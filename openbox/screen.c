@@ -258,6 +258,7 @@ void screen_set_desktop(guint num)
 {
     GList *it;
     guint old;
+    XEvent e;
      
     g_assert(num < screen_num_desktops);
 
@@ -266,6 +267,8 @@ void screen_set_desktop(guint num)
     PROP_SET32(ob_root, net_current_desktop, cardinal, num);
 
     if (old == num) return;
+
+    g_message("Moving to desktop %d", num+1);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
@@ -282,6 +285,12 @@ void screen_set_desktop(guint num)
 	if (c->frame->visible && !client_should_show(c))
             engine_frame_hide(c->frame);
     }
+
+    /* focus the last focused window on the desktop, and ignore enter events
+       from the switch so it doesnt mess with the focus */
+    XSync(ob_display, FALSE);
+    while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+    focus_fallback(TRUE);
 
     dispatch_ob(Event_Ob_Desktop, num, old);
 }

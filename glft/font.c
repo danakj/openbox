@@ -14,10 +14,6 @@ struct GHashTable *glyph_map = NULL;
 #define TRUNC(x)    ((x) >> 6)
 #define ROUND(x)    (((x)+32) & -64)
 
-#define GLFT_SHADOW "shadow"
-#define GLFT_SHADOW_OFFSET "shadowoffset"
-#define GLFT_SHADOW_ALPHA "shadowalpha"
-
 void dest_glyph_map_value(gpointer key, gpointer val, gpointer data)
 {
     struct GlftGlyph *g = val;

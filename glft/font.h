@@ -10,6 +10,10 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+#define GLFT_SHADOW "shadow"
+#define GLFT_SHADOW_OFFSET "shadowoffset"
+#define GLFT_SHADOW_ALPHA "shadowalpha"
+
 struct GlftFont {
     Display *display;
     int screen;

@@ -535,12 +535,6 @@ void OBScreen::manageWindow(Window window)
 
   Openbox::instance->bindings()->grabButtons(true, client);
 
-  if (shown) {
-    // XXX: make this optional or more intelligent
-    if (client->normal())
-      client->focus();
-  }
-
   // call the python NEWWINDOW binding
   EventData *data = new_event_data(_number, window, EventNewWindow, 0);
   Openbox::instance->bindings()->fireEvent(data);
@@ -650,7 +644,7 @@ void OBScreen::changeDesktop(long desktop)
                                      _desktop);
 
   if (old == _desktop) return;
-  
+
   OBClient::List::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->desktop() == old) {
@@ -660,9 +654,8 @@ void OBScreen::changeDesktop(long desktop)
     }
   }
 
-  // if nothing is focused, force the callbacks to fire
-//  if (!Openbox::instance->focusedClient())
-//    Openbox::instance->setFocusedClient(0);
+  // force the callbacks to fire
+  Openbox::instance->setFocusedClient(0);
 }
 
 void OBScreen::changeNumDesktops(long num)

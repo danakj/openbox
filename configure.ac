@@ -80,11 +80,17 @@ AC_CHECK_HEADER([python2.2/Python.h],
 See http://www.python.org
 ]))
 AC_CHECK_LIB([python2.2], [Py_Initialize],
-  PYTHON_LDFLAGS="-lpython2.2 -Xlinker -export-dynamic",
+  PYTHON_LDFLAGS="-lpython2.2",
+dnl -Xlinker -export-dynamic",
   AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
 See http://www.python.org
 ]))
+PYTHON_CFLAGS="-I/usr/include/python2.2 -I/usr/gwar/include/python2.2"
+AC_SUBST([PYTHON_CFLAGS])
 AC_SUBST([PYTHON_LDFLAGS])
+
+dnl Check for guile
+GUILE_FLAGS
 
 dnl Check for X headers and libraries
 AC_PATH_X

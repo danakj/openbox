@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #ifdef HAVE_CONFIG_H
 # include "../config.h"
@@ -9,7 +9,6 @@
 #include "client.hh"
 #include "screen.hh"
 #include "actions.hh"
-#include "python.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -43,7 +42,12 @@ extern "C" {
 #  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
 
-#include <python2.2/Python.h>
+//#include <guile/gh.h>
+
+#include <Python.h>
+  
+// The initializer in openbox_wrap.cc
+extern void init_openbox(void);
 
 #include "gettext.h"
 #define _(str) gettext(str)
@@ -153,10 +157,24 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
-  // initialize the python interface
+  /*
+  // make our guile interfaces exist
+  SWIG_init();
+  
+  // run the guile of d3th
+  FILE *rcpyfd = fopen("/home/natas/.openbox/user.scm", "r");
+  if (!rcpyfd) {
+    printf("failed to load guile script /home/natas/.openbox/user.scm\n");
+  } else {
+    fclose(rcpyfd);
+    gh_load("/home/natas/.openbox/user.scm");
+  }
+  */
+  
   Py_SetProgramName(argv[0]);
   Py_Initialize();
-  initopenbox(); // initialize the static 'openbox' module
+  //initopenbox(); // initialize the static 'openbox' module
+  init_openbox();
   FILE *rcpyfd = fopen("/home/natas/.openbox/user.py", "r");
   if (!rcpyfd) {
     printf("failed to load python file /home/natas/.openbox/user.py\n");
@@ -164,6 +182,7 @@ Openbox::Openbox(int argc, char **argv)
     PyRun_SimpleFile(rcpyfd, "/home/natas/.openbox/user.py");
     fclose(rcpyfd);
   }
+  
 
   _state = State_Normal; // done starting
 }

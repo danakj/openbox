@@ -27,6 +27,20 @@ namespace ob {
 
 class OBFrame;
 
+//! The MWM Hints as retrieved from the window property
+/*!
+  This structure only contains 3 elements, even though the Motif 2.0
+  structure contains 5. We only use the first 3, so that is all gets defined.
+*/
+struct MwmHints {
+  //! The number of elements in the OBClient::MwmHints struct
+  static const unsigned int elements = 3;
+  unsigned long flags;      //!< A bitmask of OBClient::MwmFlags values
+  unsigned long functions;  //!< A bitmask of OBClient::MwmFunctions values
+  unsigned long decorations;//!< A bitmask of OBClient::MwmDecorations values
+};
+
+
 //! Maintains the state of a client window.
 /*!
   OBClient maintains the state of a client window. The state consists of the
@@ -110,19 +124,6 @@ public:
   };
   //! Holds a bitmask of OBClient::Decoration values
   typedef unsigned char DecorationFlags;
-
-  //! The MWM Hints as retrieved from the window property
-  /*!
-    This structure only contains 3 elements, even though the Motif 2.0
-    structure contains 5. We only use the first 3, so that is all gets defined.
-  */
-  typedef struct MwmHints {
-    //! The number of elements in the OBClient::MwmHints struct
-    static const unsigned int elements = 3;
-    unsigned long flags;      //!< A bitmask of OBClient::MwmFlags values
-    unsigned long functions;  //!< A bitmask of OBClient::MwmFunctions values
-    unsigned long decorations;//!< A bitmask of OBClient::MwmDecorations values
-  };
 
   //! Possible actions that can be made with the _NET_WM_STATE client message
   enum StateAction { State_Remove = 0, //!< _NET_WM_STATE_REMOVE
@@ -306,6 +307,7 @@ private:
   // XXX: updateTransientFor();
 
 public:
+#ifndef SWIG
   //! Constructs a new OBClient object around a specified window id
   /*!
     @param window The window id that the OBClient class should handle
@@ -314,6 +316,7 @@ public:
   OBClient(int screen, Window window);
   //! Destroys the OBClient object
   virtual ~OBClient();
+#endif
 
   //! Returns the screen on which the clien resides
   inline int screen() const { return _screen; }

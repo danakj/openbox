@@ -13,6 +13,8 @@ extern "C" {
 # include <locale.h>
 #endif // HAVE_LOCALE_H
 
+#include <guile/gh.h>
+
 #include "gettext.h"
 }
 
@@ -22,17 +24,21 @@ using std::string;
 #include "blackbox.hh"
 #include "openbox.hh"
 
+void main_prog(int argc, char **argv) {
+  ob::Openbox openbox(argc, argv);
+  //ob::Blackbox blackbox(argc, argv, 0);
+
+  //Blackbox blackbox(argv, session_display, rc_file);
+  openbox.eventLoop();
+}
+
 int main(int argc, char **argv) {
   // initialize the locale
   setlocale(LC_ALL, "");
   bindtextdomain(PACKAGE, LOCALEDIR);
   textdomain(PACKAGE);
 
-  ob::Openbox openbox(argc, argv);
-  //ob::Blackbox blackbox(argc, argv, 0);
-
-  //Blackbox blackbox(argv, session_display, rc_file);
-  openbox.eventLoop();
-
-  return(0);
+  // start up guile
+  //gh_enter(argc, argv, main_prog);
+  main_prog(argc, argv);
 }

@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef   __openbox_hh
 #define   __openbox_hh
 
@@ -31,6 +31,17 @@ class OBScreen;
 class OBClient;
 class OBActions;
 
+//! Mouse cursors used throughout Openbox
+struct Cursors {
+  Cursor session;  //!< The default mouse cursor
+  Cursor move;     //!< For moving a window
+  Cursor ll_angle; //!< For resizing the bottom left corner of a window
+  Cursor lr_angle; //!< For resizing the bottom right corner of a window
+  Cursor ul_angle; //!< For resizing the top left corner of a window
+  Cursor ur_angle; //!< For resizing the right corner of a window
+};
+
+
 //! The main class for the Openbox window manager
 /*!
   Only a single instance of the Openbox class may be used in the application. A
@@ -58,16 +69,6 @@ public:
     State_Exiting   //!< The window manager is exiting (being destroyed)
   };
 
-  //! Mouse cursors used throughout Openbox
-  struct Cursors {
-    Cursor session;  //!< The default mouse cursor
-    Cursor move;     //!< For moving a window
-    Cursor ll_angle; //!< For resizing the bottom left corner of a window
-    Cursor lr_angle; //!< For resizing the bottom right corner of a window
-    Cursor ul_angle; //!< For resizing the top left corner of a window
-    Cursor ur_angle; //!< For resizing the right corner of a window
-  };
-  
   //! A map for looking up a specific client class from the window id
   typedef std::map<Window, OBClient *> ClientMap;
 
@@ -138,6 +139,7 @@ private:
   static void signalHandler(int signal);
 
 public:
+#ifndef SWIG
   //! Openbox constructor.
   /*!
     \param argc Number of command line arguments, as received in main()
@@ -146,6 +148,7 @@ public:
   Openbox(int argc, char **argv);
   //! Openbox destructor.
   virtual ~Openbox();
+#endif
 
   //! Returns the state of the window manager (starting, exiting, etc)
   inline RunState state() const { return _state; }
@@ -169,6 +172,7 @@ public:
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }
 
+#ifndef SWIG
   //! The main function of the Openbox class
   /*!
     This function should be called after instantiating the Openbox class.
@@ -176,6 +180,7 @@ public:
     The Openbox::shutdown method will cause this function to exit.
   */
   void eventLoop();
+#endif
 
   //! Adds an OBClient to the client list for lookups
   void addClient(Window window, OBClient *client);

@@ -94,10 +94,12 @@ private:
   void setWorkArea();
   
 public:
+#ifndef SWIG
   //! Constructs a new OBScreen object
   OBScreen(int screen, const otk::Configuration &config);
   //! Destroys the OBScreen object
   virtual ~OBScreen();
+#endif
 
   //! Returns if the screen was successfully managed
   /*!
@@ -112,6 +114,7 @@ public:
   //! Returns the style in use on the screen
   inline const otk::Style *style() const { return &_style; }
 
+  inline ClientList clients() { return _clients; }
 
   //! Adds a window's strut to the screen's list of reserved spaces
   void addStrut(otk::Strut *strut);

@@ -409,23 +409,23 @@ void Screen::changeStackingList()
   assert(size == clients.size()); // just making sure.. :)
 
   
-  // create an array of the window ids
+  // create an array of the window ids (from bottom to top, reverse order!)
   if (size > 0) {
     Window *win_it;
     
     windows = new Window[size];
     win_it = windows;
-    Client::List::const_iterator it = _stacking.begin();
-    const Client::List::const_iterator end = _stacking.end();
+    Client::List::const_reverse_iterator it = _stacking.rbegin();
+    const Client::List::const_reverse_iterator end = _stacking.rend();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
     windows = (Window*) 0;
 
   openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_client_list_stacking,
-                                     otk::Property::Atom_Window,
-                                     windows, size);
+                           otk::Property::net_client_list_stacking,
+                           otk::Property::Atom_Window,
+                           windows, size);
 
   if (size)
     delete [] windows;

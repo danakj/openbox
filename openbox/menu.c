@@ -164,17 +164,17 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     self->title = createWindow(self->frame, CWEventMask, &attrib);
     self->items = createWindow(self->frame, 0, &attrib);
 
-    XSetWindowBorderWidth(ob_display, self->frame, theme_bwidth);
-    XSetWindowBackground(ob_display, self->frame, theme_b_color->pixel);
-    XSetWindowBorderWidth(ob_display, self->title, theme_bwidth);
-    XSetWindowBorder(ob_display, self->frame, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->title, theme_b_color->pixel);
+    XSetWindowBorderWidth(ob_display, self->frame, ob_rr_theme->bwidth);
+    XSetWindowBackground(ob_display, self->frame, ob_rr_theme->b_color->pixel);
+    XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);
+    XSetWindowBorder(ob_display, self->frame, ob_rr_theme->b_color->pixel);
+    XSetWindowBorder(ob_display, self->title, ob_rr_theme->b_color->pixel);
 
     XMapWindow(ob_display, self->title);
     XMapWindow(ob_display, self->items);
 
-    self->a_title = RrAppearanceCopy(theme_a_menu_title);
-    self->a_items = RrAppearanceCopy(theme_a_menu);
+    self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
+    self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
     g_hash_table_insert(window_map, &self->frame, self);
     g_hash_table_insert(window_map, &self->title, self);
@@ -234,9 +234,9 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
     attrib.event_mask = ENTRY_EVENTMASK;
     entry->item = createWindow(menu->items, CWEventMask, &attrib);
     XMapWindow(ob_display, entry->item);
-    entry->a_item = RrAppearanceCopy(theme_a_menu_item);
-    entry->a_disabled = RrAppearanceCopy(theme_a_menu_disabled);
-    entry->a_hilite = RrAppearanceCopy(theme_a_menu_hilite);
+    entry->a_item = RrAppearanceCopy(ob_rr_theme->a_menu_item);
+    entry->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
+    entry->a_hilite = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
 
     menu->invalid = TRUE;
 
@@ -363,14 +363,14 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* TODO: I don't understand why these bevels should be here.
 	       Something must be wrong in the width calculation */
 	    x = self->parent->location.x + self->parent->size.width + 
-		theme_bevel;
+		ob_rr_theme->bevel;
 
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
 
 	    if (self->submenu->size.width + x > screen_physical_size.width)
 		x = self->parent->location.x - self->submenu->size.width - 
-		    theme_bevel;
+		    ob_rr_theme->bevel;
 	    
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,

@@ -6,87 +6,117 @@
 #include "font.h"
 #include "mask.h"
 
-extern gint theme_bevel;
-extern gint theme_handle_height;
-extern gint theme_bwidth;
-extern gint theme_cbwidth;
+typedef struct _RrTheme RrTheme;
 
-#define theme_label_height (theme_winfont_height)
-#define theme_title_height (theme_label_height + theme_bevel * 2)
-#define theme_button_size  (theme_label_height - 2)
-#define theme_grip_width   (theme_button_size * 2)
+struct _RrTheme {
+    gchar *name;
 
-extern color_rgb *theme_b_color;
-extern color_rgb *theme_cb_focused_color;
-extern color_rgb *theme_cb_unfocused_color;
-extern color_rgb *theme_title_focused_color;
-extern color_rgb *theme_title_unfocused_color;
-extern color_rgb *theme_titlebut_focused_color;
-extern color_rgb *theme_titlebut_unfocused_color;
+    const RrInstance *inst;
 
-extern gint theme_winfont_height;
-extern RrFont *theme_winfont;
-extern gchar *theme_title_layout;
+    /* style settings - geometry */
+    gint bevel;
+    gint handle_height;
+    gint bwidth;
+    gint cbwidth;
+    gint label_height;
+    gint title_height;
+    gint button_size;
+    gint grip_width;
 
-extern RrPixmapMask *theme_max_set_mask;
-extern RrPixmapMask *theme_max_unset_mask;
-extern RrPixmapMask *theme_iconify_mask;
-extern RrPixmapMask *theme_desk_set_mask;
-extern RrPixmapMask *theme_desk_unset_mask;
-extern RrPixmapMask *theme_shade_set_mask;
-extern RrPixmapMask *theme_shade_unset_mask;
-extern RrPixmapMask *theme_close_mask;
+    /* style settings - colors */
+    color_rgb *b_color;
+    color_rgb *cb_focused_color;
+    color_rgb *cb_unfocused_color;
+    color_rgb *title_focused_color;
+    color_rgb *title_unfocused_color;
+    color_rgb *titlebut_focused_color;
+    color_rgb *titlebut_unfocused_color;
+    color_rgb *menu_title_color;
+    color_rgb *menu_color;
+    color_rgb *menu_disabled_color;
+    color_rgb *menu_hilite_color;
 
-extern RrAppearance *theme_a_focused_unpressed_max;
-extern RrAppearance *theme_a_focused_pressed_max;
-extern RrAppearance *theme_a_focused_pressed_set_max;
-extern RrAppearance *theme_a_unfocused_unpressed_max;
-extern RrAppearance *theme_a_unfocused_pressed_max;
-extern RrAppearance *theme_a_unfocused_pressed_set_max;
-extern RrAppearance *theme_a_focused_unpressed_close;
-extern RrAppearance *theme_a_focused_pressed_close;
-extern RrAppearance *theme_a_unfocused_unpressed_close;
-extern RrAppearance *theme_a_unfocused_pressed_close;
-extern RrAppearance *theme_a_focused_unpressed_desk;
-extern RrAppearance *theme_a_focused_pressed_desk;
-extern RrAppearance *theme_a_focused_pressed_set_desk;
-extern RrAppearance *theme_a_unfocused_unpressed_desk;
-extern RrAppearance *theme_a_unfocused_pressed_desk;
-extern RrAppearance *theme_a_unfocused_pressed_set_desk;
-extern RrAppearance *theme_a_focused_unpressed_shade;
-extern RrAppearance *theme_a_focused_pressed_shade;
-extern RrAppearance *theme_a_focused_pressed_set_shade;
-extern RrAppearance *theme_a_unfocused_unpressed_shade;
-extern RrAppearance *theme_a_unfocused_pressed_shade;
-extern RrAppearance *theme_a_unfocused_pressed_set_shade;
-extern RrAppearance *theme_a_focused_unpressed_iconify;
-extern RrAppearance *theme_a_focused_pressed_iconify;
-extern RrAppearance *theme_a_unfocused_unpressed_iconify;
-extern RrAppearance *theme_a_unfocused_pressed_iconify;
-extern RrAppearance *theme_a_focused_grip;
-extern RrAppearance *theme_a_unfocused_grip;
-extern RrAppearance *theme_a_focused_title;
-extern RrAppearance *theme_a_unfocused_title;
-extern RrAppearance *theme_a_focused_label;
-extern RrAppearance *theme_a_unfocused_label;
-extern RrAppearance *theme_a_icon;
-extern RrAppearance *theme_a_focused_handle;
-extern RrAppearance *theme_a_unfocused_handle;
-extern RrAppearance *theme_a_menu_title;
-extern RrAppearance *theme_a_menu;
-extern RrAppearance *theme_a_menu_item;
-extern RrAppearance *theme_a_menu_disabled;
-extern RrAppearance *theme_a_menu_hilite;
+    /* style settings - fonts */
+    gint winfont_height;
+    RrFont *winfont;
+    gboolean winfont_shadow;
+    gint winfont_shadow_offset;
+    gint winfont_shadow_tint;
+    gint mtitlefont_height;
+    RrFont *mtitlefont;
+    gboolean mtitlefont_shadow;
+    gint mtitlefont_shadow_offset;
+    gint mtitlefont_shadow_tint;
+    gint mfont_height;
+    RrFont *mfont;
+    gboolean mfont_shadow;
+    gint mfont_shadow_offset;
+    gint mfont_shadow_tint;
 
-extern RrAppearance *theme_app_hilite_bg;
-extern RrAppearance *theme_app_unhilite_bg;
-extern RrAppearance *theme_app_hilite_label;
-extern RrAppearance *theme_app_unhilite_label;
-extern RrAppearance *theme_app_icon;
+    /* style settings - title layout */
+    gchar *title_layout;
 
-void theme_startup(const RrInstance *inst);
-void theme_shutdown();
+    /* style settings - masks */
+    RrPixmapMask *max_set_mask;
+    RrPixmapMask *max_unset_mask;
+    RrPixmapMask *iconify_mask;
+    RrPixmapMask *desk_set_mask;
+    RrPixmapMask *desk_unset_mask;
+    RrPixmapMask *shade_set_mask;
+    RrPixmapMask *shade_unset_mask;
+    RrPixmapMask *close_mask;
 
-gchar *theme_load(gchar *theme);
+    /* global appearances */
+    RrAppearance *a_focused_unpressed_max;
+    RrAppearance *a_focused_pressed_max;
+    RrAppearance *a_focused_pressed_set_max;
+    RrAppearance *a_unfocused_unpressed_max;
+    RrAppearance *a_unfocused_pressed_max;
+    RrAppearance *a_unfocused_pressed_set_max;
+    RrAppearance *a_focused_unpressed_close;
+    RrAppearance *a_focused_pressed_close;
+    RrAppearance *a_unfocused_unpressed_close;
+    RrAppearance *a_unfocused_pressed_close;
+    RrAppearance *a_focused_unpressed_desk;
+    RrAppearance *a_focused_pressed_desk;
+    RrAppearance *a_focused_pressed_set_desk;
+    RrAppearance *a_unfocused_unpressed_desk;
+    RrAppearance *a_unfocused_pressed_desk;
+    RrAppearance *a_unfocused_pressed_set_desk;
+    RrAppearance *a_focused_unpressed_shade;
+    RrAppearance *a_focused_pressed_shade;
+    RrAppearance *a_focused_pressed_set_shade;
+    RrAppearance *a_unfocused_unpressed_shade;
+    RrAppearance *a_unfocused_pressed_shade;
+    RrAppearance *a_unfocused_pressed_set_shade;
+    RrAppearance *a_focused_unpressed_iconify;
+    RrAppearance *a_focused_pressed_iconify;
+    RrAppearance *a_unfocused_unpressed_iconify;
+    RrAppearance *a_unfocused_pressed_iconify;
+    RrAppearance *a_focused_grip;
+    RrAppearance *a_unfocused_grip;
+    RrAppearance *a_focused_title;
+    RrAppearance *a_unfocused_title;
+    RrAppearance *a_focused_label;
+    RrAppearance *a_unfocused_label;
+    /* always parentrelative, so no focused/unfocused */
+    RrAppearance *a_icon;
+    RrAppearance *a_focused_handle;
+    RrAppearance *a_unfocused_handle;
+    RrAppearance *a_menu_title;
+    RrAppearance *a_menu;
+    RrAppearance *a_menu_item;
+    RrAppearance *a_menu_disabled;
+    RrAppearance *a_menu_hilite;
+
+    RrAppearance *app_hilite_bg;
+    RrAppearance *app_unhilite_bg;
+    RrAppearance *app_hilite_label;
+    RrAppearance *app_unhilite_label;
+    RrAppearance *app_icon;
+};
+
+RrTheme *RrThemeNew(const RrInstance *inst, gchar *theme);
+void RrThemeFree(RrTheme *theme);
 
 #endif

@@ -6,12 +6,13 @@
 #include "kernel/geom.h"
 
 struct _RrFont {
+    const RrInstance *inst;
     XftFont *xftfont;
     gint elipses_length;
 };
 
 void font_startup(void);
-RrFont *font_open(char *fontstring);
+RrFont *font_open(const RrInstance *inst, char *fontstring);
 void font_close(RrFont *f);
 int font_measure_string(RrFont *f, char *str, int shadow, int offset);
 int font_height(RrFont *f, int shadow, int offset);

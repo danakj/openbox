@@ -20,7 +20,6 @@
 #include "gettext.h"
 #include "parser/parse.h"
 #include "render/render.h"
-#include "render/font.h"
 #include "render/theme.h"
 
 #ifdef HAVE_FCNTL_H
@@ -46,6 +45,7 @@
 #include <X11/cursorfont.h>
 
 RrInstance *ob_rr_inst = NULL;
+RrTheme    *ob_rr_theme = NULL;
 Display    *ob_display = NULL;
 int         ob_screen;
 Window      ob_root;
@@ -66,7 +66,6 @@ int main(int argc, char **argv)
     struct sigaction action;
     sigset_t sigset;
     char *path;
-    char *theme;
     xmlDocPtr doc;
     xmlNodePtr node;
 
@@ -178,7 +177,6 @@ int main(int argc, char **argv)
            in this group */
 	timer_startup();
 	font_startup();
-        theme_startup(ob_rr_inst);
 	event_startup();
         grab_startup();
         plugin_startup();
@@ -194,9 +192,11 @@ int main(int argc, char **argv)
         parse_shutdown();
 
         /* load the theme specified in the rc file */
-        theme = theme_load(config_theme);
-        g_free(theme);
-        if (!theme) return 1;
+        ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
+        if (ob_rr_theme == NULL) {
+            g_critical("Unable to load a theme.");
+            exit(1);
+        }
 
         window_startup();
         menu_startup();
@@ -234,13 +234,13 @@ int main(int argc, char **argv)
         window_shutdown();
         grab_shutdown();
 	event_shutdown();
-        theme_shutdown();
 	timer_shutdown();
         config_shutdown();
     }
 
     dispatch_shutdown();
 
+    RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
     XCloseDisplay(ob_display);
 

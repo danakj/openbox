@@ -1,6 +1,5 @@
 #include "font.h"
 #include "theme.h"
-#include "kernel/openbox.h"
 #include "kernel/geom.h"
 #include "kernel/gettext.h"
 #define _(str) gettext(str)
@@ -35,18 +34,19 @@ static void measure_height(RrFont *f)
     XGlyphInfo info;
 
     /* measure an elipses */
-    XftTextExtentsUtf8(ob_display, f->xftfont,
+    XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
                        (FcChar8*)ELIPSES, strlen(ELIPSES), &info);
     f->elipses_length = (signed) info.xOff;
 }
 
-RrFont *font_open(char *fontstring)
+RrFont *font_open(const RrInstance *inst, char *fontstring)
 {
     RrFont *out;
     XftFont *xf;
     
-    if ((xf = XftFontOpenName(ob_display, ob_screen, fontstring))) {
+    if ((xf = XftFontOpenName(RrDisplay(inst), RrScreen(inst), fontstring))) {
         out = g_new(RrFont, 1);
+        out->inst = inst;
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -54,8 +54,9 @@ RrFont *font_open(char *fontstring)
     g_warning(_("Unable to load font: %s\n"), fontstring);
     g_warning(_("Trying fallback font: %s\n"), "sans");
 
-    if ((xf = XftFontOpenName(ob_display, ob_screen, "sans"))) {
+    if ((xf = XftFontOpenName(RrDisplay(inst), RrScreen(inst), "sans"))) {
         out = g_new(RrFont, 1);
+        out->inst = inst;
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -69,7 +70,7 @@ RrFont *font_open(char *fontstring)
 void font_close(RrFont *f)
 {
     if (f) {
-        XftFontClose(ob_display, f->xftfont);
+        XftFontClose(RrDisplay(f->inst), f->xftfont);
         g_free(f);
     }
 }
@@ -79,7 +80,7 @@ void font_measure_full(RrFont *f, char *str, int shadow, int offset,
 {
     XGlyphInfo info;
 
-    XftTextExtentsUtf8(ob_display, f->xftfont,
+    XftTextExtentsUtf8(RrDisplay(f->inst), f->xftfont,
                        (FcChar8*)str, strlen(str), &info);
 
     *x = (signed) info.xOff + (shadow ? ABS(offset) : 0);
@@ -115,7 +116,7 @@ void font_draw(XftDraw *d, RrTextureText *t, Rect *area)
     /* center vertically */
     y = area->y +
         (area->height - font_height(t->font, t->shadow, t->offset)) / 2;
-    w = area->width - theme_bevel * 2;
+    w = area->width;
     h = area->height;
 
     text = g_string_new(t->string);
@@ -140,10 +141,10 @@ void font_draw(XftDraw *d, RrTextureText *t, Rect *area)
 
     switch (t->justify) {
     case RR_JUSTIFY_LEFT:
-        x = area->x + theme_bevel;
+        x = area->x;
         break;
     case RR_JUSTIFY_RIGHT:
-        x = area->x + (w - mw) - theme_bevel;
+        x = area->x + (w - mw);
         break;
     case RR_JUSTIFY_CENTER:
         x = area->x + (w - mw) / 2;
@@ -158,13 +159,15 @@ void font_draw(XftDraw *d, RrTextureText *t, Rect *area)
             c.color.green = 0;
             c.color.blue = 0;
             c.color.alpha = 0xffff * t->tint / 100; /* transparent shadow */
-            c.pixel = BlackPixel(ob_display, ob_screen);
+            c.pixel = BlackPixel(RrDisplay(t->font->inst),
+                                 RrScreen(t->font->inst));
         } else {
             c.color.red = 0xffff * -t->tint / 100;
             c.color.green = 0xffff * -t->tint / 100;
             c.color.blue = 0xffff * -t->tint / 100;
             c.color.alpha = 0xffff * -t->tint / 100; /* transparent shadow */
-            c.pixel = WhitePixel(ob_display, ob_screen);
+            c.pixel = WhitePixel(RrDisplay(t->font->inst),
+                                 RrScreen(t->font->inst));
         }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,

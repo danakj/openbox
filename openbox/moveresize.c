@@ -61,7 +61,7 @@ void moveresize_startup()
 
     /* a GC to invert stuff */
     gcv.function = GXxor;
-    gcv.line_width = theme_bwidth;
+    gcv.line_width = ob_rr_theme->bwidth;
     gcv.foreground = (WhitePixel(ob_display, ob_screen) ^
                       BlackPixel(ob_display, ob_screen));
     opaque_gc = XCreateGC(ob_display, opaque_window.win,

@@ -48,13 +48,13 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     g_assert(client);
     
     newy = MAX(client->frame->area.y + client->frame->size.top, y);
-    newy -= theme_bwidth;
+    newy -= ob_rr_theme->bwidth;
     
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width -
-                  theme_bwidth * 2), 
+                  ob_rr_theme->bwidth * 2), 
 	      MIN(newy, screen_physical_size.height - self->size.height -
-                  theme_bwidth * 2));
+                  ob_rr_theme->bwidth * 2));
     XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
 
     if (!self->shown) {

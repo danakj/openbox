@@ -30,8 +30,8 @@ void menu_render_full(Menu *self) {
     if (self->label) {
 	self->a_title->texture[0].data.text.string = self->label;
 	RrMinsize(self->a_title, &self->title_min_w, &self->title_h);
-	self->title_min_w += theme_bevel * 2;
-	self->title_h += theme_bevel * 2;
+	self->title_min_w += ob_rr_theme->bevel * 2;
+	self->title_h += ob_rr_theme->bevel * 2;
 	self->size.width = MAX(self->size.width, self->title_min_w);
     }
 
@@ -53,22 +53,23 @@ void menu_render_full(Menu *self) {
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 
-        e->min_w += theme_bevel * 2;
+        e->min_w += ob_rr_theme->bevel * 2;
         ++nitems;
     }
-    self->bullet_w = self->item_h + theme_bevel;
-    self->size.width += 2 * self->bullet_w + 2 * theme_bevel;
-    self->item_h += theme_bevel * 2;
+    self->bullet_w = self->item_h + ob_rr_theme->bevel;
+    self->size.width += 2 * self->bullet_w + 2 * ob_rr_theme->bevel;
+    self->item_h += ob_rr_theme->bevel * 2;
     items_h = self->item_h * MAX(nitems, 1);
 
     XResizeWindow(ob_display, self->frame, self->size.width,
 		  MAX(self->title_h + items_h, 1));
     if (self->label)
-	XMoveResizeWindow(ob_display, self->title, -theme_bwidth,
-			  -theme_bwidth, self->size.width, self->title_h);
+	XMoveResizeWindow(ob_display, self->title, -ob_rr_theme->bwidth,
+			  -ob_rr_theme->bwidth,
+                          self->size.width, self->title_h);
 
     XMoveResizeWindow(ob_display, self->items, 0, 
-		      self->title_h + theme_bwidth, self->size.width, 
+		      self->title_h + ob_rr_theme->bwidth, self->size.width, 
 		      items_h);
 
     if (self->label)

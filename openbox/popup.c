@@ -74,16 +74,16 @@ void popup_size_to_string(Popup *self, char *text)
     int iconw;
 
     if (!self->a_text)
-        self->a_text = RrAppearanceCopy(theme_app_hilite_label);
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
 
     self->a_text->texture[0].data.text.string = text;
     RrMinsize(self->a_text, &textw, &texth);
-    textw += theme_bevel * 2;
-    texth += theme_bevel * 2;
+    textw += ob_rr_theme->bevel * 2;
+    texth += ob_rr_theme->bevel * 2;
 
-    self->h = texth + theme_bevel * 2;
+    self->h = texth + ob_rr_theme->bevel * 2;
     iconw = (self->hasicon ? texth : 0);
-    self->w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2);
+    self->w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
 }
 
 void popup_show(Popup *self, char *text, Icon *icon)
@@ -101,8 +101,8 @@ void popup_show(Popup *self, char *text, Icon *icon)
                                  InputOutput, RrVisual(ob_rr_inst),
                                  CWOverrideRedirect, &attrib);
 
-        XSetWindowBorderWidth(ob_display, self->bg, theme_bwidth);
-        XSetWindowBorder(ob_display, self->bg, theme_b_color->pixel);
+        XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
+        XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);
 
         self->text = XCreateWindow(ob_display, self->bg,
                                    0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
@@ -116,12 +116,12 @@ void popup_show(Popup *self, char *text, Icon *icon)
         XMapWindow(ob_display, self->text);
         XMapWindow(ob_display, self->icon);
 
-        self->a_bg = RrAppearanceCopy(theme_app_hilite_bg);
+        self->a_bg = RrAppearanceCopy(ob_rr_theme->app_hilite_bg);
         if (self->hasicon)
-            self->a_icon = RrAppearanceCopy(theme_app_icon);
+            self->a_icon = RrAppearanceCopy(ob_rr_theme->app_icon);
     }
     if (!self->a_text)
-        self->a_text = RrAppearanceCopy(theme_app_hilite_label);
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
@@ -137,22 +137,22 @@ void popup_show(Popup *self, char *text, Icon *icon)
 
     /* measure the shit out */
     RrMinsize(self->a_text, &textw, &texth);
-    textw += theme_bevel * 2;
-    texth += theme_bevel * 2;
+    textw += ob_rr_theme->bevel * 2;
+    texth += ob_rr_theme->bevel * 2;
 
     /* set the sizes up and reget the text sizes from the calculated
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (theme_bevel * 2);
+        texth = h - (ob_rr_theme->bevel * 2);
     } else
-        h = texth + theme_bevel * 2;
+        h = texth + ob_rr_theme->bevel * 2;
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (iconw + theme_bevel * (self->hasicon ? 3 : 2));
+        textw = w - (iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2));
     } else
-        w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2);
+        w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -194,19 +194,20 @@ void popup_show(Popup *self, char *text, Icon *icon)
 
     self->a_text->surface.parent = self->a_bg;
     self->a_text->surface.parentx = iconw +
-        theme_bevel * (self->hasicon ? 2 : 1);
-    self->a_text->surface.parenty = theme_bevel;
+        ob_rr_theme->bevel * (self->hasicon ? 2 : 1);
+    self->a_text->surface.parenty = ob_rr_theme->bevel;
     XMoveResizeWindow(ob_display, self->text,
-                      iconw + theme_bevel * (self->hasicon ? 2 : 1),
-                      theme_bevel, textw, texth);
+                      iconw + ob_rr_theme->bevel * (self->hasicon ? 2 : 1),
+                      ob_rr_theme->bevel, textw, texth);
 
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         self->a_icon->surface.parent = self->a_bg;
-        self->a_icon->surface.parentx = theme_bevel;
-        self->a_icon->surface.parenty = theme_bevel;
+        self->a_icon->surface.parentx = ob_rr_theme->bevel;
+        self->a_icon->surface.parenty = ob_rr_theme->bevel;
         XMoveResizeWindow(ob_display, self->icon,
-                          theme_bevel, theme_bevel, iconw, texth);
+                          ob_rr_theme->bevel, ob_rr_theme->bevel,
+                          iconw, texth);
     }
 
     RrPaint(self->a_bg, self->bg, w, h);

@@ -2,6 +2,7 @@
 #define __openbox_h
 
 #include "render/render.h"
+#include "render/theme.h"
 
 #ifdef USE_LIBSN
 #  define SN_API_NOT_YET_FROZEN
@@ -12,6 +13,7 @@
 #include <X11/Xlib.h>
 
 extern RrInstance *ob_rr_inst;
+extern RrTheme    *ob_rr_theme;
 
 /*! The X display */
 extern Display *ob_display; 

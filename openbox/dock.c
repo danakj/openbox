@@ -32,9 +32,9 @@ void dock_startup()
                                 RrVisual(ob_rr_inst),
                                 CWOverrideRedirect | CWEventMask,
                                 &attrib);
-    dock->a_frame = RrAppearanceCopy(theme_a_unfocused_title);
-    XSetWindowBorder(ob_display, dock->frame, theme_b_color->pixel);
-    XSetWindowBorderWidth(ob_display, dock->frame, theme_bwidth);
+    dock->a_frame = RrAppearanceCopy(ob_rr_theme->a_unfocused_title);
+    XSetWindowBorder(ob_display, dock->frame, ob_rr_theme->b_color->pixel);
+    XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->bwidth);
 
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
@@ -182,8 +182,8 @@ void dock_configure()
     }
 
     /* used for calculating offsets */
-    dock->w += theme_bwidth * 2;
-    dock->h += theme_bwidth * 2;
+    dock->w += ob_rr_theme->bwidth * 2;
+    dock->h += ob_rr_theme->bwidth * 2;
 
     /* calculate position */
     switch (config_dock_pos) {
@@ -265,39 +265,39 @@ void dock_configure()
             break;
         case DockPos_TopLeft:
             if (config_dock_horz)
-                dock->y -= dock->h - theme_bwidth;
+                dock->y -= dock->h - ob_rr_theme->bwidth;
             else
-                dock->x -= dock->w - theme_bwidth;
+                dock->x -= dock->w - ob_rr_theme->bwidth;
             break;
         case DockPos_Top:
-            dock->y -= dock->h - theme_bwidth;
+            dock->y -= dock->h - ob_rr_theme->bwidth;
             break;
         case DockPos_TopRight:
             if (config_dock_horz)
-                dock->y -= dock->h - theme_bwidth;
+                dock->y -= dock->h - ob_rr_theme->bwidth;
             else
-                dock->x += dock->w - theme_bwidth;
+                dock->x += dock->w - ob_rr_theme->bwidth;
             break;
         case DockPos_Left:
-            dock->x -= dock->w - theme_bwidth;
+            dock->x -= dock->w - ob_rr_theme->bwidth;
             break;
         case DockPos_Right:
-            dock->x += dock->w - theme_bwidth;
+            dock->x += dock->w - ob_rr_theme->bwidth;
             break;
         case DockPos_BottomLeft:
             if (config_dock_horz)
-                dock->y += dock->h - theme_bwidth;
+                dock->y += dock->h - ob_rr_theme->bwidth;
             else
-                dock->x -= dock->w - theme_bwidth;
+                dock->x -= dock->w - ob_rr_theme->bwidth;
             break;
         case DockPos_Bottom:
-            dock->y += dock->h - theme_bwidth;
+            dock->y += dock->h - ob_rr_theme->bwidth;
             break;
         case DockPos_BottomRight:
             if (config_dock_horz)
-                dock->y += dock->h - theme_bwidth;
+                dock->y += dock->h - ob_rr_theme->bwidth;
             else
-                dock->x += dock->w - theme_bwidth;
+                dock->x += dock->w - ob_rr_theme->bwidth;
             break;
         }    
     }
@@ -346,8 +346,8 @@ void dock_configure()
     }
 
     /* not used for actually sizing shit */
-    dock->w -= theme_bwidth * 2;
-    dock->h -= theme_bwidth * 2;
+    dock->w -= ob_rr_theme->bwidth * 2;
+    dock->h -= ob_rr_theme->bwidth * 2;
 
     if (dock->w > 0 && dock->h > 0) {
         XMoveResizeWindow(ob_display, dock->frame,
@@ -359,8 +359,8 @@ void dock_configure()
         XUnmapWindow(ob_display, dock->frame);
 
     /* but they are useful outside of this function! */
-    dock->w += theme_bwidth * 2;
-    dock->h += theme_bwidth * 2;
+    dock->w += ob_rr_theme->bwidth * 2;
+    dock->h += ob_rr_theme->bwidth * 2;
 
     screen_update_struts();
 }

@@ -62,12 +62,12 @@ Frame *frame_new()
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
 
-    self->framedecors = 3;
+    self->framedecors = 5;
     self->framedecor = g_new(FrameDecor, self->framedecors);
     fd = &self->framedecor[0];
     fd->obwin.type = Window_Decoration;
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
-    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
+    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &sec, &pri);
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Top;
@@ -100,11 +100,40 @@ Frame *frame_new()
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_BottomLeft;
     RECT_SET(fd->area, 0, 0, 30, 30);
-    fd->type = Decor_Titlebar;
-    fd->context = Context_Titlebar;
+    fd->type = Decor_BottomLeft;
+    fd->context = Context_BLCorner;
     fd->sizetypex = Decor_Absolute;
     fd->sizetypey = Decor_Absolute;
     fd->frame = self;
+
+    fd = &self->framedecor[3];
+    fd->obwin.type = Window_Decoration;
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
+    fd->window = RrSurfaceWindow(fd->surface);
+    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
+    fd->anchor = Decor_BottomRight;
+    RECT_SET(fd->area, 0, 0, 30, 30);
+    fd->type = Decor_BottomRight;
+    fd->context = Context_BRCorner;
+    fd->sizetypex = Decor_Absolute;
+    fd->sizetypey = Decor_Absolute;
+    fd->frame = self;
+
+    fd = &self->framedecor[4];
+    fd->obwin.type = Window_Decoration;
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &pri, &sec);
+    fd->window = RrSurfaceWindow(fd->surface);
+    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
+    fd->anchor = Decor_Bottom;
+    RECT_SET(fd->area, 0, 20, 100, 10);
+    fd->type = Decor_Titlebar;
+    fd->context = Context_Titlebar;
+    fd->sizetypex = Decor_Relative;
+    fd->sizetypey = Decor_Absolute;
+    fd->frame = self;
+
 
     self->focused = FALSE;
 
@@ -643,7 +672,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     case Decor_BottomLeft:
                     x = self->size.left - area.x - area.width;
                     y = self->size.top + cr->height
-                      - area.y - area.height;
+                      - area.y;
                     dec->xoff = x;
                     dec->yoff = y;
                     RrSurfaceSetArea(dec->surface, x, y,
@@ -655,7 +684,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     x = cr->width/2 + self->size.left - area.x
                       - area.width/2;
                     y = self->size.top + cr->height
-                      - area.y - area.height;
+                      + area.y;
                     dec->xoff = x;
                     dec->yoff = y;
                     RrSurfaceSetArea(dec->surface, x, y,
@@ -665,7 +694,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
 
                     case Decor_BottomRight:
                     x = self->size.left + cr->width + area.x;
-                    y = self->size.top + cr->height - area.y - area.height;
+                    y = self->size.top + cr->height - area.y;
                     dec->xoff = x;
                     dec->yoff = y;
                     RrSurfaceSetArea(dec->surface, x, y,

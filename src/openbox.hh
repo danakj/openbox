@@ -6,6 +6,11 @@
   @brief The main class for the Openbox window manager
 */
 
+/*
+  cuz girls look soooo goood.. on the end of my DICK
+  -- xOr
+*/
+
 extern "C" {
 #include <X11/Xlib.h>
 }

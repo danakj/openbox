@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
@@ -28,7 +27,7 @@ void gradient_render(Surface *sf, int w, int h)
     gradient_crossdiagonal(sf, w, h);
     break;
   default:
-    printf("unhandled gradient\n");
+    g_message("unhandled gradient\n");
   }
   
   if (sf->data.planar.relief == Flat && sf->data.planar.border) {

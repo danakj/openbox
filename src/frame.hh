@@ -33,9 +33,7 @@ class OBFrame : public otk::OtkWidget, public OBWidget {
 public:
 
   //! The event mask to grab on frame windows
-  static const long event_mask = EnterWindowMask | LeaveWindowMask |
-                                 ButtonPressMask | ButtonReleaseMask |
-                                 ButtonMotionMask;
+  static const long event_mask = EnterWindowMask | LeaveWindowMask;
 
 private:
   OBClient *_client;

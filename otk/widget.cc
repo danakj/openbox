@@ -34,7 +34,8 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
 }
 
 OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
-                     Direction direction, Cursor cursor, int bevel_width)
+                     Direction direction, Cursor cursor, int bevel_width,
+                     unsigned long create_mask)
   : OtkEventHandler(),
     _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
@@ -47,7 +48,7 @@ OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
 {
   assert(event_dispatcher);
   assert(style);
-  create();
+  create(create_mask);
   _event_dispatcher->registerHandler(_window, this);
   setStyle(_style); // let the widget initialize stuff
 }
@@ -67,7 +68,7 @@ OtkWidget::~OtkWidget()
   XDestroyWindow(otk::OBDisplay::display, _window);
 }
 
-void OtkWidget::create(void)
+void OtkWidget::create(unsigned long mask)
 {
   const ScreenInfo *scr_info = otk::OBDisplay::screenInfo(_screen);
   Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
@@ -75,12 +76,15 @@ void OtkWidget::create(void)
   _rect.setRect(0, 0, 1, 1); // just some initial values
 
   XSetWindowAttributes attrib_create;
-  unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask;
+  unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask |
+                              mask;
 
   attrib_create.background_pixmap = None;
   attrib_create.colormap = scr_info->colormap();
+  attrib_create.override_redirect = True; // not used by default
   attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
     ButtonMotionMask | ExposureMask | StructureNotifyMask;
+
 
   if (_cursor) {
     create_mask |= CWCursor;

@@ -28,7 +28,7 @@ public:
   OtkWidget(otk::OtkWidget *parent, Direction = Horizontal);
   OtkWidget(otk::OtkEventDispatcher *event_dispatcher, otk::Style *style,
             Direction direction = Horizontal, Cursor cursor = 0,
-            int bevel_width = 1);
+            int bevel_width = 1, unsigned long create_mask = 0);
 
   virtual ~OtkWidget();
 
@@ -126,7 +126,7 @@ protected:
   bool _focused;
 
   virtual void adjust(void);
-  virtual void create(void);
+  virtual void create(unsigned long mask = 0);
   virtual void adjustHorz(void);
   virtual void adjustVert(void);
   virtual void internalResize(int width, int height);

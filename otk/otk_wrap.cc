@@ -1862,20 +1862,26 @@ static PyObject *_wrap_new_OtkWidget__SWIG_1(PyObject *self, PyObject *args) {
     int arg3 = (int) otk::OtkWidget::Horizontal ;
     Cursor arg4 = (Cursor) 0 ;
     int arg5 = (int) 1 ;
+    unsigned long arg6 = (unsigned long) 0 ;
     otk::OtkWidget *result;
     Cursor *argp4 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj3  = 0 ;
+    PyObject * obj5  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO|iOi:new_OtkWidget",&obj0,&obj1,&arg3,&obj3,&arg5)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO|iOiO:new_OtkWidget",&obj0,&obj1,&arg3,&obj3,&arg5,&obj5)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OtkEventDispatcher,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (obj3) {
         if ((SWIG_ConvertPtr(obj3,(void **) &argp4, SWIGTYPE_p_Cursor,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
         arg4 = *argp4; 
     }
-    result = (otk::OtkWidget *)new otk::OtkWidget(arg1,arg2,(otk::OtkWidget::Direction )arg3,arg4,arg5);
+    if (obj5) {
+        arg6 = (unsigned long) PyInt_AsLong(obj5);
+        if (PyErr_Occurred()) SWIG_fail;
+    }
+    result = (otk::OtkWidget *)new otk::OtkWidget(arg1,arg2,(otk::OtkWidget::Direction )arg3,arg4,arg5,arg6);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__OtkWidget, 1);
     return resultobj;
@@ -1886,11 +1892,11 @@ static PyObject *_wrap_new_OtkWidget__SWIG_1(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_new_OtkWidget(PyObject *self, PyObject *args) {
     int argc;
-    PyObject *argv[6];
+    PyObject *argv[7];
     int ii;
     
     argc = PyObject_Length(args);
-    for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+    for (ii = 0; (ii < argc) && (ii < 6); ii++) {
         argv[ii] = PyTuple_GetItem(args,ii);
     }
     if ((argc >= 1) && (argc <= 2)) {
@@ -1916,7 +1922,7 @@ static PyObject *_wrap_new_OtkWidget(PyObject *self, PyObject *args) {
             }
         }
     }
-    if ((argc >= 2) && (argc <= 5)) {
+    if ((argc >= 2) && (argc <= 6)) {
         int _v;
         {
             void *ptr;
@@ -1965,7 +1971,15 @@ static PyObject *_wrap_new_OtkWidget(PyObject *self, PyObject *args) {
                             _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
                         }
                         if (_v) {
-                            return _wrap_new_OtkWidget__SWIG_1(self,args);
+                            if (argc <= 5) {
+                                return _wrap_new_OtkWidget__SWIG_1(self,args);
+                            }
+                            {
+                                _v = (PyInt_Check(argv[5]) || PyLong_Check(argv[5])) ? 1 : 0;
+                            }
+                            if (_v) {
+                                return _wrap_new_OtkWidget__SWIG_1(self,args);
+                            }
                         }
                     }
                 }

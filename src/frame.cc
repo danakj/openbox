@@ -24,7 +24,8 @@ namespace ob {
 const long OBFrame::event_mask;
 
 OBFrame::OBFrame(OBClient *client, otk::Style *style)
-  : otk::OtkWidget(Openbox::instance, style),
+  : otk::OtkWidget(Openbox::instance, style, Horizontal, 0, 1,
+                   CWOverrideRedirect),
     OBWidget(Type_Frame),
     _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen())),
@@ -43,8 +44,8 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   assert(client);
   assert(style);
 
-  XSelectInput(otk::OBDisplay::display, window(), OBFrame::event_mask);
-  
+  XSelectInput(otk::OBDisplay::display, _window, OBFrame::event_mask);
+
   _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
   _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
   

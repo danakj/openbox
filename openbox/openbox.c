@@ -1,20 +1,14 @@
 #include "openbox.h"
 #include "event.h"
 #include "client.h"
+#include "dispatch.h"
 #include "xerror.h"
 #include "prop.h"
 #include "screen.h"
 #include "focus.h"
 #include "extensions.h"
 #include "gettext.h"
-#include "keyboard.h"
-#include "pointer.h"
 #include "engine.h"
-#include "python.h"
-#include "hooks.h"
-#include "clientwrap.h"
-#include "openboxwrap.h"
-#include "configwrap.h"
 #include "themerc.h"
 #include "timer.h"
 #include "../render/render.h"
@@ -130,27 +124,17 @@ int main(int argc, char **argv)
      
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
+        dispatch_startup();
 	render_startup();
 	font_startup();
 	themerc_startup();
 	engine_startup(themerc_engine);
-	python_startup();
-        configwrap_startup();
-	openboxwrap_startup();
-	clientwrap_startup();
-	hooks_startup();
 	event_startup();
 	screen_startup();
 	focus_startup();
 	client_startup();
-	keyboard_startup();
-	pointer_startup();
 	  
-	/* load the user's settings */
-	if (!python_import("rc"))
-	    g_warning("ERROR LOADING RC FILE");
-
-	HOOKFIRE(startup, "()");
+	/*HOOKFIRE(startup, "()");XXX*/
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -163,21 +147,15 @@ int main(int argc, char **argv)
 
 	client_unmanage_all();
 
-	HOOKFIRE(shutdown, "()");
+	/*HOOKFIRE(shutdown, "()");XXX*/
 
-	pointer_shutdown();
-	keyboard_shutdown();
 	client_shutdown();
 	screen_shutdown();
 	event_shutdown();
-	hooks_shutdown();
-	clientwrap_shutdown();
-	openboxwrap_shutdown();
-        configwrap_shutdown();
-	python_shutdown();
 	engine_shutdown();
 	themerc_shutdown();
 	render_shutdown();
+        dispatch_shutdown();
 	timer_shutdown();
     }
 	  

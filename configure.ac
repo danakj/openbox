@@ -32,8 +32,6 @@ PKG_CHECK_MODULES(GMODULE, gmodule-2.0)
 AC_SUBST(GMODULE_CFLAGS)
 AC_SUBST(GMODULE_LIBS)
 	
-PYTHON_DEVEL
-
 AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
@@ -63,7 +61,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		render/Makefile
 		engines/Makefile
 		engines/openbox/Makefile
-		python/Makefile
+		plugins/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
 		data/Makefile

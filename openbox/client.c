@@ -7,11 +7,8 @@
 #include "event.h"
 #include "focus.h"
 #include "stacking.h"
-#include "pointer.h"
-#include "hooks.h"
-#include "openboxwrap.h"
-#include "clientwrap.h"
 
+#include <glib.h>
 #include <X11/Xutil.h>
 
 /*! The event mask to grab on client windows */
@@ -122,7 +119,6 @@ void client_manage(Window window)
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
-    PyObject *cw;
      
     XGrabServer(ob_display);
     XSync(ob_display, FALSE);
@@ -198,17 +194,12 @@ void client_manage(Window window)
 
     screen_update_struts();
 
-    /* add to the python list */
-    cw = clientwrap_new(client);
-    PyList_Append(openboxwrap_obj->client_list, cw);
-    Py_DECREF(cw);
-
-    HOOKFIRECLIENT(managed, client);
+    /*HOOKFIRECLIENT(managed, client);XXX*/
 
     client_showhide(client);
 
     /* grab all mouse bindings */
-    pointer_grab_all(client, TRUE);
+    /*pointer_grab_all(client, TRUE);XXX*/
 
     /* update the list hints */
     client_set_list();
@@ -224,13 +215,12 @@ void client_unmanage_all()
 
 void client_unmanage(Client *client)
 {
-    int j, seq;
-    PyObject *cw;
+    int j;
     GSList *it;
 
     g_message("Unmanaging window: %lx", client->window);
 
-    HOOKFIRECLIENT(closed, client);
+    /*HOOKFIRECLIENT(closed, client);XXX*/
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, client->window, SetModeDelete);
@@ -239,7 +229,7 @@ void client_unmanage(Client *client)
     XSelectInput(ob_display, client->window, NoEventMask);
 
     /* ungrab any mouse bindings */
-    pointer_grab_all(client, FALSE);
+    /*pointer_grab_all(client, FALSE);XXX*/
      
     engine_frame_hide(client->frame);
 
@@ -256,19 +246,6 @@ void client_unmanage(Client *client)
     /* once the client is out of the list, update the struts to remove it's
        influence */
     screen_update_struts();
-
-    /* remove from the python list */
-    cw = clientwrap_new(client);
-    seq = PySequence_Index(openboxwrap_obj->client_list, cw);
-    if (seq == -1)
-	PyErr_Clear();
-    else
-	PySequence_DelItem(openboxwrap_obj->client_list, seq);
-    Py_DECREF(cw);
-
-    /* notify the wrapper that its useless now */
-    if (client->wrap != NULL)
-	client->wrap->client = NULL;
 
     /* tell our parent that we're gone */
     if (client->transient_for != NULL)
@@ -402,7 +379,6 @@ static void client_get_all(Client *self)
     self->disabled_decorations = 0;
     self->group = None;
     self->nicons = 0;
-    self->wrap = NULL;
 
     client_get_area(self);
     client_get_desktop(self);
@@ -947,7 +923,7 @@ void client_update_wmhints(Client *self)
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
 	if (self->frame)
-	    HOOKFIRECLIENT(urgent, self);
+	    /*HOOKFIRECLIENT(urgent, self)XXX*/;
     }
 }
 
@@ -1242,7 +1218,7 @@ static void client_showhide(Client *self)
     else
         engine_frame_hide(self->frame);
 
-    HOOKFIRECLIENT(visible, self);
+    /*HOOKFIRECLIENT(visible, self);XXX*/
 }
 
 gboolean client_normal(Client *self) {
@@ -1267,7 +1243,7 @@ static void client_apply_startup_state(Client *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-	HOOKFIRECLIENT(urgent, self);
+	/*HOOKFIRECLIENT(urgent, self)XXX*/;
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;

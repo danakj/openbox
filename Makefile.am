@@ -1,4 +1,4 @@
-SUBDIRS = po data themes doc render kernel engines python
+SUBDIRS = po data themes doc render kernel engines plugins
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 .PHONY: doc

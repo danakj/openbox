@@ -6,7 +6,6 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-struct ClientWrap;
 struct Frame;
 
 
@@ -279,9 +278,6 @@ typedef struct Client {
     Pixmap pixmap_icon;
     /*! The mask for the pixmap_icon, or None if its not masked */
     Pixmap pixmap_icon_mask;
-
-    /* The instance of the wrapper class if one exists */
-    struct ClientWrap *wrap;
 } Client;
 
 extern GSList *client_list;

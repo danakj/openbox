@@ -7,9 +7,6 @@
 #include "engine.h"
 #include "focus.h"
 #include "stacking.h"
-#include "keyboard.h"
-#include "pointer.h"
-#include "hooks.h"
 #include "extensions.h"
 #include "timer.h"
 #include "engine.h"
@@ -286,37 +283,37 @@ void event_process(XEvent *e)
     switch(e->type) {
     case EnterNotify:
         if (client != NULL) engine_mouse_enter(client->frame, window);
-	HOOKFIRECLIENT(pointerenter, client);
+	/*HOOKFIRECLIENT(pointerenter, client);XXX*/
 	break;
     case LeaveNotify:
         if (client != NULL) engine_mouse_leave(client->frame, window);
-	HOOKFIRECLIENT(pointerleave, client);
+	/*HOOKFIRECLIENT(pointerleave, client);XXX*/
 	break;
     case ButtonPress:
         if (client != NULL) 
             engine_mouse_press(client->frame, window,
                                e->xbutton.x, e->xbutton.y);
-	pointer_event(e, client);
+	/*pointer_event(e, client);XXX*/
         break;
     case ButtonRelease:
         if (client != NULL)
             engine_mouse_release(client->frame, window,
                                  e->xbutton.x, e->xbutton.y);
-	pointer_event(e, client);
+	/*pointer_event(e, client);XXX*/
         break;
     case MotionNotify:
-	pointer_event(e, client);
+	/*pointer_event(e, client);XXX*/
 	break;
     case KeyPress:	
     case KeyRelease:
-	keyboard_event(&e->xkey);
+	/*keyboard_event(&e->xkey);XXX*/
 	break;
     default:
 	/* XKB events */
 	if (e->type == extensions_xkb_event_basep) {
 	    switch (((XkbAnyEvent*)&e)->xkb_type) {
 	    case XkbBellNotify:
-		HOOKFIRECLIENT(bell, client);
+		/*HOOKFIRECLIENT(bell, client);XXX*/
 		break;
 	    }
 	}
@@ -494,7 +491,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	/* we shouldn't be able to get this unless we're iconic */
 	g_assert(client->iconic);
 
-	HOOKFIRECLIENT(requestactivate, client);
+	/*HOOKFIRECLIENT(requestactivate, client);XXX*/
 	break;
     case ClientMessage:
 	/* validate cuz we query stuff off the client here */
@@ -554,7 +551,7 @@ static void event_handle_client(Client *client, XEvent *e)
 		/* if its not visible for other reasons, then don't mess
 		   with it */
 		return;
-	    HOOKFIRECLIENT(requestactivate, client);
+	    /*HOOKFIRECLIENT(requestactivate, client);XXX*/
 	}
 	break;
     case PropertyNotify:

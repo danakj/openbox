@@ -2,7 +2,6 @@
 #include "client.h"
 #include "screen.h"
 #include "prop.h"
-#include "hooks.h"
 
 #include <X11/Xlib.h>
 
@@ -53,5 +52,5 @@ void focus_set_client(Client *client)
     active = client ? client->window : None;
     PROP_SET32(ob_root, net_active_window, window, active);
 
-    HOOKFIRECLIENT(focused, client);
+    /*HOOKFIRECLIENT(focused, client);XXX*/
 }

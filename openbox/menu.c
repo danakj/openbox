@@ -120,7 +120,7 @@ void menu_startup()
 
     menu_add_entry(m, menu_entry_new_submenu("long", s));
 
-    m = menu_new("client menu", "client", NULL);
+    m = menu_new(NULL, "client", NULL);
     a = action_from_string("iconify");
     menu_add_entry(m, menu_entry_new("iconify", a));
     a = action_from_string("toggleshade");

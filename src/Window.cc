@@ -347,6 +347,10 @@ BlackboxWindow::~BlackboxWindow(void) {
   if (flags.moving)
     endMove();
 
+  delete timer;
+
+  delete windowmenu;
+
   if (client.window_group) {
     BWindowGroup *group = blackbox->searchGroup(client.window_group);
     if (group) group->removeWindow(this);
@@ -357,17 +361,8 @@ BlackboxWindow::~BlackboxWindow(void) {
     if (client.transient_for != (BlackboxWindow *) ~0ul) {
       client.transient_for->client.transientList.remove(this);
     }
-    // we save our transient_for though because the workspace will use it
-    // when determining the next window to get focus
+    client.transient_for = (BlackboxWindow*) 0;
   }
-
-  if (blackbox_attrib.workspace != BSENTINEL &&
-      window_number != BSENTINEL)
-    screen->getWorkspace(blackbox_attrib.workspace)->removeWindow(this);
-  else if (flags.iconic)
-    screen->removeIcon(this);
-
-  client.transient_for = (BlackboxWindow*) 0;
 
   if (client.transientList.size() > 0) {
     // reset transient_for for all transients
@@ -376,10 +371,6 @@ BlackboxWindow::~BlackboxWindow(void) {
       (*it)->client.transient_for = (BlackboxWindow*) 0;
     }
   }
-
-  delete timer;
-
-  delete windowmenu;
 
   if (frame.title)
     destroyTitlebar();

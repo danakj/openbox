@@ -16,8 +16,6 @@ class RenderControl {
 protected:
   const ScreenInfo *_screen;
 
-  // the number of bits (1-255) that each shade of color spans across. best
-  // case is 1, which gives 255 shades
   int _red_bits;
   int _green_bits;
   int _blue_bits;

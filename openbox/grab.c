@@ -75,7 +75,7 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
         if (pgrabs++ == 0) {
             ret = XGrabPointer(ob_display, screen_support_win,
                                False, GRAB_PTR_MASK, GrabModeAsync,
-                               GrabModeAsync, FALSE,
+                               GrabModeAsync, None,
                                ob_cursor(cur), event_lasttime) == Success;
             if (!ret)
                 --pgrabs;
@@ -97,7 +97,7 @@ gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
     if (grab) {
         if (pgrabs++ == 0) {
             ret = XGrabPointer(ob_display, win, False, GRAB_PTR_MASK,
-                               GrabModeAsync, GrabModeAsync, TRUE,
+                               GrabModeAsync, GrabModeAsync, None,
                                ob_cursor(cur),
                                event_lasttime) == Success;
             if (!ret)

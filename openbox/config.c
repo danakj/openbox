@@ -42,6 +42,7 @@ gint    config_screen_firstdesk;
 
 gboolean config_resize_redraw;
 gint     config_resize_popup_show;
+gint     config_resize_popup_pos;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -301,6 +302,12 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         else if (parse_contains("Nonpixel", doc, n))
             config_resize_popup_show = 1;
     }
+    if ((n = parse_find_node("popupPosition", node))) {
+        if (parse_contains("Top", doc, n))
+            config_resize_popup_pos = 1;
+        else if (parse_contains("Center", doc, n))
+            config_resize_popup_pos = 0;
+    }
 }
 
 static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -540,7 +547,8 @@ void config_startup(ObParseInst *i)
     parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
-    config_resize_popup_show = 1;
+    config_resize_popup_show = 1; /* nonpixel increments */
+    config_resize_popup_pos = 0;  /* center of client */
 
     parse_register(i, "resize", parse_resize, NULL);
 

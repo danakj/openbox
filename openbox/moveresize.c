@@ -77,11 +77,17 @@ static void popup_coords(ObClient *c, gchar *format, gint a, gint b)
     gchar *text;
 
     text = g_strdup_printf(format, a, b);
-    popup_position(popup, CenterGravity,
-                   c->frame->area.x + c->frame->size.left +
-                   c->area.width / 2,
-                   c->frame->area.y + c->frame->size.top +
-                   c->area.height / 2);
+    if (config_resize_popup_pos == 1) /* == "Top" */
+        popup_position(popup, SouthGravity,
+                       c->frame->area.x
+                     + c->frame->area.width/2,
+                       c->frame->area.y);
+    else /* == "Center" */
+        popup_position(popup, CenterGravity,
+                       c->frame->area.x + c->frame->size.left +
+                       c->area.width / 2,
+                       c->frame->area.y + c->frame->size.top +
+                       c->area.height / 2);
     popup_show(popup, text);
     g_free(text);
 }

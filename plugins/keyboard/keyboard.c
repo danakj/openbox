@@ -5,6 +5,7 @@
 #include "kernel/grab.h"
 #include "kernel/action.h"
 #include "kernel/parse.h"
+#include "kernel/timer.h"
 #include "tree.h"
 #include "keyboard.h"
 #include "keyparse.h"
@@ -20,30 +21,37 @@ KeyBindingTree *firstnode = NULL;
 
 static KeyBindingTree *curpos;
 static guint reset_key, reset_state, button_return, button_escape;
-static gboolean grabbed;
+static Timer *chain_timer;
 
-static void grab_keys(gboolean grab)
+static void grab_keys()
 {
-    if (!grab) {
-        ungrab_all_keys();
-    } else {
-	KeyBindingTree *p = firstnode;
-	while (p) {
-            grab_key(p->key, p->state, GrabModeSync);
-	    p = p->next_sibling;
-	}
+    KeyBindingTree *p;
+
+    ungrab_all_keys();
+
+    p = curpos ? curpos->first_child : firstnode;
+    while (p) {
+        grab_key(p->key, p->state, GrabModeAsync);
+        p = p->next_sibling;
     }
+    grab_key(reset_key, reset_state, GrabModeAsync);
 }
 
 static void reset_chains()
 {
-    /* XXX kill timer */
-    curpos = NULL;
-    if (grabbed) {
-	grabbed = FALSE;
-        grab_keyboard(FALSE);
-    } else
-        XAllowEvents(ob_display, AsyncKeyboard, event_lasttime);
+    if (chain_timer) {
+        timer_stop(chain_timer);
+        chain_timer = NULL;
+    }
+    if (curpos) {
+        curpos = NULL;
+        grab_keys();
+    }
+}
+
+static void chain_timeout(void *data)
+{
+    reset_chains();
 }
 
 gboolean kbind(GList *keylist, Action *action)
@@ -71,18 +79,11 @@ gboolean kbind(GList *keylist, Action *action)
         return FALSE;
     }
 
-    /* grab the server here to make sure no key presses go missed */
-    grab_server(TRUE);
-    grab_keys(FALSE);
-
     /* set the action */
     t->actions = g_slist_append(t->actions, action);
     /* assimilate this built tree into the main tree. assimilation
        destroys/uses the tree */
     if (tree) tree_assimilate(tree);
-
-    grab_keys(TRUE); 
-    grab_server(FALSE);
 
     return TRUE;
 }
@@ -115,8 +116,8 @@ static void event(ObEvent *e, void *foo)
                 Action *act = it->data;
                 act->data.cycle.final = TRUE;
                 act->func(&act->data);
-                grab_keyboard(FALSE);
                 grabbed_key = NULL;
+                grab_keyboard(FALSE);
                 reset_chains();
                 return;
             }
@@ -140,14 +141,12 @@ static void event(ObEvent *e, void *foo)
             if (p->key == e->data.x.e->xkey.keycode &&
                 p->state == e->data.x.e->xkey.state) {
                 if (p->first_child != NULL) { /* part of a chain */
-                    /* XXX TIMER */
-                    if (!grabbed) {
-                        grab_keyboard(TRUE);
-                        grabbed = TRUE;
-                        XAllowEvents(ob_display, AsyncKeyboard,
-                                     event_lasttime);
-                    }
+                    if (chain_timer) timer_stop(chain_timer);
+                    /* 5 second timeout for chains */
+                    chain_timer = timer_start(5000*1000, chain_timeout,
+                                              NULL);
                     curpos = p;
+                    grab_keys();
                 } else {
                     GSList *it;
                     for (it = p->actions; it; it = it->next) {
@@ -164,8 +163,9 @@ static void event(ObEvent *e, void *foo)
 
                             if (act->func == action_cycle_windows &&
                                 !grabbed_key) {
-                                grab_keyboard(TRUE);
                                 grabbed_key = p;
+                                grab_keyboard(TRUE);
+                                break;
                             }
                         }
                     }
@@ -184,22 +184,24 @@ void plugin_startup()
     guint i;
 
     curpos = NULL;
-    grabbed = FALSE;
+    chain_timer = NULL;
 
-    dispatch_register(Event_X_KeyPress | Event_X_KeyRelease, (EventHandler)event, NULL);
+    dispatch_register(Event_X_KeyPress | Event_X_KeyRelease,
+                      (EventHandler)event, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
     translate_key("Escape", &i, &button_escape);
     translate_key("Return", &i, &button_return);
+
+    grab_keys();
 }
 
 void plugin_shutdown()
 {
     dispatch_register(0, (EventHandler)event, NULL);
 
-    grab_keys(FALSE);
     tree_destroy(firstnode);
     firstnode = NULL;
-    grab_keys(TRUE);
+    ungrab_all_keys();
 }
 

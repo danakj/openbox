@@ -16,6 +16,18 @@ struct RrInstance {
     int gl_linewidth;
     Window shape_window;
 
+    int depth;
+    Visual *visual;
+    guint32 red_mask;
+    guint32 green_mask;
+    guint32 blue_mask;
+    guint32 red_offset;
+    guint32 green_offset;
+    guint32 blue_offset;
+    int red_shift;
+    int green_shift;
+    int blue_shift;
+
     GHashTable *surface_map;
 };
 

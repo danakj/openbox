@@ -49,6 +49,7 @@ void Label::setText(const ustring &text)
   std::string s = text.c_str(); // use a normal string, for its functionality
 
   _parsedtext.clear();
+  _text = text;
   
   // parse it into multiple lines
   std::string::size_type p = 0;

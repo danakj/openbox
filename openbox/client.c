@@ -526,8 +526,9 @@ static void client_restore_session_state(ObClient *self)
     RECT_SET(self->area, self->session->x, self->session->y,
              self->session->w, self->session->h);
     self->positioned = TRUE;
-    XResizeWindow(ob_display, self->window,
-                  self->session->w, self->session->h);
+    if (self->session->w > 0 && self->session->h > 0)
+        XResizeWindow(ob_display, self->window,
+                      self->session->w, self->session->h);
 
     self->desktop = (self->session->desktop == DESKTOP_ALL ?
                      self->session->desktop :

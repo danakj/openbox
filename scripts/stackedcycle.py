@@ -197,16 +197,24 @@ class cycledata:
             self.activatetarget(0) # activate, but dont deiconify/unshade/raise
 
     def grabfunc(self, data):
-        if data.action == ob.KeyAction.Release:
-            # have all the modifiers this started with been released?
-            if not self.state & data.state:
-                self.cycling = 0
-                focus._disable = 0
-                self.activatetarget(1) # activate, and deiconify/unshade/raise
-                self.destroypopup()
-                ob.kungrab()
-                ob.mungrab()
+        done = 0
+        # have all the modifiers this started with been released?
+        if (data.action == ob.KeyAction.Release and
+            not self.state & data.state):
+            done = 1
+        # has Escape been pressed?
+        if data.action == ob.KeyAction.Press and data.key == "Escape":
+            done = 1
+            # revert
+            self.menupos = 0
 
+        if done:
+            self.cycling = 0
+            focus._disable = 0
+            self.activatetarget(1) # activate, and deiconify/unshade/raise
+            self.destroypopup()
+            ob.kungrab()
+            ob.mungrab()
 
 def _newwindow(data):
     if _o.cycling: _o.populatelist()

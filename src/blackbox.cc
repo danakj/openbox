@@ -653,7 +653,7 @@ void Blackbox::process_event(XEvent *e) {
 
   case ClientMessage: {
     if (e->xclient.format == 32) {
-      if (e->xclient.message_type == getWMChangeStateAtom()) {
+      if (e->xclient.message_type == xatom->getAtom(XAtom::wm_change_state)) {
         BlackboxWindow *win = searchWindow(e->xclient.window);
         if (! win || ! win->validateClient()) return;
 

@@ -137,7 +137,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   xatom->setSupported(this);    // set-up netwm support
 #ifdef    HAVE_GETPID
-  xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::Type_Cardinal,
+  xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::cardinal,
                   (unsigned long) getpid());
 #endif // HAVE_GETPID
 
@@ -230,10 +230,16 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   }
   saveWorkspaceNames();
 
+  updateNetizenWorkspaceCount();
+
   workspacemenu->insert(i18n(IconSet, IconIcons, "Icons"), iconmenu);
   workspacemenu->update();
 
   current_workspace = workspacesList.front();
+  
+  xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
+                  XAtom::cardinal, 0); //first workspace
+
   workspacemenu->setItemSelected(2, True);
 
   toolbar = new Toolbar(this);
@@ -1020,6 +1026,10 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
     current_workspace = getWorkspace(id);
 
+    xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
+                    XAtom::cardinal, id);
+    printf("%d\n", id);
+
     workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
     toolbar->redrawWorkspaceLabel(True);
 
@@ -1106,6 +1116,9 @@ void BScreen::removeNetizen(Window w) {
   }
 }
 
+
+  xatom->setValue(getRootWindow(), XAtom::net_number_of_desktops,
+                  XAtom::cardinal, workspacesList.size());
 
 void BScreen::updateNetizenCurrentWorkspace(void) {
   std::for_each(netizenList.begin(), netizenList.end(),

@@ -111,6 +111,7 @@ public:
 private:
   Blackbox *blackbox;
   BScreen *screen;
+  XAtom *xatom;
   BTimer *timer;
   BlackboxAttributes blackbox_attrib;
 

@@ -75,6 +75,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   blackbox = b;
   client.window = w;
   screen = s;
+  xatom = blackbox->getXAtom();
 
   if (! validateClient()) {
     delete this;
@@ -1758,14 +1759,10 @@ void BlackboxWindow::setState(unsigned long new_state) {
   unsigned long state[2];
   state[0] = current_state;
   state[1] = None;
-  XChangeProperty(blackbox->getXDisplay(), client.window,
-                  blackbox->getWMStateAtom(), blackbox->getWMStateAtom(), 32,
-                  PropModeReplace, (unsigned char *) state, 2);
-
-  XChangeProperty(blackbox->getXDisplay(), client.window,
-                  blackbox->getBlackboxAttributesAtom(),
-                  blackbox->getBlackboxAttributesAtom(), 32, PropModeReplace,
-                  (unsigned char *) &blackbox_attrib,
+  xatom->setValue(client.window, XAtom::wm_state, XAtom::wm_state, state, 2);
+ 
+  xatom->setValue(client.window, XAtom::blackbox_attributes,
+                  XAtom::blackbox_attributes, (unsigned long *)&blackbox_attrib,
                   PropBlackboxAttributesElements);
 }
 
@@ -1775,27 +1772,16 @@ bool BlackboxWindow::getState(void) {
 
   Atom atom_return;
   bool ret = False;
-  int foo;
-  unsigned long *state, ulfoo, nitems;
+  unsigned long *state, nitems;
 
-  if ((XGetWindowProperty(blackbox->getXDisplay(), client.window,
-                          blackbox->getWMStateAtom(),
-                          0l, 2l, False, blackbox->getWMStateAtom(),
-                          &atom_return, &foo, &nitems, &ulfoo,
-                          (unsigned char **) &state) != Success) ||
-      (! state)) {
+  if (! xatom->getValue(client.window, XAtom::wm_state, XAtom::wm_state, nitems,
+                        &state))
     return False;
-  }
 
-  if (nitems >= 1) {
-    current_state = static_cast<unsigned long>(state[0]);
+  current_state = static_cast<unsigned long>(state[0]);
+  delete state;
 
-    ret = True;
-  }
-
-  XFree((void *) state);
-
-  return ret;
+  return True;
 }
 
 

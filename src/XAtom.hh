@@ -32,8 +32,13 @@ class ScreenInfo;
 
 class XAtom {
 public:
-  enum AvailableAtoms {
-    // string type
+  enum Atoms {
+    // types
+    cardinal,
+    window,
+    pixmap,
+    atom,
+    string,
     utf8_string,
     
 #ifdef    HAVE_GETPID
@@ -102,16 +107,10 @@ public:
     NUM_ATOMS
   };
 
-  enum AtomType {
-    Type_Cardinal,
-    Type_Atom,
-    Type_Window,
-    Type_Pixmap
-  };
-
   enum StringType {
-    Type_String,
-    Type_Utf8,
+    ansi,
+    utf8,
+    NUM_STRING_TYPE
   };
 
 private:
@@ -124,10 +123,10 @@ private:
 
   Atom create(const char *name) const;
 
-  void setValue(Window win, AvailableAtoms atom, Atom type, unsigned char *data,
+  void setValue(Window win, Atom atom, Atom type, unsigned char *data,
                 int size, int nelements, bool append) const;
-  bool getValue(Window win, AvailableAtoms atom, Atom type,
-                unsigned long *nelements, unsigned char **value,
+  bool getValue(Window win, Atom atom, Atom type,
+                unsigned long &nelements, unsigned char **value,
                 int size) const;
 
   // no copying!!
@@ -142,29 +141,25 @@ public:
   // constructor.
   void setSupported(const ScreenInfo *screen);
   
-  void setValue(Window win, AvailableAtoms atom, AtomType type,
-                unsigned long value) const;
-  void setValue(Window win, AvailableAtoms atom, StringType type,
-                const std::string &value) const;
-
-  void addValue(Window win, AvailableAtoms atom, AtomType type,
-                unsigned long value) const;
-  void addValue(Window win, AvailableAtoms atom, StringType type,
+  void setValue(Window win, Atoms atom, Atoms type, unsigned long value) const;
+  void setValue(Window win, Atoms atom, Atoms type,
+                unsigned long value[], int elements) const;
+  void setValue(Window win, Atoms atom, StringType type,
                 const std::string &value) const;
 
   // the 'value' is allocated inside the function and
   // delete [] value needs to be called when you are done with it.
   // the 'value' array returned is null terminated, and has 'nelements'
   // elements in it plus the null.
-  bool getValue(Window win, AvailableAtoms atom, AtomType type,
-                unsigned long *nelements, unsigned long **value) const;
-  bool getValue(Window win, AvailableAtoms atom, StringType type,
+  bool getValue(Window win, Atoms atom, Atoms type,
+                unsigned long &nelements, unsigned long **value) const;
+  bool getValue(Window win, Atoms atom, StringType type,
                 std::string &value) const;
   
-  void eraseValue(Window win, AvailableAtoms atom) const;
+  void eraseValue(Window win, Atoms atom) const;
 
   // temporary function!! remove when not used in blackbox.hh anymore!!
-  inline Atom getAtom(AvailableAtoms a)
+  inline Atom getAtom(Atoms a)
   { Atom ret = _atoms[a]; assert(ret != 0); return ret; }
 };
 

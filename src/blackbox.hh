@@ -245,10 +245,6 @@ public:
   enum { B_AmericanDate = 1, B_EuropeanDate };
 #endif // HAVE_STRFTIME
 
-  inline Atom getWMChangeStateAtom(void) const
-    { return xatom->getAtom(XAtom::wm_change_state); }
-  inline Atom getWMStateAtom(void) const
-    { return xatom->getAtom(XAtom::wm_state); }
   inline Atom getWMDeleteAtom(void) const
     { return xatom->getAtom(XAtom::wm_delete_window); }
   inline Atom getWMProtocolsAtom(void) const

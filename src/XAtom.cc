@@ -32,6 +32,11 @@ XAtom::XAtom(Blackbox *bb) {
   // make sure asserts fire if there is a problem
   memset(_atoms, sizeof(_atoms), 0);
 
+  _atoms[cardinal] = XA_CARDINAL;
+  _atoms[window] = XA_WINDOW;
+  _atoms[pixmap] = XA_PIXMAP;
+  _atoms[atom] = XA_ATOM;
+  _atoms[string] = XA_STRING;
   _atoms[utf8_string] = create("UTF8_STRING");
   
 #ifdef    HAVE_GETPID
@@ -132,40 +137,38 @@ void XAtom::setSupported(const ScreenInfo *screen) {
   _support_windows.push_back(w);
   
   // set supporting window
-  setValue(root, net_supporting_wm_check, Type_Window, w);
+  setValue(root, net_supporting_wm_check, window, w);
  
   //set properties on the supporting window
-  setValue(w, net_wm_name, Type_Utf8, "Openbox");
-  setValue(w, net_supporting_wm_check, Type_Window, w);
-  
+  setValue(w, net_wm_name, utf8, "Openbox");
+  setValue(w, net_supporting_wm_check, window, w);
   
   // we don't support any yet..
   // yes we do!
 
   Atom supported[] = {
-    _atoms[net_supported]      // remove me later, cuz i dont think i belong
+    _atoms[net_current_desktop],
+    _atoms[net_number_of_desktops]
   };
+  const int num_supported = sizeof(supported)/sizeof(Atom);
 
-  eraseValue(root, net_supported);
-  for (unsigned int i = 0, num = sizeof(supported)/sizeof(Atom); i < num; ++i)
-    addValue(root, net_supported, Type_Atom, supported[i]);
+  setValue(root, net_supported, atom, supported, num_supported);
 }
   
 
 /*
- * Internal setValue used by all typed setValue functions.
+ * Internal setValue.
  * Sets a window property on a window, optionally appending to the existing
  * value.
  */
-void XAtom::setValue(Window win, AvailableAtoms atom, Atom type,
+void XAtom::setValue(Window win, Atom atom, Atom type,
                      unsigned char* data, int size, int nelements,
                      bool append) const {
-  assert(atom >= 0 && atom < NUM_ATOMS);
-  assert(win != None); assert(type != None);
+  assert(win != None); assert(atom != None); assert(type != None);
   assert(data != (unsigned char *) 0);
   assert(size == 8 || size == 16 || size == 32);
   assert(nelements > 0);
-  XChangeProperty(_display, win, _atoms[atom], type, size,
+  XChangeProperty(_display, win, atom, type, size,
                   (append ? PropModeAppend : PropModeReplace),
                   data, nelements);                  
 }
@@ -174,73 +177,53 @@ void XAtom::setValue(Window win, AvailableAtoms atom, Atom type,
 /*
  * Set a 32-bit property value on a window.
  */
-void XAtom::setValue(Window win, AvailableAtoms atom, AtomType type,
+void XAtom::setValue(Window win, Atoms atom, Atoms type,
                      unsigned long value) const {
-  Atom t;
-  switch (type) {
-  case Type_Cardinal: t = XA_CARDINAL; break;
-  case Type_Atom:     t = XA_ATOM;     break;
-  case Type_Window:   t = XA_WINDOW;   break;
-  case Type_Pixmap:   t = XA_PIXMAP;   break;
-  default: assert(false); // unhandled AtomType
-  }
-  setValue(win, atom, t, reinterpret_cast<unsigned char*>(&value),
-           32, 1, false);
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_ATOMS);
+  setValue(win, _atoms[atom], _atoms[type],
+           reinterpret_cast<unsigned char*>(&value), 32, 1, false);
 }
 
 
 /*
- * Set a string property value on a window.
+ * Set an array of 32-bit properties value on a window.
  */
-void XAtom::setValue(Window win, AvailableAtoms atom, StringType type,
+void XAtom::setValue(Window win, Atoms atom, Atoms type,
+                     unsigned long value[], int elements) const {
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_ATOMS);
+  setValue(win, _atoms[atom], _atoms[type],
+           reinterpret_cast<unsigned char*>(value), 32, elements, false);
+}
+
+
+/*
+ * Set an string property value on a window.
+ */
+void XAtom::setValue(Window win, Atoms atom, StringType type,
                      const std::string &value) const {
-  Atom t;
-  switch (type) {
-  case Type_String: t = XA_STRING;           break;
-  case Type_Utf8:   t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_STRING_TYPE);
+  assert(win != None); assert(_atoms[atom] != None);
+
+  const char *c = value.c_str();
+  XTextProperty textprop;
+  if (Success != XmbTextListToTextProperty(_display, const_cast<char**>(&c), 1,
+                                           type == ansi ? XStringStyle :
+#ifdef X_HAVE_UTF8_STRING
+                                           XUTF8StringStyle,
+#else
+                                           XCompoundTextStyle,
+#endif
+                                           &textprop)) {
+    return;
   }
-  setValue(win, atom, t,
-           const_cast<unsigned char*>
-           (reinterpret_cast<const unsigned char*>(value.c_str())),
-           8, value.size(), false);
+  
+  XSetTextProperty(_display, win, &textprop, _atoms[atom]);
+
+  XFree(textprop.value);
 }
-
-
-/*
- * Add elements to a 32-bit property value on a window.
- */
-void XAtom::addValue(Window win, AvailableAtoms atom, AtomType type,
-                     unsigned long value) const {
-  Atom t;
-  switch (type) {
-  case Type_Cardinal: t = XA_CARDINAL; break;
-  case Type_Atom:     t = XA_ATOM;     break;
-  case Type_Window:   t = XA_WINDOW;   break;
-  case Type_Pixmap:   t = XA_PIXMAP;   break;
-  default: assert(false); // unhandled Atom_Type
-  }
-  setValue(win, atom, t, reinterpret_cast<unsigned char*>(&value), 32, 1, true);
-}
-
-
-/*
- * Add characters to a string property value on a window.
- */
-void XAtom::addValue(Window win, AvailableAtoms atom, StringType type,
-                     const std::string &value) const {
-  Atom t;
-  switch (type) {
-  case Type_String: t = XA_STRING;           break;
-  case Type_Utf8:   t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
-  }
-  setValue(win, atom, t,
-           const_cast<unsigned char*>
-           (reinterpret_cast<const unsigned char *>
-            (value.c_str())),
-           8, value.size(), true);
-} 
 
 
 /*
@@ -250,19 +233,18 @@ void XAtom::addValue(Window win, AvailableAtoms atom, StringType type,
  * property did not exist on the window, or has a different type/size format
  * than the user tried to retrieve.
  */
-bool XAtom::getValue(Window win, AvailableAtoms atom, Atom type,
-                     unsigned long *nelements, unsigned char **value,
+bool XAtom::getValue(Window win, Atom atom, Atom type,
+                     unsigned long &nelements, unsigned char **value,
                      int size) const {
-  assert(atom >= 0 && atom < NUM_ATOMS);
-  assert(win != None); assert(type != None);
+  assert(win != None); assert(atom != None); assert(type != None);
   assert(size == 8 || size == 16 || size == 32);
   unsigned char *c_val;        // value alloc'd with c malloc
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;
-  XGetWindowProperty(_display, win, _atoms[atom], 0l, 1l, False,
-                     AnyPropertyType, &ret_type, &ret_size, nelements,
-                     &ret_bytes, &c_val); // try get the first element
+  // try get the first element
+  XGetWindowProperty(_display, win, atom, 0l, 1l, False, AnyPropertyType,
+                     &ret_type, &ret_size, &nelements, &ret_bytes, &c_val);
   if (ret_type == None)
     // the property does not exist on the window
     return false;
@@ -274,8 +256,8 @@ bool XAtom::getValue(Window win, AvailableAtoms atom, Atom type,
   // the data is correct, now, is there more than 1 element?
   if (ret_bytes == 0) {
     // we got the whole property's value
-    *value = new unsigned char[*nelements * size/8 + 1];
-    memcpy(*value, c_val, *nelements * size/8 + 1);
+    *value = new unsigned char[nelements * size/8 + 1];
+    memcpy(*value, c_val, nelements * size/8 + 1);
     XFree(c_val);
     return true;    
   }
@@ -284,11 +266,11 @@ bool XAtom::getValue(Window win, AvailableAtoms atom, Atom type,
   // the number of longs that need to be retreived to get the property's entire
   // value. The last + 1 is the first long that we retrieved above.
   const int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
-  XGetWindowProperty(_display, win, _atoms[atom], 0l, remain, False, type,
-                     &ret_type, &ret_size, nelements, &ret_bytes, &c_val);
+  XGetWindowProperty(_display, win, atom, 0l, remain, False, type, &ret_type,
+                     &ret_size, &nelements, &ret_bytes, &c_val);
   assert(ret_bytes == 0);
-  *value = new unsigned char[*nelements * size/8 + 1];
-  memcpy(*value, c_val, *nelements * size/8 + 1);
+  *value = new unsigned char[nelements * size/8 + 1];
+  memcpy(*value, c_val, nelements * size/8 + 1);
   XFree(c_val);
   return true;    
 }
@@ -297,18 +279,12 @@ bool XAtom::getValue(Window win, AvailableAtoms atom, Atom type,
 /*
  * Gets a 32-bit property's value from a window.
  */
-bool XAtom::getValue(Window win, AvailableAtoms atom, AtomType type,
-                         unsigned long *nelements,
+bool XAtom::getValue(Window win, Atoms atom, Atoms type,
+                         unsigned long &nelements,
                          unsigned long **value) const {
-  Atom t;
-  switch (type) {
-  case Type_Cardinal: t = XA_CARDINAL; break;
-  case Type_Atom:     t = XA_ATOM;     break;
-  case Type_Window:   t = XA_WINDOW;   break;
-  case Type_Pixmap:   t = XA_PIXMAP;   break;
-  default: assert(false); // unhandled Atom_Type
-  }
-  return getValue(win, atom, XA_CARDINAL, nelements,
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_ATOMS);
+  return getValue(win, _atoms[atom], _atoms[type], nelements,
                   reinterpret_cast<unsigned char **>(value), 32);
 }
 
@@ -316,26 +292,48 @@ bool XAtom::getValue(Window win, AvailableAtoms atom, AtomType type,
 /*
  * Gets an string property's value from a window.
  */
-bool XAtom::getValue(Window win, AvailableAtoms atom, StringType type,
+bool XAtom::getValue(Window win, Atoms atom, StringType type,
                      std::string &value) const {
-  Atom t;
-  switch (type) {
-  case Type_String: t = XA_STRING;           break;
-  case Type_Utf8:   t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_STRING_TYPE);
+  assert(win != None); assert(_atoms[atom] != None);
+
+  XTextProperty textprop;
+  if (0 == XGetTextProperty(_display, win, &textprop, _atoms[atom]))
+    return false;
+
+  int ret;
+  int count;
+  char **list;
+  if (type == ansi) {
+      ret = XmbTextPropertyToTextList(_display, &textprop, &list, &count);
+  } else {
+#ifdef X_HAVE_UTF8_STRING
+    ret = Xutf8TextPropertyToTextList(_display, &textprop, &list, &count);
+#else
+    ret = XmbTextPropertyToTextList(_display, &textprop, &list, &count);
+#endif
   }
-  unsigned char *data;
-  unsigned long nelements;
-  bool ret = getValue(win, atom, t, &nelements, &data, 8);
-  if (ret)
-    value = reinterpret_cast<char*>(data);
-  return ret;
+ 
+  if (ret != Success || count < 1) {
+    XFree(textprop.value);
+    return false;
+  }
+
+  value = list[0];
+
+  XFreeStringList(list);
+  XFree(textprop.value);
+  return true;
 }
+
+
 
 
 /*
  * Removes a property entirely from a window.
  */
-void XAtom::eraseValue(Window win, AvailableAtoms atom) const {
+void XAtom::eraseValue(Window win, Atoms atom) const {
+  assert(atom >= 0 && atom < NUM_ATOMS);
   XDeleteProperty(_display, win, _atoms[atom]);
 }

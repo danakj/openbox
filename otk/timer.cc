@@ -7,6 +7,7 @@
 #include "timer.hh"
 #include "display.hh"
 
+extern "C" {
 #ifdef    HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #else
@@ -15,6 +16,7 @@
 #    include <unistd.h>
 #  endif // HAVE_UNISTD_H
 #endif // HAVE_SYS_SELECT_H
+}
 
 namespace otk {
 

@@ -1,7 +1,7 @@
 ! EBOX2 for openbox (with pixmaps) 
 			
-rootCommand:	Esetroot /allmythings/backgrounds/ladybug.png
-#rootCommand:	bsetroot -solid "#838183"
+#rootCommand:	Esetroot /allmythings/backgrounds/ladybug.png
+rootCommand:	bsetroot -solid "#838183"
 #rootCommand:	Esetroot /opt/gnome2/share/nautilus/patterns/bigH.png
 ! Toolbar settings...
 toolbar.button:	parentrelative

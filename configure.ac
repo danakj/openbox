@@ -21,6 +21,10 @@ OB_COMPILER_FLAGS
 AC_C_CONST
 AC_C_INLINE
 
+# XXX ADD --disable-nls option to this XXX
+CPPFLAGS=${CPPFLAGS} -DENABLE_NLS
+# XXX                                  XXX
+
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)

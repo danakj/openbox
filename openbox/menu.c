@@ -272,7 +272,6 @@ void menu_show_full(Menu *self, int x, int y, Client *client)
     }
 }
 
-
 void menu_hide(Menu *self) {
     if (self->shown) {
         XUnmapWindow(ob_display, self->frame);

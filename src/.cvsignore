@@ -3,3 +3,7 @@ Makefile.in
 openbox3
 .deps
 .libs
+ob.py
+openbox_wrap.cc
+swigruntime.cc
+swigruntime.py

@@ -38,3 +38,4 @@ rendertest
 renderstyle.lo
 rendercontrol.lo
 rendercolor.lo
+otk.py

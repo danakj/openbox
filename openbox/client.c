@@ -2289,7 +2289,7 @@ void client_set_desktop_recursive(ObClient *self,
             client_showhide(self);
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
-            action_run_string("Raise", self);
+            client_raise(self);
         screen_update_areas();
 
         /* add to the new desktop(s) */
@@ -2602,7 +2602,7 @@ void client_activate(ObClient *self, gboolean here)
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
     if (self->iconic)
-        client_iconify(self, FALSE, FALSE);
+        client_iconify(self, FALSE, here);
     if (self->desktop != DESKTOP_ALL &&
         self->desktop != screen_desktop) {
         if (here)
@@ -2623,6 +2623,16 @@ void client_activate(ObClient *self, gboolean here)
        about raising the window. when a fullscreen window loses focus, we need
        this or else the raise wont be able to raise above the to-lose-focus
        fullscreen window. */
+    client_raise(self);
+}
+
+void client_raise(ObClient *self)
+{
+    action_run_string("Raise", self);
+}
+
+void client_lower(ObClient *self)
+{
     action_run_string("Raise", self);
 }
 

@@ -1,6 +1,8 @@
 #include "event.h"
+#include "config.h"
 #include "openbox.h"
 #include "client.h"
+#include "frame.h"
 #include "screen.h"
 #include "prop.h"
 #include "dispatch.h"
@@ -46,7 +48,8 @@ void focus_shutdown()
     XDestroyWindow(ob_display, focus_backup);
 
     /* reset focus to root */
-    XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
+    XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,
+                   event_lasttime);
 }
 
 void focus_set_client(Client *client)
@@ -55,15 +58,16 @@ void focus_set_client(Client *client)
     Client *old;
     guint desktop;
 
+    if (client == focus_client) return;
+
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
-
     if (client == NULL) {
 	/* when nothing will be focused, send focus to the backup target */
-	XSetInputFocus(ob_display, focus_backup, RevertToNone,
-                       event_unfocustime);
+	XSetInputFocus(ob_display, focus_backup, RevertToPointerRoot,
+                       event_lasttime);
     }
 
     old = focus_client;
@@ -85,4 +89,53 @@ void focus_set_client(Client *client)
         dispatch_client(Event_Client_Focus, focus_client, 0, 0);
     if (old != NULL)
         dispatch_client(Event_Client_Unfocus, old, 0, 0);
+}
+
+static gboolean focus_under_pointer()
+{
+    Window w;
+    int i, x, y;
+    guint u;
+    GList *it;
+
+    if (XQueryPointer(ob_display, ob_root, &w, &w, &x, &y, &i, &i, &u))
+    {
+        for (it = stacking_list; it != NULL; it = it->next) {
+            Client *c = it->data;
+            if (c->desktop == screen_desktop &&
+                RECT_CONTAINS(c->frame->area, x, y))
+                break;
+        }
+        if (it != NULL) {
+            g_message("fallback (pointer) trying %lx", ((Client*)it->data)->window);
+            return client_normal(it->data) && client_focus(it->data);
+        }
+    }
+    return FALSE;
+}
+
+void focus_fallback(gboolean switching_desks)
+{
+    ConfigValue focus_follow;
+    GList *it;
+    gboolean fallback = TRUE;
+
+    if (!switching_desks) {
+        if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
+            g_assert_not_reached();
+        if (focus_follow.bool)
+            fallback = !focus_under_pointer();
+    }
+
+    if (fallback) {
+        for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+            if (it->data != focus_client && client_normal(it->data)) {
+                g_message("fallback trying %lx", ((Client*)it->data)->window);
+                if (client_focus(it->data))
+                    break;
+            }
+    }
+
+    if (it == NULL) /* nothing to focus */
+        focus_set_client(NULL);
 }

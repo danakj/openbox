@@ -615,8 +615,12 @@ bool Workspace::smartPlacement(Rect& win) {
   for (; wit != end; ++wit) {
     const BlackboxWindow* const curr = *wit;
 
-    if (curr->isShaded() && screen->getPlaceIgnoreShaded()) continue;
-    if (curr->isMaximizedFull() && screen->getPlaceIgnoreMaximized()) continue;
+    // watch for shaded windows and full-maxed windows
+    if (curr->isShaded()) {
+      if (screen->getPlaceIgnoreShaded()) continue;
+    } else if (curr->isMaximizedFull()) {
+      if (screen->getPlaceIgnoreMaximized()) continue;
+    }
 
     tmp.setRect(curr->frameRect().x(), curr->frameRect().y(),
                 curr->frameRect().width() + screen->getBorderWidth(),

@@ -53,18 +53,15 @@ private:
   //! The number of requested grabs on the display
   int _grab_count;
 
+  //! When true, X errors will be ignored. Use with care.
+  bool _ignore_errors;
+
   //! A list of information for all screens on the display
   ScreenInfo** _screeninfo_list;
 
   //! A list of RenderControl objects, which are used for all graphics on a
   //! screen
   RenderControl** _rendercontrol_list;
-
-  // Handles X errors on the display
-  /*
-    Displays the error if compiled for debugging.
-  */
-  //int xerrorHandler(::Display *d, XErrorEvent *e);
 
 public:
   //! Initializes the class, opens the X display
@@ -109,6 +106,11 @@ public:
 
   inline ::Display* operator*() const { return _display; }
 
+  //! When true, X errors will be ignored.
+  inline bool ignoreErrors() const { return _ignore_errors; }
+  //! Set whether X errors should be ignored. Use with care.
+  void setIgnoreErrors(bool t);
+  
   //! Grabs the display
   void grab();
 

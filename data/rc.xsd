@@ -46,6 +46,7 @@
                 <xs:element name="desktops" type="ob:desktops"/>
                 <xs:element name="resize" type="ob:resize"/>
                 <xs:element name="dock" type="ob:dock"/>
+                <xs:element name="dialog" type="ob:dialog"/>
                 <xs:element name="keyboard" type="ob:keyboard"/>
                 <xs:element name="mouse" type="ob:mouse"/>
                 <xs:element name="menu" type="ob:menu"/>
@@ -109,6 +110,12 @@
             <xs:element name="autoHide" type="ob:yesorno"/>
             <xs:element name="hideDelay" type="xs:integer"/>
             <xs:element name="moveButton" type="ob:button"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dialog">
+        <xs:sequence>
+            <xs:element name="focus" type="ob:yesorno"/>
+            <xs:element name="desktop" type="ob:yesorno"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="action">

@@ -3,6 +3,8 @@
 	* Added the <moveButton> option for moving dock apps around inside the
 	dock.
 	* Made the "Desktop" action show the pager/desktop dialog.
+	* Add the <dialog> section to allow the disabling of the focus and
+	pager/desktop dialogs.
 
 3.0-beta6:
 	* Added _OB_WM_STATE_UNDECORATED hint, which can be read and controlled

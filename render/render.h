@@ -71,8 +71,8 @@ typedef enum {
 } TextureType;
 
 typedef struct PlanarSurface {
-    int xoff;
-    int yoff;
+    int x;
+    int y;
     int width;
     int height;
     SurfaceColorType grad;

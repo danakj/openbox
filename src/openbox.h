@@ -42,9 +42,11 @@
 #endif // TIME_WITH_SYS_TIME
 
 #include "Resource.h"
-#include "LinkedList.h"
 #include "BaseDisplay.h"
 #include "Timer.h"
+
+#include <map>
+#include <list>
 
 //forward declaration
 class BScreen;
@@ -74,6 +76,10 @@ public:
 class Openbox : public BaseDisplay, public TimeoutHandler {
 private:
   typedef struct MenuTimestamp {
+    virtual ~MenuTimestamp() {
+      if (filename != (char *) 0)
+        delete [] filename;
+    }
     char *filename;
     time_t timestamp;
   } MenuTimestamp;
@@ -88,20 +94,29 @@ private:
     unsigned long cache_life, cache_max;
   } resource;
 
-  typedef DataSearch<OpenboxWindow> WindowSearch;
-  LinkedList<WindowSearch> *windowSearchList, *groupSearchList;
-  typedef DataSearch<Basemenu> MenuSearch;
-  LinkedList<MenuSearch> *menuSearchList;
-  typedef DataSearch<Toolbar> ToolbarSearch;
-  LinkedList<ToolbarSearch> *toolbarSearchList;
+  typedef std::map<Window, OpenboxWindow*> WindowLookup;
+  typedef WindowLookup::value_type WindowLookupPair;
+  WindowLookup windowSearchList, groupSearchList;
+  
+  typedef std::map<Window, Basemenu*> MenuLookup;
+  typedef MenuLookup::value_type MenuLookupPair;
+  MenuLookup menuSearchList;
+
+  typedef std::map<Window, Toolbar*> ToolbarLookup;
+  typedef ToolbarLookup::value_type ToolbarLookupPair;
+  ToolbarLookup toolbarSearchList;
 
 #ifdef    SLIT
-  typedef DataSearch<Slit> SlitSearch;
-  LinkedList<SlitSearch> *slitSearchList;
+  typedef std::map<Window, Slit*> SlitLookup;
+  typedef SlitLookup::value_type SlitLookupPair;
+  SlitLookup slitSearchList; 
 #endif // SLIT
 
-  LinkedList<MenuTimestamp> *menuTimestamps;
-  LinkedList<BScreen> *screenList;
+  typedef std::list<MenuTimestamp*> MenuTimestampList;
+  MenuTimestampList menuTimestamps;
+
+  typedef std::list<BScreen*> ScreenList;
+  ScreenList screenList;
 
   BScreen *focused_screen;
   OpenboxWindow *masked_window;

@@ -724,11 +724,11 @@ void Toolbar::checkClock(Bool redraw, Bool date) {
 
 
 void Toolbar::redrawWindowLabel(Bool redraw) {
-  if (screen.getOpenbox().focusedWindow()) {
+  OpenboxWindow *foc = screen.getOpenbox().focusedWindow();
+  if (foc != (OpenboxWindow *) 0) {
     if (redraw)
       XClearWindow(display, frame.window_label);
 
-    OpenboxWindow *foc = screen.getOpenbox().focusedWindow();
     if (foc->getScreen() != &screen) return;
 
     int dx = (frame.bevel_w * 2), dlen = strlen(*foc->getTitle());

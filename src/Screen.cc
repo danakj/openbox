@@ -104,6 +104,7 @@
 #include <strstream>
 #include <string>
 #include <algorithm>
+#include <functional>
 using namespace std;
 
 static Bool running = True;
@@ -1155,6 +1156,11 @@ void BScreen::save() {
   setClock24Hour(resource.clock24hour);
 #endif // HAVE_STRFTIME
   setHideToolbar(resource.hide_toolbar);
+    
+  toolbar->save();
+#ifdef    SLIT
+  slit->save();
+#endif // SLIT
 }
 
 
@@ -1541,14 +1547,12 @@ void BScreen::reconfigure(void) {
   slit->reconfigure();
 #endif // SLIT
 
-  wkspList::iterator wit;
-  for (wit = workspacesList.begin(); wit != workspacesList.end(); ++wit)
-    (*wit)->reconfigure();
+  std::for_each(workspacesList.begin(), workspacesList.end(),
+                std::mem_fun(&Workspace::reconfigure));
 
-  winList::iterator iit;
-  for (iit = iconList.begin(); iit != iconList.end(); ++iit)
-    if ((*iit)->validateClient())
-      (*iit)->reconfigure();
+  for (winList::iterator it = iconList.begin(); it != iconList.end(); ++it)
+    if ((*it)->validateClient())
+      (*it)->reconfigure();
 
   image_control->timeout();
 }
@@ -2054,6 +2058,7 @@ void BScreen::updateNetizenWindowFocus(void) {
   for (it = netizenList.begin(); it != netizenList.end(); ++it)
     (*it)->sendWindowFocus(f);
 }
+
 
 void BScreen::updateNetizenWindowAdd(Window w, unsigned long p) {
   netList::iterator it;
@@ -2737,9 +2742,8 @@ void BScreen::shutdown(void) {
   XSelectInput(getBaseDisplay().getXDisplay(), getRootWindow(), NoEventMask);
   XSync(getBaseDisplay().getXDisplay(), False);
 
-  wkspList::iterator it;
-  for (it = workspacesList.begin(); it != workspacesList.end(); ++it)
-    (*it)->shutdown();
+  std::for_each(workspacesList.begin(), workspacesList.end(),
+                std::mem_fun(&Workspace::shutdown));
 
   while (!iconList.empty())
     iconList.front()->restore();

@@ -189,25 +189,12 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   masked_window = NULL;
   masked = None;
 
-  windowSearchList = new LinkedList<WindowSearch>;
-  menuSearchList = new LinkedList<MenuSearch>;
-
-#ifdef    SLIT
-  slitSearchList = new LinkedList<SlitSearch>;
-#endif // SLIT
-
-  toolbarSearchList = new LinkedList<ToolbarSearch>;
-  groupSearchList = new LinkedList<WindowSearch>;
-
-  menuTimestamps = new LinkedList<MenuTimestamp>;
-
   load();
 
 #ifdef    HAVE_GETPID
   openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
 #endif // HAVE_GETPID
 
-  screenList = new LinkedList<BScreen>;
   for (int i = 0; i < getNumberOfScreens(); i++) {
     BScreen *screen = new BScreen(*this, i, config);
 
@@ -216,16 +203,16 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
       continue;
     }
 
-    screenList->insert(screen);
+    screenList.push_back(screen);
   }
 
-  if (! screenList->count()) {
+  if (screenList.empty()) {
     fprintf(stderr,
 	    i18n->getMessage(openboxSet, openboxNoManagableScreens,
 	       "Openbox::Openbox: no managable screens found, aborting.\n"));
     ::exit(3);
   }
-  focused_screen = screenList->first();
+  focused_screen = screenList.front();
 
   // save current settings and default values
   save();
@@ -244,17 +231,11 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
 
 Openbox::~Openbox() {
-  while (screenList->count())
-    delete screenList->remove(0);
+  for_each(screenList.begin(), screenList.end(),
+           PointerAssassin());
 
-  while (menuTimestamps->count()) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
-
-    if (ts->filename)
-      delete [] ts->filename;
-
-    delete ts;
-  }
+  for_each(menuTimestamps.begin(), menuTimestamps.end(),
+           PointerAssassin());
 
   if (resource.menu_file)
     delete [] resource.menu_file;
@@ -267,19 +248,7 @@ Openbox::~Openbox() {
 
   delete timer;
 
-  delete screenList;
-  delete menuTimestamps;
-
-  delete windowSearchList;
-  delete menuSearchList;
-  delete toolbarSearchList;
-  delete groupSearchList;
-
   delete [] rc_file;
-
-#ifdef    SLIT
-  delete slitSearchList;
-#endif // SLIT
 }
 
 
@@ -323,9 +292,9 @@ void Openbox::process_event(XEvent *e) {
     } else if ((tbar = searchToolbar(e->xbutton.window))) {
       tbar->buttonPressEvent(&e->xbutton);
     } else {
-      LinkedListIterator<BScreen> it(screenList);
-      BScreen *screen = it.current();
-      for (; screen; it++, screen = it.current()) {
+      ScreenList::iterator it;
+      for (it = screenList.begin(); it != screenList.end(); ++it) {
+        BScreen *screen = *it;
 	if (e->xbutton.window == screen->getRootWindow()) {
 	  if (e->xbutton.button == 1) {
             if (! screen->isRootColormapInstalled())
@@ -774,170 +743,107 @@ Bool Openbox::handleSignal(int sig) {
 
 
 BScreen *Openbox::searchScreen(Window window) {
-  LinkedListIterator<BScreen> it(screenList);
-
-  for (BScreen *curr = it.current(); curr; it++, curr = it.current()) {
-    if (curr->getRootWindow() == window) {
-      return curr;
-    }
-  }
-
+  ScreenList::iterator it;
+  for (it = screenList.begin(); it != screenList.end(); ++it)
+    if ((*it)->getRootWindow() == window)
+      return *it;
   return (BScreen *) 0;
 }
 
 
 OpenboxWindow *Openbox::searchWindow(Window window) {
-  LinkedListIterator<WindowSearch> it(windowSearchList);
-
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-      if (tmp->getWindow() == window) {
-	return tmp->getData();
-      }
-  }
-
-  return (OpenboxWindow *) 0;
+  WindowLookup::iterator it = windowSearchList.find(window);
+  if (it == windowSearchList.end())
+    return (OpenboxWindow *) 0;
+  return it->second;
 }
 
 
 OpenboxWindow *Openbox::searchGroup(Window window, OpenboxWindow *win) {
-  OpenboxWindow *w = (OpenboxWindow *) 0;
-  LinkedListIterator<WindowSearch> it(groupSearchList);
-
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      w = tmp->getData();
-      if (w->getClientWindow() != win->getClientWindow())
-        return win;
-    }
-  }
-
+  WindowLookup::iterator it = groupSearchList.find(window);
+  if (it != groupSearchList.end())
+    if (it->second->getClientWindow() != win->getClientWindow())
+      return win;
   return (OpenboxWindow *) 0;
 }
 
 
 Basemenu *Openbox::searchMenu(Window window) {
-  LinkedListIterator<MenuSearch> it(menuSearchList);
-
-  for (MenuSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Basemenu *) 0;
+  MenuLookup::iterator it = menuSearchList.find(window);
+  if (it == menuSearchList.end())
+    return (Basemenu *) 0;
+  return it->second;
 }
 
 
 Toolbar *Openbox::searchToolbar(Window window) {
-  LinkedListIterator<ToolbarSearch> it(toolbarSearchList);
-
-  for (ToolbarSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Toolbar *) 0;
+  ToolbarLookup::iterator it = toolbarSearchList.find(window);
+  if (it == toolbarSearchList.end())
+    return (Toolbar *) 0;
+  return it->second;
 }
 
 
 #ifdef    SLIT
 Slit *Openbox::searchSlit(Window window) {
-  LinkedListIterator<SlitSearch> it(slitSearchList);
-
-  for (SlitSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Slit *) 0;
+  SlitLookup::iterator it = slitSearchList.find(window);
+  if (it == slitSearchList.end())
+    return (Slit *) 0;
+  return it->second;
 }
 #endif // SLIT
 
 
 void Openbox::saveWindowSearch(Window window, OpenboxWindow *data) {
-  windowSearchList->insert(new WindowSearch(window, data));
+  windowSearchList.insert(WindowLookupPair(window, data));
 }
 
 
 void Openbox::saveGroupSearch(Window window, OpenboxWindow *data) {
-  groupSearchList->insert(new WindowSearch(window, data));
+  groupSearchList.insert(WindowLookupPair(window, data));
 }
 
 
 void Openbox::saveMenuSearch(Window window, Basemenu *data) {
-  menuSearchList->insert(new MenuSearch(window, data));
+  menuSearchList.insert(MenuLookupPair(window, data));
 }
 
 
 void Openbox::saveToolbarSearch(Window window, Toolbar *data) {
-  toolbarSearchList->insert(new ToolbarSearch(window, data));
+  toolbarSearchList.insert(ToolbarLookupPair(window, data));
 }
 
 
 #ifdef    SLIT
 void Openbox::saveSlitSearch(Window window, Slit *data) {
-  slitSearchList->insert(new SlitSearch(window, data));
+  slitSearchList.insert(SlitLookupPair(window, data));
 }
 #endif // SLIT
 
 
 void Openbox::removeWindowSearch(Window window) {
-  LinkedListIterator<WindowSearch> it(windowSearchList);
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      windowSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  windowSearchList.erase(window);
 }
 
 
 void Openbox::removeGroupSearch(Window window) {
-  LinkedListIterator<WindowSearch> it(groupSearchList);
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      groupSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  groupSearchList.erase(window);
 }
 
 
 void Openbox::removeMenuSearch(Window window) {
-  LinkedListIterator<MenuSearch> it(menuSearchList);
-  for (MenuSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      menuSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  menuSearchList.erase(window);
 }
 
 
 void Openbox::removeToolbarSearch(Window window) {
-  LinkedListIterator<ToolbarSearch> it(toolbarSearchList);
-  for (ToolbarSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      toolbarSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  toolbarSearchList.erase(window);
 }
 
 
 #ifdef    SLIT
 void Openbox::removeSlitSearch(Window window) {
-  LinkedListIterator<SlitSearch> it(slitSearchList);
-  for (SlitSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      slitSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  slitSearchList.erase(window);
 }
 #endif // SLIT
 
@@ -961,9 +867,8 @@ void Openbox::shutdown() {
 
   XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
 
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *s = it.current(); s; it++, s = it.current())
-    s->shutdown();
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::shutdown));
 
   XSync(getXDisplay(), False);
 }
@@ -988,14 +893,8 @@ void Openbox::save() {
   config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
   config.setValue("session.cacheMax", (long)resource.cache_max);
 
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *s = it.current(); s != NULL; it++, s = it.current()) {
-    s->save();
-    s->getToolbar()->save();
-#ifdef    SLIT
-    s->getSlit()->save();
-#endif // SLIT
-  }
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::save));
 
   config.setAutoSave(true);
   config.save();
@@ -1075,42 +974,27 @@ void Openbox::real_reconfigure() {
 
   load();
   
-  for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
+  for_each(menuTimestamps.begin(), menuTimestamps.end(),
+           PointerAssassin());
+  menuTimestamps.clear();
 
-    if (ts) {
-      if (ts->filename)
-	delete [] ts->filename;
-
-      delete ts;
-    }
-  }
-
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current()) {
-    screen->reconfigure();
-  }
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::reconfigure));
 
   ungrab();
 }
 
 
 void Openbox::checkMenu() {
-  Bool reread = False;
-  LinkedListIterator<MenuTimestamp> it(menuTimestamps);
-  for (MenuTimestamp *tmp = it.current(); tmp && (! reread);
-       it++, tmp = it.current()) {
+  MenuTimestampList::iterator it;
+  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it) {
     struct stat buf;
 
-    if (! stat(tmp->filename, &buf)) {
-      if (tmp->timestamp != buf.st_ctime)
-        reread = True;
-    } else {
-      reread = True;
+    if (stat((*it)->filename, &buf) || (*it)->timestamp != buf.st_ctime) {
+      rereadMenu();
+      return;
     }
   }
-
-  if (reread) rereadMenu();
 }
 
 
@@ -1122,20 +1006,12 @@ void Openbox::rereadMenu() {
 
 
 void Openbox::real_rereadMenu() {
-  for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
+  std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
+                PointerAssassin());
+  menuTimestamps.clear();
 
-    if (ts) {
-      if (ts->filename)
-	delete [] ts->filename;
-
-      delete ts;
-    }
-  }
-
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current())
-    screen->rereadMenu();
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::rereadMenu));
 }
 
 
@@ -1149,14 +1025,15 @@ void Openbox::setStyleFilename(const char *filename) {
 
 
 void Openbox::setMenuFilename(const char *filename) {
-  Bool found = False;
+  bool found = false;
 
-  LinkedListIterator<MenuTimestamp> it(menuTimestamps);
-  for (MenuTimestamp *tmp = it.current(); tmp && (! found);
-       it++, tmp = it.current()) {
-    if (! strcmp(tmp->filename, filename)) found = True;
-  }
-  if (! found) {
+  MenuTimestampList::iterator it;
+  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it)
+    if (! strcmp((*it)->filename, filename)) {
+      found = true;
+      break;
+    }
+  if (!found) {
     struct stat buf;
 
     if (! stat(filename, &buf)) {
@@ -1165,7 +1042,7 @@ void Openbox::setMenuFilename(const char *filename) {
       ts->filename = bstrdup(filename);
       ts->timestamp = buf.st_ctime;
 
-      menuTimestamps->insert(ts);
+      menuTimestamps.push_back(ts);
     }
   }
 }
@@ -1185,7 +1062,10 @@ void Openbox::timeout() {
 OpenboxWindow *Openbox::focusedWindow() {
   if (focused_screen == (BScreen *) 0)
     return (OpenboxWindow *) 0;
-  return focused_screen->getCurrentWorkspace()->focusedWindow();
+  Workspace *w = focused_screen->getCurrentWorkspace();
+  if (w == (Workspace *) 0)
+    return (OpenboxWindow *) 0;
+  return w->focusedWindow();
 }
 
 

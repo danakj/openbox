@@ -24,6 +24,8 @@
      Mon Sep 22 02:34:53 EDT 2003 - xor(a)orodu.net
          add the focusLast and raiseOnFocus options
          fix some capitalization
+     Mon Sep 22 14:08:16 EDT 2003 - xor(a)orodu.net
+         update hideTimeout to hideDelay
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -105,7 +107,7 @@
             <xs:element name="floatingX" type="xs:integer"/>
             <xs:element name="floatingY" type="xs:integer"/>
             <xs:element name="autoHide" type="ob:yesorno"/>
-            <xs:element name="hideTimeout" type="xs:integer"/>
+            <xs:element name="hideDelay" type="xs:integer"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="action">

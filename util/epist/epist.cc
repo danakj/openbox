@@ -160,8 +160,8 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            Mod1Mask | ControlMask | ShiftMask, 3));
   _actions.push_back(Action(Action::execute,
                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("F6")),
-                           Mod1Mask, "aterm"));
+                                             XStringToKeysym("space")),
+                           Mod1Mask, "rxvt"));
   activateGrabs();
 }
 

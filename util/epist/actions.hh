@@ -52,6 +52,8 @@ public:
 
     nextWindowOfClass, //done
     prevWindowOfClass, //done
+    nextWindowOfClassOnAllWorkspaces, //done
+    prevWindowOfClassOnAllWorkspaces, //done
 
     changeWorkspace, //done
     nextWorkspace, //done

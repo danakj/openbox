@@ -187,6 +187,14 @@ void screen::handleKeypress(const XEvent &e) {
         cycleWindow(false, false, true);
         return;
 
+      case Action::nextWindowOfClassOnAllWorkspaces:
+        cycleWindow(true, true, true);
+        return;
+
+      case Action::prevWindowOfClassOnAllWorkspaces:
+        cycleWindow(false, true, true);
+        return;
+
       case Action::changeWorkspace:
         changeWorkspace(it->number());
         return;

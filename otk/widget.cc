@@ -187,12 +187,6 @@ void OtkWidget::hide(bool recursive)
 
 void OtkWidget::focus(void)
 {
-/*  if (! _visible)
-    return;
-
-  XSetInputFocus(otk::OBDisplay::display, _window, RevertToPointerRoot,
-  CurrentTime);*/
-
   _focused = true;
   
   OtkWidget::OtkWidgetList::iterator it = _children.begin(),
@@ -253,7 +247,7 @@ void OtkWidget::ungrabKeyboard(void)
 void OtkWidget::render(void)
 {
   if (!_texture) return;
-  
+
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
   if (_bg_pixmap)
@@ -392,8 +386,8 @@ void OtkWidget::adjustVert(void)
 void OtkWidget::update(void)
 {
   if (_dirty) {
-    if (! _unmanaged)
-    adjust();
+    if (!_unmanaged)
+      adjust();
     render();
     XClearWindow(OBDisplay::display, _window);
   }
@@ -444,15 +438,6 @@ void OtkWidget::setStyle(Style *style)
   assert(style);
   _style = style;
   _dirty = true;
-
-  // reset textures/colors
-  if (_focused) {
-    unfocus();
-    focus();
-  } else {
-    focus();
-    unfocus();
-  }
 
   OtkWidgetList::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it)

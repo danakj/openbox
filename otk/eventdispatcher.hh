@@ -36,9 +36,12 @@ private:
   OtkEventMap _map;
   OtkEventHandler *_fallback;
   OtkEventHandler *_master;
+  XEvent _focus_e;
 
   //! The time at which the last XEvent with a time was received
   Time _lasttime; // XXX: store this! also provide an accessor!
+
+  void dispatch(const XEvent &e);
 };
 
 }

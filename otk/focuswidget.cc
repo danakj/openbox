@@ -23,43 +23,30 @@ OtkFocusWidget::~OtkFocusWidget()
 #include <stdio.h>
 void OtkFocusWidget::focus(void)
 {
-  if (!isVisible() || _focused)
+  if (_focused)
     return;
 
-  printf("FOCUS\n");
   OtkWidget::focus();
 
   if (_focus_bcolor)
     OtkWidget::setBorderColor(_focus_bcolor);
 
   OtkWidget::setTexture(_focus_texture);
-  OtkWidget::update();
+  update();
 }
 
 void OtkFocusWidget::unfocus(void)
 {
-  if (!isVisible() || !_focused)
+  if (!_focused)
     return;
 
-  printf("UNFOCUS\n");
   OtkWidget::unfocus();
 
   if (_unfocus_bcolor)
     OtkWidget::setBorderColor(_unfocus_bcolor);
 
   OtkWidget::setTexture(_unfocus_texture);
-  OtkWidget::update();
-
-  OtkWidget::OtkWidgetList children = OtkWidget::children();
-
-  OtkWidget::OtkWidgetList::iterator it = children.begin(),
-    end = children.end();
-
-  OtkFocusWidget *tmp = 0;
-  for (; it != end; ++it) {
-    tmp = dynamic_cast<OtkFocusWidget*>(*it);
-    if (tmp) tmp->unfocus();
-  }
+  update();
 }
 
 void OtkFocusWidget::setTexture(BTexture *texture)

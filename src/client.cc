@@ -40,6 +40,8 @@ OBClient::OBClient(int screen, Window window)
   _wmstate = NormalState;
   // no default decors or functions, each has to be enabled
   _decorations = _functions = 0;
+  // start unfocused
+  _focused = false;
   
   getArea();
   getDesktop();
@@ -460,6 +462,9 @@ void OBClient::updateTitle()
 
   if (_title.empty())
     _title = _("Unnamed Window");
+
+  if (frame)
+    frame->setTitle(_title);
 }
 
 
@@ -856,6 +861,37 @@ void OBClient::close()
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
   XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+}
+
+
+bool OBClient::focus()
+{
+  if (!_can_focus) return false;
+
+  XSetInputFocus(otk::OBDisplay::display, _window, RevertToNone, CurrentTime);
+  return true;
+}
+
+
+void OBClient::focusHandler(const XFocusChangeEvent &)
+{
+  frame->focus();
+  _focused = true;
+
+  Openbox::instance->setFocusedClient(this);
+}
+
+
+void OBClient::unfocusHandler(const XFocusChangeEvent &)
+{
+  frame->unfocus();
+  _focused = false;
+
+  if (Openbox::instance->focusedClient() == this) {
+    printf("UNFOCUSING\n");
+    Openbox::instance->setFocusedClient(0);
+  } else
+    printf("UNFOCUSED ALREADY COULDNT UNFOCUS\n");
 }
 
 

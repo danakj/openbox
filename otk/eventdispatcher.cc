@@ -11,8 +11,10 @@
 namespace otk {
 
 OtkEventDispatcher::OtkEventDispatcher()
-  : _fallback(0), _master(0)
+  : _fallback(0), _master(0), _focus(None)
 {
+  _focus_e.xfocus.mode = NotifyNormal;
+  _focus_e.xfocus.detail = NotifyNonlinear;
 }
 
 OtkEventDispatcher::~OtkEventDispatcher()
@@ -36,9 +38,10 @@ void OtkEventDispatcher::clearHandler(Window id)
 
 void OtkEventDispatcher::dispatchEvents(void)
 {
-  XEvent e;
-  OtkEventHandler *handler;
   OtkEventMap::iterator it;
+  XEvent e;
+  Window focus = _focus;
+  Window unfocus = None;
 
   while (XPending(OBDisplay::display)) {
     XNextEvent(OBDisplay::display, &e);
@@ -70,23 +73,58 @@ void OtkEventDispatcher::dispatchEvents(void)
         XConfigureWindow(otk::OBDisplay::display, e.xconfigurerequest.window,
                          e.xconfigurerequest.value_mask, &xwc);
       }
+    // madly compress all focus events
+    } else if (e.type == FocusIn) {
+      // any other types are not ones we're interested in
+      if (e.xfocus.detail == NotifyNonlinear) {
+        if (e.xfocus.window != focus) {
+          unfocus = focus;
+          focus = e.xfocus.window;
+        }
+      }
+    } else if (e.type == FocusOut) {
+      // any other types are not ones we're interested in
+      if (e.xfocus.detail == NotifyNonlinear) {
+        if (e.xfocus.window == focus) {
+          unfocus = focus;
+          focus = None;
+        }
+      }
     } else {
       // normal events
-      
-      it = _map.find(e.xany.window);
-
-      if (it != _map.end())
-        handler = it->second;
-      else
-        handler = _fallback;
-
-      if (handler)
-        handler->handle(e);
+      dispatch(e);
     }
-
-    if (_master)
-      _master->handle(e);
   }
+
+  if (focus != _focus) {
+    _focus_e.xfocus.type = FocusIn;
+    _focus_e.xfocus.window = focus;
+    dispatch(_focus_e);
+    _focus = focus;
+  }
+  if (unfocus != None) {
+    _focus_e.xfocus.type = FocusOut;
+    _focus_e.xfocus.window = unfocus;
+    dispatch(_focus_e);
+  }
+}
+
+void OtkEventDispatcher::dispatch(const XEvent &e) {
+  OtkEventHandler *handler;
+  OtkEventMap::iterator it;
+
+  it = _map.find(e.xany.window);
+  
+  if (it != _map.end())
+    handler = it->second;
+  else
+    handler = _fallback;
+
+  if (handler)
+    handler->handle(e);
+
+  if (master)
+    master->handle(e);
 }
 
 OtkEventHandler *OtkEventDispatcher::findHandler(Window win)

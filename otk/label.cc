@@ -32,7 +32,7 @@ void OtkLabel::setStyle(Style *style)
 void OtkLabel::update(void)
 {
   if (_dirty) {
-    const BFont &ft = style()->getFont();
+    const BFont *ft = style()->getFont();
     unsigned int sidemargin = style()->getBevelWidth() * 2;
 
     std::string t = _text; // the actual text to draw
@@ -48,7 +48,7 @@ void OtkLabel::update(void)
       
       do {
         t.resize(text_len);
-        length = ft.measureString(t);
+        length = ft->measureString(t);
       } while (length > max_length && text_len-- > 0);
 
       // justify the text
@@ -66,7 +66,7 @@ void OtkLabel::update(void)
 
     OtkWidget::update();
 
-    ft.drawString(_xftdraw, x, 0, *style()->getTextUnfocus(), t);
+    ft->drawString(_xftdraw, x, 0, *style()->getTextUnfocus(), t);
   } else
     OtkWidget::update();
 }

@@ -89,6 +89,14 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
                                      otk::OBProperty::Atom_Cardinal,
                                      viewport, 2);
 
+  // create the window which gets focus when no clients get it
+  XSetWindowAttributes attr;
+  attr.override_redirect = true;
+  _focuswindow = XCreateWindow(otk::OBDisplay::display, _info->rootWindow(),
+                               -100, -100, 1, 1, 0, 0, InputOnly,
+                               _info->visual(), CWOverrideRedirect, &attr);
+  XMapWindow(otk::OBDisplay::display, _focuswindow);
+  
   // these may be further updated if any pre-existing windows are found in
   // the manageExising() function
   setClientList();     // initialize the client lists, which will be empty

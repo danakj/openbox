@@ -93,6 +93,15 @@ public:
   //! Set the style to decorate the frame with
   virtual void setStyle(otk::Style *style);
 
+  //! Realign children
+  virtual void adjust();
+  //! Displays focused decorations
+  virtual void focus();
+  //! Displays unfocused decorations
+  virtual void unfocus();
+
+  void setTitle(const std::string &text);
+ 
   //! Update the frame's size to match the client
   void adjustSize();
   //! Update the frame's position to match the client

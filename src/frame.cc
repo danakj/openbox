@@ -43,31 +43,15 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
 
   XSelectInput(otk::OBDisplay::display, window(), OBFrame::event_mask);
   
-  unmanaged();
-  _titlebar.unmanaged();
-  _button_close.unmanaged();
-  _button_iconify.unmanaged();
-  _button_max.unmanaged();
-  _button_stick.unmanaged();
-  _label.unmanaged();
-  _handle.unmanaged();
-  _grip_left.unmanaged();
-  _grip_right.unmanaged();
-  _plate.unmanaged();
-
   _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
   _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
   
-  _button_close.setText("X");
-  _button_iconify.setText("I");
-  _button_max.setText("M");
-  _button_stick.setText("S");
   _label.setText(_client->title());
 
   _style = 0;
   setStyle(style);
 
-  //XXX: uncomment me unfocus(); // stuff starts out focused in otk
+  otk::OtkWidget::unfocus(); // stuff starts out appearing focused in otk
   
   _plate.show(); // the other stuff is shown based on decor settings
   
@@ -78,6 +62,13 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
 OBFrame::~OBFrame()
 {
   releaseClient(false);
+}
+
+
+void OBFrame::setTitle(const std::string &text)
+{
+  _label.setText(text);
+  _label.update();
 }
 
 
@@ -97,9 +88,7 @@ void OBFrame::setStyle(otk::Style *style)
   
   _style = style;
 
-  // XXX: change when focus changes!
-  XSetWindowBorder(otk::OBDisplay::display, window(),
-                   _style->getBorderColor()->pixel());
+  setBorderColor(_style->getBorderColor());
 
   // if !replace, then adjust() will get called after the client is grabbed!
   if (replace) {
@@ -107,6 +96,25 @@ void OBFrame::setStyle(otk::Style *style)
     adjustSize();
     adjustPosition();
   }
+}
+
+
+void OBFrame::focus()
+{
+  otk::OtkWidget::focus();
+  update();
+}
+
+
+void OBFrame::unfocus()
+{
+  otk::OtkWidget::unfocus();
+  update();
+}
+
+
+void OBFrame::adjust()
+{
 }
 
 
@@ -142,13 +150,13 @@ void OBFrame::adjustSize()
     _titlebar.setGeometry(-bwidth,
                           -bwidth,
                           width,
-                          (_style->getFont().height() +
+                          (_style->getFont()->height() +
                            _style->getBevelWidth() * 2));
     _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size
     _label.setGeometry(0, _style->getBevelWidth(),
-                       width, _style->getFont().height());
+                       width, _style->getFont()->height());
     // set the buttons sizes
     if (_decorations & OBClient::Decor_Iconify)
       _button_iconify.setGeometry(0, _style->getBevelWidth() + 1,

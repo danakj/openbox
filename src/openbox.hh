@@ -121,6 +121,9 @@ private:
   //! The action interface through which all user-available actions occur
   OBActions *_actions;
 
+  //! Run the application in synchronous mode? (for debugging)
+  bool _sync;
+
   //! The running state of the window manager
   RunState _state;
 
@@ -133,6 +136,19 @@ private:
   //! The configuration of the application. TEMPORARY
   otk::Configuration _config;
 
+  //! The client with input focus
+  /*!
+    Updated by the clients themselves.
+  */
+  OBClient *_focused_client;
+
+  //! The screen with input focus
+  /*!
+    Updated by the clients when they update the Openbox::focused_client
+    property.
+  */
+  OBScreen *_focused_screen;
+  
   //! Parses the command line used when executing this application
   void parseCommandLine(int argv, char **argv);
   //! Displays the version string to stdout
@@ -203,6 +219,18 @@ public:
   //! Finds an OBClient based on its window id
   OBClient *findClient(Window window);
 
+  //! The client with input focus
+  inline OBClient *focusedClient() { return _focused_client; }
+
+  //! Change the client which has focus.
+  /*!
+    This is called by the clients themselves when their focus state changes.
+  */
+  void setFocusedClient(OBClient *c);
+
+  //! The screen with input focus
+  inline OBScreen *focusedScreen() { return _focused_screen; }
+  
   //! Requests that the window manager exit
   /*!
     Causes the Openbox::eventLoop function to stop looping, so that the window

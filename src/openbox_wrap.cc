@@ -658,17 +658,18 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__OtkEventHandler swig_types[10] 
 #define  SWIGTYPE_p_otk__Rect swig_types[11] 
 #define  SWIGTYPE_p_ob__OBWidget swig_types[12] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[13] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[14] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[15] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[16] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[17] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[18] 
-#define  SWIGTYPE_p_PyObject swig_types[19] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[20] 
-#define  SWIGTYPE_p_otk__Configuration swig_types[21] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[22] 
-static swig_type_info *swig_types[24];
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[13] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[14] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[15] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[16] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[17] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[18] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[19] 
+#define  SWIGTYPE_p_PyObject swig_types[20] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[21] 
+#define  SWIGTYPE_p_otk__Configuration swig_types[22] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[23] 
+static swig_type_info *swig_types[25];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -1229,6 +1230,59 @@ static PyObject *_wrap_Openbox_findClient(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Openbox_focusedClient(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Openbox_focusedClient",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *)(arg1)->focusedClient();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Openbox_setFocusedClient(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Openbox_setFocusedClient",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setFocusedClient(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Openbox_focusedScreen(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
+    ob::OBScreen *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Openbox_focusedScreen",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBScreen *)(arg1)->focusedScreen();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBScreen, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Openbox_shutdown(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Openbox *arg1 = (ob::Openbox *) 0 ;
@@ -1352,6 +1406,23 @@ static PyObject *_wrap_OBScreen_style(PyObject *self, PyObject *args) {
     result = (otk::Style *)((ob::OBScreen const *)arg1)->style();
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Style, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_focuswindow(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    Window result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBScreen_focuswindow",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Window)((ob::OBScreen const *)arg1)->focuswindow();
+    
+    resultobj = PyInt_FromLong((long)result);
     return resultobj;
     fail:
     return NULL;
@@ -2172,6 +2243,67 @@ static PyObject *_wrap_OBClient_close(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_focus(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_focus",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)(arg1)->focus();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBClient_focusHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    XFocusChangeEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBClient_focusHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XFocusChangeEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->focusHandler((XFocusChangeEvent const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBClient_unfocusHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    XFocusChangeEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBClient_unfocusHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XFocusChangeEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->unfocusHandler((XFocusChangeEvent const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_propertyHandler(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2329,6 +2461,24 @@ static PyObject *_wrap_register(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_preregister(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    PyObject *arg2 = (PyObject *) 0 ;
+    bool result;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iO:preregister",&arg1,&obj1)) goto fail;
+    arg2 = obj1;
+    result = (bool)ob::python_preregister(arg1,arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_unregister(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     int arg1 ;
@@ -2371,6 +2521,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_addClient", _wrap_Openbox_addClient, METH_VARARGS },
 	 { (char *)"Openbox_removeClient", _wrap_Openbox_removeClient, METH_VARARGS },
 	 { (char *)"Openbox_findClient", _wrap_Openbox_findClient, METH_VARARGS },
+	 { (char *)"Openbox_focusedClient", _wrap_Openbox_focusedClient, METH_VARARGS },
+	 { (char *)"Openbox_setFocusedClient", _wrap_Openbox_setFocusedClient, METH_VARARGS },
+	 { (char *)"Openbox_focusedScreen", _wrap_Openbox_focusedScreen, METH_VARARGS },
 	 { (char *)"Openbox_shutdown", _wrap_Openbox_shutdown, METH_VARARGS },
 	 { (char *)"Openbox_swigregister", Openbox_swigregister, METH_VARARGS },
 	 { (char *)"OBScreen_client", _wrap_OBScreen_client, METH_VARARGS },
@@ -2379,6 +2532,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_imageControl", _wrap_OBScreen_imageControl, METH_VARARGS },
 	 { (char *)"OBScreen_area", _wrap_OBScreen_area, METH_VARARGS },
 	 { (char *)"OBScreen_style", _wrap_OBScreen_style, METH_VARARGS },
+	 { (char *)"OBScreen_focuswindow", _wrap_OBScreen_focuswindow, METH_VARARGS },
 	 { (char *)"OBScreen_addStrut", _wrap_OBScreen_addStrut, METH_VARARGS },
 	 { (char *)"OBScreen_removeStrut", _wrap_OBScreen_removeStrut, METH_VARARGS },
 	 { (char *)"OBScreen_loadStyle", _wrap_OBScreen_loadStyle, METH_VARARGS },
@@ -2425,6 +2579,9 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
 	 { (char *)"OBClient_resize", _wrap_OBClient_resize, METH_VARARGS },
 	 { (char *)"OBClient_close", _wrap_OBClient_close, METH_VARARGS },
+	 { (char *)"OBClient_focus", _wrap_OBClient_focus, METH_VARARGS },
+	 { (char *)"OBClient_focusHandler", _wrap_OBClient_focusHandler, METH_VARARGS },
+	 { (char *)"OBClient_unfocusHandler", _wrap_OBClient_unfocusHandler, METH_VARARGS },
 	 { (char *)"OBClient_propertyHandler", _wrap_OBClient_propertyHandler, METH_VARARGS },
 	 { (char *)"OBClient_clientMessageHandler", _wrap_OBClient_clientMessageHandler, METH_VARARGS },
 	 { (char *)"OBClient_shapeHandler", _wrap_OBClient_shapeHandler, METH_VARARGS },
@@ -2433,6 +2590,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_destroyHandler", _wrap_OBClient_destroyHandler, METH_VARARGS },
 	 { (char *)"OBClient_swigregister", OBClient_swigregister, METH_VARARGS },
 	 { (char *)"register", _wrap_register, METH_VARARGS },
+	 { (char *)"preregister", _wrap_preregister, METH_VARARGS },
 	 { (char *)"unregister", _wrap_unregister, METH_VARARGS },
 	 { NULL, NULL }
 };
@@ -2465,6 +2623,7 @@ static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureReque
 static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
 static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
 static swig_type_info _swigt__p_ob__OBWidget[] = {{"_p_ob__OBWidget", 0, "ob::OBWidget *", 0},{"_p_ob__OBWidget"},{"_p_ob__OBClient", _p_ob__OBClientTo_p_ob__OBWidget},{0}};
+static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
 static swig_type_info _swigt__p_XClientMessageEvent[] = {{"_p_XClientMessageEvent", 0, "XClientMessageEvent *", 0},{"_p_XClientMessageEvent"},{0}};
 static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventDispatcher[] = {{"_p_otk__OtkEventDispatcher", 0, "otk::OtkEventDispatcher *", 0},{"_p_otk__OtkEventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventDispatcher},{0}};
@@ -2490,6 +2649,7 @@ _swigt__p_XConfigureRequestEvent,
 _swigt__p_otk__OtkEventHandler, 
 _swigt__p_otk__Rect, 
 _swigt__p_ob__OBWidget, 
+_swigt__p_XFocusChangeEvent, 
 _swigt__p_XClientMessageEvent, 
 _swigt__p_otk__OBProperty, 
 _swigt__p_otk__OtkEventDispatcher, 

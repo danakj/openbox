@@ -32,6 +32,27 @@ bool python_register(int action, PyObject *callback)
   return true;
 }
 
+bool python_preregister(int action, PyObject *callback)
+{
+  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid action type.");
+    return false;
+  }
+  if (!PyCallable_Check(callback)) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
+    return false;
+  }
+  
+  FunctionList::iterator it = std::find(callbacks[action].begin(),
+					callbacks[action].end(),
+					callback);
+  if (it == callbacks[action].end()) { // not already in there
+    Py_XINCREF(callback);              // Add a reference to new callback
+    callbacks[action].insert(callbacks[action].begin(), callback);
+  }
+  return true;
+}
+
 bool python_unregister(int action, PyObject *callback)
 {
   if (action < 0 || action >= OBActions::NUM_ACTIONS) {

@@ -1001,42 +1001,6 @@ static PyObject *_wrap_OtkEventDispatcher_getFallbackHandler(PyObject *self, PyO
 }
 
 
-static PyObject *_wrap_OtkEventDispatcher_setMasterHandler(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::OtkEventDispatcher *arg1 = (otk::OtkEventDispatcher *) 0 ;
-    otk::OtkEventHandler *arg2 = (otk::OtkEventHandler *) 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:OtkEventDispatcher_setMasterHandler",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OtkEventDispatcher,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__OtkEventHandler,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->setMasterHandler(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_OtkEventDispatcher_getMasterHandler(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::OtkEventDispatcher *arg1 = (otk::OtkEventDispatcher *) 0 ;
-    otk::OtkEventHandler *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:OtkEventDispatcher_getMasterHandler",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OtkEventDispatcher,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::OtkEventHandler *)((otk::OtkEventDispatcher const *)arg1)->getMasterHandler();
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__OtkEventHandler, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_OtkEventDispatcher_findHandler(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::OtkEventDispatcher *arg1 = (otk::OtkEventDispatcher *) 0 ;
@@ -11327,10 +11291,7 @@ static PyObject *_wrap_Style_getFont(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"O:Style_getFont",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    {
-        otk::BFont const &_result_ref = ((otk::Style const *)arg1)->getFont();
-        result = (otk::BFont *) &_result_ref;
-    }
+    result = (otk::BFont *)((otk::Style const *)arg1)->getFont();
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__BFont, 0);
     return resultobj;
@@ -12745,8 +12706,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OtkEventDispatcher_dispatchEvents", _wrap_OtkEventDispatcher_dispatchEvents, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_setFallbackHandler", _wrap_OtkEventDispatcher_setFallbackHandler, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_getFallbackHandler", _wrap_OtkEventDispatcher_getFallbackHandler, METH_VARARGS },
-	 { (char *)"OtkEventDispatcher_setMasterHandler", _wrap_OtkEventDispatcher_setMasterHandler, METH_VARARGS },
-	 { (char *)"OtkEventDispatcher_getMasterHandler", _wrap_OtkEventDispatcher_getMasterHandler, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_findHandler", _wrap_OtkEventDispatcher_findHandler, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_swigregister", OtkEventDispatcher_swigregister, METH_VARARGS },
 	 { (char *)"OtkEventHandler_handle", _wrap_OtkEventHandler_handle, METH_VARARGS },

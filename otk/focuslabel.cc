@@ -36,7 +36,7 @@ void OtkFocusLabel::setStyle(Style *style)
 void OtkFocusLabel::update(void)
 {
   if (_dirty) {
-    const BFont &ft = style()->getFont();
+    const BFont *ft = style()->getFont();
     BColor *text_color = (isFocused() ? style()->getTextFocus()
                           : style()->getTextUnfocus());
     unsigned int sidemargin = style()->getBevelWidth() * 2;
@@ -54,7 +54,7 @@ void OtkFocusLabel::update(void)
       
       do {
         t.resize(text_len);
-        length = ft.measureString(t);
+        length = ft->measureString(t);
       } while (length > max_length && text_len-- > 0);
 
       // justify the text
@@ -72,7 +72,7 @@ void OtkFocusLabel::update(void)
 
     OtkFocusWidget::update();
 
-    ft.drawString(_xftdraw, x, 0, *text_color, t);
+    ft->drawString(_xftdraw, x, 0, *text_color, t);
   } else
     OtkFocusWidget::update();
 }

@@ -16,6 +16,7 @@ namespace otk {
 struct PixmapMask {
   Pixmap mask;
   unsigned int w, h;
+  PixmapMask() { mask = None; w = h = 0; }
 };
 
 class Style {
@@ -114,7 +115,7 @@ public:
   inline unsigned int getFrameWidth(void) const { return frame_width; }
   inline unsigned int getBorderWidth(void) const { return border_width; }
 
-  inline const BFont &getFont() const { return *font; }
+  inline const BFont *getFont() const { return font; }
 
   inline void setShadowFonts(bool fonts) { shadow_fonts = fonts; }
   inline bool hasShadowFonts(void) const { return shadow_fonts; }

@@ -62,6 +62,7 @@ private:
   //! The style with which to render on the screen
   otk::Style _style;
 
+  //! The screen's root window
   OBRootWindow _root;
   
   //! Is the root colormap currently installed?
@@ -73,6 +74,9 @@ private:
   //! Areas of the screen reserved by applications
   StrutList _struts;
 
+  //!  An offscreen window which gets focus when nothing else has it
+  Window _focuswindow;
+  
 
   //! Calculate the OBScreen::_area member
   void calcArea();
@@ -113,6 +117,8 @@ public:
   inline const otk::Rect &area() const { return _area; }
   //! Returns the style in use on the screen
   inline const otk::Style *style() const { return &_style; }
+  //!  An offscreen window which gets focus when nothing else has it
+  inline Window focuswindow() const { return _focuswindow; }
 
   //! Adds a window's strut to the screen's list of reserved spaces
   void addStrut(otk::Strut *strut);

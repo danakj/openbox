@@ -234,6 +234,8 @@ private:
   bool _urgent;
   //! Notify the window when it receives focus?
   bool _focus_notify;
+  //! Does the client window have the input focus?
+  bool _focused;
 
   //! The window uses shape extension to be non-rectangular?
   bool _shaped;
@@ -431,7 +433,12 @@ public:
 
   //! Request the client to close its window.
   void close();
+
+  //! Attempt to focus the client window
+  bool focus();
   
+  virtual void focusHandler(const XFocusChangeEvent &e);
+  virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);
   virtual void shapeHandler(const XShapeEvent &e);

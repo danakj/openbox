@@ -108,6 +108,8 @@ Openbox::Openbox(int argc, char **argv)
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
   _scriptfilepath = otk::expandTilde("~/.openbox/user.py");
+  _focused_client = 0;
+  _sync = false;
 
   parseCommandLine(argc, argv);
 
@@ -128,7 +130,9 @@ Openbox::Openbox(int argc, char **argv)
   // open the X display (and gets some info about it, and its screens)
   otk::OBDisplay::initialize(_displayreq);
   assert(otk::OBDisplay::display);
-    
+
+  XSynchronize(otk::OBDisplay::display, _sync);
+  
   // set up the signal handler
   action.sa_handler = Openbox::signalHandler;
   action.sa_mask = sigset_t();
@@ -181,6 +185,10 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
+  // set up input focus
+  _focused_screen = _screens[0];
+  setFocusedClient(0);
+  
   _state = State_Normal; // done starting
 }
 
@@ -223,6 +231,8 @@ void Openbox::parseCommandLine(int argc, char **argv)
         err = true;
       else
         _scriptfilepath = argv[i];
+    } else if (arg == "-sync") {
+      _sync = true;
     } else if (arg == "-version") {
       showVersion();
       ::exit(0);
@@ -319,6 +329,19 @@ OBClient *Openbox::findClient(Window window)
     return it->second;
   else
     return (OBClient*) 0;
+}
+
+
+void Openbox::setFocusedClient(OBClient *c)
+{
+  _focused_client = c;
+  if (c) {
+    _focused_screen = _screens[c->screen()];
+  } else {
+    assert(_focused_screen);
+    XSetInputFocus(otk::OBDisplay::display, _focused_screen->focuswindow(),
+                   RevertToNone, CurrentTime);
+  }
 }
 
 }

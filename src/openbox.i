@@ -53,6 +53,7 @@
 %}
 %ignore ob::python_callback;
 %rename(register) ob::python_register;
+%rename(preregister) ob::python_preregister;
 %rename(unregister) ob::python_unregister;
 
 %ignore ob::OBScreen::clients;

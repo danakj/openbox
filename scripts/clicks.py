@@ -18,11 +18,15 @@ def def_click_client(action, win, type, modifiers, button, time):
 		elif button == Button5:
 			print "OBClient_unshade(client)"
 
-def def_click_model(action, win, type, modifiers, button, time):
+def def_press_model(action, win, type, modifiers, button, xroot, yroot, time):
 	if button != Button1: return
 	client = Openbox_findClient(openbox, win)
-	if not client: return
-	print "OBClient_focus(client)"
+	if not client or (type == Type_StickyButton or
+			  type == Type_IconifyButton or
+			  type == Type_MaximizeButton or
+			  type == Type_CloseButton):
+		return
+	OBClient_focus(client)
 	print "OBClient_raise(client)"
 
 def def_click_root(action, win, type, modifiers, button, time):
@@ -46,7 +50,7 @@ def def_doubleclick_client(action, win, type, modifiers, button, time):
 		print "OBClient_toggleshade(client)"
 
 
-register(Action_Click, def_click_model)
+preregister(Action_ButtonPress, def_press_model)
 register(Action_Click, def_click_client)
 register(Action_Click, def_click_root)
 register(Action_DoubleClick, def_doubleclick_client)

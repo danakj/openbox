@@ -34,12 +34,14 @@ void send_client_msg(Window target, Atom type, Window about,
 %include "ob_python.i"
 %include "callback.i"
 
-%import "otk.i"
 // for Window etc
 %import "X11/X.h"
 
 %inline %{
 #include <string>
+#include "bindings.hh"
+#include "otk/display.hh"
+#include "otk/screeninfo.hh"
 
 void set_reset_key(const std::string &key)
 {

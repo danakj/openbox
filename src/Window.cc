@@ -2208,6 +2208,7 @@ void OpenboxWindow::redrawCloseButton(Bool pressed) {
 
 
 void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
+  cout << "MAP REQUEST " << client.window << " " << client.title << endl;
   if (re->window == client.window) {
 #ifdef    DEBUG
     fprintf(stderr, i18n->getMessage(WindowSet, WindowMapRequest,
@@ -2785,6 +2786,7 @@ void OpenboxWindow::startMove(int x, int y) {
   }
   frame.grab_x = x - frame.x - frame.border_w;
   frame.grab_y = y - frame.y - frame.border_w;
+  cout << "START MOVE " << client.window << " " << client.title << endl;
 }
 
 
@@ -2874,6 +2876,11 @@ void OpenboxWindow::endMove() {
   }
   screen->hideGeometry();
   XUngrabPointer(display, CurrentTime);
+  // if there are any left over motions from the move, drop them now cuz they
+  // cause problems
+  XEvent e;
+  while (XCheckTypedWindowEvent(display, frame.window, MotionNotify, &e));
+  cout << "END MOVE " << client.window << " " << client.title << endl;
 }
 
 
@@ -2887,11 +2894,12 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
   else if (functions.resize &&
 	     (((me->state & Button1Mask) && (me->window == frame.right_grip ||
 					     me->window == frame.left_grip)) ||
-	      (me->state & (Mod1Mask | Button3Mask) &&
+	      (me->state == (Mod1Mask | Button3Mask) &&
 	                                     me->window == frame.window))) {
     Bool left = resize_zone & ZoneLeft;
 
     if (! flags.resizing) {
+      cout << "START RESIZE " << client.window << " " << client.title << endl;
       Cursor cursor;
       if (resize_zone & ZoneTop)
         cursor = (resize_zone & ZoneLeft) ?
@@ -2965,7 +2973,8 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       screen->showGeometry(gx, gy);
     }
-  }
+  } else
+    cout << "MOTION " << client.window << " " << client.title << endl;
 }
 
 

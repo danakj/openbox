@@ -283,11 +283,10 @@ Openbox::~Openbox() {
 
 
 void Openbox::process_event(XEvent *e) {
-  if ((masked == e->xany.window) && masked_window &&
+  if ((masked == e->xany.window && masked_window) &&
       (e->type == MotionNotify)) {
     last_time = e->xmotion.time;
     masked_window->motionNotifyEvent(&e->xmotion);
-
     return;
   }
 

@@ -161,9 +161,7 @@ void focus_fallback(FallbackType type)
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (type != Fallback_Unfocusing || it->data != old)
-            if (client_normal(it->data) &&
-                ((Client*)it->data)->frame->visible &&
-                client_focus(it->data))
+            if (client_normal(it->data) && client_focus(it->data))
                 return;
 
     /* nothing to focus */
@@ -209,7 +207,7 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         }
         ft = client_focus_target(it->data);
         if (ft == it->data && focus_client != ft && client_normal(ft) &&
-            ft->frame->visible && client_focus(ft)) {
+            client_focus(ft)) {
             noreorder++; /* avoid reordering the focus_order */
             return ft;
         }

@@ -104,8 +104,8 @@ def _find(screen, state):
 def place(data):
     global _data
     if data.client:
-    if not (windowplacement.ignore_requested_positions and
-            data.client.normal()):
+        if not (windowplacement.ignore_requested_positions and
+                data.client.normal()):
             if data.client.positionRequested(): return
         state = _create_state(data)
         try:

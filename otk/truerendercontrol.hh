@@ -4,9 +4,27 @@
 
 #include "rendercontrol.hh"
 
+extern "C" {
+
+#ifdef HAVE_STDINT_H
+#  include <stdint.h>
+#else
+#  ifdef HAVE_SYS_TYPES_H
+#    include <sys/types.h>
+#  endif
+#endif
+
+}
+
 #include <vector>
 
 namespace otk {
+
+#ifdef HAVE_STDINT_H
+typedef uint32_t pixel32;
+#else
+typedef u_int32_t pixel32;
+#endif
 
 class TrueRenderControl : public RenderControl {
 private:
@@ -26,6 +44,8 @@ public:
   virtual ~TrueRenderControl();
 
   virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
+  virtual void drawGradientBackground(Surface &sf,
+                                      const RenderTexture &texture) const;
 };
 
 }

@@ -33,6 +33,8 @@ extern "C" {
 #  include <sys/types.h>
 #  include <unistd.h>
 #endif // HAVE_UNISTD_H
+
+#include <X11/keysym.h>
 }
 
 #include <iostream>
@@ -51,15 +53,18 @@ using std::string;
 #include "config.hh"
 
 screen::screen(epist *epist, int number) 
-  : _clients(epist->clientsList()),
-    _active(epist->activeWindow()) {
+  : _clients(epist->clientsList()), _active(epist->activeWindow()),
+    _config(epist->getConfig()), _grabbed(true), _cycling(false),
+    _stacked_cycling(false)
+{
   _epist = epist;
   _xatom = _epist->xatom();
   _last_active = _clients.end();
   _number = number;
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
-  _grabbed = true;
+
+  _config->getBoolValue(Config::stackedCycling, _stacked_cycling);
 
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -142,6 +147,13 @@ void screen::processEvent(const XEvent &e) {
   case KeyPress:
     handleKeypress(e);
     break;
+
+  case KeyRelease:
+    handleKeyrelease(e);
+    break;
+
+  default:
+    break;
   }
 }
 
@@ -177,46 +189,46 @@ void screen::handleKeypress(const XEvent &e) {
 
   case Action::nextWindow:
     
-    cycleWindow(true, it->number() != 0 ? it->number(): 1);
+    cycleWindow(state, true, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::prevWindow:
-    cycleWindow(false, it->number() != 0 ? it->number(): 1);
+    cycleWindow(state, false, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::nextWindowOnAllWorkspaces:
-    cycleWindow(true, it->number() != 0 ? it->number(): 1,  false, true);
+    cycleWindow(state, true, it->number() != 0 ? it->number(): 1,  false, true);
     return;
 
   case Action::prevWindowOnAllWorkspaces:
-    cycleWindow(false, it->number() != 0 ? it->number(): 1, false, true);
+    cycleWindow(state, false, it->number() != 0 ? it->number(): 1, false, true);
     return;
 
   case Action::nextWindowOnAllScreens:
-    cycleWindow(true, it->number() != 0 ? it->number(): 1, true);
+    cycleWindow(state, true, it->number() != 0 ? it->number(): 1, true);
     return;
 
   case Action::prevWindowOnAllScreens:
-    cycleWindow(false, it->number() != 0 ? it->number(): 1, true);
+    cycleWindow(state, false, it->number() != 0 ? it->number(): 1, true);
     return;
 
   case Action::nextWindowOfClass:
-    cycleWindow(true, it->number() != 0 ? it->number(): 1,
+    cycleWindow(state, true, it->number() != 0 ? it->number(): 1,
                 false, false, true, it->string());
     return;
 
   case Action::prevWindowOfClass:
-    cycleWindow(false, it->number() != 0 ? it->number(): 1,
+    cycleWindow(state, false, it->number() != 0 ? it->number(): 1,
                 false, false, true, it->string());
     return;
       
   case Action::nextWindowOfClassOnAllWorkspaces:
-    cycleWindow(true, it->number() != 0 ? it->number(): 1,
+    cycleWindow(state, true, it->number() != 0 ? it->number(): 1,
                 false, true, true, it->string());
     return;
       
   case Action::prevWindowOfClassOnAllWorkspaces:
-    cycleWindow(false, it->number() != 0 ? it->number(): 1,
+    cycleWindow(state, false, it->number() != 0 ? it->number(): 1,
                 false, true, true, it->string());
     return;
 
@@ -355,6 +367,30 @@ void screen::handleKeypress(const XEvent &e) {
     }
   }
 }
+
+
+void screen::handleKeyrelease(const XEvent &e) {
+  // we're not interested in non-modifiers
+  if (!isModifier(e.xkey.keycode))
+    return;
+
+  // the only keyrelease event we care about (for now) is when we do stacked
+  // cycling and the modifier is released
+  if (_stacked_cycling && _cycling && nothingIsPressed()) {
+    XWindow *w = *_active;
+
+    // all modifiers have been released. ungrab the keyboard, move the
+    // focused window to the top of the Z-order and raise it
+    ungrabModifiers();
+
+    _clients.remove(w);
+    _clients.push_front(w);
+    w->raise();
+
+    _cycling = false;
+  }
+}
+
 
 // do we want to add this window to our list?
 bool screen::doAddWindow(Window window) const {
@@ -518,9 +554,11 @@ void screen::execCommand(const string &cmd) const {
 }
 
 
-void screen::cycleWindow(const bool forward, const int increment,
-                         const bool allscreens, const bool alldesktops,
-                         const bool sameclass, const string &cn) const {
+void screen::cycleWindow(unsigned int state, const bool forward,
+                         const int increment, const bool allscreens,
+                         const bool alldesktops, const bool sameclass,
+                         const string &cn)
+{
   assert(_managed);
   assert(increment > 0);
 
@@ -534,7 +572,7 @@ void screen::cycleWindow(const bool forward, const int increment,
     begin = _clients.begin(),
     end = _clients.end();
 
-  const XWindow *t = 0;
+  XWindow *t = 0;
   
   for (int x = 0; x < increment; ++x) {
     while (1) {
@@ -575,7 +613,23 @@ void screen::cycleWindow(const bool forward, const int increment,
   }
 
   // phew. we found the window, so focus it.
-  t->focus();
+  if (_stacked_cycling && state) {
+    if (!_cycling) {
+      // grab modifiers so we can intercept KeyReleases from them
+      grabModifiers();
+      _cycling = true;
+    }
+
+    // if the window is on another desktop, we can't use XSetInputFocus, since
+    // it doesn't imply a woskpace change.
+    if (t->desktop() == _active_desktop)
+      t->focus(false); // focus, but don't raise
+    else
+      t->focus(); // change workspace and focus
+  }  
+  else {
+    t->focus();
+  }
 }
 
 
@@ -613,11 +667,12 @@ void screen::changeWorkspace(const int num) const {
 
 void screen::changeWorkspaceVert(const int num) const {
   assert(_managed);
-  const Config *conf = _epist->getConfig();
-  int width = conf->getNumberValue(Config::workspaceColumns);
+  int width = 0;
   int num_desktops = (signed)_num_desktops;
   int active_desktop = (signed)_active_desktop;
   int wnum = 0;
+
+  _config->getNumberValue(Config::workspaceColumns, width);
 
   if (width > num_desktops || width <= 0)
     return;
@@ -644,12 +699,13 @@ void screen::changeWorkspaceVert(const int num) const {
 
 void screen::changeWorkspaceHorz(const int num) const {
   assert(_managed);
-  const Config *conf = _epist->getConfig();
-  int width = conf->getNumberValue(Config::workspaceColumns);
+  int width = 0;
   int num_desktops = (signed)_num_desktops;
   int active_desktop = (signed)_active_desktop;
   int wnum = 0;
-  
+
+  _config->getNumberValue(Config::workspaceColumns, width);
+
   if (width > num_desktops || width <= 0)
     return;
 
@@ -724,4 +780,48 @@ void screen::ungrabKey(const KeyCode keyCode, const int modifierMask) const {
   XUngrabKey(display, keyCode, modifierMask|numlockMask|LockMask, _root);
   XUngrabKey(display, keyCode, modifierMask|numlockMask|LockMask|
              scrolllockMask, _root);
+}
+
+
+void screen::grabModifiers() const {
+  Display *display = _epist->getXDisplay();
+
+  XGrabKeyboard(display, rootWindow(), True, GrabModeAsync,
+                GrabModeAsync, CurrentTime);
+}
+
+
+void screen::ungrabModifiers() const {
+  Display *display = _epist->getXDisplay();
+
+  XUngrabKeyboard(display, CurrentTime);
+}
+
+
+bool screen::isModifier(const KeyCode kc) const {
+  KeySym ks = XKeycodeToKeysym(_epist->getXDisplay(), kc, 0);
+
+  if (ks == XK_Shift_L || ks == XK_Shift_R ||
+      ks == XK_Control_L || ks == XK_Control_R ||
+      ks == XK_Meta_L || ks == XK_Meta_R ||
+      ks == XK_Alt_L || ks == XK_Alt_R ||
+      ks == XK_Super_L || ks == XK_Super_R ||
+      ks == XK_Hyper_L || ks == XK_Hyper_R)
+    return true;
+  else
+    return false;
+}
+
+
+bool screen::nothingIsPressed(void) const
+{
+  char keys[32];
+  XQueryKeymap(_epist->getXDisplay(), keys);
+
+  for (int i = 0; i < 32; ++i) {
+    if (keys[i] != 0)
+      return false;
+  }
+
+  return true;
 }

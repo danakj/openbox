@@ -31,6 +31,7 @@ extern "C" {
 #include <string>
 
 #include "window.hh"
+#include "config.hh"
 
 class epist;
 class screen;
@@ -45,15 +46,19 @@ class screen {
   const ScreenInfo *_info;
 
   std::string _wm_name;
-  
+
   WindowList &_clients;
   WindowList::iterator &_active;
   WindowList::iterator _last_active;
   unsigned int _active_desktop;
   unsigned int _num_desktops;
 
+  const Config *_config;
+
   bool _managed;
   bool _grabbed; // used for keygrab toggle function
+  bool _cycling; // used for stacked cycling
+  bool _stacked_cycling;
 
   XWindow *findWindow(const XEvent &e) const;
   void updateNumDesktops();
@@ -62,6 +67,8 @@ class screen {
   void updateActiveWindow();
   bool doAddWindow(Window window) const;
   bool findSupportingWM();
+  bool isModifier(const KeyCode kc) const;
+  bool nothingIsPressed(void) const;
 
 public:
   screen(epist *epist, int number);
@@ -75,13 +82,14 @@ public:
   
   void processEvent(const XEvent &e);
   void handleKeypress(const XEvent &e);
+  void handleKeyrelease(const XEvent &e);
   void updateEverything();
 
-  void cycleWindow(const bool forward, const int increment,
+  void cycleWindow(unsigned int state, const bool forward, const int increment,
                    const bool allscreens = false,
                    const bool alldesktops = false,
                    const bool sameclass = false,
-                   const std::string &classname = "") const;
+                   const std::string &classname = "");
   void cycleWorkspace(const bool forward, const int increment,
                       const bool loop = true) const;
   void changeWorkspace(const int num) const;
@@ -93,7 +101,9 @@ public:
 
   void grabKey(const KeyCode keyCode, const int modifierMask) const;
   void ungrabKey(const KeyCode keyCode, const int modifierMask) const;
+
+  void grabModifiers(void) const;
+  void ungrabModifiers(void) const;
 };
 
 #endif // __screen_hh
-

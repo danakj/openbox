@@ -20,7 +20,7 @@ FocusWidget::~FocusWidget()
 {
 }
 
-#include <stdio.h>
+
 void FocusWidget::focus(void)
 {
   if (_focused)

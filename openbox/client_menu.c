@@ -72,13 +72,16 @@ static void client_update(ObMenuFrame *frame, gpointer data)
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
 
     e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
-    e->data.normal.label = frame->client->max_vert || frame->client->max_horz ?
-        _("Restore") : _("Maximize");
+    g_free(e->data.normal.label);
+    e->data.normal.label =
+        g_strdup(frame->client->max_vert || frame->client->max_horz ?
+                 _("Restore") : _("Maximize"));
     e->data.normal.enabled =frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
 
     e = menu_find_entry_id(menu, CLIENT_SHADE);
-    e->data.normal.label = frame->client->shaded ?
-        _("Roll down") : _("Roll up");
+    g_free(e->data.normal.label);
+    e->data.normal.label = g_strdup(frame->client->shaded ?
+                                    _("Roll down") : _("Roll up"));
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
 
     e = menu_find_entry_id(menu, CLIENT_MOVE);

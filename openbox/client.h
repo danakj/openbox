@@ -294,7 +294,6 @@ typedef struct Client {
 } Client;
 
 extern GList *client_list;
-extern GHashTable *client_map;
 
 void client_startup();
 void client_shutdown();

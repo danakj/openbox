@@ -53,6 +53,39 @@ names = ("one" "two" "three" "four")
 # the theme to display
 #theme = "operation"
 
+[dock]
+# The position on the screen to place the dock. Options are:
+#   Floating - uses the floatingX and floatingY options to position itself
+#   TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left
+#     - the appropriate corner/edge of the screen
+#position = "TopLeft"
+
+# When position is "Floating", this specifies the x-coordinate to place the
+# the dock at.
+#floatingx = 0
+
+# When position is "Floating", this specifies the y-coordinate to place the
+# the dock at.
+#floatingy = 0
+
+# The stacking layer that the dock will be in. Options are:
+#   Top - above all normal windows, same layer as panels
+#   Normal - can be above and below normal windows
+#   Bottom - below all normal windows
+#stacking = "Top"
+
+# When true, the dock will grow horizontally when dock apps are added to it,
+# otherwise it will grow vertically.
+#horizontal = no
+
+# When true, the dock will hide itself while the pointer is not over it, and
+# will show itself when the pointer is.
+#autoHide = no
+
+# The number of milliseconds to wait before hiding the dock when the pointer
+# leaves it, if the autoHide option is on.
+#hideTimeout = 3000
+
 [keyboard]
 
 #kbind (Key [Key...])	Action	[Parameter]

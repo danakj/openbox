@@ -1,5 +1,5 @@
 #include "client.h"
-#include "slit.h"
+#include "dock.h"
 #include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
@@ -26,7 +26,6 @@
 				ButtonMotionMask)
 
 GList      *client_list      = NULL;
-GHashTable *client_map       = NULL;
 
 static void client_get_all(Client *self);
 static void client_toggle_border(Client *self, gboolean show);
@@ -41,20 +40,13 @@ static void client_change_allowed_actions(Client *self);
 static void client_change_state(Client *self);
 static void client_apply_startup_state(Client *self);
 
-static guint map_hash(Window *w) { return *w; }
-static gboolean map_key_comp(Window *w1, Window *w2) { return *w1 == *w2; }
-
 void client_startup()
 {
-    client_map = g_hash_table_new((GHashFunc)map_hash,
-				  (GEqualFunc)map_key_comp);
-
     client_set_list();
 }
 
 void client_shutdown()
 {
-    g_hash_table_destroy(client_map);
 }
 
 void client_set_list()
@@ -117,7 +109,6 @@ void client_manage_all()
     Window w, *children;
     XWMHints *wmhints;
     XWindowAttributes attrib;
-    Client *active;
 
     XQueryTree(ob_display, ob_root, &w, &w, &children, &nchild);
 
@@ -154,19 +145,28 @@ void client_manage_all()
        stacking list are on the top where you can see them instead of buried
        at the bottom! */
     for (i = startup_stack_size; i > 0; --i) {
-        Client *c;
+        ObWindow *obw;
 
         w = startup_stack_order[i-1];
-        c = g_hash_table_lookup(client_map, &w);
-        if (c) stacking_lower(CLIENT_AS_WINDOW(c));
+        obw = g_hash_table_lookup(window_map, &w);
+        if (obw) {
+            g_assert(WINDOW_IS_CLIENT(obw));
+            stacking_lower(CLIENT_AS_WINDOW(obw));
+        }
     }
     g_free(startup_stack_order);
     startup_stack_order = NULL;
     startup_stack_size = 0;
 
     if (config_focus_new) {
-        active = g_hash_table_lookup(client_map, &startup_active);
-        if (!(active && client_focus(active)))
+        ObWindow *active;
+
+        active = g_hash_table_lookup(window_map, &startup_active);
+        if (active) {
+            g_assert(WINDOW_IS_CLIENT(active));
+            if (!client_focus(WINDOW_AS_CLIENT(active)))
+                focus_fallback(Fallback_NoFocus);
+        } else
             focus_fallback(Fallback_NoFocus);
     }
 }
@@ -203,7 +203,7 @@ void client_manage(Window window)
     if ((wmhint = XGetWMHints(ob_display, window))) {
 	if ((wmhint->flags & StateHint) &&
 	    wmhint->initial_state == WithdrawnState) {
-            slit_add(window, wmhint);
+            dock_add(window, wmhint);
             grab_server(FALSE);
 	    XFree(wmhint);
 	    return;
@@ -245,7 +245,7 @@ void client_manage(Window window)
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
-    g_hash_table_insert(client_map, &self->window, self);
+    g_hash_table_insert(window_map, &self->window, self);
 
     /* update the focus lists */
     focus_order_add_new(self);
@@ -330,7 +330,7 @@ void client_unmanage(Client *self)
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
-    g_hash_table_remove(client_map, &self->window);
+    g_hash_table_remove(window_map, &self->window);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -673,9 +673,10 @@ void client_update_transient_for(Client *self)
     if (XGetTransientForHint(ob_display, self->window, &t)) {
 	self->transient = TRUE;
         if (t != self->window) { /* cant be transient to itself! */
-            c = g_hash_table_lookup(client_map, &t);
+            c = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
             g_assert(c != self);
+            g_assert(!c || WINDOW_IS_CLIENT(c));
             
             if (!c && self->group) {
                 /* not transient to a client, see if it is transient for a

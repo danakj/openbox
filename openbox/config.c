@@ -9,11 +9,19 @@ gboolean config_focus_popup;
 
 char *config_theme;
 
-int config_desktops_num;
+int     config_desktops_num;
 GSList *config_desktops_names;
 
 gboolean config_opaque_move;
 gboolean config_opaque_resize;
+
+StackLayer   config_dock_layer;
+DockPosition config_dock_pos;
+int          config_dock_x;
+int          config_dock_y;
+gboolean     config_dock_horz;
+gboolean     config_dock_hide;
+guint        config_dock_hide_timeout;
 
 static void parse_focus(char *name, ParseToken *value)
 {
@@ -118,6 +126,81 @@ static void parse_moveresize(char *name, ParseToken *value)
     parse_free_token(value);
 }
 
+static void parse_dock(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "stacking")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            if (!g_ascii_strcasecmp(value->data.string, "bottom"))
+                config_dock_layer = Layer_Below;
+            else if (!g_ascii_strcasecmp(value->data.string, "normal"))
+                config_dock_layer = Layer_Normal;
+            else if (!g_ascii_strcasecmp(value->data.string, "top"))
+                config_dock_layer = Layer_Top;
+            else
+                yyerror("invalid layer");
+        }
+    } else if (!g_ascii_strcasecmp(name, "position")) {
+        if (value->type != TOKEN_STRING)
+            yyerror("invalid value");
+        else {
+            if (!g_ascii_strcasecmp(value->data.string, "topleft"))
+                config_dock_pos = DockPos_TopLeft;
+            else if (!g_ascii_strcasecmp(value->data.string, "top"))
+                config_dock_pos = DockPos_Top;
+            else if (!g_ascii_strcasecmp(value->data.string, "topright"))
+                config_dock_pos = DockPos_TopRight;
+            else if (!g_ascii_strcasecmp(value->data.string, "right"))
+                config_dock_pos = DockPos_Right;
+            else if (!g_ascii_strcasecmp(value->data.string, "bottomright"))
+                config_dock_pos = DockPos_BottomRight;
+            else if (!g_ascii_strcasecmp(value->data.string, "bottom"))
+                config_dock_pos = DockPos_Bottom;
+            else if (!g_ascii_strcasecmp(value->data.string, "bottomleft"))
+                config_dock_pos = DockPos_BottomLeft;
+            else if (!g_ascii_strcasecmp(value->data.string, "left"))
+                config_dock_pos = DockPos_Left;
+            else if (!g_ascii_strcasecmp(value->data.string, "floating"))
+                config_dock_pos = DockPos_Floating;
+            else
+                yyerror("invalid position");
+        }
+    } else if (!g_ascii_strcasecmp(name, "floatingx")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            config_dock_x = value->data.integer;
+        }
+    } else if (!g_ascii_strcasecmp(name, "floatingy")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            config_dock_y = value->data.integer;
+        }
+    } else if (!g_ascii_strcasecmp(name, "horizontal")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            config_dock_horz = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "autohide")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            config_dock_hide = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "hidetimeout")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            config_dock_hide_timeout = value->data.integer;
+        }
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
+
 void config_startup()
 {
     config_focus_new = TRUE;
@@ -141,6 +224,16 @@ void config_startup()
     config_opaque_resize = TRUE;
 
     parse_reg_section("moveresize", NULL, parse_moveresize);
+
+    config_dock_layer = Layer_Top;
+    config_dock_pos = DockPos_TopRight;
+    config_dock_x = 0;
+    config_dock_y = 0;
+    config_dock_horz = FALSE;
+    config_dock_hide = FALSE;
+    config_dock_hide_timeout = 3000;
+
+    parse_reg_section("dock", NULL, parse_dock);
 }
 
 void config_shutdown()

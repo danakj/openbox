@@ -1,5 +1,5 @@
 #include "openbox.h"
-#include "slit.h"
+#include "dock.h"
 #include "event.h"
 #include "menu.h"
 #include "client.h"
@@ -184,6 +184,7 @@ int main(int argc, char **argv)
         g_free(theme);
         if (!theme) return 1;
 
+        window_startup();
         menu_startup();
         frame_startup();
         moveresize_startup();
@@ -191,7 +192,7 @@ int main(int argc, char **argv)
 	screen_startup();
         group_startup();
 	client_startup();
-        slit_startup();
+        dock_startup();
 
         /* call startup for all the plugins */
         plugin_startall();
@@ -204,11 +205,11 @@ int main(int argc, char **argv)
 	    event_loop();
 	ob_state = State_Exiting;
 
-        slit_remove_all();
+        dock_remove_all();
 	client_unmanage_all();
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
-        slit_shutdown();
+        dock_shutdown();
 	client_shutdown();
         group_shutdown();
 	screen_shutdown();
@@ -216,6 +217,7 @@ int main(int argc, char **argv)
         moveresize_shutdown();
         frame_shutdown();
         menu_shutdown();
+        window_shutdown();
         grab_shutdown();
 	event_shutdown();
         theme_shutdown();

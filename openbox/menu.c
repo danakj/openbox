@@ -8,7 +8,6 @@
 #include "plugin.h"
 
 static GHashTable *menu_hash = NULL;
-GHashTable *menu_map = NULL;
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
 			 LeaveWindowMask)
@@ -34,9 +33,9 @@ void menu_destroy_hash_value(Menu *self)
     g_free(self->label);
     g_free(self->name);
 
-    g_hash_table_remove(menu_map, &self->title);
-    g_hash_table_remove(menu_map, &self->frame);
-    g_hash_table_remove(menu_map, &self->items);
+    g_hash_table_remove(window_map, &self->title);
+    g_hash_table_remove(window_map, &self->frame);
+    g_hash_table_remove(window_map, &self->items);
 
     stacking_remove(self);
 
@@ -53,7 +52,7 @@ void menu_entry_free(MenuEntry *self)
     g_free(self->label);
     action_free(self->action);
 
-    g_hash_table_remove(menu_map, &self->item);
+    g_hash_table_remove(window_map, &self->item);
 
     appearance_free(self->a_item);
     appearance_free(self->a_disabled);
@@ -73,7 +72,6 @@ void menu_startup()
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
-    menu_map = g_hash_table_new(g_int_hash, g_int_equal);
 
     m = menu_new(NULL, "root", NULL);
  
@@ -137,7 +135,6 @@ void menu_startup()
 void menu_shutdown()
 {
     g_hash_table_destroy(menu_hash);
-    g_hash_table_destroy(menu_map);
 }
 
 static Window createWindow(Window parent, unsigned long mask,
@@ -195,9 +192,9 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     self->a_title = appearance_copy(theme_a_menu_title);
     self->a_items = appearance_copy(theme_a_menu);
 
-    g_hash_table_insert(menu_map, &self->frame, self);
-    g_hash_table_insert(menu_map, &self->title, self);
-    g_hash_table_insert(menu_map, &self->items, self);
+    g_hash_table_insert(window_map, &self->frame, self);
+    g_hash_table_insert(window_map, &self->title, self);
+    g_hash_table_insert(window_map, &self->items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
 
     stacking_add(MENU_AS_WINDOW(self));
@@ -259,7 +256,7 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
 
     menu->invalid = TRUE;
 
-    g_hash_table_insert(menu_map, &entry->item, menu);
+    g_hash_table_insert(window_map, &entry->item, menu);
 }
 
 void menu_show(char *name, int x, int y, Client *client)

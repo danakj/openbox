@@ -1,5 +1,5 @@
 #include "openbox.h"
-#include "slit.h"
+#include "dock.h"
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"
@@ -27,8 +27,8 @@
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
-static void event_handle_slit(Slit *s, XEvent *e);
-static void event_handle_slitapp(SlitApp *app, XEvent *e);
+static void event_handle_dock(Dock *s, XEvent *e);
+static void event_handle_dockapp(DockApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, XEvent *e);
 
@@ -394,15 +394,32 @@ static void event_process(XEvent *e)
 {
     Window window;
     Client *client = NULL;
-    Slit *slit = NULL;
-    SlitApp *slitapp = NULL;
+    Dock *dock = NULL;
+    DockApp *dockapp = NULL;
     Menu *menu = NULL;
+    ObWindow *obwin = NULL;
 
     window = event_get_window(e);
-    if (!(client = g_hash_table_lookup(client_map, &window)))
-        if (!(slitapp = g_hash_table_lookup(slit_app_map, &window)))
-            if (!(slit = g_hash_table_lookup(slit_map, &window)))
-                menu = g_hash_table_lookup(menu_map, &window);
+    if ((obwin = g_hash_table_lookup(window_map, &window))) {
+        switch (obwin->type) {
+        case Window_Dock:
+            dock = WINDOW_AS_DOCK(obwin);
+            break;
+        case Window_DockApp:
+            dockapp = WINDOW_AS_DOCKAPP(obwin);
+            break;
+        case Window_Menu:
+            menu = WINDOW_AS_MENU(obwin);
+            break;
+        case Window_Client:
+            client = WINDOW_AS_CLIENT(obwin);
+            break;
+        case Window_Internal:
+            /* not to be used for events */
+            g_assert_not_reached();
+            break;
+        }
+    }
 
     event_set_lasttime(e);
     event_hack_mods(e);
@@ -415,10 +432,10 @@ static void event_process(XEvent *e)
         return;
     } else if (client)
 	event_handle_client(client, e);
-    else if (slitapp)
-	event_handle_slitapp(slitapp, e);
-    else if (slit)
-	event_handle_slit(slit, e);
+    else if (dockapp)
+	event_handle_dockapp(dockapp, e);
+    else if (dock)
+	event_handle_dock(dock, e);
     else if (window == ob_root)
 	event_handle_root(e);
     else if (e->type == MapRequest)
@@ -969,41 +986,41 @@ void fd_event_handle()
     g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
 }
 
-static void event_handle_slit(Slit *s, XEvent *e)
+static void event_handle_dock(Dock *s, XEvent *e)
 {
     switch (e->type) {
     case ButtonPress:
-        stacking_raise(SLIT_AS_WINDOW(s));
+        stacking_raise(DOCK_AS_WINDOW(s));
     case EnterNotify:
-        slit_hide(s, FALSE);
+        dock_hide(FALSE);
         break;
     case LeaveNotify:
-        slit_hide(s, TRUE);
+        dock_hide(TRUE);
         break;
     }
 }
 
-static void event_handle_slitapp(SlitApp *app, XEvent *e)
+static void event_handle_dockapp(DockApp *app, XEvent *e)
 {
     switch (e->type) {
     case MotionNotify:
-        slit_app_drag(app, &e->xmotion);
+        dock_app_drag(app, &e->xmotion);
         break;
     case UnmapNotify:
 	if (app->ignore_unmaps) {
 	    app->ignore_unmaps--;
 	    break;
 	}
-	slit_remove(app, TRUE);
+	dock_remove(app, TRUE);
 	break;
     case DestroyNotify:
-	slit_remove(app, FALSE);
+	dock_remove(app, FALSE);
 	break;
     case ReparentNotify:
-	slit_remove(app, FALSE);
+	dock_remove(app, FALSE);
 	break;
     case ConfigureNotify:
-        slit_app_configure(app, e->xconfigure.width, e->xconfigure.height);
+        dock_app_configure(app, e->xconfigure.width, e->xconfigure.height);
         break;
     }
 }

@@ -1771,7 +1771,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
           break;
 
         case 421: // exec
-          if (! (*label || *command)) {
+          if (! (*label && *command)) {
             fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
                                  "BScreen::parseMenuFile: [exec] error, "
                                  "no menu label and/or command defined\n"));

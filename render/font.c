@@ -109,7 +109,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     x += 3; /* XXX figure out X with justification */
 
     if (t->shadow) {
-
         if (t->tint >= 0) {
             c.color.red = 0;
             c.color.green = 0;

@@ -46,6 +46,10 @@ typedef struct DockApp {
 
     Window icon_win;
     Window win;
+
+    char *name;
+    char *class;
+
     int x;
     int y;
     int w;

@@ -1,5 +1,6 @@
 #include "dock.h"
 #include "screen.h"
+#include "prop.h"
 #include "config.h"
 #include "grab.h"
 #include "openbox.h"
@@ -51,12 +52,25 @@ void dock_add(Window win, XWMHints *wmhints)
 {
     DockApp *app;
     XWindowAttributes attrib;
+    char **data;
 
     app = g_new0(DockApp, 1);
     app->obwin.type = Window_DockApp;
     app->win = win;
     app->icon_win = (wmhints->flags & IconWindowHint) ?
         wmhints->icon_window : win;
+
+    if (PROP_GETSS(app->win, wm_class, locale, &data)) {
+        if (data[0]) {
+	    app->name = g_strdup(data[0]);
+            if (data[1])
+                app->class = g_strdup(data[1]);
+        }
+        g_strfreev(data);     
+    }
+
+    if (app->name == NULL) app->name = g_strdup("");
+    if (app->class == NULL) app->class = g_strdup("");
     
     if (XGetWindowAttributes(ob_display, app->icon_win, &attrib)) {
         app->w = attrib.width;
@@ -98,7 +112,7 @@ void dock_add(Window win, XWMHints *wmhints)
 
     g_hash_table_insert(window_map, &app->icon_win, app);
 
-    g_message("Managed Dock App: 0x%lx", app->icon_win);
+    g_message("Managed Dock App: 0x%lx (%s)", app->icon_win, app->class);
 }
 
 void dock_remove_all()
@@ -123,8 +137,10 @@ void dock_remove(DockApp *app, gboolean reparent)
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
     dock_configure();
 
-    g_message("Unmanaged Dock App: 0x%lx", app->icon_win);
+    g_message("Unmanaged Dock App: 0x%lx (%s)", app->icon_win, app->class);
 
+    g_free(app->name);
+    g_free(app->class);
     g_free(app);
 }
 

@@ -301,7 +301,7 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
-    g_message("Managed window 0x%lx", window);
+    g_message("Managed window 0x%lx (%s)", window, self->name);
 }
 
 void client_unmanage_all()
@@ -315,7 +315,7 @@ void client_unmanage(Client *self)
     int j;
     GSList *it;
 
-    g_message("Unmanaging window: %lx", self->window);
+    g_message("Unmanaging window: %lx (%s)", self->window, self->name);
 
     dispatch_client(Event_Client_Destroy, self, 0, 0);
     g_assert(self != NULL);

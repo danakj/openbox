@@ -293,7 +293,7 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **ret)
 
     if (get_stringlist(win, prop, &list, &nstr) && nstr) {
         s = g_convert(list[0], strlen(list[0]), "UTF-8", "ISO-8859-1",
-                         NULL, NULL, NULL);
+                      NULL, NULL, NULL);
         XFreeStringList(list);
         if (s) {
             *ret = s;

@@ -1376,9 +1376,9 @@ void client_update_title(ObClient *self)
      
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data))
-	/* try old x stuff */
-	if (!PROP_GETS(self->window, wm_name, locale, &data))
-	    data = g_strdup("Unnamed Window");
+        /* try old x stuff */
+        if (!PROP_GETS(self->window, wm_name, locale, &data))
+            data = g_strdup("Unnamed Window");
 
     /* did the title change? then reset the title_count */
     if (old_title && 0 != strncmp(old_title, data, strlen(data)))
@@ -1412,7 +1412,7 @@ void client_update_title(ObClient *self)
     self->title = data;
 
     if (self->frame)
-	frame_adjust_title(self->frame);
+        frame_adjust_title(self->frame);
 
     g_free(old_title);
 

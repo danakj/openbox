@@ -51,7 +51,7 @@ private:
   typedef WindowLookup::value_type WindowLookupPair;
   WindowLookup    _windows;
 
-  ActionList _actions;
+  ActionList      _actions;
   
   virtual void process_event(XEvent *e);
   virtual bool handleSignal(int sig);

@@ -320,10 +320,10 @@ def placewindows_random(data):
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen = display.screenInfo(data.screen)
-    width = screen.width() - client_area.width() + \
-            frame_size.left + frame_size.right
-    height = screen.height() - client_area.height() + \
-             frame_size.top + frame_size.bottom
+    width = screen.width() - (client_area.width() +
+                              frame_size.left + frame_size.right)
+    height = screen.height() - (client_area.height() + 
+                                frame_size.top + frame_size.bottom)
     global ob_rand
     if not ob_rand: ob_rand = random.Random()
     x = ob_rand.randrange(0, width-1)

@@ -28,6 +28,7 @@ public:
   };
   
 private:
+  // stuff that can be passed on the command line
   std::string _rcfilepath;   // path to the config file to use/in use
   std::string _menufilepath; // path to the menu file to use/in use
   char *_displayreq;         // display requested by the user

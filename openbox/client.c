@@ -1779,7 +1779,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
            clients (emacs) freaking out, cuz they send back a configure every
            time they receive this event, which resends them this event... etc.
         */
-        if ((moved || resized) && (!user || final)) {
+        if ((!user && moved) || (user && final)) {
             XEvent event;
             event.type = ConfigureNotify;
             event.xconfigure.display = ob_display;
@@ -1797,6 +1797,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             event.xconfigure.override_redirect = FALSE;
             XSendEvent(event.xconfigure.display, event.xconfigure.window,
                        FALSE, StructureNotifyMask, &event);
+            g_message ("SENT CONFIG");
 	}
     }
 }

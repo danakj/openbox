@@ -26,30 +26,26 @@ PseudoRenderControl::PseudoRenderControl(int screen)
   const ScreenInfo *info = display->screenInfo(_screen);
   int depth = info->depth();
 
-  _bpc = 2; // XXX THIS SHOULD BE A USER OPTION
-  assert(_bpc >= 1);
-  _ncolors = 1 << (_bpc * 3);
+  // determine the number of colors and the bits-per-color
+  int bpc = 2; // XXX THIS SHOULD BE A USER OPTION
+  assert(bpc >= 1);
+  _ncolors = 1 << (bpc * 3);
 
   if (_ncolors > 1 << depth) {
     fprintf(stderr,
             _("PseudoRenderControl: Invalid colormap size. Resizing.\n"));
-    _bpc = 1 << (depth/3) >> 3;
-    _ncolors = 1 << (_bpc * 3);
-  }
-
-  _cpc = 1 << _bpc;
-  
-  if (!(_colors = new XColor[_ncolors])) {
-    fprintf(stderr,
-            _("PseudoRenderControl: error allocating colormap\n"));
-    ::exit(1);
+    bpc = 1 << (depth/3) >> 3;
+    _ncolors = 1 << (bpc * 3);
   }
 
   // build a color cube
+  _colors = new XColor[_ncolors];
+
+  int cpc = 1 << bpc; // colors per channel
   for (int n = _ncolors - 1,
-         r = (1 << (_bpc + 1)) -1, i = 0; i < _cpc; r >>= 1, ++i)
-    for (int g = (1 << (_bpc + 1)) -1, j = 0; j < _cpc; g >>= 1, ++j)
-      for (int b = (1 << (_bpc + 1)) -1, k = 0; k < _cpc; b >>= 1, ++k, --n) {
+         r = (1 << (bpc + 1)) -1, i = 0; i < cpc; r >>= 1, ++i)
+    for (int g = (1 << (bpc + 1)) -1, j = 0; j < cpc; g >>= 1, ++j)
+      for (int b = (1 << (bpc + 1)) -1, k = 0; k < cpc; b >>= 1, ++k, --n) {
         _colors[n].red = r | r << 8;
         _colors[n].green = g | g << 8;
         _colors[n].blue = b | b << 8;

@@ -21,7 +21,7 @@ lib_LTLIBRARIES = \
 	parser/libobparser.la
 
 bin_PROGRAMS = \
-	kernel/openbox \
+	openbox/openbox \
 	tools/kdetrayproxy/kdetrayproxy
 
 if OBCONF
@@ -84,9 +84,9 @@ parser_libobparser_la_SOURCES = \
 	parser/parse.h \
 	parser/parse.c
 
-## kernel ##
+## openbox ##
 
-kernel_openbox_CPPFLAGS = \
+openbox_openbox_CPPFLAGS = \
 	$(X_CFLAGS) \
 	$(SM_CFLAGS) \
 	$(XFT_CFLAGS) \
@@ -97,7 +97,7 @@ kernel_openbox_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DRCDIR=\"$(rcdir)\" \
 	-DG_LOG_DOMAIN=\"Openbox\"
-kernel_openbox_LDADD = \
+openbox_openbox_LDADD = \
 	$(SM_LIBS) \
 	$(XINERAMA_LIBS) \
 	$(XKB_LIBS) \
@@ -112,78 +112,78 @@ kernel_openbox_LDADD = \
 	$(LIBINTL) \
 	render/libobrender.la \
 	parser/libobparser.la
-kernel_openbox_LDFLAGS = -export-dynamic
-kernel_openbox_SOURCES = \
+openbox_openbox_LDFLAGS = -export-dynamic
+openbox_openbox_SOURCES = \
 	gettext.h \
-	kernel/action.c \
-	kernel/action.h \
-	kernel/client.c \
-	kernel/client.h \
-	kernel/client_list_menu.c \
-	kernel/client_list_menu.h \
-	kernel/client_menu.c \
-	kernel/client_menu.h \
-	kernel/config.c \
-	kernel/config.h \
-	kernel/debug.c \
-	kernel/debug.h \
-	kernel/dock.c \
-	kernel/dock.h \
-	kernel/event.c \
-	kernel/event.h \
-	kernel/extensions.c \
-	kernel/extensions.h \
-	kernel/focus.c \
-	kernel/focus.h \
-	kernel/frame.c \
-	kernel/frame.h \
-	kernel/framerender.c \
-	kernel/framerender.h \
-	kernel/geom.h \
-	kernel/grab.c \
-	kernel/grab.h \
-	kernel/group.c \
-	kernel/group.h \
-	kernel/keyboard.c \
-	kernel/keyboard.h \
-	kernel/keytree.c \
-	kernel/keytree.h \
-	kernel/menuframe.c \
-	kernel/menuframe.h \
-	kernel/menu.c \
-	kernel/menu.h \
-	kernel/misc.h \
-	kernel/mouse.c \
-	kernel/mouse.h \
-	kernel/moveresize.c \
-	kernel/moveresize.h \
-	kernel/mwm.h \
-	kernel/openbox.c \
-	kernel/openbox.h \
-	kernel/place.c \
-	kernel/place.h \
-	kernel/popup.c \
-	kernel/popup.h \
-	kernel/prop.c \
-	kernel/prop.h \
-	kernel/resist.c \
-	kernel/resist.h \
-	kernel/screen.c \
-	kernel/screen.h \
-	kernel/session.c \
-	kernel/session.h \
-	kernel/stacking.c \
-	kernel/stacking.h \
-	kernel/startup.c \
-	kernel/startup.h \
-	kernel/timer.c \
-	kernel/timer.h \
-	kernel/translate.c \
-	kernel/translate.h \
-	kernel/window.c \
-	kernel/window.h \
-	kernel/xerror.c \
-	kernel/xerror.h
+	openbox/action.c \
+	openbox/action.h \
+	openbox/client.c \
+	openbox/client.h \
+	openbox/client_list_menu.c \
+	openbox/client_list_menu.h \
+	openbox/client_menu.c \
+	openbox/client_menu.h \
+	openbox/config.c \
+	openbox/config.h \
+	openbox/debug.c \
+	openbox/debug.h \
+	openbox/dock.c \
+	openbox/dock.h \
+	openbox/event.c \
+	openbox/event.h \
+	openbox/extensions.c \
+	openbox/extensions.h \
+	openbox/focus.c \
+	openbox/focus.h \
+	openbox/frame.c \
+	openbox/frame.h \
+	openbox/framerender.c \
+	openbox/framerender.h \
+	openbox/geom.h \
+	openbox/grab.c \
+	openbox/grab.h \
+	openbox/group.c \
+	openbox/group.h \
+	openbox/keyboard.c \
+	openbox/keyboard.h \
+	openbox/keytree.c \
+	openbox/keytree.h \
+	openbox/menuframe.c \
+	openbox/menuframe.h \
+	openbox/menu.c \
+	openbox/menu.h \
+	openbox/misc.h \
+	openbox/mouse.c \
+	openbox/mouse.h \
+	openbox/moveresize.c \
+	openbox/moveresize.h \
+	openbox/mwm.h \
+	openbox/openbox.c \
+	openbox/openbox.h \
+	openbox/place.c \
+	openbox/place.h \
+	openbox/popup.c \
+	openbox/popup.h \
+	openbox/prop.c \
+	openbox/prop.h \
+	openbox/resist.c \
+	openbox/resist.h \
+	openbox/screen.c \
+	openbox/screen.h \
+	openbox/session.c \
+	openbox/session.h \
+	openbox/stacking.c \
+	openbox/stacking.h \
+	openbox/startup.c \
+	openbox/startup.h \
+	openbox/timer.c \
+	openbox/timer.h \
+	openbox/translate.c \
+	openbox/translate.h \
+	openbox/window.c \
+	openbox/window.h \
+	openbox/xerror.c \
+	openbox/xerror.h
 
 ## obconf ##
 

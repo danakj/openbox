@@ -72,9 +72,21 @@ Client::Client(int screen, Window window)
   updateClass();
   updateStrut();
 
+  // this makes sure that these windows:
+  // a) appear on all desktops
+  // b) don't start iconified
+  if (_type == Type_Dock || _type == Type_Desktop) {
+    _desktop = 0xffffffff;
+  }
+  
   // restores iconic state when we restart.
   // this will override the initial_state if that was set
   if (_desktop == ICONIC_DESKTOP) _iconic = true;
+
+  // set the desktop hint, to make sure that it always exists, and to reflect
+  // any changes we've made here
+  otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
+                     otk::Property::atoms.cardinal, (unsigned)_desktop);
   
   changeState();
 }
@@ -121,13 +133,9 @@ void Client::getDesktop()
   // defaults to the current desktop
   _desktop = openbox->screen(_screen)->desktop();
 
-  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_desktop,
-                          otk::Property::atoms.cardinal,
-                          (long unsigned*)&_desktop)) {
-    // make sure the hint exists
-    otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
-                       otk::Property::atoms.cardinal, (unsigned)_desktop);
-  }
+  otk::Property::get(_window, otk::Property::atoms.net_wm_desktop,
+                     otk::Property::atoms.cardinal,
+                     (long unsigned*)&_desktop);
 }
 
 

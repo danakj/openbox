@@ -257,36 +257,54 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING && config_focus_new &&
-        (self->type == OB_CLIENT_TYPE_NORMAL || self->type == OB_CLIENT_TYPE_DIALOG)) {
-        gboolean group_foc = FALSE;
-        
-        if (self->group) {
-            GSList *it;
-
-            for (it = self->group->members; it; it = it->next) {
-                if (client_focused(it->data)) {
-                    group_foc = TRUE;
-                    break;
-                }
-            }
-        }
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
-        if ((group_foc ||
-             (!self->transient_for && (!self->group ||
-                                       !self->group->members->next))) ||
-            client_search_focus_tree_full(self) ||
-            !focus_client ||
-            !client_normal(focus_client)) {
+        (self->type == OB_CLIENT_TYPE_NORMAL ||
+         self->type == OB_CLIENT_TYPE_DIALOG))
+    {        
+        if (self->desktop != screen_desktop)
+        {
             /* activate the window */
             stacking_add(CLIENT_AS_WINDOW(self));
             activate = TRUE;
-        } else {
-            /* try to not get in the way */
-            stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
         }
-    } else {
+        else
+        {
+            gboolean group_foc = FALSE;
+
+            if (self->group) {
+                GSList *it;
+
+                for (it = self->group->members; it; it = it->next)
+                {
+                    if (client_focused(it->data))
+                    {
+                        group_foc = TRUE;
+                        break;
+                    }
+                }
+            }
+            if ((group_foc ||
+                 (!self->transient_for && (!self->group ||
+                                           !self->group->members->next))) ||
+                client_search_focus_tree_full(self) ||
+                !focus_client ||
+                !client_normal(focus_client))
+            {
+                /* activate the window */
+                stacking_add(CLIENT_AS_WINDOW(self));
+                activate = TRUE;
+            }
+            else
+            {
+                /* try to not get in the way */
+                stacking_add_nonintrusive(CLIENT_AS_WINDOW(self));
+            }
+        }
+    }
+    else
+    {
         stacking_add(CLIENT_AS_WINDOW(self));
     }
 
@@ -299,7 +317,12 @@ void client_manage(Window window)
 
     client_showhide(self);
 
-    if (activate) client_activate(self);
+    /* use client_focus instead of client_activate cuz client_activate does
+       stuff like switch desktops etc and I'm not interested in all that when
+       a window maps since its not based on an action from the user like
+       clicking a window to activate is. so keep the new window out of the way
+       but do focus it. */
+    if (activate) client_focus(self);
 
     /* update the list hints */
     client_set_list();

@@ -523,6 +523,7 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
 
     // found a good window!
     t->focus();
+    return;
   }
 }
 

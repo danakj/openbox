@@ -1040,9 +1040,9 @@ static void event_handle_menu(Client *client, XEvent *e)
                             menu_control_mouseover(over, FALSE); 
                         menu_entry_render(over);
                         over = NULL;
+                        /* this hides the menu */
+                        menu_entry_fire(entry);
                     }
-                    /* this hides the menu */
-                    menu_entry_fire(entry);
                 }
                 break;
             }

@@ -459,18 +459,20 @@ void OBScreen::manageWindow(Window window)
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
 
+  otk::OBDisplay::grab();
+
   // is the window a docking app
   if ((wmhint = XGetWMHints(otk::OBDisplay::display, window))) {
     if ((wmhint->flags & StateHint) &&
         wmhint->initial_state == WithdrawnState) {
       //slit->addClient(w); // XXX: make dock apps work!
+      otk::OBDisplay::ungrab();
+
       XFree(wmhint);
       return;
     }
     XFree(wmhint);
   }
-
-  otk::OBDisplay::grab();
 
   // choose the events we want to receive on the CLIENT window
   attrib_set.event_mask = OBClient::event_mask;
@@ -517,12 +519,9 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->addClient(client->frame->grip_left(), client);
   Openbox::instance->addClient(client->frame->grip_right(), client);
 
-  bool shown = false;
-  
   // if on the current desktop.. (or all desktops)
   if (client->desktop() == _desktop ||
       client->desktop() == (signed)0xffffffff) {
-    shown = true;
     client->frame->show();
   }
  

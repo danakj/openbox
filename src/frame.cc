@@ -63,7 +63,7 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
 
 OBFrame::~OBFrame()
 {
-  releaseClient(false);
+  releaseClient();
 }
 
 
@@ -404,11 +404,12 @@ void OBFrame::adjustShape()
 
 void OBFrame::grabClient()
 {
-  
   // reparent the client to the frame
   XReparentWindow(otk::OBDisplay::display, _client->window(),
                   _plate.window(), 0, 0);
-  _client->ignore_unmaps++;
+  // this generates 2 unmap's that we catch, one to the window and one to root,
+  // but both have .window set to this window, so both need to be ignored
+  _client->ignore_unmaps+=2;
 
   // select the event mask on the client's parent (to receive config req's)
   XSelectInput(otk::OBDisplay::display, _plate.window(),
@@ -422,14 +423,14 @@ void OBFrame::grabClient()
 }
 
 
-void OBFrame::releaseClient(bool remap)
+void OBFrame::releaseClient()
 {
   // check if the app has already reparented its window to the root window
   XEvent ev;
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
-    remap = true; // XXX: why do we remap the window if they already
-                  // reparented to root?
+    // XXX: ob2/bb didn't do this.. look up this process in other wm's!
+    XPutBackEvent(otk::OBDisplay::display, &ev);
   } else {
     // according to the ICCCM - if the client doesn't reparent to
     // root, then we have to do it for them
@@ -438,9 +439,8 @@ void OBFrame::releaseClient(bool remap)
                     _client->area().x(), _client->area().y());
   }
 
-  // if we want to remap the window, do so now
-  if (remap)
-    XMapWindow(otk::OBDisplay::display, _client->window());
+  // do an extra map here .. ? XXX
+  XMapWindow(otk::OBDisplay::display, _client->window());
 }
 
 

@@ -45,7 +45,7 @@ private:
   //! The time at which the last XEvent with a time was received
   Time _lasttime;
 
-  void dispatch(const XEvent &e);
+  void dispatch(Window win, const XEvent &e);
 };
 
 }

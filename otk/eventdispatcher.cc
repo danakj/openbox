@@ -43,7 +43,6 @@ void OtkEventDispatcher::clearHandler(Window id)
 
 void OtkEventDispatcher::dispatchEvents(void)
 {
-  OtkEventMap::iterator it;
   XEvent e;
   Window focus = None, unfocus = None;
   Window enter = None, leave = None;
@@ -52,10 +51,27 @@ void OtkEventDispatcher::dispatchEvents(void)
   while (XPending(OBDisplay::display)) {
     XNextEvent(OBDisplay::display, &e);
 
-#if 0
+#if 0//defined(DEBUG)
     printf("Event %d window %lx\n", e.type, e.xany.window);
 #endif
 
+    Window win;
+
+    // pick a window
+    switch (e.type) {
+    case UnmapNotify:
+      win = e.xunmap.window;
+      break;
+    case DestroyNotify:
+      win = e.xdestroywindow.window;
+      break;
+    case ConfigureRequest:
+      win = e.xconfigurerequest.window;
+      break;
+    default:
+      win = e.xany.window;
+    }
+    
     // grab the lasttime and hack up the modifiers
     switch (e.type) {
     case ButtonPress:
@@ -74,40 +90,16 @@ void OtkEventDispatcher::dispatchEvents(void)
                            OBDisplay::scrollLockMask());
       break;
     case PropertyNotify:
-      _lasttime = e.xproperty.time; break;
+      _lasttime = e.xproperty.time;
+      break;
     case EnterNotify:
     case LeaveNotify:
-      _lasttime = e.xcrossing.time; break;
+      _lasttime = e.xcrossing.time;
+      break;
     }
 
-    // these ConfigureRequests require some special attention
-    if (e.type == ConfigureRequest) {
-      // find the actual window! e.xany.window is the parent window
-      it = _map.find(e.xconfigurerequest.window);
-
-      if (_master)
-        _master->handle(e);
-
-      if (it != _map.end())
-        it->second->handle(e);
-      else {
-        // unhandled configure requests must be used to configure the window
-        // directly
-        XWindowChanges xwc;
-
-        xwc.x = e.xconfigurerequest.x;
-        xwc.y = e.xconfigurerequest.y;
-        xwc.width = e.xconfigurerequest.width;
-        xwc.height = e.xconfigurerequest.height;
-        xwc.border_width = e.xconfigurerequest.border_width;
-        xwc.sibling = e.xconfigurerequest.above;
-        xwc.stack_mode = e.xconfigurerequest.detail;
-
-        XConfigureWindow(otk::OBDisplay::display, e.xconfigurerequest.window,
-                         e.xconfigurerequest.value_mask, &xwc);
-      }
     // madly compress all focus events
-    } else if (e.type == FocusIn) {
+    if (e.type == FocusIn) {
       // any other types are not ones we're interested in
       if (e.xfocus.detail == NotifyNonlinear) {
         focus = e.xfocus.window;
@@ -139,7 +131,7 @@ void OtkEventDispatcher::dispatchEvents(void)
       }
     } else {
       // normal events
-      dispatch(e);
+      dispatch(win, e);
     }
   }
 
@@ -148,7 +140,7 @@ void OtkEventDispatcher::dispatchEvents(void)
     //printf("UNFOCUSING: %lx\n", unfocus);
     _focus_e.xfocus.type = FocusOut;
     _focus_e.xfocus.window = unfocus;
-    dispatch(_focus_e);
+    dispatch(_focus_e.xfocus.window, _focus_e);
 
     _focus = None;
   } else if (focus != None && focus != _focus) {
@@ -157,13 +149,13 @@ void OtkEventDispatcher::dispatchEvents(void)
     //printf("FOCUSING: %lx\n", focus);
     _focus_e.xfocus.type = FocusIn;
     _focus_e.xfocus.window = focus;
-    dispatch(_focus_e);
+    dispatch(_focus_e.xfocus.window, _focus_e);
 
     if (_focus != None) {
       //printf("UNFOCUSING: %lx\n", _focus);
       _focus_e.xfocus.type = FocusOut;
       _focus_e.xfocus.window = _focus;
-      dispatch(_focus_e);
+      dispatch(_focus_e.xfocus.window, _focus_e);
     }
     
     _focus = focus;
@@ -173,28 +165,44 @@ void OtkEventDispatcher::dispatchEvents(void)
     _crossing_e.xcrossing.type = LeaveNotify;
     _crossing_e.xcrossing.window = leave;
     _crossing_e.xcrossing.root = leave_root;
-    dispatch(_crossing_e);
+    dispatch(_crossing_e.xcrossing.window, _crossing_e);
   }
   if (enter != None) {
     _crossing_e.xcrossing.type = EnterNotify;
     _crossing_e.xcrossing.window = enter;
     _crossing_e.xcrossing.root = enter_root;
-    dispatch(_crossing_e);
+    dispatch(_crossing_e.xcrossing.window, _crossing_e);
   }
 }
 
-void OtkEventDispatcher::dispatch(const XEvent &e) {
-  OtkEventHandler *handler;
+void OtkEventDispatcher::dispatch(Window win, const XEvent &e) {
+  OtkEventHandler *handler = 0;
   OtkEventMap::iterator it;
 
   if (_master)
     _master->handle(e);
 
-  it = _map.find(e.xany.window);
+  it = _map.find(win);
   
   if (it != _map.end())
     handler = it->second;
-  else
+  // these ConfigureRequests require some special attention
+  else if (e.type == ConfigureRequest) {
+    // unhandled configure requests must be used to configure the window
+    // directly
+    XWindowChanges xwc;
+      
+    xwc.x = e.xconfigurerequest.x;
+    xwc.y = e.xconfigurerequest.y;
+    xwc.width = e.xconfigurerequest.width;
+    xwc.height = e.xconfigurerequest.height;
+    xwc.border_width = e.xconfigurerequest.border_width;
+    xwc.sibling = e.xconfigurerequest.above;
+    xwc.stack_mode = e.xconfigurerequest.detail;
+      
+    XConfigureWindow(otk::OBDisplay::display, e.xconfigurerequest.window,
+                     e.xconfigurerequest.value_mask, &xwc);
+  } else
     handler = _fallback;
 
   if (handler)

@@ -70,10 +70,7 @@ private:
   //! Reparents the client window from the root window onto the frame
   void grabClient();
   //! Reparents the client window back to the root window
-  /*!
-    @param remap Re-map the client window when we're done reparenting?
-  */
-  void releaseClient(bool remap);
+  void releaseClient();
 
 public:
   //! Constructs an OBFrame object, and reparents the client to itself

@@ -1219,15 +1219,18 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 
 void OBClient::unmapHandler(const XUnmapEvent &e)
 {
-#ifdef    DEBUG
-  printf("UnmapNotify for 0x%lx\n", e.window);
-#endif // DEBUG
-
   if (ignore_unmaps) {
+#ifdef    DEBUG
+    printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
+#endif // DEBUG
     ignore_unmaps--;
     return;
   }
   
+#ifdef    DEBUG
+  printf("UnmapNotify for 0x%lx\n", e.window);
+#endif // DEBUG
+
   OtkEventHandler::unmapHandler(e);
 
   // this deletes us etc

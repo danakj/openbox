@@ -53,6 +53,10 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
 {
     struct RrSurface *sur;
 
+    /* cant be a child of a prototype! */
+    assert(parent->inst);
+    if (!parent->inst) return NULL;
+
     sur = surface_new(type, numtex);
     sur->inst = parent->inst;
     sur->win = None; /* XXX XCreateWindow? */
@@ -101,6 +105,10 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
                                      struct RrSurface *parent)
 {
     struct RrSurface *sur;
+
+    /* cant be a child of a prototype! */
+    assert(parent->inst);
+    if (!parent->inst) return NULL;
 
     sur = surface_copy(orig);
     sur->inst = parent->inst;

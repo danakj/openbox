@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: fout: een van -solid, -mod, -gradient moet aangegeven worden\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <displaynaam>   display verbinding\n\
   -mod <x> <y>             modula patroon\n\
   -foreground, -fg <kleur> modula voorgrondkleur\n\

@@ -9,16 +9,16 @@ $ #UnsupVisual
 $ #ErrorCreatingPixmap
 # BImage::renderPixmap: erro criando pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: mapa de cores de tamanho invalido %d (%d/%d/%d) - reduzindo\n
+# BImageControl::BImageControl: tamanho invalido de mapa de cores %d (%d/%d/%d) - reduzindo\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: erro localizando mapa de cores\n
+# BImageControl::BImageControl: erro determinando mapa de cores\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: falha localizando cor %d/%d/%d\n
+# BImageControl::BImageControl: falha em alocar cor %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: reserva de pixmap cheia - liberando %d pixmaps\n
+# BImageControl::~BImageControl: cache de pixmap - liberando pixmaps %d\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: reserva cheia, forçando limpeza\n
+# BImageControl::renderImage: cache está grande, forçando desalocação\n
 $ #ColorParseError
-# BImageControl::getColor: color parse error: '%s'\n
+# BImageControl::getColor: erro ao analizar cor: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: erro localizando cor: '%s'\n
+# BImageControl::getColor: erro ao alocar cor: '%s'\n

@@ -2971,10 +2971,10 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
                                  frame.margin.top + frame.margin.bottom);
 
       /*
-        if a position change ha been specified, then that position will be used
-        instead of determining a position based on the window's gravity.
+        if a position change has been specified, then that position will be
+        used instead of determining a position based on the window's gravity.
       */
-      if (cr->value_mask & (CWX | CWY)) {
+      if (! (cr->value_mask & (CWX | CWY))) {
         Corner corner;
         switch (client.win_gravity) {
         case NorthEastGravity:
@@ -4119,11 +4119,17 @@ void BlackboxWindow::constrain(Corner anchor,
     base_height = (client.base_height) ? client.base_height :
                                          client.min_height;
 
-  // constrain
-  if (dw < client.min_width) dw = client.min_width;
-  if (dh < client.min_height) dh = client.min_height;
-  if (dw > client.max_width) dw = client.max_width;
-  if (dh > client.max_height) dh = client.max_height;
+  // constrain, but only if the min/max are being used. if they aren't, then
+  // this resize is going to be from a ConfigureRequest because the window
+  // isn't allowed to be resized by the user. And in that case, we don't want
+  // to limit what the app can do
+  if (client.max_width > client.min_width ||
+      client.max_height > client.min_height) {
+    if (dw < client.min_width) dw = client.min_width;
+    if (dh < client.min_height) dh = client.min_height;
+    if (dw > client.max_width) dw = client.max_width;
+    if (dh > client.max_height) dh = client.max_height;
+  }
 
   assert(dw >= base_width && dh >= base_height);
 

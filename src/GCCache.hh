@@ -83,7 +83,7 @@ private:
 
 class BGCCache {
 public:
-  explicit BGCCache(const BaseDisplay * const _display);
+  BGCCache(const BaseDisplay * const _display, unsigned int screen_count);
   ~BGCCache(void);
 
   // cleans up the cache

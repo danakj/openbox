@@ -24,12 +24,15 @@ $ #PlacementCenterLeft
 $ #PlacementBottomLeft
 # Слева внизу
 $ #PlacementTopCenter
-# Сверху по центру
+# Вверху по центру
 $ #PlacementBottomCenter
-# Снизу по центру
+# Внизу по центру
 $ #PlacementTopRight
-# Справа сверху
+# Справа вверху
 $ #PlacementCenterRight
 # Справа по центру
 $ #PlacementBottomRight
 # Справа внизу
+
+$ #AutoHide
+# Скрывать автоматически

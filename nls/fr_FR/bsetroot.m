@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: Erreur: il faut préciser : -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <chaîne>        	connexion à l'affichage\n\
   -mod <x> <y>             	motif\n\
   -foreground, -fg <couleur> 	couleur d'avant plan\n\

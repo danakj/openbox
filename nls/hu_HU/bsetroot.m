@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: hiba: kötelezõ megadni egy kapcsolót: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        használandó kijelzõ\n\
   -mod <x> <y>             modula minta\n\
   -foreground, -fg <color> modula elõtér színe\n\

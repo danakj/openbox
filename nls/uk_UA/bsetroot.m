@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: помилка: необх╕дно задати один з наступних ключ╕в: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        обслуговувати вказаний дисплей\n\
   -mod <x> <y>             макет кл╕тки\n\
   -foreground, -fg <color> кол╕р переднього плану кл╕тки\n\

@@ -78,9 +78,10 @@ void BGCCacheContext::set(const XFontStruct * const _font) {
 }
 
 
-BGCCache::BGCCache(const BaseDisplay * const _display)
+BGCCache::BGCCache(const BaseDisplay * const _display,
+                   unsigned int screen_count)
   : display(_display),  context_count(128u),
-    cache_size(16u), cache_buckets(8u),
+    cache_size(16u), cache_buckets(8u * screen_count),
     cache_total_size(cache_size * cache_buckets) {
 
   contexts = new BGCCacheContext*[context_count];
@@ -117,10 +118,8 @@ BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
       c->used = false;
       c->screen = scr;
     }
-    if (! c->used && c->screen == scr) {
-      c->used = true;
+    if (! c->used && c->screen == scr)
       return c;
-    }
   }
 
   fprintf(stderr, "BGCCache: context fault!\n");
@@ -141,15 +140,18 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
   const unsigned int screen = _color.screen();
   const int key = _color.red() ^ _color.green() ^ _color.blue();
   int k = (key % cache_size) * cache_buckets;
-  int i = 0; // loop variable
+  unsigned int i = 0; // loop variable
   BGCCacheItem *c = cache[ k ], *prev = 0;
 
-  // this will either loop 8 times then return/abort or it will stop matching
+  /*
+    this will either loop cache_buckets times then return/abort or
+    it will stop matching
+  */
   while (c->ctx &&
          (c->ctx->pixel != pixel || c->ctx->function != _function ||
           c->ctx->subwindow != _subwindow || c->ctx->screen != screen ||
           c->ctx->linewidth != _linewidth)) {
-    if (i < 7) {
+    if (i < (cache_buckets - 1)) {
       prev = c;
       c = cache[ ++k ];
       ++i;
@@ -164,14 +166,13 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
       return c;
     }
     // cache fault!
-    fprintf(stderr, "BGCCache: cache fault\n");
+    fprintf(stderr, "BGCCache: cache fault, count: %d, screen: %d, item screen: %d\n", c->count, screen, c->ctx->screen);
     abort();
   }
 
-  const unsigned long fontid = _font ? _font->fid : 0;
   if (c->ctx) {
     // reuse existing context
-    if (fontid && fontid != c->ctx->fontid)
+    if (_font && _font->fid && _font->fid != c->ctx->fontid)
       c->ctx->set(_font);
     c->count++;
     c->hits++;

@@ -16,7 +16,7 @@ $ #ErrorAllocatingColormap
 $ #ColorAllocFail
 # BImageControl::BImageControl: alokacja koloru %d/%d/%d nieudana\n
 $ #PixmapRelease
-# BImageControl::BImageControl: pixmap cache - zwalniam %d pixmap\n
+# BImageControl::BImageControl: pixmap cache - zwalniam %d pixmap(y)\n
 $ #PixmapCacheLarge
 # BImageControl::renderImage: du¿a pamiêæ cache, wymuszam czyszczenie\n
 $ #ColorParseError

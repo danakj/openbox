@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: 错误: 必须从中指定一个: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        显示连接\n\
   -mod <x> <y>             模式\n\
   -foreground, -fg <color> 前景色\n\

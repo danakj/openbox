@@ -1,7 +1,7 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: um erro occorreu enquanto chamando o servidor X.\n  \
+# BScreen::BScreen: um erro occorreu enquanto consultava o servidor X.\n  \
 existe outro window menager rodando no display. %s.\n
 $ #ManagingScreen
 # BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
@@ -18,31 +18,33 @@ $ #Restart
 $ #Exit
 # Sair
 $ #EXECError
-# BScreen::parseMenuFile: [exec] erro, não há indicação definida no menu e/ou comando definido\n
+# BScreen::parseMenuFile: [exec] erro, sem rótulo de menu e/ou comando definido\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [exit] erro, sem rótulo de menu definido\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] erro, não há indicação de menu e/ou nome de arquivo difinido\n
+# BScreen::parseMenuFile: [style] erro, sem rótulo de menu e/ou nome do arquivo \
+definido\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [config] erro, sem rótulo de menu definido\n
 $ #INCLUDEError
 # BScreen::parseMenuFile: [include] erro, nome de arquivo não definido\n
 $ #INCLUDEErrorReg
 # BScreen::parseMenuFile: [include] error, '%s' não é um arquivo regular\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [submenu] erro, sem rótulo de menu definido\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [restart] erro, sem rótulo de menu definido\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [reconfig] erro, sem rótulo de menu definido\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, não há diretorio difinido\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, sem diretorio difinido\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' não é um diretorio\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' não é um \
+diretorio\n
 $ #STYLESDIRErrorNoExist
 # BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' não existe\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] erro, não há indicação definida no menu\n
+# BScreen::parseMenuFile: [workspaces] erro, sem rótulo de menu definido\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat

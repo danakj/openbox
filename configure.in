@@ -292,6 +292,7 @@ nls/nl_NL/Makefile
 nls/pt_BR/Makefile
 nls/ro_RO/Makefile
 nls/ru_RU/Makefile
+nls/sk_SK/Makefile
 nls/sl_SI/Makefile
 nls/sv_SE/Makefile
 nls/tr_TR/Makefile

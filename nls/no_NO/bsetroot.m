@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: feil: én av følgende opsjoner må spesifiseres: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        skjermtilkobling3\n\
   -mod <x> <y>             modula mønster\n\
   -foreground, -fg <color> modula forgrunnsfarge\n\

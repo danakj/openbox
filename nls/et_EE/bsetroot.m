@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: viga: pead määratlema ühe järgnevaist: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        displei ühendus\n\
   -mod <x> <y>             moodula tapeet\n\
   -foreground, -fg <color> esiplaani värvi moodula\n\

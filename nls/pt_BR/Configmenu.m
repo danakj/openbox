@@ -16,18 +16,22 @@ $ #FocusNew
 # Foco em Novas Janelas
 $ #FocusLast
 # Foco na Ultima Janela Da Area de Trabalho
+$ #DisableBindings
+# Disabilitar Ações com Scroll Lock
 $ #ClickToFocus
-# Foco na Janela Quando Clicada
+# Clicar para Focar
 $ #SloppyFocus
-# Foco na Janela Quando Apontada
+# Apontar para Focar
 $ #AutoRaise
-# Sobrepor Janela Quando Ativa
+# Auto-sobrepor
+$ #ClickRaise
+# Click Raise
 $ #SmartRows
-# Posicionamento em Fila
+# Organizar Rapido (Linha)
 $ #SmartCols
-# Posicionamento em Coluna
+# Organizar Rapido (Coluna)
 $ #Cascade
-# Posicionamento em Cascata
+# Organizar em Cascata
 $ #LeftRight
 # Esquerda para Direita
 $ #RightLeft

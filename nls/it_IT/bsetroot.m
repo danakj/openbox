@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: errore: deve essere specificato uno dei seguenti: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        connessione display\n\
   -mod <x> <y>             modello di modula\n\
   -foreground, -fg <color> colore di primo piano di modula\n\

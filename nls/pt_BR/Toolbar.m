@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Toolbar
+# Barra de Ferramenta
 $ #EditWkspcName
-# Renomear Area de Trabalho
+# Editar o nome da area de trabalho corrente
 $ #ToolbarPlacement
-# Posicionamento
+# Posicionamento da Barra de Ferramentas

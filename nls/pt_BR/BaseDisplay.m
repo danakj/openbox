@@ -3,14 +3,14 @@ $set 1 #BaseDisplay
 $ #XError
 # %s:  X erro: %s(%d) opcodes %d/%d\n  recurso 0x%lx\n
 $ #SignalCaught
-# %s: recebeido sinal %d\n
+# %s: sinal recebido %d\n
 $ #ShuttingDown
-# desligando\n
+# finalizando\n
 $ #Aborting
-# abortando... gerando arquivo core\n
+# abortando... descarregando memória\n
 $ #XConnectFail
 # BaseDisplay::BaseDisplay: conecção ao servidor X falhou.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: impossivel marcar a conexão ao display como close-on-exec\n
+# BaseDisplay::BaseDisplay: impossível exibir sinal de conexão como fechar-em-execução\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): removendo má janela da trilha de eventos\n
+# BaseDisplay::eventLoop(): removendo janela inválida da lista de eventos\n

@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: napaka: doloèiti je treba eno: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        prika¾i povezavo\n\
   -mod <x> <y>             vzorec\n\
   -foreground, -fg <color> barva ospredja\n\

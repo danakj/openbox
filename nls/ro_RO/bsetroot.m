@@ -5,6 +5,7 @@ $ #MustSpecify
              -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <sir>           conexiunea la ecran\n\
   -mod <x> <y>             model\n\
   -foreground, -fg <color> culoare plan apropiat pentru model\n\

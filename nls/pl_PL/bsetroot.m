@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: b³±d: nale¿y u¿yæ jednej z opcji: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        po³±cz z podanym panelem graficznym\n\
   -mod <x> <y>             wspó³czynniki siatki typu modula\n\
   -foreground, -fg <color> kolor siatki\n\

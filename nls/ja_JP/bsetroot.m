@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s: エラー: 次の中から一つを選択しなければなりません: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <string>        ディスプレイを指定\n\
   -mod <x> <y>             組み合わせパターン\n\
   -foreground, -fg <color> 組み合わせ前景色\n\

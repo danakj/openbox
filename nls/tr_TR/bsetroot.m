@@ -4,6 +4,7 @@ $ #MustSpecify
 # %s : hata : -solid, -mod yada -gradient'den birisini belirlemek zorundasýn\n
 $ #Usage
 # %s 2.0 : Tel'if hakký (c) 1997-2000 Brad Hughes\n\n\
+	    (c) 2001-2002 Sean 'Shaleh' Perry\n\n\
   -display <metin>         ekran belirlemesi\n\
   -mod <x> <y>             bölüþüm iþlemi\n\
   -foreground, -fg <renk>  bölüþüm önalaný\n\

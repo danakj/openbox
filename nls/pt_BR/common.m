@@ -13,7 +13,7 @@ $ #DirectionVert
 # Vertical
 
 $ #AlwaysOnTop
-# Sempre Visivel
+# Sempre vísivel
 
 $ #PlacementTitle
 # Posicionamento
@@ -24,12 +24,15 @@ $ #PlacementCenterLeft
 $ #PlacementBottomLeft
 # Em Baixo a Esquerda
 $ #PlacementTopCenter
-# No Alto e no Centro
+# No Alto ao Centro
 $ #PlacementBottomCenter
-# Em Baixo e no Centro
+# Em Baixo ao Centro
 $ #PlacementTopRight
 # No Alto a Direita
 $ #PlacementCenterRight
 # No Meio a Direita
 $ #PlacementBottomRight
 # Em Baixo a Direita
+
+$ #AutoHide
+# Auto-ocultar

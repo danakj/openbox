@@ -8,17 +8,17 @@ $ #ManagingScreen
 $ #FontLoadFail
 # BScreen::LoadStyle(): нет возможности загрузить шрифт '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): нет возможности загрузить предопределенный шрифт.\n
+# BScreen::LoadStyle(): нет возможности загрузить шрифт по умолчанию.\n
 $ #EmptyMenuFile
 # %s: пустой файл меню\n
 $ #xterm
-# Xterm
+# XTerm
 $ #Restart
 # Перезапуск
 $ #Exit
 # Выход
 $ #EXECError
-# BScreen::parseMenuFile: ошибка [exec], не определено название пункта меню и/или название комманды\n
+# BScreen::parseMenuFile: ошибка [exec], не определено название пункта меню и/или комманда\n
 $ #EXITError
 # BScreen::parseMenuFile: ошибка [exit], не определено название пункта меню\n
 $ #STYLEError

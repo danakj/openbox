@@ -9,7 +9,7 @@ $ #UnsupVisual
 $ #ErrorCreatingPixmap
 # BImage::renderPixmap: ошибка создания pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: неверный размер таблицы цветов %d (%d/%d/%d) - удаляется\n
+# BImageControl::BImageControl: неверный размер таблицы цветов %d (%d/%d/%d) - уменьшается\n
 $ #ErrorAllocatingColormap
 # BImageControl::BImageControl: ошибка размещения таблицы цветов\n
 $ #ColorAllocFail
@@ -17,7 +17,7 @@ $ #ColorAllocFail
 $ #PixmapRelease
 # BImageControl::~BImageControl: кэш точечных изображений - освобождается %d блоков\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: переполнение кэша, производится быстрая очистка\n
+# BImageControl::renderImage: переполнение кэша, производится очистка\n
 $ #ColorParseError
 # BImageControl::getColor: ошибка разбора строки, описывающей цвет: '%s'\n
 $ #ColorAllocError

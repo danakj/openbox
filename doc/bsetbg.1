@@ -22,7 +22,7 @@ and to a flexible variety of third-party applications that it uses when handling
 \fIimage\fR is centered on the desktop.
 .TP
 \fB\-e\fR, \fB\-exec\fR \fIprogram\fR \fIoptions\fR \fIfallback\-\fIarg\fR \fIimage\fR
-This option tells \fBbsetbg\fR to run a seperate command by executing \fIprogram\fR with 
+This option tells \fBbsetbg\fR to run a separate command by executing \fIprogram\fR with 
 \fIoptions\fR, where \fIoptions\fR are arguments to \fIprogram\fR.
 
 If a \fIfallback\-arg\fR is supplied (\fB\-full\fR, \fB\-tile\fR, or \fB\-center\fR
@@ -43,6 +43,14 @@ Debugging mode. \fBbsetbg\fR will print commands without executing them.
 Output a list of default configuration values, suitable for redirecting into 
 \fI~/.bsetbgrc\fR. Any arguments that are supplied will be considered applications 
 to search for in the system path, overriding \fBbsetbg\fR's internal defaults.
+.TP
+\fB\-app\fR \fIimageApp\fR
+Use this flag to specify which image application to use. This
+application may be one of the pre-defined list or any application
+capable of displaying an image on the root window. This flag may be
+used in conjunction with passing application specific  parameters to
+the application, in which
+case they should be enclosed in double quotes.
 .TP
 \fB\-v\fR, \fB\-version\fR
 Output version number.
@@ -118,7 +126,11 @@ An example of the \fB-exec\fR argument:
 
 An example in which bsetbg creates a configuration file using xv and qiv:
 
-	bsetbg -g xv qiv > ~/.bsetbgrc
+    bsetbg -g xv qiv > ~/.bsetbgrc
+
+An example of the use of the \fB-app\fR argument:
+
+    bsetbg  -app qiv "-o rgb:d6/c5/a2 -x" -c foo.png
 
 .SH AUTHOR
 The author of

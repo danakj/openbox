@@ -106,6 +106,7 @@ $me $version $copyright
   -full <file>             stretch an image to fill the desktop
   -exec <args> <file>      specify an external command to execute
   
+  -app  <app>              specify the image application to use
   -post <string>           arguments to be passed to the post-command
   -debug                   prints commands without executing them
 EOF

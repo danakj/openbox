@@ -35,7 +35,7 @@ void Label::update(void)
     const Font *ft = style()->getFont();
     unsigned int sidemargin = style()->getBevelWidth() * 2;
 
-    std::string t = _text; // the actual text to draw
+    userstring t = _text; // the actual text to draw
     int x = sidemargin;    // x coord for the text
 
     // find a string that will fit inside the area for text

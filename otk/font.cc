@@ -10,15 +10,7 @@ extern "C" {
 #endif // HAVE_STDLIB_H
 }
 
-#include <iostream>
-#include <algorithm>
-
-using std::string;
-using std::cerr;
-using std::endl;
-
 #include "font.hh"
-#include "util.hh"
 #include "display.hh"
 #include "color.hh"
 #include "screeninfo.hh"
@@ -34,10 +26,10 @@ extern "C" {
 
 namespace otk {
 
-string      Font::_fallback_font = "fixed";
+std::string Font::_fallback_font = "fixed";
 bool        Font::_xft_init      = false;
 
-Font::Font(int screen_num, const string &fontstring,
+Font::Font(int screen_num, const std::string &fontstring,
              bool shadow, unsigned char offset, unsigned char tint)
   : _screen_num(screen_num),
     _fontstring(fontstring),
@@ -86,7 +78,7 @@ Font::~Font(void)
 
 
 void Font::drawString(XftDraw *d, int x, int y, const Color &color,
-                       const string &string, bool utf8) const
+                       const userstring &string) const
 {
   assert(d);
 
@@ -98,7 +90,7 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
     c.color.alpha = _tint | _tint << 8; // transparent shadow
     c.pixel = BlackPixel(Display::display, _screen_num);
 
-    if (utf8)
+    if (string.utf8())
       XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
                         _xftfont->ascent + y + _offset,
                         (FcChar8*)string.c_str(), string.size());
@@ -115,7 +107,7 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
   c.pixel = color.pixel();
   c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
 
-  if (utf8)
+  if (string.utf8())
     XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
                       (FcChar8*)string.c_str(), string.size());
   else
@@ -126,11 +118,11 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
 }
 
 
-unsigned int Font::measureString(const string &string, bool utf8) const
+unsigned int Font::measureString(const userstring &string) const
 {
   XGlyphInfo info;
 
-  if (utf8)
+  if (string.utf8())
     XftTextExtentsUtf8(Display::display, _xftfont,
                        (FcChar8*)string.c_str(), string.size(), &info);
   else

@@ -163,7 +163,7 @@ Property::~Property()
  */
 Atom Property::create(const char *name) const
 {
-  Atom a = XInternAtom(Display::display, name, False);
+  Atom a = XInternAtom(Display::display, name, false);
   assert(a);
   return a;
 }
@@ -196,7 +196,7 @@ void Property::set(Window win, Atoms atom, Atoms type,
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
   set(win, _atoms[atom], _atoms[type],
-           reinterpret_cast<unsigned char*>(&value), 32, 1, False);
+           reinterpret_cast<unsigned char*>(&value), 32, 1, false);
 }
 
 
@@ -209,7 +209,7 @@ void Property::set(Window win, Atoms atom, Atoms type,
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
   set(win, _atoms[atom], _atoms[type],
-      reinterpret_cast<unsigned char*>(value), 32, elements, False);
+      reinterpret_cast<unsigned char*>(value), 32, elements, false);
 }
 
 
@@ -217,7 +217,7 @@ void Property::set(Window win, Atoms atom, Atoms type,
  * Set an string property value on a window.
  */
 void Property::set(Window win, Atoms atom, StringType type,
-                          const std::string &value) const
+                          const userstring &value) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -226,11 +226,11 @@ void Property::set(Window win, Atoms atom, StringType type,
   switch (type) {
   case ascii: t = _atoms[Atom_String]; break;
   case utf8:  t = _atoms[Atom_Utf8]; break;
-  default: assert(False); return; // unhandled StringType
+  default: assert(false); return; // unhandled StringType
   }
   set(win, _atoms[atom], t,
       reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
-      8, value.size() + 1, False); // add 1 to the size to include the null
+      8, value.size() + 1, false); // add 1 to the size to include the null
 }
 
 
@@ -238,7 +238,7 @@ void Property::set(Window win, Atoms atom, StringType type,
  * Set an array of string property values on a window.
  */
 void Property::set(Window win, Atoms atom, StringType type,
-                     const StringVect &strings) const
+                     const userstring::vector &strings) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -247,26 +247,26 @@ void Property::set(Window win, Atoms atom, StringType type,
   switch (type) {
   case ascii: t = _atoms[Atom_String]; break;
   case utf8:  t = _atoms[Atom_Utf8]; break;
-  default: assert(False); return; // unhandled StringType
+  default: assert(false); return; // unhandled StringType
   }
 
   std::string value;
 
-  StringVect::const_iterator it = strings.begin();
-  const StringVect::const_iterator end = strings.end();
+  userstring::vector::const_iterator it = strings.begin();
+  const userstring::vector::const_iterator end = strings.end();
   for (; it != end; ++it)
       value += *it + '\0';
 
   set(win, _atoms[atom], t,
       reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
-      8, value.size(), False);
+      8, value.size(), false);
 }
 
 
 /*
  * Internal get function used by all of the typed get functions.
  * Gets an property's value from a window.
- * Returns True if the property was successfully retrieved; False if the
+ * Returns true if the property was successfully retrieved; false if the
  * property did not exist on the window, or has a different type/size format
  * than the user tried to retrieve.
  */
@@ -283,11 +283,11 @@ bool Property::get(Window win, Atom atom, Atom type,
   unsigned long ret_bytes;
   int result;
   unsigned long maxread = *nelements;
-  bool ret = False;
+  bool ret = false;
 
   // try get the first element
   result = XGetWindowProperty(Display::display, win, atom, 0l, 1l,
-                              False, AnyPropertyType, &ret_type, &ret_size,
+                              false, AnyPropertyType, &ret_type, &ret_size,
                               nelements, &ret_bytes, &c_val);
   ret = (result == Success && ret_type == type && ret_size == size &&
          *nelements > 0);
@@ -305,7 +305,7 @@ bool Property::get(Window win, Atom atom, Atom type,
       if (remain > size/8 * (signed)maxread) // dont get more than the max
         remain = size/8 * (signed)maxread;
       result = XGetWindowProperty(Display::display, win, atom, 0l,
-                                  remain, False, type, &ret_type, &ret_size,
+                                  remain, false, type, &ret_type, &ret_size,
                                   nelements, &ret_bytes, &c_val);
       ret = (result == Success && ret_type == type && ret_size == size &&
              ret_bytes == 0);
@@ -352,10 +352,10 @@ bool Property::get(Window win, Atoms atom, Atoms type,
   unsigned long num = 1;
   if (! get(win, _atoms[atom], _atoms[type], &num,
                  reinterpret_cast<unsigned char **>(&temp), 32))
-    return False;
+    return false;
   *value = temp[0];
   delete [] temp;
-  return True;
+  return true;
 }
 
 
@@ -363,20 +363,25 @@ bool Property::get(Window win, Atoms atom, Atoms type,
  * Gets an string property's value from a window.
  */
 bool Property::get(Window win, Atoms atom, StringType type,
-                     std::string *value) const
+                     userstring *value) const
 {
   unsigned long n = 1;
-  StringVect s;
+  userstring::vector s;
   if (get(win, atom, type, &n, &s)) {
     *value = s[0];
-    return True;
+    switch (type) {
+    case ascii: value->setUtf8(false); break;
+    case utf8:  value->setUtf8(true); break;
+    default: assert(false); return false; // unhandled StringType
+    }
+    return true;
   }
-  return False;
+  return false;
 }
 
 
 bool Property::get(Window win, Atoms atom, StringType type,
-                     unsigned long *nelements, StringVect *strings) const
+                   unsigned long *nelements, userstring::vector *strings) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -384,26 +389,27 @@ bool Property::get(Window win, Atoms atom, StringType type,
   assert(*nelements > 0);
 
   Atom t;
+  bool isutf8;
   switch (type) {
-  case ascii: t = _atoms[Atom_String]; break;
-  case utf8:  t = _atoms[Atom_Utf8]; break;
-  default: assert(False); return False; // unhandled StringType
+  case ascii: t = _atoms[Atom_String]; isutf8 = false; break;
+  case utf8:  t = _atoms[Atom_Utf8];   isutf8 = true; break;
+  default: assert(false); return false; // unhandled StringType
   }
   
   unsigned char *value;
   unsigned long elements = (unsigned) -1;
   if (!get(win, _atoms[atom], t, &elements, &value, 8) || elements < 1)
-    return False;
+    return false;
 
-  std::string s(reinterpret_cast<char *>(value), elements);
+  userstring s(reinterpret_cast<char *>(value), elements, isutf8);
   delete [] value;
 
-  std::string::const_iterator it = s.begin(), end = s.end();
+  userstring::const_iterator it = s.begin(), end = s.end();
   unsigned long num = 0;
   while(num < *nelements) {
-    std::string::const_iterator tmp = it; // current string.begin()
+    userstring::const_iterator tmp = it;  // current string.begin()
     it = std::find(tmp, end, '\0');       // look for null between tmp and end
-    strings->push_back(std::string(tmp, it));   // s[tmp:it)
+    strings->push_back(userstring(tmp, it, isutf8));   // s[tmp:it)
     ++num;
     if (it == end) break;
     ++it;
@@ -412,7 +418,7 @@ bool Property::get(Window win, Atoms atom, StringType type,
 
   *nelements = num;
 
-  return True;
+  return true;
 }
 
 

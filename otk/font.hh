@@ -2,6 +2,8 @@
 #ifndef   __font_hh
 #define   __font_hh
 
+#include "userstring.hh"
+
 extern "C" {
 #include <X11/Xlib.h>
 #define _XFT_NO_COMPAT_ // no Xft 1 API
@@ -9,6 +11,7 @@ extern "C" {
 }
 
 #include <assert.h>
+
 #include <string>
 
 namespace otk {
@@ -57,16 +60,24 @@ public:
   unsigned int height() const;
   unsigned int maxCharWidth() const;
 
-  unsigned int measureString(const std::string &string,
-                             bool utf8 = false) const;
+  //! Measures the length of a string
+  /*!
+    @param string The string to measure, it should be UTF8 encoded.
+  */
+  unsigned int measureString(const userstring &string) const;
 
   //! Draws a string into an XftDraw object
   /*!
     Be Warned: If you use an XftDraw object and a color, or a font from
     different screens, you WILL have unpredictable results! :)
+    @param d The drawable to render into.
+    @param x The X offset onto the drawable at which to start drawing.
+    @param x The Y offset onto the drawable at which to start drawing.
+    @param color The color to use for drawing the text.
+    @param string The string to draw, it should be UTF8 encoded.
   */
   void drawString(XftDraw *d, int x, int y, const Color &color,
-                  const std::string &string, bool utf8 = false) const;
+                  const userstring &string) const;
 };
 
 }

@@ -184,7 +184,7 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 
 void menu_frame_move_on_screen(ObMenuFrame *self)
 {
-    Rect *a;
+    Rect *a = NULL;
     guint i;
     gint dx = 0, dy = 0;
     gint pos, half;

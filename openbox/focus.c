@@ -42,10 +42,10 @@ ObClient *focus_cycle_target;
 
 static ObIconPopup *focus_cycle_popup;
 
-static void focus_cycle_destructor(ObClient *c)
+static void focus_cycle_destructor(ObClient *client, gpointer data)
 {
     /* end cycling if the target disappears */
-    if (focus_cycle_target == c)
+    if (focus_cycle_target == client)
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
@@ -54,7 +54,7 @@ void focus_startup(gboolean reconfig)
     focus_cycle_popup = icon_popup_new(TRUE);
 
     if (!reconfig) {
-        client_add_destructor((GDestroyNotify) focus_cycle_destructor);
+        client_add_destructor(focus_cycle_destructor, NULL);
 
         /* start with nothing focused */
         focus_set_client(NULL);
@@ -68,7 +68,7 @@ void focus_shutdown(gboolean reconfig)
     icon_popup_free(focus_cycle_popup);
 
     if (!reconfig) {
-        client_remove_destructor((GDestroyNotify) focus_cycle_destructor);
+        client_remove_destructor(focus_cycle_destructor);
 
         for (i = 0; i < screen_num_desktops; ++i)
             g_list_free(focus_order[i]);

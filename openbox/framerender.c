@@ -238,9 +238,9 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
     if (self->icon_x < 0) return;
 
     if (self->client->nicons) {
-        ObClientIcon *icon = client_icon(self->client,
-                                         ob_rr_theme->button_size + 2,
-                                         ob_rr_theme->button_size + 2);
+        const ObClientIcon *icon = client_icon(self->client,
+                                               ob_rr_theme->button_size + 2,
+                                               ob_rr_theme->button_size + 2);
         a->texture[0].type = RR_TEXTURE_RGBA;
         a->texture[0].data.rgba.width = icon->width;
         a->texture[0].data.rgba.height = icon->height;

@@ -53,7 +53,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             GSList *acts;
             ObAction* act;
             ObMenuEntry *e;
-            ObClientIcon *icon;
+            const ObClientIcon *icon;
 
             empty = FALSE;
 

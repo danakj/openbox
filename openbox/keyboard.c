@@ -197,17 +197,16 @@ void keyboard_interactive_end(ObInteractiveState *s,
     }
 }
 
-void keyboard_interactive_end_client(gpointer data)
+void keyboard_interactive_end_client(ObClient *client, gpointer data)
 {
     GSList *it, *next;
-    ObClient *c = data;
 
     for (it = interactive_states; it; it = next) {
         ObInteractiveState *s = it->data;
 
         next = g_slist_next(it);
 
-        if (s->client == c)
+        if (s->client == client)
             s->client = NULL;
     }
 }
@@ -291,7 +290,7 @@ void keyboard_startup(gboolean reconfig)
     grab_keys(TRUE);
 
     if (!reconfig)
-        client_add_destructor(keyboard_interactive_end_client);
+        client_add_destructor(keyboard_interactive_end_client, NULL);
 }
 
 void keyboard_shutdown(gboolean reconfig)

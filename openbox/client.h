@@ -272,8 +272,10 @@ extern GList *client_list;
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);
 
-void client_add_destructor(GDestroyNotify func);
-void client_remove_destructor(GDestroyNotify func);
+typedef void (*ObClientDestructor)(ObClient *client, gpointer data);
+
+void client_add_destructor(ObClientDestructor func, gpointer data);
+void client_remove_destructor(ObClientDestructor func);
 
 /*! Manages all existing windows */
 void client_manage_all();
@@ -503,7 +505,7 @@ void client_setup_decor_and_functions(ObClient *self);
 /*! Retrieves the window's type and sets ObClient->type */
 void client_get_type(ObClient *self);
 
-ObClientIcon *client_icon(ObClient *self, int w, int h);
+const ObClientIcon *client_icon(ObClient *self, int w, int h);
 
 /*! Searches a client's direct parents for a focused window. The function does
   not check for the passed client, only for *ONE LEVEL* of its parents.

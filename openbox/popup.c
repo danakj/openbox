@@ -248,7 +248,7 @@ void icon_popup_free(ObIconPopup *self)
 }
 
 void icon_popup_show(ObIconPopup *self,
-                     gchar *text, struct _ObClientIcon *icon)
+                     gchar *text, const ObClientIcon *icon)
 {
     if (icon) {
         self->a_icon->texture[0].type = RR_TEXTURE_RGBA;

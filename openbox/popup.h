@@ -98,7 +98,7 @@ ObIconPopup *icon_popup_new();
 void icon_popup_free(ObIconPopup *self);
 
 void icon_popup_show(ObIconPopup *self,
-                     gchar *text, struct _ObClientIcon *icon);
+                     gchar *text, const struct _ObClientIcon *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
 #define icon_popup_size(p, w, h) popup_size((p)->popup,(w),(h))

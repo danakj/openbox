@@ -51,7 +51,7 @@ static void parse_menu_separator(ObParseInst *i,
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data);
 
-static void client_dest(gpointer client)
+static void client_dest(ObClient *client, gpointer data)
 {
     /* menus can be associated with a client, so close any that are since
        we are disappearing now */
@@ -98,7 +98,7 @@ void menu_startup(gboolean reconfig)
     g_assert(menu_parse_state.parent == NULL);
 
     if (!reconfig)
-        client_add_destructor(client_dest);
+        client_add_destructor(client_dest, NULL);
 }
 
 void menu_shutdown(gboolean reconfig)

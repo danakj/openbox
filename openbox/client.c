@@ -50,6 +50,12 @@
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
 				ButtonMotionMask)
 
+typedef struct
+{
+    ObClientDestructor func;
+    gpointer data;
+} Destructor;
+
 GList      *client_list        = NULL;
 GSList     *client_destructors = NULL;
 
@@ -81,14 +87,26 @@ void client_shutdown(gboolean reconfig)
 {
 }
 
-void client_add_destructor(GDestroyNotify func)
+void client_add_destructor(ObClientDestructor func, gpointer data)
 {
-    client_destructors = g_slist_prepend(client_destructors, (gpointer)func);
+    Destructor *d = g_new(Destructor, 1);
+    d->func = func;
+    d->data = data;
+    client_destructors = g_slist_prepend(client_destructors, d);
 }
 
-void client_remove_destructor(GDestroyNotify func)
+void client_remove_destructor(ObClientDestructor func)
 {
-    client_destructors = g_slist_remove(client_destructors, (gpointer)func);
+    GSList *it;
+
+    for (it = client_destructors; it; it = g_slist_next(it)) {
+        Destructor *d = it->data;
+        if (d->func == func) {
+            g_free(d);
+            client_destructors = g_slist_delete_link(client_destructors, it);
+            break;
+        }
+    }
 }
 
 void client_set_list()
@@ -402,8 +420,8 @@ void client_unmanage(ObClient *self)
     screen_update_areas();
 
     for (it = client_destructors; it; it = g_slist_next(it)) {
-        GDestroyNotify func = (GDestroyNotify) it->data;
-        func(self);
+        Destructor *d = it->data;
+        d->func(self, d->data);
     }
         
     if (focus_client == self) {
@@ -473,9 +491,9 @@ void client_unmanage(ObClient *self)
     /* free all data allocated in the client struct */
     g_slist_free(self->transients);
     for (j = 0; j < self->nicons; ++j)
-	g_free(self->icons[j].data);
+        g_free(self->icons[j].data);
     if (self->nicons > 0)
-	g_free(self->icons);
+        g_free(self->icons);
     g_free(self->title);
     g_free(self->icon_title);
     g_free(self->name);
@@ -1498,35 +1516,35 @@ void client_update_icons(ObClient *self)
     guint w, h, i, j;
 
     for (i = 0; i < self->nicons; ++i)
-	g_free(self->icons[i].data);
+        g_free(self->icons[i].data);
     if (self->nicons > 0)
-	g_free(self->icons);
+        g_free(self->icons);
     self->nicons = 0;
 
     if (PROP_GETA32(self->window, net_wm_icon, cardinal, &data, &num)) {
-	/* figure out how many valid icons are in here */
-	i = 0;
-	while (num - i > 2) {
-	    w = data[i++];
-	    h = data[i++];
-	    i += w * h;
-	    if (i > num || w*h == 0) break;
-	    ++self->nicons;
-	}
+        /* figure out how many valid icons are in here */
+        i = 0;
+        while (num - i > 2) {
+            w = data[i++];
+            h = data[i++];
+            i += w * h;
+            if (i > num || w*h == 0) break;
+            ++self->nicons;
+        }
 
-	self->icons = g_new(ObClientIcon, self->nicons);
+        self->icons = g_new(ObClientIcon, self->nicons);
     
-	/* store the icons */
-	i = 0;
-	for (j = 0; j < self->nicons; ++j) {
+        /* store the icons */
+        i = 0;
+        for (j = 0; j < self->nicons; ++j) {
             guint x, y, t;
 
-	    w = self->icons[j].width = data[i++];
-	    h = self->icons[j].height = data[i++];
+            w = self->icons[j].width = data[i++];
+            h = self->icons[j].height = data[i++];
 
             if (w*h == 0) continue;
 
-	    self->icons[j].data = g_new(RrPixel32, w * h);
+            self->icons[j].data = g_new(RrPixel32, w * h);
             for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
                 if (x >= w) {
                     x = 0;
@@ -1538,10 +1556,10 @@ void client_update_icons(ObClient *self)
                     (((data[i] >> 8) & 0xff) << RrDefaultGreenOffset) +
                     (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
             }
-	    g_assert(i <= num);
-	}
+            g_assert(i <= num);
+        }
 
-	g_free(data);
+        g_free(data);
     } else if (PROP_GETA32(self->window, kwm_win_icon,
                            kwm_win_icon, &data, &num)) {
         if (num == 2) {
@@ -1583,18 +1601,8 @@ void client_update_icons(ObClient *self)
         }
     }
 
-    if (!self->nicons) {
-        self->nicons++;
-        self->icons = g_new(ObClientIcon, self->nicons);
-        self->icons[self->nicons-1].width = 48;
-        self->icons[self->nicons-1].height = 48;
-        self->icons[self->nicons-1].data = g_memdup(ob_rr_theme->def_win_icon,
-                                                    sizeof(RrPixel32)
-                                                    * 48 * 48);
-    }
-
     if (self->frame)
-	frame_adjust_icon(self->frame);
+        frame_adjust_icon(self->frame);
 }
 
 static void client_change_state(ObClient *self)
@@ -2659,12 +2667,35 @@ gboolean client_focused(ObClient *self)
     return self == focus_client;
 }
 
-ObClientIcon *client_icon(ObClient *self, int w, int h)
+static ObClientIcon* client_icon_recursive(ObClient *self, int w, int h)
 {
     guint i;
     /* si is the smallest image >= req */
     /* li is the largest image < req */
     unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
+
+    g_message("icons %d", self->nicons);
+
+    if (!self->nicons) {
+        ObClientIcon *parent = NULL;
+
+        if (self->transient_for) {
+            if (self->transient_for != OB_TRAN_GROUP)
+                parent = client_icon_recursive(self->transient_for, w, h);
+            else {
+                GSList *it;
+                for (it = self->group->members; it; it = g_slist_next(it)) {
+                    ObClient *c = it->data;
+                    if (c != self && !c->transient_for) {
+                        if ((parent = client_icon_recursive(c, w, h)))
+                            break;
+                    }
+                }
+            }
+        }
+        
+        return parent;
+    }
 
     for (i = 0; i < self->nicons; ++i) {
         size = self->icons[i].width * self->icons[i].height;
@@ -2680,6 +2711,21 @@ ObClientIcon *client_icon(ObClient *self, int w, int h)
     if (largest == 0) /* didnt find one smaller than the requested size */
         return &self->icons[si];
     return &self->icons[li];
+}
+
+const ObClientIcon* client_icon(ObClient *self, int w, int h)
+{
+    ObClientIcon *ret;
+    static ObClientIcon deficon;
+
+    g_message("going for broke");
+    if (!(ret = client_icon_recursive(self, w, h))) {
+        g_message("using default");
+        deficon.width = deficon.height = 48;
+        deficon.data = ob_rr_theme->def_win_icon;
+        ret = &deficon;
+    }
+    return ret;
 }
 
 /* this be mostly ripped from fvwm */

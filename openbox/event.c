@@ -69,7 +69,7 @@ static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_group(ObGroup *g, XEvent *e);
 
 static gboolean focus_delay_func(gpointer data);
-static void focus_delay_client_dest(gpointer data);
+static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 static gboolean menu_hide_delay_func(gpointer data);
 
@@ -157,7 +157,7 @@ void event_startup(gboolean reconfig)
     IceAddConnectionWatch(ice_watch, NULL);
 #endif
 
-    client_add_destructor(focus_delay_client_dest);
+    client_add_destructor(focus_delay_client_dest, NULL);
 }
 
 void event_shutdown(gboolean reconfig)
@@ -1252,11 +1252,9 @@ static gboolean focus_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-static void focus_delay_client_dest(gpointer data)
+static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    ObClient *c = data;
-
-    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, c);
+    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, client);
 }
 
 void event_ignore_queued_enters()

@@ -645,16 +645,14 @@ static void popup_coords(char *format, int a, int b, gboolean hide)
     if (hide)
         XUnmapWindow(ob_display, coords);
     else {
-        Rect area = { 10, 10, 1, 1 };
         Size s;
         char *text;
 
         text = g_strdup_printf(format, a, b);
         engine_size_label(text, TRUE, TRUE, &s);
-        area.width = s.width; area.height = s.height;
         XMoveResizeWindow(ob_display, coords,
-                          area.x, area.y, area.width, area.height);
-        engine_render_label(coords, &area, text, TRUE, TRUE);
+                          10, 10, s.width, s.height);
+        engine_render_label(coords, &s, text, TRUE, TRUE);
         g_free(text);
 
         XMapWindow(ob_display, coords);
@@ -714,9 +712,44 @@ void action_showmenu(union ActionData *data)
     g_message(__FUNCTION__);
 }
 
+static void popup_cycle(Client *c, gboolean hide)
+{
+    XSetWindowAttributes attrib;
+    static Window coords = None;
+
+    if (coords == None) {
+        attrib.override_redirect = TRUE;
+        coords = XCreateWindow(ob_display, ob_root,
+                               0, 0, 1, 1, 0, render_depth, InputOutput,
+                               render_visual, CWOverrideRedirect, &attrib);
+        g_assert(coords != None);
+    }
+
+    if (hide)
+        XUnmapWindow(ob_display, coords);
+    else {
+        Rect *a;
+        Size s;
+
+        a = screen_area(c->desktop);
+
+        engine_size_label(c->title, TRUE, TRUE, &s);
+        XMoveResizeWindow(ob_display, coords,
+                          a->x + (a->width - s.width) / 2,
+                          a->y + (a->height - s.height) / 2,
+                          s.width, s.height);
+        engine_render_label(coords, &s, c->title, TRUE, TRUE);
+
+        XMapWindow(ob_display, coords);
+    }
+}
+
 void action_cycle_windows(union ActionData *data)
 {
-    focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
-                data->cycle.cancel);
+    Client *c;
+    
+    c = focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
+                    data->cycle.cancel);
+    popup_cycle(c, !c && (data->cycle.final||data->cycle.cancel));
 }
 

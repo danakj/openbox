@@ -6,6 +6,7 @@
 #include "tree.h"
 #include "keyboard.h"
 #include "keysrc.h"
+#include "translate.h"
 #include <glib.h>
 
 void plugin_setup_config()
@@ -38,7 +39,8 @@ static void reset_chains()
     if (grabbed) {
 	grabbed = FALSE;
         grab_keyboard(FALSE);
-    }
+    } else
+        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
 }
 
 gboolean kbind(GList *keylist, Action *action)
@@ -100,6 +102,7 @@ static void press(ObEvent *e, void *foo)
                     if (!grabbed) {
                         grab_keyboard(TRUE);
                         grabbed = TRUE;
+                        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     }
                     curpos = p;
                 } else {
@@ -119,7 +122,6 @@ static void press(ObEvent *e, void *foo)
             p = p->next_sibling;
         }
     }
-    XAllowEvents(ob_display, AsyncKeyboard, e->data.x.e->xkey.time);
 }
 
 void plugin_startup()

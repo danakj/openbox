@@ -17,7 +17,7 @@ void grab_keyboard(gboolean grab)
         if (kgrabs++ == 0) {
             g_message("GRABBING KEYBOARD %d", kgrabs);
             XGrabKeyboard(ob_display, ob_root, 0, GrabModeAsync, GrabModeSync,
-                          event_lasttime);
+                          CurrentTime);
         } else
             g_message("NOT GRABBING KEYBOARD %d", kgrabs);
     } else if (kgrabs > 0) {
@@ -34,7 +34,7 @@ void grab_pointer(gboolean grab, Cursor cur)
     if (grab) {
         if (pgrabs++ == 0)
             XGrabPointer(ob_display, ob_root, False, 0, GrabModeAsync,
-                         GrabModeAsync, FALSE, cur, event_lasttime);
+                         GrabModeAsync, FALSE, cur, CurrentTime);
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, CurrentTime);

@@ -64,7 +64,6 @@ ObState     ob_state;
 gboolean    ob_sync;
 Cursor      ob_cursors[OB_NUM_CURSORS];
 KeyCode     ob_keys[OB_NUM_KEYS];
-char       *ob_rc_path;
 
 static gboolean  shutdown;
 static gboolean  restart;
@@ -504,7 +503,6 @@ static void print_help()
     print_version();
     g_print("Syntax: openbox [options]\n\n");
     g_print("Options:\n\n");
-    g_print("  --rc PATH          Specify the path to the rc file to use\n");
 #ifdef USE_SM
     g_print("  --sm-client-id ID  Specify session management ID\n");
     g_print("  --sm-disable       Disable connection to session manager\n");
@@ -529,11 +527,6 @@ static void parse_args(int argc, char **argv)
             exit(0);
         } else if (!strcmp(argv[i], "--sync")) {
             ob_sync = TRUE;
-        } else if (!strcmp(argv[i], "--rc")) {
-            if (i == argc - 1) /* no args left */
-                g_printerr(_("--rc requires an argument\n"));
-            else
-                ob_rc_path = argv[++i];
 #ifdef USE_SM
         } else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == argc - 1) /* no args left */

@@ -37,9 +37,6 @@ extern gboolean ob_remote;
 /*! Runtime option to run in synchronous mode */
 extern gboolean ob_sync;
 
-/*! The path of the rc file. If NULL the default paths are searched for one. */
-extern char *ob_rc_path;
-
 void ob_restart_other(const gchar *path);
 void ob_restart();
 void ob_exit();

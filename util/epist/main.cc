@@ -21,9 +21,86 @@
 // DEALINGS IN THE SOFTWARE.
 
 #ifdef    HAVE_CONFIG_H
-#  include "../config.h"
+#  include "../../config.h"
 #endif // HAVE_CONFIG_H
 
-int main(int, char **) {
+extern "C" {
+#ifdef    HAVE_UNISTD_H
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif // HAVE_UNISTD_H
+
+#ifdef    HAVE_SIGNAL_H
+#  include <signal.h>
+#endif // HAVE_SIGNAL_H
+
+#ifdef    HAVE_SYS_SIGNAL_H
+#  include <sys/signal.h>
+#endif // HAVE_SYS_SIGNAL_H
+
+#ifdef    HAVE_LIBGEN_H
+#  include <libgen.h>
+#endif // HAVE_LIBGEN_H
+}
+
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+bool _shutdown = false;
+char **_argv;
+
+#ifdef   HAVE_SIGACTION
+static void signalhandler(int sig)
+#else //  HAVE_SIGACTION
+static RETSIGTYPE signalhandler(int sig)
+#endif // HAVE_SIGACTION
+{
+  switch (sig) {
+  case SIGSEGV:
+    cout << "Segmentation fault. Aborting and dumping core.\n";
+    abort();
+  case SIGHUP:
+    cout << "Restarting on request.\n";
+    execvp(_argv[0], _argv);
+    execvp(basename(_argv[0]), _argv);
+  }
+  _shutdown = true;
+
+#ifndef   HAVE_SIGACTION
+  // assume broken, braindead sysv signal semantics
+  signal(sig, (RETSIGTYPE (*)(int)) signalhandler);
+#endif // HAVE_SIGACTION
+}
+
+int main(int, char **argv) {
+  _argv = argv;
+
+#ifdef    HAVE_SIGACTION
+  struct sigaction action;
+
+  action.sa_handler = signalhandler;
+  action.sa_mask = sigset_t();
+  action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
+
+  sigaction(SIGPIPE, &action, NULL);
+  sigaction(SIGSEGV, &action, NULL);
+  sigaction(SIGFPE, &action, NULL);
+  sigaction(SIGTERM, &action, NULL);
+  sigaction(SIGINT, &action, NULL);
+  sigaction(SIGHUP, &action, NULL);
+#else // !HAVE_SIGACTION
+  signal(SIGPIPE, (RETSIGTYPE (*)(int)) signalhandler);
+  signal(SIGSEGV, (RETSIGTYPE (*)(int)) signalhandler);
+  signal(SIGFPE, (RETSIGTYPE (*)(int)) signalhandler);
+  signal(SIGTERM, (RETSIGTYPE (*)(int)) signalhandler);
+  signal(SIGINT, (RETSIGTYPE (*)(int)) signalhandler);
+  signal(SIGHUP, (RETSIGTYPE (*)(int)) signalhandler);
+#endif // HAVE_SIGACTION
+  
+  while (! _shutdown) {
+    usleep(500);
+  }
   return 0;
 }

@@ -13,7 +13,7 @@ AC_LANG(C++)
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
-dnl AC_PROG_LIBTOOL  dont need this until we're doing plugins/engines
+AC_PROG_LIBTOOL
 
 AC_CHECK_PROGS(regex_cmd, sed)
 if test x$regex_cmd = "x"; then
@@ -169,6 +169,7 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(
   version.h
   Makefile
+  otk/Makefile
   src/Makefile
   util/Makefile
   util/epist/Makefile

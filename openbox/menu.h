@@ -10,14 +10,15 @@
 
 struct _ObClient;
 
-typedef struct _ObMenu      ObMenu;
+typedef struct _ObMenu ObMenu;
 typedef struct _ObMenuEntry ObMenuEntry;
 
 typedef void(*menu_controller_show)(ObMenu *self, int x, int y,
                                     struct _ObClient *);
 typedef void(*menu_controller_update)(ObMenu *self);
 typedef void(*menu_controller_mouseover)(ObMenuEntry *self, gboolean enter);
-typedef void(*menu_controller_selected)(ObMenuEntry *self, unsigned int button,
+typedef void(*menu_controller_selected)(ObMenuEntry *entry,
+                                        unsigned int button,
                                         unsigned int x, unsigned int y);
 typedef void(*menu_controller_hide)(ObMenu *self);
 
@@ -29,25 +30,42 @@ struct _ObMenu
 {
     ObWindow obwin;
 
+    /* The title displayed above the menu.
+       NULL for no titlebar */
     gchar *label;
+
+    /* Name of the menu.
+       Used in the action showmenu */
     gchar *name;
-    
+
+    /* ObMenuEntry list */
     GList *entries;
 
+    /* If the menu is currently displayed */
     gboolean shown;
+
+    /* If the rendering of the menu has changed and needs to be rerendered. */
     gboolean invalid;
 
+    /* Kind of lame.Each menu can only be a submenu, and each menu can only
+       have one submenu open */
     ObMenu *parent;
-    
     ObMenu *open_submenu;
-
+    GList *over;
+    
+    /* behaviour callbacks
+       TODO: Document and split code that HAS to be in the overridden callback */
     /* place a menu on screen */
     menu_controller_show show;
+    /* Hide the menu */
     menu_controller_hide hide;
-
     /* render a menu */
     menu_controller_update update;
+    /* Event for a mouse enter/exit on an entry
+       TODO: May have to split from simple render updating?
+    */
     menu_controller_mouseover mouseover;
+    /* Entry is clicked/hit enter on */
     menu_controller_selected selected;
 
 
@@ -65,8 +83,9 @@ struct _ObMenu
     Size size;
     guint xin_area; /* index of the xinerama head/area */
 
-    /* plugin stuff */
+    /* Name of plugin for menu */
     char *plugin;
+    /* plugin's data */
     void *plugin_data;
 };
 
@@ -161,8 +180,8 @@ ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y);
 
 void menu_entry_render(ObMenuEntry *self);
 
-void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
-                     unsigned int y);
+void menu_entry_fire(ObMenuEntry *entry,
+                     unsigned int button, unsigned int x, unsigned int y);
 
 void menu_render(ObMenu *self);
 void menu_render_full(ObMenu *self);
@@ -170,5 +189,5 @@ void menu_render_full(ObMenu *self);
 /*so plugins can call it? */
 void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data, gboolean new);
 void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
-ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key);
+void menu_control_keyboard_nav(unsigned int key);
 #endif

@@ -183,6 +183,7 @@ ObMenu *menu_new_full(char *label, char *name, ObMenu *parent,
     self->name = g_strdup(name);
     self->parent = parent;
     self->open_submenu = NULL;
+    self->over = NULL;
 
     self->entries = NULL;
     self->shown = FALSE;
@@ -318,12 +319,8 @@ void menu_hide(ObMenu *self) {
 	if (self->open_submenu)
 	    menu_hide(self->open_submenu);
 	if (self->parent && self->parent->open_submenu == self) {
-            ObMenuEntry *e;
-
+            self->over = NULL;
 	    self->parent->open_submenu = NULL;
-
-            e = menu_find_entry_by_submenu(self->parent, self);
-            self->parent->mouseover(e, FALSE);
         }
 
         if (!(self->parent && self->parent->shown)) {
@@ -440,12 +437,14 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
     Rect *a;
     ObMenuEntry *e;
 
+    g_assert(self != NULL);
+    
     if (enter) {
+        /* TODO: we prolly don't need open_submenu */
 	if (self->parent->open_submenu && self->submenu 
 	    != self->parent->open_submenu)
         {
-            e = menu_find_entry_by_submenu(self->parent,
-                                           self->parent->open_submenu);
+            e = (ObMenuEntry *) self->parent->over->data;
             e->hilite = FALSE;
             menu_entry_render(e);
 	    menu_hide(self->parent->open_submenu);
@@ -473,113 +472,100 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,
                            self->parent->client);
-	} 
-    }
-
-    if (enter || !self->submenu ||
-        menu_find_entry_by_submenu(self->parent,
-                                   self->parent->open_submenu) != self)
-        self->hilite = enter;
-
+	}
+        self->hilite = TRUE;
+        self->parent->over = g_list_find(self->parent->entries, self);
+        
+    } else
+        self->hilite = FALSE;
+    
     menu_entry_render(self);
 }
 
-ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)
+void menu_control_keyboard_nav(unsigned int key)
 {
-    GList *it = NULL;
-        
-    switch (key) {
-    case OB_KEY_DOWN: {
-        if (over != NULL) {
-            over->parent->mouseover(over, FALSE);
-                
-            it = over->parent->entries;
-            while (it != NULL && it->data != over)
-                it = it->next;
-        }
-            
-        if (it && it->next)
-            over = (ObMenuEntry *)it->next->data;
-        else if (over == NULL) {
-            if (menu_visible && ((ObMenu *)menu_visible->data)->entries)
-                over = (ObMenuEntry *)
-                    (((ObMenu *)menu_visible->data)->entries)->data;
-            else
-                over = NULL;
-        } else {
-            over = (over->parent->entries != NULL ?
-                    over->parent->entries->data : NULL);
-        }
+    static ObMenu *current_menu = NULL;
 
-        if (over)
-            over->parent->mouseover(over, TRUE);
+    ObKey obkey = OB_NUM_KEYS;
+
+    /* hrmm. could be fixed */
+    if (key == ob_keycode(OB_KEY_DOWN))
+        obkey = OB_KEY_DOWN;
+    else if (key == ob_keycode(OB_KEY_UP))
+        obkey = OB_KEY_UP;
+    else if (key == ob_keycode(OB_KEY_RIGHT)) /* fuck */
+        obkey = OB_KEY_RIGHT;
+    else if (key == ob_keycode(OB_KEY_LEFT)) /* users */
+        obkey = OB_KEY_LEFT;
+    
+    if (current_menu == NULL)
+        current_menu = menu_visible->data;
+    
+    switch (obkey) {
+    case OB_KEY_DOWN: {
+        if (current_menu->over) {
+            current_menu->mouseover(current_menu->over->data, FALSE);
+            current_menu->over = (current_menu->over->next != NULL ?
+                          current_menu->over->next :
+                          current_menu->entries);
+        }
+        else
+            current_menu->over = current_menu->entries;
+
+        if (current_menu->over)
+            current_menu->mouseover(current_menu->over->data, TRUE);
         
         break;
     }
     case OB_KEY_UP: {
-        if (over != NULL) {
-            over->parent->mouseover(over, FALSE);
-                
-            it = g_list_last(over->parent->entries);
-            while (it != NULL && it->data != over)
-                it = it->prev;
-        } 
-            
-        if (it && it->prev)
-            over = (ObMenuEntry *)it->prev->data;
-        else if (over == NULL) {
-            it = g_list_last(menu_visible);
-            if (it != NULL) {
-                it = g_list_last(((ObMenu *)it->data)->entries);
-                over = (ObMenuEntry *)(it != NULL ? it->data : NULL);
-            }
+        if (current_menu->over) {
+            current_menu->mouseover(current_menu->over->data, FALSE);
+            current_menu->over = (current_menu->over->prev != NULL ?
+                          current_menu->over->prev :
+                g_list_last(current_menu->entries));
         } else
-            over = (over->parent->entries != NULL ?
-                    g_list_last(over->parent->entries)->data :
-                    NULL);
+            current_menu->over = g_list_last(current_menu->entries);
 
-        over->parent->mouseover(over, TRUE);
+        if (current_menu->over)
+            current_menu->mouseover(current_menu->over->data, TRUE);
+        
         break;
     }
     case OB_KEY_RIGHT: {
-        if (over == NULL)
-            return over;
+        ObMenuEntry *e;
+        if (current_menu->over == NULL)
+            return;
 
-        if (over->submenu) {
-            over->parent->mouseover(over, FALSE);
-
-            if (over->submenu->entries)
-                over = over->submenu->entries->data;
-
-            over->parent->mouseover(over, TRUE);
-        }
-        else {
-            over->parent->mouseover(over, FALSE);
-
+        e = (ObMenuEntry *)current_menu->over->data;
+        if (e->submenu) {
+            current_menu = e->submenu;
+            current_menu->over = current_menu->entries;
+            if (current_menu->over)
+                current_menu->mouseover(current_menu->over->data, TRUE);
+        } else {
+            current_menu->mouseover(e, FALSE);
+            current_menu->over = NULL;
+            
             /* zero is enter */
-            menu_entry_fire(over, 0, 0, 0);
+            menu_entry_fire(e, 0, 0, 0);
         }
         break;
     }
     case OB_KEY_LEFT: {
-        if (over != NULL) {
-            over->parent->mouseover(over, FALSE);
-            menu_hide(over->parent);
-        } else {
-            it  = g_list_last(menu_visible);
-            if (it) {
-                menu_hide((ObMenu *)it->data);
-            }
-        }
+        if (current_menu->over == NULL)
+            return;
+        current_menu->mouseover(current_menu->over->data, FALSE);
+        current_menu->over = NULL;
         
-        over = NULL;
+        menu_hide(current_menu);
+
+        if (current_menu->parent)
+            current_menu = current_menu->parent;
+        
         break;
     }
-    default:
-        g_error("Unknown key");
     }
-
-    return over;
+    return;
 }
 
 void menu_noop()

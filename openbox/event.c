@@ -972,7 +972,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
 static void event_handle_menu(ObClient *client, XEvent *e)
 {
-    static ObMenuEntry *over = NULL;
     ObMenuEntry *entry;
     ObMenu *top;
     GList *it = NULL;
@@ -982,27 +981,11 @@ static void event_handle_menu(ObClient *client, XEvent *e)
     ob_debug("EVENT %d\n", e->type);
     switch (e->type) {
     case KeyPress:
-        if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-            over = menu_control_keyboard_nav(over, OB_KEY_DOWN);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
-            over = menu_control_keyboard_nav(over, OB_KEY_UP);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) /* fuck */
-            over = menu_control_keyboard_nav(over, OB_KEY_RIGHT);
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT)) /* users */
-            over = menu_control_keyboard_nav(over, OB_KEY_LEFT);
-        else {
-            if (over) {
-                over->parent->mouseover(over, FALSE);
-                over = NULL;
-            }
-
-            menu_hide(top);
-        }
+        menu_control_keyboard_nav(e->xkey.keycode);
         break;
     case ButtonPress:
-        if (e->xbutton.button > 3) break;
-
 	ob_debug("BUTTON PRESS\n");
+
         break;
     case ButtonRelease:
 	ob_debug("BUTTON RELEASED\n");
@@ -1020,30 +1003,12 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                                                     m->location.x,
                                                     e->xbutton.y_root -
                                                     m->location.y))) {
-                    if (over) {
-                        over->parent->mouseover(over, FALSE);
-                        /* this hides the menu */
-
-                        over->parent->selected(entry, e->xbutton.button,
-                                               e->xbutton.x_root,
-                                               e->xbutton.y_root);
-                        over = NULL;
-                    }
+                    m->selected(entry, e->xbutton.button,
+                                e->xbutton.x_root,
+                                e->xbutton.y_root);
+                    break;
                 }
-                break;
             }
-        }
-        if (!it) {
-            if (over) {
-                over->parent->mouseover(over, FALSE);
-                over = NULL;
-            }
-/*
-            if (top->hide)
-                top->hide(top);
-            else
-*/
-                menu_hide(top);
         }
 	
         break;
@@ -1056,19 +1021,14 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                                                 m->location.x,
                                                 e->xmotion.y_root -
                                                 m->location.y))) {
-                if (over && entry != over) {
-                    over->parent->mouseover(over, FALSE);
-                }
+                if (m->over && m->over->data != entry)
+                    m->mouseover(m->over->data, FALSE);
 
-                over = entry;
-                over->parent->mouseover(over, TRUE);
+                m->mouseover(entry, TRUE);
                 break;
             }
         }
-        if (!it && over) {
-            over->parent->mouseover(over, FALSE);
-            over = NULL;
-        }
+
         break;
     }
 }

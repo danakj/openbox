@@ -35,6 +35,29 @@ static gboolean focus_under_pointer()
     return FALSE;
 }
 
+static void chew_enter_events()
+{
+    XEvent e;
+
+    /* XXX... not anymore
+       skip the next enter event from the desktop switch so focus
+       doesn't skip briefly to what was under the pointer */
+
+    /* kill all enter events from prior to the desktop switch, we
+       aren't interested in them if we have found our own target
+       to focus.
+       XXX this is rude to other plugins...can this be done
+       better? count the events in the queue? */
+    while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+/*
+    {
+        XPutBackEvent(ob_display, &e);
+        g_message("skip");
+        ++skip_enter;
+    }
+*/
+}
+
 static void focus_fallback(gboolean switching_desks)
 {
     GList *it;
@@ -42,23 +65,9 @@ static void focus_fallback(gboolean switching_desks)
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (client_normal(it->data) && client_focus(it->data)) {
             if (switching_desks) {
-                XEvent e;
                 Client *c = it->data;
 
-                /* XXX... not anymore
-                   skip the next enter event from the desktop switch so focus
-                   doesn't skip briefly to what was under the pointer */
-
-                /* kill all enter events from prior to the desktop switch, we
-                   aren't interested in them if we have found our own target
-                   to focus.
-                   XXX this is rude to other plugins...can this be done
-                   better? count the events in the queue? */
-                while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-/*                    XPutBackEvent(ob_display, &e);
-                    g_message("skip");
-                    ++skip_enter;
-                    }*/
+                chew_enter_events();
 
                 if (warp_on_desk_switch) {
                     /* I have to do this warp twice! Otherwise windows dont get
@@ -71,6 +80,19 @@ static void focus_fallback(gboolean switching_desks)
             }
             break;
         }
+}
+
+static void focus_desktop()
+{
+    GList *it;
+
+    for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+        Client *client = it->data;
+        if (client->type == Type_Desktop && client->frame->visible)
+            if (client_focus(client))
+                break;
+    }
+    chew_enter_events();
 }
 
 static void event(ObEvent *e, void *foo)
@@ -100,6 +122,14 @@ static void event(ObEvent *e, void *foo)
         focus_fallback(TRUE);
         break;
 
+    case Event_Ob_ShowDesktop:
+        if (!e->data.o.num[0]) { /* hiding the desktop, showing the clients */
+            if (!follow_mouse || !focus_under_pointer())
+                focus_fallback(TRUE);
+        } else /* hiding clients, showing the desktop */
+            focus_desktop();
+        break;
+
     case Event_X_EnterNotify:
 /*        if (skip_enter) {
             if (e->data.x.client != NULL)
@@ -123,7 +153,8 @@ void plugin_startup()
     dispatch_register(Event_Client_Mapped | 
                       Event_Ob_Desktop | 
                       Event_Client_Unmapped |
-                      Event_X_EnterNotify,
+                      Event_X_EnterNotify |
+                      Event_Ob_ShowDesktop,
                       (EventHandler)event, NULL);
 }
 

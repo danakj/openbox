@@ -492,11 +492,12 @@ static void client_get_all(Client *self)
     self->nicons = 0;
 
     client_get_area(self);
+    client_update_transient_for(self);
+    client_update_wmhints(self);
     client_get_desktop(self);
     client_get_state(self);
     client_get_shaped(self);
 
-    client_update_transient_for(self);
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
 
@@ -510,7 +511,6 @@ static void client_get_all(Client *self)
        (min/max sizes), so we're ready to set up the decorations/functions */
     client_setup_decor_and_functions(self);
   
-    client_update_wmhints(self);
     client_update_title(self);
     client_update_icon_title(self);
     client_update_class(self);
@@ -541,9 +541,28 @@ static void client_get_desktop(Client *self)
 	if (d >= screen_num_desktops && d != DESKTOP_ALL)
 	    d = screen_num_desktops - 1;
 	self->desktop = d;
-    } else {
-	/* defaults to the current desktop */
-	self->desktop = screen_desktop;
+    } else { 
+        gboolean trdesk = FALSE;
+
+       if (self->transient_for) {
+           if (self->transient_for != TRAN_GROUP) {
+                self->desktop = self->transient_for->desktop;
+                trdesk = TRUE;
+            } else {
+                GSList *it;
+
+                for (it = self->group->members; it; it = it->next)
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                        self->desktop = ((Client*)it->data)->desktop;
+                        trdesk = TRUE;
+                        break;
+                    }
+            }
+       }
+       if (!trdesk)
+           /* defaults to the current desktop */
+           self->desktop = screen_desktop;
 
         /* set the desktop hint, to make sure that it always exists */
         PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
@@ -2086,9 +2105,25 @@ gboolean client_focusable(Client *self)
 gboolean client_focus(Client *self)
 {
     XEvent ev;
+    guint i;
 
     /* choose the correct target */
     self = client_focus_target(self);
+
+    if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop) {
+        /* update the focus lists */
+        if (self->desktop == DESKTOP_ALL) {
+            for (i = 0; i < screen_num_desktops; ++i) {
+                focus_order[i] = g_list_remove(focus_order[i], self);
+                focus_order[i] = g_list_prepend(focus_order[i], self);
+            }
+        } else {
+            i = self->desktop;
+            focus_order[i] = g_list_remove(focus_order[i], self);
+            focus_order[i] = g_list_prepend(focus_order[i], self);
+        }
+        return FALSE;
+    }
 
     if (!client_focusable(self))
 	return FALSE;

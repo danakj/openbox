@@ -232,8 +232,8 @@ the themes.org site recommends.
 	[exec] (Video Tune) {xvidtune}
 
 	[submenu] (Themes) {Themes from bb.classic.themes.org}
-		[style] (Openbox) {~/.openbox/styles/blackbox}
-		[style] (Openbox II) {~/.openbox/styles/blackbox2}
+		[style] (Openbox) {~/.openbox/styles/openbox}
+		[style] (Openbox II) {~/.openbox/styles/openbox2}
 		[style] (Hardware) {~/.openbox/styles/hardware}
 		[style] (Nova) {~/.openbox/styles/nova}
 		[style] (Orbital) {~/.openbox/styles/orbital}
@@ -285,8 +285,8 @@ After putting everything together, we have:
 	[nop] (...)
 
 	[submenu] (Themes) {Themes from bb.classic.themes.org}
-		[style] (Openbox) {~/.openbox/styles/blackbox}
-		[style] (Openbox II) {~/.openbox/styles/blackbox2}
+		[style] (Openbox) {~/.openbox/styles/openbox}
+		[style] (Openbox II) {~/.openbox/styles/openbox2}
 		[style] (Hardware) {~/.openbox/styles/hardware}
 		[style] (Nova) {~/.openbox/styles/nova}
 		[style] (Orbital) {~/.openbox/styles/orbital}

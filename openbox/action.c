@@ -1231,11 +1231,12 @@ void action_growtoedge(union ActionData *data)
 {
     int x, y, width, height, dest;
     ObClient *c = data->diraction.any.c;
-    Rect *a = screen_area(c->desktop);
+    Rect *a;
 
     if (!c)
         return;
     
+    a =  = screen_area(c->desktop);
     x = c->frame->area.x;
     y = c->frame->area.y;
     width = c->frame->area.width;

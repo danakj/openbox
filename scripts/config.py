@@ -11,6 +11,13 @@ client_buttons = ["A-1", "A-2", "A-3"]
 # theme - the theme used to decorate everything.
 theme = "/usr/local/share/openbox/styles/nyz"
 
+# titlebar_layout - the layout of the buttons/label on client titlebars, can be
+#                   made up of the following:
+#                   I - iconify button, L - text label, M - maximize button,
+#                   S - sticky button, C - close button
+#                   If no 'L' is included in the string, one will be added to
+#                   the end by Openbox.
+titlebar_layout = "ILC"
 
 #############################################################################
 ### Options that can be modified by the user to change the default hooks' ###
@@ -18,7 +25,7 @@ theme = "/usr/local/share/openbox/styles/nyz"
 #############################################################################
 
 # resize_nearest - 1 to resize from the corner nearest where the mouse is, 0
-#                  to resize always from the bottom right corner
+#                  to resize always from the bottom right corner.
 resize_nearest = 1
 
 

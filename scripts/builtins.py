@@ -58,3 +58,5 @@ def resize(data):
                     data.press_clientwidth() + dx,
                     data.press_clientheight() + dy);
 
+def execute(bin, screen = 0):
+    Openbox_execute(openbox, screen, bin)

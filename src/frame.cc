@@ -127,7 +127,9 @@ void OBFrame::adjustSize()
   // XXX: only if not overridden or something!!! MORE LOGIC HERE!!
   _decorations = _client->decorations();
   _decorations = 0xffffffff;
-  
+
+  // true/false for whether to show each element of the titlebar
+  bool tit_i = false, tit_m = false, tit_s = false, tit_c = false;
   int width;   // the width of the client and its border
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
@@ -181,11 +183,54 @@ void OBFrame::adjustSize()
     // separation between titlebar elements
     const int sep = bevel + 1;
 
-    std::string layout = "SLIMC"; // XXX: get this from somewhere
-    // XXX: it is REQUIRED that by this point, the string only has one of each
-    // possible letter, all of the letters are valid, and L exists somewhere in
-    // the string!
+    std::string layout;
+    if (!python_get_string("titlebar_layout", &layout))
+      layout = "ILMC";
 
+    // this code ensures that the string only has one of each possible
+    // letter, all of the letters are valid, and L exists somewhere in the
+    // string!
+    bool tit_l = false;
+  
+    for (std::string::size_type i = 0; i < layout.size(); ++i) {
+      switch(layout[i]) {
+      case 'i':
+      case 'I':
+        if (!tit_i && (_decorations & OBClient::Decor_Iconify)) {
+          tit_i = true;
+          continue;
+        }
+      case 'l':
+      case 'L':
+        if (!tit_l) {
+          tit_l = true;
+          continue;
+        }
+      case 'm':
+      case 'M':
+        if (!tit_m && (_decorations & OBClient::Decor_Maximize)) {
+          tit_m = true;
+          continue;
+        }
+      case 's':
+      case 'S':
+        if (!tit_s && (_decorations & OBClient::Decor_Sticky)) {
+          tit_s = true;
+          continue;
+        }
+      case 'c':
+      case 'C':
+        if (!tit_c && (_decorations & OBClient::Decor_Close)) {
+          tit_c = true;
+          continue;
+        }
+      }
+      // if we get here then we don't want the letter, kill it
+      layout.erase(i--, 1);
+    }
+    if (!tit_l)
+      layout += 'L';
+    
     // the size of the label. this ASSUMES the layout has only buttons other
     // that the ONE LABEL!!
     // adds an extra sep so that there's a space on either side of the
@@ -260,19 +305,19 @@ void OBFrame::adjustSize()
   // map/unmap all the windows
   if (_decorations & OBClient::Decor_Titlebar) {
     _label.show();
-    if (_decorations & OBClient::Decor_Iconify)
+    if (tit_i)
       _button_iconify.show();
     else
       _button_iconify.hide();
-    if (_decorations & OBClient::Decor_Maximize)
+    if (tit_m)
       _button_max.show();
     else
       _button_max.hide();
-    if (_decorations & OBClient::Decor_Sticky)
+    if (tit_s)
       _button_stick.show();
     else
       _button_stick.hide();
-    if (_decorations & OBClient::Decor_Close)
+    if (tit_c)
       _button_close.show();
     else
       _button_close.hide();

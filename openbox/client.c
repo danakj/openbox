@@ -14,6 +14,7 @@
 #include "openbox.h"
 #include "group.h"
 #include "config.h"
+#include "menu.h"
 #include "render/render.h"
 
 #include <glib.h>
@@ -311,6 +312,13 @@ void client_unmanage_all()
 	client_unmanage(client_list->data);
 }
 
+/* called by client_unmanage() to close any menus referencing this client */
+void client_close_menus(gpointer key, gpointer value, gpointer self)
+{
+    if (((Menu *)value)->client == (Client *)self)
+        menu_hide((Menu *)value);
+}
+
 void client_unmanage(Client *self)
 {
     int j;
@@ -364,6 +372,10 @@ void client_unmanage(Client *self)
     if (moveresize_client == self)
         moveresize_end(TRUE);
 
+    /* close any windows that are attached to this window */
+    g_hash_table_foreach(menu_hash, client_close_menus, self);
+
+    
     if (focus_client == self) {
         XEvent e;
 

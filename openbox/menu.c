@@ -7,7 +7,7 @@
 #include "geom.h"
 #include "plugin.h"
 
-static GHashTable *menu_hash = NULL;
+GHashTable *menu_hash = NULL;
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
 			 LeaveWindowMask)
@@ -17,9 +17,9 @@ static GHashTable *menu_hash = NULL;
 
 void menu_control_show(Menu *self, int x, int y, Client *client);
 
-void menu_destroy_hash_key(gpointer data)
+void menu_destroy_hash_key(Menu *menu)
 {
-    g_free(data);
+    g_free(menu);
 }
 
 void menu_destroy_hash_value(Menu *self)
@@ -73,7 +73,7 @@ void menu_startup()
                                       menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
-    m = menu_new(NULL, "root", NULL);
+    m = menu_new("sex menu", "root", NULL);
  
     a = action_from_string("execute");
     a->data.execute.path = g_strdup("xterm");
@@ -83,6 +83,8 @@ void menu_startup()
     menu_add_entry(m, menu_entry_new_separator("--"));
     a = action_from_string("exit");
     menu_add_entry(m, menu_entry_new("exit", a));
+
+    /*
     s = menu_new("subsex menu", "submenu", m);
     a = action_from_string("execute");
     a->data.execute.path = g_strdup("xclock");
@@ -90,19 +92,6 @@ void menu_startup()
 
     menu_add_entry(m, menu_entry_new_submenu("subz", s));
 
-    t = (Menu *)plugin_create("timed_menu");
-    if (t) {
-        a = action_from_string("execute");
-        a->data.execute.path = g_strdup("xeyes");
-        menu_add_entry(t, menu_entry_new("xeyes", a));
-        menu_add_entry(m, menu_entry_new_submenu("timed", t));
-    }
-
-    t = (Menu *)plugin_create("fifo_menu");
-    if (t) {
-        menu_add_entry(m, menu_entry_new_submenu("fifo", t));
-    }
-    
     s = menu_new("empty", "chub", m);
     menu_add_entry(m, menu_entry_new_submenu("empty", s));
 
@@ -124,17 +113,7 @@ void menu_startup()
     menu_add_entry(s, menu_entry_new("exit", a));
 
     menu_add_entry(m, menu_entry_new_submenu("long", s));
-    
-    m = menu_new(NULL, "client", NULL);
-    a = action_from_string("iconify");
-    menu_add_entry(m, menu_entry_new("iconify", a));
-    a = action_from_string("toggleshade");
-    menu_add_entry(m, menu_entry_new("(un)shade", a));
-    a = action_from_string("togglemaximizefull");
-    menu_add_entry(m, menu_entry_new("(un)maximize", a));
-    a = action_from_string("close");
-    menu_add_entry(m, menu_entry_new("close", a));
-
+    */
 }
 
 void menu_shutdown()
@@ -395,7 +374,8 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 		    theme_bevel;
 	    
 	    menu_show_full(self->submenu, x,
-			   self->parent->location.y + self->y, NULL);
+			   self->parent->location.y + self->y,
+                           self->parent->client);
 	} 
     }
 }

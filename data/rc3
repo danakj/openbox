@@ -188,3 +188,4 @@ mbind	Frame		Click		C-A-Up	SendToNextDesktopWrap
 mbind	Frame		Click		C-A-Down SendToPreviousDesktopWrap
 
 mbind	Root		Click		Right	ShowMenu "root"
+mbind   Frame           Click           Right   ShowMenu "client-menu"

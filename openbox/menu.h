@@ -12,8 +12,10 @@ struct MenuEntry;
 
 typedef void(*menu_controller_show)(struct Menu *self, int x, int y, Client *);
 typedef void(*menu_controller_update)(struct Menu *self);
-typedef void(*menu_controller_mouseover)(struct MenuEntry *self, 
+typedef void(*menu_controller_mouseover)(struct MenuEntry *self,
                                          gboolean enter);
+
+extern GHashTable *menu_hash;
 
 typedef struct Menu {
     ObWindow obwin;
@@ -135,6 +137,7 @@ void menu_entry_render(MenuEntry *self);
 void menu_entry_fire(MenuEntry *self);
 
 void menu_render(Menu *self);
+void menu_render_full(Menu *self);
 
 void menu_control_mouseover(MenuEntry *entry, gboolean enter);
 #endif

@@ -34,7 +34,7 @@ static void event_handle_root(XEvent *e);
 static void event_handle_dock(Dock *s, XEvent *e);
 static void event_handle_dockapp(DockApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
-static void event_handle_menu(Menu *menu, XEvent *e);
+static void event_handle_menu(Menu *menu, Client *c, XEvent *e);
 
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
                             (e)->xfocus.detail > NotifyNonlinearVirtual)
@@ -436,7 +436,7 @@ static void event_process(XEvent *e)
 
     /* deal with it in the kernel */
     if (menu) {
-        event_handle_menu(menu, e);
+        event_handle_menu(menu, client, e);
         return;
     } else if (client)
 	event_handle_client(client, e);
@@ -909,7 +909,7 @@ static void event_handle_client(Client *client, XEvent *e)
     }
 }
 
-static void event_handle_menu(Menu *menu, XEvent *e)
+static void event_handle_menu(Menu *menu, Client *client, XEvent *e)
 {
     MenuEntry *entry;
 

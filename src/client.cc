@@ -151,10 +151,13 @@ void Client::getDesktop()
 {
   // defaults to the current desktop
   _desktop = openbox->screen(_screen)->desktop();
+  unsigned int d;
 
   if (otk::Property::get(_window, otk::Property::atoms.net_wm_desktop,
                          otk::Property::atoms.cardinal,
-                         (long unsigned*)&_desktop)) {
+                         (long unsigned*)&d) &&
+      d < openbox->screen(_screen)->numDesktops()) {
+      _desktop = d;
 #ifdef DEBUG
 //    printf("Window requested desktop: %ld\n", _desktop);
 #endif

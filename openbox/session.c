@@ -289,7 +289,7 @@ static gboolean session_save()
             if (!client_normal(c))
                 continue;
 
-            if (!PROP_GETS(c->window, sm_client_id, locale, &client_id))
+            if (!(client_id = client_get_sm_client_id(c)))
                 continue;
 
             prex = c->area.x;
@@ -374,11 +374,11 @@ void session_state_free(ObSessionState *state)
     }
 }
 
-static gboolean session_state_cmp(const ObSessionState *s, const ObClient *c)
+static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
 {
     gchar *client_id;
 
-    if (!PROP_GETS(c->window, sm_client_id, locale, &client_id))
+    if (!(client_id = client_get_sm_client_id(c)))
         return FALSE;
     g_print("\nsaved %s\nnow %s\n", s->id, client_id);
     if (strcmp(s->id, client_id)) {
@@ -386,13 +386,13 @@ static gboolean session_state_cmp(const ObSessionState *s, const ObClient *c)
         return FALSE;
     }
     g_free(client_id);
-    g_print("\nsaved %s\nnow %s\n", s->name, c->name);
+    g_print("saved %s\nnow %s\n", s->name, c->name);
     if (strcmp(s->name, c->name))
         return FALSE;
-    g_print("\nsaved %s\nnow %s\n", s->class, c->class);
+    g_print("saved %s\nnow %s\n", s->class, c->class);
     if (strcmp(s->class, c->class))
         return FALSE;
-    g_print("\nsaved %s\nnow %s\n", s->role, c->role);
+    g_print("saved %s\nnow %s\n\n", s->role, c->role);
     if (strcmp(s->role, c->role))
         return FALSE;
     return TRUE;
@@ -416,6 +416,8 @@ void session_load(char *path)
     xmlDocPtr doc;
     xmlNodePtr node, n;
     gchar *sm_id;
+
+    g_message("loading session from %s", path);
 
     if (!parse_load(path, "openbox_session", &doc, &node))
         return;

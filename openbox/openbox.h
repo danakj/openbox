@@ -19,7 +19,7 @@ typedef enum {
 } State;
 
 /* The state of execution of the window manager */
-State ob_state;
+extern State ob_state;
 
 /*! When set to true, Openbox will exit */
 extern gboolean ob_shutdown;
@@ -39,6 +39,9 @@ typedef struct Cursors {
     Cursor ll_angle;
     Cursor lr_angle;
 } Cursors;
-Cursors ob_cursors;
+extern Cursors ob_cursors;
+
+/*! The path of the rc file. If NULL the default paths are searched for one. */
+extern char *ob_rc_path;
 
 #endif

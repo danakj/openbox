@@ -49,10 +49,12 @@ gboolean ob_shutdown = FALSE;
 gboolean ob_restart  = FALSE;
 char    *ob_restart_path = NULL;
 gboolean ob_remote   = FALSE;
-gboolean ob_sync     = TRUE;
+gboolean ob_sync     = FALSE;
 Cursors  ob_cursors;
+char    *ob_rc_path  = NULL;
 
 void signal_handler(const ObEvent *e, void *data);
+void parse_args(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
@@ -89,8 +91,8 @@ int main(int argc, char **argv)
     /* anything that died while we were restarting won't give us a SIGCHLD */
     while (waitpid(-1, NULL, WNOHANG) > 0);
      
-    /* XXX parse out command line args */
-    (void)argc;(void)argv;
+    /* parse out command line args */
+    parse_args(argc, argv);
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL) {
@@ -194,7 +196,7 @@ int main(int argc, char **argv)
 
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
-        execlp("ob3", "ob3", NULL); /* try this as a last resort */
+        execlp(BINARY, BINARY, NULL); /* try this as a last resort */
     }
      
     return 0;
@@ -226,5 +228,48 @@ void signal_handler(const ObEvent *e, void *data)
     case SIGFPE:
     case SIGSEGV:
 	g_error("Caught signal %d. Aborting and dumping core.", s);
+    }
+}
+
+void print_version()
+{
+    g_print("Openbox %s\n\n", VERSION);
+    g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
+    g_print("This is free software, and you are welcome to redistribute it\n");
+    g_print("under certain conditions. See the file COPYING for details.\n\n");
+}
+
+void print_help()
+{
+    print_version();
+    g_print("Syntax: %s [options]\n\n", BINARY);
+    g_print("Options:\n\n");
+    g_print("  -rc PATH     Specify the path to the rc file to use\n");
+    g_print("  -help        Display this help and exit\n");
+    g_print("  -version     Display the version and exit\n");
+    g_print("  -sync        Run in synchronous mode (this is slow and meant\n"
+            "               for debugging X routines)\n");
+    g_print("\nPlease report bugs at %s\n", BUGURL);
+}
+
+void parse_args(int argc, char **argv)
+{
+    int i;
+
+    for (i = 1; i < argc; ++i) {
+        if (!strcmp(argv[i], "-version")) {
+            print_version();
+            exit(0);
+        } else if (!strcmp(argv[i], "-help")) {
+            print_help();
+            exit(0);
+        } else if (!strcmp(argv[i], "-sync")) {
+            ob_sync = TRUE;
+        } else if (!strcmp(argv[i], "-rc")) {
+            if (i == argc - 1) /* no args left */
+                g_printerr("-rc requires an argument\n");
+            else
+                ob_rc_path = argv[++i];
+        }
     }
 }

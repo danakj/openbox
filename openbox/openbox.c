@@ -62,6 +62,7 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
+#include <errno.h>
 
 #include <X11/cursorfont.h>
 
@@ -101,7 +102,9 @@ gint main(gint argc, gchar **argv)
 
     g_set_prgname(argv[0]);
 
-    chdir(g_get_home_dir());
+    if (chdir(g_get_home_dir()) == -1)
+        g_warning("Unable to change to home directory (%s): %s",
+                  g_get_home_dir(), g_strerror(errno));
      
     parse_paths_startup();
 

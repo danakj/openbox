@@ -44,7 +44,7 @@ public:
 private:
   BGCCacheContext(const BaseDisplay * const _display)
     : display(_display), gc(0), pixel(0ul), fontid(0ul),
-      function(0), subwindow(0), used(false), screen(~(0u)), _linewidth(0) {}
+      function(0), subwindow(0), used(false), screen(~(0u)), linewidth(1) {}
 
   const BaseDisplay *display;
   GC gc;
@@ -113,10 +113,10 @@ private:
 class BPen {
 public:
   inline BPen(const BColor &_color,  const XFontStruct * const _font = 0,
-              int _function = GXcopy, int _subwindow = ClipByChildren,
-              int _linewidth = 0)
-    : color(_color), font(_font), function(_function), subwindow(_subwindow),
-      cache(_color.display()->gcCache()), item(0), linewidth(_linewidth) { }
+              int _linewidth = 1, int _function = GXcopy,
+              int _subwindow = ClipByChildren)
+    : color(_color), font(_font), linewidth(_linewidth), function(_function),
+      subwindow(_subwindow), cache(_color.display()->gcCache()), item(0) { }
 
   inline ~BPen(void) { if (item) cache->release(item); }
 
@@ -129,9 +129,9 @@ public:
 private:
   const BColor &color;
   const XFontStruct *font;
+  int linewidth;
   int function;
   int subwindow;
-  int linewidth;
 
   mutable BGCCache *cache;
   mutable BGCCacheItem *item;

@@ -16,4 +16,4 @@ ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = config.rpath mkinstalldirs ABOUT-NLS INSTALL README \
              COPYING AUTHORS CHANGELOG CHANGELOG.Blackbox CHANGELOG.bsetbg \
-             LICENSE README.bbtools README.bsetbg
+             README.bbtools README.bsetbg

@@ -15,7 +15,7 @@ install-data-local: openbox.cat
 		echo "Installing catalog in $(THE_NLS_PATH)"; \
 		$(mkinstalldirs) $(THE_NLS_PATH); \
 		$(INSTALL_DATA) openbox.cat $(THE_NLS_PATH); \
-                rm -f $(DESTDIR)$(pkgdatadir)/nls/nl; \
+                rm -f $(DESTDIR)$(pkgdatadir)/nls/ko; \
                 ln -f -s ko_KO $(DESTDIR)$(pkgdatadir)/nls/ko; \
 fi
 uninstall-local:

@@ -589,7 +589,7 @@ void Screen::unmanageWindow(Client *client)
   client->unfocus();
 
 #ifdef DEBUG
-  printf("Unmanaged window 0x%lx frame %lx\n", client->window(), framewin);
+  printf("Unmanaged window 0x%lx frame 0x%lx\n", client->window(), framewin);
 #endif
   
   delete client;
@@ -775,7 +775,13 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
   printf("MapRequest for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  manageWindow(e.window);
+  Client *c = openbox->findClient(e.window);
+  if (c) {
+#ifdef DEBUG
+    printf("DEBUG: MAP REQUEST CAUGHT IN SCREEN. IGNORED.\n");
+#endif
+  } else
+    manageWindow(e.window);
 }
 
 }

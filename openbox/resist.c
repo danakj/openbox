@@ -109,10 +109,11 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
 
 void resist_move_monitors(ObClient *c, gint *x, gint *y)
 {
-    Rect *area;
+    Rect *area, *parea;
     guint i;
     gint l, t, r, b; /* requested edges */
     gint al, at, ar, ab; /* screen area edges */
+    gint pl, pt, pr, pb; /* physical screen area edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
 
@@ -132,23 +133,37 @@ void resist_move_monitors(ObClient *c, gint *x, gint *y)
     if (config_resist_edge) {
         for (i = 0; i < screen_num_monitors; ++i) {
             area = screen_area_monitor(c->desktop, i);
+            parea = screen_physical_area_monitor(i);
 
-            if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
+            if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
                 continue;
 
             al = RECT_LEFT(*area);
             at = RECT_TOP(*area);
             ar = RECT_RIGHT(*area);
             ab = RECT_BOTTOM(*area);
+            pl = RECT_LEFT(*parea);
+            pt = RECT_TOP(*parea);
+            pr = RECT_RIGHT(*parea);
+            pb = RECT_BOTTOM(*parea);
 
             if (cl >= al && l < al && l >= al - config_resist_edge)
                 *x = al;
             else if (cr <= ar && r > ar && r <= ar + config_resist_edge)
                 *x = ar - w + 1;
+            else if (cl >= pl && l < pl && l >= pl - config_resist_edge)
+                *x = pl;
+            else if (cr <= pr && r > pr && r <= pr + config_resist_edge)
+                *x = pr - w + 1;
+
             if (ct >= at && t < at && t >= at - config_resist_edge)
                 *y = at;
             else if (cb <= ab && b > ab && b < ab + config_resist_edge)
                 *y = ab - h + 1;
+            else if (ct >= pt && t < pt && t >= pt - config_resist_edge)
+                *y = pt;
+            else if (cb <= pb && b > pb && b < pb + config_resist_edge)
+                *y = pb - h + 1;
         }
     }
 }
@@ -243,9 +258,11 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
 {
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
-    Rect *area;
-    gint al, at, ar, ab; /* screen boundaries */
+    Rect *area, *parea;
+    gint al, at, ar, ab; /* screen boundaries */ 
+    gint pl, pt, pr, pb; /* physical screen boundaries */
     gint incw, inch;
+    guint i;
 
     l = RECT_LEFT(c->frame->area);
     r = RECT_RIGHT(c->frame->area);
@@ -255,48 +272,67 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
     incw = c->size_inc.width;
     inch = c->size_inc.height;
 
-    /* get the screen boundaries */
-    area = screen_area(c->desktop);
-    al = RECT_LEFT(*area);
-    at = RECT_TOP(*area);
-    ar = RECT_RIGHT(*area);
-    ab = RECT_BOTTOM(*area);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        area = screen_area_monitor(c->desktop, i);
+        parea = screen_physical_area_monitor(i);
 
-    if (config_resist_edge) {
-        /* horizontal snapping */
-        switch (corn) {
-        case OB_CORNER_TOPLEFT:
-        case OB_CORNER_BOTTOMLEFT:
-            dlt = l;
-            drb = r + *w - c->frame->area.width;
-            if (r <= ar && drb > ar && drb <= ar + config_resist_edge)
-                *w = ar - l + 1;
-            break;
-        case OB_CORNER_TOPRIGHT:
-        case OB_CORNER_BOTTOMRIGHT:
-            dlt = l - *w + c->frame->area.width;
-            drb = r;
-            if (l >= al && dlt < al && dlt >= al - config_resist_edge)
-                *w = r - al + 1;
-            break;
-        }
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
+            continue;
 
-        /* vertical snapping */
-        switch (corn) {
-        case OB_CORNER_TOPLEFT:
-        case OB_CORNER_TOPRIGHT:
-            dlt = t;
-            drb = b + *h - c->frame->area.height;
-            if (b <= ab && drb > ab && drb <= ab + config_resist_edge)
-                *h = ab - t + 1;
-            break;
-        case OB_CORNER_BOTTOMLEFT:
-        case OB_CORNER_BOTTOMRIGHT:
-            dlt = t - *h + c->frame->area.height;
-            drb = b;
-            if (t >= at && dlt < at && dlt >= at - config_resist_edge)
-                *h = b - at + 1;
-            break;
+        /* get the screen boundaries */
+        al = RECT_LEFT(*area);
+        at = RECT_TOP(*area);
+        ar = RECT_RIGHT(*area);
+        ab = RECT_BOTTOM(*area);
+        pl = RECT_LEFT(*parea);
+        pt = RECT_TOP(*parea);
+        pr = RECT_RIGHT(*parea);
+        pb = RECT_BOTTOM(*parea);
+
+        if (config_resist_edge) {
+            /* horizontal snapping */
+            switch (corn) {
+            case OB_CORNER_TOPLEFT:
+            case OB_CORNER_BOTTOMLEFT:
+                dlt = l;
+                drb = r + *w - c->frame->area.width;
+                if (r <= ar && drb > ar && drb <= ar + config_resist_edge)
+                    *w = ar - l + 1;
+                else if (r <= pr && drb > pr && drb <= pr + config_resist_edge)
+                    *w = pr - l + 1;
+                break;
+            case OB_CORNER_TOPRIGHT:
+            case OB_CORNER_BOTTOMRIGHT:
+                dlt = l - *w + c->frame->area.width;
+                drb = r;
+                if (l >= al && dlt < al && dlt >= al - config_resist_edge)
+                    *w = r - al + 1;
+                else if (l >= pl && dlt < pl && dlt >= pl - config_resist_edge)
+                    *w = r - pl + 1;
+                break;
+            }
+
+            /* vertical snapping */
+            switch (corn) {
+            case OB_CORNER_TOPLEFT:
+            case OB_CORNER_TOPRIGHT:
+                dlt = t;
+                drb = b + *h - c->frame->area.height;
+                if (b <= ab && drb > ab && drb <= ab + config_resist_edge)
+                    *h = ab - t + 1;
+                else if (b <= pb && drb > pb && drb <= pb + config_resist_edge)
+                    *h = pb - t + 1;
+                break;
+            case OB_CORNER_BOTTOMLEFT:
+            case OB_CORNER_BOTTOMRIGHT:
+                dlt = t - *h + c->frame->area.height;
+                drb = b;
+                if (t >= at && dlt < at && dlt >= at - config_resist_edge)
+                    *h = b - at + 1;
+                else if (t >= pt && dlt < pt && dlt >= pt - config_resist_edge)
+                    *h = b - pt + 1;
+                break;
+            }
         }
     }
 }

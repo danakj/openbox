@@ -319,22 +319,10 @@ static void event_handle_client(Client *client, XEvent *e)
      
     switch (e->type) {
     case FocusIn:
-        if (focus_client != client)
-            focus_set_client(client);
-
-	/* focus state can affect the stacking layer */
-	client_calc_layer(client);
-
-	engine_frame_adjust_focus(client->frame);
+        client_set_focused(client, TRUE);
 	break;
     case FocusOut:
-	if (focus_client == client)
-	    focus_set_client(NULL);
-
-	/* focus state can affect the stacking layer */
-	client_calc_layer(client);
-
-	engine_frame_adjust_focus(client->frame);
+        client_set_focused(client, FALSE);
 	break;
     case ConfigureRequest:
 	g_message("ConfigureRequest for window %lx", client->window);

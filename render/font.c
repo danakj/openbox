@@ -151,6 +151,8 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         break;
     }
 
+    l = strlen(text->str); /* number of bytes */
+
     if (t->shadow) {
         if (t->tint >= 0) {
             c.color.red = 0;
@@ -167,7 +169,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,
-                          (FcChar8*)text->str, strlen(text->str));
+                          (FcChar8*)text->str, l);
     }  
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
@@ -177,6 +179,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
-                      (FcChar8*)text->str, strlen(text->str));
+                      (FcChar8*)text->str, l);
     return;
 }

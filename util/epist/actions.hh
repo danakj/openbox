@@ -57,18 +57,24 @@ public:
 
     nextWindow, //done for now
     prevWindow, //done for now
-    nextWindowOnAllWorkspaces, //done
-    prevWindowOnAllWorkspaces, //done
+    nextWindowOnAllWorkspaces, //done for now
+    prevWindowOnAllWorkspaces, //done for now
 
-    nextWindowOfClass, //done
-    prevWindowOfClass, //done
-    nextWindowOfClassOnAllWorkspaces, //done
-    prevWindowOfClassOnAllWorkspaces, //done
+    nextWindowOnAllScreens, //done for now
+    prevWindowOnAllScreens, //done for now
+
+    nextWindowOfClass, //done for now
+    prevWindowOfClass, //done for now
+    nextWindowOfClassOnAllWorkspaces, //done for now
+    prevWindowOfClassOnAllWorkspaces, //done for now
 
     changeWorkspace, //done
     nextWorkspace, //done
     prevWorkspace, //done
 
+    nextScreen, //done for now
+    prevScreen, //done for now
+  
     // these are openbox extensions
     showRootMenu,
     showWorkspaceMenu,

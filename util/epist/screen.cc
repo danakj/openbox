@@ -50,13 +50,18 @@ using std::string;
 #include "epist.hh"
 
 
-screen::screen(epist *epist, int number) {
+screen::screen(epist *epist, int number) 
+  : _clients(epist->clientsList()),
+    _active(epist->activeWindow()) {
   _epist = epist;
   _xatom = _epist->xatom();
+  _last_active = _clients.end();
   _number = number;
-  _active = _clients.end();
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
+  
+  cout << "root window on screen " << _number << ": 0x" << hex << _root << 
+    dec << endl;
   
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -76,13 +81,7 @@ screen::screen(epist *epist, int number) {
   }
  
   XSelectInput(_epist->getXDisplay(), _root, PropertyChangeMask);
-
-  updateNumDesktops();
-  updateActiveDesktop();
-  updateClientList();
-  updateActiveWindow();
 }
-
 
 screen::~screen() {
   if (_managed)
@@ -162,6 +161,14 @@ void screen::handleKeypress(const XEvent &e) {
     if (e.xkey.keycode == it->keycode() &&
         state == it->modifierMask()) {
       switch (it->type()) {
+      case Action::nextScreen:
+        _epist->cycleScreen(_number, true);
+        return;
+
+      case Action::prevScreen:
+        _epist->cycleScreen(_number, false);
+        return;
+
       case Action::nextWorkspace:
         cycleWorkspace(true);
         return;
@@ -179,27 +186,35 @@ void screen::handleKeypress(const XEvent &e) {
         return;
 
       case Action::nextWindowOnAllWorkspaces:
-        cycleWindow(true, true);
+        cycleWindow(true, false, true);
         return;
 
       case Action::prevWindowOnAllWorkspaces:
+        cycleWindow(false, false, true);
+        return;
+
+      case Action::nextWindowOnAllScreens:
+        cycleWindow(true, true);
+        return;
+
+      case Action::prevWindowOnAllScreens:
         cycleWindow(false, true);
         return;
 
       case Action::nextWindowOfClass:
-        cycleWindow(true, false, true, it->string());
+        cycleWindow(true, false, false, true, it->string());
         return;
 
       case Action::prevWindowOfClass:
-        cycleWindow(false, false, true, it->string());
+        cycleWindow(false, false, false, true, it->string());
         return;
 
       case Action::nextWindowOfClassOnAllWorkspaces:
-        cycleWindow(true, true, true, it->string());
+        cycleWindow(true, false, true, true, it->string());
         return;
 
       case Action::prevWindowOfClassOnAllWorkspaces:
-        cycleWindow(false, true, true, it->string());
+        cycleWindow(false, false, true, true, it->string());
         return;
 
       case Action::changeWorkspace:
@@ -312,6 +327,14 @@ bool screen::doAddWindow(Window window) const {
 }
 
 
+void screen::updateEverything() {
+  updateNumDesktops();
+  updateActiveDesktop();
+  updateClientList();
+  updateActiveWindow();
+}
+
+
 void screen::updateNumDesktops() {
   assert(_managed);
 
@@ -356,32 +379,53 @@ void screen::updateClientList() {
         break;
     if (it == end) {  // didn't already exist
       if (doAddWindow(rootclients[i])) {
-        //cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
+//        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
         _clients.insert(insert_point, new XWindow(_epist, this,
                                                   rootclients[i]));
       }
     }
   }
 
-  // remove clients that no longer exist
+  // remove clients that no longer exist (that belong to this screen)
   for (it = _clients.begin(); it != end;) {
     WindowList::iterator it2 = it;
     ++it;
+
+    // is on another screen?
+    if ((*it2)->getScreen() != this)
+      continue;
 
     for (i = 0; i < num; ++i)
       if (**it2 == rootclients[i])
         break;
     if (i == num)  { // no longer exists
-      //cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
-      // watch for the active window
+//      cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
+      // watch for the active and last-active window
       if (it2 == _active)
         _active = _clients.end();
+      if (it2 == _last_active)
+        _last_active = _clients.end();
       delete *it2;
       _clients.erase(it2);
     }
   }
 
   if (rootclients) delete [] rootclients;
+}
+
+
+const XWindow *screen::lastActiveWindow() const {
+  if (_last_active != _clients.end())
+    return *_last_active;
+
+  // find a window if one exists
+  WindowList::const_iterator it, end = _clients.end();
+  for (it = _clients.begin(); it != end; ++it)
+    if ((*it)->getScreen() == this)
+      return *it;
+
+  // no windows on this screen
+  return 0;
 }
 
 
@@ -393,14 +437,19 @@ void screen::updateActiveWindow() {
   
   WindowList::iterator it, end = _clients.end();
   for (it = _clients.begin(); it != end; ++it) {
-    if (**it == a)
+    if (**it == a) {
+      if ((*it)->getScreen() != this)
+        return;
       break;
+    }
   }
   _active = it;
+  _last_active = it;
 
-  //cout << "Active window is now: ";
-  //if (_active == _clients.end()) cout << "None\n";
-  //else cout << "0x" << hex << (*_active)->window() << dec << endl;
+/*  cout << "Active window is now: ";
+  if (_active == _clients.end()) cout << "None\n";
+  else cout << "0x" << hex << (*_active)->window() << dec << endl;
+*/
 }
 
 
@@ -429,37 +478,42 @@ void screen::execCommand(const std::string &cmd) const {
 }
 
 
-void screen::cycleWindow(const bool forward, const bool alldesktops,
-                         const bool sameclass, const string &cn) const {
+void screen::cycleWindow(const bool forward, const bool allscreens,
+                         const bool alldesktops, const bool sameclass,
+                         const string &cn) const {
   assert(_managed);
 
+  if (_clients.empty()) return;
+  
   string classname(cn);
   if (sameclass && classname.empty() && _active != _clients.end())
     classname = (*_active)->appClass();
 
-  WindowList::const_iterator target = _active;
-
-  if (target == _clients.end())
-    target = _clients.begin();
-
-  WindowList::const_iterator begin = target;
+  WindowList::const_iterator target = _active,
+                             first = _active,
+                             begin = _clients.begin(),
+                             end = _clients.end();
  
   do {
     if (forward) {
-      ++target;
-      if (target == _clients.end())
-        target = _clients.begin();
+      if (target == end) {
+        target = begin;
+      } else {
+        ++target;
+        if (target == end)
+          target = begin;
+      }
     } else {
-      if (target == _clients.begin())
-        target = _clients.end();
+      if (target == begin)
+        target = end;
       --target;
     }
 
-    // no window to focus
-    if (target == begin)
+    // must be no window to focus
+    if (target == first)
       return;
-  } while (target == _clients.end() ||
-           (*target)->iconic() ||
+  } while ((*target)->iconic() ||
+           (! allscreens && (*target)->getScreen() != this) ||
            (! alldesktops && (*target)->desktop() != _active_desktop) ||
            (sameclass && ! classname.empty() &&
             (*target)->appClass() != classname));

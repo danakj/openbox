@@ -69,10 +69,14 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
 
   _xatom = new XAtom(getXDisplay());
 
+  _active = _clients.end();
+  
   for (unsigned int i = 0; i < getNumberOfScreens(); ++i) {
     screen *s = new screen(this, i);
-    if (s->managed())
+    if (s->managed()) {
       _screens.push_back(s);
+      s->updateEverything();
+    }
   }
   if (_screens.empty()) {
     cout << "No compatible window manager found on any screens. Aborting.\n";
@@ -197,6 +201,18 @@ XWindow *epist::findWindow(Window window) const {
 
   return 0;
 }
+
+
+void epist::cycleScreen(int current, bool forward) const {
+  int dest = current + (forward ? 1 : -1);
+
+  if (dest < 0) dest = (signed)_screens.size() - 1;
+  else if (dest >= (signed)_screens.size()) dest = 0;
+
+  const XWindow *target = _screens[dest]->lastActiveWindow();
+  if (target) target->focus();
+}
+
 
 void epist::addAction(Action::ActionType act, unsigned int modifiers,
                       string key, int number) {

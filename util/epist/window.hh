@@ -80,6 +80,7 @@ public:
   XWindow(epist *epist, screen *screen, Window window);
   virtual ~XWindow();
 
+  inline screen *getScreen() const { return _screen; }
   inline Window window() const { return _window; }
   
   inline unsigned int desktop() const { return _desktop; }

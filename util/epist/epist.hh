@@ -31,27 +31,30 @@ extern "C" {
 #include <map>
 
 #include "actions.hh"
+#include "window.hh"
 
 #include "../../src/BaseDisplay.hh"
 
 class XAtom;
 class screen;
-class XWindow;
 
 class epist : public BaseDisplay {
 private:
-  std::string     _rc_file;
-  XAtom          *_xatom;
-  char          **_argv;
+  std::string _rc_file;
+  XAtom *_xatom;
+  char **_argv;
 
   typedef std::vector<screen *> ScreenList;
-  ScreenList      _screens;
+  ScreenList _screens;
 
   typedef std::map<Window, XWindow*> WindowLookup;
   typedef WindowLookup::value_type WindowLookupPair;
   WindowLookup    _windows;
+  
+  WindowList _clients;
+  WindowList::iterator _active;
 
-  ActionList      _actions;
+  ActionList _actions;
   
   virtual void process_event(XEvent *e);
   virtual bool handleSignal(int sig);
@@ -72,12 +75,17 @@ public:
   void removeWindow(XWindow *window);
   XWindow *findWindow(Window window) const;
 
+  void cycleScreen(int current, bool forward) const;
+
   void getLockModifiers(int &numlockMask, int &scrolllockMask) const {
     numlockMask = NumLockMask;
     scrolllockMask = ScrollLockMask;
   }
   
   const ActionList &actions(void) { return _actions; }
+  
+  WindowList& clientsList() { return _clients; }
+  WindowList::iterator& activeWindow() { return _active; }
 };
 
 #endif // __epist_hh

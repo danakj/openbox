@@ -46,8 +46,9 @@ class screen {
 
   std::string _wm_name;
   
-  WindowList _clients;
-  WindowList::iterator _active;
+  WindowList &_clients;
+  WindowList::iterator &_active;
+  WindowList::iterator _last_active;
   unsigned int _active_desktop;
   unsigned int _num_desktops;
 
@@ -68,12 +69,15 @@ public:
   inline Window rootWindow() const { return _root; }
   inline bool managed() const { return _managed; }
   inline int number() const { return _number; }
+
+  const XWindow *lastActiveWindow() const;
   
   void processEvent(const XEvent &e);
-
   void handleKeypress(const XEvent &e);
+  void updateEverything();
 
-  void cycleWindow(const bool forward, const bool alldesktops = false,
+  void cycleWindow(const bool forward, const bool allscreens = false,
+                   const bool alldesktops = false,
                    const bool sameclass = false,
                    const std::string &classname = "") const;
   void cycleWorkspace(const bool forward, const bool loop = true) const;

@@ -26,9 +26,7 @@ static void print_branch(BindingTree *first, std::string str)
       print_branch(p->first_child, str + " " + p->text);
     if (!p->chain)
       printf("%d%s\n", p->id, (str + " " + p->text).c_str());
-    BindingTree *s = p->next_sibling;
-    delete p;
-    p = s;
+    p = p->next_sibling;
   }
 }
 
@@ -44,7 +42,6 @@ void OBBindings::display()
 bool OBBindings::translate(const std::string &str, Binding &b)
 {
   unsigned int mods = 0;
-  std::string modstring;
   
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -58,7 +55,6 @@ bool OBBindings::translate(const std::string &str, Binding &b)
     end = str.find_first_of('-', begin);
 
     std::string mod(str, begin, end-begin);
-    modstring += mod;
 
     if (mod == "C") {           // control
       mods |= ControlMask;
@@ -89,8 +85,6 @@ bool OBBindings::translate(const std::string &str, Binding &b)
     begin = end + 1;
   }
   
-  printf("got modifier: %s\n", modstring.c_str());
-    
   KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
   if (sym == NoSymbol) return false;
   b.modifiers = mods;
@@ -130,8 +124,8 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
     p->chain = false;
   }
 
-  printf("BUILDING:\n");
-  print_branch(ret, "");
+//  printf("BUILDING:\n");
+//  print_branch(ret, "");
   
   // successfully built a tree
   return ret;
@@ -169,7 +163,7 @@ void OBBindings::assimilate(BindingTree *node)
     a = _tree.first_child;
     last = a;
     b = node;
-    while (a->first_child) {
+    while (a) {
       last = a;
       if (a->binding != b->binding) {
         a = a->next_sibling;
@@ -180,7 +174,10 @@ void OBBindings::assimilate(BindingTree *node)
         a = a->first_child;
       }
     }
-    last->first_child = b->first_child;
+    if (last->binding != b->binding)
+      last->next_sibling = b;
+    else
+      last->first_child = b->first_child;
     delete b;
   }
 }

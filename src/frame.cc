@@ -500,14 +500,16 @@ static void renderButton(int screen, bool focus, bool press, Window win,
 
 void Frame::renderMax()
 {
-  renderButton(_client->screen(), _client->focused(), _max_press, _max,
+  bool press = _max_press || _client->maxVert() || _client->maxHorz();
+  renderButton(_client->screen(), _client->focused(), press, _max,
                &_max_sur, geom.button_size,
                otk::RenderStyle::style(_client->screen())->maximizeMask());
 }
 
 void Frame::renderDesk()
 {
-  renderButton(_client->screen(), _client->focused(), _desk_press, _desk,
+  bool press = _desk_press || _client->desktop() == 0xffffffff;
+  renderButton(_client->screen(), _client->focused(), press, _desk,
                &_desk_sur, geom.button_size,
                otk::RenderStyle::style(_client->screen())->alldesktopsMask());
 }
@@ -675,8 +677,8 @@ void Frame::adjustShape()
 
 void Frame::adjustState()
 {
-// XXX  _button_alldesk.update();
-// XXX  _button_max.update();
+  renderDesk();
+  renderMax();
 }
 
 

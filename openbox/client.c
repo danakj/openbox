@@ -358,6 +358,9 @@ void client_manage(Window window)
             client_move(self, x, y);
     }
 
+    keyboard_grab_for_client(self, TRUE);
+    mouse_grab_for_client(self, TRUE);
+
     client_showhide(self);
 
     /* use client_focus instead of client_activate cuz client_activate does
@@ -391,9 +394,6 @@ void client_manage(Window window)
 
     /* update the list hints */
     client_set_list();
-
-    keyboard_grab_for_client(self, TRUE);
-    mouse_grab_for_client(self, TRUE);
 
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
 }

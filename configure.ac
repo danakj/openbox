@@ -80,9 +80,6 @@ AC_CONFIG_FILES([build/Makefile.incl])
 AC_OUTPUT
 
 AC_MSG_RESULT
-AC_MSG_RESULT([$PACKAGE_NAME version $PACKAGE_VERSION configured successfully.])
-
-AC_MSG_RESULT
 if test "$DEBUG" = "yes"; then
   AC_MSG_RESULT([Creating a DEBUG build.])
 else

@@ -65,7 +65,7 @@ Frame *frame_new()
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Top;
-    RECT_SET(fd->area, 0, 0, 100, 20);
+    RECT_SET(fd->area, 0, 0, 50, 20);
     fd->type = Decor_Titlebar;
     fd->context = Context_Titlebar;
     fd->sizetypex = Decor_Relative;
@@ -129,36 +129,9 @@ void frame_hide(Frame *self)
 
 void frame_adjust_shape(Frame *self)
 {
-#ifdef SHAPE
-    int i;
-    FrameDecor *dec;
-
-    /* make the pixmap's shape match the clients */
-printf("resize shape window to %x, %x\n", self->area.width, self->area.height);
-    XResizeWindow(ob_display, self->shapewindow, self->area.width,
-                      self->area.height);
-    XShapeCombineShape(ob_display, self->shapewindow, ShapeBounding,
-                       self->size.left,
-                       self->size.top,
-                       self->client->window,
-                       ShapeBounding, ShapeSet);
-    for (i = 0; i < self->framedecors; i++) {
-        dec = &self->framedecor[i];
-        if (dec->type & self->client->decorations)
-            XShapeCombineShape(ob_display, self->shapewindow, ShapeBounding,
-                              dec->xoff,
-                              dec->yoff,
-                              dec->window,
-                              ShapeBounding, ShapeUnion);
-    }
-
-    XShapeCombineShape(ob_display, self->window, ShapeBounding,
-                       0,
-                       0,
-                       self->shapewindow,
-                       ShapeBounding, ShapeSet);
-
-#endif
+    RrSurfaceShapeSetBase(self->surface, self->client->window,
+                          self->size.left, self->size.top);
+    RrSurfaceShape(self->surface);
 }
 
 void frame_adjust_state(Frame *self)

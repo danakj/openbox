@@ -3089,6 +3089,9 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
     // the amount of space away from the edge to provide resistance
     const int resistance_offset = screen->getEdgeSnapThreshold();
   
+    // find the geomeetery where the moving window currently is
+    const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
+
     // window corners
     const int wleft = dx,
               wright = dx + frame.rect.width() - 1,
@@ -3132,13 +3135,8 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
         
         // if the window is already over top of this snap target, then
         // resistance is futile, so just ignore it
-        if (screen->doOpaqueMove()) {
-          if (winrect.intersects(frame.rect))
-            continue;
-        } else {
-          if (winrect.intersects(frame.changing))
-            continue;
-        }
+        if (winrect.intersects(moving))
+          continue;
         
         int dleft = wright - winrect.left(),
            dright = winrect.right() - wleft,
@@ -3163,12 +3161,19 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
           if (snapped) {
             if (screen->getWindowCornerSnap()) {
               // try corner-snap to its other sides
-              dtop = abs(wtop - winrect.top());
-              dbottom = abs(wbottom - winrect.bottom());
-              if (dtop < resistance_size && dtop <= dbottom)
-                dy = winrect.top();
-              else if (dbottom < resistance_size)
-                dy = winrect.bottom() - frame.rect.height() + 1;
+              dtop = winrect.top() - wtop;
+              dbottom = wbottom - winrect.bottom();
+              if (dtop > 0 && dtop < resistance_size) {
+                // if we're already past the top edge, then don't provide
+                // resistance
+                if (moving.top() >= winrect.top())
+                  dy = winrect.top();
+              } else if (dbottom > 0 && dbottom < resistance_size) {
+                // if we're already past the bottom edge, then don't provide
+                // resistance
+                if (moving.bottom() <= winrect.bottom())
+                  dy = winrect.bottom() - frame.rect.height() + 1;
+              }
             }
 
             continue;
@@ -3193,12 +3198,19 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
           if (snapped) {
             if (screen->getWindowCornerSnap()) {
               // try corner-snap to its other sides
-              dleft = abs(wleft - winrect.left());
-              dright = abs(wright - winrect.right());
-              if (dleft < resistance_size && dleft <= dright)
-                dx = winrect.left();
-              else if (dright < resistance_size)
-                dx = winrect.right() - frame.rect.width() + 1;
+              dleft = winrect.left() - wleft;
+              dright = wright - winrect.right();
+              if (dleft > 0 && dleft < resistance_size) {
+                // if we're already past the left edge, then don't provide
+                // resistance
+                if (moving.left() >= winrect.left())
+                  dx = winrect.left();
+              } else if (dright > 0 && dright < resistance_size) {
+                // if we're already past the right edge, then don't provide
+                // resistance
+                if (moving.right() <= winrect.right())
+                  dx = winrect.right() - frame.rect.width() + 1;
+              }
             }
 
             continue;
@@ -3224,13 +3236,8 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       const Rect &srect = *it;
 
       // if we're not in the rectangle then don't snap to it.
-      if (screen->doOpaqueMove()) {
-        if (! srect.contains(frame.rect))
-          continue;
-      } else {
-        if (! srect.contains(frame.changing))
-          continue;
-      }
+      if (! srect.contains(moving))
+        continue;
 
       int dleft = srect.left() - wleft,
          dright = wright - srect.right(),

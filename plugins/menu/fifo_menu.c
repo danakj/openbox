@@ -42,12 +42,15 @@ void plugin_startup()
 { }
 void plugin_shutdown() { }
 
-void fifo_menu_handler(int fd, Menu *menu) {
+void fifo_menu_handler(int fd, void *d) {
+    Menu *menu = d;
     char *tmpbuf = NULL;
     unsigned long num_read;
 #ifdef DEBUG
     /* because gdb is dumb */
+#if 0
     Fifo_Menu_Data *d = FIFO_MENU_DATA(menu);
+#endif
 #endif
     
     /* if the menu is shown this will go into busy loop :(

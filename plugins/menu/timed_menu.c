@@ -64,13 +64,16 @@ void timed_menu_clean_up(Menu *m) {
     TIMED_MENU_DATA(m)->mtime = 0;
 }
 
-void timed_menu_read_pipe(int fd, Menu *menu)
+void timed_menu_read_pipe(int fd, void *d)
 {
+    Menu *menu = d;
     char *tmpbuf = NULL;
     unsigned long num_read;
 #ifdef DEBUG
     /* because gdb is dumb */
+#if 0
     Timed_Menu_Data *d = TIMED_MENU_DATA(menu);
+#endif
 #endif
 
     unsigned long num_realloc;
@@ -120,10 +123,9 @@ void timed_menu_read_pipe(int fd, Menu *menu)
     }
 }
 
-void timed_menu_timeout_handler(Menu *data)
+void timed_menu_timeout_handler(void *d)
 {
-    Action *a;
-
+    Menu *data = d;
     if (!data->shown && TIMED_MENU_DATA(data)->fd == -1) {
         switch (TIMED_MENU_DATA(data)->type) {
             case (TIMED_MENU_PIPE): {
@@ -131,10 +133,13 @@ void timed_menu_timeout_handler(Menu *data)
                    as menu */
 
                 /* I hate you glib in all your hideous forms */
-                char *args[] = {"/bin/sh", "-c", TIMED_MENU_DATA(data)->command,
-                                NULL};
+                char *args[4];
                 int child_stdout;
                 int child_pid;
+                args[0] = "/bin/sh";
+                args[1] = "-c";
+                args[2] = TIMED_MENU_DATA(data)->command;
+                args[3] = NULL;
                 if (g_spawn_async_with_pipes(
                         NULL,
                         args,

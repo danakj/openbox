@@ -9,13 +9,15 @@
 
 #include "render/theme.h"
 
+#if 0
 static char *PLUGIN_NAME = "client_menu";
+#endif
 
 static Menu *send_to_menu;
 static Menu *layer_menu;
 
 typedef struct {
-
+    gint foo;
 } Client_Menu_Data;
 
 #define CLIENT_MENU(m) ((Menu *)m)

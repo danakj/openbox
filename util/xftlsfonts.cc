@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
           break;
 
         default:
+          cout << "unable to display";
           break;
         }
       } while ((vallist = vallist->next));

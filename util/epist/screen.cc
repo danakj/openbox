@@ -455,21 +455,13 @@ void screen::updateActiveWindow() {
 void screen::execCommand(const string &cmd) const {
   pid_t pid;
   if ((pid = fork()) == 0) {
-    extern char **environ;
-
-    char *const argv[] = {
-      "sh",
-      "-c",
-      const_cast<char *>(cmd.c_str()),
-      0
-    };
     // make the command run on the correct screen
     if (putenv(const_cast<char*>(_info->displayString().c_str()))) {
       cout << "warning: couldn't set environment variable 'DISPLAY'\n";
       perror("putenv()");
     }
-    execve("/bin/sh", argv, environ);
-    exit(127);
+    execl("/bin/sh", "sh", "-c", cmd.c_str(), NULL);
+    exit(-1);
   } else if (pid == -1) {
     cout << _epist->getApplicationName() <<
       ": Could not fork a process for executing a command\n";

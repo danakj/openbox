@@ -189,9 +189,10 @@ void Client::getType()
       else if (val[i] == otk::Property::atoms.net_wm_window_type_normal)
         _type = Type_Normal;
       else if (val[i] == otk::Property::atoms.kde_net_wm_window_type_override){
-        // prevent this window from getting any decor
-        _mwmhints.flags &= MwmFlag_Decorations;
+        // prevent this window from getting any decor or functionality
+        _mwmhints.flags &= MwmFlag_Functions | MwmFlag_Decorations;
         _mwmhints.decorations = 0;
+        _mwmhints.functions = 0;
       }
       if (_type != (WindowType) -1)
         break; // grab the first known type

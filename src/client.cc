@@ -484,9 +484,6 @@ void Client::updateNormalHints()
   _min_size.setPoint(0, 0);
   _max_size.setPoint(INT_MAX, INT_MAX);
 
-  // XXX: might want to cancel any interactive resizing of the window at this
-  // point..
-
   // get the hints from the window
   if (XGetWMNormalHints(**otk::display, _window, &size, &ret)) {
     _positioned = (size.flags & (PPosition|USPosition));

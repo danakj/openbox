@@ -30,7 +30,7 @@ void gradient_render(Surface *sf, int w, int h)
     gradient_pyramid(sf, w, h);
     break;
   case Background_PipeCross:
-    printf("PipeCross\n");
+    gradient_pipecross(sf, w, h);
     break;
   case Background_Rectangle:
     gradient_rectangle(sf, w, h);
@@ -415,3 +415,46 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
     end-=inw;
   }
 }
+
+void gradient_pipecross(Surface *sf, int inw, int inh)
+{
+  pixel32 *data = sf->data.planar.pixel_data;
+  pixel32 *end = data + inw*inh;
+  pixel32 current;
+  float drx, dgx, dbx, dry, dgy, dby;
+  unsigned int r,g,b;
+  int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
+  int val;
+
+  for (y = 0; y < h; ++y) {
+    drx = (float)(sf->data.planar.secondary->r - sf->data.planar.primary->r);
+    dry = drx/(float)h;
+    drx/= (float)w;
+
+    dgx = (float)(sf->data.planar.secondary->g - sf->data.planar.primary->g);
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
+
+    dbx = (float)(sf->data.planar.secondary->b - sf->data.planar.primary->b);
+    dby = dbx/(float)h;
+    dbx/= (float)w;
+    for (x = 0; x < w; ++x, data) {
+      if ((float)x/(float)w > (float)y/(float)h) val = (int)(drx * x);
+      else val = (int)(dry * y);
+
+      r = sf->data.planar.primary->r + val;
+      g = sf->data.planar.primary->g + val;
+      b = sf->data.planar.primary->b + val;
+      current = (r << default_red_offset)
+              + (g << default_green_offset)
+              + (b << default_blue_offset);
+      *(data+x) = current;
+      *(data+inw-x) = current;
+      *(end-x) = current;
+      *(end-(inw-x)) = current;
+    }
+    data+=inw;
+    end-=inw;
+  }
+}
+

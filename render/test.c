@@ -52,7 +52,7 @@ int main()
 	render_startup();
 
 	look = appearance_new(Surface_Planar, 0);
-	look->surface.data.planar.grad = Background_Rectangle;
+	look->surface.data.planar.grad = Background_PipeCross;
 	look->surface.data.planar.secondary = color_new(0xFF, 0xFF, 0xFF);
 	look->surface.data.planar.primary = color_parse("Black");
         look->surface.data.planar.interlaced = FALSE;

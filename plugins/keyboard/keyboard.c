@@ -1,6 +1,7 @@
 #include "../../kernel/focus.h"
 #include "../../kernel/dispatch.h"
 #include "../../kernel/openbox.h"
+#include "../../kernel/grab.h"
 #include "../../kernel/action.h"
 #include "tree.h"
 #include "keyboard.h"
@@ -33,7 +34,7 @@ static void reset_chains()
     curpos = NULL;
     if (grabbed) {
 	grabbed = FALSE;
-        XUngrabKeyboard(ob_display, CurrentTime);
+        grab_server(FALSE);
     }
 }
 
@@ -69,8 +70,7 @@ static gboolean bind(GList *keylist, KeyAction *action)
     }
 
     /* grab the server here to make sure no key pressed go missed */
-    XGrabServer(ob_display);
-    XSync(ob_display, FALSE);
+    grab_server(TRUE);
 
     grab_keys(FALSE);
 
@@ -88,8 +88,7 @@ static gboolean bind(GList *keylist, KeyAction *action)
 
     grab_keys(TRUE); 
 
-    XUngrabServer(ob_display);
-    XFlush(ob_display);
+    grab_server(FALSE);
 
     return TRUE;
 }
@@ -112,15 +111,11 @@ static void press(ObEvent *e, void *foo)
                 if (p->first_child != NULL) { /* part of a chain */
                     /* XXX TIMER */
                     if (!grabbed) {
-                        /*grab should never fail because we should have a
-                          sync grab at this point */
-                        XGrabKeyboard(ob_display, ob_root, 0,
-                                      GrabModeAsync, GrabModeSync,
-                                      CurrentTime);
+                        grab_server(TRUE);
+                        grabbed = TRUE;
+                        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     }
-                    grabbed = TRUE;
                     curpos = p;
-                    XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                 } else {
                     keyaction_do(&p->action, focus_client);
 

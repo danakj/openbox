@@ -643,7 +643,10 @@ void menu_frame_select_previous(ObMenuFrame *self)
 
             if (it) {
                 e = it->data;
-                if (e->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR)
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                    break;
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                    e->entry->data.normal.enabled)
                     break;
             }
         }
@@ -666,7 +669,10 @@ void menu_frame_select_next(ObMenuFrame *self)
 
             if (it) {
                 e = it->data;
-                if (e->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR)
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                    break;
+                if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                    e->entry->data.normal.enabled)
                     break;
             }
         }

@@ -26,6 +26,14 @@ public:
   */
   inline Rect(int x, int y, unsigned int w, unsigned int h)
     : _x1(x), _y1(y), _x2(w + x - 1), _y2(h + y - 1) { }
+  //! Constructs a Rect from 2 Point objects
+  /*!
+    @param location The point defining the top left corner of the rectangle
+    @param size The width and height of the rectangle
+  */
+  inline Rect(const Point &location, const Point &size)
+    : _x1(location.x()), _y1(location.y()),
+      _x2(size.x() + location.x() - 1), _y2(size.y() + location.y() - 1) { }
   //! Constructs a Rect from an XRectangle
   inline explicit Rect(const XRectangle& xrect)
     : _x1(xrect.x), _y1(xrect.y), _x2(xrect.width + xrect.x - 1),
@@ -44,6 +52,9 @@ public:
   inline int x(void) const { return _x1; }
   //! The y component of the point defining the top left corner of the Rect
   inline int y(void) const { return _y1; }
+  //! Returns the Point that defines the top left corner of the rectangle
+  inline Point location() const { return Point(_x1, _y1); }
+
   //! Sets the x coordinate of the Rect.
   /*!
     @param x The new x component of the point defining the top left corner of
@@ -64,11 +75,19 @@ public:
              the rectangle
   */
   void setPos(int x, int y);
+  //! Sets the x and y coordinates of the Rect.
+  /*!
+    @param location The point defining the top left corner of the rectangle.
+  */
+  void setPos(const Point &location);
 
   //! The width of the Rect
   inline unsigned int width(void) const { return _x2 - _x1 + 1; }
   //! The height of the Rect
   inline unsigned int height(void) const { return _y2 - _y1 + 1; }
+  //! Returns the size of the Rect
+  inline Point size() const { return Point(_x2 - _x1 + 1, _y2 - _y1 + 1); }
+
   //! Sets the width of the Rect
   /*!
     @param w The new width of the rectangle
@@ -79,12 +98,17 @@ public:
     @param h The new height of the rectangle
   */
   void setHeight(unsigned int h);
-  //! Sets the width of the Rect.
+  //! Sets the size of the Rect.
   /*!
     @param w The new width of the rectangle
     @param h The new height of the rectangle
   */
   void setSize(unsigned int w, unsigned int h);
+  //! Sets the size of the Rect.
+  /*!
+    @param size The new size of the rectangle
+  */
+  void setSize(const Point &size);
 
   //! Sets the position and size of the Rect
   /*!
@@ -96,6 +120,12 @@ public:
     @param h The new height of the rectangle
    */
   void setRect(int x, int y, unsigned int w, unsigned int h);
+  //! Sets the position and size of the Rect
+  /*!
+    @param location The new point defining the top left corner of the rectangle
+    @param size The new size of the rectangle
+   */
+  void setRect(const Point &location, const Point &size);
 
   //! Sets the position of all 4 sides of the Rect
   /*!
@@ -105,6 +135,12 @@ public:
     @param b The new bottom coordinate of the rectangle
    */
   void setCoords(int l, int t, int r, int b);
+  //! Sets the position of all 4 sides of the Rect
+  /*!
+    @param tl The new point at the top left of the rectangle
+    @param br The new point at the bottom right of the rectangle
+   */
+  void setCoords(const Point &tl, const Point &br);
 
   //! Determines if two Rect objects are equal
   /*!

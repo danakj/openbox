@@ -3008,6 +3008,12 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
     if (self->undecorated != undecorated) {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self);
+        // Make sure the client knows it might have moved. Maybe there is a
+        // better way of doing this so only one client_configure is sent, but
+        // since 125 of these are sent per second when moving the window (with
+        // user = FALSE) i doubt it matters much.
+        client_configure(self, OB_CORNER_TOPLEFT, self->area.x, self->area.y,
+                         self->area.width, self->area.height, TRUE, TRUE);
         client_change_state(self); /* reflect this in the state hints */
     }
 }

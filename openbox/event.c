@@ -1183,8 +1183,8 @@ static void event_handle_menu(XEvent *ev)
         if ((f = menu_frame_under(ev->xmotion.x_root,
                                   ev->xmotion.y_root))) {
             menu_frame_move_on_screen(f);
-            if (e = menu_entry_frame_under(ev->xmotion.x_root,
-                                           ev->xmotion.y_root))
+            if ((e = menu_entry_frame_under(ev->xmotion.x_root,
+                                            ev->xmotion.y_root)))
                 menu_frame_select(f, e);
         }
         break;

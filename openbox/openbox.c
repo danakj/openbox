@@ -266,8 +266,8 @@ int main(int argc, char **argv)
         dock_remove_all();
 	client_unmanage_all();
 
-        menu_shutdown(); /* destroy menus before unloading plugins */
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
+        menu_shutdown();
         mouse_shutdown();
         keyboard_shutdown();
         dock_shutdown();

@@ -31,6 +31,12 @@ struct _ObMenuFrame
     ObMenuFrame *parent;
     ObMenuFrame *child;
 
+    GList *entries;
+    ObMenuEntryFrame *selected;
+
+    /* If a titlebar is displayed for the menu or not (for top-level menus) */
+    gboolean show_title;
+
     /* On-screen area (including borders!) */
     Rect area;
     gint inner_w; /* inside the borders */
@@ -38,9 +44,6 @@ struct _ObMenuFrame
     gint item_h;  /* height of all normal items */
     gint text_x;  /* offset at which the text appears in the items */
     gint text_w;  /* width of the text area in the items */
-
-    GList *entries;
-    ObMenuEntryFrame *selected;
 
     Window title;
     Window items;
@@ -82,6 +85,7 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent);
 void menu_frame_hide(ObMenuFrame *self);
 
 void menu_frame_hide_all();
+void menu_frame_hide_all_client(struct _ObClient *client);
 
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry);
 

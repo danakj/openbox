@@ -37,6 +37,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->type = Window_Menu;
     self->menu = menu;
     self->selected = NULL;
+    self->show_title = TRUE;
     self->client = client;
 
     attr.event_mask = FRAME_EVENTMASK;
@@ -51,12 +52,16 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, ObClient *client)
     self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
+    stacking_add(MENU_AS_WINDOW(self));
+
     return self;
 }
 
 void menu_frame_free(ObMenuFrame *self)
 {
     if (self) {
+        stacking_remove(MENU_AS_WINDOW(self));
+
         XDestroyWindow(ob_display, self->items);
         XDestroyWindow(ob_display, self->title);
         XDestroyWindow(ob_display, self->window);
@@ -263,7 +268,7 @@ static void menu_frame_render(ObMenuFrame *self)
     XSetWindowBorder(ob_display, self->window,
                      RrColorPixel(ob_rr_theme->b_color));
 
-    if (!self->parent && self->menu->title) {
+    if (!self->parent && self->show_title) {
         XMoveWindow(ob_display, self->title, 
                     -ob_rr_theme->bwidth, h - ob_rr_theme->bwidth);
 
@@ -344,7 +349,7 @@ static void menu_frame_render(ObMenuFrame *self)
 
     self->inner_w = w;
 
-    if (!self->parent && self->title) {
+    if (!self->parent && self->show_title) {
         XResizeWindow(ob_display, self->title,
                       w, self->title_h - ob_rr_theme->bwidth);
         RrPaint(self->a_title, self->title,
@@ -411,6 +416,8 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     if (!g_list_find(menu_frame_visible, self)) {
         menu_frame_visible = g_list_prepend(menu_frame_visible, self);
 
+        if (self->menu->update_func)
+            self->menu->update_func(self, self->menu->data);
         menu_frame_update(self);
     }
 
@@ -443,9 +450,21 @@ void menu_frame_hide(ObMenuFrame *self)
 
 void menu_frame_hide_all()
 {
-    while (menu_frame_visible)
-        menu_frame_hide(menu_frame_visible->data);
+    GList *it = g_list_last(menu_frame_visible);
+    if (it) 
+        menu_frame_hide(it->data);
 }
+
+void menu_frame_hide_all_client(ObClient *client)
+{
+    GList *it = g_list_last(menu_frame_visible);
+    if (it) {
+        ObMenuFrame *f = it->data;
+        if (f->client == client)
+            menu_frame_hide(f);
+    }
+}
+
 
 ObMenuFrame* menu_frame_under(gint x, gint y)
 {
@@ -488,6 +507,7 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
 {
     ObMenuEntryFrame *old = self->selected;
+    ObMenuFrame *oldchild = self->child;
 
     if (old == entry) return;
 
@@ -496,11 +516,11 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
     else
         self->selected = NULL;
 
-    if (old) {
+    if (old)
         menu_entry_frame_render(old);
-        if (old->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-            menu_frame_hide(self->child);
-    }
+    if (oldchild)
+        menu_frame_hide(oldchild);
+
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
@@ -519,7 +539,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
                     self->frame->area.x + self->frame->area.width
                     - ob_rr_theme->menu_overlap,
                     self->frame->area.y + self->frame->title_h +
-                    self->area.y);
+                    self->area.y + ob_rr_theme->menu_overlap);
     menu_frame_show(f, self->frame);
 }
 
@@ -528,6 +548,9 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
         GSList *it;
 
+        /* release grabs before executing the shit */
+        menu_frame_hide_all();
+
         for (it = self->entry->data.normal.actions; it;
              it = g_slist_next(it))
         {
@@ -535,6 +558,5 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self)
             act->data.any.c = self->frame->client;
             act->func(&act->data);
         }
-        menu_frame_hide_all();
     }
 }

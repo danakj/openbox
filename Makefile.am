@@ -26,10 +26,10 @@ bin_PROGRAMS = \
 	tools/kdetrayproxy/kdetrayproxy
 
 plugin_LTLIBRARIES = \
-	plugins/placement/placement.la
+	plugins/placement/placement.la \
+	plugins/menu/client_menu.la
 #	plugins/menu/timed_menu.la \
 #	plugins/menu/fifo_menu.la \
-#	plugins/menu/client_menu.la \
 #	plugins/menu/include_menu.la \
 #	plugins/menu/client_list_menu.la
 

@@ -28,8 +28,8 @@
 </menu>
 
 <menu id="root-menu" label="Openbox 3">
-  <menu id="apps-menu">
-  <menu id="games-menu">
+  <menu id="apps-menu" />
+  <menu id="games-menu" />
   <separator />
   <item label="Restart">
     <action name="restart" />

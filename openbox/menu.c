@@ -44,11 +44,11 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if (state->menus) {
         if (parse_attr_string("label", node, &label)) {
             GSList *acts = NULL;
-            
+
             for (node = node->xmlChildrenNode; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
                     acts = g_slist_append(acts, action_parse(doc, node));
-            menu_add_normal(state->menus->data, label, acts);
+            menu_add_normal(state->menus->data, 0, label, acts);
             g_free(label);
         }
     }
@@ -59,9 +59,9 @@ static void parse_menu_separator(ObParseInst *i,
                                  gpointer data)
 {
     ObMenuParseState *state = data;
-    
+
     if (state->menus)
-        menu_add_separator(state->menus->data);
+        menu_add_separator(state->menus->data, 0);
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -85,7 +85,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
 
     if (state->menus)
-        menu_add_submenu(state->menus->data, name);
+        menu_add_submenu(state->menus->data, 0, name);
 
 parse_menu_fail:
     g_free(name);
@@ -95,6 +95,7 @@ parse_menu_fail:
 
 void menu_destroy_hash_value(ObMenu *self)
 {
+    /* XXX make sure its not visible */
     menu_clear_entries_internal(self);
     g_free(self->name);
     g_free(self->title);
@@ -110,6 +111,7 @@ void menu_shutdown()
 {
     menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);
+    menu_hash = NULL;
 }
 
 void menu_parse()
@@ -170,6 +172,14 @@ gboolean menu_new(gchar *name, gchar *title, gpointer data)
     return TRUE;
 }
 
+void menu_free(gchar *name)
+{
+    ObMenu *self;
+    
+    if (!(self = menu_from_name(name))) return;
+    g_hash_table_remove(menu_hash, self->name);
+}
+
 void menu_show(gchar *name, gint x, gint y, ObClient *client)
 {
     ObMenu *self;
@@ -177,14 +187,12 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
 
     if (!(self = menu_from_name(name))) return;
 
-    /* XXX update entries */
-
     frame = menu_frame_new(self, client);
     menu_frame_move(frame, x, y);
     menu_frame_show(frame, NULL);
 }
 
-static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type)
+static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 {
     ObMenuEntry *self;
 
@@ -193,6 +201,7 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type)
     self = g_new0(ObMenuEntry, 1);
     self->type = type;
     self->menu = menu;
+    self->id = id;
     self->enabled = TRUE;
     return self;
 }
@@ -238,21 +247,21 @@ static void menu_clear_entries_internal(ObMenu *self)
     }
 }
 
-void menu_add_normal(gchar *name, gchar *label, GSList *actions)
+void menu_add_normal(gchar *name, gint id, gchar *label, GSList *actions)
 {
     ObMenu *self;
     ObMenuEntry *e;
 
     if (!(self = menu_from_name(name))) return;
 
-    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL);
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL, id);
     e->data.normal.label = g_strdup(label);
     e->data.normal.actions = actions;
 
     self->entries = g_list_append(self->entries, e);
 }
 
-void menu_add_submenu(gchar *name, gchar *submenu)
+void menu_add_submenu(gchar *name, gint id, gchar *submenu)
 {
     ObMenu *self, *sub;
     ObMenuEntry *e;
@@ -260,20 +269,44 @@ void menu_add_submenu(gchar *name, gchar *submenu)
     if (!(self = menu_from_name(name))) return;
     if (!(sub = menu_from_name(submenu))) return;
 
-    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU);
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU, id);
     e->data.submenu.submenu = sub;
 
     self->entries = g_list_append(self->entries, e);
 }
 
-void menu_add_separator(gchar *name)
+void menu_add_separator(gchar *name, gint id)
 {
     ObMenu *self;
     ObMenuEntry *e;
 
     if (!(self = menu_from_name(name))) return;
 
-    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR);
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR, id);
 
     self->entries = g_list_append(self->entries, e);
+}
+
+void menu_set_update_func(gchar *name, ObMenuUpdateFunc func)
+{
+    ObMenu *self;
+
+    if (!(self = menu_from_name(name))) return;
+    self->update_func = func;
+}
+
+ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)
+{
+    ObMenuEntry *ret = NULL;
+    GList *it;
+
+    for (it = self->entries; it; it = g_list_next(it)) {
+        ObMenuEntry *e = it->data;
+
+        if (e->id == id) {
+            ret = e;
+            break;
+        }
+    }
+    return ret;
 }

@@ -15,9 +15,4 @@ gboolean plugin_open(char *name, struct _ObParseInst *i);
 gboolean plugin_open_reopen(char *name, struct _ObParseInst *i);
 void plugin_close(char *name);
 
-/* call plugin's generic constructor */
-void *plugin_create(char *name, void *data);
-/* free memory allocated by plugin_create() */
-void plugin_destroy(char *name, void *object);
-
 #endif

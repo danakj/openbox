@@ -1,170 +1,175 @@
 #include "kernel/debug.h"
 #include "kernel/menu.h"
+#include "kernel/menuframe.h"
 #include "kernel/screen.h"
 #include "kernel/client.h"
 #include "kernel/openbox.h"
 #include "kernel/frame.h"
-
-#include "render/theme.h"
+#include "gettext.h"
 
 #include <glib.h>
 
-static char *PLUGIN_NAME = "client_menu";
+#define CLIENT_MENU_NAME  "client-menu"
+#define SEND_TO_MENU_NAME "client-send-to-menu"
+#define LAYER_MENU_NAME   "client-layer-menu"
 
-static ObMenu *send_to_menu;
-static ObMenu *layer_menu;
+enum {
+    LAYER_TOP,
+    LAYER_NORMAL,
+    LAYER_BOTTOM
+};
 
-typedef struct {
-    gint foo;
-} Client_Menu_Data;
-
-#define CLIENT_MENU(m) ((ObMenu *)m)
-#define CLIENT_MENU_DATA(m) ((Client_Menu_Data *)((ObMenu *)m)->plugin_data)
-
-void client_menu_clean_up(ObMenu *m) {
-}
-
-void client_send_to_update(ObMenu *self)
-{
-    guint i = 0;
-    GList *it = self->entries;
-    
-    /* check if we have to update. lame */
-    while (it != NULL) {
-        if (i == screen_desktop) {
-            if (((ObMenuEntry *)it->data)->enabled)
-                break;
-        } else {
-            if (!((ObMenuEntry *)it->data)->enabled)
-                break;
-        }
-        if (i >= screen_num_desktops)
-            break;
-        if (strcmp(screen_desktop_names[i],
-                   ((ObMenuEntry *)it->data)->label) != 0)
-            break;
-        ++i;
-        it = it->next;
-    }
-
-    if (it != NULL || i != screen_num_desktops) {
-        menu_clear(self);
-        ob_debug("update\n");
-        for (i = 0; i < screen_num_desktops; ++i) {
-            ObMenuEntry *e;
-            ObAction *a = action_from_string("sendtodesktop");
-            a->data.sendto.desk = i;
-            a->data.sendto.follow = FALSE;
-            e = menu_entry_new(screen_desktop_names[i], a);
-            if (i == screen_desktop)
-                e->enabled = FALSE;
-            menu_add_entry(self, e);
-        }
-        
-        menu_render(self);
-    }
-}
-
-void client_menu_show(ObMenu *self, int x, int y, ObClient *client)
-{
-    guint i;
-    gint newy, newx;
-    Rect *a = NULL;
-
-    g_assert(!self->invalid);
-    g_assert(client);
-    
-    for (i = 0; i < screen_num_monitors; ++i) {
-        a = screen_physical_area_monitor(i);
-        if (RECT_CONTAINS(*a, x, y))
-            break;
-    }
-    g_assert(a != NULL);
-    self->xin_area = i;
-
-    newx = MAX(x, client->area.x);
-    newy = MAX(y, client->area.y);
-    POINT_SET(self->location,
-	      MIN(newx, client->area.x + client->area.width - self->size.width),
-	      MIN(newy, client->area.y + client->area.height -
-                  self->size.height));
-    
-    XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
-
-    if (!self->shown) {
-	XMapWindow(ob_display, self->frame);
-        stacking_raise(MENU_AS_WINDOW(self));
-	self->shown = TRUE;
-    } else if (self->shown && self->open_submenu) {
-	menu_hide(self->open_submenu);
-    }
-}
+enum {
+    CLIENT_SEND_TO,
+    CLIENT_LAYER,
+    CLIENT_ICONIFY,
+    CLIENT_MAXIMIZE,
+    CLIENT_RAISE,
+    CLIENT_LOWER,
+    CLIENT_SHADE,
+    CLIENT_DECORATE,
+    CLIENT_MOVE,
+    CLIENT_RESIZE,
+    CLIENT_CLOSE
+};
 
 void plugin_setup_config() { }
 
-void plugin_shutdown() { }
-
-void plugin_destroy (ObMenu *m)
+static void client_update(ObMenuFrame *frame, gpointer data)
 {
+    ObMenu *menu = frame->menu;
+    ObMenuEntry *e;
+
+    frame->show_title = FALSE;
+
+    if (!frame->client) {
+        GList *it;
+
+        for (it = menu->entries; it; it = g_list_next(it)) {
+            ObMenuEntry *e = it->data;
+            e->enabled = FALSE;
+        }
+        return;
+    }
+
+    e = menu_find_entry_id(menu, CLIENT_ICONIFY);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
+
+    e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
+
+    e = menu_find_entry_id(menu, CLIENT_SHADE);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
+
+    e = menu_find_entry_id(menu, CLIENT_MOVE);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_MOVE;
+
+    e = menu_find_entry_id(menu, CLIENT_RESIZE);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_RESIZE;
+
+    e = menu_find_entry_id(menu, CLIENT_CLOSE);
+    e->enabled = frame->client->functions & OB_CLIENT_FUNC_CLOSE;
 }
 
-void *plugin_create() /* TODO: need config */
+static void send_to_update(ObMenuFrame *frame, gpointer data)
 {
-    ObMenu *m = menu_new_full(NULL, "client-menu", NULL,
-                            client_menu_show, NULL, NULL, NULL, NULL, NULL);
-    m->plugin = PLUGIN_NAME;
-    menu_add_entry(m, menu_entry_new_submenu("Send To Workspace",
-                                             send_to_menu));
-    send_to_menu->parent = m;
+    ObMenu *menu = frame->menu;
+    guint i;
+    GSList *acts;
+    ObAction *act;
 
-    menu_add_entry(m, menu_entry_new("Iconify",
-                                     action_from_string("iconify")));
-    menu_add_entry(m, menu_entry_new("Raise",
-                                     action_from_string("raise")));
-    menu_add_entry(m, menu_entry_new("Lower",
-                                     action_from_string("lower")));
-    menu_add_entry(m, menu_entry_new("Close",
-                                     action_from_string("close")));
-    menu_add_entry(m, menu_entry_new("Shade",
-                                     action_from_string("toggleshade")));
-    menu_add_entry(m, menu_entry_new("Omnipresent",
-                                     action_from_string("toggleomnipresent")));
-    menu_add_entry(m, menu_entry_new("Decorations",
-                                     action_from_string("toggledecorations")));
-    menu_add_entry(m, menu_entry_new_submenu("Layers",
-                                             layer_menu));
-    layer_menu->parent = m;
+    menu_clear_entries(SEND_TO_MENU_NAME);
 
-    /* send to desktop
-       iconify
-       raise
-       lower
-       close
-       kill
-       shade
-       omnipresent
-       decorations
-    */
-    return (void *)m;
+    if (!frame->client)
+        return;
+
+    for (i = 0; i <= screen_num_desktops; ++i) {
+        gchar *name;
+        guint desk;
+
+        if (i >= screen_num_desktops) {
+            desk = DESKTOP_ALL;
+            name = _("All desktops");
+        } else {
+            desk = i;
+            name = screen_desktop_names[i];
+        }
+
+        act = action_from_string("SendToDesktop");
+        act->data.sendto.desk = desk;
+        act->data.sendto.follow = FALSE;
+        acts = g_slist_prepend(NULL, act);
+        menu_add_normal(SEND_TO_MENU_NAME, desk, name, acts);
+
+        if (frame->client->desktop == desk) {
+            ObMenuEntry *e = menu_find_entry_id(menu, desk);
+            g_assert(e);
+            e->enabled = FALSE;
+        }
+    }
 }
 
 void plugin_startup()
 {
-    ObMenu *t;
-    /* create a Send To Workspace ObMenu */
-    send_to_menu = menu_new_full(NULL, "send-to-workspace",
-                                 NULL, NULL, client_send_to_update,
-                                 NULL, NULL, NULL,
-                                 NULL);
-    
-    layer_menu = menu_new(NULL, "layer", NULL);
-    menu_add_entry(layer_menu, menu_entry_new("Top Layer",
-                                     action_from_string("sendtotoplayer")));
-    menu_add_entry(layer_menu, menu_entry_new("Normal Layer",
-                                     action_from_string("sendtonormallayer")));
-    menu_add_entry(layer_menu, menu_entry_new("Bottom Layer",
-                                     action_from_string("sendtobottomlayer")));
-                          
-    t = (ObMenu *)plugin_create("client_menu");
+    GSList *acts;
+
+    menu_new(LAYER_MENU_NAME, _("Layer"), NULL);
+
+    acts = g_slist_prepend(NULL, action_from_string("SendToTopLayer"));
+    menu_add_normal(LAYER_MENU_NAME, LAYER_TOP, _("Always on top"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("SendToNormalLayer"));
+    menu_add_normal(LAYER_MENU_NAME, LAYER_NORMAL, _("Normal"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("SendToBottomLayer"));
+    menu_add_normal(LAYER_MENU_NAME, LAYER_BOTTOM, _("Always on bottom"),acts);
+
+
+    menu_new(SEND_TO_MENU_NAME, _("Send to desktop"), NULL);
+    menu_set_update_func(SEND_TO_MENU_NAME, send_to_update);
+
+    menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL);
+    menu_set_update_func(CLIENT_MENU_NAME, client_update);
+
+    menu_add_submenu(CLIENT_MENU_NAME, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
+
+    menu_add_submenu(CLIENT_MENU_NAME, CLIENT_LAYER, LAYER_MENU_NAME);
+
+    acts = g_slist_prepend(NULL, action_from_string("Iconify"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_ICONIFY, _("Iconify"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("Maximize"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_MAXIMIZE, _("Maximize"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("Raise"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_RAISE, _("Raise to top"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("Lower"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_LOWER, _("Lower to bottom"),acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("ToggleShade"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_SHADE, _("(Un)Shade"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("ToggleDecorations"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_DECORATE, _("Decorate"), acts);
+
+    menu_add_separator(CLIENT_MENU_NAME, -1);
+
+    acts = g_slist_prepend(NULL, action_from_string("KeyboardMove"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_MOVE, _("Move"), acts);
+
+    acts = g_slist_prepend(NULL, action_from_string("KeyboardResize"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_RESIZE, _("Resize"), acts);
+
+    menu_add_separator(CLIENT_MENU_NAME, -1);
+
+    acts = g_slist_prepend(NULL, action_from_string("Close"));
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_CLOSE, _("Close"), acts);
 }
 
+void plugin_shutdown()
+{
+    menu_free(LAYER_MENU_NAME);
+    menu_free(SEND_TO_MENU_NAME);
+    menu_free(CLIENT_MENU_NAME);
+}

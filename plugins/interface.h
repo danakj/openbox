@@ -12,10 +12,4 @@ typedef void (*PluginStartup)(void);
 /* plugin_shutdown() */
 typedef void (*PluginShutdown)(void);
 
-/* plugin_create() - for menu plugins only */
-typedef void *(*PluginCreate)(/* TODO */);
-
-/* plugin_destroy() - for menu plugins only */
-typedef void (*PluginDestroy)(void *);
-
 #endif

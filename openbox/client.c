@@ -17,7 +17,7 @@
 #include "openbox.h"
 #include "group.h"
 #include "config.h"
-#include "menu.h"
+#include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "render/render.h"
@@ -406,7 +406,9 @@ void client_unmanage(ObClient *self)
     if (moveresize_client == self)
         moveresize_end(TRUE);
 
-    /* XXX close any windows that are attached to this window */
+    /* menus can be associated with a client, so close any that are since
+       we are disappearing now */
+    menu_frame_hide_all_client(self);
     
     if (focus_client == self) {
         XEvent e;

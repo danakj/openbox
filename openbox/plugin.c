@@ -11,8 +11,6 @@ typedef struct {
     PluginSetupConfig config;
     PluginStartup startup;
     PluginShutdown shutdown;
-    PluginCreate create;
-    PluginDestroy destroy;
 } Plugin;
 
 static gpointer load_sym(GModule *module, char *name, char *symbol,
@@ -58,9 +56,6 @@ static Plugin *plugin_new(char *name)
 					 FALSE);
     p->shutdown = (PluginShutdown)load_sym(p->module, name, "plugin_shutdown",
 					   FALSE);
-    p->create = (PluginCreate)load_sym(p->module, name, "plugin_create", TRUE);
-    p->destroy = (PluginDestroy)load_sym(p->module, name, "plugin_destroy",
-					 TRUE);
 
     if (p->config == NULL || p->startup == NULL || p->shutdown == NULL) {
         g_module_close(p->module);
@@ -173,42 +168,4 @@ void plugin_loadall(ObParseInst *i)
         }
         g_io_channel_unref(io);
     }
-}
-
-void *plugin_create(char *name, void *data)
-{
-    Plugin *p = (Plugin *)g_datalist_get_data(&plugins, name);
-
-    if (p == NULL) {
-	g_warning("Unable to find plugin for create: %s", name);
-	return NULL;
-    }
-
-    if (p->create == NULL || p->destroy == NULL) {
-	g_critical("Unsupported create/destroy: %s", name);
-	return NULL;
-    }
-
-    return p->create(data);
-}
-
-void plugin_destroy(char *name, void *data)
-{
-    Plugin *p = (Plugin *)g_datalist_get_data(&plugins, name);
-
-    if (p == NULL) {
-	g_critical("Unable to find plugin for destroy: %s", name);
-	/* really shouldn't happen, but attempt to free something anyway? */
-	g_free(data);
-	return;
-    }
-
-    if (p->destroy == NULL || p->create == NULL) {
-	g_critical("Unsupported create/destroy: %s", name);
-	/* really, really shouldn't happen, but attempt to free anyway? */
-	g_free(data);
-	return;
-    }
-
-    p->destroy(data);
 }

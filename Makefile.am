@@ -26,7 +26,6 @@ bin_PROGRAMS = \
 	tools/kdetrayproxy/kdetrayproxy
 
 plugin_LTLIBRARIES = \
-	plugins/placement/placement.la \
 	plugins/menu/client_menu.la \
 	plugins/menu/client_list_menu.la
 #	plugins/menu/timed_menu.la \
@@ -168,6 +167,8 @@ kernel_openbox_SOURCES = \
 	kernel/mwm.h \
 	kernel/openbox.c \
 	kernel/openbox.h \
+	kernel/place.c \
+	kernel/place.h \
 	kernel/plugin.c \
 	kernel/plugin.h \
 	kernel/popup.c \
@@ -193,23 +194,6 @@ kernel_openbox_SOURCES = \
 	kernel/xerror.c \
 	kernel/xerror.h \
 	plugins/interface.h
-
-## plugins/placement ##
-
-plugins_placement_placement_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Placement\"
-plugins_placement_placement_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_placement_placement_la_SOURCES = \
-	plugins/placement/placement.c \
-	plugins/placement/history.c \
-	plugins/placement/history.h
 
 ## plugins/menu ##
 

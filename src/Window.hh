@@ -183,7 +183,7 @@ private:
       base_width, base_height,
       win_gravity;
 
-    unsigned long initial_state, normal_hint_flags, wm_hint_flags;
+    unsigned long initial_state, normal_hint_flags;
   } client;
 
   FunctionFlags functions;
@@ -390,7 +390,7 @@ public:
   void restore(bool remap);
   void configure(int dx, int dy, unsigned int dw, unsigned int dh);
   void setWorkspace(unsigned int n);
-  void changeBlackboxHints(BlackboxHints *net);
+  void changeBlackboxHints(const BlackboxHints *net);
   void restoreAttributes(void);
 
   void buttonPressEvent(const XButtonEvent *be);

@@ -282,16 +282,6 @@ void Blackbox::process_event(XEvent *e) {
   }
 
   case ConfigureRequest: {
-    // compress configure requests...
-    XEvent realevent;
-    unsigned int i = 0;
-    while(XCheckTypedWindowEvent(getXDisplay(), e->xconfigurerequest.window,
-                                 ConfigureRequest, &realevent)) {
-      i++;
-    }
-    if ( i > 0 )
-      e = &realevent;
-
     BlackboxWindow *win = (BlackboxWindow *) 0;
     Slit *slit = (Slit *) 0;
 
@@ -496,7 +486,7 @@ void Blackbox::process_event(XEvent *e) {
       if (win->getScreen()->isSloppyFocus() &&
           (! win->isFocused()) && (! no_focus) &&
           win->isNormal()) {  // don't focus non-normal windows with mouseover
-        if (((! sa.leave) || sa.inferior) && win->isVisible()) {
+        if ((! sa.leave || sa.inferior) && win->isVisible()) {
           if (win->setInputFocus())
             win->installColormap(True); // XXX: shouldnt we honour no install?
         }

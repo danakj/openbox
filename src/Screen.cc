@@ -283,7 +283,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   // manage shown windows
   for (i = 0; i < nchild; ++i) {
-    if (children[i] == None || (! blackbox->validateWindow(children[i])))
+    if (children[i] == None || ! blackbox->validateWindow(children[i]))
       continue;
 
     XWindowAttributes attrib;
@@ -1232,6 +1232,14 @@ void BScreen::manageWindow(Window w) {
     return;
   }
 
+  // is the window a docking app
+  XWMHints *wmhint = XGetWMHints(blackbox->getXDisplay(), w);
+  if (wmhint && (wmhint->flags & StateHint) &&
+      wmhint->initial_state == WithdrawnState) {
+    slit->addClient(w);
+    return;
+  }
+
   new BlackboxWindow(blackbox, w, this);
 
   BlackboxWindow *win = blackbox->searchWindow(w);
@@ -1763,7 +1771,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
           break;
 
         case 421: // exec
-          if ((! *label) && (! *command)) {
+          if (! (*label || *command)) {
             fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
                                  "BScreen::parseMenuFile: [exec] error, "
                                  "no menu label and/or command defined\n"));
@@ -1786,21 +1794,19 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
           break;
 
-        case 561: // style
-          {
-            if ((! *label) || (! *command)) {
-              fprintf(stderr,
-                      i18n(ScreenSet, ScreenSTYLEError,
-                           "BScreen::parseMenuFile: [style] error, "
-                           "no menu label and/or filename defined\n"));
-              continue;
-            }
-
-            string style = expandTilde(command);
-
-            menu->insert(label, BScreen::SetStyle, style.c_str());
+        case 561: { // style
+          if (! (*label && *command)) {
+            fprintf(stderr,
+                    i18n(ScreenSet, ScreenSTYLEError,
+                         "BScreen::parseMenuFile: [style] error, "
+                         "no menu label and/or filename defined\n"));
+            continue;
           }
 
+          string style = expandTilde(command);
+
+          menu->insert(label, BScreen::SetStyle, style.c_str());
+        }
           break;
 
         case 630: // config
@@ -1830,7 +1836,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
             if (submenufile) {
               struct stat buf;
               if (fstat(fileno(submenufile), &buf) ||
-                  (! S_ISREG(buf.st_mode))) {
+                  ! S_ISREG(buf.st_mode)) {
                 fprintf(stderr,
                         i18n(ScreenSet, ScreenINCLUDEErrorReg,
                              "BScreen::parseMenuFile: [include] error: "
@@ -1912,7 +1918,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
           {
             bool newmenu = ((key == 1113) ? True : False);
 
-            if ((! *label) || ((! *command) && newmenu)) {
+            if (! *label || (! *command && newmenu)) {
               fprintf(stderr,
                       i18n(ScreenSet, ScreenSTYLESDIRError,
                            "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
@@ -1958,7 +1964,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                   style += '/';
                   style += fname;
 
-                  if ((! stat(style.c_str(), &statbuf)) &&
+                  if (! stat(style.c_str(), &statbuf) &&
                       S_ISREG(statbuf.st_mode))
                     stylesmenu->insert(fname, BScreen::SetStyle, style);
                 }

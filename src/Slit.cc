@@ -133,6 +133,17 @@ void Slit::addClient(Window w) {
     client->rect.setSize(64, 64);
   }
 
+  Atom *proto;
+  int num_return = 0;
+  if (XGetWMProtocols(display, client->window, &proto, &num_return)) {
+    for (int i = 0; i < num_return; ++i) {
+      if (proto[i] ==
+          blackbox->getXAtom()->getAtom(XAtom::blackbox_structure_messages)) {
+        screen->addNetizen(new Netizen(screen, client->window));
+      }
+    }
+  }
+
   XSetWindowBorderWidth(display, client->window, 0);
 
   XGrabServer(display);
@@ -466,12 +477,17 @@ void Slit::updateStrut(void) {
       case TopCenter:
       case TopLeft:
       case TopRight:
-        strut.top = getExposedHeight() + border_width;
+        strut.top = frame.rect.top() + getExposedHeight() + border_width;
         break;
       case BottomCenter:
       case BottomLeft:
       case BottomRight:
-        strut.bottom = getExposedHeight() + border_width;
+        int pos;
+        if (do_auto_hide)
+          pos = frame.y_hidden;
+        else
+          pos = frame.rect.y();
+        strut.bottom = (screen->getRect().bottom() - pos);
         break;
       case CenterLeft:
         strut.left = getExposedWidth() + border_width;

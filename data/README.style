@@ -1,0 +1,326 @@
+Creating a new style (aka "theme"):
+-----------------------------------
+After getting Openbox up and running, the next thing you want to do is change
+the colors/fonts/etc. on the screen.  Openbox uses a "style" to read its
+configuration information.  A style in Openbox consists of X resources placed
+in a file.  Just like the menu file (see README.menu), the style file can be
+put anywhere on the filesystem; as long as you have read access to the file,
+Openbox can use it.
+
+First, we need to decide where to put our style file, and what to name it.
+I recommend using the naming scheme described on http://bb.classic.themes.org/
+when creating styles.
+
+Let's get started.  Let's put our new style into a file named `results.'
+Following the themes.org naming scheme, this file will go into
+.openbox/styles.  Same as with the menu file, we use our favorite text editor
+to create the new style.
+
+X resources consist of a key and a value.  The key is constructed of several
+smaller keys, delimited by a period (`.').  Keys may also contain a star (`*')
+to serve as a wildcard, which means that one line of typed text will match
+several keys.  This is useful for styles that are based on one or two colors.
+
+Openbox allows you to configure it's three main components: the toolbar, the
+menus and the window decorations.  Lets begin by creating a style for our
+toolbar.
+
+First we need to define a "texture" for the toolbar and it's components.
+Textures tell Openbox how to mold or shape the colors we supply.
+
+A texture is comprised of the following elements:
+
+	Raised / Sunken / Flat		give the component a raised, sunken
+					or flat appearance (respectively)
+
+	Solid / Gradient		tell Openbox whether to draw a solid
+					or gradiented texture
+
+	Interlaced			tells Openbox to interlace a
+					gradient (and gradient ONLY) texture
+
+	Bevel1 / Bevel2			tells Openbox which type of bevel
+					to use.
+
+NOTE on Bevel1 / Bevel2:
+
+Bevel1 is the default bevel.  The shading is placed on the edge of the image.
+Bevel2 is an alternative.  The shading is placed one pixel in from the edge
+of the image.
+
+Now that we understand that, let's define the textures for the toolbar.  The
+toolbar has a main frame, buttons, two labels and a clock label.  The buttons
+have 2 states, so we provide textures for both the normal and the pressed
+state.
+
+...
+toolbar:                        Raised Diagonal Gradient Bevel1
+toolbar.button:                 Raised Diagonal Gradient Bevel1
+toolbar.button.pressed:         Sunken Diagonal Interlaced Gradient Bevel1
+toolbar.clock:                  Flat Interlaced Gradient
+toolbar.label:                  Flat Interlaced Gradient
+...
+
+NOTE: the texture strings don't have to be capitalized like they did in
+previous versions.  They are still placed in capitals here, because things like
+the bbtools still use the old method.
+
+Next we define colors for the textures.  Colors can be any valid X colorname
+(from the RGB database) or it can be a color specifier, as described by
+'man 1 X.'
+
+Let's see how our file looks after adding colors:
+
+...
+toolbar:                        Raised Diagonal Gradient Bevel1
+toolbar.button:                 Raised Diagonal Gradient Bevel1
+toolbar.button.pressed:         Sunken Diagonal Interlaced Gradient Bevel1
+toolbar.clock:                  Flat Interlaced Gradient
+toolbar.label:                  Flat Interlaced Gradient
+
+toolbar.color:                  rgb:8/8/7
+toolbar.colorTo:                grey20
+toolbar.button.color:           grey
+toolbar.button.colorTo:         grey20
+toolbar.button.pressed.color:   rgb:4/4/38
+toolbar.button.pressed.colorTo: rgb:f/f/d
+toolbar.clock.color:            grey20
+toolbar.clock.colorTo:          rgb:8/8/7
+toolbar.label.color:            grey20
+toolbar.label.colorTo:          rgb:8/8/7
+toolbar.textColor:              grey85
+...
+
+As you have noticed, all textures have a color and a colorTo key.  These keys
+are required for gradient images.  For solids, only color is needed.  You will
+also notice that we have supplied the color for the text on the toolbar.  Not
+all textures have a text color, just certain base textures.
+
+Next, let's move onto the menus.  Since Openbox was written in C++, all of
+the menus used in it are subclasses of one generic base class.  Openbox reads
+the style for the configuration for that base class, which applies to all
+the menus used in Openbox.
+
+The menu has two main parts, the title and the frame.  There is nothing
+visible under them, so we only configure these two components.  The menu frame
+and menu title BOTH have a configurable text color, and the menu frame has a
+highlight color and the corresponding highlighted text color key. Let's assign
+some textures and colors to our menu, and see what our style file looks like
+so far:
+
+...
+toolbar:                        Raised Diagonal Gradient Bevel1
+toolbar.button:                 Raised Diagonal Gradient Bevel1
+toolbar.button.pressed:         Sunken Diagonal Interlaced Gradient Bevel1
+toolbar.clock:                  Flat Interlaced Gradient
+toolbar.label:                  Flat Interlaced Gradient
+
+toolbar.color:                  rgb:8/8/7
+toolbar.colorTo:                grey20
+toolbar.button.color:           grey
+toolbar.button.colorTo:         grey20
+toolbar.button.pressed.color:   rgb:4/4/38
+toolbar.button.pressed.colorTo: rgb:f/f/d
+toolbar.clock.color:            grey20
+toolbar.clock.colorTo:          rgb:8/8/7
+toolbar.label.color:            grey20
+toolbar.label.colorTo:          rgb:8/8/7
+toolbar.textColor:              grey85
+
+menu.title:                     Raised Diagonal Interlaced Gradient Bevel1
+menu.frame:                     Raised Diagonal Gradient Bevel1
+
+menu.title.color:               grey20
+menu.title.colorTo:             rgb:8/8/7
+menu.title.textColor:           grey85
+menu.frame.color:               rgb:8/8/7
+menu.frame.colorTo:             grey10
+menu.frame.textColor:           white
+menu.frame.highlightColor:      grey85
+menu.frame.hiTextColor:         grey20
+...
+
+Next, we need to configure our windows.  Windows are like buttons, they have
+two states, focused and unfocused.  There for we define a separate texture
+for unfocused windows and focused windows.  The buttons on the titlebar
+are focus dependant also, so we need to configure them as well.  The buttons
+only have one "pressed" state, so we only have to define that once, instead of
+having a focus.pressed state and an unfocus.pressed state.  The window frame
+is the thin border around the client window. Let's be sure to catch it as well.
+
+After adding the window config, our style now looks like this:
+
+...
+
+toolbar:                        Raised Diagonal Gradient Bevel1
+toolbar.button:                 Raised Diagonal Gradient Bevel1
+toolbar.button.pressed:         Sunken Diagonal Interlaced Gradient Bevel1
+toolbar.clock:                  Flat Interlaced Gradient
+toolbar.label:                  Flat Interlaced Gradient
+
+toolbar.color:                  rgb:8/8/7
+toolbar.colorTo:                grey20
+toolbar.button.color:           grey
+toolbar.button.colorTo:         grey20
+toolbar.button.pressed.color:   rgb:4/4/38
+toolbar.button.pressed.colorTo: rgb:f/f/d
+toolbar.clock.color:            grey20
+toolbar.clock.colorTo:          rgb:8/8/7
+toolbar.label.color:            grey20
+toolbar.label.colorTo:          rgb:8/8/7
+toolbar.textColor:              grey85
+
+menu.title:                     Raised Diagonal Interlaced Gradient Bevel1
+menu.frame:                     Raised Diagonal Gradient Bevel1
+
+menu.title.color:               grey20
+menu.title.colorTo:             rgb:8/8/7
+menu.title.textColor:           grey85
+menu.frame.color:               rgb:8/8/7
+menu.frame.colorTo:             grey10
+menu.frame.textColor:           white
+menu.frame.highlightColor:      grey85
+menu.frame.hiTextColor:         grey20
+
+window.focus:                   Raised Diagonal Interlaced Gradient Bevel1
+window.focus.button:            Raised Diagonal Gradient Bevel1
+window.unfocus:                 Raised Diagonal Gradient Bevel1
+window.unfocus.button:          Sunken Diagonal Gradient Bevel1
+window.button.pressed:          Flat Diagonal Interlaced Gradient
+window.frame:                   Raised Solid Bevel1
+
+window.focus.color:             grey
+window.focus.colorTo:           grey20
+window.focus.textColor:         grey85
+window.focus.button.color:      grey
+window.focus.button.colorTo:    grey20
+window.unfocus.color:           rgb:8/8/7
+window.unfocus.colorTo:         grey20
+window.unfocus.textColor:       grey
+window.unfocus.button.color:    grey20
+window.unfocus.button.colorTo:  grey
+window.button.pressed.color:    rgb:4/4/38
+window.button.pressed.colorTo:  rgb:f/f/d
+window.frame.color:             grey85
+...
+
+Now all we have to do is finish off the style with a few miscellanous options.
+These include the title and menu fonts/justification, border color, bevel and
+handle widths, window move style and the root command.
+
+Fonts must be a valid X11 font screen, or a valid font alias.  Use a utility
+like `xfontsel' (and others) to preview fonts.  Also use the utility
+`xlsfonts' to spit out all the current X font names and aliases stored in
+the X server.
+
+Justification can be one of three things:  LeftJustify, CenterJustify or
+RightJustify.
+
+The border color is the color applied to the 1 pixel border around the menu
+frame/title and the window titlebar/buttons/handle/etc.  Setting this color
+can have drastic effects on your style, so don't just leave it set to `black'
+all the time.  ;)
+
+The bevel and handle widths control the size and spacing of decorations in
+Openbox.  The larger the number, the more space Openbox takes up.
+
+The window move style tells Openbox how to move windows when you drag them
+with your mouse.  There are two options for it: Opaque or Wire.
+
+The root command is the command run every time the style is loaded (either at
+startup or after a reconfigure/style-change).  It is used to run a program
+like xv, Esetroot, wmsetbg, etc. to set an image/color/pattern on the root
+window.  Just supply a command and it will be run.
+
+Also, as a note, an X resource file can have comments.  Precede the line with
+and exclamation mark `!' and the rest of the line will be ignored.
+
+Let's finish off the details and take a look at our finished style:
+
+...
+! Results - theme for Openbox
+! by Brad Hughes bhughes@tcac.net
+
+toolbar:                        Raised Diagonal Gradient Bevel1
+toolbar.button:                 Raised Diagonal Gradient Bevel1
+toolbar.button.pressed:         Sunken Diagonal Interlaced Gradient Bevel1
+toolbar.clock:                  Flat Interlaced Gradient
+toolbar.label:                  Flat Interlaced Gradient
+
+! toolbar colors
+toolbar.color:                  rgb:8/8/7
+toolbar.colorTo:                grey20
+toolbar.button.color:           grey
+toolbar.button.colorTo:         grey20
+toolbar.button.pressed.color:   rgb:4/4/38
+toolbar.button.pressed.colorTo: rgb:f/f/d
+toolbar.clock.color:            grey20
+toolbar.clock.colorTo:          rgb:8/8/7
+toolbar.label.color:            grey20
+toolbar.label.colorTo:          rgb:8/8/7
+toolbar.textColor:              grey85
+
+! menu textures
+menu.title:                     Raised Diagonal Interlaced Gradient Bevel1
+menu.frame:                     Raised Diagonal Gradient Bevel1
+
+! menu colors
+menu.title.color:               grey20
+menu.title.colorTo:             rgb:8/8/7
+menu.title.textColor:           grey85
+menu.frame.color:               rgb:8/8/7
+menu.frame.colorTo:             grey10
+menu.frame.textColor:           white
+menu.frame.highlightColor:      grey85
+menu.frame.hiTextColor:         grey20
+
+! window textures
+window.focus:                   Raised Diagonal Interlaced Gradient Bevel1
+window.focus.button:            Raised Diagonal Gradient Bevel1
+window.unfocus:                 Raised Diagonal Gradient Bevel1
+window.unfocus.button:          Sunken Diagonal Gradient Bevel1
+window.button.pressed:          Flat Diagonal Interlaced Gradient
+window.frame:                   Raised Solid Bevel1
+
+! window colors
+window.focus.color:             grey
+window.focus.colorTo:           grey20
+window.focus.textColor:         grey85
+window.focus.button.color:      grey
+window.focus.button.colorTo:    grey20
+window.unfocus.color:           rgb:8/8/7
+window.unfocus.colorTo:         grey20
+window.unfocus.textColor:       grey
+window.unfocus.button.color:    grey20
+window.unfocus.button.colorTo:  grey
+window.button.pressed.color:    rgb:4/4/38
+window.button.pressed.colorTo:  rgb:f/f/d
+window.frame.color:             grey85
+
+! misc...
+borderColor:                    rgb:2/2/1c
+
+moveStyle:                      Opaque
+
+menuJustify:                    CenterJustify
+titleJustify:                   CenterJustify
+
+bevelWidth:                     2
+handleWidth:                    4
+
+menuFont:                       lucidasans-10
+titleFont:                      lucidasans-bold-10
+
+rootCommand:                    bsetroot -mod 4 4 -fg rgb:6/6/5c -bg grey20
+...
+
+Alright!  Our style is finished.  Let's see how the sucker looks.  First we
+need to tell Openbox to use the new style.  The way to do that is to edit
+your menu (refer to README.menu for this) and add:
+
+[style] (Results) {~/.openbox/styles/results}
+
+somewhere in our menu.  Taking advantage of Openbox' automagic menu updates,
+all we have to do is close and reopen the root menu and our new style entry
+will be visible.  Select it and Openbox will apply the new style we just
+created.

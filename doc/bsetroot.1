@@ -1,0 +1,89 @@
+.\"
+.\" Man page for Bsetroot
+.\"
+.\" Copyright (c) 2000 by Wilbert Berendsen <wbsoft@xs4all.nl>
+.\"
+.TH bsetroot 1 "June 16th, 2000" "0.60.3"
+.SH NAME
+bsetroot \- Openbox utility to change root window appearance
+.SH SYNOPSIS
+.BR bsetroot " \-help"
+.br
+.B bsetroot
+.RI "[ \-display " display " ] \-solid " color
+.br
+.B bsetroot
+.RI "[ \-display " display " ] \-mod " "x y" " \-fg " color " \-bg " color
+.br
+.B bsetroot
+.RI "[ \-display " display " ] \-gradient " texture " \-from " color " \-to " color
+.SH DESCRIPTION
+Bsetroot is a utility that can control the appearance of the root window in
+three ways: Either give it a solid color, or write a two color modula pattern
+to it, or render a gradient texture, based on two different colors.
+.PP
+Bsetroot resembles
+.IR xsetroot (1)
+in this functionality but it supports multiple screen displays, and gradient
+textures the same way as Openbox does.
+It doesn't handle cursors etc.
+Bsetroot is part of the Openbox package.
+.SH OPTIONS
+Bsetroot operates in three ways, you must choose one of the first 3 options:
+.TP
+.BI \-solid " color"
+Sets the root window to specified color.
+.TP
+.BI \-mod " x y"
+Creates a modula pattern. You must specify
+.BR \-bg " and " \-fg
+colors.
+.TP
+.BI \-gradient " texturestring"
+Renders the specified texture string to the root window.
+For possible texture strings, please refer to
+.IR openbox (1).
+You must also specify both a
+.BR \-from " and a " \-to
+color.
+.TP
+.BI \-display " display"
+Tells Bsetroot to connect to the specified display.
+.TP
+.BI "\-bg, \-background " color
+Background color.
+Needed for
+.B \-mod
+patterns.
+.TP
+.BI "\-fg, \-foreground " color
+Foreground color.
+Needed for
+.B \-mod
+patterns.
+.TP
+.BI \-from " color"
+Start color for rendering textures.
+Needed for
+.B \-gradient
+operation mode.
+.TP
+.BI \-to " color"
+Ending color for rendering textures.
+Needed for
+.B \-gradient
+operation mode.
+.TP
+.B \-help
+Prints version info and short help text.
+.SH AUTHOR
+Bsetroot was written and maintained by Brad Hughes
+.nh \" hyphenation off
+(blackbox@alug.org)
+.hy \" on again
+and Jeff Raven
+.nh
+(jraven@psu.edu).
+.hy
+.SH SEE ALSO
+.IR openbox (1)

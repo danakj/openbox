@@ -1,0 +1,1269 @@
+ChangeLog from Blackbox (this code's previous project):
+
+Changes from 0.62.0 to 0.62.1:
+  - the lock modifier code handles user redefined modifiers better
+  - check if the locale actually needs multibyte support before using multibyte
+    functions
+  - use srcdir in all of the makefiles
+  - added zh_CN (Chinese) nls support
+
+
+Changes from 0.61.1 to 0.62.0:
+  - the immorel release
+  - added the ja_JP nls directory and man pages
+  - general code touchups
+  - blackbox-nls.hh is always generated even if --disable-nls is used.
+    This allows us to not have all of those hideous #ifdef NLS chunks.
+    Nothing to worry about, if you do not want NLS this does not affect you
+  - Workspace::placeWindow() cleanups.  Also a speed bump from reducing the
+    use of iterator->current() and changing the delta from 1 to 8
+  - cleanups to compile with g++ 3.0
+  - make distclean actually removes Translation.m and blackbox-nls.hh.
+    Also fixed Makefile.am to pass --foreign instead of --gnu when calling
+    the autotools.
+  - fixed a desciptor leak in BScreen::parseMenuFile, seems opendir
+    lacked a matching closedir.
+  - fix transient window handling code in Workspace::removeWindow() so
+    transients give focus back to their parents properly.  The code originally
+    handled sloppy focus then transient windows, so we just flopped the
+    if/elsif.  This is immediately noticable with web browsers and their open
+    location windows.
+  - plugged a small leak in ~Toolbar
+  - fixed list::insert so you really can insert at item number 2.  While there
+    I cleaned up the code a bit.
+  - added decoration to the atom state stored in a window
+  - fixed a typo in bsetroot.cc: 'on of' -> 'one of'.
+  - fixed the window menu gets left open when another window button is pressed
+    issue with a call to windowmenu->hide() in window->maximize()
+  - applied xOr's patch for decoration handling
+  - applied xOr's patch for the maximize, shade, unmaximize bug
+  - applied Kennis' patch for sending incorrect Slit configure notices
+  - BlackboxWindow's flags have been moved into a flags structure
+  - applied xOr's patch for border handling
+  - resizing a window turns off its maximized flag.  Before a resized window
+    thought it was still maximized and maximizing a double action
+  - BlackboxWindow::withdraw no longet sets the state to Withdrawn.
+    This confused some X clients.
+  - updated the manpages and added Dutch NLS support (thanks Wilbert)
+  - added it_IT nls files, thanks Luca Marrazzo <marra.luca@libero.it>
+  - the menu file mentioned in the manpage is now based on DEFAULT_MENU
+  - configure script found basename in -lgen, but did not set HAVE_BASENAME
+    causing compilation problems on irix and possibly others.  Added a call
+    to AC_DEFINE in AC_CHECK_LIB to fix this.
+  - menu is no longer installed, you need to copy it yourself
+  - cleaned up i18n code a little.  Several member functions were declared
+    but never used and getMessage() had a default argument which was also
+    never used.
+  - i18n will now compile cleanly on machines without nl_types.h
+  - the lock modifiers no longer stop blackbox!
+  - maximize a window via bbkeys and the maximize button is not redrawn, fixed
+  - now exit with an error code if an unknown option is passed
+  - autoraise and multiple dialog windows yields segv bug fixed
+    also lengthened the default auto raise delay from 250 to 400
+  - another iteration of autoraise and dialog box handling, this time we
+    noticed that nothing ever reset blackbox.focused_window to 0 when a window
+    was removed
+  - check if the window is visible before changeBlackboxHints() calls maximize
+  - placeWindow no longer takes edgeSnapThreshhold into account
+  - ignore style files ending in ~
+  - support locale specifiers with @euro in them
+  - added Slovenian man pages and nls, thanks Ales Kosir
+  - Toolbar name editing buffer reduced to 128 chars, logic added to make sure
+    this buffer is not overrun
+  - added German nls files, thanks Jan Schaumann
+  - added my name to the code, updated the version output
+
+
+Changes from 0.61.0 to 0.61.1:
+  - fixed some of the code to explicitly use colormaps so that when
+    blackbox decides to use a non-default visual everything will
+    still work (although it may look darn ugly)
+  - optimizations to the deiconify/raising code to (hopefully) deal
+    with a rather nasty bug, plus make things a little more efficient
+  - changed the code so that the close button is always redrawn on
+    button release events, just in case the client decides not to
+    close in response to the message (see Acroread)
+  - tinkered with the Makefiles again to make sure Blackbox
+    completely cleans up after itself during an uninstall
+  - fixed a glitch in window placement that was making Blackbox
+    place some larger windows at coordinates near 2**31
+  - merged in a patch from nyz which fixed a bug with not sending
+    configure events when a window is both moved and resized (eg
+    when the left resize grip is used) as well as optimized some
+    of the show/hide code to use the stacking order
+  - fixed a bug in blackbox's support of the X shape extension...
+    it wasn't correctly resetting the bounding region after a window
+    was resized
+  - fixed a glitch with the geometry window where it would persist
+    if the client was unmapped while in motion
+  - tweaked the code for decorating transient windows so that it
+    is possible to use MOD1+Mouse3 to resize transients as long as
+    there is not some other reason to disable functions.resize
+
+
+Changes from 0.60.3 to 0.61.0:
+  - added slightly updated copies of the blackbox/bsetroot manpages.
+  - reworked the Windowmenu code so that using the second mouse
+    button on the Send To menu moves you along with the window
+  - merged in bsd-snprintf.(h|c) from openssh so that Blackbox can
+    compile on older boxes without (v)snprintf in their standard lib.
+  - fixed a pair of problems where blackbox was not returning icons
+    and slit apps to a useable state at shutdown
+  - fixed a problem with menus not getting layered correctly after
+    a reconfigure or menu reload
+  - changed the behavior of the various MOD1+ButtonPresses on windows...
+    they should now be more consistent with the button behavior on the
+    decorations :
+            . MOD1+Button1 raises and moves the window (unchanged)
+	    . MOD1+Button2 lowers the window (used to resize the window)
+	    . MOD1+Button3 resizes the window (new button combo)
+  - fixed a small but _extremely_ annoying bug exposed by cvsup
+  - styled frames are now a thing of the past... the textures formerly
+    known as window.frame.(un)focus have been replaced by solid colors
+    window.frame.(un)focusColor... the thickness of the frame is now
+    determined by frameWidth, which will default to bevelWidth if not
+    specified
+  - middle clicking on a window in a workspace's window list now moves
+    the window to the current workspace
+  - fixed a minor glitch with the appearance of window labels for
+    certain newly-started apps (i.e. rxvt)
+  - added a new configure option for both the toolbar and the slit --
+    autohide. Hopefully this should help quell the demands for the
+    removal of the toolbar...
+  - added code to better handle apps that change the window focus
+  - changed the command execution code (used to handle rootCommands
+    and executable menu items) to be more robust... compound commands
+    should now work
+  - a new-and-slightly-improved implementation of unstyled frames should
+    mean slightly better performance than previously
+  - fixed a couple of stupid bugs in the new code for handling
+    Solid Flat textures more efficiently
+  - fixed the nls makefiles so that they respect DESTDIR, behave better
+    if you reinstall over an existing installation, and actually remove
+    their files on a make uninstall
+  - added cthulhain's bsetbg script to the util directory... see the
+    file README.bsetbg for more information
+  - added Estonian, French and Danish translations
+
+
+Changes from 0.60.2 to 0.60.3:
+  - put in a (temporary?) fix for a bug with the new way icons are
+    handled. Previously an icon was created only for non-transient
+    windows, which means that 1) minimized transient windows were
+    not getting cleaned up at shutdown, and that 2) one could
+    conceivably lose access to a minimized transient if there were
+    a break in the transient chain.
+
+    For the time being, every iconified window gets an icon. In
+    order to make this a little nicer, if a window doesn't provide
+    an icon title, the window title is used in the icon menu, rather
+    than 'Unnamed'.
+  - fixed a bug in handling the destruction of intermediate
+    transient windows. The code was leaving the transient of a
+    destroyed window with a reference to the now non-existent
+    window. This can lead to all sorts of problems.
+  - fixed a slight positioning error when the slit is on the right
+    side of the screen
+  - included a new style, Minimal, which is designed for use on 8-bit
+    displays. It tries to use a bare minimum of colors, and with the
+    new code regarding Flat Solid, should consume very little memory.
+  - made yet another alteration to the way focus changes after a window
+    closes under ClickToFocus. Blackbox now tracks the stacking order of
+    all windows and uses this information to give the focus to the topmost
+    window.
+  - new configure option :
+	--enable-styled-frames   include support for fully-styled window
+	                         frames -- these are the decorations which
+				 are affected by the window.frame* theme
+				 entries. This option is turned on by
+				 default.
+
+				 Because of the way they are implemented,
+				 these are typically the most memory and
+				 render intensive of the various blackbox
+				 decorations, even if they are typically
+				 only a pixel or so wide. Disabling this
+				 feature can result in a substantial
+				 decrease in X memory usage, but it's
+				 enabled by default to remain compatible
+				 with previous versions.
+
+  - added a whole mess of logic so that blackbox will use
+    XSetWindowBackground for Flat Solid textures instead generating
+    a pixmap (which would be subsequently cached)... should help cut
+    down some on the X memory usage
+  - altered the behavior of the BImageControl timer... now it will
+    fire every cacheLife minutes, regardless of when anything has
+    been removed from the cache
+  - modified the NLS build code yet again... at this point we've
+    hopefully hit the least common denominator and it should work
+    for everyone
+  - dealt with a possible problem in the BlackboxWindow constructor
+    where we referred to a member after deletion
+  - removed a last lingering bit of the allocate()/deallocate() code
+  - fixed a pair of string formatting problems
+
+
+Changes from 0.60.1 to 0.60.2:
+  - updated README.bbtools, since bbpager and bbkeys were updated to work with
+    0.60.x (also removed the .diffs from the source tree)
+  - fix for compiling with NLS support on Solaris
+  - added Turkish, Russian and Swedish translations
+  - applied patch for more correct Spanish translations
+  - added completed pt_BR (Brazillian Porteguese) translation
+  - removed mem.h and the allocate()/deallocate() calls throughout blackbox
+    these have been unused for a long time, and needed to go away :)
+  - compile fixes for --enable-debug
+  - changed the font loading/drawing code... XFontSets are only used if
+    the locale is set properly.  So you can still compile with nls support,
+    but do not set your LANG environment variable, and your fonts will be
+    loaded and drawn the old way
+  - smarter Basemenu::drawItem() code added, i noticed alot of flicker when
+    moving menus, because of code constantly redrawing menus items... this
+    has been significatly modified and sped up quite a bit
+  - fixed a bug where iconified windows wouldn't remove themselves from the
+    icon menu when they unmapped/closed themselves (which would result in a
+    crash if you selected this dead item)
+  - fixed a potential crash in Workspace::removeWindow() that had relation
+    to focus last window on workspace... one person experience gibberish being
+    displayed, another experienced a crash
+  - fixed a flicker problem when changing focus between windows rapidly
+    (the toolbar's window label was getting redrawn twice per focus, not
+    optimum behavior)
+  - fixed the infamous bsetroot segfault... this was quite a feat... took 3
+    people in excess of 8 hours to find... and it was a simple one line change
+
+
+Changes from 0.51.3.1 to 0.60.1: (note:  0.60.1 is 0.60.0 non-alpha)
+  - changed licensing for Blackbox from GNU GPL to more open BSD license
+    see the file LICENSE
+  - removed alot of empty files that did nothing but passify automake/autoconf
+    Blackbox now passes --foreign to automake to lessen the requirements for
+    files like NEWS,AUTHORS,COPYING,README,etc.
+  - new configure options:
+	--enable-ordered-pseudo	this enables a new algorithm for dithering
+				on pseudocolor (8 bit) displays... a noticable
+				pattern is visible when using this.  you may or
+				may not like it... just something different
+				if you want it, but is turned off by default.
+
+	--enable-debug		turn on verbose debugging output... this
+				isn't very complete or really very helpful...
+				right now it just describes memory usage and
+				tracks a few X event handlers... this is turned
+				off by default
+
+	--enable-nls		turn on natural language support... this option
+				will turn on the use of catgets(3) to read
+				native language text from any of the supported
+				locales (see the nls/ directory for current
+				translations)...
+
+				This option also turns on the use of XFontSets,
+				which allows the display of multibyte
+				characters, like Japanese or Korean.
+				This option is turned on by default.
+
+	--enable-timed-cache	turn on/off the new timed pixmap cache... this
+				differs from the old pixmap cache in that
+				instead of releasing unused pixmaps
+				immediately, it waits for <X> minutes, where
+				<X> is set with session.cacheLife in your
+				~/.blackboxrc...  this option is turned on
+				by default.
+
+  - changed the default menu to include a listing of workspaces (and their
+    window lists) and the new configuration menu (see below)
+  - included new default styles, contributed by regulars on
+    irc.openproject.net's #blackbox
+  - generated default "translation" catalog for the C/POSIX locale... the
+    same catalog is used for English (en_US for now, will add others
+    as necessary)
+  - included translation for Spanish (es_ES) and Brazilian
+    Portuguese (pt_BR)... if you are interested in doing a
+    translation, email me at blackbox@alug.org
+  - properties and hints added for communication with bbpager and bbkeys, the
+    two most common "blackbox addons"
+  - KDE 1.x support has been completely removed, pending approval of the new
+    window manager specification to be used by KDE2 and GNOME
+  - a (broken!) base for the new window manager spec was put in place, but
+    using --enable-newspec will result in code that will not compile
+  - added a timer class to handle internal timeouts without using
+    getitimer/setitimer/SIGARLM... this will enable other things to be done,
+    as any number of timers with any timeout can be used
+  - Blackbox will search for the highest depth supported by each visual on
+    each screen... basically this means that blackbox will try to use
+    TrueColor if a TrueColor visual exists (but it's not the default visual)
+  - menu hilite changed from being just a color to being a texture and new
+    window decoration layout... as a result the style file syntax has changed,
+    old styles for 0.5x.x will not work.  See the included styles for examples,
+    and browse by http://bb.themes.org/
+  - added support for enabled/disabled and selectable menuitems, this is for
+    use in the configmenu mostly (but is used in the windowmenu)
+  - added the Configmenu, which is insertable into your menu by using:
+
+	[config] (Catchy Label)
+
+    changes made in the configmenu take effect immediately, and are saved in
+    your ~/.blackbxrc... current tunable settings:
+
+	Focus model
+	Window placement
+	Image dithering
+	Opaque window moving
+	Full Maximization
+	Focus New Windows
+	Focus Last Window on Workspace
+
+    the window placement and focus model options will be discussed below
+  - added texture type "ParentRelative" which causes the decoration to display
+    the contents of it's parent... this is a sort of pseudo-transparent option
+    and doesn't work for all decorations... see the included style named
+    "Operation" for an example of ParentRelative
+  - added support for solid interlacing... for example:
+
+	toolbar:		raised interlaced solid bevel1
+	toolbar.color:		grey
+	toolbar.colorTo:	darkgrey
+
+    will cause the toolbar base to be draw with solid lines, one line grey,
+    the next darkgrey, the next grey, the next darkgrey, ...
+  - changed dithering algorithm for TrueColor displays from Floyd-Steinberg to
+    an ordered dither... dithering at 8bpp (Pseudocolor) can be either FS or
+    ordered, but must be selected at compile time...
+
+    NOTE:  when using ordered pseudocolor (8bpp) dithering, your
+    session.colorsPerChannel ***MUST*** be 4, otherwise your display will
+    not display *any* correct colors
+  - fixed TrueColor rendering to do aligned writes (suppresses warnings on
+    Alpha Linux machines)
+  - added support for GrayScale/StaticGray displays (completely untested)
+  - made linked lists smarter, they can now have as many iterators assigned to
+    them as you want... no more FATAL errors
+  - added the Netizen class, which is a client that has 
+    _BLACKBOX_STRUCTURE_MESSAGES listed in their WM_PROTOCOLS... these clients
+    get notified of window add, remove, focus, shade, iconify, maximize,
+    resize, etc.
+
+    the two most common Netizens are bbpager and bbkeys
+  - when loading an incomplete style, blackbox now uses default colors to
+    draw decorations (instead of the annoying "see-through" effect)
+  - added menu tag [config]... which inserts the Configmenu into your rootmenu
+  - made [include] handling smarter, it will only read regular files (it
+    won't read a directory in case you ever accidentally put one there)
+  - the slit and toolbar menus now include a placement option, which will place
+    them in various positions on the screen
+  - included a slit menu option to choose it's direction (horizontal or
+    vertical)
+  - added options to the slit and toolbar menus to have them always stacked
+    above other windows
+  - right clicking on the workspace label no longer initiates a workspacename
+    edit... right clicking anywhere on the toolbar brings up the toolbar menu,
+    which has an entry that lets you change the workspace name
+  - iconified windows no longer show up in the window list for the current
+    workspace... just in the icon submenu
+  - ClickToFocus now works like one would think, clicking anywhere in a window
+    will focus it
+  - overall... this version of blackbox has and does alot more than previously
+    just take it for a test drive and see how well you like it
+
+
+Changes from 0.50.5 to 0.51.0:
+  - new default theme, shows off new gradients (see below)
+  - many themes updated to show off new menu bullet configuration
+  - added new source file Display.cc... it offers an easy way to connect to
+    an X display and setup screen info, this was done to make life easier
+    for John Kennis, the author of the bbtools.  Image.cc and Image.hh have
+    been modified to use classes from this abstraction, so that drop in
+    replacements are all that is necessary to update the bbtools image code.
+  - configurable menu bullet... 2 new resources for in your style file:
+
+        menu.bulletStyle:    (round|triangle|square|diamond|empty)
+        menu.bulletPosition: (left|right)
+
+  - new style resource for setting the borderWidth on menus, client windows and
+    the buttons/frame/handle/titlebar... the default theme uses a borderWidth
+    of zero... it's pretty neat
+  - udpated Image code... blackbox now supports 8 types of gradients (thanks
+    to mosfet@kde.org... in exchange for helping him get the diagonal gradient
+    code from blackbox into kde, kde gave me the source to their new gradients)
+    the 8 gradients are:
+
+        diagonal, vertical, horizontal, crossdiagonal, pipecross, elliptic,
+        pyramid, rectangle
+
+    use them just like you would normally (ie. raised elliptic gradient bevel1)
+  - merged John Kennis' patch for notifying KDE modules of windows that are
+    raised/lowered/activated(focused)
+  - new geometry window that is displayed when a window is moved/resized
+  - cleaned up code for detecting slit apps
+  - window stacking code changed to keep menus above windows, and to keep the
+    slit raised when the toolbar is raised
+  - fixed compiler error from gcc 2.95 about frame.frame in several places
+  - fixed some bugs with shaped windows that set decorations via MWM hints,
+    and also fixed bugs with such windows changing their shape
+  - more complete ICCCM compliance, default window gravity is now NorthWest
+    instead of Static...
+  - focus code revamped... window focusing is alot faster and simpler, i
+    mimicked the way TWM does it's focusing... proved much faster
+  - the window menu always has "Kill Client" as an option now
+  - fixed window stacking for windows that have multiple transients (like
+    netscape)
+  - smartplacement from 0.50.4 has been reinstated... i quickly grew tired of
+    waiting on windows to be placed with the old version (if you like the way
+    0.50.5 did it... send me an email and i'll consider making it an option)
+  - added some new signal handling code (using sigaction, if available on your
+    system)...
+  - fixed some bugs with KDE support... this makes bbpager behave properly
+  - workspace editing via the toolbar has been made a little nicer with the
+    new focus code... right clicking on the workspace label will put you into
+    edit mode, but no windows can be focused until you leave edit mode...
+    ALSO... the window that had focus when you entered edit mode will have the
+    focus returned to it after editing is finished
+  - added new option to blackbox... -rc <filename> will read <filename> instead
+    of .blackboxrc for it's base configuration
+  - the option for opaque window moves has been moved from the stylefile into
+    .blackboxrc... set the session.opaqueMove: resource to True or False,
+    depending on what you want
+  - general namespace cleanups... just stuff to make maintaining the code a
+    little easier...
+  - any form of "beta" has been removed from the version number for 0.51.x
+    i am declaring this series as "stable" so that i can begin a major overhaul
+    of blackbox, which will be done with John Kennis and Jason Kasper, two
+    very sharp guys that think the same way i do ;)
+
+
+Changes from 0.50.4. to 0.50.5:
+  - modified and merged some patches from several contributors.  added their
+    names to AUTHORS
+  - major documentation updates
+  - added a few more platform success reports.  changed development platform
+    again :)
+  - added new texture option: Interlaced... it is an extension to the gradient
+    texture that looks really neat... it is compiled in by default but may
+    be removed with --disable-interlace
+  - let's see... where do i begin... the code for 0.51.x has been GREATLY
+    enhanced over 0.50.4 (and the stupid little compile error for KDE has been
+    fixed ;))  Blackbox has undergone major renovation... and i can proudly
+    say that this release is rock solid.  Also, i reinstated ccmalloc's tour
+    of duty, and spent several days with it stomping memory leaks in blackbox.
+    i can proudly say that there are no major memory leaks present in 0.51.x
+  - the toolbar has changed it appearance a little bit... the menu button has
+    been removed and the labels and buttons are now symmetrically placed on the
+    toolbar...  oh no!? how do you get to your icons/workspaces now?  the
+    middle click patch from Greg Barlow has been modified, enhanced and merged
+    with 0.51.x... the workspace menu now behaves just like the root menu...
+    and it can be pinned to the root window (just move it)
+  - the image code has once again been worked over... this time a local LUG
+    friend and i have hashed it out many times and into the wee hours of the
+    morning... this stuff is FAST now... before i added interlacing... we
+    had doubled the speed of the dgradient function... yes... *doubled*
+  - the code to generate error tables, color tables and other tables that are
+    used in image dithering has been rewritten, which severs the last tie to
+    window maker's wrlib that blackbox had.  i now understand why and how all
+    the code that i "borrowed" works... and it's been improved... because of
+    this change... dithering is a lot cleaner... and dithering on 8bpp displays
+    is less grainy and less obtrusive...
+  - the linked list code has also been rewritten... blackbox has been using
+    a doubly linked list, and not taking advantage of all the list's
+    capabilities (because it doesnt need them)... so the linked lists are now
+    single-link and much quicker at inserting, removing, searching...
+  - once again... the menu parsing code has been rewritten... this code is
+    very efficient and very extensible... so extensible infact that after
+    implementing the current menu syntax... i added a new tag! you can now
+    insert the workspaces list into your root menu with this:
+
+	[workspaces] (descriptive label)
+
+  - the slit menu is now spacially correct... if you want the slit in the top
+    right corner of the root menu... click the top right corner of the slit
+    menu... i think this is a little more user friendly
+  - window gravity should be better supported now... restarts and what not
+    shouldn't produce all those one pixel shifts or moves anymore...
+  - the modifiers for the keygrabs in blackbox are now configurable...
+    the "keys" are still hard wired (left/right for workspace changing, tab
+    for window cycling)... but you may now configure which modifiers to use
+    with the key combos...  this introduces two new resources into your
+    .blackboxrc:
+
+	session.workspaceChangeModifier
+
+    and
+
+	session.windowCycleModifier
+
+    these resources may be set to any combination of the following:
+
+	Control Mod1 Mod2 Mod3 Mod4 Mod5 Lock Shift
+
+    also... for convenience... "Alt" is parsed as "Mod1"...
+    session.workspaceChangeModifier defaults to "Control" and
+    session.windowCycleModifier defaults to "Mod1"
+  - smart placement has been made smarter thanks to Dyon Balding's smarter
+    placement patch... this patch has been modified from the original slightly
+    (mostly speed concerns)
+  - signal handling has been made more robust... this allows it to compile on
+    more platforms and now prefers to use sigaction() over signal()
+  - over all... many code clean ups were made and old commented code was
+    purged... this is a very clean very stable release... enjoy people :)
+
+
+Changes from 0.50.3 to 0.50.4:
+  - changed some Copyright information to include the current year
+  - added a number of platforms to the Supported Platforms section of the
+    README
+  - added the Slit... the Slit is a window maker dockapp util that lets users
+    use all of applications with Blackbox, and allows users to easily switch
+    between Window Maker and Blackbox more easily... it is included by default,
+    but you can remove it from the source with --disable-slit on your configure
+    command line
+  - large Brueghel styles and images removed from the base distribution
+  - merged a patch from Benjamin Stewart for very robust menu parsing... this
+    patch allows for parenthesis in menu files, and works well for
+    automatically generating menus from shellscripts and programs... the menu
+    syntax has not changed... it just is understood better :)
+  - added shell style tilde-slash (~/) home directory expansion for the
+    [include] and [style] tags in menu files
+  - added some sanity to window position/gravity code to for GTK applications
+  - added Window Maker style Mod1+MouseButton1+Motion window moving (for those
+    few braindead apps that like to be positioned where no decorations are
+    visible)
+  - added a SIGCHLD handler to clean up processes started by a startup script
+    that then exec's blackbox (gets rid of all those zombie processes)
+  - added a new resource to .blackboxrc which tells Blackbox where to put the
+    Slit... editing your .blackboxrc to change this is discouraged and
+    discarded, as the Slit has a menu that lets you select where to put it
+    (click any mouse button on the slit and see for yourself)
+  - fixed a bug in the workspace renaming feature that ate all Shift keypresses
+
+
+Changes from 0.50.2 to 0.50.3:
+  - few documentation updates
+  - fixes to let -lgen actually get linked with the executable (fixes compile
+    errors on some platforms, most notably, IRIX 6.5)
+  - a new series of styles has been added to the distribution (this accounts
+    for the increased size)
+  - fix to let 16 color servers run blackbox (colormap reduction)
+  - various bug fixes... numerous strncpy's changed to sprintfs...
+  - default font set internally to "fixed" (to let it run on servers that don't
+    have any fonts installed)
+  - fixed bug to let blackbox remove all but the last workspace (instead of the
+    last two)
+  - window gravity offset changes
+  - the default key grabs have changed... there are now 4: alt-tab,
+    shift-alt-tab, ctrl-alt-right, ctrl-alt-left... these keys perform
+    as would be expected
+  - fixed wire move bug for transient windows
+  - passified error handing for the main window class
+  - fixed gravity restore for restart/exit purposes
+
+
+Changes from 0.50.1 to 0.50.2:
+  - minimal KDE integration (configure/compile time option, turned off by
+    default).  This is unfinished and i can't really say if i ever will finish
+    it, but there is enough there to integrate the panel and other modules
+    with Blackbox.
+  - changed the regexp in building menus to use a comma (,) as the separator,
+    instead of a period
+  - various bug fixen (like the one where the window list would stay put after
+    the workspace menu went away)
+  - some hacks to improve speed in the LinkedList routines
+  - new stacking method (to better integrate with the KDE support)... windows
+    are no longer in different "levels", raising windows brings them ALL the
+    way to the front (so it's possible to obscure override redirect windows
+    like image splashes etc.) and lowering throws them ALL the way to the
+    back (even under kfm's icons)... however, the rootmenu and the toolbar
+    (if configured to be ontop) will be placed above raised windows
+  - sticky windows have changed due to the new stack implementation, they can
+    be anywhere in the stack (and not always ontop or onbottom)
+  - session.screenNUM.toolbarRaised resource has changed to
+    session.screenNum.toolbarOnTop
+  - the workspace label in the toolbar is sized a little more sanely now
+    (i found that it looks the best when the workspace label width == clock
+    label width)
+  - colormap focus now has it's own resource, session.colormapFocusModel, which
+    is set to "Click" by default, which means you have to click a window's
+    decorations or the root window to (un)install a colormap... setting this
+    resource to "FollowsMouse" will work just as it says... the window under
+    the pointer will have it's colormap installed
+
+
+Changes from 0.50.0 to 0.50.1:
+  - eliminated the need for XConvertCase... workspace editing should now print
+    any and all characters correctly
+  - added check for libgen.h (which provides the prototype for basename() on
+    some systems, like OpenBSD)
+  - some code obfuscation (i've been removing comments, as some of them don't
+    relate to some of the code below them... i plan on recommenting the code
+    some time soon)
+  - clicking button 3 will hide ANY menu now, and in the case of the workspace
+    and or client menus, any other menus and/or buttons associated will be
+    closed as well
+  - added a patch for multi-screen which sets the DISPLAY env variable so that
+    items selected from one screen don't show up on another... many thanks to
+    F Harvell <fharvell@fts.net> for this
+  - fixed a clock bug... again thanks to F Harvell for this one
+  - complete and proper window placement and window restore has been
+    implemented... windows that are partially off screen will be placed in the
+    center of the root window
+  - the toolbar's workspace label is now dynamically sized according to the
+    length of the workspace names
+  - as stated above... workspace name editing has been completely redone, i
+    discovered XLookupString() this weekend and have deemed it the function of
+    the week... any and all characters should be printed properly now
+  - window placement now has it's own resource...
+    session.screen<NUM>.windowPlacement which may be set to SmartPlacement
+    (which has been implemented) or anything else to default back to cascade
+    placement
+  - a new resource, session.screen<NUM>.toolbarWidthPercent has been added, and
+    should be set to an integer representing what percentage of the root window
+    width the toolbar should occupy (default has been changed back to 67)
+
+
+Changes from 0.40.14 to 0.50.0:
+  - added util/ subdirectory to place small, utility programs to use in
+    conjunction with blackbox.
+  - updated the README... it's still vague and useless, but gives a better
+    view of whats going on
+  - the configure script now checks for a few more headers, setlocale and
+    strftime in addition to basename functions to better include support for
+    multiple arch/langs/etc.
+  - updated default menu file... made it a little more general... and made
+    the default style menu [include]'d instead of explicitly included...
+    this break off of the style menu allows for custom menus to include the
+    default style menu for a create selection of styles
+  - changed all the default styles to use bsetroot instead of xsetroot
+  - menu handling has been improved... no more than one menu at a time may be
+    visible on the desktop (save for the root menu and it's tear off menus)
+    this means that you can't have multiple window menus and the workspace menu
+    open all at once... which saves screen space and reduces clutter
+  - much of the code has been reorganzied and reformatted for better
+    readability... this consists of function name changes and function
+    "ownership" (which basically means workspaces aren't managed by the toolbar
+    itself anymore, but by a general screen class on which the toolbar can
+    operate)
+  - the workspacemenu now autohides when selecting a window from one of the
+    window lists
+  - removed many empty destructors for Basemenu subclasses to improve code
+    readability
+  - two new files, Screen.cc and Screen.hh, have been added to the distribution
+    they add the new class BScreen which was needed for the biggest change of
+    the Blackbox code base, the addition of multiple screen (i.e. multihead)
+    support.  A separate BScreen is created for each screen, and all screens
+    work inconjunction with the other... windows can't be passed between
+    screens, because the X server doesn't allow this (more investigation on
+    this later)
+  - the toolbar's clock format is now controlled by the strftime() function...
+    if configure can't find this function on your system, the old date/time
+    format is used... with strftime, clicking on the clock doesn't display the
+    date... as the date may now be part of the clock display... read the man
+    page for the strftime function to write a format string for your clock,
+    and place it in .blackboxrc (i.e.
+      session.strftimeFormat: %I:%M %p on %a, %b %d is my strftime format
+    string)
+  - the toolbar has been stripped of it's workspace responsibilities, but this
+    change has no effect on the end user.
+  - common code interspersed through out the code has been consolodated into
+    small functions and called multiple times instead of having the same or
+    similar code repeated in the same class
+  - the window startup code has been improved upon again so that shaded windows
+    are restored between restarts
+  - some ICCCM code has been updated to properly reflect the state of windows
+    while shaded or on different workspaces... this state code change should
+    also fix the JX toolkit problem of deiconifying and nothing being redrawn
+  - the main Blackbox class has been changed to purely handle X events... it
+    doesn't manage resources (save for those necessary for proper event
+    handling, like the focus model for each screen)
+  - the format of .blackboxrc has changed slightly, the session.menuFile,
+    session.doubleClickInterval, session.imageDither, session.styleFile,
+    and session.colorsPerChannel resources are unchanged.  However, the
+    following resources are screen dependant:
+
+	session.screen<num>.strftimeFormat
+	session.screen<num>.workspaces
+	session.screen<num>.workspaceNames
+	session.screen<num>.toolbarRaised
+	session.screen<num>.focusModel
+
+    where <num> is the screen number (zero being default and all that would be
+    present on a single screen/monitor setup).
+  - a utility named bsetroot (mentioned above) has been included in the
+    blackbox distribution, to aid in setting root window patterns (ala
+    xsetroot).  the only different between xsetroot and bsetroot is that
+    bsetroot doesn't redefine cursors, and doesn't restore defaults if no
+    arguments are given.  bsetroot does support multiple screens, and is ideal
+    for those setups (instead of running xsetroot for each screen)
+
+
+Changes from 0.40.12 to 0.40.13:
+	- added some compile time parameters to allow for clean compiling
+	- added support for vertical/horizontal maximization (i did this by
+	  hand, but kudos to John Martin for the idea ;)
+	- added basename() to the distribution... it will only be compiled in
+	  if basename is not present in standard libraries
+	- window focus code has changed yet again... i've decided to completely
+	  rewrite the focus handling code, instead of trying to fix it... let
+	  me know how this does
+	- a new resource has been added to the style loader... a resource of
+	  the form:  rootCommand: <shell command string> will execute this
+	  command when the style is loaded, suitable for setting the root
+	  window background to an image/pattern/color... this should make
+	  style integration more seamless
+
+
+Changes from 0.40.11 to 0.40.12:
+	- more migration to autoconf/automake/autoheader etc.
+	- changed the default installation prefix... /usr/local is now the
+	  default... all default config files will be stored in
+	  ${prefix}/share/Blackbox... any old files will not be used, and
+	  should be removed
+	- a small internal rework has made the "Inverted" option for
+	  pressed button textures obsolete... please update your configs
+	- Makefile.generic has been removed
+	- Laurie's tear off menu patch has been adapted into the source tree...
+	  sorry Laurie, but i had to rework your patch to make it completely
+	  bullet proof ;)
+	- rework of Image code... resizes and maximizations should be much
+	  faster now
+	- existance of XConvertCase is checked by configure... if it is NOT
+	  found, then when editing the workspace name, pressing shift will
+	  not print capital letters... sorry... get an uptodate X distribution
+	  (R6.3 or higher) so that XConvertCase exists...
+	- the date format on the clock is controlled by a new .blackboxrc
+	  resource... session.dateFormat... accepted values are:
+		American ( mm/dd/yy )  and
+		European ( dd.mm.yy )
+	  the default is american... if any other string is entered for the
+	  resource, blackbox defaults again to american...
+	- changed some window positioning code so that windows aren't thrown
+	  to the middle of the screen unless they are completely hidden when
+	  shown
+	- time bugs have been fixed... this is too detailed to go into... so
+	  read the source if you are curious, otherwise just hit Reconfigure
+	  when ever you change the system time, and blackbox will update and
+	  continue to monitor/display the correct time (also... wrt y2k...
+	  blackbox is y2k compliant is your libc's localtime() is y2k
+	  compliant)
+	- this release has a major internals rework... let me know of any
+	  problems... i would also love to hear about improved/degraded
+	  performance... enjoy people... 
+
+
+Changes from 0.40.10 to 0.40.11:
+	- changed the blackbox distribution to use autoconf instead of
+	  imake... let me know how this works
+	- removed all the Imakefiles and Imakeconfig in favor of autoconf...
+	- added necessary files for automake and autoconf
+	- fixed a bug that would automatically shift focus to the workspace
+	  label after switching to an empty workspace which would edit the
+	  workspace name if pressing ctrl-arrow...
+	- fixed a bug that wouldn't focus any windows with alt-tab after
+	  switching workspaces
+	- new feature:  click button 1 on the clock to display today's date
+	  releasing the mouse button redraws the current time
+	- implemented double-click window shading by adapting David Edwards'
+          <david@dt031n1a.tampabay.rr.com> shade patch
+	- added new .blackboxrc resource - session.doubleClickInterval - which
+	  controls the time between double clicks... used by the double-click
+	  shade feature... defaults to 250ms is not specified
+
+
+Changes from 0.40.9 to 0.40.10:
+	- fixed the broken menu highlights - they are now a dot in front of
+	  the menu label
+	- enhanced the image rendering code to prebuild dithering lookup
+	  tables... this saves some multiply and divide instructions during the
+	  rendering loop... it makes a noticable difference on my lowly p133 ;)
+	- just for completeness... i've added some error output for various
+	  things that could (but rarely do) go awry
+	- the focus code has been updated yet again... but this time it's for
+	  the better ;)  the ctrl arrow keys continue working after a window
+	  has been closed etc. etc... this should be the final change... unless
+	  i find more bugs in it
+
+
+Changes from 0.40.8 to 0.40.9:
+	- fixed a menu bug to keep as much of the menu on screen as possible
+	- added a patch from Peter Kovacs <kovacsp@egr.uri.edu> to raise the
+	  current focused window when the user clicks on the window label on
+	  the toolbar
+	- changed some window gravity defaults... nothing major here
+	- focus handling code has been spruced up... and majorly tested...
+	  0.40.8's focus code was about as good as a full tank of gas but
+	  no corvette... let me know how the focus handles in 0.40.9
+
+
+Changes from 0.40.7 to 0.40.8:
+	- more menu fixes... highlights are handled as normal... constant
+	  highlights are draw differently... the rounded edges minus the
+	  highlighted bar...
+	- hand strength reduction in the BImage::renderXImage() method...
+	  this doesn't offer much of a speed up... but every little bit
+	  counts
+	- stuck clients that open transients now have their transients stuck
+	  by default
+	- changed some input focus code to better handle the sloppy focus
+	  model... the little annoyances like two focused windows should now
+	  be fixed...
+	- removed gcc specific code... changed use of strsep to strtok (which
+	  is defined by ANSI C)
+	- this is strictly a maintainence release... no new features have
+	  been introduced
+
+
+Changes from 0.40.6 to 0.40.7:
+	- changed bhughes@arn.net to bhughes@tcac.net throughout the source
+	  tree
+	- menu sanity fixes... like unmapping a submenu when an item is removed
+	- image code fixes... no memory is allocated during the rendering...
+	  only when the BImage is created... thanks to lee.salzman@lvdi.net for
+	  the frame work for these changes
+	- fewer floating point division in gradient rendering routines... again
+	  thanks to lee.salzman@lvdi.net for the basis of these changes
+	- reading workspace names is now a little more robust, but probably not
+	  bullet proof... events are handled normally while reading the
+	  workspace name... instead of blocking them all... the label changes
+	  color... and reverts back to normal when enter is pressed (which
+	  applies the new workspace name)
+	- the window geometry label drawn during window resizing has moved to
+          inside the window frame, this allows us to see what size windows are
+	  being resized to when the right edge is close to the edge of root
+	- a lock system has been implemented for the blackbox objects... this
+	  fixes a nasty little problem of stale windows (decorations with no
+	  client window) because of on object grabbing the server and another
+	  unlocking it... the current system works similar to XLockDisplay
+	  (which is used in threaded X programs).
+	- icccm code enhancements for XWMHints and NormalHints
+	- window maximizing now properly returns the maximized client to its
+	  previous location (this is a bug fix... maximize netscape, then
+	  maximize an xterm... unmaximizing netscape will put it where the
+	  xterm was previously)
+
+
+Changes from 0.40.5 to 0.40.6:
+	- the workspace and client menus now keep the current workspace and
+	  focus window highlighted so that we know which window is in focus
+	  (especially useful with multiple xterms in the same workspace)
+	- image dithering code has been updated slightly to hopefully squeeze
+	  every last drop of performance out of it
+	- pixel computation has been simplified
+	- gradient code has been changed to use less floating point division
+	  this breaks Jon Denardis' gradient hack, but the option has been
+	  left in place in case Jon wants to re-implement it :)
+	- more ICCCM compliance code added... window colormap focus has a
+	  click-to-focus policy... any window that wants to use it's own
+	  colormap (i.e.  netscape -install) will have it's colormap installed
+	  when button1 is pressed anywhere on the decorations (like when
+          raising)  the default root colormap is reinstalled when pressing
+	  button1 on the root window
+	- workspace names can now be changed on the fly... they are stored in
+	  the users ~/.blackboxrc file, and may be edited from there, although
+	  any changes made to the file will be over written when blackbox is
+	  shutdown or restarted...
+	- workspace names can be edited *while blackbox is running* by pressing
+	  button3 on the workspace label on the toolbar... pressing enter ends
+	  the edit and normal event processing resumes... these names are saved
+	  on exit/restart for convienence
+	- support for window gravity has been added... this is addition is
+	  another step closer to complete ICCCM compliance
+	- window resizing is a bit more sane now... a bug once pointed out long
+	  ago that i never noticed plagued me the other day... when resizing a
+	  window to a large size... blackbox can delay a bit while it renders
+	  the new decorations... if the user tries to move the window before
+	  these decorations are finished... the window is resized again... this
+	  has been fixed
+
+
+Changes from 0.40.4 to 0.40.5:
+	- updated the default style to reflect the button resource change in
+	  0.40.4
+	- added internal menu alignment
+	- added internal linked list insertion at a certain point, used in
+	  menus
+	- submenus now update their parent menu to reflect that the submenu
+	  is no longer open
+	- right clicking anywhere on the rootmenu or window menus will now
+	  unmap them... NOTE: this doesn't work on submenus or the rootmenu
+          or on the SendToWorkspaceMenu
+	- cleaned up some of the image rendering code to use less comparisons
+	  while rendering an image... also removed alot of
+          multiplication/division use in beveling loops to increase speed
+	- changed dithering error distribution to make images smoother at
+	  15 and 8bpp (8bpp got the most benefit from this change)
+	- changed the toolbar appearance... removed the raise/lower button,
+          changing the level of the toolbar isn't possible as of yet... a new
+	  button has been added on the left of the toolbar, pressing it will
+	  map the workspace menu, which has a few changes
+	- the workspace menu now conatins submenus of all the window lists of
+	  all workspaces... it is now possible to see which window is on which
+	  workspace... also... the icon button has been removed from the
+	  toolbar and the iconmenu is now a submenu of the workspace menu
+	- window placement has been slightly modified... if clients request a
+	  certain position, the request is honored, otherwise the client is
+	  cascaded... if either the cascade or requested position obscures part
+	  of the window when the window is created, the window is centered in 
+	  the root window...
+	- window state updated... when blackbox is restarted, all client
+	  windows are placed on the workspace they were previously occupying...
+	  this is only between restarts... not when X is restarted...
+	  however... applications may be coded specifically for blackbox to
+	  start on a certain workspace... for more information on this, email
+	  me
+	- window menu placement has been made a little more sane
+
+
+Changes from 0.40.3 to 0.40.4:
+	- removed the window.handle{.color,.colorTo} resources... the handle
+	  is now treated as a button, and uses the button resources
+	- added window.focus.button and window.unfocus.button resources to the
+	  style file... this allows colors to be set different from the
+	  titlebar... the colors are controlled with window.focus.button.color,
+	  window.focus.button.colorTo, window.unfocus.button.color and
+	  window.unfocus.button.colorTo
+	- transient focus policy has changed... if any window has an open
+	  transient window... focus is awarded to the trasient instead of the
+	  parent window, even if the mouse doesn't occupy the trasient window
+	- cleaned up some namespace in Basemenu.cc and Basemenu.hh
+	- changed dithering error diffusion
+	- fixed Bevel2 so that it doesn't sig11 anymore
+	- changed stacking code slightly... "stuck" windows now are placed
+	  in relation to the toolbar... i.e. if the toolbar is on top... stuck
+	  windows are on top of any other client windows... if the toolbar
+	  is underneath client windows... stuck windows are also stacked
+	  underneath the client windows
+	- major reworking of Window.cc and Window.hh to fully support the
+	  _MOTIF_WM_HINTS on client windows... if this hint is present... then
+	  the window is decorated according to those hints... all the move/
+	  resize/configure code had to be updated because of this... one step
+	  closer to gnome compliance
+	- window menus now contain different items based on the functions
+	  available to the client window... if a window cannot be maximized...
+	  then no maximize item is present in the window menu... also, "Close"
+	  and "Kill Client" are no longer present at the same time... if the
+	  client supports the WM_DELETE_WINDOW Protocol, then "Close" is
+	  present, "Kill Client" is only present for clients that do not
+	  support the protocol
+	- windows may now be moved by the titlebar, handle or thin border
+	  around the window... window menus are also accessible by pressing
+	  button 3 on any of these 3 windows
+	- a new focus model has been added... it works... but is mostly
+	  untested... session.focusModel: AutoRaiseSloppyFocus in .blackboxrc
+	  will retain the sloppy focus model... but raise windows to the
+	  top when focused...
+
+
+Changes from 0.40.2 to 0.40.3:
+	- fixed a bug in Blackbox::nextFocus that would put blackbox into an
+	  infinite loop when 2 windows where open, window 0 was iconified and
+	  window 1 had focus and pressing alt-tab or the next window button
+	  on the toolbar
+	- completely recoded all the graphics stuffs to support all visual
+	  classes and color depths, also the image code is more compact and
+          faster than previous releases
+	- removed graphics.cc and graphics.hh from the distribution and added
+	  Image.cc and Image.hh for the new graphics implementation.  a new
+	  class called BImageControl is now in charge of all pixmap caching
+	  and color allocation on displays that don't run/support TrueColor...
+	  this takes the job away from the Blackbox class... whose job is now
+	  to manage all it's children and disperse events read from the display
+	- fixed bug that didn't handle windows created before blackbox is
+	  running (again :/)
+
+
+Changes from 0.40.1 to 0.40.2:
+	- added a variable initialize line of code to keep blackbox from
+	  splattering from a sigsegv on startup
+
+
+Changes from 0.35.0 to 0.40.1:
+	- cosmetic menu rendering fixes, changed the way the submenu dot is
+	  sized; changed an off by one error in drawing the rounded edges;
+	  fixed the text to be draw in the center of the item instead of at the
+	  bottom
+	- major changes to the toolbar (formerly the workspace manager) to
+	  change the way it looks and works.  The large blank space is gone,
+	  and the toolbar is now half the height it used to be (roughly). the
+	  workspace label displays the current workspace, with the workspace
+	  menu accessible by clicking button 1 on the label. the two buttons
+	  directly to the right of the workspace label change the workspace
+	  when pressed. the window label displays the current focused window,
+	  which makes it easier to identify which window has input focus (for
+	  some people like me that have very dark or very closely colored
+	  decorations).  the window menu is accessible by pressing button
+	  one on the window label, and selecting an item from the window menu
+	  will set input focus to that window (if it can receive focus). the
+	  two buttons to the right of the window label circulate focus (up and
+	  down, respectively) through the window list, skipping windows that
+	  cannot receive focus.  the icon button displays a menu of all
+	  iconified applications.  both the icon menu and the window menu will
+	  not become visible if they are empty.  the next button on the toolbar
+	  is a raise/lower button for the workspace manager. the toolbar is
+	  stacked on startup according to the resource set in ~/.blackboxrc,
+	  but this button will raise and lower the workspace to the users
+	  desire, saving the stack order when blackbox is exited or restarted.
+	  the clock is still the same, but editing the session.clockFormat
+	  will change it from normal time (session.clockFormat: 12) to 24hour
+	  format (session.clockFormat: 24)
+	- a pixmap cache has been implemented. a linked list stores all images
+	  rendered, removing them from the list and freeing them with the X
+	  server when all applications have removed references to them. for
+	  those who start man instances of the same applications will benefit
+	  greatly from this, as the same decorations are not redraw for each
+	  and every window.  this greatly reduces the load on the X server
+	  (my X server went from taking 20-28mb of memory to 8-11mb, a dramatic
+	  improvement, especially on this 32mb machine).  as a result of this,
+	  reconfiguring is faster, as is startup and restarting.
+	- click to focus has been implemented, with some restrictions. other
+	  window managers allow the user to click anywhere on the decorations
+	  OR the client itself to set focus.  i have not found an elegant way
+	  to do this yet, so focus can only be set by pressing button 1 on
+	  the decorations (like the titlebar, handle, buttons, border, etc.)
+	  just not on the client itself.  i am looking more into this, but
+	  don't expect anymore than what is in place now.  to use
+	  click-to-focus, put session.focusModel: ClickToFocus in ~/.blackboxrc
+	- 2 new commands have been added to the menu syntax, [include] and
+	  [style]... the [reconfig] command still has the option to reconfigure
+	  after a command has been run, but probably will be faded out...
+	  [include] (/path/to/file) includes the file inline with the current
+	  menu, meaning that a submenu isnot created for the separate file,
+	  if a submenu is desired, the file should include the [submenu] and
+	  [end] tags explicitly.
+	  [style] is a new addition for the style file support. syntax is:
+	  [style] (label here) {/path/to/style/file} which will read the new
+	  style file and reconfigure when selected.
+	- style files have been added to allow for easier switching between
+	  configurations.  the style file resources are dramtically different
+	  from those in 0.3x.x, see app-defaults/Blackbox-style.ad for an
+	  example...
+	- with the addition of style files, menus have been given their own
+	  justification resource, allowing (for example) menus to be left
+	  justified while titles are center or right justified.
+	- please read the sample configuration files in app-defaults/ for the
+	  new and improved configuration system.  NOTE: Blackbox.ad is a
+	  sample ~/.blackboxrc, but you shouldn't copy this file to
+	  ~/.blackboxrc, as Blackbox will store the resources it needs
+	  automatically
+	- an unofficial release numbered 0.40.0 was given out to some 
+	  testers, and even this release needs the same treatment as 0.35.0
+          with respect to the new config system (0.40.0 only implemented the
+          pixmap cache, the new toolbar and *part* of the new config system,
+          but not the style files or automatic generation of ~/.blackboxrc)
+
+
+Changes from 0.34.5 to 0.35.0:
+	- changed the way menus are draw to round both end of the highlight...
+	- cosmetic enhancements for the various justifications...
+	- this is the first stable release of blackbox
+
+
+Changes from 0.34.4 to 0.34.5:
+	- hopefully... this will be the last bug fix... so i can begin working
+	  on new features... i fixed event mask selection on client windows
+	  after reparenting them to the decoration frame... this should get
+	  xv working again...
+	- changed the signal hander to core on sigsegv and sigfpe... sigint and
+	  sigterm will just exit blackbox cleanly... sighup will cause blackbox
+	  to reconfigure itself
+	- changed the way the version string is printed... 
+
+
+Changes from 0.34.3 to 0.34.4:
+	- changed the window stacking code to stack windows and their menus
+	  more sanely... window menus are stacked directly ontop of the client
+	  windows... instead of on top of every other client window... the
+	  workspace manager is now by default stacked above client windows...
+	- reworked alot of code in Window.cc, blackbox.cc, Workspace.cc and
+	  WorkspaceManager.cc to properly handle ICCCM state hints... the
+	  startup and shutdown code has been completely reworked as a result of
+	  this
+
+Changes from 0.34.2 to 0.34.3:
+	- this was a small change in the code... but a BIG change for the user
+	  base... the X error handler is now non fatal... yes... this means if
+	  blackbox encounters an X error (like a bad window or a bad match) it
+	  will fprintf() the error and continue running... the quick window bug
+          has been mostly fixed... i have a small app that i wrote that quickly
+	  maps a window, calls XSync()... then destroys the window and exits...
+	  the first time i ran this little beauty... blackbox died a horrible
+	  death... blackbox now handles this app nicely... but does
+	  occasionally report an error (during the decoration creation... which
+	  is promptly destroyed from the destroy notify event placed in the
+	  queue by the X server... thus... no memory leaks... no memory
+	  corruption... blackbox just keeps chugging along nicely
+
+
+Changes from 0.34.1 to 0.34.2 (unreleased):
+	- fixed MSBFirst byte order image rendering at 32bpp (24bpp pending)
+          (for machines better than this intel machine of mine)
+	- changed BImage to allocate dithering space when the image is created
+	  and to delete it when the image is destroyed... instead of allocating
+	  the space and deleting the space each time the image is rendered to 
+	  an XImage... hopefully this will provide a speed increase (albeit a
+	  small one)
+	- changed blackbox to call XListPixmapFormats once at startup...
+	  instead of each time an image is rendered... this should afford some
+	  speed increase (a small one at best :)
+	- fixed a bug in Window.cc that re-reads the window name...
+          Jon Denardis discovered this bug while playing with netscape 4.5...
+          the validation call is now directly before the XFetchName call...
+          instead of before an if() { } block that calls strcmp and XFree()
+	- edit Window.cc to change the way buttons are decorated and sized
+	  the associatedWindow.button.color(To) resources have been removed,
+          but the associatedWindow.button texture resource is still there
+
+
+Changes from 0.34.0 to 0.34.1:
+	- fixed the unmanaged rxvt/xconsole/whatever problem that didn't
+	  decorate windows at start up... just a little logic error that was
+	  fixed with a few braces
+	- fixed the shutdown code so that X and blackbox don't die a gruesome
+	  death while reparenting the small applets on the workspace manager
+	  toolbar... the above bug fixed also fixed a bug that didn't reparent
+	  any existing app windows...
+	- updated libBox code to allow for flaws in it's design (forgotten from
+	  0.34.0)
+	- removed #include <sys/select.h> from blackbox.cc so that it compiles
+	  on any platform (since select is supposed to be defined in unistd.h)
+	- removed the NEED_STRNCASECMP block in blackbox.cc until i can get
+	  a working posix like routine to work (needed for OS2 platforms)
+	- edited the Imakefile scheme to have the the toplevel Imakefile and 
+	  Imakefiles in app-defaults/ lib/ and src/... there now is Imakeconfig
+	  which includes all the options in one file... so that editing all
+	  the Imakefiles is no longer necessary
+
+
+Changes from 0.33.6 to 0.34.0:
+	- edited some Imakefiles so that rpm creaters have an easier time
+	- added stuff to lib/  which contains a small (VERY small) library for
+	  letting applications open a window on the workspace manager toolbar
+	  this is very very new... restarting will cause the app to crash
+	  (at best) or take X with it (the worst)... play with it an let me
+	  know how it works
+	- further revised window.cc and blackbox.cc to provide better error
+	  checking... window.cc received the most updates... validating a
+	  window is now done in the statement before the window is used... not
+	  at the beginning of the function the window is used in...
+	- fixed the stacking order bug when changing workspaces... the windows
+	  will now be restored in the order that you left them... not in the
+	  order they were created in...
+	- updated the README... a little bit anyway :)
+	- updated BlackboxWindow::maximizeWindow() in window.cc to properly
+	  maximize windows that have specified size increments
+	- fixed BlackboxWindow::configureWindow so that shaded windows that re
+	  size themselves only resize the titlebar
+	- added ccmalloc 0.2.3 to the main source tree to aid in debugging...
+	  this is NOT maintained by myself, see the source tree for details
+	- eliminated a double delete call with the aid of ccmalloc!@#!
+	
+
+Changes from 0.33.5 to 0.33.6:
+	- added Makefile.generic for those of you with foobared imake configs.
+	  the use of xmkmf -a (i.e. imake) is still prefered... but this should
+	  work on any system... with a little editing
+	- added static int handleXErrors(Display *, XErrorEvent *) in
+          blackbox.cc to handle any and all X lib errors while blackbox is
+	  running... this should produce a coredump and thus the -moron
+	  community should be able to flood my inbox with stack trace upon
+	  stack trace :)
+	- added some sub directories and moved the sources around, this allows
+	  for easier inclusion of the library for blackbox specific programs
+	  (which will run in the dock)
+	- hopefully fixed the "disappearing-rxvt-trick"... since i can't
+	  reproduce it i don't know for sure
+	- removed the use of alloca in graphics.cc... i was noticing very odd
+	  behaviour from malloc() and free()... where blackbox would sig11 
+	  when exiting because of XCloseDisplay doing something naughty...
+	  and this seems to have done the trick... no more sig11's from malloc
+	  or new... everything i've thrown at blackbox is gently but firmly
+	  beaten into submission...
+	- added docboy's curved gradient hack as a compile time option... see
+	  src/Imakefile and src/graphics.cc
+
+
+Changes from 0.33.4 to 0.33.5:
+	- added a small test to cascade windows that start out partially hidden
+	  (like netscape, Xnest, xv, etc.)
+	- changed icon handling to include a menu of icons accessible from the
+	  workspace manager toolbar
+	- deiconifying a window now takes it to the top of the stack
+	- clicking on a menuitem that has a submenu no longer hides the submenu
+	- added resource "workspaceManager.24hourClock",  a value of True turns
+	  on the 24hour clock on the toolbar
+	- removed icon pixmap/window/mask support/handling from window.cc and
+	  window.hh... since icons are now handled in a menu, this is no
+	  longer needed
+	- added session.handleWidth and session.bevelWidth
+	  to control window sizes (instead of hardcoded defaults)
+	- changed parts of Basemenu.cc and WorkspaceManager.cc to follow the
+	  sizes set by session.bevelWidth
+	- fixed Alt-Tab window switching... also fixed some focus handling bugs
+	  which let two windows become focused at the same time (which is bad
+	  mojo)
+
+
+Changes from 0.33.3 to 0.33.4:
+	- corrected a typo in the sample Blackbox.ad file to correctly show
+	  which resource to set for the menu file
+	- added moderate window group support for programs like netscape and 
+	  other motif applications... modified window stacking code and
+	  internal list code to support window groups (this makes transients
+	  behave properly... another step towards more complete ICCCM
+	  compliance)
+	- modified focus event handlers to stop applications from focusing out
+	  when pressing menubars... also window focus is returned to root if 
+	  the focus window is closed... if another window is under the focus
+	  window when it is closed... that window is awarded input focus
+	- fixed tiny little bug that didn't move the close button when resizing
+	  a window
+
+
+Changes from 0.33.2 to 0.33.3: 
+	- changed some of the menu code ("updated" in 0.33.1) back to the
+	  original 0.33.0, which seems to perform better.  Reason behind it? -
+	  blackbox died too often with 0.33.1/2
+	- added "Kill Client" option to window menus... for those applications
+	  that don't accept the WM_DELETE_WINDOW atom
+	- menus that are not partially moved off the root window are shifted to
+	  a visible position when the pointer enters the frame... it is also
+	  shifted back to it's original position when left (this is new... let
+	  me know how it works)
+
+
+Changes from 0.33.1 to 0.33.2: (unreleased)
+	- changed BlackboxIcon to not try and read its config when it was
+	  created.  This was forgotten from the 0.31.0 -> 0.33.0 move :/
+
+
+Changes from 0.33.0 to 0.33.1: (unreleased)
+	- improved menu handling, less possibilty for SIGSEGV
+	- menus now make copies of all label, exec strings and titles, to
+	  make less loose pointers
+	- fixed typo to allow submenus of submenus of submenus (...)
+	- fixed workspace menu and window list menu placements
+
+
+Changes from 0.31.0 to 0.33.0:
+	- added #ifdef statements so the C preprocessor doesn't complain about
+	  _GNU_SOURCE being redefined.
+	- changed internal resource data structures
+	- added Sticky windows functionality
+	- remove old animation code bound with #ifdef ANIMATIONS
+	- fixed a silly little bug that sometimes mapped a submenu when its
+	  parent was unmapping itself
+	- added ExecReconfigure option to execute a shell statement before
+	  performing reconfiguration
+	- rearranged window config code to reduce wait time while resizing
+	- added internal macro BImageNoDitherSolid to make window frame
+	  rendering faster (dithering a solid image is silly anyway)
+	- added new menu file format
+	- added Blackbox::validateWindow to provide a stabler environment for
+	  Blackbox.  This gives blackbox more error checking and greater
+	  stability.  For me, random crashes have (nearly) disappeared.
+	- removed window name/class dependant frame texture/color
+	- with 0.31.0, each entity read it's configuration from the rc database
+	  loaded at start.  this has changed back to the old behaviour of
+	  reading all configuration parameters at start, no database reads are
+	  performed after the initial setup (save for reconfiguring).
+	- configuration has changed to be a little cleaner, and a little more
+          thorough.  See the Blackbox.ad and BlackboxMenu.ad for exmaples.
+

@@ -1,0 +1,152 @@
+
+style.name:	frobust
+style.author:	miklos
+style.date:	Tue, 03.05.02
+style.credits:	
+style.comments:			frobust!
+		
+
+rootCommand:	bsetroot -mod 4 4 -bg "#4c4c4c" -fg "#3c3c3c"
+
+! Toolbar settings...
+toolbar.button:	Flat Gradient Vertical
+toolbar.button.color:	#4c4c4c
+toolbar.button.colorTo:	#414141
+toolbar.button.picColor:	#d7e0ee
+
+toolbar.button.pressed:	Sunken Bevel1 Gradient Diagonal
+toolbar.button.pressed.color:	#484848
+toolbar.button.pressed.colorTo:	#73787e
+
+toolbar.label:	Flat Gradient Vertical
+toolbar.label.color:	#4c4c4c
+toolbar.label.colorTo:	#414141
+toolbar.label.textColor:	#d7e0ee
+
+toolbar.windowLabel:	Sunken Bevel1 Gradient Vertical
+toolbar.windowLabel.color:	#aab0b9
+toolbar.windowLabel.colorTo:	#73787e
+toolbar.windowLabel.textColor:	#000000
+
+toolbar.clock:	Flat Gradient Vertical
+toolbar.clock.color:	#4c4c4c
+toolbar.clock.colorTo:	#414141
+toolbar.clock.textColor:	#d7e0ee
+
+toolbar:	Raised Bevel1 Gradient Vertical
+toolbar.color:	#4c4c4c
+toolbar.colorTo:	#414141
+toolbar.textColor:	#d7e0ee
+!toolbar.font: creep
+toolbar.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
+toolbar.justify:	Center
+
+
+! Menu settings...
+menu.frame:	Raised Solid
+menu.frame.color:	#4c4c4c
+menu.frame.textColor:	#d7e0ee
+!menu.frame.font: creep
+menu.frame.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
+menu.frame.justify:	Right
+
+menu.title:	Raised Bevel1 Solid PipeCross
+menu.title.color:	#8d929a
+menu.title.colorTo:	#73787e
+menu.title.textColor:	#000000
+!menu.title.font: creep
+menu.title.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
+menu.title.justify:	Center
+
+menu.hilite:	Sunken Solid 
+menu.hilite.color:	#73787e
+menu.hilite.colorTo:	#ffffff
+menu.hilite.textColor:	#d7e0ee
+
+menu.bullet:	Triangle
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus:	Flat Gradient Vertical
+window.button.focus.color:	#4c4c4c
+window.button.focus.colorTo:	#414141
+window.button.focus.picColor:	#d8e0ee
+
+window.button.unfocus:	Flat Gradient Vertical
+window.button.unfocus.color:	#4c4c4c
+window.button.unfocus.colorTo:	#414141
+window.button.unfocus.picColor:	#686868
+
+window.grip.focus:	Raised Bevel1 Solid Vertical
+window.grip.focus.color:	#aab0b9
+
+window.grip.unfocus:	Raised Bevel1 Solid Horizontal
+window.grip.unfocus.color:	#4c4c4c
+window.grip.unfocus.colorTo:	#ffffff
+
+window.handle.focus:	Raised Bevel1 Solid Vertical
+window.handle.focus.color:	#8a8f96
+
+window.handle.unfocus:	Raised Bevel1 Solid Horizontal
+window.handle.unfocus.color:	#4c4c4c
+window.handle.unfocus.colorTo:	#ffffff
+
+window.label.focus:	Sunken Bevel1 Gradient Vertical
+window.label.focus.color:	#aab0b9
+window.label.focus.colorTo:	#73787e
+window.label.focus.textColor:	#000000
+window.label.focus.justify:	Center
+
+!window.font: creep
+window.font:	-Adobe-Helvetica-Medium-R-Normal--10-100-75-75-P-56-ISO8859-2
+window.justify:	Center
+window.label.unfocus:	Flat Gradient Vertical
+window.label.unfocus.color:	#4c4c4c
+window.label.unfocus.colorTo:	#414141
+window.label.unfocus.textColor:	#686868
+
+window.title.focus:	Raised Bevel1 Gradient Vertical
+window.title.focus.color:	#4c4c4c
+window.title.focus.colorTo:	#414141
+
+window.title.unfocus:	Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:	#4c4c4c
+window.title.unfocus.colorTo:	#414141
+
+window.button.pressed:	Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:	#484848
+window.button.pressed.colorTo:	#73787e
+
+window.frame.focusColor:	#73787e
+window.frame.unfocusColor:	#62666b
+handleWidth:	4
+frameWidth:	1
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#000000
+
+! ***** bbpager *****
+bbpager.frame:                          raised solid
+    bbpager.frame.color:                #484848
+
+bbpager.desktop:                        sunken Gradient Vertical bevel1
+    bbpager.desktop.color:              #4c4c4c
+    bbpager.desktop.colorTo:		#4a4a4a
+
+bbpager.desktop.focus:                  raised solid
+    bbpager.desktop.focus.color:        #4c4c4c
+
+bbpager.window:                         raised gradient vertical
+    bbpager.window.color:               #4c4c4c
+    bbpager.window.colorTo:             #414141
+
+bbpager.window.focus:                   sunken gradient vertical bevel2
+    bbpager.window.focus.color:         #aab0b9
+    bbpager.window.focus.colorTo:       #73787e
+
+bbpager.desktop.focusStyle:             border
+bbpager.active.window.borderColor:      #202020
+bbpager.inactive.window.borderColor:    #000000
+bbpager.active.desktop.borderColor:     #73787e
+

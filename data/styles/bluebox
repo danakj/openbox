@@ -1,0 +1,155 @@
+! Miscellaneous settings...
+style.name:	bluebox
+style.author:	miklos
+style.date:	Thu, Mar 21, 2002
+style.credits:	
+style.comments:			
+		
+
+rootCommand:	bsetbg -solid "#414b57"
+
+! Toolbar settings...
+toolbar.button:	Flat Gradient Vertical
+toolbar.button.color:	#46505d
+toolbar.button.colorTo:	#67788b
+toolbar.button.picColor:	#d7e0ee
+
+toolbar.button.pressed:	Sunken Bevel1 Gradient Diagonal
+toolbar.button.pressed.color:	#6a7482
+toolbar.button.pressed.colorTo:	#73787e
+
+toolbar.label:	Flat Gradient Vertical
+toolbar.label.color:	#414b57
+toolbar.label.colorTo:	#6a7b8f
+toolbar.label.textColor:	#d7e0ee
+
+toolbar.windowLabel:	Sunken Bevel1 Gradient Vertical
+toolbar.windowLabel.color:	#21354a
+toolbar.windowLabel.colorTo:	#406285
+toolbar.windowLabel.textColor:	#d7e0ee
+
+toolbar.clock:	Flat Gradient Vertical
+toolbar.clock.color:	#414b57
+toolbar.clock.colorTo:	#6a7b8f
+toolbar.clock.textColor:	#d7e0ee
+
+toolbar:	Raised Bevel1 Gradient Vertical
+toolbar.color:	#414b57
+toolbar.colorTo:	#6a7b8f
+toolbar.textColor:	#d7e0ee
+!toolbar.font:	gelly
+toolbar.font:	-*-lucida-medium-r-*-*-*-100-*-*-*-*-*-*
+toolbar.justify:	Center
+
+
+! Menu settings...
+menu.frame:	Flat Gradient Horizontal
+menu.frame.color:	#2c333b
+menu.frame.colorTo:	#6a7b8f
+menu.frame.textColor:	#becad4
+!menu.frame.font:	gelly
+menu.frame.font:	-*-lucida-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.frame.justify:	Left
+
+menu.title:	Raised Gradient Vertical
+menu.title.color:	#414b57
+menu.title.colorTo:	#67788b
+menu.title.textColor:	#8998ab
+!menu.title.font:	gelly
+menu.title.font:	-*-lucida-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.title.justify:	Center
+
+menu.hilite:	Sunken Bevel1 Gradient Horizontal
+menu.hilite.color:	#21354a
+menu.hilite.colorTo:	#406285
+menu.hilite.textColor:	#a8bed6
+
+menu.bullet:	Triangle
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus:	Flat Gradient Vertical
+window.button.focus.color:	#46505d
+window.button.focus.colorTo:	#67788b
+window.button.focus.picColor:	#d8e0ee
+
+window.button.unfocus:	Flat Gradient Vertical
+window.button.unfocus.color:	#46505d
+window.button.unfocus.colorTo:	#67788b
+window.button.unfocus.picColor:	#7e8c9d
+
+window.grip.focus:	Raised Bevel1 Solid Vertical
+window.grip.focus.color:	#46505d
+window.grip.focus.colorTo:	#ffffff
+
+window.grip.unfocus:	Raised Bevel1 Solid Horizontal
+window.grip.unfocus.color:	#3c4550
+window.grip.unfocus.colorTo:	#ffffff
+
+window.handle.focus:	Raised Bevel1 Solid Vertical
+window.handle.focus.color:	#46505d
+window.handle.focus.colorTo:	#ffffff
+
+window.handle.unfocus:	Raised Bevel1 Solid Horizontal
+window.handle.unfocus.color:	#3c4550
+window.handle.unfocus.colorTo:	#ffffff
+
+window.label.focus:	Sunken Bevel1 Gradient Vertical
+window.label.focus.color:	#21354a
+window.label.focus.colorTo:	#406285
+window.label.focus.textColor:	#d7e0ee
+!window.label.focus.font:	gelly
+window.label.focus.font:	-*-lucida-medium-r-*-*-*-100-*-*-*-*-*-*
+window.label.focus.justify:	Center
+
+!window.font:	gelly
+window.font:	-*-lucida-medium-r-*-*-*-100-*-*-*-*-*-*
+window.justify:	Center
+window.label.unfocus:	Flat Gradient Vertical
+window.label.unfocus.color:	#414b57
+window.label.unfocus.colorTo:	#6a7b8f
+window.label.unfocus.textColor:	#7e8c9d
+
+window.title.focus:	Raised Bevel1 Gradient Vertical
+window.title.focus.color:	#414b57
+window.title.focus.colorTo:	#6a7b8f
+
+window.title.unfocus:	Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:	#414b57
+window.title.unfocus.colorTo:	#6a7b8f
+
+window.button.pressed:	Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:	#6a7482
+window.button.pressed.colorTo:	#73787e
+
+window.frame.focusColor:	#73787e
+window.frame.unfocusColor:	#62666b
+handleWidth:	1
+frameWidth:	0
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#000000
+
+bbpager.frame:                          raised solid
+    bbpager.frame.color:                #515b67
+
+bbpager.desktop:                        sunken solid
+    bbpager.desktop.color:              #414b57
+
+bbpager.desktop.focus:                  raised solid
+    bbpager.desktop.focus.color:        #ffffff
+
+bbpager.window.focus:                  	raised gradient vertical
+    bbpager.window.focus.color:         #21354a
+    bbpager.window.focus.colorTo:       #406285
+
+bbpager.window:                  	flat gradient vertical
+    bbpager.window.color:         	#414b57
+    bbpager.window.colorTo:       	#6a7b8f
+
+bbpager.desktop.focusStyle:             border
+bbpager.active.window.borderColor:      #202020
+bbpager.inactive.window.borderColor:    #000000
+bbpager.active.desktop.borderColor:     #73787e
+

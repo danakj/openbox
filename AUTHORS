@@ -1,0 +1,81 @@
+Openbox authors/contributors:
+
+Project Maintainer:
+	Ben Jansens (ben@orodu.net)
+
+Developers:
+	Ben Jansens (ben@orodu.net)
+	Scott Moynes (smoynes@nexus.carleton.ca)
+
+Webmaster:
+	Please apply :)
+
+-==============================================================================-
+
+Openbox was previously known as Blackbox. Here are the authors/contributors
+from that era:
+
+Previous Maintainer:
+	Sean 'Shaleh' Perry <shaleh@debian.org>
+
+Previous Contributors:
+	Ben 'xOr' Jansens <xor@orodu.net>
+	- metric tons of code patches
+        John Kennis <jkennis@chello.nl>
+	- bbpager, ideas, and support
+        Jason 'vanRijn' Kasper <vR@movingparts.net>
+	- bbkeys, ideas, support
+	Chris Mecca <flip@linuxguide.org>
+	 - use of his irix machine for testing
+ 	Wilbert Berendsen <wbsoft@xs4all.nl>
+	 - man pages and dutch nls file
+	Luca Marrazzo <marra.luca@libero.it>
+	 - italian nls files
+	Ales Kosir <ales.kosir@telemach.net>
+	 - Slovenian man pages and nls
+	SATO Satoru <ssato@adachi.ne.jp>
+	 - Japanese nls and man pages
+	Jan Schaumann <jschauma@netmeister.org>
+	 - German nls support
+	Wang Tiejun <wtj@dept3.buaa.edu.cn>
+	 - Chinese nls support
+        Jeffrey Sean Connell <ankh@canuck.gen.nz>
+          - debugger class code (ommited from sources)
+        Frank Belew <frb@umr.edu>
+          - dgradient code
+        Scott Garner <mrfab@arn.net>
+          - suggestions, bug reports and beta testing (*the* beta moron)
+        David Doan <ddoan@usa.net>
+         - testing of 8bpp code
+        Mark Seward <illuzion@paradise.net.nz>
+         - beta testing, bug reports and 32bpp testing
+        Keith Bolland <prime@strip.net.nz>
+         - beta testing, bug reports and suggestions
+        James Spooner <spoons@xtra.co.nz>
+         - beta testing, bug reports
+        Fred Knieper <derf@tamu.edu>
+         - beta testing, bug reports
+        Steve Udell <hettar@teleport.com>
+         - beta testing, bug reports, questions (very good ones)
+        Gregory Barlow <barlowg@ncssm-server.ncssm.edu>
+        - bug reports and patches/suggestions (original middle click advocate)
+        Dyon Balding <dyon.balding@eng.monash.edu.au>
+        - patch for Smart(er)Placement window placement
+        Mike Cole <mike@mydot.com>
+        - co-author/hacker of Image.cc (local LUG buddy)
+        John Kennis <jkennis@chello.nl>
+        - author of bbtools/beta testing/bug reports
+	Wilbert Berendsen <wbsoft@xs4all.nl>
+	- author of blackbox/bsetroot manpages
+
+Second Author:
+        Jeff Raven <jraven@psu.edu>
+
+Original Author:
+        Brad Hughes <bhughes@trolltech.com>
+
+(Brad's original message):
+I would also like to thank the creators of WindowMaker.  Reading the existing
+code has helped me immensely, and the BImage class follows the RImage data type
+very closely (the 8bpp code and dithering code was based off of WindowMaker's
+wrlib).

@@ -1,0 +1,114 @@
+toolbar:			raised diagonal gradient bevel1
+toolbar.color:			rgb:7/8/8
+toolbar.colorTo:		grey20
+
+toolbar.button:			raised diagonal gradient bevel1
+toolbar.button.color:		grey
+toolbar.button.colorTo:		grey20
+toolbar.button.picColor:	black
+toolbar.button.pressed:		sunken diagonal interlaced gradient bevel1
+toolbar.button.pressed.color:	rgb:38/4/4
+toolbar.button.pressed.colorTo:	rgb:d/f/f
+
+toolbar.label:			flat interlaced diagonal gradient
+toolbar.label.color:		grey20
+toolbar.label.colorTo:		rgb:7/8/8
+toolbar.label.textColor:	grey85
+
+toolbar.windowLabel:		flat interlaced diagonal gradient
+toolbar.windowLabel.color:	grey20
+toolbar.windowLabel.colorTo:	rgb:7/8/8
+toolbar.windowLabel.textColor:	grey85
+
+toolbar.clock:			flat interlaced diagonal gradient
+toolbar.clock.color:		grey20
+toolbar.clock.colorTo:		rgb:7/8/8
+toolbar.clock.textColor:	grey85
+
+toolbar.justify:		center
+toolbar.font:			lucidasans-bold-10
+
+menu.title:			raised diagonal interlaced gradient bevel1
+menu.title.color:               grey20
+menu.title.colorTo:             rgb:7/8/8
+menu.title.textColor:           grey85
+menu.title.font:		lucidasans-bold-10
+menu.title.justify:		center
+
+menu.frame:			raised diagonal gradient bevel1
+menu.frame.color:		rgb:7/8/8
+menu.frame.colorTo:		grey10
+menu.frame.textColor:		white
+menu.frame.disableColor:	rgb:38/4/4
+menu.frame.font:		lucidasans-10
+menu.frame.justify:		center
+
+menu.bullet:			triangle
+menu.bullet.position:		right
+
+menu.hilite:			raised diagonal gradient bevel1
+menu.hilite.color:		grey60
+menu.hilite.colorTo:		white
+menu.hilite.textColor:		grey20
+
+window.title.focus:		raised diagonal gradient bevel1
+window.title.focus.color:	rgb:7/8/8
+window.title.focus.colorTo:	grey20
+window.title.unfocus:		raised diagonal gradient bevel1
+window.title.unfocus.color:	rgb:54/6/6
+window.title.unfocus.colorTo:	grey20
+
+window.label.focus:		interlaced sunken diagonal gradient bevel1
+window.label.focus.color:	grey20
+window.label.focus.colorTo:	grey
+window.label.focus.textColor:	white
+window.label.unfocus:		interlaced flat gradient
+window.label.unfocus.color:	grey20
+window.label.unfocus.colorTo:	rgb:54/6/6
+window.label.unfocus.textColor:	grey
+
+window.handle.focus:		raised diagonal gradient bevel1
+window.handle.focus.color:	rgb:7/8/8
+window.handle.focus.colorTo:	grey20
+window.handle.unfocus:		raised diagonal gradient bevel1
+window.handle.unfocus.color:	rgb:54/6/6
+window.handle.unfocus.colorTo:	grey20
+
+window.grip.focus:		raised diagonal gradient bevel1
+window.grip.focus.color:	grey
+window.grip.focus.colorTo:	grey20
+window.grip.unfocus:		sunken diagonal gradient bevel1
+window.grip.unfocus.color:	grey20
+window.grip.unfocus.colorTo:	grey
+
+
+window.button.focus:		raised diagonal gradient bevel1
+window.button.focus.color:	grey
+window.button.focus.colorTo:	grey20
+window.button.focus.picColor:	black
+window.button.unfocus:		sunken diagonal gradient bevel1
+window.button.unfocus.color:	grey20
+window.button.unfocus.colorTo:	grey
+window.button.unfocus.picColor:	grey40
+window.button.pressed:		flat diagonal interlaced gradient
+window.button.pressed.color:    rgb:38/4/4
+window.button.pressed.colorTo:  rgb:d/f/f
+
+window.frame.focusColor:	grey85
+window.frame.unfocusColor:	rgb:54/6/6
+
+window.font:			lucidasans-bold-10
+window.justify:			center
+
+! misc...
+borderColor:			rgb:1c/2/2
+
+borderWidth:                    1
+bevelWidth:			2
+handleWidth:			4
+
+rootCommand:			bsetroot -mod 4 4 -fg rgb:54/6/6 -bg grey20
+
+! for the bbtools
+menuFont:			lucidasans-10
+titleFont:			lucidasans-bold-10

@@ -1,0 +1,94 @@
+Installation instructions for Openbox:
+
+Compilation and Installation:
+--------------------------------
+   The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory in the
+Openbox source tree.
+
+Finally, it creates a shell script `config.status' that you can run
+in the future to recreate the current configuration, a file
+`config.cache' that saves the results of its tests to speed up
+reconfiguring, and a file `config.log' containing compiler output
+(useful mainly for debugging `configure').
+
+   If you need to do unusual things to compile Openbox, please try
+to figure out how `configure' could check whether to do them, and mail
+diffs or instructions to bhughes@tcac.net so they can be considered
+for the next release.  If at some point `config.cache' contains
+results you don't want to keep, you may remove or edit it.
+
+   The file `configure.in' is used to create `configure' by a program
+called `autoconf'.  You only need `configure.in' if you want to change
+it or regenerate `configure' using a newer version of `autoconf'.
+
+The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and type
+     `./configure' to configure the package for your system.  If you're
+     using `csh' on an old version of System V, you might need to type
+     `sh ./configure' instead to prevent `csh' from trying to execute
+     `configure' itself.
+
+     Running `configure' takes awhile.  While running, it prints some
+     messages telling which features it is checking for.
+
+  2. Type `make' to compile the package.
+
+  3. Type `make install' to install the programs and any data files and
+     documentation.
+
+  4. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.  To also remove the
+     files that `configure' created (so you can compile the package for
+     a different kind of computer), type `make distclean'. 
+
+
+Compilers and Options:
+----------------------
+   Some systems require unusual options for compilation or linking that
+the `configure' script does not know about.  You can give `configure'
+initial values for variables by setting them in the environment.  Using
+a Bourne-compatible shell, you can do that on the command line like
+this:
+     CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
+
+Or on systems that have the `env' program, you can do it like this:
+     env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+
+
+Optional Features:
+------------------
+Openbox supports the XShape extension of X11R6.  This support is enabled by
+default, but may be overridden by specifying `--disable-shape' on the configure
+script's command line.
+
+Openbox supports Window Maker dockapps (warning: restarts from wmaker to
+Openbox don't always handle dockapps correctly) with a gadget called the Slit.
+The Slit is compiled into Openbox by default, but may be overridden by
+specifying `--disable-slit' on the configure script's command line.
+
+Openbox supports a rendering effect called "faked interlacing" which darkens
+every other line in rendered images.  This support works only for gradient
+images.  It is compiled in by default, but may be overridden by specifying
+`--disable-interlace' on the configure script's command line. 
+
+Openbox provides an alternative rendering algorithm for dithering on
+pseudocolor (8 bit) displays. A noticeable pattern is visible when using
+this; it's a matter of taste whether this looks better than the default
+algorithm. It is disabled by default, but may be overridden by specifying
+'--enable-ordered-pseudo' on the configure script's command line.
+
+Openbox uses a timer which allows it to periodically flush its pixmap
+cache. It is enabled by default, but may be overridden by specifying
+'--disable-timed-cache' on the configure script's command line.
+
+Also, `configure' can usually find the X include and library files
+automatically, but if it doesn't, you can use the `configure'
+options `--x-includes=DIR' and `--x-libraries=DIR' to specify
+their locations.
+
+
+Please read the README file also.
+

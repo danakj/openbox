@@ -1,0 +1,2 @@
+* last focusd window is not updated when the window is closed while the focus
+  is on another workspace. This eventually can lead to a segfault.

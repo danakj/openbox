@@ -1,0 +1,183 @@
+README for bsetbg 1.xx
+
+####
+### introduction ###
+
+bsetbg is a shell script that is intended to provide a standard root image
+application for the Openbox window manager (although it will work under any
+other window manager as well). bsetbg acts as a wrapper both to bsetroot and to
+whatever application(s) you prefer to use for setting images on the root window.
+
+####
+### installation ###
+
+(o) copy the script to a directory in your path. 
+(o) chmod it to make it executable (chmod 755 /path/to/bsetbg).
+
+if you're lazy, do nothing. bsetbg will work out of the box for 99% of the
+population.
+
+if you're at least vaguely curious, run bsetbg in an xterm without any arguments.
+this way, you can watch what it does.
+
+if you're a "power user", read the 'configuration' section below.
+
+####
+### configuration ### 
+
+bsetbg reads it's configuration from ~/.bsetbgrc . if it can't find this file, it
+will search for a list of applications in the system path and use the positive
+matches to create it. if you would prefer for this not to happen, you can create
+your own config file using the included sample.config .
+~/.bsetbgrc should contain the following variables:
+
+CENTER=  application and arguments for centering an image on the root window
+FULL=    application and arguemnts for stretching/contracting an image to fill the root window
+TILE=    application and arguments to tile the root window
+DEFAULT= action to take place by default if none of the above have been specified.
+
+if you let bsetbg create the configuration file, the only applications that will
+be included in it are the ones that were found in your path. bsetbg will choose
+one of them to be the default and comment out the rest, so if you don't like what
+it chooses, edit the file and change the default values to whatever you like.
+
+####
+### usage ###
+
+** normal usage:
+
+  bsetbg -full|-tile|-center <image>
+
+running bsetbg without any arguments except the name of the image will cause it to
+set the image with the default values, which will vary from person to person. for
+the ultimate control over your theme, always tell bsetbg what you want it to do.
+
+
+** advanced usage: 
+if you use a certain program or set of arguments to achieve a particular effect 
+that goes beyond the scope of bsetbg's normal functionality, you can include the 
+application and its neccessary command line options after the -app flag:
+
+  bsetbg -app <application> <"command line options"> <image>
+
+here is an example in which bsetbg will try to run xv to center the image against
+a coloured background:
+
+  bsetbg -app xv "-rbg rgb:27/40/8b -root -rmode 5 -quit" <image>
+
+note that you MUST enclose the application's options in double quotes. if you
+don't, bsetbg will bail out and give you an error message.
+
+before bsetbg runs the command, it will check to make sure that the application
+(xv in our example) is present on the target system. if it's not, bsetbg will fall
+back to setting the image using the default values from the configuration. if you
+want to control what the fallback option will be, use either -center, -tile, or
+-full after the options for the application:
+ 
+  bsetbg -app xv "-rbg rgb:20/2b/32 -root -rmode 5 -quit" -center <image>
+
+in the above example, bsetbg will fall back to setting the image in centered mode
+if xv isn't available.
+
+
+** other usage:
+bsetbg can also be used in place of bsetroot. just give bsetbg the same arguments 
+that you would normally pass to bsetroot. example:
+
+  rootCommand:   bsetbg -gradient flatinterlaced -from rgb:46/51/5c -to rgb:34/3c/45
+
+  rootCommand:   bsetbg -solid SteelBlue
+
+
+** informational usage:
+'bsetbg -help' does what you'd expect it to.
+
+'bsetbg -info' will output information about bsetbg's current configuration
+values. use this when you're debugging an incorrect configuration.
+
+#### 
+### troubleshooting ### 
+
+this section is sort of an faq.
+
+(o) help! my background is messed up when i try to use a png image!
+
+if you are using xv, your version probably hasn't been patched to include png
+support. you have two options: 1), you can download the source and the patches and
+compile xv yourself (see the url at the end of this document), or 2), you can try
+to hunt down a binary version of xv that was compiled with the png patch.
+
+if you aren't using xv, then whatever it is that you are using is having a problem
+with png images. consult the documentation on it.
+
+
+(o) when i switch to a new Openbox style, the background doesn't change.
+
+most likely, there's an error with bsetbg. if you alt+f[1-5] to go back to your
+console, you can see bsetbg's error message. alternatively, run bsetbg from an
+xterm and look at its output.
+
+in most instances, there will be a problem with your config file. you can either
+try to fix it yourself, or you can rename your ~/.bsetbgrc to something else and
+then run bsetbg without any arguments in order to force the creation of a new
+configuration file.
+
+
+(o) when i try to set an image in full/tiled/centered mode, the image is not 
+    full/tiled/centered.
+
+you've probably given the values in the config file the wrong arguments for what
+they are meant to do. either let bsetbg create a new file (see above), or else
+read the "configuration" section if this document.
+
+
+(o) i'm a moron who can't be bothered to read your fine and well-written README.
+    can i email you with my stupid questions?
+
+don't even think about it.
+
+####
+### other stuff ###
+
+xv can be found at:
+   http://www.trilon.com/xv/downloads.html
+
+qiv lives at:
+   http://www.klografx.de/software/qiv.shtml
+
+xli can be found at:
+   http://pantransit.reptiles.org/prog/#xli
+
+display (part of ImageMagick) can be found at:
+   http://www.imagemagick.org/
+
+wmsetbg is a part of the Window Maker window manager. Window Maker can be found at:
+   http://windowmaker.org/
+
+Esetroot is a part of the Enlightenment window manager:
+   http://enlightenment.org/ 
+
+openbox homepage:
+   http://FILLMEINNOW/
+
+and lastly, bsetbg:
+   http://lordzork.com/blackbox/
+
+
+####
+### more other stuff ###
+
+many thanks are due to: 
+youngjun han, for the inspiration to do it in the first place 
+zak johnson, for invaluable suggestions 
+brad hughes, for help in debugging (not to mention, creating a smashing window 
+manager) 
+and last but not least, mycat, mr. man.
+
+send all comments/suggestions/constructive criticism/blueprints for futuristic
+weapons/etc to lordzork@lordzork.com 
+
+bsetbg has only been tested under linux. if it doesn't work on your system, email
+me the details and i'll try to fix it.
+
+copyright (C) 2000 by lordzork industries.

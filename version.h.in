@@ -1,0 +1,1 @@
+#define __openbox_version "@VERSION@"

@@ -1,0 +1,109 @@
+toolbar:			raised gradient vertical
+toolbar.color:			rgb:80/84/88
+toolbar.colorTo:		rgb:30/34/38
+
+toolbar.button:			raised gradient diagonal
+toolbar.button.color:		rgb:90/94/98
+toolbar.button.colorTo:		rgb:20/24/28
+toolbar.button.picColor:	white
+
+toolbar.button.pressed:		sunken gradient diagonal
+toolbar.button.pressed.color:	black
+toolbar.button.pressed.colorTo:	rgb:80/98/d0
+
+toolbar.clock:			sunken gradient diagonal
+toolbar.clock.color:		rgb:10/20/30
+toolbar.clock.colorTo:		rgb:70/80/90
+toolbar.clock.textColor:	white
+
+toolbar.label:			sunken gradient diagonal
+toolbar.label.color:		rgb:10/20/30
+toolbar.label.colorTo:		rgb:70/80/90
+toolbar.label.textColor:	white
+
+toolbar.windowLabel:		sunken gradient diagonal
+toolbar.windowLabel.color:	rgb:10/20/30
+toolbar.windowLabel.colorTo:	rgb:70/80/90
+toolbar.windowLabel.textColor:	white
+
+toolbar.justify:		center
+
+
+menu.title:			raised gradient diagonal
+menu.title.color:		rgb:90/94/98
+menu.title.colorTo:		rgb:20/24/28
+menu.title.textColor:		white
+menu.title.justify:		center
+
+menu.frame:			sunken gradient diagonal
+menu.frame.color:		rgb:10/20/30
+menu.frame.colorTo:		rgb:70/80/90
+menu.frame.textColor:		rgb:90/a0/b0
+menu.frame.justify:		center
+
+menu.hilite:			raised gradient diagonal
+menu.hilite.color:		rgb:90/94/98
+menu.hilite.colorTo:		rgb:20/24/28
+menu.hilite.textColor:		white
+
+menu.bullet:			empty
+menu.bullet.position:		right
+
+
+window.title.focus:		raised gradient vertical
+window.title.focus.color:	rgb:80/84/88
+window.title.focus.colorTo:	rgb:30/34/38
+window.title.unfocus:		raised vertical gradient
+window.title.unfocus.color:	rgb:50/54/58
+window.title.unfocus.colorTo:	black
+
+window.label.focus:		sunken diagonal gradient
+window.label.focus.color:	rgb:10/20/30
+window.label.focus.colorTo:	rgb:70/80/90
+window.label.focus.textColor:	white
+window.label.unfocus:		sunken gradient diagonal
+window.label.unfocus.color:	black
+window.label.unfocus.colorTo:	rgb:40/50/60
+window.label.unfocus.textColor:	rgb:60/64/68
+
+window.button.focus:		raised gradient diagonal
+window.button.focus.color:	rgb:90/94/98
+window.button.focus.colorTo:	rgb:20/24/28
+window.button.focus.picColor:	white
+window.button.unfocus:		raised gradient diagonal
+window.button.unfocus.color:	rgb:50/54/58
+window.button.unfocus.colorTo:	black
+window.button.unfocus.picColor:	rgb:70/74/78
+window.button.pressed:		sunken gradient diagonal
+window.button.pressed.color:	rgb:20/40/50
+window.button.pressed.colorTo:	rgb:60/70/80
+
+window.frame.focusColor:	rgb:40/44/48
+window.frame.unfocusColor:	rgb:20/24/28
+
+window.handle.focus:		raised gradient diagonal
+window.handle.focus.color:	rgb:70/74/78
+window.handle.focus.colorTo:	rgb:40/44/48
+window.handle.unfocus:		raised gradient diagonal
+window.handle.unfocus.color:	rgb:50/54/58
+window.handle.unfocus.colorTo:	black
+
+window.grip.focus:		sunken diagonal gradient
+window.grip.focus.color:	rgb:20/30/40
+window.grip.focus.colorTo:	rgb:60/70/80
+window.grip.unfocus:		sunken diagonal gradient
+window.grip.unfocus.color:	black
+window.grip.unfocus.colorTo:	rgb:30/40/50
+
+window.justify:			center
+
+
+borderColor:			black
+
+bevelWidth:			2
+borderWidth:			1
+handleWidth:			5
+
+rootCommand:	bsetroot -mod 4 4 -bg rgb:10/18/20 -fg rgb:30/38/40
+
+*Font:	-*-lucidatypewriter-medium-r-*-*-*-100-*-*-*-*-*-*

@@ -1,0 +1,54 @@
+Openbox TODO list:
+
+* add asserts all throughout the code to catch bugs.
+
+* new configuration class which handles the X db, with better functionality.
+  i.e. make changes in the configuraiton save instantly, and stop saving over
+  the config file on shutdown/reconfig.
+
+* convert char *'s to stl's std::string.
+
+* make the toolbar a compile-time option so it can be disabled entirely.
+
+* make it possible to cuycle workspaces by moving the mouse past the edge of
+  the desktop?
+
+* make the wheel mouse functionality optional?
+
+* add a modifer key which will scroll workspaces with the mousewheel even when
+  not on the root window?
+
+* NETWM support (see http://www.freedesktop.org/standards/wm-spec/).
+
+* handle keyboard input natively instead of relying on an external program?
+
+* remappable bindings for keyboard input and for mouse input.
+
+* snap to edges, all edges, including window edges
+
+* port bbconf to Openbox.
+
+* add a close button to root/pinned menus?
+
+* add atoms for most everything in the window manager
+  e.g. add _BLACKBOX_STYLE and _BLACKBOX_MENU atoms so that bbtools, bbconf,
+  etc. can get the current path to the style in use and menu.
+
+* when workspace name is greater than the width of its text area the toolbar
+  gets very ugly. I think waht's really needed is a new toolbar entirely, which
+  can let apps dock in it (these would, of course then, be very tiny apps).
+
+* get translations of Openbox into more languages.
+
+* window stacking layers (i.e. always on top/bottom).
+
+* draw non-opaque move/resize frames using the style's borderWidth.
+
+* better support for window groups.
+
+* support for Xft, to anti-alias text.
+
+* suppert for XRENDER, and use it for making window decorations/menus/etc
+  translucent.
+
+* fix any existant memory leaks, this is on-going forever.

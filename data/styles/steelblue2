@@ -1,0 +1,133 @@
+style.name:	steelblue2
+style.author:	miklos
+style.date:	Feb 28, 2002
+style.credits:	
+style.comments:			The return of \
+		steelblue
+		
+
+rootCommand:	bsetbg -solid "#6e7a8a"
+
+! Toolbar settings...
+toolbar.button:	Flat Gradient Vertical
+toolbar.button.color:	#6e7a8a
+toolbar.button.colorTo:	#555f6b
+toolbar.button.picColor:	#ffffff
+
+toolbar.button.pressed:	Sunken Bevel1 Gradient Diagonal
+toolbar.button.pressed.color:	#6e7b8b
+toolbar.button.pressed.colorTo:	#8fa0b5
+
+toolbar.label:	Sunken Bevel1 Gradient Diagonal
+toolbar.label.color:	#6e7b8b
+toolbar.label.colorTo:	#555f6b
+toolbar.label.textColor:	#d1d9e5
+
+toolbar.windowLabel:	Sunken Bevel1 Gradient Diagonal
+toolbar.windowLabel.color:	#8fa0b5
+toolbar.windowLabel.colorTo:	#555f6b
+toolbar.windowLabel.textColor:	#e9f2ff
+
+toolbar.clock:	Sunken Bevel1 Gradient Diagonal
+toolbar.clock.color:	#6e7b8b
+toolbar.clock.colorTo:	#555f6b
+toolbar.clock.textColor:	#d1d9e5
+
+toolbar:	Raised Bevel1 Gradient Vertical
+toolbar.color:	#6e7b8b
+toolbar.colorTo:	#555f6b
+toolbar.textColor:	#ffffff
+!toolbar.font:	lime
+toolbar.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+toolbar.justify:	Left
+
+
+! Menu settings...
+menu.frame:	Sunken Bevel2 Gradient Diagonal
+menu.frame.color:	#8fa0b5
+menu.frame.colorTo:	#6e7b8b
+menu.frame.textColor:	#ffffff
+!menu.frame.font:	lime
+menu.frame.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.frame.justify:	Right
+
+menu.title:	Raised Bevel1 Gradient Diagonal
+menu.title.color:	#6e7b8b
+menu.title.colorTo:	#555f6b
+menu.title.textColor:	#d7e0ee
+!menu.title.font:	lime
+menu.title.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.title.justify:	Center
+
+menu.hilite:	Raised Bevel1 Gradient Diagonal
+menu.hilite.color:	#6e7b8b
+menu.hilite.colorTo:	#555f6b
+menu.hilite.textColor:	#ffffff
+
+menu.bullet:	Empty
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus:	Flat Gradient CrossDiagonal
+window.button.focus.color:	#6e7b8b
+window.button.focus.colorTo:	#555f6b
+window.button.focus.picColor:	#ddeeff
+
+window.button.unfocus:	Flat Gradient Vertical
+window.button.unfocus.color:	#6e7b8b
+window.button.unfocus.colorTo:	#555f6b
+window.button.unfocus.picColor:	#748293
+
+window.grip.focus:	Raised Bevel1 Gradient Diagonal
+window.grip.focus.color:	#8fa0b5
+window.grip.focus.colorTo:	#6e7b8b
+
+window.grip.unfocus:	Raised Bevel1 Gradient Diagonal
+window.grip.unfocus.color:	#6e7b8b
+window.grip.unfocus.colorTo:	#555f6b
+
+window.handle.focus:	Raised Bevel1 Gradient Diagonal
+window.handle.focus.color:	#6e7b8b
+window.handle.focus.colorTo:	#555f6b
+
+window.handle.unfocus:	Raised Bevel1 Gradient Diagonal
+window.handle.unfocus.color:	#6e7b8b
+window.handle.unfocus.colorTo:	#555f6b
+
+window.label.focus:	Sunken Bevel1 Gradient Diagonal
+window.label.focus.color:	#8fa0b5
+window.label.focus.colorTo:	#555f6b
+window.label.focus.textColor:	#e6f0ff
+!window.label.focus.font:	lime
+window.label.focus.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+window.label.focus.justify:	Left
+
+!window.font:	lime
+window.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+window.justify:	Left
+window.label.unfocus:	Sunken Bevel1 Gradient Diagonal
+window.label.unfocus.color:	#6e7b8b
+window.label.unfocus.colorTo:	#555f6b
+window.label.unfocus.textColor:	#748293
+
+window.title.focus:	Raised Bevel1 Gradient Vertical
+window.title.focus.color:	#6e7b8b
+window.title.focus.colorTo:	#555f6b
+
+window.title.unfocus:	Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:	#6e7b8b
+window.title.unfocus.colorTo:	#555f6b
+
+window.button.pressed:	Sunken Bevel1 Gradient Diagonal
+window.button.pressed.color:	#6e7b8b
+window.button.pressed.colorTo:	#8fa0b5
+
+window.frame.focusColor:	#ffffff
+window.frame.unfocusColor:	#555f6b
+handleWidth:	4
+frameWidth:	0
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#000000
+

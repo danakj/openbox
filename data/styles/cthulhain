@@ -1,0 +1,140 @@
+! Title:	cthulhain
+! By:		cthulhain (http://lordzork.com/blackbox/
+! Email:	cthulhain@lordzork.com
+! Comment:	no comment
+
+! ***** toolbar *****
+toolbar:				raised gradient vertical
+     toolbar.color:			#585858
+     toolbar.colorTo:			#0f1319
+
+toolbar.label:				parentrelative
+     toolbar.label.textColor:		#cccccc
+
+toolbar.windowLabel:            	sunken gradient crossdiagonal
+     toolbar.windowLabel.color:		#151a22
+     toolbar.windowLabel.colorTo:	#7a8290
+     toolbar.windowLabel.textColor:	#ffffff
+
+toolbar.clock:				parentrelative
+     toolbar.clock.textColor:		#cccccc
+
+toolbar.button:				parentrelative
+     toolbar.button.picColor:		#cccccc
+
+toolbar.button.pressed:			flat gradient vertical
+     toolbar.button.pressed.color:	#0f1319
+     toolbar.button.pressed.colorTo:	#7a8290
+
+
+! ***** menu *****
+menu.title:				raised gradient crossdiagonal
+     menu.title.color:			#151a22
+     menu.title.colorTo:		#7a8290
+     menu.title.textColor:		#ffffff
+
+menu.frame:				sunken gradient crossdiagonal
+     menu.frame.color:			#0f1319
+     menu.frame.colorTo:		gray40
+     menu.frame.textColor:		#cccccc
+
+menu.hilite:				sunken gradient crossdiagonal
+     menu.hilite.color:			#151a22
+     menu.hilite.colorTo:		#7a8290
+     menu.hilite.textColor:		#ffffff
+
+menu.bullet:				triangle
+     menu.bullet.position:		right
+
+
+! ***** window focused *****
+window.title.focus:			raised gradient diagonal
+     window.title.focus.color:		gray40
+     window.title.focus.colorTo:	#0f1319
+
+window.label.focus:			sunken gradient crossdiagonal
+     window.label.focus.color:		#151a22
+     window.label.focus.colorTo:	#7a8290
+     window.label.focus.textColor:	gray90
+
+window.button.focus:			parentrelative
+     window.button.focus.picColor:	#cccccc
+
+window.button.pressed:			flat gradient vertical
+     window.button.pressed.color:	#0f1319
+     window.button.pressed.colorTo:	#7a8290
+
+window.handle.focus:			raised gradient diagonal
+     window.handle.focus.color:		gray50
+     window.handle.focus.colorTo:	#0f1319
+
+window.grip.focus:			raised gradient diagonal
+     window.grip.focus.color:		#7a8290
+     window.grip.focus.colorTo:		#151a22
+
+window.frame.focusColor:		#858585
+window.frame.focus.color:		#858585
+
+
+! ***** window unfocused *****
+window.title.unfocus:			raised gradient diagonal
+     window.title.unfocus.color:	gray40
+     window.title.unfocus.colorTo:	#0f1319
+
+window.label.unfocus:			parentrelative
+     window.label.unfocus.textColor:	#808080
+
+window.button.unfocus:			parentrelative
+     window.button.unfocus.picColor:	#727272
+
+window.handle.unfocus:			raised gradient diagonal
+     window.handle.unfocus.color:	gray50
+     window.handle.unfocus.colorTo: 	#0f1319
+
+window.grip.unfocus:			raised gradient diagonal
+     window.grip.unfocus.color:		gray50
+     window.grip.unfocus.colorTo:	#0f1319
+
+window.frame.unfocusColor:		#5e6166
+window.frame.unfocus.color:		#5e6166
+
+
+! ***** fonts *****
+*.font:					-*-lucida-medium-r-*-*-*-100-*-*-*-*-*
+    toolbar.justify:			center
+    window.justify:			right
+    menu.title.justify:			center
+    menu.frame.justify:			right
+
+! ***** the rest *****
+borderColor:				#202020
+borderWidth:				1
+bevelWidth:				2
+handleWidth:				4
+frameWidth:				0
+
+rootCommand:				bsetbg -solid "#3a404b"
+
+! ***** bbpager *****
+bbpager.frame:				sunken gradient crossdiagonal
+    bbpager.frame.color:		#151a22
+    bbpager.frame.colorTo:		#7a8290
+
+bbpager.desktop:			parentrelative
+
+bbpager.desktop.focus:		 	flat gradient vertical
+    bbpager.desktop.focus.color: 	#0f1319
+    bbpager.desktop.focus.colorTo: 	gray40
+
+bbpager.window:				raised gradient vertical
+    bbpager.window.color:		gray40
+    bbpager.window.colorTo:		#0f1319
+
+bbpager.window.focus:			raised gradient crossdiagonal
+    bbpager.window.focus.color:		#151a22
+    bbpager.window.focus.colorTo:	#7a8290
+
+bbpager.desktop.focusStyle:		border
+bbpager.active.window.borderColor:	#202020
+bbpager.inactive.window.borderColor:	#202020
+bbpager.active.desktop.borderColor:	#0f1319

@@ -1,0 +1,134 @@
+! Miscellaneous settings...
+style.name:	steelblue
+style.author:	miklos
+style.date:	Feb 3, 2002
+style.credits:	
+style.comments:	I prefer the font "luxus.pcf" to be used with this style.
+		
+
+!rootCommand:	bsetbg -solid "#3c5979"
+rootCommand:	bsetbg -mod 4 4 -to "#44668a" -from "#7788bb"
+
+! Toolbar settings...
+toolbar.button:	Flat Solid PipeCross
+toolbar.button.color:	#44668a
+toolbar.button.colorTo:	#ffffff
+toolbar.button.picColor:	#ffffff
+
+toolbar.button.pressed:	Sunken Bevel1 Solid Diagonal
+toolbar.button.pressed.color:	#3c5979
+toolbar.button.pressed.colorTo:	#ffffff
+
+toolbar.label:	Sunken Bevel1 Gradient Rectangle
+toolbar.label.color:	#44668a
+toolbar.label.colorTo:	#3c5979
+toolbar.label.textColor:	#d1d9e5
+
+toolbar.windowLabel:	Sunken Bevel1 Gradient Rectangle
+toolbar.windowLabel.color:	#5e8dbf
+toolbar.windowLabel.colorTo:	#3c5979
+toolbar.windowLabel.textColor:	#e9f2ff
+
+toolbar.clock:	Sunken Bevel1 Gradient Rectangle
+toolbar.clock.color:	#44668a
+toolbar.clock.colorTo:	#3c5979
+toolbar.clock.textColor:	#d1d9e5
+
+toolbar:	Raised Bevel1 Solid Horizontal
+toolbar.color:	#44668a
+toolbar.colorTo:	#ffffff
+toolbar.textColor:	#ffffff
+!toolbar.font:	luxus*
+toolbar.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+toolbar.justify:	Center
+
+
+! Menu settings...
+menu.frame:	Raised Bevel1 Gradient Elliptic
+menu.frame.color:	#44668a
+menu.frame.colorTo:	#44668a
+menu.frame.textColor:	#d1d9e5
+!menu.frame.font:	luxus
+menu.frame.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.frame.justify:	Right
+
+menu.title:	Sunken Bevel2 Gradient Elliptic
+menu.title.color:	#5e8dbf
+menu.title.colorTo:	#3c5979
+menu.title.textColor:	#d7e0ee
+!menu.title.font:	luxus
+menu.title.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+menu.title.justify:	Center
+
+menu.hilite:	Sunken Bevel1 Gradient Elliptic
+menu.hilite.color:	#3c5979
+menu.hilite.colorTo:	#5e8dbf
+menu.hilite.textColor:	#ffffff
+
+menu.bullet:	Triangle
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus:	Flat Solid Horizontal
+window.button.focus.color:	#44668a
+window.button.focus.colorTo:	#ffffff
+window.button.focus.picColor:	#ffffff
+
+window.button.unfocus:	Flat Solid Horizontal
+window.button.unfocus.color:	#3c5979
+window.button.unfocus.colorTo:	#ffffff
+window.button.unfocus.picColor:	#44668a
+
+window.grip.focus:	Raised Bevel1 Solid PipeCross
+window.grip.focus.color:	#5e8dbf
+window.grip.focus.colorTo:	#ffffff
+
+window.grip.unfocus:	Raised Bevel1 Solid Pyramid
+window.grip.unfocus.color:	#3c5979
+window.grip.unfocus.colorTo:	#ffffff
+
+window.handle.focus:	Raised Bevel1 Solid Pyramid
+window.handle.focus.color:	#44668a
+window.handle.focus.colorTo:	#ffffff
+
+window.handle.unfocus:	Raised Bevel1 Solid Pyramid
+window.handle.unfocus.color:	#3c5979
+window.handle.unfocus.colorTo:	#ffffff
+
+window.label.focus:	Sunken Bevel1 Gradient Rectangle
+window.label.focus.color:	#5e8dbf
+window.label.focus.colorTo:	#3c5979
+window.label.focus.textColor:	#e6f0ff
+!window.label.focus.font:	luxus
+window.label.focus.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+window.label.focus.justify:	Center
+
+!window.font:	luxus
+window.font:	-schumacher-clean-medium-r-*-*-*-100-*-*-*-*-*-*
+window.justify:	Center
+window.label.unfocus:	Sunken Bevel1 Gradient Rectangle
+window.label.unfocus.color:	#44668a
+window.label.unfocus.colorTo:	#3c5979
+window.label.unfocus.textColor:	#5077a1
+
+window.title.focus:	Raised Bevel1 Solid Diagonal
+window.title.focus.color:	#44668a
+window.title.focus.colorTo:	#ffffff
+
+window.title.unfocus:	Raised Bevel1 Solid Diagonal
+window.title.unfocus.color:	#3c5979
+window.title.unfocus.colorTo:	#ffffff
+
+window.button.pressed:	Sunken Bevel1 Solid Diagonal
+window.button.pressed.color:	#484848
+window.button.pressed.colorTo:	#ffffff
+
+window.frame.focusColor:	#63707f
+window.frame.unfocusColor:	#5e6166
+handleWidth:	4
+frameWidth:	0
+bevelWidth:	0
+borderWidth:	1
+borderColor:	#000000
+

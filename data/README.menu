@@ -1,0 +1,369 @@
+Creating a user defined menu:
+-----------------------------
+Creating a menu for Openbox requires a text editor of some sort.  Familiarity
+with your choice of text editor is assumed, since editor preference differs
+as much (if not more than) window manager preference.
+
+First, we need to decide on a location for our custom menu.  Your home
+directory is the most logical solution, since you will most likely not have
+write access anywhere else.  You place the menu file in any directory, and
+give it any name you choose, as we will later tell Openbox the path or
+location for this file.
+
+As an example, let's assume that my home directory is `/home/bhughes' (which it
+is).  I've decided to keep all my Openbox related files in a directory named
+`openbox.'  After creating the directory, I now have two options for creating
+my new menu.  I can either copy the system default (usually in
+`/usr/local/share/Openbox/menu') to this directory, or I can create a new
+one from scratch.  Let's do the latter, for the sake of completeness.
+
+I've decided to name the file `rootmenu.'  I fire up my favorite text editor
+and now have a clean file.  So let's begin.
+
+
+Menu syntax:
+------------
+The menu syntax is very simple and very effective.  There are upto three
+fields in a menu line. They are of the form:
+
+	[tag] (label or filename) {command or filename}
+
+The supported tags are as follows:
+
+[begin] (label for root menu)
+
+	This tells Openbox to start parsing the menu file.  This tag is
+	required for Openbox to parse your menu file.  If it cannot find it,
+	the system default menu is used instead.
+
+[end]
+
+	This tells Openbox that it is at the end of a menu.  This can either
+	be a submenu or the main root menu.  There must be at least one
+	of these tags in your menu to correspond to the required [begin] tag.
+
+[exec] (label for command) {shell command}
+
+	This tells Openbox to insert a command item into the menu.  When you
+	select the menu item from the menu, Openbox runs `shell command.'
+
+[exit] (label for exit)
+
+	This tells Openbox to insert an item that shuts down and exits
+	Openbox.  Any open windows are reparented to the root window before
+	Openbox exits.
+
+[include] (filename)
+
+	This tells Openbox to parse the file specified by `filename' inline
+	with the current menu.  `filename' can be the full path to a file
+	(such as /usr/local/share/Openbox/brueghel/stylesmenu) or it can
+	begin with `~/', which will be expanded into your home directory
+	(e.g. [include] (~/.openbox/stylesmenu) will include
+	/home/bhughes/.openbox/stylesmenu in my menu)
+
+[nop] (label - optional)
+
+	This tells Openbox to insert a non-operational item into the current
+	menu.  This can be used to help format the menu into blocks or sections
+	if so desired (e.g. you could put all your ssh accounts together, add
+	a [nop] and then add all your telnet accounts together).  [nop] does
+	accept a label, but it is not required, and a blank item will be used
+	if none is supplied.
+
+[style] (label) {filename}
+
+	This tells Openbox to read `filename' and apply the new textures,
+	colors and fonts to the current running session.  The filename is
+	just like the [include] tag, it can be the full path to the file,
+	or it can be of the form `~/path/from/home/dir.'  Openbox also
+	re-reads the entire menu structure from disk, incase the menu has
+	changed.
+
+[submenu] (label) {title for menu - optional}
+
+	This tells Openbox to create and parse a new menu.  This menu is
+	inserted as a submenu into the parent menu.  These menus are parsed
+	recursively, so there is no limit to the number of levels or nested
+	submenus you can have.  The title for the new menu is optional, if
+	none is supplied, the new menu's title is the same as the item label.
+
+[reconfig] (label)
+
+	This tells Openbox to reread the current style and menu files and
+	apply any changes.  This is useful for creating a new style or theme,
+	as you don't have to constantly restart Openbox every time you save
+	your style.
+
+[restart] (label) {shell command - optional}
+
+	This tells Openbox to restart.  If `shell command' is supplied, it
+	shuts down and runs the command (which is commonly the name of another
+	window manager).  If the command is omitted, Openbox restarts itself.
+
+[workspaces] (label)
+
+	This tells Openbox to insert a "link" to the workspaces menu directly
+	into your menu.  This is handy for those users who can't access the
+	workspace menu directly (e.g. if you don't have a 3 button mouse, it's
+	rather hard to middle click to show the workspace menu).  This is a
+	"link" to the systems workspace menu, so multiple [workspaces] tags
+	will display the same workspace menu, so expect it to move around if
+	you do so. ;)
+
+[config] (label)
+
+	This tells Openbox to insert the ConfigMenu into your menu.  From
+	this menu you can configure several options stored in your
+	~/.openbox/rc, and the changes take effect immediately.
+
+Comments may be inserted on any line of the file, as long as the first
+character on the line is a `#.'
+
+Also, in the labels/commands/filenames fields, you can escape any character
+like so:
+
+	[exec] (\(my cool\) \{XTERM\}) {\(xterm -T \\\"cool XTERM\\\"\)}
+
+Using `\\' inserts a literal back-slash into the label/command/filename field.
+
+
+Putting it all together:
+------------------------
+Alrighty, so let's see if we can understand the arcane incantation above.  It
+says we have to have a [begin] and an [end] tag, which create our menu and
+give it a title.  Let's do that first:
+
+
+	[begin] (Example \[Menu\])
+	
+	[end]
+
+Simple enough. Now let's add some items to the list.  We always want to have
+access to a terminal emulator, be it a regular xterm or something else.
+So we add the item to our menu, and it now looks like this:
+
+...
+[begin] (Example \[Menu\])
+[exec] (xterm) {xterm -ls}
+[end]
+...
+
+Great!  Now let's add us some items to run an irc client, a web browser and
+some other common programs.  This gives up this:
+
+...
+[begin] (Example \[Menu\])
+[exec] (xterm) {xterm -ls}
+[exec] (efnet irc) {xterm -e irc fnord irc.efnet.net}
+[exec] (Mozilla Navigator) {mozilla}
+[exec] (XEmacs) {xemacs}
+[exec] (The GIMP) {gimp}
+[exec] (Video Tune) {xvidtune}
+[end]
+...
+
+Whoa, wait a second.  This menu file is beginning to look a little cluttered.
+Not a problem, just like programmers indent and space their code, we can
+do this with our menu file, so let's clean it up a bit:
+
+...
+[begin] (Example \[Menu\])
+	[exec] (xterm) {xterm -ls}
+	[exec] (efnet irc) {xterm -e irc fnord irc.efnet.net}
+
+	[exec] (Mozilla Navigator) {mozilla}
+	[exec] (XEmacs) {xemacs}
+
+	[exec] (Konqueror) {konqueror}
+	[exec] (The GIMP) {gimp}
+
+	[exec] (Video Tune) {xvidtune}
+[end]
+...
+
+Ahh... now that looks a little better.  Now we decide that we kind of like the
+spacing in the file, and decide we want to apply it to the menu itself.  Now
+we take advantage of the [nop] tag:
+
+...
+[begin] (Example \[Menu\])
+	[exec] (xterm) {xterm -ls}
+	[exec] (efnet irc) {xterm -e irc fnord irc.efnet.net}
+
+	[nop]
+
+	[exec] (Mozilla Navigator) {mozilla}
+	[exec] (XEmacs) {xemacs}
+
+	[nop]
+
+	[exec] (Konqueror) {konqueror}
+	[exec] (The GIMP) {gimp}
+
+	[nop]
+
+	[exec] (Video Tune) {xvidtune}
+[end]
+...
+
+Now, let's create a submenu to put some items to change between all these
+themes we downloaded from http://bb.classic.themes.org/.  Let's assume we
+untarred the themes into the ~/.openbox directory like the documentation on
+the themes.org site recommends.
+
+...
+[begin] (Example \[Menu\])
+	[exec] (xterm) {xterm -ls}
+	[exec] (efnet irc) {xterm -e irc fnord irc.efnet.net}
+
+	[nop]
+
+	[exec] (Mozilla Navigator) {mozilla}
+	[exec] (XEmacs) {xemacs}
+
+	[nop]
+
+	[exec] (Konqueror) {konqueror}
+	[exec] (The GIMP) {gimp}
+
+	[nop]
+
+	[exec] (Video Tune) {xvidtune}
+
+	[submenu] (Themes) {Themes from bb.classic.themes.org}
+		[style] (Openbox) {~/.openbox/styles/blackbox}
+		[style] (Openbox II) {~/.openbox/styles/blackbox2}
+		[style] (Hardware) {~/.openbox/styles/hardware}
+		[style] (Nova) {~/.openbox/styles/nova}
+		[style] (Orbital) {~/.openbox/styles/orbital}
+		[style] (Orbital II) {~/.openbox/styles/orbital2}
+		[style] (Seething) {~/.openbox/styles/seething}
+		[style] (Zero) {~/.openbox/styles/zero}
+		[style] (Cold Fusion) {~/.openbox/styles/coldfusion}
+	[end]
+[end]
+...
+
+Even better.  Now hold on a second, if we have our themes and styles in
+~/.openbox why do we have to have our menu in ~/openbox?  Answer:  WE DON'T!
+This is where the choice comes.  Do we keep our stuff in two separate
+directories? Do we put it all in one directory?  That is up to you to decide.
+I personally prefer to keep everything in one directory (but, I use ~/.openbox
+and have been for a long, long time; long before bb.classic.themes.org was
+even thought of... and again that is *personal* preference, not a hard-fast
+rule).
+
+Now that we've gotten a feel for the menu syntax, we decide to finish off our
+menu.  In addition to the styles we downloaded, we decide we also want to
+keep a submenu for the default styles that came with Openbox.  All we need
+to do is [include] the styles file from the share directory for Openbox.
+After putting everything together, we have:
+
+
+...
+# custom menu file for Openbox
+
+[begin] (Example \[Menu\])
+	[exec] (xterm) {xterm -ls}
+	[exec] (efnet irc) {xterm -e irc fnord irc.efnet.net}
+
+	[nop]
+
+	[exec] (Mozilla Browser) {mozilla}
+	[exec] (Konqueror) {konqueror}
+	[exec] (XEmacs) {xemacs}
+
+	[nop]
+
+	[exec] (The GIMP) {gimp}
+
+	[nop]
+
+	[exec] (Video Tune) {xvidtune}
+
+	[nop] (...)
+
+	[submenu] (Themes) {Themes from bb.classic.themes.org}
+		[style] (Openbox) {~/.openbox/styles/blackbox}
+		[style] (Openbox II) {~/.openbox/styles/blackbox2}
+		[style] (Hardware) {~/.openbox/styles/hardware}
+		[style] (Nova) {~/.openbox/styles/nova}
+		[style] (Orbital) {~/.openbox/styles/orbital}
+		[style] (Orbital II) {~/.openbox/styles/orbital2}
+		[style] (Seething) {~/.openbox/styles/seething}
+		[style] (Zero) {~/.openbox/styles/zero}
+		[style] (Cold Fusion) {~/.openbox/styles/coldfusion}
+
+# include the default style menu... this is assuming Openbox was installed
+# into /usr/local
+
+		[nop]
+
+		[include] (/usr/local/share/Openbox/styles/stylesmenu)
+	[end]
+
+	[workspaces] (Workspace list)
+
+	[submenu] (Restart) {Restart which?}
+		[restart] (Openbox)
+
+# let's also give us access to some other window managers
+
+		[restart] (Window Maker) {wmaker}
+		[restart] (Enlightenment) {enlightenment}
+		[restart] (KWM) {kwm}
+		[restart] (TWM) {twm}
+	[end]
+
+	[nop] (...)
+
+	[reconfig] (Reconfigure)
+	[exit] (Quit!)
+[end]
+...
+
+And voila!  our menu file is finished.  Now we need to tell Openbox to read
+this menu file.  We do this by editing the file ~/.openbox/rc.
+
+NOTE: your ~/.openbox/rc is auotmatically updated every time Openbox restarts,
+reconfigures, changes styles or exits.  Changes to dynamic data like workspace
+count, names, etc. is lost.  About the only thing you can change and have it
+preserved is the menu filename, which is what we are about to change.
+
+The format of ~/.openbox/rc is in the X resource database format (just like
+~/.Xdefaults).  Since the file is updated automatically, it may be full of
+stuff or it may not even exist (especially if this is the first time we've
+ran Openbox).  Don't worry if you have to create ~/.openbox/rc, Openbox will
+see the file the next time it starts.
+
+What we need to do is change the resource for the menu's filename.  This is
+done by changing (or adding) the line that looks like so:
+
+...
+session.menuFile:	/path/to/some/file
+...
+
+If this resource exists, we change it.  If it does not, we add it.  Depending
+on where we put the menu file, our new resource could look like this:
+
+...
+session.menuFile:	/home/bhughes/.openbox/rootmenu
+...
+
+We save ~/.openbox/rc and then restart Openbox (reconfiguring doesn't work,
+we need Openbox to completely shutdown and reread ALL of it's configuration
+files, not just the ones that control colors/fonts/etc.)
+
+If we've done everything correctly, Openbox restarts itself and our new menu
+is now ready for use.  If something doesn't work, read over the above example
+again to make sure you didn't forget a step or leave out the necessary tags.
+
+Now that Openbox has been told where to find it's menu, it does a little more.
+Openbox 0.51.x introduced automagic menu updates.  As long as you never
+change session.menuFile, you will never have to restart or reconfigure Openbox
+whenever you change your menu.  Openbox watches the timestamps on all the
+files it reads to build your menu.  If any of them change, they are reread and
+your menu updated.  This check is done everytime you open the root menu.  Like
+I said... it is a check, it doesn't reread the menu everytime, it just looks
+at the modification time and rereads when it changes.

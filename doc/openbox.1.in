@@ -1,0 +1,813 @@
+.\"
+.\" Man page for Openbox
+.\"
+.\" Copyright (c) 2000 by Wilbert Berendsen <wbsoft@xs4all.nl>
+.\"
+.\" This manual page may be freely distributed and modified.
+.\" Parts of the text are taken from website and several README's
+.\" by His Great Hughesness himself. Why reinvent wheels?
+.\"
+.\" Created with NEdit, tested with ``man'' and ``tkman.''
+.\" This manpage uses only standard groff and tmac.an macros.
+.\" To all translators who didn't do manpages earlier (like me ;-):
+.\" Read the Man-Page-Mini-HOWTO and the LDP manpage ``man 7 man''
+.\" There's all I needed to know about these macros.
+.\"
+.\" Updated for bb 0.61 at Sat Sep  9 06:56:04 CEST 2000
+.\"
+.\" ..define sort of <blockquote><pre> macro
+.de EX
+.ne 5
+.if n .sp 1
+.if t .sp .5
+.nf
+.in +.5i
+..
+.de EE
+.fi
+.in -.5i
+.if n .sp 1
+.if t .sp .5
+..
+.TH openbox 1 "April 8th, 2002" "@VERSION@"
+.SH NAME
+openbox \- a window manager for X11
+.SH SYNOPSIS
+.BR openbox " \-help | \-version"
+.br
+.B openbox 
+.RI "[ \-rc" " rcfile " "] [ \-display" " display " ]
+.SH DESCRIPTION
+.\"
+.\" First few Paragraphs taken from FILLMEINNOW
+.\"
+.\"Openbox is yet another addition to the list of window managers for the Open
+.\"Group's X Window System, Version 11 Release 6 and above.
+.\"Openbox is built with C++, sharing no common code with any other window
+.\"manager (even though the graphics implementation is similar to that of Window
+.\"Maker).
+.\".PP
+.\"From the time the first line of code was written, Openbox has evolved around
+.\"one premise, minimalism.
+.\"It's not meant to be Eye Candy, nor the most Featureful, nor the most Adorned
+.\"for modelling the Widely acclaimed NeXT interface.
+.\"It is just meant to be
+.\".BR fast .
+.\".PP
+.\"Openbox provides configurable window decorations, a root menu to launch
+.\"applications, and a toolbar that shows the current workspace name, the focused
+.\"application name, and the current time.
+.\"There is also a workspace menu to add or remove workspaces. The `slit' can be
+.\"used to dock small applications, e.g. most of the bbtools can use the slit.
+.\".PP
+.\"Openbox features a special kind of icon handling: When you minimize a window,
+.\"no icon appears; instead, you can view all minimized applications in the `Icons'
+.\"submenu of the workspace menu.
+.\"Your desktop will never get cluttered with icons. As an alternative to icons,
+.\"shaded windows are provided: A double click on the titlebar of a window will
+.\"shade it (i.e. the window will disappear; only the titlebar stays visible).
+.\".PP
+.\"Openbox uses its own graphics class to render its images on the fly.
+.\"By using style files, you can determine at a great level how your desktop looks.
+.\"Openbox currently uses its own protocol to communicate with other clients such
+.\"as the pager.  Work is underway to support the new window manager specification
+.\"that both GNOME and KDE use.
+.SH OPTIONS
+Openbox supports the following command line options:
+.TP
+.B \-help
+Display command line options and compiled-in features, then exit.
+.TP
+.B \-version
+Display version info and exit.
+.TP
+.BI \-rc \ rcfile
+Use another rcfile than the default
+.IR  "~/.openbox/rc" .
+.TP
+.BI \-display \ display
+Start Openbox on the specified display.
+Programs started by Openbox will have the
+.B DISPLAY
+environment variable set to this value, too.
+.SH RUNNING BLACKBOX
+This program is usually started by the user's startup script, most times called
+.IR ~/.xinitrc .
+To run openbox, modify the script by adding
+.EX 0
+exec openbox
+.EE
+as the last executed command of the script.
+When Openbox terminates, the X session will terminate too.
+.PP
+When started, Openbox will try to find a default menu file in
+.IR @defaultmenu@ .
+You can provide a system-wide menu for your users here.
+.PP
+On exit or restart, Openbox will save user defaults in the file
+.I ~/.openbox/rc
+in the user's home directory.
+Some resources in this file can be edited by hand.
+.SH USING BLACKBOX
+From version 0.60.x, Openbox does no keyboard handling by itself; instead, it
+relies on an external program
+.IR bbkeys (1)
+for this.
+So, in this section, we will discuss all mouse commands.
+.SS Root window (background):
+A right click (button 3) will pop up the root menu.
+With this, you can launch your applications.
+You can also customize this menu for your needs.  See above for its location.
+A middle click (button 2) will pop up the workspace menu.
+You can add or remove a workspace, view
+applications running on all workspace, inspect your iconified applications,
+and jump directly to any workspace or application.
+.PP
+Left clicking (button 1) on an application in the Workspaces menu will bring
+you to that workspace and raise/focus that application;
+middle clicking (button 2) will warp the application to the current workspace.
+.SS Toolbar:
+The toolbar consists of three fields: a workspace name, the name of the
+window that currently has focus, and a clock.
+A left click on the toolbar will bring it to the foreground, a
+middle click will hide it behind other windows (if AlwaysOnTop is not set), and
+the right button will bring up a little menu.
+.PP
+Using this menu, you can enter a name for the current workspace (when finished,
+press Enter).
+Also, you can choose the toolbar's position, whether or not it
+should be always on top (i.e. it cannot be obscured by other windows),
+and whether it should hide itself when the mouse moves away.
+.PP
+Note: In Openbox versions below 0.60.0, a right click on the toolbar
+immediately entered workspace name edit mode.
+.SS Window Titlebar and Borders:
+A left click on any part of the window's border will raise it.
+Dragging then moves the window.
+Dragging the resize grips at the bottom left and bottom right
+corners resizes the window.
+Middle clicking will immediately lower the window.
+Right clicking on the border or titlebar pops up the window menu,
+containing these commands:
+.TP
+.B Send To...
+Send window to another workspace.
+When you select the workspace with the middle button, Openbox will
+send you, along with the application, to the selected workspace.
+.TP
+.B Shade
+Shade window (display titlebar only).
+.TP
+.B Iconify
+Iconify window.
+The `icon' can be found in the `Icons' submenu of the workspace menu.  It will
+*NOT* appear on screen otherwise.
+.TP
+.B Maximize
+(Un)Maximize window.
+When you click the middle button on this item, the
+window will maximize only vertically.
+.TP
+.B Raise
+Raise window.
+.TP
+.B Lower
+Lower window.
+.TP
+.B Stick
+(Un)Stick window.
+A stuck window will always be displayed in the current workspace.
+.TP
+.B Kill Client
+Kill (-SIGKILL) owner of window.  Only use this if the client refuses to close.
+.TP
+.B Close
+Close the application cleanly.
+.PP
+When you double click on the titlebar of a window, it will `shade', so
+that only the titlebar stays visible.
+Another double click will redisplay the window contents.
+.SS Window Buttons:
+The button at the left upper corner of a window is the Minimize button.
+Clicking with any button causes the window to be iconified.
+The rightmost button (with the X) closes the application.
+The other button on the right (if present) maximizes the window in three ways:
+Button 1 causes full screen maximization, button 2 maximizes the window only
+vertically, and button 3 only horizontally.
+.SS Any menu:
+Clicking button 3 in a menu will popdown the menu.
+Clicking button 1 on the titlebar of any (sub)menu and then dragging it somewhere
+else will cause the menu to stay visible, and not disappear when you click on
+a menu item.
+.SS Miscellaneous:
+When you want to drag a window, but cannot see either the bottom handle or its
+titlebar, you can press Alt + button 1 anywhere in the window and then
+drag it around.
+You can also use Alt + button 1 to raise a partially visible window.
+Finally, Alt + button 2 lowers a window, and Alt + button 3 resizes the window.
+.SH MENU FILE
+A default menu file is installed in
+.IR @defaultmenu@ .
+Of course, this system-wide menu can be customized for all users at once.
+But it is also possible to create a personal menu.
+It is a convention to use the directory
+.IR "~/.openbox/"
+in your home directory, and to create a menu file, e.g.
+.I menu
+in this directory, or copy the system-wide menu file to this location.
+Next, we have to tell Openbox to load our menu file instead of the default.
+This is accomplished by adding (or changing) a resource value in the
+.I ~/.openbox/rc
+file, e.g.:
+.EX
+session.menuFile:       ~/.openbox/menu
+.EE
+For this change to take effect, Openbox has to be restarted.
+Be sure that your menu is usable, then choose `Restart' from the default
+Openbox root menu.
+.SS Menu syntax
+The menu syntax is very simple and very effective.
+There are up to three fields in a menu line.
+They are of the form:
+.EX
+[tag] (label or filename) {command or filename}
+.EE
+The supported tags are as follows:
+.TP
+.B [begin] (label for root menu)
+This tells Openbox to start parsing the menu file.
+This tag is required for Openbox to parse your menu file.
+If it cannot find it, the system default menu is used instead.
+.TP
+.B [end]
+This tells Openbox that it is at the end of a menu.
+This can either be a submenu or the main root menu.
+There must be at least one of these tags in your menu to correspond to the
+required [begin] tag.
+.TP
+.B [exec] (label for command) {shell command}
+Inserts a command item into the menu.
+When you select the menu item from the menu, Openbox runs `shell command.'
+.TP
+.B [exit] (label for exit)
+Inserts an item that shuts down and exits Openbox.
+Any running programs are not closed.
+.TP
+.B [include] (filename)
+Parses the file specified by
+.I filename
+and includes it with the current menu. The filename can be the full path to a
+ file, or it can begin with
+.IR ~/ ,
+which will be expanded into your home directory (e.g.
+.EX
+[include] (~/.openbox/stylesmenu)
+.EE
+will include
+.I /home/bhughes/.openbox/stylesmenu
+in my menu).
+.TP
+.B [nop] (label - optional)
+Insert a non-operational item into the current menu.
+This can be used to help format the menu into blocks or sections
+if so desired.
+.B [nop]
+does accept a label, but it is not required, and a blank item will be used
+if none is supplied.
+.TP 
+.B [style] (label) {filename}
+This tells Openbox to insert an item that, when selected, reads the style file
+named
+.I filename
+and applies the new textures, colors, and fonts to the current
+running session.
+.TP
+.B [stylesdir] (directory name)
+Reads all filenames (directories are ignored) from the specified directory and
+ creates menu items in the current menu for every filename.  Openbox assumes
+ that each file is a valid style file.  When selected by the user, Openbox 
+applies the selected style file to the current session.
+The labels that are created in the menu are the filenames of the style files.
+.TP
+.B [stylesmenu] (label) {directory name}
+Creates a submenu entry with
+.I label 
+(that is also the title of the new submenu), and inserts in that submenu all
+filenames in the specified directory, in the same way as the
+.B [stylesdir]
+command does.
+.IP
+.RB Both\  [stylesdir] \ and\  [stylesmenu]
+commands make it possible to install style files without editing your menu file.
+.TP
+.B [submenu] (label) {title for menu - optional}
+This tells Openbox to create and parse a new menu.
+This menu is inserted as a submenu into the parent menu.
+These menus are parsed recursively, so there is no limit to the number of levels
+or nested submenus you can have.
+The title for the new menu is optional; if none is supplied,
+the new menu's title is the same as the item label.
+An
+.B [end]
+tag is required to end the submenu.
+.TP
+.B [reconfig] (label)
+When selected, this item rereads the current style and menu files and
+applies any changes.
+This is useful for creating a new style or theme, as you don't have to
+constantly restart Openbox every time you save your style.
+However, Openbox automagically rereads the menu whenever it changes.
+.TP
+.B [restart] (label) {shell command - optional}
+This tells Openbox to restart.
+If `shell command' is supplied, it shuts down and runs the command (which is
+commonly the name of another window manager).
+If the command is omitted, Openbox restarts itself.
+.TP
+.B [config] (label)
+Inserts a Openbox generated submenu item containing numerous configuration
+options concerning window placement, focus style, window moving style, etc.
+.TP
+.B [workspaces] (label)
+This tells Openbox to insert a link to the workspaces menu directly
+into your menu.
+This is handy for those users who can't access the
+workspace menu directly (e.g. if you don't have a 3 button mouse).
+.PP
+Any line that starts with a `#' is considered a comment and ignored by Openbox.
+Also, in the labels/commands/filenames fields,
+you can escape any character like so:
+.EX
+[exec] (\\(my cool\\) \\{XTERM\\}) {xterm -T \\"cool XTERM\\"}
+.EE
+Using `\\\\' inserts a literal back-slash into the label/command/filename field.
+.SS Menu example
+Now let's put together some things.
+Here is a short example of a menu file:
+.PP
+.nf
+# Openbox menu file
+[begin] (Openbox @version@)
+  [exec] (rxvt) {rxvt -ls}
+  [exec] (Mozilla) {mozilla}
+  [exec] (The GIMP) {gimp}
+  [submenu] (Window Manager)
+    [exec] (Edit Menus) {nedit .openbox/Menu}
+    [submenu] (Style) {Which Style?}
+      [stylesdir] (~/.openbox/styles)
+      [stylesmenu] (Openbox Styles) {@pkgdatadir@/styles}
+    [end]
+    [config] (Config Options)
+    [reconfig] (Reconfigure)
+    [restart] (Restart)
+  [end]
+  [exit] (Log Out)
+[end]
+# end of menu file
+.fi
+.SH STYLES
+Openbox enables you to use specialized files that contain
+.IR X (1)
+resources to specify colors, textures, and fonts and therefore
+the overall look of your window borders, menus, and the toolbar.
+.PP
+The default installation of Openbox provides some of these style files.
+Usually they are put in
+.IR @pkgdatadir@/styles .
+You can study or edit these files to grasp how the Openbox style mechanism
+works.
+You can use the
+.BR [style] ", " [stylesdir] " and " [stylesmenu]
+menu commands in your menu file to be able to select and change between styles
+on the fly.
+.PP
+You can also create a directory in your home directory (usually named
+.I ~/.openbox/styles)
+and put your own style files there.
+Of course, you may choose any name for this directory, but many downloadable
+themes will rely on the name
+.I styles
+(following the bb.themes.org naming scheme).
+.PP
+To understand how the style mechanism works, you should have a little knowledge
+of how X resources work.
+.PP
+X resources consist of a key and a value.
+The key is constructed of several smaller keys (sometimes referred to as
+children), delimited by a period (`.').
+Keys may also contain a star (`*') to serve as a wildcard, which means that one
+line of typed text will match several keys.
+This is useful for styles that are based on one or two colors.
+.PP
+Openbox allows you to configure its four main components: the toolbar, the
+slit, the menus, and the window decorations.
+.PP
+The little window that shows the x-y position while dragging windows borrows
+its style from the window's titlebar.
+.PP
+Here are some quick examples:
+.EX
+toolbar.clock.color:	green
+.EE
+This sets the color resource of the toolbar clock to `green'. Another example:
+.EX
+menu*color:	rgb:3/4/5
+.EE
+This sets the color resource of the menu
+.I and all of its `children'
+to `rgb:3/4/5'.
+(For a description of color names, see
+.IR X (1).)
+So this one also applies to
+.IR menu.title.color " and " menu.frame.color .
+And with
+.EX
+*font:	-b&h-lucida-medium-r-normal-*-*-140-*
+.EE
+you set the font resource for all keys to this font name all at once.
+(For information about the fonts installed on your system, you can use a program like
+.IR xfontsel "(1), " gtkfontsel ", or " xlsfonts "(1).)"
+.PP
+Now what makes Openbox just so spectacular is its ability to render textures
+on the fly.
+Texture descriptions are specified in a similar way to the colors shown above
+e.g.:
+.ta \w'toolbar.clock.colorTo:\ 'u
+.EX
+toolbar.clock:	Raised Gradient Diagonal Bevel1
+toolbar.clock.color:	rgb:8/6/4
+toolbar.clock.colorTo:	rgb:4/3/2
+.EE
+Don't worry; we will explain right now!
+A texture description consists of up to five fields, which are as follows:
+.TP
+.B Flat / Raised / Sunken
+gives the component either a flat, raised, or sunken appearance.
+.TP
+.B Gradient / Solid
+tells Openbox to draw either a solid color or a texture with gradient.
+.TP
+.B Horizontal / Vertical / Diagonal / Crossdiagonal / Pipecross / Elliptic / Rectangle / Pyramid
+Select one of these texture types. They only work when
+.B Gradient
+is also specified!
+.TP
+.B Interlaced
+tells Openbox to interlace the texture (darken every other line).
+This option is most commonly used with gradiented textures, but, from Openbox
+version 0.60.3 on, it also works in solid textures.
+.TP
+.B Bevel1 / Bevel2
+tells Openbox which type of bevel to use.
+Bevel1 is the default bevel.
+The shading is placed on the edge of the image.
+Bevel2 is an alternative.
+The shading is placed one pixel in from the edge of the image.
+.PP
+Instead of a texture description, the option
+.B ParentRelative
+is also available, which makes the component appear as a part of its parent, i.e.
+totally transparent.
+.PP
+All gradient textures are composed of two color values: the
+.IR color " and " colorTo " resources."
+color represents the initial color, colorTo represents the final color of the
+gradient.
+When
+.B Interlaced 
+is used in
+.B Solid
+mode, the
+.I colorTo
+resource is used to specify the interlacing color.
+.PP
+Well, here is the complete component list; also, all components together with
+which kind of value they can contain.
+Comments are preceded with an exclamation sign (!), which is also used for
+comments in Openbox style c.q. X resource files.
+.PP
+.ta \w'window.button.unfocus.picColor:\ 'u 
+.nf
+.\"
+.\" The comments also to be translated!
+.\"
+! The toolbar itself.
+toolbar:	Texture
+toolbar.color:	Color
+toolbar.colorTo:	Color
+
+! The buttons on the toolbar.
+toolbar.button:	Texture or \fIParentRelative\fR
+toolbar.button.color:	Color
+toolbar.button.colorTo:	Color
+
+! Color of the button arrows.
+toolbar.button.picColor:	Color
+
+! Buttons in pressed state.
+toolbar.button.pressed:	Texture \fI(e.g. Sunken)\fR or \fIParentRelative\fR
+toolbar.button.pressed.color:	Color
+toolbar.button.pressed.colorTo:	Color
+
+! Color of pressed button arrows.
+toolbar.button.pressed.picColor:	Color
+
+! The toolbar workspace label.
+toolbar.label:	Texture or \fIParentRelative\fR
+toolbar.label.color:	Color
+toolbar.label.colorTo:	Color
+toolbar.label.textColor:	Color
+
+! The toolbar window label.
+toolbar.windowLabel:	Texture or \fIParentRelative\fR
+toolbar.windowLabel.color:	Color
+toolbar.windowLabel.colorTo:	Color
+toolbar.windowLabel.textColor:	Color
+
+! The toolbar clock.
+toolbar.clock:	Texture or \fIParentRelative\fR
+toolbar.clock.color:	Color
+toolbar.clock.colorTo:	Color
+toolbar.clock.textColor:	Color
+
+! How the toolbar's text should be justified.
+toolbar.justify:	\fIcenter\fR, \fIleft\fR, or \fIright\fR
+
+! Font to be used for all toolbar components.
+toolbar.font:	Font \fI(e.g. -*-helvetica-medium-r-normal-*-*-100-*)\fR
+
+! The menu titlebar.
+menu.title:	Texture
+menu.title.color:	Color
+menu.title.colorTo:	Color
+menu.title.textColor:	Color
+menu.title.font:	Font
+menu.title.justify:	\fIcenter\fR, \fIleft\fR, or \fIright\fR
+
+! The menu frame.
+menu.frame:	Texture
+menu.frame.color:	Color
+menu.frame.colorTo:	Color
+menu.frame.textColor:	Color
+menu.frame.disableColor:	Color
+menu.frame.font:	Font
+menu.frame.justify:	\fIcenter\fR, \fIleft\fR, or \fIright\fR
+
+! Bullets for submenu items.
+menu.bullet:	\fIempty\fR, \fItriangle\fR, \fIsquare\fR, or \fIdiamond\fR
+menu.bullet.position:	\fIright\fR or \fIleft\fR
+
+! The highlighted menu item.
+menu.hilite:	Texture (e.g. \fIRaised\fR)
+menu.hilite.color:	Color
+menu.hilite.colorTo:	Color
+menu.hilite.textColor:	Color
+
+! A focused window.
+window.title.focus:	Texture
+window.title.focus.color:	Color
+window.title.focus.colorTo:	Color
+
+! An unfocused window.
+window.title.unfocus:	Texture
+window.title.unfocus.color:	Color
+window.title.unfocus.colorTo:	Color
+
+! Window label.
+window.label.focus:	Texture or \fIParentRelative\fR
+window.label.focus.color:	Color
+window.label.focus.colorTo:	Color
+window.label.focus.textColor:	Color
+
+window.label.unfocus:	Texture or \fIParentRelative\fR
+window.label.unfocus.color:	Color
+window.label.unfocus.colorTo:	Color
+window.label.unfocus.textColor:	Color
+
+! Handlebar.
+window.handle.focus:	Texture
+window.handle.focus.color:	Color
+window.handle.focus.colorTo:	Color
+
+window.handle.unfocus:	Texture
+window.handle.unfocus.color:	Color
+window.handle.unfocus.colorTo:	Color
+
+! Resize grips.
+window.grip.focus:	Texture
+window.grip.focus.color:	Color
+window.grip.focus.colorTo:	Color
+
+window.grip.unfocus:	Texture
+window.grip.unfocus.color:	Color
+window.grip.unfocus.colorTo:	Color
+
+! Window buttons.
+window.button.focus:	Texture or \fIParentRelative\fR
+window.button.focus.color:	Color
+window.button.focus.colorTo:	Color
+window.button.focus.picColor:	Color
+
+window.button.unfocus:	Texture or \fIParentRelative\fR
+window.button.unfocus.color:	Color
+window.button.unfocus.colorTo:	Color
+window.button.unfocus.picColor:	Color
+
+window.button.pressed:	Texture (e.g. \fISunken\fR)
+window.button.pressed.color:	Color
+window.button.pressed.colorTo:	Color
+
+! Frame around window.
+window.frame.focusColor:	Color
+window.frame.unfocusColor:	Color
+
+! Font and justification for window labels.
+window.font:	Font
+window.justify:	\fIcenter\fR, \fIleft\fR, or \fIright\fR
+
+! Miscellaneous resources.
+
+! A border can be drawn around all components.
+borderWidth:	a number of pixels, e.g. \fI1\fR
+borderColor:	Color
+
+bevelWidth:	a number of pixels > 0
+handleWidth:	a number of pixels > 0
+
+! Width of the window frame (from version 0.61 on).
+! When not specified, frameWidth defaults to the value of bevelWidth.
+frameWidth:	a number of pixels >= 0
+
+
+! This command is executed whenever this style is selected.
+! Typically it sets the root window to a nice picture.
+rootCommand:	Shell command, e.g. \fIbsetroot -mod 4 4 -fg rgb:	5/6/6 -bg grey20\fR
+
+! Some of the bbtools read these old 0.51 resources.
+menuFont:	Font
+titleFont:	Font
+.fi
+.PP
+Now, this seems a long list, but, remember, when you create your own style, you
+can easily set lots of keys with a single command, e.g.
+.EX
+.ta \w'*unfocus.textColor:\ 'u
+*color:	slategrey
+*colorTo:	darkslategrey
+*unfocus.color:	darkslategrey
+*unfocus.colorTo:	black
+*textColor:	white
+*unfocus.textColor:	lightgrey
+*font:	lucidasans-10
+.EE
+This sets already nice defaults for many components.
+.SH THE SLIT
+The slit is a special Openbox window frame that can contain dockable
+applications, e.g. the `bbtools' or WindowMaker's dockapps.
+When applications are run in the slit, they have no window borders of their own;
+instead, they are framed in the slit, and they are always visible in the current
+workspace.
+You can click button 3 on the edge of the slit window to get a menu to
+determine its position, whether its contained applications should be grouped
+horizontally or vertically and whether it should hide itself when the
+mouse moves away.
+.PP
+Most dockable applications use the
+.B -w
+option to run in the slit.
+For example, you could put in your
+.IR ~/.xinitrc :
+.EX
+bbmail -w &
+bbpager -w &
+exec openbox
+.EE
+Of course, to use the slit, you must have slit support compiled in (this is
+the default).
+.SH RESOURCE FILE
+Usually the
+.I ~/.openbox/rc
+resource file is created and maintained by Openbox itself.
+All options from the
+.B [config]
+menu (from 0.60.x on), the last selected style file, your workspace names and
+so on are saved automatically in this file.
+However, there are some resources in it you might want to edit yourself:
+.TP
+.B session.menuFile:
+This tells Openbox where to look for its menu file.
+.TP
+.B session.screen0.toolbar.widthPercent:
+This determines the amount (in %) of space the toolbar will take.
+Default value is:
+.IR 66 .
+.TP
+.B session.screen0.strftimeFormat:
+This adjusts the way the current time is displayed in the toolbar.
+The
+.IR strftime (3)
+format is used.
+Default value is:
+.IR "%I:%M %p" .
+.TP
+.B session.autoRaiseDelay:
+This adjusts the delay (in ms) before focused windows will raise when using the
+Auto Raise option.
+Default value is:
+.IR 250 .
+.TP
+.B session.doubleClickInterval:
+This adjusts the delay (in ms) between mouse clicks for Openbox to consider a double click.
+Default value is:
+.IR 250 .
+.TP
+.B session.screen0.edgeSnapThreshold:
+When moving a window across your screen, Openbox is able to have it `snap' to
+the edges of the screen for easy placement.
+This variable tells Openbox the distance (in pixels) at which the window will
+jump to the edge.
+Default value is:
+.IR 0 .
+.TP
+.B session.cacheMax:
+This tells Openbox how much memory (in Kb) it may use to store cached pixmaps on
+the X server.
+If your machine runs short of memory, you may lower this value.
+Default value is:
+.IR 200 .
+.TP
+.B session.cacheLife:
+This tells Openbox how long (in minutes) unused pixmaps may stay in the X
+server's memory.
+Default value is:
+.IR 5 .
+.TP
+.B session.colorsPerChannel:
+This tells Openbox how many colors to take from the X server on pseudocolor
+displays.  A channel would be red, green, or blue.
+Openbox will allocate this variable ^ 3 colors and make them always available.
+This value must be between 2 and 6.
+When you run Openbox on an 8-bit display, you must set this resource to 4.
+Default value is:
+.IR 4.
+.PP
+When running Openbox in a multiple desktop environment, the
+.B screen0
+key can also be
+.B screen1, 2
+etc. for any appropriate desktop.
+.SH ENVIRONMENT
+.TP
+.B HOME
+Openbox uses
+.RB $ HOME
+to find its
+.I .openbox/rc
+file, and to resolve style file and directory names.
+.TP
+.B DISPLAY
+When no other display was given on the command line, Openbox will start on the
+display specified by this variable.
+.SH AUTHOR and CREDITS
+All of the code was initially written and maintained as Blackbox by Brad Hughes
+.nh \" hyphenation off
+(blackbox@alug.org)
+.hy \" on again
+and then Jeff Raven
+.nh
+(jraven@psu.edu),
+.hy
+and then Sean 'Shaleh' Perry
+.nh
+(shaleh@debian.org)
+.hy
+.hy
+and is now maintained as Openbox by Ben Jansens
+.nh
+(ben@orodu.net)
+.hy
+with contributions and patches merged from
+many individuals around the world.
+.PP
+The official Openbox website:
+.nh
+.B http://FILLMEINNOW/
+.hy
+.br
+The bug and feature request page, as well as current releases can be found at:
+.nh
+.B http://FILLMEINNOW/
+.hy
+.br
+Many themes and other contributions:
+.nh
+.B http://bb.themes.org/
+.hy
+.PP
+This manpage was put together by Wilbert Berendsen
+.nh
+(wbsoft@xs4all.nl).
+.hy
+Numerous other languages will be available.
+.SH SEE ALSO
+.IR bsetroot (1), \ bbkeys (1)  \" not there, yet ;-(

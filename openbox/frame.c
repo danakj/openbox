@@ -140,7 +140,7 @@ Frame *frame_new()
     XResizeWindow(ob_display, self->iconify,
                   theme_button_size, theme_button_size);
     XResizeWindow(ob_display, self->icon,
-                  theme_button_size, theme_button_size);
+                  theme_button_size + 2, theme_button_size + 2);
     XResizeWindow(ob_display, self->close,
                   theme_button_size, theme_button_size);
     XResizeWindow(ob_display, self->desk,
@@ -497,7 +497,7 @@ static void layout_title(Frame *self)
 	    if (!(self->client->decorations & Decor_Icon)) break;
             if (n) { *lc = ' '; break; } /* rm duplicates */
 	    n = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= theme_button_size + 2 + theme_bevel + 1;
 	    break;
 	case 'D':
 	    if (!(self->client->decorations & Decor_AllDesktops)) break;
@@ -555,10 +555,10 @@ static void layout_title(Frame *self)
 	    if (!n) break;
 	    self->icon_x = x;
             RECT_SET(self->a_icon->area, 0, 0,
-                     theme_button_size, theme_button_size);
+                     theme_button_size + 2, theme_button_size + 2);
 	    XMapWindow(ob_display, self->icon);
-	    XMoveWindow(ob_display, self->icon, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+	    XMoveWindow(ob_display, self->icon, x, theme_bevel);
+	    x += theme_button_size + 2 + theme_bevel + 1;
 	    break;
 	case 'D':
 	    if (!d) break;

@@ -162,13 +162,13 @@ static void framerender_icon(Frame *self, Appearance *a)
 
     if (self->client->nicons) {
         Icon *icon = client_icon(self->client,
-                                 theme_button_size, theme_button_size);
+                                 theme_button_size + 2, theme_button_size + 2);
         a->texture[0].type = RGBA;
         a->texture[0].data.rgba.width = icon->width;
         a->texture[0].data.rgba.height = icon->height;
         a->texture[0].data.rgba.data = icon->data;
         RECT_SET(self->a_icon->texture[0].position, 0, 0,
-                 theme_button_size,theme_button_size);
+                 theme_button_size + 2, theme_button_size + 2);
     } else
         a->texture[0].type = NoTexture;
 

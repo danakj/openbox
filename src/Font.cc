@@ -81,10 +81,6 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
   if (! _xftfont)
     return; // failure
 
-  _font = XLoadQueryFont(_display, buildXlfd().c_str()); 
-  if (! _font)
-    return; // failure
-
   _valid = True;
 }
 #endif

@@ -19,7 +19,7 @@ openbox3_LDADD=-L../otk -lotk @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc rootwindow.cc backgroundwidget.cc labelwidget.cc \
-                  buttonwidget.cc python.cc openbox_wrap.cc
+                  buttonwidget.cc python.cc bindings.cc openbox_wrap.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

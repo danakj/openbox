@@ -9,6 +9,7 @@
 #include "client.hh"
 #include "screen.hh"
 #include "actions.hh"
+#include "bindings.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -145,8 +146,22 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
   _property = new otk::OBProperty();
-
   _actions = new OBActions();
+  _bindings = new OBBindings();
+
+  OBBindings::StringVect v;
+//  v.push_back("C-x");
+//  v.push_back("C-y");
+  v.push_back("v");
+  _bindings->add(v, 1);
+  v.clear();
+//  v.push_back("C-x");
+//  v.push_back("C-z");
+  v.push_back("a");
+  _bindings->add(v, 2);
+
+  _bindings->display();
+  ::exit(0);
 
   setMasterHandler(_actions); // set as the master event handler
 
@@ -198,6 +213,10 @@ Openbox::~Openbox()
   _state = State_Exiting; // time to kill everything
 
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
+
+  delete _bindings;
+  delete _actions;
+  delete _property;
   
   // close the X display
   otk::OBDisplay::destroy();

@@ -8,6 +8,7 @@
 
 #include "actions.hh"
 #include "widget.hh"
+#include "bindings.hh"
 
 extern "C" {
 #include <Python.h>
@@ -24,6 +25,18 @@ bool python_unregister(int action, PyObject *callback);
 
 //! Removes all python callback functions from the hook list
 bool python_unregister_all(int action);
+
+//! Add a mouse/keybinding
+/*!
+  @param keylist A python list of modifier/key/buttons, in the form:
+                 "C-A-space" or "A-Button1" etc.
+  @param callback A python function to call when the binding is used.
+*/
+bool python_bind(PyObject *keylist, PyObject *callback);
+
+bool python_unbind(PyObject *keylist);
+
+bool python_unbind_all();
 
 //! Fire a python callback function
 void python_callback(OBActions::ActionType action, Window window,

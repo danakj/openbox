@@ -30,6 +30,7 @@ namespace ob {
 class OBScreen;
 class OBClient;
 class OBActions;
+class OBBindings;
 
 //! Mouse cursors used throughout Openbox
 struct Cursors {
@@ -121,6 +122,9 @@ private:
   //! The action interface through which all user-available actions occur
   OBActions *_actions;
 
+  //! The interface through which keys/buttons are grabbed and handled
+  OBBindings *_bindings;
+
   //! Run the application in synchronous mode? (for debugging)
   bool _sync;
 
@@ -183,6 +187,9 @@ public:
 
   //! Returns the otk::OBProperty instance for the window manager
   inline const otk::OBProperty *property() const { return _property; }
+
+  //! Returns the OBBinding instance for the window manager
+  inline OBBindings *bindings() const { return _bindings; }
 
   //! Returns a managed screen
   inline OBScreen *screen(int num) {

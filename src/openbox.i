@@ -56,6 +56,9 @@
 %rename(preregister) ob::python_preregister;
 %rename(unregister) ob::python_unregister;
 %rename(unregister_all) ob::python_unregister_all;
+%rename(bind) ob::python_bind;
+%rename(unbind) ob::python_unbind;
+%rename(unbind_all) ob::python_unbind_all;
 
 %ignore ob::OBScreen::clients;
 %{

@@ -1,6 +1,7 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "python.hh"
+#include "openbox.hh"
 
 #include <vector>
 #include <algorithm>
@@ -10,6 +11,7 @@ namespace ob {
 typedef std::vector<PyObject*> FunctionList;
 
 static FunctionList callbacks[OBActions::NUM_ACTIONS];
+static FunctionList bindfuncs;
 
 bool python_register(int action, PyObject *callback)
 {
@@ -124,5 +126,84 @@ void python_callback(OBActions::ActionType action, Window window,
 
   Py_DECREF(arglist);
 }
+
+
+
+
+
+
+bool python_bind(PyObject *keylist, PyObject *callback)
+{
+  if (!PyList_Check(keylist)) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
+    return false;
+  }
+  if (!PyCallable_Check(callback)) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
+    return false;
+  }
+
+  OBBindings::StringVect vectkeylist;
+  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
+    PyObject *str = PyList_GetItem(keylist, i);
+    if (!PyString_Check(str)) {
+      PyErr_SetString(PyExc_AssertionError,
+                      "Invalid keylist. It must contain only strings.");
+      return false;
+    }
+    vectkeylist.push_back(PyString_AsString(str));
+  }
+
+  // the id is what the binding class can call back with so it doesnt have to
+  // worry about the python function pointer
+  int id = bindfuncs.size();
+  if (Openbox::instance->bindings()->add(vectkeylist, id)) {
+    Py_XINCREF(callback);              // Add a reference to new callback
+    bindfuncs.push_back(callback);
+    return true;
+  } else {
+    PyErr_SetString(PyExc_AssertionError,"Unable to create binding. Invalid.");
+    return false;
+  }
+}
+
+bool python_unbind(PyObject *keylist)
+{
+  if (!PyList_Check(keylist)) {
+    PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
+    return false;
+  }
+
+  OBBindings::StringVect vectkeylist;
+  for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
+    PyObject *str = PyList_GetItem(keylist, i);
+    if (!PyString_Check(str)) {
+      PyErr_SetString(PyExc_AssertionError,
+                      "Invalid keylist. It must contain only strings.");
+      return false;
+    }
+    vectkeylist.push_back(PyString_AsString(str));
+  }
+
+  int id;
+  if ((id =
+       Openbox::instance->bindings()->remove(vectkeylist)) >= 0) {
+    assert(bindfuncs[id]); // shouldn't be able to remove it twice
+    Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
+    // important note: we don't erase the item from the list cuz that would
+    // ruin all the id's that are in use. simply nullify it.
+    bindfuncs[id] = 0;
+    return true;
+  }
+  
+  return false;
+}
+
+bool python_unbind_all()
+{
+  Openbox::instance->bindings()->remove_all();
+  return true;
+}
+
 
 }

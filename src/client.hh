@@ -171,6 +171,8 @@ private:
   std::string  _app_name;
   //! The class of the window, can used for grouping
   std::string  _app_class;
+  //! The specified role of the window, used for identification
+  std::string  _role;
 
   //! The type of window (what its function is)
   WindowType   _type;
@@ -376,9 +378,11 @@ public:
   inline const std::string &appName() const { return _app_name; }
   //! Returns the class of the window
   inline const std::string &appClass() const { return _app_class; }
+  //! Returns the program-specified role of the window
+  inline const std::string &role() const { return _role; }
   //! Returns if the window can be focused
   /*!
-    @return true if the window can receive focusl otherwise, false
+    @return true if the window can receive focus; otherwise, false
   */
   inline bool canFocus() const { return _can_focus; }
   //! Returns if the window has indicated that it needs urgent attention

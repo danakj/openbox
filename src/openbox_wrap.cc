@@ -1976,6 +1976,28 @@ static PyObject *_wrap_OBClient_appClass(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_role(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    std::string *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_role",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    {
+        std::string const &_result_ref = ((ob::OBClient const *)arg1)->role();
+        result = (std::string *) &_result_ref;
+    }
+    
+    {
+        resultobj = PyString_FromString(result->c_str());
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_canFocus(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2764,6 +2786,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_iconTitle", _wrap_OBClient_iconTitle, METH_VARARGS },
 	 { (char *)"OBClient_appName", _wrap_OBClient_appName, METH_VARARGS },
 	 { (char *)"OBClient_appClass", _wrap_OBClient_appClass, METH_VARARGS },
+	 { (char *)"OBClient_role", _wrap_OBClient_role, METH_VARARGS },
 	 { (char *)"OBClient_canFocus", _wrap_OBClient_canFocus, METH_VARARGS },
 	 { (char *)"OBClient_urgent", _wrap_OBClient_urgent, METH_VARARGS },
 	 { (char *)"OBClient_focusNotify", _wrap_OBClient_focusNotify, METH_VARARGS },

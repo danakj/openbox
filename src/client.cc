@@ -478,17 +478,23 @@ void OBClient::updateClass()
   const otk::OBProperty *property = Openbox::instance->property();
 
   // set the defaults
-  _app_name = _app_class = "";
+  _app_name = _app_class = _role = "";
 
   otk::OBProperty::StringVect v;
   unsigned long num = 2;
 
-  if (! property->get(_window, otk::OBProperty::wm_class,
-                      otk::OBProperty::ascii, &num, &v))
-    return;
+  if (property->get(_window, otk::OBProperty::wm_class,
+                    otk::OBProperty::ascii, &num, &v)) {
+    if (num > 0) _app_name = v[0];
+    if (num > 1) _app_class = v[1];
+  }
 
-  if (num > 0) _app_name = v[0];
-  if (num > 1) _app_class = v[1];
+  v.clear();
+  num = 1;
+  if (property->get(_window, otk::OBProperty::wm_window_role,
+                    otk::OBProperty::ascii, &num, &v)) {
+    if (num > 0) _role = v[0];
+  }
 }
 
 

@@ -45,6 +45,7 @@ public:
     wm_name,
     wm_icon_name,
     wm_class,
+    wm_window_role,
     motif_wm_hints,
     blackbox_attributes,
     blackbox_change_attributes,

@@ -13577,6 +13577,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"OBProperty_wm_name", (long) otk::OBProperty::wm_name, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBProperty_wm_icon_name", (long) otk::OBProperty::wm_icon_name, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBProperty_wm_class", (long) otk::OBProperty::wm_class, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBProperty_wm_window_role", (long) otk::OBProperty::wm_window_role, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBProperty_motif_wm_hints", (long) otk::OBProperty::motif_wm_hints, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBProperty_blackbox_attributes", (long) otk::OBProperty::blackbox_attributes, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBProperty_blackbox_change_attributes", (long) otk::OBProperty::blackbox_change_attributes, 0, 0, 0},

@@ -40,6 +40,7 @@ OBProperty::OBProperty()
   _atoms[wm_name] = create("WM_NAME");
   _atoms[wm_icon_name] = create("WM_ICON_NAME");
   _atoms[wm_class] = create("WM_CLASS");
+  _atoms[wm_window_role] = create("WM_WINDOW_ROLE");
   _atoms[motif_wm_hints] = create("_MOTIF_WM_HINTS");
   _atoms[blackbox_hints] = create("_BLACKBOX_HINTS");
   _atoms[blackbox_attributes] = create("_BLACKBOX_ATTRIBUTES");

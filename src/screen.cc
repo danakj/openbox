@@ -521,12 +521,22 @@ void OBScreen::manageWindow(Window window)
 
   // XXX: make this optional or more intelligent
   client->focus();
+
+  // call the python NEWWINDOW binding
+  EventData *data = new_event_data(window, EventNewWindow, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 
 void OBScreen::unmanageWindow(OBClient *client)
 {
   OBFrame *frame = client->frame;
+
+  // call the python CLOSEWINDOW binding 
+  EventData *data = new_event_data(client->window(), EventCloseWindow, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 
   Openbox::instance->bindings()->grabButtons(false, client);
 

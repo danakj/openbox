@@ -213,28 +213,19 @@ void OBActions::motionHandler(const XMotionEvent &e)
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)
 {
   OtkEventHandler::mapRequestHandler(e);
-
-  EventData *data = new_event_data(e.window, EventNewWindow, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_DECREF((PyObject*)data);
+  // do this in OBScreen::manageWindow
 }
 
 void OBActions::unmapHandler(const XUnmapEvent &e)
 {
   OtkEventHandler::unmapHandler(e);
-
-  EventData *data = new_event_data(e.window, EventCloseWindow, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_DECREF((PyObject*)data);
+  // do this in OBScreen::unmanageWindow
 }
 
 void OBActions::destroyHandler(const XDestroyWindowEvent &e)
 {
   OtkEventHandler::destroyHandler(e);
-
-  EventData *data = new_event_data(e.window, EventCloseWindow, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_DECREF((PyObject*)data);
+  // do this in OBScreen::unmanageWindow
 }
 
 }

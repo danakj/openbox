@@ -97,9 +97,9 @@ GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile
+	cd $(top_srcdir) && $(AUTOMAKE) --foreign --include-deps Makefile
 
-Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -268,11 +268,6 @@ distdir: $(DISTFILES)
 	-rm -rf $(distdir)
 	mkdir $(distdir)
 	-chmod 777 $(distdir)
-	here=`cd $(top_builddir) && pwd`; \
-	top_distdir=`cd $(distdir) && pwd`; \
-	distdir=`cd $(distdir) && pwd`; \
-	cd $(top_srcdir) \
-	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --foreign Makefile
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \

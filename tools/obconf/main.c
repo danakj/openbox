@@ -11,7 +11,7 @@
 static GtkWidget *mainwin;
 static GtkWidget *mainlist;
 static GtkListStore *mainstore;
-static GtkWidget *mainnote;
+static GtkWidget *mainworkarea;
 static GdkPixbuf *ob_icon;
 
 enum {
@@ -67,7 +67,7 @@ static void load_stock ()
     }
 }
 
-GtkWidget* build_menu(GtkWidget *win, GtkAccelGroup *accel)
+GtkWidget* build_menu(GtkAccelGroup *accel)
 {
     GtkWidget *menu;
     GtkWidget *submenu;
@@ -105,7 +105,7 @@ GtkWidget* build_menu(GtkWidget *win, GtkAccelGroup *accel)
     return menu;
 }
 
-GtkWidget* build_list(GtkWidget *parent, GtkListStore **model)
+GtkWidget* build_list(GtkListStore **model)
 {
     GtkWidget *list;
     GtkListStore *store;
@@ -117,6 +117,7 @@ GtkWidget* build_list(GtkWidget *parent, GtkListStore **model)
                                G_TYPE_STRING);
 
     list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(list), FALSE);
 
     sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
     gtk_tree_selection_set_mode(sel, GTK_SELECTION_SINGLE);
@@ -138,7 +139,7 @@ int main(int argc, char **argv)
 {
     GtkWidget *menu;
     GtkWidget *vbox;
-    GtkWidget *hbox;
+    GtkWidget *hpane;
     GtkAccelGroup *accel;
 
     gtk_set_locale();
@@ -160,15 +161,21 @@ int main(int argc, char **argv)
 
     /* Menu */
 
-    menu = build_menu(mainwin, accel);
+    menu = build_menu(accel);
     gtk_box_pack_start(GTK_BOX(vbox), menu, FALSE, FALSE, 0);
 
-    hbox = gtk_hbox_new(FALSE, 2);
-    gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+    hpane = gtk_hpaned_new();
+    gtk_box_pack_start(GTK_BOX(vbox), hpane, TRUE, TRUE, 0);
 
     /* List */
 
-    mainlist = build_list(hbox, &mainstore);
+    mainlist = build_list(&mainstore);
+    gtk_container_add(GTK_CONTAINER(hpane), mainlist);
+
+    /* Main work area */
+
+    mainworkarea = gtk_vbox_new(FALSE, 1);
+    gtk_container_add(GTK_CONTAINER(hpane), mainworkarea);
 
     gtk_widget_show_all(mainwin);
 

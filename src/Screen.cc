@@ -1397,7 +1397,7 @@ void BScreen::manageWindow(Window w) {
 
   if (win->isDesktop()) {
     desktopWindowList.push_back(win->getFrameWindow());
-  } else {
+  } else if (win->isNormal()) {
     // don't list desktop windows as managed windows
     windowList.push_back(win);
     updateClientList();
@@ -1448,7 +1448,7 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
         break;
       }
     assert(it != end);  // the window wasnt a desktop window?
-  } else {
+  } else if (w->isNormal()) {
     // we don't list desktop windows as managed windows
     windowList.remove(w);
     updateClientList();

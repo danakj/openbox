@@ -13,6 +13,10 @@ extern "C" {
 # include <locale.h>
 #endif // HAVE_LOCALE_H
 
+#ifdef    HAVE_STDIO_H
+# include <stdio.h>
+#endif // HAVE_STDIO_H
+
 #include "gettext.h"
 }
 
@@ -20,7 +24,8 @@ extern "C" {
 
 int main(int argc, char **argv) {
   // initialize the locale
-  setlocale(LC_ALL, "");
+  if (!setlocale(LC_ALL, ""))
+    printf("Couldn't set locale from environment.\n");
   bindtextdomain(PACKAGE, LOCALEDIR);
   bind_textdomain_codeset(PACKAGE, "UTF-8");
   textdomain(PACKAGE);

@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # napaka: '-rc' zahteva argument\n
+$ #MENURequiresArg
+# napaka: '-menu' zahteva argument\n
 $ #DISPLAYRequiresArg
 # napaka: '-display' zahteva argument\n
 $ #WarnDisplaySet
@@ -12,6 +14,7 @@ $ #Usage
   \t\t\t  1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\tuporabi prikazovalnik.\n\
   -rc <string>\t\t\tuporabi nadomestno datoteko z viri.\n\
+  -menu <string>\t\t\tuse alternate menu file.\n\
   -version\t\t\tprika¾i oznako razlièice in konèaj.\n\
   -help\t\t\t\prika¾i ta navodila in konèaj.\n\n
 $ #CompileOptions

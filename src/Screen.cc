@@ -2265,59 +2265,72 @@ void BScreen::InitMenu(void) {
   } else {
     rootmenu = new Rootmenu(*this);
   }
-  Bool defaultMenu = True;
+  bool defaultMenu = true;
 
-  if (openbox.getMenuFilename()) {
-    FILE *menu_file = fopen(openbox.getMenuFilename(), "r");
+  FILE *menu_file;
+  const char *menu_filename = openbox.getMenuFilename();
 
-    if (!menu_file) {
-      perror(openbox.getMenuFilename());
-    } else {
-      if (feof(menu_file)) {
-	fprintf(stderr, i18n->getMessage(ScreenSet, ScreenEmptyMenuFile,
-					 "%s: Empty menu file"),
-		openbox.getMenuFilename());
-      } else {
-	char line[1024], label[1024];
-	memset(line, 0, 1024);
-	memset(label, 0, 1024);
-
-	while (fgets(line, 1024, menu_file) && ! feof(menu_file)) {
-	  if (line[0] != '#') {
-	    int i, key = 0, index = -1, len = strlen(line);
-
-	    key = 0;
-	    for (i = 0; i < len; i++) {
-	      if (line[i] == '[') index = 0;
-	      else if (line[i] == ']') break;
-	      else if (line[i] != ' ')
-		if (index++ >= 0)
-		  key += tolower(line[i]);
-	    }
-
-	    if (key == 517) {
-	      index = -1;
-	      for (i = index; i < len; i++) {
-		if (line[i] == '(') index = 0;
-		else if (line[i] == ')') break;
-		else if (index++ >= 0) {
-		  if (line[i] == '\\' && i < len - 1) i++;
-		  label[index - 1] = line[i];
-		}
-	      }
-
-	      if (index == -1) index = 0;
-	      label[index] = '\0';
-
-	      rootmenu->setLabel(label);
-	      defaultMenu = parseMenuFile(menu_file, rootmenu);
-	      break;
-	    }
-	  }
-	}
-      }
-      fclose(menu_file);
+  if (!(menu_file = fopen(menu_filename, "r"))) {
+    perror(menu_filename);
+    menu_filename = (char *) 0;
+  }
+  if (menu_filename == (char *) 0) {
+    // opening the menu file failed, try the DEFAULTMENU
+    menu_filename = DEFAULTMENU;
+    if (!(menu_file = fopen(menu_filename, "r"))) {
+      perror(menu_filename);
+      menu_filename = (char *) 0;
     }
+  }
+      
+  if (menu_filename) { 
+    if (feof(menu_file)) {
+      fprintf(stderr, i18n->getMessage(ScreenSet, ScreenEmptyMenuFile,
+                                      "%s: Empty menu file"), menu_filename);
+      menu_filename = (char *) 0;
+    } else {
+      // successsfully opened a menu file
+      char line[1024], label[1024];
+      memset(line, 0, 1024);
+      memset(label, 0, 1024);
+
+      while (fgets(line, 1024, menu_file) && ! feof(menu_file)) {
+        if (line[0] != '#') {
+          int i, key = 0, index = -1, len = strlen(line);
+
+          key = 0;
+          for (i = 0; i < len; i++) {
+            if (line[i] == '[') index = 0;
+            else if (line[i] == ']') break;
+            else if (line[i] != ' ')
+              if (index++ >= 0)
+                key += tolower(line[i]);
+          }
+
+          if (key == 517) {
+            index = -1;
+            for (i = index; i < len; i++) {
+              if (line[i] == '(') index = 0;
+              else if (line[i] == ')') break;
+              else if (index++ >= 0) {
+                if (line[i] == '\\' && i < len - 1) i++;
+                label[index - 1] = line[i];
+              }
+            }
+
+            if (index == -1) index = 0;
+            label[index] = '\0';
+
+            rootmenu->setLabel(label);
+            defaultMenu = parseMenuFile(menu_file, rootmenu);
+            if (!defaultMenu)
+              openbox.addMenuTimestamp(menu_filename);
+            break;
+          }
+        }
+      }
+    }
+    fclose(menu_file);
   }
 
   if (defaultMenu) {
@@ -2329,8 +2342,6 @@ void BScreen::InitMenu(void) {
 		     BScreen::Restart);
     rootmenu->insert(i18n->getMessage(ScreenSet, ScreenExit, "Exit"),
 		     BScreen::Exit);
-  } else {
-    openbox.setMenuFilename(openbox.getMenuFilename());
   }
 }
 
@@ -2530,10 +2541,9 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                 }
 
 		if (! feof(submenufile)) {
-		  if (! parseMenuFile(submenufile, menu))
-		    openbox.setMenuFilename(newfile);
-
-		  fclose(submenufile);
+		  if (!parseMenuFile(submenufile, menu))
+                    openbox.addMenuTimestamp(newfile);
+                  fclose(submenufile);
 		}
 	      } else
 		perror(newfile);
@@ -2689,8 +2699,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                   menu->insert(label, stylesmenu);
                   rootmenuList.push_back(stylesmenu);
                 }
-
-                openbox.setMenuFilename(stylesdir);
+                openbox.addMenuTimestamp(stylesdir);
               } else {
                 fprintf(stderr, i18n->getMessage(ScreenSet,
 						 ScreenSTYLESDIRErrorNotDir,

@@ -87,7 +87,7 @@ private:
   struct resource {
     Time double_click_interval;
 
-    char *menu_file, *style_file;
+    char *style_file;
     char *titlebar_layout;
     int colors_per_channel;
     timeval auto_raise_delay;
@@ -129,7 +129,7 @@ private:
   Bool no_focus, reconfigure_wait, reread_menu_wait;
   Time last_time;
   Window masked;
-  char *rc_file, **argv;
+  char *menu_file, *rc_file, **argv;
   int argc;
   Resource config;
 
@@ -144,7 +144,7 @@ protected:
 
 
 public:
-  Openbox(int, char **, char * = 0, char * = 0);
+  Openbox(int, char **, char * = 0, char * = 0, char * = 0);
   virtual ~Openbox();
 
 #ifdef    HAVE_GETPID
@@ -173,7 +173,8 @@ public:
   inline const char *getStyleFilename() const
     { return resource.style_file; }
   inline const char *getMenuFilename() const
-    { return resource.menu_file; }
+    { return menu_file; }
+  void addMenuTimestamp(const char *filename);
 
   inline const int &getColorsPerChannel() const
     { return resource.colors_per_channel; }
@@ -197,7 +198,6 @@ public:
 
   void shutdown();
   void setStyleFilename(const char *);
-  void setMenuFilename(const char *);
   void saveMenuSearch(Window, Basemenu *);
   void saveWindowSearch(Window, OpenboxWindow *);
   void saveToolbarSearch(Window, Toolbar *);

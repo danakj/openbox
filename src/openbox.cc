@@ -151,8 +151,8 @@ static Bool queueScanner(Display *, XEvent *e, char *args) {
 Openbox *openbox;
 
 
-Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
-  : BaseDisplay(m_argv[0], dpy_name) {
+Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc,
+                 char *menu) : BaseDisplay(m_argv[0], dpy_name) {
   grab();
 
   if (! XSupportsLocale())
@@ -164,25 +164,35 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   ::openbox = this;
   argc = m_argc;
   argv = m_argv;
-  if (rc == NULL) {
+  if (rc == NULL || menu == NULL) {
     char *homedir = getenv("HOME");
-
-    rc_file = new char[strlen(homedir) + strlen("/.openbox/rc") + 1];
-    sprintf(rc_file, "%s/.openbox", homedir);
-
+    char *configdir = new char[strlen(homedir) + strlen("/.openbox") + 1];
+    sprintf(configdir, "%s/.openbox", homedir);
     // try to make sure the ~/.openbox directory exists
-    mkdir(rc_file, S_IREAD | S_IWRITE | S_IEXEC | S_IRGRP | S_IWGRP | S_IXGRP |
+    mkdir(configdir, S_IREAD | S_IWRITE | S_IEXEC |
+          S_IRGRP | S_IWGRP | S_IXGRP |
           S_IROTH | S_IWOTH | S_IXOTH);
     
-    sprintf(rc_file, "%s/.openbox/rc", homedir);
-  } else {
-    rc_file = bstrdup(rc);
+
+    if (rc == NULL) {
+      rc_file = new char[strlen(configdir) + strlen("/rc") + 1];
+      sprintf(rc_file, "%s/rc", configdir);
+    } else
+      rc_file = bstrdup(rc);
+
+    if (menu == NULL) {
+      menu_file = new char[strlen(configdir) + strlen("/menu") + 1];
+      sprintf(menu_file, "%s/menu", configdir);
+    } else
+      menu_file = bstrdup(menu);
+
+    delete [] configdir;
   }
   config.setFile(rc_file);
-
+  
   no_focus = False;
 
-  resource.menu_file = resource.style_file = NULL;
+  resource.style_file = NULL;
   resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
@@ -240,9 +250,6 @@ Openbox::~Openbox() {
   for_each(menuTimestamps.begin(), menuTimestamps.end(),
            PointerAssassin());
 
-  if (resource.menu_file)
-    delete [] resource.menu_file;
-
   if (resource.style_file)
     delete [] resource.style_file;
 
@@ -252,6 +259,7 @@ Openbox::~Openbox() {
   delete timer;
 
   delete [] rc_file;
+  delete [] menu_file;
 }
 
 
@@ -883,7 +891,6 @@ void Openbox::save() {
   // save all values as they are so that the defaults will be written to the rc
   // file
   
-  config.setValue("session.menuFile", getMenuFilename());
   config.setValue("session.colorsPerChannel",
                   resource.colors_per_channel);
   config.setValue("session.styleFile", resource.style_file);
@@ -910,13 +917,6 @@ void Openbox::load() {
   std::string s;
   long l;
   
-  if (resource.menu_file)
-    delete [] resource.menu_file;
-  if (config.getValue("session.menuFile", "Session.MenuFile", s))
-    resource.menu_file = bstrdup(s.c_str());
-  else
-    resource.menu_file = bstrdup(DEFAULTMENU);
-
   if (config.getValue("session.colorsPerChannel", "Session.ColorsPerChannel",
                       l))
     resource.colors_per_channel = (l < 2 ? 2 : (l > 6 ? 6 : l)); // >= 2, <= 6
@@ -1001,6 +1001,29 @@ void Openbox::checkMenu() {
 }
 
 
+void Openbox::addMenuTimestamp(const char *filename) {
+  bool found = false;
+
+  MenuTimestampList::iterator it;
+  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it)
+    if (! strcmp((*it)->filename, filename)) {
+      found = true;
+      break;
+    }
+  if (!found) {
+    struct stat buf;
+
+    if (! stat(filename, &buf)) {
+      MenuTimestamp *ts = new MenuTimestamp;
+
+      ts->filename = bstrdup(filename);
+      ts->timestamp = buf.st_ctime;
+
+      menuTimestamps.push_back(ts);
+    }
+  }
+}
+
 void Openbox::rereadMenu() {
   reread_menu_wait = True;
 
@@ -1024,30 +1047,6 @@ void Openbox::setStyleFilename(const char *filename) {
 
   resource.style_file = bstrdup(filename);
   config.setValue("session.styleFile", resource.style_file);
-}
-
-
-void Openbox::setMenuFilename(const char *filename) {
-  bool found = false;
-
-  MenuTimestampList::iterator it;
-  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it)
-    if (! strcmp((*it)->filename, filename)) {
-      found = true;
-      break;
-    }
-  if (!found) {
-    struct stat buf;
-
-    if (! stat(filename, &buf)) {
-      MenuTimestamp *ts = new MenuTimestamp;
-
-      ts->filename = bstrdup(filename);
-      ts->timestamp = buf.st_ctime;
-
-      menuTimestamps.push_back(ts);
-    }
-  }
 }
 
 

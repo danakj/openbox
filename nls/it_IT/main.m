@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # errore: '-rc' richiede un argomento\n
+$ #MENURequiresArg
+# errore: '-menu' richiede un argomento\n
 $ #DISPLAYRequiresArg
 # errore: '-display' richiede an argomento\n
 $ #WarnDisplaySet
@@ -12,6 +14,7 @@ $ #Usage
   \t\t\t  1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\tusa connessione display.\n\
   -rc <string>\t\t\tusa un file risorsa alternativo.\n\
+  -menu <string>\t\t\tusa un file menu alternativo.\n\
   -version\t\t\tmostra la versione e esci.\n\
   -help\t\t\t\tmostra questo aiuto e esci.\n\n
 $ #CompileOptions

@@ -1,6 +1,14 @@
 Changelog for Openbox:
 
 1.2.0:
+ * changed the menu from an rcfile option to a command-
+   line option. use 'openbox -menu <file>' to select an
+   alternate menu. The default menu used is
+   ~/.openbox/menu. If the default, or the file you
+   specify does not exist, the global menu is tried.
+   And if the global menu also does not exist, a
+   simple, internal menu is used instead.               (Ben Jansens)
+
  * new version of bsetroot ported from blackbox cvs
    with intent to support Eterm/Esetroot.               (Sean Perry)
 

@@ -260,11 +260,12 @@ void client_manage(Window window)
         if (self->group) {
             GSList *it;
 
-            for (it = self->group->members; it; it = it->next)
+            for (it = self->group->members; it; it = it->next) {
                 if (client_focused(it->data)) {
                     group_foc = TRUE;
                     break;
                 }
+            }
         }
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
@@ -1139,18 +1140,20 @@ void client_update_wmhints(Client *self)
                 group_remove(self->group, self);
                 self->group = NULL;
             }
-            /* i can only have transients from the group if i am not transient
-               myself */
-            if (hints->window_group != None && !self->transient_for) {
+            if (hints->window_group != None) {
                 self->group = group_add(hints->window_group, self);
 
-                /* add other transients of the group that are already
-                   set up */
-                for (it = self->group->members; it; it = it->next)
-                    if (it->data != self &&
-                        ((Client*)it->data)->transient_for == TRAN_GROUP)
-                        self->transients = g_slist_append(self->transients,
-                                                          it->data);
+                /* i can only have transients from the group if i am not
+                   transient myself */
+                if (!self->transient_for) {
+                    /* add other transients of the group that are already
+                       set up */
+                    for (it = self->group->members; it; it = it->next)
+                        if (it->data != self &&
+                            ((Client*)it->data)->transient_for == TRAN_GROUP)
+                            self->transients = g_slist_append(self->transients,
+                                                              it->data);
+                }
             }
 
             /* the WM_HINTS can contain an icon */

@@ -397,7 +397,7 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
     dby = dbx/(float)h;
     dbx/= (float)w;
     for (x = 0; x < w; ++x, data) {
-      if (x < y) val = (int)(drx * x);
+      if (drx * x < dry * y) val = (int)(drx * x);
       else val = (int)(dry * y);
 
       r = sf->data.planar.primary->r + val;

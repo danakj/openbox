@@ -56,7 +56,7 @@ TrueRenderControl::~TrueRenderControl()
 
 void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
 {
-// since pixel32 is the largest possible pixel size, we can share the array
+  // since pixel32 is the largest possible pixel size, we can share the array
   int r, g, b;
   int x,y;
   pixel32 *data = sf.pixelData();

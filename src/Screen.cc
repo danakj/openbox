@@ -417,10 +417,29 @@ void BScreen::saveHideToolbar(bool h) {
 }
 
 
-void BScreen::saveWindowToWindowSnap(bool s) {
-  resource.window_to_window_snap = s;
-  config->setValue(screenstr + "windowToWindowSnap",
-                   resource.window_to_window_snap);
+void BScreen::saveWindowToEdgeSnap(int s) {
+  resource.snap_to_edges = s;
+
+  const char *snap;
+  switch (resource.snap_to_edges) {
+  case WindowNoSnap: snap = "NoSnap"; break;
+  case WindowResistance: snap = "Resistance"; break;
+  case WindowSnap: default: snap = "Snap"; break;
+  }
+  config->setValue(screenstr + "windowToEdgeSnap", snap);
+}
+
+
+void BScreen::saveWindowToWindowSnap(int s) {
+  resource.snap_to_windows = s;
+  
+  const char *snap;
+  switch (resource.snap_to_edges) {
+  case WindowNoSnap: snap = "NoSnap"; break;
+  case WindowResistance: snap = "Resistance"; break;
+  case WindowSnap: default: snap = "Snap"; break;
+  }
+  config->setValue(screenstr + "windowToWindowSnap", snap);
 }
 
 
@@ -457,10 +476,17 @@ void BScreen::savePlacementPolicy(int p) {
 }
 
 
-void BScreen::saveEdgeSnapThreshold(int t) {
-  resource.edge_snap_threshold = t;
+void BScreen::saveResistanceSize(int s) {
+  resource.resistance_size = s;
+  config->setValue(screenstr + "resistanceSize",
+                   resource.resistance_size);
+}
+
+
+void BScreen::saveSnapThreshold(int t) {
+  resource.snap_threshold = t;
   config->setValue(screenstr + "edgeSnapThreshold",
-                   resource.edge_snap_threshold);
+                   resource.snap_threshold);
 }
 
 
@@ -567,11 +593,13 @@ void BScreen::save_rc(void) {
   saveFocusNew(resource.focus_new);
   saveFocusLast(resource.focus_last);
   saveHideToolbar(resource.hide_toolbar);
-  saveWindowToWindowSnap(resource.window_to_window_snap);
+  saveWindowToWindowSnap(resource.snap_to_windows);
+  saveWindowToEdgeSnap(resource.snap_to_edges);
   saveWindowCornerSnap(resource.window_corner_snap);
   saveWorkspaces(resource.workspaces);
   savePlacementPolicy(resource.placement_policy);
-  saveEdgeSnapThreshold(resource.edge_snap_threshold);
+  saveSnapThreshold(resource.snap_threshold);
+  saveResistanceSize(resource.resistance_size);
   saveRowPlacementDirection(resource.row_direction);
   saveColPlacementDirection(resource.col_direction);
 #ifdef    HAVE_STRFTIME
@@ -621,9 +649,21 @@ void BScreen::load_rc(void) {
   if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
     resource.hide_toolbar = false;
 
-  if (! config->getValue(screenstr + "windowToWindowSnap",
-                         resource.window_to_window_snap))
-    resource.window_to_window_snap = true;
+  resource.snap_to_windows = WindowResistance;
+  if (config->getValue(screenstr + "windowToWindowSnap", s)) {
+    if (s == "NoSnap")
+      resource.snap_to_windows = WindowNoSnap;
+    else if (s == "Snap")
+      resource.snap_to_windows = WindowSnap;
+  }
+
+  resource.snap_to_edges = WindowResistance;
+  if (config->getValue(screenstr + "windowToEdgeSnap", s)) {
+    if (s == "NoSnap")
+      resource.snap_to_edges = WindowNoSnap;
+    else if (s == "Snap")
+      resource.snap_to_edges = WindowSnap;
+  }
 
   if (! config->getValue(screenstr + "windowCornerSnap",
                          resource.window_corner_snap))
@@ -634,8 +674,12 @@ void BScreen::load_rc(void) {
   image_control->setDither(b);
 
   if (! config->getValue(screenstr + "edgeSnapThreshold",
-                        resource.edge_snap_threshold))
-    resource.edge_snap_threshold = 4;
+                        resource.snap_threshold))
+    resource.snap_threshold = 4;
+  
+  if (! config->getValue(screenstr + "resistanceSize",
+                        resource.resistance_size))
+    resource.resistance_size = 12;
   
   if (config->getValue(screenstr + "rowPlacementDirection", s) &&
       s == "RightToLeft")

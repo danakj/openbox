@@ -3115,16 +3115,16 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
 
 void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   // how much resistance to edges to provide
-  const int resistance_size = screen->getEdgeSnapThreshold();
+  const int resistance_size = screen->getResistanceSize();
 
   // how far away to snap
-  const int snap_distance = screen->getEdgeSnapThreshold();
+  const int snap_distance = screen->getSnapThreshold();
 
   // how to snap windows
-  const int snap_to_windows = BScreen::WindowResistance;
-  const int snap_to_edges = BScreen::WindowResistance;
+  const int snap_to_windows = screen->getWindowToWindowSnap();
+  const int snap_to_edges = screen->getWindowToEdgeSnap();
   // the amount of space away from the edge to provide resistance/snap
-  const int snap_offset = screen->getEdgeSnapThreshold();
+//  const int snap_offset = screen->getSnapThreshold();
 
   // find the geomeetery where the moving window currently is
   const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;

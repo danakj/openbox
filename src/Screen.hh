@@ -147,14 +147,17 @@ private:
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
-      allow_scroll_lock, hide_toolbar, window_to_window_snap,
-      window_corner_snap, aa_fonts, ignore_shaded, ignore_maximized,
-      workspace_warping;
+      allow_scroll_lock, hide_toolbar, window_corner_snap, aa_fonts,
+      ignore_shaded, ignore_maximized, workspace_warping;
+
+    int snap_to_windows, snap_to_edges;
+
     BColor border_color;
 
     unsigned int workspaces;
     int toolbar_placement, toolbar_width_percent, placement_policy,
-      edge_snap_threshold, row_direction, col_direction, root_scroll;
+      snap_threshold, row_direction, col_direction, root_scroll,
+      resistance_size;
 
     unsigned int handle_width, bevel_width, frame_width, border_width,
       resize_zones;
@@ -216,8 +219,10 @@ public:
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
   inline bool doHideToolbar(void) const { return resource.hide_toolbar; }
-  inline bool getWindowToWindowSnap(void) const
-    { return resource.window_to_window_snap; }
+  inline int getWindowToWindowSnap(void) const
+    { return resource.snap_to_windows; }
+  inline int getWindowToEdgeSnap(void) const
+    { return resource.snap_to_edges; }
   inline bool getWindowCornerSnap(void) const
     { return resource.window_corner_snap; }
   inline bool allowScrollLock(void) const { return resource.allow_scroll_lock; }
@@ -265,8 +270,10 @@ public:
   { return resource.workspaces; }
   inline int getPlacementPolicy(void) const
   { return resource.placement_policy; }
-  inline int getEdgeSnapThreshold(void) const
-  { return resource.edge_snap_threshold; }
+  inline int getSnapThreshold(void) const
+  { return resource.snap_threshold; }
+  inline int getResistanceSize(void) const
+  { return resource.resistance_size; }
   inline int getRowPlacementDirection(void) const
   { return resource.row_direction; }
   inline int getColPlacementDirection(void) const
@@ -282,7 +289,8 @@ public:
   void savePlacementPolicy(int p);
   void saveRowPlacementDirection(int d);
   void saveColPlacementDirection(int d);
-  void saveEdgeSnapThreshold(int t);
+  void saveSnapThreshold(int t);
+  void saveResistanceSize(int s);
   void saveImageDither(bool d);
   void saveAAFonts(bool f);
   void saveOpaqueMove(bool o);
@@ -290,7 +298,8 @@ public:
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);
   void saveHideToolbar(bool h);
-  void saveWindowToWindowSnap(bool s);
+  void saveWindowToEdgeSnap(int s);
+  void saveWindowToWindowSnap(int s);
   void saveWindowCornerSnap(bool s);
   void saveResizeZones(unsigned int z);
   void savePlaceIgnoreShaded(bool i);

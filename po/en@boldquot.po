@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.0-rc3\n"
+"Project-Id-Version: openbox 3.0-rc4\n"
 "Report-Msgid-Bugs-To: ben@openbox.org\n"
-"POT-Creation-Date: 2003-10-09 15:49-0400\n"
-"PO-Revision-Date: 2003-10-09 15:49-0400\n"
+"POT-Creation-Date: 2003-10-12 19:18-0400\n"
+"PO-Revision-Date: 2003-10-12 19:18-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -41,83 +41,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:88
+#: openbox/client_list_menu.c:92
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:152
+#: openbox/client_list_menu.c:156
 msgid "Desktops"
 msgstr "Desktops"
 
-#: openbox/client_menu.c:76
+#: openbox/client_menu.c:78
 msgid "Restore"
 msgstr "Restore"
 
-#: openbox/client_menu.c:76
+#: openbox/client_menu.c:78
 msgid "Maximize"
 msgstr "Maximize"
 
-#: openbox/client_menu.c:81
+#: openbox/client_menu.c:84
 msgid "Roll down"
 msgstr "Roll down"
 
-#: openbox/client_menu.c:81
+#: openbox/client_menu.c:84
 msgid "Roll up"
 msgstr "Roll up"
 
-#: openbox/client_menu.c:142
+#: openbox/client_menu.c:145
 msgid "All desktops"
 msgstr "All desktops"
 
-#: openbox/client_menu.c:169
+#: openbox/client_menu.c:172
 msgid "Layer"
 msgstr "Layer"
 
-#: openbox/client_menu.c:174
+#: openbox/client_menu.c:177
 msgid "Always on top"
 msgstr "Always on top"
 
-#: openbox/client_menu.c:179
+#: openbox/client_menu.c:182
 msgid "Normal"
 msgstr "Normal"
 
-#: openbox/client_menu.c:184
+#: openbox/client_menu.c:187
 msgid "Always on bottom"
 msgstr "Always on bottom"
 
-#: openbox/client_menu.c:187
+#: openbox/client_menu.c:190
 msgid "Send to desktop"
 msgstr "Send to desktop"
 
-#: openbox/client_menu.c:191
+#: openbox/client_menu.c:194
 msgid "Client menu"
 msgstr "Client menu"
 
-#: openbox/client_menu.c:204
+#: openbox/client_menu.c:207
 msgid "Iconify"
 msgstr "Iconify"
 
-#: openbox/client_menu.c:221
+#: openbox/client_menu.c:224
 msgid "Raise to top"
 msgstr "Raise to top"
 
-#: openbox/client_menu.c:225
+#: openbox/client_menu.c:228
 msgid "Lower to bottom"
 msgstr "Lower to bottom"
 
-#: openbox/client_menu.c:238
+#: openbox/client_menu.c:241
 msgid "Decorate"
 msgstr "Decorate"
 
-#: openbox/client_menu.c:244
+#: openbox/client_menu.c:247
 msgid "Move"
 msgstr "Move"
 
-#: openbox/client_menu.c:248
+#: openbox/client_menu.c:251
 msgid "Resize"
 msgstr "Resize"
 
-#: openbox/client_menu.c:254
+#: openbox/client_menu.c:257
 msgid "Close"
 msgstr "Close"
 

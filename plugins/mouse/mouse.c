@@ -278,7 +278,7 @@ static void event(ObEvent *e, void *foo)
                 ABS(e->data.x.e->xmotion.y_root - py) >= threshold) {
                 guint32 corner;
 
-                if (!client)
+                if (!e->data.x.client)
                     corner = prop_atoms.net_am_moveresize_size_bottomright;
                 else
                     corner =

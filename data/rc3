@@ -27,6 +27,14 @@
 # set, the previously focused window on the desktop is focused when switching
 #focusLastOnDesktop = yes
 
+[desktops]
+
+# The number of virtual desktops to use
+#number = 4
+
+# A list of names for the desktops
+names = ("one" "two" "three" "four")
+
 [engine]
 
 # the theme engine to use

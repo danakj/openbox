@@ -439,8 +439,11 @@ void Blackbox::process_event(XEvent *e) {
     if ( i > 0 )
       e = &realevent;
 
+    if (! e->xmotion.same_screen)
+      break;
+
     // strip the lock key modifiers
-    e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
+    e->xmotion.state &= ~(NumLockMask | ScrollLockMask | LockMask);
 
     last_time = e->xmotion.time;
 

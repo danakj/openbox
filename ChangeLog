@@ -1,5 +1,18 @@
 2003-08-23  Ben Jansens  <xor@zed.orodu.net>
 
+	* ChangeLog: recent changes
+
+	* kernel/keyboard.c:
+	end the other action when starting a new interactive action while one was in place
+
+	* render/render.c: formatting
+
+	* render/render.c: 80 cols
+
+	* render/render.c: stupid function name die
+
+2003-08-23  Ben Jansens  <xor@zed.orodu.net>
+
 	* keyboard.c:
 	end the other action when starting a new interactive action while one was in place
 

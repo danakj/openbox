@@ -90,10 +90,9 @@ void popup_size_to_string(Popup *self, char *text)
 {
     int textw, texth;
     int iconw;
-    struct RrColor c;
 
-    RrColorSet(&c, 0, 0, 0, 1.0);
-    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, &c, text);
+    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT,
+                     &ob_theme->app_label_color_h, text);
     RrSurfaceMinSize(self->s_text, &textw, &texth);
     textw += ob_theme->bevel * 2;
     texth += ob_theme->bevel * 2;
@@ -108,13 +107,10 @@ void popup_show(Popup *self, char *text, Icon *icon)
     int x, y, w, h;
     int textw, texth;
     int iconw;
-    struct RrColor c;
-    struct RrFont *font;
 
     /* set up the textures */
-    RrColorSet(&c, 0, 0, 0, 1.0);
-    font = RrFontOpen(ob_render_inst, "arial-10:bold"); /* XXX mem leak! */
-    RrTextureSetText(self->s_text, 0, font, RR_LEFT, &c, text);
+    RrTextureSetText(self->s_text, 0, ob_theme->title_font, RR_LEFT,
+                     &ob_theme->app_label_color_h, text);
 
     /* measure the shit out */
     RrSurfaceMinSize(self->s_text, &textw, &texth);

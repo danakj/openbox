@@ -1284,6 +1284,18 @@ void client_update_wmhints(ObClient *self)
                 for (it = self->group->members; it; it = it->next)
                     self->transients = g_slist_remove(self->transients,
                                                       it->data);
+
+                /* remove myself from parents in the group */
+                if (self->transient_for == OB_TRAN_GROUP) {
+                    for (it = self->group->members; it; it = it->next) {
+                        ObClient *c = it->data;
+
+                        if (c != self && !c->transient_for)
+                            c->transients = g_slist_remove(c->transients,
+                                                           self);
+                    }
+                }
+
                 group_remove(self->group, self);
                 self->group = NULL;
             }

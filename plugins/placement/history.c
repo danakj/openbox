@@ -250,7 +250,7 @@ void history_startup()
     history_path = g_strdup_printf("%s.%d", path, ob_screen);
     g_free(path);
 
-    /*load_history(); /* load from the historydb file */
+    /*load_history(); /\* load from the historydb file */
 
     dispatch_register(Event_Client_Destroy, (EventHandler)event, NULL);
 }
@@ -259,7 +259,7 @@ void history_shutdown()
 {
     GSList *it;
 
-    /*save_history(); /* save to the historydb file */
+    /*save_history(); /\* save to the historydb file */
     for (it = history_list; it != NULL; it = it->next) {
         struct HistoryItem *hi = it->data;
         g_free(hi->name);

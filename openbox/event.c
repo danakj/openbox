@@ -1144,7 +1144,7 @@ static void find_max_fd()
                        (gpointer)&tmpmax);
     max_fd = MAX(x_fd, tmpmax);
 #ifdef USE_SM
-    max_fd = MAX(ice_fd, tmpmax);
+    max_fd = MAX(ice_fd, max_fd);
 #endif
 }
 

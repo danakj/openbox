@@ -278,9 +278,21 @@ dist_xsd_DATA = \
 	data/rc.xsd \
 	data/menu.xsd
 
-%.xml: %.xml.in
+edit = $(SED) \
+	-e 's!@version\@!$(VERSION)!' \
+	-e 's!@xsddir\@!$(xsddir)!'
+
+data/rc.xml: Makefile $(srcdir)/data/rc.xml.in data
 	@echo make: creating $@
-	@$(SED) -e 's!@version@!$(VERSION)!' -e 's!@xsddir@!$(xsddir)!' $^ > $@
+	@rm -f $@
+	@mkdir data 2>/dev/null || true
+	@$(edit) $(srcdir)/data/rc.xml.in >$@
+
+data/menu.xml: Makefile $(srcdir)/data/menu.xml.in data
+	@echo make: creating $@
+	@rm -f $@
+	@mkdir data 2>/dev/null || true
+	@$(edit) $(srcdir)/data/menu.xml.in >$@
 
 dist_userscript_DATA = \
 	tools/themeupdate/themeupdate.py
@@ -303,6 +315,10 @@ EXTRA_DIST = \
 	README \
 	COPYING \
 	AUTHORS
+
+CLEANFILES = \
+	data/rc.xml \
+	data/menu.xml
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

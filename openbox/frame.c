@@ -144,9 +144,12 @@ Frame *frame_new()
 
 static void frame_free(Frame *self)
 {
-/* XXX WRITEME */
+    int i;
+    for (i = 0; i < self->framedecors; i++) {
+        RrSurfaceFree(self->framedecor[i].surface);
+    }
     XDestroyWindow(ob_display, self->window);
-
+    g_free(self->framedecor);
     g_free(self);
 }
 
@@ -281,7 +284,6 @@ void frame_release_client(Frame *self, Client *client)
 
     for (i = 0; i < self->framedecors; i++)
         g_hash_table_remove(window_map, &self->framedecor[i].window);
-
     frame_free(self);
 }
 

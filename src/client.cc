@@ -979,6 +979,8 @@ void OBClient::setStackLayer(int l)
     _below = true;  // below
   }
   changeState();
+  calcLayer();
+  Openbox::instance->screen(_screen)->restack(true, this); // raise
 }
 
 

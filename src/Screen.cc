@@ -1107,8 +1107,7 @@ void BScreen::manageWindow(Window w) {
 
   XMapRequestEvent mre;
   mre.window = w;
-  if (blackbox->isStartup())
-    win->restoreAttributes();
+  if (blackbox->isStartup()) win->restoreAttributes();
   win->mapRequestEvent(&mre);
 }
 

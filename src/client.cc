@@ -110,6 +110,7 @@ void Client::getGravity()
   }
 }
 
+
 void Client::getDesktop()
 {
   // defaults to the current desktop

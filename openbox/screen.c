@@ -497,6 +497,10 @@ void screen_update_struts()
 	/* apply to the 'all desktops' strut */
 	STRUT_ADD(strut[screen_num_desktops], c->strut);
     }
+
+    for (i = 0; i < screen_num_desktops; ++i)
+        STRUT_ADD(strut[i], dock_strut);
+
     screen_update_area();
 }
 

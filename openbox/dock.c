@@ -11,10 +11,14 @@
 
 static Dock *dock;
 
+Strut dock_strut;
+
 void dock_startup()
 {
     XSetWindowAttributes attrib;
     int i;
+
+    STRUT_SET(dock_strut, 0, 0, 0, 0);
 
     dock = g_new0(struct Dock, 1);
     dock->obwin.type = Window_Dock;
@@ -273,6 +277,49 @@ void dock_configure()
         }    
     }
 
+    /* set the strut */
+    switch (config_dock_pos) {
+    case DockPos_Floating:
+        STRUT_SET(dock_strut, 0, 0, 0, 0);
+        break;
+    case DockPos_TopLeft:
+        if (config_dock_horz)
+            STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+        else
+            STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+        break;
+    case DockPos_Top:
+        STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+        break;
+    case DockPos_TopRight:
+        if (config_dock_horz)
+            STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+        else
+            STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+        break;
+    case DockPos_Left:
+        STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+        break;
+    case DockPos_Right:
+        STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+        break;
+    case DockPos_BottomLeft:
+        if (config_dock_horz)
+            STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+        else
+            STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+        break;
+    case DockPos_Bottom:
+        STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+        break;
+    case DockPos_BottomRight:
+        if (config_dock_horz)
+            STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+        else
+            STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+        break;
+    }
+
     /* not used for actually sizing shit */
     dock->w -= theme_bwidth * 2;
     dock->h -= theme_bwidth * 2;
@@ -290,6 +337,8 @@ void dock_configure()
     /* but they are useful outside of this function! */
     dock->w += theme_bwidth * 2;
     dock->h += theme_bwidth * 2;
+
+    screen_update_struts();
 }
 
 void dock_app_configure(DockApp *app, int w, int h)

@@ -2,9 +2,10 @@
 #define __dock_h
 
 #include "timer.h"
-#include "render/render.h"
 #include "window.h"
 #include "stacking.h"
+#include "geom.h"
+#include "render/render.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -50,6 +51,8 @@ typedef struct DockApp {
     int w;
     int h;
 } DockApp;
+
+extern Strut dock_strut;
 
 void dock_startup();
 void dock_shutdown();

@@ -1,0 +1,6 @@
+mouse.lo
+mouse.la
+Makefile
+Makefile.in
+.libs
+.deps

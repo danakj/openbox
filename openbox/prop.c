@@ -268,7 +268,8 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **ret)
     int nstr;
 
     if (get_stringlist(win, prop, &list, &nstr) && nstr) {
-        *ret = g_locale_to_utf8(list[0], -1, NULL, NULL, NULL);
+        *ret = g_convert(list[0], strlen(list[0]), "UTF-8", "ISO-8859-1",
+                         NULL, NULL, NULL);
         XFreeStringList(list);
         if (*ret) return TRUE;
     }
@@ -286,7 +287,8 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
 
         p = raw;
         for (i = 0; i < num; ++i) {
-            (*ret)[i] = g_locale_to_utf8(p, -1, NULL, NULL, NULL);
+            (*ret)[i] = g_convert(p, strlen(p), "UTF-8", "ISO-8859-1",
+                                  NULL, NULL, NULL);
             /* make sure translation did not fail */
             if (!(*ret)[i]) {
                 g_strfreev(*ret); /* free what we did so far */

@@ -1313,7 +1313,7 @@ void client_calc_layer(Client *self)
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
                     ((Client*)it->data)->transient_for != TRAN_GROUP) {
-                    self = self->transient_for;
+                    self = it->data;
                     break;
                 }
         }

@@ -518,14 +518,6 @@ static void client_get_all(Client *self)
     client_update_icons(self);
     client_update_kwm_icon(self);
 
-    /* this makes sure that these windows appear on all desktops */
-    if (self->type == Type_Desktop)
-	self->desktop = DESKTOP_ALL;
-
-    /* set the desktop hint, to make sure that it always exists, and to
-       reflect any changes we've made here */
-    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
-
     client_change_state(self);
 }
 
@@ -552,6 +544,9 @@ static void client_get_desktop(Client *self)
     } else {
 	/* defaults to the current desktop */
 	self->desktop = screen_desktop;
+
+        /* set the desktop hint, to make sure that it always exists */
+        PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
     }
 }
 
@@ -735,6 +730,10 @@ void client_get_type(Client *self)
 	else
 	    self->type = Type_Normal;
     }
+
+    /* this makes sure that these windows appear on all desktops */
+    if (self->type == Type_Desktop)
+	self->desktop = DESKTOP_ALL;
 }
 
 void client_update_protocols(Client *self)
@@ -1081,7 +1080,7 @@ void client_update_wmhints(Client *self)
                     else
                         self->pixmap_icon_mask = None;
 
-                    if (self->pixmap_icons != None && self->frame)
+                    if (self->frame)
                         frame_adjust_icon(self->frame);
                 }
             }

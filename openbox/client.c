@@ -710,24 +710,24 @@ static void client_get_shaped(ObClient *self)
 void client_update_transient_for(ObClient *self)
 {
     Window t = None;
-    ObClient *c = NULL;
+    ObClient *target = NULL;
 
     if (XGetTransientForHint(ob_display, self->window, &t)) {
 	self->transient = TRUE;
         if (t != self->window) { /* cant be transient to itself! */
-            c = g_hash_table_lookup(window_map, &t);
+            target = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
-            g_assert(c != self);
-            g_assert(!c || WINDOW_IS_CLIENT(c));
+            g_assert(target != self);
+            g_assert(!target || WINDOW_IS_CLIENT(target));
             
-            if (!c && self->group) {
+            if (!target && self->group) {
                 /* not transient to a client, see if it is transient for a
                    group */
                 if (t == self->group->leader ||
                     t == None ||
                     t == RootWindow(ob_display, ob_screen)) {
                     /* window is a transient for its group! */
-                    c = OB_TRAN_GROUP;
+                    target = OB_TRAN_GROUP;
                 }
             }
         }
@@ -735,41 +735,41 @@ void client_update_transient_for(ObClient *self)
 	self->transient = FALSE;
 
     /* if anything has changed... */
-    if (c != self->transient_for) {
+    if (target != self->transient_for) {
 	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
 	    /* remove from old parents */
-            for (it = self->group->members; it; it = it->next)
-                if (it->data != self &&
-                    !((ObClient*)it->data)->transient_for)
-                    ((ObClient*)it->data)->transients =
-                        g_slist_remove(((ObClient*)it->data)->transients, self);
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                ObClient *c = it->data;
+                if (c != self && !c->transient_for)
+                    c->transients = g_slist_remove(c->transients, self);
+            }
         } else if (self->transient_for != NULL) { /* transient of window */
 	    /* remove from old parent */
 	    self->transient_for->transients =
                 g_slist_remove(self->transient_for->transients, self);
         }
-	self->transient_for = c;
+	self->transient_for = target;
 	if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
             GSList *it;
 
 	    /* add to new parents */
-            for (it = self->group->members; it; it = it->next)
-                if (it->data != self &&
-                    !((ObClient*)it->data)->transient_for)
-                    ((ObClient*)it->data)->transients =
-                        g_slist_append(((ObClient*)it->data)->transients, self);
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                ObClient *c = it->data;
+                if (c != self && !c->transient_for)
+                    c->transients = g_slist_append(c->transients, self);
+            }
 
             /* remove all transients which are in the group, that causes
                circlular pointer hell of doom */
-            for (it = self->group->members; it; it = it->next) {
+            for (it = self->group->members; it; it = g_slist_next(it)) {
                 GSList *sit, *next;
                 for (sit = self->transients; sit; sit = next) {
-                    next = sit->next;
+                    next = g_slist_next(sit);
                     if (sit->data == it->data)
-                        self->transients = g_slist_remove(self->transients,
-                                                          sit->data);
+                        self->transients =
+                            g_slist_delete_link(self->transients, sit);
                 }
             }
         } else if (self->transient_for != NULL) { /* transient of window */
@@ -1174,11 +1174,12 @@ void client_update_wmhints(ObClient *self)
                 if (!self->transient_for) {
                     /* add other transients of the group that are already
                        set up */
-                    for (it = self->group->members; it; it = it->next)
-                        if (it->data != self &&
-                            ((ObClient*)it->data)->transient_for == OB_TRAN_GROUP)
-                            self->transients = g_slist_append(self->transients,
-                                                              it->data);
+                    for (it = self->group->members; it; it = it->next) {
+                        ObClient *c = it->data;
+                        if (c != self && c->transient_for == OB_TRAN_GROUP)
+                            self->transients =
+                                g_slist_append(self->transients, c);
+                    }
                 }
             }
 

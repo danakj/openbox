@@ -19,7 +19,7 @@ using std::endl;
 
 #include "font.hh"
 #include "util.hh"
-#include "gccache.hh"
+#include "display.hh"
 #include "color.hh"
 #include "screeninfo.hh"
 

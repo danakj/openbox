@@ -26,7 +26,7 @@ configuration.o: configuration.cc configuration.hh util.hh
 focuswidget.o: focuswidget.cc focuswidget.hh widget.hh rect.hh \
  point.hh texture.hh color.hh util.hh style.hh font.hh image.hh \
  screeninfo.hh timer.hh configuration.hh
-font.o: font.cc font.hh util.hh gccache.hh display.hh color.hh \
+font.o: font.cc font.hh util.hh display.hh display.hh color.hh \
  screeninfo.hh rect.hh point.hh
 gccache.o: gccache.cc gccache.hh display.hh color.hh assassin.hh \
  screeninfo.hh rect.hh point.hh

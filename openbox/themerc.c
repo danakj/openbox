@@ -137,7 +137,7 @@ void themerc_startup()
     if (chan != NULL) {
 	parse(path, g_io_channel_unix_get_fd(chan));
 	g_free(path);
-	g_io_channel_close(chan);
+        g_io_channel_unref(chan); /* close the channel */
     }
 
     /* non-NULL defaults */

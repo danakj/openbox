@@ -153,7 +153,6 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
     guint i;
-    Client *parent;
 
     grab_server(TRUE);
 
@@ -241,9 +240,21 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state != State_Starting) {
+        Client *parent;
+        gboolean group_foc = FALSE;
+        
         parent = NULL;
 
-        if (self->transient_for) {
+        if (self->group) {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next)
+                if (client_focused(it->data)) {
+                    group_foc = TRUE;
+                    break;
+                }
+        }
+        if (!group_foc && self->transient_for) {
             if (self->transient_for != TRAN_GROUP) {/* transient of a window */
                 parent = self->transient_for;
             } else { /* transient of a group */
@@ -260,7 +271,8 @@ void client_manage(Window window)
            rules for focus */
         if ((config_focus_new &&
              (self->type == Type_Normal ||
-              (self->type == Type_Dialog && !parent && !self->group))) ||
+              (self->type == Type_Dialog && (group_foc ||
+                                             (!parent && !self->group))))) ||
             (parent && (client_focused(parent) ||
                         search_focus_tree(parent, parent)))) {
             client_focus(self);

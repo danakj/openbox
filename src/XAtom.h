@@ -28,8 +28,8 @@
 #include <X11/Xatom.h>
 #include <vector>
 
-class XDisplay;
-class XScreen;
+class Openbox;
+class ScreenInfo;
 
 class XAtom {
   typedef std::vector<Window> SupportWindows;
@@ -102,7 +102,7 @@ class XAtom {
     net_wm_ping;
 
   Atom getAtom(const char *name) const;
-  void setSupported(const XScreen *screen);
+  void setSupported(const ScreenInfo *screen);
 
   void setValue(Window win, Atom atom, Atom type, unsigned char *data,
                 int size, int nelements, bool append) const;
@@ -114,7 +114,7 @@ class XAtom {
   XAtom& operator=(const XAtom&);
 
 public:
-  XAtom(const XDisplay *display);
+  XAtom(Openbox &ob);
   virtual ~XAtom();
 
   void setCardValue(Window win, Atom atom, long value) const; // 32-bit CARDINAL

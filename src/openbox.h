@@ -47,6 +47,7 @@
 
 #include <map>
 #include <list>
+#include <vector>
 
 //forward declaration
 class BScreen;
@@ -115,7 +116,7 @@ private:
   typedef std::list<MenuTimestamp*> MenuTimestampList;
   MenuTimestampList menuTimestamps;
 
-  typedef std::list<BScreen*> ScreenList;
+  typedef std::vector<BScreen*> ScreenList;
   ScreenList screenList;
 
   BScreen *current_screen;
@@ -158,8 +159,14 @@ public:
   OpenboxWindow *focusedWindow();
   void focusWindow(OpenboxWindow *w);
 
-  BScreen *getScreen(int);
+  inline BScreen *getScreen(unsigned int s) {
+    ASSERT(s < screenList.size());
+    return screenList[s];
+  }
   BScreen *searchScreen(Window);
+  inline unsigned int managedScreenCount() const {
+    return screenList.size();
+  }
 
   inline Resource &getConfig() {
     return config;

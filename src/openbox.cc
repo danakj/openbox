@@ -223,7 +223,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc,
                                   "Openbox::Openbox: no managable screens found, aborting.\n"));
                      ::exit(3);
                    }
-                   current_screen = screenList.front();
+                   current_screen = screenList[0];
 
                    // save current settings and default values
                    save();

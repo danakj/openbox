@@ -30,7 +30,7 @@ CPPFLAGS= @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Geometry.cc Iconmenu.cc Image.cc Netizen.cc Resource.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc XAtom.cc XDisplay.cc XScreen.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
+openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Geometry.cc Iconmenu.cc Image.cc Netizen.cc Resource.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc XAtom.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -82,9 +82,7 @@ Toolbar.o: Toolbar.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Clientmenu.h Workspace.h Rootmenu.h Screen.h Configmenu.h \
  Netizen.h Workspacemenu.h Toolbar.h Resource.h Geometry.h
-XAtom.o: XAtom.cc XAtom.h XDisplay.h XScreen.h Geometry.h Util.h
-XDisplay.o: XDisplay.cc XDisplay.h XAtom.h XScreen.h Geometry.h Util.h
-XScreen.o: XScreen.cc XScreen.h Geometry.h XDisplay.h XAtom.h
+XAtom.o: XAtom.cc XAtom.h Geometry.h Util.h
 Window.o: Window.cc i18n.h openbox.h BaseDisplay.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \

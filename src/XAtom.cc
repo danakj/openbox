@@ -20,12 +20,12 @@
 // DEALINGS IN THE SOFTWARE.
 
 #include "XAtom.h"
-#include "XDisplay.h"
-#include "XScreen.h"
+#include "openbox.h"
+#include "Screen.h"
 #include "Util.h"
 
-XAtom::XAtom(const XDisplay *display) {
-  _display = display->_display;
+XAtom::XAtom(Openbox &ob) {
+  _display = ob.getXDisplay();
 
 #ifdef    HAVE_GETPID
   openbox_pid = getAtom("_BLACKBOX_PID");
@@ -86,8 +86,8 @@ XAtom::XAtom(const XDisplay *display) {
 
   net_wm_ping = getAtom("_NET_WM_PING");
 
-  for (int s = 0, c = display->screenCount(); s < c; ++s)
-    setSupported(display->screen(s));
+  for (unsigned int s = 0, c = ob.managedScreenCount(); s < c; ++s)
+    setSupported( static_cast<ScreenInfo*>(ob.getScreen(s)) );
 }
 
 
@@ -115,9 +115,9 @@ Atom XAtom::getAtom(const char *name) const {
 /*
  * Sets which atoms are supported for NETWM, by Openbox, on the root window.
  */
-void XAtom::setSupported(const XScreen *screen) {
+void XAtom::setSupported(const ScreenInfo *screen) {
   // create the netwm support window
-  Window w = XCreateSimpleWindow(_display, screen->rootWindow(),
+  Window w = XCreateSimpleWindow(_display, screen->getRootWindow(),
                                  0, 0, 1, 1, 0, 0, 0);
   ASSERT(w != None);
   _support_windows.push_back(w);

@@ -1,4 +1,4 @@
-#include "widget.hh"
+#include "focuswidget.hh"
 #include "display.hh"
 #include "configuration.hh"
 #include "timerqueuemanager.hh"
@@ -13,7 +13,7 @@ int main(void) {
     otk::OBDisplay::screenInfo(DefaultScreen(otk::OBDisplay::display));
   otk::BImageControl *ctrl = new otk::BImageControl(tm, s_info, True, 4, 5, 200);
 
-  otk::Style *my_style = new otk::Style(0ul, ctrl);
+  otk::Style *my_style = new otk::Style(ctrl);
 
   const char *sfile = "/usr/local/share/openbox/styles/artwiz";
   
@@ -22,23 +22,43 @@ int main(void) {
 
   my_style->load(style_conf);
 
-  otk::OtkWidget foo(my_style);
-  otk::OtkWidget bar(&foo);
-  otk::OtkWidget baz(&foo);
-  otk::OtkWidget blef(&bar);
+  otk::OtkFocusWidget foo(my_style);
+  otk::OtkFocusWidget iconb(&foo);
+  otk::OtkFocusWidget label(&foo);
+  otk::OtkFocusWidget maxb(&foo);
+  otk::OtkFocusWidget closeb(&foo);
 
-  foo.setTexture(my_style->getButtonFocus());
-  foo.setGeometry(0, 0, 100, 110);
+  foo.setBevelWidth(2);
 
-  bar.setTexture(my_style->getLabelFocus());
-  bar.setGeometry(10, 10, 80, 40);
+  // fix the width to 400. the height will be determined by the height of
+  // its children
+  foo.setWidth(400);
+  foo.setTexture(my_style->getTitleFocus());
+  foo.setUnfocusTexture(my_style->getTitleUnfocus());
 
-  baz.setTexture(my_style->getLabelFocus());
-  baz.setGeometry(10, 60, 80, 40);
+  // fixed size
+  iconb.resize(15, 15);
+  iconb.setTexture(my_style->getButtonFocus());
+  iconb.setUnfocusTexture(my_style->getButtonUnfocus());
 
-  blef.setTexture(my_style->getHandleFocus());
-  blef.setGeometry(10, 10, 60, 20);
+  // fix height to 15 and let the width be calculated by its parent
+  label.setHeight(15);
+  label.setStretchableHorz(true);
+  label.setTexture(my_style->getLabelFocus());
+  label.setUnfocusTexture(my_style->getLabelUnfocus());
 
+  // fixed size
+  maxb.resize(15, 15);
+  maxb.setTexture(my_style->getButtonFocus());
+  maxb.setUnfocusTexture(my_style->getButtonUnfocus());
+
+  // fixed size
+  closeb.resize(15, 15);
+  closeb.setTexture(my_style->getButtonFocus());
+  closeb.setUnfocusTexture(my_style->getButtonUnfocus());
+
+  // will recursively unfocus its children
+  foo.unfocus();
   foo.show();
 
   while (1) {

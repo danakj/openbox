@@ -296,6 +296,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if ((n = parse_find_node("drawContents", node)))
         config_resize_redraw = parse_bool(doc, n);
     if ((n = parse_find_node("popupShow", node))) {
+        config_resize_popup_show = parse_int(doc, n);
         if (parse_contains("Always", doc, n))
             config_resize_popup_show = 2;
         else if (parse_contains("Never", doc, n))
@@ -304,6 +305,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_resize_popup_show = 1;
     }
     if ((n = parse_find_node("popupPosition", node))) {
+        config_resize_popup_pos = parse_int(doc, n);
         if (parse_contains("Top", doc, n))
             config_resize_popup_pos = 1;
         else if (parse_contains("Center", doc, n))

@@ -230,16 +230,10 @@ class _Cycle:
 
     def next(self, data):
         """Focus the next window."""
-        if not data.state:
-            raise RuntimeError("next must be bound to a key" +
-                               "combination with at least one modifier")
         self.cycle(data, 1)
         
     def previous(self, data):
         """Focus the previous window."""
-        if not data.state:
-            raise RuntimeError("previous must be bound to a key" +
-                               "combination with at least one modifier")
         self.cycle(data, 0)
 
 #---------------------- Window Cycling --------------------
@@ -413,8 +407,7 @@ class _CycleWindowsLinear(_CycleWindows):
     def populateItems(self):
         # get the list of clients, keeping iconic windows at the bottom
         iconic_clients = []
-        for i in range(self.screen.clientCount()):
-            c = self.screen.client(i)
+        for c in self.screen.clients:
             if self.shouldAdd(c):
                 self.items.append(c)
 

@@ -2,7 +2,9 @@
 
 styledir = $(pkgdatadir)/styles
 MAINTAINERCLEANFILES = Makefile.in
-style_DATA = artwiz bluebox cthulhain deep flux frobozz frobust nyz nyzclone operation outcomes shade steelblue steelblue2 the_orange trisb twice
+style_DATA = artwiz bbs bluebox cthulhain deep flux frobozz frobust mbdtex \
+	miklos nyz nyzclone ob20 operation outcomes purplehaaze shade steelblue \
+	steelblue2 the_orange trisb twice warp-xp
 
 distclean-local:
 	rm -f *\~ .\#*

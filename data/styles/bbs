@@ -1,0 +1,109 @@
+style.name:	[b]lack [b]ronze [s]alad
+style.author:	miklos
+
+rootCommand:	bsetbg -solid '#5d718e'
+
+!toolbar.button: flat gradient vertical  bevel1
+!toolbar.button.color: #e2dfbd
+!toolbar.button.colorTo: #6f6d5d
+toolbar.button: parentrelative
+toolbar.button.picColor:	#4d462a
+
+toolbar.button.pressed:	Sunken Bevel1 Solid 
+toolbar.button.pressed.color:	#a19f86
+
+!toolbar.label: raised gradient crossdiagonal bevel1
+!toolbar.label.color: #e2dfbd
+!toolbar.label.colorTo: #6f6d5d
+toolbar.label: parentrelative
+toolbar.label.textColor:	#334142
+
+toolbar.windowLabel:	sunken gradient crossdiagonal
+toolbar.windowLabel.color: #94927b
+toolbar.windowLabel.colorTo: #a19f86
+toolbar.windowLabel.textColor:	#334142
+
+!toolbar.clock: raised gradient crossdiagonal bevel2
+toolbar.clock: parentrelative
+toolbar.clock.color: #e2dfbd
+toolbar.clock.colorTo: #6f6d5d
+toolbar.clock.textColor:	#334142
+
+toolbar: raised Gradient vertical bevel1
+toolbar.color:	#e2dfbd
+toolbar.colorTo: #a19f86
+toolbar.justify:	Center
+
+menu.frame: raised gradient crossdiagonal bevel1
+menu.frame.color:	#e2dfbd
+menu.frame.colorTo: #6f6d5d
+menu.frame.textColor:	#334142
+menu.frame.justify:	right
+
+menu.title:	sunken gradient crossdiagonal bevel2
+menu.title.color:	#94927b
+menu.title.colorTo: #a19f86
+menu.title.textColor:	#334142
+menu.title.justify:	center
+
+menu.hilite:	sunken gradient crossdiagonal bevel2
+menu.hilite.colorTo:	#506890
+menu.hilite.color: #a19f86
+menu.hilite.textColor:	#4d462a
+
+menu.bullet:	Empty
+menu.bullet.position:	left
+menu.frame.disableColor:	#ffffff
+
+!window.button.focus: flat gradient crossdiagonal bevel1
+window.button.focus: parentrelative
+window.button.focus.color:	#e2dfbd
+window.button.focus.colorTo: #6f6d5d
+window.button.focus.picColor:	#334142
+
+window.button.unfocus: parentrelative	
+window.button.unfocus.picColor:	#556364
+
+window.grip.focus:	sunken gradient crossdiagonal bevle1
+window.grip.focus.color:	#e2dfbd
+window.grip.focus.colorTo: #6f6d5d
+
+window.grip.unfocus: parentrelative
+
+window.handle.focus: flat gradient crossdiagonal
+window.handle.focus.color:	#e2dfbd
+window.handle.focus.colorTo: #a19f86
+
+window.handle.unfocus: flat gradient crossdiagonal
+window.handle.unfocus.color: #e2dfbd
+window.handle.unfocus.colorTo: #6f6d5d
+
+window.label.focus:	sunken gradient crossdiagonal
+window.label.focus.color:	#94927b
+window.label.focus.colorTo: #a19f86
+window.label.focus.textColor:	#334142
+window.label.focus.justify:	Center
+
+window.justify:	Center
+window.label.unfocus:	parentrelative
+window.label.unfocus.textColor:	#758384
+
+window.title.focus:	raised gradient vertical bevel1
+window.title.focus.color:	#e2dfdb
+window.title.focus.colorTo: #a19f86
+
+window.title.unfocus:	raised gradient crossdiagonal  bevel1
+window.title.unfocus.color:	#e2dfdb
+window.title.unfocus.colorTo: #a19f86
+
+window.button.pressed:	Sunken Bevel1 Gradient crossdiagonal
+window.button.pressed.colorTo:	#506890
+window.button.pressed.color:	#a19f86
+
+window.frame.focusColor:	#e2dfdb
+window.frame.unfocusColor:	#6f6d5d
+handleWidth:	4
+frameWidth:	0
+bevelWidth:	1
+borderWidth:	0
+borderColor:	#8f8d7d

@@ -1,0 +1,103 @@
+style.name:	Purple H(aa)ze
+style.author:	miklos
+style.date:	Sunday July 14, 2002
+
+rootCommand:	bsetbg -solid "#8187a1"
+
+! Toolbar settings...
+toolbar.button: parentrelative
+toolbar.button.picColor:	#616e7f
+
+toolbar.button.pressed:	sunken gradient vertical
+toolbar.button.pressed.color:	#a0a6be
+toolbar.button.pressed.colorTo: #b5bdb2
+
+toolbar.label: parentrelative
+toolbar.label.textColor:	#616e7f
+
+toolbar.windowLabel:	sunken gradient elliptic 
+toolbar.windowLabel.colorTo:	#a8b6d9
+toolbar.windowLabel.color: #b0b6ce
+toolbar.windowLabel.textColor:	#1d3742
+
+toolbar.clock: parentrelative
+toolbar.clock.textColor:	#616e7f
+
+toolbar:	flat gradient vertical
+toolbar.color:	#fbfeff
+toolbar.colorTo: #bcbdcf
+toolbar.justify:	center
+
+
+! Menu settings...
+menu.frame: flat gradient horizontal
+menu.frame.color:	#b3b7d2
+menu.frame.colorTo: #687085
+menu.frame.textColor:	#061637
+menu.frame.justify: right
+
+menu.title:	flat gradient vertical
+menu.title.color:	#fbfeff
+menu.title.colorTo: #bcbdcf
+menu.title.textColor:	#1d2742
+menu.title.justify:	center
+
+menu.hilite:	flat gradient horizontal 
+menu.hilite.color: #b3b7d2
+menu.hilite.colorTo: #c2cbda
+menu.hilite.textColor:	#000000
+
+menu.bullet: diamod
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus: parentrelative
+window.button.focus.picColor:	#1d2941
+
+window.button.unfocus:	parentrelative
+window.button.unfocus.picColor:	#616e7f
+
+window.grip.focus:	Flat Solid
+window.grip.focus.color:	#687085
+
+window.grip.unfocus:	Flat Solid
+window.grip.unfocus.color:	#bcbdbf
+
+window.handle.focus:	Flat Solid
+window.handle.focus.color:	#687085
+
+window.handle.unfocus:	Flat Solid
+window.handle.unfocus.color:	#bcbdbf
+
+window.label.focus:	parentrelative
+
+window.justify:	center
+
+window.label.unfocus:	flat gradient vertical
+window.label.unfocus.color: #fbfeff
+window.label.unfocus.colorTo: #bcbdbf
+window.label.unfocus.textColor: #616e7f
+
+window.title.focus: flat gradient vertical
+window.title.focus.color: #b3b7d2
+window.title.focus.colorTo: #687085
+window.title.focus.textColor: #0d2041
+
+window.title.unfocus:	flat gradient vertical
+window.title.unfocus.color:	#fbfeff
+window.title.unfocus.colorTo: #bcbdbf
+window.title.unfocus.textColor: #616e7f
+
+window.button.pressed:	Sunken gradient diagonal
+window.button.pressed.color:	#666666
+window.button.pressed.colorTo:	#444444
+
+*.font:        -schumacher-clean-medium-r-normal-*-*-120-*-*-c-*-iso646.1991-irv
+window.frame.focusColor:	#687085
+window.frame.unfocusColor:	#bcbdbf
+handleWidth:	1
+frameWidth:	 2
+bevelWidth:	1
+borderWidth: #434d59
+borderColor:	#555555

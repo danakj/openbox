@@ -1,0 +1,131 @@
+! Miscellaneous settings...
+style.name:	miklos
+style.author:	miklos
+style.date:	03.01.02
+style.credits:	
+style.comments:			
+		
+
+! rootCommand:	 bsetroot -gradient interlaced -from rgb:5b/67/5b -to rgb:6f/78/6b
+! rootCommand: Esetroot -scale ~/bg/exonerate.jpg
+rootCommand:	bsetroot -gradient interlaced -from rgb:47/50/47 -to rgb:5b/67/5b
+! rootCommand:	bsetroot -gradient interlaced -from rgb:56/5d/53 -to rgb:5b/67/5b
+
+! Toolbar settings...
+toolbar.button:	Sunken Bevel1 Gradient Vertical Interlaced
+toolbar.button.color:	#8a968a
+toolbar.button.colorTo:	#6d7669
+toolbar.button.picColor:	#ffffff
+
+toolbar.button.pressed:	Sunken Bevel1 Gradient Diagonal Interlaced
+toolbar.button.pressed.color:	#6e7b8b
+toolbar.button.pressed.colorTo:	#8fa0b5
+
+toolbar.label:	Flat Gradient Vertical
+toolbar.label.color:	#8a968a
+toolbar.label.colorTo:	#6d7669
+toolbar.label.textColor:	#ffffff
+
+toolbar.windowLabel:	Sunken Bevel1 Gradient Diagonal
+toolbar.windowLabel.color:	#6f634a
+toolbar.windowLabel.colorTo:	#c1b5a1
+toolbar.windowLabel.textColor:	#ffffff
+
+toolbar.clock:	Flat Gradient Vertical
+toolbar.clock.color:	#8a968a
+toolbar.clock.colorTo:	#6d7669
+toolbar.clock.textColor:	#ffffff
+
+toolbar:	Raised Bevel1 Gradient Vertical
+toolbar.color:	#8a968a
+toolbar.colorTo:	#6d7669
+toolbar.textColor:	#ffffff
+! toolbar.font:	luxus
+toolbar.justify:	Left
+
+
+! Menu settings...
+menu.frame:	Raised Bevel1 Gradient Vertical
+menu.frame.color:	#8a968a
+menu.frame.colorTo:	#6d7669
+menu.frame.textColor:	#000000
+! menu.frame.font:	luxus
+menu.frame.justify:	Left
+
+menu.title:	Raised Bevel1 Gradient Vertical
+menu.title.color:	#8a968a
+menu.title.colorTo:	#6d7669
+menu.title.textColor:	#ffffff
+! menu.title.font:	luxus
+menu.title.justify:	Center
+
+menu.hilite:	Sunken Bevel2 Gradient Diagonal
+menu.hilite.color:	#6e7b8b
+menu.hilite.colorTo:	#8fa0b5
+menu.hilite.textColor:	#ffffff
+
+menu.bullet:	Empty
+menu.bullet.position:	Left
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus:	Sunken Bevel1 Gradient Vertical Interlaced
+window.button.focus.color:	#8a968a
+window.button.focus.colorTo:	#6d7669
+window.button.focus.picColor:	#ffffff
+
+window.button.unfocus:	Sunken Bevel1 Gradient Vertical
+window.button.unfocus.color:	#8a968a
+window.button.unfocus.colorTo:	#6d7669
+window.button.unfocus.picColor:	#97a397
+
+window.grip.focus:	Raised Bevel1 Gradient Vertical Interlaced
+window.grip.focus.color:	#c1b5a1
+window.grip.focus.colorTo:	#6f634a
+
+window.grip.unfocus:	Flat Gradient Vertical Interlaced
+window.grip.unfocus.color:	#8a968a
+window.grip.unfocus.colorTo:	#6d7669
+
+window.handle.focus:	Flat Gradient Vertical Interlaced
+window.handle.focus.color:	#8a968a
+window.handle.focus.colorTo:	#6d7669
+
+window.handle.unfocus:	Flat Gradient Vertical
+window.handle.unfocus.color:	#6d7669
+window.handle.unfocus.colorTo:	#565d53
+
+window.label.focus:	Sunken Bevel1 Gradient Diagonal
+window.label.focus.color:	#6f634a
+window.label.focus.colorTo:	#c1b5a1
+window.label.focus.textColor:	#ffffff
+! window.label.focus.font:	luxus
+window.label.focus.justify:	Left
+
+! window.font:	luxus
+window.justify:	Left
+window.label.unfocus:	Flat Gradient Vertical
+window.label.unfocus.color:	#8a968a
+window.label.unfocus.colorTo:	#6d7669
+window.label.unfocus.textColor:	#97a397
+
+window.title.focus:	Raised Bevel1 Gradient Vertical
+window.title.focus.color:	#8a968a
+window.title.focus.colorTo:	#6d7669
+
+window.title.unfocus:	Raised Bevel1 Gradient Vertical
+window.title.unfocus.color:	#8a968a
+window.title.unfocus.colorTo:	#6d7669
+
+window.button.pressed:	Sunken Bevel1 Gradient Diagonal Interlaced
+window.button.pressed.color:	#6e7b8b
+window.button.pressed.colorTo:	#8fa0b5
+
+window.frame.focusColor:	#7b877b
+window.frame.unfocusColor:	#5b675b
+handleWidth:	3
+frameWidth:	1
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#000000
+*Font: lime

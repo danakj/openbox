@@ -1,0 +1,99 @@
+! author: miklos
+! the xp lookalike
+
+toolbar:			raised gradient vertical
+toolbar.color:			rgb:43/66/a8
+toolbar.colorTo:		rgb:50/78/c0
+toolbar.button:			parentrelative
+toolbar.button.picColor:	rgb:d1/d1/d1
+toolbar.label:			parentrelative
+toolbar.label.textColor:	rgb:d1/d1/d1
+toolbar.windowLabel:		parentrelative
+toolbar.windowLabel.textColor:	rgb:d1/d1/d1
+toolbar.clock:			parentrelative
+toolbar.clock.textColor:	rgb:d1/d1/d1
+toolbar.justify:		right
+menu.title:			raised vertical gradient
+menu.title.color:		rgb:00/4a/d9
+menu.title.colorTo:		rgb:00/5f/f9
+menu.title.textColor:		rgb:f8/f6/e7
+menu.title.justify:		right
+
+menu.frame:			flat gradient horizontal
+menu.frame.color:		rgb:f3/f5/f6
+menu.frame.colorTo:		rgb:ee/ea/d4
+menu.frame.textColor:		rgb:00/00/00
+menu.frame.disableColor:	rgb:4/4/4
+menu.frame.justify:		right
+
+menu.bullet.position:		right
+menu.bullet:			diamond
+
+menu.hilite:			flat solid
+menu.hilite.color:		rgb:31/6a/c5
+menu.hilite.textColor:		rgb:ff/ff/ff
+
+! window.title.focus:		flat vertical gradient
+! window.title.focus.color:	rgb:6b/8f/e7
+! window.title.focus.colorTo:	rgb:4b/6f/cf
+
+window.title.focus:		flat gradient vertical
+window.title.focus.color:	rgb:24/7d/ff
+window.title.focus.colorTo:	rgb:00/48/e5
+
+! window.title.unfocus:		flat vertical gradient
+! window.title.unfocus.color:	rgb:20/5a/cd
+! window.title.unfocus.colorTo:	rgb:00/30/9c
+
+window.title.unfocus:		flat gradient vertical
+window.title.unfocus.color:	rgb:66/8e/cc
+window.title.unfocus.colorTo:	rgb:44/68/b2
+
+window.label.focus:		flat vertical gradient
+window.label.focus.color:	rgb:00/48/e5
+window.label.focus.colorTo:	rgb:24/7d/ff
+window.label.focus.textColor:	rgb:f8/f6/e7
+
+window.label.unfocus:		flat vertical gradient
+window.label.unfocus.color:	rgb:44/68/b2
+window.label.unfocus.colorTo:	rgb:66/8e/cc
+window.label.unfocus.textColor:	rgb:d1/d1/d1
+
+window.button.focus:		flat solid
+window.button.focus.color:	rgb:d6/5a/36
+window.button.focus.picColor:	rgb:e8/ff/f5
+
+window.button.unfocus:		flat solid
+window.button.unfocus.color:	rgb:78/64/7d
+window.button.unfocus.picColor:	rgb:c1/b3/cd
+
+window.handle.focus:		flat solid
+window.handle.focus.color:	rgb:6b/8f/e7
+window.handle.unfocus:		flat solid
+window.handle.unfocus.color:	rgb:20/5a/cd
+
+window.grip.focus:		raised solid
+window.grip.focus.color:	rgb:8b/af/f7
+window.grip.unfocus:		raised solid
+window.grip.unfocus.color:	rgb:00/30/9c
+
+window.frame.focusColor:	rgb:24/7d/ff
+window.frame.unfocusColor:	rgb:50/70/b0
+
+window.justify:			right
+
+*button.pressed:		sunken solid
+*button.pressed.color:		rgb:6b/8f/e7
+*button.pressed.colorTo:	
+
+borderColor:			rgb:10/30/50
+
+bevelWidth:			1
+borderWidth:			1
+handleWidth:			1
+frameWidth:			1
+
+*.font:				 -schumacher-clean-medium-r-normal-*-*-120-*-*-c-*-iso646.1991-irv
+
+rootCommand: bsetbg -solid "#4468b2"
+

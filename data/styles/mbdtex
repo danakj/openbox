@@ -1,0 +1,90 @@
+! by miklos
+! May 16, 2002
+
+toolbar:			flat gradient vertical
+toolbar.color:			rgb:6a/7c/8b
+toolbar.colorTo:		rgb:4a/59/65
+toolbar.button:			parentrelative
+toolbar.button.picColor:	rgb:d1/d1/d1
+toolbar.label:			parentrelative
+toolbar.label.textColor:	rgb:b9/cc/db
+
+toolbar.windowLabel:	parentrelative
+toolbar.windowLabel.textColor:	rgb:b9/cc/db
+
+toolbar.clock:			parentrelative
+toolbar.clock.textColor:	rgb:b9/cc/db
+toolbar.justify:		center
+
+menu.title:			flat gradient crossdiagonal
+menu.title.color:		rgb:7a/8c/9b
+menu.title.colorTo:		rgb:5b/6d/7b
+menu.title.textColor:		rgb:dd/f0/ff
+menu.title.justify:		center
+
+menu.frame:			flat gradient vertical
+menu.frame.colorTo:		rgb:5a/69/75
+menu.frame.color:		rgb:6b/7d/8b
+menu.frame.textColor:		rgb:b9/cc/db
+menu.frame.disableColor:	rgb:4/4/4
+
+menu.frame.justify:		left
+
+menu.bullet.position:	left
+
+menu.hilite:			flat gradient vertical
+menu.hilite.colorTo:		rgb:4a/59/65
+menu.hilite.color:	rgb:5b/6d/7b
+menu.hilite.textColor:		rgb:dd/f0/ff
+
+window.title.focus:		flat gradient vertical
+window.title.focus.color:	rgb:7a/8c/9b
+window.title.focus.colorTo:	rgb:5b/6d/7b
+window.title.textColor:		rgb:b9/cc/db
+
+window.title.unfocus:		flat gradient vertical
+window.title.unfocus.color:	rgb:6a/7c/8b
+window.title.unfocus.colorTo:	rgb:4a/59/65
+
+window.label.focus:		parentrelative
+window.label.focus.textColor:	rgb:dd/f0/ff
+
+window.label.unfocus:		parentrelative
+window.label.unfocus.textColor:	rgb:b9/cc/db
+
+window.button.focus:		parentrelative
+window.button.focus.picColor:	rgb:f8/f6/e7
+
+window.button.unfocus:		parentrelative
+window.button.unfocus.picColor:	rgb:b9/cc/db
+
+window.handle.focus:		flat gradient vertical
+window.handle.focus.color:	rgb:7a/8c/9b
+window.handle.focus.colorTo:	rgb:5b/6d/7b
+window.handle.unfocus:		flat gradient vertical
+window.handle.unfocus.color:	rgb:6a/7c/8b
+window.handle.unfocus.colorTo:	rgb:4a/59/65
+window.grip.focus:		flat gradient vertical
+window.grip.focus.color:	rgb:7a/8c/9b
+window.grip.focus.colorTo:	rgb:5b/6d/7b
+window.grip.unfocus:	flat gradient vertical
+window.grip.unfocus.color:	rgb:6a/7c/8b
+window.grip.unfocus.colorTo:	rgb:4a/59/65
+window.justify:			left
+
+window.frame.unfocusColor:		rgb:56/6d/7b
+window.frame.focusColor:		rgb:8a/9c/ab
+
+*button.pressed:		flat solid
+*button.pressed.color:		rgb:d6/5a/36
+
+! borderColor:			rgb:7c/7e/7f
+borderColor:			rgb:4a/59/65
+
+bevelWidth:			1
+borderWidth:			1
+handleWidth:			3
+frameWidth:			1
+
+*.font:        -schumacher-clean-medium-r-normal-*-*-120-*-*-c-*-iso646.1991-irv
+rootCommand: bsetbg -solid "#5a6975"

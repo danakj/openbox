@@ -419,8 +419,6 @@ void session_load(char *path)
     xmlNodePtr node, n;
     gchar *sm_id;
 
-    g_message("loading session from %s", path);
-
     if (!parse_load(path, "openbox_session", &doc, &node))
         return;
 
@@ -480,10 +478,7 @@ void session_load(char *path)
         state->max_vert =
             parse_find_node("max_vert", node->xmlChildrenNode) != NULL;
         
-        g_message("read session window %s", state->name);
-
         /* save this */
-        g_message("saved state for %s %s", state->name, state->id);
         sm_saved_state = g_slist_prepend(sm_saved_state, state);
         goto session_load_ok;
 

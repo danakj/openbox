@@ -1,6 +1,6 @@
 # Makefile.am for Openbox
 
-SUBDIRS = po m4 data doc otk src util
+SUBDIRS = intl  po m4 data doc otk src util
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 uninstall-local:

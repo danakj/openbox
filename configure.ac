@@ -1,23 +1,23 @@
-AC_INIT
-AC_CONFIG_SRCDIR([src/main.cc])
+AC_INIT([src/main.cc])
+AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE([openbox], [2.90.0])
 
-dnl Determine default prefix
-test "$prefix" = "NONE" && prefix="$ac_default_prefix"
+AC_PREREQ([2.50])
 
-dnl We're in the C++ world
-AC_LANG(C++)
+AC_PATH_PROG([regex_cmd], [sed])
+test -z $regex_cmd && AC_MSG_ERROR([sed not found])
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_INSTALL
 AC_PROG_LIBTOOL
+LIBTOOL="$LIBTOOL --silent"
+AC_PROG_INSTALL
 
-AC_CHECK_PROGS([regex_cmd], [sed])
-if test x$regex_cmd = "x"; then
-  AC_MSG_ERROR([error. sed is required to build the default menu file.])
-fi
+ALL_LINGUAS=""
+AM_GNU_GETTEXT
 
+AC_LANG(C++)
+	
 dnl Check what compiler we are using
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
@@ -51,9 +51,6 @@ AC_HEADER_TIME
 
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL
-
-dnl Look for gettext, using external libintl
-AM_GNU_GETTEXT([external])
 
 dnl Check whether to include debugging code
 DEBUG=""
@@ -169,29 +166,29 @@ AC_ARG_ENABLE([xinerama],
   AC_MSG_RESULT([no])
 )
 
-dnl Output files
-AM_CONFIG_HEADER(config.h)
-AC_CONFIG_FILES([
-  Makefile
-  m4/Makefile 
-  po/Makefile.in
-  otk/Makefile
-  src/Makefile
-  util/Makefile
-  util/epist/Makefile
-  doc/Makefile
-  data/Makefile
-  data/styles/Makefile
-  version.h
-])
+AC_CONFIG_FILES([Makefile
+		m4/Makefile 
+		po/Makefile.in
+		intl/Makefile
+		otk/Makefile
+		src/Makefile
+		util/Makefile
+		util/epist/Makefile
+		doc/Makefile
+		data/Makefile
+		data/styles/Makefile
+		version.h
+		])
 AC_OUTPUT
 
-dnl Print results
-AC_MSG_RESULT([])
-AC_MSG_RESULT([	$PACKAGE_NAME version $PACKAGE_VERSION configured successfully.])
-AC_MSG_RESULT([])
+AC_MSG_RESULT
+AC_MSG_RESULT([$PACKAGE version $VERSION configured successfully.])
+
+AC_MSG_RESULT
 AC_MSG_RESULT([Using '$prefix' for installation.])
 AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
 AC_MSG_RESULT([Building with '$CPPFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
-AC_MSG_RESULT([])
+AC_MSG_RESULT
+AC_MSG_RESULT([configure complete, now type \"make\"])
+AC_MSG_RESULT

@@ -81,7 +81,7 @@ void OtkWidget::create(unsigned long mask)
 
   attrib_create.background_pixmap = None;
   attrib_create.colormap = scr_info->colormap();
-  attrib_create.override_redirect = True; // not used by default
+  attrib_create.override_redirect = true; // not used by default
   attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
     ButtonMotionMask | ExposureMask | StructureNotifyMask;
 

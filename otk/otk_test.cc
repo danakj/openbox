@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   lab2.setBorderColor(otk::RenderStyle::style(app.screen())->buttonFocusColor());
   but.setText("Im not the default button...");
   but2.setText("But I AM!!");
-  but2.setDefault(true);
+  but2.setHighlighted(true);
   
 
   foo.show();

@@ -247,11 +247,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "focusraise",
-        action_focusraise,
-        NULL
-    },
-    {
         "close",
         action_close,
         NULL
@@ -631,14 +626,6 @@ void action_iconify(union ActionData *data)
 {
     if (data->client.c)
         client_iconify(data->client.c, TRUE, TRUE);
-}
-
-void action_focusraise(union ActionData *data)
-{
-    if (data->client.c) {
-        client_focus(data->client.c);
-        stacking_raise(CLIENT_AS_WINDOW(data->client.c));
-    }
 }
 
 void action_raise(union ActionData *data)

@@ -137,8 +137,6 @@ void action_raise(union ActionData *data);
 /* ClientAction */
 void action_lower(union ActionData *data);
 /* ClientAction */
-void action_focusraise(union ActionData *data);
-/* ClientAction */
 void action_close(union ActionData *data);
 /* ClientAction */
 void action_kill(union ActionData *data);

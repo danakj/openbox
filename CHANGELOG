@@ -1,5 +1,9 @@
 Changelog for Openbox:
 
+2.2.4:
+ * Fix for NETWM/EWMH compliancy. Fixes bug with        (Ben Jansens)
+   iconified windows causing some client apps to 'lock'.
+
 2.2.3:
  * Fix compile errors when the strftime funtion is not  (Ben Jansens)
    found on the system.

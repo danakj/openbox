@@ -17,10 +17,13 @@ extern "C" {
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
+#include "otk/configuration.hh"
 #include "xeventhandler.hh"
 #include "client.hh"
 
 namespace ob {
+
+class OBScreen;
 
 //! The main class for the Openbox window manager.
 /*!
@@ -61,6 +64,9 @@ public:
   
   //! A map for looking up a specific client class from the window id
   typedef std::map<Window, OBClient *> ClientMap;
+
+  //! A list of OBScreen classes
+  typedef std::vector<OBScreen *> ScreenList;
   
 private:
   // stuff that can be passed on the command line
@@ -82,6 +88,9 @@ private:
   //! A list of all managed clients
   ClientMap _clients;
 
+  //! A list of all the managed screens
+  ScreenList _screens;
+  
   //! Manages all timers for the application
   /*!
     Use of the otk::OBTimerQueueManager::fire funtion in this object ensures
@@ -108,6 +117,9 @@ private:
 
   //! When set to true, the Openbox::eventLoop function will stop and return
   bool _doshutdown;
+
+  //! The configuration of the application. TEMPORARY
+  otk::Configuration _config;
 
   //! Parses the command line used when executing this application
   void parseCommandLine(int argv, char **argv);
@@ -139,7 +151,14 @@ public:
   */
   inline otk::OBTimerQueueManager *timerManager() { return &_timermanager; }
 
+  //! Returns the otk::OBProperty instance for the window manager
   inline const otk::OBProperty *property() const { return _property; }
+
+  //! Returns a managed screen
+  inline const OBScreen *screen(int num) const {
+    assert(num >= 0); assert(num < (signed)_screens.size());
+    return _screens[num];
+  }
 
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }

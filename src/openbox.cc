@@ -6,8 +6,11 @@
 
 #include "../version.h"
 #include "openbox.hh"
+#include "screen.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
+#include "otk/assassin.hh"
+#include "otk/util.hh" // TEMPORARY
 
 extern "C" {
 #include <X11/cursorfont.h>
@@ -40,6 +43,8 @@ extern "C" {
 #include "gettext.h"
 #define _(str) gettext(str)
 }
+
+#include <algorithm>
 
 namespace ob {
 
@@ -79,8 +84,23 @@ Openbox::Openbox(int argc, char **argv)
   _displayreq = (char*) 0;
   _argv0 = argv[0];
   _doshutdown = false;
+  _rcfilepath = otk::expandTilde("~/.openbox/rc3");
 
   parseCommandLine(argc, argv);
+
+  // TEMPORARY: using the xrdb rc3
+  _config.setFile(_rcfilepath);
+  if (!_config.load()) {
+    printf("failed to load rc file %s\n", _config.file().c_str());
+    ::exit(2);
+  }
+  std::string s;
+  _config.getValue("session.styleFile", s);
+  _config.setFile(s);
+  if (!_config.load()) {
+    printf("failed to load style %s\n", _config.file().c_str());
+    ::exit(2);
+  }
 
   // open the X display (and gets some info about it, and its screens)
   otk::OBDisplay::initialize(_displayreq);
@@ -106,6 +126,10 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.lr_angle = XCreateFontCursor(otk::OBDisplay::display, XC_lr_angle);
   _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
+
+  // initialize all the screens
+  _screens.push_back(new OBScreen(0));
+  _screens[0]->loadStyle(_config);
   
   _state = State_Normal; // done starting
 }
@@ -118,6 +142,8 @@ Openbox::~Openbox()
   // unmanage all windows
   while (!_clients.empty())
     _xeventhandler.unmanageWindow(_clients.begin()->second);
+
+  std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
   
   // close the X display
   otk::OBDisplay::destroy();

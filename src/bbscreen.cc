@@ -141,7 +141,6 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
 
   // XXX: ugh
   resource.wstyle.setImageControl(image_control);
-  resource.wstyle.setScreenNumber(scrn);
   LoadStyle();
 
   XGCValues gcv;

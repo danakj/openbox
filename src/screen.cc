@@ -9,6 +9,11 @@ extern "C" {
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
+#ifdef    HAVE_UNISTD_H
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif // HAVE_UNISTD_H
+
 #include "gettext.h"
 #define _(str) gettext(str)
 }
@@ -49,12 +54,10 @@ OBScreen::OBScreen(int screen)
   printf(_("Managing screen %d: visual 0x%lx, depth %d\n"),
          _number, XVisualIDFromVisual(_info->getVisual()), _info->getDepth());
 
-#ifdef    HAVE_GETPID
   Openbox::instance->property()->set(_info->getRootWindow(),
                                      otk::OBProperty::openbox_pid,
                                      otk::OBProperty::Atom_Cardinal,
                                      (unsigned long) getpid());
-#endif // HAVE_GETPID
 
   // set the mouse cursor for the root window (the default cursor)
   XDefineCursor(otk::OBDisplay::display, _info->getRootWindow(),
@@ -64,6 +67,8 @@ OBScreen::OBScreen(int screen)
                                           _info, true);
   _image_control->installRootColormap();
   _root_cmap_installed = True;
+
+  _style.setImageControl(_image_control);
 
   
   // Set the netwm atoms for geomtery and viewport
@@ -301,6 +306,16 @@ void OBScreen::setWorkArea() {
     xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
                otk::OBProperty::Atom_Cardinal, 0, 0);
   */
+}
+
+
+void OBScreen::loadStyle(const otk::Configuration &config)
+{
+  _style.load(config);
+  if (Openbox::instance->state() == Openbox::State_Starting)
+    return;
+
+  // XXX: make stuff redraw!
 }
 
 

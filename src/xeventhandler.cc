@@ -8,12 +8,9 @@
 #include "client.hh"
 #include "frame.hh"
 #include "openbox.hh"
+#include "screen.hh"
 #include "otk/display.hh"
 #include "otk/rect.hh"
-
-// XXX: REMOVE THIS SOON!!#!
-#include "blackbox.hh"
-#include "bbscreen.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -168,12 +165,9 @@ void OBXEventHandler::manageWindow(int screen, Window window)
     // XXX: position the window intelligenty
   }
 
-  // XXX: store a style somewheres cooler!!
-  otk::Style *style = ((Blackbox*)Openbox::instance)->
-    searchScreen(RootWindow(otk::OBDisplay::display, screen))->
-    getWindowStyle();
   // create the decoration frame for the client window
-  client->frame = new OBFrame(client, style);
+  client->frame = new OBFrame(client,
+                              Openbox::instance->screen(screen)->style());
 
   // add all the client's decoration windows as event handlers for the client
   Openbox::instance->addClient(client->frame->window(), client);

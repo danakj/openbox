@@ -14,6 +14,8 @@ extern "C" {
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/point.hh"
+#include "otk/style.hh"
+#include "otk/configuration.hh" // TEMPORARY
 
 #include <string>
 
@@ -52,6 +54,9 @@ private:
   
   //! The Image Control used for rendering on the screen
   otk::BImageControl *_image_control;
+
+  //! The style with which to render on the screen
+  otk::Style _style;
 
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
@@ -107,7 +112,11 @@ public:
   void addStrut(otk::Strut *strut);
   //! Removes a window's strut from the screen's list of reserved spaces
   void removeStrut(otk::Strut *strut);
-  
+
+  //! Loads a new style on the screen
+  void loadStyle(const otk::Configuration &config);
+
+  inline const otk::Style *style() const { return &_style; }
 };
 
 }

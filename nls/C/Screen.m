@@ -1,52 +1,51 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: Fehler bei der Abfrage des X Servers.\n \
-ein anderer Windowmanager benutzt Display %s bereits.\n
+# BScreen::BScreen: un error ocurrió mientras cuestionaba el servidor X.\n  otro gestor de ventanas se está ejecutando en conexión de despliegue %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: Verwaltung von Bildschirm %d mit Visual 0x%lx, Tiefe %d\n
+# BScreen::BScreen: gestionando la pantalla %d usando visual 0x%lx, profundidad %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): Kann Font '%s' nicht finden\n
+# BScreen::LoadStyle(): no se puede cargar el tipo de letra '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): Kann Standard Font nicht finden.\n
+# BScreen::LoadStyle(): no se puede cargar el tipo de letra por omisión.\n
 $ #EmptyMenuFile
-# %s: leere Menu Datei\n
+# %s: archivo de menú vacío\n
 $ #xterm
 # xterm
 $ #Restart
-# Neustart
+# Reiniciar
 $ #Exit
-# Beenden
+# Salir
 $ #EXECError
-# BScreen::parseMenuFile: [exec] Fehler, kein Menu Eintrag und/oder Befehl definiert.\n
+# BScreen::parseMenuFile: [exec] error, no hay etiqueta de menú ni comando definido\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [exit] error, no hay etiqueta de menú definida\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] Fehler, kein Menu Eintrag und/oder Datei definiert\n
+# BScreen::parseMenuFile: [style] error, no hay etiqueta de menú ni archivo \
+definido\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [config] error, no hay etiqueta de menú definida\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] Fehler, kein Dateiname definiert\n
+# BScreen::parseMenuFile: [include] error, no hay nombre de archivo definido\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] Fehler, '%s' ist keine normale Datei\n
+# BScreen::parseMenuFile: [include] error, '%s' no es un archivo regular\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [submenu] error, no hay etiqueta de menú definida\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [restart] error, no hay etiqueta de menú definida\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [reconfig] error, no hay etiqueta de menú definida\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Fehler, kein Verzeichnis definiert\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, no hay directorio definido\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Fehler, '%s' ist kein Verzeichnis\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' no es un directorio\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Fehler, '%s' existiert nicht\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' no existe\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] Fehler, kein Menu Eintrag definiert\n
+# BScreen::parseMenuFile: [workspaces] error, no hay etiqueta de menú definida\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
 # W: %4d x H: %4d
-

@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Escritorios
+# Töölauad
 $ #NewWorkspace
-# Escritorio nuevo
+# Uus töölaud
 $ #RemoveLast
-# Quitar el último escritorio
+# Eemalda viimane

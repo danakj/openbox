@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: error creando el pixmap\n
+# BImage::render_solid: viga pixmapi loomisel\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: error creando el XImage\n
+# BImage::renderXImage: viga XImage loomisel\n
 $ #UnsupVisual
-# BImage::renderXImage: visual no soportado\n
+# BImage::renderXImage: toeta visuaal\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: error creando el pixmap\n
+# BImage::renderPixmap: viga pixmapi loomisel\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: mapa no válido de colores tamaño %d (%d/%d/%d) - reduciendo\n
+# BImageControl::BImageControl: vale värvipaletti suurus %d (%d/%d/%d) - vähendame\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: error en la asignación del mapa de colores\n
+# BImageControl::BImageControl: viga värvipaletti määramisel \n
 $ #ColorAllocFail
-# BImageControl::BImageControl: no se puede asignar el color %d/%d/%d\n
+# BImageControl::BImageControl: ei õnnestunud värvi määrata %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: reserva de pixmaps - liberando %d pixmaps\n
+# BImageControl::~BImageControl: pixmap cache - vabastame %d pixmappi\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: reserva de pixmaps grande, forzando limpieza\n
+# BImageControl::renderImage: cache on liiga suur, sundpuhastus\n
 $ #ColorParseError
-# BImageControl::getColor: error evaluando el color: '%s'\n
+# BImageControl::getColor: viga värvi analüüsimisel: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: error asignando el color: '%s'\n
+# BImageControl::getColor: viga värvi määramisel: '%s'\n

@@ -62,6 +62,9 @@ struct RrTheme {
 
     struct RrSurface *frame;
 
+    struct RrSurface *plate;
+    struct RrSurface *plate_f; /* focused */
+
     struct RrSurface *title;
     struct RrSurface *title_f; /* focused */
 

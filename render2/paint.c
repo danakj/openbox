@@ -30,16 +30,33 @@ void RrExpose(struct RrInstance *inst, XExposeEvent *e)
     win = e->window;
 
     if ((sur = RrInstaceLookupSurface(inst, win))) {
-        while (XCheckTypedWindowEvent(RrDisplay(inst), Expose, win, &e2));
-        while (sur->parent && RrSurfaceType(sur->parent) != RR_SURFACE_NONE)
-            sur = sur->parent;
-        RrPaint(sur);
+        while (1) {
+            struct RrSurface *p = NULL;
+
+            while (XCheckTypedWindowEvent(RrDisplay(inst), Expose,
+                                          sur->win, &e2));
+
+            switch (RrSurfaceType(sur)) {
+            case RR_SURFACE_NONE:
+                break;
+            case RR_SURFACE_PLANAR:
+                if (RrPlanarHasAlpha(sur))
+                    p = RrSurfaceParent(sur);
+                break;
+            case RR_SURFACE_NONPLANAR:
+                assert(0);
+            }
+
+            if (p) sur = p;
+            else break;
+        }
+        RrPaint(sur, 0);
     } else
         RrDebug("Unable to find surface for window 0x%lx\n", win);
 }
 
 /*! Paints the surface, and all its children */
-void RrPaint(struct RrSurface *sur)
+void RrPaint(struct RrSurface *sur, int recurse_always)
 {
     struct RrInstance *inst;
     struct RrSurface *p;
@@ -54,10 +71,6 @@ void RrPaint(struct RrSurface *sur)
     if (!inst) return;
 
     if (!RrSurfaceVisible(sur)) return;
-
-    /* recurse and paint children */
-    for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it))
-        RrPaint(it->data);
 
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);
@@ -103,4 +116,23 @@ void RrPaint(struct RrSurface *sur)
     glPopMatrix();
 
     glXSwapBuffers(RrDisplay(inst), RrSurfaceWindow(sur));
+
+    /* recurse and paint children */
+    for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it)) {
+        if (recurse_always)
+            RrPaint(it->data, 1);
+        else {
+            switch (RrSurfaceType(((struct RrSurface*)it->data))) {
+            case RR_SURFACE_NONE:
+                break;
+            case RR_SURFACE_PLANAR:
+                if (RrPlanarHasAlpha(it->data))
+                    RrPaint(it->data, 0);
+                break;
+            case RR_SURFACE_NONPLANAR:
+                assert(0);
+                break;
+            }
+        }
+    }
 }

@@ -97,9 +97,10 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
                                      RrVisual(inst), AllocNone);
         inst->glx_context = glXCreateContext(display, &vilist[best],
                                              NULL, True);
-        inst->shape_window = XCreateSimpleWindow(display,
-                                                 RootWindow(display, screen),
-                                                 0, 0, 1, 1, 0, 0, 0);
+        inst->shape_window = XCreateWindow(display,RootWindow(display, screen),
+                                           0, 0, 1, 1, 0,
+                                           RrInstanceDepth(inst), InputOutput,
+                                           RrInstanceVisual(inst), 0, NULL);
         /* make the context current on anything we can so we can dl 
            textures */
 

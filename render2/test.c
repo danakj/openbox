@@ -86,7 +86,7 @@ int main()
                 /* fall through ... */
             } else {
                 while (XCheckTypedWindowEvent(display, win, Expose, &report));
-                RrPaint(sur);
+                RrPaint(sur, 0);
                 break;
             }
         case ConfigureNotify:

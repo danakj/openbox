@@ -27,6 +27,15 @@ void RrPlanarSet(struct RrSurface *sur,
         sur->data.planar.border = *border;
 }
 
+int RrPlanarHasAlpha(struct RrSurface *sur)
+{
+    if (RrColorHasAlpha(RrPlanarPrimaryColor(sur))) return 1;
+    if (!(RrPlanarColorType(sur) == RR_PLANAR_NONE ||
+          RrPlanarColorType(sur) == RR_PLANAR_SOLID))
+        if (RrColorHasAlpha(RrPlanarSecondaryColor(sur))) return 1;
+    return 0;
+}
+
 static void copy_parent(struct RrSurface *sur)
 {
     int ncols;
@@ -115,19 +124,12 @@ static void RrBorderPaint(int x, int y, int w, int h, int bwidth,
 
     RrColor4f(color);
 
-    glBegin(GL_LINES);
+    glBegin(GL_LINE_LOOP);
     glLineWidth(bwidth);
     glVertex2i(x + offset, y + offset);
     glVertex2i(x + offset, y + h - offset);
-
-    glVertex2i(x + offset, y + h - offset);
     glVertex2i(x + w - offset, y + h - offset);
-
-    glVertex2i(x + w - offset, y + h - offset);
-    glVertex2i(x + w - offset,  y + offset);
-               
     glVertex2i(x + w - offset, y + offset);
-    glVertex2i(x + offset, y + offset);
     glLineWidth(1.0); /* XXX is this needed? */
     glEnd();
 }

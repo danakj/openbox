@@ -21,6 +21,8 @@ struct RrPlanarSurface {
 #define RrPlanarBorderWidth(sur) ((sur)->data.planar.borderwidth)
 #define RrPlanarBorderColor(sur) ((sur)->data.planar.border)
 
+int RrPlanarHasAlpha(struct RrSurface *sur);
+
 void RrPlanarPaint(struct RrSurface *sur, int absx, int absy);
 
 void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h);

@@ -155,15 +155,26 @@ void RrSurfaceSetArea(struct RrSurface *sur,
                       int w,
                       int h)
 {
+    int m, r;
+
     assert(w > 0 && h > 0);
     if (!(w > 0 && h > 0)) return;
+
+    m = sur->x != x || sur->y != y;
+    r = sur->w != w || sur->h != h;
 
     sur->x = x;
     sur->y = y;
     sur->w = w;
     sur->h = h;
-    if (sur->win)
-        XMoveResizeWindow(RrDisplay(sur->inst), sur->win, x, y, w, h);
+    if (sur->win) {
+        if (m && r)
+            XMoveResizeWindow(RrDisplay(sur->inst), sur->win, x, y, w, h);
+        else if (m)
+            XMoveWindow(RrDisplay(sur->inst), sur->win, x, y);
+        else if (r)
+            XResizeWindow(RrDisplay(sur->inst), sur->win, w, h);
+    }
 }
 
 Window RrSurfaceWindow(struct RrSurface *sur)
@@ -206,9 +217,11 @@ void RrSurfaceMinSize(struct RrSurface *sur, int *w, int *h)
             minh = MAX(minh, 0);
             break;
         case RR_TEXTURE_TEXT:
-            /* XXX MEASUER STRING PLS */
-            minw = MAX(minw, 100 /*MEASURESTRING*/); 
-            minh = MAX(minh, 10  /*HEIGHTOFFONT*/);
+            minw =
+                MAX(minw,
+                    RrFontMeasureString(sur->texture[i].data.text.font,
+                                        sur->texture[i].data.text.string)); 
+            minh = MAX(minh, RrFontHeight(sur->texture[i].data.text.font));
             break;
         case RR_TEXTURE_RGBA:
             minw = MAX(minw, (sur->texture[i].data.rgba.x +

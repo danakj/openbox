@@ -222,8 +222,8 @@ void RrTextureSetNone(struct RrSurface *sur,
 
 /* drawing */
 
-/*! Paints the surface, and all its children */
-void RrPaint(struct RrSurface *sur);
+/*! Paints the surface, and optionally all its children */
+void RrPaint(struct RrSurface *sur, int recurse_always);
 
 void RrExpose(struct RrInstance *inst, XExposeEvent *e);
 

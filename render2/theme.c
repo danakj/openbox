@@ -22,7 +22,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
 
     theme->title_font = RrFontOpen(inst,
                                   "arial:bold:pixelsize=10:"
-                                  "shadow:shadowoffset=1:shadowtint=0.1");
+                                  "shadow=true:shadowoffset=1:shadowtint=0.1");
     theme->title_justify = RR_CENTER;
 
     RrColorSet(&theme->b_color, 0, 0, 0, 1);
@@ -134,6 +134,15 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
                 &pri, NULL, 1, &bor);
     RrPlanarSet(theme->title_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
                 &pri, NULL, 1, &bor);
+
+    theme->plate = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
+    theme->plate_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
+
+    RrColorSet(&pri, 0, 0, 0, 1);
+    RrPlanarSet(theme->plate, RR_PLANAR_SOLID, RR_BEVEL_NONE,
+                &pri, NULL, 0, NULL);
+    RrPlanarSet(theme->plate_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
+                &pri, NULL, 0, NULL);
 
     theme->label = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
     theme->label_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);

@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // epist.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -33,6 +33,7 @@ extern "C" {
 #include "actions.hh"
 #include "window.hh"
 #include "keytree.hh"
+#include "config.hh"
 
 #include "../../src/BaseDisplay.hh"
 
@@ -45,6 +46,7 @@ private:
   XAtom *_xatom;
   char **_argv;
   keytree *_ktree;
+  Config *_config;
 
   typedef std::vector<screen *> ScreenList;
   ScreenList _screens;
@@ -82,7 +84,8 @@ public:
   
   const ActionList &actions(void) { return _actions; }
   keytree &getKeyTree(void) { return *_ktree; }
-  
+  inline const Config *getConfig(void) { return _config; }
+
   WindowList& clientsList() { return _clients; }
   WindowList::iterator& activeWindow() { return _active; }
 };

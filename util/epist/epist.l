@@ -13,6 +13,8 @@ extern YYSTYPE yylval;
 \}                  return EBRACE;
 ;                   return SEMICOLON;
 -                   return DASH;
+Options |
+options             return OPTIONS;
 Mod1 |
 Mod2 |
 Mod3 |

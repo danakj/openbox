@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // screen.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -84,6 +84,9 @@ public:
   void cycleWorkspace(const bool forward, const int increment,
                       const bool loop = true) const;
   void changeWorkspace(const int num) const;
+  void changeWorkspaceVert(const int num) const;
+  void changeWorkspaceHorz(const int num) const;
+
   void toggleShaded(const Window win) const;
   void execCommand(const std::string &cmd) const;
 

@@ -11,7 +11,7 @@ bin_PROGRAMS =		epist
 
 man_MANS = epist.1 epistrc.5
 
-epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c
+epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c config.cc
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
 					../../src/Util.o ../../src/i18n.o ../../src/Timer.o \
 					../../src/GCCache.o ../../src/Color.o
@@ -55,6 +55,9 @@ screen.o: screen.cc ../../src/BaseDisplay.hh ../../src/Timer.hh \
   ../../src/Util.hh ../../src/XAtom.hh screen.hh window.hh epist.hh \
   actions.hh keytree.hh
 window.o: window.cc epist.hh actions.hh window.hh ../../src/Util.hh \
+  keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
+  ../../src/XAtom.hh
+config.o: config.cc config.hh ../../src/Util.hh \
   keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
   ../../src/XAtom.hh
 yacc_parser.cc: epist.y

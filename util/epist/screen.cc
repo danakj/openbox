@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // screen.cc for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -48,7 +48,7 @@ using std::string;
 #include "../../src/XAtom.hh"
 #include "screen.hh"
 #include "epist.hh"
-
+#include "config.hh"
 
 screen::screen(epist *epist, int number) 
   : _clients(epist->clientsList()),
@@ -59,7 +59,7 @@ screen::screen(epist *epist, int number)
   _number = number;
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
-  
+
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
   _managed = false;
@@ -220,6 +220,22 @@ void screen::handleKeypress(const XEvent &e) {
 
   case Action::changeWorkspace:
     changeWorkspace(it->number());
+    return;
+
+  case Action::upWorkspace:
+    changeWorkspaceVert(-1);
+    return;
+
+  case Action::downWorkspace:
+    changeWorkspaceVert(1);
+    return;
+
+  case Action::leftWorkspace:
+    changeWorkspaceHorz(-1);
+    return;
+
+  case Action::rightWorkspace:
+    changeWorkspaceHorz(1);
     return;
 
   case Action::execute:
@@ -562,6 +578,48 @@ void screen::changeWorkspace(const int num) const {
   assert(_managed);
 
   _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);
+}
+
+void screen::changeWorkspaceVert(const int num) const {
+  assert(_managed);
+  const Config *conf = _epist->getConfig();
+  int width = conf->getNumberValue(Config::workspaceColumns);
+
+  if (width > _num_desktops || width <= 0)
+    return;
+
+  if (num < 0) {
+    int wnum = _active_desktop - width;
+    if (wnum >= 0)
+      changeWorkspace(wnum);
+  }
+  else {
+    int wnum = _active_desktop + width;
+    if (wnum < _num_desktops)
+      changeWorkspace(wnum);
+  }
+}
+
+void screen::changeWorkspaceHorz(const int num) const {
+  assert(_managed);
+  const Config *conf = _epist->getConfig();
+  int width = conf->getNumberValue(Config::workspaceColumns);
+
+  if (width > _num_desktops || width <= 0)
+    return;
+
+  if (num < 0) {
+    if (_active_desktop % width != 0)
+      changeWorkspace(_active_desktop - 1);
+    else
+      changeWorkspace(_active_desktop + width - 1);
+  }
+  else {
+    if (_active_desktop % width != width - 1)
+      changeWorkspace(_active_desktop + 1);
+    else
+      changeWorkspace(_active_desktop - width + 1);
+  }
 }
 
 void screen::grabKey(const KeyCode keyCode, const int modifierMask) const {

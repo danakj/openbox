@@ -3,7 +3,6 @@
 
 # ifndef YYSTYPE
 #  define YYSTYPE int
-#  define YYSTYPE_IS_TRIVIAL 1
 # endif
 # define	OBRACE	257
 # define	EBRACE	258
@@ -13,6 +12,7 @@
 # define	QUOTES	262
 # define	WORD	263
 # define	BINDING	264
+# define	OPTIONS	265
 
 
 extern YYSTYPE yylval;

@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // keytree.cc for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -21,23 +21,39 @@
 // DEALINGS IN THE SOFTWARE.
 
 #include "keytree.hh"
+#include "epist.hh"
+#include "config.hh"
 
 #include <string>
 
 using std::string;
 
-
-keytree::keytree(Display *display) : _display(display)
+keytree::keytree(Display *display, epist *ep)
+  : _display(display), _timeout_screen(NULL), _timer(NULL), _epist(ep)
 {
   _head = new keynode;
   _head->parent = NULL;
   _head->action = NULL; // head's action is always NULL
   _current = _head;
+  // for complete initialization, initialize() has to be called as well. We
+  // call initialize() when we are certain that the config object (which the
+  // timer uses) has been fully initialized. (see parser::parse())
 }
 
 keytree::~keytree()
 {
   clearTree(_head);
+  delete _timer;
+}
+
+void keytree::unloadBindings()
+{
+  ChildList::iterator it, end = _head->children.end();
+  for (it = _head->children.begin(); it != end; ++it)
+    clearTree(*it);
+
+  _head->children.clear();
+  reset();
 }
 
 void keytree::clearTree(keynode *node)
@@ -49,14 +65,25 @@ void keytree::clearTree(keynode *node)
   for (it = node->children.begin(); it != end; ++it)
     clearTree(*it);
 
+  node->children.clear();
+
   if (node->action)
     delete node->action;
   delete node;
+  node = NULL;
 }
 
 void keytree::grabDefaults(screen *scr)
 {
   grabChildren(_head, scr);
+}
+
+void keytree::ungrabDefaults(screen *scr)
+{
+  ChildList::const_iterator it, end = _head->children.end();
+  for (it = _head->children.begin(); it != end; ++it)
+    if ( (*it)->action )
+      scr->ungrabKey( (*it)->action->keycode(), (*it)->action->modifierMask() );
 }
 
 void keytree::grabChildren(keynode *node, screen *scr)
@@ -104,26 +131,41 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
   // we're done with the children. ungrab them
   if (_current != _head)
     ungrabChildren(_current, scr);
-  
+
   ChildList::const_iterator it, end = _current->children.end();
   for (it = _current->children.begin(); it != end; ++it) {
     act = (*it)->action;
     if (e.xkey.keycode == act->keycode() && state == act->modifierMask()) {
-      if ( isLeaf(*it) ) {
+      if (act->type() == Action::cancelChain) {
+        // user is cancelling the chain explicitly
+        _current = _head;
+        return (const Action *)NULL;
+      }
+      else if ( isLeaf(*it) ) {
         // node is a leaf, so an action will be executed
+        if (_timer->isTiming()) {
+          _timer->stop();
+          _timeout_screen = NULL;
+        }
+
         _current = _head;
         return act;
       }
       else {
         // node is not a leaf, so we advance down the tree, and grab the
         // children of the new current node. no action is executed
+        if (_timer->isTiming())
+          _timer->stop();
+        _timer->start();
+        _timeout_screen = scr;
+
         _current = *it;
         grabChildren(_current, scr);
         return (const Action *)NULL;
       }
     }
   }
-  
+
   // action not found. back to the head
   _current = _head;
   return (const Action *)NULL;
@@ -166,4 +208,26 @@ void keytree::setCurrentNodeProps(Action::ActionType action, unsigned int mask,
                                 XKeysymToKeycode(_display,
                                                  XStringToKeysym(key.c_str())),
                                 mask, arg);
+}
+
+void keytree::initialize(void)
+{
+  int tval = _epist->getConfig()->getNumberValue(Config::chainTimeout);
+  _timer = new BTimer(_epist, this);
+
+  if (tval <= 0)
+    tval = 3000; // set default timeout to 3 seconds
+
+  _timer->setTimeout(tval);
+}
+
+void keytree::timeout(void)
+{
+  assert(_timeout_screen != NULL);
+
+  if (_current != _head) {
+    ungrabChildren(_current, _timeout_screen);
+    _current = _head;
+  }
+  _timeout_screen = NULL;
 }

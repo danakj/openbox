@@ -1,5 +1,5 @@
 /* A Bison parser, made from epist.y
-   by GNU bison 1.35.  */
+   by GNU bison 1.34.  */
 
 #define YYBISON 1  /* Identify Bison output.  */
 
@@ -11,6 +11,7 @@
 # define	QUOTES	262
 # define	WORD	263
 # define	BINDING	264
+# define	OPTIONS	265
 
 #line 1 "epist.y"
 
@@ -34,8 +35,7 @@ void yyerror(const char *c) {
 
 
 #ifndef YYSTYPE
-# define YYSTYPE int
-# define YYSTYPE_IS_TRIVIAL 1
+#define YYSTYPE int
 #endif
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -43,12 +43,12 @@ void yyerror(const char *c) {
 
 
 
-#define	YYFINAL		30
+#define	YYFINAL		40
 #define	YYFLAG		-32768
-#define	YYNTBASE	11
+#define	YYNTBASE	12
 
 /* YYTRANSLATE(YYLEX) -- Bison token number corresponding to YYLEX. */
-#define YYTRANSLATE(x) ((unsigned)(x) <= 264 ? yytranslate[x] : 21)
+#define YYTRANSLATE(x) ((unsigned)(x) <= 265 ? yytranslate[x] : 26)
 
 /* YYTRANSLATE[YYLEX] -- Bison token number corresponding to YYLEX. */
 static const char yytranslate[] =
@@ -79,23 +79,25 @@ static const char yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     3,     4,     5,
-       6,     7,     8,     9,    10
+       6,     7,     8,     9,    10,    11
 };
 
 #if YYDEBUG
 static const short yyprhs[] =
 {
-       0,     0,     1,     4,     6,     8,    13,    18,    21,    23,
-      25,    26,    30,    32,    34,    36,    38,    40,    42,    43,
-      45,    48
+       0,     0,     1,     4,     7,     9,    11,    16,    21,    26,
+      29,    31,    33,    34,    38,    40,    42,    44,    46,    48,
+      50,    51,    53,    56,    58,    60,    61,    64
 };
 static const short yyrhs[] =
 {
-      -1,    11,    12,     0,    13,     0,    14,     0,    15,     9,
-      20,     5,     0,    15,    16,    11,    17,     0,    18,    19,
-       0,     3,     0,     4,     0,     0,    10,     6,    18,     0,
-       3,     0,     4,     0,     6,     0,     5,     0,     7,     0,
-       9,     0,     0,     7,     0,     6,     7,     0,     8,     0
+      -1,    12,    13,     0,    12,    16,     0,    14,     0,    15,
+       0,    17,     9,    22,     5,     0,    17,    18,    12,    19,
+       0,    23,     3,    24,     4,     0,    20,    21,     0,     3,
+       0,     4,     0,     0,    10,     6,    20,     0,     3,     0,
+       4,     0,     6,     0,     5,     0,     7,     0,     9,     0,
+       0,     7,     0,     6,     7,     0,     8,     0,    11,     0,
+       0,    24,    25,     0,     9,    22,     5,     0
 };
 
 #endif
@@ -104,9 +106,9 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,    27,    28,    31,    32,    35,    44,    51,    55,    59,
-      63,    64,    67,    69,    70,    71,    72,    73,    76,    77,
-      78,    79
+       0,    27,    28,    29,    32,    33,    36,    45,    52,    56,
+      60,    64,    68,    69,    72,    74,    75,    76,    77,    78,
+      81,    82,    83,    84,    87,    91,    92,    95
 };
 #endif
 
@@ -117,26 +119,27 @@ static const short yyrline[] =
 static const char *const yytname[] =
 {
   "$", "error", "$undefined.", "OBRACE", "EBRACE", "SEMICOLON", "DASH", 
-  "NUMBER", "QUOTES", "WORD", "BINDING", "commands", "command", 
-  "action_command", "chain_command", "binding", "obrace", "ebrace", 
-  "binding_w_modifier", "bind_key", "parameter", 0
+  "NUMBER", "QUOTES", "WORD", "BINDING", "OPTIONS", "commands", "command", 
+  "action_command", "chain_command", "options_block", "binding", "obrace", 
+  "ebrace", "binding_w_modifier", "bind_key", "parameter", 
+  "options_keyword", "options", "option", 0
 };
 #endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives. */
 static const short yyr1[] =
 {
-       0,    11,    11,    12,    12,    13,    14,    15,    16,    17,
-      18,    18,    19,    19,    19,    19,    19,    19,    20,    20,
-      20,    20
+       0,    12,    12,    12,    13,    13,    14,    15,    16,    17,
+      18,    19,    20,    20,    21,    21,    21,    21,    21,    21,
+      22,    22,    22,    22,    23,    24,    24,    25
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN. */
 static const short yyr2[] =
 {
-       0,     0,     2,     1,     1,     4,     4,     2,     1,     1,
-       0,     3,     1,     1,     1,     1,     1,     1,     0,     1,
-       2,     1
+       0,     0,     2,     2,     1,     1,     4,     4,     4,     2,
+       1,     1,     0,     3,     1,     1,     1,     1,     1,     1,
+       0,     1,     2,     1,     1,     0,     2,     3
 };
 
 /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -144,46 +147,50 @@ static const short yyr2[] =
    error. */
 static const short yydefact[] =
 {
-       1,    10,     0,     2,     3,     4,     0,     0,    10,     8,
-      18,     1,    12,    13,    15,    14,    16,    17,     7,    11,
-       0,    19,    21,     0,    10,    20,     5,     9,     6,     0,
+       1,    12,     0,    24,     2,     4,     5,     3,     0,     0,
+       0,    12,    10,    20,     1,    14,    15,    17,    16,    18,
+      19,     9,    25,    13,     0,    21,    23,     0,    12,     0,
+      22,     6,    11,     7,     8,    20,    26,     0,    27,     0,
        0
 };
 
 static const short yydefgoto[] =
 {
-       1,     3,     4,     5,     6,    11,    28,     7,    18,    23
+       1,     4,     5,     6,     7,     8,    14,    33,     9,    21,
+      27,    10,    29,    36
 };
 
 static const short yypact[] =
 {
-  -32768,     0,     5,-32768,-32768,-32768,     3,    -2,    -1,-32768,
-       9,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,
-       6,-32768,-32768,    13,     4,-32768,-32768,-32768,-32768,    19,
+  -32768,     0,    -1,-32768,-32768,-32768,-32768,-32768,    14,     9,
+       3,    10,-32768,    -4,-32768,-32768,-32768,-32768,-32768,-32768,
+  -32768,-32768,-32768,-32768,     2,-32768,-32768,    16,    -3,    15,
+  -32768,-32768,-32768,-32768,-32768,    -4,-32768,    17,-32768,    25,
   -32768
 };
 
 static const short yypgoto[] =
 {
-      10,-32768,-32768,-32768,-32768,-32768,-32768,    12,-32768,-32768
+      12,-32768,-32768,-32768,-32768,-32768,-32768,-32768,    18,-32768,
+      -8,-32768,-32768,-32768
 };
 
 
-#define	YYLAST		21
+#define	YYLAST		29
 
 
 static const short yytable[] =
 {
-      29,    12,    13,    14,    15,    16,     9,    17,    27,     2,
-       2,     8,    10,    25,     2,    20,    21,    22,    26,    30,
-      19,    24
+      39,    32,    24,    25,    26,    11,    22,     2,     3,    30,
+       2,     3,    15,    16,    17,    18,    19,    12,    20,    34,
+       2,    31,    38,    13,    35,    40,    28,    37,     0,    23
 };
 
 static const short yycheck[] =
 {
-       0,     3,     4,     5,     6,     7,     3,     9,     4,    10,
-      10,     6,     9,     7,    10,     6,     7,     8,     5,     0,
-       8,    11
+       0,     4,     6,     7,     8,     6,     3,    10,    11,     7,
+      10,    11,     3,     4,     5,     6,     7,     3,     9,     4,
+      10,     5,     5,     9,     9,     0,    14,    35,    -1,    11
 };
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
 #line 3 "/usr/share/bison/bison.simple"
@@ -254,12 +261,6 @@ static const short yycheck[] =
 #  define YYSTACK_ALLOC malloc
 #  define YYSTACK_FREE free
 # endif
-#endif /* ! defined (yyoverflow) || defined (YYERROR_VERBOSE) */
-
-
-#if (! defined (yyoverflow) \
-     && (! defined (__cplusplus) \
-	 || (YYLTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -286,41 +287,24 @@ union yyalloc
       + YYSTACK_GAP_MAX)
 # endif
 
-/* Copy COUNT objects from FROM to TO.  The source and destination do
-   not overlap.  */
-# ifndef YYCOPY
-#  if 1 < __GNUC__
-#   define YYCOPY(To, From, Count) \
-      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
-#  else
-#   define YYCOPY(To, From, Count)		\
-      do					\
-	{					\
-	  register YYSIZE_T yyi;		\
-	  for (yyi = 0; yyi < (Count); yyi++)	\
-	    (To)[yyi] = (From)[yyi];		\
-	}					\
-      while (0)
-#  endif
-# endif
-
-/* Relocate STACK from its old location to the new one.  The
+/* Relocate the TYPE STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
+# define YYSTACK_RELOCATE(Type, Stack)					\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
+	yymemcpy ((char *) yyptr, (char *) (Stack),			\
+		  yysize * (YYSIZE_T) sizeof (Type));			\
 	Stack = &yyptr->Stack;						\
-	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAX;	\
+	yynewbytes = yystacksize * sizeof (Type) + YYSTACK_GAP_MAX;	\
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
     while (0)
 
-#endif
+#endif /* ! defined (yyoverflow) || defined (YYERROR_VERBOSE) */
 
 
 #if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
@@ -447,6 +431,33 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
+#if ! defined (yyoverflow) && ! defined (yymemcpy)
+# if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
+#  define yymemcpy __builtin_memcpy
+# else				/* not GNU C or C++ */
+
+/* This is the most reliable way to avoid incompatibilities
+   in available built-in functions on various systems.  */
+static void
+#  if defined (__STDC__) || defined (__cplusplus)
+yymemcpy (char *yyto, const char *yyfrom, YYSIZE_T yycount)
+#  else
+yymemcpy (yyto, yyfrom, yycount)
+     char *yyto;
+     const char *yyfrom;
+     YYSIZE_T yycount;
+#  endif
+{
+  register const char *yyf = yyfrom;
+  register char *yyt = yyto;
+  register YYSIZE_T yyi = yycount;
+
+  while (yyi-- != 0)
+    *yyt++ = *yyf++;
+}
+# endif
+#endif
+
 #ifdef YYERROR_VERBOSE
 
 # ifndef yystrlen
@@ -499,7 +510,7 @@ yystpcpy (yydest, yysrc)
 # endif
 #endif
 
-#line 315 "/usr/share/bison/bison.simple"
+#line 319 "/usr/share/bison/bison.simple"
 
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
@@ -689,9 +700,6 @@ yyparse (YYPARSE_PARAM_ARG)
 	yyvs = yyvs1;
       }
 #else /* no yyoverflow */
-# ifndef YYSTACK_RELOCATE
-      goto yyoverflowlab;
-# else
       /* Extend the stack our own way.  */
       if (yystacksize >= YYMAXDEPTH)
 	goto yyoverflowlab;
@@ -705,16 +713,15 @@ yyparse (YYPARSE_PARAM_ARG)
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyoverflowlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
+	YYSTACK_RELOCATE (short, yyss);
+	YYSTACK_RELOCATE (YYSTYPE, yyvs);
 # if YYLSP_NEEDED
-	YYSTACK_RELOCATE (yyls);
+	YYSTACK_RELOCATE (YYLTYPE, yyls);
 # endif
 # undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
       }
-# endif
 #endif /* no yyoverflow */
 
       yyssp = yyss + yysize - 1;
@@ -892,67 +899,71 @@ yyreduce:
 
   switch (yyn) {
 
-case 5:
-#line 37 "epist.y"
+case 6:
+#line 38 "epist.y"
 {
         ((parser*)parser_obj)->setAction(yyvsp[-2]);
         ((parser*)parser_obj)->endAction();
-    }
-    break;
-case 6:
-#line 46 "epist.y"
+    ;
+    break;}
+case 7:
+#line 47 "epist.y"
 {
         ((parser*)parser_obj)->endChain();
-    }
-    break;
-case 8:
-#line 56 "epist.y"
-{ ((parser*)parser_obj)->startChain(); }
-    break;
-case 9:
-#line 60 "epist.y"
-{ /* ((parser*)parser_obj)->endChain(); */ }
-    break;
+    ;
+    break;}
+case 10:
+#line 61 "epist.y"
+{ ((parser*)parser_obj)->startChain(); ;
+    break;}
 case 11:
-#line 64 "epist.y"
-{ ((parser*)parser_obj)->addModifier(yyvsp[-2]); }
-    break;
-case 12:
-#line 68 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
+#line 65 "epist.y"
+{ /* ((parser*)parser_obj)->endChain(); */ ;
+    break;}
 case 13:
 #line 69 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
+{ ((parser*)parser_obj)->addModifier(yyvsp[-2]); ;
+    break;}
 case 14:
-#line 70 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
-case 15:
-#line 71 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
-case 16:
-#line 72 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
-case 17:
 #line 73 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); }
-    break;
-case 19:
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 15:
+#line 74 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 16:
+#line 75 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 17:
+#line 76 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 18:
 #line 77 "epist.y"
-{ ((parser*)parser_obj)->setArgumentNum(yyvsp[0]); }
-    break;
-case 20:
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 19:
 #line 78 "epist.y"
-{ ((parser*)parser_obj)->setArgumentNegNum(yyvsp[0]); }
-    break;
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
 case 21:
-#line 79 "epist.y"
-{ ((parser*)parser_obj)->setArgumentStr(yyvsp[0]); }
-    break;
+#line 82 "epist.y"
+{ ((parser*)parser_obj)->setArgumentNum(yyvsp[0]); ;
+    break;}
+case 22:
+#line 83 "epist.y"
+{ ((parser*)parser_obj)->setArgumentNegNum(yyvsp[0]); ;
+    break;}
+case 23:
+#line 84 "epist.y"
+{ ((parser*)parser_obj)->setArgumentStr(yyvsp[0]); ;
+    break;}
+case 27:
+#line 97 "epist.y"
+{ ((parser*)parser_obj)->setOption(yyvsp[-2]); ;
+    break;}
 }
 
 #line 705 "/usr/share/bison/bison.simple"
@@ -1186,6 +1197,6 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 82 "epist.y"
+#line 100 "epist.y"
 
 

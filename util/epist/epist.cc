@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // epist.cc for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -84,8 +84,14 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     _rc_file = DEFAULTRC;
 
   _xatom = new XAtom(getXDisplay());
-
   _active = _clients.end();
+
+  _config = new Config;
+  _ktree = new keytree(getXDisplay(), this);
+
+  // set up the key tree
+  parser p(_ktree, _config);
+  p.parse(_rc_file);
   
   for (unsigned int i = 0; i < getNumberOfScreens(); ++i) {
     screen *s = new screen(this, i);
@@ -98,12 +104,6 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     cout << "No compatible window manager found on any screens. Aborting.\n";
     ::exit(1);
   }
-
-  _ktree = new keytree(getXDisplay());
-
-  // set up the key tree
-  parser p(_ktree);
-  p.parse(_rc_file);
 
   activateGrabs();
 }

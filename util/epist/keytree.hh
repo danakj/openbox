@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // keytree.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -24,6 +24,7 @@
 #define _keytree_hh
 
 #include <list>
+#include "../../src/Timer.hh"
 #include "actions.hh"
 #include "screen.hh"
 
@@ -31,42 +32,49 @@ struct keynode; // forward declaration
 typedef std::list<keynode *> ChildList;
 
 struct keynode {
-    Action *action;
-    keynode *parent;
-    ChildList children;
+  Action *action;
+  keynode *parent;
+  ChildList children;
 };
 
-class keytree {
+class keytree : public TimeoutHandler {
 public:
-    keytree(Display *);
-    ~keytree();
+  keytree(Display *, epist *);
+  ~keytree();
 
-    void grabDefaults(screen *);
-    const Action * getAction(const XEvent&, unsigned int, screen *);
+  void grabDefaults(screen *);
+  void ungrabDefaults(screen *);
+  const Action * getAction(const XEvent&, unsigned int, screen *);
+  void unloadBindings();
+  void timeout();
 
 private:
-    // only mister parser needs to know about our sekrets (BUMMY)
-    friend class parser;
+  // only mister parser needs to know about our sekrets (BUMMY)
+  friend class parser;
     
-    void grabChildren(keynode *, screen *);
-    void ungrabChildren(keynode *, screen *);
+  void grabChildren(keynode *, screen *);
+  void ungrabChildren(keynode *, screen *);
 
-    void addAction(Action::ActionType, unsigned int, std::string, std::string);
-    void advanceOnNewNode();
-    void retract();
-    void setCurrentNodeProps(Action::ActionType, unsigned int, std::string, std::string);
+  void addAction(Action::ActionType, unsigned int, std::string, std::string);
+  void advanceOnNewNode();
+  void retract();
+  void setCurrentNodeProps(Action::ActionType, unsigned int, std::string, std::string);
+  void initialize();
 
-    void reset()
-    { _current = _head; }
+  void reset()
+  { _current = _head; }
 
-    bool isLeaf(keynode *node)
-    { return node->children.empty(); }
+  bool isLeaf(keynode *node)
+  { return node->children.empty(); }
 
-    void clearTree(keynode *);
+  void clearTree(keynode *);
 
-    keynode *_head;
-    keynode *_current;
-    Display *_display;
+  keynode *_head;
+  keynode *_current;
+  Display *_display;
+  BTimer *_timer;
+  screen *_timeout_screen;
+  epist *_epist;
 };
 
 #endif // _keytree_hh

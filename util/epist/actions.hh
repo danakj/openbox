@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // actions.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -32,7 +32,6 @@ extern "C" {
 
 class Action {
 public:
-    // xOr: this is crap.
   enum ActionType {
     noaction = 0,
     execute, //done
@@ -68,9 +67,19 @@ public:
     nextWindowOfClassOnAllWorkspaces, //done for now
     prevWindowOfClassOnAllWorkspaces, //done for now
 
+    upWindow,
+    downWindow,
+    leftWindow,
+    rightWindow,
+
     changeWorkspace, //done
     nextWorkspace, //done
     prevWorkspace, //done
+
+    upWorkspace, //all done
+    downWorkspace,
+    leftWorkspace,
+    rightWorkspace,
 
     nextScreen, //done for now
     prevScreen, //done for now
@@ -83,7 +92,7 @@ public:
     keyChain,
     numberChain,
 
-    cancel,
+    cancelChain, //done
 
     NUM_ACTIONS
   };

@@ -1,5 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-// parser.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
+// config.hh for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,53 +20,56 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef __parser_hh
-#define __parser_hh
-
-#include "actions.hh"
-#include "keytree.hh"
-#include "config.hh"
+#ifndef __config_hh
+#define __config_hh
 
 #include <string>
+#include <list>
 
-class parser {
+class ConfigItem;
+
+class Config {
 public:
-  parser(keytree *, Config *);
-  ~parser();
-
-  void parse(std::string);
-
-  void setKey(std::string key)
-  {  _key = key; }
-
-  void setArgumentNum(std::string arg)
-  { _arg = arg; }
-
-  void setArgumentNegNum(std::string arg)
-  { _arg = "-" + arg; }
-
-  void setArgumentStr(std::string arg)
-  { _arg = arg.substr(1, arg.size() - 2); }
-
-  void setOption(std::string opt)
-  { _config->addOption(opt, _arg); }
-
-  void setAction(std::string);
-  void addModifier(std::string);
-  void endAction();
-  void startChain();
-  void setChainBinding();
-  void endChain();
+  enum ItemType {
+    noType,
+    chainTimeout,
+    workspaceColumns,
+    numTypes
+  };
 
 private:
-  void reset();
+  typedef std::list<ConfigItem *> ItemList;
+  ItemList items;
 
-  keytree *_kt;
-  Config *_config;
-  unsigned int _mask;
-  Action::ActionType _action;
-  std::string _key;
-  std::string _arg;
+public:
+  Config();
+  ~Config();
+
+  const std::string &getStringValue(Config::ItemType) const;
+  int getNumberValue(Config::ItemType) const;
+  void addOption(ConfigItem *);
+  void addOption(const std::string &, const std::string &);
 };
 
-#endif //__parser_hh
+
+class ConfigItem {
+private:
+  Config::ItemType _type;
+  std::string _value;
+
+public:
+  ConfigItem(Config::ItemType type, std::string value)
+    : _type(type), _value(value) {}
+  ~ConfigItem() {}
+
+  inline const std::string &getStringValue() const
+  { return _value; }
+
+  inline int getNumberValue() const
+  { return atoi(_value.c_str()); }
+
+  inline Config::ItemType getType() const
+  { return _type; }
+};
+
+#endif // __config_hh

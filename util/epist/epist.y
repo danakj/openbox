@@ -20,12 +20,13 @@ void yyerror(const char *c) {
 
 %}
 
-%token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING 
+%token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING OPTIONS
 
 %%
 
 commands:
     | commands command
+    | commands options_block
     ;
 
 command:
@@ -46,6 +47,10 @@ chain_command:
     {
         ((parser*)parser_obj)->endChain();
     }
+    ;
+
+options_block:
+    options_keyword OBRACE options EBRACE
     ;
 
 binding:
@@ -77,6 +82,19 @@ parameter:
     | NUMBER      { ((parser*)parser_obj)->setArgumentNum($1); }
     | DASH NUMBER { ((parser*)parser_obj)->setArgumentNegNum($2); }
     | QUOTES      { ((parser*)parser_obj)->setArgumentStr($1); }
+    ;
+
+options_keyword:
+    OPTIONS
+    ;
+
+options:
+    | options option
+    ;
+
+option:
+    WORD parameter SEMICOLON
+    { ((parser*)parser_obj)->setOption($1); }
     ;
 
 %%

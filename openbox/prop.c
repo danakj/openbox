@@ -31,6 +31,8 @@ void prop_startup()
     CREATE(wm_window_role, "WM_WINDOW_ROLE");
     CREATE(motif_wm_hints, "_MOTIF_WM_HINTS");
 
+    CREATE(sm_client_id, "SM_CLIENT_ID");
+
     CREATE(net_supported, "_NET_SUPPORTED");
     CREATE(net_client_list, "_NET_CLIENT_LIST");
     CREATE(net_client_list_stacking, "_NET_CLIENT_LIST_STACKING");

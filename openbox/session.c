@@ -30,6 +30,7 @@ static SmcConn     sm_conn;
 static gchar      *save_file;
 static gint        sm_argc;
 static gchar     **sm_argv;
+static GSList     *sm_saved_state;
 
 static gboolean session_save();
 
@@ -214,17 +215,27 @@ void session_shutdown()
     }
 }
 
-static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
-                             Bool shutdown, int interact_style, Bool fast)
+static void sm_save_yourself_phase2(SmcConn conn, SmPointer data)
 {
     gboolean success;
 
-    ob_debug("got SAVE YOURSELF from session manager\n");
+    ob_debug("got SAVE YOURSELF PHASE 2 from session manager\n");
 
     success = session_save();
     save_commands();
 
     SmcSaveYourselfDone(conn, success);
+}
+
+static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
+                             Bool shutdown, int interact_style, Bool fast)
+{
+    ob_debug("got SAVE YOURSELF from session manager\n");
+
+    if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_phase2, data)) {
+        ob_debug("SAVE YOURSELF PHASE 2 failed\n");
+        SmcSaveYourselfDone(conn, FALSE);
+    }
 }
 
 static void sm_die(SmcConn conn, SmPointer data)
@@ -273,8 +284,12 @@ static gboolean session_save()
             gint32 *dimensions;
             gint prex, prey, prew, preh;
             ObClient *c = it->data;
+            gchar *client_id, *t;
 
             if (!client_normal(c))
+                continue;
+
+            if (!PROP_GETS(c->window, sm_client_id, locale, &client_id))
                 continue;
 
             prex = c->area.x;
@@ -292,14 +307,20 @@ static gboolean session_save()
                 g_free(dimensions);
             }
 
-            fprintf(f, "<window id=\"%s\">\n",
-                    g_markup_escape_text("XXX", -1));
-            fprintf(f, "\t<name>%s</name>\n",
-                    g_markup_escape_text(c->name, -1));
-            fprintf(f, "\t<class>%s</class>\n",
-                    g_markup_escape_text(c->class, -1));
-            fprintf(f, "\t<role>%s</role>\n",
-                    g_markup_escape_text(c->role, -1));
+            fprintf(f, "<window id=\"%s\">\n", client_id);
+
+            t = g_markup_escape_text(c->name, -1);
+            fprintf(f, "\t<name>%s</name>\n", t);
+            g_free(t);
+
+            t = g_markup_escape_text(c->class, -1);
+            fprintf(f, "\t<class>%s</class>\n", t);
+            g_free(t);
+
+            t = g_markup_escape_text(c->role, -1);
+            fprintf(f, "\t<role>%s</role>\n", t);
+            g_free(t);
+
             fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
             fprintf(f, "\t<x>%d</x>\n", prex);
             fprintf(f, "\t<y>%d</y>\n", prey);
@@ -324,6 +345,8 @@ static gboolean session_save()
             if (c->max_vert)
                 fprintf(f, "\t<max_vert />\n");
             fprintf(f, "</window>\n\n");
+
+            g_free(client_id);
         }
 
         fprintf(f, "</openbox_session>\n");
@@ -337,6 +360,55 @@ static gboolean session_save()
     }
 
     return success;
+}
+
+void session_state_free(ObSessionState *state)
+{
+    if (state) {
+        g_free(state->id);
+        g_free(state->name);
+        g_free(state->class);
+        g_free(state->role);
+
+        g_free(state);
+    }
+}
+
+static gboolean session_state_cmp(const ObSessionState *s, const ObClient *c)
+{
+    gchar *client_id;
+
+    if (!PROP_GETS(c->window, sm_client_id, locale, &client_id))
+        return FALSE;
+    g_print("\nsaved %s\nnow %s\n", s->id, client_id);
+    if (strcmp(s->id, client_id)) {
+        g_free(client_id);
+        return FALSE;
+    }
+    g_free(client_id);
+    g_print("\nsaved %s\nnow %s\n", s->name, c->name);
+    if (strcmp(s->name, c->name))
+        return FALSE;
+    g_print("\nsaved %s\nnow %s\n", s->class, c->class);
+    if (strcmp(s->class, c->class))
+        return FALSE;
+    g_print("\nsaved %s\nnow %s\n", s->role, c->role);
+    if (strcmp(s->role, c->role))
+        return FALSE;
+    return TRUE;
+}
+
+ObSessionState* session_state_find(ObClient *c)
+{
+    GSList *it;
+
+    for (it = sm_saved_state; it; it = g_slist_next(it))
+        if (session_state_cmp(it->data, c)) {
+            ObSessionState *s = it->data;
+            sm_saved_state = g_slist_remove(sm_saved_state, s);
+            return s;
+        }
+    return NULL;
 }
 
 void session_load(char *path)
@@ -354,64 +426,72 @@ void session_load(char *path)
 
     node = parse_find_node("window", node->xmlChildrenNode);
     while (node) {
-        gchar *id, *name, *class, *role;
-        guint desktop;
-        gint x, y, w, h;
-        gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;
-        gboolean above, below, max_horz, max_vert;
+        ObSessionState *state;
 
-        if (!parse_attr_string("id", node, &id))
+        state = g_new0(ObSessionState, 1);
+
+        if (!parse_attr_string("id", node, &state->id))
             goto session_load_bail;
         if (!(n = parse_find_node("name", node->xmlChildrenNode)))
             goto session_load_bail;
-        name = parse_string(doc, n);
+        state->name = parse_string(doc, n);
         if (!(n = parse_find_node("class", node->xmlChildrenNode)))
             goto session_load_bail;
-        class = parse_string(doc, n);
+        state->class = parse_string(doc, n);
         if (!(n = parse_find_node("role", node->xmlChildrenNode)))
             goto session_load_bail;
-        role = parse_string(doc, n);
+        state->role = parse_string(doc, n);
         if (!(n = parse_find_node("desktop", node->xmlChildrenNode)))
             goto session_load_bail;
-        desktop = parse_int(doc, n);
+        state->desktop = parse_int(doc, n);
         if (!(n = parse_find_node("x", node->xmlChildrenNode)))
             goto session_load_bail;
-        x = parse_int(doc, n);
+        state->x = parse_int(doc, n);
         if (!(n = parse_find_node("y", node->xmlChildrenNode)))
             goto session_load_bail;
-        y = parse_int(doc, n);
+        state->y = parse_int(doc, n);
         if (!(n = parse_find_node("width", node->xmlChildrenNode)))
             goto session_load_bail;
-        w = parse_int(doc, n);
+        state->w = parse_int(doc, n);
         if (!(n = parse_find_node("height", node->xmlChildrenNode)))
             goto session_load_bail;
-        h = parse_int(doc, n);
+        state->h = parse_int(doc, n);
 
-        shaded = parse_find_node("shaded", node->xmlChildrenNode) != NULL;
-        iconic = parse_find_node("iconic", node->xmlChildrenNode) != NULL;
-        skip_pager = parse_find_node("skip_pager", node->xmlChildrenNode)
-            != NULL;
-        skip_taskbar = parse_find_node("skip_taskbar", node->xmlChildrenNode)
-            != NULL;
-        fullscreen = parse_find_node("fullscreen", node->xmlChildrenNode)
-            != NULL;
-        above = parse_find_node("above", node->xmlChildrenNode) != NULL;
-        below = parse_find_node("below", node->xmlChildrenNode) != NULL;
-        max_horz = parse_find_node("max_horz", node->xmlChildrenNode) != NULL;
-        max_vert = parse_find_node("max_vert", node->xmlChildrenNode) != NULL;
+        state->shaded =
+            parse_find_node("shaded", node->xmlChildrenNode) != NULL;
+        state->iconic =
+            parse_find_node("iconic", node->xmlChildrenNode) != NULL;
+        state->skip_pager =
+            parse_find_node("skip_pager", node->xmlChildrenNode) != NULL;
+        state->skip_taskbar =
+            parse_find_node("skip_taskbar", node->xmlChildrenNode) != NULL;
+        state->fullscreen =
+            parse_find_node("fullscreen", node->xmlChildrenNode) != NULL;
+        state->above =
+            parse_find_node("above", node->xmlChildrenNode) != NULL;
+        state->below =
+            parse_find_node("below", node->xmlChildrenNode) != NULL;
+        state->max_horz =
+            parse_find_node("max_horz", node->xmlChildrenNode) != NULL;
+        state->max_vert =
+            parse_find_node("max_vert", node->xmlChildrenNode) != NULL;
         
-        g_message("read session window %s", name);
+        g_message("read session window %s", state->name);
 
-        /* XXX save this */
+        /* save this */
+        g_message("saved state for %s %s", state->name, state->id);
+        sm_saved_state = g_slist_prepend(sm_saved_state, state);
+        goto session_load_ok;
 
     session_load_bail:
+        session_state_free(state);
+
+    session_load_ok:
 
         node = parse_find_node("window", node->next);
     }
 
     xmlFreeDoc(doc);
-
-    unlink(path);
 }
 
 #endif

@@ -8,6 +8,7 @@
 #include "prop.h"
 #include "extensions.h"
 #include "frame.h"
+#include "session.h"
 #include "event.h"
 #include "grab.h"
 #include "focus.h"
@@ -43,6 +44,7 @@ static void client_showhide(ObClient *self);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self);
+static void client_restore_session_state(ObClient *self);
 
 void client_startup()
 {
@@ -232,6 +234,8 @@ void client_manage(Window window)
     self->obwin.type = Window_Client;
     self->window = window;
     client_get_all(self);
+    client_restore_session_state(self);
+    client_change_state(self);
 
     /* remove the client's border (and adjust re gravity) */
     client_toggle_border(self, FALSE);
@@ -455,6 +459,38 @@ void client_unmanage(ObClient *self)
     client_set_list();
 }
 
+static void client_restore_session_state(ObClient *self)
+{
+    ObSessionState *s;
+
+    g_message("looking for %s", self->name);
+
+    s = session_state_find(self);
+    g_message("returned %p %d", s, self->positioned);
+    if (!(s)) return;
+
+    g_message("restoring state for %s", s->name);
+
+    g_message("%d %d %d %d", s->x, s->y, s->w, s->h);
+    RECT_SET(self->area, s->x, s->y, s->w, s->h);
+    XResizeWindow(ob_display, self->window, s->w, s->h);
+    self->positioned = TRUE;
+    g_message("desktop %d", s->desktop);
+    self->desktop = s->desktop == DESKTOP_ALL ? s->desktop :
+        MIN(screen_num_desktops - 1, s->desktop);
+    self->shaded = s->shaded;
+    self->iconic = s->iconic;
+    self->skip_pager = s->skip_pager;
+    self->skip_taskbar = s->skip_taskbar;
+    self->fullscreen = s->fullscreen;
+    self->above = s->above;
+    self->below = s->below;
+    self->max_horz = s->max_horz;
+    self->max_vert = s->max_vert;
+
+    session_state_free(s);
+}
+
 void client_move_onscreen(ObClient *self, gboolean rude)
 {
     int x = self->area.x;
@@ -624,8 +660,6 @@ static void client_get_all(ObClient *self)
     client_update_class(self);
     client_update_strut(self);
     client_update_icons(self);
-
-    client_change_state(self);
 }
 
 static void client_get_area(ObClient *self)
@@ -926,7 +960,10 @@ void client_update_normal_hints(ObClient *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
-        self->positioned = !!(size.flags & (PPosition|USPosition));
+        /* don't let apps tell me where to put transient windows, but only if
+           they have a valid parent */
+        self->positioned = !!(size.flags & (PPosition|USPosition)) &&
+            !self->transient_for;
 
 	if (size.flags & PWinGravity) {
 	    self->gravity = size.win_gravity;
@@ -1864,11 +1901,6 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                 self->border_width;
             event.xconfigure.y = self->frame->area.y + self->frame->size.top -
                 self->border_width;
-            g_message("x %d cx %d y %d cy %d",
-                      self->area.x, 
-                      event.xconfigure.x,
-                      self->area.y,
-                      event.xconfigure.y);
             event.xconfigure.width = w;
             event.xconfigure.height = h;
             event.xconfigure.border_width = 0;

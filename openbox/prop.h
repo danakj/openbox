@@ -33,6 +33,9 @@ typedef struct Atoms {
     Atom wm_window_role;
     Atom motif_wm_hints;
 
+    /* SM atoms */
+    Atom sm_client_id;
+
     /* NETWM atoms */
      
     /* root window properties */

@@ -7,3 +7,8 @@ Makefile.in
 tree.lo
 translate.lo
 keyaction.lo
+lex.kparse.c
+lex.kparse.lo
+y.tab.c
+y.tab.h
+y.tab.lo 

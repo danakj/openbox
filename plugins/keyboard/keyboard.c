@@ -5,6 +5,7 @@
 #include "../../kernel/action.h"
 #include "tree.h"
 #include "keyboard.h"
+#include "keysrc.h"
 #include <glib.h>
 
 void plugin_setup_config()
@@ -40,7 +41,7 @@ static void reset_chains()
     }
 }
 
-static gboolean kbind(GList *keylist, Action *action)
+gboolean kbind(GList *keylist, Action *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
@@ -123,63 +124,11 @@ static void press(ObEvent *e, void *foo)
     XAllowEvents(ob_display, AsyncKeyboard, e->data.x.e->xkey.time);
 }
 
-static void binddef()
-{
-    GList *list = g_list_append(NULL, NULL);
-    Action *a;
-
-    /* When creating an Action struct, all of the data elements in the
-       appropriate struct need to be set, except the Client*, which will be set
-       at call-time when then action function is used.
-    */
-
-    list->data = "A-Right";
-    a = action_new(action_next_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    kbind(list, a);
-
-    list->data = "A-Left";
-    a = action_new(action_previous_desktop);
-    a->data.nextprevdesktop.wrap = TRUE;
-    kbind(list, a);
-
-    list->data = "A-1";
-    a = action_new(action_desktop);
-    a->data.desktop.desk = 0;
-    kbind(list, a);
-
-    list->data = "A-2"; 
-    a = action_new(action_desktop);
-    a->data.desktop.desk = 1;
-    kbind(list, a);
-
-    list->data = "A-3";
-    a = action_new(action_desktop);
-    a->data.desktop.desk = 2;
-    kbind(list, a);
-
-    list->data = "A-4";
-    a = action_new(action_desktop);
-    a->data.desktop.desk = 3;
-    kbind(list, a);
-
-    list->data = "A-space";
-    a = action_new(action_execute);
-    a->data.execute.path = g_strdup("xterm");
-    kbind(list, a);
-
-    list->data = "C-A-Escape";
-    a = action_new(action_execute);
-    a->data.execute.path = g_strdup("xlock -nolock -mode puzzle");
-    kbind(list, a);
-}
-
 void plugin_startup()
 {
     dispatch_register(Event_X_KeyPress, (EventHandler)press, NULL);
 
-    /* XXX parse config file! */
-    binddef();
+    keysrc_parse();
 }
 
 void plugin_shutdown()

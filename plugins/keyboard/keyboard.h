@@ -7,6 +7,6 @@
 
 extern KeyBindingTree *firstnode;
 
-guint keyboard_translate_modifier(char *str);
+gboolean kbind(GList *keylist, Action *action);
 
 #endif

@@ -1,0 +1,10 @@
+A-space		execute "xterm"
+C-A-Escape	execute "xlock -nolock -mode puzzle"
+
+A-Left		PreviousDesktopWrap
+A-Right		NextDesktopWrap
+
+A-1		Desktop 1
+A-2		Desktop 2
+A-3		Desktop 3
+A-4		Desktop 4

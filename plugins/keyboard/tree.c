@@ -31,8 +31,7 @@ KeyBindingTree *tree_build(GList *keylist)
 
     for (it = g_list_last(keylist); it != NULL; it = it->prev) {
 	p = ret;
-	ret = g_new(KeyBindingTree, 1);
-	ret->next_sibling = NULL;
+	ret = g_new0(KeyBindingTree, 1);
 	if (p == NULL) {
 	    GList *it;
 

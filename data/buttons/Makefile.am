@@ -10,4 +10,4 @@ MAINTAINERCLEANFILES = Makefile.in
 distclean-local:
 	$(RM) *\~ .\#*
 #uninstall-am:
-#	rmdir -p $(DESTDIR)$(buttonsdir) || true
+#	-rmdir -p $(DESTDIR)$(buttonsdir)

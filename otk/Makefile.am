@@ -24,6 +24,9 @@ includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
                    ../config.h
 
+EXTRA_DIST = otk.pc.in
+
+DISTCLEANFILES = otk.pc
 MAINTAINERCLEANFILES= Makefile.in
 
 pkgconfig_DATA = otk.pc
@@ -35,6 +38,10 @@ otk.pc: otk.pc.in
 
 distclean-local:
 	$(RM) *\~ *.orig *.rej .\#*
+
+uninstall-am:
+	-rmdir -p $(includeotkdir)
+	-rmdir -p $(pkgconfigdir)
 
 otk_test: libotk.la otk_test.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) -L. -lotk @LIBS@

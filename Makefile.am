@@ -6,9 +6,6 @@ MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 doc:
 	$(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
 
-uninstall-local:
-	-rmdir $(pkgdatadir)
-
 distclean-local:
 	rm -f *\~ gmon.out .\#*
 

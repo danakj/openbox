@@ -3,10 +3,9 @@ oblibdir = $(libdir)/openbox
 #pythondir = $(oblibdir)/python
 obpythondir = $(oblibdir)/python
 
-CPPFLAGS = $(XFT_CFLAGS) $(SWIG_PYTHON_CFLAGS) @CPPFLAGS@
+CPPFLAGS = -I$(srcdir)/../otk -I$(srcdir)/../src $(XFT_CFLAGS) $(SWIG_PYTHON_CFLAGS) @CPPFLAGS@
 CXXFLAGS = $(filter-out -W -Wall,@CXXFLAGS@)
 LDFLAGS  = -module -avoid-version
-INCLUDES = -I.. -I../otk -I../src
 
 obpython_LTLIBRARIES = otkpy.la obpy.la
 obpython_PYTHON = otk.py ob.py
@@ -32,7 +31,7 @@ install-exec-hook:
 uninstall-am:
 	$(RM) "$(DESTDIR)$(obpythondir)/_otk.so"
 	$(RM) "$(DESTDIR)$(obpythondir)/_ob.so"
-	rmdir -p $(obpythondir) || true
+	-rmdir -p $(obpythondir)
 
 %.py: wrap_%.cc
 
@@ -43,8 +42,8 @@ ob.i: $(addprefix ../src/,openbox.hh screen.hh client.hh python.hh frame.hh)
 	@touch $@
 
 wrap_otk.cc: otk.i
-	$(SWIG) $(SWIG_PYTHON_OPT) $(INCLUDES) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
+	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 
 wrap_ob.cc: ob.i callback.i
-	$(SWIG) $(SWIG_PYTHON_OPT) $(INCLUDES) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
+	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 

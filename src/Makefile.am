@@ -20,7 +20,7 @@ openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   buttonwidget.cc python.cc bindings.cc
 noinst_HEADERS= actions.hh backgroundwidget.hh bindings.hh buttonwidget.hh \
                 client.hh frame.hh labelwidget.hh openbox.hh python.hh \
-                screen.hh widgetbase.hh
+                screen.hh widgetbase.hh gettext.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

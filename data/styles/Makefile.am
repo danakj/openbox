@@ -10,4 +10,4 @@ MAINTAINERCLEANFILES = Makefile.in
 distclean-local:
 	$(RM) *\~ .\#*
 #uninstall-am:
-#	rmdir -p $(DESTDIR)$(styledir) || true
+#	-rmdir -p $(DESTDIR)$(styledir)

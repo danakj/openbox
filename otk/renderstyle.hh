@@ -8,6 +8,7 @@
 #include "ustring.hh"
 
 #include <list>
+#include <string>
 
 namespace otk {
 
@@ -49,7 +50,7 @@ private:
   int _screen;
   ustring _file;
 
-  RenderColor *_root_color;
+  std::string _root_args;
   
   RenderColor *_text_color_focus;
   RenderColor *_text_color_unfocus;
@@ -97,7 +98,7 @@ public:
 
   inline int screen() const { return _screen; }
   
-  inline RenderColor *rootColor() const { return _root_color; }
+  inline const std::string& rootArgs() const { return _root_args; }
   
   inline RenderColor *textFocusColor() const { return _text_color_focus; }
   inline RenderColor *textUnfocusColor() const { return _text_color_unfocus; }
@@ -153,4 +154,4 @@ public:
 
 }
 
-#endif // __rendertexture_hh
+#endif // __renderstyle_hh

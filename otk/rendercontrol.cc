@@ -13,15 +13,22 @@
 #include "surface.hh"
 #include "font.hh"
 #include "ustring.hh"
+#include "property.hh"
 
 extern "C" {
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
+#ifdef    HAVE_SYS_WAIT_H
+#  include <sys/wait.h>
+#endif // HAVE_SYS_WAIT_H
+
+#ifdef    HAVE_UNISTD_H
+#  include <unistd.h>
+#endif // HAVE_UNISTD_H
 
 #include "../src/gettext.h"
 #define _(str) gettext(str)
 }
+
+#include <cstdlib>
 
 namespace otk {
 
@@ -47,20 +54,15 @@ RenderControl *RenderControl::getRenderControl(int screen)
 
 RenderControl::RenderControl(int screen)
   : _screen(screen)
+    
 {
   printf("Initializing RenderControl\n");
+  
 }
 
 RenderControl::~RenderControl()
 {
   printf("Destroying RenderControl\n");
-}
-
-void RenderControl::drawRoot(const RenderColor &color) const
-{
-  Window root = display->screenInfo(_screen)->rootWindow();
-  XSetWindowBackground(**display, root, color.pixel());
-  XClearWindow(**display, root);
 }
 
 void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,

@@ -72,6 +72,8 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   otk::EventHandler::buttonPressHandler(e);
   insertPress(e);
 
+  printf("press queue %u pressed %u\n", _button, e.button);
+
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);
   Frame *f = dynamic_cast<Frame*>(h);

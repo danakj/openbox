@@ -3,7 +3,6 @@
 #define __application_hh
 
 #include "eventdispatcher.hh"
-#include "display.hh"
 
 namespace otk {
 
@@ -27,7 +26,6 @@ public:
 private:
   void loadStyle(void);
 
-  Display _display;
   int _screen;
   bool _dockable;
 

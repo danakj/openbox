@@ -6,6 +6,7 @@
 #include "application.hh"
 #include "property.hh"
 #include "renderstyle.hh"
+#include "display.hh"
 
 extern "C" {
 #include <X11/Xlib.h>

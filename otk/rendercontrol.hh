@@ -48,9 +48,6 @@ public:
 
   static RenderControl *getRenderControl(int screen);
 
-  //! Draws onto the root window
-  virtual void drawRoot(const RenderColor &color) const;
-  
   //! Draws a background onto a Surface, as specified by a RenderTexture
   /*!
     This function will overwrite the entire surface.

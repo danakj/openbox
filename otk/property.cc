@@ -134,6 +134,9 @@ void Property::initialize()
   atoms.kde_net_wm_window_type_override =
     create("_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 
+  atoms.rootpmapid = create("_XROOTPMAP_ID");
+  atoms.esetrootid = create("ESETROOT_PMAP_ID");
+
   atoms.openbox_premax = create("_OPENBOX_PREMAX");
   atoms.openbox_active_window = create("_OPENBOX_ACTIVE_WINDOW");
 }

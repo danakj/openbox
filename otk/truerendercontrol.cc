@@ -9,13 +9,11 @@
 #include "rendertexture.hh"
 
 extern "C" {
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
-
 #include "../src/gettext.h"
 #define _(str) gettext(str)
 }
+
+#include <cstdlib>
 
 namespace otk {
 

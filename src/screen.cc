@@ -10,6 +10,7 @@
 #include "python.hh"
 #include "otk/display.hh"
 #include "otk/property.hh"
+#include "otk/util.hh"
 
 extern "C" {
 #ifdef    HAVE_UNISTD_H
@@ -68,8 +69,9 @@ Screen::Screen(int screen)
 
   // initialize the screen's style
   otk::RenderStyle::setStyle(_number, _config.theme);
-  otk::display->renderControl(_number)->
-    drawRoot(*otk::RenderStyle::style(_number)->rootColor());
+  // draw the root window
+  otk::bexec("obsetroot " + otk::RenderStyle::style(_number)->rootArgs(),
+             _info->displayString());
 
   // set up notification of netwm support
   changeSupportedAtoms();

@@ -38,6 +38,11 @@ extern "C" {
 #include <cstdio>
 #include <cstdlib>
 
+namespace otk {
+extern void initialize();
+extern void destroy();
+}
+
 namespace ob {
 
 Openbox *openbox = (Openbox *) 0;
@@ -73,8 +78,7 @@ void Openbox::signalHandler(int signal)
 
 Openbox::Openbox(int argc, char **argv)
   : otk::EventDispatcher(),
-    otk::EventHandler(),
-    _display()
+    otk::EventHandler()
 {
   struct sigaction action;
 
@@ -82,7 +86,6 @@ Openbox::Openbox(int argc, char **argv)
 
   openbox = this;
 
-  _displayreq = (char*) 0;
   _argv = argv;
   _shutdown = false;
   _restart = false;
@@ -94,6 +97,8 @@ Openbox::Openbox(int argc, char **argv)
 
   parseCommandLine(argc, argv);
 
+  otk::initialize();
+  
   XSynchronize(**otk::display, _sync);
   
   // set up the signal handler
@@ -112,10 +117,6 @@ Openbox::Openbox(int argc, char **argv)
   // anything that died while we were restarting won't give us a SIGCHLD
   while (waitpid(-1, NULL, WNOHANG) > 0);
 
-  otk::RenderColor::initialize();
-  otk::RenderStyle::initialize();
-  otk::Timer::initialize();
-  otk::Property::initialize();
   _actions = new Actions();
   _bindings = new Bindings();
 
@@ -200,14 +201,7 @@ Openbox::~Openbox()
                  CurrentTime);
   XSync(**otk::display, false);
 
-  // this tends to block.. i honestly am not sure why. causing an x error in
-  // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
-  // all im gunna do is the same.
-  //delete _display;
-
-  otk::Timer::destroy();
-  otk::RenderStyle::destroy();
-  otk::RenderColor::destroy();
+  otk::destroy();
 }
 
 
@@ -218,12 +212,7 @@ void Openbox::parseCommandLine(int argc, char **argv)
   for (int i = 1; i < argc; ++i) {
     std::string arg(argv[i]);
 
-    if (arg == "-display") {
-      if (++i >= argc)
-        err = true;
-      else
-        _displayreq = argv[i];
-    } else if (arg == "-rc") {
+    if (arg == "-rc") {
       if (++i >= argc)
         err = true;
       else

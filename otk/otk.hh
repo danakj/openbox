@@ -30,4 +30,9 @@
 #include "ustring.hh"
 #include "widget.hh"
 
+namespace otk {
+void initialize();
+void destroy();
+}
+
 #endif // __otk_hh

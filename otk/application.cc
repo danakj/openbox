@@ -8,41 +8,34 @@
 #include "property.hh"
 #include "rendercolor.hh"
 #include "renderstyle.hh"
+#include "display.hh"
 
-extern "C" {
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-}
-
+#include <cstdlib>
 #include <iostream>
 
 namespace otk {
 
+extern void initialize();
+extern void destroy();
+
 Application::Application(int argc, char **argv)
   : EventDispatcher(),
-    _display(),
     _dockable(false),
     _appwidget_count(0)
 {
   (void)argc;
   (void)argv;
 
-  _screen = DefaultScreen(*_display);
+  otk::initialize();
   
-  Timer::initialize();
-  RenderColor::initialize();
-  RenderStyle::initialize();
-  Property::initialize();
-
+  _screen = DefaultScreen(**display);
+  
   loadStyle();
 }
 
 Application::~Application()
 {
-  RenderStyle::destroy();
-  RenderColor::destroy();
-  Timer::destroy();
+  otk::destroy();
 }
 
 void Application::loadStyle(void)

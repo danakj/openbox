@@ -41,3 +41,4 @@ rendercontrol.lo
 rendercolor.lo
 otk.py
 otk.pc
+otk.lo

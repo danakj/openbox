@@ -1,4 +1,4 @@
-SUBDIRS = po data doc otk wrap src scripts
+SUBDIRS = po data doc otk wrap src scripts tools
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 .PHONY: doc

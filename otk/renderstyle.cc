@@ -73,11 +73,11 @@ bool RenderStyle::loadStyle(RenderStyle *s, int screen,
   s->_screen = screen;
   s->_file = stylefile;
 // pick one..
-//#define FIERON
-#define MERRY
+#define FIERON
+//#define MERRY
 
 #ifdef FIERON
-  s->_root_color = new RenderColor(screen, 0x272a2f);
+  s->_root_args = "#272a2f";
   
   s->_text_color_focus = new RenderColor(screen, 0x272a2f);
   s->_text_color_unfocus = new RenderColor(screen, 0x676869);
@@ -281,7 +281,7 @@ bool RenderStyle::loadStyle(RenderStyle *s, int screen,
   s->_handle_width = 4;
 #else
 #  ifdef MERRY
-  s->_root_color = new RenderColor(screen, 0x7b756a);
+  s->_root_args = "#7b756a";
   
   s->_text_color_focus = new RenderColor(screen, 0xffffff);
   s->_text_color_unfocus = new RenderColor(screen, 0xffffff);
@@ -497,7 +497,7 @@ void RenderStyle::defaultStyle(RenderStyle *s, int screen)
   s->_screen = screen;
   s->_file = "";
 
-  s->_root_color = new RenderColor(screen, 0);
+  s->_root_args = "#000000";
   s->_text_color_focus = new RenderColor(screen, 0xffffff);
   s->_text_color_unfocus = new RenderColor(screen, 0xffffff);
   s->_button_color_focus = new RenderColor(screen, 0);
@@ -634,9 +634,6 @@ void RenderStyle::defaultStyle(RenderStyle *s, int screen)
 
 RenderStyle::~RenderStyle()
 {
-  assert(_root_color);
-  delete _root_color;
-  
   assert(_text_color_focus);
   delete _text_color_focus;
   assert(_text_color_unfocus);

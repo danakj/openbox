@@ -1,6 +1,6 @@
 #include <otk/otk.hh>
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
   otk::initialize();
 

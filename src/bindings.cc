@@ -482,23 +482,26 @@ void OBBindings::grabButton(bool grab, const Binding &b, MouseContext context,
 {
   Window win;
   int mode = GrabModeAsync;
+  unsigned int mask;
   switch(context) {
   case MC_Frame:
     win = client->frame->window();
+    mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
     break;
   case MC_Window:
     win = client->frame->plate();
     mode = GrabModeSync; // this is handled in fireButton
+    mask = ButtonPressMask; // can't catch more than this with Sync mode
+                            // the release event is manufactured by the
+                            // master buttonPressHandler
     break;
   default:
     // any other elements already get button events, don't grab on them
     return;
   }
   if (grab)
-    otk::OBDisplay::grabButton(b.key, b.modifiers, win, false,
-                               ButtonPressMask | ButtonMotionMask |
-                               ButtonReleaseMask, mode, GrabModeAsync,
-                               None, None, false);
+    otk::OBDisplay::grabButton(b.key, b.modifiers, win, false, mask, mode,
+                               GrabModeAsync, None, None, false);
   else
     otk::OBDisplay::ungrabButton(b.key, b.modifiers, win);
 }
@@ -515,8 +518,7 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
 void OBBindings::fireButton(MouseData *data)
 {
   if (data->context == MC_Window) {
-    // these are grabbed in Sync mode to allow the press to be normal to the
-    // client
+    // Replay the event, so it goes to the client, and ungrab the device.
     XAllowEvents(otk::OBDisplay::display, ReplayPointer, data->time);
   }
   

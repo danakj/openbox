@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<openbox_menu xmlns="http://openbox/.org"
+<openbox_menu xmlns="http://openbox.org/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-                http://openbox.org/schema.php?type=menu&amp;version=@version@
-                file://@xsddir@/rc.xsd">
+        xsi:schemaLocation="http://openbox.org/
+                file://@xsddir@/menu.xsd">
 
 <menu id="games-menu" label="Games">
   <item label="Crack-Attack">

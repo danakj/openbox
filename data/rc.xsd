@@ -213,6 +213,7 @@
             <xs:enumeration value="Iconify"/>
             <xs:enumeration value="Icon"/>
             <xs:enumeration value="Close"/>
+            <xs:enumeration value="MoveResize"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="button">

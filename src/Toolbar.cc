@@ -73,6 +73,7 @@ Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
   m_placement = BottomCenter;
   m_ontop = false;
   m_hidden = m_autohide = false;
+  load();
 
   // get the clock updating every minute
   clock_timer = new BTimer(openbox, *this);
@@ -1271,9 +1272,13 @@ Toolbarmenu::Toolbarmenu(Toolbar &tb) : Basemenu(tb.screen), toolbar(tb) {
 			  "Edit current workspace name"), 3);
 
   update();
+ 
+  setValues();
+}
 
-  if (toolbar.onTop()) setItemSelected(1, True);
-  if (toolbar.autoHide()) setItemSelected(2, True);
+void Toolbarmenu::setValues() {
+  setItemSelected(1, toolbar.onTop());
+  setItemSelected(2, toolbar.autoHide());
 }
 
 
@@ -1328,6 +1333,7 @@ void Toolbarmenu::internal_hide() {
 
 
 void Toolbarmenu::reconfigure() {
+  setValues();
   placementmenu->reconfigure();
 
   Basemenu::reconfigure();
@@ -1355,7 +1361,6 @@ Toolbarmenu::Placementmenu::Placementmenu(Toolbarmenu &tm)
 			  "Bottom Right"), Toolbar::BottomRight);
   update();
 }
-
 
 void Toolbarmenu::Placementmenu::itemSelected(int button, int index) {
   if (button != 1)

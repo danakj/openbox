@@ -249,9 +249,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
                 openbox.getSessionCursor());
 
   workspaceNames = new LinkedList<char>;
-
-  load();       // load config options from Resources
-
   workspacesList = new LinkedList<Workspace>;
   rootmenuList = new LinkedList<Rootmenu>;
   netizenList = new LinkedList<Netizen>;
@@ -265,6 +262,7 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
 
   image_control->setDither(resource.image_dither);
 
+  load();       // load config options from Resources
   LoadStyle();
 
   XGCValues gcv;
@@ -1040,7 +1038,8 @@ void BScreen::save() {
 #ifdef    HAVE_STRFTIME
   // it deletes the current value before setting the new one, so we have to
   // duplicate the current value.
-  setStrftimeFormat(bstrdup(resource.strftime_format)); 
+  std::string s = resource.strftime_format;
+  setStrftimeFormat(s.c_str()); 
 #else // !HAVE_STRFTIME
   setDateFormat(resource.date_format);
   setClock24Hour(resource.clock24hour);
@@ -1211,6 +1210,10 @@ void BScreen::load() {
 
 void BScreen::reconfigure(void) {
   load();
+  toolbar->load();
+#ifdef    SLIT
+  slit->load();
+#endif // SLIT
   LoadStyle();
 
   XGCValues gcv;

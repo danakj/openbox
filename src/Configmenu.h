@@ -38,9 +38,11 @@ private:
 
   protected:
     virtual void itemSelected(int, int);
+    virtual void setValues();
 
   public:
     Focusmenu(Configmenu *);
+    void reconfigure();
   };
 
   class Placementmenu : public Basemenu {
@@ -49,9 +51,12 @@ private:
 
   protected:
     virtual void itemSelected(int, int);
+    virtual void setValues();
+
 
   public:
     Placementmenu(Configmenu *);
+    void reconfigure();
   };
 
   BScreen &screen;
@@ -63,15 +68,17 @@ private:
 
 protected:
   virtual void itemSelected(int, int);
+  virtual void setValues();
+
 
 public:
   Configmenu(BScreen &);
-  virtual ~Configmenu(void);
+  virtual ~Configmenu();
 
-  inline Basemenu *getFocusmenu(void) { return focusmenu; }
-  inline Basemenu *getPlacementmenu(void) { return placementmenu; }
+  inline Basemenu *getFocusmenu() { return focusmenu; }
+  inline Basemenu *getPlacementmenu() { return placementmenu; }
 
-  void reconfigure(void);
+  void reconfigure();
 };
 
 #endif // __Configmenu_hh

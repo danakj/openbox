@@ -52,6 +52,7 @@ Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
   m_direction = Vertical;
   m_ontop = false;
   m_hidden = m_autohide = false;
+  load();
   
   display = screen.getBaseDisplay().getXDisplay();
   frame.window = frame.pixmap = None;
@@ -314,8 +315,6 @@ void Slit::load() {
 }
 
 void Slit::reconfigure(void) {
-  load();
-  
   frame.area.setSize(0, 0);
   LinkedListIterator<SlitClient> it(clientList);
   SlitClient *client;
@@ -710,8 +709,12 @@ Slitmenu::Slitmenu(Slit &sl) : Basemenu(sl.screen), slit(sl) {
 
   update();
 
-  if (slit.onTop()) setItemSelected(2, True);
-  if (slit.autoHide()) setItemSelected(3, True);
+  setValues();
+}
+
+void Slitmenu::setValues() {
+  setItemSelected(2, slit.onTop());
+  setItemSelected(3, slit.autoHide());
 }
 
 
@@ -757,6 +760,7 @@ void Slitmenu::internal_hide(void) {
 
 
 void Slitmenu::reconfigure(void) {
+  setValues();
   directionmenu->reconfigure();
   placementmenu->reconfigure();
 
@@ -776,10 +780,19 @@ Slitmenu::Directionmenu::Directionmenu(Slitmenu &sm)
 
   update();
 
-  if (sm.slit.direction() == Slit::Horizontal)
+  setValues();
+}
+
+
+void Slitmenu::Directionmenu::setValues() {
+  if (slitmenu.slit.direction() == Slit::Horizontal)
     setItemSelected(0, True);
   else
     setItemSelected(1, True);
+}
+
+void Slitmenu::Directionmenu::reconfigure() {
+  setValues();
 }
 
 

@@ -63,6 +63,10 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
 			  "Hide toolbar"), 6);
   update();
 
+  setValues();
+}
+
+void Configmenu::setValues() {
   setItemSelected(2, screen.getImageControl()->doDither());
   setItemSelected(3, screen.opaqueMove());
   setItemSelected(4, screen.fullMax());
@@ -71,7 +75,7 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
   setItemSelected(7, screen.hideToolbar());
 }
 
-Configmenu::~Configmenu(void) {
+Configmenu::~Configmenu() {
   delete focusmenu;
   delete placementmenu;
 }
@@ -130,7 +134,8 @@ void Configmenu::itemSelected(int button, int index) {
   } // switch
 }
 
-void Configmenu::reconfigure(void) {
+void Configmenu::reconfigure() {
+  setValues();
   focusmenu->reconfigure();
   placementmenu->reconfigure();
 
@@ -152,10 +157,19 @@ Configmenu::Focusmenu::Focusmenu(Configmenu *cm) : Basemenu(cm->screen) {
 			  "Auto Raise"), 3);
   update();
 
+  setValues();
+}
+
+void Configmenu::Focusmenu::setValues() {
   setItemSelected(0, !configmenu->screen.sloppyFocus());
   setItemSelected(1, configmenu->screen.sloppyFocus());
   setItemEnabled(2, configmenu->screen.sloppyFocus());
   setItemSelected(2, configmenu->screen.autoRaise());
+}
+
+void Configmenu::Focusmenu::reconfigure() {
+  setValues();
+  Basemenu::reconfigure();
 }
 
 void Configmenu::Focusmenu::itemSelected(int button, int index) {
@@ -234,6 +248,10 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 			  "Bottom to Top"), BScreen::BottomTop);
   update();
 
+  setValues();
+}
+
+void Configmenu::Placementmenu::setValues() {
   switch (configmenu->screen.placementPolicy()) {
   case BScreen::RowSmartPlacement:
     setItemSelected(0, True);
@@ -262,6 +280,11 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 
   setItemSelected(6, tb);
   setItemSelected(7, !tb);
+}
+
+void Configmenu::Placementmenu::reconfigure() {
+  setValues();
+  Basemenu::reconfigure();
 }
 
 void Configmenu::Placementmenu::itemSelected(int button, int index) {

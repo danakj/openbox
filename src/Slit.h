@@ -42,9 +42,11 @@ private:
 
   protected:
     virtual void itemSelected(int, int);
+    virtual void setValues();
 
   public:
     Directionmenu(Slitmenu &);
+    void reconfigure();
   };
 
   class Placementmenu : public Basemenu {
@@ -71,7 +73,7 @@ private:
 protected:
   virtual void itemSelected(int, int);
   virtual void internal_hide();
-
+  virtual void setValues();
 
 public:
   Slitmenu(Slit &);

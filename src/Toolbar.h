@@ -56,6 +56,7 @@ private:
 protected:
   virtual void itemSelected(int, int);
   virtual void internal_hide();
+  virtual void setValues();
 
 public:
   Toolbarmenu(Toolbar &);

@@ -1072,7 +1072,6 @@ void Openbox::real_reconfigure() {
   grab();
 
   load();
-  save();
   
   for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
     MenuTimestamp *ts = menuTimestamps->remove(0);

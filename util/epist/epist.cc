@@ -50,6 +50,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
+#include "actions.hh"
 #include "epist.hh"
 #include "screen.hh"
 #include "window.hh"

@@ -309,6 +309,7 @@ ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
            desktop */
         if (ft->transients == NULL && client_normal(ft) &&
             ((ft->can_focus || ft->focus_notify) &&
+             !ft->skip_taskbar &&
              (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL))) {
             if (ft != focus_cycle_target) { /* prevents flicker */
                 if (focus_cycle_target)

@@ -81,7 +81,7 @@ using std::string;
 #include "otk/assassin.hh"
 #include "screen.hh"
 #include "util.hh"
-#include "window.hh"
+#include "bbwindow.hh"
 #include "workspace.hh"
 #include "xatom.hh"
 

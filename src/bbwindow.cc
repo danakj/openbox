@@ -29,7 +29,7 @@ extern "C" {
 #include "image.hh"
 #include "screen.hh"
 #include "util.hh"
-#include "window.hh"
+#include "bbwindow.hh"
 #include "workspace.hh"
 
 using std::string;

@@ -196,7 +196,8 @@ void focus_fallback(FallbackType type)
             for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
                 for (sit = old->group->members; sit; sit = sit->next)
                     if (sit->data == it->data)
-                        if (sit->data != old && client_focus(sit->data))
+                        if (sit->data != old && client_normal(sit->data) &&
+                            client_focus(sit->data))
                             return;
         }
     }

@@ -28,6 +28,10 @@ struct _ObClient;
 
 /*! The client which is currently focused */
 extern struct _ObClient *focus_client;
+/*! The client which is being decorated as focused, not always matching the
+  real focus, but this is used to track it so that it can be ersolved to match
+*/
+extern struct _ObClient *focus_hilite;
 /*! The client which appears focused during a focus cycle operation */
 extern struct _ObClient *focus_cycle_target;
 

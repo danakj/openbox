@@ -35,7 +35,7 @@
 #include <glib.h>
 #include <assert.h>
 
-ObClient *focus_client;
+ObClient *focus_client, *focus_hilite;
 GList **focus_order; /* these lists are created when screen_startup
                         sets the number of desktops */
 ObClient *focus_cycle_target;

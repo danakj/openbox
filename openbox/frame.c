@@ -603,8 +603,8 @@ static void layout_title(ObFrame *self)
 
 ObFrameContext frame_context_from_string(char *name)
 {
-    if (!g_ascii_strcasecmp("root", name))
-        return OB_FRAME_CONTEXT_ROOT;
+    if (!g_ascii_strcasecmp("desktop", name))
+        return OB_FRAME_CONTEXT_DESKTOP;
     else if (!g_ascii_strcasecmp("client", name))
         return OB_FRAME_CONTEXT_CLIENT;
     else if (!g_ascii_strcasecmp("titlebar", name))
@@ -640,22 +640,23 @@ ObFrameContext frame_context(ObClient *client, Window win)
 {
     ObFrame *self;
 
-    if (win == RootWindow(ob_display, ob_screen)) return OB_FRAME_CONTEXT_ROOT;
+    if (win == RootWindow(ob_display, ob_screen))
+        return OB_FRAME_CONTEXT_DESKTOP;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
     if (win == client->window) {
-        /* conceptually, this is the root window, as far as users are
+        /* conceptually, this is the desktop, as far as users are
            concerned */
         if (client->type == OB_CLIENT_TYPE_DESKTOP)
-            return OB_FRAME_CONTEXT_ROOT;
+            return OB_FRAME_CONTEXT_DESKTOP;
         return OB_FRAME_CONTEXT_CLIENT;
     }
 
     self = client->frame;
     if (win == self->plate) {
-        /* conceptually, this is the root window, as far as users are
+        /* conceptually, this is the desktop, as far as users are
            concerned */
         if (client->type == OB_CLIENT_TYPE_DESKTOP)
-            return OB_FRAME_CONTEXT_ROOT;
+            return OB_FRAME_CONTEXT_DESKTOP;
         return OB_FRAME_CONTEXT_CLIENT;
     }
 

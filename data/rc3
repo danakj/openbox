@@ -297,7 +297,7 @@
       <action name="close"/>
     </mousebind>
   </context>
-  <context name="root">
+  <context name="desktop">
     <mousebind button="A-Up" action="click">
       <action name="desktopright"/>
     </mousebind>

@@ -19,7 +19,7 @@ typedef struct {
 } ObMouseBinding;
 
 #define CLIENT_CONTEXT(co, cl) ((cl && cl->type == OB_CLIENT_TYPE_DESKTOP) ? \
-                                co == OB_FRAME_CONTEXT_ROOT : \
+                                co == OB_FRAME_CONTEXT_DESKTOP : \
                                 co == OB_FRAME_CONTEXT_CLIENT)
 
 /* Array of GSList*s of PointerBinding*s. */

@@ -2,6 +2,39 @@
 ### Functions that can be used as callbacks for mouse/keyboard bindings ###
 ###########################################################################
 
+def state_above(data, add=2):
+    """Toggles, adds or removes the 'above' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    above = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_above)
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    above)
+    
+def state_below(data, add=2):
+    """Toggles, adds or removes the 'below' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    below = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_below)
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    below)
+    
+def state_shaded(data, add=2):
+    """Toggles, adds or removes the 'shaded' state on a window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    shaded = OBProperty_atom(Openbox_property(openbox),
+                            OBProperty_net_wm_state_shaded)
+    send_client_msg(root, OBProperty_net_wm_state, window, add,
+                    shaded)
+    
 def close(data):
     """Closes the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
@@ -88,22 +121,15 @@ def lower_win(data):
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    print "toggle_shade"
-    OBClient_shade(client, not OBClient_shaded(client))
+    state_shaded(data)
 
 def shade(data):
     """Shades the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    OBClient_shade(client, 1)
+    state_shaded(data, 1)
 
 def unshade(data):
     """Unshades the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    OBClient_shade(client, 0)
+    state_shaded(data, 0)
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
@@ -176,39 +202,6 @@ def send_to_prev_desktop(data, no_wrap=0, follow=1):
     if follow:
         change_desktop(data, d)
 
-def state_above(data, add=2):
-    """Toggles, adds or removes the 'above' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    above = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_above)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    above)
-    
-def state_below(data, add=2):
-    """Toggles, adds or removes the 'below' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    below = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_below)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    below)
-    
-def state_shaded(data, add=2):
-    """Toggles, adds or removes the 'shaded' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    shaded = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_shaded)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    shaded)
-    
 #########################################
 ### Convenience functions for scripts ###
 #########################################

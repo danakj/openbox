@@ -382,7 +382,7 @@ bool Property::get(Window win, Atoms atom, StringType type,
 
 
 bool Property::get(Window win, Atoms atom, StringType type,
-                     unsigned long *nelements, StringVect *strings) const
+                   unsigned long *nelements, StringVect *strings) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);

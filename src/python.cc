@@ -66,7 +66,7 @@ bool python_get_long(const char *name, long *value)
   return true;
 }
 
-bool python_get_string(const char *name, std::string *value)
+bool python_get_string(const char *name, otk::ustring *value)
 {
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
   if (!(val && PyString_Check(val))) return false;
@@ -75,7 +75,7 @@ bool python_get_string(const char *name, std::string *value)
   return true;
 }
 
-bool python_get_stringlist(const char *name, std::vector<std::string> *value)
+bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
 {
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
   if (!(val && PyList_Check(val))) return false;

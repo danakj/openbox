@@ -29,6 +29,7 @@
 #include "timerqueue.hh"
 #include "timerqueuemanager.hh"
 #include "util.hh"
+#include "ustring.hh"
 #include "widget.hh"
 
 #endif // __otk_hh

@@ -26,7 +26,7 @@ LabelWidget::~LabelWidget()
 }
 
 
-void LabelWidget::setText(const std::string &text)
+void LabelWidget::setText(const otk::ustring &text)
 {
   _text = text;
   _dirty = true;
@@ -77,7 +77,7 @@ void LabelWidget::update()
   otk::Widget::update();
 
   if (draw) {
-    std::string t = _text;
+    otk::ustring t = _text;
     int x = _sidemargin;    // x coord for the text
 
     // find a string that will fit inside the area for text

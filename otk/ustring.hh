@@ -152,7 +152,7 @@ public:
   ustring(const ustring& other);
   ustring& operator=(const ustring& other);
   ustring(const std::string& src);
-  ustring::ustring(const char* src);
+  ustring(const char* src);
 
   // append to the string
 
@@ -166,6 +166,7 @@ public:
   ustring::size_type bytes() const;
   ustring::size_type capacity() const;
   ustring::size_type max_size() const;
+  bool empty() const;
 
   // erase substrings
 

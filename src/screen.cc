@@ -82,10 +82,10 @@ Screen::Screen(int screen)
 
   // initialize the screen's style
   _style.setImageControl(_image_control);
-  std::string stylepath;
+  otk::ustring stylepath;
   python_get_string("theme", &stylepath);
   otk::Configuration sconfig(false);
-  sconfig.setFile(otk::expandTilde(stylepath));
+  sconfig.setFile(otk::expandTilde(stylepath.c_str()));
   if (!sconfig.load()) {
     sconfig.setFile(otk::expandTilde(DEFAULTSTYLE));
     if (!sconfig.load()) {
@@ -107,7 +107,7 @@ Screen::Screen(int screen)
                                      geometry, 2);
 
   // Set the net_desktop_names property
-  std::vector<std::string> names;
+  std::vector<otk::ustring> names;
   python_get_stringlist("desktop_names", &names);
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::Property::net_desktop_names,
@@ -710,7 +710,7 @@ void Screen::updateDesktopNames()
 }
 
 
-void Screen::setDesktopName(long i, const std::string &name)
+void Screen::setDesktopName(long i, const otk::ustring &name)
 {
   assert(i >= 0);
 

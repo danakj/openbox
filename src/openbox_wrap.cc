@@ -676,8 +676,8 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XConfigureEvent swig_types[28] 
 #define  SWIGTYPE_p_XCirculateEvent swig_types[29] 
 #define  SWIGTYPE_p_XRectangle swig_types[30] 
-#define  SWIGTYPE_p_std__string swig_types[31] 
-#define  SWIGTYPE_p_ustring swig_types[32] 
+#define  SWIGTYPE_p_otk__ustring swig_types[31] 
+#define  SWIGTYPE_p_std__string swig_types[32] 
 #define  SWIGTYPE_p_XCrossingEvent swig_types[33] 
 #define  SWIGTYPE_p_Display swig_types[34] 
 #define  SWIGTYPE_p_otk__Display swig_types[35] 
@@ -884,6 +884,9 @@ void python_callback(PyObject *func, KeyData *data)
 
 
   Display *Display_display() { return otk::Display::display; }
+
+
+#include "ustring.hh"
 
 ob::Client *ob_Screen_client(ob::Screen *self,int i){
     if (i >= (int)self->clients.size())
@@ -1506,7 +1509,8 @@ static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
     Window arg2 ;
     int arg3 ;
     int arg4 ;
-    ustring *arg5 = 0 ;
+    otk::ustring *arg5 = 0 ;
+    otk::ustring temp5 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj4  = 0 ;
@@ -1515,11 +1519,15 @@ static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (Window) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_ustring,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg5 == NULL) {
-        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    {
+        if (PyString_Check(obj4)) {
+            temp5 = otk::ustring(PyString_AsString(obj4));
+            arg5 = &temp5;
+        }else {
+            SWIG_exception(SWIG_TypeError, "ustring expected");
+        }
     }
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(ustring const &)*arg5);
+    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(otk::ustring const &)*arg5);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1591,47 +1599,6 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                     if (_v) {
                         {
                             void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_ustring, 0) == -1) {
-                                _v = 0;
-                                PyErr_Clear();
-                            }else {
-                                _v = 1;
-                            }
-                        }
-                        if (_v) {
-                            return _wrap_Property_set__SWIG_2(self,args);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (argc == 5) {
-        int _v;
-        {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
-        }
-        if (_v) {
-            {
-                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
-            }
-            if (_v) {
-                {
-                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
-                }
-                if (_v) {
-                    {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
-                    }
-                    if (_v) {
-                        {
-                            void *ptr;
                             if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
                                 _v = 0;
                                 PyErr_Clear();
@@ -1676,6 +1643,41 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                         }
                         if (_v) {
                             return _wrap_Property_set__SWIG_0(self,args);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 5) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            _v = PyString_Check(argv[4]) ? 1 : 0;
+                        }
+                        if (_v) {
+                            return _wrap_Property_set__SWIG_2(self,args);
                         }
                     }
                 }
@@ -1795,7 +1797,7 @@ static PyObject *_wrap_Property_get__SWIG_2(PyObject *self, PyObject *args) {
     Window arg2 ;
     int arg3 ;
     int arg4 ;
-    std::string *arg5 = (std::string *) 0 ;
+    otk::ustring *arg5 = (otk::ustring *) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
@@ -1805,7 +1807,7 @@ static PyObject *_wrap_Property_get__SWIG_2(PyObject *self, PyObject *args) {
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (Window) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_std__string,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_otk__ustring,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (bool)((otk::Property const *)arg1)->get(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,arg5);
     
     resultobj = PyInt_FromLong((long)result);
@@ -1920,7 +1922,7 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                     if (_v) {
                         {
                             void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_std__string, 0) == -1) {
+                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__ustring, 0) == -1) {
                                 _v = 0;
                                 PyErr_Clear();
                             }else {
@@ -5596,8 +5598,8 @@ static PyObject *_wrap_Screen_setDesktopName(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Screen *arg1 = (ob::Screen *) 0 ;
     long arg2 ;
-    std::string *arg3 = 0 ;
-    std::string temp3 ;
+    otk::ustring *arg3 = 0 ;
+    otk::ustring temp3 ;
     PyObject * obj0  = 0 ;
     PyObject * obj2  = 0 ;
     
@@ -5605,13 +5607,13 @@ static PyObject *_wrap_Screen_setDesktopName(PyObject *self, PyObject *args) {
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Screen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     {
         if (PyString_Check(obj2)) {
-            temp3 = std::string(PyString_AsString(obj2));
+            temp3 = otk::ustring(PyString_AsString(obj2));
             arg3 = &temp3;
         }else {
-            SWIG_exception(SWIG_TypeError, "string expected");
+            SWIG_exception(SWIG_TypeError, "ustring expected");
         }
     }
-    (arg1)->setDesktopName(arg2,(std::string const &)*arg3);
+    (arg1)->setDesktopName(arg2,(otk::ustring const &)*arg3);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -5969,14 +5971,14 @@ static PyObject *_wrap_Client_desktop(PyObject *self, PyObject *args) {
 static PyObject *_wrap_Client_title(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Client *arg1 = (ob::Client *) 0 ;
-    std::string *result;
+    otk::ustring *result;
     PyObject * obj0  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"O:Client_title",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     {
-        std::string const &_result_ref = ((ob::Client const *)arg1)->title();
-        result = (std::string *) &_result_ref;
+        otk::ustring const &_result_ref = ((ob::Client const *)arg1)->title();
+        result = (otk::ustring *) &_result_ref;
     }
     
     {
@@ -5991,14 +5993,14 @@ static PyObject *_wrap_Client_title(PyObject *self, PyObject *args) {
 static PyObject *_wrap_Client_iconTitle(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Client *arg1 = (ob::Client *) 0 ;
-    std::string *result;
+    otk::ustring *result;
     PyObject * obj0  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"O:Client_iconTitle",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     {
-        std::string const &_result_ref = ((ob::Client const *)arg1)->iconTitle();
-        result = (std::string *) &_result_ref;
+        otk::ustring const &_result_ref = ((ob::Client const *)arg1)->iconTitle();
+        result = (otk::ustring *) &_result_ref;
     }
     
     {
@@ -8252,8 +8254,8 @@ static swig_type_info _swigt__p_ob__KeyData[] = {{"_p_ob__KeyData", 0, "ob::KeyD
 static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "XConfigureEvent *", 0},{"_p_XConfigureEvent"},{0}};
 static swig_type_info _swigt__p_XCirculateEvent[] = {{"_p_XCirculateEvent", 0, "XCirculateEvent *", 0},{"_p_XCirculateEvent"},{0}};
 static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle *", 0},{"_p_XRectangle"},{0}};
+static swig_type_info _swigt__p_otk__ustring[] = {{"_p_otk__ustring", 0, "otk::ustring *", 0},{"_p_otk__ustring"},{0}};
 static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
-static swig_type_info _swigt__p_ustring[] = {{"_p_ustring", 0, "ustring *", 0},{"_p_ustring"},{0}};
 static swig_type_info _swigt__p_XCrossingEvent[] = {{"_p_XCrossingEvent", 0, "XCrossingEvent *", 0},{"_p_XCrossingEvent"},{0}};
 static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::Display *", 0},{"_p_otk__Display"},{0}};
@@ -8316,8 +8318,8 @@ _swigt__p_ob__KeyData,
 _swigt__p_XConfigureEvent, 
 _swigt__p_XCirculateEvent, 
 _swigt__p_XRectangle, 
+_swigt__p_otk__ustring, 
 _swigt__p_std__string, 
-_swigt__p_ustring, 
 _swigt__p_XCrossingEvent, 
 _swigt__p_Display, 
 _swigt__p_otk__Display, 

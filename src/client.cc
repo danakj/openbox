@@ -531,15 +531,15 @@ void Client::updateClass()
 
   if (property->get(_window, otk::Property::wm_class,
                     otk::Property::ascii, &num, &v)) {
-    if (num > 0) _app_name = v[0];
-    if (num > 1) _app_class = v[1];
+    if (num > 0) _app_name = v[0].c_str();
+    if (num > 1) _app_class = v[1].c_str();
   }
 
   v.clear();
   num = 1;
   if (property->get(_window, otk::Property::wm_window_role,
                     otk::Property::ascii, &num, &v)) {
-    if (num > 0) _role = v[0];
+    if (num > 0) _role = v[0].c_str();
   }
 }
 

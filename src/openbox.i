@@ -112,6 +112,8 @@ void python_callback(PyObject *func, KeyData *data)
   Display *Display_display() { return otk::Display::display; }
 %};
 
+%include "../otk/ustring.i"
+
 %include "../otk/display.hh"
 %include "../otk/point.hh"
 %include "../otk/property.hh"

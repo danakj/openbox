@@ -64,7 +64,7 @@ Frame::~Frame()
 }
 
 
-void Frame::setTitle(const std::string &text)
+void Frame::setTitle(const otk::ustring &text)
 {
   _label.setText(text);
   _label.update();
@@ -172,7 +172,7 @@ void Frame::adjustSize()
     // separation between titlebar elements
     const int sep = bevel + 1;
 
-    std::string layout;
+    otk::ustring layout;
     if (!python_get_string("titlebar_layout", &layout))
       layout = "ILMC";
 

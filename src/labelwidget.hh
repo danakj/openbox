@@ -6,6 +6,7 @@
 #include "otk/widget.hh"
 #include "otk/font.hh"
 #include "otk/style.hh"
+#include "otk/ustring.hh"
 
 namespace ob {
 
@@ -17,7 +18,7 @@ private:
   otk::Color *_text_color;
   int _sidemargin;
   otk::Style::TextJustify _justify;
-  std::string _text;
+  otk::ustring _text;
   //! Object used by Xft to render to the drawable
   XftDraw *_xftdraw;
   
@@ -34,8 +35,8 @@ public:
 
   virtual void update();
 
-  inline const std::string &text() const { return _text; }
-  void setText(const std::string &text);
+  inline const otk::ustring &text() const { return _text; }
+  void setText(const otk::ustring &text);
 };
 
 }

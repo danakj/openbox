@@ -18,6 +18,7 @@ extern "C" {
 #include "otk/screeninfo.hh"
 #include "otk/style.hh"
 #include "otk/widget.hh"
+#include "otk/ustring.hh"
 
 #include <string>
 
@@ -88,7 +89,7 @@ public:
   //! Displays unfocused decorations
   virtual void unfocus();
 
-  void setTitle(const std::string &text);
+  void setTitle(const otk::ustring &text);
  
   //! Reparents the client window from the root window onto the frame
   void grabClient();

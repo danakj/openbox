@@ -12,6 +12,7 @@
 
 %include "stl.i"
 //%include std_list.i
+%include "ustring.i"
 
 %ignore otk::OBDisplay::display;
 %inline %{

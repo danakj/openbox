@@ -19,6 +19,7 @@ extern "C" {
 #include "otk/screeninfo.hh"
 #include "otk/eventhandler.hh"
 #include "otk/property.hh"
+#include "otk/ustring.hh"
 
 #include <string>
 #include <list>
@@ -191,7 +192,7 @@ public:
     @param name The name to set for the desktop
     If the index is too large, it is simply ignored.
   */
-  void setDesktopName(long i, const std::string &name);
+  void setDesktopName(long i, const otk::ustring &name);
 
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);

@@ -12,6 +12,7 @@
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
+#include "otk/ustring.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -182,9 +183,9 @@ private:
   long _desktop;
 
   //! Normal window title
-  std::string  _title; // XXX: Have to keep track if this string is Utf8 or not
+  otk::ustring  _title;
   //! Window title when iconifiged
-  std::string  _icon_title;
+  otk::ustring  _icon_title;
 
   //! The application that created the window
   std::string  _app_name;
@@ -412,9 +413,9 @@ BB    @param window The window id that the Client class should handle
   */
   inline long desktop() const { return _desktop; }
   //! Returns the window's title
-  inline const std::string &title() const { return _title; }
+  inline const otk::ustring &title() const { return _title; }
   //! Returns the window's title when it is iconified
-  inline const std::string &iconTitle() const { return _title; }
+  inline const otk::ustring &iconTitle() const { return _title; }
   //! Returns the application's name to whom the window belongs
   inline const std::string &appName() const { return _app_name; }
   //! Returns the class of the window

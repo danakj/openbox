@@ -142,6 +142,11 @@ ustring::size_type ustring::max_size() const
   return _string.max_size();
 }
 
+bool ustring::empty() const
+{
+  return _string.empty();
+}
+
 void ustring::clear()
 {
   _string.erase();

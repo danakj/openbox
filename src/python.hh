@@ -10,6 +10,7 @@
 #include "otk/rect.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
+#include "otk/ustring.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -165,8 +166,8 @@ void python_destroy();
 bool python_exec(const std::string &path);
 
 bool python_get_long(const char *name, long *value);
-bool python_get_string(const char *name, std::string *value);
-bool python_get_stringlist(const char *name, std::vector<std::string> *value);
+bool python_get_string(const char *name, otk::ustring *value);
+bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value);
 
 /***********************************************
  * These are found in openbox.i, not python.cc *

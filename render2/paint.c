@@ -29,6 +29,7 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     struct RrSurface *p;
     int ok;
     int surx, sury;
+    GSList *it;
 
     inst = RrSurfaceInstance(sur);
 
@@ -43,7 +44,20 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     if (!(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur)))
         return;
 
-    /* XXX recurse and paint children */
+    /* recurse and paint children */
+    for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it)) {
+        struct RrSurface *child = it->data;
+        /* in the area to repaint? */
+        if (RrSurfaceX(child) < x+w &&
+            RrSurfaceX(child) + RrSurfaceWidth(child) > x &&
+            RrSurfaceY(child) < y+h &&
+            RrSurfaceY(child) + RrSurfaceHeight(child))
+            RrPaintArea(child,
+                        MAX(0, x-RrSurfaceX(child)),
+                        MAX(0, y-RrSurfaceY(child)),
+                        MIN(RrSurfaceWidth(child), w-(x-RrSurfaceX(child))),
+                        MIN(RrSurfaceHeight(child), h-(y-RrSurfaceY(child))));
+    }
 
     if (!RrSurfaceVisible(sur)) return;
 

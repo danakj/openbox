@@ -4,6 +4,7 @@
 #include "render.h"
 #include "texture.h"
 #include "planar.h"
+#include <glib.h>
 
 struct RrNonPlanarSurface {
     int foo;
@@ -39,6 +40,8 @@ struct RrSurface {
     int h;
 
     int visible : 1;
+
+    GSList *children;
 };
 
 struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
@@ -52,5 +55,7 @@ struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
 #define RrSurfaceY(sur) ((sur)->y)
 #define RrSurfaceWidth(sur) ((sur)->w)
 #define RrSurfaceHeight(sur) ((sur)->h)
+
+#define RrSurfaceChildren(sur) ((sur)->children)
 
 #endif

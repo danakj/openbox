@@ -23,6 +23,7 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
     sur->w = 1;
     sur->h = 1;
     sur->visible = 0;
+    sur->children = NULL;
     return sur;
 }
 
@@ -84,6 +85,8 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
     sur->parent = parent;
     RrSurfaceShow(sur);
 
+    parent->children = g_slist_append(parent->children, sur);
+
     RrInstaceAddSurface(sur);
     return sur;
 }
@@ -143,6 +146,8 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
     sur->parent = parent;
     RrSurfaceShow(sur);
 
+    parent->children = g_slist_append(parent->children, sur);
+
     RrInstaceAddSurface(sur);
     return sur;
 }
@@ -151,6 +156,9 @@ void RrSurfaceFree(struct RrSurface *sur)
 {
     int i;
     if (sur) {
+        if (sur->parent)
+            sur->parent->children = g_slist_remove(sur->parent->children, sur);
+
         RrInstaceRemoveSurface(sur);
         for (i = 0; i < sur->ntextures; ++i)
             RrTextureFreeContents(&sur->texture[i]);

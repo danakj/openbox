@@ -65,4 +65,10 @@ void OtkButton::update(void)
     OtkFocusWidget::update();
 }
 
+void OtkButton::expose(const XExposeEvent &e)
+{
+  _dirty = true;
+  OtkFocusWidget::expose(e);
+}
+
 }

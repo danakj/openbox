@@ -18,10 +18,18 @@ AC_DEFUN([OB_DEBUG],
     [  --enable-debug          build a debug version default=no],
     [DEBUG=$enableval], [DEBUG="no"])
 
-  # cvs builds are always debug
+    # these special builds are always debug
     CVS=""
-    test "${PACKAGE_VERSION%*cvs}" != "$PACKAGE_VERSION" && CVS="yes"
+    test "${PACKAGE_VERSION%*cvs*}" != "$PACKAGE_VERSION" && CVS="yes"
     test "$CVS" = "yes" && DEBUG="yes"
+
+    TEST=""
+    test "${PACKAGE_VERSION%*alpha*}" != "$PACKAGE_VERSION" && TEST="yes"
+    test "$TEST" = "yes" && DEBUG="yes"
+
+    TEST=""
+    test "${PACKAGE_VERSION%*beta*}" != "$PACKAGE_VERSION" && TEST="yes"
+    test "$TEST" = "yes" && DEBUG="yes"
 
     if test "$DEBUG" = "yes"; then
 	MSG="DEBUG"
@@ -30,6 +38,9 @@ AC_DEFUN([OB_DEBUG],
     fi
     if test "$CVS" = "yes"; then
 	MSG="$MSG (CVS build)"
+    fi
+    if test "$TEST" = "yes"; then
+	MSG="$MSG (test release)"
     fi
     if test "$STRICT" = "yes"; then
 	MSG="$MSG with strict ANSI compliance"

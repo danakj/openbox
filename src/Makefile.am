@@ -30,7 +30,7 @@ CPPFLAGS= @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
+openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc Resource.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -39,6 +39,7 @@ distclean-local:
 
 # local dependencies
 
+Resource.o: Resource.cc Resource.h
 BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h LinkedList.h \
  Timer.h
 Basemenu.o: Basemenu.cc i18n.h openbox.h BaseDisplay.h \

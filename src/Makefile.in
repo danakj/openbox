@@ -104,7 +104,7 @@ CPPFLAGS = @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ @DEBUG@ @NEWWMS
 
 bin_PROGRAMS = openbox
 
-openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
+openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc Resource.cc
 
 MAINTAINERCLEANFILES = Makefile.in
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -123,7 +123,7 @@ X_PRE_LIBS = @X_PRE_LIBS@
 openbox_OBJECTS =  BaseDisplay.o Basemenu.o Clientmenu.o Configmenu.o \
 Iconmenu.o Image.o LinkedList.o Netizen.o Rootmenu.o Screen.o Slit.o \
 Timer.o Toolbar.o Window.o Windowmenu.o Workspace.o Workspacemenu.o \
-openbox.o bsd-snprintf.o i18n.o main.o
+openbox.o bsd-snprintf.o i18n.o main.o Resource.o
 openbox_LDADD = $(LDADD)
 openbox_DEPENDENCIES = 
 openbox_LDFLAGS = 
@@ -144,10 +144,10 @@ TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/BaseDisplay.P .deps/Basemenu.P .deps/Clientmenu.P \
 .deps/Configmenu.P .deps/Iconmenu.P .deps/Image.P .deps/LinkedList.P \
-.deps/Netizen.P .deps/Rootmenu.P .deps/Screen.P .deps/Slit.P \
-.deps/Timer.P .deps/Toolbar.P .deps/Window.P .deps/Windowmenu.P \
-.deps/Workspace.P .deps/Workspacemenu.P .deps/bsd-snprintf.P \
-.deps/i18n.P .deps/main.P .deps/openbox.P
+.deps/Netizen.P .deps/Resource.P .deps/Rootmenu.P .deps/Screen.P \
+.deps/Slit.P .deps/Timer.P .deps/Toolbar.P .deps/Window.P \
+.deps/Windowmenu.P .deps/Workspace.P .deps/Workspacemenu.P \
+.deps/bsd-snprintf.P .deps/i18n.P .deps/main.P .deps/openbox.P
 SOURCES = $(openbox_SOURCES)
 OBJECTS = $(openbox_OBJECTS)
 
@@ -389,6 +389,7 @@ distclean-local:
 
 # local dependencies
 
+Resource.o: Resource.cc Resource.h
 BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h LinkedList.h \
  Timer.h
 Basemenu.o: Basemenu.cc i18n.h openbox.h BaseDisplay.h \

@@ -32,7 +32,7 @@ static Rect* pick_head(ObClient *c)
     }
 
     /* more than one guy in his group (more than just him) */
-    if (c->group && c->group->members->next) {
+    if (client_has_group_siblings(c)) {
         GSList *it;
 
         /* try on the client's desktop */
@@ -160,7 +160,7 @@ static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
     }
 
     /* has to be more than me in the group */
-    if (diffhead && c->group && c->group->members->next) {
+    if (diffhead && client_has_group_siblings(c)) {
         guint *num, most;
         GSList *it;
 
@@ -219,8 +219,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
                            screen_desktop : client->desktop];
         foc = list ? list->data : NULL;
 
-        for (it = stacking_list; it && !stop; it = g_list_next(it))
-        {
+        for (it = stacking_list; it && !stop; it = g_list_next(it)) {
             ObClient *c;
 
             if (WINDOW_IS_CLIENT(it->data))
@@ -242,13 +241,29 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
         }
     } else if (type == SMART_GROUP) {
         /* has to be more than me in the group */
-        if (!client->group || !client->group->members->next)
+        if (!client_has_group_siblings(client))
             return FALSE;
 
         for (sit = client->group->members; sit; sit = g_slist_next(sit)) {
             ObClient *c = sit->data;
             if (!SMART_IGNORE(client, c))
                 spaces = area_remove(spaces, &c->frame->area);
+        }
+
+        /* stay out from under windows in higher layers */
+        for (it = stacking_list; it; it = g_list_next(it)) {
+            ObClient *c;
+
+            if (WINDOW_IS_CLIENT(it->data))
+                c = it->data;
+            else
+                continue;
+
+            if (c->layer > client->layer) {
+                if (!SMART_IGNORE(client, c))
+                    spaces = area_remove(spaces, &c->frame->area);
+            } else
+                break;
         }
     } else
         g_assert_not_reached();

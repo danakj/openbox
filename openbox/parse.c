@@ -37,7 +37,7 @@ void parse_free_token(ParseToken *token)
 
     switch (token->type) {
     case TOKEN_STRING:
-        g_free(token-data.string);
+        g_free(token->data.string);
         break;
     case TOKEN_IDENTIFIER:
         g_free(token->data.identifier);
@@ -82,7 +82,7 @@ static void parse_rc_token(ParseToken *token)
 
     if (id == NULL) {
         if (token->type == TOKEN_IDENTIFIER) {
-            id = token.identifier;
+            id = token->data.identifier;
             return;
         } else {
             yyerror("syntax error");
@@ -96,16 +96,16 @@ static void parse_rc_token(ParseToken *token)
         }
     } else if (!got_val) {
         if (token->type == TOKEN_STRING) {
-            s = token.string;
-            got_val = type;
+            s = token->data.string;
+            got_val = token->type;
             return;
         } else if (token->type == TOKEN_BOOL) {
-            b = token.bool;
-            got_val = type;
+            b = token->data.bool;
+            got_val = token->type;
             return;
         } else if (token->type == TOKEN_INTEGER) {
-            i = token.integer;
-            got_val = type;
+            i = token->data.integer;
+            got_val = token->type;
             return;
         } else
             yyerror("syntax error");
@@ -140,5 +140,5 @@ static void parse_rc_token(ParseToken *token)
     id = s = NULL;
     got_eq = FALSE;
     got_val = 0;
-    parse_free_token(token->type, token);
+    parse_free_token(token);
 }

@@ -1717,8 +1717,6 @@ bool Client::focus()
   // visible on the screen
   if (!(frame->visible() && (_can_focus || _focus_notify))) return false;
 
-  if (_focused) return true;
-
   // do a check to see if the window has already been unmapped or destroyed
   // do this intelligently while watching out for unmaps we've generated
   // (ignore_unmaps > 0)
@@ -1762,8 +1760,6 @@ bool Client::focus()
 
 void Client::unfocus() const
 {
-  if (!_focused) return;
-
   assert(openbox->focusedClient() == this);
   openbox->setFocusedClient(0);
 }

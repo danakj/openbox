@@ -57,7 +57,7 @@ static int glx_rating(Display *display, XVisualInfo *v)
 
 struct RrInstance *RrInstanceNew(Display *display, int screen)
 {
-    int count, i = 0, val, best = 0, rate = 0, temp;
+    int count, i = 0, val, best = 0, rate = 0, temp, ok;
     XVisualInfo vimatch, *vilist;
 
     vimatch.screen = screen;
@@ -100,6 +100,11 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         inst->shape_window = XCreateSimpleWindow(display,
                                                  RootWindow(display, screen),
                                                  0, 0, 1, 1, 0, 0, 0);
+        /* make the context current on anything we can so we can dl 
+           textures */
+
+        ok = glXMakeCurrent(display, inst->shape_window, inst->glx_context);
+        assert(ok);
         inst->surface_map = g_hash_table_new(g_int_hash, g_int_equal);
 
         assert(inst->glx_context);

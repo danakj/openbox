@@ -1300,27 +1300,64 @@ static Client *search_focus_tree(Client *node, Client *skip)
     return NULL;
 }
 
+static void calc_recursive(Client *self, StackLayer l, gboolean raised)
+{
+    StackLayer old;
+    GSList *it;
+
+    old = self->layer;
+    self->layer = l;
+
+    for (it = self->transients; it; it = it->next)
+        calc_recursive(it->data, l, raised ? raised : l != old);
+
+    if (!raised && l != old)
+	if (self->frame)
+	    stacking_raise(self);
+}
+
 void client_calc_layer(Client *self)
 {
     StackLayer l;
+    gboolean f;
+
+    /* transients take on the layer of their parents */
+    if (self->transient_for) {
+        if (self->transient_for != TRAN_GROUP) {
+            self = self->transient_for;
+        } else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next)
+                if (it->data != self &&
+                    ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                    self = self->transient_for;
+                    break;
+                }
+        }
+    }
+
+    /* is us or one of our transients focused? */
+    if (client_focused(self))
+        f = TRUE;
+    else if (search_focus_tree(self, self))
+        f = TRUE;
+    else
+        f = FALSE;
 
     if (self->iconic) l = Layer_Icon;
     /* fullscreen windows are only in the fullscreen layer while focused */
-    else if (self->fullscreen && focus_client == self) l = Layer_Fullscreen;
+    else if (self->fullscreen && f) l = Layer_Fullscreen;
     else if (self->type == Type_Desktop) l = Layer_Desktop;
     else if (self->type == Type_Dock) {
-	if (!self->below) l = Layer_Top;
-	else l = Layer_Normal;
+        if (!self->below) l = Layer_Top;
+        else l = Layer_Normal;
     }
     else if (self->above) l = Layer_Above;
     else if (self->below) l = Layer_Below;
     else l = Layer_Normal;
-     
-    if (l != self->layer) {
-	self->layer = l;
-	if (self->frame)
-	    stacking_raise(self);
-    }
+
+    calc_recursive(self, l, FALSE);
 }
 
 gboolean client_should_show(Client *self)
@@ -1547,7 +1584,8 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 	self->fullscreen == fs) return;         /* already done */
 
     self->fullscreen = fs;
-    client_change_state(self); /* change the state hints on the client */
+    client_change_state(self); /* change the state hints on the client,
+                                  and adjust out layer/stacking */
 
     if (fs) {
 	if (savearea) {
@@ -1588,9 +1626,6 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     client_setup_decor_and_functions(self);
 
     client_configure(self, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
-
-    /* raise (back) into our stacking layer */
-    stacking_raise(self);
 
     /* try focus us when we go into fullscreen mode */
     client_focus(self);

@@ -88,6 +88,10 @@ struct _ObClient
       desktops) */
     guint desktop;
 
+    /*! The startup id for the startup-notification protocol. This will be
+      NULL if a startup id is not set. */
+    gchar *startup_id;
+
     /*! Normal window title */
     gchar *title;
     /*! The count for the title. When another window with the same title

@@ -1,6 +1,7 @@
 #ifndef __render_color_h
 #define __render_color_h
 
+#include <glib.h>
 #include "render.h"
 
 /*! Sets up color masks for grabbing pixmaps from the server*/
@@ -32,5 +33,9 @@ void RrColorInspect(struct RrInstance *i);
 #define default_blue_offset 0
 #define render_endian LSBFirst
 #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
+
+gboolean RrPixmapToRGBA(struct RrInstance *inst, Pixmap pmap, 
+                               Pixmap mask, int *w, int *h, RrData32 **data);
+
 
 #endif

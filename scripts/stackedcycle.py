@@ -26,10 +26,16 @@ activate_while_cycling = 1
 
 def next(data):
     """Focus the next window."""
+    if not data.state:
+        raise RuntimeError("stackedcycle.next must be bound to a key" +
+                           "combination with at least one modifier")
     _o.cycle(data, 1)
     
 def previous(data):
     """Focus the previous window."""
+    if not data.state:
+        raise RuntimeError("stackedcycle.previous must be bound to a key" +
+                           "combination with at least one modifier")
     _o.cycle(data, 0)
 
 ###########################################################################

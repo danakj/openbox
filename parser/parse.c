@@ -7,7 +7,9 @@ struct Callback {
     void *data;
 };
 
-static GHashTable *callbacks;
+struct _ObParseInst {
+    GHashTable *callbacks;
+};
 
 static void destfunc(struct Callback *c)
 {
@@ -15,22 +17,28 @@ static void destfunc(struct Callback *c)
     g_free(c);
 }
 
-void parse_startup()
+ObParseInst* parse_startup()
 {
-    callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
-                                      (GDestroyNotify)destfunc);
+    ObParseInst *i = g_new(ObParseInst, 1);
+    i->callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+                                         (GDestroyNotify)destfunc);
+    return i;
 }
 
-void parse_shutdown()
+void parse_shutdown(ObParseInst *i)
 {
-    g_hash_table_destroy(callbacks);
+    if (i) {
+        g_hash_table_destroy(i->callbacks);
+        g_free(i);
+    }
 }
 
-void parse_register(const char *tag, ParseCallback func, void *data)
+void parse_register(ObParseInst *i, const char *tag,
+                    ParseCallback func, void *data)
 {
     struct Callback *c;
 
-    if ((c = g_hash_table_lookup(callbacks, tag))) {
+    if ((c = g_hash_table_lookup(i->callbacks, tag))) {
         g_warning("tag '%s' already registered", tag);
         return;
     }
@@ -39,7 +47,7 @@ void parse_register(const char *tag, ParseCallback func, void *data)
     c->tag = g_strdup(tag);
     c->func = func;
     c->data = data;
-    g_hash_table_insert(callbacks, c->tag, c);
+    g_hash_table_insert(i->callbacks, c->tag, c);
 }
 
 gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
@@ -66,7 +74,6 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
 gboolean parse_load(const char *path, const char *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root)
 {
-
     xmlLineNumbersDefault(1);
 
     if ((*doc = xmlParseFile(path))) {
@@ -79,8 +86,33 @@ gboolean parse_load(const char *path, const char *rootname,
             if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
                 xmlFreeDoc(*doc);
                 *doc = NULL;
-                g_warning("document %s is of wrong type. root *root is "
-                          "not 'openbox_config'", path);
+                g_warning("document %s is of wrong type. root node is "
+                          "not '%s'", path, rootname);
+            }
+        }
+    }
+    if (!*doc)
+        return FALSE;
+    return TRUE;
+}
+
+gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
+                        xmlDocPtr *doc, xmlNodePtr *root)
+{
+    xmlLineNumbersDefault(1);
+
+    if ((*doc = xmlParseMemory(data, len))) {
+        *root = xmlDocGetRootElement(*doc);
+        if (!*root) {
+            xmlFreeDoc(*doc);
+            *doc = NULL;
+            g_warning("Given memory is an empty document");
+        } else {
+            if (xmlStrcasecmp((*root)->name, (const xmlChar*)rootname)) {
+                xmlFreeDoc(*doc);
+                *doc = NULL;
+                g_warning("document in given memory is of wrong type. root "
+                          "node is not '%s'", rootname);
             }
         }
     }
@@ -94,13 +126,13 @@ void parse_close(xmlDocPtr doc)
     xmlFree(doc);
 }
 
-void parse_tree(xmlDocPtr doc, xmlNodePtr node, void *nothing)
+void parse_tree(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 {
     while (node) {
-        struct Callback *c = g_hash_table_lookup(callbacks, node->name);
+        struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
 
         if (c)
-            c->func(doc, node, c->data);
+            c->func(i, doc, node, c->data);
 
         node = node->next;
     }

@@ -4,24 +4,28 @@
 #include <libxml/parser.h>
 #include <glib.h>
 
-typedef void (*ParseCallback)(xmlDocPtr doc, xmlNodePtr node, void *data);
+typedef struct _ObParseInst ObParseInst;
 
-void parse_startup();
-void parse_shutdown();
+typedef void (*ParseCallback)(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                              gpointer data);
+
+ObParseInst* parse_startup();
+void parse_shutdown(ObParseInst *inst);
 
 /* Loads Openbox's rc, from $HOME or $PREFIX as a fallback */
 gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root);
 
-/* callbacks - must call parse_startup to use these */
-
-void parse_register(const char *tag, ParseCallback func, void *data);
-void parse_tree(xmlDocPtr doc, xmlNodePtr node, void *nothing);
+void parse_register(ObParseInst *inst, const char *tag,
+                    ParseCallback func, gpointer data);
+void parse_tree(ObParseInst *inst, xmlDocPtr doc, xmlNodePtr node);
 
 
 /* open/close */
 
 gboolean parse_load(const char *path, const char *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root);
+gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
+                        xmlDocPtr *doc, xmlNodePtr *root);
 void parse_close(xmlDocPtr doc);
 
 

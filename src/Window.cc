@@ -59,6 +59,11 @@ extern "C" {
 
 using std::string;
 
+// change this to change what modifier keys openbox uses for mouse bindings
+// for example: Mod1Mask | ControlMask
+//          or: ControlMask| ShiftMask
+const unsigned int ModMask = Mod1Mask;
+
 /*
  * Initializes the class with default values/the window's set initial values.
  */
@@ -826,17 +831,17 @@ void BlackboxWindow::grabButtons(void) {
                          screen->allowScrollLock());
   
   if (functions & Func_Move)
-    blackbox->grabButton(Button1, Mod1Mask, frame.window, True,
+    blackbox->grabButton(Button1, ModMask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
                          GrabModeAsync, frame.window, None,
                          screen->allowScrollLock());
   if (functions & Func_Resize)
-    blackbox->grabButton(Button3, Mod1Mask, frame.window, True,
+    blackbox->grabButton(Button3, ModMask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
                          GrabModeAsync, frame.window, None,
                          screen->allowScrollLock());
   // alt+middle lowers the window
-  blackbox->grabButton(Button2, Mod1Mask, frame.window, True,
+  blackbox->grabButton(Button2, ModMask, frame.window, True,
                        ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
                        frame.window, None,
                        screen->allowScrollLock());
@@ -847,9 +852,9 @@ void BlackboxWindow::ungrabButtons(void) {
   if ((! screen->isSloppyFocus()) || screen->doClickRaise())
     blackbox->ungrabButton(Button1, 0, frame.plate);
 
-  blackbox->ungrabButton(Button1, Mod1Mask, frame.window);
-  blackbox->ungrabButton(Button2, Mod1Mask, frame.window);
-  blackbox->ungrabButton(Button3, Mod1Mask, frame.window);
+  blackbox->ungrabButton(Button1, ModMask, frame.window);
+  blackbox->ungrabButton(Button2, ModMask, frame.window);
+  blackbox->ungrabButton(Button3, ModMask, frame.window);
 }
 
 
@@ -2762,7 +2767,7 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
 
   if (frame.maximize_button == be->window && be->button <= 3) {
     redrawMaximizeButton(True);
-  } else if (be->button == 1 || (be->button == 3 && be->state == Mod1Mask)) {
+  } else if (be->button == 1 || (be->button == 3 && be->state == ModMask)) {
     if (! flags.focused)
       setInputFocus();
 
@@ -2888,7 +2893,7 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
   } else if (flags.resizing) {
     endResize();
   } else if (re->window == frame.window) {
-    if (re->button == 2 && re->state == Mod1Mask)
+    if (re->button == 2 && re->state == ModMask)
       XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
   }
 }
@@ -3307,7 +3312,7 @@ void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
     } else if ((functions & Func_Resize) &&
                (me->state & Button1Mask && (me->window == frame.right_grip ||
                                             me->window == frame.left_grip)) ||
-               (me->state & Button3Mask && me->state & Mod1Mask &&
+               (me->state & Button3Mask && me->state & ModMask &&
                 me->window == frame.window)) {
       unsigned int zones = screen->getResizeZones();
       Corner corner;

@@ -194,12 +194,14 @@ int main(int argc, char **argv)
 	timer_startup();
 	event_startup();
         grab_startup();
+        window_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
         plugin_loadall();
 
         /* set up the kernel config shit */
         config_startup();
+        menu_startup();
         /* parse/load user options */
         if (parse_load_rc(&doc, &node))
             parse_tree(doc, node->xmlChildrenNode, NULL);
@@ -211,8 +213,6 @@ int main(int argc, char **argv)
         if (ob_rr_theme == NULL)
             exit_with_error("Unable to load a theme.");
 
-        window_startup();
-        menu_startup();
         frame_startup();
         moveresize_startup();
 	focus_startup();

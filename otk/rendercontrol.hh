@@ -11,6 +11,7 @@ namespace otk {
 
 class ScreenInfo;
 class Surface;
+class RenderTexture;
 
 class RenderControl {
 protected:
@@ -66,7 +67,8 @@ public:
 
   static RenderControl *getRenderControl(int screen);
 
-  virtual void render(Surface *sf) = 0;
+  virtual void drawBackground(Surface *sf,
+			      const RenderTexture &texture) const = 0;
 };
 
 }

@@ -6,6 +6,7 @@
 
 #include "rendercontrol.hh"
 #include "truerendercontrol.hh"
+#include "rendertexture.hh"
 #include "display.hh"
 #include "screeninfo.hh"
 

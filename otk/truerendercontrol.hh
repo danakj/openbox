@@ -17,7 +17,7 @@ public:
   TrueRenderControl(const ScreenInfo *screen);
   virtual ~TrueRenderControl();
 
-  virtual void render(Surface *sf);
+  virtual void drawBackground(Surface *sf, const RenderTexture &texture) const;
 };
 
 }

@@ -102,7 +102,8 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
   }
 }
 
-void TrueRenderControl::render(Surface *sf)
+void TrueRenderControl::drawBackground(Surface *sf,
+				       const RenderTexture &texture) const
 {
   assert(sf);
   

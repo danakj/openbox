@@ -344,6 +344,15 @@ void client_manage(Window window)
 
         place_client(self, &x, &y);
 
+        /* make sure the window is visible. */
+        client_find_onscreen(self, &x, &y,
+                             self->frame->area.width,
+                             self->frame->area.height,
+                             /* non-normal clients has less rules, and
+                                windows that are being restored from a session
+                                do also. we can assume you want it back where
+                                you saved it */
+                             client_normal(self) && !self->session);
         if (x != ox || y != oy) 	 
             client_move(self, x, y);
     }
@@ -603,8 +612,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* XXX watch for xinerama dead areas */
     /* This makes sure windows aren't entirely outside of the screen so you
      * can't see them at all */
-    //a = screen_area(self->desktop);
-    a = screen_physical_area_monitor(client_monitor(self));
+    a = screen_area(self->desktop);
     if (client_normal(self)) {
         if (!self->strut.right && *x >= a->x + a->width - 1)
             *x = a->x + a->width - self->frame->area.width;
@@ -619,7 +627,11 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* This here doesn't let windows even a pixel outside the screen,
      * not applied to all windows. Not sure if it's going to stay at all.
      * I wonder if disabling this will break struts somehow? Let's find out. */
-    if (rude) {
+    if (0 && rude) {
+        /* avoid the xinerama monitor divide while we're at it,
+         * remember to fix the placement stuff to avoid it also and
+         * then remove this XXX */
+        a = screen_physical_area_monitor(client_monitor(self));
         /* this is ben's MOZILLA BITCHSLAP. "oh ya it fucking feels good.
            Java can suck it too." */
 

@@ -375,13 +375,9 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
 
 void place_client(ObClient *client, gint *x, gint *y)
 {
-   /* non-normal clients has less rules, and windows that are being restored
-    * from a session do also. we can assume you want it back where you
-    * saved it */
-    gint rude = client_normal(client) && !client->session;
     if (client->positioned)
-        rude = 0;
-    else if (place_transient(client, x, y)             ||
+        return;
+    if (place_transient(client, x, y)             ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :
          place_smart(client, x, y, SMART_FULL)    ||
@@ -393,9 +389,4 @@ void place_client(ObClient *client, gint *x, gint *y)
         frame_frame_gravity(client->frame, x, y);
     } else
         g_assert_not_reached(); /* the last one better succeed */
-    /* make sure the window is visible. */
-    client_find_onscreen(client, x, y,
-                         client->frame->area.width,
-                         client->frame->area.height,
-                         rude);
 }

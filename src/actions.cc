@@ -230,7 +230,7 @@ void Actions::keyReleaseHandler(const XKeyEvent &e)
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
 
   // remove from the state the mask of the modifier being released, if it is
-  // a modifier key being released (XXX this is a little ugly..)
+  // a modifier key being released (this is a little ugly..)
   const XModifierKeymap *map = otk::display->modifierMap();
   const int mask_table[] = {
     ShiftMask, LockMask, ControlMask, Mod1Mask,

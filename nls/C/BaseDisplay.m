@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  ошибка X сервера: %s(%d) значения %d/%d\n ресурс 0x%lx\n
+# %s:  Napaka v sistemu oken X: %s(%d) operacijska koda %d/%d\n  vir 0x%lx\n
 $ #SignalCaught
-# %s: получен сигнал %d \n
+# %s: prejet signal %d\n
 $ #ShuttingDown
-# отключение\n
+# zaustavitev\n
 $ #Aborting
-# Отмена... создается дамп core\n
+# prekinitev... izmet posmrtnih ostankov core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: соединение с X сервером провалено.\n
+# BaseDisplay::BaseDisplay: neuspe╧na povezava do stre╬nika X.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: нет возможности пометить активный дисплей как "закрытый-на-исполнение"\n
+# BaseDisplay::BaseDisplay: povezave do prikazovalnika ni moХ pripraviti do samodejne prekinitve ob zaustavitvi\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): плохое окно удаляется из очереди событий\n
+# BaseDisplay::eventLoop(): pokvarjeno okno je odstranjeno iz dogodkovne vrste\n

@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# ошибка: '-rc' требует наличие аргумента\n
+# napaka: '-rc' zahteva argument\n
 $ #DISPLAYRequiresArg
-# ошибка: '-display' требует наличие аргумента\n
+# napaka: '-display' zahteva argument\n
 $ #WarnDisplaySet
-# предупреждение: невозможно установить переменную окружения 'DISPLAY'\n
+# opozorilo: spremenljivke okolja 'DISPLAY' ni moХ nastaviti\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
                  2001 - 2002 Sean 'Shaleh' Perry\n\
                  1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tиспользовать заданный дисплей.\n\
-  -rc <string>\t\t\tиспользовать альтернативный файл ресурсов.\n\
-  -version\t\t\tвывести номер версии и выйти.\n\
-  -help\t\t\t\tвывести эту подсказку и выйти.\n\n
+  -display <string>\t\tuporabi prikazovalnik.\n\
+  -rc <string>\t\t\tuporabi nadomestno datoteko z viri.\n\
+  -version\t\t\tprika╬i oznako razliХice in konХaj.\n\
+  -help\t\t\t\prika╬i ta navodila in konХaj.\n\n
 $ #CompileOptions
-# Compile time options:\n\
-  Debugging\t\t\t%s\n\
-  Shape:\t\t\t%s\n\
+# Izbire pri prevajanju:\n\
+  Razhro╧Хevanje\t\t\t%s\n\
+  Oblika:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
   Event Clobbering:\t\t%s\n\
-  8bpp Ordered Dithering:\t%s\n\n
+  Osembitno stresanje barv:\t%s\n\n

@@ -11,12 +11,12 @@ $ #NoStrftimeTimeFormat24
 $ #NoStrftimeTimeFormat12
 # %02d:%02d %sm
 $ #NoStrftimeTimeFormatP
-# пп
+# p
 $ #NoStrftimeTimeFormatA
-# дп
+# a
 $ #ToolbarTitle
-# Тулбар
+# Orodna letev
 $ #EditWkspcName
-# Редактировать имя текущего рабочего стола
+# Uredi ime trenutnega namizja
 $ #ToolbarPlacement
-# Местоположение тулбара
+# Lega orodne letve

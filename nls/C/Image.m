@@ -1,24 +1,25 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: ошибка создания pixmap\n
+# BImage::render_solid: napaka pri izdelavi slike (pixmap)\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: ошибка создания XImage\n
+# BImage::renderXImage: napaka pri izdelavi slike (XImage)\n
 $ #UnsupVisual
-# BImage::renderXImage: неподдерживаемый тип визуализации\n
+# BImage::renderXImage: nepodprt videz\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: ошибка создания pixmap\n
+# BImage::renderPixmap: napaka pri izdelavi slike (pixmap)\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: неверный размер таблицы цветов %d (%d/%d/%d) - удаляется\n
+# BImageControl::BImageControl: prevelika barvna paleta %d (%d/%d/%d) - krХim\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: ошибка размещения таблицы цветов\n
+# BImageControl::BImageControl: napaka pri dodeljevanju palete\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: невозможно разместить цвет %d/%d/%d в памяти\n
+# BImageControl::BImageControl: napaka pri dodeljevanju barve %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: кэш точечных изображений - освобождается %d блоков\n
+# BImageControl::~BImageControl: medpomnilnik slik - zavr╬enih je %d slik\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: переполнение кэша, производится быстрая очистка\n
+# BImageControl::renderImage: medpomnilnik je zrasel, prisilno Хi╧Хenje\n
 $ #ColorParseError
-# BImageControl::getColor: ошибка разбора строки, описывающей цвет: '%s'\n
+# BImageControl::getColor: napaka pri branju barve: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: ошибка размещения цвета в памяти: '%s'\n
+# BImageControl::getColor: napaka pri dodeljevanju barve: '%s'\n
+

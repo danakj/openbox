@@ -1,48 +1,48 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: произошла ошибка при обращении к X серверу.\n  \
-другой менеджер окон уже запущен на дисплее %s.\n
+# BScreen::BScreen: napaka pri poizvedovanju stre╬nika za X.\n  \
+nek upravljalnik oken ╬e teХe v prikazovalniku %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: обслуживается экран %d, используемый тип визуализации 0x%lx, глубина цвета %d\n
+# BScreen::BScreen: upravljenje zaslona %d z videzem 0x%lx globine %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): нет возможности загрузить шрифт '%s'\n
+# BScreen::LoadStyle(): pisave '%s' ni moХ nalo╬iti\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): нет возможности загрузить предопределенный шрифт.\n
+# BScreen::LoadStyle(): privzete pisave ni moХ nalo╬iti.\n
 $ #EmptyMenuFile
-# %s: пустой файл меню\n
+# %s: prazna menujska datoteka\n
 $ #xterm
-# Xterm
+# xterm
 $ #Restart
-# Перезапуск
+# Ponovni zagon
 $ #Exit
-# Выход
+# Izhod
 $ #EXECError
-# BScreen::parseMenuFile: ошибка [exec], не определено название пункта меню и/или название комманды\n
+# BScreen::parseMenuFile: [exec] napaka: oznaki menuja ali ukaza nista doloХeni\n
 $ #EXITError
-# BScreen::parseMenuFile: ошибка [exit], не определено название пункта меню\n
+# BScreen::parseMenuFile: [exit] napaka: oznaka menuja ni doloХena\n
 $ #STYLEError
-# BScreen::parseMenuFile: ошибка [style], не определено название пункта меню и/или имя файла\n
+# BScreen::parseMenuFile: [style] napaka: oznaki menuja ali datoteke nista doloХeni\n
 $ #CONFIGError
-# BScreen::parseMenuFile: ошибка [config], не определено название пункта меню\n
+# BScreen::parseMenuFile: [config] napaka: oznaka menuja ni doloХena\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: ошибка [include], не определено имя файла\n
+# BScreen::parseMenuFile: [include] napaka: ime datoteke ni doloХeno\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: ошибка [include], '%s' не обычный файл\n
+# BScreen::parseMenuFile: [include] napaka: '%s' ni prava datoteka\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: ошибка [submenu], не определено название пункта меню\n
+# BScreen::parseMenuFile: [submenu] napaka: oznaka menuja ni doloХena\n
 $ #RESTARTError
-# BScreen::parseMenuFile: ошибка [restart], не определено название пункта меню\n
+# BScreen::parseMenuFile: [restart] napaka: oznaka menuja ni doloХena\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: ошибка [reconfig], не определено название пункта меню\n
+# BScreen::parseMenuFile: [reconfig] napaka: oznaka menuja ni doloХena\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], не определено имя директории\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka: imenik ni doloХen\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], '%s' не директория\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka: '%s' ni imenik\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], '%s' не существует\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka:, '%s' ne obstaja\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: ошибка [workspaces], не определено название пункта меню\n
+# BScreen::parseMenuFile: [workspaces] napaka: oznaka menuja ni doloХena\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat

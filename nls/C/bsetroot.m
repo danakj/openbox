@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s: ошибка: необходимо задать один из следующих ключей: -solid, -mod, -gradient\n
+# %s: napaka: doloХiti je treba eno: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
-  -display <string>        соединение с дисплеем\n\
-  -mod <x> <y>             макет клетки\n\
-  -foreground, -fg <color> цвет переднего плана клетки\n\
-  -background, -bg <color> цвет фона клетки\n\n\
-  -gradient <texture>      градиент\n\
-  -from <color>            начальный цвет градиента\n\
-  -to <color>              конечный цвет градиента\n\n\
-  -solid <color>           сплошной цвет\n\n\
-  -help                    вывести эту подсказку и выйти\n
+  -display <string>        prika╬i povezavo\n\
+  -mod <x> <y>             vzorec\n\
+  -foreground, -fg <color> barva ospredja\n\
+  -background, -bg <color> barva ozadja\n\n\
+  -gradient <texture>      prelivna tekstura\n\
+  -from <color>            zaХetna barva preliva\n\
+  -to <color>              konХna barva preliva\n\n\
+  -solid <color>           enotna barva\n\n\
+  -help                    prika╬i ta navodila in konХaj\n
 

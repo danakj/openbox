@@ -2,16 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: создается 0x%lx\n
+# BlackboxWindow::BlackboxWindow: izdelujem 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: провален процесс XGetWindowAttributres\n
+# BlackboxWindow::BlackboxWindow: neuspe╧en XGetWindowAttributres\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: нет возможности найти экран для корневого окна 0x%lx\n
+# BlackboxWindow::BlackboxWindow: zaslona za korensko okno 0x%lx ni moХ najti\n
 $ #Unnamed
-# Безымянное
+# Neimenovano
 $ #MapRequest
-# BlackboxWindow::mapRequestEvent() для 0x%lx\n
+# BlackboxWindow::mapRequestEvent() za 0x%lx\n
 $ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() для 0x%lx\n
+# BlackboxWindow::unmapNotifyEvent() za 0x%lx\n
 $ #ReparentNotify
-# BlackboxWindow::reparentNotifyEvent: reparent 0x%lx to 0x%lx\n
+# BlackboxWindow::unmapnotifyEvent: ponovno prikljuХeno 0x%lx korenskemu oknu 0x%lx\n

@@ -134,7 +134,7 @@ Screen::Screen(int screen)
   openbox->registerHandler(_info->rootWindow(), this);
 
   // call the python Startup callbacks
-  EventData data(_number, 0, EventAction::Shutdown, 0);
+  EventData data(_number, 0, EventAction::Startup, 0);
   openbox->bindings()->fireEvent(&data);
 }
 

@@ -136,7 +136,7 @@ bevelWidth:	1
 borderWidth:	1
 borderColor:	#25252d
 
-window.button.max.mask:  fieron-max.xbm
-window.button.icon.mask: fieron-icon.xbm
-window.button.stick.mask:fieron-stick.xbm
-window.button.close.mask:fieron-close.xbm
+window.button.max.mask:  	max.xbm
+window.button.icon.mask: 	icon.xbm
+window.button.stick.mask:	stick.xbm
+window.button.close.mask:	close.xbm

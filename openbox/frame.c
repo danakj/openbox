@@ -47,7 +47,6 @@ Frame *frame_new()
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
-XSetWindowBorderWidth(ob_display, self->window, 1);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -67,7 +66,6 @@ XSetWindowBorderWidth(ob_display, self->window, 1);
     self->framedecor[0].sizetypex = Decor_Absolute;
     self->framedecor[0].sizetypey = Decor_Relative;
     self->framedecor[0].frame = self;
-XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 1);
     XMapWindow(ob_display, self->framedecor[0].window);
 
     self->framedecor[1].obwin.type = Window_Decoration;
@@ -79,7 +77,6 @@ XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 1);
     self->framedecor[1].sizetypex = Decor_Absolute;
     self->framedecor[1].sizetypey = Decor_Relative;
     self->framedecor[1].frame = self;
-XSetWindowBorderWidth(ob_display, self->framedecor[1].window, 1);
     XMapWindow(ob_display, self->framedecor[1].window);
 
     self->focused = FALSE;
@@ -117,47 +114,26 @@ void frame_hide(Frame *self)
 
 void frame_adjust_shape(Frame *self)
 {
-#ifdef SHAPEAGAERGGREA
-    int num;
-    XRectangle xrect[2];
+#ifdef SHAPE
+    int i;
+    FrameDecor *dec;
 
-    if (!self->client->shaped) {
-	/* clear the shape on the frame window */
-	XShapeCombineMask(ob_display, self->window, ShapeBounding,
-			  self->innersize.left,
-			  self->innersize.top,
-			  None, ShapeSet);
-    } else {
-	/* make the frame's shape match the clients */
-	XShapeCombineShape(ob_display, self->window, ShapeBounding,
-			   self->innersize.left,
-			   self->innersize.top,
-			   self->client->window,
-			   ShapeBounding, ShapeSet);
-
-	num = 0;
-	if (self->client->decorations & Decor_Titlebar) {
-	    xrect[0].x = -theme_bevel;
-	    xrect[0].y = -theme_bevel;
-	    xrect[0].width = self->width + self->bwidth * 2;
-	    xrect[0].height = theme_title_height +
-		self->bwidth * 2;
-	    ++num;
-	}
-
-	if (self->client->decorations & Decor_Handle) {
-	    xrect[1].x = -theme_bevel;
-	    xrect[1].y = FRAME_HANDLE_Y(self);
-	    xrect[1].width = self->width + self->bwidth * 2;
-	    xrect[1].height = theme_handle_height +
-		self->bwidth * 2;
-	    ++num;
-	}
-
-	XShapeCombineRectangles(ob_display, self->window,
-				ShapeBounding, 0, 0, xrect, num,
-				ShapeUnion, Unsorted);
+    /* make the frame's shape match the clients */
+    XShapeCombineShape(ob_display, self->window, ShapeBounding,
+                       self->size.left,
+                       self->size.top,
+                       self->client->window,
+                       ShapeBounding, ShapeSet);
+    for (i = 0; i < self->framedecors; i++) {
+        dec = &self->framedecor[i];
+        if (dec->type & self->client->decorations)
+            XShapeCombineShape(ob_display, self->window, ShapeBounding,
+                              dec->xoff,
+                              dec->yoff,
+                              dec->window,
+                              ShapeBounding, ShapeUnion);
     }
+
 #endif
 }
 
@@ -585,6 +561,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     case Decor_TopLeft:
                     x = self->size.left - area.x - area.width;
                     y = self->size.top - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -594,6 +572,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     x = cr->width/2 + self->size.left - area.x
                       - area.width/2;
                     y = self->size.top - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -603,6 +583,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     x = self->size.left + cr->width
                       + area.x;
                     y = self->size.top - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -613,6 +595,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.width;
                     y = cr->height/2 + self->size.top - area.y
                       - area.height/2;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -622,6 +606,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     x = self->size.left + cr->width + area.x;
                     y = cr->height/2 + self->size.top - area.y
                       - area.height/2;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -631,6 +617,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     x = self->size.left - area.x - area.width;
                     y = self->size.top + cr->height
                       - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -641,6 +629,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.width/2;
                     y = self->size.top + cr->height
                       - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width,
                                       area.height);
@@ -649,6 +639,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     case Decor_BottomRight:
                     x = self->size.left + cr->width + area.x;
                     y = self->size.top + cr->height - area.y - area.height;
+                    dec->xoff = x;
+                    dec->yoff = y;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       area.width, area.height);
                     break;

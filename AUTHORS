@@ -6,7 +6,6 @@ Project Maintainer:
 Developers:
 	Ben Jansens (ben@orodu.net)
 	Derek Foreman (derek@signalmarketing.com)
-	Marius Nita (marius@cs.pdx.edu)
 	Scott Moynes (smoynes@nexus.carleton.ca)
 
 Contributors:
@@ -14,4 +13,5 @@ Contributors:
 	- Web site design
 	Mike Bacso (smakwel@yahoo.com)
 	- Openbox styles
-
+	Marius Nita (marius@cs.pdx.edu)
+	- Otk prototype code, design ideas.

@@ -67,7 +67,7 @@ AC_CHECK_HEADERS(unistd.h sys/stat.h sys/select.h sys/time.h sys/wait.h)
 
 AC_PATH_PROG([SED], [sed], [no])
 if test "$SED" = "no"; then
-  AC_MSG_ERROR([The program "sed" is not avaiable. This program is required to build Openbox.])
+  AC_MSG_ERROR([The program "sed" is not available. This program is required to build Openbox.])
 fi
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
@@ -75,17 +75,28 @@ AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
 AC_ARG_ENABLE(pango,
-              AC_HELP_STRING([--enable-pango],
-                             [enable the pango library for better display of international fonts. (default=no)]),
-              [enable_pango=yes], [enable_pango=no])
+  AC_HELP_STRING(
+    [--enable-pango],
+    [enable the pango library for better display of international fonts. [[default=no]]]
+  ),
+  [enable_pango=yes],
+  [enable_pango=no]
+)
 
 if test "$enable_pango" = yes; then
-PKG_CHECK_MODULES([PANGO], [pango pangoxft])
-AC_SUBST(PANGO_CFLAGS)
-AC_SUBST(PANGO_LIBS)
-DEFS="$DEFS -DUSE_PANGO"
+PKG_CHECK_MODULES([PANGO], [pango pangoxft],
+  [
+    AC_DEFINE(USE_PANGO, [1], [Use Pango])
+    AC_SUBST(PANGO_CFLAGS)
+    AC_SUBST(PANGO_LIBS)
+    pango_found=yes
+  ],
+    pango_found=no
+)
+else
+  pango_found=no
 fi
-	
+
 PKG_CHECK_MODULES(XFT, [xft])
 AC_SUBST(XFT_CFLAGS)
 AC_SUBST(XFT_LIBS)
@@ -94,16 +105,30 @@ PKG_CHECK_MODULES(XML, [libxml-2.0])
 AC_SUBST(XML_CFLAGS)
 AC_SUBST(XML_LIBS)
 
+AC_ARG_ENABLE(startup-notification,
+  AC_HELP_STRING(
+    [--disable-startup-notification],
+    [disable the startup notification library. [[default=yes]]]
+  ),
+  [enable_sn=no],
+  [enable_sn=yes]
+)
+
+if test "$enable_sn" = yes; then
 PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0],
   [
     AC_DEFINE(USE_LIBSN, [1], [Use startup-notification])
     AC_SUBST(LIBSN_CFLAGS)
     AC_SUBST(LIBSN_LIBS)
+    sn_found=yes
   ],
   [
-    no_such_luck=yes
+    sn_found=no
   ]
 )
+else
+  sn_found=no
+fi
 
 dnl Check for session management
 X11_SM
@@ -130,4 +155,9 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 
 AC_MSG_RESULT
-AC_MSG_RESULT([configure complete, now type \"make\"])
+AC_MSG_RESULT([Compiling with these options:
+               Pango... $pango_found
+               Startup Notification... $sn_found
+               Session Management... $SM
+               ])
+AC_MSG_RESULT([configure complete, now type "make"])

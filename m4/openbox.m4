@@ -8,14 +8,14 @@ AC_DEFUN([OB_DEBUG],
     AC_MSG_CHECKING([build type])
 
     AC_ARG_ENABLE([strict-ansi],
-    [  --enable-strict-ansi    Enable strict ANSI compliance build default=no],
+    AC_HELP_STRING([--enable-strict-ansi],[Enable strict ANSI compliance build [[default=no]]]),
     [STRICT=$enableval], [STRICT="no"])
     if test "$GCC" = "yes" && test "$STRICT" = "yes"; then
 	CFLAGS="$CFLAGS -ansi -pedantic -D_XOPEN_SOURCE"
     fi
 
     AC_ARG_ENABLE([debug],
-    [  --enable-debug          build a debug version default=no],
+    AC_HELP_STRING([--enable-debug],[build a debug version [[default=no]]]),
     [DEBUG=$enableval], [DEBUG="no"])
 
     # these special builds are always debug
@@ -90,7 +90,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 AC_DEFUN([OB_NLS],
 [
     AC_ARG_ENABLE([nls],
-    [  --enable-nls            Enable NLS translations  default=yes],
+    AC_HELP_STRING([--enable-nls],[Enable NLS translations [[default=yes]]]),
     [NLS=$enableval], [NLS="yes"])
 
     if test "$NLS" = yes; then

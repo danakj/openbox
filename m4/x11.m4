@@ -462,7 +462,8 @@ AC_DEFUN([X11_SM],
   AC_REQUIRE([X11_DEVEL])
 
   AC_ARG_ENABLE([session-management],
-  [  --disable-session-management  build without support for session managers],
+  AC_HELP_STRING(
+  [--disable-session-management], [build without support for session managers [[default=yes]]]),
   [SM=$enableval], [SM="yes"])
   
   if test "$SM" = "yes"; then

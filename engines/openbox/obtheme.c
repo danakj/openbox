@@ -356,7 +356,7 @@ gboolean obtheme_load()
 	ob_s_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
 
     if (read_mask(db, "window.button.max.mask", &ob_s_max_unset_mask)) {
-        if (!read_mask(db, "window.button.max.pressed.mask",
+        if (!read_mask(db, "window.button.max.toggled.mask",
                        &ob_s_max_set_mask)) {
             ob_s_max_set_mask = pixmap_mask_copy(ob_s_max_unset_mask);
         }
@@ -379,7 +379,7 @@ gboolean obtheme_load()
 
     if (read_mask(db, "window.button.stick.mask",
                    &ob_s_desk_unset_mask)) {
-        if (!read_mask(db, "window.button.stick.pressed.mask",
+        if (!read_mask(db, "window.button.stick.toggled.mask",
                        &ob_s_desk_set_mask)) {
             ob_s_desk_set_mask =
                 pixmap_mask_copy(ob_s_desk_unset_mask);

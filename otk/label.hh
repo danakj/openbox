@@ -18,6 +18,8 @@ public:
 
   void update(void);
 
+  virtual void setStyle(Style *style);
+  
 private:
   //! Object used by Xft to render to the drawable
   XftDraw *_xftdraw;

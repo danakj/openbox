@@ -16,15 +16,23 @@ OtkFocusLabel::OtkFocusLabel(OtkWidget *parent)
   const ScreenInfo *info = OBDisplay::screenInfo(getScreen());
   _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
                            info->getColormap());
-  
-  setTexture(getStyle()->getLabelFocus());
-  setUnfocusTexture(getStyle()->getLabelUnfocus());
+  setStyle(getStyle());
 }
 
 OtkFocusLabel::~OtkFocusLabel()
 {
   XftDrawDestroy(_xftdraw);
 }
+
+
+void OtkFocusLabel::setStyle(Style *style)
+{
+  OtkFocusWidget::setStyle(style);
+  
+  setTexture(getStyle()->getLabelFocus());
+  setUnfocusTexture(getStyle()->getLabelUnfocus());
+}
+
 
 void OtkFocusLabel::update(void)
 {

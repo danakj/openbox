@@ -15,13 +15,21 @@ OtkLabel::OtkLabel(OtkWidget *parent)
   _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
                            info->getColormap());
   
-  setTexture(getStyle()->getLabelUnfocus());
+  setStyle(getStyle());
 }
 
 OtkLabel::~OtkLabel()
 {
   XftDrawDestroy(_xftdraw);
 }
+
+void OtkLabel::setStyle(Style *style)
+{
+  OtkWidget::setStyle(style);
+
+  setTexture(getStyle()->getLabelUnfocus());
+}
+
 
 void OtkLabel::update(void)
 {

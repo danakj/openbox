@@ -25,11 +25,11 @@ PyObject *OtkScreenInfo_New(int num)
 
   self->screen = num;
   self->root_window = RootWindow(OBDisplay->display, self->screen);
-  self->rect = OtkRect_New(0, 0,
-			   WidthOfScreen(ScreenOfDisplay(OBDisplay->display,
-							 self->screen)),
-			   HeightOfScreen(ScreenOfDisplay(OBDisplay->display,
-							  self->screen)));
+  self->rect = (OtkRect*)
+    OtkRect_New(0, 0, WidthOfScreen(ScreenOfDisplay(OBDisplay->display,
+                                                    self->screen)),
+                HeightOfScreen(ScreenOfDisplay(OBDisplay->display,
+                                               self->screen)));
   
   /*
     If the default depth is at least 8 we will use that,
@@ -78,16 +78,16 @@ PyObject *OtkScreenInfo_New(int num)
   }
 
   // get the default display string and strip the screen number
-  self->display_string =
+  self->display_string = (PyStringObject*)
     PyString_FromFormat("DISPLAY=%s",DisplayString(OBDisplay->display));
-  dstr = PyString_AsString(self->display_string);
+  dstr = PyString_AsString((PyObject*)self->display_string);
   dstr2 = strrchr(dstr, '.');
   if (dstr2) {
     PyObject *str;
     
-    _PyString_Resize(&self->display_string, dstr2 - dstr);
+    _PyString_Resize((PyObject**)&self->display_string, dstr2 - dstr);
     str = PyString_FromFormat(".%d", self->screen);
-    PyString_Concat(&self->display_string, str);
+    PyString_Concat((PyObject**)&self->display_string, str);
   }
 
 #ifdef    XINERAMA
@@ -142,7 +142,7 @@ static PyObject *otkscreeninfo_getscreen(OtkScreenInfo* self, PyObject* args)
   return PyInt_FromLong(self->screen);
 }
 
-static PyObject *otkscreeninfo_getrect(OtkScreenInfo* self, PyObject* args)
+static OtkRect *otkscreeninfo_getrect(OtkScreenInfo* self, PyObject* args)
 {
   if (!PyArg_ParseTuple(args, ":getRect"))
     return NULL;

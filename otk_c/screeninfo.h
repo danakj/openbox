@@ -7,6 +7,8 @@
 
 extern PyTypeObject OtkScreenInfo_Type;
 
+struct OtkRect;
+
 typedef struct OtkScreenInfo {
   int screen;
   Window root_window;
@@ -15,8 +17,8 @@ typedef struct OtkScreenInfo {
   Visual *visual;
   Colormap colormap;
 
-  PyObject *display_string; // PyStringObject
-  PyObject *rect; // OtkRect
+  PyStringObject *display_string;
+  struct OtkRect *rect; // OtkRect
 #ifdef XINERAMA
   PyObject *xinerama_areas; // PyListObject[OtkRect]
   Bool xinerama_active;

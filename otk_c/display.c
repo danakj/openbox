@@ -123,9 +123,9 @@ line argument.\n\n"));
   OBDisplay = self;
   
   // Get information on all the screens which are available.
-  self->screenInfoList = PyList_New(ScreenCount(self->display));
+  self->screenInfoList = (PyListObject*)PyList_New(ScreenCount(self->display));
   for (i = 0; i < ScreenCount(self->display); ++i)
-    PyList_SetItem(self->screenInfoList, i, OtkScreenInfo_New(i));
+    PyList_SetItem((PyObject*)self->screenInfoList, i, OtkScreenInfo_New(i));
 
   Py_INCREF(OBDisplay); // make sure it stays around!!
 }
@@ -148,7 +148,7 @@ void OtkDisplay_Ungrab(OtkDisplay *self)
 
 OtkScreenInfo *OtkDisplay_ScreenInfo(OtkDisplay *self, int num)
 {
-  PyObject *py = PyList_GetItem(self->screenInfoList, num);
+  PyObject *py = PyList_GetItem((PyObject*)self->screenInfoList, num);
   return (OtkScreenInfo*) py;
 }
 

@@ -35,7 +35,7 @@ typedef struct OtkDisplay {
   int grab_count;
 
   //! A list of information for all screens on the display
-  PyObject *screenInfoList; // PyListObject
+  PyListObject *screenInfoList;
 } OtkDisplay;
 
 //! Opens the X display, and sets the global OBDisplay variable

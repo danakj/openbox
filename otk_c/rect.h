@@ -4,7 +4,8 @@
 
 #include <Python.h>
 
-typedef struct {
+typedef struct OtkRect {
+  PyObject_HEAD
   int x, y, width, height;
 } OtkRect;
 

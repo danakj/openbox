@@ -205,8 +205,8 @@ void TrueRenderControl::highlight(pixel32 *x, pixel32 *y, bool raised) const
   b = *up & 0xFF;
   b += b >> 1;
   if (r > 255) r = 255;
-  if (g > 255) r = 255;
-  if (b > 255) r = 255;
+  if (g > 255) g = 255;
+  if (b > 255) b = 255;
   *up = (r << 16) + (g << 8) + b;
   
   r = (*down >> 16) & 0xFF;

@@ -8,7 +8,7 @@ sh libtoolize --copy --force --automake
 sh aclocal
 sh autoheader
 sh autoconf
-sh automake --foreign --include-deps --add-missing
+sh automake --foreign --include-deps --add-missing --copy
 
 echo
 echo You are now ready to run ./configure

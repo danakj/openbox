@@ -332,11 +332,11 @@ void Workspace::shutdown(void) {
   }
 }
 
-static rectList calcSpace(const OpenboxWindow &win, const rectList &spaces) {
+static rectList calcSpace(const Rect &win, const rectList &spaces) {
   rectList result;
   rectList::const_iterator siter;
   for(siter=spaces.begin(); siter!=spaces.end(); ++siter) {
-    if(win.area().Intersect(*siter)) {
+    if(win.Intersect(*siter)) {
       //Check for space to the left of the window
       if(win.origin().x() > siter->x())
         result.push_back(Rect(siter->x(), siter->y(),
@@ -385,7 +385,8 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
   
   //Find Free Spaces
   for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
-     spaces = calcSpace(*cur, spaces);
+     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+                        spaces);
   
   //Find first space that fits the window
   best = NULL;

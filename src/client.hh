@@ -549,7 +549,11 @@ BB    @param window The window id that the Client class should handle
     focus while it exists/remains modal.
   */
   inline bool modal() const { return _modal; }
-  //! Returns if the window is shaded
+  //! The window should not be displayed by pagers
+  inline bool skipPager() const { return _skip_pager; }
+  //! The window should not be displayed by taskbars
+  inline bool skipTaskbar() const { return _skip_taskbar; } 
+ //! Returns if the window is shaded
   /*!
     When the window is shaded, only its titlebar is visible.
   */

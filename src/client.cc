@@ -1203,7 +1203,7 @@ void Client::changeState()
   state[1] = None;
   otk::Property::set(_window, otk::Property::atoms.wm_state,
                      otk::Property::atoms.wm_state, state, 2);
-  
+
   Atom netstate[10];
   int num = 0;
   if (_modal)

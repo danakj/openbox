@@ -1181,6 +1181,16 @@ static void event_handle_menu(XEvent *ev)
                                             ev->xmotion.y_root)))
                 menu_frame_select(f, e);
         }
+        {
+            ObMenuFrame *a;
+
+            a = find_active_menu();
+            if (a && a != f &&
+                a->selected->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
+            {
+                menu_frame_select(a, NULL);
+            }
+        }
         break;
     case KeyPress:
         if (ev->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))

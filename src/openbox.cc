@@ -106,6 +106,7 @@ Openbox::Openbox(int argc, char **argv)
   _scriptfilepath = otk::expandTilde("~/.openbox/user.py");
   _focused_client = 0;
   _sync = false;
+  _single = false;
 
   parseCommandLine(argc, argv);
 

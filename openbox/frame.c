@@ -4,7 +4,8 @@
 #include "framerender.h"
 #include "render2/theme.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
+#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask | \
+                         ExposureMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask | ExposureMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
@@ -45,10 +46,8 @@ Frame *frame_new()
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
 
-    mask = 0;
-    self->plate = createWindow(self->window, mask, &attrib);
-
     self->s_frame = RrSurfaceNew(ob_render_inst, 0, self->window, 0);
+    self->s_plate = RrSurfaceNewChild(0, self->s_frame, 0);
     self->s_title = RrSurfaceNewChild(0, self->s_frame, 0);
     self->s_label = RrSurfaceNewChild(0, self->s_title, 0);
     self->s_max = RrSurfaceNewChild(0, self->s_title, 0);
@@ -61,6 +60,7 @@ Frame *frame_new()
     self->s_lgrip = RrSurfaceNewChild(0, self->s_handle, 0);
     self->s_rgrip = RrSurfaceNewChild(0, self->s_handle, 0);
 
+    self->plate = RrSurfaceWindow(self->s_plate);
     self->w_title = RrSurfaceWindow(self->s_title);
     self->w_label = RrSurfaceWindow(self->s_label);
     self->w_max = RrSurfaceWindow(self->s_max);
@@ -91,7 +91,7 @@ Frame *frame_new()
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
-    XMapWindow(ob_display, self->plate);
+    RrSurfaceShow(self->s_plate);
     RrSurfaceShow(self->s_label);
     RrSurfaceShow(self->s_lgrip);
     RrSurfaceShow(self->s_rgrip);
@@ -115,9 +115,9 @@ static void frame_free(Frame *self)
     RrSurfaceFree(self->s_max);
     RrSurfaceFree(self->s_label);
     RrSurfaceFree(self->s_title);
+    RrSurfaceFree(self->s_plate);
     RrSurfaceFree(self->s_frame);
 
-    XDestroyWindow(ob_display, self->plate);
     XDestroyWindow(ob_display, self->window);
 
     g_free(self);
@@ -242,12 +242,14 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 
     if (resized) {
         /* move and resize the plate */
-        XMoveResizeWindow(ob_display, self->plate,
-                          self->size.left, self->size.top,
-                          self->client->area.width,
-                          self->client->area.height);
+        RrSurfaceSetArea(self->s_plate,
+                         self->size.left - self->cbwidth,
+                         self->size.top - self->cbwidth,
+                         self->client->area.width - self->cbwidth * 2,
+                         self->client->area.height - self->cbwidth * 2);
         /* when the client has StaticGravity, it likes to move around. */
-        XMoveWindow(ob_display, self->client->window, 0, 0);
+        XMoveWindow(ob_display, self->client->window,
+                    self->cbwidth, self->cbwidth);
     }
 
     /* shading can change without being moved or resized */
@@ -282,22 +284,26 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 void frame_adjust_state(Frame *self)
 {
     framerender_frame(self);
+    RrPaint(self->s_frame, 1);
 }
 
 void frame_adjust_focus(Frame *self, gboolean hilite)
 {
     self->focused = hilite;
     framerender_frame(self);
+    RrPaint(self->s_frame, 1);
 }
 
 void frame_adjust_title(Frame *self)
 {
     framerender_frame(self);
+    RrPaint(self->s_label, 1);
 }
 
 void frame_adjust_icon(Frame *self)
 {
     framerender_frame(self);
+    RrPaint(self->s_icon, 1);
 }
 
 void frame_grab_client(Frame *self, Client *client)

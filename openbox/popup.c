@@ -91,7 +91,7 @@ void popup_size_to_string(Popup *self, char *text)
     int textw, texth;
     int iconw;
 
-    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT,
+    RrTextureSetText(self->s_text, 0, ob_theme->title_font, RR_LEFT,
                      &ob_theme->app_label_color_h, text);
     RrSurfaceMinSize(self->s_text, &textw, &texth);
     textw += ob_theme->bevel * 2;
@@ -193,8 +193,11 @@ void popup_show(Popup *self, char *text, Icon *icon)
     if (!RrSurfaceVisible(self->s_bg)) {
         RrSurfaceShow(self->s_bg);
         stacking_raise(INTERNAL_AS_WINDOW(self));
-    } else
-        RrPaint(self->s_bg);
+    } else {
+        RrPaint(self->s_text, 1);
+        if (self->hasicon)
+            RrPaint(self->s_icon, 1);
+    }
 }
 
 void popup_hide(Popup *self)

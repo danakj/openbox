@@ -9,12 +9,14 @@ void framerender_frame(Frame *self)
     /* XXX plate, client border */
 
     if (self->client->decorations & Decor_Titlebar) {
-        struct RrSurface *t, *l, *m, *n, *i, *d, *s, *c;
+        struct RrSurface *t, *l, *p, *m, *n, *i, *d, *s, *c;
 
         t = (self->focused ?
              ob_theme->title_f : ob_theme->title);
         l = (self->focused ?
              ob_theme->label_f : ob_theme->label);
+        p = (self->focused ?
+             ob_theme->plate_f : ob_theme->plate);
         m = (self->focused ?
              (self->client->max_vert || self->client->max_horz ?
               ob_theme->max_p_f : (self->max_press ?
@@ -50,6 +52,7 @@ void framerender_frame(Frame *self)
 
         RrSurfaceCopy(self->s_title, t);
         RrSurfaceCopy(self->s_label, l);
+        RrSurfaceCopy(self->s_plate, p);
 
         RrTextureSetText(self->s_label, 0, ob_theme->title_font,
                          ob_theme->title_justify,
@@ -96,6 +99,4 @@ void framerender_frame(Frame *self)
         RrSurfaceCopy(self->s_lgrip, g);
         RrSurfaceCopy(self->s_rgrip, g);
     }
-    /* XXX this could be more efficient */
-    RrPaint(self->s_frame);
 }

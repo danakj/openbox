@@ -576,22 +576,27 @@ static void event_handle_client(Client *client, XEvent *e)
             case Context_Maximize:
                 client->frame->max_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
+                RrPaint(client->frame->s_max, 1);
                 break;
             case Context_Close:
                 client->frame->close_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
+                RrPaint(client->frame->s_close, 1);
                 break;
             case Context_Iconify:
                 client->frame->iconify_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
+                RrPaint(client->frame->s_iconify, 1);
                 break;
             case Context_AllDesktops:
                 client->frame->desk_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
-                break; 
+                RrPaint(client->frame->s_desk, 1);
+                break;
             case Context_Shade:
                 client->frame->shade_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
+                RrPaint(client->frame->s_shade, 1);
                 break;
             default:
                 /* nothing changes with clicks for any other contexts */

@@ -38,6 +38,7 @@ typedef struct Frame {
     Rect   area;
     gboolean visible;
 
+    struct RrSurface *s_plate;
     struct RrSurface *s_frame;
     struct RrSurface *s_title;
     struct RrSurface *s_label;

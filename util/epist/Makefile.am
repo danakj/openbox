@@ -2,14 +2,14 @@
 
 DEFAULT_RC=$(pkgdatadir)/epistrc
 
-CLEANFILES = epist.1
+CLEANFILES = epist.1 epistrc.5
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@ -DDEFAULTRC=\"$(DEFAULT_RC)\"
 
 #EXTRA_PROGRAMS =		epist
 bin_PROGRAMS =		epist
 
-man_MANS = epist.1
+man_MANS = epist.1 epistrc.5
 
 epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
@@ -26,6 +26,10 @@ distclean-local:
 epist.1: epist.1.in
 	@regex_cmd@ -e "s,@pkgdatadir@,$(pkgdatadir)," \
 		epist.1.in > epist.1
+
+epistrc.5: epistrc.5.in
+	@regex_cmd@ -e "s,@pkgdatadir@,$(pkgdatadir)," \
+		epistrc.5.in > epistrc.5
 
 install-data-local: epistrc
 	test -f $(DESTDIR)$(pkgdatadir)/epistrc || \

@@ -1,4 +1,4 @@
-.TH epist 1 "August 2002" "epist" "v0.0"
+.TH epist 1 "August 2002" "epist" "v1.0"
 .SH NAME
 epist - NetWM keybindings grabber
 .SH SYNOPSIS
@@ -18,9 +18,9 @@ rather than the mouse.
 .SH CONFIGURATION
 \fBepist\fR will read its configuration from \fI~/.openbox/epistrc\fR otherwise
 a default configuration, installed in \fI@pkgdatadir@/epistrc\fR
-will be used.
+will be used. See \fIepistrc\fR(5) for more details on the format of the file.
 .SH AUTHOR
 The authors of epist are Scott Moynes <smoynes@nexus.carleton.ca>,
 Marius Nita <marius@cs.pdx.edu>, and Ben Jansens <ben@orodu.net>.
 .SH SEE ALSO
-\fIopenbox\fR(1)
+\fIopenbox\fR(1) \fIepistrc\fR(5)

@@ -1126,8 +1126,7 @@ static void event_handle_menu(XEvent *ev)
         else {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
-                menu_entry_frame_execute(e,
-                                         !(ev->xbutton.state & ControlMask));
+                menu_entry_frame_execute(e, ev->xbutton.state);
         }
         break;
     case MotionNotify:
@@ -1145,8 +1144,7 @@ static void event_handle_menu(XEvent *ev)
         else if (ev->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
             ObMenuFrame *f;
             if ((f = find_active_menu()))
-                menu_entry_frame_execute(f->selected,
-                                         !(ev->xkey.state & ControlMask));
+                menu_entry_frame_execute(f->selected, ev->xkey.state);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
             ObMenuFrame *f;
             if ((f = find_active_menu()) && f->parent)

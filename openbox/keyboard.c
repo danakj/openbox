@@ -133,6 +133,8 @@ void keyboard_interactive_grab(guint state, ObClient *client,
 {
     ObInteractiveState *s;
 
+    g_assert(action->data.any.interactive);
+
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
             return;
@@ -179,12 +181,8 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
                 cancel = done = TRUE;
         }
         if (done) {
-            g_assert(s->action->data.any.interactive);
-
-            s->action->data.inter.cancel = cancel;
-            s->action->data.inter.final = TRUE;
-
-            s->action->func(&s->action->data);
+            action_run_interactive(s->action, s->client,
+                                   e->xkey.state, cancel, TRUE);
 
             g_free(s);
 
@@ -221,7 +219,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
         p = curpos->first_child;
     while (p) {
         if (p->key == e->xkey.keycode &&
-            p->state == e->xkey.state) {
+            p->state == e->xkey.state)
+        {
             if (p->first_child != NULL) { /* part of a chain */
                 ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
                 /* 5 second timeout for chains */
@@ -232,32 +231,10 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 grab_keys(TRUE);
             } else {
                 GSList *it;
-                for (it = p->actions; it; it = it->next) {
-                    ObAction *act = it->data;
-                    if (act->func != NULL) {
-                        act->data.any.c = client;
 
-                        if (act->func == action_moveresize) {
-                            screen_pointer_pos(&act->data.moveresize.x,
-                                               &act->data.moveresize.y);
-                        }
-
-                        if (act->data.any.interactive) {
-                            act->data.inter.cancel = FALSE;
-                            act->data.inter.final = FALSE;
-                            keyboard_interactive_grab(e->xkey.state, client,
-                                                      0, act);
-                        }
-
-                        if (act->func == action_showmenu) {
-                            act->data.showmenu.x = e->xkey.x_root;
-                            act->data.showmenu.y = e->xkey.y_root;
-                        }
-
-                        act->data.any.c = client;
-                        act->func(&act->data);
-                    }
-                }
+                for (it = p->actions; it; it = it->next)
+                    action_run_key(it->data, client, e->xkey.state,
+                                   e->xkey.x_root, e->xkey.y_root);
 
                 keyboard_reset_chains();
             }

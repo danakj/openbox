@@ -180,7 +180,9 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
             for (node = node->xmlChildrenNode; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
-                    acts = g_slist_append(acts, action_parse(i, doc, node));
+                    acts = g_slist_append(acts, action_parse
+                                          (i, doc, node,
+                                           OB_USER_ACTION_MENU_SELECTION));
             menu_add_normal(state->parent, -1, label, acts);
             g_free(label);
         }

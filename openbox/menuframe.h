@@ -100,6 +100,6 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y);
 
 void menu_entry_frame_show_submenu(ObMenuEntryFrame *self);
 
-void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide);
+void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state);
 
 #endif

@@ -82,20 +82,9 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if (keylist) {
         nact = parse_find_node("action", node);
         while (nact) {
-            if ((action = action_parse(i, doc, nact))) {
-                /* validate that its okay for a key binding */
-                if (action->func == action_moveresize &&
-                    action->data.moveresize.corner !=
-                    prop_atoms.net_wm_moveresize_move_keyboard &&
-                    action->data.moveresize.corner !=
-                    prop_atoms.net_wm_moveresize_size_keyboard) {
-                    action_free(action);
-                    action = NULL;
-                }
-
-                if (action)
-                    keyboard_bind(keylist, action);
-            }
+            if ((action = action_parse(i, doc, nact,
+                                       OB_USER_ACTION_KEYBOARD_KEY)))
+                keyboard_bind(keylist, action);
             nact = parse_find_node("action", nact->next);
         }
     }
@@ -123,6 +112,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr n, nbut, nact;
     char *buttonstr;
     char *contextstr;
+    ObUserAction uact;
     ObMouseAction mact;
     ObAction *action;
 
@@ -141,44 +131,27 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         while (nbut) {
             if (!parse_attr_string("button", nbut, &buttonstr))
                 goto next_nbut;
-            if (parse_attr_contains("press", nbut, "action"))
+            if (parse_attr_contains("press", nbut, "action")) {
+                uact = OB_USER_ACTION_MOUSE_PRESS;
                 mact = OB_MOUSE_ACTION_PRESS;
-            else if (parse_attr_contains("release", nbut, "action"))
+            } else if (parse_attr_contains("release", nbut, "action")) {
+                uact = OB_USER_ACTION_MOUSE_RELEASE;
                 mact = OB_MOUSE_ACTION_RELEASE;
-            else if (parse_attr_contains("click", nbut, "action"))
+            } else if (parse_attr_contains("click", nbut, "action")) {
+                uact = OB_USER_ACTION_MOUSE_CLICK;
                 mact = OB_MOUSE_ACTION_CLICK;
-            else if (parse_attr_contains("doubleclick", nbut,"action"))
+            } else if (parse_attr_contains("doubleclick", nbut,"action")) {
+                uact = OB_USER_ACTION_MOUSE_DOUBLE_CLICK;
                 mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
-            else if (parse_attr_contains("drag", nbut, "action"))
+            } else if (parse_attr_contains("drag", nbut, "action")) {
+                uact = OB_USER_ACTION_MOUSE_MOTION;
                 mact = OB_MOUSE_ACTION_MOTION;
-            else
+            } else
                 goto next_nbut;
             nact = parse_find_node("action", nbut->xmlChildrenNode);
             while (nact) {
-                if ((action = action_parse(i, doc, nact))) {
-                    /* validate that its okay for a mouse binding*/
-                    if (mact == OB_MOUSE_ACTION_MOTION) {
-                        if (action->func != action_moveresize ||
-                            action->data.moveresize.corner ==
-                            prop_atoms.net_wm_moveresize_move_keyboard ||
-                            action->data.moveresize.corner ==
-                            prop_atoms.net_wm_moveresize_size_keyboard) {
-                            action_free(action);
-                            action = NULL;
-                        }
-                    } else {
-                        if (action->func == action_moveresize &&
-                            action->data.moveresize.corner !=
-                            prop_atoms.net_wm_moveresize_move_keyboard &&
-                            action->data.moveresize.corner !=
-                            prop_atoms.net_wm_moveresize_size_keyboard) {
-                            action_free(action);
-                            action = NULL;
-                        }
-                    }
-                    if (action)
-                        mouse_bind(buttonstr, contextstr, mact, action);
-                }
+                if ((action = action_parse(i, doc, nact, uact)))
+                    mouse_bind(buttonstr, contextstr, mact, action);
                 nact = parse_find_node("action", nact->next);
             }
             g_free(buttonstr);

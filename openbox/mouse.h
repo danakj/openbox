@@ -3,17 +3,9 @@
 
 #include "action.h"
 #include "frame.h"
+#include "misc.h"
 
 #include <X11/Xlib.h>
-
-typedef enum {
-    OB_MOUSE_ACTION_PRESS,
-    OB_MOUSE_ACTION_RELEASE,
-    OB_MOUSE_ACTION_CLICK,
-    OB_MOUSE_ACTION_DOUBLE_CLICK,
-    OB_MOUSE_ACTION_MOTION,
-    OB_MOUSE_NUM_ACTIONS
-} ObMouseAction;
 
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);

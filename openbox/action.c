@@ -5,21 +5,22 @@
 #include "menu.h"
 #include "prop.h"
 #include "stacking.h"
-#include "frame.h"
 #include "screen.h"
 #include "action.h"
 #include "openbox.h"
 #include "grab.h"
+#include "keyboard.h"
 
 #include <glib.h>
 
 typedef struct ActionString {
     char *name;
     void (*func)(union ActionData *);
-    void (*setup)(ObAction *);
+    void (*setup)(ObAction **, ObUserAction uact);
 } ActionString;
 
-ObAction *action_new(void (*func)(union ActionData *data))
+static ObAction *action_new(void (*func)(union ActionData *data),
+                            ObUserAction uact)
 {
     ObAction *a = g_new0(ObAction, 1);
     a->func = func;
@@ -40,262 +41,255 @@ void action_free(ObAction *a)
     g_free(a);
 }
 
-void setup_action_directional_focus_north(ObAction *a)
+void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
 { 
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTH;
 }
 
-void setup_action_directional_focus_east(ObAction *a)
+void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_EAST;
 }
 
-void setup_action_directional_focus_south(ObAction *a)
+void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTH;
 }
 
-void setup_action_directional_focus_west(ObAction *a)
+void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_WEST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_WEST;
 }
 
-void setup_action_directional_focus_northeast(ObAction *a)
+void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
 }
 
-void setup_action_directional_focus_southeast(ObAction *a)
+void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
 }
 
-void setup_action_directional_focus_southwest(ObAction *a)
+void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
 }
 
-void setup_action_directional_focus_northwest(ObAction *a)
+void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
 {
-    a->data.interdiraction.inter.any.interactive = TRUE;
-    a->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
+    (*a)->data.interdiraction.inter.any.interactive = TRUE;
+    (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
 }
 
-void setup_action_send_to_desktop(ObAction *a)
+void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
 {
-    a->data.sendto.follow = TRUE;
+    (*a)->data.sendto.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_prev(ObAction *a)
+void setup_action_send_to_desktop_prev(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_WEST;
-    a->data.sendtodir.linear = TRUE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_WEST;
+    (*a)->data.sendtodir.linear = TRUE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_next(ObAction *a)
+void setup_action_send_to_desktop_next(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_EAST;
-    a->data.sendtodir.linear = TRUE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_EAST;
+    (*a)->data.sendtodir.linear = TRUE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_left(ObAction *a)
+void setup_action_send_to_desktop_left(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_WEST;
-    a->data.sendtodir.linear = FALSE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_WEST;
+    (*a)->data.sendtodir.linear = FALSE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_right(ObAction *a)
+void setup_action_send_to_desktop_right(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_EAST;
-    a->data.sendtodir.linear = FALSE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_EAST;
+    (*a)->data.sendtodir.linear = FALSE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_up(ObAction *a)
+void setup_action_send_to_desktop_up(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_NORTH;
-    a->data.sendtodir.linear = FALSE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_NORTH;
+    (*a)->data.sendtodir.linear = FALSE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_desktop_down(ObAction *a)
+void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
 {
-    a->data.sendtodir.inter.any.interactive = TRUE;
-    a->data.sendtodir.dir = OB_DIRECTION_SOUTH;
-    a->data.sendtodir.linear = FALSE;
-    a->data.sendtodir.wrap = TRUE;
-    a->data.sendtodir.follow = TRUE;
+    (*a)->data.sendtodir.inter.any.interactive = TRUE;
+    (*a)->data.sendtodir.dir = OB_DIRECTION_SOUTH;
+    (*a)->data.sendtodir.linear = FALSE;
+    (*a)->data.sendtodir.wrap = TRUE;
+    (*a)->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_desktop_prev(ObAction *a)
+void setup_action_desktop_prev(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_WEST;
-    a->data.desktopdir.linear = TRUE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_WEST;
+    (*a)->data.desktopdir.linear = TRUE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_desktop_next(ObAction *a)
+void setup_action_desktop_next(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_EAST;
-    a->data.desktopdir.linear = TRUE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_EAST;
+    (*a)->data.desktopdir.linear = TRUE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_desktop_left(ObAction *a)
+void setup_action_desktop_left(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_WEST;
-    a->data.desktopdir.linear = FALSE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_WEST;
+    (*a)->data.desktopdir.linear = FALSE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_desktop_right(ObAction *a)
+void setup_action_desktop_right(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_EAST;
-    a->data.desktopdir.linear = FALSE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_EAST;
+    (*a)->data.desktopdir.linear = FALSE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_desktop_up(ObAction *a)
+void setup_action_desktop_up(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_NORTH;
-    a->data.desktopdir.linear = FALSE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_NORTH;
+    (*a)->data.desktopdir.linear = FALSE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_desktop_down(ObAction *a)
+void setup_action_desktop_down(ObAction **a, ObUserAction uact)
 {
-    a->data.desktopdir.inter.any.interactive = TRUE;
-    a->data.desktopdir.dir = OB_DIRECTION_SOUTH;
-    a->data.desktopdir.linear = FALSE;
-    a->data.desktopdir.wrap = TRUE;
+    (*a)->data.desktopdir.inter.any.interactive = TRUE;
+    (*a)->data.desktopdir.dir = OB_DIRECTION_SOUTH;
+    (*a)->data.desktopdir.linear = FALSE;
+    (*a)->data.desktopdir.wrap = TRUE;
 }
 
-void setup_action_move_keyboard(ObAction *a)
+void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
 {
-    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move_keyboard;
+    (*a)->data.cycle.inter.any.interactive = TRUE;
+    (*a)->data.cycle.linear = FALSE;
+    (*a)->data.cycle.forward = TRUE;
 }
 
-void setup_action_move(ObAction *a)
+void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
 {
-    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move;
+    (*a)->data.cycle.inter.any.interactive = TRUE;
+    (*a)->data.cycle.linear = FALSE;
+    (*a)->data.cycle.forward = FALSE;
 }
 
-void setup_action_resize(ObAction *a)
+void setup_action_movetoedge_north(ObAction **a, ObUserAction uact)
 {
-    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_topleft;
+    (*a)->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
-void setup_action_resize_keyboard(ObAction *a)
+void setup_action_movetoedge_south(ObAction **a, ObUserAction uact)
 {
-    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_keyboard;
+    (*a)->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
-void setup_action_cycle_windows_linear_next(ObAction *a)
+void setup_action_movetoedge_east(ObAction **a, ObUserAction uact)
 {
-    a->data.cycle.inter.any.interactive = TRUE;
-    a->data.cycle.linear = TRUE;
-    a->data.cycle.forward = TRUE;
+    (*a)->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
-void setup_action_cycle_windows_linear_previous(ObAction *a)
+void setup_action_movetoedge_west(ObAction **a, ObUserAction uact)
 {
-    a->data.cycle.inter.any.interactive = TRUE;
-    a->data.cycle.linear = TRUE;
-    a->data.cycle.forward = FALSE;
+    (*a)->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
-void setup_action_cycle_windows_next(ObAction *a)
+void setup_action_growtoedge_north(ObAction **a, ObUserAction uact)
 {
-    a->data.cycle.inter.any.interactive = TRUE;
-    a->data.cycle.linear = FALSE;
-    a->data.cycle.forward = TRUE;
+    (*a)->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
-void setup_action_cycle_windows_previous(ObAction *a)
+void setup_action_growtoedge_south(ObAction **a, ObUserAction uact)
 {
-    a->data.cycle.inter.any.interactive = TRUE;
-    a->data.cycle.linear = FALSE;
-    a->data.cycle.forward = FALSE;
+    (*a)->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
-void setup_action_movetoedge_north(ObAction *a)
+void setup_action_growtoedge_east(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
-void setup_action_movetoedge_south(ObAction *a)
+void setup_action_growtoedge_west(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
-void setup_action_movetoedge_east(ObAction *a)
+void setup_action_top_layer(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.layer.layer = 1;
 }
 
-void setup_action_movetoedge_west(ObAction *a)
+void setup_action_normal_layer(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_WEST;
+    (*a)->data.layer.layer = 0;
 }
 
-void setup_action_growtoedge_north(ObAction *a)
+void setup_action_bottom_layer(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.layer.layer = -1;
 }
 
-void setup_action_growtoedge_south(ObAction *a)
+void setup_action_move(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.moveresize.move = TRUE;
+    (*a)->data.moveresize.keyboard =
+        (uact == OB_USER_ACTION_KEYBOARD_KEY ||
+         uact == OB_USER_ACTION_MENU_SELECTION);
 }
 
-void setup_action_growtoedge_east(ObAction *a)
+void setup_action_resize(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.moveresize.move = FALSE;
+    (*a)->data.moveresize.keyboard =
+        (uact == OB_USER_ACTION_KEYBOARD_KEY ||
+         uact == OB_USER_ACTION_MENU_SELECTION);
 }
 
-void setup_action_growtoedge_west(ObAction *a)
+void setup_action_showmenu(ObAction **a, ObUserAction uact)
 {
-    a->data.diraction.direction = OB_DIRECTION_WEST;
-}
-
-void setup_action_top_layer(ObAction *a)
-{
-    a->data.layer.layer = 1;
-}
-
-void setup_action_normal_layer(ObAction *a)
-{
-    a->data.layer.layer = 0;
-}
-
-void setup_action_bottom_layer(ObAction *a)
-{
-    a->data.layer.layer = -1;
+    /* you cannot call ShowMenu from inside a menu, cuz the menu code makes
+       assumptions that there is only one menu (and submenus) open at
+       a time! */
+    if (uact == OB_USER_ACTION_MENU_SELECTION) {
+        action_free(*a);
+        a = NULL;
+    }
 }
 
 ActionString actionstrings[] =
@@ -348,12 +342,12 @@ ActionString actionstrings[] =
     {
         "activate",
         action_activate,
-        NULL,
+        NULL
     },
     {
         "focus",
         action_focus,
-        NULL,
+        NULL
     },
     {
         "unfocus",
@@ -561,11 +555,6 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "keyboardmove", 
-        action_moveresize,
-        setup_action_move_keyboard
-    },
-    {
         "move",
         action_moveresize,
         setup_action_move
@@ -574,11 +563,6 @@ ActionString actionstrings[] =
         "resize",
         action_moveresize,
         setup_action_resize
-    },
-    {
-        "keyboardresize",
-        action_moveresize,
-        setup_action_resize_keyboard
     },
     {
         "toggleshowdesktop",
@@ -618,7 +602,7 @@ ActionString actionstrings[] =
     {
         "showmenu",
         action_showmenu,
-        NULL
+        setup_action_showmenu
     },
     {
         "sendtotoplayer",
@@ -644,16 +628,6 @@ ActionString actionstrings[] =
         "togglealwaysonbottom",
         action_toggle_layer,
         setup_action_bottom_layer
-    },
-    {
-        "nextwindowlinear",
-        action_cycle_windows,
-        setup_action_cycle_windows_linear_next
-    },
-    {
-        "previouswindowlinear",
-        action_cycle_windows,
-        setup_action_cycle_windows_linear_previous
     },
     {
         "nextwindow",
@@ -712,32 +686,37 @@ ActionString actionstrings[] =
     }
 };
 
-ObAction *action_from_string(char *name)
+ObAction *action_from_string(char *name, ObUserAction uact)
 {
     ObAction *a = NULL;
+    gboolean exist = FALSE;
     int i;
 
     for (i = 0; actionstrings[i].name; i++)
         if (!g_ascii_strcasecmp(name, actionstrings[i].name)) {
-            a = action_new(actionstrings[i].func);
+            exist = TRUE;
+            a = action_new(actionstrings[i].func, uact);
             if (actionstrings[i].setup)
-                actionstrings[i].setup(a);
+                actionstrings[i].setup(&a, uact);
             break;
         }
-    if (!a)
+    if (!exist)
         g_warning("Invalid action '%s' requested. No such action exists.",
                   name);
+    if (!a)
+        g_warning("Invalid use of action '%s'. Action will be ignored.", name);
     return a;
 }
 
-ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
+ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                       ObUserAction uact)
 {
     char *actname;
     ObAction *act = NULL;
     xmlNodePtr n;
 
     if (parse_attr_string("name", node, &actname)) {
-        if ((act = action_from_string(actname))) {
+        if ((act = action_from_string(actname, uact))) {
             if (act->func == action_execute || act->func == action_restart) {
                 if ((n = parse_find_node("execute", node->xmlChildrenNode))) {
                     gchar *s = parse_string(doc, n);
@@ -747,26 +726,25 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             } else if (act->func == action_showmenu) {
                 if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);
-            } else if (act->func == action_desktop) {
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.desktop.desk = parse_int(doc, n);
-                if (act->data.desktop.desk > 0) act->data.desktop.desk--;
-            } else if (act->func == action_send_to_desktop) {
-                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
-                    act->data.sendto.desk = parse_int(doc, n);
-                if (act->data.sendto.desk > 0) act->data.sendto.desk--;
             } else if (act->func == action_move_relative_horz ||
                        act->func == action_move_relative_vert ||
                        act->func == action_resize_relative_horz ||
                        act->func == action_resize_relative_vert) {
                 if ((n = parse_find_node("delta", node->xmlChildrenNode)))
                     act->data.relative.delta = parse_int(doc, n);
-            } else if (act->func == action_desktop_dir) {
-                if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
-                    act->data.desktopdir.wrap = parse_bool(doc, n);
-            } else if (act->func == action_send_to_desktop) {
+            } else if (act->func == action_desktop) {
+                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
+                    act->data.desktop.desk = parse_int(doc, n);
+                if (act->data.desktop.desk > 0) act->data.desktop.desk--;
+           } else if (act->func == action_send_to_desktop) {
+                if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
+                    act->data.sendto.desk = parse_int(doc, n);
+                if (act->data.sendto.desk > 0) act->data.sendto.desk--;
                 if ((n = parse_find_node("follow", node->xmlChildrenNode)))
                     act->data.sendto.follow = parse_bool(doc, n);
+            } else if (act->func == action_desktop_dir) {
+                if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
+                    act->data.desktopdir.wrap = parse_bool(doc, n); 
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
@@ -775,11 +753,38 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             } else if (act->func == action_activate) {
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
+            } else if (act->func == action_cycle_windows) {
+                if ((n = parse_find_node("linear", node->xmlChildrenNode)))
+                    act->data.cycle.linear = parse_bool(doc, n);
             }
         }
         g_free(actname);
     }
     return act;
+}
+
+void action_run_full(ObAction *a, struct _ObClient *c,
+                     ObFrameContext context,
+                     guint state, guint button, gint x, gint y,
+                     gboolean cancel, gboolean done)
+{
+    if (x < 0 && y < 0)
+        screen_pointer_pos(&x, &y);
+
+    a->data.any.c = c;
+    a->data.any.x = x;
+    a->data.any.y = y;
+
+    a->data.any.button = button;
+
+    if (a->data.any.interactive) {
+        a->data.inter.cancel = cancel;
+        a->data.inter.final = done;
+        if (!(cancel || done))
+            keyboard_interactive_grab(state, c, context, a);
+    }
+
+    a->func(&a->data);
 }
 
 void action_execute(union ActionData *data)
@@ -1089,14 +1094,48 @@ void action_toggle_decorations(union ActionData *data)
     client_setup_decor_and_functions(c);
 }
 
+static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
+{
+    if (x - cx > cw / 2) {
+        if (y - cy > ch / 2)
+            return prop_atoms.net_wm_moveresize_size_bottomright;
+        else
+            return prop_atoms.net_wm_moveresize_size_topright;
+    } else {
+        if (y - cy > ch / 2)
+            return prop_atoms.net_wm_moveresize_size_bottomleft;
+        else
+            return prop_atoms.net_wm_moveresize_size_topleft;
+    }
+}
+
 void action_moveresize(union ActionData *data)
 {
     ObClient *c = data->moveresize.any.c;
+    guint32 corner;
 
     if (!c || !client_normal(c)) return;
 
-    moveresize_start(c, data->moveresize.x, data->moveresize.y,
-                     data->moveresize.button, data->moveresize.corner);
+    if (data->moveresize.keyboard) {
+        corner = (data->moveresize.move ?
+                  prop_atoms.net_wm_moveresize_move_keyboard :
+                  prop_atoms.net_wm_moveresize_size_keyboard);
+    } else {
+        corner = (data->moveresize.move ?
+                  prop_atoms.net_wm_moveresize_move :
+                  pick_corner(data->any.x, data->any.y,
+                              c->frame->area.x, c->frame->area.y,
+                              /* use the client size because the frame
+                                 can be differently sized (shaded
+                                 windows) and we want this based on the
+                                 clients size */
+                              c->area.width + c->frame->size.left +
+                              c->frame->size.right,
+                              c->area.height + c->frame->size.top +
+                              c->frame->size.bottom));
+    }
+
+    moveresize_start(c, data->any.x, data->any.y, data->any.button, corner);
 }
 
 void action_reconfigure(union ActionData *data)
@@ -1117,7 +1156,7 @@ void action_exit(union ActionData *data)
 void action_showmenu(union ActionData *data)
 {
     if (data->showmenu.name) {
-        menu_show(data->showmenu.name, data->showmenu.x, data->showmenu.y,
+        menu_show(data->showmenu.name, data->any.x, data->any.y,
                   data->showmenu.any.c);
     }
 }

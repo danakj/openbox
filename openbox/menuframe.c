@@ -711,7 +711,7 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     menu_frame_show(f, self->frame);
 }
 
-void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
+void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
 {
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.enabled)
@@ -725,31 +725,16 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
         ObClient *client = self->frame->client;
 
         /* release grabs before executing the shit */
-        if (hide)
+        if (!(state & ControlMask))
             menu_frame_hide_all();
 
         if (func)
-            func(entry, data);
+            func(entry, state, data);
         else {
             GSList *it;
 
             for (it = acts; it; it = g_slist_next(it))
-            {
-                ObAction *act = it->data;
-                act->data.any.c = client;
-
-                if (act->func == action_moveresize)
-                    screen_pointer_pos(&act->data.moveresize.x,
-                                       &act->data.moveresize.y);
-
-                if (!(act->func == action_cycle_windows ||
-                      act->func == action_desktop_dir ||
-                      act->func == action_send_to_desktop_dir ||
-                      act->func == action_showmenu))
-                {
-                    act->func(&act->data);
-                }
-            }
+                action_run(it->data, client, state);
         }
     }
 }

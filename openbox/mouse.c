@@ -9,13 +9,12 @@
 #include "frame.h"
 #include "translate.h"
 #include "mouse.h"
-#include "keyboard.h"
 #include <glib.h>
 
 typedef struct {
     guint state;
     guint button;
-    GSList *actions[OB_MOUSE_NUM_ACTIONS]; /* lists of Action pointers */
+    GSList *actions[OB_NUM_MOUSE_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
 #define FRAME_CONTEXT(co, cl) ((cl && cl->type != OB_CLIENT_TYPE_DESKTOP) ? \
@@ -33,7 +32,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
     GSList *it;
 
     for (i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i)
-        for (it = bound_contexts[i]; it != NULL; it = it->next) {
+        for (it = bound_contexts[i]; it != NULL; it = g_slist_next(it)) {
             /* grab/ungrab the button */
             ObMouseBinding *b = it->data;
             Window win;
@@ -75,14 +74,14 @@ static void clearall()
     
     for(i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i) {
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
+            ObMouseBinding *b = it->data;
             int j;
 
-            ObMouseBinding *b = it->data;
-            for (j = 0; j < OB_MOUSE_NUM_ACTIONS; ++j) {
+            for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j) {
                 GSList *it;
-                for (it = b->actions[j]; it; it = it->next) {
+
+                for (it = b->actions[j]; it; it = it->next)
                     action_free(it->data);
-                }
                 g_slist_free(b->actions[j]);
             }
             g_free(b);
@@ -92,9 +91,9 @@ static void clearall()
     }
 }
 
-static gboolean fire_button(ObMouseAction a, ObFrameContext context,
-                            ObClient *c, guint state,
-                            guint button, int x, int y)
+static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
+                             ObClient *c, guint state,
+                             guint button, int x, int y)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -107,83 +106,9 @@ static gboolean fire_button(ObMouseAction a, ObFrameContext context,
     /* if not bound, then nothing to do! */
     if (it == NULL) return FALSE;
 
-    for (it = b->actions[a]; it; it = it->next) {
-        ObAction *act = it->data;
-        if (act->func != NULL) {
-            act->data.any.c = c;
-
-            g_assert(act->func != action_moveresize);
-
-            if (act->func == action_showmenu) {
-                act->data.showmenu.x = x;
-                act->data.showmenu.y = y;
-            }
-
-            if (act->data.any.interactive) {
-                act->data.inter.cancel = FALSE;
-                act->data.inter.final = FALSE;
-                keyboard_interactive_grab(state, c, context, act);
-            }
-
-            act->func(&act->data);
-        }
-    }
+    for (it = b->actions[a]; it; it = it->next)
+        action_run_mouse(it->data, c, context, state, button, x, y);
     return TRUE;
-}
-
-static gboolean fire_motion(ObMouseAction a, ObFrameContext context,
-                            ObClient *c, guint state, guint button,
-                            int x_root, int y_root, guint32 corner)
-{
-    GSList *it;
-    ObMouseBinding *b;
-
-    for (it = bound_contexts[context]; it != NULL; it = it->next) {
-        b = it->data;
-        if (b->state == state && b->button == button)
-		break;
-    }
-    /* if not bound, then nothing to do! */
-    if (it == NULL) return FALSE;
-
-    for (it = b->actions[a]; it; it = it->next) {
-        ObAction *act = it->data;
-        if (act->func != NULL) {
-            act->data.any.c = c;
-
-            if (act->func == action_moveresize) {
-                act->data.moveresize.x = x_root;
-                act->data.moveresize.y = y_root;
-                act->data.moveresize.button = button;
-                if (!(act->data.moveresize.corner ==
-                      prop_atoms.net_wm_moveresize_move ||
-                      act->data.moveresize.corner ==
-                      prop_atoms.net_wm_moveresize_move_keyboard ||
-                      act->data.moveresize.corner ==
-                      prop_atoms.net_wm_moveresize_size_keyboard))
-                    act->data.moveresize.corner = corner;
-            } else
-                g_assert_not_reached();
-
-            act->func(&act->data);
-        }
-    }
-    return TRUE;
-}
-
-static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
-{
-    if (x - cx < cw / 2) {
-        if (y - cy < ch / 2)
-            return prop_atoms.net_wm_moveresize_size_topleft;
-        else
-            return prop_atoms.net_wm_moveresize_size_bottomleft;
-    } else {
-        if (y - cy < ch / 2)
-            return prop_atoms.net_wm_moveresize_size_topright;
-        else
-            return prop_atoms.net_wm_moveresize_size_bottomright;
-    }
 }
 
 void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
@@ -203,10 +128,10 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
         button = e->xbutton.button;
         state = e->xbutton.state;
 
-        fire_button(OB_MOUSE_ACTION_PRESS, context,
-                    client, e->xbutton.state,
-                    e->xbutton.button,
-                    e->xbutton.x_root, e->xbutton.y_root);
+        fire_binding(OB_MOUSE_ACTION_PRESS, context,
+                     client, e->xbutton.state,
+                     e->xbutton.button,
+                     e->xbutton.x_root, e->xbutton.y_root);
 
         if (CLIENT_CONTEXT(context, client)) {
             /* Replay the event, so it goes to the client*/
@@ -252,22 +177,22 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
             state = 0;
             ltime = e->xbutton.time;
         }
-        fire_button(OB_MOUSE_ACTION_RELEASE, context,
-                    client, e->xbutton.state,
-                    e->xbutton.button,
-                    e->xbutton.x_root, e->xbutton.y_root);
+        fire_binding(OB_MOUSE_ACTION_RELEASE, context,
+                     client, e->xbutton.state,
+                     e->xbutton.button,
+                     e->xbutton.x_root, e->xbutton.y_root);
         if (click)
-            fire_button(OB_MOUSE_ACTION_CLICK, context,
-                        client, e->xbutton.state,
-                        e->xbutton.button,
-                        e->xbutton.x_root,
-                        e->xbutton.y_root);
+            fire_binding(OB_MOUSE_ACTION_CLICK, context,
+                         client, e->xbutton.state,
+                         e->xbutton.button,
+                         e->xbutton.x_root,
+                         e->xbutton.y_root);
         if (dclick)
-            fire_button(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
-                        client, e->xbutton.state,
-                        e->xbutton.button,
-                        e->xbutton.x_root,
-                        e->xbutton.y_root);
+            fire_binding(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
+                         client, e->xbutton.state,
+                         e->xbutton.button,
+                         e->xbutton.x_root,
+                         e->xbutton.y_root);
         break;
 
     case MotionNotify:
@@ -276,7 +201,6 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
                 config_mouse_threshold ||
                 ABS(e->xmotion.y_root - py) >=
                 config_mouse_threshold) {
-                guint32 corner;
 
                 /* You can't drag on buttons */
                 if (context == OB_FRAME_CONTEXT_MAXIMIZE ||
@@ -287,26 +211,8 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
                     context == OB_FRAME_CONTEXT_CLOSE)
                     break;
 
-                if (!client)
-                    corner = prop_atoms.net_wm_moveresize_size_bottomright;
-                else
-                    corner =
-                        pick_corner(e->xmotion.x_root,
-                                    e->xmotion.y_root,
-                                    client->frame->area.x,
-                                    client->frame->area.y,
-                                    /* use the client size because the frame
-                                       can be differently sized (shaded
-                                       windows) and we want this based on the
-                                       clients size */
-                                    client->area.width +
-                                    client->frame->size.left +
-                                    client->frame->size.right,
-                                    client->area.height +
-                                    client->frame->size.top +
-                                    client->frame->size.bottom);
-                fire_motion(OB_MOUSE_ACTION_MOTION, context,
-                            client, state, button, px, py, corner);
+                fire_binding(OB_MOUSE_ACTION_MOTION, context,
+                             client, state, button, px, py);
                 button = 0;
                 state = 0;
             }

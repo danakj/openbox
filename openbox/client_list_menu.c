@@ -40,7 +40,8 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
                 menu_add_separator(menu, -1);
             }
 
-            act = action_from_string("activate");
+            act = action_from_string("Activate",
+                                     OB_USER_ACTION_MENU_SELECTION);
             act->data.activate.any.c = c;
             acts = g_slist_prepend(NULL, act);
             e = menu_add_normal(menu, i,
@@ -56,16 +57,16 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     
 }
 
-/* executes it without changing the client in the actions, since we set that
+/* executes it using the client in the actions, since we set that
    when we make the actions! */
-static void desk_menu_execute(ObMenuEntry *self, gpointer data)
+static void desk_menu_execute(ObMenuEntry *self, guint state, gpointer data)
 {
     GSList *it;
 
     for (it = self->data.normal.actions; it; it = g_slist_next(it))
     {
         ObAction *act = it->data;
-        act->func(&act->data);
+        action_run(it->data, act->data.any.c, state);
     }
 }
 

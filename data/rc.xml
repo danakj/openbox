@@ -96,10 +96,10 @@
     <action name="PreviousWindow"/>
   </keybind>
   <keybind key="A-F7">
-    <action name="KeyboardMove"/>
+    <action name="Move"/>
   </keybind>
   <keybind key="A-F8">
-    <action name="KeyboardResize"/>
+    <action name="Resize"/>
   </keybind>
   <keybind key="A-F9">
     <action name="Iconify"/>

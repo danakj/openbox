@@ -2,7 +2,10 @@
 #define __action_h
 
 #include "misc.h"
+#include "frame.h"
 #include "parser/parse.h"
+
+struct _ObClient;
 
 typedef struct _ObAction ObAction;
 
@@ -14,6 +17,9 @@ typedef struct _ObAction ObAction;
 struct AnyAction {
     struct _ObClient *c;
     gboolean interactive;
+    gint x;
+    gint y;
+    gint button;
 };
 
 struct InteractiveAction {
@@ -84,17 +90,13 @@ struct DesktopDirection {
 
 struct MoveResize {
     struct AnyAction any;
-    int x;
-    int y;
-    guint32 corner; /* prop_atoms.net_wm_moveresize_* */
-    guint button;
+    gboolean move;
+    gboolean keyboard;
 };
 
 struct ShowMenu {
     struct AnyAction any;
     char *name;
-    int x;
-    int y;
 };
 
 struct CycleWindows {
@@ -123,6 +125,7 @@ union ActionData {
 };
 
 struct _ObAction {
+    ObUserAction act;
     /* The func member acts like an enum to tell which one of the structs in
        the data union are valid.
     */
@@ -130,23 +133,52 @@ struct _ObAction {
     union ActionData data;
 };
 
-ObAction *action_new(void (*func)(union ActionData *data));
-
 /* Creates a new Action from the name of the action
    A few action types need data set after making this call still. Check if
    the returned action's "func" is one of these.
    action_execute - the path needs to be set
    action_restart - the path can optionally be set
    action_desktop - the destination desktop needs to be set
+   action_send_to_desktop - the destination desktop needs to be set
    action_move_relative_horz - the delta
    action_move_relative_vert - the delta
    action_resize_relative_horz - the delta
    action_resize_relative_vert - the delta
 */
 
-ObAction *action_from_string(char *name);
-ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
+ObAction *action_from_string(char *name, ObUserAction uact);
+ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                       ObUserAction uact);
 void action_free(ObAction *a);
+
+/*! Executes an action.
+  @param c The client associated with the action. Can be NULL.
+  @param context The context in which the user action occured.
+  @param state The keyboard modifiers state at the time the user action occured
+  @param button The mouse button used to execute the action.
+  @param x The x coord at which the user action occured.
+  @param y The y coord at which the user action occured.
+  @param cancel If the action is cancelling an interactive action. This only
+         affects interactive actions, but should generally always be FALSE.
+  @param done If the action is completing an interactive action. This only
+         affects interactive actions, but should generally always be FALSE.
+*/
+void action_run_full(ObAction *a, struct _ObClient *c,
+                     ObFrameContext context,
+                     guint state, guint button, gint x, gint y,
+                     gboolean cancel, gboolean done);
+
+#define action_run_mouse(a, c, t, s, b, x, y) \
+    action_run_full(a, c, t, s, b, x, y, FALSE, FALSE)
+
+#define action_run_interactive(a, c, s, n, d) \
+    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, n, d)
+
+#define action_run_key(a, c, s, x, y) \
+    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, x, y, FALSE,FALSE)
+
+#define action_run(a, c, s) \
+    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, FALSE,FALSE)
 
 /* Execute */
 void action_execute(union ActionData *data);

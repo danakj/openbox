@@ -1,0 +1,133 @@
+!! merry2
+!! Menu settings
+
+menu.title: flat gradient vertical bevel1
+menu.title.color: #3e71aa
+menu.title.colorTo: #3e71aa
+menu.title.borderColor: #000000
+menu.title.textColor: #ffffff
+menu.title.justify: center
+menu.frame: flat solid bevel1
+menu.frame.color: #f6f6f6
+menu.frame.colorTo: #000000
+menu.frame.borderColor: #000000
+menu.frame.textColor: #000000
+menu.frame.justify: left
+menu.frame.disableColor: #ececec
+
+menu.hilite: flat solid
+menu.hilite.color: #3e71aa
+menu.hilite.colorTo: #5a6dbd
+menu.hilite.borderColor: #000000
+menu.hilite.textColor: #ffffff
+
+menu.bullet: triangle
+menu.bullet.position: right
+
+!! General window settings
+window.button.pressed: flat solid bevel1
+window.button.pressed.color: #000000
+window.button.pressed.colorTo: #000000
+window.button.pressed.borderColor: #000000
+window.justify: center
+
+!! focused window settings
+window.frame.focusColor: #000000
+
+window.title.focus: flat solid bevel1
+window.title.focus.color: #f6f6f6
+window.title.focus.colorTo: #f6f6f6
+window.title.focus.borderColor: #000000
+
+window.handle.focus: raised border gradient vertical bevel1
+window.handle.focus.color: #f6f6f6
+window.handle.focus.colorTo: #dadada
+window.handle.focus.borderColor: #f6f6f6
+
+window.grip.focus: raised solid bevel1
+window.grip.focus.color: #f6f6f6
+window.grip.focus.colorTo: #dadada
+window.grip.focus.borderColor: #000000
+
+#blue
+#window.label.focus: flat border gradient vertical bevel1
+#window.label.focus.color: #4c59a6
+#window.label.focus.colorTo: #5a6dbe
+#window.label.focus.borderColor: #000000
+#window.label.focus.textColor: #ffffff
+
+#green
+window.label.focus: flat border gradient vertical interlaced bevel1
+window.label.focus.color: #3e71aa
+window.label.focus.colorTo:  #3e71aa
+window.label.focus.borderColor: #000000
+window.label.focus.textColor: #ffffff
+
+window.button.focus: flat solid bevel1
+window.button.focus.color: #f6f6f6
+window.button.focus.colorTo: #000000
+window.button.focus.borderColor: #000000
+window.button.focus.picColor: #1f1f1f
+
+window.button.pressed.focus: sunken solid bevel1
+window.button.pressed.focus.color: #e6e2de
+window.button.pressed.focus.colorTo: #000000
+window.button.pressed.focus.borderColor: #000000
+
+!! unfocused window settings
+window.frame.unfocusColor: #000000
+
+window.title.unfocus: flat solid bevel1
+window.title.unfocus.color: #f6f6f6
+window.title.unfocus.colorTo: #dadada
+window.title.unfocus.borderColor: #000000
+
+window.handle.unfocus: raised border gradient vertical bevel1
+window.handle.unfocus.color: #f6f6f6
+window.handle.unfocus.colorTo: #dadada
+window.handle.unfocus.borderColor: #f6f6f6
+
+window.grip.unfocus: parentrelative
+window.grip.unfocus.color: #f6f6f6
+window.grip.unfocus.colorTo: #dadada
+window.grip.unfocus.borderColor: #000000
+
+#huh i dunno what you like?? # = the brown block
+window.label.unfocus: parentrelative
+#window.label.unfocus: flat border solid
+#window.label.unfocus.color: #d5d6d5
+#window.label.unfocus.colorTo: #e1e1e1
+#window.label.unfocus.borderColor: #222222
+window.label.unfocus.textColor: #4d4d4d
+#window.label.unfocus.textColor: #ffffff
+
+window.button.unfocus: flat solid bevel1
+window.button.unfocus.color: #f6f6f6
+window.button.unfocus.colorTo: #000000
+window.button.unfocus.borderColor: #868074
+window.button.unfocus.picColor: #4d4d4d
+
+window.button.pressed.unfocus: sunken solid bevel1
+window.button.pressed.unfocus.color: #e6e2de
+window.button.pressed.unfocus.colorTo: #000000
+window.button.pressed.unfocus.borderColor: #000000
+
+!#oh xor...
+window.button.disabled.focus: parentrelative
+window.button.disabled.focus.picColor: #7c7c7c
+#
+window.button.disabled.unfocus: parentrelative
+window.button.disabled.unfocus.picColor:  #7c7c7c
+
+!! Global width settings
+borderWidth: 1
+bevelWidth: 1
+handleWidth: 4
+frameWidth: 0
+
+!! Miscellaneous settings
+borderColor: #222222
+!! font me!
+window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
+menu.frame.xftfont: National First Font:pixelsize=15
+menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10

@@ -7,7 +7,7 @@ plugindir       = $(libdir)/openbox/plugins
 desktopfilesdir = $(datadir)/gnome/wm-properties
 pixmapdir       = $(datadir)/pixmaps
 
-theme = operation
+theme = thebear
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -367,54 +367,59 @@ tools_kdetrayproxy_kdetrayproxy_SOURCES = \
 
 ## themes ##
 
-dist_theme_DATA = \
-	themes/artwiz \
-	themes/bbs \
-	themes/bluebox \
-	themes/cthulhain \
-	themes/deep \
-	themes/ebox \
-	themes/fieron \
-	themes/fieron2 \
-	themes/flux \
-	themes/frobozz \
-	themes/frobust \
-	themes/mbdtex \
-	themes/miklos \
-	themes/nyz \
-	themes/nyzclone \
-	themes/ob20 \
-	themes/operation \
-	themes/outcomes \
-	themes/paper \
-	themes/purplehaaze \
-	themes/shade \
-	themes/steelblue \
-	themes/steelblue2 \
-	themes/the_orange \
-	themes/trisb \
-	themes/twice \
-	themes/warp-xp
+thebear_themedir = $(themedir)/thebear
+dist_thebear_theme_DATA = \
+	themes/thebear/themerc
 
-fieronthemedir = $(themedir)/fieron_data
-dist_fierontheme_DATA = \
-	themes/fieron_data/close.xbm \
-	themes/fieron_data/iconify.xbm \
-	themes/fieron_data/max.xbm \
-	themes/fieron_data/stick.xbm
+planton_themedir = $(themedir)/planton
+dist_planton_theme_DATA = \
+	themes/planton/themerc \
+	themes/planton/max.xbm \
+	themes/planton/max_t.xbm \
+	themes/planton/stick.xbm \
+	themes/planton/stick_t.xbm \
+	themes/planton/shade.xbm \
+	themes/planton/shade_t.xbm \
+	themes/planton/iconify.xbm \
+	themes/planton/close.xbm
 
-fieron2themedir = $(themedir)/fieron2_data
-dist_fieron2theme_DATA = \
-	themes/fieron2_data/close.xbm \
-	themes/fieron2_data/iconify.xbm \
-	themes/fieron2_data/max.xbm \
-	themes/fieron2_data/stick.xbm
+lightindustry_themedir = $(themedir)/Light-Industry
+dist_lightindustry_theme_DATA = \
+	themes/Light-Industry/themerc \
+	themes/Light-Industry/max.xbm \
+	themes/Light-Industry/iconify.xbm \
+	themes/Light-Industry/close.xbm
 
-eboxthemedir = $(themedir)/ebox_data
-dist_eboxtheme_DATA = \
-	themes/ebox_data/close.xbm \
-	themes/ebox_data/iconify.xbm \
-	themes/ebox_data/max.xbm
+lightindustrybig_themedir = $(themedir)/Light-Industry-big
+dist_lightindustrybig_theme_DATA = \
+	themes/Light-Industry-big/themerc \
+	themes/Light-Industry-big/max.xbm \
+	themes/Light-Industry-big/iconify.xbm \
+	themes/Light-Industry-big/close.xbm
+
+imerry_themedir = $(themedir)/I-merry
+dist_imerry_theme_DATA = \
+	themes/I-merry/themerc \
+	themes/I-merry/max.xbm \
+	themes/I-merry/iconify.xbm \
+	themes/I-merry/close.xbm
+
+greenz_themedir = $(themedir)/I-merry
+dist_greenz_theme_DATA = \
+	themes/I-merry/themerc
+
+bbstyle_themedir = $(themedir)/BBstylE
+dist_bbstyle_theme_DATA = \
+	themes/BBstylE/themerc \
+	themes/BBstylE/max.xbm \
+	themes/BBstylE/max_t.xbm \
+	themes/BBstylE/stick.xbm \
+	themes/BBstylE/stick_t.xbm \
+	themes/BBstylE/shade.xbm \
+	themes/BBstylE/shade_t.xbm \
+	themes/BBstylE/iconify.xbm \
+	themes/BBstylE/close.xbm
+
 
 ## data ##
 

@@ -798,17 +798,19 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
 {
     XrmDatabase db;
 
-    if ((db = XrmGetFileDatabase(name)))
-        theme->path = g_path_get_dirname(name);
+    char *s = g_build_filename(name, "themerc", NULL);
+    if ((db = XrmGetFileDatabase(s)))
+        theme->path = g_path_get_dirname(s);
+    g_free(s);
     if (db == NULL) {
 	char *s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-				   name, NULL);
+				   name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
 	g_free(s);
     }
     if (db == NULL) {
-	char *s = g_build_filename(THEMEDIR, name, NULL);
+	char *s = g_build_filename(THEMEDIR, name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);
@@ -894,25 +896,22 @@ static gboolean read_mask(const RrInstance *inst,
 {
     gboolean ret = FALSE;
     char *s;
-    char *data_dir;
     int hx, hy; /* ignored */
     unsigned int w, h;
     unsigned char *b;
 
-    data_dir = g_strdup_printf("%s_data", theme->name);
-
     s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-                         data_dir, maskname, NULL);
+                         theme->name, maskname, NULL);
     if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
         ret = TRUE;
     else {
         g_free(s);
-        s = g_build_filename(THEMEDIR, data_dir, maskname, NULL);
+        s = g_build_filename(THEMEDIR, theme->name, maskname, NULL);
         if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
             ret = TRUE;
         else {
             g_free(s);
-            s = g_build_filename(theme->path, data_dir, maskname, NULL);
+            s = g_build_filename(theme->path, maskname, NULL);
             if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
                 ret = TRUE;
         }
@@ -924,7 +923,6 @@ static gboolean read_mask(const RrInstance *inst,
     }
       
     g_free(s);
-    g_free(data_dir);
 
     return ret;
 }

@@ -1,0 +1,5 @@
+/* Created with The GIMP */
+#define stick_width 4
+#define stick_height 4
+static unsigned char stick_bits[] = {
+   0x0f, 0x0f, 0x0f, 0x0f };

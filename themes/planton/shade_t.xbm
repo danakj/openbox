@@ -1,0 +1,4 @@
+#define shade_t_width 4
+#define shade_t_height 4
+static unsigned char shade_t_bits[] = {
+   0x0f, 0x09, 0x0f, 0x00 };

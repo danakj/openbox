@@ -1,0 +1,5 @@
+/* Created with The GIMP */
+#define max_width 4
+#define max_height 4
+static unsigned char max_bits[] = {
+   0x0f, 0x0f, 0x09, 0x0f };

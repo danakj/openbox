@@ -1,0 +1,147 @@
+!! Theme information
+style.name: Cheetah3
+style.author: Me(rry)
+style.date: 
+style.credits: probably stole from some gnome metacity theme or something
+style.comments: made with stylebox
+
+!! Toolbar settings
+toolbar: flat solid bevel1
+toolbar.color: #e6e2de
+toolbar.justify: center
+
+toolbar.button: parentrelative
+toolbar.button.picColor: #ffffff
+toolbar.button.pressed: parentrelative
+toolbar.button.pressed.picColor: #ffffff
+
+toolbar.label: parentrelative
+toolbar.label.textColor: #000000
+
+toolbar.clock: parentrelative
+toolbar.clock.textColor: #000000
+
+toolbar.windowLabel: parentrelative
+toolbar.windowLabel.textColor: #000000
+
+!! Menu settings
+
+menu.title: flat gradient vertical bevel1
+menu.title.color: #5a6dc5
+menu.title.colorTo: #4a59a5
+menu.title.textColor: #fcfcfe
+menu.title.justify: center
+
+menu.frame: raised solid bevel1
+menu.frame.color: #e6e6e6
+menu.frame.colorTo: #000000
+menu.frame.textColor: #000000
+menu.frame.justify: left
+menu.frame.disableColor: #ececec
+
+menu.hilite: flat gradient vertical bevel1
+menu.hilite.color: #4a5194
+menu.hilite.colorTo: #5a71c5
+menu.hilite.textColor: #ffffff
+
+menu.bullet: triangle
+menu.bullet.position: right
+
+!! General window settings
+window.button.pressed: flat solid bevel1
+window.button.pressed.color: #000000
+window.button.pressed.colorTo: #000000
+window.justify: center
+
+!! focused window settings
+window.frame.focusColor: #000000
+
+window.title.focus: flat gradient vertical bevel1
+window.title.focus.color: #6375ce
+window.title.focus.colorTo: #4a5194
+
+window.handle.focus:  flat gradient vertical bevel1
+window.handle.focus.color: #6375ce
+window.handle.focus.colorTo: #4a5194
+
+window.grip.focus:  flat gradient vertical bevel1
+window.grip.focus.color: #6375ce
+window.grip.focus.colorTo: #4a5194
+
+window.label.focus: parentrelative
+window.label.focus.color: #000000
+window.label.focus.colorTo: #000000
+window.label.focus.textColor: #ffffff
+
+window.button.focus: parentrelative
+window.button.focus.color: #000000
+window.button.focus.colorTo: #000000
+window.button.focus.picColor: #d6d7ef
+
+window.button.pressed.focus: sunken solid bevel1
+window.button.pressed.focus.color: #4c59a6
+window.button.pressed.focus.colorTo: #000000
+
+!! unfocused window settings
+window.frame.unfocusColor: #000000
+
+window.title.unfocus: flat gradient vertical bevel1
+window.title.unfocus.color: #e1e1e1
+window.title.unfocus.colorTo: #a5a2a5
+
+window.handle.unfocus:  flat gradient vertical bevel1
+window.handle.unfocus.color: #e6e6e6
+window.handle.unfocus.colorTo: #cdcac7
+
+window.grip.unfocus: flat gradient vertical bevel1
+window.grip.unfocus.color: #e6e6e6
+window.grip.unfocus.colorTo: #cdcac7
+
+window.label.unfocus: parentrelative
+window.label.unfocus.textColor: #ffffff
+
+window.button.unfocus: parentrelative
+window.button.unfocus.picColor: #ffffff
+
+window.button.pressed.unfocus: sunken solidbevel1
+window.button.pressed.unfocus.color: #cdcac7
+window.button.pressed.unfocus.colorTo: #000000
+
+!##stupid shit
+window.button.disabled.focus: flat
+window.button.disabled.focus.color: #990000
+window.button.disabled.focus.colorTo: #990000
+window.button.disabled.focus.picColor: #ffffff
+#window.button.disabled.focus.borderColor: #83aede
+#
+window.button.disabled.unfocus: flat
+window.button.disabled.unfocus.color: #d5dad5
+window.button.disabled.unfocus.colorTo: #b4b6b4
+window.button.disabled.unfocus.picColor:  #7b7d7b
+#window.button.disabled.unfocus.borderColor: #7b7d7b
+
+
+!! Global width settings
+borderWidth: 1
+bevelWidth: 1
+handleWidth: 3
+frameWidth: 0
+
+
+!! Miscellaneous settings
+borderColor: #222222
+rootCommand: Esetroot /win/lin/backgrounds/GNO-LEAF.png
+
+window.title.layout:	NILMC
+!! font me!
+window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=90
+menu.frame.xftfont: National First Font:pixelsize=15
+menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
+
+!! Bitmap button masks
+#window.button.max.mask:  	max.xbm
+#window.button.icon.mask: 	icon.xbm
+#window.button.stick.mask:	stick.xbm
+#window.button.close.mask:	close.xbm
+#window.button.shade.mask:	shade.xbm
+

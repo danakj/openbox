@@ -1,0 +1,120 @@
+!total rip of ximian's industrial theme for metacity, by tigert, i believe.
+
+!! Menu settings
+
+menu.title: raised gradient vertical bevel1
+menu.title.color: #6295e6
+menu.title.colorTo: #41719c
+menu.title.textColor: #fcfcfe
+menu.title.justify: center
+
+menu.frame: raised solid bevel1
+menu.frame.color: #f6f6f6
+menu.frame.colorTo: #000000
+menu.frame.textColor: #000000
+menu.frame.justify: left
+menu.frame.disableColor: #ececec
+
+menu.hilite: flat solid bevel1
+menu.hilite.color: #3971ac
+menu.hilite.colorTo: #5a71c5
+menu.hilite.textColor: #ffffff
+
+!! General window settings
+window.button.pressed: flat solid bevel1
+window.button.pressed.color: #000000
+window.button.pressed.colorTo: #000000
+window.justify: left
+
+!! focused window settings
+window.frame.focusColor: #000000
+
+window.title.focus: Raised solid
+#window.title.focus.color: #afbd85
+#window.title.focus.colorTo: #5b7eac
+window.title.focus.color: #afbd85
+window.title.focus.colorTo: #316194
+
+window.handle.focus:  raised gradient vertical bevel 2
+window.handle.focus.color: #6295e6
+window.handle.focus.colorTo: #316194
+
+window.grip.focus:  parentrelative
+window.grip.focus.color: #5189e5
+window.grip.focus.colorTo: #316194
+
+window.label.focus: parentrelative
+window.label.focus.color: #000000
+window.label.focus.colorTo: #000000
+window.label.focus.textColor: #ffffff
+
+window.button.focus: flat border
+window.button.focus.color: #7d8f56
+#window.button.focus.colorTo: #7399cd
+window.button.focus.picColor: #ffffff
+window.button.focus.borderColor: #ffffff
+
+window.button.pressed.focus: flat border solid
+window.button.pressed.focus.color: #314464
+window.button.pressed.focus.colorTo: #000000
+window.button.pressed.focus.borderColor: #83aede
+
+!! unfocused window settings
+window.frame.unfocusColor: #000000
+
+window.title.unfocus: raised gradient vertical bevel1
+window.title.unfocus.color: #e1e1e1
+window.title.unfocus.colorTo: #a5a2a5
+
+window.handle.unfocus:  raised gradient vertical bevel1
+window.handle.unfocus.color: #e6e6e6
+window.handle.unfocus.colorTo: #cdcac7
+
+window.grip.unfocus: raised gradient vertical bevel1
+window.grip.unfocus.color: #e6e6e6
+window.grip.unfocus.colorTo: #cdcac7
+
+window.label.unfocus: parentrelative
+#window.label.unfocus.textColor: #ffffff
+window.label.unfocus.textColor: #7b7d7b
+
+window.button.unfocus: flat border gradient vertical
+window.button.unfocus.color: #d5dad5
+window.button.unfocus.colorTo: #b4b6b4
+window.button.unfocus.picColor:  #7b7d7b
+window.button.unfocus.borderColor: #7b7d7b
+
+window.button.pressed.unfocus: flat border solid
+window.button.pressed.unfocus.color: #c5c2c5
+window.button.pressed.unfocus.colorTo: #000000
+window.button.pressed.unfocus.borderColor: #7b7d7b
+
+!##stupid shit
+window.button.disabled.focus: flat border
+window.button.disabled.focus.color: #990000
+window.button.disabled.focus.colorTo: #990000
+window.button.disabled.focus.picColor: #ffffff
+window.button.disabled.focus.borderColor: #83aede
+#
+window.button.disabled.unfocus: flat border gradient vertical
+window.button.disabled.unfocus.color: #d5dad5
+window.button.disabled.unfocus.colorTo: #b4b6b4
+window.button.disabled.unfocus.picColor:  #7b7d7b
+window.button.disabled.unfocus.borderColor: #7b7d7b
+
+!! Global width settings
+borderWidth: 1
+bevelWidth: 1
+handleWidth: 4
+frameWidth: 0
+#borderColor: #091d2e
+borderColor: #091d2e
+
+window.title.layout:	NLIMC
+
+!! font me!
+#window.title.xftfont: Borzoi:pixelsize=11
+window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
+menu.frame.xftfont: National First Font:pixelsize=15
+#menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
+menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10

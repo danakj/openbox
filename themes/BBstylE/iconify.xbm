@@ -1,0 +1,5 @@
+/* Created with The GIMP */
+#define icon_width 4
+#define icon_height 4
+static unsigned char icon_bits[] = {
+   0x00, 0x0f, 0x09, 0x0f };

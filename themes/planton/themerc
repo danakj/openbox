@@ -1,0 +1,136 @@
+
+!! Menu settings
+
+menu.title: raised gradient vertical
+menu.title.color: #9cb6d5
+menu.title.colorTo: #39658b
+menu.title.borderColor: #000000
+menu.title.textColor: #ffffff
+menu.title.justify: center
+menu.title.font: -b&h-lucida-medium-r-normal-sans-10-100-75-75-p-58-iso8859-1
+menu.title.xft.font: Microsoft Sans Serif
+menu.title.xft.size: 6
+menu.title.xft.flags: normal
+menu.title.xft.shadow.offset: 1
+menu.title.xft.shadow.tint: 25
+
+menu.frame: raised solid bevel1
+menu.frame.color: #f6f6f6
+menu.frame.textColor: #000000
+menu.frame.justify: left
+menu.frame.disableColor: #ffffff
+
+menu.hilite: flat solid bevel1
+menu.hilite.color: #3971ac
+menu.hilite.colorTo: #5a71c5
+menu.hilite.textColor: #ffffff
+
+!! General window settings
+window.button.pressed: flat solid bevel1
+window.button.pressed.color: #000000
+window.button.pressed.colorTo: #000000
+window.button.pressed.borderColor: #000000
+window.justify: center
+
+!! focused window settings
+window.frame.focusColor: #bec1d6
+
+window.title.focus: raised gradient vertical
+window.title.focus.color: #9cb6d5
+window.title.focus.colorTo: #39658b
+window.title.focus.borderColor: #000000
+
+window.handle.focus: raised gradient vertical
+window.handle.focus.color: #e6e2de
+window.handle.focus.colorTo: #737573
+window.handle.focus.borderColor: #000000
+
+window.grip.focus:  raised gradient vertical
+window.grip.focus.color: #9cb6d5
+window.grip.focus.colorTo: #39658b
+window.grip.focus.borderColor: #000000
+
+window.label.focus: parentrelative
+window.label.focus.color: #bbbbcc
+window.label.focus.colorTo: #ccccdd
+window.label.focus.borderColor: #000000
+window.label.focus.textColor: #ffffff
+
+window.button.focus: parentrelative
+window.button.focus.color: #bbbbcc
+window.button.focus.colorTo: #ccccdd
+window.button.focus.borderColor: #7a8093
+window.button.focus.picColor: #ffffff
+
+window.button.pressed.focus: sunken solid
+window.button.pressed.focus.color: #9cb6d5
+window.button.pressed.focus.colorTo: #39658b
+window.button.pressed.focus.borderColor: #000000
+
+!! unfocused window settings
+window.frame.unfocusColor: #666462
+
+window.title.unfocus: raised gradient vertical
+window.title.unfocus.color: #dedede
+window.title.unfocus.colorTo: #c9c9c9
+window.title.unfocus.borderColor: #222222
+
+window.handle.unfocus: raised 
+window.handle.unfocus.color: #e6e2de
+window.handle.unfocus.colorTo: #737573
+window.handle.unfocus.borderColor: #000000
+
+window.grip.unfocus: raised 
+window.grip.unfocus.color: #e6e2de
+window.grip.unfocus.colorTo: #737573
+window.grip.unfocus.borderColor: #000000
+
+window.label.unfocus: parentrelative
+window.label.unfocus.color: #000000
+window.label.unfocus.colorTo: #000000
+window.label.unfocus.borderColor: #000000
+window.label.unfocus.textColor: #222222
+
+window.button.unfocus: parentrelative
+window.button.unfocus.color: #000000
+window.button.unfocus.colorTo: #000000
+window.button.unfocus.borderColor: #000000
+window.button.unfocus.picColor: #222222
+
+window.button.pressed.unfocus: flat gradient vertical bevel1
+window.button.pressed.unfocus.color: #e6e2de
+window.button.pressed.unfocus.colorTo: #737573
+window.button.pressed.unfocus.borderColor: #000000
+
+!##stupid shit
+window.button.disabled.focus: flat border
+window.button.disabled.focus.color: #990000
+window.button.disabled.focus.colorTo: #990000
+window.button.disabled.focus.picColor: #ffffff
+window.button.disabled.focus.borderColor: #83aede
+#
+window.button.disabled.unfocus: flat border gradient vertical
+window.button.disabled.unfocus.color: #d5dad5
+window.button.disabled.unfocus.colorTo: #b4b6b4
+window.button.disabled.unfocus.picColor:  #7b7d7b
+window.button.disabled.unfocus.borderColor: #7b7d7b
+
+
+!! Global width settings
+borderWidth: 1
+bevelWidth: 1
+handleWidth: 4
+frameWidth: 0
+borderColor: #24272f
+
+!! Miscellaneous settings
+#borderColor: #222222
+rootCommand: Esetroot /win/lin/backgrounds/leaf3.png
+
+window.title.layout:	ILMC
+!! font me!
+window.title.xftfont: Borzoi:pixelsize=10
+menu.frame.xftfont: National First Font:pixelsize=15
+menu.title.xftfont: Borzoi:pixelsize=10
+
+

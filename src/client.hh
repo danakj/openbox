@@ -7,7 +7,7 @@
   property changes on the window and some client messages
 */
 
-#include "widget.hh"
+#include "widgetbase.hh"
 #include "otk/point.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"

@@ -5,7 +5,7 @@
 #endif
 
 #include "actions.hh"
-#include "widget.hh"
+#include "widgetbase.hh"
 #include "openbox.hh"
 #include "client.hh"
 #include "screen.hh"

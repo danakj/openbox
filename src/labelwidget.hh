@@ -2,10 +2,10 @@
 #ifndef   __oblabelwidget_hh
 #define   __oblabelwidget_hh
 
+#include "widgetbase.hh"
 #include "otk/widget.hh"
 #include "otk/font.hh"
 #include "otk/style.hh"
-#include "widget.hh"
 
 namespace ob {
 

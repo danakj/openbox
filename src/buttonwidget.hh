@@ -2,8 +2,8 @@
 #ifndef   __obbuttonwidget_hh
 #define   __obbuttonwidget_hh
 
+#include "widgetbase.hh"
 #include "otk/widget.hh"
-#include "widget.hh"
 
 namespace ob {
 

@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __obwidget_hh
-#define   __obwidget_hh
+#ifndef   __obwidgetbase_hh
+#define   __obwidgetbase_hh
 
 #include "python.hh"
 
@@ -8,7 +8,6 @@ namespace ob {
 
 class OBWidget {
 public:
-  // update the enum in openbox.i to match this one
   enum WidgetType {
     Type_Frame,
     Type_Titlebar,
@@ -69,4 +68,4 @@ public:
 
 }
 
-#endif // __obwidget_hh
+#endif // __obwidgetbase_hh

@@ -107,13 +107,10 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
-%import "../otk/eventdispatcher.hh"
-%import "../otk/eventhandler.hh"
-%import "widget.hh"
-%import "actions.hh"
+%include "../otk/otk.i"
 
-%include "../otk/point.hh"
-%include "../otk/rect.hh"
+%import "widgetbase.hh"
+%import "actions.hh"
 
 %include "openbox.hh"
 %include "screen.hh"

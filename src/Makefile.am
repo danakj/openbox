@@ -35,6 +35,6 @@ openbox.i: openbox.hh screen.hh client.hh python.hh
 	touch $@
 
 openbox_wrap.cc: openbox.i
-	swig $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
+	swig -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 
 # local dependencies

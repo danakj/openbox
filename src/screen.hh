@@ -11,7 +11,7 @@ extern "C" {
 }
 
 #include "client.hh"
-#include "widget.hh"
+#include "widgetbase.hh"
 #include "otk/image.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"

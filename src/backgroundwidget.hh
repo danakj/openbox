@@ -3,7 +3,7 @@
 #define   __obbackgroundwidget_hh
 
 #include "otk/widget.hh"
-#include "widget.hh"
+#include "widgetbase.hh"
 
 namespace ob {
 

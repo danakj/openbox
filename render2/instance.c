@@ -111,6 +111,7 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
 void RrInstanceFree(struct RrInstance *inst)
 {
     if (inst) {
+        g_hash_table_destroy(inst->surface_map);
         glXDestroyContext(inst->display, inst->glx_context);
         XFreeColormap(inst->display, inst->cmap);
         free(inst);

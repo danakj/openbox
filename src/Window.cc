@@ -347,10 +347,6 @@ BlackboxWindow::~BlackboxWindow(void) {
   if (flags.moving)
     endMove();
 
-  delete timer;
-
-  delete windowmenu;
-
   if (client.window_group) {
     BWindowGroup *group = blackbox->searchGroup(client.window_group);
     if (group) group->removeWindow(this);
@@ -380,6 +376,10 @@ BlackboxWindow::~BlackboxWindow(void) {
       (*it)->client.transient_for = (BlackboxWindow*) 0;
     }
   }
+
+  delete timer;
+
+  delete windowmenu;
 
   if (frame.title)
     destroyTitlebar();

@@ -174,8 +174,8 @@ openbox_openbox_SOURCES = \
 	openbox/session.h \
 	openbox/stacking.c \
 	openbox/stacking.h \
-	openbox/startup.c \
-	openbox/startup.h \
+	openbox/startupnotify.c \
+	openbox/startupnotify.h \
 	openbox/translate.c \
 	openbox/translate.h \
 	openbox/window.c \

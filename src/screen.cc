@@ -786,7 +786,8 @@ void Screen::propertyHandler(const XPropertyEvent &e)
 
   // compress changes to a single property into a single change
   XEvent ce;
-  while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
+  while (XCheckTypedWindowEvent(**otk::display, _info->rootWindow(),
+                                e.type, &ce)) {
     // XXX: it would be nice to compress ALL changes to a property, not just
     //      changes in a row without other props between.
     if (ce.xproperty.atom != e.atom) {
@@ -811,7 +812,6 @@ void Screen::clientMessageHandler(const XClientMessageEvent &e)
   } else if (e.message_type == otk::Property::atoms.net_number_of_desktops) {
     changeNumDesktops(e.data.l[0]);
   }
-  // XXX: so many client messages to handle here! ..or not.. they go to clients
 }
 
 

@@ -65,7 +65,7 @@ private:
   Window   _window;
 
   //! The id of the group the window belongs to
-  XID       _group;
+  Window   _group;
 
   // XXX: transient_for, transients
 
@@ -73,7 +73,7 @@ private:
   unsigned int _desktop;
 
   //! Normal window title
-  std::string  _title;
+  std::string  _title; // XXX: Have to keep track if this string is Utf8 or not
   //! Window title when iconifiged
   std::string  _icon_title;
 

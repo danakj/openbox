@@ -11,15 +11,18 @@ menu.items.color: #e6e6e6
 menu.items.colorTo: #000000
 menu.items.textColor: #000000
 menu.items.justify: left
-menu.disabled.textColor: #222222
+menu.disabled.textColor: #737573
 
 menu.selected: flat gradient vertical bevel1
 menu.selected.color: #4a5194
 menu.selected.colorTo: #5a71c5
 menu.selected.textColor: #ffffff
+menu.bullet.imageColor: #000000
+menu.bullet.selected.imageColor: #ffffff
+
+menuOverlap: 5
 
 window.label.justify: center
-
 
 window.title.focus: flat gradient vertical bevel1
 window.title.focus.color: #6375ce
@@ -88,15 +91,15 @@ window.button.toggled.focus.imageColor: #f1f1f1
 window.button.toggled.unfocus: parentrelative
 window.button.toggled.focus.imageColor: #f1f1f1
 
-window.frame.unfocusColor: #f7f7f7
-window.frame.focusColor: #f7f7f7
+window.frame.unfocusColor: #e6e6e6
+window.frame.focusColor: #e6e6e6
 
 !! Global width settings
 borderWidth: 1
 bevelWidth: 1
 handleWidth: 3
 frameWidth: 0
-menuOverlap: 5
+
 
 !! Miscellaneous settings
 borderColor: #222222
@@ -104,5 +107,5 @@ borderColor: #222222
 !! font me!
 window.label.focus.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
 window.label.unfocus.font:Bitstream Vera Sans:bold:pixelsize=9
-menu.items.font: National First Font:pixelsize=12
+menu.items.font: Bitstream Vera Sans:pixelsize=10
 menu.title.font: Bitstream Vera Sans:bold:pixelsize=10

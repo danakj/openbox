@@ -189,9 +189,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   blackbox->saveWindowSearch(frame.plate, this);
   blackbox->saveWindowSearch(client.window, this);
 
-  screen->addStrut(&client.strut);
-  updateStrut();
-  
   // determine if this is a transient window
   getTransientInfo();
 
@@ -260,6 +257,10 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
       place_window = False;
   }
 
+  // add the window's strut. note this is done *after* placing the window.
+  screen->addStrut(&client.strut);
+  updateStrut();
+  
   if (decorations & Decor_Titlebar)
     createTitlebar();
 

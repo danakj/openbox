@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Instellingen
+# Configurações
 $ #FocusModel
-# Toetsenbord focusmodel
+# Modelo de Foco
 $ #WindowPlacement
-# Plaatsing van vensters
+# Posicionamento das Janelas
 $ #ImageDithering
-# Kleurbenadering
+# Simulação de Cores em Imagens
 $ #OpaqueMove
-# Inhoud vensters zichtbaar tijdens slepen
+# Movimento Opaco de Janelas
 $ #FullMax
-# Volledig maximaliseren
+# Maximização Total
 $ #FocusNew
-# Geef nieuwe vensters direct focus
+# Foco em Novas Janelas
 $ #FocusLast
-# Focus laatste venster bij wisselen van werkblad
+# Foco na Ultima Janela Da Area de Trabalho
 $ #ClickToFocus
-# Geef focus na muisklik in venster
+# Foco na Janela Quando Clicada
 $ #SloppyFocus
-# Geef focus zodra muis in venster komt
+# Foco na Janela Quando Apontada
 $ #AutoRaise
-# Vensters automatisch naar voorgrond
+# Sobrepor Janela Quando Ativa
 $ #SmartRows
-# Optimale plaatsing (rijen)
+# Posicionamento em Fila
 $ #SmartCols
-# Optimale plaatsing (kolommen)
+# Posicionamento em Coluna
 $ #Cascade
-# Trapsgewijs
+# Posicionamento em Cascata
 $ #LeftRight
-# Van links naar rechts
+# Esquerda para Direita
 $ #RightLeft
-# Van rechts naar links
+# Direita para Esquerda
 $ #TopBottom
-# Van boven naar beneden
+# Cima para Baixo
 $ #BottomTop
-# Van beneden naar boven
+# Baixo para Cima

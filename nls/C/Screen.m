@@ -1,52 +1,52 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: er is een fout opgetreden bij het verbinden met de X server.\n  \
-er werkt al een andere window manager op display %s.\n
+# BScreen::BScreen: um erro occorreu enquanto chamando o servidor X.\n  \
+existe outro window menager rodando no display. %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: manager op scherm %d met visual 0x%lx, kleurdiepte %d\n
+# BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): kan lettertype '%s' niet laden\n
+# BScreen::LoadStyle(): impossivel carregar fonte '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): kan standaardlettertype niet laden\n
+# BScreen::LoadStyle(): impossivel carregar fonte padrão.\n
 $ #EmptyMenuFile
-# %s: leeg menu bestand\n
+# %s: arquivo de menu vazio\n
 $ #xterm
 # xterm
 $ #Restart
-# Herstarten
+# Reiniciar
 $ #Exit
-# Afsluiten
+# Sair
 $ #EXECError
-# BScreen::parseMenuFile: [exec] fout, geen label en/of commando aangegeven\n
+# BScreen::parseMenuFile: [exec] erro, não há indicação definida no menu e/ou comando definido\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [exit] erro, não há indicação definida no menu\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] fout, geen label en/of bestandsnaam aangegeven\n
+# BScreen::parseMenuFile: [style] erro, não há indicação de menu e/ou nome de arquivo difinido\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [config] erro, não há indicação definida no menu\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] fout, geen bestandsnaam aangegeven\n
+# BScreen::parseMenuFile: [include] erro, nome de arquivo não definido\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] fout, '%s' is geen leesbaar bestand\n
+# BScreen::parseMenuFile: [include] error, '%s' não é um arquivo regular\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [submenu] erro, não há indicação definida no menu\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [restart] erro, não há indicação definida no menu\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [reconfig] erro, não há indicação definida no menu\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, geen directory aangegeven\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, não há diretorio difinido\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, '%s' is geen directory\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' não é um diretorio\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, '%s' bestaat niet\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' não existe\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] fout, geen label aangegeven\n
+# BScreen::parseMenuFile: [workspaces] erro, não há indicação definida no menu\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# B: %4d x H: %4d
+# W: %4d x H: %4d
 

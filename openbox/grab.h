@@ -12,7 +12,7 @@ void grab_shutdown(gboolean reconfig);
 gboolean grab_keyboard(gboolean grab);
 gboolean grab_pointer(gboolean grab, ObCursor cur);
 gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win);
-void grab_server(gboolean grab);
+gint grab_server(gboolean grab);
 
 void grab_button(guint button, guint state, Window win, guint mask);
 void grab_button_full(guint button, guint state, Window win, guint mask,

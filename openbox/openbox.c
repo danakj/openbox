@@ -18,6 +18,7 @@
 #include "themerc.h"
 #include "timer.h"
 #include "../render/render.h"
+#include "../render/font.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>

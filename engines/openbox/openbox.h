@@ -3,8 +3,8 @@
 
 #include "../../render/render.h"
 #include "../../render/color.h"
+#include "../../render/font.h"
 
-extern int s_font_height;
 extern int s_bevel;
 extern int s_handle_height;
 extern int s_bwidth;
@@ -13,6 +13,13 @@ extern int s_cbwidth;
 extern color_rgb *s_b_color;
 extern color_rgb *s_cb_focused_color;
 extern color_rgb *s_cb_unfocused_color;
+extern color_rgb *s_title_focused_color;
+extern color_rgb *s_title_unfocused_color;
+
+extern int s_winfont_height;
+extern int s_winfont_shadow;
+extern int s_winfont_shadow_offset;
+extern ObFont *s_winfont;
 
 extern Appearance *a_focused_unpressed_max;
 extern Appearance *a_focused_pressed_max;

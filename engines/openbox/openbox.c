@@ -6,12 +6,13 @@
 #include "../../kernel/frame.h"
 #include "../../render/render.h"
 #include "../../render/color.h"
+#include "../../render/font.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define TITLE_HEIGHT    (s_font_height + s_bevel * 2)
-#define LABEL_HEIGHT    (s_font_height)
+#define TITLE_HEIGHT    (s_winfont_height + s_bevel * 2)
+#define LABEL_HEIGHT    (s_winfont_height)
 #define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
 		         f->cbwidth)
 #define BUTTON_SIZE     (LABEL_HEIGHT - 2)
@@ -22,7 +23,6 @@
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
 
 /* style settings - geometry */
-int s_font_height;
 int s_bevel;
 int s_handle_height;
 int s_bwidth;
@@ -31,6 +31,13 @@ int s_cbwidth;
 color_rgb *s_b_color;
 color_rgb *s_cb_focused_color;
 color_rgb *s_cb_unfocused_color;
+color_rgb *s_title_focused_color;
+color_rgb *s_title_unfocused_color;
+/* style settings - fonts */
+int s_winfont_height;
+int s_winfont_shadow;
+int s_winfont_shadow_offset;
+ObFont *s_winfont;
 
 /* global appearances */
 Appearance *a_focused_unpressed_max;
@@ -128,6 +135,7 @@ gboolean startup()
     g_quark_from_string("close");
 
     s_b_color = s_cb_unfocused_color = s_cb_focused_color = NULL;
+    s_winfont = NULL;
 
     a_focused_unpressed_max = appearance_new(Surface_Planar, 0);//1);
     a_focused_pressed_max = appearance_new(Surface_Planar, 0);//1);
@@ -149,11 +157,23 @@ gboolean startup()
     a_unfocused_grip = appearance_new(Surface_Planar, 0);
     a_focused_title = appearance_new(Surface_Planar, 0);
     a_unfocused_title = appearance_new(Surface_Planar, 0);
-    a_focused_label = appearance_new(Surface_Planar, 0);//1);
-    a_unfocused_label = appearance_new(Surface_Planar, 0);//1);
+    a_focused_label = appearance_new(Surface_Planar, 1);
+    a_unfocused_label = appearance_new(Surface_Planar, 1);
     a_icon = appearance_new(Surface_Planar, 0);//1);
     a_focused_handle = appearance_new(Surface_Planar, 0);
     a_unfocused_handle = appearance_new(Surface_Planar, 0);
+
+    a_focused_label->texture[0].type = Text;
+    a_focused_label->texture[0].data.text.font = s_winfont;
+    a_focused_label->texture[0].data.text.shadow = s_winfont_shadow;
+    a_focused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
+    a_focused_label->texture[0].data.text.color = s_title_focused_color;
+
+    a_unfocused_label->texture[0].type = Text;
+    a_unfocused_label->texture[0].data.text.font = s_winfont;
+    a_unfocused_label->texture[0].data.text.shadow = s_winfont_shadow;
+    a_unfocused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
+    a_unfocused_label->texture[0].data.text.color = s_title_unfocused_color;
 
     return load();
 }
@@ -163,6 +183,8 @@ void shutdown()
     if (s_b_color != NULL) color_free(s_b_color);
     if (s_cb_unfocused_color != NULL) color_free(s_cb_unfocused_color);
     if (s_cb_focused_color != NULL) color_free(s_cb_focused_color);
+
+    if (s_winfont != NULL) font_close(s_winfont);
 
     appearance_free(a_focused_unpressed_max);
     appearance_free(a_focused_pressed_max);
@@ -602,7 +624,8 @@ static void layout_title(ObFrame *self)
     }
     if (self->label_width < 1) self->label_width = 1;
 
-    XResizeWindow(ob_display, self->label, self->label_width, s_font_height);
+    XResizeWindow(ob_display, self->label, self->label_width,
+                  s_winfont_height);
   
     if (!n) {
 	self->frame.client->decorations &= ~Decor_Icon;
@@ -726,7 +749,10 @@ static void render_label(ObFrame *self)
 {
     if (self->label_x < 0) return;
 
-    /* XXX set the texture's text! */
+    /* set the texture's text! */
+    self->a_focused_label->texture[0].data.text.string =
+        self->frame.client->title;
+
     paint(self->label, (self->frame.client->focused ?
 			self->a_focused_label :
 			self->a_unfocused_label),

@@ -250,8 +250,12 @@ gboolean load()
 	}
     }
 
-    /* XXX load the font, not from the theme file tho, its in themerc_font */
-    s_font_height = 10;
+    /* load the font, not from the theme file tho, its in themerc_font */
+    s_winfont_shadow = 1; /* XXX read from themrc */
+    s_winfont_shadow_offset = 2; /* XXX read from themerc */
+    s_winfont = font_open(themerc_font);
+    s_winfont_height = font_height(s_winfont, s_winfont_shadow,
+                                   s_winfont_shadow_offset);
 
     if (!read_int(db, "handleWidth", &s_handle_height) ||
 	s_handle_height < 0 || s_handle_height > 100) s_handle_height = 6;
@@ -268,6 +272,12 @@ gboolean load()
 	s_cb_focused_color = color_new(0xff, 0xff, 0xff);
     if (!read_color(db, "window.frame.unfocusColor", &s_cb_unfocused_color))
 	s_cb_unfocused_color = color_new(0xff, 0xff, 0xff);
+    if (!read_color(db, "window.label.focus.textColor",
+                    &s_title_focused_color))
+	s_title_focused_color = color_new(0xff, 0xff, 0xff);
+    if (!read_color(db, "window.label.unfocus.textColor",
+                    &s_title_unfocused_color))
+	s_title_unfocused_color = color_new(0xff, 0xff, 0xff);
 
     if (!read_appearance(db, "window.title.focus", a_focused_title))
 	set_default_appearance(a_focused_title);
@@ -317,6 +327,7 @@ gboolean load()
     a_focused_pressed_iconify = appearance_copy(a_focused_pressed_max);
 
     a_icon->surface.data.planar.grad = Background_ParentRelative;
+
 
     /* XXX load the button masks */
 

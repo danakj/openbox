@@ -542,7 +542,6 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   // future (with the NETWM 'strut')
   Rect space(0, 0, screen.size().w(), screen.size().h());
 
-  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
 #ifdef    SLIT
   Slit *slit = screen.getSlit();
   int remove;   // 0 - top/2 - right/2 - bottom/3 - left
@@ -584,7 +583,6 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   }
 #endif
 
-  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
   Toolbar *toolbar = screen.getToolbar();
   int tbarh = screen.hideToolbar() ? 0 :
     toolbar->getExposedHeight() + screen.getBorderWidth() * 2;
@@ -604,7 +602,6 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   default:
     ASSERT(false);      // unhandled placement
   }
-  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
 
   const int win_w = win->size().w() + (screen.getBorderWidth() * 4),
     win_h = win->size().h() + (screen.getBorderWidth() * 4),

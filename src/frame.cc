@@ -446,7 +446,7 @@ void Frame::renderLabel()
     otk::pixel32 *dest = s->pixelData(), *src;
     int w = _title_sur->size().width();
   
-    src = _title_sur->pixelData() + w * (geom.bevel + 1) + geom.title_x;
+    src = _title_sur->pixelData() + w * geom.bevel + geom.title_x;
     
     // get the background under the label
     int xd = s->size().width();

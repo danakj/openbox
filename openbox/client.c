@@ -1664,7 +1664,9 @@ static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
 
-    if (self->fullscreen) l = OB_STACKING_LAYER_FULLSCREEN;
+    if (self->fullscreen &&
+        (client_focused(self) || client_search_focus_tree(self)))
+        l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
@@ -2613,8 +2615,8 @@ void client_activate(ObClient *self, gboolean here)
         return;
     if (self->shaded)
         client_shade(self, FALSE);
-    client_focus(self);
-    stacking_raise(CLIENT_AS_WINDOW(self));
+    action_run_string("Focus", self);
+    action_run_string("Raise", self);
 }
 
 gboolean client_focused(ObClient *self)

@@ -50,14 +50,7 @@ public:
 
   virtual void keyPressHandler(const XKeyEvent &e);
 
-  //! Notify that a mouse drag is taking place.
-  /*!
-    @param win The window the drag is on
-    @param delta The change in position of the mouse pointer
-    @param modifiers The modifier state during the drag.
-  */
-  void drag(Window win, otk::Point delta, unsigned int modifiers,
-            unsigned int button, Time time);
+  virtual void motionHandler(const XMotionEvent &e);
 };
 
 }

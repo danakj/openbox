@@ -112,12 +112,11 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 }
 
 
-void OBActions::drag(Window win, otk::Point delta, unsigned int modifiers,
-                     unsigned int button, Time time)
+void OBActions::motionHandler(const XMotionEvent &e)
 {
-  (void)win;(void)delta;(void)modifiers;(void)button;(void)time;
-
-  // XXX: some guile shit...
+  // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
+  printf("GUILE: MOTION: win %lx modifiers %u x %d y %d\n",
+         (long)e.window, e.state, e.x, e.y);
 }
 
 

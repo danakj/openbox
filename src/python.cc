@@ -212,6 +212,7 @@ void python_init(char *argv0)
   init_otk();
   init_openbox();
   PyRun_SimpleString("from _otk import *; from _openbox import *;");
+  PyRun_SimpleString("openbox = Openbox_instance()");
 
   // set up access to the python global variables
   PyObject *obmodule = PyImport_AddModule("__main__");
@@ -302,5 +303,17 @@ bool python_get_string(const char *name, std::string *value)
   return true;
 }
 
+bool python_get_stringlist(const char *name, std::vector<std::string> *value)
+{
+  PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
+  if (!(val && PyList_Check(val))) return false;
+
+  for (int i = 0, end = PyList_Size(val); i < end; ++i) {
+    PyObject *str = PyList_GetItem(val, i);
+    if (PyString_Check(str))
+      value->push_back(PyString_AsString(str));
+  }
+  return true;
+}
 
 }

@@ -32,7 +32,7 @@ void python_callback(PyObject *func, Window window, unsigned int state,
 
 
 bool python_get_string(const char *name, std::string *value);
-bool python_getstringlist(const char *name, std::vector<std::string> *value);
+bool python_get_stringlist(const char *name, std::vector<std::string> *value);
 
 }
 

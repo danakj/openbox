@@ -133,6 +133,11 @@ Openbox::Openbox(int argc, char **argv)
   
   // load config values
   python_exec(SCRIPTDIR"/config.py"); // load openbox config values
+  // run all of the python scripts
+  python_exec(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+  python_exec(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
+  // run the user's script
+  python_exec(_scriptfilepath.c_str());
 
   // initialize all the screens
   OBScreen *screen;
@@ -147,12 +152,6 @@ Openbox::Openbox(int argc, char **argv)
     printf(_("No screens were found without a window manager. Exiting.\n"));
     ::exit(1);
   }
-
-  // run all of the python scripts, including the user's
-  python_exec(SCRIPTDIR"/globals.py"); // create/set global vars
-  python_exec(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
-  python_exec(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
-  python_exec(_scriptfilepath.c_str());
 
   ScreenList::iterator it, end = _screens.end();
   for (it = _screens.begin(); it != end; ++it) {

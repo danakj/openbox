@@ -786,7 +786,9 @@ static std::string SwigString_AsString(PyObject* o) {
     Action_EnterWindow,
     Action_LeaveWindow,
     Action_KeyPress,
-    Action_MouseMotion
+    Action_MouseMotion,
+    Action_NewWindow,
+    Action_CloseWindow
   };
   enum WidgetType {
     Type_Frame,
@@ -2918,6 +2920,8 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Action_LeaveWindow", (long) Action_LeaveWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_KeyPress", (long) Action_KeyPress, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_MouseMotion", (long) Action_MouseMotion, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Action_NewWindow", (long) Action_NewWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Action_CloseWindow", (long) Action_CloseWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_Frame", (long) Type_Frame, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_Titlebar", (long) Type_Titlebar, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Type_Handle", (long) Type_Handle, 0, 0, 0},

@@ -328,7 +328,8 @@ gboolean obtheme_load()
     }
 
     if (!read_int(db, "handleWidth", &ob_s_handle_height) ||
-	ob_s_handle_height < 0 || ob_s_handle_height > 100) ob_s_handle_height = 6;
+	ob_s_handle_height < 0 || ob_s_handle_height > 100)
+        ob_s_handle_height = 6;
     if (!read_int(db, "bevelWidth", &ob_s_bevel) ||
 	ob_s_bevel <= 0 || ob_s_bevel > 100) ob_s_bevel = 3;
     if (!read_int(db, "borderWidth", &ob_s_bwidth) ||

@@ -402,15 +402,15 @@ void BScreen::saveFocusLast(bool f) {
 
 void BScreen::saveAAFonts(bool f) {
   resource.aa_fonts = f;
-  reconfigure();
   config->setValue(screenstr + "antialiasFonts", resource.aa_fonts);
+  reconfigure();
 }
 
 
 void BScreen::saveShadowFonts(bool f) {
   resource.shadow_fonts = f;
-  reconfigure();
   config->setValue(screenstr + "dropShadowFonts", resource.shadow_fonts);
+  reconfigure();
 }
 
 
@@ -682,11 +682,12 @@ void BScreen::load_rc(void) {
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
 
-  if (! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
-    resource.shadow_fonts = false;
-
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;
+
+  if (! resource.aa_fonts ||
+      ! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
+    resource.shadow_fonts = false;
 
   if (! config->getValue(screenstr + "resizeZones", resource.resize_zones) ||
       (resource.resize_zones != 1 && resource.resize_zones != 2 &&
@@ -1676,6 +1677,9 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #ifdef    XINERAMA
   ++bbwins;
 #endif // XINERAMA
+#ifdef    XFT
+  ++bbwins;
+#endif // XFT
 
   Window *session_stack = new
     Window[(num + workspacesList.size() + rootmenuList.size() +
@@ -1699,6 +1703,9 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #ifdef    XINERAMA
   *(session_stack + i++) = configmenu->getXineramamenu()->getWindowID();
 #endif // XINERAMA
+#ifdef    XFT
+  *(session_stack + i++) = configmenu->getXftmenu()->getWindowID();
+#endif // XFT
   *(session_stack + i++) = configmenu->getWindowID();
 
   *(session_stack + i++) = slit->getMenu()->getDirectionmenu()->getWindowID();

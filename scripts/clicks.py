@@ -33,7 +33,8 @@ def def_click_root(action, win, type, modifiers, button, time):
 	if type == Type_Root:
 		if button == Button1:
 			print "nothing probly.."
-			OBClient_unfocus(Openbox_focusedClient(openbox))
+			client = Openbox_focusedClient(openbox)
+			if client: OBClient_unfocus(client)
 		elif button == Button2:
 			print "workspace menu"
 		elif button == Button3:

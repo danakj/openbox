@@ -64,6 +64,7 @@ typedef struct Frame {
     Client *client;
 
     Window window;
+    Window shapewindow;
 
     Strut  size;
     Rect   area;

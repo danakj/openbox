@@ -42,12 +42,12 @@ Frame *frame_new()
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
-
-    self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR,
+/* never map shapewindow */
+    self->shapewindow = createWindow(ob_root, mask, &attrib);
+    self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_NONE,
                                  self->window, 0);
     RrColorSet(&pri, 1, 0, 0, 0);
     RrColorSet(&sec, 1, 0, 1, 0);
-    RrPlanarSet(self->surface, RR_PLANAR_VERTICAL, &pri, &sec);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -146,6 +146,7 @@ static void frame_free(Frame *self)
     RrSurfaceFree(self->surface);
     XDestroyWindow(ob_display, self->plate);
     XDestroyWindow(ob_display, self->window);
+    XDestroyWindow(ob_display, self->shapewindow);
     g_free(self->framedecor);
     g_free(self);
 }
@@ -174,8 +175,11 @@ void frame_adjust_shape(Frame *self)
     int i;
     FrameDecor *dec;
 
-    /* make the frame's shape match the clients */
-    XShapeCombineShape(ob_display, self->window, ShapeBounding,
+    /* make the pixmap's shape match the clients */
+printf("resize shape window to %x, %x\n", self->area.width, self->area.height);
+    XResizeWindow(ob_display, self->shapewindow, self->area.width,
+                      self->area.height);
+    XShapeCombineShape(ob_display, self->shapewindow, ShapeBounding,
                        self->size.left,
                        self->size.top,
                        self->client->window,
@@ -183,12 +187,18 @@ void frame_adjust_shape(Frame *self)
     for (i = 0; i < self->framedecors; i++) {
         dec = &self->framedecor[i];
         if (dec->type & self->client->decorations)
-            XShapeCombineShape(ob_display, self->window, ShapeBounding,
+            XShapeCombineShape(ob_display, self->shapewindow, ShapeBounding,
                               dec->xoff,
                               dec->yoff,
                               dec->window,
                               ShapeBounding, ShapeUnion);
     }
+
+    XShapeCombineShape(ob_display, self->window, ShapeBounding,
+                       0,
+                       0,
+                       self->shapewindow,
+                       ShapeBounding, ShapeSet);
 
 #endif
 }

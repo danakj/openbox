@@ -656,7 +656,8 @@ void OBScreen::changeDesktop(long desktop)
   }
 
   // force the callbacks to fire
-  Openbox::instance->setFocusedClient(0);
+  if (!Openbox::instance->focusedClient())
+    Openbox::instance->setFocusedClient(0);
 }
 
 void OBScreen::changeNumDesktops(long num)

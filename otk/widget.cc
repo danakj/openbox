@@ -324,7 +324,7 @@ void Widget::adjustHorz(void)
     if (prev_widget)
       x = prev_widget->_rect.x() + prev_widget->_rect.width() + _bevel_width;
     else
-      x = _rect.x() + _bevel_width;
+      x = _bevel_width;
     y = (tallest - tmp->_rect.height()) / 2 + _bevel_width;
 
     tmp->move(x, y);
@@ -381,7 +381,7 @@ void Widget::adjustVert(void)
     if (prev_widget)
       y = prev_widget->_rect.y() + prev_widget->_rect.height() + _bevel_width;
     else
-      y = _rect.y() + _bevel_width;
+      y = _bevel_width;
     x = (widest - tmp->_rect.width()) / 2 + _bevel_width;
 
     tmp->move(x, y);

@@ -27,6 +27,7 @@ gboolean grab_keyboard(gboolean grab)
     } else if (kgrabs > 0) {
         if (--kgrabs == 0)
             XUngrabKeyboard(ob_display, event_lasttime);
+        ret = TRUE;
     }
     return ret;
 }
@@ -46,6 +47,7 @@ gboolean grab_pointer(gboolean grab, Cursor cur)
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, event_lasttime);
+        ret = TRUE;
     }
     return ret;
 }
@@ -65,6 +67,7 @@ gboolean grab_pointer_window(gboolean grab, Cursor cur, Window win)
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, event_lasttime);
+        ret = TRUE;
     }
     return ret;
 }

@@ -32,3 +32,8 @@ truerendercontrol.lo
 util.lo
 widget.lo
 ustring.lo
+surface.lo
+rendertexture.lo
+rendertest
+renderstyle.lo
+rendercontrol.lo

@@ -102,7 +102,7 @@ def _focused(data):
         else: # if we are cycling, then update our pointer
             _cyc_w = data.client.window()
             _hilite_popup_list(data)
-    elif fallback: 
+    elif fallback:
         # pass around focus
         desktop = ob.openbox.screen(_cyc_screen).desktop()
         for w in _clients:
@@ -158,7 +158,7 @@ def _focus_stacked_ungrab(data):
             client = ob.openbox.findClient(_cyc_w)
             if client:
                 data.client = client
-                _focused(data) # resort the list as appropriate
+                #_focused(data) # resort the list as appropriate
                 if cycle_raise:
                     ob.openbox.screen(data.screen).raiseWindow(client)
 

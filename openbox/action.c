@@ -432,6 +432,21 @@ ActionString actionstrings[] =
         setup_action_resize_keyboard
     },
     {
+        "toggleshowdesktop",
+        action_toggle_show_desktop,
+        NULL
+    },
+    {
+        "showdesktop",
+        action_show_desktop,
+        NULL
+    },
+    {
+        "unshowdesktop",
+        action_unshow_desktop,
+        NULL
+    },
+    {
         "restart",
         action_restart,
         NULL
@@ -1143,4 +1158,19 @@ void action_toggle_layer(union ActionData *data)
         else if (data->layer.layer > 0)
             client_set_layer(c, c->above ? 0 : 1);
     }
+}
+
+void action_toggle_show_desktop(union ActionData *data)
+{
+    screen_show_desktop(!screen_showing_desktop);
+}
+
+void action_show_desktop(union ActionData *data)
+{
+    screen_show_desktop(TRUE);
+}
+
+void action_unshow_desktop(union ActionData *data)
+{
+    screen_show_desktop(FALSE);
 }

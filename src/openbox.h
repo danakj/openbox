@@ -122,7 +122,6 @@ protected:
   void load_rc(void);
   void save_rc(void);
   void reload_rc(void);
-  void symlink_rc(const char *) const;
   void real_rereadMenu(void);
   void real_reconfigure(void);
 

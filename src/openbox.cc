@@ -175,7 +175,6 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   } else {
     rc_file = bstrdup(rc);
   }
-  symlink_rc(rc_file);
   config.setFile(rc_file);
 
   no_focus = False;
@@ -1641,16 +1640,4 @@ void Openbox::setFocusedWindow(OpenboxWindow *win) {
     old_tbar->redrawWindowLabel(True);
   if (old_screen && old_screen != screen)
     old_screen->updateNetizenWindowFocus();
-}
-
-#warning TODO: wrap in appropriate #ifdefs.
-
-void Openbox::symlink_rc(const char*rcfile)const{
-  char *homedir = getenv("HOME");
-  
-  char *link_file = new char[strlen(homedir) + strlen("/.blackoxrc") + 1];
-  sprintf(link_file, "%s/.blackboxrc", homedir);
-  if(symlink(rcfile, link_file) == -1){
-    perror("Cannot create symlink");
-  }
 }

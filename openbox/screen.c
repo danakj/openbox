@@ -418,6 +418,7 @@ void screen_set_desktop(guint num)
 {
     GList *it;
     guint old;
+    ObClient *target;
      
     g_assert(num < screen_num_desktops);
 
@@ -438,16 +439,16 @@ void screen_set_desktop(guint num)
     /* show windows before hiding the rest to lessen the enter/leave events */
 
     /* show windows from top to bottom */
-    for (it = stacking_list; it != NULL; it = it->next) {
+    for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (!c->frame->visible && client_should_show(c))
+            if (client_should_show(c))
                 frame_show(c->frame);
         }
     }
 
     /* hide windows from bottom to top */
-    for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+    for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             if (c->frame->visible && !client_should_show(c))
@@ -457,13 +458,18 @@ void screen_set_desktop(guint num)
 
     event_ignore_queued_enters();
 
-    /*!
-      When this focus_client check is not used, you can end up with races, as
-      demonstrated with gnome-panel, sometmies the window you click on on
-      another desktop ends up losing focus cuz of the fallback.
-    */
-    if (!focus_client)
-        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+    target = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS);
+    if (target) {
+        frame_adjust_focus(target->frame, TRUE);
+
+        /*!
+          When this focus_client check is not used, you can end up with races,
+          as demonstrated with gnome-panel, sometmies the window you click on
+          another desktop ends up losing focus cuz of the focus change here.
+        */
+        if (!focus_client)
+            client_focus(target);
+    }
 }
 
 static void get_row_col(guint d, guint *r, guint *c)

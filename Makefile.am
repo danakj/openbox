@@ -313,6 +313,7 @@ dist_noinst_DATA = \
 EXTRA_DIST = \
 	config.rpath \
 	mkinstalldirs \
+	CHANGELOG \
 	README \
 	COPYING \
 	AUTHORS

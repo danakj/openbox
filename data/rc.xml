@@ -304,6 +304,9 @@
     <mousebind button="A-Down" action="click">
       <action name="DesktopPrevious"/>
     </mousebind>
+    <mousebind button="Left" action="press">
+      <action name="focus"/>
+    </mousebind> 
     <mousebind button="Middle" action="press">
       <action name="ShowMenu"><menu>client-list-menu</menu></action>
     </mousebind> 

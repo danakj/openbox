@@ -1,4 +1,6 @@
+#ifdef USE_GL
 #include <GL/gl.h>
+#endif /* USE_GL */
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"

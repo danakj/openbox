@@ -154,8 +154,10 @@ kernel_openbox_SOURCES = \
 	kernel/menu.c \
 	kernel/menu.h \
 	kernel/menu_render.c \
+	kernel/misc.h \
 	kernel/moveresize.c \
 	kernel/moveresize.h \
+	kernel/mwm.h \
 	kernel/openbox.c \
 	kernel/openbox.h \
 	kernel/plugin.c \

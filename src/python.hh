@@ -46,6 +46,7 @@ struct MouseContext {
 struct MouseAction {
   enum MA {
     Press,
+    Release,
     Click,
     DoubleClick,
     Motion

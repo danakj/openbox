@@ -117,6 +117,20 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
     (openbox->findHandler(e.window));
   if (!w) return;
 
+  // run the RELEASE python hook
+  // kill off the Button1Mask etc, only want the modifiers
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+  int screen;
+  Client *c = openbox->findClient(e.window);
+  if (c)
+    screen = c->screen();
+  else
+    screen = otk::display->findScreen(e.root)->screen();
+  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
+                 MouseAction::Release);
+  openbox->bindings()->fireButton(&data);
+
   // not for the button we're watching?
   if (_button != e.button) return;
 
@@ -133,17 +147,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // run the CLICK python hook
-  // kill off the Button1Mask etc, only want the modifiers
-  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
-                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  int screen;
-  Client *c = openbox->findClient(e.window);
-  if (c)
-    screen = c->screen();
-  else
-    screen = otk::display->findScreen(e.root)->screen();
-  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
-                 MouseAction::Click);
+  data.action = MouseAction::Click;
   openbox->bindings()->fireButton(&data);
     
 

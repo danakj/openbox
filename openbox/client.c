@@ -1632,9 +1632,7 @@ void client_set_desktop(Client *self, guint target)
   
     g_message("Setting desktop %u\n", target);
 
-    if (!(target < screen_num_desktops ||
-	  target == DESKTOP_ALL))
-	return;
+    g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
     old = self->desktop;
     self->desktop = target;

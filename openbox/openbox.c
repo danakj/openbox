@@ -141,6 +141,7 @@ int main(int argc, char **argv)
 
         /* XXX load all plugins!! */
         plugin_open("focus");
+        plugin_open("keyboard");
 
 	/* get all the existing windows */
 	client_manage_all();

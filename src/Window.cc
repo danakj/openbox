@@ -2594,7 +2594,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
           mx = be->x_root - windowmenu->getWidth() / 2;
           if (be->window == frame.title || be->window == frame.label) {
             my = frame.y + frame.title_h;
-          } else if (be->window = frame.handle) {
+          } else if (be->window == frame.handle) {
             my = frame.y + frame.y_handle - windowmenu->getHeight();
           } else { // (be->window == frame.window)
             if (be->y <= (signed) frame.bevel_w) {
@@ -2688,9 +2688,10 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
           (re->x >= 0) && ((unsigned) re->x <= frame.button_w) &&
           (re->y >= 0) && ((unsigned) re->y <= frame.button_h)) {
           close();
-      } else {
-        redrawCloseButton(False);
       }
+      //we should always redraw the close button. some applications
+      //eg. acroread don't honour the close.
+      redrawCloseButton(False);
     }
   // middle button released
   } else if (re->button == 2) {
@@ -3064,21 +3065,25 @@ void OpenboxWindow::changeOpenboxHints(OpenboxHints *net) {
 
     default:
     case DecorNormal:
-      decorations.titlebar = decorations.border = decorations.handle =
-       decorations.iconify = decorations.maximize = decorations.menu = True;
+      decorations.titlebar = decorations.iconify = decorations.menu =
+        decorations.border = True;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
 
     case DecorTiny:
       decorations.titlebar = decorations.iconify = decorations.menu = True;
-      decorations.border = decorations.handle = decorations.maximize = False;
- 
+      decorations.border = decorations.border = decorations.handle = False;
+      decorations.maximize = functions.maximize;
+
       break;
 
     case DecorTool:
-      decorations.titlebar = decorations.menu = functions.move = True;
-      decorations.iconify = decorations.border = decorations.handle =
-	decorations.maximize = False;
+      decorations.titlebar = decorations.menu = True;
+      decorations.iconify = decorations.border = False;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
     }

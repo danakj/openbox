@@ -1,6 +1,19 @@
 Changelog for Openbox:
 
+0.99.2:
+ * improved logic for decorating windows when the
+   decoration level is changed                          (Ben Jansens)
+
+ * fix positioning of the window menu                   (Ben Jansens)
+
+0.99.1:
+ * forced a redraw of the close button after pressing
+   it. Some applications (eg. acroread) ignore the
+   close request and you end up with a funky close
+   button.                                              (Scott Moynes)
+
 0.99.0:
+
  * renamed header files from *.hh to *.h.               (Ben Jansens)
 
  * fix clipping of the date/time in the toolbar with

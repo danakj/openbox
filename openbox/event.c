@@ -488,7 +488,7 @@ static void event_process(const XEvent *ec, gpointer data)
         if (menu_frame_visible)
             event_handle_menu(e);
         else {
-            if (!keyboard_process_interactive_grab(e)) {
+            if (!keyboard_process_interactive_grab(e, &client)) {
                 if (moveresize_in_progress)
                     moveresize_event(e);
 

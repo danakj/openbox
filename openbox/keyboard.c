@@ -157,7 +157,7 @@ void keyboard_interactive_grab(guint state, ObClient *client,
     interactive_states = g_slist_append(interactive_states, s);
 }
 
-gboolean keyboard_process_interactive_grab(const XEvent *e)
+gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 {
     GSList *it, *next;
     gboolean handled = FALSE;
@@ -192,7 +192,8 @@ gboolean keyboard_process_interactive_grab(const XEvent *e)
             }
 
             handled = TRUE;
-        }
+        } else
+            *client = s->client;
     }
 
     return handled;

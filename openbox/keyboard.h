@@ -22,7 +22,8 @@ void keyboard_reset_chains();
 
 void keyboard_interactive_grab(guint state, struct _ObClient *client,
                                struct _ObAction *action);
-gboolean keyboard_process_interactive_grab(const XEvent *e);
+gboolean keyboard_process_interactive_grab(const XEvent *e,
+                                           struct _ObClient **client);
 
 void keyboard_grab_for_client(struct _ObClient *c, gboolean grab);
 

@@ -204,6 +204,11 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            Mod1Mask | ControlMask | ShiftMask, 3));
   _actions.push_back(Action(Action::execute,
                            XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Escape")),
+                           Mod1Mask | ControlMask,
+                           "sleep 1 && xset dpms force off"));
+  _actions.push_back(Action(Action::execute,
+                           XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("space")),
                            Mod1Mask, "rxvt"));
   activateGrabs();

@@ -29,13 +29,14 @@ void menu_render(ObMenu *self) {
     }
     
     /* set texture data and size them mofos out */
-    if (self->label) {
+    if (self->label && !(self->parent && self->parent->shown)) {
 	self->a_title->texture[0].data.text.string = self->label;
 	RrMinsize(self->a_title, &self->title_min_w, &self->title_h);
 	self->title_min_w += ob_rr_theme->bevel * 2;
 	self->title_h += ob_rr_theme->bevel * 2;
 	self->size.width = MAX(self->size.width, self->title_min_w);
-    }
+    } else
+        self->title_h = -ob_rr_theme->bwidth;
 
     for (it = self->entries; it; it = it->next) {
         ObMenuEntry *e = it->data;
@@ -72,16 +73,19 @@ void menu_render(ObMenu *self) {
 
     self->size.height = MAX(self->title_h + items_h + ob_rr_theme->bwidth, 1);
     XResizeWindow(ob_display, self->frame, self->size.width,self->size.height);
-    if (self->label)
+    if (self->label && !(self->parent && self->parent->shown)) {
 	XMoveResizeWindow(ob_display, self->title, -ob_rr_theme->bwidth,
 			  -ob_rr_theme->bwidth,
                           self->size.width, self->title_h);
+        XMapWindow(ob_display, self->title);
+    } else
+        XUnmapWindow(ob_display, self->title);
 
     XMoveResizeWindow(ob_display, self->items, 0, 
 		      self->title_h + ob_rr_theme->bwidth, self->size.width, 
 		      items_h);
 
-    if (self->label)
+    if (self->label && !(self->parent && self->parent->shown))
 	RrPaint(self->a_title, self->title, self->size.width, self->title_h);
     RrPaint(self->a_items, self->items, self->size.width, items_h);
 

@@ -6,14 +6,16 @@
 
 typedef struct {
     GModule *module;
-    char *name;
+    gchar *name;
+
+    gboolean started;
 
     PluginSetupConfig config;
     PluginStartup startup;
     PluginShutdown shutdown;
 } Plugin;
 
-static gpointer load_sym(GModule *module, char *name, char *symbol,
+static gpointer load_sym(GModule *module, gchar *name, gchar *symbol,
 			 gboolean allow_fail)
 {
     gpointer var;
@@ -26,12 +28,13 @@ static gpointer load_sym(GModule *module, char *name, char *symbol,
     return var;
 }
 
-static Plugin *plugin_new(char *name)
+static Plugin *plugin_new(gchar *name)
 {
     Plugin *p;
-    char *path;
+    gchar *path;
    
     p = g_new(Plugin, 1);
+    p->started = FALSE;
 
     path = g_build_filename(g_get_home_dir(), ".openbox", "plugins", name,
                             NULL);
@@ -88,15 +91,12 @@ void plugin_shutdown()
     g_datalist_clear(&plugins);
 }
 
-gboolean plugin_open_full(char *name, gboolean reopen, ObParseInst *i)
+gboolean plugin_open(gchar *name, ObParseInst *i)
 {
     Plugin *p;
 
-    if (g_datalist_get_data(&plugins, name) != NULL) {
-	if (!reopen) 
-	    g_warning("plugin '%s' already loaded, can't load again", name);
+    if (g_datalist_get_data(&plugins, name) != NULL)
         return TRUE;
-    }
 
     p = plugin_new(name);
     if (p == NULL) {
@@ -109,22 +109,12 @@ gboolean plugin_open_full(char *name, gboolean reopen, ObParseInst *i)
     return TRUE;
 }
 
-gboolean plugin_open(char *name, ObParseInst *i) {
-    return plugin_open_full(name, FALSE, i);
-}
-
-gboolean plugin_open_reopen(char *name, ObParseInst *i) {
-    return plugin_open_full(name, TRUE, i);
-}
-
-void plugin_close(char *name)
-{
-    g_datalist_remove_data(&plugins, name);
-}
-
 static void foreach_start(GQuark key, Plugin *p, gpointer *foo)
 {
-    p->startup();
+    if (!p->started) {
+        p->startup();
+        p->started = TRUE;
+    }
 }
 
 void plugin_startall()
@@ -132,11 +122,25 @@ void plugin_startall()
     g_datalist_foreach(&plugins, (GDataForeachFunc)foreach_start, NULL);
 }
 
+void plugin_start(gchar *name)
+{
+    Plugin *p;
+
+    if (!(p = g_datalist_get_data(&plugins, name))) {
+        g_warning("Tried to start plugin '%s' but it is not loaded", name);
+        return;
+    }
+    if (!p->started) {
+        p->startup();
+        p->started = TRUE;
+    }
+}
+
 void plugin_loadall(ObParseInst *i)
 {
     GIOChannel *io;
     GError *err;
-    char *path, *name;
+    gchar *path, *name;
 
     path = g_build_filename(g_get_home_dir(), ".openbox", "pluginrc", NULL);
     err = NULL;
@@ -153,10 +157,6 @@ void plugin_loadall(ObParseInst *i)
     if (io == NULL) {
         /* load the default plugins */
         plugin_open("placement", i);
-
-        /* XXX rm me when the parser loads me magically */
-        plugin_open("client_menu", i);
-        plugin_open("client_list_menu", i);
     } else {
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==

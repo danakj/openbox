@@ -194,8 +194,6 @@ void session_startup(int argc, char **argv)
         g_free(val_uid.value);
 
         save_commands();
-
-        ob_debug("Connected to session manager with id %s\n", ob_sm_id);
     }
 }
 

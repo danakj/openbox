@@ -74,8 +74,6 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
 gboolean parse_load(const char *path, const char *rootname,
                     xmlDocPtr *doc, xmlNodePtr *root)
 {
-    xmlLineNumbersDefault(1);
-
     if ((*doc = xmlParseFile(path))) {
         *root = xmlDocGetRootElement(*doc);
         if (!*root) {
@@ -99,8 +97,6 @@ gboolean parse_load(const char *path, const char *rootname,
 gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
                         xmlDocPtr *doc, xmlNodePtr *root)
 {
-    xmlLineNumbersDefault(1);
-
     if ((*doc = xmlParseMemory(data, len))) {
         *root = xmlDocGetRootElement(*doc);
         if (!*root) {

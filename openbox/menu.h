@@ -47,6 +47,9 @@ typedef enum
 struct _ObNormalMenuEntry {
     gchar *label;
 
+    /* state */
+    gboolean enabled;
+
     /* List of ObActions */
     GSList *actions;
 };
@@ -65,9 +68,6 @@ struct _ObMenuEntry
     ObMenu *menu;
 
     gint id;
-
-    /* state */
-    gboolean enabled;
 
     union u {
         ObNormalMenuEntry normal;

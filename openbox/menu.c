@@ -68,19 +68,29 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data)
 {
     ObMenuParseState *state = data;
-    gchar *name = NULL, *title = NULL;
+    gchar *name = NULL, *title = NULL, *plugin = NULL;
 
     if (!parse_attr_string("id", node, &name))
         goto parse_menu_fail;
 
     if (!g_hash_table_lookup(menu_hash, name)) {
-        if (!parse_attr_string("label", node, &title))
-            goto parse_menu_fail;
+        if (parse_attr_string("plugin", node, &plugin)) {
+            if (!plugin_open(plugin, i))
+                goto parse_menu_fail;
+            plugin_start(plugin);
+            if (!g_hash_table_lookup(menu_hash, name))
+                g_warning("Specified plugin '%s' did not provide the "
+                          "menu '%s'", plugin, name);
+                goto parse_menu_fail;
+        } else {
+            if (!parse_attr_string("label", node, &title))
+                goto parse_menu_fail;
 
-        if (menu_new(name, title, NULL)) {
-            state->menus = g_slist_prepend(state->menus, name);
-            parse_tree(i, doc, node->xmlChildrenNode);
-            state->menus = g_slist_delete_link(state->menus, state->menus);
+            if (menu_new(name, title, NULL)) {
+                state->menus = g_slist_prepend(state->menus, name);
+                parse_tree(i, doc, node->xmlChildrenNode);
+                state->menus = g_slist_delete_link(state->menus, state->menus);
+            }
         }
     }
 
@@ -90,6 +100,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 parse_menu_fail:
     g_free(name);
     g_free(title);
+    g_free(plugin);
 }
 
 
@@ -202,7 +213,16 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
     self->type = type;
     self->menu = menu;
     self->id = id;
-    self->enabled = TRUE;
+
+    switch (type) {
+    case OB_MENU_ENTRY_TYPE_NORMAL:
+        self->data.normal.enabled = TRUE;
+        break;
+    case OB_MENU_ENTRY_TYPE_SUBMENU:
+    case OB_MENU_ENTRY_TYPE_SEPARATOR:
+        break;
+    }
+
     return self;
 }
 

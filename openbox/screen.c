@@ -179,8 +179,6 @@ gboolean screen_annex()
     }
 
 
-    ob_debug("Managing screen %d\n", ob_screen);
-
     set_root_cursor();
 
     /* set the OPENBOX_PID hint */

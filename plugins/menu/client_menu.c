@@ -39,36 +39,49 @@ static void client_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
+    GList *it;
 
     frame->show_title = FALSE;
 
-    if (!frame->client) {
-        GList *it;
-
-        for (it = menu->entries; it; it = g_list_next(it)) {
-            ObMenuEntry *e = it->data;
-            e->enabled = FALSE;
-        }
-        return;
+    for (it = menu->entries; it; it = g_list_next(it)) {
+        e = it->data;
+        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
+            e->data.normal.enabled = !!frame->client;
     }
 
+    if (!frame->client)
+        return;
+
     e = menu_find_entry_id(menu, CLIENT_ICONIFY);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
+    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
 
     e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
+    e->data.normal.enabled =frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
 
     e = menu_find_entry_id(menu, CLIENT_SHADE);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
+    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
 
     e = menu_find_entry_id(menu, CLIENT_MOVE);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_MOVE;
+    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_MOVE;
 
     e = menu_find_entry_id(menu, CLIENT_RESIZE);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_RESIZE;
+    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_RESIZE;
 
     e = menu_find_entry_id(menu, CLIENT_CLOSE);
-    e->enabled = frame->client->functions & OB_CLIENT_FUNC_CLOSE;
+    e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_CLOSE;
+}
+
+static void layer_update(ObMenuFrame *frame, gpointer data)
+{
+    ObMenu *menu = frame->menu;
+    ObMenuEntry *e;
+    GList *it;
+
+    for (it = menu->entries; it; it = g_list_next(it)) {
+        e = it->data;
+        if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
+            e->data.normal.enabled = !!frame->client;
+    }
 }
 
 static void send_to_update(ObMenuFrame *frame, gpointer data)
@@ -104,7 +117,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         if (frame->client->desktop == desk) {
             ObMenuEntry *e = menu_find_entry_id(menu, desk);
             g_assert(e);
-            e->enabled = FALSE;
+            e->data.normal.enabled = FALSE;
         }
     }
 }
@@ -114,6 +127,7 @@ void plugin_startup()
     GSList *acts;
 
     menu_new(LAYER_MENU_NAME, _("Layer"), NULL);
+    menu_set_update_func(LAYER_MENU_NAME, layer_update);
 
     acts = g_slist_prepend(NULL, action_from_string("SendToTopLayer"));
     menu_add_normal(LAYER_MENU_NAME, LAYER_TOP, _("Always on top"), acts);
@@ -127,6 +141,7 @@ void plugin_startup()
 
     menu_new(SEND_TO_MENU_NAME, _("Send to desktop"), NULL);
     menu_set_update_func(SEND_TO_MENU_NAME, send_to_update);
+
 
     menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL);
     menu_set_update_func(CLIENT_MENU_NAME, client_update);

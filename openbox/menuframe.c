@@ -171,7 +171,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
 
-    item_a = (!self->entry->enabled ?
+    item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+               !self->entry->data.normal.enabled) ?
               self->a_disabled :
               (self == self->frame->selected ?
                self->a_selected :
@@ -193,7 +194,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     item_a->surface.parenty = self->area.y;
     RrPaint(item_a, self->window, self->area.width, self->area.height);
 
-    text_a = (!self->entry->enabled ?
+    text_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+               !self->entry->data.normal.enabled) ?
               self->a_text_disabled :
               (self == self->frame->selected ?
                self->a_text_selected :
@@ -299,7 +301,8 @@ static void menu_frame_render(ObMenuFrame *self)
         RECT_SET_POINT(e->area, 0, allitems_h);
         XMoveWindow(ob_display, e->window, 0, e->area.y);
 
-        text_a = (!e->entry->enabled ?
+        text_a = ((e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+                   !e->entry->data.normal.enabled) ?
                   e->a_text_disabled :
                   (e == self->selected ?
                    e->a_text_selected :

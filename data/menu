@@ -27,9 +27,13 @@
   </item>
 </menu>
 
+<menu id="client-menu" plugin="client_menu" />
+
 <menu id="root-menu" label="Openbox 3">
   <menu id="apps-menu" />
   <menu id="games-menu" />
+  <separator />
+  <menu id="client-menu" plugin="client_menu" />
   <separator />
   <item label="Restart">
     <action name="restart" />

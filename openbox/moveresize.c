@@ -317,6 +317,7 @@ void moveresize_event(XEvent *e)
                 start_y += dy - (cur_y - oy);
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
                 int dx = 0, dy = 0, ox = cur_x, oy = cur_y;
+                int opx, px, opy, py;
 
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     dx = 4;
@@ -331,6 +332,7 @@ void moveresize_event(XEvent *e)
 
                 cur_x += dx;
                 cur_y += dy;
+                screen_pointer_pos(&opx, &opy);
                 XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
                 /* steal the motion events this causes */
                 XSync(ob_display, FALSE);
@@ -338,6 +340,7 @@ void moveresize_event(XEvent *e)
                     XEvent ce;
                     while (XCheckTypedEvent(ob_display, MotionNotify, &ce));
                 }
+                screen_pointer_pos(&px, &py);
 
                 do_move(FALSE);
 
@@ -345,8 +348,8 @@ void moveresize_event(XEvent *e)
                    not nessesarily (resistance), this adjusts where the curor
                    thinks it started so that it keeps up with where the window
                    actually is */
-                start_x += dx - (cur_x - ox);
-                start_y += dy - (cur_y - oy);
+                start_x += (px - opx) - (cur_x - ox);
+                start_y += (py - opy) - (cur_y - oy);
             }
         }
     }

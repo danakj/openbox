@@ -6,84 +6,100 @@
   <description> \m/ Test Theme \m/ </description>
 </about>
 
-<text id="vroom">
-  <opacity>80%</opacity>
-  <font>arial:pixelsize=10</font>
+<color id="red">
+  <red>70</red>
+  <green>10</green>
+  <blue>10</blue>
+  <opacity>70</opacity>
+</color>
+
+<color id="darkred">
+  <red>30</red>
+  <green>3</green>
+  <blue>3</blue>
+  <opacity>70</opacity>
+</color>
+
+<color id="clearblack">
+  <red>0</red>
+  <green>0</green>
+  <blue>0</blue>
+  <opacity>50</opacity>
+</color>
+
+<foreground id="vroom">
+  <color>
+    <red>100</red>
+    <green>40</green>
+    <blue>67</blue>
+    <opacity>80</opacity>
+  </color>
   <shadow>
     <offset>2</offset>
-    <opacity>50%</opacity>
-    <color>#000000</color>
+    <color id="clearblack" />
   </shadow>
-  <color>#45ea32</color>
-</text>
+</foreground>
 
-<button_style id="fun">
-  <opacity>80%</opacity>
-  <shadow>
-    <offset>2</offset>
-    <opacity>80%</opacity>
-    <color>#000000</color>
-  </shadow>
-  <color>#45ea32</color>
-</button>
-
-<surface_style id="blah-flat">
-  <background style="solid">
-    <color>#eeffaa</color>
-  </background>
+<background id="solid">
+  <solid>
+    <color id="darkred" />
+  </solid>
   <border>
-    <color>#45ea32</color>
+    <color id="red" />
   </border>
-</texture>
+</background>
 
-<surface_style id="blah-sunken">
-  <background style="vertical">
-    <color>#eeffaa</color>
-    <color>#aa9536</color>
-  </background>
-  <bevel relief="sunken" style="inner" />
-  <interlaced />
-</texture>
+<background id="fancy">
+  <solid>
+    <color id="darkred" />
+    <color id="red" />
+  </solid>
+  <bevel relief="raised" type="outer" />
+</background>
 
-<button_layout id="funlayout">
-  <pressed>
-    <focus style="fun" />
-    <unfocus style="fun" />
-  </pressed>
-  <unpressed>
-    <focus style="fun" />
-    <unfocus style="fun" />
-  </unpressed>
-  <disabled>
-    <focus style="fun" />
-    <unfocus style="fun" />
-  </disabled>
-</button>
+<layout id="flatlayout">
+  <focused   foreground="vroom" background="solid" />
+  <unfocused foreground="vroom" background="solid" />
+</layout>
 
-<surface_layout id="titlelayout">
-  <focus   style="blah-flat"   text="vroom" />
-  <unfocus style="blah-sunken" text="vroom" />
-</surface>
+<layout id="raisedlayout">
+  <focused   foreground="vroom" background="fancy" />
+  <unfocused foreground="vroom" background="solid" />
+</layout>
 
-<window>
-  <button id="close"    layout="funlayout" />
-  <button id="stick"    layout="funlayout" />
-  <button id="iconify"  layout="funlayout" />
-  <button id="maximize" layout="funlayout" />
-  <button id="icon"     layout="funlayout" />
-  <button id="shade"    layout="funlayout" />
+<button_set id="funbutton">
+  <pressed   layout="flatlayout" />
+  <unpressed layout="raisedlayout" />
+  <disabled  layout="flatlayout" />
+</button_set>
 
-  <surface id="title"	  layout="titlelayout" />
-  <surface id="handle"    layout="titlelayout" />
-  <surface id="leftgrip"  layout="titlelayout" />
-  <surface id="rightgrip" layout="titlelayout" />
-</window>
+<surface_set id="flatsurface" layout="flatlayout" />
 
-<menu>
-  <surface id="title"    style="blah-sunken" text="vroom" />
-  <surface id="item"     style="blah-flat"   text="vroom" />
-  <surface id="selected" style="blah-sunken" text="vroom" />
-  <surface id="disabled" style="blaf-flat"   text="vroom" />
+<surface_set id="raisedsurface" layout="raisedlayout" />
+
+<menu_set id="coolmenu">
+  <normal   foreground="vroom" background="solid" />
+  <active   foreground="vroom" background="fancy" />
+  <disabled foreground="vroom" background="solid" />
+</menu_set>
+
+<style>
+  <button id="close"    set="funbutton" />
+  <button id="stick"    set="funbutton" />
+  <button id="iconify"  set="funbutton" />
+  <button id="maximize" set="funbutton" />
+  <button id="icon"     set="funbutton" />
+  <button id="shade"    set="funbutton" />
+
+  <surface id="titlebar"  set="flatsurface" />
+  <surface id="label"     set="raisedsurface" />
+  <surface id="handle"    set="flatsurface" />
+  <surface id="leftgrip"  set="flatsurface" />
+  <surface id="rightgrip" set="flatsurface" />
+
+  <menutitle foreground="vroom" background="fancy" />
+  <menu      set="coolmenu" />
 </menu>
+</style>
 
 </openbox_theme>

@@ -93,7 +93,7 @@ static void resist_move(Client *c, int *x, int *y)
             if (snapy == NULL) {
                 if (ct >= tb && t < tb && t >= tb - resist.integer)
                     *y = tb, snapy = target;
-                else if (!cb <= tt && b > tt && b <= tt + resist.integer)
+                else if (cb <= tt && b > tt && b <= tt + resist.integer)
                     *y = tt - h + 1, snapy = target;
                 if (snapy != NULL) {
                     /* try to corner snap to the window */
@@ -244,7 +244,6 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     case Corner_TopRight:
         dlt = lt;
         drb = rb + *h - c->frame->area.height;
-        g_message("dlt %d drb %d rb %d ab %d", dlt, drb, rb, ab);
         if (rb <= ab && drb > ab && drb <= ab + resist.integer)
             *h = ab - lt + 1;
         break;

@@ -521,7 +521,10 @@ static void event_handle_client(Client *client, XEvent *e)
 		/* if its not visible for other reasons, then don't mess
 		   with it */
 		return;
-	    /*HOOKFIRECLIENT(requestactivate, client);XXX*/
+            if (client->shaded)
+                client_shade(client, FALSE);
+            client_focus(client);
+            stacking_raise(client);
 	}
 	break;
     case PropertyNotify:

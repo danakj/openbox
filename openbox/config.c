@@ -65,7 +65,6 @@ gint config_mouse_dclicktime;
 
 gboolean config_menu_warppointer;
 gboolean config_menu_xorstyle;
-gboolean config_menu_hilightfirst;
 guint    config_menu_hide_delay;
 
 GSList *config_menu_files;
@@ -407,8 +406,6 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_menu_warppointer = parse_bool(doc, n);
         if ((n = parse_find_node("xorStyle", node)))
             config_menu_xorstyle = parse_bool(doc, n);
-        if ((n = parse_find_node("hilightFirst", node)))
-            config_menu_hilightfirst = parse_bool(doc, n);
         if ((n = parse_find_node("hideDelay", node)))
             config_menu_hide_delay = parse_int(doc, n);
     }
@@ -599,7 +596,6 @@ void config_startup(ObParseInst *i)
 
     config_menu_warppointer = TRUE;
     config_menu_xorstyle = TRUE;
-    config_menu_hilightfirst = TRUE;
     config_menu_hide_delay = 250;
     config_menu_files = NULL;
 

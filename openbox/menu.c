@@ -305,12 +305,8 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
     else
         menu_frame_move(frame,
                         x - ob_rr_theme->bwidth, y - ob_rr_theme->bwidth);
-    if (!menu_frame_show(frame, NULL)) {
+    if (!menu_frame_show(frame, NULL))
         menu_frame_free(frame);
-    } else {
-        if (frame->entries)
-            menu_frame_select_next(frame);
-    }
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

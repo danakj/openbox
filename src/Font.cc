@@ -117,8 +117,8 @@ bool BFont::createFont(void) {
   if (_xftfont)
     return True;
 
-  cerr << "BFont::BFont(): couldn't load font '" << _name << "'" << endl <<
-    "as an Xft font, trying as a standard X font." << endl;
+  cerr << "BFont::BFont(): couldn't load font '" << _name <<
+    "' as an Xft font, trying as a standard X font." << endl;
 #endif
 
   if (i18n.multibyte()) {

@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: Erreur de création de pixmap\n
+# BImage::render_solid: errore creando la pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: Erreur de création de XImage\n
+# BImage::renderXImage: errore creando XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: Mode visuel non supporté\n
+# BImage::renderXImage: visuale non supportata\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: Erreur de création de pixmap\n
+# BImage::renderPixmap: errore creando la pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: Taille de la palette de couleurs invalide%d (%d/%d/%d) - coupe\n
+# BImageControl::BImageControl: grandezza della mappa di colori non valida %d (%d/%d/%d) - riduzione\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: Erreur d'allocation de la palette de couleurs\n
+# BImageControl::BImageControl: errore di assegnazione mappa di colori\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: Echec d'allocation de couleur %d/%d/%d\n
+# BImageControl::BImageControl: fallita l'assegnazione del colore %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: Cache pixmap - abandon %d pixmaps\n
+# BImageControl::~BImageControl: pixmap cache - rilascio %d pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: Occupation du cache importante, nettoyage forcé\n
+# BImageControl::renderImage: la cache e' larga, forzo la pulitura\n
 $ #ColorParseError
-# BImageControl::getColor: Erreur de lecture de couleur: '%s'\n
+# BImageControl::getColor: errore di analisi del colore: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: Erreur d'allocation,couleur: '%s'\n
+# BImageControl::getColor: errore di assegnazione del colore: '%s'\n

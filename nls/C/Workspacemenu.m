@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Espaces de travail
+# Aree di Lavoro
 $ #NewWorkspace
-# Nouvel espace de travail
+# Nuova Area di Lavoro
 $ #RemoveLast
-# Supprimer le dernier
+# Rimuovi Ultima

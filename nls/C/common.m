@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Oui
+# Si
 $ #No
-# Non
+# No
 
 $ #DirectionTitle
-# Orientation
+# Direzione
 $ #DirectionHoriz
-# Horizontal
+# Orizzontale
 $ #DirectionVert
-# Vertical
+# Verticale
 
 $ #AlwaysOnTop
-# Toujours au dessus
+# Sempre in primo piano
 
 $ #PlacementTitle
-# Disposition
+# Posizionamento
 $ #PlacementTopLeft
-# En haut à gauche
+# in Alto a Sinistra
 $ #PlacementCenterLeft
-# Au centre à gauche
+# al Centro a Sinistra
 $ #PlacementBottomLeft
-# En bas à gauche
+# in Basso a Sinistra
 $ #PlacementTopCenter
-# En haut au centre
+# in Alto al Centro
 $ #PlacementBottomCenter
-# En bas au centre
+# in Basso al Centro
 $ #PlacementTopRight
-# En haut à droite
+# in Alto a Destra
 $ #PlacementCenterRight
-# Au centre à droite
+# al Centro a Destra
 $ #PlacementBottomRight
-# En bas à droite
+# in Basso a Destra
 
 $ #AutoHide
-# Auto disparaît
+# Nascondi Automaticamente

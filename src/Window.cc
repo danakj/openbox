@@ -3688,14 +3688,16 @@ void BlackboxWindow::enterNotifyEvent(const XCrossingEvent* ce) {
     }
   }
 
-  if ((! leave || inferior) && ! isFocused()) {
-    bool success = setInputFocus();
-    if (success)    // if focus succeeded install the colormap
-      installColormap(True); // XXX: shouldnt we honour no install?
-  }
+  if (! leave || inferior) {
+    if (! isFocused()) {
+      bool success = setInputFocus();
+      if (success)    // if focus succeeded install the colormap
+        installColormap(True); // XXX: shouldnt we honour no install?
+    }
 
-  if (screen->doAutoRaise())
-    timer->start();
+    if (screen->doAutoRaise())
+      timer->start();
+  }
 }
 
 

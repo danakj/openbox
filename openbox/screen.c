@@ -184,10 +184,10 @@ void screen_shutdown()
 
 void screen_resize()
 {
-    /* Set the _NET_DESKTOP_GEOMETRY hint */
     /* XXX RandR support here? */
     int geometry[2];
 
+    /* Set the _NET_DESKTOP_GEOMETRY hint */
     geometry[0] = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
     geometry[1] = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
     PROP_SET32A(ob_root, net_desktop_geometry, cardinal, geometry, 2);

@@ -271,7 +271,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
             self->innersize.top += ob_rr_theme->title_height + self->rbwidth +
                 (self->rbwidth - self->bwidth);
-        if (self->decorations & OB_FRAME_DECOR_HANDLE)
+        if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+            ob_rr_theme->show_handle)
             self->innersize.bottom += ob_rr_theme->handle_height +
                 self->rbwidth + (self->rbwidth - self->bwidth);
   
@@ -312,7 +313,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             layout_title(self);
 
         if (!fake) {
-            if (self->decorations & OB_FRAME_DECOR_HANDLE) {
+            if (self->decorations & OB_FRAME_DECOR_HANDLE &&
+                ob_rr_theme->show_handle)
+            {
                 XMoveResizeWindow(ob_display, self->handle,
                                   -self->bwidth, FRAME_HANDLE_Y(self),
                                   self->width, ob_rr_theme->handle_height);

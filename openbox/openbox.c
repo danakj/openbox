@@ -1,3 +1,21 @@
+/* -*- indent-tabs-mode: t; tab-width: 4; c-basic-offset: 4; -*-
+
+   openbox.c for the Openbox window manager
+   Copyright (c) 2003        Ben Jansens
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   See the COPYING file for a copy of the GNU General Public License.
+*/
+
 #include "debug.h"
 #include "openbox.h"
 #include "session.h"
@@ -318,7 +336,8 @@ static void signal_handler(int signal, gpointer data)
 
 static void print_version()
 {
-    g_print("Openbox %s\n\n", PACKAGE_VERSION);
+    g_print("Openbox %s\n", PACKAGE_VERSION);
+	g_print("Copyright (c) 2003 Ben Jansens, and others\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -326,23 +345,23 @@ static void print_version()
 
 static void print_help()
 {
-    print_version();
     g_print("Syntax: openbox [options]\n\n");
     g_print("Options:\n\n");
 #ifdef USE_SM
     g_print("  --sm-disable        Disable connection to session manager\n");
     g_print("  --sm-client-id ID   Specify session management ID\n");
-    g_print("  --sm-save-file FILE Specify file to load a saved session\n"
-            "                      from\n");
+    g_print("  --sm-save-file FILE Specify file to load a saved session"
+            "from\n");
 #endif
     g_print("  --replace           Replace the currently running window "
             "manager\n");
     g_print("  --help              Display this help and exit\n");
     g_print("  --version           Display the version and exit\n");
-    g_print("  --sync              Run in synchronous mode (this is slow and\n"
-            "                      meant for debugging X routines)\n");
+    g_print("  --sync              Run in synchronous mode (this is slow and "
+            "meant for\n"
+			"                      debugging X routines)\n");
     g_print("  --debug             Display debugging output\n");
-    g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
+    g_print("\nPlease report bugs at %s\n\n", PACKAGE_BUGREPORT);
 }
 
 static void parse_args(int argc, char **argv)

@@ -361,9 +361,8 @@ Client *Openbox::findClient(Window window)
 void Openbox::setFocusedClient(Client *c)
 {
   // sometimes this is called with the already-focused window, this is
-  // important for the python scripts to work (eg, c = 0 twice, or for the
-  // cycling list, it relies on this behavior. don't just return if its already
-  // set as focused
+  // important for the python scripts to work (eg, c = 0 twice). don't just
+  // return if _focused_client == c
   
   assert(_focused_screen);
 

@@ -182,6 +182,7 @@ void client_manage(Window window)
 	XFree(wmhint);
     }
 */
+    g_message("Managing window: %lx", window);
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
@@ -245,7 +246,7 @@ void client_manage(Window window)
     /* make sure the window is visible */
     client_move_onscreen(self);
 
-/*    g_message("Managed window 0x%lx", window);*/
+    g_message("Managed window 0x%lx", window);
 }
 
 void client_unmanage_all()
@@ -260,7 +261,7 @@ void client_unmanage(Client *self)
     int j;
     GSList *it;
 
-/*    g_message("Unmanaging window: %lx", self->window);*/
+    g_message("Unmanaging window: %lx", self->window);
 
     dispatch_client(Event_Client_Destroy, self, 0, 0);
     g_assert(self != NULL);
@@ -311,6 +312,8 @@ void client_unmanage(Client *self)
         }
     }
 
+    focus_fallback(FALSE);
+
     /* remove from its group */
     if (self->group) {
         group_remove(self->group, self);
@@ -339,6 +342,8 @@ void client_unmanage(Client *self)
 	if (self->iconic)
 	    XMapWindow(ob_display, self->window);
     }
+
+    g_message("Unmanaged window 0x%lx", self->window);
 
     /* free all data allocated in the client struct */
     g_slist_free(self->transients);

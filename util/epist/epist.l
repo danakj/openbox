@@ -27,8 +27,12 @@ Control |
 control |
 shift |
 Shift               yylval = (int) strdup(yytext); return BINDING;
+on |
+On |
 true |
 True                yylval = (int) strdup(yytext); return TRUE;
+Off |
+off |
 false |
 False               yylval = (int) strdup(yytext); return FALSE;
 [0-9]+              yylval = (int) strdup(yytext); return NUMBER;

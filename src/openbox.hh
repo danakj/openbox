@@ -142,7 +142,7 @@ public:
   inline const otk::OBProperty *property() const { return _property; }
 
   //! Returns the mouse cursors used throughout Openbox
-  inline const Cursors &cursor() const { return _cursors; }
+  inline const Cursors &cursors() const { return _cursors; }
 
   //! The main function of the Openbox class
   /*!

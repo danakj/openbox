@@ -1008,6 +1008,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
                                 e->xbutton.y_root);
                     break;
                 }
+                break;
             }
         }
 

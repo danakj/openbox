@@ -297,7 +297,7 @@ void menu_show_full(ObMenu *self, int x, int y, ObClient *client)
 {
     g_assert(self != NULL);
        
-    menu_render(self);
+    self->update(self);
     
     self->client = client;
 
@@ -319,7 +319,6 @@ void menu_hide(ObMenu *self) {
 	if (self->open_submenu)
 	    menu_hide(self->open_submenu);
 	if (self->parent && self->parent->open_submenu == self) {
-            self->over = NULL;
 	    self->parent->open_submenu = NULL;
         }
 
@@ -328,6 +327,11 @@ void menu_hide(ObMenu *self) {
             grab_pointer(FALSE, None);
         }
         menu_visible = g_list_remove(menu_visible, self);
+        if (self->over) {
+            ((ObMenuEntry *)self->over->data)->hilite = FALSE;
+            menu_entry_render(self->over->data);
+            self->over = NULL;
+        }
     }
 }
 
@@ -385,7 +389,7 @@ void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
 {
     ObMenu *m;
 
-    if (button > 3) return;
+    if (button != 1) return;
 
     if (self->action) {
         self->action->data.any.c = self->parent->client;
@@ -461,7 +465,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 		ob_rr_theme->bwidth - ob_rr_theme->menu_overlap;
 
 	    /* need to get the width. is this bad?*/
-	    menu_render(self->submenu);
+	    self->parent->update(self->submenu);
 
             a = screen_physical_area_monitor(self->parent->xin_area);
 
@@ -485,6 +489,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 void menu_control_keyboard_nav(unsigned int key)
 {
     static ObMenu *current_menu = NULL;
+    ObMenuEntry *e = NULL;
 
     ObKey obkey = OB_NUM_KEYS;
 
@@ -532,24 +537,28 @@ void menu_control_keyboard_nav(unsigned int key)
         break;
     }
     case OB_KEY_RIGHT: {
-        ObMenuEntry *e;
         if (current_menu->over == NULL)
             return;
-
         e = (ObMenuEntry *)current_menu->over->data;
         if (e->submenu) {
             current_menu = e->submenu;
             current_menu->over = current_menu->entries;
             if (current_menu->over)
                 current_menu->mouseover(current_menu->over->data, TRUE);
-        } else {
-            current_menu->mouseover(e, FALSE);
-            current_menu->over = NULL;
-            
-            /* zero is enter */
-            menu_entry_fire(e, 0, 0, 0);
         }
         break;
+    }
+
+    case OB_KEY_RETURN: {
+        if (current_menu->over == NULL)
+            return;
+        e = (ObMenuEntry *)current_menu->over->data;
+
+        current_menu->mouseover(e, FALSE);
+        current_menu->over = NULL;
+        /* zero is enter */
+        menu_entry_fire(e, 0, 0, 0);
+
     }
     case OB_KEY_LEFT: {
         if (current_menu->over != NULL) {

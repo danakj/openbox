@@ -52,7 +52,7 @@ void client_send_to_update(ObMenu *self)
             menu_add_entry(self, e);
         }
         
-        self->update(self);
+        menu_render(self);
     }
 }
 

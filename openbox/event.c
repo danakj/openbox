@@ -450,7 +450,16 @@ static void event_handle_client(Client *client, XEvent *e)
 	/* we shouldn't be able to get this unless we're iconic */
 	g_assert(client->iconic);
 
-	/*HOOKFIRECLIENT(requestactivate, client);XXX*/
+        if (screen_showing_desktop)
+            screen_show_desktop(FALSE);
+        client_iconify(client, FALSE, TRUE);
+        if (!client->frame->visible)
+            /* if its not visible still, then don't mess with it */
+            break;
+        if (client->shaded)
+            client_shade(client, FALSE);
+        client_focus(client);
+        stacking_raise(client);
 	break;
     case ClientMessage:
 	/* validate cuz we query stuff off the client here */

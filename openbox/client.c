@@ -238,8 +238,25 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
-    if (ob_state != State_Starting && config_focus_new)
-        client_focus(self);
+    /* focus the new window? */
+    if (ob_state != State_Starting) {
+        if (config_focus_new)
+            client_focus(self);
+        else if (self->transient_for) {
+            if (self->transient_for != TRAN_GROUP) {/* transient of a window */
+                if (focus_client == self->transient_for)
+                    client_focus(self);
+            } else { /* transient of a group */
+                GSList *it;
+
+                for (it = self->group->members; it; it = it->next)
+                    if (focus_client == it->data) {
+                        client_focus(self);
+                        break;
+                    }
+            }
+        }
+    }
 
     /* update the list hints */
     client_set_list();

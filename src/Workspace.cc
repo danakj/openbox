@@ -781,8 +781,10 @@ void Workspace::placeWindow(BlackboxWindow *win) {
     cascadePlacement(new_win, (win->getTitleHeight() +
                                screen->getBorderWidth() * 2));
 
-  // make sure the placement was valid
-  assert(screen->availableArea().contains(new_win));
+  if (new_win.right() > screen->availableArea().right())
+    new_win.setX(screen->availableArea().left());
+  if (new_win.bottom() > screen->availableArea().bottom())
+    new_win.setY(screen->availableArea().top());
 
   win->configure(new_win.x(), new_win.y(), new_win.width(), new_win.height());
 }

@@ -614,22 +614,30 @@ void screen::changeWorkspaceHorz(const int num) const {
   assert(_managed);
   const Config *conf = _epist->getConfig();
   int width = conf->getNumberValue(Config::workspaceColumns);
-
+  int wnum;
+  
   if (width > _num_desktops || width <= 0)
     return;
 
   if (num < 0) {
     if (_active_desktop % width != 0)
       changeWorkspace(_active_desktop - 1);
-    else
-      changeWorkspace(_active_desktop + width - 1);
+    else {
+      wnum = _active_desktop + width - 1;
+      if (wnum >= _num_desktops)
+        wnum = _num_desktops - 1;
+    }
   }
   else {
-    if (_active_desktop % width != width - 1)
-      changeWorkspace(_active_desktop + 1);
+    if (_active_desktop % width != width - 1) {
+      wnum = _active_desktop + 1;
+      if (wnum >= _num_desktops)
+        wnum = _num_desktops / width * width;
+    }
     else
-      changeWorkspace(_active_desktop - width + 1);
+      wnum = _active_desktop - width + 1;
   }
+  changeWorkspace(wnum);
 }
 
 void screen::grabKey(const KeyCode keyCode, const int modifierMask) const {

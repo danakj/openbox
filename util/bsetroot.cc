@@ -136,8 +136,6 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
   int format;
   unsigned long length, after;
   unsigned char *data;
-  int mode = PropModeAppend;
-  int emode = PropModeAppend;
   const ScreenInfo *screen_info = getScreenInfo(screen);
 
   if (rootpmap_id == None) {
@@ -147,29 +145,22 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
 
   XGrabServer(getXDisplay());
 
-  // Clear out the old pixmap?
+  // Clear out the old pixmap
   XGetWindowProperty(getXDisplay(), screen_info->getRootWindow(),
-                     rootpmap_id, 0L, 1L, False, AnyPropertyType,
+                     rootpmap_id, 0L, 1L, False, XA_PIXMAP,
                      &type, &format, &length, &after, &data);
-  if ((type == XA_PIXMAP) && (format == 32) && (length == 1)) {
+  if (type == XA_PIXMAP && format == 32) {
     XKillClient(getXDisplay(), *((Pixmap *) data));
     XSync(getXDisplay(), False);
-    mode = PropModeReplace;
+    XFree(data);
   }
-
-  // Clear out the old esetroot pixmap?
-  XGetWindowProperty(getXDisplay(), screen_info->getRootWindow(),
-                     esetroot_id, 0L, 1L, False, AnyPropertyType,
-                     &type, &format, &length, &after, &data);
-  if ((type == XA_PIXMAP) && (format == 32) && (length == 1))
-    emode = PropModeReplace;
 
   if (pixmap) {
     XChangeProperty(getXDisplay(), screen_info->getRootWindow(),
-        rootpmap_id, XA_PIXMAP, 32, mode,
+        rootpmap_id, XA_PIXMAP, 32, PropModeReplace,
         (unsigned char *) &pixmap, 1);
     XChangeProperty(getXDisplay(), screen_info->getRootWindow(),
-        esetroot_id, XA_PIXMAP, 32, emode,
+        esetroot_id, XA_PIXMAP, 32, PropModeReplace,
         (unsigned char *) &pixmap, 1);
   } else {
     XDeleteProperty(getXDisplay(), screen_info->getRootWindow(),

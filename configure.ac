@@ -6,7 +6,7 @@ AC_LANG(C++)
 # Determine build target
 OB_DEBUG
 
-AM_INIT_AUTOMAKE([Openbox], [2.90.0cvs])
+AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
 test "$prefix" = "NONE" && prefix="$ac_default_prefix"
 

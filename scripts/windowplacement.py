@@ -23,7 +23,7 @@ def random(data):
     """Place windows randomly around the screen."""
     if not data.client: return
     if data.client.positionRequested(): return
-    client_area = data.client.area()
+    client_area = data.client.frame.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
     width = screen_area.width() - (client_area.width() +
@@ -42,7 +42,7 @@ def cascade(data):
     """Place windows in a cascading order from top-left to bottom-right."""
     if not data.client: return
     if data.client.positionRequested(): return
-    client_area = data.client.area()
+    client_area = data.client.frame.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
     width = screen_area.width() - (client_area.width() +

@@ -18,7 +18,7 @@ void stacking_set_list()
     if (size > 0) {
 	windows = g_new(Window, size);
 	win_it = windows;
-	for (it = g_list_last(stacking_list); it; it = it->prev, ++win_it)
+	for (it = g_list_last(stacking_list); it != NULL; it = it->prev, ++win_it)
 	    *win_it = ((Client*)it->data)->window;
     } else
 	windows = NULL;
@@ -46,7 +46,7 @@ void stacking_raise(Client *client)
   
     /* the stacking list is from highest to lowest */
     it = stacking_list;
-    while (it) {
+    while (it != NULL) {
 	Client *c = it->data;
 	if (client->layer >= c->layer && m != c)
 	    break;

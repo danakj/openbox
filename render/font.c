@@ -98,8 +98,10 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
 {
     int x,y,w,h;
     XftColor c;
+    char *text;
+    int m;
+    size_t l;
 
-    x = position->x;
     y = position->y;
     w = position->width;
     h = position->height;
@@ -108,7 +110,26 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     y -= (2 * (t->font->xftfont->ascent + t->font->xftfont->descent) -
           (t->font->height + h) - 1) / 2;
 
-    x += 3; /* XXX figure out X with justification */
+    text = g_strdup(t->string);
+    l = strlen(text);
+    m = font_measure_string(t->font, text, t->shadow, t->offset);
+    while (l && m > position->width) {
+        text[--l] = '\0';
+    m = font_measure_string(t->font, text, t->shadow, t->offset);
+    }
+    if (!l) return;
+
+    switch (t->justify) {
+    case Justify_Left:
+        x = position->x;
+        break;
+    case Justify_Right:
+        x = position->x + (w - m);
+        break;
+    case Justify_Center:
+        x = position->x + (w - m) / 2;
+        break;
+    }
 
     if (t->shadow) {
         if (t->tint >= 0) {
@@ -126,7 +147,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,
-                          (FcChar8*)t->string, strlen(t->string));
+                          (FcChar8*)text, l);
     }  
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
@@ -136,6 +157,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
-                      (FcChar8*)t->string, strlen(t->string));
+                      (FcChar8*)text, l);
     return;
 }

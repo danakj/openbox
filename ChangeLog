@@ -1,5 +1,12 @@
 2003-09-15  Ben Jansens  <xor@zed.orodu.net>
 
+	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c, openbox/focus.c, openbox/focus.h, openbox/screen.c:
+	remove focusLast and focusLastOnDesktop
+
+	* openbox/focus.c: fix directional focus when nothing is focused
+
+	* ChangeLog: recent changes
+
 	* configure.ac: beta3
 
 	* openbox/session.c: use the sm_client_id in the client struct
@@ -209,20 +216,6 @@
 
 	* openbox/action.c: no mouse interactive actions. no bugs.
 
-2003-09-09  Ben Jansens  <xor@zed.orodu.net>
-
-	* openbox/event.c, openbox/keyboard.c, openbox/keyboard.h:
-	save teh client for interactive actions cuz after teh keyboard is grabbed there is no client
-
-	* configure.ac: beta2
-
-	* ChangeLog: recent changes
-
-	* openbox/action.c, openbox/action.h, openbox/event.c, openbox/keyboard.c, openbox/keyboard.h, openbox/mouse.c, openbox/mouse.h, openbox/screen.c:
-	no more interactive mouse actions, they are evil etc. actions now "feel" much more solid. if move/resizing a window while changing workspaces, it will follow.
-
-	* openbox/action.c: no mouse interactive actions. no bugs.
-
 2003-09-08  Ben Jansens  <xor@zed.orodu.net>
 
 	* openbox/client.c: remove debug prints
@@ -365,288 +358,6 @@
 	* ChangeLog: recent changes
 
 	* openbox/startupnotify.c: fix for not using startup notification
-
-	* ChangeLog: recent changes
-
-	* configure.ac: beta1 time. fuck yah.
-
-	* openbox/openbox.c:
-	kill the window mapping.. its not doing anything anyways? whatever..
-
-	* openbox/mouse.c:
-	dont ungrab/grab all the mouse bindings every time a new one is added. just do it once on startup.
-
-	* openbox/openbox.c:
-	dont exit when a theme can't be loaded during reconfigure
-
-	* openbox/client.c:
-	handle the case where a transient is a child of a dockapp
-
-	* openbox/moveresize.c:
-	don't let move/resize occur on non-visible clients
-
-	* openbox/openbox.c:
-	display a popup and perform a smooth transition when reconfiguring
-
-	* openbox/keyboard.c: grab keys on the client windows themselves
-
-	* openbox/frame.c:
-	only remove one flash timer at a time, so all frames dont stop flashing just cuz a window closed
-
-	* openbox/client_list_menu.c: remove from desktop_menus when freed
-
-	* openbox/event.c:
-	use the ob_main_loop_timeout_remove_data to only remove one timer
-
-	* openbox/dock.c: dont set a strut when there are no apps in the dock
-
-	* openbox/client.c:
-	support getting the desktop from the startup notification protocol
-	pass on to the startup notification code that a window has mapped with a given wmclass
-
-	* openbox/client.h: add the startup_id
-
-	* openbox/openbox.c, openbox/openbox.h: add the NONE cursor.
-	remove startup notification code from openbox.c and openbox.h
-	call the new sn_startup/shutdown for startupnotification.c
-
-	* openbox/moveresize.c: use NONE cursor when not specifying one
-
-	* Makefile.am:
-	remove startup hacks and add startup notification in its own files
-
-	* openbox/event.c:
-	remove the startup notification code from event.c, it all lives in its own file now
-
-	* openbox/startupnotify.c, openbox/startupnotify.h:
-	add startup notification in its own .c/.h files
-
-	* openbox/menuframe.c: use the NONE cursor when not specifying one
-
-	* openbox/mainloop.c, openbox/mainloop.h:
-	add ob_main_loop_timeout_remove_data.
-	make the timeout remove functions remove *all* timeouts that match
-
-	* openbox/startup.c, openbox/startup.h:
-	remove teh startup state saving hacks since we can reconfigure now. no more restarting for the average user anymore.
-
-	* openbox/grab.c: use the NONE cursor when not specifying one
-
-	* openbox/screen.c, openbox/screen.h:
-	remove all the startup notification code from screen.c
-
-	* openbox/prop.c, openbox/prop.h: add the startup_id atom
-
-	* openbox/action.c, openbox/keyboard.c, openbox/mouse.c:
-	use the NONE cursor when not specifying a cursor
-
-	* openbox/misc.h: add a NONE cursor, to not change the cursor at all
-
-	* data/menu.xml: add reconfigure to the menu
-
-	* openbox/action.c, openbox/action.h, openbox/client.c, openbox/client.h, openbox/dock.c, openbox/dock.h, openbox/event.c, openbox/event.h, openbox/focus.c, openbox/focus.h, openbox/frame.c, openbox/frame.h, openbox/grab.h, openbox/group.c, openbox/group.h, openbox/keyboard.c, openbox/keyboard.h, openbox/menu.c, openbox/menu.h, openbox/mouse.c, openbox/mouse.h, openbox/moveresize.c, openbox/moveresize.h, openbox/openbox.c, openbox/openbox.h, openbox/screen.c, openbox/screen.h, openbox/window.c, openbox/window.h:
-	add a reconfigure action, also reconfigure on SIGUSR2.
-	support reconfiguring throughout the entire codebase.
-
-	* themes/thebear/themerc: updates for thebear from merry
-
-	* openbox/event.c:
-	make focusDelay check the destroying window properly before killing the timer
-
-	* data/rc.xml: add default A-space binding for the client menu
-
-	* AUTHORS: add teh focusDelay option for mikachu
-
-	* openbox/menuframe.c, openbox/menuframe.h:
-	track the maximum margin of menu items. use this to keep icons in the menus inside the bevel/borders of the menu items
-
-	* ChangeLog: recent changes
-
-	* configure.ac: alpha8
-
-	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c:
-	add the focusDelay option
-
-	* openbox/mouse.c:
-	dont grab frame context mouse bindings on desktop windows
-
-	* openbox/client.c, openbox/client.h, openbox/menu.c, openbox/moveresize.c:
-	make the client destructor a GDestroyNotify
-
-	* Makefile.am: add themeupdate.py to the distribution
-
-	* data/rc.xml: add focus the desktop on left click binding
-
-	* openbox/menuframe.c: rm empty line
-
-	* openbox/menuframe.c: limit menus' width to 400px
-
-	* data/rc.xml, openbox/config.c:
-	rename the theme name node from 'theme' to 'name'
-
-	* data/rc.xml: fix capitalization and empty tags. cleanup.
-
-	* data/rc.xml: remove obsolete placement/remember option
-
-	* openbox/moveresize.c:
-	only show resize popups for clients with size increments. no move popup at all. waste of screen space.
-
-	* openbox/popup.c: use the provided margins to layout the popup better
-
-	* render/render.c, render/render.h:
-	provide a function to give the margins for an appearance
-
-	* data/rc.xml, openbox/config.c:
-	make the default screen-edge resistance 20 (double what it is for windows)
-
-	* render/render.c:
-	we use the offsets we get from the server, we should use the byte order too..
-
-	* render/color.c: remove bad comment
-
-2003-09-03  Ben Jansens  <xor@zed.orodu.net>
-
-	* openbox/startupnotify.c: fix for not using startup notification
-
-	* ChangeLog: recent changes
-
-	* configure.ac: beta1 time. fuck yah.
-
-	* openbox/openbox.c:
-	kill the window mapping.. its not doing anything anyways? whatever..
-
-	* openbox/mouse.c:
-	dont ungrab/grab all the mouse bindings every time a new one is added. just do it once on startup.
-
-	* openbox/openbox.c:
-	dont exit when a theme can't be loaded during reconfigure
-
-	* openbox/client.c:
-	handle the case where a transient is a child of a dockapp
-
-	* openbox/moveresize.c:
-	don't let move/resize occur on non-visible clients
-
-	* openbox/openbox.c:
-	display a popup and perform a smooth transition when reconfiguring
-
-	* openbox/keyboard.c: grab keys on the client windows themselves
-
-	* openbox/frame.c:
-	only remove one flash timer at a time, so all frames dont stop flashing just cuz a window closed
-
-	* openbox/client_list_menu.c: remove from desktop_menus when freed
-
-	* openbox/event.c:
-	use the ob_main_loop_timeout_remove_data to only remove one timer
-
-	* openbox/dock.c: dont set a strut when there are no apps in the dock
-
-	* openbox/client.c:
-	support getting the desktop from the startup notification protocol
-	pass on to the startup notification code that a window has mapped with a given wmclass
-
-	* openbox/client.h: add the startup_id
-
-	* openbox/openbox.c, openbox/openbox.h: add the NONE cursor.
-	remove startup notification code from openbox.c and openbox.h
-	call the new sn_startup/shutdown for startupnotification.c
-
-	* openbox/moveresize.c: use NONE cursor when not specifying one
-
-	* Makefile.am:
-	remove startup hacks and add startup notification in its own files
-
-	* openbox/event.c:
-	remove the startup notification code from event.c, it all lives in its own file now
-
-	* openbox/startupnotify.c, openbox/startupnotify.h:
-	add startup notification in its own .c/.h files
-
-	* openbox/menuframe.c: use the NONE cursor when not specifying one
-
-	* openbox/mainloop.c, openbox/mainloop.h:
-	add ob_main_loop_timeout_remove_data.
-	make the timeout remove functions remove *all* timeouts that match
-
-	* openbox/startup.c, openbox/startup.h:
-	remove teh startup state saving hacks since we can reconfigure now. no more restarting for the average user anymore.
-
-	* openbox/grab.c: use the NONE cursor when not specifying one
-
-	* openbox/screen.c, openbox/screen.h:
-	remove all the startup notification code from screen.c
-
-	* openbox/prop.c, openbox/prop.h: add the startup_id atom
-
-	* openbox/action.c, openbox/keyboard.c, openbox/mouse.c:
-	use the NONE cursor when not specifying a cursor
-
-	* openbox/misc.h: add a NONE cursor, to not change the cursor at all
-
-	* data/menu.xml: add reconfigure to the menu
-
-	* openbox/action.c, openbox/action.h, openbox/client.c, openbox/client.h, openbox/dock.c, openbox/dock.h, openbox/event.c, openbox/event.h, openbox/focus.c, openbox/focus.h, openbox/frame.c, openbox/frame.h, openbox/grab.h, openbox/group.c, openbox/group.h, openbox/keyboard.c, openbox/keyboard.h, openbox/menu.c, openbox/menu.h, openbox/mouse.c, openbox/mouse.h, openbox/moveresize.c, openbox/moveresize.h, openbox/openbox.c, openbox/openbox.h, openbox/screen.c, openbox/screen.h, openbox/window.c, openbox/window.h:
-	add a reconfigure action, also reconfigure on SIGUSR2.
-	support reconfiguring throughout the entire codebase.
-
-	* themes/thebear/themerc: updates for thebear from merry
-
-	* openbox/event.c:
-	make focusDelay check the destroying window properly before killing the timer
-
-	* data/rc.xml: add default A-space binding for the client menu
-
-	* AUTHORS: add teh focusDelay option for mikachu
-
-	* openbox/menuframe.c, openbox/menuframe.h:
-	track the maximum margin of menu items. use this to keep icons in the menus inside the bevel/borders of the menu items
-
-	* ChangeLog: recent changes
-
-	* configure.ac: alpha8
-
-	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c:
-	add the focusDelay option
-
-	* openbox/mouse.c:
-	dont grab frame context mouse bindings on desktop windows
-
-	* openbox/client.c, openbox/client.h, openbox/menu.c, openbox/moveresize.c:
-	make the client destructor a GDestroyNotify
-
-	* Makefile.am: add themeupdate.py to the distribution
-
-	* data/rc.xml: add focus the desktop on left click binding
-
-	* openbox/menuframe.c: rm empty line
-
-	* openbox/menuframe.c: limit menus' width to 400px
-
-	* data/rc.xml, openbox/config.c:
-	rename the theme name node from 'theme' to 'name'
-
-	* data/rc.xml: fix capitalization and empty tags. cleanup.
-
-	* data/rc.xml: remove obsolete placement/remember option
-
-	* openbox/moveresize.c:
-	only show resize popups for clients with size increments. no move popup at all. waste of screen space.
-
-	* openbox/popup.c: use the provided margins to layout the popup better
-
-	* render/render.c, render/render.h:
-	provide a function to give the margins for an appearance
-
-	* data/rc.xml, openbox/config.c:
-	make the default screen-edge resistance 20 (double what it is for windows)
-
-	* render/render.c:
-	we use the offsets we get from the server, we should use the byte order too..
-
-	* render/color.c: remove bad comment
-
-2003-09-03  Ben Jansens  <xor@zed.orodu.net>
 
 	* ChangeLog: recent changes
 
@@ -1465,8 +1176,6 @@
 
 2003-08-03  Ben Jansens  <xor@zed.orodu.net>
 
-	* tools/obconf/main.c: add more widgets to the main window
-
 	* ChangeLog: recent changes
 
 	* data/rc3, openbox/client.c, openbox/config.c, openbox/config.h, openbox/moveresize.c:
@@ -1477,10 +1186,6 @@
 	give the plate the same background color as its border
 
 2003-08-02  Ben Jansens  <xor@zed.orodu.net>
-
-	* tools/obconf/main.c: has a pane and list and workarea
-
-	* tools/obconf/main.c: has a menu and a treeview
 
 	* openbox/client.c, openbox/event.c:
 	use the frame size not the client size when figuring out if stuff fits on the screen
@@ -1568,8 +1273,6 @@
 	* configure.ac: alpha3
 
 	* openbox/frame.c: fix a long-lurknig gravity bug
-
-	* tools/obconf/main.c: dont inlcude these headers they arent needed yet
 
 	* ChangeLog: recent changes
 
@@ -1710,10 +1413,7 @@
 
 2003-07-26  Ben Jansens  <xor@zed.orodu.net>
 
-	* tools/obconf/main.c: make errors non-modal
-
-	* Makefile.am, configure.ac, tools/obconf/.cvsignore, tools/obconf/Makefile, tools/obconf/main.c:
-	restarting work on obconf
+	* Makefile.am, configure.ac: restarting work on obconf
 
 	* ChangeLog: recent changes
 
@@ -1756,7 +1456,7 @@
 	* configure.ac:
 	dont display the build type at the end its already in the output
 
-	* configure.ac, openbox/action.c, openbox/client.c, openbox/debug.h, openbox/dock.c, openbox/event.c, openbox/focus.c, openbox/menu.c, openbox/menu_render.c, openbox/openbox.c, openbox/screen.c, parser/parse.c, render/color.c, render/gradient.c, render/instance.c, render/theme.c, tools/obconf/main.c:
+	* configure.ac, openbox/action.c, openbox/client.c, openbox/debug.h, openbox/dock.c, openbox/event.c, openbox/focus.c, openbox/menu.c, openbox/menu_render.c, openbox/openbox.c, openbox/screen.c, parser/parse.c, render/color.c, render/gradient.c, render/instance.c, render/theme.c:
 	use ob_debug for any debug printing and only display the output when its a debug build or when --debug is passed to it
 
 	* render/gradient.c:
@@ -2007,7 +1707,7 @@
 	* render/color.c, render/font.c, render/font.h, render/geom.h, render/image.c, render/image.h, render/mask.c, render/mask.h, render/render.c, render/render.h:
 	remove rependancy on geom.h from the kernel, provide what is used in its own geom.h
 
-	* Makefile.am, configure.ac, data/.cvsignore, data/Makefile, data/Makefile.am, openbox/.cvsignore, openbox/Makefile, openbox/Makefile.am, parser/.cvsignore, parser/Makefile, parser/Makefile.am, render/.cvsignore, render/Makefile, render/Makefile.am, themes/.cvsignore, themes/Makefile, themes/Makefile.am, tools/Makefile.am, tools/obconf/Makefile.am:
+	* Makefile.am, configure.ac, data/.cvsignore, data/Makefile, data/Makefile.am, openbox/.cvsignore, openbox/Makefile, openbox/Makefile.am, parser/.cvsignore, parser/Makefile, parser/Makefile.am, render/.cvsignore, render/Makefile, render/Makefile.am, themes/.cvsignore, themes/Makefile, themes/Makefile.am, tools/Makefile.am:
 	update the build system, using a single Makefile.am for a sexyass non-recursive make. booyah!
 
 	* gettext.h, openbox/gettext.h:
@@ -2073,7 +1773,7 @@
 	* openbox/popup.c:
 	create the popup's window before adding it to the stacking list, so that it is stacked properly and doesnt wreck everything
 
-	* Makefile.am, configure.ac, data/Makefile.am, openbox/Makefile.am, parser/Makefile.am, render/Makefile.am, themes/Makefile.am, tools/obconf/Makefile.am:
+	* Makefile.am, configure.ac, data/Makefile.am, openbox/Makefile.am, parser/Makefile.am, render/Makefile.am, themes/Makefile.am:
 	prepare for alpha1 release.
 	make 'make dist' work.
 
@@ -2741,7 +2441,7 @@
 
 2003-05-24  Ben Jansens  <xor@zed.orodu.net>
 
-	* Makefile.am, configure.ac, openbox/Makefile.am, openbox/action.c, openbox/action.h, openbox/config.c, openbox/focus.c, openbox/openbox.c, openbox/parse.c, openbox/parse.h, openbox/plugin.c, parser/.cvsignore, parser/Makefile.am, parser/parse.c, parser/parse.h, tools/.cvsignore, tools/Makefile.am, tools/obconf/.cvsignore, tools/obconf/Makefile.am, tools/obconf/about.c, tools/obconf/main.c, tools/obconf/obconf.glade, tools/obconf/obconf.gladep, tools/obconf/obconf.h, tools/obconf/plugins.c, tools/obconf/plugins.h:
+	* Makefile.am, configure.ac, openbox/Makefile.am, openbox/action.c, openbox/action.h, openbox/config.c, openbox/focus.c, openbox/openbox.c, openbox/parse.c, openbox/parse.h, openbox/plugin.c, parser/.cvsignore, parser/Makefile.am, parser/parse.c, parser/parse.h, tools/.cvsignore, tools/Makefile.am:
 	this is a big one! im putting stats in here just cuz!
 	 59 files changed, 1691 insertions(+), 607 deletions(-)
 	Adding the beginings of ObConf. Adding a resistance-config plugin for ObConf.

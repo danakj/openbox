@@ -1,6 +1,6 @@
 <openbox_menu>
 
-<menu id="root" label="Openbox 3">
+<menu id="root-menu" label="Openbox 3">
   <menu id="apps" label="Applications">
     <item label="Xterm">
       <action name="execute"><execute>xterm</execute></action>

@@ -82,7 +82,7 @@ AC_DEFUN([XFT_DEVEL],
   LIBS="$LIBS $XFT_LIBS"
   CXXFLAGS="$XFT_CFLAGS $CXXFLAGS"
 
-  AC_CHECK_LIB([Xft], [XftGetVersion],
+  AC_CHECK_LIB([Xft], [XftGetVersion], # this was not defined in < 2.0
     if test "$XFT_MIN"; then
       AC_MSG_CHECKING([for X11/Xft/Xft.h for Xft >= $XFT_MIN])
       AC_TRY_COMPILE(

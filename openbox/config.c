@@ -9,6 +9,8 @@ gboolean config_focus_popup;
 
 char *config_theme;
 
+gchar *config_title_layout;
+
 int     config_desktops_num;
 GSList *config_desktops_names;
 
@@ -51,6 +53,10 @@ static void parse_theme(xmlDocPtr doc, xmlNodePtr node, void *d)
     if ((n = parse_find_node("theme", node))) {
         g_free(config_theme);
         config_theme = parse_string(doc, n);
+    }
+    if ((n = parse_find_node("titlelayout", node))) {
+        g_free(config_title_layout);
+        config_title_layout = parse_string(doc, n);
     }
 }
 
@@ -163,6 +169,8 @@ void config_startup()
     parse_register("focus", parse_focus, NULL);
 
     config_theme = NULL;
+
+    config_title_layout = g_strdup("NLIMC");
 
     parse_register("theme", parse_theme, NULL);
 

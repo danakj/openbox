@@ -47,6 +47,9 @@ extern guint config_dock_hide_timeout;
 /* The name of the theme */
 char *config_theme;
 
+/* Titlebar button layout */
+gchar *config_title_layout;
+
 /*! The number of desktops */
 extern int config_desktops_num;
 /*! Names for the desktops */

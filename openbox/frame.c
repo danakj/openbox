@@ -2,6 +2,7 @@
 #include "client.h"
 #include "openbox.h"
 #include "extensions.h"
+#include "config.h"
 #include "framerender.h"
 #include "render/theme.h"
 
@@ -429,7 +430,7 @@ static void layout_title(ObFrame *self)
 
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_rr_theme->bevel + 1) * 2;
-    for (lc = ob_rr_theme->title_layout; *lc != '\0'; ++lc) {
+    for (lc = config_title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
             if (n) { *lc = ' '; break; } /* rm duplicates */
@@ -487,7 +488,7 @@ static void layout_title(ObFrame *self)
     if (!c) XUnmapWindow(ob_display, self->close);
 
     x = ob_rr_theme->bevel + 1;
-    for (lc = ob_rr_theme->title_layout; *lc != '\0'; ++lc) {
+    for (lc = config_title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;

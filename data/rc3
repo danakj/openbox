@@ -25,6 +25,7 @@
 
 <theme>
   <theme>operation</theme>
+  <titlelayout>NLIMC</titlelayout>
 </theme>
 
 <desktops>

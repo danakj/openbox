@@ -49,9 +49,6 @@ struct _RrTheme {
     gint mfont_height;
     RrFont *mfont;
 
-    /* style settings - title layout */
-    gchar *title_layout;
-
     /* style settings - masks */
     RrPixmapMask *max_set_mask;
     RrPixmapMask *max_unset_mask;

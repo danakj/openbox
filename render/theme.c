@@ -133,11 +133,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             mjust = RR_JUSTIFY_CENTER;
     }
 
-    /* load the title layout */
-    if (!read_string(db, "window.title.layout", &font_str))
-        font_str = "NLIMC";
-    theme->title_layout = g_strdup(font_str);
-
     /* load direct dimensions */
     if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
 	theme->menu_overlap < 0 || theme->menu_overlap > 20)
@@ -731,8 +726,6 @@ void RrThemeFree(RrTheme *theme)
         RrFontClose(theme->winfont);
         RrFontClose(theme->mtitlefont);
         RrFontClose(theme->mfont);
-
-        g_free(theme->title_layout);
 
         RrAppearanceFree(theme->a_disabled_focused_max);
         RrAppearanceFree(theme->a_disabled_unfocused_max);

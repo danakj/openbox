@@ -8,8 +8,10 @@
 #include "yacc_parser.hh"
 
 extern YYSTYPE yylval;
-    
+
 %}
+
+%option yylineno
 
 %%
 
@@ -27,6 +29,8 @@ Mod3 |
 mod3 |
 Mod4 |
 mod4 |
+Mod5 |
+mod5 |
 Control |
 control |
 shift |

@@ -9,7 +9,10 @@
     
 #define YYPARSE_PARAM parser_obj
 #define YYSTYPE char*
-    
+
+extern int yylineno;
+extern char *yytext;
+
 extern "C" {
     int yylex();
     int yywrap() {
@@ -17,14 +20,15 @@ extern "C" {
     }
 }
 
-void yyerror(const char *c) {
-    printf("ERROR: %s\n", c);
+void yyerror(const char *c)
+{
+    printf("ERROR: %s, on line %d, near %s\n", c, yylineno, yytext);
 }
-
 
 %}
 
 %token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING OPTIONS TRUE FALSE
+%expect 1
 
 %%
 

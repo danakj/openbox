@@ -73,6 +73,7 @@ private:
   Action::ActionType _action;
   std::string _key;
   std::string _arg;
+  bool _add;
 };
 
 #endif //__parser_hh

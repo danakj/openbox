@@ -31,12 +31,14 @@ extern "C" {
 
 #include "parser.hh"
 #include <string>
+#include <iostream>
 
 using std::string;
+using std::cout;
 
 parser::parser(keytree *kt, Config *conf)
   : _kt(kt), _config(conf), _mask(0), _action(Action::noaction),
-    _key(""), _arg("")
+    _key(""), _arg(""), _add(true)
 {
 }
 
@@ -120,39 +122,56 @@ void parser::setAction(string act)
     if ( strcasecmp(actions[i].str, act.c_str()) == 0 ) {
       _action = actions[i].act;
       found = true;
+      break;
     }
   }
 
-  if (!found)
-    _action = Action::noaction;
+  if (!found) {
+    cout << "ERROR: Invalid action (" << act << "). Binding ignored.\n";
+    _add = false;
+  }
 }
 
 void parser::addModifier(string mod)
 {
   struct {
-    string str;
+    const char *str;
     unsigned int mask;
   }
   modifiers[] = {
-    { "Mod1", Mod1Mask },
-    { "Mod2", Mod2Mask },
-    { "Mod3", Mod3Mask },
-    { "Mod4", Mod4Mask },
-    { "Control", ControlMask },
-    { "Shift", ShiftMask },
+    { "mod1", Mod1Mask },
+    { "mod2", Mod2Mask },
+    { "mod3", Mod3Mask },
+    { "mod4", Mod4Mask },
+    { "mod5", Mod5Mask },
+    { "control", ControlMask },
+    { "shift", ShiftMask },
     { "", 0 }
   };
 
+  bool found = false;
+
   for (int i = 0; modifiers[i].str != ""; ++i) {
-    if (modifiers[i].str == mod)
+    if ( strcasecmp(modifiers[i].str, mod.c_str()) == 0 ) {
       _mask |= modifiers[i].mask;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    cout << "ERROR: Invalid modifier (" << mod << "). Binding ignored.\n";
+    _add = false;
   }
 }
 
 void parser::endAction()
 {
-  _kt->addAction(_action, _mask, _key, _arg);
+  if (_add)
+    _kt->addAction(_action, _mask, _key, _arg);
   reset();
+
+  _add = true;
 }
 
 void parser::startChain()
@@ -171,6 +190,10 @@ void parser::endChain()
 void parser::setChainBinding()
 {
   if (_mask != 0 && _key != "") {
+    if (!_add) {
+      cout << "Error: Bad modifier detected on chain's root key.\n";
+      _add = true;
+    }
     _kt->setCurrentNodeProps(Action::noaction, _mask, _key, "");
     reset();
   }

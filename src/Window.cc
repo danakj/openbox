@@ -261,16 +261,16 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
 
   if (! screen->sloppyFocus())
     openbox.grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
-        GrabModeSync, GrabModeSync, None, None);
+        GrabModeSync, GrabModeSync, frame.plate, None);
 
   openbox.grabButton(Button1, Mod1Mask, frame.window, True,
       ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-      GrabModeAsync, None, openbox.getMoveCursor());
+      GrabModeAsync, frame.window, openbox.getMoveCursor());
   openbox.grabButton(Button2, Mod1Mask, frame.window, True,
-      ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
+      ButtonReleaseMask, GrabModeAsync, GrabModeAsync, frame.window, None);
   openbox.grabButton(Button3, Mod1Mask, frame.window, True,
       ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-      GrabModeAsync, None, None);
+      GrabModeAsync, frame.window, None);
 
   positionWindows();
   XRaiseWindow(display, frame.plate);

@@ -199,10 +199,8 @@ Openbox::~Openbox()
 
   if (_restart) {
     if (!_restart_prog.empty()) {
-      const std::string &dstr =
-        otk::display->screenInfo(first_screen)->displayString();
-      otk::putenv(const_cast<char *>(dstr.c_str()));
-      execlp(_restart_prog.c_str(), _restart_prog.c_str(), NULL);
+      otk::putenv(otk::display->screenInfo(first_screen)->displayString());
+      execl("/bin/sh", "/bin/sh", "-c", _restart_prog.c_str(), NULL); 
       perror(_restart_prog.c_str());
     }
     

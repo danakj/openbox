@@ -143,7 +143,6 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
 
     switch (sn_monitor_event_get_type(ev)) {
     case SN_MONITOR_EVENT_INITIATED:
-        g_message("starting");
         d = wait_data_new(seq);
         sn_waits = g_slist_prepend(sn_waits, d);
         /* 30 second timeout for apps to start */

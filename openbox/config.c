@@ -365,21 +365,7 @@ static void bind_default_keyboard()
     ObDefKeyBind binds[] = {
         { "A-Tab", "NextWindow" },
         { "S-A-Tab", "PreviousWindow" },
-        { "C-A-Right", "DesktopRight" },
-        { "C-A-Left", "DesktopLeft" },
-        { "C-A-Up", "DesktopUp" },
-        { "C-A-Down", "DesktopDown" },
-        { "S-A-Right", "SendToDesktopRight" },
-        { "S-A-Left", "SendToDesktopLeft" },
-        { "S-A-Up", "SendToDesktopUp" },
-        { "S-A-Down", "SendToDesktopDown" },
-        { "A-F10", "MaximizeFull" },
-        { "A-F5", "UnmaximizeFull" },
-        { "A-F12", "ToggleShade" },
         { "A-F4", "Close" },
-        { "A-F7", "Move" },
-        { "A-F8", "Resize" },
-        { "A-F9", "Iconify" },
         { NULL, NULL }
     };
 
@@ -402,14 +388,6 @@ static void bind_default_mouse()
 {
     ObDefMouseBind *it;
     ObDefMouseBind binds[] = {
-        { "Up", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
-        { "Down", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
-        { "A-Up", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
-        { "A-Down", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
-        { "A-Up", "Frame", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
-        { "A-Down", "Frame", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
-        { "A-Up", "MoveResize", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
-        { "Down", "MoveResize", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
         { "Left", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Middle", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
         { "Right", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },

@@ -3,6 +3,7 @@
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
+#include "font.h"
 #include "../kernel/openbox.h"
 
 int render_depth;
@@ -86,7 +87,7 @@ void x_paint(Window win, Appearance *l, int w, int h)
                 l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
                                         render_visual, render_colormap);
             }
-            font_draw(l->xftdraw, l->texture[i].data.text);
+            font_draw(l->xftdraw, &l->texture[i].data.text);
         break;
         }
     }

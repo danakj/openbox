@@ -1621,6 +1621,33 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 
 void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 {
+    /* move up the transient chain as far as possible first if deiconifying */
+    if (!iconic)
+        while (self->transient_for) {
+            if (self->transient_for != TRAN_GROUP) {
+                if (self->transient_for->iconic == iconic)
+                    break;
+                self = self->transient_for;
+            } else {
+                GSList *it;
+
+                /* the check for TRAN_GROUP is to prevent an infinate loop with
+                   2 transients of the same group at the head of the group's
+                   members list */
+                for (it = self->group->members; it; it = it->next) {
+                    Client *c = it->data;
+
+                    if (c != self && c->transient_for->iconic != iconic &&
+                        (c->transient_for != TRAN_GROUP ||
+                         c->group != self->group)) {
+                        self = it->data;
+                        break;
+                    }
+                }
+                if (it == NULL) break;
+            }
+        }
+
     if (self->iconic == iconic) return; /* nothing to do */
 
     g_message("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),

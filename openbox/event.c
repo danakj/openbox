@@ -1,19 +1,19 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   event.c for the Openbox window manager
-   Copyright (c) 2003        Ben Jansens
+event.c for the Openbox window manager
+Copyright (c) 2003        Ben Jansens
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   See the COPYING file for a copy of the GNU General Public License.
+See the COPYING file for a copy of the GNU General Public License.
 */
 
 #include "event.h"
@@ -123,23 +123,23 @@ void event_startup(gboolean reconfig)
     modmap = XGetModifierMapping(ob_display);
     g_assert(modmap);
     if (modmap && modmap->max_keypermod > 0) {
-	size_t cnt;
-	const size_t size = mask_table_size * modmap->max_keypermod;
-	/* get the values of the keyboard lock modifiers
-	   Note: Caps lock is not retrieved the same way as Scroll and Num
-	   lock since it doesn't need to be. */
-	const KeyCode num_lock = XKeysymToKeycode(ob_display, XK_Num_Lock);
-	const KeyCode scroll_lock = XKeysymToKeycode(ob_display,
-						     XK_Scroll_Lock);
+        size_t cnt;
+        const size_t size = mask_table_size * modmap->max_keypermod;
+        /* get the values of the keyboard lock modifiers
+           Note: Caps lock is not retrieved the same way as Scroll and Num
+           lock since it doesn't need to be. */
+        const KeyCode num_lock = XKeysymToKeycode(ob_display, XK_Num_Lock);
+        const KeyCode scroll_lock = XKeysymToKeycode(ob_display,
+                                                     XK_Scroll_Lock);
 	  
-	for (cnt = 0; cnt < size; ++cnt) {
-	    if (! modmap->modifiermap[cnt]) continue;
+        for (cnt = 0; cnt < size; ++cnt) {
+            if (! modmap->modifiermap[cnt]) continue;
 	       
-	    if (num_lock == modmap->modifiermap[cnt])
-		NumLockMask = mask_table[cnt / modmap->max_keypermod];
-	    if (scroll_lock == modmap->modifiermap[cnt])
-		ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
-	}
+            if (num_lock == modmap->modifiermap[cnt])
+                NumLockMask = mask_table[cnt / modmap->max_keypermod];
+            if (scroll_lock == modmap->modifiermap[cnt])
+                ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
+        }
     }
 
     ob_main_loop_x_add(ob_main_loop, event_process, event_done, NULL, NULL);
@@ -174,29 +174,29 @@ static Window event_get_window(XEvent *e)
         window = RootWindow(ob_display, ob_screen);
         break;
     case MapRequest:
-	window = e->xmap.window;
-	break;
+        window = e->xmap.window;
+        break;
     case UnmapNotify:
-	window = e->xunmap.window;
-	break;
+        window = e->xunmap.window;
+        break;
     case DestroyNotify:
-	window = e->xdestroywindow.window;
-	break;
+        window = e->xdestroywindow.window;
+        break;
     case ConfigureRequest:
-	window = e->xconfigurerequest.window;
-	break;
+        window = e->xconfigurerequest.window;
+        break;
     case ConfigureNotify:
         window = e->xconfigure.window;
         break;
     default:
 #ifdef XKB
-	if (extensions_xkb && e->type == extensions_xkb_event_basep) {
-	    switch (((XkbAnyEvent*)e)->xkb_type) {
-	    case XkbBellNotify:
-		window = ((XkbBellNotifyEvent*)e)->window;
-	    default:
-		window = None;
-	    }
+        if (extensions_xkb && e->type == extensions_xkb_event_basep) {
+            switch (((XkbAnyEvent*)e)->xkb_type) {
+            case XkbBellNotify:
+                window = ((XkbBellNotifyEvent*)e)->window;
+            default:
+                window = None;
+            }
         } else
 #endif
             window = e->xany.window;
@@ -212,24 +212,24 @@ static void event_set_lasttime(XEvent *e)
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-	t = e->xbutton.time;
-	break;
+        t = e->xbutton.time;
+        break;
     case KeyPress:
-	t = e->xkey.time;
-	break;
+        t = e->xkey.time;
+        break;
     case KeyRelease:
-	t = e->xkey.time;
-	break;
+        t = e->xkey.time;
+        break;
     case MotionNotify:
-	t = e->xmotion.time;
-	break;
+        t = e->xmotion.time;
+        break;
     case PropertyNotify:
-	t = e->xproperty.time;
-	break;
+        t = e->xproperty.time;
+        break;
     case EnterNotify:
     case LeaveNotify:
-	t = e->xcrossing.time;
-	break;
+        t = e->xcrossing.time;
+        break;
     default:
         /* if more event types are anticipated, get their timestamp
            explicitly */
@@ -255,31 +255,31 @@ static void event_hack_mods(XEvent *e)
     case ButtonPress:
     case ButtonRelease:
         STRIP_MODS(e->xbutton.state);
-	break;
+        break;
     case KeyPress:
         STRIP_MODS(e->xkey.state);
-	break;
+        break;
     case KeyRelease:
         STRIP_MODS(e->xkey.state);
-	/* remove from the state the mask of the modifier being released, if
-	   it is a modifier key being released (this is a little ugly..) */
-	kp = modmap->modifiermap;
-	for (i = 0; i < mask_table_size; ++i) {
-	    for (k = 0; k < modmap->max_keypermod; ++k) {
-		if (*kp == e->xkey.keycode) { /* found the keycode */
-		    /* remove the mask for it */
-		    e->xkey.state &= ~mask_table[i];
-		    /* cause the first loop to break; */
-		    i = mask_table_size;
-		    break; /* get outta here! */
-		}
-		++kp;
-	    }
-	}
-	break;
+        /* remove from the state the mask of the modifier being released, if
+           it is a modifier key being released (this is a little ugly..) */
+        kp = modmap->modifiermap;
+        for (i = 0; i < mask_table_size; ++i) {
+            for (k = 0; k < modmap->max_keypermod; ++k) {
+                if (*kp == e->xkey.keycode) { /* found the keycode */
+                    /* remove the mask for it */
+                    e->xkey.state &= ~mask_table[i];
+                    /* cause the first loop to break; */
+                    i = mask_table_size;
+                    break; /* get outta here! */
+                }
+                ++kp;
+            }
+        }
+        break;
     case MotionNotify:
         STRIP_MODS(e->xmotion.state);
-	/* compress events */
+        /* compress events */
         {
             XEvent ce;
             while (XCheckTypedWindowEvent(ob_display, e->xmotion.window,
@@ -287,8 +287,8 @@ static void event_hack_mods(XEvent *e)
                 e->xmotion.x_root = ce.xmotion.x_root;
                 e->xmotion.y_root = ce.xmotion.y_root;
             }
-	}
-	break;
+        }
+        break;
     }
 }
 
@@ -409,20 +409,20 @@ static void event_process(const XEvent *ec, gpointer data)
            window directly */
         XWindowChanges xwc;
 	       
-	xwc.x = e->xconfigurerequest.x;
-	xwc.y = e->xconfigurerequest.y;
-	xwc.width = e->xconfigurerequest.width;
-	xwc.height = e->xconfigurerequest.height;
-	xwc.border_width = e->xconfigurerequest.border_width;
-	xwc.sibling = e->xconfigurerequest.above;
-	xwc.stack_mode = e->xconfigurerequest.detail;
+        xwc.x = e->xconfigurerequest.x;
+        xwc.y = e->xconfigurerequest.y;
+        xwc.width = e->xconfigurerequest.width;
+        xwc.height = e->xconfigurerequest.height;
+        xwc.border_width = e->xconfigurerequest.border_width;
+        xwc.sibling = e->xconfigurerequest.above;
+        xwc.stack_mode = e->xconfigurerequest.detail;
        
-	/* we are not to be held responsible if someone sends us an
-	   invalid request! */
-	xerror_set_ignore(TRUE);
-	XConfigureWindow(ob_display, window,
-			 e->xconfigurerequest.value_mask, &xwc);
-	xerror_set_ignore(FALSE);
+        /* we are not to be held responsible if someone sends us an
+           invalid request! */
+        xerror_set_ignore(TRUE);
+        XConfigureWindow(ob_display, window,
+                         e->xconfigurerequest.value_mask, &xwc);
+        xerror_set_ignore(FALSE);
     }
 
     /* user input (action-bound) events */
@@ -473,27 +473,27 @@ static void event_handle_root(XEvent *e)
         break;
 
     case ClientMessage:
-	if (e->xclient.format != 32) break;
+        if (e->xclient.format != 32) break;
 
-	msgtype = e->xclient.message_type;
-	if (msgtype == prop_atoms.net_current_desktop) {
-	    unsigned int d = e->xclient.data.l[0];
-	    if (d < screen_num_desktops)
-		screen_set_desktop(d);
-	} else if (msgtype == prop_atoms.net_number_of_desktops) {
-	    unsigned int d = e->xclient.data.l[0];
-	    if (d > 0)
-		screen_set_num_desktops(d);
-	} else if (msgtype == prop_atoms.net_showing_desktop) {
-	    screen_show_desktop(e->xclient.data.l[0] != 0);
-	}
-	break;
+        msgtype = e->xclient.message_type;
+        if (msgtype == prop_atoms.net_current_desktop) {
+            unsigned int d = e->xclient.data.l[0];
+            if (d < screen_num_desktops)
+                screen_set_desktop(d);
+        } else if (msgtype == prop_atoms.net_number_of_desktops) {
+            unsigned int d = e->xclient.data.l[0];
+            if (d > 0)
+                screen_set_num_desktops(d);
+        } else if (msgtype == prop_atoms.net_showing_desktop) {
+            screen_show_desktop(e->xclient.data.l[0] != 0);
+        }
+        break;
     case PropertyNotify:
-	if (e->xproperty.atom == prop_atoms.net_desktop_names)
-	    screen_update_desktop_names();
-	else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
-	    screen_update_layout();
-	break;
+        if (e->xproperty.atom == prop_atoms.net_desktop_names)
+            screen_update_desktop_names();
+        else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
+            screen_update_layout();
+        break;
     case ConfigureNotify:
 #ifdef XRANDR
         XRRUpdateConfiguration(e);
@@ -584,7 +584,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case FocusIn:
 #ifdef DEBUG_FOCUS
         ob_debug("FocusIn on client for %lx (client %lx) mode %d detail %d\n",
-                 e->xfocus.window, client->window, e->xfocus.mode, e->xfocus.detail);
+                 e->xfocus.window, client->window,
+                 e->xfocus.mode, e->xfocus.detail);
 #endif
         focus_in = client;
         if (focus_out == client)
@@ -593,7 +594,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case FocusOut:
 #ifdef DEBUG_FOCUS
         ob_debug("FocusOut on client for %lx (client %lx) mode %d detail %d\n",
-                 e->xfocus.window, client->window, e->xfocus.mode, e->xfocus.detail);
+                 e->xfocus.window, client->window,
+                 e->xfocus.mode, e->xfocus.detail);
 #endif
         if (focus_in == client)
             focus_in = NULL;
@@ -625,10 +627,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         case OB_FRAME_CONTEXT_FRAME:
             /*
-            if (config_focus_follow && config_focus_delay)
-                ob_main_loop_timeout_remove_data(ob_main_loop,
-                                                 focus_delay_func,
-                                                 client);
+              if (config_focus_follow && config_focus_delay)
+              ob_main_loop_timeout_remove_data(ob_main_loop,
+              focus_delay_func,
+              client);
             */
             break;
         default:
@@ -695,50 +697,50 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     }
     case ConfigureRequest:
-	/* compress these */
-	while (XCheckTypedWindowEvent(ob_display, client->window,
-				      ConfigureRequest, &ce)) {
+        /* compress these */
+        while (XCheckTypedWindowEvent(ob_display, client->window,
+                                      ConfigureRequest, &ce)) {
             ++i;
-	    /* XXX if this causes bad things.. we can compress config req's
-	       with the same mask. */
-	    e->xconfigurerequest.value_mask |=
-		ce.xconfigurerequest.value_mask;
-	    if (ce.xconfigurerequest.value_mask & CWX)
-		e->xconfigurerequest.x = ce.xconfigurerequest.x;
-	    if (ce.xconfigurerequest.value_mask & CWY)
-		e->xconfigurerequest.y = ce.xconfigurerequest.y;
-	    if (ce.xconfigurerequest.value_mask & CWWidth)
-		e->xconfigurerequest.width = ce.xconfigurerequest.width;
-	    if (ce.xconfigurerequest.value_mask & CWHeight)
-		e->xconfigurerequest.height = ce.xconfigurerequest.height;
-	    if (ce.xconfigurerequest.value_mask & CWBorderWidth)
-		e->xconfigurerequest.border_width =
-		    ce.xconfigurerequest.border_width;
-	    if (ce.xconfigurerequest.value_mask & CWStackMode)
-		e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
-	}
+            /* XXX if this causes bad things.. we can compress config req's
+               with the same mask. */
+            e->xconfigurerequest.value_mask |=
+                ce.xconfigurerequest.value_mask;
+            if (ce.xconfigurerequest.value_mask & CWX)
+                e->xconfigurerequest.x = ce.xconfigurerequest.x;
+            if (ce.xconfigurerequest.value_mask & CWY)
+                e->xconfigurerequest.y = ce.xconfigurerequest.y;
+            if (ce.xconfigurerequest.value_mask & CWWidth)
+                e->xconfigurerequest.width = ce.xconfigurerequest.width;
+            if (ce.xconfigurerequest.value_mask & CWHeight)
+                e->xconfigurerequest.height = ce.xconfigurerequest.height;
+            if (ce.xconfigurerequest.value_mask & CWBorderWidth)
+                e->xconfigurerequest.border_width =
+                    ce.xconfigurerequest.border_width;
+            if (ce.xconfigurerequest.value_mask & CWStackMode)
+                e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
+        }
 
-	/* if we are iconic (or shaded (fvwm does this)) ignore the event */
-	if (client->iconic || client->shaded) return;
+        /* if we are iconic (or shaded (fvwm does this)) ignore the event */
+        if (client->iconic || client->shaded) return;
 
-	/* resize, then move, as specified in the EWMH section 7.7 */
-	if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
-					       CWX | CWY |
+        /* resize, then move, as specified in the EWMH section 7.7 */
+        if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
+                                               CWX | CWY |
                                                CWBorderWidth)) {
-	    int x, y, w, h;
-	    ObCorner corner;
+            int x, y, w, h;
+            ObCorner corner;
 
             if (e->xconfigurerequest.value_mask & CWBorderWidth)
                 client->border_width = e->xconfigurerequest.border_width;
 
-	    x = (e->xconfigurerequest.value_mask & CWX) ?
-		e->xconfigurerequest.x : client->area.x;
-	    y = (e->xconfigurerequest.value_mask & CWY) ?
-		e->xconfigurerequest.y : client->area.y;
-	    w = (e->xconfigurerequest.value_mask & CWWidth) ?
-		e->xconfigurerequest.width : client->area.width;
-	    h = (e->xconfigurerequest.value_mask & CWHeight) ?
-		e->xconfigurerequest.height : client->area.height;
+            x = (e->xconfigurerequest.value_mask & CWX) ?
+                e->xconfigurerequest.x : client->area.x;
+            y = (e->xconfigurerequest.value_mask & CWY) ?
+                e->xconfigurerequest.y : client->area.y;
+            w = (e->xconfigurerequest.value_mask & CWWidth) ?
+                e->xconfigurerequest.width : client->area.width;
+            h = (e->xconfigurerequest.value_mask & CWHeight) ?
+                e->xconfigurerequest.height : client->area.height;
 
             {
                 int newx = x;
@@ -755,68 +757,68 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     y = newy;
             }
 	       
-	    switch (client->gravity) {
-	    case NorthEastGravity:
-	    case EastGravity:
-		corner = OB_CORNER_TOPRIGHT;
-		break;
-	    case SouthWestGravity:
-	    case SouthGravity:
-		corner = OB_CORNER_BOTTOMLEFT;
-		break;
-	    case SouthEastGravity:
-		corner = OB_CORNER_BOTTOMRIGHT;
-		break;
-	    default:     /* NorthWest, Static, etc */
-		corner = OB_CORNER_TOPLEFT;
-	    }
+            switch (client->gravity) {
+            case NorthEastGravity:
+            case EastGravity:
+                corner = OB_CORNER_TOPRIGHT;
+                break;
+            case SouthWestGravity:
+            case SouthGravity:
+                corner = OB_CORNER_BOTTOMLEFT;
+                break;
+            case SouthEastGravity:
+                corner = OB_CORNER_BOTTOMRIGHT;
+                break;
+            default:     /* NorthWest, Static, etc */
+                corner = OB_CORNER_TOPLEFT;
+            }
 
-	    client_configure_full(client, corner, x, y, w, h, FALSE, TRUE,
+            client_configure_full(client, corner, x, y, w, h, FALSE, TRUE,
                                   TRUE);
-	}
+        }
 
-	if (e->xconfigurerequest.value_mask & CWStackMode) {
-	    switch (e->xconfigurerequest.detail) {
-	    case Below:
-	    case BottomIf:
-            client_lower(client);
-            break;
+        if (e->xconfigurerequest.value_mask & CWStackMode) {
+            switch (e->xconfigurerequest.detail) {
+            case Below:
+            case BottomIf:
+                client_lower(client);
+                break;
 
-	    case Above:
-	    case TopIf:
-	    default:
-            client_raise(client);
-            break;
-	    }
-	}
-	break;
+            case Above:
+            case TopIf:
+            default:
+                client_raise(client);
+                break;
+            }
+        }
+        break;
     case UnmapNotify:
-	if (client->ignore_unmaps) {
-	    client->ignore_unmaps--;
-	    break;
-	}
-	client_unmanage(client);
-	break;
+        if (client->ignore_unmaps) {
+            client->ignore_unmaps--;
+            break;
+        }
+        client_unmanage(client);
+        break;
     case DestroyNotify:
-	client_unmanage(client);
-	break;
+        client_unmanage(client);
+        break;
     case ReparentNotify:
-	/* this is when the client is first taken captive in the frame */
-	if (e->xreparent.parent == client->frame->plate) break;
+        /* this is when the client is first taken captive in the frame */
+        if (e->xreparent.parent == client->frame->plate) break;
 
-	/*
-	  This event is quite rare and is usually handled in unmapHandler.
-	  However, if the window is unmapped when the reparent event occurs,
-	  the window manager never sees it because an unmap event is not sent
-	  to an already unmapped window.
-	*/
+        /*
+          This event is quite rare and is usually handled in unmapHandler.
+          However, if the window is unmapped when the reparent event occurs,
+          the window manager never sees it because an unmap event is not sent
+          to an already unmapped window.
+        */
 
-	/* we don't want the reparent event, put it back on the stack for the
-	   X server to deal with after we unmanage the window */
-	XPutBackEvent(ob_display, e);
+        /* we don't want the reparent event, put it back on the stack for the
+           X server to deal with after we unmanage the window */
+        XPutBackEvent(ob_display, e);
      
-	client_unmanage(client);
-	break;
+        client_unmanage(client);
+        break;
     case MapRequest:
         ob_debug("MapRequest for 0x%lx\n", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it

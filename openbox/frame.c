@@ -213,6 +213,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 {
     if (resized) {
         self->decorations = self->client->decorations;
+        self->max_horz = self->client->max_horz;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER) {
             self->bwidth = ob_rr_theme->bwidth;
@@ -222,11 +223,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         }
         self->rbwidth = self->bwidth;
 
-        if (self->client->max_vert && self->client->max_horz)
-            self->client->decorations =
-                self->decorations &= ~OB_FRAME_DECOR_HANDLE;
-
-        if (self->client->max_horz)
+        if (self->max_horz)
             self->bwidth = self->cbwidth_x = 0;
 
         STRUT_SET(self->innersize,
@@ -235,7 +232,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   self->cbwidth_x,
                   self->cbwidth_y);
         self->width = self->client->area.width + self->cbwidth_x * 2 -
-            (self->client->max_horz ? self->rbwidth * 2 : 0);
+            (self->max_horz ? self->rbwidth * 2 : 0);
         self->width = MAX(self->width, 1); /* no lower than 1 */
 
         /* set border widths */

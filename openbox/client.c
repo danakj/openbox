@@ -233,7 +233,7 @@ void client_manage(Window window)
 
     /* create the ObClient struct, and populate it from the hints on the
        window */
-    self = g_new(ObClient, 1);
+    self = g_new0(ObClient, 1);
     self->obwin.type = Window_Client;
     self->window = window;
 
@@ -309,8 +309,6 @@ void client_manage(Window window)
     if (ob_state() == OB_STATE_RUNNING)
         client_move_onscreen(self, TRUE);
 
-    screen_update_areas();
-
     client_showhide(self);
 
     /* use client_focus instead of client_activate cuz client_activate does
@@ -328,6 +326,9 @@ void client_manage(Window window)
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
     g_hash_table_insert(window_map, &self->window, self);
+
+    /* this has to happen after we're in the client_list */
+    screen_update_areas();
 
     /* update the list hints */
     client_set_list();
@@ -651,26 +652,11 @@ static void client_toggle_border(ObClient *self, gboolean show)
 
 static void client_get_all(ObClient *self)
 {
-    /* update EVERYTHING!! */
-
-    self->ignore_unmaps = 0;
-  
-    /* defaults */
-    self->frame = NULL;
-    self->session = NULL;
-    self->title = self->icon_title = NULL;
+    /* non-zero defaults */
     self->title_count = 1;
-    self->name = self->class = self->role = NULL;
     self->wmstate = NormalState;
-    self->transient = FALSE;
-    self->transients = NULL;
-    self->transient_for = NULL;
     self->layer = -1;
-    self->urgent = FALSE;
-    self->positioned = FALSE;
     self->decorate = TRUE;
-    self->group = NULL;
-    self->nicons = 0;
 
     client_get_area(self);
     client_update_transient_for(self);
@@ -1131,6 +1117,10 @@ void client_setup_decor_and_functions(ObClient *self)
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
 
+    /* kill the handle on fully maxed windows */
+    if (self->max_vert && self->max_horz)
+        self->decorations &= ~OB_FRAME_DECOR_HANDLE;
+
     /* finally, the user can have requested no decorations, which overrides
        everything */
     if (!self->decorate)
@@ -1408,12 +1398,13 @@ void client_update_strut(ObClient *self)
     guint num;
     guint32 *data;
     gboolean got = FALSE;
+    StrutPartial strut;
 
     if (PROP_GETA32(self->window, net_wm_strut_partial, cardinal,
                     &data, &num)) {
         if (num == 12) {
             got = TRUE;
-            STRUT_PARTIAL_SET(self->strut,
+            STRUT_PARTIAL_SET(strut,
                               data[0], data[2], data[1], data[3],
                               data[4], data[5], data[8], data[9],
                               data[6], data[7], data[10], data[11]);
@@ -1425,7 +1416,7 @@ void client_update_strut(ObClient *self)
         PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
         if (num == 4) {
             got = TRUE;
-            STRUT_PARTIAL_SET(self->strut,
+            STRUT_PARTIAL_SET(strut,
                               data[0], data[2], data[1], data[3],
                               0, 0, 0, 0, 0, 0, 0, 0);
         }
@@ -1433,13 +1424,17 @@ void client_update_strut(ObClient *self)
     }
 
     if (!got)
-        STRUT_PARTIAL_SET(self->strut, 0, 0, 0, 0,
+        STRUT_PARTIAL_SET(strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
 
-    /* updating here is pointless while we're being mapped cuz we're not in
-       the client list yet */
-    if (self->frame)
-	screen_update_areas();
+    if (!STRUT_EQUAL(strut, self->strut)) {
+        self->strut = strut;
+
+        /* updating here is pointless while we're being mapped cuz we're not in
+           the client list yet */
+        if (self->frame)
+            screen_update_areas();
+    }
 }
 
 void client_update_icons(ObClient *self)
@@ -1743,6 +1738,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 {
     gboolean moved = FALSE, resized = FALSE;
     guint fdecor = self->frame->decorations;
+    gboolean fhorz = self->frame->max_horz;
 
     /* make the frame recalculate its dimentions n shit without changing
        anything visible for real, this way the constraints below can work with
@@ -1820,6 +1816,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     if (!(w == self->area.width && h == self->area.height)) {
         int basew, baseh, minw, minh;
+        int mw, mh, aw, ah;
 
         /* base size is substituted with min size if not specified */
         if (self->base_size.width || self->base_size.height) {
@@ -1838,33 +1835,31 @@ void client_configure_full(ObClient *self, ObCorner anchor,
             minh = self->base_size.height;
         }
 
-        if (user) {
-            /* for interactive resizing. have to move half an increment in each
-               direction. */
+        /* for interactive resizing. have to move half an increment in each
+           direction. */
 
-            /* how far we are towards the next size inc */
-            int mw = (w - basew) % self->size_inc.width; 
-            int mh = (h - baseh) % self->size_inc.height;
-            /* amount to add */
-            int aw = self->size_inc.width / 2;
-            int ah = self->size_inc.height / 2;
-            /* don't let us move into a new size increment */
-            if (mw + aw >= self->size_inc.width)
-                aw = self->size_inc.width - mw - 1;
-            if (mh + ah >= self->size_inc.height)
-                ah = self->size_inc.height - mh - 1;
-            w += aw;
-            h += ah;
+        /* how far we are towards the next size inc */
+        mw = (w - basew) % self->size_inc.width; 
+        mh = (h - baseh) % self->size_inc.height;
+        /* amount to add */
+        aw = self->size_inc.width / 2;
+        ah = self->size_inc.height / 2;
+        /* don't let us move into a new size increment */
+        if (mw + aw >= self->size_inc.width)
+            aw = self->size_inc.width - mw - 1;
+        if (mh + ah >= self->size_inc.height)
+            ah = self->size_inc.height - mh - 1;
+        w += aw;
+        h += ah;
     
-            /* if this is a user-requested resize, then check against min/max
-               sizes */
+        /* if this is a user-requested resize, then check against min/max
+           sizes */
 
-            /* smaller than min size or bigger than max size? */
-            if (w > self->max_size.width) w = self->max_size.width;
-            if (w < minw) w = minw;
-            if (h > self->max_size.height) h = self->max_size.height;
-            if (h < minh) h = minh;
-        }
+        /* smaller than min size or bigger than max size? */
+        if (w > self->max_size.width) w = self->max_size.width;
+        if (w < minw) w = minw;
+        if (h > self->max_size.height) h = self->max_size.height;
+        if (h < minh) h = minh;
 
         w -= basew;
         h -= baseh;
@@ -1888,20 +1883,18 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         w += basew;
         h += baseh;
 
-        if (user) {
-            /* adjust the height to match the width for the aspect ratios.
-             for this, min size is not substituted for base size ever. */
-            w -= self->base_size.width;
-            h -= self->base_size.height;
+        /* adjust the height to match the width for the aspect ratios.
+           for this, min size is not substituted for base size ever. */
+        w -= self->base_size.width;
+        h -= self->base_size.height;
 
-            if (self->min_ratio)
-                if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
-            if (self->max_ratio)
-                if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
+        if (self->min_ratio)
+            if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
+        if (self->max_ratio)
+            if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
 
-            w += self->base_size.width;
-            h += self->base_size.height;
-        }
+        w += self->base_size.width;
+        h += self->base_size.height;
     }
 
     switch (anchor) {
@@ -1933,7 +1926,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     /* move/resize the frame to match the request */
     if (self->frame) {
-        if (self->decorations != fdecor)
+        if (self->decorations != fdecor || self->max_horz != fhorz)
             moved = resized = TRUE;
 
         if (moved || resized)
@@ -2189,6 +2182,8 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
 	PROP_ERASE(self->window, openbox_premax);
 
     client_change_state(self); /* change the state hints on the client */
+
+    client_setup_decor_and_functions(self);
 
     /* figure out where the client should be going */
     frame_frame_gravity(self->frame, &x, &y);

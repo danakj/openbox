@@ -59,6 +59,7 @@ struct _ObFrame
     gboolean obscured;
 
     guint     decorations;
+    gboolean  max_horz;
 
     Window    title;
     Window    label;

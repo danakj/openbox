@@ -14,6 +14,8 @@ static void place_random(Client *c)
     int x, y;
     Rect *area;
 
+    if (ob_state == State_Starting) return;
+
     area = screen_area(c->desktop);
 
     l = area->x;
@@ -34,8 +36,6 @@ static void place_random(Client *c)
 static void event(ObEvent *e, void *foo)
 {
     g_assert(e->type == Event_Client_New);
-
-    if (ob_state == State_Starting) return;
 
     /* requested a position */
     if (e->data.c.client->positioned) return;

@@ -179,7 +179,47 @@ gboolean startup()
     a_focused_handle = appearance_new(Surface_Planar, 0);
     a_unfocused_handle = appearance_new(Surface_Planar, 0);
 
-    return load();
+    if (load()) {
+        RECT_SET(a_focused_pressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_unpressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_pressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_unpressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_pressed_iconify->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_unpressed_iconify->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_pressed_iconify->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_unpressed_iconify->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_unpressed_iconify->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_pressed_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_unpressed_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_pressed_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_unpressed_max->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_pressed_close->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_focused_unpressed_close->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_pressed_close->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(a_unfocused_unpressed_close->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+
+        RECT_SET(a_focused_grip->area, 0, 0, GRIP_WIDTH, s_handle_height);
+        RECT_SET(a_unfocused_grip->area, 0, 0, GRIP_WIDTH, s_handle_height);
+        return TRUE;
+    } else
+        return FALSE;
 }
 
 void shutdown()
@@ -444,6 +484,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
             self->innersize.top += TITLE_HEIGHT + self->bwidth;
             XMapWindow(ob_display, self->title);
 
+            RECT_SET(self->a_focused_title->area, 0, 0,
+                     self->width, TITLE_HEIGHT);
+            RECT_SET(self->a_unfocused_title->area, 0, 0,
+                     self->width, TITLE_HEIGHT);
+
             /* layout the title bar elements */
             layout_title(self);
         } else {
@@ -466,6 +511,26 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
             self->innersize.bottom += s_handle_height +
                 self->bwidth;
             XMapWindow(ob_display, self->handle);
+
+            if (self->a_focused_handle->surface.data.planar.grad ==
+                Background_ParentRelative)
+                RECT_SET(self->a_focused_handle->area, 0, 0,
+                         self->width, s_handle_height);
+            else
+                RECT_SET(self->a_focused_handle->area,
+                         GRIP_WIDTH + self->bwidth, 0,
+                         self->width - (GRIP_WIDTH + self->bwidth) * 2,
+                         s_handle_height);
+            if (self->a_unfocused_handle->surface.data.planar.grad ==
+                Background_ParentRelative)
+                RECT_SET(self->a_unfocused_handle->area, 0, 0,
+                         self->width, s_handle_height);
+            else
+                RECT_SET(self->a_unfocused_handle->area,
+                         GRIP_WIDTH + self->bwidth, 0,
+                         self->width - (GRIP_WIDTH + self->bwidth) * 2,
+                         s_handle_height);
+
         } else
             XUnmapWindow(ob_display, self->handle);
     }
@@ -510,7 +575,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
        shading can change without being moved or resized */
     XMoveResizeWindow(ob_display, self->frame.window,
                       self->frame.area.x, self->frame.area.y,
-                      self->width, self->frame.area.height - self->bwidth * 2);
+                      self->width,
+                      self->frame.area.height - self->bwidth * 2);
 
     if (resized) {
         render(self);
@@ -619,7 +685,7 @@ void frame_release_client(ObFrame *self, Client *client)
 
 static void layout_title(ObFrame *self)
 {
-    const char *lc;
+    char *lc;
     int x;
     gboolean n, d, i, l, m ,c;
     ConfigValue layout;
@@ -637,29 +703,35 @@ static void layout_title(ObFrame *self)
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
+            if (n) { *lc = ' '; break; } /* rm duplicates */
 	    n = TRUE;
 	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'D':
 	    if (!(self->frame.client->decorations & Decor_AllDesktops)) break;
+            if (d) { *lc = ' '; break; } /* rm duplicates */
 	    d = TRUE;
 	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'I':
 	    if (!(self->frame.client->decorations & Decor_Iconify)) break;
+            if (i) { *lc = ' '; break; } /* rm duplicates */
 	    i = TRUE;
 	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'L':
+            if (l) { *lc = ' '; break; } /* rm duplicates */
 	    l = TRUE;
 	    break;
 	case 'M':
 	    if (!(self->frame.client->decorations & Decor_Maximize)) break;
+            if (m) { *lc = ' '; break; } /* rm duplicates */
 	    m = TRUE;
 	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'C':
 	    if (!(self->frame.client->decorations & Decor_Close)) break;
+            if (c) { *lc = ' '; break; } /* rm duplicates */
 	    c = TRUE;
 	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
@@ -683,6 +755,7 @@ static void layout_title(ObFrame *self)
 	case 'N':
 	    if (!n) break;
 	    self->icon_x = x;
+            RECT_SET(self->a_icon->area, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 	    XMapWindow(ob_display, self->icon);
 	    XMoveWindow(ob_display, self->icon, x, s_bevel + 1);
 	    x += BUTTON_SIZE + s_bevel + 1;
@@ -724,6 +797,11 @@ static void layout_title(ObFrame *self)
 	    break;
 	}
     }
+
+    RECT_SET(self->a_focused_label->area, 0, 0,
+             self->label_width, LABEL_HEIGHT);
+    RECT_SET(self->a_unfocused_label->area, 0, 0,
+             self->label_width, LABEL_HEIGHT);
 }
 
 static void render(ObFrame *self)
@@ -767,7 +845,7 @@ static void render(ObFrame *self)
              (self->close_press ?
               a_unfocused_pressed_close : a_unfocused_unpressed_close));
 
-        paint(self->title, t, 0, 0, self->width, TITLE_HEIGHT);
+        paint(self->title, t);
 
         /* set parents for any parent relative guys */
         l->surface.data.planar.parent = t;
@@ -812,23 +890,19 @@ static void render(ObFrame *self)
 
         if (g->surface.data.planar.grad == Background_ParentRelative) {
             g->surface.data.planar.parent = h;
-            paint(self->handle, h, 0, 0, self->width, s_handle_height);
-        } else {
-            paint(self->handle, h,
-                  GRIP_WIDTH + self->bwidth, 0,
-                  self->width - (GRIP_WIDTH + self->bwidth) * 2,
-                  s_handle_height);
-        }
+            paint(self->handle, h);
+        } else
+            paint(self->handle, h);
 
         g->surface.data.planar.parentx = 0;
         g->surface.data.planar.parenty = 0;
 
-        paint(self->lgrip, g, 0, 0, GRIP_WIDTH, s_handle_height);
+        paint(self->lgrip, g);
 
         g->surface.data.planar.parentx = self->width - GRIP_WIDTH;
         g->surface.data.planar.parenty = 0;
 
-        paint(self->rgrip, g, 0, 0, GRIP_WIDTH, s_handle_height);
+        paint(self->rgrip, g);
     }
 }
 
@@ -841,7 +915,7 @@ static void render_label(ObFrame *self, Appearance *a)
     a->texture[0].data.text.string = self->frame.client->title;
     RECT_SET(a->texture[0].position, 0, 0, self->label_width, LABEL_HEIGHT);
 
-    paint(self->label, a, 0, 0, self->label_width, LABEL_HEIGHT);
+    paint(self->label, a);
 }
 
 static void render_icon(ObFrame *self, Appearance *a)
@@ -859,7 +933,7 @@ static void render_icon(ObFrame *self, Appearance *a)
     } else
         a->texture[0].type = NoTexture;
 
-    paint(self->icon, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->icon, a);
 }
 
 static void render_max(ObFrame *self, Appearance *a)
@@ -867,7 +941,7 @@ static void render_max(ObFrame *self, Appearance *a)
     if (self->max_x < 0) return;
 
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->max, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->max, a);
 }
 
 static void render_iconify(ObFrame *self, Appearance *a)
@@ -875,7 +949,7 @@ static void render_iconify(ObFrame *self, Appearance *a)
     if (self->iconify_x < 0) return;
 
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->iconify, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->iconify, a);
 }
 
 static void render_desk(ObFrame *self, Appearance *a)
@@ -883,7 +957,7 @@ static void render_desk(ObFrame *self, Appearance *a)
     if (self->desk_x < 0) return;
 
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->desk, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->desk, a);
 }
 
 static void render_close(ObFrame *self, Appearance *a)
@@ -891,7 +965,7 @@ static void render_close(ObFrame *self, Appearance *a)
     if (self->close_x < 0) return;
 
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->close, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->close, a);
 }
 
 GQuark get_context(Client *client, Window win)

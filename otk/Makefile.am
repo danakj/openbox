@@ -1,4 +1,4 @@
-CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@
+CPPFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CPPFLAGS@
 
 INCLUDES= -I../src
 
@@ -9,7 +9,10 @@ libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc \
-                  label.cc focuslabel.cc application.cc appwidget.cc
+                  label.cc focuslabel.cc application.cc appwidget.cc \
+                  otk_wrap.cc
+
+#libotk_a_LDFLAGS = $(PYTHON_LDFLAGS)
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -18,6 +21,12 @@ distclean-local:
 
 otk_test: libotk.a otk_test.cc
 	$(CXX) $(CPPFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
+
+otk.i: $(wildcard *.hh)
+	touch $@
+
+otk_wrap.cc: otk.i
+	swig -python -c++ -nodefault -o $@ $<
 
 # local dependencies
 application.o: application.cc application.hh eventdispatcher.hh \

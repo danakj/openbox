@@ -12,18 +12,18 @@ public:
   OtkButton(OtkWidget *parent);
   ~OtkButton();
 
-  inline const BTexture *getPressedFocusTexture(void) const
+  inline const otk::BTexture *getPressedFocusTexture(void) const
   { return _pressed_focus_tx; }
-  void setPressedFocusTexture(BTexture *texture)
+  void setPressedFocusTexture(otk::BTexture *texture)
   { _pressed_focus_tx = texture; }
 
-  inline const BTexture *getPressedUnfocusTexture(void) const
+  inline const otk::BTexture *getPressedUnfocusTexture(void) const
   { return _pressed_unfocus_tx; }
-  void setPressedUnfocusTexture(BTexture *texture)
+  void setPressedUnfocusTexture(otk::BTexture *texture)
   { _pressed_unfocus_tx = texture; }
 
-  void setTexture(BTexture *texture);
-  void setUnfocusTexture(BTexture *texture);
+  void setTexture(otk::BTexture *texture);
+  void setUnfocusTexture(otk::BTexture *texture);
 
   inline bool isPressed(void) const { return _pressed; }
   void press(unsigned int mouse_button);
@@ -32,7 +32,7 @@ public:
   void buttonPressHandler(const XButtonEvent &e);
   void buttonReleaseHandler(const XButtonEvent &e);
 
-  virtual void setStyle(Style *style);
+  virtual void setStyle(otk::Style *style);
   
 private:
 

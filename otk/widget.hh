@@ -25,8 +25,8 @@ public:
 
   typedef std::list<OtkWidget *> OtkWidgetList;
 
-  OtkWidget(OtkWidget *parent, Direction = Horizontal);
-  OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
+  OtkWidget(otk::OtkWidget *parent, Direction = Horizontal);
+  OtkWidget(otk::OtkEventDispatcher *event_dispatcher, otk::Style *style,
             Direction direction = Horizontal, Cursor cursor = 0,
             int bevel_width = 1);
 
@@ -38,12 +38,12 @@ public:
   void configureHandler(const XConfigureEvent &e);
 
   inline Window window(void) const { return _window; }
-  inline const OtkWidget *parent(void) const { return _parent; }
+  inline const otk::OtkWidget *parent(void) const { return _parent; }
   inline const OtkWidgetList &children(void) const { return _children; }
   inline unsigned int screen(void) const { return _screen; }
-  inline const Rect &rect(void) const { return _rect; }
+  inline const otk::Rect &rect(void) const { return _rect; }
 
-  void move(const Point &to);
+  void move(const otk::Point &to);
   void move(int x, int y);
 
   virtual void setWidth(int);
@@ -52,11 +52,11 @@ public:
   virtual int width() const { return _rect.width(); }
   virtual int height() const { return _rect.height(); }
 
-  virtual void resize(const Point &to);
+  virtual void resize(const otk::Point &to);
   virtual void resize(int x, int y);
 
-  virtual void setGeometry(const Rect &new_geom);
-  virtual void setGeometry(const Point &topleft, int width, int height);
+  virtual void setGeometry(const otk::Rect &new_geom);
+  virtual void setGeometry(const otk::Point &topleft, int width, int height);
   virtual void setGeometry(int x, int y, int width, int height);
 
   inline bool isVisible(void) const { return _visible; };
@@ -75,12 +75,12 @@ public:
   bool grabKeyboard(void);
   void ungrabKeyboard(void);
 
-  inline BTexture *texture(void) const { return _texture; }
-  virtual void setTexture(BTexture *texture)
+  inline otk::BTexture *texture(void) const { return _texture; }
+  virtual void setTexture(otk::BTexture *texture)
     { _texture = texture; _dirty = true; }
 
-  inline const BColor *borderColor(void) const { return _bcolor; }
-  virtual void setBorderColor(const BColor *color) {
+  inline const otk::BColor *borderColor(void) const { return _bcolor; }
+  virtual void setBorderColor(const otk::BColor *color) {
     assert(color); _bcolor = color;
     XSetWindowBorder(OBDisplay::display, _window, color->pixel());
   }
@@ -88,7 +88,7 @@ public:
   inline int borderWidth(void) const { return _bwidth; }
   void setBorderWidth(int width) {
     _bwidth = width;
-    XSetWindowBorderWidth(OBDisplay::display, _window, width);
+    XSetWindowBorderWidth(otk::OBDisplay::display, _window, width);
   }
 
   virtual void addChild(OtkWidget *child, bool front = false);
@@ -113,12 +113,12 @@ public:
   inline Direction direction(void) const { return _direction; }
   void setDirection(Direction dir) { _direction = dir; }
 
-  inline Style *style(void) const { return _style; }
-  virtual void setStyle(Style *style);
+  inline otk::Style *style(void) const { return _style; }
+  virtual void setStyle(otk::Style *style);
 
-  inline OtkEventDispatcher *eventDispatcher(void)
+  inline otk::OtkEventDispatcher *eventDispatcher(void)
   { return _event_dispatcher; }
-  void setEventDispatcher(OtkEventDispatcher *disp);
+  void setEventDispatcher(otk::OtkEventDispatcher *disp);
 
   void unmanaged(void) { _unmanaged = true; }
 

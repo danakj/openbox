@@ -16,21 +16,21 @@ public:
   virtual ~OtkEventDispatcher();
 
   virtual void clearAllHandlers(void);
-  virtual void registerHandler(Window id, OtkEventHandler *handler);
+  virtual void registerHandler(Window id, otk::OtkEventHandler *handler);
   virtual void clearHandler(Window id);
   virtual void dispatchEvents(void);
 
-  inline void setFallbackHandler(OtkEventHandler *fallback)
+  inline void setFallbackHandler(otk::OtkEventHandler *fallback)
   { _fallback = fallback; }
-  OtkEventHandler *getFallbackHandler(void) const { return _fallback; }
+  otk::OtkEventHandler *getFallbackHandler(void) const { return _fallback; }
 
   //! Sets an event handler that gets all events for all handlers after
   //! any specific handlers have received them
-  inline void setMasterHandler(OtkEventHandler *master)
+  inline void setMasterHandler(otk::OtkEventHandler *master)
   { _master = master; }
-  OtkEventHandler *getMasterHandler(void) const { return _master; }
+  otk::OtkEventHandler *getMasterHandler(void) const { return _master; }
 
-  OtkEventHandler *findHandler(Window win);
+  otk::OtkEventHandler *findHandler(Window win);
   
 private:
   OtkEventMap _map;

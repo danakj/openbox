@@ -60,12 +60,12 @@ void OtkApplication::loadStyle(void)
   _style->load(*_style_conf);
 }
 
-void OtkApplication::exec(void)
+void OtkApplication::run(void)
 {
   if (_appwidget_count <= 0) {
     std::cerr << "ERROR: No main widgets exist. You must create and show() " <<
       "an OtkAppWidget for the OtkApplication before calling " <<
-      "OtkApplication::exec().\n";
+      "OtkApplication::run().\n";
     ::exit(1);
   }
 

@@ -68,15 +68,17 @@ public:
 
 class BImageControl {
 public:
+#ifndef SWIG
   struct CachedImage {
     Pixmap pixmap;
 
     unsigned int count, width, height;
     unsigned long pixel1, pixel2, texture;
   };
+#endif
 
-  BImageControl(OBTimerQueueManager *timermanager,
-                const ScreenInfo *scrn,
+  BImageControl(otk::OBTimerQueueManager *timermanager,
+                const otk::ScreenInfo *scrn,
                 bool _dither= False, int _cpc = 4,
                 unsigned long cache_timeout = 300000l,
                 unsigned long cmax = 200l);
@@ -98,7 +100,7 @@ public:
   unsigned long getSqrt(unsigned int x);
 
   Pixmap renderImage(unsigned int width, unsigned int height,
-                     const BTexture &texture);
+                     const otk::BTexture &texture);
 
   void installRootColormap(void);
   void removeImage(Pixmap pixmap);

@@ -10,23 +10,23 @@ class OtkFocusWidget : public OtkWidget {
 
 public:
 
-  OtkFocusWidget(OtkWidget *parent, Direction = Horizontal);
+  OtkFocusWidget(otk::OtkWidget *parent, Direction = Horizontal);
   virtual ~OtkFocusWidget();
 
   virtual void focus(void);
   virtual void unfocus(void);
 
-  virtual void setTexture(BTexture *texture);
-  virtual void setBorderColor(const BColor *color);
+  virtual void setTexture(otk::BTexture *texture);
+  virtual void setBorderColor(const otk::BColor *color);
 
-  inline void setUnfocusTexture(BTexture *texture)
+  inline void setUnfocusTexture(otk::BTexture *texture)
   { _unfocus_texture = texture; }
-  inline BTexture *getUnfocusTexture(void) const
+  inline otk::BTexture *getUnfocusTexture(void) const
   { return _unfocus_texture; }
 
-  inline void setUnfocusBorderColor(const BColor *color)
+  inline void setUnfocusBorderColor(const otk::BColor *color)
   { _unfocus_bcolor = color; }
-  inline const BColor *getUnfocusBorderColor(void) const
+  inline const otk::BColor *getUnfocusBorderColor(void) const
   { return _unfocus_bcolor; }
 
   inline bool isFocused(void) const { return _focused; }

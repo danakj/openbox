@@ -11,7 +11,7 @@ extern "C" {
 
 namespace otk {
 
-class OtkEventHandler{
+class OtkEventHandler {
 public:
   //! Dispatches events to one of the other handlers based on their type.
   virtual void handle(const XEvent &e);

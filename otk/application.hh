@@ -19,13 +19,13 @@ public:
   OtkApplication(int argc, char **argv);
   virtual ~OtkApplication();
 
-  virtual void exec(void);
+  virtual void run(void);
   // more bummy cool functionality
 
   void setDockable(bool dockable) { _dockable = dockable; }
   inline bool isDockable(void) const { return _dockable; }
 
-  inline Style *getStyle(void) const { return _style; }
+  inline otk::Style *getStyle(void) const { return _style; }
   // more accessors
 
 private:

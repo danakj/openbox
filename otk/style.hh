@@ -13,6 +13,11 @@
 
 namespace otk {
 
+struct PixmapMask {
+  Pixmap mask;
+  unsigned int w, h;
+};
+
 class Style {
 public:
 
@@ -22,11 +27,6 @@ public:
 
   enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
   enum BulletType { RoundBullet = 1, TriangleBullet, SquareBullet, NoBullet };
-
-  struct PixmapMask {
-    Pixmap mask;
-    unsigned int w, h;
-  };
 
 // private:
 
@@ -83,16 +83,11 @@ public:
 
   void load(const Configuration &style);
 
-  inline BColor *getBorderColor(void) { return &border_color; }
-
   inline BColor *getTextFocus(void) { return &l_text_focus; }
   inline BColor *getTextUnfocus(void) { return &l_text_unfocus; }
 
   inline BColor *getButtonPicFocus(void) { return &b_pic_focus; }
   inline BColor *getButtonPicUnfocus(void) { return &b_pic_unfocus; }
-
-  inline BTexture *getFrameFocus(void) { return &f_focus; }
-  inline BTexture *getFrameUnfocus(void) { return &f_unfocus; }
 
   inline BTexture *getTitleFocus(void) { return &t_focus; }
   inline BTexture *getTitleUnfocus(void) { return &t_unfocus; }

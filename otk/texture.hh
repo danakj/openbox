@@ -63,7 +63,9 @@ public:
   void setTexture(const unsigned long _texture) { t  = _texture; }
   void addTexture(const unsigned long _texture) { t |= _texture; }
 
+#ifndef SWIG
   BTexture &operator=(const BTexture &tt);
+#endif
   inline bool operator==(const BTexture &tt)
   { return (c == tt.c && ct == tt.ct && lc == tt.lc &&
             sc == tt.sc && t == tt.t); }

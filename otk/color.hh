@@ -40,7 +40,9 @@ public:
   unsigned long pixel(void) const;
 
   // operators
+#ifndef SWIG
   BColor &operator=(const BColor &c);
+#endif
   inline bool operator==(const BColor &c) const
   { return (r == c.r && b == c.b && b == c.b); }
   inline bool operator!=(const BColor &c) const

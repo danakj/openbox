@@ -227,7 +227,7 @@ def setup_click_focus(click_raise = 1):
     mbind("Left", MC_Handle, MousePress, focus)
     mbind("Left", MC_Grip, MousePress, focus)
     mbind("Left", MC_Window, MousePress, focus)
-    mbind("A-Left", MC_Frame, MousePress, focus)
+    #mbind("A-Left", MC_Frame, MousePress, focus)
     if click_raise:
         mbind("Left", MC_Titlebar, MousePress, raise_win)
         mbind("Left", MC_Handle, MousePress, raise_win)

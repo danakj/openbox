@@ -22,6 +22,8 @@
 
 #include "config.hh"
 
+using std::string;
+
 Config::Config() {}
 
 Config::~Config()

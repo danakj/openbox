@@ -46,6 +46,12 @@ public:
   };
 
 private:
+  // defined by black/openbox
+  static const unsigned int PropBlackboxAttributesElements = 9;
+  static const unsigned int AttribDecoration = 1 << 6;
+  static const unsigned int DecorNone = 0;
+  static const unsigned int DecorNormal = 2;
+
   epist  *_epist;
   screen *_screen;
   XAtom  *_xatom;
@@ -67,10 +73,12 @@ private:
   bool _iconic;
   bool _max_vert;
   bool _max_horz;
+  bool _decorated;
 
   bool _unmapped;
 
   void updateDimentions();
+  void updateBlackboxAttributes();
   void updateNormalHints();
   void updateWMHints();
   void updateState();
@@ -95,6 +103,7 @@ public:
   inline bool iconic() const { return _iconic; }
   inline bool maxVert() const { return _max_vert; }
   inline bool maxHorz() const { return _max_horz; }
+  inline bool decorated() const { return _decorated; }
   inline const Rect &area() const { return _rect; }
   inline unsigned int x() const { return _rect.x(); }
   inline unsigned int y() const { return _rect.y(); }
@@ -109,6 +118,7 @@ public:
   void lower() const;
   void iconify() const;
   void focus() const;
+  void decorate(bool d) const;
   void sendTo(unsigned int dest) const;
   void move(int x, int y) const;
   void resizeRel(int dwidth, int dheight) const;

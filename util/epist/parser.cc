@@ -101,6 +101,7 @@ void parser::setAction(string act)
     { "prevscreen", Action::prevScreen },
     { "showrootmenu", Action::showRootMenu },
     { "showworkspacemenu", Action::showWorkspaceMenu },
+    { "toggledecorations", Action::toggleDecorations },
     { "stringchain", Action::stringChain },
     { "keychain", Action::keyChain },
     { "numberchain", Action::numberChain },

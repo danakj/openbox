@@ -321,6 +321,10 @@ void screen::handleKeypress(const XEvent &e) {
     case Action::toggleMaximizeFull:
       window->toggleMaximize(XWindow::Max_Full);
       return;
+
+    case Action::toggleDecorations:
+      window->decorate(! window->decorated());
+      return;
       
     default:
       assert(false);  // unhandled action type!

@@ -44,6 +44,7 @@ XWindow::XWindow(epist *epist, screen *screen, Window window)
   XSelectInput(_epist->getXDisplay(), _window,
                PropertyChangeMask | StructureNotifyMask);
 
+  updateBlackboxAttributes();
   updateNormalHints();
   updateWMHints();
   updateDimentions();
@@ -75,6 +76,23 @@ void XWindow::updateDimentions() {
     _rect.setRect(x, y, w, h);
   else
     _rect.setRect(0, 0, 1, 1);
+}
+
+
+void XWindow::updateBlackboxAttributes() {
+  unsigned long *data;
+  unsigned long num = PropBlackboxAttributesElements;
+
+  _decorated = true;
+
+  if (_xatom->getValue(_window,
+                       XAtom::blackbox_attributes, XAtom::blackbox_attributes,
+                       num, &data)) {
+    if (num == PropBlackboxAttributesElements)
+      if (data[0] & AttribDecoration)
+        _decorated = (data[4] != DecorNone);
+    delete data;
+  }
 }
 
 
@@ -435,4 +453,12 @@ void XWindow::maximize(Max max) const {
                         _xatom->getAtom(XAtom::net_wm_state_maximized_vert));
     break;
   }
+}
+
+
+void XWindow::decorate(bool d) const {
+  _xatom->sendClientMessage(_screen->rootWindow(),
+                            XAtom::blackbox_change_attributes,
+                            _window, AttribDecoration,
+                            0, 0, 0, (d ? DecorNormal : DecorNone));
 }

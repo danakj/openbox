@@ -497,7 +497,7 @@ void XAtom::eraseValue(Window win, Atoms atom) const {
 
 void XAtom::sendClientMessage(Window target, Atoms type, Window about,
                               long data, long data1, long data2,
-                              long data3) const {
+                              long data3, long data4) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(target != None);
 
@@ -510,6 +510,7 @@ void XAtom::sendClientMessage(Window target, Atoms type, Window about,
   e.xclient.data.l[1] = data1;
   e.xclient.data.l[2] = data2;
   e.xclient.data.l[3] = data3;
+  e.xclient.data.l[4] = data4;
 
   XSendEvent(_display, target, False,
              SubstructureRedirectMask | SubstructureNotifyMask,

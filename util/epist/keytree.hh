@@ -40,7 +40,7 @@ struct keynode {
 class keytree : public TimeoutHandler {
 public:
   keytree(Display *, epist *);
-  ~keytree();
+  virtual ~keytree();
 
   void grabDefaults(screen *);
   void ungrabDefaults(screen *);
@@ -72,8 +72,8 @@ private:
   keynode *_head;
   keynode *_current;
   Display *_display;
-  BTimer *_timer;
   screen *_timeout_screen;
+  BTimer *_timer;
   epist *_epist;
 };
 

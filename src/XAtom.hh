@@ -216,7 +216,7 @@ public:
   // sends a client message a window
   void sendClientMessage(Window target, Atoms type, Window about,
                          long data = 0, long data1 = 0, long data2 = 0,
-                         long data3 = 0) const;
+                         long data3 = 0, long data4 = 0) const;
 
   // temporary function!! remove when not used in blackbox.hh anymore!!
   inline Atom getAtom(Atoms a)

@@ -87,6 +87,7 @@ public:
     // these are openbox extensions
     showRootMenu,
     showWorkspaceMenu,
+    toggleDecorations,
 
     stringChain, 
     keyChain,

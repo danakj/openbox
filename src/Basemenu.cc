@@ -619,8 +619,25 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       XFillRectangle(display, menu.frame, hipen.gc(),
                      hilite_x, hilite_y, hilite_w, hilite_h);
   }
-  
+
   if (dooppsel && item->isSelected()) {
+    if ( style->tick_image.mask != None) {
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     oppsel_x, item_y + menu.item_h/2 - style->tick_image.h/2);
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(),
+                   style->tick_image.mask);
+
+      cout << oppsel_x << ' ' << sel_x << endl;
+      XFillRectangle(blackbox->getXDisplay(), menu.frame, pen.gc(),
+                     oppsel_x, item_y + menu.item_h/2 - style->tick_image.h/2,
+                     style->tick_image.w,
+                     style->tick_image.h);
+
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
+      
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     0, 0);
+    } else {
       XPoint pts[6];
 
       pts[0].x = oppsel_x + 0;
@@ -644,6 +661,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
       XFillPolygon(display, menu.frame, pen.gc(), pts, 6, Nonconvex,
                    CoordModePrevious);
+    }
   }
 
   if (dotext && text) {
@@ -655,52 +673,69 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dosel && item->submenu()) {
-    const int bullet_size = 3;
+    if ( style->bullet_image.mask != None) {
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     sel_x, item_y + menu.item_h/2 - style->bullet_image.h/2);
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(),
+                   style->bullet_image.mask);
 
-    switch (screen->getMenuStyle()->bullet) {
-    case Square:
-      XDrawRectangle(display, menu.frame, pen.gc(), sel_x, sel_y,
-                     bullet_size * 2, bullet_size * 2);
-      break;
+      XFillRectangle(blackbox->getXDisplay(), menu.frame, pen.gc(),
+                     sel_x, item_y + menu.item_h/2 - style->bullet_image.h/2,
+                     sel_x + style->bullet_image.w,
+                     item_y + menu.item_h/2 + style->bullet_image.h/2);
 
-    case Triangle:
-      XPoint tri[3];
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
+      
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     0, 0);
+    } else {
+      const int bullet_size = 3;
 
-      if (screen->getMenuStyle()->bullet_pos == Right) {
-        tri[0].x = sel_x + quarter_w - bullet_size;
-        tri[0].y = sel_y + quarter_w - bullet_size;
-        tri[1].x = 2 * bullet_size;
-        tri[1].y = bullet_size;
-        tri[2].x = -(2 * bullet_size);
-        tri[2].y = bullet_size;
-      } else {
-        tri[0].x = sel_x + quarter_w - bullet_size;
-        tri[0].y = item_y + half_w;
-        tri[1].x = 2 * bullet_size;
-        tri[1].y = bullet_size;
-        tri[2].x = 0;
-        tri[2].y = -(2 * bullet_size);
+      switch (screen->getMenuStyle()->bullet) {
+      case Square:
+        XDrawRectangle(display, menu.frame, pen.gc(), sel_x, sel_y,
+                       bullet_size * 2, bullet_size * 2);
+        break;
+
+      case Triangle:
+        XPoint tri[3];
+
+        if (screen->getMenuStyle()->bullet_pos == Right) {
+          tri[0].x = sel_x + quarter_w - bullet_size;
+          tri[0].y = sel_y + quarter_w - bullet_size;
+          tri[1].x = 2 * bullet_size;
+          tri[1].y = bullet_size;
+          tri[2].x = -(2 * bullet_size);
+          tri[2].y = bullet_size;
+        } else {
+          tri[0].x = sel_x + quarter_w - bullet_size;
+          tri[0].y = item_y + half_w;
+          tri[1].x = 2 * bullet_size;
+          tri[1].y = bullet_size;
+          tri[2].x = 0;
+          tri[2].y = -(2 * bullet_size);
+        }
+
+        XFillPolygon(display, menu.frame, pen.gc(), tri, 3, Convex,
+                     CoordModePrevious);
+        break;
+
+      case Diamond:
+        XPoint dia[4];
+
+        dia[0].x = sel_x + quarter_w - bullet_size;
+        dia[0].y = item_y + half_w;
+        dia[1].x = bullet_size;
+        dia[1].y = -bullet_size;
+        dia[2].x = bullet_size;
+        dia[2].y = bullet_size;
+        dia[3].x = -bullet_size;
+        dia[3].y = bullet_size;
+
+        XFillPolygon(display, menu.frame, pen.gc(), dia, 4, Convex,
+                     CoordModePrevious);
+        break;
       }
-
-      XFillPolygon(display, menu.frame, pen.gc(), tri, 3, Convex,
-                   CoordModePrevious);
-      break;
-
-    case Diamond:
-      XPoint dia[4];
-
-      dia[0].x = sel_x + quarter_w - bullet_size;
-      dia[0].y = item_y + half_w;
-      dia[1].x = bullet_size;
-      dia[1].y = -bullet_size;
-      dia[2].x = bullet_size;
-      dia[2].y = bullet_size;
-      dia[3].x = -bullet_size;
-      dia[3].y = bullet_size;
-
-      XFillPolygon(display, menu.frame, pen.gc(), dia, 4, Convex,
-                   CoordModePrevious);
-      break;
     }
   }
 }

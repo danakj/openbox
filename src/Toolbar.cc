@@ -623,28 +623,67 @@ void Toolbar::redrawWorkspaceLabel(bool redraw) {
 
 
 void Toolbar::drawArrow(Drawable surface, bool left) const {
+  ToolbarStyle *style = screen->getToolbarStyle();
+
+  BPen pen(style->b_pic);
+
   int hh = frame.button_w / 2, hw = frame.button_w / 2;
   XPoint pts[3];
   const int bullet_size = 3;
 
+
   if (left) {
-    pts[0].x = hw - bullet_size;
-    pts[0].y = hh;
-    pts[1].x = 2 * bullet_size;
-    pts[1].y = bullet_size;
-    pts[2].x = 0;
-    pts[2].y = -(2 * bullet_size);
+    if (style->left_button.mask == None) {
+      pts[0].x = hw - bullet_size;
+      pts[0].y = hh;
+      pts[1].x = 2 * bullet_size;
+      pts[1].y = bullet_size;
+      pts[2].x = 0;
+      pts[2].y = -(2 * bullet_size);
+      XFillPolygon(display, surface, pen.gc(), pts, 3, Convex,
+                   CoordModePrevious);
+    } else {
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(), style->left_button.mask);
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     (frame.button_w - style->left_button.w)/2,
+                     (frame.button_w - style->left_button.h)/2);
+
+      XFillRectangle(blackbox->getXDisplay(), surface, pen.gc(),
+                     (frame.button_w - style->left_button.w)/2,
+                     (frame.button_w - style->left_button.h)/2,
+                     (frame.button_w + style->left_button.w)/2,
+                     (frame.button_w + style->left_button.h)/2);
+
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
+    }
   } else {
-    pts[0].x = hw - bullet_size;
-    pts[0].y = hh - bullet_size;
-    pts[1].x = (2 * bullet_size);
-    pts[1].y =  bullet_size;
-    pts[2].x = -(2 * bullet_size);
-    pts[2].y = bullet_size;
+    if (style->right_button.mask == None) {
+      pts[0].x = hw - bullet_size;
+      pts[0].y = hh - bullet_size;
+      pts[1].x = (2 * bullet_size);
+      pts[1].y =  bullet_size;
+      pts[2].x = -(2 * bullet_size);
+      pts[2].y = bullet_size;
+      XFillPolygon(display, surface, pen.gc(), pts, 3, Convex,
+                   CoordModePrevious);
+    } else {
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(),
+                   style->right_button.mask);
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+                     (frame.button_w - style->right_button.w)/2,
+                     (frame.button_w - style->right_button.h)/2);
+
+      XFillRectangle(blackbox->getXDisplay(), surface, pen.gc(),
+                     (frame.button_w - style->right_button.w)/2,
+                     (frame.button_w - style->right_button.h)/2,
+                     (frame.button_w + style->right_button.w)/2,
+                     (frame.button_w + style->right_button.h)/2);
+
+      XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
+      XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
+    }
   }
-  
-  BPen pen(screen->getToolbarStyle()->b_pic);
-  XFillPolygon(display, surface, pen.gc(), pts, 3, Convex, CoordModePrevious);
 }
 
 

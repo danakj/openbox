@@ -61,11 +61,18 @@ struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
+struct PixmapMask {
+  Pixmap mask;
+  unsigned int w, h;
+};
+
 struct WindowStyle {
   BColor l_text_focus, l_text_unfocus, b_pic_focus,
     b_pic_unfocus;
   BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
+
+  PixmapMask close_button, max_button, icon_button, stick_button;
 
   BFont *font;
 
@@ -79,6 +86,8 @@ struct ToolbarStyle {
   BColor l_text, w_text, c_text, b_pic;
   BTexture toolbar, label, window, button, pressed, clock;
 
+  PixmapMask left_button, right_button; //these should probably be the same
+  
   BFont *font;
 
   TextJustify justify;
@@ -91,6 +100,8 @@ struct MenuStyle {
   BColor t_text, f_text, h_text, d_text;
   BTexture title, frame, hilite;
 
+  PixmapMask bullet_image, tick_image;
+  
   BFont *t_font, *f_font;
 
   TextJustify t_justify, f_justify;
@@ -180,6 +191,9 @@ private:
 
   bool parseMenuFile(FILE *file, Rootmenu *menu);
 
+  void readDatabaseMask(const string &rname,
+                        PixmapMask &pixmapMask,
+                        const Configuration &style);
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
                                const Configuration &style);

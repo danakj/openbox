@@ -339,6 +339,31 @@ BScreen::~BScreen(void) {
   if (resource.tstyle.font)
     delete resource.tstyle.font;
 
+  if (resource.wstyle.close_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
+  if (resource.wstyle.max_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
+  if (resource.wstyle.icon_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
+  if (resource.wstyle.stick_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
+
+  if (resource.tstyle.left_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
+  if (resource.tstyle.right_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
+
+  if (resource.mstyle.bullet_image.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
+  if (resource.mstyle.tick_image.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
+    
+  resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
+    resource.wstyle.icon_button.mask =
+    resource.wstyle.stick_button.mask = None;
+  resource.tstyle.left_button.mask = resource.tstyle.right_button.mask = None;
+  resource.mstyle.bullet_image.mask = resource.mstyle.tick_image.mask = None;
+  
   XFreeGC(blackbox->getXDisplay(), opGC);
 }
 
@@ -1037,6 +1062,28 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.b_pressed =
     readDatabaseTexture("window.button.pressed", "black", style);
 
+  if (resource.wstyle.close_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
+  if (resource.wstyle.max_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
+  if (resource.wstyle.icon_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
+  if (resource.wstyle.stick_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
+
+  resource.wstyle.close_button.mask = resource.wstyle.max_button.mask =
+    resource.wstyle.icon_button.mask =
+    resource.wstyle.icon_button.mask = None;
+  
+  readDatabaseMask("window.button.close_mask", resource.wstyle.close_button,
+                   style);
+  readDatabaseMask("window.button.max_mask", resource.wstyle.max_button,
+                   style);
+  readDatabaseMask("window.button.icon_mask", resource.wstyle.icon_button,
+                   style);
+  readDatabaseMask("window.button.stick_mask", resource.wstyle.stick_button,
+                   style);
+
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
   BColor color = readDatabaseColor("window.frame.focusColor", "white", style);
@@ -1076,7 +1123,12 @@ void BScreen::LoadStyle(void) {
   if (resource.wstyle.h_unfocus.texture() == BTexture::Parent_Relative)
     resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
 
-// load toolbar config
+  // load toolbar config
+  if (resource.tstyle.left_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.left_button.mask);
+  if (resource.tstyle.right_button.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.tstyle.right_button.mask);
+  
   resource.tstyle.toolbar =
     readDatabaseTexture("toolbar", "black", style);
   resource.tstyle.label =
@@ -1097,7 +1149,11 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("toolbar.clock.textColor", "white", style);
   resource.tstyle.b_pic =
     readDatabaseColor("toolbar.button.picColor", "black", style);
-
+  readDatabaseMask("toolbar.button.left_mask", resource.tstyle.left_button,
+                   style);
+  readDatabaseMask("toolbar.button.right_mask", resource.tstyle.right_button,
+                   style);
+  
   resource.tstyle.justify = LeftJustify;
   if (style.getValue("toolbar.justify", s)) {
     if (s == "right" || s == "Right")
@@ -1115,6 +1171,11 @@ void BScreen::LoadStyle(void) {
   }
 
   // load menu config
+  if (resource.mstyle.bullet_image.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.bullet_image.mask);
+  if (resource.mstyle.tick_image.mask != None)
+    XFreePixmap(blackbox->getXDisplay(), resource.mstyle.tick_image.mask);
+  
   resource.mstyle.title =
     readDatabaseTexture("menu.title", "white", style);
   resource.mstyle.frame =
@@ -1129,7 +1190,9 @@ void BScreen::LoadStyle(void) {
     readDatabaseColor("menu.frame.disableColor", "black", style);
   resource.mstyle.h_text =
     readDatabaseColor("menu.hilite.textColor", "black", style);
-
+  readDatabaseMask("menu.bullet.mask", resource.mstyle.bullet_image, style);
+  readDatabaseMask("menu.selected.mask", resource.mstyle.tick_image, style);
+    
   resource.mstyle.t_justify = LeftJustify;
   if (style.getValue("menu.title.justify", s)) {
     if (s == "right" || s == "Right")
@@ -2566,6 +2629,32 @@ void BScreen::toggleFocusModel(FocusModel model) {
                 std::mem_fun(&BlackboxWindow::grabButtons));
 }
 
+void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
+                               const Configuration &style) {
+  string s;
+  int hx, hy; //ignored
+  int ret = BitmapOpenFailed; //default to failure.
+  
+  if (style.getValue(rname, s))
+  {
+    if (s[0] != '/' && s[0] != '~')
+    {
+      std::string xbmFile = std::string("~/.openbox/buttons/") + s;
+      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
+                            expandTilde(xbmFile).c_str(), &pixmapMask.w,
+                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+    } else
+      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
+                            expandTilde(s).c_str(), &pixmapMask.w,
+                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+    
+    if (ret == BitmapSuccess)
+      return;
+  }
+
+  pixmapMask.mask = None;
+  pixmapMask.w = pixmapMask.h = 0;
+}
 
 BTexture BScreen::readDatabaseTexture(const string &rname,
                                       const string &default_color,

@@ -7,7 +7,7 @@
 #include "mask.h"
 #include "color.h"
 #include "image.h"
-#include "../kernel/openbox.h"
+#include "kernel/openbox.h"
 
 int render_depth;
 Visual *render_visual;
@@ -384,4 +384,44 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
               im, 0, 0, x, y, w, h);
     im->data = NULL;
     XDestroyImage(im);
+}
+
+void appearance_minsize(Appearance *l, Size *s)
+{
+    int i;
+    SIZE_SET(*s, 0, 0);
+
+    switch (l->surface.type) {
+    case Surface_Planar:
+        if (l->surface.data.planar.border ||
+            l->surface.data.planar.bevel == Bevel1)
+            SIZE_SET(*s, 2, 2);
+        else if (l->surface.data.planar.bevel == Bevel2)
+            SIZE_SET(*s, 4, 4);
+
+        for (i = 0; i < l->textures; ++i)
+            switch (l->texture[i].type) {
+            case Bitmask:
+                s->width += l->texture[i].data.mask.mask->w;
+                s->height += l->texture[i].data.mask.mask->h;
+                break;
+            case Text:
+                s->width +=font_measure_string(l->texture[i].data.text.font,
+                                               l->texture[i].data.text.string,
+                                               l->texture[i].data.text.shadow,
+                                               l->texture[i].data.text.offset);
+                s->height +=  font_height(l->texture[i].data.text.font,
+                                          l->texture[i].data.text.shadow,
+                                          l->texture[i].data.text.offset);
+                break;
+            case RGBA:
+                s->width += l->texture[i].data.rgba.width;
+                s->height += l->texture[i].data.rgba.height;
+                break;
+            case NoTexture:
+                break;
+            }            
+        break;
+    }
+    return s;
 }

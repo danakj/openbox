@@ -4,6 +4,7 @@
 #include "extensions.h"
 #include "config.h"
 #include "framerender.h"
+#include "mainloop.h"
 #include "render/theme.h"
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
@@ -39,6 +40,7 @@ ObFrame *frame_new()
     self->visible = FALSE;
     self->obscured = TRUE;
     self->decorations = 0;
+    self->flashing = FALSE;
 
     /* create all of the decor windows */
     mask = CWOverrideRedirect | CWEventMask;
@@ -778,4 +780,56 @@ void frame_frame_gravity(ObFrame *self, int *x, int *y)
 	*y += self->size.top;
 	break;
     }
+}
+
+static void flash_done(gpointer data)
+{
+    ObFrame *self = data;
+    self->flashing = FALSE;
+
+    if (self->focused != self->flash_on)
+        frame_adjust_focus(self, self->focused);
+}
+
+static gboolean flash_timeout(gpointer data)
+{
+    ObFrame *self = data;
+    GTimeVal now;
+    gboolean focused;
+
+    g_message("flash");
+
+    g_get_current_time(&now);
+    if (now.tv_sec > self->flash_end.tv_sec ||
+        (now.tv_sec == self->flash_end.tv_sec &&
+         now.tv_usec >= self->flash_end.tv_usec)) {
+        g_message("done flashing");
+        return FALSE; /* we are done */
+    }
+
+    self->flash_on = !self->flash_on;
+    g_message("on %d", self->flash_on);
+    {
+        focused = self->focused; /* save the focused flag */
+        frame_adjust_focus(self, self->flash_on);
+        self->focused = focused;
+    }
+
+    return TRUE; /* go again */
+}
+
+void frame_flash(ObFrame *self)
+{
+    self->flash_on = self->focused;
+
+    if (!self->flashing)
+        ob_main_loop_timeout_add(ob_main_loop,
+                                 G_USEC_PER_SEC / 2,
+                                 flash_timeout,
+                                 self,
+                                 flash_done);
+    g_get_current_time(&self->flash_end);
+    g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 4);
+    
+    self->flashing = TRUE;
 }

@@ -114,6 +114,10 @@ struct _ObFrame
     gboolean  iconify_hover;
 
     gboolean  focused;
+
+    gboolean  flashing;
+    gboolean  flash_on;
+    GTimeVal  flash_end;
 };
 
 ObFrame *frame_new();
@@ -145,5 +149,6 @@ void frame_client_gravity(ObFrame *self, int *x, int *y);
 */
 void frame_frame_gravity(ObFrame *self, int *x, int *y);
 
+void frame_flash(ObFrame *self);
 
 #endif

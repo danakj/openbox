@@ -32,6 +32,7 @@
 #include "BaseDisplay.h"
 #include "Timer.h"
 #include "Windowmenu.h"
+#include "Geometry.h"
 
 // forward declaration
 class OpenboxWindow;
@@ -66,7 +67,7 @@ typedef struct MwmHints {
 class OpenboxWindow : public TimeoutHandler {
 private:
   BImageControl *image_ctrl;
-  Openbox *openbox;
+  Openbox &openbox;
   BScreen *screen;
   Display *display;
   BTimer *timer;
@@ -110,7 +111,7 @@ private:
   } flags;
 
   struct _client {
-    OpenboxWindow *transient_for,  // which window are we a transient for?
+    OpenboxWindow *transient_for,   // which window are we a transient for?
       *transient;                   // which window is our transient?
 
     Window window,                  // the client's window
@@ -198,7 +199,7 @@ private:
 
     unsigned int width, height, title_h, label_w, label_h, handle_h,
       button_w, button_h, grip_w, grip_h, mwm_border_w, border_h, border_w,
-      bevel_w, snap_w, snap_h;
+      bevel_w;
   } frame;
 
 protected:
@@ -238,7 +239,7 @@ protected:
 
 
 public:
-  OpenboxWindow(Openbox *b, Window w, BScreen *s = (BScreen *) 0);
+  OpenboxWindow(Openbox &b, Window w, BScreen *s = (BScreen *) 0);
   virtual ~OpenboxWindow(void);
 
   inline Bool isTransient(void) const { return flags.transient; }
@@ -270,22 +271,47 @@ public:
 
   inline char **getTitle(void) { return &client.title; }
   inline char **getIconTitle(void) { return &client.icon_title; }
-  inline const int &getXFrame(void) const { return frame.x; }
-  inline const int &getYFrame(void) const { return frame.y; }
-  inline const int &getXClient(void) const { return client.x; }
-  inline const int &getYClient(void) const { return client.y; }
+  //inline const int &getXFrame(void) const { return frame.x; }
+  //inline const int &getYFrame(void) const { return frame.y; }
+  //inline const int &getXClient(void) const { return client.x; }
+  //inline const int &getYClient(void) const { return client.y; }
   inline const int &getWorkspaceNumber(void) const { return workspace_number; }
   inline const int &getWindowNumber(void) const { return window_number; }
 
-  inline const unsigned int &getWidth(void) const { return frame.width; }
-  inline const unsigned int &getHeight(void) const { return frame.height; }
-  inline const unsigned int &getClientHeight(void) const
-  { return client.height; }
-  inline const unsigned int &getClientWidth(void) const
-  { return client.width; }
+  //inline const unsigned int &getWidth(void) const { return frame.width; }
+  //inline const unsigned int &getHeight(void) const {
+  //  if (!flags.shaded)
+  //    return frame.height;
+  //  else
+  //    return frame.title_h;
+  //}
+  //inline const unsigned int &getClientHeight(void) const
+  //{ return client.height; }
+  //inline const unsigned int &getClientWidth(void) const
+  //{ return client.width; }
   inline const unsigned int &getTitleHeight(void) const
   { return frame.title_h; }
 
+  //inline const Point origin() const {
+  //  return Point(frame.x, frame.y);
+  //}
+  //inline const Point clientOrigin() const {
+  //  return Point(client.x, client.y);
+  //}
+  //inline const Size size() const {
+  //  return Size(frame.width, flags.shaded ? frame.title_h : frame.height);
+  //}
+  //inline const Size clientSize() const {
+  //  return Size(client.width, client.height);
+  //}
+  inline const Rect area() const {
+    return Rect(frame.x, frame.y, frame.width,
+                flags.shaded ? frame.title_h : frame.height);
+  }
+  inline const Rect clientArea() const {
+    return Rect(client.x, client.y, client.width, client.height);
+  }
+  
   inline void setWindowNumber(int n) { window_number = n; }
   
   Bool validateClient(void);

@@ -33,84 +33,82 @@
 #include "Netizen.h"
 #include "Screen.h"
 
-Netizen::Netizen(BScreen *scr, Window win) {
-  screen = scr;
-  basedisplay = screen->getBaseDisplay();
-  window = win;
-
+Netizen::Netizen(BScreen &scr, Window win) : screen(scr),
+  basedisplay(scr.getBaseDisplay()), window(win)
+{
   event.type = ClientMessage;
-  event.xclient.message_type = basedisplay->getOpenboxStructureMessagesAtom();
-  event.xclient.display = basedisplay->getXDisplay();
+  event.xclient.message_type = basedisplay.getOpenboxStructureMessagesAtom();
+  event.xclient.display = basedisplay.getXDisplay();
   event.xclient.window = window;
   event.xclient.format = 32;
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyStartupAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyStartupAtom();
   event.xclient.data.l[1] = event.xclient.data.l[2] =
     event.xclient.data.l[3] = event.xclient.data.l[4] = 0l;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendWorkspaceCount(void) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWorkspaceCountAtom();
-  event.xclient.data.l[1] = screen->getCount();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWorkspaceCountAtom();
+  event.xclient.data.l[1] = screen.getWorkspaceCount();
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendCurrentWorkspace(void) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyCurrentWorkspaceAtom();
-  event.xclient.data.l[1] = screen->getCurrentWorkspaceID();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyCurrentWorkspaceAtom();
+  event.xclient.data.l[1] = screen.getCurrentWorkspaceID();
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendWindowFocus(Window w) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWindowFocusAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWindowFocusAtom();
   event.xclient.data.l[1] = w;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendWindowAdd(Window w, unsigned long p) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWindowAddAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWindowAddAtom();
   event.xclient.data.l[1] = w;
   event.xclient.data.l[2] = p;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 
   event.xclient.data.l[2] = 0l;
 }
 
 
 void Netizen::sendWindowDel(Window w) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWindowDelAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWindowDelAtom();
   event.xclient.data.l[1] = w;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendWindowRaise(Window w) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWindowRaiseAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWindowRaiseAtom();
   event.xclient.data.l[1] = w;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendWindowLower(Window w) {
-  event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWindowLowerAtom();
+  event.xclient.data.l[0] = basedisplay.getOpenboxNotifyWindowLowerAtom();
   event.xclient.data.l[1] = w;
 
-  XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
+  XSendEvent(basedisplay.getXDisplay(), window, False, NoEventMask, &event);
 }
 
 
 void Netizen::sendConfigNotify(XEvent *e) {
-  XSendEvent(basedisplay->getXDisplay(), window, False,
+  XSendEvent(basedisplay.getXDisplay(), window, False,
              StructureNotifyMask, e);
 }

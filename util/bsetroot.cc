@@ -2,10 +2,13 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STRING_H
 #  include <string.h>
+#endif // HAVE_STRING_H
+
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STDLIB_H
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
@@ -26,7 +29,7 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
 
   img_ctrl = new BImageControl*[getNumberOfScreens()];
   for (; i < getNumberOfScreens(); i++)
-    img_ctrl[i] = new BImageControl(this, getScreenInfo(i), True);
+    img_ctrl[i] = new BImageControl(*this, *getScreenInfo(i), True);
 
   for (i = 1; i < argc; i++) {
     if (! strcmp("-help", argv[i])) {
@@ -220,8 +223,8 @@ void bsetroot::gradient(void) {
       texture.getColorTo()->setPixel(BlackPixel(getXDisplay(), screen));
 
     pixmaps[screen] =
-      img_ctrl[screen]->renderImage(getScreenInfo(screen)->getWidth(),
-                                    getScreenInfo(screen)->getHeight(),
+      img_ctrl[screen]->renderImage(getScreenInfo(screen)->size().w(),
+                                    getScreenInfo(screen)->size().h(),
                                     &texture);
 
     XSetWindowBackgroundPixmap(getXDisplay(),

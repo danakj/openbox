@@ -32,6 +32,7 @@ class ScreenInfo;
 
 #include "LinkedList.h"
 #include "Timer.h"
+#include "Geometry.h"
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -142,7 +143,7 @@ protected:
 
 
 public:
-  BaseDisplay(char *, char * = 0);
+  BaseDisplay(const char *, char * = 0);
   virtual ~BaseDisplay(void);
 
   inline const Atom &getWMChangeStateAtom(void) const
@@ -328,19 +329,19 @@ public:
 
 class ScreenInfo {
 private:
-  BaseDisplay *basedisplay;
+  BaseDisplay &basedisplay;
   Visual *visual;
   Window root_window;
   Colormap colormap;
 
   int depth, screen_number;
-  unsigned int width, height;
+  Size m_size;
 
 
 public:
-  ScreenInfo(BaseDisplay *, int);
+  ScreenInfo(BaseDisplay &, int);
 
-  inline BaseDisplay *getBaseDisplay(void) { return basedisplay; }
+  inline BaseDisplay &getBaseDisplay(void) { return basedisplay; }
 
   inline Visual *getVisual(void) { return visual; }
   inline const Window &getRootWindow(void) const { return root_window; }
@@ -349,8 +350,9 @@ public:
   inline const int &getDepth(void) const { return depth; }
   inline const int &getScreenNumber(void) const { return screen_number; }
 
-  inline const unsigned int &getWidth(void) const { return width; }
-  inline const unsigned int &getHeight(void) const { return height; }
+//  inline const unsigned int &getWidth(void) const { return width; }
+//  inline const unsigned int &getHeight(void) const { return height; }
+  inline const Size &size() const { return m_size; }
 };
 
 

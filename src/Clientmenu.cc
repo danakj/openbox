@@ -38,10 +38,9 @@
 #include "Workspacemenu.h"
 
 
-Clientmenu::Clientmenu(Workspace *ws) : Basemenu(ws->getScreen()) {
-  wkspc = ws;
-  screen = wkspc->getScreen();
-
+Clientmenu::Clientmenu(Workspace &ws) : Basemenu(ws.getScreen()),
+  screen(ws.getScreen()), wkspc(ws)
+{
   setInternalMenu();
 }
 
@@ -49,16 +48,16 @@ Clientmenu::Clientmenu(Workspace *ws) : Basemenu(ws->getScreen()) {
 void Clientmenu::itemSelected(int button, int index) {
   if (button > 2) return;
 
-  OpenboxWindow *win = wkspc->getWindow(index);
+  OpenboxWindow *win = wkspc.getWindow(index);
   if (win) {
     if (button == 1) {
-      if (! wkspc->isCurrent()) wkspc->setCurrent();
+      if (! wkspc.isCurrent()) wkspc.setCurrent();
     } else if (button == 2) {
-      if (! wkspc->isCurrent()) win->deiconify(True, False);
+      if (! wkspc.isCurrent()) win->deiconify(True, False);
     }
-    wkspc->raiseWindow(win);
+    wkspc.raiseWindow(win);
     win->setInputFocus();
   }
 
-  if (! (screen->getWorkspacemenu()->isTorn() || isTorn())) hide();
+  if (! (screen.getWorkspacemenu()->isTorn() || isTorn())) hide();
 }

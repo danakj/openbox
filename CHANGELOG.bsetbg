@@ -1,3 +1,6 @@
+2.0
+* complete rewrite.
+
 1.12
 * fixed a bug with the bsetroot code that prevented compound commands from
   being executed properly.

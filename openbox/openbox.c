@@ -132,8 +132,6 @@ int main(int argc, char **argv)
     if (ob_rr_inst == NULL)
         ob_exit_with_error("Failed to initialize the render library.");
 
-    /* XXX fork self onto other screens */
-     
     XSynchronize(ob_display, xsync);
 
     /* check for locale support */
@@ -288,6 +286,8 @@ int main(int argc, char **argv)
             config_shutdown();
         } while (reconfigure);
     }
+
+    XSync(ob_display, FALSE);
 
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);

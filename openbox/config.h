@@ -13,8 +13,14 @@ extern gboolean config_focus_last;
 extern gboolean config_focus_last_on_desktop;
 /*! Show a popup dialog while cycling focus */
 extern gboolean config_focus_popup;
-/*! The number of slits to create */
-extern int config_slit_number;
+/*! The number of slits to create 
+  extern int config_slit_number;*/
+/*! When true windows are moved opaquely, when false just an outline is shown
+  while they are moved */
+extern gboolean config_opaque_move;
+/*! When true windows are resize opaquely, when false just an outline is shown
+  while they are resize */
+extern gboolean config_opaque_resize;
 
 /* The name of the theme */
 char *config_theme;

@@ -6,6 +6,7 @@
 #include "dispatch.h"
 #include "openbox.h"
 #include "popup.h"
+#include "config.h"
 #include "render/render.h"
 #include "render/theme.h"
 
@@ -33,9 +34,6 @@ static gboolean first_draw = FALSE;
 
 #define POPUP_X (10)
 #define POPUP_Y (10)
-
-gboolean config_opaque_move = FALSE;
-gboolean config_opaque_resize = FALSE;
 
 void moveresize_startup()
 {
@@ -203,17 +201,22 @@ static void do_move()
     client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
     /* draw the new one */
-    if (!config_opaque_move)
-        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
-                       moveresize_client->frame->area.x,
-                       moveresize_client->frame->area.y,
-                       moveresize_client->frame->area.width - 1,
-                       moveresize_client->frame->area.height - 1);
-    /* erase the old one */
-    if (!config_opaque_move && !first_draw)
-        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
-                       oldx, oldy, oldw - 1, oldh - 1);
-    first_draw = FALSE;
+    if (moveresize_client->frame->area.x != oldx ||
+        moveresize_client->frame->area.y != oldy ||
+        moveresize_client->frame->area.width != oldw ||
+        moveresize_client->frame->area.height != oldh) {
+        if (!config_opaque_move)
+            XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                           moveresize_client->frame->area.x,
+                           moveresize_client->frame->area.y,
+                           moveresize_client->frame->area.width - 1,
+                           moveresize_client->frame->area.height - 1);
+        /* erase the old one */
+        if (!config_opaque_move && !first_draw)
+            XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                           oldx, oldy, oldw - 1, oldh - 1);
+        first_draw = FALSE;
+    }
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

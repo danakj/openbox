@@ -12,6 +12,9 @@ char *config_theme;
 int config_desktops_num;
 GSList *config_desktops_names;
 
+gboolean config_opaque_move;
+gboolean config_opaque_resize;
+
 static void parse_focus(char *name, ParseToken *value)
 {
     if (!g_ascii_strcasecmp(name, "focusnew")) {
@@ -96,6 +99,25 @@ static void parse_desktops(char *name, ParseToken *value)
     parse_free_token(value);
 }
 
+static void parse_moveresize(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "opaque_move")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            config_opaque_move = value->data.integer;
+        }
+    } else if (!g_ascii_strcasecmp(name, "opaque_resize")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            config_opaque_resize = value->data.integer;
+        }
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
+
 void config_startup()
 {
     config_focus_new = TRUE;
@@ -114,6 +136,11 @@ void config_startup()
     config_desktops_names = NULL;
 
     parse_reg_section("desktops", NULL, parse_desktops);
+
+    config_opaque_move = TRUE;
+    config_opaque_resize = TRUE;
+
+    parse_reg_section("moveresize", NULL, parse_moveresize);
 }
 
 void config_shutdown()

@@ -38,6 +38,16 @@
 # A list of names for the desktops
 names = ("one" "two" "three" "four")
 
+[moveresize]
+
+# When true windows are moved opaquely, when false just an outline is shown
+# while they are moved
+#opaque_move = yes
+
+# When true windows are resized opaquely, when false just an outline is shown
+# while they are resized
+#opaque_resize = yes
+
 [theme]
 
 # the theme to display

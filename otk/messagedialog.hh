@@ -40,6 +40,7 @@ public:
 
   virtual void show();
   virtual void hide();
+  virtual void focus();
 
   virtual const DialogButton& result() const { return *_result; }
   virtual void setResult(const DialogButton &result) { _result = &result; }

@@ -112,6 +112,12 @@ const DialogButton& MessageDialog::run()
   return *_result;
 }
 
+void MessageDialog::focus()
+{
+  if (visible())
+    XSetInputFocus(**display, window(), None, CurrentTime);
+}
+
 void MessageDialog::show()
 {
   std::vector<DialogButton>::const_iterator it, end = _buttons.end();

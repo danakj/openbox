@@ -15,8 +15,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
     _file(stylefile)
 {
 // pick one..
-//#define FIERON
-#define MERRY
+#define FIERON
+//#define MERRY
 
 #ifdef FIERON
   _root_color = new RenderColor(_screen, 0x272a2f);
@@ -256,10 +256,10 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                         RenderTexture::Flat,
                                         RenderTexture::Bevel1,
                                         false,
-                                        RenderTexture::Solid,
+                                        RenderTexture::Vertical,
                                         false,
                                         0xe6e6e6,
-                                        0xe6e6e6,
+                                        0xd9d9d9,
                                         0x0,
                                         0x0);
 
@@ -268,24 +268,25 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                    RenderTexture::Flat,
                                    RenderTexture::Bevel1,
                                    true,
-                                   RenderTexture::Solid,
+                                   RenderTexture::Vertical,
                                    false,
                                    //0x6a6973,
                                    //0x6a6973,
                                    0x4c59a6,
- 			           0x4c59a6,
+ 			           0x5a6dbd,
 				   0x222222,
                                    0x0);
-  _label_unfocus = new RenderTexture(_screen,
+  //urg this ain't so hot
+_label_unfocus = new RenderTexture(_screen,
                           		false,
                                    RenderTexture::Flat,
                                    RenderTexture::Bevel1,
                                    true,
-                                   RenderTexture::Solid,
+                                   RenderTexture::Vertical,
                                    false,
-                                   0xcdcac7,
-                                   0xcdcac7,
-				0xb0ada9,
+                                   0xb4b2ad,
+                                   0xc3c1bc,
+				0x6a696a,
                                    0x0);
 
 
@@ -294,10 +295,10 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     RenderTexture::Flat,
                                     RenderTexture::Bevel1,
                                     false,
-                                    RenderTexture::Solid,
+                                    RenderTexture::Vertical,
                                     false,
                                     0xe6e6e6,
-                                        0xe6e6e6,
+                                        0xd9d9d9,
                                     0x0,
                                     0x0);
   _handle_unfocus = new RenderTexture(_screen,
@@ -339,9 +340,9 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _button_press_focus = new RenderTexture(_screen,
                                           false,
                                             RenderTexture::Sunken,
-                                            RenderTexture::Bevel1,
+                                            RenderTexture::Bevel2,
                                           false,
-                                          RenderTexture::Solid,
+                                          RenderTexture::Vertical,
                                           false,
                                           0xe6e6e6,
                                           0xe6e6e6,
@@ -350,9 +351,9 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _button_press_unfocus = new RenderTexture(_screen,
                                             false,
                                               RenderTexture::Sunken,
-                                            RenderTexture::Bevel1,
+                                            RenderTexture::Bevel2,
                                             false,
-                                            RenderTexture::Solid,
+                                            RenderTexture::Vertical,
                                             false,
                                               0xe6e6e6,
                                         0xe6e6e6,
@@ -364,10 +365,10 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                   RenderTexture::Flat,
                                   RenderTexture::Bevel1,
                                   false,
-                                  RenderTexture::Solid,
+                                  RenderTexture::Vertical,
                                   false,
                                     0xe6e6e6,
-                                        0xe6e6e6,
+                                        0xd9d9d9,
                                   0x0,
                                   0x0);
   _grip_unfocus = new RenderTexture(_screen,

@@ -168,7 +168,7 @@ static void manageWindow(Window window)
   /// XMapSubwindows(otk::OBDisplay::display, FRAMEWINDOW);
   XMapWindow(otk::OBDisplay::display, window);
  
-  // handle any requested states such as shaded/maximized
+  // XXX: handle any requested states such as shaded/maximized
 }
 
 // XXX: move this to the OBScreen or OBClient class!

@@ -314,6 +314,7 @@ EXTRA_DIST = \
 	config.rpath \
 	mkinstalldirs \
 	CHANGELOG \
+	COMPLIANCE \
 	README \
 	COPYING \
 	AUTHORS

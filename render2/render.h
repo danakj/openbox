@@ -39,14 +39,6 @@ struct RrColor {
     float a;
 };
 
-/*! Returns the red component for an RrColor */
-#define RrColorRed(c) (c).r
-/*! Returns the green component for an RrColor */
-#define RrColorGreen(c) (c).g
-/*! Returns the blue component for an RrColor */
-#define RrColorBlue(c) (c).b
-/*! Returns the alpha component for an RrColor */
-#define RrColorAlpha(c) (c).a
 /*! Returns if an RrColor is non-opaque */
 #define RrColorHasAlpha(c) ((c).a > 0.0000001)
 
@@ -84,29 +76,6 @@ enum RrSurfaceType {
     RR_SURFACE_NONPLANAR
 };
 
-/*! The options available for the background of an RrSurface */
-enum RrSurfaceColorType {
-    /*! No rendering on the surface background, its contents will be
-      undefined. */
-    RR_SURFACE_NONE,
-    /*! Solid color fill. */
-    RR_SURFACE_SOLID,
-    /*! Horizontal gradient. */
-    RR_SURFACE_HORIZONTAL,
-    /*! Vertical gradient. */
-    RR_SURFACE_VERTICAL,
-    /*! Diagonal (TL->BR) gradient. */
-    RR_SURFACE_DIAGONAL,
-    /*! Cross-Diagonal (TR->BL) gradient. */
-    RR_SURFACE_CROSSDIAGONAL,
-    /*! Pipecross gradient. */
-    RR_SURFACE_PIPECROSS,
-    /*! Rectangle gradient. */
-    RR_SURFACE_RECTANGLE,
-    /*! Pyramid gradient. */
-    RR_SURFACE_PYRAMID
-};
-
 /*! Create a new RrSurface prototype that can't render. A prototype can be
  copied to a new RrSurface that can render. */
 struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
@@ -136,6 +105,36 @@ void RrSurfaceSetArea(struct RrSurface *sur,
                       int h);
 
 Window RrSurfaceWindow(struct RrSurface *sur);
+
+/* planar surfaces */
+
+/*! The options available for the background of an RrSurface */
+enum RrSurfaceColorType {
+    /*! No rendering on the surface background, its contents will be
+      undefined. */
+    RR_PLANAR_NONE,
+    /*! Solid color fill. */
+    RR_PLANAR_SOLID,
+    /*! Horizontal gradient. */
+    RR_PLANAR_HORIZONTAL,
+    /*! Vertical gradient. */
+    RR_PLANAR_VERTICAL,
+    /*! Diagonal (TL->BR) gradient. */
+    RR_PLANAR_DIAGONAL,
+    /*! Cross-Diagonal (TR->BL) gradient. */
+    RR_PLANAR_CROSSDIAGONAL,
+    /*! Pipecross gradient. */
+    RR_PLANAR_PIPECROSS,
+    /*! Rectangle gradient. */
+    RR_PLANAR_RECTANGLE,
+    /*! Pyramid gradient. */
+    RR_PLANAR_PYRAMID
+};
+
+void RrPlanarSet(struct RrSurface *sur,
+                 enum RrSurfaceColorType type,
+                 struct RrColor *primary,
+                 struct RrColor *secondary);
 
 /* textures */
 
@@ -173,12 +172,12 @@ void RrTextureSetText(struct RrSurface *sur,
 /* drawing */
 
 /*! Paints the surface, and all its children */
-void RrSurfacePaint(struct RrSurface *sur);
+void RrPaint(struct RrSurface *sur);
 /*! Paints the surface, and all its children, but only in the given area. */
-void RrSurfacePaintArea(struct RrSurface *sur,
-                        int x,
-                        int y,
-                        int w,
-                        int h);
+void RrPaintArea(struct RrSurface *sur,
+                 int x,
+                 int y,
+                 int w,
+                 int h);
 
 #endif

@@ -22,6 +22,7 @@ libobrender2_la_SOURCES=\
 	debug.c \
 	font.c \
 	surface.c \
+	planar.c \
 	texture.c \
 	paint.c
 
@@ -30,7 +31,9 @@ noinst_HEADERS=\
 	instance.h \
 	debug.h \
 	surface.h \
-	texture.h
+	planar.h \
+	texture.h \
+	color.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

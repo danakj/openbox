@@ -3,13 +3,7 @@
 
 #include "render.h"
 #include "texture.h"
-
-struct RrPlanarSurface {
-    enum RrSurfaceColorType colortype;
-
-    struct RrColor primary;
-    struct RrColor secondary;
-};
+#include "planar.h"
 
 struct RrNonPlanarSurface {
     int foo;
@@ -56,9 +50,5 @@ struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
 #define RrSurfaceY(sur) ((sur)->y)
 #define RrSurfaceWidth(sur) ((sur)->w)
 #define RrSurfaceHeight(sur) ((sur)->h)
-
-#define RrPlanarColorType(sur) ((sur)->data.planar.colortype)
-#define RrPlanarPrimaryColor(sur) ((sur)->data.planar.primary)
-#define RrPlanarSecondaryColor(sur) ((sur)->data.planar.primary)
 
 #endif

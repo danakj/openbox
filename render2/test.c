@@ -19,11 +19,14 @@ int main()
 {
     Display *display;
     Window win;
-    struct RrInstance *inst;
     XEvent report;
     XClassHint chint;
     Atom delete_win, protocols;
     int quit;
+
+    struct RrInstance *inst;
+    struct RrSurface *sur;
+    struct RrColor pri, sec;
 
     if (!(display = XOpenDisplay(NULL))) {
         fprintf(stderr, "couldn't connect to X server in DISPLAY\n");
@@ -55,7 +58,12 @@ int main()
         return EXIT_FAILURE;
     }
 
-    /*paint(win, look);*/
+    sur = RrSurfaceNew(inst, RR_SURFACE_PLANAR, win, 0);
+    RrSurfaceSetArea(sur, 10, 10, 100, 100);
+    RrColorSet(&pri, 0, 0, 0, 0);
+    RrColorSet(&pri, 1, 1, 1, 0);
+    RrPlanarSet(sur, RR_PLANAR_VERTICAL, &pri, &sec);
+
     quit = 0;
     while (!quit) {
         XNextEvent(display, &report);
@@ -65,11 +73,14 @@ int main()
                 if ((Atom)report.xclient.data.l[0] == delete_win)
                     quit = 1;
         case Expose:
+            RrPaint(sur);
             break;
         case ConfigureNotify:
-            /*look->area.width = report.xconfigure.width;
-            look->area.height = report.xconfigure.height;
-            paint(win, look);*/
+            RrSurfaceSetArea(sur,
+                             report.xconfigure.x,
+                             report.xconfigure.y,
+                             report.xconfigure.width,
+                             report.xconfigure.height);
             break;
         }
 

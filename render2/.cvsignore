@@ -13,3 +13,4 @@ font.lo
 surface.lo
 paint.lo
 texture.lo
+planar.lo

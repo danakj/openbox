@@ -32,6 +32,7 @@ void focus_startup()
 void focus_set_client(Client *client)
 {
     Window active;
+    Client *old;
      
     /* sometimes this is called with the already-focused window, this is
        important for the python scripts to work (eg, c = 0 twice). don't just
@@ -47,14 +48,15 @@ void focus_set_client(Client *client)
 	XSetInputFocus(ob_display, focus_backup, RevertToNone, CurrentTime);
     }
 
+    old = focus_client;
     focus_client = client;
 
     /* set the NET_ACTIVE_WINDOW hint */
     active = client ? client->window : None;
     PROP_SET32(ob_root, net_active_window, window, active);
 
-    if (focus_client != NULL) {
+    if (focus_client != NULL)
         dispatch_client(Event_Client_Focus, focus_client, 0, 0);
-        dispatch_client(Event_Client_Unfocus, focus_client, 0, 0);
-    }
+    if (old != NULL)
+        dispatch_client(Event_Client_Unfocus, old, 0, 0);
 }

@@ -2786,6 +2786,7 @@ void BlackboxWindow::beginMove(int x_root, int y_root) {
   frame.grab_y = y_root - frame.rect.y() - frame.border_w;
 }
 
+
 void BlackboxWindow::doMove(int x_root, int y_root) {
   assert(flags.moving);
   assert(blackbox->getChangingWindow() == this);
@@ -2797,16 +2798,96 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   const int snap_distance = screen->getEdgeSnapThreshold();
 
   if (snap_distance) {
-    Rect srect = screen->availableArea();
     // window corners
     const int wleft = dx,
-      wright = dx + frame.rect.width() - 1,
-      wtop = dy,
-      wbottom = dy + frame.rect.height() - 1;
+              wright = dx + frame.rect.width() - 1,
+              wtop = dy,
+              wbottom = dy + frame.rect.height() - 1;
+
+    if (screen->getWindowToWindowSnap()) {
+      Workspace *w = screen->getWorkspace(getWorkspaceNumber());
+      assert(w);
+
+      // try snap to another window
+      for (unsigned int i = 0, c = w->getCount(); i < c; ++i) {
+        BlackboxWindow *snapwin = w->getWindow(i);
+        if (snapwin == this)
+          continue;   // don't snap to self
+
+        bool snapped = False;
+        
+        const Rect &winrect = snapwin->frameRect();
+        int dleft = std::abs(wright - winrect.left()),
+           dright = std::abs(wleft - winrect.right()),
+             dtop = std::abs(wbottom - winrect.top()),
+          dbottom = std::abs(wtop - winrect.bottom());
+
+        if (wtop >= (signed)(winrect.y() - frame.rect.height() + 1) &&
+            wtop < (signed)(winrect.y() + winrect.height() - 1)) {
+
+          // snap left of other window?
+          if (dleft < snap_distance && dleft <= dright) {
+            dx = winrect.left() - frame.rect.width();
+            snapped = True;
+          }
+          // snap right of other window?
+          else if (dright < snap_distance) {
+            dx = winrect.right() + 1;
+            snapped = True;
+          }
+
+          if (snapped) {
+            if (screen->getWindowCornerSnap()) {
+              // try corner-snap to its other sides
+              dtop = std::abs(wtop - winrect.top());
+              dbottom = std::abs(wbottom - winrect.bottom());
+              if (dtop < snap_distance && dtop <= dbottom)
+                dy = winrect.top();
+              else if (dbottom < snap_distance)
+                dy = winrect.bottom() - frame.rect.height() + 1;
+            }
+
+            continue;
+          }
+        }
+
+        if (wleft >= (signed)(winrect.x() - frame.rect.width() + 1) &&
+            wleft < (signed)(winrect.x() + winrect.width() - 1)) {
+
+          // snap top of other window?
+          if (dtop < snap_distance && dtop <= dbottom) {
+            dy = winrect.top() - frame.rect.height();
+            snapped = True;
+          }
+          // snap bottom of other window?
+          else if (dbottom < snap_distance) {
+            dy = winrect.bottom() + 1;
+            snapped = True;
+          }
+
+          if (snapped) {
+            if (screen->getWindowCornerSnap()) {
+              // try corner-snap to its other sides
+              dleft = std::abs(wleft - winrect.left());
+              dright = std::abs(wright - winrect.right());
+              if (dleft < snap_distance && dleft <= dright)
+                dx = winrect.left();
+              else if (dright < snap_distance)
+                dx = winrect.right() - frame.rect.width() + 1;
+            }
+
+            continue;
+          }
+        }
+      }
+    }
+
+    // try snap to the screen's available area
+    Rect srect = screen->availableArea();
 
     int dleft = std::abs(wleft - srect.left()),
-      dright = std::abs(wright - srect.right()),
-      dtop = std::abs(wtop - srect.top()),
+       dright = std::abs(wright - srect.right()),
+         dtop = std::abs(wtop - srect.top()),
       dbottom = std::abs(wbottom - srect.bottom());
 
     // snap left?

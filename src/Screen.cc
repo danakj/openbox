@@ -1431,6 +1431,8 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 
 
 void BScreen::lowerDesktops(void) {
+  if (desktopWindowList.empty()) return;
+
   XLowerWindow(blackbox->getXDisplay(), desktopWindowList[0]);
   if (desktopWindowList.size() > 1)
     XRestackWindows(blackbox->getXDisplay(), &desktopWindowList[0],

@@ -381,7 +381,9 @@ void client_close(Client *self);
 /*! Kill the client off violently */
 void client_kill(Client *self);
 
-/*! Sends the window to the specified desktop */
+/*! Sends the window to the specified desktop
+  @param donthide If TRUE, the window will not be shown/hidden after its
+         desktop has been changed. Generally this should be FALSE. */
 void client_set_desktop(Client *self, guint target, gboolean donthide);
 
 /*! Return a modal child of the client window

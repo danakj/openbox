@@ -185,6 +185,14 @@ CPPFLAGS=$OLDCPPFLAGS
 AC_SUBST([XFT_CFLAGS])
 AC_SUBST([XFT_LIBS])
 
+dnl Check for Guile
+GUILE_FLAGS
+if ! test "$GUILE_CFLAGS" && ! test "$GUILE_LDFLAGS"; then
+  AC_MSG_ERROR([Openbox requires the Guile language to be installed.
+See http://www.gnu.org/software/guile/ .
+])
+fi
+		
 dnl Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])

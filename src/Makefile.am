@@ -2,12 +2,12 @@ localedir=$(datadir)/locale
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GUILE_CFLAGS) @CPPFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -DLOCALEDIR=\"$(localedir)\"
 
-LIBS=$(XFT_LIBS) @LIBS@
+LIBS=$(XFT_LIBS) $(GUILE_LDFLAGS) @LIBS@
 
 INCLUDES= -I../otk
 

@@ -267,7 +267,6 @@ static void pixel_data_to_pixmap(RrAppearance *l,
     in = l->surface.pixel_data;
     out = l->pixmap;
 
-    im->byte_order = LSBFirst;
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */

@@ -300,7 +300,8 @@ void client_manage(Window window)
     dispatch_client(Event_Client_New, self, 0, 0);
 
     /* make sure the window is visible */
-    if (client_normal(self))
+    if (!(self->strut.left || self->strut.right ||
+          self->strut.top || self->strut.bottom))
         client_move_onscreen(self, TRUE);
 
     screen_update_areas();

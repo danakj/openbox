@@ -776,7 +776,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    h = (e->xconfigurerequest.value_mask & CWHeight) ?
 		e->xconfigurerequest.height : client->area.height;
 
-            if (client_normal(client)) {
+            if (!(client->strut.left || client->strut.right ||
+                  client->strut.top || client->strut.bottom)) {
                 int newx = x;
                 int newy = y;
                 client_find_onscreen(client, &newx, &newy, w, h, TRUE);
@@ -974,7 +975,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = client->area.y;
             client->gravity = tmpg;
 
-            if (client_normal(client)) {
+            if (!(client->strut.left || client->strut.right ||
+                  client->strut.top || client->strut.bottom)) {
                 int newx = x;
                 int newy = y;
                 client_find_onscreen(client, &newx, &newy, w, h, TRUE);

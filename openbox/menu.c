@@ -193,7 +193,7 @@ void menu_parse()
     }
 }
 
-gboolean menu_new(gchar *name, gchar *title, gpointer data)
+ObMenu* menu_new(gchar *name, gchar *title, gpointer data)
 {
     ObMenu *self;
 
@@ -206,7 +206,7 @@ gboolean menu_new(gchar *name, gchar *title, gpointer data)
 
     g_hash_table_replace(menu_hash, self->name, self);
 
-    return TRUE;
+    return self;
 }
 
 void menu_free(gchar *name)
@@ -295,7 +295,8 @@ static void menu_clear_entries_internal(ObMenu *self)
     }
 }
 
-void menu_add_normal(gchar *name, gint id, gchar *label, GSList *actions)
+ObMenuEntry* menu_add_normal(gchar *name, gint id, gchar *label,
+                             GSList *actions)
 {
     ObMenu *self;
     ObMenuEntry *e;
@@ -307,9 +308,10 @@ void menu_add_normal(gchar *name, gint id, gchar *label, GSList *actions)
     e->data.normal.actions = actions;
 
     self->entries = g_list_append(self->entries, e);
+    return e;
 }
 
-void menu_add_submenu(gchar *name, gint id, gchar *submenu)
+ObMenuEntry* menu_add_submenu(gchar *name, gint id, gchar *submenu)
 {
     ObMenu *self;
     ObMenuEntry *e;
@@ -320,9 +322,10 @@ void menu_add_submenu(gchar *name, gint id, gchar *submenu)
     e->data.submenu.name = g_strdup(submenu);
 
     self->entries = g_list_append(self->entries, e);
+    return e;
 }
 
-void menu_add_separator(gchar *name, gint id)
+ObMenuEntry* menu_add_separator(gchar *name, gint id)
 {
     ObMenu *self;
     ObMenuEntry *e;
@@ -332,6 +335,7 @@ void menu_add_separator(gchar *name, gint id)
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR, id);
 
     self->entries = g_list_append(self->entries, e);
+    return e;
 }
 
 void menu_set_update_func(gchar *name, ObMenuUpdateFunc func)

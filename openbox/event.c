@@ -1102,14 +1102,15 @@ static void find_max_fd()
 #endif
 }
 
-void event_remove_fd(int n)
+void event_remove_fd(gint n)
 {
     FD_CLR(n, &allset);
     g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
     find_max_fd();
 }
 
-static void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
+static void fd_event_handle_foreach(GQuark n,
+                                    gpointer data, gpointer user_data)
 {
     if (FD_ISSET( (int)n, &selset)) {
         event_fd_handler *h = (event_fd_handler *)data;

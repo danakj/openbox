@@ -7,21 +7,21 @@
 extern Time event_lasttime;
 
 /*! The value of the mask for the NumLock modifier */
-extern unsigned int NumLockMask;
+extern guint NumLockMask;
 /*! The value of the mask for the ScrollLock modifier */
-extern unsigned int ScrollLockMask;
+extern guint ScrollLockMask;
 
 void event_startup();
 void event_shutdown();
 
 typedef struct event_fd_handler {
-    int fd;
-    void *data;
-    void (*handler)(int fd, void *data);
+    gint fd;
+    gpointer data;
+    void (*handler)(gint fd, gpointer data);
 } event_fd_handler;
 
 void event_add_fd_handler(event_fd_handler *handler);
-void event_remove_fd(int n);
+void event_remove_fd(gint n);
 
 void event_loop();
 

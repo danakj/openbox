@@ -326,7 +326,14 @@
 </mouse>
 
 <menu>
-  <location>~/.openbox/menu</location>
+  <!-- You can specify more than one menu file in here and they are all loaded,
+       just don't make menu ids clash or, well, it'll be kind of pointless -->
+
+  <!-- default menu file (or custom one in $HOME/.openbox/) -->
+  <file>menu</file>
+
+  <!-- debian menu file -->
+  <file>/etc/X11/openbox/openbox-menu</file>
 </menu>
 
 </openbox_config>

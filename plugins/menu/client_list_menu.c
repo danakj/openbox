@@ -44,11 +44,10 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             act = action_from_string("activate");
             act->data.activate.c = c;
             acts = g_slist_prepend(NULL, act);
-            menu_add_normal(menu->name, i,
-                            (c->iconic ? c->icon_title : c->title), acts);
+            e = menu_add_normal(menu->name, i,
+                                (c->iconic ? c->icon_title : c->title), acts);
 
             if ((icon = client_icon(c, 32, 32))) {
-                e = menu_find_entry_id(menu, i);
                 e->data.normal.icon_width = icon->width;
                 e->data.normal.icon_height = icon->height;
                 e->data.normal.icon_data = icon->data;

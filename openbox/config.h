@@ -72,8 +72,8 @@ gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 gint config_resist_edge;
 
-/*! User-specified path to the menu file */
-extern gchar *config_menu_path;
+/*! User-specified menu files */
+extern GSList *config_menu_files;
 
 void config_startup(struct _ObParseInst *i);
 void config_shutdown();

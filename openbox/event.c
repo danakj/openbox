@@ -332,7 +332,8 @@ static void event_handle_client(Client *client, XEvent *e)
 	/* focus state can affect the stacking layer */
 	client_calc_layer(client);
 
-	focus_set_client(client);
+        if (focus_client != client)
+            focus_set_client(client);
 	break;
     case FocusOut:
 	client->focused = FALSE;

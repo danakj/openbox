@@ -311,6 +311,8 @@ private:
   */
   FunctionFlags _functions;
 
+  //! Retrieves the window's initial gravity
+  void getGravity();
   //! Retrieves the desktop hint's value and sets Client::_desktop
   void getDesktop();
   //! Retrieves the window's type and sets Client::_type

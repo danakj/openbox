@@ -47,6 +47,7 @@ Client::Client(int screen, Window window)
   // pick a layer to start from
   _layer = Layer_Normal;
   
+  getGravity();
   getArea();
   getDesktop();
 
@@ -60,7 +61,6 @@ Client::Client(int screen, Window window)
   getShaped();
 
   updateProtocols();
-  updateNormalHints();
   updateWMHints();
   updateTitle();
   updateIconTitle();
@@ -90,6 +90,17 @@ Client::~Client()
   }
 }
 
+
+void Client::getGravity()
+{
+  XWindowAttributes wattrib;
+  Status ret;
+  
+  ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
+  assert(ret != BadWindow);
+
+  _gravity = wattrib.win_gravity;
+}
 
 void Client::getDesktop()
 {
@@ -378,7 +389,6 @@ void Client::updateNormalHints()
   int oldgravity = _gravity;
 
   // defaults
-  _gravity = NorthWestGravity;
   _size_inc.setPoint(1, 1);
   _base_size.setPoint(0, 0);
   _min_size.setPoint(0, 0);
@@ -391,8 +401,18 @@ void Client::updateNormalHints()
   if (XGetWMNormalHints(**otk::display, _window, &size, &ret)) {
     _positioned = (size.flags & (PPosition|USPosition));
 
-    if (size.flags & PWinGravity)
+    if (size.flags & PWinGravity) {
       _gravity = size.win_gravity;
+      
+      // if the client has a frame, i.e. has already been mapped and is
+      // changing its gravity
+      if (frame && _gravity != oldgravity) {
+        // move our idea of the client's position based on its new gravity
+        int x, y;
+        frame->frameGravity(x, y);
+        _area.setPos(x, y);
+      }
+    }
 
     if (size.flags & PMinSize)
       _min_size.setPoint(size.min_width, size.min_height);
@@ -405,15 +425,6 @@ void Client::updateNormalHints()
     
     if (size.flags & PResizeInc)
       _size_inc.setPoint(size.width_inc, size.height_inc);
-  }
-
-  // if the client has a frame, i.e. has already been mapped and is
-  // changing its gravity
-  if (frame && _gravity != oldgravity) {
-    // move our idea of the client's position based on its new gravity
-    int x, y;
-    frame->frameGravity(x, y);
-    _area.setPos(x, y);
   }
 }
 

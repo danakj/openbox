@@ -39,7 +39,7 @@ public:
     raiseWindow,
     lowerWindow,
     closeWindow,
-    shade,
+    toggleshade,
     moveWindowUp,
     moveWindowDown,
     moveWindowLeft,

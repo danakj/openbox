@@ -65,8 +65,9 @@ public:
 
   void handleKeypress(const XEvent &e);
 
-  void cycleWorkspace(const bool forward)const;
-  void changeWorkspace(const int num)const;
+  void cycleWindow(const bool forward) const;
+  void cycleWorkspace(const bool forward) const;
+  void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;
 };
 

@@ -157,6 +157,14 @@ void screen::handleKeypress(const XEvent &e) {
         cycleWorkspace(false);
         return;
 
+      case Action::nextWindow:
+        cycleWindow(true);
+        return;
+
+      case Action::prevWindow:
+        cycleWindow(false);
+        return;
+
       case Action::changeWorkspace:
         changeWorkspace(it->number());
         return;
@@ -167,7 +175,7 @@ void screen::handleKeypress(const XEvent &e) {
         XWindow *window = *_active;
 
         switch (it->type()) {
-        case Action::shade:
+        case Action::toggleshade:
           window->shade(! window->shaded());
           return;
         }
@@ -274,6 +282,37 @@ void screen::updateActiveWindow() {
       }
  */
 
+
+void screen::cycleWindow(const bool forward) const {
+  if (_clients.empty()) return;
+    
+  WindowList::const_iterator target = _active;
+
+  if (target == _clients.end())
+    target = _clients.begin();
+ 
+  do {
+    if (forward) {
+      ++target;
+      if (target == _clients.end())
+        target = _clients.begin();
+    } else {
+      if (target == _clients.begin())
+        target = _clients.end();
+      --target;
+    }
+  } while (target == _clients.end() || (*target)->iconic());
+  
+  if (target != _clients.end()) {
+    // we dont send an ACTIVE_WINDOW client message because that would also
+    // unshade the window if it was shaded
+    XSetInputFocus(_epist->getXDisplay(), (*target)->window(), RevertToNone,
+                   CurrentTime);
+    XRaiseWindow(_epist->getXDisplay(), (*target)->window());
+  }
+}
+
+
 void screen::cycleWorkspace(const bool forward) const {
   unsigned long currentDesktop = 0;
   unsigned long numDesktops = 0;
@@ -296,6 +335,7 @@ void screen::cycleWorkspace(const bool forward) const {
     changeWorkspace(currentDesktop);
   }
 }
+
 
 void screen::changeWorkspace(const int num) const {
   _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);

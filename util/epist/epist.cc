@@ -79,15 +79,23 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
   _actions.push_back(Action(Action::nextWorkspace,
                             XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),
-                            Mod1Mask));
+                            ControlMask));
   _actions.push_back(Action(Action::prevWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),
-                           ControlMask));
-  _actions.push_back(Action(Action::shade,
+                           ControlMask | ShiftMask));
+  _actions.push_back(Action(Action::toggleshade,
                             XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("F5")),
                             Mod1Mask));
+  _actions.push_back(Action(Action::nextWindow,
+                            XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Tab")),
+                            Mod1Mask));
+  _actions.push_back(Action(Action::prevWindow,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Tab")),
+                           Mod1Mask | ShiftMask));
   activateGrabs();
 }
 

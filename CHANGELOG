@@ -1,0 +1,9 @@
+3.0-beta6:
+	* Added _OB_WM_STATE_UNDECORATED hint, which can be read and controlled
+	  by external applications
+	* Closed bug #874 (libtool won't install libobrender.la)
+	* Launch ObConf when selecting GNOME's Desktop Preferences for Windows
+	* Focus new children always if their direct parent is focused
+
+3.0-beta5:
+	* Initial release.

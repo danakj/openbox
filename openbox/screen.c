@@ -434,6 +434,9 @@ void screen_set_desktop(guint num)
                 frame_hide(c->frame);
         }
     }
+
+    if (!focus_client)
+        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
 }
 
 static void get_row_col(guint d, guint *r, guint *c)
@@ -725,7 +728,7 @@ void screen_update_layout()
                     if (rows * cols >= screen_num_desktops + cols)
                         rows--;
                 } else if (rows == 0) {
-                    rows = screen_num_desktops / rows;
+                    rows = screen_num_desktops / cols;
                     if (cols * rows < screen_num_desktops)
                         rows++;
                     if (cols * rows >= screen_num_desktops + rows)

@@ -32,6 +32,9 @@ extern gboolean config_focus_new;
 extern gboolean config_focus_follow;
 /*! Timeout for focusing windows on focus follows mouse, in microseconds */
 extern guint    config_focus_delay;
+/*! If windows should automatically be raised when they are focused in
+ focus follows mouse */
+extern guint    config_focus_raise;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */

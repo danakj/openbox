@@ -723,7 +723,7 @@ so on are saved automatically in this file.
 .PP
 For a complete description of all of the resource file's options, see the
 documentation at
-.IT http://icculus.org/openbox/rc.php
+.I http://icculus.org/openbox/rc.php
 .SH ENVIRONMENT
 .TP
 .B HOME

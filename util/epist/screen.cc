@@ -70,7 +70,7 @@ screen::screen(epist *epist, int number)
   }
   if (_managed)
     cout << "Found compatible window manager '" << _wm_name << "' for screen "
-      << _number << ".\n";
+         << _number << ".\n";
   else {
     cout << "Unable to find a compatible window manager for screen " <<
       _number << ".\n";
@@ -154,154 +154,153 @@ void screen::handleKeypress(const XEvent &e) {
   const Action *it = _epist->getKeyTree().getAction(e, state, this);
   
   if (!it)
-      return;
+    return;
 
   switch (it->type()) {
   case Action::nextScreen:
-      _epist->cycleScreen(_number, true);
-      return;
+    _epist->cycleScreen(_number, true);
+    return;
 
   case Action::prevScreen:
-      _epist->cycleScreen(_number, false);
-      return;
+    _epist->cycleScreen(_number, false);
+    return;
 
   case Action::nextWorkspace:
-      cycleWorkspace(true);
-      return;
+    cycleWorkspace(true);
+    return;
 
   case Action::prevWorkspace:
-      cycleWorkspace(false);
-      return;
+    cycleWorkspace(false);
+    return;
 
   case Action::nextWindow:
-      cycleWindow(true);
-      return;
+    cycleWindow(true);
+    return;
 
   case Action::prevWindow:
-      cycleWindow(false);
-      return;
+    cycleWindow(false);
+    return;
 
   case Action::nextWindowOnAllWorkspaces:
-      cycleWindow(true, false, true);
-      return;
+    cycleWindow(true, false, true);
+    return;
 
   case Action::prevWindowOnAllWorkspaces:
-      cycleWindow(false, false, true);
-      return;
+    cycleWindow(false, false, true);
+    return;
 
   case Action::nextWindowOnAllScreens:
-      cycleWindow(true, true);
-      return;
+    cycleWindow(true, true);
+    return;
 
   case Action::prevWindowOnAllScreens:
-      cycleWindow(false, true);
-      return;
+    cycleWindow(false, true);
+    return;
 
   case Action::nextWindowOfClass:
-      cycleWindow(true, false, false, true, it->string());
-      return;
+    cycleWindow(true, false, false, true, it->string());
+    return;
 
   case Action::prevWindowOfClass:
-      cycleWindow(false, false, false, true, it->string());
-      return;
+    cycleWindow(false, false, false, true, it->string());
+    return;
       
   case Action::nextWindowOfClassOnAllWorkspaces:
-      cycleWindow(true, false, true, true, it->string());
-      return;
+    cycleWindow(true, false, true, true, it->string());
+    return;
       
   case Action::prevWindowOfClassOnAllWorkspaces:
-      cycleWindow(false, false, true, true, it->string());
-      return;
+    cycleWindow(false, false, true, true, it->string());
+    return;
 
   case Action::changeWorkspace:
-    // we subtract one so counting starts at 1 in the config file
-      changeWorkspace(it->number() - 1);
-      return;
+    changeWorkspace(it->number());
+    return;
 
   case Action::execute:
-      execCommand(it->string());
-      return;
+    execCommand(it->string());
+    return;
 
   default:
-      break;
+    break;
   }
 
   // these actions require an active window
   if (_active != _clients.end()) {
-      XWindow *window = *_active;
+    XWindow *window = *_active;
       
-      switch (it->type()) {
-      case Action::iconify:
-          window->iconify();
-          return;
+    switch (it->type()) {
+    case Action::iconify:
+      window->iconify();
+      return;
 
-      case Action::close:
-          window->close();
-          return;
+    case Action::close:
+      window->close();
+      return;
 
-      case Action::raise:
-          window->raise();
-          return;
+    case Action::raise:
+      window->raise();
+      return;
 
-      case Action::lower:
-          window->lower();
-          return;
+    case Action::lower:
+      window->lower();
+      return;
 
-      case Action::sendToWorkspace:
-          window->sendTo(it->number());
-          return;
+    case Action::sendToWorkspace:
+      window->sendTo(it->number());
+      return;
 
-      case Action::toggleomnipresent:
-          if (window->desktop() == 0xffffffff)
-            window->sendTo(_active_desktop);
-          else
-            window->sendTo(0xffffffff);
-          return;
+    case Action::toggleomnipresent:
+      if (window->desktop() == 0xffffffff)
+        window->sendTo(_active_desktop);
+      else
+        window->sendTo(0xffffffff);
+      return;
 
-      case Action::moveWindowUp:
-          window->move(window->x(), window->y() - it->number());
-          return;
+    case Action::moveWindowUp:
+      window->move(window->x(), window->y() - it->number());
+      return;
       
-      case Action::moveWindowDown:
-          window->move(window->x(), window->y() + it->number());
-          return;
+    case Action::moveWindowDown:
+      window->move(window->x(), window->y() + it->number());
+      return;
       
-      case Action::moveWindowLeft:
-          window->move(window->x() - it->number(), window->y());
-          return;
+    case Action::moveWindowLeft:
+      window->move(window->x() - it->number(), window->y());
+      return;
       
-      case Action::moveWindowRight:
-          window->move(window->x() + it->number(), window->y());
-          return;
+    case Action::moveWindowRight:
+      window->move(window->x() + it->number(), window->y());
+      return;
       
-      case Action::resizeWindowWidth:
-          window->resize(window->width() + it->number(), window->height());
-          return;
+    case Action::resizeWindowWidth:
+      window->resize(window->width() + it->number(), window->height());
+      return;
       
-      case Action::resizeWindowHeight:
-          window->resize(window->width(), window->height() + it->number());
-          return;
+    case Action::resizeWindowHeight:
+      window->resize(window->width(), window->height() + it->number());
+      return;
       
-      case Action::toggleshade:
-          window->shade(! window->shaded());
-          return;
+    case Action::toggleshade:
+      window->shade(! window->shaded());
+      return;
       
-      case Action::toggleMaximizeHorizontal:
-          window->toggleMaximize(XWindow::Max_Horz);
-          return;
+    case Action::toggleMaximizeHorizontal:
+      window->toggleMaximize(XWindow::Max_Horz);
+      return;
       
-      case Action::toggleMaximizeVertical:
-          window->toggleMaximize(XWindow::Max_Vert);
-          return;
+    case Action::toggleMaximizeVertical:
+      window->toggleMaximize(XWindow::Max_Vert);
+      return;
       
-      case Action::toggleMaximizeFull:
-          window->toggleMaximize(XWindow::Max_Full);
-          return;
+    case Action::toggleMaximizeFull:
+      window->toggleMaximize(XWindow::Max_Full);
+      return;
       
-      default:
-          assert(false);  // unhandled action type!
-          break;
-      }
+    default:
+      assert(false);  // unhandled action type!
+      break;
+    }
   }
 }
 
@@ -374,7 +373,7 @@ void screen::updateClientList() {
         break;
     if (it == end) {  // didn't already exist
       if (doAddWindow(rootclients[i])) {
-//        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
+        //        cout << "Added window: 0x" << hex << rootclients[i] << dec << endl;
         _clients.insert(insert_point, new XWindow(_epist, this,
                                                   rootclients[i]));
       }
@@ -394,7 +393,7 @@ void screen::updateClientList() {
       if (**it2 == rootclients[i])
         break;
     if (i == num)  { // no longer exists
-//      cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
+      //      cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
       // watch for the active and last-active window
       if (it2 == _active)
         _active = _clients.end();
@@ -443,10 +442,10 @@ void screen::updateActiveWindow() {
   if (it != end)
     _last_active = it;
 
-/*  cout << "Active window is now: ";
-  if (_active == _clients.end()) cout << "None\n";
-  else cout << "0x" << hex << (*_active)->window() << dec << endl;
-*/
+  /*  cout << "Active window is now: ";
+      if (_active == _clients.end()) cout << "None\n";
+      else cout << "0x" << hex << (*_active)->window() << dec << endl;
+  */
 }
 
 
@@ -479,8 +478,8 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
     classname = (*_active)->appClass();
 
   WindowList::const_iterator target = _active,
-                             begin = _clients.begin(),
-                             end = _clients.end();
+    begin = _clients.begin(),
+    end = _clients.end();
  
   while (1) {
     if (forward) {

@@ -1,2 +1,4 @@
 # List of source files containing translatable strings.
-kernel/openbox.c
+openbox/client_list_menu.c
+openbox/client_menu.c
+openbox/openbox.c

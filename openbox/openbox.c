@@ -134,7 +134,8 @@ int main(int argc, char **argv)
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         exit_with_error("Failed to set display as close-on-exec.");
 
-    session_load(sm_save_file);
+    if (sm_save_file)
+        session_load(sm_save_file);
     session_startup(argc, argv);
 
 #ifdef USE_LIBSN

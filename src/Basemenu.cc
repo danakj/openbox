@@ -49,7 +49,7 @@ using namespace std;
 
 static Basemenu *shown = (Basemenu *) 0;
 
-Basemenu::Basemenu(BScreen &scrn) : screen(scrn), openbox(*scrn.getOpenbox()) {
+Basemenu::Basemenu(BScreen &scrn) : screen(scrn), openbox(scrn.getOpenbox()) {
   image_ctrl = screen.getImageControl();
   display = openbox.getXDisplay();
   parent = (Basemenu *) 0;

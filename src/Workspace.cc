@@ -120,12 +120,12 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
 	w->getTransientFor()->isVisible()) {
       w->getTransientFor()->setInputFocus();
     } else if (screen->isSloppyFocus()) {
-      screen->getOpenbox()->setFocusedWindow((OpenboxWindow *) 0);
+      screen->getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
     } else {
       OpenboxWindow *top = stackingList->first();
       if (! top || ! top->setInputFocus()) {
-	screen->getOpenbox()->setFocusedWindow((OpenboxWindow *) 0);
-	XSetInputFocus(screen->getOpenbox()->getXDisplay(),
+	screen->getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
+	XSetInputFocus(screen->getOpenbox().getXDisplay(),
 		       screen->getToolbar()->getWindowID(),
 		       RevertToParent, CurrentTime);
       }
@@ -251,12 +251,12 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
     win = win->getTransientFor();
   }
 
-  screen->getOpenbox()->grab();
+  screen->getOpenbox().grab();
 
-  XLowerWindow(screen->getBaseDisplay()->getXDisplay(), *nstack);
-  XRestackWindows(screen->getBaseDisplay()->getXDisplay(), nstack, i);
+  XLowerWindow(screen->getBaseDisplay().getXDisplay(), *nstack);
+  XRestackWindows(screen->getBaseDisplay().getXDisplay(), nstack, i);
 
-  screen->getOpenbox()->ungrab();
+  screen->getOpenbox().ungrab();
 
   delete [] nstack;
 }

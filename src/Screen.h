@@ -102,7 +102,7 @@ private:
   Pixmap geom_pixmap;
   Window geom_window;
 
-  Openbox *openbox;
+  Openbox &openbox;
   BImageControl *image_control;
   Configmenu *configmenu;
   Iconmenu *iconmenu;
@@ -175,7 +175,7 @@ protected:
 
 
 public:
-  BScreen(Openbox *, int);
+  BScreen(Openbox &, int);
   ~BScreen(void);
 
   inline const Bool &isToolbarOnTop(void) const
@@ -199,7 +199,7 @@ public:
 
   inline const GC &getOpGC() const { return opGC; }
 
-  inline Openbox *getOpenbox(void) { return openbox; }
+  inline Openbox &getOpenbox(void) { return openbox; }
   inline BColor *getBorderColor(void) { return &resource.border_color; }
   inline BImageControl *getImageControl(void) { return image_control; }
   inline Rootmenu *getRootmenu(void) { return rootmenu; }

@@ -328,7 +328,7 @@ public:
 
 class ScreenInfo {
 private:
-  BaseDisplay *basedisplay;
+  BaseDisplay &basedisplay;
   Visual *visual;
   Window root_window;
   Colormap colormap;
@@ -338,9 +338,9 @@ private:
 
 
 public:
-  ScreenInfo(BaseDisplay *, int);
+  ScreenInfo(BaseDisplay &, int);
 
-  inline BaseDisplay *getBaseDisplay(void) { return basedisplay; }
+  inline BaseDisplay &getBaseDisplay(void) { return basedisplay; }
 
   inline Visual *getVisual(void) { return visual; }
   inline const Window &getRootWindow(void) const { return root_window; }

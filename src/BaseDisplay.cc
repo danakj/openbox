@@ -337,7 +337,7 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
 
   screenInfoList = new LinkedList<ScreenInfo>;
   for (int i = 0; i < number_of_screens; i++) {
-    ScreenInfo *screeninfo = new ScreenInfo(this, i);
+    ScreenInfo *screeninfo = new ScreenInfo(*this, i);
     screenInfoList->insert(screeninfo);
   }
 
@@ -574,17 +574,16 @@ void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
 }
 
 
-ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
-  basedisplay = d;
+ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d) {
   screen_number = num;
 
-  root_window = RootWindow(basedisplay->getXDisplay(), screen_number);
-  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
+  root_window = RootWindow(basedisplay.getXDisplay(), screen_number);
+  depth = DefaultDepth(basedisplay.getXDisplay(), screen_number);
 
   width =
-    WidthOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
+    WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(), screen_number));
   height =
-    HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
+    HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(), screen_number));
 
   // search for a TrueColor Visual... if we can't find one... we will use the
   // default visual for the screen
@@ -596,7 +595,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
 
   visual = (Visual *) 0;
 
-  if ((vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
+  if ((vinfo_return = XGetVisualInfo(basedisplay.getXDisplay(),
                                      VisualScreenMask | VisualClassMask,
                                      &vinfo_template, &vinfo_nitems)) &&
       vinfo_nitems > 0) {
@@ -611,10 +610,10 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
   }
 
   if (visual) {
-    colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
+    colormap = XCreateColormap(basedisplay.getXDisplay(), root_window,
 			       visual, AllocNone);
   } else {
-    visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
-    colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
+    visual = DefaultVisual(basedisplay.getXDisplay(), screen_number);
+    colormap = DefaultColormap(basedisplay.getXDisplay(), screen_number);
   }
 }

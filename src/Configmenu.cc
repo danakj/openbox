@@ -164,13 +164,13 @@ void Configmenu::Focusmenu::itemSelected(int button, int index) {
     configmenu->screen.saveSloppyFocus(False);
     configmenu->screen.saveAutoRaise(False);
 
-    if (! configmenu->screen.getOpenbox()->getFocusedWindow())
-      XSetInputFocus(configmenu->screen.getOpenbox()->getXDisplay(),
+    if (! configmenu->screen.getOpenbox().getFocusedWindow())
+      XSetInputFocus(configmenu->screen.getOpenbox().getXDisplay(),
 		     configmenu->screen.getToolbar()->getWindowID(),
 		     RevertToParent, CurrentTime);
     else
-      XSetInputFocus(configmenu->screen.getOpenbox()->getXDisplay(),
-		     configmenu->screen.getOpenbox()->
+      XSetInputFocus(configmenu->screen.getOpenbox().getXDisplay(),
+		     configmenu->screen.getOpenbox().
 		     getFocusedWindow()->getClientWindow(),
 		     RevertToParent, CurrentTime);
 

@@ -53,7 +53,7 @@
 
 
 Rootmenu::Rootmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn),
-  openbox(*scrn.getOpenbox())
+  openbox(scrn.getOpenbox())
 {
 }
 
@@ -73,7 +73,7 @@ void Rootmenu::itemSelected(int button, int index) {
 #ifndef    __EMX__
       char displaystring[MAXPATHLEN];
       sprintf(displaystring, "DISPLAY=%s",
-	      DisplayString(screen.getBaseDisplay()->getXDisplay()));
+	      DisplayString(screen.getBaseDisplay().getXDisplay()));
       sprintf(displaystring + strlen(displaystring) - 1, "%d",
 	      screen.getScreenNumber());
 

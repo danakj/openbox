@@ -96,8 +96,8 @@ private:
   Bool on_top, hidden, do_auto_hide;
   Display *display;
 
-  Openbox *openbox;
-  BScreen *screen;
+  Openbox &openbox;
+  BScreen &screen;
   BTimer *timer;
 
   LinkedList<SlitClient> *clientList;
@@ -117,7 +117,7 @@ private:
 
 
 public:
-  Slit(BScreen *);
+  Slit(BScreen &);
   virtual ~Slit();
 
   inline const Bool &isOnTop(void) const { return on_top; }

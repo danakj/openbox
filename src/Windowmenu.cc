@@ -134,7 +134,7 @@ void Windowmenu::itemSelected(int button, int index) {
       break;
 
     case BScreen::WindowKill:
-      XKillClient(screen.getBaseDisplay()->getXDisplay(),
+      XKillClient(screen.getBaseDisplay().getXDisplay(),
                   window.getClientWindow());
       break;
     }

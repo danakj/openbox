@@ -1005,7 +1005,7 @@ void OpenboxWindow::getWMProtocols(void) {
       else if (proto[i] == openbox->getWMTakeFocusAtom())
         flags.send_focus_message = True;
       else if (proto[i] == openbox->getOpenboxStructureMessagesAtom())
-        screen->addNetizen(new Netizen(screen, client.window));
+        screen->addNetizen(new Netizen(*screen, client.window));
     }
 
     XFree(proto);

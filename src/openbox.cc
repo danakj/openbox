@@ -206,7 +206,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   screenList = new LinkedList<BScreen>;
   for (int i = 0; i < getNumberOfScreens(); i++) {
-    BScreen *screen = new BScreen(this, i);
+    BScreen *screen = new BScreen(*this, i);
 
     if (! screen->isScreenManaged()) {
       delete screen;

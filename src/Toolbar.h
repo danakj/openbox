@@ -88,9 +88,9 @@ private:
     virtual void timeout(void);
   } hide_handler;
 
-  Openbox *openbox;
+  Openbox &openbox;
   BImageControl *image_ctrl;
-  BScreen *screen;
+  BScreen &screen;
   BTimer *clock_timer, *hide_timer;
   Toolbarmenu *toolbarmenu;
 
@@ -103,7 +103,7 @@ private:
 
 
 public:
-  Toolbar(BScreen *);
+  Toolbar(BScreen &);
   virtual ~Toolbar(void);
 
   inline Toolbarmenu *getMenu(void) { return toolbarmenu; }

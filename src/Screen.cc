@@ -180,16 +180,14 @@ static const char *getFontSize(const char *pattern, int *size) {
 }
 
 
-BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
-  openbox = ob;
-
+BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	       SubstructureRedirectMask | KeyPressMask | KeyReleaseMask |
 	       ButtonPressMask | ButtonReleaseMask;
 
   XErrorHandler old = XSetErrorHandler((XErrorHandler) anotherWMRunning);
-  XSelectInput(getBaseDisplay()->getXDisplay(), getRootWindow(), event_mask);
-  XSync(getBaseDisplay()->getXDisplay(), False);
+  XSelectInput(getBaseDisplay().getXDisplay(), getRootWindow(), event_mask);
+  XSync(getBaseDisplay().getXDisplay(), False);
   XSetErrorHandler((XErrorHandler) old);
 
   managed = running;
@@ -216,14 +214,14 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
 #ifdef    HAVE_GETPID
   pid_t bpid = getpid();
 
-  XChangeProperty(getBaseDisplay()->getXDisplay(), getRootWindow(),
-                  openbox->getOpenboxPidAtom(), XA_CARDINAL,
+  XChangeProperty(getBaseDisplay().getXDisplay(), getRootWindow(),
+                  openbox.getOpenboxPidAtom(), XA_CARDINAL,
                   sizeof(pid_t) * 8, PropModeReplace,
                   (unsigned char *) &bpid, 1);
 #endif // HAVE_GETPID
 
-  XDefineCursor(getBaseDisplay()->getXDisplay(), getRootWindow(),
-                openbox->getSessionCursor());
+  XDefineCursor(getBaseDisplay().getXDisplay(), getRootWindow(),
+                openbox.getSessionCursor());
 
   workspaceNames = new LinkedList<char>;
   workspacesList = new LinkedList<Workspace>;
@@ -232,12 +230,12 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   iconList = new LinkedList<OpenboxWindow>;
 
   image_control =
-    new BImageControl(openbox, this, True, openbox->getColorsPerChannel(),
-                      openbox->getCacheLife(), openbox->getCacheMax());
+    new BImageControl(&openbox, this, True, openbox.getColorsPerChannel(),
+                      openbox.getCacheLife(), openbox.getCacheMax());
   image_control->installRootColormap();
   root_colormap_installed = True;
 
-  openbox->load_rc(this);
+  openbox.load_rc(this);
 
   image_control->setDither(resource.image_dither);
 
@@ -247,88 +245,88 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   unsigned long gc_value_mask = GCForeground;
   if (! i18n->multibyte()) gc_value_mask |= GCFont;
 
-  gcv.foreground = WhitePixel(getBaseDisplay()->getXDisplay(),
+  gcv.foreground = WhitePixel(getBaseDisplay().getXDisplay(),
 			      getScreenNumber())
-                 ^ BlackPixel(getBaseDisplay()->getXDisplay(),
+                 ^ BlackPixel(getBaseDisplay().getXDisplay(),
 			      getScreenNumber());
   gcv.function = GXxor;
   gcv.subwindow_mode = IncludeInferiors;
-  opGC = XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+  opGC = XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
                    GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
   gcv.foreground = resource.wstyle.l_text_focus.getPixel();
   if (resource.wstyle.font)
     gcv.font = resource.wstyle.font->fid;
   resource.wstyle.l_text_focus_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.wstyle.l_text_unfocus.getPixel();
   if (resource.wstyle.font)
     gcv.font = resource.wstyle.font->fid;
   resource.wstyle.l_text_unfocus_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.wstyle.b_pic_focus.getPixel();
   resource.wstyle.b_pic_focus_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      GCForeground, &gcv);
 
   gcv.foreground = resource.wstyle.b_pic_unfocus.getPixel();
   resource.wstyle.b_pic_unfocus_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      GCForeground, &gcv);
 
   gcv.foreground = resource.mstyle.t_text.getPixel();
   if (resource.mstyle.t_font)
     gcv.font = resource.mstyle.t_font->fid;
   resource.mstyle.t_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.f_text.getPixel();
   if (resource.mstyle.f_font)
     gcv.font = resource.mstyle.f_font->fid;
   resource.mstyle.f_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.h_text.getPixel();
   resource.mstyle.h_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.d_text.getPixel();
   resource.mstyle.d_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.hilite.getColor()->getPixel();
   resource.mstyle.hilite_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.l_text.getPixel();
   if (resource.tstyle.font)
     gcv.font = resource.tstyle.font->fid;
   resource.tstyle.l_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.w_text.getPixel();
   resource.tstyle.w_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.c_text.getPixel();
   resource.tstyle.c_text_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.b_pic.getPixel();
   resource.tstyle.b_pic_gc =
-    XCreateGC(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateGC(getBaseDisplay().getXDisplay(), getRootWindow(),
 	      gc_value_mask, &gcv);
 
   const char *s =  i18n->getMessage(ScreenSet, ScreenPositionLength,
@@ -358,7 +356,7 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   attrib.save_under = True;
 
   geom_window =
-    XCreateWindow(getBaseDisplay()->getXDisplay(), getRootWindow(),
+    XCreateWindow(getBaseDisplay().getXDisplay(), getRootWindow(),
                   0, 0, geom_w, geom_h, resource.border_width, getDepth(),
                   InputOutput, getVisual(), mask, &attrib);
   geom_visible = False;
@@ -367,24 +365,24 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
     if (resource.wstyle.t_focus.getTexture() ==
 	                              (BImage_Flat | BImage_Solid)) {
       geom_pixmap = None;
-      XSetWindowBackground(getBaseDisplay()->getXDisplay(), geom_window,
+      XSetWindowBackground(getBaseDisplay().getXDisplay(), geom_window,
 			   resource.wstyle.t_focus.getColor()->getPixel());
     } else {
       geom_pixmap = image_control->renderImage(geom_w, geom_h,
 					       &resource.wstyle.t_focus);
-      XSetWindowBackgroundPixmap(getBaseDisplay()->getXDisplay(),
+      XSetWindowBackgroundPixmap(getBaseDisplay().getXDisplay(),
 				 geom_window, geom_pixmap);
     }
   } else {
     if (resource.wstyle.l_focus.getTexture() ==
 	                              (BImage_Flat | BImage_Solid)) {
       geom_pixmap = None;
-      XSetWindowBackground(getBaseDisplay()->getXDisplay(), geom_window,
+      XSetWindowBackground(getBaseDisplay().getXDisplay(), geom_window,
 			   resource.wstyle.l_focus.getColor()->getPixel());
     } else {
       geom_pixmap = image_control->renderImage(geom_w, geom_h,
 					       &resource.wstyle.l_focus);
-      XSetWindowBackgroundPixmap(getBaseDisplay()->getXDisplay(),
+      XSetWindowBackgroundPixmap(getBaseDisplay().getXDisplay(),
 				 geom_window, geom_pixmap);
     }
   }
@@ -413,10 +411,10 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   current_workspace = workspacesList->first();
   workspacemenu->setItemSelected(2, True);
 
-  toolbar = new Toolbar(this);
+  toolbar = new Toolbar(*this);
 
 #ifdef    SLIT
-  slit = new Slit(this);
+  slit = new Slit(*this);
 #endif // SLIT
 
   InitMenu();
@@ -429,14 +427,14 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   int i;
   unsigned int nchild;
   Window r, p, *children;
-  XQueryTree(getBaseDisplay()->getXDisplay(), getRootWindow(), &r, &p,
+  XQueryTree(getBaseDisplay().getXDisplay(), getRootWindow(), &r, &p,
 	     &children, &nchild);
 
   // preen the window list of all icon windows... for better dockapp support
   for (i = 0; i < (int) nchild; i++) {
     if (children[i] == None) continue;
 
-    XWMHints *wmhints = XGetWMHints(getBaseDisplay()->getXDisplay(),
+    XWMHints *wmhints = XGetWMHints(getBaseDisplay().getXDisplay(),
 				    children[i]);
 
     if (wmhints) {
@@ -455,18 +453,18 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
 
   // manage shown windows
   for (i = 0; i < (int) nchild; ++i) {
-    if (children[i] == None || (! openbox->validateWindow(children[i])))
+    if (children[i] == None || (! openbox.validateWindow(children[i])))
       continue;
 
     XWindowAttributes attrib;
-    if (XGetWindowAttributes(getBaseDisplay()->getXDisplay(), children[i],
+    if (XGetWindowAttributes(getBaseDisplay().getXDisplay(), children[i],
                              &attrib)) {
       if (attrib.override_redirect) continue;
 
       if (attrib.map_state != IsUnmapped) {
-        new OpenboxWindow(openbox, children[i], this);
+        new OpenboxWindow(&openbox, children[i], this);
 
-        OpenboxWindow *win = openbox->searchWindow(children[i]);
+        OpenboxWindow *win = openbox.searchWindow(children[i]);
         if (win) {
           XMapRequestEvent mre;
           mre.window = children[i];
@@ -478,11 +476,11 @@ BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
   }
 
   if (! resource.sloppy_focus)
-    XSetInputFocus(getBaseDisplay()->getXDisplay(), toolbar->getWindowID(),
+    XSetInputFocus(getBaseDisplay().getXDisplay(), toolbar->getWindowID(),
 		   RevertToParent, CurrentTime);
 
   XFree(children);
-  XFlush(getBaseDisplay()->getXDisplay());
+  XFlush(getBaseDisplay().getXDisplay());
 }
 
 
@@ -493,7 +491,7 @@ BScreen::~BScreen(void) {
     image_control->removeImage(geom_pixmap);
 
   if (geom_window != None)
-    XDestroyWindow(getBaseDisplay()->getXDisplay(), geom_window);
+    XDestroyWindow(getBaseDisplay().getXDisplay(), geom_window);
 
   removeWorkspaceNames();
 
@@ -533,54 +531,54 @@ BScreen::~BScreen(void) {
   delete netizenList;
 
   if (resource.wstyle.fontset)
-    XFreeFontSet(getBaseDisplay()->getXDisplay(), resource.wstyle.fontset);
+    XFreeFontSet(getBaseDisplay().getXDisplay(), resource.wstyle.fontset);
   if (resource.mstyle.t_fontset)
-    XFreeFontSet(getBaseDisplay()->getXDisplay(), resource.mstyle.t_fontset);
+    XFreeFontSet(getBaseDisplay().getXDisplay(), resource.mstyle.t_fontset);
   if (resource.mstyle.f_fontset)
-    XFreeFontSet(getBaseDisplay()->getXDisplay(), resource.mstyle.f_fontset);
+    XFreeFontSet(getBaseDisplay().getXDisplay(), resource.mstyle.f_fontset);
   if (resource.tstyle.fontset)
-    XFreeFontSet(getBaseDisplay()->getXDisplay(), resource.tstyle.fontset);
+    XFreeFontSet(getBaseDisplay().getXDisplay(), resource.tstyle.fontset);
 
   if (resource.wstyle.font)
-    XFreeFont(getBaseDisplay()->getXDisplay(), resource.wstyle.font);
+    XFreeFont(getBaseDisplay().getXDisplay(), resource.wstyle.font);
   if (resource.mstyle.t_font)
-    XFreeFont(getBaseDisplay()->getXDisplay(), resource.mstyle.t_font);
+    XFreeFont(getBaseDisplay().getXDisplay(), resource.mstyle.t_font);
   if (resource.mstyle.f_font)
-    XFreeFont(getBaseDisplay()->getXDisplay(), resource.mstyle.f_font);
+    XFreeFont(getBaseDisplay().getXDisplay(), resource.mstyle.f_font);
   if (resource.tstyle.font)
-    XFreeFont(getBaseDisplay()->getXDisplay(), resource.tstyle.font);
+    XFreeFont(getBaseDisplay().getXDisplay(), resource.tstyle.font);
   if (resource.root_command != NULL)
     delete [] resource.root_command;
 
-  XFreeGC(getBaseDisplay()->getXDisplay(), opGC);
+  XFreeGC(getBaseDisplay().getXDisplay(), opGC);
 
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.wstyle.l_text_focus_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.wstyle.l_text_unfocus_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.wstyle.b_pic_focus_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.wstyle.b_pic_unfocus_gc);
 
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.mstyle.t_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.mstyle.f_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.mstyle.h_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.mstyle.d_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.mstyle.hilite_gc);
 
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.tstyle.l_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.tstyle.w_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.tstyle.c_text_gc);
-  XFreeGC(getBaseDisplay()->getXDisplay(),
+  XFreeGC(getBaseDisplay().getXDisplay(),
 	  resource.tstyle.b_pic_gc);
 }
 
@@ -636,7 +634,7 @@ void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
     if (xcol.blue >= 0xff) xcol.blue = 0xffff;
     else xcol.blue *= 0xff;
 
-    if (! XAllocColor(getBaseDisplay()->getXDisplay(),
+    if (! XAllocColor(getBaseDisplay().getXDisplay(),
 		      getColormap(), &xcol))
       xcol.pixel = 0;
 
@@ -652,7 +650,7 @@ void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
       (unsigned int) ((texture->getColor()->getBlue() >> 2) +
 		      (texture->getColor()->getBlue() >> 1)) * 0xff;
 
-    if (! XAllocColor(getBaseDisplay()->getXDisplay(),
+    if (! XAllocColor(getBaseDisplay().getXDisplay(),
 		      getColormap(), &xcol))
       xcol.pixel = 0;
 
@@ -707,7 +705,7 @@ void BScreen::readDatabaseFontSet(const char *rname, const char *rclass,
   std::string s;
 
   if (*fontset)
-    XFreeFontSet(getBaseDisplay()->getXDisplay(), *fontset);
+    XFreeFontSet(getBaseDisplay().getXDisplay(), *fontset);
 
   if (resource.styleconfig.getValue(rname, rclass, s)) {
     if (! (*fontset = createFontSet(s.c_str())))
@@ -736,10 +734,10 @@ void BScreen::readDatabaseFont(const char *rname, const char *rclass,
   std::string s;
 
   if (*font)
-    XFreeFont(getBaseDisplay()->getXDisplay(), *font);
+    XFreeFont(getBaseDisplay().getXDisplay(), *font);
 
   if (resource.styleconfig.getValue(rname, rclass, s)) {
-    if ((*font = XLoadQueryFont(getBaseDisplay()->getXDisplay(),
+    if ((*font = XLoadQueryFont(getBaseDisplay().getXDisplay(),
 				s.c_str())) == NULL) {
       fprintf(stderr, i18n->getMessage(ScreenSet, ScreenFontLoadFail,
 			 "BScreen::LoadStyle(): couldn't load font '%s'\n"),
@@ -750,7 +748,7 @@ void BScreen::readDatabaseFont(const char *rname, const char *rclass,
     load_default = true;
 
   if (load_default) {
-    if ((*font = XLoadQueryFont(getBaseDisplay()->getXDisplay(),
+    if ((*font = XLoadQueryFont(getBaseDisplay().getXDisplay(),
 				defaultFont)) == NULL) {
       fprintf(stderr, i18n->getMessage(ScreenSet, ScreenDefaultFontLoadFail,
 	         "BScreen::LoadStyle(): couldn't load default font.\n"));
@@ -766,7 +764,7 @@ XFontSet BScreen::createFontSet(const char *fontname) {
   int nmissing, pixel_size = 0, buf_size = 0;
   char weight[FONT_ELEMENT_SIZE], slant[FONT_ELEMENT_SIZE];
 
-  fs = XCreateFontSet(getBaseDisplay()->getXDisplay(),
+  fs = XCreateFontSet(getBaseDisplay().getXDisplay(),
 		      fontname, &missing, &nmissing, &def);
   if (fs && (! nmissing)) return fs;
 
@@ -775,7 +773,7 @@ XFontSet BScreen::createFontSet(const char *fontname) {
     if (nmissing) XFreeStringList(missing);
 
     setlocale(LC_CTYPE, "C");
-    fs = XCreateFontSet(getBaseDisplay()->getXDisplay(), fontname,
+    fs = XCreateFontSet(getBaseDisplay().getXDisplay(), fontname,
 			&missing, &nmissing, &def);
     setlocale(LC_CTYPE, "");
   }
@@ -809,9 +807,9 @@ XFontSet BScreen::createFontSet(const char *fontname) {
   fontname = pattern2;
 
   if (nmissing) XFreeStringList(missing);
-  if (fs) XFreeFontSet(getBaseDisplay()->getXDisplay(), fs);
+  if (fs) XFreeFontSet(getBaseDisplay().getXDisplay(), fs);
 
-  fs = XCreateFontSet(getBaseDisplay()->getXDisplay(), fontname,
+  fs = XCreateFontSet(getBaseDisplay().getXDisplay(), fontname,
 		      &missing, &nmissing, &def);
   delete [] pattern2;
 
@@ -826,71 +824,71 @@ void BScreen::reconfigure(void) {
   unsigned long gc_value_mask = GCForeground;
   if (! i18n->multibyte()) gc_value_mask |= GCFont;
 
-  gcv.foreground = WhitePixel(getBaseDisplay()->getXDisplay(),
+  gcv.foreground = WhitePixel(getBaseDisplay().getXDisplay(),
 			      getScreenNumber());
   gcv.function = GXinvert;
   gcv.subwindow_mode = IncludeInferiors;
-  XChangeGC(getBaseDisplay()->getXDisplay(), opGC,
+  XChangeGC(getBaseDisplay().getXDisplay(), opGC,
 	    GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
   gcv.foreground = resource.wstyle.l_text_focus.getPixel();
   if (resource.wstyle.font)
     gcv.font = resource.wstyle.font->fid;
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.wstyle.l_text_focus_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.wstyle.l_text_focus_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.wstyle.l_text_unfocus.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.wstyle.l_text_unfocus_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.wstyle.l_text_unfocus_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.wstyle.b_pic_focus.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.wstyle.b_pic_focus_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.wstyle.b_pic_focus_gc,
 	    GCForeground, &gcv);
 
   gcv.foreground = resource.wstyle.b_pic_unfocus.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.wstyle.b_pic_unfocus_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.wstyle.b_pic_unfocus_gc,
 	    GCForeground, &gcv);
 
   gcv.foreground = resource.mstyle.t_text.getPixel();
   if (resource.mstyle.t_font)
     gcv.font = resource.mstyle.t_font->fid;
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.mstyle.t_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.mstyle.t_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.f_text.getPixel();
   if (resource.mstyle.f_font)
     gcv.font = resource.mstyle.f_font->fid;
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.mstyle.f_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.mstyle.f_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.h_text.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.mstyle.h_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.mstyle.h_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.d_text.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.mstyle.d_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.mstyle.d_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.mstyle.hilite.getColor()->getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.mstyle.hilite_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.mstyle.hilite_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.l_text.getPixel();
   if (resource.tstyle.font)
     gcv.font = resource.tstyle.font->fid;
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.tstyle.l_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.tstyle.l_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.w_text.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.tstyle.w_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.tstyle.w_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.c_text.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.tstyle.c_text_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.tstyle.c_text_gc,
 	    gc_value_mask, &gcv);
 
   gcv.foreground = resource.tstyle.b_pic.getPixel();
-  XChangeGC(getBaseDisplay()->getXDisplay(), resource.tstyle.b_pic_gc,
+  XChangeGC(getBaseDisplay().getXDisplay(), resource.tstyle.b_pic_gc,
 	    gc_value_mask, &gcv);
 
   const char *s = i18n->getMessage(ScreenSet, ScreenPositionLength,
@@ -918,32 +916,32 @@ void BScreen::reconfigure(void) {
     if (resource.wstyle.t_focus.getTexture() ==
 	                              (BImage_Flat | BImage_Solid)) {
       geom_pixmap = None;
-      XSetWindowBackground(getBaseDisplay()->getXDisplay(), geom_window,
+      XSetWindowBackground(getBaseDisplay().getXDisplay(), geom_window,
 			 resource.wstyle.t_focus.getColor()->getPixel());
     } else {
       geom_pixmap = image_control->renderImage(geom_w, geom_h,
 					       &resource.wstyle.t_focus);
-      XSetWindowBackgroundPixmap(getBaseDisplay()->getXDisplay(),
+      XSetWindowBackgroundPixmap(getBaseDisplay().getXDisplay(),
 				 geom_window, geom_pixmap);
     }
   } else {
     if (resource.wstyle.l_focus.getTexture() ==
 	                              (BImage_Flat | BImage_Solid)) {
       geom_pixmap = None;
-      XSetWindowBackground(getBaseDisplay()->getXDisplay(), geom_window,
+      XSetWindowBackground(getBaseDisplay().getXDisplay(), geom_window,
 			 resource.wstyle.l_focus.getColor()->getPixel());
     } else {
       geom_pixmap = image_control->renderImage(geom_w, geom_h,
 					       &resource.wstyle.l_focus);
-      XSetWindowBackgroundPixmap(getBaseDisplay()->getXDisplay(),
+      XSetWindowBackgroundPixmap(getBaseDisplay().getXDisplay(),
 				 geom_window, geom_pixmap);
     }
   }
   if (tmp) image_control->removeImage(tmp);
 
-  XSetWindowBorderWidth(getBaseDisplay()->getXDisplay(), geom_window,
+  XSetWindowBorderWidth(getBaseDisplay().getXDisplay(), geom_window,
                         resource.border_width);
-  XSetWindowBorder(getBaseDisplay()->getXDisplay(), geom_window,
+  XSetWindowBorder(getBaseDisplay().getXDisplay(), geom_window,
                    resource.border_color.getPixel());
 
   workspacemenu->reconfigure();
@@ -995,7 +993,7 @@ void BScreen::removeWorkspaceNames(void) {
 void BScreen::LoadStyle(void) {
   obResource &conf = resource.styleconfig;
   
-  conf.setFile(openbox->getStyleFilename());
+  conf.setFile(openbox.getStyleFilename());
   if (!conf.load()) {
     conf.setFile(DEFAULTSTYLE);
     if (!conf.load()) {
@@ -1043,77 +1041,77 @@ void BScreen::LoadStyle(void) {
   // load window config
   readDatabaseTexture("window.title.focus", "Window.Title.Focus",
 		      &resource.wstyle.t_focus,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.title.unfocus", "Window.Title.Unfocus",
 		      &resource.wstyle.t_unfocus,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.label.focus", "Window.Label.Focus",
 		      &resource.wstyle.l_focus,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.label.unfocus", "Window.Label.Unfocus",
 		      &resource.wstyle.l_unfocus,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.handle.focus", "Window.Handle.Focus",
 		      &resource.wstyle.h_focus,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.handle.unfocus", "Window.Handle.Unfocus",
 		      &resource.wstyle.h_unfocus,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.grip.focus", "Window.Grip.Focus",
                       &resource.wstyle.g_focus,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.grip.unfocus", "Window.Grip.Unfocus",
                       &resource.wstyle.g_unfocus,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.button.focus", "Window.Button.Focus",
 		      &resource.wstyle.b_focus,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.button.unfocus", "Window.Button.Unfocus",
 		      &resource.wstyle.b_unfocus,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("window.button.pressed", "Window.Button.Pressed",
 		      &resource.wstyle.b_pressed,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseColor("window.frame.focusColor",
 		    "Window.Frame.FocusColor",
 		    &resource.wstyle.f_focus,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("window.frame.unfocusColor",
 		    "Window.Frame.UnfocusColor",
 		    &resource.wstyle.f_unfocus,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("window.label.focus.textColor",
 		    "Window.Label.Focus.TextColor",
 		    &resource.wstyle.l_text_focus,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("window.label.unfocus.textColor",
 		    "Window.Label.Unfocus.TextColor",
 		    &resource.wstyle.l_text_unfocus,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("window.button.focus.picColor",
 		    "Window.Button.Focus.PicColor",
 		    &resource.wstyle.b_pic_focus,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("window.button.unfocus.picColor",
 		    "Window.Button.Unfocus.PicColor",
 		    &resource.wstyle.b_pic_unfocus,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
 
   if (conf.getValue("window.justify", "Window.Justify", s)) {
@@ -1129,44 +1127,44 @@ void BScreen::LoadStyle(void) {
   // load toolbar config
   readDatabaseTexture("toolbar", "Toolbar",
 		      &resource.tstyle.toolbar,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("toolbar.label", "Toolbar.Label",
 		      &resource.tstyle.label,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("toolbar.windowLabel", "Toolbar.WindowLabel",
 		      &resource.tstyle.window,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("toolbar.button", "Toolbar.Button",
 		      &resource.tstyle.button,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("toolbar.button.pressed", "Toolbar.Button.Pressed",
 		      &resource.tstyle.pressed,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("toolbar.clock", "Toolbar.Clock",
 		      &resource.tstyle.clock,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseColor("toolbar.label.textColor", "Toolbar.Label.TextColor",
 		    &resource.tstyle.l_text,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("toolbar.windowLabel.textColor",
 		    "Toolbar.WindowLabel.TextColor",
 		    &resource.tstyle.w_text,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("toolbar.clock.textColor", "Toolbar.Clock.TextColor",
 		    &resource.tstyle.c_text,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("toolbar.button.picColor", "Toolbar.Button.PicColor",
 		    &resource.tstyle.b_pic,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
 
   if (conf.getValue("toolbar.justify", "Toolbar.Justify", s)) {
@@ -1182,31 +1180,31 @@ void BScreen::LoadStyle(void) {
   // load menu config
   readDatabaseTexture("menu.title", "Menu.Title",
 		      &resource.mstyle.title,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("menu.frame", "Menu.Frame",
 		      &resource.mstyle.frame,
-		      BlackPixel(getBaseDisplay()->getXDisplay(),
+		      BlackPixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseTexture("menu.hilite", "Menu.Hilite",
 		      &resource.mstyle.hilite,
-		      WhitePixel(getBaseDisplay()->getXDisplay(),
+		      WhitePixel(getBaseDisplay().getXDisplay(),
 				 getScreenNumber()));
   readDatabaseColor("menu.title.textColor", "Menu.Title.TextColor",
 		    &resource.mstyle.t_text,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("menu.frame.textColor", "Menu.Frame.TextColor",
 		    &resource.mstyle.f_text,
-		    WhitePixel(getBaseDisplay()->getXDisplay(),
+		    WhitePixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("menu.frame.disableColor", "Menu.Frame.DisableColor",
 		    &resource.mstyle.d_text,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
   readDatabaseColor("menu.hilite.textColor", "Menu.Hilite.TextColor",
 		    &resource.mstyle.h_text,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
 
   if (conf.getValue("menu.title.justify", "Menu.Title.Justify", s)) {
@@ -1250,7 +1248,7 @@ void BScreen::LoadStyle(void) {
     resource.mstyle.bullet_pos = Basemenu::Left;
 
   readDatabaseColor("borderColor", "BorderColor", &resource.border_color,
-		    BlackPixel(getBaseDisplay()->getXDisplay(),
+		    BlackPixel(getBaseDisplay().getXDisplay(),
 			       getScreenNumber()));
 
   // load bevel, border and handle widths
@@ -1291,7 +1289,7 @@ void BScreen::LoadStyle(void) {
 #ifndef    __EMX__
     char displaystring[MAXPATHLEN];
     sprintf(displaystring, "DISPLAY=%s",
-	    DisplayString(getBaseDisplay()->getXDisplay()));
+	    DisplayString(getBaseDisplay().getXDisplay()));
     sprintf(displaystring + strlen(displaystring) - 1, "%d",
 	    getScreenNumber());
 
@@ -1389,11 +1387,11 @@ void BScreen::changeWorkspaceID(int id) {
     workspacemenu->setItemSelected(current_workspace->getWorkspaceID() + 2,
 				   False);
 
-    if (openbox->getFocusedWindow() &&
-	openbox->getFocusedWindow()->getScreen() == this &&
-        (! openbox->getFocusedWindow()->isStuck())) {
-      current_workspace->setLastFocusedWindow(openbox->getFocusedWindow());
-      openbox->setFocusedWindow((OpenboxWindow *) 0);
+    if (openbox.getFocusedWindow() &&
+	openbox.getFocusedWindow()->getScreen() == this &&
+        (! openbox.getFocusedWindow()->isStuck())) {
+      current_workspace->setLastFocusedWindow(openbox.getFocusedWindow());
+      openbox.setFocusedWindow((OpenboxWindow *) 0);
     }
 
     current_workspace = getWorkspace(id);
@@ -1405,7 +1403,7 @@ void BScreen::changeWorkspaceID(int id) {
     current_workspace->showAll();
 
     if (resource.focus_last && current_workspace->getLastFocusedWindow()) {
-      XSync(openbox->getXDisplay(), False);
+      XSync(openbox.getXDisplay(), False);
       current_workspace->getLastFocusedWindow()->setInputFocus();
     }
   }
@@ -1427,8 +1425,8 @@ void BScreen::addNetizen(Netizen *n) {
 		       w->getWorkspaceID());
   }
 
-  Window f = ((openbox->getFocusedWindow()) ?
-              openbox->getFocusedWindow()->getClientWindow() : None);
+  Window f = ((openbox.getFocusedWindow()) ?
+              openbox.getFocusedWindow()->getClientWindow() : None);
   n->sendWindowFocus(f);
 }
 
@@ -1462,8 +1460,8 @@ void BScreen::updateNetizenWorkspaceCount(void) {
 
 
 void BScreen::updateNetizenWindowFocus(void) {
-  Window f = ((openbox->getFocusedWindow()) ?
-              openbox->getFocusedWindow()->getClientWindow() : None);
+  Window f = ((openbox.getFocusedWindow()) ?
+              openbox.getFocusedWindow()->getClientWindow() : None);
   LinkedListIterator<Netizen> it(netizenList);
   for (Netizen *n = it.current(); n; it++, n = it.current())
     n->sendWindowFocus(f);
@@ -1510,7 +1508,7 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
     Window[(num + workspacesList->count() + rootmenuList->count() + 13)];
   int i = 0, k = num;
 
-  XRaiseWindow(getBaseDisplay()->getXDisplay(), iconmenu->getWindowID());
+  XRaiseWindow(getBaseDisplay().getXDisplay(), iconmenu->getWindowID());
   *(session_stack + i++) = iconmenu->getWindowID();
 
   LinkedListIterator<Workspace> wit(workspacesList);
@@ -1549,7 +1547,7 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
   while (k--)
     *(session_stack + i++) = *(workspace_stack + k);
 
-  XRestackWindows(getBaseDisplay()->getXDisplay(), session_stack, i);
+  XRestackWindows(getBaseDisplay().getXDisplay(), session_stack, i);
 
   delete [] session_stack;
 }
@@ -1607,11 +1605,11 @@ void BScreen::nextFocus(void) {
   int focused_window_number = -1;
   OpenboxWindow *next;
 
-  if (openbox->getFocusedWindow()) {
-    if (openbox->getFocusedWindow()->getScreen()->getScreenNumber() ==
+  if (openbox.getFocusedWindow()) {
+    if (openbox.getFocusedWindow()->getScreen()->getScreenNumber() ==
 	getScreenNumber()) {
       have_focused = True;
-      focused_window_number = openbox->getFocusedWindow()->getWindowNumber();
+      focused_window_number = openbox.getFocusedWindow()->getWindowNumber();
     }
   }
 
@@ -1641,11 +1639,11 @@ void BScreen::prevFocus(void) {
   int focused_window_number = -1;
   OpenboxWindow *prev;
 
-  if (openbox->getFocusedWindow()) {
-    if (openbox->getFocusedWindow()->getScreen()->getScreenNumber() ==
+  if (openbox.getFocusedWindow()) {
+    if (openbox.getFocusedWindow()->getScreen()->getScreenNumber() ==
 	getScreenNumber()) {
       have_focused = True;
-      focused_window_number = openbox->getFocusedWindow()->getWindowNumber();
+      focused_window_number = openbox.getFocusedWindow()->getWindowNumber();
     }
   }
 
@@ -1674,17 +1672,17 @@ void BScreen::raiseFocus(void) {
   Bool have_focused = False;
   int focused_window_number = -1;
 
-  if (openbox->getFocusedWindow()) {
-    if (openbox->getFocusedWindow()->getScreen()->getScreenNumber() ==
+  if (openbox.getFocusedWindow()) {
+    if (openbox.getFocusedWindow()->getScreen()->getScreenNumber() ==
 	getScreenNumber()) {
       have_focused = True;
-      focused_window_number = openbox->getFocusedWindow()->getWindowNumber();
+      focused_window_number = openbox.getFocusedWindow()->getWindowNumber();
     }
   }
 
   if ((getCurrentWorkspace()->getCount() > 1) && have_focused)
-    getWorkspace(openbox->getFocusedWindow()->getWorkspaceNumber())->
-      raiseWindow(openbox->getFocusedWindow());
+    getWorkspace(openbox.getFocusedWindow()->getWorkspaceNumber())->
+      raiseWindow(openbox.getFocusedWindow());
 }
 
 
@@ -1700,16 +1698,16 @@ void BScreen::InitMenu(void) {
   }
   Bool defaultMenu = True;
 
-  if (openbox->getMenuFilename()) {
-    FILE *menu_file = fopen(openbox->getMenuFilename(), "r");
+  if (openbox.getMenuFilename()) {
+    FILE *menu_file = fopen(openbox.getMenuFilename(), "r");
 
     if (!menu_file) {
-      perror(openbox->getMenuFilename());
+      perror(openbox.getMenuFilename());
     } else {
       if (feof(menu_file)) {
 	fprintf(stderr, i18n->getMessage(ScreenSet, ScreenEmptyMenuFile,
 					 "%s: Empty menu file"),
-		openbox->getMenuFilename());
+		openbox.getMenuFilename());
       } else {
 	char line[1024], label[1024];
 	memset(line, 0, 1024);
@@ -1763,7 +1761,7 @@ void BScreen::InitMenu(void) {
     rootmenu->insert(i18n->getMessage(ScreenSet, ScreenExit, "Exit"),
 		     BScreen::Exit);
   } else {
-    openbox->saveMenuFilename(openbox->getMenuFilename());
+    openbox.saveMenuFilename(openbox.getMenuFilename());
   }
 }
 
@@ -1964,7 +1962,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
 		if (! feof(submenufile)) {
 		  if (! parseMenuFile(submenufile, menu))
-		    openbox->saveMenuFilename(newfile);
+		    openbox.saveMenuFilename(newfile);
 
 		  fclose(submenufile);
 		}
@@ -2123,7 +2121,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                   rootmenuList->insert(stylesmenu);
                 }
 
-                openbox->saveMenuFilename(stylesdir);
+                openbox.saveMenuFilename(stylesdir);
               } else {
                 fprintf(stderr, i18n->getMessage(ScreenSet,
 						 ScreenSTYLESDIRErrorNotDir,
@@ -2165,10 +2163,10 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
 
 void BScreen::shutdown(void) {
-  openbox->grab();
+  openbox.grab();
 
-  XSelectInput(getBaseDisplay()->getXDisplay(), getRootWindow(), NoEventMask);
-  XSync(getBaseDisplay()->getXDisplay(), False);
+  XSelectInput(getBaseDisplay().getXDisplay(), getRootWindow(), NoEventMask);
+  XSync(getBaseDisplay().getXDisplay(), False);
 
   LinkedListIterator<Workspace> it(workspacesList);
   for (Workspace *w = it.current(); w; it++, w = it.current())
@@ -2183,17 +2181,17 @@ void BScreen::shutdown(void) {
   slit->shutdown();
 #endif // SLIT
 
-  openbox->ungrab();
+  openbox.ungrab();
 }
 
 
 void BScreen::showPosition(int x, int y) {
   if (! geom_visible) {
-    XMoveResizeWindow(getBaseDisplay()->getXDisplay(), geom_window,
+    XMoveResizeWindow(getBaseDisplay().getXDisplay(), geom_window,
                       (getWidth() - geom_w) / 2,
                       (getHeight() - geom_h) / 2, geom_w, geom_h);
-    XMapWindow(getBaseDisplay()->getXDisplay(), geom_window);
-    XRaiseWindow(getBaseDisplay()->getXDisplay(), geom_window);
+    XMapWindow(getBaseDisplay().getXDisplay(), geom_window);
+    XRaiseWindow(getBaseDisplay().getXDisplay(), geom_window);
 
     geom_visible = True;
   }
@@ -2203,16 +2201,16 @@ void BScreen::showPosition(int x, int y) {
   sprintf(label, i18n->getMessage(ScreenSet, ScreenPositionFormat,
 				  "X: %4d x Y: %4d"), x, y);
 
-  XClearWindow(getBaseDisplay()->getXDisplay(), geom_window);
+  XClearWindow(getBaseDisplay().getXDisplay(), geom_window);
 
   if (i18n->multibyte()) {
-    XmbDrawString(getBaseDisplay()->getXDisplay(), geom_window,
+    XmbDrawString(getBaseDisplay().getXDisplay(), geom_window,
 		  resource.wstyle.fontset, resource.wstyle.l_text_focus_gc,
 		  resource.bevel_width, resource.bevel_width -
 		  resource.wstyle.fontset_extents->max_ink_extent.y,
 		  label, strlen(label));
   } else {
-    XDrawString(getBaseDisplay()->getXDisplay(), geom_window,
+    XDrawString(getBaseDisplay().getXDisplay(), geom_window,
 		resource.wstyle.l_text_focus_gc,
 		resource.bevel_width,
 		resource.wstyle.font->ascent +
@@ -2223,11 +2221,11 @@ void BScreen::showPosition(int x, int y) {
 
 void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   if (! geom_visible) {
-    XMoveResizeWindow(getBaseDisplay()->getXDisplay(), geom_window,
+    XMoveResizeWindow(getBaseDisplay().getXDisplay(), geom_window,
                       (getWidth() - geom_w) / 2,
                       (getHeight() - geom_h) / 2, geom_w, geom_h);
-    XMapWindow(getBaseDisplay()->getXDisplay(), geom_window);
-    XRaiseWindow(getBaseDisplay()->getXDisplay(), geom_window);
+    XMapWindow(getBaseDisplay().getXDisplay(), geom_window);
+    XRaiseWindow(getBaseDisplay().getXDisplay(), geom_window);
 
     geom_visible = True;
   }
@@ -2237,16 +2235,16 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   sprintf(label, i18n->getMessage(ScreenSet, ScreenGeometryFormat,
 				  "W: %4d x H: %4d"), gx, gy);
 
-  XClearWindow(getBaseDisplay()->getXDisplay(), geom_window);
+  XClearWindow(getBaseDisplay().getXDisplay(), geom_window);
 
   if (i18n->multibyte()) {
-    XmbDrawString(getBaseDisplay()->getXDisplay(), geom_window,
+    XmbDrawString(getBaseDisplay().getXDisplay(), geom_window,
 		  resource.wstyle.fontset, resource.wstyle.l_text_focus_gc,
 		  resource.bevel_width, resource.bevel_width -
 		  resource.wstyle.fontset_extents->max_ink_extent.y,
 		  label, strlen(label));
   } else {
-    XDrawString(getBaseDisplay()->getXDisplay(), geom_window,
+    XDrawString(getBaseDisplay().getXDisplay(), geom_window,
 		resource.wstyle.l_text_focus_gc,
 		resource.bevel_width,
 		resource.wstyle.font->ascent +
@@ -2257,7 +2255,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
 
 void BScreen::hideGeometry(void) {
   if (geom_visible) {
-    XUnmapWindow(getBaseDisplay()->getXDisplay(), geom_window);
+    XUnmapWindow(getBaseDisplay().getXDisplay(), geom_window);
     geom_visible = False;
   }
 }

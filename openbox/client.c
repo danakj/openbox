@@ -720,6 +720,11 @@ static void client_get_all(ObClient *self)
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
 
+    /* The transient hint is used to pick a type, but the type can also affect
+       transiency (dialogs are always made transients). This is Havoc's idea,
+       but it is needed to make some apps work right (eg tsclient). */
+    client_update_transient_for(self);
+
     client_get_state(self);
 
     {
@@ -928,6 +933,9 @@ void client_update_transient_for(ObClient *self)
                 }
             }
         }
+    } else if (self->type == OB_CLIENT_TYPE_DIALOG && self->group) {
+        self->transient = TRUE;
+        target = OB_TRAN_GROUP;
     } else
         self->transient = FALSE;
 

@@ -375,11 +375,11 @@ planton_themedir = $(themedir)/planton
 dist_planton_theme_DATA = \
 	themes/planton/themerc \
 	themes/planton/max.xbm \
-	themes/planton/max_t.xbm \
+	themes/planton/max_toggled.xbm \
 	themes/planton/stick.xbm \
-	themes/planton/stick_t.xbm \
+	themes/planton/stick_toggled.xbm \
 	themes/planton/shade.xbm \
-	themes/planton/shade_t.xbm \
+	themes/planton/shade_toggled.xbm \
 	themes/planton/iconify.xbm \
 	themes/planton/close.xbm
 
@@ -412,11 +412,11 @@ bbstyle_themedir = $(themedir)/BBstylE
 dist_bbstyle_theme_DATA = \
 	themes/BBstylE/themerc \
 	themes/BBstylE/max.xbm \
-	themes/BBstylE/max_t.xbm \
+	themes/BBstylE/max_toggled.xbm \
 	themes/BBstylE/stick.xbm \
-	themes/BBstylE/stick_t.xbm \
+	themes/BBstylE/stick_toggled.xbm \
 	themes/BBstylE/shade.xbm \
-	themes/BBstylE/shade_t.xbm \
+	themes/BBstylE/shade_toggled.xbm \
 	themes/BBstylE/iconify.xbm \
 	themes/BBstylE/close.xbm
 

@@ -1,3 +1,12 @@
+  * Fixed (hopefully) the ugly bugly that would cause  (Marius)
+    epist to hog the keyboard on invalid keys.
+
+  * Added stackedCyclingRaise option, to allow windows (Marius)
+    to raise on focus when stacked is on.
+
+  * Small fixes, better sanity checks, much better     (Marius)
+    error reporting on bad keys and modifiers.
+
 2.1.0
 
   * Improved parser: much better error reporting for

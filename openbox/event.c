@@ -600,6 +600,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     XEvent ce;
     Atom msgtype;
     int i=0;
+    ObFrameContext con;
      
     switch (e->type) {
     case ButtonPress:
@@ -658,6 +659,18 @@ static void event_handle_client(ObClient *client, XEvent *e)
         frame_adjust_focus(client->frame, FALSE);
 	break;
     case EnterNotify:
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+        case OB_FRAME_CONTEXT_SHADE:
+        case OB_FRAME_CONTEXT_ICONIFY:
+        case OB_FRAME_CONTEXT_CLOSE:
+            g_message("hi");
+            frame_adjust_state(client->frame);
+            break;
+        default:
+            break;
+        }
         con = frame_context(client, e->xcrossing.subwindow);
         if (client_normal(client)) {
             if (ob_state() == OB_STATE_STARTING) {

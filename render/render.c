@@ -18,7 +18,7 @@
 static void pixel_data_to_pixmap(RrAppearance *l,
                                  gint x, gint y, gint w, gint h);
 
-void RrPaint(RrAppearance *l, Window win, gint w, gint h)
+void RrPaint(RrAppearance *a, Window win, gint w, gint h)
 {
     int i, transferred = 0, sw;
     RrPixel32 *source, *dest;
@@ -28,114 +28,101 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
 
     if (w <= 0 || h <= 0) return;
 
-    resized = (l->w != w || l->h != h);
+    resized = (a->w != w || a->h != h);
 
-    oldp = l->pixmap; /* save to free after changing the visible pixmap */
-    l->pixmap = XCreatePixmap(RrDisplay(l->inst),
-                              RrRootWindow(l->inst),
-                              w, h, RrDepth(l->inst));
+    oldp = a->pixmap; /* save to free after changing the visible pixmap */
+    a->pixmap = XCreatePixmap(RrDisplay(a->inst),
+                              RrRootWindow(a->inst),
+                              w, h, RrDepth(a->inst));
 
-    g_assert(l->pixmap != None);
-    l->w = w;
-    l->h = h;
+    g_assert(a->pixmap != None);
+    a->w = w;
+    a->h = h;
 
-    if (l->xftdraw != NULL)
-        XftDrawDestroy(l->xftdraw);
-    l->xftdraw = XftDrawCreate(RrDisplay(l->inst), l->pixmap,
-                               RrVisual(l->inst), RrColormap(l->inst));
-    g_assert(l->xftdraw != NULL);
+    if (a->xftdraw != NULL)
+        XftDrawDestroy(a->xftdraw);
+    a->xftdraw = XftDrawCreate(RrDisplay(a->inst), a->pixmap,
+                               RrVisual(a->inst), RrColormap(a->inst));
+    g_assert(a->xftdraw != NULL);
 
-    g_free(l->surface.pixel_data);
-    l->surface.pixel_data = g_new(RrPixel32, w * h);
+    g_free(a->surface.pixel_data);
+    a->surface.pixel_data = g_new(RrPixel32, w * h);
 
-    if (l->surface.grad == RR_SURFACE_PARENTREL) {
-        g_assert (l->surface.parent);
-        g_assert (l->surface.parent->w);
+    if (a->surface.grad == RR_SURFACE_PARENTREL) {
+        g_assert (a->surface.parent);
+        g_assert (a->surface.parent->w);
 
-        sw = l->surface.parent->w;
-        source = (l->surface.parent->surface.pixel_data +
-                  l->surface.parentx + sw * l->surface.parenty);
-        dest = l->surface.pixel_data;
+        sw = a->surface.parent->w;
+        source = (a->surface.parent->surface.pixel_data +
+                  a->surface.parentx + sw * a->surface.parenty);
+        dest = a->surface.pixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(RrPixel32));
         }
     } else
-        RrRender(l, w, h);
+        RrRender(a, w, h);
 
-    RECT_SET(tarea, 0, 0, w, h);
-    if (l->surface.grad != RR_SURFACE_PARENTREL) {
-        if (l->surface.relief != RR_RELIEF_FLAT) {
-            switch (l->surface.bevel) {
-            case RR_BEVEL_1:
-                tarea.x += 1; tarea.y += 1;
-                tarea.width -= 2; tarea.height -= 2;
-                break;
-            case RR_BEVEL_2:
-                tarea.x += 2; tarea.y += 2;
-                tarea.width -= 4; tarea.height -= 4;
-                break;
-            }
-        } else if (l->surface.border) {
-            tarea.x += 1; tarea.y += 1;
-            tarea.width -= 2; tarea.height -= 2;
-        }
-    }
+    {
+        gint l, t, r, b;
+        RrMargins(a, &l, &t, &r, &b);
+        RECT_SET(tarea, l, t, w - l - r, h - t - b); 
+    }       
 
-    for (i = 0; i < l->textures; i++) {
-        switch (l->texture[i].type) {
+    for (i = 0; i < a->textures; i++) {
+        switch (a->texture[i].type) {
         case RR_TEXTURE_NONE:
             break;
         case RR_TEXTURE_TEXT:
             if (!transferred) {
                 transferred = 1;
-                if (l->surface.grad != RR_SURFACE_SOLID)
-                    pixel_data_to_pixmap(l, 0, 0, w, h);
+                if (a->surface.grad != RR_SURFACE_SOLID)
+                    pixel_data_to_pixmap(a, 0, 0, w, h);
             }
-            if (l->xftdraw == NULL) {
-                l->xftdraw = XftDrawCreate(RrDisplay(l->inst), l->pixmap, 
-                                           RrVisual(l->inst),
-                                           RrColormap(l->inst));
+            if (a->xftdraw == NULL) {
+                a->xftdraw = XftDrawCreate(RrDisplay(a->inst), a->pixmap, 
+                                           RrVisual(a->inst),
+                                           RrColormap(a->inst));
             }
-            RrFontDraw(l->xftdraw, &l->texture[i].data.text, &tarea);
+            RrFontDraw(a->xftdraw, &a->texture[i].data.text, &tarea);
             break;
         case RR_TEXTURE_LINE_ART:
             if (!transferred) {
                 transferred = 1;
-                if (l->surface.grad != RR_SURFACE_SOLID)
-                    pixel_data_to_pixmap(l, 0, 0, w, h);
+                if (a->surface.grad != RR_SURFACE_SOLID)
+                    pixel_data_to_pixmap(a, 0, 0, w, h);
             }
-            XDrawLine(RrDisplay(l->inst), l->pixmap,
-                      RrColorGC(l->texture[i].data.lineart.color),
-                      l->texture[i].data.lineart.x1,
-                      l->texture[i].data.lineart.y1,
-                      l->texture[i].data.lineart.x2,
-                      l->texture[i].data.lineart.y2);
+            XDrawLine(RrDisplay(a->inst), a->pixmap,
+                      RrColorGC(a->texture[i].data.lineart.color),
+                      a->texture[i].data.lineart.x1,
+                      a->texture[i].data.lineart.y1,
+                      a->texture[i].data.lineart.x2,
+                      a->texture[i].data.lineart.y2);
             break;
         case RR_TEXTURE_MASK:
             if (!transferred) {
                 transferred = 1;
-                if (l->surface.grad != RR_SURFACE_SOLID)
-                    pixel_data_to_pixmap(l, 0, 0, w, h);
+                if (a->surface.grad != RR_SURFACE_SOLID)
+                    pixel_data_to_pixmap(a, 0, 0, w, h);
             }
-            RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
+            RrPixmapMaskDraw(a->pixmap, &a->texture[i].data.mask, &tarea);
             break;
         case RR_TEXTURE_RGBA:
             g_assert(!transferred);
-            RrImageDraw(l->surface.pixel_data,
-                        &l->texture[i].data.rgba, &tarea);
+            RrImageDraw(a->surface.pixel_data,
+                        &a->texture[i].data.rgba, &tarea);
         break;
         }
     }
 
     if (!transferred) {
         transferred = 1;
-        if (l->surface.grad != RR_SURFACE_SOLID)
-            pixel_data_to_pixmap(l, 0, 0, w, h);
+        if (a->surface.grad != RR_SURFACE_SOLID)
+            pixel_data_to_pixmap(a, 0, 0, w, h);
     }
 
-    XSetWindowBackgroundPixmap(RrDisplay(l->inst), win, l->pixmap);
-    XClearWindow(RrDisplay(l->inst), win);
-    if (oldp) XFreePixmap(RrDisplay(l->inst), oldp);
+    XSetWindowBackgroundPixmap(RrDisplay(a->inst), win, a->pixmap);
+    XClearWindow(RrDisplay(a->inst), win);
+    if (oldp) XFreePixmap(RrDisplay(a->inst), oldp);
 }
 
 RrAppearance *RrAppearanceNew(const RrInstance *inst, gint numtex)
@@ -281,55 +268,65 @@ static void pixel_data_to_pixmap(RrAppearance *l,
     g_free(scratch);
 }
 
-void RrMinsize(RrAppearance *l, gint *w, gint *h)
+void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b)
+{
+    *l = *t = *r = *b = 0;
+
+    if (a->surface.grad != RR_SURFACE_PARENTREL) {
+        if (a->surface.relief != RR_RELIEF_FLAT) {
+            switch (a->surface.bevel) {
+            case RR_BEVEL_1:
+                *l = *t = *r = *b = 1;
+                break;
+            case RR_BEVEL_2:
+                *l = *t = *r = *b = 2;
+                break;
+            }
+        } else if (a->surface.border) {
+            *l = *t = *r = *b = 1;
+        }
+    }
+}
+
+void RrMinsize(RrAppearance *a, gint *w, gint *h)
 {
     gint i;
     gint m;
+    gint l, t, r, b;
     *w = *h = 0;
 
-    for (i = 0; i < l->textures; ++i) {
-        switch (l->texture[i].type) {
+    for (i = 0; i < a->textures; ++i) {
+        switch (a->texture[i].type) {
         case RR_TEXTURE_NONE:
             break;
         case RR_TEXTURE_MASK:
-            *w = MAX(*w, l->texture[i].data.mask.mask->width);
-            *h = MAX(*h, l->texture[i].data.mask.mask->height);
+            *w = MAX(*w, a->texture[i].data.mask.mask->width);
+            *h = MAX(*h, a->texture[i].data.mask.mask->height);
             break;
         case RR_TEXTURE_TEXT:
-            m = RrFontMeasureString(l->texture[i].data.text.font,
-                                    l->texture[i].data.text.string);
+            m = RrFontMeasureString(a->texture[i].data.text.font,
+                                    a->texture[i].data.text.string);
             *w = MAX(*w, m);
-            m = RrFontHeight(l->texture[i].data.text.font);
+            m = RrFontHeight(a->texture[i].data.text.font);
             *h += MAX(*h, m);
             break;
         case RR_TEXTURE_RGBA:
-            *w += MAX(*w, l->texture[i].data.rgba.width);
-            *h += MAX(*h, l->texture[i].data.rgba.height);
+            *w += MAX(*w, a->texture[i].data.rgba.width);
+            *h += MAX(*h, a->texture[i].data.rgba.height);
             break;
         case RR_TEXTURE_LINE_ART:
-            *w += MAX(*w, MAX(l->texture[i].data.lineart.x1,
-                              l->texture[i].data.lineart.x2));
-            *h += MAX(*h, MAX(l->texture[i].data.lineart.y1,
-                              l->texture[i].data.lineart.y2));
+            *w += MAX(*w, MAX(a->texture[i].data.lineart.x1,
+                              a->texture[i].data.lineart.x2));
+            *h += MAX(*h, MAX(a->texture[i].data.lineart.y1,
+                              a->texture[i].data.lineart.y2));
             break;
         }
     }
 
-    if (l->surface.relief != RR_RELIEF_FLAT) {
-        switch (l->surface.bevel) {
-        case RR_BEVEL_1:
-            *w += 2;
-            *h += 2;
-            break;
-        case RR_BEVEL_2:
-            *w += 4;
-            *h += 4;
-            break;
-        }
-    } else if (l->surface.border) {
-        *w += 2;
-        *h += 2;
-    }
+    RrMargins(a, &l, &t, &r, &b);
+
+    *w += l + r;
+    *h += t + b;
 
     if (*w < 1) *w = 1;
     if (*h < 1) *h = 1;

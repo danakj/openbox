@@ -183,8 +183,9 @@ int RrFontMeasureString (const RrFont *f, const gchar *str);
 int RrFontHeight        (const RrFont *f);
 int RrFontMaxCharWidth  (const RrFont *f);
 
-void RrPaint   (RrAppearance *l, Window win, gint w, gint h);
-void RrMinsize (RrAppearance *l, gint *w, gint *h);
+void RrPaint   (RrAppearance *a, Window win, gint w, gint h);
+void RrMinsize (RrAppearance *a, gint *w, gint *h);
+void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b);
 
 gboolean RrPixmapToRGBA(const RrInstance *inst,
                         Pixmap pmap, Pixmap mask,

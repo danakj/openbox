@@ -15,7 +15,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
 
     theme->bevel = 1;
     theme->bwidth = 1;
-    theme->cbwidth = 1;
+    theme->cbwidth = 0;
     theme->handle_height = 4;
 
     theme->title_layout = "NLIMC";
@@ -190,6 +190,11 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
                 &pri, NULL, 0, NULL);
 
     theme->menu_hilite = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
+
+    /* app stuff */
+
+    RrColorSet(&theme->app_label_color, 1, 1, 1, 1);
+    RrColorSet(&theme->app_label_color_h, 1, 1, 1, 1);
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
     RrPlanarSet(theme->menu_item, RR_PLANAR_SOLID, RR_BEVEL_NONE,

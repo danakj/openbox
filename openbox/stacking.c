@@ -258,12 +258,7 @@ void stacking_add(ObWindow *win)
     l = window_layer(win);
     wins = g_list_append(NULL, win); /* list of 1 element */
 
-    for (it = stacking_list; it; it = g_list_next(it))
-        if (window_layer(it->data) <= l)
-            break;
-    do_restack(wins, it);
-    g_list_free(wins);
-
+    stacking_list = g_list_append(stacking_list, win);
     stacking_raise(win);
 }
 

@@ -1,4 +1,4 @@
-CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
+CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@ \
 -Dmultibyte\(\)=True
 
 INCLUDES= -I../src

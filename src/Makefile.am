@@ -1,7 +1,7 @@
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
+CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 

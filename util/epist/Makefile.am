@@ -4,7 +4,7 @@ DEFAULT_RC=$(pkgdatadir)/epistrc
 
 CLEANFILES = epist.1 epistrc.5
 
-CXXFLAGS= @CXXFLAGS@ -DDEFAULTRC=\"$(DEFAULT_RC)\"
+CPPFLAGS= @CPPFLAGS@ -DDEFAULTRC=\"$(DEFAULT_RC)\"
 
 #EXTRA_PROGRAMS =		epist
 bin_PROGRAMS =		epist

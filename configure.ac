@@ -1,6 +1,6 @@
-AC_INIT([openbox], [2.90.0], [http://icculus.org/openbox])
-AC_CONFIG_SRCDIR([src/blackbox.cc])
-AM_INIT_AUTOMAKE
+AC_INIT
+AC_CONFIG_SRCDIR([src/main.cc])
+AM_INIT_AUTOMAKE([openbox], [2.90.0])
 
 dnl Determine default prefix
 test "$prefix" = "NONE" && prefix="$ac_default_prefix"
@@ -22,7 +22,7 @@ dnl Check what compiler we are using
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
-  CXXFLAGS="$CXXFLAGS -Wall -W -pedantic"
+  CPPFLAGS="$CPPFLAGS -Wall -W -pedantic"
 else
   AC_MSG_RESULT([no, trying other compilers])
   AC_MSG_CHECKING(for MIPSpro)
@@ -31,11 +31,11 @@ else
     AC_MSG_RESULT([no])
   else
     AC_MSG_RESULT([yes, version $mips_pro_ver.])
-    AC_MSG_CHECKING(for -LANG:std in CXXFLAGS)
-    lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
+    AC_MSG_CHECKING(for -LANG:std in CPPFLAGS)
+    lang_std_not_set=`echo $CPPFLAGS | grep "\-LANG:std"`
     if test "x$lang_std_not_set" = "x"; then
       AC_MSG_RESULT([not set, setting.])
-      CXXFLAGS="${CXXFLAGS} -LANG:std"
+      CPPFLAGS="${CPPFLAGS} -LANG:std"
     else
       AC_MSG_RESULT([already set.])
     fi
@@ -51,6 +51,9 @@ AC_HEADER_TIME
 
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL
+
+dnl Look for gettext
+AM_GNU_GETTEXT
 
 dnl Check whether to include debugging code
 DEBUG=""
@@ -71,7 +74,7 @@ AC_ARG_ENABLE([debug],
   AC_MSG_RESULT([no])
   DEBUG="-DNDEBUG"
 )
-CXXFLAGS="$CXXFLAGS $DEBUG"
+CPPFLAGS="$CPPFLAGS $DEBUG"
 
 dnl Check for X headers and libraries
 AC_PATH_X
@@ -80,7 +83,7 @@ test "$no_x" = "yes" && AC_MSG_ERROR([No Xlibs found.])
 test -z "$x_includes" && x_includes="/usr/include"
 test -z "$x_libraries" && x_libraries="/usr/lib"
      
-CXXFLAGS="$CXXFLAGS $X_CXXFLAGS"
+CPPFLAGS="$CPPFLAGS $X_CPPFLAGS"
 LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS"
 LDFLAGS="$LDFLAGS $X_PRE_LIBS $LIBS $X_EXTRA_LIBS"
 
@@ -166,21 +169,12 @@ AC_ARG_ENABLE([xinerama],
   AC_MSG_RESULT([no])
 )
 
-dnl Print results
-AC_MSG_RESULT([])
-AC_MSG_RESULT([	$PACKAGE version $VERSION configured successfully.])
-AC_MSG_RESULT([])
-AC_MSG_RESULT([Using '$prefix' for installation.])
-AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
-AC_MSG_RESULT([Building with '$CXXFLAGS' for C++ compiler flags.])
-AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
-AC_MSG_RESULT([])
-
-
 dnl Output files
 AM_CONFIG_HEADER(config.h)
-AC_CONFIG_FILES([
+AC_CONFIG_FILES([ intl/Makefile 
   Makefile
+  m4/Makefile 
+  po/Makefile.in
   otk/Makefile
   src/Makefile
   util/Makefile
@@ -191,3 +185,13 @@ AC_CONFIG_FILES([
   version.h
 ])
 AC_OUTPUT
+
+dnl Print results
+AC_MSG_RESULT([])
+AC_MSG_RESULT([	$PACKAGE_NAME version $PACKAGE_VERSION configured successfully.])
+AC_MSG_RESULT([])
+AC_MSG_RESULT([Using '$prefix' for installation.])
+AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
+AC_MSG_RESULT([Building with '$CPPFLAGS' for C++ compiler flags.])
+AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
+AC_MSG_RESULT([])

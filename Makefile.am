@@ -1,6 +1,6 @@
 # Makefile.am for Openbox
 
-SUBDIRS = data doc otk src util
+SUBDIRS = po m4 data doc otk src util
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 uninstall-local:
@@ -8,3 +8,9 @@ uninstall-local:
 
 distclean-local:
 	rm -f *\~ gmon.out .\#*
+
+ACLOCAL_AMFLAGS = -I m4
+
+EXTRA_DIST = admin/config.rpath admin/mkinstalldirs ABOUT-NLS INSTALL README \
+             COPYING AUTHORS CHANGELOG CHANGELOG.Blackbox CHANGELOG.bsetbg \
+             LICENSE README.bbtools README.bsetbg

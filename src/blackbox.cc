@@ -107,7 +107,7 @@ Blackbox::Blackbox(int argc, char **m_argv, char *rc)
                                            S_IRGRP | S_IWGRP | S_IXGRP |
                                            S_IROTH | S_IWOTH | S_IXOTH);
   
-  if (! rc) rc = "~/.openbox/rc";
+  if (! rc) rc = "~/.openbox/rc3";
   rc_file = expandTilde(rc);
   config.setFile(rc_file);  
 

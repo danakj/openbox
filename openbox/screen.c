@@ -867,23 +867,23 @@ void screen_show_desktop(gboolean show)
     screen_showing_desktop = show;
 
     if (show) {
-	/* bottom to top */
-	for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+        /* bottom to top */
+        for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
                 if (client->frame->visible && !client_should_show(client))
                     frame_hide(client->frame);
             }
-	}
+        }
     } else {
         /* top to bottom */
-	for (it = stacking_list; it != NULL; it = it->next) {
+        for (it = stacking_list; it != NULL; it = it->next) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
                 if (!client->frame->visible && client_should_show(client))
                     frame_show(client->frame);
             }
-	}
+        }
     }
 
     if (show) {

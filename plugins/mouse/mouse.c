@@ -178,7 +178,8 @@ static gboolean fire_motion(MouseAction a, Context context, Client *c,
                 break;
             }
             b->action[a]->data.resize.final = final;
-        }
+        } else
+            g_assert_not_reached();
         b->action[a]->func(&b->action[a]->data);
         return TRUE;
     }
@@ -204,7 +205,7 @@ static void event(ObEvent *e, void *foo)
 {
     static Time ltime;
     static int px, py, cx, cy, cw, ch, dx, dy;
-    static guint button = 0, lbutton = 0;
+    static guint button = 0, state = 0, lbutton = 0;
     static gboolean drag = FALSE, drag_used = FALSE;
     static Corner corner = Corner_TopLeft;
     gboolean click = FALSE;
@@ -239,6 +240,7 @@ static void event(ObEvent *e, void *foo)
                 corner = pick_corner(px, py, cx, cy, cw, ch);
             }
             button = e->data.x.e->xbutton.button;
+            state = e->data.x.e->xbutton.state;
         }
         context = engine_get_context(e->data.x.client,
                                      e->data.x.e->xbutton.window);
@@ -261,8 +263,7 @@ static void event(ObEvent *e, void *foo)
             /* end drags */
             if (drag_used) {
                 fire_motion(MouseAction_Motion, context,
-                            e->data.x.client, e->data.x.e->xbutton.state,
-                            e->data.x.e->xbutton.button,
+                            e->data.x.client, state, button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
                 drag = drag_used = FALSE;
                 
@@ -291,6 +292,7 @@ static void event(ObEvent *e, void *foo)
             }
 
             button = 0;
+            state = 0;
             ltime = e->data.x.e->xbutton.time;
         }
         fire_button(MouseAction_Release, context,
@@ -318,8 +320,7 @@ static void event(ObEvent *e, void *foo)
                                              e->data.x.e->xbutton.window);
                 drag_used = fire_motion(MouseAction_Motion, context,
                                         e->data.x.client,
-                                        e->data.x.e->xmotion.state,
-                                        button, cx, cy, cw, ch, dx, dy,
+                                        state, button, cx, cy, cw, ch, dx, dy,
                                         FALSE, corner);
             }
         }

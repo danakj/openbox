@@ -15,11 +15,11 @@ AC_DEFUN([OB_DEBUG],
   test "${VERSION%*cvs}" != "$VERSION" && DEBUG="yes"
   
   if test "$DEBUG" = "yes"; then
-    AC_MSG_RESULT([debug])
-    AC_DEFINE([DEBUG], [1], [Creating a DEBUG build])
+    AC_MSG_RESULT([DEBUG])
+    AC_DEFINE([DEBUG], [1], [Creating a debug build])
   else
-    AC_MSG_RESULT([release])
-    AC_DEFINE([NDEBUG], [1], [Creating a RELEASE build])
+    AC_MSG_RESULT([RELEASE])
+    AC_DEFINE([NDEBUG], [1], [Creating a release build])
   fi
 ])
 

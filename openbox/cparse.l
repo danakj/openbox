@@ -44,8 +44,8 @@ static void stringvalue()
             entry.type = Config_String;
             entry.value.string = g_strdup(cparsetext+1); /* drop the left quote */
             if (entry.value.string[cparseleng-2] != '"')
-                printf("warning: improperly terminated string on line %d\n",
-                       lineno);
+                g_warning("improperly terminated string on line %d",
+                          lineno);
             else
                 entry.value.string[cparseleng-2] = '\0';
         } else

@@ -27,8 +27,8 @@ void config_startup()
     config_def_set(config_def_new("engine", Config_String));
     config_def_set(config_def_new("theme", Config_String));
     config_def_set(config_def_new("font", Config_String));
+    config_def_set(config_def_new("font.shadow", Config_Integer));
     config_def_set(config_def_new("font.shadow.offset", Config_Integer));
-    config_def_set(config_def_new("font.shadow.tint", Config_Integer));
     config_def_set(config_def_new("titlebar.layout", Config_String));
 
     /*g_datalist_foreach(&config_def, print_config, NULL);*/
@@ -54,15 +54,15 @@ void config_parse()
         load = TRUE;
     }
     g_free(path);
-    g_free(path);
 
     if (!load) {
         /* load the system wide rc */
         path = g_build_filename(RCDIR, "rc3", NULL);
         if ((file = fopen(path, "r")) != NULL) {
-            cparse_go(path, file);
+            /*cparse_go(path, file);*/
             fclose(file);
         }
+        g_free(path);
     }
 }
 

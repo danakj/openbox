@@ -3,7 +3,7 @@
 #include "../../kernel/screen.h"
 #include "../../kernel/extensions.h"
 #include "../../kernel/dispatch.h"
-#include "../../kernel/themerc.h"
+#include "../../kernel/config.h"
 #include "../../kernel/frame.h"
 #include "../../render/render.h"
 #include "../../render/color.h"
@@ -605,12 +605,18 @@ static void layout_title(ObFrame *self)
     const char *lc;
     int x;
     gboolean n, d, i, l, m ,c;
+    ConfigValue layout;
 
     n = d = i = l = m = c = FALSE;
 
+    if (!config_get("titlebar.layout", Config_String, &layout)) {
+        layout.string = "NDLIMC";
+        config_set("titlebar.layout", Config_String, layout);
+    }
+
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (s_bevel + 1) * 2;
-    for (lc = themerc_titlebar_layout; *lc != '\0'; ++lc) {
+    for (lc = layout.string; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
@@ -678,7 +684,7 @@ static void layout_title(ObFrame *self)
     }
 
     x = s_bevel + 1;
-    for (lc = themerc_titlebar_layout; *lc != '\0'; ++lc) {
+    for (lc = layout.string; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;

@@ -147,23 +147,22 @@ int main(int argc, char **argv)
         config_startup();
 	render_startup();
 	font_startup();
-	themerc_startup();
+        plugin_startup();
+
+        /* load the plugins specified in the pluginrc */
+        plugin_loadall();
+        /* parse/load user options */
+        config_parse();
+
 	engine_startup();
 	event_startup();
 	screen_startup();
 	focus_startup();
 	client_startup();
         grab_startup();
-        plugin_startup();
 
-        /* XXX load all plugins!! */
-        plugin_open("focus");
-        plugin_open("keyboard");
-        plugin_open("mouse");
-        plugin_open("placement");
-        plugin_open("resistance");
-
-        config_parse();
+        /* call startup for all the plugins */
+        plugin_startall();
 
 	/* get all the existing windows */
 	client_manage_all();

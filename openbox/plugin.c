@@ -94,13 +94,59 @@ gboolean plugin_open(char *name)
         g_warning("failed to load plugin '%s'", name);
         return FALSE;
     }
+    /* XXX p->plugin_set_config(); */
 
     g_datalist_set_data_full(&plugins, name, p,  (GDestroyNotify) plugin_free);
-    p->startup();
     return TRUE;
 }
 
 void plugin_close(char *name)
 {
     g_datalist_remove_data(&plugins, name);
+}
+
+static void foreach_start(GQuark key, Plugin *p, gpointer *foo)
+{
+    p->startup();
+}
+
+void plugin_startall()
+{
+    g_datalist_foreach(&plugins, (GDataForeachFunc)foreach_start, NULL);
+}
+
+void plugin_loadall()
+{
+    GIOChannel *io;
+    GError *err;
+    char *path, *name;
+
+    path = g_build_filename(g_get_home_dir(), ".openbox", "pluginrc", NULL);
+    err = NULL;
+    io = g_io_channel_new_file(path, "r", &err);
+    g_free(path);
+
+    if (io == NULL) {
+        path = g_build_filename(RCDIR, "pluginrc", NULL);
+        err = NULL;
+        io = g_io_channel_new_file(path, "r", &err);
+        g_free(path);
+    }
+
+    if (io == NULL) {
+        /* load the default plugins */
+        plugin_open("focus");
+        plugin_open("keyboard");
+        plugin_open("mouse");
+        plugin_open("placement");
+        plugin_open("resistance");
+    } else {
+        /* load the plugins in the rc file */
+        while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==
+               G_IO_STATUS_NORMAL) {
+            plugin_open(name);
+            g_free(name);
+        }
+        g_io_channel_unref(io);
+    }
 }

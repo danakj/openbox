@@ -64,9 +64,8 @@ void engine_startup()
     ConfigValue engine;
 
     module = NULL;
-    g_message("ENGINE STARTUP");
+
     if (config_get("engine", Config_String, &engine)) {
-        g_warning("GOT ENGINE %s", engine.string);
 	if (load(engine.string))
 	    return;
 	g_warning("Failed to load the engine '%s'", engine.string);

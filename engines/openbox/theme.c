@@ -1,5 +1,5 @@
 #include "openbox.h"
-#include "../../kernel/themerc.h"
+#include "../../kernel/config.h"
 #include "../../kernel/openbox.h"
 
 #include <glib.h>
@@ -135,10 +135,14 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
     int hx, hy; /* ignored */
     unsigned int w, h;
     unsigned char *b;
+    ConfigValue theme;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
-	button_dir = g_strdup_printf("%s_buttons", themerc_theme);
+        if (!config_get("theme", Config_String, &theme))
+            g_assert_not_reached(); /* where's the default!? its not set? */
+
+	button_dir = g_strdup_printf("%s_buttons", theme.string);
 
         s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
                              "openbox", button_dir, retvalue.addr, NULL);
@@ -153,8 +157,8 @@ gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
                 ret = TRUE;
             else {
                 g_free(s);
-                s = g_strdup_printf("%s_buttons/%s", themerc_theme, 
-                                    themerc_theme);
+                s = g_strdup_printf("%s_buttons/%s", theme.string,
+                                    theme.string);
                 if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
                     BitmapSuccess) 
                     ret = TRUE;
@@ -289,11 +293,12 @@ gboolean load()
     XrmDatabase db = NULL;
     Justify winjust;
     char *winjuststr;
+    ConfigValue theme, shadow, offset, font;
 
-    if (themerc_theme != NULL) {
-	db = loaddb(themerc_theme);
+    if (config_get("theme", Config_String, &theme)) {
+	db = loaddb(theme.string);
         if (db == NULL) {
-	    g_warning("Failed to load the theme '%s'", themerc_theme);
+	    g_warning("Failed to load the theme '%s'", theme.string);
 	    g_message("Falling back to the default: '%s'", DEFAULT_THEME);
 	}
     }
@@ -304,14 +309,22 @@ gboolean load()
 	    return FALSE;
 	}
         /* change to reflect what was actually loaded */
-        g_free(themerc_theme);
-        themerc_theme = g_strdup(DEFAULT_THEME);
+        theme.string = DEFAULT_THEME;
+        config_set("theme", Config_String, theme);
     }
 
-    /* load the font, not from the theme file tho, its in themerc_font */
+    /* load the font, not from the theme file tho, its in the config */
     s_winfont_shadow = 1; /* XXX read from themrc */
-    s_winfont_shadow_offset = 1; /* XXX read from themerc */
-    s_winfont = font_open(themerc_font);
+    if (!config_get("font.shadow.offset", Config_Integer, &offset) ||
+        offset.integer < 0 || offset.integer >= 10) {
+        s_winfont_shadow_offset = 1; /* default */
+    }
+    
+    if (!config_get("font", Config_String, &font)) {
+        font.string = DEFAULT_FONT;
+        config_set("font", Config_String, font);
+    }
+    s_winfont = font_open(font.string);
     s_winfont_height = font_height(s_winfont, s_winfont_shadow,
                                    s_winfont_shadow_offset);
 

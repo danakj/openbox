@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __atom_hh
-#define   __atom_hh
+#ifndef   __property_hh
+#define   __property_hh
 
 /*! @file property.hh
   @brief Provides access to window properties
@@ -14,8 +14,8 @@ extern "C" {
 }
 
 #include <vector>
+#include <string>
 
-#include "userstring.hh"
 #include "screeninfo.hh"
 
 namespace otk {
@@ -175,6 +175,9 @@ private:
            int size) const;
 
 public:
+  //! A list of strings
+  typedef std::vector<std::string> StringVect;
+
   //! Constructs a new Atom object
   /*!
     CAUTION: This constructor uses Display::display, so ensure that it is
@@ -217,7 +220,7 @@ public:
     @param value The string to set the property to
   */
   void set(Window win, Atoms atom, StringType type,
-           const userstring &value) const;
+           const std::string &value) const;
   //! Sets a string-array property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
@@ -228,7 +231,7 @@ public:
     @param strings A list of strings to set the property to
   */
   void set(Window win, Atoms atom, StringType type,
-           const userstring::vector &strings) const;
+           const StringVect &strings) const;
 
   //! Gets the value of a property on a window
   /*!
@@ -281,7 +284,7 @@ public:
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, StringType type, userstring *value) const;
+  bool get(Window win, Atoms atom, StringType type, std::string *value) const;
   //! Gets strings from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
@@ -300,7 +303,7 @@ public:
             type was successful; otherwise, false
   */
   bool get(Window win, Atoms atom, StringType type,
-           unsigned long *nelements, userstring::vector *strings) const;
+           unsigned long *nelements, StringVect *strings) const;
 
   //! Removes a property from a window
   /*!
@@ -324,4 +327,4 @@ public:
 
 }
 
-#endif // __atom_hh
+#endif // __property_hh

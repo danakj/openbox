@@ -35,6 +35,8 @@ ob.mbind("Left", ob.MouseContext.Root, ob.MouseAction.Click,
 
 ob.kbind(["A-F4"], ob.KeyContext.All, callbacks.close)
 
+ob.kbind(["W-d"], ob.KeyContext.All, callbacks.toggle_show_desktop)
+
 # focus bindings
 import stackedcycle # functions for doing stacked 'kde-style' cycling
 ob.kbind(["A-Tab"], ob.KeyContext.All, stackedcycle.next)

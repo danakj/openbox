@@ -3,6 +3,7 @@
 #include "kernel/action.h"
 #include "kernel/event.h"
 #include "kernel/client.h"
+#include "kernel/prop.h"
 #include "kernel/grab.h"
 #include "kernel/parse.h"
 #include "kernel/frame.h"
@@ -121,8 +122,7 @@ static void fire_button(MouseAction a, Context context, Client *c, guint state,
     if (b->action[a] != NULL && b->action[a]->func != NULL) {
         b->action[a]->data.any.c = c;
 
-        g_assert(!(b->action[a]->func == action_move ||
-                   b->action[a]->func == action_resize));
+        g_assert(b->action[a]->func != action_moveresize);
 
         if (b->action[a]->func == action_showmenu) {
             b->action[a]->data.showmenu.x = x;
@@ -133,14 +133,9 @@ static void fire_button(MouseAction a, Context context, Client *c, guint state,
     }
 }
 
-/* corner should be the opposite corner of the window in which the pointer
-   clicked, Corner_TopLeft if a good default if there is no client 
-   Returns True or False for if a binding existed for the action or not.
-*/
-static gboolean fire_motion(MouseAction a, Context context, Client *c,
-                            guint state, guint button, int cx, int cy,
-                            int cw, int ch, int dx, int dy,
-                            gboolean final, Corner corner)
+static void fire_motion(MouseAction a, Context context, Client *c,
+                        guint state, guint button, int x_root, int y_root,
+                        guint32 corner)
 {
     GSList *it;
     MouseBinding *b;
@@ -151,68 +146,49 @@ static gboolean fire_motion(MouseAction a, Context context, Client *c,
 		break;
     }
     /* if not bound, then nothing to do! */
-    if (it == NULL) return FALSE;
+    if (it == NULL) return;
 
     if (b->action[a] != NULL && b->action[a]->func != NULL) {
         b->action[a]->data.any.c = c;
 
-        if (b->action[a]->func == action_move) {
-            b->action[a]->data.move.x = cx + dx;
-            b->action[a]->data.move.y = cy + dy;
-            b->action[a]->data.move.final = final;
-        } else if (b->action[a]->func == action_resize) {
-            b->action[a]->data.resize.corner = corner;
-            switch (corner) {
-            case Corner_TopLeft:
-                b->action[a]->data.resize.x = cw + dx;
-                b->action[a]->data.resize.y = ch + dy;
-                break;
-            case Corner_TopRight:
-                b->action[a]->data.resize.x = cw - dx;
-                b->action[a]->data.resize.y = ch + dy;
-                break;
-            case Corner_BottomLeft:
-                b->action[a]->data.resize.x = cw + dx;
-                b->action[a]->data.resize.y = ch - dy;
-                break;
-            case Corner_BottomRight:
-                b->action[a]->data.resize.x = cw - dx;
-                b->action[a]->data.resize.y = ch - dy;
-                break;
-            }
-            b->action[a]->data.resize.final = final;
+        if (b->action[a]->func == action_moveresize) {
+            b->action[a]->data.moveresize.x = x_root;
+            b->action[a]->data.moveresize.y = y_root;
+            b->action[a]->data.moveresize.button = button;
+            if (!(b->action[a]->data.moveresize.corner ==
+                  prop_atoms.net_wm_moveresize_move ||
+                  b->action[a]->data.moveresize.corner ==
+                  prop_atoms.net_wm_moveresize_move_keyboard ||
+                  b->action[a]->data.moveresize.corner ==
+                  prop_atoms.net_wm_moveresize_size_keyboard))
+                b->action[a]->data.moveresize.corner = corner;
         } else
             g_assert_not_reached();
+
         b->action[a]->func(&b->action[a]->data);
-        return TRUE;
     }
-    return FALSE;
 }
 
-static Corner pick_corner(int x, int y, int cx, int cy, int cw, int ch)
+static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
 {
     if (x - cx < cw / 2) {
         if (y - cy < ch / 2)
-            return Corner_BottomRight;
+            return prop_atoms.net_wm_moveresize_size_topleft;
         else
-            return Corner_TopRight;
+            return prop_atoms.net_wm_moveresize_size_bottomleft;
     } else {
         if (y - cy < ch / 2)
-            return Corner_BottomLeft;
+            return prop_atoms.net_wm_moveresize_size_topright;
         else
-            return Corner_TopLeft;
+            return prop_atoms.net_wm_moveresize_size_bottomright;
     }
 }
 
 static void event(ObEvent *e, void *foo)
 {
     static Time ltime;
-    static int px, py, cx, cy, cw, ch, dx, dy;
     static guint button = 0, state = 0, lbutton = 0;
-    static gboolean drag = FALSE, drag_used = FALSE;
-    static Corner corner = Corner_TopLeft;
-    static Client *drag_client = NULL;
-    static Context drag_context = Context_None;
+    static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
     Context context;
@@ -231,26 +207,10 @@ static void event(ObEvent *e, void *foo)
                                 e->data.x.e->xbutton.window);
 
         if (!button) {
-            if (e->data.x.client != NULL) {
-                cx = e->data.x.client->frame->area.x;
-                cy = e->data.x.client->frame->area.y;
-                /* use the client size because the frame can be differently
-                   sized (shaded windows) and we want this based on the clients
-                   size */
-                cw = e->data.x.client->area.width + 
-                    e->data.x.client->frame->size.left +
-                    e->data.x.client->frame->size.right;
-                ch = e->data.x.client->area.height +
-                    e->data.x.client->frame->size.top +
-                    e->data.x.client->frame->size.bottom;
-                px = e->data.x.e->xbutton.x_root;
-                py = e->data.x.e->xbutton.y_root;
-                corner = pick_corner(px, py, cx, cy, cw, ch);
-            }
+            px = e->data.x.e->xbutton.x_root;
+            py = e->data.x.e->xbutton.y_root;
             button = e->data.x.e->xbutton.button;
             state = e->data.x.e->xbutton.state;
-            drag_context = context;
-            drag_client = e->data.x.client;
         }
 
         fire_button(MouseAction_Press, context,
@@ -269,38 +229,26 @@ static void event(ObEvent *e, void *foo)
         context = frame_context(e->data.x.client,
                                 e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
-            /* end drags */
-            if (drag_used) {
-                fire_motion(MouseAction_Motion, drag_context,
-                            drag_client, state, button,
-                            cx, cy, cw, ch, dx, dy, TRUE, corner);
-                drag = drag_used = FALSE;
-                drag_context = Context_None;
-                drag_client = NULL;
-                
-                lbutton = 0;
-            } else {
-                /* clicks are only valid if its released over the window */
-                int junk;
-                Window wjunk;
-                guint ujunk, b, w, h;
-                XGetGeometry(ob_display, e->data.x.e->xbutton.window,
-                             &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
-                if (e->data.x.e->xbutton.x >= (signed)-b &&
-                    e->data.x.e->xbutton.y >= (signed)-b &&
-                    e->data.x.e->xbutton.x < (signed)(w+b) &&
-                    e->data.x.e->xbutton.y < (signed)(h+b)) {
-                    click = TRUE;
-                    /* double clicks happen if there were 2 in a row! */
-                    if (lbutton == button &&
-                        e->data.x.e->xbutton.time - dclicktime <= ltime) {
-                        dclick = TRUE;
-                        lbutton = 0;
-                    } else
-                        lbutton = button;
-                } else
+            /* clicks are only valid if its released over the window */
+            int junk;
+            Window wjunk;
+            guint ujunk, b, w, h;
+            XGetGeometry(ob_display, e->data.x.e->xbutton.window,
+                         &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
+            if (e->data.x.e->xbutton.x >= (signed)-b &&
+                e->data.x.e->xbutton.y >= (signed)-b &&
+                e->data.x.e->xbutton.x < (signed)(w+b) &&
+                e->data.x.e->xbutton.y < (signed)(h+b)) {
+                click = TRUE;
+                /* double clicks happen if there were 2 in a row! */
+                if (lbutton == button &&
+                    e->data.x.e->xbutton.time - dclicktime <= ltime) {
+                    dclick = TRUE;
                     lbutton = 0;
-            }
+                } else
+                    lbutton = button;
+            } else
+                lbutton = 0;
 
             button = 0;
             state = 0;
@@ -326,17 +274,30 @@ static void event(ObEvent *e, void *foo)
 
     case Event_X_MotionNotify:
         if (button) {
-            dx = e->data.x.e->xmotion.x_root - px;
-            dy = e->data.x.e->xmotion.y_root - py;
-            if (!drag &&
-                (ABS(dx) >= threshold || ABS(dy) >= threshold)) {
-                drag = TRUE;
-            }
-            if (drag) {
-                drag_used = fire_motion(MouseAction_Motion, drag_context,
-                                        drag_client,
-                                        state, button, cx, cy, cw, ch, dx, dy,
-                                        FALSE, corner);
+            if (ABS(e->data.x.e->xmotion.x_root - px) >= threshold ||
+                ABS(e->data.x.e->xmotion.y_root - py) >= threshold) {
+                guint32 corner = 
+                    pick_corner(e->data.x.e->xmotion.x_root,
+                                e->data.x.e->xmotion.y_root,
+                                e->data.x.client->frame->area.x,
+                                e->data.x.client->frame->area.y,
+                                /* use the client size because the frame can be
+                                   differently sized (shaded windows) and we
+                                   want this based on the clients size */
+                                e->data.x.client->area.width +
+                                e->data.x.client->frame->size.left +
+                                e->data.x.client->frame->size.right,
+                                e->data.x.client->area.height +
+                                e->data.x.client->frame->size.top +
+                                e->data.x.client->frame->size.bottom);
+                context = frame_context(e->data.x.client,
+                                        e->data.x.e->xmotion.window);
+                fire_motion(MouseAction_Motion, context,
+                            e->data.x.client, state, button,
+                            e->data.x.e->xmotion.x_root, 
+                            e->data.x.e->xmotion.y_root, corner);
+                button = 0;
+                state = 0;
             }
         }
         break;

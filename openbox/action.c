@@ -1,7 +1,9 @@
 #include "client.h"
 #include "grab.h"
 #include "focus.h"
+#include "moveresize.h"
 #include "menu.h"
+#include "prop.h"
 #include "stacking.h"
 #include "frame.h"
 #include "framerender.h"
@@ -151,10 +153,18 @@ Action *action_from_string(char *name)
         a->data.nextprevdesktop.wrap = TRUE;
     } else if (!g_ascii_strcasecmp(name, "toggledecorations")) {
         a = action_new(action_toggle_decorations);
+    } else if (!g_ascii_strcasecmp(name, "keyboardmove")) {
+        a = action_new(action_moveresize);
+        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move_keyboard;
     } else if (!g_ascii_strcasecmp(name, "move")) {
-        a = action_new(action_move);
+        a = action_new(action_moveresize);
+        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move;
     } else if (!g_ascii_strcasecmp(name, "resize")) {
-        a = action_new(action_resize);
+        a = action_new(action_moveresize);
+        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_topleft;
+    } else if (!g_ascii_strcasecmp(name, "keyboardresize")) {
+        a = action_new(action_moveresize);
+        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_keyboard;
     } else if (!g_ascii_strcasecmp(name, "restart")) {
         a = action_new(action_restart);
     } else if (!g_ascii_strcasecmp(name, "exit")) {
@@ -628,92 +638,14 @@ void action_toggle_decorations(union ActionData *data)
     client_setup_decor_and_functions(c);
 }
 
-static void popup_coords(char *format, Cursor cur, int a, int b, gboolean hide)
+void action_moveresize(union ActionData *data)
 {
-    XSetWindowAttributes attrib;
-    static Window coords = None;
-
-    if (coords == None) {
-        attrib.override_redirect = TRUE;
-        coords = XCreateWindow(ob_display, ob_root,
-                               0, 0, 1, 1, 0, render_depth, InputOutput,
-                               render_visual, CWOverrideRedirect, &attrib);
-        g_assert(coords != None);
-
-        grab_pointer(TRUE, cur);
-
-        XMapWindow(ob_display, coords);
-    }
-
-    if (hide) {
-        XDestroyWindow(ob_display, coords);
-        coords = None;
-
-        grab_pointer(FALSE, None);
-    } else {
-        Size s;
-        char *text;
-
-        text = g_strdup_printf(format, a, b);
-        framerender_size_popup_label(text, &s);
-        XMoveResizeWindow(ob_display, coords,
-                          10, 10, s.width, s.height);
-        framerender_popup_label(coords, &s, text);
-        g_free(text);
-    }
-}
-
-void action_move(union ActionData *data)
-{
-    Client *c = data->move.c;
-    int x = data->move.x;
-    int y = data->move.y;
+    Client *c = data->moveresize.c;
 
     if (!c || !client_normal(c)) return;
 
-    dispatch_move(c, &x, &y);
-
-    popup_coords("X:  %d  Y:  %d", ob_cursors.move, x, y, data->move.final);
-
-    frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
-    client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
-                     TRUE, data->move.final);
-}
-
-void action_resize(union ActionData *data)
-{
-    Client *c = data->resize.c;
-    Cursor cur;
-    int w = data->resize.x;
-    int h = data->resize.y;
- 
-    if (!c || c->shaded || !client_normal(c)) return;
-
-    dispatch_resize(c, &w, &h, data->resize.corner);
-
-    w -= c->frame->size.left + c->frame->size.right;
-    h -= c->frame->size.top + c->frame->size.bottom;
-    
-    client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
-                     TRUE, data->resize.final);
-
-    switch (data->resize.corner) {
-    case Corner_TopLeft:
-        cur = ob_cursors.br;
-        break;
-    case Corner_TopRight:
-        cur = ob_cursors.bl;
-        break;
-    case Corner_BottomLeft:
-        cur = ob_cursors.tr;
-        break;
-    case Corner_BottomRight:
-        cur = ob_cursors.tl;
-        break;
-    }
-
-    popup_coords("W:  %d  H:  %d", cur, c->logical_size.width,
-                 c->logical_size.height, data->move.final);
+    moveresize_start(c, data->moveresize.x, data->moveresize.y,
+                     data->moveresize.button, data->moveresize.corner);
 }
 
 void action_restart(union ActionData *data)

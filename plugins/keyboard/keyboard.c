@@ -143,9 +143,6 @@ static void event(ObEvent *e, void *foo)
                     if (p->action->func != NULL) {
                         p->action->data.any.c = focus_client;
 
-                        g_assert(!(p->action->func == action_move ||
-                                   p->action->func == action_resize));
-
                         if (p->action->func == action_cycle_windows) {
                             p->action->data.cycle.final = FALSE;
                             p->action->data.cycle.cancel = FALSE;

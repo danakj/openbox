@@ -1,4 +1,5 @@
 #include "kernel/parse.h"
+#include "kernel/prop.h"
 #include "keyboard.h"
 
 void keyparse(ParseToken *token)
@@ -44,9 +45,11 @@ void keyparse(ParseToken *token)
             action = action_from_string(token->data.identifier);
 
             /* no move/resize with the keyboard */
-            if (action &&
-                (action->func == action_move ||
-                 action->func == action_resize)) {
+            if (action && action->func == action_moveresize &&
+                action->data.moveresize.corner !=
+                prop_atoms.net_wm_moveresize_move_keyboard &&
+                action->data.moveresize.corner !=
+                prop_atoms.net_wm_moveresize_size_keyboard) {
                 action_free(action);
                 action = NULL;
             }

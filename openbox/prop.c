@@ -69,15 +69,18 @@ void prop_startup()
     CREATE(net_wm_window_type_dialog, "_NET_WM_WINDOW_TYPE_DIALOG");
     CREATE(net_wm_window_type_normal, "_NET_WM_WINDOW_TYPE_NORMAL");
 
-    CREATE(net_wm_moveresize_size_topleft, "_NET_WM_MOVERESIZE_SIZE_TOPLEFT");
-    CREATE(net_wm_moveresize_size_topright,
-	   "_NET_WM_MOVERESIZE_SIZE_TOPRIGHT");
-    CREATE(net_wm_moveresize_size_bottomleft,
-	   "_NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT");
-    CREATE(net_wm_moveresize_size_bottomright,
-	   "_NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT");
-    CREATE(net_wm_moveresize_move, "_NET_WM_MOVERESIZE_MOVE");
- 
+    prop_atoms.net_wm_moveresize_size_topleft = 0;
+    prop_atoms.net_wm_moveresize_size_top = 1;
+    prop_atoms.net_wm_moveresize_size_topright = 2;
+    prop_atoms.net_wm_moveresize_size_right = 3;
+    prop_atoms.net_wm_moveresize_size_bottomright = 4;
+    prop_atoms.net_wm_moveresize_size_bottom = 5;
+    prop_atoms.net_wm_moveresize_size_bottomleft = 6;
+    prop_atoms.net_wm_moveresize_size_left = 7;
+    prop_atoms.net_wm_moveresize_move = 8;
+    prop_atoms.net_wm_moveresize_size_keyboard = 9;
+    prop_atoms.net_wm_moveresize_move_keyboard = 10;
+
     CREATE(net_wm_action_move, "_NET_WM_ACTION_MOVE");
     CREATE(net_wm_action_resize, "_NET_WM_ACTION_RESIZE");
     CREATE(net_wm_action_minimize, "_NET_WM_ACTION_MINIMIZE");

@@ -73,11 +73,17 @@ typedef struct Atoms {
     Atom net_wm_window_type_dialog;
     Atom net_wm_window_type_normal;
 
-    Atom net_wm_moveresize_size_topleft;
+    Atom net_wm_moveresize_size_topleft; 
+    Atom net_wm_moveresize_size_top;
     Atom net_wm_moveresize_size_topright;
-    Atom net_wm_moveresize_size_bottomleft;
+    Atom net_wm_moveresize_size_right;
     Atom net_wm_moveresize_size_bottomright;
+    Atom net_wm_moveresize_size_bottom;
+    Atom net_wm_moveresize_size_bottomleft;
+    Atom net_wm_moveresize_size_left;
     Atom net_wm_moveresize_move;
+    Atom net_wm_moveresize_size_keyboard;
+    Atom net_wm_moveresize_move_keyboard;
 
     Atom net_wm_action_move;
     Atom net_wm_action_resize;

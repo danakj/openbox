@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "framerender.h"
 #include "focus.h"
+#include "moveresize.h"
 #include "stacking.h"
 #include "extensions.h"
 #include "timer.h"
@@ -358,6 +359,14 @@ static void event_process(XEvent *e)
 			 e->xconfigurerequest.value_mask, &xwc);
 	xerror_set_ignore(FALSE);
     }
+
+    if (moveresize_in_progress)
+        if (e->type == MotionNotify || e->type == ButtonRelease ||
+            e->type == ButtonPress ||
+            e->type == KeyPress || e->type == KeyRelease) {
+            moveresize_event(e);
+            return; /* no dispatch! */
+        }
 
     /* user input (action-bound) events */
     /*

@@ -48,19 +48,12 @@ struct NextPreviousDesktop {
     gboolean wrap;
 };
 
-struct Move {
+struct MoveResize {
     Client *c;
     int x;
     int y;
-    gboolean final;
-};
-
-struct Resize {
-    Client *c;
-    int x;
-    int y;
-    gboolean final;
-    Corner corner;
+    guint32 corner; /* prop_atoms.net_wm_moveresize_* */
+    guint button;
 };
 
 struct ShowMenu {
@@ -87,8 +80,7 @@ union ActionData {
     struct SendToNextPreviousDesktop sendtonextprev;
     struct Desktop desktop;
     struct NextPreviousDesktop nextprevdesktop;
-    struct Move move;
-    struct Resize resize;
+    struct MoveResize moveresize;
     struct ShowMenu showmenu;
     struct CycleWindows cycle;
 };
@@ -195,10 +187,8 @@ void action_next_desktop_row(union ActionData *data);
 void action_previous_desktop_row(union ActionData *data);
 /* ClientAction */
 void action_toggle_decorations(union ActionData *data);
-/* Move */
-void action_move(union ActionData *data);
-/* Resize */
-void action_resize(union ActionData *data);
+/* MoveResize */
+void action_moveresize(union ActionData *data);
 /* Execute */
 void action_restart(union ActionData *data);
 /* Any */

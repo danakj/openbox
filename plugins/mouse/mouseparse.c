@@ -1,5 +1,6 @@
 #include "kernel/action.h"
 #include "kernel/parse.h"
+#include "kernel/prop.h"
 #include "mouse.h"
 
 void mouseparse(ParseToken *token)
@@ -68,12 +69,26 @@ void mouseparse(ParseToken *token)
             action = action_from_string(token->data.identifier);
 
             /* check for valid actions for motion events */
-            if ((event == MouseAction_Motion) ^
-                (action &&
-                 (action->func == action_move ||
-                  action->func == action_resize))) {
-                action_free(action);
-                action = NULL;
+            if (action->func == action_moveresize)
+                g_message("%d", action->data.moveresize.corner);
+            if (event == MouseAction_Motion) {
+                if (action && (action->func != action_moveresize ||
+                               action->data.moveresize.corner ==
+                               prop_atoms.net_wm_moveresize_move_keyboard ||
+                               action->data.moveresize.corner ==
+                               prop_atoms.net_wm_moveresize_size_keyboard)) {
+                    action_free(action);
+                    action = NULL;
+                }
+            } else {
+                if (action && action->func == action_moveresize &&
+                    action->data.moveresize.corner !=
+                    prop_atoms.net_wm_moveresize_move_keyboard &&
+                    action->data.moveresize.corner !=
+                    prop_atoms.net_wm_moveresize_size_keyboard) {
+                    action_free(action);
+                    action = NULL;
+                }
             }
 
             if (action != NULL) {

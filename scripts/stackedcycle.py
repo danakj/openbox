@@ -76,7 +76,6 @@ class cycledata:
 
         # get the list of clients
         self.clients = []
-        print focus._clients
         for i in focus._clients:
             c = ob.openbox.findClient(i)
             if c: self.clients.append(c)
@@ -97,7 +96,6 @@ class cycledata:
             
             w = otk.FocusLabel(self.widget)
             if current and c.window() == current.window():
-                print "found " + str(i)
                 self.menupos = i
                 w.focus()
             else:

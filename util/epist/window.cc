@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // window.cc for Epistrophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
@@ -261,12 +261,15 @@ void XWindow::iconify() const {
 }
 
 
-void XWindow::focus() const {
+void XWindow::focus(bool raise) const {
   // this will cause the window to be uniconified also
-  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
-                            _window);
- 
-  //XSetInputFocus(_epist->getXDisplay(), _window, None, CurrentTime);
+
+  if (raise) {
+    _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
+                              _window);
+  } else {
+    XSetInputFocus(_epist->getXDisplay(), _window, None, CurrentTime);
+  }
 }
 
 

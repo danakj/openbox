@@ -117,7 +117,7 @@ public:
   void raise() const;
   void lower() const;
   void iconify() const;
-  void focus() const;
+  void focus(bool raise = true) const;
   void decorate(bool d) const;
   void sendTo(unsigned int dest) const;
   void move(int x, int y) const;

@@ -66,7 +66,7 @@ void Openbox::signalHandler(int signal)
     openbox->restart();
     break;
 
-  case SIGCLD:
+  case SIGCHLD:
     wait(NULL);
     break;
 
@@ -121,9 +121,9 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGTERM, &action, (struct sigaction *) 0);
   sigaction(SIGINT, &action, (struct sigaction *) 0);
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
-  sigaction(SIGCLD, &action, (struct sigaction *) 0);
+  sigaction(SIGCHLD, &action, (struct sigaction *) 0);
 
-  // anything that died while we were restarting won't give us a SIGCLD
+  // anything that died while we were restarting won't give us a SIGCHLD
   while (waitpid(-1, NULL, WNOHANG) > 0);
 
   otk::Timer::initialize();

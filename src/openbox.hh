@@ -29,8 +29,9 @@ namespace ob {
 
 class OBScreen;
 class OBClient;
+class OBActions;
 
-//! The main class for the Openbox window manager.
+//! The main class for the Openbox window manager
 /*!
   Only a single instance of the Openbox class may be used in the application. A
   pointer to this instance is held in the Openbox::instance static member
@@ -43,12 +44,15 @@ class OBClient;
 class Openbox : public otk::OtkEventDispatcher, public otk::OtkEventHandler
 {
 public:
-  //! The single instance of the Openbox class for the application.
+  //! The single instance of the Openbox class for the application
   /*!
     Since this variable is globally available in the application, the Openbox
     class does not need to be passed around to any of the other classes.
   */
   static Openbox *instance;
+
+  //! The action interface through which all user-available actions occur
+  static OBActions *actions;
 
   //! The posible running states of the window manager
   enum RunState {

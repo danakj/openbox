@@ -8,6 +8,7 @@
 #include "openbox.hh"
 #include "client.hh"
 #include "screen.hh"
+#include "actions.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -49,7 +50,8 @@ extern "C" {
 
 namespace ob {
 
-Openbox *Openbox::instance = (Openbox *) 0;
+Openbox *Openbox::instance  = (Openbox *) 0;
+OBActions *Openbox::actions = (OBActions *) 0;
 
 
 void Openbox::signalHandler(int signal)
@@ -121,6 +123,8 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
   _property = new otk::OBProperty();
+
+  Openbox::actions = new OBActions();
 
   // create the mouse cursors we'll use
   _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);

@@ -636,11 +636,24 @@ bool Workspace::smartPlacement(Rect& win) {
     RectList availableAreas = screen->allAvailableAreas();
     RectList::iterator it, end = availableAreas.end();
 
-    for (it = availableAreas.begin(); it != end; ++it)
+    for (it = availableAreas.begin(); it != end; ++it) {
+      Rect r = *it;
+      r.setRect(r.x() + screen->getSnapOffset(),
+                r.y() + screen->getSnapOffset(),
+                r.width() - screen->getSnapOffset(),
+                r.height() - screen->getSnapOffset());
       spaces.push_back(*it);
+    }
   } else
 #endif // XINERAMA
-    spaces.push_back(screen->availableArea());
+  {
+    Rect r = screen->availableArea();
+    r.setRect(r.x() + screen->getSnapOffset(),
+              r.y() + screen->getSnapOffset(),
+              r.width() - screen->getSnapOffset(),
+              r.height() - screen->getSnapOffset());
+    spaces.push_back(r);
+  }
 
   //Find Free Spaces
   BlackboxWindowList::const_iterator wit = windowList.begin(),

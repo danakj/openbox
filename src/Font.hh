@@ -71,6 +71,7 @@ private:
 
 #ifdef XFT
   bool              _antialias;
+  bool              _shadow;
 
   XftFont          *_xftfont;
 
@@ -95,7 +96,7 @@ public:
 #ifdef XFT
   // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
-        bool bold, bool italic, bool antialias = True);
+        bool bold, bool italic, bool shadow, bool antialias = True);
 #endif
   // loads a standard X font
   BFont(Display *d, BScreen *screen, const std::string &xlfd);

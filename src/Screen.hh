@@ -148,7 +148,7 @@ private:
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
       allow_scroll_lock, hide_toolbar, window_corner_snap, aa_fonts,
-      ignore_shaded, ignore_maximized, workspace_warping;
+      ignore_shaded, ignore_maximized, workspace_warping, shadow_fonts;
 
     int snap_to_windows, snap_to_edges;
     unsigned int snap_offset;
@@ -212,6 +212,7 @@ public:
   inline bool doAutoRaise(void) const { return resource.auto_raise; }
   inline bool doClickRaise(void) const { return resource.click_raise; }
   inline bool isScreenManaged(void) const { return managed; }
+  inline bool doShadowFonts(void) const { return resource.shadow_fonts; }
   inline bool doAAFonts(void) const { return resource.aa_fonts; }
   inline bool doImageDither(void) const { return image_control->doDither(); }
   inline bool doOrderedDither(void) const { return resource.ordered_dither; }
@@ -296,6 +297,7 @@ public:
   void saveSnapOffset(int o);
   void saveResistanceSize(int s);
   void saveImageDither(bool d);
+  void saveShadowFonts(bool f);
   void saveAAFonts(bool f);
   void saveOpaqueMove(bool o);
   void saveFullMax(bool f);

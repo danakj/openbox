@@ -48,7 +48,7 @@ string      BFont::_fallback_font   = "fixed";
 
 #ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
-             bool bold, bool italic, bool antialias) :
+             bool bold, bool italic, bool shadow, bool antialias) :
                                           _display(d),
                                           _screen(screen),
                                           _family(family),
@@ -57,6 +57,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
                                           _bold(bold),
                                           _italic(italic),
                                           _antialias(antialias),
+                                          _shadow(shadow),
                                           _xftfont(0),
                                           _font(0),
                                           _fontset(0),
@@ -91,6 +92,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
                                        _screen(screen),
 #ifdef    XFT
                                        _antialias(False),
+                                       _shadow(False),
                                        _xftfont(0),
 #endif // XFT
                                        _font(0),
@@ -259,6 +261,19 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     XftDraw *draw = XftDrawCreate(_display, d, _screen->getVisual(),
                                   _screen->getColormap());
     assert(draw);
+
+    if (_shadow) {
+      XftColor c;
+      c.color.red = 0;
+      c.color.green = 0;
+      c.color.blue = 0;
+      c.color.alpha = 0x55 | 0x55 << 8; // transparent shadow
+      c.pixel = BlackPixel(_display, _screen->getScreenNumber());
+
+        
+      XftDrawStringUtf8(draw, &c, _xftfont, x - 1, _xftfont->ascent + y + 1,
+                        (XftChar8 *) string.c_str(), string.size());
+    }
 
     XftColor c;
     c.color.red = color.red() | color.red() << 8;

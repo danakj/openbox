@@ -407,6 +407,13 @@ void BScreen::saveAAFonts(bool f) {
 }
 
 
+void BScreen::saveShadowFonts(bool f) {
+  resource.shadow_fonts = f;
+  reconfigure();
+  config->setValue(screenstr + "dropShadowFonts", resource.shadow_fonts);
+}
+
+
 void BScreen::saveHideToolbar(bool h) {
   resource.hide_toolbar = h;
   if (resource.hide_toolbar)
@@ -593,6 +600,7 @@ void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
   saveImageDither(doImageDither());
+  saveShadowFonts(resource.shadow_fonts);
   saveAAFonts(resource.aa_fonts);
   saveResizeZones(resource.resize_zones);
   saveOpaqueMove(resource.opaque_move);
@@ -645,6 +653,9 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
+
+  if (! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
+    resource.shadow_fonts = true;
 
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;
@@ -2561,7 +2572,7 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
     }
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic, resource.aa_fonts);
+                         italic, resource.shadow_fonts, resource.aa_fonts);
     if (b->valid())
       return b;
     else

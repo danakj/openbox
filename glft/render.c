@@ -50,16 +50,11 @@ void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g)
     g_free(padbuf);
 }
 
-void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
-                      struct GlftColor *color, int x, int y)
+static void drawstring(struct GlftFont *font, const char *str, int bytes,
+                       struct GlftColor *color, int x, int y)
 {
     const char *c;
     struct GlftGlyph *g, *p = NULL;
-
-    if (!g_utf8_validate(str, bytes, NULL)) {
-        GlftDebug("Invalid UTF-8 in string\n");
-        return;
-    }
 
     glColor4f(color->r, color->g, color->b, color->a);
     glPushMatrix();
@@ -92,6 +87,29 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
     }
 
     glPopMatrix();
+}
+
+void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
+                      struct GlftColor *color, int x, int y)
+{
+    if (!g_utf8_validate(str, bytes, NULL)) {
+        GlftDebug("Invalid UTF-8 in string\n");
+        return;
+    }
+
+    drawstring(font, str, bytes, color, x, y);
+    if (font->shadow && font->shadow_alpha != 0) {
+        struct GlftColor c;
+        if (font->shadow_alpha > 0) {
+            c.r = c.g = c.b = 0.0;
+            c.a = font->shadow_alpha;
+        } else {
+            c.r = c.g = c.b = 1.0;
+            c.a = -font->shadow_alpha;
+        }
+        drawstring(font, str, bytes, &c,
+                   x + font->shadow_offset, y + font->shadow_offset);
+    }
 }
 
 void GlftMeasureString(struct GlftFont *font,

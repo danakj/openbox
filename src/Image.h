@@ -26,8 +26,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "LinkedList.h"
 #include "Timer.h"
+#include <list>
 
 class ScreenInfo;
 class BImage;
@@ -186,7 +186,8 @@ private:
     unsigned long pixel1, pixel2, texture;
   } Cache;
 
-  LinkedList<Cache> *cache;
+  typedef std::list<Cache*> CacheList;
+  CacheList cache;
 
 
 protected:

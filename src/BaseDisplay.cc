@@ -91,6 +91,8 @@
 #include "LinkedList.h"
 #include "Timer.h"
 
+#include <algorithm>
+
 // X error handler to handle any and all X errors while the application is
 // running
 static Bool internal_error = False;
@@ -338,11 +340,9 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 
   timerList = new LinkedList<BTimer>;
 
-  screenInfoList = new LinkedList<ScreenInfo>;
-  for (int i = 0; i < number_of_screens; i++) {
-    ScreenInfo *screeninfo = new ScreenInfo(*this, i);
-    screenInfoList->insert(screeninfo);
-  }
+  screenInfoList.reserve(ScreenCount(display));
+  for (int i = 0; i < number_of_screens; i++)
+    screenInfoList.push_back(new ScreenInfo(*this, i));
 
 #ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
@@ -390,14 +390,8 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 
 
 BaseDisplay::~BaseDisplay(void) {
-  while (screenInfoList->count()) {
-    ScreenInfo *si = screenInfoList->first();
-
-    screenInfoList->remove(si);
-    delete si;
-  }
-
-  delete screenInfoList;
+  std::for_each(screenInfoList.begin(), screenInfoList.end(),
+                PointerAssassin());
 
   // we don't create the BTimers, we don't delete them
   while (timerList->count())

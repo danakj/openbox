@@ -2057,8 +2057,6 @@ BImageControl::BImageControl(BaseDisplay &dpy, ScreenInfo &scrn, Bool _dither,
 	    getVisual()->c_class);
     exit(1);
   }
-
-  cache = new LinkedList<Cache>;
 }
 
 
@@ -2087,16 +2085,16 @@ BImageControl::~BImageControl(void) {
     delete [] colors;
   }
 
-  if (cache->count()) {
-    int i, n = cache->count();
+  if (!cache.empty()) {
+    int i, n = cache.size();
     fprintf(stderr, i18n->getMessage(ImageSet, ImagePixmapRelease,
 		       "BImageContol::~BImageControl: pixmap cache - "
 	               "releasing %d pixmaps\n"), n);
 
     for (i = 0; i < n; i++) {
-      Cache *tmp = cache->first();
+      Cache *tmp = cache.front();
       XFreePixmap(basedisplay.getXDisplay(), tmp->pixmap);
-      cache->remove(tmp);
+      cache.remove(tmp);
       delete tmp;
     }
 
@@ -2107,30 +2105,29 @@ BImageControl::~BImageControl(void) {
     }
 #endif // TIMEDCACHE
   }
-
-  delete cache;
 }
 
 
 Pixmap BImageControl::searchCache(unsigned int width, unsigned int height,
 		  unsigned long texture,
 		  BColor *c1, BColor *c2) {
-  if (cache->count()) {
-    LinkedListIterator<Cache> it(cache);
+  if (!cache.empty()) {
 
-    for (Cache *tmp = it.current(); tmp; it++, tmp = it.current()) {
+    CacheList::iterator it;
+    for (it = cache.begin(); it != cache.end(); ++it) {
+      Cache *tmp = *it;
       if ((tmp->width == width) && (tmp->height == height) &&
           (tmp->texture == texture) && (tmp->pixel1 == c1->getPixel()))
-          if (texture & BImage_Gradient) {
-            if (tmp->pixel2 == c2->getPixel()) {
-              tmp->count++;
-              return tmp->pixmap;
-            }
-          } else {
+        if (texture & BImage_Gradient) {
+          if (tmp->pixel2 == c2->getPixel()) {
             tmp->count++;
             return tmp->pixmap;
           }
+        } else {
+          tmp->count++;
+          return tmp->pixmap;
         }
+    }
   }
 
   return None;
@@ -2163,9 +2160,9 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
     else
       tmp->pixel2 = 0l;
 
-    cache->insert(tmp);
+    cache.push_back(tmp);
 
-    if ((unsigned) cache->count() > cache_max) {
+    if ((unsigned) cache.size() > cache_max) {
 #ifdef    DEBUG
       fprintf(stderr, i18n->getMessage(ImageSet, ImagePixmapCacheLarge,
                          "BImageControl::renderImage: cache is large, "
@@ -2184,8 +2181,9 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
 
 void BImageControl::removeImage(Pixmap pixmap) {
   if (pixmap) {
-    LinkedListIterator<Cache> it(cache);
-    for (Cache *tmp = it.current(); tmp; it++, tmp = it.current()) {
+    CacheList::iterator it;
+    for (it = cache.begin(); it != cache.end(); ++it) {
+      Cache *tmp = *it;
       if (tmp->pixmap == pixmap) {
         if (tmp->count) {
 	  tmp->count--;
@@ -2434,12 +2432,14 @@ void BImageControl::parseColor(BColor *color, const char *c) {
 
 
 void BImageControl::timeout(void) {
-  LinkedListIterator<Cache> it(cache);
-  for (Cache *tmp = it.current(); tmp; it++, tmp = it.current()) {
+  CacheList::iterator it;
+  for (it = cache.begin(); it != cache.end(); ) {
+    Cache *tmp = *it;
+    ++it;       // move on to the next item before this one is removed
     if (tmp->count <= 0) {
       XFreePixmap(basedisplay.getXDisplay(), tmp->pixmap);
-      cache->remove(tmp);
+      cache.remove(tmp);
       delete tmp;
-    }
+    } 
   }
 }

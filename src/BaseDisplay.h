@@ -33,6 +33,8 @@ class ScreenInfo;
 #include "LinkedList.h"
 #include "Timer.h"
 #include "Geometry.h"
+#include "Util.h"
+#include <vector>
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -127,7 +129,10 @@ private:
 
   Bool _startup, _shutdown;
   Display *display;
-  LinkedList<ScreenInfo> *screenInfoList;
+
+  typedef std::vector<ScreenInfo*> ScreenInfoList;
+  ScreenInfoList screenInfoList;
+ 
   LinkedList<BTimer> *timerList;
 
   char *display_name, *application_name;
@@ -270,8 +275,10 @@ public:
 
 #endif // NEWWMSPEC
 
-  inline ScreenInfo *getScreenInfo(int s)
-    { return (ScreenInfo *) screenInfoList->find(s); }
+  inline ScreenInfo *getScreenInfo(int s) {
+    ASSERT(s < screenInfoList.size());
+    return screenInfoList[s];
+  }
 
   inline const Bool &hasShapeExtensions(void) const
     { return shape.extensions; }

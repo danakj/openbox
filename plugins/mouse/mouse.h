@@ -18,8 +18,6 @@ typedef struct {
     GSList *actions[NUM_MOUSEACTION]; /* lists of Action pointers */
 } MouseBinding;
 
-extern gboolean mouse_lefthand;
-
 gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
                Action *action);
 

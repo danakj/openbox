@@ -111,7 +111,6 @@
 <mouse>
   <dragThreshold>3</dragThreshold>
   <doubleClickTime>200</doubleClickTime>
-  <leftHanded>no</leftHanded>
 
   <context name="frame">
     <mousebind button="A-Left" action="drag">

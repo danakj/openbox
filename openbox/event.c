@@ -313,7 +313,8 @@ static gboolean event_ignore(XEvent *e, Client *client)
 #endif
                     /* is the focused window getting a FocusOut/In back to
                        itself? */
-                    if (fe.xfocus.window == e->xfocus.window) {
+                    if (fe.xfocus.window == e->xfocus.window &&
+                        !event_ignore(&fe, client)) {
 #ifdef DEBUG_FOCUS
                         g_message("focused window got an Out/In back to "
                                   "itself IGNORED both");

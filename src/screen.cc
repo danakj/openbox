@@ -254,7 +254,7 @@ void Screen::updateStruts()
   for (sit = _struts.begin(); sit != send; ++sit)
     sit->left = sit->right = sit->top = sit->bottom = 0;
 
-  ClientList::const_iterator it, end = clients.end();
+  std::list<Client*>::const_iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->iconic()) continue; // these dont count in the strut
     
@@ -318,7 +318,7 @@ void Screen::changeWorkArea()
 */
     if (old_area != _area[i]) {
       // the area has changed, adjust all the maximized windows
-      ClientList::iterator it, end = clients.end();
+      std::list<Client*>::iterator it, end = clients.end();
       for (it = clients.begin(); it != end; ++it)
         if (i < _num_desktops) {
           if ((*it)->desktop() == i)
@@ -442,8 +442,8 @@ void Screen::changeClientList()
     
     windows = new Window[size];
     win_it = windows;
-    ClientList::const_iterator it = clients.begin();
-    const ClientList::const_iterator end = clients.end();
+    std::list<Client*>::const_iterator it = clients.begin();
+    const std::list<Client*>::const_iterator end = clients.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -473,8 +473,8 @@ void Screen::changeStackingList()
     
     windows = new Window[size];
     win_it = windows;
-    ClientList::const_reverse_iterator it = _stacking.rbegin();
-    const ClientList::const_reverse_iterator end = _stacking.rend();
+    std::list<Client*>::const_reverse_iterator it = _stacking.rbegin();
+    const std::list<Client*>::const_reverse_iterator end = _stacking.rend();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -676,8 +676,8 @@ void Screen::lowerWindow(Client *client)
 
   assert(!_stacking.empty()); // this would be bad
 
-  ClientList::iterator it = --_stacking.end();
-  const ClientList::iterator end = _stacking.begin();
+  std::list<Client*>::iterator it = --_stacking.end();
+  const std::list<Client*>::iterator end = _stacking.begin();
 
   if (client->modal() && client->transientFor()) {
     // don't let a modal window lower below its transient_for
@@ -685,7 +685,8 @@ void Screen::lowerWindow(Client *client)
     assert(it != _stacking.end());
 
     wins[0] = (it == _stacking.begin() ? _focuswindow :
-               ((*(--ClientList::const_iterator(it)))->frame->window()));
+               ((*(--std::list<Client*>::const_iterator(it)))->
+                frame->window()));
     wins[1] = client->frame->window();
     if (wins[0] == wins[1]) return; // already right above the window
 
@@ -719,8 +720,8 @@ void Screen::raiseWindow(Client *client)
   // remove the client before looking so we can't run into ourselves
   _stacking.remove(client);
   
-  ClientList::iterator it = _stacking.begin();
-  const ClientList::iterator end = _stacking.end();
+  std::list<Client*>::iterator it = _stacking.begin();
+  const std::list<Client*>::iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
   for (; it != end && ((*it)->layer() > client->layer() || m == *it); ++it);
@@ -730,7 +731,7 @@ void Screen::raiseWindow(Client *client)
     otherwise, we want to stack under the previous window in the stack.
   */
   wins[0] = (it == _stacking.begin() ? _focuswindow :
-             ((*(--ClientList::const_iterator(it)))->frame->window()));
+             ((*(--std::list<Client*>::const_iterator(it)))->frame->window()));
   wins[1] = client->frame->window();
 
   _stacking.insert(it, client);
@@ -755,7 +756,7 @@ void Screen::changeDesktop(unsigned int desktop)
 
   if (old == _desktop) return;
 
-  ClientList::iterator it, end = clients.end();
+  std::list<Client*>::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it)
     (*it)->showhide();
 
@@ -771,7 +772,7 @@ void Screen::changeNumDesktops(unsigned int num)
   if (!(num > 0)) return;
 
   // move windows on desktops that will no longer exist!
-  ClientList::iterator it, end = clients.end();
+  std::list<Client*>::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     unsigned int d = (*it)->desktop();
     if (d >= num && d != 0xffffffff) {
@@ -874,7 +875,7 @@ void Screen::showDesktop(bool show)
   
   _showing_desktop = show;
 
-  ClientList::iterator it, end = clients.end();
+  std::list<Client*>::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->type() == Client::Type_Desktop) {
       if (show)

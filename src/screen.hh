@@ -54,10 +54,8 @@ public:
                                           ButtonPressMask |
                                           ButtonReleaseMask;
 
-  //! Holds a list of Clients
-  typedef std::list<Client*> ClientList;
   //! All managed clients on the screen (in order of being mapped)
-  ClientList clients;
+  std::list<Client*> clients;
   
 private:
   //! Was %Openbox able to manage the screen?
@@ -88,7 +86,7 @@ private:
   Window _supportwindow;
 
   //! A list of all managed clients on the screen, in their stacking order
-  ClientList _stacking;
+  std::list<Client*> _stacking;
 
   //! The desktop currently being displayed
   unsigned int _desktop;

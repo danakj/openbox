@@ -81,18 +81,11 @@ void x_paint(Window win, Appearance *l, int w, int h)
     if (l->surface.data.planar.grad == Background_Solid)
         gradient_solid(l, w, h);
     else gradient_render(&l->surface, w, h);
-    for (i = 0; i < l->textures; i++) {
-        switch (l->texture[i].type) {
-        case Text:
-            if (l->xftdraw == NULL) {
-                l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
-                                        render_visual, render_colormap);
-            }
-            font_draw(l->xftdraw, &l->texture[i].data.text);
-        break;
-        }
-    }
-//reduce depth
+
+/*reduce depth here...
+  also, this is not the right place for this code, it's only here so
+  text rendering shows up for now.
+*/
     if (l->surface.data.planar.grad != Background_Solid) {
         im = XCreateImage(ob_display, render_visual, render_depth,
                           ZPixmap, 0, NULL, w, h, 32, 0);
@@ -103,6 +96,18 @@ void x_paint(Window win, Appearance *l, int w, int h)
                   im, 0, 0, 0, 0, w, h);
         im->data = NULL;
         XDestroyImage(im);
+    }
+
+    for (i = 0; i < l->textures; i++) {
+        switch (l->texture[i].type) {
+        case Text:
+            if (l->xftdraw == NULL) {
+                l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
+                                        render_visual, render_colormap);
+            }
+            font_draw(l->xftdraw, &l->texture[i].data.text);
+        break;
+        }
     }
     XSetWindowBackgroundPixmap(ob_display, win, l->pixmap);
     XClearWindow(ob_display, win);

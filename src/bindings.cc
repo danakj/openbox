@@ -390,7 +390,6 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           OBClient *c = Openbox::instance->focusedClient();
           KeyData data(screen, c, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
-          printf("Firing key!\n");
           for (it = p->callbacks.begin(); it != end; ++it)
             python_callback(*it, &data);
           resetChains(this);

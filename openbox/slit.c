@@ -136,8 +136,9 @@ void slit_add(Window win, XWMHints *wmhints)
     XChangeSaveSet(ob_display, app->icon_win, SetModeInsert);
     XSelectInput(ob_display, app->icon_win, SLITAPP_EVENT_MASK);
 
-    grab_button_full(2, 0, app->icon_win, ButtonMotionMask, GrabModeAsync,
-                     ob_cursors.move);
+    grab_button_full(2, 0, app->icon_win,
+                     ButtonPressMask | ButtonReleaseMask | ButtonMotionMask,
+                     GrabModeAsync, ob_cursors.move);
 
     g_hash_table_insert(slit_app_map, &app->icon_win, app);
 

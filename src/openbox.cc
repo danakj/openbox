@@ -70,6 +70,7 @@ void Openbox::signalHandler(int signal)
     printf("Caught signal %d. Exiting.\n", signal);
     instance->shutdown();
     break;
+
   case SIGFPE:
   case SIGSEGV:
     printf("Caught signal %d. Aborting and dumping core.\n", signal);
@@ -109,6 +110,7 @@ Openbox::Openbox(int argc, char **argv)
   action.sa_handler = Openbox::signalHandler;
   action.sa_mask = sigset_t();
   action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
+  sigaction(SIGUSR1, &action, (struct sigaction *) 0);
   sigaction(SIGPIPE, &action, (struct sigaction *) 0);
   sigaction(SIGSEGV, &action, (struct sigaction *) 0);
   sigaction(SIGFPE, &action, (struct sigaction *) 0);

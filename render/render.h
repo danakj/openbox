@@ -111,6 +111,7 @@ typedef union {
 } TextureData;
 
 typedef struct Texture {
+    Rect position;
     TextureType type;
     TextureData data;
 } Texture;

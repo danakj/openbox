@@ -101,7 +101,8 @@ MessageDialog::~MessageDialog()
 
 const DialogButton& MessageDialog::run()
 {
-  show();
+  if (!visible())
+    show();
 
   while (visible()) {
     dispatcher()->dispatchEvents();
@@ -118,11 +119,17 @@ void MessageDialog::show()
     _button_widgets.push_back(new DialogButtonWidget(_button_holder,
 						     this, *it));
 
+  Rect r;
+
+  if (parent())
+    r = parent()->area();
+  else
+    r = Rect(Point(0, 0), display->screenInfo(screen())->size());
+  
   XSizeHints size;
-  size.flags = PMinSize;
+  size.flags = PMinSize | PPosition;
   size.min_width = minSize().width();
   size.min_height = minSize().height();
-  XSetWMNormalHints(**display, window(), &size);
 
   Size dest = area().size();
   if (dest.width() < 200 || dest.height() < 100) {
@@ -132,6 +139,12 @@ void MessageDialog::show()
     resize(dest);
   }
 
+  // center it above its parent
+  move(Point(r.x() + (r.width() - dest.width()) / 2,
+	     r.y() + (r.height() - dest.height()) / 2));
+  
+  XSetWMNormalHints(**display, window(), &size);
+  
   Widget::show();
 }
 

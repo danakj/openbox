@@ -41,7 +41,7 @@ def close(data):
     if not client: return
     root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
     window = OBClient_window(client)
-    send_client_msg(root, OBProperty_net_close_window, window)
+    send_client_msg(root, OBProperty_net_close_window, window, 0)
 
 def focus(data):
     """Focuses the window on which the event occured"""

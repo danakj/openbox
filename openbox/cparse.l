@@ -10,6 +10,7 @@ static ConfigEntry entry = { NULL, -1 };
 
 static void stringvalue();
 static void numbervalue();
+static void boolvalue();
 static void identifier();
 static void newline();
 static int yywrap();
@@ -20,17 +21,19 @@ string \"[^"\n]*\"
 identifier [a-zA-Z][a-zA-Z0-9_.]*
 white [ \t]*
 assign {white}={white}
+bool ([tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[yY][eE][sS]|[nN][oO]|[oO][nN]|[oO][fF][fF])
 
 %%
 
+^# comment = TRUE;
+{bool}/{white}\n boolvalue();
 {string}/{white}\n stringvalue();
 {number}/{white}\n numbervalue();
 ^{identifier}/{assign} identifier();
 \n newline();
-^# comment = TRUE;
 =
 [ \t]
-. haserror = TRUE;
+. if (!comment) haserror = TRUE;
 
 %%
 
@@ -56,6 +59,19 @@ static void numbervalue()
         if (!haserror && entry.name != NULL && (signed)entry.type < 0) {
             entry.type = Config_Integer;
             entry.value.integer = atoi(yytext);
+        } else
+            haserror = TRUE;
+    }
+}
+
+static void boolvalue()
+{
+    if (!comment) {
+        if (!haserror && entry.name != NULL && (signed)entry.type < 0) {
+            entry.type = Config_Bool;
+            entry.value.bool = (!g_ascii_strcasecmp("true", yytext) ||
+                                !g_ascii_strcasecmp("yes", yytext) ||
+                                !g_ascii_strcasecmp("on", yytext));
         } else
             haserror = TRUE;
     }
@@ -87,6 +103,7 @@ static void newline()
 
         haserror = FALSE;
     }
+    comment = FALSE;
     ++yylineno;
 }
 

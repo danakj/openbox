@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Indstillinger
+# Einstellungen
 $ #FocusModel
 # Fokus Model
 $ #WindowPlacement
-# Vindueplacering
+# Fenster Plazierung
 $ #ImageDithering
-# Billede Dithering
+# Image Dithering
 $ #OpaqueMove
-# Uklar vinduesflytning
+# Fenster beim Verschieben durchsichtig
 $ #FullMax
-# Fuld maximering
+# Vollständige Vergrößerung
 $ #FocusNew
-# Fokus nyt vindue
+# Fokus auf Neue Fenster
 $ #FocusLast
-# Fokus vindue ved skrivebords ændring
+# Fokus auf letztes Fenster bei Arbeitsplatz Wechsel
 $ #ClickToFocus
-# Klik for fokus
+# Fokus durch Mausklick
 $ #SloppyFocus
-# Dovent fokus
+# Fokus folgt Maus
 $ #AutoRaise
-# Hæv automatisk
+# Fenster automatisch in Vordergrund
 $ #SmartRows
-# Intelligent placering (Rækker)
+# Optimale Plazierung (Reihen)
 $ #SmartCols
-# Intelligent placering (Søjler)
+# Optimale Plazierung (Spalten)
 $ #Cascade
-# Kaskade placering
+# Verschobene Plazierung
 $ #LeftRight
-# Fra venstre mod højre
+# Von links nach rechts
 $ #RightLeft
-# Fra højre mod venstre
+# Von rechts nach links
 $ #TopBottom
-# Oppefra
+# Von oben nach unten
 $ #BottomTop
-# Nedefra
+# Von unten nach oben

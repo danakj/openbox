@@ -1,21 +1,21 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# fejl: '-rc' kræver et argument\n
+# Fehler: '-rc' benötigt einen Parameter\n
 $ #DISPLAYRequiresArg
-# fjel: '-display' kræver et argument\n
+# Fehler: '-display' benötigt einen Parameter\n
 $ #WarnDisplaySet
-# advarsel: kunne ikke sætte variablen 'DISPLAY'\n
+# Achtung: konnte die Umgebungsvariable 'DISPLAY' nicht setzen\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
                  2001 - 2002 Sean 'Shaleh' Perry\n\
                  1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tbrug skærm tilslutning.\n\
-  -rc <string>\t\t\tbrug alternativ resource fil.\n\
-  -version\t\t\tvis versionsnummer og afslut.\n\
-  -help\t\t\t\tvis denne hjælp og afslut.\n\n
+  -display <string>\t\tDisplay Verbindung.\n\
+  -rc <string>\t\t\talternative Konfigurationsdatei.\n\
+  -version\t\t\tzeige Versionsnummer und Beendung.\n\
+  -help\t\t\t\tzeige diesen Hilfstext und Beendung.\n\n
 $ #CompileOptions
-# Kompileret med:\n\
+# Optionen zum Kompilationszeitpunkt:\n\
   Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\

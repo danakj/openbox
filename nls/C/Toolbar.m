@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Værktøjsbjælke
+# Toolbar
 $ #EditWkspcName
-# Andring af skrivebordets navn
+# Arbeitsplatzname ändern
 $ #ToolbarPlacement
-# Værktøjsbjælkens placering
+# Toolbar Platzierung

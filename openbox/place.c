@@ -39,7 +39,6 @@ static Rect* pick_head(ObClient *c)
     return NULL;
 }
 
-#if 0
 static gboolean place_random(ObClient *client, gint *x, gint *y)
 {
     int l, r, t, b;
@@ -62,7 +61,6 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
 
     return TRUE;
 }
-#endif
 
 static GSList* area_add(GSList *list, Rect *a)
 {
@@ -272,7 +270,9 @@ void place_client(ObClient *client, gint *x, gint *y)
     if (place_transient(client, x, y) ||
         place_dialog(client, x, y)    ||
         place_smart(client, x, y)     ||
-        place_under_mouse(client, x, y))
+        (config_focus_follow ?
+         place_under_mouse(client, x, y) :
+         place_random(client, x, y)))
     {
         /* get where the client should be */
         frame_frame_gravity(client->frame, x, y);

@@ -166,8 +166,9 @@ static void event(ObEvent *e, void *foo)
             --skip_enter;
         }
         else*/
-        if (e->data.x.client != NULL && client_normal(e->data.x.client))
-            client_focus(e->data.x.client);
+        if (follow_mouse.bool)
+            if (e->data.x.client != NULL && client_normal(e->data.x.client))
+                client_focus(e->data.x.client);
         break;
 
     default:

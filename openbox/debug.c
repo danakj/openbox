@@ -35,5 +35,6 @@ void ob_debug(char *a, ...)
     if (show) {
         va_start(vl, a);
         vfprintf(stderr, a, vl);
+        va_end(vl);
     }
 }

@@ -46,7 +46,8 @@ $(depdir)/%.d: $(srcdir)/%.c
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(bindir)/
-	$(INSTALL) $(target) $(DESTDIR)$(bindir)/$(notdir $(target))
+	$(LIBTOOL) --mode=install $(INSTALL) $(target) \
+		$(DESTDIR)$(bindir)/$(notdir $(target))
 
 uninstall:
 	-$(RM) $(DESTDIR)$(bindir)/$(notdir $(target))

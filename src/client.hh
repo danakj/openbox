@@ -478,8 +478,11 @@ private:
   /*!
     @param x The X coordinate to move to.
     @param y The Y coordinate to move to.
+    @param final true if this is the final move, false if there are more move
+                 events coming. The client is not notified of the move when
+                 final is false.
   */
-  void internal_move(int x, int y);
+  void internal_move(int x, int y, bool final = true);
   //! Internal version of the Client::resize function
   /*!
     This also maintains things like the client's minsize, and size increments.
@@ -674,8 +677,11 @@ public:
     the position specified.
     @param x The X coordinate to move to.
     @param y The Y coordinate to move to.
+    @param final true if this is the final move, false if there are more move
+                 events coming. The client is not notified of the move when
+                 final is false.
   */
-  void move(int x, int y);
+  void move(int x, int y, bool final = true);
   
   //! Resizes the client window, anchoring it in a given corner
   /*!

@@ -167,7 +167,7 @@ void Client::getType()
   _type = (WindowType) -1;
   
   unsigned long *val;
-  unsigned long num = (unsigned) -1;
+  unsigned long num;
   if (otk::Property::get(_window, otk::Property::atoms.net_wm_window_type,
                          otk::Property::atoms.atom, &num, &val)) {
     // use the first value that we know about in the array
@@ -372,7 +372,7 @@ void Client::getState()
     _iconic = _skip_taskbar = _skip_pager = false;
   
   unsigned long *state;
-  unsigned long num = (unsigned) -1;
+  unsigned long num;
   
   if (otk::Property::get(_window, otk::Property::atoms.net_wm_state,
                          otk::Property::atoms.atom, &num, &state)) {
@@ -717,7 +717,7 @@ void Client::updateTransientFor()
 
 void Client::updateIcons()
 {
-  unsigned long num = (unsigned) -1;
+  unsigned long num;
   unsigned long *data;
   unsigned long w, h, i = 0;
 
@@ -775,7 +775,7 @@ void Client::updateKwmIcon()
   Pixmap *data;
   if (otk::Property::get(_window, otk::Property::atoms.kwm_win_icon,
                          otk::Property::atoms.kwm_win_icon, &num, &data)) {
-    if (num >= 2) {
+    if (num == 2) {
       _pixmap_icon = data[0];
       _pixmap_icon_mask = data[1];
     }
@@ -1283,15 +1283,15 @@ const Icon *Client::icon(const otk::Size &s) const
   return &_icons[li];
 }
 
-void Client::move(int x, int y)
+void Client::move(int x, int y, bool final)
 {
   if (!(_functions & Func_Move)) return;
   frame->frameGravity(x, y); // get the client's position based on x,y for the
                              // frame
-  internal_move(x, y);
+  internal_move(x, y, final);
 }
 
-void Client::internal_move(int x, int y)
+void Client::internal_move(int x, int y, bool final)
 {
   _area = otk::Rect(otk::Point(x, y), _area.size());
 
@@ -1301,28 +1301,30 @@ void Client::internal_move(int x, int y)
 
     // send synthetic configure notify (we don't need to if we aren't mapped
     // yet)
-    XEvent event;
-    event.type = ConfigureNotify;
-    event.xconfigure.display = **otk::display;
-    event.xconfigure.event = _window;
-    event.xconfigure.window = _window;
+    if (final) {
+      XEvent event;
+      event.type = ConfigureNotify;
+      event.xconfigure.display = **otk::display;
+      event.xconfigure.event = _window;
+      event.xconfigure.window = _window;
     
-    // root window coords with border in mind
-    event.xconfigure.x = x - _border_width + frame->size().left;
-    event.xconfigure.y = y - _border_width + frame->size().top;
+      // root window coords with border in mind
+      event.xconfigure.x = x - _border_width + frame->size().left;
+      event.xconfigure.y = y - _border_width + frame->size().top;
     
-    event.xconfigure.width = _area.width();
-    event.xconfigure.height = _area.height();
-    event.xconfigure.border_width = _border_width;
-    event.xconfigure.above = frame->plate();
-    event.xconfigure.override_redirect = False;
-    XSendEvent(event.xconfigure.display, event.xconfigure.window, False,
-               StructureNotifyMask, &event);
+      event.xconfigure.width = _area.width();
+      event.xconfigure.height = _area.height();
+      event.xconfigure.border_width = _border_width;
+      event.xconfigure.above = frame->plate();
+      event.xconfigure.override_redirect = False;
+      XSendEvent(event.xconfigure.display, event.xconfigure.window, False,
+                 StructureNotifyMask, &event);
 #if 0//def DEBUG
-    printf("Sent synthetic ConfigureNotify %d,%d %d,%d to 0x%lx\n",
-           event.xconfigure.x, event.xconfigure.y, event.xconfigure.width,
-           event.xconfigure.height, event.xconfigure.window);
+      printf("Sent synthetic ConfigureNotify %d,%d %d,%d to 0x%lx\n",
+             event.xconfigure.x, event.xconfigure.y, event.xconfigure.width,
+             event.xconfigure.height, event.xconfigure.window);
 #endif
+    }
   }
 }
 
@@ -1541,7 +1543,7 @@ void Client::maximize(bool max, int dir, bool savearea)
       if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
                              otk::Property::atoms.cardinal, &n,
                              (long unsigned**) &readdim)) {
-        if (n >= 4) {
+        if (n == 4) {
           if (_max_horz) {
             dimensions[0] = readdim[0];
             dimensions[2] = readdim[2];
@@ -1573,7 +1575,7 @@ void Client::maximize(bool max, int dir, bool savearea)
     if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
                            otk::Property::atoms.cardinal, &n,
                            (long unsigned**) &dimensions)) {
-      if (n >= 4) {
+      if (n == 4) {
         if (dir == 0 || dir == 1) { // horz
           x = (signed int)dimensions[0];
           w = (signed int)dimensions[2];
@@ -1656,7 +1658,7 @@ void Client::fullscreen(bool fs, bool savearea)
     if (otk::Property::get(_window, otk::Property::atoms.openbox_premax,
                            otk::Property::atoms.cardinal, &n,
                            (long unsigned**) &dimensions)) {
-      if (n >= 4) {
+      if (n == 4) {
         x = dimensions[0];
         y = dimensions[1];
         w = dimensions[2];

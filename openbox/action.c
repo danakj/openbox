@@ -12,6 +12,12 @@
 
 #include <glib.h>
 
+typedef struct ActionString {
+    char *name;
+    void (*func)(union ActionData *);
+    void (*setup)(Action *);
+} ActionString;
+
 Action *action_new(void (*func)(union ActionData *data))
 {
     Action *a = g_new0(Action, 1);
@@ -33,160 +39,468 @@ void action_free(Action *a)
     g_free(a);
 }
 
+void setup_action_directional_focus_north(Action *a)
+{
+    a->data.dfocus.direction = Direction_North;
+}
+
+void setup_action_directional_focus_east(Action *a)
+{
+    a->data.dfocus.direction = Direction_East;
+}
+
+void setup_action_directional_focus_south(Action *a)
+{
+    a->data.dfocus.direction = Direction_South;
+}
+
+void setup_action_directional_focus_west(Action *a)
+{
+    a->data.dfocus.direction = Direction_West;
+}
+
+void setup_action_directional_focus_northeast(Action *a)
+{
+    a->data.dfocus.direction = Direction_NorthEast;
+}
+
+void setup_action_directional_focus_southeast(Action *a)
+{
+    a->data.dfocus.direction = Direction_SouthEast;
+}
+
+void setup_action_directional_focus_southwest(Action *a)
+{
+    a->data.dfocus.direction = Direction_SouthWest;
+}
+
+void setup_action_directional_focus_northwest(Action *a)
+{
+    a->data.dfocus.direction = Direction_NorthWest;
+}
+
+void setup_action_send_to_desktop(Action *a)
+{
+    a->data.sendto.follow = TRUE;
+}
+
+void setup_action_send_to_np_desktop(Action *a)
+{
+    a->data.sendtonextprev.wrap = FALSE;
+    a->data.sendtonextprev.follow = TRUE;
+}
+
+void setup_action_send_to_np_desktop_wrap(Action *a)
+{
+    a->data.sendtonextprev.wrap = TRUE;
+    a->data.sendtonextprev.follow = TRUE;
+}
+
+void setup_action_np_desktop(Action *a)
+{
+    a->data.nextprevdesktop.wrap = FALSE;
+}
+
+void setup_action_np_desktop_wrap(Action *a)
+{
+    a->data.nextprevdesktop.wrap = TRUE;
+}
+
+void setup_action_move_keyboard(Action *a)
+{
+    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move_keyboard;
+}
+
+void setup_action_move(Action *a)
+{
+    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move;
+}
+
+void setup_action_resize(Action *a)
+{
+    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_topleft;
+}
+
+void setup_action_resize_keyboard(Action *a)
+{
+    a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_keyboard;
+}
+
+void setup_action_cycle_windows_linear_next(Action *a)
+{
+    a->data.cycle.linear = TRUE;
+    a->data.cycle.forward = TRUE;
+}
+
+void setup_action_cycle_windows_linear_previous(Action *a)
+{
+    a->data.cycle.linear = TRUE;
+    a->data.cycle.forward = FALSE;
+}
+
+void setup_action_cycle_windows_next(Action *a)
+{
+    a->data.cycle.linear = FALSE;
+    a->data.cycle.forward = TRUE;
+}
+
+void setup_action_cycle_windows_previous(Action *a)
+{
+    a->data.cycle.linear = FALSE;
+    a->data.cycle.forward = FALSE;
+}
+    
+ActionString actionstrings[] =
+{
+    {
+        "execute", 
+        action_execute, 
+        NULL
+    },
+    {
+        "directionalfocusnorth", 
+        action_directional_focus, 
+        setup_action_directional_focus_north
+    },
+    {
+        "directionalfocuseast", 
+        action_directional_focus, 
+        setup_action_directional_focus_east
+    },
+    {
+        "directionalfocussouth", 
+        action_directional_focus, 
+        setup_action_directional_focus_south
+    },
+    {
+        "directionalfocuswest",
+        action_directional_focus,
+        setup_action_directional_focus_west
+    },
+    {
+        "directionalfocusnortheast",
+        action_directional_focus,
+        setup_action_directional_focus_northeast
+    },
+    {
+        "directionalfocussoutheast",
+        action_directional_focus,
+        setup_action_directional_focus_southeast
+    },
+    {
+        "directionalfocussouthwest",
+        action_directional_focus,
+        setup_action_directional_focus_southwest
+    },
+    {
+        "directionalfocusnorthwest",
+        action_directional_focus,
+        setup_action_directional_focus_northwest
+    },
+    {
+        "focus",
+        action_focus,
+        NULL,
+    },
+    {
+        "unfocus",
+        action_unfocus,
+        NULL
+    },
+    {
+        "iconify",
+        action_iconify,
+        NULL
+    },
+    {
+        "raise",
+        action_raise,
+        NULL
+    },
+    {
+        "lower",
+        action_lower,
+        NULL
+    },
+    {
+        "focusraise",
+        action_focusraise,
+        NULL
+    },
+    {
+        "close",
+        action_close,
+        NULL
+    },
+    {
+        "kill",
+        action_kill,
+        NULL
+    },
+    {
+        "shadelower",
+        action_shadelower,
+        NULL
+    },
+    {
+        "unshaderaise",
+        action_unshaderaise,
+        NULL
+    },
+    {
+        "shade",
+        action_shade,
+        NULL
+    },
+    {
+        "unshade",
+        action_unshade,
+        NULL
+    },
+    {
+        "toggleshade",
+        action_toggle_shade,
+        NULL
+    },
+    {
+        "toggleomnipresent",
+        action_toggle_omnipresent,
+        NULL
+    },
+    {
+        "moverelativehorz",
+        action_move_relative_horz,
+        NULL
+    },
+    {
+        "moverelativevert",
+        action_move_relative_vert,
+        NULL
+    },
+    {
+        "resizerelativehorz",
+        action_resize_relative_horz,
+        NULL
+    },
+    {
+        "resizerelativevert",
+        action_resize_relative_vert,
+        NULL
+    },
+    {
+        "maximizefull",
+        action_maximize_full,
+        NULL
+    },
+    {
+        "unmaximizefull",
+        action_unmaximize_full,
+        NULL
+    },
+    {
+        "togglemaximizefull",
+        action_toggle_maximize_full,
+        NULL
+    },
+    {
+        "maximizehorz",
+        action_maximize_horz,
+        NULL
+    },
+    {
+        "unmaximizehorz",
+        action_unmaximize_horz,
+        NULL
+    },
+    {
+        "togglemaximizehorz",
+        action_toggle_maximize_horz,
+        NULL
+    },
+    {
+        "maximizevert",
+        action_maximize_vert,
+        NULL
+    },
+    {
+        "unmaximizevert",
+        action_unmaximize_vert,
+        NULL
+    },
+    {
+        "togglemaximizevert",
+        action_toggle_maximize_vert,
+        NULL
+    },
+    {
+        "sendtodesktop",
+        action_send_to_desktop,
+        setup_action_send_to_desktop
+    },
+    {
+        "sendtonextdesktop",
+        action_send_to_next_desktop,
+        setup_action_send_to_np_desktop
+    },
+    {
+        "sendtonextdesktopwrap",
+        action_send_to_next_desktop,
+        setup_action_send_to_np_desktop_wrap
+    },
+    {
+        "sendtopreviousdesktop",
+        action_send_to_previous_desktop,
+        setup_action_send_to_np_desktop
+    },
+    {
+        "sendtopreviousdesktopwrap",
+        action_send_to_previous_desktop,
+        setup_action_send_to_np_desktop_wrap
+    },
+    {
+        "desktop",
+        action_desktop,
+        NULL
+    },
+    {
+        "nextdesktop",
+        action_next_desktop,
+        setup_action_np_desktop
+    },
+    {
+        "nextdesktopwrap",
+        action_next_desktop,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "previousdesktop",
+        action_previous_desktop,
+        setup_action_np_desktop
+    },
+    {
+        "previousdesktopwrap",
+        action_previous_desktop,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "nextdesktopcolumn",
+        action_next_desktop_column,
+        setup_action_np_desktop
+    },
+    {
+        "nextdesktopcolumnwrap",
+        action_next_desktop_column,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "previousdesktopcolumn",
+        action_previous_desktop_column,
+        setup_action_np_desktop
+    },
+    {
+        "previousdesktopcolumnwrap",
+        action_previous_desktop_column,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "nextdesktoprow",
+        action_next_desktop_row,
+        setup_action_np_desktop
+    },
+    {
+        "nextdesktoprowwrap",
+        action_next_desktop_row,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "previousdesktoprow",
+        action_previous_desktop_row,
+        setup_action_np_desktop
+    },
+    {
+        "previousdesktoprowwrap",
+        action_previous_desktop_row,
+        setup_action_np_desktop_wrap
+    },
+    {
+        "toggledecorations",
+        action_toggle_decorations,
+        NULL
+    },
+    {
+        "keyboardmove", 
+        action_moveresize,
+        setup_action_move_keyboard
+    },
+    {
+        "move",
+        action_moveresize,
+        setup_action_move
+    },
+    {
+        "resize",
+        action_moveresize,
+        setup_action_resize
+    },
+    {
+        "keyboardresize",
+        action_moveresize,
+        setup_action_resize_keyboard
+    },
+    {
+        "restart",
+        action_restart,
+        NULL
+    },
+    {
+        "exit",
+        action_exit,
+        NULL
+    },
+    {
+        "showmenu",
+        action_showmenu,
+        NULL
+    },
+    {
+        "nextwindowlinear",
+        action_cycle_windows,
+        setup_action_cycle_windows_linear_next
+    },
+    {
+        "previouswindowlinear",
+        action_cycle_windows,
+        setup_action_cycle_windows_linear_previous
+    },
+    {
+        "nextwindow",
+        action_cycle_windows,
+        setup_action_cycle_windows_next
+    },
+    {
+        "previouswindow",
+        action_cycle_windows,
+        setup_action_cycle_windows_previous
+    },
+    {
+        NULL,
+        NULL,
+        NULL
+    }
+};
+
 Action *action_from_string(char *name)
 {
     Action *a = NULL;
-    if (!g_ascii_strcasecmp(name, "execute")) {
-        a = action_new(action_execute);
-    } else if (!g_ascii_strcasecmp(name, "focus")) {
-        a = action_new(action_focus);
-    } else if (!g_ascii_strcasecmp(name, "unfocus")) {
-        a = action_new(action_unfocus);
-    } else if (!g_ascii_strcasecmp(name, "iconify")) {
-        a = action_new(action_iconify);
-    } else if (!g_ascii_strcasecmp(name, "raise")) {
-        a = action_new(action_raise);
-    } else if (!g_ascii_strcasecmp(name, "lower")) {
-        a = action_new(action_lower);
-    } else if (!g_ascii_strcasecmp(name, "focusraise")) {
-        a = action_new(action_focusraise);
-    } else if (!g_ascii_strcasecmp(name, "close")) {
-        a = action_new(action_close);
-    } else if (!g_ascii_strcasecmp(name, "kill")) {
-        a = action_new(action_kill);
-    } else if (!g_ascii_strcasecmp(name, "shadelower")) {
-        a = action_new(action_shadelower);
-    } else if (!g_ascii_strcasecmp(name, "unshaderaise")) {
-        a = action_new(action_unshaderaise);
-    } else if (!g_ascii_strcasecmp(name, "shade")) {
-        a = action_new(action_shade);
-    } else if (!g_ascii_strcasecmp(name, "unshade")) {
-        a = action_new(action_unshade);
-    } else if (!g_ascii_strcasecmp(name, "toggleshade")) {
-        a = action_new(action_toggle_shade);
-    } else if (!g_ascii_strcasecmp(name, "toggleomnipresent")) {
-        a = action_new(action_toggle_omnipresent);
-    } else if (!g_ascii_strcasecmp(name, "moverelativehorz")) {
-        a = action_new(action_move_relative_horz);
-    } else if (!g_ascii_strcasecmp(name, "moverelativevert")) {
-        a = action_new(action_move_relative_vert);
-    } else if (!g_ascii_strcasecmp(name, "resizerelativehorz")) {
-        a = action_new(action_resize_relative_horz);
-    } else if (!g_ascii_strcasecmp(name, "resizerelativevert")) {
-        a = action_new(action_resize_relative_vert);
-    } else if (!g_ascii_strcasecmp(name, "maximizefull")) {
-        a = action_new(action_maximize_full);
-    } else if (!g_ascii_strcasecmp(name, "unmaximizefull")) {
-        a = action_new(action_unmaximize_full);
-    } else if (!g_ascii_strcasecmp(name, "togglemaximizefull")) {
-        a = action_new(action_toggle_maximize_full);
-    } else if (!g_ascii_strcasecmp(name, "maximizehorz")) {
-        a = action_new(action_maximize_horz);
-    } else if (!g_ascii_strcasecmp(name, "unmaximizehorz")) {
-        a = action_new(action_unmaximize_horz);
-    } else if (!g_ascii_strcasecmp(name, "togglemaximizehorz")) {
-        a = action_new(action_toggle_maximize_horz);
-    } else if (!g_ascii_strcasecmp(name, "maximizevert")) {
-        a = action_new(action_maximize_vert);
-    } else if (!g_ascii_strcasecmp(name, "unmaximizevert")) {
-        a = action_new(action_unmaximize_vert);
-    } else if (!g_ascii_strcasecmp(name, "togglemaximizevert")) {
-        a = action_new(action_toggle_maximize_vert);
-    } else if (!g_ascii_strcasecmp(name, "sendtodesktop")) {
-        a = action_new(action_send_to_desktop);
-        a->data.sendto.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "sendtonextdesktop")) {
-        a = action_new(action_send_to_next_desktop);
-        a->data.sendtonextprev.wrap = FALSE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "sendtonextdesktopwrap")) {
-        a = action_new(action_send_to_next_desktop);
-        a->data.sendtonextprev.wrap = TRUE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "sendtopreviousdesktop")) {
-        a = action_new(action_send_to_previous_desktop);
-        a->data.sendtonextprev.wrap = FALSE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "sendtopreviousdesktopwrap")) {
-        a = action_new(action_send_to_previous_desktop);
-        a->data.sendtonextprev.wrap = TRUE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "desktop")) {
-        a = action_new(action_desktop);
-    } else if (!g_ascii_strcasecmp(name, "nextdesktop")) {
-        a = action_new(action_next_desktop);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "nextdesktopwrap")) {
-        a = action_new(action_next_desktop);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktop")) {
-        a = action_new(action_previous_desktop);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktopwrap")) {
-        a = action_new(action_previous_desktop);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "nextdesktopcolumn")) {
-        a = action_new(action_next_desktop_column);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "nextdesktopcolumnwrap")) {
-        a = action_new(action_next_desktop_column);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktopcolumn")) {
-        a = action_new(action_previous_desktop_column);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktopcolumnwrap")) {
-        a = action_new(action_previous_desktop_column);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "nextdesktoprow")) {
-        a = action_new(action_next_desktop_row);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "nextdesktoprowwrap")) {
-        a = action_new(action_next_desktop_row);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktoprow")) {
-        a = action_new(action_previous_desktop_row);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "previousdesktoprowwrap")) {
-        a = action_new(action_previous_desktop_row);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "toggledecorations")) {
-        a = action_new(action_toggle_decorations);
-    } else if (!g_ascii_strcasecmp(name, "keyboardmove")) {
-        a = action_new(action_moveresize);
-        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move_keyboard;
-    } else if (!g_ascii_strcasecmp(name, "move")) {
-        a = action_new(action_moveresize);
-        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_move;
-    } else if (!g_ascii_strcasecmp(name, "resize")) {
-        a = action_new(action_moveresize);
-        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_topleft;
-    } else if (!g_ascii_strcasecmp(name, "keyboardresize")) {
-        a = action_new(action_moveresize);
-        a->data.moveresize.corner = prop_atoms.net_wm_moveresize_size_keyboard;
-    } else if (!g_ascii_strcasecmp(name, "restart")) {
-        a = action_new(action_restart);
-    } else if (!g_ascii_strcasecmp(name, "exit")) {
-        a = action_new(action_exit);
-    } else if (!g_ascii_strcasecmp(name, "showmenu")) {
-        a = action_new(action_showmenu);
-    } else if (!g_ascii_strcasecmp(name, "nextwindowlinear")) {
-        a = action_new(action_cycle_windows);
-        a->data.cycle.linear = TRUE;
-        a->data.cycle.forward = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "previouswindowlinear")) {
-        a = action_new(action_cycle_windows);
-        a->data.cycle.linear = TRUE;
-        a->data.cycle.forward = FALSE;
-    } else if (!g_ascii_strcasecmp(name, "nextwindow")) {
-        a = action_new(action_cycle_windows);
-        a->data.cycle.linear = FALSE;
-        a->data.cycle.forward = TRUE;
-    } else if (!g_ascii_strcasecmp(name, "previouswindow")) {
-        a = action_new(action_cycle_windows);
-        a->data.cycle.linear = FALSE;
-        a->data.cycle.forward = FALSE;
-    }
-    
+    int i;
+
+    for (i = 0; actionstrings[i].name; i++)
+        if (!g_ascii_strcasecmp(name, actionstrings[i].name)) {
+            a = action_new(actionstrings[i].func);
+            if (actionstrings[i].setup)
+                actionstrings[i].setup(a);
+            break;
+        }
     return a;
 }
 
@@ -689,3 +1003,12 @@ void action_cycle_windows(union ActionData *data)
                     data->cycle.cancel);
 }
 
+void action_directional_focus(union ActionData *data)
+{
+    Client *nf;
+
+    if (!data->dfocus.c)
+        return;
+    if ((nf = client_find_directional(data->dfocus.c, data->dfocus.direction)))
+        client_activate(nf);
+}

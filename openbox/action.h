@@ -12,6 +12,11 @@ struct AnyAction {
     Client *c;
 };
 
+struct DirectionalFocus {
+    Client *c;
+    int direction;
+};
+
 struct Execute {
     Client *c;
     char *path;
@@ -73,6 +78,7 @@ struct CycleWindows {
 
 union ActionData {
     struct AnyAction any;
+    struct DirectionalFocus dfocus;
     struct Execute execute;
     struct ClientAction client;
     struct MoveResizeRelative relative;
@@ -106,6 +112,7 @@ Action *action_new(void (*func)(union ActionData *data));
    action_resize_relative_horz - the delta
    action_resize_relative_vert - the delta
 */
+
 Action *action_from_string(char *name);
 void action_free(Action *a);
 
@@ -197,4 +204,6 @@ void action_exit(union ActionData *data);
 void action_showmenu(union ActionData *data);
 /* CycleWindows */
 void action_cycle_windows(union ActionData *data);
+
+void action_directional_focus(union ActionData *data);
 #endif

@@ -2344,3 +2344,98 @@ Icon *client_icon(Client *self, int w, int h)
         return &self->icons[si];
     return &self->icons[li];
 }
+
+/* this be mostly ripped from fvwm */
+Client *client_find_directional(Client *c, Direction dir) 
+{
+    int my_cx, my_cy, his_cx, his_cy;
+    int offset = 0;
+    int distance = 0;
+    int score, best_score;
+    Client *best_client, *cur;
+    GList *it;
+
+    if(!client_list)
+        return NULL;
+
+    /* first, find the centre coords of the currently focused window */
+    my_cx = c->frame->area.x + c->frame->area.width / 2;
+    my_cy = c->frame->area.y + c->frame->area.height / 2;
+
+    best_score = -1;
+    best_client = NULL;
+
+    for(it = g_list_first(client_list); it; it = it->next) {
+        cur = it->data;
+
+        /* the currently selected window isn't interesting */
+        if(cur == c)
+            continue;
+        if (!client_normal(cur))
+            continue;
+        if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            continue;
+        if(cur->iconic)
+            continue;
+	if(client_focus_target(cur) == cur &&
+           !(cur->can_focus || cur->focus_notify))
+            continue;
+
+        /* find the centre coords of this window, from the
+         * currently focused window's point of view */
+        his_cx = (cur->frame->area.x - my_cx)
+            + cur->frame->area.width / 2;
+        his_cy = (cur->frame->area.y - my_cy)
+            + cur->frame->area.height / 2;
+
+        if(dir > 3) { 
+            int tx;
+            /* Rotate the diagonals 45 degrees counterclockwise.
+             * To do this, multiply the matrix /+h +h\ with the
+             * vector (x y).                   \-h +h/
+             * h = sqrt(0.5). We can set h := 1 since absolute
+             * distance doesn't matter here. */
+            tx = his_cx + his_cy;
+            his_cy = -his_cx + his_cy;
+            his_cx = tx;
+        }
+
+        switch(dir) {
+        case Direction_North :
+        case Direction_South :
+        case Direction_NorthEast :
+        case Direction_SouthWest :
+            offset = (his_cx < 0) ? -his_cx : his_cx;
+            distance = (dir == Direction_North || dir == Direction_NorthEast) ?
+                -his_cy : his_cy;
+            break;
+        case Direction_East :
+        case Direction_West :
+        case Direction_SouthEast :
+        case Direction_NorthWest :
+            offset = (his_cy < 0) ? -his_cy : his_cy;
+            distance = (dir == Direction_West || dir == Direction_NorthWest) ?
+                -his_cx : his_cx;
+            break;
+        }
+
+        /* the target must be in the requested direction */
+        if(distance <= 0)
+            continue;
+
+        /* Calculate score for this window.  The smaller the better. */
+        score = distance + offset;
+
+        /* windows more than 45 degrees off the direction are
+         * heavily penalized and will only be chosen if nothing
+         * else within a million pixels */
+        if(offset > distance)
+            score += 1000000;
+
+        if(best_score == -1 || score < best_score)
+            best_client = cur,
+                best_score = score;
+    }
+
+    return best_client;
+}

@@ -110,6 +110,17 @@ typedef enum {
     Decor_Close       = 1 << 8  /*!< Display a close button */
 } Decoration;
 
+/*! The directions used by client_find_directional */
+typedef enum {
+    Direction_North,
+    Direction_East,
+    Direction_South,
+    Direction_West,
+    Direction_NorthEast,
+    Direction_SouthEast,
+    Direction_SouthWest,
+    Direction_NorthWest
+} Direction;
 
 typedef struct Client {
     ObWindow obwin;
@@ -482,5 +493,8 @@ Client *client_search_focus_tree_full(Client *self);
     @return A modal child of the client window, or 0 if none was found.
 */
 Client *client_search_modal_child(Client *self);
+
+/*! Return the "closest" client in the given direction */
+Client *client_find_directional(Client *c, Direction dir);
 
 #endif

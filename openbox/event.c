@@ -248,6 +248,10 @@ void event_process(XEvent *e)
     case EnterNotify:
     case LeaveNotify:
 	event_lasttime = e->xcrossing.time;
+        /* XXX this caused problems before... but i don't remember why. hah.
+           so back it is. if problems arise again, then try filtering on the
+           detail instead of the mode. */
+        if (e->xcrossing.mode != NotifyNormal) return;
 	break;
     }
 

@@ -346,6 +346,13 @@ gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
 
     grab_all_clients(FALSE);
 
+    /* when there are no modifiers in the binding, then the action cannot
+       be interactive */
+    if (!state && action->data.any.interactive) {
+        action->data.any.interactive = FALSE;
+        action->data.inter.final = TRUE;
+    }
+
     /* add the binding */
     b = g_new0(ObMouseBinding, 1);
     b->state = state;

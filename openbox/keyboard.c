@@ -83,6 +83,7 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
+    gboolean mods = TRUE;
 
     g_assert(keylist != NULL);
     g_assert(action != NULL);
@@ -96,12 +97,26 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
         tree = NULL;
     } else
         t = tree;
-    while (t->first_child) t = t->first_child;
 
     if (conflict) {
         g_warning("conflict with binding");
         tree_destroy(tree);
         return FALSE;
+    }
+
+    /* find if every key in this chain has modifiers, and also find the
+       bottom node of the tree */
+    while (t->first_child) {
+        if (!t->state)
+            mods = FALSE;
+        t = t->first_child;
+    }
+
+    /* when there are no modifiers in the binding, then the action cannot
+       be interactive */
+    if (!mods && action->data.any.interactive) {
+        action->data.any.interactive = FALSE;
+        action->data.inter.final = TRUE;
     }
 
     /* set the action */

@@ -155,10 +155,13 @@ Openbox::Openbox(int argc, char **argv)
   v.push_back("v");
   _bindings->add_key(v, 1);
   v.clear();
-//  v.push_back("C-x");
-//  v.push_back("C-z");
+  v.push_back("C-x");
+  v.push_back("C-z");
   v.push_back("a");
   _bindings->add_key(v, 2);
+  v.clear();
+  v.push_back("C-a");
+  _bindings->add_key(v, 3);
 
   _bindings->add_mouse("A-1", 1);
 

@@ -150,6 +150,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
     ret = new BindingTree(id);
     if (!p) ret->chain = false;
     ret->first_child = p;
+    printf("adding child %lx\n", (long)p);
     if (!translate(*it, ret->binding, true)) {
       destroytree(ret);
       ret = 0;
@@ -162,7 +163,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
 
 
 OBBindings::OBBindings()
-  : _curpos(&_keytree)
+  : _curpos(&_keytree), _mousetree(0)
 {
 }
 

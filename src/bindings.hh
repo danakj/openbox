@@ -49,7 +49,7 @@ private:
   BindingTree _keytree; // root node of the tree (this doesn't have siblings!)
   BindingTree *_curpos; // position in the keytree
 
-  BindingTree _mousetree; // this tree is a list. it has only siblings
+  BindingTree *_mousetree; // this tree is a list. it has only siblings
   
   int find_key(BindingTree *search);
   bool translate(const std::string &str, Binding &b, bool askey);

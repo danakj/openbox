@@ -1,35 +1,45 @@
-###########################################################################
-### Functions that can be used as callbacks for mouse/keyboard bindings ###
-###########################################################################
+############################################################################
+### Functions that can be used as callbacks for mouse/keyboard bindings  ###
+############################################################################
+
+#############################################################################
+### Options that can be modified to change the default hooks' behaviors.  ###
+###                                                                       ###
+# resize_nearest - 1 to resize from the corner nearest where the mouse    ###
+###                  is, 0 to resize always from the bottom right corner. ###
+resize_nearest = 1                                                        ###
+###                                                                       ###
+#############################################################################
 
 import ob
+import otk
 
 def state_above(data, add=2):
     """Toggles, adds or removes the 'above' state on a window."""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().net_wm_state, data.client.window(),
-                       add, ob.Property_atoms().net_wm_state_above)
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_above)
     
 def state_below(data, add=2):
     """Toggles, adds or removes the 'below' state on a window."""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().net_wm_state, data.client.window(),
-                       add, ob.Property_atoms().net_wm_state_below)
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_below)
     
 def state_shaded(data, add=2):
     """Toggles, adds or removes the 'shaded' state on a window."""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().net_wm_state, data.client.window(),
-                       add, ob.Property_atoms().net_wm_state_shaded)
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_state, data.client.window(),
+                       add, otk.Property_atoms().net_wm_state_shaded)
 
 def iconify(data):
     """Iconifies the window on which the event occured"""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().wm_change_state,
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().wm_change_state,
                        data.client.window(), 3) # IconicState
     
 def restore(data):
@@ -37,15 +47,15 @@ def restore(data):
        if. If you want to focus the window too, it is recommended that you
        use the activate() function."""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().wm_change_state,
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().wm_change_state,
                        data.client.window(), 1) # NormalState
     
 def close(data):
     """Closes the window on which the event occured"""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().net_close_window,
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_close_window,
                        data.client.window(), 0)
 
 def focus(data):
@@ -83,23 +93,23 @@ def resize(data):
 
     # pick a corner to anchor
     if not (resize_nearest or data.context == MC_Grip):
-        corner = Client.TopLeft
+        corner = ob.Client.TopLeft
     else:
         x = px - data.press_clientx
         y = py - data.press_clienty
         if y < data.press_clientheight / 2:
             if x < data.press_clientwidth / 2:
-                corner = Client.BottomRight
+                corner = ob.Client.BottomRight
                 dx *= -1
             else:
-                corner = Client.BottomLeft
+                corner = ob.Client.BottomLeft
             dy *= -1
         else:
             if x < data.press_clientwidth / 2:
-                corner = Client.TopRight
+                corner = ob.Client.TopRight
                 dx *= -1
             else:
-                corner = Client.TopLeft
+                corner = ob.Client.TopLeft
 
     data.client.resize(corner,
                        data.press_clientwidth + dx,
@@ -133,8 +143,8 @@ def unshade(data):
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
-    root = ob.display.screenInfo(data.screen).rootWindow()
-    ob.send_client_msg(root, ob.Property_atoms().net_current_desktop,
+    root = otk.display.screenInfo(data.screen).rootWindow()
+    ob.send_client_msg(root, otk.Property_atoms().net_current_desktop,
                        root, num)
 
 def next_desktop(data, no_wrap=0):
@@ -164,8 +174,8 @@ def prev_desktop(data, no_wrap=0):
 def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
     if not data.client: return
-    ob.send_client_msg(ob.display.screenInfo(data.screen).rootWindow(),
-                       ob.Property_atoms().net_wm_desktop,
+    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
+                       otk.Property_atoms().net_wm_desktop,
                        data.client.window(),num)
 
 def toggle_all_desktops(data):

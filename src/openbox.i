@@ -110,6 +110,7 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
+/*
 %include "../otk/ustring.i"
 
 %ignore otk::display;
@@ -133,6 +134,9 @@ void python_callback(PyObject *func, KeyData *data)
 %include "../otk/eventdispatcher.hh"
 
 %import "../otk/widget.hh"
+*/
+%import "../otk/otk.i"
+
 %import "widgetbase.hh"
 %import "actions.hh"
 

@@ -15,7 +15,7 @@ INCLUDES= -I..
 
 bin_PROGRAMS= openbox3
 
-openbox3_LDADD=-L../otk -lotk @LIBINTL@
+openbox3_LDADD=-L../otk -lotk -lswigpy @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc backgroundwidget.cc labelwidget.cc \
@@ -35,7 +35,7 @@ distclean-local:
 openbox.i: openbox.hh screen.hh client.hh python.hh frame.hh
 	touch $@
 
-openbox_wrap.cc: openbox.i
-	swig -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
+%_wrap.cc: %.i
+	swig -c -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 
 # local dependencies

@@ -10,20 +10,19 @@ extern "C" {
 
 namespace otk {
 
-class RenderColor {
-public:
-  struct RGB {
-    int r;
-    int g;
-    int b;
-    RGB(int red, int green, int blue) : r(red), g(green), b(blue) {}
-    // color is in ARGB format
-    RGB(unsigned long color)
-      : r((color >> 16) & 0xff),
-        g((color >> 8) & 0xff),
-        b((color) & 0xff) {}
-  };
+struct RGB {
+  int r;
+  int g;
+  int b;
+  RGB(int red, int green, int blue) : r(red), g(green), b(blue) {}
+  // color is in ARGB format
+  RGB(unsigned long color)
+    : r((color >> 16) & 0xff),
+      g((color >> 8) & 0xff),
+      b((color) & 0xff) {}
+};
 
+class RenderColor {
 private:
   struct CacheItem {
     GC gc;

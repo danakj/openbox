@@ -261,7 +261,7 @@ void Screen::calcArea()
 #endif // XINERAMA
 */
   
-  if (old_area != _area)
+  //if (old_area != _area)
     // XXX: re-maximize windows
 
   changeWorkArea();

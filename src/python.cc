@@ -9,8 +9,9 @@
 #include "otk/util.hh"
 
 extern "C" {
-// The initializer in openbox_wrap.cc
+// The initializer in openbox_wrap.cc / otk_wrap.cc
 extern void init_ob(void);
+extern void init_otk(void);
 }
 
 namespace ob {
@@ -23,6 +24,7 @@ void python_init(char *argv0)
   Py_SetProgramName(argv0);
   Py_Initialize();
   // initialize the C python module
+  init_otk();
   init_ob();
   // include the openbox directories for python scripts in the sys path
   PyRun_SimpleString("import sys");
@@ -30,10 +32,10 @@ void python_init(char *argv0)
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
   PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
-  PyRun_SimpleString("import ob;");
+  PyRun_SimpleString("import ob; import otk;");
   // set up convenience global variables
   PyRun_SimpleString("ob.openbox = ob.Openbox_instance()");
-  PyRun_SimpleString("ob.display = ob.Display_instance()");
+  PyRun_SimpleString("otk.display = otk.Display_instance()");
 
   // set up access to the python global variables
   PyObject *obmodule = PyImport_AddModule("config");

@@ -30,15 +30,5 @@ desktop_names = ["one", "two", "three", "four", "five", "six", "seven", \
 #                      between.
 number_of_desktops = 4
 
-#############################################################################
-### Options that can be modified by the user to change the default hooks' ###
-### behaviors.                                                            ###
-#############################################################################
-
-# resize_nearest - 1 to resize from the corner nearest where the mouse is, 0
-#                  to resize always from the bottom right corner.
-resize_nearest = 1
-
-
 
 print "Loaded config.py"

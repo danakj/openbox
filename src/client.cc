@@ -575,8 +575,8 @@ void Client::updateStrut()
     _strut.left = data[0];
     _strut.right = data[1];
     _strut.top = data[2];
-    _strut.bottom = data[3];
-    
+    _strut.bottom = data[3]; 
+   
     openbox->screen(_screen)->updateStrut();
   }
 

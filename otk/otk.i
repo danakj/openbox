@@ -14,35 +14,40 @@
 //%include std_list.i
 %include "ustring.i"
 
-%ignore otk::OBDisplay::display;
+%ignore otk::display;
 %inline %{
-  Display *OBDisplay_display() { return otk::OBDisplay::display; }
+  otk::Display *Display_instance() { return otk::display; }
+%};
+
+%ignore otk::Property::atoms;
+%inline %{
+  const otk::Atoms& Property_atoms() { return otk::Property::atoms; }
 %};
 
 namespace otk {
-%rename(setValue_bool) Configuration::setValue(std::string const &,bool);
+/*%rename(setValue_bool) Configuration::setValue(std::string const &,bool);
 %rename(setValue_unsigned) Configuration::setValue(const std::string &, unsigned int);
 %rename(setValue_long) Configuration::setValue(const std::string &, long);
 %rename(setValue_unsignedlong) Configuration::setValue(const std::string &, unsigned long);
 %rename(setValue_string) Configuration::setValue(const std::string &, const std::string &);
-%rename(setValue_charptr) Configuration::setValue(const std::string &, const char *);
+%rename(setValue_charptr) Configuration::setValue(const std::string &, const char *);*/
 
 %rename(itostring_unsigned) itostring(unsigned int);
 %rename(itostring_long) itostring(long);
 %rename(itostring_unsigned_long) itostring(unsigned long);
 
 // these are needed for guile, but not needed for python!
-%rename(equals) BColor::operator==;
-%rename(equals) Rect::operator==;
-%rename(equals) BTexture::operator==;
-%ignore BColor::operator!=;
-%ignore BTexture::operator!=;
+//%rename(equals) BColor::operator==;
+//%rename(equals) Rect::operator==;
+//%rename(equals) BTexture::operator==;
+//%ignore BColor::operator!=;
+//%ignore BTexture::operator!=;
 %ignore Rect::operator!=;
 %ignore Rect::operator|;
 %ignore Rect::operator|=;
 %ignore Rect::operator&;
 %ignore Rect::operator&=;
-%ignore OBTimer::operator<;
+//%ignore OBTimer::operator<;
 %ignore TimerLessThan;
 
 /*
@@ -52,8 +57,13 @@ namespace otk {
 */
 }
 
-%include "eventdispatcher.hh"
 %include "eventhandler.hh"
+%include "eventdispatcher.hh"
+%include "point.hh"
+%include "rect.hh"
+%include "rendercolor.hh"
+%include "rendertexture.hh"
+%include "renderstyle.hh"
 %include "widget.hh"
 %include "focuswidget.hh"
 %include "focuslabel.hh"
@@ -61,23 +71,16 @@ namespace otk {
 %include "application.hh"
 %include "assassin.hh"
 %include "button.hh"
-%include "color.hh"
-%include "configuration.hh"
+//%include "configuration.hh"
 %include "display.hh"
 %include "font.hh"
-%include "gccache.hh"
-%include "image.hh"
+%include "rendercontrol.hh"
 %include "label.hh"
-%include "point.hh"
 %include "property.hh"
-%include "rect.hh"
 %include "screeninfo.hh"
 %include "strut.hh"
-%include "style.hh"
-%include "texture.hh"
 %include "timer.hh"
 %include "util.hh"
-%include "widget.hh"
 
 // for Mod1Mask etc
 %include "X11/X.h"

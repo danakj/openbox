@@ -70,10 +70,10 @@ public:
   RenderTexture(int screen,
                 bool parent_relative, ReliefType relief, BevelType bevel,
                 bool border, GradientType gradient, bool interlaced,
-                const RenderColor::RGB &color,
-                const RenderColor::RGB &secondary_color,
-                const RenderColor::RGB &border_color,
-                const RenderColor::RGB &interlace_color)
+                const RGB &color,
+                const RGB &secondary_color,
+                const RGB &border_color,
+                const RGB &interlace_color)
     : _screen(screen),
       _parent_relative(parent_relative),
       _relief(relief),

@@ -24,10 +24,8 @@ private:
   int _screen;
   std::string _display_string;
   Size _size;
-#ifdef XINERAMA
   std::vector<Rect> _xinerama_areas;
   bool _xinerama_active;
-#endif
 
 public:
   ScreenInfo(int num);
@@ -39,11 +37,9 @@ public:
   inline int screen() const { return _screen; }
   inline const Size& size() const { return _size; }
   inline const std::string& displayString() const { return _display_string; }
-#ifdef XINERAMA
   inline const std::vector<Rect> &xineramaAreas() const
     { return _xinerama_areas; }
   inline bool isXineramaActive() const { return _xinerama_active; }
-#endif
 };
 
 }

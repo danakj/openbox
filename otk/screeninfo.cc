@@ -80,7 +80,7 @@ ScreenInfo::ScreenInfo(int num) {
 
   _display_string = string("DISPLAY=") + default_string + '.' +
     itostring(static_cast<unsigned long>(_screen));
-  
+
 #if 0 //def    XINERAMA
   _xinerama_active = False;
 
@@ -112,12 +112,16 @@ ScreenInfo::ScreenInfo(int num) {
 
           // if we can't find any xinerama regions, then we act as if it is not
           // active, even though it said it was
-          _xinerama_active = True;
+          _xinerama_active = true;
         }
       }
     }
   }
+#else
+  _xinerama_active = false;
 #endif // XINERAMA
+  if (!_xinerama_active)
+    _xinerama_areas.push_back(Rect(Point(0, 0), _size));
 }
 
 }

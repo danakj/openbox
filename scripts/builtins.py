@@ -65,9 +65,6 @@ def resize(data):
                     data.press_clientwidth() + dx,
                     data.press_clientheight() + dy);
 
-def execute(bin, screen = 0):
-    Openbox_execute(openbox, screen, bin)
-
 def restart(data):
     Openbox_restart(openbox, "")
 
@@ -101,5 +98,12 @@ def unshade(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     OBClient_shade(client, 0)
+    
+#########################################
+### Convenience functions for scripts ###
+#########################################
+
+def execute(bin, screen = 0):
+    Openbox_execute(openbox, screen, bin)
 
 print "Loaded builtins.py"

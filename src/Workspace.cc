@@ -231,9 +231,10 @@ void Workspace::setFocused(const BlackboxWindow *w, bool focused) {
   for (i = 0, it = windowList.begin(); it != end; ++it, ++i)
     if (*it == w)
       break;
-  assert(it != end);
-  
-  clientmenu->setItemSelected(i, focused);
+  // if its == end, then a window thats not in the windowList
+  // got focused, such as a !isNormal() window.
+  if (it != end)
+    clientmenu->setItemSelected(i, focused);
 }
 
 

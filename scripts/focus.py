@@ -90,11 +90,8 @@ def _focused(data):
     global _doing_stacked
     global _cyc_w
 
-    print "FOCUSED " + str(data.client)
-    
     if data.client:
         if not _doing_stacked: # only move the window when we're not cycling
-            print "HI"
             win = data.client.window()
             # move it to the top
             _clients.remove(win)

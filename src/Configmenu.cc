@@ -1,4 +1,5 @@
 // Configmenu.cc for Openbox
+// Copyright (c) 2002 - 2002 Ben Jansens <ben@orodu.net>
 // Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
@@ -184,32 +185,18 @@ void Configmenu::Focusmenu::itemSelected(int button, int index) {
   case 1: // click to focus
     configmenu->screen.setSloppyFocus(false);
     configmenu->screen.setAutoRaise(false);
-
-    if (! configmenu->screen.getOpenbox().focusedWindow())
-      XSetInputFocus(configmenu->screen.getOpenbox().getXDisplay(),
-		     configmenu->screen.getToolbar()->getWindowID(),
-		     RevertToParent, CurrentTime);
-    else
-      XSetInputFocus(configmenu->screen.getOpenbox().getXDisplay(),
-		     configmenu->screen.getOpenbox().
-		     focusedWindow()->getClientWindow(),
-		     RevertToParent, CurrentTime);
-
+    // make windows all grab button1 clicks
     configmenu->screen.reconfigure();
-
     break;
 
   case 2: // sloppy focus
     configmenu->screen.setSloppyFocus(true);
-
+    // make windows stop grabbing button1 clicks
     configmenu->screen.reconfigure();
-
     break;
 
   case 3: // auto raise with sloppy focus
-    bool change = ((configmenu->screen.autoRaise()) ? false : true);
-    configmenu->screen.setAutoRaise(change);
-
+    configmenu->screen.setAutoRaise(!configmenu->screen.autoRaise());
     break;
   }
 

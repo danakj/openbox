@@ -115,14 +115,13 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
     if (w->isTransient() && w->getTransientFor() &&
 	w->getTransientFor()->isVisible()) {
       w->getTransientFor()->setInputFocus();
-    } else if (screen.sloppyFocus()) {
-      screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
     } else {
-      if (_zorder.empty() || !_zorder.front()->setInputFocus()) {
+      if (screen.sloppyFocus() ||               // sloppy focus
+          _zorder.empty() ||                    // click focus but no windows
+          !_zorder.front()->setInputFocus()) {  // tried window, but wont focus
 	screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
-	XSetInputFocus(screen.getOpenbox().getXDisplay(),
-		       screen.getToolbar()->getWindowID(),
-		       RevertToParent, CurrentTime);
+        XSetInputFocus(screen.getOpenbox().getXDisplay(),
+                       PointerRoot, None, CurrentTime);
       }
     }
   }
@@ -319,7 +318,7 @@ void Workspace::setName(char *new_name) {
 void Workspace::shutdown(void) {
   while (!_windows.empty()) {
     _windows[0]->restore();
-    _windows.erase(_windows.begin());
+    delete _windows[0];
   }
 }
 

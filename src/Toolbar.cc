@@ -971,9 +971,7 @@ void Toolbar::edit() {
     return;
 
   XSetInputFocus(display, frame.workspace_label,
-                 ((screen.sloppyFocus()) ? RevertToPointerRoot :
-                  RevertToParent),
-                 CurrentTime);
+                 RevertToPointerRoot, CurrentTime);
   XClearWindow(display, frame.workspace_label);
 
   openbox.setNoFocus(True);

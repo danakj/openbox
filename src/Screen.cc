@@ -236,8 +236,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
 
   workspaceNames = new LinkedList<char>;
   workspacesList = new LinkedList<Workspace>;
-  rootmenuList = new LinkedList<Rootmenu>;
-  netizenList = new LinkedList<Netizen>;
   iconList = new LinkedList<OpenboxWindow>;
 
   image_control =
@@ -484,9 +482,8 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     }
   }
 
-  if (! resource.sloppy_focus)
-    XSetInputFocus(getBaseDisplay().getXDisplay(), toolbar->getWindowID(),
-		   RevertToParent, CurrentTime);
+  XSetInputFocus(getBaseDisplay().getXDisplay(),
+                 PointerRoot, None, CurrentTime);
 
   XFree(children);
   XFlush(getBaseDisplay().getXDisplay());
@@ -507,14 +504,14 @@ BScreen::~BScreen(void) {
   while (workspacesList->count())
     delete workspacesList->remove(0);
 
-  while (rootmenuList->count())
-    rootmenuList->remove(0);
+  while (!rootmenuList.empty())
+    rootmenuList.erase(rootmenuList.begin());
 
   while (iconList->count())
     delete iconList->remove(0);
 
-  while (netizenList->count())
-    delete netizenList->remove(0);
+  while (!netizenList.empty())
+    netizenList.erase(netizenList.begin());
 
 #ifdef    HAVE_STRFTIME
   if (resource.strftime_format)
@@ -535,9 +532,7 @@ BScreen::~BScreen(void) {
 
   delete workspacesList;
   delete workspaceNames;
-  delete rootmenuList;
   delete iconList;
-  delete netizenList;
 
   if (resource.wstyle.fontset)
     XFreeFontSet(getBaseDisplay().getXDisplay(), resource.wstyle.fontset);
@@ -2012,7 +2007,7 @@ void BScreen::changeWorkspaceID(int id) {
 
 
 void BScreen::addNetizen(Netizen *n) {
-  netizenList->insert(n);
+  netizenList.push_back(n);
 
   n->sendWorkspaceCount();
   n->sendCurrentWorkspace();
@@ -2031,80 +2026,79 @@ void BScreen::addNetizen(Netizen *n) {
 
 
 void BScreen::removeNetizen(Window w) {
-  LinkedListIterator<Netizen> it(netizenList);
+  netList::iterator it;
   int i = 0;
 
-  for (Netizen *n = it.current(); n; it++, i++, n = it.current())
-    if (n->getWindowID() == w) {
-      Netizen *tmp = netizenList->remove(i);
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    if ((*it)->getWindowID() == w) {
+      Netizen *tmp = *it;
+      netizenList.erase(it);
       delete tmp;
-
       break;
     }
 }
 
 
 void BScreen::updateNetizenCurrentWorkspace(void) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendCurrentWorkspace();
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendCurrentWorkspace();
 }
 
 
 void BScreen::updateNetizenWorkspaceCount(void) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWorkspaceCount();
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWorkspaceCount();
 }
 
 
 void BScreen::updateNetizenWindowFocus(void) {
   Window f = ((openbox.focusedWindow()) ?
               openbox.focusedWindow()->getClientWindow() : None);
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWindowFocus(f);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWindowFocus(f);
 }
 
-
 void BScreen::updateNetizenWindowAdd(Window w, unsigned long p) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWindowAdd(w, p);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWindowAdd(w, p);
 }
 
 
 void BScreen::updateNetizenWindowDel(Window w) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWindowDel(w);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWindowDel(w);
 }
 
 
 void BScreen::updateNetizenWindowRaise(Window w) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWindowRaise(w);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWindowRaise(w);
 }
 
 
 void BScreen::updateNetizenWindowLower(Window w) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendWindowLower(w);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendWindowLower(w);
 }
 
 
 void BScreen::updateNetizenConfigNotify(XEvent *e) {
-  LinkedListIterator<Netizen> it(netizenList);
-  for (Netizen *n = it.current(); n; it++, n = it.current())
-    n->sendConfigNotify(e);
+  netList::iterator it;
+  for (it = netizenList.begin(); it != netizenList.end(); ++it)
+    (*it)->sendConfigNotify(e);
 }
 
 
 void BScreen::raiseWindows(Window *workspace_stack, int num) {
   Window *session_stack = new
-    Window[(num + workspacesList->count() + rootmenuList->count() + 13)];
+    Window[(num + workspacesList->count() + rootmenuList.size() + 13)];
   int i = 0, k = num;
 
   XRaiseWindow(getBaseDisplay().getXDisplay(), iconmenu->getWindowID());
@@ -2130,9 +2124,9 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
     toolbar->getMenu()->getPlacementmenu()->getWindowID();
   *(session_stack + i++) = toolbar->getMenu()->getWindowID();
 
-  LinkedListIterator<Rootmenu> rit(rootmenuList);
-  for (Rootmenu *tmp = rit.current(); tmp; rit++, tmp = rit.current())
-    *(session_stack + i++) = tmp->getWindowID();
+  menuList::iterator rit;
+  for (rit = rootmenuList.begin(); rit != rootmenuList.end(); ++rit)
+    *(session_stack + i++) = (*rit)->getWindowID();
   *(session_stack + i++) = rootmenu->getWindowID();
 
   if (toolbar->onTop())
@@ -2276,8 +2270,8 @@ void BScreen::raiseFocus(void) {
 
 void BScreen::InitMenu(void) {
   if (rootmenu) {
-    while (rootmenuList->count())
-      rootmenuList->remove(0);
+    while (!rootmenuList.empty())
+      rootmenuList.erase(rootmenuList.begin());
 
     while (rootmenu->getCount())
       rootmenu->remove(0);
@@ -2580,7 +2574,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 	    parseMenuFile(file, submenu);
 	    submenu->update();
 	    menu->insert(label, submenu);
-	    rootmenuList->insert(submenu);
+	    rootmenuList.push_back(submenu);
 	  }
 
 	  break;
@@ -2706,7 +2700,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                 if (newmenu) {
                   stylesmenu->setLabel(label);
                   menu->insert(label, stylesmenu);
-                  rootmenuList->insert(stylesmenu);
+                  rootmenuList.push_back(stylesmenu);
                 }
 
                 openbox.setMenuFilename(stylesdir);

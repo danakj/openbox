@@ -53,6 +53,10 @@
 #include "Image.h"
 #include "Resource.h"
 
+#include <list>
+typedef std::list<Rootmenu *> menuList;
+typedef std::list<Netizen *> netList;
+
 // forward declaration
 class BScreen;
 
@@ -109,8 +113,8 @@ private:
   Iconmenu *iconmenu;
   Rootmenu *rootmenu;
 
-  LinkedList<Rootmenu> *rootmenuList;
-  LinkedList<Netizen> *netizenList;
+  menuList rootmenuList;
+  netList netizenList;
   LinkedList<OpenboxWindow> *iconList;
 
 #ifdef    SLIT

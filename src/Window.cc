@@ -1388,7 +1388,7 @@ Bool OpenboxWindow::setInputFocus(void) {
   } else if (! flags.focused) {
     if (focus_mode == F_LocallyActive || focus_mode == F_Passive)
       XSetInputFocus(display, client.window,
-		     RevertToPointerRoot, CurrentTime);
+                      RevertToPointerRoot, CurrentTime);
     else
       XSetInputFocus(display, screen->getRootWindow(),
 		     RevertToNone, CurrentTime);

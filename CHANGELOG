@@ -1,6 +1,7 @@
 :
 	* Closed bug #921 (focus rectangle stays on the screen after modifier
 	 release)
+	* Closed bug #927 (disappearing windows, crash with I-merry theme)
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

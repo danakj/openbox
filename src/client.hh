@@ -295,9 +295,6 @@ private:
   //! The window uses shape extension to be non-rectangular?
   bool _shaped;
 
-  //! If the window has a modal child window, then this will point to it
-  Client *_modal_child;
-
   //! The window is modal, so it must be processed before any windows it is
   //! related to can be focused
   bool _modal;
@@ -384,11 +381,6 @@ private:
     by sending it to any other valid desktop.
   */
   void setDesktop(long desktop);
-  //! Set whether the window is modal or not
-  /*!
-    This adjusts references in parents etc to match.
-  */
-  void setModal(bool modal);
   
   //! Calculates the stacking layer for the client window
   void calcLayer();
@@ -430,6 +422,10 @@ private:
                  unshaded.
   */
   void shade(bool shade);
+
+  //! Recursively searches the client 'tree' for a modal client, always skips
+  //! the topmost node (the window you're starting with).
+  Client *Client::searchModalTree(Client *node, Client *skip);
 
   //! Fires the urgent callbacks which lets the user do what they want with
   //! urgent windows
@@ -481,9 +477,6 @@ private:
   */
   void internal_resize(Corner anchor, int w, int h,
                        bool user = true, int x = INT_MIN, int y = INT_MIN);
-
-  //! Attempts to find and return a modal child of this window, recursively.
-  Client *findModalChild(Client *skip = 0) const;
 
   //! Removes or reapplies the client's border to its window
   /*!
@@ -587,9 +580,6 @@ BB    @param window The window id that the Client class should handle
   //! Return the client this window is transient for
   inline Client *transientFor() const { return _transient_for; }
 
-  //! Returns the window which is a modal child of this window
-  inline Client *modalChild() const { return _modal_child; }
-  
   //! Returns if the window is modal
   /*!
     If the window is modal, then no other windows that it is related to can get
@@ -670,6 +660,12 @@ BB    @param window The window id that the Client class should handle
   */
   void disableDecorations(DecorationFlags flags);
   
+  //! Return a modal child of the client window
+  /*!
+    @return A modal child of the client window, or 0 if none was found.
+  */
+  Client *findModalChild();
+
   //! Attempt to focus the client window
   bool focus();
 

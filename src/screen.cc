@@ -595,7 +595,7 @@ void Screen::unmanageWindow(Client *client)
   updateStrut();
 
   // unset modal before dropping our focus
-  client->setModal(false);
+  client->_modal = false;
   
   // unfocus the client (calls the focus callbacks)
   client->unfocus();
@@ -652,6 +652,10 @@ void Screen::raiseWindow(Client *client)
 
   assert(!_stacking.empty()); // this would be bad
 
+  Client *m = client->findModalChild();
+  // if we have a modal child, raise it instead, we'll go along tho later
+  if (m) raiseWindow(m);
+  
   // remove the client before looking so we can't run into ourselves
   _stacking.remove(client);
   
@@ -659,7 +663,10 @@ void Screen::raiseWindow(Client *client)
   const ClientList::iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
-  for (; it != end && (*it)->layer() > client->layer(); ++it);
+//  for (;it != end, ++it) {
+//    if ((*it)->layer() <= client->layer() && m != *it) break;
+//  }
+  for (; it != end && ((*it)->layer() > client->layer() || m == *it); ++it);
 
   /*
     if our new position is the top, we want to stack under the _focuswindow
@@ -673,11 +680,7 @@ void Screen::raiseWindow(Client *client)
 
   XRestackWindows(**otk::display, wins, 2);
 
-  // if the window has a modal child, then raise it after us to put it on top
-  if (client->modalChild())
-    raiseWindow(client->modalChild());
-  else
-    changeStackingList(); // no need to do this twice!
+  changeStackingList(); 
 }
 
 void Screen::changeDesktop(long desktop)

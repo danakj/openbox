@@ -44,7 +44,6 @@ Client::Client(int screen, Window window)
   _urgent = false;
   _positioned = false;
   _disabled_decorations = 0;
-  _modal_child = 0;
   _group = None;
   _desktop = 0;
   
@@ -670,18 +669,11 @@ void Client::updateTransientFor()
 
   // if anything has changed...
   if (c != _transient_for) {
-    bool m = _modal;
-    if (_modal)
-      setModal(false);
-    
     if (_transient_for)
       _transient_for->_transients.remove(this); // remove from old parent
     _transient_for = c;
     if (_transient_for)
       _transient_for->_transients.push_back(this); // add to new parent
-
-    if (m)
-      setModal(true);
   }
 }
 
@@ -794,65 +786,12 @@ void Client::setDesktop(long target)
 }
 
 
-Client *Client::findModalChild(Client *skip) const
-{
-  Client *ret = 0;
-  
-  // find a modal child recursively and try focus it
-  List::const_iterator it, end = _transients.end();
-  for (it = _transients.begin(); it != end; ++it)
-    if ((*it)->_modal && *it != skip)
-      return *it; // got one
-  // none of our direct children are modal, let them try check
-  for (it = _transients.begin(); it != end; ++it)
-    if ((ret = (*it)->findModalChild()))
-      return ret; // got one
-  return ret;
-}
-
-
-void Client::setModal(bool modal)
-{
-  if (modal == _modal) return;
-  
-  if (modal) {
-    Client *c = this;
-    while (c->_transient_for) {
-      c = c->_transient_for;
-      if (c == this) break; // circular?
-      if (c->_modal_child) break; // already has a modal child
-      c->_modal_child = this;
-    }
-  } else {
-    // try find a replacement modal dialog
-    Client *replacement = 0;
-    
-    Client *c = this;
-    while (c->_transient_for) // go up the tree
-      c = c->_transient_for;
-    replacement = c->findModalChild(this); // find a modal child, skipping this
-    assert(replacement != this);
-
-    c = this;
-    while (c->_transient_for) {
-      c = c->_transient_for;
-      if (c == this) break; // circular?
-      if (c->_modal_child != this) break; // has a different modal child
-      if (c == replacement) break; // found the replacement itself
-      c->_modal_child = replacement;
-    }
-  }
-  _modal = modal;
-}
-
-
 void Client::setState(StateAction action, long data1, long data2)
 {
   bool shadestate = _shaded;
   bool fsstate = _fullscreen;
   bool maxh = _max_horz;
   bool maxv = _max_vert;
-  bool modal = _modal;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -888,7 +827,7 @@ void Client::setState(StateAction action, long data1, long data2)
     if (action == State_Add) {
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (_modal) continue;
-        modal = true;
+        _modal = true;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         maxv = true;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
@@ -913,7 +852,7 @@ void Client::setState(StateAction action, long data1, long data2)
     } else { // action == State_Remove
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (!_modal) continue;
-        modal = false;
+        _modal = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         maxv = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
@@ -950,8 +889,6 @@ void Client::setState(StateAction action, long data1, long data2)
         maximize(maxv, 2, true);
     }
   }
-  if (modal != _modal)
-    setModal(modal);
   // change fullscreen state before shading, as it will affect if the window
   // can shade or not
   if (fsstate != _fullscreen)
@@ -1382,11 +1319,6 @@ void Client::applyStartupState()
 {
   // these are in a carefully crafted order..
 
-  if (_modal) {
-    _modal = false;
-    setModal(true);
-  }
-  
   if (_iconic) {
     _iconic = false;
     setDesktop(ICONIC_DESKTOP);
@@ -1644,11 +1576,38 @@ void Client::installColormap(bool install) const
 }
 
 
+// recursively searches the client 'tree' for a modal client, always skips the
+// topmost node (the window you're starting with)
+Client *Client::searchModalTree(Client *node, Client *skip)
+{
+  List::const_iterator it, end = node->_transients.end();
+  Client *ret;
+  
+  for (it = node->_transients.begin(); it != end; ++it) {
+    if (*it == skip) continue; // circular?
+    printf("recursing\n");
+    if ((ret = searchModalTree(*it, skip))) return ret; // got one
+    printf("trying this window\n");
+    if ((*it)->_modal) {
+          printf("found it\n");
+          return *it; // got one
+    }
+  }
+  printf("found none\n");
+  return 0;
+}
+
+Client *Client::findModalChild()
+{
+  return searchModalTree(this, this);
+}
+
+
 bool Client::focus()
 {
   // if we have a modal child, then focus it, not us
-  if (_modal_child)
-    return _modal_child->focus();
+  Client *c = findModalChild();
+  if (c) return c->focus();
 
   // won't try focus if the client doesn't want it, or if the window isn't
   // visible on the screen

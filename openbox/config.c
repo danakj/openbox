@@ -41,6 +41,7 @@ GSList *config_desktops_names;
 gint    config_screen_firstdesk;
 
 gboolean config_resize_redraw;
+gint     config_resize_popup_show;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -292,6 +293,14 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     
     if ((n = parse_find_node("drawContents", node)))
         config_resize_redraw = parse_bool(doc, n);
+    if ((n = parse_find_node("popupShow", node))) {
+        if (parse_contains("Always", doc, n))
+            config_resize_popup_show = 2;
+        else if (parse_contains("Never", doc, n))
+            config_resize_popup_show = 0;
+        else if (parse_contains("Nonpixel", doc, n))
+            config_resize_popup_show = 1;
+    }
 }
 
 static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -531,6 +540,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
+    config_resize_popup_show = 1;
 
     parse_register(i, "resize", parse_resize, NULL);
 

@@ -14,7 +14,7 @@ private:
   //! The x value
   int _x;
   //! The y value
- int _y;
+  int _y;
 
 public:
   //! Constructs a new Point with 0,0 values
@@ -25,12 +25,12 @@ public:
   //! Changes the x value to the new value specified
   void setX(int x) { _x = x; }
   //! Returns the x value
-  void x() const { return _x; }
+  int x() const { return _x; }
 
   //! Changes the y value to the new value specified
   void setY(int x) { _x = x; }
   //! Returns the y value
-  void y() const { return _x; }
+  int y() const { return _x; }
 };
 
 }

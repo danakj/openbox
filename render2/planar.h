@@ -5,6 +5,7 @@
 
 struct RrPlanarSurface {
     enum RrSurfaceColorType colortype;
+    enum RrBevelType bevel;
 
     struct RrColor primary;
     struct RrColor secondary;

@@ -172,8 +172,17 @@ enum RrSurfaceColorType {
     RR_PLANAR_PYRAMID
 };
 
+enum RrBevelType {
+    RR_SUNKEN_OUTER = -2,
+    RR_SUNKEN_INNER = -1,
+    RR_BEVEL_NONE   =  0,
+    RR_RAISED_INNER =  1,
+    RR_RAISED_OUTER =  2
+};
+
 void RrPlanarSet(struct RrSurface *sur,
                  enum RrSurfaceColorType type,
+                 enum RrBevelType bevel,
                  struct RrColor *primary,
                  struct RrColor *secondary);
 

@@ -10,10 +10,12 @@
 
 void RrPlanarSet(struct RrSurface *sur,
                  enum RrSurfaceColorType type,
+                 enum RrBevelType bevel,
                  struct RrColor *primary,
                  struct RrColor *secondary)
 {
     sur->data.planar.colortype = type;
+    sur->data.planar.bevel = bevel;
     sur->data.planar.primary = *primary;
     sur->data.planar.secondary = *secondary;
 }
@@ -293,6 +295,8 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
         struct RrTextureText *t;
         glEnable(GL_TEXTURE_2D);
         switch (sur->texture[i].type) {
+        case RR_TEXTURE_NONE:
+            break;
         case RR_TEXTURE_TEXT:
             t = &sur->texture[i].data.text;
             printf("text %s\n", t->string);
@@ -303,8 +307,7 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
             }
             GlftRenderString(t->font->font, t->string, 
                              strlen(t->string), 0, 0);
-
-        break;
+            break;
         }
     }
     glDisable(GL_TEXTURE_2D);

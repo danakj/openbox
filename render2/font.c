@@ -1,4 +1,5 @@
 #include "render.h"
+#include "instance.h"
 #include "font.h"
 #include <stdlib.h>
 
@@ -8,14 +9,14 @@ struct RrFont *RrFontOpen(struct RrInstance *inst, const char *fontstring)
 
     font = malloc(sizeof(struct RrFont));
     font->inst = inst;
-/*XXX    font->font = GlftFontOpen(fontstring);*/
+    font->font = GlftFontOpen(RrDisplay(inst), RrScreen(inst), fontstring);
     return font;
 }
 
 void RrFontClose(struct RrFont *font)
 {
     if (font) {
-/*XXX        GlftFontClose(font->font);*/
+        GlftFontClose(font->font);
         free(font);
     }
 }

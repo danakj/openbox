@@ -26,6 +26,9 @@ Changelog for Openbox:
    as iconify, can't end up being iconified anyhow.
    (Fixes the "Desktop Access" feature in KDE.)
 
+ * Fix window gravity handling for an application
+   resizing (ConfigureRequest event for resize only).   (Ben Jansens)
+
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)
    which modifier combo Openbox uses for mouse

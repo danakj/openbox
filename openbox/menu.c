@@ -154,6 +154,7 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     Menu *self;
 
     self = g_new0(Menu, 1);
+    self->obwin.type = Window_Menu;
     self->label = g_strdup(label);
     self->name = g_strdup(name);
     self->parent = parent;
@@ -350,7 +351,9 @@ void menu_control_show(Menu *self, int x, int y, Client *client) {
 	      MIN(y, screen_physical_size.height - self->size.height));
 
     if (!self->shown) {
-	stacking_raise_internal(self->frame);
+        /* XXX gotta add to the stacking list first!
+           stacking_raise(MENU_AS_WINDOW(self));
+        */
 	XMapWindow(ob_display, self->frame);
 	self->shown = TRUE;
     } else if (self->shown && self->open_submenu) {

@@ -1,37 +1,12 @@
 #include "slit.h"
 #include "screen.h"
 #include "grab.h"
-#include "timer.h"
 #include "openbox.h"
 #include "render/theme.h"
-#include "render/render.h"
 
 #define SLIT_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
                          EnterWindowMask | LeaveWindowMask)
 #define SLITAPP_EVENT_MASK (StructureNotifyMask)
-
-struct Slit {
-    Window frame;
-
-    /* user-requested position stuff */
-    SlitPosition pos;
-    int gravity;
-    int user_x, user_y;
-
-    /* actual position (when not auto-hidden) */
-    int x, y;
-    int w, h;
-
-    gboolean horz;
-    gboolean hide;
-    gboolean hidden;
-
-    Appearance *a_frame;
-
-    Timer *hide_timer;
-
-    GList *slit_apps;
-};
 
 GHashTable *slit_map = NULL;
 GHashTable *slit_app_map = NULL;
@@ -53,12 +28,14 @@ void slit_startup()
 
     nslits = 1;
     slit = g_new0(struct Slit, nslits);
+    slit->obwin.type = Window_Slit;
 
     for (i = 0; i < nslits; ++i) {
         slit[i].horz = FALSE;
         slit[i].hide = FALSE;
         slit[i].hidden = TRUE;
         slit[i].pos = SlitPos_TopRight;
+        slit[i].layer = Layer_Top;
 
         attrib.event_mask = SLIT_EVENT_MASK;
         attrib.override_redirect = True;
@@ -71,6 +48,8 @@ void slit_startup()
         XSetWindowBorderWidth(ob_display, slit[i].frame, theme_bwidth);
 
         g_hash_table_insert(slit_map, &slit[i].frame, &slit[i]);
+        stacking_add(&slit[i]);
+        stacking_raise(SLIT_AS_WINDOW(&slit[i]));
     }
 }
 
@@ -82,6 +61,7 @@ void slit_shutdown()
         XDestroyWindow(ob_display, slit[i].frame);
         appearance_free(slit[i].a_frame);
         g_hash_table_remove(slit_map, &slit[i].frame);
+        stacking_remove(&slit[i]);
     }
     g_hash_table_destroy(slit_app_map);
     g_hash_table_destroy(slit_map);

@@ -40,8 +40,7 @@ void focus_startup()
 				 -100, -100, 1, 1, 0,
                                  CopyFromParent, InputOutput, CopyFromParent,
                                  CWOverrideRedirect, &attrib);
-    XMapWindow(ob_display, focus_backup);
-    stacking_raise_internal(focus_backup);
+    XMapRaised(ob_display, focus_backup);
 
     /* start with nothing focused */
     focus_set_client(NULL);

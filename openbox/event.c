@@ -916,6 +916,8 @@ static void event_handle_menu(Menu *menu, XEvent *e)
 static void event_handle_slit(Slit *s, XEvent *e)
 {
     switch (e->type) {
+    case ButtonPress:
+        stacking_raise(SLIT_AS_WINDOW(s));
     case EnterNotify:
         slit_hide(s, FALSE);
         break;

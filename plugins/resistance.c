@@ -65,6 +65,8 @@ static void resist_move(Client *c, int *x, int *y)
             Client *target;
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
+            if (!WINDOW_IS_CLIENT(it->data))
+                continue;
             target = it->data;
             /* don't snap to self or non-visibles */
             if (!target->frame->visible || target == c) continue; 

@@ -222,14 +222,14 @@ void action_focusraise(union ActionData *data)
 {
     if (data->client.c) {
         client_focus(data->client.c);
-        stacking_raise(data->client.c);
+        stacking_raise(CLIENT_AS_WINDOW(data->client.c));
     }
 }
 
 void action_raise(union ActionData *data)
 {
     if (data->client.c)
-        stacking_raise(data->client.c);
+        stacking_raise(CLIENT_AS_WINDOW(data->client.c));
 }
 
 void action_unshaderaise(union ActionData *data)
@@ -238,7 +238,7 @@ void action_unshaderaise(union ActionData *data)
         if (data->client.c->shaded)
             client_shade(data->client.c, FALSE);
         else
-            stacking_raise(data->client.c);
+            stacking_raise(CLIENT_AS_WINDOW(data->client.c));
     }
 }
 
@@ -246,7 +246,7 @@ void action_shadelower(union ActionData *data)
 {
     if (data->client.c) {
         if (data->client.c->shaded)
-            stacking_lower(data->client.c);
+            stacking_lower(CLIENT_AS_WINDOW(data->client.c));
         else
             client_shade(data->client.c, TRUE);
     }
@@ -255,7 +255,7 @@ void action_shadelower(union ActionData *data)
 void action_lower(union ActionData *data)
 {
     if (data->client.c)
-        stacking_lower(data->client.c);
+        stacking_lower(CLIENT_AS_WINDOW(data->client.c));
 }
 
 void action_close(union ActionData *data)

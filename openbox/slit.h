@@ -1,23 +1,14 @@
 #ifndef __slit_h
 #define __slit_h
 
+#include "timer.h"
+#include "render/render.h"
+#include "window.h"
+#include "stacking.h"
+
 #include <glib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-
-typedef struct Slit Slit;
-
-typedef struct SlitApp {
-    int ignore_unmaps;
-
-    Slit *slit;
-    Window icon_win;
-    Window win;
-    int x;
-    int y;
-    int w;
-    int h;
-} SlitApp;
 
 typedef enum {
     SlitPos_Floating,
@@ -30,6 +21,44 @@ typedef enum {
     SlitPos_BottomLeft,
     SlitPos_Left
 } SlitPosition;
+
+typedef struct Slit {
+    ObWindow obwin;
+
+    Window frame;
+    StackLayer layer;
+
+    /* user-requested position stuff */
+    SlitPosition pos;
+    int gravity;
+    int user_x, user_y;
+
+    /* actual position (when not auto-hidden) */
+    int x, y;
+    int w, h;
+
+    gboolean horz;
+    gboolean hide;
+    gboolean hidden;
+
+    Appearance *a_frame;
+
+    Timer *hide_timer;
+
+    GList *slit_apps;
+} Slit;
+
+typedef struct SlitApp {
+    int ignore_unmaps;
+
+    Slit *slit;
+    Window icon_win;
+    Window win;
+    int x;
+    int y;
+    int w;
+    int h;
+} SlitApp;
 
 extern GHashTable *slit_map;
 extern GHashTable *slit_app_map;

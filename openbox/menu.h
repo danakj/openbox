@@ -18,6 +18,8 @@ typedef void(*menu_controller_mouseover)(struct MenuEntry *self,
                                          gboolean enter);
 
 typedef struct Menu {
+    ObWindow obwin;
+
     char *label;
     char *name;
     

@@ -158,7 +158,7 @@ void client_manage_all()
 
         w = startup_stack_order[i-1];
         c = g_hash_table_lookup(client_map, &w);
-        if (c) stacking_lower(c);
+        if (c) stacking_lower(CLIENT_AS_WINDOW(c));
     }
     g_free(startup_stack_order);
     startup_stack_order = NULL;
@@ -222,6 +222,7 @@ void client_manage(Window window)
     /* create the Client struct, and populate it from the hints on the
        window */
     self = g_new(Client, 1);
+    self->obwin.type = Window_Client;
     self->window = window;
     client_get_all(self);
 
@@ -242,14 +243,14 @@ void client_manage(Window window)
     grab_server(FALSE);
      
     client_list = g_list_append(client_list, self);
-    stacking_list = g_list_append(stacking_list, self);
+    stacking_add(self);
     g_assert(!g_hash_table_lookup(client_map, &self->window));
     g_hash_table_insert(client_map, &self->window, self);
 
     /* update the focus lists */
     focus_order_add_new(self);
 
-    stacking_raise(self);
+    stacking_raise(CLIENT_AS_WINDOW(self));
 
     screen_update_struts();
 
@@ -336,7 +337,7 @@ void client_unmanage(Client *self)
     frame_hide(self->frame);
 
     client_list = g_list_remove(client_list, self);
-    stacking_list = g_list_remove(stacking_list, self);
+    stacking_remove(self);
     g_hash_table_remove(client_map, &self->window);
 
     /* update the focus lists */
@@ -1455,8 +1456,7 @@ static StackLayer calc_layer(Client *self)
 {
     StackLayer l;
 
-    if (self->iconic) l = Layer_Icon;
-    else if (self->fullscreen) l = Layer_Fullscreen;
+    if (self->fullscreen) l = Layer_Fullscreen;
     else if (self->type == Type_Desktop) l = Layer_Desktop;
     else if (self->type == Type_Dock) {
         if (!self->below) l = Layer_Top;
@@ -1484,7 +1484,7 @@ static void calc_recursive(Client *self, Client *orig, StackLayer l,
 
     if (!raised && l != old)
 	if (orig->frame) /* only restack if the original window is managed */
-	    stacking_raise(self);
+	    stacking_raise(CLIENT_AS_WINDOW(self));
 }
 
 void client_calc_layer(Client *self)
@@ -2028,7 +2028,7 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
         client_showhide(self);
     /* raise if it was not already on the desktop */
     if (old != DESKTOP_ALL)
-        stacking_raise(self);
+        stacking_raise(CLIENT_AS_WINDOW(self));
     screen_update_struts();
 
     /* add to the new desktop(s) */
@@ -2310,7 +2310,7 @@ void client_activate(Client *self)
     if (self->shaded)
         client_shade(self, FALSE);
     client_focus(self);
-    stacking_raise(self);
+    stacking_raise(CLIENT_AS_WINDOW(self));
 }
 
 gboolean client_focused(Client *self)

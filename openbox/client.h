@@ -110,6 +110,8 @@ typedef enum {
 
 
 typedef struct Client {
+    ObWindow obwin;
+
     Window  window;
 
     /*! The window's decorations. NULL while the window is being managed! */

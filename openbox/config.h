@@ -13,6 +13,8 @@ extern gboolean config_focus_last;
 extern gboolean config_focus_last_on_desktop;
 /*! Show a popup dialog while cycling focus */
 extern gboolean config_focus_popup;
+/*! The number of slits to create */
+extern int config_slit_number;
 
 /* The name of the theme */
 char *config_theme;

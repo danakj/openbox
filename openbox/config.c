@@ -8,10 +8,6 @@ static void config_free_entry(ConfigEntry *entry);
 static void config_set_entry(char *name, ConfigValueType type,
                              ConfigValue value);
 static void config_def_free(ConfigDefEntry *entry);
-static void print_config(GQuark q, gpointer data, gpointer fonk){
-    ConfigDefEntry *e = (ConfigDefEntry *)data;
-    g_message("config: %s %d", e->name, e->hasList);
-}
 
 static GData *config = NULL;
 static GData *config_def = NULL;
@@ -22,6 +18,8 @@ void cparse_go(char *filename, FILE *);
 
 void config_startup()
 {
+    ConfigValue val;
+
     /* set up options exported by the kernel */
     config_def_set(config_def_new("engine", Config_String,
                                   "Engine",
@@ -48,7 +46,18 @@ void config_startup()
                                   "The ordering of the elements in the "
                                   "window titlebars."));
 
-    /*g_datalist_foreach(&config_def, print_config, NULL);*/
+    config_def_set(config_def_new("focusNew", Config_Bool,
+                                  "Focus New Windows",
+                                  "Focus windows when they first appear."));
+    val.bool = TRUE;
+    config_set("focusNew", Config_Bool, val);
+
+    config_def_set(config_def_new("focusFollowsMouse", Config_Bool,
+                                  "Focus Follows Mouse",
+                                  "Focus windows when the mouse pointer "
+                                  "enters them."));
+    val.bool = TRUE;
+    config_set("focusFollowsMouse", Config_Bool, val);
 }
 
 void config_shutdown()
@@ -90,7 +99,6 @@ gboolean config_set(char *name, ConfigValueType type, ConfigValue value)
 
     name = g_ascii_strdown(name, -1);
 
-    /*g_datalist_foreach(&config_def, print_config, NULL);*/
     def = g_datalist_get_data(&config_def, name);
 
     if (def == NULL) {

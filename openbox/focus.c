@@ -131,7 +131,6 @@ void focus_fallback(gboolean switching_desks)
 
     if (!under) {
         for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
-            g_message("fallback trying 0x%lx", ((Client*)it->data)->window);
             if (it->data != focus_client && client_normal(it->data)) {
                 /* if we're switching desktops, and we get the already focused
                    window, then we wont get a FocusIn for it, so just restore

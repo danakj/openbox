@@ -56,7 +56,7 @@ Frame *frame_new()
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
 
-    self->framedecors = 5;
+    self->framedecors = 2;
     self->framedecor = g_new(FrameDecor, self->framedecors);
     fd = &self->framedecor[0];
     fd->obwin.type = Window_Decoration;
@@ -65,7 +65,7 @@ Frame *frame_new()
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Top;
-    RECT_SET(fd->area, 0, 0, 120, 20);
+    RECT_SET(fd->area, 0, 0, 100, 20);
     fd->type = Decor_Titlebar;
     fd->context = Context_Titlebar;
     fd->sizetypex = Decor_Relative;
@@ -75,53 +75,11 @@ Frame *frame_new()
     fd = &self->framedecor[1];
     fd->obwin.type = Window_Decoration;
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
-    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
-    fd->window = RrSurfaceWindow(fd->surface);
-    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
-    fd->anchor = Decor_Right;
-    RECT_SET(fd->area, 0, 0, 5, 100);
-    fd->type = Decor_Titlebar;
-    fd->context = Context_Titlebar;
-    fd->sizetypex = Decor_Absolute;
-    fd->sizetypey = Decor_Relative;
-    fd->frame = self;
-
-    fd = &self->framedecor[2];
-    fd->obwin.type = Window_Decoration;
-    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
-    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
-    fd->window = RrSurfaceWindow(fd->surface);
-    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
-    fd->anchor = Decor_BottomLeft;
-    RECT_SET(fd->area, 0, 0, 30, 30);
-    fd->type = Decor_BottomLeft;
-    fd->context = Context_BLCorner;
-    fd->sizetypex = Decor_Absolute;
-    fd->sizetypey = Decor_Absolute;
-    fd->frame = self;
-
-    fd = &self->framedecor[3];
-    fd->obwin.type = Window_Decoration;
-    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
-    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
-    fd->window = RrSurfaceWindow(fd->surface);
-    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
-    fd->anchor = Decor_BottomRight;
-    RECT_SET(fd->area, 0, 0, 30, 30);
-    fd->type = Decor_BottomRight;
-    fd->context = Context_BRCorner;
-    fd->sizetypex = Decor_Absolute;
-    fd->sizetypey = Decor_Absolute;
-    fd->frame = self;
-
-    fd = &self->framedecor[4];
-    fd->obwin.type = Window_Decoration;
-    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &pri, &sec);
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Bottom;
-    RECT_SET(fd->area, 0, 20, 100, 10);
+    RECT_SET(fd->area, 0, 0, 100, 10);
     fd->type = Decor_Titlebar;
     fd->context = Context_Titlebar;
     fd->sizetypex = Decor_Relative;

@@ -64,7 +64,7 @@ typedef vector<Rect> rectList;
 
 Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
 
-  cascade_x = cascade_y = 32;
+  cascade_x = cascade_y = 0;
 
   id = i;
 
@@ -93,7 +93,7 @@ Workspace::~Workspace(void) {
 const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   if (! w) return -1;
 
-  if (place) placeWindow(w);
+  if (place) placeWindow(*w);
 
   w->setWorkspace(id);
   w->setWindowNumber(windowList->count());
@@ -566,24 +566,29 @@ Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
 }
 
 
-Point *const Workspace::cascadePlacement(const OpenboxWindow *const win){
-  if (((unsigned) cascade_x > (screen.size().w() / 2)) ||
-      ((unsigned) cascade_y > (screen.size().h() / 2)))
-    cascade_x = cascade_y = 32;
+Point *const Workspace::cascadePlacement(const OpenboxWindow &win,
+                                         const Rect &space) {
+  if ((cascade_x + win.area().w() + screen.getBorderWidth() * 2 >
+       (space.x() + space.w())) ||
+      (cascade_y + win.area().h() + screen.getBorderWidth() * 2 >
+       (space.y() + space.h())))
+    cascade_x = cascade_y = 0;
+  if (cascade_x < space.x() || cascade_y < space.y()) {
+    cascade_x = space.x();
+    cascade_y = space.y();
+  }
 
-  cascade_x += win->getTitleHeight();
-  cascade_y += win->getTitleHeight();
-
-  return new Point(cascade_x, cascade_y);
+  Point *p = new Point(cascade_x, cascade_y);
+  cascade_x += win.getTitleHeight();
+  cascade_y += win.getTitleHeight();
+  return p;
 }
 
 
-void Workspace::placeWindow(OpenboxWindow *win) {
-  ASSERT(win != NULL);
-
+void Workspace::placeWindow(OpenboxWindow &win) {
   Rect space = screen.availableArea();
-  const Size window_size(win->area().w()+screen.getBorderWidth() * 4,
-                         win->area().h()+screen.getBorderWidth() * 4);
+  const Size window_size(win.area().w()+screen.getBorderWidth() * 4,
+                         win.area().h()+screen.getBorderWidth() * 4);
   Point *place = NULL;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
@@ -600,14 +605,14 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   } // switch
 
   if (place == NULL)
-    place = cascadePlacement(win);
+    place = cascadePlacement(win, space);
  
   ASSERT(place != NULL);  
-  if (place->x() + window_size.w() > (signed) screen.size().w())
-    place->setX(((signed) screen.size().w() - window_size.w()) / 2);
-  if (place->y() + window_size.h() > (signed) screen.size().h())
-    place->setY(((signed) screen.size().h() - window_size.h()) / 2);
+  if (place->x() + window_size.w() > (signed) space.x() + space.w())
+    place->setX(((signed) space.x() + space.w() - window_size.w()) / 2);
+  if (place->y() + window_size.h() > (signed) space.y() + space.h())
+    place->setY(((signed) space.y() + space.h() - window_size.h()) / 2);
 
-  win->configure(place->x(), place->y(), win->area().w(), win->area().h());
+  win.configure(place->x(), place->y(), win.area().w(), win.area().h());
   delete place;
 }

@@ -385,7 +385,9 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                            use it */
                         event_process(&fe, &d);
                         if (!d.ignored) {
+#ifdef DEBUG_FOCUS
                             ob_debug("FocusIn was OK, so don't fallback\n");
+#endif
                             fallback = FALSE;
                             break;
                         }

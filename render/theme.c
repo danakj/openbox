@@ -1040,28 +1040,12 @@ static gboolean read_mask(const RrInstance *inst,
     unsigned int w, h;
     unsigned char *b;
 
-    s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-                         theme->name, maskname, NULL);
-    if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
+    s = g_build_filename(theme->path, maskname, NULL);
+    if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) {
         ret = TRUE;
-    else {
-        g_free(s);
-        s = g_build_filename(THEMEDIR, theme->name, maskname, NULL);
-        if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
-            ret = TRUE;
-        else {
-            g_free(s);
-            s = g_build_filename(theme->path, maskname, NULL);
-            if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
-                ret = TRUE;
-        }
-    }
-
-    if (ret) {
         *value = RrPixmapMaskNew(inst, w, h, (char*)b);
         XFree(b);
     }
-      
     g_free(s);
 
     return ret;

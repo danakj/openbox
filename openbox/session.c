@@ -30,6 +30,9 @@ static SmcConn     sm_conn;
 static gchar      *save_file;
 static gint        sm_argc;
 static gchar     **sm_argv;
+
+static gboolean session_save();
+
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast);
 static void sm_die(SmcConn conn, SmPointer data);
@@ -79,10 +82,17 @@ static void save_commands()
         }
     }
 
-    prop_res.vals[j].value = "--sm-save-file";
-    prop_res.vals[j++].length = strlen("--sm-save-file");
-    prop_res.vals[j].value = save_file;
-    prop_res.vals[j++].length = strlen(save_file);
+    if (save_file) {
+        prop_res.vals[j].value = "--sm-save-file";
+        prop_res.vals[j++].length = strlen("--sm-save-file");
+        prop_res.vals[j].value = save_file;
+        prop_res.vals[j++].length = strlen(save_file);
+    } else {
+        prop_res.vals[j].value = "--sm-client-id";
+        prop_res.vals[j++].length = strlen("--sm-client-id");
+        prop_res.vals[j].value = ob_sm_id;
+        prop_res.vals[j++].length = strlen(ob_sm_id);
+    }
 
     props[0] = &prop_res;
     props[1] = &prop_cmd;
@@ -173,6 +183,8 @@ void session_startup(int argc, char **argv)
 
         g_free(val_uid.value);
 
+        save_commands();
+
         ob_debug("Connected to session manager with id %s\n", ob_sm_id);
     }
 }
@@ -205,12 +217,38 @@ void session_shutdown()
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast)
 {
+    gboolean success;
+
+    ob_debug("got SAVE YOURSELF from session manager\n");
+
+    success = session_save();
+    save_commands();
+
+    SmcSaveYourselfDone(conn, success);
+}
+
+static void sm_die(SmcConn conn, SmPointer data)
+{
+    ob_exit();
+    ob_debug("got DIE from session manager\n");
+}
+
+static void sm_save_complete(SmcConn conn, SmPointer data)
+{
+    ob_debug("got SAVE COMPLETE from session manager\n");
+}
+
+static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
+{
+    ob_debug("got SHUTDOWN CANCELLED from session manager\n");
+}
+
+static gboolean session_save()
+{
     gchar *filename;
     FILE *f;
     GList *it;
     gboolean success = TRUE;
-
-    ob_debug("got SAVE YOURSELF from session manager\n");
 
     /* this algo is from metacity */
     filename = g_strdup_printf("%d-%d-%u.obs",
@@ -254,38 +292,38 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                 g_free(dimensions);
             }
 
-            fprintf(f, "\t<window id=\"%s\">\n",
+            fprintf(f, "<window id=\"%s\">\n",
                     g_markup_escape_text("XXX", -1));
-            fprintf(f, "\t\t<name>%s</name>\n",
+            fprintf(f, "\t<name>%s</name>\n",
                     g_markup_escape_text(c->name, -1));
-            fprintf(f, "\t\t<class>%s</class>\n",
+            fprintf(f, "\t<class>%s</class>\n",
                     g_markup_escape_text(c->class, -1));
-            fprintf(f, "\t\t<role>%s</role>\n",
+            fprintf(f, "\t<role>%s</role>\n",
                     g_markup_escape_text(c->role, -1));
-            fprintf(f, "\t\t<desktop>%d</desktop>\n", c->desktop);
-            fprintf(f, "\t\t<x>%d</x>\n", prex);
-            fprintf(f, "\t\t<y>%d</y>\n", prey);
-            fprintf(f, "\t\t<width>%d</width>\n", prew);
-            fprintf(f, "\t\t<height>%d</height>\n", preh);
+            fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
+            fprintf(f, "\t<x>%d</x>\n", prex);
+            fprintf(f, "\t<y>%d</y>\n", prey);
+            fprintf(f, "\t<width>%d</width>\n", prew);
+            fprintf(f, "\t<height>%d</height>\n", preh);
             if (c->shaded)
-                fprintf(f, "\t\t<shaded />\n");
+                fprintf(f, "\t<shaded />\n");
             if (c->iconic)
-                fprintf(f, "\t\t<iconic />\n");
+                fprintf(f, "\t<iconic />\n");
             if (c->skip_pager)
-                fprintf(f, "\t\t<skip_pager />\n");
+                fprintf(f, "\t<skip_pager />\n");
             if (c->skip_taskbar)
-                fprintf(f, "\t\t<skip_taskbar />\n");
+                fprintf(f, "\t<skip_taskbar />\n");
             if (c->fullscreen)
-                fprintf(f, "\t\t<fullscreen />\n");
+                fprintf(f, "\t<fullscreen />\n");
             if (c->above)
-                fprintf(f, "\t\t<above />\n");
+                fprintf(f, "\t<above />\n");
             if (c->below)
-                fprintf(f, "\t\t<below />\n");
+                fprintf(f, "\t<below />\n");
             if (c->max_horz)
-                fprintf(f, "\t\t<max_horz />\n");
+                fprintf(f, "\t<max_horz />\n");
             if (c->max_vert)
-                fprintf(f, "\t\t<max_vert />\n");
-            fprintf(f, "\t</window>\n\n");
+                fprintf(f, "\t<max_vert />\n");
+            fprintf(f, "</window>\n\n");
         }
 
         fprintf(f, "</openbox_session>\n");
@@ -298,25 +336,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
         fclose(f);
     }
 
-    save_commands();
-
-    SmcSaveYourselfDone(conn, success);
-}
-
-static void sm_die(SmcConn conn, SmPointer data)
-{
-    ob_exit();
-    ob_debug("got DIE from session manager\n");
-}
-
-static void sm_save_complete(SmcConn conn, SmPointer data)
-{
-    ob_debug("got SAVE COMPLETE from session manager\n");
-}
-
-static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
-{
-    ob_debug("got SHUTDOWN CANCELLED from session manager\n");
+    return success;
 }
 
 void session_load(char *path)

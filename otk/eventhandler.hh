@@ -28,6 +28,9 @@ public:
   //! Called whenever a button of the pointer is released.
   virtual void buttonReleaseHandler(const XButtonEvent &) {}
 
+  //! Called whenever the pointer moved
+  virtual void motionHandler(const XMotionEvent &) {}
+
   //! Called whenever the pointer enters a window.
   virtual void enterHandler(const XCrossingEvent &) {}
 

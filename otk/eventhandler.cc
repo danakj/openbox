@@ -30,6 +30,8 @@ void OtkEventHandler::handle(const XEvent &e)
     return buttonPressHandler(e.xbutton);
   case ButtonRelease:
     return buttonReleaseHandler(e.xbutton);
+  case MotionNotify:
+    return motionHandler(e.xmotion);
   case EnterNotify:
     return enterHandler(e.xcrossing);
   case LeaveNotify:

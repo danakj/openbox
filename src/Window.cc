@@ -204,11 +204,14 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     return;
 
   case Type_Dock:
-    // docks (such as kicker) cannot be moved, and appear on all workspaces
+  case Type_Menu:
+    // docks (such as kicker) and menus (as used by kde for the 'desktop menu'
+    // which mimics apple, cannot be moved, and appear on all workspaces
+    // also, these have no decorations
     functions &= ~(Func_Move);
+    decorations &= ~Decor_Titlebar;
     flags.stuck = True;
   case Type_Toolbar:
-  case Type_Menu:
   case Type_Utility:
     // these windows have minimal decorations, only a titlebar, and cannot
     // be resized or iconified

@@ -44,6 +44,8 @@ typedef enum {
     NoTexture
 } TextureType;
 
+struct Appearance;
+
 typedef struct PlanarSurface {
     SurfaceColorType grad;
     ReliefType relief;
@@ -53,6 +55,9 @@ typedef struct PlanarSurface {
     color_rgb *border_color;
     gboolean interlaced;
     gboolean border;
+    struct Appearance *parent;
+    int parentx;
+    int parenty;
     pixel32 *pixel_data;
 } PlanarSurface;
 

@@ -29,6 +29,8 @@ gboolean config_focus_follow;
 guint    config_focus_delay;
 guint    config_focus_raise;
 
+ObPlacePolicy config_place_policy;
+
 char *config_theme;
 
 gchar *config_title_layout;
@@ -205,6 +207,18 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_focus_delay = parse_int(doc, n) * 1000;
     if ((n = parse_find_node("raiseOnFocus", node)))
         config_focus_raise = parse_bool(doc, n);
+}
+
+static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                            void *d)
+{
+    xmlNodePtr n;
+
+    node = node->children;
+    
+    if ((n = parse_find_node("policy", node)))
+        if (parse_contains("UnderMouse", doc, n))
+            config_place_policy = OB_PLACE_POLICY_MOUSE;
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -477,6 +491,10 @@ void config_startup(ObParseInst *i)
     config_focus_raise = FALSE;
 
     parse_register(i, "focus", parse_focus, NULL);
+
+    config_place_policy = OB_PLACE_POLICY_SMART;
+
+    parse_register(i, "placement", parse_placement, NULL);
 
     config_theme = NULL;
 

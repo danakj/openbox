@@ -21,6 +21,7 @@
 
 #include "misc.h"
 #include "stacking.h"
+#include "place.h"
 
 #include <glib.h>
 
@@ -35,6 +36,8 @@ extern guint    config_focus_delay;
 /*! If windows should automatically be raised when they are focused in
  focus follows mouse */
 extern guint    config_focus_raise;
+
+extern ObPlacePolicy config_place_policy;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */

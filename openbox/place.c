@@ -374,7 +374,7 @@ void place_client(ObClient *client, gint *x, gint *y)
         return;
     if (place_transient(client, x, y)             ||
         place_dialog(client, x, y)                ||
-        ((config_focus_follow && config_focus_new) ?
+        ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :
          place_smart(client, x, y, SMART_FULL)    ||
          place_smart(client, x, y, SMART_GROUP)   ||

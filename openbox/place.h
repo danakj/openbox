@@ -23,6 +23,12 @@
 
 struct _ObClient;
 
-void place_client(ObClient *client, gint *x, gint *y);
+typedef enum
+{
+    OB_PLACE_POLICY_SMART,
+    OB_PLACE_POLICY_MOUSE
+} ObPlacePolicy;
+
+void place_client(struct _ObClient *client, gint *x, gint *y);
 
 #endif

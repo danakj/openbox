@@ -267,10 +267,8 @@ static GSList* split_paths(const gchar *paths)
     c = g_strdup(paths);
     s = c;
     e = c - 1;
-    g_message("paths %s", paths);
     while ((e = strchr(e + 1, ':'))) {
         *e = '\0';
-        g_message("s %s", s);
         if (s[0] != '\0')
             list = g_slist_append(list, g_strdup(s));
         s = e + 1;

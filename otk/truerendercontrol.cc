@@ -102,45 +102,64 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
 void TrueRenderControl::drawGradientBackground(
      Surface &sf, const RenderTexture &texture) const
 {
-    int w = sf.width(), h = sf.height();
+  int w = sf.width(), h = sf.height(), off, x, y;
 
-    const ScreenInfo *info = display->screenInfo(_screen);
-    XImage *im = XCreateImage(**display, info->visual(), info->depth(),
-                              ZPixmap, 0, NULL, w, h, 32, 0);
+  const ScreenInfo *info = display->screenInfo(_screen);
+  XImage *im = XCreateImage(**display, info->visual(), info->depth(),
+                            ZPixmap, 0, NULL, w, h, 32, 0);
   
-    pixel32 *data = new pixel32[sf.height()*sf.width()];
-    pixel32 current;
-    pixel32 *dp = data;
-    float dr, dg, db;
-    unsigned int r,g,b;
+  pixel32 *data = new pixel32[sf.height()*sf.width()];
+  pixel32 current;
+  pixel32 *dp = data;
+  float dr, dg, db;
+  unsigned int r,g,b;
+//XXX: move this to seperate vgrad function
+  dr = (float)(texture.secondary_color().red() - texture.color().red());
+  dr/= (float)sf.height();
 
-    dr = (float)(texture.secondary_color().red() - texture.color().red());
-    dr/= (float)sf.height();
+  dg = (float)(texture.secondary_color().green() - texture.color().green());
+  dg/= (float)sf.height();
 
-    dg = (float)(texture.secondary_color().green() - texture.color().green());
-    dg/= (float)sf.height();
+  db = (float)(texture.secondary_color().blue() - texture.color().blue());
+  db/= (float)sf.height();
 
-    db = (float)(texture.secondary_color().blue() - texture.color().blue());
-    db/= (float)sf.height();
+  for (y = 0; y < h; ++y) {
+    r = texture.color().red() + (int)(dr * y);
+    g = texture.color().green() + (int)(dg * y);
+    b = texture.color().blue() + (int)(db * y);
+    current = (r << 16)
+            + (g << 8)
+            + b;
+    for (x = 0; x < w; ++x, dp ++)
+      *dp = current;
+  }
+//XXX: end of vgrad
 
-    for (int y = 0; y < h; ++y) {
-      r = texture.color().red() + (int)(dr * y);
-      g = texture.color().green() + (int)(dg * y);
-      b = texture.color().blue() + (int)(db * y);
-      current = (r << 16)
-              + (g << 8)
-              + b;
-      for (int x = 0; x < w; ++x, dp ++)
-        *dp = current;
+  if (texture.relief() == RenderTexture::Flat && texture.border()) {
+    r = texture.borderColor().red();
+    g = texture.borderColor().green();
+    b = texture.borderColor().blue();
+    current = (r << 16)
+            + (g << 8)
+            + b;
+    for (off = 0, x = 0; x < w; ++x, off++) {
+	*(data + off) = current;
+	*(data + off + ((h-1) * w)) = current;
     }
+    for (off = 0, x = 0; x < h; ++x, off++) {
+	*(data + (off * w)) = current;
+	*(data + (off * w) + w - 1) = current;
+    }
+  }
 
-    im->data = (char*) data;
+//XXX: any dithering should be done now
+  im->data = (char*) data;
 
-    sf.setPixmap(im);
+  sf.setPixmap(im);
 
-    delete [] im->data;
-    im->data = NULL;
-    XDestroyImage(im);
+  delete [] im->data;
+  im->data = NULL;
+  XDestroyImage(im);
 }
 
 void TrueRenderControl::drawBackground(Surface& sf,

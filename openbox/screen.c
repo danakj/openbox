@@ -28,6 +28,7 @@
 #include "screen.h"
 #include "client.h"
 #include "frame.h"
+#include "event.h"
 #include "focus.h"
 #include "popup.h"
 #include "extensions.h"
@@ -453,8 +454,9 @@ void screen_set_desktop(guint num)
         }
     }
 
-    if (!focus_client)
-        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+    event_ignore_queued_enters();
+    
+    focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
 }
 
 static void get_row_col(guint d, guint *r, guint *c)

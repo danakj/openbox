@@ -3,6 +3,7 @@
 import sys
 
 data = []
+valid = True
 
 def out(str):
     sys.stderr.write(str)
@@ -21,14 +22,15 @@ def getkeyval(line):
         key = value = None
     return key, value
 
-def find_key(data, keysubstr):
+def find_key(data, keysubstr, exact = False):
     i = 0
     n = len(data)
     while i < n:
         l = data[i]
         key, value = getkeyval(l)
         if key and value:
-            if key.find(keysubstr) != -1:
+            if (exact and key == keysubstr) or \
+               (not exact and key.find(keysubstr) != -1):
                 return i, key, value
         i += 1
     return -1, None, None
@@ -72,12 +74,13 @@ def remove(data):
                 break
 
 def pressed(data):
-    i, nul, nul = find_key(data, 'window.button.pressed')
+    i, nul, nul = find_key(data, 'window.button.pressed', True)
     if i >= 0:
         out('The window.button.pressed option has been replaced by ' +
             'window.button.pressed.focus and ' +
             'window.button.pressed.unfocus.\nUpdate (Y/n)? ')
         if read_bool():
+            l = data[i]
             out('Removing "window.button.pressed"\n')
             data.pop(i)
             out('Adding "window.button.pressed.unfocus"\n')
@@ -162,17 +165,25 @@ def xft_fonts(data):
             out('Removing ' + key + '\n')
             data.pop(i)
 
+def warn_missing(data):
+    need = ('window.button.hover.focus',  'window.button.hover.unfocus',
+            'menuOverlap')
+    for n in need:
+        i, nul, nul = find_key(data, n)
+        if i < 0:
+            out('The ' + n + ' value was not found in the theme, but it '
+                'can optionally be set.\n')
 
-
-
-
-
-
-
-
-
-
-
+def err_missing(data):
+    need = ('window.button.disabled.focus',  'window.button.disabled.unfocus',
+            'window.frame.focusColor', 'window.frame.unfocusColor')
+    for n in need:
+        i, nul, nul = find_key(data, n)
+        if i < 0:
+            out('*** ERROR *** The ' + n + ' value was not found in the '
+                'theme, but it is required to be set.\n')
+            global valid
+            valid = False
 
 
 def usage():
@@ -194,10 +205,14 @@ for i in range(len(data)):
     data[i] = data[i].strip()
 
 simple_replace(data)
-#remove(data)
-#pressed(data)
-#x_fonts(data)
+remove(data)
+pressed(data)
+x_fonts(data)
 xft_fonts(data)
+warn_missing(data)
+err_missing(data)
 
 for l in data:
     print l
+
+sys.exit(not valid)

@@ -237,9 +237,10 @@ void Workspace::showAll(void) {
   const BlackboxWindowList::iterator end = stackingList.end();
   for (; it != end; ++it) {
     BlackboxWindow *bw = *it;
-    // not normal windows cant focus from mouse enters anyways, so we dont
-    // need to unmap/remap them on workspace changes
-    if (! bw->isStuck() || bw->isNormal())
+    // sticky windows arent unmapped on a workspace change so we don't have ot
+    // map them, but sometimes on a restart, another app can unmap our sticky
+    // windows, so we map on startup always
+    if (! bw->isStuck() || screen->getBlackbox()->isStartup())
       bw->show();
   }
 }
@@ -254,9 +255,9 @@ void Workspace::hideAll(void) {
   const BlackboxWindowList::iterator end = lst.end();
   for (; it != end; ++it) {
     BlackboxWindow *bw = *it;
-    // not normal windows cant focus from mouse enters anyways, so we dont
-    // need to unmap/remap them on workspace changes
-    if (! bw->isStuck() || bw->isNormal())
+    // don't hide sticky windows, or they'll end up flickering on a workspace
+    // change
+    if (! bw->isStuck())
       bw->withdraw();
   }
 }

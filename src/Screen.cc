@@ -1232,8 +1232,10 @@ void BScreen::changeWorkspaceID(unsigned int id) {
     current_workspace->setLastFocusedWindow((BlackboxWindow *) 0);
   }
 
-  // when we switch workspaces, unfocus whatever was focused
-  blackbox->setFocusedWindow((BlackboxWindow *) 0);
+  // when we switch workspaces, unfocus whatever was focused if it is going
+  // to be unmapped
+  if (focused && ! focused->isStuck())
+    blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
   current_workspace->hideAll();
   workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
@@ -1248,10 +1250,30 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
   current_workspace->showAll();
 
-  if (resource.focus_last && current_workspace->getLastFocusedWindow()) {
-    XSync(blackbox->getXDisplay(), False);
-    current_workspace->getLastFocusedWindow()->setInputFocus();
+  int x, y, rx, ry;
+  Window c, r;
+  unsigned int m;
+  BlackboxWindow *win = (BlackboxWindow *) 0;
+  bool f = False;
+
+  XSync(blackbox->getXDisplay(), False);
+
+  // If sloppy focus and we can find the client window under the pointer,
+  // try to focus it.  
+  if (resource.sloppy_focus &&
+      XQueryPointer(blackbox->getXDisplay(), getRootWindow(), &r, &c,
+                    &rx, &ry, &x, &y, &m) &&
+      c != None) {
+    if ( (win = blackbox->searchWindow(c)) )
+      f = win->setInputFocus();
   }
+
+  // If that fails, and we're doing focus_last, try to focus the last window.  
+  if (! f && resource.focus_last && current_workspace->getLastFocusedWindow())
+    f = current_workspace->getLastFocusedWindow()->setInputFocus();
+
+  // If that fails, then set focus to nothing.
+  if (! f) blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
   updateNetizenCurrentWorkspace();
 }

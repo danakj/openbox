@@ -333,12 +333,24 @@ static gboolean event_ignore(XEvent *e, Client *client)
     case LeaveNotify:
         /* NotifyUngrab occurs when a mouse button is released and the event is
            caused, like when lowering a window */
-        /* NotifyVirtual occurs when ungrabbing the pointer */
+        /* NotifyVirtual occurs when ungrabbing the pointer,
+           NotifyNonlinearVirtual occurs when closing a gtk app's menu */
         if (e->xcrossing.mode == NotifyGrab ||
             e->xcrossing.detail == NotifyInferior ||
             (e->xcrossing.mode == NotifyUngrab &&
-             e->xcrossing.detail == NotifyVirtual))
+             (e->xcrossing.detail == NotifyVirtual ||
+              e->xcrossing.detail == NotifyNonlinearVirtual))) {
+#ifdef DEBUG_FOCUS
+            g_message("EnterNotify mode %d detail %d on %lx IGNORED",
+                      e->xcrossing.mode,
+                      e->xcrossing.detail, client?client->window:0);
+#endif
             return TRUE;
+        }
+#ifdef DEBUG_FOCUS
+        g_message("EnterNotify mode %d detail %d on %lx", e->xcrossing.mode,
+                  e->xcrossing.detail, client?client->window:0);
+#endif
 	break;
     }
     return FALSE;

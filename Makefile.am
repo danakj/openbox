@@ -238,7 +238,7 @@ dist_om4ob_theme_DATA = \
 	themes/Om4Ob/openbox-3/shade_toggled.xbm \
 	themes/Om4Ob/openbox-3/shade.xbm
 
-thebear_themedir = $(themedir)/TheBear
+thebear_themedir = $(themedir)/openbox-3/TheBear
 dist_thebear_theme_DATA = \
 	themes/TheBear/openbox-3/themerc
 

@@ -9,6 +9,8 @@ extern "C" {
 #include <assert.h>
 }
 
+namespace otk {
+
 //! userstring is a std::string with an extra flag specifying if the string is
 //! UTF-8 encoded.
 class userstring : public std::string
@@ -100,5 +102,7 @@ public:
     return append(s);
   }
 };
+
+}
 
 #endif // __userstring_hh

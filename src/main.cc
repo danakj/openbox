@@ -28,6 +28,9 @@ extern "C" {
 #endif // HAVE_SYS_PARAM_H
 }
 
+#include "gettext.h"
+#define _(str) gettext(str)
+
 #include <string>
 using std::string;
 
@@ -36,50 +39,50 @@ using std::string;
 
 static void showHelp(int exitval) {
   // print program usage and command line options
-  printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
-         "  -display <string>\t\tuse display connection.\n"
-         "  -rc <string>\t\t\tuse alternate resource file.\n"
-         "  -menu <string>\t\tuse alternate menu file.\n"
-         "  -version\t\t\tdisplay version and exit.\n"
-         "  -help\t\t\t\tdisplay this help text and exit.\n\n",
+  printf(_("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"),
          OPENBOX_VERSION);
+  printf(_("  -display <string>  use display connection.\n\
+  -rc <string>       use alternate resource file.\n\
+  -menu <string>     use alternate menu file.\n\
+  -version           display version and exit.\n\
+  -help              display this help text and exit.\n\n"));
 
   // some people have requested that we print out compile options
   // as well
-  printf("Compile time options:\n"
-         "  Debugging:\t\t\t%s\n"
-         "  Shape:\t\t\t%s\n"
-         "  Xft:\t\t\t\t%s\n"
-         "  Xinerama:\t\t\t%s\n"
-         "  8bpp Ordered Dithering:\t%s\n\n",
+  printf(_("Compile time options:\n\
+  Debugging:\t\t\t%s\n\
+  Shape:\t\t\t%s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
+  8bpp Ordered Dithering:\t%s\n\n"),
 #ifdef    DEBUG
-         "yes",
+         _("yes"),
 #else // !DEBUG
-         "no",
+         _("no"),
 #endif // DEBUG
 
 #ifdef    SHAPE
-         "yes",
+         _("yes"),
 #else // !SHAPE
-         "no",
+         _("no"),
 #endif // SHAPE
 
 #ifdef    XFT
-         "yes",
+         _("yes"),
 #else // !XFT
-         "no",
+         _("no"),
 #endif // XFT
 
 #ifdef    XINERAMA
-         "yes",
+         _("yes"),
 #else // !XINERAMA
-         "no",
+         _("no"),
 #endif // XINERAMA
 
 #ifdef    ORDEREDPSEUDO
-         "yes"
+         _("yes")
 #else // !ORDEREDPSEUDO
-         "no"
+         _("no")
 #endif // ORDEREDPSEUDO
           );
 
@@ -96,7 +99,7 @@ int main(int argc, char **argv) {
       // look for alternative rc file to use
 
       if ((++i) >= argc) {
-        fprintf(stderr, "error: '-rc' requires and argument\n");
+        fprintf(stderr, _("error: '-rc' requires and argument\n"));
 
         ::exit(1);
       }
@@ -106,7 +109,7 @@ int main(int argc, char **argv) {
       // look for alternative menu file to use
 
       if ((++i) >= argc) {
-        fprintf(stderr, "error: '-menu' requires and argument\n");
+        fprintf(stderr, _("error: '-menu' requires and argument\n"));
 
         ::exit(1);
       }
@@ -117,7 +120,7 @@ int main(int argc, char **argv) {
       // set by the environment variable DISPLAY
 
       if ((++i) >= argc) {
-        fprintf(stderr, "error: '-display' requires an argument\n");
+        fprintf(stderr, _("error: '-display' requires an argument\n"));
 
         ::exit(1);
       }
@@ -128,13 +131,14 @@ int main(int argc, char **argv) {
 
       if (putenv(const_cast<char*>(dtmp.c_str()))) {
         fprintf(stderr,
-                "warning: couldn't set environment variable 'DISPLAY'\n");
+                _("warning: couldn't set environment variable 'DISPLAY'\n"));
         perror("putenv()");
       }
     } else if (! strcmp(argv[i], "-version")) {
       // print current version string
-      printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n",
+      printf(_("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"),
              OPENBOX_VERSION);
+      printf("\n");
 
       ::exit(0);
     } else if (! strcmp(argv[i], "-help")) {

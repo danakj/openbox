@@ -271,6 +271,9 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             client_activate(focus_cycle_target);
         goto done_cycle;
     }
+    if (!first)
+        grab_pointer(TRUE, None);
+
     if (!first) first = focus_client;
     if (!focus_cycle_target) focus_cycle_target = focus_client;
 
@@ -312,7 +315,10 @@ done_cycle:
     focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;
+
     popup_cycle(ft, FALSE);
+    grab_pointer(FALSE, None);
+
     return NULL;
 }
 

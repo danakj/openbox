@@ -14,13 +14,15 @@
 #include "otk/display.hh"
 
 #include <stdio.h>
+#include <algorithm>
 
 namespace ob {
 
 const int Actions::BUTTONS;
 
 Actions::Actions()
-  : _button(0)
+  : _button(0),
+    _dragging(false)
 {
   for (int i=0; i<BUTTONS; ++i)
     _posqueue[i] = new ButtonPressAction();
@@ -119,6 +121,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   if (_button != e.button) return;
 
   _button = 0;
+  _dragging = false;
 
   // find the area of the window
   XWindowAttributes attr;
@@ -237,6 +240,20 @@ void Actions::motionHandler(const XMotionEvent &e)
   WidgetBase *w = dynamic_cast<WidgetBase*>
     (openbox->findHandler(e.window));
   if (!w) return;
+
+  if (!_dragging) {
+    long threshold;
+    int dx = x_root - _posqueue[0]->pos.x();
+    int dy = y_root - _posqueue[0]->pos.y();
+    // XXX: dont get this from python every time!
+    if (!python_get_long("drag_threshold", &threshold))
+      threshold = 0;
+    if (!(std::abs(dx) >= threshold || std::abs(dy) >= threshold))
+      return; // not at the threshold yet
+  }
+  _dragging = true; // in a drag now
+  
+  // check if the movement is more than the threshold
 
   // run the MOTION python hook
   // kill off the Button1Mask etc, only want the modifiers

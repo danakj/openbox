@@ -55,6 +55,9 @@ private:
     Used for motion events as the starting position.
   */
   ButtonPressAction *_posqueue[BUTTONS];
+  //! This is set to true once a drag has started and false when done to make
+  //! sure the threshold isnt checked anymore once a drag is underway
+  bool _dragging;
 
   
   void insertPress(const XButtonEvent &e);

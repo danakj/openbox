@@ -90,6 +90,8 @@ Action *action_from_string(char *name)
         a = action_new(action_unmaximize_vert);
     } else if (!g_ascii_strcasecmp(name, "togglemaximizevert")) {
         a = action_new(action_toggle_maximize_vert);
+    } else if (!g_ascii_strcasecmp(name, "sendtodesktop")) {
+        a = action_new(action_send_to_desktop);
     } else if (!g_ascii_strcasecmp(name, "sendtonextdesktop")) {
         a = action_new(action_send_to_next_desktop);
         a->data.sendtonextprev.wrap = FALSE;

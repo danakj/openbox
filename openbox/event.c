@@ -24,10 +24,6 @@
 #include <X11/Xatom.h>
 #include <glib.h>
 
-#ifdef USE_LIBSN
-#  include <libsn/sn.h>
-#endif
-
 #ifdef HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif
@@ -96,16 +92,6 @@ static void ice_watch(IceConn conn, IcePointer data, Bool opening,
 }
 #endif
 
-#ifdef USE_LIBSN
-static void sn_handler(const XEvent *e, gpointer display)
-{
-    XEvent ec;
-    ec = *e;
-    sn_display_process_event(display, &ec);
-}
-#endif
-
-
 void event_startup(gboolean reconfig)
 {
     if (reconfig) return;
@@ -139,10 +125,6 @@ void event_startup(gboolean reconfig)
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
-#endif
-
-#ifdef USE_LIBSN
-    ob_main_loop_x_add(ob_main_loop, sn_handler, ob_sn_display, NULL);
 #endif
 
     client_add_destructor(focus_delay_client_dest);

@@ -45,8 +45,8 @@ void OtkEventDispatcher::dispatchEvents(void)
 {
   XEvent e;
   Window focus = None, unfocus = None;
-  Window enter = None, leave = None;
-  Window enter_root = None, leave_root = None;
+/*  Window enter = None, leave = None;
+  Window enter_root = None, leave_root = None;*/
 
   while (XPending(OBDisplay::display)) {
     XNextEvent(OBDisplay::display, &e);
@@ -112,7 +112,8 @@ void OtkEventDispatcher::dispatchEvents(void)
         unfocus = e.xfocus.window;
         focus = None;
         //printf("FocusOut focus=%lx unfocus=%lx\n", focus, unfocus);
-      }
+        }
+    /*
     // madly compress all crossing events
     } else if (e.type == EnterNotify) {
       // any other types are not ones we're interested in
@@ -129,6 +130,7 @@ void OtkEventDispatcher::dispatchEvents(void)
         leave_root = e.xcrossing.root;
         //printf("Leave enter=%lx leave=%lx\n", enter, leave);
       }
+    */
     } else {
       // normal events
       dispatch(win, e);
@@ -160,7 +162,7 @@ void OtkEventDispatcher::dispatchEvents(void)
     
     _focus = focus;
   }
-  
+  /*
   if (leave != None) {
     _crossing_e.xcrossing.type = LeaveNotify;
     _crossing_e.xcrossing.window = leave;
@@ -172,7 +174,7 @@ void OtkEventDispatcher::dispatchEvents(void)
     _crossing_e.xcrossing.window = enter;
     _crossing_e.xcrossing.root = enter_root;
     dispatch(_crossing_e.xcrossing.window, _crossing_e);
-  }
+    }*/
 }
 
 void OtkEventDispatcher::dispatch(Window win, const XEvent &e) {

@@ -5,11 +5,18 @@
 ###########################################################################
 ###         Options that affect the behavior of the focus module.       ###
 ###                                                                     ###
-# raise the window also when it is focused                              ###
+# cycle_raise - raise the window also when it is focused                ###
 cycle_raise = 1                                                         ###
-# raise as you cycle in stacked mode                                    ###
+# avoid_skip_taskbar - don't focus windows which have requested to not  ###
+###                    be displayed in taskbars. you will still be able ###
+###                    to focus the windows, but not through cycling,   ###
+###                    they won't be focused as a fallback if           ###
+###                    'fallback' is enabled.                           ###
+avoid_skip_taskbar = 1                                                  ###
+# stacked_cycle_raise - raise as you cycle in stacked mode              ###
 stacked_cycle_raise = 0                                                 ###
-# show a pop-up list of windows while cycling                           ###
+# stacked_cycle_popup_list - show a pop-up list of windows while
+###                          cycling                                    ###
 stacked_cycle_popup_list = 1                                            ###
 # send focus somewhere when nothing is left with the focus, if possible ###
 fallback = 0                                                            ###
@@ -90,9 +97,10 @@ def _focused(data):
         desktop = ob.openbox.screen(_cyc_screen).desktop()
         for w in _clients:
             client = ob.openbox.findClient(w)
-            if client and (client.desktop() == desktop or
-                           client.desktop() == 0xffffffff) \
-                           and client.normal() and client.focus()):
+            if client and not (avoid_skip_taskbar and client.skipTaskbar()) \
+                   and (client.desktop() == desktop or
+                        client.desktop() == 0xffffffff) \
+                        and client.normal() and client.focus():
                 break
         if _doing_stacked:
             _cyc_w = 0
@@ -122,9 +130,10 @@ def _do_stacked_cycle(data, forward):
     desktop = ob.openbox.screen(data.screen).desktop()
     for w in clients:
         client = ob.openbox.findClient(w)
-        if client and (client.desktop() == desktop or
-                       client.desktop() == 0xffffffff) \
-                       and client.normal() and client.focus():
+                   
+        if client and not (avoid_skip_taskbar and client.skipTaskbar()) and \
+               (client.desktop() == desktop or client.desktop() == 0xffffffff)\
+                and client.normal() and client.focus():
             if stacked_cycle_raise:
                 ob.openbox.screen(data.screen).raiseWindow(client)
             return
@@ -178,6 +187,7 @@ def _destroy_popup_list():
         _list_widget = 0
     
 def _create_popup_list(data):
+    global avoid_skip_taskbar
     global _list_widget, _list_labels, _list_windows, _clients
 
     if _list_widget:
@@ -197,11 +207,10 @@ def _create_popup_list(data):
     for c in _clients:
         client = ob.openbox.findClient(c)
         desktop = ob.openbox.screen(data.screen).desktop()
-        if client and not client.skipTaskbar() and \
-               ((client.desktop() == desktop or
-                 client.desktop() == 0xffffffff) and \
-                client.normal() and (client.canFocus() or
-                                     client.focusNotify())):
+        if client and not (avoid_skip_taskbar and client.skipTaskbar()) and \
+               (client.desktop() == desktop or client.desktop() == 0xffffffff)\
+               and client.normal() and (client.canFocus() or
+                                        client.focusNotify()):
             t = client.title()
             if len(t) > 50: # limit the length of titles
                 t = t[:24] + "..." + t[-24:]
@@ -263,6 +272,8 @@ def focus_prev_stacked(data):
 def focus_next(data, num=1, forward=1):
     """Focus the next (or previous, with forward=0) window in a linear
        order."""
+    global avoid_skip_taskbar
+
     screen = ob.openbox.screen(data.screen)
     count = screen.clientCount()
 
@@ -290,10 +301,10 @@ def focus_next(data, num=1, forward=1):
     curdesk = screen.desktop()
     while 1:
         client = screen.client(t)
-        if not client.skipTaskbar() and client.normal() and \
-               (client.desktop() == curdesk or
-                client.desktop() == 0xffffffff)\
-               and client.focus():
+        if not (avoid_skip_taskbar and client.skipTaskbar()) and \
+               client.normal() and (client.desktop() == curdesk or
+                                    client.desktop() == 0xffffffff)\
+                                    and client.focus():
             if cycle_raise:
                 screen.raiseWindow(client)
             return

@@ -1,5 +1,9 @@
 Changelog for Openbox:
 
+2.2.3:
+ * Fix compile errors when the strftime funtion is not  (Ben Jansens)
+   found on the system.
+
 2.2.2:
  * Add an option to disable the window raise on 	(Scott Moynes)
    mouse clicks with the modifierMask.

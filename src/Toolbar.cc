@@ -552,7 +552,7 @@ void Toolbar::checkClock(bool redraw, bool date) {
     if (date) {
       // format the date... with special consideration for y2k ;)
       if (screen->getDateFormat() == Blackbox::B_EuropeanDate)
-        sprintf(t, 18n(ToolbarSet, ToolbarNoStrftimeDateFormatEu,
+        sprintf(t, i18n(ToolbarSet, ToolbarNoStrftimeDateFormatEu,
                        "%02d.%02d.%02d"),
                 tt->tm_mday, tt->tm_mon + 1,
                 (tt->tm_year >= 100) ? tt->tm_year - 100 : tt->tm_year);

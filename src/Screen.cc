@@ -563,7 +563,7 @@ void BScreen::saveStrftimeFormat(const std::string& format) {
 void BScreen::saveDateFormat(int f) {
   resource.date_format = f;
   config->setValue(screenstr + "dateFormat",
-                   resource.date_format == B_EuropeanDate ?
+                   resource.date_format == Blackbox::B_EuropeanDate ?
                    "European" : "American");
 }
 
@@ -681,7 +681,7 @@ void BScreen::save_rc(void) {
   saveStrftimeFormat(resource.strftime_format); 
 #else // !HAVE_STRFTIME
   saveDateFormat(resource.date_format);
-  savwClock24Hour(resource.clock24hour);
+  saveClock24Hour(resource.clock24hour);
 #endif // HAVE_STRFTIME
   savePlaceIgnoreShaded(resource.ignore_shaded);
   savePlaceIgnoreMaximized(resource.ignore_maximized);
@@ -838,9 +838,9 @@ void BScreen::load_rc(void) {
   long l;
 
   if (config->getValue(screenstr + "dateFormat", s) && s == "European")
-    resource.date_format = B_EuropeanDate;
+    resource.date_format = Blackbox::B_EuropeanDate;
  else
-    resource.date_format = B_AmericanDate;
+    resource.date_format = Blackbox::B_AmericanDate;
 
   if (! config->getValue(screenstr + "clockFormat", l))
     l = 12;

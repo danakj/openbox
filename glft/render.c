@@ -142,4 +142,8 @@ void GlftMeasureString(struct GlftFont *font,
         p = g;
         c = g_utf8_next_char(c);
     }
+    if (font->shadow) {
+        *w += font->shadow_offset;
+        *h += font->shadow_offset;
+    }
 }

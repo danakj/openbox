@@ -277,7 +277,8 @@ void client_manage(Window window)
     client_restore_session_stacking(self);
 
     /* focus the new window? */
-    if (ob_state() != OB_STATE_STARTING && config_focus_new &&
+    if (ob_state() != OB_STATE_STARTING &&
+        (config_focus_new || client_search_focus_tree_full(self)) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
@@ -3031,9 +3032,8 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
     case OB_DIRECTION_NORTHWEST:
     case OB_DIRECTION_SOUTHWEST:
         /* not implemented */
-        break;
     default:
-            g_assert_not_reached();
+        g_assert_not_reached();
     }
     return dest;
 }

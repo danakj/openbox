@@ -67,11 +67,13 @@ public:
   Rect(const int x, const int y, const unsigned int w, const unsigned int h);
   
   void setSize(const Size &size);
+  void setSize(const unsigned int w, const unsigned int h);
   inline const Size &size() const {
     return const_cast<const Size &>(m_size);
   }
   
   void setOrigin(const Point &origin);
+  void setOrigin(const int x, const int y);
   inline const Point &origin() const {
     return const_cast<const Point &>(m_origin);
   }

@@ -70,8 +70,18 @@ void Rect::setSize(const Size &size) {
   m_size = size;
 }
 
+void Rect::setSize(const unsigned int w, const unsigned int h) {
+  m_size.setW(w);
+  m_size.setH(h);
+}
+
 void Rect::setOrigin(const Point &origin) {
   m_origin = origin;
+}
+
+void Rect::setOrigin(const int x, const int y) {
+  m_origin.setX(x);
+  m_origin.setY(y);
 }
 
 void Rect::setX(const int x) {

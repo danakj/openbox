@@ -464,11 +464,11 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   const int win_w = win->size().w() + (screen.getBorderWidth() * 4),
     win_h = win->size().h() + (screen.getBorderWidth() * 4),
 #ifdef    SLIT
-    slit_x = screen.getSlit()->getX() - screen.getBorderWidth(),
-    slit_y = screen.getSlit()->getY() - screen.getBorderWidth(),
-    slit_w = screen.getSlit()->getWidth() +
+    slit_x = screen.getSlit()->area().x() - screen.getBorderWidth(),
+    slit_y = screen.getSlit()->area().y() - screen.getBorderWidth(),
+    slit_w = screen.getSlit()->area().w() +
       (screen.getBorderWidth() * 4),
-    slit_h = screen.getSlit()->getHeight() +
+    slit_h = screen.getSlit()->area().h() +
       (screen.getBorderWidth() * 4),
 #endif // SLIT
     toolbar_x = screen.getToolbar()->getX() - screen.getBorderWidth(),

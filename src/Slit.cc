@@ -68,12 +68,12 @@ Slit::Slit(BScreen &scr) : screen(scr), openbox(scr.getOpenbox()) {
   attrib.event_mask = SubstructureRedirectMask | ButtonPressMask |
                       EnterWindowMask | LeaveWindowMask;
 
-  frame.x = frame.y = 0;
-  frame.width = frame.height = 1;
-
+  frame.area = Rect(0, 0, 1, 1);
+  
   frame.window =
-    XCreateWindow(display, screen.getRootWindow(), frame.x, frame.y,
-		  frame.width, frame.height, screen.getBorderWidth(),
+    XCreateWindow(display, screen.getRootWindow(),
+                  frame.area.x(), frame.area.y(),
+		  frame.area.w(), frame.area.h(), screen.getBorderWidth(),
                   screen.getDepth(), InputOutput, screen.getVisual(),
                   create_mask, &attrib);
   openbox.saveSlitSearch(frame.window, this);
@@ -209,49 +209,48 @@ void Slit::removeClient(Window w, Bool remap) {
 
 
 void Slit::reconfigure(void) {
-  frame.width = 0;
-  frame.height = 0;
+  frame.area.setSize(0, 0);
   LinkedListIterator<SlitClient> it(clientList);
   SlitClient *client;
 
   switch (screen.getSlitDirection()) {
   case Vertical:
     for (client = it.current(); client; it++, client = it.current()) {
-      frame.height += client->height + screen.getBevelWidth();
+      frame.area.setH(frame.area.h() + client->height + screen.getBevelWidth());
 
-      if (frame.width < client->width)
-        frame.width = client->width;
+      if (frame.area.w() < client->width)
+        frame.area.setW(client->width);
     }
 
-    if (frame.width < 1)
-      frame.width = 1;
+    if (frame.area.w() < 1)
+      frame.area.setW(1);
     else
-      frame.width += (screen.getBevelWidth() * 2);
+      frame.area.setW(frame.area.w() + (screen.getBevelWidth() * 2));
 
-    if (frame.height < 1)
-      frame.height = 1;
+    if (frame.area.h() < 1)
+      frame.area.setH(1);
     else
-      frame.height += screen.getBevelWidth();
+      frame.area.setH(frame.area.h() + screen.getBevelWidth());
 
     break;
 
   case Horizontal:
     for (client = it.current(); client; it++, client = it.current()) {
-      frame.width += client->width + screen.getBevelWidth();
+      frame.area.setW(frame.area.w() + client->width + screen.getBevelWidth());
 
-      if (frame.height < client->height)
-        frame.height = client->height;
+      if (frame.area.h() < client->height)
+        frame.area.setH(client->height);
     }
 
-    if (frame.width < 1)
-      frame.width = 1;
+    if (frame.area.w() < 1)
+      frame.area.setW(1);
     else
-      frame.width += screen.getBevelWidth();
+      frame.area.setW(frame.area.w() + screen.getBevelWidth());
 
-    if (frame.height < 1)
-      frame.height = 1;
+    if (frame.area.h() < 1)
+      frame.area.setH(1);
     else
-      frame.height += (screen.getBevelWidth() * 2);
+      frame.area.setH(frame.area.h() + (screen.getBevelWidth() * 2));
 
     break;
   }
@@ -275,7 +274,7 @@ void Slit::reconfigure(void) {
     XSetWindowBackground(display, frame.window,
 			 texture->getColor()->getPixel());
   } else {
-    frame.pixmap = image_ctrl->renderImage(frame.width, frame.height,
+    frame.pixmap = image_ctrl->renderImage(frame.area.w(), frame.area.h(),
 					   texture);
     XSetWindowBackgroundPixmap(display, frame.window, frame.pixmap);
   }
@@ -291,7 +290,7 @@ void Slit::reconfigure(void) {
     y = screen.getBevelWidth();
 
     for (client = it.current(); client; it++, client = it.current()) {
-      x = (frame.width - client->width) / 2;
+      x = (frame.area.w() - client->width) / 2;
 
       XMoveResizeWindow(display, client->window, x, y,
                         client->width, client->height);
@@ -327,7 +326,7 @@ void Slit::reconfigure(void) {
     y = 0;
 
     for (client = it.current(); client; it++, client = it.current()) {
-      y = (frame.height - client->height) / 2;
+      y = (frame.area.h() - client->height) / 2;
 
       XMoveResizeWindow(display, client->window, x, y,
                         client->width, client->height);
@@ -367,130 +366,110 @@ void Slit::reposition(void) {
   // place the slit in the appropriate place
   switch (screen.getSlitPlacement()) {
   case TopLeft:
-    frame.x = 0;
-    frame.y = 0;
+    frame.area.setOrigin(0, 0);
     if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-	               - frame.width;
-      frame.y_hidden = 0;
+      frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
+                           - frame.area.w(), 0);
     } else {
-      frame.x_hidden = 0;
-      frame.y_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-	               - frame.height;
+      frame.hidden = Point(0, screen.getBevelWidth() - screen.getBorderWidth()
+                           - frame.area.h());
     }
     break;
 
   case CenterLeft:
-    frame.x = 0;
-    frame.y = (screen.size().h() - frame.height) / 2;
-    frame.x_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-	             - frame.width;
-    frame.y_hidden = frame.y;
+    frame.area.setOrigin(0, (screen.size().h() - frame.area.h()) / 2);
+    frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
+                         - frame.area.w(), frame.area.y());
     break;
 
   case BottomLeft:
-    frame.x = 0;
-    frame.y = screen.size().h() - frame.height
-      - (screen.getBorderWidth() * 2);
-    if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-	               - frame.width;
-      frame.y_hidden = frame.y;
-    } else {
-      frame.x_hidden = 0;
-      frame.y_hidden = screen.size().h() - screen.getBevelWidth()
-	               - screen.getBorderWidth();
-    }
+    frame.area.setOrigin(0, screen.size().h() - frame.area.h()
+                         - (screen.getBorderWidth() * 2));
+    if (screen.getSlitDirection() == Vertical)
+      frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
+                           - frame.area.w(), frame.area.y());
+    else
+      frame.hidden = Point(0, screen.size().h() - screen.getBevelWidth()
+                           - screen.getBorderWidth());
     break;
 
   case TopCenter:
-    frame.x = (screen.size().w() - frame.width) / 2;
-    frame.y = 0;
-    frame.x_hidden = frame.x;
-    frame.y_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-                     - frame.height;
+    frame.area.setOrigin((screen.size().w() - frame.area.w()) / 2, 0);
+    frame.hidden = Point(frame.area.x(), screen.getBevelWidth()
+                         - screen.getBorderWidth() - frame.area.h());
     break;
 
   case BottomCenter:
-    frame.x = (screen.size().h() - frame.width) / 2;
-    frame.y = screen.size().h() - frame.height
-      - (screen.getBorderWidth() * 2);
-    frame.x_hidden = frame.x;
-    frame.y_hidden = screen.size().h() - screen.getBevelWidth()
-                     - screen.getBorderWidth();
+    frame.area.setOrigin((screen.size().w() - frame.area.w()) / 2,
+                         screen.size().h() - frame.area.h()
+                         - (screen.getBorderWidth() * 2));
+    frame.hidden = Point(frame.area.x(), screen.size().h()
+                         - screen.getBevelWidth() - screen.getBorderWidth());
     break;
 
   case TopRight:
-    frame.x = screen.size().w() - frame.width
-      - (screen.getBorderWidth() * 2);
-    frame.y = 0;
-    if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.size().w() - screen.getBevelWidth()
-	               - screen.getBorderWidth();
-      frame.y_hidden = 0;
-    } else {
-      frame.x_hidden = frame.x;
-      frame.y_hidden = screen.getBevelWidth() - screen.getBorderWidth()
-                       - frame.height;
-    }
+    frame.area.setOrigin(screen.size().w() - frame.area.w()
+                         - (screen.getBorderWidth() * 2), 0);
+    if (screen.getSlitDirection() == Vertical)
+      frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
+                           - screen.getBorderWidth(), 0);
+    else
+      frame.hidden = Point(frame.area.x(), screen.getBevelWidth()
+                           - screen.getBorderWidth() - frame.area.h());
     break;
 
   case CenterRight:
   default:
-    frame.x = screen.size().w() - frame.width
-      - (screen.getBorderWidth() * 2);
-    frame.y = (screen.size().h() - frame.height) / 2;
-    frame.x_hidden = screen.size().w() - screen.getBevelWidth()
-                     - screen.getBorderWidth();
-    frame.y_hidden = frame.y;
+    frame.area.setOrigin(screen.size().w() - frame.area.w()
+                         - (screen.getBorderWidth() * 2),
+                         (screen.size().h() - frame.area.h()) / 2);
+    frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
+                         - screen.getBorderWidth(), frame.area.y());
     break;
 
   case BottomRight:
-    frame.x = screen.size().w() - frame.width
-      - (screen.getBorderWidth() * 2);
-    frame.y = screen.size().h() - frame.height
-      - (screen.getBorderWidth() * 2);
-    if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.size().w() - screen.getBevelWidth()
-	               - screen.getBorderWidth();
-      frame.y_hidden = frame.y;
-    } else {
-      frame.x_hidden = frame.x;
-      frame.y_hidden = screen.size().h() - screen.getBevelWidth()
-                       - screen.getBorderWidth();
-    }
+    frame.area.setOrigin(screen.size().w() - frame.area.w()
+                         - (screen.getBorderWidth() * 2),
+                         screen.size().h() - frame.area.h()
+                         - (screen.getBorderWidth() * 2));
+    if (screen.getSlitDirection() == Vertical)
+      frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
+                           - screen.getBorderWidth(), frame.area.y());
+    else
+      frame.hidden = Point(frame.area.x(), screen.size().h() - screen.getBevelWidth()
+                           - screen.getBorderWidth());
     break;
   }
 
   Toolbar *tbar = screen.getToolbar();
-  int sw = frame.width + (screen.getBorderWidth() * 2),
-      sh = frame.height + (screen.getBorderWidth() * 2),
+  int sw = frame.area.w() + (screen.getBorderWidth() * 2),
+      sh = frame.area.h() + (screen.getBorderWidth() * 2),
       tw = tbar->getWidth() + screen.getBorderWidth(),
       th = tbar->getHeight() + screen.getBorderWidth();
 
-  if (tbar->getX() < frame.x + sw && tbar->getX() + tw > frame.x &&
-      tbar->getY() < frame.y + sh && tbar->getY() + th > frame.y) {
-    if (frame.y < th) {
-      frame.y += tbar->getExposedHeight();
+  if (tbar->getX() < frame.area.x() + sw && tbar->getX() + tw > frame.area.x() &&
+      tbar->getY() < frame.area.y() + sh && tbar->getY() + th > frame.area.y()) {
+    if (frame.area.y() < th) {
+      frame.area.setY(frame.area.y() + tbar->getExposedHeight());
       if (screen.getSlitDirection() == Vertical)
-        frame.y_hidden += tbar->getExposedHeight();
+        frame.hidden.setY(frame.hidden.y() + tbar->getExposedHeight());
       else
-	frame.y_hidden = frame.y;
+	frame.hidden.setY(frame.area.y());
     } else {
-      frame.y -= tbar->getExposedHeight();
+      frame.area.setY(frame.area.y() - tbar->getExposedHeight());
       if (screen.getSlitDirection() == Vertical)
-        frame.y_hidden -= tbar->getExposedHeight();
+        frame.hidden.setY(frame.area.y() - tbar->getExposedHeight());
       else
-	frame.y_hidden = frame.y;
+	frame.hidden.setY(frame.area.y());
     }
   }
 
   if (hidden)
-    XMoveResizeWindow(display, frame.window, frame.x_hidden,
-		      frame.y_hidden, frame.width, frame.height);
+    XMoveResizeWindow(display, frame.window, frame.hidden.x(),
+		      frame.hidden.y(), frame.area.w(), frame.area.h());
   else
-    XMoveResizeWindow(display, frame.window, frame.x,
-		      frame.y, frame.width, frame.height);
+    XMoveResizeWindow(display, frame.window, frame.area.x(),
+		      frame.area.y(), frame.area.w(), frame.area.h());
 }
 
 
@@ -600,9 +579,9 @@ void Slit::configureRequestEvent(XConfigureRequestEvent *e) {
 void Slit::timeout(void) {
   hidden = ! hidden;
   if (hidden)
-    XMoveWindow(display, frame.window, frame.x_hidden, frame.y_hidden);
+    XMoveWindow(display, frame.window, frame.hidden.x(), frame.hidden.y());
   else
-    XMoveWindow(display, frame.window, frame.x, frame.y);
+    XMoveWindow(display, frame.window, frame.area.x(), frame.area.y());
 }
 
 

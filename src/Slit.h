@@ -28,6 +28,7 @@
 
 #include "Basemenu.h"
 #include "LinkedList.h"
+#include "Geometry.h"
 
 // forward declaration
 class Slit;
@@ -107,9 +108,12 @@ private:
     Pixmap pixmap;
     Window window;
 
-    int x, y, x_hidden, y_hidden;
-    unsigned int width, height;
+    //int x, y, x_hidden, y_hidden;
+    //unsigned int width, height;
+    Rect area;
+    Point hidden;
   } frame;
+
 
   friend class Slitmenu;
   friend class Slitmenu::Directionmenu;
@@ -128,13 +132,17 @@ public:
 
   inline const Window &getWindowID() const { return frame.window; }
 
-  inline const int &getX(void) const
-  { return ((hidden) ? frame.x_hidden : frame.x); }
-  inline const int &getY(void) const
-  { return ((hidden) ? frame.y_hidden : frame.y); }
+  //inline const int &getX(void) const
+  //{ return ((hidden) ? frame.x_hidden : frame.x); }
+  //inline const int &getY(void) const
+  //{ return ((hidden) ? frame.y_hidden : frame.y); }
+  inline const Point &origin() const { return frame.area.origin(); }
+  
+  //inline const unsigned int &getWidth(void) const { return frame.width; }
+  //inline const unsigned int &getHeight(void) const { return frame.height; }
+  inline const Size &size() const { return frame.area.size(); }
 
-  inline const unsigned int &getWidth(void) const { return frame.width; }
-  inline const unsigned int &getHeight(void) const { return frame.height; }
+  inline const Rect &area() const { return frame.area; }
 
   void addClient(Window);
   void removeClient(SlitClient *, Bool = True);

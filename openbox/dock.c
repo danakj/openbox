@@ -155,16 +155,16 @@ void dock_configure()
     for (it = dock->dock_apps; it; it = it->next) {
         struct DockApp *app = it->data;
         if (config_dock_horz) {
-            app->x = spot;
-            app->y = (dock->h - app->h) / 2;
             dock->w += app->w;
             dock->h = MAX(dock->h, app->h);
+            app->x = spot;
+            app->y = (dock->h - app->h) / 2;
             spot += app->w;
         } else {
-            app->x = (dock->w - app->w) / 2;
-            app->y = spot;
             dock->w = MAX(dock->w, app->w);
             dock->h += app->h;
+            app->x = (dock->w - app->w) / 2;
+            app->y = spot;
             spot += app->h;
         }
 

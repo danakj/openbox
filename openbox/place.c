@@ -385,6 +385,15 @@ void place_client(ObClient *client, gint *x, gint *y)
          place_smart(client, x, y, SMART_FOCUSED) ||
          place_random(client, x, y)))
     {
+        /* make sure the window is visible. */
+        client_find_onscreen(client, x, y,
+                             client->frame->area.width,
+                             client->frame->area.height,
+                             /* non-normal clients has less rules, and
+                                windows that are being restored from a session
+                                do also. we can assume you want it back where
+                                you saved it */
+                             client_normal(client) && !client->session);
         /* get where the client should be */
         frame_frame_gravity(client->frame, x, y);
     } else

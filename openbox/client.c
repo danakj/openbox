@@ -344,16 +344,6 @@ void client_manage(Window window)
 
         place_client(self, &x, &y);
 
-           
-        /* make sure the window is visible. */
-        client_find_onscreen(self, &x, &y,
-                             self->frame->area.width,
-                             self->frame->area.height,
-                             /* non-normal clients has less rules, and
-                                windows that are being restored from a session
-                                do also. we can assume you want it back where
-                                you saved it */
-                             client_normal(self) && !self->session);
         if (x != ox || y != oy) 	 
             client_move(self, x, y);
     }
@@ -628,7 +618,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* This here doesn't let windows even a pixel outside the screen,
      * not applied to all windows. Not sure if it's going to stay at all.
      * I wonder if disabling this will break struts somehow? Let's find out. */
-    if (0 && rude) {
+    if (rude) {
         /* avoid the xinerama monitor divide while we're at it,
          * remember to fix the placement stuff to avoid it also and
          * then remove this XXX */

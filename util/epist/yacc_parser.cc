@@ -28,7 +28,10 @@
     
 #define YYPARSE_PARAM parser_obj
 #define YYSTYPE char*
-    
+
+extern int yylineno;
+extern char *yytext;
+
 extern "C" {
     int yylex();
     int yywrap() {
@@ -36,10 +39,10 @@ extern "C" {
     }
 }
 
-void yyerror(const char *c) {
-    printf("ERROR: %s\n", c);
+void yyerror(const char *c)
+{
+    printf("ERROR: %s, on line %d, near %s\n", c, yylineno, yytext);
 }
-
 
 #ifndef YYSTYPE
 #define YYSTYPE int
@@ -112,9 +115,9 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-    31,    32,    33,    36,    37,    40,    49,    56,    60,    64,
-    68,    72,    73,    76,    78,    79,    80,    81,    82,    85,
-    86,    87,    88,    89,    90,    93,    97,    98,   101
+    35,    36,    37,    40,    41,    44,    53,    60,    64,    68,
+    72,    76,    77,    80,    82,    83,    84,    85,    86,    89,
+    90,    91,    92,    93,    94,    97,   101,   102,   105
 };
 #endif
 
@@ -728,76 +731,76 @@ yyreduce:
   switch (yyn) {
 
 case 6:
-#line 42 "epist.y"
+#line 46 "epist.y"
 {
         ((parser*)parser_obj)->setAction(yyvsp[-2]);
         ((parser*)parser_obj)->endAction();
     ;
     break;}
 case 7:
-#line 51 "epist.y"
+#line 55 "epist.y"
 {
         ((parser*)parser_obj)->endChain();
     ;
     break;}
 case 10:
-#line 65 "epist.y"
+#line 69 "epist.y"
 { ((parser*)parser_obj)->startChain(); ;
     break;}
 case 11:
-#line 69 "epist.y"
+#line 73 "epist.y"
 { /* ((parser*)parser_obj)->endChain(); */ ;
     break;}
 case 13:
-#line 73 "epist.y"
+#line 77 "epist.y"
 { ((parser*)parser_obj)->addModifier(yyvsp[-2]); ;
     break;}
 case 14:
-#line 77 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 15:
-#line 78 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 16:
-#line 79 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 17:
-#line 80 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 18:
 #line 81 "epist.y"
 { ((parser*)parser_obj)->setKey(yyvsp[0]); ;
     break;}
-case 19:
+case 15:
 #line 82 "epist.y"
 { ((parser*)parser_obj)->setKey(yyvsp[0]); ;
     break;}
-case 21:
+case 16:
+#line 83 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 17:
+#line 84 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 18:
+#line 85 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 19:
 #line 86 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 21:
+#line 90 "epist.y"
 { ((parser*)parser_obj)->setArgumentNum(yyvsp[0]); ;
     break;}
 case 22:
-#line 87 "epist.y"
+#line 91 "epist.y"
 { ((parser*)parser_obj)->setArgumentNegNum(yyvsp[0]); ;
     break;}
 case 23:
-#line 88 "epist.y"
+#line 92 "epist.y"
 { ((parser*)parser_obj)->setArgumentStr(yyvsp[0]); ;
     break;}
 case 24:
-#line 89 "epist.y"
+#line 93 "epist.y"
 { ((parser*)parser_obj)->setArgumentTrue(yyvsp[0]); ;
     break;}
 case 25:
-#line 90 "epist.y"
+#line 94 "epist.y"
 { ((parser*)parser_obj)->setArgumentFalse(yyvsp[0]); ;
     break;}
 case 29:
-#line 103 "epist.y"
+#line 107 "epist.y"
 { ((parser*)parser_obj)->setOption(yyvsp[-2]); ;
     break;}
 }
@@ -1022,6 +1025,6 @@ yyerrhandle:
     }
   return 1;
 }
-#line 106 "epist.y"
+#line 110 "epist.y"
 
 

@@ -1,0 +1,62 @@
+kernel_dir:=kernel
+kernel_target:=$(binary)
+kernel_sources:=action.c client.c config.c dispatch.c engine.c event.c \
+                extensions.c focus.c frame.c grab.c menu.c openbox.c \
+                parse.c plugin.c prop.c screen.c stacking.c timer.c xerror.c \
+                lex.yy.c parse.tab.c
+kernel_lex:=parse.l
+kernel_yacc:=parse.y
+kernel_CPPFLAGS:=$(CPPFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(XFT_CFLAGS) \
+  -DG_LOG_DOMAIN=\"Openbox\"
+kernel_LIBS:=$(LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS)
+kernel_LDFLAGS:=-export-dynamic
+
+kernel_srcdir:=$(srcdir)/$(kernel_dir)
+kernel_lex:=$(addprefix $(kernel_srcdir)/,$(kernel_lex))
+kernel_yacc:=$(addprefix $(kernel_srcdir)/,$(kernel_yacc))
+kernel_target:=$(addprefix $(kernel_dir)/,$(kernel_target))
+kernel_objects:=$(addprefix $(kernel_dir)/,$(kernel_sources:.c=.o))
+kernel_sources:=$(addprefix $(kernel_srcdir)/,$(kernel_sources))
+kernel_deps:=$(addprefix $(depdir)/,$(kernel_objects:.o=.d))
+kernel_depdir:=$(depdir)/$(kernel_dir)
+
+$(kernel_target): $(kernel_objects) $(render_target)
+	$(LIBTOOL) --mode=link $(CC) -o $@ $^ $(kernel_LIBS) $(kernel_LDFLAGS)
+
+$(kernel_dir):
+	@mkdir $@
+
+$(kernel_dir)/%.o: $(kernel_srcdir)/%.c $(kernel_depdir)/%.d
+	$(CC) $(DEFS) $(kernel_CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(kernel_dir)/lex.yy.c: $(kernel_lex)
+	cd kernel && \
+	$(FLEX) $(notdir $<)
+
+%.tab.h: %.tab.c
+
+$(kernel_dir)/%.tab.c: $(kernel_srcdir)/%.y
+	cd kernel && \
+	$(BISON) -d $(notdir $<)
+
+$(kernel_depdir)/%.d: $(kernel_srcdir)/%.c $(depdir)
+	@echo Building dependancies for $<
+	@mkdir $(dir $@) 2> /dev/null || true
+	@$(CC) $(kernel_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.o) $<
+
+kernel-install:
+	$(INSTALL) -d $(DESTDIR)$(bindir)/
+	$(INSTALL) $(kernel_target) $(DESTDIR)$(bindir)/$(notdir $(kernel_target))
+
+kernel-uninstall:
+	-$(RM) $(DESTDIR)$(bindir)/$(notdir $(kernel_target))
+	-rmdir $(DESTDIR)$(bindir)/
+
+kernel-clean:
+	$(RM) $(kernel_target) $(kernel_objects) $(kernel_dir)/*\~
+	$(RM) $(kernel_srcdir)/lex.yy.c
+	$(RM) $(kernel_yacc:.y=.tab.c) $(kernel_yacc:.y=.tab.h)
+
+-include $(kernel_deps)
+
+.PHONY: kernel-install kernel-uninstall kernel-clean

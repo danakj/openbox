@@ -20,7 +20,7 @@ AC_DEFUN([OB_DEBUG],
 
   # cvs builds are always debug
   CVS=""
-  test "${VERSION%*cvs}" != "$VERSION" && CVS="yes"
+  test "${PACKAGE_VERSION%*cvs}" != "$PACKAGE_VERSION" && CVS="yes"
   test "$CVS" = "yes" && DEBUG="yes"
 
   if test "$DEBUG" = "yes"; then

@@ -1,7 +1,3 @@
-Makefile.in
-Makefile
 placement.la
 placement.lo
-.deps
-.libs
 history.lo

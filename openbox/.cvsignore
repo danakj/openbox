@@ -1,9 +1,4 @@
 openbox3
-Makefile.in
-Makefile
-.libs
-.deps
-lex.cparse.c
-y.tab.c
-y.tab.h
 lex.yy.c
+parse.tab.c
+parse.tab.h

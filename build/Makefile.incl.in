@@ -1,0 +1,44 @@
+CFLAGS = @CFLAGS@
+CPPFLAGS = -I. -I$(srcdir) @CPPFLAGS@ \
+  -DLOCALEDIR=\"$(localedir)\" \
+  -DRCDIR=\"$(rcdir)\" \
+  -DPLUGINDIR=\"$(plugindir)\" \
+  -DENGINEDIR=\"$(enginedir)\" \
+  -DDEFAULT_ENGINE=\"openbox\" \
+  -DBINARY=\"$(binary)\"
+DEFS = @DEFS@
+LIBS = @LIBS@
+
+GLIB_CFLAGS = @GLIB_CFLAGS@
+GLIB_LIBS = @GLIB_LIBS@ -DG_DISABLE_DEPRECATED
+
+GMODULE_CFLAGS = @GMODULE_CFLAGS@
+GMODULE_LIBS = @GMODULE_LIBS@ -DG_DISABLE_DEPRECATED
+
+XFT_CFLAGS = @XFT_CFLAGS@
+XFT_LIBS = @XFT_LIBS@
+
+FLEX = @FLEX@
+BISON = @BISON@
+INSTALL = @INSTALL@
+LIBTOOL = @LIBTOOL@
+
+srcdir = @srcdir@
+# non-recursive!
+top_builddir = .
+
+prefix ?= @prefix@
+exec_prefix ?= @exec_prefix@
+
+bindir ?= @bindir@
+libdir ?= @libdir@
+includedir ?= @includedir@
+datadir ?= @datadir@
+
+localedir = $(datadir)/locale
+enginedir = $(libdir)/openbox/engines
+plugindir = $(libdir)/openbox/plugins
+rcdir = $(datadir)/openbox
+themesdir = $(datadir)/openbox/themes
+
+binary = openbox3

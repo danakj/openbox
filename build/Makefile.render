@@ -1,0 +1,37 @@
+render_dir:=render
+render_target:=librender.a
+render_sources:=color.c font.c gradient.c image.c mask.c render.c test.c
+render_CPPFLAGS:=$(CPPFLAGS) $(GLIB_CFLAGS) $(XFT_CFLAGS) \
+  -DG_LOG_DOMAIN=\"Render\"
+
+render_srcdir:=$(srcdir)/$(render_dir)
+render_target:=$(addprefix $(render_dir)/,$(render_target))
+render_objects:=$(addprefix $(render_dir)/,$(render_sources:.c=.o))
+render_sources:=$(addprefix $(render_srcdir)/,$(render_sources))
+render_deps:=$(addprefix $(depdir)/,$(render_objects:.o=.d))
+render_depdir:=$(depdir)/$(render_dir)
+
+$(render_target): $(render_objects)
+	$(AR) r $@ $^
+
+$(render_dir):
+	@mkdir $@
+
+$(render_dir)/%.o: $(render_srcdir)/%.c $(depdir)/%.d
+	$(CC) $(DEFS) $(render_CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(render_depdir)/%.d: $(render_srcdir)/%.c $(render_depdir)
+	@echo Building dependancies for $<
+	@mkdir $(dir $@) 2> /dev/null || true
+	@$(CC) $(render_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.o) $<
+
+render-install:
+
+render-uninstall:
+
+render-clean:
+	$(RM) $(render_target) $(render_objects) $(render_srcdir)/*\~
+
+-include $(render_deps)
+
+.PHONY: render-install render-uninstall render-clean

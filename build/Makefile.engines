@@ -1,0 +1,60 @@
+engines_dir:=engines
+engines_srcdir:=$(srcdir)/$(engines_dir)
+engines_depdir:=$(depdir)/$(engines_dir)
+
+engines_ob_dir:=$(engines_dir)/openbox
+engines_ob_srcdir:=$(engines_srcdir)/openbox
+engines_ob_target:=openbox.la
+engines_ob_sources:=obengine.c obtheme.c obrender.c
+engines_ob_CPPFLAGS:=$(CPPFLAGS) $(GLIB_CFLAGS) $(XFT_CFLAGS) \
+  -DG_LOG_DOMAIN=\"Engine-Openbox\" \
+  -DTHEMEDIR=\"$(themesdir)/openbox\" \
+  -DDEFAULT_THEME=\"operation\"
+
+engines_targets:=$(engines_ob_dir)/$(engines_ob_target)
+
+engines_ob_objects:=$(addprefix $(engines_ob_dir)/,$(engines_ob_sources:.c=.lo))
+engines_ob_sources:=$(addprefix $(engines_ob_srcdir)/,$(engines_ob_sources))
+engines_ob_target:=$(addprefix $(engines_ob_dir)/,$(engines_ob_target))
+engines_ob_deps:=$(addprefix $(depdir)/,$(engines_ob_objects:.lo=.d))
+engines_ob_depdir:=$(depdir)/$(engines_ob_dir)
+
+## engines_ob
+
+$(engines_ob_target): $(engines_ob_objects)
+	$(LIBTOOL) --mode=link $(CC) -rpath $(enginedir) $(engines_ob_CPPFLAGS) \
+		$(CFLAGS) -module -avoid-version -o $@ $^
+
+$(engines_ob_dir):
+	@mkdir $@
+
+$(engines_ob_dir)/%.lo: $(engines_ob_srcdir)/%.c $(engines_ob_depdir)/%.d
+	$(LIBTOOL) --mode=compile $(CC) $(DEFS) \
+		$(engines_ob_CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(engines_ob_depdir)/%.d: $(engines_ob_srcdir)/%.c $(depdir)
+	@echo Building dependancies for $<
+	@mkdir $(engines_depdir) 2> /dev/null || true
+	@mkdir $(dir $@) 2> /dev/null || true
+	@$(CC) $(engines_ob_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
+
+## end engines_ob
+
+engines-install:
+	$(INSTALL) -d $(DESTDIR)$(enginedir)/
+	$(LIBTOOL) --mode=install $(INSTALL) $(engines_ob_target) \
+		$(DESTDIR)$(enginedir)/$(notdir $(engines_ob_target))
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(enginedir)
+
+engines-uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) \
+		$(DESTDIR)$(enginedir)/$(notdir $(engines_ob_target))
+	-rmdir $(DESTDIR)$(enginedir)/
+
+engines-clean:
+	$(RM) $(engines_ob_target) $(engines_ob_objects)
+	$(RM) $(engines_ob_dir)/*\~
+
+-include $(engines_ob_deps)
+
+.PHONY: engines-install engines-uninstall engines-clean

@@ -1,0 +1,96 @@
+plugins_dir:=plugins
+plugins_srcdir:=$(srcdir)/$(plugins_dir)
+
+plugins_resistance_dir:=$(plugins_dir)
+plugins_resistance_srcdir:=$(plugins_srcdir)
+plugins_resistance_target:=resistance.la
+plugins_resistance_sources:=resistance.c
+plugins_resistance_CPPFLAGS:=$(CPPFLAGS) $(GLIB_CFLAGS) $(XFT_CFLAGS) \
+  -DG_LOG_DOMAIN=\"Plugin-Resistance\"
+
+plugins_placement_dir:=$(plugins_dir)/placement
+plugins_placement_srcdir:=$(plugins_srcdir)/placement
+plugins_placement_target:=placement.la
+plugins_placement_sources:=placement.c history.c
+plugins_placement_CPPFLAGS:=$(CPPFLAGS) $(GLIB_CFLAGS) $(XFT_CFLAGS) \
+  -DG_LOG_DOMAIN=\"Plugin-Placement\"
+
+plugins_targets:=$(plugins_resistance_dir)/$(plugins_resistance_target)
+plugins_targets:=$(plugins_targets) $(plugins_placement_dir)/$(plugins_placement_target)
+
+plugins_resistance_objects:=$(addprefix $(plugins_resistance_dir)/,$(plugins_resistance_sources:.c=.lo))
+plugins_resistance_sources:=$(addprefix $(plugins_resistance_srcdir)/,$(plugins_resistance_sources))
+plugins_resistance_target:=$(addprefix $(plugins_resistance_dir)/,$(plugins_resistance_target))
+plugins_resistance_deps:=$(addprefix $(depdir)/,$(plugins_resistance_objects:.lo=.d))
+plugins_resistance_depdir:=$(depdir)/$(plugins_resistance_dir)
+
+plugins_placement_objects:=$(addprefix $(plugins_placement_dir)/,$(plugins_placement_sources:.c=.lo))
+plugins_placement_sources:=$(addprefix $(plugins_placement_srcdir)/,$(plugins_placement_sources))
+plugins_placement_target:=$(addprefix $(plugins_placement_dir)/,$(plugins_placement_target))
+plugins_placement_deps:=$(addprefix $(depdir)/,$(plugins_placement_objects:.lo=.d))
+plugins_placement_depdir:=$(depdir)/$(plugins_placement_dir)
+
+## plugins_resistance
+
+$(plugins_resistance_target): $(plugins_resistance_objects)
+	$(LIBTOOL) --mode=link $(CC) -rpath $(plugindir) $(plugins_resistance_CPPFLAGS) \
+		$(CFLAGS) -module -avoid-version -o $@ $^
+
+$(plugins_resistance_dir):
+	@mkdir $@
+
+$(plugins_resistance_dir)/%.lo: $(plugins_resistance_srcdir)/%.c $(plugins_resistance_depdir)/%.d
+	$(LIBTOOL) --mode=compile $(CC) $(DEFS) \
+		$(plugins_resistance_CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(plugins_resistance_depdir)/%.d: $(plugins_resistance_srcdir)/%.c $(depdir)
+	@echo Building dependancies for $<
+	@mkdir $(dir $@) 2> /dev/null || true
+	@$(CC) $(plugins_resistance_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
+
+## end plugins_resistance
+
+## plugins_placement
+
+$(plugins_placement_target): $(plugins_placement_objects)
+	$(LIBTOOL) --mode=link $(CC) -rpath $(plugindir) $(plugins_placement_CPPFLAGS) \
+		$(CFLAGS) -module -avoid-version -o $@ $^
+
+$(plugins_placement_dir):
+	@mkdir $@
+
+$(plugins_placement_dir)/%.lo: $(plugins_placement_srcdir)/%.c $(plugins_placement_depdir)/%.d
+	$(LIBTOOL) --mode=compile $(CC) $(DEFS) \
+		$(plugins_placement_CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(plugins_placement_depdir)/%.d: $(plugins_placement_srcdir)/%.c $(depdir)
+	@echo Building dependancies for $<
+	@mkdir $(dir $@) 2> /dev/null || true
+	@$(CC) $(plugins_placement_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
+
+## end plugins_placement
+
+plugins-install:
+	$(INSTALL) -d $(DESTDIR)$(plugindir)/
+	$(LIBTOOL) --mode=install $(INSTALL) $(plugins_resistance_target) \
+		$(DESTDIR)$(plugindir)/$(notdir $(plugins_resistance_target))
+	$(LIBTOOL) --mode=install $(INSTALL) $(plugins_placement_target) \
+		$(DESTDIR)$(plugindir)/$(notdir $(plugins_placement_target))
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(plugindir)
+
+plugins-uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) \
+		$(DESTDIR)$(plugindir)/$(notdir $(plugins_placement_target))
+	$(LIBTOOL) --mode=uninstall $(RM) \
+		$(DESTDIR)$(plugindir)/$(notdir $(plugins_resistance_target))
+	-rmdir $(DESTDIR)$(plugindir)/
+
+plugins-clean:
+	$(RM) $(plugins_resistance_target) $(plugins_resistance_objects)
+	$(RM) $(plugins_resistance_dir)/*\~
+	$(RM) $(plugins_placement_target) $(plugins_placement_objects)
+	$(RM) $(plugins_placement_dir)/*\~
+
+-include $(plugins_resistance_deps) $(plugins_placement_deps)
+
+.PHONY: plugins-install plugins-uninstall plugins-clean

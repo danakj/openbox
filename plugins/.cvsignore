@@ -1,9 +1,1 @@
-focus.lo
-focus.la
-Makefile
-Makefile.in
-.libs
-.deps
-focus_la-focus.lo
 resistance.la
-resistance_la-resistance.lo

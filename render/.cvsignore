@@ -1,6 +1,2 @@
-? .deps
-? .libs
-? Makefile
-? Makefile.in
-? rendertest
-
+rendertest
+librender.a

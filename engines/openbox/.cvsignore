@@ -1,7 +1,3 @@
-Makefile
-Makefile.in
-.deps
-.libs
 openbox.la
 obengine.lo
 obtheme.lo

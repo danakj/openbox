@@ -1,10 +1,4 @@
 mouse.lo
 mouse.la
-Makefile
-Makefile.in
-.libs
-.deps
 translate.lo
-lex.mparse.c
-lex.mparse.lo
 mouserc_parse.lo

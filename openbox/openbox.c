@@ -7,13 +7,13 @@
 #include "screen.h"
 #include "focus.h"
 #include "extensions.h"
-#include "gettext.h"
 #include "config.h"
 #include "parse.h"
 #include "grab.h"
 #include "engine.h"
 #include "plugin.h"
 #include "timer.h"
+#include "gettext.h"
 #include "../render/render.h"
 #include "../render/font.h"
 
@@ -69,9 +69,9 @@ int main(int argc, char **argv)
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
 	g_warning("Couldn't set locale from environment.\n");
-    bindtextdomain(PACKAGE, LOCALEDIR);
-    bind_textdomain_codeset(PACKAGE, "UTF-8");
-    textdomain(PACKAGE);
+    bindtextdomain(PACKAGE_NAME, LOCALEDIR);
+    bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
+    textdomain(PACKAGE_NAME);
 
     /* start our event dispatcher and register for signals */
     dispatch_startup();
@@ -256,7 +256,7 @@ void signal_handler(const ObEvent *e, void *data)
 
 void print_version()
 {
-    g_print("Openbox %s\n\n", VERSION);
+    g_print("Openbox %s\n\n", PACKAGE_VERSION);
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -272,7 +272,7 @@ void print_help()
     g_print("  -version     Display the version and exit\n");
     g_print("  -sync        Run in synchronous mode (this is slow and meant\n"
             "               for debugging X routines)\n");
-    g_print("\nPlease report bugs at %s\n", BUGURL);
+    g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
 void parse_args(int argc, char **argv)

@@ -8,7 +8,7 @@
 
 /* config options */
 static gboolean follow_mouse = TRUE;
-static gboolean warp_on_desk_switch = TRUE;
+static gboolean warp_on_desk_switch = FALSE;
 static gboolean focus_new = FALSE;
 
 static int skip_enter = 0;

@@ -30,6 +30,8 @@ extern "C" {
 #include <string>
 #include <map>
 
+#include <actions.hh>
+
 #include "../../src/BaseDisplay.hh"
 
 class XAtom;
@@ -49,9 +51,12 @@ private:
   typedef WindowLookup::value_type WindowLookupPair;
   WindowLookup    _windows;
 
+  ActionList _actions;
+  
   virtual void process_event(XEvent *e);
   virtual bool handleSignal(int sig);
 
+  void activateGrabs();
 public:
   epist(char **argv, char *display_name, char *rc_file);
   virtual ~epist();
@@ -61,6 +66,8 @@ public:
   void addWindow(XWindow *window);
   void removeWindow(XWindow *window);
   XWindow *findWindow(Window window) const;
+
+  list<Action> actions(void) { return _actions; }
 };
 
 #endif // __epist_hh

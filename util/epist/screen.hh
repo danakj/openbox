@@ -62,6 +62,10 @@ public:
   inline bool managed() const { return _managed; }
   
   void processEvent(const XEvent &e);
+
+  void handleKeypress(const XEvent &e);
+
+  void cycleWorkspace(const bool forward);
 };
 
 #endif // __screen_hh

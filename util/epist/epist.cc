@@ -75,6 +75,16 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     cout << "No compatible window manager found on any screens. Aborting.\n";
     ::exit(1);
   }
+
+  _actions.push_back(Action(Action::nextDesktop,
+                            XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Tab")),
+                            Mod1Mask));
+  _actions.push_back(Action(Action::prevDesktop,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Tab")),
+                           ControlMask));
+  activateGrabs();
 }
 
 
@@ -82,7 +92,24 @@ epist::~epist() {
   delete _xatom;
 }
 
+//   XGrabKey(_epist->getXDisplay(), XKeysymToKeycode(_epist->getXDisplay(),
+//                                            XStringToKeysym("F5")),
+//            Mod1Mask, _root, True, GrabModeAsync, GrabModeAsync);
+                  
+void epist::activateGrabs() {
 
+  ScreenList::const_iterator scrit, scrend = _screens.end();
+  
+  for (scrit = _screens.begin(); scrit != scrend; ++scrit) {
+    ActionList::const_iterator end = _actions.end();
+
+    for(ActionList::const_iterator ait = _actions.begin();
+        ait != end; ++ait) {
+      XGrabKey(getXDisplay(), ait->keycode(), ait->modifierMask(),
+               (*scrit)->rootWindow(), True, GrabModeAsync, GrabModeAsync);
+    }
+  }
+}
 bool epist::handleSignal(int sig) {
   switch (sig) {
   case SIGHUP:

@@ -137,10 +137,30 @@ void screen::processEvent(const XEvent &e) {
     }
     break;
   case KeyPress:
+    handleKeypress(e);
     break;
   }
 }
 
+void screen::handleKeypress(const XEvent &e) {
+  list<Action>::const_iterator it = _epist->actions().begin();
+  list<Action>::const_iterator end = _epist->actions().end();
+  for (; it != end; ++it) {
+    if (e.xkey.keycode == it->keycode() &&
+        e.xkey.state == it->modifierMask() )
+      {
+        switch (it->type()) {
+        case Action::nextDesktop:
+          cycleWorkspace(true);
+          break;
+        case Action::prevDesktop:
+          cycleWorkspace(false);
+          break;
+        }
+        break;
+      }
+  }
+}
 
 // do we want to add this window to our list?
 bool screen::doAddWindow(Window window) const {
@@ -238,3 +258,35 @@ void screen::updateActiveWindow() {
         perror("putenv()");
       }
  */
+
+void screen::cycleWorkspace(const bool forward) {
+  cout << "blef" << endl;
+
+  unsigned long currentDesktop = 0;
+  unsigned long numDesktops = 0;
+  
+  if (_xatom->getValue(_root, XAtom::net_current_desktop, XAtom::cardinal,
+                       currentDesktop)) {
+    if (forward)     
+      ++currentDesktop;
+    else
+      --currentDesktop;
+
+    cout << currentDesktop << endl;
+
+    
+    _xatom->getValue(_root, XAtom::net_number_of_desktops, XAtom::cardinal,
+                     numDesktops);
+    
+    if ( ( (signed)currentDesktop) == -1)
+      currentDesktop = numDesktops - 1;
+    else if (currentDesktop >= numDesktops)
+      currentDesktop = 0;
+
+    
+    _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root,
+                              currentDesktop);
+    
+  }
+}
+                                               

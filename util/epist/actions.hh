@@ -1,41 +1,62 @@
-// xOr: this is crap.
-enum ActionType {
-  noaction = 0,
-  execute,
-  iconify,
-  raiseWindow,
-  lowerWindow,
-  closeWindow,
-  shade,
-  moveWindowUp,
-  moveWindowDown,
-  moveWindowLeft,
-  moveWindowRight,
-  nextWindow,
-  prevWindow,
+#ifndef __actions_hh
+#define __actions_hh
+#include <list>
 
-  nextWindow,
-  prevWindow,
-  nextWindowOnAllDesktops,
-  prevWindowOnAllDesktops,
+extern "C" {
+#include <X11/X.h>
+}
+class Action {
+public:
+    // xOr: this is crap.
+  enum ActionType {
+    noaction = 0,
+    execute,
+    iconify,
+    raiseWindow,
+    lowerWindow,
+    closeWindow,
+    shade,
+    moveWindowUp,
+    moveWindowDown,
+    moveWindowLeft,
+    moveWindowRight,
 
-  nextWindowOfClass,
-  prevWindowOfClass,
+    nextWindow,
+    prevWindow,
+    nextWindowOnAllDesktops,
+    prevWindowOnAllDesktops,
 
-  changeDesktop,
-  nextDesktop,
-  prevDesktop,
+    nextWindowOfClass,
+    prevWindowOfClass,
 
-  // these are openbox extensions
-  showRootMenu,
-  showWorkspaceMenu,
+    changeDesktop,
+    nextDesktop,
+    prevDesktop,
 
-  stringChain, 
-  keyChain,
-  numberChain,
+    // these are openbox extensions
+    showRootMenu,
+    showWorkspaceMenu,
 
-  cancel,
+    stringChain, 
+    keyChain,
+    numberChain,
 
-  NUM_ACTIONS
+    cancel,
+  };
+
+private:
+  enum Action::ActionType _type;
+  const KeyCode _keycode;
+  const int _modifierMask;
+  
+public:
+  inline enum ActionType type() const { return _type;}
+  inline const KeyCode keycode() const { return _keycode; }
+  inline const int modifierMask() const { return _modifierMask; }
+
+  Action::Action(enum ActionType type, KeyCode keycode, int modifierMask);
 };
+  
+typedef list<Action> ActionList;
 
+#endif

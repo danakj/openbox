@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 2.2.4:
+ * Fixed a bug when resizing shaded windows. It now	(Scott Moynes)
+   unshades before resizing.
+
  * Fixed a bug in the image cache that would draw	(Scott Moynes)
    borders incorrectly in rare circumstances.
 

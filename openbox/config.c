@@ -197,7 +197,7 @@ gboolean config_def_set(ConfigDefEntry *entry)
     gboolean ret = FALSE;
     ConfigDefEntry *def;
 
-    if ((entry = g_datalist_get_data(&config_def, entry->name))) {
+    if ((def = g_datalist_get_data(&config_def, entry->name))) {
         g_assert(def != entry); /* adding it twice!? */
         g_warning("Definition already set for config option '%s'. ",
                   entry->name);

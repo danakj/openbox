@@ -407,7 +407,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 {
     FrameDecor *dec;
     Rect *cr;
-    int i, le = 0, re = 0, te = 0, be = 0, temp;
+    int i, le = 0, re = 0, te = 0, be = 0, temp, x, y;
 
     if (resized)
         for (i = 0; i < self->framedecors; i++) {
@@ -536,6 +536,90 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                              &self->area.x, &self->area.y);
     }
 
+    if (resized)
+        for (i = 0; i < self->framedecors; i++) {
+            dec = &self->framedecor[i];
+            cr = &self->client->area;
+            if (!(dec->type & self->client->decorations))
+                XUnmapWindow(ob_display, dec->window);
+            else
+                switch (dec->anchor) {
+                    case Decor_TopLeft:
+                    x = self->size.left - dec->position.x - dec->position.width;
+                    y = self->size.top - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_Top:
+                    x = cr->width/2 + self->size.left - dec->position.x
+                      - dec->position.width/2;
+                    y = self->size.top - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_TopRight:
+                    x = self->size.left + cr->width
+                      - dec->position.x - dec->position.width;
+                    y = self->size.top - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_Left:
+                    x = self->size.left - dec->position.x
+                      - dec->position.width;
+                    y = cr->height/2 + self->size.top - dec->position.y
+                      - dec->position.height/2;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_Right:
+                    x = self->size.left + cr->width - dec->position.x
+                      - dec->position.width;
+                    y = cr->height/2 + self->size.top - dec->position.y
+                      - dec->position.height/2;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_BottomLeft:
+                    x = self->size.left - dec->position.x - dec->position.width;
+                    y = self->size.top + cr->height
+                      - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_Bottom:
+                    x = cr->width/2 + self->size.left - dec->position.x
+                      - dec->position.width/2;
+                    y = self->size.top + cr->height
+                      - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+
+                    case Decor_BottomRight:
+                    x = self->size.left + cr->width
+                      - dec->position.x - dec->position.width;
+                    y = self->size.top + cr->height
+                      - dec->position.y - dec->position.height;
+                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
+                }
+        }
     /* move and resize the top level frame.
        shading can change without being moved or resized */
     XMoveResizeWindow(ob_display, self->window,

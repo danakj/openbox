@@ -279,7 +279,7 @@ void client_manage(Window window)
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
         (config_focus_new || (self->transient_for &&
-                              self->transient_for != TRAN_GROUP &&
+                              self->transient_for != OB_TRAN_GROUP &&
                               client_focused(self->transient_for))) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more

@@ -2492,7 +2492,7 @@ ObClient *client_focus_target(ObClient *self)
     ObClient *child;
      
     /* if we have a modal child, then focus it, not us */
-    child = client_search_modal_child(self);
+    child = client_search_modal_child(client_search_top_transient(self));
     if (child) return child;
     return self;
 }

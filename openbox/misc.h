@@ -90,6 +90,7 @@ typedef enum {
 } ObMouseAction;
 
 typedef enum {
+    OB_USER_ACTION_NONE, /* being fired from inside another action and such */
     OB_USER_ACTION_KEYBOARD_KEY,
     OB_USER_ACTION_MOUSE_PRESS,
     OB_USER_ACTION_MOUSE_RELEASE,

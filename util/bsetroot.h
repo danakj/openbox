@@ -8,7 +8,6 @@
 class bsetroot : public BaseDisplay {
 private:
   BImageControl **img_ctrl;
-  Pixmap *pixmaps;
 
   char *fore, *back, *grad;
 
@@ -22,6 +21,9 @@ public:
   ~bsetroot(void);
 
   inline virtual Bool handleSignal(int) { return False; }
+
+  void setPixmapProperty(int, Pixmap);
+  Pixmap duplicatePixmap(int, Pixmap, int, int);
 
   void gradient(void);
   void modula(int, int);

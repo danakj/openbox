@@ -1,6 +1,8 @@
 #include "glft.h"
 
+FcBool init_done = 0;
+
 FcBool GlftInit()
 {
-    return FcInit();
+    return init_done = FcInit();
 }

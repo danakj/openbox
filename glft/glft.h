@@ -3,8 +3,18 @@
 
 #include <fontconfig/fontconfig.h>
 
-struct GlftFont;
+/* initialization */
 
 FcBool GlftInit();
+
+/* fonts */
+
+struct GlftFont;
+
+struct GlftFont *GlftFontOpen(const char *name);
+
+void GlftFontClose(struct GlftFont *font);
+
+/* rendering */
 
 #endif

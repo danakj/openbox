@@ -15,10 +15,16 @@ glfttest_LDFLAGS=-lglft -L.
 glfttest_SOURCES=test.c
 
 lib_LTLIBRARIES=libglft.la
-libglft_la_SOURCES=init.c
+libglft_la_SOURCES=\
+	init.c \
+	font.c \
+	debug.c
 
-
-noinst_HEADERS=glft.h
+noinst_HEADERS=\
+	glft.h \
+	font.h \
+	init.h \
+	debug.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

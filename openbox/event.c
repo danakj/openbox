@@ -72,6 +72,8 @@ static const int mask_table[] = {
 };
 static int mask_table_size;
 
+static ObClient *focus_delay_client;
+
 #ifdef USE_SM
 static void ice_handler(int fd, gpointer conn)
 {
@@ -657,8 +659,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
         case OB_FRAME_CONTEXT_FRAME:
             /* XXX if doing a 'reconfigure' make sure you kill this timer,
                maybe all timers.. */
-            if (config_focus_delay)
+            if (config_focus_delay) {
+                focus_delay_client = NULL;
                 ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+            }
         default:
             break;
         }
@@ -705,8 +709,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                         ob_main_loop_timeout_add(ob_main_loop,
                                                  config_focus_delay,
                                                  focus_delay_func,
-                                                 client,
-                                                 NULL);
+                                                 NULL, NULL);
+                        focus_delay_client = client;
                     } else
                         client_focus(client);
                 }
@@ -1178,12 +1182,15 @@ static void event_handle_menu(XEvent *ev)
 
 static gboolean focus_delay_func(gpointer data)
 {
-    ObClient *c = data;
-    client_focus(c);
+    client_focus(focus_delay_client);
     return FALSE; /* no repeat */
 }
 
 static void focus_delay_client_dest(gpointer data)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+    ObClient *c = data;
+    if (c == focus_delay_client) {
+        focus_delay_client = NULL;
+        ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+    }
 }

@@ -1001,7 +1001,7 @@ void Openbox::save() {
 
 void Openbox::load() {
   if (!config.load())
-    return;
+    config.create();
 
   std::string s;
   long l;

@@ -85,6 +85,13 @@ bool Resource::load() {
   return true;
 }
 
+void Resource::create() {
+  if (m_database != NULL)
+    XrmDestroyDatabase(m_database);
+  m_modified = false;
+  ASSERT(NULL != (m_database = XrmGetStringDatabase("")));
+}
+
 void Resource::setValue(const std::string &rname, bool value) {
   ASSERT(m_database != NULL);
 

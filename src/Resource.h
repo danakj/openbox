@@ -50,6 +50,7 @@ public:
 
   void save();
   bool load();
+  void create();
 
   void setValue(const std::string &rname, bool value);
   void setValue(const std::string &rname, int value);

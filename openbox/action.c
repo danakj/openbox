@@ -1,172 +1,205 @@
 #include "client.h"
 #include "stacking.h"
+#include "frame.h"
 #include "screen.h"
+#include "action.h"
 
 #include <glib.h>
 
-void action_execute(char *path)
+Action *action_new(void (*func)(union ActionData *data))
+{
+    Action *a = g_new(Action, 1);
+    a->func = func;
+
+    /* deal with pointers */
+    if (func == action_execute)
+        a->data.execute.path = NULL;
+
+    return a;
+}
+
+void action_free(Action *a)
+{
+    /* deal with pointers */
+    if (a->func == action_execute)
+        g_free(a->data.execute.path);
+
+    g_free(a);
+}
+
+void action_execute(union ActionData *data)
 {
     GError *e;
-    if (!g_spawn_command_line_async(path, &e)) {
-        g_warning("failed to execute '%s': %s", path, e->message);
+    if (!g_spawn_command_line_async(data->execute.path, &e)) {
+        g_warning("failed to execute '%s': %s",
+                  data->execute.path, e->message);
     }
 }
 
-void action_iconify(Client *c)
+void action_iconify(union ActionData *data)
 {
-    client_iconify(c, TRUE, TRUE);
+    client_iconify(data->client.c, TRUE, TRUE);
 }
 
-void action_raise(Client *c)
+void action_raise(union ActionData *data)
 {
-    stacking_raise(c);
+    stacking_raise(data->client.c);
 }
 
-void action_lower(Client *c)
+void action_lower(union ActionData *data)
 {
-    stacking_lower(c);
+    stacking_lower(data->client.c);
 }
 
-void action_close(Client *c)
+void action_close(union ActionData *data)
 {
-    client_close(c);
+    client_close(data->client.c);
 }
 
-void action_shade(Client *c)
+void action_shade(union ActionData *data)
 {
-    client_shade(c, TRUE);
+    client_shade(data->client.c, TRUE);
 }
 
-void action_unshade(Client *c)
+void action_unshade(union ActionData *data)
 {
-    client_shade(c, FALSE);
+    client_shade(data->client.c, FALSE);
 }
 
-void action_toggle_shade(Client *c)
+void action_toggle_shade(union ActionData *data)
 {
-    client_shade(c, !c->shaded);
+    client_shade(data->client.c, !data->client.c->shaded);
 }
 
-void action_toggle_omnipresent(Client *c)
+void action_toggle_omnipresent(union ActionData *data)
 {
-    client_set_desktop(c, c->desktop == DESKTOP_ALL ?
+    client_set_desktop(data->client.c, data->client.c->desktop == DESKTOP_ALL ?
                        screen_desktop : DESKTOP_ALL);
 }
 
-void action_move_relative(Client *c, int dx, int dy)
+void action_move_relative(union ActionData *data)
 {
-    client_configure(c, Corner_TopLeft, c->area.x + dx, c->area.y + dy,
+    Client *c = data->relative.c;
+    client_configure(c, Corner_TopLeft,
+                     c->area.x + data->relative.dx,
+                     c->area.y + data->relative.dy,
                      c->area.width, c->area.height, TRUE, TRUE);
 }
 
-void action_resize_relative(Client *c, int dx, int dy)
+void action_resize_relative(union ActionData *data)
 {
+    Client *c = data->relative.c;
     client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
-                     c->area.width + dx, c->area.height + dy, TRUE, TRUE);
+                     c->area.width + data->relative.dx,
+                     c->area.height + data->relative.dy, TRUE, TRUE);
 }
 
-void action_maximize_full(Client *c)
+void action_maximize_full(union ActionData *data)
 {
-    client_maximize(c, TRUE, 0, TRUE);
+    client_maximize(data->client.c, TRUE, 0, TRUE);
 }
 
-void action_unmaximize_full(Client *c)
+void action_unmaximize_full(union ActionData *data)
 {
-    client_maximize(c, FALSE, 0, TRUE);
+    client_maximize(data->client.c, FALSE, 0, TRUE);
 }
 
-void action_toggle_maximize_full(Client *c)
+void action_toggle_maximize_full(union ActionData *data)
 {
-    client_maximize(c, !(c->max_horz || c->max_vert), 0, TRUE);
+    client_maximize(data->client.c,
+                    !(data->client.c->max_horz || data->client.c->max_vert),
+                    0, TRUE);
 }
 
-void action_maximize_horz(Client *c)
+void action_maximize_horz(union ActionData *data)
 {
-    client_maximize(c, TRUE, 1, TRUE);
+    client_maximize(data->client.c, TRUE, 1, TRUE);
 }
 
-void action_unmaximize_horz(Client *c)
+void action_unmaximize_horz(union ActionData *data)
 {
-    client_maximize(c, FALSE, 1, TRUE);
+    client_maximize(data->client.c, FALSE, 1, TRUE);
 }
 
-void action_toggle_maximize_horz(Client *c)
+void action_toggle_maximize_horz(union ActionData *data)
 {
-    client_maximize(c, !c->max_horz, 1, TRUE);
+    client_maximize(data->client.c, !data->client.c->max_horz, 1, TRUE);
 }
 
-void action_maximize_vert(Client *c)
+void action_maximize_vert(union ActionData *data)
 {
-    client_maximize(c, TRUE, 2, TRUE);
+    client_maximize(data->client.c, TRUE, 2, TRUE);
 }
 
-void action_unmaximize_vert(Client *c)
+void action_unmaximize_vert(union ActionData *data)
 {
-    client_maximize(c, FALSE, 2, TRUE);
+    client_maximize(data->client.c, FALSE, 2, TRUE);
 }
 
-void action_toggle_maximize_vert(Client *c)
+void action_toggle_maximize_vert(union ActionData *data)
 {
-    client_maximize(c, !c->max_vert, 2, TRUE);
+    client_maximize(data->client.c, !data->client.c->max_vert, 2, TRUE);
 }
 
-void action_send_to_desktop(Client *c, guint desktop)
+void action_send_to_desktop(union ActionData *data)
 {
-    if (desktop < screen_num_desktops || desktop == DESKTOP_ALL)
-        client_set_desktop(c, desktop);
+    if (data->sendto.desktop < screen_num_desktops ||
+        data->sendto.desktop == DESKTOP_ALL)
+        client_set_desktop(data->sendto.c, data->sendto.desktop);
 }
 
-void action_send_to_next_desktop(Client *c, gboolean wrap, gboolean follow)
+void action_send_to_next_desktop(union ActionData *data)
 {
     guint d;
 
     d = screen_desktop + 1;
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->sendtonextprev.wrap) return;
         d = 0;
     }
-    client_set_desktop(c, d);
-    if (follow) screen_set_desktop(d);
+    client_set_desktop(data->sendtonextprev.c, d);
+    if (data->sendtonextprev.follow) screen_set_desktop(d);
 }
 
-void action_send_to_previous_desktop(Client *c, gboolean wrap, gboolean follow)
+void action_send_to_previous_desktop(union ActionData *data)
 {
     guint d;
 
     d = screen_desktop - 1;
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->sendtonextprev.wrap) return;
         d = screen_num_desktops - 1;
     }
-    client_set_desktop(c, d);
-    if (follow) screen_set_desktop(d);
+    client_set_desktop(data->sendtonextprev.c, d);
+    if (data->sendtonextprev.follow) screen_set_desktop(d);
 }
 
-void action_desktop(guint desktop)
+void action_desktop(union ActionData *data)
 {
-    if (desktop < screen_num_desktops || desktop == DESKTOP_ALL)
-        screen_set_desktop(desktop);
+    if (data->desktop.desk < screen_num_desktops ||
+        data->desktop.desk == DESKTOP_ALL)
+        screen_set_desktop(data->desktop.desk);
 }
 
-void action_next_desktop(gboolean wrap)
+void action_next_desktop(union ActionData *data)
 {
     guint d;
 
     d = screen_desktop + 1;
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         d = 0;
     }
     screen_set_desktop(d);
 }
 
-void action_previous_desktop(gboolean wrap)
+void action_previous_desktop(union ActionData *data)
 {
     guint d;
 
     d = screen_desktop - 1;
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         d = screen_num_desktops - 1;
     }
     screen_set_desktop(d);
@@ -267,7 +300,7 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-void action_next_desktop_column(gboolean wrap)
+void action_next_desktop_column(union ActionData *data)
 {
     guint r, c, d;
 
@@ -275,7 +308,7 @@ void action_next_desktop_column(gboolean wrap)
     ++c;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         c = 0;
     }
     if (d >= screen_num_desktops)
@@ -285,7 +318,7 @@ void action_next_desktop_column(gboolean wrap)
         screen_set_desktop(d);
 }
 
-void action_previous_desktop_column(gboolean wrap)
+void action_previous_desktop_column(union ActionData *data)
 {
     guint r, c, d;
 
@@ -293,7 +326,7 @@ void action_previous_desktop_column(gboolean wrap)
     --c;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         c = screen_desktop_layout.columns - 1;
     }
     if (d >= screen_num_desktops)
@@ -303,7 +336,7 @@ void action_previous_desktop_column(gboolean wrap)
         screen_set_desktop(d);
 }
 
-void action_next_desktop_row(gboolean wrap)
+void action_next_desktop_row(union ActionData *data)
 {
     guint r, c, d;
 
@@ -311,7 +344,7 @@ void action_next_desktop_row(gboolean wrap)
     ++r;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         r = 0;
     }
     if (d >= screen_num_desktops)
@@ -321,7 +354,7 @@ void action_next_desktop_row(gboolean wrap)
         screen_set_desktop(d);
 }
 
-void action_previous_desktop_row(gboolean wrap)
+void action_previous_desktop_row(union ActionData *data)
 {
     guint r, c, d;
 
@@ -329,7 +362,7 @@ void action_previous_desktop_row(gboolean wrap)
     --r;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!wrap) return;
+        if (!data->nextprevdesktop.wrap) return;
         c = screen_desktop_layout.rows - 1;
     }
     if (d >= screen_num_desktops)
@@ -339,8 +372,29 @@ void action_previous_desktop_row(gboolean wrap)
         screen_set_desktop(d);
 }
 
-void action_toggle_decorations(Client *c)
+void action_toggle_decorations(union ActionData *data)
 {
+    Client *c = data->client.c;
     c->disabled_decorations = c->disabled_decorations ? 0 : ~0;
     client_setup_decor_and_functions(c);
+}
+
+void action_move(union ActionData *data)
+{
+    Client *c = data->move.c;
+    int x = data->move.x;
+    int y = data->move.y;
+
+    client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
+                     TRUE, data->move.final);
+}
+
+void action_resize(union ActionData *data)
+{
+    Client *c = data->resize.c;
+    int w = data->resize.x - c->frame->size.left - c->frame->size.right;
+    int h = data->resize.y - c->frame->size.top - c->frame->size.bottom;
+
+    client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
+                     TRUE, data->resize.final);
 }

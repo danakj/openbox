@@ -5,7 +5,6 @@
 #include "../../kernel/action.h"
 #include "tree.h"
 #include "keyboard.h"
-#include "keyaction.h"
 #include <glib.h>
 
 KeyBindingTree *firstnode;
@@ -21,6 +20,7 @@ static void grab_keys(gboolean grab)
     } else {
 	KeyBindingTree *p = firstnode;
 	while (p) {
+            /* XXX grab all lock keys too */
 	    XGrabKey(ob_display, p->key, p->state, ob_root, FALSE,
 		     GrabModeAsync, GrabModeSync);
 	    p = p->next_sibling;
@@ -38,56 +38,43 @@ static void reset_chains()
     }
 }
 
-static void clearall()
-{
-    grab_keys(FALSE);
-    tree_destroy(firstnode);
-    firstnode = NULL;
-    grab_keys(TRUE);
-}
-
-static gboolean bind(GList *keylist, KeyAction *action)
+static gboolean kbind(GList *keylist, Action *action)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
+
+    g_assert(keylist != NULL);
+    g_assert(action != NULL);
 
     if (!(tree = tree_build(keylist))) {
         g_warning("invalid binding");
         return FALSE;
     }
-
-    t = tree_find(tree, &conflict);
-    if (conflict) {
-        g_warning("conflict with binding");
-        tree_destroy(tree);
-        return FALSE;
-    }
-    if (t != NULL) {
+    if ((t = tree_find(tree, &conflict)) != NULL) {
 	/* already bound to something */
 	g_warning("keychain is already bound");
         tree_destroy(tree);
         return FALSE;
     }
+    if (conflict) {
+        g_warning("conflict with binding");
+        tree_destroy(tree);
+        return FALSE;
+    }
 
-    /* grab the server here to make sure no key pressed go missed */
+    /* grab the server here to make sure no key presses go missed */
     grab_server(TRUE);
-
     grab_keys(FALSE);
 
-    /* set the function */
+    /* set the action */
     t = tree;
     while (t->first_child) t = t->first_child;
-    t->action.action = action->action;
-    t->action.type[0] = action->type[0];
-    t->action.type[1] = action->type[1];
-    t->action.data[0] = action->data[0];
-    t->action.data[1] = action->data[1];
-
-    /* assimilate this built tree into the main tree */
-    tree_assimilate(tree); /* assimilation destroys/uses the tree */
+    t->action = action;
+    /* assimilate this built tree into the main tree. assimilation
+       destroys/uses the tree */
+    tree_assimilate(tree);
 
     grab_keys(TRUE); 
-
     grab_server(FALSE);
 
     return TRUE;
@@ -117,7 +104,14 @@ static void press(ObEvent *e, void *foo)
                     }
                     curpos = p;
                 } else {
-                    keyaction_do(&p->action, focus_client);
+                    if (p->action->func != NULL) {
+                        p->action->data.any.c = focus_client;
+
+                        g_assert(!(p->action->func == action_move ||
+                                   p->action->func == action_resize));
+
+                        p->action->func(&p->action->data);
+                    }
 
                     XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     reset_chains();
@@ -132,49 +126,47 @@ static void press(ObEvent *e, void *foo)
 static void binddef()
 {
     GList *list = g_list_append(NULL, NULL);
-    KeyAction a;
+    Action *a;
+
+    /* When creating an Action struct, all of the data elements in the
+       appropriate struct need to be set, except the Client*, which will be set
+       at call-time when then action function is used.
+    */
 
     list->data = "C-Right";
-    a.action = Action_NextDesktop;
-    keyaction_set_bool(&a, 0, TRUE);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_next_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    kbind(list, a);
 
     list->data = "C-Left";
-    a.action = Action_PreviousDesktop;
-    keyaction_set_bool(&a, 0, TRUE);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_previous_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    kbind(list, a);
 
     list->data = "C-1";
-    a.action = Action_Desktop;
-    keyaction_set_uint(&a, 0, 0);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_desktop);
+    a->data.desktop.desk = 0;
+    kbind(list, a);
 
-    list->data = "C-2";
-    a.action = Action_Desktop;
-    keyaction_set_uint(&a, 0, 1);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    list->data = "C-2"; 
+    a = action_new(action_desktop);
+    a->data.desktop.desk = 1;
+    kbind(list, a);
 
     list->data = "C-3";
-    a.action = Action_Desktop;
-    keyaction_set_uint(&a, 0, 2);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_desktop);
+    a->data.desktop.desk = 2;
+    kbind(list, a);
 
     list->data = "C-4";
-    a.action = Action_Desktop;
-    keyaction_set_uint(&a, 0, 3);
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_desktop);
+    a->data.desktop.desk = 3;
+    kbind(list, a);
 
     list->data = "C-space";
-    a.action = Action_Execute;
-    keyaction_set_string(&a, 0, "xterm");
-    keyaction_set_none(&a, 1);
-    bind(list, &a);
+    a = action_new(action_execute);
+    a->data.execute.path = g_strdup("xterm");
+    kbind(list, a);
 }
 
 void plugin_startup()
@@ -188,6 +180,10 @@ void plugin_startup()
 void plugin_shutdown()
 {
     dispatch_register(0, (EventHandler)press, NULL);
-    clearall();
+
+    grab_keys(FALSE);
+    tree_destroy(firstnode);
+    firstnode = NULL;
+    grab_keys(TRUE);
 }
 

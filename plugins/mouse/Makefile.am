@@ -7,9 +7,9 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 plugin_LTLIBRARIES=mouse.la
 
 mouse_la_LDFLAGS=-module -avoid-version
-mouse_la_SOURCES=mouse.c
+mouse_la_SOURCES=mouse.c translate.c
 
-noinst_HEADERS=
+noinst_HEADERS=mouse.h translate.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

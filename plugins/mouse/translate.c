@@ -1,6 +1,7 @@
 #include "../../kernel/openbox.h"
 #include <glib.h>
 #include <string.h>
+#include <stdlib.h>
 
 static guint translate_modifier(char *str)
 {
@@ -15,17 +16,16 @@ static guint translate_modifier(char *str)
     return 0;
 }
 
-gboolean translate_key(char *str, guint *state, guint *keycode)
+gboolean translate_button(char *str, guint *state, guint *button)
 {
     char **parsed;
     char *l;
     int i;
     gboolean ret = FALSE;
-    KeySym sym;
 
     parsed = g_strsplit(str, "-", -1);
     
-    /* first, find the key (last token) */
+    /* first, find the button (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)
 	l = parsed[i];
@@ -40,15 +40,10 @@ gboolean translate_key(char *str, guint *state, guint *keycode)
 	*state |= m;
     }
 
-    /* figure out the keycode */
-    sym = XStringToKeysym(l);
-    if (sym == NoSymbol) {
-	g_warning("Invalid key name '%s' in key binding.", l);
-	goto translation_fail;
-    }
-    *keycode = XKeysymToKeycode(ob_display, sym);
-    if (!keycode) {
-	g_warning("Key '%s' does not exist on the display.", l); 
+    /* figure out the button */
+    *button = atoi(l);
+    if (!*button) {
+	g_warning("Invalid button '%s' in pointer binding.", l);
 	goto translation_fail;
     }
 

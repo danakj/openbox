@@ -21,7 +21,7 @@ void grab_pointer(gboolean grab, Cursor cur)
     if (grab) {
         if (pgrabs++ == 0)
             XGrabPointer(ob_display, ob_root, False, 0, GrabModeAsync,
-                         GrabModeSync, FALSE, cur, CurrentTime);
+                         GrabModeAsync, FALSE, cur, CurrentTime);
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, CurrentTime);

@@ -1,6 +1,5 @@
 #include "keyboard.h"
 #include "translate.h"
-#include "keyaction.h"
 #include <glib.h>
 
 void tree_destroy(KeyBindingTree *tree)
@@ -15,7 +14,7 @@ void tree_destroy(KeyBindingTree *tree)
 	    for (it = tree->keylist; it != NULL; it = it->next)
 		g_free(it->data);
 	    g_list_free(tree->keylist);
-            keyaction_free(&tree->action);
+            action_free(tree->action);
 	}
 	g_free(tree);
 	tree = c;

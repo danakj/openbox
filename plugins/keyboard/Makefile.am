@@ -7,9 +7,9 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 plugin_LTLIBRARIES=keyboard.la
 
 keyboard_la_LDFLAGS=-module -avoid-version
-keyboard_la_SOURCES=keyboard.c tree.c translate.c keyaction.c
+keyboard_la_SOURCES=keyboard.c tree.c translate.c
 
-noinst_HEADERS=keyboard.h tree.h translate.h keyaction.h
+noinst_HEADERS=keyboard.h tree.h translate.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

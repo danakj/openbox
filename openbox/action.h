@@ -3,70 +3,155 @@
 
 #include "client.h"
 
-typedef enum {
-    Action_Execute,
-    Action_Iconify,
-    Action_Raise,
-    Action_Lower,
-    Action_Close,
-    Action_Shade,
-    Action_Unshade,
-    Action_ToggleShade,
-    Action_ToggleOmnipresent,
-    Action_MoveRelative,
-    Action_ResizeRelative,
-    Action_MaximizeFull,
-    Action_UnmaximizeFull,
-    Action_ToggleMaximizeFull,
-    Action_MaximizeHorz,
-    Action_UnmaximizeHorz,
-    Action_ToggleMaximizeHorz,
-    Action_MaximizeVert,
-    Action_UnmaximizeVert,
-    Action_ToggleMaximizeVert,
-    Action_SendToDesktop,
-    Action_SendToNextDesktop,
-    Action_SendToPreviousDesktop,
-    Action_Desktop,
-    Action_NextDesktop,
-    Action_PreviousDesktop,
-    Action_NextDesktopColumn,
-    Action_PreviousDesktopColumn,
-    Action_NextDesktopRow,
-    Action_PreviousDesktopRow,
-    Action_ToggleDecorations
+/* These have to all have a Client* at the top even if they don't use it, so
+   that I can set it blindly later on. So every function will have a Client*
+   available (possibly NULL though) if it wants it.
+*/
+
+struct AnyAction {
+    Client *c;
+};
+
+struct Execute {
+    Client *c;
+    char *path;
+};
+
+struct ClientAction {
+    Client *c;
+};
+
+struct MoveResizeRelative {
+    Client *c;
+    int dx;
+    int dy;
+};
+
+struct SendToDesktop {
+    Client *c;
+    guint desktop;
+};
+
+struct SendToNextPreviousDesktop {
+    Client *c;
+    gboolean wrap;
+    gboolean follow;
+};
+
+struct Desktop {
+    Client *c;
+    guint desk;
+};
+
+struct NextPreviousDesktop {
+    Client *c;
+    gboolean wrap;
+};
+
+struct Move {
+    Client *c;
+    int x;
+    int y;
+    gboolean final;
+};
+
+struct Resize {
+    Client *c;
+    int x;
+    int y;
+    gboolean final;
+    Corner corner;
+};
+
+union ActionData {
+    struct AnyAction any;
+    struct Execute execute;
+    struct ClientAction client;
+    struct MoveResizeRelative relative;
+    struct SendToDesktop sendto;
+    struct SendToNextPreviousDesktop sendtonextprev;
+    struct Desktop desktop;
+    struct NextPreviousDesktop nextprevdesktop;
+    struct Move move;
+    struct Resize resize;
+};
+
+typedef struct {
+    /* The func member acts like an enum to tell which one of the structs in
+       the data union are valid.
+    */
+    void (*func)(union ActionData *data);
+    union ActionData data;
 } Action;
 
-void action_execute(char *path);
-void action_iconify(Client *c);
-void action_raise(Client *c);
-void action_lower(Client *c);
-void action_close(Client *c);
-void action_shade(Client *c);
-void action_unshade(Client *c);
-void action_toggle_shade(Client *c);
-void action_toggle_omnipresent(Client *c);
-void action_move_relative(Client *c, int dx, int dy);
-void action_resize_relative(Client *c, int dx, int dy);
-void action_maximize_full(Client *c);
-void action_unmaximize_full(Client *c);
-void action_toggle_maximize_full(Client *c);
-void action_maximize_horz(Client *c);
-void action_unmaximize_horz(Client *c);
-void action_toggle_maximize_horz(Client *c);
-void action_maximize_vert(Client *c);
-void action_unmaximize_vert(Client *c);
-void action_toggle_maximize_vert(Client *c);
-void action_send_to_desktop(Client *c, guint desktop);
-void action_send_to_next_desktop(Client *c, gboolean wrap, gboolean follow);
-void action_send_to_previous_desktop(Client *c, gboolean wrap,gboolean follow);
-void action_desktop(guint desktop);
-void action_next_desktop(gboolean wrap);
-void action_previous_desktop(gboolean wrap);
-void action_next_desktop_column(gboolean wrap);
-void action_previous_desktop_column(gboolean wrap);
-void action_next_desktop_row(gboolean wrap);
-void action_previous_desktop_row(gboolean wrap);
-void action_toggle_decorations(Client *c);
+Action *action_new(void (*func)(union ActionData *data));
+void action_free(Action *a);
+
+/* Execute */
+void action_execute(union ActionData *data);
+/* ClientAction */
+void action_iconify(union ActionData *data);
+/* ClientAction */
+void action_raise(union ActionData *data);
+/* ClientAction */
+void action_lower(union ActionData *data);
+/* ClientAction */
+void action_close(union ActionData *data);
+/* ClientAction */
+void action_shade(union ActionData *data);
+/* ClientAction */
+void action_unshade(union ActionData *data);
+/* ClientAction */
+void action_toggle_shade(union ActionData *data);
+/* ClientAction */
+void action_toggle_omnipresent(union ActionData *data);
+/* MoveResizeRelative */
+void action_move_relative(union ActionData *data);
+/* MoveResizeRelative */
+void action_resize_relative(union ActionData *data);
+/* ClientAction */
+void action_maximize_full(union ActionData *data);
+/* ClientAction */
+void action_unmaximize_full(union ActionData *data);
+/* ClientAction */
+void action_toggle_maximize_full(union ActionData *data);
+/* ClientAction */
+void action_maximize_horz(union ActionData *data);
+/* ClientAction */
+void action_unmaximize_horz(union ActionData *data);
+/* ClientAction */
+void action_toggle_maximize_horz(union ActionData *data);
+/* ClientAction */
+void action_maximize_vert(union ActionData *data);
+/* ClientAction */
+void action_unmaximize_vert(union ActionData *data);
+/* ClientAction */
+void action_toggle_maximize_vert(union ActionData *data);
+/* SendToDesktop */
+void action_send_to_desktop(union ActionData *data);
+/* SendToNextPreviousDesktop */
+void action_send_to_next_desktop(union ActionData *data);
+/* SendToNextPreviousDesktop */
+void action_send_to_previous_desktop(union ActionData *data);
+/* Desktop */
+void action_desktop(union ActionData *data);
+/* NextPreviousDesktop */
+void action_next_desktop(union ActionData *data);
+/* NextPreviousDesktop */
+void action_previous_desktop(union ActionData *data);
+/* NextPreviousDesktop */
+void action_next_desktop_column(union ActionData *data);
+/* NextPreviousDesktop */
+void action_previous_desktop_column(union ActionData *data);
+/* NextPreviousDesktop */
+void action_next_desktop_row(union ActionData *data);
+/* NextPreviousDesktop */
+void action_previous_desktop_row(union ActionData *data);
+/* ClientAction */
+void action_toggle_decorations(union ActionData *data);
+/* Move */
+void action_move(union ActionData *data);
+/* Resize */
+void action_resize(union ActionData *data);
 
 #endif

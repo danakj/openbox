@@ -3,7 +3,6 @@
 
 #include <glib.h>
 
-guint translate_modifier(char *str);
 gboolean translate_key(char *str, guint *state, guint *keycode);
 
 #endif

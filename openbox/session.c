@@ -2,10 +2,13 @@
 
 #ifndef USE_SM
 
+#include "session.h"
+#include "client.h"
+
 void session_load(char *path) {}
 void session_startup(int argc, char **argv) {}
 void session_shutdown() {}
-ObSessionState* session_state_find(struct _ObClient *c) { return NULL; }
+ObSessionState* session_state_find(ObClient *c) { return NULL; }
 void session_state_free(ObSessionState *state) {}
 
 #else

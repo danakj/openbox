@@ -17,9 +17,9 @@ typedef struct {
     GSList *actions[OB_MOUSE_NUM_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
-#define CLIENT_CONTEXT(co, cl) (co == OB_FRAME_CONTEXT_CLIENT || \
-                                (co == OB_FRAME_CONTEXT_ROOT && \
-                                 cl->type == OB_CLIENT_TYPE_DESKTOP))
+#define CLIENT_CONTEXT(co, cl) ((cl && cl->type == OB_CLIENT_TYPE_DESKTOP) ? \
+                                co == OB_FRAME_CONTEXT_ROOT : \
+                                co == OB_FRAME_CONTEXT_CLIENT)
 
 /* Array of GSList*s of PointerBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];

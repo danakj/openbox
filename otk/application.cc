@@ -48,7 +48,7 @@ void OtkApplication::loadStyle(void)
   std::string style = "/usr/local/share/openbox/styles/artwiz";
   _style_conf->setFile(style);
   if (!_style_conf->load()) {
-    std::cerr << "Unable to load style \"" << style << "\". Aborting.\n";
+    std::cerr << "ERROR: Unable to load style \"" << style << "\".\n";
     ::exit(1);
   }
   _style->load(*_style_conf);

@@ -241,7 +241,6 @@ void event_process(XEvent *e)
            so back it is. if problems arise again, then try filtering on the
            detail instead of the mode. */
         if (e->xcrossing.mode != NotifyNormal) return;
-        g_print("%s\n", e->type == EnterNotify ? "EnterNotify":"LeaveNotify");
 	break;
     }
 

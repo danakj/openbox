@@ -190,7 +190,6 @@ tools_obconf_obconf_CPPFLAGS = \
 	$(GDK_PIXBUF_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
-	-DPLUGINDIR=\"$(plugindir)\" \
 	-DRCDIR=\"$(rcdir)\" \
 	-DPIXMAPDIR=\"$(pixmapdir)\" \
 	-DG_LOG_DOMAIN=\"Obconf\"
@@ -202,8 +201,7 @@ tools_obconf_obconf_LDADD = \
 	parser/libobparser.la
 tools_obconf_obconf_SOURCES = \
 	gettext.h \
-	tools/obconf/main.c \
-	plugins/obconf_interface.h
+	tools/obconf/main.c
 
 
 ## kdetrayproxy ##

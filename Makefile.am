@@ -55,11 +55,6 @@ render_libobrender_la_CPPFLAGS = \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
-render_libobrender_la_LIBADD = \
-	$(X_LIBS) \
-	$(XFT_LIBS) \
-	$(GLIB_LIBS) \
-	$(XML_LIBS) 
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \

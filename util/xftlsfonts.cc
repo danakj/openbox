@@ -7,6 +7,8 @@ const char *VERSION = "1.0";
 
 #ifndef   XFT
 #include <iostream>
+using std::cout;
+using std::endl;
 
 int main(int, char **) {
   cout << NAME << " version " << VERSION << endl;

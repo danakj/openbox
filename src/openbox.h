@@ -41,7 +41,7 @@
 #  endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 
-
+#include "Resource.h"
 #include "LinkedList.h"
 #include "BaseDisplay.h"
 #include "Timer.h"
@@ -115,6 +115,7 @@ private:
   Window masked;
   char *rc_file, **argv;
   int argc;
+  obResource config;
 
 
 protected:

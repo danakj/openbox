@@ -30,9 +30,10 @@
 class obResource {
 public:
   obResource(const std::string &file);
+  obResource();
   virtual ~obResource();
 
-  // an empty string is an invalid value for the file and will cause an assert
+  // an empty string will cause an assert if load() or save() is called
   inline const std::string &file() const {
     return static_cast<const std::string &>(m_file);
   }

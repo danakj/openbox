@@ -56,6 +56,8 @@
 #include "Workspace.h"
 #include "Workspacemenu.h"
 
+#include <string>
+
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
@@ -171,6 +173,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   } else {
     rc_file = bstrdup(rc);
   }
+  config.setFile(rc_file);
 
   no_focus = False;
 
@@ -1200,89 +1203,64 @@ void Openbox::save_rc(void) {
 
 
 void Openbox::load_rc(void) {
-  XrmDatabase database = (XrmDatabase) 0;
+  config.load();
 
-  database = XrmGetFileDatabase(rc_file);
-
-  XrmValue value;
-  char *value_type;
-
+  std::string s;
+  long l;
+  bool b;
+  
   if (resource.menu_file)
     delete [] resource.menu_file;
-
-  if (XrmGetResource(database, "session.menuFile", "Session.MenuFile",
-		     &value_type, &value))
-    resource.menu_file = bstrdup(value.addr);
+  if (config.getValue("session.menuFile", "Session.MenuFile", s))
+    resource.menu_file = bstrdup(s.c_str());
   else
     resource.menu_file = bstrdup(DEFAULTMENU);
 
-  if (XrmGetResource(database, "session.colorsPerChannel",
-		     "Session.ColorsPerChannel", &value_type, &value)) {
-    if (sscanf(value.addr, "%d", &resource.colors_per_channel) != 1) {
-      resource.colors_per_channel = 4;
-    } else {
-      if (resource.colors_per_channel < 2) resource.colors_per_channel = 2;
-      if (resource.colors_per_channel > 6) resource.colors_per_channel = 6;
-    }
-  } else {
+  if (config.getValue("session.colorsPerChannel", "Session.ColorsPerChannel",
+                      l))
+    resource.colors_per_channel = (l < 2 ? 2 : (l > 6 ? 6 : l)); // >= 2, <= 6
+  else
     resource.colors_per_channel = 4;
-  }
 
   if (resource.style_file)
     delete [] resource.style_file;
-
-  if (XrmGetResource(database, "session.styleFile", "Session.StyleFile",
-		     &value_type, &value))
-    resource.style_file = bstrdup(value.addr);
+  if (config.getValue("session.styleFile", "Session.StyleFile", s))
+    resource.style_file = bstrdup(s.c_str());
   else
     resource.style_file = bstrdup(DEFAULTSTYLE);
 
-  if (XrmGetResource(database, "session.titlebarLayout",
-                     "Session.TitlebarLayout", &value_type, &value)) {
-    resource.titlebar_layout = bstrdup(value.addr == NULL ? "ILMC" :
-                                       value.addr);
-  } else {
+  if (resource.titlebar_layout)
+    delete [] resource.titlebar_layout;
+  if (config.getValue("session.titlebarLayout", "Session.TitlebarLayout", s))
+    resource.titlebar_layout = bstrdup(s.c_str());
+  else
     resource.titlebar_layout = bstrdup("ILMC");
-  }
 
-  if (XrmGetResource(database, "session.doubleClickInterval",
-		     "Session.DoubleClickInterval", &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.double_click_interval) != 1)
-      resource.double_click_interval = 250;
-  } else {
+  if (config.getValue("session.doubleClickInterval",
+                      "Session.DoubleClickInterval", l))
+    resource.double_click_interval = l;
+  else
     resource.double_click_interval = 250;
-  }
 
-  if (XrmGetResource(database, "session.autoRaiseDelay",
-                     "Session.AutoRaiseDelay", &value_type, &value)) {
-    if (sscanf(value.addr, "%ld", &resource.auto_raise_delay.tv_usec) != 1)
-      resource.auto_raise_delay.tv_usec = 400;
-  } else {
+  if (!config.getValue("session.autoRaiseDelay", "Session.AutoRaiseDelay", l))
+    resource.auto_raise_delay.tv_usec = l;
+  else
     resource.auto_raise_delay.tv_usec = 400;
-  }
-
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec / 1000;
   resource.auto_raise_delay.tv_usec -=
     (resource.auto_raise_delay.tv_sec * 1000);
   resource.auto_raise_delay.tv_usec *= 1000;
 
-  if (XrmGetResource(database, "session.cacheLife", "Session.CacheLife",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.cache_life) != 1)
-      resource.cache_life = 5l;
-  } else {
-    resource.cache_life = 5l;
-  }
-
+  if (config.getValue("session.cacheLife", "Session.CacheLife", l))
+    resource.cache_life = l;
+  else
+    resource.cache_life = 51;
   resource.cache_life *= 60000;
 
-  if (XrmGetResource(database, "session.cacheMax", "Session.CacheMax",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.cache_max) != 1)
-      resource.cache_max = 200;
-  } else {
+  if (config.getValue("session.cacheMax", "Session.CacheMax", l))
+    resource.cache_max = l;
+  else
     resource.cache_max = 200;
-  }
 }
 
 

@@ -42,6 +42,12 @@ obResource::obResource(const std::string &file) {
   m_autosave = true;
 }
 
+obResource::obResource() {
+  m_modified = false;
+  m_database = NULL;
+  m_autosave = true;
+}
+
 obResource::~obResource() {
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
@@ -49,7 +55,6 @@ obResource::~obResource() {
 
 void obResource::setFile(const std::string &file) {
   m_file = file;
-  assert(m_file.c_str() != NULL);
 }
 
 void obResource::setAutoSave(bool autosave) {
@@ -57,12 +62,14 @@ void obResource::setAutoSave(bool autosave) {
 }
 
 void obResource::save() {
+  assert(m_file.c_str() != NULL);
   assert(m_database != NULL);
   XrmPutFileDatabase(m_database, m_file.c_str());
   m_modified = false;
 }
 
 bool obResource::load() {
+  assert(m_file.c_str() != NULL);
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
   m_modified = false;
@@ -72,6 +79,7 @@ bool obResource::load() {
 }
 
 void obResource::setValue(const std::string &rname, bool value) {
+  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
 
   const char *val = (value ? "True" : "False");
@@ -84,6 +92,7 @@ void obResource::setValue(const std::string &rname, bool value) {
 }
 
 void obResource::setValue(const std::string &rname, long value) {
+  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   char val[11];
@@ -97,6 +106,7 @@ void obResource::setValue(const std::string &rname, long value) {
 }
 
 void obResource::setValue(const std::string &rname, const char *value) {
+  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
@@ -108,6 +118,7 @@ void obResource::setValue(const std::string &rname, const char *value) {
 }
 
 void obResource::setValue(const std::string &rname, const std::string &value) {
+  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;

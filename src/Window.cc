@@ -906,12 +906,18 @@ void BlackboxWindow::getWMNormalHints(void) {
   long icccm_mask;
   XSizeHints sizehint;
 
-  const Rect& screen_area = screen->availableArea();
-
   client.min_width = client.min_height =
     client.width_inc = client.height_inc = 1;
   client.base_width = client.base_height = 0;
+
+  /*
+    use the full screen, not the strut modified size. otherwise when the
+    availableArea changes max_width/height will be incorrect and lead to odd
+    rendering bugs.
+  */
+  const Rect& screen_area = screen->getRect();
   client.max_width = screen_area.width();
+
   client.max_height = screen_area.height();
   client.min_aspect_x = client.min_aspect_y =
     client.max_aspect_x = client.max_aspect_y = 1;

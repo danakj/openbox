@@ -503,7 +503,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.active.label.bg", theme->app_hilite_fg,
                          TRUE))
         set_default_appearance(theme->app_hilite_fg);
-    else if (theme->app_hilite_label->surface.grad == RR_SURFACE_PARENTREL) {
+    else if (theme->app_hilite_fg->surface.grad == RR_SURFACE_PARENTREL) {
         if (!read_appearance(db, inst,
                              "window.active.title.bg",
                              theme->app_hilite_fg,
@@ -1282,27 +1282,27 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
     icname = g_strconcat(rname, ".interlace.color", NULL);
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
-	parse_appearance(retvalue.addr,
-			 &value->surface.grad,
-			 &value->surface.relief,
-			 &value->surface.bevel,
-			 &value->surface.interlaced,
-			 &value->surface.border,
+        retvalue.addr != NULL) {
+        parse_appearance(retvalue.addr,
+                         &value->surface.grad,
+                         &value->surface.relief,
+                         &value->surface.bevel,
+                         &value->surface.interlaced,
+                         &value->surface.border,
                          allow_trans);
-	if (!read_color(db, inst, cname, &value->surface.primary))
-	    value->surface.primary = RrColorNew(inst, 0, 0, 0);
-	if (!read_color(db, inst, ctoname, &value->surface.secondary))
-	    value->surface.secondary = RrColorNew(inst, 0, 0, 0);
-	if (value->surface.border)
-	    if (!read_color(db, inst, bcname,
-			    &value->surface.border_color))
-		value->surface.border_color = RrColorNew(inst, 0, 0, 0);
+        if (!read_color(db, inst, cname, &value->surface.primary))
+            value->surface.primary = RrColorNew(inst, 0, 0, 0);
+        if (!read_color(db, inst, ctoname, &value->surface.secondary))
+            value->surface.secondary = RrColorNew(inst, 0, 0, 0);
+        if (value->surface.border)
+            if (!read_color(db, inst, bcname,
+                            &value->surface.border_color))
+                value->surface.border_color = RrColorNew(inst, 0, 0, 0);
         if (value->surface.interlaced)
-	    if (!read_color(db, inst, icname,
-			    &value->surface.interlace_color))
-		value->surface.interlace_color = RrColorNew(inst, 0, 0, 0);
-	ret = TRUE;
+            if (!read_color(db, inst, icname,
+                            &value->surface.interlace_color))
+                value->surface.interlace_color = RrColorNew(inst, 0, 0, 0);
+        ret = TRUE;
     }
 
     g_free(icname);

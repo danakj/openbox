@@ -68,10 +68,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
 
-    theme->app_selected_bg = RrAppearanceNew(inst, 0);
-    theme->app_unselected_bg = RrAppearanceNew(inst, 0);
-    theme->app_selected_label = RrAppearanceNew(inst, 1);
-    theme->app_unselected_label = RrAppearanceNew(inst, 1);
+    theme->app_hilite_bg = RrAppearanceNew(inst, 0);
+    theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
+    theme->app_hilite_label = RrAppearanceNew(inst, 1);
+    theme->app_unhilite_label = RrAppearanceNew(inst, 1);
 
     if (name) {
 	db = loaddb(theme, name);
@@ -464,21 +464,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* read the appearances for rendering non-decorations */
     if (!read_appearance(db, inst,
-                         "window.title.focus", theme->app_selected_bg,
+                         "window.title.focus", theme->app_hilite_bg,
                          FALSE))
-        set_default_appearance(theme->app_selected_bg);
+        set_default_appearance(theme->app_hilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.focus", theme->app_selected_label,
+                         "window.label.focus", theme->app_hilite_label,
                          TRUE))
-        set_default_appearance(theme->app_selected_label);
+        set_default_appearance(theme->app_hilite_label);
     if (!read_appearance(db, inst,
-                         "window.title.unfocus", theme->app_unselected_bg,
+                         "window.title.unfocus", theme->app_unhilite_bg,
                          FALSE))
-        set_default_appearance(theme->app_unselected_bg);
+        set_default_appearance(theme->app_unhilite_bg);
     if (!read_appearance(db, inst,
-                         "window.label.unfocus", theme->app_unselected_label,
+                         "window.label.unfocus", theme->app_unhilite_label,
                          TRUE))
-        set_default_appearance(theme->app_unselected_label);
+        set_default_appearance(theme->app_unhilite_label);
 
     /* read buttons textures */
     if (!read_appearance(db, inst,
@@ -633,26 +633,26 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* set up the textures */
     theme->a_focused_label->texture[0].type = 
-        theme->app_selected_label->texture[0].type = RR_TEXTURE_TEXT;
+        theme->app_hilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_focused_label->texture[0].data.text.justify = winjust;
-    theme->app_selected_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    theme->app_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_focused_label->texture[0].data.text.font =
-        theme->app_selected_label->texture[0].data.text.font =
+        theme->app_hilite_label->texture[0].data.text.font =
         theme->winfont_focused;
     theme->a_focused_label->texture[0].data.text.color =
-        theme->app_selected_label->texture[0].data.text.color =
+        theme->app_hilite_label->texture[0].data.text.color =
         theme->title_focused_color;
 
     theme->a_unfocused_label->texture[0].type =
-        theme->app_unselected_label->texture[0].type = RR_TEXTURE_TEXT;
+        theme->app_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
-    theme->app_unselected_label->texture[0].data.text.justify =
+    theme->app_unhilite_label->texture[0].data.text.justify =
         RR_JUSTIFY_LEFT;
     theme->a_unfocused_label->texture[0].data.text.font =
-        theme->app_unselected_label->texture[0].data.text.font =
+        theme->app_unhilite_label->texture[0].data.text.font =
         theme->winfont_unfocused;
     theme->a_unfocused_label->texture[0].data.text.color =
-        theme->app_unselected_label->texture[0].data.text.color =
+        theme->app_unhilite_label->texture[0].data.text.color =
         theme->title_unfocused_color;
 
     theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
@@ -987,10 +987,10 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_menu_text_selected);
         RrAppearanceFree(theme->a_clear);
         RrAppearanceFree(theme->a_clear_tex);
-        RrAppearanceFree(theme->app_selected_bg);
-        RrAppearanceFree(theme->app_unselected_bg);
-        RrAppearanceFree(theme->app_selected_label);
-        RrAppearanceFree(theme->app_unselected_label);
+        RrAppearanceFree(theme->app_hilite_bg);
+        RrAppearanceFree(theme->app_unhilite_bg);
+        RrAppearanceFree(theme->app_hilite_label);
+        RrAppearanceFree(theme->app_unhilite_label);
     }
 }
 

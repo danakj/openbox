@@ -153,10 +153,10 @@ struct _RrTheme {
     RrAppearance *a_clear;     /* clear with no texture */
     RrAppearance *a_clear_tex; /* clear with a texture */
 
-    RrAppearance *app_selected_bg;
-    RrAppearance *app_unselected_bg;
-    RrAppearance *app_selected_label;
-    RrAppearance *app_unselected_label;
+    RrAppearance *app_hilite_bg;
+    RrAppearance *app_unhilite_bg;
+    RrAppearance *app_hilite_label;
+    RrAppearance *app_unhilite_label;
 
 };
 

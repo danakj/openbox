@@ -323,7 +323,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_bullet->surface.parent = item_a;
         self->a_bullet->surface.parentx =
             self->frame->text_x + self->frame->text_w - self->frame->item_h
-            - PADDING;
+            + PADDING;
         self->a_bullet->surface.parenty = PADDING;
         RrPaint(self->a_bullet, self->bullet,
                 self->frame->item_h - 2*PADDING,

@@ -3,7 +3,7 @@ LIBS=`pkg-config --libs glib-2.0` -ll
 
 targets = cltest
 
-sources = obcl.c main.c parse.c lex.c
+sources = obcl.c main.c parse.c lex.c process.c
 headers = obcl.h
 
 .PHONY: all clean

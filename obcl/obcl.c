@@ -57,24 +57,24 @@ void cl_tree_print(GList *tree, int depth)
 
         switch(tmp->type) {
         case CL_ID:
-            printf("--ID-- %s\n", tmp->u.str);
+            printf("[ID] '%s'\n", tmp->u.str);
             break;
         case CL_STR:
-            printf("--STR-- %s\n", tmp->u.str);
+            printf("[STR] '%s'\n", tmp->u.str);
             break;
         case CL_NUM:
-            printf("--NUM-- %.2f\n", tmp->u.num);
+            printf("[NUM] %.2f\n", tmp->u.num);
             break;
         case CL_LIST:
-            printf("--LIST-- %s\n", tmp->u.lb.id);
+            printf("[LIST] '%s'\n", tmp->u.lb.id);
             cl_tree_print(tmp->u.lb.list, depth+2);
             break;
         case CL_BLOCK:
-            printf("--BLOCK-- %s\n", tmp->u.lb.id);
+            printf("[BLOCK] '%s'\n", tmp->u.lb.id);
             cl_tree_print(tmp->u.lb.block, depth+2);
             break;
         case CL_LISTBLOCK:
-            printf("--LISTBLOCK-- %s\n", tmp->u.lb.id);
+            printf("[LISTBLOCK] %s\n", tmp->u.lb.id);
             cl_tree_print(tmp->u.lb.list, depth+2);
             printf("\n");
             cl_tree_print(tmp->u.lb.block, depth+2);

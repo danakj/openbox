@@ -93,8 +93,10 @@ static void addbinding()
            mouse bindings */
     } else if (a && (a->func == action_move || a->func == action_resize ||
                      a->func == action_execute || a->func == action_desktop ||
-                     a->func == action_move_relative ||
-                     a->func == action_resize_relative)) {
+                     a->func == action_move_relative_horz ||
+                     a->func == action_move_relative_vert ||
+                     a->func == action_resize_relative_horz ||
+                     a->func == action_resize_relative_vert)) {
         action_free(a);
         a = NULL;
     }

@@ -42,10 +42,10 @@ extern gboolean config_dock_hide;
 extern guint config_dock_hide_timeout;
 
 /* The name of the theme */
-char *config_theme;
+extern char *config_theme;
 
 /* Titlebar button layout */
-gchar *config_title_layout;
+extern gchar *config_title_layout;
 
 /*! The number of desktops */
 extern int config_desktops_num;
@@ -53,9 +53,9 @@ extern int config_desktops_num;
 extern GSList *config_desktops_names;
 
 /*! The keycode of the key combo which resets the keybaord chains */
-guint config_keyboard_reset_keycode;
+extern guint config_keyboard_reset_keycode;
 /*! The modifiers of the key combo which resets the keybaord chains */
-guint config_keyboard_reset_state;
+extern guint config_keyboard_reset_state;
 
 /*! Number of pixels a drag must go before being considered a drag */
 extern gint config_mouse_threshold;
@@ -64,9 +64,9 @@ extern gint config_mouse_threshold;
 extern gint config_mouse_dclicktime;
 
 /*! Number of pixels to resist while crossing another window's edge */
-gint config_resist_win;
+extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
-gint config_resist_edge;
+extern gint config_resist_edge;
 
 /*! User-specified menu files */
 extern GSList *config_menu_files;

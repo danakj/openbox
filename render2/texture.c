@@ -94,7 +94,6 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex)
     case RR_TEXTURE_NONE:
         break;
     case RR_TEXTURE_TEXT:
-        printf("text %s\n", tex->data.text.string);
         assert(tex->data.text.font);
         col.r = tex->data.text.color.r;
         col.g = tex->data.text.color.g;

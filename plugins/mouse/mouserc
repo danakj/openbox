@@ -41,7 +41,8 @@
 
 # Action: The action to be performed then the Event occurs with the Button in
 #         the context.
-#  Value actions are:
+#
+#  For all Events *except* for drag Events, these are valid:
 #  * Focus - Focus the client
 #  * Unfocus - Unfocus the client
 #  * Iconify - Iconify the client
@@ -97,6 +98,10 @@
 #  * PreviousDesktopRowWrap - Switches to the desktop in the previous row,
 #                             based on the desktop layout set by a pager
 #                             (wrapping around the first and last rows)
+#  * Restart - Restarts Openbox
+#  * Exit - Exits Openbox
+#
+#  For drag Events only, these are valid:
 #  * Move - Move the client interactively, this can only be bound to the Drag
 #           Event
 #  * Resize - Resize the client interactively, this can only be bound to the

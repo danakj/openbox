@@ -485,6 +485,11 @@ void focus_cycle_draw_indicator()
         a_focus_indicator->texture[3].data.lineart.y2 = 0;
         RrPaint(a_focus_indicator, focus_indicator.bottom.win,
                 w, h);
+
+        XMapWindow(ob_display, focus_indicator.top.win);
+        XMapWindow(ob_display, focus_indicator.left.win);
+        XMapWindow(ob_display, focus_indicator.right.win);
+        XMapWindow(ob_display, focus_indicator.bottom.win);
     }
 }
 
@@ -494,7 +499,13 @@ static gboolean valid_focus_target(ObClient *ft)
        focus an iconic window, but we want to be able to, so we just check
        if the focus flags on the window allow it, and its on the current
        desktop */
-    return (!ft->transients && client_normal(ft) &&
+    return ((ft->type == OB_CLIENT_TYPE_NORMAL ||
+             ft->type == OB_CLIENT_TYPE_DIALOG ||
+             (!client_has_group_siblings(ft) &&
+              (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+               ft->type == OB_CLIENT_TYPE_MENU ||
+               ft->type == OB_CLIENT_TYPE_UTILITY))) &&
+            !ft->transients &&
             ((ft->can_focus || ft->focus_notify) &&
              !ft->skip_taskbar &&
              (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)));

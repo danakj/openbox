@@ -11,7 +11,7 @@ static XrmDatabase loaddb(char *theme);
 static gboolean read_int(XrmDatabase db, char *rname, int *value);
 static gboolean read_string(XrmDatabase db, char *rname, char **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
-                           gchar *rname, color_rgb **value);
+                           gchar *rname, RrColor **value);
 static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
                           gchar *rname, gchar *theme,
                           RrPixmapMask **value);
@@ -767,7 +767,7 @@ static gboolean read_string(XrmDatabase db, char *rname, char **value)
 }
 
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
-                           gchar *rname, color_rgb **value)
+                           gchar *rname, RrColor **value)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname);
@@ -776,7 +776,7 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
-	color_rgb *c = RrColorParse(inst, retvalue.addr);
+	RrColor *c = RrColorParse(inst, retvalue.addr);
 	if (c != NULL) {
 	    *value = c;
 	    ret = TRUE;

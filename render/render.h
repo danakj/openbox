@@ -16,7 +16,7 @@ typedef struct _RrTextureRGBA      RrTextureRGBA;
 typedef struct _RrTextureText      RrTextureText;
 typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
-typedef struct _RrColor            color_rgb; /* XXX ugly */
+typedef struct _RrColor            RrColor;
 
 typedef guint32 pixel32; /* XXX prefix */
 typedef guint16 pixel16;
@@ -62,11 +62,11 @@ struct _RrSurface {
     RrSurfaceColorType grad;
     RrReliefType relief;
     RrBevelType bevel;
-    color_rgb *primary;
-    color_rgb *secondary;
-    color_rgb *border_color;
-    color_rgb *bevel_dark; 
-    color_rgb *bevel_light;
+    RrColor *primary;
+    RrColor *secondary;
+    RrColor *border_color;
+    RrColor *bevel_dark; 
+    RrColor *bevel_light;
     gboolean interlaced;
     gboolean border;
     RrAppearance *parent;
@@ -81,7 +81,7 @@ struct _RrTextureText {
     gint shadow;
     gchar tint;
     guchar offset;
-    color_rgb *color;
+    RrColor *color;
     gchar *string;
 };
 
@@ -94,7 +94,7 @@ struct _RrPixmapMask {
 };
 
 struct _RrTextureMask {
-    color_rgb *color;
+    RrColor *color;
     RrPixmapMask *mask;
 };
 
@@ -153,9 +153,9 @@ gint     RrBlueMask     (const RrInstance *inst);
 guint    RrPseudoBPC    (const RrInstance *inst);
 XColor*  RrPseudoColors (const RrInstance *inst);
 
-color_rgb *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
-color_rgb *RrColorParse (const RrInstance *inst, gchar *colorname);
-void       RrColorFree  (color_rgb *in);
+RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
+RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
+void     RrColorFree  (RrColor *in);
 
 RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
 RrAppearance *RrAppearanceCopy (RrAppearance *a);

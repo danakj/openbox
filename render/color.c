@@ -7,7 +7,7 @@
 XColor *pseudo_colors;
 int pseudo_bpc;
 
-void color_allocate_gc(color_rgb *in)
+void color_allocate_gc(RrColor *in)
 {
     XGCValues gcv;
 
@@ -18,7 +18,7 @@ void color_allocate_gc(color_rgb *in)
                        GCForeground | GCCapStyle, &gcv);
 }
 
-color_rgb *RrColorParse(const RrInstance *inst, gchar *colorname)
+RrColor *RrColorParse(const RrInstance *inst, gchar *colorname)
 {
     XColor xcol;
 
@@ -36,16 +36,16 @@ color_rgb *RrColorParse(const RrInstance *inst, gchar *colorname)
     return RrColorNew(inst, xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
 }
 
-color_rgb *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
+RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 {
     /* this should be replaced with something far cooler */
-    color_rgb *out = NULL;
+    RrColor *out = NULL;
     XColor xcol;
     xcol.red = (r << 8) | r;
     xcol.green = (g << 8) | g;
     xcol.blue = (b << 8) | b;
     if (XAllocColor(RrDisplay(inst), RrColormap(inst), &xcol)) {
-        out = g_new(color_rgb, 1);
+        out = g_new(RrColor, 1);
         out->inst = inst;
         out->r = xcol.red >> 8;
         out->g = xcol.green >> 8;
@@ -58,7 +58,7 @@ color_rgb *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 
 /*XXX same color could be pointed to twice, this might have to be a refcount*/
 
-void RrColorFree(color_rgb *c)
+void RrColorFree(RrColor *c)
 {
     if (c) {
         if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);

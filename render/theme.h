@@ -24,17 +24,17 @@ struct _RrTheme {
     gint grip_width;
 
     /* style settings - colors */
-    color_rgb *b_color;
-    color_rgb *cb_focused_color;
-    color_rgb *cb_unfocused_color;
-    color_rgb *title_focused_color;
-    color_rgb *title_unfocused_color;
-    color_rgb *titlebut_focused_color;
-    color_rgb *titlebut_unfocused_color;
-    color_rgb *menu_title_color;
-    color_rgb *menu_color;
-    color_rgb *menu_disabled_color;
-    color_rgb *menu_hilite_color;
+    RrColor *b_color;
+    RrColor *cb_focused_color;
+    RrColor *cb_unfocused_color;
+    RrColor *title_focused_color;
+    RrColor *title_unfocused_color;
+    RrColor *titlebut_focused_color;
+    RrColor *titlebut_unfocused_color;
+    RrColor *menu_title_color;
+    RrColor *menu_color;
+    RrColor *menu_disabled_color;
+    RrColor *menu_hilite_color;
 
     /* style settings - fonts */
     gint winfont_height;

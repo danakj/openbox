@@ -31,7 +31,7 @@ struct _RrColor {
     GC gc;
 };
 
-void color_allocate_gc(color_rgb *in);
+void color_allocate_gc(RrColor *in);
 XColor *pickColor(const RrInstance *inst, gint r, gint g, gint b);
 void reduce_depth(const RrInstance *inst, pixel32 *data, XImage *im);
 void increase_depth(const RrInstance *inst, pixel32 *data, XImage *im);

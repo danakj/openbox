@@ -581,8 +581,10 @@ static void event_handle_client(Client *client, XEvent *e)
 #ifdef DEBUG_FOCUS
         g_message("FocusIn on client for %lx", client->window);
 #endif
-        focus_set_client(client);
-        frame_adjust_focus(client->frame, TRUE);
+        if (client != focus_client) {
+            focus_set_client(client);
+            frame_adjust_focus(client->frame, TRUE);
+        }
         break;
     case FocusOut:
 #ifdef DEBUG_FOCUS

@@ -1,3 +1,7 @@
+:
+	* Closed bug #921 (focus rectangle stays on the screen after modifier
+	 release)
+
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)
 	* Allow resizing of windows in only vertical/horizontal directions

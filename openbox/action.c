@@ -774,12 +774,28 @@ void action_iconify(union ActionData *data)
 
 void action_raiselower(union ActionData *data)
 {
-    if (data->client.c) {
-        if (data->client.c->frame->obscured)
-            stacking_raise(CLIENT_AS_WINDOW(data->client.c));
-        else
-            stacking_lower(CLIENT_AS_WINDOW(data->client.c));
+    ObClient *c = data->client.c;
+    GList *it;
+    gboolean raise = FALSE;
+
+    if (!c) return;
+
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        ObClient *cit = it->data;
+
+        if (cit == c) break;
+        if (client_normal(cit) && cit->layer == c->layer) {
+            if (RECT_INTERSECTS_RECT(cit->frame->area, c->frame->area)) {
+                raise = TRUE;
+                break;
+            }
+        }
     }
+
+    if (raise)
+        stacking_raise(CLIENT_AS_WINDOW(c));
+    else
+        stacking_lower(CLIENT_AS_WINDOW(c));
 }
 
 void action_raise(union ActionData *data)

@@ -7,9 +7,8 @@ $ #DISPLAYRequiresArg
 $ #WarnDisplaySet
 # Figyelem: nem lehet a 'DISPLAY' környezeti változót beállítani\n
 $ #Usage
-# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
-                 2001 - 2002 Sean 'Shaleh' Perry\n\
-                 1997 - 2000, 2002 Brad Hughes\n\n\
+# Blackbox %s: (c) 2001 - 2002 Sean 'Shaleh' Perry\n\
+  \t\t\t 1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\thasználandó kijelzõ\n\
   -rc <string>\t\t\tválasztható konfigurációs file.\n\
   -version\t\t\tverziószám kijelzése és kilépés.\n\
@@ -18,6 +17,4 @@ $ #CompileOptions
 # Fordításnál állítható lehetõségek:\n\
   Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp Ordered Dithering:\t%s\n\n

@@ -3,25 +3,27 @@ $set 3 #Configmenu
 $ #ConfigOptions
 # Options de configuration
 $ #FocusModel
-# Mode de convergence
+# Mode d'attribution du clavier
 $ #WindowPlacement
 # Disposition des fenêtres
 $ #ImageDithering
-# Lissage d'images
+# Lissage des images
 $ #OpaqueMove
 # Déplacement opaque des fenêtres
 $ #FullMax
-# Maximization complète
+# Maximisation complète
 $ #FocusNew
-# Convergence de la nouvelle fenêtre
+# Clavier à la nouvelle fenêtre
 $ #FocusLast
-# Convergence de la dernière fenêtre
+# Clavier à la dernière fenêtre
 $ #ClickToFocus
-# Cliquer pour converger
+# Cliquer pour obtenir le clavier
 $ #SloppyFocus
-# Convergence souple
+# Attribution du clavier souple
 $ #AutoRaise
 # Premier plan automatique
+$ #ClickRaise
+# Cliquer pour mettre au premier plan
 $ #SmartRows
 # Disposition futée (Lignes)
 $ #SmartCols

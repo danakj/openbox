@@ -1,52 +1,54 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen : X sunucusunu sorgularken hata oldu.\n  \
-%s ekranýnda baþka bir pencere yöneticisi çalýþýyor gibi.\n
+# BScreen::BScreen: an error occured while querying the X server.\n  \
+another window manager is already running on display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen : %d ekraný, 0x%lx görünümüyle , %d derinliðiyle\n
+# BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle() : '%s' yazý tipi yüklenemedi.\n
+# BScreen::LoadStyle(): couldn't load font '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): önayarlý yazý tipi yüklenemedi.\n
+# BScreen::LoadStyle(): couldn't load default font.\n
 $ #EmptyMenuFile
-# %s : boþ mönü dosyasý\n
+# %s: empty menu file\n
 $ #xterm
-# X komutasý
+# xterm
 $ #Restart
-# Yeniden baþla
+# Restart
 $ #Exit
-# Çýk
+# Exit
 $ #EXECError
-# BScreen::parseMenuFile : [exec] hatasý, mönü yaftasý ve/yada komuta belirlenmedi\n
+# BScreen::parseMenuFile: [exec] error, no menu label and/or command defined\n
 $ #EXITError
-# BScreen::parseMenuFile : [exit] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [exit] error, no menu label defined\n
 $ #STYLEError
-# BScreen::parseMenuFile : [style] hatasý, mönü yaftasý ve/yada dosya adý belirlenmedi\n
+# BScreen::parseMenuFile: [style] error, no menu label and/or filename \
+defined\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [config] error, no menu label defined\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] hatasý, dosya adý belirlenmedi\n
+# BScreen::parseMenuFile: [include] error, no filename defined\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] hatasý, '%s' vasat bir dosya deðil\n
+# BScreen::parseMenuFile: [include] error, '%s' is not a regular file\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [submenu] error, no menu label defined\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [restart] error, no menu label defined\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [reconfig] error, no menu label defined\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatasý, dizin adý belirlenmedi\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, no directory defined\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatasý, '%s' bir dizin \
-deðildir\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' is not a \
+directory\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] hatasý, '%s' var deðil\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' does not exist\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] hatasý, mönü yaftasý belirlenmedi\n
+# BScreen::parseMenuFile: [workspaces] error, no menu label defined\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# Y: %4d x E: %4d
+# W: %4d x H: %4d
+

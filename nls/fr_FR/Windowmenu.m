@@ -1,19 +1,19 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Redirige vers...
+# Envoie vers ...
 $ #Shade
-# Ombrage
+# Fantôme
 $ #Iconify
 # Iconifie
 $ #Maximize
-# Maximize
+# Maximise
 $ #Raise
-# Résurrection
+# Élève
 $ #Lower
-# Réduit
+# Abaisse
 $ #Stick
-# Epingle
+# Épingle
 $ #KillClient
 # Massacre
 $ #Close

@@ -1,4 +1,4 @@
 $set 2 #Basemenu
 
-$ #OpenboxMenu
-# Openbox'i Menüü
+$ #BlackboxMenu
+# Blackbox'i Menüü

@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s : hata : -solid, -mod yada -gradient'den birisini belirlemek zorundasýn\n
+# %s: error: must specify one of: -solid, -mod, -gradient\n
 $ #Usage
-# %s 2.0 : Tel'if hakký (c) 1997-2000 Brad Hughes\n\n\
-  -display <metin>         ekran belirlemesi\n\
-  -mod <x> <y>             bölüþüm iþlemi\n\
-  -foreground, -fg <renk>  bölüþüm önalaný\n\
-  -background, -bg <renk>  bölüþüm ardalaný\n\n\
-  -gradient <kaplam>       geçiþim kaplamý\n\
-  -from <renk>             geçiþim baþlama rengi\n\
-  -to <renk>               geçiþim bitiþ rengi\n\n\
-  -solid <renk>            tek renk\n\n\
-  -help                    bu yardým iletisini göster ve çýk\n
+# %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
+  -display <string>        display connection\n\
+  -mod <x> <y>             modula pattern\n\
+  -foreground, -fg <color> modula foreground color\n\
+  -background, -bg <color> modula background color\n\n\
+  -gradient <texture>      gradient texture\n\
+  -from <color>            gradient start color\n\
+  -to <color>              gradient end color\n\n\
+  -solid <color>           solid color\n\n\
+  -help                    print this help text and exit\n
 

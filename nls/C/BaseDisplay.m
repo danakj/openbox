@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s : X hatasý : %s ( %d ) opkodlar %d/%d\n  kaynak 0x%lx\n
+# %s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n
 $ #SignalCaught
-# %s : %d sinyali alýndý \n
+# %s: signal %d caught\n
 $ #ShuttingDown
-# kapatýlýyorum\n
+# shutting down\n
 $ #Aborting
-# kapatýlýyorum ... çöküntüyü býrakýyorum\n
+# aborting... dumping core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay : X sunucusuna baðlanýlýnamadý .\n
+# BaseDisplay::BaseDisplay: connection to X server failed.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay : çalýþtýrýrken kapatmada ekrana baðlanýlýnamadý \n
+# BaseDisplay::BaseDisplay: couldn't mark display connection as close-on-exec\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop() : eylem kuyruðundaki 'kötü' pencereyi siliyorum \n
+# BaseDisplay::eventLoop(): removing bad window from event queue\n

@@ -13,7 +13,7 @@ $ #DirectionVert
 # Vertical
 
 $ #AlwaysOnTop
-# Toujours au-dessus
+# Toujours au dessus
 
 $ #PlacementTitle
 # Disposition
@@ -33,3 +33,6 @@ $ #PlacementCenterRight
 # Au centre à droite
 $ #PlacementBottomRight
 # En bas à droite
+
+$ #AutoHide
+# Auto disparaît

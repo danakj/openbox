@@ -7,10 +7,10 @@ $ #SignalCaught
 $ #ShuttingDown
 # arrêt du programme\n
 $ #Aborting
-# annulation... ponte du fichier core\n
+# annulation... génération du fichier core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: échec de la connexion à X\n
+# BaseDisplay::BaseDisplay: échec de la connexion au serveur X\n
 $ #CloseOnExecFail
 # BaseDisplay::BaseDisplay: impossible d'attribuer close-on-exec à l'affichage\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): suppression d'une mauvaise fenêtre de la queue\n
+# BaseDisplay::eventLoop(): suppression d'une mauvaise fenêtre de la queue des événements\n

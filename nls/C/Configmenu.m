@@ -1,38 +1,40 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Ayarlar
+# Config Options
 $ #FocusModel
-# Foküsleme
+# Focus Model
 $ #WindowPlacement
-# Pencere yerleþimi
+# Window Placement
 $ #ImageDithering
-# Resim oluþturmasý
+# Image Dithering
 $ #OpaqueMove
-# Ekraný içerikli taþý
+# Opaque Window Moving
 $ #FullMax
-# Tam ekranla, vallahi
+# Full Maximization
 $ #FocusNew
-# Yeni pencereleri foküsle
+# Focus New Windows
 $ #FocusLast
-# Masaüstündeki son pencereyi foküsle
+# Focus Window on Workspace Change
 $ #ClickToFocus
-# Týklayarak foküsle
+# Click to Focus
 $ #SloppyFocus
-# Aðýr foküsle
+# Sloppy Focus
 $ #AutoRaise
-# Otomatikman yükselt
+# Auto Raise
+$ #ClickRaise
+# Click Raise
 $ #SmartRows
-# Akýllý yerleþim( Sýralar )
+# Smart Placement (Rows)
 $ #SmartCols
-# Akýllý yerleþim( Sütunlar )
+# Smart Placement (Columns)
 $ #Cascade
 # Cascade Placement
 $ #LeftRight
-# Soldan saða
+# Left to Right
 $ #RightLeft
-# Saðdan sola
+# Right to Left
 $ #TopBottom
-# Üstten aþaða
+# Top to Bottom
 $ #BottomTop
-# Alttan üste
+# Bottom to Top

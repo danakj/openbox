@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Masaüstleri
+# Workspaces
 $ #NewWorkspace
-# Yeni bir masaüstü
+# New Workspace
 $ #RemoveLast
-# Son masaüstünü sil
+# Remove Last

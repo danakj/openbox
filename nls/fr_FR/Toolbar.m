@@ -17,6 +17,6 @@ $ #NoStrftimeTimeFormatA
 $ #ToolbarTitle
 # Barre d'outils
 $ #EditWkspcName
-# Bâptème du bureau courant
+# Edition du nom de l'espace courant
 $ #ToolbarPlacement
 # Disposition de la barre d'outils

@@ -2,10 +2,6 @@
 
 #include "config.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <algorithm>
-
 #include "font.hh"
 #include "surface.hh"
 #include "util.hh"
@@ -13,13 +9,14 @@
 #include "screeninfo.hh"
 
 extern "C" {
-#ifdef    HAVE_STDIO_H
-#  include <stdio.h>
-#endif // HAVE_STDIO_H
-
 #include "../src/gettext.h"
 #define _(str) gettext(str)
 }
+
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <algorithm>
 
 namespace otk {
 

@@ -60,14 +60,16 @@ void Openbox::signalHandler(int signal)
   switch (signal) {
   case SIGHUP:
     // XXX: Do something with HUP? Really shouldn't, we get this when X shuts
-    //      down and hangs-up on us.
+    //      down and hangs-up on us. we also get a SIGPIPE.
+    printf("Caught HUP signal. Restarting.\n");
+    instance->restart();
+    break;
     
   case SIGINT:
   case SIGTERM:
   case SIGPIPE:
     printf("Caught signal %d. Exiting.\n", signal);
     instance->shutdown();
-
     break;
   case SIGFPE:
   case SIGSEGV:

@@ -164,7 +164,6 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   active_screen = 0;
   focused_window = changing_window = (BlackboxWindow *) 0;
 
-  XrmInitialize();
   load_rc();
 
   xatom = new XAtom(getXDisplay());
@@ -1202,7 +1201,7 @@ void Blackbox::save_rc(void) {
 
 void Blackbox::load_rc(void) {
   if (! config.load())
-        config.create();
+    config.create();
   
   string s;
 

@@ -164,6 +164,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         font_str = "NLIMC";
     theme->title_layout = g_strdup(font_str);
 
+    /* load direct dimensions */
     if (!read_int(db, "handleWidth", &theme->handle_height) ||
 	theme->handle_height < 0 || theme->handle_height > 100)
         theme->handle_height = 6;

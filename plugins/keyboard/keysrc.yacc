@@ -25,8 +25,6 @@ static char *path;
 %token <integer> INTEGER;
 %token <string> STRING
 %token <string> FIELD
-%token <string> EXECUTE
-%token <string> RESTART
 %token <string> DESKTOP
 
 %type <list> fields
@@ -36,10 +34,8 @@ static char *path;
 config:
   | config '\n'
   | config fields FIELD '\n' { addbinding($2, $3, NULL, 0); }
-  | config fields DESKTOP INTEGER '\n' { addbinding($2, $3, NULL, $4); }
-  | config fields RESTART '\n' { addbinding($2, $3, NULL, 0); }
-  | config fields EXECUTE STRING '\n' { addbinding($2, $3, $4, 0); }
-  | config fields RESTART STRING '\n' { addbinding($2, $3, $4, 0); }
+  | config fields FIELD INTEGER '\n' { addbinding($2, $3, NULL, $4); }
+  | config fields FIELD STRING '\n' { addbinding($2, $3, $4, 0); }
   ;
 
 fields:
@@ -92,6 +88,11 @@ static void addbinding(GList *keylist, char *action, char *apath, int num)
         a->data.execute.path = apath;
     if (a->func == action_desktop)
         a->data.desktop.desk = (unsigned) num + 1;
+    if (a->func == action_move_relative_horz ||
+        a->func == action_move_relative_vert ||
+        a->func == action_resize_relative_horz ||
+        a->func == action_resize_relative_vert)
+        a->data.relative.delta = num;
 
     if (!kbind(keylist, a)) {
         action_free(a);

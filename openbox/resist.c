@@ -251,8 +251,6 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
         case OB_CORNER_BOTTOMLEFT:
             dlt = l;
             drb = r + *w - c->frame->area.width;
-            g_message("r %d drb %d ar %d res %d",
-                      r, drb, ar, config_resist_edge);
             if (r <= ar && drb > ar && drb <= ar + config_resist_edge)
                 *w = ar - l + 1;
             break;

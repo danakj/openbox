@@ -247,7 +247,9 @@ void OtkWidget::adjustHorz(void)
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
-    if (tmp->isStretchableHorz() && _fixed_width)
+    if (tmp->isStretchableVert())
+      tmp->setHeight(_rect.height() - _bevel_width * 2);
+    if (tmp->isStretchableHorz())
       stretchable.push_back(tmp);
     else
       width += tmp->_rect.width() + _bevel_width;
@@ -262,10 +264,8 @@ void OtkWidget::adjustHorz(void)
 
     int str_width = _rect.width() - width / stretchable.size();
 
-    for (; str_it != str_end; ++str_it) {
+    for (; str_it != str_end; ++str_it)
       (*str_it)->setWidth(str_width - _bevel_width);
-      //(*str_it)->update();
-    }
   }
 
   OtkWidget *prev_widget = 0;
@@ -302,7 +302,9 @@ void OtkWidget::adjustVert(void)
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
-    if (tmp->isStretchableVert() && _fixed_height)
+    if (tmp->isStretchableHorz())
+      tmp->setWidth(_rect.width() - _bevel_width * 2);
+    if (tmp->isStretchableVert())
       stretchable.push_back(tmp);
     else
       height += tmp->_rect.height() + _bevel_width;
@@ -317,10 +319,8 @@ void OtkWidget::adjustVert(void)
 
     int str_height = _rect.height() - height / stretchable.size();
 
-    for (; str_it != str_end; ++str_it) {
+    for (; str_it != str_end; ++str_it)
       (*str_it)->setHeight(str_height - _bevel_width);
-      //(*str_it)->update();
-    }
   }
 
   OtkWidget *prev_widget = 0;
@@ -416,7 +416,7 @@ bool OtkWidget::configure(const XConfigureEvent &e)
       std::cout << "configure\n";
       if (!(e.width == _rect.width() && e.height == _rect.height()))
         _dirty = true;
-      _rect.setRect(e.x, e.y, e.width, e.height);
+      _rect.setRect(_rect.x(), _rect.y(), e.width, e.height);
       update();
     }
     return true;

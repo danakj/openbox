@@ -255,7 +255,7 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         }
         g->height = -(font->face->glyph->metrics.height >> 6);
 
-        g_hash_table_insert(font->glyph_map, &g->w, &g);
+        g_hash_table_insert(font->glyph_map, &g->w, g);
     }
 
     return g;

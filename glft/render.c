@@ -93,7 +93,7 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
     glPushMatrix();
 
     c = str;
-    while (c) {
+    while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
         if (g) {
             glCallList(g->dlist);
@@ -101,7 +101,6 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
         } else
             glTranslatef(font->max_advance_width, 0.0, 0.0);
         c = g_utf8_next_char(c);
-        if (c - str >= bytes) break;
     }
 
     glPopMatrix();

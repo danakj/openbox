@@ -59,6 +59,7 @@ struct GlftGlyph {
 
     int padx, pady;
     int texw, texh;
+    int left, yoff;
 };
 
 /*! Takes a character in UTF-8 encoding and returns an OpenGL display list

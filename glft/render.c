@@ -20,6 +20,9 @@ void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g)
     g->texw = slot->bitmap.width;
     g->texh = slot->bitmap.rows;
 
+    g->left = slot->bitmap_left;
+
+    g->yoff = slot->bitmap.rows - slot->bitmap_top;
     g->padx = 1;
     while (g->padx < slot->bitmap.width)
        g->padx <<= 1;
@@ -29,7 +32,6 @@ void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g)
        g->pady <<= 1;
 
     padbuf = g_new0(unsigned char, g->padx * g->pady);
-printf("glyph rendered to %d wide\n", slot->bitmap.width);
     for (i = 0; i < slot->bitmap.rows; i++)
         memcpy(padbuf + i*g->padx,
                slot->bitmap.buffer + i*slot->bitmap.width,
@@ -64,23 +66,22 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
     while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
         if (g) {
-printf("glyph width %d(%d)\n", g->width, g->x);
             glTranslatef(GlftFontAdvance(font, p, g), 0.0, 0.0);
             glBindTexture(GL_TEXTURE_2D, g->tnum);
             glBegin(GL_QUADS);
-            glColor3f(0.0, 0.0, 0.0);
+            glColor3f(1.0, 1.0, 1.0);
 
             glTexCoord2f(0, g->texh/(float)g->pady);
-            glVertex2i(0, 0);
+            glVertex2i(g->left, 0 - g->yoff);
 
             glTexCoord2f(g->texw/(float)g->padx, g->texh/(float)g->pady);
-            glVertex2i(0 + g->texw, 0);
+            glVertex2i(g->left + g->texw, 0 - g->yoff);
 
             glTexCoord2f(g->texw/(float)g->padx, 0);
-            glVertex2i(0 + g->texw, 0 + g->texh);
+            glVertex2i(g->left + g->texw, g->texh - g->yoff);
 
             glTexCoord2f(0, 0);
-            glVertex2i(0, 0 + g->texh);
+            glVertex2i(g->left, g->texh - g->yoff);
             glEnd();
         } else
             glTranslatef(font->max_advance_width, 0.0, 0.0);

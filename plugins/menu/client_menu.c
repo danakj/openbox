@@ -77,7 +77,7 @@ void plugin_destroy (Menu *m)
 void *plugin_create() /* TODO: need config */
 {
     Menu *m = menu_new_full(NULL, "client-menu", NULL,
-                            client_menu_show, NULL);
+                            /*client_menu_show*/NULL, NULL);
     menu_add_entry(m, menu_entry_new_submenu("Send To Workspace",
                                              send_to_menu));
     send_to_menu->parent = m;

@@ -17,6 +17,7 @@
 #include "config.h"
 #include "menu.h"
 #include "render2/render.h"
+#include "render2/color.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -1354,14 +1355,14 @@ void client_update_icons(Client *self)
 	}
 
 	g_free(data);
-    }/* XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
-       else if (PROP_GETA32(self->window, kwm_win_icon,
-                           kwm_win_icon, &data, &num)) {
+    }
+    else if (PROP_GETA32(self->window, kwm_win_icon,
+                         kwm_win_icon, &data, &num)) {
         if (num == 2) {
             self->nicons++;
             self->icons = g_new(Icon, self->nicons);
             xerror_set_ignore(TRUE);
-            if (!render_pixmap_to_rgba(data[0], data[1],
+            if (!RrPixmapToRGBA(ob_render_inst, data[0], data[1],
                                        &self->icons[self->nicons-1].width,
                                        &self->icons[self->nicons-1].height,
                                        &self->icons[self->nicons-1].data)) {
@@ -1379,7 +1380,7 @@ void client_update_icons(Client *self)
                 self->nicons++;
                 self->icons = g_new(Icon, self->nicons);
                 xerror_set_ignore(TRUE);
-                if (!render_pixmap_to_rgba(hints->icon_pixmap,
+                if (!RrPixmapToRGBA(ob_render_inst, hints->icon_pixmap,
                                            (hints->flags & IconMaskHint ?
                                             hints->icon_mask : None),
                                            &self->icons[self->nicons-1].width,
@@ -1393,7 +1394,6 @@ void client_update_icons(Client *self)
             XFree(hints);
         }
     }
-*/
 
     if (self->frame)
 	frame_adjust_icon(self->frame);

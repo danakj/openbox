@@ -14,6 +14,7 @@ userscriptdir   = $(datadir)/openbox
 theme = TheBear
 
 AUTOMAKE_OPTIONS = subdir-objects foreign
+
 ACLOCAL_AMFLAGS = -I m4
 
 INCLUDES = -I.

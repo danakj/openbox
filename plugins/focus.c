@@ -19,7 +19,7 @@ void plugin_setup_config()
     config_set("focus.followMouse", Config_Bool, val);
     config_def_set(config_def_new("focus.focusNew", Config_Bool,
                                   "Focus New Windows",
-                                  "Focus windows when they first appear "));
+                                  "Focus windows when they first appear."));
     val.bool = TRUE;
     config_set("focus.focusNew", Config_Bool, val);
 /*

@@ -8,15 +8,26 @@ Copyright (C) 2002-2003  Ben Jansens
 
 ----
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+This program is licensed under a number of different terms:
+
+Anything found in the render2 and glft directories is licensed under version
+2.1 of the GNU Lesser General Public License as published by the Free Software
+Foundation, and can be redistributed and/or modified under its terms.
+
+Anything found in the doc directory is licensed under version 1.2 of the GNU
+Free Documentation License as published by the Free Software Foundation, and
+can be redistributed and/or modified under its terms; with no Invariant
+Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+The remainder of this program, not aforementioned, is licensed under
+version 2 or the GNU General Public License as published by the Free Software
+Foundation, and can be redistributed and/or modified under its terms.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    See the COPYING file for a copy of the GNU General Public License.
-
+See the COPYING.LGPL file for a copy of the GNU Lesser General Public License.
+See the COPYING.FDL file for a copy of the GNU Free Documentation License.
+See the COPYING.GPL file for a copy of the GNU General Public License.

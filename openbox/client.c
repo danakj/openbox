@@ -747,7 +747,8 @@ void client_setup_decor_and_functions(Client *self)
 {
     /* start with everything (cept fullscreen) */
     self->decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-	Decor_Icon | Decor_AllDesktops | Decor_Iconify | Decor_Maximize;
+	Decor_Icon | Decor_AllDesktops | Decor_Iconify | Decor_Maximize |
+        Decor_Shade;
     self->functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
 	Func_Shade;
     if (self->delete_window) {
@@ -842,6 +843,8 @@ void client_setup_decor_and_functions(Client *self)
 	self->decorations &= ~Decor_Maximize;
     if (self->disabled_decorations & Decor_AllDesktops)
 	self->decorations &= ~Decor_AllDesktops;
+    if (self->disabled_decorations & Decor_Shade)
+	self->decorations &= ~Decor_Shade;
     if (self->disabled_decorations & Decor_Close)
 	self->decorations &= ~Decor_Close;
 

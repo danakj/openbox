@@ -100,7 +100,8 @@ typedef enum {
     /*! Display a button to toggle the window's placement on
       all desktops */
     Decor_AllDesktops = 1 << 6,
-    Decor_Close       = 1 << 7  /*!< Display a close button */
+    Decor_Shade       = 1 << 7, /*!< Displays a shade button */
+    Decor_Close       = 1 << 8  /*!< Display a close button */
 } Decoration;
 
 

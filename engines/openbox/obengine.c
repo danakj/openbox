@@ -42,6 +42,8 @@ pixmap_mask *ob_s_max_unset_mask;
 pixmap_mask *ob_s_iconify_mask;
 pixmap_mask *ob_s_desk_set_mask;
 pixmap_mask *ob_s_desk_unset_mask;
+pixmap_mask *ob_s_shade_set_mask;
+pixmap_mask *ob_s_shade_unset_mask;
 pixmap_mask *ob_s_close_mask;
 
 /* global appearances */
@@ -61,6 +63,12 @@ Appearance *ob_a_focused_pressed_set_desk;
 Appearance *ob_a_unfocused_unpressed_desk;
 Appearance *ob_a_unfocused_pressed_desk;
 Appearance *ob_a_unfocused_pressed_set_desk;
+Appearance *ob_a_focused_unpressed_shade;
+Appearance *ob_a_focused_pressed_shade;
+Appearance *ob_a_focused_pressed_set_shade;
+Appearance *ob_a_unfocused_unpressed_shade;
+Appearance *ob_a_unfocused_pressed_shade;
+Appearance *ob_a_unfocused_pressed_set_shade;
 Appearance *ob_a_focused_unpressed_iconify;
 Appearance *ob_a_focused_pressed_iconify;
 Appearance *ob_a_unfocused_unpressed_iconify;
@@ -92,6 +100,7 @@ gboolean startup()
     g_quark_from_string("brcorner");
     g_quark_from_string("maximize");
     g_quark_from_string("alldesktops");
+    g_quark_from_string("shade");
     g_quark_from_string("iconify");
     g_quark_from_string("icon");
     g_quark_from_string("close");
@@ -109,6 +118,7 @@ gboolean startup()
     ob_s_winfont = NULL;
     ob_s_max_set_mask = ob_s_max_unset_mask = NULL;
     ob_s_desk_set_mask = ob_s_desk_unset_mask = NULL;
+    ob_s_shade_set_mask = ob_s_shade_unset_mask = NULL;
     ob_s_iconify_mask = ob_s_close_mask = NULL;
 
     ob_a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
@@ -127,6 +137,12 @@ gboolean startup()
     ob_a_unfocused_unpressed_desk = NULL;
     ob_a_unfocused_pressed_desk = NULL;
     ob_a_unfocused_pressed_set_desk = NULL;
+    ob_a_focused_unpressed_shade = NULL;
+    ob_a_focused_pressed_shade = NULL;
+    ob_a_focused_pressed_set_shade = NULL;
+    ob_a_unfocused_unpressed_shade = NULL;
+    ob_a_unfocused_pressed_shade = NULL;
+    ob_a_unfocused_pressed_set_shade = NULL;
     ob_a_focused_unpressed_iconify = NULL;
     ob_a_focused_pressed_iconify = NULL;
     ob_a_unfocused_unpressed_iconify = NULL;
@@ -153,6 +169,18 @@ gboolean startup()
         RECT_SET(ob_a_unfocused_pressed_set_desk->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_unfocused_unpressed_desk->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_focused_pressed_shade->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_focused_pressed_set_shade->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_focused_unpressed_shade->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_unfocused_pressed_shade->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_unfocused_pressed_set_shade->area, 0, 0,
+                 BUTTON_SIZE, BUTTON_SIZE);
+        RECT_SET(ob_a_unfocused_unpressed_shade->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
         RECT_SET(ob_a_focused_pressed_iconify->area, 0, 0,
                  BUTTON_SIZE, BUTTON_SIZE);
@@ -214,6 +242,10 @@ void shutdown()
         pixmap_mask_free(ob_s_desk_set_mask);
     if (ob_s_desk_unset_mask != NULL)
         pixmap_mask_free(ob_s_desk_unset_mask);
+    if (ob_s_shade_set_mask != NULL)
+        pixmap_mask_free(ob_s_shade_set_mask);
+    if (ob_s_shade_unset_mask != NULL)
+        pixmap_mask_free(ob_s_shade_unset_mask);
     if (ob_s_iconify_mask != NULL)
         pixmap_mask_free(ob_s_iconify_mask);
     if (ob_s_close_mask != NULL)
@@ -243,6 +275,14 @@ void shutdown()
 	appearance_free(ob_a_unfocused_unpressed_desk);
     if (ob_a_unfocused_pressed_desk != NULL)
 	appearance_free(ob_a_unfocused_pressed_desk);
+    if (ob_a_focused_unpressed_shade != NULL)
+	appearance_free(ob_a_focused_unpressed_shade);
+    if (ob_a_focused_pressed_shade != NULL)
+	appearance_free(ob_a_focused_pressed_shade);
+    if (ob_a_unfocused_unpressed_shade != NULL)
+	appearance_free(ob_a_unfocused_unpressed_shade);
+    if (ob_a_unfocused_pressed_shade != NULL)
+	appearance_free(ob_a_unfocused_pressed_shade);
     if (ob_a_focused_unpressed_iconify != NULL)
 	appearance_free(ob_a_focused_unpressed_iconify);
     if (ob_a_focused_pressed_iconify != NULL)
@@ -297,6 +337,7 @@ Frame *frame_new()
     self->max = createWindow(self->title, mask, &attrib);
     self->close = createWindow(self->title, mask, &attrib);
     self->desk = createWindow(self->title, mask, &attrib);
+    self->shade = createWindow(self->title, mask, &attrib);
     self->icon = createWindow(self->title, mask, &attrib);
     self->iconify = createWindow(self->title, mask, &attrib);
     self->handle = createWindow(self->frame.window, mask, &attrib);
@@ -323,6 +364,7 @@ Frame *frame_new()
     XResizeWindow(ob_display, self->icon, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->close, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->desk, BUTTON_SIZE, BUTTON_SIZE);
+    XResizeWindow(ob_display, self->shade, BUTTON_SIZE, BUTTON_SIZE);
     XResizeWindow(ob_display, self->lgrip, GRIP_WIDTH, ob_s_handle_height);
     XResizeWindow(ob_display, self->rgrip, GRIP_WIDTH, ob_s_handle_height);
 
@@ -336,7 +378,7 @@ Frame *frame_new()
     self->a_icon = appearance_copy(ob_a_icon);
 
     self->max_press = self->close_press = self->desk_press = 
-	self->iconify_press = FALSE;
+	self->iconify_press = self->shade_press = FALSE;
 
     dispatch_register(Event_X_ButtonPress | Event_X_ButtonRelease,
                       (EventHandler)mouse_event, self);
@@ -451,6 +493,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
         /* they all default off, they're turned on in layout_title */
         self->icon_x = -1;
         self->desk_x = -1;
+        self->shade_x = -1;
         self->icon_x = -1;
         self->label_x = -1;
         self->max_x = -1;
@@ -470,13 +513,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 
             /* layout the title bar elements */
             layout_title(self);
-        } else {
+        } else
             XUnmapWindow(ob_display, self->title);
-            /* make all the titlebar stuff not render */
-            self->frame.client->decorations &= ~(Decor_Icon | Decor_Iconify |
-                                                 Decor_Maximize | Decor_Close |
-                                                 Decor_AllDesktops);
-        }
 
         if (self->frame.client->decorations & Decor_Handle) {
             XMoveResizeWindow(ob_display, self->handle,
@@ -618,6 +656,7 @@ void frame_grab_client(ObFrame *self, Client *client)
     g_hash_table_insert(client_map, &self->max, client);
     g_hash_table_insert(client_map, &self->close, client);
     g_hash_table_insert(client_map, &self->desk, client);
+    g_hash_table_insert(client_map, &self->shade, client);
     g_hash_table_insert(client_map, &self->icon, client);
     g_hash_table_insert(client_map, &self->iconify, client);
     g_hash_table_insert(client_map, &self->handle, client);
@@ -653,6 +692,7 @@ void frame_release_client(ObFrame *self, Client *client)
     g_hash_table_remove(client_map, &self->max);
     g_hash_table_remove(client_map, &self->close);
     g_hash_table_remove(client_map, &self->desk);
+    g_hash_table_remove(client_map, &self->shade);
     g_hash_table_remove(client_map, &self->icon);
     g_hash_table_remove(client_map, &self->iconify);
     g_hash_table_remove(client_map, &self->handle);
@@ -666,10 +706,10 @@ static void layout_title(ObFrame *self)
 {
     char *lc;
     int x;
-    gboolean n, d, i, l, m ,c;
+    gboolean n, d, i, l, m, c, s;
     ConfigValue layout;
 
-    n = d = i = l = m = c = FALSE;
+    n = d = i = l = m = c = s = FALSE;
 
     if (!config_get("titlebar.layout", Config_String, &layout)) {
         layout.string = "NDLIMC";
@@ -690,6 +730,12 @@ static void layout_title(ObFrame *self)
 	    if (!(self->frame.client->decorations & Decor_AllDesktops)) break;
             if (d) { *lc = ' '; break; } /* rm duplicates */
 	    d = TRUE;
+	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
+	    break;
+	case 'S':
+	    if (!(self->frame.client->decorations & Decor_Shade)) break;
+            if (s) { *lc = ' '; break; } /* rm duplicates */
+	    s = TRUE;
 	    self->label_width -= BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'I':
@@ -723,6 +769,7 @@ static void layout_title(ObFrame *self)
   
     if (!n) XUnmapWindow(ob_display, self->icon);
     if (!d) XUnmapWindow(ob_display, self->desk);
+    if (!s) XUnmapWindow(ob_display, self->shade);
     if (!i) XUnmapWindow(ob_display, self->iconify);
     if (!l) XUnmapWindow(ob_display, self->label);
     if (!m) XUnmapWindow(ob_display, self->max);
@@ -744,6 +791,13 @@ static void layout_title(ObFrame *self)
 	    self->desk_x = x;
 	    XMapWindow(ob_display, self->desk);
 	    XMoveWindow(ob_display, self->desk, x, ob_s_bevel + 1);
+	    x += BUTTON_SIZE + ob_s_bevel + 1;
+	    break;
+	case 'S':
+	    if (!s) break;
+	    self->shade_x = x;
+	    XMapWindow(ob_display, self->shade);
+	    XMoveWindow(ob_display, self->shade, x, ob_s_bevel + 1);
 	    x += BUTTON_SIZE + ob_s_bevel + 1;
 	    break;
 	case 'I':
@@ -801,6 +855,9 @@ static void mouse_event(const ObEvent *e, ObFrame *self)
     } else if (win == self->desk) { 
         self->desk_press = press;
         obrender_frame(self);
+    } else if (win == self->shade) { 
+        self->shade_press = press;
+        obrender_frame(self);
     }
 }
 
@@ -825,6 +882,7 @@ GQuark get_context(Client *client, Window win)
     if (win == self->close)  return g_quark_try_string("close");
     if (win == self->icon)  return g_quark_try_string("icon");
     if (win == self->desk)  return g_quark_try_string("alldesktops");
+    if (win == self->shade)  return g_quark_try_string("shade");
 
     return g_quark_try_string("none");
 }

@@ -37,6 +37,8 @@ extern pixmap_mask *ob_s_max_unset_mask;
 extern pixmap_mask *ob_s_iconify_mask;
 extern pixmap_mask *ob_s_desk_set_mask;
 extern pixmap_mask *ob_s_desk_unset_mask;
+extern pixmap_mask *ob_s_shade_set_mask;
+extern pixmap_mask *ob_s_shade_unset_mask;
 extern pixmap_mask *ob_s_close_mask;
 
 extern Appearance *ob_a_focused_unpressed_max;
@@ -55,6 +57,12 @@ extern Appearance *ob_a_focused_pressed_set_desk;
 extern Appearance *ob_a_unfocused_unpressed_desk;
 extern Appearance *ob_a_unfocused_pressed_desk;
 extern Appearance *ob_a_unfocused_pressed_set_desk;
+extern Appearance *ob_a_focused_unpressed_shade;
+extern Appearance *ob_a_focused_pressed_shade;
+extern Appearance *ob_a_focused_pressed_set_shade;
+extern Appearance *ob_a_unfocused_unpressed_shade;
+extern Appearance *ob_a_unfocused_pressed_shade;
+extern Appearance *ob_a_unfocused_pressed_set_shade;
 extern Appearance *ob_a_focused_unpressed_iconify;
 extern Appearance *ob_a_focused_pressed_iconify;
 extern Appearance *ob_a_unfocused_unpressed_iconify;
@@ -77,6 +85,7 @@ typedef struct ObFrame {
     Window max;
     Window close;
     Window desk;
+    Window shade;
     Window icon;
     Window iconify;
     Window handle;
@@ -101,6 +110,7 @@ typedef struct ObFrame {
     int label_x;       /* x-position of the window title */
     int iconify_x;     /* x-position of the window iconify button */
     int desk_x;         /* x-position of the window all-desktops button */
+    int shade_x;         /* x-position of the window shade button */
     int max_x;         /* x-position of the window maximize button */
     int close_x;       /* x-position of the window close button */
     int bwidth;        /* border width */
@@ -109,6 +119,7 @@ typedef struct ObFrame {
     gboolean max_press;
     gboolean close_press;
     gboolean desk_press;
+    gboolean shade_press;
     gboolean iconify_press;
 } ObFrame;
 

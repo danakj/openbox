@@ -150,6 +150,7 @@ Icon		DoubleClick	Left	Close
 Close		Click		Left	Close
 Close		Click		Middle	Kill
 AllDesktops	Click		Left	ToggleOmnipresent
+Shade		Click		Left	ToggleShade
 
 Root		Click		Up	NextDesktopWrap
 Root		Click		Down	PreviousDesktopWrap

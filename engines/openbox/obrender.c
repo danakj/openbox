@@ -7,6 +7,7 @@ static void obrender_max(ObFrame *self, Appearance *a);
 static void obrender_icon(ObFrame *self, Appearance *a);
 static void obrender_iconify(ObFrame *self, Appearance *a);
 static void obrender_desk(ObFrame *self, Appearance *a);
+static void obrender_shade(ObFrame *self, Appearance *a);
 static void obrender_close(ObFrame *self, Appearance *a);
 
 void obrender_frame(ObFrame *self)
@@ -20,7 +21,7 @@ void obrender_frame(ObFrame *self)
     }
 
     if (self->frame.client->decorations & Decor_Titlebar) {
-        Appearance *t, *l, *m, *n, *i, *d, *c;
+        Appearance *t, *l, *m, *n, *i, *d, *s, *c;
 
         t = (client_focused(self->frame.client) ?
              self->a_focused_title : self->a_unfocused_title);
@@ -51,6 +52,15 @@ void obrender_frame(ObFrame *self)
               ob_a_unfocused_pressed_set_desk :
               (self->desk_press ?
                ob_a_unfocused_pressed_desk : ob_a_unfocused_unpressed_desk)));
+        s = (client_focused(self->frame.client) ?
+             (self->frame.client->shaded ?
+              ob_a_focused_pressed_set_shade :
+              (self->shade_press ?
+               ob_a_focused_pressed_shade : ob_a_focused_unpressed_shade)) :
+             (self->frame.client->shaded ?
+              ob_a_unfocused_pressed_set_shade :
+              (self->shade_press ?
+               ob_a_unfocused_pressed_shade :ob_a_unfocused_unpressed_shade)));
         c = (client_focused(self->frame.client) ?
              (self->close_press ?
               ob_a_focused_pressed_close : ob_a_focused_unpressed_close) :
@@ -80,6 +90,10 @@ void obrender_frame(ObFrame *self)
         d->surface.data.planar.parentx = self->desk_x;
         d->surface.data.planar.parenty = ob_s_bevel + 1;
 
+        s->surface.data.planar.parent = t;
+        s->surface.data.planar.parentx = self->shade_x;
+        s->surface.data.planar.parenty = ob_s_bevel + 1;
+
         c->surface.data.planar.parent = t;
         c->surface.data.planar.parentx = self->close_x;
         c->surface.data.planar.parenty = ob_s_bevel + 1;
@@ -89,6 +103,7 @@ void obrender_frame(ObFrame *self)
         obrender_icon(self, n);
         obrender_iconify(self, i);
         obrender_desk(self, d);
+        obrender_shade(self, s);
         obrender_close(self, c);
     }
 
@@ -170,6 +185,14 @@ static void obrender_desk(ObFrame *self, Appearance *a)
 
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
     paint(self->desk, a);
+}
+
+static void obrender_shade(ObFrame *self, Appearance *a)
+{
+    if (self->shade_x < 0) return;
+
+    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    paint(self->shade, a);
 }
 
 static void obrender_close(ObFrame *self, Appearance *a)

@@ -396,6 +396,24 @@ gboolean obtheme_load()
         }
     }
 
+    if (read_mask(db, "window.button.shade.mask",
+                   &ob_s_shade_unset_mask)) {
+        if (!read_mask(db, "window.button.shade.toggled.mask",
+                       &ob_s_shade_set_mask)) {
+            ob_s_shade_set_mask =
+                pixmap_mask_copy(ob_s_shade_unset_mask);
+        }
+    } else {
+        {
+            char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00 };
+            ob_s_shade_unset_mask = pixmap_mask_new(7, 7, data);
+        }
+        {
+            char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
+            ob_s_shade_set_mask = pixmap_mask_new(7, 7, data);
+        }
+    }
+
     if (!read_mask(db, "window.button.close.mask",
                    &ob_s_close_mask)) {
         char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
@@ -449,6 +467,14 @@ gboolean obtheme_load()
     ob_a_focused_unpressed_desk = appearance_copy(ob_a_focused_unpressed_max);
     ob_a_focused_pressed_desk = appearance_copy(ob_a_focused_pressed_max);
     ob_a_focused_pressed_set_desk = appearance_copy(ob_a_focused_pressed_max);
+    ob_a_unfocused_unpressed_shade =
+        appearance_copy(ob_a_unfocused_unpressed_max);
+    ob_a_unfocused_pressed_shade = appearance_copy(ob_a_unfocused_pressed_max);
+    ob_a_unfocused_pressed_set_shade =
+        appearance_copy(ob_a_unfocused_pressed_max);
+    ob_a_focused_unpressed_shade = appearance_copy(ob_a_focused_unpressed_max);
+    ob_a_focused_pressed_shade = appearance_copy(ob_a_focused_pressed_max);
+    ob_a_focused_pressed_set_shade = appearance_copy(ob_a_focused_pressed_max);
     ob_a_unfocused_unpressed_iconify =
         appearance_copy(ob_a_unfocused_unpressed_max);
     ob_a_unfocused_pressed_iconify =
@@ -496,6 +522,12 @@ gboolean obtheme_load()
         ob_a_unfocused_unpressed_desk->texture[0].type = 
         ob_a_unfocused_pressed_desk->texture[0].type = 
         ob_a_unfocused_pressed_set_desk->texture[0].type = 
+        ob_a_focused_unpressed_shade->texture[0].type = 
+        ob_a_focused_pressed_shade->texture[0].type = 
+        ob_a_focused_pressed_set_shade->texture[0].type = 
+        ob_a_unfocused_unpressed_shade->texture[0].type = 
+        ob_a_unfocused_pressed_shade->texture[0].type = 
+        ob_a_unfocused_pressed_set_shade->texture[0].type = 
         ob_a_focused_unpressed_iconify->texture[0].type = 
         ob_a_focused_pressed_iconify->texture[0].type = 
         ob_a_unfocused_unpressed_iconify->texture[0].type = 
@@ -521,6 +553,14 @@ gboolean obtheme_load()
     ob_a_focused_pressed_set_desk->texture[0].data.mask.mask = 
         ob_a_unfocused_pressed_set_desk->texture[0].data.mask.mask =
         ob_s_desk_set_mask;
+    ob_a_focused_unpressed_shade->texture[0].data.mask.mask = 
+        ob_a_unfocused_unpressed_shade->texture[0].data.mask.mask = 
+        ob_a_focused_pressed_shade->texture[0].data.mask.mask = 
+        ob_a_unfocused_pressed_shade->texture[0].data.mask.mask =
+        ob_s_shade_unset_mask;
+    ob_a_focused_pressed_set_shade->texture[0].data.mask.mask = 
+        ob_a_unfocused_pressed_set_shade->texture[0].data.mask.mask =
+        ob_s_shade_set_mask;
     ob_a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         ob_a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
         ob_a_focused_pressed_iconify->texture[0].data.mask.mask = 
@@ -534,6 +574,9 @@ gboolean obtheme_load()
         ob_a_focused_unpressed_desk->texture[0].data.mask.color = 
         ob_a_focused_pressed_desk->texture[0].data.mask.color = 
         ob_a_focused_pressed_set_desk->texture[0].data.mask.color = 
+        ob_a_focused_unpressed_shade->texture[0].data.mask.color = 
+        ob_a_focused_pressed_shade->texture[0].data.mask.color = 
+        ob_a_focused_pressed_set_shade->texture[0].data.mask.color = 
         ob_a_focused_unpressed_iconify->texture[0].data.mask.color = 
         ob_a_focused_pressed_iconify->texture[0].data.mask.color =
         ob_s_titlebut_focused_color;
@@ -545,6 +588,9 @@ gboolean obtheme_load()
         ob_a_unfocused_unpressed_desk->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_desk->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_set_desk->texture[0].data.mask.color = 
+        ob_a_unfocused_unpressed_shade->texture[0].data.mask.color = 
+        ob_a_unfocused_pressed_shade->texture[0].data.mask.color = 
+        ob_a_unfocused_pressed_set_shade->texture[0].data.mask.color = 
         ob_a_unfocused_unpressed_iconify->texture[0].data.mask.color = 
         ob_a_unfocused_pressed_iconify->texture[0].data.mask.color =
         ob_s_titlebut_unfocused_color;

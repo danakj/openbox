@@ -42,14 +42,36 @@
 #include <algorithm>
 
 using std::cerr;
+using std::endl;
 
+std::string XDisplay::_app_name;
+Window      XDisplay::_last_bad_window = None;
+  
+/*
+ * X error handler to handle all X errors while the application is
+ * running.
+ */
 int XDisplay::XErrorHandler(Display *d, XErrorEvent *e) {
-  d=d;e=e;
-  return 0;
+#ifdef DEBUG
+  char errtxt[128];
+  XGetErrorText(d, e->error_code, errtxt, sizeof(errtxt)/sizeof(char));
+  cerr << _app_name.c_str() << ": X error: " << 
+    errtxt << "(" << e->error_code << ") opcodes " <<
+    e->request_code << "/" << e->minor_code << endl;
+  cerr.flags(std::ios_base::hex);
+  cerr << "  resource 0x" << e->resourceid << endl;
+  cerr.flags(std::ios_base::dec);
+#endif
+  
+  if (e->error_code == BadWindow)
+    _last_bad_window = e->resourceid;
+  
+  return False;
 }
 
 
-XDisplay::XDisplay(const char *dpyname) {
+XDisplay::XDisplay(const std::string &application_name, const char *dpyname) {
+  _app_name = application_name;
   _grabs = 0;
   _hasshape = false;
   

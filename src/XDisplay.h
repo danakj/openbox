@@ -41,8 +41,11 @@ private:
 
   typedef std::vector<XScreen*> XScreenList;
   XScreenList    _screens;
- 
+
+  // X error handling
   static int XErrorHandler(Display *d, XErrorEvent *e);
+  static std::string _app_name;
+  static Window _last_bad_window;
 
   // no copying!!
   XDisplay(const XDisplay &);
@@ -52,7 +55,7 @@ protected:
   virtual void process_event(XEvent *) = 0;
 
 public:
-  XDisplay(const char *dpyname = 0);
+  XDisplay(const std::string &application_name, const char *dpyname = 0);
   virtual ~XDisplay();
 
   XScreen *screen(unsigned int s) const;

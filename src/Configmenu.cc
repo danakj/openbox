@@ -39,29 +39,29 @@
 
 Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
 {
-  setLabel(i18n->getMessage(ConfigmenuSet, ConfigmenuConfigOptions,
-			    "Config options"));
+  setLabel(i18n(ConfigmenuSet, ConfigmenuConfigOptions,
+                "Config options"));
   setInternalMenu();
 
   focusmenu = new Focusmenu(this);
   placementmenu = new Placementmenu(this);
 
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuFocusModel,
-			  "Focus Model"), focusmenu);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuWindowPlacement,
-			  "Window Placement"), placementmenu);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuImageDithering,
-			  "Image Dithering"), 1);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuOpaqueMove,
-			  "Opaque Window Moving"), 2);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuFullMax,
-			  "Full Maximization"), 3);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuFocusNew,
-			  "Focus New Windows"), 4);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuFocusLast,
-			  "Focus Last Window on Workspace"), 5);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuHideToolbar,
-			  "Hide toolbar"), 6);
+  insert(i18n(ConfigmenuSet, ConfigmenuFocusModel,
+              "Focus Model"), focusmenu);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
+              "Window Placement"), placementmenu);
+  insert(i18n(ConfigmenuSet, ConfigmenuImageDithering,
+              "Image Dithering"), 1);
+  insert(i18n(ConfigmenuSet, ConfigmenuOpaqueMove,
+              "Opaque Window Moving"), 2);
+  insert(i18n(ConfigmenuSet, ConfigmenuFullMax,
+              "Full Maximization"), 3);
+  insert(i18n(ConfigmenuSet, ConfigmenuFocusNew,
+              "Focus New Windows"), 4);
+  insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
+              "Focus Last Window on Workspace"), 5);
+  insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
+              "Hide toolbar"), 6);
   update();
 
   setValues();
@@ -145,16 +145,16 @@ void Configmenu::reconfigure() {
 Configmenu::Focusmenu::Focusmenu(Configmenu *cm) : Basemenu(cm->screen) {
   configmenu = cm;
 
-  setLabel(i18n->getMessage(ConfigmenuSet, ConfigmenuFocusModel,
-			    "Focus Model"));
+  setLabel(i18n(ConfigmenuSet, ConfigmenuFocusModel,
+                "Focus Model"));
   setInternalMenu();
 
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuClickToFocus,
-			  "Click To Focus"), 1);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuSloppyFocus,
-			  "Sloppy Focus"), 2);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuAutoRaise,
-			  "Auto Raise"), 3);
+  insert(i18n(ConfigmenuSet, ConfigmenuClickToFocus,
+              "Click To Focus"), 1);
+  insert(i18n(ConfigmenuSet, ConfigmenuSloppyFocus,
+              "Sloppy Focus"), 2);
+  insert(i18n(ConfigmenuSet, ConfigmenuAutoRaise,
+              "Auto Raise"), 3);
   update();
 
   setValues();
@@ -207,37 +207,37 @@ void Configmenu::Focusmenu::itemSelected(int button, int index) {
 }
 
 Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
- Basemenu(cm->screen) {
+Basemenu(cm->screen) {
   configmenu = cm;
 
-  setLabel(i18n->getMessage(ConfigmenuSet, ConfigmenuWindowPlacement,
-			    "Window Placement"));
+  setLabel(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
+                "Window Placement"));
   setInternalMenu();
-  
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuSmartRows,
-			  "Smart Placement (Rows)"),
-	 BScreen::RowSmartPlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuSmartCols,
-			  "Smart Placement (Columns)"),
-	 BScreen::ColSmartPlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuCascade,
-			  "Cascade Placement"), BScreen::CascadePlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuBestFit,
-                          "Best Fit Placement"), BScreen::BestFitPlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuUnderMouse,
-                          "Under Mouse Placement"),
+
+  insert(i18n(ConfigmenuSet, ConfigmenuSmartRows,
+              "Smart Placement (Rows)"),
+         BScreen::RowSmartPlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuSmartCols,
+              "Smart Placement (Columns)"),
+         BScreen::ColSmartPlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuCascade,
+              "Cascade Placement"), BScreen::CascadePlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuBestFit,
+              "Best Fit Placement"), BScreen::BestFitPlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuUnderMouse,
+              "Under Mouse Placement"),
          BScreen::UnderMousePlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuClickMouse,
-                          "Click Mouse Placement"),
+  insert(i18n(ConfigmenuSet, ConfigmenuClickMouse,
+              "Click Mouse Placement"),
          BScreen::ClickMousePlacement);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuLeftRight,
-			  "Left to Right"), BScreen::LeftRight);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuRightLeft,
-			  "Right to Left"), BScreen::RightLeft);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuTopBottom,
-			  "Top to Bottom"), BScreen::TopBottom);
-  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuBottomTop,
-			  "Bottom to Top"), BScreen::BottomTop);
+  insert(i18n(ConfigmenuSet, ConfigmenuLeftRight,
+              "Left to Right"), BScreen::LeftRight);
+  insert(i18n(ConfigmenuSet, ConfigmenuRightLeft,
+              "Right to Left"), BScreen::RightLeft);
+  insert(i18n(ConfigmenuSet, ConfigmenuTopBottom,
+              "Top to Bottom"), BScreen::TopBottom);
+  insert(i18n(ConfigmenuSet, ConfigmenuBottomTop,
+              "Bottom to Top"), BScreen::BottomTop);
   update();
 
   setValues();
@@ -253,9 +253,9 @@ void Configmenu::Placementmenu::setValues() {
   setItemSelected(5, p == BScreen::ClickMousePlacement);
 
   bool rl = (configmenu->screen.rowPlacementDirection() ==
-	     BScreen::LeftRight),
-       tb = (configmenu->screen.colPlacementDirection() ==
-	     BScreen::TopBottom);
+             BScreen::LeftRight),
+  tb = (configmenu->screen.colPlacementDirection() ==
+        BScreen::TopBottom);
 
   setItemSelected(6, rl);
   setItemEnabled(6, (p != BScreen::UnderMousePlacement &&

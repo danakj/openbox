@@ -41,12 +41,12 @@
 Workspacemenu::Workspacemenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
   setInternalMenu();
 
-  setLabel(i18n->getMessage(WorkspacemenuSet, WorkspacemenuWorkspacesTitle,
-			    "Workspaces"));
-  insert(i18n->getMessage(WorkspacemenuSet, WorkspacemenuNewWorkspace,
-			  "New Workspace"));
-  insert(i18n->getMessage(WorkspacemenuSet, WorkspacemenuRemoveLast,
-			  "Remove Last"));
+  setLabel(i18n(WorkspacemenuSet, WorkspacemenuWorkspacesTitle,
+                "Workspaces"));
+  insert(i18n(WorkspacemenuSet, WorkspacemenuNewWorkspace,
+              "New Workspace"));
+  insert(i18n(WorkspacemenuSet, WorkspacemenuRemoveLast,
+              "Remove Last"));
 }
 
 
@@ -59,7 +59,7 @@ void Workspacemenu::itemSelected(int button, int index) {
   else if (index == 1)
     screen.removeLastWorkspace();
   else if ((screen.getCurrentWorkspace()->getWorkspaceID() !=
-	    (index - 2)) && ((index - 2) < screen.getWorkspaceCount()))
+            (index - 2)) && ((index - 2) < screen.getWorkspaceCount()))
     screen.changeWorkspaceID(index - 2);
 
   if (! (screen.getWorkspacemenu()->isTorn() || isTorn()))

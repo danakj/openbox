@@ -153,94 +153,94 @@ Openbox *openbox;
 
 Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc,
                  char *menu) : BaseDisplay(m_argv[0], dpy_name) {
-  grab();
+                   grab();
 
-  if (! XSupportsLocale())
-    fprintf(stderr, "X server does not support locale\n");
+                   if (! XSupportsLocale())
+                     fprintf(stderr, "X server does not support locale\n");
 
-  if (XSetLocaleModifiers("") == NULL)
-    fprintf(stderr, "cannot set locale modifiers\n");
+                   if (XSetLocaleModifiers("") == NULL)
+                     fprintf(stderr, "cannot set locale modifiers\n");
 
-  ::openbox = this;
-  argc = m_argc;
-  argv = m_argv;
-  if (rc == NULL || menu == NULL) {
-    char *homedir = getenv("HOME");
-    char *configdir = new char[strlen(homedir) + strlen("/.openbox") + 1];
-    sprintf(configdir, "%s/.openbox", homedir);
-    // try to make sure the ~/.openbox directory exists
-    mkdir(configdir, S_IREAD | S_IWRITE | S_IEXEC |
-          S_IRGRP | S_IWGRP | S_IXGRP |
-          S_IROTH | S_IWOTH | S_IXOTH);
-    
+                   ::openbox = this;
+                   argc = m_argc;
+                   argv = m_argv;
+                   if (rc == NULL || menu == NULL) {
+                     char *homedir = getenv("HOME");
+                     char *configdir = new char[strlen(homedir) + strlen("/.openbox") + 1];
+                     sprintf(configdir, "%s/.openbox", homedir);
+                     // try to make sure the ~/.openbox directory exists
+                     mkdir(configdir, S_IREAD | S_IWRITE | S_IEXEC |
+                           S_IRGRP | S_IWGRP | S_IXGRP |
+                           S_IROTH | S_IWOTH | S_IXOTH);
 
-    if (rc == NULL) {
-      rc_file = new char[strlen(configdir) + strlen("/rc") + 1];
-      sprintf(rc_file, "%s/rc", configdir);
-    } else
-      rc_file = bstrdup(rc);
 
-    if (menu == NULL) {
-      menu_file = new char[strlen(configdir) + strlen("/menu") + 1];
-      sprintf(menu_file, "%s/menu", configdir);
-    } else
-      menu_file = bstrdup(menu);
+                     if (rc == NULL) {
+                       rc_file = new char[strlen(configdir) + strlen("/rc") + 1];
+                       sprintf(rc_file, "%s/rc", configdir);
+                     } else
+                       rc_file = bstrdup(rc);
 
-    delete [] configdir;
-  }
-  config.setFile(rc_file);
-  
-  no_focus = False;
+                     if (menu == NULL) {
+                       menu_file = new char[strlen(configdir) + strlen("/menu") + 1];
+                       sprintf(menu_file, "%s/menu", configdir);
+                     } else
+                       menu_file = bstrdup(menu);
 
-  resource.style_file = NULL;
-  resource.titlebar_layout = NULL;
-  resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
+                     delete [] configdir;
+                   }
+                   config.setFile(rc_file);
 
-  current_screen = (BScreen *) 0;
-  masked_window = (OpenboxWindow *) 0;
-  masked = None;
+                   no_focus = False;
 
-  load();
+                   resource.style_file = NULL;
+                   resource.titlebar_layout = NULL;
+                   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
+
+                   current_screen = (BScreen *) 0;
+                   masked_window = (OpenboxWindow *) 0;
+                   masked = None;
+
+                   load();
 
 #ifdef    HAVE_GETPID
-  openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
+                   openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
 #endif // HAVE_GETPID
 
-  for (unsigned int s = 0; s < numberOfScreens(); s++) {
-    BScreen *screen = new BScreen(*this, s, config);
+                   for (unsigned int s = 0; s < numberOfScreens(); s++) {
+                     BScreen *screen = new BScreen(*this, s, config);
 
-    if (! screen->isScreenManaged()) {
-      delete screen;
-      continue;
-    }
+                     if (! screen->isScreenManaged()) {
+                       delete screen;
+                       continue;
+                     }
 
-    screenList.push_back(screen);
-  }
+                     screenList.push_back(screen);
+                   }
 
-  if (screenList.empty()) {
-    fprintf(stderr,
-	    i18n->getMessage(openboxSet, openboxNoManagableScreens,
-	       "Openbox::Openbox: no managable screens found, aborting.\n"));
-    ::exit(3);
-  }
-  current_screen = screenList.front();
+                   if (screenList.empty()) {
+                     fprintf(stderr,
+                             i18n(openboxSet, openboxNoManagableScreens,
+                                  "Openbox::Openbox: no managable screens found, aborting.\n"));
+                     ::exit(3);
+                   }
+                   current_screen = screenList.front();
 
-  // save current settings and default values
-  save();
-  
-  XSynchronize(getXDisplay(), False);
-  XSync(getXDisplay(), False);
+                   // save current settings and default values
+                   save();
 
-  reconfigure_wait = reread_menu_wait = False;
+                   XSynchronize(getXDisplay(), False);
+                   XSync(getXDisplay(), False);
 
-  timer = new BTimer(*this, *this);
-  timer->setTimeout(0);
-  timer->fireOnce(True);
+                   reconfigure_wait = reread_menu_wait = False;
 
-  ungrab();
+                   timer = new BTimer(*this, *this);
+                   timer->setTimeout(0);
+                   timer->fireOnce(True);
 
-  focusWindow(0);
-}
+                   ungrab();
+
+                   focusWindow(0);
+                 }
 
 
 Openbox::~Openbox() {
@@ -291,7 +291,7 @@ void Openbox::process_event(XEvent *e) {
       win->buttonPressEvent(&e->xbutton);
 
       if (e->xbutton.button == 1)
-	win->installColormap(True);
+        win->installColormap(True);
     } else if ((menu = searchMenu(e->xbutton.window))) {
       menu->buttonPressEvent(&e->xbutton);
 
@@ -306,68 +306,68 @@ void Openbox::process_event(XEvent *e) {
       ScreenList::iterator it;
       for (it = screenList.begin(); it != screenList.end(); ++it) {
         BScreen *screen = *it;
-	if (e->xbutton.window == screen->getRootWindow()) {
-	  if (e->xbutton.button == 1) {
+        if (e->xbutton.window == screen->getRootWindow()) {
+          if (e->xbutton.button == 1) {
             if (! screen->isRootColormapInstalled())
-	      screen->getImageControl()->installRootColormap();
+              screen->getImageControl()->installRootColormap();
 
-	    if (screen->getWorkspacemenu()->isVisible())
-	      screen->getWorkspacemenu()->hide();
+            if (screen->getWorkspacemenu()->isVisible())
+              screen->getWorkspacemenu()->hide();
 
             if (screen->getRootmenu()->isVisible())
               screen->getRootmenu()->hide();
           } else if (e->xbutton.button == 2) {
-	    int mx = e->xbutton.x_root -
-	      (screen->getWorkspacemenu()->getWidth() / 2);
-	    int my = e->xbutton.y_root -
-	      (screen->getWorkspacemenu()->getTitleHeight() / 2);
+            int mx = e->xbutton.x_root -
+              (screen->getWorkspacemenu()->getWidth() / 2);
+            int my = e->xbutton.y_root -
+              (screen->getWorkspacemenu()->getTitleHeight() / 2);
 
-	    if (mx < 0) mx = 0;
-	    if (my < 0) my = 0;
+            if (mx < 0) mx = 0;
+            if (my < 0) my = 0;
 
-	    if (mx + screen->getWorkspacemenu()->getWidth() >
-		screen->size().w())
-	      mx = screen->size().w() -
-		screen->getWorkspacemenu()->getWidth() -
-		screen->getBorderWidth();
+            if (mx + screen->getWorkspacemenu()->getWidth() >
+                screen->size().w())
+              mx = screen->size().w() -
+                screen->getWorkspacemenu()->getWidth() -
+                screen->getBorderWidth();
 
-	    if (my + screen->getWorkspacemenu()->getHeight() >
-		screen->size().h())
-	      my = screen->size().h() -
-		screen->getWorkspacemenu()->getHeight() -
-		screen->getBorderWidth();
+            if (my + screen->getWorkspacemenu()->getHeight() >
+                screen->size().h())
+              my = screen->size().h() -
+                screen->getWorkspacemenu()->getHeight() -
+                screen->getBorderWidth();
 
-	    screen->getWorkspacemenu()->move(mx, my);
+            screen->getWorkspacemenu()->move(mx, my);
 
-	    if (! screen->getWorkspacemenu()->isVisible()) {
-	      screen->getWorkspacemenu()->removeParent();
-	      screen->getWorkspacemenu()->show();
-	    }
-	  } else if (e->xbutton.button == 3) {
-	    int mx = e->xbutton.x_root -
-	      (screen->getRootmenu()->getWidth() / 2);
-	    int my = e->xbutton.y_root -
-	      (screen->getRootmenu()->getTitleHeight() / 2);
+            if (! screen->getWorkspacemenu()->isVisible()) {
+              screen->getWorkspacemenu()->removeParent();
+              screen->getWorkspacemenu()->show();
+            }
+          } else if (e->xbutton.button == 3) {
+            int mx = e->xbutton.x_root -
+              (screen->getRootmenu()->getWidth() / 2);
+            int my = e->xbutton.y_root -
+              (screen->getRootmenu()->getTitleHeight() / 2);
 
-	    if (mx < 0) mx = 0;
-	    if (my < 0) my = 0;
+            if (mx < 0) mx = 0;
+            if (my < 0) my = 0;
 
-	    if (mx + screen->getRootmenu()->getWidth() > screen->size().w())
-	      mx = screen->size().w() -
-		screen->getRootmenu()->getWidth() -
-		screen->getBorderWidth();
+            if (mx + screen->getRootmenu()->getWidth() > screen->size().w())
+              mx = screen->size().w() -
+                screen->getRootmenu()->getWidth() -
+                screen->getBorderWidth();
 
-	    if (my + screen->getRootmenu()->getHeight() > screen->size().h())
-		my = screen->size().h() -
-		  screen->getRootmenu()->getHeight() -
-		  screen->getBorderWidth();
+            if (my + screen->getRootmenu()->getHeight() > screen->size().h())
+              my = screen->size().h() -
+                screen->getRootmenu()->getHeight() -
+                screen->getBorderWidth();
 
-	    screen->getRootmenu()->move(mx, my);
+            screen->getRootmenu()->move(mx, my);
 
-	    if (! screen->getRootmenu()->isVisible()) {
-	      checkMenu();
-	      screen->getRootmenu()->show();
-	    }
+            if (! screen->getRootmenu()->isVisible()) {
+              checkMenu();
+              screen->getRootmenu()->show();
+            }
           } else if (e->xbutton.button == 4) {
             if ((screen->getCurrentWorkspaceID() + 1) >
                 screen->getWorkspaceCount() - 1)
@@ -426,18 +426,18 @@ void Openbox::process_event(XEvent *e) {
       grab();
 
       if (validateWindow(e->xconfigurerequest.window)) {
-	XWindowChanges xwc;
+        XWindowChanges xwc;
 
-	xwc.x = e->xconfigurerequest.x;
-	xwc.y = e->xconfigurerequest.y;
-	xwc.width = e->xconfigurerequest.width;
-	xwc.height = e->xconfigurerequest.height;
-	xwc.border_width = e->xconfigurerequest.border_width;
-	xwc.sibling = e->xconfigurerequest.above;
-	xwc.stack_mode = e->xconfigurerequest.detail;
+        xwc.x = e->xconfigurerequest.x;
+        xwc.y = e->xconfigurerequest.y;
+        xwc.width = e->xconfigurerequest.width;
+        xwc.height = e->xconfigurerequest.height;
+        xwc.border_width = e->xconfigurerequest.border_width;
+        xwc.sibling = e->xconfigurerequest.above;
+        xwc.stack_mode = e->xconfigurerequest.detail;
 
-	XConfigureWindow(getXDisplay(), e->xconfigurerequest.window,
-			 e->xconfigurerequest.value_mask, &xwc);
+        XConfigureWindow(getXDisplay(), e->xconfigurerequest.window,
+                         e->xconfigurerequest.value_mask, &xwc);
       }
 
       ungrab();
@@ -449,9 +449,9 @@ void Openbox::process_event(XEvent *e) {
   case MapRequest: {
 #ifdef    DEBUG
     fprintf(stderr,
-	    i18n->getMessage(openboxSet, openboxMapRequest,
-		 "Openbox::process_event(): MapRequest for 0x%lx\n"),
-	    e->xmaprequest.window);
+            i18n(openboxSet, openboxMapRequest,
+                 "Openbox::process_event(): MapRequest for 0x%lx\n"),
+            e->xmaprequest.window);
 #endif // DEBUG
 
     OpenboxWindow *win = searchWindow(e->xmaprequest.window);
@@ -471,7 +471,7 @@ void Openbox::process_event(XEvent *e) {
     if (win)
       win->mapNotifyEvent(&e->xmap);
 
-      break;
+    break;
   }
 
   case UnmapNotify: {
@@ -514,7 +514,7 @@ void Openbox::process_event(XEvent *e) {
   case MotionNotify: {
     // strip the lock key modifiers
     e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
-    
+
     last_time = e->xmotion.time;
 
     OpenboxWindow *win = (OpenboxWindow *) 0;
@@ -535,7 +535,7 @@ void Openbox::process_event(XEvent *e) {
       OpenboxWindow *win = searchWindow(e->xproperty.window);
 
       if (win)
-	win->propertyNotifyEvent(e->xproperty.atom);
+        win->propertyNotifyEvent(e->xproperty.atom);
     }
 
     break;
@@ -562,16 +562,16 @@ void Openbox::process_event(XEvent *e) {
     XCheckIfEvent(getXDisplay(), &dummy, queueScanner, (char *) &sa);
 
     if ((e->xcrossing.window == e->xcrossing.root) &&
-	(screen = searchScreen(e->xcrossing.window))) {
+        (screen = searchScreen(e->xcrossing.window))) {
       screen->getImageControl()->installRootColormap();
     } else if ((win = searchWindow(e->xcrossing.window))) {
       if (win->getScreen()->sloppyFocus() &&
-	  (! win->isFocused()) && (! no_focus)) {
-	grab();
+          (! win->isFocused()) && (! no_focus)) {
+        grab();
 
         if (((! sa.leave) || sa.inferior) && win->isVisible() &&
             win->setInputFocus())
-	  win->installColormap(True);
+          win->installColormap(True);
 
         ungrab();
       }
@@ -641,7 +641,7 @@ void Openbox::process_event(XEvent *e) {
 
     if (screen)
       screen->setRootColormapInstalled((e->xcolormap.state ==
-					ColormapInstalled) ? True : False);
+                                        ColormapInstalled) ? True : False);
 
     break;
   }
@@ -667,19 +667,19 @@ void Openbox::process_event(XEvent *e) {
         if (! win || ! win->validateClient()) return;
 
         if (e->xclient.data.l[0] == IconicState)
-	  win->iconify();
+          win->iconify();
         if (e->xclient.data.l[0] == NormalState)
           win->deiconify();
       } else if (e->xclient.message_type == getOpenboxChangeWorkspaceAtom()) {
-	BScreen *screen = searchScreen(e->xclient.window);
+        BScreen *screen = searchScreen(e->xclient.window);
 
-	if (screen && e->xclient.data.l[0] >= 0 &&
-	    e->xclient.data.l[0] < screen->getWorkspaceCount())
-	  screen->changeWorkspaceID(e->xclient.data.l[0]);
+        if (screen && e->xclient.data.l[0] >= 0 &&
+            e->xclient.data.l[0] < screen->getWorkspaceCount())
+          screen->changeWorkspaceID(e->xclient.data.l[0]);
       } else if (e->xclient.message_type == getOpenboxChangeWindowFocusAtom()) {
-	OpenboxWindow *win = searchWindow(e->xclient.window);
+        OpenboxWindow *win = searchWindow(e->xclient.window);
 
-	if (win && win->isVisible() && win->setInputFocus())
+        if (win && win->isVisible() && win->setInputFocus())
           win->installColormap(True);
       } else if (e->xclient.message_type == getOpenboxCycleWindowFocusAtom()) {
         BScreen *screen = searchScreen(e->xclient.window);
@@ -689,20 +689,20 @@ void Openbox::process_event(XEvent *e) {
             screen->prevFocus();
           else
             screen->nextFocus();
-	}
+        }
       } else if (e->xclient.message_type == getOpenboxChangeAttributesAtom()) {
-	OpenboxWindow *win = searchWindow(e->xclient.window);
+        OpenboxWindow *win = searchWindow(e->xclient.window);
 
-	if (win && win->validateClient()) {
-	  OpenboxHints net;
-	  net.flags = e->xclient.data.l[0];
-	  net.attrib = e->xclient.data.l[1];
-	  net.workspace = e->xclient.data.l[2];
-	  net.stack = e->xclient.data.l[3];
-	  net.decoration = e->xclient.data.l[4];
+        if (win && win->validateClient()) {
+          OpenboxHints net;
+          net.flags = e->xclient.data.l[0];
+          net.attrib = e->xclient.data.l[1];
+          net.workspace = e->xclient.data.l[2];
+          net.stack = e->xclient.data.l[3];
+          net.decoration = e->xclient.data.l[4];
 
-	  win->changeOpenboxHints(&net);
-	}
+          win->changeOpenboxHints(&net);
+        }
       }
     }
 
@@ -717,8 +717,8 @@ void Openbox::process_event(XEvent *e) {
       OpenboxWindow *win = (OpenboxWindow *) 0;
 
       if ((win = searchWindow(e->xany.window)) ||
-	  (shape_event->kind != ShapeBounding))
-	win->shapeEvent(shape_event);
+          (shape_event->kind != ShapeBounding))
+        win->shapeEvent(shape_event);
     }
 #endif // SHAPE
 
@@ -880,17 +880,17 @@ void Openbox::shutdown() {
                 std::mem_fun(&BScreen::shutdown));
 
   focusWindow(0);
-  
+
   XSync(getXDisplay(), False);
 }
 
 
 void Openbox::save() {
   config.setAutoSave(false);
-  
+
   // save all values as they are so that the defaults will be written to the rc
   // file
-  
+
   config.setValue("session.colorsPerChannel",
                   resource.colors_per_channel);
   config.setValue("session.styleFile", resource.style_file);
@@ -898,8 +898,8 @@ void Openbox::save() {
   config.setValue("session.doubleClickInterval",
                   (long)resource.double_click_interval);
   config.setValue("session.autoRaiseDelay",
-          ((resource.auto_raise_delay.tv_sec * 1000) +
-           (resource.auto_raise_delay.tv_usec / 1000)));
+                  ((resource.auto_raise_delay.tv_sec * 1000) +
+                   (resource.auto_raise_delay.tv_usec / 1000)));
   config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
   config.setValue("session.cacheMax", (long)resource.cache_max);
 
@@ -916,7 +916,7 @@ void Openbox::load() {
 
   std::string s;
   long l;
-  
+
   if (config.getValue("session.colorsPerChannel", "Session.ColorsPerChannel",
                       l))
     resource.colors_per_channel = (l < 2 ? 2 : (l > 6 ? 6 : l)); // >= 2, <= 6
@@ -976,7 +976,7 @@ void Openbox::real_reconfigure() {
   grab();
 
   load();
-  
+
   for_each(menuTimestamps.begin(), menuTimestamps.end(),
            PointerAssassin());
   menuTimestamps.clear();
@@ -1091,7 +1091,7 @@ void Openbox::focusWindow(OpenboxWindow *win) {
     wkspc = current_screen->getWorkspace(win->getWorkspaceNumber());
     win->setFocusFlag(true);
     wkspc->focusWindow(win);
-    
+
     if (tbar)
       tbar->redrawWindowLabel(true);
     current_screen->updateNetizenWindowFocus();

@@ -32,9 +32,6 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "i18n.h"
-#include "openbox.h"
-
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
@@ -59,68 +56,72 @@
 #define   MAXPATHLEN 255
 #endif // MAXPATHLEN
 
+#include "openbox.h"
+#include "i18n.h"
+
+I18n i18n("openbox.cat");
 
 static void showHelp(int exitval) {
   // print program usage and command line options
-  printf(i18n->getMessage(mainSet, mainUsage,
-			  "Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
-                          "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n\n"
-			  "\t\t\t  1997 - 2000 Brad Hughes\n\n"
-			  "  -display <string>\t\tuse display connection.\n"
-			  "  -rc <string>\t\t\tuse alternate resource file.\n"
-			  "  -menu <string>\t\t\tuse alternate menu file.\n"
-			  "  -version\t\t\tdisplay version and exit.\n"
-			  "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
-	 __openbox_version);
+  printf(i18n(mainSet, mainUsage,
+              "Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
+              "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n\n"
+              "\t\t\t  1997 - 2000 Brad Hughes\n\n"
+              "  -display <string>\t\tuse display connection.\n"
+              "  -rc <string>\t\t\tuse alternate resource file.\n"
+              "  -menu <string>\t\t\tuse alternate menu file.\n"
+              "  -version\t\t\tdisplay version and exit.\n"
+              "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
+         __openbox_version);
 
   // some people have requested that we print out compile options
   // as well
-  fprintf(stdout,i18n->getMessage(mainSet, mainCompileOptions,
-				  "Compile time options:\n"
-				  "  Debugging:\t\t\t%s\n"
-				  "  Interlacing:\t\t\t%s\n"
-				  "  Shape:\t\t\t%s\n"
-				  "  Slit:\t\t\t\t%s\n"
-				  "  8bpp Ordered Dithering:\t%s\n"
-                                  "  Event Clobbering:\t\t%s\n\n"),
+  fprintf(stdout,i18n(mainSet, mainCompileOptions,
+                      "Compile time options:\n"
+                      "  Debugging:\t\t\t%s\n"
+                      "  Interlacing:\t\t\t%s\n"
+                      "  Shape:\t\t\t%s\n"
+                      "  Slit:\t\t\t\t%s\n"
+                      "  8bpp Ordered Dithering:\t%s\n"
+                      "  Event Clobbering:\t\t%s\n\n"),
 #ifdef    DEBUG
-	  i18n->getMessage(CommonSet, CommonYes, "yes"),
+          i18n(CommonSet, CommonYes, "yes"),
 #else // !DEBUG
-	  i18n->getMessage(CommonSet, CommonNo, "no"),
+          i18n(CommonSet, CommonNo, "no"),
 #endif // DEBUG
 
 #ifdef    INTERLACE
-	  i18n->getMessage(CommonSet, CommonYes, "yes"),
+          i18n(CommonSet, CommonYes, "yes"),
 #else // !INTERLACE
-	  i18n->getMessage(CommonSet, CommonNo, "no"),
+          i18n(CommonSet, CommonNo, "no"),
 #endif // INTERLACE
 
 #ifdef    SHAPE
-	  i18n->getMessage(CommonSet, CommonYes, "yes"),
+          i18n(CommonSet, CommonYes, "yes"),
 #else // !SHAPE
-	  i18n->getMessage(CommonSet, CommonNo, "no"),
+          i18n(CommonSet, CommonNo, "no"),
 #endif // SHAPE
 
 #ifdef    SLIT
-	  i18n->getMessage(CommonSet, CommonYes, "yes"),
+          i18n(CommonSet, CommonYes, "yes"),
 #else // !SLIT
-	  i18n->getMessage(CommonSet, CommonNo, "no"),
+          i18n(CommonSet, CommonNo, "no"),
 #endif // SLIT
 
 #ifdef    ORDEREDPSEUDO
-	  i18n->getMessage(CommonSet, CommonYes, "yes"),
+          i18n(CommonSet, CommonYes, "yes"),
 #else // !ORDEREDPSEUDO
-	  i18n->getMessage(CommonSet, CommonNo, "no"),
+          i18n(CommonSet, CommonNo, "no"),
 #endif // ORDEREDPSEUDO
 
 #ifndef   NOCLOBBER
-	  i18n->getMessage(CommonSet, CommonYes, "yes")
+          i18n(CommonSet, CommonYes, "yes")
 #else // !NOCLOBBER
-	  i18n->getMessage(CommonSet, CommonNo, "no")
+            i18n(CommonSet, CommonNo, "no")
 #endif // NOCLOBBER
-	  );
+            );
 
-  ::exit(exitval);
+          ::exit(exitval);
 }
 
 int main(int argc, char **argv) {
@@ -128,16 +129,14 @@ int main(int argc, char **argv) {
   char *rc_file = (char *) 0;
   char *menu_file = (char *) 0;
 
-  NLSInit("openbox.cat");
-
   for (int i = 1; i < argc; ++i) {
     if (! strcmp(argv[i], "-rc")) {
       // look for alternative rc file to use
 
       if ((++i) >= argc) {
         fprintf(stderr,
-                i18n->getMessage(mainSet, mainRCRequiresArg,
-                                 "error: '-rc' requires and argument\n"));
+                i18n(mainSet, mainRCRequiresArg,
+                     "error: '-rc' requires and argument\n"));
 
         ::exit(1);
       }
@@ -148,8 +147,8 @@ int main(int argc, char **argv) {
 
       if ((++i) >= argc) {
         fprintf(stderr,
-		i18n->getMessage(mainSet, mainMENURequiresArg,
-				 "error: '-menu' requires and argument\n"));
+                i18n(mainSet, mainMENURequiresArg,
+                     "error: '-menu' requires and argument\n"));
 
         ::exit(1);
       }
@@ -160,11 +159,11 @@ int main(int argc, char **argv) {
       // set by the environment variable DISPLAY
 
       if ((++i) >= argc) {
-	fprintf(stderr,
-		i18n->getMessage(mainSet, mainDISPLAYRequiresArg,
-				 "error: '-display' requires an argument\n"));
+        fprintf(stderr,
+                i18n(mainSet, mainDISPLAYRequiresArg,
+                     "error: '-display' requires an argument\n"));
 
-	::exit(1);
+        ::exit(1);
       }
 
       session_display = argv[i];
@@ -172,16 +171,15 @@ int main(int argc, char **argv) {
       sprintf(dtmp, "DISPLAY=%s", session_display);
 
       if (putenv(dtmp)) {
-	fprintf(stderr,
-		i18n->
-		getMessage(mainSet, mainWarnDisplaySet,
-		   "warning: couldn't set environment variable 'DISPLAY'\n"));
-	perror("putenv()");
+        fprintf(stderr,
+                i18n(mainSet, mainWarnDisplaySet,
+                     "warning: couldn't set environment variable 'DISPLAY'\n"));
+        perror("putenv()");
       }
     } else if (! strcmp(argv[i], "-version")) {
       // print current version string
       printf("Openbox %s : (c) 1997 - 2000 Brad Hughes\n"
-	     "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n",
+             "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n",
              __openbox_version);
 
       ::exit(0);

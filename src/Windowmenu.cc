@@ -43,7 +43,7 @@
 
 
 Windowmenu::Windowmenu(OpenboxWindow &win) : Basemenu(*win.getScreen()),
-  window(win), screen(*win.getScreen())
+window(win), screen(*win.getScreen())
 {
 
   setTitleVisibility(False);
@@ -51,24 +51,24 @@ Windowmenu::Windowmenu(OpenboxWindow &win) : Basemenu(*win.getScreen()),
   setInternalMenu();
 
   sendToMenu = new SendtoWorkspacemenu(*this);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuSendTo, "Send To ..."),
-	 sendToMenu);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuShade, "Shade"),
-	 BScreen::WindowShade);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuIconify, "Iconify"),
-	 BScreen::WindowIconify);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuMaximize, "Maximize"),
-	 BScreen::WindowMaximize);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuRaise,"Raise"),
-	 BScreen::WindowRaise);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuLower, "Lower"),
-	 BScreen::WindowLower);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuStick, "Stick"),
-	 BScreen::WindowStick);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuKillClient, "Kill Client"),
-	 BScreen::WindowKill);
-  insert(i18n->getMessage(WindowmenuSet, WindowmenuClose, "Close"),
-	 BScreen::WindowClose);
+  insert(i18n(WindowmenuSet, WindowmenuSendTo, "Send To ..."),
+         sendToMenu);
+  insert(i18n(WindowmenuSet, WindowmenuShade, "Shade"),
+         BScreen::WindowShade);
+  insert(i18n(WindowmenuSet, WindowmenuIconify, "Iconify"),
+         BScreen::WindowIconify);
+  insert(i18n(WindowmenuSet, WindowmenuMaximize, "Maximize"),
+         BScreen::WindowMaximize);
+  insert(i18n(WindowmenuSet, WindowmenuRaise,"Raise"),
+         BScreen::WindowRaise);
+  insert(i18n(WindowmenuSet, WindowmenuLower, "Lower"),
+         BScreen::WindowLower);
+  insert(i18n(WindowmenuSet, WindowmenuStick, "Stick"),
+         BScreen::WindowStick);
+  insert(i18n(WindowmenuSet, WindowmenuKillClient, "Kill Client"),
+         BScreen::WindowKill);
+  insert(i18n(WindowmenuSet, WindowmenuClose, "Close"),
+         BScreen::WindowClose);
 
   update();
 
@@ -159,11 +159,11 @@ void Windowmenu::reconfigure(void) {
 
 Windowmenu::SendtoWorkspacemenu::SendtoWorkspacemenu(Windowmenu &w)
   : Basemenu(w.screen), windowmenu(w) {
-  setTitleVisibility(False);
-  setMovable(False);
-  setInternalMenu();
-  update();
-}
+    setTitleVisibility(False);
+    setMovable(False);
+    setInternalMenu();
+    update();
+  }
 
 
 void Windowmenu::SendtoWorkspacemenu::itemSelected(int button, int index) {

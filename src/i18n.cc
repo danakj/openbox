@@ -1,5 +1,6 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 // i18n.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,52 +21,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
-
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "i18n.h"
-
+extern "C" {
 #include <X11/Xlocale.h>
 
-#ifdef    HAVE_STDLIB_H
+#ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
 
-#ifdef    HAVE_STRING_H
+#ifdef HAVE_STRING_H
 #  include <string.h>
 #endif // HAVE_STRING_H
 
-#ifdef    HAVE_STDIO_H
+#ifdef HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
 #ifdef    HAVE_LOCALE_H
 #  include <locale.h>
 #endif // HAVE_LOCALE_H
-
-// the rest of bb source uses True and False from X, so we continue that
-#define True true
-#define False false
-
-static I18n static_i18n;
-I18n *i18n;
-
-void NLSInit(const char *catalog) {
-  i18n = &static_i18n;
-
-  i18n->openCatalog(catalog);
 }
 
+#include <string>
+using std::string;
 
-I18n::I18n(void) {
-  mb = False;
+#include "i18n.h"
+
+I18n::I18n(const char *catalog) {
+  mb = false;
 #ifdef    HAVE_SETLOCALE
   locale = setlocale(LC_ALL, "");
   if (! locale) {
@@ -76,7 +62,7 @@ I18n::I18n(void) {
   } else {
     // MB_CUR_MAX returns the size of a char in the current locale
     if (MB_CUR_MAX > 1)
-      mb = True;
+      mb = true;
     // truncate any encoding off the end of the locale
     char *l = strchr(locale, '@');
     if (l) *l = '\0';
@@ -88,14 +74,12 @@ I18n::I18n(void) {
   catalog_fd = (nl_catd) -1;
 #endif
 #endif // HAVE_SETLOCALE
-
-  catalog_filename = (char *) 0;
+  if (catalog)
+    openCatalog(catalog);
 }
 
 
-I18n::~I18n(void) {
-  delete [] catalog_filename;
-
+I18n::~I18n() {
 #if defined(NLS) && defined(HAVE_CATCLOSE)
   if (catalog_fd != (nl_catd) -1)
     catclose(catalog_fd);
@@ -105,35 +89,27 @@ I18n::~I18n(void) {
 
 void I18n::openCatalog(const char *catalog) {
 #if defined(NLS) && defined(HAVE_CATOPEN)
-  int lp = strlen(LOCALEPATH), lc = strlen(locale),
-      ct = strlen(catalog), len = lp + lc + ct + 3;
-  catalog_filename = new char[len];
-
-  strncpy(catalog_filename, LOCALEPATH, lp);
-  *(catalog_filename + lp) = '/';
-  strncpy(catalog_filename + lp + 1, locale, lc);
-  *(catalog_filename + lp + lc + 1) = '/';
-  strncpy(catalog_filename + lp + lc + 2, catalog, ct + 1);
+  string catalog_filename = LOCALEPATH;
+  catalog_filename += '/';
+  catalog_filename += locale;
+  catalog_filename += '/';
+  catalog_filename += catalog;
 
 #  ifdef    MCLoadBySet
-  catalog_fd = catopen(catalog_filename, MCLoadBySet);
+  catalog_fd = catopen(catalog_filename.c_str(), MCLoadBySet);
 #  else // !MCLoadBySet
-  catalog_fd = catopen(catalog_filename, NL_CAT_LOCALE);
+  catalog_fd = catopen(catalog_filename.c_str(), NL_CAT_LOCALE);
 #  endif // MCLoadBySet
 
   if (catalog_fd == (nl_catd) -1)
     fprintf(stderr, "failed to open catalog, using default messages\n");
-#else // !HAVE_CATOPEN
-
-  catalog_filename = (char *) 0;
 #endif // HAVE_CATOPEN
 }
 
-
-const char *I18n::getMessage(int set, int msg, const char *msgString) const {
+const char* I18n::operator()(int set, int msg, const char *msgString) const {
 #if   defined(NLS) && defined(HAVE_CATGETS)
   if (catalog_fd != (nl_catd) -1)
-    return (const char *) catgets(catalog_fd, set, msg, msgString);
+    return catgets(catalog_fd, set, msg, msgString);
   else
 #endif
     return msgString;

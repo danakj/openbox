@@ -3324,7 +3324,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* not implemented */
     default:
         g_assert_not_reached();
-	dest = 0; /* suppress warning */
+        dest = 0; /* suppress warning */
     }
     return dest;
 }

@@ -666,7 +666,7 @@ g_print("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     break;
 
                     case Decor_Bottom:
-)                    x = cr->width/2 + self->size.left - area.x
+                    x = cr->width/2 + self->size.left - area.x
                       - area.width/2;
                     y = self->size.top + cr->height
                       + area.y;

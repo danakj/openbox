@@ -11,8 +11,7 @@ EngineFrameNew *engine_frame_new;
 EngineFrameGrabClient *engine_frame_grab_client;
 EngineFrameReleaseClient *engine_frame_release_client;
 
-EngineFrameAdjustSize *engine_frame_adjust_size;
-EngineFrameAdjustPosition *engine_frame_adjust_position;
+EngineFrameAdjustArea *engine_frame_adjust_area;
 EngineFrameAdjustShape *engine_frame_adjust_shape;
 EngineFrameAdjustState *engine_frame_adjust_state;
 EngineFrameAdjustFocus *engine_frame_adjust_focus;

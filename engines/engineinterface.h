@@ -18,12 +18,9 @@ typedef void EngineFrameGrabClient(Frame *self, Client *client);
 /* frame_release_client */
 typedef void EngineFrameReleaseClient(Frame *self, Client *client);
 
-/* frame_adjust_size */
-/*! Update the frame's size to match the client */
-typedef void EngineFrameAdjustSize(Frame *self);
-/* frame_adjust_position */
-/*! Update the frame's position to match the client */
-typedef void EngineFrameAdjustPosition(Frame *self);
+/* frame_adjust_area */
+/*! Update the frame's size/position to match the client */
+typedef void EngineFrameAdjustArea(Frame *self);
 /* frame_adjust_shape */
 /*! Shape the frame window to the client window */
 typedef void EngineFrameAdjustShape(Frame *self);

@@ -42,8 +42,7 @@ static gboolean load(char *name)
     LOADSYM(frame_new, engine_frame_new);
     LOADSYM(frame_grab_client, engine_frame_grab_client);
     LOADSYM(frame_release_client, engine_frame_release_client);
-    LOADSYM(frame_adjust_size, engine_frame_adjust_size);
-    LOADSYM(frame_adjust_position, engine_frame_adjust_position);
+    LOADSYM(frame_adjust_area, engine_frame_adjust_area);
     LOADSYM(frame_adjust_shape, engine_frame_adjust_shape);
     LOADSYM(frame_adjust_state, engine_frame_adjust_state);
     LOADSYM(frame_adjust_focus, engine_frame_adjust_focus);

@@ -407,7 +407,7 @@ void frame_adjust_shape(ObFrame *self)
 #endif
 }
 
-void frame_adjust_size(ObFrame *self)
+void frame_adjust_area(ObFrame *self)
 {
     if (self->frame.client->decorations & Decor_Border) {
 	self->bwidth = s_bwidth;
@@ -461,11 +461,19 @@ void frame_adjust_size(ObFrame *self)
 	XMapWindow(ob_display, self->handle);
     } else
 	XUnmapWindow(ob_display, self->handle);
-  
-    XResizeWindow(ob_display, self->frame.window, self->width,
-		  (self->frame.client->shaded ? TITLE_HEIGHT :
-		   self->innersize.top + self->innersize.bottom +
-		   self->frame.client->area.height));
+
+    /* find the new coordinates */
+    self->frame.area.x = self->frame.client->area.x;
+    self->frame.area.y = self->frame.client->area.y;
+    frame_client_gravity((Frame*)self,
+			 &self->frame.area.x, &self->frame.area.y);
+    /* move and resize the top level frame */
+    XMoveResizeWindow(ob_display, self->frame.window,
+                      self->frame.area.x, self->frame.area.y,
+                      self->width,
+                      (self->frame.client->shaded ? TITLE_HEIGHT :
+                       self->innersize.top + self->innersize.bottom +
+                       self->frame.client->area.height));
 
     /* do this in two steps because clients whose gravity is set to
        'Static' don't end up getting moved at all with an XMoveResizeWindow */
@@ -491,16 +499,6 @@ void frame_adjust_size(ObFrame *self)
     render(self);
      
     frame_adjust_shape(self);
-}
-
-void frame_adjust_position(ObFrame *self)
-{
-    self->frame.area.x = self->frame.client->area.x;
-    self->frame.area.y = self->frame.client->area.y;
-    frame_client_gravity((Frame*)self,
-			 &self->frame.area.x, &self->frame.area.y);
-    XMoveWindow(ob_display, self->frame.window,
-		self->frame.area.x, self->frame.area.y);
 }
 
 void frame_adjust_state(ObFrame *self)
@@ -548,8 +546,7 @@ void frame_grab_client(ObFrame *self, Client *client)
     /* map the client so it maps when the frame does */
     XMapWindow(ob_display, client->window);
 
-    frame_adjust_size(self);
-    frame_adjust_position(self);
+    frame_adjust_area(self);
 
     /* set all the windows for the frame in the client_map */
     g_hash_table_insert(client_map, (gpointer)self->frame.window, client);

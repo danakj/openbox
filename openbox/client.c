@@ -815,10 +815,9 @@ void client_setup_decor_and_functions(Client *self)
     client_change_allowed_actions(self);
 
     if (self->frame) {
-	/* change the decors on the frame */
-	engine_frame_adjust_size(self->frame);
-	/* with more/less decorations, we may need to be repositioned */
-	engine_frame_adjust_position(self->frame);
+	/* change the decors on the frame, and with more/less decorations,
+           we may also need to be repositioned */
+	engine_frame_adjust_area(self->frame);
 	/* with new decor, the window's maximized size may change */
 	client_remaximize(self);
     }
@@ -1386,12 +1385,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     /* move/resize the frame to match the request */
     if (self->frame) {
-	/* Adjust the size and then the position, as required by the EWMH */
-	if (resized)
-	    engine_frame_adjust_size(self->frame);
-	if (moved) {
-	    engine_frame_adjust_position(self->frame);
+        engine_frame_adjust_area(self->frame);
 
+	if (moved) {
 	    if (!user || final) {
 		XEvent event;
 		event.type = ConfigureNotify;
@@ -1625,7 +1621,8 @@ void client_shade(Client *self, gboolean shade)
 	self->wmstate = shade ? IconicState : NormalState;
     self->shaded = shade;
     client_change_state(self);
-    engine_frame_adjust_size(self->frame);
+    /* resize the frame to just the titlebar */
+    engine_frame_adjust_area(self->frame);
 }
 
 void client_close(Client *self)

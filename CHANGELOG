@@ -1,5 +1,11 @@
 Changelog for Openbox:
 
+2.1.2:
+ * Build fixes for xftlsfonts and for openbox on        (Marius Nita)
+   redhat systems.
+
+ * Fix window menu placement on very small windows.     (Scott Moynes)
+
 2.1.1:
  * A build fix for xftlsfonts.                          (Scott Moynes)
 

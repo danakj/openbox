@@ -621,8 +621,10 @@ BB    @param window The window id that the Client class should handle
   /*!
     @param x The X coordinate to move to.
     @param y The Y coordinate to move to.
+    @param bool framepos True if the frame should be moved to the position
+                instead of the client. This makes it ignore the gravity.
   */
-  void move(int x, int y);
+  void move(int x, int y, bool framepos = false);
   
   //! Resizes the client window, anchoring it in a given corner
   /*!

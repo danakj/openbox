@@ -495,7 +495,7 @@ void Client::updateNormalHints()
       // changing its gravity
       if (frame && _gravity != oldgravity) {
         // move our idea of the client's position based on its new gravity
-        int x, y;
+        int x = frame->rect().x(), y = frame->rect().y();
         frame->frameGravity(x, y);
         _area.setPos(x, y);
       }
@@ -1146,9 +1146,11 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
 }
 
 
-void Client::move(int x, int y)
+void Client::move(int x, int y, bool framepos)
 {
   if (!(_functions & Func_Move)) return;
+  if (framepos)
+    frame->frameGravity(x, y);
   internal_move(x, y);
 }
 
@@ -1386,6 +1388,8 @@ void Client::maximize(bool max, int dir, bool savearea)
     _gravity = StaticGravity;
     // adjust our idea of position based on StaticGravity, so we stay put
     // unless asked
+    x = frame->rect().x();
+    y = frame->rect().y();
     frame->frameGravity(x, y);
 
     if (savearea) {
@@ -1471,7 +1475,7 @@ void Client::maximize(bool max, int dir, bool savearea)
   if (max) {
     // because of my little gravity trick in here, we have to set the position
     // of the client to what it really is
-    int x, y;
+    int x = frame->rect().x(), y = frame->rect().y();
     frame->frameGravity(x, y);
     _area.setPos(x, y);
   }

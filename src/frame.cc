@@ -344,6 +344,8 @@ void Frame::adjustSize()
 void Frame::adjustPosition()
 {
   int x, y;
+  x = _client->area().x();
+  y = _client->area().y();
   clientGravity(x, y);
   move(x, y);
 }
@@ -450,9 +452,6 @@ void Frame::releaseClient()
 
 void Frame::clientGravity(int &x, int &y)
 {
-  x = _client->area().x();
-  y = _client->area().y();
-
   // horizontal
   switch (_client->gravity()) {
   default:
@@ -509,9 +508,6 @@ void Frame::clientGravity(int &x, int &y)
 
 void Frame::frameGravity(int &x, int &y)
 {
-  x = rect().x();
-  y = rect().y();
-  
   // horizontal
   switch (_client->gravity()) {
   default:

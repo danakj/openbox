@@ -22,11 +22,11 @@ GList **focus_order; /* these lists are created when screen_startup
                         sets the number of desktops */
 ObClient *focus_cycle_target;
 
-static Popup *focus_cycle_popup;
+static ObIconPopup *focus_cycle_popup;
 
 void focus_startup(gboolean reconfig)
 {
-    focus_cycle_popup = popup_new(TRUE);
+    focus_cycle_popup = icon_popup_new(TRUE);
 
     if (!reconfig)
         /* start with nothing focused */
@@ -37,7 +37,7 @@ void focus_shutdown(gboolean reconfig)
 {
     guint i;
 
-    popup_free(focus_cycle_popup);
+    icon_popup_free(focus_cycle_popup);
 
     if (!reconfig) {
         for (i = 0; i < screen_num_desktops; ++i)
@@ -223,22 +223,22 @@ void focus_fallback(ObFocusFallbackType type)
 static void popup_cycle(ObClient *c, gboolean show)
 {
     if (!show) {
-        popup_hide(focus_cycle_popup);
+        icon_popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
         ObClient *p = c;
         char *title;
 
         a = screen_physical_area_monitor(0);
-        popup_position(focus_cycle_popup, CenterGravity,
-                       a->x + a->width / 2, a->y + a->height / 2);
-/*        popup_size(focus_cycle_popup, a->height/2, a->height/16);
-        popup_show(focus_cycle_popup, c->title,
-                   client_icon(c, a->height/16, a->height/16));
+        icon_popup_position(focus_cycle_popup, CenterGravity,
+                            a->x + a->width / 2, a->y + a->height / 2);
+/*        icon_popup_size(focus_cycle_popup, a->height/2, a->height/16);
+        icon_popup_show(focus_cycle_popup, c->title,
+                        client_icon(c, a->height/16, a->height/16));
 */
         /* XXX the size and the font extents need to be related on some level
          */
-        popup_size(focus_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+        icon_popup_size(focus_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
 
         /* use the transient's parent's title/icon */
         while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
@@ -252,9 +252,10 @@ static void popup_cycle(ObClient *c, gboolean show)
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
 
-        popup_show(focus_cycle_popup,
-                   (title ? title : (c->iconic ? c->icon_title : c->title)),
-                   client_icon(p, 48, 48));
+        icon_popup_show(focus_cycle_popup,
+                        (title ? title :
+                         (c->iconic ? c->icon_title : c->title)),
+                        client_icon(p, 48, 48));
         g_free(title);
     }
 }

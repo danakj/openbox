@@ -41,7 +41,7 @@ Window   screen_support_win;
 static Rect  **area; /* array of desktop holding array of xinerama areas */
 static Rect  *monitor_area;
 
-static Popup *desktop_cycle_popup;
+static ObPagerPopup *desktop_cycle_popup;
 
 static gboolean replace_wm()
 {
@@ -252,7 +252,7 @@ void screen_startup(gboolean reconfig)
     GSList *it;
     guint i;
 
-    desktop_cycle_popup = popup_new(FALSE);
+    desktop_cycle_popup = pager_popup_new(FALSE);
 
     if (!reconfig)
         /* get the initial size */
@@ -288,7 +288,7 @@ void screen_shutdown(gboolean reconfig)
 {
     Rect **r;
 
-    popup_free(desktop_cycle_popup);
+    pager_popup_free(desktop_cycle_popup);
 
     if (!reconfig) {
         XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
@@ -560,19 +560,18 @@ static void popup_cycle(guint d, gboolean show)
     Rect *a;
 
     if (!show) {
-        popup_hide(desktop_cycle_popup);
+        pager_popup_hide(desktop_cycle_popup);
     } else {
         a = screen_physical_area_monitor(0);
-        popup_position(desktop_cycle_popup, CenterGravity,
-                       a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_position(desktop_cycle_popup, CenterGravity,
+                             a->x + a->width / 2, a->y + a->height / 2);
         /* XXX the size and the font extents need to be related on some level
          */
-        popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
+        pager_popup_size(desktop_cycle_popup, POPUP_WIDTH, POPUP_HEIGHT);
 
-        popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
+        pager_popup_set_text_align(desktop_cycle_popup, RR_JUSTIFY_CENTER);
 
-        popup_show(desktop_cycle_popup,
-                   screen_desktop_names[d], NULL);
+        pager_popup_show(desktop_cycle_popup, screen_desktop_names[d], d);
     }
 }
 
@@ -723,31 +722,39 @@ void screen_update_layout()
                     goto screen_update_layout_bail;
             }
 
+            cols = data[1];
+            rows = data[2];
+
             /* fill in a zero rows/columns */
-            if ((data[1] == 0 && data[2] == 0) || /* both 0's is bad data.. */
-                (data[1] != 0 && data[2] != 0)) { /* no 0's is bad data.. */
+            if ((cols == 0 && rows == 0)) { /* both 0's is bad data.. */
                 goto screen_update_layout_bail;
             } else {
-                if (data[1] == 0) {
-                    data[1] = (screen_num_desktops +
-                               screen_num_desktops % data[2]) / data[2];
-                } else if (data[2] == 0) {
-                    data[2] = (screen_num_desktops +
-                               screen_num_desktops % data[1]) / data[1];
+                if (cols == 0) {
+                    cols = screen_num_desktops / rows;
+                    if (rows * cols < screen_num_desktops)
+                        cols++;
+                    if (rows * cols >= screen_num_desktops + cols)
+                        rows--;
+                } else if (rows == 0) {
+                    rows = screen_num_desktops / rows;
+                    if (cols * rows < screen_num_desktops)
+                        rows++;
+                    if (cols * rows >= screen_num_desktops + rows)
+                        cols--;
                 }
-                cols = data[1];
-                rows = data[2];
             }
 
             /* bounds checking */
             if (orient == OB_ORIENTATION_HORZ) {
-                rows = MIN(rows, screen_num_desktops);
-                cols = MIN(cols, ((screen_num_desktops +
-                                     (screen_num_desktops % rows)) / rows));
+                cols = MIN(screen_num_desktops, cols);
+                rows = MIN(rows, (screen_num_desktops + cols - 1) / cols);
+                cols = screen_num_desktops / rows +
+                    !!(screen_num_desktops % rows);
             } else {
-                cols = MIN(cols, screen_num_desktops);
-                rows = MIN(rows, ((screen_num_desktops +
-                                     (screen_num_desktops % cols)) / cols));
+                rows = MIN(screen_num_desktops, rows);
+                cols = MIN(cols, (screen_num_desktops + rows - 1) / rows);
+                rows = screen_num_desktops / cols +
+                    !!(screen_num_desktops % cols);
             }
 
             valid = TRUE;

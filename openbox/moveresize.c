@@ -26,7 +26,7 @@ static guint button;
 static guint32 corner;
 static ObCorner lockcorner;
 
-static Popup *popup = NULL;
+static ObPopup *popup = NULL;
 
 static void client_dest(gpointer client)
 {
@@ -61,7 +61,7 @@ static void popup_coords(ObClient *c, char *format, int a, int b)
                    c->area.width / 2,
                    c->frame->area.y + c->frame->size.top +
                    c->area.height / 2);
-    popup_show(popup, text, NULL);
+    popup_show(popup, text);
     g_free(text);
 }
 

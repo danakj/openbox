@@ -189,14 +189,6 @@ int main(int argc, char **argv)
 
     if (screen_annex()) { /* it will be ours! */
         do {
-            event_startup(reconfigure);
-            grab_startup(reconfigure);
-            /* focus_backup is used for stacking, so this needs to come before
-               anything that calls stacking_add */
-            focus_startup(reconfigure);
-            window_startup(reconfigure);
-            sn_startup(reconfigure);
-
             {
                 ObParseInst *i;
                 xmlDocPtr doc;
@@ -218,12 +210,21 @@ int main(int argc, char **argv)
             /* load the theme specified in the rc file */
             {
                 RrTheme *theme;
-                if ((theme = RrThemeNew(ob_rr_inst, config_theme)))
+                if ((theme = RrThemeNew(ob_rr_inst, config_theme))) {
+                    RrThemeFree(ob_rr_theme);
                     ob_rr_theme = theme;
+                }
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error("Unable to load a theme.");
             }
 
+            event_startup(reconfigure);
+            grab_startup(reconfigure);
+            /* focus_backup is used for stacking, so this needs to come before
+               anything that calls stacking_add */
+            focus_startup(reconfigure);
+            window_startup(reconfigure);
+            sn_startup(reconfigure);
             moveresize_startup(reconfigure);
             screen_startup(reconfigure);
             group_startup(reconfigure);

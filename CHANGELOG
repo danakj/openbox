@@ -9,6 +9,10 @@ Changelog for Openbox:
  
  * added UnderMouse window placement algorithm/type.    (Ben Jansens)
 
+1.0.1:
+ * improved logic for decorating windows when the
+   decoration level is changed                          (Ben Jansens)
+
 1.0.0:
  * maximizing windows takes the slit into account as
    well as the toolbar when 'Full Maximization' is off  (Ben Jansens)

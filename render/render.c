@@ -81,7 +81,6 @@ void render_startup(void)
 {
     int count, i = 0, val, best = 0, rate = 0, temp;
     XVisualInfo vimatch, *vilist;
-    paint = x_paint;
 
     render_depth = DefaultDepth(ob_display, ob_screen);
     render_visual = DefaultVisual(ob_display, ob_screen);
@@ -125,12 +124,6 @@ void render_startup(void)
   switch (render_visual->class) {
   case TrueColor:
     truecolor_startup();
-    break;
-  case PseudoColor:
-  case StaticColor:
-  case GrayScale:
-  case StaticGray:
-    pseudocolor_startup();
     break;
   default:
     g_critical("unsupported visual class.\n");

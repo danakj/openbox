@@ -208,7 +208,7 @@ public:
 
   inline const Window &getDrawable(void) const { return window; }
 
-  inline Visual *getVisual(void) { return screeninfo.getVisual(); }
+  inline Visual *getVisual(void) const { return screeninfo.getVisual(); }
 
   inline const int &getBitsPerPixel(void) const { return bits_per_pixel; }
   inline const int &getDepth(void) const { return screen_depth; }

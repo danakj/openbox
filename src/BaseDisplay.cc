@@ -338,8 +338,8 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
   screenInfoList.reserve(ScreenCount(display));
-  for (int i = 0; i < number_of_screens; i++)
-    screenInfoList.push_back(new ScreenInfo(*this, i));
+  for (unsigned int s = 0; s < number_of_screens; s++)
+    screenInfoList.push_back(new ScreenInfo(*this, s));
 
 #ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
@@ -512,8 +512,6 @@ void BaseDisplay::grab(void) {
 void BaseDisplay::ungrab(void) {
   if (! --server_grabs)
     XUngrabServer(display);
-
-  if (server_grabs < 0) server_grabs = 0;
 }
 
 

@@ -232,8 +232,6 @@ static void sm_save_yourself_phase2(SmcConn conn, SmPointer data)
 {
     gboolean success;
 
-    ob_debug("got SAVE YOURSELF PHASE 2 from session manager\n");
-
     success = session_save();
     save_commands();
 
@@ -243,8 +241,6 @@ static void sm_save_yourself_phase2(SmcConn conn, SmPointer data)
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast)
 {
-    ob_debug("got SAVE YOURSELF from session manager\n");
-
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_phase2, data)) {
         ob_debug("SAVE YOURSELF PHASE 2 failed\n");
         SmcSaveYourselfDone(conn, FALSE);
@@ -254,17 +250,14 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
 static void sm_die(SmcConn conn, SmPointer data)
 {
     ob_exit();
-    ob_debug("got DIE from session manager\n");
 }
 
 static void sm_save_complete(SmcConn conn, SmPointer data)
 {
-    ob_debug("got SAVE COMPLETE from session manager\n");
 }
 
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
-    ob_debug("got SHUTDOWN CANCELLED from session manager\n");
 }
 
 static gboolean session_save()

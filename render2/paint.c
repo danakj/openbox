@@ -16,7 +16,7 @@ struct ExposeArea {
 
 #define MERGE_AREA(a, x, y, w, h) \
             a->w = MAX(a->x + a->w - 1, x + w - 1) - MIN(a->x, x), \
-            a->h = MAX(a->y + a->h - 1, y + h - 1) - MIN(a->x, x), \
+            a->h = MAX(a->y + a->h - 1, y + h - 1) - MIN(a->y, y), \
             a->x = MIN(a->x, x), \
             a->y = MIN(a->y, y)
 
@@ -26,51 +26,19 @@ void RrExpose(struct RrInstance *inst, XEvent *e)
     XEvent e2;
     GSList *tops = NULL, *it, *n;
     struct RrSurface *sur;
-    int x, y, w, h;
 
-    XPutBackEvent(RrDisplay(inst), e);
-    while (XCheckTypedEvent(RrDisplay(inst), Expose, &e2)) {
-        if ((sur = RrInstaceLookupSurface(inst, e2.xexpose.window))) {
-            x = e->xexpose.x;
-            y = e->xexpose.y;
-            w = e->xexpose.width;
-            h = e->xexpose.height;
-            x = 0;
-            y = 0;
-            w = RrSurfaceWidth(sur);
-            h = RrSurfaceHeight(sur);
-
-            while (sur->parent) {
-                x += RrSurfaceX(sur);
-                y += RrSurfaceY(sur);
-                sur = sur->parent;
-            }
-            for (it = tops; it; it = g_slist_next(it)) {
-                struct ExposeArea *a = it->data;
-                if (a->sur == sur) {
-                    MERGE_AREA(a, x, y, w, h);
-                    break;
-                }
-            }
-            if (!it) {
-                struct ExposeArea *a = malloc(sizeof(struct ExposeArea));
-                a->sur = sur;
-                a->x = x;
-                a->y = y;
-                a->w = w;
-                a->h = h;
-                tops = g_slist_append(tops, a);
-            }
-        } else {
-            RrDebug("Unable to find surface for window 0x%lx\n",
-                    e2.xexpose.window);
+    e2 = *e;
+    if ((sur = RrInstaceLookupSurface(inst, e2.xexpose.window))) {
+        while (XCheckTypedWindowEvent(RrDisplay(inst), Expose,
+                                      e->xexpose.window, &e2));
+        while (sur->parent &&
+               RrSurfaceType(sur->parent) != RR_SURFACE_NONE) {
+            sur = sur->parent;
         }
-    }
-    for (it = tops; it; it = n) {
-        struct ExposeArea *a = it->data;
-        n = g_slist_next(it);
-        RrPaintArea(sur, a->x, a->y, a->w, a->h);
-        tops = g_slist_delete_link(tops, it);
+        RrPaint(sur);
+    } else {
+        RrDebug("Unable to find surface for window 0x%lx\n",
+                e2.xexpose.window);
     }
 }
 
@@ -98,21 +66,8 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     if (!RrSurfaceVisible(sur)) return;
 
     /* recurse and paint children */
-    for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it)) {
-        struct RrSurface *child = it->data;
-        /* in the area to repaint? */
-        if (RrSurfaceX(child) < x+w &&
-            RrSurfaceX(child) + RrSurfaceWidth(child) > x &&
-            RrSurfaceY(child) < y+h &&
-            RrSurfaceY(child) + RrSurfaceHeight(child) > y)
-            RrPaintArea(child,
-                        MAX(0, x-RrSurfaceX(child)),
-                        MAX(0, y-RrSurfaceY(child)),
-                        MIN(RrSurfaceWidth(child),
-                            w - MAX(0, (RrSurfaceX(child)-x))),
-                        MIN(RrSurfaceHeight(child),
-                            h - MAX(0, (RrSurfaceY(child)-y))));
-    }
+    for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it))
+        RrPaint(it->data);
 
     RrDebug("making %p, %p, %p current\n",
             RrDisplay(inst), RrSurfaceWindow(sur), RrContext(inst));

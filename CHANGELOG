@@ -1,6 +1,12 @@
-3.3:
+3.3-rc1:
+  * Poked around a bit in the code that keeps windows onscreen, if you
+    are using xinerama, please let me know if things are better/worse/same.
+  * Add support for pango, disabled by default due to a bug in pango 1.8 that
+    breaks shadows, it works fine with 1.6.x though. Poke the pango developers
+    here http://bugzilla.gnome.org/show_bug.cgi?id=169622 if you want this
+    to be fixed.
   * Made edge resist and Send/MoveToEdge not hit windows at layers below
-    the current one, by default. This is now configurable.
+    the current one, add option to disable this behaviour.
   * Fixed directional focus not getting trapped in omnipresent windows
   * Fixed focus actions when bound to the mouse, normal focus cycle is always
     linear and directional focus is totally disabled, it makes no sense
@@ -8,7 +14,10 @@
   * Added an option for the raise/lower/raiselower/unshaderaise/shadelower
     options called group that lets you bind stuff to raise/lower the whole
     window group. <action name="raise"><group>yes</group></action>
-  * Various bug fixes. (I always wanted to write this in a changelog)
+  * Add various new actions. I haven't updated the web docs yet, but I think
+    I managed to get all of them listed in rc.xsd.
+  * Bugs 1783, 1812, 1863, 1905, 2005, 1957 fixed.
+  * Some translations added. (ca, no, pl, ru, fr)
 
 3.2:
   * Added spanish and swedish translations

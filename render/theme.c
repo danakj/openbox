@@ -499,17 +499,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.active.label.bg", theme->app_hilite_label,
                          TRUE))
         set_default_appearance(theme->app_hilite_label);
-    if (!read_appearance(db, inst,
-                         "window.active.label.bg", theme->app_hilite_fg,
-                         TRUE))
-        set_default_appearance(theme->app_hilite_fg);
-    else if (theme->app_hilite_fg->surface.grad == RR_SURFACE_PARENTREL) {
-        if (!read_appearance(db, inst,
-                             "window.active.title.bg",
-                             theme->app_hilite_fg,
-                             FALSE))
-            set_default_appearance(theme->app_hilite_fg);
-    }
+    if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
+        theme->app_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
+    else
+        theme->app_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
     if (!read_appearance(db, inst,
                          "window.inactive.title.bg", theme->app_unhilite_bg,
                          FALSE))
@@ -518,18 +511,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.inactive.label.bg", theme->app_unhilite_label,
                          TRUE))
         set_default_appearance(theme->app_unhilite_label);
-    if (!read_appearance(db, inst,
-                         "window.inactive.label.bg", theme->app_unhilite_fg,
-                         TRUE))
-        set_default_appearance(theme->app_unhilite_fg);
-    else if (theme->app_unhilite_label->surface.grad == RR_SURFACE_PARENTREL) {
-        if (!read_appearance(db, inst,
-                             "window.inactive.title.bg",
-                             theme->app_unhilite_fg,
-                             FALSE))
-            set_default_appearance(theme->app_unhilite_fg);
-    }
-        
+    if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
+        theme->app_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_label);
+    else
+        theme->app_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_title);
 
     /* read buttons textures */
     if (!read_appearance(db, inst,

@@ -56,21 +56,25 @@ int main()
 	look->surface.data.planar.secondary = color_new(0xFF, 0xFF, 0xFF);
 	look->surface.data.planar.primary = color_parse("Red");
         look->surface.data.planar.interlaced = FALSE;
+        look->area.x = 0;
+        look->area.x = 0;
+        look->area.width = 500;
+        look->area.height = 500;
 	if (ob_display == NULL) {
 		fprintf(stderr, "couldn't connect to X server :0\n");
 		return 0;
 	}
 
-	paint(win, look, 0, 0, 500, 500);
+	paint(win, look);
 	while (1) {
 		XNextEvent(ob_display, &report);
 		switch (report.type) {
 		case Expose:
 		break;
 		case ConfigureNotify:
-			w = report.xconfigure.width;
-			h = report.xconfigure.height;
-			paint(win, look, 0, 0, w, h);
+			look->area.width = report.xconfigure.width;
+			look->area.height = report.xconfigure.height;
+			paint(win, look);
 			printf("confignotify %i:%i\n", w, h);
 		break;
 		}

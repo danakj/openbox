@@ -191,8 +191,8 @@ char *bstrdup(const char *s) {
   return n;
 }
 
-BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
-  application_name = app_name;
+BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
+  application_name = bstrdup(app_name);
 
   _startup = True;
   _shutdown = False;

@@ -114,7 +114,7 @@ public:
 
 class BImage {
 private:
-  BImageControl *control;
+  BImageControl &control;
 
 #ifdef    INTERLACE
   Bool interlaced;
@@ -148,7 +148,7 @@ protected:
 
 
 public:
-  BImage(BImageControl *, unsigned int, unsigned int);
+  BImage(BImageControl &, unsigned int, unsigned int);
   ~BImage(void);
 
   Pixmap render(BTexture *);
@@ -160,8 +160,8 @@ public:
 class BImageControl : public TimeoutHandler {
 private:
   Bool dither;
-  BaseDisplay *basedisplay;
-  ScreenInfo *screeninfo;
+  BaseDisplay &basedisplay;
+  ScreenInfo &screeninfo;
 #ifdef    TIMEDCACHE
   BTimer *timer;
 #endif // TIMEDCACHE
@@ -195,19 +195,19 @@ protected:
 
 
 public:
-  BImageControl(BaseDisplay *, ScreenInfo *, Bool = False, int = 4,
+  BImageControl(BaseDisplay &, ScreenInfo &, Bool = False, int = 4,
                 unsigned long = 300000l, unsigned long = 200l);
   virtual ~BImageControl(void);
 
-  inline BaseDisplay *getBaseDisplay(void) { return basedisplay; }
+  inline BaseDisplay &getBaseDisplay(void) { return basedisplay; }
 
   inline const Bool &doDither(void) { return dither; }
 
-  inline ScreenInfo *getScreenInfo(void) { return screeninfo; }
+  inline ScreenInfo &getScreenInfo(void) { return screeninfo; }
 
   inline const Window &getDrawable(void) const { return window; }
 
-  inline Visual *getVisual(void) { return screeninfo->getVisual(); }
+  inline Visual *getVisual(void) { return screeninfo.getVisual(); }
 
   inline const int &getBitsPerPixel(void) const { return bits_per_pixel; }
   inline const int &getDepth(void) const { return screen_depth; }

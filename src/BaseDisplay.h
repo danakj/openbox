@@ -142,7 +142,7 @@ protected:
 
 
 public:
-  BaseDisplay(char *, char * = 0);
+  BaseDisplay(const char *, char * = 0);
   virtual ~BaseDisplay(void);
 
   inline const Atom &getWMChangeStateAtom(void) const

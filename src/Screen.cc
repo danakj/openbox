@@ -230,7 +230,7 @@ BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
   iconList = new LinkedList<OpenboxWindow>;
 
   image_control =
-    new BImageControl(&openbox, this, True, openbox.getColorsPerChannel(),
+    new BImageControl(openbox, *this, True, openbox.getColorsPerChannel(),
                       openbox.getCacheLife(), openbox.getCacheMax());
   image_control->installRootColormap();
   root_colormap_installed = True;

@@ -23,14 +23,17 @@ typedef struct Rect {
 } Rect;
 
 #define RECT_SET_POINT(r, nx, ny) \
-  {r.x = ny; r.y = ny;}
+    {r.x = ny; r.y = ny;}
 #define RECT_SET_SIZE(r, w, h) \
-  {r.width = w; r.height = h;}
+    {r.width = w; r.height = h;}
 #define RECT_SET(r, nx, ny, w, h) \
-  {r.x = nx; r.y = ny; r.width = w; r.height = h;}
+    {r.x = nx; r.y = ny; r.width = w; r.height = h;}
 
 #define RECT_EQUAL(r1, r2) (r1.x == r2.x && r1.y == r2.y && \
 			    r1.width == r2.width && r1.height == r2.height)
+
+#define RECT_CONTAINS(r, x, y) \
+    (x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height)
 
 typedef struct Strut {
     int left;
@@ -40,10 +43,10 @@ typedef struct Strut {
 } Strut;
 
 #define STRUT_SET(s, l, t, r, b) \
-  {s.left = l; s.top = t; s.right = r; s.bottom = b; }
+    {s.left = l; s.top = t; s.right = r; s.bottom = b; }
 
 #define STRUT_ADD(s1, s2) \
-  {s1.left = MAX(s1.left, s2.left); s1.right = MAX(s1.right, s2.right); \
-   s1.top = MAX(s1.top, s2.top); s1.bottom = MAX(s1.bottom, s2.bottom); }
+    {s1.left = MAX(s1.left, s2.left); s1.right = MAX(s1.right, s2.right); \
+     s1.top = MAX(s1.top, s2.top); s1.bottom = MAX(s1.bottom, s2.bottom); }
 
 #endif

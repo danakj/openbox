@@ -369,11 +369,7 @@ void screen::handleKeypress(const XEvent &e) {
 }
 
 
-void screen::handleKeyrelease(const XEvent &e) {
-  // we're not interested in non-modifiers
-  if (!isModifier(e.xkey.keycode))
-    return;
-
+void screen::handleKeyrelease(const XEvent &) {
   // the only keyrelease event we care about (for now) is when we do stacked
   // cycling and the modifier is released
   if (_stacked_cycling && _cycling && nothingIsPressed()) {
@@ -795,21 +791,6 @@ void screen::ungrabModifiers() const {
   Display *display = _epist->getXDisplay();
 
   XUngrabKeyboard(display, CurrentTime);
-}
-
-
-bool screen::isModifier(const KeyCode kc) const {
-  KeySym ks = XKeycodeToKeysym(_epist->getXDisplay(), kc, 0);
-
-  if (ks == XK_Shift_L || ks == XK_Shift_R ||
-      ks == XK_Control_L || ks == XK_Control_R ||
-      ks == XK_Meta_L || ks == XK_Meta_R ||
-      ks == XK_Alt_L || ks == XK_Alt_R ||
-      ks == XK_Super_L || ks == XK_Super_R ||
-      ks == XK_Hyper_L || ks == XK_Hyper_R)
-    return true;
-  else
-    return false;
 }
 
 

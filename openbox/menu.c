@@ -17,7 +17,7 @@ typedef struct _ObMenuParseState ObMenuParseState;
 
 struct _ObMenuParseState
 {
-    GSList *menus;
+    ObMenu *parent;
     ObMenu *pipe_creator;
 };
 
@@ -78,7 +78,7 @@ void menu_startup(gboolean reconfig)
 
     menu_parse_inst = parse_startup();
 
-    menu_parse_state.menus = NULL;
+    menu_parse_state.parent = NULL;
     menu_parse_state.pipe_creator = NULL;
     parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
     parse_register(menu_parse_inst, "item", parse_menu_item,
@@ -100,7 +100,7 @@ void menu_startup(gboolean reconfig)
         }
     }
     
-    g_assert(menu_parse_state.menus == NULL);
+    g_assert(menu_parse_state.parent == NULL);
 
     if (!reconfig)
         client_add_destructor(client_dest);
@@ -149,13 +149,9 @@ void menu_pipe_execute(ObMenu *self)
         menu_clear_entries(self);
 
         menu_parse_state.pipe_creator = self;
-        menu_parse_state.menus = g_slist_prepend(NULL, self);
+        menu_parse_state.parent = self;
         parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
-        menu_parse_state.menus = g_slist_remove(menu_parse_state.menus, self);
-        menu_parse_state.pipe_creator = NULL;
         xmlFreeDoc(doc);
-
-        g_assert(menu_parse_state.menus == NULL);
     } else {
         g_warning("Invalid output from pipe-menu: %s", self->execute);
     }
@@ -179,14 +175,14 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     ObMenuParseState *state = data;
     gchar *label;
     
-    if (state->menus) {
+    if (state->parent) {
         if (parse_attr_string("label", node, &label)) {
             GSList *acts = NULL;
 
             for (node = node->xmlChildrenNode; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
                     acts = g_slist_append(acts, action_parse(i, doc, node));
-            menu_add_normal(state->menus->data, -1, label, acts);
+            menu_add_normal(state->parent, -1, label, acts);
             g_free(label);
         }
     }
@@ -198,8 +194,8 @@ static void parse_menu_separator(ObParseInst *i,
 {
     ObMenuParseState *state = data;
 
-    if (state->menus)
-        menu_add_separator(state->menus->data, -1);
+    if (state->parent)
+        menu_add_separator(state->parent, -1);
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -221,15 +217,18 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             if (parse_attr_string("execute", node, &script)) {
                 menu->execute = ob_expand_tilde(script);
             } else {
-                state->menus = g_slist_prepend(state->menus, menu);
+                ObMenu *old;
+
+                old = state->parent;
+                state->parent = menu;
                 parse_tree(i, doc, node->xmlChildrenNode);
-                state->menus = g_slist_delete_link(state->menus, state->menus);
+                state->parent = old;
             }
         }
     }
 
-    if (state->menus)
-        menu_add_submenu(state->menus->data, -1, name);
+    if (state->parent)
+        menu_add_submenu(state->parent, -1, name);
 
 parse_menu_fail:
     g_free(name);

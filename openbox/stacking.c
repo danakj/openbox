@@ -13,12 +13,18 @@ void stacking_set_list()
     GList *it;
     guint size = g_list_length(stacking_list);
 
+    /* on shutdown, don't update the properties, so that we can read it back
+       in on startup and re-stack the windows as they were before we shut down
+    */
+    if (ob_state == State_Exiting) return;
+
     /* create an array of the window ids (from bottom to top,
        reverse order!) */
     if (size > 0) {
 	windows = g_new(Window, size);
 	win_it = windows;
-	for (it = g_list_last(stacking_list); it != NULL; it = it->prev, ++win_it)
+	for (it = g_list_last(stacking_list); it != NULL;
+             it = it->prev, ++win_it)
 	    *win_it = ((Client*)it->data)->window;
     } else
 	windows = NULL;

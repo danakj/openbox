@@ -196,8 +196,13 @@ void OBFrame::adjust()
     // that the ONE LABEL!!
     // adds an extra sep so that there's a space on either side of the
     // titlebar.. note: x = sep, below.
-    _label.setWidth(width - sep * 2 - 
-                    (_button_iconify.width() + sep) * (layout.size() - 1));
+    int lwidth = width - sep * 2 -
+      (_button_iconify.width() + sep) * (layout.size() - 1);
+    // quick sanity check for really small windows. if this is needed, its
+    // obviously not going to be displayed right...
+    // XXX: maybe we should make this look better somehow? constraints?
+    if (lwidth <= 0) lwidth = 1;
+    _label.setWidth(lwidth);
 
     int x = sep;
     for (int i = 0, len = layout.size(); i < len; ++i) {
@@ -446,6 +451,12 @@ void OBFrame::applyGravity()
     break;
   }
   move(x, y);
+}
+
+
+void OBFrame::reverseGravity()
+{
+  move(_client->area().x() - _size.left, _client->area().y() - _size.top);
 }
 
 

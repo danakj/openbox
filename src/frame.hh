@@ -91,7 +91,7 @@ public:
 
   //! Reversely applies gravity for the client's gravity, moving the frame so
   //! that the client is in its pre-gravity position
-  void restoreGravity();
+  void reverseGravity();
 };
 
 }

@@ -17,6 +17,7 @@ extern "C" {
 
 #include <string>
 
+#include "otk/point.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
@@ -41,8 +42,17 @@ class OBClient : public otk::OtkEventHandler {
 public:
 
   //! The frame window which decorates around the client window
+  /*!
+    NOTE: This should NEVER be used inside the client class's constructor!
+  */
   OBFrame *frame;
-  
+
+  //! Corners of the client window, used for anchor positions
+  enum Corner { TopLeft,
+                TopRight,
+                BottomLeft,
+                BottomRight };
+
   //! Possible window types
   enum WindowType { Type_Desktop, //!< A desktop (bottom-most window)
                     Type_Dock,    //!< A dock bar/panel window
@@ -153,8 +163,22 @@ private:
   //! The type of window (what its function is)
   WindowType   _type;
 
-  //! Position and size of the window (relative to the root window)
+  //! Position and size of the window
+  /*!
+    This will not always be the actual position of the window on screen, it is
+    rather, the position requested by the client, to which the window's gravity
+    is applied.
+  */
   otk::Rect    _area;
+
+  //! The logical size of the window
+  /*!
+    The "logical" size of the window is refers to the user's perception of the
+    size of the window, and is the value that should be displayed to the user.
+    For example, with xterms, this value it the number of characters being
+    displayed in the terminal, instead of the number of pixels.
+  */
+  otk::Point   _logical_size;
 
   //! Width of the border on the window.
   /*!
@@ -163,42 +187,24 @@ private:
   */
   int _border_width;
 
-  //! The minimum width of the client window
+  //! The minimum size of the client window
   /*!
     If the min is > the max, then the window is not resizable
   */
-  int _min_x;
-  //! The minimum height of the client window
+  otk::Point _min_size;
+  //! The maximum size of the client window
   /*!
     If the min is > the max, then the window is not resizable
   */
-  int _min_y;
-  //! The maximum width of the client window
+  otk::Point _max_size;
+  //! The size of increments to resize the client window by
+  otk::Point _size_inc;
+  //! The base size of the client window
   /*!
-    If the min is > the max, then the window is not resizable
+    This value should be subtracted from the window's actual size when
+    displaying its size to the user, or working with its min/max size
   */
-  int _max_x;
-  //! The maximum height of the client window
-  /*!
-    If the min is > the max, then the window is not resizable
-  */
-  int _max_y;
-  //! The size of increments to resize the client window by (for the width)
-  int _inc_x;
-  //! The size of increments to resize the client window by (for the height)
-  int _inc_y;
-  //! The base width of the client window
-  /*!
-    This value should be subtracted from the window's actual width when
-    displaying its size to the user, or working with its min/max width
-  */
-  int _base_x;
-  //! The base height of the client window
-  /*!
-    This value should be subtracted from the window's actual height when
-    displaying its size to the user, or working with its min/max height
-  */
-  int _base_y;
+  otk::Point _base_size;
 
   //! Where to place the decorated window in relation to the undecorated window
   int _gravity;
@@ -289,6 +295,21 @@ private:
   void updateClass();
   // XXX: updateTransientFor();
 
+  //! Move the client window
+  /*!
+    This shouldnt be used to move the window internally! It will apply
+    window gravity after moving the window.
+  */
+  void move(int x, int y);
+  
+  //! Resizes the client window, anchoring it in a given corner
+  /*!
+    This also maintains things like the client's minsize, and size increments.
+    @param anchor The corner to keep in the same position when resizing
+    @param size The new size for the client
+  */
+  void resize(Corner anchor, int x, int y);
+  
 public:
   //! Constructs a new OBClient object around a specified window id
   /*!
@@ -387,49 +408,8 @@ public:
   */
   inline bool floating() const { return _floating; }
 
-  //! Returns the window's border width
-  /*!
-    The border width is set to 0 when the client becomes managed, but the
-    border width is stored here so that it can be restored to the client window
-    when it is unmanaged later.
-  */
+  //! Returns the client's requested border width (not used by the wm)
   inline int borderWidth() const { return _border_width; }
-  //! Returns the minimum width of the client window
-  /*!
-    If the min is > the max, then the window is not resizable
-  */
-  inline int minX() const { return _min_x; }
-  //! Returns the minimum height of the client window
-  /*!
-    If the min is > the max, then the window is not resizable
-  */
-  inline int minY() const { return _min_y; }
-  //! Returns the maximum width of the client window
-  /*!
-    If the min is > the max, then the window is not resizable
-  */
-  inline int maxX() const { return _max_x; }
-  //! Returns the maximum height of the client window
-  /*!
-    If the min is > the max, then the window is not resizable
-  */
-  inline int maxY() const { return _max_y; }
-  //! Returns the increment size for resizing the window (for the width)
-  inline int incrementX() const { return _inc_x; }
-  //! Returns the increment size for resizing the window (for the height)
-  inline int incrementY() const { return _inc_y; }
-  //! Returns the base width of the window
-  /*!
-    This value should be subtracted from the window's actual width when
-    displaying its size to the user, or working with its min/max width
-  */
-  inline int baseX() const { return _base_x; }
-  //! Returns the base height of the window
-  /*!
-    This value should be subtracted from the window's actual height when
-    displaying its size to the user, or working with its min/max height
-  */
-  inline int baseY() const { return _base_y; }
 
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
@@ -440,12 +420,7 @@ public:
 
   virtual void shapeHandler(const XShapeEvent &e);
   
-  //! Changes the stored positions and size of the OBClient window
-  /*!
-    This does not actually change the physical geometry, that needs to be done
-    before/after setting this value to keep it in sync
-  */
-  void setArea(const otk::Rect &area);
+  virtual void configureRequestHandler(const XConfigureRequestEvent &e);
 };
 
 }

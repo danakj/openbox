@@ -5,6 +5,7 @@
 #endif
 
 #include "client.hh"
+#include "frame.hh"
 #include "bbscreen.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
@@ -374,10 +375,10 @@ void OBClient::updateNormalHints()
 
   // defaults
   _gravity = NorthWestGravity;
-  _inc_x = _inc_y = 1;
-  _base_x = _base_y = 0;
-  _min_x = _min_y = 0;
-  _max_x = _max_y = INT_MAX;
+  _size_inc.setPoint(1, 1);
+  _base_size.setPoint(0, 0);
+  _min_size.setPoint(0, 0);
+  _max_size.setPoint(INT_MAX, INT_MAX);
 
   // XXX: might want to cancel any interactive resizing of the window at this
   // point..
@@ -389,25 +390,17 @@ void OBClient::updateNormalHints()
     if (size.flags & PWinGravity)
       _gravity = size.win_gravity;
     
-    if (size.flags & PMinSize) {
-      _min_x = size.min_width;
-      _min_y = size.min_height;
-    }
+    if (size.flags & PMinSize)
+      _min_size.setPoint(size.min_width, size.min_height);
     
-    if (size.flags & PMaxSize) {
-      _max_x = size.max_width;
-      _max_y = size.max_height;
-    }
+    if (size.flags & PMaxSize)
+      _max_size.setPoint(size.max_width, size.max_height);
     
-    if (size.flags & PBaseSize) {
-      _base_x = size.base_width;
-      _base_y = size.base_height;
-    }
+    if (size.flags & PBaseSize)
+      _base_size.setPoint(size.base_width, size.base_height);
     
-    if (size.flags & PResizeInc) {
-      _inc_x = size.width_inc;
-      _inc_y = size.height_inc;
-    }
+    if (size.flags & PResizeInc)
+      _size_inc.setPoint(size.width_inc, size.height_inc);
   }
 }
 
@@ -719,9 +712,117 @@ void OBClient::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void OBClient::setArea(const otk::Rect &area)
+void OBClient::resize(Corner anchor, int w, int h)
 {
-  _area = area;
+  w -= _base_size.x(); 
+  h -= _base_size.y();
+
+  // is the window resizable? if it is not, then don't check its sizes, the
+  // client can do what it wants and the user can't change it anyhow
+  if (_min_size.x() <= _max_size.x() && _min_size.y() <= _max_size.y()) {
+    // smaller than min size or bigger than max size?
+    if (w < _min_size.x()) w = _min_size.x();
+    else if (w > _max_size.x()) w = _max_size.x();
+    if (h < _min_size.y()) h = _min_size.y();
+    else if (h > _max_size.y()) h = _max_size.y();
+  }
+
+  // keep to the increments
+  w /= _size_inc.x();
+  h /= _size_inc.y();
+
+  // store the logical size
+  _logical_size.setPoint(w, h);
+
+  w *= _size_inc.x();
+  h *= _size_inc.y();
+
+  w += _base_size.x();
+  h += _base_size.y();
+  
+  switch (anchor) {
+  case TopLeft:
+    break;
+  case TopRight:
+    _area.setX(_area.x() - _area.width() - w);
+    break;
+  case BottomLeft:
+    _area.setY(_area.y() - _area.height() - h);
+    break;
+  case BottomRight:
+    _area.setX(_area.x() - _area.width() - w);
+    _area.setY(_area.y() - _area.height() - h);
+    break;
+  }
+
+  _area.setSize(w, h);
+
+  // resize the frame to match
+  frame->adjust();
 }
+
+
+void OBClient::move(int x, int y)
+{
+  _area.setPos(x, y);
+  // move the frame to be in the requested position
+  frame->applyGravity();
+}
+
+
+void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
+{
+  // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event
+
+  if (e.value_mask & CWBorderWidth)
+    _border_width = e.border_width;
+
+    // resize, then move, as specified in the EWMH section 7.7
+  if (e.value_mask & (CWWidth | CWHeight)) {
+    int w = (e.value_mask & CWWidth) ? e.width : _area.width();
+    int h = (e.value_mask & CWHeight) ? e.height : _area.height();
+
+    Corner corner;
+    switch (_gravity) {
+    case NorthEastGravity:
+    case EastGravity:
+      corner = TopRight;
+      break;
+    case SouthWestGravity:
+    case SouthGravity:
+      corner = BottomLeft;
+      break;
+    case SouthEastGravity:
+      corner = BottomRight;
+      break;
+    default:     // NorthWest, Static, etc
+      corner = TopLeft;
+    }
+
+    resize(corner, w, h);
+  }
+
+  if (e.value_mask & (CWX | CWY)) {
+    int x = (e.value_mask & CWX) ? e.x : _area.x();
+    int y = (e.value_mask & CWY) ? e.y : _area.y();
+    move(x, y);
+  }
+
+  if (e.value_mask & CWStackMode) {
+    switch (e.detail) {
+    case Below:
+    case BottomIf:
+      // XXX: lower the window
+      break;
+
+    case Above:
+    case TopIf:
+    default:
+      // XXX: raise the window
+      break;
+    }
+  }
+}
+
 
 }

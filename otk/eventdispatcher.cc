@@ -33,7 +33,7 @@ void OtkEventDispatcher::clearHandler(Window id)
 {
   _map.erase(id);
 }
-#include <stdio.h>
+
 void OtkEventDispatcher::dispatchEvents(void)
 {
   XEvent e;

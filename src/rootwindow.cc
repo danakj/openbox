@@ -108,4 +108,24 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
   }
 }
 
+
+#include <stdio.h>
+void OBRootWindow::configureRequestHandler(const XConfigureRequestEvent &e)
+{
+  // when configure requests come to the root window, just pass them on
+  XWindowChanges xwc;
+
+  xwc.x = e.x;
+  xwc.y = e.y;
+  xwc.width = e.width;
+  xwc.height = e.height;
+  xwc.border_width = e.border_width;
+  xwc.sibling = e.above;
+  xwc.stack_mode = e.detail;
+
+  XConfigureWindow(otk::OBDisplay::display, e.window,
+                   e.value_mask, &xwc);
+}
+
+
 }

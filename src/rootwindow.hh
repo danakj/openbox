@@ -58,6 +58,8 @@ public:
 
   virtual void mapRequestHandler(const XMapRequestEvent &);
 
+  virtual void configureRequestHandler(const XConfigureRequestEvent &e);
+
   //! Sets the name of a desktop
   /*!
     @param i The index of the desktop to set the name for (base 0)

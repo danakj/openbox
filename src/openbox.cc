@@ -280,6 +280,5 @@ OBClient *Openbox::findClient(Window window)
     return (OBClient*) 0;
 }
 
-
 }
 

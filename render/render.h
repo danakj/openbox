@@ -1,10 +1,9 @@
 #ifndef __render_h
 #define __render_h
 
-#define _XFT_NO_COMPAT_ /* no Xft 1 API */
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
+#define _XFT_NO_COMPAT_ /* no Xft 1 API */
 #include <X11/Xft/Xft.h>
-#include <X11/Xlib.h>
 #include <glib.h>
 
 typedef union  _RrTextureData      RrTextureData;

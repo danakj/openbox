@@ -1,7 +1,5 @@
 #ifndef __font_h
 #define __font_h
-#define _XFT_NO_COMPAT_ /* no Xft 1 API */
-#include <X11/Xft/Xft.h>
 #include "render.h"
 #include "geom.h"
 

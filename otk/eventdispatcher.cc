@@ -101,9 +101,9 @@ void EventDispatcher::dispatchEvents(void)
 
 void EventDispatcher::dispatchFocus(const XEvent &e)
 {
-  printf("focus %s detail %d -> 0x%lx\n",
-         (e.xfocus.type == FocusIn ? "IN" : "OUT"),
-         e.xfocus.detail, e.xfocus.window);
+//  printf("focus %s detail %d -> 0x%lx\n",
+//         (e.xfocus.type == FocusIn ? "IN" : "OUT"),
+//         e.xfocus.detail, e.xfocus.window);
   // ignore focus changes from grabs
   if (e.xfocus.mode != NotifyNormal) //|| e.xfocus.mode == NotifyUngrab ||
       // From Metacity, from WindowMaker, ignore all funky pointer root events

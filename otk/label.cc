@@ -27,13 +27,13 @@ void OtkLabel::update(void)
 {
   if (_dirty) {
     const BFont &ft = getStyle()->getFont();
-    unsigned int bevel = getStyle()->getBevelWidth();
+    unsigned int bevel = getStyle()->getBevelWidth() / 2;
 
     std::string t = _text; // the actual text to draw
     int x = bevel;         // x coord for the text
 
     // find a string that will fit inside the area for text
-    int max_length = width() - getBevelWidth() * 2;
+    int max_length = width() - bevel * 2;
     if (max_length <= 0) {
       t = ""; // can't fit anything
     } else {

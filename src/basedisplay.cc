@@ -59,7 +59,7 @@ using std::string;
 #include "basedisplay.hh"
 #include "gccache.hh"
 #include "timer.hh"
-#include "util.hh"
+#include "otk/util.hh"
 
 
 // X error handler to handle any and all X errors while the application is

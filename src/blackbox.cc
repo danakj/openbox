@@ -80,7 +80,7 @@ using std::string;
 #include "otk/image.hh"
 #include "otk/assassin.hh"
 #include "screen.hh"
-#include "util.hh"
+#include "otk/util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
 
@@ -102,12 +102,12 @@ Blackbox::Blackbox(int argc, char **m_argv, char *rc)
   argv = m_argv;
 
   // try to make sure the ~/.openbox directory exists
-  mkdir(expandTilde("~/.openbox").c_str(), S_IREAD | S_IWRITE | S_IEXEC |
+  mkdir(otk::expandTilde("~/.openbox").c_str(), S_IREAD | S_IWRITE | S_IEXEC |
                                            S_IRGRP | S_IWGRP | S_IXGRP |
                                            S_IROTH | S_IWOTH | S_IXOTH);
   
   if (! rc) rc = "~/.openbox/rc3";
-  rc_file = expandTilde(rc);
+  rc_file = otk::expandTilde(rc);
   config.setFile(rc_file);  
 
   no_focus = False;
@@ -1062,7 +1062,7 @@ void Blackbox::load_rc(void) {
   else if (resource.colors_per_channel > 6) resource.colors_per_channel = 6;
 
   if (config.getValue("session.styleFile", s))
-    resource.style_file = expandTilde(s);
+    resource.style_file = otk::expandTilde(s);
   else
     resource.style_file = DEFAULTSTYLE;
 

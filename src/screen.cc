@@ -59,11 +59,10 @@ using std::string;
 #include "otk/gccache.hh"
 #include "otk/image.hh"
 #include "otk/assassin.hh"
+#include "otk/util.hh"
 #include "openbox.hh"
-#include "util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
-#include "util.hh"
 
 #ifndef   FONT_ELEMENT_SIZE
 #define   FONT_ELEMENT_SIZE 50
@@ -87,7 +86,7 @@ static int anotherWMRunning(Display *display, XErrorEvent *) {
 
 BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
   blackbox = bb;
-  screenstr = "session.screen" + itostring(scrn) + '.';
+  screenstr = "session.screen" + otk::itostring(scrn) + '.';
   config = blackbox->getConfig();
   xatom = blackbox->getXAtom();
 
@@ -139,6 +138,10 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
   root_colormap_installed = True;
 
   load_rc();
+
+  // XXX: ugh
+  resource.wstyle.setImageControl(image_control);
+  resource.wstyle.setScreenNumber(scrn);
   LoadStyle();
 
   XGCValues gcv;
@@ -150,8 +153,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
                    GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
   const char *s = "0: 0000 x 0: 0000";
-  geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
-  geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
+  geom_w = resource.wstyle.font->measureString(s) + resource.wstyle.bevel_width * 2;
+  geom_h = resource.wstyle.font->height() + resource.wstyle.bevel_width * 2;
 
   XSetWindowAttributes attrib;
   unsigned long mask = CWBorderPixel | CWColormap | CWSaveUnder;
@@ -159,8 +162,10 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
   attrib.colormap = getColormap();
   attrib.save_under = True;
 
+  // XXX -- move this geom_* crap out of here
+
   geom_window = XCreateWindow(otk::OBDisplay::display, getRootWindow(),
-                              0, 0, geom_w, geom_h, resource.border_width,
+                              0, 0, geom_w, geom_h, resource.wstyle.border_width,
                               getDepth(), InputOutput, getVisual(),
                               mask, &attrib);
   geom_visible = False;
@@ -188,6 +193,9 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
     Workspace *wkspc = new Workspace(this, workspacesList.size());
     workspacesList.push_back(wkspc);
   }
+
+  // /GEOM_PIXMAP
+
   saveWorkspaceNames();
 
   updateNetizenWorkspaceCount();
@@ -272,25 +280,30 @@ BScreen::~BScreen(void) {
 
   delete image_control;
 
-  if (resource.wstyle.font)
-    delete resource.wstyle.font;
-
-  if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.close_button.mask);
-  if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.max_button.mask);
-  if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.icon_button.mask);
-  if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.stick_button.mask);
-
-  resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
-    resource.wstyle.icon_button.mask =
-    resource.wstyle.stick_button.mask = None;
+  // delete style
   
   XFreeGC(otk::OBDisplay::display, opGC);
 }
 
+
+void BScreen::LoadStyle(void) {
+  otk::Configuration style_conf(False);
+
+  const char *sfile = blackbox->getStyleFilename();
+  if (sfile != NULL) {
+    style_conf.setFile(sfile);
+    if (! style_conf.load()) {
+      style_conf.setFile(DEFAULTSTYLE);
+      if (! style_conf.load())
+        style_conf.create();  // hardcoded default values will be used.
+    }
+  }
+
+  // merge in the rc file
+  style_conf.merge(config->file(), True);
+
+  resource.wstyle.load(style_conf);
+}
 
 void BScreen::saveSloppyFocus(bool s) {
   resource.sloppy_focus = s;
@@ -744,8 +757,8 @@ void BScreen::reconfigure(void) {
 
   const char *s = "0: 0000 x 0: 0000";
 
-  geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
-  geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
+  geom_w = resource.wstyle.font->measureString(s) + resource.wstyle.bevel_width * 2;
+  geom_h = resource.wstyle.font->height() + resource.wstyle.bevel_width * 2;
 
   otk::BTexture* texture = &(resource.wstyle.l_focus);
   geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
@@ -761,9 +774,9 @@ void BScreen::reconfigure(void) {
                                geom_window, geom_pixmap);
 
   XSetWindowBorderWidth(otk::OBDisplay::display, geom_window,
-                        resource.border_width);
+                        resource.wstyle.border_width);
   XSetWindowBorder(otk::OBDisplay::display, geom_window,
-                   resource.border_color.pixel());
+                   resource.wstyle.border_color.pixel());
 
   typedef std::vector<int> SubList;
   SubList remember_subs;
@@ -784,150 +797,11 @@ void BScreen::reconfigure(void) {
 }
 
 
-void BScreen::LoadStyle(void) {
-  Configuration style(False);
-
-  const char *sfile = blackbox->getStyleFilename();
-  if (sfile != NULL) {
-    style.setFile(sfile);
-    if (! style.load()) {
-      style.setFile(DEFAULTSTYLE);
-      if (! style.load())
-        style.create();  // hardcoded default values will be used.
-    }
-  }
-
-  // merge in the rc file
-  style.merge(config->file(), True);
-
-  string s;
-
-  // load fonts/fontsets
-  if (resource.wstyle.font)
-    delete resource.wstyle.font;
-
-  resource.wstyle.font = readDatabaseFont("window.", style);
-
-  // load window config
-  resource.wstyle.t_focus =
-    readDatabaseTexture("window.title.focus", "white", style);
-  resource.wstyle.t_unfocus =
-    readDatabaseTexture("window.title.unfocus", "black", style);
-  resource.wstyle.l_focus =
-    readDatabaseTexture("window.label.focus", "white", style);
-  resource.wstyle.l_unfocus =
-    readDatabaseTexture("window.label.unfocus", "black", style);
-  resource.wstyle.h_focus =
-    readDatabaseTexture("window.handle.focus", "white", style);
-  resource.wstyle.h_unfocus =
-    readDatabaseTexture("window.handle.unfocus", "black", style);
-  resource.wstyle.g_focus =
-    readDatabaseTexture("window.grip.focus", "white", style);
-  resource.wstyle.g_unfocus =
-    readDatabaseTexture("window.grip.unfocus", "black", style);
-  resource.wstyle.b_focus =
-    readDatabaseTexture("window.button.focus", "white", style);
-  resource.wstyle.b_unfocus =
-    readDatabaseTexture("window.button.unfocus", "black", style);
-  resource.wstyle.b_pressed =
-    readDatabaseTexture("window.button.pressed", "black", style);
-
-  //if neither of these can be found, we will use the previous resource
-  resource.wstyle.b_pressed_focus =
-    readDatabaseTexture("window.button.pressed.focus", "black", style, true);
-  resource.wstyle.b_pressed_unfocus =
-    readDatabaseTexture("window.button.pressed.unfocus", "black", style, true);
-
-  if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.close_button.mask);
-  if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.max_button.mask);
-  if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.icon_button.mask);
-  if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, resource.wstyle.stick_button.mask);
-
-  resource.wstyle.close_button.mask = resource.wstyle.max_button.mask =
-    resource.wstyle.icon_button.mask =
-    resource.wstyle.icon_button.mask = None;
-  
-  readDatabaseMask("window.button.close.mask", resource.wstyle.close_button,
-                   style);
-  readDatabaseMask("window.button.max.mask", resource.wstyle.max_button,
-                   style);
-  readDatabaseMask("window.button.icon.mask", resource.wstyle.icon_button,
-                   style);
-  readDatabaseMask("window.button.stick.mask", resource.wstyle.stick_button,
-                   style);
-
-  // we create the window.frame texture by hand because it exists only to
-  // make the code cleaner and is not actually used for display
-  otk::BColor color = readDatabaseColor("window.frame.focusColor", "white",
-                                        style);
-  resource.wstyle.f_focus = otk::BTexture("solid flat", getScreenNumber(),
-                                          image_control);
-  resource.wstyle.f_focus.setColor(color);
-
-  color = readDatabaseColor("window.frame.unfocusColor", "white", style);
-  resource.wstyle.f_unfocus = otk::BTexture("solid flat", getScreenNumber(),
-                                            image_control);
-  resource.wstyle.f_unfocus.setColor(color);
-
-  resource.wstyle.l_text_focus =
-    readDatabaseColor("window.label.focus.textColor", "black", style);
-  resource.wstyle.l_text_unfocus =
-    readDatabaseColor("window.label.unfocus.textColor", "white", style);
-  resource.wstyle.b_pic_focus =
-    readDatabaseColor("window.button.focus.picColor", "black", style);
-  resource.wstyle.b_pic_unfocus =
-    readDatabaseColor("window.button.unfocus.picColor", "white", style);
-
-  resource.wstyle.justify = LeftJustify;
-  if (style.getValue("window.justify", s)) {
-    if (s == "right" || s == "Right")
-      resource.wstyle.justify = RightJustify;
-    else if (s == "center" || s == "Center")
-      resource.wstyle.justify = CenterJustify;
-  }
-
-  // sanity checks
-  if (resource.wstyle.t_focus.texture() == otk::BTexture::Parent_Relative)
-    resource.wstyle.t_focus = resource.wstyle.f_focus;
-  if (resource.wstyle.t_unfocus.texture() == otk::BTexture::Parent_Relative)
-    resource.wstyle.t_unfocus = resource.wstyle.f_unfocus;
-  if (resource.wstyle.h_focus.texture() == otk::BTexture::Parent_Relative)
-    resource.wstyle.h_focus = resource.wstyle.f_focus;
-  if (resource.wstyle.h_unfocus.texture() == otk::BTexture::Parent_Relative)
-    resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
-
-  resource.border_color =
-    readDatabaseColor("borderColor", "black", style);
-
-  // load bevel, border and handle widths
-  if (! style.getValue("handleWidth", resource.handle_width) ||
-      resource.handle_width > (getWidth() / 2) || resource.handle_width == 0)
-    resource.handle_width = 6;
-
-  if (! style.getValue("borderWidth", resource.border_width))
-    resource.border_width = 1;
-
-  if (! style.getValue("bevelWidth", resource.bevel_width) ||
-      resource.bevel_width > (getWidth() / 2) || resource.bevel_width == 0)
-    resource.bevel_width = 3;
-
-  if (! style.getValue("frameWidth", resource.frame_width) ||
-      resource.frame_width > (getWidth() / 2))
-    resource.frame_width = resource.bevel_width;
-
-  if (style.getValue("rootCommand", s))
-    bexec(s, displayString());
-}
-
 
 void BScreen::addIcon(BlackboxWindow *w) {
   if (! w) return;
 
-  w->setWorkspace(BSENTINEL);
+  w->setWorkspace(otk::BSENTINEL);
   w->setWindowNumber(iconList.size());
 
   iconList.push_back(w);
@@ -1214,8 +1088,8 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   // Remove the modality so that its parent won't try to re-focus the window
   if (w->isModal()) w->setModal(False);
   
-  if (w->getWorkspaceNumber() != BSENTINEL &&
-      w->getWindowNumber() != BSENTINEL) {
+  if (w->getWorkspaceNumber() != otk::BSENTINEL &&
+      w->getWindowNumber() != otk::BSENTINEL) {
     getWorkspace(w->getWorkspaceNumber())->removeWindow(w);
     if (w->isStuck()) {
       for (unsigned int i = 0; i < getNumberOfWorkspaces(); ++i)
@@ -1357,7 +1231,7 @@ void BScreen::reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
                                 bool ignore_sticky) {
   if (! w) return;
 
-  if (wkspc_id == BSENTINEL)
+  if (wkspc_id == otk::BSENTINEL)
     wkspc_id = current_workspace->getID();
 
   if (w->getWorkspaceNumber() == wkspc_id)
@@ -1482,7 +1356,7 @@ void BScreen::showPosition(int x, int y) {
   XClearWindow(otk::OBDisplay::display, geom_window);
 
   resource.wstyle.font->drawString(geom_window,
-                                   resource.bevel_width, resource.bevel_width,
+                                   resource.wstyle.bevel_width, resource.wstyle.bevel_width,
                                    resource.wstyle.l_text_focus,
                                    label);
 }
@@ -1506,7 +1380,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   XClearWindow(otk::OBDisplay::display, geom_window);
 
   resource.wstyle.font->drawString(geom_window,
-                                   resource.bevel_width, resource.bevel_width,
+                                   resource.wstyle.bevel_width, resource.wstyle.bevel_width,
                                    resource.wstyle.l_text_focus,
                                    label);
 }
@@ -1676,124 +1550,6 @@ void BScreen::toggleFocusModel(FocusModel model) {
 
   std::for_each(windowList.begin(), windowList.end(),
                 std::mem_fun(&BlackboxWindow::grabButtons));
-}
-
-void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
-                               const Configuration &style) {
-  string s;
-  int hx, hy; //ignored
-  int ret = BitmapOpenFailed; //default to failure.
-  
-  if (style.getValue(rname, s))
-  {
-    if (s[0] != '/' && s[0] != '~')
-    {
-      std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(otk::OBDisplay::display, getRootWindow(),
-                            expandTilde(xbmFile).c_str(), &pixmapMask.w,
-                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
-    } else
-      ret = XReadBitmapFile(otk::OBDisplay::display, getRootWindow(),
-                            expandTilde(s).c_str(), &pixmapMask.w,
-                            &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
-    
-    if (ret == BitmapSuccess)
-      return;
-  }
-
-  pixmapMask.mask = None;
-  pixmapMask.w = pixmapMask.h = 0;
-}
-
-otk::BTexture BScreen::readDatabaseTexture(const string &rname,
-                                           const string &default_color,
-                                           const Configuration &style, 
-                                           bool allowNoTexture) {
-  otk::BTexture texture;
-  string s;
-
-  if (style.getValue(rname, s))
-    texture = otk::BTexture(s);
-  else if (allowNoTexture) //no default
-    texture.setTexture(otk::BTexture::NoTexture);
-  else
-    texture.setTexture(otk::BTexture::Solid | otk::BTexture::Flat);
-
-  // associate this texture with this screen
-  texture.setScreen(getScreenNumber());
-  texture.setImageControl(image_control);
-
-  if (texture.texture() != otk::BTexture::NoTexture) {
-    texture.setColor(readDatabaseColor(rname + ".color", default_color,
-                                       style));
-    texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
-                                         style));
-    texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
-                                             default_color, style));
-  }
-
-  return texture;
-}
-
-
-otk::BColor BScreen::readDatabaseColor(const string &rname,
-                                       const string &default_color,
-                                       const Configuration &style) {
-  otk::BColor color;
-  string s;
-  if (style.getValue(rname, s))
-    color = otk::BColor(s, getScreenNumber());
-  else
-    color = otk::BColor(default_color, getScreenNumber());
-  return color;
-}
-
-
-otk::BFont *BScreen::readDatabaseFont(const string &rbasename,
-                                      const Configuration &style) {
-  string fontname;
-
-  string s;
-
-  int i;
-  if (style.getValue(rbasename + "xft.font", s) &&
-      style.getValue(rbasename + "xft.size", i)) {
-    string family = s;
-    bool bold = False;
-    bool italic = False;
-    bool dropShadow = False;
-
-    if (style.getValue(rbasename + "xft.flags", s)) {
-      if (s.find("bold") != string::npos)
-        bold = True;
-      if (s.find("italic") != string::npos)
-        italic = True;
-      if (s.find("shadow") != string::npos)
-        dropShadow = True;
-    }
-    
-    unsigned char offset = 1;
-    if (style.getValue(rbasename + "xft.shadow.offset", s)) {
-      offset = atoi(s.c_str()); //doesn't detect errors
-      if (offset > CHAR_MAX)
-        offset = 1;
-    }
-
-    unsigned char tint = 0x40;
-    if (style.getValue(rbasename + "xft.shadow.tint", s)) {
-      tint = atoi(s.c_str());
-    }
-
-    
-    otk::BFont *b = new otk::BFont(getScreenNumber(), family, i, bold, italic,
-                                   dropShadow && resource.shadow_fonts,
-                                   offset, tint, resource.aa_fonts);
-    if (b->valid())
-      return b;
-    delete b;
-  }
-    
-  exit(2);  // can't continue without a font
 }
 
 }

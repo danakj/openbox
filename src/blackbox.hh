@@ -28,7 +28,7 @@ extern "C" {
 #include "otk/timer.hh"
 #include "otk/property.hh"
 #include "openbox.hh"
-#include "configuration.hh"
+#include "otk/configuration.hh"
 #include "timer.hh"
 
 #define AttribShaded      (1l << 0)
@@ -111,7 +111,7 @@ private:
   BScreen *active_screen;
   BlackboxWindow *focused_window, *changing_window;
   otk::OBTimer *timer;
-  Configuration config;
+  otk::Configuration config;
   otk::OBProperty *xatom;
 
   bool no_focus, reconfigure_wait;
@@ -163,7 +163,7 @@ public:
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
   inline BlackboxWindow *getChangingWindow(void) { return changing_window; }
 
-  inline Configuration *getConfig() { return &config; }
+  inline otk::Configuration *getConfig() { return &config; }
   inline const Time &getDoubleClickInterval(void) const
   { return resource.double_click_interval; }
   inline const Time &getLastTime(void) const { return last_time; }

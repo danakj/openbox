@@ -17,7 +17,7 @@ extern "C" {
 #include "otk/rect.hh"
 #include "otk/strut.hh"
 #include "blackbox.hh"
-#include "util.hh"
+#include "otk/util.hh"
 
 #define MwmHintsFunctions     (1l << 0)
 #define MwmHintsDecorations   (1l << 1)

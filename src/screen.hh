@@ -26,34 +26,13 @@ extern "C" {
 #include "otk/image.hh"
 #include "otk/strut.hh"
 #include "otk/property.hh"
+#include "otk/configuration.hh"
+#include "otk/style.hh"
 #include "timer.hh"
 #include "workspace.hh"
 #include "blackbox.hh"
 
 namespace ob {
-
-enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
-
-struct PixmapMask {
-  Pixmap mask;
-  unsigned int w, h;
-};
-
-struct WindowStyle {
-  otk::BColor l_text_focus, l_text_unfocus, b_pic_focus,
-    b_pic_unfocus;
-  otk::BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
-    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, b_pressed_focus,
-    b_pressed_unfocus, g_focus, g_unfocus;
-
-  PixmapMask close_button, max_button, icon_button, stick_button;
-  otk::BFont *font;
-
-  TextJustify justify;
-
-  void doJustify(const std::string &text, int &start_pos,
-                 unsigned int max_length, unsigned int modifier) const;
-};
 
 class BScreen : public otk::ScreenInfo {
 private:
@@ -64,7 +43,7 @@ private:
 
   Blackbox *blackbox;
   otk::BImageControl *image_control;
-  Configuration *config;
+  otk::Configuration *config;
   otk::OBProperty *xatom;
 
   BlackboxWindowList iconList, windowList;
@@ -88,7 +67,7 @@ private:
   WorkspaceList workspacesList;
 
   struct screen_resource {
-    WindowStyle wstyle;
+    otk::Style wstyle;
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
@@ -98,15 +77,12 @@ private:
     int snap_to_windows, snap_to_edges;
     unsigned int snap_offset;
 
-    otk::BColor border_color;
-
     unsigned int workspaces;
     int placement_policy,
       snap_threshold, row_direction, col_direction, root_scroll,
       resistance_size;
 
-    unsigned int handle_width, bevel_width, frame_width, border_width,
-      resize_zones;
+    unsigned int resize_zones;
 
     std::string strftime_format;
 
@@ -115,22 +91,6 @@ private:
 
   BScreen(const BScreen&);
   BScreen& operator=(const BScreen&);
-
-  void readDatabaseMask(const std::string &rname,
-                        PixmapMask &pixmapMask,
-                        const Configuration &style);
-  
-  otk::BTexture readDatabaseTexture(const std::string &rname,
-                               const std::string &default_color,
-                               const Configuration &style, 
-                               bool allowNoTexture = false);
-  otk::BColor readDatabaseColor(const std::string &rname,
-                           const std::string &default_color,
-                           const Configuration &style);
-  otk::BFont *readDatabaseFont(const std::string &rbasename,
-                               const Configuration &style);
-
-  void LoadStyle(void);
 
   void updateWorkArea(void);
 
@@ -144,7 +104,6 @@ public:
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
          UnderMousePlacement, ClickMousePlacement, LeftRight, RightLeft,
          TopBottom, BottomTop, IgnoreShaded, IgnoreMaximized };
-  enum { RoundBullet = 1, TriangleBullet, SquareBullet, NoBullet };
   enum { Restart = 1, RestartOther, Exit, Shutdown, Execute, Reconfigure,
          WindowShade, WindowIconify, WindowMaximize, WindowClose, WindowRaise,
          WindowLower, WindowStick, WindowKill, SetStyle };
@@ -153,6 +112,8 @@ public:
 
   BScreen(Blackbox *bb, unsigned int scrn);
   ~BScreen(void);
+
+  void LoadStyle(void);
 
   inline bool isSloppyFocus(void) const { return resource.sloppy_focus; }
   inline bool isRootColormapInstalled(void) const
@@ -182,21 +143,15 @@ public:
   inline const GC &getOpGC(void) const { return opGC; }
 
   inline Blackbox *getBlackbox(void) { return blackbox; }
-  inline otk::BColor *getBorderColor(void) { return &resource.border_color; }
+  inline otk::BColor *getBorderColor(void) {
+    return &resource.wstyle.border_color;
+  }
   inline otk::BImageControl *getImageControl(void) { return image_control; }
 
   Workspace *getWorkspace(unsigned int index) const;
 
   inline Workspace *getCurrentWorkspace(void) { return current_workspace; }
 
-  inline unsigned int getHandleWidth(void) const
-  { return resource.handle_width; }
-  inline unsigned int getBevelWidth(void) const
-  { return resource.bevel_width; }
-  inline unsigned int getFrameWidth(void) const
-  { return resource.frame_width; }
-  inline unsigned int getBorderWidth(void) const
-  { return resource.border_width; }
   inline unsigned int getResizeZones(void) const
   { return resource.resize_zones; }
   inline bool getPlaceIgnoreShaded(void) const
@@ -258,7 +213,7 @@ public:
   { return resource.strftime_format.c_str(); }
   void saveStrftimeFormat(const std::string& format);
 
-  inline WindowStyle *getWindowStyle(void) { return &resource.wstyle; }
+  inline otk::Style *getWindowStyle(void) { return &resource.wstyle; }
 
   BlackboxWindow *getIcon(unsigned int index);
 

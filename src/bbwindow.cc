@@ -28,9 +28,11 @@ extern "C" {
 #include "gccache.hh"
 #include "image.hh"
 #include "screen.hh"
-#include "util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
+
+#include "otk/util.hh"
+#include "otk/style.hh"
 
 using std::string;
 using std::abs;
@@ -94,7 +96,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     flags.skip_pager = flags.fullscreen = False;
   flags.maximized = 0;
 
-  blackbox_attrib.workspace = window_number = BSENTINEL;
+  blackbox_attrib.workspace = window_number = otk::BSENTINEL;
 
   blackbox_attrib.flags = blackbox_attrib.attrib = blackbox_attrib.stack = 0l;
   blackbox_attrib.decoration = DecorNormal;
@@ -1830,7 +1832,7 @@ void BlackboxWindow::show(void) {
 
 void BlackboxWindow::deiconify(bool reassoc, bool raise) {
   if (flags.iconic || reassoc)
-    screen->reassociateWindow(this, BSENTINEL, False);
+    screen->reassociateWindow(this, otk::BSENTINEL, False);
   else if (blackbox_attrib.workspace != screen->getCurrentWorkspaceID())
     return;
 
@@ -2033,7 +2035,7 @@ void BlackboxWindow::remaximize(void) {
 void BlackboxWindow::setWorkspace(unsigned int n) {
   blackbox_attrib.flags |= AttribWorkspace;
   blackbox_attrib.workspace = n;
-  if (n == BSENTINEL) { // iconified window
+  if (n == otk::BSENTINEL) { // iconified window
     /*
        we set the workspace to 'all workspaces' so that taskbars will show the
        window. otherwise, it made uniconifying a window imposible without the
@@ -2092,7 +2094,7 @@ void BlackboxWindow::stick(void) {
         screen->getWorkspace(i)->removeWindow(this, True);
 
     if (! flags.iconic)
-      screen->reassociateWindow(this, BSENTINEL, True);
+      screen->reassociateWindow(this, otk::BSENTINEL, True);
     // temporary fix since sticky windows suck. set the hint to what we
     // actually hold in our data.
     xatom->set(client.window, otk::OBProperty::net_wm_desktop,
@@ -2564,7 +2566,7 @@ void BlackboxWindow::redrawLabel(void) const {
   }
   XClearWindow(otk::OBDisplay::display, frame.label);
 
-  WindowStyle *style = screen->getWindowStyle();
+  otk::Style *style = screen->getWindowStyle();
 
   int pos = frame.bevel_w * 2;
   style->doJustify(client.title.c_str(), pos, frame.label_w, frame.bevel_w * 4);
@@ -2627,7 +2629,7 @@ void BlackboxWindow::redrawIconifyButton(bool pressed) const {
   otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
                 screen->getWindowStyle()->b_pic_unfocus);
 
-  PixmapMask pm = screen->getWindowStyle()->icon_button;
+  otk::Style::PixmapMask pm = screen->getWindowStyle()->icon_button;
   
   if (screen->getWindowStyle()->icon_button.mask != None) {
     XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
@@ -2659,7 +2661,7 @@ void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
   otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
                 screen->getWindowStyle()->b_pic_unfocus);
   
-  PixmapMask pm = screen->getWindowStyle()->max_button;
+  otk::Style::PixmapMask pm = screen->getWindowStyle()->max_button;
     
   if (pm.mask != None) {
     XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
@@ -2693,7 +2695,7 @@ void BlackboxWindow::redrawCloseButton(bool pressed) const {
   otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
                 screen->getWindowStyle()->b_pic_unfocus);
   
-  PixmapMask pm = screen->getWindowStyle()->close_button;
+  otk::Style::PixmapMask pm = screen->getWindowStyle()->close_button;
 
   if (pm.mask != None) {
     XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
@@ -2727,7 +2729,7 @@ void BlackboxWindow::redrawStickyButton(bool pressed) const {
   otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
                 screen->getWindowStyle()->b_pic_unfocus);
   
-  PixmapMask pm = screen->getWindowStyle()->stick_button;
+  otk::Style::PixmapMask pm = screen->getWindowStyle()->stick_button;
 
   if (pm.mask != None) {
     XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
@@ -3988,12 +3990,12 @@ void BlackboxWindow::changeBlackboxHints(const BlackboxHints *net) {
  * window's dimensions.
  */
 void BlackboxWindow::upsize(void) {
-  frame.bevel_w = screen->getBevelWidth();
+  frame.bevel_w = screen->getWindowStyle()->getBevelWidth();
 
   if (decorations & Decor_Border) {
-    frame.border_w = screen->getBorderWidth();
+    frame.border_w = screen->getWindowStyle()->getBorderWidth();
     if (! isTransient())
-      frame.mwm_border_w = screen->getFrameWidth();
+      frame.mwm_border_w = screen->getWindowSty2le()->getFrameWidth();
     else
       frame.mwm_border_w = 0;
   } else {
@@ -4003,7 +4005,7 @@ void BlackboxWindow::upsize(void) {
   if (decorations & Decor_Titlebar) {
     // the height of the titlebar is based upon the height of the font being
     // used to display the window's title
-    WindowStyle *style = screen->getWindowStyle();
+    otk::Style *style = screen->getWindowStyle();
     frame.title_h = style->font->height() + (frame.bevel_w * 2) + 2;
 
     frame.label_h = frame.title_h - (frame.bevel_w * 2);
@@ -4026,7 +4028,7 @@ void BlackboxWindow::upsize(void) {
 
   if (decorations & Decor_Handle) {
     frame.grip_w = frame.button_w * 2;
-    frame.handle_h = screen->getHandleWidth();
+    frame.handle_h = screen->getWindowStyle()->getHandleWidth();
 
     // set the bottom frame margin
     frame.margin.bottom = frame.border_w + frame.handle_h +
@@ -4154,32 +4156,6 @@ void BlackboxWindow::constrain(Corner anchor,
     assert(false);  // unhandled corner
   }
   frame.changing.setPos(frame.changing.x() + dx, frame.changing.y() + dy);
-}
-
-
-void WindowStyle::doJustify(const std::string &text, int &start_pos,
-                            unsigned int max_length,
-                            unsigned int modifier) const {
-  size_t text_len = text.size();
-  unsigned int length;
-
-  do {
-    length = font->measureString(string(text, 0, text_len)) + modifier;
-  } while (length > max_length && text_len-- > 0);
-
-  switch (justify) {
-  case RightJustify:
-    start_pos += max_length - length;
-    break;
-
-  case CenterJustify:
-    start_pos += (max_length - length) / 2;
-    break;
-
-  case LeftJustify:
-  default:
-    break;
-  }
 }
 
 

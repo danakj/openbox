@@ -28,7 +28,7 @@ using std::string;
 #include "otk/font.hh"
 #include "otk/display.hh"
 #include "screen.hh"
-#include "util.hh"
+#include "otk/util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
 
@@ -605,8 +605,8 @@ bool Workspace::smartPlacement(otk::Rect& win) {
     }
 
     tmp.setRect(curr->frameRect().x(), curr->frameRect().y(),
-                curr->frameRect().width() + screen->getBorderWidth(),
-                curr->frameRect().height() + screen->getBorderWidth());
+                curr->frameRect().width() + screen->getWindowStyle()->getBorderWidth(),
+                curr->frameRect().height() + screen->getWindowStyle()->getBorderWidth());
 
     spaces = calcSpace(tmp, spaces);
   }
@@ -765,7 +765,7 @@ void Workspace::placeWindow(BlackboxWindow *win) {
 
   if (placed == False)
     cascadePlacement(new_win, (win->getTitleHeight() +
-                               screen->getBorderWidth() * 2));
+                               screen->getWindowStyle()->getBorderWidth() * 2));
 
   if (new_win.right() > screen->availableArea().right())
     new_win.setX(screen->availableArea().left());

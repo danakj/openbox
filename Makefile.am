@@ -252,6 +252,8 @@ dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
+	render/obrender-3.0.pc.in \
+	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py
 
 EXTRA_DIST = \

@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# 是
+# Yes
 $ #No
-# 否
+# No
 
 $ #DirectionTitle
-# 方向
+# Direction
 $ #DirectionHoriz
-# 水平
+# Horizontal
 $ #DirectionVert
-# 垂直
+# Vertical
 
 $ #AlwaysOnTop
-# 总在最上面
+# Always on top
 
 $ #PlacementTitle
-# 放置
+# Placement
 $ #PlacementTopLeft
-# 上左
+# Top Left
 $ #PlacementCenterLeft
-# 中左
+# Center Left
 $ #PlacementBottomLeft
-# 下左
+# Bottom Left
 $ #PlacementTopCenter
-# 上中
+# Top Center
 $ #PlacementBottomCenter
-# 下中
+# BottomCenter
 $ #PlacementTopRight
-# 上右
+# Top Right
 $ #PlacementCenterRight
-# 中右
+# Center Right
 $ #PlacementBottomRight
-# 下右
+# Bottom Right
 
 $ #AutoHide
-# 自动隐藏
+# Auto hide

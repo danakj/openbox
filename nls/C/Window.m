@@ -2,13 +2,13 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: 正在创建 0x%lx\n
+# BlackboxWindow::BlackboxWindow: creating 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: XGetWindowAttributres 失败\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributres failed\n
 $ #CannotFindScreen
 # BlackboxWindow::BlackboxWindow: cannot find screen for root window 0x%lx\n
 $ #Unnamed
-# 无命名
+# Unnamed
 $ #MapRequest
 # BlackboxWindow::mapRequestEvent() for 0x%lx\n
 $ #UnmapNotify

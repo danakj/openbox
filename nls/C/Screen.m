@@ -1,52 +1,54 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: 查询X服务器时出错.\n  \
-已经有另一个窗口管理器在运行 %s.\n
+# BScreen::BScreen: an error occured while querying the X server.\n  \
+another window manager is already running on display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: 对屏幕 %d 使用视 0x%lx, 深度 %d\n
+# BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): 无法载入字体 '%s'\n
+# BScreen::LoadStyle(): couldn't load font '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): 无法载入默认字体.\n
+# BScreen::LoadStyle(): couldn't load default font.\n
 $ #EmptyMenuFile
-# %s: 清空菜单文件\n
+# %s: empty menu file\n
 $ #xterm
 # xterm
 $ #Restart
-# 重新开始
+# Restart
 $ #Exit
-# 退出
+# Exit
 $ #EXECError
-# BScreen::parseMenuFile: [exec] 错误, 没有菜单的标题或命令\n
+# BScreen::parseMenuFile: [exec] error, no menu label and/or command defined\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] 错误, 没有菜单的标题\n
+# BScreen::parseMenuFile: [exit] error, no menu label defined\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] 错误, 没有菜单标题或文件名\n
+# BScreen::parseMenuFile: [style] error, no menu label and/or filename \
+defined\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] 错误, 没有菜单标题\n
+# BScreen::parseMenuFile: [config] error, no menu label defined\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] 错误, 没有文件名\n
+# BScreen::parseMenuFile: [include] error, no filename defined\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] 错误, '%s' 不是一个普通文件\n
+# BScreen::parseMenuFile: [include] error, '%s' is not a regular file\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] 错误, 没有菜单标题\n
+# BScreen::parseMenuFile: [submenu] error, no menu label defined\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] 错误, 没有菜单标题\n
+# BScreen::parseMenuFile: [restart] error, no menu label defined\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] 错误, 没有菜单标题\n
+# BScreen::parseMenuFile: [reconfig] error, no menu label defined\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] 错误, 没有指名目录\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, no directory defined\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] 错误, '%s' 不是目录\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' is not a \
+directory\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] 错误, '%s' 不存在\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' does not exist\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] 错误, 没有菜单标题\n
+# BScreen::parseMenuFile: [workspaces] error, no menu label defined\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
-# 左: %4d x 上: %4d
+# X: %4d x Y: %4d
 $ #GeometryFormat
-# 宽: %4d x 高: %4d
+# W: %4d x H: %4d
 

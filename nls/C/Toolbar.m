@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# 工具条
+# Toolbar
 $ #EditWkspcName
-# 编辑桌面名
+# Edit current workspace name
 $ #ToolbarPlacement
-# 工具条放置
+# Toolbar Placement

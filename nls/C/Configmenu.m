@@ -1,38 +1,40 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# 配置选项
+# Config Options
 $ #FocusModel
-# 聚焦模式
+# Focus Model
 $ #WindowPlacement
-# 窗口放置
+# Window Placement
 $ #ImageDithering
-# 图像调谐
+# Image Dithering
 $ #OpaqueMove
-# 显示移动窗口内容
+# Opaque Window Moving
 $ #FullMax
-# 完全最大化
+# Full Maximization
 $ #FocusNew
-# 聚焦新窗口
+# Focus New Windows
 $ #FocusLast
-# 桌面改变时聚焦窗口
+# Focus Window on Workspace Change
 $ #ClickToFocus
-# 点击聚焦
+# Click to Focus
 $ #SloppyFocus
-# 自动聚焦
+# Sloppy Focus
 $ #AutoRaise
-# 自动放前
+# Auto Raise
+$ #ClickRaise
+# Click Raise
 $ #SmartRows
-# 自动放置(行)
+# Smart Placement (Rows)
 $ #SmartCols
-# 自动放置(列)
+# Smart Placement (Columns)
 $ #Cascade
-# 层叠放置
+# Cascade Placement
 $ #LeftRight
-# 从左到右
+# Left to Right
 $ #RightLeft
-# 从右到左
+# Right to Left
 $ #TopBottom
-# 从上到下
+# Top to Bottom
 $ #BottomTop
-# 从下到上
+# Bottom to Top

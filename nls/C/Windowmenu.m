@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# 发送到...
+# Send To ...
 $ #Shade
-# 卷帘
+# Shade
 $ #Iconify
-# 图标化
+# Iconify
 $ #Maximize
-# 最大化
+# Maximize
 $ #Raise
-# 放前
+# Raise
 $ #Lower
-# 放后
+# Lower
 $ #Stick
-# 钉住
+# Stick
 $ #KillClient
-# 杀死
+# Kill Client
 $ #Close
-# 关闭
+# Close

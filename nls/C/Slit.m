@@ -3,6 +3,6 @@ $set 7 #Slit
 $ #SlitTitle
 # Slit
 $ #SlitDirection
-# Slit ·½Ïò
+# Slit Direction
 $ #SlitPlacement
-# Slit ·ÅÖÃ
+# Slit Placement

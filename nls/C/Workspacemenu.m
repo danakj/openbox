@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# 桌面
+# Workspaces
 $ #NewWorkspace
-# 新建桌面
+# New Workspace
 $ #RemoveLast
-# 删除桌面
+# Remove Last

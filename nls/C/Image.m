@@ -1,13 +1,13 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: 创建pixmap出错\n
+# BImage::render_solid: error creating pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: 创建XImage出错\n
+# BImage::renderXImage: error creating XImage\n
 $ #UnsupVisual
 # BImage::renderXImage: unsupported visual\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: 创建pixmap出错\n
+# BImage::renderPixmap: error creating pixmap\n
 $ #InvalidColormapSize
 # BImageControl::BImageControl: invalid colormap size %d (%d/%d/%d) - reducing\n
 $ #ErrorAllocatingColormap

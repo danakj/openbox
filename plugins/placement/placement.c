@@ -50,7 +50,7 @@ void plugin_startup()
 
 void plugin_shutdown()
 {
-    dispatch_register(0, (EventHandler)event, NULL);
+    dispatch_register(0, (EventHandler)place_event, NULL);
 
     history_shutdown();
 }

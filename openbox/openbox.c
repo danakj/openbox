@@ -6,17 +6,18 @@
 #include "prop.h"
 #include "screen.h"
 #include "focus.h"
+#include "frame.h"
 #include "extensions.h"
 #include "parse.h"
 #include "grab.h"
-#include "engine.h"
 #include "plugin.h"
 #include "timer.h"
 #include "group.h"
 #include "config.h"
 #include "gettext.h"
-#include "../render/render.h"
-#include "../render/font.h"
+#include "render/render.h"
+#include "render/font.h"
+#include "render/theme.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -64,6 +65,7 @@ int main(int argc, char **argv)
     struct sigaction action;
     sigset_t sigset;
     char *path;
+    char *theme;
 
     ob_state = State_Starting;
 
@@ -157,9 +159,9 @@ int main(int argc, char **argv)
 	timer_startup();
 	render_startup();
 	font_startup();
+        theme_startup();
 	event_startup();
         grab_startup();
-        engine_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
         plugin_loadall();
@@ -171,9 +173,12 @@ int main(int argc, char **argv)
         /* we're done with parsing now, kill it */
         parse_shutdown();
 
-        /* load the engine specified in the rc */
-	engine_load();
+        /* load the theme specified in the rc file */
+        theme = theme_load("ebox"); /* woot i like this theme :) */
+        g_free(theme);
+        if (!theme) return 1;
 
+        frame_startup();
 	focus_startup();
 	screen_startup();
         group_startup();
@@ -197,9 +202,10 @@ int main(int argc, char **argv)
         group_shutdown();
 	screen_shutdown();
 	focus_shutdown();
-	engine_shutdown();
+        frame_shutdown();
         grab_shutdown();
 	event_shutdown();
+        theme_shutdown();
 	render_shutdown();
 	timer_shutdown();
         config_shutdown();

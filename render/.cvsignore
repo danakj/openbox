@@ -9,3 +9,4 @@ mask.lo
 render.lo
 test.lo
 libobrender.la
+theme.lo

@@ -116,6 +116,8 @@ static void event(ObEvent *e, void *foo)
     if (e->type == Event_X_KeyRelease)
         return;
 
+    g_assert(e->type == Event_X_KeyPress);
+
     if (e->data.x.e->xkey.keycode == reset_key &&
         e->data.x.e->xkey.state == reset_state) {
         reset_chains();

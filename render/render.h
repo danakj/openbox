@@ -6,7 +6,7 @@
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 #include "color.h"
-#include "../kernel/geom.h"
+#include "kernel/geom.h"
 
 typedef enum {
     Surface_Planar,

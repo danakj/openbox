@@ -2,12 +2,11 @@
 #include "focus.h"
 #include "stacking.h"
 #include "frame.h"
+#include "framerender.h"
 #include "screen.h"
 #include "action.h"
 #include "dispatch.h"
 #include "openbox.h"
-#include "engine.h"
-#include "render/render.h"
 
 #include <glib.h>
 
@@ -649,10 +648,10 @@ static void popup_coords(char *format, int a, int b, gboolean hide)
         char *text;
 
         text = g_strdup_printf(format, a, b);
-        engine_size_label(text, TRUE, TRUE, &s);
+        framerender_size_popup_label(text, &s);
         XMoveResizeWindow(ob_display, coords,
                           10, 10, s.width, s.height);
-        engine_render_label(coords, &s, text, TRUE, TRUE);
+        framerender_popup_label(coords, &s, text);
         g_free(text);
 
         XMapWindow(ob_display, coords);
@@ -733,12 +732,12 @@ static void popup_cycle(Client *c, gboolean hide)
 
         a = screen_area(c->desktop);
 
-        engine_size_label(c->title, TRUE, TRUE, &s);
+        framerender_size_popup_label(c->title, &s);
         XMoveResizeWindow(ob_display, coords,
                           a->x + (a->width - s.width) / 2,
                           a->y + (a->height - s.height) / 2,
                           s.width, s.height);
-        engine_render_label(coords, &s, c->title, TRUE, TRUE);
+        framerender_popup_label(coords, &s, c->title);
 
         XMapWindow(ob_display, coords);
     }

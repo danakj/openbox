@@ -5,12 +5,11 @@
 #include "config.h"
 #include "screen.h"
 #include "frame.h"
-#include "engine.h"
+#include "framerender.h"
 #include "focus.h"
 #include "stacking.h"
 #include "extensions.h"
 #include "timer.h"
-#include "engine.h"
 #include "dispatch.h"
 
 #include <X11/Xlib.h>
@@ -368,6 +367,34 @@ static void event_handle_client(Client *client, XEvent *e)
     int i=0;
      
     switch (e->type) {
+    case ButtonPress:
+    case ButtonRelease:
+        switch (frame_context(client->frame, e->xbutton.window)) {
+        case Context_Maximize:
+            client->frame->max_press = (e->type == ButtonPress);
+            framerender_frame(client->frame);
+            break;
+        case Context_Close:
+            client->frame->close_press = (e->type == ButtonPress);
+            framerender_frame(client->frame);
+            break;
+        case Context_Iconify:
+            client->frame->iconify_press = (e->type == ButtonPress);
+            framerender_frame(client->frame);
+            break;
+        case Context_AllDesktops:
+            client->frame->desk_press = (e->type == ButtonPress);
+            framerender_frame(client->frame);
+            break; 
+        case Context_Shade:
+            client->frame->shade_press = (e->type == ButtonPress);
+            framerender_frame(client->frame);
+            break;
+        default:
+            /* nothing changes with clicks for any other contexts */
+            break;
+        }
+        break;
     case FocusIn:
         focus_set_client(client);
     case FocusOut:
@@ -377,7 +404,7 @@ static void event_handle_client(Client *client, XEvent *e)
 #endif
         /* focus state can affect the stacking layer */
         client_calc_layer(client);
-        engine_frame_adjust_focus(client->frame);
+        frame_adjust_focus(client->frame);
 	break;
     case EnterNotify:
         if (client_normal(client)) {
@@ -639,7 +666,7 @@ static void event_handle_client(Client *client, XEvent *e)
 #ifdef SHAPE
         if (extensions_shape && e->type == extensions_shape_event_basep) {
             client->shaped = ((XShapeEvent*)e)->shaped;
-            engine_frame_adjust_shape(client->frame);
+            frame_adjust_shape(client->frame);
         }
 #endif
     }

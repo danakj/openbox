@@ -84,9 +84,7 @@ static gboolean get_all(Window win, Atom prop, Atom type, int size,
 			     &ret_items, &bytes_left, &xdata);
     if (res == Success) {
 	if (ret_size == size && ret_items > 0) {
-	    *data = g_malloc(ret_items * (size / 8) + sizeof(guchar*));
-            g_memmove(*data, xdata, ret_items * (size / 8));
-            data[ret_items * (size / 8)] = NULL;
+	    *data = g_memdup(xdata, ret_items * (size / 8));
 	    *num = ret_items;
 	    ret = TRUE;
 	}

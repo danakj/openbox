@@ -4,7 +4,7 @@
 #  include <stdlib.h>
 #endif
 
-int yylineno = 1;
+extern int lineno;
 %}
 
 real [-0-9][0-9]*\.[0-9]+
@@ -15,9 +15,9 @@ bool ([tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[yY][eE][sS]|[nN][oO]|[oO][nN]|[oO][
 
 %%
 
-^[ \t]*#.*\n /* comment */ { ++yylineno; }
+^[ \t]*#.*\n /* comment */ { ++lineno; }
 ^[ \t]*#.*   /* comment */
-^[ \t]*\n    /* empty lines */ { ++yylineno; }
+^[ \t]*\n    /* empty lines */ { ++lineno; }
 [ \t]        /* whitespace */
 {real}       { yylval.real = atof(yytext); return REAL; }
 {integer}    { yylval.integer = atoi(yytext); return INTEGER; }

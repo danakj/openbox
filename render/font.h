@@ -2,7 +2,7 @@
 #define __font_h
 #include <X11/Xft/Xft.h>
 #include "render.h"
-#include "../kernel/geom.h"
+#include "kernel/geom.h"
 
 void font_startup(void);
 ObFont *font_open(char *fontstring);

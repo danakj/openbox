@@ -5,36 +5,34 @@
 
 #include <string.h>
 
-void cwmcc_root_get_supported(Window win, Atom **atoms)
+void cwmcc_root_get_supported(Window win, Atom **atoms, gulong *num)
 {
-    gulong num;
-
     if (!cwmcc_prop_get_array32(win, CWMCC_ATOM(root, net_supported),
-                                CWMCC_ATOM(type, atom), atoms, &num)) {
+                                CWMCC_ATOM(type, atom), atoms, num)) {
         g_warning("Failed to read NET_SUPPORTED from 0x%lx", win);
         *atoms = NULL;
+        *num = 0;
     }
 }
 
-void cwmcc_root_get_client_list(Window win, Window **windows)
+void cwmcc_root_get_client_list(Window win, Window **windows, gulong *num)
 {
-    gulong num;
-
     if (!cwmcc_prop_get_array32(win, CWMCC_ATOM(root, net_client_list),
-                                CWMCC_ATOM(type, window), windows, &num)) {
+                                CWMCC_ATOM(type, window), windows, num)) {
         g_warning("Failed to read NET_CLIENT_LIST from 0x%lx", win);
         *windows = NULL;
+        *num = 0;
     }
 }
 
-void cwmcc_root_get_client_list_stacking(Window win, Window **windows)
+void cwmcc_root_get_client_list_stacking(Window win, Window **windows,
+                                         gulong *num)
 {
-    gulong num;
-
     if (!cwmcc_prop_get_array32(win,CWMCC_ATOM(root, net_client_list_stacking),
-                                CWMCC_ATOM(type, window), windows, &num)) {
+                                CWMCC_ATOM(type, window), windows, num)) {
         g_warning("Failed to read NET_CLIENT_LIST_STACKING from 0x%lx", win);
         *windows = NULL;
+        *num = 0;
     }
 }
 

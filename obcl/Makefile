@@ -1,4 +1,4 @@
 all clean distclean install uninstall:
-	$(MAKE) -$(MAKEFLAGS) -C ../.. $@
+	$(MAKE) -$(MAKEFLAGS) -C .. $@
 
 .PHONY: all clean distclean install uninstall

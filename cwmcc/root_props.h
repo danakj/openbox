@@ -4,11 +4,12 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-void cwmcc_root_get_supported(Window win, Atom **atoms);
+void cwmcc_root_get_supported(Window win, Atom **atoms, gulong *num);
 
-void cwmcc_root_get_client_list(Window win, Window **windows);
+void cwmcc_root_get_client_list(Window win, Window **windows, gulong *num);
 
-void cwmcc_root_get_client_list_stacking(Window win, Window **windows);
+void cwmcc_root_get_client_list_stacking(Window win, Window **windows,
+                                         gulong *num);
 
 void cwmcc_root_get_number_of_desktops(Window win, gulong *desktops);
 

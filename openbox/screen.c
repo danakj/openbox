@@ -4,7 +4,6 @@
 #include "screen.h"
 #include "client.h"
 #include "frame.h"
-#include "engine.h"
 #include "focus.h"
 #include "dispatch.h"
 #include "../render/render.h"
@@ -287,14 +286,14 @@ void screen_set_desktop(guint num)
     for (it = stacking_list; it != NULL; it = it->next) {
         Client *c = it->data;
 	if (!c->frame->visible && client_should_show(c))
-            engine_frame_show(c->frame);
+            frame_show(c->frame);
     }
 
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
         Client *c = it->data;
 	if (c->frame->visible && !client_should_show(c))
-            engine_frame_hide(c->frame);
+            frame_hide(c->frame);
     }
 
     /* focus the last focused window on the desktop, and ignore enter events
@@ -396,14 +395,14 @@ void screen_show_desktop(gboolean show)
 	for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
 	    Client *client = it->data;
 	    if (client->frame->visible && !client_should_show(client))
-                engine_frame_hide(client->frame);
+                frame_hide(client->frame);
 	}
     } else {
         /* top to bottom */
 	for (it = stacking_list; it != NULL; it = it->next) {
 	    Client *client = it->data;
 	    if (!client->frame->visible && client_should_show(client))
-                engine_frame_show(client->frame);
+                frame_show(client->frame);
 	}
     }
 

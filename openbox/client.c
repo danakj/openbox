@@ -3,7 +3,6 @@
 #include "prop.h"
 #include "extensions.h"
 #include "frame.h"
-#include "engine.h"
 #include "event.h"
 #include "grab.h"
 #include "focus.h"
@@ -206,9 +205,9 @@ void client_manage(Window window)
     XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
-    self->frame = engine_frame_new();
+    self->frame = frame_new();
 
-    engine_frame_grab_client(self->frame, self);
+    frame_grab_client(self->frame, self);
 
     client_apply_startup_state(self);
 
@@ -290,7 +289,7 @@ void client_unmanage(Client *self)
     /* we dont want events no more */
     XSelectInput(ob_display, self->window, NoEventMask);
 
-    engine_frame_hide(self->frame);
+    frame_hide(self->frame);
 
     client_list = g_list_remove(client_list, self);
     stacking_list = g_list_remove(stacking_list, self);
@@ -347,7 +346,7 @@ void client_unmanage(Client *self)
     client_toggle_border(self, TRUE);
 
     /* reparent the window out of the frame, and free the frame */
-    engine_frame_release_client(self->frame, self);
+    frame_release_client(self->frame, self);
     self->frame = NULL;
      
     if (ob_state != State_Exiting) {
@@ -933,7 +932,7 @@ void client_setup_decor_and_functions(Client *self)
     if (self->frame) {
 	/* change the decors on the frame, and with more/less decorations,
            we may also need to be repositioned */
-	engine_frame_adjust_area(self->frame, TRUE, TRUE);
+	frame_adjust_area(self->frame, TRUE, TRUE);
 	/* with new decor, the window's maximized size may change */
 	client_remaximize(self);
     }
@@ -1051,7 +1050,7 @@ void client_update_wmhints(Client *self)
 		    self->pixmap_icon_mask = None;
 
 		if (self->frame)
-		    engine_frame_adjust_icon(self->frame);
+		    frame_adjust_icon(self->frame);
 	    }
 	}
 
@@ -1100,7 +1099,7 @@ void client_update_title(Client *self)
     self->title = data;
 
     if (self->frame)
-	engine_frame_adjust_title(self->frame);
+	frame_adjust_title(self->frame);
 }
 
 void client_update_icon_title(Client *self)
@@ -1224,7 +1223,7 @@ void client_update_icons(Client *self)
     }
 
     if (self->frame)
-	engine_frame_adjust_icon(self->frame);
+	frame_adjust_icon(self->frame);
 }
 
 void client_update_kwm_icon(Client *self)
@@ -1239,7 +1238,7 @@ void client_update_kwm_icon(Client *self)
 	self->pixmap_icon = self->pixmap_icon_mask = None;
     }
     if (self->frame)
-	engine_frame_adjust_icon(self->frame);
+	frame_adjust_icon(self->frame);
 }
 
 static void client_change_state(Client *self)
@@ -1278,7 +1277,7 @@ static void client_change_state(Client *self)
     client_calc_layer(self);
 
     if (self->frame)
-	engine_frame_adjust_state(self->frame);
+	frame_adjust_state(self->frame);
 }
 
 static Client *search_focus_tree(Client *node, Client *skip)
@@ -1349,9 +1348,9 @@ static void client_showhide(Client *self)
 {
 
     if (client_should_show(self))
-        engine_frame_show(self->frame);
+        frame_show(self->frame);
     else
-        engine_frame_hide(self->frame);
+        frame_hide(self->frame);
 }
 
 gboolean client_normal(Client *self) {
@@ -1524,7 +1523,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
     /* move/resize the frame to match the request */
     if (self->frame) {
         if (moved || resized)
-            engine_frame_adjust_area(self->frame, moved, resized);
+            frame_adjust_area(self->frame, moved, resized);
 
         if (!user || final) {
             XEvent event;
@@ -1790,7 +1789,7 @@ void client_shade(Client *self, gboolean shade)
     self->shaded = shade;
     client_change_state(self);
     /* resize the frame to just the titlebar */
-    engine_frame_adjust_area(self->frame, FALSE, FALSE);
+    frame_adjust_area(self->frame, FALSE, FALSE);
 }
 
 void client_close(Client *self)
@@ -1839,7 +1838,7 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     self->desktop = target;
     PROP_SET32(self->window, net_wm_desktop, cardinal, target);
     /* the frame can display the current desktop state */
-    engine_frame_adjust_state(self->frame);
+    frame_adjust_state(self->frame);
     /* 'move' the window to the new desktop */
     if (!donthide)
         client_showhide(self);

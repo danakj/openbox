@@ -1,6 +1,6 @@
 include build/Makefile.incl
 
-targets = render cwmcc obcl kernel plugins engines themes data
+targets = render cwmcc obcl kernel plugins themes data
 
 all: libtool
 	@for i in $(targets); do \

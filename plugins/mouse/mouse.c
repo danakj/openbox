@@ -3,9 +3,7 @@
 #include "kernel/action.h"
 #include "kernel/event.h"
 #include "kernel/client.h"
-#include "kernel/frame.h"
 #include "kernel/grab.h"
-#include "kernel/engine.h"
 #include "kernel/parse.h"
 #include "kernel/frame.h"
 #include "translate.h"
@@ -242,8 +240,8 @@ static void event(ObEvent *e, void *foo)
             button = e->data.x.e->xbutton.button;
             state = e->data.x.e->xbutton.state;
         }
-        context = engine_get_context(e->data.x.client,
-                                     e->data.x.e->xbutton.window);
+        context = frame_context(e->data.x.client->frame,
+                                e->data.x.e->xbutton.window);
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
@@ -257,8 +255,8 @@ static void event(ObEvent *e, void *foo)
             break;
 
     case Event_X_ButtonRelease:
-        context = engine_get_context(e->data.x.client,
-                                     e->data.x.e->xbutton.window);
+        context = frame_context(e->data.x.client->frame,
+                                e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
             if (drag_used) {
@@ -316,8 +314,8 @@ static void event(ObEvent *e, void *foo)
                 (ABS(dx) >= threshold || ABS(dy) >= threshold))
                 drag = TRUE;
             if (drag) {
-                context = engine_get_context(e->data.x.client,
-                                             e->data.x.e->xbutton.window);
+                context = frame_context(e->data.x.client->frame,
+                                        e->data.x.e->xbutton.window);
                 drag_used = fire_motion(MouseAction_Motion, context,
                                         e->data.x.client,
                                         state, button, cx, cy, cw, ch, dx, dy,

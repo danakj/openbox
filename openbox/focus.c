@@ -9,7 +9,6 @@
 #include "dispatch.h"
 #include "focus.h"
 #include "parse.h"
-#include "engine.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>

@@ -23,7 +23,7 @@ extern int yylex();
 extern int yyparse();
 void yyerror(char *err);
 
-extern int yylineno;
+extern int lineno;
 extern FILE *yyin;
 
 static char *path;
@@ -56,14 +56,14 @@ void parse_set_section(char *section);
 
 sections:
   | sections '[' IDENTIFIER ']' { parse_set_section($3); } '\n'
-    { ++yylineno; } lines
+    { ++lineno; } lines
   ;
 
 lines:
   | lines tokens { t.type='\n'; t.data.character='\n'; parse_token(&t); } '\n'
-    { ++yylineno; }
+    { ++lineno; }
   | lines IDENTIFIER '=' listtoken { parse_assign($2, &t); } '\n'
-    { ++yylineno; }
+    { ++lineno; }
   ;
 
 tokens:
@@ -115,8 +115,10 @@ listtoken:
 
 %%
 
+int lineno;
+
 void yyerror(char *err) {
-    g_message("%s:%d: %s", path, yylineno, err);
+    g_message("%s:%d: %s", path, lineno, err);
 }
 
 void parse_rc()
@@ -134,7 +136,7 @@ void parse_rc()
         }
     }
 
-    yylineno = 1;
+    lineno = 1;
 
     yyparse();
 

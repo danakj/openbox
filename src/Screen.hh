@@ -154,7 +154,7 @@ private:
 
     unsigned int workspaces;
     int toolbar_placement, toolbar_width_percent, placement_policy,
-      edge_snap_threshold, row_direction, col_direction;
+      edge_snap_threshold, row_direction, col_direction, root_scroll;
 
     unsigned int handle_width, bevel_width, frame_width, border_width,
       resize_zones;
@@ -196,6 +196,7 @@ public:
          WindowShade, WindowIconify, WindowMaximize, WindowClose, WindowRaise,
          WindowLower, WindowStick, WindowKill, SetStyle };
   enum FocusModel { SloppyFocus, ClickToFocus };
+  enum RootScrollDirection { NoScroll, NormalScroll, ReverseScroll };
 
   BScreen(Blackbox *bb, unsigned int scrn);
   ~BScreen(void);
@@ -221,6 +222,7 @@ public:
   inline bool allowScrollLock(void) const { return resource.allow_scroll_lock; }
   inline bool doWorkspaceWarping(void) const
     { return resource.workspace_warping; }
+  inline int rootScrollDirection(void) const { return resource.root_scroll; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
@@ -294,6 +296,7 @@ public:
   void savePlaceIgnoreMaximized(bool i);
   void saveAllowScrollLock(bool a);
   void saveWorkspaceWarping(bool w);
+  void saveRootScrollDirection(int d);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

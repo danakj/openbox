@@ -544,6 +544,18 @@ void BScreen::saveWorkspaceWarping(bool w) {
 }
 
 
+void BScreen::saveRootScrollDirection(int d) {
+  resource.root_scroll = d;
+  const char *dir;
+  switch (resource.root_scroll) {
+  case NoScroll: dir = "None"; break;
+  case ReverseScroll: dir = "Reverse"; break;
+  case NormalScroll: default: dir = "Normal"; break;
+  }
+  config->setValue(screenstr + "rootScrollDirection", dir);
+}
+
+
 void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
@@ -572,6 +584,7 @@ void BScreen::save_rc(void) {
   savePlaceIgnoreMaximized(resource.ignore_maximized);
   saveAllowScrollLock(resource.allow_scroll_lock);
   saveWorkspaceWarping(resource.workspace_warping);
+  saveRootScrollDirection(resource.root_scroll);
 
   toolbar->save_rc();
   slit->save_rc();
@@ -707,13 +720,21 @@ void BScreen::load_rc(void) {
                          resource.ignore_maximized))
     resource.ignore_maximized = true;
 
-if (! config->getValue(screenstr + "disableBindingsWithScrollLock",
+  if (! config->getValue(screenstr + "disableBindingsWithScrollLock",
                        resource.allow_scroll_lock))
-  resource.allow_scroll_lock = false;
+    resource.allow_scroll_lock = false;
 
   if (! config->getValue(screenstr + "workspaceWarping",
                          resource.workspace_warping))
     resource.workspace_warping = false;
+
+  resource.root_scroll = NormalScroll;
+  if (config->getValue(screenstr + "rootScrollDirection", s)) {
+    if (s == "None")
+      resource.root_scroll = NoScroll;
+    else if (s == "Reverse")
+      resource.root_scroll = ReverseScroll;
+  }
 }
 
 
@@ -2242,13 +2263,15 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
       rootmenu->show();
     }
   // mouse wheel up
-  } else if (xbutton->button == 4) {
+  } else if ((xbutton->button == 4 && resource.root_scroll == NormalScroll) ||
+             (xbutton->button == 5 && resource.root_scroll == ReverseScroll)) {
     if (getCurrentWorkspaceID() >= getWorkspaceCount() - 1)
       changeWorkspaceID(0);
     else
       changeWorkspaceID(getCurrentWorkspaceID() + 1);
   // mouse wheel down
-  } else if (xbutton->button == 5) {
+  } else if ((xbutton->button == 5 && resource.root_scroll == NormalScroll) ||
+             (xbutton->button == 4 && resource.root_scroll == ReverseScroll)) {
     if (getCurrentWorkspaceID() == 0)
       changeWorkspaceID(getWorkspaceCount() - 1);
     else

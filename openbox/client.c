@@ -1094,70 +1094,70 @@ void client_setup_decor_and_functions(ObClient *self)
          OB_CLIENT_FUNC_MAXIMIZE |
          OB_CLIENT_FUNC_SHADE);
     if (self->delete_window) {
-	self->functions |= OB_CLIENT_FUNC_CLOSE;
+        self->functions |= OB_CLIENT_FUNC_CLOSE;
         self->decorations |= OB_FRAME_DECOR_CLOSE;
     }
 
     if (!(self->min_size.width < self->max_size.width ||
-	  self->min_size.height < self->max_size.height))
-	self->functions &= ~OB_CLIENT_FUNC_RESIZE;
+          self->min_size.height < self->max_size.height))
+        self->functions &= ~OB_CLIENT_FUNC_RESIZE;
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
-	/* normal windows retain all of the possible decorations and
-	   functionality, and are the only windows that you can fullscreen */
-	self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
-	break;
+        /* normal windows retain all of the possible decorations and
+           functionality, and are the only windows that you can fullscreen */
+        self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
+        break;
 
     case OB_CLIENT_TYPE_DIALOG:
     case OB_CLIENT_TYPE_UTILITY:
-	/* these windows cannot be maximized */
-	self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
-	break;
+        /* these windows cannot be maximized */
+        self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+        break;
 
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
-	/* these windows get less functionality */
-	self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
-	break;
+        /* these windows get less functionality */
+        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
+        break;
 
     case OB_CLIENT_TYPE_DESKTOP:
     case OB_CLIENT_TYPE_DOCK:
     case OB_CLIENT_TYPE_SPLASH:
-	/* none of these windows are manipulated by the window manager */
-	self->decorations = 0;
-	self->functions = 0;
-	break;
+        /* none of these windows are manipulated by the window manager */
+        self->decorations = 0;
+        self->functions = 0;
+        break;
     }
 
     /* Mwm Hints are applied subtractively to what has already been chosen for
        decor and functionality */
     if (self->mwmhints.flags & OB_MWM_FLAG_DECORATIONS) {
-	if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
-	    if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE) ||
+        if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
+            if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE) ||
                    (self->mwmhints.decorations & OB_MWM_DECOR_TITLE)))
                 /* if the mwm hints request no handle or title, then all
                    decorations are disabled */
-		self->decorations = 0;
-	}
+                self->decorations = 0;
+        }
     }
 
     if (self->mwmhints.flags & OB_MWM_FLAG_FUNCTIONS) {
 	if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
-		self->functions &= ~OB_CLIENT_FUNC_RESIZE;
+            self->functions &= ~OB_CLIENT_FUNC_RESIZE;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
-		self->functions &= ~OB_CLIENT_FUNC_MOVE;
+            self->functions &= ~OB_CLIENT_FUNC_MOVE;
             /* dont let mwm hints kill any buttons
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
-		self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
+            self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
-		self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+            self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
             */
 	    /* dont let mwm hints kill the close button
-	       if (! (self->mwmhints.functions & MwmFunc_Close))
-	       self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
-	}
+	        if (! (self->mwmhints.functions & MwmFunc_Close))
+                self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
+	    }
     }
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE))

@@ -78,7 +78,7 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
             out->pixel = xcol.pixel;
             out->key = key;
             out->refcount = 1;
-            g_hash_table_replace(RrColorHash(inst), &out->key, out);
+            g_hash_table_insert(RrColorHash(inst), &out->key, out);
         }
     }
     return out;
@@ -88,6 +88,7 @@ void RrColorFree(RrColor *c)
 {
     if (c) {
         if (--c->refcount < 1) {
+            g_assert(g_hash_table_lookup(RrColorHash(c->inst), &c->key));
             g_hash_table_remove(RrColorHash(c->inst), &c->key);
             if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
                                       &c->pixel, 1, 0);

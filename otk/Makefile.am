@@ -12,7 +12,7 @@ CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 lib_LTLIBRARIES=libotk.la
 
 libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
-                  renderstyle.cc rendercolor.cc  \
+                  renderstyle.cc rendercolor.cc pseudorendercontrol.cc \
                   display.cc font.cc \
                   property.cc rect.cc screeninfo.cc \
                   timer.cc \

@@ -6,6 +6,7 @@
 
 #include "rendercontrol.hh"
 #include "truerendercontrol.hh"
+#include "pseudorendercontrol.hh"
 #include "rendertexture.hh"
 #include "rendercolor.hh"
 #include "display.hh"
@@ -34,7 +35,7 @@ RenderControl *RenderControl::getRenderControl(int screen)
     return new TrueRenderControl(screen);
   case PseudoColor:
   case StaticColor:
-//    return new PseudoRenderControl(screen);
+    return new PseudoRenderControl(screen);
   case GrayScale:
   case StaticGray:
 //    return new GrayRenderControl(screen);

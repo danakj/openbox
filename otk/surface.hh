@@ -4,6 +4,7 @@
 
 #include "point.hh"
 #include "truerendercontrol.hh"
+#include "pseudorendercontrol.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -45,6 +46,7 @@ public:
   // to it. Noone else needs them tho, so they are private.
   friend class RenderControl;
   friend class TrueRenderControl;
+  friend class PseudoRenderControl;
 };
 
 }

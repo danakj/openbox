@@ -1,0 +1,100 @@
+<openbox_theme>
+
+<about>
+  <author>Ben Jansens</author>
+  <date>Thu Jul 10 2003</date>
+  <description> \m/ Test Theme \m/ </description>
+</about>
+
+<text id="vroom">
+  <opacity>80%</opacity>
+  <font>arial:pixelsize=10</font>
+  <shadow>
+    <offset>2</offset>
+    <opacity>50%</opacity>
+    <color>#000000</color>
+  </shadow>
+  <color>#45ea32</color>
+</text>
+
+<button_style id="fun">
+  <opacity>80%</opacity>
+  <shadow>
+    <offset>2</offset>
+    <opacity>80%</opacity>
+    <color>#000000</color>
+  </shadow>
+  <color>#45ea32</color>
+</button>
+
+<surface_style id="blah-flat">
+  <background style="solid">
+    <color>#eeffaa</color>
+  </background>
+  <border>
+    <color>#45ea32</color>
+  </border>
+</texture>
+
+<surface_style id="blah-sunken">
+  <background style="vertical">
+    <color>#eeffaa</color>
+    <color>#aa9536</color>
+  </background>
+  <bevel relief="sunken" style="inner" />
+  <interlaced />
+</texture>
+
+<button_layout id="funlayout">
+  <enabled>
+    <pressed>
+      <focus style="fun" />
+      <unfocus style="fun" />
+    </pressed>
+    <unpressed>
+      <focus style="fun" />
+      <unfocus style="fun" />
+    </unpressed>
+  </enabled>
+  <disabled>
+    <pressed>
+      <focus style="fun" />
+      <unfocus style="fun" />
+    </pressed>
+    <unpressed>
+      <focus style="fun" />
+      <unfocus style="fun" />
+    </unpressed>
+  </disabled>
+</button>
+
+<surface_layout id="titlelayout">
+  <focus   style="blah-flat"   text="vroom" />
+  <unfocus style="blah-sunken" text="vroom" />
+</surface>
+
+<menu_layout id="titlelayout">
+  <focus   style="blah-flat"   text="vroom" />
+  <unfocus style="blah-sunken" text="vroom" />
+</surface>
+
+<window>
+  <button id="close"    layout="funlayout" />
+  <button id="stick"    layout="funlayout" />
+  <button id="iconify"  layout="funlayout" />
+  <button id="maximize" layout="funlayout" />
+  <button id="icon"     layout="funlayout" />
+  <button id="shade"    layout="funlayout" />
+
+  <surface id="title"  layout="titlelayout" />
+  <surface id="handle" layout="titlelayout" />
+</window>
+
+<menu>
+  <surface id="title"    style="blah-sunken" text="vroom" />
+  <surface id="item"     style="blah-flat"   text="vroom" />
+  <surface id="selected" style="blah-sunken" text="vroom" />
+  <surface id="disabled" style="blaf-flat"   text="vroom" />
+</menu>
+
+</openbox_theme>

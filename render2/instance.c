@@ -109,12 +109,14 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         inst->surface_map = g_hash_table_new(g_int_hash, g_int_equal);
 
         assert(inst->glx_context);
+        glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(-1, RrScreenWidth(inst), -1, RrScreenHeight(inst), 0, 10);
+        glOrtho(-0.1, RrScreenWidth(inst) - 1.1,
+                -0.1, RrScreenHeight(inst) - 1.1, 0, 10);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();

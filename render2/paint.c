@@ -84,15 +84,15 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);
 
-    glViewport(0, 0, RrScreenWidth(inst), RrScreenHeight(inst));
+    glViewport(0, 0, RrScreenWidth(inst)-1, RrScreenHeight(inst)-1);
 /*
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(RrSurfaceX(sur), RrSurfaceX(sur) + RrSurfaceWidth(sur),
-            RrSurfaceY(sur), RrSurfaceY(sur) + RrSurfaceHeight(sur),
+    glOrtho(RrSurfaceX(sur), RrSurfaceX(sur) + RrSurfaceWidth(sur)-1,
+            RrSurfaceY(sur), RrSurfaceY(sur) + RrSurfaceHeight(sur)-1,
             0, 10);
     glMatrixMode(GL_MODELVIEW);
-    glViewport(0, 0, RrSurfaceWidth(sur), RrSurfaceHeight(sur));
+    glViewport(0, 0, RrSurfaceWidth(sur)-1, RrSurfaceHeight(sur)-1);
 */
     glPushMatrix();
     glTranslatef(-RrSurfaceX(sur), -RrSurfaceY(sur), 0);

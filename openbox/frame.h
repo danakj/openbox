@@ -76,11 +76,6 @@ typedef struct Frame {
     int framedecors;
     struct FrameDecor *framedecor;
 
-    int width;         /* width of client + borders */
-    int height;         /* height of client + borders */
-    int bwidth;        /* border width */
-    int cbwidth;       /* client border width */
-
     gboolean max_press;
     gboolean close_press;
     gboolean desk_press;

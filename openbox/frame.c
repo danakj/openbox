@@ -9,11 +9,6 @@
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 
-/* XXX temp */
-static int theme_bwidth = 3;
-static int theme_cbwidth = 3;
-static int theme_title_height = 8;
-
 void frame_startup()
 {
 }
@@ -553,34 +548,24 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                 break;
             }
         }
-printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
+g_print("frame extends by %d, %d, %d, %d\n", le, te, le, be);
     if (resized) {
+        /*
         if (self->client->decorations & Decor_Border) {
             self->bwidth = theme_bwidth;
             self->cbwidth = theme_cbwidth;
         } else {
             self->bwidth = self->cbwidth = 0;
         }
-        STRUT_SET(self->size, self->cbwidth + le, 
-                  self->cbwidth + te, self->cbwidth + re, self->cbwidth + be);
-
-        self->width = self->client->area.width + self->cbwidth * 2 + re + le;
-        g_assert(self->width > 0);
-    }
-    if (resized) {
-        STRUT_SET(self->size,
-                  self->cbwidth + le,
-                  self->cbwidth + te,
-                  self->cbwidth + re,
-                  self->cbwidth + be);
-
+        */
+        STRUT_SET(self->size, le, te, re, be);
     }
 
     if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
-                          self->size.left - self->cbwidth,
-                          self->size.top - self->cbwidth,
+                          self->size.left,
+                          self->size.top,
                           self->client->area.width,
                           self->client->area.height);
 
@@ -592,7 +577,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
     RECT_SET_SIZE(self->area,
 		  self->client->area.width +
 		  self->size.left + self->size.right,
-		  (self->client->shaded ? theme_title_height + self->bwidth*2:
+		  (self->client->shaded ? self->size.top : 
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
@@ -681,7 +666,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     break;
 
                     case Decor_Bottom:
-                    x = cr->width/2 + self->size.left - area.x
+)                    x = cr->width/2 + self->size.left - area.x
                       - area.width/2;
                     y = self->size.top + cr->height
                       + area.y;
@@ -706,8 +691,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
        shading can change without being moved or resized */
     RrSurfaceSetArea(self->surface,
                       self->area.x, self->area.y,
-                      self->width,
-                      self->area.height - self->bwidth * 2);
+                      self->area.width,
+                      self->area.height);
 
     if (resized) {
         framerender_frame(self);

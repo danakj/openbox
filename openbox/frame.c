@@ -9,8 +9,12 @@
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 
+static struct RrFont *foont;
+
 void frame_startup()
 {
+    foont = RrFontOpen(ob_render_inst, "arial-18:bold");
+    g_assert(foont != NULL);
 }
 
 void frame_shutdown()
@@ -34,9 +38,12 @@ Frame *frame_new()
     unsigned long mask;
     Frame *self;
     FrameDecor *fd;
+    int i;
+    RrData32 crap[64 * 64];
 
     self = g_new(Frame, 1);
-
+    for (i = 0; i < 64*64; i++)
+        crap[i] = (i%2)*255 + (255 << 8);
     /* create all of the decor windows */
     mask = CWOverrideRedirect | CWEventMask;
     attrib.event_mask = FRAME_EVENTMASK;
@@ -62,10 +69,11 @@ Frame *frame_new()
     fd->obwin.type = Window_Decoration;
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &sec, &pri);
+    RrTextureSetText(fd->surface, 0, foont, RR_LEFT, "OPENBOX SUCKS");
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Top;
-    RECT_SET(fd->area, 0, 0, 50, 20);
+    RECT_SET(fd->area, 0, 0, 100, 20);
     fd->type = Decor_Titlebar;
     fd->context = Context_Titlebar;
     fd->sizetypex = Decor_Relative;
@@ -74,7 +82,7 @@ Frame *frame_new()
 
     fd = &self->framedecor[1];
     fd->obwin.type = Window_Decoration;
-    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 0);
     RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &pri, &sec);
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);

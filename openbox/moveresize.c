@@ -90,7 +90,13 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
 {
     ObCursor cur;
 
-    if (moveresize_in_progress || !c->frame->visible)
+    moving = (cnr == prop_atoms.net_wm_moveresize_move ||
+              cnr == prop_atoms.net_wm_moveresize_move_keyboard);
+
+    if (moveresize_in_progress || !c->frame->visible ||
+        !(moving ?
+          (c->functions & OB_CLIENT_FUNC_MOVE) :
+          (c->functions & OB_CLIENT_FUNC_RESIZE)))
         return;
 
     moveresize_client = c;
@@ -116,15 +122,12 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
                      c->area.width / 2, c->area.height / 2);
     */
 
-    if (corner == prop_atoms.net_wm_moveresize_move ||
-        corner == prop_atoms.net_wm_moveresize_move_keyboard) {
+    if (moving) {
         cur_x = start_cx;
         cur_y = start_cy;
-        moving = TRUE;
     } else {
         cur_x = start_cw;
         cur_y = start_ch;
-        moving = FALSE;
     }
 
     moveresize_in_progress = TRUE;

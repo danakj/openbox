@@ -284,8 +284,6 @@ static gboolean event_ignore(XEvent *e, Client *client)
                   e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
 
-        /* Try process a FocusIn first, and if a legit one isn't found, then
-           do the fallback shiznit. */
         {
             XEvent fe;
             gboolean fallback = TRUE;

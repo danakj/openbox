@@ -29,7 +29,7 @@ CPPFLAGS=@CPPFLAGS@ @DEBUG@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc Configuration.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc blackbox.cc i18n.cc main.cc
+openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Color.cc Configmenu.cc Configuration.cc GCCache.cc Iconmenu.cc Image.cc ImageControl.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Texture.cc Timer.cc Toolbar.cc Util.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc XAtom.cc blackbox.cc i18n.cc main.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

@@ -55,6 +55,7 @@ extern "C" {
 #include "Workspacemenu.hh"
 #include "blackbox.hh"
 class Slit; // forward reference
+class XAtom;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
@@ -119,6 +120,7 @@ private:
   Iconmenu *iconmenu;
   Rootmenu *rootmenu;
   Configuration *config;
+  XAtom *xatom;
 
   typedef std::list<Rootmenu*> RootmenuList;
   RootmenuList rootmenuList;

@@ -108,7 +108,7 @@ using std::string;
 #include "Window.hh"
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
-
+#include "XAtom.hh"
 
 // X event scanner for enter/leave notifies - adapted from twm
 struct scanargs {
@@ -159,7 +159,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
   XrmInitialize();
   load_rc();
 
-  init_icccm();
+  xatom = new XAtom(this);
 
   cursor.session = XCreateFontCursor(getXDisplay(), XC_left_ptr);
   cursor.move = XCreateFontCursor(getXDisplay(), XC_fleur);
@@ -206,6 +206,8 @@ Blackbox::~Blackbox(void) {
 
   std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
                 PointerAssassin());
+
+  delete xatom;
 
   delete timer;
 }
@@ -739,89 +741,6 @@ bool Blackbox::handleSignal(int sig) {
   }
 
   return True;
-}
-
-
-void Blackbox::init_icccm(void) {
-  xa_wm_colormap_windows =
-    XInternAtom(getXDisplay(), "WM_COLORMAP_WINDOWS", False);
-  xa_wm_protocols = XInternAtom(getXDisplay(), "WM_PROTOCOLS", False);
-  xa_wm_state = XInternAtom(getXDisplay(), "WM_STATE", False);
-  xa_wm_change_state = XInternAtom(getXDisplay(), "WM_CHANGE_STATE", False);
-  xa_wm_delete_window = XInternAtom(getXDisplay(), "WM_DELETE_WINDOW", False);
-  xa_wm_take_focus = XInternAtom(getXDisplay(), "WM_TAKE_FOCUS", False);
-  motif_wm_hints = XInternAtom(getXDisplay(), "_MOTIF_WM_HINTS", False);
-
-  blackbox_hints = XInternAtom(getXDisplay(), "_BLACKBOX_HINTS", False);
-  blackbox_attributes =
-    XInternAtom(getXDisplay(), "_BLACKBOX_ATTRIBUTES", False);
-  blackbox_change_attributes =
-    XInternAtom(getXDisplay(), "_BLACKBOX_CHANGE_ATTRIBUTES", False);
-  blackbox_structure_messages =
-    XInternAtom(getXDisplay(), "_BLACKBOX_STRUCTURE_MESSAGES", False);
-  blackbox_notify_startup =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_STARTUP", False);
-  blackbox_notify_window_add =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WINDOW_ADD", False);
-  blackbox_notify_window_del =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WINDOW_DEL", False);
-  blackbox_notify_current_workspace =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_CURRENT_WORKSPACE", False);
-  blackbox_notify_workspace_count =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WORKSPACE_COUNT", False);
-  blackbox_notify_window_focus =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WINDOW_FOCUS", False);
-  blackbox_notify_window_raise =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WINDOW_RAISE", False);
-  blackbox_notify_window_lower =
-    XInternAtom(getXDisplay(), "_BLACKBOX_NOTIFY_WINDOW_LOWER", False);
-  blackbox_change_workspace =
-    XInternAtom(getXDisplay(), "_BLACKBOX_CHANGE_WORKSPACE", False);
-  blackbox_change_window_focus =
-    XInternAtom(getXDisplay(), "_BLACKBOX_CHANGE_WINDOW_FOCUS", False);
-  blackbox_cycle_window_focus =
-    XInternAtom(getXDisplay(), "_BLACKBOX_CYCLE_WINDOW_FOCUS", False);
-
-#ifdef    NEWWMSPEC
-  net_supported = XInternAtom(getXDisplay(), "_NET_SUPPORTED", False);
-  net_client_list = XInternAtom(getXDisplay(), "_NET_CLIENT_LIST", False);
-  net_client_list_stacking =
-    XInternAtom(getXDisplay(), "_NET_CLIENT_LIST_STACKING", False);
-  net_number_of_desktops =
-    XInternAtom(getXDisplay(), "_NET_NUMBER_OF_DESKTOPS", False);
-  net_desktop_geometry =
-    XInternAtom(getXDisplay(), "_NET_DESKTOP_GEOMETRY", False);
-  net_desktop_viewport =
-    XInternAtom(getXDisplay(), "_NET_DESKTOP_VIEWPORT", False);
-  net_current_desktop =
-    XInternAtom(getXDisplay(), "_NET_CURRENT_DESKTOP", False);
-  net_desktop_names = XInternAtom(getXDisplay(), "_NET_DESKTOP_NAMES", False);
-  net_active_window = XInternAtom(getXDisplay(), "_NET_ACTIVE_WINDOW", False);
-  net_workarea = XInternAtom(getXDisplay(), "_NET_WORKAREA", False);
-  net_supporting_wm_check =
-    XInternAtom(getXDisplay(), "_NET_SUPPORTING_WM_CHECK", False);
-  net_virtual_roots = XInternAtom(getXDisplay(), "_NET_VIRTUAL_ROOTS", False);
-  net_close_window = XInternAtom(getXDisplay(), "_NET_CLOSE_WINDOW", False);
-  net_wm_moveresize = XInternAtom(getXDisplay(), "_NET_WM_MOVERESIZE", False);
-  net_properties = XInternAtom(getXDisplay(), "_NET_PROPERTIES", False);
-  net_wm_name = XInternAtom(getXDisplay(), "_NET_WM_NAME", False);
-  net_wm_desktop = XInternAtom(getXDisplay(), "_NET_WM_DESKTOP", False);
-  net_wm_window_type =
-    XInternAtom(getXDisplay(), "_NET_WM_WINDOW_TYPE", False);
-  net_wm_state = XInternAtom(getXDisplay(), "_NET_WM_STATE", False);
-  net_wm_strut = XInternAtom(getXDisplay(), "_NET_WM_STRUT", False);
-  net_wm_icon_geometry =
-    XInternAtom(getXDisplay(), "_NET_WM_ICON_GEOMETRY", False);
-  net_wm_icon = XInternAtom(getXDisplay(), "_NET_WM_ICON", False);
-  net_wm_pid = XInternAtom(getXDisplay(), "_NET_WM_PID", False);
-  net_wm_handled_icons =
-    XInternAtom(getXDisplay(), "_NET_WM_HANDLED_ICONS", False);
-  net_wm_ping = XInternAtom(getXDisplay(), "_NET_WM_PING", False);
-#endif // NEWWMSPEC
-
-#ifdef    HAVE_GETPID
-  blackbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
-#endif // HAVE_GETPID
 }
 
 

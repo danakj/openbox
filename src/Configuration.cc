@@ -25,6 +25,8 @@
 #include "Configuration.hh"
 #include "Util.hh"
 
+#include <algorithm>
+
 #ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H

@@ -21,9 +21,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "../config.h"
 
 extern "C" {
 #include <X11/Xatom.h>
@@ -86,6 +84,7 @@ using std::string;
 #include "Window.hh"
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
+#include "XAtom.hh"
 
 #ifndef   FONT_ELEMENT_SIZE
 #define   FONT_ELEMENT_SIZE 50
@@ -110,6 +109,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   blackbox = bb;
   screenstr = (string)"session.screen" + itostring(scrn) + '.';
   config = blackbox->getConfig();
+  xatom = blackbox->getXAtom();
 
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
     SubstructureRedirectMask | ButtonPressMask | ButtonReleaseMask;
@@ -135,13 +135,10 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
     resource.wstyle.font = (XFontStruct *) 0;
 
+  xatom->setSupported(this);    // set-up netwm support
 #ifdef    HAVE_GETPID
-  pid_t bpid = getpid();
-
-  XChangeProperty(blackbox->getXDisplay(), getRootWindow(),
-                  blackbox->getBlackboxPidAtom(), XA_CARDINAL,
-                  sizeof(pid_t) * 8, PropModeReplace,
-                  (unsigned char *) &bpid, 1);
+  xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::Type_Cardinal,
+                  (unsigned long) getpid());
 #endif // HAVE_GETPID
 
   XDefineCursor(blackbox->getXDisplay(), getRootWindow(),

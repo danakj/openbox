@@ -129,6 +129,14 @@ void RrSurfaceMinSize(struct RrSurface *sur,
                       int *w,
                       int *h);
 
+/*! Shape a surface to its children. This is not done implicitly inside the
+  library at *any* time. You must call this for each surface you want to
+  shape, when you want to update it. This means when you resize the surface
+  or change its base shape, or move/resize any of its children, you will need
+  to call this explicitly. Also, please note that you must call it on the
+  children surfaces first and work your way up to the top level surface for it
+  to function properly.
+*/
 void RrSurfaceShape(struct RrSurface *sur);
 
 /*! Set the base shape for a surface. To clear the base, pass 0 for all

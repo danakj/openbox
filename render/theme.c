@@ -19,12 +19,26 @@ color_rgb *theme_title_focused_color;
 color_rgb *theme_title_unfocused_color;
 color_rgb *theme_titlebut_focused_color;
 color_rgb *theme_titlebut_unfocused_color;
+color_rgb *theme_menu_title_color;
+color_rgb *theme_menu_color;
+color_rgb *theme_menu_disabled_color;
+color_rgb *theme_menu_hilite_color;
 /* style settings - fonts */
 int theme_winfont_height;
 ObFont *theme_winfont;
 gboolean theme_winfont_shadow;
 int theme_winfont_shadow_offset;
 int theme_winfont_shadow_tint;
+int theme_mtitlefont_height;
+ObFont *theme_mtitlefont;
+gboolean theme_mtitlefont_shadow;
+int theme_mtitlefont_shadow_offset;
+int theme_mtitlefont_shadow_tint;
+int theme_mfont_height;
+ObFont *theme_mfont;
+gboolean theme_mfont_shadow;
+int theme_mfont_shadow_offset;
+int theme_mfont_shadow_tint;
 /* style settings - title layout */
 char *theme_title_layout;
 /* style settings - masks */
@@ -73,6 +87,11 @@ Appearance *theme_a_unfocused_label;
 Appearance *theme_a_icon; /* always parentrelative, so no focused/unfocused */
 Appearance *theme_a_focused_handle;
 Appearance *theme_a_unfocused_handle;
+Appearance *theme_a_menu_title;
+Appearance *theme_a_menu;
+Appearance *theme_a_menu_item;
+Appearance *theme_a_menu_disabled;
+Appearance *theme_a_menu_hilite;
 
 Appearance *theme_app_hilite_label;
 Appearance *theme_app_unhilite_label;
@@ -81,8 +100,10 @@ void theme_startup()
 {
     theme_b_color = theme_cb_unfocused_color = theme_cb_focused_color = 
         theme_title_unfocused_color = theme_title_focused_color = 
-        theme_titlebut_unfocused_color = theme_titlebut_focused_color = NULL;
-    theme_winfont = NULL;
+        theme_titlebut_unfocused_color = theme_titlebut_focused_color = 
+        theme_menu_color = theme_menu_title_color = theme_menu_disabled_color =
+        theme_menu_hilite_color = NULL;
+    theme_winfont = theme_mtitlefont = theme_mfont = NULL;
     theme_title_layout = NULL;
     theme_max_set_mask = theme_max_unset_mask = NULL;
     theme_desk_set_mask = theme_desk_unset_mask = NULL;
@@ -124,6 +145,12 @@ void theme_startup()
     theme_a_icon = appearance_new(Surface_Planar, 1);
     theme_a_focused_handle = appearance_new(Surface_Planar, 0);
     theme_a_unfocused_handle = appearance_new(Surface_Planar, 0);
+    theme_a_menu = appearance_new(Surface_Planar, 0);
+    theme_a_menu_title = appearance_new(Surface_Planar, 1);
+    theme_a_menu_item = appearance_new(Surface_Planar, 1);
+    theme_a_menu_disabled = appearance_new(Surface_Planar, 1);
+    theme_a_menu_hilite = appearance_new(Surface_Planar, 1);
+
     theme_app_hilite_label = appearance_new(Surface_Planar, 1);
     theme_app_unhilite_label = appearance_new(Surface_Planar, 1);
 
@@ -138,6 +165,10 @@ void theme_shutdown()
     color_free(theme_title_focused_color);
     color_free(theme_titlebut_unfocused_color);
     color_free(theme_titlebut_focused_color);
+    color_free(theme_menu_color);
+    color_free(theme_menu_title_color);
+    color_free(theme_menu_disabled_color);
+    color_free(theme_menu_hilite_color);
 
     pixmap_mask_free(theme_max_set_mask);
     pixmap_mask_free(theme_max_unset_mask);
@@ -149,6 +180,9 @@ void theme_shutdown()
     pixmap_mask_free(theme_close_mask);
 
     font_close(theme_winfont);
+    font_close(theme_mtitlefont);
+    font_close(theme_mfont);
+
     g_free(theme_title_layout);
 
     appearance_free(theme_a_focused_unpressed_max);
@@ -182,6 +216,11 @@ void theme_shutdown()
     appearance_free(theme_a_icon);
     appearance_free(theme_a_focused_handle);
     appearance_free(theme_a_unfocused_handle);
+    appearance_free(theme_a_menu);
+    appearance_free(theme_a_menu_title);
+    appearance_free(theme_a_menu_item);
+    appearance_free(theme_a_menu_disabled);
+    appearance_free(theme_a_menu_hilite);
     appearance_free(theme_app_hilite_label);
     appearance_free(theme_app_unhilite_label);
 }
@@ -445,9 +484,9 @@ char *theme_load(char *theme)
 {
     XrmDatabase db = NULL;
     char *loaded = NULL;
-    Justify winjust;
+    Justify winjust, mtitlejust, mjust;
     char *str;
-    char *winfont_str;
+    char *font_str;
 
     if (theme) {
 	db = loaddb(theme);
@@ -467,7 +506,7 @@ char *theme_load(char *theme)
     }
 
     /* load the font stuff */
-    winfont_str = "arial-8:bold";
+    font_str = "arial-8:bold";
 
     theme_winfont_shadow = FALSE;
     if (read_string(db, "window.xft.flags", &str)) {
@@ -484,9 +523,9 @@ char *theme_load(char *theme)
         theme_winfont_shadow_tint < 100 || theme_winfont_shadow_tint > 100)
         theme_winfont_shadow_tint = 25;
 
-    theme_winfont = font_open(winfont_str);
+    theme_winfont = font_open(font_str);
     theme_winfont_height = font_height(theme_winfont, theme_winfont_shadow,
-                                      theme_winfont_shadow_offset);
+                                       theme_winfont_shadow_offset);
 
     winjust = Justify_Left;
     if (read_string(db, "window.justify", &str)) {
@@ -494,6 +533,69 @@ char *theme_load(char *theme)
             winjust = Justify_Right;
         else if (!g_ascii_strcasecmp(str, "center"))
             winjust = Justify_Center;
+        g_free(str);
+    }
+
+    font_str = "arial-10:bold";
+
+    theme_mtitlefont_shadow = FALSE;
+    if (read_string(db, "menu.title.xft.flags", &str)) {
+        if (g_strrstr(str, "shadow"))
+            theme_mtitlefont_shadow = TRUE;
+        g_free(str);
+    }
+ 
+    if (!read_int(db, "menu.title.xft.shadow.offset",
+                  &theme_mtitlefont_shadow_offset))
+        theme_mtitlefont_shadow_offset = 1;
+    if (!read_int(db, "menu.title.xft.shadow.tint",
+                  &theme_mtitlefont_shadow_tint) ||
+        theme_mtitlefont_shadow_tint < 100 ||
+        theme_mtitlefont_shadow_tint > 100)
+        theme_mtitlefont_shadow_tint = 25;
+
+    theme_mtitlefont = font_open(font_str);
+    theme_mtitlefont_height = font_height(theme_mtitlefont,
+                                          theme_mtitlefont_shadow,
+                                          theme_mtitlefont_shadow_offset);
+
+    mtitlejust = Justify_Left;
+    if (read_string(db, "menu.title.justify", &str)) {
+        if (!g_ascii_strcasecmp(str, "right"))
+            mtitlejust = Justify_Right;
+        else if (!g_ascii_strcasecmp(str, "center"))
+            mtitlejust = Justify_Center;
+        g_free(str);
+    }
+
+    font_str = "arial-10:bold";
+
+    theme_mfont_shadow = FALSE;
+    if (read_string(db, "menu.frame.xft.flags", &str)) {
+        if (g_strrstr(str, "shadow"))
+            theme_mfont_shadow = TRUE;
+        g_free(str);
+    }
+ 
+    if (!read_int(db, "menu.frame.xft.shadow.offset",
+                  &theme_mfont_shadow_offset))
+        theme_mfont_shadow_offset = 1;
+    if (!read_int(db, "menu.frame.xft.shadow.tint",
+                  &theme_mfont_shadow_tint) ||
+        theme_mfont_shadow_tint < 100 ||
+        theme_mfont_shadow_tint > 100)
+        theme_mfont_shadow_tint = 25;
+
+    theme_mfont = font_open(font_str);
+    theme_mfont_height = font_height(theme_mfont, theme_mfont_shadow,
+                                     theme_mfont_shadow_offset);
+
+    mjust = Justify_Left;
+    if (read_string(db, "menu.frame.justify", &str)) {
+        if (!g_ascii_strcasecmp(str, "right"))
+            mjust = Justify_Right;
+        else if (!g_ascii_strcasecmp(str, "center"))
+            mjust = Justify_Center;
         g_free(str);
     }
 
@@ -510,11 +612,12 @@ char *theme_load(char *theme)
     if (!read_int(db, "frameWidth", &theme_cbwidth) ||
 	theme_cbwidth < 0 || theme_cbwidth > 100) theme_cbwidth = theme_bevel;
 
+    /* load colors */
     if (!read_color(db, "borderColor", &theme_b_color))
 	theme_b_color = color_new(0, 0, 0);
     if (!read_color(db, "window.frame.focusColor", &theme_cb_focused_color))
 	theme_cb_focused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.frame.unfocusColor", &theme_cb_unfocused_color))
+    if (!read_color(db, "window.frame.unfocusColor",&theme_cb_unfocused_color))
 	theme_cb_unfocused_color = color_new(0xff, 0xff, 0xff);
     if (!read_color(db, "window.label.focus.textColor",
                     &theme_title_focused_color))
@@ -528,6 +631,14 @@ char *theme_load(char *theme)
     if (!read_color(db, "window.button.unfocus.picColor",
                     &theme_titlebut_unfocused_color))
 	theme_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
+    if (!read_color(db, "menu.title.textColor", &theme_menu_title_color))
+        theme_menu_title_color = color_new(0, 0, 0);
+    if (!read_color(db, "menu.frame.textColor", &theme_menu_color))
+        theme_menu_color = color_new(0xff, 0xff, 0xff);
+    if (!read_color(db, "menu.frame.disableColor", &theme_menu_disabled_color))
+        theme_menu_disabled_color = color_new(0, 0, 0);
+    if (!read_color(db, "menu.hilite.textColor", &theme_menu_hilite_color))
+        theme_menu_hilite_color = color_new(0, 0, 0);
 
     if (read_mask(db, "window.button.max.mask", theme, &theme_max_unset_mask)){
         if (!read_mask(db, "window.button.max.toggled.mask", theme,
@@ -604,12 +715,18 @@ char *theme_load(char *theme)
 	set_default_appearance(theme_a_unfocused_label);
     if (!read_appearance(db, "window.handle.focus", theme_a_focused_handle))
 	set_default_appearance(theme_a_focused_handle);
-    if (!read_appearance(db, "window.handle.unfocus", theme_a_unfocused_handle))
+    if (!read_appearance(db, "window.handle.unfocus",theme_a_unfocused_handle))
 	set_default_appearance(theme_a_unfocused_handle);
     if (!read_appearance(db, "window.grip.focus", theme_a_focused_grip))
 	set_default_appearance(theme_a_focused_grip);
     if (!read_appearance(db, "window.grip.unfocus", theme_a_unfocused_grip))
 	set_default_appearance(theme_a_unfocused_grip);
+    if (!read_appearance(db, "menu.frame", theme_a_menu))
+	set_default_appearance(theme_a_menu);
+    if (!read_appearance(db, "menu.title", theme_a_menu_title))
+	set_default_appearance(theme_a_menu_title);
+    if (!read_appearance(db, "menu.hilite", theme_a_menu_hilite))
+	set_default_appearance(theme_a_menu_hilite);
 
     /* read the appearances for rendering non-decorations. these cannot be
        parent-relative */
@@ -735,6 +852,45 @@ char *theme_load(char *theme)
     theme_a_unfocused_label->texture[0].data.text.color =
         theme_app_unhilite_label->texture[0].data.text.color =
         theme_title_unfocused_color;
+
+    theme_a_menu_title->texture[0].type = Text;
+    theme_a_menu_title->texture[0].data.text.justify = mtitlejust;
+    theme_a_menu_title->texture[0].data.text.font = theme_mtitlefont;
+    theme_a_menu_title->texture[0].data.text.shadow = theme_mtitlefont_shadow;
+    theme_a_menu_title->texture[0].data.text.offset =
+        theme_mtitlefont_shadow_offset;
+    theme_a_menu_title->texture[0].data.text.tint =
+        theme_mtitlefont_shadow_tint;
+    theme_a_menu_title->texture[0].data.text.color = theme_menu_title_color;
+
+    theme_a_menu_item->surface.data.planar.grad = 
+        theme_a_menu_disabled->surface.data.planar.grad =
+        Background_ParentRelative;
+
+    theme_a_menu_item->texture[0].type =
+        theme_a_menu_disabled->texture[0].type = 
+        theme_a_menu_hilite->texture[0].type = Text;
+    theme_a_menu_item->texture[0].data.text.justify = 
+        theme_a_menu_disabled->texture[0].data.text.justify = 
+        theme_a_menu_hilite->texture[0].data.text.justify = mjust;
+    theme_a_menu_item->texture[0].data.text.font =
+        theme_a_menu_disabled->texture[0].data.text.font =
+        theme_a_menu_hilite->texture[0].data.text.font = theme_mfont;
+    theme_a_menu_item->texture[0].data.text.shadow = 
+        theme_a_menu_disabled->texture[0].data.text.shadow = 
+        theme_a_menu_hilite->texture[0].data.text.shadow = theme_mfont_shadow;
+    theme_a_menu_item->texture[0].data.text.offset =
+        theme_a_menu_disabled->texture[0].data.text.offset = 
+        theme_a_menu_hilite->texture[0].data.text.offset = 
+        theme_mfont_shadow_offset;
+    theme_a_menu_item->texture[0].data.text.tint =
+        theme_a_menu_disabled->texture[0].data.text.tint =
+        theme_a_menu_hilite->texture[0].data.text.tint =
+        theme_mfont_shadow_tint;
+    theme_a_menu_item->texture[0].data.text.color = theme_menu_color;
+    theme_a_menu_disabled->texture[0].data.text.color =
+        theme_menu_disabled_color;
+    theme_a_menu_hilite->texture[0].data.text.color =  theme_menu_hilite_color;
 
     theme_a_focused_unpressed_max->texture[0].type = 
         theme_a_focused_pressed_max->texture[0].type = 

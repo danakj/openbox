@@ -72,6 +72,11 @@ extern Appearance *theme_a_unfocused_label;
 extern Appearance *theme_a_icon;
 extern Appearance *theme_a_focused_handle;
 extern Appearance *theme_a_unfocused_handle;
+extern Appearance *theme_a_menu_title;
+extern Appearance *theme_a_menu;
+extern Appearance *theme_a_menu_item;
+extern Appearance *theme_a_menu_disabled;
+extern Appearance *theme_a_menu_hilite;
 
 extern Appearance *theme_app_hilite_label;
 extern Appearance *theme_app_unhilite_label;

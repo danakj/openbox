@@ -122,7 +122,7 @@ void x_paint(Window win, Appearance *l)
             + sw * l->surface.data.planar.parenty;
         dest = l->surface.data.planar.pixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
-/*            memcpy(dest, source, w * sizeof(pixel32));*/
+            memcpy(dest, source, w * sizeof(pixel32));
         }
     }
     else if (l->surface.data.planar.grad == Background_Solid)

@@ -1,24 +1,21 @@
-#include "focuslabel.hh"
+#include "label.hh"
 
 namespace otk {
 
-OtkFocusLabel::OtkFocusLabel(OtkWidget *parent)
-  : OtkFocusWidget(parent), _text(""), _dirty(false)
+OtkLabel::OtkLabel(OtkWidget *parent)
+  : OtkWidget(parent), _text(""), _dirty(false)
 {
-  setTexture(getStyle()->getLabelFocus());
-  setUnfocusTexture(getStyle()->getLabelUnfocus());
+  setTexture(getStyle()->getLabelUnfocus());
 }
 
-OtkFocusLabel::~OtkFocusLabel()
+OtkLabel::~OtkLabel()
 {
 }
 
-void OtkFocusLabel::update(void)
+void OtkLabel::update(void)
 {
   if (_dirty) {
     const BFont &ft = getStyle()->getFont();
-    BColor *text_color = (isFocused() ? getStyle()->getTextFocus()
-                          : getStyle()->getTextUnfocus());
     unsigned int bevel = getStyle()->getBevelWidth();
 
     std::string t = _text; // the actual text to draw
@@ -50,26 +47,26 @@ void OtkFocusLabel::update(void)
       }
     }
 
-    OtkFocusWidget::update();
+    OtkWidget::update();
 
-    ft.drawString(getWindow(), x, bevel, *text_color, t);
+    ft.drawString(getWindow(), x, bevel, *getStyle()->getTextUnfocus(), t);
   } else
-    OtkFocusWidget::update();
+    OtkWidget::update();
 
   _dirty = false;
 }
 
-int OtkFocusLabel::exposeHandler(const XExposeEvent &e)
+int OtkLabel::exposeHandler(const XExposeEvent &e)
 {
   _dirty = true;
-  return OtkFocusWidget::exposeHandler(e);
+  return OtkWidget::exposeHandler(e);
 }
 
-int OtkFocusLabel::configureHandler(const XConfigureEvent &e)
+int OtkLabel::configureHandler(const XConfigureEvent &e)
 {
   if (!(e.width == width() && e.height == height()))
     _dirty = true;
-  return OtkFocusWidget::configureHandler(e);
+  return OtkWidget::configureHandler(e);
 }
 
 }

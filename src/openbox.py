@@ -29,6 +29,8 @@ except AttributeError:
 
 Openbox_instance = _openbox.Openbox_instance
 
+Display_instance = _openbox.Display_instance
+
 class Display(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Display, name, value)

@@ -883,6 +883,9 @@ void python_callback(PyObject *func, KeyData *data)
   #include <iterator>
 
 
+  otk::Display *Display_instance() { return otk::display; }
+
+
 #include "ustring.hh"
 
 ob::Client *ob_Screen_client(ob::Screen *self,int i){
@@ -906,6 +909,20 @@ static PyObject *_wrap_Openbox_instance(PyObject *self, PyObject *args) {
     result = (ob::Openbox *)Openbox_instance();
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__Openbox, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Display_instance(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Display *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":Display_instance")) goto fail;
+    result = (otk::Display *)Display_instance();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Display, 0);
     return resultobj;
     fail:
     return NULL;
@@ -7953,6 +7970,7 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
+	 { (char *)"Display_instance", _wrap_Display_instance, METH_VARARGS },
 	 { (char *)"new_Display", _wrap_new_Display, METH_VARARGS },
 	 { (char *)"delete_Display", _wrap_delete_Display, METH_VARARGS },
 	 { (char *)"Display_gcCache", _wrap_Display_gcCache, METH_VARARGS },

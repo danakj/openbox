@@ -110,6 +110,9 @@ void python_callback(PyObject *func, KeyData *data)
 };
 
 %ignore otk::display;
+%inline %{
+  otk::Display *Display_instance() { return otk::display; }
+%};
 
 %include "../otk/ustring.i"
 

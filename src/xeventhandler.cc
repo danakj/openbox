@@ -2,9 +2,14 @@
 
 #include "xeventhandler.hh"
 #include "client.hh"
+#include "frame.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
 #include "otk/rect.hh"
+
+// XXX: REMOVE THIS SOON!!#!
+#include "blackbox.hh"
+#include "screen.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -119,7 +124,7 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 
 
 // XXX: put this into the OBScreen or OBClient class!
-static void manageWindow(Window window)
+static void manageWindow(int screen, Window window)
 {
   OBClient *client = 0;
   XWMHints *wmhint;
@@ -139,15 +144,14 @@ static void manageWindow(Window window)
   }
 
   // choose the events we want to receive on the CLIENT window
-  attrib_set.event_mask = PropertyChangeMask | FocusChangeMask |
-                          StructureNotifyMask;
+  attrib_set.event_mask = OBClient::event_mask;
   attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
                                      ButtonMotionMask;
   XChangeWindowAttributes(otk::OBDisplay::display, window,
                           CWEventMask|CWDontPropagate, &attrib_set);
 
   // create the OBClient class, which gets all of the hints on the window
-  Openbox::instance->addClient(window, client = new OBClient(window));
+  Openbox::instance->addClient(window, client = new OBClient(screen, window));
 
   // we dont want a border on the client
   XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
@@ -159,14 +163,15 @@ static void manageWindow(Window window)
   if (!client->positionRequested()) {
     // XXX: position the window intelligenty
   }
+
+  // XXX: store a style somewheres cooler!!
+  otk::Style *style = ((Blackbox*)Openbox::instance)->
+    searchScreen(RootWindow(otk::OBDisplay::display, screen))->
+    getWindowStyle();
+  client->frame = new OBFrame(client, style);
   
-  // XXX: grab server, reparent client to the frame, ungrab server
-
-  // XXX: if shaped, shape the frame..
-
   // XXX: if on the current desktop..
-  /// XMapSubwindows(otk::OBDisplay::display, FRAMEWINDOW);
-  XMapWindow(otk::OBDisplay::display, window);
+  XMapWindow(otk::OBDisplay::display, client->frame->window());
  
   // XXX: handle any requested states such as shaded/maximized
 }
@@ -174,46 +179,27 @@ static void manageWindow(Window window)
 // XXX: move this to the OBScreen or OBClient class!
 static void unmanageWindow(OBClient *client)
 {
-  bool remap = false; // remap the window when we're done?
-  
-  Window window = client->window();
+  OBFrame *frame = client->frame;
 
   // XXX: pass around focus if this window was focused
   
   // remove the window from our save set
-  XChangeSaveSet(otk::OBDisplay::display, window, SetModeDelete);
+  XChangeSaveSet(otk::OBDisplay::display, client->window(), SetModeDelete);
 
   // we dont want events no more
-  XSelectInput(otk::OBDisplay::display, window, NoEventMask);
+  XSelectInput(otk::OBDisplay::display, client->window(), NoEventMask);
 
-  // XXX: XUnmapWindow(otk::OBDisplay::display, FRAME);
-  XUnmapWindow(otk::OBDisplay::display, window);
+  XUnmapWindow(otk::OBDisplay::display, frame->window());
   
   // we dont want a border on the client
-  XSetWindowBorderWidth(otk::OBDisplay::display, window,client->borderWidth());
+  XSetWindowBorderWidth(otk::OBDisplay::display, client->window(),
+                        client->borderWidth());
 
   // remove the client class from the search list
-  Openbox::instance->removeClient(window);
+  Openbox::instance->removeClient(client->window());
 
-  // check if the app has already reparented its window to the root window
-  XEvent ev;
-  if (XCheckTypedWindowEvent(otk::OBDisplay::display, window, ReparentNotify,
-                             &ev)) {
-    remap = true; // XXX: why do we remap the window if they already
-                  // reparented to root?
-  } else {
-    // according to the ICCCM - if the client doesn't reparent to
-    // root, then we have to do it for them
-    XReparentWindow(otk::OBDisplay::display, window,
-                    RootWindow(otk::OBDisplay::display,
-                               DefaultScreen(otk::OBDisplay::display)),
-                    // XXX: screen->getRootWindow(),
-                    client->area().x(), client->area().y());
-  }
-
-  // if we want to remap the window, do so now
-  if (remap)
-    XMapWindow(otk::OBDisplay::display, window);
+  delete client->frame;
+  client->frame = 0;
 
   delete client;
 }
@@ -229,7 +215,44 @@ void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
   if (client) {
     // XXX: uniconify and/or unshade the window
   } else {
-    manageWindow(e.window);
+    int screen = INT_MAX;
+
+    for (int i = 0; i < ScreenCount(otk::OBDisplay::display); ++i)
+      if (otk::OBDisplay::screenInfo(i)->getRootWindow() == e.parent) {
+        screen = i;
+        break;
+      }
+
+    if (screen >= ScreenCount(otk::OBDisplay::display)) {
+      /*
+        we got a map request for a window who's parent isn't root. this
+        can happen in only one circumstance:
+
+        a client window unmapped a managed window, and then remapped it
+        somewhere between unmapping the client window and reparenting it
+        to root.
+
+        regardless of how it happens, we need to find the screen that
+        the window is on
+      */
+      XWindowAttributes wattrib;
+      if (! XGetWindowAttributes(otk::OBDisplay::display, e.window,
+                                 &wattrib)) {
+        // failed to get the window attributes, perhaps the window has
+        // now been destroyed?
+        return;
+      }
+
+      for (int i = 0; i < ScreenCount(otk::OBDisplay::display); ++i)
+        if (otk::OBDisplay::screenInfo(i)->getRootWindow() == wattrib.root) {
+          screen = i;
+          break;
+        }
+    }
+
+    assert(screen < ScreenCount(otk::OBDisplay::display));
+
+    manageWindow(screen, e.window);
   }
   
 /*

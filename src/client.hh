@@ -18,6 +18,8 @@ extern "C" {
 
 namespace ob {
 
+class OBFrame;
+
 //! Maintains the state of a client window.
 /*!
   OBClient maintains the state of a client window. The state consists of the
@@ -32,6 +34,10 @@ namespace ob {
 */
 class OBClient {
 public:
+
+  //! The frame window which decorates around the client window
+  OBFrame *frame;
+  
   //! Possible window types
   enum WindowType { Type_Desktop, //!< A desktop (bottom-most window)
                     Type_Dock,    //!< A dock bar/panel window
@@ -107,7 +113,14 @@ public:
                      State_Toggle      //!< _NET_WM_STATE_TOGGLE
   };
 
+  //! The event mask to grab on client windows
+  static const long event_mask = PropertyChangeMask | FocusChangeMask |
+                                 StructureNotifyMask;
+
 private:
+  //! The screen number on which the client resides
+  int      _screen;
+  
   //! The actual window that this class is wrapping up
   Window   _window;
 
@@ -272,11 +285,15 @@ public:
   //! Constructs a new OBClient object around a specified window id
   /*!
     @param window The window id that the OBClient class should handle
+    @param screen The screen on which the window resides
   */
-  OBClient(Window window);
+  OBClient(int screen, Window window);
   //! Destroys the OBClient object
   virtual ~OBClient();
 
+  //! Returns the screen on which the clien resides
+  inline int screen() const { return _screen; }
+  
   //! Returns the window id that the OBClient object is handling
   inline Window window() const { return _window; }
 

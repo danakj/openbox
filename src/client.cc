@@ -1,5 +1,9 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
+#ifdef HAVE_CONFIG_H
+# include "../config.h"
+#endif
+
 #include "client.hh"
 #include "screen.hh"
 #include "openbox.hh"
@@ -18,8 +22,8 @@ extern "C" {
 
 namespace ob {
 
-OBClient::OBClient(Window window)
-  : _window(window)
+OBClient::OBClient(int screen, Window window)
+  : _screen(screen), _window(window)
 {
   assert(window);
 
@@ -78,6 +82,7 @@ OBClient::OBClient(Window window)
   updateIconTitle();
   updateClass();
 
+/*
 #ifdef DEBUG
   printf("Mapped window: 0x%lx\n"
          "  title:         \t%s\t  icon title:    \t%s\n"
@@ -123,6 +128,7 @@ OBClient::OBClient(Window window)
          _floating ? "yes" : "no",
          _positioned ? "yes" : "no");
 #endif
+*/
 }
 
 

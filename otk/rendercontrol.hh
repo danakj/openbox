@@ -7,10 +7,11 @@ extern "C" {
 #include <X11/Xutil.h>
 }
 
+#include "surface.hh"
+
 namespace otk {
 
 class ScreenInfo;
-class Surface;
 class RenderTexture;
 class Font;
 class RenderColor;

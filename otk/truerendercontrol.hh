@@ -4,29 +4,9 @@
 
 #include "rendercontrol.hh"
 
-extern "C" {
-
-#ifdef HAVE_STDINT_H
-#  include <stdint.h>
-#else
-#  ifdef HAVE_SYS_TYPES_H
-#    include <sys/types.h>
-#  endif
-#endif
-
-}
-
 #include <vector>
 
 namespace otk {
-
-#ifdef HAVE_STDINT_H
-typedef uint32_t pixel32;
-typedef uint16_t pixel16;
-#else
-typedef u_int32_t pixel32;
-typedef u_int16_t pixel16;
-#endif /* HAVE_STDINT_H */
 
 #ifdef WORDS_BIGENDIAN
 const int default_red_shift=0;
@@ -54,13 +34,10 @@ private:
   int _blue_offset;
 
   inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
-  void reduceDepth(XImage *im, pixel32 *data) const;
-  void verticalGradient(Surface &sf, const RenderTexture &texture,
-                        pixel32 *data) const;
-  void diagonalGradient(Surface &sf, const RenderTexture &texture,
-                        pixel32 *data) const;
-  void crossDiagonalGradient(Surface &sf, const RenderTexture &texture,
-                        pixel32 *data) const;
+  void reduceDepth(Surface &sf, XImage *im) const;
+  void verticalGradient(Surface &sf, const RenderTexture &texture) const;
+  void diagonalGradient(Surface &sf, const RenderTexture &texture) const;
+  void crossDiagonalGradient(Surface &sf, const RenderTexture &texture) const;
   virtual void drawGradientBackground(Surface &sf,
                                       const RenderTexture &texture) const;
   

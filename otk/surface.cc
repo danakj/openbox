@@ -9,6 +9,7 @@
 
 extern "C" {
 #include <X11/Xutil.h>
+#include <cstring>
 }
 
 namespace otk {
@@ -16,6 +17,7 @@ namespace otk {
 Surface::Surface(int screen, const Size &size)
   : _screen(screen),
     _size(size),
+    _pixel_data(new pixel32[size.width()*size.height()]),
     _pixmap(None),
     _xftdraw(0)
 {
@@ -24,6 +26,7 @@ Surface::Surface(int screen, const Size &size)
 Surface::~Surface()
 {
   destroyObjects();
+  delete [] _pixel_data;
 }
 
 void Surface::setPixmap(const RenderColor &color)
@@ -33,6 +36,15 @@ void Surface::setPixmap(const RenderColor &color)
 
   XFillRectangle(**display, _pixmap, color.gc(), 0, 0,
                  _size.width(), _size.height());
+
+  pixel32 val = 0; // XXX set this from the color and shift amounts!
+  for (unsigned int i = 0, s = _size.width() * _size.height(); i < s; ++i) {
+    unsigned char *p = (unsigned char*)&_pixel_data[i];
+    *p = (unsigned char) (val >> 24);
+    *++p = (unsigned char) (val >> 16);
+    *++p = (unsigned char) (val >> 8);
+    *++p = (unsigned char) val;
+  }
 }
 
 void Surface::setPixmap(XImage *image)

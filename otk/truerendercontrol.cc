@@ -64,23 +64,24 @@ void TrueRenderControl::drawGradientBackground(
   XImage *im = XCreateImage(**display, info->visual(), info->depth(),
                             ZPixmap, 0, NULL, w, h, 32, 0);
   im->byte_order = endian;
-  pixel32 *data = new pixel32[h*w];
-  pixel32 current;
 
   switch (texture.gradient()) {
   case RenderTexture::Vertical:
-    verticalGradient(sf, texture, data);
+    verticalGradient(sf, texture);
     break;
   case RenderTexture::Diagonal:
-    diagonalGradient(sf, texture, data);
+    diagonalGradient(sf, texture);
     break;
   case RenderTexture::CrossDiagonal:
-    crossDiagonalGradient(sf, texture, data);
+    crossDiagonalGradient(sf, texture);
     break;
   default:
     printf("unhandled gradient\n");
   }
 
+  pixel32 *data = sf.pixelData();
+  pixel32 current;
+  
   if (texture.relief() == RenderTexture::Flat && texture.border()) {
     r = texture.borderColor().red();
     g = texture.borderColor().green();
@@ -122,21 +123,20 @@ void TrueRenderControl::drawGradientBackground(
     }
   }
 
-  reduceDepth(im, data);
+  reduceDepth(sf, im);
 
   im->data = (char*) data;
 
   sf.setPixmap(im);
 
-  delete [] im->data;
   im->data = NULL;
   XDestroyImage(im);
 }
 
 void TrueRenderControl::verticalGradient(Surface &sf,
-                                         const RenderTexture &texture,
-                                         pixel32 *data) const
+                                         const RenderTexture &texture) const
 {
+  pixel32 *data = sf.pixelData();
   pixel32 current;
   float dr, dg, db;
   unsigned int r,g,b;
@@ -164,9 +164,9 @@ void TrueRenderControl::verticalGradient(Surface &sf,
 }
 
 void TrueRenderControl::diagonalGradient(Surface &sf,
-                                         const RenderTexture &texture,
-                                         pixel32 *data) const
+                                         const RenderTexture &texture) const
 {
+  pixel32 *data = sf.pixelData();
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
   unsigned int r,g,b;
@@ -196,10 +196,10 @@ void TrueRenderControl::diagonalGradient(Surface &sf,
   }
 }
 
-void TrueRenderControl::crossDiagonalGradient(Surface &sf,
-                                              const RenderTexture &texture,
-                                              pixel32 *data) const
+void TrueRenderControl::crossDiagonalGradient(
+  Surface &sf, const RenderTexture &texture) const
 {
+  pixel32 *data = sf.pixelData();
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
   unsigned int r,g,b;
@@ -229,11 +229,12 @@ void TrueRenderControl::crossDiagonalGradient(Surface &sf,
   }
 }
 
-void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
+void TrueRenderControl::reduceDepth(Surface &sf, XImage *im) const
 {
 // since pixel32 is the largest possible pixel size, we can share the array
   int r, g, b;
   int x,y;
+  pixel32 *data = sf.pixelData();
   pixel16 *p = (pixel16*) data;
   switch (im->bits_per_pixel) {
   case 32:

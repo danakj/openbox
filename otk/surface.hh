@@ -3,23 +3,41 @@
 #define __surface_hh
 
 #include "size.hh"
-#include "truerendercontrol.hh"
-#include "pseudorendercontrol.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
 #define _XFT_NO_COMPAT_ // no Xft 1 API
 #include <X11/Xft/Xft.h>
+
+#ifdef HAVE_STDINT_H
+#  include <stdint.h>
+#else
+#  ifdef HAVE_SYS_TYPES_H
+#    include <sys/types.h>
+#  endif
+#endif
 }
 
 namespace otk {
 
 class ScreenInfo;
 class RenderColor;
+class RenderControl;
+class TrueRenderControl;
+class PseudoRenderControl;
+
+#ifdef HAVE_STDINT_H
+typedef uint32_t pixel32;
+typedef uint16_t pixel16;
+#else
+typedef u_int32_t pixel32;
+typedef u_int16_t pixel16;
+#endif /* HAVE_STDINT_H */
 
 class Surface {
   int _screen;
   Size _size;
+  pixel32 *_pixel_data;
   Pixmap _pixmap;
   XftDraw *_xftdraw;
 
@@ -36,9 +54,11 @@ public:
 
   inline int screen(void) const { return _screen; }
 
-  virtual const Size& size() const { return _size; }
+  const Size& size() const { return _size; }
 
-  virtual Pixmap pixmap() const { return _pixmap; }
+  Pixmap pixmap() const { return _pixmap; }
+
+  pixel32 *pixelData() { return _pixel_data; }
 
   // The RenderControl classes use the internal objects in this class to render
   // to it. Noone else needs them tho, so they are private.

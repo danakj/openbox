@@ -47,15 +47,14 @@ void focus_set_client(Client *client)
 	XSetInputFocus(ob_display, focus_backup, RevertToNone, CurrentTime);
     }
 
-    if (focus_client != NULL)
-        dispatch_client(Event_Client_Unfocus, focus_client, 0, 0);
-
     focus_client = client;
 
     /* set the NET_ACTIVE_WINDOW hint */
     active = client ? client->window : None;
     PROP_SET32(ob_root, net_active_window, window, active);
 
-    if (focus_client != NULL)
+    if (focus_client != NULL) {
         dispatch_client(Event_Client_Focus, focus_client, 0, 0);
+        dispatch_client(Event_Client_Unfocus, focus_client, 0, 0);
+    }
 }

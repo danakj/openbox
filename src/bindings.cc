@@ -146,7 +146,7 @@ OBBindings::OBBindings()
 {
   _timer.setTimeout(5000); // chains reset after 5 seconds
   
-  setResetKey("C-g"); // set the default reset key
+//  setResetKey("C-g"); // set the default reset key
 
   for (int i = 0; i < NUM_EVENTS; ++i)
     _events[i] = 0;
@@ -329,13 +329,14 @@ void OBBindings::grabKeys(bool grab)
       p = p->next_sibling;
     }
 
-    if (grab)
-      otk::OBDisplay::grabKey(_resetkey.key, _resetkey.modifiers,
-                              root, true, GrabModeAsync, GrabModeAsync,
-                              false);
-    else
-      otk::OBDisplay::ungrabKey(_resetkey.key, _resetkey.modifiers,
-                                root);
+    if (_resetkey.key)
+      if (grab)
+        otk::OBDisplay::grabKey(_resetkey.key, _resetkey.modifiers,
+                                root, false, GrabModeAsync, GrabModeAsync,
+                                false);
+      else
+        otk::OBDisplay::ungrabKey(_resetkey.key, _resetkey.modifiers,
+                                  root);
   }
 }
 

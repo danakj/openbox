@@ -66,7 +66,7 @@ def _focused(data):
 
 def _newwindow(data):
     # make sure its not already in the list
-    win = client.window()
+    win = data.client.window()
     for i in range(len(_clients)):
         if _clients[i].window() == win:
             return

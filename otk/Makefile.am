@@ -16,7 +16,7 @@ libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
                   display.cc font.cc \
                   property.cc rect.cc screeninfo.cc \
                   timer.cc \
-                  configuration.cc util.cc widget.cc focuswidget.cc \
+                  util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc \
                   otk_wrap.cc

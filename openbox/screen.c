@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "openbox.h"
 #include "dock.h"
 #include "xerror.h"
@@ -65,7 +66,7 @@ static gboolean replace_wm()
     current_wm_sn_owner = XGetSelectionOwner(ob_display, wm_sn_atom);
     if (current_wm_sn_owner) {
         if (!ob_replace_wm) {
-            g_message("A window manager is already running on screen %d",
+            g_warning("A window manager is already running on screen %d",
                       ob_screen);
             return FALSE;
         }
@@ -102,7 +103,7 @@ static gboolean replace_wm()
                        timestamp);
 
     if (XGetSelectionOwner(ob_display, wm_sn_atom) != screen_support_win) {
-        g_message("Could not acquire window manager selection on screen %d",
+        g_warning("Could not acquire window manager selection on screen %d",
                   ob_screen);
         return FALSE;
     }
@@ -123,7 +124,7 @@ static gboolean replace_wm()
       }
 
       if (wait >= timeout) {
-          g_message("Timeout expired while waiting for the current WM to die "
+          g_warning("Timeout expired while waiting for the current WM to die "
                     "on screen %d", ob_screen);
           return FALSE;
       }
@@ -165,7 +166,7 @@ gboolean screen_annex()
                  ROOT_EVENTMASK);
     xerror_set_ignore(FALSE);
     if (xerror_occured) {
-        g_message("A window manager is already running on screen %d",
+        g_warning("A window manager is already running on screen %d",
                   ob_screen);
 
         XDestroyWindow(ob_display, screen_support_win);
@@ -173,7 +174,7 @@ gboolean screen_annex()
     }
 
 
-    g_message("Managing screen %d", ob_screen);
+    ob_debug("Managing screen %d\n", ob_screen);
 
     set_root_cursor();
 
@@ -426,7 +427,7 @@ void screen_set_desktop(guint num)
 
     if (old == num) return;
 
-    g_message("Moving to desktop %d", num+1);
+    ob_debug("Moving to desktop %d\n", num+1);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 
@@ -452,11 +453,11 @@ void screen_set_desktop(guint num)
        from the switch so it doesnt mess with the focus */
     while (XCheckTypedEvent(ob_display, EnterNotify, &e));
 #ifdef DEBUG_FOCUS
-    g_message("switch fallback");
+    ob_debug("switch fallback\n");
 #endif
     focus_fallback(OB_FOCUS_FALLBACK_DESKTOP);
 #ifdef DEBUG_FOCUS
-    g_message("/switch fallback");
+    ob_debug("/switch fallback\n");
 #endif
 
     dispatch_ob(Event_Ob_Desktop, num, old);

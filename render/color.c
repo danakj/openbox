@@ -1,8 +1,9 @@
+#include "render.h"
+#include "color.h"
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <string.h>
-#include "render.h"
-#include "color.h"
 
 void RrColorAllocateGC(RrColor *in)
 {
@@ -75,10 +76,6 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
             (RrBlueOffset(inst) != RrDefaultBlueOffset) ||
             (RrGreenOffset(inst) != RrDefaultGreenOffset)) {
-            g_message("CONVERSION %d->%d %d->%d %d->%d",
-                      RrDefaultRedOffset, RrRedOffset(inst),
-                      RrDefaultGreenOffset, RrGreenOffset(inst),
-                      RrDefaultBlueOffset, RrBlueOffset(inst));
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;
@@ -125,7 +122,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 
     break;
     default:
-        g_message("your bit depth is currently unhandled\n");
+        g_warning("your bit depth is currently unhandled\n");
     }
 }
 
@@ -142,8 +139,6 @@ XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b)
 static void swap_byte_order(XImage *im)
 {
     int x, y, di;
-
-    g_message("SWAPPING BYTE ORDER");
 
     di = 0;
     for (y = 0; y < im->height; ++y) {
@@ -163,7 +158,7 @@ static void swap_byte_order(XImage *im)
             case 8:
                 break;
             default:
-                g_message("your bit depth is currently unhandled\n");
+                g_warning("your bit depth is currently unhandled");
             }
         }
         di += im->bytes_per_line;
@@ -224,7 +219,7 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     case 8:
-        g_message("this image bit depth is currently unhandled\n");
+        g_warning("this image bit depth is currently unhandled");
         break;
     case 1:
         for (y = 0; y < im->height; y++) {
@@ -239,7 +234,7 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     default:
-        g_message("this image bit depth is currently unhandled\n");
+        g_warning("this image bit depth is currently unhandled");
     }
 }
 

@@ -1,3 +1,4 @@
+#include "kernel/debug.h"
 #include "kernel/openbox.h"
 #include "kernel/dispatch.h"
 #include "kernel/frame.h"
@@ -145,7 +146,7 @@ static void save_history()
 
     for (it = history_list; it; it = g_slist_next(it)) {
         struct HistoryItem *hi = it->data;
-        g_message("adding %s", hi->name);
+        ob_debug("adding %s\n", hi->name);
         node = xmlNewChild(root, NULL, (const xmlChar*) "entry", NULL);
         xmlNewProp(node, (const xmlChar*) "name", (const xmlChar*) hi->name);
         xmlNewProp(node, (const xmlChar*) "class", (const xmlChar*) hi->class);

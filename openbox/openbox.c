@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "openbox.h"
 #include "dock.h"
 #include "event.h"
@@ -91,6 +92,10 @@ int main(int argc, char **argv)
     char *path;
     xmlDocPtr doc;
     xmlNodePtr node;
+
+#ifdef DEBUG
+    ob_debug_show_output(TRUE);
+#endif
 
     state = OB_STATE_STARTING;
 
@@ -430,7 +435,7 @@ static void sm_startup(int argc, char **argv)
         g_free(prop_cmd.vals);
         g_free(prop_res.vals);
 
-        g_message("Connected to session manager with id %s", ob_sm_id);
+        ob_debug("Connected to session manager with id %s\n", ob_sm_id);
     }
     g_free (ob_sm_id);
 #endif
@@ -510,6 +515,7 @@ static void print_help()
     g_print("  --version          Display the version and exit\n");
     g_print("  --sync             Run in synchronous mode (this is slow and\n"
             "                     meant for debugging X routines)\n");
+    g_print("  --debug            Display debugging output\n");
     g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
@@ -530,6 +536,8 @@ static void parse_args(int argc, char **argv)
             ob_replace_wm = TRUE;
         } else if (!strcmp(argv[i], "--sync")) {
             xsync = TRUE;
+        } else if (!strcmp(argv[i], "--debug")) {
+            ob_debug_show_output(TRUE);
 #ifdef USE_SM
         } else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == argc - 1) /* no args left */
@@ -551,24 +559,24 @@ static void parse_args(int argc, char **argv)
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast)
 {
-    g_message("got SAVE YOURSELF from session manager");
+    ob_debug("got SAVE YOURSELF from session manager\n");
     SmcSaveYourselfDone(conn, TRUE);
 }
 
 static void sm_die(SmcConn conn, SmPointer data)
 {
     ob_exit();
-    g_message("got DIE from session manager");
+    ob_debug("got DIE from session manager\n");
 }
 
 static void sm_save_complete(SmcConn conn, SmPointer data)
 {
-    g_message("got SAVE COMPLETE from session manager");
+    ob_debug("got SAVE COMPLETE from session manager\n");
 }
 
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
-    g_message("got SHUTDOWN CANCELLED from session manager");
+    ob_debug("got SHUTDOWN CANCELLED from session manager\n");
 }
 #endif
 

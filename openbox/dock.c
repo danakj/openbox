@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "dock.h"
 #include "screen.h"
 #include "prop.h"
@@ -115,7 +116,7 @@ void dock_add(Window win, XWMHints *wmhints)
 
     g_hash_table_insert(window_map, &app->icon_win, app);
 
-    g_message("Managed Dock App: 0x%lx (%s)", app->icon_win, app->class);
+    ob_debug("Managed Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
 }
 
 void dock_remove_all()
@@ -141,7 +142,7 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
     dock_configure();
 
-    g_message("Unmanaged Dock App: 0x%lx (%s)", app->icon_win, app->class);
+    ob_debug("Unmanaged Dock App: 0x%lx (%s)\n", app->icon_win, app->class);
 
     g_free(app->name);
     g_free(app->class);

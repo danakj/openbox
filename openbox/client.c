@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "client.h"
 #include "dock.h"
 #include "xerror.h"
@@ -216,7 +217,7 @@ void client_manage(Window window)
 	XFree(wmhint);
     }
 
-    g_message("Managing window: %lx", window);
+    ob_debug("Managing window: %lx\n", window);
 
     /* choose the events we want to receive on the CLIENT window */
     attrib_set.event_mask = CLIENT_EVENTMASK;
@@ -322,7 +323,7 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
-    g_message("Managed window 0x%lx (%s)", window, self->class);
+    ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
 }
 
 void client_unmanage_all()
@@ -343,7 +344,7 @@ void client_unmanage(ObClient *self)
     guint j;
     GSList *it;
 
-    g_message("Unmanaging window: %lx (%s)", self->window, self->class);
+    ob_debug("Unmanaging window: %lx (%s)\n", self->window, self->class);
 
     dispatch_client(Event_Client_Destroy, self, 0, 0);
     g_assert(self != NULL);
@@ -434,7 +435,7 @@ void client_unmanage(ObClient *self)
     }
 
 
-    g_message("Unmanaged window 0x%lx", self->window);
+    ob_debug("Unmanaged window 0x%lx\n", self->window);
 
     /* free all data allocated in the client struct */
     g_slist_free(self->transients);
@@ -1098,7 +1099,6 @@ static void client_change_allowed_actions(ObClient *self)
 	else self->shaded = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-        g_message("UNSETTING ICONIC");
 	if (self->frame) client_iconify(self, FALSE, TRUE);
 	else self->iconic = FALSE;
     }
@@ -1191,8 +1191,8 @@ void client_update_wmhints(ObClient *self)
 
     if (ur != self->urgent) {
 	self->urgent = ur;
-	g_message("Urgent Hint for 0x%lx: %s", self->window,
-		  ur ? "ON" : "OFF");
+	ob_debug("Urgent Hint for 0x%lx: %s\n", self->window,
+                 ur ? "ON" : "OFF");
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
 	if (self->frame)
@@ -1905,8 +1905,8 @@ static void client_iconify_recursive(ObClient *self,
 
 
     if (self->iconic != iconic) {
-        g_message("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
-                  self->window);
+        ob_debug("%sconifying window: 0x%lx\n", (iconic ? "I" : "Uni"),
+                 self->window);
 
         self->iconic = iconic;
 
@@ -2126,7 +2126,7 @@ void client_set_desktop_recursive(ObClient *self,
 
     if (target != self->desktop) {
 
-        g_message("Setting desktop %u", target+1);
+        ob_debug("Setting desktop %u\n", target+1);
 
         g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
@@ -2416,9 +2416,9 @@ gboolean client_focus(ObClient *self)
     }
 
 #ifdef DEBUG_FOCUS
-    g_message("%sively focusing %lx at %d", (self->can_focus ? "act" : "pass"),
-              self->window, (int)
-              event_lasttime);
+    ob_debug("%sively focusing %lx at %d\n",
+             (self->can_focus ? "act" : "pass"),
+             self->window, (int) event_lasttime);
 #endif
 
     /* Cause the FocusIn to come back to us. Important for desktop switches,
@@ -2432,7 +2432,7 @@ void client_unfocus(ObClient *self)
 {
     g_assert(focus_client == self);
 #ifdef DEBUG_FOCUS
-    g_message("client_unfocus for %lx", self->window);
+    ob_debug("client_unfocus for %lx\n", self->window);
 #endif
     focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
 }

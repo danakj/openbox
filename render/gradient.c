@@ -38,7 +38,7 @@ void RrRender(RrAppearance *a, int w, int h)
         gradient_pyramid(&a->surface, w, h);
         break;
     default:
-        g_message("unhandled gradient");
+        g_assert_not_reached(); /* unhandled gradient */
         return;
     }
   
@@ -183,9 +183,6 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 
         switch (sp->bevel) {
         case RR_BEVEL_1:
-            g_message("%lx %lx %lx",
-                      sp->primary->pixel,
-                      sp->bevel_dark->pixel, sp->bevel_light->pixel);
             XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
                       left, bottom, right, bottom);
             XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,

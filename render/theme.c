@@ -63,8 +63,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (name) {
 	db = loaddb(theme, name);
         if (db == NULL) {
-	    g_warning("Failed to load the theme '%s'", name);
-	    g_message("Falling back to the default: '%s'", DEFAULT_THEME);
+	    g_warning("Failed to load the theme '%s'\n"
+                      "Falling back to the default: '%s'",
+                      name, DEFAULT_THEME);
 	} else
             theme->name = g_path_get_basename(name);
     }

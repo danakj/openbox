@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "event.h"
 #include "openbox.h"
 #include "grab.h"
@@ -64,7 +65,7 @@ void focus_set_client(ObClient *client)
     ObClient *old;
 
 #ifdef DEBUG_FOCUS
-    g_message("focus_set_client 0x%lx", client ? client->window : 0);
+    ob_debug("focus_set_client 0x%lx\n", client ? client->window : 0);
 #endif
 
     /* uninstall the old colormap, and install the new one */

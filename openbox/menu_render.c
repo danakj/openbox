@@ -1,5 +1,6 @@
 /* Functions for default rendering of menus. Might become pluginnable */
 
+#include "debug.h"
 #include "menu.h"
 #include "openbox.h"
 #include "render/theme.h"
@@ -125,15 +126,10 @@ void menu_entry_render(ObMenuEntry *self)
 	break;
 
     default:
-	g_message("unhandled render_type");
-	a = !self->enabled ? self->a_disabled :
-        (self->hilite && 
-         (self->action ||
-          self->render_type == OB_MENU_ENTRY_RENDER_TYPE_SUBMENU) ? 
-         self->a_hilite : self->a_item);
+	g_assert_not_reached(); /* unhandled rendering type */
 	break;
     }
-    g_message ("%s %d", self->label, self->hilite);
+    ob_debug("%s %d\n", self->label, self->hilite);
 
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);

@@ -1,13 +1,13 @@
-#include <glib.h>
-
+#include "kernel/debug.h"
 #include "kernel/menu.h"
 #include "kernel/screen.h"
 #include "kernel/client.h"
 #include "kernel/openbox.h"
-
 #include "kernel/frame.h"
 
 #include "render/theme.h"
+
+#include <glib.h>
 
 static char *PLUGIN_NAME = "client_menu";
 
@@ -42,7 +42,7 @@ void client_send_to_update(ObMenu *self)
 
     if (it != NULL || i != screen_num_desktops) {
         menu_clear(self);
-        g_message("update");
+        ob_debug("update\n");
         for (i = 0; i < screen_num_desktops; ++i) {
             ObMenuEntry *e;
             Action *a = action_from_string("sendtodesktop");
@@ -58,7 +58,8 @@ void client_send_to_update(ObMenu *self)
 
 void client_menu_show(ObMenu *self, int x, int y, ObClient *client)
 {
-    guint i, newy, newx;
+    guint i;
+    gint newy, newx;
     Rect *a = NULL;
 
     g_assert(!self->invalid);

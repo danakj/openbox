@@ -59,7 +59,7 @@ gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
     }
     g_free(path);
     if (!r)
-        g_message("unable to find a valid config file, using defaults");
+        g_warning("unable to find a valid config file, using defaults");
     return r;
 }
 

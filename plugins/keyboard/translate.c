@@ -15,7 +15,7 @@ static guint translate_modifier(char *str)
              !g_ascii_strcasecmp("C", str)) return ControlMask;
     else if (!g_ascii_strcasecmp("Shift", str) ||
              !g_ascii_strcasecmp("S", str)) return ShiftMask;
-    g_message("Invalid modifier '%s' in binding.", str);
+    g_warning("Invalid modifier '%s' in binding.", str);
     return 0;
 }
 
@@ -47,12 +47,12 @@ gboolean translate_key(char *str, guint *state, guint *keycode)
     /* figure out the keycode */
     sym = XStringToKeysym(l);
     if (sym == NoSymbol) {
-	g_message("Invalid key name '%s' in key binding.", l);
+	g_warning("Invalid key name '%s' in key binding.", l);
 	goto translation_fail;
     }
     *keycode = XKeysymToKeycode(ob_display, sym);
     if (!*keycode) {
-	g_message("Key '%s' does not exist on the display.", l); 
+	g_warning("Key '%s' does not exist on the display.", l); 
 	goto translation_fail;
     }
 

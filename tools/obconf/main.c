@@ -1,3 +1,4 @@
+#include "kernel/debug.h"
 #include "obconf.h"
 #include "plugins.h"
 #include "parser/parse.h"
@@ -71,21 +72,21 @@ void on_quit_activate(GtkMenuItem *item, gpointer d)
 
 void on_applybutton_clicked(GtkButton *but, gpointer d)
 {
-    g_message("apply");
+    ob_debug("apply\n");
 }
 
 void on_revertbutton_clicked(GtkButton *but, gpointer d)
 {
-    g_message("revert");
+    ob_debug("revert\n");
 }
 
 void on_helpbutton_clicked(GtkButton *but, gpointer d)
 {
-    g_message("help");
+    ob_debug("help\n");
 }
 
 void on_sectiontree_row_activated(GtkTreeView *tree, GtkTreePath *path,
                                   GtkTreeViewColumn *col, gpointer p)
 {
-    g_message("activated");
+    ob_debug("activated\n");
 }

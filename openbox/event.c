@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "openbox.h"
 #include "dock.h"
 #include "client.h"
@@ -315,8 +316,8 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 	if (INVALID_FOCUSIN(e) ||
             client == NULL) {
 #ifdef DEBUG_FOCUS
-        g_message("FocusIn on %lx mode %d detail %d IGNORED", e->xfocus.window,
-                  e->xfocus.mode, e->xfocus.detail);
+        ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
+                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
             /* says a client was not found for the event (or a valid FocusIn
                event was not found.
@@ -326,22 +327,22 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
         }
 
 #ifdef DEBUG_FOCUS
-        g_message("FocusIn on %lx mode %d detail %d", e->xfocus.window,
-                  e->xfocus.mode, e->xfocus.detail);
+        ob_debug("FocusIn on %lx mode %d detail %d\n", e->xfocus.window,
+                 e->xfocus.mode, e->xfocus.detail);
 #endif
         break;
     case FocusOut:
 	if (INVALID_FOCUSOUT(e)) {
 #ifdef DEBUG_FOCUS
-        g_message("FocusOut on %lx mode %d detail %d IGNORED",
-                  e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
+        ob_debug("FocusOut on %lx mode %d detail %d IGNORED\n",
+                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
             return TRUE;
         }
 
 #ifdef DEBUG_FOCUS
-        g_message("FocusOut on %lx mode %d detail %d",
-                  e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
+        ob_debug("FocusOut on %lx mode %d detail %d\n",
+                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
 
         {
@@ -355,7 +356,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                         break;
                 if (fe.type == FocusOut) {
 #ifdef DEBUG_FOCUS
-                    g_message("found pending FocusOut");
+                    ob_debug("found pending FocusOut");
 #endif
                     if (!INVALID_FOCUSOUT(&fe)) {
                         /* if there is a VALID FocusOut still coming, don't
@@ -366,7 +367,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                     }
                 } else {
 #ifdef DEBUG_FOCUS
-                    g_message("found pending FocusIn");
+                    ob_debug("found pending FocusIn");
 #endif
                     /* is the focused window getting a FocusOut/In back to
                        itself?
@@ -383,16 +384,16 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                         */
                         if (focus_client) {
 #ifdef DEBUG_FOCUS
-                            g_message("focused window got an Out/In back to "
-                                      "itself IGNORED both");
+                            ob_debug("focused window got an Out/In back to "
+                                     "itself IGNORED both");
 #endif
                             return TRUE;
                         } else {
                             event_process(&fe);
 #ifdef DEBUG_FOCUS
-                            g_message("focused window got an Out/In back to "
-                                      "itself but focus_client was null "
-                                      "IGNORED just the Out");
+                            ob_debug("focused window got an Out/In back to "
+                                     "itself but focus_client was null "
+                                     "IGNORED just the Out");
 #endif
                             return TRUE;
                         }
@@ -411,8 +412,8 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             }
             if (fallback) {
 #ifdef DEBUG_FOCUS
-                g_message("no valid FocusIn and no FocusOut events found, "
-                          "falling back");
+                ob_debug("no valid FocusIn and no FocusOut events found, "
+                         "falling back");
 #endif
                 focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             }
@@ -428,18 +429,18 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             (e->xcrossing.mode == NotifyUngrab &&
              e->xcrossing.detail == NotifyVirtual)) {
 #ifdef DEBUG_FOCUS
-            g_message("%sNotify mode %d detail %d on %lx IGNORED",
-                      (e->type == EnterNotify ? "Enter" : "Leave"),
-                      e->xcrossing.mode,
-                      e->xcrossing.detail, client?client->window:0);
+            ob_debug("%sNotify mode %d detail %d on %lx IGNORED",
+                     (e->type == EnterNotify ? "Enter" : "Leave"),
+                     e->xcrossing.mode,
+                     e->xcrossing.detail, client?client->window:0);
 #endif
             return TRUE;
         }
 #ifdef DEBUG_FOCUS
-        g_message("%sNotify mode %d detail %d on %lx",
-                  (e->type == EnterNotify ? "Enter" : "Leave"),
-                  e->xcrossing.mode,
-                  e->xcrossing.detail, client?client->window:0);
+        ob_debug("%sNotify mode %d detail %d on %lx",
+                 (e->type == EnterNotify ? "Enter" : "Leave"),
+                 e->xcrossing.mode,
+                 e->xcrossing.detail, client?client->window:0);
 #endif
 	break;
     }
@@ -552,7 +553,7 @@ static void event_handle_root(XEvent *e)
      
     switch(e->type) {
     case SelectionClear:
-        g_message("Another WM has requested to replace us. Exiting.");
+        ob_debug("Another WM has requested to replace us. Exiting.\n");
         ob_exit();
         break;
 
@@ -588,7 +589,7 @@ static void event_handle_root(XEvent *e)
         ;
 #ifdef VIDMODE
         if (extensions_vidmode && e->type == extensions_vidmode_event_basep) {
-            g_message("VIDMODE EVENT");
+            ob_debug("VIDMODE EVENT\n");
         }
 #endif
     }
@@ -635,7 +636,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case FocusIn:
 #ifdef DEBUG_FOCUS
-        g_message("FocusIn on client for %lx", client->window);
+        ob_debug("FocusIn on client for %lx\n", client->window);
 #endif
         if (client != focus_client) {
             focus_set_client(client);
@@ -644,7 +645,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case FocusOut:
 #ifdef DEBUG_FOCUS
-        g_message("FocusOut on client for %lx", client->window);
+        ob_debug("FocusOut on client for %lx\n", client->window);
 #endif
         /* are we a fullscreen window or a transient of one? (checks layer)
            if we are then we need to be iconified since we are losing focus
@@ -668,8 +669,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                                       client);
             } else if (config_focus_follow) {
 #ifdef DEBUG_FOCUS
-                g_message("EnterNotify on %lx, focusing window",
-                          client->window);
+                ob_debug("EnterNotify on %lx, focusing window\n",
+                         client->window);
 #endif
                 client_focus(client);
             }
@@ -782,7 +783,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	client_unmanage(client);
 	break;
     case MapRequest:
-        g_message("MapRequest for 0x%lx", client->window);
+        ob_debug("MapRequest for 0x%lx\n", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it! */
         if (screen_showing_desktop)
@@ -836,22 +837,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                    FALSE);
 	} else if (msgtype == prop_atoms.net_wm_state) {
 	    /* can't compress these */
-	    g_message("net_wm_state %s %ld %ld for 0x%lx",
-		      (e->xclient.data.l[0] == 0 ? "Remove" :
-		       e->xclient.data.l[0] == 1 ? "Add" :
-		       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
-		      e->xclient.data.l[1], e->xclient.data.l[2],
-		      client->window);
+	    ob_debug("net_wm_state %s %ld %ld for 0x%lx\n",
+                     (e->xclient.data.l[0] == 0 ? "Remove" :
+                      e->xclient.data.l[0] == 1 ? "Add" :
+                      e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
+                     e->xclient.data.l[1], e->xclient.data.l[2],
+                     client->window);
 	    client_set_state(client, e->xclient.data.l[0],
 			     e->xclient.data.l[1], e->xclient.data.l[2]);
 	} else if (msgtype == prop_atoms.net_close_window) {
-	    g_message("net_close_window for 0x%lx", client->window);
+	    ob_debug("net_close_window for 0x%lx\n", client->window);
 	    client_close(client);
 	} else if (msgtype == prop_atoms.net_active_window) {
-	    g_message("net_active_window for 0x%lx", client->window);
+	    ob_debug("net_active_window for 0x%lx\n", client->window);
             client_activate(client);
 	} else if (msgtype == prop_atoms.net_wm_moveresize) {
-	    g_message("net_wm_moveresize for 0x%lx", client->window);
+	    ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
             if ((Atom)e->xclient.data.l[2] ==
                 prop_atoms.net_wm_moveresize_size_topleft ||
                 (Atom)e->xclient.data.l[2] ==
@@ -978,7 +979,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 
     top = g_list_nth_data(menu_visible, 0);
 
-    g_message("EVENT %d", e->type);
+    ob_debug("EVENT %d\n", e->type);
     switch (e->type) {
     case KeyPress:
         if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
@@ -1009,12 +1010,12 @@ static void event_handle_menu(ObClient *client, XEvent *e)
     case ButtonPress:
         if (e->xbutton.button > 3) break;
 
-	g_message("BUTTON PRESS");
+	ob_debug("BUTTON PRESS\n");
         break;
     case ButtonRelease:
         if (e->xbutton.button > 3) break;
 
-	g_message("BUTTON RELEASED");
+	ob_debug("BUTTON RELEASED\n");
 
         for (it = menu_visible; it; it = g_list_next(it)) {
             ObMenu *m = it->data;
@@ -1062,7 +1063,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 	
         break;
     case MotionNotify:
-        g_message("motion");
+        ob_debug("motion\n");
         for (it = menu_visible; it; it = g_list_next(it)) {
             ObMenu *m = it->data;
             if ((entry = menu_find_entry_by_pos(it->data,

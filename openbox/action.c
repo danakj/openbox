@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "client.h"
 #include "focus.h"
 #include "moveresize.h"
@@ -576,7 +577,6 @@ Action *action_parse(xmlDocPtr doc, xmlNodePtr node)
                        act->func == action_desktop_up ||
                        act->func == action_desktop_down) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode))) {
-                    g_message("WRAP %d", parse_bool(doc, n));
                     act->data.desktopdir.wrap = parse_bool(doc, n);
                 }
             } else if (act->func == action_send_to_desktop_right ||

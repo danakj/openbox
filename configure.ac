@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.0-alpha2], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.0-alpha2a-ex-plus], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([kernel/openbox.c])
 
@@ -84,7 +84,8 @@ PKG_CHECK_MODULES(GTK, [gtk+-2.0],
     AC_MSG_WARN([disabling build of the configuration tool])
   ]
 )
-AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
+#AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
+AM_CONDITIONAL(OBCONF, [false])
 
 # Check for session management
 X11_SM

@@ -72,7 +72,6 @@ void RrPseudoColorSetup (RrInstance *inst)
     int tr, tg, tb, n, r, g, b, i, incolors, ii;
     unsigned long dev;
     int cpc, _ncolors;
-    g_message("Initializing PseudoColor RenderControl\n");
 
     /* determine the number of colors and the bits-per-color */
     inst->pseudo_bpc = 2; /* XXX THIS SHOULD BE A USER OPTION */

@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "menu.h"
 #include "openbox.h"
 #include "stacking.h"
@@ -37,7 +38,7 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
             goto parse_menu_fail;
         if (!parse_attr_string("label", node, &title))
             goto parse_menu_fail;
-        g_message("menu label %s", title);
+        ob_debug("menu label %s\n", title);
 
         if (parse_attr_string("plugin", node, &plugin)) {
             PluginMenuCreateData data;
@@ -431,7 +432,8 @@ ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y)
     y -= menu->title_h + ob_rr_theme->bwidth;
     if (y < 0) return NULL;
     
-    g_message ("%d %p", y/menu->item_h, g_list_nth_data(menu->entries, y / menu->item_h));
+    ob_debug("%d %p\n", y/menu->item_h,
+             g_list_nth_data(menu->entries, y / menu->item_h));
     return g_list_nth_data(menu->entries, y / menu->item_h);
 }
 

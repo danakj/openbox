@@ -146,7 +146,7 @@ gboolean kbind(GList *keylist, Action *action)
     while (t->first_child) t = t->first_child;
 
     if (conflict) {
-        g_message("conflict with binding");
+        g_warning("conflict with binding");
         tree_destroy(tree);
         return FALSE;
     }

@@ -1,25 +1,27 @@
-# nls/fr_FR/Makefile.am for Openbox
+# Makefile.am for Blackbox - an X11 Window Manager
 
 NLSTEST = @NLS@
-CLEANFILES = openbox.cat
+THE_LANG = fr_FR
+THE_NLS_PATH = $(DESTDIR)$(pkgdatadir)/nls/$(THE_LANG)
+CLEANFILES = blackbox.cat
 MAINTAINERCLEANFILES = Makefile.in Translation.m
 DISTCLEANFILES = Translation.m
-MFILES = @srcdir@/BaseDisplay.m @srcdir@/Basemenu.m @srcdir@/Configmenu.m @srcdir@/Icon.m @srcdir@/Image.m @srcdir@/Screen.m @srcdir@/Slit.m @srcdir@/Toolbar.m @srcdir@/Window.m @srcdir@/Windowmenu.m @srcdir@/Workspace.m @srcdir@/Workspacemenu.m @srcdir@/openbox.m @srcdir@/common.m @srcdir@/main.m @srcdir@/bsetroot.m
+MFILES = @srcdir@/BaseDisplay.m @srcdir@/Basemenu.m @srcdir@/Configmenu.m @srcdir@/Icon.m @srcdir@/Image.m @srcdir@/Screen.m @srcdir@/Slit.m @srcdir@/Toolbar.m @srcdir@/Window.m @srcdir@/Windowmenu.m @srcdir@/Workspace.m @srcdir@/Workspacemenu.m @srcdir@/blackbox.m @srcdir@/common.m @srcdir@/main.m @srcdir@/bsetroot.m
 
-all-local: openbox.cat
-install-data-local: openbox.cat
+all-local: blackbox.cat
+install-data-local: blackbox.cat
 	@if test x$(NLSTEST) = "x-DNLS"; then \
-		echo "Installing catalog in $(DESTDIR)$(pkgdatadir)/nls/fr_FR"; \
-		$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)/nls/fr_FR; \
-		$(INSTALL_DATA) openbox.cat $(DESTDIR)$(pkgdatadir)/nls/fr_FR; \
+		echo "Installing catalog in $(THE_NLS_PATH)"; \
+		$(mkinstalldirs) $(THE_NLS_PATH); \
+		$(INSTALL_DATA) blackbox.cat $(THE_NLS_PATH); \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/fr; \
-		ln -f -s fr_FR $(DESTDIR)$(pkgdatadir)/nls/fr; \
+                ln -f -s fr_FR $(DESTDIR)$(pkgdatadir)/nls/fr; \
 	fi
 uninstall-local:
 	@if test x$(NLSTEST) = "x-DNLS"; then \
-		rm -f $(DESTDIR)$(pkgdatadir)/nls/fr_FR/openbox.cat; \
+		rm -f $(THE_NLS_PATH)/blackbox.cat; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/fr; \
-		rmdir $(DESTDIR)$(pkgdatadir)/nls/fr_FR; \
+		rmdir $(THE_NLS_PATH); \
 	fi
 
 Translation.m: $(MFILES)
@@ -27,9 +29,9 @@ Translation.m: $(MFILES)
 		awk -f @srcdir@/../convert.awk output=Translation.m $(MFILES); \
 	fi
 
-openbox.cat: Translation.m
+blackbox.cat: Translation.m
 	@if test x$(NLSTEST) = "x-DNLS"; then \
-		$(gencat_cmd) openbox.cat Translation.m; \
+		$(gencat_cmd) blackbox.cat Translation.m; \
 	fi
 
 distclean-local:

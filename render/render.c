@@ -177,7 +177,10 @@ Appearance *appearance_copy(Appearance *orig)
     break;
     }
     copy->textures = orig->textures;
-    memcpy(copy->texture, orig->texture, orig->textures * sizeof(Texture));
+    if (orig->textures) {
+        copy->texture = malloc(orig->textures * sizeof(Texture));
+        memcpy(copy->texture, orig->texture, orig->textures * sizeof(Texture));
+    } else copy->texture = NULL;
     copy->pixmap = None;
     copy->xftdraw = NULL;
     return copy;

@@ -387,7 +387,8 @@ EXTRA_DIST = \
 	mkinstalldirs \
 	README \
 	COPYING \
-	AUTHORS
+	AUTHORS \
+	plugins/obconf_interface.h
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

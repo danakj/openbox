@@ -12,6 +12,7 @@ Button::Button(Widget *parent)
   : FocusLabel(parent), _pressed(false), _pressed_focus_tx(0),
     _pressed_unfocus_tx(0), _unpr_focus_tx(0), _unpr_unfocus_tx(0)
 {
+  setStyle(_style);
 }
 
 Button::~Button()

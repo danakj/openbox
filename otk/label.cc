@@ -11,6 +11,7 @@ namespace otk {
 Label::Label(Widget *parent)
   : Widget(parent), _text("")
 {
+  setStyle(_style);
 }
 
 Label::~Label()

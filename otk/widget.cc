@@ -32,7 +32,6 @@ Widget::Widget(Widget *parent, Direction direction)
   parent->addChild(this);
   create();
   _event_dispatcher->registerHandler(_window, this);
-  setStyle(_style); // let the widget initialize stuff
 }
 
 Widget::Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
@@ -53,7 +52,6 @@ Widget::Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
   assert(style);
   create(override_redirect);
   _event_dispatcher->registerHandler(_window, this);
-  setStyle(_style); // let the widget initialize stuff
 }
 
 Widget::~Widget()

@@ -10,7 +10,7 @@ distclean-local:
 	$(RM) *\~ .\#*
 
 menu: $(srcdir)/menu.in
-	$(SED) -e "s!@pkgdatadir@!$(pkgdatadir)!" $< > $@
+	$(SED) -e "s!@datadir@!$(datadir)!" $< > $@
 
 uninstall-am:
-	$(RM) $(DESTDIR)$(pkgdatadir)/menu
+	$(RM) $(DESTDIR)$(datadir)/menu

@@ -83,7 +83,7 @@
   [end]
  
   [submenu] (Styles) {Choose a style...}
-    [stylesdir] (@pkgdatadir@/styles)
+    [stylesdir] (@datadir@/styles)
   [end]
 
   [workspaces] (Workspace List)

@@ -56,6 +56,7 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
                     .parent = menu
                 };
                 parent = plugin_create(plugin, &data);
+                g_free(plugin);
             } else {
                 parent = menu;
                 parse_menu(doc, node->xmlChildrenNode, &parent);
@@ -110,6 +111,7 @@ void menu_destroy_hash_value(ObMenu *self)
     stacking_remove(self);
 
     RrAppearanceFree(self->a_title);
+    RrAppearanceFree(self->a_items);
     XDestroyWindow(ob_display, self->title);
     XDestroyWindow(ob_display, self->frame);
     XDestroyWindow(ob_display, self->items);

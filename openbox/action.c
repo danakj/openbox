@@ -589,6 +589,7 @@ Action *action_parse(xmlDocPtr doc, xmlNodePtr node)
                     act->data.sendtodir.follow = parse_bool(doc, n);
             }
         }
+        g_free(actname);
     }
     return act;
 }

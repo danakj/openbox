@@ -5,3 +5,5 @@ translate.lo
 keyaction.lo
 .libs
 keyparse.lo
+Makefile.in
+.deps

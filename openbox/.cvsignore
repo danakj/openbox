@@ -26,3 +26,5 @@ screen.lo
 stacking.lo
 timer.lo
 xerror.lo
+Makefile.in
+.deps

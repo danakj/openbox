@@ -3,3 +3,5 @@ mouse.la
 translate.lo
 mouseparse.lo
 .libs
+Makefile.in
+.deps

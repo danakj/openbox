@@ -2,3 +2,5 @@ placement.la
 placement.lo
 history.lo
 .libs
+Makefile.in
+.deps

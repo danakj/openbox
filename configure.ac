@@ -1,5 +1,6 @@
 AC_PREREQ([2.50])
 AC_INIT([openbox], [2.90.0cvs], [http://bugzilla.icculus.org])
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([kernel/openbox.c])
 
 AC_PREFIX_DEFAULT([/usr/local])
@@ -33,12 +34,9 @@ LIBTOOL="$LIBTOOL --silent"
 
 AC_PROG_INSTALL
 
-OB_NLS
-## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ##
-##ALL_LINGUAS=""
-##AM_GNU_GETTEXT_VERSION(0.11.5)
-##AM_GNU_GETTEXT([external])
-## XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX ##
+ALL_LINGUAS=""
+AM_GNU_GETTEXT_VERSION(0.11.5)
+AM_GNU_GETTEXT([external])
 
 AC_CHECK_HEADERS(ctype.h fcntl.h locale.h signal.h string.h stdio.h stdlib.h)
 AC_CHECK_HEADERS(unistd.h sys/stat.h sys/select.h sys/time.h sys/wait.h)
@@ -62,7 +60,16 @@ X11_EXT_XKB
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
-AC_CONFIG_FILES([Makefile build/Makefile.incl])
+AC_CONFIG_FILES([Makefile
+                 po/Makefile.in
+                 themes/Makefile
+		 data/Makefile
+                 render/Makefile
+                 kernel/Makefile
+		 plugins/Makefile
+		 plugins/placement/Makefile
+		 plugins/mouse/Makefile
+		 plugins/keyboard/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT

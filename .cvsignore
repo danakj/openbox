@@ -9,3 +9,10 @@ Makefile
 config.guess
 config.sub
 ltmain.sh
+ABOUT-NLS
+INSTALL
+compile
+config.rpath
+depcomp
+missing
+mkinstalldirs

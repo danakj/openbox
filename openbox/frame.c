@@ -119,9 +119,9 @@ Frame *frame_new()
     self->iconify = createWindow(self->title, mask, &attrib);
     self->handle = createWindow(self->window, mask, &attrib);
     mask |= CWCursor;
-    attrib.cursor = ob_cursors.ll_angle;
+    attrib.cursor = ob_cursors.bl;
     self->lgrip = createWindow(self->handle, mask, &attrib);
-    attrib.cursor = ob_cursors.lr_angle;
+    attrib.cursor = ob_cursors.br;
     self->rgrip = createWindow(self->handle, mask, &attrib);
 
     /* the other stuff is shown based on decor settings */

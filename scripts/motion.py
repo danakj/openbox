@@ -81,8 +81,7 @@ def _motion_grab(data):
     global _motion_mask, _inmove, _inresize;
 
     # are all the modifiers this started with still pressed?
-    print _motion_mask, data.state
-    if not _motion_mask == data.state:
+    if not _motion_mask & data.state:
         if _inmove:
             _end_move(data)
         elif _inresize:

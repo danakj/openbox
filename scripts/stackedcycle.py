@@ -218,7 +218,7 @@ class _cycledata:
         done = 0
         notreverting = 1
         # have all the modifiers this started with been released?
-        if not self.state == data.state:
+        if not self.state & data.state:
             done = 1
         elif data.action == ob.KeyAction.Press:
             # has Escape been pressed?

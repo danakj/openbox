@@ -1,5 +1,6 @@
 #include "client.h"
 #include "screen.h"
+#include "moveresize.h"
 #include "prop.h"
 #include "extensions.h"
 #include "frame.h"
@@ -237,8 +238,6 @@ void client_manage(Window window)
 
     client_showhide(self);
 
-    dispatch_client(Event_Client_Mapped, self, 0, 0);
-
     /* focus the new window? */
     if (ob_state != State_Starting && client_normal(self)) {
         if (config_focus_new)
@@ -264,6 +263,8 @@ void client_manage(Window window)
 
     /* make sure the window is visible */
     client_move_onscreen(self);
+
+    dispatch_client(Event_Client_Mapped, self, 0, 0);
 
     g_message("Managed window 0x%lx", window);
 }
@@ -330,6 +331,9 @@ void client_unmanage(Client *self)
             client_calc_layer(it->data);
         }
     }
+
+    if (moveresize_client == self)
+        moveresize_end(TRUE);
 
     if (focus_client == self)
         client_unfocus(self);

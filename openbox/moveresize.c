@@ -9,12 +9,13 @@
 #include <glib.h>
 
 gboolean moveresize_in_progress = FALSE;
+Client *moveresize_client = NULL;
+
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
 static Window coords = None;
 static int start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static int cur_x, cur_y;
-static Client *client;
 static guint button;
 static guint32 corner;
 static Corner lockcorner;
@@ -65,7 +66,7 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
 
     g_assert(!moveresize_in_progress);
 
-    client = c;
+    moveresize_client = c;
     start_cx = c->frame->area.x;
     start_cy = c->frame->area.y;
     start_cw = c->area.width;
@@ -121,7 +122,7 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     grab_keyboard(TRUE);
 }
 
-static void end_moveresize(gboolean cancel)
+void moveresize_end(gboolean cancel)
 {
     grab_keyboard(FALSE);
     grab_pointer(FALSE, None);
@@ -132,44 +133,51 @@ static void end_moveresize(gboolean cancel)
     moveresize_in_progress = FALSE;
 
     if (moving) {
-        client_configure(client, Corner_TopLeft, (cancel ? start_cx : cur_x),
+        client_configure(moveresize_client, Corner_TopLeft,
+                         (cancel ? start_cx : cur_x),
                          (cancel ? start_cy : cur_y),
                          start_cw, start_ch, TRUE, TRUE);
     } else {
-        client_configure(client, lockcorner, client->area.x,
-                         client->area.y, (cancel ? start_cw : cur_x),
+        client_configure(moveresize_client, lockcorner,
+                         moveresize_client->area.x,
+                         moveresize_client->area.y,
+                         (cancel ? start_cw : cur_x),
                          (cancel ? start_ch : cur_y), TRUE, TRUE);
     }
 }
 
 static void do_move()
 {
-    dispatch_move(client, &cur_x, &cur_y);
+    dispatch_move(moveresize_client, &cur_x, &cur_y);
 
     popup_coords("X:  %d  Y:  %d", cur_x, cur_y);
 
     /* get where the client should be */
-    frame_frame_gravity(client->frame, &cur_x, &cur_y);
-    client_configure(client, Corner_TopLeft, cur_x, cur_y,
+    frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
+    client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
 }
 
 static void do_resize()
 {
     /* dispatch_resize needs the frame size */
-    cur_x += client->frame->size.left + client->frame->size.right;
-    cur_y += client->frame->size.top + client->frame->size.bottom;
+    cur_x += moveresize_client->frame->size.left +
+        moveresize_client->frame->size.right;
+    cur_y += moveresize_client->frame->size.top +
+        moveresize_client->frame->size.bottom;
 
-    dispatch_resize(client, &cur_x, &cur_y, lockcorner);
+    dispatch_resize(moveresize_client, &cur_x, &cur_y, lockcorner);
 
-    cur_x -= client->frame->size.left + client->frame->size.right;
-    cur_y -= client->frame->size.top + client->frame->size.bottom;
+    cur_x -= moveresize_client->frame->size.left +
+        moveresize_client->frame->size.right;
+    cur_y -= moveresize_client->frame->size.top +
+        moveresize_client->frame->size.bottom;
     
-    client_configure(client, lockcorner, client->area.x,
-                     client->area.y, cur_x, cur_y, TRUE, FALSE);
+    client_configure(moveresize_client, lockcorner, moveresize_client->area.x,
+                     moveresize_client->area.y, cur_x, cur_y, TRUE, FALSE);
 
-    popup_coords("W:  %d  H:  %d", client->logical_size.width,
-                 client->logical_size.height);
+    popup_coords("W:  %d  H:  %d", moveresize_client->logical_size.width,
+                 moveresize_client->logical_size.height);
 }
 
 void moveresize_event(XEvent *e)
@@ -184,7 +192,7 @@ void moveresize_event(XEvent *e)
         }
     } else if (e->type == ButtonRelease) {
         if (!button || e->xbutton.button == button) {
-            end_moveresize(FALSE);
+            moveresize_end(FALSE);
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
@@ -237,19 +245,19 @@ void moveresize_event(XEvent *e)
         }
     } else if (e->type == KeyPress) {
         if (e->xkey.keycode == button_escape)
-            end_moveresize(TRUE);
+            moveresize_end(TRUE);
         else if (e->xkey.keycode == button_return)
-            end_moveresize(FALSE);
+            moveresize_end(FALSE);
         else {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
                 if (e->xkey.keycode == button_right)
-                    cur_x += MAX(4, client->size_inc.width);
+                    cur_x += MAX(4, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == button_left)
-                    cur_x -= MAX(4, client->size_inc.width);
+                    cur_x -= MAX(4, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == button_down)
-                    cur_y += MAX(4, client->size_inc.height);
+                    cur_y += MAX(4, moveresize_client->size_inc.height);
                 else if (e->xkey.keycode == button_up)
-                    cur_y -= MAX(4, client->size_inc.height);
+                    cur_y -= MAX(4, moveresize_client->size_inc.height);
                 else
                     return;
                 do_resize();

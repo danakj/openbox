@@ -27,9 +27,7 @@ Group *group_add(Window leader, Client *client)
         self->leader = leader;
         self->members = NULL;
         g_hash_table_insert(group_map, &self->leader, self);
-        g_message("NEW GROUP FOR %lx", leader);
-    } else
-        g_message("REUSING GROUP FOR %lx", leader);
+    }
 
     self->members = g_slist_append(self->members, client);
 

@@ -48,8 +48,9 @@ int main () {
 
   XMapWindow(display, win);
   XFlush(display);
-  sleep(2);
+  sleep(1);
 
+  printf("urgent on\n");
   hint.flags = XUrgencyHint;
   XSetWMHints(display, win, &hint);
   XFlush(display);

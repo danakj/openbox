@@ -26,7 +26,7 @@ $(dir)/%.lo: $(srcdir)/%.c $(depdir)/%.d
 $(depdir)/%.d: $(srcdir)/%.c
 	@echo Building dependancies for $<
 	@$(INSTALL) -d $(depdir)
-	@$(DEPCOMPILE) -w -MM -MF $@ -MQ $(<:.c=.o) $<
+	@$(DEPCOMPILE) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(libdir)/

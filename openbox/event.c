@@ -620,23 +620,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
            is a waste of resources to go drawing it. */
         if (!(e->xbutton.button == 4 || e->xbutton.button == 5)) {
             switch (frame_context(client, e->xbutton.window)) {
-            case Context_Maximize:
+            case OB_FRAME_CONTEXT_MAXIMIZE:
                 client->frame->max_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
                 break;
-            case Context_Close:
+            case OB_FRAME_CONTEXT_CLOSE:
                 client->frame->close_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
                 break;
-            case Context_Iconify:
+            case OB_FRAME_CONTEXT_ICONIFY:
                 client->frame->iconify_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
                 break;
-            case Context_AllDesktops:
+            case OB_FRAME_CONTEXT_ALLDESKTOPS:
                 client->frame->desk_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
                 break; 
-            case Context_Shade:
+            case OB_FRAME_CONTEXT_SHADE:
                 client->frame->shade_press = (e->type == ButtonPress);
                 framerender_frame(client->frame);
                 break;

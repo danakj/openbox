@@ -4,15 +4,15 @@
 #include "framerender.h"
 #include "render/theme.h"
 
-static void framerender_label(Frame *self, RrAppearance *a);
-static void framerender_icon(Frame *self, RrAppearance *a);
-static void framerender_max(Frame *self, RrAppearance *a);
-static void framerender_iconify(Frame *self, RrAppearance *a);
-static void framerender_desk(Frame *self, RrAppearance *a);
-static void framerender_shade(Frame *self, RrAppearance *a);
-static void framerender_close(Frame *self, RrAppearance *a);
+static void framerender_label(ObFrame *self, RrAppearance *a);
+static void framerender_icon(ObFrame *self, RrAppearance *a);
+static void framerender_max(ObFrame *self, RrAppearance *a);
+static void framerender_iconify(ObFrame *self, RrAppearance *a);
+static void framerender_desk(ObFrame *self, RrAppearance *a);
+static void framerender_shade(ObFrame *self, RrAppearance *a);
+static void framerender_close(ObFrame *self, RrAppearance *a);
 
-void framerender_frame(Frame *self)
+void framerender_frame(ObFrame *self)
 {
     if (self->focused)
         XSetWindowBorder(ob_display, self->plate,
@@ -145,7 +145,7 @@ void framerender_frame(Frame *self)
     }
 }
 
-static void framerender_label(Frame *self, RrAppearance *a)
+static void framerender_label(ObFrame *self, RrAppearance *a)
 {
     if (self->label_x < 0) return;
     /* set the texture's text! */
@@ -153,7 +153,7 @@ static void framerender_label(Frame *self, RrAppearance *a)
     RrPaint(a, self->label, self->label_width, ob_rr_theme->label_height);
 }
 
-static void framerender_icon(Frame *self, RrAppearance *a)
+static void framerender_icon(ObFrame *self, RrAppearance *a)
 {
     if (self->icon_x < 0) return;
 
@@ -172,33 +172,33 @@ static void framerender_icon(Frame *self, RrAppearance *a)
             ob_rr_theme->button_size + 2, ob_rr_theme->button_size + 2);
 }
 
-static void framerender_max(Frame *self, RrAppearance *a)
+static void framerender_max(ObFrame *self, RrAppearance *a)
 {
     if (self->max_x < 0) return;
     RrPaint(a, self->max, ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
-static void framerender_iconify(Frame *self, RrAppearance *a)
+static void framerender_iconify(ObFrame *self, RrAppearance *a)
 {
     if (self->iconify_x < 0) return;
     RrPaint(a, self->iconify,
             ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
-static void framerender_desk(Frame *self, RrAppearance *a)
+static void framerender_desk(ObFrame *self, RrAppearance *a)
 {
     if (self->desk_x < 0) return;
     RrPaint(a, self->desk, ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
-static void framerender_shade(Frame *self, RrAppearance *a)
+static void framerender_shade(ObFrame *self, RrAppearance *a)
 {
     if (self->shade_x < 0) return;
     RrPaint(a, self->shade,
             ob_rr_theme->button_size, ob_rr_theme->button_size);
 }
 
-static void framerender_close(Frame *self, RrAppearance *a)
+static void framerender_close(ObFrame *self, RrAppearance *a)
 {
     if (self->close_x < 0) return;
     RrPaint(a, self->close,

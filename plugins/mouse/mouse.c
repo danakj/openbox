@@ -102,14 +102,14 @@ void plugin_setup_config()
 }
 
 /* Array of GSList*s of PointerBinding*s. */
-static GSList *bound_contexts[NUM_CONTEXTS];
+static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
 
 static void grab_for_client(ObClient *client, gboolean grab)
 {
     int i;
     GSList *it;
 
-    for (i = 0; i < NUM_CONTEXTS; ++i)
+    for (i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i)
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
             /* grab/ungrab the button */
             MouseBinding *b = it->data;
@@ -117,11 +117,11 @@ static void grab_for_client(ObClient *client, gboolean grab)
             int mode;
             unsigned int mask;
 
-            if (i == Context_Frame) {
+            if (i == OB_FRAME_CONTEXT_FRAME) {
                 win = client->frame->window;
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
-            } else if (i == Context_Client) {
+            } else if (i == OB_FRAME_CONTEXT_CLIENT) {
                 win = client->frame->plate;
                 mode = GrabModeSync; /* this is handled in event */
                 mask = ButtonPressMask; /* can't catch more than this with Sync
@@ -149,7 +149,7 @@ static void clearall()
     int i;
     GSList *it;
     
-    for(i = 0; i < NUM_CONTEXTS; ++i) {
+    for(i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i) {
         for (it = bound_contexts[i]; it != NULL; it = it->next) {
             int j;
 
@@ -167,7 +167,8 @@ static void clearall()
     }
 }
 
-static void fire_button(MouseAction a, Context context, ObClient *c, guint state,
+static void fire_button(MouseAction a, ObFrameContext context,
+                        ObClient *c, guint state,
                         guint button, int x, int y)
 {
     GSList *it;
@@ -198,7 +199,7 @@ static void fire_button(MouseAction a, Context context, ObClient *c, guint state
     }
 }
 
-static void fire_motion(MouseAction a, Context context, ObClient *c,
+static void fire_motion(MouseAction a, ObFrameContext context, ObClient *c,
                         guint state, guint button, int x_root, int y_root,
                         guint32 corner)
 {
@@ -259,7 +260,7 @@ static void event(ObEvent *e, void *foo)
     static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
-    Context context;
+    ObFrameContext context;
     
     switch (e->type) {
     case Event_Client_Mapped:
@@ -284,7 +285,7 @@ static void event(ObEvent *e, void *foo)
                     e->data.x.e->xbutton.button,
                     e->data.x.e->xbutton.x_root, e->data.x.e->xbutton.y_root);
 
-        if (context == Context_Client) {
+        if (context == OB_FRAME_CONTEXT_CLIENT) {
             /* Replay the event, so it goes to the client*/
             XAllowEvents(ob_display, ReplayPointer, event_lasttime);
             /* Fall through to the release case! */
@@ -348,12 +349,12 @@ static void event(ObEvent *e, void *foo)
                                         e->data.x.e->xmotion.window);
 
                 /* You can't drag on buttons */
-                if (context == Context_Maximize ||
-                    context == Context_AllDesktops ||
-                    context == Context_Shade ||
-                    context == Context_Iconify ||
-                    context == Context_Icon ||
-                    context == Context_Close)
+                if (context == OB_FRAME_CONTEXT_MAXIMIZE ||
+                    context == OB_FRAME_CONTEXT_ALLDESKTOPS ||
+                    context == OB_FRAME_CONTEXT_SHADE ||
+                    context == OB_FRAME_CONTEXT_ICONIFY ||
+                    context == OB_FRAME_CONTEXT_ICON ||
+                    context == OB_FRAME_CONTEXT_CLOSE)
                     break;
 
                 if (!e->data.x.client)
@@ -393,7 +394,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
                Action *action)
 {
     guint state, button;
-    Context context;
+    ObFrameContext context;
     MouseBinding *b;
     GSList *it;
 

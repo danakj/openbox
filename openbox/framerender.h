@@ -3,6 +3,6 @@
 
 #include "frame.h"
 
-void framerender_frame(Frame *self);
+void framerender_frame(ObFrame *self);
 
 #endif

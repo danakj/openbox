@@ -1,4 +1,5 @@
 #include "frame.h"
+#include "client.h"
 #include "openbox.h"
 #include "extensions.h"
 #include "framerender.h"
@@ -10,7 +11,10 @@
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 
-static void layout_title(Frame *self);
+#define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
+		           f->cbwidth)
+
+static void layout_title(ObFrame *self);
 
 void frame_startup()
 {
@@ -29,13 +33,13 @@ static Window createWindow(Window parent, unsigned long mask,
                        
 }
 
-Frame *frame_new()
+ObFrame *frame_new()
 {
     XSetWindowAttributes attrib;
     unsigned long mask;
-    Frame *self;
+    ObFrame *self;
 
-    self = g_new(Frame, 1);
+    self = g_new(ObFrame, 1);
 
     self->visible = FALSE;
     self->decorations = 0;
@@ -110,10 +114,10 @@ Frame *frame_new()
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = self->shade_press = FALSE;
 
-    return (Frame*)self;
+    return (ObFrame*)self;
 }
 
-static void frame_free(Frame *self)
+static void frame_free(ObFrame *self)
 {
     RrAppearanceFree(self->a_unfocused_title); 
     RrAppearanceFree(self->a_focused_title);
@@ -128,7 +132,7 @@ static void frame_free(Frame *self)
     g_free(self);
 }
 
-void frame_show(Frame *self)
+void frame_show(ObFrame *self)
 {
     if (!self->visible) {
 	self->visible = TRUE;
@@ -136,7 +140,7 @@ void frame_show(Frame *self)
     }
 }
 
-void frame_hide(Frame *self)
+void frame_hide(ObFrame *self)
 {
     if (self->visible) {
 	self->visible = FALSE;
@@ -145,7 +149,7 @@ void frame_hide(Frame *self)
     }
 }
 
-void frame_adjust_shape(Frame *self)
+void frame_adjust_shape(ObFrame *self)
 {
 #ifdef SHAPE
     int num;
@@ -191,7 +195,7 @@ void frame_adjust_shape(Frame *self)
 #endif
 }
 
-void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
+void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 {
     if (resized) {
         self->decorations = self->client->decorations;
@@ -291,7 +295,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
            frame_client_gravity. */
         self->area.x = self->client->area.x;
         self->area.y = self->client->area.y;
-        frame_client_gravity((Frame*)self,
+        frame_client_gravity((ObFrame*)self,
                              &self->area.x, &self->area.y);
     }
 
@@ -309,28 +313,28 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
     }
 }
 
-void frame_adjust_state(Frame *self)
+void frame_adjust_state(ObFrame *self)
 {
     framerender_frame(self);
 }
 
-void frame_adjust_focus(Frame *self, gboolean hilite)
+void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
     self->focused = hilite;
     framerender_frame(self);
 }
 
-void frame_adjust_title(Frame *self)
+void frame_adjust_title(ObFrame *self)
 {
     framerender_frame(self);
 }
 
-void frame_adjust_icon(Frame *self)
+void frame_adjust_icon(ObFrame *self)
 {
     framerender_frame(self);
 }
 
-void frame_grab_client(Frame *self, ObClient *client)
+void frame_grab_client(ObFrame *self, ObClient *client)
 {
     self->client = client;
 
@@ -372,7 +376,7 @@ void frame_grab_client(Frame *self, ObClient *client)
     g_hash_table_insert(window_map, &self->rgrip, client);
 }
 
-void frame_release_client(Frame *self, ObClient *client)
+void frame_release_client(ObFrame *self, ObClient *client)
 {
     XEvent ev;
 
@@ -414,7 +418,7 @@ void frame_release_client(Frame *self, ObClient *client)
     frame_free(self);
 }
 
-static void layout_title(Frame *self)
+static void layout_title(ObFrame *self)
 {
     char *lc;
     int x;
@@ -543,68 +547,64 @@ static void layout_title(Frame *self)
     }
 }
 
-Context frame_context_from_string(char *name)
+ObFrameContext frame_context_from_string(char *name)
 {
     if (!g_ascii_strcasecmp("root", name))
-        return Context_Root;
+        return OB_FRAME_CONTEXT_ROOT;
     else if (!g_ascii_strcasecmp("client", name))
-        return Context_Client;
+        return OB_FRAME_CONTEXT_CLIENT;
     else if (!g_ascii_strcasecmp("titlebar", name))
-        return Context_Titlebar;
+        return OB_FRAME_CONTEXT_TITLEBAR;
     else if (!g_ascii_strcasecmp("handle", name))
-        return Context_Handle;
+        return OB_FRAME_CONTEXT_HANDLE;
     else if (!g_ascii_strcasecmp("frame", name))
-        return Context_Frame;
+        return OB_FRAME_CONTEXT_FRAME;
     else if (!g_ascii_strcasecmp("blcorner", name))
-        return Context_BLCorner;
-    else if (!g_ascii_strcasecmp("tlcorner", name))
-        return Context_TLCorner;
+        return OB_FRAME_CONTEXT_BLCORNER;
     else if (!g_ascii_strcasecmp("brcorner", name))
-        return Context_BRCorner;
-    else if (!g_ascii_strcasecmp("trcorner", name))
-        return Context_TRCorner;
+        return OB_FRAME_CONTEXT_BRCORNER;
     else if (!g_ascii_strcasecmp("maximize", name))
-        return Context_Maximize;
+        return OB_FRAME_CONTEXT_MAXIMIZE;
     else if (!g_ascii_strcasecmp("alldesktops", name))
-        return Context_AllDesktops;
+        return OB_FRAME_CONTEXT_ALLDESKTOPS;
     else if (!g_ascii_strcasecmp("shade", name))
-        return Context_Shade;
+        return OB_FRAME_CONTEXT_SHADE;
     else if (!g_ascii_strcasecmp("iconify", name))
-        return Context_Iconify;
+        return OB_FRAME_CONTEXT_ICONIFY;
     else if (!g_ascii_strcasecmp("icon", name))
-        return Context_Icon;
+        return OB_FRAME_CONTEXT_ICON;
     else if (!g_ascii_strcasecmp("close", name))
-        return Context_Close;
-    return Context_None;
+        return OB_FRAME_CONTEXT_CLOSE;
+    return OB_FRAME_CONTEXT_NONE;
 }
 
-Context frame_context(ObClient *client, Window win)
+ObFrameContext frame_context(ObClient *client, Window win)
 {
-    Frame *self;
+    ObFrame *self;
 
-    if (win == ob_root) return Context_Root;
-    if (client == NULL) return Context_None;
-    if (win == client->window) return Context_Client;
+    if (win == ob_root) return OB_FRAME_CONTEXT_ROOT;
+    if (client == NULL) return OB_FRAME_CONTEXT_NONE;
+    if (win == client->window) return OB_FRAME_CONTEXT_CLIENT;
 
     self = client->frame;
-    if (win == self->window) return Context_Frame;
-    if (win == self->plate)  return Context_Client;
-    if (win == self->title)  return Context_Titlebar;
-    if (win == self->label)  return Context_Titlebar;
-    if (win == self->handle) return Context_Handle;
-    if (win == self->lgrip)  return Context_BLCorner;
-    if (win == self->rgrip)  return Context_BRCorner;
-    if (win == self->max)    return Context_Maximize;
-    if (win == self->iconify)return Context_Iconify;
-    if (win == self->close)  return Context_Close;
-    if (win == self->icon)   return Context_Icon;
-    if (win == self->desk)   return Context_AllDesktops;
-    if (win == self->shade)  return Context_Shade;
+    if (win == self->window) return OB_FRAME_CONTEXT_FRAME;
+    if (win == self->plate)  return OB_FRAME_CONTEXT_CLIENT;
+    if (win == self->title)  return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->label)  return OB_FRAME_CONTEXT_TITLEBAR;
+    if (win == self->handle) return OB_FRAME_CONTEXT_HANDLE;
+    if (win == self->lgrip)  return OB_FRAME_CONTEXT_BLCORNER;
+    if (win == self->rgrip)  return OB_FRAME_CONTEXT_BRCORNER;
+    if (win == self->max)    return OB_FRAME_CONTEXT_MAXIMIZE;
+    if (win == self->iconify)return OB_FRAME_CONTEXT_ICONIFY;
+    if (win == self->close)  return OB_FRAME_CONTEXT_CLOSE;
+    if (win == self->icon)   return OB_FRAME_CONTEXT_ICON;
+    if (win == self->desk)   return OB_FRAME_CONTEXT_ALLDESKTOPS;
+    if (win == self->shade)  return OB_FRAME_CONTEXT_SHADE;
 
-    return Context_None;
+    return OB_FRAME_CONTEXT_NONE;
 }
 
-void frame_client_gravity(Frame *self, int *x, int *y)
+void frame_client_gravity(ObFrame *self, int *x, int *y)
 {
     /* horizontal */
     switch (self->client->gravity) {
@@ -659,7 +659,7 @@ void frame_client_gravity(Frame *self, int *x, int *y)
     }
 }
 
-void frame_frame_gravity(Frame *self, int *x, int *y)
+void frame_frame_gravity(ObFrame *self, int *x, int *y)
 {
     /* horizontal */
     switch (self->client->gravity) {

@@ -10,7 +10,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-struct Frame;
+struct _ObFrame;
 struct _ObGroup;
 
 typedef struct _ObClient     ObClient;
@@ -75,7 +75,7 @@ struct _ObClient
     Window  window;
 
     /*! The window's decorations. NULL while the window is being managed! */
-    struct Frame *frame;
+    struct _ObFrame *frame;
 
     /*! The number of unmap events to ignore on the window */
     int ignore_unmaps;

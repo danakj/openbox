@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "frame.h"
+#include "client.h"
 #include "window.h"
 #include "stacking.h"
 #include "render/render.h"

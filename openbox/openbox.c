@@ -197,6 +197,9 @@ int main(int argc, char **argv)
 	timer_startup();
 	event_startup();
         grab_startup();
+        /* focus_backup is used for stacking, so this needs to come before
+           anything that calls stacking_add */
+	focus_startup();
         window_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
@@ -218,7 +221,6 @@ int main(int argc, char **argv)
 
         frame_startup();
         moveresize_startup();
-	focus_startup();
 	screen_startup();
         group_startup();
 	client_startup();

@@ -34,7 +34,6 @@ void focus_startup()
     XSetWindowAttributes attrib;
 
     focus_client = NULL;
-    focus_cycle_popup = popup_new(TRUE);
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
@@ -42,6 +41,10 @@ void focus_startup()
                                  CopyFromParent, InputOutput, CopyFromParent,
                                  CWOverrideRedirect, &attrib);
     XMapRaised(ob_display, focus_backup);
+
+    /* do this *after* focus_backup is created, since it is used for
+       stacking */
+    focus_cycle_popup = popup_new(TRUE);
 
     /* start with nothing focused */
     focus_set_client(NULL);

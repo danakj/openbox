@@ -61,6 +61,8 @@ static void do_restack(GList *wins, GList *before)
 
     for (i = 1, it = wins; it; ++i, it = g_list_next(it)) {
         win[i] = window_top(it->data);
+        g_assert(win[i] != None); /* better not call stacking shit before
+                                     setting your top level window value */
         stacking_list = g_list_insert_before(stacking_list, before, it->data);
     }
 
@@ -253,7 +255,10 @@ void stacking_lower(ObWindow *window)
 void stacking_add(ObWindow *win)
 {
     StackLayer l;
-    GList *wins, *it;
+    GList *wins;
+
+    g_assert(focus_backup != None); /* make sure I dont break this in the
+                                       future */
 
     l = window_layer(win);
     wins = g_list_append(NULL, win); /* list of 1 element */

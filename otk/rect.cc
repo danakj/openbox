@@ -21,7 +21,7 @@ void Rect::setPos(const Point &location)
   _x2 += location.x() - _x1;
   _x1 = location.x();
   _y2 += location.y() - _y1;
-  _y1 = loaction.y();
+  _y1 = location.y();
 }
 
 
@@ -34,19 +34,19 @@ void Rect::setPos(int x, int y)
 }
 
 
-void Rect::setWidth(unsigned int w)
+void Rect::setWidth(int w)
 {
   _x2 = w + _x1 - 1;
 }
 
 
-void Rect::setHeight(unsigned int h)
+void Rect::setHeight(int h)
 {
   _y2 = h + _y1 - 1;
 }
 
 
-void Rect::setSize(unsigned int w, unsigned int h)
+void Rect::setSize(int w, int h)
 {
   _x2 = w + _x1 - 1;
   _y2 = h + _y1 - 1;
@@ -60,13 +60,13 @@ void Rect::setSize(const Point &size)
 }
 
 
-void Rect::setRect(int x, int y, unsigned int w, unsigned int h)
+void Rect::setRect(int x, int y, int w, int h)
 {
   *this = Rect(x, y, w, h);
 }
 
 
-void setRect(const Point &location, const Point &size)
+void Rect::setRect(const Point &location, const Point &size)
 {
   *this = Rect(location, size);
 }
@@ -81,7 +81,7 @@ void Rect::setCoords(int l, int t, int r, int b)
 }
 
 
-void setCoords(const Point &tl, const Point &br)
+void Rect::setCoords(const Point &tl, const Point &br)
 {
   _x1 = tl.x();
   _y1 = tl.y();

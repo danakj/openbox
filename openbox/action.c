@@ -785,7 +785,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     return act;
 }
 
-void action_run_list(GSList *acts, struct _ObClient *c,
+void action_run_list(GSList *acts, ObClient *c,
                      guint state, guint button, gint x, gint y,
                      gboolean cancel, gboolean done)
 {
@@ -793,16 +793,22 @@ void action_run_list(GSList *acts, struct _ObClient *c,
     ObAction *a;
     gboolean inter = FALSE;
 
+    if (!acts)
+        return;
+
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
 
-    for (it = acts; it; it = g_slist_next(it)) {
-        a = it->data;
-        if (a->data.any.interactive) {
-            inter = TRUE;
-            break;
+    if (grab_on_keyboard())
+        inter = TRUE;
+    else
+        for (it = acts; it; it = g_slist_next(it)) {
+            a = it->data;
+            if (a->data.any.interactive) {
+                inter = TRUE;
+                break;
+            }
         }
-    }
 
     if (!inter) {
         /* sometimes when we execute another app as an action,

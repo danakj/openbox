@@ -14,6 +14,16 @@ stacked_cycle_popup_list = 1                                            ###
 # send focus somewhere when nothing is left with the focus, if possible ###
 fallback = 0                                                            ###
 ###                                                                     ###
+###                                                                     ###
+# Provides:                                                             ###
+# def focus_next_stacked(data, forward=1):                              ###
+# def focus_prev_stacked(data):                                         ###
+# def focus_next(data, num=1, forward=1):                               ###
+# def focus_prev(data, num=1):                                          ###
+###                                                                     ###
+# All of these functions call be used as callbacks for bindings         ###
+# directly.                                                             ###
+###                                                                     ###
 ###########################################################################
 
 import otk

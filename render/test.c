@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/shape.h>
-#include <GL/glx.h>
+/*#include <GL/glx.h>*/
 #include <string.h>
 #include <stdlib.h>
 #include "render.h"

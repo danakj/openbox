@@ -25,3 +25,19 @@ translate it into what you see. The Client.frame.area is the actual position
 and size of the entire frame. This is usually the value you want to use, unless
 you are in client.c (probably) and adjusting/using the position or size from
 the client's perspective.
+
+Indentation
+-----------
+For openbox, we aim to have consistent coding style. Some, but surely
+not all, guidelines:
+ * use 4 space indents
+ * tabs should not appear in source files
+ * functions should have the opening and closing braces on their own
+   lines
+ * most other constructs should have braces on the same line as the
+   statement
+ * when in doubt look at the rest of the source
+ * vim users can use "set expandtab tabstop=4 shiftwidth=4
+   softtabstop=4" for some of this
+
+

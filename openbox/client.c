@@ -1143,20 +1143,20 @@ void client_setup_decor_and_functions(ObClient *self)
     }
 
     if (self->mwmhints.flags & OB_MWM_FLAG_FUNCTIONS) {
-	if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
-	    if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
-            self->functions &= ~OB_CLIENT_FUNC_RESIZE;
-	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
-            self->functions &= ~OB_CLIENT_FUNC_MOVE;
+        if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
+            if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
+                self->functions &= ~OB_CLIENT_FUNC_RESIZE;
+            if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
+                self->functions &= ~OB_CLIENT_FUNC_MOVE;
             /* dont let mwm hints kill any buttons
-	    if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
-            self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
-	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
-            self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+               if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
+               self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
+               if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
+               self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
             */
-	    /* dont let mwm hints kill the close button
-	        if (! (self->mwmhints.functions & MwmFunc_Close))
-                self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
+            /* dont let mwm hints kill the close button
+               if (! (self->mwmhints.functions & MwmFunc_Close))
+               self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
 	    }
     }
 

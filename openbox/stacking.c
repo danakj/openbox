@@ -199,7 +199,7 @@ static GList *pick_windows(Client *top, Client *selected, gboolean raise)
 static GList *pick_group_windows(Client *top, Client *selected, gboolean raise)
 {
     GList *ret = NULL;
-    GList *it, *next;
+    GList *it, *next, *prev;
     GSList *sit;
     int i, n;
 
@@ -208,12 +208,16 @@ static GList *pick_group_windows(Client *top, Client *selected, gboolean raise)
         i = 0;
         n = g_slist_length(top->group->members) - 1;
         for (it = stacking_list; i < n && it; it = next) {
+            prev = g_list_previous(it);
             next = g_list_next(it);
+
             if ((sit = g_slist_find(top->group->members, it->data))) {
                 ++i;
-                ret = g_list_concat(ret, pick_windows(sit->data,
-                                                      selected, raise)); 
-                it = stacking_list;
+                ret = g_list_concat(ret,
+                                    pick_windows(sit->data, selected, raise)); 
+                /* if we dont have a prev then start back at the beginning,
+                   otherwise skip back to the prev's next */
+                next = prev ? g_list_next(prev) : stacking_list;
             }
         }
     }

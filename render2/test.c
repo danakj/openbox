@@ -42,7 +42,11 @@ int main()
     XSetClassHint(display, win, &chint);
 
     /* init Render */
-    inst = RrInit(display, DefaultScreen(display));
+    if (!(inst = RrInit(display, DefaultScreen(display)))) {
+        fprintf(stderr, "couldn't initialize the Render library "
+                "(no suitable GL support found)\n");
+        return EXIT_FAILURE;
+    }
 
     /*paint(win, look);*/
     while (1) {

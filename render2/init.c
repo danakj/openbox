@@ -77,8 +77,6 @@ struct RrInstance *RrInit(Display *display,
     if (rate > 0) {
         g_print("picked visual %d with rating %d\n", best, rate);
         ret = RrInstanceNew(display, screen, vilist[best]);
-    } else {
-        g_print("no valid GL visual was found\n");
     }
     return ret;
 }

@@ -118,7 +118,8 @@ void x_paint(Window win, Appearance *l)
 
     if (l->surface.data.planar.grad == Background_ParentRelative) {
         sw = l->surface.data.planar.parent->area.width;
-        source = l->surface.data.planar.parent->surface.data.planar.pixel_data;
+        source = l->surface.data.planar.parent->surface.data.planar.pixel_data
+            + l->surface.data.planar.parentx + sw * parenty;
         dest = l->surface.data.planar.pixel_data;
         for (i = parenty; i < parenty + h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(pixel32));

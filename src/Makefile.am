@@ -11,11 +11,11 @@ LDFLAGS=`pkg-config --libs xft`
 
 INCLUDES= -I../otk
 
-bin_PROGRAMS= openbox
+bin_PROGRAMS= openbox3
 
-openbox_LDADD=../otk/libotk.a @LIBINTL@
+openbox3_LDADD=../otk/libotk.a @LIBINTL@
 
-openbox_SOURCES= client.cc configuration.cc screen.cc openbox.cc \
+openbox3_SOURCES= client.cc configuration.cc screen.cc openbox.cc \
                  util.cc bbwindow.cc workspace.cc blackbox.cc \
                  main.cc xeventhandler.cc
 

@@ -269,6 +269,38 @@ def setup_scroll():
     mbind("C-A-4", MC_Frame, MouseClick, send_to_next_desktop)
     mbind("C-A-5", MC_Frame, MouseClick, send_to_prev_desktop)
 
+focus_stack = []
+def setup_fallback_focus():
+    """Sets up a focus fallback routine so that when no windows are focused,
+       the last window on the desktop that had focus will be focused."""
+    def focused(data):
+        global focus_stack
+        if data.client:
+            window = data.client.window()
+            # add to front the stack
+            if window in focus_stack:
+                focus_stack.remove(window)
+            focus_stack.insert(0, window)
+        else:
+            # pass around focus
+            desktop = openbox.screen(data.screen).desktop()
+            l = len(focus_stack)
+            i = 0
+            while i < l:
+                w = focus_stack[i]
+                client = openbox.findClient(w)
+                if not client: # window is gone, remove it
+                    focus_stack.pop(i)
+                    l = l - 1
+                elif client.desktop() == desktop and \
+                         client.normal() and client.focus():
+                    break
+                else:
+                    i = i + 1
+
+    ebind(EventFocus, focused)
+
+    
 ############################################################################
 ### Window placement algorithms, choose one of these and ebind it to the ###
 ### EventPlaceWindow action.                                             ###

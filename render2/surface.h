@@ -2,15 +2,7 @@
 #define __render_surface_h
 
 #include "render.h"
-
-union RrTextureData {
-    int foo;
-};
-
-struct RrTexture {
-    enum RrTextureType type;
-    union RrTextureData data;
-};
+#include "texture.h"
 
 struct RrPlanarSurface {
     enum RrSurfaceColorType colortype;
@@ -34,7 +26,13 @@ struct RrSurface {
     enum RrSurfaceType type;
     union RrSurfaceData data;
 
-    Window win; /* this can optionally be None if parent != NULL ... */
+    /* This member is created inside Render if parent != NULL, but is passed
+       in if parent == NULL and should not be destroyed!
+
+       Always check for this to be None before rendering it. Just skip by
+       (and assert) if it is None.
+    */
+    Window win; /* XXX this can optionally be None if parent != NULL ... */
 
     int ntextures;
     struct RrTexture *texture;

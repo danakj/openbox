@@ -110,6 +110,10 @@ enum RrSurfaceColorType {
     RR_SURFACE_PYRAMID
 };
 
+/*! Create a new RrSurface prototype that can't render. A prototype can be
+ copied to a new RrSurface that can render. */
+struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
+                                    int numtex);
 /*! Create a new top-level RrSurface for a Window. */
 struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
                                enum RrSurfaceType type,

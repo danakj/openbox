@@ -21,6 +21,18 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
     return sur;
 }
 
+struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
+                                    int numtex)
+{
+    struct RrSurface *sur;
+
+    sur = surface_new(type, numtex);
+    sur->inst = inst;
+    sur->win = None;
+    sur->parent = NULL;
+    return sur;
+}
+
 struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
                                enum RrSurfaceType type,
                                Window win,
@@ -63,6 +75,7 @@ static struct RrSurface *surface_copy(struct RrSurface *orig)
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);
+        break;
     }
     sur->ntextures = orig->ntextures;
     sur->texture = malloc(sizeof(struct RrTexture) * sur->ntextures);

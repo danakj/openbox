@@ -366,7 +366,21 @@ void screen_set_num_desktops(guint num)
     /* may be some unnamed desktops that we need to fill in with names */
     screen_update_desktop_names();
 
-    /* update the focus lists */
+    /* move windows on desktops that will no longer exist! */
+    for (it = client_list; it != NULL; it = it->next) {
+        ObClient *c = it->data;
+        if (c->desktop >= num && c->desktop != DESKTOP_ALL)
+            client_set_desktop(c, num - 1, FALSE);
+    }
+ 
+    /* change our struts/area to match (after moving windows) */
+    screen_update_areas();
+
+    /* change our desktop if we're on one that no longer exists! */
+    if (screen_desktop >= screen_num_desktops)
+	screen_set_desktop(num - 1);
+
+   /* update the focus lists */
     /* free our lists for the desktops which have disappeared */
     for (i = num; i < old; ++i)
         g_list_free(focus_order[i]);
@@ -375,20 +389,6 @@ void screen_set_num_desktops(guint num)
     /* set the new lists to be empty */
     for (i = old; i < num; ++i)
         focus_order[i] = NULL;
-
-    /* move windows on desktops that will no longer exist! */
-    for (it = client_list; it != NULL; it = it->next) {
-        ObClient *c = it->data;
-        if (c->desktop >= num && c->desktop != DESKTOP_ALL)
-            client_set_desktop(c, num - 1, FALSE);
-    }
-
-    /* change our struts/area to match (after moving windows) */
-    screen_update_areas();
-
-    /* change our desktop if we're on one that no longer exists! */
-    if (screen_desktop >= screen_num_desktops)
-	screen_set_desktop(num - 1);
 }
 
 void screen_set_desktop(guint num)

@@ -205,6 +205,18 @@ void BInput::doAction(BlackboxWindow *window, Action action) const {
     if (window) window->lower();
     return;
 
+  case Stick:
+    if (window && ! window->isStuck()) window->stick();
+    return;
+
+  case Unstick:
+    if (window && window->isStuck()) window->stick();
+    return;
+
+  case ToggleStick:
+    if (window) window->stick();
+    return;
+
   case Shade:
     if (window && ! window->isShaded()) window->shade();
     return;

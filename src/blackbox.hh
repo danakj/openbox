@@ -202,6 +202,7 @@ public:
   inline XAtom *getXAtom(void) { return xatom; }
   inline BInput *getInput(void) { return input; }
   
+  inline BScreen *getFocusedScreen(void) { return active_screen; }
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
   inline BlackboxWindow *getChangingWindow(void) { return changing_window; }
 

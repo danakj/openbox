@@ -2750,8 +2750,8 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
                           BInput::IconifyButtonClick))
       redrawIconifyButton(False);
   } else if (frame.close_button == re->window) {
-    if ((re->x < 0 || re->x >= static_cast<signed>(frame.button_w)) ||
-        (re->y < 0 || re->y >= static_cast<signed>(frame.button_w)))
+    if (! ((re->x < 0 || re->x >= static_cast<signed>(frame.button_w)) ||
+           (re->y < 0 || re->y >= static_cast<signed>(frame.button_w))))
       input->doAction(this, re->button, state, BInput::CloseButtonClick);
       redrawCloseButton(False);
   } else if (flags.moving) {

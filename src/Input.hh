@@ -64,20 +64,26 @@ public:
     Lower,
     Shade,
     Unshade,
+    Stick,
+    Unstick,
     Focus,
     Iconify,
-    ToggleMaximizeVert,
-    ToggleMaximizeHoriz,
-    ToggleMaximize,
-    ToggleShade,
     Close,
+    ShowWindowMenu,
+    
     BeginMove,
     BeginResizeUL,
     BeginResizeUR,
     BeginResizeLL,
     BeginResizeLR,
     BeginResizeRelative,  // picks a corner based on the mouse cursor's position
-    ShowWindowMenu,
+    
+    ToggleMaximizeVert,
+    ToggleMaximizeHoriz,
+    ToggleMaximize,
+    ToggleShade,
+    ToggleStick,
+
     NUM_ACTIONS
   };
 

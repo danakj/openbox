@@ -167,6 +167,8 @@ class _cycledata:
             ob.send_client_msg(self.screeninfo.rootWindow(),
                                otk.atoms.openbox_active_window,
                                client.window(), final, r)
+            if not final:
+                focus._skip += 1
 
     def cycle(self, data, forward):
         if not self.cycling:
@@ -177,7 +179,6 @@ class _cycledata:
             ob.mgrab(data.screen)
 
             self.cycling = 1
-            focus._disable = 1
             self.state = data.state
             self.screen = ob.openbox.screen(data.screen)
             self.screeninfo = otk.display.screenInfo(data.screen)
@@ -215,11 +216,10 @@ class _cycledata:
             self.menupos = 0
 
         if done:
-            self.cycling = 0
-            focus._disable = 0
             # activate, and deiconify/unshade/raise
             self.activatetarget(notreverting)
             self.destroypopup()
+            self.cycling = 0
             ob.kungrab()
             ob.mungrab()
 

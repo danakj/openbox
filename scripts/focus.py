@@ -24,7 +24,7 @@ import ob
 
 # maintain a list of clients, stacked in focus order
 _clients = []
-_disable = 0
+_skip = 0
 
 def _focusable(client, desktop):
     if not client.normal(): return 0
@@ -50,9 +50,13 @@ def _remove(client):
 def _focused(data):
     global _clients
 
-    if _disable: return
+    if _skip:
+        global _skip
+        _skip -= 1
+        return
 
     if data.client:
+        print data.client.window()
         # move it to the top
         try:
             _remove(data.client)

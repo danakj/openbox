@@ -5,16 +5,20 @@
 #endif
 
 #include "actions.hh"
+#include "otk/display.hh"
 
 #include <stdio.h>
 
 namespace ob {
 
 const unsigned int OBActions::DOUBLECLICKDELAY = 300;
+const int OBActions::BUTTONS;
 
 OBActions::OBActions()
   : _button(0)
 {
+  for (int i=0; i<BUTTONS; ++i)
+    _posqueue[i] = new ButtonPressAction();
 
   // XXX: load a configuration out of somewhere
 
@@ -23,12 +27,40 @@ OBActions::OBActions()
 
 OBActions::~OBActions()
 {
+  for (int i=0; i<BUTTONS; ++i)
+    delete _posqueue[i];
 }
 
+
+void OBActions::insertPress(const XButtonEvent &e)
+{
+  ButtonPressAction *a = _posqueue[BUTTONS - 1];
+  for (int i=BUTTONS-1; i>0;)
+    _posqueue[i] = _posqueue[--i];
+  _posqueue[0] = a;
+  a->button = e.button;
+  a->pos.setPoint(e.x, e.y);
+}
+
+void OBActions::removePress(const XButtonEvent &e)
+{
+  ButtonPressAction *a = 0;
+  for (int i=0; i<BUTTONS; ++i) {
+    if (_posqueue[i]->button == e.button)
+      a = _posqueue[i];
+    if (a) // found one and removed it
+      _posqueue[i] = _posqueue[i+1];
+  }
+  if (a) { // found one
+    _posqueue[BUTTONS-1] = a;
+    a->button = 0;
+  }
+}
 
 void OBActions::buttonPressHandler(const XButtonEvent &e)
 {
   OtkEventHandler::buttonPressHandler(e);
+  insertPress(e);
   
   // XXX: run the PRESS guile hook
   printf("GUILE: PRESS: win %lx modifiers %u button %u time %lx\n",
@@ -43,6 +75,7 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 {
   OtkEventHandler::buttonReleaseHandler(e);
+  removePress(e);
   
   // XXX: run the RELEASE guile hook
   printf("GUILE: RELEASE: win %lx modifiers %u button %u time %lx\n",
@@ -116,7 +149,8 @@ void OBActions::motionHandler(const XMotionEvent &e)
 {
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   printf("GUILE: MOTION: win %lx modifiers %u x %d y %d\n",
-         (long)e.window, e.state, e.x, e.y);
+         (long)e.window, e.state,
+         e.x - _posqueue[0]->pos.x(), e.y - _posqueue[0]->pos.y());
 }
 
 

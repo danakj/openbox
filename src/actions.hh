@@ -6,10 +6,12 @@
   @brief The action interface for user-available actions
 */
 
-#include "otk/display.hh"
 #include "otk/point.hh"
-#include "otk/rect.hh"
 #include "otk/eventhandler.hh"
+
+extern "C" {
+#include <X11/Xlib.h>
+}
 
 namespace ob {
 
@@ -20,23 +22,38 @@ namespace ob {
 */
 class OBActions : public otk::OtkEventHandler {
 public:
-  struct MouseButtonAction {
+  struct ButtonReleaseAction {
     Window win;
     unsigned int button;
     Time time;
-    MouseButtonAction() { win = 0; button = 0; time = 0; }
+    ButtonReleaseAction() { win = 0; button = 0; time = 0; }
+  };
+
+  struct ButtonPressAction {
+    unsigned int button;
+    otk::Point pos;
+    ButtonPressAction() { button = 0; }
   };
   
 private:
   // milliseconds XXX: config option
   static const unsigned int DOUBLECLICKDELAY;
+  static const int BUTTONS = 5;
   
-  //! The last 2 button release processed for CLICKs
-  MouseButtonAction _release;
   //! The mouse button currently being watched from a press for a CLICK
   unsigned int _button;
+  //! The last button release processed for CLICKs
+  ButtonReleaseAction _release;
+  //! The point where the mouse was when each mouse button was pressed
+  /*!
+    Used for motion events as the starting position.
+  */
+  ButtonPressAction *_posqueue[BUTTONS];
 
-  void insertPress(Window win, unsigned int button, Time time);
+  //! Insert a button/position in the _posqueue
+  void insertPress(const XButtonEvent &e);
+  //! Remove a button/position from the _posqueue
+  void removePress(const XButtonEvent &e);
   
 public:
   OBActions();

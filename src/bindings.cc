@@ -9,6 +9,9 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+
+#include "gettext.h"
+#define _(str) gettext(str)
 }
 
 namespace ob {
@@ -80,6 +83,7 @@ bool OBBindings::translate(const std::string &str, Binding &b)
                mod == "Mod5") {
       mods |= Mod5Mask;
     } else {                    // invalid
+      printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
       return false;
     }
     begin = end + 1;

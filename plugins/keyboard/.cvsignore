@@ -4,3 +4,6 @@ Makefile
 Makefile.in
 .libs
 .deps
+tree.lo
+translate.lo
+keyaction.lo

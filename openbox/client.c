@@ -927,6 +927,12 @@ void client_setup_decor_and_functions(Client *self)
     if (!(self->decorations & Decor_Titlebar))
 	self->functions &= ~Func_Shade;
 
+    /* now we need to check against rules for the client's current state */
+    if (self->fullscreen) {
+	self->functions &= (Func_Close | Func_Fullscreen | Func_Iconify);
+	self->decorations = 0;
+    }
+
     client_change_allowed_actions(self);
 
     if (self->frame) {
@@ -1413,6 +1419,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 	y = 0;
 	w = screen_physical_size.width;
 	h = screen_physical_size.height;
+        user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -1560,13 +1567,6 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     client_change_state(self); /* change the state hints on the client */
 
     if (fs) {
-	/* save the functions and remove them */
-	self->pre_fs_func = self->functions;
-	self->functions &= (Func_Close | Func_Fullscreen |
-			    Func_Iconify);
-	/* save the decorations and remove them */
-	self->pre_fs_decor = self->decorations;
-	self->decorations = 0;
 	if (savearea) {
 	    long dimensions[4];
 	    dimensions[0] = self->area.x;
@@ -1584,9 +1584,6 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     } else {
 	long *dimensions;
 
-	self->functions = self->pre_fs_func;
-	self->decorations = self->pre_fs_decor;
-	  
 	if (PROP_GET32A(self->window, openbox_premax, cardinal,
 			dimensions, 4)) {
 	    x = dimensions[0];
@@ -1605,11 +1602,9 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 	}
     }
 
-    client_change_allowed_actions(self); /* based on the new _functions */
+    client_setup_decor_and_functions(self);
 
-    /* when fullscreening, don't obey things like increments, fill the
-       screen */
-    client_configure(self, Corner_TopLeft, x, y, w, h, !fs, TRUE);
+    client_configure(self, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
 
     /* raise (back) into our stacking layer */
     stacking_raise(self);

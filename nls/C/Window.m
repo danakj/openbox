@@ -2,16 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: Génération 0x%lx\n
+# BlackboxWindow::BlackboxWindow: creazione 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: Echec de XGetWindowAttributres\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributres fallito\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: Impossible de trouver l'écran de la fenêtre racine 0x%lx\n
+# BlackboxWindow::BlackboxWindow: impossibile trovare schermo per finestra principale 0x%lx\n
 $ #Unnamed
-# Inconnu
+# Senza Nome
 $ #MapRequest
-# BlackboxWindow::mapRequestEvent() pour 0x%lx\n
+# BlackboxWindow::mapRequestEvent() per 0x%lx\n
 $ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() pour 0x%lx\n
+# BlackboxWindow::unmapNotifyEvent() per 0x%lx\n
 $ #ReparentNotify
-# BlackboxWindow::reparentNotifyEvent: réattribue 0x%lx à la 0x%lx\n
+# BlackboxWindow::reparentNotifyEvent: reparent 0x%lx a 0x%lx\n

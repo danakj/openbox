@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Barra degli Strumenti
+# ツールバー
 $ #EditWkspcName
-# Modifica nome Area di Lavoro corrente
+# 今のワークスペース名を編集
 $ #ToolbarPlacement
-# Posizionamento Barra
+# ツールバーの位置

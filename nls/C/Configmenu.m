@@ -1,40 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Options de configuration
+# Opzioni di Configurazione
 $ #FocusModel
-# Mode d'attribution du clavier
+# Modalita' Focus
 $ #WindowPlacement
-# Disposition des fenêtres
+# Posizionamento Finestra
 $ #ImageDithering
-# Lissage des images
+# Dithering dell'immagine
 $ #OpaqueMove
-# Déplacement opaque des fenêtres
+# Movimento Opaco della finestra
 $ #FullMax
-# Maximisation complète
+# Massimo Ingrandimento
 $ #FocusNew
-# Clavier à la nouvelle fenêtre
+# Attiva Focus alle nuove Finestre
 $ #FocusLast
-# Clavier à la dernière fenêtre
+# Attiva Focus al cambio dell'Area di Lavoro
 $ #ClickToFocus
-# Cliquer pour obtenir le clavier
+# Clicca per il Focus
 $ #SloppyFocus
-# Attribution du clavier souple
+# Focus Intelligente (Sloppy)
 $ #AutoRaise
-# Premier plan automatique
-$ #ClickRaise
-# Cliquer pour mettre au premier plan
+# Sollevamento Finestra Automatico
 $ #SmartRows
-# Disposition futée (Lignes)
+# Posizionamento Intelligente (Righe)
 $ #SmartCols
-# Disposition futée (Colonnes)
+# Posizionamento Intelligente (Colonne)
 $ #Cascade
-# Disposition en cascade
+# Posizionamento a Cascata
 $ #LeftRight
-# De gauche à droite
+# da Sinistra a Destra
 $ #RightLeft
-# De droite à gauche
+# da Destra a Sinistra
 $ #TopBottom
-# De haut en bas
+# dall'Alto in Basso
 $ #BottomTop
-# De bas en haut
+# dal Basso in Alto

@@ -3,6 +3,6 @@ $set 7 #Slit
 $ #SlitTitle
 # Slit
 $ #SlitDirection
-# Direzione Slit
+# Slit の方向
 $ #SlitPlacement
-# Posizionamento Slit
+# Slit の配置

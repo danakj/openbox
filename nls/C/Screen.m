@@ -1,54 +1,54 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: Erreur survenue pendant une requête adressée au serveur X.\n  \
-Un autre gestionnaire de fenêtres est déjà lancé %s.\n
+# BScreen::BScreen: e' accaduto un errore mentre si interrogava il server X.\n  \
+un'altro gestore di finestre e' attualmente in esecuzione sul display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: Gestion de l'écran %d avec le mode visuel 0x%lx, profondeur %d\n
+# BScreen::BScreen: gestendo schermo %d usando visuale 0x%lx, depth %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): Impossible de charger la police de caractères '%s'\n
+# BScreen::LoadStyle(): impossibile caricare il font '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): Impossible de charger la police de caractères initiale.\n
+# BScreen::LoadStyle(): impossibile caricare il font di default.\n
 $ #EmptyMenuFile
-# %s: Fichier de menu vide\n
+# %s: file menu vuoto\n
 $ #xterm
 # xterm
 $ #Restart
-# Redémarrer
+# Riavvia
 $ #Exit
-# Sortie
+# Esci
 $ #EXECError
-# BScreen::parseMenuFile: [exec] Erreur, pas de libellé de menu et/ou de commande definie\n
+# BScreen::parseMenuFile: [exec] errore, nessuna voce nel menu e/o comando definito\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [exit] errore, nessuna voce nel menu definita\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] Erreur, pas libellé de menu et/ou de nom de fichier\
-defini\n
+# BScreen::parseMenuFile: [style] errore, nessuna voce nel menu e/o file\
+definto\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [config] errore, nessuna voce nel menu definta\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] Erreur, aucun nom de fichier défini\n
+# BScreen::parseMenuFile: [include] errore, nessun file definito\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] Erreur, '%s' est un fichier invalide\n
+# BScreen::parseMenuFile: [include] errore, '%s' non è un file regolare\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [submenu] errore, nessuna voce nel menu definta\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [restart] errore, nessuna voce nel menu definta\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [reconfig] errore, nessuna voce nel menu definta\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, aucun répertoire défini\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, nessuna cartella definita\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, '%s' est un répertoire \
-invalide\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, '%s' non e' una \
+cartella\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, '%s' est inexistant\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, '%s' non esiste\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] Erreur, aucun libellé de menu défini\n
+# BScreen::parseMenuFile: [workspaces] errore, nessuna voce nel menu definita\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# L: %4d x H: %4d
+# W: %4d x H: %4d
 

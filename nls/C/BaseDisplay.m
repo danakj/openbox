@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s: errore di X: %s(%d) opcodes %d/%d\n  risorsa 0x%lx\n
+# %s:  X エラー: %s(%d) opcodes %d/%d\n  resource 0x%lx\n
 $ #SignalCaught
-# %s: segnale %d intercettato\n
+# %s: シグナル %d 発生\n
 $ #ShuttingDown
-# arresto del programma\n
+# 終了\n
 $ #Aborting
-# Annullamento...generazione file core\n
+# 中止 ... コアダンプします\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: connessione al server X fallita.\n
+# BaseDisplay::BaseDisplay: X サーバへの接続に失敗\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: non e' possibile contrassegnare la connessione al display come close-on-exec\n
+# BaseDisplay::BaseDisplay: couldn't mark display connection as close-on-exec\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): rimozione finestra difettosa dalla coda degli eventi\n
+# BaseDisplay::eventLoop(): イベントキューから不正なウィンドウを消します\n

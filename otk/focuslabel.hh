@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef __label_hh
-#define __label_hh
+#ifndef __focuslabel_hh
+#define __focuslabel_hh
 
 #include "focuswidget.hh"
 
@@ -27,4 +27,4 @@ private:
 
 }
 
-#endif
+#endif // __focuslabel_hh

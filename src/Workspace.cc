@@ -48,6 +48,7 @@ using std::string;
 #include "i18n.hh"
 #include "blackbox.hh"
 #include "Clientmenu.hh"
+#include "Font.hh"
 #include "Netizen.hh"
 #include "Screen.hh"
 #include "Toolbar.hh"
@@ -62,7 +63,10 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
   screen = scrn;
   xatom = screen->getBlackbox()->getXAtom();
 
-  cascade_x = cascade_y = 32;
+  cascade_x = cascade_y = 0;
+#ifdef    XINERAMA
+  cascade_region = 0;
+#endif // XINERAMA
 
   id = i;
 
@@ -143,8 +147,12 @@ void Workspace::removeWindow(BlackboxWindow *w) {
   for (; it != end; ++it, ++i)
     (*it)->setWindowNumber(i);
 
-  if (i == 0)
-    cascade_x = cascade_y = 32;
+  if (i == 0) {
+    cascade_x = cascade_y = 0;
+#ifdef    XINERAMA
+    cascade_region = 0;
+#endif // XINERAMA
+  }
 }
 
 
@@ -673,7 +681,7 @@ bool Workspace::smartPlacement(Rect& win) {
 }
 
 
-bool Workspace::underMousePlacement(Rect &win) {
+bool Workspace::underMousePlacement(Rect &win) const {
   int x, y, rx, ry;
   Window c, r;
   unsigned int m;
@@ -714,19 +722,40 @@ bool Workspace::underMousePlacement(Rect &win) {
 }
 
 
-bool Workspace::cascadePlacement(Rect &win) {
-  const Rect &availableArea = screen->availableArea();
+bool Workspace::cascadePlacement(Rect &win, const int offset) {
+  Rect area;
+  
+#ifdef    XINERAMA
+  if (screen->isXineramaActive() &&
+      screen->getBlackbox()->doXineramaPlacement()) {
+    area = screen->allAvailableAreas()[cascade_region];
+  } else
+#endif // XINERAMA
+    area = screen->availableArea();
 
-  if ((cascade_x > static_cast<signed>(availableArea.width() / 2)) ||
-      (cascade_y > static_cast<signed>(availableArea.height() / 2)))
-    cascade_x = cascade_y = 32;
+  if ((static_cast<signed>(cascade_x + win.width()) > area.right() + 1) ||
+      (static_cast<signed>(cascade_y + win.height()) > area.bottom() + 1)) {
+    cascade_x = cascade_y = 0;
+#ifdef    XINERAMA
+    if (screen->isXineramaActive() &&
+        screen->getBlackbox()->doXineramaPlacement()) {
+      // go to the next xinerama region, and use its area
+      if (++cascade_region >= screen->allAvailableAreas().size())
+        cascade_region = 0;
+      area = screen->allAvailableAreas()[cascade_region];
+    }
+#endif // XINERAMA
+  }
 
-  if (cascade_x == 32) {
-    cascade_x += availableArea.x();
-    cascade_y += availableArea.y();
+  if (cascade_x == 0) {
+    cascade_x = area.x() + offset;
+    cascade_y = area.y() + offset;
   }
 
   win.setPos(cascade_x, cascade_y);
+
+  cascade_x += offset;
+  cascade_y += offset;
 
   return True;
 }
@@ -748,11 +777,9 @@ void Workspace::placeWindow(BlackboxWindow *win) {
     break; // handled below
   } // switch
 
-  if (placed == False) {
-    cascadePlacement(new_win);
-    cascade_x += win->getTitleHeight() + (screen->getBorderWidth() * 2);
-    cascade_y += win->getTitleHeight() + (screen->getBorderWidth() * 2);
-  }
+  if (placed == False)
+    cascadePlacement(new_win, (win->getTitleHeight() +
+                               screen->getBorderWidth() * 2));
 
   // make sure the placement was valid
   assert(screen->availableArea().contains(new_win));

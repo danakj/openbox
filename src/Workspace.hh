@@ -52,7 +52,10 @@ private:
 
   std::string name;
   unsigned int id;
-  int cascade_x, cascade_y;
+  unsigned int cascade_x, cascade_y;
+#ifdef    XINERAMA
+  unsigned int cascade_region;
+#endif // XINERAMA
 
   Workspace(const Workspace&);
   Workspace& operator=(const Workspace&);
@@ -63,7 +66,7 @@ private:
                        StackVector::iterator &stack);
 
   void placeWindow(BlackboxWindow *win);
-  bool cascadePlacement(Rect& win);
+  bool cascadePlacement(Rect& win, const int offset);
   bool smartPlacement(Rect& win);
   bool underMousePlacement(Rect& win);
 

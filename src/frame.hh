@@ -104,6 +104,16 @@ public:
   //! Returns the frame's most-parent window, which is a child of the root
   //! window
   inline Window window() const { return _window; }
+
+  inline Window titlebar() const { return _titlebar; }
+  inline Window label() const { return _label; }
+  inline Window buttonIconify() const { return _button_iconify; }
+  inline Window buttonMax() const { return _button_max; }
+  inline Window buttonStick() const { return _button_stick; }
+  inline Window buttonClose() const { return _button_close; }
+  inline Window handle() const { return _handle; }
+  inline Window gripLeft() const { return _grip_left; }
+  inline Window gripRight() const { return _grip_right; }
 };
 
 }

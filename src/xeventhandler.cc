@@ -156,6 +156,16 @@ void OBXEventHandler::manageWindow(int screen, Window window)
 
   // create the OBClient class, which gets all of the hints on the window
   Openbox::instance->addClient(window, client = new OBClient(screen, window));
+  // add all the client's decoration windows as event handlers for the client
+  Openbox::instance->addClient(client->frame->titlebar(), client);
+  Openbox::instance->addClient(client->frame->buttonIconify(), client);
+  Openbox::instance->addClient(client->frame->buttonMax(), client);
+  Openbox::instance->addClient(client->frame->buttonStick(), client);
+  Openbox::instance->addClient(client->frame->buttonClose(), client);
+  Openbox::instance->addClient(client->frame->label(), client);
+  Openbox::instance->addClient(client->frame->handle(), client);
+  Openbox::instance->addClient(client->frame->gripLeft(), client);
+  Openbox::instance->addClient(client->frame->gripRight(), client);
 
   // we dont want a border on the client
   XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
@@ -201,6 +211,16 @@ void OBXEventHandler::unmanageWindow(OBClient *client)
 
   // remove the client class from the search list
   Openbox::instance->removeClient(client->window());
+  // remove the frame's decor elements as event handlers for the client
+  Openbox::instance->removeClient(frame->titlebar());
+  Openbox::instance->removeClient(frame->buttonIconify());
+  Openbox::instance->removeClient(frame->buttonMax());
+  Openbox::instance->removeClient(frame->buttonStick());
+  Openbox::instance->removeClient(frame->buttonClose());
+  Openbox::instance->removeClient(frame->label());
+  Openbox::instance->removeClient(frame->handle());
+  Openbox::instance->removeClient(frame->gripLeft());
+  Openbox::instance->removeClient(frame->gripRight());
 
   delete client->frame;
   client->frame = 0;

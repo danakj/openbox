@@ -2,6 +2,7 @@
 #include "../../kernel/openbox.h"
 #include "../../kernel/screen.h"
 #include "../../kernel/extensions.h"
+#include "../../kernel/dispatch.h"
 #include "../../kernel/themerc.h"
 #include "../../kernel/frame.h"
 #include "../../render/render.h"
@@ -125,6 +126,9 @@ static void render_icon(ObFrame *self);
 static void render_iconify(ObFrame *self);
 static void render_desk(ObFrame *self);
 static void render_close(ObFrame *self);
+
+static void frame_mouse_press(const ObEvent *e, ObFrame *self);
+static void frame_mouse_release(const ObEvent *e, ObFrame *self);
 
 gboolean startup()
 {
@@ -314,6 +318,11 @@ Frame *frame_new()
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = FALSE;
 
+    dispatch_register(Event_X_ButtonPress, (EventHandler)frame_mouse_press,
+                      self);
+    dispatch_register(Event_X_ButtonRelease, (EventHandler)frame_mouse_release,
+                      self);
+
     return (Frame*)self;
 }
 
@@ -328,6 +337,9 @@ static void frame_free(ObFrame *self)
     appearance_free(self->a_icon);
 
     XDestroyWindow(ob_display, self->frame.window);
+
+    dispatch_register(0, (EventHandler)frame_mouse_press, self);
+    dispatch_register(0, (EventHandler)frame_mouse_release, self);
 
     g_free(self);
 }
@@ -867,49 +879,37 @@ GQuark get_context(Client *client, Window win)
     return g_quark_try_string("none");
 }
 
-void frame_mouse_enter(ObFrame *self, Window win)
+static void frame_mouse_press(const ObEvent *e, ObFrame *self)
 {
-}
-
-void frame_mouse_leave(ObFrame *self, Window win)
-{
-}
-
-void frame_mouse_press(ObFrame *self, Window win, int x, int y)
-{
+    Window win = e->data.x.e->xbutton.window;
     if (win == self->max) {
         self->max_press = TRUE;
         render_max(self);
-    }
-    else if (win == self->close) {
+    } else if (win == self->close) {
         self->close_press = TRUE;
         render_close(self);
-    }
-    else if (win == self->iconify) {
+    } else if (win == self->iconify) {
         self->iconify_press = TRUE;
         render_iconify(self);
-    }
-    else if (win == self->desk) { 
+    } else if (win == self->desk) { 
         self->desk_press = TRUE;
         render_desk(self);
     }
 }
 
-void frame_mouse_release(ObFrame *self, Window win, int x, int y)
+static void frame_mouse_release(const ObEvent *e, ObFrame *self)
 {
+    Window win = e->data.x.e->xbutton.window;
     if (win == self->max) {
         self->max_press = FALSE;
         render_max(self);
-    }
-    else if (win == self->close) {
+    } else if (win == self->close) {
         self->close_press = FALSE; 
         render_close(self);
-    }
-    else if (win == self->iconify) {
+    } else if (win == self->iconify) {
         self->iconify_press = FALSE;
         render_iconify(self);
-    }
-    else if (win == self->desk) {
+    } else if (win == self->desk) {
         self->desk_press = FALSE;
         render_desk(self);
     }

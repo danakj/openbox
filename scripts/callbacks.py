@@ -114,8 +114,12 @@ def focus(data):
     data.client.focus()
 
 def restart(data, other = ""):
-    """Restarts openbox, optionally starting another window manager."""
+    """Restarts Openbox, optionally starting another window manager."""
     ob.openbox.restart(other)
+
+def exit(data):
+    """Exits Openbox."""
+    ob.openbox.shutdown()
 
 def raise_win(data):
     """Raises the window on which the event occured"""

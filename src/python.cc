@@ -100,7 +100,7 @@ PyObject *mbind(const std::string &button, ob::MouseContext context,
     return NULL;
   }
   
-  if (!ob::Openbox::instance->bindings()->addButton(button, context,
+  if (!ob::openbox->bindings()->addButton(button, context,
                                                     action, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
@@ -115,7 +115,7 @@ PyObject *ebind(ob::EventAction action, PyObject *func)
     return NULL;
   }
   
-  if (!ob::Openbox::instance->bindings()->addEvent(action, func)) {
+  if (!ob::openbox->bindings()->addEvent(action, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
   }
@@ -145,7 +145,7 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
   }
 
   (void)context; // XXX use this sometime!
-  if (!ob::Openbox::instance->bindings()->addKey(vectkeylist, func)) {
+  if (!ob::openbox->bindings()->addKey(vectkeylist, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
   }
@@ -174,7 +174,7 @@ PyObject *kunbind(PyObject *keylist, PyObject *func)
     vectkeylist.push_back(PyString_AsString(str));
   }
 
-  if (!ob::Openbox::instance->bindings()->removeKey(vectkeylist, func)) {
+  if (!ob::openbox->bindings()->removeKey(vectkeylist, func)) {
       PyErr_SetString(PyExc_RuntimeError, "Could not remove callback.");
       return NULL;
   }
@@ -183,12 +183,12 @@ PyObject *kunbind(PyObject *keylist, PyObject *func)
 
 void kunbind_all()
 {
-  ob::Openbox::instance->bindings()->removeAllKeys();
+  ob::openbox->bindings()->removeAllKeys();
 }
 
 void set_reset_key(const std::string &key)
 {
-  ob::Openbox::instance->bindings()->setResetKey(key);
+  ob::openbox->bindings()->setResetKey(key);
 }
 
 PyObject *send_client_msg(Window target, int type, Window about,
@@ -205,7 +205,7 @@ PyObject *send_client_msg(Window target, int type, Window about,
   e.xclient.type = ClientMessage;
   e.xclient.format = 32;
   e.xclient.message_type =
-    Openbox::instance->property()->atom((otk::Property::Atoms)type);
+    openbox->property()->atom((otk::Property::Atoms)type);
   e.xclient.window = about;
   e.xclient.data.l[0] = data;
   e.xclient.data.l[1] = data1;

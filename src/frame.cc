@@ -24,7 +24,7 @@ namespace ob {
 const long Frame::event_mask;
 
 Frame::Frame(Client *client, otk::Style *style)
-  : otk::Widget(Openbox::instance, style, Horizontal, 0, 1, true),
+  : otk::Widget(openbox, style, Horizontal, 0, 1, true),
     WidgetBase(WidgetBase::Type_Frame),
     _client(client),
     _screen(otk::Display::screenInfo(client->screen())),
@@ -45,8 +45,8 @@ Frame::Frame(Client *client, otk::Style *style)
 
   XSelectInput(otk::Display::display, _window, Frame::event_mask);
 
-  _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
-  _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
+  _grip_left.setCursor(openbox->cursors().ll_angle);
+  _grip_right.setCursor(openbox->cursors().lr_angle);
   
   _label.setText(_client->title());
 
@@ -412,7 +412,7 @@ void Frame::grabClient()
     member set the root window, and one set to the client, but both get handled
     and need to be ignored.
   */
-  if (Openbox::instance->state() == Openbox::State_Starting)
+  if (openbox->state() == Openbox::State_Starting)
     _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config req's)

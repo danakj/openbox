@@ -65,17 +65,17 @@ Screen::Screen(int screen)
   printf(_("Managing screen %d: visual 0x%lx, depth %d\n"),
          _number, XVisualIDFromVisual(_info->visual()), _info->depth());
 
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::openbox_pid,
                                      otk::Property::Atom_Cardinal,
                                      (unsigned long) getpid());
 
   // set the mouse cursor for the root window (the default cursor)
   XDefineCursor(otk::Display::display, _info->rootWindow(),
-                Openbox::instance->cursors().session);
+                openbox->cursors().session);
 
   // initialize the shit that is used for all drawing on the screen
-  _image_control = new otk::ImageControl(Openbox::instance->timerManager(),
+  _image_control = new otk::ImageControl(openbox->timerManager(),
                                          _info, true);
   _image_control->installRootColormap();
   _root_cmap_installed = True;
@@ -101,7 +101,7 @@ Screen::Screen(int screen)
   // Set the netwm properties for geometry
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_desktop_geometry,
                                      otk::Property::Atom_Cardinal,
                                      geometry, 2);
@@ -109,7 +109,7 @@ Screen::Screen(int screen)
   // Set the net_desktop_names property
   std::vector<otk::ustring> names;
   python_get_stringlist("desktop_names", &names);
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_desktop_names,
                                      otk::Property::utf8,
                                      names);
@@ -137,11 +137,11 @@ Screen::Screen(int screen)
   calcArea();          // initialize the available working area
 
   // register this class as the event handler for the root window
-  Openbox::instance->registerHandler(_info->rootWindow(), this);
+  openbox->registerHandler(_info->rootWindow(), this);
 
   // call the python Startup callbacks
   EventData data(_number, 0, EventShutdown, 0);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 }
 
 
@@ -157,7 +157,7 @@ Screen::~Screen()
 
   // call the python Shutdown callbacks
   EventData data(_number, 0, EventShutdown, 0);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 
   XDestroyWindow(otk::Display::display, _focuswindow);
   XDestroyWindow(otk::Display::display, _supportwindow);
@@ -284,17 +284,17 @@ void Screen::changeSupportedAtoms()
                                        0, 0, 1, 1, 0, 0, 0);
 
   // set supporting window
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_supporting_wm_check,
                                      otk::Property::Atom_Window,
                                      _supportwindow);
 
   //set properties on the supporting window
-  Openbox::instance->property()->set(_supportwindow,
+  openbox->property()->set(_supportwindow,
                                      otk::Property::net_wm_name,
                                      otk::Property::utf8,
                                      "Openbox");
-  Openbox::instance->property()->set(_supportwindow,
+  openbox->property()->set(_supportwindow,
                                      otk::Property::net_supporting_wm_check,
                                      otk::Property::Atom_Window,
                                      _supportwindow);
@@ -363,9 +363,9 @@ void Screen::changeSupportedAtoms()
   // convert to the atom values
   for (int i = 0; i < num_supported; ++i)
     supported[i] =
-      Openbox::instance->property()->atom((otk::Property::Atoms)supported[i]);
+      openbox->property()->atom((otk::Property::Atoms)supported[i]);
   
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_supported,
                                      otk::Property::Atom_Atom,
                                      supported, num_supported);
@@ -390,7 +390,7 @@ void Screen::changeClientList()
   } else
     windows = (Window*) 0;
 
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_client_list,
                                      otk::Property::Atom_Window,
                                      windows, size);
@@ -423,7 +423,7 @@ void Screen::changeStackingList()
   } else
     windows = (Window*) 0;
 
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_client_list_stacking,
                                      otk::Property::Atom_Window,
                                      windows, size);
@@ -442,7 +442,7 @@ void Screen::changeWorkArea() {
     dims[(i * 4) + 2] = _area.width();
     dims[(i * 4) + 3] = _area.height();
   }
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_workarea,
                                      otk::Property::Atom_Cardinal,
                                      dims, 4 * _num_desktops);
@@ -480,9 +480,9 @@ void Screen::manageWindow(Window window)
   // create the Client class, which gets all of the hints on the window
   client = new Client(_number, window);
   // register for events
-  Openbox::instance->registerHandler(window, client);
+  openbox->registerHandler(window, client);
   // add to the wm's map
-  Openbox::instance->addClient(window, client);
+  openbox->addClient(window, client);
 
   // we dont want a border on the client
   client->toggleClientBorder(false);
@@ -491,29 +491,29 @@ void Screen::manageWindow(Window window)
   // reparented back to root automatically
   XChangeSaveSet(otk::Display::display, window, SetModeInsert);
 
-  if (!(Openbox::instance->state() == Openbox::State_Starting ||
+  if (!(openbox->state() == Openbox::State_Starting ||
         client->positionRequested())) {
     // position the window intelligenty .. hopefully :)
     // call the python PLACEWINDOW binding
     EventData data(_number, client, EventPlaceWindow, 0);
-    Openbox::instance->bindings()->fireEvent(&data);
+    openbox->bindings()->fireEvent(&data);
   }
 
   // create the decoration frame for the client window
   client->frame = new Frame(client, &_style);
 
   // add to the wm's map
-  Openbox::instance->addClient(client->frame->window(), client);
-  Openbox::instance->addClient(client->frame->plate(), client);
-  Openbox::instance->addClient(client->frame->titlebar(), client);
-  Openbox::instance->addClient(client->frame->label(), client);
-  Openbox::instance->addClient(client->frame->button_max(), client);
-  Openbox::instance->addClient(client->frame->button_iconify(), client);
-  Openbox::instance->addClient(client->frame->button_stick(), client);
-  Openbox::instance->addClient(client->frame->button_close(), client);
-  Openbox::instance->addClient(client->frame->handle(), client);
-  Openbox::instance->addClient(client->frame->grip_left(), client);
-  Openbox::instance->addClient(client->frame->grip_right(), client);
+  openbox->addClient(client->frame->window(), client);
+  openbox->addClient(client->frame->plate(), client);
+  openbox->addClient(client->frame->titlebar(), client);
+  openbox->addClient(client->frame->label(), client);
+  openbox->addClient(client->frame->button_max(), client);
+  openbox->addClient(client->frame->button_iconify(), client);
+  openbox->addClient(client->frame->button_stick(), client);
+  openbox->addClient(client->frame->button_close(), client);
+  openbox->addClient(client->frame->handle(), client);
+  openbox->addClient(client->frame->grip_left(), client);
+  openbox->addClient(client->frame->grip_right(), client);
 
   // reparent the client to the frame
   client->frame->grabClient();
@@ -536,11 +536,11 @@ void Screen::manageWindow(Window window)
   // update the root properties
   changeClientList();
 
-  Openbox::instance->bindings()->grabButtons(true, client);
+  openbox->bindings()->grabButtons(true, client);
 
   // call the python NEWWINDOW binding
   EventData data(_number, client, EventNewWindow, 0);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 
 #ifdef DEBUG
   printf("Managed window 0x%lx\n", window);
@@ -554,25 +554,25 @@ void Screen::unmanageWindow(Client *client)
 
   // call the python CLOSEWINDOW binding 
   EventData data(_number, client, EventCloseWindow, 0);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 
-  Openbox::instance->bindings()->grabButtons(false, client);
+  openbox->bindings()->grabButtons(false, client);
 
   // remove from the wm's map
-  Openbox::instance->removeClient(client->window());
-  Openbox::instance->removeClient(frame->window());
-  Openbox::instance->removeClient(frame->plate());
-  Openbox::instance->removeClient(frame->titlebar());
-  Openbox::instance->removeClient(frame->label());
-  Openbox::instance->removeClient(frame->button_max());
-  Openbox::instance->removeClient(frame->button_iconify());
-  Openbox::instance->removeClient(frame->button_stick());
-  Openbox::instance->removeClient(frame->button_close());
-  Openbox::instance->removeClient(frame->handle());
-  Openbox::instance->removeClient(frame->grip_left());
-  Openbox::instance->removeClient(frame->grip_right());
+  openbox->removeClient(client->window());
+  openbox->removeClient(frame->window());
+  openbox->removeClient(frame->plate());
+  openbox->removeClient(frame->titlebar());
+  openbox->removeClient(frame->label());
+  openbox->removeClient(frame->button_max());
+  openbox->removeClient(frame->button_iconify());
+  openbox->removeClient(frame->button_stick());
+  openbox->removeClient(frame->button_close());
+  openbox->removeClient(frame->handle());
+  openbox->removeClient(frame->grip_left());
+  openbox->removeClient(frame->grip_right());
   // unregister for handling events
-  Openbox::instance->clearHandler(client->window());
+  openbox->clearHandler(client->window());
   
   // remove the window from our save set
   XChangeSaveSet(otk::Display::display, client->window(), SetModeDelete);
@@ -646,7 +646,7 @@ void Screen::changeDesktop(long desktop)
   long old = _desktop;
   
   _desktop = desktop;
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_current_desktop,
                                      otk::Property::Atom_Cardinal,
                                      _desktop);
@@ -663,8 +663,8 @@ void Screen::changeDesktop(long desktop)
   }
 
   // force the callbacks to fire
-  if (!Openbox::instance->focusedClient())
-    Openbox::instance->setFocusedClient(0);
+  if (!openbox->focusedClient())
+    openbox->setFocusedClient(0);
 }
 
 void Screen::changeNumDesktops(long num)
@@ -676,7 +676,7 @@ void Screen::changeNumDesktops(long num)
   // XXX: move windows on desktops that will no longer exist!
   
   _num_desktops = num;
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_number_of_desktops,
                                      otk::Property::Atom_Cardinal,
                                      _num_desktops);
@@ -684,7 +684,7 @@ void Screen::changeNumDesktops(long num)
   // set the viewport hint
   unsigned long *viewport = new unsigned long[_num_desktops * 2];
   memset(viewport, 0, sizeof(unsigned long) * _num_desktops * 2);
-  Openbox::instance->property()->set(_info->rootWindow(),
+  openbox->property()->set(_info->rootWindow(),
                                      otk::Property::net_desktop_viewport,
                                      otk::Property::Atom_Cardinal,
                                      viewport, _num_desktops * 2);
@@ -697,7 +697,7 @@ void Screen::changeNumDesktops(long num)
 
 void Screen::updateDesktopNames()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   unsigned long num = (unsigned) -1;
   
@@ -716,7 +716,7 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
 
   if (i >= _num_desktops) return;
 
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
   
   otk::Property::StringVect newnames = _desktop_names;
   newnames[i] = name;
@@ -729,7 +729,7 @@ void Screen::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
 
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   // compress changes to a single property into a single change
   XEvent ce;
@@ -753,7 +753,7 @@ void Screen::clientMessageHandler(const XClientMessageEvent &e)
 
   if (e.format != 32) return;
 
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   if (e.message_type == property->atom(otk::Property::net_current_desktop)) {
     changeDesktop(e.data.l[0]);
@@ -778,14 +778,14 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
     right to the client window, because of how they are sent and their struct
     layout.
   */
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
 
   if (c) {
     // send a net_active_window message
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type =
-      Openbox::instance->property()->atom(otk::Property::net_active_window);
+      openbox->property()->atom(otk::Property::net_active_window);
     ce.xclient.display = otk::Display::display;
     ce.xclient.window = c->window();
     ce.xclient.format = 32;

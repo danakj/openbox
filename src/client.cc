@@ -72,7 +72,7 @@ Client::Client(int screen, Window window)
 
 Client::~Client()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   // clean up childrens' references
   while (!_transients.empty()) {
@@ -84,7 +84,7 @@ Client::~Client()
   if (_transient_for)
     _transient_for->_transients.remove(this); // remove from old parent
   
-  if (Openbox::instance->state() != Openbox::State_Exiting) {
+  if (openbox->state() != Openbox::State_Exiting) {
     // these values should not be persisted across a window unmapping/mapping
     property->erase(_window, otk::Property::net_wm_desktop);
     property->erase(_window, otk::Property::net_wm_state);
@@ -94,16 +94,16 @@ Client::~Client()
 
 void Client::getDesktop()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   // defaults to the current desktop
-  _desktop = Openbox::instance->screen(_screen)->desktop();
+  _desktop = openbox->screen(_screen)->desktop();
 
   if (!property->get(_window, otk::Property::net_wm_desktop,
                      otk::Property::Atom_Cardinal,
                      (long unsigned*)&_desktop)) {
     // make sure the hint exists
-    Openbox::instance->property()->set(_window,
+    openbox->property()->set(_window,
                                        otk::Property::net_wm_desktop,
                                        otk::Property::Atom_Cardinal,
                                        (unsigned)_desktop);
@@ -113,7 +113,7 @@ void Client::getDesktop()
 
 void Client::getType()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   _type = (WindowType) -1;
   
@@ -245,7 +245,7 @@ void Client::setupDecorAndFunctions()
 
 void Client::getMwmHints()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   unsigned long num = MwmHints::elements;
   unsigned long *hints;
@@ -283,7 +283,7 @@ void Client::getArea()
 
 void Client::getState()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
     _skip_taskbar = _skip_pager = false;
@@ -368,7 +368,7 @@ void Client::calcLayer() {
         if we don't have a frame, then we aren't mapped yet (and this would
         SIGSEGV :)
       */
-      Openbox::instance->screen(_screen)->restack(true, this); // raise
+      openbox->screen(_screen)->restack(true, this); // raise
     }
   }
 }
@@ -376,7 +376,7 @@ void Client::calcLayer() {
 
 void Client::updateProtocols()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   Atom *proto;
   int num_return = 0;
@@ -480,7 +480,7 @@ void Client::updateWMHints()
 
 void Client::updateTitle()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   _title = "";
   
@@ -502,7 +502,7 @@ void Client::updateTitle()
 
 void Client::updateIconTitle()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   _icon_title = "";
   
@@ -521,7 +521,7 @@ void Client::updateIconTitle()
 
 void Client::updateClass()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   // set the defaults
   _app_name = _app_class = _role = "";
@@ -548,7 +548,7 @@ void Client::updateStrut()
 {
   unsigned long num = 4;
   unsigned long *data;
-  if (!Openbox::instance->property()->get(_window,
+  if (!openbox->property()->get(_window,
                                           otk::Property::net_wm_strut,
                                           otk::Property::Atom_Cardinal,
                                           &num, &data))
@@ -560,7 +560,7 @@ void Client::updateStrut()
     _strut.top = data[2];
     _strut.bottom = data[3];
     
-    Openbox::instance->screen(_screen)->updateStrut();
+    openbox->screen(_screen)->updateStrut();
   }
 
   delete [] data;
@@ -574,7 +574,7 @@ void Client::updateTransientFor()
 
   if (XGetTransientForHint(otk::Display::display, _window, &t) &&
       t != _window) { // cant be transient to itself!
-    c = Openbox::instance->findClient(t);
+    c = openbox->findClient(t);
     assert(c != this); // if this happens then we need to check for it
 
     if (!c /*XXX: && _group*/) {
@@ -606,7 +606,7 @@ void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
   
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   // compress changes to a single property into a single change
   XEvent ce;
@@ -671,13 +671,13 @@ void Client::setDesktop(long target)
   
   _desktop = target;
 
-  Openbox::instance->property()->set(_window,
+  openbox->property()->set(_window,
                                      otk::Property::net_wm_desktop,
                                      otk::Property::Atom_Cardinal,
                                      (unsigned)_desktop);
   
   // 'move' the window to the new desktop
-  if (_desktop == Openbox::instance->screen(_screen)->desktop() ||
+  if (_desktop == openbox->screen(_screen)->desktop() ||
       _desktop == (signed)0xffffffff)
     frame->show();
   else
@@ -687,7 +687,7 @@ void Client::setDesktop(long target)
 
 void Client::setState(StateAction action, long data1, long data2)
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
   bool shadestate = _shaded;
 
   if (!(action == State_Add || action == State_Remove ||
@@ -865,7 +865,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
   
   if (e.format != 32) return;
 
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
   
   if (e.message_type == property->atom(otk::Property::wm_change_state)) {
     // compress changes into a single change
@@ -926,7 +926,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
       shade(false);
     // XXX: deiconify
     focus();
-    Openbox::instance->screen(_screen)->restack(true, this); // raise
+    openbox->screen(_screen)->restack(true, this); // raise
   }
 }
 
@@ -1037,7 +1037,7 @@ void Client::move(int x, int y)
 void Client::close()
 {
   XEvent ce;
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   if (!(_functions & Func_Close)) return;
 
@@ -1063,7 +1063,7 @@ void Client::close()
 
 void Client::changeState()
 {
-  const otk::Property *property = Openbox::instance->property();
+  const otk::Property *property = openbox->property();
 
   unsigned long state[2];
   state[0] = _wmstate;
@@ -1128,7 +1128,7 @@ bool Client::focus() const
 
   if (_focus_notify) {
     XEvent ce;
-    const otk::Property *property = Openbox::instance->property();
+    const otk::Property *property = openbox->property();
     
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
@@ -1136,7 +1136,7 @@ bool Client::focus() const
     ce.xclient.window = _window;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = property->atom(otk::Property::wm_take_focus);
-    ce.xclient.data.l[1] = Openbox::instance->lastTime();
+    ce.xclient.data.l[1] = openbox->lastTime();
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
@@ -1151,8 +1151,8 @@ void Client::unfocus() const
 {
   if (!_focused) return;
 
-  assert(Openbox::instance->focusedClient() == this);
-  Openbox::instance->setFocusedClient(0);
+  assert(openbox->focusedClient() == this);
+  openbox->setFocusedClient(0);
 }
 
 
@@ -1167,7 +1167,7 @@ void Client::focusHandler(const XFocusChangeEvent &e)
   frame->focus();
   _focused = true;
 
-  Openbox::instance->setFocusedClient(this);
+  openbox->setFocusedClient(this);
 }
 
 
@@ -1182,8 +1182,8 @@ void Client::unfocusHandler(const XFocusChangeEvent &e)
   frame->unfocus();
   _focused = false;
 
-  if (Openbox::instance->focusedClient() == this)
-    Openbox::instance->setFocusedClient(0);
+  if (openbox->focusedClient() == this)
+    openbox->setFocusedClient(0);
 }
 
 
@@ -1239,13 +1239,13 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
     switch (e.detail) {
     case Below:
     case BottomIf:
-      Openbox::instance->screen(_screen)->restack(false, this); // lower
+      openbox->screen(_screen)->restack(false, this); // lower
       break;
 
     case Above:
     case TopIf:
     default:
-      Openbox::instance->screen(_screen)->restack(true, this); // raise
+      openbox->screen(_screen)->restack(true, this); // raise
       break;
     }
   }
@@ -1269,7 +1269,7 @@ void Client::unmapHandler(const XUnmapEvent &e)
   otk::EventHandler::unmapHandler(e);
 
   // this deletes us etc
-  Openbox::instance->screen(_screen)->unmanageWindow(this);
+  openbox->screen(_screen)->unmanageWindow(this);
 }
 
 
@@ -1282,7 +1282,7 @@ void Client::destroyHandler(const XDestroyWindowEvent &e)
   otk::EventHandler::destroyHandler(e);
 
   // this deletes us etc
-  Openbox::instance->screen(_screen)->unmanageWindow(this);
+  openbox->screen(_screen)->unmanageWindow(this);
 }
 
 
@@ -1311,7 +1311,7 @@ void Client::reparentHandler(const XReparentEvent &e)
   XPutBackEvent(otk::Display::display, &ev);
   
   // this deletes us etc
-  Openbox::instance->screen(_screen)->unmanageWindow(this);
+  openbox->screen(_screen)->unmanageWindow(this);
 }
 
 }

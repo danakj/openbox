@@ -45,7 +45,7 @@ void Actions::insertPress(const XButtonEvent &e)
   a->button = e.button;
   a->pos.setPoint(e.x_root, e.y_root);
 
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c) a->clientarea = c->area();
 }
 
@@ -73,21 +73,21 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   
   // run the PRESS python hook
   WidgetBase *w = dynamic_cast<WidgetBase*>
-    (Openbox::instance->findHandler(e.window));
+    (openbox->findHandler(e.window));
   assert(w); // everything should be a widget
 
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   int screen;
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c)
     screen = c->screen();
   else
     screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MousePress);
-  Openbox::instance->bindings()->fireButton(&data);
+  openbox->bindings()->fireButton(&data);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -112,7 +112,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   removePress(e);
   
   WidgetBase *w = dynamic_cast<WidgetBase*>
-    (Openbox::instance->findHandler(e.window));
+    (openbox->findHandler(e.window));
   assert(w); // everything should be a widget
 
   // not for the button we're watching?
@@ -134,14 +134,14 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   int screen;
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c)
     screen = c->screen();
   else
     screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MouseClick);
-  Openbox::instance->bindings()->fireButton(&data);
+  openbox->bindings()->fireButton(&data);
     
 
   // XXX: dont load this every time!!@*
@@ -154,7 +154,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
 
     // run the DOUBLECLICK python hook
     data.action = MouseDoubleClick;
-    Openbox::instance->bindings()->fireButton(&data);
+    openbox->bindings()->fireButton(&data);
     
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -175,13 +175,13 @@ void Actions::enterHandler(const XCrossingEvent &e)
   
   // run the ENTER python hook
   int screen;
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c)
     screen = c->screen();
   else
     screen = otk::Display::findScreen(e.root)->screen();
   EventData data(screen, c, EventEnterWindow, e.state);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 }
 
 
@@ -191,13 +191,13 @@ void Actions::leaveHandler(const XCrossingEvent &e)
 
   // run the LEAVE python hook
   int screen;
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c)
     screen = c->screen();
   else
     screen = otk::Display::findScreen(e.root)->screen();
   EventData data(screen, c, EventLeaveWindow, e.state);
-  Openbox::instance->bindings()->fireEvent(&data);
+  openbox->bindings()->fireEvent(&data);
 }
 
 
@@ -208,7 +208,7 @@ void Actions::keyPressHandler(const XKeyEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  Openbox::instance->bindings()->
+  openbox->bindings()->
     fireKey(otk::Display::findScreen(e.root)->screen(),
             state, e.keycode, e.time);
 }
@@ -235,7 +235,7 @@ void Actions::motionHandler(const XMotionEvent &e)
   }
 
   WidgetBase *w = dynamic_cast<WidgetBase*>
-    (Openbox::instance->findHandler(e.window));
+    (openbox->findHandler(e.window));
   assert(w); // everything should be a widget
 
   // run the MOTION python hook
@@ -244,14 +244,14 @@ void Actions::motionHandler(const XMotionEvent &e)
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;
   int screen;
-  Client *c = Openbox::instance->findClient(e.window);
+  Client *c = openbox->findClient(e.window);
   if (c)
     screen = c->screen();
   else
     screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
                  x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
-  Openbox::instance->bindings()->fireButton(&data);
+  openbox->bindings()->fireButton(&data);
 }
 
 void Actions::mapRequestHandler(const XMapRequestEvent &e)
@@ -283,13 +283,13 @@ void Actions::xkbHandler(const XkbEvent &e)
   switch (((XkbAnyEvent*)&e)->xkb_type) {
   case XkbBellNotify:
     w = ((XkbBellNotifyEvent*)&e)->window;
-    Client *c = Openbox::instance->findClient(w);
+    Client *c = openbox->findClient(w);
     if (c)
       screen = c->screen();
     else
-      screen = Openbox::instance->focusedScreen()->number();
+      screen = openbox->focusedScreen()->number();
     EventData data(screen, c, EventBell, 0);
-    Openbox::instance->bindings()->fireEvent(&data);
+    openbox->bindings()->fireEvent(&data);
     break;
   }
 }

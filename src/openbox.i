@@ -20,9 +20,9 @@
 //%include std_list.i
 //%template(ClientList) std::list<Client*>;
 
-%ignore ob::Openbox::instance;
+%ignore ob::openbox;
 %inline %{
-  ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
+  ob::Openbox *Openbox_instance() { return ob::openbox; }
 %};
 
 %{
@@ -96,7 +96,7 @@ void python_callback(PyObject *func, KeyData *data)
 %}
 %extend ob::Screen {
   Client *client(int i) {
-    if (i >= (int)self->clients.size())
+    if (i < 0 || i >= (int)self->clients.size())
       return NULL;
     ob::Client::List::iterator it = self->clients.begin();
     std::advance(it,i);

@@ -145,7 +145,7 @@ KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
 Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
-    _timer(Openbox::instance->timerManager(),
+    _timer(openbox->timerManager(),
            (otk::TimeoutHandler)resetChains, this)
 {
   _timer.setTimeout(5000); // chains reset after 5 seconds
@@ -341,7 +341,7 @@ void Bindings::removeAllKeys()
 
 void Bindings::grabKeys(bool grab)
 {
-  for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
+  for (int i = 0; i < openbox->screenCount(); ++i) {
     Window root = otk::Display::screenInfo(i)->rootWindow();
 
     KeyBindingTree *p = _curpos->first_child;
@@ -387,7 +387,7 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           grabKeys(true);
           otk::Display::ungrab();
         } else {
-          Client *c = Openbox::instance->focusedClient();
+          Client *c = openbox->focusedClient();
           KeyData data(screen, c, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
@@ -440,8 +440,8 @@ bool Bindings::addButton(const std::string &but, MouseContext context,
     bind->binding.modifiers = b.modifiers;
     _buttons[context].push_back(bind);
     // grab the button on all clients
-    for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
-      Screen *s = Openbox::instance->screen(sn);
+    for (int sn = 0; sn < openbox->screenCount(); ++sn) {
+      Screen *s = openbox->screen(sn);
       Client::List::iterator c_it, c_end = s->clients.end();
       for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
         grabButton(true, bind->binding, context, *c_it);
@@ -466,8 +466,8 @@ void Bindings::removeAllButtons()
         }
       }
       // ungrab the button on all clients
-      for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
-        Screen *s = Openbox::instance->screen(sn);
+      for (int sn = 0; sn < openbox->screenCount(); ++sn) {
+        Screen *s = openbox->screen(sn);
         Client::List::iterator c_it, c_end = s->clients.end();
         for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
           grabButton(false, (*it)->binding, (MouseContext)i, *c_it);

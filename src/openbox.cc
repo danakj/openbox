@@ -51,7 +51,7 @@ extern "C" {
 
 namespace ob {
 
-Openbox *Openbox::instance  = (Openbox *) 0;
+Openbox *openbox = (Openbox *) 0;
 
 
 void Openbox::signalHandler(int signal)
@@ -59,7 +59,7 @@ void Openbox::signalHandler(int signal)
   switch (signal) {
   case SIGUSR1:
     printf("Caught SIGUSR1 signal. Restarting.\n");
-    instance->restart();
+    openbox->restart();
     break;
 
   case SIGHUP:
@@ -67,7 +67,7 @@ void Openbox::signalHandler(int signal)
   case SIGTERM:
   case SIGPIPE:
     printf("Caught signal %d. Exiting.\n", signal);
-    instance->shutdown();
+    openbox->shutdown();
     break;
 
   case SIGFPE:
@@ -86,7 +86,7 @@ Openbox::Openbox(int argc, char **argv)
 
   _state = State_Starting; // initializing everything
 
-  Openbox::instance = this;
+  openbox = this;
 
   _displayreq = (char*) 0;
   _argv = argv;
@@ -378,7 +378,7 @@ void Openbox::setFocusedClient(Client *c)
 
   // call the python Focus callbacks
   EventData data(_focused_screen->number(), c, EventFocus, 0);
-  Openbox::instance->bindings()->fireEvent(&data);
+  _bindings->fireEvent(&data);
 }
 
 void Openbox::execute(int screen, const std::string &bin)

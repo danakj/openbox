@@ -813,7 +813,7 @@ std::string SwigString_AsString(PyObject* o) {
 #include <stdexcept>
 
 
-  ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
+  ob::Openbox *Openbox_instance() { return ob::openbox; }
 
 
 namespace ob {
@@ -889,7 +889,7 @@ void python_callback(PyObject *func, KeyData *data)
 #include "ustring.hh"
 
 ob::Client *ob_Screen_client(ob::Screen *self,int i){
-    if (i >= (int)self->clients.size())
+    if (i < 0 || i >= (int)self->clients.size())
       return NULL;
     ob::Client::List::iterator it = self->clients.begin();
     std::advance(it,i);

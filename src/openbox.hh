@@ -38,6 +38,14 @@ struct Cursors {
   Cursor ur_angle; //!< For resizing the right corner of a window
 };
 
+class Openbox;
+
+//! The single instance of the Openbox class for the application
+/*!
+  Since this variable is globally available in the application, the Openbox
+  class does not need to be passed around to any of the other classes.
+*/
+extern Openbox *openbox;
 
 //! The main class for the Openbox window manager
 /*!
@@ -52,13 +60,6 @@ struct Cursors {
 class Openbox : public otk::EventDispatcher, public otk::EventHandler
 {
 public:
-  //! The single instance of the Openbox class for the application
-  /*!
-    Since this variable is globally available in the application, the Openbox
-    class does not need to be passed around to any of the other classes.
-  */
-  static Openbox *instance;
-
   //! The posible running states of the window manager
   enum RunState {
     State_Starting, //!< The window manager is starting up (being created)

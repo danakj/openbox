@@ -717,7 +717,7 @@ fi
 
 PACKAGE=openbox
 
-VERSION=1.1.1
+VERSION=1.2.0
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -2737,7 +2737,7 @@ if test "${enable_debug+set}" = set; then
   enableval="$enable_debug"
   if test x$enableval = "xyes"; then
     echo "$ac_t""yes" 1>&6
-    DEBUG="-DDEBUG"
+    DEBUG="-DDEBUG -Wall -W -pedantic"
   else
     echo "$ac_t""no" 1>&6
   fi

@@ -68,15 +68,15 @@ public:
   inline BScreen &getScreen(void) { return screen; }
   inline Clientmenu *getMenu(void) { return clientmenu; }
   inline const char *getName(void) const { return name; }
-  inline const int &getWorkspaceID(void) const { return id; }
+  inline int getWorkspaceID(void) const { return id; }
   inline OpenboxWindow *focusedWindow() { return _focused; }
   inline OpenboxWindow *lastFocusedWindow() { return _last; }
   void focusWindow(OpenboxWindow *win);
   OpenboxWindow *getWindow(int);
-  Bool isCurrent(void);
-  const int addWindow(OpenboxWindow *, Bool = False);
-  const int removeWindow(OpenboxWindow *);
-  const int getCount(void);
+  bool isCurrent(void);
+  int addWindow(OpenboxWindow *, bool = false);
+  int removeWindow(OpenboxWindow *);
+  int getCount(void);
   void showAll(void);
   void hideAll(void);
   void removeAll(void);

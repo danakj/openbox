@@ -583,7 +583,7 @@ Rect BScreen::availableArea() const {
 #ifdef    SLIT
     int slit_x = slit->autoHide() ? slit->hiddenOrigin().x() : slit->area().x(),
     slit_y = slit->autoHide() ? slit->hiddenOrigin().y() : slit->area().y();
-    int tbarh = resource.hide_toolbar ? 0 :
+    unsigned int tbarh = resource.hide_toolbar ? 0 :
       toolbar->getExposedHeight() + resource.border_width * 2;
     bool tbartop;
     switch (toolbar->placement()) {
@@ -1836,7 +1836,7 @@ void BScreen::LoadStyle(void) {
 
   // load bevel, border and handle widths
   if (conf.getValue("handleWidth", "HandleWidth", l)) {
-    if (l <= size().w() / 2 && l != 0)
+    if (l <= (signed)size().w() / 2 && l != 0)
       resource.handle_width = l;
     else
       resource.handle_width = 6;
@@ -1849,7 +1849,7 @@ void BScreen::LoadStyle(void) {
     resource.border_width = 1;
 
   if (conf.getValue("bevelWidth", "BevelWidth", l)) {
-    if (l <= size().w() / 2 && l != 0)
+    if (l <= (signed)size().w() / 2 && l != 0)
       resource.bevel_width = l;
     else
       resource.bevel_width = 3;
@@ -1857,7 +1857,7 @@ void BScreen::LoadStyle(void) {
     resource.bevel_width = 3;
 
   if (conf.getValue("frameWidth", "FrameWidth", l)) {
-    if (l <= size().w() / 2)
+    if (l <= (signed)size().w() / 2)
       resource.frame_width = l;
     else
       resource.frame_width = resource.bevel_width;
@@ -1912,7 +1912,7 @@ void BScreen::removeIcon(OpenboxWindow *w) {
 
 
 OpenboxWindow *BScreen::getIcon(int index) {
-  if (index < 0 || index >= iconList.size())
+  if (index < 0 || index >= (signed)iconList.size())
     return (OpenboxWindow *) 0;
 
   winList::iterator it = iconList.begin();
@@ -2021,7 +2021,6 @@ void BScreen::addNetizen(Netizen *n) {
 
 void BScreen::removeNetizen(Window w) {
   netList::iterator it;
-  int i = 0;
 
   for (it = netizenList.begin(); it != netizenList.end(); ++it)
     if ((*it)->getWindowID() == w) {
@@ -2147,7 +2146,7 @@ void BScreen::addWorkspaceName(const char *name) {
 
 
 const char *BScreen::getNameOfWorkspace(int id) {
-  if (id < 0 || id >= workspaceNames.size())
+  if (id < 0 || id >= (signed)workspaceNames.size())
     return (const char *) 0;
   return workspaceNames[id].c_str();
 }

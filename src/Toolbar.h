@@ -93,9 +93,9 @@ private:
   } hide_handler;
 
   Openbox &openbox;
+  BScreen &screen;
   Resource &config;
   BImageControl *image_ctrl;
-  BScreen &screen;
   BTimer *clock_timer, *hide_timer;
   Toolbarmenu *toolbarmenu;
 

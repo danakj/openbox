@@ -220,7 +220,7 @@ protected:
   void associateClientWindow();
   void decorate();
   void decorateLabel();
-  void positionButtons(Bool redecorate_label = False);
+  void positionButtons();
   void positionWindows();
   void createCloseButton();
   void createIconifyButton();

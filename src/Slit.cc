@@ -45,8 +45,8 @@
 #include <string>
 using std::ends;
 
-Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
-  openbox(scr.getOpenbox()), config(conf)
+Slit::Slit(BScreen &scr, Resource &conf) : openbox(scr.getOpenbox()),
+  screen(scr), config(conf)
 {
   load();
   

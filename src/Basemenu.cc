@@ -233,7 +233,7 @@ int Basemenu::insert(const char **ulabel, int pos, int function) {
 
 
 int Basemenu::remove(int index) {
-  if (index < 0 || index > menuitems.size()) return -1;
+  if (index < 0 || index > (signed)menuitems.size()) return -1;
 
   BasemenuItem *item = menuitems[index];
   menuitems.erase(menuitems.begin() + index);
@@ -413,7 +413,7 @@ void Basemenu::update(void) {
 
   if (title_vis && visible) redrawTitle();
 
-  for (int i = 0; visible && i < menuitems.size(); i++) {
+  for (int i = 0; visible && i < (signed)menuitems.size(); i++) {
     if (i == which_sub) {
       drawItem(i, True, 0);
       drawSubmenu(i);
@@ -531,7 +531,7 @@ void Basemenu::drawSubmenu(int index) {
       itmp->submenu()->internal_hide();
   }
 
-  if (index >= 0 && index < menuitems.size()) {
+  if (index >= 0 && index < (signed)menuitems.size()) {
     BasemenuItem *item = menuitems[index];
     if (item->submenu() && visible && (! item->submenu()->isTorn()) &&
 	item->isEnabled()) {
@@ -584,19 +584,17 @@ void Basemenu::drawSubmenu(int index) {
 }
 
 
-Bool Basemenu::hasSubmenu(int index) {
-  if ((index >= 0) && (index < menuitems.size()))
-    if (menuitems[index]->submenu())
-      return True;
-
-  return False;
+bool Basemenu::hasSubmenu(int index) {
+  if (index < 0 | index >= (signed)menuitems.size())
+    return false;
+  return (menuitems[index]->submenu());
 }
 
 
 void Basemenu::drawItem(int index, Bool highlight, Bool clear,
 			int x, int y, unsigned int w, unsigned int h)
 {
-  if (index < 0 || index > menuitems.size()) return;
+  if (index < 0 || index > (signed)menuitems.size()) return;
 
   BasemenuItem *item = menuitems[index];
   if (! item) return;
@@ -773,8 +771,8 @@ void Basemenu::setLabel(const char *l) {
 }
 
 
-void Basemenu::setItemSelected(int index, Bool sel) {
-  if (index < 0 || index >= menuitems.size()) return;
+void Basemenu::setItemSelected(int index, bool sel) {
+  if (index < 0 || index >= (signed)menuitems.size()) return;
 
   BasemenuItem *item = find(index);
   if (! item) return;
@@ -784,18 +782,18 @@ void Basemenu::setItemSelected(int index, Bool sel) {
 }
 
 
-Bool Basemenu::isItemSelected(int index) {
-  if (index < 0 || index >= menuitems.size()) return False;
+bool Basemenu::isItemSelected(int index) {
+  if (index < 0 || index >= (signed)menuitems.size()) return false;
 
   BasemenuItem *item = find(index);
-  if (! item) return False;
+  if (! item) return false;
 
   return item->isSelected();
 }
 
 
-void Basemenu::setItemEnabled(int index, Bool enable) {
-  if (index < 0 || index >= menuitems.size()) return;
+void Basemenu::setItemEnabled(int index, bool enable) {
+  if (index < 0 || index >= (signed)menuitems.size()) return;
 
   BasemenuItem *item = find(index);
   if (! item) return;
@@ -805,8 +803,8 @@ void Basemenu::setItemEnabled(int index, Bool enable) {
 }
 
 
-Bool Basemenu::isItemEnabled(int index) {
-  if (index < 0 || index >= menuitems.size()) return False;
+bool Basemenu::isItemEnabled(int index) {
+  if (index < 0 || index >= (signed)menuitems.size()) return false;
 
   BasemenuItem *item = find(index);
   if (! item) return False;
@@ -820,7 +818,7 @@ void Basemenu::buttonPressEvent(XButtonEvent *be) {
     int sbl = (be->x / menu.item_w), i = (be->y / menu.item_h);
     int w = (sbl * menu.persub) + i;
 
-    if (w < menuitems.size() && w >= 0) {
+    if (w < (signed)menuitems.size() && w >= 0) {
       which_press = i;
       which_sbl = sbl;
 
@@ -862,7 +860,7 @@ void Basemenu::buttonReleaseEvent(XButtonEvent *re) {
 	    w = (sbl * menu.persub) + i,
 	    p = (which_sbl * menu.persub) + which_press;
 
-      if (w < menuitems.size() && w >= 0) {
+      if (w < (signed)menuitems.size() && w >= 0) {
 	drawItem(p, (p == which_sub), True);
 
         if  (p == w && isItemEnabled(w)) {
@@ -908,7 +906,7 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
 	  w = (sbl * menu.persub) + i;
 
     if ((i != which_press || sbl != which_sbl) &&
-	(w < menuitems.size() && w >= 0)) {
+	(w < (signed)menuitems.size() && w >= 0)) {
       if (which_press != -1 && which_sbl != -1) {
 	int p = (which_sbl * menu.persub) + which_press;
 	BasemenuItem *item = menuitems[p];

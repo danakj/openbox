@@ -81,7 +81,7 @@ Workspace::~Workspace(void) {
 }
 
 
-const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
+int Workspace::addWindow(OpenboxWindow *w, bool place) {
   if (! w) return -1;
 
   if (place) placeWindow(*w);
@@ -103,7 +103,7 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
 }
 
 
-const int Workspace::removeWindow(OpenboxWindow *w) {
+int Workspace::removeWindow(OpenboxWindow *w) {
   if (! w) return -1;
 
   _zorder.remove(w);
@@ -190,7 +190,7 @@ void Workspace::raiseWindow(OpenboxWindow *w) {
   Workspace *wkspc;
 
   win = bottom;
-  while (True) {
+  while (true) {
     *(curr++) = win->getFrameWindow();
     screen.updateNetizenWindowRaise(win->getClientWindow());
 
@@ -229,7 +229,7 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
   Window *nstack = new Window[i], *curr = nstack;
   Workspace *wkspc;
 
-  while (True) {
+  while (true) {
     *(curr++) = win->getFrameWindow();
     screen.updateNetizenWindowLower(win->getClientWindow());
 
@@ -267,25 +267,25 @@ void Workspace::reconfigure(void) {
 
 
 OpenboxWindow *Workspace::getWindow(int index) {
-  if ((index >= 0) && (index < _windows.size()))
+  if ((index >= 0) && (index < (signed)_windows.size()))
     return _windows[index];
   else
     return (OpenboxWindow *) 0;
 }
 
 
-const int Workspace::getCount(void) {
-  return _windows.size();
+int Workspace::getCount(void) {
+  return (signed)_windows.size();
 }
 
 
 void Workspace::update(void) {
   clientmenu->update();
-  screen.getToolbar()->redrawWindowLabel(True);
+  screen.getToolbar()->redrawWindowLabel(true);
 }
 
 
-Bool Workspace::isCurrent(void) {
+bool Workspace::isCurrent(void) {
   return (id == screen.getCurrentWorkspaceID());
 }
 

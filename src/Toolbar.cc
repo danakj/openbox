@@ -66,8 +66,8 @@
 #include <string>
 using std::ends;
 
-Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
-  openbox(scrn.getOpenbox()), config(conf)
+Toolbar::Toolbar(BScreen &scrn, Resource &conf) : openbox(scrn.getOpenbox()),
+  screen(scrn), config(conf)
 {
   load();
 

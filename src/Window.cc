@@ -721,7 +721,7 @@ void OpenboxWindow::createMaximizeButton(void) {
 }
 
 
-void OpenboxWindow::positionButtons(Bool redecorate_label) {
+void OpenboxWindow::positionButtons() {
   const char *format = openbox.getTitleBarLayout();
   const unsigned int bw = frame.bevel_w + 1;
   const unsigned int by = frame.bevel_w + 1;
@@ -785,23 +785,19 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
     }
   }
 
-  if (!hasclose) {
-      openbox.removeWindowSearch(frame.close_button);
-      XDestroyWindow(display, frame.close_button);
-      frame.close_button = None;
+  if (!hasclose && frame.close_button) {
+    openbox.removeWindowSearch(frame.close_button);
+    XDestroyWindow(display, frame.close_button);
   }
-  if (!hasiconify) {
-      openbox.removeWindowSearch(frame.iconify_button);
-      XDestroyWindow(display, frame.iconify_button);
-      frame.iconify_button = None;
+  if (!hasiconify && frame.iconify_button) {
+    openbox.removeWindowSearch(frame.iconify_button);
+    XDestroyWindow(display, frame.iconify_button);
   }
-  if (!hasmaximize) {
-      openbox.removeWindowSearch(frame.maximize_button);
-      XDestroyWindow(display, frame.maximize_button);                 
-      frame.maximize_button = None;
+  if (!hasmaximize && frame.iconify_button) {
+    openbox.removeWindowSearch(frame.maximize_button);
+    XDestroyWindow(display, frame.maximize_button);                 
   }
-  if (redecorate_label)
-    decorateLabel();
+
   redrawLabel();
   redrawAllButtons();
 }
@@ -1302,10 +1298,9 @@ void OpenboxWindow::configure(int dx, int dy,
 
     XMoveWindow(display, frame.window, frame.x, frame.y);
 
+    setFocusFlag(flags.focused);
     positionWindows();
     decorate();
-    setFocusFlag(flags.focused);
-    redrawAllButtons();
   } else {
     frame.x = dx;
     frame.y = dy;
@@ -1534,7 +1529,7 @@ void OpenboxWindow::maximize(unsigned int button) {
     openbox_attrib.premax_x = openbox_attrib.premax_y = 0;
     openbox_attrib.premax_w = openbox_attrib.premax_h = 0;
 
-    redrawAllButtons();
+    redrawMaximizeButton(flags.maximized);
     setState(current_state);
     return;
   }
@@ -1608,7 +1603,7 @@ void OpenboxWindow::maximize(unsigned int button) {
 
   configure(dx, dy, dw, dh);
   screen->getWorkspace(workspace_number)->raiseWindow(this);
-  redrawAllButtons();
+  redrawMaximizeButton(flags.maximized);
   setState(current_state);
 }
 
@@ -2241,11 +2236,7 @@ void OpenboxWindow::mapNotifyEvent(XMapEvent *ne) {
     openbox.grab();
     if (! validateClient()) return;
 
-    if (decorations.titlebar) positionButtons();
-
     setState(NormalState);
-
-    redrawAllButtons();
 
     if (flags.transient || screen->focusNew())
       setInputFocus();
@@ -2410,7 +2401,10 @@ void OpenboxWindow::propertyNotifyEvent(Atom atom) {
 
       if (decorations.close && (! frame.close_button)) {
         createCloseButton();
-        if (decorations.titlebar) positionButtons(True);
+        if (decorations.titlebar) {
+          positionButtons();
+          decorateLabel();
+        }
         if (windowmenu) windowmenu->reconfigure();
       }
     }

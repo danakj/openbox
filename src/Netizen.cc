@@ -33,8 +33,8 @@
 #include "Netizen.h"
 #include "Screen.h"
 
-Netizen::Netizen(BScreen &scr, Window win) : screen(scr),
-  basedisplay(scr.getBaseDisplay()), window(win)
+Netizen::Netizen(BScreen &scr, Window win) :basedisplay(scr.getBaseDisplay()),
+  screen(scr), window(win)
 {
   event.type = ClientMessage;
   event.xclient.message_type = basedisplay.getOpenboxStructureMessagesAtom();

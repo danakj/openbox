@@ -55,8 +55,8 @@
 #endif // MAXPATHLEN
 
 
-Rootmenu::Rootmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn),
-  openbox(scrn.getOpenbox())
+Rootmenu::Rootmenu(BScreen &scrn) : Basemenu(scrn), openbox(scrn.getOpenbox()),
+  screen(scrn)  
 {
 }
 

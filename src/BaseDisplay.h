@@ -276,7 +276,7 @@ public:
 
 #endif // NEWWMSPEC
 
-  inline ScreenInfo *getScreenInfo(int s) {
+  inline ScreenInfo *getScreenInfo(unsigned int s) {
     ASSERT(s < screenInfoList.size());
     return screenInfoList[s];
   }

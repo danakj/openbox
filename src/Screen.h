@@ -197,7 +197,7 @@ public:
 
   Rect availableArea() const;
   
-  inline Workspace *getWorkspace(int w) {
+  inline Workspace *getWorkspace(unsigned int w) {
     ASSERT(w < workspacesList.size());
     return workspacesList[w];
   }

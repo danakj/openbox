@@ -212,6 +212,11 @@ public:
   
   void eraseValue(Window win, Atoms atom) const;
 
+  // sends a client message a window
+  void sendClientMessage(Window target, Atoms type, Window about,
+                         long data = 0, long data1 = 0, long data2 = 0,
+                         long data3 = 0) const;
+
   // temporary function!! remove when not used in blackbox.hh anymore!!
   inline Atom getAtom(Atoms a)
   { assert(a >= 0 && a < NUM_ATOMS); Atom ret = _atoms[a];

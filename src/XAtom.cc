@@ -491,3 +491,25 @@ void XAtom::eraseValue(Window win, Atoms atom) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   XDeleteProperty(_display, win, _atoms[atom]);
 }
+
+
+void XAtom::sendClientMessage(Window target, Atoms type, Window about,
+                              long data, long data1, long data2,
+                              long data3) const {
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(target != None);
+
+  XEvent e;
+  e.xclient.type = ClientMessage;
+  e.xclient.format = 32;
+  e.xclient.message_type = _atoms[type];
+  e.xclient.window = about;
+  e.xclient.data.l[0] = data;
+  e.xclient.data.l[1] = data1;
+  e.xclient.data.l[2] = data2;
+  e.xclient.data.l[3] = data3;
+
+  XSendEvent(_display, target, False,
+             SubstructureRedirectMask | SubstructureNotifyMask,
+             &e);
+}

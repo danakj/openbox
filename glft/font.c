@@ -279,7 +279,7 @@ void GlftMeasureString(struct GlftFont *font,
     *h = 0;
 
     c = str;
-    while (c) {
+    while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
         if (g) {
             *w += g->width;
@@ -288,7 +288,6 @@ void GlftMeasureString(struct GlftFont *font,
             *w += font->max_advance_width;
         }
         c = g_utf8_next_char(c);
-        if (c - str > bytes) break;
     }
 }
 

@@ -213,10 +213,6 @@ static void event(ObEvent *e, void *foo)
         }
         context = engine_get_context(e->data.x.client,
                                      e->data.x.e->xbutton.window);
-        g_message("press %d frame %d client %d",
-                  context, 
-                  g_quark_try_string("frame"),
-                  g_quark_try_string("client"));
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
@@ -232,10 +228,6 @@ static void event(ObEvent *e, void *foo)
     case Event_X_ButtonRelease:
         context = engine_get_context(e->data.x.client,
                                      e->data.x.e->xbutton.window);
-        g_message("release %d frame %d client %d",
-                  context, 
-                  g_quark_try_string("frame"),
-                  g_quark_try_string("client"));
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
             if (drag) {

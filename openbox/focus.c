@@ -18,7 +18,9 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 
 Window focus_backup = None;
 gboolean focus_new = TRUE;
-gboolean focus_follow = TRUE;
+gboolean focus_follow = FALSE;
+static gboolean focus_last = TRUE;
+static gboolean focus_last_on_desktop = TRUE;
 
 static gboolean noreorder = 0;
 
@@ -36,6 +38,18 @@ static void parse_assign(char *name, ParseToken *value)
         else {
             focus_follow = value->data.bool;
         }
+    } else if (!g_ascii_strcasecmp(name, "focuslast")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            focus_last = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "focuslastondesktop")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            focus_last_on_desktop = value->data.bool;
+        }
     } else
         yyerror("invalid option");
     parse_free_token(value);
@@ -50,7 +64,9 @@ void focus_startup()
 
     focus_client = NULL;
     focus_new = TRUE;
-    focus_follow = TRUE;
+    focus_follow = FALSE;
+    focus_last = TRUE;
+    focus_last_on_desktop = TRUE;
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
@@ -149,7 +165,6 @@ static gboolean focus_under_pointer()
 void focus_fallback(gboolean switching_desks)
 {
     GList *it;
-    gboolean under = FALSE;
     Client *old = NULL;
 
     old = focus_client;
@@ -163,19 +178,20 @@ void focus_fallback(gboolean switching_desks)
     if (switching_desks) {
         /* don't skip any windows when switching desktops */
         old = NULL;
-    } else {
-        if (focus_follow)
-            under = focus_under_pointer();
     }
 
-    if (!under) {
-        for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-            if (it->data != old && client_normal(it->data))
-                if (client_focus(it->data))
-                    break;
-        if (it == NULL) /* nothing to focus */
-            focus_set_client(NULL);
+    if (!(switching_desks ? focus_last_on_desktop : focus_last)) {
+        if (focus_follow) focus_under_pointer();
+        return;
     }
+
+    for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+        if (it->data != old && client_normal(it->data))
+            if (client_focus(it->data))
+                return;
+
+    /* nothing to focus */
+    focus_set_client(NULL);
 }
 
 void focus_cycle(gboolean forward, gboolean linear, gboolean done,
@@ -203,7 +219,9 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean done,
     else        list = focus_order[screen_desktop];
 
     start = it = g_list_find(list, focus_client);
-    if (!start) goto done_cycle; /* switched desktops or something? */
+    if (!start) /* switched desktops or something? */
+        start = it = forward ? g_list_last(list) : g_list_first(list);
+    if (!start) goto done_cycle;
 
     do {
         if (forward) {

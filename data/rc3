@@ -16,8 +16,16 @@
 # focus new windows when they appear
 #focusNew = yes
 
-# does focus follow the mouse pointer
-#followMouse = yes
+# does focus follow the mouse pointer when it enters a window
+#followMouse = no
+
+# when no windows are left with focus, focus the last window on the desktop
+# to previously have focus
+#focusLast = yes
+
+# a special case of focusLast that applies when switching between desktops; if
+# set, the previously focused window on the desktop is focused when switching
+#focusLastOnDesktop = yes
 
 [engine]
 

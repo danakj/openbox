@@ -17,7 +17,7 @@ extern GList **focus_order;
 
 /*! Should new windows be focused */
 extern gboolean focus_new;
-/*! Should focus follow the mouse pointer */
+/*! Focus windows when the mouse enters them */
 extern gboolean focus_follow;
 
 void focus_startup();

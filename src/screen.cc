@@ -433,16 +433,34 @@ void Screen::manageWindow(Window window)
   Client *client = 0;
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
+  XEvent e;
+  XWindowAttributes attrib;
 
   otk::display->grab();
 
+  // check if it has already been unmapped by the time we started mapping
+  // the grab does a sync so we don't have to here
+  if (XCheckTypedWindowEvent(**otk::display, window, DestroyNotify, &e) ||
+      XCheckTypedWindowEvent(**otk::display, window, UnmapNotify, &e)) {
+    XPutBackEvent(**otk::display, &e);
+    
+    otk::display->ungrab();
+    return; // don't manage it
+  }
+  
+  if (!XGetWindowAttributes(**otk::display, window, &attrib) ||
+      attrib.override_redirect) {
+    otk::display->ungrab();
+    return; // don't manage it
+  }
+  
   // is the window a docking app
   if ((wmhint = XGetWMHints(**otk::display, window))) {
     if ((wmhint->flags & StateHint) &&
         wmhint->initial_state == WithdrawnState) {
       //slit->addClient(w); // XXX: make dock apps work!
-      otk::display->ungrab();
 
+      otk::display->ungrab();
       XFree(wmhint);
       return;
     }

@@ -212,7 +212,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   iconmenu = new Iconmenu(this);
   configmenu = new Configmenu(this);
 
-  if (resource.workspaces != 0) {
+  if (resource.workspaces > 0) {
     for (unsigned int i = 0; i < resource.workspaces; ++i) {
       Workspace *wkspc = new Workspace(this, workspacesList.size());
       workspacesList.push_back(wkspc);

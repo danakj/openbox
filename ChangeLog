@@ -1,3 +1,385 @@
+2003-07-24  xor@zed.orodu.net  <xor@zed>
+
+	* configure.ac:
+	dont display the build type at the end its already in the output
+
+	* configure.ac, kernel/action.c, kernel/client.c, kernel/debug.h, kernel/dock.c, kernel/event.c, kernel/focus.c, kernel/menu.c, kernel/menu_render.c, kernel/openbox.c, kernel/screen.c, parser/parse.c, plugins/keyboard/keyboard.c, plugins/keyboard/translate.c, plugins/menu/client_menu.c, plugins/placement/history.c, render/color.c, render/gradient.c, render/instance.c, render/theme.c, tools/obconf/main.c:
+	use ob_debug for any debug printing and only display the output when its a debug build or when --debug is passed to it
+
+	* render/gradient.c:
+	draw the bevel stuff in the pixel data buffer so parent-relative stuff can use it.
+
+	* render/render.c: space
+
+2003-07-23  xor@zed.orodu.net  <xor@zed>
+
+	* render/render.c:
+	init the parent shit in the surface when making a copy
+
+	* Makefile.am: use rm -f
+
+	* plugins/menu/include_menu.c: declare vars at top
+
+	* plugins/menu/timed_menu.c:
+	i already fixed this once :) var declarations go first
+
+	* Makefile.am: include obconf_interface.h in the dist
+
+	* Makefile.am: remove headers that dont exist
+
+	* plugins/menu/.cvsignore: add the include menu plugin
+
+	* m4/Makefile.am: add the new m4s
+
+2003-07-23  woodblock  <woodblock@zed>
+
+	* plugins/menu/timed_menu.c: Timed menu updates. Still needs work.
+
+	* plugins/menu/client_menu.c:
+	Better placement of the client window. Might need some tweaking.
+
+2003-07-23  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/menu.c: unhilite the entry for the submenu when it is closed
+
+	* configure.ac: alpha2
+
+	* DESIGN/themes.txt: add hover
+
+2003-07-23  woodblock  <woodblock@zed>
+
+	* Makefile.am, plugins/menu/include_menu.c:
+	Added include_menu.c as an example of how one could write a plugin.
+
+	* kernel/config.c, kernel/menu.c, parser/parse.c, plugins/keyboard/keyboard.c, plugins/menu/fifo_menu.c, plugins/mouse/mouse.c, plugins/placement/history.c:
+	* Change xml parsing to pass the parent node, rather than the first
+	child.
+	* Add x,y co-ordinates on showmenu action so we can place menus on keypress.
+
+2003-07-22  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/event.c, kernel/openbox.c, kernel/openbox.h, kernel/screen.c:
+	add the --replace command line option, and support for the WM_Sn selection
+
+	* kernel/prop.c, kernel/prop.h: add the MANAGER atom.
+	allow prop_message to be used with a user-defined mask instead of only with the NetWM mask
+
+	* plugins/keyboard/keyboard.c:
+	set the x/y values in the moveresize struct for moveresize key actions
+
+	* kernel/client.c: stop shownig the desktop when a new window maps
+
+	* kernel/menu.c: add a func to find a menu entry from a submenu.
+	keep menu entries highlighted while they have their submenu open
+
+	* kernel/menu.h: add a func to find a menu entry from a submenu
+
+	* plugins/menu/fifo_menu.c: declare vars at the top of the block
+
+	* kernel/menu.c, render/theme.c, render/theme.h:
+	add a menuOverlap property to themes, and use it in the submenu placement
+
+	* configure.ac: update to new version of gettext
+
+	* m4/.cvsignore, po/.cvsignore: more stuff to ignore
+
+2003-07-21  woodblock  <woodblock@zed>
+
+	* kernel/event.c, kernel/menu.c, kernel/menu.h:
+	Keyboard navigatable menus
+
+2003-07-19  woodblock  <woodblock@zed>
+
+	* kernel/action.c, kernel/menu.c: Fix a couple memory leaks.
+
+	* plugins/menu/fifo_menu.c:
+	If there is a pid="true" attribute in the <menu plugin="fifo_menu">
+	tag, append .pid to the fifo files. This allows for more than one
+	openbox to be run by the same user and use fifo menus.
+
+2003-07-17  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, kernel/menu.h, kernel/plugin.c, kernel/plugin.h, plugins/menu/fifo_menu.c:
+	Menu parsing updates for plugins.
+
+	FIFO menus are the only plugin that takes advantage of this.
+	Example:
+	<menu id="root" label="Openbox 3">
+	  <menu id="fonk" label="fonk" plugin="fifo_menu">
+	  </menu>
+	</menu>
+
+	This creates a FIFO ~/.openbox/fifo_menu/fonk to which you can send
+	menus to. The menus sent to it must be like
+	<fifo>
+	  <item>
+	   etc...
+	</fifo>
+
+	I think. If my memory serves me right.
+
+	It is all hideous, but I just wanted to experiment and see if it was
+	possible.
+
+2003-07-12  xor@zed.orodu.net  <xor@zed>
+
+	* render/theme.c: useless code move
+
+	* kernel/client.c: simple code cleanup
+
+2003-07-11  xor@zed.orodu.net  <xor@zed>
+
+	* render/color.c, render/render.c:
+	removed the RrEndian so using LSBFirst always now. hopefully this works!
+
+	* kernel/client.c:
+	when a transient maps on another desktop, give it focus when it deserves it
+
+	* render/render.h: same default offsets for all endian machines
+
+	* DESIGN/themes.txt: some input from woobie and changed the menu stuff
+
+	* DESIGN/themes.txt: extra menu tag
+
+	* kernel/openbox.c: add --g-fatal-warnings
+
+	* kernel/dock.c:
+	fix a seggie i introduced, going too far in the dockapps list
+
+	* DESIGN/themes.txt: attempt #2
+
+	* DESIGN/themes.txt: oops extra menu_layout
+
+	* DESIGN/themes.txt: a full style defn..
+
+	* kernel/client.c: move to the desktop of the activated window
+
+2003-07-10  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/action.c, kernel/client.c, kernel/client.h, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/openbox.c, render/theme.c, render/theme.h, tests/.cvsignore, tests/noresize.c:
+	add disabled buttons, instead of now showing buttons at all when they wont do anything, now show a disabled button instead. this severely breaks compatibility with blackbox themes since there is no good way to automiatically create a disabled button that i can think of, so if they dont exist in the theme you get black and white for the button.
+
+	when a window cant be resized, its handle is not removed but its grips are.
+
+	change allowing the user to disable individual decorations as that is overkill,
+	instead allow a toggle through the client.decorate boolean.
+
+	* tests/Makefile: readd the Makefile
+
+	* kernel/focus.c: simply startup/shutdown
+
+	* AUTHORS: add some more contributors
+
+	* kernel/openbox.c: sync is in unistd.h
+
+	* kernel/client.c, kernel/event.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/window.c, kernel/window.h, plugins/menu/client_menu.c, plugins/menu/fifo_menu.c, plugins/menu/timed_menu.c:
+	prefix and capitalize ObMenu ObMenuEntry and ObMenuEntryRenderType
+	make the ObMenuEntryRenderType a standard enum instead bitflags
+
+	* kernel/focus.c, kernel/openbox.c, kernel/openbox.h, kernel/screen.c, kernel/screen.h:
+	move ob_pointer_pos to screen_pointer_pos
+
+	* kernel/client.c, kernel/dock.c, kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/openbox.c, kernel/openbox.h, kernel/screen.c, kernel/stacking.c, plugins/placement/history.c, plugins/placement/placement.c:
+	make ob_state a function so it cant be changed outside of openbox.c
+
+	* kernel/client.c, kernel/dock.c, kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/grab.c, kernel/menu.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, kernel/prop.c, kernel/screen.c, kernel/stacking.c, kernel/startup.c:
+	remove the ob_root var, its redundant of what Xlib already provides
+
+	* kernel/openbox.c, kernel/openbox.h: use gint
+
+	* kernel/openbox.c, kernel/openbox.h:
+	ob_remote has been killed, remove ob_sync from the public header, its only used internally
+
+	* kernel/openbox.c, kernel/openbox.h:
+	the --rc arg and rc_path var wasnt even being used so just rm it
+
+	* kernel/action.c, kernel/event.c, kernel/openbox.c, kernel/openbox.h:
+	make the ob_restart/shutdown stuff static vars and expose them only through functions ob_restart_other(), ob_restart() and ob_exit()
+
+	* kernel/stacking.c: remove useless include
+
+	* kernel/focus.c, kernel/focus.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, plugins/keyboard/keyboard.c:
+	replace the focus_backup with the screen_support_win, we dont need 2 offscreen windows.
+
+	* kernel/screen.c:
+	use the xerror stuff to trap errors instead of dupliacted the effort here
+
+	* kernel/dock.c, kernel/dock.h, kernel/screen.c, kernel/timer.c, kernel/timer.h, plugins/keyboard/keyboard.c, plugins/menu/timed_menu.c:
+	prefix the Timer->ObTimer and TimeoutHandler->ObTimeoutHandler shitz
+
+	* kernel/action.h, kernel/client.c, kernel/client.h, kernel/config.c, kernel/config.h, kernel/dispatch.c, kernel/dispatch.h, kernel/dock.c, kernel/event.c, kernel/extensions.h, kernel/framerender.c, kernel/framerender.h, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/moveresize.c, kernel/popup.h, kernel/screen.h, kernel/stacking.c, kernel/stacking.h, kernel/window.c, kernel/window.h, plugins/keyboard/keyboard.c:
+	prefixing and capitalizing the StackLayer -> ObStackingLayer enum.
+	less includes in headers for less rebuilding on changes
+
+	* kernel/client.c, kernel/event.c, kernel/focus.c, kernel/focus.h, kernel/screen.c:
+	prefix and capitalize the ObFocusFallbackType enum
+
+	* kernel/config.c, kernel/config.h, kernel/dock.c:
+	use the ObOrientation enum instead of a horz bool for configuring the dock's orientation
+
+	* kernel/config.c, kernel/config.h, kernel/dock.c, kernel/dock.h, kernel/event.c, kernel/window.c, kernel/window.h:
+	prefixing for the dock. use ObDirection instead of dupliacting it in another enum for the dock's placement
+
+	* kernel/popup.c, kernel/popup.h:
+	prefixing for the Popup->ObPopup struct
+
+	* kernel/moveresize.h: dont need client.h in this header
+
+	* kernel/client.h, kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/framerender.h, kernel/popup.c, plugins/mouse/mouse.c:
+	prefixing and capitalization for the Frame->ObFrame struct and the Context->ObFrameContext enum and its constants.
+
+	* kernel/client.h, kernel/group.c, kernel/group.h:
+	prefix Group to ObGroup
+
+	* kernel/client.c, kernel/client.h, kernel/focus.c, kernel/stacking.c:
+	prefix TRAN_GROUP to OB_TRAN_GROUP
+
+	* kernel/action.c, kernel/client.c, kernel/client.h, kernel/frame.h, kernel/screen.c:
+	prefix and capitalize some more constants/enums in client.h (Function -> ObFunctions and WindowType -> ObClientType)
+
+	* plugins/menu/client_menu.c, plugins/menu/fifo_menu.c, plugins/menu/timed_menu.c:
+	kill warnings
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h, kernel/dispatch.c, kernel/dispatch.h, kernel/event.c, kernel/focus.c, kernel/focus.h, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/group.c, kernel/group.h, kernel/menu.c, kernel/menu.h, kernel/moveresize.c, kernel/moveresize.h, kernel/popup.c, kernel/popup.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, kernel/window.c, kernel/window.h, plugins/keyboard/keyboard.c, plugins/mouse/mouse.c, plugins/placement/history.c, plugins/placement/history.h, plugins/placement/placement.c, plugins/resistance/resistance.c:
+	rename the Client struct to ObClient
+
+	* Makefile.am: add the new misc.h and mwm.h to the kernel sources
+
+	* kernel/client.c, kernel/client.h, kernel/mwm.h:
+	add a mwm.h for the mwm hint structure and flags.
+	use proper prefixing and capitalization for the new mwm stuff.
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h, kernel/dispatch.c, kernel/dispatch.h, kernel/dock.c, kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/grab.c, kernel/grab.h, kernel/misc.h, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, plugins/keyboard/keyboard.c, plugins/placement/history.c, plugins/placement/placement.c, plugins/resistance/resistance.c:
+	add misc.h with some standard enumerations with proper prefixing and capitalizations.
+
+	use the new enums throughout.
+
+	provide keycodes and cursors through ob_cursor and ob_keycode functions, which use the new misc.h enums for picking the cursor and keycode.
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/extensions.c, kernel/focus.c, kernel/menu.c, kernel/moveresize.c, kernel/screen.c, kernel/screen.h, plugins/menu/client_menu.c, plugins/placement/placement.c, plugins/resistance/resistance.c:
+	rename 'xinerama' stuff to 'monitors' to be more generic and descriptive.
+
+	* kernel/stacking.c: speed up pick_group_windows too
+
+	* kernel/stacking.c: make pick_windows waaaay faster
+
+	* kernel/openbox.c:
+	remove the use of the BINARY define. kill a compiler warning.
+
+	* kernel/stacking.c: allow restacking of transients above one another
+
+	* kernel/focus.c:
+	put the transient's title before the parent's in the focus popup
+
+	* kernel/extensions.c, kernel/extensions.h:
+	remove the xinerama active boolean, just count the extension as not present if it is not active
+
+	* kernel/client.c, kernel/client.h: add client_search_top_transient.
+	keep transients all on the same desktop together. use client_search_top_transient where possible in client.c
+
+	* kernel/debug.c, kernel/debug.h:
+	add ob_debug for printing stuff only when debug is enabled
+
+	* plugins/mouse/mouseparse.c, plugins/mouse/mouseparse.h:
+	these havent been used for a long time.. ;) old parsing shit be gone
+
+	* render/color.c, render/font.c, render/font.h, render/geom.h, render/image.c, render/image.h, render/mask.c, render/mask.h, render/render.c, render/render.h:
+	remove rependancy on geom.h from the kernel, provide what is used in its own geom.h
+
+	* Makefile.am, configure.ac, data/.cvsignore, data/Makefile, data/Makefile.am, kernel/.cvsignore, kernel/Makefile, kernel/Makefile.am, parser/.cvsignore, parser/Makefile, parser/Makefile.am, plugins/.cvsignore, plugins/Makefile.am, plugins/keyboard/.cvsignore, plugins/keyboard/Makefile, plugins/keyboard/Makefile.am, plugins/menu/.cvsignore, plugins/menu/Makefile, plugins/menu/Makefile.am, plugins/mouse/.cvsignore, plugins/mouse/Makefile, plugins/mouse/Makefile.am, plugins/placement/.cvsignore, plugins/placement/Makefile, plugins/placement/Makefile.am, plugins/resistance/.cvsignore, plugins/resistance/Makefile, plugins/resistance/Makefile.am, render/.cvsignore, render/Makefile, render/Makefile.am, themes/.cvsignore, themes/Makefile, themes/Makefile.am, themes/ebox_data/.cvsignore, themes/ebox_data/Makefile.am, themes/fieron2_data/.cvsignore, themes/fieron2_data/Makefile.am, themes/fieron_data/.cvsignore, themes/fieron_data/Makefile.am, tools/Makefile.am, tools/obconf/Makefile.am:
+	update the build system, using a single Makefile.am for a sexyass non-recursive make. booyah!
+
+	* gettext.h, kernel/gettext.h:
+	move the gettext header out to the root source dir
+
+2003-07-07  xor@zed.orodu.net  <xor@zed>
+
+	* render/font.c: include stdlib for exit()
+
+2003-07-06  xor@zed.orodu.net  <xor@zed>
+
+	* bootstrap: add ACLOCAL_FLAGS to the aclocal call.
+
+2003-07-05  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/openbox.c: use --foo instead of -foo for cmd line arguments
+
+	* render/color.c, render/render.h:
+	try some better default offsets for big endian machines.
+	print what the conversion is so i can see what it should be if im wrong though
+
+	* render/color.c:
+	used RrColorShift when RrColorOffset was what we wanted
+
+	* configure.ac, kernel/Makefile.am, render/Makefile.am, render/color.c, render/color.h, render/gradient.c, render/instance.c, render/instance.h, render/render.c, render/render.h:
+	use the gdk-pixbuf-xlib library to render with
+
+	* configure.ac: coment the USE_LIBSN defined variable
+
+2003-07-02  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/stacking.c:
+	rename the raise and lower functions. raise is claimed by signal.h already
+
+2003-06-30  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/dock.c: set te strut smaller when autohide is on
+
+2003-06-30  woodblock  <woodblock@zed>
+
+	* kernel/event.c:
+	Makes a simple click not so accidently annoying by making it not
+	execute a menu action if nothing is highlighted.
+
+2003-06-30  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/extensions.c:
+	messed up the indexes while finding the combined size of all xineerama heads
+
+	* kernel/extensions.c: oops, i want the max edges to find the full area
+
+	* CHANGELOG, ChangeLog: using a changelog generated off of CVS
+
+2003-06-30  woodblock  <woodblock@zed>
+
+	* plugins/menu/Makefile.am:
+	Remove menu plugins because they are stupid and don't work.
+
+2003-06-29  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/prop.c:
+	the prop_get_strings_locale function looked for a utf8 typed property
+
+	* kernel/focus.c, kernel/openbox.c, kernel/stacking.c:
+	add some comments and asserts to make sure I don't ever add this bug again
+
+	* kernel/popup.c:
+	create the popup's window before adding it to the stacking list, so that it is stacked properly and doesnt wreck everything
+
+	* Makefile.am, configure.ac, data/Makefile.am, kernel/Makefile.am, parser/Makefile.am, plugins/Makefile.am, plugins/keyboard/Makefile.am, plugins/menu/Makefile.am, plugins/mouse/Makefile.am, plugins/placement/Makefile.am, plugins/resistance/Makefile.am, render/Makefile.am, themes/Makefile.am, themes/ebox_data/Makefile.am, themes/fieron2_data/Makefile.am, themes/fieron_data/Makefile.am, tools/obconf/Makefile.am:
+	prepare for alpha1 release.
+	make 'make dist' work.
+
+	* m4/.cvsignore, m4/Makefile.am:
+	add a makefile so i can put stuff into the make dist
+
+	* m4/python.m4: python support is gone
+
+	* po/POTFILES.in:
+	we dont really have any translatable stuff yet but this was pointing at old cpp shit
+
+	* plugins/placement/history.c:
+	use strcmp instead of collate, since collate is slower and we're only doing an == check
+
+	* plugins/keyboard/keyparse.c, plugins/keyboard/keyparse.h:
+	these are old and not used anymore
+
+	* render/gradient.c:
+	missed setting 'current' at the end of the pyramid gradient
+
+	* kernel/stacking.c:
+	waste of energy in stacking_add, and it even caused bugs. woops.
+
 2003-06-29  xor@zed  <xor@zed>
 
 	* kernel/stacking.c:

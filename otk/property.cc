@@ -136,6 +136,7 @@ void Property::initialize()
     create("_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 
   atoms.openbox_premax = create("_OPENBOX_PREMAX");
+  atoms.openbox_active_window = create("_OPENBOX_ACTIVE_WINDOW");
 }
 
 void Property::set(Window win, Atom atom, Atom type, unsigned char* data,

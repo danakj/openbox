@@ -125,6 +125,7 @@ struct Atoms {
   Atom kde_net_wm_window_type_override;
 
   Atom openbox_premax;
+  Atom openbox_active_window;
 };
 
 

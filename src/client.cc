@@ -1092,9 +1092,16 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
       setDesktop(openbox->screen(_screen)->desktop());
     if (_shaded)
       shade(false);
-    // XXX: deiconify
     focus();
     openbox->screen(_screen)->raiseWindow(this);
+  } else if (e.message_type == otk::Property::atoms.openbox_active_window) {
+    if (_iconic)
+      setDesktop(openbox->screen(_screen)->desktop());
+    if (e.data.l[0] && _shaded)
+      shade(false);
+    focus();
+    if (e.data.l[1])
+      openbox->screen(_screen)->raiseWindow(this);
   }
 }
 

@@ -194,6 +194,8 @@ void focus_fallback(ObFocusFallbackType type)
                     trans = TRUE;
             }
 
+            g_message("trans %d", trans);
+
             /* try for transient relations */
             if (trans) {
                 if (old->transient_for == OB_TRAN_GROUP) {
@@ -291,7 +293,7 @@ static gboolean valid_focus_target(ObClient *ft)
        focus an iconic window, but we want to be able to, so we just check
        if the focus flags on the window allow it, and its on the current
        desktop */
-    return (ft == client_focus_target(ft) && client_normal(ft) &&
+    return (!ft->transients && client_normal(ft) &&
             ((ft->can_focus || ft->focus_notify) &&
              !ft->skip_taskbar &&
              (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)));

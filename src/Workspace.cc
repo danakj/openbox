@@ -227,7 +227,10 @@ void Workspace::showAll(void) {
   const BlackboxWindowList::iterator end = stackingList.end();
   for (; it != end; ++it) {
     BlackboxWindow *bw = *it;
-    bw->show();
+    // not normal windows cant focus from mouse enters anyways, so we dont
+    // need to unmap/remap them on workspace changes
+    if (! bw->isStuck() || bw->isNormal())
+      bw->show();
   }
 }
 
@@ -240,7 +243,10 @@ void Workspace::hideAll(void) {
     BlackboxWindow *bw = *it;
     ++it; // withdraw removes the current item from the list so we need the next
           // iterator before that happens
-    bw->withdraw();
+    // not normal windows cant focus from mouse enters anyways, so we dont
+    // need to unmap/remap them on workspace changes
+    if (! bw->isStuck() || bw->isNormal())
+      bw->withdraw();
   }
 }
 

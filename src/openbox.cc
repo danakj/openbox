@@ -213,7 +213,7 @@ Openbox::~Openbox()
   // this tends to block.. i honestly am not sure why. causing an x error in
   // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
   // all im gunna do is the same.
-  //otk::display->destroy();
+  //delete _display;
 
   otk::Timer::destroy();
   otk::RenderColor::destroy();

@@ -253,6 +253,7 @@ void Property::set(Window win, Atoms atom, StringType type,
   }
 
   ustring value;
+  value.setUtf8(u);
 
   StringVect::const_iterator it = strings.begin();
   const StringVect::const_iterator end = strings.end();

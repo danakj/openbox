@@ -74,6 +74,8 @@ static void desk_menu_destroy(ObMenu *menu, gpointer data)
     DesktopData *d = data;
 
     g_free(d);
+
+    desktop_menus = g_slist_remove(desktop_menus, menu);
 }
 
 static void self_update(ObMenuFrame *frame, gpointer data)

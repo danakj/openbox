@@ -755,7 +755,8 @@ void Blackbox::process_event(XEvent *e) {
             else
               win->show();
             screen->reassociateWindow(win, wksp, True);
-          } else if (wksp == 0xfffffffe) { // XXX: BUG, BUT DOING THIS SO KDE WORKS FOR NOW!!
+          } else if (wksp == 0xfffffffe || // XXX: BUG, BUT DOING THIS SO KDE WORKS FOR NOW!!
+                     wksp == 0xffffffff) {
             if (win->isIconic()) win->deiconify(False, True);
             if (! win->isStuck()) win->stick();
             if (! win->isVisible()) win->show();
@@ -781,22 +782,8 @@ void Blackbox::process_event(XEvent *e) {
         // NET_NUMBER_OF_DESKTOPS
         BScreen *screen = searchScreen(e->xclient.window);
         
-        if (e->xclient.data.l[0] > 0) {
-          if ((unsigned) e->xclient.data.l[0] < screen->getWorkspaceCount()) {
-            // shrink
-            for (int i = screen->getWorkspaceCount();
-                 i > e->xclient.data.l[0]; --i)
-              screen->removeLastWorkspace();
-            // removeLast already sets the current workspace to the 
-            // last available one.
-          } else if ((unsigned) e->xclient.data.l[0] >
-                     screen->getWorkspaceCount()) {
-            // grow
-            for(int i = screen->getWorkspaceCount(); 
-                i < e->xclient.data.l[0]; ++i)
-              screen->addWorkspace();
-          }
-        }
+        if (e->xclient.data.l[0] > 0)
+          screen->changeWorkspaceCount((unsigned) e->xclient.data.l[0]);
       } else if (e->xclient.message_type ==
                  xatom->getAtom(XAtom::net_close_window)) {
         // NET_CLOSE_WINDOW

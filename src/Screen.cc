@@ -686,6 +686,23 @@ void BScreen::load_rc(void) {
 }
 
 
+void BScreen::changeWorkspaceCount(unsigned int new_count) {
+  assert(new_count > 0);
+
+  if (new_count < workspacesList.size()) {
+    // shrink
+    for (unsigned int i = workspacesList.size(); i > new_count; --i)
+      removeLastWorkspace();
+    // removeLast already sets the current workspace to the 
+    // last available one.
+  } else if (new_count > workspacesList.size()) {
+    // grow
+    for(unsigned int i = workspacesList.size(); i < new_count; ++i)
+      addWorkspace();
+  }
+}
+
+
 void BScreen::reconfigure(void) {
   // don't reconfigure while saving the initial rc file, it's a waste and it
   // breaks somethings (workspace names)
@@ -695,6 +712,10 @@ void BScreen::reconfigure(void) {
   toolbar->load_rc();
   slit->load_rc();
   LoadStyle();
+
+  // we need to do this explicitly, because just loading this value from the rc
+  // does nothing
+  changeWorkspaceCount(resource.workspaces);
 
   XGCValues gcv;
   gcv.foreground = WhitePixel(blackbox->getXDisplay(),

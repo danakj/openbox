@@ -267,6 +267,8 @@ public:
   inline int getColPlacementDirection(void) const
   { return resource.col_direction; }
 
+  void changeWorkspaceCount(unsigned int new_count);
+  
   inline void setRootColormapInstalled(bool r) { root_colormap_installed = r; }
   void saveSloppyFocus(bool s);
   void saveAutoRaise(bool a);

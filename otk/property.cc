@@ -61,6 +61,8 @@ void Property::initialize()
   atoms.net_workarea = create("_NET_WORKAREA");
   atoms.net_supporting_wm_check = create("_NET_SUPPORTING_WM_CHECK");
 //  atoms.net_virtual_roots = create("_NET_VIRTUAL_ROOTS");
+  atoms.net_desktop_layout = create("_NET_DESKTOP_LAYOUT");
+  atoms.net_showing_desktop = create("_NET_SHOWING_DESKTOP");
 
   atoms.net_close_window = create("_NET_CLOSE_WINDOW");
   atoms.net_wm_moveresize = create("_NET_WM_MOVERESIZE");

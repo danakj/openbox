@@ -60,6 +60,8 @@ struct Atoms {
   Atom net_workarea;
   Atom net_supporting_wm_check;
 //  Atom net_virtual_roots;
+  Atom net_desktop_layout;
+  Atom net_showing_desktop;
   // root window messages
   Atom net_close_window;
   Atom net_wm_moveresize;

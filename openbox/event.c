@@ -1093,7 +1093,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 
         /* will call the menu_hide() for each submenu as well */
         if (!it)
-            ((ObMenu *)menu_visible->data)->hide(menu_visible->data);
+            menu_control_keyboard_nav(ob_keycode(OB_KEY_ESCAPE));
 	
         break;
     case MotionNotify:

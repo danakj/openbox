@@ -1,3 +1,272 @@
+2003-08-31  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/action.c, openbox/action.h, openbox/screen.c, openbox/screen.h:
+	add the DesktopLast action, props to marius nita for this one
+
+	* openbox/event.c: remove debug print
+
+	* openbox/client_list_menu.c:
+	add a separator in the client-list-menus above iconic windows
+
+	* openbox/menuframe.c:
+	dont lose the menu selection while puttin the mouse over a separator (properly)
+
+	* openbox/event.c: compress events properly
+
+	* openbox/menuframe.c:
+	only hide menus if theyre supposed to when executing
+
+	* openbox/action.c, openbox/action.h:
+	make directional focusing an interactive action
+
+	* data/rc3: the <interactive> tags are no longer needed
+
+	* openbox/screen.c:
+	make desktop cycling work properly when non-interactive
+
+	* openbox/keyboard.c, openbox/mouse.c:
+	when no modifiers are in a binding, then make it non-interactive
+
+	* openbox/focus.c, openbox/focus.h:
+	make focus cycling work when not interactive
+	add focus_directional_cycle
+
+	* AUTHORS: tore did some more actions :)
+
+	* openbox/keyboard.c:
+	ungrab keys before grabbnig keys at the next chain level
+
+	* openbox/grab.c:
+	grab the pointer Async for key grabs, lets key bindings like <execute>xkill</execute> work
+
+	* openbox/menuframe.c, openbox/menuframe.h: draw menu separators
+
+	* render/render.c, render/render.h: add RrColorGC
+	add a LineArt texture type for drawing a line, this is used for drawing the menu separators
+
+	* render/gradient.c, render/mask.c: use RrColorGC
+
+	* render/color.c: add RrColorGC
+
+	* openbox/stacking.c: kill a warning
+
+	* openbox/client.c:
+	move_onscreen was supposed to go away.. :) thanks mikachu
+
+2003-08-30  woodblock  <woodblock@zed>
+
+	* AUTHORS: *** empty log message ***
+
+2003-08-30  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/client_menu.c:
+	add masks from the titlebar buttons to the client menu's options
+
+	* openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h:
+	add suppot for showing pixmap masks in menus where the rgba icons go too
+
+	* openbox/client.c: use the nwe theme's show_handle value
+
+	* render/theme.c, render/theme.h:
+	allow handlewidth of 0, which sets show_handle to false
+
+	* openbox/event.c: compress motion events
+
+	* render/theme.c: bugz, wrong vars
+
+	* openbox/menuframe.c: add padding in the menu title too
+
+	* openbox/client.c, openbox/client.h, openbox/menu.c, openbox/moveresize.c:
+	add destructor functions for clients that you acn subscribe with, and use these instead of hardcoding special cases in the unmanage code
+
+	* data/rc3, openbox/action.c, openbox/action.h, openbox/client_list_menu.c, openbox/config.c, openbox/config.h, openbox/focus.c, openbox/focus.h, openbox/keyboard.c, openbox/mouse.c, openbox/screen.c, openbox/screen.h:
+	make interactive actions a type and not special cases.
+	add the <interactive> option to them to turn off interactivity
+
+	* openbox/grab.c: remove debug print
+
+	* Makefile.am, openbox/dock.c, openbox/dock.h, openbox/event.c, openbox/event.h, openbox/grab.c, openbox/keyboard.c, openbox/mainloop.c, openbox/mainloop.h, openbox/openbox.c, openbox/openbox.h, openbox/screen.c, openbox/timer.c, openbox/timer.h:
+	using the ObMainLoop, which rulz the planet
+
+	* data/rc3: put debian menu file first
+
+	* openbox/menu.c, openbox/menu.h: add pipe-menus
+
+	* openbox/menuframe.c: fix grabbing and not releasing with menus
+
+2003-08-29  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/menuframe.c: dont ungrab twice when hiding menus
+
+	* openbox/event.c:
+	properly select the first menu item in the child menu when using the 'right' keycode
+
+	* openbox/menuframe.c: dont keyboard nav onto disabled menu items
+
+	* openbox/event.c:
+	missing break would be bad in future if added more cases
+
+	* Makefile.am, configure.ac: dont need gmodule anymore
+
+	* openbox/event.c, openbox/menu.c, openbox/menuframe.c, openbox/menuframe.h:
+	ultra-keyboard-controlled-menus
+
+	* openbox/translate.c, openbox/client_list_menu.c, openbox/client_menu.c:
+	fix includes
+
+	* po/POTFILES.in: update which files have translatable strings
+
+	* Makefile.am, configure.ac: the kernel/ dir has been moved to openbox/
+
+	* openbox/openbox.c: remove the plugin stuffs
+
+	* openbox/resist.c: remove a dispatch.h
+
+	* openbox/action.c, openbox/menu.c, openbox/menu.h:
+	remove plugins from the menu parsing
+
+	* Makefile.am, data/menu, data/rc3, openbox/client_list_menu.c, openbox/client_list_menu.h, openbox/client_menu.c, openbox/client_menu.h:
+	move the client and client-list menus into the 'kernel'
+
+	* Makefile.am, openbox/client.c, openbox/dispatch.c, openbox/dispatch.h, openbox/event.c, openbox/focus.c, openbox/moveresize.c, openbox/openbox.c, openbox/screen.c:
+	remove the event dispatcher
+
+	* openbox/action.c:
+	typo, reading from the wrong member of the actiondata union
+
+	* Makefile.am, openbox/place.c, openbox/place.h:
+	add window placement routines to the kernel
+
+	* openbox/menuframe.c:
+	place submenus with their borders over the parent's
+
+	* render/theme.c: nicer default bullets
+
+2003-08-28  Ben Jansens  <xor@zed.orodu.net>
+
+	* render/theme.c:
+	only left-justify menus, remove the menu.frame.justify option
+
+	* openbox/menu.c, openbox/menuframe.c, openbox/openbox.c, openbox/prop.c, openbox/screen.c, render/color.c, render/font.c, render/theme.c:
+	fix a bunch of memleaks from valgrind and stuff
+
+	* render/render.c: free rgba texture caches
+
+	* openbox/menuframe.c: only execute enabled items
+
+	* data/rc3, openbox/config.h, openbox/event.c, openbox/event.h, openbox/menu.c, openbox/menu.h:
+	new method for loading menu files etc
+
+	* openbox/config.c: fix crash bug is parsing menu section of the rc3
+
+	* openbox/menuframe.c: missed one thing, using invalid mem still
+
+	* openbox/menu.c, openbox/menu.h, openbox/menuframe.c:
+	fix for using freed memory to exec stuff
+
+	* openbox/menuframe.c: free the menu entry frames
+
+	* openbox/action.c: rm double ;;
+
+	* openbox/menu.h, openbox/menuframe.c:
+	add icons to the client-list-menu
+
+	* data/menu, data/rc3: load the plugins in the rc3 for the menus
+
+	* openbox/menu.c, openbox/menu.h, openbox/menuframe.c:
+	make submenus not require the menu to exist when they are created, not until they are shown.
+	crash fix in client_menu
+
+	* Makefile.am, data/menu, openbox/action.c, openbox/action.h, openbox/config.c, openbox/event.c, openbox/menu.c, openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h:
+	make client-list-menu work too
+	more menu cleanups
+
+	* data/menu, openbox/menu.c, openbox/menu.h, openbox/menuframe.c, openbox/plugin.c, openbox/plugin.h, openbox/screen.c, openbox/session.c, parser/parse.c:
+	load menu plugins automatically from whats in the menu file
+	menu fixups
+	move enabled into the 'normal menu item' specific data stuff
+
+	* Makefile.am, data/menu, openbox/client.c, openbox/event.c, openbox/menu.c, openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h, openbox/openbox.c, openbox/plugin.c, openbox/plugin.h:
+	change the menu plugin interface, no need for the create/destroy functions any more.
+	redo the client-menu plugin to work with the new menu api
+
+	* openbox/action.c, openbox/action.h:
+	add follow option back for sendto actions
+
+	* data/menu: split the menus out so they aren't nested in the example
+
+	* Makefile.am, openbox/client.c, openbox/event.c, openbox/menu.c, openbox/menu.h, openbox/menu_render.c, openbox/menuframe.c, openbox/menuframe.h, openbox/popup.c, openbox/window.c, openbox/window.h, render/font.c, render/theme.c, render/theme.h:
+	half way through the changes to new menu code/design. hot shit. static menus work, on to plugins next.
+
+2003-08-27  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/geom.h: oooops RECT_SET_POINT was broken
+
+	* openbox/event.c: more typo :)
+
+	* openbox/event.c: typo :)
+
+	* openbox/client.c, openbox/event.c:
+	dont be rude to non-normal windows with keeping them onscreen
+
+	* openbox/frame.c: fix border on shaded maximized windows
+
+	* openbox/event.c: double deref, props to 'mmj' for spotting this
+
+2003-08-25  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/client.c:
+	remove the last of the cool stuff thanks to GTK fuck fuck. no more not focusing windows in groups that arent focused on map
+
+	* openbox/session.c: blef
+
+	* openbox/session.c: type change
+
+	* openbox/session.c: make --disable-session-management work i think
+
+	* openbox/focus.c: dont force fallbacks within groups
+
+	* openbox/client.c, openbox/frame.c, openbox/frame.h:
+	better handling of maximizing, wrt changing decorations on the windows, and showing the correct decor for the max state especially for windows which dont change size (Xnest) when maximized cuz they are at their maximum size already
+
+	* openbox/geom.h: add STRUT_EQUAL
+
+	* openbox/frame.c:
+	set the client decorations to match the frame's so that there is not thot to be changes later on whene there were actually none
+
+	* openbox/client.c, openbox/client.h:
+	restore the stacking order of a saved session
+
+	* openbox/session.c, openbox/session.h:
+	save the stacking order of the windows, and sort the saved session data based on stacking when it is loaded. make the list public.
+
+	* openbox/screen.c:
+	dont put #define values into the supported atoms list
+
+	* openbox/stacking.h: clarify that stacking_below sucks
+
+	* openbox/stacking.c, openbox/stacking.h:
+	add stacking_below which moves a window to immediately below another window. use with care it doesn't enforce transient shit etc..
+
+2003-08-23  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/keyboard.c: better handling of multiple niteractive actions
+
+	* m4/x11.m4: better ac macro usage
+
+	* configure.ac: alpha6
+
+	* ChangeLog: recent changes
+
+	* openbox/keyboard.c:
+	end the other action when starting a new interactive action while one was in place
+
+	* render/render.c: formatting
+
+	* render/render.c: 80 cols
+
+	* render/render.c: stupid function name die
+
 2003-08-23  Ben Jansens  <xor@zed.orodu.net>
 
 	* ChangeLog: recent changes

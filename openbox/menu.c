@@ -552,10 +552,10 @@ void menu_control_keyboard_nav(unsigned int key)
         break;
     }
     case OB_KEY_LEFT: {
-        if (current_menu->over == NULL)
-            return;
-        current_menu->mouseover(current_menu->over->data, FALSE);
-        current_menu->over = NULL;
+        if (current_menu->over != NULL) {
+            current_menu->mouseover(current_menu->over->data, FALSE);
+            current_menu->over = NULL;
+        }
         
         menu_hide(current_menu);
 
@@ -564,6 +564,9 @@ void menu_control_keyboard_nav(unsigned int key)
         
         break;
     }
+    default:
+        if (current_menu)
+            menu_hide(current_menu);
     }
     return;
 }

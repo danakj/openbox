@@ -7,32 +7,32 @@
 </about>
 
 <color id="red">
-  <red>70</red>
-  <green>10</green>
-  <blue>10</blue>
-  <opacity>70</opacity>
+  <red>0.7</red>
+  <green>0.1</green>
+  <blue>0.1</blue>
+  <opacity>0.7</opacity>
 </color>
 
 <color id="darkred">
-  <red>30</red>
-  <green>3</green>
-  <blue>3</blue>
-  <opacity>70</opacity>
+  <red>0.3</red>
+  <green>0.03</green>
+  <blue>0.03</blue>
+  <opacity>0.7</opacity>
 </color>
 
 <color id="clearblack">
   <red>0</red>
   <green>0</green>
   <blue>0</blue>
-  <opacity>50</opacity>
+  <opacity>0.5</opacity>
 </color>
 
 <foreground id="vroom">
   <color>
-    <red>100</red>
-    <green>40</green>
-    <blue>67</blue>
-    <opacity>80</opacity>
+    <red>1</red>
+    <green>0.4</green>
+    <blue>0.67</blue>
+    <opacity>0.8</opacity>
   </color>
   <shadow>
     <offset>2</offset>
@@ -67,38 +67,36 @@
   <unfocused foreground="vroom" background="solid" />
 </layout>
 
-<button_set id="funbutton">
+<button_class id="funbutton">
   <pressed   layout="flatlayout" />
   <unpressed layout="raisedlayout" />
   <disabled  layout="flatlayout" />
-</button_set>
+</button_class>
 
-<surface_set id="flatsurface" layout="flatlayout" />
+<surface_class id="flatsurface" layout="flatlayout" />
 
-<surface_set id="raisedsurface" layout="raisedlayout" />
-
-<menu_set id="coolmenu">
-  <normal   foreground="vroom" background="solid" />
-  <active   foreground="vroom" background="fancy" />
-  <disabled foreground="vroom" background="solid" />
-</menu_set>
+<surface_class id="raisedsurface" layout="raisedlayout" />
 
 <style>
-  <button id="close"    set="funbutton" />
-  <button id="stick"    set="funbutton" />
-  <button id="iconify"  set="funbutton" />
-  <button id="maximize" set="funbutton" />
-  <button id="icon"     set="funbutton" />
-  <button id="shade"    set="funbutton" />
+  <button id="close"    class="funbutton" />
+  <button id="stick"    class="funbutton" />
+  <button id="iconify"  class="funbutton" />
+  <button id="maximize" class="funbutton" />
+  <button id="icon"     class="funbutton" />
+  <button id="shade"    class="funbutton" />
 
-  <surface id="titlebar"  set="flatsurface" />
-  <surface id="label"     set="raisedsurface" />
-  <surface id="handle"    set="flatsurface" />
-  <surface id="leftgrip"  set="flatsurface" />
-  <surface id="rightgrip" set="flatsurface" />
+  <surface id="titlebar"  class="flatsurface" />
+  <surface id="label"     class="raisedsurface" />
+  <surface id="handle"    class="flatsurface" />
+  <surface id="leftgrip"  class="flatsurface" />
+  <surface id="rightgrip" class="flatsurface" />
 
-  <menutitle foreground="vroom" background="fancy" />
-  <menu      set="coolmenu" />
+  <menu>
+    <title    foreground="vroom" background="fancy" />
+    <normal   foreground="vroom" background="solid" />
+    <active   foreground="vroom" background="fancy" />
+    <disabled foreground="vroom" background="solid" />
+  </menu>
 </style>
 
 </openbox_theme>

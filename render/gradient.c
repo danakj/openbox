@@ -338,7 +338,7 @@ void gradient_pyramid(Surface *sf, int inw, int inh)
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
   unsigned int r,g,b;
-  int x, y, h=inh/2, w=inw/2;
+  int x, y, h=(inh+1)/2, w=(inw+1)/2;
 memset(data, 0, inw*inh*sizeof(pixel32));
   for (y = 0; y < h; ++y) {
     drx = (float)(sf->data.planar.secondary->r - sf->data.planar.primary->r);

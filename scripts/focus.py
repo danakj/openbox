@@ -9,11 +9,14 @@
 cycle_raise = 1                                                         ###
 # raise as you cycle in stacked mode                                    ###
 stacked_cycle_raise = 0                                                 ###
+# show a pop-up list of windows while cycling                           ###
+cycle_popup_list = 1
 # send focus somewhere when nothing is left with the focus, if possible ###
 fallback = 0                                                            ###
 ###                                                                     ###
 ###########################################################################
 
+import otk
 import ob
 
 # maintain a list of clients, stacked in focus order
@@ -62,6 +65,13 @@ def _focused(data):
             _clients.insert(0, win)
         else: # if we are cycling, then update our pointer
             _cyc_w = data.client.window()
+            global _list_widget, _list_labels, _list_windows
+            if _list_widget:
+                i = 0
+                for w in _list_windows:
+                    if w == _cyc_w: _list_labels[i].focus()
+                    else: _list_labels[i].unfocus()
+                    i += 1
     elif fallback: 
         # pass around focus
         desktop = ob.openbox.screen(_cyc_screen).desktop()
@@ -115,6 +125,15 @@ def _focus_stacked_ungrab(data):
                 client = ob.openbox.findClient(_cyc_w)
                 if client:
                     ob.openbox.screen(data.screen).raiseWindow(client)
+            global _list_widget, _list_labels, _list_windows
+            if _list_widget:
+                _list_windows = []
+                _list_labels = []
+                _list_widget = 0
+
+_list_widget = 0
+_list_labels = []
+_list_windows = []
 
 def focus_next_stacked(data, forward=1):
     """Focus the next (or previous, with forward=0) window in a stacked
@@ -134,6 +153,50 @@ def focus_next_stacked(data, forward=1):
         _cyc_w = 0
         _cyc_screen = data.screen
         _doing_stacked = 1
+
+        global cycle_popup_list
+        if cycle_popup_list:
+            global _list_widget, _list_labels
+            if not _list_widget: # make the widget list
+                style = ob.openbox.screen(data.screen).style()
+                _list_widget = otk.Widget(ob.openbox, style,
+                                          otk.Widget.Vertical, 0,
+                                          style.bevelWidth(), 1)
+                t = style.labelFocusBackground()
+                _list_widget.setTexture(t)
+
+                titles = []
+                font = style.labelFont()
+                height = font.height()
+                longest = 0
+                for c in _clients:
+                    client = ob.openbox.findClient(c)
+                    screen = ob.openbox.screen(data.screen)
+                    desktop = screen.desktop()
+                    if client and (client.desktop() == desktop and \
+                                   client.normal()):
+                        t = client.title()
+                        titles.append(t)
+                        _list_windows.append(c)
+                        l = font.measureString(t)
+                        if l > longest: longest = l
+                if len(titles):
+                    for t in titles:
+                        w = otk.FocusLabel(_list_widget)
+                        w.resize(longest, height)
+                        w.setText(t)
+                        w.unfocus()
+                        _list_labels.append(w)
+                    _list_labels[0].focus()
+                    _list_widget.update()
+                    area = screen.area()
+                    _list_widget.move(area.x() + (area.width() -
+                                                  _list_widget.width()) / 2,
+                                      area.y() + (area.height() -
+                                                  _list_widget.height()) / 2)
+                    _list_widget.show(1)
+                else:
+                    _list_widget = 0 #nothing to list
 
         ob.kgrab(data.screen, _focus_stacked_ungrab)
         focus_next_stacked(data, forward) # start with the first press

@@ -27,7 +27,7 @@ struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
     struct RrSurface *sur;
 
     sur = surface_new(type, numtex);
-    sur->inst = inst;
+    sur->inst = NULL;
     sur->win = None;
     sur->parent = NULL;
     return sur;

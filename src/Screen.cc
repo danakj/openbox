@@ -856,6 +856,7 @@ void BScreen::setImageDither(bool d) {
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
   config.setValue(s.str(), resource.image_dither);
   s.rdbuf()->freeze(0);
+  openbox.reconfigure();
 }
 
 

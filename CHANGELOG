@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 2.1.0:
+ * drop shadows for fonts, optional. (dropShadowFonts   (Ben Jansens)
+   in the rc file).
+
  * GNOME 2 Support. (Fixed problems with Gnome 2        (Ben Jansens)
    taskbar.
 

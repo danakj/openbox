@@ -505,6 +505,8 @@ ObClient *client_search_modal_child(ObClient *self);
 
 ObClient *client_search_top_transient(ObClient *self);
 
+/*! Search for a transient of a client. The transient is returned if it is one,
+  NULL is returned if the given search is not a transient of the client. */
 ObClient *client_search_transient(ObClient *self, ObClient *search);
 
 /*! Return the "closest" client in the given direction */

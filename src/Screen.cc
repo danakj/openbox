@@ -214,6 +214,7 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     resource.tstyle.fontset = resource.wstyle.fontset = NULL;
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
     resource.wstyle.font = NULL;
+  resource.root_command = NULL;
 
 #ifdef   SLIT
   slit = NULL;

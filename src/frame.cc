@@ -412,6 +412,8 @@ void OBFrame::grabClient()
   XUngrabServer(otk::OBDisplay::display);
 
   update();
+
+  XMapWindow(otk::OBDisplay::display, _window);
 }
 
 

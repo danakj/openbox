@@ -128,9 +128,19 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
   // initialize all the screens
-  _screens.push_back(new OBScreen(0, _config));
-  _screens[0]->manageExisting();
-  // XXX: "change to" the first workspace on the screen to initialize stuff
+  OBScreen *screen;
+  screen = new OBScreen(0, _config);
+  if (screen->managed()) {
+    _screens.push_back(screen);
+    _screens[0]->manageExisting();
+    // XXX: "change to" the first workspace on the screen to initialize stuff
+  } else
+    delete screen;
+
+  if (_screens.empty()) {
+    printf(_("No screens were found without a window manager. Exiting.\n"));
+    ::exit(1);
+  }
   
   _state = State_Normal; // done starting
 }

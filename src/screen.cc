@@ -327,8 +327,6 @@ void OBScreen::manageWindow(Window window)
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
 
-  printf("Managing Window: %lx\n", window);
-
   // is the window a docking app
   if ((wmhint = XGetWMHints(otk::OBDisplay::display, window))) {
     if ((wmhint->flags & StateHint) &&

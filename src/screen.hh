@@ -99,6 +99,12 @@ public:
   //! Destroys the OBScreen object
   virtual ~OBScreen();
 
+  //! Returns if the screen was successfully managed
+  /*!
+    If this is false, then the screen should be deleted and should NOT be
+    used.
+  */
+  inline bool managed() const { return _managed; }
   //! Returns the Image Control used for rendering on the screen
   inline otk::BImageControl *imageControl() { return _image_control; }
   //! Returns the dimentions of the screen

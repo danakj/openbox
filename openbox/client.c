@@ -1336,10 +1336,8 @@ void client_update_title(ObClient *self)
         }
     /* dont display the number for the first window */
     if (self->title_count > 1) {
-        char *vdata, *ndata;
-        ndata = g_strdup_printf(" - [%u]", self->title_count);
-        vdata = g_strconcat(data, ndata, NULL);
-        g_free(ndata);
+        char *ndata;
+        ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
         g_free(data);
         data = vdata;
     }

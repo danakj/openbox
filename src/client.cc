@@ -832,6 +832,11 @@ void OBClient::unmapHandler(const XUnmapEvent &e)
   printf("UnmapNotify for 0x%lx\n", e.window);
 #endif // DEBUG
 
+  if (ignore_unmaps) {
+    ignore_unmaps--;
+    return;
+  }
+  
   OtkEventHandler::unmapHandler(e);
 
   // this deletes us etc

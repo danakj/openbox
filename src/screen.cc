@@ -387,6 +387,8 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   // XXX: pass around focus if this window was focused
 
+  // remove from the wm's map
+  Openbox::instance->removeClient(client->window());
   // unregister for handling events
   Openbox::instance->clearHandler(client->window());
   

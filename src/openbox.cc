@@ -260,6 +260,7 @@ void Openbox::addClient(Window window, OBClient *client)
 
 void Openbox::removeClient(Window window)
 {
+  _clients[window] = 0;
   ClientMap::iterator it = _clients.find(window);
   if (it != _clients.end())
     _clients.erase(it);

@@ -31,8 +31,6 @@ gboolean grab_keyboard(gboolean grab)
         ret = TRUE;
     }
 
-    g_message("grabs: %d", kgrabs);
-
     return ret;
 }
 

@@ -6,6 +6,9 @@
 
 extern "C" {
 #include <Python.h>
+
+#include "gettext.h"
+#define _(str) gettext(str)
 }
 
 #include <cstring>
@@ -50,24 +53,32 @@ bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
 
 Config::Config()
 {
-  PyRun_SimpleString("import config;");
   // set up access to the python global variables
-  PyObject *obmodule = PyImport_AddModule("config");
+  PyObject *obmodule = PyImport_ImportModule("config");
   obdict = PyModule_GetDict(obmodule);
+  Py_DECREF(obmodule);
 
   python_get_stringlist("DESKTOP_NAMES", &desktop_names);
 
   python_get_string("THEME", &theme);
 
-  if (!python_get_string("TITLEBAR_LAYOUT", &titlebar_layout))
-    titlebar_layout = "NTIMC";
+  if (!python_get_string("TITLEBAR_LAYOUT", &titlebar_layout)) {
+    fprintf(stderr, _("Unable to load config.%s\n"), "TITLEBAR_LAYOUT");
+    ::exit(1);
+  }
 
-  if (!python_get_long("DOUBLE_CLICK_DELAY", &double_click_delay))
-    double_click_delay = 300;
-  if (!python_get_long("DRAG_THRESHOLD", &drag_threshold))
-    drag_threshold = 3;
-  if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&num_desktops))
-    num_desktops = 1;
+  if (!python_get_long("DOUBLE_CLICK_DELAY", &double_click_delay)) {
+    fprintf(stderr, _("Unable to load config.%s\n"), "DOUBLE_CLICK_DELAY");
+    ::exit(1);
+  }
+  if (!python_get_long("DRAG_THRESHOLD", &drag_threshold)) {
+    fprintf(stderr, _("Unable to load config.%s\n"), "DRAG_THRESHOLD");
+    ::exit(1);
+  }
+  if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&num_desktops)) {
+    fprintf(stderr, _("Unable to load config.%s\n"), "NUMBER_OF_DESKTOPS");
+    ::exit(1);
+  }
 }
 
 Config::~Config()

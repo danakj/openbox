@@ -145,6 +145,7 @@ def _do_move():
             _popwidget = otk.Widget(_screen, ob.openbox, 
                                     otk.Widget.Horizontal, 0, 1)
             _poplabel = otk.Label(_popwidget)
+            _poplabel.setHighlighted(1)
         _poplabel.setText(text)
         scsize = otk.display.screenInfo(_screen).size()
         size = _poplabel.minSize()
@@ -230,6 +231,7 @@ def _do_resize():
             _popwidget = otk.Widget(_screen, ob.openbox, 
                                     otk.Widget.Horizontal, 0, 1)
             _poplabel = otk.Label(_popwidget)
+            _poplabel.setHighlighted(1)
         _poplabel.setText(text)
         scsize = otk.display.screenInfo(_screen).size()
         size = _poplabel.minSize()

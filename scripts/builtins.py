@@ -38,7 +38,10 @@ def state_shaded(data, add=2):
 def close(data):
     """Closes the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
-    if client: OBClient_close(client)
+    if not client: return
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    window = OBClient_window(client)
+    send_client_msg(root, OBProperty_net_close_window, window)
 
 def focus(data):
     """Focuses the window on which the event occured"""

@@ -118,7 +118,7 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 }
 
 
-// XXX: put this into the OBScreen class!
+// XXX: put this into the OBScreen or OBClient class!
 static void manageWindow(Window window)
 {
   OBClient *client = 0;
@@ -171,6 +171,7 @@ static void manageWindow(Window window)
   // handle any requested states such as shaded/maximized
 }
 
+// XXX: move this to the OBScreen or OBClient class!
 static void unmanageWindow(OBClient *client)
 {
   bool remap = false; // remap the window when we're done?

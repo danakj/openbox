@@ -214,8 +214,6 @@ def _do_resize():
 
     w = _cw + dx
     h = _ch + dy
-    if w < 0: w = 0
-    if h < 0: h = 0
 
     if RESIZE_RUBBERBAND:
         # draw the outline ...

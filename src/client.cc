@@ -480,7 +480,7 @@ void Client::updateNormalHints()
   _size_inc = otk::Size(1, 1);
   _base_size = otk::Size(0, 0);
   _min_size = otk::Size(0, 0);
-  _max_size = otk::Size(UINT_MAX, UINT_MAX);
+  _max_size = otk::Size(INT_MAX, INT_MAX);
 
   // get the hints from the window
   if (XGetWMNormalHints(**otk::display, _window, &size, &ret)) {
@@ -833,6 +833,7 @@ void Client::setModal(bool modal)
     while (c->_transient_for) // go up the tree
       c = c->_transient_for;
     replacement = c->findModalChild(this); // find a modal child, skipping this
+    assert(replacement != this);
 
     c = this;
     while (c->_transient_for) {
@@ -1120,33 +1121,26 @@ void Client::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void Client::resize(Corner anchor, unsigned int w, unsigned int h)
+void Client::resize(Corner anchor, int w, int h)
 {
   if (!(_functions & Func_Resize)) return;
   internal_resize(anchor, w, h);
 }
 
 
-void Client::internal_resize(Corner anchor, unsigned int w, unsigned int h,
+void Client::internal_resize(Corner anchor, int w, int h,
                              bool user, int x, int y)
 {
-  if (_base_size.width() < w)
-    w -= _base_size.width();
-  else
-    w = 0;
-  if (_base_size.height() < h)
-    h -= _base_size.height();
-  else
-    h = 0;
+  w -= _base_size.width();
+  h -= _base_size.height();
 
   if (user) {
     // for interactive resizing. have to move half an increment in each
     // direction.
-    unsigned int mw = w % _size_inc.width(); // how far we are towards the next
-                                             // size inc
-    unsigned int mh = h % _size_inc.height();
-    unsigned int aw = _size_inc.width() / 2; // amount to add
-    unsigned int ah = _size_inc.height() / 2;
+    int mw = w % _size_inc.width(); // how far we are towards the next size inc
+    int mh = h % _size_inc.height();
+    int aw = _size_inc.width() / 2; // amount to add
+    int ah = _size_inc.height() / 2;
     // don't let us move into a new size increment
     if (mw + aw >= _size_inc.width()) aw = _size_inc.width() - mw - 1;
     if (mh + ah >= _size_inc.height()) ah = _size_inc.height() - mh - 1;

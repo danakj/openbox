@@ -102,7 +102,7 @@ protected:
   RenderTexture *_texture;
   
 private:
-  void internal_moveresize(int x, int y, unsigned w, unsigned int h);
+  void internal_moveresize(int x, int y, int w, int h);
 
   int _screen;
   Widget *_parent;

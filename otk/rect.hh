@@ -14,13 +14,13 @@ public:
   Rect() : _p(), _s() {}
   Rect(const Point &p, const Size &s) : _p(p), _s(s) {}
   Rect(const Rect &r) : _p(r._p), _s(r._s) {}
-  Rect(int x, int y, unsigned int w, unsigned int h)
+  Rect(int x, int y, int w, int h)
     : _p(x, y), _s(w, h) {}
 
   inline int x() const { return _p.x(); }
   inline int y() const { return _p.y(); }
-  inline unsigned int width() const { return _s.width(); }
-  inline unsigned int height() const { return _s.height(); }
+  inline int width() const { return _s.width(); }
+  inline int height() const { return _s.height(); }
 
   inline int left() const { return _p.x(); }
   inline int top() const { return _p.y(); }

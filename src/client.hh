@@ -479,7 +479,7 @@ private:
     The x and y coordinates must both be sepcified together, or they will have
     no effect. When they are specified, the anchor is ignored.
   */
-  void internal_resize(Corner anchor, unsigned int w, unsigned int h,
+  void internal_resize(Corner anchor, int w, int h,
                        bool user = true, int x = INT_MIN, int y = INT_MIN);
 
   //! Attempts to find and return a modal child of this window, recursively.
@@ -651,7 +651,7 @@ BB    @param window The window id that the Client class should handle
     @param w The width component of the new size for the client.
     @param h The height component of the new size for the client.
   */
-  void resize(Corner anchor, unsigned int w, unsigned int h);
+  void resize(Corner anchor, int w, int h);
 
   //! Reapplies the maximized state to the window
   /*!

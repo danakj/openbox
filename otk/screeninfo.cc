@@ -17,7 +17,9 @@ using std::string;
 
 namespace otk {
 
-ScreenInfo::ScreenInfo(unsigned int num) {
+ScreenInfo::ScreenInfo(int num) {
+  assert(num >= 0 && num < ScreenCount(**display));
+  
   _screen = num;
 
   _root_window = RootWindow(**display, _screen);

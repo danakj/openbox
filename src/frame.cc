@@ -88,8 +88,8 @@ Frame::Frame(Client *client)
   _numbuttons = 0;
   _buttons = new Window[0];
   _buttons_sur = new otk::Surface*[0];
-  _titleorder = new unsigned int[1];
-  _titleorder[0] = (unsigned)-1;
+  _titleorder = new int[1];
+  _titleorder[0] = -1;
 
   // register all of the windows with the event dispatcher
   Window *w = allWindows();
@@ -106,7 +106,7 @@ Frame::~Frame()
     openbox->clearHandler(w[i]);
   delete [] w;
 
-  for (unsigned int i = 0; i < _numbuttons; ++i) {
+  for (int i = 0; i < _numbuttons; ++i) {
     XDestroyWindow(**otk::display, _buttons[i]);
     delete _buttons_sur[i];
   }
@@ -167,7 +167,7 @@ Window *Frame::allWindows() const
   w[i++] = _handle;
   w[i++] = _lgrip;
   w[i++] = _rgrip;
-  for (unsigned int j = 0; j < _numbuttons; ++j)
+  for (int j = 0; j < _numbuttons; ++j)
     w[j + i++] = _buttons[j];
   w[i] = 0;
   return w;
@@ -194,7 +194,7 @@ void Frame::applyStyle(const otk::RenderStyle &style)
   XResizeWindow(**otk::display, _lgrip, geom.grip_width(), geom.handle_height);
   XResizeWindow(**otk::display, _rgrip, geom.grip_width(), geom.handle_height);
   
-  for (unsigned int i = 0; i < _numbuttons; ++i)
+  for (int i = 0; i < _numbuttons; ++i)
     XResizeWindow(**otk::display, _buttons[i],
                   geom.button_size, geom.button_size);
 }
@@ -350,16 +350,17 @@ void Frame::renderLabel()
   otk::ustring t = _client->title(); // the actual text to draw
   int x = geom.bevel;                // x coord for the text
 
-  if ((unsigned)x * 2 > geom.label_width) return; // no room at all
+  if (x * 2 > geom.label_width) return; // no room at all
 
   // find a string that will fit inside the area for text
   otk::ustring::size_type text_len = t.size();
-  unsigned int length;
-  unsigned int maxsize = geom.label_width - geom.bevel * 2;
+  int length;
+  int maxsize = geom.label_width - geom.bevel * 2;
       
   do {
     t.resize(text_len);
-    length = font->measureString(t);
+    length = font->measureString(t);  // this returns an unsigned, so check < 0
+    if (length < 0) length = maxsize; // if the string's that long just adjust
   } while (length > maxsize && text_len-- > 0);
 
   if (text_len <= 0) return; // won't fit anything

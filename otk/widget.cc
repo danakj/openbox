@@ -26,7 +26,7 @@ Widget::Widget(int screen, EventDispatcher *ed, Direction direction, int bevel,
                 ExposureMask | StructureNotifyMask),
     _alignment(RenderStyle::CenterJustify),
     _direction(direction),
-    _max_size(UINT_MAX, UINT_MAX),
+    _max_size(INT_MAX, INT_MAX),
     _visible(false),
     _bordercolor(0),
     _borderwidth(0),
@@ -49,7 +49,7 @@ Widget::Widget(Widget *parent, Direction direction, int bevel)
                 ExposureMask | StructureNotifyMask),
     _alignment(RenderStyle::CenterJustify),
     _direction(direction),
-    _max_size(UINT_MAX, UINT_MAX),
+    _max_size(INT_MAX, INT_MAX),
     _visible(false),
     _bordercolor(0),
     _borderwidth(0),
@@ -120,7 +120,7 @@ void Widget::update()
 
 void Widget::moveresize(const Rect &r)
 {
-  unsigned int w, h;
+  int w, h;
   w = std::min(std::max(r.width(), minSize().width()), maxSize().width());
   h = std::min(std::max(r.height(), minSize().height()), maxSize().height());
 
@@ -134,7 +134,7 @@ void Widget::moveresize(const Rect &r)
   update();
 }
 
-void Widget::internal_moveresize(int x, int y, unsigned w, unsigned int h)
+void Widget::internal_moveresize(int x, int y, int w, int h)
 {
   assert(w > 0);
   assert(h > 0);
@@ -248,18 +248,15 @@ void Widget::layoutHorz()
 
   if (visible.empty()) return;
 
-  if ((unsigned)(_borderwidth * 2 + _bevel * 2) > _area.width() ||
-      (unsigned)(_borderwidth * 2 + _bevel * 2) > _area.height())
-    return; // not worth laying anything out!
-  
-  int x, y; unsigned int w, h; // working area
+  int x, y, w, h; // working area
   x = y = _bevel;
   w = _area.width() - _borderwidth * 2 - _bevel * 2;
   h = _area.height() - _borderwidth * 2 - _bevel * 2;
+  if (w < 0 || h < 0) return; // not worth laying anything out!
 
   int free = w - (visible.size() - 1) * _bevel;
   if (free < 0) free = 0;
-  unsigned int each;
+  int each;
   
   std::list<Widget*> adjustable = visible;
 
@@ -279,7 +276,7 @@ void Widget::layoutHorz()
       each = free / adjustable.size();
       for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
         std::list<Widget*>::iterator next = it; ++next;
-        unsigned int m = (*it)->maxSize().width() - (*it)->minSize().width();
+        int m = (*it)->maxSize().width() - (*it)->minSize().width();
         if (m > 0 && m < each) {
           free -= m;
           if (free < 0) free = 0;
@@ -298,7 +295,7 @@ void Widget::layoutHorz()
   else
     each = 0;
   for (it = visible.begin(), end = visible.end(); it != end; ++it) {
-    unsigned int w;
+    int w;
     // is the widget adjustable?
     std::list<Widget*>::const_iterator
       found = std::find(adjustable.begin(), adjustable.end(), *it);
@@ -311,8 +308,8 @@ void Widget::layoutHorz()
     }
     // align it vertically
     int yy = y;
-    unsigned int hh = std::max(std::min(h, (*it)->_max_size.height()),
-                               (*it)->_min_size.height());
+    int hh = std::max(std::min(h, (*it)->_max_size.height()),
+                      (*it)->_min_size.height());
     if (hh < h) {
       switch(_alignment) {
       case RenderStyle::RightBottomJustify:
@@ -347,18 +344,15 @@ void Widget::layoutVert()
 
   if (visible.empty()) return;
 
-  if ((unsigned)(_borderwidth * 2 + _bevel * 2) > _area.width() ||
-      (unsigned)(_borderwidth * 2 + _bevel * 2) > _area.height())
-    return; // not worth laying anything out!
-  
-  int x, y; unsigned int w, h; // working area
+  int x, y, w, h; // working area
   x = y = _bevel;
   w = _area.width() - _borderwidth * 2 - _bevel * 2;
   h = _area.height() - _borderwidth * 2 - _bevel * 2;
+  if (w < 0 || h < 0) return; // not worth laying anything out!
 
   int free = h - (visible.size() - 1) * _bevel;
   if (free < 0) free = 0;
-  unsigned int each;
+  int each;
 
   std::list<Widget*> adjustable = visible;
 
@@ -378,7 +372,7 @@ void Widget::layoutVert()
       each = free / adjustable.size();
       for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
         std::list<Widget*>::iterator next = it; ++next;
-        unsigned int m = (*it)->maxSize().height() - (*it)->minSize().height();
+        int m = (*it)->maxSize().height() - (*it)->minSize().height();
         if (m > 0 && m < each) {
           free -= m;
           if (free < 0) free = 0;
@@ -397,7 +391,7 @@ void Widget::layoutVert()
   else
     each = 0;
   for (it = visible.begin(), end = visible.end(); it != end; ++it) {
-    unsigned int h;
+    int h;
     // is the widget adjustable?
     std::list<Widget*>::const_iterator
       found = std::find(adjustable.begin(), adjustable.end(), *it);
@@ -410,8 +404,8 @@ void Widget::layoutVert()
     }
     // align it horizontally
     int xx = x;
-    unsigned int ww = std::max(std::min(w, (*it)->_max_size.width()),
-                               (*it)->_min_size.width());
+    int ww = std::max(std::min(w, (*it)->_max_size.width()),
+                      (*it)->_min_size.width());
     if (ww < w) {
       switch(_alignment) {
       case RenderStyle::RightBottomJustify:
@@ -434,8 +428,8 @@ void Widget::layoutVert()
 void Widget::render()
 {
   if (!_texture || !_dirty) return;
-  if ((unsigned)_borderwidth * 2 > _area.width() ||
-      (unsigned)_borderwidth * 2 > _area.height())
+  if (_borderwidth * 2 > _area.width() ||
+      _borderwidth * 2 > _area.height())
     return; // no surface to draw on
   
   Surface *s = new Surface(_screen, Size(_area.width() - _borderwidth * 2,
@@ -481,8 +475,8 @@ void Widget::configureHandler(const XConfigureEvent &e)
     ev.xconfigure.height = e.height;
     while (XCheckTypedWindowEvent(**display, window(), ConfigureNotify, &ev));
 
-    if (!((unsigned)ev.xconfigure.width == area().width() &&
-          (unsigned)ev.xconfigure.height == area().height())) {
+    if (!(ev.xconfigure.width == area().width() &&
+          ev.xconfigure.height == area().height())) {
       _area = Rect(_area.position(), Size(e.width, e.height));
       update();
     }

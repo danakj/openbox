@@ -71,11 +71,12 @@ void Label::setFont(const Font *f)
 
 void Label::calcDefaultSizes()
 {
-  unsigned int longest = 0;
+  int longest = 0;
   // find the longest line
   std::vector<ustring>::iterator it, end = _parsedtext.end();
   for (it = _parsedtext.begin(); it != end; ++it) {
-    unsigned int length = _font->measureString(*it);
+    int length = _font->measureString(*it);
+    if (length < 0) continue; // lines too long get skipped
     if (length > longest) longest = length;
   }
   setMinSize(Size(longest + borderWidth() * 2 + bevel() * 4,
@@ -101,10 +102,10 @@ void Label::styleChanged(const RenderStyle &style)
 void Label::renderForeground(Surface &surface)
 {
   const RenderControl *control = display->renderControl(screen());
-  unsigned int sidemargin = bevel() * 2;
+  int sidemargin = bevel() * 2;
   int y = bevel();
-  unsigned int w = area().width() - borderWidth() * 2 - sidemargin * 2;
-  unsigned int h = area().height() - borderWidth() * 2 - bevel() * 2;
+  int w = area().width() - borderWidth() * 2 - sidemargin * 2;
+  int h = area().height() - borderWidth() * 2 - bevel() * 2;
 
   switch (_justify_vert) {
   case RenderStyle::RightBottomJustify:
@@ -128,12 +129,13 @@ void Label::renderForeground(Surface &surface)
 
     // find a string that will fit inside the area for text
     ustring::size_type text_len = t.size();
-    unsigned int length;
+    int length;
       
     do {
       t.resize(text_len);
       length = _font->measureString(t);
     } while (length > w && text_len-- > 0);
+    if (length < 0) continue; // lines too long get skipped
 
     if (text_len <= 0) continue; // won't fit anything
 

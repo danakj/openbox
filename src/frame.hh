@@ -25,18 +25,18 @@ class Client;
 
 //! Varius geometry settings in the frame decorations
 struct FrameGeometry {
-  unsigned int width; // title and handle
-  unsigned int font_height;
-  unsigned int title_height() { return font_height + bevel*2; }
-  unsigned int label_width;
-  unsigned int label_height() { return font_height; }
-  unsigned int handle_height; // static, from the style
+  int width; // title and handle
+  int font_height;
+  int title_height() { return font_height + bevel*2; }
+  int label_width;
+  int label_height() { return font_height; }
+  int handle_height; // static, from the style
   int handle_y;
-  unsigned int button_size;   // static, from the style
-  unsigned  grip_width() { return button_size * 2; }
-  unsigned  bevel;         // static, from the style
-  unsigned  bwidth;  // frame elements' border width
-  unsigned  cbwidth; // client border width
+  int button_size;   // static, from the style
+  int grip_width() { return button_size * 2; }
+  int bevel;         // static, from the style
+  int bwidth;  // frame elements' border width
+  int cbwidth; // client border width
 };
 
 //! Holds and decorates a frame around an Client (client window)
@@ -74,10 +74,10 @@ private:
   Window  _lgrip;   // lefthand resize grab on the handle
   Window  _rgrip;   // righthand resize grab on the handle
   Window *_buttons; // all of the titlebar buttons
-  unsigned int  _numbuttons; // number of buttons, size of _buttons array
-  unsigned int *_titleorder; // order of the buttons and the label (always
-                             // holds '_numbuttons + 1' elements (for the
-                             // label, which is coded as '-1')
+  int  _numbuttons; // number of buttons, size of _buttons array
+  int *_titleorder; // order of the buttons and the label (always
+                    // holds '_numbuttons + 1' elements (for the
+                    // label, which is coded as '-1')
 
   // surfaces for each 
   otk::Surface  *_frame_sur;

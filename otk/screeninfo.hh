@@ -21,7 +21,7 @@ private:
   Colormap _colormap;
 
   int _depth;
-  unsigned int _screen;
+  int _screen;
   std::string _display_string;
   Size _size;
 #ifdef XINERAMA
@@ -30,13 +30,13 @@ private:
 #endif
 
 public:
-  ScreenInfo(unsigned int num);
+  ScreenInfo(int num);
 
   inline Visual *visual() const { return _visual; }
   inline Window rootWindow() const { return _root_window; }
   inline Colormap colormap() const { return _colormap; }
   inline int depth() const { return _depth; }
-  inline unsigned int screen() const { return _screen; }
+  inline int screen() const { return _screen; }
   inline const Size& size() const { return _size; }
   inline const std::string& displayString() const { return _display_string; }
 #ifdef XINERAMA

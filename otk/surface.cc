@@ -39,8 +39,8 @@ void Surface::setPixmap(const RenderColor &color)
 
 void Surface::setPixmap(XImage *image)
 {
-  assert((unsigned)image->width == _size.width());
-  assert((unsigned)image->height == _size.height());
+  assert(image->width == _size.width());
+  assert(image->height == _size.height());
   
   if (_pixmap == None)
     createObjects();

@@ -7,6 +7,7 @@
 #  include "../config.h"
 #endif
 
+#include "frame.hh"
 #include "openbox.hh"
 #include "screen.hh"
 #include "client.hh"
@@ -131,12 +132,14 @@ void python_callback(PyObject *func, KeyData *data)
 %include "../otk/eventhandler.hh"
 %include "../otk/eventdispatcher.hh"
 
+%import "../otk/widget.hh"
 %import "widgetbase.hh"
 %import "actions.hh"
 
 %include "openbox.hh"
 %include "screen.hh"
 %include "client.hh"
+%include "frame.hh"
 %include "python.hh"
 
 // for Mod1Mask etc

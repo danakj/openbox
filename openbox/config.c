@@ -26,7 +26,6 @@
 
 gboolean config_focus_new;
 gboolean config_focus_follow;
-gboolean config_focus_last;
 guint    config_focus_delay;
 guint    config_focus_raise;
 
@@ -202,8 +201,6 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_focus_new = parse_bool(doc, n);
     if ((n = parse_find_node("followMouse", node)))
         config_focus_follow = parse_bool(doc, n);
-    if ((n = parse_find_node("focusLast", node)))
-        config_focus_last = parse_bool(doc, n);
     if ((n = parse_find_node("focusDelay", node)))
         config_focus_delay = parse_int(doc, n) * 1000;
     if ((n = parse_find_node("raiseOnFocus", node)))
@@ -476,7 +473,6 @@ void config_startup(ObParseInst *i)
 {
     config_focus_new = TRUE;
     config_focus_follow = FALSE;
-    config_focus_last = TRUE;
     config_focus_delay = 0;
     config_focus_raise = FALSE;
 

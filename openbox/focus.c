@@ -183,7 +183,7 @@ void focus_fallback(ObFocusFallbackType type)
         if (old->transient_for) {
             gboolean trans = FALSE;
 
-            if (config_focus_last || !config_focus_follow)
+            if (!config_focus_follow)
                 trans = TRUE;
             else {
                 ObClient *c;
@@ -215,7 +215,7 @@ void focus_fallback(ObFocusFallbackType type)
         }
     }
 
-    if (!config_focus_last && config_focus_follow)
+    if (config_focus_follow)
         if (focus_under_pointer())
             return;
 

@@ -274,12 +274,10 @@ static void event(ObEvent *e, void *foo)
         context = frame_context(e->data.x.client,
                                 e->data.x.e->xbutton.window);
 
-        if (!button) {
-            px = e->data.x.e->xbutton.x_root;
-            py = e->data.x.e->xbutton.y_root;
-            button = e->data.x.e->xbutton.button;
-            state = e->data.x.e->xbutton.state;
-        }
+        px = e->data.x.e->xbutton.x_root;
+        py = e->data.x.e->xbutton.y_root;
+        button = e->data.x.e->xbutton.button;
+        state = e->data.x.e->xbutton.state;
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,

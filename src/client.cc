@@ -42,32 +42,19 @@ OBClient::OBClient(Window window)
 
 #ifdef DEBUG
   printf("Mapped window: 0x%lx\n"
-         "  title:          %s\n"
-         "  icon title:     %s\n"
-         "  app name:       %s\n"
-         "  class:          %s\n"
-         "  position:       %d, %d\n"
-         "  size:           %d, %d\n"
-         "  desktop:        %lu\n"
-         "  group:          0x%lx\n"
-         "  type:           %d\n"
-         "  min size        %d, %d\n"
-         "  base size       %d, %d\n"
-         "  max size        %d, %d\n"
-         "  size incr       %d, %d\n"
-         "  gravity         %d\n"
-         "  wm state        %ld\n"
-         "  can be focused: %s\n"
-         "  notify focus:   %s\n"
-         "  urgent:         %s\n"
-         "  shaped:         %s\n"
-         "  modal:          %s\n"
-         "  shaded:         %s\n"
-         "  iconic:         %s\n"
-         "  vert maximized: %s\n"
-         "  horz maximized: %s\n"
-         "  fullscreen:     %s\n"
-         "  floating:       %s\n",
+         "  title:         \t%s\t  icon title:    \t%s\n"
+         "  app name:      \t%s\t\t  class:         \t%s\n"
+         "  position:      \t%d, %d\t\t  size:          \t%d, %d\n"
+         "  desktop:       \t%lu\t\t  group:         \t0x%lx\n"
+         "  type:          \t%d\t\t  min size       \t%d, %d\n"
+         "  base size      \t%d, %d\t\t  max size       \t%d, %d\n"
+         "  size incr      \t%d, %d\t\t  gravity        \t%d\n"
+         "  wm state       \t%ld\t\t  can be focused:\t%s\n"
+         "  notify focus:  \t%s\t\t  urgent:        \t%s\n"
+         "  shaped:        \t%s\t\t  modal:         \t%s\n"
+         "  shaded:        \t%s\t\t  iconic:        \t%s\n"
+         "  vert maximized:\t%s\t\t  horz maximized:\t%s\n"
+         "  fullscreen:    \t%s\t\t  floating:      \t%s\n",
          _window,
          _title.c_str(),
          _icon_title.c_str(),
@@ -247,11 +234,21 @@ void OBClient::updateNormalHints()
   _gravity = NorthWestGravity;
   _inc_x = _inc_y = 1;
   _base_x = _base_y = 0;
+  _min_x = _min_y = 0;
+  _max_x = _max_y = (unsigned) -1;
 
   // get the hints from the window
   if (XGetWMNormalHints(otk::OBDisplay::display, _window, &size, &ret)) {
     if (size.flags & PWinGravity)
       _gravity = size.win_gravity;
+    if (size.flags & PMinSize) {
+      _min_x = size.min_width;
+      _min_y = size.min_height;
+    }
+    if (size.flags & PMaxSize) {
+      _max_x = size.max_width;
+      _max_y = size.max_height;
+    }
     if (size.flags & PBaseSize) {
       _base_x = size.base_width;
       _base_y = size.base_height;

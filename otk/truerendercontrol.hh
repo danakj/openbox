@@ -25,7 +25,7 @@ public:
   TrueRenderControl(int screen);
   virtual ~TrueRenderControl();
 
-  virtual void drawBackground(Surface *sf, const RenderTexture &texture) const;
+  virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
 };
 
 }

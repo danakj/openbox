@@ -18,26 +18,27 @@ class ScreenInfo;
 class Surface {
   int _screen;
   Point _size;
-  Pixmap _pm;
+  Pixmap _pixmap;
   XftDraw *_xftdraw;
 
+protected:
   void createObjects();
   void destroyObjects();
+
+  void setPixmap(XImage *image);
+  void setPixmap(const Color &color);
   
-protected:
-  Surface(int screen);
-  Surface(int screen, const Point &size);
-
-  virtual void setSize(int w, int h);
-
 public:
+  Surface(int screen, const Point &size);
   virtual ~Surface();
 
   inline int screen(void) const { return _screen; }
+
   virtual const Point& size() const { return _size; }
   virtual int width() const { return _size.x(); }
   virtual int height() const { return _size.y(); }
-  virtual Pixmap pixmap() const { return _pm; } // TEMP
+
+  virtual Pixmap pixmap() const { return _pixmap; }
 
   // The RenderControl classes use the internal objects in this class to render
   // to it. Noone else needs them tho, so they are private.

@@ -17,12 +17,12 @@ public:
   virtual void focus(void);
   virtual void unfocus(void);
 
-  virtual void setTexture(Texture *texture);
+  virtual void setTexture(RenderTexture *texture);
   virtual void setBorderColor(const Color *color);
 
-  inline void setUnfocusTexture(Texture *texture)
+  inline void setUnfocusTexture(RenderTexture *texture)
   { _unfocus_texture = texture; }
-  inline Texture *getUnfocusTexture(void) const
+  inline RenderTexture *getUnfocusTexture(void) const
   { return _unfocus_texture; }
 
   inline void setUnfocusBorderColor(const Color *color)
@@ -35,8 +35,8 @@ public:
 
 private:
 
-  Texture *_unfocus_texture;
-  Texture *_focus_texture;
+  RenderTexture *_unfocus_texture;
+  RenderTexture *_focus_texture;
 
   const Color *_unfocus_bcolor;
   const Color *_focus_bcolor;

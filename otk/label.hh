@@ -16,13 +16,17 @@ public:
   inline const ustring &getText(void) const { return _text; }
   void setText(const ustring &text) { _text = text; _dirty = true; }
 
-  void update(void);
+  virtual void renderForeground(void);
 
   virtual void setStyle(Style *style);
 
 private:
-  //! Text displayed in the label
+  //! Text to be displayed in the label
   ustring _text;
+  //! The actual text being shown, may be a subset of _text
+  ustring _drawtext;
+  //! The drawing offset for the text
+  int _drawx;
 };
 
 }

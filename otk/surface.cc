@@ -7,6 +7,7 @@
 #include "surface.hh"
 #include "display.hh"
 #include "screeninfo.hh"
+#include "gccache.hh"
 
 extern "C" {
 #include <X11/Xutil.h>
@@ -14,22 +15,12 @@ extern "C" {
 
 namespace otk {
 
-Surface::Surface(int screen)
-  : _screen(screen),
-    _size(1, 1),
-    _pm(None),
-    _xftdraw(0)
-{
-  createObjects();
-}
-
 Surface::Surface(int screen, const Point &size)
   : _screen(screen),
     _size(size),
-    _pm(None),
+    _pixmap(None),
     _xftdraw(0)
 {
-  createObjects();
 }
 
 Surface::~Surface()
@@ -37,36 +28,53 @@ Surface::~Surface()
   destroyObjects();
 }
 
+void Surface::setPixmap(const Color &color)
+{
+  if (_pixmap == None)
+    createObjects();
+
+  Pen p(color);
+  XFillRectangle(**display, _pixmap, p.gc(), 0, 0,
+                 _size.x(), _size.y());
+}
+
+void Surface::setPixmap(XImage *image)
+{
+  printf("SET PIXMAP\n");
+  assert(image->width == _size.x());
+  assert(image->height == _size.y());
+  
+  if (_pixmap == None)
+    createObjects();
+
+  XPutImage(**display, _pixmap, DefaultGC(**display, _screen),
+            image, 0, 0, 0, 0, _size.x(), _size.y());
+}
+
 void Surface::createObjects()
 {
-  assert(_pm == None); assert(!_xftdraw);
+  assert(_pixmap == None); assert(!_xftdraw);
 
   const ScreenInfo *info = display->screenInfo(_screen);
   
-  _pm = XCreatePixmap(**display, info->rootWindow(), _size.x(), _size.y(),
-		      info->depth());
-
-  _xftdraw = XftDrawCreate(**display, _pm, info->visual(), info->colormap());
+  _pixmap = XCreatePixmap(**display, info->rootWindow(),
+                          _size.x(), _size.y(), info->depth());
+    
+  _xftdraw = XftDrawCreate(**display, _pixmap,
+                           info->visual(), info->colormap());
 }
 
 void Surface::destroyObjects()
 {
-  assert(_pm != None); assert(_xftdraw);
+  if (_xftdraw) {
+    XftDrawDestroy(_xftdraw);
+    _xftdraw = 0;
+  }
 
-  XftDrawDestroy(_xftdraw);
-  _xftdraw = 0;
-
-  XFreePixmap(**display, _pm);
-  _pm = None;
-}
-
-void Surface::setSize(int w, int h)
-{
-  if (w == _size.x() && h == _size.y()) return; // no change
-  
-  _size.setPoint(w, h);
-  destroyObjects();
-  createObjects();
+  if (_pixmap != None) {
+    XFreePixmap(**display, _pixmap);
+    _pixmap = None;
+  }
 }
 
 }

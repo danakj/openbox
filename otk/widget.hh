@@ -2,13 +2,13 @@
 #ifndef __widget_hh
 #define __widget_hh
 
-#include "surface.hh"
 #include "rect.hh"
 #include "point.hh"
-#include "texture.hh"
+#include "rendertexture.hh"
 #include "style.hh"
 #include "eventdispatcher.hh"
 #include "display.hh"
+#include "surface.hh"
 
 extern "C" {
 #include <assert.h>
@@ -19,7 +19,7 @@ extern "C" {
 
 namespace otk {
 
-class Widget : public Surface, public EventHandler {
+class Widget : public EventHandler {
 
 public:
 
@@ -42,13 +42,17 @@ public:
   inline Window window(void) const { return _window; }
   inline const Widget *parent(void) const { return _parent; }
   inline const WidgetList &children(void) const { return _children; }
-  inline Rect rect(void) const { return Rect(_pos, size()); }
+  inline unsigned int screen(void) const { return _screen; }
+  inline const Rect &rect(void) const { return _rect; }
 
   void move(const Point &to);
   void move(int x, int y);
 
   virtual void setWidth(int);
   virtual void setHeight(int);
+
+  virtual int width() const { return _rect.width(); }
+  virtual int height() const { return _rect.height(); }
 
   virtual void resize(const Point &to);
   virtual void resize(int x, int y);
@@ -73,8 +77,8 @@ public:
   bool grabKeyboard(void);
   void ungrabKeyboard(void);
 
-  inline Texture *texture(void) const { return _texture; }
-  virtual void setTexture(Texture *texture)
+  inline RenderTexture *texture(void) const { return _texture; }
+  virtual void setTexture(RenderTexture *texture)
     { _texture = texture; _dirty = true; }
 
   inline const Color *borderColor(void) const { return _bcolor; }
@@ -129,6 +133,7 @@ protected:
   virtual void adjustVert(void);
   virtual void internalResize(int width, int height);
   virtual void render(void);
+  virtual void renderForeground(void) {} // for overriding
 
   Window _window;
 
@@ -149,18 +154,20 @@ protected:
   bool _stretchable_vert;
   bool _stretchable_horz;
 
-  Texture *_texture;
+  RenderTexture *_texture;
   Pixmap _bg_pixmap;
   unsigned int _bg_pixel;
 
   const Color *_bcolor;
   unsigned int _bwidth;
 
-  Point _pos;
+  Rect _rect;
   unsigned int _screen;
 
   bool _fixed_width;
   bool _fixed_height;
+
+  Surface _surface;
 
   EventDispatcher *_event_dispatcher;
 };

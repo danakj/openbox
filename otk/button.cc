@@ -22,11 +22,12 @@ Button::~Button()
 void Button::setStyle(Style *style)
 {
   FocusLabel::setStyle(style);
-  
-  setTexture(style->getButtonFocus());
-  setUnfocusTexture(style->getButtonUnfocus());
-  _pressed_focus_tx = style->getButtonPressedFocus();
-  _pressed_unfocus_tx = style->getButtonPressedUnfocus();
+
+  // XXX: do this again
+  //setTexture(style->getButtonFocus());
+  //setUnfocusTexture(style->getButtonUnfocus());
+  //_pressed_focus_tx = style->getButtonPressedFocus();
+  //_pressed_unfocus_tx = style->getButtonPressedUnfocus();
 }
 
 
@@ -51,13 +52,13 @@ void Button::release(unsigned int mouse_button)
   _pressed = false;
 }
 
-void Button::setTexture(Texture *texture)
+void Button::setTexture(RenderTexture *texture)
 {
   FocusWidget::setTexture(texture);
   _unpr_focus_tx = texture;
 }
 
-void Button::setUnfocusTexture(Texture *texture)
+void Button::setUnfocusTexture(RenderTexture *texture)
 {
   FocusWidget::setUnfocusTexture(texture);
   _unpr_unfocus_tx = texture;

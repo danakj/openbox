@@ -69,11 +69,11 @@ public:
   static RenderControl *getRenderControl(int screen);
 
   //! Draws a string onto a Surface
-  virtual void drawString(Surface *sf, const Font &font, int x, int y,
+  virtual void drawString(Surface& sf, const Font &font, int x, int y,
 			  const Color &color, const ustring &string) const;
 
   //! Draws a background onto a Surface, as specified by a RenderTexture
-  virtual void drawBackground(Surface *sf,
+  virtual void drawBackground(Surface &sf,
 			      const RenderTexture &texture) const = 0;
 };
 

@@ -98,16 +98,19 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
   }
 }
 
-void TrueRenderControl::drawBackground(Surface *sf,
+void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const
 {
-  assert(sf);
-  
-  int w = sf->width(), h = sf->height();
-  XImage *im = sf->_im;
-  Pixmap pm = sf->_pm;
-  assert(im); assert(pm != None);
+  (void)texture;
 
+  assert(sf._screen == _screen);
+  
+  int w = sf.width(), h = sf.height();
+
+  const ScreenInfo *info = display->screenInfo(_screen);
+  XImage *im = XCreateImage(**display, info->visual(), info->depth(),
+                            ZPixmap, 0, NULL, w, h, 32, 0);
+  
   unsigned char *data = new unsigned char[im->bytes_per_line * h];
   unsigned char *dp = data;
   unsigned int bytes_per_pixel = im->bits_per_pixel/8;
@@ -123,9 +126,10 @@ void TrueRenderControl::drawBackground(Surface *sf,
       renderPixel(im, dp, (255*x/w) >> _blue_shift << _blue_offset);
 
   im->data = (char*) data;
-  
-  XPutImage(**display, pm, DefaultGC(**display, _screen),
-            sf->_im, 0, 0, 0, 0, w, h);
-}
 
+  sf.setPixmap(im);
+
+  delete [] im->data;
+  im->data = NULL;
+  XDestroyImage(im);}
 }

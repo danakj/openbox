@@ -13,18 +13,18 @@ public:
   Button(Widget *parent);
   ~Button();
 
-  inline const Texture *getPressedFocusTexture(void) const
+  inline const RenderTexture *getPressedFocusTexture(void) const
   { return _pressed_focus_tx; }
-  void setPressedFocusTexture(Texture *texture)
+  void setPressedFocusTexture(RenderTexture *texture)
   { _pressed_focus_tx = texture; }
 
-  inline const Texture *getPressedUnfocusTexture(void) const
+  inline const RenderTexture *getPressedUnfocusTexture(void) const
   { return _pressed_unfocus_tx; }
-  void setPressedUnfocusTexture(Texture *texture)
+  void setPressedUnfocusTexture(RenderTexture *texture)
   { _pressed_unfocus_tx = texture; }
 
-  void setTexture(Texture *texture);
-  void setUnfocusTexture(Texture *texture);
+  void setTexture(RenderTexture *texture);
+  void setUnfocusTexture(RenderTexture *texture);
 
   inline bool isPressed(void) const { return _pressed; }
   void press(unsigned int mouse_button);
@@ -40,11 +40,11 @@ private:
   bool _pressed;
   unsigned int _mouse_button;
 
-  Texture *_pressed_focus_tx;
-  Texture *_pressed_unfocus_tx;
+  RenderTexture *_pressed_focus_tx;
+  RenderTexture *_pressed_unfocus_tx;
 
-  Texture *_unpr_focus_tx;
-  Texture *_unpr_unfocus_tx;
+  RenderTexture *_unpr_focus_tx;
+  RenderTexture *_unpr_unfocus_tx;
 };
 
 }

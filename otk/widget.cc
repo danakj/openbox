@@ -15,8 +15,7 @@
 namespace otk {
 
 Widget::Widget(Widget *parent, Direction direction)
-  : Surface(parent->screen()),
-    EventHandler(),
+  : EventHandler(),
     _dirty(false), _focused(false),
     _parent(parent), _style(parent->style()), _direction(direction),
     _cursor(parent->cursor()), _bevel_width(parent->bevelWidth()),
@@ -24,8 +23,9 @@ Widget::Widget(Widget *parent, Direction direction)
     _visible(false), _grabbed_mouse(false),
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
-    _bcolor(0), _bwidth(0), _pos(0,0), _screen(parent->screen()),
+    _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1), _screen(parent->screen()),
     _fixed_width(false), _fixed_height(false),
+    _surface(parent->screen(), _rect.size()),
     _event_dispatcher(parent->eventDispatcher())
 {
   assert(parent);
@@ -38,15 +38,15 @@ Widget::Widget(Widget *parent, Direction direction)
 Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
                      Direction direction, Cursor cursor, int bevel_width,
                      bool override_redirect)
-  : Surface(style->getScreen()),
-    EventHandler(),
+  : EventHandler(),
     _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
     _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
-    _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _pos(0,0),
+    _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1),
     _screen(style->getScreen()), _fixed_width(false), _fixed_height(false),
+    _surface(style->getScreen(), _rect.size()),
     _event_dispatcher(event_dispatcher)
 {
   assert(event_dispatcher);
@@ -76,6 +76,8 @@ void Widget::create(bool override_redirect)
   const ScreenInfo *scr_info = display->screenInfo(_screen);
   Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
 
+  _rect.setRect(0, 0, 1, 1); // just some initial values
+
   XSetWindowAttributes attrib_create;
   unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask;
 
@@ -94,8 +96,8 @@ void Widget::create(bool override_redirect)
     attrib_create.cursor = _cursor;
   }
 
-  _window = XCreateWindow(**display, p_window, _pos.x(),
-                          _pos.y(), width(), height(), 0,
+  _window = XCreateWindow(**display, p_window, _rect.x(),
+                          _rect.y(), _rect.width(), _rect.height(), 0,
                           scr_info->depth(), InputOutput,
                           scr_info->visual(), create_mask, &attrib_create);
   _ignore_config++;
@@ -105,14 +107,14 @@ void Widget::setWidth(int w)
 {
   assert(w > 0);
   _fixed_width = true;  
-  setGeometry(_pos.x(), _pos.y(), w, height());
+  setGeometry(_rect.x(), _rect.y(), w, _rect.height());
 }
 
 void Widget::setHeight(int h)
 {
   assert(h > 0);
   _fixed_height = true;
-  setGeometry(_pos.x(), _pos.y(), _pos.x(), h);
+  setGeometry(_rect.x(), _rect.y(), _rect.width(), h);
 }
 
 void Widget::move(const Point &to)
@@ -122,7 +124,7 @@ void Widget::move(const Point &to)
 
 void Widget::move(int x, int y)
 {
-  _pos.setPoint(x, y);
+  _rect.setPos(x, y);
   XMoveWindow(**display, _window, x, y);
   _ignore_config++;
 }
@@ -136,7 +138,7 @@ void Widget::resize(int w, int h)
 {
   assert(w > 0 && h > 0);
   _fixed_width = _fixed_height = true;
-  setGeometry(_pos.x(), _pos.y(), w, h);
+  setGeometry(_rect.x(), _rect.y(), w, h);
 }
 
 void Widget::setGeometry(const Rect &new_geom)
@@ -151,8 +153,7 @@ void Widget::setGeometry(const Point &topleft, int width, int height)
 
 void Widget::setGeometry(int x, int y, int width, int height)
 {
-  _pos.setPoint(x, y);
-  setSize(width, height);
+  _rect = Rect(x, y, width, height);
   _dirty = true;
 
   // don't use an XMoveResizeWindow here, because it doesn't seem to move
@@ -258,19 +259,14 @@ void Widget::ungrabKeyboard(void)
 void Widget::render(void)
 {
   if (!_texture) return;
+  printf("RENDER\n");
 
-  _bg_pixmap = _texture->render(width(), height(), _bg_pixmap);
+  _surface = Surface(_screen, _rect.size());
+  display->renderControl(_screen)->drawBackground(_surface, *_texture);
 
-  if (_bg_pixmap) {
-    XSetWindowBackgroundPixmap(**display, _window, _bg_pixmap);
-    _bg_pixel = None;
-  } else {
-    unsigned int pix = _texture->color().pixel();
-    if (pix != _bg_pixel) {
-      _bg_pixel = pix;
-      XSetWindowBackground(**display, _window, pix);
-    }
-  }
+  renderForeground();
+
+  XSetWindowBackgroundPixmap(**display, _window, _surface.pixmap());
 }
 
 void Widget::adjust(void)
@@ -296,22 +292,22 @@ void Widget::adjustHorz(void)
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
     if (tmp->isStretchableVert())
-      tmp->setHeight(height() > _bevel_width * 2 ?
-                     height() - _bevel_width * 2 : _bevel_width);
+      tmp->setHeight(_rect.height() > _bevel_width * 2 ?
+                     _rect.height() - _bevel_width * 2 : _bevel_width);
     if (tmp->isStretchableHorz())
       stretchable.push_back(tmp);
     else
-      width += tmp->width() + _bevel_width;
+      width += tmp->_rect.width() + _bevel_width;
 
-    if (tmp->height() > tallest)
-      tallest = tmp->height();
+    if (tmp->_rect.height() > tallest)
+      tallest = tmp->_rect.height();
   }
 
   if (stretchable.size() > 0) {
     WidgetList::iterator str_it = stretchable.begin(),
       str_end = stretchable.end();
 
-    int str_width = Surface::width() - width / stretchable.size();
+    int str_width = _rect.width() - width / stretchable.size();
 
     for (; str_it != str_end; ++str_it)
       (*str_it)->setWidth(str_width > _bevel_width ? str_width - _bevel_width
@@ -325,10 +321,10 @@ void Widget::adjustHorz(void)
     int x, y;
 
     if (prev_widget)
-      x = prev_widget->_pos.x() + prev_widget->width() + _bevel_width;
+      x = prev_widget->_rect.x() + prev_widget->_rect.width() + _bevel_width;
     else
-      x = _pos.x() + _bevel_width;
-    y = (tallest - tmp->height()) / 2 + _bevel_width;
+      x = _rect.x() + _bevel_width;
+    y = (tallest - tmp->_rect.height()) / 2 + _bevel_width;
 
     tmp->move(x, y);
 
@@ -353,22 +349,22 @@ void Widget::adjustVert(void)
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
     if (tmp->isStretchableHorz())
-      tmp->setWidth(width() > _bevel_width * 2 ?
-                    width() - _bevel_width * 2 : _bevel_width);
+      tmp->setWidth(_rect.width() > _bevel_width * 2 ?
+                    _rect.width() - _bevel_width * 2 : _bevel_width);
     if (tmp->isStretchableVert())
       stretchable.push_back(tmp);
     else
-      height += tmp->height() + _bevel_width;
+      height += tmp->_rect.height() + _bevel_width;
 
-    if (tmp->width() > widest)
-      widest = tmp->width();
+    if (tmp->_rect.width() > widest)
+      widest = tmp->_rect.width();
   }
 
   if (stretchable.size() > 0) {
     WidgetList::iterator str_it = stretchable.begin(),
       str_end = stretchable.end();
 
-    int str_height = Surface::height() - height / stretchable.size();
+    int str_height = _rect.height() - height / stretchable.size();
 
     for (; str_it != str_end; ++str_it)
       (*str_it)->setHeight(str_height > _bevel_width ?
@@ -382,10 +378,10 @@ void Widget::adjustVert(void)
     int x, y;
 
     if (prev_widget)
-      y = prev_widget->_pos.y() + prev_widget->height() + _bevel_width;
+      y = prev_widget->_rect.y() + prev_widget->_rect.height() + _bevel_width;
     else
-      y = _pos.y() + _bevel_width;
-    x = (widest - tmp->width()) / 2 + _bevel_width;
+      y = _rect.y() + _bevel_width;
+    x = (widest - tmp->_rect.width()) / 2 + _bevel_width;
 
     tmp->move(x, y);
 
@@ -417,9 +413,9 @@ void Widget::internalResize(int w, int h)
   if (! _fixed_width && ! _fixed_height)
     resize(w, h);
   else if (! _fixed_width)
-    resize(w, height());
+    resize(w, _rect.height());
   else if (! _fixed_height)
-    resize(width(), h);
+    resize(_rect.width(), h);
 }
 
 void Widget::addChild(Widget *child, bool front)
@@ -477,10 +473,9 @@ void Widget::configureHandler(const XConfigureEvent &e)
   if (_ignore_config) {
     _ignore_config--;
   } else {
-    if (!(e.width == width() && e.height == height())) {
+    if (!(e.width == _rect.width() && e.height == _rect.height())) {
       _dirty = true;
-      _pos.setPoint(e.x, e.y);
-      setSize(e.width, e.height);
+      _rect.setSize(e.width, e.height);
     }
     update();
   }

@@ -49,7 +49,7 @@ void FocusWidget::unfocus(void)
   update();
 }
 
-void FocusWidget::setTexture(Texture *texture)
+void FocusWidget::setTexture(RenderTexture *texture)
 {
   Widget::setTexture(texture);
   _focus_texture = texture;

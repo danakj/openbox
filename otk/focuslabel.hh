@@ -16,7 +16,7 @@ public:
   inline const ustring &getText(void) const { return _text; }
   void setText(const ustring &text) { _text = text; _dirty = true; }
 
-  void update(void);
+  void renderForeground(void);
 
   virtual void setStyle(Style *style);
   

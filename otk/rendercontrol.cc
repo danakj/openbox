@@ -60,13 +60,12 @@ RenderControl::~RenderControl()
 
 }
 
-void RenderControl::drawString(Surface *sf, const Font &font, int x, int y,
+void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,
 			       const Color &color, const ustring &string) const
 {
-  assert(sf);
-  assert(sf->_screen == _screen);
-  XftDraw *d = sf->_xftdraw;
-  assert(d);
+  assert(sf._screen == _screen);
+  XftDraw *d = sf._xftdraw;
+  assert(d); // this means that the background hasn't been rendered yet!
   
   if (font._shadow) {
     XftColor c;

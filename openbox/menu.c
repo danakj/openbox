@@ -436,7 +436,7 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    != self->parent->open_submenu)
 	    menu_hide(self->parent->open_submenu);
 	
-	if (self->submenu) {
+	if (self->submenu && self->parent->open_submenu != self->submenu) {
 	    self->parent->open_submenu = self->submenu;
 
 	    /* shouldn't be invalid since it must be displayed */

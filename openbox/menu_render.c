@@ -7,15 +7,12 @@
 void menu_render_full(Menu *self);
 
 void menu_render(Menu *self) {
-    if (self->invalid) {
-	if (self->update) {
-	    self->update(self);
-	} else {
-	    menu_render_full(self);
-	}
+    if (self->update) {
+        self->update(self);
+    } else if (self->invalid) {
+        menu_render_full(self);
     }
 }
-	    
 
 void menu_render_full(Menu *self) {
     GList *it;

@@ -118,7 +118,7 @@ public:
 
 #if defined(SHAPE) || defined(DOXYGEN_IGNORE)
   //! Called when a shape extention event fires
-  virtual void shapeHandler(const XShapeEvent &) {};
+  virtual void shapeHandler(const XShapeEvent &) {}
 #endif // SHAPE 
 
   virtual ~OtkEventHandler();

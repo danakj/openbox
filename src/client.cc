@@ -23,9 +23,13 @@ extern "C" {
 namespace ob {
 
 OBClient::OBClient(int screen, Window window)
-  : _screen(screen), _window(window)
+  : otk::OtkEventHandler(),
+    _screen(screen), _window(window)
 {
+  assert(screen >= 0);
   assert(window);
+
+  Openbox::instance->registerHandler(_window, this);
 
   ignore_unmaps = 0;
   
@@ -494,8 +498,10 @@ void OBClient::updateClass()
 }
 
 
-void OBClient::update(const XPropertyEvent &e)
+void OBClient::propertyHandler(const XPropertyEvent &e)
 {
+  otk::OtkEventHandler::propertyHandler(e);
+  
   const otk::OBProperty *property = Openbox::instance->property();
 
   if (e.atom == XA_WM_NORMAL_HINTS)
@@ -642,8 +648,10 @@ void OBClient::setState(StateAction action, long data1, long data2)
 }
 
 
-void OBClient::update(const XClientMessageEvent &e)
+void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 {
+  otk::OtkEventHandler::clientMessageHandler(e);
+  
   if (e.format != 32) return;
 
   const otk::OBProperty *property = Openbox::instance->property();
@@ -659,8 +667,10 @@ void OBClient::update(const XClientMessageEvent &e)
 
 
 #if defined(SHAPE) || defined(DOXYGEN_IGNORE)
-void OBClient::update(const XShapeEvent &e)
+void OBClient::shapeHandler(const XShapeEvent &e)
 {
+  otk::OtkEventHandler::shapeHandler(e);
+  
   _shaped = e.shaped;
 }
 #endif

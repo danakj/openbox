@@ -19,6 +19,7 @@ extern "C" {
 
 #include "otk/strut.hh"
 #include "otk/rect.hh"
+#include "otk/eventhandler.hh"
 
 namespace ob {
 
@@ -36,7 +37,7 @@ class OBFrame;
   class' member variables and call whatever is nessary to complete the
   change (such as causing a redraw of the titlebar after the title is changed).
 */
-class OBClient {
+class OBClient : public otk::OtkEventHandler {
 public:
 
   //! The frame window which decorates around the client window
@@ -433,16 +434,12 @@ public:
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
 
-  //! Updates the OBClient class from a property change XEvent
-  void update(const XPropertyEvent &e);
-  //! Processes a client message XEvent for the window and causes an action
-  //! or whatever was specified to occur
-  void update(const XClientMessageEvent &e);
-#if defined(SHAPE) || defined(DOXYGEN_IGNORE)
-  //! Updates the client's shape status
-  void update(const XShapeEvent &e);
-#endif
+  virtual void propertyHandler(const XPropertyEvent &);
 
+  virtual void clientMessageHandler(const XClientMessageEvent &);
+
+  virtual void shapeHandler(const XShapeEvent &);
+  
   //! Changes the stored positions and size of the OBClient window
   /*!
     This does not actually change the physical geometry, that needs to be done

@@ -188,6 +188,8 @@ public:
     manager can be destroyed.
   */
   inline void shutdown() { _doshutdown = true; }
+
+  virtual void mapRequestHandler(const XMapRequestEvent &);
 };
 
 }

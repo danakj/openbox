@@ -76,11 +76,13 @@ public:
   void handleKeypress(const XEvent &e);
   void updateEverything();
 
-  void cycleWindow(const bool forward, const bool allscreens = false,
+  void cycleWindow(const bool forward, const int increment,
+                   const bool allscreens = false,
                    const bool alldesktops = false,
                    const bool sameclass = false,
                    const std::string &classname = "") const;
-  void cycleWorkspace(const bool forward, const bool loop = true) const;
+  void cycleWorkspace(const bool forward, const int increment,
+                      const bool loop = true) const;
   void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;
   void execCommand(const std::string &cmd) const;

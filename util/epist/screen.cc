@@ -166,51 +166,56 @@ void screen::handleKeypress(const XEvent &e) {
     return;
 
   case Action::nextWorkspace:
-    cycleWorkspace(true);
+    cycleWorkspace(true, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::prevWorkspace:
-    cycleWorkspace(false);
+    cycleWorkspace(false, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::nextWindow:
-    cycleWindow(true);
+    
+    cycleWindow(true, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::prevWindow:
-    cycleWindow(false);
+    cycleWindow(false, it->number() != 0 ? it->number(): 1);
     return;
 
   case Action::nextWindowOnAllWorkspaces:
-    cycleWindow(true, false, true);
+    cycleWindow(true, it->number() != 0 ? it->number(): 1,  false, true);
     return;
 
   case Action::prevWindowOnAllWorkspaces:
-    cycleWindow(false, false, true);
+    cycleWindow(false, it->number() != 0 ? it->number(): 1, false, true);
     return;
 
   case Action::nextWindowOnAllScreens:
-    cycleWindow(true, true);
+    cycleWindow(true, it->number() != 0 ? it->number(): 1, true);
     return;
 
   case Action::prevWindowOnAllScreens:
-    cycleWindow(false, true);
+    cycleWindow(false, it->number() != 0 ? it->number(): 1, true);
     return;
 
   case Action::nextWindowOfClass:
-    cycleWindow(true, false, false, true, it->string());
+    cycleWindow(true, it->number() != 0 ? it->number(): 1,
+                false, false, true, it->string());
     return;
 
   case Action::prevWindowOfClass:
-    cycleWindow(false, false, false, true, it->string());
+    cycleWindow(false, it->number() != 0 ? it->number(): 1,
+                false, false, true, it->string());
     return;
       
   case Action::nextWindowOfClassOnAllWorkspaces:
-    cycleWindow(true, false, true, true, it->string());
+    cycleWindow(true, it->number() != 0 ? it->number(): 1,
+                false, true, true, it->string());
     return;
       
   case Action::prevWindowOfClassOnAllWorkspaces:
-    cycleWindow(false, false, true, true, it->string());
+    cycleWindow(false, it->number() != 0 ? it->number(): 1,
+                false, true, true, it->string());
     return;
 
   case Action::changeWorkspace:
@@ -466,13 +471,13 @@ void screen::execCommand(const string &cmd) const {
 }
 
 
-void screen::cycleWindow(const bool forward, const bool allscreens,
-                         const bool alldesktops, const bool sameclass,
-                         const string &cn) const {
+void screen::cycleWindow(const bool forward, const int increment,
+                         const bool allscreens, const bool alldesktops,
+                         const bool sameclass, const string &cn) const {
   assert(_managed);
 
   if (_clients.empty()) return;
-  
+
   string classname(cn);
   if (sameclass && classname.empty() && _active != _clients.end())
     classname = (*_active)->appClass();
@@ -480,60 +485,70 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
   WindowList::const_iterator target = _active,
     begin = _clients.begin(),
     end = _clients.end();
- 
-  while (1) {
-    if (forward) {
-      if (target == end) {
-        target = begin;
+
+  const XWindow *t;
+  
+  for (int x = 0; x < increment; ++x) {
+    while (1) {
+      if (forward) {
+        if (target == end) {
+          target = begin;
+        } else {
+          ++target;
+        }
       } else {
-        ++target;
+        if (target == begin)
+          target = end;
+        for (int x = 0; x < increment; ++x)
+          --target;
       }
-    } else {
-      if (target == begin)
-        target = end;
-      --target;
+
+      // must be no window to focus
+      if (target == _active)
+        return;
+
+      // start back at the beginning of the loop
+      if (target == end)
+        continue;
+
+      // determine if this window is invalid for cycling to
+      t = *target;
+      if (t->iconic()) continue;
+      if (! allscreens && t->getScreen() != this) continue;
+      if (! alldesktops && ! (t->desktop() == _active_desktop ||
+                              t->desktop() == 0xffffffff)) continue;
+      if (sameclass && ! classname.empty() &&
+          t->appClass() != classname) continue;
+      if (! t->canFocus()) continue;
+
+      // found a good window so break out of the while, and perhaps continue
+      // with the for loop
+      break;
     }
-
-    // must be no window to focus
-    if (target == _active)
-      return;
-
-    // start back at the beginning of the loop
-    if (target == end)
-      continue;
-
-    // determine if this window is invalid for cycling to
-    const XWindow *t = *target;
-    if (t->iconic()) continue;
-    if (! allscreens && t->getScreen() != this) continue;
-    if (! alldesktops && ! (t->desktop() == _active_desktop ||
-                            t->desktop() == 0xffffffff)) continue;
-    if (sameclass && ! classname.empty() &&
-        t->appClass() != classname) continue;
-    if (! t->canFocus()) continue;
-
-    // found a good window!
-    t->focus();
-    return;
   }
+
+  // phew. we found the window, so focus it.
+  t->focus();
 }
 
 
-void screen::cycleWorkspace(const bool forward, const bool loop) const {
+void screen::cycleWorkspace(const bool forward, const int increment, const bool loop) const {
   assert(_managed);
 
   unsigned int destination = _active_desktop;
 
-  if (forward) {
-    if (destination < _num_desktops - 1)
-      ++destination;
-    else if (loop)
-      destination = 0;
-  } else {
-    if (destination > 0)
-      --destination;
-    else if (loop)
-      destination = _num_desktops - 1;
+  for (int x = 0; x < increment; ++x) {
+    if (forward) {
+      if (destination < _num_desktops - 1)
+        ++destination;
+      else if (loop)
+        destination = 0;
+    } else {
+      if (destination > 0)
+        --destination;
+      else if (loop)
+        destination = _num_desktops - 1;
+    }
   }
 
   if (destination != _active_desktop) 

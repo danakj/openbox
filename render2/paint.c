@@ -51,12 +51,14 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
         if (RrSurfaceX(child) < x+w &&
             RrSurfaceX(child) + RrSurfaceWidth(child) > x &&
             RrSurfaceY(child) < y+h &&
-            RrSurfaceY(child) + RrSurfaceHeight(child))
+            RrSurfaceY(child) + RrSurfaceHeight(child) > y)
             RrPaintArea(child,
                         MAX(0, x-RrSurfaceX(child)),
                         MAX(0, y-RrSurfaceY(child)),
-                        MIN(RrSurfaceWidth(child), w-(x-RrSurfaceX(child))),
-                        MIN(RrSurfaceHeight(child), h-(y-RrSurfaceY(child))));
+                        MIN(RrSurfaceWidth(child),
+                            w - MAX(0, (RrSurfaceX(child)-x))),
+                        MIN(RrSurfaceHeight(child),
+                            h - MAX(0, (RrSurfaceY(child)-y))));
     }
 
     if (!RrSurfaceVisible(sur)) return;

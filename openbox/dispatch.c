@@ -8,6 +8,7 @@ typedef struct {
     void *data;
 } Func;
 
+/* an array of GSList*s of Func*s */
 static GSList **funcs;
 
 void dispatch_startup()

@@ -5,8 +5,10 @@
 #include "dispatch.h"
 
 #include <X11/Xlib.h>
+#include <glib.h>
 
 Client *focus_client = NULL;
+GList **focus_order = NULL;
 
 Window focus_backup = None;
 
@@ -14,6 +16,8 @@ void focus_set_client(Client *client);
 
 void focus_startup()
 {
+    guint i;
+
     /* create the window which gets focus when no clients get it. Have to
        make it override-redirect so we don't try manage it, since it is
        mapped. */
@@ -25,14 +29,31 @@ void focus_startup()
 				 CopyFromParent, CWOverrideRedirect, &attrib);
     XMapRaised(ob_display, focus_backup);
 
+    focus_order = g_new(GList*, screen_num_desktops);
+    for (i = 0; i < screen_num_desktops; ++i)
+        focus_order[i] = NULL;
+
     /* start with nothing focused */
     focus_set_client(NULL);
+}
+
+void focus_shutdown()
+{
+    guint i;
+
+    for (i = 0; i < screen_num_desktops; ++i)
+        g_list_free(focus_order[i]);
+    g_free(focus_order);
+
+    /* reset focus to root */
+    XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
 }
 
 void focus_set_client(Client *client)
 {
     Window active;
     Client *old;
+    guint desktop;
 
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
@@ -46,6 +67,14 @@ void focus_set_client(Client *client)
 
     old = focus_client;
     focus_client = client;
+
+    /* move to the top of the list */
+    if (client != NULL) {
+        desktop = client->desktop;
+        if (desktop == DESKTOP_ALL) desktop = screen_desktop;
+        focus_order[desktop] = g_list_remove(focus_order[desktop], client);
+        focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
+    }
 
     /* set the NET_ACTIVE_WINDOW hint */
     active = client ? client->window : None;

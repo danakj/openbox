@@ -20,9 +20,10 @@ typedef enum {
     Event_Client_New      = 1 << 8, /* new window, before mapping */
     Event_Client_Mapped   = 1 << 9, /* new window, after mapping */
     Event_Client_Destroy  = 1 << 10, /* unmanaged */
-    Event_Client_Focus    = 1 << 11, /* focused */
-    Event_Client_Unfocus  = 1 << 12, /* unfocused */
-    Event_Client_Urgent   = 1 << 13, /* entered/left urgent state */
+    Event_Client_Unmapped = 1 << 11, /* unmanaged, after unmapping */
+    Event_Client_Focus    = 1 << 12, /* focused */
+    Event_Client_Unfocus  = 1 << 13, /* unfocused */
+    Event_Client_Urgent   = 1 << 14, /* entered/left urgent state */
     Event_Client_Desktop  = 1 << 15, /* moved to a new desktop */
 
     Event_Ob_Desktop      = 1 << 16, /* changed desktops */

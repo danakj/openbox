@@ -160,6 +160,7 @@ int main(int argc, char **argv)
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
         grab_shutdown();
 	client_shutdown();
+	focus_shutdown();
 	screen_shutdown();
 	event_shutdown();
 	engine_shutdown();
@@ -168,8 +169,6 @@ int main(int argc, char **argv)
 	timer_shutdown();
     }
 
-    /* reset focus to root before exiting */
-    XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
     XCloseDisplay(ob_display);
 
     dispatch_shutdown();

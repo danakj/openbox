@@ -214,6 +214,7 @@ void client_unmanage_all()
 
 void client_unmanage(Client *client)
 {
+    guint i;
     int j;
     GSList *it;
 
@@ -242,6 +243,15 @@ void client_unmanage(Client *client)
     stacking_list = g_list_remove(stacking_list, client);
     g_hash_table_remove(client_map, (gpointer)client->window);
 
+    /* update the focus lists */
+    if (client->desktop == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            focus_order[i] = g_list_remove(focus_order[i], client);
+    } else {
+        i = client->desktop;
+        focus_order[i] = g_list_remove(focus_order[i], client);
+    }
+
     /* once the client is out of the list, update the struts to remove it's
        influence */
     screen_update_struts();
@@ -257,7 +267,7 @@ void client_unmanage(Client *client)
 	client_calc_layer(it->data);
     }
 
-    /* unfocus the client (calls the focus callbacks) (we're out of the
+    /* unfocus the client (dispatchs the focus event) (we're out of the
      transient lists already, so being modal doesn't matter) */
     if (client->focused)
 	client_unfocus(client);
@@ -1622,7 +1632,7 @@ void client_close(Client *self)
 
 void client_set_desktop(Client *self, guint target)
 {
-    guint old;
+    guint old, i;
 
     if (target == self->desktop) return;
   
@@ -1638,6 +1648,20 @@ void client_set_desktop(Client *self, guint target)
     /* 'move' the window to the new desktop */
     client_showhide(self);
     screen_update_struts();
+
+    /* update the focus lists */
+    if (old == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            focus_order[i] = g_list_remove(focus_order[i], self);
+    } else {
+        focus_order[old] = g_list_remove(focus_order[old], self);
+    }
+    if (target == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            focus_order[i] = g_list_prepend(focus_order[i], self);
+    } else {
+        focus_order[target] = g_list_prepend(focus_order[target], self);
+    }
 
     dispatch_client(Event_Client_Desktop, self, target, old);
 }

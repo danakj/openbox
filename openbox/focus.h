@@ -2,6 +2,7 @@
 #define __focus_h
 
 #include <X11/Xlib.h>
+#include <glib.h>
 
 struct Client;
 
@@ -11,7 +12,11 @@ extern Window focus_backup;
 /*! The client which is currently focused */
 extern struct Client *focus_client;
 
+/*! The recent focus order on each desktop */
+extern GList **focus_order;
+
 void focus_startup();
+void focus_shutdown();
 
 /*! Specify which client is currently focused, this doesn't actually
   send focus anywhere, its called by the Focus event handlers */

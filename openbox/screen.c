@@ -195,7 +195,7 @@ void screen_resize()
 
 void screen_set_num_desktops(guint num)
 {
-    guint old;
+    guint i, old;
     gulong *viewport;
      
     g_assert(num > 0);
@@ -236,6 +236,16 @@ void screen_set_num_desktops(guint num)
 
     /* may be some unnamed desktops that we need to fill in with names */
     screen_update_desktop_names();
+
+    /* update the focus lists */
+    /* free our lists for the desktops which have disappeared */
+    for (i = num; i < old; ++i)
+        g_list_free(focus_order[i]);
+    /* realloc the array */
+    focus_order = g_renew(GList*, focus_order, num);
+    /* set the new lists to be empty */
+    for (i = old; i < num; ++i)
+        focus_order[i] = NULL;
 
     dispatch_ob(Event_Ob_NumDesktops, num, old);
 

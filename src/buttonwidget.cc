@@ -113,6 +113,7 @@ void ButtonWidget::renderForeground()
       assert(false); // there's no other button widgets!
     }
 
+    assert(pm->mask);
     if (pm->mask == None) return; // no mask for the button, leave it empty
 
     width = _rect.width();
@@ -121,14 +122,13 @@ void ButtonWidget::renderForeground()
                                _style->buttonUnfocusColor());
 
     // set the clip region
+    int x = (width - pm->w) / 2, y = (width - pm->h) / 2;
     XSetClipMask(**otk::display, color->gc(), pm->mask);
-    XSetClipOrigin(**otk::display, color->gc(),
-                   (width - pm->w)/2, (width - pm->h)/2);
+    XSetClipOrigin(**otk::display, color->gc(), x, y);
 
     // fill in the clipped region
-    XFillRectangle(**otk::display, _window, color->gc(),
-                   (width - pm->w)/2, (width - pm->h)/2,
-                   (width + pm->w)/2, (width + pm->h)/2);
+    XFillRectangle(**otk::display, _surface->pixmap(), color->gc(), x, y,
+                   x + pm->w, y + pm->h);
 
     // unset the clip region
     XSetClipMask(**otk::display, color->gc(), None);

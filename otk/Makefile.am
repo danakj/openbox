@@ -1,4 +1,4 @@
-CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@
+CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@
 
 INCLUDES= -I../src
 

@@ -10,104 +10,103 @@ namespace otk {
 class OtkEventHandler{
 public:
   //! Dispatches events to one of the other handlers based on their type.
-  virtual int handle(const XEvent &e);
+  virtual void handle(const XEvent &e);
 
   //! Called whenever any key is pressed.
-  virtual int keyPressHandler(const XKeyEvent &) {return 1;}
+  virtual void keyPressHandler(const XKeyEvent &) {}
 
   //! Called whenever any key is released.
-  virtual int keyReleaseHandler(const XKeyEvent &) {return 1;}
+  virtual void keyReleaseHandler(const XKeyEvent &) {}
 
   //! Called whenever a button of the pointer is pressed.
-  virtual int buttonPressHandler(const XButtonEvent &) {return 1;}
+  virtual void buttonPressHandler(const XButtonEvent &) {}
 
   //! Called whenever a button of the pointer is released.
-  virtual int buttonReleaseHandler(const XButtonEvent &) {return 1;}
+  virtual void buttonReleaseHandler(const XButtonEvent &) {}
 
   //! Called whenever the pointer enters a window.
-  virtual int enterHandler(const XCrossingEvent &) {return 1;}
+  virtual void enterHandler(const XCrossingEvent &) {}
 
   //! Called whenever the pointer leaves a window.
-  virtual int leaveHandler(const XCrossingEvent &) {return 1;}
+  virtual void leaveHandler(const XCrossingEvent &) {}
 
   //! Called when a window gains focus.
-  virtual int focusHandler(const XFocusChangeEvent &) {return 1;}
+  virtual void focusHandler(const XFocusChangeEvent &) {}
 
   //! Called when a window looses focus.
-  virtual int unfocusHandler(const XFocusChangeEvent &) {return 1;}
+  virtual void unfocusHandler(const XFocusChangeEvent &) {}
 
   //! Called when a window becomes visible to the user.
-  virtual int exposeHandler(const XExposeEvent &) {return 1;}
+  virtual void exposeHandler(const XExposeEvent &) {}
 
   //! Called to handle GraphicsExpose events.
-  virtual int graphicsExposeHandler(const XGraphicsExposeEvent &) {return 1;}
+  virtual void graphicsExposeHandler(const XGraphicsExposeEvent &) {}
 
   //! Called to handle NoExpose events.
-  virtual int noExposeEventHandler(const XNoExposeEvent &) {return 1;}
+  virtual void noExposeEventHandler(const XNoExposeEvent &) {}
 
   //! Called when the window requests a change in its z-order.
-  virtual int circulateRequestHandler(const XCirculateRequestEvent &)
-  {return 1;}
+  virtual void circulateRequestHandler(const XCirculateRequestEvent &)
+  {}
 
   //! Called when a different client initiates a configure window request.
-  virtual int configureRequestHandler(const XConfigureRequestEvent &)
-  {return 1;}
+  virtual void configureRequestHandler(const XConfigureRequestEvent &)
+  {}
 
   //! Called when a different client tries to map a window.
-  virtual int mapRequestHandler(const XMapRequestEvent &) {return 1;}
+  virtual void mapRequestHandler(const XMapRequestEvent &) {}
 
   //! Called when another client attemps to change the size of a window.
-  virtual int resizeRequestHandler(const XResizeRequestEvent &) {return 1;}
+  virtual void resizeRequestHandler(const XResizeRequestEvent &) {}
 
   //! Called when the z-order of the window has changed.
-  virtual int circulateHandler(const XCirculateEvent &) {return 1;}
+  virtual void circulateHandler(const XCirculateEvent &) {}
 
   //! Called when the window as been reconfigured.
-  virtual int configureHandler(const XConfigureEvent &) {return 1;}
+  virtual void configureHandler(const XConfigureEvent &) {}
 
   //! Called when a window is created.
-  virtual int createHandler(const XCreateWindowEvent &) {return 1;}
+  virtual void createHandler(const XCreateWindowEvent &) {}
 
   //! Called when a window is destroyed.
-  virtual int destroyHandler(const XDestroyWindowEvent &) {return 1;}
+  virtual void destroyHandler(const XDestroyWindowEvent &) {}
 
   //! Called when a window is moved because of a change in the size of its 
   //! parent.
-  virtual int gravityHandler(const XGravityEvent &) {return 1;}
+  virtual void gravityHandler(const XGravityEvent &) {}
 
   //! Called when a window is mapped.
-  virtual int mapHandler(const XMapEvent &) {return 1;}
+  virtual void mapHandler(const XMapEvent &) {}
 
   //! Called when the server generats a MappingNotify event
-  virtual int mappingHandler(const XMappingEvent &) {return 1;}
+  virtual void mappingHandler(const XMappingEvent &) {}
 
   //! Called when a window is reparented
-  virtual int reparentHandler(const XReparentEvent &) {return 1;}
+  virtual void reparentHandler(const XReparentEvent &) {}
 
   //! Called when a window is unmapped
-  virtual int unmapHandler(const XUnmapEvent &) {return 1;}
+  virtual void unmapHandler(const XUnmapEvent &) {}
 
   //! Called when a the visibilty of a window changes
-  virtual int visibilityHandler(const XVisibilityEvent &) {return 1;}
+  virtual void visibilityHandler(const XVisibilityEvent &) {}
 
   //! Called when the colormap changes, or is installed or unistalled
-  virtual int colorMapHandler(const XColormapEvent &) {return 1;}
+  virtual void colorMapHandler(const XColormapEvent &) {}
 
   //! Called when a client calls XSendEvent
-  virtual int clientMessageHandler(const XClientMessageEvent &) {return 1;}
+  virtual void clientMessageHandler(const XClientMessageEvent &) {}
 
   //! Called when a property of a window changes
-  virtual int propertyHandler(const XPropertyEvent &) {return 1;}
+  virtual void propertyHandler(const XPropertyEvent &) {}
 
   //! Called when the client loses ownership of a selection
-  virtual int selectionClearHandler(const XSelectionClearEvent &) {return 1;}
+  virtual void selectionClearHandler(const XSelectionClearEvent &) {}
 
   //! Called when a ConvertSelection protocol request is sent
-  virtual int selectionHandler(const XSelectionEvent &) {return 1;}
+  virtual void selectionHandler(const XSelectionEvent &) {}
 
   //! Called when a SelectionEvent occurs
-  virtual int selectionRequestHandler(const XSelectionRequestEvent &)
-  {return 1;}
+  virtual void selectionRequestHandler(const XSelectionRequestEvent &) {}
 
   virtual ~OtkEventHandler();
 

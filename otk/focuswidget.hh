@@ -11,10 +11,6 @@ class OtkFocusWidget : public OtkWidget {
 public:
 
   OtkFocusWidget(OtkWidget *parent, Direction = Horizontal);
-  OtkFocusWidget(OtkApplication *app, Direction direction = Horizontal,
-                 Cursor cursor = 0, int bevel_width = 1);
-  OtkFocusWidget(Style *style, Direction direction = Horizontal,
-                 Cursor cursor = 0, int bevel_width = 1);
   virtual ~OtkFocusWidget();
 
   virtual void focus(void);

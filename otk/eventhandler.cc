@@ -13,7 +13,7 @@ OtkEventHandler::~OtkEventHandler()
 }
 
 
-int OtkEventHandler::handle(const XEvent &e)
+void OtkEventHandler::handle(const XEvent &e)
 {
   switch(e.type){
   case KeyPress:
@@ -79,7 +79,6 @@ int OtkEventHandler::handle(const XEvent &e)
   case SelectionRequest:
     return selectionRequestHandler(e.xselectionrequest);
   };
-  return 0;
 }
 
 }

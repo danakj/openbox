@@ -9,7 +9,7 @@ libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc \
-                  label.cc focuslabel.cc application.cc
+                  label.cc focuslabel.cc application.cc appwidget.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -20,26 +20,51 @@ otk_test: libotk.a otk_test.cc
 	$(CXX) $(CPPFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
 
 # local dependencies
-button.o: button.cc button.hh focuswidget.hh widget.hh rect.hh \
- point.hh texture.hh color.hh util.hh style.hh font.hh image.hh \
- screeninfo.hh timer.hh configuration.hh
+application.o: application.cc application.hh eventdispatcher.hh \
+ eventhandler.hh display.hh configuration.hh timerqueuemanager.hh \
+ timerqueue.hh timer.hh image.hh color.hh screeninfo.hh rect.hh \
+ point.hh style.hh font.hh texture.hh util.hh widget.hh
+appwidget.o: appwidget.cc appwidget.hh widget.hh rect.hh point.hh \
+ texture.hh color.hh util.hh style.hh font.hh image.hh screeninfo.hh \
+ timer.hh configuration.hh eventdispatcher.hh eventhandler.hh \
+ application.hh display.hh timerqueuemanager.hh timerqueue.hh
+button.o: button.cc button.hh focuslabel.hh focuswidget.hh widget.hh \
+ rect.hh point.hh texture.hh color.hh util.hh style.hh font.hh \
+ image.hh screeninfo.hh timer.hh configuration.hh eventdispatcher.hh \
+ eventhandler.hh application.hh display.hh timerqueuemanager.hh \
+ timerqueue.hh
 color.o: color.cc color.hh display.hh screeninfo.hh rect.hh point.hh
 configuration.o: configuration.cc configuration.hh util.hh
+eventdispatcher.o: eventdispatcher.cc eventdispatcher.hh \
+ eventhandler.hh display.hh
+eventhandler.o: eventhandler.cc eventhandler.hh
+focuslabel.o: focuslabel.cc focuslabel.hh focuswidget.hh widget.hh \
+ rect.hh point.hh texture.hh color.hh util.hh style.hh font.hh \
+ image.hh screeninfo.hh timer.hh configuration.hh eventdispatcher.hh \
+ eventhandler.hh application.hh display.hh timerqueuemanager.hh \
+ timerqueue.hh
 focuswidget.o: focuswidget.cc focuswidget.hh widget.hh rect.hh \
  point.hh texture.hh color.hh util.hh style.hh font.hh image.hh \
- screeninfo.hh timer.hh configuration.hh
-font.o: font.cc font.hh util.hh display.hh display.hh color.hh \
- screeninfo.hh rect.hh point.hh
+ screeninfo.hh timer.hh configuration.hh eventdispatcher.hh \
+ eventhandler.hh application.hh display.hh timerqueuemanager.hh \
+ timerqueue.hh
+font.o: font.cc font.hh util.hh display.hh color.hh screeninfo.hh \
+ rect.hh point.hh
 gccache.o: gccache.cc gccache.hh display.hh color.hh assassin.hh \
  screeninfo.hh rect.hh point.hh
 image.o: image.cc display.hh gccache.hh color.hh image.hh \
  screeninfo.hh rect.hh point.hh timer.hh texture.hh util.hh
 imagecontrol.o: imagecontrol.cc display.hh color.hh image.hh \
  screeninfo.hh rect.hh point.hh timer.hh texture.hh util.hh
-otk_test.o: otk_test.cc focuswidget.hh widget.hh rect.hh point.hh \
- texture.hh color.hh util.hh style.hh font.hh image.hh screeninfo.hh \
- timer.hh configuration.hh button.hh display.hh timerqueuemanager.hh \
- timerqueue.hh
+label.o: label.cc label.hh widget.hh rect.hh point.hh texture.hh \
+ color.hh util.hh style.hh font.hh image.hh screeninfo.hh timer.hh \
+ configuration.hh eventdispatcher.hh eventhandler.hh application.hh \
+ display.hh timerqueuemanager.hh timerqueue.hh
+otk_test.o: otk_test.cc application.hh eventdispatcher.hh \
+ eventhandler.hh display.hh configuration.hh timerqueuemanager.hh \
+ timerqueue.hh timer.hh image.hh color.hh screeninfo.hh rect.hh \
+ point.hh style.hh font.hh texture.hh util.hh focuswidget.hh widget.hh \
+ appwidget.hh button.hh focuslabel.hh
 property.o: property.cc property.hh screeninfo.hh rect.hh point.hh \
  display.hh
 rect.o: rect.cc rect.hh point.hh
@@ -56,7 +81,5 @@ timerqueuemanager.o: timerqueuemanager.cc timerqueuemanager.hh \
 util.o: util.cc util.hh
 widget.o: widget.cc widget.hh rect.hh point.hh texture.hh color.hh \
  util.hh style.hh font.hh image.hh screeninfo.hh timer.hh \
- configuration.hh display.hh assassin.hh
-eventhandler.o: eventhandler.cc eventhandler.hh
-eventdispatcher.o: eventdispatcher.cc eventdispatcher.hh
-application.o: application.cc application.hh
+ configuration.hh eventdispatcher.hh eventhandler.hh application.hh \
+ display.hh timerqueuemanager.hh timerqueue.hh assassin.hh

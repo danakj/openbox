@@ -51,18 +51,18 @@ void OtkButton::setUnfocusTexture(BTexture *texture)
   _unpr_unfocus_tx = texture;
 }
 
-int OtkButton::buttonPressHandler(const XButtonEvent &e)
+void OtkButton::buttonPressHandler(const XButtonEvent &e)
 {
   press(e.button);
   update();
-  return OtkFocusWidget::buttonPressHandler(e);
+  OtkFocusWidget::buttonPressHandler(e);
 }
 
-int OtkButton::buttonReleaseHandler(const XButtonEvent &e)
+void OtkButton::buttonReleaseHandler(const XButtonEvent &e)
 {
   release(e.button);
   update();
-  return OtkFocusWidget::buttonReleaseHandler(e);
+  OtkFocusWidget::buttonReleaseHandler(e);
 }
 
 }

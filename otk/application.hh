@@ -10,7 +10,7 @@
 
 namespace otk {
 
-class OtkWidget;
+class OtkAppWidget;
 
 class OtkApplication : public OtkEventDispatcher {
 
@@ -28,20 +28,18 @@ public:
   inline Style *getStyle(void) const { return _style; }
   // more accessors
 
-protected:
-  bool setMainWidget(const OtkWidget *main_widget);
-
 private:
   void loadStyle(void);
 
-  const OtkWidget *_main_widget;
   OBTimerQueueManager *_timer_manager;
   BImageControl *_img_ctrl;
   Configuration *_style_conf;
   Style *_style;
   bool _dockable;
 
-  friend class OtkWidget; // for access to setMainWidget
+  int _appwidget_count;
+
+  friend class OtkAppWidget;
 };
 
 }

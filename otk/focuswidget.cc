@@ -8,20 +8,6 @@ OtkFocusWidget::OtkFocusWidget(OtkWidget *parent, Direction direction)
   _focus_texture = parent->getTexture();
 }
 
-OtkFocusWidget::OtkFocusWidget(OtkApplication *app, Direction direction,
-                               Cursor cursor, int bevel_width)
-  : OtkWidget(app, direction, cursor, bevel_width),
-    _unfocus_texture(0), _focused(true)
-{
-}
-
-OtkFocusWidget::OtkFocusWidget(Style *style, Direction direction,
-                               Cursor cursor, int bevel_width)
-  : OtkWidget(style, direction, cursor, bevel_width),
-    _unfocus_texture(0), _focused(true)
-{
-}
-
 OtkFocusWidget::~OtkFocusWidget()
 {
 }

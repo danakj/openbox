@@ -3,8 +3,6 @@
 #include "widget.hh"
 
 extern "C" {
-#include <X11/Xlib.h>
-  
 #ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
@@ -15,13 +13,16 @@ extern "C" {
 namespace otk {
 
 OtkApplication::OtkApplication(int argc, char **argv)
-  : OtkEventDispatcher(), _main_widget(0), _dockable(false)
+  : OtkEventDispatcher(),
+    _dockable(false),
+    _appwidget_count(0)
 {
   argc = argc;
   argv = argv;
 
   OBDisplay::initialize(0);
-  const ScreenInfo *s_info = OBDisplay::screenInfo(DefaultScreen(OBDisplay::display));
+  const ScreenInfo *s_info =
+    OBDisplay::screenInfo(DefaultScreen(OBDisplay::display));
 
   _timer_manager = new OBTimerQueueManager();
   _img_ctrl = new BImageControl(_timer_manager, s_info, True, 4, 5, 200);
@@ -55,36 +56,17 @@ void OtkApplication::loadStyle(void)
 
 void OtkApplication::exec(void)
 {
-  if (!_main_widget) {
-    std::cerr << "ERROR: No main widget set. You must create a main " <<
-      "OtkWidget for the OtkApplication before calling " <<
+  if (_appwidget_count <= 0) {
+    std::cerr << "ERROR: No main widgets exist. You must create and show() " <<
+      "an OtkAppWidget for the OtkApplication before calling " <<
       "OtkApplication::exec().\n";
     ::exit(1);
   }
-  while (1) {
+
+  while (_appwidget_count > 0) {
     dispatchEvents();
     _timer_manager->fire(); // fire pending events
   }
-}
-
-bool OtkApplication::setMainWidget(const OtkWidget *main_widget)
-{
-  // ignore it if it has already been set
-  if (_main_widget) {
-    std::cerr << "WARNING: More than one main OtkWidget being created for " <<
-      "the OtkApplication!\n";
-    return false;
-  }
-
-  _main_widget = main_widget;
-
-  // set WM Protocols on the window
-  Atom protocols[2];
-  protocols[0] = XInternAtom(OBDisplay::display, "WM_PROTOCOLS", false);
-  protocols[1] = XInternAtom(OBDisplay::display, "WM_DELETE_WINDOW", false);
-  XSetWMProtocols(OBDisplay::display, _main_widget->getWindow(), protocols, 2);
-
-  return true;
 }
 
 }

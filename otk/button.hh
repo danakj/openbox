@@ -29,8 +29,8 @@ public:
   void press(unsigned int mouse_button);
   void release(unsigned int mouse_button);
 
-  int buttonPressHandler(const XButtonEvent &e);
-  int buttonReleaseHandler(const XButtonEvent &e);
+  void buttonPressHandler(const XButtonEvent &e);
+  void buttonReleaseHandler(const XButtonEvent &e);
 
 private:
 

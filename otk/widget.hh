@@ -8,7 +8,7 @@
 #include "point.hh"
 #include "texture.hh"
 #include "style.hh"
-#include "eventhandler.hh"
+#include "eventdispatcher.hh"
 #include "application.hh"
 
 namespace otk {
@@ -22,17 +22,16 @@ public:
   typedef std::list<OtkWidget *> OtkWidgetList;
 
   OtkWidget(OtkWidget *parent, Direction = Horizontal);
-  OtkWidget(OtkApplication *app, Direction direction = Horizontal,
-            Cursor cursor = 0, int bevel_width = 1);
-  OtkWidget(Style *style, Direction direction = Horizontal,
-            Cursor cursor = 0, int bevel_width = 1);
+  OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
+            Direction direction = Horizontal, Cursor cursor = 0,
+            int bevel_width = 1);
 
   virtual ~OtkWidget();
 
   virtual void update(void);
 
-  int exposeHandler(const XExposeEvent &e);
-  int configureHandler(const XConfigureEvent &e);
+  void exposeHandler(const XExposeEvent &e);
+  void configureHandler(const XConfigureEvent &e);
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
@@ -144,6 +143,7 @@ private:
   bool _fixed_height;
 
   OtkEventDispatcher *_event_dispatcher;
+  OtkApplication *_application;
 };
 
 }

@@ -1,15 +1,16 @@
 #include "application.hh"
 #include "focuswidget.hh"
+#include "appwidget.hh"
 #include "button.hh"
 
 int main(int argc, char **argv) {
   otk::OtkApplication app(argc, argv);
 
-  otk::OtkFocusWidget foo(&app);
+  otk::OtkAppWidget foo(&app);
 
   foo.resize(600, 500);
   foo.setTexture(app.getStyle()->getTitleFocus());
-  foo.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
+//  foo.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
 
   foo.setBevelWidth(2);
   foo.setDirection(otk::OtkWidget::Horizontal);

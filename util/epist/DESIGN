@@ -3,6 +3,7 @@ Epist design notes, by woodblock
 
 - Chained keybindings like emacs, and I suppose vi if you're wierd like that.
  - most actions can take extra parameters. probably only numbers, or strings, maybe both.
+ - no interactive string inputs
 - A config file that doesn't suck
 
 

@@ -9464,21 +9464,20 @@ static PyObject *_wrap_delete_Frame(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Frame_area(PyObject *self, PyObject *args) {
+static PyObject *_wrap_Frame_size(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Frame *arg1 = (ob::Frame *) 0 ;
-    otk::Rect result;
+    otk::Strut *result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:Frame_area",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_size",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = ((ob::Frame const *)arg1)->area();
-    
     {
-        otk::Rect * resultptr;
-        resultptr = new otk::Rect((otk::Rect &) result);
-        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Rect, 1);
+        otk::Strut const &_result_ref = ((ob::Frame const *)arg1)->size();
+        result = (otk::Strut *) &_result_ref;
     }
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Strut, 0);
     return resultobj;
     fail:
     return NULL;
@@ -11538,7 +11537,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Client_swigregister", Client_swigregister, METH_VARARGS },
 	 { (char *)"new_Frame", _wrap_new_Frame, METH_VARARGS },
 	 { (char *)"delete_Frame", _wrap_delete_Frame, METH_VARARGS },
-	 { (char *)"Frame_area", _wrap_Frame_area, METH_VARARGS },
+	 { (char *)"Frame_size", _wrap_Frame_size, METH_VARARGS },
 	 { (char *)"Frame_setStyle", _wrap_Frame_setStyle, METH_VARARGS },
 	 { (char *)"Frame_adjust", _wrap_Frame_adjust, METH_VARARGS },
 	 { (char *)"Frame_focus", _wrap_Frame_focus, METH_VARARGS },

@@ -836,7 +836,7 @@ class Frame(_object):
         try:
             if self.thisown: destroy(self)
         except: pass
-    def area(*args): return apply(_openbox.Frame_area,args)
+    def size(*args): return apply(_openbox.Frame_size,args)
     def setStyle(*args): return apply(_openbox.Frame_setStyle,args)
     def adjust(*args): return apply(_openbox.Frame_adjust,args)
     def focus(*args): return apply(_openbox.Frame_focus,args)

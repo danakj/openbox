@@ -86,6 +86,8 @@ static void addbinding(GList *keylist, char *action, char *apath, int num)
     /* these have extra data! */
     if (a->func == action_execute || a->func == action_restart)
         a->data.execute.path = apath;
+    else
+        g_free(apath);
     if (a->func == action_desktop)
         a->data.desktop.desk = (unsigned) num + 1;
     if (a->func == action_move_relative_horz ||

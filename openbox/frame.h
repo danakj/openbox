@@ -42,13 +42,20 @@ typedef enum {
 
 struct Frame;
 
+typedef enum {
+    Decor_Absolute,
+    Decor_Relative
+} DecorSizeType;
+
 typedef struct FrameDecor {
     ObWindow obwin;
     Window window;
 
     Context context;
     Anchor anchor;
-    Rect position;
+    Rect area;
+    DecorSizeType sizetypex;
+    DecorSizeType sizetypey;
     Decoration type;
     struct Frame *frame;
 /*    struct RrSurface *surface;  SOOOOON!*/

@@ -216,7 +216,10 @@
     <mousebind button="Left" action="press">
       <action name="focus"/>
     </mousebind>
-    <mousebind button="Left" action="press">
+    <mousebind button="Right" action="press">
+      <action name="showmenu"><menu>client-menu</menu></action>
+    </mousebind>
+    <mousebind button="Left" action="click">
       <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="Left" action="doubleclick">

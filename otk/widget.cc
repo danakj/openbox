@@ -37,7 +37,6 @@ Widget::Widget(int screen, EventDispatcher *ed, Direction direction, int bevel,
 {
   createWindow(overrideredir);
   _dispatcher->registerHandler(_window, this);
-  styleChanged(*RenderStyle::style(_screen));
 }
 
 Widget::Widget(Widget *parent, Direction direction, int bevel)
@@ -485,7 +484,14 @@ void Widget::layoutVert()
 
 void Widget::render()
 {
-  if (!_texture || !_dirty) return;
+  if (!_dirty) return;
+  if (!_texture) {
+    // set a solid color as the default background
+    XSetWindowBackground(**display, _window,
+                         RenderStyle::style(_screen)->
+                         titlebarUnfocusBackground()->color().pixel());
+    return;
+  }
   if (_borderwidth * 2 > _area.width() ||
       _borderwidth * 2 > _area.height())
     return; // no surface to draw on
@@ -514,9 +520,9 @@ void Widget::renderChildren()
     (*it)->render();
 }
 
-void Widget::styleChanged(const RenderStyle &style)
+void Widget::styleChanged(const RenderStyle &)
 {
-  _texture = style.titlebarUnfocusBackground();
+  refresh();
 }
 
 void Widget::exposeHandler(const XExposeEvent &e)

@@ -6,6 +6,7 @@
 
 #include "rootwindow.hh"
 #include "openbox.hh"
+#include "screen.hh"
 #include "otk/display.hh"
 
 namespace ob {
@@ -90,5 +91,21 @@ void OBRootWindow::setDesktopName(int i, const std::string &name)
                 otk::OBProperty::utf8, newnames);
 }
 
+
+void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
+{
+#ifdef    DEBUG
+  printf("MapRequest for 0x%lx\n", e.window);
+#endif // DEBUG
+
+  OBClient *client = Openbox::instance->findClient(e.window);
+
+  if (client) {
+    // XXX: uniconify and/or unshade the window
+  } else {
+    Openbox::instance->screen(_info->getScreenNumber())->
+      manageWindow(e.window);
+  }
+}
 
 }

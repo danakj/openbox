@@ -121,9 +121,6 @@ Openbox::Openbox(int argc, char **argv)
 
   _property = new otk::OBProperty();
 
-  // set this class as the fallback event handler (for map events)
-  setFallbackHandler(this);
-
   // create the mouse cursors we'll use
   _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
   _cursors.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);
@@ -283,59 +280,6 @@ OBClient *Openbox::findClient(Window window)
     return (OBClient*) 0;
 }
 
-
-void Openbox::mapRequestHandler(const XMapRequestEvent &e)
-{
-#ifdef    DEBUG
-  printf("MapRequest for 0x%lx\n", e.window);
-#endif // DEBUG
-
-  otk::OtkEventHandler::mapRequestHandler(e);
-
-  OBClient *client = findClient(e.window);
-
-  if (client) {
-    // XXX: uniconify and/or unshade the window
-  } else {
-    int screen = INT_MAX;
-
-    for (int i = 0; i < ScreenCount(otk::OBDisplay::display); ++i)
-      if (otk::OBDisplay::screenInfo(i)->getRootWindow() == e.parent) {
-        screen = i;
-        break;
-      }
-
-    if (screen >= ScreenCount(otk::OBDisplay::display)) {
-      /*
-        we got a map request for a window who's parent isn't root. this
-        can happen in only one circumstance:
-
-        a client window unmapped a managed window, and then remapped it
-        somewhere between unmapping the client window and reparenting it
-        to root.
-
-        regardless of how it happens, we need to find the screen that
-        the window is on
-      */
-      XWindowAttributes wattrib;
-      if (! XGetWindowAttributes(otk::OBDisplay::display, e.window,
-                                 &wattrib)) {
-        // failed to get the window attributes, perhaps the window has
-        // now been destroyed?
-        return;
-      }
-
-      for (int i = 0; i < ScreenCount(otk::OBDisplay::display); ++i)
-        if (otk::OBDisplay::screenInfo(i)->getRootWindow() == wattrib.root) {
-          screen = i;
-          break;
-        }
-    }
-
-    assert(screen < static_cast<int>(_screens.size()));
-    _screens[screen]->manageWindow(e.window);
-  }
-}
 
 }
 

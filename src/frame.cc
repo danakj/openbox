@@ -24,6 +24,7 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   : otk::OtkWidget(Openbox::instance, style),
     _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen())),
+    _plate(this),
     _titlebar(this),
     _button_close(&_titlebar),
     _button_iconify(&_titlebar),
@@ -48,6 +49,9 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _handle.unmanaged();
   _grip_left.unmanaged();
   _grip_right.unmanaged();
+  _plate.unmanaged();
+
+  _plate.show();
 
   _button_close.setText("X");
   _button_iconify.setText("I");
@@ -90,6 +94,10 @@ void OBFrame::setStyle(otk::Style *style)
   
   _style = style;
 
+  // XXX: change when focus changes!
+  XSetWindowBorder(otk::OBDisplay::display, _plate.getWindow(),
+                   _style->getFrameFocus()->color().pixel());
+
   XSetWindowBorder(otk::OBDisplay::display, getWindow(),
                    _style->getBorderColor()->pixel());
   XSetWindowBorder(otk::OBDisplay::display, _titlebar.getWindow(),
@@ -115,17 +123,21 @@ void OBFrame::adjust()
   
   int width;   // the width of the client window and the border around it
   int bwidth;  // width to make borders
+  int cbwidth; // width of the inner client border
   
   if (_decorations & OBClient::Decor_Border) {
     bwidth = _style->getBorderWidth();
+    cbwidth = _style->getFrameWidth();
     _size.left = _size.top = _size.bottom = _size.right =
       _style->getFrameWidth();
     width = _client->area().width() + _style->getFrameWidth() * 2;
   } else {
-    bwidth = 0;
+    bwidth = cbwidth = 0;
     _size.left = _size.top = _size.bottom = _size.right = 0;
     width = _client->area().width();
   }
+  XSetWindowBorderWidth(otk::OBDisplay::display, _plate.getWindow(), cbwidth);
+
   XSetWindowBorderWidth(otk::OBDisplay::display, getWindow(), bwidth);
   XSetWindowBorderWidth(otk::OBDisplay::display, _titlebar.getWindow(),
                         bwidth);
@@ -238,8 +250,8 @@ void OBFrame::adjust()
   resize(_size.left + _size.right + _client->area().width(),
          _size.top + _size.bottom + _client->area().height());
 
-  XMoveWindow(otk::OBDisplay::display, _client->window(),
-              _size.left, _size.top);
+  _plate.setGeometry(_size.left, _size.top, _client->area().width(),
+                     _client->area().height());
 
   // map/unmap all the windows
   if (_decorations & OBClient::Decor_Titlebar) {
@@ -329,7 +341,8 @@ void OBFrame::grabClient()
   //XSelectInput(otk::OBDisplay::display, _window, SubstructureRedirectMask);
 
   // reparent the client to the frame
-  XReparentWindow(otk::OBDisplay::display, _client->window(), getWindow(), 0, 0);
+  XReparentWindow(otk::OBDisplay::display, _client->window(),
+                  _plate.getWindow(), 0, 0);
   _client->ignore_unmaps++;
 
   // raise the client above the frame

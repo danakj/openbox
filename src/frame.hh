@@ -38,6 +38,7 @@ private:
   otk::Strut _size;
 
   // decoration windows
+  otk::OtkFocusWidget _plate;   // sits entirely under the client window
   otk::OtkFocusWidget _titlebar;
   otk::OtkButton      _button_close;
   otk::OtkButton      _button_iconify;

@@ -5,25 +5,6 @@ style.date:
 style.credits: probably stole from some gnome metacity theme or something
 style.comments: made with stylebox
 
-!! Toolbar settings
-toolbar: flat solid bevel1
-toolbar.color: #e6e2de
-toolbar.justify: center
-
-toolbar.button: parentrelative
-toolbar.button.picColor: #ffffff
-toolbar.button.pressed: parentrelative
-toolbar.button.pressed.picColor: #ffffff
-
-toolbar.label: parentrelative
-toolbar.label.textColor: #000000
-
-toolbar.clock: parentrelative
-toolbar.clock.textColor: #000000
-
-toolbar.windowLabel: parentrelative
-toolbar.windowLabel.textColor: #000000
-
 !! Menu settings
 
 menu.title: flat gradient vertical bevel1
@@ -130,18 +111,8 @@ frameWidth: 0
 
 !! Miscellaneous settings
 borderColor: #222222
-rootCommand: Esetroot /win/lin/backgrounds/GNO-LEAF.png
 
-window.title.layout:	NILMC
 !! font me!
 window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=90
 menu.frame.xftfont: National First Font:pixelsize=15
 menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
-
-!! Bitmap button masks
-#window.button.max.mask:  	max.xbm
-#window.button.icon.mask: 	icon.xbm
-#window.button.stick.mask:	stick.xbm
-#window.button.close.mask:	close.xbm
-#window.button.shade.mask:	shade.xbm
-

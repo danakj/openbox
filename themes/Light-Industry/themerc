@@ -30,8 +30,8 @@ window.justify: center
 window.frame.focusColor: #000000
 
 window.title.focus: Raised gradient interlaced vertical
-#window.title.focus.color: #a8c3e5
-#window.title.focus.colorTo: #5b7eac
+!window.title.focus.color: #a8c3e5
+!window.title.focus.colorTo: #5b7eac
 window.title.focus.color: #6295e6
 window.title.focus.colorTo: #316194
 
@@ -77,12 +77,12 @@ window.grip.unfocus.color: #e6e6e6
 window.grip.unfocus.colorTo: #cdcac7
 
 window.label.unfocus: parentrelative
-#window.label.unfocus.textColor: #ffffff
+!window.label.unfocus.textColor: #ffffff
 window.label.unfocus.textColor: #7b7d7b
 
 window.button.unfocus: flat border gradient vertical
-#window.button.unfocus.color: #d5dad5
-#window.button.unfocus.colorTo: #b4b6b4
+!window.button.unfocus.color: #d5dad5
+!window.button.unfocus.colorTo: #b4b6b4
 window.button.unfocus.color: #f6f6f6
 window.button.unfocus.colorTo: #f6f6f6
 window.button.unfocus.picColor:  #7b7d7b
@@ -99,7 +99,7 @@ window.button.disabled.focus.color: #990000
 window.button.disabled.focus.colorTo: #990000
 window.button.disabled.focus.picColor: #ffffff
 window.button.disabled.focus.borderColor: #83aede
-#
+
 window.button.disabled.unfocus: flat border gradient vertical
 window.button.disabled.unfocus.color: #d5dad5
 window.button.disabled.unfocus.colorTo: #b4b6b4
@@ -111,14 +111,12 @@ borderWidth: 1
 bevelWidth: 1
 handleWidth: 4
 frameWidth: 0
-#borderColor: #091d2e
+!borderColor: #091d2e
 borderColor: #091d2e
 
-window.title.layout:	NLIMC
-
 !! font me!
-#window.title.xftfont: Borzoi:pixelsize=11
+!window.title.xftfont: Borzoi:pixelsize=11
 window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10
 menu.frame.xftfont: National First Font:pixelsize=15
-#menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
+!menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
 menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10

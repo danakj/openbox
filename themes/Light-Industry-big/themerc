@@ -75,7 +75,7 @@ window.grip.unfocus.color: #e6e6e6
 window.grip.unfocus.colorTo: #cdcac7
 
 window.label.unfocus: parentrelative
-#window.label.unfocus.textColor: #ffffff
+!window.label.unfocus.textColor: #ffffff
 window.label.unfocus.textColor: #7b7d7b
 
 window.button.unfocus: flat border gradient vertical
@@ -95,7 +95,7 @@ window.button.disabled.focus.color: #990000
 window.button.disabled.focus.colorTo: #990000
 window.button.disabled.focus.picColor: #ffffff
 window.button.disabled.focus.borderColor: #83aede
-#
+
 window.button.disabled.unfocus: flat border gradient vertical
 window.button.disabled.unfocus.color: #d5dad5
 window.button.disabled.unfocus.colorTo: #b4b6b4
@@ -107,14 +107,12 @@ borderWidth: 1
 bevelWidth: 1
 handleWidth: 4
 frameWidth: 0
-#borderColor: #091d2e
+!borderColor: #091d2e
 borderColor: #091d2e
 
-window.title.layout:	NLIMC
-
 !! font me!
-#window.title.xftfont: Borzoi:pixelsize=9:shadow=y:shadowtint=75
+!window.title.xftfont: Borzoi:pixelsize=9:shadow=y:shadowtint=75
 window.title.xftfont: Bitstream Vera Sans:bold:pixelsize=11:shadow=y:shadowtint=30
 menu.frame.xftfont: National First Font:pixelsize=15
-#menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
+!menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
 menu.title.xftfont: Bitstream Vera Sans:bold:pixelsize=10

@@ -115,7 +115,7 @@ window.button.pressed.unfocus.borderColor: #000000
 !#oh xor...
 window.button.disabled.focus: parentrelative
 window.button.disabled.focus.picColor: #7c7c7c
-#
+
 window.button.disabled.unfocus: parentrelative
 window.button.disabled.unfocus.picColor:  #7c7c7c
 

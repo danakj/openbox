@@ -125,9 +125,7 @@ borderColor: #24272f
 
 !! Miscellaneous settings
 #borderColor: #222222
-rootCommand: Esetroot /win/lin/backgrounds/leaf3.png
 
-window.title.layout:	ILMC
 !! font me!
 window.title.xftfont: Borzoi:pixelsize=10
 menu.frame.xftfont: National First Font:pixelsize=15

@@ -327,7 +327,7 @@ class _CycleWindows(_Cycle):
         if self.INCLUDE_ALL_DESKTOPS:
             d = client.desktop()
             if d == 0xffffffff: d = self.screen.desktop()
-            t = self.screen.desktopName(d) + " - " + t
+            t = self.screen.desktopNames()[d] + " - " + t
 
         return t
     
@@ -420,7 +420,7 @@ class _CycleWindowsLinear(_CycleWindows):
         if self.INCLUDE_ALL_DESKTOPS:
             d = client.desktop()
             if d == 0xffffffff: d = self.screen.desktop()
-            t = self.screen.desktopName(d) + " - " + t
+            t = self.screen.desktopNames()[d] + " - " + t
 
         return t
     
@@ -447,9 +447,10 @@ class _CycleDesktops(_Cycle):
         _Cycle.__init__(self)
 
     def populateItems(self):
-        for i in range(self.screen.numDesktops()):
-            self.items.append(
-                _CycleDesktops.Desktop(self.screen.desktopName(i), i))
+        names = self.screen.desktopNames()
+        num = self.screen.numDesktops()
+        for n, i in zip(names[:num], range(num)):
+            self.items.append(_CycleDesktops.Desktop(n, i))
 
     def menuLabel(self, desktop):
         return desktop.name

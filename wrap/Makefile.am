@@ -16,6 +16,8 @@ otkpy_la_SOURCES  = wrap_otk.cc
 
 obpy_la_SOURCES  = wrap_ob.cc
 
+EXTRA_DIST = otk.i ob.i callback.i
+
 CLEANFILES = wrap_* *.py
 MAINTAINERCLEANFILES = Makefile.in
 

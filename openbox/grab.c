@@ -1,8 +1,15 @@
 #include "openbox.h"
+#include "event.h"
+
 #include <glib.h>
 #include <X11/Xlib.h>
 
 static guint kgrabs, pgrabs, sgrabs;
+
+#define MASK_LIST_SIZE 8
+
+/*! A list of all possible combinations of keyboard lock masks */
+static unsigned int mask_list[MASK_LIST_SIZE];
 
 void grab_keyboard(gboolean grab)
 {
@@ -45,7 +52,19 @@ void grab_server(gboolean grab)
 
 void grab_startup()
 {
+    guint i = 0;
+
     kgrabs = pgrabs = sgrabs = 0;
+
+    mask_list[i++] = 0;
+    mask_list[i++] = LockMask;
+    mask_list[i++] = NumLockMask;
+    mask_list[i++] = LockMask | NumLockMask;
+    mask_list[i++] = ScrollLockMask;
+    mask_list[i++] = ScrollLockMask | LockMask;
+    mask_list[i++] = ScrollLockMask | NumLockMask;
+    mask_list[i++] = ScrollLockMask | LockMask | NumLockMask;
+    g_assert(i == MASK_LIST_SIZE);
 }
 
 void grab_shutdown()
@@ -53,4 +72,36 @@ void grab_shutdown()
     while (kgrabs) grab_keyboard(FALSE);
     while (pgrabs) grab_pointer(FALSE, None);
     while (sgrabs) grab_server(FALSE);
+}
+
+void grab_button(guint button, guint state, Window win, guint mask,
+                 int pointer_mode)
+{
+    guint i;
+
+    for (i = 0; i < MASK_LIST_SIZE; ++i)
+        XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
+                    pointer_mode, GrabModeAsync, None, None);
+}
+
+void ungrab_button(guint button, guint state, Window win)
+{
+    guint i;
+
+    for (i = 0; i < MASK_LIST_SIZE; ++i)
+        XUngrabButton(ob_display, button, state | mask_list[i], win);
+}
+
+void grab_key(guint keycode, guint state, int keyboard_mode)
+{
+    guint i;
+
+    for (i = 0; i < MASK_LIST_SIZE; ++i)
+        XGrabKey(ob_display, keycode, state | mask_list[i], ob_root, FALSE,
+                 GrabModeAsync, keyboard_mode);
+}
+
+void ungrab_all_keys()
+{
+    XUngrabKey(ob_display, AnyKey, AnyModifier, ob_root);
 }

@@ -58,7 +58,7 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
 {
     /* end cycling if the target disappears */
     if (focus_cycle_target == client)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
 static Window createWindow(Window parent, gulong mask,
@@ -192,7 +192,7 @@ void focus_set_client(ObClient *client)
 
     /* in the middle of cycling..? kill it. */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
     old = focus_client;
     focus_client = client;

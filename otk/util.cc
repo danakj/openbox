@@ -39,6 +39,7 @@ string expandTilde(const string& s) {
 
   const char* const home = getenv("HOME");
   if (home == NULL) return s;
+printf("tilde: getenv(DISPLAY)=%s\n", getenv("DISPLAY"));
 
   return string(home + s.substr(s.find('/')));
 }

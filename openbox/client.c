@@ -715,6 +715,18 @@ static void client_get_all(ObClient *self)
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
 
+    {
+        /* a couple type-based defaults for new windows */
+
+        /* this makes sure that these windows appear on all desktops */
+        if (self->type == OB_CLIENT_TYPE_DESKTOP)
+            self->desktop = DESKTOP_ALL;
+
+        /* dock windows default to ABOVE */
+        if (self->type == OB_CLIENT_TYPE_DOCK && !self->below)
+            self->above = TRUE;
+    }
+
     client_update_protocols(self);
 
     client_get_gravity(self); /* get the attribute gravity */
@@ -956,36 +968,36 @@ void client_get_type(ObClient *self)
     self->type = -1;
   
     if (PROP_GETA32(self->window, net_wm_window_type, atom, &val, &num)) {
-	/* use the first value that we know about in the array */
-	for (i = 0; i < num; ++i) {
-	    if (val[i] == prop_atoms.net_wm_window_type_desktop)
-		self->type = OB_CLIENT_TYPE_DESKTOP;
-	    else if (val[i] == prop_atoms.net_wm_window_type_dock)
-		self->type = OB_CLIENT_TYPE_DOCK;
-	    else if (val[i] == prop_atoms.net_wm_window_type_toolbar)
-		self->type = OB_CLIENT_TYPE_TOOLBAR;
-	    else if (val[i] == prop_atoms.net_wm_window_type_menu)
-		self->type = OB_CLIENT_TYPE_MENU;
-	    else if (val[i] == prop_atoms.net_wm_window_type_utility)
-		self->type = OB_CLIENT_TYPE_UTILITY;
-	    else if (val[i] == prop_atoms.net_wm_window_type_splash)
-		self->type = OB_CLIENT_TYPE_SPLASH;
-	    else if (val[i] == prop_atoms.net_wm_window_type_dialog)
-		self->type = OB_CLIENT_TYPE_DIALOG;
-	    else if (val[i] == prop_atoms.net_wm_window_type_normal)
-		self->type = OB_CLIENT_TYPE_NORMAL;
-	    else if (val[i] == prop_atoms.kde_net_wm_window_type_override) {
-		/* prevent this window from getting any decor or
-		   functionality */
-		self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS |
-					 OB_MWM_FLAG_DECORATIONS);
-		self->mwmhints.decorations = 0;
-		self->mwmhints.functions = 0;
-	    }
-	    if (self->type != (ObClientType) -1)
-		break; /* grab the first legit type */
-	}
-	g_free(val);
+        /* use the first value that we know about in the array */
+        for (i = 0; i < num; ++i) {
+            if (val[i] == prop_atoms.net_wm_window_type_desktop)
+                self->type = OB_CLIENT_TYPE_DESKTOP;
+            else if (val[i] == prop_atoms.net_wm_window_type_dock)
+                self->type = OB_CLIENT_TYPE_DOCK;
+            else if (val[i] == prop_atoms.net_wm_window_type_toolbar)
+                self->type = OB_CLIENT_TYPE_TOOLBAR;
+            else if (val[i] == prop_atoms.net_wm_window_type_menu)
+                self->type = OB_CLIENT_TYPE_MENU;
+            else if (val[i] == prop_atoms.net_wm_window_type_utility)
+                self->type = OB_CLIENT_TYPE_UTILITY;
+            else if (val[i] == prop_atoms.net_wm_window_type_splash)
+                self->type = OB_CLIENT_TYPE_SPLASH;
+            else if (val[i] == prop_atoms.net_wm_window_type_dialog)
+                self->type = OB_CLIENT_TYPE_DIALOG;
+            else if (val[i] == prop_atoms.net_wm_window_type_normal)
+                self->type = OB_CLIENT_TYPE_NORMAL;
+            else if (val[i] == prop_atoms.kde_net_wm_window_type_override) {
+                /* prevent this window from getting any decor or
+                   functionality */
+                self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS |
+                                         OB_MWM_FLAG_DECORATIONS);
+                self->mwmhints.decorations = 0;
+                self->mwmhints.functions = 0;
+            }
+            if (self->type != (ObClientType) -1)
+                break; /* grab the first legit type */
+        }
+        g_free(val);
     }
     
     if (self->type == (ObClientType) -1) {
@@ -1096,17 +1108,15 @@ void client_setup_decor_and_functions(ObClient *self)
          OB_FRAME_DECOR_ALLDESKTOPS |
          OB_FRAME_DECOR_ICONIFY |
          OB_FRAME_DECOR_MAXIMIZE |
-         OB_FRAME_DECOR_SHADE);
+         OB_FRAME_DECOR_SHADE |
+         OB_FRAME_DECOR_CLOSE);
     self->functions =
         (OB_CLIENT_FUNC_RESIZE |
          OB_CLIENT_FUNC_MOVE |
          OB_CLIENT_FUNC_ICONIFY |
          OB_CLIENT_FUNC_MAXIMIZE |
-         OB_CLIENT_FUNC_SHADE);
-    if (self->delete_window) {
-        self->functions |= OB_CLIENT_FUNC_CLOSE;
-        self->decorations |= OB_FRAME_DECOR_CLOSE;
-    }
+         OB_CLIENT_FUNC_SHADE |
+         OB_CLIENT_FUNC_CLOSE);
 
     if (!(self->min_size.width < self->max_size.width ||
           self->min_size.height < self->max_size.height))
@@ -1211,13 +1221,6 @@ void client_setup_decor_and_functions(ObClient *self)
     if (self->frame) {
         /* adjust the client's decorations, etc. */
         client_reconfigure(self);
-    } else {
-        /* this makes sure that these windows appear on all desktops */
-        if (self->type == OB_CLIENT_TYPE_DESKTOP &&
-            self->desktop != DESKTOP_ALL)
-        {
-            self->desktop = DESKTOP_ALL;
-        }
     }
 }
 
@@ -2305,6 +2308,11 @@ void client_close(ObClient *self)
 
     if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
+    /* in the case that the client provides no means to requesting that it
+       close, we just kill it */
+    if (!self->delete_window)
+        client_kill(self);
+    
     /*
       XXX: itd be cool to do timeouts and shit here for killing the client's
       process off

@@ -155,11 +155,6 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
     return TRUE;
 }
 
-gboolean keyboard_interactive_grab_in_progress()
-{
-    return interactive_states != NULL;
-}
-
 void keyboard_interactive_grab(guint state, ObClient *client,
                                ObAction *action)
 {

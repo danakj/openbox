@@ -1,6 +1,8 @@
 #ifndef __events_h
 #define __events_h
 
+#include <X11/Xlib.h>
+
 /*! Time at which the last event with a timestamp occured. */
 extern Time event_lasttime;
 

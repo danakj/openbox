@@ -2,10 +2,9 @@ import hooks, ob, keymap, buttonmap, os, sys, input, motion, historyplacement
 import stackedcycle
 from input import Pointer
 
-import config
-print dir(config)
-
 hooks.managed.append(historyplacement.place)
+#import windowplacement
+#hooks.managed.append(windowplacement.random)
 
 _grab = 0
 def printshit(keydata, client):

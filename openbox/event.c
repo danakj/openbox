@@ -916,7 +916,7 @@ static void event_handle_client(Client *client, XEvent *e)
             else
                 h = client->area.y;
             client->gravity = tmpg;
-            client_configure(client, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
+            client_configure(client, Corner_TopLeft, x, y, w, h, FALSE, TRUE);
             client->gravity = oldg;
         }
 	break;

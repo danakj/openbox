@@ -164,7 +164,7 @@ if test "$enableval" = "yes"; then
 , XftFont foo,
       AC_MSG_RESULT([yes])
       XFT="yes"
-      test "${XFT2}" = "yes" || LIBS="${LIBS} -lXft"
+      test "$XFT2" = "yes" || LIBS="$LIBS -lXft"
 
       dnl Check for utf8 support in the Xft library
       dnl AC_CHECK_LIB(Xft, XftDrawStringUtf8,

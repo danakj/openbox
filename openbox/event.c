@@ -246,10 +246,9 @@ void event_process(XEvent *e)
     case EnterNotify:
     case LeaveNotify:
 	event_lasttime = e->xcrossing.time;
-        /* XXX this caused problems before... but i don't remember why. hah.
-           so back it is. if problems arise again, then try filtering on the
-           detail instead of the mode. */
-        if (e->xcrossing.mode != NotifyNormal) return;
+        /* NotifyUngrab occurs when a mouse button is released and the event is
+           caused, like when lowering a window */
+        if (e->xcrossing.mode == NotifyGrab) return;
 	break;
     }
 
@@ -485,9 +484,8 @@ static void event_handle_client(Client *client, XEvent *e)
 		}
 		e->xclient = ce.xclient;
 	    }
-            if (e->xclient.data.l[0] >= 0 &&
-                e->xclient.data.l[0] < screen_num_desktops)
-                client_set_desktop(client, e->xclient.data.l[0]);
+            if ((unsigned)e->xclient.data.l[0] < screen_num_desktops)
+                client_set_desktop(client, (unsigned)e->xclient.data.l[0]);
 	} else if (msgtype == prop_atoms.net_wm_state) {
 	    /* can't compress these */
 	    g_message("net_wm_state %s %ld %ld for 0x%lx",

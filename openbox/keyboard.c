@@ -157,6 +157,37 @@ void keyboard_interactive_grab(guint state, ObClient *client,
     interactive_states = g_slist_append(interactive_states, s);
 }
 
+void keyboard_interactive_end(ObInteractiveState *s,
+                              guint state, gboolean cancel)
+{
+    action_run_interactive(s->action, s->client, state, cancel, TRUE);
+
+    g_free(s);
+
+    interactive_states = g_slist_remove(interactive_states, s);
+
+    if (!interactive_states) {
+        grab_keyboard(FALSE);
+        grab_pointer(FALSE, OB_CURSOR_NONE);
+        keyboard_reset_chains();
+    }
+}
+
+void keyboard_interactive_end_client(gpointer data)
+{
+    GSList *it, *next;
+    ObClient *c = data;
+
+    for (it = interactive_states; it; it = next) {
+        ObInteractiveState *s = it->data;
+
+        next = g_slist_next(it);
+
+        if (s->client == c)
+            keyboard_interactive_end(s, 0, FALSE);
+    }
+}
+
 gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 {
     GSList *it, *next;
@@ -179,17 +210,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
                 cancel = done = TRUE;
         }
         if (done) {
-            action_run_interactive(s->action, s->client,
-                                   e->xkey.state, cancel, TRUE);
-
-            g_free(s);
-
-            interactive_states = g_slist_delete_link(interactive_states, it);
-            if (!interactive_states) {
-                grab_keyboard(FALSE);
-                grab_pointer(FALSE, OB_CURSOR_NONE);
-                keyboard_reset_chains();
-            }
+            keyboard_interactive_end(s, e->xkey.state, cancel);
 
             handled = TRUE;
         } else
@@ -246,11 +267,17 @@ void keyboard_event(ObClient *client, const XEvent *e)
 void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
+
+    if (!reconfig)
+        client_add_destructor(keyboard_interactive_end_client);
 }
 
 void keyboard_shutdown(gboolean reconfig)
 {
     GSList *it;
+
+    if (!reconfig)
+        client_remove_destructor(keyboard_interactive_end_client);
 
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;

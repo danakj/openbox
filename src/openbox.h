@@ -66,8 +66,8 @@ private:
 public:
   DataSearch(Window w, Z *d): window(w), data(d) {}
 
-  inline const Window &getWindow(void) const { return window; }
-  inline Z *getData(void) { return data; }
+  inline const Window &getWindow() const { return window; }
+  inline Z *getData() { return data; }
 };
 
 
@@ -119,28 +119,27 @@ private:
 
 
 protected:
-  void load_rc(void);
-  void save_rc(void);
-  void reload_rc(void);
-  void real_rereadMenu(void);
-  void real_reconfigure(void);
+  void load();
+  void save();
+  void real_rereadMenu();
+  void real_reconfigure();
 
   virtual void process_event(XEvent *);
 
 
 public:
   Openbox(int, char **, char * = 0, char * = 0);
-  virtual ~Openbox(void);
+  virtual ~Openbox();
 
 #ifdef    HAVE_GETPID
-  inline const Atom &getOpenboxPidAtom(void) const { return openbox_pid; }
+  inline const Atom &getOpenboxPidAtom() const { return openbox_pid; }
 #endif // HAVE_GETPID
 
   Basemenu *searchMenu(Window);
 
   OpenboxWindow *searchGroup(Window, OpenboxWindow *);
   OpenboxWindow *searchWindow(Window);
-  inline OpenboxWindow *getFocusedWindow(void) { return focused_window; }
+  inline OpenboxWindow *getFocusedWindow() { return focused_window; }
 
   BScreen *getScreen(int);
   BScreen *searchScreen(Window);
@@ -148,29 +147,29 @@ public:
   inline Resource &getConfig() {
     return config;
   }
-  inline const Time &getDoubleClickInterval(void) const
+  inline const Time &getDoubleClickInterval() const
     { return resource.double_click_interval; }
-  inline const Time &getLastTime(void) const { return last_time; }
+  inline const Time &getLastTime() const { return last_time; }
 
   Toolbar *searchToolbar(Window);
 
-  inline const char *getStyleFilename(void) const
+  inline const char *getStyleFilename() const
     { return resource.style_file; }
-  inline const char *getMenuFilename(void) const
+  inline const char *getMenuFilename() const
     { return resource.menu_file; }
 
-  inline const int &getColorsPerChannel(void) const
+  inline const int &getColorsPerChannel() const
     { return resource.colors_per_channel; }
 
-  inline const timeval &getAutoRaiseDelay(void) const
+  inline const timeval &getAutoRaiseDelay() const
     { return resource.auto_raise_delay; }
 
-  inline const char *getTitleBarLayout(void) const
+  inline const char *getTitleBarLayout() const
     { return resource.titlebar_layout; }
 
-  inline const unsigned long &getCacheLife(void) const
+  inline const unsigned long &getCacheLife() const
     { return resource.cache_life; }
-  inline const unsigned long &getCacheMax(void) const
+  inline const unsigned long &getCacheMax() const
     { return resource.cache_max; }
 
   inline void maskWindowEvents(Window w, OpenboxWindow *bw)
@@ -178,8 +177,7 @@ public:
   inline void setNoFocus(Bool f) { no_focus = f; }
 
   void setFocusedWindow(OpenboxWindow *w);
-  void shutdown(void);
-  void load_rc(BScreen *);
+  void shutdown();
   void saveStyleFilename(const char *);
   void saveMenuFilename(const char *);
   void saveMenuSearch(Window, Basemenu *);
@@ -191,13 +189,13 @@ public:
   void removeToolbarSearch(Window);
   void removeGroupSearch(Window);
   void restart(const char * = 0);
-  void reconfigure(void);
-  void rereadMenu(void);
-  void checkMenu(void);
+  void reconfigure();
+  void rereadMenu();
+  void checkMenu();
 
   virtual Bool handleSignal(int);
 
-  virtual void timeout(void);
+  virtual void timeout();
 
 #ifdef    SLIT
   Slit *searchSlit(Window);

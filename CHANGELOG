@@ -1,6 +1,13 @@
 Changelog for Openbox:
 
 1.0.0:
+ * better handling of teh rc file and its configuration
+   options. The file is written each time an option in
+   the file is changed, instead of being written at
+   shutdown. This means that you can edit the file by
+   hand while in Openbox, and then choose reconfig or
+   restart to have it use the new rc file.              (Ben Jansens)
+
  * added a runtime option for hiding the toolbar.       (Scott Moynes)
 	
  * made shaded windows edge-snap correctly to the

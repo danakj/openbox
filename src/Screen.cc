@@ -189,6 +189,28 @@ static const char *getFontSize(const char *pattern, int *size) {
 BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   openbox(ob), config(conf)
 {
+  // default values
+  resource.full_max = false;
+  resource.focus_new = false;
+  resource.focus_last = false;
+  resource.row_direction = LeftRight;
+  resource.col_direction = TopBottom;
+  resource.workspaces = 1;
+  resource.sloppy_focus = true;
+  resource.auto_raise = false;
+  resource.zones = 1;
+  resource.placement_policy = CascadePlacement;
+#ifdef    HAVE_STRFTIME
+  resource.strftime_format = bstrdup("%I:%M %p");
+#else // !have_strftime
+  resource.date_format = B_AmericanDate;
+  resource.clock24hour =  false;
+#endif // HAVE_STRFTIME
+  resource.edge_snap_threshold = 4;
+  resource.image_dither = true;
+  resource.root_command = NULL;
+  resource.opaque_move = false;
+
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	       SubstructureRedirectMask | KeyPressMask | KeyReleaseMask |
 	       ButtonPressMask | ButtonReleaseMask;
@@ -213,11 +235,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     resource.tstyle.fontset = resource.wstyle.fontset = (XFontSet) 0;
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
     resource.wstyle.font = (XFontStruct *) 0;
-  resource.root_command = NULL;
-
-#ifdef    HAVE_STRFTIME
-  resource.strftime_format = 0;
-#endif // HAVE_STRFTIME
 
 #ifdef    HAVE_GETPID
   pid_t bpid = getpid();
@@ -232,6 +249,9 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
                 openbox.getSessionCursor());
 
   workspaceNames = new LinkedList<char>;
+
+  load();       // load config options from Resources
+
   workspacesList = new LinkedList<Workspace>;
   rootmenuList = new LinkedList<Rootmenu>;
   netizenList = new LinkedList<Netizen>;
@@ -242,8 +262,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
                       openbox.getCacheLife(), openbox.getCacheMax());
   image_control->installRootColormap();
   root_colormap_installed = True;
-
-  openbox.load_rc(this);
 
   image_control->setDither(resource.image_dither);
 
@@ -404,11 +422,13 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     for (int i = 0; i < resource.workspaces; ++i) {
       wkspc = new Workspace(*this, workspacesList->count());
       workspacesList->insert(wkspc);
+      saveWorkspaceNames();
       workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
     }
   } else {
     wkspc = new Workspace(*this, workspacesList->count());
     workspacesList->insert(wkspc);
+    saveWorkspaceNames();
     workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
   }
 
@@ -824,6 +844,210 @@ XFontSet BScreen::createFontSet(const char *fontname) {
   return fs;
 }
 
+void BScreen::setSloppyFocus(bool b) {
+  resource.sloppy_focus = b;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".focusModel" << ends;
+  config.setValue(s.str(),
+                  (resource.sloppy_focus ?
+                  (resource.auto_raise ? "AutoRaiseSloppyFocus" : "SloppyFocus")
+                  : "ClickToFocus"));
+}
+
+void BScreen::setAutoRaise(bool a) {
+  resource.auto_raise = a;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".focusModel" << ends;
+  config.setValue(s.str(),
+                  (resource.sloppy_focus ?
+                  (resource.auto_raise ? "AutoRaiseSloppyFocus" : "SloppyFocus")
+                  : "ClickToFocus"));
+}
+
+void BScreen::setImageDither(bool d) {
+  resource.image_dither = d;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
+  config.setValue(s.str(), resource.image_dither);
+}
+
+void BScreen::setOpaqueMove(bool o) {
+  resource.opaque_move = o;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".opaqueMove" << ends;
+  config.setValue(s.str(), resource.opaque_move);
+}
+
+void BScreen::setFullMax(bool f) {
+  resource.full_max = f;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".fullMaximization" << ends;
+  config.setValue(s.str(), resource.full_max);
+}
+
+void BScreen::setFocusNew(bool f) {
+  resource.focus_new = f;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".focusNewWindows" << ends;
+  config.setValue(s.str(), resource.focus_new);
+}
+
+void BScreen::setFocusLast(bool f) {
+  resource.focus_last = f;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".focusLastWindow" << ends;
+  config.setValue(s.str(), resource.focus_last);
+}
+
+void BScreen::setWindowZones(int z) {
+  resource.zones = z;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".windowZones" << ends;
+  config.setValue(s.str(), resource.zones);
+}
+
+void BScreen::setWorkspaceCount(int w) {
+  resource.workspaces = w;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".workspaces" << ends;
+  config.setValue(s.str(), resource.workspaces);
+}
+
+void BScreen::setPlacementPolicy(int p) {
+  resource.placement_policy = p;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".windowPlacement" << ends;
+  const char *placement;
+  switch (resource.placement_policy) {
+  case CascadePlacement: placement = "CascadePlacement"; break;
+  case BestFitPlacement: placement = "BestFitPlacement"; break;
+  case ColSmartPlacement: placement = "ColSmartPlacement"; break;
+  default:
+  case RowSmartPlacement: placement = "RowSmartPlacement"; break;
+  }
+  config.setValue(s.str(), placement);
+}
+
+void BScreen::setEdgeSnapThreshold(int t) {
+  resource.edge_snap_threshold = t;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".edgeSnapThreshold" << ends;
+  config.setValue(s.str(), resource.edge_snap_threshold);
+}
+
+void BScreen::setRowPlacementDirection(int d) {
+  resource.row_direction = d;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".rowPlacementDirection" <<
+    ends;
+  config.setValue(s.str(),
+                  resource.row_direction == LeftRight ?
+                  "LeftToRight" : "RightToLeft");
+}
+
+void BScreen::setColPlacementDirection(int d) {
+  resource.col_direction = d;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".colPlacementDirection" <<
+    ends;
+  config.setValue(s.str(),
+                  resource.col_direction == TopBottom ?
+                  "TopToBottom" : "BottomToTop");
+}
+
+void BScreen::setRootCommand(const char *cmd) {
+if (resource.root_command != NULL)
+    delete [] resource.root_command;
+  if (cmd != NULL)
+    resource.root_command = bstrdup(cmd);
+  else
+    resource.root_command = NULL;
+  // this doesn't save to the Resources config because it can't be changed
+  // inside Openbox, and this way we dont add an empty command which would over-
+  // ride the styles commend when none has been specified
+}
+#ifdef    HAVE_STRFTIME
+void BScreen::setStrftimeFormat(const char *f) {
+  if (resource.strftime_format != NULL)
+    delete [] resource.strftime_format;
+
+  resource.strftime_format = bstrdup(f);
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".strftimeFormat" << ends;
+  config.setValue(s.str(), resource.strftime_format);
+}
+
+#else // !HAVE_STRFTIME
+void BScreen::setDateFormat(int f) {
+  resource.date_format = f;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".dateFormat" << ends;
+  config.setValue(s.str(), resource.date_format == B_EuropeanDate ?
+                  "European" : "American");
+}
+
+void BScreen::setClock24Hour(Bool c) {
+  resource.clock24hour = c;
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".clockFormat" << ends;
+  config.setValue(s.str(), resource.clock24hour ? 24 : 12);
+}
+#endif // HAVE_STRFTIME
+
+void BScreen::setHideToolbar(bool b) {
+  resource.hide_toolbar = b;
+  if (resource.hide_toolbar)
+    getToolbar()->unMapToolbar();
+  else
+    getToolbar()->mapToolbar();
+  ostrstream s;
+  s << "session.screen" << getScreenNumber() << ".hideToolbar" << ends;
+  config.setValue(s.str(), resource.hide_toolbar ? "True" : "False");
+}
+
+void BScreen::saveWorkspaceNames() {
+    ostrstream rc, names;
+
+    for (int i = 0; i < resource.workspaces; i++) {
+      Workspace *w = getWorkspace(i);
+      if (w != NULL) {
+        names << w->getName();
+        if (i < resource.workspaces-1)
+          names << ',';
+      }
+    }
+    names << ends;
+
+    rc << "session.screen" << getScreenNumber() << ".workspaceNames" << ends;
+    config.setValue(rc.str(), names.str());
+}
+
+void BScreen::save() {
+  setSloppyFocus(resource.sloppy_focus);
+  setAutoRaise(resource.auto_raise);
+  setImageDither(resource.image_dither);
+  setOpaqueMove(resource.opaque_move);
+  setFullMax(resource.full_max);
+  setFocusNew(resource.focus_new);
+  setFocusLast(resource.focus_last);
+  setWindowZones(resource.zones);
+  setWorkspaceCount(resource.workspaces);
+  setPlacementPolicy(resource.placement_policy);
+  setEdgeSnapThreshold(resource.edge_snap_threshold);
+  setRowPlacementDirection(resource.row_direction);
+  setColPlacementDirection(resource.col_direction);
+  setRootCommand(resource.root_command);
+#ifdef    HAVE_STRFTIME
+  // it deletes the current value before setting the new one, so we have to
+  // duplicate the current value.
+  setStrftimeFormat(bstrdup(resource.strftime_format)); 
+#else // !HAVE_STRFTIME
+  setDateFormat(resource.date_format);
+  setClock24Hour(resource.clock24hour);
+#endif // HAVE_STRFTIME
+  setHideToolbar(resource.hide_toolbar);
+}
+
 void BScreen::load() {
   std::ostrstream rscreen, rname, rclass;
   std::string s;
@@ -836,6 +1060,153 @@ void BScreen::load() {
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.hide_toolbar = b;
 
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "fullMaximization" << ends;
+  rclass << rscreen.str() << "FullMaximization" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    resource.full_max = b;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "focusNewWindows" << ends;
+  rclass << rscreen.str() << "FocusNewWindows" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    resource.focus_new = b;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "focusLastWindow" << ends;
+  rclass << rscreen.str() << "FocusLastWindow" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    resource.focus_last = b;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "rowPlacementDirection" << ends;
+  rclass << rscreen.str() << "RowPlacementDirection" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (0 == strncasecmp(s.c_str(), "RightToLeft", s.length()))
+      resource.row_direction = RightLeft;
+    else if (0 == strncasecmp(s.c_str(), "LeftToRight", s.length()))
+      resource.row_direction = LeftRight;
+  }
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "colPlacementDirection" << ends;
+  rclass << rscreen.str() << "ColPlacementDirection" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (0 == strncasecmp(s.c_str(), "BottomToTop", s.length()))
+      resource.col_direction = BottomTop;
+    else if (0 == strncasecmp(s.c_str(), "TopToBottom", s.length()))
+      resource.col_direction = TopBottom;
+  }
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "workspaces" << ends;
+  rclass << rscreen.str() << "Workspaces" << ends;
+  if (config.getValue(rname.str(), rclass.str(), l))
+    resource.workspaces = l;
+
+  removeWorkspaceNames();
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "workspaceNames" << ends;
+  rclass << rscreen.str() << "WorkspaceNames" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    std::string::const_iterator it = s.begin(), end = s.end();
+    while(1) {
+      std::string::const_iterator tmp = it;// current string.begin()
+      it = std::find(tmp, end, ',');       // look for comma between tmp and end
+      std::string name(tmp, it);           // name = s[tmp:it]
+      addWorkspaceName(name.c_str());
+      if (it == end)
+        break;
+      ++it;
+    }
+  }
+  
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "focusModel" << ends;
+  rclass << rscreen.str() << "FocusModel" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (0 == strncasecmp(s.c_str(), "ClickToFocus", s.length())) {
+      resource.auto_raise = false;
+      resource.sloppy_focus = false;
+    } else if (0 == strncasecmp(s.c_str(), "AutoRaiseSloppyFocus",
+                                s.length())) {
+      resource.sloppy_focus = true;
+      resource.auto_raise = true;
+    } else if (0 == strncasecmp(s.c_str(), "SloppyFocus", s.length())) {
+      resource.sloppy_focus = true;
+      resource.auto_raise = false;
+    }
+  }
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "windowZones" << ends;
+  rclass << rscreen.str() << "WindowZones" << ends;
+  if (config.getValue(rname.str(), rclass.str(), l))
+    resource.zones = (l == 1 || l == 2 || l == 4) ? l : 1;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "windowPlacement" << ends;
+  rclass << rscreen.str() << "WindowPlacement" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (0 == strncasecmp(s.c_str(), "RowSmartPlacement", s.length()))
+      resource.placement_policy = RowSmartPlacement;
+    else if (0 == strncasecmp(s.c_str(), "ColSmartPlacement", s.length()))
+      resource.placement_policy = ColSmartPlacement;
+    else if (0 == strncasecmp(s.c_str(), "BestFitPlacement", s.length()))
+      resource.placement_policy = BestFitPlacement;
+    else if (0 == strncasecmp(s.c_str(), "CascadePlacement", s.length()))
+      resource.placement_policy = CascadePlacement;
+  }
+
+#ifdef    HAVE_STRFTIME
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "strftimeFormat" << ends;
+  rclass << rscreen.str() << "StrftimeFormat" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s))
+    resource.strftime_format = bstrdup(s.c_str());
+#else // !HAVE_STRFTIME
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "dateFormat" << ends;
+  rclass << rscreen.str() << "DateFormat" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s)) {
+    if (strncasecmp(s.c_str(), "European", s.length()))
+      resource.date_format = B_EuropeanDate;
+    else if (strncasecmp(s.c_str(), "American", s.length()))
+      resource.date_format = B_AmericanDate;
+  }
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "clockFormat" << ends;
+  rclass << rscreen.str() << "ClockFormat" << ends;
+  if (config.getValue(rname.str(), rclass.str(), l)) {
+    if (clock == 24)
+      resource.clock24hour = true;
+    else if (clock == 12)
+      resource.clock24hour =  false;
+#endif // HAVE_STRFTIME
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "edgeSnapThreshold" << ends;
+  rclass << rscreen.str() << "EdgeSnapThreshold" << ends;
+  if (config.getValue(rname.str(), rclass.str(), l))
+    resource.edge_snap_threshold = l;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "imageDither" << ends;
+  rclass << rscreen.str() << "ImageDither" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
+    resource.image_dither = b;
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "rootCommand" << ends;
+  rclass << rscreen.str() << "RootCommand" << ends;
+  if (config.getValue(rname.str(), rclass.str(), s))
+    resource.root_command = bstrdup(s.c_str());
+
+  rname.seekp(0); rclass.seekp(0);
+  rname << rscreen.str() << "opaqueMove" << ends;
+  rclass << rscreen.str() << "OpaqueMove" << ends;
+    resource.opaque_move = b;
 }
 
 void BScreen::reconfigure(void) {
@@ -1008,7 +1379,7 @@ void BScreen::rereadMenu(void) {
 
 void BScreen::removeWorkspaceNames(void) {
   while (workspaceNames->count())
-   delete [] workspaceNames->remove(0);
+    delete [] workspaceNames->remove(0);
 }
 
 
@@ -1362,6 +1733,7 @@ OpenboxWindow *BScreen::getIcon(int index) {
 int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(*this, workspacesList->count());
   workspacesList->insert(wkspc);
+  saveWorkspaceNames();
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
 			wkspc->getWorkspaceID() + 2);
@@ -1575,20 +1947,9 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
 }
 
 
-#ifdef    HAVE_STRFTIME
-void BScreen::saveStrftimeFormat(const char *format) {
-  if (resource.strftime_format)
-    delete [] resource.strftime_format;
-
-  resource.strftime_format = bstrdup(format);
-}
-#endif // HAVE_STRFTIME
-
-
 void BScreen::addWorkspaceName(const char *name) {
   workspaceNames->insert(bstrdup(name));
 }
-
 
 char* BScreen::getNameOfWorkspace(int id) {
   char *name = (char *) 0;
@@ -2280,15 +2641,3 @@ void BScreen::hideGeometry(void) {
     geom_visible = False;
   }
 }
-
-void BScreen::setHideToolbar(bool b) {
-  resource.hide_toolbar = b;
-  if (resource.hide_toolbar)
-    getToolbar()->unMapToolbar();
-  else
-    getToolbar()->mapToolbar();
-  ostrstream s;
-  s << "session.screen" << getScreenNumber() << ".hideToolbar" << ends;
-  config.setValue(s.str(), resource.hide_toolbar ? "True" : "False");
-}
-

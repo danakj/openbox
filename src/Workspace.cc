@@ -120,7 +120,7 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
     if (w->isTransient() && w->getTransientFor() &&
 	w->getTransientFor()->isVisible()) {
       w->getTransientFor()->setInputFocus();
-    } else if (screen.isSloppyFocus()) {
+    } else if (screen.sloppyFocus()) {
       screen.getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
     } else {
       OpenboxWindow *top = stackingList->first();
@@ -321,6 +321,7 @@ void Workspace::setName(char *new_name) {
   
   clientmenu->setLabel(name);
   clientmenu->update();
+  screen.saveWorkspaceNames();
 }
 
 
@@ -406,22 +407,22 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
   int test_x, test_y, place_x = 0, place_y = 0;
   int start_pos = 0;
   int change_y =
-     ((screen.getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
+     ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
   int change_x =
-     ((screen.getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
+     ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
   int delta_x = 8, delta_y = 8;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
+  test_y = (screen.colPlacementDirection() == BScreen::TopBottom) ?
     start_pos : screen.size().h() - win_size.h() - start_pos;
 
   while(!placed &&
-        ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
+        ((screen.colPlacementDirection() == BScreen::BottomTop) ?
          test_y > 0 : test_y + win_size.h() < (signed) space.h())) {
-    test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
+    test_x = (screen.rowPlacementDirection() == BScreen::LeftRight) ?
       start_pos : space.w() - win_size.w() - start_pos;
     while (!placed &&
-           ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
+           ((screen.rowPlacementDirection() == BScreen::RightLeft) ?
             test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
       placed = true;
 
@@ -467,23 +468,23 @@ inline Point * Workspace::colSmartPlacement(const Size &win_size,
   int test_x, test_y;
   int start_pos = 0;
   int change_y =
-    ((screen.getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
+    ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
   int change_x =
-    ((screen.getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
+    ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
   int delta_x = 8, delta_y = 8;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
+  test_x = (screen.rowPlacementDirection() == BScreen::LeftRight) ?
     start_pos : screen.size().w() - win_size.w() - start_pos;
 
   while(!placed &&
-        ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
+        ((screen.rowPlacementDirection() == BScreen::RightLeft) ?
          test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
-    test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
+    test_y = (screen.colPlacementDirection() == BScreen::TopBottom) ?
       start_pos : screen.size().h() - win_size.h() - start_pos;
 
     while(!placed &&
-          ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
+          ((screen.colPlacementDirection() == BScreen::BottomTop) ?
            test_y > 0 : test_y + win_size.h() < (signed) space.h())){
 
       placed = true;
@@ -555,9 +556,9 @@ void Workspace::placeWindow(OpenboxWindow *win) {
       (screen.getBorderWidth() * 4),
     start_pos = 0,
     change_y =
-      ((screen.getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
+      ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
     change_x =
-      ((screen.getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
+      ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
     delta_x = 8, delta_y = 8;
 
   LinkedListIterator<OpenboxWindow> it(windowList);
@@ -570,7 +571,7 @@ void Workspace::placeWindow(OpenboxWindow *win) {
                    win->size().h()+screen.getBorderWidth() * 4);
   Point *place = NULL;
 
-  switch (screen.getPlacementPolicy()) {
+  switch (screen.placementPolicy()) {
   case BScreen::BestFitPlacement:
     place = bestFitPlacement(window_size, space);
     break;

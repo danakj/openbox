@@ -64,10 +64,10 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
   update();
 
   setItemSelected(2, screen.getImageControl()->doDither());
-  setItemSelected(3, screen.doOpaqueMove());
-  setItemSelected(4, screen.doFullMax());
-  setItemSelected(5, screen.doFocusNew());
-  setItemSelected(6, screen.doFocusLast());
+  setItemSelected(3, screen.opaqueMove());
+  setItemSelected(4, screen.fullMax());
+  setItemSelected(5, screen.focusNew());
+  setItemSelected(6, screen.focusLast());
   setItemSelected(7, screen.hideToolbar());
 }
 
@@ -96,30 +96,30 @@ void Configmenu::itemSelected(int button, int index) {
   }
 
   case 2: { // opaque move
-    screen.saveOpaqueMove((! screen.doOpaqueMove()));
+    screen.setOpaqueMove(!screen.opaqueMove());
 
-    setItemSelected(index, screen.doOpaqueMove());
+    setItemSelected(index, screen.opaqueMove());
 
     break;
   }
 
   case 3: { // full maximization
-    screen.saveFullMax((! screen.doFullMax()));
+    screen.setFullMax(!screen.fullMax());
 
-    setItemSelected(index, screen.doFullMax());
+    setItemSelected(index, screen.fullMax());
 
     break;
   }
   case 4: { // focus new windows
-    screen.saveFocusNew((! screen.doFocusNew()));
+    screen.setFocusNew(!screen.focusNew());
 
-    setItemSelected(index, screen.doFocusNew());
+    setItemSelected(index, screen.focusNew());
     break;
   }
 
   case 5: { // focus last window on workspace
-    screen.saveFocusLast(!(screen.doFocusLast()));
-    setItemSelected(index, screen.doFocusLast());
+    screen.setFocusLast(!screen.focusLast());
+    setItemSelected(index, screen.focusLast());
     break;
   }
   case 6:{ //toggle toolbar hide
@@ -152,10 +152,10 @@ Configmenu::Focusmenu::Focusmenu(Configmenu *cm) : Basemenu(cm->screen) {
 			  "Auto Raise"), 3);
   update();
 
-  setItemSelected(0, (! configmenu->screen.isSloppyFocus()));
-  setItemSelected(1, configmenu->screen.isSloppyFocus());
-  setItemEnabled(2, configmenu->screen.isSloppyFocus());
-  setItemSelected(2, configmenu->screen.doAutoRaise());
+  setItemSelected(0, !configmenu->screen.sloppyFocus());
+  setItemSelected(1, configmenu->screen.sloppyFocus());
+  setItemEnabled(2, configmenu->screen.sloppyFocus());
+  setItemSelected(2, configmenu->screen.autoRaise());
 }
 
 void Configmenu::Focusmenu::itemSelected(int button, int index) {
@@ -169,8 +169,8 @@ void Configmenu::Focusmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case 1: // click to focus
-    configmenu->screen.saveSloppyFocus(False);
-    configmenu->screen.saveAutoRaise(False);
+    configmenu->screen.setSloppyFocus(false);
+    configmenu->screen.setAutoRaise(false);
 
     if (! configmenu->screen.getOpenbox().getFocusedWindow())
       XSetInputFocus(configmenu->screen.getOpenbox().getXDisplay(),
@@ -187,23 +187,23 @@ void Configmenu::Focusmenu::itemSelected(int button, int index) {
     break;
 
   case 2: // sloppy focus
-    configmenu->screen.saveSloppyFocus(True);
+    configmenu->screen.setSloppyFocus(true);
 
     configmenu->screen.reconfigure();
 
     break;
 
   case 3: // auto raise with sloppy focus
-    Bool change = ((configmenu->screen.doAutoRaise()) ? False : True);
-    configmenu->screen.saveAutoRaise(change);
+    bool change = ((configmenu->screen.autoRaise()) ? false : true);
+    configmenu->screen.setAutoRaise(change);
 
     break;
   }
 
-  setItemSelected(0, (! configmenu->screen.isSloppyFocus()));
-  setItemSelected(1, configmenu->screen.isSloppyFocus());
-  setItemEnabled(2, configmenu->screen.isSloppyFocus());
-  setItemSelected(2, configmenu->screen.doAutoRaise());
+  setItemSelected(0, !configmenu->screen.sloppyFocus());
+  setItemSelected(1, configmenu->screen.sloppyFocus());
+  setItemEnabled(2, configmenu->screen.sloppyFocus());
+  setItemSelected(2, configmenu->screen.autoRaise());
 }
 
 Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
@@ -234,7 +234,7 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 			  "Bottom to Top"), BScreen::BottomTop);
   update();
 
-  switch (configmenu->screen.getPlacementPolicy()) {
+  switch (configmenu->screen.placementPolicy()) {
   case BScreen::RowSmartPlacement:
     setItemSelected(0, True);
     break;
@@ -252,16 +252,16 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
     break;
   }
 
-  Bool rl = (configmenu->screen.getRowPlacementDirection() ==
+  Bool rl = (configmenu->screen.rowPlacementDirection() ==
 	     BScreen::LeftRight),
-       tb = (configmenu->screen.getColPlacementDirection() ==
+       tb = (configmenu->screen.colPlacementDirection() ==
 	     BScreen::TopBottom);
 
   setItemSelected(4, rl);
-  setItemSelected(5, ! rl);
+  setItemSelected(5, !rl);
 
   setItemSelected(6, tb);
-  setItemSelected(7, ! tb);
+  setItemSelected(7, !tb);
 }
 
 void Configmenu::Placementmenu::itemSelected(int button, int index) {
@@ -275,7 +275,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case BScreen::RowSmartPlacement:
-    configmenu->screen.savePlacementPolicy(item->function());
+    configmenu->screen.setPlacementPolicy(item->function());
 
     setItemSelected(0, True);
     setItemSelected(1, False);
@@ -285,7 +285,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::ColSmartPlacement:
-    configmenu->screen.savePlacementPolicy(item->function());
+    configmenu->screen.setPlacementPolicy(item->function());
 
     setItemSelected(0, False);
     setItemSelected(1, True);
@@ -295,7 +295,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::CascadePlacement:
-    configmenu->screen.savePlacementPolicy(item->function());
+    configmenu->screen.setPlacementPolicy(item->function());
 
     setItemSelected(0, False);
     setItemSelected(1, False);
@@ -305,7 +305,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::BestFitPlacement:
-    configmenu->screen.savePlacementPolicy(item->function());
+    configmenu->screen.setPlacementPolicy(item->function());
 
     setItemSelected(0, False);
     setItemSelected(1, False);
@@ -315,7 +315,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::LeftRight:
-    configmenu->screen.saveRowPlacementDirection(BScreen::LeftRight);
+    configmenu->screen.setRowPlacementDirection(BScreen::LeftRight);
 
     setItemSelected(4, True);
     setItemSelected(5, False);
@@ -323,7 +323,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::RightLeft:
-    configmenu->screen.saveRowPlacementDirection(BScreen::RightLeft);
+    configmenu->screen.setRowPlacementDirection(BScreen::RightLeft);
 
     setItemSelected(4, False);
     setItemSelected(5, True);
@@ -331,7 +331,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::TopBottom:
-    configmenu->screen.saveColPlacementDirection(BScreen::TopBottom);
+    configmenu->screen.setColPlacementDirection(BScreen::TopBottom);
 
     setItemSelected(5, True);
     setItemSelected(6, False);
@@ -339,7 +339,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     break;
 
   case BScreen::BottomTop:
-    configmenu->screen.saveColPlacementDirection(BScreen::BottomTop);
+    configmenu->screen.setColPlacementDirection(BScreen::BottomTop);
 
     setItemSelected(5, False);
     setItemSelected(6, True);

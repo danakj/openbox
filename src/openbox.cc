@@ -201,7 +201,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   menuTimestamps = new LinkedList<MenuTimestamp>;
 
-  load_rc();
+  load();
 
 #ifdef    HAVE_GETPID
   openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
@@ -226,6 +226,9 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
     ::exit(3);
   }
 
+  // save current settings and default values
+  save();
+  
   XSynchronize(getXDisplay(), False);
   XSync(getXDisplay(), False);
 
@@ -239,7 +242,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 }
 
 
-Openbox::~Openbox(void) {
+Openbox::~Openbox() {
   while (screenList->count())
     delete screenList->remove(0);
 
@@ -583,7 +586,7 @@ void Openbox::process_event(XEvent *e) {
 	(screen = searchScreen(e->xcrossing.window))) {
       screen->getImageControl()->installRootColormap();
     } else if ((win = searchWindow(e->xcrossing.window))) {
-      if (win->getScreen()->isSloppyFocus() &&
+      if (win->getScreen()->sloppyFocus() &&
 	  (! win->isFocused()) && (! no_focus)) {
 	grab();
 
@@ -748,11 +751,8 @@ void Openbox::process_event(XEvent *e) {
 Bool Openbox::handleSignal(int sig) {
   switch (sig) {
   case SIGHUP:
-    reconfigure();
-    break;
-
   case SIGUSR1:
-    reload_rc();
+    reconfigure();
     break;
 
   case SIGUSR2:
@@ -957,7 +957,7 @@ void Openbox::restart(const char *prog) {
 }
 
 
-void Openbox::shutdown(void) {
+void Openbox::shutdown() {
   BaseDisplay::shutdown();
 
   XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
@@ -967,13 +967,14 @@ void Openbox::shutdown(void) {
     s->shutdown();
 
   XSync(getXDisplay(), False);
-
-  save_rc();
 }
 
 
-void Openbox::save_rc(void) {
+void Openbox::save() {
   config.setAutoSave(false);
+  
+  // save all values as they are so that the defaults will be written to the rc
+  // file
   
   config.setValue("session.menuFile", getMenuFilename());
   config.setValue("session.colorsPerChannel",
@@ -985,122 +986,20 @@ void Openbox::save_rc(void) {
            (resource.auto_raise_delay.tv_usec / 1000)));
   config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
   config.setValue("session.cacheMax", (long)resource.cache_max);
+  config.setValue("session.styleFile", resource.style_file);
 
   LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current()) {
-//  ScreenList::iterator it = screenList.begin();
-//  for (; it != screenList.end(); ++it) {
-//    BScreen *screen = *it;
-    char rc_string[1024];
-    const int screen_number = screen->getScreenNumber();
-
-    config.setValue("session.opaqueMove",
-                    (screen->doOpaqueMove()) ? "True" : "False");
-    config.setValue("session.imageDither",
-                    (screen->getImageControl()->doDither()) ? "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.fullMaximization", screen_number);
-    config.setValue(rc_string, screen->doFullMax() ? "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.focusNewWindows", screen_number);
-    config.setValue(rc_string, screen->doFocusNew() ? "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.focusLastWindow", screen_number);
-    config.setValue(rc_string, screen->doFocusLast() ? "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.rowPlacementDirection", screen_number);
-    config.setValue(rc_string,
-                    screen->getRowPlacementDirection() == BScreen::LeftRight ?
-                    "LeftToRight" : "RightToLeft");
-
-    sprintf(rc_string, "session.screen%d.colPlacementDirection", screen_number);
-    config.setValue(rc_string,
-                    screen->getColPlacementDirection() == BScreen::TopBottom ?
-                    "TopToBottom" : "BottomToTop");
-
-    const char *placement;
-    switch (screen->getPlacementPolicy()) {
-    case BScreen::CascadePlacement: placement = "CascadePlacement"; break;
-    case BScreen::BestFitPlacement: placement = "BestFitPlacement"; break;
-    case BScreen::ColSmartPlacement: placement = "ColSmartPlacement"; break;
-    default:
-    case BScreen::RowSmartPlacement: placement = "RowSmartPlacement"; break;
-    }
-    sprintf(rc_string, "session.screen%d.windowPlacement", screen_number);
-    config.setValue(rc_string, placement);
-
-    sprintf(rc_string, "session.screen%d.focusModel", screen_number);
-    config.setValue(rc_string,
-                    (screen->isSloppyFocus() ?
-                     (screen->doAutoRaise() ? "AutoRaiseSloppyFocus" :
-                      "SloppyFocus") : "ClickToFocus"));
-
-    sprintf(rc_string, "session.screen%d.workspaces", screen_number);
-    config.setValue(rc_string, screen->getWorkspaceCount());
-
-#ifdef    HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.strftimeFormat", screen_number);
-    config.setValue(rc_string, screen->getStrftimeFormat());
-#else // !HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.dateFormat", screen_number);
-    config.setValue(rc_string, screen->getDateFormat() == B_EuropeanDate ?
-                    "European" : "American");
-
-    sprintf(rc_string, "session.screen%d.clockFormat", screen_number);
-    config.setValue(rc_string, screen->isClock24Hour() ? 24 : 12);
-#endif // HAVE_STRFTIME
-
-    sprintf(rc_string, "session.screen%d.edgeSnapThreshold", screen_number);
-    config.setValue(rc_string, screen->getEdgeSnapThreshold());
-
-    // write out the user's workspace names
-    int i, len = 0;
-    for (i = 0; i < screen->getWorkspaceCount(); i++)
-      len += strlen((screen->getWorkspace(i)->getName()) ?
-        screen->getWorkspace(i)->getName() : "Null") + 1;
-
-    char *resource_string = new char[len + 1024],
-      *save_string = new char[len], *save_string_pos = save_string,
-      *name_string_pos;
-    if (save_string) {
-      for (i = 0; i < screen->getWorkspaceCount(); i++) {
-        len = strlen((screen->getWorkspace(i)->getName()) ?
-         screen->getWorkspace(i)->getName() : "Null") + 1;
-        name_string_pos =
-          (char *) ((screen->getWorkspace(i)->getName()) ?
-                    screen->getWorkspace(i)->getName() : "Null");
-        
-        while (--len) *(save_string_pos++) = *(name_string_pos++);
-        *(save_string_pos++) = ',';
-      }
-    }
-
-    *(--save_string_pos) = '\0';
-
-    sprintf(resource_string, "session.screen%d.workspaceNames", screen_number);
-    config.setValue(resource_string, save_string);
-
-    delete [] resource_string;
-    delete [] save_string;
-/*
-    std::string save_string = screen->getWorkspace(0)->getName();
-    for (unsigned int i = 1; i < screen->getWorkspaceCount(); ++i) {
-      save_string += ',';
-      save_string += screen->getWorkspace(i)->getName();
-    }
-
-    char *resource_string = new char[save_string.length() + 48];
-    sprintf(resource_string, "session.screen%d.workspaceNames", screen_number);
-    config.setValue(rc_string, save_string);
-
-    delete [] resource_string;*/
+  for (BScreen *s = it.current(); s != NULL; it++, s = it.current()) {
+    s->save();
+    s->getToolbar()->save();
+    s->getSlit()->save();
   }
 
   config.setAutoSave(true);
   config.save();
 }
 
-void Openbox::load_rc(void) {
+void Openbox::load() {
   if (!config.load())
     return;
 
@@ -1162,207 +1061,18 @@ void Openbox::load_rc(void) {
 }
 
 
-void Openbox::load_rc(BScreen *screen) {
-  ASSERT (screen != NULL);
-  const int screen_number = screen->getScreenNumber();
-  ASSERT (screen_number >= 0);
-
-  if (!config.load())
-    return;
-
-  std::string s;
-  long l;
-  bool b;
-  char name_lookup[1024], class_lookup[1024];
-   
-  sprintf(name_lookup,  "session.screen%d.fullMaximization", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FullMaximization", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveFullMax((Bool)b);
-  else
-    screen->saveFullMax(False);
-
-  sprintf(name_lookup,  "session.screen%d.focusNewWindows", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FocusNewWindows", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveFocusNew((Bool)b);
-  else
-    screen->saveFocusNew(False);
-  
-  sprintf(name_lookup,  "session.screen%d.focusLastWindow", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.focusLastWindow", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveFocusLast((Bool)b);
-  else
-    screen->saveFocusLast(False);
-  
-  sprintf(name_lookup,  "session.screen%d.rowPlacementDirection",
-          screen_number);
-  sprintf(class_lookup, "Session.Screen%d.RowPlacementDirection",
-	  screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "righttoleft", s.length()))
-      screen->saveRowPlacementDirection(BScreen::RightLeft);
-    else
-      screen->saveRowPlacementDirection(BScreen::LeftRight);
-  } else
-    screen->saveRowPlacementDirection(BScreen::LeftRight);
-  
-  sprintf(name_lookup,  "session.screen%d.colPlacementDirection",
-	  screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ColPlacementDirection",
-	  screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "bottomtotop", s.length()))
-      screen->saveColPlacementDirection(BScreen::BottomTop);
-    else
-      screen->saveColPlacementDirection(BScreen::TopBottom);
-  } else
-    screen->saveColPlacementDirection(BScreen::TopBottom);
-
-  sprintf(name_lookup,  "session.screen%d.workspaces", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Workspaces", screen_number);
-  if (config.getValue(name_lookup, class_lookup, l))
-    screen->saveWorkspaces(l);
-  else
-    screen->saveWorkspaces(1);
-  
-  screen->removeWorkspaceNames();
-  sprintf(name_lookup,  "session.screen%d.workspaceNames", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WorkspaceNames", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-  //  for (int i = 0; i < screen->getNumberOfWorkspaces(); i++) {
-    std::string::const_iterator it = s.begin(), end = s.end();
-    while(1) {
-      std::string::const_iterator tmp = it;// current string.begin()
-      it = std::find(tmp, end, ',');       // look for comma between tmp and end
-      std::string name(tmp, it);           // name = s[tmp:it]
-      screen->addWorkspaceName(name.c_str());
-      if (it == end)
-        break;
-      ++it;
-    }
-  }
-
-  sprintf(name_lookup,  "session.screen%d.focusModel", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FocusModel", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "clicktofocus", s.length())) {
-      screen->saveAutoRaise(False);
-      screen->saveSloppyFocus(False);
-    } else if (0 == strncasecmp(s.c_str(), "autoraisesloppyfocus",
-                                s.length())) {
-      screen->saveSloppyFocus(True);
-      screen->saveAutoRaise(True);
-    } else {
-      screen->saveSloppyFocus(True);
-      screen->saveAutoRaise(False);
-    }
-  } else {
-    screen->saveSloppyFocus(True);
-    screen->saveAutoRaise(False);
-  }
-
-  sprintf(name_lookup,  "session.screen%d.windowZones", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WindowZones", screen_number);
-  if (config.getValue(name_lookup, class_lookup, l))
-    screen->saveWindowZones((l == 1 || l == 2 || l == 4) ? l : 1);
-  else
-    screen->saveWindowZones(1);
-  
-  sprintf(name_lookup,  "session.screen%d.windowPlacement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WindowPlacement", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "RowSmartPlacement", s.length()))
-      screen->savePlacementPolicy(BScreen::RowSmartPlacement);
-    else if (0 == strncasecmp(s.c_str(), "ColSmartPlacement", s.length()))
-      screen->savePlacementPolicy(BScreen::ColSmartPlacement);
-    else if (0 == strncasecmp(s.c_str(), "BestFitPlacement", s.length()))
-      screen->savePlacementPolicy(BScreen::BestFitPlacement);
-    else
-      screen->savePlacementPolicy(BScreen::CascadePlacement);
-  } else
-    screen->savePlacementPolicy(BScreen::RowSmartPlacement);
-
-#ifdef    SLIT
-#endif // SLIT
-
-#ifdef    HAVE_STRFTIME
-  sprintf(name_lookup,  "session.screen%d.strftimeFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.StrftimeFormat", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s))
-    screen->saveStrftimeFormat(s.c_str());
-  else
-    screen->saveStrftimeFormat("%I:%M %p");
-
-#else //  HAVE_STRFTIME
-  sprintf(name_lookup,  "session.screen%d.dateFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.DateFormat", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (strncasecmp(s.c_str(), "european", s.length()))
-      screen->saveDateFormat(B_AmericanDate);
-    else
-      screen->saveDateFormat(B_EuropeanDate);
-  } else
-    screen->saveDateFormat(B_AmericanDate);
-
-  sprintf(name_lookup,  "session.screen%d.clockFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ClockFormat", screen_number);
-  if (config.getValue(name_lookup, class_lookup, l)) {
-    if (clock == 24)
-      screen->saveClock24Hour(True);
-    else
-      screen->saveClock24Hour(False);
-  } else
-    screen->saveClock24Hour(False);
-#endif // HAVE_STRFTIME
-
-  sprintf(name_lookup,  "session.screen%d.edgeSnapThreshold", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.EdgeSnapThreshold", screen_number);
-  if (config.getValue(name_lookup, class_lookup, l))
-    screen->saveEdgeSnapThreshold(l);
-  else
-    screen->saveEdgeSnapThreshold(4);
-
-  sprintf(name_lookup,  "session.screen%d.imageDither", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ImageDither", screen_number);
-  if (config.getValue("session.imageDither", "Session.ImageDither", b))
-    screen->saveImageDither((Bool)b);
-  else
-    screen->saveImageDither(True);
-
-  sprintf(name_lookup, "session.screen%d.rootCommand", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.RootCommand", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s))
-    screen->saveRootCommand(s.c_str());
-  else
-    screen->saveRootCommand(NULL);
-
-  if (config.getValue("session.opaqueMove", "Session.OpaqueMove", b))
-    screen->saveOpaqueMove((Bool)b);
-  else
-    screen->saveOpaqueMove(False);
-}
-
-
-void Openbox::reload_rc(void) {
-  load_rc();
-  reconfigure();
-}
-
-
-void Openbox::reconfigure(void) {
+void Openbox::reconfigure() {
   reconfigure_wait = True;
 
   if (! timer->isTiming()) timer->start();
 }
 
 
-void Openbox::real_reconfigure(void) {
+void Openbox::real_reconfigure() {
   grab();
 
-  config.load();
-  config.setValue("session.styleFile", resource.style_file);    // autosave's
+  load();
+  save();
   
   for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
     MenuTimestamp *ts = menuTimestamps->remove(0);
@@ -1384,7 +1094,7 @@ void Openbox::real_reconfigure(void) {
 }
 
 
-void Openbox::checkMenu(void) {
+void Openbox::checkMenu() {
   Bool reread = False;
   LinkedListIterator<MenuTimestamp> it(menuTimestamps);
   for (MenuTimestamp *tmp = it.current(); tmp && (! reread);
@@ -1403,14 +1113,14 @@ void Openbox::checkMenu(void) {
 }
 
 
-void Openbox::rereadMenu(void) {
+void Openbox::rereadMenu() {
   reread_menu_wait = True;
 
   if (! timer->isTiming()) timer->start();
 }
 
 
-void Openbox::real_rereadMenu(void) {
+void Openbox::real_rereadMenu() {
   for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
     MenuTimestamp *ts = menuTimestamps->remove(0);
 
@@ -1459,7 +1169,7 @@ void Openbox::saveMenuFilename(const char *filename) {
 }
 
 
-void Openbox::timeout(void) {
+void Openbox::timeout() {
   if (reconfigure_wait)
     real_reconfigure();
 

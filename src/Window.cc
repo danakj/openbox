@@ -259,7 +259,7 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
 
   associateClientWindow();
 
-  if (! screen->isSloppyFocus())
+  if (! screen->sloppyFocus())
     openbox.grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
         GrabModeSync, GrabModeSync, None, None);
 
@@ -847,7 +847,7 @@ void OpenboxWindow::reconfigure(void) {
 
   configure(frame.x, frame.y, frame.width, frame.height);
 
-  if (! screen->isSloppyFocus())
+  if (! screen->sloppyFocus())
     openbox.grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
         GrabModeSync, GrabModeSync, None, None);
   else
@@ -1407,7 +1407,7 @@ Bool OpenboxWindow::setInputFocus(void) {
       XSendEvent(display, client.window, False, NoEventMask, &ce);
     }
 
-    if (screen->isSloppyFocus() && screen->doAutoRaise())
+    if (screen->sloppyFocus() && screen->autoRaise())
       timer->start();
 
     ret = True;
@@ -1465,7 +1465,7 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
   XMapSubwindows(display, frame.window);
   XMapWindow(display, frame.window);
 
-  if (flags.iconic && screen->doFocusNew()) setInputFocus();
+  if (flags.iconic && screen->focusNew()) setInputFocus();
 
   flags.visible = True;
   flags.iconic = False;
@@ -1553,7 +1553,7 @@ void OpenboxWindow::maximize(unsigned int button) {
   dh -= client.base_height;
   dh -= frame.y_border;
 
-  if (! screen->doFullMax())
+  if (! screen->fullMax())
     dh -= screen->getToolbar()->getExposedHeight() + frame.border_w;
 
   if (dw < client.min_width) dw = client.min_width;
@@ -1573,7 +1573,7 @@ void OpenboxWindow::maximize(unsigned int button) {
 
   dx += ((screen->size().w() - dw) / 2) - frame.border_w;
 
-  if (screen->doFullMax()) {
+  if (screen->fullMax()) {
     dy += ((screen->size().h() - dh) / 2) - frame.border_w;
   } else {
     dy += (((screen->size().h() - screen->getToolbar()->getExposedHeight())
@@ -1740,7 +1740,7 @@ void OpenboxWindow::setFocusFlag(Bool focus) {
       XSetWindowBorder(display, frame.plate, frame.uborder_pixel);
   }
 
-  if (screen->isSloppyFocus() && screen->doAutoRaise() && timer->isTiming())
+  if (screen->sloppyFocus() && screen->autoRaise() && timer->isTiming())
     timer->stop();
 }
 
@@ -2258,7 +2258,7 @@ void OpenboxWindow::mapNotifyEvent(XMapEvent *ne) {
 
     redrawAllButtons();
 
-    if (flags.transient || screen->doFocusNew())
+    if (flags.transient || screen->focusNew())
       setInputFocus();
     else
       setFocusFlag(False);
@@ -2641,7 +2641,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
       shade();
   }
 
-  if (! (flags.focused || screen->isSloppyFocus()) ) {
+  if (! (flags.focused || screen->sloppyFocus()) ) {
     setInputFocus();  // any click focus' the window in 'click to focus'
   }
   if (stack_change < 0) {
@@ -2722,7 +2722,7 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
     flags.moving = False;
 
     openbox.maskWindowEvents(0, (OpenboxWindow *) 0);
-    if (!screen->doOpaqueMove()) {
+    if (!screen->opaqueMove()) {
       XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
                      frame.move_x, frame.move_y, frame.resize_w - 1,
                      frame.resize_h - 1);
@@ -2781,7 +2781,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       openbox.maskWindowEvents(client.window, this);
 
-      if (! screen->doOpaqueMove()) {
+      if (! screen->opaqueMove()) {
         openbox.grab();
 
         frame.move_x = frame.x;
@@ -2802,7 +2802,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       dx -= frame.border_w;
       dy -= frame.border_w;
 
-      int snap_distance = screen->getEdgeSnapThreshold();
+      int snap_distance = screen->edgeSnapThreshold();
       // width/height of the snapping window
       unsigned int snap_w = frame.width + (frame.border_w * 2);
       unsigned int snap_h = size().h() + (frame.border_w * 2);
@@ -2843,7 +2843,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
           dy = dbby - snap_h;
       }
 
-      if (screen->doOpaqueMove()) {
+      if (screen->opaqueMove()) {
 	configure(dx, dy, frame.width, frame.height);
       } else {
 	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),

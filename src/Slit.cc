@@ -256,6 +256,13 @@ void Slit::setDirection(int d) {
                   m_direction == Horizontal ? "Horizontal" : "Vertical");
 }
 
+void Slit::save() {
+  setOnTop(m_ontop);
+  setAutoHide(m_autohide);
+  setPlacement(m_placement);
+  setDirection(m_direction);
+}
+
 void Slit::load() {
   std::ostrstream rscreen, rname, rclass;
   std::string s;

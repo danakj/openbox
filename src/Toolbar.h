@@ -136,6 +136,7 @@ public:
   void edit();
   void reconfigure();
   void load();
+  void save();
   void mapToolbar();
   void unMapToolbar();
 #ifdef    HAVE_STRFTIME

@@ -257,6 +257,13 @@ void Toolbar::setPlacement(int p) {
   config.setValue(s.str(), placement);
 }
 
+void Toolbar::save() {
+  setOnTop(m_ontop);
+  setAutoHide(m_autohide);
+  setWidthPercent(m_width_percent);
+  setPlacement(m_placement);
+}
+
 void Toolbar::load() {
   std::ostrstream rscreen, rname, rclass;
   std::string s;
@@ -379,7 +386,7 @@ void Toolbar::reconfigure() {
     tt = localtime(&ttmp);
     if (tt) {
       char t[1025], *time_string = (char *) 0;
-      int len = strftime(t, 1024, screen.getStrftimeFormat(), tt);
+      int len = strftime(t, 1024, screen.strftimeFormat(), tt);
       t[len++-1] = ' ';   // add a space to the string for padding
       t[len] = '\0';
 
@@ -616,7 +623,7 @@ void Toolbar::checkClock(Bool redraw, Bool date) {
   if (redraw) {
 #ifdef    HAVE_STRFTIME
     char t[1024];
-    if (! strftime(t, 1024, screen.getStrftimeFormat(), tt))
+    if (! strftime(t, 1024, screen.strftimeFormat(), tt))
       return;
 #else // !HAVE_STRFTIME
     char t[9];
@@ -950,7 +957,7 @@ void Toolbar::edit() {
     return;
 
   XSetInputFocus(display, frame.workspace_label,
-                 ((screen.isSloppyFocus()) ? RevertToPointerRoot :
+                 ((screen.sloppyFocus()) ? RevertToPointerRoot :
                   RevertToParent),
                  CurrentTime);
   XClearWindow(display, frame.workspace_label);

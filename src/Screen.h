@@ -132,23 +132,21 @@ private:
     ToolbarStyle tstyle;
     MenuStyle mstyle;
 
-    Bool sloppy_focus, auto_raise,
-      auto_edge_balance, image_dither, ordered_dither, opaque_move, full_max,
-      focus_new, focus_last;
-    bool hide_toolbar;
+    bool sloppy_focus, auto_raise, auto_edge_balance, image_dither, focus_last,
+      ordered_dither, opaque_move, hide_toolbar, full_max, focus_new;
     BColor border_color;
     Resource styleconfig;
 
-    int workspaces, toolbar_placement, toolbar_width_percent, placement_policy,
-      edge_snap_threshold, row_direction, col_direction;
+    int workspaces, placement_policy, edge_snap_threshold, row_direction,
+      col_direction;
 
     unsigned int handle_width, bevel_width, frame_width, border_width;
-    unsigned int zones; // number of zones to be used when alt-resizing a window
+    int zones; // number of zones to be used when alt-resizing a window
 
 #ifdef    HAVE_STRFTIME
     char *strftime_format;
 #else // !HAVE_STRFTIME
-    Bool clock24hour;
+    bool clock24hour;
     int date_format;
 #endif // HAVE_STRFTIME
 
@@ -175,21 +173,7 @@ public:
   BScreen(Openbox &, int, Resource &);
   ~BScreen();
 
-  inline const Bool &isSloppyFocus() const
-  { return resource.sloppy_focus; }
-  inline const Bool &isRootColormapInstalled() const
-  { return root_colormap_installed; }
-  inline const Bool &doAutoRaise() const { return resource.auto_raise; }
   inline const Bool &isScreenManaged() const { return managed; }
-  inline const Bool &doImageDither() const
-  { return resource.image_dither; }
-  inline const Bool &doOrderedDither() const
-  { return resource.ordered_dither; }
-  inline const Bool &doOpaqueMove() const { return resource.opaque_move; }
-  inline const Bool &doFullMax() const { return resource.full_max; }
-  inline const Bool &doFocusNew() const { return resource.focus_new; }
-  inline const Bool &doFocusLast() const { return resource.focus_last; }
-
   inline const GC &getOpGC() const { return opGC; }
 
   inline Openbox &getOpenbox() { return openbox; }
@@ -201,16 +185,14 @@ public:
   inline Slit *getSlit() { return slit; }
 #endif // SLIT
 
-  inline int getWindowZones() const
-  { return resource.zones; }
-  inline void saveWindowZones(int z) { resource.zones = z; }
-  
   inline Toolbar *getToolbar() { return toolbar; }
 
   inline Workspace *getWorkspace(int w) { return workspacesList->find(w); }
   inline Workspace *getCurrentWorkspace() { return current_workspace; }
 
   inline Workspacemenu *getWorkspacemenu() { return workspacemenu; }
+  
+  inline void iconUpdate() { iconmenu->update(); }
 
   inline const unsigned int &getHandleWidth() const
   { return resource.handle_width; }
@@ -225,51 +207,63 @@ public:
   { return current_workspace->getWorkspaceID(); }
   inline const int getWorkspaceCount() { return workspacesList->count(); }
   inline const int getIconCount() { return iconList->count(); }
-  inline const int &getNumberOfWorkspaces() const
-  { return resource.workspaces; }
-  inline const int &getPlacementPolicy() const
-  { return resource.placement_policy; }
-  inline const int &getEdgeSnapThreshold() const
-  { return resource.edge_snap_threshold; }
-  inline const int &getRowPlacementDirection() const
-  { return resource.row_direction; }
-  inline const int &getColPlacementDirection() const
-  { return resource.col_direction; }
 
-  inline void saveRootCommand(const char *cmd) {
-    if (resource.root_command != NULL)
-      delete [] resource.root_command;
-    if (cmd != NULL)
-      resource.root_command = bstrdup(cmd);
-    else
-      resource.root_command = NULL;
-  }
-  inline const char *getRootCommand() const
-  { return resource.root_command; }
-  
+  inline const Bool &isRootColormapInstalled() const
+    { return root_colormap_installed; }
   inline void setRootColormapInstalled(Bool r) { root_colormap_installed = r; }
-  inline void saveSloppyFocus(Bool s) { resource.sloppy_focus = s; }
-  inline void saveAutoRaise(Bool a) { resource.auto_raise = a; }
-  inline void saveWorkspaces(int w) { resource.workspaces = w; }
-  inline void savePlacementPolicy(int p) { resource.placement_policy = p; }
-  inline void saveRowPlacementDirection(int d) { resource.row_direction = d; }
-  inline void saveColPlacementDirection(int d) { resource.col_direction = d; }
-  inline void saveEdgeSnapThreshold(int t)
-  { resource.edge_snap_threshold = t; }
-  inline void saveImageDither(Bool d) { resource.image_dither = d; }
-  inline void saveOpaqueMove(Bool o) { resource.opaque_move = o; }
-  inline void saveFullMax(Bool f) { resource.full_max = f; }
-  inline void saveFocusNew(Bool f) { resource.focus_new = f; }
-  inline void saveFocusLast(Bool f) { resource.focus_last = f; }
-  inline void iconUpdate() { iconmenu->update(); }
+  
+  inline bool sloppyFocus() const { return resource.sloppy_focus; }
+  void setSloppyFocus(bool s);
+  
+  inline bool autoRaise() const { return resource.auto_raise; }
+  void setAutoRaise(bool a);
+  
+  inline bool imageDither() const { return resource.image_dither; }
+  void setImageDither(bool d);
+  
+  inline bool orderedDither() const { return resource.ordered_dither; }
+  
+  inline bool opaqueMove() const { return resource.opaque_move; }
+  void setOpaqueMove(bool o);
+  
+  inline bool fullMax() const { return resource.full_max; }
+  void setFullMax(bool f);
+  
+  inline bool focusNew() const { return resource.focus_new; }
+  void setFocusNew(bool f);
+  
+  inline bool focusLast() const { return resource.focus_last; }
+  void setFocusLast(bool f);
+  
+  inline int getWindowZones() const { return resource.zones; }
+  void setWindowZones(int z);
+  
+  inline int workspaceCount() const { return resource.workspaces; }
+  void setWorkspaceCount(int w);
+
+  inline int placementPolicy() const { return resource.placement_policy; }
+  void setPlacementPolicy(int p);
+
+  inline int edgeSnapThreshold() const { return resource.edge_snap_threshold; }
+  void setEdgeSnapThreshold(int t);
+  
+  inline int rowPlacementDirection() const { return resource.row_direction; }
+  void setRowPlacementDirection(int d);
+  
+  inline int colPlacementDirection() const { return resource.col_direction; }
+  void setColPlacementDirection(int d);
+  
+  inline char *rootCommand() const { return resource.root_command; }
+  inline void setRootCommand(const char *cmd);
+  
 #ifdef    HAVE_STRFTIME
-  inline char *getStrftimeFormat() { return resource.strftime_format; }
-  void saveStrftimeFormat(const char *);
+  inline char *strftimeFormat() { return resource.strftime_format; }
+  void setStrftimeFormat(const char *);
 #else // !HAVE_STRFTIME
-  inline int getDateFormat() { return resource.date_format; }
-  inline void saveDateFormat(int f) { resource.date_format = f; }
-  inline Bool isClock24Hour() { return resource.clock24hour; }
-  inline void saveClock24Hour(Bool c) { resource.clock24hour = c; }
+  inline int dateFormat() { return resource.date_format; }
+  void setDateFormat(int f);
+  inline bool clock24Hour() { return resource.clock24hour; }
+  void setClock24Hour(Bool c);
 #endif // HAVE_STRFTIME
 
   inline bool hideToolbar() const { return resource.hide_toolbar; }
@@ -286,6 +280,7 @@ public:
 
   void removeWorkspaceNames();
   void addWorkspaceName(const char *);
+  void saveWorkspaceNames();
   void addNetizen(Netizen *);
   void removeNetizen(Window);
   void addIcon(OpenboxWindow *);
@@ -299,6 +294,7 @@ public:
   void raiseFocus();
   void reconfigure();
   void load();
+  void save();
   void rereadMenu();
   void shutdown();
   void showPosition(int, int);

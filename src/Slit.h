@@ -137,6 +137,7 @@ public:
   void removeClient(Window, Bool = True);
   void reconfigure();
   void load();
+  void save();
   void reposition();
   void shutdown();
 

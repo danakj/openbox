@@ -8,6 +8,7 @@
 #include "action.h"
 #include "prop.h"
 #include "timer.h"
+#include "config.h"
 #include "keytree.h"
 #include "keyboard.h"
 #include "translate.h"
@@ -36,6 +37,10 @@ static void grab_for_window(Window win, gboolean grab)
             grab_key(p->key, p->state, win, GrabModeAsync);
             p = p->next_sibling;
         }
+        if (curpos)
+            grab_key(config_keyboard_reset_keycode,
+                     config_keyboard_reset_state,
+                     win, GrabModeAsync);
     }
 }
 
@@ -178,6 +183,13 @@ void keyboard_event(ObClient *client, const XEvent *e)
     KeyBindingTree *p;
 
     g_assert(e->type == KeyPress);
+
+    if (e->xkey.keycode == config_keyboard_reset_keycode &&
+        e->xkey.state == config_keyboard_reset_state)
+    {
+        keyboard_reset_chains();
+        return;
+    }
 
     if (curpos == NULL)
         p = keyboard_firstnode;

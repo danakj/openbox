@@ -53,6 +53,8 @@
 </dock>
 
 <keyboard>
+  <chainQuitKey>C-g</chainQuitKey>
+
   <keybind key="A-F10">
     <action name="MaximizeFull"></action>
   </keybind>

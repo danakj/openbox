@@ -2,6 +2,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "prop.h"
+#include "translate.h"
 #include "parser/parse.h"
 
 gboolean config_focus_new;
@@ -29,6 +30,9 @@ ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
 guint           config_dock_hide_timeout;
 
+guint config_keyboard_reset_keycode;
+guint config_keyboard_reset_state;
+
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
@@ -48,6 +52,12 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
     ObAction *action;
     xmlNodePtr n, nact;
     GList *it;
+
+    if ((n = parse_find_node("chainQuitKey", node))) {
+        key = parse_string(doc, n);
+        translate_key(key, &config_keyboard_reset_state,
+                      &config_keyboard_reset_keycode);
+    }
 
     n = parse_find_node("keybind", node);
     while (n) {
@@ -342,6 +352,9 @@ void config_startup()
     config_dock_hide_timeout = 3000;
 
     parse_register("dock", parse_dock, NULL);
+
+    translate_key("C-g", &config_keyboard_reset_state,
+                  &config_keyboard_reset_keycode);
 
     parse_register("keyboard", parse_keyboard, NULL);
 

@@ -1,5 +1,7 @@
 Openbox TODO list:
 
+* make Escape key cancel moving/resizing a window
+
 * add asserts all throughout the code to catch bugs.
 
 * new configuration class which handles the X db, with better functionality.

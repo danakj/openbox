@@ -37,9 +37,9 @@
 #include "Windowmenu.h"
 #include "Workspace.h"
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 
 Windowmenu::Windowmenu(OpenboxWindow &win) : Basemenu(*win.getScreen()),

@@ -250,7 +250,8 @@ int Basemenu::remove(int index) {
 
 void Basemenu::update(void) {
   MenuStyle *style = screen->getMenuStyle();
-  menu.item_h = style->f_font->height() + menu.bevel_w;
+  menu.item_h = (style->f_font->height() < 9 ? 9 : style->f_font->height()) +
+                menu.bevel_w;  // 9 for the menu pixmaps (checkmarks)
   menu.title_h = style->t_font->height() + menu.bevel_w * 2;
 
   if (title_vis) {

@@ -968,6 +968,10 @@ void Client::resize(Corner anchor, int w, int h, int x, int y)
   w /= _size_inc.x();
   h /= _size_inc.y();
 
+  // you cannot resize to nothing
+  if (w < 1) w = 1;
+  if (h < 1) h = 1;
+  
   // store the logical size
   _logical_size.setPoint(w, h);
 

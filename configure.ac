@@ -41,7 +41,7 @@ ALL_LINGUAS=""
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT([external])
 
-AC_CHECK_HEADERS(ctype.h fcntl.h locale.h process.h signal.h string.h stdlib.h)
+AC_CHECK_HEADERS(ctype.h fcntl.h locale.h signal.h string.h stdlib.h)
 AC_CHECK_HEADERS(unistd.h sys/select.h sys/time.h sys/wait.h)
 # AC_HEADER_TIME
 # AC_TYPE_SIGNAL

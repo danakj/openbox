@@ -261,6 +261,9 @@ Openbox::~Openbox() {
   if (resource.style_file)
     delete [] resource.style_file;
 
+  if (resource.titlebar_layout)
+    delete [] resource.titlebar_layout;
+
   delete timer;
 
   delete screenList;

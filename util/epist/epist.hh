@@ -67,7 +67,7 @@ public:
   void removeWindow(XWindow *window);
   XWindow *findWindow(Window window) const;
 
-  ActionList actions(void) { return _actions; }
+  const ActionList actions(void) { return _actions; }
 };
 
 #endif // __epist_hh

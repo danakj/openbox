@@ -246,19 +246,27 @@ void screen::handleKeypress(const XEvent &e) {
           return;
 
         case Action::moveWindowUp:
-          window->move(0, -it->number());
+          window->move(window->x(), window->y() - it->number());
           return;
       
         case Action::moveWindowDown:
-          window->move(0, it->number());
+          window->move(window->x(), window->y() + it->number());
           return;
       
         case Action::moveWindowLeft:
-          window->move(-it->number(), 0);
+          window->move(window->x() - it->number(), window->y());
           return;
       
         case Action::moveWindowRight:
-          window->move(it->number(), 0);
+          window->move(window->x() + it->number(), window->y());
+          return;
+      
+        case Action::resizeWindowWidth:
+          window->resize(window->width() + it->number(), window->height());
+          return;
+      
+        case Action::resizeWindowHeight:
+          window->resize(window->width(), window->height() + it->number());
           return;
       
         case Action::toggleshade:

@@ -30,12 +30,11 @@ extern "C" {
 #include <list>
 #include <string>
 
+#include "../../src/Util.hh"
+
 class epist;
 class screen;
-class XWindow;
 class XAtom;
-
-typedef std::list<XWindow *> WindowList;
 
 class XWindow {
 public:
@@ -47,15 +46,18 @@ public:
   };
 
 private:
-  epist *_epist;
+  epist  *_epist;
   screen *_screen;
-  XAtom *_xatom;
+  XAtom  *_xatom;
+
   Window _window;
-  
+
   unsigned int _desktop;
   std::string _title;
   std::string _app_name;
   std::string _app_class;
+  Rect _rect;
+  int _gravity;
 
   // states
   bool _shaded;
@@ -65,6 +67,8 @@ private:
 
   bool _unmapped;
 
+  void updateDimentions();
+  void updateGravity();
   void updateState();
   void updateDesktop();
   void updateTitle();
@@ -87,6 +91,11 @@ public:
   inline bool iconic() const { return _iconic; }
   inline bool maxVert() const { return _max_vert; }
   inline bool maxHorz() const { return _max_horz; }
+  inline const Rect &area() const { return _rect; }
+  inline unsigned int x() const { return _rect.x(); }
+  inline unsigned int y() const { return _rect.y(); }
+  inline unsigned int width() const { return _rect.width(); }
+  inline unsigned int height() const { return _rect.height(); }
 
   void processEvent(const XEvent &e);
 
@@ -98,11 +107,14 @@ public:
   void focus() const;
   void sendTo(unsigned int dest) const;
   void move(int x, int y) const;
+  void resize(unsigned int width, unsigned int height) const;
   void toggleMaximize(Max max) const; // i hate toggle functions
   void maximize(Max max) const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }
 };
+
+typedef std::list<XWindow *> WindowList;
 
 #endif // __window_hh

@@ -365,6 +365,13 @@ static void binddef()
     mbind("1", "brcorner", MouseAction_Motion, a);
     a = action_new(action_resize);
     mbind("A-3", "frame", MouseAction_Motion, a);
+
+    a = action_new(action_toggle_shade);
+    mbind("1", "titlebar", MouseAction_DClick, a);
+    a = action_new(action_shade);
+    mbind("4", "titlebar", MouseAction_Press, a);
+    a = action_new(action_unshade);
+    mbind("5", "titlebar", MouseAction_Click, a);
 }
 
 void plugin_startup()

@@ -1,6 +1,6 @@
 Changelog for Openbox:
 
-1.3.0:
+2.0.0:
  * make reconfigure reset the timeout values for
    windows, the slit, and the toolbar, so that a new
    autoRaiseDelay value will take effect without having

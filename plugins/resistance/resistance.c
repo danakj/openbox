@@ -161,7 +161,7 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
     ab = at + area->height - 1;
 
     /* snap to other windows */
-    if (resist_windows) {
+    if (win_resistance) {
         for (it = stacking_list; it != NULL; it = it->next) {
             if (!WINDOW_IS_CLIENT(it->data))
                 continue;
@@ -225,41 +225,43 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
     }
 
     /* snap to screen edges */
-    
-    /* horizontal snapping */
-    switch (corn) {
-    case OB_CORNER_TOPLEFT:
-    case OB_CORNER_BOTTOMLEFT:
-        dlt = l;
-        drb = r + *w - c->frame->area.width;
-        if (r <= ar && drb > ar && drb <= ar + edge_resistance)
-            *w = ar - l + 1;
-        break;
-    case OB_CORNER_TOPRIGHT:
-    case OB_CORNER_BOTTOMRIGHT:
-        dlt = l - *w + c->frame->area.width;
-        drb = r;
-        if (l >= al && dlt < al && dlt >= al - edge_resistance)
-            *w = r - al + 1;
-        break;
-    }
 
-    /* vertical snapping */
-    switch (corn) {
-    case OB_CORNER_TOPLEFT:
-    case OB_CORNER_TOPRIGHT:
-        dlt = t;
-        drb = b + *h - c->frame->area.height;
-        if (b <= ab && drb > ab && drb <= ab + edge_resistance)
-            *h = ab - t + 1;
-        break;
-    case OB_CORNER_BOTTOMLEFT:
-    case OB_CORNER_BOTTOMRIGHT:
-        dlt = t - *h + c->frame->area.height;
-        drb = b;
-        if (t >= at && dlt < at && dlt >= at - edge_resistance)
-            *h = b - at + 1;
-        break;
+    if (edge_resistance) {
+        /* horizontal snapping */
+        switch (corn) {
+        case OB_CORNER_TOPLEFT:
+        case OB_CORNER_BOTTOMLEFT:
+            dlt = l;
+            drb = r + *w - c->frame->area.width;
+            if (r <= ar && drb > ar && drb <= ar + edge_resistance)
+                *w = ar - l + 1;
+            break;
+        case OB_CORNER_TOPRIGHT:
+        case OB_CORNER_BOTTOMRIGHT:
+            dlt = l - *w + c->frame->area.width;
+            drb = r;
+            if (l >= al && dlt < al && dlt >= al - edge_resistance)
+                *w = r - al + 1;
+            break;
+        }
+
+        /* vertical snapping */
+        switch (corn) {
+        case OB_CORNER_TOPLEFT:
+        case OB_CORNER_TOPRIGHT:
+            dlt = t;
+            drb = b + *h - c->frame->area.height;
+            if (b <= ab && drb > ab && drb <= ab + edge_resistance)
+                *h = ab - t + 1;
+            break;
+        case OB_CORNER_BOTTOMLEFT:
+        case OB_CORNER_BOTTOMRIGHT:
+            dlt = t - *h + c->frame->area.height;
+            drb = b;
+            if (t >= at && dlt < at && dlt >= at - edge_resistance)
+                *h = b - at + 1;
+            break;
+        }
     }
 }
 

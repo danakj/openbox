@@ -3130,10 +3130,10 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
 
   // window corners
-  const int wleft = dx - snap_offset,
-           wright = dx + frame.rect.width() - 1 + snap_offset,
-             wtop = dy - snap_offset,
-          wbottom = dy + frame.rect.height() - 1 + snap_offset;
+  const int wleft = dx,
+           wright = dx + frame.rect.width() - 1,
+             wtop = dy,
+          wbottom = dy + frame.rect.height() - 1;
 
   if (snap_to_windows) {
     RectList rectlist;
@@ -3170,6 +3170,11 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
     for (it = rectlist.begin(); it != end; ++it) {
       bool snapped = False;
       const Rect &winrect = *it;
+      Rect offsetrect;
+      offsetrect.setCoords(winrect.left() - snap_offset,
+                           winrect.top() - snap_offset,
+                           winrect.right() + snap_offset,
+                           winrect.bottom() + snap_offset);
 
       if (snap_to_windows == BScreen::WindowResistance)
         // if the window is already over top of this snap target, then
@@ -3184,31 +3189,31 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           wtop < (signed)(winrect.y() + winrect.height() - 1)) {
 
         if (snap_to_windows == BScreen::WindowResistance) {
-          dleft = wright - winrect.left();
-          dright = winrect.right() - wleft;
+          dleft = wright - offsetrect.left();
+          dright = offsetrect.right() - wleft;
 
           // snap left of other window?
           if (dleft >= 0 && dleft < resistance_size) {
-            dx = winrect.left() - frame.rect.width();
+            dx = offsetrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
           else if (dright >= 0 && dright < resistance_size) {
-            dx = winrect.right() + 1;
+            dx = offsetrect.right() + 1;
             snapped = True;
           }
         } else { // BScreen::WindowSnap
-          dleft = abs(wright - winrect.left());
-          dright = abs(wleft - winrect.right());
+          dleft = abs(wright - offsetrect.left());
+          dright = abs(wleft - offsetrect.right());
 
           // snap left of other window?
           if (dleft < snap_distance && dleft <= dright) {
-            dx = winrect.left() - frame.rect.width();
+            dx = offsetrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
           else if (dright < snap_distance) {
-            dx = winrect.right() + 1;
+            dx = offsetrect.right() + 1;
             snapped = True;
           }            
         }
@@ -3249,31 +3254,31 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           wleft < (signed)(winrect.x() + winrect.width() - 1)) {
 
         if (snap_to_windows == BScreen::WindowResistance) {
-          dtop = wbottom - winrect.top();
-          dbottom = winrect.bottom() - wtop;
+          dtop = wbottom - offsetrect.top();
+          dbottom = offsetrect.bottom() - wtop;
 
           // snap top of other window?
           if (dtop >= 0 && dtop < resistance_size) {
-            dy = winrect.top() - frame.rect.height();
+            dy = offsetrect.top() - frame.rect.height();
             snapped = True;
           }
           // snap bottom of other window?
           else if (dbottom >= 0 && dbottom < resistance_size) {
-            dy = winrect.bottom() + 1;
+            dy = offsetrect.bottom() + 1;
             snapped = True;
           }
         } else { // BScreen::WindowSnap
-          dtop = abs(wbottom - winrect.top());
-          dbottom = abs(wtop - winrect.bottom());
+          dtop = abs(wbottom - offsetrect.top());
+          dbottom = abs(wtop - offsetrect.bottom());
 
           // snap top of other window?
           if (dtop < snap_distance && dtop <= dbottom) {
-            dy = winrect.top() - frame.rect.height();
+            dy = offsetrect.top() - frame.rect.height();
             snapped = True;
           }
           // snap bottom of other window?
           else if (dbottom < snap_distance) {
-            dy = winrect.bottom() + 1;
+            dy = offsetrect.bottom() + 1;
             snapped = True;
           }
 
@@ -3328,6 +3333,11 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
     RectList::const_iterator it, end = rectlist.end();
     for (it = rectlist.begin(); it != end; ++it) {
       const Rect &srect = *it;
+      Rect offsetrect;
+      offsetrect.setCoords(srect.left() + snap_offset,
+                           srect.top() + snap_offset,
+                           srect.right() - snap_offset,
+                           srect.bottom() - snap_offset);
 
       if (snap_to_edges == BScreen::WindowResistance) {
         // if we're not in the rectangle then don't snap to it.
@@ -3341,43 +3351,43 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
       }
 
       if (snap_to_edges == BScreen::WindowResistance) {
-      int dleft = srect.left() - wleft,
-         dright = wright - srect.right(),
-           dtop = srect.top() - wtop,
-        dbottom = wbottom - srect.bottom();
+      int dleft = offsetrect.left() - wleft,
+         dright = wright - offsetrect.right(),
+           dtop = offsetrect.top() - wtop,
+        dbottom = wbottom - offsetrect.bottom();
 
         // snap left?
         if (dleft > 0 && dleft < resistance_size)
-          dx = srect.left();
+          dx = offsetrect.left();
         // snap right?
         else if (dright > 0 && dright < resistance_size)
-          dx = srect.right() - frame.rect.width() + 1;
+          dx = offsetrect.right() - frame.rect.width() + 1;
 
         // snap top?
         if (dtop > 0 && dtop < resistance_size)
-          dy = srect.top();
+          dy = offsetrect.top();
         // snap bottom?
         else if (dbottom > 0 && dbottom < resistance_size)
-          dy = srect.bottom() - frame.rect.height() + 1;
+          dy = offsetrect.bottom() - frame.rect.height() + 1;
       } else { // BScreen::WindowSnap
-        int dleft = abs(wleft - srect.left()),
-           dright = abs(wright - srect.right()),
-             dtop = abs(wtop - srect.top()),
-          dbottom = abs(wbottom - srect.bottom());
+        int dleft = abs(wleft - offsetrect.left()),
+           dright = abs(wright - offsetrect.right()),
+             dtop = abs(wtop - offsetrect.top()),
+          dbottom = abs(wbottom - offsetrect.bottom());
 
         // snap left?
         if (dleft < snap_distance && dleft <= dright)
-          dx = srect.left();
+          dx = offsetrect.left();
         // snap right?
         else if (dright < snap_distance)
-          dx = srect.right() - frame.rect.width() + 1;
+          dx = offsetrect.right() - frame.rect.width() + 1;
 
         // snap top?
         if (dtop < snap_distance && dtop <= dbottom)
-          dy = srect.top();
+          dy = offsetrect.top();
         // snap bottom?
         else if (dbottom < snap_distance)
-          dy = srect.bottom() - frame.rect.height() + 1;
+          dy = offsetrect.bottom() - frame.rect.height() + 1;
       }
     }
   }

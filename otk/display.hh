@@ -47,6 +47,9 @@ private:
   //! The value of the mask for the ScrollLock modifier
   unsigned int _scroll_lock_mask;
 
+  //! The key codes for the modifier keys
+  XModifierKeymap *_modmap;
+  
   //! The number of requested grabs on the display
   int _grab_count;
 
@@ -102,6 +105,7 @@ public:
 
   inline unsigned int numLockMask() const { return _num_lock_mask; }
   inline unsigned int scrollLockMask() const { return _scroll_lock_mask; }
+  const XModifierKeymap *modifierMap() const { return _modmap; }
 
   inline ::Display* operator*() const { return _display; }
 

@@ -147,7 +147,8 @@ KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
 Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
-    _timer((otk::Timer *) 0)
+    _timer((otk::Timer *) 0),
+    _keybgrab_callback(0)
 {
 //  setResetKey("C-g"); // set the default reset key
 }
@@ -371,38 +372,73 @@ void Bindings::grabKeys(bool grab)
 }
 
 
-void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
-                         Time time)
+bool Bindings::grabKeyboard(PyObject *callback)
 {
-  if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
-    resetChains(this);
+  assert(callback);
+  if (_keybgrab_callback) return false; // already grabbed
+  
+  int screen = openbox->screen(0)->number();
+  Window root = otk::display->screenInfo(screen)->rootWindow();
+  if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
+                    GrabModeAsync, CurrentTime))
+    return false;
+  printf("****GRABBED****\n");
+  _keybgrab_callback = callback;
+  return true;
+}
+
+
+void Bindings::ungrabKeyboard()
+{
+  if (!_keybgrab_callback) return; // not grabbed
+
+  _keybgrab_callback = 0;
+  XUngrabKeyboard(**otk::display, CurrentTime);
+  printf("****UNGRABBED****\n");
+}
+
+
+void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
+                       Time time, KeyAction action)
+{
+  if (_keybgrab_callback) {
+    Client *c = openbox->focusedClient();
+    KeyData data(screen, c, time, modifiers, key, action);
+    python_callback(_keybgrab_callback, &data);
   } else {
-    KeyBindingTree *p = _curpos->first_child;
-    while (p) {
-      if (p->binding.key == key && p->binding.modifiers == modifiers) {
-        if (p->chain) {
-	  if (_timer)
-            delete _timer;
-          _timer = new otk::Timer(5000, // 5 second timeout
-                                  (otk::Timer::TimeoutHandler)resetChains,
-                                  this);
-          // grab the server here to make sure no key pressed go missed
-          otk::display->grab();
-          grabKeys(false);
-          _curpos = p;
-          grabKeys(true);
-          otk::display->ungrab();
-        } else {
-          Client *c = openbox->focusedClient();
-          KeyData data(screen, c, time, modifiers, key);
-          CallbackList::iterator it, end = p->callbacks.end();
-          for (it = p->callbacks.begin(); it != end; ++it)
-            python_callback(*it, &data);
-          resetChains(this);
+    // KeyRelease events only occur during keyboard grabs
+    if (action == EventKeyRelease) return;
+    
+    if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
+      resetChains(this);
+    } else {
+      KeyBindingTree *p = _curpos->first_child;
+      while (p) {
+        if (p->binding.key == key && p->binding.modifiers == modifiers) {
+          if (p->chain) {
+            if (_timer)
+              delete _timer;
+            _timer = new otk::Timer(5000, // 5 second timeout
+                                    (otk::Timer::TimeoutHandler)resetChains,
+                                    this);
+            // grab the server here to make sure no key pressed go missed
+            otk::display->grab();
+            grabKeys(false);
+            _curpos = p;
+            grabKeys(true);
+            otk::display->ungrab();
+          } else {
+            Client *c = openbox->focusedClient();
+            KeyData data(screen, c, time, modifiers, key, action);
+            CallbackList::iterator it, end = p->callbacks.end();
+            for (it = p->callbacks.begin(); it != end; ++it)
+              python_callback(*it, &data);
+            resetChains(this);
+          }
+          break;
         }
-        break;
+        p = p->next_sibling;
       }
-      p = p->next_sibling;
     }
   }
 }

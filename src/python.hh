@@ -53,6 +53,12 @@ enum KeyContext {
   NUM_KEY_CONTEXT
 };
 
+enum KeyAction {
+  EventKeyPress,
+  EventKeyRelease,
+  NUM_KEY_ACTION
+};
+
 enum EventAction {
   EventEnterWindow,
   EventLeaveWindow,
@@ -61,10 +67,9 @@ enum EventAction {
   EventCloseWindow,
   EventStartup,
   EventShutdown,
-  EventKey,
   EventFocus,
   EventBell,
-  EventUrgentNotify,
+  EventUrgentWindow,
   NUM_EVENTS
 };
 
@@ -148,18 +153,18 @@ public:
   Client *client;
   Time time;
   unsigned int state;
-  std::string key;
-  EventAction action; // this is here so that all the Data structs have .action
+  char *key;
+  KeyAction action;
 
   KeyData(int screen, Client *client, Time time, unsigned int state,
-          unsigned int key) {
+          unsigned int key, KeyAction action) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
     this->state  = state;
     this->key    = XKeysymToString(XKeycodeToKeysym(**otk::display,
                                                     key, 0));
-    this->action = EventKey;
+    this->action = action;
   }
 };
 
@@ -186,6 +191,9 @@ PyObject *mbind(const std::string &button, ob::MouseContext context,
                 ob::MouseAction action, PyObject *func);
 
 PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
+
+PyObject *kgrab(PyObject *func);
+PyObject *kungrab();
 
 PyObject *ebind(ob::EventAction action, PyObject *func);
 

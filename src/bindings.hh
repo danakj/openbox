@@ -83,6 +83,8 @@ private:
                   Client *client);
 
   CallbackList _eventlist[NUM_EVENTS];
+
+  PyObject *_keybgrab_callback;
   
 public:
   //! Initializes an Bindings object
@@ -111,11 +113,15 @@ public:
   //! Removes all key bindings
   void removeAllKeys();
 
-  void fireKey(int screen, unsigned int modifiers,unsigned int key, Time time);
+  void fireKey(int screen, unsigned int modifiers,unsigned int key, Time time,
+               KeyAction action);
 
   void setResetKey(const std::string &key);
 
   void grabKeys(bool grab);
+
+  bool grabKeyboard(PyObject *callback);
+  void ungrabKeyboard();
 
   bool addButton(const std::string &but, MouseContext context,
                  MouseAction action, PyObject *callback);

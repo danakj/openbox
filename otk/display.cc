@@ -128,16 +128,15 @@ DISPLAY environment variable approriately.\n\n"));
 #endif // XINERAMA
 
   // get lock masks that are defined by the display (not constant)
-  XModifierKeymap *modmap;
-
-  modmap = XGetModifierMapping(_display);
-  if (modmap && modmap->max_keypermod > 0) {
+  _modmap = XGetModifierMapping(_display);
+  assert(_modmap);
+  if (_modmap && _modmap->max_keypermod > 0) {
     const int mask_table[] = {
       ShiftMask, LockMask, ControlMask, Mod1Mask,
       Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
     };
     const size_t size = (sizeof(mask_table) / sizeof(mask_table[0])) *
-      modmap->max_keypermod;
+      _modmap->max_keypermod;
     // get the values of the keyboard lock modifiers
     // Note: Caps lock is not retrieved the same way as Scroll and Num lock
     // since it doesn't need to be.
@@ -145,16 +144,14 @@ DISPLAY environment variable approriately.\n\n"));
     const KeyCode scroll_lock = XKeysymToKeycode(_display, XK_Scroll_Lock);
 
     for (size_t cnt = 0; cnt < size; ++cnt) {
-      if (! modmap->modifiermap[cnt]) continue;
+      if (! _modmap->modifiermap[cnt]) continue;
 
-      if (num_lock == modmap->modifiermap[cnt])
-        _num_lock_mask = mask_table[cnt / modmap->max_keypermod];
-      if (scroll_lock == modmap->modifiermap[cnt])
-        _scroll_lock_mask = mask_table[cnt / modmap->max_keypermod];
+      if (num_lock == _modmap->modifiermap[cnt])
+        _num_lock_mask = mask_table[cnt / _modmap->max_keypermod];
+      if (scroll_lock == _modmap->modifiermap[cnt])
+        _scroll_lock_mask = mask_table[cnt / _modmap->max_keypermod];
     }
   }
-
-  if (modmap) XFreeModifiermap(modmap);
 
   _mask_list[0] = 0;
   _mask_list[1] = LockMask;
@@ -181,6 +178,8 @@ Display::~Display()
   while (_grab_count > 0)
     ungrab();
 
+  XFreeModifiermap(_modmap);
+  
   for (int i = 0; i < ScreenCount(_display); ++i) {
     delete _rendercontrol_list[i];
     delete _screeninfo_list[i];

@@ -1435,7 +1435,7 @@ void Client::unmapHandler(const XUnmapEvent &e)
 {
   if (ignore_unmaps) {
 #ifdef    DEBUG
-    printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
+//  printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
 #endif // DEBUG
     ignore_unmaps--;
     return;

@@ -677,38 +677,37 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XConfigureEvent swig_types[29] 
 #define  SWIGTYPE_p_XRectangle swig_types[30] 
 #define  SWIGTYPE_p_otk__ustring swig_types[31] 
-#define  SWIGTYPE_p_std__string swig_types[32] 
-#define  SWIGTYPE_p_XCrossingEvent swig_types[33] 
-#define  SWIGTYPE_p_otk__Display swig_types[34] 
-#define  SWIGTYPE_p_Display swig_types[35] 
-#define  SWIGTYPE_p_XMappingEvent swig_types[36] 
-#define  SWIGTYPE_p_otk__EventHandler swig_types[37] 
-#define  SWIGTYPE_p_XReparentEvent swig_types[38] 
-#define  SWIGTYPE_p_otk__EventDispatcher swig_types[39] 
-#define  SWIGTYPE_p_ob__Bindings swig_types[40] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[41] 
-#define  SWIGTYPE_p_ob__Actions swig_types[42] 
-#define  SWIGTYPE_p_otk__Widget swig_types[43] 
-#define  SWIGTYPE_p_XEvent swig_types[44] 
-#define  SWIGTYPE_p_otk__Property swig_types[45] 
-#define  SWIGTYPE_p_PyObject swig_types[46] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[47] 
-#define  SWIGTYPE_p_otk__RenderStyle swig_types[48] 
-#define  SWIGTYPE_p_ob__EventData swig_types[49] 
-#define  SWIGTYPE_p_XCreateWindowEvent swig_types[50] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
-#define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
-#define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
-#define  SWIGTYPE_p_otk__Atoms swig_types[54] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[55] 
-#define  SWIGTYPE_p_int swig_types[56] 
-#define  SWIGTYPE_p_otk__Strut swig_types[57] 
-#define  SWIGTYPE_p_unsigned_long swig_types[58] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[59] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[60] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[61] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[62] 
-static swig_type_info *swig_types[64];
+#define  SWIGTYPE_p_XCrossingEvent swig_types[32] 
+#define  SWIGTYPE_p_otk__Display swig_types[33] 
+#define  SWIGTYPE_p_Display swig_types[34] 
+#define  SWIGTYPE_p_XMappingEvent swig_types[35] 
+#define  SWIGTYPE_p_otk__EventHandler swig_types[36] 
+#define  SWIGTYPE_p_XReparentEvent swig_types[37] 
+#define  SWIGTYPE_p_otk__EventDispatcher swig_types[38] 
+#define  SWIGTYPE_p_ob__Bindings swig_types[39] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[40] 
+#define  SWIGTYPE_p_ob__Actions swig_types[41] 
+#define  SWIGTYPE_p_otk__Widget swig_types[42] 
+#define  SWIGTYPE_p_XEvent swig_types[43] 
+#define  SWIGTYPE_p_otk__Property swig_types[44] 
+#define  SWIGTYPE_p_PyObject swig_types[45] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[46] 
+#define  SWIGTYPE_p_otk__RenderStyle swig_types[47] 
+#define  SWIGTYPE_p_ob__EventData swig_types[48] 
+#define  SWIGTYPE_p_XCreateWindowEvent swig_types[49] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[50] 
+#define  SWIGTYPE_p_otk__Property__StringVect swig_types[51] 
+#define  SWIGTYPE_p_ob__WidgetBase swig_types[52] 
+#define  SWIGTYPE_p_otk__Atoms swig_types[53] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[54] 
+#define  SWIGTYPE_p_int swig_types[55] 
+#define  SWIGTYPE_p_otk__Strut swig_types[56] 
+#define  SWIGTYPE_p_unsigned_long swig_types[57] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[58] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[59] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[60] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[61] 
+static swig_type_info *swig_types[63];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -11115,15 +11114,16 @@ static PyObject *_wrap_KeyData_state_get(PyObject *self, PyObject *args) {
 static PyObject *_wrap_KeyData_key_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::KeyData *arg1 = (ob::KeyData *) 0 ;
-    std::string *arg2 = (std::string *) 0 ;
+    char *arg2 ;
     PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:KeyData_key_set",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"Os:KeyData_key_set",&obj0,&arg2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_std__string,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->key = *arg2;
-    
+    {
+        if (arg1->key) delete [] arg1->key;
+        arg1->key = (char *) (new char[strlen(arg2)+1]);
+        strcpy((char *) arg1->key,arg2);
+    }
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
@@ -11134,14 +11134,14 @@ static PyObject *_wrap_KeyData_key_set(PyObject *self, PyObject *args) {
 static PyObject *_wrap_KeyData_key_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::KeyData *arg1 = (ob::KeyData *) 0 ;
-    std::string *result;
+    char *result;
     PyObject * obj0  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"O:KeyData_key_get",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (std::string *)& ((arg1)->key);
+    result = (char *) ((arg1)->key);
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_std__string, 0);
+    resultobj = result ? PyString_FromString(result) : Py_BuildValue((char*)"");
     return resultobj;
     fail:
     return NULL;
@@ -11156,7 +11156,7 @@ static PyObject *_wrap_KeyData_action_set(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"Oi:KeyData_action_set",&obj0,&arg2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->action = (ob::EventAction )arg2;
+    if (arg1) (arg1)->action = (ob::KeyAction )arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -11189,13 +11189,14 @@ static PyObject *_wrap_new_KeyData(PyObject *self, PyObject *args) {
     Time arg3 ;
     unsigned int arg4 ;
     unsigned int arg5 ;
+    int arg6 ;
     ob::KeyData *result;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     PyObject * obj3  = 0 ;
     PyObject * obj4  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"iOOOO:new_KeyData",&arg1,&obj1,&obj2,&obj3,&obj4)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOi:new_KeyData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6)) goto fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg3 = (Time) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
@@ -11203,7 +11204,7 @@ static PyObject *_wrap_new_KeyData(PyObject *self, PyObject *args) {
     if (PyErr_Occurred()) SWIG_fail;
     arg5 = (unsigned int) PyInt_AsLong(obj4);
     if (PyErr_Occurred()) SWIG_fail;
-    result = (ob::KeyData *)new ob::KeyData(arg1,arg2,arg3,arg4,arg5);
+    result = (ob::KeyData *)new ob::KeyData(arg1,arg2,arg3,arg4,arg5,(ob::KeyAction )arg6);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__KeyData, 1);
     return resultobj;
@@ -11262,6 +11263,37 @@ static PyObject *_wrap_kbind(PyObject *self, PyObject *args) {
     arg1 = obj0;
     arg3 = obj2;
     result = (PyObject *)ob::kbind(arg1,(ob::KeyContext )arg2,arg3);
+    
+    resultobj = result;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_kgrab(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    PyObject *arg1 = (PyObject *) 0 ;
+    PyObject *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:kgrab",&obj0)) goto fail;
+    arg1 = obj0;
+    result = (PyObject *)ob::kgrab(arg1);
+    
+    resultobj = result;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_kungrab(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    PyObject *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":kungrab")) goto fail;
+    result = (PyObject *)ob::kungrab();
     
     resultobj = result;
     return resultobj;
@@ -11825,6 +11857,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"KeyData_swigregister", KeyData_swigregister, METH_VARARGS },
 	 { (char *)"mbind", _wrap_mbind, METH_VARARGS },
 	 { (char *)"kbind", _wrap_kbind, METH_VARARGS },
+	 { (char *)"kgrab", _wrap_kgrab, METH_VARARGS },
+	 { (char *)"kungrab", _wrap_kungrab, METH_VARARGS },
 	 { (char *)"ebind", _wrap_ebind, METH_VARARGS },
 	 { (char *)"set_reset_key", _wrap_set_reset_key, METH_VARARGS },
 	 { (char *)"send_client_msg", _wrap_send_client_msg, METH_VARARGS },
@@ -11899,7 +11933,6 @@ static swig_type_info _swigt__p_XCirculateEvent[] = {{"_p_XCirculateEvent", 0, "
 static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "XConfigureEvent *", 0},{"_p_XConfigureEvent"},{0}};
 static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle *", 0},{"_p_XRectangle"},{0}};
 static swig_type_info _swigt__p_otk__ustring[] = {{"_p_otk__ustring", 0, "otk::ustring *", 0},{"_p_otk__ustring"},{0}};
-static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
 static swig_type_info _swigt__p_XCrossingEvent[] = {{"_p_XCrossingEvent", 0, "XCrossingEvent *", 0},{"_p_XCrossingEvent"},{0}};
 static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::Display *", 0},{"_p_otk__Display"},{0}};
 static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
@@ -11964,7 +11997,6 @@ _swigt__p_XCirculateEvent,
 _swigt__p_XConfigureEvent, 
 _swigt__p_XRectangle, 
 _swigt__p_otk__ustring, 
-_swigt__p_std__string, 
 _swigt__p_XCrossingEvent, 
 _swigt__p_otk__Display, 
 _swigt__p_Display, 
@@ -12085,17 +12117,19 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"KC_Menu", (long) ob::KC_Menu, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"KC_All", (long) ob::KC_All, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_KEY_CONTEXT", (long) ob::NUM_KEY_CONTEXT, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventKeyPress", (long) ob::EventKeyPress, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventKeyRelease", (long) ob::EventKeyRelease, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"NUM_KEY_ACTION", (long) ob::NUM_KEY_ACTION, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventEnterWindow", (long) ob::EventEnterWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventLeaveWindow", (long) ob::EventLeaveWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventPlaceWindow", (long) ob::EventPlaceWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventNewWindow", (long) ob::EventNewWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventCloseWindow", (long) ob::EventCloseWindow, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"EventUrgentWindow", (long) ob::EventUrgentWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventStartup", (long) ob::EventStartup, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventShutdown", (long) ob::EventShutdown, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"EventKey", (long) ob::EventKey, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventFocus", (long) ob::EventFocus, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventBell", (long) ob::EventBell, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventUrgentWindow", (long) ob::EventUrgentWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL", (long) 11, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL_REVISION", (long) 0, 0, 0, 0},

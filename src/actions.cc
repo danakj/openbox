@@ -206,6 +206,7 @@ void Actions::leaveHandler(const XCrossingEvent &e)
 
 void Actions::keyPressHandler(const XKeyEvent &e)
 {
+  printf("press\n");
   otk::EventHandler::keyPressHandler(e);
 
   // kill off the Button1Mask etc, only want the modifiers
@@ -213,7 +214,41 @@ void Actions::keyPressHandler(const XKeyEvent &e)
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   openbox->bindings()->
     fireKey(otk::display->findScreen(e.root)->screen(),
-            state, e.keycode, e.time);
+            state, e.keycode, e.time, EventKeyPress);
+}
+
+
+void Actions::keyReleaseHandler(const XKeyEvent &e)
+{
+  printf("release\n");
+  otk::EventHandler::keyReleaseHandler(e);
+
+  // kill off the Button1Mask etc, only want the modifiers
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+
+  // remove from the state the mask of the modifier being released, if it is
+  // a modifier key being released (XXX this is a little ugly..)
+  const XModifierKeymap *map = otk::display->modifierMap();
+  const int mask_table[] = {
+    ShiftMask, LockMask, ControlMask, Mod1Mask,
+    Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
+  };
+  KeyCode *kp = map->modifiermap;
+  for (int i = 0, n = sizeof(mask_table)/sizeof(mask_table[0]); i < n; ++i) {
+    for (int k = 0; k < map->max_keypermod; ++k) {
+      if (*kp == e.keycode) { // found the keycode
+        state &= ~mask_table[i]; // remove the mask for it
+        i = n; // cause the first loop to break;
+        break; // get outta here!
+      }
+      ++kp;
+    }
+  }
+  
+  openbox->bindings()->
+    fireKey(otk::display->findScreen(e.root)->screen(),
+            state, e.keycode, e.time, EventKeyRelease);
 }
 
 

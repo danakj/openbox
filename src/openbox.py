@@ -904,17 +904,19 @@ NUM_MOUSE_ACTION = _openbox.NUM_MOUSE_ACTION
 KC_Menu = _openbox.KC_Menu
 KC_All = _openbox.KC_All
 NUM_KEY_CONTEXT = _openbox.NUM_KEY_CONTEXT
+EventKeyPress = _openbox.EventKeyPress
+EventKeyRelease = _openbox.EventKeyRelease
+NUM_KEY_ACTION = _openbox.NUM_KEY_ACTION
 EventEnterWindow = _openbox.EventEnterWindow
 EventLeaveWindow = _openbox.EventLeaveWindow
 EventPlaceWindow = _openbox.EventPlaceWindow
 EventNewWindow = _openbox.EventNewWindow
 EventCloseWindow = _openbox.EventCloseWindow
-EventUrgentWindow = _openbox.EventUrgentWindow
 EventStartup = _openbox.EventStartup
 EventShutdown = _openbox.EventShutdown
-EventKey = _openbox.EventKey
 EventFocus = _openbox.EventFocus
 EventBell = _openbox.EventBell
+EventUrgentWindow = _openbox.EventUrgentWindow
 NUM_EVENTS = _openbox.NUM_EVENTS
 class MouseData(_object):
     __swig_setmethods__ = {}
@@ -1048,6 +1050,10 @@ _openbox.KeyData_swigregister(KeyDataPtr)
 mbind = _openbox.mbind
 
 kbind = _openbox.kbind
+
+kgrab = _openbox.kgrab
+
+kungrab = _openbox.kungrab
 
 ebind = _openbox.ebind
 

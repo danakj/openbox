@@ -8,7 +8,8 @@ ob_focus_fallback = 0
 # maintain a list of clients, stacked in focus order
 ob_clients = []
 # maintaint he current focused window
-ob_focused = 0;
+ob_focused = 0
+ob_hold_client_list = 0
 
 def ob_new_win(data):
     global ob_clients
@@ -22,12 +23,14 @@ def ob_close_win(data):
 def ob_focused(data):
     global ob_clients
     if data.client:
-        win = data.client.window()
-        ob_focused = win
-        # move it to the top
-        ob_clients.remove(win)
-        ob_clients.insert(0, win)
+        if not ob_hold_client_list:
+            win = data.client.window()
+            ob_focused = win
+            # move it to the top
+            ob_clients.remove(win)
+            ob_clients.insert(0, win)
     elif ob_focus_fallback:
+        ob_old_client_list = 0 # something is wrong.. stop holding
         # pass around focus
         ob_focused = 0
         desktop = openbox.screen(data.screen).desktop()
@@ -40,6 +43,38 @@ def ob_focused(data):
 ebind(EventNewWindow, ob_new_win)
 ebind(EventCloseWindow, ob_close_win)
 ebind(EventFocus, ob_focused)
+
+ob_cyc_mask = 0
+ob_cyc_key = 0;
+
+def focus_next_stacked_grab(data):
+    global ob_cyc_mask;
+    global ob_cyc_key;
+
+    if data.action == EventKeyRelease:
+        print "release: " + str(ob_cyc_mask) + "..." + str(data.state)
+        # have all the modifiers this started with been released?
+        if not ob_cyc_mask & data.state:
+            kungrab() # ungrab ourself
+            print "UNGRABBED!"
+    else:
+        print "press: " + str(ob_cyc_mask) + "..." + str(data.state) + \
+              "..." + data.key
+        if ob_cyc_key == data.key:
+            print "CYCLING!!"
+
+def focus_next_stacked(data, forward=1):
+    global ob_cyc_mask;
+    global ob_cyc_key;
+    ob_cyc_mask = data.state
+    ob_cyc_key = data.key
+
+    kgrab(focus_next_stacked_grab)
+    print "GRABBED!"
+    focus_next_stacked_grab(data) # start with the first press
+
+def focus_prev_stacked(data):
+    return
 
 def focus_next(data, num=1, forward=1):
     """Focus the next (or previous, with forward=0) window in a linear

@@ -76,6 +76,7 @@ public:
   virtual void leaveHandler(const XCrossingEvent &e);
 
   virtual void keyPressHandler(const XKeyEvent &e);
+  virtual void keyReleaseHandler(const XKeyEvent &e);
 
   virtual void motionHandler(const XMotionEvent &e);
 

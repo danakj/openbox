@@ -26,7 +26,6 @@ extern "C" {
 namespace ob {
 
 class Client;
-class RootWindow;
 
 //! Manages a single screen
 /*!

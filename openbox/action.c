@@ -891,8 +891,8 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
                     act->data.cycle.dialog = parse_bool(doc, n);
             }
+            INTERACTIVE_LIMIT(act, uact);
         }
-        INTERACTIVE_LIMIT(act, uact);
         g_free(actname);
     }
     return act;

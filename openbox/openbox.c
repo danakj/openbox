@@ -98,6 +98,11 @@ int main(int argc, char **argv)
     mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
                  S_IROTH | S_IWOTH | S_IXOTH));
     g_free(path);
+    /* create the ~/.openbox/themes dir */
+    path = g_build_filename(g_get_home_dir(), ".openbox", "themes", NULL);
+    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
+                 S_IROTH | S_IWOTH | S_IXOTH));
+    g_free(path);
      
     /* parse out command line args */
     parse_args(argc, argv);

@@ -6,6 +6,10 @@
 #include "../../kernel/dispatch.h"
 #include "../../kernel/config.h"
 
+#ifdef HAVE_SYS_STAT_H
+#  include <sys/stat.h>
+#  include <sys/types.h>
+#endif
 #include <X11/Xlib.h>
 #include <glib.h>
 
@@ -70,6 +74,8 @@ static void mouse_event(const ObEvent *e, ObFrame *self);
 
 gboolean startup()
 {
+    char *path;
+
     g_quark_from_string("none");
     g_quark_from_string("root");
     g_quark_from_string("client");
@@ -83,6 +89,13 @@ gboolean startup()
     g_quark_from_string("iconify");
     g_quark_from_string("icon");
     g_quark_from_string("close");
+
+    /* create the ~/.openbox/themes/openbox dir */
+    path = g_build_filename(g_get_home_dir(), ".openbox", "themes", "openbox",
+                            NULL);
+    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
+                 S_IROTH | S_IWOTH | S_IXOTH));
+    g_free(path);
 
     ob_s_b_color = ob_s_cb_unfocused_color = ob_s_cb_focused_color = 
         ob_s_title_unfocused_color = ob_s_title_focused_color = 

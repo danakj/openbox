@@ -123,7 +123,7 @@ void OBFrame::update()
     _titlebar_area.setRect(0, 0, width,
                            (_style->getFont()->height() +
                             _style->getFrameWidth() * 2));
-    _size.top += _titlebar_area.height();
+    _size.top += _titlebar_area.height() + _style->getBorderWidth();
 
     // set the label size
     _label_area.setRect(0, _style->getBevelWidth(),
@@ -192,22 +192,25 @@ void OBFrame::update()
   }
 
   if (_decorations & OBClient::Decor_Handle) {
-    _handle_area.setRect(0, _size.top + _client->area().height(),
+    _handle_area.setRect(0, _size.top + _client->area().height() +
+                         _style->getBorderWidth(),
                          width, _style->getHandleWidth());
     _grip_left_area.setRect(0,
-                            _handle_area.y() + _handle_area.height(),
+                            _handle_area.y() + _handle_area.height() +
+                            _style->getBorderWidth(),
                             // XXX: get a Point class in otk and use that for
                             // the 'buttons size' since theyre all the same
                             _button_iconify_area.width() * 2,
                             _handle_area.height());
     _grip_right_area.setRect(((_handle_area.right() + 1) -
                               _button_iconify_area.width() * 2),
-                             _handle_area.y() + _handle_area.height(),
+                             _handle_area.y() + _handle_area.height() +
+                             _style->getBorderWidth(),
                              // XXX: get a Point class in otk and use that for
                              // the 'buttons size' since theyre all the same
                              _button_iconify_area.width() * 2,
                              _handle_area.height());
-    _size.bottom += _handle_area.height();
+    _size.bottom += _handle_area.height() + _style->getBorderWidth() * 2;
   }
   
 

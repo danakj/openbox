@@ -947,7 +947,7 @@ void Blackbox::process_event(XEvent *e) {
       XShapeEvent *shape_event = (XShapeEvent *) e;
       BlackboxWindow *win = searchWindow(e->xany.window);
 
-      if (win)
+      if (win && shape_event->kind == ShapeBounding)
         win->shapeEvent(shape_event);
     }
 #endif // SHAPE

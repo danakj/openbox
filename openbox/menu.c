@@ -77,9 +77,9 @@ MenuEntry *menu_entry_new_full(const char *label, Action *action,
     menu_entry->label = g_strdup(label);
     menu_entry->render_type = render_type;
     menu_entry->action.func = action->func;
-    menu_entry->action.data = action->data; //watch out. copying Client * ptr
+    menu_entry->action.data = action->data; /*watch out. copying Client * ptr*/
 
-    menu_entry->render_data = render_data; //watch out.
+    menu_entry->render_data = render_data; /*watch out.*/
     menu_entry->submenu = submenu;
 
     return menu_entry;

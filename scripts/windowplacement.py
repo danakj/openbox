@@ -24,12 +24,9 @@ def random(data):
     if not data.client: return
     if data.client.positionRequested(): return
     client_area = data.client.frame.area()
-    frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
-    width = screen_area.width() - (client_area.width() +
-                                   frame_size.left + frame_size.right)
-    height = screen_area.height() - (client_area.height() + 
-                                     frame_size.top + frame_size.bottom)
+    width = screen_area.width() - client_area.width()
+    height = screen_area.height() - client_area.height()
     global _rand
     x = _rand.randrange(screen_area.x(), width-1)
     y = _rand.randrange(screen_area.y(), height-1)
@@ -43,18 +40,16 @@ def cascade(data):
     if not data.client: return
     if data.client.positionRequested(): return
     client_area = data.client.frame.area()
-    frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area(data.client.desktop())
-    width = screen_area.width() - (client_area.width() +
-                                   frame_size.left + frame_size.right)
-    height = screen_area.height() - (client_area.height() + 
-                                     frame_size.top + frame_size.bottom)
+    width = screen_area.width() - client_area.width()
+    height = screen_area.height() - client_area.height()
     global _cascade_x, _cascade_y
     if _cascade_x < screen_area.x() or _cascade_y < screen_area.y() or \
            _cascade_x >= width or _cascade_y >= height:
         _cascade_x = screen_area.x()
         _cascade_y = screen_area.y()
     data.client.move(_cascade_x, _cascade_y)
+    frame_size = data.client.frame.size()
     _cascade_x += frame_size.top
     _cascade_y += frame_size.top
 

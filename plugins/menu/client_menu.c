@@ -175,7 +175,7 @@ void plugin_startup()
     menu_add_normal(CLIENT_MENU_NAME, CLIENT_LOWER, _("Lower to bottom"),acts);
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleShade"));
-    menu_add_normal(CLIENT_MENU_NAME, CLIENT_SHADE, _("(Un)Shade"), acts);
+    menu_add_normal(CLIENT_MENU_NAME, CLIENT_SHADE, _("Shade"), acts);
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleDecorations"));
     menu_add_normal(CLIENT_MENU_NAME, CLIENT_DECORATE, _("Decorate"), acts);

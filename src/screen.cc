@@ -536,7 +536,7 @@ void Screen::manageWindow(Window window)
   // add to the screen's list
   clients.push_back(client);
   // once the client is in the list, update our strut to include the new
-  // client's
+  // client's (it is good that this happens after window placement!)
   updateStrut();
   // this puts into the stacking order, then raises it
   _stacking.push_back(client);

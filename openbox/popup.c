@@ -108,8 +108,10 @@ void popup_show(ObPopup *self, gchar *text)
     gint iconw;
     Rect *area; /* won't go outside this */
 
-    area = screen_physical_area_monitor(0); /* XXX i'm guessing this
-                                               is wrong for xinerama? */
+    area = screen_physical_area();          /* XXX this should work quite
+                                               good, someone with xinerama,
+                                               and different resolutions on
+                                               screens? */
 
     RrMargins(self->a_bg, &l, &t, &r, &b);
 

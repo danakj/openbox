@@ -3,7 +3,6 @@
 #include "openbox.h"
 #include "stacking.h"
 #include "client.h"
-#include "grab.h"
 #include "config.h"
 #include "screen.h"
 #include "menuframe.h"

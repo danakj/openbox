@@ -34,7 +34,7 @@ public:
 
   virtual ~Widget();
 
-  virtual void update(void);
+  virtual void update();
 
   void exposeHandler(const XExposeEvent &e);
   void configureHandler(const XConfigureEvent &e);

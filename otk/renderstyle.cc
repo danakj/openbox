@@ -15,8 +15,8 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
     _file(stylefile)
 {
 // pick one..
-#define FIERON
-//#define MERRY
+//#define FIERON
+#define MERRY
 
 #ifdef FIERON
   _root_color = new RenderColor(_screen, 0x272a2f);
@@ -388,7 +388,6 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _max_mask = new PixmapMask();
   _max_mask->w = _max_mask->h = 7;
   {
-    //char data[] = { 0x7e, 0xff, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0x7e };
     char data []  = {0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f  };
     _max_mask->mask =
       XCreateBitmapFromData(**display,
@@ -399,7 +398,6 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _icon_mask = new PixmapMask();
   _icon_mask->w = _icon_mask->h = 7;
   {
-    //char data[] = { 0x00, 0x00, 0xc3, 0xe7, 0x7e, 0x3c, 0x18, 0x00 };
     char data[] = {0x00, 0x00, 0x00, 0x00, 0x3e, 0x3e, 0x3e };
     _icon_mask->mask =
       XCreateBitmapFromData(**display,
@@ -410,7 +408,6 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _alldesk_mask = new PixmapMask();
   _alldesk_mask->w = _alldesk_mask->h = 7;
   {
-    //char data[] = { 0x00, 0x00, 0x18, 0x3c, 0x3c, 0x18, 0x00, 0x00 };
     char data[] = {0x00, 0x36, 0x36, 0x00, 0x36, 0x36, 0x00 };
     _alldesk_mask->mask =
       XCreateBitmapFromData(**display,
@@ -421,7 +418,6 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   _close_mask = new PixmapMask();
   _close_mask->w = _close_mask->h = 7;
   {
-    //char data[] = { 0xc3, 0xe7, 0x7e, 0x3c, 0x3c, 0x7e, 0xe7, 0xc3 };
     char data[] = {  0x22, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x22 };
     _close_mask->mask =
       XCreateBitmapFromData(**display,

@@ -5,10 +5,6 @@
 #############################################################################
 ### Options that can be modified to change the default hooks' behaviors.  ###
 ###                                                                       ###
-# resize_nearest - 1 to resize from the corner nearest where the mouse    ###
-###                  is, 0 to resize always from the bottom right corner. ###
-resize_nearest = 1                                                        ###
-###                                                                       ###
 #############################################################################
 
 import ob
@@ -65,55 +61,6 @@ def focus(data):
     if data.action == ob.EventAction.EnterWindow and not data.client.normal():
         return
     data.client.focus()
-
-def move(data):
-    """Moves the window interactively. This should only be used with
-       MouseMotion events"""
-    if not data.client: return
-
-    # not-normal windows dont get moved
-    if not data.client.normal(): return
-
-    dx = data.xroot - data.pressx
-    dy = data.yroot - data.pressy
-    data.client.move(data.press_clientx + dx, data.press_clienty + dy)
-
-def resize(data):
-    """Resizes the window interactively. This should only be used with
-       MouseMotion events"""
-    if not data.client: return
-
-    # not-normal windows dont get resized
-    if not data.client.normal(): return
-
-    px = data.pressx
-    py = data.pressy
-    dx = data.xroot - px
-    dy = data.yroot - py
-
-    # pick a corner to anchor
-    if not (resize_nearest or data.context == MC_Grip):
-        corner = ob.Client.TopLeft
-    else:
-        x = px - data.press_clientx
-        y = py - data.press_clienty
-        if y < data.press_clientheight / 2:
-            if x < data.press_clientwidth / 2:
-                corner = ob.Client.BottomRight
-                dx *= -1
-            else:
-                corner = ob.Client.BottomLeft
-            dy *= -1
-        else:
-            if x < data.press_clientwidth / 2:
-                corner = ob.Client.TopRight
-                dx *= -1
-            else:
-                corner = ob.Client.TopLeft
-
-    data.client.resize(corner,
-                       data.press_clientwidth + dx,
-                       data.press_clientheight + dy);
 
 def restart(data, other = ""):
     """Restarts openbox, optionally starting another window manager."""

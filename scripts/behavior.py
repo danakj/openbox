@@ -6,6 +6,7 @@
 
 import ob
 import callbacks
+import motion
 
 def setup_window_clicks():
     """Sets up the default bindings for various mouse buttons for various
@@ -26,16 +27,26 @@ def setup_window_clicks():
         * Double-left click on a window's titlebar will toggle shading it
     """
     ob.mbind("A-Left", ob.MouseContext.Frame,
-             ob.MouseAction.Motion, callbacks.move)
+             ob.MouseAction.Motion, motion.move)
+    ob.mbind("A-Left", ob.MouseContext.Frame,
+             ob.MouseAction.Release, motion.end_move)
     ob.mbind("Left", ob.MouseContext.Titlebar,
-             ob.MouseAction.Motion, callbacks.move)
+             ob.MouseAction.Motion, motion.move)
+    ob.mbind("Left", ob.MouseContext.Titlebar,
+             ob.MouseAction.Release, motion.end_move)
     ob.mbind("Left", ob.MouseContext.Handle,
-             ob.MouseAction.Motion, callbacks.move)
+             ob.MouseAction.Motion, motion.move)
+    ob.mbind("Left", ob.MouseContext.Handle,
+             ob.MouseAction.Release, motion.end_move)
 
     ob.mbind("A-Right", ob.MouseContext.Frame,
-             ob.MouseAction.Motion, callbacks.resize)
+             ob.MouseAction.Motion, motion.resize)
+    ob.mbind("A-Right", ob.MouseContext.Frame,
+             ob.MouseAction.Release, motion.end_resize)
     ob.mbind("Left", ob.MouseContext.Grip,
-             ob.MouseAction.Motion, callbacks.resize)
+             ob.MouseAction.Motion, motion.resize)
+    ob.mbind("Left", ob.MouseContext.Grip,
+             ob.MouseAction.Release, motion.end_resize)
 
     ob.mbind("Left", ob.MouseContext.Titlebar,
              ob.MouseAction.Press, callbacks.raise_win)

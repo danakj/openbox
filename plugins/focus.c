@@ -29,8 +29,7 @@ static gboolean focus_under_pointer()
                 break;
         }
         if (it != NULL) {
-            client_focus(it->data);
-            return TRUE;
+            return client_normal(it->data) && client_focus(it->data);
         }
     }
     return FALSE;

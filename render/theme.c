@@ -245,7 +245,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "menu.bullet.picColor", &theme->menu_color))
-        theme->menu_bullet_color = RrColorNew(inst, 0x00, 0x00, 0x00);
+        theme->menu_bullet_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "menu.frame.disableColor", &theme->menu_disabled_color))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
@@ -398,10 +398,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     if (!read_mask(inst, "bullet.xbm", theme, &theme->menu_bullet_mask)) {
-        unsigned char data[] =
-            { 0x18, 0x30, 0x60, 0xfe, 0xfe, 0x60, 0x30, 0x18 };
-        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 8, 8,
-                                                  (gchar *)data);
+        char data[] = { 0x18, 0x30, 0x60, 0xfe, 0xfe, 0x60, 0x30, 0x18 };
+        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 8, 8, data);
     }
 
     /* read the decoration textures */
@@ -765,6 +763,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->iconify_mask;
+    theme->a_menu_bullet->texture[0].data.mask.mask = 
+        theme->menu_bullet_mask;
     theme->a_disabled_focused_max->texture[0].data.mask.color = 
         theme->a_disabled_focused_close->texture[0].data.mask.color = 
         theme->a_disabled_focused_desk->texture[0].data.mask.color = 
@@ -821,6 +821,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_unfocused_pressed_shade->texture[0].data.mask.color = 
         theme->a_unfocused_pressed_iconify->texture[0].data.mask.color =
         theme->titlebut_unfocused_pressed_color;
+    theme->a_menu_bullet->texture[0].data.mask.color = 
+        theme->menu_bullet_color;
 
     XrmDestroyDatabase(db);
 

@@ -126,16 +126,25 @@ void menu_entry_render(ObMenuEntry *self)
 
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);
-    XMoveResizeWindow(ob_display, self->submenu_pic, menu->size.width - ob_rr_theme->bevel - 1, self->y,
-                      8, 8);
+    if (s) {
+        XMoveResizeWindow(ob_display, self->submenu_pic,
+                          menu->size.width -
+                          menu->bullet_w + (menu->bullet_w - 8) / 2,
+                          self->y + (menu->item_h - 8) / 2,
+                          8, 8);
+        XMapWindow(ob_display, self->submenu_pic);
+    } else
+        XUnmapWindow(ob_display, self->submenu_pic);
+
     a->surface.parent = menu->a_items;
     a->surface.parentx = 0;
     a->surface.parenty = self->y;
 
     if (s) {
         s->surface.parent = a;
-        s->surface.parentx = menu->size.width - 8;
-        s->surface.parenty = 0;
+        s->surface.parentx = menu->size.width -
+            menu->bullet_w + (menu->bullet_w - 8) / 2,
+        s->surface.parenty = (menu->item_h - 8) / 2;
     }
 
     RrPaint(a, self->item, menu->size.width, menu->item_h);

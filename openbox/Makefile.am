@@ -23,10 +23,10 @@ LIBS=$(XFT_LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) @LIBS@
 
 bin_PROGRAMS=$(binary)
 
-ob3_LDADD=@LIBINTL@ ../render/librender.a
-ob3_LDFLAGS=-export-dynamic
-ob3_SOURCES=client.c event.c extensions.c focus.c frame.c openbox.c prop.c \
-	screen.c stacking.c xerror.c themerc.c timer.c dispatch.c \
+openbox3_LDADD=@LIBINTL@ ../render/librender.a
+openbox3_LDFLAGS=-export-dynamic
+openbox3_SOURCES=client.c event.c extensions.c focus.c frame.c openbox.c \
+	prop.c screen.c stacking.c xerror.c themerc.c timer.c dispatch.c \
 	engine.c plugin.c action.c grab.c
 
 noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \

@@ -12,3 +12,4 @@ render_libobrender_la-theme.lo
 .deps
 render_libobrender_la-instance.lo
 .dirstamp
+obrender-3.0.pc

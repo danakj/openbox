@@ -4,7 +4,8 @@ themedir        = $(datadir)/openbox/themes
 localedir       = $(datadir)/locale
 rcdir           = $(datadir)/openbox
 desktopfilesdir = $(datadir)/gnome/wm-properties
-pixmapdir       = $(datadir)/pixmaps
+pkgconfigdir    = $(libdir)/pkgconfig
+pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 
 theme = thebear
 
@@ -23,11 +24,6 @@ lib_LTLIBRARIES = \
 bin_PROGRAMS = \
 	openbox/openbox \
 	tools/kdetrayproxy/kdetrayproxy
-
-if OBCONF
-bin_PROGRAMS += \
-	tools/obconf/obconf
-endif
 
 ## render ##
 
@@ -183,26 +179,6 @@ openbox_openbox_SOURCES = \
 	openbox/xerror.c \
 	openbox/xerror.h
 
-## obconf ##
-
-tools_obconf_obconf_CPPFLAGS = \
-	$(GTK_CFLAGS) \
-	$(GDK_PIXBUF_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DLOCALEDIR=\"$(localedir)\" \
-	-DRCDIR=\"$(rcdir)\" \
-	-DPIXMAPDIR=\"$(pixmapdir)\" \
-	-DG_LOG_DOMAIN=\"Obconf\"
-tools_obconf_obconf_LDADD = \
-	$(GTK_LIBS) \
-	$(GDK_PIXBUF_LIBS) \
-	$(LIBINTL) \
-	render/libobrender.la \
-	parser/libobparser.la
-tools_obconf_obconf_SOURCES = \
-	gettext.h \
-	tools/obconf/main.c
-
 
 ## kdetrayproxy ##
 
@@ -254,6 +230,17 @@ thebear_themedir = $(themedir)/thebear
 dist_thebear_theme_DATA = \
 	themes/thebear/themerc
 
+
+## public headers ##
+
+pubinclude_HEADERS = \
+	render/render.h \
+	render/theme.h \
+	parser/parse.h
+
+nodist_pkgconfig_DATA = \
+	render/obrender-3.0.pc \
+	parser/obparser-3.0.pc
 
 ## data ##
 

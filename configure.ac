@@ -3,12 +3,49 @@ AC_INIT([openbox], [3.0-beta1], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
+dnl Making releases:
+dnl   OB_MICRO_VERSION += 1;
+dnl   OB_INTERFACE_AGE += 1;
+dnl   OB_BINARY_AGE += 1;
+dnl if any functions have been added, set OB_INTERFACE_AGE to 0.
+dnl if backwards compatibility has been broken,
+dnl set OB_BINARY_AGE and OB_INTERFACE_AGE to 0.
+dnl
+dnl if MAJOR or MINOR version changes, be sure to change AC_INIT above to match
+dnl
+OB_MAJOR_VERSION=3
+OB_MINOR_VERSION=0
+OB_MICRO_VERSION=0
+OB_INTERFACE_AGE=0
+OB_BINARY_AGE=0
+OB_VERSION=$OB_MAJOR_VERSION.$OB_MINOR_VERSION
+
+AC_SUBST(OB_MAJOR_VERSION)
+AC_SUBST(OB_MINOR_VERSION)
+AC_SUBST(OB_MICRO_VERSION)
+AC_SUBST(OB_INTERFACE_AGE)
+AC_SUBST(OB_BINARY_AGE)
+AC_SUBST(OB_VERSION)
+
+dnl Libtool versioning
+LT_RELEASE=$VERSION
+LT_CURRENT=`expr $OB_MICRO_VERSION - $OB_INTERFACE_AGE`
+LT_REVISION=$OB_INTERFACE_AGE
+LT_AGE=`expr $OB_BINARY_AGE - $OB_INTERFACE_AGE`
+LT_CURRENT_MINUS_AGE=`expr $LT_CURRENT - $LT_AGE`
+
+AC_SUBST(LT_RELEASE)
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
+AC_SUBST(LT_CURRENT_MINUS_AGE)
+
 AC_PREFIX_DEFAULT([/usr/local])
 test "$prefix" = "NONE" && prefix=$ac_default_prefix
 
-# Determine build target
+dnl Determine build target
 OB_DEBUG
-# Pick compiler specific/build target flags, and set $CVS
+dnl Pick compiler specific/build target flags, and set $CVS
 AM_PROG_CC_C_O
 OB_COMPILER_FLAGS
 AC_C_CONST
@@ -54,40 +91,14 @@ PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0],
   ]
 )
 
-PKG_CHECK_MODULES(GTK, [gtk+-2.0],
-  [
-    AC_SUBST(GTK_CFLAGS)
-    AC_SUBST(GTK_LIBS)
-    use_gtk="yes"
-
-    PKG_CHECK_MODULES(GDK_PIXBUF, [gdk-pixbuf-2.0],
-      [
-        AC_SUBST(GDK_PIXBUF_CFLAGS)
-        AC_SUBST(GDK_PIXBUF_LIBS)
-        use_gdk_pixbuf="yes"
-      ],
-      [
-        use_gdk_pixbuf="no"
-        AC_MSG_WARN([disabling build of the configuration tool])
-      ]
-    )
-  ],
-  [
-    use_gtk="no"
-    AC_MSG_WARN([disabling build of the configuration tool])
-  ]
-)
-AM_CONDITIONAL(OBCONF,
-               [test "$use_gtk" = "yes" && test "$use_gdk_pixbuf" = "yes"])
-
-# Check for session management
+dnl Check for session management
 X11_SM
 
 #EFENCE_LIBS=-lefence
 EFENCE_LIBS=""
 AC_SUBST(EFENCE_LIBS)
 
-# Check for X11 extensions
+dnl Check for X11 extensions
 X11_EXT_XKB
 X11_EXT_XRANDR
 X11_EXT_VIDMODE
@@ -98,6 +109,8 @@ AC_CONFIG_FILES([
   Makefile
   m4/Makefile
   po/Makefile.in
+  render/obrender-3.0.pc
+  parser/obparser-3.0.pc
 ])
 AC_OUTPUT
 

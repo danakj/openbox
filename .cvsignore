@@ -17,3 +17,4 @@ depcomp
 missing
 mkinstalldirs
 Makefile.in
+version.h

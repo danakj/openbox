@@ -523,12 +523,6 @@ void focus_cycle(gboolean forward, gboolean linear,
     ObClient *ft = NULL;
 
     if (cancel) {
-        /*
-        if (focus_cycle_target)
-            frame_adjust_focus(focus_cycle_target->frame, FALSE);
-        if (focus_client)
-            frame_adjust_focus(focus_client->frame, TRUE);
-        */
         focus_cycle_target = NULL;
         goto done_cycle;
     } else if (done && dialog) {
@@ -591,10 +585,6 @@ void focus_directional_cycle(ObDirection dir,
     ObClient *ft = NULL;
 
     if (cancel) {
-        if (focus_cycle_target)
-            frame_adjust_focus(focus_cycle_target->frame, FALSE);
-        if (focus_client)
-            frame_adjust_focus(focus_client->frame, TRUE);
         focus_cycle_target = NULL;
         goto done_cycle;
     } else if (done && dialog) {
@@ -619,10 +609,8 @@ void focus_directional_cycle(ObDirection dir,
         
     if (ft) {
         if (ft != focus_cycle_target) {/* prevents flicker */
-            if (focus_cycle_target)
-                frame_adjust_focus(focus_cycle_target->frame, FALSE);
             focus_cycle_target = ft;
-            frame_adjust_focus(focus_cycle_target->frame, TRUE);
+            focus_cycle_draw_indicator();
         }
     }
     if (focus_cycle_target) {
@@ -639,6 +627,7 @@ done_cycle:
     first = NULL;
     focus_cycle_target = NULL;
 
+    focus_cycle_draw_indicator();
     popup_cycle(ft, FALSE);
 
     return;

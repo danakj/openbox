@@ -96,7 +96,7 @@ void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
     XftColor c;
 
     /* accomidate for areas bigger/smaller than Xft thinks the font is tall */
-    y += (h - t->font->xftfont->height) / 2;
+    y += (t->font->xftfont->height + 1 - (t->font->height + h)) / 2;
 
     x += 3; /* XXX figure out X with justification */
 
@@ -118,8 +118,7 @@ void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
     c.pixel = t->color->pixel;
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
-                      t->font->xftfont->ascent + y -
-                      (t->font->xftfont->height - t->font->height) / 2,
-                     (FcChar8*)t->string, strlen(t->string));
+                      t->font->xftfont->ascent + y,
+                      (FcChar8*)t->string, strlen(t->string));
     return;
 }

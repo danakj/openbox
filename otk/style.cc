@@ -19,7 +19,7 @@ Style::Style(unsigned int screen)
 {
 }
 
-Style::Style(unsigned int screen, otk::BImageControl *ctrl)
+Style::Style(unsigned int screen, BImageControl *ctrl)
   : image_control(ctrl), font(NULL), screen_number(screen)
 {
 }
@@ -29,13 +29,13 @@ Style::~Style() {
     delete font;
 
   if (close_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, close_button.mask);
+    XFreePixmap(OBDisplay::display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, max_button.mask);
+    XFreePixmap(OBDisplay::display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, icon_button.mask);
+    XFreePixmap(OBDisplay::display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, stick_button.mask);
+    XFreePixmap(OBDisplay::display, stick_button.mask);
 
   max_button.mask = None;
   close_button.mask = None;
@@ -43,7 +43,7 @@ Style::~Style() {
   stick_button.mask = None;
 }
 
-void Style::load(otk::Configuration &style) {
+void Style::load(Configuration &style) {
   std::string s;
 
   // load fonts/fontsets
@@ -76,13 +76,13 @@ void Style::load(otk::Configuration &style) {
                                           "black", style, true);
 
   if (close_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, close_button.mask);
+    XFreePixmap(OBDisplay::display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, max_button.mask);
+    XFreePixmap(OBDisplay::display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, icon_button.mask);
+    XFreePixmap(OBDisplay::display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(otk::OBDisplay::display, stick_button.mask);
+    XFreePixmap(OBDisplay::display, stick_button.mask);
 
   close_button.mask = max_button.mask = icon_button.mask
                     = icon_button.mask = None;
@@ -94,13 +94,13 @@ void Style::load(otk::Configuration &style) {
 
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
-  otk::BColor color = readDatabaseColor("window.frame.focusColor", "white",
+  BColor color = readDatabaseColor("window.frame.focusColor", "white",
                                         style);
-  f_focus = otk::BTexture("solid flat", screen_number, image_control);
+  f_focus = BTexture("solid flat", screen_number, image_control);
   f_focus.setColor(color);
 
   color = readDatabaseColor("window.frame.unfocusColor", "white", style);
-  f_unfocus = otk::BTexture("solid flat", screen_number, image_control);
+  f_unfocus = BTexture("solid flat", screen_number, image_control);
   f_unfocus.setColor(color);
 
   l_text_focus = readDatabaseColor("window.label.focus.textColor",
@@ -123,20 +123,20 @@ void Style::load(otk::Configuration &style) {
   }
 
   // sanity checks
-  if (t_focus.texture() == otk::BTexture::Parent_Relative)
+  if (t_focus.texture() == BTexture::Parent_Relative)
     t_focus = f_focus;
-  if (t_unfocus.texture() == otk::BTexture::Parent_Relative)
+  if (t_unfocus.texture() == BTexture::Parent_Relative)
     t_unfocus = f_unfocus;
-  if (h_focus.texture() == otk::BTexture::Parent_Relative)
+  if (h_focus.texture() == BTexture::Parent_Relative)
     h_focus = f_focus;
-  if (h_unfocus.texture() == otk::BTexture::Parent_Relative)
+  if (h_unfocus.texture() == BTexture::Parent_Relative)
     h_unfocus = f_unfocus;
 
   border_color = readDatabaseColor("borderColor", "black", style);
 
   // load bevel, border and handle widths
 
-  const otk::ScreenInfo *s_info = otk::OBDisplay::screenInfo(screen_number);
+  const ScreenInfo *s_info = OBDisplay::screenInfo(screen_number);
   unsigned int width = s_info->getRect().width();
 
   if (! style.getValue("handleWidth", handle_width) ||
@@ -186,8 +186,8 @@ void Style::doJustify(const std::string &text, int &start_pos,
 
 
 void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
-                             const otk::Configuration &style) {
-  Window root_window = otk::OBDisplay::screenInfo(screen_number)->getRootWindow();
+                             const Configuration &style) {
+  Window root_window = OBDisplay::screenInfo(screen_number)->getRootWindow();
   std::string s;
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.
@@ -197,11 +197,11 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
     if (s[0] != '/' && s[0] != '~')
     {
       std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(otk::OBDisplay::display, root_window,
+      ret = XReadBitmapFile(OBDisplay::display, root_window,
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     } else
-      ret = XReadBitmapFile(otk::OBDisplay::display, root_window,
+      ret = XReadBitmapFile(OBDisplay::display, root_window,
                             expandTilde(s).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     
@@ -214,26 +214,26 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
 }
 
 
-otk::BTexture Style::readDatabaseTexture(const std::string &rname,
+BTexture Style::readDatabaseTexture(const std::string &rname,
                                          const std::string &default_color,
-                                         const otk::Configuration &style, 
+                                         const Configuration &style, 
                                          bool allowNoTexture)
 {
-  otk::BTexture texture;
+  BTexture texture;
   std::string s;
 
   if (style.getValue(rname, s))
-    texture = otk::BTexture(s);
+    texture = BTexture(s);
   else if (allowNoTexture) //no default
-    texture.setTexture(otk::BTexture::NoTexture);
+    texture.setTexture(BTexture::NoTexture);
   else
-    texture.setTexture(otk::BTexture::Solid | otk::BTexture::Flat);
+    texture.setTexture(BTexture::Solid | BTexture::Flat);
 
   // associate this texture with this screen
   texture.setScreen(screen_number);
   texture.setImageControl(image_control);
 
-  if (texture.texture() != otk::BTexture::NoTexture) {
+  if (texture.texture() != BTexture::NoTexture) {
     texture.setColor(readDatabaseColor(rname + ".color", default_color,
                                        style));
     texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
@@ -246,21 +246,21 @@ otk::BTexture Style::readDatabaseTexture(const std::string &rname,
 }
 
 
-otk::BColor Style::readDatabaseColor(const std::string &rname,
+BColor Style::readDatabaseColor(const std::string &rname,
                                      const std::string &default_color,
-                                     const otk::Configuration &style) {
-  otk::BColor color;
+                                     const Configuration &style) {
+  BColor color;
   std::string s;
   if (style.getValue(rname, s))
-    color = otk::BColor(s, screen_number);
+    color = BColor(s, screen_number);
   else
-    color = otk::BColor(default_color, screen_number);
+    color = BColor(default_color, screen_number);
   return color;
 }
 
 
-otk::BFont *Style::readDatabaseFont(const std::string &rbasename,
-                                    const otk::Configuration &style) {
+BFont *Style::readDatabaseFont(const std::string &rbasename,
+                                    const Configuration &style) {
   std::string fontname;
 
   std::string s;
@@ -295,9 +295,9 @@ otk::BFont *Style::readDatabaseFont(const std::string &rbasename,
     }
 
     
-    otk::BFont *b = new otk::BFont(screen_number, family, i, bold, italic,
-                                   dropShadow && shadow_fonts,
-                                   offset, tint, aa_fonts);
+    BFont *b = new BFont(screen_number, family, i, bold, italic,
+                         dropShadow && shadow_fonts,
+                         offset, tint, aa_fonts);
     if (b->valid())
       return b;
     delete b;

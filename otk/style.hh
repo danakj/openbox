@@ -26,17 +26,17 @@ public:
 
 // private:
 
-  otk::BImageControl *image_control;
+  BImageControl *image_control;
 
-  otk::BColor
+  BColor
     l_text_focus, l_text_unfocus,
     b_pic_focus, b_pic_unfocus;
   
-  otk::BColor border_color;
+  BColor border_color;
 
-  otk::BFont *font;
+  BFont *font;
 
-  otk::BTexture
+  BTexture
     f_focus, f_unfocus,
     t_focus, t_unfocus,
     l_focus, l_unfocus,
@@ -58,7 +58,7 @@ public:
 
   Style();
   Style(unsigned int);
-  Style(unsigned int, otk::BImageControl *);
+  Style(unsigned int, BImageControl *);
   ~Style();
 
   void doJustify(const std::string &text, int &start_pos,
@@ -66,28 +66,28 @@ public:
 
   void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
-                        const otk::Configuration &style);
+                        const Configuration &style);
   
-  otk::BTexture readDatabaseTexture(const std::string &rname,
+  BTexture readDatabaseTexture(const std::string &rname,
                                     const std::string &default_color,
-                                    const otk::Configuration &style, 
+                                    const Configuration &style, 
                                     bool allowNoTexture = false);
 
-  otk::BColor readDatabaseColor(const std::string &rname,
+  BColor readDatabaseColor(const std::string &rname,
                                 const std::string &default_color,
-                                const otk::Configuration &style);
+                                const Configuration &style);
 
-  otk::BFont *readDatabaseFont(const std::string &rbasename,
-                               const otk::Configuration &style);
+  BFont *readDatabaseFont(const std::string &rbasename,
+                               const Configuration &style);
 
-  void load(otk::Configuration &);
+  void load(Configuration &);
 
   inline unsigned int getHandleWidth(void) const { return handle_width; }
   inline unsigned int getBevelWidth(void) const { return bevel_width; }
   inline unsigned int getFrameWidth(void) const { return frame_width; }
   inline unsigned int getBorderWidth(void) const { return border_width; }
 
-  inline void setImageControl(otk::BImageControl *c) { image_control = c; }
+  inline void setImageControl(BImageControl *c) { image_control = c; }
   inline void setScreenNumber(unsigned int scr) { screen_number = scr; }
 
   // XXX add inline accessors for the rest of the bummy

@@ -4,6 +4,7 @@
 #include "render.h"
 #include "gradient.h"
 #include "font.h"
+#include "mask.h"
 #include "../kernel/openbox.h"
 
 int render_depth;
@@ -106,6 +107,11 @@ void x_paint(Window win, Appearance *l, int w, int h)
                                         render_visual, render_colormap);
             }
             font_draw(l->xftdraw, &l->texture[i].data.text);
+        break;
+        case Bitmask:
+            if (l->texture[i].data.mask.color->gc == None)
+                color_allocate_gc(l->texture[i].data.mask.color);
+            mask_draw(l->pixmap, &l->texture[i].data.mask, w, h);
         break;
         }
     }

@@ -2877,7 +2877,7 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
             his_offset = cur->frame->area.x + cur->frame->area.width;
 
-            if(his_offset + 1 < my_offset)
+            if(his_offset + 1 > my_offset)
                 continue;
             
             if(his_offset < dest)

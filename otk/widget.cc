@@ -230,12 +230,14 @@ void Widget::calcDefaultSizes()
     }
   }
   if (_direction == Horizontal) {
-    _min_size = otk::Size(min_sum, min_biggest + (_bevel + _borderwidth) * 2);
+    _min_size = otk::Size(min_sum + (_bevel + _borderwidth) * 2,
+                          min_biggest + (_bevel + _borderwidth) * 2);
     _max_size = otk::Size((fullmax ? INT_MAX :
                            max_sum  + (_bevel + _borderwidth) * 2),
                           max_biggest);
   } else {
-    _min_size = otk::Size(min_biggest, min_sum + (_bevel + _borderwidth) * 2);
+    _min_size = otk::Size(min_biggest + (_bevel + _borderwidth) * 2,
+                          min_sum + (_bevel + _borderwidth) * 2);
     _max_size = otk::Size(max_biggest, (fullmax ? INT_MAX : max_sum +
                                         (_bevel + _borderwidth) * 2));
   }

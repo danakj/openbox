@@ -1236,10 +1236,7 @@ void OBClient::destroyHandler(const XDestroyWindowEvent &e)
 void OBClient::reparentHandler(const XReparentEvent &e)
 {
   // this is when the client is first taken captive in the frame
-  if (e.parent == frame->plate()) {
-    printf("Ignored ReparentNotify for 0x%lx\n", e.window);
-    return;
-  }
+  if (e.parent == frame->plate()) return;
 
 #ifdef    DEBUG
   printf("ReparentNotify for 0x%lx\n", e.window);

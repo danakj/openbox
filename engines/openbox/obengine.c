@@ -14,7 +14,8 @@
 #include <glib.h>
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
-#define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
+#define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
+                         ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 

@@ -18,6 +18,8 @@ typedef struct {
     GSList *actions[OB_MOUSE_NUM_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
+#define FRAME_CONTEXT(co, cl) ((cl && cl->type != OB_CLIENT_TYPE_DESKTOP) ? \
+                               co == OB_FRAME_CONTEXT_FRAME : FALSE)
 #define CLIENT_CONTEXT(co, cl) ((cl && cl->type == OB_CLIENT_TYPE_DESKTOP) ? \
                                 co == OB_FRAME_CONTEXT_DESKTOP : \
                                 co == OB_FRAME_CONTEXT_CLIENT)
@@ -38,7 +40,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             int mode;
             unsigned int mask;
 
-            if (i == OB_FRAME_CONTEXT_FRAME) {
+            if (FRAME_CONTEXT(i, client)) {
                 win = client->frame->window;
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;

@@ -13,6 +13,7 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
     if ((n = parse_find_node("remember", node)))
         history = parse_bool(doc, n);
 }

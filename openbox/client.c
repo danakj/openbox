@@ -1598,6 +1598,8 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 
 void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 {
+    GSList *it;
+
     /* move up the transient chain as far as possible first if deiconifying */
     if (!iconic)
         while (self->transient_for) {
@@ -1615,8 +1617,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
                     Client *c = it->data;
 
                     if (c != self && c->transient_for->iconic != iconic &&
-                        (c->transient_for != TRAN_GROUP ||
-                         c->group != self->group)) {
+                        c->transient_for != TRAN_GROUP) {
                         self = it->data;
                         break;
                     }
@@ -1652,12 +1653,8 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
                     self, 0, 0);
 
     /* iconify all transients */
-    if (self->transients) {
-        GSList *it;
-
-        for (it = self->transients; it != NULL; it = it->next)
-            if (it->data != self) client_iconify(it->data, iconic, curdesk);
-    }
+    for (it = self->transients; it != NULL; it = it->next)
+        if (it->data != self) client_iconify(it->data, iconic, curdesk);
 }
 
 void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)

@@ -1,5 +1,6 @@
 prefix=/tmp/ob
-libdir=$(prefix)/lib
+exec_prefix=$(prefix)
+libdir=$(exec_prefix)/lib
 
 targets = libotk.so libotk.a
 sources = display.c

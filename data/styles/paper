@@ -11,8 +11,14 @@
 *colorTo:                         rgb:df/de/dd
 *textColor:                       rgb:66/66/66
 *picColor:                        rgb:66/66/66
+
 !*font:                            mints-mild
 *font:                            -adobe-helvetica-medium-r-*-*-*-100-*-*-*-*-*-*
+
+*xft.font:	Trebuchet MS
+*xft.size:	9
+menu*xft.size:	11
+
 *justify:                         center
 
 !   t o o l b a r   ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !

@@ -173,10 +173,8 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.
   
-  if (style.getValue(rname, s))
-  {
-    if (s[0] != '/' && s[0] != '~')
-    {
+  if (style.getValue(rname, s)) {
+    if (s[0] != '/' && s[0] != '~') {
       std::string xbmFile = std::string("~/.openbox/buttons/") + s;
       ret = XReadBitmapFile(OBDisplay::display, root_window,
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,

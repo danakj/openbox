@@ -114,7 +114,7 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, RrScreenWidth(inst), 0, RrScreenHeight(inst), 0, 10);
+        glOrtho(-1, RrScreenWidth(inst), -1, RrScreenHeight(inst), 0, 10);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();

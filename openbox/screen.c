@@ -572,7 +572,7 @@ void screen_desktop_popup(guint d, gboolean show)
 {
     Rect *a;
 
-    if (!show || !config_dialog_desktop) {
+    if (!show) {
         pager_popup_hide(desktop_cycle_popup);
     } else {
         a = screen_physical_area_monitor(0);

@@ -93,11 +93,6 @@ extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 extern gint config_resist_edge;
 
-/*! Show a dialog while cycling focus between windows */
-extern gboolean config_dialog_focus;
-/*! Show a dialogs while switching between desktops */
-extern gboolean config_dialog_desktop;
-
 /*! User-specified menu files */
 extern GSList *config_menu_files;
 

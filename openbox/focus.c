@@ -232,7 +232,7 @@ void focus_fallback(ObFocusFallbackType type)
 
 static void popup_cycle(ObClient *c, gboolean show)
 {
-    if (!show || !config_dialog_focus) {
+    if (!show) {
         icon_popup_hide(focus_cycle_popup);
     } else {
         Rect *a;

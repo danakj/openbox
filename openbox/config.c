@@ -343,19 +343,6 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
 
-static void parse_dialog(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                         void *d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-    
-    if ((n = parse_find_node("focus", node)))
-        config_dialog_focus = parse_bool(doc, n);
-    if ((n = parse_find_node("desktop", node)))
-        config_dialog_desktop = parse_bool(doc, n);
-}
-
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     for (node = node->children; node; node = node->next) {
@@ -541,11 +528,6 @@ void config_startup(ObParseInst *i)
     config_resist_edge = 20;
 
     parse_register(i, "resistance", parse_resistance, NULL);
-
-    config_dialog_focus = TRUE;
-    config_dialog_desktop = TRUE;
-
-    parse_register(i, "dialog", parse_dialog, NULL);
 
     config_menu_files = NULL;
 

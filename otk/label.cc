@@ -47,7 +47,15 @@ void Label::update()
       w = ft->measureString(_text) + sidemargin * 2;
     if (!_fixed_height)
       h = ft->height();
-    internalResize(w, h);
+
+    // enforce a minimum size
+    if (w > _rect.width()) {
+      if (h > _rect.height())
+        internalResize(w, h);
+      else
+        internalResize(w, _rect.height());
+    } else
+      internalResize(_rect.width(), h);
   }
   Widget::update();
 }

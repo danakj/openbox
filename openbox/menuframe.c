@@ -175,7 +175,7 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
         if (RECT_INTERSECTS_RECT(*a, self->area))
             break;
     }
-    if (a) a = screen_physical_area_monitor(0);
+    if (!a) a = screen_physical_area_monitor(0);
 
     dx = MIN(0, (a->x + a->width) - (self->area.x + self->area.width));
     dy = MIN(0, (a->y + a->height) - (self->area.y + self->area.height));

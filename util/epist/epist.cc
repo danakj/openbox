@@ -134,6 +134,22 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Right")),
                            Mod1Mask | ControlMask, 1));
+  _actions.push_back(Action(Action::resizeWindowHeight,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Up")),
+                           ShiftMask | Mod1Mask | ControlMask, -1));
+  _actions.push_back(Action(Action::resizeWindowHeight,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Down")),
+                           ShiftMask | Mod1Mask | ControlMask, 1));
+  _actions.push_back(Action(Action::resizeWindowWidth,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Left")),
+                           ShiftMask | Mod1Mask | ControlMask, -1));
+  _actions.push_back(Action(Action::resizeWindowWidth,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Right")),
+                           ShiftMask | Mod1Mask | ControlMask, 1));
   _actions.push_back(Action(Action::iconify,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("I")),

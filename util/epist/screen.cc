@@ -146,164 +146,162 @@ void screen::processEvent(const XEvent &e) {
 
 void screen::handleKeypress(const XEvent &e) {
   int scrolllockMask, numlockMask;
-
-  ActionList::const_iterator it = _epist->actions().begin();
-  ActionList::const_iterator end = _epist->actions().end();
-
   _epist->getLockModifiers(numlockMask, scrolllockMask);
   
-  for (; it != end; ++it) {
-    unsigned int state = e.xkey.state & ~(LockMask|scrolllockMask|numlockMask);
-    
-    if (e.xkey.keycode == it->keycode() &&
-        state == it->modifierMask()) {
+  // Mask out the lock modifiers. We want our keys to always work
+  // This should be made an option
+  unsigned int state = e.xkey.state & ~(LockMask|scrolllockMask|numlockMask);
+  const Action *it = _epist->getKeyTree().getAction(e, state, this);
+  
+  if (!it)
+      return;
+
+  switch (it->type()) {
+  case Action::nextScreen:
+      _epist->cycleScreen(_number, true);
+      return;
+
+  case Action::prevScreen:
+      _epist->cycleScreen(_number, false);
+      return;
+
+  case Action::nextWorkspace:
+      cycleWorkspace(true);
+      return;
+
+  case Action::prevWorkspace:
+      cycleWorkspace(false);
+      return;
+
+  case Action::nextWindow:
+      cycleWindow(true);
+      return;
+
+  case Action::prevWindow:
+      cycleWindow(false);
+      return;
+
+  case Action::nextWindowOnAllWorkspaces:
+      cycleWindow(true, false, true);
+      return;
+
+  case Action::prevWindowOnAllWorkspaces:
+      cycleWindow(false, false, true);
+      return;
+
+  case Action::nextWindowOnAllScreens:
+      cycleWindow(true, true);
+      return;
+
+  case Action::prevWindowOnAllScreens:
+      cycleWindow(false, true);
+      return;
+
+  case Action::nextWindowOfClass:
+      cycleWindow(true, false, false, true, it->string());
+      return;
+
+  case Action::prevWindowOfClass:
+      cycleWindow(false, false, false, true, it->string());
+      return;
+      
+  case Action::nextWindowOfClassOnAllWorkspaces:
+      cycleWindow(true, false, true, true, it->string());
+      return;
+      
+  case Action::prevWindowOfClassOnAllWorkspaces:
+      cycleWindow(false, false, true, true, it->string());
+      return;
+
+  case Action::changeWorkspace:
+    // we subtract one so counting starts at 1 in the config file
+      changeWorkspace(it->number() - 1);
+      return;
+
+  case Action::execute:
+      execCommand(it->string());
+      return;
+
+  default:
+      break;
+  }
+
+  // these actions require an active window
+  if (_active != _clients.end()) {
+      XWindow *window = *_active;
+      
       switch (it->type()) {
-      case Action::nextScreen:
-        _epist->cycleScreen(_number, true);
-        return;
-
-      case Action::prevScreen:
-        _epist->cycleScreen(_number, false);
-        return;
-
-      case Action::nextWorkspace:
-        cycleWorkspace(true);
-        return;
-
-      case Action::prevWorkspace:
-        cycleWorkspace(false);
-        return;
-
-      case Action::nextWindow:
-        cycleWindow(true);
-        return;
-
-      case Action::prevWindow:
-        cycleWindow(false);
-        return;
-
-      case Action::nextWindowOnAllWorkspaces:
-        cycleWindow(true, false, true);
-        return;
-
-      case Action::prevWindowOnAllWorkspaces:
-        cycleWindow(false, false, true);
-        return;
-
-      case Action::nextWindowOnAllScreens:
-        cycleWindow(true, true);
-        return;
-
-      case Action::prevWindowOnAllScreens:
-        cycleWindow(false, true);
-        return;
-
-      case Action::nextWindowOfClass:
-        cycleWindow(true, false, false, true, it->string());
-        return;
-
-      case Action::prevWindowOfClass:
-        cycleWindow(false, false, false, true, it->string());
-        return;
-
-      case Action::nextWindowOfClassOnAllWorkspaces:
-        cycleWindow(true, false, true, true, it->string());
-        return;
-
-      case Action::prevWindowOfClassOnAllWorkspaces:
-        cycleWindow(false, false, true, true, it->string());
-        return;
-
-      case Action::changeWorkspace:
-        changeWorkspace(it->number());
-        return;
-
-      case Action::execute:
-        execCommand(it->string());
-        return;
-
-      default:
-        break;
-      }
-
-      // these actions require an active window
-      if (_active != _clients.end()) {
-        XWindow *window = *_active;
-
-        switch (it->type()) {
-        case Action::iconify:
+      case Action::iconify:
           window->iconify();
           return;
 
-        case Action::close:
+      case Action::close:
           window->close();
           return;
 
-        case Action::raise:
+      case Action::raise:
           window->raise();
           return;
 
-        case Action::lower:
+      case Action::lower:
           window->lower();
           return;
 
-        case Action::sendToWorkspace:
+      case Action::sendToWorkspace:
           window->sendTo(it->number());
           return;
 
-        case Action::toggleomnipresent:
+      case Action::toggleomnipresent:
           if (window->desktop() == 0xffffffff)
             window->sendTo(_active_desktop);
           else
             window->sendTo(0xffffffff);
           return;
 
-        case Action::moveWindowUp:
+      case Action::moveWindowUp:
           window->move(window->x(), window->y() - it->number());
           return;
       
-        case Action::moveWindowDown:
+      case Action::moveWindowDown:
           window->move(window->x(), window->y() + it->number());
           return;
       
-        case Action::moveWindowLeft:
+      case Action::moveWindowLeft:
           window->move(window->x() - it->number(), window->y());
           return;
       
-        case Action::moveWindowRight:
+      case Action::moveWindowRight:
           window->move(window->x() + it->number(), window->y());
           return;
       
-        case Action::resizeWindowWidth:
+      case Action::resizeWindowWidth:
           window->resize(window->width() + it->number(), window->height());
           return;
       
-        case Action::resizeWindowHeight:
+      case Action::resizeWindowHeight:
           window->resize(window->width(), window->height() + it->number());
           return;
       
-        case Action::toggleshade:
+      case Action::toggleshade:
           window->shade(! window->shaded());
           return;
       
-        case Action::toggleMaximizeHorizontal:
+      case Action::toggleMaximizeHorizontal:
           window->toggleMaximize(XWindow::Max_Horz);
           return;
       
-        case Action::toggleMaximizeVertical:
+      case Action::toggleMaximizeVertical:
           window->toggleMaximize(XWindow::Max_Vert);
           return;
       
-        case Action::toggleMaximizeFull:
+      case Action::toggleMaximizeFull:
           window->toggleMaximize(XWindow::Max_Full);
           return;
       
-        default:
+      default:
           assert(false);  // unhandled action type!
           break;
-        }
       }
-    }
   }
 }
 
@@ -582,4 +580,22 @@ void screen::grabKey(const KeyCode keyCode, const int modifierMask) const {
   XGrabKey(display, keyCode, 
            modifierMask|numlockMask|LockMask|scrolllockMask,
            _root, True, GrabModeAsync, GrabModeAsync);
+}
+
+void screen::ungrabKey(const KeyCode keyCode, const int modifierMask) const {
+
+  Display *display = _epist->getXDisplay();
+  int numlockMask, scrolllockMask;
+
+  _epist->getLockModifiers(numlockMask, scrolllockMask);
+
+  XUngrabKey(display, keyCode, modifierMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|LockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|scrolllockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|numlockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|LockMask|scrolllockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|scrolllockMask|numlockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|numlockMask|LockMask, _root);
+  XUngrabKey(display, keyCode, modifierMask|numlockMask|LockMask|
+             scrolllockMask, _root);
 }

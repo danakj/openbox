@@ -1,5 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
-// actions.cc for Epistophy - a key handler for NETWM/EWMH window managers.
+// keytree.hh for Epistophy - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,32 +20,53 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#ifndef _keytree_hh
+#define _keytree_hh
+
+#include <list>
 #include "actions.hh"
+#include "screen.hh"
 
-Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
-               const std::string &str)
-  : _type(type), _keycode(keycode), _modifierMask(modifierMask)
-{
-  // These are the action types that take string arguments. This
-  // should probably be moved to a static member
-  ActionType str_types[] = {
-    execute,
-    nextWindowOfClass,
-    prevWindowOfClass,
-    nextWindowOfClassOnAllWorkspaces,
-    prevWindowOfClassOnAllWorkspaces,
-    noaction
-  };
+struct keynode; // forward declaration
+typedef std::list<keynode *> ChildList;
 
-  for (int i = 0; str_types[i] != noaction; ++i) {
-    if (type == str_types[i]) {
-      _stringParam = str;
-      return;
-    }
-  }
-  
-  _numberParam = atoi( str.c_str() );
+struct keynode {
+    Action *action;
+    keynode *parent;
+    ChildList children;
+};
 
-  if (type == changeWorkspace)
-    _numberParam;
-}
+class keytree {
+public:
+    keytree(Display *);
+    ~keytree();
+
+    void grabDefaults(screen *);
+    const Action * getAction(const XEvent&, unsigned int, screen *);
+
+private:
+    // only mister parser needs to know about our sekrets (BUMMY)
+    friend class parser;
+    
+    void grabChildren(keynode *, screen *);
+    void ungrabChildren(keynode *, screen *);
+
+    void addAction(Action::ActionType, unsigned int, std::string, std::string);
+    void advanceOnNewNode();
+    void retract();
+    void setCurrentNodeProps(Action::ActionType, unsigned int, std::string, std::string);
+
+    void reset()
+    { _current = _head; }
+
+    bool isLeaf(keynode *node)
+    { return node->children.empty(); }
+
+    void clearTree(keynode *);
+
+    keynode *_head;
+    keynode *_current;
+    Display *_display;
+};
+
+#endif // _keytree_hh

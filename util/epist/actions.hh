@@ -93,8 +93,8 @@ private:
   const KeyCode _keycode;
   const unsigned int _modifierMask;
 
-  const int _numberParam;
-  const std::string _stringParam;
+  int _numberParam;
+  std::string _stringParam;
 public:
   inline enum ActionType type() const { return _type;}
   inline const KeyCode keycode() const { return _keycode; }
@@ -103,9 +103,7 @@ public:
   inline const std::string &string() const { return _stringParam; }
 
   Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
-         int number = 0);
-  Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
-         const std::string &str);
+         const std::string &str = "");
 };
   
 typedef std::list<Action> ActionList;

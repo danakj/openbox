@@ -4,7 +4,7 @@ CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
 EXTRA_PROGRAMS =		epist
 
-epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc
+epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
 					../../src/Util.o ../../src/i18n.o \
 					../../src/GCCache.o ../../src/Color.o ../../src/Texture.o \
@@ -25,3 +25,10 @@ screen.o: screen.cc ../../src/XAtom.hh screen.hh window.hh epist.hh \
   ../../src/BaseDisplay.hh ../../src/Timer.hh ../../src/Util.hh
 window.o: window.cc window.hh epist.hh ../../src/BaseDisplay.hh \
   ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
+yacc_parser.o: yacc_parser.cc yacc_parser.hh epist.hh ../../src/BaseDisplay.hh \
+  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
+keytree.o: keytree.cc keytree.hh epist.hh ../../src/BaseDisplay.hh \
+  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
+parser.o: parser.cc parser.hh epist.hh ../../src/BaseDisplay.hh \
+  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
+lex.yy.o: lex.yy.c

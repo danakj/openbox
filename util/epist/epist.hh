@@ -32,6 +32,7 @@ extern "C" {
 
 #include "actions.hh"
 #include "window.hh"
+#include "keytree.hh"
 
 #include "../../src/BaseDisplay.hh"
 
@@ -43,6 +44,7 @@ private:
   std::string _rc_file;
   XAtom *_xatom;
   char **_argv;
+  keytree *_ktree;
 
   typedef std::vector<screen *> ScreenList;
   ScreenList _screens;
@@ -60,10 +62,6 @@ private:
   virtual bool handleSignal(int sig);
 
   void activateGrabs();
-  void addAction(Action::ActionType act, unsigned int modifiers,
-                 std::string key, int number = 0);
-  void addAction(Action::ActionType act, unsigned int modifiers,
-                 std::string key, std::string str);
 
 public:
   epist(char **argv, char *display_name, char *rc_file);
@@ -83,6 +81,7 @@ public:
   }
   
   const ActionList &actions(void) { return _actions; }
+  keytree &getKeyTree(void) { return *_ktree; }
   
   WindowList& clientsList() { return _clients; }
   WindowList::iterator& activeWindow() { return _active; }

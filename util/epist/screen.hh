@@ -86,6 +86,7 @@ public:
   void execCommand(const std::string &cmd) const;
 
   void grabKey(const KeyCode keyCode, const int modifierMask) const;
+  void ungrabKey(const KeyCode keyCode, const int modifierMask) const;
 };
 
 #endif // __screen_hh

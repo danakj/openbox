@@ -54,6 +54,7 @@ using std::string;
 #include "epist.hh"
 #include "screen.hh"
 #include "window.hh"
+#include "parser.hh"
 #include "../../src/XAtom.hh"
 
 
@@ -65,7 +66,7 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
   if (rc_file)
     _rc_file = rc_file;
   else
-    _rc_file = expandTilde("~/.openbox/epistrc");
+    _rc_file = expandTilde("~/.epistrc");
 
   _xatom = new XAtom(getXDisplay());
 
@@ -83,52 +84,11 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     ::exit(1);
   }
 
-  addAction(Action::nextScreen, ControlMask, "Tab");
-  addAction(Action::prevScreen, ControlMask | ShiftMask, "Tab");
-  addAction(Action::nextWindow, Mod1Mask, "Tab");
-  addAction(Action::prevWindow, Mod1Mask | ShiftMask, "Tab");
-  addAction(Action::toggleshade, Mod1Mask, "F5");
-  addAction(Action::close, Mod1Mask, "F4");
-  addAction(Action::nextWindowOnAllWorkspaces, Mod1Mask | ControlMask, "Tab");
-  addAction(Action::prevWindowOnAllWorkspaces,
-            Mod1Mask | ShiftMask | ControlMask, "Tab");
-  addAction(Action::prevWorkspace, Mod1Mask, "Left");
-  addAction(Action::nextWorkspace, Mod1Mask, "Right");
-  addAction(Action::raise, Mod1Mask, "Up");
-  addAction(Action::lower, Mod1Mask, "Down");
-  addAction(Action::moveWindowUp, Mod1Mask | ControlMask, "Up", 1);
-  addAction(Action::moveWindowDown, Mod1Mask | ControlMask, "Down", 1);
-  addAction(Action::moveWindowLeft, Mod1Mask | ControlMask, "Left", 1);
-  addAction(Action::moveWindowRight, Mod1Mask | ControlMask, "Right", 1);
-  addAction(Action::resizeWindowHeight, ShiftMask | Mod1Mask | ControlMask,
-            "Up", -1);
-  addAction(Action::resizeWindowHeight, ShiftMask | Mod1Mask | ControlMask,
-            "Down", 1);
-  addAction(Action::resizeWindowWidth, ShiftMask | Mod1Mask | ControlMask,
-            "Left", -1);
-  addAction(Action::resizeWindowWidth, ShiftMask | Mod1Mask | ControlMask,
-            "Right", 1);
-  addAction(Action::iconify, Mod1Mask | ControlMask, "I");
-  addAction(Action::toggleomnipresent, Mod1Mask | ControlMask, "O");
-  addAction(Action::toggleMaximizeHorizontal, ShiftMask | Mod1Mask, "X");
-  addAction(Action::toggleMaximizeVertical, ShiftMask | ControlMask, "X");
-  addAction(Action::toggleMaximizeFull, Mod1Mask | ControlMask, "X");
-  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "1", 0);
-  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "2", 1);
-  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "3", 2);
-  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "4", 3);
-  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
-            "1", 0);
-  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
-            "2", 1);
-  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
-            "3", 2);
-  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
-            "4", 3);
-  addAction(Action::execute, Mod1Mask | ControlMask, "Escape",
-            "sleep 1 && xset dpms force off");
-  addAction(Action::execute, Mod1Mask, "space",
-            "rxvt");
+  _ktree = new keytree(getXDisplay());
+
+  // set up the key tree
+  parser p(_ktree);
+  p.parse(_rc_file);
 
   activateGrabs();
 }
@@ -142,13 +102,8 @@ void epist::activateGrabs() {
 
   ScreenList::const_iterator scrit, scrend = _screens.end();
   
-  for (scrit = _screens.begin(); scrit != scrend; ++scrit) {
-    ActionList::const_iterator ait, end = _actions.end();
-
-    for(ait = _actions.begin(); ait != end; ++ait) {
-      (*scrit)->grabKey(ait->keycode(), ait->modifierMask());
-    }
-  }
+  for (scrit = _screens.begin(); scrit != scrend; ++scrit)
+      _ktree->grabDefaults(*scrit);
 }
 
 
@@ -221,20 +176,4 @@ void epist::cycleScreen(int current, bool forward) const {
 
   const XWindow *target = _screens[dest]->lastActiveWindow();
   if (target) target->focus();
-}
-
-
-void epist::addAction(Action::ActionType act, unsigned int modifiers,
-                      string key, int number) {
-  _actions.push_back(Action(act, XKeysymToKeycode(getXDisplay(),
-                                                  XStringToKeysym(key.c_str())),
-                            modifiers, number));
-}
-
-
-void epist::addAction(Action::ActionType act, unsigned int modifiers,
-                      string key, string str) {
-  _actions.push_back(Action(act, XKeysymToKeycode(getXDisplay(),
-                                                  XStringToKeysym(key.c_str())),
-                            modifiers, str));
 }

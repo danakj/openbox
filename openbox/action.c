@@ -36,6 +36,16 @@ void action_execute(union ActionData *data)
     }
 }
 
+void action_focus(union ActionData *data)
+{
+    client_focus(data->client.c);
+}
+
+void action_unfocus (union ActionData *data)
+{
+    client_unfocus(data->client.c);
+}
+
 void action_iconify(union ActionData *data)
 {
     client_iconify(data->client.c, TRUE, TRUE);

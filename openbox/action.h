@@ -90,6 +90,10 @@ void action_free(Action *a);
 /* Execute */
 void action_execute(union ActionData *data);
 /* ClientAction */
+void action_focus(union ActionData *data);
+/* ClientAction */
+void action_unfocus(union ActionData *data);
+/* ClientAction */
 void action_iconify(union ActionData *data);
 /* ClientAction */
 void action_raise(union ActionData *data);

@@ -745,9 +745,6 @@ void Screen::raiseWindow(Client *client)
   const ClientList::iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
-//  for (;it != end, ++it) {
-//    if ((*it)->layer() <= client->layer() && m != *it) break;
-//  }
   for (; it != end && ((*it)->layer() > client->layer() || m == *it); ++it);
 
   /*

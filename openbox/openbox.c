@@ -16,7 +16,6 @@
 #include "mouse.h"
 #include "extensions.h"
 #include "grab.h"
-#include "plugin.h"
 #include "timer.h"
 #include "group.h"
 #include "config.h"
@@ -219,21 +218,15 @@ int main(int argc, char **argv)
            anything that calls stacking_add */
 	focus_startup();
         window_startup();
-        plugin_startup();
-        /* load the plugins specified in the pluginrc */
-        plugin_loadall(i);
 
         /* set up the kernel config shit */
         config_startup(i);
-        menu_startup(i);
         /* parse/load user options */
         if (parse_load_rc(&doc, &node))
             parse_tree(i, doc, node->xmlChildrenNode);
         /* we're done with parsing now, kill it */
         xmlFreeDoc(doc);
         parse_shutdown(i);
-
-        menu_parse();
 
         /* load the theme specified in the rc file */
         ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
@@ -247,9 +240,7 @@ int main(int argc, char **argv)
         dock_startup();
         keyboard_startup();
         mouse_startup();
-
-        /* call startup for all the plugins */
-        plugin_startall();
+        menu_startup();
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -262,7 +253,6 @@ int main(int argc, char **argv)
         dock_remove_all();
 	client_unmanage_all();
 
-        plugin_shutdown(); /* calls all the plugins' shutdown functions */
         menu_shutdown();
         mouse_shutdown();
         keyboard_shutdown();

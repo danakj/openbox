@@ -275,22 +275,16 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
   }
 #endif // XFT
 
-  BGCCache *_cache = color.display()->gcCache();
-  BGCCacheItem *_item = _cache->find(color, _font, GXcopy, ClipByChildren);
-
-  assert(_cache);
-  assert(_item);
+  BPen pen(color, _font);
 
   if (i18n.multibyte())
-    XmbDrawString(_display, d, _fontset, _item->gc(),
+    XmbDrawString(_display, d, _fontset, pen.gc(),
                   x, y - _fontset_extents->max_ink_extent.y,
                   string.c_str(), string.size());
   else
-    XDrawString(_display, d, _item->gc(),
+    XDrawString(_display, d, pen.gc(),
                 x, _font->ascent + y,
                 string.c_str(), string.size());
-
-  _cache->release(_item);
 }
 
 

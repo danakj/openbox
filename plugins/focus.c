@@ -86,6 +86,7 @@ static void events(ObEvent *e, void *foo)
     case Event_X_EnterNotify:
         if (e->data.x.client && client_normal(e->data.x.client))
             client_focus(e->data.x.client);
+        break;
 
     default:
         g_assert_not_reached();

@@ -1,4 +1,4 @@
-:
+3.0-rc5:
 	* Closed bug #908 (sometimes some weird grab is left)
 	* Closed bug #945 (xawtv overlay visible on every desktop)
 	* Closed bug #944 (remove restarting/reconfiguring messages from

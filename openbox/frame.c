@@ -223,7 +223,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         self->rbwidth = self->bwidth;
 
         if (self->client->max_vert && self->client->max_horz)
-            self->decorations &= ~OB_FRAME_DECOR_HANDLE;
+            self->client->decorations =
+                self->decorations &= ~OB_FRAME_DECOR_HANDLE;
 
         if (self->client->max_horz)
             self->bwidth = self->cbwidth_x = 0;

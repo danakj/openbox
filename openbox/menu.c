@@ -135,8 +135,7 @@ void menu_pipe_execute(ObMenu *self)
     if (!self->execute)
         return;
 
-    if (!g_spawn_command_line_sync(self->execute, &output, NULL, NULL, &err))
-    {
+    if (!g_spawn_command_line_sync(self->execute, &output, NULL, NULL, &err)) {
         g_warning("Failed to execute command for pipe-menu: %s", err->message);
         g_error_free(err);
         return;

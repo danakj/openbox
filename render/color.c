@@ -58,9 +58,11 @@ color_rgb *color_new(int r, int g, int b)
 
 void color_free(color_rgb *c)
 {
-    if (c->gc != None)
-        XFreeGC(ob_display, c->gc);
-    g_free(c);
+    if (c != NULL) {
+        if (c->gc != None)
+            XFreeGC(ob_display, c->gc);
+        g_free(c);
+    }
 }
 
 void reduce_depth(pixel32 *data, XImage *im)
@@ -87,7 +89,7 @@ void reduce_depth(pixel32 *data, XImage *im)
                 data += im->width;
                 p32 += im->width;
             } 
-        } else im->data = data;
+        } else im->data = (char*) data;
         break;
     case 16:
         for (y = 0; y < im->height; y++) {

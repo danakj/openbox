@@ -2,6 +2,7 @@
 #include "openbox.h"
 #include "event.h"
 #include "xerror.h"
+#include "screen.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -42,7 +43,7 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
 
     if (grab) {
         if (pgrabs++ == 0)
-            ret = XGrabPointer(ob_display, RootWindow(ob_display, ob_screen),
+            ret = XGrabPointer(ob_display, screen_support_win,
                                False, GRAB_PTR_MASK, GrabModeAsync,
                                GrabModeAsync, FALSE,
                                ob_cursor(cur), event_lasttime) == Success;

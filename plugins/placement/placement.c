@@ -3,6 +3,7 @@
 #include "../../kernel/frame.h"
 #include "../../kernel/screen.h"
 #include "../../kernel/openbox.h"
+#include "../../kernel/config.h"
 #include "history.h"
 #include <glib.h>
 
@@ -10,6 +11,14 @@ gboolean history = TRUE;
 
 void plugin_setup_config()
 {
+    ConfigValue val;
+
+    config_def_set(config_def_new("placement.remember", Config_Bool,
+                                  "Remember Window Positions",
+                                  "Place windows where they last were "
+                                  "positioned."));
+    val.bool = TRUE;
+    config_set("placement.remember", Config_Bool, val);
 }
 
 static void place_random(Client *c)
@@ -39,12 +48,18 @@ static void place_random(Client *c)
 
 static void event(ObEvent *e, void *foo)
 {
+    ConfigValue remember;
+    gboolean r;
+
     g_assert(e->type == Event_Client_New);
 
     /* requested a position */
     if (e->data.c.client->positioned) return;
 
-    if (!place_history(e->data.c.client))
+    r = config_get("placement.remember", Config_Bool, &remember);
+    g_assert(r);
+
+    if (!remember.bool || !place_history(e->data.c.client))
         place_random(e->data.c.client);
 }
 

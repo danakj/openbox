@@ -224,7 +224,7 @@ void Screen::updateStrut()
 
 void Screen::calcArea()
 {
-  otk::Rect old_area = _area;
+//  otk::Rect old_area = _area;
 
 /*
 #ifdef    XINERAMA

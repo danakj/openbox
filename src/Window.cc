@@ -3039,11 +3039,11 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
     // snap to the strut (and screen boundaries for xinerama)
 #ifdef    XINERAMA
-    if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
-      RectList::iterator it, end = screen->allAvailableAreas().end();
-      for (it = screen->allAvailableAreas().begin(); it != end; ++it)
-        snaplist.push_back(*it);
-    } else
+    if (screen->isXineramaActive() && blackbox->doXineramaSnapping())
+      snaplist.insert(snaplist.begin(),
+                      screen->allAvailableAreas().begin(),
+                      screen->allAvailableAreas().end());
+    else
 #endif // XINERAMA
       if (! screen->doFullMax())
         snaplist.push_back(screen->availableArea());
@@ -3051,9 +3051,14 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
     // always snap to the screen edges
     snaplist.push_back(screen->getRect());
 
-    RectList::iterator it, end = snaplist.end();
+    RectList::const_iterator it, end = snaplist.end();
     for (it = snaplist.begin(); it != end; ++it) {
-      Rect &srect = *it;
+      const Rect &srect = *it;
+
+      // if we're not in the rectangle then don't snap to it.
+      if (! srect.intersects(Rect(wleft, wtop, frame.rect.width(),
+                                  frame.rect.height())))
+        continue;
 
       int dleft = std::abs(wleft - srect.left()),
          dright = std::abs(wright - srect.right()),

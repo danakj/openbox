@@ -313,7 +313,7 @@ public:
   // as then Xinerama will work correctly.
   const Rect& availableArea(void) const;
 #ifdef    XINERAMA
-  RectList allAvailableAreas(void) const;
+  const RectList& allAvailableAreas(void) const;
 #endif // XINERAMA
   void updateAvailableArea(void);
   void addStrut(Strut *strut);

@@ -2075,9 +2075,12 @@ const Rect& BScreen::availableArea(void) const {
 
 
 #ifdef    XINERAMA
-RectList BScreen::allAvailableAreas(void) const {
+const RectList& BScreen::allAvailableAreas(void) const {
   assert(isXineramaActive());
   assert(xineramaUsableArea.size() > 0);
+  fprintf(stderr, "1found x %d y %d w %d h %d\n",
+          xineramaUsableArea[0].x(), xineramaUsableArea[0].y(),
+          xineramaUsableArea[0].width(), xineramaUsableArea[0].height());
   return xineramaUsableArea;
 }
 #endif // XINERAMA

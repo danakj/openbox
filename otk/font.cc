@@ -97,11 +97,11 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
     if (string.utf8())
       XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
                         _xftfont->ascent + y + _offset,
-                        (FcChar8*)string.c_str(), string.size());
+                        (FcChar8*)string.c_str(), string.bytes());
     else
       XftDrawString8(d, &c, _xftfont, x + _offset,
                      _xftfont->ascent + y + _offset,
-                     (FcChar8*)string.c_str(), string.size());
+                     (FcChar8*)string.c_str(), string.bytes());
   }
     
   XftColor c;
@@ -113,10 +113,10 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
 
   if (string.utf8())
     XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                      (FcChar8*)string.c_str(), string.size());
+                      (FcChar8*)string.c_str(), string.bytes());
   else
     XftDrawString8(d, &c, _xftfont, x, _xftfont->ascent + y,
-                   (FcChar8*)string.c_str(), string.size());
+                   (FcChar8*)string.c_str(), string.bytes());
 
   return;
 }
@@ -128,10 +128,10 @@ unsigned int Font::measureString(const ustring &string) const
 
   if (string.utf8())
     XftTextExtentsUtf8(**display, _xftfont,
-                       (FcChar8*)string.c_str(), string.size(), &info);
+                       (FcChar8*)string.c_str(), string.bytes(), &info);
   else
     XftTextExtents8(**display, _xftfont,
-                    (FcChar8*)string.c_str(), string.size(), &info);
+                    (FcChar8*)string.c_str(), string.bytes(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }

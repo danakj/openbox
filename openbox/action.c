@@ -621,7 +621,10 @@ void action_previous_desktop_row(union ActionData *data)
 
 void action_toggle_decorations(union ActionData *data)
 {
-    Client *c = data->client.c;
+    Client *c = data->client.c;;
+
+    if (!c) return;
+
     c->disabled_decorations = c->disabled_decorations ? 0 : ~0;
     client_setup_decor_and_functions(c);
 }

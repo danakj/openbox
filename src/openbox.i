@@ -99,6 +99,10 @@ PyObject * unregister_all(int action)
 
 PyObject * bind(PyObject *keylist, PyObject *func)
 {
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
     return NULL;

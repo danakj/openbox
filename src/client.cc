@@ -1269,6 +1269,12 @@ void OBClient::reparentHandler(const XReparentEvent &e)
     to an already unmapped window.
   */
 
+  // put another copy of this event on the stack (for the frame reparent
+  // process)
+  XEvent ev;
+  ev.xreparent = e;
+  XPutBackEvent(otk::OBDisplay::display, &ev);
+  
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);
 }

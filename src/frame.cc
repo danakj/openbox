@@ -436,8 +436,12 @@ void OBFrame::releaseClient()
   XEvent ev;
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
-    // XXX: ob2/bb didn't do this.. look up this process in other wm's!
-    //XPutBackEvent(otk::OBDisplay::display, &ev);
+    /*
+      If the app reparented itself, then we unmanage the window. This causes
+      the window to be unmapped, so to be nice to it, we remap the window
+      here. We don't put the event back onto the stack because we put it there
+      in the first place.
+    */
     XMapWindow(otk::OBDisplay::display, _client->window());
   } else {
     // according to the ICCCM - if the client doesn't reparent to

@@ -207,7 +207,7 @@ int main(int argc, char **argv)
                 if (parse_load_rc(&doc, &node))
                     parse_tree(i, doc, node->xmlChildrenNode);
                 /* we're done with parsing now, kill it */
-                xmlFreeDoc(doc);
+                parse_close(doc);
                 parse_shutdown(i);
             }
 

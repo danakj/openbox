@@ -61,6 +61,6 @@ config.o: config.cc config.hh ../../src/Util.hh \
   keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
   ../../src/XAtom.hh
 yacc_parser.cc: epist.y
-	yacc -d epist.y -o yacc_parser.cc
+	bison -d epist.y -o yacc_parser.cc
 lex.yy.c: epist.l
 	lex epist.l

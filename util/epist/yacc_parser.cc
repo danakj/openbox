@@ -15,6 +15,10 @@
 
 #line 1 "epist.y"
 
+#ifdef    HAVE_CONFIG_H
+#  include "../../config.h"
+#endif // HAVE_CONFIG_H
+
 #include <stdio.h>
 #include <string.h>
 #include "parser.hh"
@@ -106,9 +110,9 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,    27,    28,    29,    32,    33,    36,    45,    52,    56,
-      60,    64,    68,    69,    72,    74,    75,    76,    77,    78,
-      81,    82,    83,    84,    87,    91,    92,    95
+       0,    31,    32,    33,    36,    37,    40,    49,    56,    60,
+      64,    68,    72,    73,    76,    78,    79,    80,    81,    82,
+      85,    86,    87,    88,    91,    95,    96,    99
 };
 #endif
 
@@ -900,68 +904,68 @@ yyreduce:
   switch (yyn) {
 
 case 6:
-#line 38 "epist.y"
+#line 42 "epist.y"
 {
         ((parser*)parser_obj)->setAction(yyvsp[-2]);
         ((parser*)parser_obj)->endAction();
     ;
     break;}
 case 7:
-#line 47 "epist.y"
+#line 51 "epist.y"
 {
         ((parser*)parser_obj)->endChain();
     ;
     break;}
 case 10:
-#line 61 "epist.y"
+#line 65 "epist.y"
 { ((parser*)parser_obj)->startChain(); ;
     break;}
 case 11:
-#line 65 "epist.y"
+#line 69 "epist.y"
 { /* ((parser*)parser_obj)->endChain(); */ ;
     break;}
 case 13:
-#line 69 "epist.y"
+#line 73 "epist.y"
 { ((parser*)parser_obj)->addModifier(yyvsp[-2]); ;
     break;}
 case 14:
-#line 73 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 15:
-#line 74 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 16:
-#line 75 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 17:
-#line 76 "epist.y"
-{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
-    break;}
-case 18:
 #line 77 "epist.y"
 { ((parser*)parser_obj)->setKey(yyvsp[0]); ;
     break;}
-case 19:
+case 15:
 #line 78 "epist.y"
 { ((parser*)parser_obj)->setKey(yyvsp[0]); ;
     break;}
-case 21:
+case 16:
+#line 79 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 17:
+#line 80 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 18:
+#line 81 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 19:
 #line 82 "epist.y"
+{ ((parser*)parser_obj)->setKey(yyvsp[0]); ;
+    break;}
+case 21:
+#line 86 "epist.y"
 { ((parser*)parser_obj)->setArgumentNum(yyvsp[0]); ;
     break;}
 case 22:
-#line 83 "epist.y"
+#line 87 "epist.y"
 { ((parser*)parser_obj)->setArgumentNegNum(yyvsp[0]); ;
     break;}
 case 23:
-#line 84 "epist.y"
+#line 88 "epist.y"
 { ((parser*)parser_obj)->setArgumentStr(yyvsp[0]); ;
     break;}
 case 27:
-#line 97 "epist.y"
+#line 101 "epist.y"
 { ((parser*)parser_obj)->setOption(yyvsp[-2]); ;
     break;}
 }
@@ -1197,6 +1201,6 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 100 "epist.y"
+#line 104 "epist.y"
 
 

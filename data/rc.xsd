@@ -117,6 +117,7 @@
             <xs:element minOccurs="0" name="desktop" type="xs:integer"/>
             <xs:element minOccurs="0" name="follow" type="ob:yesorno"/>
             <xs:element minOccurs="0" name="execute" type="xs:string"/>
+            <xs:element minOccurs="0" name="dialog" type="ob:yesorno"/>
         </xs:sequence>
         <xs:attribute name="name" type="ob:actionname" use="required"/>
     </xs:complexType>

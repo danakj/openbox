@@ -392,6 +392,7 @@ void screen::handleKeyrelease(const XEvent &) {
 
     _clients.remove(w);
     _clients.push_front(w);
+    _active = _clients.begin();
     w->raise();
 
     _cycling = false;

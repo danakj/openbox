@@ -1179,7 +1179,6 @@ ObMenuFrame* find_active_menu()
 
 ObMenuFrame* find_active_or_last_menu()
 {
-    GList *it;
     ObMenuFrame *ret = NULL;
 
     ret = find_active_menu();

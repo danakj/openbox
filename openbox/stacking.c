@@ -102,7 +102,7 @@ void stacking_lower(Client *client)
     } else {
 	while (it != stacking_list) {
 	    Client *c = it->data;
-	    if (client->layer >= c->layer)
+	    if (client->layer <= c->layer)
 		break;
 	    it = it->prev;
 	}

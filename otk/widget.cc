@@ -296,11 +296,29 @@ void OtkWidget::adjustVert(void)
 
   int widest = 0;
   int height = _bevel_width;
+  OtkWidgetList stretchable;
+
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
+    if (tmp->isStretchableVert() && _fixed_height)
+      stretchable.push_back(tmp);
+    else
+      height += tmp->_rect.height() + _bevel_width;
+
     if (tmp->_rect.width() > widest)
       widest = tmp->_rect.width();
-    height += tmp->_rect.height() + _bevel_width;
+  }
+
+  if (stretchable.size() > 0) {
+    OtkWidgetList::iterator str_it = stretchable.begin(),
+      str_end = stretchable.end();
+
+    int str_height = _rect.height() - height / stretchable.size();
+
+    for (; str_it != str_end; ++str_it) {
+      (*str_it)->setHeight(str_height - _bevel_width);
+      (*str_it)->update();
+    }
   }
 
   OtkWidget *prev_widget = 0;

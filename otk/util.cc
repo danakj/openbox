@@ -61,30 +61,6 @@ void bexec(const string& command, const string& displaystring) {
 }
 
 
-string textPropertyToString(Display *display, XTextProperty& text_prop) {
-  string ret;
-
-  if (text_prop.value && text_prop.nitems > 0) {
-    if (text_prop.encoding == XA_STRING) {
-      ret = (char *) text_prop.value;
-    } else {
-      text_prop.nitems = strlen((char *) text_prop.value);
-
-      char **list;
-      int num;
-      if (XmbTextPropertyToTextList(display, &text_prop,
-                                    &list, &num) == Success &&
-          num > 0 && *list) {
-        ret = *list;
-        XFreeStringList(list);
-      }
-    }
-  }
-
-  return ret;
-}
-
-
 string itostring(unsigned long i) {
   if (i == 0)
     return string("0");

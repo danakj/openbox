@@ -23,14 +23,9 @@ extern "C" {
 
 namespace otk {
 
-/* XXX: this needs autoconf help */
-const unsigned int BSENTINEL = 65535;
-
 std::string expandTilde(const std::string& s);
 
 void bexec(const std::string& command, const std::string& displaystring);
-
-std::string textPropertyToString(Display *display, XTextProperty& text_prop);
 
 std::string itostring(unsigned long i);
 std::string itostring(long i);

@@ -9,9 +9,21 @@
 EDGE_RESISTANCE = 10
 """The amount of resistance to provide to moving a window past a screen
    boundary. Specify a value of 0 to disable edge resistance."""
+POPUP_IN_WINDOW = 0
+"""When this is non-zero, the coordinates popups will be placed relative to
+   the window being moved/resized. When zero, they will appear relative to the
+   entire screen."""
 POPUP_CENTERED = 1
-"""When this is non-zero, the coordinates popups will be centered on the
-   screen. When zero, they will appear in the upper-left corner."""
+"""When this is non-zero, the coordinates popups will be centered relative to
+   the window or screen (see POPUP_IN_WINDOW). When zero, they will be placed
+   at based upon POPUP_COORDS."""
+POPUP_COORDS = 0, 0
+"""When POPUP_CENTERED is zero, these coordinates will be used to place the
+   coordinates popup. The popup will be placed relative to the window or the
+   screen (see POPUP_IN_WINDOW). A value of 0, 0 would place it in the top
+   left corner, while a value of -1, -1 would place it in the bottom right.
+   These values behave simmilarly to those passed to the -geometry flag of many
+   applications."""
 MOVE_POPUP = 1
 """Display a coordinates popup when moving windows."""
 MOVE_RUBBERBAND = 0
@@ -60,7 +72,6 @@ import ob
 import otk
 
 _popwidget = 0
-_poplabel = 0
 
 # motion state
 _inmove = 0
@@ -79,6 +90,22 @@ _client = 0
 _screen = 0
 
 _motion_mask = 0
+
+def _place_popup():
+    if POPUP_IN_WINDOW:
+        area = _client.frame.area()
+    else:
+        area = otk.Rect(otk.Point(0, 0), ob.openbox.screen(_screen).size())
+    size = _popwidget.minSize()
+    if POPUP_CENTERED:
+        x = area.position().x() + (area.size().width() - size.width()) / 2
+        y = area.position().y() + (area.size().height() - size.height()) / 2
+    else:
+        try: x, y = POPUP_COORDS
+        except: x = y = 0
+        if x < 0: x += area.right() - size.width() + 2
+        if y < 0: y += area.bottom() - size.height() + 2
+    _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
 
 def _motion_grab(data):
     global _motion_mask, _inmove, _inresize;
@@ -141,23 +168,14 @@ def _do_move(final):
         _client.move(x, y, final)
 
     if MOVE_POPUP:
-        global _popwidget, _poplabel
+        global _popwidget
         text = "X: " + str(x) + " Y: " + str(y)
         if not _popwidget:
-            _popwidget = otk.Widget(_screen, ob.openbox, 
-                                    otk.Widget.Horizontal, 0, 1)
-            _poplabel = otk.Label(_popwidget)
-            _poplabel.setHighlighted(1)
-        _poplabel.setText(text)
-        size = _poplabel.minSize()
-        if POPUP_CENTERED:
-            scsize = ob.openbox.screen(_screen).size()
-            x = (scsize.width() - size.width()) / 2
-            y = (scsize.height() - size.height()) / 2
-        else:
-            x = y = 0
-        _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
-        _popwidget.show(1)
+            _popwidget = otk.Label(_screen, ob.openbox)
+            _popwidget.setHighlighted(1)
+        _popwidget.setText(text)
+        _place_popup()
+        _popwidget.show()
 
 def _move(data):
     if not data.client: return
@@ -181,14 +199,13 @@ def _move(data):
 
 def _end_move(data):
     global MOVE_RUBBERBAND
-    global _inmove, _popwidget, _poplabel
+    global _inmove, _popwidget
     if _inmove:
         r = MOVE_RUBBERBAND
         MOVE_RUBBERBAND = 0
         _do_move(1)
         MOVE_RUBBERBAND = r
         _inmove = 0
-    _poplabel = 0
     _popwidget = 0
     ob.kungrab()
 
@@ -228,24 +245,15 @@ def _do_resize():
         _client.resize(corner, w, h)
 
     if RESIZE_POPUP:
-        global _popwidget, _poplabel
+        global _popwidget
         ls = _client.logicalSize()
         text = "W: " + str(ls.width()) + " H: " + str(ls.height())
         if not _popwidget:
-            _popwidget = otk.Widget(_screen, ob.openbox, 
-                                    otk.Widget.Horizontal, 0, 1)
-            _poplabel = otk.Label(_popwidget)
-            _poplabel.setHighlighted(1)
-        _poplabel.setText(text)
-        size = _poplabel.minSize()
-        if POPUP_CENTERED:
-            scsize = ob.openbox.screen(_screen).size()
-            x = (scsize.width() - size.width()) / 2
-            y = (scsize.height() - size.height()) / 2
-        else:
-            x = y = 0
-        _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
-        _popwidget.show(1)
+            _popwidget = otk.Label(_screen, ob.openbox)
+            _popwidget.setHighlighted(1)
+        _popwidget.setText(text)
+        _place_popup()
+        _popwidget.show()
 
 def _resize(data):
     if not data.client: return
@@ -274,13 +282,12 @@ def _resize(data):
 
 def _end_resize(data):
     global RESIZE_RUBBERBAND, _inresize
-    global _popwidget, _poplabel
+    global _popwidget
     if _inresize:
         r = RESIZE_RUBBERBAND
         RESIZE_RUBBERBAND = 0
         _do_resize()
         RESIZE_RUBBERBAND = r
         _inresize = 0
-    _poplabel = 0
     _popwidget = 0
     ob.kungrab()

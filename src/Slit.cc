@@ -86,6 +86,9 @@ Slit::~Slit(void) {
 
   delete slitmenu;
 
+  screen->removeStrut(&strut);
+  screen->updateAvailableArea();
+
   screen->getImageControl()->removeImage(frame.pixmap);
 
   blackbox->removeSlitSearch(frame.window);

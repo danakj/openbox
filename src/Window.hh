@@ -176,8 +176,10 @@ private:
       min_width, min_height,        // can not be resized smaller
       max_width, max_height,        // can not be resized larger
       width_inc, height_inc,        // increment step
+#if 0 // not supported at the moment
       min_aspect_x, min_aspect_y,   // minimum aspect ratio
       max_aspect_x, max_aspect_y,   // maximum aspect ratio
+#endif
       base_width, base_height,
       win_gravity;
 

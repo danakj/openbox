@@ -159,8 +159,6 @@ Toolbar::Toolbar(BScreen *scrn) {
   frame.base = frame.label = frame.wlabel = frame.clk = frame.button =
     frame.pbutton = None;
 
-  screen->addStrut(&strut);
-
   reconfigure();
   mapToolbar();
 }
@@ -203,6 +201,7 @@ void Toolbar::mapToolbar() {
     XMapSubwindows(display, frame.window);
     XMapWindow(display, frame.window);
   }
+  screen->addStrut(&strut);
   updateStrut();
 }
 
@@ -211,6 +210,9 @@ void Toolbar::unmapToolbar() {
   if (toolbarmenu->isVisible())
     toolbarmenu->hide();
   //hidden so we can maximize over the toolbar
+  screen->removeStrut(&strut);
+  screen->updateAvailableArea();
+
   XUnmapWindow(display, frame.window);
   updateStrut();
 }

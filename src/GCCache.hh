@@ -39,6 +39,8 @@ public:
            const int _function, const int _subwindow);
   void set(const XFontStruct * const _font);
 
+  ~BGCCacheContext(void);
+
 private:
   BGCCacheContext(const BaseDisplay * const _display)
     : display(_display), gc(0), pixel(0ul), fontid(0ul),

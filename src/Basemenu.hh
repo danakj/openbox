@@ -57,8 +57,7 @@ private:
     Window window, frame, title;
 
     std::string label;
-    int x, y, x_move, y_move, x_shift, y_shift, sublevels, persub, minsub,
-      grab_x, grab_y;
+    int x, y, x_move, y_move, x_shift, y_shift, sublevels, persub, minsub;
     unsigned int width, height, title_h, frame_h, item_w, item_h, bevel_w,
       bevel_h;
   } menu;

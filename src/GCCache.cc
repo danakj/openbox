@@ -35,6 +35,12 @@ extern "C" {
 #include "Util.hh"
 
 
+BGCCacheContext::~BGCCacheContext(void) {
+  if (gc)
+    XFreeGC(display->getXDisplay(), gc);
+}
+
+
 void BGCCacheContext::set(const BColor &_color,
                           const XFontStruct * const _font,
                           const int _function, const int _subwindow) {

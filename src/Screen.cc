@@ -691,7 +691,7 @@ void BScreen::load_rc(void) {
   
   if (! config->getValue(screenstr + "resistanceSize",
                         resource.resistance_size))
-    resource.resistance_size = 12;
+    resource.resistance_size = 18;
   
   if (config->getValue(screenstr + "rowPlacementDirection", s) &&
       s == "RightToLeft")

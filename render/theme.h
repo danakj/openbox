@@ -27,6 +27,8 @@ struct _RrTheme {
     RrColor *cb_unfocused_color;
     RrColor *title_focused_color;
     RrColor *title_unfocused_color;
+    RrColor *titlebut_disabled_focused_color;
+    RrColor *titlebut_disabled_unfocused_color;
     RrColor *titlebut_focused_color;
     RrColor *titlebut_unfocused_color;
     RrColor *menu_title_color;
@@ -56,28 +58,38 @@ struct _RrTheme {
     RrPixmapMask *close_mask;
 
     /* global appearances */
+    RrAppearance *a_disabled_focused_max;
+    RrAppearance *a_disabled_unfocused_max;
     RrAppearance *a_focused_unpressed_max;
     RrAppearance *a_focused_pressed_max;
     RrAppearance *a_focused_pressed_set_max;
     RrAppearance *a_unfocused_unpressed_max;
     RrAppearance *a_unfocused_pressed_max;
     RrAppearance *a_unfocused_pressed_set_max;
+    RrAppearance *a_disabled_focused_close;
+    RrAppearance *a_disabled_unfocused_close;
     RrAppearance *a_focused_unpressed_close;
     RrAppearance *a_focused_pressed_close;
     RrAppearance *a_unfocused_unpressed_close;
     RrAppearance *a_unfocused_pressed_close;
+    RrAppearance *a_disabled_focused_desk;
+    RrAppearance *a_disabled_unfocused_desk;
     RrAppearance *a_focused_unpressed_desk;
     RrAppearance *a_focused_pressed_desk;
     RrAppearance *a_focused_pressed_set_desk;
     RrAppearance *a_unfocused_unpressed_desk;
     RrAppearance *a_unfocused_pressed_desk;
     RrAppearance *a_unfocused_pressed_set_desk;
+    RrAppearance *a_disabled_focused_shade;
+    RrAppearance *a_disabled_unfocused_shade;
     RrAppearance *a_focused_unpressed_shade;
     RrAppearance *a_focused_pressed_shade;
     RrAppearance *a_focused_pressed_set_shade;
     RrAppearance *a_unfocused_unpressed_shade;
     RrAppearance *a_unfocused_pressed_shade;
     RrAppearance *a_unfocused_pressed_set_shade;
+    RrAppearance *a_disabled_focused_iconify;
+    RrAppearance *a_disabled_unfocused_iconify;
     RrAppearance *a_focused_unpressed_iconify;
     RrAppearance *a_focused_pressed_iconify;
     RrAppearance *a_unfocused_unpressed_iconify;

@@ -26,6 +26,22 @@ typedef enum {
     OB_FRAME_NUM_CONTEXTS
 } ObFrameContext;
 
+/*! The decorations the client window wants to be displayed on it */
+typedef enum {
+    OB_FRAME_DECOR_TITLEBAR    = 1 << 0, /*!< Display a titlebar */
+    OB_FRAME_DECOR_HANDLE      = 1 << 1, /*!< Display a handle (bottom) */
+    OB_FRAME_DECOR_GRIPS       = 1 << 2, /*!< Display grips in the handle */
+    OB_FRAME_DECOR_BORDER      = 1 << 3, /*!< Display a border */
+    OB_FRAME_DECOR_ICON        = 1 << 4, /*!< Display the window's icon */
+    OB_FRAME_DECOR_ICONIFY     = 1 << 5, /*!< Display an iconify button */
+    OB_FRAME_DECOR_MAXIMIZE    = 1 << 6, /*!< Display a maximize button */
+    /*! Display a button to toggle the window's placement on
+      all desktops */
+    OB_FRAME_DECOR_ALLDESKTOPS = 1 << 7,
+    OB_FRAME_DECOR_SHADE       = 1 << 8, /*!< Displays a shade button */
+    OB_FRAME_DECOR_CLOSE       = 1 << 9  /*!< Display a close button */
+} ObFrameDecorations;
+
 struct _ObFrame
 {
     struct _ObClient *client;
@@ -82,9 +98,6 @@ struct _ObFrame
 
     gboolean  focused;
 };
-
-void frame_startup();
-void frame_shutdown();
 
 ObFrame *frame_new();
 void frame_show(ObFrame *self);

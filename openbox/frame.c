@@ -16,14 +16,6 @@
 
 static void layout_title(ObFrame *self);
 
-void frame_startup()
-{
-}
-
-void frame_shutdown()
-{
-}
-
 static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
@@ -171,7 +163,7 @@ void frame_adjust_shape(ObFrame *self)
 			   ShapeBounding, ShapeSet);
 
 	num = 0;
-	if (self->decorations & Decor_Titlebar) {
+	if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
 	    xrect[0].x = -ob_rr_theme->bevel;
 	    xrect[0].y = -ob_rr_theme->bevel;
 	    xrect[0].width = self->width + self->bwidth * 2;
@@ -180,7 +172,7 @@ void frame_adjust_shape(ObFrame *self)
 	    ++num;
 	}
 
-	if (self->decorations & Decor_Handle) {
+	if (self->decorations & OB_FRAME_DECOR_HANDLE) {
 	    xrect[1].x = -ob_rr_theme->bevel;
 	    xrect[1].y = FRAME_HANDLE_Y(self);
 	    xrect[1].width = self->width + self->bwidth * 2;
@@ -200,7 +192,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 {
     if (resized) {
         self->decorations = self->client->decorations;
-        if (self->decorations & Decor_Border) {
+        if (self->decorations & OB_FRAME_DECOR_BORDER) {
             self->bwidth = ob_rr_theme->bwidth;
             self->cbwidth = ob_rr_theme->cbwidth;
         } else {
@@ -230,7 +222,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
         self->max_x = -1;
         self->close_x = -1;
 
-        if (self->decorations & Decor_Titlebar) {
+        if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
             XMoveResizeWindow(ob_display, self->title,
                               -self->bwidth, -self->bwidth,
                               self->width, ob_rr_theme->title_height);
@@ -242,18 +234,26 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
         } else
             XUnmapWindow(ob_display, self->title);
 
-        if (self->decorations & Decor_Handle) {
+        if (self->decorations & OB_FRAME_DECOR_HANDLE) {
             XMoveResizeWindow(ob_display, self->handle,
                               -self->bwidth, FRAME_HANDLE_Y(self),
                               self->width, ob_rr_theme->handle_height);
-            XMoveWindow(ob_display, self->lgrip,
-                        -self->bwidth, -self->bwidth);
-            XMoveWindow(ob_display, self->rgrip,
-                        -self->bwidth + self->width -
-                        ob_rr_theme->grip_width, -self->bwidth);
             self->innersize.bottom += ob_rr_theme->handle_height +
                 self->bwidth;
             XMapWindow(ob_display, self->handle);
+
+            if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+                XMoveWindow(ob_display, self->lgrip,
+                            -self->bwidth, -self->bwidth);
+                XMoveWindow(ob_display, self->rgrip,
+                            -self->bwidth + self->width -
+                            ob_rr_theme->grip_width, -self->bwidth);
+                XMapWindow(ob_display, self->lgrip);
+                XMapWindow(ob_display, self->rgrip);
+            } else {
+                XUnmapWindow(ob_display, self->lgrip);
+                XUnmapWindow(ob_display, self->rgrip);
+            }
 
             /* XXX make a subwindow with these dimentions?
                ob_rr_theme->grip_width + self->bwidth, 0,
@@ -433,28 +433,24 @@ static void layout_title(ObFrame *self)
     for (lc = ob_rr_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
-	    if (!(self->decorations & Decor_Icon)) break;
             if (n) { *lc = ' '; break; } /* rm duplicates */
 	    n = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size + 2 +
                                   ob_rr_theme->bevel + 1);
 	    break;
 	case 'D':
-	    if (!(self->decorations & Decor_AllDesktops)) break;
             if (d) { *lc = ' '; break; } /* rm duplicates */
 	    d = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->bevel + 1);
 	    break;
 	case 'S':
-	    if (!(self->decorations & Decor_Shade)) break;
             if (s) { *lc = ' '; break; } /* rm duplicates */
 	    s = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->bevel + 1);
 	    break;
 	case 'I':
-	    if (!(self->decorations & Decor_Iconify)) break;
             if (i) { *lc = ' '; break; } /* rm duplicates */
 	    i = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size +
@@ -465,14 +461,12 @@ static void layout_title(ObFrame *self)
 	    l = TRUE;
 	    break;
 	case 'M':
-	    if (!(self->decorations & Decor_Maximize)) break;
             if (m) { *lc = ' '; break; } /* rm duplicates */
 	    m = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->bevel + 1);
 	    break;
 	case 'C':
-	    if (!(self->decorations & Decor_Close)) break;
             if (c) { *lc = ' '; break; } /* rm duplicates */
 	    c = TRUE;
 	    self->label_width -= (ob_rr_theme->button_size +

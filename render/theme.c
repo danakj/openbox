@@ -31,44 +31,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     theme->inst = inst;
 
-    theme->b_color = theme->cb_unfocused_color = theme->cb_focused_color = 
-        theme->title_unfocused_color = theme->title_focused_color = 
-        theme->titlebut_unfocused_color = theme->titlebut_focused_color = 
-        theme->menu_color = theme->menu_title_color =
-        theme->menu_disabled_color = theme->menu_hilite_color = NULL;
-    theme->winfont = theme->mtitlefont = theme->mfont = NULL;
-    theme->title_layout = NULL;
-    theme->max_set_mask = theme->max_unset_mask = NULL;
-    theme->desk_set_mask = theme->desk_unset_mask = NULL;
-    theme->shade_set_mask = theme->shade_unset_mask = NULL;
-    theme->iconify_mask = theme->close_mask = NULL;
-
+    theme->a_disabled_focused_max = RrAppearanceNew(inst, 1);
+    theme->a_disabled_unfocused_max = RrAppearanceNew(inst, 1);
     theme->a_focused_unpressed_max = RrAppearanceNew(inst, 1);
     theme->a_focused_pressed_max = RrAppearanceNew(inst, 1);
     theme->a_focused_pressed_set_max = RrAppearanceNew(inst, 1);
     theme->a_unfocused_unpressed_max = RrAppearanceNew(inst, 1);
     theme->a_unfocused_pressed_max = RrAppearanceNew(inst, 1);
     theme->a_unfocused_pressed_set_max = RrAppearanceNew(inst, 1);
-    theme->a_focused_unpressed_close = NULL;
-    theme->a_focused_pressed_close = NULL;
-    theme->a_unfocused_unpressed_close = NULL;
-    theme->a_unfocused_pressed_close = NULL;
-    theme->a_focused_unpressed_desk = NULL;
-    theme->a_focused_pressed_desk = NULL;
-    theme->a_focused_pressed_set_desk = NULL;
-    theme->a_unfocused_unpressed_desk = NULL;
-    theme->a_unfocused_pressed_desk = NULL;
-    theme->a_unfocused_pressed_set_desk = NULL;
-    theme->a_focused_unpressed_shade = NULL;
-    theme->a_focused_pressed_shade = NULL;
-    theme->a_focused_pressed_set_shade = NULL;
-    theme->a_unfocused_unpressed_shade = NULL;
-    theme->a_unfocused_pressed_shade = NULL;
-    theme->a_unfocused_pressed_set_shade = NULL;
-    theme->a_focused_unpressed_iconify = NULL;
-    theme->a_focused_pressed_iconify = NULL;
-    theme->a_unfocused_unpressed_iconify = NULL;
-    theme->a_unfocused_pressed_iconify = NULL;
     theme->a_focused_grip = RrAppearanceNew(inst, 0);
     theme->a_unfocused_grip = RrAppearanceNew(inst, 0);
     theme->a_focused_title = RrAppearanceNew(inst, 0);
@@ -194,6 +164,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "window.label.unfocus.textColor",
                     &theme->title_unfocused_color))
 	theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "window.button.disabled.focus.picColor",
+                    &theme->titlebut_disabled_focused_color))
+	theme->titlebut_disabled_focused_color =
+            RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "window.button.disabled.unfocus.picColor",
+                    &theme->titlebut_disabled_unfocused_color))
+	theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "window.button.focus.picColor",
                     &theme->titlebut_focused_color))
@@ -323,6 +302,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* read buttons textures */
     if (!read_appearance(db, inst,
+                         "window.button.disabled.focus",
+			 theme->a_disabled_focused_max))
+        set_default_appearance(theme->a_disabled_focused_max);
+    if (!read_appearance(db, inst,
+                         "window.button.disabled.unfocus",
+			 theme->a_disabled_unfocused_max))
+        set_default_appearance(theme->a_disabled_unfocused_max);
+    if (!read_appearance(db, inst,
                          "window.button.pressed.focus",
 			 theme->a_focused_pressed_max))
 	if (!read_appearance(db, inst,
@@ -345,6 +332,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 			 theme->a_unfocused_unpressed_max))
 	set_default_appearance(theme->a_unfocused_unpressed_max);
 
+    theme->a_disabled_focused_close =
+        RrAppearanceCopy(theme->a_disabled_focused_max);
+    theme->a_disabled_unfocused_close =
+        RrAppearanceCopy(theme->a_disabled_unfocused_max);
     theme->a_unfocused_unpressed_close =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     theme->a_unfocused_pressed_close =
@@ -353,6 +344,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrAppearanceCopy(theme->a_focused_unpressed_max);
     theme->a_focused_pressed_close =
         RrAppearanceCopy(theme->a_focused_pressed_max);
+    theme->a_disabled_focused_desk =
+        RrAppearanceCopy(theme->a_disabled_focused_max);
+    theme->a_disabled_unfocused_desk =
+        RrAppearanceCopy(theme->a_disabled_unfocused_max);
     theme->a_unfocused_unpressed_desk =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     theme->a_unfocused_pressed_desk =
@@ -365,6 +360,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrAppearanceCopy(theme->a_focused_pressed_max);
     theme->a_focused_pressed_set_desk =
         RrAppearanceCopy(theme->a_focused_pressed_max);
+    theme->a_disabled_focused_shade =
+        RrAppearanceCopy(theme->a_disabled_focused_max);
+    theme->a_disabled_unfocused_shade =
+        RrAppearanceCopy(theme->a_disabled_unfocused_max);
     theme->a_unfocused_unpressed_shade =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     theme->a_unfocused_pressed_shade =
@@ -377,6 +376,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrAppearanceCopy(theme->a_focused_pressed_max);
     theme->a_focused_pressed_set_shade =
         RrAppearanceCopy(theme->a_focused_pressed_max);
+    theme->a_disabled_focused_iconify =
+        RrAppearanceCopy(theme->a_disabled_focused_max);
+    theme->a_disabled_unfocused_iconify =
+        RrAppearanceCopy(theme->a_disabled_focused_max);
     theme->a_unfocused_unpressed_iconify =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     theme->a_unfocused_pressed_iconify =
@@ -437,33 +440,45 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_hilite->texture[0].data.text.color =
         theme->menu_hilite_color;
 
-    theme->a_focused_unpressed_max->texture[0].type = 
+    theme->a_disabled_focused_max->texture[0].type = 
+        theme->a_disabled_unfocused_max->texture[0].type = 
+        theme->a_focused_unpressed_max->texture[0].type = 
         theme->a_focused_pressed_max->texture[0].type = 
         theme->a_focused_pressed_set_max->texture[0].type =  
         theme->a_unfocused_unpressed_max->texture[0].type = 
         theme->a_unfocused_pressed_max->texture[0].type = 
         theme->a_unfocused_pressed_set_max->texture[0].type = 
+        theme->a_disabled_focused_close->texture[0].type = 
+        theme->a_disabled_unfocused_close->texture[0].type = 
         theme->a_focused_unpressed_close->texture[0].type = 
         theme->a_focused_pressed_close->texture[0].type = 
         theme->a_unfocused_unpressed_close->texture[0].type = 
         theme->a_unfocused_pressed_close->texture[0].type = 
+        theme->a_disabled_focused_desk->texture[0].type = 
+        theme->a_disabled_unfocused_desk->texture[0].type = 
         theme->a_focused_unpressed_desk->texture[0].type = 
         theme->a_focused_pressed_desk->texture[0].type = 
         theme->a_focused_pressed_set_desk->texture[0].type = 
         theme->a_unfocused_unpressed_desk->texture[0].type = 
         theme->a_unfocused_pressed_desk->texture[0].type = 
         theme->a_unfocused_pressed_set_desk->texture[0].type = 
+        theme->a_disabled_focused_shade->texture[0].type = 
+        theme->a_disabled_unfocused_shade->texture[0].type = 
         theme->a_focused_unpressed_shade->texture[0].type = 
         theme->a_focused_pressed_shade->texture[0].type = 
         theme->a_focused_pressed_set_shade->texture[0].type = 
         theme->a_unfocused_unpressed_shade->texture[0].type = 
         theme->a_unfocused_pressed_shade->texture[0].type = 
         theme->a_unfocused_pressed_set_shade->texture[0].type = 
+        theme->a_disabled_focused_iconify->texture[0].type = 
+        theme->a_disabled_unfocused_iconify->texture[0].type = 
         theme->a_focused_unpressed_iconify->texture[0].type = 
         theme->a_focused_pressed_iconify->texture[0].type = 
         theme->a_unfocused_unpressed_iconify->texture[0].type = 
         theme->a_unfocused_pressed_iconify->texture[0].type = RR_TEXTURE_MASK;
-    theme->a_focused_unpressed_max->texture[0].data.mask.mask = 
+    theme->a_disabled_focused_max->texture[0].data.mask.mask = 
+        theme->a_disabled_unfocused_max->texture[0].data.mask.mask = 
+        theme->a_focused_unpressed_max->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_max->texture[0].data.mask.mask = 
         theme->a_focused_pressed_max->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_max->texture[0].data.mask.mask =
@@ -471,12 +486,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_pressed_set_max->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_set_max->texture[0].data.mask.mask =
         theme->max_set_mask;
-    theme->a_focused_pressed_close->texture[0].data.mask.mask = 
+    theme->a_disabled_focused_close->texture[0].data.mask.mask = 
+        theme->a_disabled_unfocused_close->texture[0].data.mask.mask = 
+        theme->a_focused_pressed_close->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_close->texture[0].data.mask.mask =
         theme->a_focused_unpressed_close->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_close->texture[0].data.mask.mask =
         theme->close_mask;
-    theme->a_focused_unpressed_desk->texture[0].data.mask.mask = 
+    theme->a_disabled_focused_desk->texture[0].data.mask.mask = 
+        theme->a_disabled_unfocused_desk->texture[0].data.mask.mask = 
+        theme->a_focused_unpressed_desk->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_desk->texture[0].data.mask.mask = 
         theme->a_focused_pressed_desk->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_desk->texture[0].data.mask.mask =
@@ -484,7 +503,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_pressed_set_desk->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_set_desk->texture[0].data.mask.mask =
         theme->desk_set_mask;
-    theme->a_focused_unpressed_shade->texture[0].data.mask.mask = 
+    theme->a_disabled_focused_shade->texture[0].data.mask.mask = 
+        theme->a_disabled_unfocused_shade->texture[0].data.mask.mask = 
+        theme->a_focused_unpressed_shade->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_shade->texture[0].data.mask.mask = 
         theme->a_focused_pressed_shade->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_shade->texture[0].data.mask.mask =
@@ -492,11 +513,25 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_pressed_set_shade->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_set_shade->texture[0].data.mask.mask =
         theme->shade_set_mask;
-    theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
+    theme->a_disabled_focused_iconify->texture[0].data.mask.mask = 
+        theme->a_disabled_unfocused_iconify->texture[0].data.mask.mask = 
+        theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_focused_pressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_iconify->texture[0].data.mask.mask =
         theme->iconify_mask;
+    theme->a_disabled_focused_max->texture[0].data.mask.color = 
+        theme->a_disabled_focused_close->texture[0].data.mask.color = 
+        theme->a_disabled_focused_desk->texture[0].data.mask.color = 
+        theme->a_disabled_focused_shade->texture[0].data.mask.color = 
+        theme->a_disabled_focused_iconify->texture[0].data.mask.color = 
+        theme->titlebut_disabled_focused_color;
+    theme->a_disabled_unfocused_max->texture[0].data.mask.color = 
+        theme->a_disabled_unfocused_close->texture[0].data.mask.color = 
+        theme->a_disabled_unfocused_desk->texture[0].data.mask.color = 
+        theme->a_disabled_unfocused_shade->texture[0].data.mask.color = 
+        theme->a_disabled_unfocused_iconify->texture[0].data.mask.color = 
+        theme->titlebut_disabled_unfocused_color;
     theme->a_focused_unpressed_max->texture[0].data.mask.color = 
         theme->a_focused_pressed_max->texture[0].data.mask.color = 
         theme->a_focused_pressed_set_max->texture[0].data.mask.color = 

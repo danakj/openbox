@@ -53,21 +53,6 @@ typedef enum
     OB_CLIENT_FUNC_CLOSE      = 1 << 6  /*!< Allow to be closed */
 } ObFunctions;
 
-/*! The decorations the client window wants to be displayed on it */
-typedef enum {
-    Decor_Titlebar    = 1 << 0, /*!< Display a titlebar */
-    Decor_Handle      = 1 << 1, /*!< Display a handle (bottom) */
-    Decor_Border      = 1 << 2, /*!< Display a border */
-    Decor_Icon        = 1 << 3, /*!< Display the window's icon */
-    Decor_Iconify     = 1 << 4, /*!< Display an iconify button */
-    Decor_Maximize    = 1 << 5, /*!< Display a maximize button */
-    /*! Display a button to toggle the window's placement on
-      all desktops */
-    Decor_AllDesktops = 1 << 6,
-    Decor_Shade       = 1 << 7, /*!< Displays a shade button */
-    Decor_Close       = 1 << 8  /*!< Display a close button */
-} Decoration;
-
 struct _ObClient
 {
     ObWindow obwin;
@@ -225,16 +210,16 @@ struct _ObClient
       are always below windows in higher layers. */
     ObStackingLayer layer;
 
-    /*! A bitmask of values in the Decoration enum
+    /*! A bitmask of values in the ObFrameDecorations enum
       The values in the variable are the decorations that the client wants to
       be displayed around it.
     */
     guint decorations;
 
-    /*! A bitmask of values in the Decoration enum.
-      Specifies the decorations that should NOT be displayed on the client.
+    /*! A user option. When this is set to FALSE the client will not ever
+      be decorated.
     */
-    guint disabled_decorations;
+    gboolean decorate;
 
     /*! A bitmask of values in the ObFunctions enum
       The values in the variable specify the ways in which the user is allowed

@@ -544,7 +544,7 @@ static void client_get_all(ObClient *self)
     self->layer = -1;
     self->urgent = FALSE;
     self->positioned = FALSE;
-    self->disabled_decorations = 0;
+    self->decorate = TRUE;
     self->group = NULL;
     self->nicons = 0;
 
@@ -914,22 +914,28 @@ void client_update_normal_hints(ObClient *self)
 void client_setup_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
-    self->decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-	Decor_Icon | Decor_AllDesktops | Decor_Iconify | Decor_Maximize |
-        Decor_Shade;
-    self->functions = OB_CLIENT_FUNC_RESIZE | OB_CLIENT_FUNC_MOVE |
-        OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_MAXIMIZE |
-        OB_CLIENT_FUNC_SHADE;
+    self->decorations = (OB_FRAME_DECOR_TITLEBAR |
+                         OB_FRAME_DECOR_HANDLE |
+                         OB_FRAME_DECOR_GRIPS |
+                         OB_FRAME_DECOR_BORDER |
+                         OB_FRAME_DECOR_ICON |
+                         OB_FRAME_DECOR_ALLDESKTOPS |
+                         OB_FRAME_DECOR_ICONIFY |
+                         OB_FRAME_DECOR_MAXIMIZE |
+                         OB_FRAME_DECOR_SHADE);
+    self->functions = (OB_CLIENT_FUNC_RESIZE |
+                       OB_CLIENT_FUNC_MOVE |
+                       OB_CLIENT_FUNC_ICONIFY |
+                       OB_CLIENT_FUNC_MAXIMIZE |
+                       OB_CLIENT_FUNC_SHADE);
     if (self->delete_window) {
-	self->decorations |= Decor_Close;
 	self->functions |= OB_CLIENT_FUNC_CLOSE;
+        self->decorations |= OB_FRAME_DECOR_CLOSE;
     }
 
     if (!(self->min_size.width < self->max_size.width ||
-	  self->min_size.height < self->max_size.height)) {
-	self->decorations &= ~(Decor_Maximize | Decor_Handle);
+	  self->min_size.height < self->max_size.height))
 	self->functions &= ~OB_CLIENT_FUNC_RESIZE;
-    }
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
@@ -941,14 +947,12 @@ void client_setup_decor_and_functions(ObClient *self)
     case OB_CLIENT_TYPE_DIALOG:
     case OB_CLIENT_TYPE_UTILITY:
 	/* these windows cannot be maximized */
-	self->decorations &= ~Decor_Maximize;
 	self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
 	break;
 
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
 	/* these windows get less functionality */
-	self->decorations &= ~(Decor_Iconify | Decor_Handle);
 	self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
 	break;
 
@@ -965,16 +969,11 @@ void client_setup_decor_and_functions(ObClient *self)
        decor and functionality */
     if (self->mwmhints.flags & OB_MWM_FLAG_DECORATIONS) {
 	if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
-	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_BORDER))
-		self->decorations &= ~Decor_Border;
-	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_HANDLE))
-		self->decorations &= ~Decor_Handle;
-	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_TITLE))
-		self->decorations &= ~Decor_Titlebar;
-	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_ICONIFY))
-		self->decorations &= ~Decor_Iconify;
-	    if (! (self->mwmhints.decorations & OB_MWM_DECOR_MAXIMIZE))
-		self->decorations &= ~Decor_Maximize;
+	    if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE) ||
+                   (self->mwmhints.decorations & OB_MWM_DECOR_TITLE)))
+                /* if the mwm hints request no handle or title, then all
+                   decorations are disabled */
+		self->decorations = 0;
 	}
     }
 
@@ -984,43 +983,40 @@ void client_setup_decor_and_functions(ObClient *self)
 		self->functions &= ~OB_CLIENT_FUNC_RESIZE;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
 		self->functions &= ~OB_CLIENT_FUNC_MOVE;
+            /* dont let mwm hints kill any buttons
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
 		self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
 		self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+            */
 	    /* dont let mwm hints kill the close button
 	       if (! (self->mwmhints.functions & MwmFunc_Close))
-	       self->functions &= ~Func_Close; */
+	       self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
 	}
     }
 
-    /* can't maximize without moving/resizing */
-    if (!((self->functions & OB_CLIENT_FUNC_MOVE) &&
-          (self->functions & OB_CLIENT_FUNC_RESIZE)))
-	self->functions &= ~(OB_CLIENT_FUNC_MAXIMIZE |
-                             OB_CLIENT_FUNC_FULLSCREEN);
+    if (!(self->functions & OB_CLIENT_FUNC_SHADE))
+        self->decorations &= ~OB_FRAME_DECOR_SHADE;
+    if (!(self->functions & OB_CLIENT_FUNC_ICONIFY))
+        self->decorations &= ~OB_FRAME_DECOR_ICONIFY;
+    if (!(self->functions & OB_CLIENT_FUNC_RESIZE))
+        self->decorations &= ~OB_FRAME_DECOR_GRIPS;
 
-    /* finally, user specified disabled decorations are applied to subtract
-       decorations */
-    if (self->disabled_decorations & Decor_Titlebar)
-	self->decorations &= ~Decor_Titlebar;
-    if (self->disabled_decorations & Decor_Handle)
-	self->decorations &= ~Decor_Handle;
-    if (self->disabled_decorations & Decor_Border)
-	self->decorations &= ~Decor_Border;
-    if (self->disabled_decorations & Decor_Iconify)
-	self->decorations &= ~Decor_Iconify;
-    if (self->disabled_decorations & Decor_Maximize)
-	self->decorations &= ~Decor_Maximize;
-    if (self->disabled_decorations & Decor_AllDesktops)
-	self->decorations &= ~Decor_AllDesktops;
-    if (self->disabled_decorations & Decor_Shade)
-	self->decorations &= ~Decor_Shade;
-    if (self->disabled_decorations & Decor_Close)
-	self->decorations &= ~Decor_Close;
+    /* can't maximize without moving/resizing */
+    if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
+          (self->functions & OB_CLIENT_FUNC_MOVE) &&
+          (self->functions & OB_CLIENT_FUNC_RESIZE))) {
+	self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+        self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
+    }
+
+    /* finally, the user can have requested no decorations, which overrides
+       everything */
+    if (!self->decorate)
+        self->decorations = 0;
 
     /* if we don't have a titlebar, then we cannot shade! */
-    if (!(self->decorations & Decor_Titlebar))
+    if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
 	self->functions &= ~OB_CLIENT_FUNC_SHADE;
 
     /* now we need to check against rules for the client's current state */

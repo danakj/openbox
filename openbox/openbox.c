@@ -243,7 +243,6 @@ int main(int argc, char **argv)
         if (ob_rr_theme == NULL)
             exit_with_error("Unable to load a theme.");
 
-        frame_startup();
         moveresize_startup();
 	screen_startup();
         group_startup();
@@ -271,7 +270,6 @@ int main(int argc, char **argv)
 	screen_shutdown();
 	focus_shutdown();
         moveresize_shutdown();
-        frame_shutdown();
         menu_shutdown();
         window_shutdown();
         grab_shutdown();

@@ -1105,7 +1105,7 @@ void action_toggle_decorations(union ActionData *data)
 
     if (!c) return;
 
-    c->disabled_decorations = c->disabled_decorations ? 0 : ~0;
+    c->decorate = !c->decorate;
     client_setup_decor_and_functions(c);
 }
 

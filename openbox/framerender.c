@@ -22,61 +22,81 @@ void framerender_frame(ObFrame *self)
         XSetWindowBorder(ob_display, self->plate,
                          RrColorPixel(ob_rr_theme->cb_unfocused_color));
 
-    if (self->client->decorations & Decor_Titlebar) {
+    if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
         RrAppearance *t, *l, *m, *n, *i, *d, *s, *c;
 
         t = (self->focused ?
              self->a_focused_title : self->a_unfocused_title);
         l = (self->focused ?
              self->a_focused_label : self->a_unfocused_label);
-        m = (self->focused ?
-             (self->client->max_vert || self->client->max_horz ?
-              ob_rr_theme->a_focused_pressed_set_max :
-              (self->max_press ?
-               ob_rr_theme->a_focused_pressed_max :
-               ob_rr_theme->a_focused_unpressed_max)) :
-             (self->client->max_vert || self->client->max_horz ?
-              ob_rr_theme->a_unfocused_pressed_set_max :
-              (self->max_press ?
-               ob_rr_theme->a_unfocused_pressed_max :
-               ob_rr_theme->a_unfocused_unpressed_max)));
+        m = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
+             (self->focused ?
+              ob_rr_theme->a_disabled_focused_max :
+              ob_rr_theme->a_disabled_unfocused_max) :
+             (self->focused ?
+              (self->client->max_vert || self->client->max_horz ?
+               ob_rr_theme->a_focused_pressed_set_max :
+               (self->max_press ?
+                ob_rr_theme->a_focused_pressed_max :
+                ob_rr_theme->a_focused_unpressed_max)) :
+              (self->client->max_vert || self->client->max_horz ?
+               ob_rr_theme->a_unfocused_pressed_set_max :
+               (self->max_press ?
+                ob_rr_theme->a_unfocused_pressed_max :
+                ob_rr_theme->a_unfocused_unpressed_max))));
         n = self->a_icon;
-        i = (self->focused ?
-             (self->iconify_press ?
-              ob_rr_theme->a_focused_pressed_iconify :
-              ob_rr_theme->a_focused_unpressed_iconify) :
-             (self->iconify_press ?
-              ob_rr_theme->a_unfocused_pressed_iconify :
-              ob_rr_theme->a_unfocused_unpressed_iconify));
-        d = (self->focused ?
-             (self->client->desktop == DESKTOP_ALL ?
-              ob_rr_theme->a_focused_pressed_set_desk :
-              (self->desk_press ?
-               ob_rr_theme->a_focused_pressed_desk :
-               ob_rr_theme->a_focused_unpressed_desk)) :
-             (self->client->desktop == DESKTOP_ALL ?
-              ob_rr_theme->a_unfocused_pressed_set_desk :
-              (self->desk_press ?
-               ob_rr_theme->a_unfocused_pressed_desk :
-               ob_rr_theme->a_unfocused_unpressed_desk)));
-        s = (self->focused ?
-             (self->client->shaded ?
-              ob_rr_theme->a_focused_pressed_set_shade :
-              (self->shade_press ?
-               ob_rr_theme->a_focused_pressed_shade :
-               ob_rr_theme->a_focused_unpressed_shade)) :
-             (self->client->shaded ?
-              ob_rr_theme->a_unfocused_pressed_set_shade :
-              (self->shade_press ?
-               ob_rr_theme->a_unfocused_pressed_shade :
-               ob_rr_theme->a_unfocused_unpressed_shade)));
-        c = (self->focused ?
-             (self->close_press ?
-              ob_rr_theme->a_focused_pressed_close :
-              ob_rr_theme->a_focused_unpressed_close) :
-             (self->close_press ?
-              ob_rr_theme->a_unfocused_pressed_close :
-              ob_rr_theme->a_unfocused_unpressed_close));
+        i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
+             (self->focused ?
+              ob_rr_theme->a_disabled_focused_iconify :
+              ob_rr_theme->a_disabled_unfocused_iconify) :
+             (self->focused ?
+              (self->iconify_press ?
+               ob_rr_theme->a_focused_pressed_iconify :
+               ob_rr_theme->a_focused_unpressed_iconify) :
+              (self->iconify_press ?
+               ob_rr_theme->a_unfocused_pressed_iconify :
+               ob_rr_theme->a_unfocused_unpressed_iconify)));
+        d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
+             (self->focused ?
+              ob_rr_theme->a_disabled_focused_desk :
+              ob_rr_theme->a_disabled_unfocused_desk) :
+             (self->focused ?
+              (self->client->desktop == DESKTOP_ALL ?
+               ob_rr_theme->a_focused_pressed_set_desk :
+               (self->desk_press ?
+                ob_rr_theme->a_focused_pressed_desk :
+                ob_rr_theme->a_focused_unpressed_desk)) :
+              (self->client->desktop == DESKTOP_ALL ?
+               ob_rr_theme->a_unfocused_pressed_set_desk :
+               (self->desk_press ?
+                ob_rr_theme->a_unfocused_pressed_desk :
+                ob_rr_theme->a_unfocused_unpressed_desk))));
+        s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
+             (self->focused ?
+              ob_rr_theme->a_disabled_focused_shade :
+              ob_rr_theme->a_disabled_unfocused_shade) :
+             (self->focused ?
+              (self->client->shaded ?
+               ob_rr_theme->a_focused_pressed_set_shade :
+               (self->shade_press ?
+                ob_rr_theme->a_focused_pressed_shade :
+                ob_rr_theme->a_focused_unpressed_shade)) :
+              (self->client->shaded ?
+               ob_rr_theme->a_unfocused_pressed_set_shade :
+               (self->shade_press ?
+                ob_rr_theme->a_unfocused_pressed_shade :
+                ob_rr_theme->a_unfocused_unpressed_shade))));
+        c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
+             (self->focused ?
+              ob_rr_theme->a_disabled_focused_close :
+              ob_rr_theme->a_disabled_unfocused_close) :
+             (self->focused ?
+              (self->close_press ?
+               ob_rr_theme->a_focused_pressed_close :
+               ob_rr_theme->a_focused_unpressed_close) :
+              (self->close_press ?
+               ob_rr_theme->a_unfocused_pressed_close :
+               ob_rr_theme->a_unfocused_unpressed_close)));
 
         RrPaint(t, self->title, self->width, ob_rr_theme->title_height);
 
@@ -118,7 +138,7 @@ void framerender_frame(ObFrame *self)
         framerender_close(self, c);
     }
 
-    if (self->client->decorations & Decor_Handle) {
+    if (self->decorations & OB_FRAME_DECOR_HANDLE) {
         RrAppearance *h, *g;
 
         h = (self->focused ?
@@ -126,23 +146,25 @@ void framerender_frame(ObFrame *self)
 
         RrPaint(h, self->handle, self->width, ob_rr_theme->handle_height);
 
-        g = (self->focused ?
-             ob_rr_theme->a_focused_grip : ob_rr_theme->a_unfocused_grip);
+        if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+            g = (self->focused ?
+                 ob_rr_theme->a_focused_grip : ob_rr_theme->a_unfocused_grip);
 
-        if (g->surface.grad == RR_SURFACE_PARENTREL)
-            g->surface.parent = h;
+            if (g->surface.grad == RR_SURFACE_PARENTREL)
+                g->surface.parent = h;
 
-        g->surface.parentx = 0;
-        g->surface.parenty = 0;
+            g->surface.parentx = 0;
+            g->surface.parenty = 0;
 
-        RrPaint(g, self->lgrip,
-                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+            RrPaint(g, self->lgrip,
+                    ob_rr_theme->grip_width, ob_rr_theme->handle_height);
 
-        g->surface.parentx = self->width - ob_rr_theme->grip_width;
-        g->surface.parenty = 0;
+            g->surface.parentx = self->width - ob_rr_theme->grip_width;
+            g->surface.parenty = 0;
 
-        RrPaint(g, self->rgrip,
-                ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+            RrPaint(g, self->rgrip,
+                    ob_rr_theme->grip_width, ob_rr_theme->handle_height);
+        }
     }
 }
 

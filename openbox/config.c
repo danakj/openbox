@@ -361,6 +361,9 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_dock_x = parse_int(doc, n);
         if ((n = parse_find_node("floatingY", node)))
             config_dock_y = parse_int(doc, n);
+    } else {
+        if ((n = parse_find_node("noStrut", node)))
+            config_dock_floating = parse_bool(doc, n);
     }
     if ((n = parse_find_node("stacking", node))) {
         if (parse_contains("top", doc, n))

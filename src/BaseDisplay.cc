@@ -519,7 +519,6 @@ void BaseDisplay::ungrab(void) {
 
 void BaseDisplay::addTimer(BTimer *timer) {
   ASSERT(timer != (BTimer *) 0);
-  printf("ADDING TIMER\n");
 
   TimerList::iterator it;
   for (it = timerList.begin(); it != timerList.end(); ++it) {
@@ -535,7 +534,6 @@ void BaseDisplay::addTimer(BTimer *timer) {
 
 
 void BaseDisplay::removeTimer(BTimer *timer) {
-  printf("REMOVING TIMER\n");
   timerList.remove(timer);
 }
 

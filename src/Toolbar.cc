@@ -725,7 +725,9 @@ void Toolbar::checkClock(Bool redraw, Bool date) {
 
 void Toolbar::redrawWindowLabel(Bool redraw) {
   OpenboxWindow *foc = screen.getOpenbox().focusedWindow();
-  if (foc != (OpenboxWindow *) 0) {
+  if (foc == (OpenboxWindow *) 0) {
+    XClearWindow(display, frame.window_label);
+  } else {
     if (redraw)
       XClearWindow(display, frame.window_label);
 
@@ -780,8 +782,6 @@ void Toolbar::redrawWindowLabel(Bool redraw) {
     else
       XDrawString(display, frame.window_label, style->w_text_gc, dx,
 		  (style->font->ascent + 1), *foc->getTitle(), dlen);
-  } else {
-    XClearWindow(display, frame.window_label);
   }
 }
  

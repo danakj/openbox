@@ -225,6 +225,7 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   slit = NULL;
 #endif // SLIT
   toolbar = NULL;
+  current_workspace = (Workspace *) 0;
 
 #ifdef    HAVE_GETPID
   pid_t bpid = getpid();

@@ -1,7 +1,12 @@
 Changelog for Openbox:
 
 1.2.0:
- * make image dithering value load correctly
+ * more focus code changes. also fixes a segfault from
+   last round of focus changes.                         (Ben Jansens)
+ 
+ * make image dithering value load correctly.           (Ben Jansens)
+
+ * fix segfault with multiple screens.                  (Shaleh Perry)
 
 1.1.0:
  * improved focused window logic to remove a segfault

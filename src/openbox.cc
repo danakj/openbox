@@ -186,6 +186,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
+  focused_screen = (BScreen *) 0;
   masked_window = NULL;
   masked = None;
 

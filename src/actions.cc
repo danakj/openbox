@@ -42,7 +42,10 @@ void OBActions::insertPress(const XButtonEvent &e)
     _posqueue[i] = _posqueue[--i];
   _posqueue[0] = a;
   a->button = e.button;
-  a->pos.setPoint(e.x, e.y);
+  a->pos.setPoint(e.x_root, e.y_root);
+
+  OBClient *c = Openbox::instance->findClient(e.window);
+  a->clientarea = c->area();
 }
 
 void OBActions::removePress(const XButtonEvent &e)
@@ -169,20 +172,52 @@ void OBActions::motionHandler(const XMotionEvent &e)
 {
   if (!e.same_screen) return; // this just gets stupid
 
+  int x_root = e.x_root, y_root = e.y_root;
+  
+  // compress changes to a window into a single change
+  XEvent ce;
+  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+    if (ce.xmotion.window != e.window) {
+      XPutBackEvent(otk::OBDisplay::display, &ce);
+      break;
+    } else {
+      x_root = e.x_root;
+      y_root = e.y_root;
+    }
+  }
+
+
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  _dx = e.x - _posqueue[0]->pos.x();
-  _dy = e.y - _posqueue[0]->pos.y();
+  _dx = x_root - _posqueue[0]->pos.x();
+  _dy = y_root - _posqueue[0]->pos.y();
   
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   printf("GUILE: MOTION: win %lx type %d  modifiers %u x %d y %d\n",
          (long)e.window, (w ? w->type():-1), e.state, _dx, _dy);
 
-  if (w && (w->type() == OBWidget::Type_Titlebar ||
-            w->type() == OBWidget::Type_Label)) {
-    OBClient *c = Openbox::instance->findClient(e.window);
-    if (c) c->move(c->area().x() + _dx, c->area().y() + _dy);
+  OBClient *c = Openbox::instance->findClient(e.window);
+  if (w && c) {
+    switch (w->type()) {
+    case OBWidget::Type_Titlebar:
+    case OBWidget::Type_Label:
+      c->move(_posqueue[0]->clientarea.x() + _dx,
+              _posqueue[0]->clientarea.y() + _dy);
+      break;
+    case OBWidget::Type_LeftGrip:
+      c->resize(OBClient::TopRight,
+                _posqueue[0]->clientarea.width() - _dx,
+                _posqueue[0]->clientarea.height() + _dy);
+      break;
+    case OBWidget::Type_RightGrip:
+      c->resize(OBClient::TopLeft,
+                _posqueue[0]->clientarea.width() + _dx,
+                _posqueue[0]->clientarea.height() + _dy);
+      break;
+    default:
+      break;
+    }
   }
 }
 

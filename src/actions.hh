@@ -7,6 +7,7 @@
 */
 
 #include "otk/point.hh"
+#include "otk/rect.hh"
 #include "otk/eventhandler.hh"
 
 extern "C" {
@@ -32,6 +33,7 @@ public:
   struct ButtonPressAction {
     unsigned int button;
     otk::Point pos;
+    otk::Rect clientarea;
     ButtonPressAction() { button = 0; }
   };
   

@@ -778,6 +778,11 @@ void OBClient::resize(Corner anchor, int w, int h)
   w -= _base_size.x(); 
   h -= _base_size.y();
 
+  // for interactive resizing. have to move half an increment in each
+  // direction.
+  w += _size_inc.x() / 2;
+  h += _size_inc.y() / 2;
+
   // is the window resizable? if it is not, then don't check its sizes, the
   // client can do what it wants and the user can't change it anyhow
   if (_min_size.x() <= _max_size.x() && _min_size.y() <= _max_size.y()) {

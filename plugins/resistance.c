@@ -6,7 +6,6 @@
 #include <glib.h>
 
 static int resistance = 10;
-static gboolean edge_resistance = TRUE; /* window-to-edge */
 static gboolean window_resistance = TRUE; /* window-to-window */
 
 static void resist(Client *c, int *x, int *y)
@@ -18,8 +17,6 @@ static void resist(Client *c, int *x, int *y)
     int cl, ct, cr, cb; /* current edges */
     int w, h; /* current size */
     gboolean snapx = FALSE, snapy = FALSE;
-
-    if (!edge_resistance) return;
 
     w = c->frame->area.width;
     h = c->frame->area.height;

@@ -245,7 +245,6 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
     ::exit(2);
   }
 
-  number_of_screens = ScreenCount(display);
   display_name = XDisplayName(dpy_name);
 
 #ifdef    SHAPE
@@ -337,8 +336,8 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
-  screenInfoList.reserve(ScreenCount(display));
-  for (unsigned int s = 0; s < number_of_screens; s++)
+  screenInfoList.reserve(numberOfScreens());
+  for (unsigned int s = 0; s < numberOfScreens(); s++)
     screenInfoList.push_back(new ScreenInfo(*this, s));
 
 #ifndef   NOCLOBBER

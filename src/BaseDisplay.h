@@ -137,7 +137,7 @@ private:
   TimerList timerList;
 
   char *display_name, *application_name;
-  unsigned int number_of_screens, server_grabs, colors_per_channel;
+  unsigned int server_grabs, colors_per_channel;
 
 
 protected:
@@ -308,8 +308,8 @@ public:
   inline const char *getApplicationName() const
     { return (const char *) application_name; }
 
-  inline const unsigned int getNumberOfScreens() const
-    { return number_of_screens; }
+  inline const unsigned int numberOfScreens() const
+    { return ScreenCount(display); }
   inline const int &getShapeEventBase() const
     { return shape.event_basep; }
 

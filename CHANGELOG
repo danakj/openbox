@@ -1,6 +1,16 @@
 Changelog for Openbox:
 
 1.2.0:
+ * new version of bsetroot ported from blackbox cvs
+   with intent to support Eterm/Esetroot.               (Sean Perry)
+
+ * make bsetroot behave properly with Eterm/Esetroot.   (Ben Jansens)
+
+ * new version of bsetbg.                               (Timothy King)
+
+ * fix the 'wrong window move' bug displayed by apps
+   such as bbkeys.                                      (Sean Perry)
+
  * fix bug when removing and then readding a titlebar
    button witout restarted (by reconfiguring).          (Ben Jansens)
 
@@ -9,7 +19,7 @@ Changelog for Openbox:
  
  * make image dithering value load correctly.           (Ben Jansens)
 
- * fix segfault with multiple screens.                  (Shaleh Perry)
+ * fix segfault with multiple screens.                  (Sean Perry)
 
 1.1.0:
  * improved focused window logic to remove a segfault

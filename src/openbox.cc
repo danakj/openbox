@@ -196,7 +196,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
 #endif // HAVE_GETPID
 
-  for (unsigned int s = 0; s < getNumberOfScreens(); s++) {
+  for (unsigned int s = 0; s < numberOfScreens(); s++) {
     BScreen *screen = new BScreen(*this, s, config);
 
     if (! screen->isScreenManaged()) {

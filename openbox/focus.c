@@ -1,5 +1,6 @@
 #include "event.h"
 #include "openbox.h"
+#include "grab.h"
 #include "framerender.h"
 #include "client.h"
 #include "config.h"

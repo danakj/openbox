@@ -9,6 +9,10 @@
 #endif // HAVE_CONFIG_H
 
 extern "C" {
+#ifdef    HAVE_LOCALE_H
+# include <locale.h>
+#endif // HAVE_LOCALE_H
+
 #include "gettext.h"
 }
 

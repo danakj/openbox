@@ -86,8 +86,6 @@ Workspace::~Workspace(void) {
 const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   if (! w) return -1;
 
-  if (place) placeWindow(*w);
-
   w->setWorkspace(id);
   w->setWindowNumber(_windows.size());
 
@@ -100,6 +98,8 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   screen.updateNetizenWindowAdd(w->getClientWindow(), id);
 
   raiseWindow(w);
+
+  if (place) placeWindow(*w);
 
   return w->getWindowNumber();
 }

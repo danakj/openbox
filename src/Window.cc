@@ -538,24 +538,6 @@ void OpenboxWindow::associateClientWindow(void) {
   if (decorations.iconify) createIconifyButton();
   if (decorations.maximize) createMaximizeButton();
   if (decorations.close) createCloseButton();
-
-  if (frame.ubutton) {
-    if (frame.close_button)
-      XSetWindowBackgroundPixmap(display, frame.close_button, frame.ubutton);
-    if (frame.maximize_button)
-      XSetWindowBackgroundPixmap(display, frame.maximize_button,
-				 frame.ubutton);
-    if (frame.iconify_button)
-      XSetWindowBackgroundPixmap(display, frame.iconify_button, frame.ubutton);
-  } else {
-    if (frame.close_button)
-      XSetWindowBackground(display, frame.close_button, frame.ubutton_pixel);
-    if (frame.maximize_button)
-      XSetWindowBackground(display, frame.maximize_button,
-			   frame.ubutton_pixel);
-    if (frame.iconify_button)
-      XSetWindowBackground(display, frame.iconify_button, frame.ubutton_pixel);
-  }
 }
 
 
@@ -760,37 +742,40 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
   for (int i = 0; format[i] != '\0' && i < 4; i++) {
     switch(format[i]) {
     case 'C':
-      if (decorations.close && frame.close_button != None) {
+      if (decorations.close) {
+        if (frame.close_button == None)
+          createCloseButton();
         XMoveResizeWindow(display, frame.close_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.close_button);
         XClearWindow(display, frame.close_button);
         bx += frame.button_w + bw;
         hasclose = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'I':
-      if (decorations.iconify && frame.iconify_button != None) {
+      if (decorations.iconify) {
+        if (frame.iconify_button == None)
+          createIconifyButton();
         XMoveResizeWindow(display, frame.iconify_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.iconify_button);
         XClearWindow(display, frame.iconify_button);
         bx += frame.button_w + bw;
         hasiconify = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'M':
-      if (decorations.maximize && frame.maximize_button != None) {
+      if (decorations.maximize) {
+        if (frame.maximize_button == None)
+          createMaximizeButton();
         XMoveResizeWindow(display, frame.maximize_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.maximize_button);
         XClearWindow(display, frame.maximize_button);
         bx += frame.button_w + bw;
         hasmaximize = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'L':
       XMoveResizeWindow(display, frame.label, bx, by - 1,
@@ -802,15 +787,18 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
 
   if (!hasclose) {
       openbox.removeWindowSearch(frame.close_button);
-      XDestroyWindow(display, frame.close_button);     
+      XDestroyWindow(display, frame.close_button);
+      frame.close_button = None;
   }
   if (!hasiconify) {
       openbox.removeWindowSearch(frame.iconify_button);
       XDestroyWindow(display, frame.iconify_button);
+      frame.iconify_button = None;
   }
   if (!hasmaximize) {
       openbox.removeWindowSearch(frame.maximize_button);
       XDestroyWindow(display, frame.maximize_button);                 
+      frame.maximize_button = None;
   }
   if (redecorate_label)
     decorateLabel();
@@ -1626,6 +1614,7 @@ void OpenboxWindow::maximize(unsigned int button) {
 
 
 void OpenboxWindow::setWorkspace(int n) {
+  ASSERT(n < screen->getWorkspaceCount());
   workspace_number = n;
 
   openbox_attrib.flags |= AttribWorkspace;

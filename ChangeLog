@@ -1,3 +1,113 @@
+2003-09-25  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/focus.c:
+	handle the focus_cycle_target being destroyed during cycling
+
+2003-09-24  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/keyboard.c:
+	dont kill interactive actions when the client dies, just remove teh client pointer.
+
+	* openbox/action.c, openbox/action.h:
+	add the ObClientActionReq to ObAction which says if an action needs a client for it or not
+
+	* themes/TheBear/openbox-3/themerc:
+	give disabled active buttons a different color from enabled ones
+
+	* configure.ac: beta5
+
+	* openbox/frame.c: support the _KDE_NET_WM_FRAME_STRUT hint
+
+	* openbox/client.c: support the _KDE_WM_CHANGE_STATE hint
+
+	* openbox/prop.c, openbox/prop.h:
+	remove the kde systray hints, add _kde_wm_change_state and _kde_net_wm_frame_strut
+
+	* tests/urgent.c: throw in some output
+
+	* openbox/geom.h: add PARTIAL_SRUT_EQUAL
+
+	* openbox/dock.c:
+	hide the dock when reconfiguring otherwise the user has to move the mouse over it to make it hide the first time
+
+	* openbox/mainloop.c: insert timers in the correct order
+
+	* tests/icons.c: fix for icons.c
+
+	* openbox/action.c:
+	fix problems with conflicing interactive desktop switching and send-to-ing
+
+	* data/rc.xml.in: add raise to the desktop left press binding
+
+	* openbox/event.c: ignore all NotifyInferior crossing events again
+
+2003-09-23  Ben Jansens  <xor@zed.orodu.net>
+
+	* Makefile.am: typo
+
+	* Makefile.am, bootstrap: move foreign into the Makefile.am
+
+2003-09-22  Ben Jansens  <xor@zed.orodu.net>
+
+	* data/rc.xml.in: same thing
+
+	* data/rc.xml.in: udpate comment to match new basedir shit
+
+	* data/rc.xsd: update hideTimeout to hideDelay
+
+	* data/rc.xml.in: update to the new hideDelay option
+
+	* openbox/session.c: missing a \n
+
+	* Makefile.am:
+	reorder the lib_LTLIBRARIES variable, apparently this fixes installing with a DESTDIR, thanks automake >:|
+
+	* Makefile.am: fixes for auto* build process
+
+	* ChangeLog: recent changes
+
+	* data/menu.xml.in, data/menu.xsd, data/rc.xml.in, data/rc.xsd:
+	fix capitalization
+
+	* data/rc.xsd: add focusLast and raiseOnFocus
+
+	* configure.ac: beta4
+
+	* ChangeLog: recent changes
+
+	* data/rc.xml.in: add focusLast and raiseOnFocus
+
+	* openbox/place.c: visible is in the frame struct
+
+	* openbox/place.c: ignore non-visible windows too
+
+	* openbox/config.c: simplify the default bindings
+
+	* openbox/client_list_menu.c: s/Activate/Go there/
+
+	* openbox/screen.c: whitespace
+
+	* openbox/client_list_menu.c: gettextize the empty desktop string
+
+	* openbox/client_list_menu.c: change Switch To... to Activate...
+
+	* openbox/grab.c:
+	dont need to swallow enter events on ungrab cuz we just ignore them all now
+
+	* openbox/event.c, openbox/event.h:
+	provide a means to properly ignore enter events for focus changes
+
+	* openbox/config.c, openbox/config.h, openbox/focus.c:
+	add back focusLast
+
+	* openbox/screen.c:
+	eat enter events on desktop switch so that our own policy can be applied
+
+	* openbox/client.c, openbox/openbox.c:
+	we always want to start with something focused, moving this to openbox.c
+
+	* openbox/action.c: add comment
+
 2003-09-22  Ben Jansens  <xor@zed.orodu.net>
 
 	* data/menu.xml.in, data/menu.xsd, data/rc.xml.in, data/rc.xsd:

@@ -1351,7 +1351,7 @@ void BScreen::updateStackingList(void) {
 void BScreen::addSystrayWindow(Window window) {
   XGrabServer(blackbox->getXDisplay());
   
-  XSelectInput(blackbox->getXDisplay(), window, SubstructureRedirectMask);
+  XSelectInput(blackbox->getXDisplay(), window, StructureNotifyMask);
   systrayWindowList.push_back(window);
   xatom->setValue(getRootWindow(), XAtom::kde_net_system_tray_windows,
                   XAtom::window,

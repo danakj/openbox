@@ -5,3 +5,10 @@ themedata_DATA=\
   iconify.xbm \
   max.xbm \
   stick.xbm
+
+EXTRA_DIST=$(themedata_DATA)
+
+MAINTAINERCLEANFILES=Makefile.in
+
+distclean-local:
+	$(RM) *\~ *.orig *.rej .\#*

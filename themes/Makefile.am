@@ -7,6 +7,8 @@ theme_DATA=artwiz bbs bluebox cthulhain deep ebox fieron fieron2 flux frobozz \
            purplehaaze shade steelblue steelblue2 the_orange trisb twice \
            warp-xp
 
+EXTRA_DIST=$(theme_DATA)
+
 MAINTAINERCLEANFILES=Makefile.in
 
 distclean-local:

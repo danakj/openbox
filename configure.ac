@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [2.90.0cvs], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.0-alpha1], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([kernel/openbox.c])
 
@@ -15,14 +15,6 @@ OB_DEBUG
 OB_COMPILER_FLAGS
 AC_C_CONST
 AC_C_INLINE
-
-if test "$CVS" = "yes"; then
-    AC_PATH_PROG([FLEX], [flex])
-    test "$FLEX" || AC_MSG_ERROR([flex not found])
-
-    AC_PATH_PROG([BISON], [bison])
-    test "BISON" || AC_MSG_ERROR([bison not found])
-fi
 
 AC_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
@@ -96,6 +88,10 @@ AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
 # Check for session management
 X11_SM
 
+#EFENCE_LIBS=-lefence
+EFENCE_LIBS=""
+AC_SUBST(EFENCE_LIBS)
+
 # Check for X11 extensions
 X11_EXT_XKB
 X11_EXT_XRANDR
@@ -104,6 +100,7 @@ X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
 AC_CONFIG_FILES([Makefile
+                 m4/Makefile
                  po/Makefile.in
                  themes/Makefile
                  themes/ebox_data/Makefile

@@ -1,15 +1,19 @@
 plugindir=$(libdir)/openbox/plugins
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
-         $(XML_CFLAGS)  @CPPFLAGS@ \
-         -DG_LOG_DOMAIN=\"Plugin-Mouse\"
+AM_CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
+            $(XML_CFLAGS)  \
+            -DG_LOG_DOMAIN=\"Plugin-Mouse\"
 
 INCLUDES=-I../..
 
 plugin_LTLIBRARIES=mouse.la
 
 mouse_la_LDFLAGS=-module -avoid-version
-mouse_la_SOURCES=mouse.c translate.c
+mouse_la_SOURCES=\
+  mouse.h \
+  mouse.c \
+  translate.h \
+  translate.c
 
 noinst_HEADERS=mouse.h translate.h
 

@@ -1,8 +1,8 @@
 plugindir=$(libdir)/openbox/plugins
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
-         $(XML_CFLAGS)  @CPPFLAGS@ \
-         -DPLUGINDIR=\"$(plugindir)\"
+AM_CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
+            $(XML_CFLAGS) \
+            -DPLUGINDIR=\"$(plugindir)\"
 
 INCLUDES=-I../.. -I../../tools
 
@@ -11,20 +11,21 @@ if OBCONF
 plugin_LTLIBRARIES+=resistance-config.la
 endif
 
-resistance_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Resistance\"
+resistance_la_CPPFLAGS=$(AM_CPPFLAGS) -DG_LOG_DOMAIN=\"Plugin-Resistance\"
 resistance_la_LDFLAGS=-module -avoid-version
-resistance_la_SOURCES=resistance.c
+resistance_la_SOURCES=resistance.c resistance.h
 
 if OBCONF
-resistance_config_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Resistance\" \
+resistance_config_la_CPPFLAGS=$(AM_CPPFLAGS) \
+                              -DG_LOG_DOMAIN=\"Plugin-Resistance\" \
                               $(GTK_CFLAGS) $(GLADE_CFLAGS)
 resistance_config_la_LDFLAGS=-module -avoid-version
 resistance_config_la_SOURCES=resistance_config.c
 endif
 
-noinst_HEADERS=resistance.h
-
 noinst_DATA=resistance.glade resistance.gladep
+
+EXTRA_DIST=$(noinst_DATA)
 
 MAINTAINERCLEANFILES= Makefile.in
 

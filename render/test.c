@@ -41,11 +41,11 @@ int main()
 	win =
 	    XCreateWindow(ob_display, RootWindow(ob_display, 0)
                           , 10, 10, w, h, 10, 
-                          CopyFromParent,	// depth
-			  CopyFromParent,	// class
-			  CopyFromParent,	// visual
-			  0,	// valuemask
-			  0);	// attributes
+                          CopyFromParent,	/* depth */
+			  CopyFromParent,	/* class */
+			  CopyFromParent,	/* visual */
+			  0,	                /* valuemask */
+			  0);	                /* attributes */
 	XMapWindow(ob_display, win);
 	XSelectInput(ob_display, win, ExposureMask | StructureNotifyMask);
 	root = RootWindow (ob_display, DefaultScreen (ob_display));

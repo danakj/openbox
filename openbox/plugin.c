@@ -46,8 +46,8 @@ static Plugin *plugin_new(char *name)
         return NULL;
     }
 
-    p->startup = load_sym(p->module, name, "plugin_startup");
-    p->shutdown = load_sym(p->module, name, "plugin_shutdown");
+    p->startup = (PluginStartup)load_sym(p->module, name, "plugin_startup");
+    p->shutdown = (PluginShutdown)load_sym(p->module, name, "plugin_shutdown");
 
     if (p->startup == NULL || p->shutdown == NULL) {
         g_module_close(p->module);

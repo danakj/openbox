@@ -17,7 +17,7 @@ color_rgb *color_parse(char *colorname)
     XColor xcol;
 
     g_assert(colorname != NULL);
-    // get rgb values from colorname                                  
+    /* get rgb values from colorname */
 
     xcol.red = 0;
     xcol.green = 0;
@@ -50,56 +50,57 @@ color_rgb *color_new(int r, int g, int b)
     return NULL;
 }
 
-//XXX same color could be pointed to twice, this might have to be a refcount
+/*XXX same color could be pointed to twice, this might have to be a refcount*/
 
 void color_free(color_rgb *c)
 {
     if (c->gc != None)
         XFreeGC(ob_display, c->gc);
-    free(c);
+    g_free(c);
 }
 
 void reduce_depth(pixel32 *data, XImage *im)
 {
-  // since pixel32 is the largest possible pixel size, we can share the array
-  int r, g, b;
-  int x,y;
-  pixel16 *p = (pixel16*) data;
-  switch (im->bits_per_pixel) {
-  case 32:
-    if ((render_red_offset != default_red_shift) ||
-        (render_blue_offset != default_blue_shift) ||
-        (render_green_offset != default_green_shift)) {
-      for (y = 0; y < im->height; y++) {
-        for (x = 0; x < im->width; x++) {
-          r = (data[x] >> default_red_shift) & 0xFF;
-          g = (data[x] >> default_green_shift) & 0xFF;
-          b = (data[x] >> default_blue_shift) & 0xFF;
-          data[x] = (r << render_red_offset) + (g << render_green_offset) +
-            (b << render_blue_offset);
+    /* since pixel32 is the largest possible pixel size, we can share the
+       array*/
+    int r, g, b;
+    int x,y;
+    pixel16 *p = (pixel16*) data;
+    switch (im->bits_per_pixel) {
+    case 32:
+        if ((render_red_offset != default_red_shift) ||
+            (render_blue_offset != default_blue_shift) ||
+            (render_green_offset != default_green_shift)) {
+            for (y = 0; y < im->height; y++) {
+                for (x = 0; x < im->width; x++) {
+                    r = (data[x] >> default_red_shift) & 0xFF;
+                    g = (data[x] >> default_green_shift) & 0xFF;
+                    b = (data[x] >> default_blue_shift) & 0xFF;
+                    data[x] = (r << render_red_offset) + (g << render_green_offset) +
+                        (b << render_blue_offset);
+                }
+                data += im->width;
+            } 
         }
-        data += im->width;
-      } 
+        break;
+    case 16:
+        for (y = 0; y < im->height; y++) {
+            for (x = 0; x < im->width; x++) {
+                r = (data[x] >> default_red_shift) & 0xFF;
+                r = r >> render_red_shift;
+                g = (data[x] >> default_green_shift) & 0xFF;
+                g = g >> render_green_shift;
+                b = (data[x] >> default_blue_shift) & 0xFF;
+                b = b >> render_blue_shift;
+                p[x] = (r << render_red_offset)
+                    + (g << render_green_offset)
+                    + (b << render_blue_offset);
+            }
+            data += im->width;
+            p += im->bytes_per_line/2;
+        }
+        break;
+    default:
+        g_message("your bit depth is currently unhandled\n");
     }
-    break;
-  case 16:
-    for (y = 0; y < im->height; y++) {
-      for (x = 0; x < im->width; x++) {
-        r = (data[x] >> default_red_shift) & 0xFF;
-        r = r >> render_red_shift;
-        g = (data[x] >> default_green_shift) & 0xFF;
-        g = g >> render_green_shift;
-        b = (data[x] >> default_blue_shift) & 0xFF;
-        b = b >> render_blue_shift;
-        p[x] = (r << render_red_offset)
-             + (g << render_green_offset)
-             + (b << render_blue_offset);
-      }
-      data += im->width;
-      p += im->bytes_per_line/2;
-    }
-    break;
-  default:
-    g_message("your bit depth is currently unhandled\n");
-  }
 }

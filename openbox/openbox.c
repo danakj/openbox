@@ -19,9 +19,6 @@
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
 #endif
-#ifdef HAVE_SYS_SELECT_H
-#  include <sys/select.h>
-#endif
 #ifdef HAVE_SIGNAL_H
 #  include <signal.h>
 #endif
@@ -78,7 +75,7 @@ int main(int argc, char **argv)
     sigemptyset(&sigset);
     action.sa_handler = dispatch_signal;
     action.sa_mask = sigset;
-    action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
+    action.sa_flags = SA_NOCLDSTOP;
     sigaction(SIGUSR1, &action, (struct sigaction *) NULL);
     sigaction(SIGPIPE, &action, (struct sigaction *) NULL);
     sigaction(SIGSEGV, &action, (struct sigaction *) NULL);

@@ -177,7 +177,7 @@ gboolean startup()
     a_unfocused_title = appearance_new(Surface_Planar, 0);
     a_focused_label = appearance_new(Surface_Planar, 1);
     a_unfocused_label = appearance_new(Surface_Planar, 1);
-    a_icon = appearance_new(Surface_Planar, 0);//1);
+    a_icon = appearance_new(Surface_Planar, 0);/*1);*/
     a_focused_handle = appearance_new(Surface_Planar, 0);
     a_unfocused_handle = appearance_new(Surface_Planar, 0);
 

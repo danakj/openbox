@@ -24,8 +24,8 @@ void render_startup(void)
 
     if (render_depth < 8) {
       XVisualInfo vinfo_template, *vinfo_return;
-      // search for a TrueColor Visual... if we can't find one...
-      // we will use the default visual for the screen
+      /* search for a TrueColor Visual... if we can't find one...
+         we will use the default visual for the screen */
       int vinfo_nitems;
       int best = -1;
 
@@ -40,7 +40,7 @@ void render_startup(void)
         for (i = 0; i < vinfo_nitems; ++i) {
           if (vinfo_return[i].depth > max_depth) {
             if (max_depth == 24 && vinfo_return[i].depth > 24)
-              break;          // prefer 24 bit over 32
+                break;          /* prefer 24 bit over 32 */
             max_depth = vinfo_return[i].depth;
             best = i;
           }
@@ -66,7 +66,7 @@ void truecolor_startup(void)
   timage = XCreateImage(ob_display, render_visual, render_depth,
                         ZPixmap, 0, NULL, 1, 1, 32, 0);
   g_assert(timage != NULL);
-  // find the offsets for each color in the visual's masks
+  /* find the offsets for each color in the visual's masks */
   red_mask = timage->red_mask;
   green_mask = timage->green_mask;
   blue_mask = timage->blue_mask;
@@ -122,8 +122,8 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
                           ZPixmap, 0, NULL, w, h, 32, 0);
         g_assert(im != NULL);
         im->byte_order = endian;
-        im->data = (unsigned char *)l->surface.data.planar.pixel_data;
-        reduce_depth(im->data, im);
+        im->data = (char *)l->surface.data.planar.pixel_data;
+        reduce_depth((pixel32*)im->data, im);
         XPutImage(ob_display, l->pixmap, DefaultGC(ob_display, ob_screen),
                   im, 0, 0, x, y, w, h);
         im->data = NULL;

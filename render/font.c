@@ -62,7 +62,7 @@ ObFont *font_open(char *fontstring)
     g_warning(_("Unable to load font: %s\n"), "fixed");
     g_warning(_("Aborting!.\n"));
 
-    exit(3); // can't continue without a font
+    exit(3); /* can't continue without a font */
 }
 
 void font_close(ObFont *f)

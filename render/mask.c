@@ -19,19 +19,19 @@ void pixmap_mask_free(pixmap_mask *m)
 void mask_draw(Pixmap p, TextureMask *m, int width, int height)
 {
     int x, y;
-    if (m->mask == None) return; // no mask given
+    if (m->mask == None) return; /* no mask given */
 
-    // set the clip region
+    /* set the clip region */
     x = (width - m->mask->w) / 2;
     y = (height - m->mask->h) / 2;
     XSetClipMask(ob_display, m->color->gc, m->mask->mask);
     XSetClipOrigin(ob_display, m->color->gc, x, y);
 
-    // fill in the clipped region
+    /* fill in the clipped region */
     XFillRectangle(ob_display, p, m->color->gc, x, y,
                    x + m->mask->w, y + m->mask->h);
 
-    // unset the clip region
+    /* unset the clip region */
     XSetClipMask(ob_display, m->color->gc, None);
     XSetClipOrigin(ob_display, m->color->gc, 0, 0);
 }

@@ -10,12 +10,21 @@ static GSList *timers; /* nearest timer is at the top */
 
 #define NEAREST_TIMEOUT (((Timer*)timers->data)->timeout)
 
+static long timecompare(GTimeVal *a, GTimeVal *b)
+{
+    long r;
+
+    if ((r = b->tv_sec - a->tv_sec)) return r;
+    return b->tv_usec - a->tv_sec;
+    
+}
+
 static void insert_timer(Timer *self)
 {
     GSList *it;
     for (it = timers; it != NULL; it = it->next) {
 	Timer *t = it->data;
-	if (!timercmp(&self->timeout, &t->timeout, >)) {
+        if (timecompare(&self->timeout, &t->timeout) <= 0) {
 	    timers = g_slist_insert_before(timers, it, self);
 	    break;
 	}
@@ -99,7 +108,7 @@ void timer_dispatch(GTimeVal **wait)
 	
 	/* the queue is sorted, so if this timer shouldn't fire, none are 
 	   ready */
-	if (!timercmp(&now, &NEAREST_TIMEOUT, >))
+        if (timecompare(&now, &NEAREST_TIMEOUT) <= 0)
 	    break;
 
 	/* we set the last fired time to delay msec after the previous firing,

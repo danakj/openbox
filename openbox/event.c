@@ -15,6 +15,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#ifdef HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+#endif
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);

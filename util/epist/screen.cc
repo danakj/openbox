@@ -444,7 +444,8 @@ void screen::updateActiveWindow() {
     }
   }
   _active = it;
-  _last_active = it;
+  if (it != end)
+    _last_active = it;
 
   /*  cout << "Active window is now: ";
       if (_active == _clients.end()) cout << "None\n";

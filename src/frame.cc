@@ -407,9 +407,16 @@ void OBFrame::grabClient()
   // reparent the client to the frame
   XReparentWindow(otk::OBDisplay::display, _client->window(),
                   _plate.window(), 0, 0);
-  // this generates 2 unmap's that we catch, one to the window and one to root,
-  // but both have .window set to this window, so both need to be ignored
-  _client->ignore_unmaps+=2;
+  /*
+    When reparenting the client window, it is usually not mapped yet, since
+    this occurs from a MapRequest. However, in the case where Openbox is
+    starting up, the window is already mapped, so we'll see unmap events for
+    it. There are 2 unmap events generated that we see, one with the 'event'
+    member set the root window, and one set to the client, but both get handled
+    and need to be ignored.
+  */
+  if (Openbox::instance->state() == Openbox::State_Starting)
+    _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config req's)
   XSelectInput(otk::OBDisplay::display, _plate.window(),
@@ -430,7 +437,8 @@ void OBFrame::releaseClient()
   if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
                              ReparentNotify, &ev)) {
     // XXX: ob2/bb didn't do this.. look up this process in other wm's!
-    XPutBackEvent(otk::OBDisplay::display, &ev);
+    //XPutBackEvent(otk::OBDisplay::display, &ev);
+    XMapWindow(otk::OBDisplay::display, _client->window());
   } else {
     // according to the ICCCM - if the client doesn't reparent to
     // root, then we have to do it for them
@@ -440,7 +448,7 @@ void OBFrame::releaseClient()
   }
 
   // do an extra map here .. ? XXX
-  XMapWindow(otk::OBDisplay::display, _client->window());
+//  XMapWindow(otk::OBDisplay::display, _client->window());
 }
 
 

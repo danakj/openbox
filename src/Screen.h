@@ -135,7 +135,7 @@ private:
       auto_edge_balance, image_dither, ordered_dither, opaque_move, full_max,
       focus_new, focus_last, toolbar_total_hide;
     BColor border_color;
-    obResource styleconfig;
+    Resource styleconfig;
 
     int workspaces, toolbar_placement, toolbar_width_percent, placement_policy,
       edge_snap_threshold, row_direction, col_direction;

@@ -115,7 +115,7 @@ private:
   Window masked;
   char *rc_file, **argv;
   int argc;
-  obResource config;
+  Resource config;
 
 
 protected:
@@ -145,7 +145,7 @@ public:
   BScreen *getScreen(int);
   BScreen *searchScreen(Window);
 
-  inline obResource &getConfig() {
+  inline Resource &getConfig() {
     return config;
   }
   inline const Time &getDoubleClickInterval(void) const

@@ -27,11 +27,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 
-class obResource {
+class Resource {
 public:
-  obResource(const std::string &file);
-  obResource();
-  virtual ~obResource();
+  Resource(const std::string &file);
+  Resource();
+  virtual ~Resource();
 
   inline const std::string &file() const {
     return static_cast<const std::string &>(m_file);

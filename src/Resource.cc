@@ -34,9 +34,9 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-bool obResource::m_initialized = false;
+bool Resource::m_initialized = false;
 
-obResource::obResource(const std::string &file) {
+Resource::Resource(const std::string &file) {
   setFile(file);
   m_modified = false;
   m_database = NULL;
@@ -47,7 +47,7 @@ obResource::obResource(const std::string &file) {
   }
 }
 
-obResource::obResource() {
+Resource::Resource() {
   m_modified = false;
   m_database = NULL;
   m_autosave = true;
@@ -57,26 +57,26 @@ obResource::obResource() {
   }
 }
 
-obResource::~obResource() {
+Resource::~Resource() {
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
 }
 
-void obResource::setFile(const std::string &file) {
+void Resource::setFile(const std::string &file) {
   m_file = file;
 }
 
-void obResource::setAutoSave(bool autosave) {
+void Resource::setAutoSave(bool autosave) {
   m_autosave = autosave;
 }
 
-void obResource::save() {
+void Resource::save() {
   ASSERT(m_database != NULL);
   XrmPutFileDatabase(m_database, m_file.c_str());
   m_modified = false;
 }
 
-bool obResource::load() {
+bool Resource::load() {
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
   m_modified = false;
@@ -85,7 +85,7 @@ bool obResource::load() {
   return true;
 }
 
-void obResource::setValue(const std::string &rname, bool value) {
+void Resource::setValue(const std::string &rname, bool value) {
   ASSERT(m_database != NULL);
 
   const char *val = (value ? "True" : "False");
@@ -97,11 +97,11 @@ void obResource::setValue(const std::string &rname, bool value) {
     save();
 }
 
-void obResource::setValue(const std::string &rname, int value) {
+void Resource::setValue(const std::string &rname, int value) {
   setValue(rname, (long)value);
 }
 
-void obResource::setValue(const std::string &rname, long value) {
+void Resource::setValue(const std::string &rname, long value) {
   ASSERT(m_database != NULL);
   
   char val[11];
@@ -114,7 +114,7 @@ void obResource::setValue(const std::string &rname, long value) {
     save();
 }
 
-void obResource::setValue(const std::string &rname, const char *value) {
+void Resource::setValue(const std::string &rname, const char *value) {
   ASSERT(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
@@ -125,7 +125,7 @@ void obResource::setValue(const std::string &rname, const char *value) {
     save();
 }
 
-void obResource::setValue(const std::string &rname, const std::string &value) {
+void Resource::setValue(const std::string &rname, const std::string &value) {
   ASSERT(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
@@ -136,7 +136,7 @@ void obResource::setValue(const std::string &rname, const std::string &value) {
     save();
 }
 
-bool obResource::getValue(const std::string &rname, const std::string &rclass,
+bool Resource::getValue(const std::string &rname, const std::string &rclass,
                           bool &value) const {
   ASSERT(rclass.c_str() != NULL);
   ASSERT(m_database != NULL);
@@ -154,7 +154,7 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
   return true;
 }
 
-bool obResource::getValue(const std::string &rname, const std::string &rclass,
+bool Resource::getValue(const std::string &rname, const std::string &rclass,
                           long &value) const {
   ASSERT(m_database != NULL);
   
@@ -170,7 +170,7 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
   return true;
 }
 
-bool obResource::getValue(const std::string &rname, const std::string &rclass,
+bool Resource::getValue(const std::string &rname, const std::string &rclass,
                           std::string &value) const {
   ASSERT(m_database != NULL);
   

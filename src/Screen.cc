@@ -996,7 +996,7 @@ void BScreen::removeWorkspaceNames(void) {
 
 
 void BScreen::LoadStyle(void) {
-  obResource &conf = resource.styleconfig;
+  Resource &conf = resource.styleconfig;
   
   conf.setFile(openbox.getStyleFilename());
   if (!conf.load()) {

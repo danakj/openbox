@@ -92,26 +92,24 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     theme->app_hilite_bg = RrAppearanceNew(inst, 0);
     theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
-    theme->app_hilite_fg = RrAppearanceNew(inst, 0);
-    theme->app_unhilite_fg = RrAppearanceNew(inst, 0);
     theme->app_hilite_label = RrAppearanceNew(inst, 1);
     theme->app_unhilite_label = RrAppearanceNew(inst, 1);
 
     if (name) {
-	db = loaddb(theme, name);
+        db = loaddb(theme, name);
         if (db == NULL) {
-	    g_warning("Failed to load the theme '%s'\n"
+            g_warning("Failed to load the theme '%s'\n"
                       "Falling back to the default: '%s'",
                       name, DEFAULT_THEME);
-	} else
+        } else
             theme->name = g_path_get_basename(name);
     }
     if (db == NULL) {
-	db = loaddb(theme, DEFAULT_THEME);
-	if (db == NULL) {
-	    g_warning("Failed to load the theme '%s'.", DEFAULT_THEME);
-	    return NULL;
-	} else
+        db = loaddb(theme, DEFAULT_THEME);
+        if (db == NULL) {
+            g_warning("Failed to load the theme '%s'.", DEFAULT_THEME);
+            return NULL;
+        } else
             theme->name = g_path_get_basename(DEFAULT_THEME);
     }
 
@@ -133,7 +131,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         return NULL;
     }
     theme->win_font_height = MAX(theme->win_font_height,
-                                RrFontHeight(theme->win_font_unfocused));
+                                 RrFontHeight(theme->win_font_unfocused));
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.label.text.justify", &str)) {
@@ -171,7 +169,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* load direct dimensions */
     if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
-	theme->menu_overlap < 0 || theme->menu_overlap > 20)
+        theme->menu_overlap < 0 || theme->menu_overlap > 20)
         theme->menu_overlap = 0;
     if (!read_int(db, "window.handle.width", &theme->handle_height))
         theme->handle_height = 6;
@@ -180,48 +178,48 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (theme->handle_height <= 0 || theme->handle_height > 100)
         theme->handle_height = 6;
     if (!read_int(db, "padding.width", &theme->padding) ||
-	theme->padding < 0 || theme->padding > 100)
+        theme->padding < 0 || theme->padding > 100)
         theme->padding = 3;
     if (!read_int(db, "border.width", &theme->bwidth) ||
-	theme->bwidth < 0 || theme->bwidth > 100)
+        theme->bwidth < 0 || theme->bwidth > 100)
         theme->bwidth = 1;
     if (!read_int(db, "window.client.padding.width", &theme->cbwidth) ||
-	theme->cbwidth < 0 || theme->cbwidth > 100)
+        theme->cbwidth < 0 || theme->cbwidth > 100)
         theme->cbwidth = theme->padding;
 
     /* load colors */
     if (!read_color(db, inst,
                     "border.color", &theme->b_color))
-	theme->b_color = RrColorNew(inst, 0, 0, 0);
+        theme->b_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "window.active.client.color",
                     &theme->cb_focused_color))
-	theme->cb_focused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+        theme->cb_focused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "window.inactive.client.color",
                     &theme->cb_unfocused_color))
-	theme->cb_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+        theme->cb_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "window.active.label.text.color",
                     &theme->title_focused_color))
-	theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
+        theme->title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
     if (!read_color(db, inst,
                     "window.inactive.label.text.color",
                     &theme->title_unfocused_color))
-	theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+        theme->title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "window.active.button.unpressed.image.color",
                     &theme->titlebut_focused_unpressed_color))
-	theme->titlebut_focused_unpressed_color = RrColorNew(inst, 0, 0, 0);
+        theme->titlebut_focused_unpressed_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "window.inactive.button.unpressed.image.color",
                     &theme->titlebut_unfocused_unpressed_color))
-	theme->titlebut_unfocused_unpressed_color =
+        theme->titlebut_unfocused_unpressed_color =
             RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "window.active.button.pressed.image.color",
                     &theme->titlebut_focused_pressed_color))
-	theme->titlebut_focused_pressed_color =
+        theme->titlebut_focused_pressed_color =
             RrColorNew(inst,
                        theme->titlebut_focused_unpressed_color->r,
                        theme->titlebut_focused_unpressed_color->g,
@@ -229,7 +227,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_color(db, inst,
                     "window.inactive.button.pressed.image.color",
                     &theme->titlebut_unfocused_pressed_color))
-	theme->titlebut_unfocused_pressed_color =
+        theme->titlebut_unfocused_pressed_color =
             RrColorNew(inst,
                        theme->titlebut_unfocused_unpressed_color->r,
                        theme->titlebut_unfocused_unpressed_color->g,
@@ -237,16 +235,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_color(db, inst,
                     "window.active.button.disabled.image.color",
                     &theme->titlebut_disabled_focused_color))
-	theme->titlebut_disabled_focused_color =
+        theme->titlebut_disabled_focused_color =
             RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
                     "window.inactive.button.disabled.image.color",
                     &theme->titlebut_disabled_unfocused_color))
-	theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
+        theme->titlebut_disabled_unfocused_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "window.active.button.hover.image.color",
                     &theme->titlebut_hover_focused_color))
-	theme->titlebut_hover_focused_color =
+        theme->titlebut_hover_focused_color =
             RrColorNew(inst,
                        theme->titlebut_focused_unpressed_color->r,
                        theme->titlebut_focused_unpressed_color->g,
@@ -254,7 +252,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_color(db, inst,
                     "window.inactive.button.hover.image.color",
                     &theme->titlebut_hover_unfocused_color))
-	theme->titlebut_hover_unfocused_color =
+        theme->titlebut_hover_unfocused_color =
             RrColorNew(inst,
                        theme->titlebut_unfocused_unpressed_color->r,
                        theme->titlebut_unfocused_unpressed_color->g,
@@ -262,7 +260,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_color(db, inst,
                     "window.active.button.toggled.image.color",
                     &theme->titlebut_toggled_focused_color))
-	theme->titlebut_toggled_focused_color =
+        theme->titlebut_toggled_focused_color =
             RrColorNew(inst,
                        theme->titlebut_focused_pressed_color->r,
                        theme->titlebut_focused_pressed_color->g,
@@ -270,7 +268,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_color(db, inst,
                     "window.inactive.button.toggled.image.color",
                     &theme->titlebut_toggled_unfocused_color))
-	theme->titlebut_toggled_unfocused_color =
+        theme->titlebut_toggled_unfocused_color =
             RrColorNew(inst,
                        theme->titlebut_unfocused_pressed_color->r,
                        theme->titlebut_unfocused_pressed_color->g,
@@ -307,7 +305,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         if (!read_mask(inst, "max_hover.xbm", theme, &theme->max_hover_mask)) {
             theme->max_hover_mask = RrPixmapMaskCopy(theme->max_mask);
         }
-   } else {
+    } else {
         {
             guchar data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
             theme->max_mask = RrPixmapMaskNew(inst, 7, 7, (char*)data);
@@ -448,47 +446,47 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_appearance(db, inst,
                          "window.active.title.bg", theme->a_focused_title,
                          FALSE))
-	set_default_appearance(theme->a_focused_title);
+        set_default_appearance(theme->a_focused_title);
     if (!read_appearance(db, inst,
                          "window.inactive.title.bg", theme->a_unfocused_title,
                          FALSE))
-	set_default_appearance(theme->a_unfocused_title);
+        set_default_appearance(theme->a_unfocused_title);
     if (!read_appearance(db, inst,
                          "window.active.label.bg", theme->a_focused_label,
                          TRUE))
-	set_default_appearance(theme->a_focused_label);
+        set_default_appearance(theme->a_focused_label);
     if (!read_appearance(db, inst,
                          "window.inactive.label.bg", theme->a_unfocused_label,
                          TRUE))
-	set_default_appearance(theme->a_unfocused_label);
+        set_default_appearance(theme->a_unfocused_label);
     if (!read_appearance(db, inst,
                          "window.active.handle.bg", theme->a_focused_handle,
                          FALSE))
-	set_default_appearance(theme->a_focused_handle);
+        set_default_appearance(theme->a_focused_handle);
     if (!read_appearance(db, inst,
                          "window.inactive.handle.bg",theme->a_unfocused_handle,
                          FALSE))
-	set_default_appearance(theme->a_unfocused_handle);
+        set_default_appearance(theme->a_unfocused_handle);
     if (!read_appearance(db, inst,
                          "window.active.grip.bg", theme->a_focused_grip,
                          TRUE))
-	set_default_appearance(theme->a_focused_grip);
+        set_default_appearance(theme->a_focused_grip);
     if (!read_appearance(db, inst,
                          "window.inactive.grip.bg", theme->a_unfocused_grip,
                          TRUE))
-	set_default_appearance(theme->a_unfocused_grip);
+        set_default_appearance(theme->a_unfocused_grip);
     if (!read_appearance(db, inst,
                          "menu.items.bg", theme->a_menu,
                          FALSE))
-	set_default_appearance(theme->a_menu);
+        set_default_appearance(theme->a_menu);
     if (!read_appearance(db, inst,
                          "menu.title.bg", theme->a_menu_title,
                          FALSE))
-	set_default_appearance(theme->a_menu_title);
+        set_default_appearance(theme->a_menu_title);
     if (!read_appearance(db, inst,
                          "menu.items.active.bg", theme->a_menu_selected,
                          TRUE))
-	set_default_appearance(theme->a_menu_selected);
+        set_default_appearance(theme->a_menu_selected);
 
     /* read the appearances for rendering non-decorations */
     if (!read_appearance(db, inst,
@@ -534,12 +532,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         set_default_appearance(theme->a_focused_pressed_max);
     if (!read_appearance(db, inst,
                          "window.inactive.button.pressed.bg",
-			 theme->a_unfocused_pressed_max,
+                         theme->a_unfocused_pressed_max,
                          TRUE))
         set_default_appearance(theme->a_unfocused_pressed_max);
     if (!read_appearance(db, inst,
                          "window.active.button.toggled.bg",
-			 theme->a_toggled_focused_max,
+                         theme->a_toggled_focused_max,
                          TRUE))
     {
         RrAppearanceFree(theme->a_toggled_focused_max);
@@ -548,7 +546,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
     if (!read_appearance(db, inst,
                          "window.inactive.button.toggled.bg",
-			 theme->a_toggled_unfocused_max,
+                         theme->a_toggled_unfocused_max,
                          TRUE))
     {
         RrAppearanceFree(theme->a_toggled_unfocused_max);
@@ -557,17 +555,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
     if (!read_appearance(db, inst,
                          "window.active.button.unpressed.bg",
-			 theme->a_focused_unpressed_max,
+                         theme->a_focused_unpressed_max,
                          TRUE))
-	set_default_appearance(theme->a_focused_unpressed_max);
+        set_default_appearance(theme->a_focused_unpressed_max);
     if (!read_appearance(db, inst,
                          "window.inactive.button.unpressed.bg",
-			 theme->a_unfocused_unpressed_max,
+                         theme->a_unfocused_unpressed_max,
                          TRUE))
-	set_default_appearance(theme->a_unfocused_unpressed_max);
+        set_default_appearance(theme->a_unfocused_unpressed_max);
     if (!read_appearance(db, inst,
                          "window.active.button.hover.bg",
-			 theme->a_hover_focused_max,
+                         theme->a_hover_focused_max,
                          TRUE))
     {
         RrAppearanceFree(theme->a_hover_focused_max);
@@ -576,7 +574,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
     if (!read_appearance(db, inst,
                          "window.inactive.button.hover.bg",
-			 theme->a_hover_unfocused_max,
+                         theme->a_hover_unfocused_max,
                          TRUE))
     {
         RrAppearanceFree(theme->a_hover_unfocused_max);
@@ -610,7 +608,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrAppearanceCopy(theme->a_hover_unfocused_max); 
     theme->a_toggled_focused_desk =
         RrAppearanceCopy(theme->a_toggled_focused_max);
-   theme->a_toggled_unfocused_desk =
+    theme->a_toggled_unfocused_desk =
         RrAppearanceCopy(theme->a_toggled_unfocused_max);
     theme->a_unfocused_unpressed_desk =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
@@ -885,7 +883,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_unfocused_unpressed_shade->texture[0].data.mask.color = 
         theme->a_unfocused_unpressed_iconify->texture[0].data.mask.color = 
         theme->titlebut_unfocused_unpressed_color;
-        theme->a_unfocused_pressed_max->texture[0].data.mask.color = 
+    theme->a_unfocused_pressed_max->texture[0].data.mask.color = 
         theme->a_unfocused_pressed_close->texture[0].data.mask.color = 
         theme->a_unfocused_pressed_desk->texture[0].data.mask.color = 
         theme->a_unfocused_pressed_shade->texture[0].data.mask.color = 
@@ -910,11 +908,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
            right now, so if anyone complains, here is how to keep text from
            going over the title's bevel/border with a padding.width of 0 and a
            bevelless/borderless label
-        RrMargins(theme->a_focused_title, &fl, &ft, &fr, &fb);
-        RrMargins(theme->a_unfocused_title, &ul, &ut, &ur, &ub);
-        theme->title_height = theme->label_height +
-            MAX(MAX(theme->padding * 2, ft + fb),
-                MAX(theme->padding * 2, ut + ub));
+           RrMargins(theme->a_focused_title, &fl, &ft, &fr, &fb);
+           RrMargins(theme->a_unfocused_title, &ul, &ut, &ur, &ub);
+           theme->title_height = theme->label_height +
+           MAX(MAX(theme->padding * 2, ft + fb),
+           MAX(theme->padding * 2, ut + ub));
         */
         theme->title_height = theme->label_height + theme->padding * 2;
         /* this should match the above title_height given the same font size
@@ -1072,7 +1070,7 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
 
     if (name[0] == '/') {
         s = g_build_filename(name, "openbox-3", "themerc", NULL);
-	if ((db = XrmGetFileDatabase(s)))
+        if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);
     } else {
@@ -1096,7 +1094,7 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
 
     if (db == NULL) {
         s = g_build_filename(name, "themerc", NULL);
-	if ((db = XrmGetFileDatabase(s)))
+        if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);
     }
@@ -1110,11 +1108,11 @@ static char *create_class_name(char *rname)
     char *p = rclass;
 
     while (TRUE) {
-	*p = toupper(*p);
-	p = strchr(p+1, '.');
-	if (p == NULL) break;
-	++p;
-	if (*p == '\0') break;
+        *p = toupper(*p);
+        p = strchr(p+1, '.');
+        if (p == NULL) break;
+        ++p;
+        if (*p == '\0') break;
     }
     return rclass;
 }
@@ -1127,10 +1125,10 @@ static gboolean read_int(XrmDatabase db, char *rname, int *value)
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
-	*value = (int)strtol(retvalue.addr, &end, 10);
-	if (end != retvalue.addr)
-	    ret = TRUE;
+        retvalue.addr != NULL) {
+        *value = (int)strtol(retvalue.addr, &end, 10);
+        if (end != retvalue.addr)
+            ret = TRUE;
     }
 
     g_free(rclass);
@@ -1145,9 +1143,9 @@ static gboolean read_string(XrmDatabase db, char *rname, char **value)
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
-	*value = retvalue.addr;
-	ret = TRUE;
+        retvalue.addr != NULL) {
+        *value = retvalue.addr;
+        ret = TRUE;
     }
 
     g_free(rclass);
@@ -1163,12 +1161,12 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
-	RrColor *c = RrColorParse(inst, retvalue.addr);
-	if (c != NULL) {
-	    *value = c;
-	    ret = TRUE;
-	}
+        retvalue.addr != NULL) {
+        RrColor *c = RrColorParse(inst, retvalue.addr);
+        if (c != NULL) {
+            *value = c;
+            ret = TRUE;
+        }
     }
 
     g_free(rclass);
@@ -1205,48 +1203,48 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
 
     /* convert to all lowercase */
     for (t = tex; *t != '\0'; ++t)
-	*t = g_ascii_tolower(*t);
+        *t = g_ascii_tolower(*t);
 
     if (allow_trans && strstr(tex, "parentrelative") != NULL) {
-	*grad = RR_SURFACE_PARENTREL;
+        *grad = RR_SURFACE_PARENTREL;
     } else {
-	if (strstr(tex, "gradient") != NULL) {
-	    if (strstr(tex, "crossdiagonal") != NULL)
-		*grad = RR_SURFACE_CROSS_DIAGONAL;
-	    else if (strstr(tex, "pyramid") != NULL)
-		*grad = RR_SURFACE_PYRAMID;
-	    else if (strstr(tex, "horizontal") != NULL)
-		*grad = RR_SURFACE_HORIZONTAL;
-	    else if (strstr(tex, "vertical") != NULL)
-		*grad = RR_SURFACE_VERTICAL;
-	    else
-		*grad = RR_SURFACE_DIAGONAL;
-	} else {
-	    *grad = RR_SURFACE_SOLID;
-	}
+        if (strstr(tex, "gradient") != NULL) {
+            if (strstr(tex, "crossdiagonal") != NULL)
+                *grad = RR_SURFACE_CROSS_DIAGONAL;
+            else if (strstr(tex, "pyramid") != NULL)
+                *grad = RR_SURFACE_PYRAMID;
+            else if (strstr(tex, "horizontal") != NULL)
+                *grad = RR_SURFACE_HORIZONTAL;
+            else if (strstr(tex, "vertical") != NULL)
+                *grad = RR_SURFACE_VERTICAL;
+            else
+                *grad = RR_SURFACE_DIAGONAL;
+        } else {
+            *grad = RR_SURFACE_SOLID;
+        }
 
-	if (strstr(tex, "sunken") != NULL)
-	    *relief = RR_RELIEF_SUNKEN;
-	else if (strstr(tex, "flat") != NULL)
-	    *relief = RR_RELIEF_FLAT;
-	else
-	    *relief = RR_RELIEF_RAISED;
+        if (strstr(tex, "sunken") != NULL)
+            *relief = RR_RELIEF_SUNKEN;
+        else if (strstr(tex, "flat") != NULL)
+            *relief = RR_RELIEF_FLAT;
+        else
+            *relief = RR_RELIEF_RAISED;
 	
-	*border = FALSE;
-	if (*relief == RR_RELIEF_FLAT) {
-	    if (strstr(tex, "border") != NULL)
-		*border = TRUE;
-	} else {
-	    if (strstr(tex, "bevel2") != NULL)
-		*bevel = RR_BEVEL_2;
-	    else
-		*bevel = RR_BEVEL_1;
-	}
+        *border = FALSE;
+        if (*relief == RR_RELIEF_FLAT) {
+            if (strstr(tex, "border") != NULL)
+                *border = TRUE;
+        } else {
+            if (strstr(tex, "bevel2") != NULL)
+                *bevel = RR_BEVEL_2;
+            else
+                *bevel = RR_BEVEL_1;
+        }
 
-	if (strstr(tex, "interlaced") != NULL)
-	    *interlaced = TRUE;
-	else
-	    *interlaced = FALSE;
+        if (strstr(tex, "interlaced") != NULL)
+            *interlaced = TRUE;
+        else
+            *interlaced = FALSE;
     }
 }
 

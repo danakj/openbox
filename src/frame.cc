@@ -16,9 +16,10 @@ extern "C" {
 #include "otk/display.hh"
 
 #include <string>
-#include <iostream> // TEMP
 
 namespace ob {
+
+const long OBFrame::event_mask;
 
 OBFrame::OBFrame(OBClient *client, otk::Style *style)
   : otk::OtkWidget(Openbox::instance, style),
@@ -39,6 +40,8 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   assert(client);
   assert(style);
 
+  XSelectInput(otk::OBDisplay::display, getWindow(), OBFrame::event_mask);
+  
   unmanaged();
   _titlebar.unmanaged();
   _button_close.unmanaged();

@@ -35,15 +35,6 @@ extern "C" {
 #  include <fcntl.h>
 #endif // HAVE_FCNTL_H
 
-#ifdef    HAVE_UNISTD_H
-#  include <sys/types.h>
-#  include <unistd.h>
-#endif // HAVE_UNISTD_H
-
-#ifdef    HAVE_SYS_SELECT_H
-#  include <sys/select.h>
-#endif // HAVE_SYS_SELECT_H
-
 #ifdef    HAVE_SYS_WAIT_H
 #  include <sys/wait.h>
 #endif // HAVE_SYS_WAIT_H
@@ -197,8 +188,6 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
-  int first_screen = _screens.front()->number();
-  
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
 
   delete _bindings;
@@ -217,18 +206,6 @@ Openbox::~Openbox()
 
   otk::Timer::destroy();
   otk::RenderColor::destroy();
-
-  if (_restart) {
-    if (!_restart_prog.empty()) {
-      otk::putenv(otk::display->screenInfo(first_screen)->displayString());
-      execl("/bin/sh", "/bin/sh", "-c", _restart_prog.c_str(), NULL); 
-      perror(_restart_prog.c_str());
-    }
-    
-    // fall back in case the above execlp doesn't work
-    execvp(_argv[0], _argv);
-    execvp(otk::basename(_argv[0]).c_str(), _argv);
-  }
 }
 
 

@@ -228,6 +228,13 @@ public:
   inline void restart(const std::string &bin = "") {
     _shutdown = true; _restart = true; _restart_prog = bin;
   }
+
+  //! True if Openbox should be restarted instead of exiting
+  inline bool doRestart() const { return _restart; }
+
+  //! The command line requested to be executed in place of restarting
+  //! Openbox the way it was run previously.
+  inline const std::string &restartProgram() const { return _restart_prog; }
 };
 
 }

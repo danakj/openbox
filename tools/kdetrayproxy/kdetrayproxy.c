@@ -151,7 +151,7 @@ void addicon(Window win)
 void removeicon(Window win, int unmap)
 {
     IList *it, *last = NULL;
-    void *old;
+    int (*old)(Display *, XErrorEvent *);
 
     for (it = list; it; last = it, it = it->next)
         if (it->win == win) {

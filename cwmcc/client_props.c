@@ -72,7 +72,7 @@ void cwmcc_client_get_icon_name(Window win, char **name)
         }
 }
 
-void cwmcc_client_icon_set_name(Window win, char *name)
+void cwmcc_client_set_icon_name(Window win, char *name)
 {
     XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, net_wm_icon_name),
                     CWMCC_ATOM(type, utf8), 32, PropModeReplace,

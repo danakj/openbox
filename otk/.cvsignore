@@ -28,6 +28,7 @@ style.lo
 texture.lo
 timer.lo
 timerqueuemanager.lo
+truerendercontrol.lo
 util.lo
 widget.lo
 ustring.lo

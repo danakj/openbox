@@ -59,8 +59,8 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
 
             tl = RECT_LEFT(target->frame->area) - 1;
             tt = RECT_TOP(target->frame->area) - 1;
-            tr = RECT_RIGHT(target->frame->area)+ 2;
-            tb = RECT_BOTTOM(target->frame->area) + 2;
+            tr = RECT_RIGHT(target->frame->area) + 1;
+            tb = RECT_BOTTOM(target->frame->area) + 1;
 
             /* snapx and snapy ensure that the window snaps to the top-most
                window edge available, without going all the way from

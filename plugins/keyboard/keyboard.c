@@ -34,7 +34,8 @@ static void grab_keys()
         grab_key(p->key, p->state, GrabModeAsync);
         p = p->next_sibling;
     }
-    grab_key(reset_key, reset_state, GrabModeAsync);
+    if (curpos)
+        grab_key(reset_key, reset_state, GrabModeAsync);
 }
 
 static void reset_chains()

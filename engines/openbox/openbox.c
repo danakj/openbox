@@ -471,23 +471,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
             XUnmapWindow(ob_display, self->handle);
     }
 
-    if (moved) {
-        /* find the new coordinates */
-        self->frame.area.x = self->frame.client->area.x;
-        self->frame.area.y = self->frame.client->area.y;
-        frame_client_gravity((Frame*)self,
-                             &self->frame.area.x, &self->frame.area.y);
-    }
-
-    /* move and resize the top level frame.
-       shading can change without being moved or resized */
-    XMoveResizeWindow(ob_display, self->frame.window,
-                      self->frame.area.x, self->frame.area.y,
-                      self->width,
-                      (self->frame.client->shaded ? TITLE_HEIGHT :
-                       self->innersize.top + self->innersize.bottom +
-                       self->frame.client->area.height));
-
     if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->frame.plate,
@@ -514,6 +497,21 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 		  (self->frame.client->shaded ? TITLE_HEIGHT + self->bwidth*2:
                    self->frame.client->area.height +
                    self->frame.size.top + self->frame.size.bottom));
+
+    if (moved) {
+        /* find the new coordinates, done after setting the frame.size, for
+           frame_client_gravity. */
+        self->frame.area.x = self->frame.client->area.x;
+        self->frame.area.y = self->frame.client->area.y;
+        frame_client_gravity((Frame*)self,
+                             &self->frame.area.x, &self->frame.area.y);
+    }
+
+    /* move and resize the top level frame.
+       shading can change without being moved or resized */
+    XMoveResizeWindow(ob_display, self->frame.window,
+                      self->frame.area.x, self->frame.area.y,
+                      self->width, self->frame.area.height - self->bwidth * 2);
 
     if (resized) {
         render(self);

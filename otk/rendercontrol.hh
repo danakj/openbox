@@ -28,6 +28,7 @@ protected:
 
   inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
   void verticalGradient(Surface &sf, const RenderTexture &texture) const;
+  void horizontalGradient(Surface &sf, const RenderTexture &texture) const;
   void diagonalGradient(Surface &sf, const RenderTexture &texture) const;
   void crossDiagonalGradient(Surface &sf, const RenderTexture &texture) const;
   virtual void drawGradientBackground(Surface &sf,

@@ -232,6 +232,9 @@ void RenderControl::drawGradientBackground(
   case RenderTexture::Vertical:
     verticalGradient(sf, texture);
     break;
+  case RenderTexture::Horizontal:
+    horizontalGradient(sf, texture);
+    break;
   case RenderTexture::Diagonal:
     diagonalGradient(sf, texture);
     break;
@@ -318,6 +321,36 @@ void RenderControl::verticalGradient(Surface &sf,
             + (b << default_blue_shift);
     for (int x = 0; x < w; ++x, ++data)
       *data = current;
+  }
+}
+
+void RenderControl::horizontalGradient(Surface &sf,
+                                         const RenderTexture &texture) const
+{
+  pixel32 *data = sf.pixelData();
+  pixel32 current;
+  float dr, dg, db;
+  unsigned int r,g,b;
+  int w = sf.size().width(), h = sf.size().height();
+
+  dr = (float)(texture.secondary_color().red() - texture.color().red());
+  dr/= (float)w;
+
+  dg = (float)(texture.secondary_color().green() - texture.color().green());
+  dg/= (float)w;
+
+  db = (float)(texture.secondary_color().blue() - texture.color().blue());
+  db/= (float)w;
+
+  for (int x = 0; x < w; ++x, ++data) {
+    r = texture.color().red() + (int)(dr * x);
+    g = texture.color().green() + (int)(dg * x);
+    b = texture.color().blue() + (int)(db * x);
+    current = (r << default_red_shift)
+            + (g << default_green_shift)
+            + (b << default_blue_shift);
+    for (int y = 0; y < h; ++y)
+      *(data + y*w) = current;
   }
 }
 

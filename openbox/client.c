@@ -2505,12 +2505,17 @@ gboolean client_focus(ObClient *self)
         return FALSE;
     }
 
-    if (self->can_focus)
+    if (self->can_focus) {
         /* RevertToPointerRoot causes much more headache than RevertToNone, so
            I choose to use it always, hopefully to find errors quicker, if any
-           are left. (I hate X. I hate focus events.) */
-	XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
+           are left. (I hate X. I hate focus events.)
+           
+           Update: Changing this to RevertToNone fixed a bug with mozilla (bug
+           #799. So now it is RevertToNone again.
+        */
+	XSetInputFocus(ob_display, self->window, RevertToNone,
                        event_lasttime);
+    }
 
     if (self->focus_notify) {
 	XEvent ce;

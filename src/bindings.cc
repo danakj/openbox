@@ -149,7 +149,7 @@ static void assimilate(BindingTree *parent, BindingTree *node)
 
 int OBBindings::find(BindingTree *search) {
   BindingTree *a, *b;
-  a = _tree;
+  a = _tree.first_child;
   b = search;
   while (a && b) {
     if (a->binding != b->binding) {
@@ -206,7 +206,7 @@ bool OBBindings::add(const StringVect &keylist, int id)
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  if (find_bind(_tree.first_child, tree) < -1) {
+  if (find(tree) < -1) {
     // conflicts with another binding
     destroytree(tree);
     return false;
@@ -226,7 +226,7 @@ int OBBindings::find(const StringVect &keylist)
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  ret = find_bind(_tree.first_child, tree) >= 0;
+  ret = find(tree) >= 0;
 
   destroytree(tree);
 

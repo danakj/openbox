@@ -29,7 +29,7 @@ openbox.i: openbox.hh screen.hh client.hh
 	touch openbox.i
 
 openbox_wrap.cc: openbox.i
-	swig -python -c++ -nodefault -module openbox -o openbox_wrap.cc openbox.i
+	swig -python -c++ -nodefault -o openbox_wrap.cc openbox.i
 #	swig -guile -c++ -nodefault -o openbox_wrap.cc openbox.i
 
 # local dependencies

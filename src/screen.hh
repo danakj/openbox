@@ -43,6 +43,9 @@ public:
                                           ButtonPressMask |
                                           ButtonReleaseMask;
 
+  //! All managed clients on the screen
+  ClientList clients;
+  
 private:
   //! Was %Openbox able to manage the screen?
   bool _managed;
@@ -63,9 +66,6 @@ private:
   
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
-
-  //! All managed clients on the screen
-  ClientList _clients;
 
   //! Area usable for placement etc (total - struts)
   otk::Rect _area;
@@ -113,8 +113,6 @@ public:
   inline const otk::Rect &area() const { return _area; }
   //! Returns the style in use on the screen
   inline const otk::Style *style() const { return &_style; }
-
-  inline ClientList clients() { return _clients; }
 
   //! Adds a window's strut to the screen's list of reserved spaces
   void addStrut(otk::Strut *strut);

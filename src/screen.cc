@@ -101,8 +101,8 @@ OBScreen::~OBScreen()
   if (! _managed) return;
 
   // unmanage all windows
-  while (!_clients.empty())
-    unmanageWindow(_clients.front());
+  while (!clients.empty())
+    unmanageWindow(clients.front());
 
   delete _image_control;
 }
@@ -243,13 +243,13 @@ void OBScreen::setClientList()
   Window *windows;
 
   // create an array of the window ids
-  if (_clients.size() > 0) {
+  if (clients.size() > 0) {
     Window *win_it;
     
-    windows = new Window[_clients.size()];
+    windows = new Window[clients.size()];
     win_it = windows;
-    ClientList::const_iterator it = _clients.begin();
-    const ClientList::const_iterator end = _clients.end();
+    ClientList::const_iterator it = clients.begin();
+    const ClientList::const_iterator end = clients.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -258,9 +258,9 @@ void OBScreen::setClientList()
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_client_list,
                                      otk::OBProperty::Atom_Window,
-                                     windows, _clients.size());
+                                     windows, clients.size());
 
-  if (_clients.size())
+  if (clients.size())
     delete [] windows;
 
   setStackingList();
@@ -389,7 +389,7 @@ void OBScreen::manageWindow(Window window)
   otk::OBDisplay::ungrab();
 
   // add to the screen's list
-  _clients.push_back(client);
+  clients.push_back(client);
   // update the root properties
   setClientList();
 }
@@ -432,7 +432,7 @@ void OBScreen::unmanageWindow(OBClient *client)
   client->frame = 0;
 
   // remove from the screen's list
-  _clients.remove(client);
+  clients.remove(client);
   delete client;
 
   // update the root properties

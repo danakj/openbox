@@ -12,17 +12,32 @@
 #include "client.hh"
 %}
 
-%immutable ob::Openbox::instance;
+%include stl.i
+//%include std_list.i
+//%template(ClientList) std::list<OBClient*>;
+
+
+%ignore ob::Openbox::instance;
+%ignore ob::OBScreen::clients;
 
 %include "openbox.hh"
 %include "screen.hh"
 %include "client.hh"
 
-
-%include stl.i
-%include std_list.i
+%inline %{
+  ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
+%};
 
 %{
-class OBClient;
+  #include <iterator>
 %}
-%template(ClientList) std::list<OBClient*>;
+%extend ob::OBScreen {
+  OBClient *client(int i) {
+    ob::OBScreen::ClientList::iterator it = self->clients.begin();
+    std::advance(it,i);
+    return *it;
+  }
+  int clientCount() const {
+    return (int) self->clients.size();
+  }
+};

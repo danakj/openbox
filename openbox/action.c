@@ -700,16 +700,6 @@ ActionString actionstrings[] =
         setup_action_growtoedge_east
     },
     {
-        "vibrate",
-        action_vibrate,
-        NULL
-    },
-    {
-        "flash",
-        action_flash,
-        NULL
-    },
-    {
         NULL,
         NULL,
         NULL
@@ -1247,35 +1237,4 @@ void action_show_desktop(union ActionData *data)
 void action_unshow_desktop(union ActionData *data)
 {
     screen_show_desktop(FALSE);
-}
-
-void action_vibrate(union ActionData *data)
-{
-    ObClient *c = data->client.any.c;
-    gint x, y, thr, length, i;
-
-    if (!c) return;
-
-    x = c->frame->area.x;
-    y = c->frame->area.y;
-    thr = 120;
-    length = y + thr;
-    for (i = 0; i < 5; ++i) {
-        while (y < length) {
-            client_move(c, x, y);
-            y += 4;
-            x -= 1;
-        }
-        while (y >= length - thr) {
-            client_move(c, x, y);
-            y -= 4;
-            x += 1;
-        }
-    }
-}
-
-void action_flash(union ActionData *data)
-{
-    if (!data->client.any.c) return;
-    frame_flash(data->client.any.c->frame);
 }

@@ -44,6 +44,7 @@ OBClient::OBClient(int screen, Window window)
   
   getArea();
   getDesktop();
+  // XXX: updateTransientFor();
   getType();
 
   // set the decorations and functions
@@ -85,7 +86,6 @@ OBClient::OBClient(int screen, Window window)
   updateProtocols();
   updateNormalHints();
   updateWMHints();
-  // XXX: updateTransientFor();
   updateTitle();
   updateIconTitle();
   updateClass();

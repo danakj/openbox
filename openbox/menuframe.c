@@ -105,7 +105,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 
     self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_item);
     self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
-    self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
+    self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_selected);
 
     if (entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
         self->a_separator = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
@@ -123,7 +123,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self->a_text_disabled =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
     self->a_text_selected =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_hilite);
+        RrAppearanceCopy(ob_rr_theme->a_menu_text_selected);
 
     return self;
 }

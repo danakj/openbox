@@ -26,6 +26,34 @@ void plugin_setup_config()
     parse_register("placement", parse_xml, NULL);
 }
 
+static Rect* pick_head(ObClient *c)
+{
+    /* more than one guy in his group (more than just him) */
+    if (c->group && c->group->members->next) {
+        GSList *it;
+
+        /* try on the client's desktop */
+        for (it = c->group->members; it; it = g_slist_next(it)) {
+            ObClient *itc = it->data;            
+            if (itc != c &&
+                (itc->desktop == c->desktop ||
+                 itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
+                return screen_area_monitor(c->desktop,
+                                           client_monitor(it->data));
+        }
+
+        /* try on all desktops */
+        for (it = c->group->members; it; it = g_slist_next(it)) {
+            ObClient *itc = it->data;            
+            if (itc != c)
+                return screen_area_monitor(c->desktop,
+                                           client_monitor(it->data));
+        }
+    }
+
+    return NULL;
+}
+
 static void place_random(ObClient *c)
 {
     int l, r, t, b;
@@ -33,9 +61,11 @@ static void place_random(ObClient *c)
     Rect *area;
 
     if (ob_state() == OB_STATE_STARTING) return;
-
-    area = screen_area_monitor(c->desktop,
-                               g_random_int_range(0, screen_num_monitors));
+    
+    area = pick_head(c);
+    if (!area)
+        area = screen_area_monitor(c->desktop,
+                                   g_random_int_range(0, screen_num_monitors));
 
     l = area->x;
     t = area->y;
@@ -102,6 +132,24 @@ static void event(ObEvent *e, void *foo)
                 return;
             }
         }
+    }
+
+    /* center parentless dialogs on the screen */
+    if (e->data.c.client->type == OB_CLIENT_TYPE_DIALOG) {
+        Rect *area;
+        ObClient *c = e->data.c.client;
+        int x, y;
+
+        area = pick_head(c);
+        if (!area)
+            area = screen_area_monitor(c->desktop, 0);
+
+        x = (area->width - c->frame->area.width) / 2 + area->x;
+        y = (area->height - c->frame->area.height) / 2 + area->y;
+        client_configure(c, OB_CORNER_TOPLEFT, x, y,
+                         c->area.width, c->area.height,
+                         TRUE, TRUE);
+        return;
     }
 
     if (!history || !place_history(e->data.c.client))

@@ -1,3 +1,18 @@
+const char *NAME = "xftlsfonts";
+const char *VERSION = "1.0";
+
+#ifndef   XFT
+#include <iostream>
+
+int main(int, char **) {
+  cout << NAME << " version " << VERSION << endl;
+  cout << "Copyright (c) 2002, Ben Jansens <ben@orodu.net>" << endl;
+  cout << endl;
+  cout << "Openbox was built without support for Xft fonts. This utility must"
+    << endl;
+  cout << "must be built with Xft support in order to function." << endl;
+}
+#else  // XFT
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
@@ -6,9 +21,6 @@ extern "C" {
 #include <iostream>
 #include <string>
 #include <vector>
-
-const char *NAME = "xftlsfonts";
-const char *VERSION = "1.0";
 
 using std::string;
 using std::cout;
@@ -129,3 +141,5 @@ int main(int argc, char **argv) {
   XCloseDisplay(display);
   return 0;
 }
+#endif // XFT
+

@@ -1245,12 +1245,6 @@ void BScreen::manageWindow(Window w) {
 void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   w->restore(remap);
 
-  if (w->getWorkspaceNumber() != BSENTINEL &&
-      w->getWindowNumber() != BSENTINEL)
-    getWorkspace(w->getWorkspaceNumber())->removeWindow(w);
-  else if (w->isIconic())
-    removeIcon(w);
-
   if (w->isNormal()) {
     // we don't list non-normal windows as managed windows
     windowList.remove(w);
@@ -1265,9 +1259,6 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
       }
     assert(it != end);  // the window wasnt a desktop window?
   }
-
-  if (blackbox->getFocusedWindow() == w)
-    blackbox->setFocusedWindow((BlackboxWindow *) 0);
 
   removeNetizen(w->getClientWindow());
 

@@ -361,8 +361,17 @@ BlackboxWindow::~BlackboxWindow(void) {
     if (client.transient_for != (BlackboxWindow *) ~0ul) {
       client.transient_for->client.transientList.remove(this);
     }
-    client.transient_for = (BlackboxWindow*) 0;
+    // we save our transient_for though because the workspace will use it
+    // when determining the next window to get focus
   }
+
+  if (blackbox_attrib.workspace != BSENTINEL &&
+      window_number != BSENTINEL)
+    screen->getWorkspace(blackbox_attrib.workspace)->removeWindow(this);
+  else if (flags.iconic)
+    screen->removeIcon(this);
+
+  client.transient_for = (BlackboxWindow*) 0;
 
   if (client.transientList.size() > 0) {
     // reset transient_for for all transients

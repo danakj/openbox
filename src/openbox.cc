@@ -347,6 +347,15 @@ void Openbox::setFocusedClient(OBClient *c)
     XSetInputFocus(otk::OBDisplay::display, _focused_screen->focuswindow(),
                    RevertToNone, CurrentTime);
   }
+  // set the NET_ACTIVE_WINDOW hint for all screens
+  ScreenList::iterator it, end = _screens.end();
+  for (it = _screens.begin(); it != end; ++it) {
+    int num = (*it)->number();
+    Window root = otk::OBDisplay::screenInfo(num)->rootWindow();
+    _property->set(root, otk::OBProperty::net_active_window,
+                   otk::OBProperty::Atom_Window,
+                   (c && _focused_screen == *it) ? c->window() : None);
+  }
 }
 
 void Openbox::execute(int screen, const std::string &bin)

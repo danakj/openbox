@@ -9564,6 +9564,28 @@ static PyObject *_wrap_Client_reparentHandler(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Client_mapRequestHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Client *arg1 = (ob::Client *) 0 ;
+    XMapRequestEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Client_mapRequestHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XMapRequestEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->mapRequestHandler((XMapRequestEvent const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * Client_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -11735,6 +11757,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Client_unmapHandler", _wrap_Client_unmapHandler, METH_VARARGS },
 	 { (char *)"Client_destroyHandler", _wrap_Client_destroyHandler, METH_VARARGS },
 	 { (char *)"Client_reparentHandler", _wrap_Client_reparentHandler, METH_VARARGS },
+	 { (char *)"Client_mapRequestHandler", _wrap_Client_mapRequestHandler, METH_VARARGS },
 	 { (char *)"Client_swigregister", Client_swigregister, METH_VARARGS },
 	 { (char *)"new_Frame", _wrap_new_Frame, METH_VARARGS },
 	 { (char *)"delete_Frame", _wrap_delete_Frame, METH_VARARGS },
@@ -12061,6 +12084,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Client_State_Toggle", (long) ob::Client::State_Toggle, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_event_mask", (long) ob::Client::event_mask, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_no_propagate_mask", (long) ob::Client::no_propagate_mask, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Client_ICONIC_DESKTOP", (long) ob::Client::ICONIC_DESKTOP, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Frame_event_mask", (long) ob::Frame::event_mask, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Frame", (long) ob::MC_Frame, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Titlebar", (long) ob::MC_Titlebar, 0, 0, 0},

@@ -36,7 +36,7 @@ Client::Client(int screen, Window window)
   
   // update EVERYTHING the first time!!
 
-  // the state is kinda assumed to be normal. is this right? XXX
+  // we default to NormalState, visible
   _wmstate = NormalState; _iconic = false;
   // no default decors or functions, each has to be enabled
   _decorations = _functions = 0;
@@ -54,20 +54,28 @@ Client::Client(int screen, Window window)
   getType();
   getMwmHints();
 
-  setupDecorAndFunctions();
-  
-  getState();
+  getState(); // gets all the states except for iconic, which is found from
+              // the desktop == ICONIC_DESKTOP
   getShaped();
 
   updateProtocols();
-  getGravity(); // get the attribute gravity
+
+  // got the type, the mwmhints, and the protocols, so we're ready to set up
+  // the decorations/functions
+  setupDecorAndFunctions();
+  
+  getGravity();        // get the attribute gravity
   updateNormalHints(); // this may override the attribute gravity
-  updateWMHints();
+  updateWMHints(true); // also get the initial_state and set _iconic
   updateTitle();
   updateIconTitle();
   updateClass();
   updateStrut();
 
+  // restores iconic state when we restart.
+  // this will override the initial_state if that was set
+  if (_desktop == ICONIC_DESKTOP) _iconic = true;
+  
   changeState();
 }
 
@@ -88,6 +96,11 @@ Client::~Client()
     // these values should not be persisted across a window unmapping/mapping
     otk::Property::erase(_window, otk::Property::atoms.net_wm_desktop);
     otk::Property::erase(_window, otk::Property::atoms.net_wm_state);
+  } else {
+    // if we're left in an iconic state, the client wont be mapped. this is
+    // bad, since we will no longer be managing the window on restart
+    if (_iconic)
+      XMapWindow(**otk::display, _window);
   }
 }
 
@@ -173,6 +186,10 @@ void Client::setupDecorAndFunctions()
     Decor_AllDesktops | Decor_Iconify | Decor_Maximize;
   _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
     Func_Shade;
+  if (_delete_window) {
+    _decorations |= Decor_Close;
+    _functions |= Func_Close;
+  }
   
   switch (_type) {
   case Type_Normal:
@@ -367,16 +384,13 @@ void Client::updateProtocols()
   int num_return = 0;
 
   _focus_notify = false;
-  _decorations &= ~Decor_Close;
-  _functions &= ~Func_Close;
+  _delete_window = false;
 
   if (XGetWMProtocols(**otk::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
       if (proto[i] == otk::Property::atoms.wm_delete_window) {
-        _decorations |= Decor_Close;
-        _functions |= Func_Close;
-        if (frame)
-          frame->adjustSize(); // update the decorations
+        // this means we can request the window to close
+        _delete_window = true;
       } else if (proto[i] == otk::Property::atoms.wm_take_focus)
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus
@@ -434,7 +448,7 @@ void Client::updateNormalHints()
 }
 
 
-void Client::updateWMHints()
+void Client::updateWMHints(bool initstate)
 {
   XWMHints *hints;
 
@@ -445,6 +459,10 @@ void Client::updateWMHints()
   if ((hints = XGetWMHints(**otk::display, _window)) != NULL) {
     if (hints->flags & InputHint)
       _can_focus = hints->input;
+
+    // only do this when initstate is true!
+    if (initstate && (hints->flags & StateHint))
+      _iconic = hints->initial_state == IconicState;
 
     if (hints->flags & XUrgencyHint)
       _urgent = true;
@@ -613,8 +631,11 @@ void Client::propertyHandler(const XPropertyEvent &e)
     updateIconTitle();
   else if (e.atom == otk::Property::atoms.wm_class)
     updateClass();
-  else if (e.atom == otk::Property::atoms.wm_protocols)
+  else if (e.atom == otk::Property::atoms.wm_protocols) {
     updateProtocols();
+    setupDecorAndFunctions();
+    frame->adjustSize(); // update the decorations
+  }
   else if (e.atom == otk::Property::atoms.net_wm_strut)
     updateStrut();
 }
@@ -624,13 +645,12 @@ void Client::setWMState(long state)
 {
   if (state == _wmstate) return; // no change
   
-  _wmstate = state;
-  switch (_wmstate) {
+  switch (state) {
   case IconicState:
-    // XXX: cause it to iconify
+    setDesktop(ICONIC_DESKTOP);
     break;
   case NormalState:
-    // XXX: cause it to uniconify
+    setDesktop(openbox->screen(_screen)->desktop());
     break;
   }
 }
@@ -642,10 +662,13 @@ void Client::setDesktop(long target)
   
   printf("Setting desktop %ld\n", target);
 
-  if (!(target >= 0 || target == (signed)0xffffffff)) return;
+  if (!(target >= 0 || target == (signed)0xffffffff ||
+        target == ICONIC_DESKTOP))
+    return;
   
   _desktop = target;
 
+  // set the desktop hint
   otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
                      otk::Property::atoms.cardinal, (unsigned)_desktop);
   
@@ -656,6 +679,25 @@ void Client::setDesktop(long target)
   else
     frame->hide();
 
+  // Handle Iconic state. Iconic state is maintained by the client being a
+  // member of the ICONIC_DESKTOP, so this is where we make iconifying and
+  // uniconifying happen.
+  bool i = _desktop == ICONIC_DESKTOP;
+  if (i != _iconic) { // has the state changed?
+    _iconic = i;
+    if (_iconic) {
+      _wmstate = IconicState;
+      ignore_unmaps++;
+      // we unmap the client itself so that we can get MapRequest events, and
+      // because the ICCCM tells us to!
+      XUnmapWindow(**otk::display, _window);
+    } else {
+      _wmstate = NormalState;
+      XMapWindow(**otk::display, _window);
+    }
+    changeState();
+  }
+  
   frame->adjustState();
 }
 
@@ -884,6 +926,8 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
 #ifdef DEBUG
     printf("net_active_window for 0x%lx\n", _window);
 #endif
+    if (_iconic)
+      setDesktop(openbox->screen(_screen)->desktop());
     if (_shaded)
       shade(false);
     // XXX: deiconify
@@ -1112,7 +1156,12 @@ void Client::changeAllowedActions(void)
 void Client::applyStartupState()
 {
   // these are in a carefully crafted order..
-  
+
+  if (_iconic) {
+    _iconic = false;
+    _desktop = 0;    // set some other source desktop so this goes through
+    setDesktop(ICONIC_DESKTOP);
+  }
   if (_fullscreen) {
     _fullscreen = false;
     fullscreen(true);
@@ -1138,7 +1187,9 @@ void Client::shade(bool shade)
   if (!(_functions & Func_Shade) || // can't
       _shaded == shade) return;     // already done
 
-  _wmstate = shade ? IconicState : NormalState;
+  // when we're iconic, don't change the wmstate
+  if (!_iconic)
+    _wmstate = shade ? IconicState : NormalState;
   _shaded = shade;
   changeState();
   frame->adjustSize();
@@ -1280,7 +1331,8 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
   
   otk::EventHandler::configureRequestHandler(e);
 
-  // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event
+  // if we are iconic (or shaded (fvwm does this)) ignore the event
+  if (_iconic || _shaded) return;
 
   if (e.value_mask & CWBorderWidth)
     _border_width = e.border_width;
@@ -1397,6 +1449,19 @@ void Client::reparentHandler(const XReparentEvent &e)
   
   // this deletes us etc
   openbox->screen(_screen)->unmanageWindow(this);
+}
+
+void Client::mapRequestHandler(const XMapRequestEvent &e)
+{
+#ifdef    DEBUG
+  printf("MapRequest for already managed 0x%lx\n", e.window);
+#endif // DEBUG
+
+  assert(_iconic); // we shouldn't be able to get this unless we're iconic
+
+  // move to the current desktop (uniconify)
+  setDesktop(openbox->screen(_screen)->desktop());
+  // XXX: should we focus/raise the window? (basically a net_wm_active_window)
 }
 
 }

@@ -780,6 +780,7 @@ class Client(EventHandler,):
     State_Toggle = _openbox.Client_State_Toggle
     event_mask = _openbox.Client_event_mask
     no_propagate_mask = _openbox.Client_no_propagate_mask
+    ICONIC_DESKTOP = _openbox.Client_ICONIC_DESKTOP
     __swig_setmethods__["ignore_unmaps"] = _openbox.Client_ignore_unmaps_set
     __swig_getmethods__["ignore_unmaps"] = _openbox.Client_ignore_unmaps_get
     if _newclass:ignore_unmaps = property(_openbox.Client_ignore_unmaps_get,_openbox.Client_ignore_unmaps_set)
@@ -825,6 +826,7 @@ class Client(EventHandler,):
     def unmapHandler(*args): return apply(_openbox.Client_unmapHandler,args)
     def destroyHandler(*args): return apply(_openbox.Client_destroyHandler,args)
     def reparentHandler(*args): return apply(_openbox.Client_reparentHandler,args)
+    def mapRequestHandler(*args): return apply(_openbox.Client_mapRequestHandler,args)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C Client instance at %s>" % (self.this,)

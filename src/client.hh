@@ -164,6 +164,10 @@ public:
   static const long no_propagate_mask = ButtonPressMask | ButtonReleaseMask |
                                         ButtonMotionMask;
 
+  //! The desktop value which indicated the window is iconified and not on any
+  //! desktop
+  static const long ICONIC_DESKTOP = 0xfffffffe;
+
   //! The number of unmap events to ignore on the window
   int ignore_unmaps;
   
@@ -261,6 +265,9 @@ private:
   //! NormalState
   long _wmstate;
 
+  //! True if the client supports the delete_window protocol
+  bool _delete_window;
+  
   //! Was the window's position requested by the application? if not, we should
   //! place the window ourselves when it first appears
   bool _positioned;
@@ -352,6 +359,10 @@ private:
   void setState(StateAction action, long data1, long data2);
 
   //! Sends the window to the specified desktop
+  /*!
+    A window is iconified by sending it to the ICONIC_DESKTOP, and restored
+    by sending it to any other valid desktop.
+  */
   void setDesktop(long desktop);
   
   //! Calculates the stacking layer for the client window
@@ -363,7 +374,12 @@ private:
   //! Updates the WMNormalHints and adjusts things if they change
   void updateNormalHints();
   //! Updates the WMHints and adjusts things if they change
-  void updateWMHints();
+  /*!
+    @param initstate Whether to read the initial_state property from the
+                     WMHints. This should only be used during the mapping
+                     process.
+  */
+  void updateWMHints(bool initstate = false);
   //! Updates the window's title
   void updateTitle();
   //! Updates the window's icon title
@@ -577,6 +593,7 @@ BB    @param window The window id that the Client class should handle
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
   virtual void reparentHandler(const XReparentEvent &e);
+  virtual void mapRequestHandler(const XMapRequestEvent &e);
 #if defined(SHAPE)
   virtual void shapeHandler(const XShapeEvent &e);
 #endif // SHAPE 

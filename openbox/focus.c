@@ -49,7 +49,6 @@ struct {
 } focus_indicator;
 
 RrAppearance *a_focus_indicator;
-RrColor *color_black;
 RrColor *color_white;
 
 static ObIconPopup *focus_cycle_popup;
@@ -107,7 +106,6 @@ void focus_startup(gboolean reconfig)
         stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
         stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
-        color_black = RrColorNew(ob_rr_inst, 0, 0, 0);
         color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
 
         a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
@@ -142,7 +140,6 @@ void focus_shutdown(gboolean reconfig)
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
 
-        RrColorFree(color_black);
         RrColorFree(color_white);
 
         RrAppearanceFree(a_focus_indicator);

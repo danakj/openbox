@@ -1,5 +1,34 @@
 2003-08-02  xor@zed.orodu.net  <xor@zed>
 
+	* Makefile.am, themes/om4ob/close.xbm, themes/om4ob/close_hover.xbm, themes/om4ob/desk.xbm, themes/om4ob/desk_hover.xbm, themes/om4ob/desk_toggled.xbm, themes/om4ob/iconify.xbm, themes/om4ob/iconify_hover.xbm, themes/om4ob/iconify_pressed.xbm, themes/om4ob/max.xbm, themes/om4ob/max_disabled.xbm, themes/om4ob/max_hover.xbm, themes/om4ob/max_pressed.xbm, themes/om4ob/max_toggled.xbm, themes/om4ob/shade.xbm, themes/om4ob/shade_disabled.xbm, themes/om4ob/shade_hover.xbm, themes/om4ob/shade_toggled.xbm, themes/om4ob/themerc:
+	add the om4ob theme
+
+	* ChangeLog: recent changes
+
+	* render/theme.c: oops indenting
+
+	* render/theme.c:
+	look in theme dirs first, use the theme as the path as a last attempt only!
+
+	* kernel/frame.c: the grips go below the titlebar buttons
+
+	* plugins/placement/placement.c: place transients better
+
+	* kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/geom.h, kernel/prop.c, kernel/prop.h:
+	add partial struts tho they arent useful eyt
+
+	* data/rc3, kernel/frame.c, kernel/frame.h, kernel/framerender.c, render/theme.h:
+	invisible resizing areas/grips in the top corners of the window
+
+	* plugins/mouse/mouse.c:
+	omg i found the bug that would make the mouse cursor end up way far from where you started the drag.
+
+	* render/theme.c: use the toggled mask for shade and desk buttons
+
+	* kernel/client.c: that line ended up in teh if somehow...
+
+2003-08-02  xor@zed.orodu.net  <xor@zed>
+
 	* theme.c: oops indenting
 
 	* theme.c:

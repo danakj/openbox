@@ -176,9 +176,11 @@ def focus_next_stacked(data, forward=1):
                     if client and (client.desktop() == desktop and \
                                    client.normal()):
                         t = client.title()
+                        if len(t) > 50: # limit the length of titles
+                            t = t[:24] + "..." + t[-24:]
                         titles.append(t)
                         _list_windows.append(c)
-                        l = font.measureString(t)
+                        l = font.measureString(t) + 10 # add margin
                         if l > longest: longest = l
                 if len(titles):
                     for t in titles:

@@ -4,6 +4,7 @@
 #include "prop.h"
 #include "translate.h"
 #include "parser/parse.h"
+#include "openbox.h"
 
 gboolean config_focus_new;
 gboolean config_focus_follow;
@@ -38,16 +39,6 @@ GSList *config_menu_files;
 
 gint config_resist_win;
 gint config_resist_edge;
-
-gchar *expand_tilde(const gchar *f)
-{
-    if (!f)
-        return NULL;
-    else if (f[0] != '~')
-        return g_strdup(f);
-    else
-        return g_strconcat(g_get_home_dir(), f+1, NULL);
-}
 
 /*
 
@@ -228,7 +219,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
         g_free(config_theme);
         c = parse_string(doc, n);
-        config_theme = expand_tilde(c);
+        config_theme = ob_expand_tilde(c);
         g_free(c);
     }
     if ((n = parse_find_node("titleLayout", node))) {
@@ -343,7 +334,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 
             c = parse_string(doc, node);
             config_menu_files = g_slist_append(config_menu_files,
-                                               expand_tilde(c));
+                                               ob_expand_tilde(c));
             g_free(c);
         }
     }

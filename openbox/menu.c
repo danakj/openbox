@@ -203,7 +203,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
         if ((menu = menu_new(name, title, NULL))) {
             if (parse_attr_string("execute", node, &script)) {
-                menu->execute = g_strdup(script);
+                menu->execute = ob_expand_tilde(script);
             } else {
                 state->menus = g_slist_prepend(state->menus, menu);
                 parse_tree(i, doc, node->xmlChildrenNode);

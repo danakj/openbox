@@ -730,8 +730,11 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     if (parse_attr_string("name", node, &actname)) {
         if ((act = action_from_string(actname))) {
             if (act->func == action_execute || act->func == action_restart) {
-                if ((n = parse_find_node("execute", node->xmlChildrenNode)))
-                    act->data.execute.path = parse_string(doc, n);
+                if ((n = parse_find_node("execute", node->xmlChildrenNode))) {
+                    gchar *s = parse_string(doc, n);
+                    act->data.execute.path = expand_tilde(s);
+                    g_free(s);
+                }
             } else if (act->func == action_showmenu) {
                 if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);

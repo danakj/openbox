@@ -6,9 +6,11 @@
 #############################################################################
 ### Options that can be modified to change the functions' behaviors.      ###
 ###                                                                       ###
-# snap - snap windows to other windows and screen edges while moving them ###
-snap = 1
-###
+# edge_resistance - the amount of resistance to provide to moving a       ###
+###                 window past a screen boundary. Specify a value of 0   ###
+###                 to disable edge resistance.                           ###
+edge_resistance = 10                                                      ###
+###                                                                       ###
 # move_popup - display a coordinates popup when moving windows.           ###
 move_popup = 1                                                            ###
 ###                                                                       ###
@@ -90,9 +92,29 @@ def _do_move():
     x = _cx + _dx
     y = _cy + _dy
 
-    global snap
-    if snap:
-        pass
+    global edge_resistance
+    if edge_resistance:
+        fs = _client.frame.size()
+        w = _client.area().width() + fs.left + fs.right
+        h = _client.area().height() + fs.top + fs.bottom
+        # use the area based on the struts
+        area = ob.openbox.screen(_screen).area()
+        l = area.left()
+        r = area.right() - w
+        t = area.top()
+        b = area.bottom() - h
+        # left screen edge
+        if x < l and x >= l - edge_resistance:
+            x = l
+        # right screen edge
+        if x > r and x <= r + edge_resistance:
+            x = r
+        # top screen edge
+        if y < t and y >= t - edge_resistance:
+            y = t
+        # right screen edge
+        if y > b and y <= b + edge_resistance:
+            y = b
 
     global move_rubberband
     if move_rubberband:
@@ -117,8 +139,8 @@ def _do_move():
             _poplabel.setTexture(style.labelFocusBackground())
         _poplabel.fitString(text)
         _poplabel.setText(text)
-        area = otk.display.screenInfo(_screen).rect()
         _popwidget.update() 
+        area = otk.display.screenInfo(_screen).rect()
         _popwidget.move(area.x() + (area.width() -
                                     _popwidget.width()) / 2,
                         area.y() + (area.height() -

@@ -71,8 +71,7 @@ Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
   lastfocus = (OpenboxWindow *) 0;
 
   name = (char *) 0;
-  char *tmp = screen.getNameOfWorkspace(id);
-  setName(tmp);
+  setName(screen.getNameOfWorkspace(id));
 }
 
 
@@ -297,7 +296,7 @@ void Workspace::setCurrent(void) {
 }
 
 
-void Workspace::setName(char *new_name) {
+void Workspace::setName(const char *new_name) {
   if (name)
     delete [] name;
 
@@ -316,10 +315,8 @@ void Workspace::setName(char *new_name) {
 
 
 void Workspace::shutdown(void) {
-  while (!_windows.empty()) {
+  while (!_windows.empty())
     _windows[0]->restore();
-    delete _windows[0];
-  }
 }
 
 static rectList calcSpace(const Rect &win, const rectList &spaces) {
@@ -420,7 +417,8 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
   spaces.push_back(space); //initially the entire screen is free
   
   //Find Free Spaces
-  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+  winVect::iterator it;
+  for (it = _windows.begin(); it != _windows.end(); ++it)
      spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   
@@ -474,7 +472,8 @@ Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
   spaces.push_back(space); //initially the entire screen is free
   
   //Find Free Spaces
-  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+  winVect::iterator it;
+  for (it = _windows.begin(); it != _windows.end(); ++it)
      spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   //Sort spaces by preference
@@ -514,7 +513,8 @@ Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
   spaces.push_back(space); //initially the entire screen is free
   
   //Find Free Spaces
-  for (winVect::iterator it = _windows.begin(); it != _windows.end(); ++it)
+  winVect::iterator it;
+  for (it = _windows.begin(); it != _windows.end(); ++it)
      spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   //Sort spaces by user preference

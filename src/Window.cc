@@ -3054,6 +3054,8 @@ void OpenboxWindow::restore(void) {
   XMapWindow(display, client.window);
 
   XFlush(display);
+
+  delete this;
 }
 
 

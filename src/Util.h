@@ -29,4 +29,11 @@
 # define ASSERT(x)
 #endif //  DEBUG
 
+struct PointerAssassin {
+  template<typename T>
+  inline void operator()(const T ptr) const {
+    delete ptr;
+  }
+};
+
 #endif // __Util_hh

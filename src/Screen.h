@@ -40,7 +40,6 @@
 #include "BaseDisplay.h"
 #include "Configmenu.h"
 #include "Iconmenu.h"
-#include "LinkedList.h"
 #include "Netizen.h"
 #include "Rootmenu.h"
 #include "Timer.h"
@@ -52,10 +51,14 @@
 #endif // SLIT
 #include "Image.h"
 #include "Resource.h"
+#include "Util.h"
 
 #include <list>
+#include <vector>
 typedef std::list<Rootmenu *> menuList;
 typedef std::list<Netizen *> netList;
+typedef std::vector<Workspace *> wkspList;
+typedef std::vector<std::string> wkspNameList;
 
 // forward declaration
 class BScreen;
@@ -115,7 +118,7 @@ private:
 
   menuList rootmenuList;
   netList netizenList;
-  LinkedList<OpenboxWindow> *iconList;
+  winList iconList;     // winList is declared in Workspace.h
 
 #ifdef    SLIT
   Slit *slit;
@@ -128,8 +131,8 @@ private:
   unsigned int geom_w, geom_h;
   unsigned long event_mask;
 
-  LinkedList<char> *workspaceNames;
-  LinkedList<Workspace> *workspacesList;
+  wkspNameList workspaceNames;
+  wkspList workspacesList;
 
   struct resource {
     WindowStyle wstyle;
@@ -193,7 +196,10 @@ public:
 
   Rect availableArea() const;
   
-  inline Workspace *getWorkspace(int w) { return workspacesList->find(w); }
+  inline Workspace *getWorkspace(int w) {
+    ASSERT(w < workspacesList.size());
+    return workspacesList[w];
+  }
   inline Workspace *getCurrentWorkspace() { return current_workspace; }
 
   inline Workspacemenu *getWorkspacemenu() { return workspacemenu; }
@@ -211,8 +217,8 @@ public:
 
   inline const int getCurrentWorkspaceID()
   { return current_workspace->getWorkspaceID(); }
-  inline const int getWorkspaceCount() { return workspacesList->count(); }
-  inline const int getIconCount() { return iconList->count(); }
+  inline const int getWorkspaceCount() { return workspacesList.size(); }
+  inline const int getIconCount() { return iconList.size(); }
 
   inline const Bool &isRootColormapInstalled() const
     { return root_colormap_installed; }
@@ -291,7 +297,7 @@ public:
   void removeNetizen(Window);
   void addIcon(OpenboxWindow *);
   void removeIcon(OpenboxWindow *);
-  char* getNameOfWorkspace(int);
+  const char *getNameOfWorkspace(int);
   void changeWorkspaceID(int);
   void raiseWindows(Window *, int);
   void reassociateWindow(OpenboxWindow *, int, Bool);

@@ -85,7 +85,7 @@ public:
   void reconfigure();
   void update();
   void setCurrent(void);
-  void setName(char *);
+  void setName(const char *);
   void shutdown(void);
 };
 

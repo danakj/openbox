@@ -2283,6 +2283,9 @@ void OpenboxWindow::unmapNotifyEvent(XUnmapEvent *ue) {
     openbox.grab();
     if (! validateClient()) return;
 
+    if (flags.moving)
+      endMove();
+    
     XChangeSaveSet(display, client.window, SetModeDelete);
     XSelectInput(display, client.window, NoEventMask);
 
@@ -2318,6 +2321,8 @@ void OpenboxWindow::unmapNotifyEvent(XUnmapEvent *ue) {
 
 void OpenboxWindow::destroyNotifyEvent(XDestroyWindowEvent *de) {
   if (de->window == client.window) {
+    if (flags.moving)
+      endMove();
     XUnmapWindow(display, frame.window);
 
     delete this;
@@ -2754,9 +2759,8 @@ void OpenboxWindow::startMove(int x, int y) {
   ASSERT(!flags.moving);
 
   // make sure only one window is moving at a time
-  OpenboxWindow *w;
-  if ((w = openbox.getMaskedWindow()) != (OpenboxWindow *) 0 &&
-      w->flags.moving)
+  OpenboxWindow *w = openbox.getMaskedWindow();
+  if (w != (OpenboxWindow *) 0 && w->flags.moving)
     w->endMove();
   
   XGrabPointer(display, frame.window, False, PointerMotionMask |

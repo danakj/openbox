@@ -20,6 +20,7 @@
 #define __events_h
 
 #include <X11/Xlib.h>
+#include <glib.h>
 
 /*! Time at which the last event with a timestamp occured. */
 extern Time event_lasttime;

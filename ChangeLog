@@ -1,3 +1,286 @@
+2003-09-22  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/place.c: visible is in the frame struct
+
+	* openbox/place.c: ignore non-visible windows too
+
+	* openbox/config.c: simplify the default bindings
+
+	* openbox/client_list_menu.c: s/Activate/Go there/
+
+	* openbox/screen.c: whitespace
+
+	* openbox/client_list_menu.c: gettextize the empty desktop string
+
+	* openbox/client_list_menu.c: change Switch To... to Activate...
+
+	* openbox/grab.c:
+	dont need to swallow enter events on ungrab cuz we just ignore them all now
+
+	* openbox/event.c, openbox/event.h:
+	provide a means to properly ignore enter events for focus changes
+
+	* openbox/config.c, openbox/config.h, openbox/focus.c:
+	add back focusLast
+
+	* openbox/screen.c:
+	eat enter events on desktop switch so that our own policy can be applied
+
+	* openbox/client.c, openbox/openbox.c:
+	we always want to start with something focused, moving this to openbox.c
+
+	* openbox/action.c: add comment
+
+	* openbox/mainloop.c: indenting
+
+2003-09-21  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/action.c, openbox/event.c, openbox/event.h:
+	when ending actions which can move windows, and we were using the mouse, instead of doing a focus fallback, which instantly focuses, and doesn't raise, we do an event_enter_client which simulates the act of entering the window with the pointer
+
+	* openbox/client.c, openbox/client.h, openbox/focus.c:
+	move the code to find the window under the pointer out of focus.c to client.c
+
+	* openbox/place.c:
+	place so to avoid windows in layers above the window being placed!
+
+	* openbox/event.h: add glib.h include
+
+	* openbox/config.c, openbox/config.h: add raiseOnFocus option
+
+	* openbox/event.c: fix race condition in focus delay
+
+	* openbox/event.c: ignore ungrab enter notifies for focus
+
+	* openbox/mouse.c: pass the context to action_run_mouse
+
+	* openbox/action.c, openbox/action.h:
+	grab the pointer before doing client actions more intelligently, i.e. only when using sloppy focus.
+	fallback focus after the action if the action was fired via a mouse binding, otherwise do not. this makes keyboard bindings not fuck with sloppy focus.
+
+	* openbox/config.c, openbox/config.h, openbox/dock.c:
+	rename dock/himeTimeout to dock/hideDelay in the config file
+
+	* openbox/client.c:
+	dont assert, just ignore client_unfocus() when the client isnt already focused
+
+	* openbox/dock.c:
+	dont save the appearance when reconfiguring!! that was a crash waiting to happen!!
+	also reset the border stuff on reconfigure
+
+	* openbox/event.c, openbox/event.h:
+	allow a number of enter events to be ignored. Don't just skip any enter/leave events as these are used for highlighting hover buttons and ignoring these makes the hover state out of sync sometimes
+
+	* openbox/grab.c:
+	count the EnterNotify events and tell openbox to ignore them when ungrabbing the pointer
+
+	* openbox/action.c: if the keyboard is grabbed then dont ungrab it!
+
+	* openbox/grab.c, openbox/grab.h:
+	export if the keyboard and pointer are currently grabbed or not
+
+	* openbox/keyboard.c, openbox/keyboard.h: remove that shti
+
+	* openbox/action.h: whitespace
+
+	* openbox/keyboard.c, openbox/keyboard.h:
+	export if an interactive grab is in progress
+
+	* openbox/focus.c:
+	dont drop out of dirfocus when there is no new target to be found
+
+	* openbox/client_list_menu.c: use the new action_run symantics
+
+	* tests/icons.c: declare variables at the top of the blocks
+
+	* openbox/menu.c: dont add null actions to the list
+
+2003-09-20  Ben Jansens  <xor@zed.orodu.net>
+
+	* Makefile.am: use DESTDIR in install-data-hook
+
+2003-09-19  Ben Jansens  <xor@zed.orodu.net>
+
+	* data/.cvsignore: add the generated xml files
+
+	* openbox/place.c: smart xinerama placement for groups
+
+	* openbox/place.c:
+	smart placement has a fallback for just groups now too
+
+	* Makefile.am: install the menu.xsd
+
+	* Makefile.am, data/menu.xml, data/menu.xml.in, data/menu.xsd, data/rc.xml, data/rc.xml.in, data/rc.xsd:
+	add the schemas to the distribution
+
+	* configure.ac: look for sed
+
+	* openbox/mouse.c: comment
+
+	* openbox/keyboard.c, openbox/menuframe.c, openbox/mouse.c:
+	use the new action ru system which always runs lists of actions instead of individual ones
+
+	* openbox/config.c: const
+
+	* openbox/action.c, openbox/action.h:
+	only allow running lists of actions at a time, policy is to always allow multiple action bindings, so this enforces it, and at the same time, UngrabKeyboard() before firing actions if there are no interactive ones. This is needed for some execute's, namely gnome-panel-control --main-menu.
+
+	* openbox/client.c:
+	properly send resize events for when the app has requested the resize
+
+	* openbox/config.c: dont allow 0 desktops
+
+2003-09-18  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/client.c:
+	dont split client requested resizes into 2 events, thanks to manmower for this idea
+
+	* openbox/session.c: make a warning into a debug message
+
+	* Makefile.am, tools/gnome-panel-control/.cvsignore, tools/gnome-panel-control/gnome-panel-control.c:
+	rename gnomepanelproxy to gnome-panel-control
+
+	* Makefile.am, tools/gnome-panel-control/.cvsignore, tools/gnome-panel-control/Makefile, tools/gnome-panel-control/gnome-panel-control.c:
+	add gnomepanelproxy
+
+	* openbox/client_list_menu.c:
+	add a 'Switch to...' entry to empty desktops in the client-list-menu
+
+	* openbox/event.c:
+	while doing a moveresize, the client actions act on will be the client being moveresized
+
+	* openbox/resist.c: off by one error
+
+2003-09-17  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/config.c:
+	provide some default bindings, not a complete list from the rc.xml.. yet.
+
+	* openbox/keyboard.c, openbox/keyboard.h, openbox/mouse.c, openbox/mouse.h:
+	provide a way to remove all bindings
+
+	* openbox/frame.c, openbox/frame.h, openbox/translate.c, openbox/translate.h, openbox/action.h, openbox/action.c:
+	const
+
+	* gettext.h, openbox/action.c, openbox/action.h, openbox/client.c, openbox/client.h, openbox/client_list_menu.c, openbox/client_list_menu.h, openbox/client_menu.c, openbox/client_menu.h, openbox/config.c, openbox/config.h, openbox/debug.c, openbox/debug.h, openbox/dock.c, openbox/dock.h, openbox/event.c, openbox/event.h, openbox/extensions.c, openbox/extensions.h, openbox/focus.c, openbox/focus.h, openbox/frame.c, openbox/frame.h, openbox/framerender.c, openbox/framerender.h, openbox/geom.h, openbox/grab.c, openbox/grab.h, openbox/group.c, openbox/group.h, openbox/keyboard.c, openbox/keyboard.h, openbox/keytree.c, openbox/keytree.h, openbox/mainloop.c, openbox/mainloop.h, openbox/menu.c, openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h, openbox/misc.h, openbox/mouse.c, openbox/mouse.h, openbox/moveresize.c, openbox/moveresize.h, openbox/mwm.h, openbox/openbox.c, openbox/openbox.h, openbox/place.c, openbox/place.h, openbox/popup.c, openbox/popup.h, openbox/prop.c, openbox/prop.h, openbox/resist.c, openbox/resist.h, openbox/screen.c, openbox/screen.h, openbox/session.c, openbox/session.h, openbox/stacking.c, openbox/stacking.h, openbox/startupnotify.c, openbox/startupnotify.h, openbox/translate.c, openbox/translate.h, openbox/window.c, openbox/window.h, openbox/xerror.c, openbox/xerror.h, parser/parse.c, parser/parse.h, render/color.c, render/color.h, render/font.c, render/font.h, render/geom.h, render/gradient.c, render/gradient.h, render/icon.h, render/image.c, render/image.h, render/instance.c, render/instance.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h, tests/aspect.c, tests/fullscreen.c, tests/grav.c, tests/icons.c, tests/modal.c, tests/modal2.c, tests/modal3.c, tests/noresize.c, tests/override.c, tests/urgent.c, tools/kdetrayproxy/kdetrayproxy.c:
+	no tabs
+
+	* gettext.h, openbox/action.c, openbox/action.h, openbox/client.c, openbox/client.h, openbox/client_list_menu.c, openbox/client_list_menu.h, openbox/client_menu.c, openbox/client_menu.h, openbox/config.c, openbox/config.h, openbox/debug.c, openbox/debug.h, openbox/dock.c, openbox/dock.h, openbox/event.c, openbox/event.h, openbox/extensions.c, openbox/extensions.h, openbox/focus.c, openbox/focus.h, openbox/frame.c, openbox/frame.h, openbox/framerender.c, openbox/framerender.h, openbox/geom.h, openbox/grab.c, openbox/grab.h, openbox/group.c, openbox/group.h, openbox/keyboard.c, openbox/keyboard.h, openbox/keytree.c, openbox/keytree.h, openbox/mainloop.c, openbox/mainloop.h, openbox/menu.c, openbox/menu.h, openbox/menuframe.c, openbox/menuframe.h, openbox/misc.h, openbox/mouse.c, openbox/mouse.h, openbox/moveresize.c, openbox/moveresize.h, openbox/mwm.h, openbox/openbox.c, openbox/openbox.h, openbox/place.c, openbox/place.h, openbox/popup.c, openbox/popup.h, openbox/prop.c, openbox/prop.h, openbox/resist.c, openbox/resist.h, openbox/screen.c, openbox/screen.h, openbox/session.c, openbox/session.h, openbox/stacking.c, openbox/stacking.h, openbox/startupnotify.c, openbox/startupnotify.h, openbox/translate.c, openbox/translate.h, openbox/window.c, openbox/window.h, openbox/xerror.c, openbox/xerror.h, parser/parse.c, parser/parse.h, render/color.c, render/color.h, render/font.c, render/font.h, render/geom.h, render/gradient.c, render/gradient.h, render/icon.h, render/image.c, render/image.h, render/instance.c, render/instance.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h, tests/aspect.c, tests/fullscreen.c, tests/grav.c, tests/icons.c, tests/modal.c, tests/modal2.c, tests/modal3.c, tests/noresize.c, tests/override.c, tests/urgent.c, tools/kdetrayproxy/kdetrayproxy.c, tools/themeupdate/themeupdate.py:
+	add copyright headers, adjust --version output to include copyright, and --help output to not include version output.
+
+	* Makefile.am: make the installed themeupdate.py executable
+
+	* Makefile.am: install themupdate.py to share/openbox/
+
+	* data/rc.xml, openbox/frame.c, openbox/frame.h, openbox/mouse.c:
+	add the MoveResize context, which is used while doing a move/resize on a window. Actions bound in this context can be executed with the mouse during a move/resize on a window.
+
+	* openbox/menuframe.c, render/theme.c, render/theme.h:
+	api cleanups for render/theme.h
+
+	* openbox/menuframe.c: use the theme padding for the menu title's size
+
+	* openbox/action.c, openbox/event.c, openbox/openbox.c, openbox/openbox.h, openbox/session.c:
+	make ob_exit() take an error code. don't exit with 0 for signals other than TERM and INT.
+
+	* openbox/openbox.c:
+	move where grabs are init'd since they use the screen_support_win now
+
+	* openbox/menu.c: remoev unneeded include
+
+	* themes/Artwiz/openbox-3/themerc, themes/Blah41/openbox-3/themerc, themes/Om4Ob/openbox-3/themerc:
+	fix to be up-to-date with the theme spec
+
+	* openbox/translate.c:
+	allow the use of keycodes directly in key bindings
+
+2003-09-16  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/moveresize.c:
+	dont assert if a moveresize is started while one is in progress. apps could do this with client messages, or the user can easily do it with actions.
+
+	* openbox/grab.c:
+	grab the pointer on the screen_support_win, causing all mouse events during a grab to not be acted on as if they were on the root window/context
+
+	* Makefile.am: dont use -release for libtool
+
+	* openbox/screen.c:
+	fallback when nothing is focused and we switch desktops!
+
+	* openbox/event.c: ifdef DEBUG_FOCUS focus output
+
+	* data/rc.xml: default to "TheBear"
+
+	* Makefile.am: fix properly
+
+	* Makefile.am: make TheBear install poroerly in its openbox-3 dir
+
+	* Makefile.am, configure.ac:
+	install the libs with release and version info via libtool
+
+2003-09-15  Ben Jansens  <xor@zed.orodu.net>
+
+	* render/theme.c: look in ~/.themes for themes also
+
+	* render/icon.h: new icon from merry, more clarity when small
+
+	* Makefile.am, configure.ac, openbox/action.c, openbox/config.c, openbox/menu.c, openbox/openbox.c, openbox/openbox.h, openbox/session.c, parser/parse.c, parser/parse.h, render/obrender-3.0.pc.in, render/theme.c:
+	make openbox base-dir spec compliant, and change the theme dir structure, so that themes go in $XDG_DATA_DIRS/themes/ with gtk/metacity/whateverelse themes
+
+	* openbox/client.c, openbox/event.c, openbox/focus.c, openbox/mainloop.c, openbox/mainloop.h, openbox/startupnotify.c:
+	revert my commit of d3th, it fucked up focus badly
+
+	* openbox/stacking.c: raise all the windows with the transient
+
+	* openbox/stacking.c: raise all parents with a transient
+
+	* openbox/client.c, openbox/event.c, openbox/focus.c, openbox/mainloop.c, openbox/mainloop.h, openbox/stacking.c, openbox/startupnotify.c:
+	break focus. or maybe make it better.
+	these changes make it work when you alt-tab off a fullscreen window, that it doesnt iconify, and that it is immediately restacked instead of waiting for a FocusIn event to arrive. The code now assumes that if the window says it can focus, that if we focus it, it is focused.
+	add the XDone handler to ObMainLoop, which is fired upon the occurance of there being no more X events to read.
+
+	* openbox/event.c:
+	dont leave non-submenu items selected when the mouse isnt over them
+
+	* ChangeLog: recent changes
+
+	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c, openbox/focus.c, openbox/focus.h, openbox/screen.c:
+	remove focusLast and focusLastOnDesktop
+
+	* openbox/focus.c: fix directional focus when nothing is focused
+
+	* ChangeLog: recent changes
+
+	* configure.ac: beta3
+
+	* openbox/session.c: use the sm_client_id in the client struct
+
+	* openbox/client.c, openbox/client.h:
+	save the sm_client_id just like saving other properties, dont query each time its needed
+
+	* openbox/event.c:
+	propogate property changes on the group leader to the whole group
+
+	* openbox/popup.c: remove debug prints
+
+	* openbox/startupnotify.c: remove debug print
+
+	* openbox/event.c: sloppy focus fixes, ignore a few more enter events
+
+	* openbox/focus.c:
+	fix crashing when doing a directional focus with no windows on the desktop
+
+	* openbox/place.c: best fit only one direction
+
+	* openbox/place.c: no center in the first smart-place
+
+	* openbox/place.c: sort smallest to largest area
+
+	* openbox/place.c: 2 passes at smart placement
+
+	* openbox/place.c:
+	smart placement only avoids the focused window, and centers in its area
+
 2003-09-15  Ben Jansens  <xor@zed.orodu.net>
 
 	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c, openbox/focus.c, openbox/focus.h, openbox/screen.c:

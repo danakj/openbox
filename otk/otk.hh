@@ -2,6 +2,8 @@
 #ifndef __otk_hh
 #define __otk_hh
 
+#include "../config.h"
+
 #include "eventdispatcher.hh"
 #include "eventhandler.hh"
 #include "widget.hh"

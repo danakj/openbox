@@ -1,5 +1,6 @@
 #include "client.h"
 #include "dock.h"
+#include "xerror.h"
 #include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
@@ -1362,6 +1363,7 @@ void client_update_icons(Client *self)
         if (num == 2) {
             self->nicons++;
             self->icons = g_new(Icon, self->nicons);
+            xerror_set_ignore(TRUE);
             if (!render_pixmap_to_rgba(data[0], data[1],
                                        &self->icons[self->nicons-1].width,
                                        &self->icons[self->nicons-1].height,
@@ -1369,6 +1371,7 @@ void client_update_icons(Client *self)
                 g_free(&self->icons[self->nicons-1]);
                 self->nicons--;
             }
+            xerror_set_ignore(FALSE);
         }
         g_free(data);
     } else {
@@ -1378,6 +1381,7 @@ void client_update_icons(Client *self)
             if (hints->flags & IconPixmapHint) {
                 self->nicons++;
                 self->icons = g_new(Icon, self->nicons);
+                xerror_set_ignore(TRUE);
                 if (!render_pixmap_to_rgba(hints->icon_pixmap,
                                            (hints->flags & IconMaskHint ?
                                             hints->icon_mask : None),
@@ -1387,6 +1391,7 @@ void client_update_icons(Client *self)
                     g_free(&self->icons[self->nicons-1]);
                     self->nicons--;
                 }
+                xerror_set_ignore(FALSE);
             }
             XFree(hints);
         }

@@ -946,7 +946,8 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                 a->data.inter.cancel = cancel;
                 a->data.inter.final = done;
                 if (!(cancel || done))
-                    keyboard_interactive_grab(state, a->data.any.c, a);
+                    if (!keyboard_interactive_grab(state, a->data.any.c, a))
+                        continue;
 
                 /* interactive actions are not queued */
                 a->func(&a->data);

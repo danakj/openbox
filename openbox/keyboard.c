@@ -155,8 +155,8 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
     return TRUE;
 }
 
-void keyboard_interactive_grab(guint state, ObClient *client,
-                               ObAction *action)
+gboolean keyboard_interactive_grab(guint state, ObClient *client,
+                                   ObAction *action)
 {
     ObInteractiveState *s;
 
@@ -164,10 +164,10 @@ void keyboard_interactive_grab(guint state, ObClient *client,
 
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
-            return;
+            return FALSE;
         if (!grab_pointer(TRUE, OB_CURSOR_NONE)) {
             grab_keyboard(FALSE);
-            return;
+            return FALSE;
         }
     }
 
@@ -178,6 +178,8 @@ void keyboard_interactive_grab(guint state, ObClient *client,
     s->actions = g_slist_append(NULL, action);
 
     interactive_states = g_slist_append(interactive_states, s);
+
+    return TRUE;
 }
 
 void keyboard_interactive_end(ObInteractiveState *s,

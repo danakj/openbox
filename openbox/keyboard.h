@@ -39,8 +39,8 @@ void keyboard_unbind_all();
 void keyboard_event(struct _ObClient *client, const XEvent *e);
 void keyboard_reset_chains();
 
-void keyboard_interactive_grab(guint state, struct _ObClient *client,
-                               struct _ObAction *action);
+gboolean keyboard_interactive_grab(guint state, struct _ObClient *client,
+                                   struct _ObAction *action);
 gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            struct _ObClient **client);
 

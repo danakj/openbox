@@ -122,13 +122,13 @@ public:
   void setAtomValue(Window win, Atom atom, Atom value) const;
   void setWindowValue(Window win, Atom atom, Window value) const;
   void setPixmapValue(Window win, Atom atom, Pixmap value) const;
-  void setStringValue(Window win, Atom atom, std::string &value) const;
+  void setStringValue(Window win, Atom atom, const std::string &value) const;
   
   void addCardValue(Window win, Atom atom, long value) const; // 32-bit CARDINAL
   void addAtomValue(Window win, Atom atom, Atom value) const;
   void addWindowValue(Window win, Atom atom, Window value) const;
   void addPixmapValue(Window win, Atom atom, Pixmap value) const;
-  void addStringValue(Window win, Atom atom, std::string &value) const;
+  void addStringValue(Window win, Atom atom, const std::string &value) const;
 
   // the 'value' is allocated inside the function and
   // delete [] value needs to be called when you are done with it.
@@ -142,8 +142,7 @@ public:
                 Window **value) const;
   bool getPixmapValue(Window win, Atom atom, unsigned long *nelements,
                 Pixmap **value) const;
-  bool getStringValue(Window win, Atom atom, unsigned long *nelements,
-                std::string &value) const; 
+  bool getStringValue(Window win, Atom atom, std::string &value) const;
   
   void eraseValue(Window win, Atom atom) const;
   

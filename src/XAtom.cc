@@ -182,7 +182,8 @@ void XAtom::setPixmapValue(Window win, Atom atom, Pixmap value) const {
 /*
  * Set a string property value on a window.
  */
-void XAtom::setStringValue(Window win, Atom atom, std::string &value) const {
+void XAtom::setStringValue(Window win, Atom atom,
+                           const std::string &value) const {
   setValue(win, atom, XA_STRING,
            const_cast<unsigned char*>
            (reinterpret_cast<const unsigned char*>(value.c_str())),
@@ -229,7 +230,8 @@ void XAtom::addPixmapValue(Window win, Atom atom, Pixmap value) const {
 /*
  * Add characters to a string property value on a window.
  */
-void XAtom::addStringValue(Window win, Atom atom, std::string &value) const {
+void XAtom::addStringValue(Window win, Atom atom,
+                           const std::string &value) const {
   setValue(win, atom, XA_STRING,
            const_cast<unsigned char*>
            (reinterpret_cast<const unsigned char *>
@@ -328,10 +330,10 @@ bool XAtom::getPixmapValue(Window win, Atom atom, unsigned long *nelements,
 /*
  * Gets an string property's value from a window.
  */
-bool XAtom::getStringValue(Window win, Atom atom, unsigned long *nelements,
-                     std::string &value) const {
+bool XAtom::getStringValue(Window win, Atom atom, std::string &value) const {
   unsigned char *data;
-  bool ret = XAtom::getValue(win, atom, XA_STRING, nelements, &data, 8);
+  unsigned long nelements;
+  bool ret = XAtom::getValue(win, atom, XA_STRING, &nelements, &data, 8);
   if (ret)
     value = reinterpret_cast<char*>(data);
   return ret;

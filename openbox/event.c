@@ -232,7 +232,8 @@ void event_process(XEvent *e)
            for FocusOut, so it is safely ignored there.
         */
 	if (e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail > NotifyNonlinearVirtual || client == NULL) {
+            e->xfocus.detail > NotifyNonlinearVirtual ||
+            client == NULL) {
             /* says a client was not found for the event (or a valid FocusIn
                event was not found.
             */
@@ -254,13 +255,21 @@ void event_process(XEvent *e)
         /* Try process a FocusIn first, and if a legit one isn't found, then
            do the fallback shiznit. */
         {
-            XEvent fi;
+            XEvent fi, fo;
+            gboolean isfo = FALSE;
+
             if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
 		event_process(&fi);
 
+                /* when we have gotten a fi/fo pair, then see if there are any
+                   more fo's coming. if there are, then don't fallback just yet
+                */
+                if ((isfo = XCheckTypedEvent(ob_display, FocusOut, &fo)))
+                    XPutBackEvent(ob_display, &fo);
+
                 /* secret magic way of event_process telling us that no client
                    was found for the FocusIn event. ^_^ */
-                if (fi.xfocus.window == None)
+                if (!isfo && fi.xfocus.window == None)
                     focus_fallback(FALSE);
                 if (fi.xfocus.window == e->xfocus.window)
                     return;

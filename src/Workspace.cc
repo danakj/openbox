@@ -59,6 +59,7 @@
 #endif // HAVE_STRING_H
 
 #include <vector>
+#include <algorithm>
 typedef vector<Rect> rectList;
 
 Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
@@ -371,11 +372,35 @@ static rectList calcSpace(const Rect &win, const rectList &spaces) {
   return result;
 }
 
+
+bool incWidth(const Rect &first, const Rect &second) {
+  return first.x() < second.x();
+}
+
+
+bool decWidth(const Rect &first, const Rect &second) {
+  if (second.x() == first.x())
+     return second.w() < first.w();
+  return second.x() < first.x();
+}
+
+
+bool incHeight(const Rect &first, const Rect &second) {
+  return first.y() < second.y();
+}
+
+
+bool decHeight(const Rect &first, const Rect &second) {
+  if (second.y() == first.y())
+     return second.h() < first.h();
+  return second.y() < first.y();
+}
+
+
 //BestFitPlacement finds the smallest free space that fits the window
 //to be placed. It currentl ignores whether placement is right to left or top
 //to bottom.
-Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
-{
+Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
   const Rect *best;
   rectList spaces;
   LinkedListIterator<OpenboxWindow> it(windowList);
@@ -410,6 +435,46 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
     return NULL; //fall back to cascade
 }
 
+
+Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
+  const Rect *best;
+  rectList spaces;
+  LinkedListIterator<OpenboxWindow> it(windowList);
+  rectList::const_iterator siter;
+  spaces.push_back(space); //initially the entire screen is free
+  it.reset();
+  
+  //Find Free Spaces
+  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
+     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+                        spaces);
+  
+  //Sort the spaces by placement choice
+  if (screen.rowPlacementDirection() == BScreen::TopBottom)
+     sort(spaces.begin(),spaces.end(),incHeight);
+  else
+     sort(spaces.begin(),spaces.end(),decHeight);
+
+  //Find first space that fits the window
+  best = NULL;
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
+    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
+      best = siter;
+      break;
+    }
+
+  if (best != NULL) {
+    Point *pt = new Point(best->origin());
+    if (screen.colPlacementDirection() != BScreen::TopBottom)
+      pt->setY(pt->y() + (best->h() - win_size.h()));
+    if (screen.rowPlacementDirection() != BScreen::LeftRight)
+      pt->setX(pt->x() + (best->w() - win_size.w()));
+    return pt;
+  } else
+    return NULL; //fall back to cascade
+}
+
+/*
 inline Point *Workspace::rowSmartPlacement(const Size &win_size,
                                            const Rect &space){
   bool placed=false;
@@ -469,7 +534,47 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
   else
     return NULL; // fall back to cascade
 }
+*/
 
+Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
+  const Rect *best;
+  rectList spaces;
+  LinkedListIterator<OpenboxWindow> it(windowList);
+  rectList::const_iterator siter;
+  spaces.push_back(space); //initially the entire screen is free
+  it.reset();
+  
+  //Find Free Spaces
+  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
+     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+                        spaces);
+  
+  //Sort the spaces by placement choice
+  if (screen.rowPlacementDirection() == BScreen::LeftRight)
+     sort(spaces.begin(),spaces.end(),incWidth);
+  else
+     sort(spaces.begin(),spaces.end(),decWidth);
+
+  //Find first space that fits the window
+  best = NULL;
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
+    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
+      best = siter;
+      break;
+    }
+
+  if (best != NULL) {
+    Point *pt = new Point(best->origin());
+    if (screen.colPlacementDirection() != BScreen::TopBottom)
+      pt->setY(pt->y() + (best->h() - win_size.h()));
+    if (screen.rowPlacementDirection() != BScreen::LeftRight)
+      pt->setX(pt->x() + (best->w() - win_size.w()));
+    return pt;
+  } else
+    return NULL; //fall back to cascade
+}
+
+/*
 inline Point * Workspace::colSmartPlacement(const Size &win_size,
                                             const Rect &space){
   Point *pt;
@@ -531,6 +636,7 @@ inline Point * Workspace::colSmartPlacement(const Size &win_size,
   else
     return NULL;
 }
+*/
 
 Point *const Workspace::cascadePlacement(const OpenboxWindow *const win){
   if (((unsigned) cascade_x > (screen.size().w() / 2)) ||

@@ -121,21 +121,18 @@ void OBFrame::adjust()
   _decorations = _client->decorations();
   _decorations = 0xffffffff;
   
-  int width;   // the width of the client window and the border around it
+  int width;   // the width of the whole frame
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
   
   if (_decorations & OBClient::Decor_Border) {
     bwidth = _style->getBorderWidth();
     cbwidth = _style->getFrameWidth();
-    _size.left = _size.top = _size.bottom = _size.right =
-      _style->getFrameWidth();
-    width = _client->area().width() + _style->getFrameWidth() * 2;
-  } else {
+  } else
     bwidth = cbwidth = 0;
-    _size.left = _size.top = _size.bottom = _size.right = 0;
-    width = _client->area().width();
-  }
+  _size.left = _size.top = _size.bottom = _size.right = bwidth + cbwidth;
+  width = _client->area().width() + (bwidth + cbwidth) * 2;
+
   XSetWindowBorderWidth(otk::OBDisplay::display, _plate.getWindow(), cbwidth);
 
   XSetWindowBorderWidth(otk::OBDisplay::display, getWindow(), bwidth);
@@ -250,8 +247,8 @@ void OBFrame::adjust()
   resize(_size.left + _size.right + _client->area().width(),
          _size.top + _size.bottom + _client->area().height());
 
-  _plate.setGeometry(_size.left, _size.top, _client->area().width(),
-                     _client->area().height());
+  _plate.setGeometry(_size.left - cbwidth, _size.top - cbwidth,
+                     _client->area().width(), _client->area().height());
 
   // map/unmap all the windows
   if (_decorations & OBClient::Decor_Titlebar) {

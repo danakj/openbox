@@ -56,8 +56,6 @@ Configmenu.o: Configmenu.cc i18n.hh ../nls/blackbox-nls.hh \
  Rootmenu.hh Workspace.hh Workspacemenu.hh blackbox.hh \
  Configuration.hh XAtom.hh Window.hh Windowmenu.hh
 Configuration.o: Configuration.cc ../config.h Configuration.hh Util.hh
-Font.o: Font.cc Font.hh Util.hh GCCache.hh BaseDisplay.hh Timer.hh \
- Color.hh
 GCCache.o: GCCache.cc GCCache.hh BaseDisplay.hh Timer.hh Util.hh \
  Color.hh
 Iconmenu.o: Iconmenu.cc i18n.hh ../nls/blackbox-nls.hh Iconmenu.hh \
@@ -71,9 +69,6 @@ Image.o: Image.cc blackbox.hh i18n.hh ../nls/blackbox-nls.hh \
 ImageControl.o: ImageControl.cc blackbox.hh i18n.hh \
  ../nls/blackbox-nls.hh BaseDisplay.hh Timer.hh Util.hh \
  Configuration.hh XAtom.hh Color.hh Image.hh Texture.hh
-Input.o: Input.cc Input.hh blackbox.hh i18n.hh ../nls/blackbox-nls.hh \
- BaseDisplay.hh Timer.hh Util.hh Configuration.hh XAtom.hh Window.hh \
- Windowmenu.hh Basemenu.hh
 Netizen.o: Netizen.cc Netizen.hh Screen.hh Color.hh Texture.hh Util.hh \
  Image.hh Timer.hh BaseDisplay.hh Configmenu.hh Basemenu.hh \
  Iconmenu.hh Rootmenu.hh Workspace.hh Workspacemenu.hh blackbox.hh \
@@ -87,7 +82,7 @@ Screen.o: Screen.cc ../config.h i18n.hh ../nls/blackbox-nls.hh \
  Clientmenu.hh Basemenu.hh GCCache.hh Color.hh Iconmenu.hh Image.hh \
  Screen.hh Texture.hh Configmenu.hh Netizen.hh Rootmenu.hh \
  Workspace.hh Workspacemenu.hh Slit.hh Toolbar.hh Window.hh \
- Windowmenu.hh Input.hh
+ Windowmenu.hh
 Slit.o: Slit.cc i18n.hh ../nls/blackbox-nls.hh blackbox.hh \
  BaseDisplay.hh Timer.hh Util.hh Configuration.hh XAtom.hh Image.hh \
  Color.hh Screen.hh Texture.hh Configmenu.hh Basemenu.hh Iconmenu.hh \

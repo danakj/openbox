@@ -1039,8 +1039,6 @@ void client_update_wmhints(Client *self)
         if (hints->window_group != (self->group ? self->group->leader : None)){
             /* remove from the old group if there was one */
             if (self->group != NULL) {
-                group_remove(self->group, self);
-
                 /* remove transients of the group */
                 for (it = self->group->members; it; it = it->next)
                     if (it->data != self &&
@@ -1048,6 +1046,7 @@ void client_update_wmhints(Client *self)
                         self->transients = g_slist_remove(self->transients,
                                                           it->data);
                     }
+                group_remove(self->group, self);
                 self->group = NULL;
             }
             if (hints->window_group != None)

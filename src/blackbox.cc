@@ -112,26 +112,6 @@ using std::string;
 #include "Workspacemenu.hh"
 #include "XAtom.hh"
 
-// X event scanner for enter/leave notifies - adapted from twm
-struct scanargs {
-  Window w;
-  bool leave, inferior, enter;
-};
-
-static Bool queueScanner(Display *, XEvent *e, char *args) {
-  scanargs *scan = (scanargs *) args;
-  if ((e->type == LeaveNotify) &&
-      (e->xcrossing.window == scan->w) &&
-      (e->xcrossing.mode == NotifyNormal)) {
-    scan->leave = True;
-    scan->inferior = (e->xcrossing.detail == NotifyInferior);
-  } else if ((e->type == EnterNotify) && (e->xcrossing.mode == NotifyUngrab)) {
-    scan->enter = True;
-  }
-
-  return False;
-}
-
 Blackbox *blackbox;
 
 
@@ -474,24 +454,12 @@ void Blackbox::process_event(XEvent *e) {
 
     if (e->xcrossing.mode == NotifyGrab) break;
 
-    XEvent dummy;
-    scanargs sa;
-    sa.w = e->xcrossing.window;
-    sa.enter = sa.leave = False;
-    XCheckIfEvent(getXDisplay(), &dummy, queueScanner, (char *) &sa);
-
     if ((e->xcrossing.window == e->xcrossing.root) &&
         (screen = searchScreen(e->xcrossing.window))) {
       screen->getImageControl()->installRootColormap();
     } else if ((win = searchWindow(e->xcrossing.window))) {
-      if (win->getScreen()->isSloppyFocus() &&
-          (! win->isFocused()) && (! no_focus) &&
-          win->isNormal()) {  // don't focus non-normal windows with mouseover
-        if ((! sa.leave || sa.inferior) && win->isVisible()) {
-          if (win->setInputFocus())
-            win->installColormap(True); // XXX: shouldnt we honour no install?
-        }
-      }
+      if (! no_focus)
+        win->enterNotifyEvent(&e->xcrossing);
     } else if ((menu = searchMenu(e->xcrossing.window))) {
       menu->enterNotifyEvent(&e->xcrossing);
     } else if ((tbar = searchToolbar(e->xcrossing.window))) {
@@ -513,7 +481,7 @@ void Blackbox::process_event(XEvent *e) {
     if ((menu = searchMenu(e->xcrossing.window)))
       menu->leaveNotifyEvent(&e->xcrossing);
     else if ((win = searchWindow(e->xcrossing.window)))
-      win->installColormap(False);
+      win->leaveNotifyEvent(&e->xcrossing);
     else if ((tbar = searchToolbar(e->xcrossing.window)))
       tbar->leaveNotifyEvent(&e->xcrossing);
     else if ((slit = searchSlit(e->xcrossing.window)))

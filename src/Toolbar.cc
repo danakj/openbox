@@ -53,16 +53,14 @@ using std::string;
 
 #include "i18n.hh"
 #include "blackbox.hh"
-#include "Clientmenu.hh"
 #include "Font.hh"
 #include "GCCache.hh"
-#include "Iconmenu.hh"
 #include "Image.hh"
-#include "Rootmenu.hh"
 #include "Screen.hh"
 #include "Toolbar.hh"
 #include "Window.hh"
 #include "Workspace.hh"
+#include "Clientmenu.hh"
 #include "Workspacemenu.hh"
 #include "Slit.hh"
 
@@ -910,11 +908,10 @@ void Toolbar::keyPressEvent(const XKeyEvent *ke) {
       editing = False;
 
       blackbox->setNoFocus(False);
-      if (blackbox->getFocusedWindow()) {
+      if (blackbox->getFocusedWindow())
         blackbox->getFocusedWindow()->setInputFocus();
-      } else {
+      else
         blackbox->setFocusedWindow(0);
-      }
 
       // the toolbar will be reconfigured when the change to the workspace name
       // gets caught in the PropertyNotify event handler

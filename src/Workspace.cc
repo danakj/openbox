@@ -222,36 +222,6 @@ void Workspace::setFocused(const BlackboxWindow *w, bool focused) {
 }
 
 
-void Workspace::showAll(void) {
-  BlackboxWindowList::iterator it = stackingList.begin();
-  const BlackboxWindowList::iterator end = stackingList.end();
-  for (; it != end; ++it) {
-    BlackboxWindow *bw = *it;
-    // not normal windows cant focus from mouse enters anyways, so we dont
-    // need to unmap/remap them on workspace changes
-    if (! bw->isStuck() || bw->isNormal())
-      bw->show();
-  }
-}
-
-
-void Workspace::hideAll(void) {
-  // withdraw in reverse order to minimize the number of Expose events
-
-  BlackboxWindowList lst(stackingList.rbegin(), stackingList.rend());
-
-  BlackboxWindowList::iterator it = lst.begin();
-  const BlackboxWindowList::iterator end = lst.end();
-  for (; it != end; ++it) {
-    BlackboxWindow *bw = *it;
-    // not normal windows cant focus from mouse enters anyways, so we dont
-    // need to unmap/remap them on workspace changes
-    if (! bw->isStuck() || bw->isNormal())
-      bw->withdraw();
-  }
-}
-
-
 void Workspace::removeAll(void) {
   while (! windowList.empty())
     windowList.front()->iconify();
@@ -262,14 +232,16 @@ void Workspace::removeAll(void) {
  * returns the number of transients for win, plus the number of transients
  * associated with each transient of win
  */
-static int countTransients(const BlackboxWindow * const win) {
-  int ret = win->getTransients().size();
-  if (ret > 0) {
-    BlackboxWindowList::const_iterator it, end = win->getTransients().end();
-    for (it = win->getTransients().begin(); it != end; ++it) {
-      ret += countTransients(*it);
-    }
-  }
+static unsigned int countTransients(const BlackboxWindow * const win) {
+  BlackboxWindowList transients = win->getTransients();
+  if (transients.empty()) return 0;
+
+  unsigned int ret = transients.size();
+  BlackboxWindowList::const_iterator it = transients.begin(),
+    end = transients.end();
+  for (; it != end; ++it)
+    ret += countTransients(*it);
+
   return ret;
 }
 
@@ -282,48 +254,48 @@ static int countTransients(const BlackboxWindow * const win) {
  */
 void Workspace::raiseTransients(const BlackboxWindow * const win,
                                 StackVector::iterator &stack) {
-  if (win->getTransients().size() == 0) return; // nothing to do
+  if (win->getTransients().empty()) return; // nothing to do
 
   // put win's transients in the stack
   BlackboxWindowList::const_iterator it, end = win->getTransients().end();
   for (it = win->getTransients().begin(); it != end; ++it) {
-    *stack++ = (*it)->getFrameWindow();
-    screen->updateNetizenWindowRaise((*it)->getClientWindow());
+    BlackboxWindow *w = *it;
+    *stack++ = w->getFrameWindow();
+    screen->updateNetizenWindowRaise(w->getClientWindow());
 
-    if (! (*it)->isIconic()) {
-      Workspace *wkspc = screen->getWorkspace((*it)->getWorkspaceNumber());
-      wkspc->stackingList.remove((*it));
-      wkspc->stackingList.push_front((*it));
+    if (! w->isIconic()) {
+      Workspace *wkspc = screen->getWorkspace(w->getWorkspaceNumber());
+      wkspc->stackingList.remove(w);
+      wkspc->stackingList.push_front(w);
     }
   }
 
   // put transients of win's transients in the stack
-  for (it = win->getTransients().begin(); it != end; ++it) {
+  for (it = win->getTransients().begin(); it != end; ++it)
     raiseTransients(*it, stack);
-  }
 }
 
 
 void Workspace::lowerTransients(const BlackboxWindow * const win,
                                 StackVector::iterator &stack) {
-  if (win->getTransients().size() == 0) return; // nothing to do
+  if (win->getTransients().empty()) return; // nothing to do
 
   // put transients of win's transients in the stack
   BlackboxWindowList::const_reverse_iterator it,
     end = win->getTransients().rend();
-  for (it = win->getTransients().rbegin(); it != end; ++it) {
+  for (it = win->getTransients().rbegin(); it != end; ++it)
     lowerTransients(*it, stack);
-  }
 
   // put win's transients in the stack
   for (it = win->getTransients().rbegin(); it != end; ++it) {
-    *stack++ = (*it)->getFrameWindow();
-    screen->updateNetizenWindowLower((*it)->getClientWindow());
+    BlackboxWindow *w = *it;
+    *stack++ = w->getFrameWindow();
+    screen->updateNetizenWindowLower(w->getClientWindow());
 
-    if (! (*it)->isIconic()) {
-      Workspace *wkspc = screen->getWorkspace((*it)->getWorkspaceNumber());
-      wkspc->stackingList.remove((*it));
-      wkspc->stackingList.push_back((*it));
+    if (! w->isIconic()) {
+      Workspace *wkspc = screen->getWorkspace(w->getWorkspaceNumber());
+      wkspc->stackingList.remove(w);
+      wkspc->stackingList.push_back(w);
     }
   }
 }
@@ -335,10 +307,8 @@ void Workspace::raiseWindow(BlackboxWindow *w) {
   if (win->isDesktop()) return;
 
   // walk up the transient_for's to the window that is not a transient
-  while (win->isTransient() && ! win->isDesktop()) {
-    if (! win->getTransientFor()) break;
+  while (win->isTransient() && win->getTransientFor())
     win = win->getTransientFor();
-  }
 
   // get the total window count (win and all transients)
   unsigned int i = 1 + countTransients(win);
@@ -365,10 +335,8 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
   BlackboxWindow *win = w;
 
   // walk up the transient_for's to the window that is not a transient
-  while (win->isTransient() && ! win->isDesktop()) {
-    if (! win->getTransientFor()) break;
+  while (win->isTransient() && win->getTransientFor())
     win = win->getTransientFor();
-  }
 
   // get the total window count (win and all transients)
   unsigned int i = 1 + countTransients(win);
@@ -401,9 +369,11 @@ void Workspace::reconfigure(void) {
 BlackboxWindow *Workspace::getWindow(unsigned int index) {
   if (index < windowList.size()) {
     BlackboxWindowList::iterator it = windowList.begin();
-    for(; index > 0; --index, ++it); /* increment to index */
+    while (index-- > 0) // increment to index
+      ++it;
     return *it;
   }
+
   return 0;
 }
 
@@ -435,6 +405,7 @@ BlackboxWindow* Workspace::getPrevWindowInList(BlackboxWindow *w) {
 
 
 BlackboxWindow* Workspace::getTopWindowOnStack(void) const {
+  assert(! stackingList.empty());
   return stackingList.front();
 }
 
@@ -460,6 +431,50 @@ void Workspace::appendStackOrder(BlackboxWindowList &stack_order) const {
       stack_order.push_back(*it);
 }
   
+
+void Workspace::hide(void) {
+  BlackboxWindow *focused = screen->getBlackbox()->getFocusedWindow();
+  if (focused && focused->getScreen() == screen) {
+    assert(focused->isStuck() || focused->getWorkspaceNumber() == id);
+
+    lastfocus = focused;
+  } else {
+    // if no window had focus, no need to store a last focus
+    lastfocus = (BlackboxWindow *) 0;
+  }
+
+  // when we switch workspaces, unfocus whatever was focused
+  screen->getBlackbox()->setFocusedWindow((BlackboxWindow *) 0);
+
+  // withdraw windows in reverse order to minimize the number of Expose events
+
+  BlackboxWindowList::reverse_iterator it = stackingList.rbegin();
+  const BlackboxWindowList::reverse_iterator end = stackingList.rend();
+  for (; it != end; ++it) {
+    BlackboxWindow *bw = *it;
+    // not normal windows cant focus from mouse enters anyways, so we dont
+    // need to unmap/remap them on workspace changes
+    if (! bw->isStuck() || bw->isNormal())
+      bw->withdraw();
+  }
+}
+
+
+void Workspace::show(void) {
+  std::for_each(stackingList.begin(), stackingList.end(),
+                std::mem_fun(&BlackboxWindow::show));
+
+  XSync(screen->getBlackbox()->getXDisplay(), False);
+
+  if (screen->doFocusLast()) {
+    if (! screen->isSloppyFocus() && ! lastfocus && ! stackingList.empty())
+      lastfocus = stackingList.front();
+
+    if (lastfocus)
+      lastfocus->setInputFocus();
+  }
+}
+
 
 bool Workspace::isCurrent(void) const {
   return (id == screen->getCurrentWorkspaceID());

@@ -301,7 +301,7 @@ private:
   void doResize(int x_root, int y_root);
   void endResize(void);
 
-  void constrain(Corner anchor, int *pw = 0, int *ph = 0);
+  void constrain(Corner anchor, unsigned int *pw = 0, unsigned int *ph = 0);
 
 public:
   BlackboxWindow(Blackbox *b, Window w, BScreen *s);
@@ -398,13 +398,15 @@ public:
   void buttonPressEvent(const XButtonEvent *be);
   void buttonReleaseEvent(const XButtonEvent *re);
   void motionNotifyEvent(const XMotionEvent *me);
-  void destroyNotifyEvent(const XDestroyWindowEvent */*unused*/);
+  void destroyNotifyEvent(const XDestroyWindowEvent* /*unused*/);
   void mapRequestEvent(const XMapRequestEvent *mre);
-  void unmapNotifyEvent(const XUnmapEvent */*unused*/);
-  void reparentNotifyEvent(const XReparentEvent */*unused*/);
+  void unmapNotifyEvent(const XUnmapEvent* /*unused*/);
+  void reparentNotifyEvent(const XReparentEvent* /*unused*/);
   void propertyNotifyEvent(const XPropertyEvent *pe);
   void exposeEvent(const XExposeEvent *ee);
   void configureRequestEvent(const XConfigureRequestEvent *cr);
+  void enterNotifyEvent(const XCrossingEvent *ce);
+  void leaveNotifyEvent(const XCrossingEvent* /*unused*/);
 
 #ifdef    SHAPE
   void configureShape(void);

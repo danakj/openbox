@@ -155,6 +155,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   current_state = NormalState;
 
+  windowmenu = 0;
+
   /*
     get the initial size and location of client window (relative to the
     _root window_). This position is the reference point used with the
@@ -167,8 +169,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   timer = new BTimer(blackbox, this);
   timer->setTimeout(blackbox->getAutoRaiseDelay());
-
-  windowmenu = new Windowmenu(this);
 
   // get size, aspect, minimum/maximum size and other hints set by the
   // client
@@ -257,21 +257,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   screen->addStrut(&client.strut);
   updateStrut();
   
-#ifdef    SHAPE
-  if (blackbox->hasShapeExtensions() && flags.shaped)
-    configureShape();
-#endif // SHAPE
-  
-  // get the window's title before adding it to the workspace
-  getWMName();
-  getWMIconName();
-
-  if (blackbox_attrib.workspace >= screen->getWorkspaceCount())
-    screen->getCurrentWorkspace()->addWindow(this, place_window);
-  else
-    screen->getWorkspace(blackbox_attrib.workspace)->
-      addWindow(this, place_window);
-
   /*
     the server needs to be grabbed here to prevent client's from sending
     events while we are in the process of configuring their window.
@@ -284,6 +269,12 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   blackbox->saveWindowSearch(client.window, this);
 
+  if (blackbox_attrib.workspace >= screen->getWorkspaceCount())
+    screen->getCurrentWorkspace()->addWindow(this, place_window);
+  else
+    screen->getWorkspace(blackbox_attrib.workspace)->
+      addWindow(this, place_window);
+
   if (! place_window) {
     // don't need to call configure if we are letting the workspace
     // place the window
@@ -295,6 +286,11 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   positionWindows();
 
   XUngrabServer(blackbox->getXDisplay());
+
+#ifdef    SHAPE
+  if (blackbox->hasShapeExtensions() && flags.shaped)
+    configureShape();
+#endif // SHAPE
 
   // now that we know where to put the window and what it should look like
   // we apply the decorations
@@ -338,6 +334,9 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   if (flags.maximized && (functions & Func_Maximize))
     remaximize();
+
+  // create this last so it only needs to be configured once
+  windowmenu = new Windowmenu(this);
 }
 
 
@@ -369,18 +368,16 @@ BlackboxWindow::~BlackboxWindow(void) {
 
   // remove ourselves from our transient_for
   if (isTransient()) {
-    if (client.transient_for != (BlackboxWindow *) ~0ul) {
+    if (client.transient_for != (BlackboxWindow *) ~0ul)
       client.transient_for->client.transientList.remove(this);
-    }
     client.transient_for = (BlackboxWindow*) 0;
   }
 
   if (client.transientList.size() > 0) {
     // reset transient_for for all transients
     BlackboxWindowList::iterator it, end = client.transientList.end();
-    for (it = client.transientList.begin(); it != end; ++it) {
+    for (it = client.transientList.begin(); it != end; ++it)
       (*it)->client.transient_for = (BlackboxWindow*) 0;
-    }
   }
 
   if (frame.title)
@@ -417,7 +414,8 @@ Window BlackboxWindow::createToplevelWindow(void) {
   attrib_create.colormap = screen->getColormap();
   attrib_create.override_redirect = True;
   attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
-                             ButtonMotionMask | EnterWindowMask;
+                             ButtonMotionMask |
+                             EnterWindowMask | LeaveWindowMask;
 
   return XCreateWindow(blackbox->getXDisplay(), screen->getRootWindow(),
                        0, 0, 1, 1, frame.border_w, screen->getDepth(),
@@ -452,6 +450,8 @@ Window BlackboxWindow::createChildWindow(Window parent, Cursor cursor) {
 
 void BlackboxWindow::associateClientWindow(void) {
   XSetWindowBorderWidth(blackbox->getXDisplay(), client.window, 0);
+  getWMName();
+  getWMIconName();
 
   XChangeSaveSet(blackbox->getXDisplay(), client.window, SetModeInsert);
 
@@ -1417,9 +1417,22 @@ void BlackboxWindow::getTransientInfo(void) {
     return;
   }
 
-  // register ourselves with our new transient_for
-  client.transient_for->client.transientList.push_back(this);
-  flags.stuck = client.transient_for->flags.stuck;
+  // Check for a circular transient state: this can lock up Blackbox
+  // when it tries to find the non-transient window for a transient.
+  BlackboxWindow *w = this;
+  while(w->client.transient_for) {
+    if(w->client.transient_for == this) {
+      client.transient_for = (BlackboxWindow*) 0;
+      break;
+    }
+    w = w->client.transient_for;
+  }
+
+  if (client.transient_for) {
+    // register ourselves with our new transient_for
+    client.transient_for->client.transientList.push_back(this);
+    flags.stuck = client.transient_for->flags.stuck;
+  }
 }
 
 
@@ -1559,9 +1572,8 @@ bool BlackboxWindow::setInputFocus(void) {
   if (client.transientList.size() > 0) {
     // transfer focus to any modal transients
     BlackboxWindowList::iterator it, end = client.transientList.end();
-    for (it = client.transientList.begin(); it != end; ++it) {
+    for (it = client.transientList.begin(); it != end; ++it)
       if ((*it)->flags.modal) return (*it)->setInputFocus();
-    }
   }
 
   bool ret = True;
@@ -1692,9 +1704,8 @@ void BlackboxWindow::deiconify(bool reassoc, bool raise) {
   // reassociate and deiconify all transients
   if (reassoc && client.transientList.size() > 0) {
     BlackboxWindowList::iterator it, end = client.transientList.end();
-    for (it = client.transientList.begin(); it != end; ++it) {
+    for (it = client.transientList.begin(); it != end; ++it)
       (*it)->deiconify(True, False);
-    }
   }
 
   if (raise)
@@ -2064,17 +2075,12 @@ void BlackboxWindow::redrawWindowFrame(void) const {
 
 void BlackboxWindow::setFocusFlag(bool focus) {
   // only focus a window if it is visible
-  if (focus && !flags.visible)
+  if (focus && ! flags.visible)
     return;
 
   flags.focused = focus;
 
   redrawWindowFrame();
-
-  if (screen->isSloppyFocus() && screen->doAutoRaise()) {
-    if (isFocused()) timer->start();
-    else timer->stop();
-  }
 
   if (flags.focused)
     blackbox->setFocusedWindow(this);
@@ -3487,7 +3493,7 @@ void BlackboxWindow::beginResize(int x_root, int y_root, Corner dir) {
   flags.resizing = True;
   blackbox->setChangingWindow(this);
 
-  int gw, gh;
+  unsigned int gw, gh;
   frame.changing = frame.rect;
 
   constrain(anchor,  &gw, &gh);
@@ -3511,7 +3517,7 @@ void BlackboxWindow::doResize(int x_root, int y_root) {
                  screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                  frame.changing.width() - 1, frame.changing.height() - 1);
 
-  int gw, gh;
+  unsigned int gw, gh;
   Corner anchor;
 
   switch (resize_dir) {
@@ -3624,6 +3630,43 @@ void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
       beginResize(me->x_root, me->y_root, corner);
     }
   }
+}
+
+
+void BlackboxWindow::enterNotifyEvent(const XCrossingEvent* ce) {
+  if (! (screen->isSloppyFocus() && isVisible() && isNormal()))
+    return;
+
+  XEvent e;
+  bool leave = False, inferior = False;
+
+  while (XCheckTypedWindowEvent(blackbox->getXDisplay(), ce->window,
+                                LeaveNotify, &e)) {
+    if (e.type == LeaveNotify && e.xcrossing.mode == NotifyNormal) {
+      leave = True;
+      inferior = (e.xcrossing.detail == NotifyInferior);
+    }
+  }
+
+  if ((! leave || inferior) && ! isFocused()) {
+    bool success = setInputFocus();
+    if (success)    // if focus succeeded install the colormap
+      installColormap(True); // XXX: shouldnt we honour no install?
+  }
+
+  if (screen->doAutoRaise())
+    timer->start();
+}
+
+
+void BlackboxWindow::leaveNotifyEvent(const XCrossingEvent*) {
+  if (! (screen->isSloppyFocus() && screen->doAutoRaise() && isNormal()))
+    return;
+
+  installColormap(False);
+
+  if (timer->isTiming())
+    timer->stop();
 }
 
 
@@ -3878,11 +3921,14 @@ void BlackboxWindow::upsize(void) {
  * The logical width and height are placed into pw and ph, if they
  * are non-zero.  Logical size refers to the users perception of
  * the window size (for example an xterm resizes in cells, not in pixels).
+ * pw and ph are then used to display the geometry during window moves, resize,
+ * etc.
  *
  * The physical geometry is placed into frame.changing_{x,y,width,height}.
  * Physical geometry refers to the geometry of the window in pixels.
  */
-void BlackboxWindow::constrain(Corner anchor, int *pw, int *ph) {
+void BlackboxWindow::constrain(Corner anchor,
+                               unsigned int *pw, unsigned int *ph) {
   // frame.changing represents the requested frame size, we need to
   // strip the frame margin off and constrain the client size
   frame.changing.setCoords(frame.changing.left() + frame.margin.left,
@@ -3890,39 +3936,42 @@ void BlackboxWindow::constrain(Corner anchor, int *pw, int *ph) {
                            frame.changing.right() - frame.margin.right,
                            frame.changing.bottom() - frame.margin.bottom);
 
-  int dw = frame.changing.width(), dh = frame.changing.height(),
+  unsigned int dw = frame.changing.width(), dh = frame.changing.height(),
     base_width = (client.base_width) ? client.base_width : client.min_width,
     base_height = (client.base_height) ? client.base_height :
                                          client.min_height;
 
   // constrain
-  if (dw < static_cast<signed>(client.min_width)) dw = client.min_width;
-  if (dh < static_cast<signed>(client.min_height)) dh = client.min_height;
-  if (dw > static_cast<signed>(client.max_width)) dw = client.max_width;
-  if (dh > static_cast<signed>(client.max_height)) dh = client.max_height;
+  if (dw < client.min_width) dw = client.min_width;
+  if (dh < client.min_height) dh = client.min_height;
+  if (dw > client.max_width) dw = client.max_width;
+  if (dh > client.max_height) dh = client.max_height;
 
-  dw -= base_width;
-  dw /= client.width_inc;
-  dh -= base_height;
-  dh /= client.height_inc;
+  assert(dw >= base_width && dh >= base_height);
 
-  if (pw) {
-    if (client.width_inc == 1)
-      *pw = dw + base_width;
-    else
-      *pw = dw;
+  if (client.width_inc > 1) {
+    dw -= base_width;
+    dw /= client.width_inc;
   }
-  if (ph) {
-    if (client.height_inc == 1)
-      *ph = dh + base_height;
-    else
-      *ph = dh;
+  if (client.height_inc > 1) {
+    dh -= base_height;
+    dh /= client.height_inc;
   }
 
-  dw *= client.width_inc;
-  dw += base_width;
-  dh *= client.height_inc;
-  dh += base_height;
+  if (pw)
+    *pw = dw;
+
+  if (ph)
+    *ph = dh;
+
+  if (client.width_inc > 1) {
+    dw *= client.width_inc;
+    dw += base_width;
+  }
+  if (client.height_inc > 1) {
+    dh *= client.height_inc;
+    dh += base_height;
+  }
 
   frame.changing.setSize(dw, dh);
 
@@ -4011,13 +4060,10 @@ BWindowGroup::find(BScreen *screen, bool allow_transients) const {
   BlackboxWindow *ret = blackbox->getFocusedWindow();
 
   // does the focus window match (or any transient_fors)?
-  while (ret) {
-    if (ret->getScreen() == screen && ret->getGroupWindow() == group) {
-      if (ret->isTransient() && allow_transients) break;
-      else if (! ret->isTransient()) break;
-    }
-
-    ret = ret->getTransientFor();
+  for (; ret; ret = ret->getTransientFor()) {
+    if (ret->getScreen() == screen && ret->getGroupWindow() == group &&
+        (! ret->isTransient() || allow_transients))
+      break;
   }
 
   if (ret) return ret;
@@ -4026,10 +4072,9 @@ BWindowGroup::find(BScreen *screen, bool allow_transients) const {
   BlackboxWindowList::const_iterator it, end = windowList.end();
   for (it = windowList.begin(); it != end; ++it) {
     ret = *it;
-    if (ret->getScreen() == screen && ret->getGroupWindow() == group) {
-      if (ret->isTransient() && allow_transients) break;
-      else if (! ret->isTransient()) break;
-    }
+    if (ret->getScreen() == screen && ret->getGroupWindow() == group &&
+        (! ret->isTransient() || allow_transients))
+      break;
   }
 
   return ret;

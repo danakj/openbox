@@ -1129,7 +1129,8 @@ void BScreen::removeIcon(BlackboxWindow *w) {
 BlackboxWindow *BScreen::getIcon(unsigned int index) {
   if (index < iconList.size()) {
     BlackboxWindowList::iterator it = iconList.begin();
-    for (; index > 0; --index, ++it) ; /* increment to index */
+    while (index-- > 0) // increment to index
+      ++it;
     return *it;
   }
 
@@ -1185,37 +1186,19 @@ unsigned int BScreen::removeLastWorkspace(void) {
 void BScreen::changeWorkspaceID(unsigned int id) {
   if (! current_workspace || id == current_workspace->getID()) return;
 
-  BlackboxWindow *focused = blackbox->getFocusedWindow();
-  if (focused && focused->getScreen() == this) {
-    assert(focused->isStuck() ||
-           focused->getWorkspaceNumber() == current_workspace->getID());
+  current_workspace->hide();
 
-    current_workspace->setLastFocusedWindow(focused);
-  } else {
-    // if no window had focus, no need to store a last focus
-    current_workspace->setLastFocusedWindow((BlackboxWindow *) 0);
-  }
-
-  // when we switch workspaces, unfocus whatever was focused
-  blackbox->setFocusedWindow((BlackboxWindow *) 0);
-    
-  current_workspace->hideAll();
   workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
 
   current_workspace = getWorkspace(id);
+
+  current_workspace->show();
 
   xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                   XAtom::cardinal, id);
 
   workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
   toolbar->redrawWorkspaceLabel(True);
-
-  current_workspace->showAll();
-
-  if (resource.focus_last && current_workspace->getLastFocusedWindow()) {
-    XSync(blackbox->getXDisplay(), False);
-    current_workspace->getLastFocusedWindow()->setInputFocus();
-  }
 
   updateNetizenCurrentWorkspace();
 }
@@ -1790,12 +1773,13 @@ void BScreen::InitMenu(void) {
 
 
 static
-void string_within(char begin, char end, const char *input, size_t length,
-                   char *output) {
+size_t string_within(char begin, char end,
+                     const char *input, size_t start_at, size_t length,
+                     char *output) {
   bool parse = False;
   size_t index = 0;
-
-  for (size_t i = 0; i < length; ++i) {
+  size_t i = start_at;
+  for (; i < length; ++i) {
     if (input[i] == begin) {
       parse = True;
     } else if (input[i] == end) {
@@ -1810,6 +1794,8 @@ void string_within(char begin, char end, const char *input, size_t length,
     output[index] = '\0';
   else
     output[0] = '\0';
+
+  return i;
 }
 
 
@@ -1832,7 +1818,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     unsigned int key = 0;
 
     // get the keyword enclosed in []'s
-    string_within('[', ']', line, line_length, keyword);
+    size_t pos = string_within('[', ']', line, 0, line_length, keyword);
 
     if (keyword[0] == '\0') {  // no keyword, no menu entry
       continue;
@@ -1845,10 +1831,10 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     }
 
     // get the label enclosed in ()'s
-    string_within('(', ')', line, line_length, label);
+    pos = string_within('(', ')', line, pos, line_length, label);
 
     // get the command enclosed in {}'s
-    string_within('{', '}', line, line_length, command);
+    pos = string_within('{', '}', line, pos, line_length, command);
 
     switch (key) {
     case 311: // end

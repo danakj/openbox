@@ -48,6 +48,8 @@ public:
   virtual void enterHandler(const XCrossingEvent &e);
   virtual void leaveHandler(const XCrossingEvent &e);
 
+  virtual void keyPressHandler(const XKeyEvent &e);
+
   //! Notify that a mouse drag is taking place.
   /*!
     @param win The window the drag is on
@@ -56,14 +58,6 @@ public:
   */
   void drag(Window win, otk::Point delta, unsigned int modifiers,
             unsigned int button, Time time);
-
-  //! Notify that a key press has occured on a window.
-  /*!
-    @param win The window the key press was on
-    @param modifiers The modifier state for the action.
-    @param keycode The keycode of the key pressed.
-  */
-  void key(Window win, unsigned int modifiers, unsigned int keycode);
 };
 
 }

@@ -104,18 +104,18 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
 }
 
 
+void OBActions::keyPressHandler(const XKeyEvent &e)
+{
+  // XXX: run the KEY guile hook
+  printf("GUILE: KEY: win %lx modifiers %u keycode %u\n",
+         (long)e.window, e.state, e.keycode);
+}
+
+
 void OBActions::drag(Window win, otk::Point delta, unsigned int modifiers,
                      unsigned int button, Time time)
 {
   (void)win;(void)delta;(void)modifiers;(void)button;(void)time;
-
-  // XXX: some guile shit...
-}
-
-
-void OBActions::key(Window win, unsigned int modifiers, unsigned int keycode)
-{
-  (void)win;(void)modifiers;(void)keycode;
 
   // XXX: some guile shit...
 }

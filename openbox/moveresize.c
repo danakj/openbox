@@ -130,9 +130,6 @@ void moveresize_end(gboolean cancel)
     XDestroyWindow(ob_display, coords);
     coords = None;
 
-    moveresize_in_progress = FALSE;
-    moveresize_client = NULL;
-
     if (moving) {
         client_configure(moveresize_client, Corner_TopLeft,
                          (cancel ? start_cx : cur_x),
@@ -145,6 +142,9 @@ void moveresize_end(gboolean cancel)
                          (cancel ? start_cw : cur_x),
                          (cancel ? start_ch : cur_y), TRUE, TRUE);
     }
+
+    moveresize_in_progress = FALSE;
+    moveresize_client = NULL;
 }
 
 static void do_move()

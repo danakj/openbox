@@ -1,7 +1,17 @@
-:
+3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)
 	* Allow resizing of windows in only vertical/horizontal directions
 	(via Alt-MiddleClick-Drag with the default bindings)
+	* Added intelligence to window cycling and raise/lowering based on
+	window types
+	* Closed bug #902 (Openbox raises gDesklets when clicked). This has the
+	side effect that panels which do not set the ABOVE state (most panels
+	curerntly around) will no longer be kept always on top. You can set the
+	ABOVE state yourself by using the client menu (Alt-RightClick in the
+	default bindings) and selecting the Always on top Layer
+	* Closed bug #907 (window focus is not properly indicated)
+	* Added a focus indicator during focus cycling that is always visible
+	instead of just moving the focus hilight around.
 
 3.0-rc2:
 	* Closed bug #885 (raiseOnFocus is flawed)

@@ -2,13 +2,15 @@
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
-EXTRA_PROGRAMS =		epist
+#EXTRA_PROGRAMS =		epist
+bin_PROGRAMS =		epist
 
 epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
-					../../src/Util.o ../../src/i18n.o \
-					../../src/GCCache.o ../../src/Color.o ../../src/Texture.o \
-					../../src/Timer.o ../../src/Image.o ../../src/ImageControl.o
+					../../src/Util.o ../../src/i18n.o ../../src/Timer.o \
+					../../src/GCCache.o ../../src/Color.o
+#					../../src/Texture.o \
+#					../../src/Image.o ../../src/ImageControl.o
 
 MAINTAINERCLEANFILES =	Makefile.in
 

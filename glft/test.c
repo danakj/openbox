@@ -86,6 +86,9 @@ int main(int argc, char **argv)
     glOrtho(-50, W-50, -100, H-100, 0, 10);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_TEXTURE_2D);
+    glClearColor(0.0, 0.0, 1.0, 0.0);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
     quit = 0;
     while (!quit) {
         XNextEvent(display, &report);

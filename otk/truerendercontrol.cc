@@ -57,8 +57,4 @@ TrueRenderControl::~TrueRenderControl()
 
 }
 
-void TrueRenderControl::render(::Drawable d)
-{
-}
-
 }

@@ -1,10 +1,15 @@
 :
 	* Closed bug #875 (RaiseLower fails to funtion on windows with dialogs)
 	* Added the <moveButton> option for moving dock apps around inside the
-	dock.
+	dock. (Closes bug #798)
 	* Made the "Desktop" action show the pager/desktop dialog.
-	* Add the <dialog> section to allow the disabling of the focus and
-	pager/desktop dialogs.
+	* Add the <dialog> section to the rc.xml to allow the disabling of the
+	focus and pager/desktop dialogs.
+	* No longer iconify fullscreen windows when they lose focus (Closes
+	bug #876)
+	* When not using focusLast, when a focused transient is closed, focus
+	will still fallback to its parent or transient siblings.
+	* Improved intelligence for focus cycling with modal transients.
 
 3.0-beta6:
 	* Added _OB_WM_STATE_UNDECORATED hint, which can be read and controlled

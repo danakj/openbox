@@ -47,13 +47,15 @@ class BFont {
    * static members
    */
 private:
-//  static bool         _antialias;
+  static bool         _antialias;
   static std::string  _fallback_font;
 
 public:
-//  inline static bool antialias(void) { return _antialias; }
-//  inline static void setAntialias(bool a) { _antialias = a; }
+  inline static bool antialias(void) { return _antialias; }
+  inline static void setAntialias(bool a) { _antialias = a; }
 
+  // the fallback is only used for X fonts, not for Xft fonts, since it is
+  // assumed that X fonts will be the fallback from Xft.
   inline static std::string fallbackFont(void) { return _fallback_font; }
   inline static void setFallbackFont(const std::string &f)
     { _fallback_font = f; }
@@ -65,7 +67,7 @@ private:
   Display          *_display;
   BScreen          *_screen;
 
-  std::string       _name;
+  std::string       _family;
   bool              _simplename;  // true if not spec'd as a -*-* string
   int               _size;
   bool              _bold;
@@ -73,6 +75,8 @@ private:
 
 #ifdef XFT
   XftFont          *_xftfont;
+
+  bool createXftFont(void);
 #endif
   
   // standard
@@ -81,24 +85,28 @@ private:
   XFontSet          _fontset;
   XFontSetExtents  *_fontset_extents;
 
-  std::string buildXlfdName(bool mb) const;
+  std::string buildXlfd(void) const;
+  std::string buildMultibyteXlfd(void) const;
 
-  bool init(const std::string &xlfd = "");
-  bool createFont(void);
-  bool parseFontString(const std::string &xlfd);
+  bool createXFont(const std::string &xlfd);
+  bool parseXlfd(const std::string &xlfd);
   
   bool              _valid;
 
 public:
+#ifdef XFT
+  // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
         bool bold, bool italic);
+#endif
+  // loads a standard X font
   BFont(Display *d, BScreen *screen, const std::string &xlfd);
-  virtual ~BFont();
+  virtual ~BFont(void);
 
   inline bool valid(void) const { return _valid; }
 
-  inline std::string name(void) const { assert(_valid); return _name; }
-  inline int size(void) const { assert(_valid); return _size / 10; }
+  inline std::string family(void) const { assert(_valid); return _family; }
+  inline int size(void) const { assert(_valid); return _size; }
   inline bool bold(void) const { assert(_valid); return _bold; }
   inline bool italic(void) const { assert(_valid); return _italic; }
 

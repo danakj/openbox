@@ -756,10 +756,10 @@ void BScreen::LoadStyle(void) {
   resource.wstyle.font = resource.tstyle.font = resource.mstyle.f_font =
     resource.mstyle.t_font = (BFont *) 0;
 
-  resource.wstyle.font = readDatabaseFont("window.font", style);
-  resource.tstyle.font = readDatabaseFont("toolbar.font", style);
-  resource.mstyle.t_font = readDatabaseFont("menu.title.font", style);
-  resource.mstyle.f_font = readDatabaseFont("menu.frame.font", style);
+  resource.wstyle.font = readDatabaseFont("window.", style);
+  resource.tstyle.font = readDatabaseFont("toolbar.", style);
+  resource.mstyle.t_font = readDatabaseFont("menu.title.", style);
+  resource.mstyle.f_font = readDatabaseFont("menu.frame.", style);
 
   // load window config
   resource.wstyle.t_focus =
@@ -2137,13 +2137,38 @@ BColor BScreen::readDatabaseColor(const string &rname,
 }
 
 
-BFont *BScreen::readDatabaseFont(const string &rname,
+BFont *BScreen::readDatabaseFont(const string &rbasename,
                                  const Configuration &style) {
   string fontname;
 
   string s;
-  style.getValue(rname, s); // if this fails, a blank string will be used,
-                            // which will cause the fallback font to load.
+
+#ifdef    XFT
+  int i;
+  if (style.getValue(rbasename + "xft.font", s) &&
+      style.getValue(rbasename + "xft.size", i)) {
+    string family = s;
+    bool bold = False;
+    bool italic = False;
+    if (style.getValue(rbasename + "xft.flags", s)) {
+      if (s.find("bold") != string::npos)
+        bold = True;
+      if (s.find("italic") != string::npos)
+        italic = True;
+    }
+    
+    BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
+                         italic);
+    if (b->valid())
+      return b;
+    else
+      delete b; // fall back to the normal X font stuff
+  }
+#endif // XFT
+
+  style.getValue(rbasename + "font", s);
+  // if this fails, a blank string will be used, which will cause the fallback
+  // font to load.
 
   BFont *b = new BFont(blackbox->getXDisplay(), this, s);
   if (! b->valid())

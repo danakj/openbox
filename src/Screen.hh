@@ -180,7 +180,8 @@ private:
   BColor readDatabaseColor(const std::string &rname,
                            const std::string &default_color,
                            const Configuration &style);
-  BFont *readDatabaseFont(const std::string &rname, const Configuration &style);
+  BFont *readDatabaseFont(const std::string &rbasename,
+                          const Configuration &style);
 
   void InitMenu(void);
   void LoadStyle(void);

@@ -44,26 +44,46 @@ using std::endl;
 #include "GCCache.hh"
 #include "Color.hh"
 
-//bool        BFont::_antialias       = False;
+bool        BFont::_antialias       = True;
 string      BFont::_fallback_font   = "fixed";
 
 
+#ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
              bool bold, bool italic) : _display(d),
                                        _screen(screen),
-                                       _name(family),
+                                       _family(family),
                                        _simplename(False),
-                                       _size(size * 10),
+                                       _size(size),
                                        _bold(bold),
                                        _italic(italic),
-#ifdef    XFT
                                        _xftfont(0),
-#endif // XFT
                                        _font(0),
                                        _fontset(0),
                                        _fontset_extents(0) {
-  _valid = init();
+  _valid = False;
+
+  _xftfont = XftFontOpen(_display, _screen->getScreenNumber(),
+                         XFT_FAMILY, XftTypeString,  _family.c_str(),
+                         XFT_SIZE,   XftTypeInteger, _size,
+                         XFT_WEIGHT, XftTypeInteger, (_bold ?
+                                                      XFT_WEIGHT_BOLD :
+                                                      XFT_WEIGHT_MEDIUM),
+                         XFT_SLANT,  XftTypeInteger, (_italic ?
+                                                      XFT_SLANT_ITALIC :
+                                                      XFT_SLANT_ROMAN),
+                         XFT_ANTIALIAS, XftTypeBool, _antialias,
+                         0);
+  if (! _xftfont)
+    return; // failure
+
+  _font = XLoadQueryFont(_display, buildXlfd().c_str()); 
+  if (! _font)
+    return; // failure
+
+  _valid = True;
 }
+#endif
 
 
 BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
@@ -81,53 +101,43 @@ BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
   else
     int_xlfd = xlfd;
   
-  _valid = init(xlfd);
-}
+  if ((_valid = createXFont(int_xlfd)))
+    return; // success
 
-
-bool BFont::init(const string &xlfd) {
-  // try load the specified font
-  if (xlfd.empty() || parseFontString(xlfd))
-    if (createFont())
-      return True;
-
-  if (xlfd != _fallback_font) {
+  if (int_xlfd != _fallback_font) {
     // try the fallback
-    cerr << "BFont::BFont(): couldn't load font '" << _name << "'" << endl <<
+    cerr << "BFont::BFont(): couldn't load font '" << _family << "'" << endl <<
       "Falling back to default '" << _fallback_font << "'" << endl;
-  if (parseFontString(_fallback_font))
-    if (createFont())
-      return True;
+
+    if ((_valid = createXFont(_fallback_font)))
+      return; // success
   }
 
-  cerr << "BFont::BFont(): couldn't load font '" << _name << "'" << endl <<
+  cerr << "BFont::BFont(): couldn't load font '" << _family << "'" << endl <<
     "Giving up!" << endl;
-  
-  return False;
+  return; // failure
 }
 
 
-bool BFont::createFont(void) {
-  std::string fullname;
+bool BFont::createXFont(const std::string &xlfd) {
+  /*
+     Even though this is only used for font sets (multibyte), it is still parsed
+     out so that the bold/italic/etc information is still available from the
+     class when using non-multibyte.
 
-#ifdef    XFT
-  fullname = buildXlfdName(False);
-  _xftfont = XftFontOpenXlfd(_display, _screen->getScreenNumber(),
-                             fullname.c_str());
-  if (_xftfont)
-    return True;
-
-  cerr << "BFont::BFont(): couldn't load font '" << _name <<
-    "' as an Xft font, trying as a standard X font." << endl;
-#endif
+     This is where _simplename, _bold, _italic, and _size are initialized, since
+     they are not initialized in the constructor. This needs to occur before
+     calling any Xlfd-building functions.
+  */
+  if (! parseXlfd(xlfd))
+    return False;
 
   if (i18n.multibyte()) {
     char **missing, *def = "-";
     int nmissing;
-  
-    fullname = buildXlfdName(True);
-    _fontset = XCreateFontSet(_display, fullname.c_str(), &missing, &nmissing,
-                              &def);
+ 
+    _fontset = XCreateFontSet(_display, buildMultibyteXlfd().c_str(),
+                              &missing, &nmissing, &def);
     if (nmissing) XFreeStringList(missing);
     if (_fontset)
       _fontset_extents = XExtentsOfFontSet(_fontset);
@@ -137,16 +147,14 @@ bool BFont::createFont(void) {
     assert(_fontset_extents);
   }
     
-  fullname = buildXlfdName(False);
-  cerr << "loading font '" << fullname.c_str() << "'\n";
-  _font = XLoadQueryFont(_display, fullname.c_str());
+  _font = XLoadQueryFont(_display, xlfd.c_str());
   if (! _font)
     return False;
   return True;
 }
 
 
-BFont::~BFont() {
+BFont::~BFont(void) {
 #ifdef    XFT
   if (_xftfont)
     XftFontClose(_display, _xftfont);
@@ -160,24 +168,34 @@ BFont::~BFont() {
 
 
 /*
- * Takes _name, _size, _bold, _italic, etc and builds them into a full XLFD.
+ * Takes _family, _size, _bold, _italic, etc and builds them into a full XLFD.
  */
-string BFont::buildXlfdName(bool mb) const {
+string BFont::buildXlfd(void) const {
+  if (_simplename) 
+    return _family;
+
+  string weight = _bold ? "bold" : "medium";
+  string slant = _italic ? "i" : "r";
+  string sizestr= _size ? itostring(_size * 10) : "*";
+
+  return "-*-" + _family + "-" + weight + "-" + slant + "-*-*-*-" + sizestr +
+      "-*-*-*-*-*-*";
+}
+
+
+/*
+ * Takes _family, _size, _bold, _italic, etc and builds them into a full XLFD.
+ */
+string BFont::buildMultibyteXlfd(void) const {
   string weight = _bold ? "bold" : "medium";
   string slant = _italic ? "i" : "r";
   string sizestr= _size ? itostring(_size) : "*";
 
-  if (mb)
-    return _name + ',' +
-           "-*-*-" + weight + "-" + slant + "-*-*-" + sizestr +
-             "-*-*-*-*-*-*-*" + ',' +
-           "-*-*-*-*-*-*-" + sizestr + "-*-*-*-*-*-*-*" + ',' +
-           "*";
-  else if (_simplename)
-    return _name;
-  else
-    return "-*-" + _name + "-" + weight + "-" + slant + "-*-*-*-" +
-           sizestr + "-*-*-*-*-*-*";
+  return _family + ','
+    + "-*-*-" + weight + "-" + slant + "-*-*-*-" + sizestr +
+      "-*-*-*-*-*-*" + ','
+    + "-*-*-*-*-*-*-*-" + sizestr + "-*-*-*-*-*-*" + ',' +
+    + "*";
 }
 
 
@@ -185,9 +203,9 @@ string BFont::buildXlfdName(bool mb) const {
  * Takes a full X font name and parses it out so we know if we're bold, our
  * size, etc.
  */
-bool BFont::parseFontString(const string &xlfd) {
+bool BFont::parseXlfd(const string &xlfd) {
   if (xlfd.empty() || xlfd[0] != '-') {
-    _name = xlfd;
+    _family = xlfd;
     _simplename = True;
     _bold = False;
     _italic = False;
@@ -203,10 +221,12 @@ bool BFont::parseFontString(const string &xlfd) {
     while(1) {
       string::const_iterator tmp = it;   // current string.begin()
       it = std::find(tmp, end, '-');     // look for comma between tmp and end
-      if (i == 2) _name = string(tmp, it); // s[tmp:it]
+      if (i == 2) _family = string(tmp, it); // s[tmp:it]
       if (i == 3) weight = string(tmp, it);
       if (i == 4) slant = string(tmp, it);
-      if (i == 8) sizestr = string(tmp, it);
+      if (i == 7 && string(tmp, it) != "*") sizestr = string(tmp, it);
+      if (sizestr.empty() &&
+          i == 8 && string(tmp, it) != "*") sizestr = string(tmp, it);
       if (it == end || i >= 8)
         break;
       ++it;
@@ -216,15 +236,14 @@ bool BFont::parseFontString(const string &xlfd) {
       return False;
     _bold = weight == "bold" || weight == "demibold";
     _italic = slant == "i" || slant == "o";
-    if (atoi(sizestr.c_str()))
-      _size = atoi(sizestr.c_str());
+    _size = atoi(sizestr.c_str()) / 10;
   }
   
   // min/max size restrictions for sanity, but 0 is the font's "default size"
-  if (_size && _size < 30)
-    _size = 30;
-  else if (_size > 970)
-    _size = 970;
+  if (_size && _size < 3)
+    _size = 3;
+  else if (_size > 97)
+    _size = 97;
 
   return True;
 }

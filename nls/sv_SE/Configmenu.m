@@ -16,12 +16,16 @@ $ #FocusNew
 # Fokus på nya fönster
 $ #FocusLast
 # Fokusera fönster vid skrivbordsbyte
+$ #DisableBindings
+# G?r s? att bindningar inte fungerar med Scroll Lock
 $ #ClickToFocus
 # Klicka för fokus
 $ #SloppyFocus
 # Hafsig fokus
 $ #AutoRaise
 # Höj automatiskt
+$ #ClickRaise
+# Klicka f?r att h?ja
 $ #SmartRows
 # Smart placering (Rader)
 $ #SmartCols

@@ -11,21 +11,20 @@ Changes from 0.62.1 to 0.65.0:
   - huge amounts of internal cleanups
   - added emacs local variables to each file that prevent the addition of tabs
   - added a Util.cc file which contains useful functions with no obvious home.
-  - removed several unused variables and otherwise reduced the memory usage
-    of the objects in Blackbox.  For the record we are about 100k larger than
-    0.62.0 and that is mostly due to the STL.  However for the most part
-    blackbox runs faster and is still one of the leanest window managers out
-    there today.
   - move code over to the STL
+  - removed several unused variables and otherwise reduced the memory usage
+    of the objects in Blackbox.  For the record the binary is roughly 100k
+    larger than 0.62.0 and that is mostly due to the STL but there is also a
+    fair bit of new code.  However for the most part blackbox runs faster and
+    is still one of the leanest window managers out there today.
   - bsetroot now sets _XROOTPMAP_ID, so pseudo transparent apps will be happy
   - beginnings of a strut implementation.  toolbar and slit are removed from
     the available screen area if 'full maximize' is not set
-  - handle the odd edge case where a reparent event occurs while the window
-    is unmapped.  XReparentWindow sends an UnmapNotify to the window manager
-    however the window is already unmapped so the window manager never gets
-    the event and the unmapNotify event is where reparentNotify was handled.
-    Added a reparentNotifyEvent handler in the BlackboxWindow class and a new
-    case in the Blackbox class's process_event function.
+  - XReparentWindow sends an UnmapNotify to the window manager however
+    in certain cases the window is already unmapped so the window manager
+    never gets the event and the unmapNotify event is where reparentNotify was
+    handled.  Added a reparentNotifyEvent handler in the BlackboxWindow class
+    and a new case in the Blackbox class's process_event function.
   - no more blackbox->grab/ungrab calls everywhere
   - compression of motion and expose
   - Now we have one function which turns ~/ into /home/user/.  This is now
@@ -40,9 +39,9 @@ Changes from 0.62.1 to 0.65.0:
   - update transient handling, should solve issues with apps like acroread.
     added a getTransientInfo() method of the BlackboxWindow class which
     handles checking the transient state in X and setting the appropriate
-    variables on the window.  To further attack the infinite loops this
-    function ensures that client.transient != this.  We also check for loops
-    of the forms A -> B -> C -> A.  The new transient code also allows for one
+    variables on the window.  To attack the infinite loops this
+    function ensures that client.transient != this and we check for loops
+    of the form A -> B -> C -> A.  The new transient code also allows for one
     window to have multiple transients so applications like xmms and web
     browsers are better behaved.
   - even better ICCCM support and focus handling

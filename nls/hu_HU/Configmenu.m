@@ -16,12 +16,16 @@ $ #FocusNew
 # Új ablak kapja a fókuszt
 $ #FocusLast
 # Munkaasztal váltása után fókusz az utolsó ablakon
+$ #DisableBindings
+# Scroll Lock-n?l nem figyeli a billenty?zetet
 $ #ClickToFocus
 # Kattintás fókuszhoz
 $ #SloppyFocus
 # A fókusz követi az egeret
 $ #AutoRaise
 # Autómatikus elõreugró ablakok
+$ #ClickRaise
+# Kattint?ssal az el?t?rbe
 $ #SmartRows
 # Optimális ablakrendezés (sorok)
 $ #SmartCols

@@ -102,9 +102,9 @@ static void press(ObEvent *e, void *foo)
                     if (!grabbed) {
                         grab_keyboard(TRUE);
                         grabbed = TRUE;
-                        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     }
                     curpos = p;
+                    XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                 } else {
                     if (p->action->func != NULL) {
                         p->action->data.any.c = focus_client;

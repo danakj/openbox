@@ -44,6 +44,8 @@ Screen::Screen(int screen)
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
 
+  _showing_desktop = false;
+
   ::running = false;
   XErrorHandler old = XSetErrorHandler(::anotherWMRunning);
   XSelectInput(**otk::display, _info->rootWindow(),
@@ -397,13 +399,13 @@ void Screen::changeSupportedAtoms()
     otk::Property::atoms.net_client_list_stacking,
     otk::Property::atoms.net_desktop_names,
     otk::Property::atoms.net_close_window,
+    otk::Property::atoms.net_desktop_layout,
+    otk::Property::atoms.net_showing_desktop,
     otk::Property::atoms.net_wm_name,
     otk::Property::atoms.net_wm_visible_name,
     otk::Property::atoms.net_wm_icon_name,
     otk::Property::atoms.net_wm_visible_icon_name,
-/*
     otk::Property::atoms.net_wm_desktop,
-*/
     otk::Property::atoms.net_wm_strut,
     otk::Property::atoms.net_wm_window_type,
     otk::Property::atoms.net_wm_window_type_desktop,
@@ -878,6 +880,15 @@ void Screen::installColormap(bool install) const
     XUninstallColormap(**otk::display, _info->colormap());
 }
 
+void Screen::showDesktop(bool show)
+{
+  if (show == _showing_desktop) return; // no change
+
+  _showing_desktop = show;
+  ClientList::iterator it, end = clients.end();
+  for (it = clients.begin(); it != end; ++it)
+    (*it)->showhide();
+}
 
 void Screen::propertyHandler(const XPropertyEvent &e)
 {
@@ -912,6 +923,8 @@ void Screen::clientMessageHandler(const XClientMessageEvent &e)
     changeDesktop(e.data.l[0]);
   } else if (e.message_type == otk::Property::atoms.net_number_of_desktops) {
     changeNumDesktops(e.data.l[0]);
+  } else if (e.message_type == otk::Property::atoms.net_showing_desktop) {
+    showDesktop(e.data.l[0] != 0);
   }
 }
 
@@ -929,8 +942,11 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
 #ifdef DEBUG
     printf("DEBUG: MAP REQUEST CAUGHT IN SCREEN. IGNORED.\n");
 #endif
-  } else
+  } else {
+    if (_showing_desktop)
+      showDesktop(false); // leave showing-the-desktop mode
     manageWindow(e.window);
+  }
 }
 
 }

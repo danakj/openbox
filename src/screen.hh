@@ -95,7 +95,11 @@ private:
   //! The names of all desktops
   otk::Property::StringVect _desktop_names;
 
+  //! The layout of the desktops as specified by an EWMH compliant pager
   DesktopLayout _layout;
+
+  //! True when the window manager is in 'showing desktop' mode
+  bool _showing_desktop;
 
   //! Calculate the Screen::_area member
   void calcArea();
@@ -139,6 +143,10 @@ private:
   */
   void changeNumDesktops(unsigned int num);
 
+  //! Shows and focuses the desktop and hides all the client windows, or
+  //! returns to the normal state, showing client windows.
+  void showDesktop(bool show);
+
 public:
 #ifndef SWIG
   //! Constructs a new Screen object
@@ -161,6 +169,8 @@ public:
   inline unsigned int desktop() const { return _desktop; }
   //! Returns the number of desktops
   inline unsigned int numDesktops() const { return _num_desktops; }
+  //! When true, the desktop is being shown and all clients are hidden
+  inline bool showingDesktop() const { return _showing_desktop; }
 
   //! Returns the area of the screen not reserved by applications' Struts
   /*!

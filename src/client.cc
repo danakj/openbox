@@ -764,12 +764,17 @@ void Client::setDesktop(unsigned int target)
 
 void Client::showhide()
 {
-  if (!_iconic &&
-      (_desktop == openbox->screen(_screen)->desktop() ||
-       _desktop == 0xffffffff))
-    frame->show();
-  else
-    frame->hide();
+  bool show;
+  Screen *s = openbox->screen(_screen);
+
+  if (_iconic) show = false;
+  else if (!(_desktop == s->desktop() ||
+             _desktop == 0xffffffff)) show = false;
+  else if (normal() && s->showingDesktop()) show = false;
+  else show = true;
+
+  if (show) frame->show();
+  else      frame->hide();
 }
 
 

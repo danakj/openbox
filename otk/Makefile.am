@@ -10,9 +10,9 @@ noinst_LTLIBRARIES=libotk.la
 
 libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
                   renderstyle.cc rendercolor.cc  \
-                  color.cc display.cc font.cc gccache.cc image.cc \
-                  property.cc imagecontrol.cc rect.cc screeninfo.cc \
-                  texture.cc timer.cc style.cc \
+                  display.cc font.cc \
+                  property.cc rect.cc screeninfo.cc \
+                  timer.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc

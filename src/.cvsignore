@@ -3,4 +3,3 @@ Makefile.in
 openbox3
 .deps
 .libs
-openbox.py

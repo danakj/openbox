@@ -1200,8 +1200,8 @@ static void event_handle_menu(XEvent *ev)
                 menu_frame_select(f, NULL);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()) && f->child && f->child->entries)
-                menu_frame_select(f->child, f->child->entries->data);
+            if ((f = find_active_menu()) && f->child)
+                menu_frame_select_next(f->child);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_UP)) {
             ObMenuFrame *f;
             if ((f = find_active_menu()))

@@ -948,7 +948,12 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                 if (!(cancel || done))
                     if (!keyboard_interactive_grab(state, a->data.any.c, a))
                         continue;
+            }
 
+            /* XXX UGLY HACK race with motion event starting a move and the
+               button release gettnig processed first. answer: don't queue
+               moveresize starts. UGLY HACK XXX */
+            if (a->data.any.interactive || a->func == action_moveresize) {
                 /* interactive actions are not queued */
                 a->func(&a->data);
             } else

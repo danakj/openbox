@@ -939,7 +939,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_close(client);
 	} else if (msgtype == prop_atoms.net_active_window) {
 	    ob_debug("net_active_window for 0x%lx\n", client->window);
-            client_activate(client);
+            client_activate(client, FALSE);
 	} else if (msgtype == prop_atoms.net_wm_moveresize) {
 	    ob_debug("net_wm_moveresize for 0x%lx\n", client->window);
             if ((Atom)e->xclient.data.l[2] ==

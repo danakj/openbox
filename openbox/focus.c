@@ -278,7 +278,7 @@ ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         goto done_cycle;
     } else if (done) {
         if (focus_cycle_target)
-            client_activate(focus_cycle_target);
+            client_activate(focus_cycle_target, FALSE);
         goto done_cycle;
     }
 

@@ -2533,16 +2533,19 @@ void client_unfocus(ObClient *self)
     focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
 }
 
-void client_activate(ObClient *self)
+void client_activate(ObClient *self, gboolean here)
 {
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
     if (self->iconic)
         client_iconify(self, FALSE, FALSE);
     if (self->desktop != DESKTOP_ALL &&
-        self->desktop != screen_desktop)
-        screen_set_desktop(self->desktop);
-    else if (!self->frame->visible)
+        self->desktop != screen_desktop) {
+        if (here)
+            client_set_desktop(self, screen_desktop, FALSE);
+        else
+            screen_set_desktop(self->desktop);
+    } else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess
            with it */
         return;

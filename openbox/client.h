@@ -395,8 +395,11 @@ gboolean client_focus(ObClient *self);
 void client_unfocus(ObClient *self);
 
 /*! Activates the client for use, focusing, uniconifying it, etc. To be used
-  when the user deliberately selects a window for use. */
-void client_activate(ObClient *self);
+  when the user deliberately selects a window for use.
+  @param here If true, then the client is brought to the current desktop;
+              otherwise, the desktop is changed to where the client lives.
+*/
+void client_activate(ObClient *self, gboolean here);
 
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(ObClient *self);

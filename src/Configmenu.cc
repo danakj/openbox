@@ -52,8 +52,6 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Window-To-Window Snapping"), windowsnapmenu);
   insert(i18n(ConfigmenuSet, ConfigmenuWindowToEdgeSnap,
               "Window-To-Edge Snapping"), edgesnapmenu);
-  insert(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
-              "Window Placement"), placementmenu);
 #ifdef    XINERAMA
   insert(i18n(ConfigmenuSet, ConfigmenuXineramaSupport,
               "XineramaSupport"), xineramamenu);

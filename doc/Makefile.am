@@ -3,9 +3,11 @@
 CLEANFILES = openbox.1
 MAINTAINERCLEANFILES = Makefile.in
 man_MANS = openbox.1 bsetroot.1 bsetbg.1 xftlsfonts.1
-SUBDIRS = doxygen
+SUBDIRS = 
 
 DEFAULT_MENU=$(pkgdatadir)/menu
+
+EXTRA_DIST = openbox.1.in bsetroot.1 bsetbg.1 xftlsfonts.1
 
 distclean-local:
 	rm -f *\~ .\#*

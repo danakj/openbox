@@ -1,15 +1,40 @@
 Changelog for Openbox:
-2.2.0
+
+2.2.1:
+ * Make configure look for Xft version 2 libraries and  (Ben Jansens)
+   use them if they are available.
+
+ * Add bitmap button support to all the default styles. (Ben Jansens)
+
+ * Change the default premax values to be larger than 0 (Ben Jansens)
+   for clients that map in a maximized state. (avoid a
+   mozilla crash.)
+
+ * Fix for clients changing from a non-resizable window (Ben Jansens)
+   to a resizable window.
+
+ * Fix bug with mutltibyte fonts being really tiny.     (Ben Jansens)
+
+ * Stop using Utf8 drawing routines for Xft. These      (Ben Jansens)
+   don't work at all for high-ascii letters, which are
+   used in the non-english locales.
+
+ * Fix menu redraw bug when dragging them off-screen or (Scott Moynes,
+   under other menus, with Xft fonts.                    Ben Jansens)
+
+ * Build fixes for xftlsfonts and for openbox on        (Marius Nita)
+   redhat systems.
+
+2.2.0:
  * Allow changing the appearance of buttons with xbm	(Scott Moynes)
    bitmap files. Can be disabled with 
    --disable-bitmap-buttons.
  
  * Added style textures for				(Scott Moynes)
    window.button.pressed.focus/unfocus:
-2.1.2
+
  * Fixed window menu placement bug			(Scott Moynes)
 
-2.1.1:
  * A build fix for xftlsfonts.                          (Scott Moynes)
 
  * Add a configuration menu for changing Xft font       (Ben Jansens)

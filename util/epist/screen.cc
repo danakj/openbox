@@ -57,8 +57,8 @@ using std::hex;
 using std::dec;
 using std::string;
 
-#include "../../src/basedisplay.hh"
-#include "../../src/xatom.hh"
+#include "../../src/BaseDisplay.hh"
+#include "../../src/XAtom.hh"
 #include "screen.hh"
 #include "epist.hh"
 #include "config.hh"

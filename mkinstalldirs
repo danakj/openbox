@@ -22,7 +22,7 @@ do
      esac
 
      if test ! -d "$pathcomp"; then
-        echo "mkdir $pathcomp"
+        echo "mkdir $pathcomp" 1>&2
 
         mkdir "$pathcomp" || lasterr=$?
 

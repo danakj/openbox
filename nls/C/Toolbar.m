@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Tegumiriba
+# Barre d'outils
 $ #EditWkspcName
-# Muuda töölaua nime
+# Edition du nom de l'espace courant
 $ #ToolbarPlacement
-# Tegumiriba asukoht
+# Disposition de la barre d'outils

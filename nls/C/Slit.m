@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Pragu
+# Fente
 $ #SlitDirection
-# Prao suund
+# Orientation de la Fente
 $ #SlitPlacement
-# Prao asukoht
+# Disposition de la Fente

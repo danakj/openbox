@@ -2,17 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: creando 0x%lx\n
+# BlackboxWindow::BlackboxWindow: loome 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: XGetWindowAttributres falló\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributres ebaõnnestus\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: no se puede encontrar la pantalla para la ventana \
-  raíz 0x%lx\n
+# BlackboxWindow::BlackboxWindow: ei leidnud displeid juuraknale 0x%lx\n
 $ #Unnamed
-# Sin nombre
+# Nimeta
 $ #MapRequest
-# BlackboxWindow::mapRequestEvent() para 0x%lx\n
+# BlackboxWindow::mapRequestEvent() 0x%lx'le\n
 $ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() para 0x%lx\n
+# BlackboxWindow::unmapNotifyEvent() 0x%lx'le\n
 $ #ReparentNotify
-# BlackboxWindow::reparentNotifyEvent: el padre nuevo para 0x%lx es 0x%lx\n
+# BlackboxWindow::reparentNotifyEvent: 0x%lx juurele 0x%lx\n

@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Opciones de configuración
+# Konfiguratsioon
 $ #FocusModel
-# Modelo de enfoque
+# Fookusmood
 $ #WindowPlacement
-# Ubicación de ventanas
+# Akende paigutamine
 $ #ImageDithering
-# Simulación de colores en imágenes
+# Piltide teravustamine
 $ #OpaqueMove
-# Movimiento opaco de ventanas
+# Nähtav akende liigutamine
 $ #FullMax
-# Maximización total
+# Üle-ekraani suurendus
 $ #FocusNew
-# Enfocar ventanas nuevas
+# Fookus uutele akendele
 $ #FocusLast
-# Enfocar la última ventana en el escritorio
+# Fokusseeri viimane aken
 $ #ClickToFocus
-# Seleccionar para enfocar
+# Klikka fookuse saamiseks
 $ #SloppyFocus
-# Enfocar sin forma estricta
+# Kaasaskäiv fookus
 $ #AutoRaise
-# Elevar automáticamente las ventanas
+# Akende esiletoomine
 $ #SmartRows
-# Ubicación inteligente (filas)
+# Arukas paigutus (read)
 $ #SmartCols
-# Ubicación inteligente (columnas)
+# Arukas paigutus (tulbad)
 $ #Cascade
-# Ubicación en cascada
+# Kaskaadis
 $ #LeftRight
-# De izquierda a derecha
+# Vasakult paremale
 $ #RightLeft
-# De derecha a izquierda
+# Paremalt vasakule
 $ #TopBottom
-# De arriba hacia abajo
+# Ülevalt alla
 $ #BottomTop
-# De abajo hacia arriba
+# Alt ülesse

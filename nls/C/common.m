@@ -1,35 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Jah
+# Oui
 $ #No
-# Ei
+# Non
 
 $ #DirectionTitle
-# Suund
+# Orientation
 $ #DirectionHoriz
-# Horisontaalne
+# Horizontal
 $ #DirectionVert
-# Vertikaalne
+# Vertical
 
 $ #AlwaysOnTop
-# Alati esiplaanil
+# Toujours au dessus
 
 $ #PlacementTitle
-# Asetus
+# Disposition
 $ #PlacementTopLeft
-# Üleval vasakul
+# En haut à gauche
 $ #PlacementCenterLeft
-# Keskel vasakul
+# Au centre à gauche
 $ #PlacementBottomLeft
-# All vasakul
+# En bas à gauche
 $ #PlacementTopCenter
-# Üleval keskel
+# En haut au centre
 $ #PlacementBottomCenter
-# All keskel
+# En bas au centre
 $ #PlacementTopRight
-# Üleval paremal
+# En haut à droite
 $ #PlacementCenterRight
-# Keskel paremal
+# Au centre à droite
 $ #PlacementBottomRight
-# All paremal
+# En bas à droite
+
+$ #AutoHide
+# Auto disparaît

@@ -87,6 +87,8 @@ public:
   inline unsigned int getFrameWidth(void) const { return frame_width; }
   inline unsigned int getBorderWidth(void) const { return border_width; }
 
+  inline const BFont *getFont() const { return font; }
+
   inline void setImageControl(BImageControl *c) { image_control = c; }
   inline void setScreenNumber(unsigned int scr) { screen_number = scr; }
 

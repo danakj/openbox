@@ -11,14 +11,13 @@ extern "C" {
 
 #include <string>
 
+#include "client.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
 #include "otk/style.hh"
 
 namespace ob {
-
-class OBClient;
 
 //! Holds and decorates a frame around an OBClient (client window)
 /*!
@@ -36,8 +35,45 @@ private:
   //! The size of the frame on each side of the client window
   otk::Strut _size;
 
+  // decoration windows
+  Window _titlebar;
+  otk::Rect _titlebar_area;
+  
+  Window _button_close;
+  otk::Rect _button_close_area;
+  
+  Window _button_iconify;
+  otk::Rect _button_iconify_area;
+
+  Window _button_max;
+  otk::Rect _button_max_area;
+
+  Window _button_stick;
+  otk::Rect _button_stick_area;
+
+  Window _label;
+  otk::Rect _label_area;
+
+  Window _handle;
+  otk::Rect _handle_area;
+
+  Window _grip_left;
+  otk::Rect _grip_left_area;
+
+  Window _grip_right;
+  otk::Rect _grip_right_area;
+
+  //! The decorations to display on the window.
+  /*!
+    This is by default the same value as in the OBClient::decorations, but it
+    is duplicated here so that it can be overridden per-window by the user.
+  */
+  OBClient::DecorationFlags _decorations;
+
   //! Creates the base frame window
   Window createFrame();
+  //! Creates a child frame decoration element window
+  Window createChild(Window parent, Cursor cursor);
 
   //! Reparents the client window from the root window onto the frame
   void grabClient();
@@ -60,10 +96,10 @@ public:
   //! Load a style to decorate the frame with
   void loadStyle(const otk::Style *style);
 
-  //! Size the frame to the client
-  void resize();
+  //! Update the frame to match the client
+  void update();
   //! Shape the frame window to the client window
-  void shape(); 
+  void updateShape(); 
   
   //! Returns the frame's most-parent window, which is a child of the root
   //! window

@@ -93,7 +93,8 @@ public:
                     Decor_Border   = 1 << 2, //!< Display a border
                     Decor_Iconify  = 1 << 3, //!< Display an iconify button
                     Decor_Maximize = 1 << 4, //!< Display a maximize button
-                    Decor_Close    = 1 << 5  //!< Display a close button
+                    Decor_Sticky   = 1 << 5, //!< Display a sticky button
+                    Decor_Close    = 1 << 6  //!< Display a close button
   };
   //! Holds a bitmask of OBClient::Decoration values
   typedef unsigned char DecorationFlags;

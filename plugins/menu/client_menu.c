@@ -90,7 +90,7 @@ static void layer_update(ObMenuFrame *frame, gpointer data)
     e->data.normal.enabled = !frame->client->above;
 
     e = menu_find_entry_id(menu, LAYER_NORMAL);
-    e->data.normal.enabled = !(frame->client->above || frame->client->below);
+    e->data.normal.enabled = (frame->client->above || frame->client->below);
 
     e = menu_find_entry_id(menu, LAYER_BOTTOM);
     e->data.normal.enabled = !frame->client->below;

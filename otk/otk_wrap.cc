@@ -12501,11 +12501,17 @@ static PyObject *_wrap_delete_OBTimerQueueManager(PyObject *self, PyObject *args
 static PyObject *_wrap_OBTimerQueueManager_fire(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::OBTimerQueueManager *arg1 = (otk::OBTimerQueueManager *) 0 ;
+    bool arg2 = (bool) true ;
     PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:OBTimerQueueManager_fire",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O|O:OBTimerQueueManager_fire",&obj0,&obj1)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OBTimerQueueManager,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->fire();
+    if (obj1) {
+        arg2 = (bool) PyInt_AsLong(obj1);
+        if (PyErr_Occurred()) SWIG_fail;
+    }
+    (arg1)->fire(arg2);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;

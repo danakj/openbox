@@ -22,11 +22,12 @@ public:
   //! Destroys the OBTimerQueueManager
   virtual ~OBTimerQueueManager() {}
 
-  //! Will wait for and fire the next timer in the queue.
+  //! Fire the next timer in the queue.
   /*!
-    The function will stop waiting if an event is received from the X server.
+    @param wait If true, this function will wait for the next timer, breaking
+                on any events from the X server.
   */
-  virtual void fire();
+  virtual void fire(bool wait = true);
 
   //! Adds a new timer to the queue
   /*!

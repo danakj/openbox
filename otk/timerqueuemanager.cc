@@ -9,7 +9,7 @@
 
 namespace otk {
 
-void OBTimerQueueManager::fire()
+void OBTimerQueueManager::fire(bool wait)
 {
   fd_set rfds;
   timeval now, tm, *timeout = (timeval *) 0;
@@ -19,16 +19,18 @@ void OBTimerQueueManager::fire()
   FD_ZERO(&rfds);
   FD_SET(xfd, &rfds); // break on any x events
 
-  if (! timerList.empty()) {
-    const OBTimer* const timer = timerList.top();
+  if (wait) {
+    if (! timerList.empty()) {
+      const OBTimer* const timer = timerList.top();
+      
+      gettimeofday(&now, 0);
+      tm = timer->remainingTime(now);
+      
+      timeout = &tm;
+    }
 
-    gettimeofday(&now, 0);
-    tm = timer->remainingTime(now);
-
-    timeout = &tm;
+    select(xfd + 1, &rfds, 0, 0, timeout);
   }
-
-  select(xfd + 1, &rfds, 0, 0, timeout);
 
   // check for timer timeout
   gettimeofday(&now, 0);

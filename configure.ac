@@ -4,6 +4,8 @@ AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
 AC_PREREQ([2.50])
 
+test "$prefix" = "NONE" && prefix="$ac_default_prefix"
+    
 AC_PATH_PROG([regex_cmd], [sed])
 test "$regex_cmd" || AC_MSG_ERROR([sed not found])
 
@@ -121,26 +123,36 @@ else
   AC_MSG_RESULT([$PYTHON_CFLAGS])
 fi
 
-# Set the library directory blindly.   This probably won't work with older versions
+# Find the python library
+PYTHON_LIBS=""
 AC_MSG_CHECKING([for Python library])
-dirs="$PYVERSION/config $PYVERSION/lib python/lib"
+dirs="$PYEPREFIX/lib $PYEPREFIX/lib/$PYVERSION/config \
+      $PYEPREFIX/lib/$PYVERSION/lib $PYEPREFIX/lib/python/lib"
 for i in $dirs; do
-  if test -d "$PYEPREFIX/lib/$i"; then
-    PYLIB="$PYEPREFIX/lib/$i"
-    break
+  # look for really old versions
+  if test -r "$i/lib$PYVERSION.so"; then
+      PYLIB="$i"
+      PYTHON_LIBS="-L$PYLIB -l$PYVERSION"
+      break
+  else
+    if test -r "$i/libPython.a"; then
+      PYLIB="$i"
+      PYTHON_LIBS="-L$PYLIB -lModules -lPython -lObjects -lParser"
+      break
+    else
+      if test -r "$i/lib$PYVERSION.a"; then
+        PYLIB="$i"
+        PYTHON_LIBS="-L$PYLIB -l$PYVERSION -lpthread -ldl -lutil -lm"
+        break
+      fi
+    fi
   fi
 done
+
 if ! test "$PYLIB"; then
   AC_MSG_ERROR([Not found])
 else
   AC_MSG_RESULT([$PYLIB])
-fi
-
-# Check for really old versions
-if test -r "$PYLIB/libPython.a"; then
-    PYTHON_LIBS="-L$PYLIB -lModules -lPython -lObjects -lParser"
-else
-    PYTHON_LIBS="-L$PYLIB -l$PYVERSION"
 fi
 
 AC_SUBST([PYTHON_CFLAGS])

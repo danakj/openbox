@@ -100,7 +100,11 @@ line argument.\n\n"));
     printf(_("Couldn't mark display connection as close-on-exec.\n\n"));
     ::exit(1);
   }
-
+  if (! XSupportsLocale())
+    printf(_("X server does not support locale.\n"));
+  if (XSetLocaleModifiers("") == NULL)
+    printf(_("Cannot set locale modifiers for the X server.\n"));
+  
   // set our error handler for X errors
   XSetErrorHandler(xerrorHandler);
 

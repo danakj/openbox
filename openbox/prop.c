@@ -306,12 +306,17 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
 gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
 {
     char *raw;
+    char *str;
     guint num;
      
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
-	*ret = g_strndup(raw, num); /* grab the first string from the list */
+	str = g_strndup(raw, num); /* grab the first string from the list */
 	g_free(raw);
-	return TRUE;
+        if (g_utf8_validate(str, -1, NULL)) {
+            *ret = str;
+            return TRUE;
+        }
+        g_free(str);
     }
     return FALSE;
 }
@@ -327,7 +332,10 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 
         p = raw;
         for (i = 0; i < num; ++i) {
-            (*ret)[i] = g_strdup(p);
+            if (g_utf8_validate(p, -1, NULL))
+                (*ret)[i] = g_strdup(p);
+            else
+                (*ret)[i] = g_strdup("");
             p += strlen(p) + 1;
         }
 	g_free(raw);

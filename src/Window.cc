@@ -44,6 +44,7 @@ extern "C" {
 
 #include "i18n.hh"
 #include "blackbox.hh"
+#include "Font.hh"
 #include "GCCache.hh"
 #include "Iconmenu.hh"
 #include "Image.hh"
@@ -2323,20 +2324,12 @@ void BlackboxWindow::redrawLabel(void) const {
 
   WindowStyle *style = screen->getWindowStyle();
 
-  int pos = frame.bevel_w * 2,
-    dlen = style->doJustify(client.title.c_str(), pos, frame.label_w,
-                            frame.bevel_w * 4, i18n.multibyte());
-
-  BPen pen((flags.focused) ? style->l_text_focus : style->l_text_unfocus,
-           style->font);
-  if (i18n.multibyte())
-    XmbDrawString(blackbox->getXDisplay(), frame.label, style->fontset,
-                  pen.gc(), pos,
-                  (1 - style->fontset_extents->max_ink_extent.y),
-                  client.title.c_str(), dlen);
-  else
-    XDrawString(blackbox->getXDisplay(), frame.label, pen.gc(), pos,
-                (style->font->ascent + 1), client.title.c_str(), dlen);
+  int pos = frame.bevel_w * 2;
+  style->doJustify(client.title.c_str(), pos, frame.label_w, frame.bevel_w * 4);
+  style->font->drawString(frame.label, pos, 1,
+                          (flags.focused ? style->l_text_focus :
+                           style->l_text_unfocus),
+                          client.title);
 }
 
 
@@ -3406,12 +3399,7 @@ void BlackboxWindow::upsize(void) {
     // the height of the titlebar is based upon the height of the font being
     // used to display the window's title
     WindowStyle *style = screen->getWindowStyle();
-    if (i18n.multibyte())
-      frame.title_h = (style->fontset_extents->max_ink_extent.height +
-                       (frame.bevel_w * 2) + 2);
-    else
-      frame.title_h = (style->font->ascent + style->font->descent +
-                       (frame.bevel_w * 2) + 2);
+    frame.title_h = style->font->height() + (frame.bevel_w * 2) + 2;
 
     frame.label_h = frame.title_h - (frame.bevel_w * 2);
     frame.button_w = (frame.label_h - 2);
@@ -3554,21 +3542,14 @@ void BlackboxWindow::constrain(Corner anchor, int *pw, int *ph) {
 }
 
 
-int WindowStyle::doJustify(const char *text, int &start_pos,
-                           unsigned int max_length, unsigned int modifier,
-                           bool multibyte) const {
-  size_t text_len = strlen(text);
+int WindowStyle::doJustify(const std::string &text, int &start_pos,
+                           unsigned int max_length,
+                           unsigned int modifier) const {
+  size_t text_len = text.size();
   unsigned int length;
 
   do {
-    if (multibyte) {
-      XRectangle ink, logical;
-      XmbTextExtents(fontset, text, text_len, &ink, &logical);
-      length = logical.width;
-    } else {
-      length = XTextWidth(font, text, text_len);
-    }
-    length += modifier;
+    length = font->measureString(string(text, 0, text_len)) + modifier;
   } while (length > max_length && text_len-- > 0);
 
   switch (justify) {

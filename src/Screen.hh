@@ -54,7 +54,9 @@ extern "C" {
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
 #include "blackbox.hh"
+
 class Slit; // forward reference
+class BFont;
 class XAtom;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
@@ -65,37 +67,31 @@ struct WindowStyle {
   BTexture t_focus, t_unfocus, l_focus, l_unfocus, h_focus, h_unfocus,
     b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
-  XFontSet fontset;
-  XFontSetExtents *fontset_extents;
-  XFontStruct *font;
+  BFont *font;
 
   TextJustify justify;
 
-  int doJustify(const char *text, int &start_pos, unsigned int max_length,
-                unsigned int modifier, bool multibyte) const;
+  int doJustify(const std::string &text, int &start_pos,
+                unsigned int max_length, unsigned int modifier) const;
 };
 
 struct ToolbarStyle {
   BColor l_text, w_text, c_text, b_pic;
   BTexture toolbar, label, window, button, pressed, clock;
 
-  XFontSet fontset;
-  XFontSetExtents *fontset_extents;
-  XFontStruct *font;
+  BFont *font;
 
   TextJustify justify;
 
-  int doJustify(const char *text, int &start_pos, unsigned int max_length,
-                unsigned int modifier, bool multibyte) const;
+  int doJustify(const std::string &text, int &start_pos,
+                unsigned int max_length, unsigned int modifier) const;
 };
 
 struct MenuStyle {
   BColor t_text, f_text, h_text, d_text;
   BTexture title, frame, hilite;
 
-  XFontSet t_fontset, f_fontset;
-  XFontSetExtents *t_fontset_extents, *f_fontset_extents;
-  XFontStruct *t_font, *f_font;
+  BFont *t_font, *f_font;
 
   TextJustify t_justify, f_justify;
   int bullet, bullet_pos;
@@ -180,13 +176,11 @@ private:
 
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
-                               Configuration &style);
+                               const Configuration &style);
   BColor readDatabaseColor(const std::string &rname,
                            const std::string &default_color,
-                           Configuration &style);
-  XFontSet readDatabaseFontSet(const std::string &rname, Configuration &style);
-  XFontStruct *readDatabaseFont(const std::string &rname, Configuration &style);
-  XFontSet createFontSet(const std::string &fontname);
+                           const Configuration &style);
+  BFont *readDatabaseFont(const std::string &rname, const Configuration &style);
 
   void InitMenu(void);
   void LoadStyle(void);

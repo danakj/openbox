@@ -46,6 +46,7 @@ using namespace std;
 #include "i18n.hh"
 #include "blackbox.hh"
 #include "Basemenu.hh"
+#include "Font.hh"
 #include "GCCache.hh"
 #include "Image.hh"
 #include "Screen.hh"
@@ -90,27 +91,15 @@ Basemenu::Basemenu(BScreen *scrn) {
 
   menu.bevel_w = screen->getBevelWidth();
 
-  if (i18n.multibyte())
-    menu.width = menu.title_h = menu.item_w = menu.frame_h =
-      screen->getMenuStyle()->t_fontset_extents->max_ink_extent.height +
-      (menu.bevel_w  * 2);
-  else
-    menu.width = menu.title_h = menu.item_w = menu.frame_h =
-      screen->getMenuStyle()->t_font->ascent +
-      screen->getMenuStyle()->t_font->descent + (menu.bevel_w * 2);
+  MenuStyle *style = screen->getMenuStyle();
+  menu.width = menu.title_h = menu.item_w = menu.frame_h =
+    style->t_font->height() + (menu.bevel_w  * 2);
 
   menu.sublevels =
     menu.persub =
     menu.minsub = 0;
 
-  MenuStyle *style = screen->getMenuStyle();
-  if (i18n.multibyte()) {
-    menu.item_h = style->f_fontset_extents->max_ink_extent.height +
-      (menu.bevel_w);
-  } else {
-    menu.item_h = style->f_font->ascent + style->f_font->descent +
-      (menu.bevel_w);
-  }
+  menu.item_h = style->f_font->height() + menu.bevel_w;
 
   menu.height = menu.title_h + screen->getBorderWidth() + menu.frame_h;
 
@@ -265,31 +254,12 @@ int Basemenu::remove(int index) {
 
 void Basemenu::update(void) {
   MenuStyle *style = screen->getMenuStyle();
-  if (i18n.multibyte()) {
-    menu.item_h = style->f_fontset_extents->max_ink_extent.height +
-      menu.bevel_w;
-    menu.title_h = style->t_fontset_extents->max_ink_extent.height +
-      (menu.bevel_w * 2);
-  } else {
-    menu.item_h = style->f_font->ascent + style->f_font->descent +
-      menu.bevel_w;
-    menu.title_h = style->t_font->ascent + style->t_font->descent +
-      (menu.bevel_w * 2);
-  }
+  menu.item_h = style->f_font->height() + menu.bevel_w;
+  menu.title_h = style->t_font->height() + menu.bevel_w * 2;
 
   if (title_vis) {
-    const char *s = getLabel();
-    int l = strlen(s);
-
-    if (i18n.multibyte()) {
-      XRectangle ink, logical;
-      XmbTextExtents(screen->getMenuStyle()->t_fontset, s, l, &ink, &logical);
-      menu.item_w = logical.width;
-    } else {
-      menu.item_w = XTextWidth(screen->getMenuStyle()->t_font, s, l);
-    }
-
-    menu.item_w += (menu.bevel_w * 2);
+    menu.item_w = screen->getMenuStyle()->t_font->measureString(menu.label) +
+      menu.bevel_w * 2;
   }  else {
     menu.item_w = 1;
   }
@@ -297,18 +267,8 @@ void Basemenu::update(void) {
   unsigned int ii = 0;
   MenuItems::iterator it = menuitems.begin(), end = menuitems.end();
   for (; it != end; ++it) {
-    BasemenuItem *tmp = *it;
-    const char *s = tmp->l.c_str();
-    int l = strlen(s);
-
-    if (i18n.multibyte()) {
-      XRectangle ink, logical;
-      XmbTextExtents(screen->getMenuStyle()->f_fontset, s, l, &ink, &logical);
-      ii = logical.width;
-    } else
-      ii = XTextWidth(screen->getMenuStyle()->f_font, s, l);
-
-    ii += (menu.bevel_w * 2) + (menu.item_h * 2);
+    ii = screen->getMenuStyle()->f_font->measureString((*it)->l) +
+      (menu.bevel_w * 2) + (menu.item_h * 2);
 
     menu.item_w = ((menu.item_w < ii) ? ii : menu.item_w);
   }
@@ -484,17 +444,9 @@ void Basemenu::redrawTitle(void) {
     i18n(BasemenuSet, BasemenuBlackboxMenu, "Blackbox Menu");
   int dx = menu.bevel_w, len = strlen(text);
   unsigned int l;
+  MenuStyle *style = screen->getMenuStyle();
 
-  if (i18n.multibyte()) {
-    XRectangle ink, logical;
-    XmbTextExtents(screen->getMenuStyle()->t_fontset, text, len,
-                   &ink, &logical);
-    l = logical.width;
-  } else {
-    l = XTextWidth(screen->getMenuStyle()->t_font, text, len);
-  }
-
-  l +=  (menu.bevel_w * 2);
+  l = style->t_font->measureString(text) + menu.bevel_w * 2;
 
   switch (screen->getMenuStyle()->t_justify) {
   case RightJustify:
@@ -510,15 +462,8 @@ void Basemenu::redrawTitle(void) {
     break;
   }
 
-  MenuStyle *style = screen->getMenuStyle();
-  BPen pen(style->t_text, style->t_font);
-  if (i18n.multibyte())
-    XmbDrawString(display, menu.title, style->t_fontset, pen.gc(), dx,
-                  (menu.bevel_w - style->t_fontset_extents->max_ink_extent.y),
-                  text, len);
-  else
-    XDrawString(display, menu.title, pen.gc(), dx,
-                (style->t_font->ascent + menu.bevel_w), text, len);
+  style->t_font->drawString(menu.title, dx, menu.bevel_w,
+                            style->t_text, text);
 }
 
 
@@ -605,19 +550,8 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   unsigned int half_w = menu.item_h / 2, quarter_w = menu.item_h / 4;
 
   if (text) {
-    if (i18n.multibyte()) {
-      XRectangle ink, logical;
-      XmbTextExtents(screen->getMenuStyle()->f_fontset,
-                     text, len, &ink, &logical);
-      text_w = logical.width;
-      text_y = item_y + (menu.bevel_w / 2) -
-        screen->getMenuStyle()->f_fontset_extents->max_ink_extent.y;
-    } else {
-      text_w = XTextWidth(screen->getMenuStyle()->f_font, text, len);
-      text_y =  item_y +
-        screen->getMenuStyle()->f_font->ascent +
-        (menu.bevel_w / 2);
-    }
+    text_w = screen->getMenuStyle()->f_font->measureString(text);
+    text_y = item_y + menu.bevel_w / 2;
 
     switch(screen->getMenuStyle()->f_justify) {
     case LeftJustify:
@@ -638,8 +572,6 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
   MenuStyle *style = screen->getMenuStyle();
   BPen pen((highlight || item->isSelected()) ? style->h_text : style->f_text),
-      textpen((highlight) ? style->h_text :
-              item->isEnabled() ? style->f_text : style->d_text, style->f_font),
       hipen(style->hilite.color());
 
 
@@ -696,11 +628,11 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dotext && text) {
-    if (i18n.multibyte())
-      XmbDrawString(display, menu.frame, screen->getMenuStyle()->f_fontset,
-                    textpen.gc(), text_x, text_y, text, len);
-    else
-      XDrawString(display, menu.frame, textpen.gc(), text_x, text_y, text, len);
+    style->f_font->drawString(menu.frame, text_x, text_y,
+                              (highlight ? style->h_text :
+                               (item->isEnabled() ? style->f_text :
+                                style->d_text)),
+                              text);
   }
 
   if (dosel && item->submenu()) {

@@ -101,11 +101,9 @@ struct PointerAssassin {
 
 std::string itostring(unsigned long i);
 std::string itostring(long i);
-inline std::string itostring(unsigned int i) {
-  return itostring((unsigned long) i);
-}
-inline std::string itostring(int i) {
-  return itostring((long) i);
-}
-
+inline std::string itostring(unsigned int i)
+  { return itostring((unsigned long) i); }
+inline std::string itostring(int i)
+  { return itostring((long) i); }
+  
 #endif

@@ -54,6 +54,7 @@ using std::string;
 #include "i18n.hh"
 #include "blackbox.hh"
 #include "Clientmenu.hh"
+#include "Font.hh"
 #include "GCCache.hh"
 #include "Iconmenu.hh"
 #include "Image.hh"
@@ -289,14 +290,10 @@ void Toolbar::load_rc(void) {
 
 
 void Toolbar::reconfigure(void) {
-  unsigned int height = 0,
-    width = (screen->getWidth() * width_percent) / 100;
-
-  if (i18n.multibyte())
-    height = screen->getToolbarStyle()->fontset_extents->max_ink_extent.height;
-  else
-    height = screen->getToolbarStyle()->font->ascent +
-      screen->getToolbarStyle()->font->descent;
+  unsigned int width, height;
+ 
+  width = (screen->getWidth() * width_percent) / 100;
+  height = screen->getToolbarStyle()->font->height();
 
   frame.bevel_w = screen->getBevelWidth();
   frame.button_w = height;
@@ -362,47 +359,26 @@ void Toolbar::reconfigure(void) {
       int len = strftime(t, 1024, screen->getStrftimeFormat(), tt);
       if (len == 0) { // invalid time format found
         screen->saveStrftimeFormat("%I:%M %p"); // so use the default
-        len = strftime(t, 1024, screen->getStrftimeFormat(), tt);
+        strftime(t, 1024, screen->getStrftimeFormat(), tt);
       }
       // find the length of the rendered string and add room for two extra
       // characters to it.  This allows for variable width output of the fonts
-      if (i18n.multibyte()) {
-        XRectangle ink, logical;
-        XmbTextExtents(screen->getToolbarStyle()->fontset, t, len,
-                       &ink, &logical);
-        XFontSetExtents* extents = screen->getToolbarStyle()->fontset_extents;
-        frame.clock_w = logical.width +
-          (extents->max_logical_extent.width * 2);
-      } else {
-        XFontStruct* font = screen->getToolbarStyle()->font;
-        frame.clock_w = XTextWidth(font, t, len) +
-          ((font->max_bounds.rbearing - font->min_bounds.lbearing) * 2);
-      }
+      BFont *font = screen->getToolbarStyle()->font;
+      frame.clock_w = font->measureString(t) + font->maxCharWidth() * 2;
     }
   }
 #else // !HAVE_STRFTIME
-  frame.clock_w =
-    XTextWidth(screen->getToolbarStyle()->font,
-               i18n(ToolbarSet, ToolbarNoStrftimeLength, "00:00000"),
-               strlen(i18n(ToolbarSet, ToolbarNoStrftimeLength,
-                           "00:00000")));
+  {
+    string s = i18n(ToolbarSet, ToolbarNoStrftimeLength, "00:00000");
+    frame.clock_w = screen->getToolbarStyle()->font->measureString(s);
+  }
 #endif // HAVE_STRFTIME
 
   frame.workspace_label_w = 0;
 
   for (unsigned int i = 0; i < screen->getWorkspaceCount(); i++) {
     const string& workspace_name = screen->getWorkspace(i)->getName();
-    if (i18n.multibyte()) {
-      XRectangle ink, logical;
-      XmbTextExtents(screen->getToolbarStyle()->fontset,
-                     workspace_name.c_str(), workspace_name.length(),
-                     &ink, &logical);
-      width = logical.width;
-    } else {
-      width = XTextWidth(screen->getToolbarStyle()->font,
-                     workspace_name.c_str(), workspace_name.length());
-    }
-
+    width = screen->getToolbarStyle()->font->measureString(workspace_name);
     if (width > frame.workspace_label_w) frame.workspace_label_w = width;
   }
 
@@ -604,17 +580,9 @@ void Toolbar::checkClock(bool redraw, bool date) {
 
     ToolbarStyle *style = screen->getToolbarStyle();
 
-    int pos = frame.bevel_w * 2, // this is modified by doJustify()
-      dlen = style->doJustify(t, pos, frame.clock_w,
-                              frame.bevel_w * 4, i18n.multibyte());
-    BPen pen(style->c_text, style->font);
-    if (i18n.multibyte())
-      XmbDrawString(display, frame.clock, style->fontset, pen.gc(),
-                    pos, (1 - style->fontset_extents->max_ink_extent.y),
-                    t, dlen);
-    else
-      XDrawString(display, frame.clock, pen.gc(), pos,
-                  (style->font->ascent + 1), t, dlen);
+    int pos = frame.bevel_w * 2; // this is modified by doJustify()
+    style->doJustify(t, pos, frame.clock_w, frame.bevel_w * 4);
+    style->font->drawString(frame.clock, pos, 1, style->c_text, t);
   }
 }
 
@@ -634,17 +602,9 @@ void Toolbar::redrawWindowLabel(bool redraw) {
   const char *title = foc->getTitle();
   ToolbarStyle *style = screen->getToolbarStyle();
 
-  int pos = frame.bevel_w * 2, // modified by doJustify()
-    dlen = style->doJustify(title, pos, frame.window_label_w,
-                            frame.bevel_w * 4, i18n.multibyte());
-  BPen pen(style->w_text, style->font);
-  if (i18n.multibyte())
-    XmbDrawString(display, frame.window_label, style->fontset, pen.gc(), pos,
-                  (1 - style->fontset_extents->max_ink_extent.y),
-                  title, dlen);
-  else
-    XDrawString(display, frame.window_label, pen.gc(), pos,
-                (style->font->ascent + 1), title, dlen);
+  int pos = frame.bevel_w * 2; // modified by doJustify()
+  style->doJustify(title, pos, frame.window_label_w, frame.bevel_w * 4);
+  style->font->drawString(frame.window_label, pos, 1, style->w_text, title);
 }
 
 
@@ -656,18 +616,10 @@ void Toolbar::redrawWorkspaceLabel(bool redraw) {
 
   ToolbarStyle *style = screen->getToolbarStyle();
 
-  int pos = frame.bevel_w * 2,
-    dlen = style->doJustify(name.c_str(), pos, frame.workspace_label_w,
-                            frame.bevel_w * 4, i18n.multibyte());
-  BPen pen(style->l_text, style->font);
-  if (i18n.multibyte())
-    XmbDrawString(display, frame.workspace_label, style->fontset, pen.gc(),
-                  pos, (1 - style->fontset_extents->max_ink_extent.y),
-                  name.c_str(), dlen);
-  else
-    XDrawString(display, frame.workspace_label, pen.gc(), pos,
-                (style->font->ascent + 1),
-                name.c_str(), dlen);
+  int pos = frame.bevel_w * 2;
+  style->doJustify(name.c_str(), pos, frame.workspace_label_w,
+                   frame.bevel_w * 4);
+  style->font->drawString(frame.workspace_label, pos, 1, style->l_text, name);
 }
 
 
@@ -695,7 +647,7 @@ void Toolbar::redrawPrevWorkspaceButton(bool pressed, bool redraw) {
   pts[2].x = 0; pts[2].y = -4;
 
   ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic, style->font);
+  BPen pen(style->b_pic);
   XFillPolygon(display, frame.psbutton, pen.gc(),
                pts, 3, Convex, CoordModePrevious);
 }
@@ -725,7 +677,7 @@ void Toolbar::redrawNextWorkspaceButton(bool pressed, bool redraw) {
   pts[2].x = -4; pts[2].y = 2;
 
   ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic, style->font);
+  BPen pen(style->b_pic);
   XFillPolygon(display, frame.nsbutton, pen.gc(),
                pts, 3, Convex, CoordModePrevious);
 }
@@ -755,7 +707,7 @@ void Toolbar::redrawPrevWindowButton(bool pressed, bool redraw) {
   pts[2].x = 0; pts[2].y = -4;
 
   ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic, style->font);
+  BPen pen(style->b_pic);
   XFillPolygon(display, frame.pwbutton, pen.gc(),
                pts, 3, Convex, CoordModePrevious);
 }
@@ -785,7 +737,7 @@ void Toolbar::redrawNextWindowButton(bool pressed, bool redraw) {
   pts[2].x = -4; pts[2].y = 2;
 
   ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic, style->font);
+  BPen pen(style->b_pic);
   XFillPolygon(display, frame.nwbutton, pen.gc(), pts, 3, Convex,
                CoordModePrevious);
 }
@@ -809,7 +761,7 @@ void Toolbar::edit(void) {
     blackbox->getFocusedWindow()->setFocusFlag(False);
 
   ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->l_text, style->font);
+  BPen pen(style->l_text);
   XDrawRectangle(display, frame.workspace_label, pen.gc(),
                  frame.workspace_label_w / 2, 0, 1,
                  frame.label_h - 1);
@@ -1020,32 +972,17 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
       }
 
       XClearWindow(display, frame.workspace_label);
-      unsigned int l = new_workspace_name.length(), tw, x;
+      unsigned int tw, x;
 
-      if (i18n.multibyte()) {
-        XRectangle ink, logical;
-        XmbTextExtents(screen->getToolbarStyle()->fontset,
-                       new_workspace_name.c_str(), l, &ink, &logical);
-        tw = logical.width;
-      } else {
-        tw = XTextWidth(screen->getToolbarStyle()->font,
-                        new_workspace_name.c_str(), l);
-      }
+      tw = screen->getToolbarStyle()->font->measureString(new_workspace_name);
       x = (frame.workspace_label_w - tw) / 2;
 
       if (x < frame.bevel_w) x = frame.bevel_w;
 
       ToolbarStyle *style = screen->getToolbarStyle();
-      BPen pen(style->l_text, style->font);
-      if (i18n.multibyte())
-        XmbDrawString(display, frame.workspace_label, style->fontset,
-                      pen.gc(), x,
-                      (1 - style->fontset_extents->max_ink_extent.y),
-                      new_workspace_name.c_str(), l);
-      else
-        XDrawString(display, frame.workspace_label, pen.gc(), x,
-                    (style->font->ascent + 1),
-                    new_workspace_name.c_str(), l);
+      style->font->drawString(frame.workspace_label, x, 1, style->l_text,
+                              new_workspace_name);
+      BPen pen(style->l_text);
       XDrawRectangle(display, frame.workspace_label, pen.gc(), x + tw, 0, 1,
                      frame.label_h - 1);
     }
@@ -1235,21 +1172,14 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, unsigned int index) {
 }
 
 
-int ToolbarStyle::doJustify(const char *text, int &start_pos,
-                            unsigned int max_length, unsigned int modifier,
-                            bool multibyte) const {
-  size_t text_len = strlen(text);
+int ToolbarStyle::doJustify(const std::string &text, int &start_pos,
+                            unsigned int max_length,
+                            unsigned int modifier) const {
+  size_t text_len = text.size();
   unsigned int length;
 
   do {
-    if (multibyte) {
-      XRectangle ink, logical;
-      XmbTextExtents(fontset, text, text_len, &ink, &logical);
-      length = logical.width;
-    } else {
-      length = XTextWidth(font, text, text_len);
-    }
-    length += modifier;
+    length = font->measureString(string(text, 0, text_len)) + modifier;
   } while (length > max_length && text_len-- > 0);
 
   switch (justify) {

@@ -53,8 +53,6 @@ AC_CHECK_LIB(X11, XOpenDisplay,
 
 LIBS="$LIBS $X_EXTRA_LIBS"
 
-Xext_lib=""
-
 dnl Check for XShape extension support and proper library files.
 SHAPE=""
 AC_MSG_CHECKING([whether to build support for the XShape extension])
@@ -65,16 +63,16 @@ AC_ARG_ENABLE(
 if test x$enableval = "xyes"; then
   AC_MSG_RESULT([yes])
   AC_CHECK_LIB(Xext, XShapeCombineShape,
-    AC_MSG_CHECKING([for X11/extensions/shape.h])
-    AC_TRY_LINK(
+	AC_MSG_CHECKING([for X11/extensions/shape.h])
+	AC_TRY_LINK(
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
 , long foo = ShapeSet,
-      AC_MSG_RESULT([yes])
-      SHAPE="yes",
-      AC_MSG_RESULT([no])
-    )
+	  AC_MSG_RESULT([yes])
+	  SHAPE="yes",
+	  AC_MSG_RESULT([no])
+	)
   )
 else
   AC_MSG_RESULT([no])
@@ -82,6 +80,34 @@ fi
 if test x$SHAPE = "xyes"; then
   LIBS="$LIBS -lXext"
   AC_DEFINE(SHAPE,1,Enable support of the XShape extension)
+fi
+
+dnl Check for Xft extension support and proper library files.
+XFT=""
+AC_MSG_CHECKING([whether to build support for the Xft extension])
+AC_ARG_ENABLE(
+  xft, [  --enable-xft             enable support of the Xft extension [default=yes]])
+
+: ${enableval="yes"}
+if test x$enableval = "xyes"; then
+  AC_MSG_RESULT([yes])
+  AC_CHECK_LIB(Xft, XftOpenFontName,
+    AC_MSG_CHECKING([for X11/Xft/Xft.h])
+    AC_TRY_LINK(
+#include <X11/Xlib.h>
+#include <X11/Xft/Xft.h>
+, XftFont foo,
+      AC_MSG_RESULT([yes])
+      XFT="yes",
+      AC_MSG_RESULT([no])
+    )
+  )
+else
+  AC_MSG_RESULT([no])
+fi
+if test x$XFT = "xyes"; then
+  LIBS="$LIBS -lXft"
+  AC_DEFINE(XFT,1,Enable support of the Xft extension)
 fi
 
 dnl Check for the Slit

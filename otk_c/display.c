@@ -33,7 +33,9 @@ extern PyTypeObject OtkDisplay_Type;
 
 static int xerrorHandler(Display *d, XErrorEvent *e);
 
-PyObject *OtkDisplay_New(char *name)
+struct OtkDisplay *OBDisplay = NULL;
+
+void OtkDisplay_Initialize(char *name)
 {
   OtkDisplay* self;
   PyObject *disp_env;
@@ -117,14 +119,13 @@ line argument.\n\n"));
   self->mask_list[6] = ScrollLockMask | NumLockMask;
   self->mask_list[7] = ScrollLockMask | LockMask | NumLockMask;
 
+  // set the global var, for the new screeninfo's
+  OBDisplay = self;
+  
   // Get information on all the screens which are available.
   self->screenInfoList = PyList_New(ScreenCount(self->display));
   for (i = 0; i < ScreenCount(self->display); ++i)
     PyList_SetItem(self->screenInfoList, i, OtkScreenInfo_New(i));
-
-  self->gccache = OtkGCCache_New(PyList_Size(self->screenInfoList));
-  
-  return (PyObject*)self;
 }
 
 void OtkDisplay_Grab(OtkDisplay *self)

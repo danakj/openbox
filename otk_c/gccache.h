@@ -16,7 +16,7 @@ typedef struct OtkGCCacheContext {
   int function;
   int subwindow;
   Bool used;
-  unsigned int screen;
+  int screen;
   int linewidth;
 } OtkGCCacheContext;
 

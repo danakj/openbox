@@ -6,7 +6,7 @@ targets = libotk.so libotk.a
 sources = display.c screeninfo.c rect.c gccache.c color.c
 headers = display.h screeninfo.h rect.h gccache.h color.h
 
-CFLAGS+=-I/usr/gwar/include/python2.2
+CFLAGS+=-g -I/usr/gwar/include/python2.2 -W -Wall
 
 .PHONY: all install clean
 

@@ -8,7 +8,7 @@
 # include <stdlib.h>
 #endif
 
-static OtkGCCache *gccache;
+static OtkGCCache *gccache = NULL;
 
 OtkGCCacheContext *OtkGCCacheContext_New()
 {
@@ -81,12 +81,14 @@ OtkGCCacheItem *OtkGCCacheItem_New()
   self->count = 0;
   self->hits = 0;
   self->fault = False;
+
+  return self;
 }
 
 
 void OtkGCCache_Initialize(int screen_count)
 {
-  int i;
+  unsigned int i;
 
   gccache = malloc(sizeof(OtkGCCache));
 
@@ -108,7 +110,7 @@ void OtkGCCache_Initialize(int screen_count)
 
 void OtkGCCache_Destroy()
 {
-  int i;
+  unsigned int i;
 
   for (i = 0; i < gccache->context_count; ++i)
     OtkGCCacheContext_Destroy(gccache->contexts[i]);
@@ -126,7 +128,7 @@ OtkGCCacheContext *OtkGCCache_NextContext(int screen)
 {
   Window hd = OtkDisplay_ScreenInfo(OBDisplay, screen)->root_window;
   OtkGCCacheContext *c;
-  int i;
+  unsigned int i;
 
   for (i = 0; i < gccache->context_count; ++i) {
     c = gccache->contexts[i];
@@ -155,10 +157,10 @@ OtkGCCacheItem *OtkGCCache_Find(OtkColor *color, XFontStruct *font,
 				int function, int subwindow, int linewidth)
 {
   const unsigned long pixel = OtkColor_Pixel(color);
-  const unsigned int screen = color->screen;
+  const int screen = color->screen;
   const int key = color->red ^ color->green ^ color->blue;
   int k = (key % gccache->cache_size) * gccache->cache_buckets;
-  int i = 0; // loop variable
+  unsigned int i = 0; // loop variable
   OtkGCCacheItem *c = gccache->cache[k], *prev = 0;
 
   /*
@@ -219,13 +221,13 @@ void OtkGCCache_Release(OtkGCCacheItem *item)
 
 void OtkGCCache_Purge()
 {
-  int i;
+  unsigned int i;
   
   for (i = 0; i < gccache->cache_total_size; ++i) {
     OtkGCCacheItem *d = gccache->cache[i];
 
     if (d->ctx && d->count == 0) {
-      release(d->ctx);
+      OtkGCCache_InternalRelease(d->ctx);
       d->ctx = 0;
     }
   }

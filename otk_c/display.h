@@ -6,10 +6,9 @@
 #include <Python.h>
 
 struct OtkScreenInfo;
-struct OtkGCCache;
 struct OtkDisplay;
 
-struct OtkDisplay *OBDisplay; // the global display XXX: move this to app.h and ob.h?
+extern struct OtkDisplay *OBDisplay; // the global display XXX: move this to app.h and ob.h?
 
 typedef struct OtkDisplay {
   PyObject_HEAD
@@ -35,25 +34,15 @@ typedef struct OtkDisplay {
 
   //! A list of information for all screens on the display
   PyObject *screenInfoList; // PyListObject
-
-  //! A cache for re-using GCs, used by the drawing objects
-  /*!
-    @see BPen
-    @see BFont
-    @see BImage
-    @see BImageControl
-    @see BTexture
-  */
-  struct OtkGCCache *gccache;
 } OtkDisplay;
 
-//! Creates a struct, opens the X display
+//! Opens the X display, and sets the global OBDisplay variable
 /*!
   @see OBDisplay::display
   @param name The name of the X display to open. If it is null, the DISPLAY
   environment variable is used instead.
 */
-PyObject *OtkDisplay_New(char *name);
+void OtkDisplay_Initialize(char *name);
 
 //! Grabs the display
 void OtkDisplay_Grab(OtkDisplay *self);

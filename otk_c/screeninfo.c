@@ -85,7 +85,7 @@ PyObject *OtkScreenInfo_New(int num)
   if (dstr2) {
     PyObject *str;
     
-    PyString_Resize(self->display_string, dstr2 - dstr);
+    _PyString_Resize(&self->display_string, dstr2 - dstr);
     str = PyString_FromFormat(".%d", self->screen);
     PyString_Concat(&self->display_string, str);
   }

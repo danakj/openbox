@@ -328,16 +328,18 @@ void Screen::changeSupportedAtoms()
     otk::Property::atoms.net_wm_moveresize_size_bottomright,
     otk::Property::atoms.net_wm_moveresize_move,
 */
-/*
     otk::Property::atoms.net_wm_allowed_actions,
     otk::Property::atoms.net_wm_action_move,
     otk::Property::atoms.net_wm_action_resize,
+    otk::Property::atoms.net_wm_action_minimize,
     otk::Property::atoms.net_wm_action_shade,
+/*    otk::Property::atoms.net_wm_action_stick,*/
     otk::Property::atoms.net_wm_action_maximize_horz,
     otk::Property::atoms.net_wm_action_maximize_vert,
+    otk::Property::atoms.net_wm_action_fullscreen,
     otk::Property::atoms.net_wm_action_change_desktop,
     otk::Property::atoms.net_wm_action_close,
-*/
+
     otk::Property::atoms.net_wm_state,
     otk::Property::atoms.net_wm_state_modal,
     otk::Property::atoms.net_wm_state_maximized_vert,
@@ -503,8 +505,8 @@ void Screen::manageWindow(Window window)
       client->desktop() == (signed)0xffffffff) {
     client->frame->show();
   }
- 
-  // XXX: handle any requested states such as maximized
+
+  client->applyStartupState();
 
   otk::display->ungrab();
 

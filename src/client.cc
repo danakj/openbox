@@ -168,15 +168,17 @@ void Client::getType()
 
 void Client::setupDecorAndFunctions()
 {
-  // start with everything
+  // start with everything (cept fullscreen)
   _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
     Decor_Iconify | Decor_Maximize;
-  _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
+  _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
+    Func_Shade;
   
   switch (_type) {
   case Type_Normal:
     // normal windows retain all of the possible decorations and
-    // functionality
+    // functionality, and are the only windows that you can fullscreen
+    _functions |= Func_Fullscreen;
 
   case Type_Dialog:
     // dialogs cannot be maximized
@@ -209,8 +211,11 @@ void Client::setupDecorAndFunctions()
         _decorations &= ~Decor_Border;
       if (! (_mwmhints.decorations & MwmDecor_Handle))
         _decorations &= ~Decor_Handle;
-      if (! (_mwmhints.decorations & MwmDecor_Title))
+      if (! (_mwmhints.decorations & MwmDecor_Title)) {
         _decorations &= ~Decor_Titlebar;
+        // if we don't have a titlebar, then we cannot shade!
+        _functions &= ~Func_Shade;
+      }
       if (! (_mwmhints.decorations & MwmDecor_Iconify))
         _decorations &= ~Decor_Iconify;
       if (! (_mwmhints.decorations & MwmDecor_Maximize))
@@ -287,10 +292,9 @@ void Client::getState()
     for (unsigned long i = 0; i < num; ++i) {
       if (state[i] == otk::Property::atoms.net_wm_state_modal)
         _modal = true;
-      else if (state[i] == otk::Property::atoms.net_wm_state_shaded) {
+      else if (state[i] == otk::Property::atoms.net_wm_state_shaded)
         _shaded = true;
-        _wmstate = IconicState;
-      } else if (state[i] == otk::Property::atoms.net_wm_state_skip_taskbar)
+      else if (state[i] == otk::Property::atoms.net_wm_state_skip_taskbar)
         _skip_taskbar = true;
       else if (state[i] == otk::Property::atoms.net_wm_state_skip_pager)
         _skip_pager = true;
@@ -657,6 +661,7 @@ void Client::setDesktop(long target)
 void Client::setState(StateAction action, long data1, long data2)
 {
   bool shadestate = _shaded;
+  bool fsstate = _fullscreen;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -703,16 +708,13 @@ void Client::setState(StateAction action, long data1, long data2)
         _max_horz = true;
         // XXX: resize the window etc
       } else if (state == otk::Property::atoms.net_wm_state_shaded) {
-        if (_shaded) continue;
-        // shade when we're all thru here
         shadestate = true;
       } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
         _skip_taskbar = true;
       } else if (state == otk::Property::atoms.net_wm_state_skip_pager) {
         _skip_pager = true;
       } else if (state == otk::Property::atoms.net_wm_state_fullscreen) {
-        if (_fullscreen) continue;
-        _fullscreen = true;
+        fsstate = true;
       } else if (state == otk::Property::atoms.net_wm_state_above) {
         if (_above) continue;
         _above = true;
@@ -734,16 +736,13 @@ void Client::setState(StateAction action, long data1, long data2)
         _max_horz = false;
         // XXX: resize the window etc
       } else if (state == otk::Property::atoms.net_wm_state_shaded) {
-        if (!_shaded) continue;
-        // unshade when we're all thru here
         shadestate = false;
       } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
         _skip_taskbar = false;
       } else if (state == otk::Property::atoms.net_wm_state_skip_pager) {
         _skip_pager = false;
       } else if (state == otk::Property::atoms.net_wm_state_fullscreen) {
-        if (!_fullscreen) continue;
-        _fullscreen = false;
+        fsstate = false;
       } else if (state == otk::Property::atoms.net_wm_state_above) {
         if (!_above) continue;
         _above = false;
@@ -753,6 +752,10 @@ void Client::setState(StateAction action, long data1, long data2)
       }
     }
   }
+  // change fullscreen state before shading, as it will affect if the window
+  // can shade or not
+  if (fsstate != _fullscreen)
+    fullscreen(fsstate);
   if (shadestate != _shaded)
     shade(shadestate);
   calcLayer();
@@ -1074,18 +1077,23 @@ void Client::changeState()
 
 void Client::changeAllowedActions(void)
 {
-  Atom actions[7];
+  Atom actions[9];
   int num = 0;
 
-  actions[num++] = otk::Property::atoms.net_wm_action_shade;
   actions[num++] = otk::Property::atoms.net_wm_action_change_desktop;
 
+  if (_functions & Func_Shade)
+    actions[num++] = otk::Property::atoms.net_wm_action_shade;
   if (_functions & Func_Close)
     actions[num++] = otk::Property::atoms.net_wm_action_close;
   if (_functions & Func_Move)
-        actions[num++] = otk::Property::atoms.net_wm_action_move;
+    actions[num++] = otk::Property::atoms.net_wm_action_move;
+  if (_functions & Func_Iconify)
+    actions[num++] = otk::Property::atoms.net_wm_action_minimize;
   if (_functions & Func_Resize)
-        actions[num++] = otk::Property::atoms.net_wm_action_resize;
+    actions[num++] = otk::Property::atoms.net_wm_action_resize;
+  if (_functions & Func_Fullscreen)
+    actions[num++] = otk::Property::atoms.net_wm_action_fullscreen;
   if (_functions & Func_Maximize) {
     actions[num++] = otk::Property::atoms.net_wm_action_maximize_horz;
     actions[num++] = otk::Property::atoms.net_wm_action_maximize_vert;
@@ -1096,14 +1104,87 @@ void Client::changeAllowedActions(void)
 }
 
 
+void Client::applyStartupState()
+{
+  // these are in a carefully crafted order..
+  
+  if (_fullscreen) {
+    _fullscreen = false;
+    fullscreen(true);
+  }
+  if (_shaded) {
+    _shaded = false;
+    shade(true);
+  }
+  
+  if (_max_vert); // XXX: incomplete
+  if (_max_horz); // XXX: incomplete
+
+  if (_skip_taskbar); // nothing to do for this
+  if (_skip_pager);   // nothing to do for this
+  if (_modal);        // nothing to do for this
+  if (_above);        // nothing to do for this
+  if (_below);        // nothing to do for this
+}
+
+
 void Client::shade(bool shade)
 {
-  if (shade == _shaded) return; // already done
+  if (!(_functions & Func_Shade) || // can't
+      _shaded == shade) return;     // already done
 
   _wmstate = shade ? IconicState : NormalState;
   _shaded = shade;
   changeState();
   frame->adjustSize();
+}
+
+
+void Client::fullscreen(bool fs)
+{
+  static FunctionFlags saved_func;
+  static DecorationFlags saved_decor;
+  static otk::Rect saved_area;
+  static otk::Point saved_logical_size;
+
+  if (!(_functions & Func_Fullscreen) || // can't
+      _fullscreen == fs) return;         // already done
+
+  _fullscreen = fs;
+  changeState(); // change the state hints on the client
+
+  if (fs) {
+    // save the functions and remove them
+    saved_func = _functions;
+    _functions = _functions & (Func_Close | Func_Fullscreen | Func_Iconify);
+    // save the decorations and remove them
+    saved_decor = _decorations;
+    _decorations = 0;
+    // save the area and adjust it (we don't call internal resize here for
+    // constraints on the size, etc, we just make it fullscreen).
+    saved_area = _area;
+    const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
+    _area.setRect(0, 0, info->width(), info->height());
+    saved_logical_size = _logical_size;
+    _logical_size.setPoint((info->width() - _base_size.x()) / _size_inc.x(),
+                           (info->height() - _base_size.y()) / _size_inc.y());
+  } else {
+    _functions = saved_func;
+    _decorations = saved_decor;
+    _area = saved_area;
+    _logical_size = saved_logical_size;
+  }
+  
+  changeAllowedActions();  // based on the new _functions
+  
+  frame->adjustSize();     // drop/replace the decor's and resize
+  frame->adjustPosition(); // get (back) in position!
+
+  // raise (back) into our stacking layer
+  openbox->screen(_screen)->raiseWindow(this);
+
+  // try focus us when we go into fullscreen mode
+  if (fs) focus();
 }
 
 

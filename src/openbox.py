@@ -271,15 +271,24 @@ class Atoms(_object):
     __swig_setmethods__["net_wm_action_resize"] = _openbox.Atoms_net_wm_action_resize_set
     __swig_getmethods__["net_wm_action_resize"] = _openbox.Atoms_net_wm_action_resize_get
     if _newclass:net_wm_action_resize = property(_openbox.Atoms_net_wm_action_resize_get,_openbox.Atoms_net_wm_action_resize_set)
+    __swig_setmethods__["net_wm_action_minimize"] = _openbox.Atoms_net_wm_action_minimize_set
+    __swig_getmethods__["net_wm_action_minimize"] = _openbox.Atoms_net_wm_action_minimize_get
+    if _newclass:net_wm_action_minimize = property(_openbox.Atoms_net_wm_action_minimize_get,_openbox.Atoms_net_wm_action_minimize_set)
     __swig_setmethods__["net_wm_action_shade"] = _openbox.Atoms_net_wm_action_shade_set
     __swig_getmethods__["net_wm_action_shade"] = _openbox.Atoms_net_wm_action_shade_get
     if _newclass:net_wm_action_shade = property(_openbox.Atoms_net_wm_action_shade_get,_openbox.Atoms_net_wm_action_shade_set)
+    __swig_setmethods__["net_wm_action_stick"] = _openbox.Atoms_net_wm_action_stick_set
+    __swig_getmethods__["net_wm_action_stick"] = _openbox.Atoms_net_wm_action_stick_get
+    if _newclass:net_wm_action_stick = property(_openbox.Atoms_net_wm_action_stick_get,_openbox.Atoms_net_wm_action_stick_set)
     __swig_setmethods__["net_wm_action_maximize_horz"] = _openbox.Atoms_net_wm_action_maximize_horz_set
     __swig_getmethods__["net_wm_action_maximize_horz"] = _openbox.Atoms_net_wm_action_maximize_horz_get
     if _newclass:net_wm_action_maximize_horz = property(_openbox.Atoms_net_wm_action_maximize_horz_get,_openbox.Atoms_net_wm_action_maximize_horz_set)
     __swig_setmethods__["net_wm_action_maximize_vert"] = _openbox.Atoms_net_wm_action_maximize_vert_set
     __swig_getmethods__["net_wm_action_maximize_vert"] = _openbox.Atoms_net_wm_action_maximize_vert_get
     if _newclass:net_wm_action_maximize_vert = property(_openbox.Atoms_net_wm_action_maximize_vert_get,_openbox.Atoms_net_wm_action_maximize_vert_set)
+    __swig_setmethods__["net_wm_action_fullscreen"] = _openbox.Atoms_net_wm_action_fullscreen_set
+    __swig_getmethods__["net_wm_action_fullscreen"] = _openbox.Atoms_net_wm_action_fullscreen_get
+    if _newclass:net_wm_action_fullscreen = property(_openbox.Atoms_net_wm_action_fullscreen_get,_openbox.Atoms_net_wm_action_fullscreen_set)
     __swig_setmethods__["net_wm_action_change_desktop"] = _openbox.Atoms_net_wm_action_change_desktop_set
     __swig_getmethods__["net_wm_action_change_desktop"] = _openbox.Atoms_net_wm_action_change_desktop_get
     if _newclass:net_wm_action_change_desktop = property(_openbox.Atoms_net_wm_action_change_desktop_get,_openbox.Atoms_net_wm_action_change_desktop_set)
@@ -756,6 +765,8 @@ class Client(EventHandler,):
     Func_Move = _openbox.Client_Func_Move
     Func_Iconify = _openbox.Client_Func_Iconify
     Func_Maximize = _openbox.Client_Func_Maximize
+    Func_Shade = _openbox.Client_Func_Shade
+    Func_Fullscreen = _openbox.Client_Func_Fullscreen
     Func_Close = _openbox.Client_Func_Close
     Decor_Titlebar = _openbox.Client_Decor_Titlebar
     Decor_Handle = _openbox.Client_Decor_Handle
@@ -793,10 +804,12 @@ class Client(EventHandler,):
     def transientFor(*args): return apply(_openbox.Client_transientFor,args)
     def modal(*args): return apply(_openbox.Client_modal,args)
     def shaded(*args): return apply(_openbox.Client_shaded,args)
+    def fullscreen(*args): return apply(_openbox.Client_fullscreen,args)
     def iconic(*args): return apply(_openbox.Client_iconic,args)
     def maxVert(*args): return apply(_openbox.Client_maxVert,args)
     def maxHorz(*args): return apply(_openbox.Client_maxHorz,args)
     def layer(*args): return apply(_openbox.Client_layer,args)
+    def applyStartupState(*args): return apply(_openbox.Client_applyStartupState,args)
     def toggleClientBorder(*args): return apply(_openbox.Client_toggleClientBorder,args)
     def area(*args): return apply(_openbox.Client_area,args)
     def strut(*args): return apply(_openbox.Client_strut,args)

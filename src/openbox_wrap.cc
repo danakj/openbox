@@ -3621,6 +3621,43 @@ static PyObject *_wrap_Atoms_net_wm_action_resize_get(PyObject *self, PyObject *
 }
 
 
+static PyObject *_wrap_Atoms_net_wm_action_minimize_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_minimize_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_minimize = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_minimize_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_minimize_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_minimize);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Atoms_net_wm_action_shade_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::Atoms *arg1 = (otk::Atoms *) 0 ;
@@ -3650,6 +3687,43 @@ static PyObject *_wrap_Atoms_net_wm_action_shade_get(PyObject *self, PyObject *a
     if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_shade_get",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (Atom) ((arg1)->net_wm_action_shade);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_stick_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_stick_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_stick = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_stick_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_stick_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_stick);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -3724,6 +3798,43 @@ static PyObject *_wrap_Atoms_net_wm_action_maximize_vert_get(PyObject *self, PyO
     if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_maximize_vert_get",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (Atom) ((arg1)->net_wm_action_maximize_vert);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_fullscreen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_fullscreen_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_fullscreen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_fullscreen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_fullscreen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_fullscreen);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -9045,6 +9156,23 @@ static PyObject *_wrap_Client_shaded(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Client_fullscreen(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Client *arg1 = (ob::Client *) 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Client_fullscreen",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((ob::Client const *)arg1)->fullscreen();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Client_iconic(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Client *arg1 = (ob::Client *) 0 ;
@@ -9107,6 +9235,22 @@ static PyObject *_wrap_Client_layer(PyObject *self, PyObject *args) {
     result = (int)((ob::Client const *)arg1)->layer();
     
     resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Client_applyStartupState(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Client *arg1 = (ob::Client *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Client_applyStartupState",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Client,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->applyStartupState();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -11289,12 +11433,18 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Atoms_net_wm_action_move_get", _wrap_Atoms_net_wm_action_move_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_resize_set", _wrap_Atoms_net_wm_action_resize_set, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_resize_get", _wrap_Atoms_net_wm_action_resize_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_minimize_set", _wrap_Atoms_net_wm_action_minimize_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_minimize_get", _wrap_Atoms_net_wm_action_minimize_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_shade_set", _wrap_Atoms_net_wm_action_shade_set, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_shade_get", _wrap_Atoms_net_wm_action_shade_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_stick_set", _wrap_Atoms_net_wm_action_stick_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_stick_get", _wrap_Atoms_net_wm_action_stick_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_maximize_horz_set", _wrap_Atoms_net_wm_action_maximize_horz_set, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_maximize_horz_get", _wrap_Atoms_net_wm_action_maximize_horz_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_maximize_vert_set", _wrap_Atoms_net_wm_action_maximize_vert_set, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_maximize_vert_get", _wrap_Atoms_net_wm_action_maximize_vert_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_fullscreen_set", _wrap_Atoms_net_wm_action_fullscreen_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_fullscreen_get", _wrap_Atoms_net_wm_action_fullscreen_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_change_desktop_set", _wrap_Atoms_net_wm_action_change_desktop_set, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_change_desktop_get", _wrap_Atoms_net_wm_action_change_desktop_get, METH_VARARGS },
 	 { (char *)"Atoms_net_wm_action_close_set", _wrap_Atoms_net_wm_action_close_set, METH_VARARGS },
@@ -11513,10 +11663,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Client_transientFor", _wrap_Client_transientFor, METH_VARARGS },
 	 { (char *)"Client_modal", _wrap_Client_modal, METH_VARARGS },
 	 { (char *)"Client_shaded", _wrap_Client_shaded, METH_VARARGS },
+	 { (char *)"Client_fullscreen", _wrap_Client_fullscreen, METH_VARARGS },
 	 { (char *)"Client_iconic", _wrap_Client_iconic, METH_VARARGS },
 	 { (char *)"Client_maxVert", _wrap_Client_maxVert, METH_VARARGS },
 	 { (char *)"Client_maxHorz", _wrap_Client_maxHorz, METH_VARARGS },
 	 { (char *)"Client_layer", _wrap_Client_layer, METH_VARARGS },
+	 { (char *)"Client_applyStartupState", _wrap_Client_applyStartupState, METH_VARARGS },
 	 { (char *)"Client_toggleClientBorder", _wrap_Client_toggleClientBorder, METH_VARARGS },
 	 { (char *)"Client_area", _wrap_Client_area, METH_VARARGS },
 	 { (char *)"Client_strut", _wrap_Client_strut, METH_VARARGS },
@@ -11840,6 +11992,8 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Client_Func_Move", (long) ob::Client::Func_Move, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Func_Iconify", (long) ob::Client::Func_Iconify, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Func_Maximize", (long) ob::Client::Func_Maximize, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Client_Func_Shade", (long) ob::Client::Func_Shade, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Client_Func_Fullscreen", (long) ob::Client::Func_Fullscreen, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Func_Close", (long) ob::Client::Func_Close, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Decor_Titlebar", (long) ob::Client::Decor_Titlebar, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Decor_Handle", (long) ob::Client::Decor_Handle, 0, 0, 0},

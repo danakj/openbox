@@ -121,11 +121,13 @@ public:
   };
 
   //! The things the user can do to the client window
-  enum Function { Func_Resize   = 1 << 0, //!< Allow resizing
-                  Func_Move     = 1 << 1, //!< Allow moving
-                  Func_Iconify  = 1 << 2, //!< Allow to be iconified
-                  Func_Maximize = 1 << 3, //!< Allow to be maximized
-                  Func_Close    = 1 << 4  //!< Allow to be closed
+  enum Function { Func_Resize     = 1 << 0, //!< Allow resizing
+                  Func_Move       = 1 << 1, //!< Allow moving
+                  Func_Iconify    = 1 << 2, //!< Allow to be iconified
+                  Func_Maximize   = 1 << 3, //!< Allow to be maximized
+                  Func_Shade      = 1 << 4, //!< Allow to be shaded
+                  Func_Fullscreen = 1 << 5, //!< Allow to be made fullscreen
+                  Func_Close      = 1 << 6  //!< Allow to be closed
   };
   //! Holds a bitmask of Client::Function values
   typedef unsigned char FunctionFlags;
@@ -339,6 +341,12 @@ private:
   //! Sets the wm_state to the specified value
   void setWMState(long state);
   //! Adjusts the window's net_state
+  /*!
+    This should not be called as part of the window mapping process! It is for
+    use when updating the state post-mapping.<br>
+    Client::applyStartupState is used to do the same things during the mapping
+    process.
+  */
   void setState(StateAction action, long data1, long data2);
 
   //! Sends the window to the specified desktop
@@ -379,6 +387,13 @@ private:
                  unshaded.
   */
   void shade(bool shade);
+
+  //! Fullscreen's or unfullscreen's the client window
+  /*!
+    @param fs true if the window should be made fullscreen; false if it should
+              be returned to normal state.
+  */
+  void fullscreen(bool fs);
 
   //! Internal version of the Client::move function
   /*!
@@ -494,6 +509,8 @@ BB    @param window The window id that the Client class should handle
     When the window is shaded, only its titlebar is visible.
   */
   inline bool shaded() const { return _shaded; }
+  //! Returns if the window is in fullscreen mode
+  inline bool fullscreen() const { return _fullscreen; }
   //! Returns if the window is iconified
   /*!
     When the window is iconified, it is not visible at all (except in iconbars/
@@ -507,6 +524,13 @@ BB    @param window The window id that the Client class should handle
   //! Returns the window's stacking layer
   inline StackLayer layer() const { return _layer; }
 
+  //! Applies the states requested when the window mapped
+  /*!
+    This should be called only once, during the window mapping process. It
+    applies things like maximized, and fullscreen.
+  */
+  void applyStartupState();
+  
   //! Removes or reapplies the client's border to its window
   /*!
     Used when managing and unmanaging a window.

@@ -64,6 +64,7 @@ private:
   void placeWindow(BlackboxWindow *win);
   bool cascadePlacement(Rect& win, const Rect& availableArea);
   bool smartPlacement(Rect& win, const Rect& availableArea);
+  bool underMousePlacement(Rect& win, const Rect& availableArea);
 
 public:
   Workspace(BScreen *scrn, unsigned int i = 0);

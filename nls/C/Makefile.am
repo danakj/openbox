@@ -8,7 +8,7 @@ MFILES = @srcdir@/BaseDisplay.m @srcdir@/Basemenu.m @srcdir@/Configmenu.m @srcdi
 
 all-local: Translation.m openbox.cat
 install-data-local: openbox.cat
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		echo "Installing catalog in $(DESTDIR)$(pkgdatadir)/nls/C"; \
 		$(mkinstalldirs) $(DESTDIR)$(pkgdatadir)/nls/C; \
 		$(INSTALL_DATA) openbox.cat $(DESTDIR)$(pkgdatadir)/nls/C; \
@@ -24,7 +24,7 @@ install-data-local: openbox.cat
 		ln -f -s C $(DESTDIR)$(pkgdatadir)/nls/en; \
 	fi
 uninstall-local:
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/C/openbox.cat; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/US_ASCII; \
 		rm -f $(DESTDIR)$(pkgdatadir)/nls/POSIX; \
@@ -42,7 +42,7 @@ Translation.m: $(MFILES)
 		output=Translation.m $(MFILES)
 
 openbox.cat: Translation.m
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		$(gencat_cmd) openbox.cat Translation.m; \
 	fi
 

@@ -556,6 +556,31 @@ bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
 }
 
 
+bool Workspace::underMousePlacement(Rect &win, const Rect &availableArea) {
+  int x, y, rx, ry;
+  Window c, r;
+  unsigned int m;
+  XQueryPointer(screen->getBlackbox()->getXDisplay(), screen->getRootWindow(),
+                &r, &c, &rx, &ry, &x, &y, &m);
+  x = rx - win.width() / 2;
+  y = ry - win.height() / 2;
+
+  if (x < availableArea.x())
+    x = availableArea.x();
+  if (y < availableArea.y())
+    y = availableArea.y();
+  if (x + win.width() > availableArea.x() + availableArea.width())
+    x = availableArea.x() + availableArea.width() - win.width();
+  if (y + win.height() > availableArea.y() + availableArea.height())
+    y = availableArea.y() + availableArea.height() - win.height();
+
+  win.setX(x);
+  win.setY(y);
+
+  return True;
+}
+
+
 bool Workspace::cascadePlacement(Rect &win, const Rect &availableArea) {
   if ((cascade_x > static_cast<signed>(availableArea.width() / 2)) ||
       (cascade_y > static_cast<signed>(availableArea.height() / 2)))
@@ -583,6 +608,8 @@ void Workspace::placeWindow(BlackboxWindow *win) {
   case BScreen::ColSmartPlacement:
     placed = smartPlacement(new_win, availableArea);
     break;
+  case BScreen::UnderMousePlacement:
+    placed = underMousePlacement(new_win, availableArea);
   default:
     break; // handled below
   } // switch

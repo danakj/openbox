@@ -7,7 +7,7 @@ MAINTAINERCLEANFILES = Makefile.in blackbox-nls.hh
 DISTCLEANFILES = blackbox-nls.hh
 
 uninstall-local:
-	@if test x$(NLSTEST) = "x-DNLS"; then \
+	@if test x$(NLSTEST) = "xyes"; then \
 		rmdir $(DESTDIR)$(pkgdatadir)/nls; \
 	fi
 distclean-local:

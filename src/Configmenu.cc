@@ -203,6 +203,8 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm):
          BScreen::ColSmartPlacement);
   insert(i18n(ConfigmenuSet, ConfigmenuCascade, "Cascade Placement"),
          BScreen::CascadePlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuUnderMouse, "Under Mouse Placement"),
+         BScreen::UnderMousePlacement);
   insert(i18n(ConfigmenuSet, ConfigmenuLeftRight, "Left to Right"),
          BScreen::LeftRight);
   insert(i18n(ConfigmenuSet, ConfigmenuRightLeft, "Right to Left"),
@@ -217,28 +219,26 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm):
 
 
 void Configmenu::Placementmenu::setValues(void) {
-  switch (getScreen()->getPlacementPolicy()) {
-  case BScreen::RowSmartPlacement:
-    setItemSelected(0, True);
-    break;
-
-  case BScreen::ColSmartPlacement:
-    setItemSelected(1, True);
-    break;
-
-  case BScreen::CascadePlacement:
-    setItemSelected(2, True);
-    break;
-  }
+  int placement = getScreen()->getPlacementPolicy();
+  
+  setItemSelected(0, placement == BScreen::RowSmartPlacement);
+  setItemSelected(1, placement == BScreen::ColSmartPlacement);
+  setItemSelected(2, placement == BScreen::CascadePlacement);
+  setItemSelected(3, placement == BScreen::UnderMousePlacement);
 
   bool rl = (getScreen()->getRowPlacementDirection() == BScreen::LeftRight),
-       tb = (getScreen()->getColPlacementDirection() == BScreen::TopBottom);
+       tb = (getScreen()->getColPlacementDirection() == BScreen::TopBottom),
+       e = placement != BScreen::UnderMousePlacement;
 
-  setItemSelected(3, rl);
-  setItemSelected(4, ! rl);
+  setItemSelected(4, rl);
+  setItemSelected(5, ! rl);
+  setItemEnabled(4, e);
+  setItemEnabled(5, e);
 
-  setItemSelected(5, tb);
-  setItemSelected(6, ! tb);
+  setItemSelected(6, tb);
+  setItemSelected(7, ! tb);
+  setItemEnabled(6, e);
+  setItemEnabled(7, e);
 }
 
 
@@ -261,59 +261,88 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
   case BScreen::RowSmartPlacement:
     getScreen()->savePlacementPolicy(item->function());
 
-    setItemSelected(0, True);
-    setItemSelected(1, False);
-    setItemSelected(2, False);
+    setItemSelected(0, true);
+    setItemSelected(1, false);
+    setItemSelected(2, false);
+    setItemSelected(3, false);
+    setItemEnabled(4, true);
+    setItemEnabled(5, true);
+    setItemEnabled(6, true);
+    setItemEnabled(7, true);
 
     break;
 
   case BScreen::ColSmartPlacement:
     getScreen()->savePlacementPolicy(item->function());
 
-    setItemSelected(0, False);
-    setItemSelected(1, True);
-    setItemSelected(2, False);
+    setItemSelected(0, false);
+    setItemSelected(1, true);
+    setItemSelected(2, false);
+    setItemSelected(3, false);
+    setItemEnabled(4, true);
+    setItemEnabled(5, true);
+    setItemEnabled(6, true);
+    setItemEnabled(7, true);
 
     break;
 
   case BScreen::CascadePlacement:
     getScreen()->savePlacementPolicy(item->function());
 
-    setItemSelected(0, False);
-    setItemSelected(1, False);
-    setItemSelected(2, True);
+    setItemSelected(0, false);
+    setItemSelected(1, false);
+    setItemSelected(2, true);
+    setItemSelected(3, false);
+    setItemEnabled(4, true);
+    setItemEnabled(5, true);
+    setItemEnabled(6, true);
+    setItemEnabled(7, true);
+
+    break;
+
+  case BScreen::UnderMousePlacement:
+    getScreen()->savePlacementPolicy(item->function());
+
+    setItemSelected(0, false);
+    setItemSelected(1, false);
+    setItemSelected(2, false);
+    setItemSelected(3, true);
+    setItemEnabled(4, false);
+    setItemEnabled(5, false);
+    setItemEnabled(6, false);
+    setItemEnabled(7, false);
 
     break;
 
   case BScreen::LeftRight:
     getScreen()->saveRowPlacementDirection(BScreen::LeftRight);
 
-    setItemSelected(3, True);
-    setItemSelected(4, False);
+    setItemSelected(4, true);
+    setItemSelected(5, false);
 
     break;
 
   case BScreen::RightLeft:
     getScreen()->saveRowPlacementDirection(BScreen::RightLeft);
 
-    setItemSelected(3, False);
-    setItemSelected(4, True);
+    setItemSelected(4, false);
+    setItemSelected(5, true);
 
     break;
 
   case BScreen::TopBottom:
     getScreen()->saveColPlacementDirection(BScreen::TopBottom);
 
-    setItemSelected(5, True);
-    setItemSelected(6, False);
+    setItemSelected(6, true);
+    setItemSelected(7, false);
 
     break;
 
   case BScreen::BottomTop:
     getScreen()->saveColPlacementDirection(BScreen::BottomTop);
 
-    setItemSelected(5, False);
-    setItemSelected(6, True);
+    setItemSelected(6, false);
+    setItemSelected(7, true);
 
     break;
   }

@@ -98,9 +98,7 @@ void OtkEventDispatcher::dispatchEvents(void)
       // send a FocusIn first if one exists
       while (XCheckTypedEvent(OBDisplay::display, FocusIn, &fi)) {
         // any other types are not ones we're interested in
-        printf("found focusin\n");
         if (fi.xfocus.detail == NotifyNonlinear) {
-          printf("sending focusin\n");
           dispatch(fi.xfocus.window, fi);
           break;
         }

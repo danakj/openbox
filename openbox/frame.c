@@ -1,5 +1,40 @@
 #include "frame.h"
 
+Context frame_context_from_string(char *name)
+{
+    if (!g_ascii_strcasecmp("root", name))
+        return Context_Root;
+    else if (!g_ascii_strcasecmp("client", name))
+        return Context_Client;
+    else if (!g_ascii_strcasecmp("titlebar", name))
+        return Context_Titlebar;
+    else if (!g_ascii_strcasecmp("handle", name))
+        return Context_Handle;
+    else if (!g_ascii_strcasecmp("frame", name))
+        return Context_Frame;
+    else if (!g_ascii_strcasecmp("blcorner", name))
+        return Context_BLCorner;
+    else if (!g_ascii_strcasecmp("tlcorner", name))
+        return Context_TLCorner;
+    else if (!g_ascii_strcasecmp("brcorner", name))
+        return Context_BRCorner;
+    else if (!g_ascii_strcasecmp("trcorner", name))
+        return Context_TRCorner;
+    else if (!g_ascii_strcasecmp("maximize", name))
+        return Context_Maximize;
+    else if (!g_ascii_strcasecmp("alldesktops", name))
+        return Context_AllDesktops;
+    else if (!g_ascii_strcasecmp("shade", name))
+        return Context_Shade;
+    else if (!g_ascii_strcasecmp("iconify", name))
+        return Context_Iconify;
+    else if (!g_ascii_strcasecmp("icon", name))
+        return Context_Icon;
+    else if (!g_ascii_strcasecmp("close", name))
+        return Context_Close;
+    return Context_None;
+}
+
 void frame_client_gravity(Frame *self, int *x, int *y)
 {
     /* horizontal */

@@ -92,21 +92,6 @@ gboolean startup()
 {
     char *path;
 
-    g_quark_from_string("none");
-    g_quark_from_string("root");
-    g_quark_from_string("client");
-    g_quark_from_string("titlebar");
-    g_quark_from_string("handle");
-    g_quark_from_string("frame");
-    g_quark_from_string("blcorner");
-    g_quark_from_string("brcorner");
-    g_quark_from_string("maximize");
-    g_quark_from_string("alldesktops");
-    g_quark_from_string("shade");
-    g_quark_from_string("iconify");
-    g_quark_from_string("icon");
-    g_quark_from_string("close");
-
     /* create the ~/.openbox/themes/openbox dir */
     path = g_build_filename(g_get_home_dir(), ".openbox", "themes", "openbox",
                             NULL);
@@ -861,28 +846,28 @@ static void mouse_event(const ObEvent *e, ObFrame *self)
     }
 }
 
-GQuark get_context(Client *client, Window win)
+Context get_context(Client *client, Window win)
 {
     ObFrame *self;
 
-    if (win == ob_root) return g_quark_try_string("root");
-    if (client == NULL) return g_quark_try_string("none");
-    if (win == client->window) return g_quark_try_string("client");
+    if (win == ob_root) return Context_Root;
+    if (client == NULL) return Context_None;
+    if (win == client->window) return Context_Client;
 
     self = (ObFrame*) client->frame;
-    if (win == self->frame.window) return g_quark_try_string("frame");
-    if (win == self->frame.plate)  return g_quark_try_string("client");
-    if (win == self->title)  return g_quark_try_string("titlebar");
-    if (win == self->label)  return g_quark_try_string("titlebar");
-    if (win == self->handle) return g_quark_try_string("handle");
-    if (win == self->lgrip)  return g_quark_try_string("blcorner");
-    if (win == self->rgrip)  return g_quark_try_string("brcorner");
-    if (win == self->max)  return g_quark_try_string("maximize");
-    if (win == self->iconify)  return g_quark_try_string("iconify");
-    if (win == self->close)  return g_quark_try_string("close");
-    if (win == self->icon)  return g_quark_try_string("icon");
-    if (win == self->desk)  return g_quark_try_string("alldesktops");
-    if (win == self->shade)  return g_quark_try_string("shade");
+    if (win == self->frame.window) return Context_Frame;
+    if (win == self->frame.plate)  return Context_Client;
+    if (win == self->title)  return Context_Titlebar;
+    if (win == self->label)  return Context_Titlebar;
+    if (win == self->handle) return Context_Handle;
+    if (win == self->lgrip)  return Context_BLCorner;
+    if (win == self->rgrip)  return Context_BRCorner;
+    if (win == self->max)  return Context_Maximize;
+    if (win == self->iconify)  return Context_Iconify;
+    if (win == self->close)  return Context_Close;
+    if (win == self->icon)  return Context_Icon;
+    if (win == self->desk)  return Context_AllDesktops;
+    if (win == self->shade)  return Context_Shade;
 
-    return g_quark_try_string("none");
+    return Context_None;
 }

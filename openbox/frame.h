@@ -4,6 +4,28 @@
 #include "geom.h"
 #include "client.h"
 
+typedef enum {
+    Context_None,
+    Context_Root,
+    Context_Client,
+    Context_Titlebar,
+    Context_Handle,
+    Context_Frame,
+    Context_BLCorner,
+    Context_BRCorner,
+    Context_TLCorner,
+    Context_TRCorner,
+    Context_Maximize,
+    Context_AllDesktops,
+    Context_Shade,
+    Context_Iconify,
+    Context_Icon,
+    Context_Close,
+    NUM_CONTEXTS
+} Context;
+
+Context frame_context_from_string(char *name);
+
 typedef struct Frame {
     Client *client;
 

@@ -46,6 +46,6 @@ typedef void EngineFrameShow(Frame *self);
 typedef void EngineFrameHide(Frame *self);
 
 /* get_context */
-typedef GQuark EngineGetContext(Client *client, Window win);
+typedef Context EngineGetContext(Client *client, Window win);
 
 #endif

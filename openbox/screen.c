@@ -91,7 +91,7 @@ gboolean screen_annex()
     PROP_SET32(ob_root, net_supporting_wm_check, window, support_window);
 
     /* set properties on the supporting window */
-    PROP_SETS(support_window, net_wm_name, "Openbox");
+    PROP_SETS(support_window, net_wm_name, "Openbox3");
     PROP_SET32(support_window, net_supporting_wm_check, window,support_window);
 
     /* set the _NET_SUPPORTED_ATOMS hint */

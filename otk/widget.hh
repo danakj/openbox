@@ -65,6 +65,7 @@ public:
 
   inline bool isFocused(void) const { return _focused; };
   virtual void focus(void);
+  virtual void unfocus(void);
 
   inline bool hasGrabbedMouse(void) const { return _grabbed_mouse; }
   bool grabMouse(void);
@@ -76,7 +77,19 @@ public:
 
   inline BTexture *getTexture(void) const { return _texture; }
   virtual void setTexture(BTexture *texture)
-  { _texture = texture; _dirty = true; }
+    { _texture = texture; _dirty = true; }
+
+  inline const BColor *getBorderColor(void) const { return _bcolor; }
+  virtual void setBorderColor(const BColor *color) {
+    assert(color); _bcolor = color;
+    XSetWindowBorder(OBDisplay::display, _window, color->pixel());
+  }
+
+  inline int getBorderWidth(void) const { return _bwidth; }
+  void setBorderWidth(int width) {
+    _bwidth = width;
+    XSetWindowBorderWidth(OBDisplay::display, _window, width);
+  }
 
   virtual void addChild(OtkWidget *child, bool front = false);
   virtual void removeChild(OtkWidget *child);
@@ -112,11 +125,13 @@ public:
 protected:
   
   bool _dirty;
+  bool _focused;
+
+  virtual void adjust(void);
 
 private:
 
   void create(void);
-  void adjust(void);
   void adjustHorz(void);
   void adjustVert(void);
   void internalResize(int width, int height);
@@ -134,7 +149,6 @@ private:
   int _ignore_config;
 
   bool _visible;
-  bool _focused;
 
   bool _grabbed_mouse;
   bool _grabbed_keyboard;
@@ -146,6 +160,9 @@ private:
   Pixmap _bg_pixmap;
   unsigned int _bg_pixel;
 
+  const BColor *_bcolor;
+  unsigned int _bwidth;
+
   Rect _rect;
   unsigned int _screen;
 
@@ -155,7 +172,6 @@ private:
   bool _unmanaged;
 
   OtkEventDispatcher *_event_dispatcher;
-  OtkApplication *_application;
 };
 
 }

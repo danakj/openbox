@@ -12,7 +12,6 @@ OtkButton::OtkButton(OtkWidget *parent)
   : OtkFocusLabel(parent), _pressed(false), _pressed_focus_tx(0),
     _pressed_unfocus_tx(0), _unpr_focus_tx(0), _unpr_unfocus_tx(0)
 {
-  setStyle(getStyle());
 }
 
 OtkButton::~OtkButton()

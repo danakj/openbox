@@ -10,6 +10,7 @@ extern "C" {
 }
 
 #include "client.hh"
+#include "backgroundwidget.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
@@ -49,14 +50,14 @@ private:
   otk::Strut _innersize;
 
   // decoration windows
-  otk::OtkFocusWidget _plate;   // sits entirely under the client window
-  otk::OtkFocusWidget _titlebar;
+  OBBackgroundWidget  _plate;   // sits entirely under the client window
+  OBBackgroundWidget  _titlebar;
   otk::OtkButton      _button_close;
   otk::OtkButton      _button_iconify;
   otk::OtkButton      _button_max;
   otk::OtkButton      _button_stick;
   otk::OtkFocusLabel  _label;
-  otk::OtkFocusWidget _handle;
+  OBBackgroundWidget  _handle;
   otk::OtkButton      _grip_left;
   otk::OtkButton      _grip_right;
 

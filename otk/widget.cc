@@ -16,38 +16,40 @@ namespace otk {
 
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   : OtkEventHandler(),
-    _dirty(false),
+    _dirty(false), _focused(false),
     _parent(parent), _style(parent->getStyle()), _direction(direction),
     _cursor(parent->getCursor()), _bevel_width(parent->getBevelWidth()),
     _ignore_config(0),
-    _visible(false), _focused(false), _grabbed_mouse(false),
+    _visible(false), _grabbed_mouse(false),
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
-    _screen(parent->getScreen()), _fixed_width(false), _fixed_height(false),
-    _event_dispatcher(parent->getEventDispatcher()), _application(0)
+    _bcolor(0), _bwidth(0), _screen(parent->getScreen()), _fixed_width(false),
+    _fixed_height(false), _event_dispatcher(parent->getEventDispatcher())
 {
   assert(parent);
   parent->addChild(this);
   create();
   _event_dispatcher->registerHandler(_window, this);
+  setStyle(_style); // let the widget initialize stuff
 }
 
 OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
                      Direction direction, Cursor cursor, int bevel_width)
   : OtkEventHandler(),
-    _dirty(false),
+    _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
-    _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
+    _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
-    _bg_pixmap(0), _bg_pixel(0), _screen(style->getScreen()),
-    _fixed_width(false), _fixed_height(false),
-    _event_dispatcher(event_dispatcher), _application(0)
+    _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0),
+    _screen(style->getScreen()), _fixed_width(false), _fixed_height(false),
+    _event_dispatcher(event_dispatcher)
 {
   assert(event_dispatcher);
   assert(style);
   create();
   _event_dispatcher->registerHandler(_window, this);
+  setStyle(_style); // let the widget initialize stuff
 }
 
 OtkWidget::~OtkWidget()
@@ -185,11 +187,28 @@ void OtkWidget::hide(bool recursive)
 
 void OtkWidget::focus(void)
 {
-  if (! _visible)
+/*  if (! _visible)
     return;
 
   XSetInputFocus(otk::OBDisplay::display, _window, RevertToPointerRoot,
-                 CurrentTime);
+  CurrentTime);*/
+
+  _focused = true;
+  
+  OtkWidget::OtkWidgetList::iterator it = _children.begin(),
+    end = _children.end();
+  for (; it != end; ++it)
+    (*it)->focus();
+}
+
+void OtkWidget::unfocus(void)
+{
+  _focused = false;
+  
+  OtkWidget::OtkWidgetList::iterator it = _children.begin(),
+    end = _children.end();
+  for (; it != end; ++it)
+    (*it)->unfocus();
 }
 
 bool OtkWidget::grabMouse(void)
@@ -419,12 +438,22 @@ void OtkWidget::removeChild(OtkWidget *child)
   if (it != _children.end())
     _children.erase(it);
 }
-
+#include <stdio.h>
 void OtkWidget::setStyle(Style *style)
 {
   assert(style);
   _style = style;
   _dirty = true;
+
+  // reset textures/colors
+  if (_focused) {
+    unfocus();
+    focus();
+  } else {
+    focus();
+    unfocus();
+  }
+
   OtkWidgetList::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it)
     (*it)->setStyle(style);

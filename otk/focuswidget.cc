@@ -9,44 +9,44 @@
 namespace otk {
 
 OtkFocusWidget::OtkFocusWidget(OtkWidget *parent, Direction direction)
-  : OtkWidget(parent, direction), _unfocus_texture(0), _focused(true)
+  : OtkWidget(parent, direction), _unfocus_texture(0), _unfocus_bcolor(0)
 {
+  _focused = true;
   _focus_texture = parent->getTexture();
+  _focus_bcolor = parent->getBorderColor();
 }
 
 OtkFocusWidget::~OtkFocusWidget()
 {
 }
 
+#include <stdio.h>
 void OtkFocusWidget::focus(void)
 {
-  if (_focused)
+  if (!isVisible() || _focused)
     return;
 
-  // XXX: what about OtkWidget::focus()
+  printf("FOCUS\n");
+  OtkWidget::focus();
 
-  assert(_focus_texture);
+  if (_focus_bcolor)
+    OtkWidget::setBorderColor(_focus_bcolor);
+
   OtkWidget::setTexture(_focus_texture);
   OtkWidget::update();
-
-  OtkWidget::OtkWidgetList children = OtkWidget::getChildren();
-
-  OtkWidget::OtkWidgetList::iterator it = children.begin(),
-    end = children.end();
-
-  OtkFocusWidget *tmp = 0;
-  for (; it != end; ++it) {
-    tmp = dynamic_cast<OtkFocusWidget*>(*it);
-    if (tmp) tmp->focus();
-  }
 }
 
 void OtkFocusWidget::unfocus(void)
 {
-  if (! _focused)
+  if (!isVisible() || !_focused)
     return;
 
-  assert(_unfocus_texture);
+  printf("UNFOCUS\n");
+  OtkWidget::unfocus();
+
+  if (_unfocus_bcolor)
+    OtkWidget::setBorderColor(_unfocus_bcolor);
+
   OtkWidget::setTexture(_unfocus_texture);
   OtkWidget::update();
 
@@ -66,6 +66,12 @@ void OtkFocusWidget::setTexture(BTexture *texture)
 {
   OtkWidget::setTexture(texture);
   _focus_texture = texture;
+}
+
+void OtkFocusWidget::setBorderColor(const BColor *color)
+{
+  OtkWidget::setBorderColor(color);
+  _focus_bcolor = color;
 }
 
 }

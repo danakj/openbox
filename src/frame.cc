@@ -25,14 +25,14 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   : otk::OtkWidget(Openbox::instance, style),
     _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen())),
-    _plate(this),
-    _titlebar(this),
+    _plate(this, OBWidget::Type_Plate),
+    _titlebar(this, OBWidget::Type_Titlebar),
     _button_close(&_titlebar),
     _button_iconify(&_titlebar),
     _button_max(&_titlebar),
     _button_stick(&_titlebar),
     _label(&_titlebar),
-    _handle(this),
+    _handle(this, OBWidget::Type_Handle),
     _grip_left(&_handle),
     _grip_right(&_handle),
     _decorations(client->decorations())
@@ -57,8 +57,6 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
   _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
   
-  _plate.show();
-
   _button_close.setText("X");
   _button_iconify.setText("I");
   _button_max.setText("M");
@@ -68,6 +66,10 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _style = 0;
   setStyle(style);
 
+  //XXX: uncomment me unfocus(); // stuff starts out focused in otk
+  
+  _plate.show(); // the other stuff is shown based on decor settings
+  
   grabClient();
 }
 
@@ -93,11 +95,6 @@ void OBFrame::setStyle(otk::Style *style)
   _grip_right.setPressedFocusTexture(style->getGripFocus());
   _grip_right.setPressedUnfocusTexture(style->getGripUnfocus());
 
-  _titlebar.setTexture(style->getTitleFocus());
-  _titlebar.setUnfocusTexture(style->getTitleUnfocus());
-  _handle.setTexture(style->getHandleFocus());
-  _handle.setUnfocusTexture(style->getHandleUnfocus());
-  
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
   bool replace = (_style);
@@ -109,20 +106,13 @@ void OBFrame::setStyle(otk::Style *style)
   _style = style;
 
   // XXX: change when focus changes!
-  XSetWindowBorder(otk::OBDisplay::display, _plate.getWindow(),
-                   _style->getFrameFocus()->color().pixel());
-
   XSetWindowBorder(otk::OBDisplay::display, getWindow(),
-                   _style->getBorderColor()->pixel());
-  XSetWindowBorder(otk::OBDisplay::display, _titlebar.getWindow(),
                    _style->getBorderColor()->pixel());
   XSetWindowBorder(otk::OBDisplay::display, _grip_left.getWindow(),
                    _style->getBorderColor()->pixel());
   XSetWindowBorder(otk::OBDisplay::display, _grip_right.getWindow(),
                    _style->getBorderColor()->pixel());
-  XSetWindowBorder(otk::OBDisplay::display, _handle.getWindow(),
-                   _style->getBorderColor()->pixel());
-  
+
   // if !replace, then adjust() will get called after the client is grabbed!
   if (replace) {
     // size/position everything
@@ -151,17 +141,14 @@ void OBFrame::adjustSize()
     cbwidth;
   width = _client->area().width() + cbwidth * 2;
 
-  XSetWindowBorderWidth(otk::OBDisplay::display, _plate.getWindow(), cbwidth);
+  _plate.setBorderWidth(cbwidth);
 
-  XSetWindowBorderWidth(otk::OBDisplay::display, getWindow(), bwidth);
-  XSetWindowBorderWidth(otk::OBDisplay::display, _titlebar.getWindow(),
-                        bwidth);
-  XSetWindowBorderWidth(otk::OBDisplay::display, _grip_left.getWindow(),
-                        bwidth);
-  XSetWindowBorderWidth(otk::OBDisplay::display, _grip_right.getWindow(),
-                        bwidth);
-  XSetWindowBorderWidth(otk::OBDisplay::display, _handle.getWindow(), bwidth);
-
+  setBorderWidth(bwidth);
+  _titlebar.setBorderWidth(bwidth);
+  _grip_left.setBorderWidth(bwidth);
+  _grip_right.setBorderWidth(bwidth);
+  _handle.setBorderWidth(bwidth);
+  
   if (_decorations & OBClient::Decor_Titlebar) {
     // set the titlebar size
     _titlebar.setGeometry(-bwidth,

@@ -16,7 +16,6 @@ OtkFocusLabel::OtkFocusLabel(OtkWidget *parent)
   const ScreenInfo *info = OBDisplay::screenInfo(getScreen());
   _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
                            info->getColormap());
-  setStyle(getStyle());
 }
 
 OtkFocusLabel::~OtkFocusLabel()

@@ -220,7 +220,9 @@ void keytree::setCurrentNodeProps(Action::ActionType action, unsigned int mask,
 
 void keytree::initialize(void)
 {
-  int tval = _epist->getConfig()->getNumberValue(Config::chainTimeout);
+  int tval = 0;
+
+  _epist->getConfig()->getNumberValue(Config::chainTimeout, tval);
   _timer = new BTimer(_epist, this);
 
   if (tval <= 0)

@@ -145,7 +145,7 @@ void session_startup(int argc, char **argv)
         SmProp prop_pid = { SmProcessID, SmARRAY8, 1, };
         SmProp prop_pri = { "_GSM_Priority", SmCARD8, 1, };
         SmProp *props[6];
-        gulong hint, pri;
+        gchar hint, pri;
         gchar pid[32];
 
         val_prog.value = argv[0];

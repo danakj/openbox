@@ -28,9 +28,8 @@ RenderColor::RenderColor(int screen, unsigned char red,
     _red(red),
     _green(green),
     _blue(blue),
-    _gc(0)
+    _allocated(false)
 {
-  create();
 }
 
 RenderColor::RenderColor(int screen, RGB rgb)
@@ -38,12 +37,11 @@ RenderColor::RenderColor(int screen, RGB rgb)
     _red(rgb.r),
     _green(rgb.g),
     _blue(rgb.b),
-    _gc(0)
+    _allocated(false)
 {
-  create();
 }
 
-void RenderColor::create()
+void RenderColor::create() const
 {
   unsigned long color = _blue | _green << 8 | _red << 16;
   
@@ -84,6 +82,20 @@ void RenderColor::create()
     _cache[_screen][color] = item;
     ++item->count;
   }
+
+  _allocated = true;
+}
+
+unsigned long RenderColor::pixel() const
+{
+  if (!_allocated) create();
+  return _pixel;
+}
+
+GC RenderColor::gc() const
+{
+  if (!_allocated) create();
+  return _gc;
 }
 
 RenderColor::~RenderColor()
@@ -91,13 +103,17 @@ RenderColor::~RenderColor()
   unsigned long color = _blue | _green << 8 | _red << 16;
 
   CacheItem *item = _cache[_screen][color];
-  assert(item); // it better be in the cache ...
 
-  if (--item->count <= 0) {
-    // remove from the cache
-    XFreeGC(**display, _gc);
-    _cache[_screen][color] = 0;
-    delete item;
+  if (item) {
+    if (--item->count <= 0) {
+      // remove from the cache
+      XFreeGC(**display, _gc);
+      _cache[_screen][color] = 0;
+      delete item;
+
+      const ScreenInfo *info = display->screenInfo(_screen);
+      XFreeColors(**display, info->colormap(), &_pixel, 1, 0);
+    }
   }
 }
 

@@ -1316,6 +1316,11 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 {
     gboolean moved = FALSE, resized = FALSE;
 
+    /* gets the frame's position */
+    frame_client_gravity(self->frame, &x, &y);
+
+    /* these positions are frame positions, not client positions */
+
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
 	x = 0;
@@ -1334,6 +1339,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
                 self->frame->size.top - self->frame->size.bottom;
         }
     }
+
+    /* gets the client's position */
+    frame_frame_gravity(self->frame, &x, &y);
 
     /* these override the above states! if you cant move you can't move! */
     if (user) {

@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.0-rc4\n"
+"Project-Id-Version: openbox 3.0\n"
 "Report-Msgid-Bugs-To: ben@openbox.org\n"
-"POT-Creation-Date: 2003-10-12 19:18-0400\n"
-"PO-Revision-Date: 2003-10-12 19:18-0400\n"
+"POT-Creation-Date: 2003-12-22 12:48-0500\n"
+"PO-Revision-Date: 2003-12-22 12:48-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -41,11 +41,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/client_list_menu.c:92
+#: openbox/client_list_menu.c:94
 msgid "Go there..."
 msgstr "Go there..."
 
-#: openbox/client_list_menu.c:156
+#: openbox/client_list_menu.c:160
 msgid "Desktops"
 msgstr "Desktops"
 
@@ -65,66 +65,71 @@ msgstr "Roll down"
 msgid "Roll up"
 msgstr "Roll up"
 
-#: openbox/client_menu.c:145
+#: openbox/client_menu.c:146
 msgid "All desktops"
 msgstr "All desktops"
 
-#: openbox/client_menu.c:172
+#: openbox/client_menu.c:170
 msgid "Layer"
 msgstr "Layer"
 
-#: openbox/client_menu.c:177
+#: openbox/client_menu.c:175
 msgid "Always on top"
 msgstr "Always on top"
 
-#: openbox/client_menu.c:182
+#: openbox/client_menu.c:180
 msgid "Normal"
 msgstr "Normal"
 
-#: openbox/client_menu.c:187
+#: openbox/client_menu.c:185
 msgid "Always on bottom"
 msgstr "Always on bottom"
 
-#: openbox/client_menu.c:190
+#: openbox/client_menu.c:188
 msgid "Send to desktop"
 msgstr "Send to desktop"
 
-#: openbox/client_menu.c:194
+#: openbox/client_menu.c:192
 msgid "Client menu"
 msgstr "Client menu"
 
-#: openbox/client_menu.c:207
+#: openbox/client_menu.c:205
 msgid "Iconify"
 msgstr "Iconify"
 
-#: openbox/client_menu.c:224
+#: openbox/client_menu.c:222
 msgid "Raise to top"
 msgstr "Raise to top"
 
-#: openbox/client_menu.c:228
+#: openbox/client_menu.c:226
 msgid "Lower to bottom"
 msgstr "Lower to bottom"
 
-#: openbox/client_menu.c:241
+#: openbox/client_menu.c:239
 msgid "Decorate"
 msgstr "Decorate"
 
-#: openbox/client_menu.c:247
+#: openbox/client_menu.c:245
 msgid "Move"
 msgstr "Move"
 
-#: openbox/client_menu.c:251
+#: openbox/client_menu.c:249
 msgid "Resize"
 msgstr "Resize"
 
-#: openbox/client_menu.c:257
+#: openbox/client_menu.c:255
 msgid "Close"
 msgstr "Close"
 
-#: openbox/session.c:131
+#: openbox/session.c:124
 msgid "--sm-client-id requires an argument\n"
 msgstr "--sm-client-id requires an argument\n"
 
-#: openbox/session.c:139
+#: openbox/session.c:132
 msgid "--sm-save-file requires an argument\n"
 msgstr "--sm-save-file requires an argument\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Unable to make directory '%s': %s"

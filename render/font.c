@@ -96,7 +96,8 @@ void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
     XftColor c;
 
     /* accomidate for areas bigger/smaller than Xft thinks the font is tall */
-    y += (t->font->xftfont->height + 1 - (t->font->height + h)) / 2;
+    y -= (2 * (t->font->xftfont->ascent + t->font->xftfont->descent) -
+          (t->font->height + h)) / 2;
 
     x += 3; /* XXX figure out X with justification */
 

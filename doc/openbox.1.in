@@ -69,9 +69,9 @@ openbox \- a window manager for X11
 .\".PP
 .\"Openbox uses its own graphics class to render its images on the fly.
 .\"By using style files, you can determine at a great level how your desktop looks.
-.\"Openbox currently uses its own protocol to communicate with other clients such
-.\"as the pager.  Work is underway to support the new window manager specification
-.\"that both GNOME and KDE use.
+.\"Openbox currently uses the Blackbox protocol to communicate with other clients
+.\"such as the pager.  Work is underway to support the new window manager
+.\"specification that both GNOME and KDE use.
 .SH OPTIONS
 Openbox supports the following command line options:
 .TP
@@ -312,8 +312,8 @@ An
 tag is required to end the submenu.
 .TP
 .B [reconfig] (label)
-When selected, this item rereads the current style and menu files and
-applies any changes.
+When selected, this item rereads the current style, menu files and rc file,
+and applies any changes.
 This is useful for creating a new style or theme, as you don't have to
 constantly restart Openbox every time you save your style.
 However, Openbox automagically rereads the menu whenever it changes.
@@ -791,17 +791,12 @@ many individuals around the world.
 .PP
 The official Openbox website:
 .nh
-.B http://FILLMEINNOW/
-.hy
-.br
-The bug and feature request page, as well as current releases can be found at:
-.nh
-.B http://FILLMEINNOW/
+.B http://openbox.sunsite.dk/
 .hy
 .br
 Many themes and other contributions:
 .nh
-.B http://bb.themes.org/
+.B http://themes.freshmeat.net/
 .hy
 .PP
 This manpage was put together by Wilbert Berendsen

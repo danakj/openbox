@@ -513,7 +513,10 @@ static gboolean valid_focus_target(ObClient *ft)
            ft->type == OB_CLIENT_TYPE_UTILITY))) &&
         ((ft->can_focus || ft->focus_notify) &&
          !ft->skip_taskbar &&
-         (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)))
+         (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) &&
+        ft == client_focus_target(ft))
+        return TRUE;
+/*
     {
         GSList *it;
 
@@ -525,6 +528,7 @@ static gboolean valid_focus_target(ObClient *ft)
         }
         return TRUE;
     }
+*/
 
     return FALSE;
 }
@@ -662,11 +666,12 @@ void focus_order_add_new(ObClient *c)
                 else
                     focus_order[i] = g_list_insert(focus_order[i], c, 1);
             }
-        } else
-             if (focus_order[d] && ((ObClient*)focus_order[d]->data)->iconic)
+        } else {
+            if (focus_order[d] && ((ObClient*)focus_order[d]->data)->iconic)
                 focus_order[d] = g_list_insert(focus_order[d], c, 0);
             else
                 focus_order[d] = g_list_insert(focus_order[d], c, 1);
+        }
     }
 }
 

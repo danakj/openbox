@@ -1411,7 +1411,7 @@ void action_cycle_windows(union ActionData *data)
        on us */
     event_halt_focus_delay();
 
-    focus_cycle(data->cycle.forward, data->cycle.linear,
+    focus_cycle(data->cycle.forward, data->cycle.linear, data->any.interactive,
                 data->cycle.dialog,
                 data->cycle.inter.final, data->cycle.inter.cancel);
 }
@@ -1423,6 +1423,7 @@ void action_directional_focus(union ActionData *data)
     event_halt_focus_delay();
 
     focus_directional_cycle(data->interdiraction.direction,
+                            data->any.interactive,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,
                             data->interdiraction.inter.cancel);

@@ -538,7 +538,7 @@ static gboolean valid_focus_target(ObClient *ft)
     return FALSE;
 }
 
-void focus_cycle(gboolean forward, gboolean linear,
+void focus_cycle(gboolean forward, gboolean linear, gboolean interactive,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
@@ -547,20 +547,26 @@ void focus_cycle(gboolean forward, gboolean linear,
     GList *it, *start, *list;
     ObClient *ft = NULL;
 
-    if (cancel) {
-        focus_cycle_target = NULL;
-        goto done_cycle;
-    } else if (done)
-        goto done_cycle;
+    if (interactive) {
+        if (cancel) {
+            focus_cycle_target = NULL;
+            goto done_cycle;
+        } else if (done)
+            goto done_cycle;
 
-    if (!focus_order[screen_desktop])
-        goto done_cycle;
+        if (!focus_order[screen_desktop])
+            goto done_cycle;
 
-    if (!first) first = focus_client;
+        if (!first) first = focus_client;
+
+        if (linear) list = client_list;
+        else        list = focus_order[screen_desktop];
+    } else {
+        if (!focus_order[screen_desktop])
+            goto done_cycle;
+        list = client_list;
+    }
     if (!focus_cycle_target) focus_cycle_target = focus_client;
-
-    if (linear) list = client_list;
-    else        list = focus_order[screen_desktop];
 
     start = it = g_list_find(list, focus_cycle_target);
     if (!start) /* switched desktops or something? */
@@ -577,12 +583,18 @@ void focus_cycle(gboolean forward, gboolean linear,
         }
         ft = it->data;
         if (valid_focus_target(ft)) {
-            if (ft != focus_cycle_target) { /* prevents flicker */
+            if (interactive) {
+                if (ft != focus_cycle_target) { /* prevents flicker */
+                    focus_cycle_target = ft;
+                    focus_cycle_draw_indicator();
+                }
+                popup_cycle(ft, dialog);
+                return;
+            } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
-                focus_cycle_draw_indicator();
+                done = TRUE;
+                break;
             }
-            popup_cycle(ft, dialog);
-            return;
         }
     } while (it != start);
 
@@ -596,17 +608,22 @@ done_cycle:
     g_list_free(order);
     order = NULL;
 
-    focus_cycle_draw_indicator();
-    popup_cycle(ft, FALSE);
+    if (interactive) {
+        focus_cycle_draw_indicator();
+        popup_cycle(ft, FALSE);
+    }
 
     return;
 }
 
-void focus_directional_cycle(ObDirection dir,
+void focus_directional_cycle(ObDirection dir, gboolean interactive,
                              gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     ObClient *ft = NULL;
+
+    if (!interactive)
+        return;
 
     if (cancel) {
         focus_cycle_target = NULL;

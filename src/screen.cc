@@ -619,7 +619,7 @@ void Screen::raiseWindow(Client *client)
   _stacking.remove(client);
   
   Client::List::iterator it = _stacking.begin();
-  Client::List::const_iterator end = _stacking.end();
+  const Client::List::iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
   for (; it != end && (*it)->layer() > client->layer(); ++it);

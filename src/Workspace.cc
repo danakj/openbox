@@ -399,13 +399,13 @@ bool rowLRTB(const Rect &first, const Rect &second){
 bool colLRTB(const Rect &first, const Rect &second){
   if (first.x()==second.x())
      return first.y()<second.y();
-  return first.x()<second.y();
+  return first.x()<second.x();
 }
  
 bool colLRBT(const Rect &first, const Rect &second){
   if (first.x()==second.x())
      return first.y()+first.h()>second.y()+second.h();
-  return first.x()<second.y();
+  return first.x()<second.x();
 }
 
 bool colRLTB(const Rect &first, const Rect &second){

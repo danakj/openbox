@@ -1,3 +1,5 @@
+scriptdir = $(libdir)/openbox/python
+
 CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@
 
 INCLUDES= -I../src
@@ -14,6 +16,8 @@ libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   otk_wrap.cc
 
 libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS)
+
+scriptdir_DATA = otk.py
 
 MAINTAINERCLEANFILES= Makefile.in
 

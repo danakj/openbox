@@ -22,6 +22,8 @@ openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   buttonwidget.cc python.cc bindings.cc \
                   openbox_wrap.cc
 
+scriptdir_DATA = openbox.py
+
 MAINTAINERCLEANFILES= Makefile.in
 
 distclean-local:

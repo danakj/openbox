@@ -227,5 +227,24 @@ void OBDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
                   grab_window);
 }
 
+void OBDisplay::grabKey(unsigned int keycode, unsigned int modifiers,
+                        Window grab_window, bool owner_events,
+                        int pointer_mode, int keyboard_mode,
+                        bool allow_scroll_lock)
+{
+  unsigned int length = (allow_scroll_lock) ? 8 / 2:
+                                              8;
+  for (size_t cnt = 0; cnt < length; ++cnt)
+    XGrabKey(otk::OBDisplay::display, keycode, modifiers | _mask_list[cnt],
+                grab_window, owner_events, pointer_mode, keyboard_mode);
+}
+
+void OBDisplay::ungrabKey(unsigned int keycode, unsigned int modifiers,
+                          Window grab_window)
+{
+  for (size_t cnt = 0; cnt < 8; ++cnt)
+    XUngrabKey(otk::OBDisplay::display, keycode, modifiers | _mask_list[cnt],
+               grab_window);
+}
 
 }

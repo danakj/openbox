@@ -149,25 +149,6 @@ Openbox::Openbox(int argc, char **argv)
   _actions = new OBActions();
   _bindings = new OBBindings();
 
-  OBBindings::StringVect v;
-  v.push_back("C-A-x");
-  v.push_back("C-y");
-  v.push_back("v");
-  _bindings->add_key(v, 1);
-  v.clear();
-  v.push_back("C-x");
-  v.push_back("C-z");
-  v.push_back("a");
-  _bindings->add_key(v, 2);
-  v.clear();
-  v.push_back("C-a");
-  _bindings->add_key(v, 3);
-
-  _bindings->add_mouse("C-1", 1);
-
-  printf("CHAINS:\n");
-  _bindings->display();
-
   setMasterHandler(_actions); // set as the master event handler
 
   // create the mouse cursors we'll use
@@ -205,6 +186,9 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
+  // grab any keys set up before the screens existed
+  _bindings->grabKeys(true);
+
   // set up input focus
   _focused_screen = _screens[0];
   setFocusedClient(0);
@@ -217,12 +201,13 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
-  std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
-
   delete _bindings;
   delete _actions;
-  delete _property;
   
+  std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
+
+  delete _property;
+
   // close the X display
   otk::OBDisplay::destroy();
 }

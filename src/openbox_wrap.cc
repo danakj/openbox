@@ -645,33 +645,34 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 
 /* -------- TYPES TABLE (BEGIN) -------- */
 
-#define  SWIGTYPE_p_otk__OBTimerQueueManager swig_types[0] 
-#define  SWIGTYPE_p_ob__Cursors swig_types[1] 
-#define  SWIGTYPE_p_ob__OBScreen swig_types[2] 
-#define  SWIGTYPE_p_otk__Style swig_types[3] 
-#define  SWIGTYPE_p_ob__OBFrame swig_types[4] 
-#define  SWIGTYPE_p_XReparentEvent swig_types[5] 
-#define  SWIGTYPE_p_ob__OBClient swig_types[6] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[7] 
-#define  SWIGTYPE_p_otk__Strut swig_types[8] 
-#define  SWIGTYPE_p_XShapeEvent swig_types[9] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[10] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[11] 
-#define  SWIGTYPE_p_otk__Rect swig_types[12] 
-#define  SWIGTYPE_p_ob__OBWidget swig_types[13] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[14] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[15] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[16] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[17] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[18] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[19] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[20] 
-#define  SWIGTYPE_p_PyObject swig_types[21] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[22] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[23] 
-#define  SWIGTYPE_p_otk__Configuration swig_types[24] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[25] 
-static swig_type_info *swig_types[27];
+#define  SWIGTYPE_p_ob__OBActions__ActionType swig_types[0] 
+#define  SWIGTYPE_p_otk__OBTimerQueueManager swig_types[1] 
+#define  SWIGTYPE_p_ob__Cursors swig_types[2] 
+#define  SWIGTYPE_p_ob__OBScreen swig_types[3] 
+#define  SWIGTYPE_p_otk__Style swig_types[4] 
+#define  SWIGTYPE_p_ob__OBFrame swig_types[5] 
+#define  SWIGTYPE_p_XReparentEvent swig_types[6] 
+#define  SWIGTYPE_p_ob__OBClient swig_types[7] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[8] 
+#define  SWIGTYPE_p_otk__Strut swig_types[9] 
+#define  SWIGTYPE_p_XShapeEvent swig_types[10] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[11] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[12] 
+#define  SWIGTYPE_p_otk__Rect swig_types[13] 
+#define  SWIGTYPE_p_ob__OBWidget swig_types[14] 
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[15] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[16] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[17] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[18] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[19] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[20] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[21] 
+#define  SWIGTYPE_p_PyObject swig_types[22] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[23] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
+#define  SWIGTYPE_p_otk__Configuration swig_types[25] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[26] 
+static swig_type_info *swig_types[28];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -691,6 +692,7 @@ static swig_type_info *swig_types[27];
 #include "screen.hh"
 #include "client.hh"
 #include "python.hh"
+#include "bindings.hh"
 
 
 #define  SWIG_MemoryError    1
@@ -2606,6 +2608,30 @@ static PyObject *_wrap_unbind_key(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_set_reset_key(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    std::string *arg1 = 0 ;
+    std::string temp1 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:set_reset_key",&obj0)) goto fail;
+    {
+        if (PyString_Check(obj0)) {
+            temp1 = std::string(PyString_AsString(obj0));
+            arg1 = &temp1;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
+    }
+    ob::python_set_reset_key((std::string const &)*arg1);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_bind_mouse(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     std::string *arg1 = 0 ;
@@ -2661,12 +2687,46 @@ static PyObject *_wrap_unbind_mouse(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_unbind_all(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    bool result;
     
     if(!PyArg_ParseTuple(args,(char *)":unbind_all")) goto fail;
-    result = (bool)ob::python_unbind_all();
+    ob::python_unbind_all();
     
-    resultobj = PyInt_FromLong((long)result);
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_python_callback_binding(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    ob::OBActions::ActionType arg2 ;
+    Window arg3 ;
+    unsigned int arg4 ;
+    unsigned int arg5 ;
+    Time arg6 ;
+    ob::OBActions::ActionType *argp2 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
+    PyObject * obj4  = 0 ;
+    PyObject * obj5  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOO:python_callback_binding",&arg1,&obj1,&obj2,&obj3,&obj4,&obj5)) goto fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &argp2, SWIGTYPE_p_ob__OBActions__ActionType,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg2 = *argp2; 
+    arg3 = (Window) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg4 = (unsigned int) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg5 = (unsigned int) PyInt_AsLong(obj4);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg6 = (Time) PyInt_AsLong(obj5);
+    if (PyErr_Occurred()) SWIG_fail;
+    ob::python_callback_binding(arg1,arg2,arg3,arg4,arg5,arg6);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -2774,9 +2834,11 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"unregister_all", _wrap_unregister_all, METH_VARARGS },
 	 { (char *)"bind_key", _wrap_bind_key, METH_VARARGS },
 	 { (char *)"unbind_key", _wrap_unbind_key, METH_VARARGS },
+	 { (char *)"set_reset_key", _wrap_set_reset_key, METH_VARARGS },
 	 { (char *)"bind_mouse", _wrap_bind_mouse, METH_VARARGS },
 	 { (char *)"unbind_mouse", _wrap_unbind_mouse, METH_VARARGS },
 	 { (char *)"unbind_all", _wrap_unbind_all, METH_VARARGS },
+	 { (char *)"python_callback_binding", _wrap_python_callback_binding, METH_VARARGS },
 	 { NULL, NULL }
 };
 
@@ -2795,6 +2857,7 @@ static void *_p_ob__OBClientTo_p_ob__OBWidget(void *x) {
 static void *_p_ob__OpenboxTo_p_otk__OtkEventDispatcher(void *x) {
     return (void *)((otk::OtkEventDispatcher *)  ((ob::Openbox *) x));
 }
+static swig_type_info _swigt__p_ob__OBActions__ActionType[] = {{"_p_ob__OBActions__ActionType", 0, "ob::OBActions::ActionType *", 0},{"_p_ob__OBActions__ActionType"},{0}};
 static swig_type_info _swigt__p_otk__OBTimerQueueManager[] = {{"_p_otk__OBTimerQueueManager", 0, "otk::OBTimerQueueManager *", 0},{"_p_otk__OBTimerQueueManager"},{0}};
 static swig_type_info _swigt__p_ob__Cursors[] = {{"_p_ob__Cursors", 0, "ob::Cursors *", 0},{"_p_ob__Cursors"},{0}};
 static swig_type_info _swigt__p_ob__OBScreen[] = {{"_p_ob__OBScreen", 0, "ob::OBScreen *", 0},{"_p_ob__OBScreen"},{0}};
@@ -2823,6 +2886,7 @@ static swig_type_info _swigt__p_otk__Configuration[] = {{"_p_otk__Configuration"
 static swig_type_info _swigt__p_XUnmapEvent[] = {{"_p_XUnmapEvent", 0, "XUnmapEvent *", 0},{"_p_XUnmapEvent"},{0}};
 
 static swig_type_info *swig_types_initial[] = {
+_swigt__p_ob__OBActions__ActionType, 
 _swigt__p_otk__OBTimerQueueManager, 
 _swigt__p_ob__Cursors, 
 _swigt__p_ob__OBScreen, 

@@ -28,7 +28,6 @@ typedef struct Binding {
 
 typedef struct BindingTree {
   Binding binding;
-  std::string text;
   int id;     // the id given for the binding in add()
   bool chain; // true if this is a chain to another key (not an action)
 
@@ -54,6 +53,8 @@ private:
   BindingTree *_curpos; // position in the keytree
 
   BindingTree *_mousetree; // this tree is a list. it has only siblings
+
+  Binding _resetkey; // the key which resets the key chain status
   
   int find_key(BindingTree *search) const;
   bool translate(const std::string &str, Binding &b, bool askey) const;
@@ -61,7 +62,6 @@ private:
   void assimilate(BindingTree *node);
 
   void grabMouseOnAll(bool grab);
-  void grabKeys(bool grab);
   
 public:
   //! Initializes an OBBinding object
@@ -109,18 +109,13 @@ public:
   */
   int find_key(const StringVect &keylist);
 
-  void process(unsigned int modifiers, unsigned int key);
-
-  // XXX: need an exec() function or something that will be used by openbox
-  //      and hold state for which chain we're in etc. (it could have a timer
-  //      for reseting too...)
-
-  void display();
-
   void fire(OBActions::ActionType type, Window window, unsigned int modifiers,
             unsigned int key, Time time);
 
+  void setResetKey(const std::string &key);
+
   void grabMouse(bool grab, const OBClient *client);
+  void grabKeys(bool grab);
 };
 
 }

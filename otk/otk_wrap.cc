@@ -5605,6 +5605,68 @@ static PyObject *_wrap_OBDisplay_ungrabButton(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBDisplay_grabKey(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    unsigned int arg1 ;
+    unsigned int arg2 ;
+    Window arg3 ;
+    bool arg4 ;
+    int arg5 ;
+    int arg6 ;
+    bool arg7 ;
+    Window *argp3 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
+    PyObject * obj6  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOOOiiO:OBDisplay_grabKey",&obj0,&obj1,&obj2,&obj3,&arg5,&arg6,&obj6)) goto fail;
+    arg1 = (unsigned int) PyInt_AsLong(obj0);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj2,(void **) &argp3, SWIGTYPE_p_Window,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg3 = *argp3; 
+    arg4 = (bool) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg7 = (bool) PyInt_AsLong(obj6);
+    if (PyErr_Occurred()) SWIG_fail;
+    otk::OBDisplay::grabKey(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBDisplay_ungrabKey(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    unsigned int arg1 ;
+    unsigned int arg2 ;
+    Window arg3 ;
+    Window *argp3 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOO:OBDisplay_ungrabKey",&obj0,&obj1,&obj2)) goto fail;
+    arg1 = (unsigned int) PyInt_AsLong(obj0);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj2,(void **) &argp3, SWIGTYPE_p_Window,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg3 = *argp3; 
+    otk::OBDisplay::ungrabKey(arg1,arg2,arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_delete_OBDisplay(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::OBDisplay *arg1 = (otk::OBDisplay *) 0 ;
@@ -12946,6 +13008,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBDisplay_ungrab", _wrap_OBDisplay_ungrab, METH_VARARGS },
 	 { (char *)"OBDisplay_grabButton", _wrap_OBDisplay_grabButton, METH_VARARGS },
 	 { (char *)"OBDisplay_ungrabButton", _wrap_OBDisplay_ungrabButton, METH_VARARGS },
+	 { (char *)"OBDisplay_grabKey", _wrap_OBDisplay_grabKey, METH_VARARGS },
+	 { (char *)"OBDisplay_ungrabKey", _wrap_OBDisplay_ungrabKey, METH_VARARGS },
 	 { (char *)"delete_OBDisplay", _wrap_delete_OBDisplay, METH_VARARGS },
 	 { (char *)"OBDisplay_swigregister", OBDisplay_swigregister, METH_VARARGS },
 	 { (char *)"BFont_fallbackFont", _wrap_BFont_fallbackFont, METH_VARARGS },

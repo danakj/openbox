@@ -2,6 +2,7 @@
 
 #include "python.hh"
 #include "openbox.hh"
+#include "otk/display.hh"
 
 #include <vector>
 #include <algorithm>
@@ -11,8 +12,7 @@ namespace ob {
 typedef std::vector<PyObject*> FunctionList;
 
 static FunctionList callbacks[OBActions::NUM_ACTIONS];
-static FunctionList keyfuncs;
-static FunctionList mousefuncs;
+static FunctionList bindfuncs;
 
 bool python_register(int action, PyObject *callback)
 {
@@ -160,10 +160,10 @@ bool python_bind_key(PyObject *keylist, PyObject *callback)
 
   // the id is what the binding class can call back with so it doesnt have to
   // worry about the python function pointer
-  int id = keyfuncs.size();
+  int id = bindfuncs.size();
   if (Openbox::instance->bindings()->add_key(vectkeylist, id)) {
     Py_XINCREF(callback);              // Add a reference to new callback
-    keyfuncs.push_back(callback);
+    bindfuncs.push_back(callback);
     return true;
   } else {
     PyErr_SetString(PyExc_AssertionError,"Unable to create binding. Invalid.");
@@ -192,15 +192,20 @@ bool python_unbind_key(PyObject *keylist)
   int id;
   if ((id =
        Openbox::instance->bindings()->remove_key(vectkeylist)) >= 0) {
-    assert(keyfuncs[id]); // shouldn't be able to remove it twice
-    Py_XDECREF(keyfuncs[id]);  // Dispose of previous callback
+    assert(bindfuncs[id]); // shouldn't be able to remove it twice
+    Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
     // important note: we don't erase the item from the list cuz that would
     // ruin all the id's that are in use. simply nullify it.
-    keyfuncs[id] = 0;
+    bindfuncs[id] = 0;
     return true;
   }
   
   return false;
+}
+
+void python_set_reset_key(const std::string &key)
+{
+  Openbox::instance->bindings()->setResetKey(key);
 }
 
 bool python_bind_mouse(const std::string &button, PyObject *callback)
@@ -212,10 +217,10 @@ bool python_bind_mouse(const std::string &button, PyObject *callback)
 
   // the id is what the binding class can call back with so it doesnt have to
   // worry about the python function pointer
-  int id = mousefuncs.size();
+  int id = bindfuncs.size();
   if (Openbox::instance->bindings()->add_mouse(button, id)) {
     Py_XINCREF(callback);              // Add a reference to new callback
-    mousefuncs.push_back(callback);
+    bindfuncs.push_back(callback);
     return true;
   } else {
     PyErr_SetString(PyExc_AssertionError,"Unable to create binding. Invalid.");
@@ -228,21 +233,20 @@ bool python_unbind_mouse(const std::string &button)
   int id;
   if ((id =
        Openbox::instance->bindings()->remove_mouse(button)) >= 0) {
-    assert(mousefuncs[id]); // shouldn't be able to remove it twice
-    Py_XDECREF(mousefuncs[id]);  // Dispose of previous callback
+    assert(bindfuncs[id]); // shouldn't be able to remove it twice
+    Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
     // important note: we don't erase the item from the list cuz that would
     // ruin all the id's that are in use. simply nullify it.
-    mousefuncs[id] = 0;
+    bindfuncs[id] = 0;
     return true;
   }
   
   return false;
 }
 
-bool python_unbind_all()
+void python_unbind_all()
 {
   Openbox::instance->bindings()->remove_all();
-  return true;
 }
 
 
@@ -250,24 +254,21 @@ void python_callback_binding(int id, OBActions::ActionType action,
                              Window window, unsigned int state,
                              unsigned int keybutton, Time time)
 {
-  PyObject *func;
-  
   assert(action >= 0 && action < OBActions::NUM_ACTIONS);
 
-  if (action == OBActions::Action_KeyPress)
-    func = keyfuncs[id];
-  else
-    func = mousefuncs[id];
-
-  if (!func) return;
+  if (!bindfuncs[id]) return; // the key was unbound
 
   PyObject *arglist;
   PyObject *result;
 
-  arglist = Py_BuildValue("iliil", action, window, state, keybutton, time);
+  arglist = Py_BuildValue("ilisl", action, window, state,
+                          XKeysymToString(
+                            XKeycodeToKeysym(otk::OBDisplay::display,
+                                             keybutton, 0)),
+                          time);
 
   // call the callback
-  result = PyEval_CallObject(func, arglist);
+  result = PyEval_CallObject(bindfuncs[id], arglist);
   if (result) {
     Py_DECREF(result);
   } else {

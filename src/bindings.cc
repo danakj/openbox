@@ -21,38 +21,6 @@ extern "C" {
 
 namespace ob {
 
-#include <stdio.h>
-static void print_branch(const BindingTree *first, std::string str)
-{
-  const BindingTree *p = first;
-  
-  while (p) {
-    if (p->first_child)
-      print_branch(p->first_child, str + " " + p->text);
-    if (!p->chain)
-      printf("%d%s\n", p->id, (str + " " + p->text).c_str());
-    p = p->next_sibling;
-  }
-}
-
-
-void OBBindings::display()
-{
-  if (_keytree.first_child) {
-    printf("Key Tree:\n");
-    print_branch(_keytree.first_child, "");
-  }
-  if (_mousetree) {
-    printf("Mouse Tree:\n");
-    BindingTree *p = _mousetree;
-    while (p) {
-      printf("%d %s\n", p->id, p->text.c_str());
-      p = p->next_sibling;
-    }
-  }
-}
-
-
 static bool buttonvalue(const std::string &button, unsigned int *val)
 {
   if (button == "1" || button == "Button1") {
@@ -116,7 +84,7 @@ bool OBBindings::translate(const std::string &str, Binding &b,
 
     std::string mod(str, begin, end-begin);
     if (!modvalue(mod, &modval)) {
-//      printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
+      printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
       return false;
     }
     
@@ -127,11 +95,19 @@ bool OBBindings::translate(const std::string &str, Binding &b,
   b.modifiers = modval;
   if (askey) {
     KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
-    if (sym == NoSymbol) return false;
-    b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
+    if (sym == NoSymbol) {
+      printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
+      return false;
+    }
+    if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
+      printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
     return b.key != 0;
   } else {
-    return buttonvalue(key, &b.key);
+    if (!buttonvalue(key, &b.key)) {
+      printf(_("Invalid Button name in mouse binding: %s\n"), key.c_str());
+      return false;
+    } else
+      return true;
   }
 }
 
@@ -161,15 +137,15 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
       ret = 0;
       break;
     }
-    ret->text = *it; // XXX: rm me
   }
   return ret;
 }
 
 
 OBBindings::OBBindings()
-  : _curpos(&_keytree), _mousetree(0)
+  : _curpos(&_keytree), _mousetree(0), _resetkey(0,0)
 {
+  setResetKey("C-g"); // set the default reset key
 }
 
 
@@ -199,7 +175,6 @@ bool OBBindings::add_mouse(const std::string &button, int id)
   grabMouseOnAll(false); // ungrab everything
   
   *newp = new BindingTree(id);
-  (*newp)->text = button;
   (*newp)->chain = false;
   (*newp)->binding.key = n.binding.key;
   (*newp)->binding.modifiers = n.binding.modifiers;
@@ -333,6 +308,18 @@ int OBBindings::remove_key(const StringVect &keylist)
 }
 
 
+void OBBindings::setResetKey(const std::string &key)
+{
+  Binding b(0, 0);
+  if (translate(key, b, true)) {
+    grabKeys(false);
+    _resetkey.key = b.key;
+    _resetkey.modifiers = b.modifiers;
+    grabKeys(true);
+  }
+}
+
+
 static void remove_branch(BindingTree *first)
 {
   BindingTree *p = first;
@@ -360,25 +347,6 @@ void OBBindings::remove_all()
     p = n;
   }
   _mousetree = 0;
-}
-
-
-void OBBindings::process(unsigned int modifiers, unsigned int key)
-{
-  BindingTree *c = _curpos->first_child;
-
-  while (c) {
-    if (c->binding.key == key && c->binding.modifiers == modifiers) {
-      _curpos = c;
-      break;
-    }
-  }
-  if (c) {
-    if (!_curpos->chain) {
-      // XXX execute command for _curpos->id
-      _curpos = &_keytree; // back to the start
-    }
-  }
 }
 
 
@@ -428,6 +396,14 @@ void OBBindings::grabKeys(bool grab)
                                   root);
       p = p->next_sibling;
     }
+
+    if (grab)
+      otk::OBDisplay::grabKey(_resetkey.key, _resetkey.modifiers,
+                              root, true, GrabModeAsync, GrabModeAsync,
+                              false);
+    else
+      otk::OBDisplay::ungrabKey(_resetkey.key, _resetkey.modifiers,
+                                root);
   }
 }
 
@@ -436,23 +412,29 @@ void OBBindings::fire(OBActions::ActionType type, Window window,
                       unsigned int modifiers, unsigned int key, Time time)
 {
   if (type == OBActions::Action_KeyPress) {
-    BindingTree *p = _curpos->first_child;
-    while (p) {
-      if (p->binding.key == key && p->binding.modifiers == modifiers) {
-        if (p->chain) {
-          grabKeys(false);
-          _curpos = p;
-          grabKeys(true);
-        } else {
-          python_callback_binding(p->id, type, window, modifiers, key, time);
-          _curpos = &_keytree;
+    if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
+      grabKeys(false);
+      _curpos = &_keytree;
+      grabKeys(true);
+    } else {
+      BindingTree *p = _curpos->first_child;
+      while (p) {
+        if (p->binding.key == key && p->binding.modifiers == modifiers) {
+          if (p->chain) {
+            grabKeys(false);
+            _curpos = p;
+            grabKeys(true);
+          } else {
+            python_callback_binding(p->id, type, window, modifiers, key, time);
+            grabKeys(false);
+            _curpos = &_keytree;
+            grabKeys(true);
+          }
+          break;
         }
-        break;
+        p = p->next_sibling;
       }
-      p = p->next_sibling;
     }
-    
-    assert(false);
   } else {
     BindingTree *p = _mousetree;
     while (p) {

@@ -44,6 +44,8 @@ bool python_bind_key(PyObject *keylist, PyObject *callback);
 
 bool python_unbind_key(PyObject *keylist);
 
+void python_set_reset_key(const std::string &key);
+
 //! Adds a mouse binding
 /*!
   Bindings do not generate motion events. You can only handle motion events by
@@ -54,7 +56,7 @@ bool python_bind_mouse(const std::string &button, PyObject *callback);
 
 bool python_unbind_mouse(const std::string &button);
 
-bool python_unbind_all();
+void python_unbind_all();
 
 //! Fire a python callback function
 void python_callback(OBActions::ActionType action, Window window,

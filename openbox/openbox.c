@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
-	exit_with_error("Failed to open the display.");
+	ob_exit_with_error("Failed to open the display.");
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
 

@@ -297,10 +297,10 @@
   </context>
   <context name="desktop">
     <mousebind button="Up" action="click">
-      <action name="desktopnext"><interactive>no</interactive></action>
+      <action name="desktopnext"></action>
     </mousebind>
     <mousebind button="Down" action="click">
-      <action name="desktopprevious"><interactive>no</interactive></action>
+      <action name="desktopprevious"></action>
     </mousebind>
     <mousebind button="A-Up" action="click">
       <action name="desktopnext"/>

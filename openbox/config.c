@@ -40,8 +40,6 @@ GSList *config_menu_files;
 gint config_resist_win;
 gint config_resist_edge;
 
-GSList *config_urgent_actions;
-
 /*
 
 <keybind key="C-x">
@@ -354,33 +352,6 @@ static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_resist_edge = parse_int(doc, n);
 }
 
-static void parse_urgent(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                         void *d)
-{
-    ObAction *action;
-    xmlNodePtr nact;
-
-    nact = parse_find_node("action", node->xmlChildrenNode);
-    while (nact) {
-        if ((action = action_parse(i, doc, nact))) {
-            /* validate that its okay for an urgent binding */
-            if (action->func == action_moveresize &&
-                action->data.moveresize.corner !=
-                prop_atoms.net_wm_moveresize_move_keyboard &&
-                action->data.moveresize.corner !=
-                prop_atoms.net_wm_moveresize_size_keyboard) {
-                action_free(action);
-                action = NULL;
-            }
-
-            if (action)
-                config_urgent_actions = g_slist_append(config_urgent_actions,
-                                                       action);
-        }
-        nact = parse_find_node("action", nact->next);
-    }
-}
-
 void config_startup(ObParseInst *i)
 {
     config_focus_new = TRUE;
@@ -434,8 +405,6 @@ void config_startup(ObParseInst *i)
     config_menu_files = NULL;
 
     parse_register(i, "menu", parse_menu, NULL);
-
-    parse_register(i, "urgent", parse_urgent, NULL);
 }
 
 void config_shutdown()

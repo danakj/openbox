@@ -71,9 +71,6 @@ extern gint config_resist_edge;
 /*! User-specified menu files */
 extern GSList *config_menu_files;
 
-/*! Actions to execute when a client sets its urgent flag */
-extern GSList *config_urgent_actions;
-
 void config_startup(struct _ObParseInst *i);
 void config_shutdown();
 

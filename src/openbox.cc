@@ -14,6 +14,7 @@
 #include "otk/util.hh"
 #include "otk/rendercolor.hh"
 #include "otk/renderstyle.hh"
+#include "otk/messagedialog.hh"
 
 extern "C" {
 #include <X11/cursorfont.h>
@@ -133,14 +134,18 @@ Openbox::Openbox(int argc, char **argv)
   // initialize scripting
   python_init(argv[0]);
   
-  // load config values
-  //python_exec(SCRIPTDIR"/config.py"); // load openbox config values
-  // run all of the python scripts
-  //python_exec(SCRIPTDIR"/builtins.py"); // builtin callbacks
-  //python_exec(SCRIPTDIR"/focus.py"); // focus helpers
   // run the user's script or the system defaults if that fails
-  if (!python_exec(_scriptfilepath.c_str()))
+  bool pyerr = false;
+  if (!python_exec(_scriptfilepath.c_str())) {
+    pyerr = true;
+
+    // reset all the python stuff
+    _bindings->removeAllKeys();
+    _bindings->removeAllButtons();
+    _bindings->removeAllEvents();
+    
     python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors
+  }
 
   // initialize all the screens
   _focused_screen = 0;
@@ -183,6 +188,18 @@ Openbox::Openbox(int argc, char **argv)
   setFocusedClient(0);
   
   _state = State_Normal; // done starting
+
+  if (pyerr) {
+    std::string msg;
+    msg += _("An error occured while executing the python scripts.");
+    msg += "\n\n";
+    msg += _("See the exact error message in Openbox's output for details.");
+    otk::MessageDialog dia(this, _("Python Error"), msg);
+    dia.addButton(otk::DialogButton("OK", true));
+    dia.show();
+    dia.focus();
+    dia.run();
+  }
 }
 
 

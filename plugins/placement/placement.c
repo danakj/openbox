@@ -1,5 +1,6 @@
 #include "kernel/dispatch.h"
 #include "kernel/client.h"
+#include "kernel/group.h"
 #include "kernel/frame.h"
 #include "kernel/screen.h"
 #include "kernel/openbox.h"
@@ -57,6 +58,51 @@ static void event(ObEvent *e, void *foo)
 
     /* requested a position */
     if (e->data.c.client->positioned) return;
+
+    if (e->data.c.client->transient_for) {
+        if (e->data.c.client->transient_for != OB_TRAN_GROUP) {
+            ObClient *c = e->data.c.client;
+            ObClient *p = e->data.c.client->transient_for;
+            int x = (c->frame->area.width - p->frame->area.width) / 2 +
+                p->frame->area.x;
+            int y = (c->frame->area.height - p->frame->area.height) / 2 +
+                p->frame->area.y;
+            client_configure(c, OB_CORNER_TOPLEFT, x, y,
+                             c->area.width, c->area.height,
+                             TRUE, TRUE);
+            return;
+        } else {
+            GSList *it;
+            ObClient *c = e->data.c.client;
+            gboolean first = TRUE;
+            int l, r, t, b;
+            for (it = c->group->members; it; it = it->next) {
+                ObClient *m = it->data;
+                if (!(m == c || m->transient_for)) {
+                    if (first) {
+                        l = m->frame->area.x;
+                        t = m->frame->area.y;
+                        r = m->frame->area.x + m->frame->area.width - 1;
+                        b = m->frame->area.y + m->frame->area.height - 1;
+                        first = FALSE;
+                    } else {
+                        l = MIN(l, m->frame->area.x);
+                        t = MIN(t, m->frame->area.y);
+                        r = MAX(r, m->frame->area.x +m->frame->area.width - 1);
+                        b = MAX(b, m->frame->area.y +m->frame->area.height -1);
+                    }
+                }
+            }
+            if (!first) {
+                int x = ((r + 1 - l) - c->frame->area.width) / 2 + l; 
+                int y = ((b + 1 - t) - c->frame->area.height) / 2 + t;
+                client_configure(c, OB_CORNER_TOPLEFT, x, y,
+                                 c->area.width, c->area.height,
+                                 TRUE, TRUE);
+                return;
+            }
+        }
+    }
 
     if (!history || !place_history(e->data.c.client))
         place_random(e->data.c.client);

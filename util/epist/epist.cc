@@ -30,10 +30,6 @@ extern "C" {
 #  include <unistd.h>
 #endif // HAVE_UNISTD_H
 
-#ifdef    HAVE_STDIO_H
-#  include <stdio.h>
-#endif // HAVE_STDIO_H
-
 #ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
@@ -42,9 +38,9 @@ extern "C" {
 #  include <signal.h>
 #endif // HAVE_SIGNAL_H
 
-#ifdef    HAVE_LIBGEN_H
+/*#ifdef    HAVE_LIBGEN_H
 #  include <libgen.h>
-#endif // HAVE_LIBGEN_H
+#endif // HAVE_LIBGEN_H*/
 }
 
 #include <iostream>
@@ -56,129 +52,93 @@ using std::string;
 
 #include "epist.hh"
 #include "process.hh"
+#include "screen.hh"
+#include "window.hh"
 #include "../../src/XAtom.hh"
 
-bool _shutdown = false;
-char **_argv;
-char *_display_name = 0;
-Display *_display = 0;
-Window _root = None;
-XAtom *_xatom;
+
+epist::epist(char **argv, char *dpy_name, char *rc_file)
+  : BaseDisplay(argv[0], dpy_name) {
+
+  _argv = argv;
+
+  if (rc_file)
+    _rc_file = rc_file;
+  else
+    _rc_file = expandTilde("~/.openbox/epistrc");
+
+  _xatom = new XAtom(getXDisplay());
+
+  screen *s = new screen(this, DefaultScreen(getXDisplay()));
+  if (s->managed())
+    _screens.push_back(s);
+  if (_screens.empty()) {
+    cout << "No compatible window manager found on any screens. Aborting.\n";
+    ::exit(1);
+  }
+}
 
 
-#ifdef   HAVE_SIGACTION
-static void signalhandler(int sig)
-#else //  HAVE_SIGACTION
-static RETSIGTYPE signalhandler(int sig)
-#endif // HAVE_SIGACTION
-{
+epist::~epist() {
+  delete _xatom;
+}
+
+
+bool epist::handleSignal(int sig) {
   switch (sig) {
-  case SIGSEGV:
-    cout << "epist: Segmentation fault. Aborting and dumping core.\n";
-    abort();
   case SIGHUP:
     cout << "epist: Restarting on request.\n";
     execvp(_argv[0], _argv);
     execvp(basename(_argv[0]), _argv);
-  }
-  _shutdown = true;
+    return false;  // this should be unreachable
 
-#ifndef   HAVE_SIGACTION
-  // assume broken, braindead sysv signal semantics
-  signal(sig, (RETSIGTYPE (*)(int)) signalhandler);
-#endif // HAVE_SIGACTION
+  case SIGTERM:
+  case SIGINT:
+  case SIGPIPE:
+    shutdown();
+    return true;
+  }
+
+  return false;
 }
 
 
-void parseCommandLine(int argc, char **argv) {
-  _argv = argv;
+void epist::process_event(XEvent *e) {
+  Window root;
 
-  for (int i = 1; i < argc; ++i) {
-    if (string(argv[i]) == "-display") {
-      if (++i >= argc) {
-        cout << "error:: '-display' requires an argument\n";
-        exit(1);
-      }
-      _display_name = argv[i];
-
-      string dtmp = (string)"DISPLAY=" + _display_name;
-      if (putenv(const_cast<char*>(dtmp.c_str()))) {
-        cout << "warning: couldn't set environment variable 'DISPLAY'\n";
-        perror("putenv()");
-      }
-    }
-  }
-}
-
+  if (e->xany.type == KeyPress)
+    root = e->xkey.root;
+  else
+    root = e->xany.window;
   
-bool findSupportingWM() {
-  Window support_win;
-  if (! _xatom->getValue(_root, XAtom::net_supporting_wm_check, XAtom::window,
-                         support_win) || support_win == None)
-    return false;
-
-  string title;
-  _xatom->getValue(support_win, XAtom::net_wm_name, XAtom::utf8, title);
-  cout << "Found compatible window manager: " << title << endl;
-  return true;
-}
-
-
-int main(int argc, char **argv) {
-#ifdef    HAVE_SIGACTION
-  struct sigaction action;
-
-  action.sa_handler = signalhandler;
-  action.sa_mask = sigset_t();
-  action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
-
-  sigaction(SIGPIPE, &action, NULL);
-  sigaction(SIGSEGV, &action, NULL);
-  sigaction(SIGFPE, &action, NULL);
-  sigaction(SIGTERM, &action, NULL);
-  sigaction(SIGINT, &action, NULL);
-  sigaction(SIGHUP, &action, NULL);
-#else // !HAVE_SIGACTION
-  signal(SIGPIPE, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGSEGV, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGFPE, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGTERM, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGINT, (RETSIGTYPE (*)(int)) signalhandler);
-  signal(SIGHUP, (RETSIGTYPE (*)(int)) signalhandler);
-#endif // HAVE_SIGACTION
-
-  parseCommandLine(argc, argv);
-
-  _display = XOpenDisplay(_display_name);
-  if (! _display) {
-    cout << "Connection to X server '" << _display_name << "' failed.\n";
-    return 1;
-  }
-  _root = RootWindow(_display, DefaultScreen(_display));
-  _xatom = new XAtom(_display);
-
-  XSelectInput(_display, _root, PropertyChangeMask);
-
-  // find a window manager supporting NETWM, waiting for it to load if we must
-  while (! (_shutdown || findSupportingWM()));
- 
-  if (! _shutdown) {
-    updateClientList();
-    updateActiveWindow();
-  }
-  
-  while (! _shutdown) {
-    if (XPending(_display)) {
-      XEvent e;
-      XNextEvent(_display, &e);
-      processEvent(e);
-    } else {
-      usleep(300);
+  ScreenList::const_iterator it, end = _screens.end();
+  for (it = _screens.begin(); it != end; ++it) {
+    if ((*it)->rootWindow() == root) {
+      (*it)->processEvent(*e);
+      return;
     }
   }
 
-  XSelectInput(_display, _root, None);
-  delete _xatom;
-  XCloseDisplay(_display);
+  // wasnt a root window, try for client windows
+  XWindow *w = findWindow(e->xany.window);
+  if (w) w->processEvent(*e);
+}
+  
+
+void epist::addWindow(XWindow *window) {
+  _windows.insert(WindowLookupPair(window->window(), window));
+}
+
+
+void epist::removeWindow(XWindow *window) {
+  _windows.erase(window->window());
+}
+
+
+XWindow *epist::findWindow(Window window) const {
+  WindowLookup::const_iterator it = _windows.find(window);
+  if (it != _windows.end())
+    return it->second;
+
   return 0;
 }

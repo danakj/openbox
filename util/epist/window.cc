@@ -24,10 +24,6 @@
 #  include "../../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "window.hh"
-#include "epist.hh"
-#include "../../src/XAtom.hh"
-
 #include <iostream>
 
 using std::cout;
@@ -35,20 +31,30 @@ using std::endl;
 using std::hex;
 using std::dec;
 
-XWindow::XWindow(Window window) : _window(window) {
+#include "window.hh"
+#include "epist.hh"
+#include "../../src/XAtom.hh"
+
+XWindow::XWindow(epist *epist, Window window)
+  : _epist(epist), _xatom(epist->xatom()), _window(window) {
+
   _unmapped = false;
 
-  XSelectInput(_display, _window, PropertyChangeMask | StructureNotifyMask);
+  XSelectInput(_epist->getXDisplay(), _window,
+               PropertyChangeMask | StructureNotifyMask);
   updateState();
   updateDesktop();
   updateTitle();
   updateClass();
+
+  _epist->addWindow(this);
 }
 
 
 XWindow::~XWindow() {
   if (! _unmapped)
-    XSelectInput(_display, _window, None);
+    XSelectInput(_epist->getXDisplay(), _window, None);
+  _epist->removeWindow(this);
 }
 
 
@@ -109,4 +115,28 @@ void XWindow::updateClass() {
 
   if (num > 0) _app_name = v[0];
   if (num > 1) _app_class = v[1];
+}
+
+
+void XWindow::processEvent(const XEvent &e) {
+  assert(e.xany.window == _window);
+
+  switch (e.type) {
+  case PropertyNotify:
+    // a client window
+    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
+      updateState();
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
+      updateDesktop();
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_name) ||
+             e.xproperty.atom == _xatom->getAtom(XAtom::wm_name))
+      updateTitle();
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::wm_class))
+      updateClass();
+    break;
+  case DestroyNotify:
+  case UnmapNotify:
+    _unmapped = true;
+    break;
+  }
 }

@@ -30,12 +30,16 @@ extern "C" {
 #include <list>
 #include <string>
 
+class epist;
 class XWindow;
+class XAtom;
 
 typedef std::list<XWindow *> WindowList;
 
 class XWindow {
 private:
+  epist *_epist;
+  XAtom *_xatom;
   Window _window;
   
   unsigned int _desktop;
@@ -51,8 +55,13 @@ private:
 
   bool _unmapped;
 
+  void updateState();
+  void updateDesktop();
+  void updateTitle();
+  void updateClass();
+
 public:
-  XWindow(Window window);
+  XWindow(epist *epist, Window window);
   virtual ~XWindow();
 
   inline Window window() const { return _window; }
@@ -67,12 +76,7 @@ public:
   inline bool maxVert() const { return _max_vert; }
   inline bool maxHorz() const { return _max_horz; }
 
-  inline void setUnmapped(bool u) { _unmapped = u; }
-
-  void updateState();
-  void updateDesktop();
-  void updateTitle();
-  void updateClass();
+  void processEvent(const XEvent &e);
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

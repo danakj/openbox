@@ -1,5 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; -*-
-// epist.hh for Epistory - a key handler for NETWM/EWMH window managers.
+// screen.hh for Epistory - a key handler for NETWM/EWMH window managers.
 // Copyright (c) 2002 - 2002 Ben Jansens <ben at orodu.net>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,47 +20,49 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __epist_hh
-#define   __epist_hh
+#ifndef   __screen_hh
+#define   __screen_hh
 
 extern "C" {
-#include <X11/Xlib.h>
+#include "X11/Xlib.h"
 }
 
-#include <string>
-#include <map>
+#include <vector>
 
-#include "../../src/BaseDisplay.hh"
+#include "window.hh"
 
-class XAtom;
+class epist;
 class screen;
-class XWindow;
+class XAtom;
 
-class epist : public BaseDisplay {
-private:
-  std::string     _rc_file;
-  XAtom          *_xatom;
-  char          **_argv;
+class screen {
+  epist *_epist;
+  XAtom *_xatom;
+  int _number;
+  Window _root;
 
-  typedef std::vector<screen *> ScreenList;
-  ScreenList      _screens;
+  std::string _wm_name;
+  
+  WindowList _clients;
+  WindowList::iterator _active;
 
-  typedef std::map<Window, XWindow*> WindowLookup;
-  typedef WindowLookup::value_type WindowLookupPair;
-  WindowLookup    _windows;
+  bool _managed;
 
-  virtual void process_event(XEvent *e);
-  virtual bool handleSignal(int sig);
+  XWindow *findWindow(const XEvent &e) const;
+  void updateClientList();
+  void updateActiveWindow();
+  bool doAddWindow(Window window) const;
+  bool findSupportingWM();
 
 public:
-  epist(char **argv, char *display_name, char *rc_file);
-  virtual ~epist();
-
-  inline XAtom *xatom() { return _xatom; }
-
-  void addWindow(XWindow *window);
-  void removeWindow(XWindow *window);
-  XWindow *findWindow(Window window) const;
+  screen(epist *epist, int number);
+  virtual ~screen();
+  
+  inline Window rootWindow() const { return _root; }
+  inline bool managed() const { return _managed; }
+  
+  void processEvent(const XEvent &e);
 };
 
-#endif // __epist_hh
+#endif // __screen_hh
+

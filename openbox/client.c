@@ -238,7 +238,7 @@ void client_manage(Window window)
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
     /* focus the new window? */
-    if (ob_state != State_Starting) {
+    if (ob_state != State_Starting && client_normal(self)) {
         if (config_focus_new)
             client_focus(self);
         else if (self->transient_for) {

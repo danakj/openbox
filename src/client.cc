@@ -138,6 +138,8 @@ void OBClient::getType()
 //               property->atom(otk::OBProperty::kde_net_wm_window_type_override))
 //        mwm_decorations = 0; // prevent this window from getting any decor
       // XXX: make this work again
+      if (_type != (WindowType) -1)
+        break; // grab the first known type
     }
     delete val;
   }

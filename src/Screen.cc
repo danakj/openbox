@@ -1315,15 +1315,22 @@ void BScreen::updateStackingList(void) {
 
 
 void BScreen::addSystrayWindow(Window window) {
+  XGrabServer(blackbox->getXDisplay());
+  
+  XSelectInput(blackbox->getXDisplay(), window, SubstructureRedirectMask);
   systrayWindowList.push_back(window);
   xatom->setValue(getRootWindow(), XAtom::kde_net_system_tray_windows,
                   XAtom::window,
                   &systrayWindowList[0], systrayWindowList.size());
   blackbox->saveSystrayWindowSearch(window, this);
+
+  XUngrabServer(blackbox->getXDisplay());
 }
 
 
 void BScreen::removeSystrayWindow(Window window) {
+  XGrabServer(blackbox->getXDisplay());
+  
   WindowList::iterator it = systrayWindowList.begin();
   const WindowList::iterator end = systrayWindowList.end();
   for (; it != end; ++it)
@@ -1333,8 +1340,13 @@ void BScreen::removeSystrayWindow(Window window) {
                       XAtom::window,
                       &systrayWindowList[0], systrayWindowList.size());
       blackbox->removeSystrayWindowSearch(window);
+      XSelectInput(blackbox->getXDisplay(), window, NoEventMask);
       break;
     }
+
+  assert(it != end);    // not a systray window
+
+  XUngrabServer(blackbox->getXDisplay());
 }
 
 
@@ -1361,18 +1373,17 @@ void BScreen::manageWindow(Window w) {
   if (! win)
     return;
 
-
-  if (win->isNormal()) {
-    // don't list non-normal windows as managed windows
+  if (win->isDesktop()) {
+    desktopWindowList.push_back(win->getFrameWindow());
+  } else {
+    // don't list desktop windows as managed windows
     windowList.push_back(win);
     updateClientList();
   
     if (win->isTopmost())
       specialWindowList.push_back(win->getFrameWindow());
-  } else if (win->isDesktop()) {
-    desktopWindowList.push_back(win->getFrameWindow());
   }
-
+  
   XMapRequestEvent mre;
   mre.window = w;
   if (blackbox->isStartup() && win->isNormal()) win->restoreAttributes();
@@ -1406,8 +1417,17 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   } else if (w->isIconic())
     removeIcon(w);
 
-  if (w->isNormal()) {
-    // we don't list non-normal windows as managed windows
+  if (w->isDesktop()) {
+    WindowList::iterator it = desktopWindowList.begin();
+    const WindowList::iterator end = desktopWindowList.end();
+    for (; it != end; ++it)
+      if (*it == w->getFrameWindow()) {
+        desktopWindowList.erase(it);
+        break;
+      }
+    assert(it != end);  // the window wasnt a desktop window?
+  } else {
+    // we don't list desktop windows as managed windows
     windowList.remove(w);
     updateClientList();
 
@@ -1421,15 +1441,6 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
         }
       assert(it != end);  // the window wasnt a special window?
     }
-  } else if (w->isDesktop()) {
-    WindowList::iterator it = desktopWindowList.begin();
-    const WindowList::iterator end = desktopWindowList.end();
-    for (; it != end; ++it)
-      if (*it == w->getFrameWindow()) {
-        desktopWindowList.erase(it);
-        break;
-      }
-    assert(it != end);  // the window wasnt a desktop window?
   }
 
   if (blackbox->getFocusedWindow() == w)

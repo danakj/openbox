@@ -374,13 +374,11 @@ void place_client(ObClient *client, gint *x, gint *y)
         return;
     if (place_transient(client, x, y)             ||
         place_dialog(client, x, y)                ||
-        (!(config_focus_follow && config_focus_new) ?
+        ((config_focus_follow && config_focus_new) ?
+         place_under_mouse(client, x, y) :
          place_smart(client, x, y, SMART_FULL)    ||
          place_smart(client, x, y, SMART_GROUP)   ||
-         place_smart(client, x, y, SMART_FOCUSED) :
-         FALSE)                                   ||
-        (config_focus_follow ?
-         place_under_mouse(client, x, y) :
+         place_smart(client, x, y, SMART_FOCUSED) ||
          place_random(client, x, y)))
     {
         /* get where the client should be */

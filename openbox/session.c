@@ -41,7 +41,6 @@ static void save_commands()
     SmProp *props[2];
     SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
     SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8, };
-    gchar *file_path;
     gint i, j, n;
     gboolean has_id = FALSE, has_file = FALSE;
 
@@ -80,19 +79,15 @@ static void save_commands()
         }
     }
 
-    file_path = g_build_filename(g_get_home_dir(), ".openbox", "sessions",
-                                 save_file, NULL);
-
     prop_res.vals[j].value = "--sm-save-file";
     prop_res.vals[j++].length = strlen("--sm-save-file");
-    prop_res.vals[j].value = file_path;
-    prop_res.vals[j++].length = strlen(file_path);
+    prop_res.vals[j].value = save_file;
+    prop_res.vals[j++].length = strlen(save_file);
 
     props[0] = &prop_res;
     props[1] = &prop_cmd;
     SmcSetProperties(sm_conn, 1, props);
 
-    g_free(file_path);
     g_free(prop_res.vals);
     g_free(prop_cmd.vals);
 }

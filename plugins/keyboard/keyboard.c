@@ -126,6 +126,8 @@ void plugin_startup()
 {
     dispatch_register(Event_X_KeyPress, (EventHandler)press, NULL);
 
+    translate_key("C-g", &reset_state, &reset_key);
+
     keysrc_parse();
 }
 

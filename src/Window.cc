@@ -1579,12 +1579,18 @@ bool BlackboxWindow::setInputFocus(void) {
     return True;
   }
 #endif
-  if (! frame.rect.intersects(screen->getRect())) {
-    // client is outside the screen, move it to the center
-    configure((screen->getWidth() - frame.rect.width()) / 2,
-              (screen->getHeight() - frame.rect.height()) / 2,
-              frame.rect.width(), frame.rect.height());
-  }
+  /*
+     We only do this check for normal windows and dialogs because other windows
+     do this on purpose, such as kde's kicker, and we don't want to go moving
+     it.
+  */
+  if (window_type == Type_Normal || window_type == Type_Dialog)
+    if (! frame.rect.intersects(screen->getRect())) {
+      // client is outside the screen, move it to the center
+      configure((screen->getWidth() - frame.rect.width()) / 2,
+                (screen->getHeight() - frame.rect.height()) / 2,
+                frame.rect.width(), frame.rect.height());
+    }
 
   if (client.transientList.size() > 0) {
     // transfer focus to any modal transients

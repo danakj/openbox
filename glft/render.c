@@ -4,7 +4,7 @@
 #include <glib.h>
 #include <GL/glx.h>
 
-#define TPOINTS 5.0
+#define TPOINTS 15.0
 
 #define TOFLOAT(x) (((x) >> 6) + ((x) & 63)/64.0)
 

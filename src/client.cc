@@ -93,13 +93,21 @@ Client::~Client()
 
 void Client::getGravity()
 {
+  XSizeHints size;
   XWindowAttributes wattrib;
   Status ret;
-  
-  ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
-  assert(ret != BadWindow);
+  long junk;
 
-  _gravity = wattrib.win_gravity;
+  if (XGetWMNormalHints(**otk::display, _window, &size, &junk) &&
+      size.flags & PWinGravity)
+    // first try the normal hints
+    _gravity = size.win_gravity;
+  else {
+    // then fall back to the attribute
+    ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
+    assert(ret != BadWindow);
+    _gravity = wattrib.win_gravity;
+  }
 }
 
 void Client::getDesktop()
@@ -406,7 +414,7 @@ void Client::updateNormalHints()
       
       // if the client has a frame, i.e. has already been mapped and is
       // changing its gravity
-      if (frame && _gravity != oldgravity) {
+      if (_gravity != oldgravity) {
         // move our idea of the client's position based on its new gravity
         int x, y;
         frame->frameGravity(x, y);

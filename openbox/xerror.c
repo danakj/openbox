@@ -14,7 +14,7 @@ int xerror_handler(Display *d, XErrorEvent *e)
 	{
 	    XGetErrorText(d, e->error_code, errtxt, 127);
 	    if (e->error_code == BadWindow)
-		g_warning("X Error: %s", errtxt);
+		/*g_warning("X Error: %s", errtxt)*/;
 	    else
 		g_error("X Error: %s", errtxt);
 	}

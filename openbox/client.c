@@ -2594,11 +2594,12 @@ gboolean client_focus(ObClient *self)
 
 void client_unfocus(ObClient *self)
 {
-    g_assert(focus_client == self);
+    if (focus_client == self) {
 #ifdef DEBUG_FOCUS
-    ob_debug("client_unfocus for %lx\n", self->window);
+        ob_debug("client_unfocus for %lx\n", self->window);
 #endif
-    focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
+        focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
+    }
 }
 
 void client_activate(ObClient *self, gboolean here)

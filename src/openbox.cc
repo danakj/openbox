@@ -319,9 +319,11 @@ void Openbox::showHelp()
 
 void Openbox::eventLoop()
 {
-  while (!_shutdown) {
+  while (true) {
     dispatchEvents(); // from otk::EventDispatcher
     XFlush(otk::Display::display); // flush here before we go wait for timers
+    // don't wait if we're to shutdown
+    if (_shutdown) break;
     _timermanager.fire(!_sync); // wait if not in sync mode
   }
 }

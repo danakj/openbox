@@ -379,9 +379,12 @@ void gradient_solid(Appearance *l, int x, int y, int w, int h)
         }
         break;
     case Flat:
-        if (sp->border)
+        if (sp->border) {
+            if (sp->border_color->gc == None)
+                color_allocate_gc(sp->border_color);
             XDrawRectangle(ob_display, l->pixmap, sp->border_color->gc,
                            left, top, right, bottom);
+        }
         break;
     default:  
         g_assert_not_reached(); /* unhandled ReliefType */

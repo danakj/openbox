@@ -525,10 +525,21 @@ void ob_main_loop_timeout_remove(ObMainLoop *loop,
 
     for (it = loop->timers; it; it = g_slist_next(it)) {
         ObMainLoopTimer *t = it->data;
-        if (t->func == handler) {
+        if (t->func == handler)
             t->del_me = TRUE;
-            break;
-        }
+    }
+}
+
+void ob_main_loop_timeout_remove_data(ObMainLoop *loop,
+                                      GSourceFunc handler,
+                                      gpointer data)
+{
+    GSList *it;
+
+    for (it = loop->timers; it; it = g_slist_next(it)) {
+        ObMainLoopTimer *t = it->data;
+        if (t->func == handler && t->data == data)
+            t->del_me = TRUE;
     }
 }
 

@@ -28,11 +28,12 @@ typedef struct CLNode {
 
 } CLNode;
 
-void free_cl_tree(GList *tree);
 GList *cl_parse(gchar *file);
 GList *cl_parse_fh(FILE *file);
-void cl_print_tree(GList *tree, int depth);
 
-GList *parse_file(FILE *fh);
+void cl_tree_free(GList *tree);
+void cl_tree_print(GList *tree, int depth);
+
+void cl_tree_process(GList *tree);
 
 #endif /* __obcl_h */

@@ -51,6 +51,7 @@ stmt: TOK_ID list ';'
         CLNode *s = g_new(CLNode,1);
         s->type = CL_LIST;
         s->u.lb.list = $2;
+        s->u.lb.block = NULL;
         s->u.lb.id = $1;
         $$ = s;
     }
@@ -68,6 +69,7 @@ stmt: TOK_ID list ';'
         CLNode *s = g_new(CLNode,1);
         s->type = CL_BLOCK;
         s->u.lb.block = $2;
+        s->u.lb.list = NULL;
         s->u.lb.id = $1;
         $$ = s;
     }

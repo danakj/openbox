@@ -1,22 +1,49 @@
 #include "obcl.h"
 
-void free_cl_tree(GList *tree)
+void cl_tree_free(GList *tree)
 {
+    CLNode *tmp;
 
+    if (!tree) return;
+
+    for (; tree; tree = tree->next) {
+        tmp = (CLNode*)tree->data;
+        switch(tmp->type) {
+        case CL_ID:
+        case CL_STR:
+            g_free(tmp->u.str);
+            break;
+        case CL_LIST:
+        case CL_BLOCK:
+        case CL_LISTBLOCK:
+            g_free(tmp->u.lb.id);
+            cl_tree_free(tmp->u.lb.list);
+            cl_tree_free(tmp->u.lb.block);
+            break;
+        default:
+            break;
+        }
+        g_free(tmp);
+    }
+    g_list_free(tree);
 }
 
 GList *cl_parse(gchar *file)
 {
     FILE *fh = fopen(file, "r");
-    if (fh)
-        return cl_parse_fh(fh);
-    else {
-        printf("can't open file %s\n", file);
-        return 0;
+    GList *ret = NULL;
+
+    if (fh) {
+        ret = cl_parse_fh(fh);
+        fclose(fh);
+    } else {
+        perror(file);
     }
+
+    return ret;
 }
 
-void cl_print_tree(GList *tree, int depth)
+void cl_tree_print(GList *tree, int depth)
 {
     CLNode *tmp;
     int tmpd = depth;
@@ -40,17 +67,17 @@ void cl_print_tree(GList *tree, int depth)
             break;
         case CL_LIST:
             printf("--LIST-- %s\n", tmp->u.lb.id);
-            cl_print_tree(tmp->u.lb.list, depth+2);
+            cl_tree_print(tmp->u.lb.list, depth+2);
             break;
         case CL_BLOCK:
             printf("--BLOCK-- %s\n", tmp->u.lb.id);
-            cl_print_tree(tmp->u.lb.block, depth+2);
+            cl_tree_print(tmp->u.lb.block, depth+2);
             break;
         case CL_LISTBLOCK:
             printf("--LISTBLOCK-- %s\n", tmp->u.lb.id);
-            cl_print_tree(tmp->u.lb.list, depth+2);
+            cl_tree_print(tmp->u.lb.list, depth+2);
             printf("\n");
-            cl_print_tree(tmp->u.lb.block, depth+2);
+            cl_tree_print(tmp->u.lb.block, depth+2);
             break;
         }
     }

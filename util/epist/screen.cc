@@ -408,11 +408,10 @@ void screen::execCommand(const std::string &cmd) const {
   if ((pid = fork()) == 0) {
     extern char **environ;
 
-    string c = "exec " + cmd;
     char *const argv[] = {
       "sh",
       "-c",
-      const_cast<char *>(c.c_str()),
+      const_cast<char *>(cmd.c_str()),
       0
     };
     // make the command run on the correct screen

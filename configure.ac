@@ -16,6 +16,8 @@ OB_COMPILER_FLAGS
 AC_C_CONST
 AC_C_INLINE
 
+AC_PROG_MAKE_SET
+
 if test "$CVS" = "yes"; then
     AC_PATH_PROG([FLEX], [flex])
     test "$FLEX" || AC_MSG_ERROR([flex not found])

@@ -3,7 +3,7 @@ include build/Makefile.incl
 dir = plugins/placement
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Placement\"
-LDFLAGS = -module -avoid-version
+LDFLAGS += -module -avoid-version
 
 target = placement.la
 sources = history.c placement.c

@@ -3,7 +3,7 @@ include build/Makefile.incl
 dir = plugins/keyboard
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Keyboard\"
-LDFLAGS = -module -avoid-version
+LDFLAGS += -module -avoid-version
 
 target = keyboard.la
 sources = keyboard.c tree.c translate.c keyparse.c

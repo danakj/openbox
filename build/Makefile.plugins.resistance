@@ -3,7 +3,7 @@ include build/Makefile.incl
 dir = plugins
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Resistance\"
-LDFLAGS = -module -avoid-version
+LDFLAGS += -module -avoid-version
 
 target = resistance.la
 sources = resistance.c

@@ -3,7 +3,7 @@ include build/Makefile.incl
 dir = plugins/mouse
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Mouse\"
-LDFLAGS = -module -avoid-version
+LDFLAGS += -module -avoid-version
 
 target = mouse.la
 sources = mouse.c translate.c mouseparse.c

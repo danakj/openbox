@@ -1,4 +1,7 @@
+# @configure_input@
+
 CC = @CC@
+@SET_MAKE@
 MAKE += --no-print-directory
 
 CFLAGS = @CFLAGS@
@@ -11,6 +14,7 @@ CPPFLAGS = -I. -I$(srcdir) @CPPFLAGS@ \
   -DBINARY=\"$(binary)\"
 DEFS = @DEFS@
 LIBS = @LIBS@
+LDFLAGS = @LDFLAGS@
 
 GLIB_CFLAGS = @GLIB_CFLAGS@
 GLIB_LIBS = @GLIB_LIBS@ -DG_DISABLE_DEPRECATED
@@ -27,9 +31,8 @@ INSTALL = @INSTALL@
 LIBTOOL = @LIBTOOL@
 
 srcdir = @srcdir@
-
-# non-recursive!
 top_builddir = .
+depdir = .deps
 
 prefix ?= @prefix@
 exec_prefix ?= @exec_prefix@
@@ -44,8 +47,6 @@ enginedir = $(libdir)/openbox/engines
 plugindir = $(libdir)/openbox/plugins
 rcdir = $(datadir)/openbox
 themedir = $(datadir)/openbox/themes
-
-depdir = .deps
 
 COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 

@@ -5,7 +5,7 @@ theme = operation
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Engine-Openbox\" \
             -DDEFAULT_THEME=\"$(theme)\" -DTHEMEDIR=\"$(themedir)/openbox\"
-LDFLAGS = -module -avoid-version
+LDFLAGS += -module -avoid-version
 
 target = openbox.la
 sources = obengine.c obtheme.c obrender.c

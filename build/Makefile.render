@@ -17,7 +17,7 @@ depdir := $(depdir)/$(dir)
 all: $(target)
 
 $(target): $(objects)
-	$(LINK) -static -o $@ $^
+	$(LINK) -static -o $@ $^ $(LDFLAGS)
 
 $(dir)/%.o: $(srcdir)/%.c $(depdir)/%.d
 	$(LTCOMPILE) -c -o $@ $<

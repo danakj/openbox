@@ -127,7 +127,7 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
                     pointer_mode, GrabModeSync, None, ob_cursor(cur));
     xerror_set_ignore(FALSE);
     if (xerror_occured)
-        g_warning("failed to grab keycode %d modifiers %d", keycode, state);
+        g_warning("failed to grab button %d modifiers %d", button, state);
 }
 
 void grab_button(guint button, guint state, Window win, guint mask)

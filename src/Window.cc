@@ -153,9 +153,16 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   client.rect.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
   client.old_bw = wattrib.border_width;
 
-  timer = 0;
   windowmenu = 0;
   lastButtonPressTime = 0;
+
+  timer = new BTimer(blackbox, this);
+  timer->setTimeout(blackbox->getAutoRaiseDelay());
+
+  if (! getBlackboxHints()) {
+    getMWMHints();
+    getNetWMHints();
+  }
 
   // get size, aspect, minimum/maximum size and other hints set by the
   // client
@@ -167,14 +174,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     screen->getSlit()->addClient(client.window);
     delete this;
     return;
-  }
-
-  timer = new BTimer(blackbox, this);
-  timer->setTimeout(blackbox->getAutoRaiseDelay());
-
-  if (! getBlackboxHints()) {
-    getMWMHints();
-    getNetWMHints();
   }
 
   frame.window = createToplevelWindow();

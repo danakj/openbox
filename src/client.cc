@@ -75,6 +75,7 @@ OBClient::OBClient(Window window)
   updateWMHints();
   // XXX: updateTransientFor();
   updateTitle();
+  updateIconTitle();
   updateClass();
 
 #ifdef DEBUG
@@ -328,6 +329,8 @@ void OBClient::updateProtocols()
   int num_return = 0;
 
   _focus_notify = false;
+  _decorations &= ~Decor_Close;
+  _functions &= ~Func_Close;
 
   if (XGetWMProtocols(otk::OBDisplay::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
@@ -438,6 +441,25 @@ void OBClient::updateTitle()
 }
 
 
+void OBClient::updateIconTitle()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  _icon_title = "";
+  
+  // try netwm
+  if (! property->get(_window, otk::OBProperty::net_wm_icon_name,
+                      otk::OBProperty::utf8, &_icon_title)) {
+    // try old x stuff
+    property->get(_window, otk::OBProperty::wm_icon_name,
+                  otk::OBProperty::ascii, &_icon_title);
+  }
+
+  if (_title.empty())
+    _icon_title = _("Unnamed Window");
+}
+
+
 void OBClient::updateClass()
 {
   const otk::OBProperty *property = Openbox::instance->property();
@@ -466,10 +488,11 @@ void OBClient::update(const XPropertyEvent &e)
   else if (e.atom == XA_WM_HINTS)
     updateWMHints();
   else if (e.atom == property->atom(otk::OBProperty::net_wm_name) ||
-           e.atom == property->atom(otk::OBProperty::wm_name) ||
-           e.atom == property->atom(otk::OBProperty::net_wm_icon_name) ||
-           e.atom == property->atom(otk::OBProperty::wm_icon_name))
+           e.atom == property->atom(otk::OBProperty::wm_name))
     updateTitle();
+  else if (e.atom == property->atom(otk::OBProperty::net_wm_icon_name) ||
+           e.atom == property->atom(otk::OBProperty::wm_icon_name))
+    updateIconTitle();
   else if (e.atom == property->atom(otk::OBProperty::wm_class))
     updateClass();
   else if (e.atom == property->atom(otk::OBProperty::wm_protocols))

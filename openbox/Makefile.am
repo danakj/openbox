@@ -44,5 +44,8 @@ y.tab.c: parse.yacc
 
 MAINTAINERCLEANFILES= Makefile.in
 
+clean-local:
+	$(RM) y.tab.c y.tab.h lex.yy.c
+
 distclean-local:
 	$(RM) *\~ *.orig *.rej .\#*

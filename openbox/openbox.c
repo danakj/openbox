@@ -99,7 +99,7 @@ gint main(gint argc, gchar **argv)
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
-	g_warning("Couldn't set locale from environment.\n");
+        g_warning("Couldn't set locale from environment.\n");
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
@@ -119,7 +119,7 @@ gint main(gint argc, gchar **argv)
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
-	ob_exit_with_error("Failed to open the display.");
+        ob_exit_with_error("Failed to open the display.");
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         ob_exit_with_error("Failed to set display as close-on-exec.");
 
@@ -144,9 +144,9 @@ gint main(gint argc, gchar **argv)
 
     /* check for locale support */
     if (!XSupportsLocale())
-	g_warning("X server does not support locale.");
+        g_warning("X server does not support locale.");
     if (!XSetLocaleModifiers(""))
-	g_warning("Cannot set locale modifiers for the X server.");
+        g_warning("Cannot set locale modifiers for the X server.");
 
     /* set our error handler */
     XSetErrorHandler(xerror_handler);
@@ -312,7 +312,7 @@ gint main(gint argc, gchar **argv)
             gchar **argvp;
             GError *err = NULL;
 
-            /* run other shit */
+            /* run other window manager */
             if (g_shell_parse_argv(restart_path, &argcp, &argvp, &err)) {
                 execvp(argvp[0], argvp);
                 g_strfreev(argvp);
@@ -356,7 +356,7 @@ static void signal_handler(gint signal, gpointer data)
 static void print_version()
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
-	g_print("Copyright (c) 2003 Ben Jansens, and others\n\n");
+    g_print("Copyright (c) 2003 Ben Jansens, and others\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -378,7 +378,7 @@ static void print_help()
     g_print("  --version           Display the version and exit\n");
     g_print("  --sync              Run in synchronous mode (this is slow and "
             "meant for\n"
-			"                      debugging X routines)\n");
+            "                      debugging X routines)\n");
     g_print("  --debug             Display debugging output\n");
     g_print("\nPlease report bugs at %s\n\n", PACKAGE_BUGREPORT);
 }

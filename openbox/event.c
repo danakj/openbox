@@ -141,10 +141,10 @@ void event_startup(gboolean reconfig)
         const KeyCode num_lock = XKeysymToKeycode(ob_display, XK_Num_Lock);
         const KeyCode scroll_lock = XKeysymToKeycode(ob_display,
                                                      XK_Scroll_Lock);
-	  
+
         for (cnt = 0; cnt < size; ++cnt) {
             if (! modmap->modifiermap[cnt]) continue;
-	       
+
             if (num_lock == modmap->modifiermap[cnt])
                 NumLockMask = mask_table[cnt / modmap->max_keypermod];
             if (scroll_lock == modmap->modifiermap[cnt])
@@ -495,7 +495,7 @@ static void event_process(const XEvent *ec, gpointer data)
         /* unhandled configure requests must be used to configure the
            window directly */
         XWindowChanges xwc;
-	       
+
         xwc.x = e->xconfigurerequest.x;
         xwc.y = e->xconfigurerequest.y;
         xwc.width = e->xconfigurerequest.width;

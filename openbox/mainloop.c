@@ -667,7 +667,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
             g_free(curr);
             continue;
         }
-	
+
         /* the queue is sorted, so if this timer shouldn't fire, none are 
            ready */
         if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)

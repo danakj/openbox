@@ -1,5 +1,7 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
+%include "std_string.i"
+
 %{
 /*
   Calls a python callback for the MouseCallback function type
@@ -100,6 +102,8 @@ static void PythonEventCallback(ob::EventData *data, void *pyfunc)
 }
 
 %inline %{
+#include "bindings.hh"
+  
 bool mbind(const std::string &button, ob::MouseContext::MC context,
            ob::MouseAction::MA action, PyObject *func)
 {

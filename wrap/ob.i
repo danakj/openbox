@@ -3,67 +3,8 @@
 %module ob
 
 %{
-#include "config.h"
-
-#include "frame.hh"
-#include "openbox.hh"
-#include "screen.hh"
-#include "client.hh"
-#include "bindings.hh"
-#include "actions.hh"
-#include "python.hh"
-#include "otk/otk.hh"
-%}
-
-%include "stl.i"
-%include "callback.i"
-
-%immutable ob::openbox;
-/*
-%ignore ob::openbox;
-%inline %{
-  ob::Openbox *Openbox_instance() { return ob::openbox; }
-%};
-*/
-
-%typemap(python,out) std::list<ob::Client*> {
-  unsigned int s = $1.size();
-  PyObject *l = PyList_New(s);
-
-  std::list<ob::Client*>::const_iterator it = $1.begin(), end = $1.end();
-  for (unsigned int i = 0; i < s; ++i, ++it) {
-    PyObject *pdata = SWIG_NewPointerObj((void *) *it,
-                                         SWIGTYPE_p_ob__Client, 0);
-    PyList_SET_ITEM(l, i, pdata);
- }
-  $result = l;
-}
- 
-// do this through events
-%ignore ob::Screen::showDesktop(bool);
-
-%ignore ob::Screen::managed;
-%ignore ob::Screen::config;
-
-%import "otk.i"
-
-%import "actions.hh"
-
-%include "openbox.hh"
-%include "screen.hh"
-%include "client.hh"
-%include "frame.hh"
-%include "python.hh"
-
-// for Window etc
-%import "X11/X.h"
-
-%inline %{
-void set_reset_key(const std::string &key)
-{
-  ob::openbox->bindings()->setResetKey(key);
-}
-
+#include <X11/Xlib.h>
+#include "otk/display.hh"
 void send_client_msg(Window target, Atom type, Window about,
                      long data=0, long data1=0, long data2=0,
                      long data3=0, long data4=0)
@@ -82,6 +23,27 @@ void send_client_msg(Window target, Atom type, Window about,
   XSendEvent(**otk::display, target, false,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
+}
+
+%}
+
+%include "ob_openbox.i"
+%include "ob_screen.i"
+%include "ob_client.i"
+%include "ob_frame.i"
+%include "ob_python.i"
+%include "callback.i"
+
+%import "otk.i"
+// for Window etc
+%import "X11/X.h"
+
+%inline %{
+#include <string>
+
+void set_reset_key(const std::string &key)
+{
+  ob::openbox->bindings()->setResetKey(key);
 }
 
 void execute(const std::string &bin, int screen=0)

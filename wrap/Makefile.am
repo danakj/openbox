@@ -44,6 +44,6 @@ ob.i: $(addprefix ../src/,openbox.hh screen.hh client.hh python.hh frame.hh)
 wrap_otk.cc: otk.i
 	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 
-wrap_ob.cc: ob.i callback.i
+wrap_ob.cc: ob.i callback.i ob_client.i ob_screen.i ob_openbox.i ob_frame.i ob_python.i
 	$(SWIG) $(SWIG_PYTHON_OPT) $(filter -I%,$(CPPFLAGS)) -nodefault -o $@ $<
 

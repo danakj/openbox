@@ -14,10 +14,11 @@ void color_allocate_gc(color_rgb *in)
 
 color_rgb *color_parse(char *colorname)
 {
+    XColor xcol;
+
     g_assert(colorname != NULL);
     // get rgb values from colorname                                  
 
-    XColor xcol;
     xcol.red = 0;
     xcol.green = 0;
     xcol.blue = 0;

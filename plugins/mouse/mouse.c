@@ -279,7 +279,7 @@ static void event(ObEvent *e, void *foo)
                 guint32 corner;
 
                 if (!e->data.x.client)
-                    corner = prop_atoms.net_am_moveresize_size_bottomright;
+                    corner = prop_atoms.net_wm_moveresize_size_bottomright;
                 else
                     corner =
                         pick_corner(e->data.x.e->xmotion.x_root,

@@ -102,37 +102,42 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
 void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const
 {
-  assert(sf._screen == _screen);
+  assert(_screen == sf._screen);
+  assert(_screen == texture.color().screen());
+
+  if (texture.gradient() == RenderTexture::Solid) {
+    drawSolidBackground(sf, texture);
+  } else {
+    int w = sf.width(), h = sf.height();
+
+    const ScreenInfo *info = display->screenInfo(_screen);
+    XImage *im = XCreateImage(**display, info->visual(), info->depth(),
+                              ZPixmap, 0, NULL, w, h, 32, 0);
   
-  int w = sf.width(), h = sf.height();
+    unsigned char *data = new unsigned char[im->bytes_per_line * h];
+    unsigned char *dp = data;
+    unsigned int bytes_per_pixel = im->bits_per_pixel/8;
 
-  const ScreenInfo *info = display->screenInfo(_screen);
-  XImage *im = XCreateImage(**display, info->visual(), info->depth(),
-                            ZPixmap, 0, NULL, w, h, 32, 0);
-  
-  unsigned char *data = new unsigned char[im->bytes_per_line * h];
-  unsigned char *dp = data;
-  unsigned int bytes_per_pixel = im->bits_per_pixel/8;
+    for (int y = 0; y < h/3; ++y)
+      for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+        renderPixel(im, dp, (255*x/w) >> _red_shift << _red_offset);
+    for (int y = 0; y < h/3; ++y)
+      for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+        renderPixel(im, dp, (255*x/w) >> _green_shift << _green_offset);
+    for (int y = 0; y < h/3; ++y)
+      for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
+        renderPixel(im, dp, (255*x/w) >> _blue_shift << _blue_offset);
 
-  for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
-      renderPixel(im, dp, (255*x/w) >> _red_shift << _red_offset);
-  for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
-      renderPixel(im, dp, (255*x/w) >> _green_shift << _green_offset);
-  for (int y = 0; y < h/3; ++y)
-    for (int x = 0; x < w; ++x, dp += bytes_per_pixel)
-      renderPixel(im, dp, (255*x/w) >> _blue_shift << _blue_offset);
-
-  im->data = (char*) data;
+    im->data = (char*) data;
 
 //  sf.setPixmap(im);
-  sf.setPixmap(texture.color());
+    sf.setPixmap(texture.color());
 //  sf.setPixmap(RenderColor(_screen, 0xff, 0xff, 0));
 
-  delete [] im->data;
-  im->data = NULL;
-  XDestroyImage(im);
+    delete [] im->data;
+    im->data = NULL;
+    XDestroyImage(im);
+  }
 }
 
 }

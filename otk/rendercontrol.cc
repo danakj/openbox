@@ -102,4 +102,89 @@ void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,
   return;
 }
 
+void RenderControl::drawSolidBackground(Surface& sf,
+                                        const RenderTexture& texture) const
+{
+  assert(_screen == sf._screen);
+  assert(_screen == texture.color().screen());
+  
+  if (texture.parentRelative()) return;
+  
+  sf.setPixmap(texture.color());
+
+  int width = sf.width(), height = sf.height();
+  int left = 0, top = 0, right = width - 1, bottom = height - 1;
+
+  if (texture.interlaced())
+    for (int i = 0; i < height; i += 2)
+      XDrawLine(**display, sf.pixmap(), texture.interlaceColor().gc(),
+                0, i, width, i);
+
+  switch (texture.relief()) {
+  case RenderTexture::Raised:
+    switch (texture.bevel()) {
+    case RenderTexture::Bevel1:
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left, bottom, right, bottom);
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                right, bottom, right, top);
+
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left, top, right, top);
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left, bottom, left, top);
+      break;
+    case RenderTexture::Bevel2:
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left + 1, bottom - 2, right - 2, bottom - 2);
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                right - 2, bottom - 2, right - 2, top + 1);
+
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left + 1, top + 1, right - 2, top + 1);
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left + 1, bottom - 2, left + 1, top + 1);
+      break;
+    default:
+      assert(false); // unhandled RenderTexture::BevelType
+    }
+    break;
+  case RenderTexture::Sunken:
+    switch (texture.bevel()) {
+    case RenderTexture::Bevel1:
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left, bottom, right, bottom);
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                right, bottom, right, top);
+
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left, top, right, top);
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left, bottom, left, top);
+      break;
+    case RenderTexture::Bevel2:
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                left + 1, bottom - 2, right - 2, bottom - 2);
+      XDrawLine(**display, sf.pixmap(), texture.bevelLightColor().gc(),
+                right - 2, bottom - 2, right - 2, top + 1);
+
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left + 1, top + 1, right - 2, top + 1);
+      XDrawLine(**display, sf.pixmap(), texture.bevelDarkColor().gc(),
+                left + 1, bottom - 2, left + 1, top + 1);
+      break;
+    default:
+      assert(false); // unhandled RenderTexture::BevelType
+    }
+    break;
+  case RenderTexture::Flat:
+    if (texture.border())
+      XDrawRectangle(**display, sf.pixmap(), texture.borderColor().gc(),
+                     left, top, right, bottom);
+    break;
+  default:
+    assert(false); // unhandled RenderTexture::ReliefType
+  }
+}
+
 }

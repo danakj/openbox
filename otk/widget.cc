@@ -467,7 +467,7 @@ void Widget::setEventDispatcher(EventDispatcher *disp)
 void Widget::exposeHandler(const XExposeEvent &e)
 {
   EventHandler::exposeHandler(e);
-  XClearArea(**display, _window, e.x, e.y, e.width, e.height, false);
+//  XClearArea(**display, _window, e.x, e.y, e.width, e.height, false);
 }
 
 void Widget::configureHandler(const XConfigureEvent &e)

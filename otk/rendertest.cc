@@ -14,13 +14,17 @@ int main(int argc, char **argv)
   foo.resize(600, 500);
 
   otk::RenderColor color(0, 0, 0xff, 0xff);
+  otk::RenderColor colord(0, 0, 0, 0);
+  otk::RenderColor colorl(0, 0xff, 0xff, 0xff);
   otk::RenderTexture tex(false,
-			 otk::RenderTexture::Flat,
+			 otk::RenderTexture::Raised,
+			 otk::RenderTexture::Bevel1,
 			 false,
 			 otk::RenderTexture::Solid,
 			 false,
 			 &color,
-			 0,
+			 &colord,
+			 &colorl,
 			 0,
 			 0);
   foo.setTexture(&tex);

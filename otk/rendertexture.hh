@@ -35,6 +35,8 @@ private:
   bool _parent_relative;
   //! The relief type of the texture
   ReliefType _relief;
+  //! The way the bevel should be drawn
+  BevelType _bevel;
   //! If a flat border is drawn on the outside, ignored for all ReliefType
   //! values except ReliefType::Flat
   bool _border;
@@ -47,33 +49,40 @@ private:
   //! This must always be defined
   const RenderColor *_color;
   //! The shadow color for the bevel. This must be defined if
-  //! RenderTexture::relief is not RenderTexture::ReliefType::Flat
+  //! RenderTexture::_relief is not RenderTexture::ReliefType::Flat
   const RenderColor *_bevel_dark_color;
   //! The light color for the bevel. This must be defined if
-  //! RenderTexture::relief is not RenderTexture::ReliefType::Flat
+  //! RenderTexture::_relief is not RenderTexture::ReliefType::Flat
   const RenderColor *_bevel_light_color;
-  //! The color for the flat border if RenderTexture::border is true. This must
-  //! be defined if it is true
+  //! The color for the flat border if RenderTexture::_border is true. This
+  //! must be defined if it is true
   const RenderColor *_border_color;
+  //! The color for the interlace lines if RenderTexture. This must be defined
+  //! if it is true
+  const RenderColor *_interlace_color;
 
 public:
-  RenderTexture(bool parent_relative, ReliefType relief, bool border,
-                GradientType gradient, bool interlaced,
+  RenderTexture(bool parent_relative, ReliefType relief, BevelType bevel,
+                bool border, GradientType gradient, bool interlaced,
                 const RenderColor *color, const RenderColor *bevel_dark_color,
                 const RenderColor *bevel_light_color,
-                const RenderColor *border_color)
+                const RenderColor *border_color,
+                const RenderColor *interlace_color)
     : _parent_relative(parent_relative),
       _relief(relief),
+      _bevel(bevel),
       _border(border),
       _gradient(gradient),
       _interlaced(interlaced),
       _color(color),
       _bevel_dark_color(bevel_dark_color),
       _bevel_light_color(bevel_light_color),
-      _border_color(border_color)
+      _border_color(border_color),
+      _interlace_color(interlace_color)
     {
       assert(_relief == Flat || (_bevel_dark_color && _bevel_light_color));
       assert(!_border || _border_color);
+      assert(!_interlaced || _interlace_color);
       assert(_color);
     }
 
@@ -81,6 +90,8 @@ public:
   inline bool parentRelative() const { return _parent_relative; }
   //! The relief type of the texture
   inline ReliefType relief() const { return _relief; }
+  //! The way the bevel should be drawn
+  inline BevelType bevel() const { return _bevel; }
   //! If a flat border is drawn on the outside, ignored for all ReliefType
   //! values except ReliefType::Flat
   inline bool border() const { return _border; }
@@ -93,16 +104,20 @@ public:
   //! This must always be defined
   inline const RenderColor& color() const { return *_color; }
   //! The shadow color for the bevel. This must be defined if
-  //! RenderTexture::relief is not RenderTexture::ReliefType::Flat
+  //! RenderTexture::_relief is not RenderTexture::ReliefType::Flat
   inline const RenderColor& bevelDarkColor() const
     { return *_bevel_dark_color; }
   //! The light color for the bevel. This must be defined if
-  //! RenderTexture::relief is not RenderTexture::ReliefType::Flat
+  //! RenderTexture::)relief is not RenderTexture::ReliefType::Flat
   inline const RenderColor& bevelLightColor() const
     { return *_bevel_light_color; }
-  //! The color for the flat border if RenderTexture::border is true. This must
-  //! be defined if it is true
+  //! The color for the flat border if RenderTexture::_border is true. This
+  //! must be defined if it is true
   inline const RenderColor& borderColor() const { return *_border_color; }
+  //! The color for the interlace lines if RenderTexture. This must be defined
+  //! if it is true
+  inline const RenderColor& interlaceColor() const
+    { return *_interlace_color; }
 };
 
 }

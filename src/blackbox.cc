@@ -1169,6 +1169,17 @@ void Blackbox::save_rc(void) {
   config.setValue("session.cacheMax", resource.cache_max);
   config.setValue("session.styleFile", resource.style_file);
   config.setValue("session.titlebarLayout", resource.titlebar_layout);
+
+  string s;
+  if (resource.mod_mask & Mod1Mask) s += "Mod1-";
+  if (resource.mod_mask & Mod2Mask) s += "Mod2-";
+  if (resource.mod_mask & Mod3Mask) s += "Mod3-";
+  if (resource.mod_mask & Mod4Mask) s += "Mod4-";
+  if (resource.mod_mask & Mod5Mask) s += "Mod5-";
+  if (resource.mod_mask & ShiftMask) s += "Shift-";
+  if (resource.mod_mask & ControlMask) s += "Control-";
+  s.resize(s.size() - 1); // drop the last '-'
+  config.setValue("session.modifierMask", s);
   
 #ifdef    XINERAMA
   saveXineramaPlacement(resource.xinerama_placement);
@@ -1236,6 +1247,26 @@ void Blackbox::load_rc(void) {
                         resource.xinerama_snap))
     resource.xinerama_snap = false;
 #endif // XINERAMA
+  
+  resource.mod_mask = 0;
+  if (config.getValue("session.modifierMask", s)) {
+    if (s.find("Mod1") != string::npos)
+      resource.mod_mask |= Mod1Mask;
+    if (s.find("Mod2") != string::npos)
+      resource.mod_mask |= Mod2Mask;
+    if (s.find("Mod3") != string::npos)
+      resource.mod_mask |= Mod3Mask;
+    if (s.find("Mod4") != string::npos)
+      resource.mod_mask |= Mod4Mask;
+    if (s.find("Mod5") != string::npos)
+      resource.mod_mask |= Mod5Mask;
+    if (s.find("Shift") != string::npos)
+      resource.mod_mask |= ShiftMask;
+    if (s.find("Control") != string::npos)
+      resource.mod_mask |= ControlMask;
+  }
+  if (! resource.mod_mask)
+    resource.mod_mask = Mod1Mask;
 }
 
 

@@ -115,6 +115,8 @@ private:
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
     std::string titlebar_layout;
+    unsigned int mod_mask;  // modifier mask used for window-mouse interaction
+
 
 #ifdef    XINERAMA
     bool xinerama_placement, xinerama_maximize, xinerama_snap;
@@ -254,6 +256,9 @@ public:
     { return cursor.ul_angle; }
   inline Cursor getUpperRightAngleCursor(void) const
     { return cursor.ur_angle; }
+  
+  inline unsigned int getMouseModMask(void) const
+    { return resource.mod_mask; }
 
   void setFocusedWindow(BlackboxWindow *win);
   void setChangingWindow(BlackboxWindow *win);

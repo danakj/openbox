@@ -134,6 +134,7 @@ private:
 
   unsigned int window_number;
   unsigned long current_state;
+  unsigned int mod_mask;    // the mod mask used to grab buttons
 
   enum FocusMode { F_NoInput = 0, F_Passive,
                    F_LocallyActive, F_GloballyActive };

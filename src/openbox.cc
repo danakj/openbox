@@ -320,9 +320,9 @@ void Openbox::showHelp()
 void Openbox::eventLoop()
 {
   while (!_shutdown) {
-    _timermanager.fire(!_sync); // wait if not in sync mode
     dispatchEvents(); // from otk::EventDispatcher
     XFlush(otk::Display::display); // flush here before we go wait for timers
+    _timermanager.fire(!_sync); // wait if not in sync mode
   }
 }
 

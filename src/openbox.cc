@@ -54,13 +54,13 @@ void Openbox::signalHandler(int signal)
   case SIGINT:
   case SIGTERM:
   case SIGPIPE:
-    printf("Caught signal %d. Exiting.", signal);
+    printf("Caught signal %d. Exiting.\n", signal);
     instance->shutdown();
 
     break;
   case SIGFPE:
   case SIGSEGV:
-    printf("Caught signal %d. Aborting and dumping core.", signal);
+    printf("Caught signal %d. Aborting and dumping core.\n", signal);
     abort();
   }
 }
@@ -107,10 +107,8 @@ Openbox::~Openbox()
   _state = State_Exiting; // time to kill everything
 
   // unmanage all windows
-  ClientMap::iterator it, end;
-  for (it = _clients.begin(), end = _clients.end(); it != end; ++it) {
-    _xeventhandler.unmanageWindow(it->second);
-  }
+  while (!_clients.empty())
+    _xeventhandler.unmanageWindow(_clients.begin()->second);
   
   // close the X display
   otk::OBDisplay::destroy();
@@ -224,13 +222,24 @@ void Openbox::addClient(Window window, OBClient *client)
 
 void Openbox::removeClient(Window window)
 {
-  _clients[window] = (OBClient *) 0;
+  ClientMap::iterator it = _clients.find(window);
+  if (it != _clients.end())
+    _clients.erase(it);
 }
 
 
 OBClient *Openbox::findClient(Window window)
 {
-  return _clients[window];
+  /*
+    NOTE: we dont use _clients[] to find the value because that will insert
+    a new null into the hash, which really sucks when we want to clean up the
+    hash at shutdown!
+  */
+  ClientMap::iterator it = _clients.find(window);
+  if (it != _clients.end())
+    return it->second;
+  else
+    return (OBClient*) 0;
 }
 
 }

@@ -267,6 +267,8 @@ void OBFrame::update()
   // map/unmap all the windows
   if (_decorations & OBClient::Decor_Titlebar) {
     XMapWindow(otk::OBDisplay::display, _titlebar);
+    XSetWindowBorder(otk::OBDisplay::display, _titlebar,
+                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _label);
     if (_decorations & OBClient::Decor_Iconify)
       XMapWindow(otk::OBDisplay::display, _button_iconify);
@@ -295,8 +297,14 @@ void OBFrame::update()
 
   if (_decorations & OBClient::Decor_Handle) {
     XMapWindow(otk::OBDisplay::display, _handle);
+    XSetWindowBorder(otk::OBDisplay::display, _handle,
+                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _grip_left);
+    XSetWindowBorder(otk::OBDisplay::display, _grip_left,
+                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _grip_right);
+    XSetWindowBorder(otk::OBDisplay::display, _grip_right,
+                     _style->getBorderWidth());
   } else {
     XUnmapWindow(otk::OBDisplay::display, _handle);
     XUnmapWindow(otk::OBDisplay::display, _grip_left);

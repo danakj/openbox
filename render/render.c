@@ -143,6 +143,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
     RrAppearance *copy = g_new(RrAppearance, 1);
+    gint i;
 
     copy->inst = orig->inst;
 
@@ -195,6 +196,11 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     copy->textures = orig->textures;
     copy->texture = g_memdup(orig->texture,
                              orig->textures * sizeof(RrTexture));
+    for (i = 0; i < copy->textures; ++i)
+        if (copy->texture[i].type == RR_TEXTURE_RGBA) {
+            g_free(copy->texture[i].data.rgba.cache);
+            copy->texture[i].data.rgba.cache = NULL;
+        }
     copy->pixmap = None;
     copy->xftdraw = NULL;
     copy->w = copy->h = 0;
@@ -203,10 +209,17 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 
 void RrAppearanceFree(RrAppearance *a)
 {
+    gint i;
+
     if (a) {
         RrSurface *p;
         if (a->pixmap != None) XFreePixmap(RrDisplay(a->inst), a->pixmap);
         if (a->xftdraw != NULL) XftDrawDestroy(a->xftdraw);
+        for (i = 0; i < a->textures; ++i)
+            if (a->texture[i].type == RR_TEXTURE_RGBA) {
+                g_free(a->texture[i].data.rgba.cache);
+                a->texture[i].data.rgba.cache = NULL;
+            }
         if (a->textures)
             g_free(a->texture);
         p = &a->surface;

@@ -43,9 +43,9 @@
 
 /*! The event mask to grab on the root window */
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
-			EnterWindowMask | LeaveWindowMask | \
-			SubstructureNotifyMask | SubstructureRedirectMask | \
-			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
+                        EnterWindowMask | LeaveWindowMask | \
+                        SubstructureNotifyMask | SubstructureRedirectMask | \
+                        ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 guint    screen_num_desktops;
 guint    screen_num_monitors;

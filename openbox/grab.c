@@ -13,47 +13,54 @@
 /*! A list of all possible combinations of keyboard lock masks */
 static unsigned int mask_list[MASK_LIST_SIZE];
 
-int grab_keyboard(gboolean grab)
+gboolean grab_keyboard(gboolean grab)
 {
     static guint kgrabs = 0;
+    gboolean ret = FALSE;
+
     if (grab) {
         if (kgrabs++ == 0)
-            XGrabKeyboard(ob_display, ob_root, FALSE, GrabModeAsync,
-                          GrabModeAsync, event_lasttime);
+            ret = XGrabKeyboard(ob_display, ob_root, FALSE, GrabModeAsync,
+                                GrabModeAsync, event_lasttime) == Success;
     } else if (kgrabs > 0) {
         if (--kgrabs == 0)
             XUngrabKeyboard(ob_display, event_lasttime);
     }
-    return kgrabs;
+    return ret;
 }
 
-int grab_pointer(gboolean grab, Cursor cur)
+gboolean grab_pointer(gboolean grab, Cursor cur)
 {
     static guint pgrabs = 0;
+    gboolean ret = FALSE;
+
     if (grab) {
         if (pgrabs++ == 0)
-            XGrabPointer(ob_display, ob_root, False, GRAB_PTR_MASK,
-                         GrabModeAsync, GrabModeAsync, FALSE, cur,
-                         event_lasttime);
+            ret = XGrabPointer(ob_display, ob_root, False, GRAB_PTR_MASK,
+                               GrabModeAsync, GrabModeAsync, FALSE, cur,
+                               event_lasttime) == Success;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, event_lasttime);
     }
-    return pgrabs;
+    return ret;
 }
 
-int grab_pointer_window(gboolean grab, Cursor cur, Window win)
+gboolean grab_pointer_window(gboolean grab, Cursor cur, Window win)
 {
     static guint pgrabs = 0;
+    gboolean ret = FALSE;
+
     if (grab) {
         if (pgrabs++ == 0)
-            XGrabPointer(ob_display, win, False, GRAB_PTR_MASK, GrabModeAsync,
-                         GrabModeAsync, TRUE, cur, event_lasttime);
+            ret = XGrabPointer(ob_display, win, False, GRAB_PTR_MASK,
+                               GrabModeAsync, GrabModeAsync, TRUE, cur,
+                               event_lasttime) == Success;
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
             XUngrabPointer(ob_display, event_lasttime);
     }
-    return pgrabs;
+    return ret;
 }
 
 int grab_server(gboolean grab)

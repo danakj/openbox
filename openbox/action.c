@@ -155,6 +155,10 @@ Action *action_from_string(char *name)
     } else if (!g_ascii_strcasecmp(name, "exit")) {
         a = action_new(action_exit);
     }
+    else if (!g_ascii_strcasecmp(name, "showmenu")) {
+        a = action_new(action_showmenu);
+    }
+    
     return a;
 }
 
@@ -623,10 +627,13 @@ void action_resize(union ActionData *data)
  
     if (!c || !client_normal(c)) return;
 
+    /* XXX window snapping/struts */
+    
     dispatch_resize(c, &w, &h, data->resize.corner);
     
     w -= c->frame->size.left + c->frame->size.right;
     h -= c->frame->size.top + c->frame->size.bottom;
+    
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);
 }
@@ -640,4 +647,9 @@ void action_restart(union ActionData *data)
 void action_exit(union ActionData *data)
 {
     ob_shutdown = TRUE;
+}
+
+void action_showmenu(union ActionData *data)
+{
+    g_message(__FUNCTION__);
 }

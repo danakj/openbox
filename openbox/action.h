@@ -62,6 +62,11 @@ struct Resize {
     Corner corner;
 };
 
+struct ShowMenu {
+    Client *c;
+    char * menuName;
+};
+
 union ActionData {
     struct AnyAction any;
     struct Execute execute;
@@ -73,6 +78,7 @@ union ActionData {
     struct NextPreviousDesktop nextprevdesktop;
     struct Move move;
     struct Resize resize;
+    struct ShowMenu showMenu;
 };
 
 typedef struct {
@@ -185,5 +191,6 @@ void action_resize(union ActionData *data);
 void action_restart(union ActionData *data);
 /* Any */
 void action_exit(union ActionData *data);
-
+/* ShowMenu */
+void action_showmenu(union ActionData *data);
 #endif

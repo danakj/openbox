@@ -56,16 +56,13 @@ static void event(ObEvent *e, void *foo)
 {
     g_assert(e->type == Event_Client_New);
 
-    /* requested a position */
-    if (e->data.c.client->positioned) return;
-
     if (e->data.c.client->transient_for) {
         if (e->data.c.client->transient_for != OB_TRAN_GROUP) {
             ObClient *c = e->data.c.client;
             ObClient *p = e->data.c.client->transient_for;
-            int x = (c->frame->area.width - p->frame->area.width) / 2 +
+            int x = (p->frame->area.width - c->frame->area.width) / 2 +
                 p->frame->area.x;
-            int y = (c->frame->area.height - p->frame->area.height) / 2 +
+            int y = (p->frame->area.height - c->frame->area.height) / 2 +
                 p->frame->area.y;
             client_configure(c, OB_CORNER_TOPLEFT, x, y,
                              c->area.width, c->area.height,
@@ -103,6 +100,9 @@ static void event(ObEvent *e, void *foo)
             }
         }
     }
+
+    /* requested a position */
+    if (e->data.c.client->positioned) return;
 
     if (!history || !place_history(e->data.c.client))
         place_random(e->data.c.client);

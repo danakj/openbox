@@ -50,7 +50,7 @@ void GlftRenderGlyph(FT_Face face, struct GlftGlyph *g)
 }
 
 void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
-                      int x, int y)
+                      struct GlftColor *color, int x, int y)
 {
     const char *c;
     struct GlftGlyph *g, *p = NULL;

@@ -18,10 +18,18 @@ void GlftFontClose(struct GlftFont *font);
 
 /* rendering */
 
+struct GlftColor {
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
 /*! Renders a string in UTF-8 encoding */
 void GlftRenderString(struct GlftFont *font,
                       const char *str,
                       int bytes,
+                      struct GlftColor *color,
                       int x,
                       int y);
 

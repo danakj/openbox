@@ -211,7 +211,7 @@ void keyboard_interactive_end_client(gpointer data)
         next = g_slist_next(it);
 
         if (s->client == c)
-            keyboard_interactive_end(s, 0, FALSE);
+            s->client = NULL;
     }
 }
 

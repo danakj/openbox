@@ -16,9 +16,9 @@ bin_PROGRAMS= openbox3
 openbox3_LDADD=-L../otk -lotk @LIBINTL@
 openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
-                  main.cc python.cc bindings.cc
+                  main.cc python.cc bindings.cc config.cc
 noinst_HEADERS= actions.hh bindings.hh client.hh frame.hh openbox.hh \
-                python.hh screen.hh
+                python.hh screen.hh config.hh
 
 MAINTAINERCLEANFILES= Makefile.in
 

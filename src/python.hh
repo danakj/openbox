@@ -233,10 +233,6 @@ void python_init(char *argv0);
 void python_destroy();
 bool python_exec(const std::string &path);
 
-bool python_get_long(const char *name, long *value);
-bool python_get_string(const char *name, otk::ustring *value);
-bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value);
-
 #endif // SWIG
 
 }

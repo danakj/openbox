@@ -99,7 +99,7 @@ Frame::Frame(Client *client)
 
   applyStyle(*otk::RenderStyle::style(_client->screen()));
 
-  _layout = "NDITMC";
+  _layout = openbox->screen(_client->screen())->config().titlebar_layout;
 
   // register all of the windows with the event dispatcher
   Window *w = allWindows();

@@ -14,8 +14,6 @@ extern "C" {
 
 namespace ob {
 
-static PyObject *obdict = NULL;
-
 void python_init(char *argv0)
 {
   // start the python engine
@@ -27,15 +25,6 @@ void python_init(char *argv0)
   PyRun_SimpleString(const_cast<char*>(("sys.path.insert(0, '" +
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
-  //PyRun_SimpleString("import ob; import otk; import config;");
-  PyRun_SimpleString("import config;");
-  // set up convenience global variables
-  //PyRun_SimpleString("ob.openbox = ob.Openbox_instance()");
-  //PyRun_SimpleString("otk.display = otk.Display_instance()");
-
-  // set up access to the python global variables
-  PyObject *obmodule = PyImport_AddModule("config");
-  obdict = PyModule_GetDict(obmodule);
 }
 
 void python_destroy()
@@ -52,39 +41,6 @@ bool python_exec(const std::string &path)
   }
   PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));
   fclose(rcpyfd);
-  return true;
-}
-
-bool python_get_long(const char *name, long *value)
-{
-  PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
-  if (!(val && PyInt_Check(val))) return false;
-  
-  *value = PyInt_AsLong(val);
-  return true;
-}
-
-bool python_get_string(const char *name, otk::ustring *value)
-{
-  PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
-  if (!(val && PyString_Check(val))) return false;
-  
-  *value = PyString_AsString(val);
-  return true;
-}
-
-bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
-{
-  PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
-  if (!(val && PyList_Check(val))) return false;
-
-  value->clear();
-  
-  for (int i = 0, end = PyList_Size(val); i < end; ++i) {
-    PyObject *str = PyList_GetItem(val, i);
-    if (PyString_Check(str))
-      value->push_back(PyString_AsString(str));
-  }
   return true;
 }
 

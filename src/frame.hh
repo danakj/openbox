@@ -95,7 +95,7 @@ private:
   otk::Surface  *_icon_sur;
   otk::Surface  *_close_sur;
 
-  std::string _layout; // layout of the titlebar
+  otk::ustring _layout; // layout of the titlebar
 
   bool _max_press;
   bool _desk_press;

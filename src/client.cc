@@ -446,7 +446,7 @@ void Client::calcLayer() {
     }
     c = c->_transient_for;
   }
-  if (!fs) {
+  if (!fs && _fullscreen) {
     // is one of our transients focused?
     c = searchFocusTree(this, this);
     if (c) fs = true;
@@ -738,8 +738,6 @@ void Client::updateIcons()
       i += w * h;
       assert(i <= num);
     }
-    printf("i: %lu\n", i);
-    printf("bleffffffff\n");
     
     delete [] data;
   }

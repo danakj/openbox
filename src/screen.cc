@@ -66,21 +66,8 @@ Screen::Screen(int screen)
   XDefineCursor(**otk::display, _info->rootWindow(),
                 openbox->cursors().session);
 
-  // XXX: initialize the screen's style
-  /*
-  otk::ustring stylepath;
-  python_get_string("THEME", &stylepath);
-  otk::Configuration sconfig(false);
-  sconfig.setFile(otk::expandTilde(stylepath.c_str()));
-  if (!sconfig.load()) {
-    sconfig.setFile(otk::expandTilde(DEFAULTSTYLE));
-    if (!sconfig.load()) {
-      printf(_("Unable to load default style: %s. Aborting.\n"), DEFAULTSTYLE);
-      ::exit(1);
-    }
-  }
-  _style.load(sconfig);
-  */
+  // initialize the screen's style
+  otk::RenderStyle::setStyle(_number, _config.theme);
   otk::display->renderControl(_number)->
     drawRoot(*otk::RenderStyle::style(_number)->rootColor());
 
@@ -95,19 +82,15 @@ Screen::Screen(int screen)
                      otk::Property::atoms.cardinal, geometry, 2);
 
   // Set the net_desktop_names property
-  std::vector<otk::ustring> names;
-  python_get_stringlist("DESKTOP_NAMES", &names);
   otk::Property::set(_info->rootWindow(),
                      otk::Property::atoms.net_desktop_names,
-                     otk::Property::utf8, names);
+                     otk::Property::utf8, _config.desktop_names);
   // the above set() will cause the updateDesktopNames to fire right away so
   // we have a list of desktop names
 
   _desktop = 0;
-  
-  if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&_num_desktops))
-    _num_desktops = 1;
-  changeNumDesktops(_num_desktops); // set the hint
+
+  changeNumDesktops(_config.num_desktops); // set the hint
 
   changeDesktop(0); // set the hint
 

@@ -48,6 +48,9 @@
 // do this through events
 %ignore ob::Screen::showDesktop(bool);
 
+%ignore ob::Screen::managed;
+%ignore ob::Screen::config;
+
 %import "otk.i"
 
 %import "actions.hh"

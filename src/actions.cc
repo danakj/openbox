@@ -165,12 +165,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   data.action = MouseAction::Click;
   openbox->bindings()->fireButton(&data);
     
-
-  // XXX: dont load this every time!!@*
-  long dblclick;
-  if (!python_get_long("DOUBLE_CLICK_DELAY", &dblclick))
-    dblclick = 300;
-
+  long dblclick = openbox->screen(screen)->config().double_click_delay;
   if (e.time - _release.time < (unsigned)dblclick &&
       _release.win == e.window && _release.button == e.button) {
 
@@ -318,13 +313,17 @@ void Actions::motionHandler(const XMotionEvent &e)
     y_root = e.y_root;
   }
 
+  int screen;
+  Client *c = openbox->findClient(e.window);
+  if (c)
+    screen = c->screen();
+  else
+    screen = otk::display->findScreen(e.root)->screen();
+
   if (!_dragging) {
-    long threshold;
     int dx = x_root - _posqueue[0]->pos.x();
     int dy = y_root - _posqueue[0]->pos.y();
-    // XXX: dont get this from python every time!
-    if (!python_get_long("DRAG_THRESHOLD", &threshold))
-      threshold = 0;
+    long threshold = openbox->screen(screen)->config().drag_threshold;
     if (!(std::abs(dx) >= threshold || std::abs(dy) >= threshold))
       return; // not at the threshold yet
   }
@@ -337,12 +336,6 @@ void Actions::motionHandler(const XMotionEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;
-  int screen;
-  Client *c = openbox->findClient(e.window);
-  if (c)
-    screen = c->screen();
-  else
-    screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, button, context,
                  MouseAction::Motion, x_root, y_root,
                  _posqueue[0]->pos, _posqueue[0]->clientarea);

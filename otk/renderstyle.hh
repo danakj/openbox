@@ -5,8 +5,8 @@
 #include "rendertexture.hh"
 #include "rendercolor.hh"
 #include "font.hh"
+#include "ustring.hh"
 
-#include <string>
 #include <list>
 
 namespace otk {
@@ -34,6 +34,7 @@ public:
   static void registerNotify(int screen, StyleNotify *n);
   static void unregisterNotify(int screen, StyleNotify *n);
   static RenderStyle *style(int screen);
+  static bool setStyle(int screen, const ustring &stylefile);
   
   enum Justify {
     LeftTopJustify,
@@ -42,8 +43,11 @@ public:
   };
 
 private:
+  static bool loadStyle(RenderStyle *s, int screen, const ustring &stylefile);
+  static void defaultStyle(RenderStyle *s, int screen);
+  
   int _screen;
-  std::string _file;
+  ustring _file;
 
   RenderColor *_root_color;
   
@@ -89,7 +93,6 @@ private:
   int _bevel_width;
 
 public:
-  RenderStyle(int screen, const std::string &stylefile);
   virtual ~RenderStyle();
 
   inline int screen() const { return _screen; }

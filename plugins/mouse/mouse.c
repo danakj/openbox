@@ -6,6 +6,7 @@
 #include "../../kernel/frame.h"
 #include "../../kernel/grab.h"
 #include "../../kernel/engine.h"
+#include "../../kernel/config.h"
 #include "translate.h"
 #include "mouse.h"
 #include "mouserc_parse.h"
@@ -13,9 +14,16 @@
 
 void plugin_setup_config()
 {
+    config_def_set(config_def_new("mouse.dragThreshold", Config_Integer,
+                                  "Drag Threshold",
+                                  "The drag threshold in pixels before a Drag "
+                                  "event starts."));
+    config_def_set(config_def_new("mouse.doubleClickTime", Config_Integer,
+                                  "Double Click Interval",
+                                  "The amount of time (in milliseconds) in "
+                                  "which two clicks must occur to cause a "
+                                  "DoubleClick event."));
 }
-
-static int drag_threshold = 3;
 
 /* GData of GSList*s of PointerBinding*s. */
 static GData *bound_contexts;
@@ -190,9 +198,16 @@ static void event(ObEvent *e, void *foo)
     static guint button = 0, lbutton = 0;
     static gboolean drag = FALSE, drag_used = FALSE;
     static Corner corner = Corner_TopLeft;
+    ConfigValue doubleclicktime;
+    ConfigValue dragthreshold;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
     GQuark context;
+    
+    if (!config_get("mouse.dragThreshold", Config_Integer, &dragthreshold))
+        dragthreshold.integer = 3; /* default */
+    if (!config_get("mouse.doubleClickTime", Config_Integer, &doubleclicktime))
+        doubleclicktime.integer = 200; /* default */
 
     switch (e->type) {
     case Event_Client_Mapped:
@@ -264,7 +279,8 @@ static void event(ObEvent *e, void *foo)
                     click = TRUE;
                     /* double clicks happen if there were 2 in a row! */
                     if (lbutton == button &&
-                        e->data.x.e->xbutton.time - 300 <= ltime) {
+                        e->data.x.e->xbutton.time - doubleclicktime.integer <=
+                        ltime) {
                         dclick = TRUE;
                         lbutton = 0;
                     } else
@@ -294,7 +310,8 @@ static void event(ObEvent *e, void *foo)
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
             if (!drag &&
-                (ABS(dx) >= drag_threshold || ABS(dy) >= drag_threshold))
+                (ABS(dx) >= dragthreshold.integer ||
+                 ABS(dy) >= dragthreshold.integer))
                 drag = TRUE;
             if (drag) {
                 context = engine_get_context(e->data.x.client,

@@ -86,11 +86,6 @@ def lower_win(data):
     screen = Openbox_screen(openbox, OBClient_screen(client))
     OBScreen_restack(screen, 0, client)
 
-def focusraise(data):
-    """Focuses and raises the window on which the event occured"""
-    focus(data)
-    raise_win(data)
-
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())

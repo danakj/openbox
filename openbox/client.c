@@ -186,6 +186,7 @@ void client_manage(Window window)
      
     client_list = g_slist_append(client_list, client);
     stacking_list = g_list_append(stacking_list, client);
+    g_assert(!g_hash_table_lookup(client_map, (gpointer)client->window));
     g_hash_table_insert(client_map, (gpointer)window, client);
 
     /* update the focus lists */
@@ -548,11 +549,13 @@ void client_update_transient_for(Client *self)
     if (c != self->transient_for) {
 	if (self->transient_for)
 	    /* remove from old parent */
-	    g_slist_remove(self->transient_for->transients, self);
+	    self->transient_for->transients =
+                g_slist_remove(self->transient_for->transients, self);
 	self->transient_for = c;
 	if (self->transient_for)
 	    /* add to new parent */
-	    g_slist_append(self->transient_for->transients, self);
+	    self->transient_for->transients =
+                g_slist_append(self->transient_for->transients, self);
     }
 }
 

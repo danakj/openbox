@@ -41,10 +41,22 @@ WindowList::iterator _active = _clients.end();
 void processEvent(const XEvent &e) {
   switch (e.type) {
   case PropertyNotify:
-    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
-      updateActiveWindow();
-    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list))
-      updateClientList();
+    if (e.xany.window == _root) {
+      // root window
+      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
+        updateActiveWindow();
+      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list))
+        updateClientList();
+    } else {
+      // a client window
+      WindowList::iterator it, end = _clients.end();
+      for (it = _clients.begin(); it != end; ++it)
+        if (*it == e.xproperty.window)
+          break;
+      assert(it != end);  // this means a client somehow got removed from the
+                          // list!
+      it->updateState();
+    }
     break;
   }
 }

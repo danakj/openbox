@@ -53,6 +53,8 @@ public:
   inline bool maxVert() const { return _max_vert; }
   inline bool maxHorz() const { return _max_horz; }
 
+  void updateState();
+
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }
 };

@@ -25,13 +25,40 @@
 #endif // HAVE_CONFIG_H
 
 #include "window.hh"
+#include "epist.hh"
+#include "../../src/XAtom.hh"
 
 
 XWindow::XWindow(Window window) : _window(window) {
+  XSelectInput(_display, _window, PropertyChangeMask);
+  updateState();
 }
 
 
 XWindow::~XWindow() {
+  XSelectInput(_display, _window, None);
 }
 
 
+void XWindow::updateState() {
+  // set the defaults
+  _shaded = _iconic = _max_vert = _max_horz = false;
+  
+  unsigned long num = (unsigned) -1;
+  Atom *state;
+  if (! _xatom->getValue(_window, XAtom::net_wm_state, XAtom::atom,
+                         num, &state))
+    return;
+  for (unsigned long i = 0; i < num; ++i) {
+    if (state[i] == _xatom->getAtom(XAtom::net_wm_state_maximized_vert))
+      _max_vert = true;
+    if (state[i] == _xatom->getAtom(XAtom::net_wm_state_maximized_horz))
+      _max_horz = true;
+    if (state[i] == _xatom->getAtom(XAtom::net_wm_state_shaded))
+      _shaded = true;
+    if (state[i] == _xatom->getAtom(XAtom::net_wm_state_hidden))
+      _iconic = true;
+  }
+
+  delete [] state;
+}

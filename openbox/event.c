@@ -241,6 +241,7 @@ void event_process(XEvent *e)
            so back it is. if problems arise again, then try filtering on the
            detail instead of the mode. */
         if (e->xcrossing.mode != NotifyNormal) return;
+        g_print("%s\n", e->type == EnterNotify ? "EnterNotify":"LeaveNotify");
 	break;
     }
 
@@ -319,24 +320,22 @@ static void event_handle_client(Client *client, XEvent *e)
      
     switch (e->type) {
     case FocusIn:
-	client->focused = TRUE;
-	engine_frame_adjust_focus(client->frame);
-
-	/* focus state can affect the stacking layer */
-	client_calc_layer(client);
-
         if (focus_client != client)
             focus_set_client(client);
-	break;
-    case FocusOut:
-	client->focused = FALSE;
-	engine_frame_adjust_focus(client->frame);
 
 	/* focus state can affect the stacking layer */
 	client_calc_layer(client);
 
+	engine_frame_adjust_focus(client->frame);
+	break;
+    case FocusOut:
 	if (focus_client == client)
 	    focus_set_client(NULL);
+
+	/* focus state can affect the stacking layer */
+	client_calc_layer(client);
+
+	engine_frame_adjust_focus(client->frame);
 	break;
     case ConfigureRequest:
 	g_message("ConfigureRequest for window %lx", client->window);

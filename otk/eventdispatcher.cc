@@ -56,8 +56,6 @@ void OtkEventDispatcher::dispatchEvents(void)
     printf("Event %d window %lx\n", e.type, e.xany.window);
 #endif
 
-    printf("num=%u scroll=%u\n", OBDisplay::numLockMask(), OBDisplay::scrollLockMask());
-
     // grab the lasttime and hack up the modifiers
     switch (e.type) {
     case ButtonPress:

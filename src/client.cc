@@ -288,6 +288,23 @@ void Client::setupDecorAndFunctions()
     }
   }
 
+  // finally, user specified disabled decorations are applied to subtract
+  // decorations
+  if (_disabled_decorations & Decor_Titlebar)
+    _decorations &= ~Decor_Titlebar;
+  if (_disabled_decorations & Decor_Handle)
+    _decorations &= ~Decor_Handle;
+  if (_disabled_decorations & Decor_Border)
+    _decorations &= ~Decor_Border;
+  if (_disabled_decorations & Decor_Iconify)
+    _decorations &= ~Decor_Iconify;
+  if (_disabled_decorations & Decor_Maximize)
+    _decorations &= ~Decor_Maximize;
+  if (_disabled_decorations & Decor_AllDesktops)
+    _decorations &= ~Decor_AllDesktops;
+  if (_disabled_decorations & Decor_Close)
+    _decorations &= ~Decor_Close;
+
   changeAllowedActions();
 }
 
@@ -1319,6 +1336,15 @@ void Client::fullscreen(bool fs)
 
   // try focus us when we go into fullscreen mode
   if (fs) focus();
+}
+
+
+void Client::disableDecorations(DecorationFlags flags)
+{
+  _disabled_decorations = flags;
+  setupDecorAndFunctions();
+  if (frame)
+    frame->adjustSize(); // change the decors on the frame
 }
 
 

@@ -520,6 +520,9 @@ void Screen::manageWindow(Window window)
     openbox->bindings()->fireEvent(&data);
   }
 
+  EventData data(_number, client, EventAction::DisplayingWindow, 0);
+  openbox->bindings()->fireEvent(&data);
+
   // if on the current desktop.. (or all desktops)
   if (client->desktop() == _desktop ||
       client->desktop() == (signed)0xffffffff) {
@@ -532,6 +535,9 @@ void Screen::manageWindow(Window window)
 
   // add to the screen's list
   clients.push_back(client);
+  // once the client is in the list, update our strut to include the new
+  // client's
+  updateStrut();
   // this puts into the stacking order, then raises it
   _stacking.push_back(client);
   raiseWindow(client);
@@ -540,7 +546,6 @@ void Screen::manageWindow(Window window)
 
   openbox->bindings()->grabButtons(true, client);
 
-  // call the python NEWWINDOW binding
   EventData data(_number, client, EventAction::NewWindow, 0);
   openbox->bindings()->fireEvent(&data);
 

@@ -326,6 +326,12 @@ private:
   */
   DecorationFlags _decorations;
 
+  //! A bitmask of values in the Client::Decoration enum.
+  /*!
+    Specifies the decorations that should NOT be displayed on the client.
+  */
+  DecorationFlags _disabled_decorations;
+
   //! A bitmask of values in the Client::Function enum
   /*!
     The values in the variable specify the ways in which the user is allowed to
@@ -527,6 +533,10 @@ BB    @param window The window id that the Client class should handle
   //! Returns the decorations that the client window wishes to be displayed on
   //! it
   inline DecorationFlags decorations() const { return _decorations; }
+  //! Returns the decorations that the user has requested to be disabled on the
+  //! client
+  inline DecorationFlags disabledDecorations() const
+    { return _disabled_decorations; }
   //! Returns the functions that the user can perform on the window
   inline FunctionFlags funtions() const { return _functions; }
 
@@ -596,6 +606,16 @@ BB    @param window The window id that the Client class should handle
   */
   void resize(Corner anchor, int w, int h);
 
+  //! Choose a mask of decorations to not display on the client
+  /*!
+    Pass a value of 0 to the function to turn all decorations back on. Note
+    that you cannot add decorations to a window with this, you can only remove
+    decorations that would otherwise have been displayed.
+    @param flags The mask of values from Client::Decoration to specify which
+                 decorations should not be displayed.
+  */
+  void disableDecorations(DecorationFlags flags);
+  
   //! Attempt to focus the client window
   bool focus();
 
@@ -609,7 +629,7 @@ BB    @param window The window id that the Client class should handle
             been unmapped/destroyed, and so is invalid.
   */
   bool validate() const;
-  
+
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);

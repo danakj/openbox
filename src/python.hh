@@ -36,8 +36,10 @@ struct MouseContext {
     AllDesktopsButton,
     Grip,
     Root,
-    MenuItem,
-    NUM_MOUSE_CONTEXT
+    MenuItem
+#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+    , NUM_MOUSE_CONTEXT
+#endif
   };
 };
 
@@ -46,40 +48,80 @@ struct MouseAction {
     Press,
     Click,
     DoubleClick,
-    Motion,
-    NUM_MOUSE_ACTION
+    Motion
+#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+    , NUM_MOUSE_ACTION
+#endif
   };
 };
 
 struct KeyContext {
   enum KC {
     Menu,
-    All,
-    NUM_KEY_CONTEXT
+    All
+#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+    , NUM_KEY_CONTEXT
+#endif
   };
 };
 
 struct KeyAction {
   enum KA {
     Press,
-    Release,
-    NUM_KEY_ACTION
+    Release
+#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+    , NUM_KEY_ACTION
+#endif
   };
 };
 
 struct EventAction {
   enum EA {
-    EnterWindow,
-    LeaveWindow,
+    EnterWindow,        //!< Occurs when the mouse enters a window
+    LeaveWindow,        //!< Occurs when the mouse leaves a window
+    //! Occurs while a window is being managed. The handler should call
+    //! Client::move to the window
     PlaceWindow,
+    //! Occurs while a window is being managed, just before the window is
+    //! displayed
+    /*!
+      Note that the window's state may not be completely stabilized by this
+      point. The NewWindow event should be used when possible.
+    */
+    DisplayingWindow,
+    //! Occurs when a window is finished being managed
     NewWindow,
+    //! Occurs when a window has been closed and is going to be unmanaged
     CloseWindow,
+    //! Occurs when the window manager manages a screen
+    /*!
+      This event occurs on each managed screen during startup.
+    */
     Startup,
+    //! Occurs when the window manager unmanages a screen
+    /*!
+      This event occurs on each managed screen during shutdown.
+    */
     Shutdown,
+    //! Occurs when the input focus target changes
+    /*!
+      The data.client will be None of no client is focused.
+    */
     Focus,
+    //! Occurs when the system is fired through X.
+    /*!
+      The data.client will hold the client associated with the bell if
+      one has been specified, or None.
+    */
     Bell,
-    UrgentWindow,
-    NUM_EVENTS
+    //! Occurs when a client toggles its urgent status.
+    /*!
+      The Client::urgent method can be used to get the status.
+    */
+    UrgentWindow
+#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+    , NUM_EVENTS
+#endif
   };
 };
 

@@ -705,8 +705,13 @@ void Blackbox::process_event(XEvent *e) {
         if (screen && workspace < screen->getWorkspaceCount())
           screen->changeWorkspaceID(workspace);
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::blackbox_change_window_focus) ||
-                 e->xclient.message_type == 
+                 xatom->getAtom(XAtom::blackbox_change_window_focus)) {
+        // TEMP HACK TO KEEP BBKEYS WORKING
+        BlackboxWindow *win = searchWindow(e->xclient.window);
+
+        if (win && win->isVisible() && win->setInputFocus())
+          win->installColormap(True);
+      } else if (e->xclient.message_type == 
                  xatom->getAtom(XAtom::net_active_window)) {
         // NET_ACTIVE_WINDOW
         BlackboxWindow *win = searchWindow(e->xclient.window);

@@ -14,6 +14,10 @@ extern "C" {
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
 #include "otk/style.hh"
+#include "otk/widget.hh"
+#include "otk/button.hh"
+#include "otk/focuswidget.hh"
+#include "otk/focuslabel.hh"
 
 #include <string>
 
@@ -22,46 +26,27 @@ namespace ob {
 //! Holds and decorates a frame around an OBClient (client window)
 /*!
 */
-class OBFrame {
+class OBFrame : public otk::OtkWidget {
 private:
   OBClient *_client;
   const otk::ScreenInfo *_screen;
 
   //! The style to use for size and display the decorations
-  const otk::Style *_style;
+  otk::Style *_style;
 
-  //! The window id of the base frame window
-  Window _window;
   //! The size of the frame on each side of the client window
   otk::Strut _size;
 
   // decoration windows
-  Window _titlebar;
-  otk::Rect _titlebar_area;
-  
-  Window _button_close;
-  otk::Rect _button_close_area;
-  
-  Window _button_iconify;
-  otk::Rect _button_iconify_area;
-
-  Window _button_max;
-  otk::Rect _button_max_area;
-
-  Window _button_stick;
-  otk::Rect _button_stick_area;
-
-  Window _label;
-  otk::Rect _label_area;
-
-  Window _handle;
-  otk::Rect _handle_area;
-
-  Window _grip_left;
-  otk::Rect _grip_left_area;
-
-  Window _grip_right;
-  otk::Rect _grip_right_area;
+  otk::OtkFocusWidget _titlebar;
+  otk::OtkButton      _button_close;
+  otk::OtkButton      _button_iconify;
+  otk::OtkButton      _button_max;
+  otk::OtkButton      _button_stick;
+  otk::OtkFocusLabel  _label;
+  otk::OtkFocusWidget _handle;
+  otk::OtkButton      _grip_left;
+  otk::OtkButton      _grip_right;
 
   //! The decorations to display on the window.
   /*!
@@ -89,31 +74,17 @@ public:
     @param client The client window which will be decorated by the new OBFrame
     @param style The style to use to decorate the frame
   */
-  OBFrame(OBClient *client, const otk::Style *style);
+  OBFrame(OBClient *client, otk::Style *style);
   //! Destroys the OBFrame object
   virtual ~OBFrame();
 
-  //! Load a style to decorate the frame with
-  void loadStyle(const otk::Style *style);
+  //! Set the style to decorate the frame with
+  virtual void setStyle(otk::Style *style);
 
   //! Update the frame to match the client
-  void update();
+  void adjust();
   //! Shape the frame window to the client window
-  void updateShape(); 
-  
-  //! Returns the frame's most-parent window, which is a child of the root
-  //! window
-  inline Window window() const { return _window; }
-
-  inline Window titlebar() const { return _titlebar; }
-  inline Window label() const { return _label; }
-  inline Window buttonIconify() const { return _button_iconify; }
-  inline Window buttonMax() const { return _button_max; }
-  inline Window buttonStick() const { return _button_stick; }
-  inline Window buttonClose() const { return _button_close; }
-  inline Window handle() const { return _handle; }
-  inline Window gripLeft() const { return _grip_left; }
-  inline Window gripRight() const { return _grip_right; }
+  void adjustShape(); 
 };
 
 }

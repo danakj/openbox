@@ -74,6 +74,8 @@ void Openbox::signalHandler(int signal)
 
 
 Openbox::Openbox(int argc, char **argv)
+  : otk::OtkEventDispatcher(),
+    otk::OtkEventHandler()
 {
   struct sigaction action;
 
@@ -244,14 +246,8 @@ void Openbox::showHelp()
 void Openbox::eventLoop()
 {
   while (!_doshutdown) {
-    if (XPending(otk::OBDisplay::display)) {
-      XEvent e;
-      XNextEvent(otk::OBDisplay::display, &e);
-      //process_event(&e);
-      _xeventhandler.handle(e);
-    } else {
-      _timermanager.fire();
-    }
+    dispatchEvents(); // from OtkEventDispatcher
+    _timermanager.fire();
   }
 }
 

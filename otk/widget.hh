@@ -103,6 +103,8 @@ public:
   { return _event_dispatcher; }
   void setEventDispatcher(OtkEventDispatcher *disp);
 
+  void unmanaged(void) { _unmanaged = true; }
+
 protected:
   
   bool _dirty;
@@ -145,6 +147,8 @@ private:
 
   bool _fixed_width;
   bool _fixed_height;
+
+  bool _unmanaged;
 
   OtkEventDispatcher *_event_dispatcher;
   OtkApplication *_application;

@@ -22,7 +22,8 @@ extern "C" {
 #include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
 #include "otk/configuration.hh"
-#include "xeventhandler.hh"
+#include "otk/eventdispatcher.hh"
+#include "otk/eventhandler.hh"
 #include "client.hh"
 
 namespace ob {
@@ -39,7 +40,7 @@ class OBScreen;
   not exit until the window manager is ready to be destroyed. Destruction of
   the Openbox class instance will shutdown the window manager.
 */
-class Openbox
+class Openbox : public otk::OtkEventDispatcher, public otk::OtkEventHandler
 {
 public:
   //! The single instance of the Openbox class for the application.
@@ -101,9 +102,6 @@ private:
     that all timers fire when their times elapse.
   */
   otk::OBTimerQueueManager _timermanager;
-
-  //! The class which will handle raw XEvents
-  OBXEventHandler _xeventhandler;
 
   //! Cached atoms on the display
   /*!

@@ -371,6 +371,7 @@ void OtkWidget::adjustVert(void)
 void OtkWidget::update(void)
 {
   if (_dirty) {
+    if (! _unmanaged)
     adjust();
     render();
     XClearWindow(OBDisplay::display, _window);

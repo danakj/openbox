@@ -237,9 +237,6 @@ void client_manage(Window window)
     client_get_all(self);
     client_restore_session_state(self);
 
-    /* set the desktop hint, to make sure that it always exists */
-    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
-
     client_change_state(self);
 
     /* remove the client's border (and adjust re gravity) */
@@ -472,10 +469,13 @@ static void client_restore_session_state(ObClient *self)
     if (!(s)) return;
 
     RECT_SET(self->area, s->x, s->y, s->w, s->h);
-    XResizeWindow(ob_display, self->window, s->w, s->h);
     self->positioned = TRUE;
+    XResizeWindow(ob_display, self->window, s->w, s->h);
+
     self->desktop = s->desktop == DESKTOP_ALL ? s->desktop :
         MIN(screen_num_desktops - 1, s->desktop);
+    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
+
     self->shaded = s->shaded;
     self->iconic = s->iconic;
     self->skip_pager = s->skip_pager;
@@ -703,6 +703,10 @@ static void client_get_desktop(ObClient *self)
        if (!trdesk)
            /* defaults to the current desktop */
            self->desktop = screen_desktop;
+    }
+    if (self->desktop != d) {
+        /* set the desktop hint, to make sure that it always exists */
+        PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
     }
 }
 

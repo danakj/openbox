@@ -1,3 +1,105 @@
+# Keysrc - Keybindings configuration for Openbox
+
+# Key [Key...] Action [Argument]
+
+# Key: A list of keys to form a key chain, or just a single key.
+# Each Key a string composed of [<modifier>-]<key>. A Key can have 0 or more
+# modifiers. Valid modifiers are Mod1 ('A' is an alias for this), Mod2, Mod3,
+# Mod4 ('W' is an alias for this), and Mod5. Valid buttons are defined by the
+# X server. The 'xev' utility can be used to look up the name of a key.
+#
+# When there is more than one Key in a binding, they form a chain, where you
+# must press the first Key, then the second, etc, to fire the binding.
+#
+# The 'C-g' key combination can be used to abort a key chain in progress.
+
+# Action: The action to be performed when the key binding is pressed.
+#
+#  * Unfocus - Unfocus the focused client
+#  * Iconify - Iconify the focused client
+#  * Raise - Raise the focused client to the front
+#  * Lower - Lower the focused client to the back
+#  * Close - Close the focused client
+#  * Kill - Kill the focused client forcefully
+#  * Shade - Shade (roll up) the focused client
+#  * Unshade - Unshade (roll down) the focused client
+#  * ToggleShade - Shade and unshade the focused client
+#  * ToggleOmnipresent - Place the focused client on all desktops or the
+#                        current one
+#  * MaximizeFull - Maximize the focused window horizontally and vertically
+#  * UnmaximizeFull - Restore the focused window horizontally and vertically
+#  * ToggleMaximizeFull - Maximize or restore the focused window horizontally
+#                         and vertically
+#  * MaximizeHorz - Maximize the focused window horizontally
+#  * UnmaximizeHorz - Restore the focused window horizontally
+#  * ToggleMaximizeHorz - Maximize or restore the focused window horizontally
+#  * MaximizeVert - Maximize the focused window vertically
+#  * UnmaximizeVert - Restore the focused window vertically
+#  * ToggleMaximizeVert - Maximize or restore the focused window vertically
+#  * SendToNextDesktop - Sends the focused window to the next desktop
+#  * SendToNextDesktopWrap - Sends the focused window to the next desktop
+#                            (wrapping around the first and last desktops)
+#  * SendToPreviousDesktop - Sends the focused window to the previous desktop
+#  * SendToPreviousDesktopWrap - Sends the focused window to the previous
+#                                desktop (wrapping around the first and last
+#                                desktops)
+#  * NextDesktop - Switches to the next desktop
+#  * NextDesktopWrap - Switches to the next desktop (wrapping around the first
+#		       and last desktops)
+#  * PreviousDesktop - Switches to the previous desktop
+#  * PreviousDesktopWrap - Switches to the previous desktop (wrapping around
+#			   the first and last desktops)
+#  * NextDesktopColumn - Switches to the desktop in the next column, based on
+#                        the desktop layout set by a pager
+#  * NextDesktopColumnWrap - Switches to the desktop in the next column, based
+#                            on the desktop layout set by a pager (wrapping
+#                            around the first and last columns)
+#  * PreviousDesktopColumn - Switches to the desktop in the previous column,
+#                            based on the desktop layout set by a pager
+#  * PreviousDesktopColumnWrap - Switches to the desktop in the previous
+#                                column, based on the desktop layout set by a
+#                                pager (wrapping around the first and last
+#                                columns)
+#  * NextDesktopRow - Switches to the desktop in the next row, based on the
+#                     desktop layout set by a pager
+#  * NextDesktopRowWrap - Switches to the desktop in the next row, based on the
+#                         desktop layout set by a pager (wrapping around the
+#                         first and last rows)
+#  * PreviousDesktopRow - Switches to the desktop in the previous row, based on
+#                         the desktop layout set by a pager
+#  * PreviousDesktopRowWrap - Switches to the desktop in the previous row,
+#                             based on the desktop layout set by a pager
+#                             (wrapping around the first and last rows)
+#  * MoveRelativeHorz - Moves the focused client horizontally
+#      * Takes a number argument which specifies the amount to move the window.
+#	 A positive number moves to the right, negative to the left.
+#  * MoveRelativeVert - Moves the focused client vertcally
+#      * Takes a number argument which specifies the amount to move the window.
+#	 A positive number moves down, negative up.
+#  * ResizeRelativeHorz - Resizes the focused client horizontally
+#      * Takes a number argument which specifies the amount to resize the
+#        window. A positive number grows it, a negative number shrinks it.
+#  * ResizeRelativeVert - Resizes the focused client vertically
+#      * Takes a number argument which specifies the amount to resize the
+#        window. A positive number grows it, a negative number shrinks it.
+#  * Desktops - Switches to the specified desktop
+#      * Takes a number argument which specifies the desktop to switch to
+#	 (starting at 1).
+#  * Execute - Executes a command
+#      * Takes a string argument "in quotes" that is the command to execute.
+#  * Restart - Restarts Openbox
+#      * Optionally takes a string argument "in quotes" that is the command to
+# 	 execute in place of restarting Openbox.
+#  * Exit - Exits Openbox
+#
+#  For drag Events only, these are valid:
+#  * Move - Move the client interactively, this can only be bound to the Drag
+#           Event
+#  * Resize - Resize the client interactively, this can only be bound to the
+#             Drag Event
+
+
+
 A-space		execute "xterm"
 C-A-Escape	execute "xlock -nolock -mode puzzle"
 

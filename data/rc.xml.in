@@ -345,7 +345,7 @@
   <!-- debian menu file -->
   <file>/etc/X11/openbox/openbox-menu.xml</file>
 
-  <!-- default menu file (or custom one in $HOME/.openbox/) -->
+  <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
   <file>menu.xml</file>
 </menu>
 

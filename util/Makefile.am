@@ -9,7 +9,7 @@ bin_PROGRAMS =		bsetroot xftlsfonts
 bsetroot_SOURCES =	bsetroot.cc
 bsetroot_LDADD =	../src/basedisplay.o ../otk/color.o ../otk/gccache.o \
 			../otk/texture.o ../src/timer.o ../otk/image.o \
-			../otk/imagecontrol.o ../src/util.o
+			../otk/imagecontrol.o ../src/util.o ../src/screeninfo.o
 
 xftlsfonts_SOURCES = xftlsfonts.cc
 

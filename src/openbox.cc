@@ -71,7 +71,8 @@ void Openbox::signalHandler(int signal)
   case SIGTERM:
   case SIGPIPE:
     printf("Caught signal %d. Exiting.", signal);
-    // XXX: Make Openbox exit
+    instance->shutdown();
+
     break;
   case SIGFPE:
   case SIGSEGV:

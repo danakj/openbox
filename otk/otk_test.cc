@@ -5,8 +5,6 @@
 #include "image.hh"
 #include "style.hh"
 
-#include <unistd.h>
-
 int main(void) {
   otk::OBDisplay::initialize(NULL);
   otk::Configuration style_conf(False);

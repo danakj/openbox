@@ -3,6 +3,8 @@ scriptdir = $(libdir)/openbox/python
 
 CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 -DBUTTONSDIR=\"$(buttonsdir)\" -DSWIG_GLOBAL
+# -DSWIG_GLOBAL means we don't have to link libswigpy cuz libotk will export
+# everything it would
 
 #INCLUDES= -I../src
 

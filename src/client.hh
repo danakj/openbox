@@ -434,11 +434,11 @@ public:
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
 
-  virtual void propertyHandler(const XPropertyEvent &);
+  virtual void propertyHandler(const XPropertyEvent &e);
 
-  virtual void clientMessageHandler(const XClientMessageEvent &);
+  virtual void clientMessageHandler(const XClientMessageEvent &e);
 
-  virtual void shapeHandler(const XShapeEvent &);
+  virtual void shapeHandler(const XShapeEvent &e);
   
   //! Changes the stored positions and size of the OBClient window
   /*!

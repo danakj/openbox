@@ -37,7 +37,8 @@ namespace ob {
 
 
 OBScreen::OBScreen(int screen, const otk::Configuration &config)
-  : _number(screen)
+  : _number(screen),
+    _root(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(otk::OBDisplay::display));
   _info = otk::OBDisplay::screenInfo(screen);

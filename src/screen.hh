@@ -10,6 +10,7 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
+#include "rootwindow.hh"
 #include "otk/image.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
@@ -21,6 +22,7 @@ extern "C" {
 namespace ob {
 
 class OBClient;
+class OBRootWindow;
 
 //! Manages a single screen
 /*!
@@ -57,6 +59,8 @@ private:
   //! The style with which to render on the screen
   otk::Style _style;
 
+  OBRootWindow _root;
+  
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
 

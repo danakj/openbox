@@ -13,6 +13,19 @@ Changelog for Openbox:
    for moving during the warp. Now everything works as
    expected.
 
+ * Better workspace changing for sticky windows, don't  (Ben Jansens)
+   unmap/remap them, causing them to flicker. But keep
+   sloppy focus working right still.
+
+ * Fixed Sloppy Focus-Auto Raise bug, as exibited by    (Ben Jansens)
+   fullscreen SDL applications. A frame window would
+   be raised over the app.
+
+ * Enforce windows' functionality, so that windows that (Ben Jansens)
+   aren't suppoosed to be able to perform actions, such
+   as iconify, can't end up being iconified anyhow.
+   (Fixes the "Desktop Access" feature in KDE.)
+
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)
    which modifier combo Openbox uses for mouse

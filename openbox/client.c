@@ -153,7 +153,7 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
     guint i;
-    gboolean f;
+    Client *parent;
 
     grab_server(TRUE);
 
@@ -225,10 +225,10 @@ void client_manage(Window window)
     /* update the focus lists */
     if (self->desktop == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_append(focus_order[i], self);
+            focus_order[i] = g_list_insert(focus_order[i], self, 1);
     } else {
         i = self->desktop;
-        focus_order[i] = g_list_append(focus_order[i], self);
+        focus_order[i] = g_list_insert(focus_order[i], self, 1);
     }
 
     stacking_raise(self);
@@ -241,30 +241,28 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state != State_Starting && client_normal(self)) {
-        f = FALSE;
+        parent = NULL;
 
         if (self->transient_for) {
             if (self->transient_for != TRAN_GROUP) {/* transient of a window */
-                if (focus_client == self->transient_for) {
-                    client_focus(self);
-                    f = TRUE;
-                }
+                parent = self->transient_for;
             } else { /* transient of a group */
                 GSList *it;
 
                 for (it = self->group->members; it; it = it->next)
-                    if (focus_client == it->data) {
-                        client_focus(self);
-                        f = TRUE;
-                        break;
-                    }
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for != TRAN_GROUP)
+                        parent = it->data;
             }
         }
         /* note the check against Type_Normal, not client_normal(self), which
            would also include dialog types. in this case we want more strict
            rules for focus */
-        if (!f && config_focus_new && self->type == Type_Normal)
+        if ((config_focus_new && self->type == Type_Normal) ||
+            (parent && (client_focused(parent) ||
+                        search_focus_tree(parent, parent)))) {
             client_focus(self);
+        }
     }
 
     /* update the list hints */
@@ -344,8 +342,14 @@ void client_unmanage(Client *self)
     if (moveresize_client == self)
         moveresize_end(TRUE);
 
-    if (focus_client == self)
+    if (focus_client == self) {
+        XEvent e;
+
+        /* focus the last focused window on the desktop, and ignore enter
+           events from the unmap so it doesnt mess with the focus */
+        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
         client_unfocus(self);
+    }
 
     /* remove from its group */
     if (self->group) {
@@ -375,6 +379,7 @@ void client_unmanage(Client *self)
 	if (self->iconic)
 	    XMapWindow(ob_display, self->window);
     }
+
 
     g_message("Unmanaged window 0x%lx", self->window);
 
@@ -2160,7 +2165,7 @@ gboolean client_focus(Client *self)
     }
 
     if (self->can_focus)
-        /* RevertToPointerRoot causes much more headache than TevertToNone, so
+        /* RevertToPointerRoot causes much more headache than RevertToNone, so
            I choose to use it always, hopefully to find errors quicker, if any
            are left. (I hate X. I hate focus events.) */
 	XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
@@ -2182,7 +2187,9 @@ gboolean client_focus(Client *self)
     }
 
 #ifdef DEBUG_FOCUS
-    g_message("focusing %lx", self->window);
+    g_message("%sively focusing %lx at %d", (self->can_focus ? "act" : "pass"),
+              self->window, (int)
+              event_lasttime);
 #endif
 
     /* Cause the FocusIn to come back to us. Important for desktop switches,
@@ -2196,7 +2203,7 @@ void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
 #ifdef DEBUG_FOCUS
-    g_message("client_unfocus");
+    g_message("client_unfocus for %lx", self->window);
 #endif
     focus_fallback(Fallback_Unfocusing);
 }

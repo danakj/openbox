@@ -28,7 +28,8 @@ def def_press_model(action, win, type, modifiers, button, xroot, yroot, time):
 		return
 	if click_focus != 0:
 		OBClient_focus(client)
-	print "OBClient_raise(client)"
+	if click_raise != 0:
+		print "OBClient_raise(client)"
 
 def def_click_root(action, win, type, modifiers, button, time):
 	if type == Type_Root:

@@ -35,16 +35,13 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 {
   OtkEventHandler::buttonPressHandler(e);
   
-  // run the PRESS guile hook
+  // run the PRESS python hook
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
   python_callback(Action_ButtonPress, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.x_root, e.y_root, e.time);
-  if (w && w->type() == OBWidget::Type_Frame) // a binding
-    Openbox::instance->bindings()->fire(Action_ButtonPress, e.window,
-                                        e.state, e.button, e.time);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -59,13 +56,10 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  // run the RELEASE guile hook
+  // run the RELEASE python hook
   python_callback(Action_ButtonRelease, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.x_root, e.y_root, e.time);
-  if (w && w->type() == OBWidget::Type_Frame) // a binding
-    Openbox::instance->bindings()->fire(Action_ButtonRelease, e.window,
-                                        e.state, e.button, e.time);
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -81,24 +75,18 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
         e.x < attr.width && e.y < attr.height))
     return;
 
-  // run the CLICK guile hook
+  // run the CLICK python hook
   python_callback(Action_Click, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.time);
-  if (w && w->type() == OBWidget::Type_Frame) // a binding
-    Openbox::instance->bindings()->fire(Action_Click, e.window,
-                                        e.state, e.button, e.time);
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
 
-    // run the DOUBLECLICK guile hook
+    // run the DOUBLECLICK python hook
     python_callback(Action_DoubleClick, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.button, e.time);
-    if (w && w->type() == OBWidget::Type_Frame) // a binding
-      Openbox::instance->bindings()->fire(Action_DoubleClick, e.window,
-                                          e.state, e.button, e.time);
     
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -120,7 +108,7 @@ void OBActions::enterHandler(const XCrossingEvent &e)
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  // run the ENTER guile hook
+  // run the ENTER python hook
   python_callback(Action_EnterWindow, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1), e.state);
 }
@@ -133,7 +121,7 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  // run the LEAVE guile hook
+  // run the LEAVE python hook
   python_callback(Action_LeaveWindow, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1), e.state);
 }
@@ -144,8 +132,7 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 //  OBWidget *w = dynamic_cast<OBWidget*>
 //    (Openbox::instance->findHandler(e.window));
 
-  Openbox::instance->bindings()->fire(Action_KeyPress, e.window,
-                                      e.state, e.keycode, e.time);
+  Openbox::instance->bindings()->fire(e.window, e.state, e.keycode, e.time);
 }
 
 
@@ -172,12 +159,23 @@ void OBActions::motionHandler(const XMotionEvent &e)
     (Openbox::instance->findHandler(e.window));
 
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
-  //      maybe that should all be done via python tho..
-  // run the simple MOTION guile hook for now...
+  //      maybe that should all be done via python tho.. (or radial menus!)
+  // run the simple MOTION python hook for now...
   python_callback(Action_MouseMotion, e.window,
                   (OBWidget::WidgetType)(w ? w->type():-1),
                   e.state, e.x_root, e.y_root, e.time);
 }
 
+void OBActions::mapRequestHandler(const XMapRequestEvent &e)
+{
+}
+
+void OBActions::unmapHandler(const XUnmapEvent &e)
+{
+}
+
+void OBActions::destroyHandler(const XDestroyWindowEvent &e)
+{
+}
 
 }

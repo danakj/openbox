@@ -18,13 +18,13 @@ namespace ob {
 
 //! Add a python callback funtion to the back of the hook list
 /*!
-  Registering functions for KeyPress events is pointless. Use python_bind_key
+  Registering functions for KeyPress events is pointless. Use python_bind
   instead to do this.
 */
 bool python_register(int action, PyObject *callback);
 //! Add a python callback funtion to the front of the hook list
 /*!
-  Registering functions for KeyPress events is pointless. Use python_bind_key
+  Registering functions for KeyPress events is pointless. Use python_bind
   instead to do this.
 */
 bool python_preregister(int action, PyObject *callback);
@@ -40,21 +40,11 @@ bool python_unregister_all(int action);
                  "C-A-space" or "A-Button1" etc.
   @param callback A python function to call when the binding is used.
 */
-bool python_bind_key(PyObject *keylist, PyObject *callback);
+bool python_bind(PyObject *keylist, PyObject *callback);
 
-bool python_unbind_key(PyObject *keylist);
+bool python_unbind(PyObject *keylist);
 
 void python_set_reset_key(const std::string &key);
-
-//! Adds a mouse binding
-/*!
-  Bindings do not generate motion events. You can only handle motion events by
-  using register to set a function for all motion events. Bindings do generate
-  ButtonPress, ButtonRelease, Click, and DoubleClick events.
-*/
-bool python_bind_mouse(const std::string &button, PyObject *callback);
-
-bool python_unbind_mouse(const std::string &button);
 
 void python_unbind_all();
 
@@ -64,8 +54,8 @@ void python_callback(OBActions::ActionType action, Window window,
                      long d1 = LONG_MIN, long d2 = LONG_MIN,
                      long d3 = LONG_MIN, long d4 = LONG_MIN);
 
-void python_callback_binding(int id, OBActions::ActionType action,
-                             Window window, unsigned int state,
+//! Fire a python callback function for a key binding
+void python_callback_binding(int id, Window window, unsigned int state,
                              unsigned int keybutton, Time time);
 
 }

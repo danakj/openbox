@@ -56,12 +56,10 @@
 %rename(preregister) ob::python_preregister;
 %rename(unregister) ob::python_unregister;
 %rename(unregister_all) ob::python_unregister_all;
-%rename(bind_key) ob::python_bind_key;
-%rename(unbind_key) ob::python_unbind_key;
-%rename(set_reset_key) ob::python_set_reset_key;
-%rename(bind_mouse) ob::python_bind_mouse;
-%rename(unbind_mouse) ob::python_unbind_mouse;
+%rename(bind) ob::python_bind;
+%rename(unbind) ob::python_unbind;
 %rename(unbind_all) ob::python_unbind_all;
+%rename(set_reset_key) ob::python_set_reset_key;
 
 %ignore ob::OBScreen::clients;
 %{

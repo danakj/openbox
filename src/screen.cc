@@ -401,18 +401,12 @@ void OBScreen::manageWindow(Window window)
   clients.push_back(client);
   // update the root properties
   setClientList();
-
-  // grab buttons on the window
-  Openbox::instance->bindings()->grabMouse(true, client);
 }
 
 
 void OBScreen::unmanageWindow(OBClient *client)
 {
   OBFrame *frame = client->frame;
-
-  // ungrab buttons on the window
-  Openbox::instance->bindings()->grabMouse(false, client);
 
   // XXX: pass around focus if this window was focused
 

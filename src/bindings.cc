@@ -123,7 +123,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
     ret = new BindingTree(id);
     if (!p) ret->chain = false; // only the first built node
     ret->first_child = p;
-    if (!translate(*it, ret->binding, true)) {
+    if (!translate(*it, ret->binding)) {
       destroytree(ret);
       ret = 0;
       break;
@@ -134,7 +134,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
 
 
 OBBindings::OBBindings()
-  : _curpos(&_keytree), _resetkey(0,0)
+  : _curpos(&_tree), _resetkey(0,0)
 {
   setResetKey("C-g"); // set the default reset key
 }
@@ -151,11 +151,11 @@ void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
-  if (!_keytree.first_child) {
+  if (!_tree.first_child) {
     // there are no nodes at this level yet
-    _keytree.first_child = node;
+    _tree.first_child = node;
   } else {
-    a = _keytree.first_child;
+    a = _tree.first_child;
     last = a;
     b = node;
     while (a) {
@@ -179,9 +179,9 @@ void OBBindings::assimilate(BindingTree *node)
 }
 
 
-int OBBindings::find_key(BindingTree *search) const {
+int OBBindings::find(BindingTree *search) const {
   BindingTree *a, *b;
-  a = _keytree.first_child;
+  a = _tree.first_child;
   b = search;
   while (a && b) {
     if (a->binding != b->binding) {
@@ -202,14 +202,14 @@ int OBBindings::find_key(BindingTree *search) const {
 }
 
 
-bool OBBindings::add_key(const StringVect &keylist, int id)
+bool OBBindings::add(const StringVect &keylist, int id)
 {
   BindingTree *tree;
 
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  if (find_key(tree) != -1) {
+  if (find(tree) != -1) {
     // conflicts with another binding
     destroytree(tree);
     return false;
@@ -226,7 +226,7 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
 }
 
 
-int OBBindings::find_key(const StringVect &keylist)
+int OBBindings::find(const StringVect &keylist)
 {
   BindingTree *tree;
   bool ret;
@@ -234,7 +234,7 @@ int OBBindings::find_key(const StringVect &keylist)
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  ret = find_key(tree) >= 0;
+  ret = find(tree) >= 0;
 
   destroytree(tree);
 
@@ -242,13 +242,13 @@ int OBBindings::find_key(const StringVect &keylist)
 }
 
 
-int OBBindings::remove_key(const StringVect &keylist)
+int OBBindings::remove(const StringVect &keylist)
 {
   (void)keylist;
   assert(false); // XXX: function not implemented yet
 
   grabKeys(false);
-  _curpos = &_keytree;
+  _curpos = &_tree;
 
   // do shit here...
   
@@ -260,7 +260,7 @@ int OBBindings::remove_key(const StringVect &keylist)
 void OBBindings::setResetKey(const std::string &key)
 {
   Binding b(0, 0);
-  if (translate(key, b, true)) {
+  if (translate(key, b)) {
     grabKeys(false);
     _resetkey.key = b.key;
     _resetkey.modifiers = b.modifiers;
@@ -285,9 +285,9 @@ static void remove_branch(BindingTree *first)
 
 void OBBindings::remove_all()
 {
-  if (_keytree.first_child) {
-    remove_branch(_keytree.first_child);
-    _keytree.first_child = 0;
+  if (_tree.first_child) {
+    remove_branch(_tree.first_child);
+    _tree.first_child = 0;
   }
 }
 
@@ -325,7 +325,7 @@ void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     grabKeys(false);
-    _curpos = &_keytree;
+    _curpos = &_tree;
     grabKeys(true);
   } else {
     BindingTree *p = _curpos->first_child;
@@ -336,9 +336,9 @@ void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
           _curpos = p;
           grabKeys(true);
         } else {
-          python_callback_binding(p->id, type, window, modifiers, key, time);
+          python_callback_binding(p->id, window, modifiers, key, time);
           grabKeys(false);
-          _curpos = &_keytree;
+          _curpos = &_tree;
           grabKeys(true);
         }
         break;

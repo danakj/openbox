@@ -136,7 +136,7 @@ void python_callback(OBActions::ActionType action, Window window,
 
 
 
-bool python_bind_key(PyObject *keylist, PyObject *callback)
+bool python_bind(PyObject *keylist, PyObject *callback)
 {
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
@@ -161,7 +161,7 @@ bool python_bind_key(PyObject *keylist, PyObject *callback)
   // the id is what the binding class can call back with so it doesnt have to
   // worry about the python function pointer
   int id = bindfuncs.size();
-  if (Openbox::instance->bindings()->add_key(vectkeylist, id)) {
+  if (Openbox::instance->bindings()->add(vectkeylist, id)) {
     Py_XINCREF(callback);              // Add a reference to new callback
     bindfuncs.push_back(callback);
     return true;
@@ -171,7 +171,7 @@ bool python_bind_key(PyObject *keylist, PyObject *callback)
   }
 }
 
-bool python_unbind_key(PyObject *keylist)
+bool python_unbind(PyObject *keylist)
 {
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_AssertionError, "Invalid keylist. Not a list.");
@@ -191,7 +191,7 @@ bool python_unbind_key(PyObject *keylist)
 
   int id;
   if ((id =
-       Openbox::instance->bindings()->remove_key(vectkeylist)) >= 0) {
+       Openbox::instance->bindings()->remove(vectkeylist)) >= 0) {
     assert(bindfuncs[id]); // shouldn't be able to remove it twice
     Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
     // important note: we don't erase the item from the list cuz that would
@@ -208,60 +208,21 @@ void python_set_reset_key(const std::string &key)
   Openbox::instance->bindings()->setResetKey(key);
 }
 
-bool python_bind_mouse(const std::string &button, PyObject *callback)
-{
-  if (!PyCallable_Check(callback)) {
-    PyErr_SetString(PyExc_AssertionError, "Invalid callback function.");
-    return false;
-  }
-
-  // the id is what the binding class can call back with so it doesnt have to
-  // worry about the python function pointer
-  int id = bindfuncs.size();
-  if (Openbox::instance->bindings()->add_mouse(button, id)) {
-    Py_XINCREF(callback);              // Add a reference to new callback
-    bindfuncs.push_back(callback);
-    return true;
-  } else {
-    PyErr_SetString(PyExc_AssertionError,"Unable to create binding. Invalid.");
-    return false;
-  }
-}
-
-bool python_unbind_mouse(const std::string &button)
-{
-  int id;
-  if ((id =
-       Openbox::instance->bindings()->remove_mouse(button)) >= 0) {
-    assert(bindfuncs[id]); // shouldn't be able to remove it twice
-    Py_XDECREF(bindfuncs[id]);  // Dispose of previous callback
-    // important note: we don't erase the item from the list cuz that would
-    // ruin all the id's that are in use. simply nullify it.
-    bindfuncs[id] = 0;
-    return true;
-  }
-  
-  return false;
-}
-
 void python_unbind_all()
 {
   Openbox::instance->bindings()->remove_all();
 }
 
 
-void python_callback_binding(int id, OBActions::ActionType action,
-                             Window window, unsigned int state,
+void python_callback_binding(int id, Window window, unsigned int state,
                              unsigned int keybutton, Time time)
 {
-  assert(action >= 0 && action < OBActions::NUM_ACTIONS);
-
   if (!bindfuncs[id]) return; // the key was unbound
 
   PyObject *arglist;
   PyObject *result;
 
-  arglist = Py_BuildValue("ilisl", action, window, state,
+  arglist = Py_BuildValue("lisl", window, state,
                           XKeysymToString(
                             XKeycodeToKeysym(otk::OBDisplay::display,
                                              keybutton, 0)),

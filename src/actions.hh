@@ -33,6 +33,8 @@ public:
     Action_LeaveWindow,
     Action_KeyPress,
     Action_MouseMotion,
+    Action_NewWindow,
+    Action_CloseWindow,
     NUM_ACTIONS
   };
   
@@ -67,6 +69,10 @@ public:
   virtual void keyPressHandler(const XKeyEvent &e);
 
   virtual void motionHandler(const XMotionEvent &e);
+
+  virtual void mapRequestHandler(const XMapRequestEvent &e);
+  virtual void unmapHandler(const XUnmapEvent &e);
+  virtual void destroyHandler(const XDestroyWindowEvent &e);
 };
 
 }

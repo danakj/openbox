@@ -18,6 +18,9 @@ client_buttons = ["A-1", "A-2", "A-3"]
 # click_focus - true if clicking in a client will cause it to focus in the
 #               default hook functions
 click_focus = 0
+# click_raise - true if clicking in a client will cause it to raise to the
+#               top of its stacking layer
+click_raise = 0
 # enter_focus - true if entering a client window will cause it to focus in the
 #               default hook functions
 enter_focus = 1

@@ -42,7 +42,7 @@ parse.h: y.tab.h
 
 y.tab.h: y.tab.c
 
-y.tab.c: parse.yacc
+y.tab.c: parse.y
 	$(YACC) -d $<
 
 MAINTAINERCLEANFILES= Makefile.in

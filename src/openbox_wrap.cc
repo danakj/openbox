@@ -2530,7 +2530,7 @@ static PyObject *_wrap_OBClient_focus(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"O:OBClient_focus",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)(arg1)->focus();
+    result = (bool)((ob::OBClient const *)arg1)->focus();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2546,7 +2546,7 @@ static PyObject *_wrap_OBClient_unfocus(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"O:OBClient_unfocus",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->unfocus();
+    ((ob::OBClient const *)arg1)->unfocus();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;

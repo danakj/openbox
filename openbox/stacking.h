@@ -19,7 +19,7 @@ typedef enum {
 } ObStackingLayer;
 
 /* list of ObWindow*s in stacking order from highest to lowest */
-extern GList  *stacking_list;
+extern GList *stacking_list;
 
 /*! Sets the window stacking list on the root window from the
   stacking_list */

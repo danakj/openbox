@@ -546,8 +546,9 @@ void screen::updateActiveWindow() {
      * cycle stack.
      */
     if (_stacked_cycling && !_cycling) {
-      _clients.remove(*_active);
-      _clients.push_front(*_active);
+      XWindow *win = *_active;
+      _clients.remove(win);
+      _clients.push_front(win);
       _active = _clients.begin();
     }
 

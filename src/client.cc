@@ -1378,20 +1378,11 @@ void Client::maximize(bool max, int dir, bool savearea)
     if (dir == 2 && !_max_vert) return;
   }
 
-  int g = _gravity;
-  
   const otk::Rect &a = openbox->screen(_screen)->area();
-  int x = _area.x(), y = _area.y(), w = _area.width(), h = _area.height();
+  int x = frame->rect().x(), y = frame->rect().y(),
+    w = _area.width(), h = _area.height();
   
   if (max) {
-    // when maximizing, put the client where we want, NOT the frame!
-    _gravity = StaticGravity;
-    // adjust our idea of position based on StaticGravity, so we stay put
-    // unless asked
-    x = frame->rect().x();
-    y = frame->rect().y();
-    frame->frameGravity(x, y);
-
     if (savearea) {
       long dimensions[4];
       long *readdim;
@@ -1429,7 +1420,7 @@ void Client::maximize(bool max, int dir, bool savearea)
       w = a.width();
     }
     if (dir == 0 || dir == 2) { // vert
-      y = a.y() + frame->size().top;
+      y = a.y();
       h = a.height() - frame->size().top - frame->size().bottom;
     }
   } else {
@@ -1461,24 +1452,20 @@ void Client::maximize(bool max, int dir, bool savearea)
         h = a.height() / 2;
       }
     }
-    otk::Property::erase(_window, otk::Property::atoms.openbox_premax);
   }
 
   if (dir == 0 || dir == 1) // horz
     _max_horz = max;
   if (dir == 0 || dir == 2) // vert
     _max_vert = max;
+
+  if (!_max_horz && !_max_vert)
+    otk::Property::erase(_window, otk::Property::atoms.openbox_premax);
+
   changeState(); // change the state hints on the client
 
+  frame->frameGravity(x, y); // figure out where the client should be going
   internal_resize(TopLeft, w, h, true, x, y);
-  _gravity = g;
-  if (max) {
-    // because of my little gravity trick in here, we have to set the position
-    // of the client to what it really is
-    int x = frame->rect().x(), y = frame->rect().y();
-    frame->frameGravity(x, y);
-    _area.setPos(x, y);
-  }
 }
 
 

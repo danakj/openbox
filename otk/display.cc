@@ -65,8 +65,8 @@ int OBDisplay::xerrorHandler(Display *d, XErrorEvent *e)
   {
     XGetErrorText(d, e->error_code, errtxt, 128);
     printf("X Error: %s\n", errtxt);
-//    if (e->error_code != BadWindow)
-//      abort();
+    if (e->error_code != BadWindow)
+      abort();
   }
 #else
   (void)d;

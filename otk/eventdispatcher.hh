@@ -38,9 +38,6 @@ private:
   OtkEventMap _map;
   OtkEventHandler *_fallback;
   OtkEventHandler *_master;
-  Window _focus;
-  XEvent _focus_e;
-  XEvent _crossing_e;
 
   //! The time at which the last XEvent with a time was received
   Time _lasttime;

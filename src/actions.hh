@@ -9,6 +9,7 @@
 #include "otk/display.hh"
 #include "otk/point.hh"
 #include "otk/rect.hh"
+#include "otk/eventhandler.hh"
 
 namespace ob {
 
@@ -17,7 +18,7 @@ namespace ob {
   When these actions are fired, hooks to the guile engine are fired so that
   guile code is run.
 */
-class OBActions {
+class OBActions : public otk::OtkEventHandler {
 public:
   struct MousePressAction {
     Window win;
@@ -28,7 +29,7 @@ public:
   
 private:
   // milliseconds XXX: config option
-  static const unsigned int DOUBLECLICKDELAY = 200;
+  static const unsigned int DOUBLECLICKDELAY;
   
   //! The last 2 button presses processed for CLICKs
   /*!
@@ -46,27 +47,11 @@ public:
   OBActions();
   virtual ~OBActions();
 
-  //! Notify that a mouse button press has occured on a window.
-  /*!
-    @param win The window on which the action was performed.
-    @param modifiers The modifier state for the action.
-    @param button The mouse button the action is for.
-    @param time The time at which the event occured (from the XEvent).
-  */
-  void bpress(Window win, unsigned int modifiers, unsigned int button,
-              Time time);
+  virtual void buttonPressHandler(const XButtonEvent &e);
+  virtual void buttonReleaseHandler(const XButtonEvent &e);
+  
 
-  //! Notify that a mouse button release has occured on a window.
-  /*!
-    @param win The window on which the action was performed.
-    @param area The area of the window on which the action was performed.
-    @param mpos The position of the mouse pointer relative to the root window.
-    @param modifiers The modifier state for the action.
-    @param button The mouse button the action is for.
-    @param time The time at which the event occured (from the XEvent).
-  */
-  void brelease(Window win, const otk::Rect &area, const otk::Point &mpos,
-                unsigned int modifiers, unsigned int button, Time time);
+
 
   //! Notify that a mouse enter action has occured on a window.
   /*!

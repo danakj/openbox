@@ -126,6 +126,8 @@ Openbox::Openbox(int argc, char **argv)
 
   Openbox::actions = new OBActions();
 
+  setMasterHandler(Openbox::actions); // set as the master event handler
+
   // create the mouse cursors we'll use
   _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
   _cursors.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);

@@ -10,14 +10,13 @@
 
 namespace ob {
 
-const unsigned int OBActions::DOUBLECLICKDELAY;
+const unsigned int OBActions::DOUBLECLICKDELAY = 300;
 
 OBActions::OBActions()
   : _button(0), _enter_win(0)
 {
   _presses[0] = new MousePressAction();
   _presses[1] = new MousePressAction();
-  _presses[2] = new MousePressAction();
 
   // XXX: load a configuration out of somewhere
 
@@ -40,49 +39,51 @@ void OBActions::insertPress(Window win, unsigned int button, Time time)
 }
 
 
-void OBActions::bpress(Window win, unsigned int modifiers, unsigned int button,
-                       Time time)
+void OBActions::buttonPressHandler(const XButtonEvent &e)
 {
-  (void)modifiers;
   // XXX: run the PRESS guile hook
-  printf("GUILE: PRESS: win %lx modifiers %ux button %ud time %lx",
-         (long)win, modifiers, button, time);
+  printf("GUILE: PRESS: win %lx modifiers %u button %u time %lx\n",
+         (long)e.window, e.state, e.button, e.time);
     
   if (_button) return; // won't count toward CLICK events
 
-  _button = button;
+  _button = e.button;
 
-  insertPress(win, button, time);
+  insertPress(e.window, e.button, e.time);
 }
   
 
-void OBActions::brelease(Window win, const otk::Rect &area,
-                         const otk::Point &mpos, 
-                         unsigned int modifiers, unsigned int button,
-                         Time time)
+void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 {
-  (void)modifiers;
   // XXX: run the RELEASE guile hook
-  printf("GUILE: RELEASE: win %lx modifiers %ux button %ud time %lx",
-         (long)win, modifiers, button, time);
+  printf("GUILE: RELEASE: win %lx modifiers %u button %u time %lx\n",
+         (long)e.window, e.state, e.button, e.time);
 
-  if (_button && _button != button) return; // not for the button we're watchin
+  // not for the button we're watching?
+  if (_button && _button != e.button) return;
 
   _button = 0;
 
-  if (!area.contains(mpos)) return; // not on the window any more
+  // find the area of the window
+  XWindowAttributes attr;
+  if (!XGetWindowAttributes(otk::OBDisplay::display, e.window, &attr)) return;
+
+  // if not on the window any more, it isnt a CLICK
+  if (!(e.same_screen && e.x >= 0 && e.y >= 0 &&
+        e.x < attr.width && e.y < attr.height))
+    return;
 
   // XXX: run the CLICK guile hook
-  printf("GUILE: CLICK: win %lx modifiers %ux button %ud time %lx",
-         (long)win, modifiers, button, time);
+  printf("GUILE: CLICK: win %lx modifiers %u button %u time %lx\n",
+         (long)e.window, e.state, e.button, e.time);
 
   if (_presses[0]->win == _presses[1]->win &&
       _presses[0]->button == _presses[1]->button &&
-      time - _presses[1]->time < DOUBLECLICKDELAY) {
+      e.time - _presses[1]->time < DOUBLECLICKDELAY) {
 
     // XXX: run the DOUBLECLICK guile hook
-    printf("GUILE: DOUBLECLICK: win %lx modifiers %ux button %ud time %lx",
-           (long)win, modifiers, button, time);
+    printf("GUILE: DOUBLECLICK: win %lx modifiers %u button %u time %lx\n",
+           (long)e.window, e.state, e.button, e.time);
 
   }
 }
@@ -94,7 +95,7 @@ void OBActions::enter(Window win, unsigned int modifiers)
 
   (void)modifiers;
   // XXX: run the ENTER guile hook
-  printf("GUILE: ENTER: win %lx modifiers %ux", (long)win, modifiers);
+  printf("GUILE: ENTER: win %lx modifiers %u\n", (long)win, modifiers);
 
 }
 
@@ -103,7 +104,7 @@ void OBActions::leave(unsigned int modifiers)
 {
   (void)modifiers;
   // XXX: run the LEAVE guile hook
-  printf("GUILE: LEAVE: win %lx modifiers %ux", (long)_enter_win, modifiers);
+  printf("GUILE: LEAVE: win %lx modifiers %u\n", (long)_enter_win, modifiers);
 
   _enter_win = 0;
 }

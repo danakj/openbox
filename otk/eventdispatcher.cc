@@ -11,7 +11,7 @@
 namespace otk {
 
 OtkEventDispatcher::OtkEventDispatcher()
-  : _fallback(0)
+  : _fallback(0), _master(0)
 {
 }
 
@@ -57,6 +57,9 @@ void OtkEventDispatcher::dispatchEvents(void)
 
     if (handler)
       handler->handle(e);
+
+    if (_master)
+      _master->handle(e);
   }
 }
 

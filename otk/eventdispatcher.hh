@@ -24,9 +24,16 @@ public:
   { _fallback = fallback; }
   OtkEventHandler *getFallbackHandler(void) const { return _fallback; }
 
+  //! Sets an event handler that gets all events for all handlers after
+  //! any specific handlers have received them
+  inline void setMasterHandler(OtkEventHandler *master)
+  { _master = master; }
+  OtkEventHandler *getMasterHandler(void) const { return _master; }
+  
 private:
   OtkEventMap _map;
   OtkEventHandler *_fallback;
+  OtkEventHandler *_master;
 
   //! The time at which the last XEvent with a time was received
   Time _lasttime; // XXX: store this! also provide an accessor!

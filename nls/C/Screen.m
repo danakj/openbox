@@ -1,51 +1,53 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: un error ocurrió mientras cuestionaba el servidor X.\n  otro gestor de ventanas se está ejecutando en conexión de despliegue %s.\n
+# BScreen::BScreen: viga X serveri küsitlemisel.\n  \
+teine akahaldur juba töötab displeil %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: gestionando la pantalla %d usando visual 0x%lx, profundidad %d\n
+# BScreen::BScreen: haldame displeid %d reolutsioonis 0x%lx, vörvisügavusel %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): no se puede cargar el tipo de letra '%s'\n
+# BScreen::LoadStyle(): ei saanud laadida fonti '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): no se puede cargar el tipo de letra por omisión.\n
+# BScreen::LoadStyle(): ei saanud laadida vaikimisi määratud fonti.\n
 $ #EmptyMenuFile
-# %s: archivo de menú vacío\n
+# %s: tühi menüüfail\n
 $ #xterm
 # xterm
 $ #Restart
-# Reiniciar
+# Restart
 $ #Exit
-# Salir
+# Välju
 $ #EXECError
-# BScreen::parseMenuFile: [exec] error, no hay etiqueta de menú ni comando definido\n
+# BScreen::parseMenuFile: [exec] viga, menüü pealkirja ja/või käsku pole määratud\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [exit] viga, menüü pealkirja pole määratud\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] error, no hay etiqueta de menú ni archivo \
-definido\n
+# BScreen::parseMenuFile: [style] viga, menüü pealkirja ja/või failinime \
+pole määratud\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [config] viga, menüü pealkirja pole määratud\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] error, no hay nombre de archivo definido\n
+# BScreen::parseMenuFile: [include] viga, failinime pole määratud\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] error, '%s' no es un archivo regular\n
+# BScreen::parseMenuFile: [include] viga, '%s' ei ole tavaline fail\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [submenu] viga, menüü pealkirja pole määratud\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [restart] viga, menüü pealkirja pole määratud\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [reconfig] viga, menüü pealkirja pole määratud\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, no hay directorio definido\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, kataloogi pole määratud\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' no es un directorio\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, '%s' pole kataloog\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' no existe\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, '%s' pole olemas\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] error, no hay etiqueta de menú definida\n
+# BScreen::parseMenuFile: [workspaces] viga, menüü pealkirja pole määratud\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
 # W: %4d x H: %4d
+

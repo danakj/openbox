@@ -7,7 +7,7 @@ $ #NoStrftimeDateFormat
 $ #NoStrftimeDateFormatEu
 # %02d.%02d.%02d
 $ #NoStrftimeTimeFormat24
-# %02d:%02d
+#  %02d:%02d 
 $ #NoStrftimeTimeFormat12
 # %02d:%02d %sm
 $ #NoStrftimeTimeFormatP
@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Escritorio
+# Tegumiriba
 $ #EditWkspcName
-# Cambiar el nombre del escritorio actual
+# Muuda töölaua nime
 $ #ToolbarPlacement
-# Ubicación de la barra de herramientas
+# Tegumiriba asukoht

@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Slit
+# Pragu
 $ #SlitDirection
-# Dirección de slit
+# Prao suund
 $ #SlitPlacement
-# Ubicación de slit
+# Prao asukoht

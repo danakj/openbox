@@ -1,7 +1,7 @@
 # Makefile.am for Blackbox - an X11 Window Manager
 
 NLSTEST = @NLS@
-THE_LANG = es_ES
+THE_LANG = et_ET
 THE_NLS_PATH = $(DESTDIR)$(pkgdatadir)/nls/$(THE_LANG)
 CLEANFILES = blackbox.cat
 MAINTAINERCLEANFILES = Makefile.in Translation.m
@@ -14,13 +14,10 @@ install-data-local: blackbox.cat
 		echo "Installing catalog in $(THE_NLS_PATH)"; \
 		$(mkinstalldirs) $(THE_NLS_PATH); \
 		$(INSTALL_DATA) blackbox.cat $(THE_NLS_PATH); \
-		rm -f $(DESTDIR)$(pkgdatadir)/nls/es; \
-		ln -f -s es_ES $(DESTDIR)$(pkgdatadir)/nls/es; \
 	fi
 uninstall-local:
 	@if test x$(NLSTEST) = "x-DNLS"; then \
 		rm -f $(THE_NLS_PATH)/blackbox.cat; \
-		rm -f $(DESTDIR)$(pkgdatadir)/nls/es; \
 		rmdir $(THE_NLS_PATH); \
 	fi
 

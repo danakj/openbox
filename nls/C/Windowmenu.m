@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Enviar a ...
+# Saada...
 $ #Shade
-# Enrollar
+# Varjuta
 $ #Iconify
-# Convertir en icono
+# Ikoniseeri
 $ #Maximize
-# Maximizar
+# Suurenda
 $ #Raise
-# Elevar
+# Esiplaanile
 $ #Lower
-# Bajar
+# Tahaplaanile
 $ #Stick
-# Fijar
+# Kleebi
 $ #KillClient
-# Matar al cliente
+# Killi klient
 $ #Close
-# Cerrar
+# Sulge

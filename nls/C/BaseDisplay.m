@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  Un error de X: %s(%d) clave de operación %d/%d\n  recurso 0x%lx\n
+# %s:  X'i viga: %s(%d) opkood %d/%d\n  resurss 0x%lx\n
 $ #SignalCaught
-# %s: señal %d capturada\n
+# %s: signaal %d püütud\n
 $ #ShuttingDown
-# cerrando\n
+# lõpetame\n
 $ #Aborting
-# cancelando... generando 'core'\n
+# katkestame... mälupilt tehtud\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: la conexión al servidor de X falló.\n
+# BaseDisplay::BaseDisplay: ühenduse saamine X serveriga ebaõnnestus.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: no se pude marcar la conexión de despliegue como close-on-exec\n
+# BaseDisplay::BaseDisplay: ühenduse märgistamine 'close-on-exec' ebaõnnestus\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): quitando la ventana errónea de la cola de eventos\n
+# BaseDisplay::eventLoop(): eemaldame vigase akna tominigute reast\n

@@ -112,7 +112,6 @@ AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  themes/Makefile
 		 data/Makefile
-                 render/Makefile
 		 glft/Makefile
                  render2/Makefile
 		 parser/Makefile

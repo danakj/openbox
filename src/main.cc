@@ -94,6 +94,11 @@ int main(int argc, char **argv) {
   char *rc_file = (char *) 0;
   char *menu_file = (char *) 0;
 
+  // initialize the locale
+  setlocale(LC_ALL, "");
+  bindtextdomain(PACKAGE, LOCALEDIR);
+  textdomain(PACKAGE);
+  
   for (int i = 1; i < argc; ++i) {
     if (! strcmp(argv[i], "-rc")) {
       // look for alternative rc file to use

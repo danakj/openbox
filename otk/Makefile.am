@@ -1,5 +1,4 @@
-CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@ \
--Dmultibyte\(\)=True
+CPPFLAGS=`pkg-config --cflags xft` @CPPFLAGS@
 
 INCLUDES= -I../src
 

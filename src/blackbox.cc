@@ -89,6 +89,7 @@ Blackbox *blackbox;
 
 Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
   : BaseDisplay(m_argv[0], dpy_name) {
+
   if (! XSupportsLocale())
     fprintf(stderr, "X server does not support locale\n");
 

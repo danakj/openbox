@@ -9,6 +9,13 @@ import windowplacement # fallback routines
 ### Options for the historyplacement module (Options in the                ###
 ### windowplacement module also apply!):                                   ###
 ###                                                                        ###
+# ignore_requested_positions - When true, the placement algorithm will     ###
+###                            attempt to place windows even when they     ###
+###                            request a position (like XMMS).             ###
+###                            Note this only applies to normal windows,   ###
+###                            not to special cases like desktops and      ###
+###                            docks.                                      ###
+ignore_requested_positions = 0                                             ###
 # fallback - The window placement algorithm that will be used when history ###
 ###          placement does not have a place for the window.               ###
 fallback = windowplacement.random                                          ###
@@ -104,8 +111,7 @@ def _find(screen, state):
 def place(data):
     global _data
     if data.client:
-        if not (windowplacement.ignore_requested_positions and
-                data.client.normal()):
+        if not (ignore_requested_positions and data.client.normal()):
             if data.client.positionRequested(): return
         state = _create_state(data)
         try:

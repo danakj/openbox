@@ -10,13 +10,6 @@
 ##############################################################################
 ### Options for the windowplacement module:                                ###
 ###                                                                        ###
-# ignore_requested_positions - When true, the placement algorithm will     ###
-###                            attempt to place windows even when they     ###
-###                            request a position (like XMMS).             ###
-###                            Note this only applies to normal windows,   ###
-###                            not to special cases like desktops and      ###
-###                            docks.                                      ###
-ignore_requested_positions = 0                                             ###
 ###                                                                        ###
 ##############################################################################
 
@@ -29,8 +22,7 @@ _rand = random.Random()
 def random(data):
     """Place windows randomly around the screen."""
     if not data.client: return
-    if not (ignore_requested_positions and data.client.normal()):
-        if data.client.positionRequested(): return
+    if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area()
@@ -49,8 +41,7 @@ _cascade_y = 0
 def cascade(data):
     """Place windows in a cascading order from top-left to bottom-right."""
     if not data.client: return
-    if not (ignore_requested_positions and data.client.normal()):
-        if data.client.positionRequested(): return
+    if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area()

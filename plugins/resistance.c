@@ -255,6 +255,15 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
             *h = rb - al + 1;
         break;
     }
+
+    /* round down for size increments */
+    *w -= c->frame->area.width + c->frame->size.left + c->frame->size.right;
+    *w = *w / c->size_inc.width * c->size_inc.width;
+    *w += c->frame->area.width + c->frame->size.left + c->frame->size.right;
+
+    *h -= c->frame->area.height + c->frame->size.top + c->frame->size.bottom;
+    *h = *h / c->size_inc.height * c->size_inc.height;
+    *h += c->frame->area.height + c->frame->size.top + c->frame->size.bottom;
 }
 
 static void event(ObEvent *e, void *foo)

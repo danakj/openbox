@@ -350,6 +350,8 @@ void screen_set_num_desktops(guint num)
 
     g_assert(num > 0);
 
+    if (screen_num_desktops == num) return;
+
     old = screen_num_desktops;
     screen_num_desktops = num;
     PROP_SET32(RootWindow(ob_display, ob_screen),

@@ -10,336 +10,387 @@ extern "C" {
 #endif // SHAPE
 }
 
-#include "openbox.hh"
 #include "frame.hh"
 #include "client.hh"
-#include "python.hh"
-#include "bindings.hh"
+#include "openbox.hh"
 #include "otk/display.hh"
 
 #include <string>
+#include <cassert>
 
 namespace ob {
 
 const long Frame::event_mask;
 
-Frame::Frame(Client *client, otk::RenderStyle *style)
-  : otk::Widget(openbox, style, Horizontal, 0, 1, true),
-    WidgetBase(WidgetBase::Type_Frame),
-    _client(client),
-    _screen(otk::display->screenInfo(client->screen())),
-    _plate(this, WidgetBase::Type_Plate),
-    _titlebar(this, WidgetBase::Type_Titlebar),
-    _button_close(&_titlebar, WidgetBase::Type_CloseButton, client),
-    _button_iconify(&_titlebar, WidgetBase::Type_IconifyButton, client),
-    _button_max(&_titlebar, WidgetBase::Type_MaximizeButton, client),
-    _button_alldesk(&_titlebar, WidgetBase::Type_AllDesktopsButton, client),
-    _label(&_titlebar, WidgetBase::Type_Label),
-    _handle(this, WidgetBase::Type_Handle),
-    _grip_left(&_handle, WidgetBase::Type_LeftGrip, client),
-    _grip_right(&_handle, WidgetBase::Type_RightGrip, client),
-    _decorations(client->decorations())
+Window createWindow(const otk::ScreenInfo *info, Window parent, 
+                    unsigned long mask, XSetWindowAttributes *attrib)
 {
-  assert(client);
-  assert(style);
-
-  XSelectInput(**otk::display, _window, Frame::event_mask);
-
-  _grip_left.setCursor(openbox->cursors().ll_angle);
-  _grip_right.setCursor(openbox->cursors().lr_angle);
-  
-  _label.setText(_client->title());
-
-  _style = 0;
-  setStyle(style);
-
-  otk::Widget::unfocus(); // stuff starts out appearing focused in otk
-  
-  _plate.show(); // the other stuff is shown based on decor settings
+  return XCreateWindow(**otk::display, parent, 0, 0, 1, 1, 0,
+                       info->depth(), InputOutput, info->visual(),
+                       mask, attrib);
+                       
 }
 
+Frame::Frame(Client *client)
+  : _client(client),
+    _visible(false),
+    _plate(0),
+    _title(0),
+    _label(0),
+    _handle(0),
+    _lgrip(0),
+    _rgrip(0),
+    _buttons(0),
+    _numbuttons(0),
+    _titleorder(0),
+    _frame_sur(0),
+    _title_sur(0),
+    _label_sur(0),
+    _handle_sur(0),
+    _grip_sur(0),
+    _buttons_sur(0)
+{
+  assert(client);
+
+  XSetWindowAttributes attrib;
+  unsigned long mask;
+  const otk::ScreenInfo *info = otk::display->screenInfo(client->screen());
+
+  // create all of the decor windows (except title bar buttons)
+  mask = CWOverrideRedirect | CWEventMask;
+  attrib.event_mask = Frame::event_mask;
+  attrib.override_redirect = true;
+  _frame = createWindow(info, info->rootWindow(), mask, &attrib);
+
+  mask = 0;
+  _plate = createWindow(info, _frame, mask, &attrib);
+  mask = CWEventMask;
+  attrib.event_mask = (ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
+                       ExposureMask);
+  _title = createWindow(info, _frame, mask, &attrib);
+  _label = createWindow(info, _title, mask, &attrib);
+  _handle = createWindow(info, _frame, mask, &attrib);
+  mask |= CWCursor;
+  attrib.cursor = openbox->cursors().ll_angle;
+  _lgrip = createWindow(info, _handle, mask, &attrib);
+  attrib.cursor = openbox->cursors().lr_angle;
+  _rgrip = createWindow(info, _handle, mask, &attrib);
+
+  // the other stuff is shown based on decor settings
+  XMapWindow(**otk::display, _plate);
+  XMapWindow(**otk::display, _lgrip);
+  XMapWindow(**otk::display, _rgrip);
+  XMapWindow(**otk::display, _label);
+
+  applyStyle(*otk::RenderStyle::style(_client->screen()));
+
+  // XXX load buttons
+  _numbuttons = 0;
+  _buttons = new Window[0];
+  _buttons_sur = new otk::Surface*[0];
+  _titleorder = new unsigned int[1];
+  _titleorder[0] = (unsigned)-1;
+
+  // register all of the windows with the event dispatcher
+  Window *w = allWindows();
+  for (unsigned int i = 0; w[i]; ++i)
+    openbox->registerHandler(w[i], this);
+  delete [] w;
+}
 
 Frame::~Frame()
 {
-}
+  // unregister all of the windows with the event dispatcher
+  Window *w = allWindows();
+  for (unsigned int i = 0; w[i]; ++i)
+    openbox->clearHandler(w[i]);
+  delete [] w;
 
-
-void Frame::setTitle(const otk::ustring &text)
-{
-  _label.setText(text);
-  _label.update();
-}
-
-
-void Frame::setStyle(otk::RenderStyle *style)
-{
-  assert(style);
-
-  // if a style was previously set, then 'replace' is true, cause we're
-  // replacing a style
-  bool replace = (_style);
-
-  otk::Widget::setStyle(style);
-
-  if (replace) {
-    // XXX: do shit here whatever
+  for (unsigned int i = 0; i < _numbuttons; ++i) {
+    XDestroyWindow(**otk::display, _buttons[i]);
+    delete _buttons_sur[i];
   }
+  XDestroyWindow(**otk::display, _rgrip);
+  XDestroyWindow(**otk::display, _lgrip);
+  XDestroyWindow(**otk::display, _handle);
+  XDestroyWindow(**otk::display, _label);
+  XDestroyWindow(**otk::display, _title);
+  XDestroyWindow(**otk::display, _frame);
+
+  if (_frame_sur) delete _frame_sur;
+  if (_title_sur) delete _title_sur;
+  if (_label_sur) delete _label_sur;
+  if (_handle_sur) delete _handle_sur;
+  if (_grip_sur) delete _grip_sur;
+
+  delete [] _buttons;
+  delete [] _titleorder;
+  delete [] _buttons_sur;
+}
+
+void Frame::show()
+{
+  if (!_visible) {
+    _visible = true;
+    XMapWindow(**otk::display, _frame);
+  }
+}
+
+void Frame::hide()
+{
+  if (_visible) {
+    _visible = false;
+    XUnmapWindow(**otk::display, _frame);
+  }
+}
+
+MouseContext::MC Frame::mouseContext(Window win) const
+{
+  if (win == _frame)  return MouseContext::Frame;
+  if (win == _title ||
+      win == _label)  return MouseContext::Titlebar;
+  if (win == _handle) return MouseContext::Handle;
+  if (win == _plate)  return MouseContext::Window;
+  if (win == _lgrip ||
+      win == _rgrip)  return MouseContext::Grip;
+  return (MouseContext::MC) -1;
+}
+
+Window *Frame::allWindows() const
+{
+  Window *w = new Window[7 + _numbuttons + 1];
+  unsigned int i = 0;
+  w[i++] = _frame;
+  w[i++] = _plate;
+  w[i++] = _title;
+  w[i++] = _label;
+  w[i++] = _handle;
+  w[i++] = _lgrip;
+  w[i++] = _rgrip;
+  for (unsigned int j = 0; j < _numbuttons; ++j)
+    w[j + i++] = _buttons[j];
+  w[i] = 0;
+  return w;
+}
+
+void Frame::applyStyle(const otk::RenderStyle &style)
+{
+  // set static border colors
+  XSetWindowBorder(**otk::display, _frame, style.frameBorderColor()->pixel());
+  XSetWindowBorder(**otk::display, _title, style.frameBorderColor()->pixel());
+  XSetWindowBorder(**otk::display, _handle, style.frameBorderColor()->pixel());
+  XSetWindowBorder(**otk::display, _lgrip, style.frameBorderColor()->pixel());
+  XSetWindowBorder(**otk::display, _rgrip, style.frameBorderColor()->pixel());
+
+  // size all the fixed-size elements
+  geom.font_height = style.labelFont()->height();
+  if (geom.font_height < 1) geom.font_height = 1;
+  geom.button_size = geom.font_height - 2;
+  if (geom.button_size < 1) geom.button_size = 1;
+  geom.handle_height = style.handleWidth();
+  if (geom.handle_height < 1) geom.handle_height = 1;
+  geom.bevel = style.bevelWidth();
   
-  _style = style;
-
-  setBorderColor(_style->frameBorderColor());
-
-  // if !replace, then adjust() will get called after the client is grabbed!
-  if (replace) {
-    // size/position everything
-    adjustSize();
-    adjustPosition();
-  }
+  XResizeWindow(**otk::display, _lgrip, geom.grip_width(), geom.handle_height);
+  XResizeWindow(**otk::display, _rgrip, geom.grip_width(), geom.handle_height);
+  
+  for (unsigned int i = 0; i < _numbuttons; ++i)
+    XResizeWindow(**otk::display, _buttons[i],
+                  geom.button_size, geom.button_size);
 }
 
-
-void Frame::focus()
+void Frame::styleChanged(const otk::RenderStyle &style)
 {
-  otk::Widget::focus();
-  update();
+  applyStyle(style);
+  
+  // size/position everything
+  adjustSize();
+  adjustPosition();
 }
 
-
-void Frame::unfocus()
+void Frame::adjustFocus()
 {
-  otk::Widget::unfocus();
-  update();
+  // XXX optimizations later...
+  adjustSize();
 }
 
-
-void Frame::adjust()
+void Frame::adjustTitle()
 {
-  // the party all happens in adjustSize
+  // XXX optimizations later...
+  adjustSize();
 }
 
+static void render(int screen, const otk::Size &size, Window win,
+                   otk::Surface **surface,
+                   const otk::RenderTexture &texture)
+{
+  otk::Surface *s = new otk::Surface(screen, size);
+  otk::display->renderControl(screen)->drawBackground(*s, texture);
+  XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
+  XClearWindow(**otk::display, win);
+  if (*surface) delete *surface;
+  *surface = s;
+}
 
 void Frame::adjustSize()
 {
-  // XXX: only if not overridden or something!!! MORE LOGIC HERE!!
-  _decorations = _client->decorations();
+  Client::DecorationFlags decorations = _client->decorations();
+  const otk::RenderStyle *style = otk::RenderStyle::style(_client->screen());
 
-  // true/false for whether to show each element of the titlebar
-  bool tit_i = false, tit_m = false, tit_s = false, tit_c = false;
-  int width;   // the width of the client and its border
-  int bwidth;  // width to make borders
-  int cbwidth; // width of the inner client border
-  int fontheight = _style->labelFont()->height(); // height of the font
-  int butsize = fontheight - 2; // width and height of the titlebar buttons
-  const int bevel = _style->bevelWidth();
-  
-  if (_decorations & Client::Decor_Border) {
-    bwidth = _style->frameBorderWidth();
-    cbwidth = _style->clientBorderWidth();
-  } else
-    bwidth = cbwidth = 0;
-  _innersize.left = _innersize.top = _innersize.bottom = _innersize.right =
-    cbwidth;
-  width = _client->area().width() + cbwidth * 2;
-
-  _plate.setBorderWidth(cbwidth);
-
-  setBorderWidth(bwidth);
-  _titlebar.setBorderWidth(bwidth);
-  _grip_left.setBorderWidth(bwidth);
-  _grip_right.setBorderWidth(bwidth);
-  _handle.setBorderWidth(bwidth);
-  
-  if (_decorations & Client::Decor_Titlebar) {
-    // set the titlebar size
-    _titlebar.setGeometry(-bwidth,
-                          -bwidth,
-                          width,
-                          _style->labelFont()->height() + (bevel * 2));
-    _innersize.top += _titlebar.height() + bwidth;
-
-    // set the label size
-    _label.setGeometry(0, bevel, width, fontheight);
-    // set the buttons sizes
-    if (_decorations & Client::Decor_Iconify)
-      _button_iconify.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & Client::Decor_Maximize)
-      _button_max.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & Client::Decor_AllDesktops)
-      _button_alldesk.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & Client::Decor_Close)
-      _button_close.setGeometry(0, bevel + 1, butsize, butsize);
-
-    // separation between titlebar elements
-    const int sep = bevel + 1;
-
-    otk::ustring layout;
-    if (!python_get_string("TITLEBAR_LAYOUT", &layout))
-      layout = "ILMC";
-
-    // this code ensures that the string only has one of each possible
-    // letter, all of the letters are valid, and L exists somewhere in the
-    // string!
-    bool tit_l = false;
-  
-    for (std::string::size_type i = 0; i < layout.size(); ++i) {
-      switch (layout[i]) {
-      case 'i':
-      case 'I':
-        if (!tit_i && (_decorations & Client::Decor_Iconify)) {
-          tit_i = true;
-          continue;
-        }
-        break;
-      case 'l':
-      case 'L':
-        if (!tit_l) {
-          tit_l = true;
-          continue;
-        }
-        break;
-      case 'm':
-      case 'M':
-        if (!tit_m && (_decorations & Client::Decor_Maximize)) {
-          tit_m = true;
-          continue;
-        }
-        break;
-      case 'd':
-      case 'D':
-        if (!tit_s && (_decorations & Client::Decor_AllDesktops)) {
-          tit_s = true;
-          continue;
-        }
-        break;
-      case 'c':
-      case 'C':
-        if (!tit_c && (_decorations & Client::Decor_Close)) {
-          tit_c = true;
-          continue;
-        }
-        break;
-      }
-      // if we get here then we don't want the letter, kill it
-      layout.erase(i--, 1);
-    }
-    if (!tit_l)
-      layout += "L";
-    
-    // the size of the label. this ASSUMES the layout has only buttons other
-    // that the ONE LABEL!!
-    // adds an extra sep so that there's a space on either side of the
-    // titlebar.. note: x = sep, below.
-    int lwidth = width - sep * 2 -
-      (butsize + sep) * (layout.size() - 1);
-    // quick sanity check for really small windows. if this is needed, its
-    // obviously not going to be displayed right...
-    // XXX: maybe we should make this look better somehow? constraints?
-    if (lwidth <= 0) lwidth = 1;
-    _label.setWidth(lwidth);
-
-    int x = sep;
-    for (std::string::size_type i = 0, len = layout.size(); i < len; ++i) {
-      switch (layout[i]) {
-      case 'i':
-      case 'I':
-        _button_iconify.move(x, _button_iconify.rect().y());
-        x += _button_iconify.width();
-        break;
-      case 'l':
-      case 'L':
-        _label.move(x, _label.rect().y());
-        x += _label.width();
-        break;
-      case 'm':
-      case 'M':
-        _button_max.move(x, _button_max.rect().y());
-        x += _button_max.width();
-        break;
-      case 'd':
-      case 'D':
-        _button_alldesk.move(x, _button_alldesk.rect().y());
-        x += _button_alldesk.width();
-        break;
-      case 'c':
-      case 'C':
-        _button_close.move(x, _button_close.rect().y());
-        x += _button_close.width();
-        break;
-      default:
-        assert(false); // the layout string is invalid!
-      }
-      x += sep;
-    }
-  }
-
-  if (_decorations & Client::Decor_Handle) {
-    _handle.setGeometry(-bwidth,
-                        _innersize.top + _client->area().height() + cbwidth,
-                        width, _style->handleWidth());
-    _grip_left.setGeometry(-bwidth,
-                           -bwidth,
-                           butsize * 2,
-                           _handle.height());
-    _grip_right.setGeometry(((_handle.rect().right() + 1) -
-                             butsize * 2),
-                            -bwidth,
-                            butsize * 2,
-                            _handle.height());
-    _innersize.bottom += _handle.height() + bwidth;
-  }
-  
-
-  // position/size all the windows
-
-  if (_client->shaded())
-    resize(_innersize.left + _innersize.right + _client->area().width(),
-           _titlebar.height());
-  else
-    resize(_innersize.left + _innersize.right + _client->area().width(),
-           _innersize.top + _innersize.bottom + _client->area().height());
-
-  _plate.setGeometry(_innersize.left - cbwidth, _innersize.top - cbwidth,
-                     _client->area().width(), _client->area().height());
-
-  // map/unmap all the windows
-  if (_decorations & Client::Decor_Titlebar) {
-    _label.show();
-    if (tit_i)
-      _button_iconify.show();
-    else
-      _button_iconify.hide();
-    if (tit_m)
-      _button_max.show();
-    else
-      _button_max.hide();
-    if (tit_s)
-      _button_alldesk.show();
-    else
-      _button_alldesk.hide();
-    if (tit_c)
-      _button_close.show();
-    else
-      _button_close.hide();
-    _titlebar.show();
+  if (decorations & Client::Decor_Border) {
+    geom.bwidth = style->frameBorderWidth();
+    geom.cbwidth = style->clientBorderWidth();
   } else {
-    _titlebar.hide(true);
+    geom.bwidth = geom.cbwidth = 0;
+  }
+  _innersize.left = _innersize.top = _innersize.bottom = _innersize.right =
+    geom.cbwidth;
+  geom.width = _client->area().width() + geom.cbwidth * 2;
+  assert(geom.width > 0);
+
+  // set border widths
+  XSetWindowBorderWidth(**otk::display, _plate, geom.cbwidth);
+  XSetWindowBorderWidth(**otk::display, _frame, geom.bwidth);
+  XSetWindowBorderWidth(**otk::display, _title, geom.bwidth);
+  XSetWindowBorderWidth(**otk::display, _handle, geom.bwidth);
+  XSetWindowBorderWidth(**otk::display, _lgrip, geom.bwidth);
+  XSetWindowBorderWidth(**otk::display, _rgrip, geom.bwidth);
+  
+  // position/size and map/unmap all the windows
+
+  if (decorations & Client::Decor_Titlebar) {
+    XMoveResizeWindow(**otk::display, _title, -geom.bwidth, -geom.bwidth,
+                      geom.width, geom.title_height());
+    _innersize.top += geom.title_height() + geom.bwidth;
+    XMapWindow(**otk::display, _title);
+
+    // layout the title bar elements
+    layoutTitle();
+  } else
+    XUnmapWindow(**otk::display, _title);
+
+  if (decorations & Client::Decor_Handle) {
+    geom.handle_y = _innersize.top + _client->area().height() + geom.cbwidth;
+    XMoveResizeWindow(**otk::display, _handle, -geom.bwidth, geom.handle_y,
+                      geom.width, geom.handle_height);
+    XMoveWindow(**otk::display, _lgrip, -geom.bwidth, -geom.bwidth);
+    XMoveWindow(**otk::display, _rgrip,
+                -geom.bwidth + geom.width - geom.grip_width(),
+                -geom.bwidth);
+    _innersize.bottom += geom.handle_height + geom.bwidth;
+    XMapWindow(**otk::display, _handle);
+  } else
+    XUnmapWindow(**otk::display, _handle);
+  
+  XResizeWindow(**otk::display, _frame, geom.width,
+                (_client->shaded() ? geom.title_height() :
+                 _innersize.top + _innersize.bottom +
+                 _client->area().height()));
+
+  XMoveResizeWindow(**otk::display, _plate,
+                    _innersize.left - geom.cbwidth,
+                    _innersize.top - geom.cbwidth,
+                    _client->area().width(), _client->area().height());
+
+  _size.left   = _innersize.left + geom.bwidth;
+  _size.right  = _innersize.right + geom.bwidth;
+  _size.top    = _innersize.top + geom.bwidth;
+  _size.bottom = _innersize.bottom + geom.bwidth;
+
+  _area = otk::Rect(_area.position(), otk::Size(_client->area().width() +
+                                                _size.left + _size.right,
+                                                _client->area().height() +
+                                                _size.top + _size.bottom));
+
+  // render all the elements
+  int screen = _client->screen();
+  bool focus = _client->focused();
+  if (decorations & Client::Decor_Titlebar) {
+    render(screen, otk::Size(geom.width, geom.title_height()), _title,
+           &_title_sur, *(focus ? style->titlebarFocusBackground() :
+                          style->titlebarUnfocusBackground()));
+    
+    renderLabel();
   }
 
-  if (_decorations & Client::Decor_Handle)
-    _handle.show(true);
-  else
-    _handle.hide(true);
+  if (decorations & Client::Decor_Handle) {
+    render(screen, otk::Size(geom.width, geom.handle_height), _handle,
+           &_handle_sur, *(focus ? style->handleFocusBackground() :
+                           style->handleUnfocusBackground()));
+    render(screen, otk::Size(geom.grip_width(), geom.handle_height), _lgrip,
+           &_grip_sur, *(focus ? style->gripFocusBackground() :
+                         style->gripUnfocusBackground()));
+    XSetWindowBackgroundPixmap(**otk::display, _rgrip, _grip_sur->pixmap());
+    XClearWindow(**otk::display, _rgrip);
+  }
+
+  XSetWindowBorder(**otk::display, _plate,
+                   focus ? style->clientBorderFocusColor()->pixel() :
+                   style->clientBorderUnfocusColor()->pixel());
   
-  _size.left   = _innersize.left + bwidth;
-  _size.right  = _innersize.right + bwidth;
-  _size.top    = _innersize.top + bwidth;
-  _size.bottom = _innersize.bottom + bwidth;
-
   adjustShape();
-
-  update();
 }
 
+void Frame::renderLabel()
+{
+  const otk::RenderStyle *style = otk::RenderStyle::style(_client->screen());
+  const otk::RenderControl *control =
+    otk::display->renderControl(_client->screen());
+  const otk::Font *font = style->labelFont();
+
+  otk::Surface *s = new otk::Surface(_client->screen(),
+                                     otk::Size(geom.label_width,
+                                               geom.label_height()));
+  control->drawBackground(*s, *(_client->focused() ?
+                                style->labelFocusBackground() :
+                                style->labelUnfocusBackground()));
+
+  otk::ustring t = _client->title(); // the actual text to draw
+  int x = geom.bevel;                // x coord for the text
+
+  if ((unsigned)x * 2 > geom.label_width) return; // no room at all
+
+  // find a string that will fit inside the area for text
+  otk::ustring::size_type text_len = t.size();
+  unsigned int length;
+  unsigned int maxsize = geom.label_width - geom.bevel * 2;
+      
+  do {
+    t.resize(text_len);
+    length = font->measureString(t);
+  } while (length > maxsize && text_len-- > 0);
+
+  if (text_len <= 0) return; // won't fit anything
+
+  // justify the text
+  switch (style->labelTextJustify()) {
+  case otk::RenderStyle::RightBottomJustify:
+    x += maxsize - length;
+    break;
+  case otk::RenderStyle::CenterJustify:
+    x += (maxsize - length) / 2;
+    break;
+  case otk::RenderStyle::LeftTopJustify:
+    break;
+  }
+ 
+  control->drawString(*s, *font, x, 0,
+                      *(_client->focused() ? style->textFocusColor() :
+                        style->textUnfocusColor()), t);
+
+  XSetWindowBackgroundPixmap(**otk::display, _label, s->pixmap());
+  XClearWindow(**otk::display, _label);
+  if (_label_sur) delete _label_sur;
+  _label_sur = s;
+}
+
+void Frame::layoutTitle()
+{
+  geom.label_width = geom.width - geom.bevel * 2;
+  if (geom.label_width < 1) geom.label_width = 1;
+  XMoveResizeWindow(**otk::display, _label, geom.bevel, geom.bevel,
+                    geom.label_width, geom.font_height);
+}
 
 void Frame::adjustPosition()
 {
@@ -347,25 +398,25 @@ void Frame::adjustPosition()
   x = _client->area().x();
   y = _client->area().y();
   clientGravity(x, y);
-  move(x, y);
+  XMoveWindow(**otk::display, _frame, x, y);
+  _area = otk::Rect(otk::Point(x, y), _area.size());
 }
 
 
 void Frame::adjustShape()
 {
 #ifdef SHAPE
-  int bwidth = (_decorations & Client::Decor_Border) ?
-    _style->frameBorderWidth() : 0;
+  Client::DecorationFlags decorations = _client->decorations();
   
   if (!_client->shaped()) {
     // clear the shape on the frame window
-    XShapeCombineMask(**otk::display, _window, ShapeBounding,
+    XShapeCombineMask(**otk::display, _frame, ShapeBounding,
                       _innersize.left,
                       _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
-    XShapeCombineShape(**otk::display, _window, ShapeBounding,
+    XShapeCombineShape(**otk::display, _frame, ShapeBounding,
                        _innersize.left,
                        _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);
@@ -373,23 +424,23 @@ void Frame::adjustShape()
     int num = 0;
     XRectangle xrect[2];
 
-    if (_decorations & Client::Decor_Titlebar) {
-      xrect[0].x = _titlebar.rect().x();
-      xrect[0].y = _titlebar.rect().y();
-      xrect[0].width = _titlebar.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
-      xrect[0].height = _titlebar.height() + bwidth * 2;
+    if (decorations & Client::Decor_Titlebar) {
+      xrect[0].x = -geom.bevel;
+      xrect[0].y = -geom.bevel;
+      xrect[0].width = geom.width + geom.bwidth * 2;
+      xrect[0].height = geom.title_height() + geom.bwidth * 2;
       ++num;
     }
 
-    if (_decorations & Client::Decor_Handle) {
-      xrect[1].x = _handle.rect().x();
-      xrect[1].y = _handle.rect().y();
-      xrect[1].width = _handle.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
-      xrect[1].height = _handle.height() + bwidth * 2;
+    if (decorations & Client::Decor_Handle) {
+      xrect[1].x = -geom.bevel;
+      xrect[1].y = geom.handle_y;
+      xrect[1].width = geom.width + geom.bwidth * 2;
+      xrect[1].height = geom.handle_height + geom.bwidth * 2;
       ++num;
     }
 
-    XShapeCombineRectangles(**otk::display, window(),
+    XShapeCombineRectangles(**otk::display, _frame,
                             ShapeBounding, 0, 0, xrect, num,
                             ShapeUnion, Unsorted);
   }
@@ -399,15 +450,15 @@ void Frame::adjustShape()
 
 void Frame::adjustState()
 {
-  _button_alldesk.update();
-  _button_max.update();
+// XXX  _button_alldesk.update();
+// XXX  _button_max.update();
 }
 
 
 void Frame::grabClient()
 {
   // reparent the client to the frame
-  XReparentWindow(**otk::display, _client->window(), _plate.window(), 0, 0);
+  XReparentWindow(**otk::display, _client->window(), _plate, 0, 0);
   /*
     When reparenting the client window, it is usually not mapped yet, since
     this occurs from a MapRequest. However, in the case where Openbox is
@@ -420,7 +471,7 @@ void Frame::grabClient()
     _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config/map req's)
-  XSelectInput(**otk::display, _plate.window(), SubstructureRedirectMask);
+  XSelectInput(**otk::display, _plate, SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
   XMapWindow(**otk::display, _client->window());
@@ -444,7 +495,7 @@ void Frame::releaseClient()
     // according to the ICCCM - if the client doesn't reparent itself, then we
     // will reparent the window to root for them
     XReparentWindow(**otk::display, _client->window(),
-                    _screen->rootWindow(),
+                    otk::display->screenInfo(_client->screen())->rootWindow(),
                     _client->area().x(), _client->area().y());
   }
 }

@@ -29,7 +29,6 @@ namespace ob {
 
 Client::Client(int screen, Window window)
   : otk::EventHandler(),
-    WidgetBase(WidgetBase::Type_Client),
     frame(0), _screen(screen), _window(window)
 {
   assert(screen >= 0);
@@ -581,7 +580,7 @@ void Client::updateTitle()
     _title = _("Unnamed Window");
 
   if (frame)
-    frame->setTitle(_title);
+    frame->adjustTitle();
 }
 
 
@@ -1128,8 +1127,14 @@ void Client::resize(Corner anchor, unsigned int w, unsigned int h)
 void Client::internal_resize(Corner anchor, unsigned int w, unsigned int h,
                              bool user, int x, int y)
 {
-  w -= _base_size.width(); 
-  h -= _base_size.height();
+  if (_base_size.width() < w)
+    w -= _base_size.width();
+  else
+    w = 0;
+  if (_base_size.height() < h)
+    h -= _base_size.height();
+  else
+    h = 0;
 
   if (user) {
     // for interactive resizing. have to move half an increment in each
@@ -1714,8 +1719,8 @@ void Client::focusHandler(const XFocusChangeEvent &e)
   
   otk::EventHandler::focusHandler(e);
 
-  frame->focus();
   _focused = true;
+  frame->adjustFocus();
 
   openbox->setFocusedClient(this);
 }
@@ -1729,26 +1734,29 @@ void Client::unfocusHandler(const XFocusChangeEvent &e)
   
   otk::EventHandler::unfocusHandler(e);
 
-  frame->unfocus();
   _focused = false;
+  frame->adjustFocus();
 
   if (openbox->focusedClient() == this)
     openbox->setFocusedClient(0);
 }
 
 
-void Client::configureRequestHandler(const XConfigureRequestEvent &e)
+void Client::configureRequestHandler(const XConfigureRequestEvent &ec)
 {
 #ifdef    DEBUG
-  printf("ConfigureRequest for 0x%lx\n", e.window);
+  printf("ConfigureRequest for 0x%lx\n", ec.window);
 #endif // DEBUG
   
-  otk::EventHandler::configureRequestHandler(e);
+  otk::EventHandler::configureRequestHandler(ec);
 
   // compress these
+  XConfigureRequestEvent e = ec;
   XEvent ev;
   while (XCheckTypedWindowEvent(**otk::display, window(), ConfigureRequest,
                                 &ev)) {
+    // XXX if this causes bad things.. we can compress config req's with the
+    //     same mask.
     e.value_mask |= ev.xconfigurerequest.value_mask;
     if (ev.xconfigurerequest.value_mask & CWX)
       e.x = ev.xconfigurerequest.x;

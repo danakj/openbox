@@ -8,8 +8,6 @@
 */
 
 #include "screen.hh"
-#include "widgetbase.hh"
-#include "otk/point.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
@@ -56,7 +54,7 @@ struct MwmHints {
   class' member variables and call whatever is nessary to complete the
   change (such as causing a redraw of the titlebar after the title is changed).
 */
-class Client : public otk::EventHandler, public WidgetBase {
+class Client : public otk::EventHandler {
 public:
 
   //! The frame window which decorates around the client window
@@ -229,7 +227,7 @@ private:
     For example, with xterms, this value it the number of characters being
     displayed in the terminal, instead of the number of pixels.
   */
-  otk::Point   _logical_size;
+  otk::Size   _logical_size;
 
   //! Width of the border on the window.
   /*!
@@ -253,20 +251,20 @@ private:
   /*!
     If the min is > the max, then the window is not resizable
   */
-  otk::Point _min_size;
+  otk::Size _min_size;
   //! The maximum size of the client window
   /*!
     If the min is > the max, then the window is not resizable
   */
-  otk::Point _max_size;
+  otk::Size _max_size;
   //! The size of increments to resize the client window by
-  otk::Point _size_inc;
+  otk::Size _size_inc;
   //! The base size of the client window
   /*!
     This value should be subtracted from the window's actual size when
     displaying its size to the user, or working with its min/max size
   */
-  otk::Point _base_size;
+  otk::Size _base_size;
 
   //! Window decoration and functionality hints
   MwmHints _mwmhints;
@@ -481,8 +479,8 @@ private:
     The x and y coordinates must both be sepcified together, or they will have
     no effect. When they are specified, the anchor is ignored.
   */
-  void internal_resize(Corner anchor, int w, int h, bool user = true,
-                       int x = INT_MIN, int y = INT_MIN);
+  void internal_resize(Corner anchor, unsigned int w, unsigned int h,
+                       bool user = true, int x = INT_MIN, int y = INT_MIN);
 
   //! Attempts to find and return a modal child of this window, recursively.
   Client *findModalChild(Client *skip = 0) const;
@@ -629,7 +627,7 @@ BB    @param window The window id that the Client class should handle
     For example, with xterms, this value it the number of characters being
     displayed in the terminal, instead of the number of pixels.
   */
-  const otk::Point &logicalSize() const { return _logical_size; }
+  const otk::Size &logicalSize() const { return _logical_size; }
 
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
@@ -653,7 +651,7 @@ BB    @param window The window id that the Client class should handle
     @param w The width component of the new size for the client.
     @param h The height component of the new size for the client.
   */
-  void resize(Corner anchor, int w, int h);
+  void resize(Corner anchor, unsigned int w, unsigned int h);
 
   //! Reapplies the maximized state to the window
   /*!

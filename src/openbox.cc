@@ -15,6 +15,7 @@
 #include "otk/property.hh"
 #include "otk/util.hh"
 #include "otk/rendercolor.hh"
+#include "otk/renderstyle.hh"
 
 extern "C" {
 #include <X11/cursorfont.h>
@@ -120,6 +121,7 @@ Openbox::Openbox(int argc, char **argv)
   while (waitpid(-1, NULL, WNOHANG) > 0);
 
   otk::RenderColor::initialize();
+  otk::RenderStyle::initialize();
   otk::Timer::initialize();
   otk::Property::initialize();
   _actions = new Actions();
@@ -180,7 +182,7 @@ Openbox::Openbox(int argc, char **argv)
   for (it = _screens.begin(); it != end; ++it) {
     (*it)->manageExisting();
   }
- 
+  
   // grab any keys set up before the screens existed
   _bindings->grabKeys(true);
 
@@ -212,6 +214,7 @@ Openbox::~Openbox()
   //delete _display;
 
   otk::Timer::destroy();
+  otk::RenderStyle::destroy();
   otk::RenderColor::destroy();
 }
 

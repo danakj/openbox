@@ -5,9 +5,9 @@
 #endif
 
 #include "actions.hh"
-#include "widgetbase.hh"
 #include "openbox.hh"
 #include "client.hh"
+#include "frame.hh"
 #include "screen.hh"
 #include "python.hh"
 #include "bindings.hh"
@@ -72,12 +72,20 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
 {
   otk::EventHandler::buttonPressHandler(e);
   insertPress(e);
-  
-  // run the PRESS python hook
-  WidgetBase *w = dynamic_cast<WidgetBase*>
-    (openbox->findHandler(e.window));
-  if (!w) return;
 
+  MouseContext::MC context;
+  EventHandler *h = openbox->findHandler(e.window);
+  Frame *f = dynamic_cast<Frame*>(h);
+  if (f)
+    context= f->mouseContext(e.window);
+  else if (dynamic_cast<Client*>(h))
+    context = MouseContext::Window;
+  else if (dynamic_cast<Screen*>(h))
+    context = MouseContext::Root;
+  else
+    return; // not a valid mouse context
+
+  // run the PRESS python hook
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
@@ -87,7 +95,7 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
+  MouseData data(screen, c, e.time, state, e.button, context,
                  MouseAction::Press);
   openbox->bindings()->fireButton(&data);
     
@@ -95,7 +103,7 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
 
   _button = e.button;
 
-  if (w->mcontext() == MouseContext::Window) {
+  if (context == MouseContext::Window) {
     /*
       Because of how events are grabbed on the client window, we can't get
       ButtonRelease events, so instead we simply manufacture them here, so that
@@ -113,9 +121,17 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   otk::EventHandler::buttonReleaseHandler(e);
   removePress(e);
   
-  WidgetBase *w = dynamic_cast<WidgetBase*>
-    (openbox->findHandler(e.window));
-  if (!w) return;
+  MouseContext::MC context;
+  EventHandler *h = openbox->findHandler(e.window);
+  Frame *f = dynamic_cast<Frame*>(h);
+  if (f)
+    context= f->mouseContext(e.window);
+  else if (dynamic_cast<Client*>(h))
+    context = MouseContext::Window;
+  else if (dynamic_cast<Screen*>(h))
+    context = MouseContext::Root;
+  else
+    return; // not a valid mouse context
 
   // run the RELEASE python hook
   // kill off the Button1Mask etc, only want the modifiers
@@ -127,7 +143,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
+  MouseData data(screen, c, e.time, state, e.button, context,
                  MouseAction::Release);
   openbox->bindings()->fireButton(&data);
 
@@ -260,6 +276,18 @@ void Actions::motionHandler(const XMotionEvent &e)
 
   if (!e.same_screen) return; // this just gets stupid
 
+  MouseContext::MC context;
+  EventHandler *h = openbox->findHandler(e.window);
+  Frame *f = dynamic_cast<Frame*>(h);
+  if (f)
+    context= f->mouseContext(e.window);
+  else if (dynamic_cast<Client*>(h))
+    context = MouseContext::Window;
+  else if (dynamic_cast<Screen*>(h))
+    context = MouseContext::Root;
+  else
+    return; // not a valid mouse context
+
   int x_root = e.x_root, y_root = e.y_root;
   
   // compress changes to a window into a single change
@@ -268,10 +296,6 @@ void Actions::motionHandler(const XMotionEvent &e)
     x_root = e.x_root;
     y_root = e.y_root;
   }
-
-  WidgetBase *w = dynamic_cast<WidgetBase*>
-    (openbox->findHandler(e.window));
-  if (!w) return;
 
   if (!_dragging) {
     long threshold;
@@ -298,7 +322,7 @@ void Actions::motionHandler(const XMotionEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  MouseData data(screen, c, e.time, state, button, w->mcontext(),
+  MouseData data(screen, c, e.time, state, button, context,
                  MouseAction::Motion, x_root, y_root,
                  _posqueue[0]->pos, _posqueue[0]->clientarea);
   openbox->bindings()->fireButton(&data);

@@ -16,11 +16,10 @@ bin_PROGRAMS= openbox3
 openbox3_LDADD=-L../otk -lotk @LIBINTL@
 openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
-                  main.cc backgroundwidget.cc labelwidget.cc \
-                  buttonwidget.cc python.cc bindings.cc
-noinst_HEADERS= actions.hh backgroundwidget.hh bindings.hh buttonwidget.hh \
-                client.hh frame.hh labelwidget.hh openbox.hh python.hh \
-                screen.hh widgetbase.hh gettext.h
+                  main.cc python.cc bindings.cc
+noinst_HEADERS= actions.hh bindings.hh \
+                client.hh frame.hh openbox.hh python.hh \
+                screen.hh
 
 MAINTAINERCLEANFILES= Makefile.in
 

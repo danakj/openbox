@@ -48,8 +48,7 @@ namespace ob {
 
 Screen::Screen(int screen)
   : WidgetBase(WidgetBase::Type_Root),
-    _number(screen),
-    _style(screen, "")
+    _number(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
@@ -91,14 +90,15 @@ Screen::Screen(int screen)
   }
   _style.load(sconfig);
   */
-  otk::display->renderControl(_number)->drawRoot(*_style.rootColor());
+  otk::display->renderControl(_number)->
+    drawRoot(*otk::RenderStyle::style(_number)->rootColor());
 
   // set up notification of netwm support
   changeSupportedAtoms();
 
   // Set the netwm properties for geometry
-  unsigned long geometry[] = { _info->width(),
-                               _info->height() };
+  unsigned long geometry[] = { _info->size().width(),
+                               _info->size().height() };
   otk::Property::set(_info->rootWindow(),
                      otk::Property::atoms.net_desktop_geometry,
                      otk::Property::atoms.cardinal, geometry, 2);
@@ -237,9 +237,9 @@ void Screen::calcArea()
 #endif // XINERAMA
 */
   
-  _area.setRect(_strut.left, _strut.top,
-                _info->width() - (_strut.left + _strut.right),
-                _info->height() - (_strut.top + _strut.bottom));
+  _area = otk::Rect(_strut.left, _strut.top,
+                    _info->size().width() - (_strut.left + _strut.right),
+                    _info->size().height() - (_strut.top + _strut.bottom));
 
 /*
 #ifdef    XINERAMA
@@ -494,7 +494,7 @@ void Screen::manageWindow(Window window)
   XChangeSaveSet(**otk::display, window, SetModeInsert);
 
   // create the decoration frame for the client window
-  client->frame = new Frame(client, &_style);
+  client->frame = new Frame(client);
   // register the plate for events (map req's)
   // this involves removing itself from the handler list first, since it is
   // auto added to the list, being a widget. we won't get any events on the
@@ -503,17 +503,10 @@ void Screen::manageWindow(Window window)
   openbox->registerHandler(client->frame->plate(), client);
 
   // add to the wm's map
-  openbox->addClient(client->frame->window(), client);
-  openbox->addClient(client->frame->plate(), client);
-  openbox->addClient(client->frame->titlebar(), client);
-  openbox->addClient(client->frame->label(), client);
-  openbox->addClient(client->frame->button_max(), client);
-  openbox->addClient(client->frame->button_iconify(), client);
-  openbox->addClient(client->frame->button_alldesk(), client);
-  openbox->addClient(client->frame->button_close(), client);
-  openbox->addClient(client->frame->handle(), client);
-  openbox->addClient(client->frame->grip_left(), client);
-  openbox->addClient(client->frame->grip_right(), client);
+  Window *w = client->frame->allWindows();
+  for (unsigned int i = 0; w[i]; ++i)
+    openbox->addClient(w[i], client);
+  delete [] w;
 
   // reparent the client to the frame
   client->frame->grabClient();
@@ -573,17 +566,10 @@ void Screen::unmanageWindow(Client *client)
 
   // remove from the wm's map
   openbox->removeClient(client->window());
-  openbox->removeClient(frame->window());
-  openbox->removeClient(frame->plate());
-  openbox->removeClient(frame->titlebar());
-  openbox->removeClient(frame->label());
-  openbox->removeClient(frame->button_max());
-  openbox->removeClient(frame->button_iconify());
-  openbox->removeClient(frame->button_alldesk());
-  openbox->removeClient(frame->button_close());
-  openbox->removeClient(frame->handle());
-  openbox->removeClient(frame->grip_left());
-  openbox->removeClient(frame->grip_right());
+  Window *w = frame->allWindows();
+  for (unsigned int i = 0; w[i]; ++i)
+    openbox->addClient(w[i], client);
+  delete [] w;
   // unregister for handling events
   openbox->clearHandler(client->window());
   

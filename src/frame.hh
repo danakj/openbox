@@ -9,20 +9,35 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "client.hh"
-#include "backgroundwidget.hh"
-#include "labelwidget.hh"
-#include "buttonwidget.hh"
+#include "python.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
-#include "otk/screeninfo.hh"
 #include "otk/renderstyle.hh"
-#include "otk/widget.hh"
 #include "otk/ustring.hh"
+#include "otk/surface.hh"
+#include "otk/eventhandler.hh"
 
 #include <string>
 
 namespace ob {
+
+class Client;
+
+//! Varius geometry settings in the frame decorations
+struct FrameGeometry {
+  unsigned int width; // title and handle
+  unsigned int font_height;
+  unsigned int title_height() { return font_height + bevel*2; }
+  unsigned int label_width;
+  unsigned int label_height() { return font_height; }
+  unsigned int handle_height; // static, from the style
+  int handle_y;
+  unsigned int button_size;   // static, from the style
+  unsigned  grip_width() { return button_size * 2; }
+  unsigned  bevel;         // static, from the style
+  unsigned  bwidth;  // frame elements' border width
+  unsigned  cbwidth; // client border width
+};
 
 //! Holds and decorates a frame around an Client (client window)
 /*!
@@ -30,7 +45,7 @@ namespace ob {
   parent with the SubstructureRedirectMask so that structure events for the
   client are sent to the window manager.
 */
-class Frame : public otk::Widget, public WidgetBase {
+class Frame : public otk::StyleNotify, public otk::EventHandler {
 public:
 
   //! The event mask to grab on frame windows
@@ -38,7 +53,6 @@ public:
    
 private:
   Client *_client;
-  const otk::ScreenInfo *_screen;
 
   //! The size of the frame on each side of the client window
   otk::Strut _size;
@@ -46,32 +60,45 @@ private:
   //! The size of the frame on each side of the client window inside the border
   otk::Strut _innersize;
 
-  // decoration windows
-  BackgroundWidget  _plate;   // sits entirely under the client window
-  BackgroundWidget  _titlebar;
-  ButtonWidget      _button_close;
-  ButtonWidget      _button_iconify;
-  ButtonWidget      _button_max;
-  ButtonWidget      _button_alldesk;
-  LabelWidget       _label;
-  BackgroundWidget  _handle;
-  ButtonWidget      _grip_left;
-  ButtonWidget      _grip_right;
+  //! The position and size of the entire frame (including borders)
+  otk::Rect _area;
 
-  //! The decorations to display on the window.
-  /*!
-    This is by default the same value as in the Client::decorations, but it
-    is duplicated here so that it can be overridden per-window by the user.
-  */
-  Client::DecorationFlags _decorations;
+  bool _visible;
+  
+  // decoration windows
+  Window  _frame;   // sits under everything
+  Window  _plate;   // sits entirely under the client window
+  Window  _title;   // the titlebar
+  Window  _label;   // the section of the titlebar which shows the window name
+  Window  _handle;  // bottom bar
+  Window  _lgrip;   // lefthand resize grab on the handle
+  Window  _rgrip;   // righthand resize grab on the handle
+  Window *_buttons; // all of the titlebar buttons
+  unsigned int  _numbuttons; // number of buttons, size of _buttons array
+  unsigned int *_titleorder; // order of the buttons and the label (always
+                             // holds '_numbuttons + 1' elements (for the
+                             // label, which is coded as '-1')
+
+  // surfaces for each 
+  otk::Surface  *_frame_sur;
+  otk::Surface  *_title_sur;
+  otk::Surface  *_label_sur;
+  otk::Surface  *_handle_sur;
+  otk::Surface  *_grip_sur;
+  otk::Surface **_buttons_sur;
+
+  FrameGeometry geom;
+  
+  void applyStyle(const otk::RenderStyle &style);
+  void layoutTitle();
+  void renderLabel();
 
 public:
-  //! Constructs an Frame object, and reparents the client to itself
+  //! Constructs an Frame object for a client
   /*!
-    @param client The client window which will be decorated by the new Frame
-    @param style The style to use to decorate the frame
+    @param client The client which will be decorated by the new Frame
   */
-  Frame(Client *client, otk::RenderStyle *style);
+  Frame(Client *client);
   //! Destroys the Frame object
   virtual ~Frame();
 
@@ -79,18 +106,8 @@ public:
   const otk::Strut& size() const { return _size; }
   
   //! Set the style to decorate the frame with
-  virtual void setStyle(otk::RenderStyle *style);
+  virtual void styleChanged(const otk::RenderStyle &style);
 
-  //! Empty overridden method to prevent automatic alignment of children
-  virtual void adjust();
-  
-  //! Displays focused decorations
-  virtual void focus();
-  //! Displays unfocused decorations
-  virtual void unfocus();
-
-  void setTitle(const otk::ustring &text);
- 
   //! Reparents the client window from the root window onto the frame
   void grabClient();
   //! Reparents the client window back to the root window
@@ -103,8 +120,10 @@ public:
   //! Shape the frame window to the client window
   void adjustShape();
   //! Update the frame to match the client's new state (for things like toggle
-  //! buttons)
+  //! buttons, focus, and the title) XXX break this up
   void adjustState();
+  void adjustFocus();
+  void adjustTitle();
 
   //! Applies gravity to the client's position to find where the frame should
   //! be positioned.
@@ -120,27 +139,32 @@ public:
   */
   void frameGravity(int &x, int &y);
 
-  //! Gets the window id of the frame's "plate" subelement
-  inline Window plate() const { return _plate.window(); }
-  //! Gets the window id of the frame's "titlebar" subelement
-  inline Window titlebar() const { return _titlebar.window(); }
-  //! Gets the window id of the frame's "label" subelement
-  inline Window label() const { return _label.window(); }
-  //! Gets the window id of the frame's "close button" subelement
-  inline Window button_close() const { return _button_close.window(); }
-  //! Gets the window id of the frame's "iconify button" subelement
-  inline Window button_iconify() const { return _button_iconify.window(); }
-  //! Gets the window id of the frame's "maximize button" subelement
-  inline Window button_max() const { return _button_max.window(); }
-  //! Gets the window id of the frame's "all desktops button" subelement
-  inline Window button_alldesk() const { return _button_alldesk.window(); }
-  //! Gets the window id of the frame's "handle" subelement
-  inline Window handle() const { return _handle.window(); }
-  //! Gets the window id of the frame's "left grip" subelement
-  inline Window grip_left() const { return _grip_left.window(); }
-  //! Gets the window id of the frame's "right grip" subelement
-  inline Window grip_right() const { return _grip_right.window(); }
+  //! The position and size of the frame window
+  inline const otk::Rect& area() const { return _area; }
 
+  //! Returns if the frame is visible
+  inline bool visible() const { return _visible; }
+
+  //! Shows the frame
+  void show();
+  //! Hides the frame
+  void hide();
+
+  //! Returns the MouseContext for the given window id
+  /*!
+    Returns '-1' if no valid mouse context exists in the frame for the given
+    id.
+  */
+  ob::MouseContext::MC mouseContext(Window win) const;
+
+  //! Gets the window id of the frame's base top-level parent
+  inline Window window() const { return _frame; }
+  //! Gets the window id of the client's parent window
+  inline Window plate() const { return _plate; }
+
+  //! Returns a null terminated array of the window ids that make up the
+  //! frame's decorations.
+  Window *allWindows() const;
 };
 
 }

@@ -294,7 +294,7 @@ void focus_cycle(gboolean forward, gboolean linear,
     static ObClient *t = NULL;
     static GList *order = NULL;
     GList *it, *start, *list;
-    ObClient *ft;
+    ObClient *ft = NULL;
 
     if (cancel) {
         if (focus_cycle_target)

@@ -1,4 +1,5 @@
 #include "client.h"
+#include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
 #include "prop.h"
@@ -26,9 +27,6 @@
 GList      *client_list      = NULL;
 GHashTable *client_map       = NULL;
 
-static Window *client_startup_stack_order = NULL;
-static guint  client_startup_stack_size = 0;
-
 static void client_get_all(Client *self);
 static void client_toggle_border(Client *self, gboolean show);
 static void client_get_area(Client *self);
@@ -52,11 +50,6 @@ void client_startup()
 {
     client_map = g_hash_table_new((GHashFunc)map_hash,
 				  (GEqualFunc)map_key_comp);
-
-    /* save the stacking order on startup! */
-    PROP_GETA32(ob_root, net_client_list_stacking, window,
-                (guint32**)&client_startup_stack_order,
-                &client_startup_stack_size);
 
     client_set_list();
 }
@@ -95,6 +88,7 @@ void client_manage_all()
     Window w, *children;
     XWMHints *wmhints;
     XWindowAttributes attrib;
+    Client *active;
 
     XQueryTree(ob_display, ob_root, &w, &w, &children, &nchild);
 
@@ -130,19 +124,21 @@ void client_manage_all()
        why with stacking_lower? Why, because then windows who aren't in the
        stacking list are on the top where you can see them instead of buried
        at the bottom! */
-    for (i = client_startup_stack_size; i > 0; --i) {
+    for (i = startup_stack_size; i > 0; --i) {
         Client *c;
 
-        w = client_startup_stack_order[i-1];
+        w = startup_stack_order[i-1];
         c = g_hash_table_lookup(client_map, &w);
         if (c) stacking_lower(c);
     }
-    g_free(client_startup_stack_order);
-    client_startup_stack_order = NULL;
-    client_startup_stack_size = 0;
+    g_free(startup_stack_order);
+    startup_stack_order = NULL;
+    startup_stack_size = 0;
 
-    if (config_focus_new)
-        focus_fallback(Fallback_NoFocus);
+    active = g_hash_table_lookup(client_map, &startup_active);
+    if (!active || !client_focus(active))
+        if (config_focus_new)
+            focus_fallback(Fallback_NoFocus);
 }
 
 void client_manage(Window window)

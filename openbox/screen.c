@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "prop.h"
+#include "startup.h"
 #include "config.h"
 #include "screen.h"
 #include "client.h"
@@ -173,8 +174,10 @@ void screen_startup()
 
     screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
-    screen_desktop = 0;
-    screen_set_desktop(0);
+    if (startup_desktop >= screen_num_desktops)
+        startup_desktop = 0;
+    screen_desktop = startup_desktop;
+    screen_set_desktop(startup_desktop);
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;

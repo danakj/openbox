@@ -5,6 +5,7 @@
 #include "dispatch.h"
 #include "xerror.h"
 #include "prop.h"
+#include "startup.h"
 #include "screen.h"
 #include "focus.h"
 #include "moveresize.h"
@@ -150,6 +151,9 @@ int main(int argc, char **argv)
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
+
+    /* save stuff that we can use to restore state */
+    startup_save();
 
     if (screen_annex()) { /* it will be ours! */
         /* startup the parsing so everything can register sections of the rc */

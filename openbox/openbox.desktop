@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Openbox
+Exec=openbox
+# name of loadable control center module
+X-GNOME-WMSettingsModule=openbox
+# name we put on the WM spec check window
+X-GNOME-WMName=Openbox
+# back compat only
+X-GnomeWMSettingsLibrary=openbox
+
+[Window Manager]
+SessionManaged=true

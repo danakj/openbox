@@ -376,15 +376,15 @@ static void binddef()
     mbind("1", "titlebar", MouseAction_Press, a);
     a = action_new(action_focus);
     mbind("1", "handle", MouseAction_Press, a);
-    a = action_new(action_raise);
+    a = action_new(action_focusraise);
     mbind("1", "titlebar", MouseAction_Click, a);
-    a = action_new(action_raise);
+    a = action_new(action_focusraise);
     mbind("1", "handle", MouseAction_Click, a);
     a = action_new(action_lower);
     mbind("2", "titlebar", MouseAction_Press, a);
     a = action_new(action_lower);
     mbind("2", "handle", MouseAction_Press, a);
-    a = action_new(action_raise);
+    a = action_new(action_focusraise);
     mbind("A-1", "frame", MouseAction_Click, a);
     a = action_new(action_lower);
     mbind("A-3", "frame", MouseAction_Click, a);

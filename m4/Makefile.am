@@ -16,5 +16,7 @@ EXTRA_DIST=\
   stdint_h.m4 \
   uintmax_t.m4 \
   ulonglong.m4 \
+  nls.m4 \
+  po.m4 \
   openbox.m4 \
   x11.m4

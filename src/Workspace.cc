@@ -101,9 +101,7 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
 
     if (screen->doFocusNew() || (w->isTransient() && w->getTransientFor() &&
                                  w->getTransientFor()->isFocused())) {
-      if (id == screen->getCurrentWorkspaceID())
-        w->setInputFocus();
-      else {
+      if (id != screen->getCurrentWorkspaceID()) {
         /*
            not on the focused workspace, so the window is not going to get focus
            but if the user wants new windows focused, then it should get focus

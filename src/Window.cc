@@ -2706,6 +2706,8 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
     break;
 
   case XA_WM_TRANSIENT_FOR: {
+    bool s = flags.stuck;
+    
     // determine if this is a transient window
     getTransientInfo();
 
@@ -2714,6 +2716,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
       functions &= ~Func_Maximize;
       setAllowedActions();
       setupDecor();
+      if (flags.stuck != s) stick();
     }
 
     reconfigure();

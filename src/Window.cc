@@ -1465,6 +1465,24 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
   XMapSubwindows(display, frame.window);
   XMapWindow(display, frame.window);
 
+  // if we're using the click to place placement type, then immediately
+  // after the window is mapped, we need to start interactively moving it
+  if (!(flags.iconic || reassoc) &&
+      screen->placementPolicy() == BScreen::ClickMousePlacement) {
+    // if the last window wasn't placed yet, or we're just moving a window
+    // already, finish off that move cleanly
+    OpenboxWindow *w = openbox.getFocusedWindow();
+    if (w != (OpenboxWindow *) 0 && w->flags.moving)
+      w->endMove();
+
+    int x, y, rx, ry;
+    Window c, r;
+    unsigned int m;
+    XQueryPointer(openbox.getXDisplay(), screen->getRootWindow(),
+                  &r, &c, &rx, &ry, &x, &y, &m);
+    startMove(rx, ry);
+  }
+  
   if (flags.iconic && screen->focusNew()) setInputFocus();
 
   flags.visible = True;
@@ -1725,6 +1743,7 @@ void OpenboxWindow::setFocusFlag(Bool focus) {
 
   if (screen->sloppyFocus() && screen->autoRaise() && timer->isTiming())
     timer->stop();
+
 }
 
 

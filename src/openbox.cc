@@ -479,19 +479,9 @@ void Openbox::process_event(XEvent *e) {
     if (! win)
       win = new OpenboxWindow(*this, e->xmaprequest.window);
 
-    if ((win = searchWindow(e->xmaprequest.window))) {
+    if ((win = searchWindow(e->xmaprequest.window)))
       win->mapRequestEvent(&e->xmaprequest);
-      // if we're using the click to place placement type, then immediately
-      // after the window is mapped, we need to start interactively moving it
-      if (win->getScreen()->placementPolicy() == BScreen::ClickMousePlacement) {
-        int x, y, rx, ry;
-        Window c, r;
-        unsigned int m;
-        XQueryPointer(getXDisplay(), win->getScreen()->getRootWindow(),
-                      &r, &c, &rx, &ry, &x, &y, &m);
-        win->startMove(rx, ry);
-      }
-    }
+
     break;
   }
 

@@ -348,8 +348,6 @@ gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
 	}
     }
 
-    grab_all_clients(FALSE);
-
     /* when there are no modifiers in the binding, then the action cannot
        be interactive */
     if (!state && action->data.any.interactive) {
@@ -364,13 +362,12 @@ gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
     b->actions[mact] = g_slist_append(NULL, action);
     bound_contexts[context] = g_slist_append(bound_contexts[context], b);
 
-    grab_all_clients(TRUE);
-
     return TRUE;
 }
 
 void mouse_startup(gboolean reconfig)
 {
+    grab_all_clients(TRUE);
 }
 
 void mouse_shutdown(gboolean reconfig)

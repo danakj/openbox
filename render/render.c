@@ -333,6 +333,8 @@ Appearance *appearance_new(SurfaceType type, int numtex)
     p->primary = NULL;
     p->secondary = NULL;
     p->border_color = NULL;
+    p->bevel_dark = NULL;
+    p->bevel_light = NULL;
     p->pixel_data = NULL;
     break;
   }
@@ -369,6 +371,18 @@ Appearance *appearance_copy(Appearance *orig)
                                           spo->border_color->b);
         else spc->border_color = NULL;
 
+        if (spo->bevel_dark != NULL)
+            spc->bevel_dark = color_new(spo->bevel_dark->r,
+                                        spo->bevel_dark->g,
+                                        spo->bevel_dark->b);
+        else spc->bevel_dark = NULL;
+
+        if (spo->bevel_light != NULL)
+            spc->bevel_light = color_new(spo->bevel_light->r,
+                                         spo->bevel_light->g,
+                                         spo->bevel_light->b);
+        else spc->bevel_light = NULL;
+
         spc->interlaced = spo->interlaced;
         spc->border = spo->border;
         spc->pixel_data = NULL;
@@ -391,10 +405,12 @@ void appearance_free(Appearance *a)
             g_free(a->texture);
         if (a->surface.type == Surface_Planar) {
             p = &a->surface.data.planar;
-            if (p->primary != NULL) color_free(p->primary);
-            if (p->secondary != NULL) color_free(p->secondary);
-            if (p->border_color != NULL) color_free(p->border_color);
-            if (p->pixel_data != NULL) g_free(p->pixel_data);
+            color_free(p->primary);
+            color_free(p->secondary);
+            color_free(p->border_color);
+            color_free(p->bevel_dark);
+            color_free(p->bevel_light);
+            g_free(p->pixel_data);
         }
         g_free(a);
     }

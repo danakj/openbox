@@ -33,8 +33,7 @@ typedef enum {
     Background_CrossDiagonal,
     Background_PipeCross,
     Background_Rectangle,
-    Background_Pyramid,
-    Background_Elliptic
+    Background_Pyramid
 } SurfaceColorType;
 
 typedef enum {
@@ -53,6 +52,8 @@ typedef struct PlanarSurface {
     color_rgb *primary;
     color_rgb *secondary;
     color_rgb *border_color;
+    color_rgb *bevel_dark; 
+    color_rgb *bevel_light;
     gboolean interlaced;
     gboolean border;
     struct Appearance *parent;

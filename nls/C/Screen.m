@@ -9,6 +9,8 @@ $ #FontLoadFail
 # BScreen::LoadStyle(): couldn't load font '%s'\n
 $ #DefaultFontLoadFail
 # BScreen::LoadStyle(): couldn't load default font.\n
+$ #DefaultStyleLoadFail
+# BScreen::LoadStyle(): couldn't load default style.\n
 $ #EmptyMenuFile
 # %s: empty menu file\n
 $ #xterm

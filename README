@@ -3,13 +3,13 @@ README for Openbox:
 The source tree for Openbox is comprised of five subdirectories:
 
 	data/		- this holds the default data files that Openbox
-                          requires for proper operation
+                          requires for proper operation.
 
 	doc/		- this holds the documentation files that explain
-	                  the various aspects of Openbox
+	                  the various aspects of Openbox.
 
 	nls/		- this holds the message files used to generate
-			  message catalogs for different languages
+			  message catalogs for different languages.
 
 	src/		- this holds the actual C++ source code for the window
 			  manager.

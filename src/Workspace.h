@@ -26,6 +26,7 @@
 #include <X11/Xlib.h>
 
 #include "LinkedList.h"
+#include "Geometry.h"
 
 class BScreen;
 class Clientmenu;
@@ -34,7 +35,7 @@ class OpenboxWindow;
 
 class Workspace {
 private:
-  BScreen *screen;
+  BScreen &screen;
   OpenboxWindow *lastfocus;
   Clientmenu *clientmenu;
 
@@ -46,13 +47,16 @@ private:
 
 protected:
   void placeWindow(OpenboxWindow *);
-
+  Point *bestFitPlacement(const Size &win_size, const Rect &space);
+  Point *rowSmartPlacement(const Size &win_size, const Rect &space);
+  Point *colSmartPlacement(const Size &win_size, const Rect &space);
+  Point *const cascadePlacement(const OpenboxWindow* window);
 
 public:
-  Workspace(BScreen *, int = 0);
+  Workspace(BScreen &, int = 0);
   ~Workspace(void);
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen &getScreen(void) { return screen; }
 
   inline OpenboxWindow *getLastFocusedWindow(void) { return lastfocus; }
   

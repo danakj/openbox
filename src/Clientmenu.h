@@ -29,14 +29,14 @@ class BScreen;
 
 class Clientmenu : public Basemenu {
 private:
-  BScreen *screen;
-  Workspace *wkspc;
+  BScreen &screen;
+  Workspace &wkspc;
 
 protected:
   virtual void itemSelected(int, int);
 
 public:
-  Clientmenu(Workspace *);
+  Clientmenu(Workspace &);
 };
 
 

@@ -33,10 +33,7 @@
 #include "BaseDisplay.h"
 #include "Timer.h"
 
-BTimer::BTimer(BaseDisplay *d, TimeoutHandler *h) {
-  display = d;
-  handler = h;
-
+BTimer::BTimer(BaseDisplay &d, TimeoutHandler &h) : display(d), handler(h) {
   once = timing = False;
 }
 
@@ -61,16 +58,16 @@ void BTimer::start(void) {
 
   if (! timing) {
     timing = True;
-    display->addTimer(this);
+    display.addTimer(this);
   }
 }
 
 void BTimer::stop(void) {
   timing = False;
 
-  display->removeTimer(this);
+  display.removeTimer(this);
 }
 
 void BTimer::fireTimeout(void) {
-  if (handler) handler->timeout();
+  handler.timeout();
 }

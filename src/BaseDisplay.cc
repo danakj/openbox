@@ -48,10 +48,13 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
@@ -191,8 +194,8 @@ char *bstrdup(const char *s) {
   return n;
 }
 
-BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
-  application_name = app_name;
+BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
+  application_name = bstrdup(app_name);
 
   _startup = True;
   _shutdown = False;
@@ -337,7 +340,7 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
 
   screenInfoList = new LinkedList<ScreenInfo>;
   for (int i = 0; i < number_of_screens; i++) {
-    ScreenInfo *screeninfo = new ScreenInfo(this, i);
+    ScreenInfo *screeninfo = new ScreenInfo(*this, i);
     screenInfoList->insert(screeninfo);
   }
 
@@ -379,6 +382,9 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
   
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
+#else
+  NumLockMask = Mod2Mask;
+  ScrollLockMask = Mod5Mask;
 #endif // NOCLOBBER
 }
 
@@ -398,6 +404,9 @@ BaseDisplay::~BaseDisplay(void) {
     timerList->remove(0);
 
   delete timerList;
+  
+  if (application_name != NULL)
+    delete [] application_name;
 
   XCloseDisplay(display);
 }
@@ -571,17 +580,17 @@ void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
 }
 
 
-ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
-  basedisplay = d;
-  screen_number = num;
+ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d),
+  screen_number(num)
+{
 
-  root_window = RootWindow(basedisplay->getXDisplay(), screen_number);
-  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
+  root_window = RootWindow(basedisplay.getXDisplay(), screen_number);
+  depth = DefaultDepth(basedisplay.getXDisplay(), screen_number);
 
-  width =
-    WidthOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
-  height =
-    HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
+  m_size = Size(WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                              screen_number)),
+                HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                               screen_number)));
 
   // search for a TrueColor Visual... if we can't find one... we will use the
   // default visual for the screen
@@ -593,7 +602,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
 
   visual = (Visual *) 0;
 
-  if ((vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
+  if ((vinfo_return = XGetVisualInfo(basedisplay.getXDisplay(),
                                      VisualScreenMask | VisualClassMask,
                                      &vinfo_template, &vinfo_nitems)) &&
       vinfo_nitems > 0) {
@@ -608,10 +617,10 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
   }
 
   if (visual) {
-    colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
+    colormap = XCreateColormap(basedisplay.getXDisplay(), root_window,
 			       visual, AllocNone);
   } else {
-    visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
-    colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
+    visual = DefaultVisual(basedisplay.getXDisplay(), screen_number);
+    colormap = DefaultColormap(basedisplay.getXDisplay(), screen_number);
   }
 }

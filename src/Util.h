@@ -1,6 +1,5 @@
-// Iconmenu.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
+// Util.h for Openbox
+// Copyright (c) 2002 - 2002 Ben Jansens (ben@orodu.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -20,43 +19,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
+#ifndef   __Util_hh
+#define   __Util_hh
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#ifdef     DEBUG
+# include <assert.h>
+# define ASSERT(x) assert(x)
+#else  // !DEBUG
+# define ASSERT(x)
+#endif //  DEBUG
 
-#include "i18n.h"
-#include "Iconmenu.h"
-#include "Screen.h"
-#include "Window.h"
-
-
-Iconmenu::Iconmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
-  setInternalMenu();
-
-  setLabel(i18n->getMessage(IconSet, IconIcons, "Icons"));
-  update();
-}
-
-
-void Iconmenu::itemSelected(int button, int index) {
-  if (button != 1)
-    return;
-
-  if (index >= 0 && index < screen.getIconCount()) {
-    OpenboxWindow *win = screen.getIcon(index);
-
-    if (win) {
-      win->deiconify();
-      win->setInputFocus();
-    }
-  }
-
-  if (! (screen.getWorkspacemenu()->isTorn() || isTorn()))
-    hide();
-}
+#endif // __Util_hh

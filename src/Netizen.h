@@ -32,15 +32,15 @@ class Netizen;
 
 class Netizen {
 private:
-  BaseDisplay *basedisplay;
-  BScreen *screen;
+  BaseDisplay &basedisplay;
+  BScreen &screen;
   Window window;
   XEvent event;
 
 protected:
 
 public:
-  Netizen(BScreen *, Window);
+  Netizen(BScreen &, Window);
 
   inline const Window &getWindowID(void) const { return window; }
 

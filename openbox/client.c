@@ -1303,8 +1303,6 @@ static Client *search_focus_tree(Client *node, Client *skip)
 void client_calc_layer(Client *self)
 {
     StackLayer l;
-    gboolean fs;
-    Client *c;
 
     if (self->iconic) l = Layer_Icon;
     /* fullscreen windows are only in the fullscreen layer while focused */

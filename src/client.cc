@@ -17,12 +17,12 @@ extern "C" {
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
-#include <assert.h>
-
 #include "gettext.h"
 #define _(str) gettext(str)
 }
 
+#include <climits>
+#include <cassert>
 #include <algorithm>
 
 namespace ob {
@@ -221,7 +221,8 @@ void Client::setupDecorAndFunctions()
     _functions |= Func_Close;
   }
 
-  if (!(_min_size.x() < _max_size.x() || _min_size.y() < _max_size.y())) {
+  if (!(_min_size.width() < _max_size.width() ||
+        _min_size.height() < _max_size.height())) {
     _decorations &= ~(Decor_Maximize | Decor_Handle);
     _functions &= ~(Func_Resize | Func_Maximize);
   }
@@ -356,7 +357,7 @@ void Client::getArea()
   ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
   assert(ret != BadWindow);
 
-  _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
+  _area = otk::Rect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
   _border_width = wattrib.border_width;
 }
 
@@ -477,10 +478,10 @@ void Client::updateNormalHints()
   // defaults
   _min_ratio = 0.0;
   _max_ratio = 0.0;
-  _size_inc.setPoint(1, 1);
-  _base_size.setPoint(0, 0);
-  _min_size.setPoint(0, 0);
-  _max_size.setPoint(INT_MAX, INT_MAX);
+  _size_inc = otk::Size(1, 1);
+  _base_size = otk::Size(0, 0);
+  _min_size = otk::Size(0, 0);
+  _max_size = otk::Size(UINT_MAX, UINT_MAX);
 
   // get the hints from the window
   if (XGetWMNormalHints(**otk::display, _window, &size, &ret)) {
@@ -493,9 +494,9 @@ void Client::updateNormalHints()
       // changing its gravity
       if (frame && _gravity != oldgravity) {
         // move our idea of the client's position based on its new gravity
-        int x = frame->rect().x(), y = frame->rect().y();
+        int x = frame->area().x(), y = frame->area().y();
         frame->frameGravity(x, y);
-        _area.setPos(x, y);
+        _area = otk::Rect(otk::Point(x, y), _area.size());
       }
     }
 
@@ -505,16 +506,16 @@ void Client::updateNormalHints()
     }
 
     if (size.flags & PMinSize)
-      _min_size.setPoint(size.min_width, size.min_height);
+      _min_size = otk::Size(size.min_width, size.min_height);
     
     if (size.flags & PMaxSize)
-      _max_size.setPoint(size.max_width, size.max_height);
+      _max_size = otk::Size(size.max_width, size.max_height);
     
     if (size.flags & PBaseSize)
-      _base_size.setPoint(size.base_width, size.base_height);
+      _base_size = otk::Size(size.base_width, size.base_height);
     
     if (size.flags & PResizeInc)
-      _size_inc.setPoint(size.width_inc, size.height_inc);
+      _size_inc = otk::Size(size.width_inc, size.height_inc);
   }
 }
 
@@ -1012,7 +1013,7 @@ void Client::toggleClientBorder(bool addborder)
     else           y += _border_width;
     break;
   }
-  _area.setPos(x, y);
+  _area = otk::Rect(otk::Point(x, y), _area.size());
 
   if (addborder) {
     XSetWindowBorderWidth(**otk::display, _window, _border_width);
@@ -1117,29 +1118,30 @@ void Client::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void Client::resize(Corner anchor, int w, int h)
+void Client::resize(Corner anchor, unsigned int w, unsigned int h)
 {
   if (!(_functions & Func_Resize)) return;
   internal_resize(anchor, w, h);
 }
 
 
-void Client::internal_resize(Corner anchor, int w, int h, bool user,
-                             int x, int y)
+void Client::internal_resize(Corner anchor, unsigned int w, unsigned int h,
+                             bool user, int x, int y)
 {
-  w -= _base_size.x(); 
-  h -= _base_size.y();
+  w -= _base_size.width(); 
+  h -= _base_size.height();
 
   if (user) {
     // for interactive resizing. have to move half an increment in each
     // direction.
-    int mw = w % _size_inc.x(); // how far we are towards the next size inc
-    int mh = h % _size_inc.y();
-    int aw = _size_inc.x() / 2; // amount to add
-    int ah = _size_inc.y() / 2;
+    unsigned int mw = w % _size_inc.width(); // how far we are towards the next
+                                             // size inc
+    unsigned int mh = h % _size_inc.height();
+    unsigned int aw = _size_inc.width() / 2; // amount to add
+    unsigned int ah = _size_inc.height() / 2;
     // don't let us move into a new size increment
-    if (mw + aw >= _size_inc.x()) aw = _size_inc.x() - mw - 1;
-    if (mh + ah >= _size_inc.y()) ah = _size_inc.y() - mh - 1;
+    if (mw + aw >= _size_inc.width()) aw = _size_inc.width() - mw - 1;
+    if (mh + ah >= _size_inc.height()) ah = _size_inc.height() - mh - 1;
     w += aw;
     h += ah;
     
@@ -1147,10 +1149,10 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
     // and aspect ratios
 
     // smaller than min size or bigger than max size?
-    if (w < _min_size.x()) w = _min_size.x();
-    else if (w > _max_size.x()) w = _max_size.x();
-    if (h < _min_size.y()) h = _min_size.y();
-    else if (h > _max_size.y()) h = _max_size.y();
+    if (w < _min_size.width()) w = _min_size.width();
+    else if (w > _max_size.width()) w = _max_size.width();
+    if (h < _min_size.height()) h = _min_size.height();
+    else if (h > _max_size.height()) h = _max_size.height();
 
     // adjust the height ot match the width for the aspect ratios
     if (_min_ratio)
@@ -1160,21 +1162,21 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
   }
 
   // keep to the increments
-  w /= _size_inc.x();
-  h /= _size_inc.y();
+  w /= _size_inc.width();
+  h /= _size_inc.height();
 
   // you cannot resize to nothing
   if (w < 1) w = 1;
   if (h < 1) h = 1;
   
   // store the logical size
-  _logical_size.setPoint(w, h);
+  _logical_size = otk::Size(w, h);
 
-  w *= _size_inc.x();
-  h *= _size_inc.y();
+  w *= _size_inc.width();
+  h *= _size_inc.height();
 
-  w += _base_size.x();
-  h += _base_size.y();
+  w += _base_size.width();
+  h += _base_size.height();
 
   if (x == INT_MIN || y == INT_MIN) {
     x = _area.x();
@@ -1195,7 +1197,7 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
     }
   }
 
-  _area.setSize(w, h);
+  _area = otk::Rect(_area.position(), otk::Size(w, h));
 
   XResizeWindow(**otk::display, _window, w, h);
 
@@ -1216,7 +1218,7 @@ void Client::move(int x, int y)
 
 void Client::internal_move(int x, int y)
 {
-  _area.setPos(x, y);
+  _area = otk::Rect(otk::Point(x, y), _area.size());
 
   // move the frame to be in the requested position
   if (frame) { // this can be called while mapping, before frame exists
@@ -1458,7 +1460,7 @@ void Client::maximize(bool max, int dir, bool savearea)
   }
 
   const otk::Rect &a = openbox->screen(_screen)->area();
-  int x = frame->rect().x(), y = frame->rect().y(),
+  int x = frame->area().x(), y = frame->area().y(),
     w = _area.width(), h = _area.height();
   
   if (max) {
@@ -1581,8 +1583,8 @@ void Client::fullscreen(bool fs, bool savearea)
     const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
     x = 0;
     y = 0;
-    w = info->width();
-    h = info->height();
+    w = info->size().width();
+    h = info->size().height();
   } else {
     _functions = saved_func;
     _decorations = saved_decor;
@@ -1650,7 +1652,7 @@ bool Client::focus()
 
   // won't try focus if the client doesn't want it, or if the window isn't
   // visible on the screen
-  if (!(frame->isVisible() && (_can_focus || _focus_notify))) return false;
+  if (!(frame->visible() && (_can_focus || _focus_notify))) return false;
 
   if (_focused) return true;
 
@@ -1742,6 +1744,25 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
 #endif // DEBUG
   
   otk::EventHandler::configureRequestHandler(e);
+
+  // compress these
+  XEvent ev;
+  while (XCheckTypedWindowEvent(**otk::display, window(), ConfigureRequest,
+                                &ev)) {
+    e.value_mask |= ev.xconfigurerequest.value_mask;
+    if (ev.xconfigurerequest.value_mask & CWX)
+      e.x = ev.xconfigurerequest.x;
+    if (ev.xconfigurerequest.value_mask & CWY)
+      e.y = ev.xconfigurerequest.y;
+    if (ev.xconfigurerequest.value_mask & CWWidth)
+      e.width = ev.xconfigurerequest.width;
+    if (ev.xconfigurerequest.value_mask & CWHeight)
+      e.height = ev.xconfigurerequest.height;
+    if (ev.xconfigurerequest.value_mask & CWBorderWidth)
+      e.border_width = ev.xconfigurerequest.border_width;
+    if (ev.xconfigurerequest.value_mask & CWStackMode)
+      e.detail = ev.xconfigurerequest.detail;
+  }
 
   // if we are iconic (or shaded (fvwm does this)) ignore the event
   if (_iconic || _shaded) return;

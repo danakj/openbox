@@ -33,7 +33,7 @@ void focus_set_client(Client *client)
 {
     Window active;
     Client *old;
-     
+
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);

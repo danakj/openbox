@@ -1,3 +1,17 @@
+3.1:
+	* Added japanese translation (bug #1029)
+	* Closed bug #1060 (modal unfocused window should be placed above
+	focused parent)
+	* Closed bug #1012 (Openbox stalls gnome session startup after
+	--replace)
+	* Closed bug #1073 (The Desktop action doesn't work)
+	* Closed bug #1023 (config_focus_raise declared as guint)
+	* Closed bug #1019 (Strange behavior with focus:followMouse and
+	RaiseLower action)
+	* Closed bug #1007 (use g_snprintf in openbox/session.c instead of
+	sprintf)
+	* Closed bug #1001 (gimp crashes openbox)
+
 3.0:
 	* Closed bug #908 (sometimes some weird grab is left)
 	* Closed bug #945 (xawtv overlay visible on every desktop)

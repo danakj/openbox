@@ -39,10 +39,13 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_UNISTD_H
 #include <sys/types.h>
@@ -65,6 +68,7 @@ static void showHelp(int exitval) {
 			  "\t\t\t  1997 - 2000 Brad Hughes\n\n"
 			  "  -display <string>\t\tuse display connection.\n"
 			  "  -rc <string>\t\t\tuse alternate resource file.\n"
+			  "  -menu <string>\t\t\tuse alternate menu file.\n"
 			  "  -version\t\t\tdisplay version and exit.\n"
 			  "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
 	 __openbox_version);
@@ -122,6 +126,7 @@ static void showHelp(int exitval) {
 int main(int argc, char **argv) {
   char *session_display = (char *) 0;
   char *rc_file = (char *) 0;
+  char *menu_file = (char *) 0;
 
   NLSInit("openbox.cat");
 
@@ -131,13 +136,25 @@ int main(int argc, char **argv) {
 
       if ((++i) >= argc) {
         fprintf(stderr,
-		i18n->getMessage(mainSet, mainRCRequiresArg,
-				 "error: '-rc' requires and argument\n"));
+                i18n->getMessage(mainSet, mainRCRequiresArg,
+                                 "error: '-rc' requires and argument\n"));
 
         ::exit(1);
       }
 
       rc_file = argv[i];
+    } else if (! strcmp(argv[i], "-menu")) {
+      // look for alternative menu file to use
+
+      if ((++i) >= argc) {
+        fprintf(stderr,
+		i18n->getMessage(mainSet, mainMENURequiresArg,
+				 "error: '-menu' requires and argument\n"));
+
+        ::exit(1);
+      }
+
+      menu_file = argv[i];
     } else if (! strcmp(argv[i], "-display")) {
       // check for -display option... to run on a display other than the one
       // set by the environment variable DISPLAY
@@ -163,8 +180,9 @@ int main(int argc, char **argv) {
       }
     } else if (! strcmp(argv[i], "-version")) {
       // print current version string
-      printf("Openbox %s : (c) 1997 - 2000 Brad Hughes\n"
-	     "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n",
+      printf("Openbox %s : (c)\t2002 - 2002 Ben Jansens\n"
+       "\t\t\t1997 - 2000 Brad Hughes\n"
+	     "\t\t\t2001 - 2002 Sean 'Shaleh' Perry\n",
              __openbox_version);
 
       ::exit(0);
@@ -179,7 +197,7 @@ int main(int argc, char **argv) {
   _chdir2(getenv("X11ROOT"));
 #endif // __EMX__
 
-  Openbox openbox(argc, argv, session_display, rc_file);
+  Openbox openbox(argc, argv, session_display, rc_file, menu_file);
   openbox.eventLoop();
 
   return(0);

@@ -34,11 +34,17 @@
 
 #include <X11/Xlocale.h>
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
+#endif // HAVE_STRING_H
+
+#ifdef    HAVE_STDIO_H
 #  include <stdio.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STDIO_H
 
 #ifdef    HAVE_LOCALE_H
 #  include <locale.h>
@@ -97,8 +103,8 @@ I18n::~I18n(void) {
 }
 
 
-void I18n::openCatalog(const char *catalog) {
 #if defined(NLS) && defined(HAVE_CATOPEN)
+void I18n::openCatalog(const char *catalog) {
   int lp = strlen(LOCALEPATH), lc = strlen(locale),
       ct = strlen(catalog), len = lp + lc + ct + 3;
   catalog_filename = new char[len];
@@ -117,18 +123,23 @@ void I18n::openCatalog(const char *catalog) {
 
   if (catalog_fd == (nl_catd) -1)
     fprintf(stderr, "failed to open catalog, using default messages\n");
-#else // !HAVE_CATOPEN
-
-  catalog_filename = (char *) 0;
-#endif // HAVE_CATOPEN
 }
+#else // !HAVE_CATOPEN
+void I18n::openCatalog(const char *) {
+  catalog_filename = (char *) 0;
+}
+#endif // HAVE_CATOPEN
 
 
-const char *I18n::getMessage(int set, int msg, const char *msgString) const {
 #if   defined(NLS) && defined(HAVE_CATGETS)
+const char *I18n::getMessage(int set, int msg, const char *msgString) const {
   if (catalog_fd != (nl_catd) -1)
     return (const char *) catgets(catalog_fd, set, msg, msgString);
   else
-#endif
     return msgString;
 }
+#else
+const char *I18n::getMessage(int, int, const char *msgString) const {
+  return msgString;
+}
+#endif

@@ -13,7 +13,7 @@ the example styles included here.
 Also in the data/ directory is a file named `menu'.  This is meant as an
 example but is also installed if make install detects that no menu exists.
 If openbox is ever started without a valid menu the user will get a backup
-menu which gives the ability to launch and xterm and exit the window manager.
+menu which gives the ability to launch a xterm and exit the window manager.
 
 For information on creating/editing a menu, see the file README.menu.
 

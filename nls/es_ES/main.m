@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # error: '-rc' requiere un argumento
+$ #MENURequiresArg
+# error: '-menu' requiere un argumento
 $ #DISPLAYRequiresArg
 # error: '-display' requiere un argumento
 $ #WarnDisplaySet
@@ -12,6 +14,7 @@ $ #Usage
   \t\t\t  1997 - 2000 Brad Hughes\n\n\
   -display <string> conexión de despliegue.\n\
   -rc <string>      archivo alternativo de recuros.\n\
+  -menu <string>    archivo alternativo de menu.\n\
   -version          mostrar la versión y cerrar.\n\
   -help             mostrar este texto de ayuda y cerrar.\n\n
 $ #CompileOptions

@@ -1,6 +1,7 @@
 // Window.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
-// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
+// Copyright (c) 2002 - 2002 Ben Jansens (ben at orodu.net)
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry (shaleh at debian.org)
+// Copyright (c) 1997 - 2000 Brad Hughes (bhughes at tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -33,9 +34,9 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    DEBUG
 #  ifdef    HAVE_STDIO_H
@@ -54,11 +55,12 @@
 #ifdef    SLIT
 #  include "Slit.h"
 #endif // SLIT
+#include "Util.h"
 
 /*
  * Initializes the class with default values/the window's set initial values.
  */
-OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
+OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
 #ifdef    DEBUG
   fprintf(stderr, i18n->getMessage(WindowSet, WindowCreating,
 		     "OpenboxWindow::OpenboxWindow(): creating 0x%lx\n"),
@@ -66,10 +68,9 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 #endif // DEBUG
 
   client.window = w;
-  openbox = b;
-  display = openbox->getXDisplay();
+  display = openbox.getXDisplay();
 
-  openbox->grab();
+  openbox.grab();
   if (! validateClient()) return;
 
   // fetch client size and placement
@@ -83,14 +84,14 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 	       "failed\n"));
 #endif // DEBUG
 
-    b->ungrab();
+    openbox.ungrab();
     return;
   }
 
   if (s) {
     screen = s;
   } else {
-    screen = openbox->searchScreen(RootWindowOfScreen(wattrib.screen));
+    screen = openbox.searchScreen(RootWindowOfScreen(wattrib.screen));
     if (! screen) {
 #ifdef    DEBUG
       fprintf(stderr, i18n->getMessage(WindowSet, WindowCannotFindScreen,
@@ -99,11 +100,13 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 	              RootWindowOfScreen(wattrib.screen));
 #endif // DEBUG
 
-      b->ungrab();
+      openbox.ungrab();
       return;
     }
   }
 
+  mapped = false;
+  
   flags.moving = flags.resizing = flags.shaded = flags.visible =
     flags.iconic = flags.transient = flags.focused =
     flags.stuck = flags.modal =  flags.send_focus_message =
@@ -152,8 +155,10 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
   lastButtonPressTime = 0;
   image_ctrl = screen->getImageControl();
 
-  timer = new BTimer(openbox, this);
-  timer->setTimeout(openbox->getAutoRaiseDelay());
+  current_state = WithdrawnState;
+
+  timer = new BTimer(openbox, *this);
+  timer->setTimeout(openbox.getAutoRaiseDelay());
   timer->fireOnce(True);
 
   getOpenboxHints();
@@ -169,29 +174,28 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 #ifdef    SLIT
   if (client.initial_state == WithdrawnState) {
     screen->getSlit()->addClient(client.window);
+    openbox.ungrab();
     delete this;
-
-    b->ungrab();
     return;
   }
 #endif // SLIT
 
   flags.managed = True;
-  openbox->saveWindowSearch(client.window, this);
+  openbox.saveWindowSearch(client.window, this);
 
   // determine if this is a transient window
   Window win;
   if (XGetTransientForHint(display, client.window, &win)) {
     if (win && (win != client.window)) {
       OpenboxWindow *tr;
-      if ((tr = openbox->searchWindow(win))) {
+      if ((tr = openbox.searchWindow(win))) {
 	while (tr->client.transient) tr = tr->client.transient;
 	client.transient_for = tr;
 	tr->client.transient = this;
 	flags.stuck = client.transient_for->flags.stuck;
 	flags.transient = True;
       } else if (win == client.window_group) {
-	if ((tr = openbox->searchGroup(win, this))) {
+	if ((tr = openbox.searchGroup(win, this))) {
 	  while (tr->client.transient) tr = tr->client.transient;
 	  client.transient_for = tr;
 	  tr->client.transient = this;
@@ -217,61 +221,61 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
   }
   upsize();
 
-  Bool place_window = True;
-  if (openbox->isStartup() || flags.transient ||
+  place_window = true;
+  if (openbox.isStartup() || flags.transient ||
       client.normal_hint_flags & (PPosition|USPosition)) {
     setGravityOffsets();
 
-    if ((openbox->isStartup()) ||
+    if ((openbox.isStartup()) ||
 	(frame.x >= 0 &&
 	 (signed) (frame.y + frame.y_border) >= 0 &&
-	 frame.x <= (signed) screen->getWidth() &&
-	 frame.y <= (signed) screen->getHeight()))
-      place_window = False;
+	 frame.x <= (signed) screen->size().w() &&
+	 frame.y <= (signed) screen->size().h()))
+      place_window = false;
   }
 
   frame.window = createToplevelWindow(frame.x, frame.y, frame.width,
 				      frame.height,
 				      frame.border_w);
-  openbox->saveWindowSearch(frame.window, this);
+  openbox.saveWindowSearch(frame.window, this);
 
   frame.plate = createChildWindow(frame.window);
-  openbox->saveWindowSearch(frame.plate, this);
+  openbox.saveWindowSearch(frame.plate, this);
 
   if (decorations.titlebar) {
     frame.title = createChildWindow(frame.window);
     frame.label = createChildWindow(frame.title);
-    openbox->saveWindowSearch(frame.title, this);
-    openbox->saveWindowSearch(frame.label, this);
+    openbox.saveWindowSearch(frame.title, this);
+    openbox.saveWindowSearch(frame.label, this);
   }
 
   if (decorations.handle) {
     frame.handle = createChildWindow(frame.window);
-    openbox->saveWindowSearch(frame.handle, this);
+    openbox.saveWindowSearch(frame.handle, this);
 
     frame.left_grip =
-      createChildWindow(frame.handle, openbox->getLowerLeftAngleCursor());
-    openbox->saveWindowSearch(frame.left_grip, this);
+      createChildWindow(frame.handle, openbox.getLowerLeftAngleCursor());
+    openbox.saveWindowSearch(frame.left_grip, this);
 
     frame.right_grip =
-      createChildWindow(frame.handle, openbox->getLowerRightAngleCursor());
-    openbox->saveWindowSearch(frame.right_grip, this);
+      createChildWindow(frame.handle, openbox.getLowerRightAngleCursor());
+    openbox.saveWindowSearch(frame.right_grip, this);
   }
 
   associateClientWindow();
 
-  if (! screen->isSloppyFocus())
-    openbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
-        GrabModeSync, GrabModeSync, None, None);
+  if (! screen->sloppyFocus())
+    openbox.grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
+        GrabModeSync, GrabModeSync, frame.plate, None);
 
-  openbox->grabButton(Button1, Mod1Mask, frame.window, True,
+  openbox.grabButton(Button1, Mod1Mask, frame.window, True,
       ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-      GrabModeAsync, None, openbox->getMoveCursor());
-  openbox->grabButton(Button2, Mod1Mask, frame.window, True,
-      ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None);
-  openbox->grabButton(Button3, Mod1Mask, frame.window, True,
+      GrabModeAsync, frame.window, openbox.getMoveCursor());
+  openbox.grabButton(Button2, Mod1Mask, frame.window, True,
+      ButtonReleaseMask, GrabModeAsync, GrabModeAsync, frame.window, None);
+  openbox.grabButton(Button3, Mod1Mask, frame.window, True,
       ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-      GrabModeAsync, None, None);
+      GrabModeAsync, frame.window, None);
 
   positionWindows();
   XRaiseWindow(display, frame.plate);
@@ -280,11 +284,11 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
   XMapSubwindows(display, frame.window);
 
   if (decorations.menu)
-    windowmenu = new Windowmenu(this);
+    windowmenu = new Windowmenu(*this);
 
   decorate();
 
-  if (workspace_number < 0 || workspace_number >= screen->getCount())
+  if (workspace_number < 0 || workspace_number >= screen->getWorkspaceCount())
     screen->getCurrentWorkspace()->addWindow(this, place_window);
   else
     screen->getWorkspace(workspace_number)->addWindow(this, place_window);
@@ -296,6 +300,11 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
     shade();
   }
 
+  if (flags.stuck) {
+    flags.stuck = False;
+    stick();
+  }
+
   if (flags.maximized && functions.maximize) {
     unsigned int button = flags.maximized;
     flags.maximized = 0;
@@ -304,7 +313,7 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 
   setFocusFlag(False);
 
-  openbox->ungrab();
+  openbox.ungrab();
 }
 
 
@@ -314,9 +323,14 @@ OpenboxWindow::~OpenboxWindow(void) {
     XUngrabPointer(display, CurrentTime);
   }
 
-  if (workspace_number != -1 && window_number != -1)
-    screen->getWorkspace(workspace_number)->removeWindow(this);
-  else if (flags.iconic)
+  if (workspace_number != -1 && window_number != -1) {
+    if (flags.stuck) {
+      // make sure no other workspaces think that we're focused
+      for (int i=0; i < screen->getWorkspaceCount(); i++)
+        screen->getWorkspace(i)->removeWindow(this);
+    } else
+      screen->getWorkspace(workspace_number)->removeWindow(this);
+  } else if (flags.iconic)
     screen->removeIcon(this);
 
   if (timer) {
@@ -339,7 +353,7 @@ OpenboxWindow::~OpenboxWindow(void) {
     XFree(client.openbox_hint);
 
   if (client.window_group)
-    openbox->removeGroupSearch(client.window_group);
+    openbox.removeGroupSearch(client.window_group);
 
   if (flags.transient && client.transient_for)
     client.transient_for->client.transient = client.transient;
@@ -347,17 +361,17 @@ OpenboxWindow::~OpenboxWindow(void) {
     client.transient->client.transient_for = client.transient_for;
 
   if (frame.close_button) {
-    openbox->removeWindowSearch(frame.close_button);
+    openbox.removeWindowSearch(frame.close_button);
     XDestroyWindow(display, frame.close_button);
   }
 
   if (frame.iconify_button) {
-    openbox->removeWindowSearch(frame.iconify_button);
+    openbox.removeWindowSearch(frame.iconify_button);
     XDestroyWindow(display, frame.iconify_button);
   }
 
   if (frame.maximize_button) {
-    openbox->removeWindowSearch(frame.maximize_button);
+    openbox.removeWindowSearch(frame.maximize_button);
     XDestroyWindow(display, frame.maximize_button);
   }
 
@@ -374,8 +388,8 @@ OpenboxWindow::~OpenboxWindow(void) {
     if( frame.ulabel)
       image_ctrl->removeImage(frame.ulabel);
 
-    openbox->removeWindowSearch(frame.label);
-    openbox->removeWindowSearch(frame.title);
+    openbox.removeWindowSearch(frame.label);
+    openbox.removeWindowSearch(frame.title);
     XDestroyWindow(display, frame.label);
     XDestroyWindow(display, frame.title);
   }
@@ -393,9 +407,9 @@ OpenboxWindow::~OpenboxWindow(void) {
     if (frame.ugrip)
       image_ctrl->removeImage(frame.ugrip);
 
-    openbox->removeWindowSearch(frame.handle);
-    openbox->removeWindowSearch(frame.right_grip);
-    openbox->removeWindowSearch(frame.left_grip);
+    openbox.removeWindowSearch(frame.handle);
+    openbox.removeWindowSearch(frame.right_grip);
+    openbox.removeWindowSearch(frame.left_grip);
     XDestroyWindow(display, frame.right_grip);
     XDestroyWindow(display, frame.left_grip);
     XDestroyWindow(display, frame.handle);
@@ -411,17 +425,17 @@ OpenboxWindow::~OpenboxWindow(void) {
     image_ctrl->removeImage(frame.pbutton);
 
   if (frame.plate) {
-    openbox->removeWindowSearch(frame.plate);
+    openbox.removeWindowSearch(frame.plate);
     XDestroyWindow(display, frame.plate);
   }
 
   if (frame.window) {
-    openbox->removeWindowSearch(frame.window);
+    openbox.removeWindowSearch(frame.window);
     XDestroyWindow(display, frame.window);
   }
 
   if (flags.managed) {
-    openbox->removeWindowSearch(client.window);
+    openbox.removeWindowSearch(client.window);
     screen->removeNetizen(client.window);
   }
 }
@@ -501,7 +515,7 @@ void OpenboxWindow::associateClientWindow(void) {
                           &attrib_set);
 
 #ifdef    SHAPE
-  if (openbox->hasShapeExtensions()) {
+  if (openbox.hasShapeExtensions()) {
     XShapeSelectInput(display, client.window, ShapeNotifyMask);
 
     int foo;
@@ -539,24 +553,6 @@ void OpenboxWindow::associateClientWindow(void) {
   if (decorations.iconify) createIconifyButton();
   if (decorations.maximize) createMaximizeButton();
   if (decorations.close) createCloseButton();
-
-  if (frame.ubutton) {
-    if (frame.close_button)
-      XSetWindowBackgroundPixmap(display, frame.close_button, frame.ubutton);
-    if (frame.maximize_button)
-      XSetWindowBackgroundPixmap(display, frame.maximize_button,
-				 frame.ubutton);
-    if (frame.iconify_button)
-      XSetWindowBackgroundPixmap(display, frame.iconify_button, frame.ubutton);
-  } else {
-    if (frame.close_button)
-      XSetWindowBackground(display, frame.close_button, frame.ubutton_pixel);
-    if (frame.maximize_button)
-      XSetWindowBackground(display, frame.maximize_button,
-			   frame.ubutton_pixel);
-    if (frame.iconify_button)
-      XSetWindowBackground(display, frame.iconify_button, frame.ubutton_pixel);
-  }
 }
 
 
@@ -719,7 +715,7 @@ void OpenboxWindow::decorateLabel(void) {
 void OpenboxWindow::createCloseButton(void) {
   if (decorations.close && frame.title != None) {
     frame.close_button = createChildWindow(frame.title);
-    openbox->saveWindowSearch(frame.close_button, this);
+    openbox.saveWindowSearch(frame.close_button, this);
   }
 }
 
@@ -727,7 +723,7 @@ void OpenboxWindow::createCloseButton(void) {
 void OpenboxWindow::createIconifyButton(void) {
   if (decorations.iconify && frame.title != None) {
     frame.iconify_button = createChildWindow(frame.title);
-    openbox->saveWindowSearch(frame.iconify_button, this);
+    openbox.saveWindowSearch(frame.iconify_button, this);
   }
 }
 
@@ -735,13 +731,13 @@ void OpenboxWindow::createIconifyButton(void) {
 void OpenboxWindow::createMaximizeButton(void) {
   if (decorations.maximize && frame.title != None) {
     frame.maximize_button = createChildWindow(frame.title);
-    openbox->saveWindowSearch(frame.maximize_button, this);
+    openbox.saveWindowSearch(frame.maximize_button, this);
   }
 }
 
 
-void OpenboxWindow::positionButtons(Bool redecorate_label) {
-  const char *format = openbox->getTitleBarLayout();
+void OpenboxWindow::positionButtons() {
+  const char *format = openbox.getTitleBarLayout();
   const unsigned int bw = frame.bevel_w + 1;
   const unsigned int by = frame.bevel_w + 1;
   unsigned int bx = frame.bevel_w + 1;
@@ -761,37 +757,40 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
   for (int i = 0; format[i] != '\0' && i < 4; i++) {
     switch(format[i]) {
     case 'C':
-      if (decorations.close && frame.close_button != None) {
+      if (decorations.close) {
+        if (frame.close_button == None)
+          createCloseButton();
         XMoveResizeWindow(display, frame.close_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.close_button);
         XClearWindow(display, frame.close_button);
         bx += frame.button_w + bw;
         hasclose = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'I':
-      if (decorations.iconify && frame.iconify_button != None) {
+      if (decorations.iconify) {
+        if (frame.iconify_button == None)
+          createIconifyButton();
         XMoveResizeWindow(display, frame.iconify_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.iconify_button);
         XClearWindow(display, frame.iconify_button);
         bx += frame.button_w + bw;
         hasiconify = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'M':
-      if (decorations.maximize && frame.maximize_button != None) {
+      if (decorations.maximize) {
+        if (frame.maximize_button == None)
+          createMaximizeButton();
         XMoveResizeWindow(display, frame.maximize_button, bx, by,
                           frame.button_w, frame.button_h);
         XMapWindow(display, frame.maximize_button);
         XClearWindow(display, frame.maximize_button);
         bx += frame.button_w + bw;
         hasmaximize = true;
-      } else if (frame.close_button)
-        XUnmapWindow(display, frame.close_button);
+      }
       break;
     case 'L':
       XMoveResizeWindow(display, frame.label, bx, by - 1,
@@ -801,20 +800,22 @@ void OpenboxWindow::positionButtons(Bool redecorate_label) {
     }
   }
 
-  if (!hasclose) {
-      openbox->removeWindowSearch(frame.close_button);
-      XDestroyWindow(display, frame.close_button);     
+  if (!hasclose && frame.close_button) {
+    openbox.removeWindowSearch(frame.close_button);
+    XDestroyWindow(display, frame.close_button);
+    frame.close_button = None;
   }
-  if (!hasiconify) {
-      openbox->removeWindowSearch(frame.iconify_button);
-      XDestroyWindow(display, frame.iconify_button);
+  if (!hasiconify && frame.iconify_button) {
+    openbox.removeWindowSearch(frame.iconify_button);
+    XDestroyWindow(display, frame.iconify_button);
+    frame.iconify_button = None;
   }
-  if (!hasmaximize) {
-      openbox->removeWindowSearch(frame.maximize_button);
-      XDestroyWindow(display, frame.maximize_button);                 
+  if (!hasmaximize && frame.iconify_button) {
+    openbox.removeWindowSearch(frame.maximize_button);
+    XDestroyWindow(display, frame.maximize_button);                 
+    frame.maximize_button = None;
   }
-  if (redecorate_label)
-    decorateLabel();
+
   redrawLabel();
   redrawAllButtons();
 }
@@ -848,16 +849,19 @@ void OpenboxWindow::reconfigure(void) {
 
   configure(frame.x, frame.y, frame.width, frame.height);
 
-  if (! screen->isSloppyFocus())
-    openbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
+  if (! screen->sloppyFocus())
+    openbox.grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
         GrabModeSync, GrabModeSync, None, None);
   else
-    openbox->ungrabButton(Button1, 0, frame.plate);
+    openbox.ungrabButton(Button1, 0, frame.plate);
 
   if (windowmenu) {
     windowmenu->move(windowmenu->getX(), frame.y + frame.title_h);
     windowmenu->reconfigure();
   }
+  
+  // re-get the timeout delay
+  timer->setTimeout(openbox.getAutoRaiseDelay());
 }
 
 
@@ -1000,12 +1004,12 @@ void OpenboxWindow::getWMProtocols(void) {
 
   if (XGetWMProtocols(display, client.window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
-      if (proto[i] == openbox->getWMDeleteAtom())
+      if (proto[i] == openbox.getWMDeleteAtom())
 	functions.close = decorations.close = True;
-      else if (proto[i] == openbox->getWMTakeFocusAtom())
+      else if (proto[i] == openbox.getWMTakeFocusAtom())
         flags.send_focus_message = True;
-      else if (proto[i] == openbox->getOpenboxStructureMessagesAtom())
-        screen->addNetizen(new Netizen(screen, client.window));
+      else if (proto[i] == openbox.getOpenboxStructureMessagesAtom())
+        screen->addNetizen(new Netizen(*screen, client.window));
     }
 
     XFree(proto);
@@ -1052,7 +1056,7 @@ void OpenboxWindow::getWMHints(void) {
   if (wmhint->flags & WindowGroupHint) {
     if (! client.window_group) {
       client.window_group = wmhint->window_group;
-      openbox->saveGroupSearch(client.window_group, this);
+      openbox.saveGroupSearch(client.window_group, this);
     }
   } else {
     client.window_group = None;
@@ -1070,10 +1074,10 @@ void OpenboxWindow::getWMNormalHints(void) {
   XSizeHints sizehint;
 
   client.min_width = client.min_height =
-    client.base_width = client.base_height =
     client.width_inc = client.height_inc = 1;
-  client.max_width = screen->getWidth();
-  client.max_height = screen->getHeight();
+  client.base_width = client.base_height = 0;
+  client.max_width = screen->size().w();
+  client.max_height = screen->size().h();
   client.min_aspect_x = client.min_aspect_y =
     client.max_aspect_x = client.max_aspect_y = 1;
   client.win_gravity = NorthWestGravity;
@@ -1128,9 +1132,9 @@ void OpenboxWindow::getMWMHints(void) {
   unsigned long num, len;
 
   int ret = XGetWindowProperty(display, client.window,
-			       openbox->getMotifWMHintsAtom(), 0,
+			       openbox.getMotifWMHintsAtom(), 0,
 			       PropMwmHintsElements, False,
-			       openbox->getMotifWMHintsAtom(), &atom_return,
+			       openbox.getMotifWMHintsAtom(), &atom_return,
 			       &format, &num, &len,
 			       (unsigned char **) &client.mwm_hint);
 
@@ -1198,9 +1202,9 @@ void OpenboxWindow::getOpenboxHints(void) {
   unsigned long num, len;
 
   int ret = XGetWindowProperty(display, client.window,
-			       openbox->getOpenboxHintsAtom(), 0,
+			       openbox.getOpenboxHintsAtom(), 0,
 			       PropOpenboxHintsElements, False,
-			       openbox->getOpenboxHintsAtom(), &atom_return,
+			       openbox.getOpenboxHintsAtom(), &atom_return,
 			       &format, &num, &len,
 			       (unsigned char **) &client.openbox_hint);
   if (ret != Success || !client.openbox_hint ||
@@ -1288,7 +1292,7 @@ void OpenboxWindow::configure(int dx, int dy,
     downsize();
 
 #ifdef    SHAPE
-    if (openbox->hasShapeExtensions() && flags.shaped) {
+    if (openbox.hasShapeExtensions() && flags.shaped) {
       XShapeCombineShape(display, frame.window, ShapeBounding,
  		         frame.mwm_border_w, frame.y_border +
 			 frame.mwm_border_w, client.window,
@@ -1318,7 +1322,6 @@ void OpenboxWindow::configure(int dx, int dy,
     positionWindows();
     decorate();
     setFocusFlag(flags.focused);
-    redrawAllButtons();
   } else {
     frame.x = dx;
     frame.y = dy;
@@ -1354,67 +1357,64 @@ void OpenboxWindow::configure(int dx, int dy,
 }
 
 
-Bool OpenboxWindow::setInputFocus(void) {
+bool OpenboxWindow::setInputFocus(void) {
   if (((signed) (frame.x + frame.width)) < 0) {
     if (((signed) (frame.y + frame.y_border)) < 0)
       configure(frame.border_w, frame.border_w, frame.width, frame.height);
-    else if (frame.y > (signed) screen->getHeight())
-      configure(frame.border_w, screen->getHeight() - frame.height,
+    else if (frame.y > (signed) screen->size().h())
+      configure(frame.border_w, screen->size().h() - frame.height,
                 frame.width, frame.height);
     else
       configure(frame.border_w, frame.y + frame.border_w,
                 frame.width, frame.height);
-  } else if (frame.x > (signed) screen->getWidth()) {
+  } else if (frame.x > (signed) screen->size().w()) {
     if (((signed) (frame.y + frame.y_border)) < 0)
-      configure(screen->getWidth() - frame.width, frame.border_w,
+      configure(screen->size().w() - frame.width, frame.border_w,
                 frame.width, frame.height);
-    else if (frame.y > (signed) screen->getHeight())
-      configure(screen->getWidth() - frame.width,
-	        screen->getHeight() - frame.height, frame.width, frame.height);
+    else if (frame.y > (signed) screen->size().h())
+      configure(screen->size().w() - frame.width,
+	        screen->size().h() - frame.height, frame.width, frame.height);
     else
-      configure(screen->getWidth() - frame.width,
+      configure(screen->size().w() - frame.width,
                 frame.y + frame.border_w, frame.width, frame.height);
   }
 
-  openbox->grab();
+  openbox.grab();
   if (! validateClient()) return False;
 
-  Bool ret = False;
+  bool ret = false;
 
   if (client.transient && flags.modal) {
     ret = client.transient->setInputFocus();
   } else if (! flags.focused) {
-    if (focus_mode == F_LocallyActive || focus_mode == F_Passive)
+    if (focus_mode == F_LocallyActive || focus_mode == F_Passive) {
       XSetInputFocus(display, client.window,
-		     RevertToPointerRoot, CurrentTime);
-    else
-      XSetInputFocus(display, screen->getRootWindow(),
-		     RevertToNone, CurrentTime);
+                      RevertToPointerRoot, CurrentTime);
+      openbox.focusWindow(this);
 
-    openbox->setFocusedWindow(this);
+      if (flags.send_focus_message) {
+        XEvent ce;
+        ce.xclient.type = ClientMessage;
+        ce.xclient.message_type = openbox.getWMProtocolsAtom();
+        ce.xclient.display = display;
+        ce.xclient.window = client.window;
+        ce.xclient.format = 32;
+        ce.xclient.data.l[0] = openbox.getWMTakeFocusAtom();
+        ce.xclient.data.l[1] = openbox.getLastTime();
+        ce.xclient.data.l[2] = 0l;
+        ce.xclient.data.l[3] = 0l;
+        ce.xclient.data.l[4] = 0l;
+        XSendEvent(display, client.window, False, NoEventMask, &ce);
+      }
 
-    if (flags.send_focus_message) {
-      XEvent ce;
-      ce.xclient.type = ClientMessage;
-      ce.xclient.message_type = openbox->getWMProtocolsAtom();
-      ce.xclient.display = display;
-      ce.xclient.window = client.window;
-      ce.xclient.format = 32;
-      ce.xclient.data.l[0] = openbox->getWMTakeFocusAtom();
-      ce.xclient.data.l[1] = openbox->getLastTime();
-      ce.xclient.data.l[2] = 0l;
-      ce.xclient.data.l[3] = 0l;
-      ce.xclient.data.l[4] = 0l;
-      XSendEvent(display, client.window, False, NoEventMask, &ce);
+      if (screen->sloppyFocus() && screen->autoRaise())
+        timer->start();
+
+      ret = true;
     }
-
-    if (screen->isSloppyFocus() && screen->doAutoRaise())
-      timer->start();
-
-    ret = True;
   }
 
-  openbox->ungrab();
+  openbox.ungrab();
 
   return ret;
 }
@@ -1422,6 +1422,9 @@ Bool OpenboxWindow::setInputFocus(void) {
 
 void OpenboxWindow::iconify(void) {
   if (flags.iconic) return;
+
+  if (flags.moving)
+    endMove();
 
   if (windowmenu) windowmenu->hide();
 
@@ -1450,7 +1453,7 @@ void OpenboxWindow::iconify(void) {
 }
 
 
-void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
+void OpenboxWindow::deiconify(bool reassoc, bool raise, bool initial) {
   if (flags.iconic || reassoc)
     screen->reassociateWindow(this, -1, False);
   else if (workspace_number != screen->getCurrentWorkspace()->getWorkspaceID())
@@ -1466,7 +1469,19 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
   XMapSubwindows(display, frame.window);
   XMapWindow(display, frame.window);
 
-  if (flags.iconic && screen->doFocusNew()) setInputFocus();
+  // if we're using the click to place placement type, then immediately
+  // after the window is mapped, we need to start interactively moving it
+  if (initial && place_window &&
+      screen->placementPolicy() == BScreen::ClickMousePlacement) {
+    int x, y, rx, ry;
+    Window c, r;
+    unsigned int m;
+    XQueryPointer(openbox.getXDisplay(), screen->getRootWindow(),
+                  &r, &c, &rx, &ry, &x, &y, &m);
+    startMove(rx, ry);
+  }
+  
+  if (flags.iconic && screen->focusNew()) setInputFocus();
 
   flags.visible = True;
   flags.iconic = False;
@@ -1481,11 +1496,11 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
 void OpenboxWindow::close(void) {
   XEvent ce;
   ce.xclient.type = ClientMessage;
-  ce.xclient.message_type = openbox->getWMProtocolsAtom();
+  ce.xclient.message_type = openbox.getWMProtocolsAtom();
   ce.xclient.display = display;
   ce.xclient.window = client.window;
   ce.xclient.format = 32;
-  ce.xclient.data.l[0] = openbox->getWMDeleteAtom();
+  ce.xclient.data.l[0] = openbox.getWMDeleteAtom();
   ce.xclient.data.l[1] = CurrentTime;
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
@@ -1495,6 +1510,9 @@ void OpenboxWindow::close(void) {
 
 
 void OpenboxWindow::withdraw(void) {
+  if (flags.moving)
+    endMove();
+
   flags.visible = False;
   flags.iconic = False;
 
@@ -1510,6 +1528,9 @@ void OpenboxWindow::withdraw(void) {
 
 
 void OpenboxWindow::maximize(unsigned int button) {
+  if (flags.moving)
+    endMove();
+  
   // handle case where menu is open then the max button is used instead
   if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 
@@ -1529,33 +1550,28 @@ void OpenboxWindow::maximize(unsigned int button) {
     openbox_attrib.premax_x = openbox_attrib.premax_y = 0;
     openbox_attrib.premax_w = openbox_attrib.premax_h = 0;
 
-    redrawAllButtons();
+    redrawMaximizeButton(flags.maximized);
     setState(current_state);
     return;
   }
-
-  int dx = 0, dy = 0;
-  unsigned int dw, dh;
 
   openbox_attrib.premax_x = frame.x;
   openbox_attrib.premax_y = frame.y;
   openbox_attrib.premax_w = frame.width;
   openbox_attrib.premax_h = frame.height;
 
-  dw = screen->getWidth();
+  Rect space = screen->availableArea();
+  unsigned int dw = space.w(),
+               dh = space.h();
   dw -= frame.border_w * 2;
   dw -= frame.mwm_border_w * 2;
   dw -= client.base_width;
 
-  dh = screen->getHeight();
   dh -= frame.border_w * 2;
   dh -= frame.mwm_border_w * 2;
   dh -= ((frame.handle_h + frame.border_w) * decorations.handle);
   dh -= client.base_height;
   dh -= frame.y_border;
-
-  if (! screen->doFullMax())
-    dh -= screen->getToolbar()->getExposedHeight() + frame.border_w;
 
   if (dw < client.min_width) dw = client.min_width;
   if (dh < client.min_height) dh = client.min_height;
@@ -1572,23 +1588,8 @@ void OpenboxWindow::maximize(unsigned int button) {
   dh += ((frame.handle_h + frame.border_w) * decorations.handle);
   dh += frame.mwm_border_w * 2;
 
-  dx += ((screen->getWidth() - dw) / 2) - frame.border_w;
-
-  if (screen->doFullMax()) {
-    dy += ((screen->getHeight() - dh) / 2) - frame.border_w;
-  } else {
-    dy += (((screen->getHeight() - screen->getToolbar()->getExposedHeight())
-           - dh) / 2) - frame.border_w;
-
-    switch (screen->getToolbarPlacement()) {
-    case Toolbar::TopLeft:
-    case Toolbar::TopCenter:
-    case Toolbar::TopRight:
-      dy += screen->getToolbar()->getExposedHeight() +
-        frame.border_w;
-      break;
-    }
-  }
+  int dx = space.x() + ((space.w() - dw) / 2) - frame.border_w,
+      dy = space.y() + ((space.h() - dh) / 2) - frame.border_w;
 
   switch(button) {
   case 1:
@@ -1623,12 +1624,13 @@ void OpenboxWindow::maximize(unsigned int button) {
 
   configure(dx, dy, dw, dh);
   screen->getWorkspace(workspace_number)->raiseWindow(this);
-  redrawAllButtons();
+  redrawMaximizeButton(flags.maximized);
   setState(current_state);
 }
 
 
 void OpenboxWindow::setWorkspace(int n) {
+  ASSERT(n < screen->getWorkspaceCount());
   workspace_number = n;
 
   openbox_attrib.flags |= AttribWorkspace;
@@ -1741,13 +1743,14 @@ void OpenboxWindow::setFocusFlag(Bool focus) {
       XSetWindowBorder(display, frame.plate, frame.uborder_pixel);
   }
 
-  if (screen->isSloppyFocus() && screen->doAutoRaise() && timer->isTiming())
+  if (screen->sloppyFocus() && screen->autoRaise() && timer->isTiming())
     timer->stop();
+
 }
 
 
 void OpenboxWindow::installColormap(Bool install) {
-  openbox->grab();
+  openbox.grab();
   if (! validateClient()) return;
 
   int i = 0, ncmap = 0;
@@ -1778,23 +1781,25 @@ void OpenboxWindow::installColormap(Bool install) {
     XFree(cmaps);
   }
 
-  openbox->ungrab();
+  openbox.ungrab();
 }
 
 
 void OpenboxWindow::setState(unsigned long new_state) {
+  if (! mapped) return;
+
   current_state = new_state;
 
   unsigned long state[2];
   state[0] = (unsigned long) current_state;
   state[1] = (unsigned long) None;
-  XChangeProperty(display, client.window, openbox->getWMStateAtom(),
-		  openbox->getWMStateAtom(), 32, PropModeReplace,
+  XChangeProperty(display, client.window, openbox.getWMStateAtom(),
+		  openbox.getWMStateAtom(), 32, PropModeReplace,
 		  (unsigned char *) state, 2);
 
   XChangeProperty(display, client.window,
-		  openbox->getOpenboxAttributesAtom(),
-                  openbox->getOpenboxAttributesAtom(), 32, PropModeReplace,
+		  openbox.getOpenboxAttributesAtom(),
+                  openbox.getOpenboxAttributesAtom(), 32, PropModeReplace,
                   (unsigned char *) &openbox_attrib,
 		  PropOpenboxAttributesElements);
 }
@@ -1808,12 +1813,12 @@ Bool OpenboxWindow::getState(void) {
   int foo;
   unsigned long *state, ulfoo, nitems;
 
-  if ((XGetWindowProperty(display, client.window, openbox->getWMStateAtom(),
-			  0l, 2l, False, openbox->getWMStateAtom(),
+  if ((XGetWindowProperty(display, client.window, openbox.getWMStateAtom(),
+			  0l, 2l, False, openbox.getWMStateAtom(),
 			  &atom_return, &foo, &nitems, &ulfoo,
 			  (unsigned char **) &state) != Success) ||
       (! state)) {
-    openbox->ungrab();
+    openbox.ungrab();
     return False;
   }
 
@@ -1895,9 +1900,9 @@ void OpenboxWindow::restoreAttributes(void) {
 
   OpenboxAttributes *net;
   int ret = XGetWindowProperty(display, client.window,
-			       openbox->getOpenboxAttributesAtom(), 0l,
+			       openbox.getOpenboxAttributesAtom(), 0l,
 			       PropOpenboxAttributesElements, False,
-			       openbox->getOpenboxAttributesAtom(),
+			       openbox.getOpenboxAttributesAtom(),
 			       &atom_return, &foo, &nitems, &ulfoo,
 			       (unsigned char **) &net);
   if (ret != Success || !net || nitems != PropOpenboxAttributesElements)
@@ -1927,7 +1932,7 @@ void OpenboxWindow::restoreAttributes(void) {
   }
 
   if (((int) openbox_attrib.workspace != screen->getCurrentWorkspaceID()) &&
-      ((int) openbox_attrib.workspace < screen->getCount())) {
+      ((int) openbox_attrib.workspace < screen->getWorkspaceCount())) {
     screen->reassociateWindow(this, openbox_attrib.workspace, True);
 
     if (current_state == NormalState) current_state = WithdrawnState;
@@ -2211,11 +2216,11 @@ void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
             client.window);
 #endif // DEBUG
 
-    openbox->grab();
+    openbox.grab();
     if (! validateClient()) return;
 
     Bool get_state_ret = getState();
-    if (! (get_state_ret && openbox->isStartup())) {
+    if (! (get_state_ret && openbox.isStartup())) {
       if ((client.wm_hint_flags & StateHint) &&
           (! (current_state == NormalState || current_state == IconicState)))
         current_state = client.initial_state;
@@ -2224,6 +2229,8 @@ void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
     } else if (flags.iconic) {
       current_state = NormalState;
     }
+
+    mapped = true;
 
     switch (current_state) {
     case IconicState:
@@ -2238,11 +2245,12 @@ void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
     case InactiveState:
     case ZoomState:
     default:
-      deiconify(False);
+      deiconify(False, True, True);     // specify that we're initializing the
+                                        // window
       break;
     }
 
-    openbox->ungrab();
+    openbox.ungrab();
   }
 }
 
@@ -2250,16 +2258,12 @@ void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
 void OpenboxWindow::mapNotifyEvent(XMapEvent *ne) {
   if ((ne->window == client.window) && (! ne->override_redirect)
       && (flags.visible)) {
-    openbox->grab();
+    openbox.grab();
     if (! validateClient()) return;
-
-    if (decorations.titlebar) positionButtons();
 
     setState(NormalState);
 
-    redrawAllButtons();
-
-    if (flags.transient || screen->doFocusNew())
+    if (flags.transient || screen->focusNew())
       setInputFocus();
     else
       setFocusFlag(False);
@@ -2267,7 +2271,7 @@ void OpenboxWindow::mapNotifyEvent(XMapEvent *ne) {
     flags.visible = True;
     flags.iconic = False;
 
-    openbox->ungrab();
+    openbox.ungrab();
   }
 }
 
@@ -2280,15 +2284,18 @@ void OpenboxWindow::unmapNotifyEvent(XUnmapEvent *ue) {
             client.window);
 #endif // DEBUG
 
-    openbox->grab();
+    openbox.grab();
     if (! validateClient()) return;
 
+    if (flags.moving)
+      endMove();
+    
     XChangeSaveSet(display, client.window, SetModeDelete);
     XSelectInput(display, client.window, NoEventMask);
 
-    XDeleteProperty(display, client.window, openbox->getWMStateAtom());
+    XDeleteProperty(display, client.window, openbox.getWMStateAtom());
     XDeleteProperty(display, client.window,
-		    openbox->getOpenboxAttributesAtom());
+		    openbox.getOpenboxAttributesAtom());
 
     XUnmapWindow(display, frame.window);
     XUnmapWindow(display, client.window);
@@ -2309,7 +2316,7 @@ void OpenboxWindow::unmapNotifyEvent(XUnmapEvent *ue) {
 
     XFlush(display);
 
-    openbox->ungrab();
+    openbox.ungrab();
 
     delete this;
   }
@@ -2318,6 +2325,8 @@ void OpenboxWindow::unmapNotifyEvent(XUnmapEvent *ue) {
 
 void OpenboxWindow::destroyNotifyEvent(XDestroyWindowEvent *de) {
   if (de->window == client.window) {
+    if (flags.moving)
+      endMove();
     XUnmapWindow(display, frame.window);
 
     delete this;
@@ -2326,7 +2335,7 @@ void OpenboxWindow::destroyNotifyEvent(XDestroyWindowEvent *de) {
 
 
 void OpenboxWindow::propertyNotifyEvent(Atom atom) {
-  openbox->grab();
+  openbox.grab();
   if (! validateClient()) return;
 
   switch(atom) {
@@ -2340,13 +2349,13 @@ void OpenboxWindow::propertyNotifyEvent(Atom atom) {
     Window win;
     if (XGetTransientForHint(display, client.window, &win)) {
       if (win && (win != client.window)) {
-        if ((client.transient_for = openbox->searchWindow(win))) {
+        if ((client.transient_for = openbox.searchWindow(win))) {
           client.transient_for->client.transient = this;
           flags.stuck = client.transient_for->flags.stuck;
           flags.transient = True;
         } else if (win == client.window_group) {
 	  //jr This doesn't look quite right...
-          if ((client.transient_for = openbox->searchGroup(win, this))) {
+          if ((client.transient_for = openbox.searchGroup(win, this))) {
             client.transient_for->client.transient = this;
             flags.stuck = client.transient_for->flags.stuck;
             flags.transient = True;
@@ -2412,12 +2421,15 @@ void OpenboxWindow::propertyNotifyEvent(Atom atom) {
   }
 
   default:
-    if (atom == openbox->getWMProtocolsAtom()) {
+    if (atom == openbox.getWMProtocolsAtom()) {
       getWMProtocols();
 
       if (decorations.close && (! frame.close_button)) {
         createCloseButton();
-        if (decorations.titlebar) positionButtons(True);
+        if (decorations.titlebar) {
+          positionButtons();
+          decorateLabel();
+        }
         if (windowmenu) windowmenu->reconfigure();
       }
     }
@@ -2425,7 +2437,7 @@ void OpenboxWindow::propertyNotifyEvent(Atom atom) {
     break;
   }
 
-  openbox->ungrab();
+  openbox.ungrab();
 }
 
 
@@ -2443,7 +2455,7 @@ void OpenboxWindow::exposeEvent(XExposeEvent *ee) {
 
 void OpenboxWindow::configureRequestEvent(XConfigureRequestEvent *cr) {
   if (cr->window == client.window) {
-    openbox->grab();
+    openbox.grab();
     if (! validateClient()) return;
 
     int cx = frame.x, cy = frame.y;
@@ -2487,13 +2499,13 @@ void OpenboxWindow::configureRequestEvent(XConfigureRequestEvent *cr) {
       }
     }
 
-    openbox->ungrab();
+    openbox.ungrab();
   }
 }
 
 
 void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
-  openbox->grab();
+  openbox.grab();
   if (! validateClient())
     return;
 
@@ -2504,8 +2516,6 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
   // alt + left/right click begins interactively moving/resizing the window
   // when the mouse is moved
   if (be->state == Mod1Mask && (be->button == 1 || be->button == 3)) {
-    frame.grab_x = be->x_root - frame.x - frame.border_w;
-    frame.grab_y = be->y_root - frame.y - frame.border_w;
     if (be->button == 3) {
       if (screen->getWindowZones() == 4 &&
           be->y < (signed) frame.height / 2) {
@@ -2542,7 +2552,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
                be->window == frame.label) {
       // shade the window when the titlebar is double clicked
       if ( (be->time - lastButtonPressTime) <=
-            openbox->getDoubleClickInterval()) {
+            openbox.getDoubleClickInterval()) {
         lastButtonPressTime = 0;
         shade();
       } else {
@@ -2594,7 +2604,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
           mx = be->x_root - windowmenu->getWidth() / 2;
           if (be->window == frame.title || be->window == frame.label) {
             my = frame.y + frame.title_h;
-          } else if (be->window = frame.handle) {
+          } else if (be->window == frame.handle) {
             my = frame.y + frame.y_handle - windowmenu->getHeight();
           } else { // (be->window == frame.window)
             if (be->y <= (signed) frame.bevel_w) {
@@ -2642,7 +2652,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
       shade();
   }
 
-  if (! (flags.focused || screen->isSloppyFocus()) ) {
+  if (! (flags.focused || screen->sloppyFocus()) ) {
     setInputFocus();  // any click focus' the window in 'click to focus'
   }
   if (stack_change < 0) {
@@ -2651,12 +2661,12 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
     screen->getWorkspace(workspace_number)->raiseWindow(this);
   }
  
-  openbox->ungrab();
+  openbox.ungrab();
 }
 
 
 void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
-  openbox->grab();
+  openbox.grab();
   if (! validateClient())
     return;
 
@@ -2688,9 +2698,10 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
           (re->x >= 0) && ((unsigned) re->x <= frame.button_w) &&
           (re->y >= 0) && ((unsigned) re->y <= frame.button_h)) {
           close();
-      } else {
-        redrawCloseButton(False);
       }
+      //we should always redraw the close button. some applications
+      //eg. acroread don't honour the close.
+      redrawCloseButton(False);
     }
   // middle button released
   } else if (re->button == 2) {
@@ -2719,21 +2730,7 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
   // when the window is being interactively moved, a button release stops the
   // move where it is
   if (flags.moving) {
-    flags.moving = False;
-
-    openbox->maskWindowEvents(0, (OpenboxWindow *) 0);
-    if (!screen->doOpaqueMove()) {
-      XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-                     frame.move_x, frame.move_y, frame.resize_w - 1,
-                     frame.resize_h - 1);
-
-      configure(frame.move_x, frame.move_y, frame.width, frame.height);
-      openbox->ungrab();
-    } else {
-      configure(frame.x, frame.y, frame.width, frame.height);
-    }
-    screen->hideGeometry();
-    XUngrabPointer(display, CurrentTime);
+    endMove();
   // when the window is being interactively resized, a button release stops the
   // resizing
   } else if (flags.resizing) {
@@ -2742,13 +2739,6 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
                    frame.resize_x, frame.resize_y,
                    frame.resize_w - 1, frame.resize_h - 1);
     screen->hideGeometry();
-    if (resize_zone & ZoneLeft) {
-      left_fixsize();
-    } else {  // when resizing with "Alt+Button3", the resize is the same as if
-              // done with the right grip (the right side of the window is what
-              // moves)
-      right_fixsize();
-    }
     // unset maximized state when resized after fully maximized
     if (flags.maximized == 1) {
         maximize(0);
@@ -2756,111 +2746,266 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
     configure(frame.resize_x, frame.resize_y,
               frame.resize_w - (frame.border_w * 2),
               frame.resize_h - (frame.border_w * 2));
-    openbox->ungrab();
+    openbox.ungrab();
     XUngrabPointer(display, CurrentTime);
     resize_zone = 0;
   }
 
-  openbox->ungrab();
+  openbox.ungrab();
+}
+
+
+void OpenboxWindow::startMove(int x, int y) {
+  ASSERT(!flags.moving);
+
+  // make sure only one window is moving at a time
+  OpenboxWindow *w = openbox.getMaskedWindow();
+  if (w != (OpenboxWindow *) 0 && w->flags.moving)
+    w->endMove();
+  
+  XGrabPointer(display, frame.window, False, PointerMotionMask |
+               ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
+               None, openbox.getMoveCursor(), CurrentTime);
+
+  if (windowmenu && windowmenu->isVisible())
+    windowmenu->hide();
+
+  flags.moving = True;
+
+  openbox.maskWindowEvents(client.window, this);
+
+  if (! screen->opaqueMove()) {
+    openbox.grab();
+
+    frame.move_x = frame.x;
+    frame.move_y = frame.y;
+    frame.resize_w = frame.width + (frame.border_w * 2);
+    frame.resize_h = ((flags.shaded) ? frame.title_h : frame.height) +
+      (frame.border_w * 2);
+
+    screen->showPosition(frame.x, frame.y);
+
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y,
+                   frame.resize_w - 1, frame.resize_h - 1);
+  }
+  frame.grab_x = x - frame.x - frame.border_w;
+  frame.grab_y = y - frame.y - frame.border_w;
+}
+
+
+void OpenboxWindow::doMove(int x, int y) {
+  ASSERT(flags.moving);
+
+  int dx = x - frame.grab_x, dy = y - frame.grab_y;
+
+  dx -= frame.border_w;
+  dy -= frame.border_w;
+
+  const int snap_distance = screen->edgeSnapThreshold();
+
+  if (snap_distance) {
+    // window corners
+    const int wleft = dx,
+             wright = dx + area().w() + (frame.border_w * 2) - 1,
+               wtop = dy,
+            wbottom = dy + area().h() + (frame.border_w * 2) - 1;
+
+    Workspace *w = screen->getWorkspace(getWorkspaceNumber());
+    assert(w);
+
+    if (screen->windowToWindowSnap()) {
+      // try snap to another window
+      for (unsigned int i = 0, c = w->getCount(); i < c; ++i) {
+        OpenboxWindow *snapwin = w->getWindow(i);
+        if (snapwin == this)
+          continue;   // don't snap to self
+        
+        const Rect &winrect = snapwin->area();
+        int dleft = std::abs(wright - winrect.left()),
+           dright = std::abs(wleft - winrect.right()),
+             dtop = std::abs(wbottom - winrect.top()),
+          dbottom = std::abs(wtop - winrect.bottom());
+
+        if (wtop >= (signed)(winrect.y() - area().h() - frame.border_w * 3) &&
+            wtop < (signed)(winrect.y() + winrect.h() + frame.border_w * 3)) {
+
+          // snap left of other window?
+          if (dleft < snap_distance && dleft <= dright) {
+            dx = winrect.left() - area().w() - (frame.border_w * 2);
+
+            if (screen->windowCornerSnap()) {
+              // try corner-snap to its other sides
+              dtop = std::abs(wtop - winrect.top());
+              dbottom = std::abs(wbottom - winrect.bottom());
+              if (dtop < snap_distance && dtop <= dbottom)
+                dy = winrect.top();
+              else if (dbottom < snap_distance)
+                dy = winrect.bottom() - area().h() + frame.border_w;
+            }
+
+            continue;
+          }
+          // snap right of other window?
+          else if (dright < snap_distance) {
+            dx = winrect.right() + (frame.border_w * 2) + 1;
+
+            if (screen->windowCornerSnap()) {
+              // try corner-snap to its other sides
+              dtop = std::abs(wtop - winrect.top());
+              dbottom = std::abs(wbottom - winrect.bottom());
+              if (dtop < snap_distance && dtop <= dbottom)
+                dy = winrect.top();
+              else if (dbottom < snap_distance)
+                dy = winrect.bottom() - area().h() + frame.border_w;
+            }
+
+            continue;
+          }
+        }
+
+        if (wleft >= (signed)(winrect.x() - area().w() - frame.border_w * 3) &&
+            wleft < (signed)(winrect.x() + winrect.w() + frame.border_w * 3)) {
+
+          // snap top of other window?
+          if (dtop < snap_distance && dtop <= dbottom) {
+            dy = winrect.top() - area().h() - (frame.border_w * 2);
+
+            if (screen->windowCornerSnap()) {
+              // try corner-snap to its other sides
+              dleft = std::abs(wleft - winrect.left());
+              dright = std::abs(wright - winrect.right());
+              if (dleft < snap_distance && dleft <= dright)
+                dx = winrect.left();
+              else if (dright < snap_distance)
+                dx = winrect.right() - area().w() + frame.border_w;
+            }
+
+            continue;
+          }
+          // snap bottom of other window?
+          else if (dbottom < snap_distance) {
+            dy = winrect.bottom() + (frame.border_w * 2) + 1;
+
+            if (screen->windowCornerSnap()) {
+              // try corner-snap to its other sides
+              dleft = std::abs(wleft - winrect.left());
+              dright = std::abs(wright - winrect.right());
+              if (dleft < snap_distance && dleft <= dright)
+                dx = winrect.left();
+              else if (dright < snap_distance)
+                dx = winrect.right() - area().w() + frame.border_w;
+            }
+
+            continue;
+          }
+        }
+      }
+    }
+
+    // try snap to the screen's available area
+    Rect srect = screen->availableArea();
+
+    int dleft = std::abs(wleft - srect.left()),
+       dright = std::abs(wright - srect.right()),
+         dtop = std::abs(wtop - srect.top()),
+      dbottom = std::abs(wbottom - srect.bottom());
+
+    // snap left?
+    if (dleft < snap_distance && dleft <= dright)
+      dx = srect.left();
+    // snap right?
+    else if (dright < snap_distance)
+      dx = srect.right() - area().w() - (frame.border_w * 2) + 1;
+
+    // snap top?
+    if (dtop < snap_distance && dtop <= dbottom)
+      dy = srect.top();
+    // snap bottom?
+    else if (dbottom < snap_distance)
+      dy = srect.bottom() - area().h() - (frame.border_w * 2) + 1;
+        
+    if (! screen->fullMax()) {
+      srect = Rect(Point(0,0), screen->size()); // now get the full screen
+
+      dleft = std::abs(wleft - srect.left());
+      dright = std::abs(wright - srect.right());
+      dtop = std::abs(wtop - srect.top());
+      dbottom = std::abs(wbottom - srect.bottom());
+
+      // snap left?
+      if (dleft < snap_distance && dleft <= dright)
+        dx = srect.left();
+      // snap right?
+      else if (dright < snap_distance)
+        dx = srect.right() - area().w() - (frame.border_w * 2) + 1;
+
+      // snap top?
+      if (dtop < snap_distance && dtop <= dbottom)
+        dy = srect.top();
+      // snap bottom?
+      else if (dbottom < snap_distance)
+        dy = srect.bottom() - area().h() - (frame.border_w * 2) + 1;
+    }
+  }
+
+
+  
+  if (screen->opaqueMove()) {
+    configure(dx, dy, frame.width, frame.height);
+  } else {
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+
+    frame.move_x = dx;
+    frame.move_y = dy;
+
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+  }
+
+  screen->showPosition(dx, dy);
+}
+
+
+void OpenboxWindow::endMove() {
+  ASSERT(flags.moving);
+
+  flags.moving = False;
+
+  openbox.maskWindowEvents(0, (OpenboxWindow *) 0);
+  if (!screen->opaqueMove()) {
+    XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
+                   frame.move_x, frame.move_y, frame.resize_w - 1,
+                   frame.resize_h - 1);
+
+    configure(frame.move_x, frame.move_y, frame.width, frame.height);
+    openbox.ungrab();
+  } else {
+    configure(frame.x, frame.y, frame.width, frame.height);
+  }
+  screen->hideGeometry();
+  XUngrabPointer(display, CurrentTime);
+  // if there are any left over motions from the move, drop them now cuz they
+  // cause problems
+  XEvent e;
+  while (XCheckTypedWindowEvent(display, frame.window, MotionNotify, &e));
 }
 
 
 void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
-  if (!flags.resizing && (me->state & Button1Mask) && functions.move &&
+  if (flags.moving)
+      doMove(me->x_root, me->y_root);
+  else if (!flags.resizing && (me->state & Button1Mask) && functions.move &&
       (frame.title == me->window || frame.label == me->window ||
-       frame.handle == me->window || frame.window == me->window)) {
-    if (! flags.moving) {
-      XGrabPointer(display, me->window, False, Button1MotionMask |
-                   ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
-                   None, openbox->getMoveCursor(), CurrentTime);
-
-      if (windowmenu && windowmenu->isVisible())
-        windowmenu->hide();
-
-      flags.moving = True;
-
-      openbox->maskWindowEvents(client.window, this);
-
-      if (! screen->doOpaqueMove()) {
-        openbox->grab();
-
-        frame.move_x = frame.x;
-	frame.move_y = frame.y;
-        frame.resize_w = frame.width + (frame.border_w * 2);
-        frame.resize_h = ((flags.shaded) ? frame.title_h : frame.height) +
-          (frame.border_w * 2);
-
-	screen->showPosition(frame.x, frame.y);
-
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y,
-		       frame.resize_w - 1, frame.resize_h - 1);
-      }
-    } else {
-      int dx = me->x_root - frame.grab_x, dy = me->y_root - frame.grab_y;
-
-      dx -= frame.border_w;
-      dy -= frame.border_w;
-
-      int snap_distance = screen->getEdgeSnapThreshold();
-      if (snap_distance) {
-        int drx = screen->getWidth() - (dx + frame.snap_w);
-
-        if (dx < drx && (dx > 0 && dx < snap_distance) ||
-                        (dx < 0 && dx > -snap_distance) )
-          dx = 0;
-        else if ( (drx > 0 && drx < snap_distance) ||
-                  (drx < 0 && drx > -snap_distance) )
-          dx = screen->getWidth() - frame.snap_w;
-
-        int dtty, dbby, dty, dby;
-        switch (screen->getToolbarPlacement()) {
-        case Toolbar::TopLeft:
-        case Toolbar::TopCenter:
-        case Toolbar::TopRight:
-          dtty = screen->getToolbar()->getExposedHeight() +
-	         frame.border_w;
-          dbby = screen->getHeight();
-          break;
-
-        default:
-          dtty = 0;
-	  dbby = screen->getToolbar()->getY();
-          break;
-        }
-
-        dty = dy - dtty;
-        dby = dbby - (dy + frame.snap_h);
-
-        if ( (dy > 0 && dty < snap_distance) ||
-            (dy < 0 && dty > -snap_distance) )
-          dy = dtty;
-        else if ( (dby > 0 && dby < snap_distance) ||
-                 (dby < 0 && dby > -snap_distance) )
-          dy = dbby - frame.snap_h;
-      }
-
-      if (screen->doOpaqueMove()) {
-	configure(dx, dy, frame.width, frame.height);
-      } else {
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y, frame.resize_w - 1,
-		       frame.resize_h - 1);
-
-	frame.move_x = dx;
-	frame.move_y = dy;
-
-	XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
-		       frame.move_x, frame.move_y, frame.resize_w - 1,
-		       frame.resize_h - 1);
-      }
-
-      screen->showPosition(dx, dy);
-    }
-  } else if (functions.resize &&
+       frame.handle == me->window || frame.window == me->window))
+    startMove(me->x_root, me->y_root);
+  else if (functions.resize &&
 	     (((me->state & Button1Mask) && (me->window == frame.right_grip ||
 					     me->window == frame.left_grip)) ||
-	      (me->state & (Mod1Mask | Button3Mask) &&
+	      (me->state == (Mod1Mask | Button3Mask) &&
 	                                     me->window == frame.window))) {
     Bool left = resize_zone & ZoneLeft;
 
@@ -2868,29 +3013,29 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       Cursor cursor;
       if (resize_zone & ZoneTop)
         cursor = (resize_zone & ZoneLeft) ?
-          openbox->getUpperLeftAngleCursor() :
-          openbox->getUpperRightAngleCursor();
+          openbox.getUpperLeftAngleCursor() :
+          openbox.getUpperRightAngleCursor();
       else
         cursor = (resize_zone & ZoneLeft) ?
-          openbox->getLowerLeftAngleCursor() :
-          openbox->getLowerRightAngleCursor();
+          openbox.getLowerLeftAngleCursor() :
+          openbox.getLowerRightAngleCursor();
       XGrabPointer(display, me->window, False, ButtonMotionMask |
                    ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None,
                    cursor, CurrentTime);
 
       flags.resizing = True;
 
-      openbox->grab();
+      openbox.grab();
 
       int gx, gy;
       if (resize_zone & ZoneRight)
-        frame.grab_x = me->x - screen->getBorderWidth();
+        frame.grab_x = me->x - frame.border_w;
       else
-        frame.grab_x = me->x + screen->getBorderWidth();
+        frame.grab_x = me->x + frame.border_w;
       if (resize_zone & ZoneTop)
-        frame.grab_y = me->y + screen->getBorderWidth() * 2;
+        frame.grab_y = me->y + (frame.border_w * 2);
       else
-        frame.grab_y = me->y - screen->getBorderWidth() * 2;
+        frame.grab_y = me->y - (frame.border_w * 2);
       frame.resize_x = frame.x;
       frame.resize_y = frame.y;
       frame.resize_w = frame.width + (frame.border_w * 2);
@@ -2899,7 +3044,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       if (left)
         left_fixsize(&gx, &gy);
       else
-	right_fixsize(&gx, &gy);
+        right_fixsize(&gx, &gy);
 
       screen->showGeometry(gx, gy);
 
@@ -2913,23 +3058,23 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
       int gx, gy;
 
+      frame.resize_w = frame.width + (frame.border_w * 2);
+      frame.resize_h = frame.height + (frame.border_w * 2);
+
       if (resize_zone & ZoneTop)
-        frame.resize_h = frame.height - (me->y - frame.grab_y);
+        frame.resize_h -= me->y - frame.grab_y;
       else
-        frame.resize_h = frame.height + (me->y - frame.grab_y);
+        frame.resize_h += me->y - frame.grab_y;
       if (frame.resize_h < 1) frame.resize_h = 1;
 
       if (left) {
-        frame.resize_x = me->x_root - frame.grab_x;
-        if (frame.resize_x > (signed) (frame.x + frame.width))
-          frame.resize_x = frame.resize_x + frame.width - 1;
-
+        frame.resize_w += frame.grab_x - me->x;
+        if (frame.resize_w < 1) frame.resize_w = 1;
         left_fixsize(&gx, &gy);
       } else {
-	frame.resize_w = frame.width + (me->x - frame.grab_x);
-	if (frame.resize_w < 1) frame.resize_w = 1;
-
-	right_fixsize(&gx, &gy);
+        frame.resize_w += me->x - frame.grab_x;
+        if (frame.resize_w < 1) frame.resize_w = 1;
+        right_fixsize(&gx, &gy);
       }
 
       XDrawRectangle(display, screen->getRootWindow(), screen->getOpGC(),
@@ -2944,9 +3089,9 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
 
 #ifdef    SHAPE
 void OpenboxWindow::shapeEvent(XShapeEvent *) {
-  if (openbox->hasShapeExtensions()) {
+  if (openbox.hasShapeExtensions()) {
     if (flags.shaped) {
-      openbox->grab();
+      openbox.grab();
       if (! validateClient()) return;
       XShapeCombineShape(display, frame.window, ShapeBounding,
 			 frame.mwm_border_w, frame.y_border +
@@ -2969,26 +3114,26 @@ void OpenboxWindow::shapeEvent(XShapeEvent *) {
 
       XShapeCombineRectangles(display, frame.window, ShapeBounding, 0, 0,
 			      xrect, num, ShapeUnion, Unsorted);
-      openbox->ungrab();
+      openbox.ungrab();
     }
   }
 }
 #endif // SHAPE
 
 
-Bool OpenboxWindow::validateClient(void) {
+bool OpenboxWindow::validateClient(void) {
   XSync(display, False);
 
   XEvent e;
   if (XCheckTypedWindowEvent(display, client.window, DestroyNotify, &e) ||
       XCheckTypedWindowEvent(display, client.window, UnmapNotify, &e)) {
     XPutBackEvent(display, &e);
-    openbox->ungrab();
+    openbox.ungrab();
 
-    return False;
+    return false;
   }
 
-  return True;
+  return true;
 }
 
 
@@ -3007,6 +3152,8 @@ void OpenboxWindow::restore(void) {
   XMapWindow(display, client.window);
 
   XFlush(display);
+
+  delete this;
 }
 
 
@@ -3064,21 +3211,25 @@ void OpenboxWindow::changeOpenboxHints(OpenboxHints *net) {
 
     default:
     case DecorNormal:
-      decorations.titlebar = decorations.border = decorations.handle =
-       decorations.iconify = decorations.maximize = decorations.menu = True;
+      decorations.titlebar = decorations.iconify = decorations.menu =
+        decorations.border = True;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
 
     case DecorTiny:
       decorations.titlebar = decorations.iconify = decorations.menu = True;
-      decorations.border = decorations.handle = decorations.maximize = False;
- 
+      decorations.border = decorations.border = decorations.handle = False;
+      decorations.maximize = functions.maximize;
+
       break;
 
     case DecorTool:
-      decorations.titlebar = decorations.menu = functions.move = True;
-      decorations.iconify = decorations.border = decorations.handle =
-	decorations.maximize = False;
+      decorations.titlebar = decorations.menu = True;
+      decorations.iconify = decorations.border = False;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
     }
@@ -3147,9 +3298,6 @@ void OpenboxWindow::upsize(void) {
   
   frame.width = client.width + (frame.mwm_border_w * 2);
   frame.height = frame.y_handle + frame.handle_h;
-
-  frame.snap_w = frame.width + (frame.border_w * 2);
-  frame.snap_h = frame.height + (frame.border_w * 2);
 }
 
 
@@ -3171,38 +3319,49 @@ void OpenboxWindow::downsize(void) {
     - frame.handle_h - (decorations.handle ? frame.border_w : 0);
 
   frame.y_handle = frame.border_h + frame.y_border + frame.border_w;
-
-  frame.snap_w = frame.width + (frame.border_w * 2);
-  frame.snap_h = frame.height + (frame.border_w * 2);
 }
 
 
 void OpenboxWindow::right_fixsize(int *gx, int *gy) {
   // calculate the size of the client window and conform it to the
   // size specified by the size hints of the client window...
-  int dx = frame.resize_w - client.base_width - (frame.mwm_border_w * 2) -
-    (frame.border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
-    frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
-    + (client.height_inc / 2);
+  int dx = frame.resize_w;
+  int dy = frame.resize_h;
+
+  // subtract the borders
+  dx -= (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  dy -= frame.y_border + frame.handle_h + (frame.border_w * 3) +
+    (frame.mwm_border_w * 2);
+
+  dx +=  client.width_inc / 2;
+  dy +=  client.height_inc / 2;
 
   if (dx < (signed) client.min_width) dx = client.min_width;
   if (dy < (signed) client.min_height) dy = client.min_height;
-  if ((unsigned) dx > client.max_width) dx = client.max_width;
-  if ((unsigned) dy > client.max_height) dy = client.max_height;
+  if (dx > (signed) client.max_width) dx = client.max_width;
+  if (dy > (signed) client.max_height) dy = client.max_height;
 
+  dx -= client.base_width;
   dx /= client.width_inc;
+  dy -= client.base_height;
   dy /= client.height_inc;
 
   if (gx) *gx = dx;
   if (gy) *gy = dy;
 
-  dx = (dx * client.width_inc) + client.base_width;
-  dy = (dy * client.height_inc) + client.base_height;
+  dx *= client.width_inc;
+  dx += client.base_width;
+  dy *= client.height_inc;
+  dy += client.base_height;
 
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
-  frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) +  (frame.border_w * 3);
+  // add the borders
+  dx += (frame.mwm_border_w * 2) + (frame.border_w * 2);
+  dy += frame.y_border + frame.handle_h + (frame.border_w * 3) +
+    (frame.mwm_border_w * 2);
+
+  frame.resize_w = dx;
+  frame.resize_h = dy;
+
   if (resize_zone & ZoneTop)
     frame.resize_y = frame.y + frame.height - frame.resize_h +
       screen->getBorderWidth() * 2;
@@ -3210,35 +3369,8 @@ void OpenboxWindow::right_fixsize(int *gx, int *gy) {
 
 
 void OpenboxWindow::left_fixsize(int *gx, int *gy) {
-  // calculate the size of the client window and conform it to the
-  // size specified by the size hints of the client window...
-  int dx = frame.x + frame.width - frame.resize_x - client.base_width -
-    (frame.mwm_border_w * 2) + (client.width_inc / 2);
-  int dy = frame.resize_h - frame.y_border - client.base_height -
-    frame.handle_h - (frame.border_w * 3) - (frame.mwm_border_w * 2)
-    + (client.height_inc / 2);
+  right_fixsize(gx, gy);
 
-  if (dx < (signed) client.min_width) dx = client.min_width;
-  if (dy < (signed) client.min_height) dy = client.min_height;
-  if ((unsigned) dx > client.max_width) dx = client.max_width;
-  if ((unsigned) dy > client.max_height) dy = client.max_height;
-
-  dx /= client.width_inc;
-  dy /= client.height_inc;
-
-  if (gx) *gx = dx;
-  if (gy) *gy = dy;
-
-  dx = (dx * client.width_inc) + client.base_width;
-  dy = (dy * client.height_inc) + client.base_height;
-
-  frame.resize_w = dx + (frame.mwm_border_w * 2) + (frame.border_w * 2);
-  frame.resize_x = frame.x + frame.width - frame.resize_w +
-                   (frame.border_w * 2);
-  frame.resize_h = dy + frame.y_border + frame.handle_h +
-                   (frame.mwm_border_w * 2) + (frame.border_w * 3);
-  if (resize_zone & ZoneTop)
-    frame.resize_y = frame.y + frame.height - frame.resize_h +
-      screen->getBorderWidth() * 2;
-  
+  frame.resize_x = frame.x + (frame.width + (frame.border_w * 2) -
+                              frame.resize_w);
 }

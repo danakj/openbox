@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p4 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -77,14 +77,14 @@ VERSION = @VERSION@
 gencat_cmd = @gencat_cmd@
 regex_cmd = @regex_cmd@
 
-CPPFLAGS = @CPPFLAGS@ @DEBUG@ @NLS@ @TIMEDCACHE@ @NEWWMSPEC@ @INTERLACE@ @ORDEREDPSEUDO@
+CPPFLAGS = @CPPFLAGS@ @DEBUG@ @NLS@ @TIMEDCACHE@ @NEWWMSPEC@ @INTERLACE@ @ORDEREDPSEUDO@ @CLOBBER@
 
 
 bin_SCRIPTS = bsetbg
 bin_PROGRAMS = bsetroot
 
 bsetroot_SOURCES = bsetroot.cc
-bsetroot_LDADD = ../src/BaseDisplay.o ../src/LinkedList.o ../src/Timer.o ../src/Image.o ../src/i18n.o
+bsetroot_LDADD = ../src/BaseDisplay.o ../src/Timer.o ../src/Image.o ../src/i18n.o ../src/Geometry.o
 
 MAINTAINERCLEANFILES = Makefile.in
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -101,8 +101,8 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 bsetroot_OBJECTS =  bsetroot.o
-bsetroot_DEPENDENCIES =  ../src/BaseDisplay.o ../src/LinkedList.o \
-../src/Timer.o ../src/Image.o ../src/i18n.o
+bsetroot_DEPENDENCIES =  ../src/BaseDisplay.o ../src/Timer.o \
+../src/Image.o ../src/i18n.o ../src/Geometry.o
 bsetroot_LDFLAGS = 
 SCRIPTS =  $(bin_SCRIPTS)
 
@@ -378,7 +378,7 @@ distclean-local:
 	rm -f *\~
 
 bsetroot.o: bsetroot.cc ../config.h bsetroot.h ../src/BaseDisplay.h \
- ../src/LinkedList.h ../src/Timer.h ../src/Image.h
+ ../src/Timer.h ../src/Image.h ../src/Geometry.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

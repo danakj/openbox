@@ -30,8 +30,11 @@
 class BaseDisplay;
 class ScreenInfo;
 
-#include "LinkedList.h"
 #include "Timer.h"
+#include "Geometry.h"
+#include "Util.h"
+#include <vector>
+#include <list>
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -126,11 +129,15 @@ private:
 
   Bool _startup, _shutdown;
   Display *display;
-  LinkedList<ScreenInfo> *screenInfoList;
-  LinkedList<BTimer> *timerList;
+
+  typedef std::vector<ScreenInfo*> ScreenInfoList;
+  ScreenInfoList screenInfoList;
+ 
+  typedef std::list<BTimer*> TimerList;
+  TimerList timerList;
 
   char *display_name, *application_name;
-  int number_of_screens, server_grabs, colors_per_channel;
+  unsigned int server_grabs, colors_per_channel;
 
 
 protected:
@@ -142,170 +149,172 @@ protected:
 
 
 public:
-  BaseDisplay(char *, char * = 0);
-  virtual ~BaseDisplay(void);
+  BaseDisplay(const char *, char * = 0);
+  virtual ~BaseDisplay();
 
-  inline const Atom &getWMChangeStateAtom(void) const
+  inline const Atom &getWMChangeStateAtom() const
     { return xa_wm_change_state; }
-  inline const Atom &getWMStateAtom(void) const
+  inline const Atom &getWMStateAtom() const
     { return xa_wm_state; }
-  inline const Atom &getWMDeleteAtom(void) const
+  inline const Atom &getWMDeleteAtom() const
     { return xa_wm_delete_window; }
-  inline const Atom &getWMProtocolsAtom(void) const
+  inline const Atom &getWMProtocolsAtom() const
     { return xa_wm_protocols; }
-  inline const Atom &getWMTakeFocusAtom(void) const
+  inline const Atom &getWMTakeFocusAtom() const
     { return xa_wm_take_focus; }
-  inline const Atom &getWMColormapAtom(void) const
+  inline const Atom &getWMColormapAtom() const
     { return xa_wm_colormap_windows; }
-  inline const Atom &getMotifWMHintsAtom(void) const
+  inline const Atom &getMotifWMHintsAtom() const
     { return motif_wm_hints; }
 
   // this atom is for normal app->WM hints about decorations, stacking,
   // starting workspace etc...
-  inline const Atom &getOpenboxHintsAtom(void) const
+  inline const Atom &getOpenboxHintsAtom() const
     { return openbox_hints;}
 
   // these atoms are for normal app->WM interaction beyond the scope of the
   // ICCCM...
-  inline const Atom &getOpenboxAttributesAtom(void) const
+  inline const Atom &getOpenboxAttributesAtom() const
     { return openbox_attributes; }
-  inline const Atom &getOpenboxChangeAttributesAtom(void) const
+  inline const Atom &getOpenboxChangeAttributesAtom() const
     { return openbox_change_attributes; }
 
   // these atoms are for window->WM interaction, with more control and
   // information on window "structure"... common examples are
   // notifying apps when windows are raised/lowered... when the user changes
   // workspaces... i.e. "pager talk"
-  inline const Atom &getOpenboxStructureMessagesAtom(void) const
+  inline const Atom &getOpenboxStructureMessagesAtom() const
     { return openbox_structure_messages; }
 
   // *Notify* portions of the NETStructureMessages protocol
-  inline const Atom &getOpenboxNotifyStartupAtom(void) const
+  inline const Atom &getOpenboxNotifyStartupAtom() const
     { return openbox_notify_startup; }
-  inline const Atom &getOpenboxNotifyWindowAddAtom(void) const
+  inline const Atom &getOpenboxNotifyWindowAddAtom() const
     { return openbox_notify_window_add; }
-  inline const Atom &getOpenboxNotifyWindowDelAtom(void) const
+  inline const Atom &getOpenboxNotifyWindowDelAtom() const
     { return openbox_notify_window_del; }
-  inline const Atom &getOpenboxNotifyWindowFocusAtom(void) const
+  inline const Atom &getOpenboxNotifyWindowFocusAtom() const
     { return openbox_notify_window_focus; }
-  inline const Atom &getOpenboxNotifyCurrentWorkspaceAtom(void) const
+  inline const Atom &getOpenboxNotifyCurrentWorkspaceAtom() const
     { return openbox_notify_current_workspace; }
-  inline const Atom &getOpenboxNotifyWorkspaceCountAtom(void) const
+  inline const Atom &getOpenboxNotifyWorkspaceCountAtom() const
     { return openbox_notify_workspace_count; }
-  inline const Atom &getOpenboxNotifyWindowRaiseAtom(void) const
+  inline const Atom &getOpenboxNotifyWindowRaiseAtom() const
     { return openbox_notify_window_raise; }
-  inline const Atom &getOpenboxNotifyWindowLowerAtom(void) const
+  inline const Atom &getOpenboxNotifyWindowLowerAtom() const
     { return openbox_notify_window_lower; }
 
   // atoms to change that request changes to the desktop environment during
   // runtime... these messages can be sent by any client... as the sending
   // client window id is not included in the ClientMessage event...
-  inline const Atom &getOpenboxChangeWorkspaceAtom(void) const
+  inline const Atom &getOpenboxChangeWorkspaceAtom() const
     { return openbox_change_workspace; }
-  inline const Atom &getOpenboxChangeWindowFocusAtom(void) const
+  inline const Atom &getOpenboxChangeWindowFocusAtom() const
     { return openbox_change_window_focus; }
-  inline const Atom &getOpenboxCycleWindowFocusAtom(void) const
+  inline const Atom &getOpenboxCycleWindowFocusAtom() const
     { return openbox_cycle_window_focus; }
 
 #ifdef    NEWWMSPEC
 
   // root window properties
-  inline const Atom &getNETSupportedAtom(void) const
+  inline const Atom &getNETSupportedAtom() const
     { return net_supported; }
-  inline const Atom &getNETClientListAtom(void) const
+  inline const Atom &getNETClientListAtom() const
     { return net_client_list; }
-  inline const Atom &getNETClientListStackingAtom(void) const
+  inline const Atom &getNETClientListStackingAtom() const
     { return net_client_list_stacking; }
-  inline const Atom &getNETNumberOfDesktopsAtom(void) const
+  inline const Atom &getNETNumberOfDesktopsAtom() const
     { return net_number_of_desktops; }
-  inline const Atom &getNETDesktopGeometryAtom(void) const
+  inline const Atom &getNETDesktopGeometryAtom() const
     { return net_desktop_geometry; }
-  inline const Atom &getNETDesktopViewportAtom(void) const
+  inline const Atom &getNETDesktopViewportAtom() const
     { return net_desktop_viewport; }
-  inline const Atom &getNETCurrentDesktopAtom(void) const
+  inline const Atom &getNETCurrentDesktopAtom() const
     { return net_current_desktop; }
-  inline const Atom &getNETDesktopNamesAtom(void) const
+  inline const Atom &getNETDesktopNamesAtom() const
     { return net_desktop_names; }
-  inline const Atom &getNETActiveWindowAtom(void) const
+  inline const Atom &getNETActiveWindowAtom() const
     { return net_active_window; }
-  inline const Atom &getNETWorkareaAtom(void) const
+  inline const Atom &getNETWorkareaAtom() const
     { return net_workarea; }
-  inline const Atom &getNETSupportingWMCheckAtom(void) const
+  inline const Atom &getNETSupportingWMCheckAtom() const
     { return net_supporting_wm_check; }
-  inline const Atom &getNETVirtualRootsAtom(void) const
+  inline const Atom &getNETVirtualRootsAtom() const
     { return net_virtual_roots; }
 
   // root window messages
-  inline const Atom &getNETCloseWindowAtom(void) const
+  inline const Atom &getNETCloseWindowAtom() const
     { return net_close_window; }
-  inline const Atom &getNETWMMoveResizeAtom(void) const
+  inline const Atom &getNETWMMoveResizeAtom() const
     { return net_wm_moveresize; }
 
   // application window properties
-  inline const Atom &getNETPropertiesAtom(void) const
+  inline const Atom &getNETPropertiesAtom() const
     { return net_properties; }
-  inline const Atom &getNETWMNameAtom(void) const
+  inline const Atom &getNETWMNameAtom() const
     { return net_wm_name; }
-  inline const Atom &getNETWMDesktopAtom(void) const
+  inline const Atom &getNETWMDesktopAtom() const
     { return net_wm_desktop; }
-  inline const Atom &getNETWMWindowTypeAtom(void) const
+  inline const Atom &getNETWMWindowTypeAtom() const
     { return net_wm_window_type; }
-  inline const Atom &getNETWMStateAtom(void) const
+  inline const Atom &getNETWMStateAtom() const
     { return net_wm_state; }
-  inline const Atom &getNETWMStrutAtom(void) const
+  inline const Atom &getNETWMStrutAtom() const
     { return net_wm_strut; }
-  inline const Atom &getNETWMIconGeometryAtom(void) const
+  inline const Atom &getNETWMIconGeometryAtom() const
     { return net_wm_icon_geometry; }
-  inline const Atom &getNETWMIconAtom(void) const
+  inline const Atom &getNETWMIconAtom() const
     { return net_wm_icon; }
-  inline const Atom &getNETWMPidAtom(void) const
+  inline const Atom &getNETWMPidAtom() const
     { return net_wm_pid; }
-  inline const Atom &getNETWMHandledIconsAtom(void) const
+  inline const Atom &getNETWMHandledIconsAtom() const
     { return net_wm_handled_icons; }
 
   // application protocols
-  inline const Atom &getNETWMPingAtom(void) const
+  inline const Atom &getNETWMPingAtom() const
     { return net_wm_ping; }
 
 #endif // NEWWMSPEC
 
-  inline ScreenInfo *getScreenInfo(int s)
-    { return (ScreenInfo *) screenInfoList->find(s); }
+  inline ScreenInfo *getScreenInfo(unsigned int s) {
+    ASSERT(s < screenInfoList.size());
+    return screenInfoList[s];
+  }
 
-  inline const Bool &hasShapeExtensions(void) const
+  inline const Bool &hasShapeExtensions() const
     { return shape.extensions; }
-  inline const Bool &doShutdown(void) const
+  inline const Bool &doShutdown() const
     { return _shutdown; }
-  inline const Bool &isStartup(void) const
+  inline const Bool &isStartup() const
     { return _startup; }
 
-  inline const Cursor &getSessionCursor(void) const
+  inline const Cursor &getSessionCursor() const
     { return cursor.session; }
-  inline const Cursor &getMoveCursor(void) const
+  inline const Cursor &getMoveCursor() const
     { return cursor.move; }
-  inline const Cursor &getLowerLeftAngleCursor(void) const
+  inline const Cursor &getLowerLeftAngleCursor() const
     { return cursor.ll_angle; }
-  inline const Cursor &getLowerRightAngleCursor(void) const
+  inline const Cursor &getLowerRightAngleCursor() const
     { return cursor.lr_angle; }
-  inline const Cursor &getUpperLeftAngleCursor(void) const
+  inline const Cursor &getUpperLeftAngleCursor() const
     { return cursor.ul_angle; }
-  inline const Cursor &getUpperRightAngleCursor(void) const
+  inline const Cursor &getUpperRightAngleCursor() const
     { return cursor.ur_angle; }
 
-  inline Display *getXDisplay(void) { return display; }
+  inline Display *getXDisplay() { return display; }
 
-  inline const char *getXDisplayName(void) const
+  inline const char *getXDisplayName() const
     { return (const char *) display_name; }
-  inline const char *getApplicationName(void) const
+  inline const char *getApplicationName() const
     { return (const char *) application_name; }
 
-  inline const int &getNumberOfScreens(void) const
-    { return number_of_screens; }
-  inline const int &getShapeEventBase(void) const
+  inline const unsigned int numberOfScreens() const
+    { return ScreenCount(display); }
+  inline const int &getShapeEventBase() const
     { return shape.event_basep; }
 
-  inline void shutdown(void) { _shutdown = True; }
-  inline void run(void) { _startup = _shutdown = False; }
+  inline void shutdown() { _shutdown = True; }
+  inline void run() { _startup = _shutdown = False; }
 
   const Bool validateWindow(Window);
 
@@ -314,9 +323,9 @@ public:
   void ungrabButton(unsigned int button, unsigned int modifiers,
       Window grab_window) const;
   
-  void grab(void);
-  void ungrab(void);
-  void eventLoop(void);
+  void grab();
+  void ungrab();
+  void eventLoop();
   void addTimer(BTimer *);
   void removeTimer(BTimer *);
 
@@ -328,29 +337,30 @@ public:
 
 class ScreenInfo {
 private:
-  BaseDisplay *basedisplay;
+  BaseDisplay &basedisplay;
   Visual *visual;
   Window root_window;
   Colormap colormap;
 
   int depth, screen_number;
-  unsigned int width, height;
+  Size m_size;
 
 
 public:
-  ScreenInfo(BaseDisplay *, int);
+  ScreenInfo(BaseDisplay &, int);
 
-  inline BaseDisplay *getBaseDisplay(void) { return basedisplay; }
+  inline BaseDisplay &getBaseDisplay() { return basedisplay; }
 
-  inline Visual *getVisual(void) { return visual; }
-  inline const Window &getRootWindow(void) const { return root_window; }
-  inline const Colormap &getColormap(void) const { return colormap; }
+  inline Visual *getVisual() const { return visual; }
+  inline const Window &getRootWindow() const { return root_window; }
+  inline const Colormap &getColormap() const { return colormap; }
 
-  inline const int &getDepth(void) const { return depth; }
-  inline const int &getScreenNumber(void) const { return screen_number; }
+  inline const int &getDepth() const { return depth; }
+  inline const int &getScreenNumber() const { return screen_number; }
 
-  inline const unsigned int &getWidth(void) const { return width; }
-  inline const unsigned int &getHeight(void) const { return height; }
+//  inline const unsigned int &getWidth() const { return width; }
+//  inline const unsigned int &getHeight() const { return height; }
+  inline const Size &size() const { return m_size; }
 };
 
 

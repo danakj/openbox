@@ -1,4 +1,4 @@
-// Icon.h for Openbox
+// Iconmenu.h for Openbox
 // Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
@@ -31,13 +31,13 @@ class BScreen;
 
 class Iconmenu : public Basemenu {
 private:
-  BScreen *screen;
+  BScreen &screen;
 
 protected:
   virtual void itemSelected(int, int);
 
 public:
-  Iconmenu(BScreen *);
+  Iconmenu(BScreen &);
 };
 
 

@@ -1,7 +1,7 @@
 dnl configure.in for Openbox
 dnl Initialize autoconf and automake
 AC_INIT(src/openbox.cc)
-AM_INIT_AUTOMAKE(openbox,0.99.0,no-define)
+AM_INIT_AUTOMAKE(openbox,1.2.4,no-define)
 
 dnl Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -21,8 +21,7 @@ if test x$regex_cmd = "x"; then
 fi
 
 dnl Check for system header files
-AC_HEADER_STDC
-AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdio.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
+AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdio.h string.h stdlib.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
 AC_HEADER_TIME
 
 dnl Check for existance of basename(), setlocale() and strftime()
@@ -173,7 +172,7 @@ AC_ARG_ENABLE(debug,
   [  --enable-debug          include verbose debugging code [default=no]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    DEBUG="-DDEBUG"
+    DEBUG="-DDEBUG -Wall -W -pedantic -fno-inline"
   else
     AC_MSG_RESULT([no])
   fi,

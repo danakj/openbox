@@ -684,6 +684,8 @@ void BScreen::load_rc(void) {
   if (! config->getValue(screenstr + "edgeSnapOffset",
                         resource.snap_offset))
     resource.snap_offset = 0;
+  if (resource.snap_offset > 50)  // sanity check, setting this huge would
+    resource.snap_offset = 50;    // seriously suck.
   
   if (! config->getValue(screenstr + "edgeSnapThreshold",
                         resource.snap_threshold))

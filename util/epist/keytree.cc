@@ -22,6 +22,11 @@
 
 #include "keytree.hh"
 
+#include <string>
+
+using std::string;
+
+
 keytree::keytree(Display *display) : _display(display)
 {
   _head = new keynode;

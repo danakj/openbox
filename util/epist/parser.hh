@@ -1,6 +1,7 @@
-#include <string>
 #include "actions.hh"
 #include "keytree.hh"
+
+#include <string>
 
 class parser {
 public:

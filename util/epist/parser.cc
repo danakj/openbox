@@ -1,10 +1,16 @@
 extern "C" {
 #include <stdio.h>
 }
+
 #include "parser.hh"
 
+#include <string>
+
+using std::string;
+
+
 parser::parser(keytree *kt)
-    : _mask(0), _action(Action::noaction), _key(""), _arg(""), _kt(kt)
+    : _kt(kt), _mask(0), _action(Action::noaction), _key(""), _arg("") 
 {
 }
 

@@ -115,6 +115,8 @@ void menu_destroy_hash_value(ObMenu *self)
 {
     GList *it;
 
+    if (self->destroy) self->destroy(self);
+
     for (it = self->entries; it; it = it->next)
         menu_entry_free(it->data);
     g_list_free(self->entries);
@@ -215,7 +217,8 @@ ObMenu *menu_new_full(char *label, char *name, ObMenu *parent,
                       menu_controller_show show, menu_controller_update update,
                       menu_controller_selected selected,
                       menu_controller_hide hide,
-                      menu_controller_mouseover mouseover)
+                      menu_controller_mouseover mouseover,
+                      menu_controller_destroy destroy)
 {
     XSetWindowAttributes attrib;
     ObMenu *self;
@@ -233,6 +236,7 @@ ObMenu *menu_new_full(char *label, char *name, ObMenu *parent,
     self->invalid = TRUE;
 
     /* default controllers */
+    self->destroy = destroy;
     self->show = (show != NULL ? show : menu_show_full);
     self->hide = (hide != NULL ? hide : menu_hide);
     self->update = (update != NULL ? update : menu_render);
@@ -513,7 +517,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 		ob_rr_theme->bwidth - ob_rr_theme->menu_overlap;
 
 	    /* need to get the width. is this bad?*/
-	    self->parent->update(self->submenu);
+	    self->submenu->update(self->submenu);
 
             a = screen_physical_area_monitor(self->parent->xin_area);
 

@@ -14,6 +14,7 @@ struct _ObParseInst;
 typedef struct _ObMenu ObMenu;
 typedef struct _ObMenuEntry ObMenuEntry;
 
+typedef void(*menu_controller_destroy)(ObMenu *self);
 typedef void(*menu_controller_show)(ObMenu *self, int x, int y,
                                     struct _ObClient *);
 typedef void(*menu_controller_update)(ObMenu *self);
@@ -54,6 +55,9 @@ struct _ObMenu
     ObMenu *open_submenu;
     GList *over;
     
+    /* destructor */
+    menu_controller_destroy destroy;
+
     /* behaviour callbacks
        TODO: Document and split code that HAS to be in the overridden callback */
     /* place a menu on screen */
@@ -142,13 +146,15 @@ void menu_noop();
 
 #define menu_new(l, n, p) \
   menu_new_full(l, n, p, menu_show_full, menu_render, menu_entry_fire, \
-                menu_hide, menu_control_mouseover)
+                menu_hide, menu_control_mouseover, NULL)
 
 ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
-                      menu_controller_show show, menu_controller_update update,
+                      menu_controller_show show,
+                      menu_controller_update update,
                       menu_controller_selected selected,
                       menu_controller_hide hide,
-                      menu_controller_mouseover mouseover);
+                      menu_controller_mouseover mouseover,
+                      menu_controller_destroy destroy);
 
 void menu_free(char *name);
 

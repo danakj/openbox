@@ -215,6 +215,8 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
 	 BScreen::ColSmartPlacement);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuCascade,
 			  "Cascade Placement"), BScreen::CascadePlacement);
+  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuBestFit,
+                          "Best Fit Placement"), BScreen::BestFitPlacement);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuLeftRight,
 			  "Left to Right"), BScreen::LeftRight);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuRightLeft,
@@ -237,6 +239,10 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
   case BScreen::CascadePlacement:
     setItemSelected(2, True);
     break;
+
+  case BScreen::BestFitPlacement:
+    setItemSelected(3, True);
+    break;
   }
 
   Bool rl = (configmenu->screen->getRowPlacementDirection() ==
@@ -244,11 +250,11 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
        tb = (configmenu->screen->getColPlacementDirection() ==
 	     BScreen::TopBottom);
 
-  setItemSelected(3, rl);
-  setItemSelected(4, ! rl);
+  setItemSelected(4, rl);
+  setItemSelected(5, ! rl);
 
-  setItemSelected(5, tb);
-  setItemSelected(6, ! tb);
+  setItemSelected(6, tb);
+  setItemSelected(7, ! tb);
 }
 
 void Configmenu::Placementmenu::itemSelected(int button, int index) {
@@ -267,6 +273,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     setItemSelected(0, True);
     setItemSelected(1, False);
     setItemSelected(2, False);
+    setItemSelected(3, False);
 
     break;
 
@@ -276,6 +283,7 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     setItemSelected(0, False);
     setItemSelected(1, True);
     setItemSelected(2, False);
+    setItemSelected(3, False);
 
     break;
 
@@ -285,22 +293,33 @@ void Configmenu::Placementmenu::itemSelected(int button, int index) {
     setItemSelected(0, False);
     setItemSelected(1, False);
     setItemSelected(2, True);
+    setItemSelected(3, False);
+
+    break;
+
+  case BScreen::BestFitPlacement:
+    configmenu->screen->savePlacementPolicy(item->function());
+
+    setItemSelected(0, False);
+    setItemSelected(1, False);
+    setItemSelected(2, False);
+    setItemSelected(3, True);
 
     break;
 
   case BScreen::LeftRight:
     configmenu->screen->saveRowPlacementDirection(BScreen::LeftRight);
 
-    setItemSelected(3, True);
-    setItemSelected(4, False);
+    setItemSelected(4, True);
+    setItemSelected(5, False);
 
     break;
 
   case BScreen::RightLeft:
     configmenu->screen->saveRowPlacementDirection(BScreen::RightLeft);
 
-    setItemSelected(3, False);
-    setItemSelected(4, True);
+    setItemSelected(4, False);
+    setItemSelected(5, True);
 
     break;
 

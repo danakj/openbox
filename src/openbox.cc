@@ -1043,6 +1043,7 @@ void Openbox::save_rc(void) {
 
     switch (screen->getPlacementPolicy()) {
     case BScreen::CascadePlacement: placement = "CascadePlacement"; break;
+    case BScreen::BestFitPlacement: placement = "BestFitPlacement"; break;
     case BScreen::ColSmartPlacement: placement = "ColSmartPlacement"; break;
     default:
     case BScreen::RowSmartPlacement: placement = "RowSmartPlacement"; break;
@@ -1363,6 +1364,8 @@ void Openbox::load_rc(BScreen *screen) {
       screen->savePlacementPolicy(BScreen::RowSmartPlacement);
     else if (0 == strncasecmp(s.c_str(), "ColSmartPlacement", s.length()))
       screen->savePlacementPolicy(BScreen::ColSmartPlacement);
+    else if (0 == strncasecmp(s.c_str(), "BestFitPlacement", s.length()))
+      screen->savePlacementPolicy(BScreen::BestFitPlacement);
     else
       screen->savePlacementPolicy(BScreen::CascadePlacement);
   } else

@@ -28,6 +28,8 @@ $ #SmartCols
 # Smart Placement (Columns)
 $ #Cascade
 # Cascade Placement
+$ #BestFit
+# Best Fit Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft

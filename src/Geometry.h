@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __geometru_h
+#ifndef   __geometry_h
 #define   __geometry_h
 
 class Point{
@@ -99,4 +99,4 @@ public:
   bool Intersect(const Rect &r) const;
 };  
 
-#endif // __geomtry_h
+#endif // __geometry_h

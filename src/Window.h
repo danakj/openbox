@@ -32,6 +32,7 @@
 #include "BaseDisplay.h"
 #include "Timer.h"
 #include "Windowmenu.h"
+#include "Geometry.h"
 
 // forward declaration
 class OpenboxWindow;
@@ -286,6 +287,25 @@ public:
   inline const unsigned int &getTitleHeight(void) const
   { return frame.title_h; }
 
+  inline const Point getOrigin() const {
+    return Point(frame.x, frame.y);
+  }
+  inline const Point getClientOrigin() const {
+    return Point(client.x, client.y);
+  }
+  inline const Size getSize() const {
+    return Size(frame.width, frame.height);
+  }
+  inline const Size getClientSize() const {
+    return Size(client.width, client.height);
+  }
+  inline const Rect getArea() const {
+    return Rect(frame.x, frame.y, frame.width, frame.height);
+  }
+  inline const Rect getClientArea() const {
+    return Rect(client.x, client.y, client.width, client.height);
+  }
+  
   inline void setWindowNumber(int n) { window_number = n; }
   
   Bool validateClient(void);

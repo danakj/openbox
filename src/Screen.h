@@ -338,8 +338,8 @@ public:
   void updateNetizenWindowRaise(Window);
   void updateNetizenWindowLower(Window);
 
-  enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement, LeftRight,
-         RightLeft, TopBottom, BottomTop };
+  enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
+         BestFitPlacement, LeftRight, RightLeft, TopBottom, BottomTop };
   enum { LeftJustify = 1, RightJustify, CenterJustify };
   enum { RoundBullet = 1, TriangleBullet, SquareBullet, NoBullet };
   enum { Restart = 1, RestartOther, Exit, Shutdown, Execute, Reconfigure,

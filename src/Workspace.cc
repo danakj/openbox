@@ -1,4 +1,5 @@
 // Workspace.cc for Openbox
+// Copyright (c) 2002 - 2002 Ben Jansens (ben@orodu.net)
 // Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
@@ -41,15 +42,22 @@
 #include "Window.h"
 #include "Workspace.h"
 #include "Windowmenu.h"
+#include "Geometry.h"
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
+#ifdef    HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
 #ifdef    STDC_HEADERS
 #  include <string.h>
 #endif // STDC_HEADERS
 
+#include <vector>
+typedef vector<Rect> rectList;
 
 Workspace::Workspace(BScreen *scrn, int i) {
   screen = scrn;
@@ -322,7 +330,137 @@ void Workspace::shutdown(void) {
   }
 }
 
+static rectList calcSpace(const OpenboxWindow &win, const rectList &spaces) {
+  rectList result;
+  rectList::const_iterator siter;
+  for(siter=spaces.begin(); siter!=spaces.end(); ++siter) {
+    if(win.getArea().Intersect(*siter)) {
+      //Check for space to the left of the window
+      if(win.getXFrame() > siter->x())
+        result.push_back(Rect(siter->x(), siter->y(),
+                              win.getXFrame() - siter->x() - 1,
+                              siter->h()));
+      //Check for space above the window
+      if(win.getYFrame() > siter->y())
+        result.push_back(Rect(siter->x(), siter->y(),
+                              siter->w(),
+                              win.getYFrame() - siter->y() - 1));
+      //Check for space to the right of the window
+      if((win.getXFrame()+win.getWidth()) <
+         (siter->x()+siter->w()))
+        result.push_back(Rect(win.getXFrame() + win.getWidth() + 1,
+                              siter->y(),
+                              siter->x() + siter->w() -
+                              win.getXFrame() - win.getWidth() - 1,
+                              siter->h()));
+      //Check for space below the window
+      if((win.getYFrame()+win.getHeight()) <
+         (siter->y()+siter->h()))
+        result.push_back(Rect(siter->x(),
+                              win.getYFrame() + win.getHeight() + 1,
+                              siter->w(),
+                              siter->y() + siter->h()-
+                              win.getYFrame() - win.getHeight() - 1));
+
+    }
+    else
+      result.push_back(*siter);
+  }
+  return result;
+}
+
+//BestFitPlacement finds the smallest free space that fits the window
+//to be placed. It currentl ignores whether placement is right to left or top
+//to bottom.
+Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
+{
+  const Rect *best;
+  rectList spaces;
+  LinkedListIterator<OpenboxWindow> it(windowList);
+  rectList::const_iterator siter;
+  spaces.push_back(space); //initially the entire screen is free
+  it.reset();
+  
+  //Find Free Spaces
+  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
+     spaces = calcSpace(*cur, spaces);
+  
+  //Find first space that fits the window
+  best = 0;
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
+    if ((siter->w() >= win_size.w()) &&
+        (siter->h() >= win_size.h()))
+      best = siter;
+  }
+
+  if (best != 0)
+    return new Point(best->origin());
+  else
+    return new Point(200, 0);
+}
+
+inline Point *Workspace::rowSmartPlacement(const Size &win_size,
+                                           const Rect &space){
+  bool placed=false;
+  int test_x, test_y, place_x = 0, place_y = 0;
+  int start_pos = 0;
+  int change_y =
+     ((screen->getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
+  int change_x =
+     ((screen->getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
+  int delta_x = 8, delta_y = 8;
+  LinkedListIterator<OpenboxWindow> it(windowList);
+
+  test_y = (screen->getColPlacementDirection() == BScreen::TopBottom) ?
+    start_pos : screen->getHeight() - win_size.h() - start_pos;
+
+  while(!placed &&
+        ((screen->getColPlacementDirection() == BScreen::BottomTop) ?
+         test_y > 0 : test_y + win_size.h() < (signed) space.h())) {
+     test_x = (screen->getRowPlacementDirection() == BScreen::LeftRight) ?
+              start_pos : space.w() - win_size.w() - start_pos;
+     while (!placed &&
+            ((screen->getRowPlacementDirection() == BScreen::RightLeft) ?
+             test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
+        placed = true;
+    
+        it.reset();
+        for (OpenboxWindow *curr = it.current(); placed && curr;
+             it++, curr = it.current()) {
+           int curr_w = curr->getWidth() + (screen->getBorderWidth() * 4);
+           int curr_h =
+             ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
+             (screen->getBorderWidth() * 4);
+   
+           if (curr->getXFrame() < test_x + win_size.w() &&
+               curr->getXFrame() + curr_w > test_x &&
+               curr->getYFrame() < test_y + win_size.h() &&
+               curr->getYFrame() + curr_h > test_y) {
+              placed = false;
+           }
+        }
+ 
+        // Removed code for checking toolbar and slit
+        // The space passed in should not include either
+        
+        if (placed) {
+           place_x = test_x;
+           place_y = test_y;
+ 
+           break;
+        }   
+        
+        test_x += (change_x * delta_x);
+     }
+
+     test_y += (change_y * delta_y);
+  }
+  return new Point(place_x, place_y);
+}
+
 void Workspace::placeWindow(OpenboxWindow *win) {
+  assert(win != NULL);
+
   Bool placed = False;
 
   const int win_w = win->getWidth() + (screen->getBorderWidth() * 4),
@@ -351,68 +489,31 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   int test_x, test_y, place_x = 0, place_y = 0;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
+  Rect space(0, 0,
+             screen->getWidth(),
+             screen->getHeight()
+            );
+  Size window_size(win_w, win_h);
+
   switch (screen->getPlacementPolicy()) {
-  case BScreen::RowSmartPlacement: {
-    test_y = (screen->getColPlacementDirection() == BScreen::TopBottom) ?
-      start_pos : screen->getHeight() - win_h - start_pos;
-
-    while (!placed &&
-	   ((screen->getColPlacementDirection() == BScreen::BottomTop) ?
-	    test_y > 0 : test_y + win_h < (signed) screen->getHeight())) {
-      test_x = (screen->getRowPlacementDirection() == BScreen::LeftRight) ?
-	start_pos : screen->getWidth() - win_w - start_pos;
-
-      while (!placed &&
-	     ((screen->getRowPlacementDirection() == BScreen::RightLeft) ?
-	      test_x > 0 : test_x + win_w < (signed) screen->getWidth())) {
-        placed = True;
-
-        it.reset();
-        for (OpenboxWindow *curr = it.current(); placed && curr;
-	     it++, curr = it.current()) {
-          if (curr->isMaximizedFull()) // fully maximized, ignore it
-            continue;
-          int curr_w = curr->getWidth() + (screen->getBorderWidth() * 4);
-          int curr_h =
-	    ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
-            (screen->getBorderWidth() * 4);
-	  
-          if (curr->getXFrame() < test_x + win_w &&
-              curr->getXFrame() + curr_w > test_x &&
-              curr->getYFrame() < test_y + win_h &&
-              curr->getYFrame() + curr_h > test_y) {
-            placed = False;
-	  }
-        }
-
-        if (placed &&
-	    (toolbar_x < test_x + win_w &&
-             toolbar_x + toolbar_w > test_x &&
-             toolbar_y < test_y + win_h &&
-             toolbar_y + toolbar_h > test_y)
-#ifdef    SLIT
-             ||
-            (slit_x < test_x + win_w &&
-             slit_x + slit_w > test_x &&
-             slit_y < test_y + win_h &&
-             slit_y + slit_h > test_y)
-#endif // SLIT
-	    )
-          placed = False;
-
-        if (placed) {
-          place_x = test_x;
-          place_y = test_y;
-
-          break;
-        }
-
-	test_x += (change_x * delta_x);
-      }
-
-      test_y += (change_y * delta_y);
+  case BScreen::BestFitPlacement: {
+    Point *spot = bestFitPlacement(window_size, space);
+    if (spot != NULL) {
+      place_x=spot->x();
+      place_y=spot->y();
+      delete spot;
+      placed=true;
     }
-
+    break;
+  }
+  case BScreen::RowSmartPlacement: {
+    Point *spot=rowSmartPlacement(window_size, space);
+    if (spot != NULL) {
+      place_x=spot->x();
+      place_y=spot->y();
+      delete spot;
+      placed=true;
+    }
     break;
   }
 

@@ -26,6 +26,7 @@
 #include <X11/Xlib.h>
 
 #include "LinkedList.h"
+#include "Geometry.h"
 
 class BScreen;
 class Clientmenu;
@@ -46,6 +47,8 @@ private:
 
 protected:
   void placeWindow(OpenboxWindow *);
+  Point *bestFitPlacement(const Size &win_size, const Rect &space);
+  Point *rowSmartPlacement(const Size &win_size, const Rect &space);
 
 
 public:

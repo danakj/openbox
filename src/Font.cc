@@ -33,6 +33,7 @@ extern "C" {
 
 #include <iostream>
 #include <algorithm>
+#include <string>
 
 using std::string;
 using std::cerr;

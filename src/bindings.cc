@@ -481,7 +481,7 @@ bool Bindings::addButton(const std::string &but, MouseContext::MC context,
                            MouseAction::MA action, PyObject *callback)
 {
   assert(context >= 0 && context < MouseContext::NUM_MOUSE_CONTEXT);
-  assert(action >= 0 && context < MouseContext::NUM_MOUSE_ACTION);
+  assert(action >= 0 && action < MouseAction::NUM_MOUSE_ACTION);
   
   Binding b(0,0);
   if (!translate(but, b, false))

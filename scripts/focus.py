@@ -17,9 +17,15 @@ fallback = 0                                                            ###
 ###                                                                     ###
 # Provides:                                                             ###
 # def focus_next_stacked(data, forward=1):                              ###
+#   """Focus the next (or previous, with forward=0) window in a stacked ###
+#      order."""                                                        ###
 # def focus_prev_stacked(data):                                         ###
+#   """Focus the previous window in a stacked order."""                 ###
 # def focus_next(data, num=1, forward=1):                               ###
+#   """Focus the next (or previous, with forward=0) window in a linear  ###
+#      order."""                                                        ###
 # def focus_prev(data, num=1):                                          ###
+#   """Focus the previous window in a linear order."""                  ###
 ###                                                                     ###
 # All of these functions call be used as callbacks for bindings         ###
 # directly.                                                             ###

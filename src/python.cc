@@ -496,13 +496,17 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject *kunbind(PyObject *keylist)
+PyObject *kunbind(PyObject *keylist, PyObject *func)
 {
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
     return NULL;
   }
-
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
+  
   ob::OBBindings::StringVect vectkeylist;
   for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
     PyObject *str = PyList_GetItem(keylist, i);
@@ -514,7 +518,10 @@ PyObject *kunbind(PyObject *keylist)
     vectkeylist.push_back(PyString_AsString(str));
   }
 
-  ob::Openbox::instance->bindings()->removeKey(vectkeylist);
+  if (!ob::Openbox::instance->bindings()->removeKey(vectkeylist, func)) {
+      PyErr_SetString(PyExc_RuntimeError, "Could not remove callback.");
+      return NULL;
+  }
   Py_INCREF(Py_None); return Py_None;
 }
 

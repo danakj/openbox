@@ -116,7 +116,7 @@ static void destroytree(KeyBindingTree *tree)
 }
 
 KeyBindingTree *OBBindings::buildtree(const StringVect &keylist,
-                                   PyObject *callback) const
+                                      PyObject *callback) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
 
@@ -125,8 +125,12 @@ KeyBindingTree *OBBindings::buildtree(const StringVect &keylist,
   StringVect::const_reverse_iterator it, end = keylist.rend();
   for (it = keylist.rbegin(); it != end; ++it) {
     p = ret;
-    ret = new KeyBindingTree(callback);
-    if (!p) ret->chain = false; // only the first built node
+    ret = new KeyBindingTree();
+    if (!p) {
+      // this is the first built node, the bottom node of the tree
+      ret->chain = false;
+      ret->callbacks.push_back(callback);
+    }
     ret->first_child = p;
     if (!translate(*it, ret->binding)) {
       destroytree(ret);
@@ -147,9 +151,6 @@ OBBindings::OBBindings()
   _timer.setTimeout(5000); // chains reset after 5 seconds
   
 //  setResetKey("C-g"); // set the default reset key
-
-  for (int i = 0; i < NUM_EVENTS; ++i)
-    _events[i] = 0;
 }
 
 
@@ -194,7 +195,8 @@ void OBBindings::assimilate(KeyBindingTree *node)
 }
 
 
-PyObject *OBBindings::find(KeyBindingTree *search, bool *conflict) const {
+KeyBindingTree *OBBindings::find(KeyBindingTree *search,
+                                 bool *conflict) const {
   *conflict = false;
   KeyBindingTree *a, *b;
   a = _keytree.first_child;
@@ -206,7 +208,7 @@ PyObject *OBBindings::find(KeyBindingTree *search, bool *conflict) const {
       if (a->chain == b->chain) {
 	if (!a->chain) {
           // found it! (return the actual id, not the search's)
-	  return a->callback;
+	  return a;
         }
       } else {
         *conflict = true;
@@ -222,32 +224,40 @@ PyObject *OBBindings::find(KeyBindingTree *search, bool *conflict) const {
 
 bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
 {
-  KeyBindingTree *tree;
+  KeyBindingTree *tree, *t;
   bool conflict;
 
   if (!(tree = buildtree(keylist, callback)))
     return false; // invalid binding requested
 
-  if (find(tree, &conflict) || conflict) {
+  t = find(tree, &conflict);
+  if (conflict) {
     // conflicts with another binding
     destroytree(tree);
     return false;
   }
 
-  grabKeys(false);
-  
-  // assimilate this built tree into the main tree
-  assimilate(tree); // assimilation destroys/uses the tree
+  if (t) {
+    // already bound to something
+    // XXX: look if callback is already bound to this key?
+    t->callbacks.push_back(callback);
+    destroytree(tree);
+  } else {
+    grabKeys(false);
 
+    // assimilate this built tree into the main tree
+    assimilate(tree); // assimilation destroys/uses the tree
+
+    grabKeys(true); 
+  }
+ 
   Py_INCREF(callback);
 
-  grabKeys(true); 
- 
   return true;
 }
 
 
-bool OBBindings::removeKey(const StringVect &keylist)
+bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
 {
   assert(false); // XXX: function not implemented yet
 
@@ -257,17 +267,22 @@ bool OBBindings::removeKey(const StringVect &keylist)
   if (!(tree = buildtree(keylist, 0)))
     return false; // invalid binding requested
 
-  PyObject *func = find(tree, &conflict);
-  if (func) {
-    grabKeys(false);
-
-    _curpos = &_keytree;
-    
-    // XXX do shit here ...
-    Py_DECREF(func);
-    
-    grabKeys(true);
-    return true;
+  KeyBindingTree *t = find(tree, &conflict);
+  if (t) {
+    CallbackList::iterator it = std::find(t->callbacks.begin(),
+                                          t->callbacks.end(),
+                                          callback);
+    if (it != t->callbacks.end()) {
+      grabKeys(false);
+      
+      _curpos = &_keytree;
+      
+      // XXX do shit here ...
+      Py_XDECREF(*it);
+      
+      grabKeys(true);
+      return true;
+    }
   }
   return false;
 }
@@ -293,7 +308,10 @@ static void remove_branch(KeyBindingTree *first)
     if (p->first_child)
       remove_branch(p->first_child);
     KeyBindingTree *s = p->next_sibling;
-    Py_XDECREF(p->callback);
+    while(!p->callbacks.empty()) {
+      Py_XDECREF(p->callbacks.front());
+      p->callbacks.pop_front();
+    }
     delete p;
     p = s;
   }
@@ -359,8 +377,10 @@ void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
           OBClient *c = Openbox::instance->focusedClient();
           if (c) win = c->window();
           KeyData *data = new_key_data(win, time, modifiers, key);
-          python_callback(p->callback, (PyObject*)data);
-          Py_DECREF((PyObject*)data);
+          CallbackList::iterator it, end = p->callbacks.end();
+          for (it = p->callbacks.begin(); it != end; ++it)
+            python_callback(*it, (PyObject*)data);
+          Py_XDECREF((PyObject*)data);
           resetChains(this);
         }
         break;
@@ -394,8 +414,6 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
   for (it = _buttons[context].begin(); it != end; ++it)
     if ((*it)->binding.key == b.key &&
         (*it)->binding.modifiers == b.modifiers) {
-      if ((*it)->callback[action] == callback)
-        return true; // already bound
       break;
     }
 
@@ -417,8 +435,7 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
     }
   } else
     bind = *it;
-  Py_XDECREF(bind->callback[action]); // if it was already bound, unbind it
-  bind->callback[action] = callback;
+  bind->callbacks[action].push_back(callback);
   Py_INCREF(callback);
   return true;
 }
@@ -429,8 +446,10 @@ void OBBindings::removeAllButtons()
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it) {
       for (int a = 0; a < NUM_MOUSE_ACTION; ++a) {
-        Py_XDECREF((*it)->callback[a]);
-        (*it)->callback[a] = 0;
+        while (!(*it)->callbacks[a].empty()) {
+          Py_XDECREF((*it)->callbacks[a].front());
+          (*it)->callbacks[a].pop_front();
+        }
       }
       // ungrab the button on all clients
       for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
@@ -491,8 +510,10 @@ void OBBindings::fireButton(ButtonData *data)
   for (it = _buttons[data->context].begin(); it != end; ++it)
     if ((*it)->binding.key == data->button &&
         (*it)->binding.modifiers == data->state) {
-      if ((*it)->callback[data->action])
-        python_callback((*it)->callback[data->action], (PyObject*)data);
+      CallbackList::iterator c_it,c_end = (*it)->callbacks[data->action].end();
+      for (c_it = (*it)->callbacks[data->action].begin();
+           c_it != c_end; ++c_it)
+        python_callback(*c_it, (PyObject*)data);
     }
 }
 
@@ -503,35 +524,43 @@ bool OBBindings::addEvent(EventAction action, PyObject *callback)
     return false;
   }
 
-  Py_XDECREF(_events[action]);
-  _events[action] = callback;
+  _eventlist[action].push_back(callback);
   Py_INCREF(callback);
   return true;
 }
 
-bool OBBindings::removeEvent(EventAction action)
+bool OBBindings::removeEvent(EventAction action, PyObject *callback)
 {
   if (action < 0 || action >= NUM_EVENTS) {
     return false;
   }
   
-  Py_XDECREF(_events[action]);
-  _events[action] = 0;
-  return true;
+  CallbackList::iterator it = std::find(_eventlist[action].begin(),
+                                        _eventlist[action].end(),
+                                        callback);
+  if (it != _eventlist[action].end()) {
+    Py_XDECREF(*it);
+    _eventlist[action].erase(it);
+    return true;
+  }
+  return false;
 }
 
 void OBBindings::removeAllEvents()
 {
   for (int i = 0; i < NUM_EVENTS; ++i) {
-    Py_XDECREF(_events[i]);
-    _events[i] = 0;
+    while (!_eventlist[i].empty()) {
+      Py_XDECREF(_eventlist[i].front());
+      _eventlist[i].pop_front();
+    }
   }
 }
 
 void OBBindings::fireEvent(EventData *data)
 {
-  if (_events[data->action])
-    python_callback(_events[data->action], (PyObject*)data);
+  CallbackList::iterator c_it, c_end = _eventlist[data->action].end();
+  for (c_it = _eventlist[data->action].begin(); c_it != c_end; ++c_it)
+    python_callback(*c_it, (PyObject*)data);
 }
 
 }

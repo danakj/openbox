@@ -22,6 +22,8 @@ namespace ob {
 
 class OBClient;
 
+typedef std::list<PyObject *> CallbackList;
+
 typedef struct Binding {
   unsigned int modifiers;
   unsigned int key;
@@ -35,27 +37,22 @@ typedef struct Binding {
 
 typedef struct KeyBindingTree {
   Binding binding;
-  PyObject *callback; // the callback given for the binding in add()
+  CallbackList callbacks; // the callbacks given for the binding in add()
   bool chain;     // true if this is a chain to another key (not an action)
 
   struct KeyBindingTree *next_sibling; // the next binding in the tree at the same
                                     // level
   struct KeyBindingTree *first_child;  // the first child of this binding (next
                                     // binding in a chained sequence).
-  KeyBindingTree(PyObject *callback) : binding(0, 0) {
-    this->callback = callback; chain = true; next_sibling = first_child = 0;
-  }
   KeyBindingTree() : binding(0, 0) {
-    this->callback = 0; chain = true; next_sibling = first_child = 0;
+    chain = true; next_sibling = first_child = 0;
   }
 } KeyBindingTree;
 
 typedef struct ButtonBinding {
   Binding binding;
-  PyObject *callback[NUM_MOUSE_ACTION];
-  ButtonBinding() : binding(0, 0) {
-    for(int i=0; i<NUM_MOUSE_ACTION; ++i) callback[i] = 0;
-  }
+  CallbackList callbacks[NUM_MOUSE_ACTION];
+  ButtonBinding() : binding(0, 0) {}
 };
 
 class OBBindings {
@@ -72,7 +69,7 @@ private:
 
   otk::OBTimer _timer;
   
-  PyObject *find(KeyBindingTree *search, bool *conflict) const;
+  KeyBindingTree *find(KeyBindingTree *search, bool *conflict) const;
   KeyBindingTree *buildtree(const StringVect &keylist,
                             PyObject *callback) const;
   void assimilate(KeyBindingTree *node);
@@ -85,7 +82,7 @@ private:
   void grabButton(bool grab, const Binding &b, MouseContext context,
                   OBClient *client);
 
-  PyObject *_events[NUM_EVENTS];
+  CallbackList _eventlist[NUM_EVENTS];
   
 public:
   //! Initializes an OBBindings object
@@ -109,7 +106,7 @@ public:
     @return The callbackid of the binding, or '< 0' if there was no binding to
             be removed.
   */
-  bool removeKey(const StringVect &keylist);
+  bool removeKey(const StringVect &keylist, PyObject *callback);
 
   //! Removes all key bindings
   void removeAllKeys();
@@ -134,7 +131,7 @@ public:
   bool addEvent(EventAction action, PyObject *callback);
 
   //! Unbind the callback function from an event
-  bool removeEvent(EventAction action);
+  bool removeEvent(EventAction action, PyObject *callback);
 
   //! Remove all callback functions
   void removeAllEvents();

@@ -471,6 +471,12 @@ void Screen::manageWindow(Window window)
 
   // create the decoration frame for the client window
   client->frame = new Frame(client, &_style);
+  // register the plate for events (map req's)
+  // this involves removing itself from the handler list first, since it is
+  // auto added to the list, being a widget. we won't get any events on the
+  // plate except for events for the client (SubstructureRedirectMask)
+  openbox->clearHandler(client->frame->plate());
+  openbox->registerHandler(client->frame->plate(), client);
 
   // add to the wm's map
   openbox->addClient(client->frame->window(), client);
@@ -765,30 +771,7 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
   printf("MapRequest for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  /*
-    MapRequest events come here even after the window exists instead of going
-    right to the client window, because of how they are sent and their struct
-    layout.
-  */
-  Client *c = openbox->findClient(e.window);
-
-  if (c) {
-    // send a net_active_window message
-    XEvent ce;
-    ce.xclient.type = ClientMessage;
-    ce.xclient.message_type = otk::Property::atoms.net_active_window;
-    ce.xclient.display = **otk::display;
-    ce.xclient.window = c->window();
-    ce.xclient.format = 32;
-    ce.xclient.data.l[0] = 0l;
-    ce.xclient.data.l[1] = 0l;
-    ce.xclient.data.l[2] = 0l;
-    ce.xclient.data.l[3] = 0l;
-    ce.xclient.data.l[4] = 0l;
-    XSendEvent(**otk::display, _info->rootWindow(), false,
-               SubstructureRedirectMask | SubstructureNotifyMask,
-               &ce);
-  } else
-    manageWindow(e.window);
+  manageWindow(e.window);
 }
+
 }

@@ -2732,15 +2732,18 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
     string family = s;
     bool bold = False;
     bool italic = False;
+    bool dropShadow = False;
     if (style.getValue(rbasename + "xft.flags", s)) {
       if (s.find("bold") != string::npos)
         bold = True;
       if (s.find("italic") != string::npos)
         italic = True;
+      if (s.find("shadow") != string::npos)
+        dropShadow = True;
     }
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic, resource.shadow_fonts, resource.aa_fonts);
+                         italic, dropShadow, resource.aa_fonts);
     if (b->valid())
       return b;
     else

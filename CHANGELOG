@@ -3,6 +3,7 @@
 	 release)
 	* Closed bug #927 (disappearing windows, crash with I-merry theme)
 	* Fix crash when restoring a session with a maximized window
+	* Fix leak of RrColors in menus
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

@@ -1,3 +1,5 @@
+#include "popup.h"
+
 #include "openbox.h"
 #include "frame.h"
 #include "client.h"
@@ -6,7 +8,8 @@
 #include "render/render.h"
 #include "render/theme.h"
 
-typedef struct Popup {
+struct _ObPopup
+{
     ObWindow obwin;
     Window bg;
 
@@ -17,13 +20,13 @@ typedef struct Popup {
     RrAppearance *a_bg;
     RrAppearance *a_icon;
     RrAppearance *a_text;
-    int gravity;
-    int x;
-    int y;
-    int w;
-    int h;
+    gint gravity;
+    gint x;
+    gint y;
+    gint w;
+    gint h;
     gboolean mapped;
-} Popup;
+};
 
 Popup *popup_new(gboolean hasicon)
 {
@@ -75,23 +78,23 @@ void popup_free(Popup *self)
     }
 }
 
-void popup_position(Popup *self, int gravity, int x, int y)
+void popup_position(Popup *self, gint gravity, gint x, gint y)
 {
     self->gravity = gravity;
     self->x = x;
     self->y = y;
 }
 
-void popup_size(Popup *self, int w, int h)
+void popup_size(Popup *self, gint w, gint h)
 {
     self->w = w;
     self->h = h;
 }
 
-void popup_size_to_string(Popup *self, char *text)
+void popup_size_to_string(Popup *self, gchar *text)
 {
-    int textw, texth;
-    int iconw;
+    gint textw, texth;
+    gint iconw;
 
     if (!self->a_text)
         self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
@@ -106,11 +109,11 @@ void popup_size_to_string(Popup *self, char *text)
     self->w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
 }
 
-void popup_show(Popup *self, char *text, ObClientIcon *icon)
+void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 {
-    int x, y, w, h;
-    int textw, texth;
-    int iconw;
+    gint x, y, w, h;
+    gint textw, texth;
+    gint iconw;
 
     /* create the shit if needed */
     if (!self->a_bg)

@@ -10,7 +10,9 @@ focus.FALLBACK = 1
 
 # choose a default focus model
 focusmodel.setup_click_focus() # use focusmodel.setup_sloppy_focus() instead to
-                               # make focus follow the cursor
+                               # make focus follow the cursor, or bind things
+                               # in some way like these functions do to make
+                               # your own custom 'focus model'.
 # set up the mouse buttons
 behavior.setup_window_clicks()
 behavior.setup_window_buttons()

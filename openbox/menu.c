@@ -72,7 +72,7 @@ void menu_startup()
     Action *a;
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                      menu_destroy_hash_key,
+                                      (GDestroyNotify)menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
     m = menu_new("sex menu", "root", NULL);

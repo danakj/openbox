@@ -69,7 +69,7 @@ typedef enum MenuEntryRenderType {
     MenuEntryRenderType_Other = 1 << 7
 } MenuEntryRenderType;
 
-typedef struct {
+typedef struct MenuEntry {
     char *label;
     Menu *parent;
 

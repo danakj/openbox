@@ -712,7 +712,7 @@ static void layout_title(ObFrame *self)
     n = d = i = l = m = c = s = FALSE;
 
     if (!config_get("titlebar.layout", Config_String, &layout)) {
-        layout.string = "NDLIMC";
+        layout.string = "NDSLIMC";
         config_set("titlebar.layout", Config_String, layout);
     }
 

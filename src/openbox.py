@@ -29,50 +29,35 @@ except AttributeError:
 
 Openbox_instance = _openbox.Openbox_instance
 
-Display_display = _openbox.Display_display
-
 class Display(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Display, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, Display, name)
-    __swig_getmethods__["initialize"] = lambda x: _openbox.Display_initialize
-    if _newclass:initialize = staticmethod(_openbox.Display_initialize)
-    __swig_getmethods__["destroy"] = lambda x: _openbox.Display_destroy
-    if _newclass:destroy = staticmethod(_openbox.Display_destroy)
-    __swig_getmethods__["gcCache"] = lambda x: _openbox.Display_gcCache
-    if _newclass:gcCache = staticmethod(_openbox.Display_gcCache)
-    __swig_getmethods__["screenInfo"] = lambda x: _openbox.Display_screenInfo
-    if _newclass:screenInfo = staticmethod(_openbox.Display_screenInfo)
-    __swig_getmethods__["findScreen"] = lambda x: _openbox.Display_findScreen
-    if _newclass:findScreen = staticmethod(_openbox.Display_findScreen)
-    __swig_getmethods__["xkb"] = lambda x: _openbox.Display_xkb
-    if _newclass:xkb = staticmethod(_openbox.Display_xkb)
-    __swig_getmethods__["xkbEventBase"] = lambda x: _openbox.Display_xkbEventBase
-    if _newclass:xkbEventBase = staticmethod(_openbox.Display_xkbEventBase)
-    __swig_getmethods__["shape"] = lambda x: _openbox.Display_shape
-    if _newclass:shape = staticmethod(_openbox.Display_shape)
-    __swig_getmethods__["shapeEventBase"] = lambda x: _openbox.Display_shapeEventBase
-    if _newclass:shapeEventBase = staticmethod(_openbox.Display_shapeEventBase)
-    __swig_getmethods__["xinerama"] = lambda x: _openbox.Display_xinerama
-    if _newclass:xinerama = staticmethod(_openbox.Display_xinerama)
-    __swig_getmethods__["numLockMask"] = lambda x: _openbox.Display_numLockMask
-    if _newclass:numLockMask = staticmethod(_openbox.Display_numLockMask)
-    __swig_getmethods__["scrollLockMask"] = lambda x: _openbox.Display_scrollLockMask
-    if _newclass:scrollLockMask = staticmethod(_openbox.Display_scrollLockMask)
-    __swig_getmethods__["grab"] = lambda x: _openbox.Display_grab
-    if _newclass:grab = staticmethod(_openbox.Display_grab)
-    __swig_getmethods__["ungrab"] = lambda x: _openbox.Display_ungrab
-    if _newclass:ungrab = staticmethod(_openbox.Display_ungrab)
-    __swig_getmethods__["grabButton"] = lambda x: _openbox.Display_grabButton
-    if _newclass:grabButton = staticmethod(_openbox.Display_grabButton)
-    __swig_getmethods__["ungrabButton"] = lambda x: _openbox.Display_ungrabButton
-    if _newclass:ungrabButton = staticmethod(_openbox.Display_ungrabButton)
-    __swig_getmethods__["grabKey"] = lambda x: _openbox.Display_grabKey
-    if _newclass:grabKey = staticmethod(_openbox.Display_grabKey)
-    __swig_getmethods__["ungrabKey"] = lambda x: _openbox.Display_ungrabKey
-    if _newclass:ungrabKey = staticmethod(_openbox.Display_ungrabKey)
-    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __init__(self,*args):
+        self.this = apply(_openbox.new_Display,args)
+        self.thisown = 1
+    def __del__(self, destroy= _openbox.delete_Display):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    def gcCache(*args): return apply(_openbox.Display_gcCache,args)
+    def screenInfo(*args): return apply(_openbox.Display_screenInfo,args)
+    def findScreen(*args): return apply(_openbox.Display_findScreen,args)
+    def xkb(*args): return apply(_openbox.Display_xkb,args)
+    def xkbEventBase(*args): return apply(_openbox.Display_xkbEventBase,args)
+    def shape(*args): return apply(_openbox.Display_shape,args)
+    def shapeEventBase(*args): return apply(_openbox.Display_shapeEventBase,args)
+    def xinerama(*args): return apply(_openbox.Display_xinerama,args)
+    def numLockMask(*args): return apply(_openbox.Display_numLockMask,args)
+    def scrollLockMask(*args): return apply(_openbox.Display_scrollLockMask,args)
+    def __mul__(*args): return apply(_openbox.Display___mul__,args)
+    def grab(*args): return apply(_openbox.Display_grab,args)
+    def ungrab(*args): return apply(_openbox.Display_ungrab,args)
+    def grabButton(*args): return apply(_openbox.Display_grabButton,args)
+    def ungrabButton(*args): return apply(_openbox.Display_ungrabButton,args)
+    def grabKey(*args): return apply(_openbox.Display_grabKey,args)
+    def ungrabKey(*args): return apply(_openbox.Display_ungrabKey,args)
     def __repr__(self):
         return "<C Display instance at %s>" % (self.this,)
 
@@ -82,42 +67,6 @@ class DisplayPtr(Display):
         if not hasattr(self,"thisown"): self.thisown = 0
         self.__class__ = Display
 _openbox.Display_swigregister(DisplayPtr)
-Display_initialize = _openbox.Display_initialize
-
-Display_destroy = _openbox.Display_destroy
-
-Display_gcCache = _openbox.Display_gcCache
-
-Display_screenInfo = _openbox.Display_screenInfo
-
-Display_findScreen = _openbox.Display_findScreen
-
-Display_xkb = _openbox.Display_xkb
-
-Display_xkbEventBase = _openbox.Display_xkbEventBase
-
-Display_shape = _openbox.Display_shape
-
-Display_shapeEventBase = _openbox.Display_shapeEventBase
-
-Display_xinerama = _openbox.Display_xinerama
-
-Display_numLockMask = _openbox.Display_numLockMask
-
-Display_scrollLockMask = _openbox.Display_scrollLockMask
-
-Display_grab = _openbox.Display_grab
-
-Display_ungrab = _openbox.Display_ungrab
-
-Display_grabButton = _openbox.Display_grabButton
-
-Display_ungrabButton = _openbox.Display_ungrabButton
-
-Display_grabKey = _openbox.Display_grabKey
-
-Display_ungrabKey = _openbox.Display_ungrabKey
-
 
 class Point(_object):
     __swig_setmethods__ = {}

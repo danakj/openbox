@@ -14,6 +14,7 @@ extern "C" {
 #include <vector>
 #include <map>
 
+#include "otk/display.hh"
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
@@ -74,6 +75,9 @@ public:
   typedef std::vector<Screen *> ScreenList;
   
 private:
+  //! The display on which Openbox is running
+  otk::Display _display;
+  
   // stuff that can be passed on the command line
   //! Path to the config file to use/in use
   /*!

@@ -679,8 +679,8 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__ustring swig_types[31] 
 #define  SWIGTYPE_p_std__string swig_types[32] 
 #define  SWIGTYPE_p_XCrossingEvent swig_types[33] 
-#define  SWIGTYPE_p_Display swig_types[34] 
-#define  SWIGTYPE_p_otk__Display swig_types[35] 
+#define  SWIGTYPE_p_otk__Display swig_types[34] 
+#define  SWIGTYPE_p_Display swig_types[35] 
 #define  SWIGTYPE_p_XMappingEvent swig_types[36] 
 #define  SWIGTYPE_p_otk__Style swig_types[37] 
 #define  SWIGTYPE_p_otk__EventHandler swig_types[38] 
@@ -883,9 +883,6 @@ void python_callback(PyObject *func, KeyData *data)
   #include <iterator>
 
 
-  Display *Display_display() { return otk::Display::display; }
-
-
 #include "ustring.hh"
 
 ob::Client *ob_Screen_client(ob::Screen *self,int i){
@@ -915,39 +912,28 @@ static PyObject *_wrap_Openbox_instance(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Display_display(PyObject *self, PyObject *args) {
+static PyObject *_wrap_new_Display(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    Display *result;
+    otk::Display *result;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_display")) goto fail;
-    result = (Display *)Display_display();
+    if(!PyArg_ParseTuple(args,(char *)":new_Display")) goto fail;
+    result = (otk::Display *)new otk::Display();
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_Display, 0);
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Display, 1);
     return resultobj;
     fail:
     return NULL;
 }
 
 
-static PyObject *_wrap_Display_initialize(PyObject *self, PyObject *args) {
+static PyObject *_wrap_delete_Display(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    char *arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"s:Display_initialize",&arg1)) goto fail;
-    otk::Display::initialize(arg1);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_Display_destroy(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    
-    if(!PyArg_ParseTuple(args,(char *)":Display_destroy")) goto fail;
-    otk::Display::destroy();
+    if(!PyArg_ParseTuple(args,(char *)"O:delete_Display",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    delete arg1;
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -958,10 +944,13 @@ static PyObject *_wrap_Display_destroy(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_gcCache(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     otk::GCCache *result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_gcCache")) goto fail;
-    result = (otk::GCCache *)otk::Display::gcCache();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_gcCache",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::GCCache *)((otk::Display const *)arg1)->gcCache();
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__GCCache, 0);
     return resultobj;
@@ -972,11 +961,14 @@ static PyObject *_wrap_Display_gcCache(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_screenInfo(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    int arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    int arg2 ;
     otk::ScreenInfo *result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"i:Display_screenInfo",&arg1)) goto fail;
-    result = (otk::ScreenInfo *)otk::Display::screenInfo(arg1);
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Display_screenInfo",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::ScreenInfo *)(arg1)->screenInfo(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
     return resultobj;
@@ -987,14 +979,17 @@ static PyObject *_wrap_Display_screenInfo(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_findScreen(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    Window arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    Window arg2 ;
     otk::ScreenInfo *result;
     PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:Display_findScreen",&obj0)) goto fail;
-    arg1 = (Window) PyInt_AsLong(obj0);
+    if(!PyArg_ParseTuple(args,(char *)"OO:Display_findScreen",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Window) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    result = (otk::ScreenInfo *)otk::Display::findScreen(arg1);
+    result = (otk::ScreenInfo *)(arg1)->findScreen(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
     return resultobj;
@@ -1005,10 +1000,13 @@ static PyObject *_wrap_Display_findScreen(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_xkb(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     bool result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_xkb")) goto fail;
-    result = (bool)otk::Display::xkb();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_xkb",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((otk::Display const *)arg1)->xkb();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1019,10 +1017,13 @@ static PyObject *_wrap_Display_xkb(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_xkbEventBase(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     int result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_xkbEventBase")) goto fail;
-    result = (int)otk::Display::xkbEventBase();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_xkbEventBase",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Display const *)arg1)->xkbEventBase();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1033,10 +1034,13 @@ static PyObject *_wrap_Display_xkbEventBase(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_shape(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     bool result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_shape")) goto fail;
-    result = (bool)otk::Display::shape();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_shape",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((otk::Display const *)arg1)->shape();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1047,10 +1051,13 @@ static PyObject *_wrap_Display_shape(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_shapeEventBase(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     int result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_shapeEventBase")) goto fail;
-    result = (int)otk::Display::shapeEventBase();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_shapeEventBase",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Display const *)arg1)->shapeEventBase();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1061,10 +1068,13 @@ static PyObject *_wrap_Display_shapeEventBase(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_xinerama(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     bool result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_xinerama")) goto fail;
-    result = (bool)otk::Display::xinerama();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_xinerama",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((otk::Display const *)arg1)->xinerama();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1075,10 +1085,13 @@ static PyObject *_wrap_Display_xinerama(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_numLockMask(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_numLockMask")) goto fail;
-    result = (unsigned int)otk::Display::numLockMask();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_numLockMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int)((otk::Display const *)arg1)->numLockMask();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1089,10 +1102,13 @@ static PyObject *_wrap_Display_numLockMask(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_scrollLockMask(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int result;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_scrollLockMask")) goto fail;
-    result = (unsigned int)otk::Display::scrollLockMask();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_scrollLockMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int)((otk::Display const *)arg1)->scrollLockMask();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1101,11 +1117,31 @@ static PyObject *_wrap_Display_scrollLockMask(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Display___mul__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    Display *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Display___mul__",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Display *)((otk::Display const *)arg1)->operator *();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_Display, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Display_grab(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_grab")) goto fail;
-    otk::Display::grab();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_grab",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->grab();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1116,9 +1152,12 @@ static PyObject *_wrap_Display_grab(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_ungrab(PyObject *self, PyObject *args) {
     PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":Display_ungrab")) goto fail;
-    otk::Display::ungrab();
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_ungrab",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->ungrab();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1129,43 +1168,46 @@ static PyObject *_wrap_Display_ungrab(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_grabButton(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    unsigned int arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int arg2 ;
-    Window arg3 ;
-    bool arg4 ;
-    unsigned int arg5 ;
-    int arg6 ;
+    unsigned int arg3 ;
+    Window arg4 ;
+    bool arg5 ;
+    unsigned int arg6 ;
     int arg7 ;
-    Window arg8 ;
-    Cursor arg9 ;
-    bool arg10 ;
+    int arg8 ;
+    Window arg9 ;
+    Cursor arg10 ;
+    bool arg11 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     PyObject * obj3  = 0 ;
     PyObject * obj4  = 0 ;
-    PyObject * obj7  = 0 ;
+    PyObject * obj5  = 0 ;
     PyObject * obj8  = 0 ;
     PyObject * obj9  = 0 ;
+    PyObject * obj10  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOOOOiiOOO:Display_grabButton",&obj0,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7,&obj7,&obj8,&obj9)) goto fail;
-    arg1 = (unsigned int) PyInt_AsLong(obj0);
-    if (PyErr_Occurred()) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOOOOOiiOOO:Display_grabButton",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&arg7,&arg8,&obj8,&obj9,&obj10)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    arg3 = (Window) PyInt_AsLong(obj2);
+    arg3 = (unsigned int) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
-    arg4 = (bool) PyInt_AsLong(obj3);
+    arg4 = (Window) PyInt_AsLong(obj3);
     if (PyErr_Occurred()) SWIG_fail;
-    arg5 = (unsigned int) PyInt_AsLong(obj4);
+    arg5 = (bool) PyInt_AsLong(obj4);
     if (PyErr_Occurred()) SWIG_fail;
-    arg8 = (Window) PyInt_AsLong(obj7);
+    arg6 = (unsigned int) PyInt_AsLong(obj5);
     if (PyErr_Occurred()) SWIG_fail;
-    arg9 = (Cursor) PyInt_AsLong(obj8);
+    arg9 = (Window) PyInt_AsLong(obj8);
     if (PyErr_Occurred()) SWIG_fail;
-    arg10 = (bool) PyInt_AsLong(obj9);
+    arg10 = (Cursor) PyInt_AsLong(obj9);
     if (PyErr_Occurred()) SWIG_fail;
-    otk::Display::grabButton(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10);
+    arg11 = (bool) PyInt_AsLong(obj10);
+    if (PyErr_Occurred()) SWIG_fail;
+    ((otk::Display const *)arg1)->grabButton(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1176,21 +1218,24 @@ static PyObject *_wrap_Display_grabButton(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_ungrabButton(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    unsigned int arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int arg2 ;
-    Window arg3 ;
+    unsigned int arg3 ;
+    Window arg4 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOO:Display_ungrabButton",&obj0,&obj1,&obj2)) goto fail;
-    arg1 = (unsigned int) PyInt_AsLong(obj0);
-    if (PyErr_Occurred()) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOOO:Display_ungrabButton",&obj0,&obj1,&obj2,&obj3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    arg3 = (Window) PyInt_AsLong(obj2);
+    arg3 = (unsigned int) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
-    otk::Display::ungrabButton(arg1,arg2,arg3);
+    arg4 = (Window) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    ((otk::Display const *)arg1)->ungrabButton(arg2,arg3,arg4);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1201,31 +1246,34 @@ static PyObject *_wrap_Display_ungrabButton(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_grabKey(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    unsigned int arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int arg2 ;
-    Window arg3 ;
-    bool arg4 ;
-    int arg5 ;
+    unsigned int arg3 ;
+    Window arg4 ;
+    bool arg5 ;
     int arg6 ;
-    bool arg7 ;
+    int arg7 ;
+    bool arg8 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     PyObject * obj3  = 0 ;
-    PyObject * obj6  = 0 ;
+    PyObject * obj4  = 0 ;
+    PyObject * obj7  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOOOiiO:Display_grabKey",&obj0,&obj1,&obj2,&obj3,&arg5,&arg6,&obj6)) goto fail;
-    arg1 = (unsigned int) PyInt_AsLong(obj0);
-    if (PyErr_Occurred()) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOOOOiiO:Display_grabKey",&obj0,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7,&obj7)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    arg3 = (Window) PyInt_AsLong(obj2);
+    arg3 = (unsigned int) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
-    arg4 = (bool) PyInt_AsLong(obj3);
+    arg4 = (Window) PyInt_AsLong(obj3);
     if (PyErr_Occurred()) SWIG_fail;
-    arg7 = (bool) PyInt_AsLong(obj6);
+    arg5 = (bool) PyInt_AsLong(obj4);
     if (PyErr_Occurred()) SWIG_fail;
-    otk::Display::grabKey(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
+    arg8 = (bool) PyInt_AsLong(obj7);
+    if (PyErr_Occurred()) SWIG_fail;
+    ((otk::Display const *)arg1)->grabKey(arg2,arg3,arg4,arg5,arg6,arg7,arg8);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1236,21 +1284,24 @@ static PyObject *_wrap_Display_grabKey(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Display_ungrabKey(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    unsigned int arg1 ;
+    otk::Display *arg1 = (otk::Display *) 0 ;
     unsigned int arg2 ;
-    Window arg3 ;
+    unsigned int arg3 ;
+    Window arg4 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOO:Display_ungrabKey",&obj0,&obj1,&obj2)) goto fail;
-    arg1 = (unsigned int) PyInt_AsLong(obj0);
-    if (PyErr_Occurred()) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOOO:Display_ungrabKey",&obj0,&obj1,&obj2,&obj3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    arg3 = (Window) PyInt_AsLong(obj2);
+    arg3 = (unsigned int) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
-    otk::Display::ungrabKey(arg1,arg2,arg3);
+    arg4 = (Window) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    ((otk::Display const *)arg1)->ungrabKey(arg2,arg3,arg4);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -7902,9 +7953,8 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
-	 { (char *)"Display_display", _wrap_Display_display, METH_VARARGS },
-	 { (char *)"Display_initialize", _wrap_Display_initialize, METH_VARARGS },
-	 { (char *)"Display_destroy", _wrap_Display_destroy, METH_VARARGS },
+	 { (char *)"new_Display", _wrap_new_Display, METH_VARARGS },
+	 { (char *)"delete_Display", _wrap_delete_Display, METH_VARARGS },
 	 { (char *)"Display_gcCache", _wrap_Display_gcCache, METH_VARARGS },
 	 { (char *)"Display_screenInfo", _wrap_Display_screenInfo, METH_VARARGS },
 	 { (char *)"Display_findScreen", _wrap_Display_findScreen, METH_VARARGS },
@@ -7915,6 +7965,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Display_xinerama", _wrap_Display_xinerama, METH_VARARGS },
 	 { (char *)"Display_numLockMask", _wrap_Display_numLockMask, METH_VARARGS },
 	 { (char *)"Display_scrollLockMask", _wrap_Display_scrollLockMask, METH_VARARGS },
+	 { (char *)"Display___mul__", _wrap_Display___mul__, METH_VARARGS },
 	 { (char *)"Display_grab", _wrap_Display_grab, METH_VARARGS },
 	 { (char *)"Display_ungrab", _wrap_Display_ungrab, METH_VARARGS },
 	 { (char *)"Display_grabButton", _wrap_Display_grabButton, METH_VARARGS },
@@ -8257,8 +8308,8 @@ static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle
 static swig_type_info _swigt__p_otk__ustring[] = {{"_p_otk__ustring", 0, "otk::ustring *", 0},{"_p_otk__ustring"},{0}};
 static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
 static swig_type_info _swigt__p_XCrossingEvent[] = {{"_p_XCrossingEvent", 0, "XCrossingEvent *", 0},{"_p_XCrossingEvent"},{0}};
-static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_otk__Display[] = {{"_p_otk__Display", 0, "otk::Display *", 0},{"_p_otk__Display"},{0}};
+static swig_type_info _swigt__p_Display[] = {{"_p_Display", 0, "Display *", 0},{"_p_Display"},{0}};
 static swig_type_info _swigt__p_XMappingEvent[] = {{"_p_XMappingEvent", 0, "XMappingEvent *", 0},{"_p_XMappingEvent"},{0}};
 static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
 static swig_type_info _swigt__p_otk__EventHandler[] = {{"_p_otk__EventHandler", 0, "otk::EventHandler *", 0},{"_p_ob__Client", _p_ob__ClientTo_p_otk__EventHandler},{"_p_ob__Actions", _p_ob__ActionsTo_p_otk__EventHandler},{"_p_otk__EventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventHandler},{"_p_ob__Screen", _p_ob__ScreenTo_p_otk__EventHandler},{0}};
@@ -8321,8 +8372,8 @@ _swigt__p_XRectangle,
 _swigt__p_otk__ustring, 
 _swigt__p_std__string, 
 _swigt__p_XCrossingEvent, 
-_swigt__p_Display, 
 _swigt__p_otk__Display, 
+_swigt__p_Display, 
 _swigt__p_XMappingEvent, 
 _swigt__p_otk__Style, 
 _swigt__p_otk__EventHandler, 

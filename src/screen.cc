@@ -49,14 +49,14 @@ Screen::Screen(int screen)
   : WidgetBase(WidgetBase::Type_Root),
     _number(screen)
 {
-  assert(screen >= 0); assert(screen < ScreenCount(otk::Display::display));
-  _info = otk::Display::screenInfo(screen);
+  assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
+  _info = otk::display->screenInfo(screen);
 
   ::running = false;
   XErrorHandler old = XSetErrorHandler(::anotherWMRunning);
-  XSelectInput(otk::Display::display, _info->rootWindow(),
+  XSelectInput(**otk::display, _info->rootWindow(),
                Screen::event_mask);
-  XSync(otk::Display::display, false);
+  XSync(**otk::display, false);
   XSetErrorHandler(old);
 
   _managed = !::running;
@@ -71,7 +71,7 @@ Screen::Screen(int screen)
                                      (unsigned long) getpid());
 
   // set the mouse cursor for the root window (the default cursor)
-  XDefineCursor(otk::Display::display, _info->rootWindow(),
+  XDefineCursor(**otk::display, _info->rootWindow(),
                 openbox->cursors().session);
 
   // initialize the shit that is used for all drawing on the screen
@@ -126,10 +126,10 @@ Screen::Screen(int screen)
   // create the window which gets focus when no clients get it
   XSetWindowAttributes attr;
   attr.override_redirect = true;
-  _focuswindow = XCreateWindow(otk::Display::display, _info->rootWindow(),
+  _focuswindow = XCreateWindow(**otk::display, _info->rootWindow(),
                                -100, -100, 1, 1, 0, 0, InputOnly,
                                _info->visual(), CWOverrideRedirect, &attr);
-  XMapWindow(otk::Display::display, _focuswindow);
+  XMapWindow(**otk::display, _focuswindow);
   
   // these may be further updated if any pre-existing windows are found in
   // the manageExising() function
@@ -149,7 +149,7 @@ Screen::~Screen()
 {
   if (! _managed) return;
 
-  XSelectInput(otk::Display::display, _info->rootWindow(), NoEventMask);
+  XSelectInput(**otk::display, _info->rootWindow(), NoEventMask);
   
   // unmanage all windows
   while (!clients.empty())
@@ -159,8 +159,8 @@ Screen::~Screen()
   EventData data(_number, 0, EventShutdown, 0);
   openbox->bindings()->fireEvent(&data);
 
-  XDestroyWindow(otk::Display::display, _focuswindow);
-  XDestroyWindow(otk::Display::display, _supportwindow);
+  XDestroyWindow(**otk::display, _focuswindow);
+  XDestroyWindow(**otk::display, _supportwindow);
 
   delete _image_control;
 }
@@ -170,14 +170,14 @@ void Screen::manageExisting()
 {
   unsigned int i, j, nchild;
   Window r, p, *children;
-  XQueryTree(otk::Display::display, _info->rootWindow(), &r, &p,
+  XQueryTree(**otk::display, _info->rootWindow(), &r, &p,
              &children, &nchild);
 
   // preen the window list of all icon windows... for better dockapp support
   for (i = 0; i < nchild; i++) {
     if (children[i] == None) continue;
 
-    XWMHints *wmhints = XGetWMHints(otk::Display::display,
+    XWMHints *wmhints = XGetWMHints(**otk::display,
                                     children[i]);
 
     if (wmhints) {
@@ -201,7 +201,7 @@ void Screen::manageExisting()
       continue;
 
     XWindowAttributes attrib;
-    if (XGetWindowAttributes(otk::Display::display, children[i], &attrib)) {
+    if (XGetWindowAttributes(**otk::display, children[i], &attrib)) {
       if (attrib.override_redirect) continue;
 
       if (attrib.map_state != IsUnmapped) {
@@ -279,7 +279,7 @@ void Screen::calcArea()
 void Screen::changeSupportedAtoms()
 {
   // create the netwm support window
-  _supportwindow = XCreateSimpleWindow(otk::Display::display,
+  _supportwindow = XCreateSimpleWindow(**otk::display,
                                        _info->rootWindow(),
                                        0, 0, 1, 1, 0, 0, 0);
 
@@ -456,14 +456,14 @@ void Screen::manageWindow(Window window)
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
 
-  otk::Display::grab();
+  otk::display->grab();
 
   // is the window a docking app
-  if ((wmhint = XGetWMHints(otk::Display::display, window))) {
+  if ((wmhint = XGetWMHints(**otk::display, window))) {
     if ((wmhint->flags & StateHint) &&
         wmhint->initial_state == WithdrawnState) {
       //slit->addClient(w); // XXX: make dock apps work!
-      otk::Display::ungrab();
+      otk::display->ungrab();
 
       XFree(wmhint);
       return;
@@ -474,7 +474,7 @@ void Screen::manageWindow(Window window)
   // choose the events we want to receive on the CLIENT window
   attrib_set.event_mask = Client::event_mask;
   attrib_set.do_not_propagate_mask = Client::no_propagate_mask;
-  XChangeWindowAttributes(otk::Display::display, window,
+  XChangeWindowAttributes(**otk::display, window,
                           CWEventMask|CWDontPropagate, &attrib_set);
 
   // create the Client class, which gets all of the hints on the window
@@ -489,7 +489,7 @@ void Screen::manageWindow(Window window)
   
   // specify that if we exit, the window should not be destroyed and should be
   // reparented back to root automatically
-  XChangeSaveSet(otk::Display::display, window, SetModeInsert);
+  XChangeSaveSet(**otk::display, window, SetModeInsert);
 
   if (!(openbox->state() == Openbox::State_Starting ||
         client->positionRequested())) {
@@ -526,7 +526,7 @@ void Screen::manageWindow(Window window)
  
   // XXX: handle any requested states such as maximized
 
-  otk::Display::ungrab();
+  otk::display->ungrab();
 
   // add to the screen's list
   clients.push_back(client);
@@ -575,10 +575,10 @@ void Screen::unmanageWindow(Client *client)
   openbox->clearHandler(client->window());
   
   // remove the window from our save set
-  XChangeSaveSet(otk::Display::display, client->window(), SetModeDelete);
+  XChangeSaveSet(**otk::display, client->window(), SetModeDelete);
 
   // we dont want events no more
-  XSelectInput(otk::Display::display, client->window(), NoEventMask);
+  XSelectInput(**otk::display, client->window(), NoEventMask);
 
   frame->hide();
 
@@ -633,7 +633,7 @@ void Screen::restack(bool raise, Client *client)
   for (; it != end; ++it)
     wins.push_back((*it)->frame->window());
 
-  XRestackWindows(otk::Display::display, &wins[0], wins.size());
+  XRestackWindows(**otk::display, &wins[0], wins.size());
   changeStackingList();
 }
 
@@ -733,11 +733,11 @@ void Screen::propertyHandler(const XPropertyEvent &e)
 
   // compress changes to a single property into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
+  while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
     // XXX: it would be nice to compress ALL changes to a property, not just
     //      changes in a row without other props between.
     if (ce.xproperty.atom != e.atom) {
-      XPutBackEvent(otk::Display::display, &ce);
+      XPutBackEvent(**otk::display, &ce);
       break;
     }
   }
@@ -786,7 +786,7 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type =
       openbox->property()->atom(otk::Property::net_active_window);
-    ce.xclient.display = otk::Display::display;
+    ce.xclient.display = **otk::display;
     ce.xclient.window = c->window();
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = 0l;
@@ -794,7 +794,7 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
-    XSendEvent(otk::Display::display, _info->rootWindow(), false,
+    XSendEvent(**otk::display, _info->rootWindow(), false,
                SubstructureRedirectMask | SubstructureNotifyMask,
                &ce);
   } else

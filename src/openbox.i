@@ -90,6 +90,8 @@ void python_callback(PyObject *func, KeyData *data)
 }
 %}
 
+#ignore ob::openbox;
+
 %ignore ob::Screen::clients;
 %{
   #include <iterator>
@@ -107,10 +109,7 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
-%ignore otk::Display::display;
-%inline %{
-  Display *Display_display() { return otk::Display::display; }
-%};
+%ignore otk::display;
 
 %include "../otk/ustring.i"
 

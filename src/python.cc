@@ -213,7 +213,7 @@ PyObject *send_client_msg(Window target, int type, Window about,
   e.xclient.data.l[3] = data3;
   e.xclient.data.l[4] = data4;
 
-  XSendEvent(otk::Display::display, target, false,
+  XSendEvent(**otk::display, target, false,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
   Py_INCREF(Py_None); return Py_None;

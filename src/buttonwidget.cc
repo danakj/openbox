@@ -114,18 +114,18 @@ void ButtonWidget::update()
                  *_style->getButtonPicUnfocus());
 
     // set the clip region
-    XSetClipMask(otk::Display::display, pen.gc(), pm->mask);
-    XSetClipOrigin(otk::Display::display, pen.gc(),
+    XSetClipMask(**otk::display, pen.gc(), pm->mask);
+    XSetClipOrigin(**otk::display, pen.gc(),
                    (width - pm->w)/2, (width - pm->h)/2);
 
     // fill in the clipped region
-    XFillRectangle(otk::Display::display, _window, pen.gc(),
+    XFillRectangle(**otk::display, _window, pen.gc(),
                    (width - pm->w)/2, (width - pm->h)/2,
                    (width + pm->w)/2, (width + pm->h)/2);
 
     // unset the clip region
-    XSetClipMask(otk::Display::display, pen.gc(), None);
-    XSetClipOrigin(otk::Display::display, pen.gc(), 0, 0);
+    XSetClipMask(**otk::display, pen.gc(), None);
+    XSetClipOrigin(**otk::display, pen.gc(), 0, 0);
   }
 }
 

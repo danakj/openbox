@@ -273,7 +273,7 @@ void Client::getArea()
   XWindowAttributes wattrib;
   Status ret;
   
-  ret = XGetWindowAttributes(otk::Display::display, _window, &wattrib);
+  ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
   assert(ret != BadWindow);
 
   _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
@@ -332,14 +332,14 @@ void Client::getShaped()
 {
   _shaped = false;
 #ifdef   SHAPE
-  if (otk::Display::shape()) {
+  if (otk::display->shape()) {
     int foo;
     unsigned int ufoo;
     int s;
 
-    XShapeSelectInput(otk::Display::display, _window, ShapeNotifyMask);
+    XShapeSelectInput(**otk::display, _window, ShapeNotifyMask);
 
-    XShapeQueryExtents(otk::Display::display, _window, &s, &foo,
+    XShapeQueryExtents(**otk::display, _window, &s, &foo,
                        &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo, &ufoo);
     _shaped = (s != 0);
   }
@@ -385,7 +385,7 @@ void Client::updateProtocols()
   _decorations &= ~Decor_Close;
   _functions &= ~Func_Close;
 
-  if (XGetWMProtocols(otk::Display::display, _window, &proto, &num_return)) {
+  if (XGetWMProtocols(**otk::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
       if (proto[i] == property->atom(otk::Property::wm_delete_window)) {
         _decorations |= Decor_Close;
@@ -419,7 +419,7 @@ void Client::updateNormalHints()
   // point..
 
   // get the hints from the window
-  if (XGetWMNormalHints(otk::Display::display, _window, &size, &ret)) {
+  if (XGetWMNormalHints(**otk::display, _window, &size, &ret)) {
     _positioned = (size.flags & (PPosition|USPosition));
 
     if (size.flags & PWinGravity)
@@ -457,7 +457,7 @@ void Client::updateWMHints()
   _can_focus = true;
   _urgent = false;
   
-  if ((hints = XGetWMHints(otk::Display::display, _window)) != NULL) {
+  if ((hints = XGetWMHints(**otk::display, _window)) != NULL) {
     if (hints->flags & InputHint)
       _can_focus = hints->input;
 
@@ -572,7 +572,7 @@ void Client::updateTransientFor()
   Window t = 0;
   Client *c = 0;
 
-  if (XGetTransientForHint(otk::Display::display, _window, &t) &&
+  if (XGetTransientForHint(**otk::display, _window, &t) &&
       t != _window) { // cant be transient to itself!
     c = openbox->findClient(t);
     assert(c != this); // if this happens then we need to check for it
@@ -581,7 +581,7 @@ void Client::updateTransientFor()
       // not transient to a client, see if it is transient for a group
       if (//t == _group->leader() ||
         t == None ||
-        t == otk::Display::screenInfo(_screen)->rootWindow()) {
+        t == otk::display->screenInfo(_screen)->rootWindow()) {
         // window is a transient for its group!
         // XXX: for now this is treated as non-transient.
         //      this needs to be fixed!
@@ -610,11 +610,11 @@ void Client::propertyHandler(const XPropertyEvent &e)
 
   // compress changes to a single property into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
+  while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
     // XXX: it would be nice to compress ALL changes to a property, not just
     //      changes in a row without other props between.
     if (ce.xproperty.atom != e.atom) {
-      XPutBackEvent(otk::Display::display, &ce);
+      XPutBackEvent(**otk::display, &ce);
       break;
     }
   }
@@ -850,12 +850,12 @@ void Client::toggleClientBorder(bool addborder)
   _area.setPos(x, y);
 
   if (addborder) {
-    XSetWindowBorderWidth(otk::Display::display, _window, _border_width);
+    XSetWindowBorderWidth(**otk::display, _window, _border_width);
 
     // move the client so it is back it the right spot _with_ its border!
-    XMoveWindow(otk::Display::display, _window, x, y);
+    XMoveWindow(**otk::display, _window, x, y);
   } else
-    XSetWindowBorderWidth(otk::Display::display, _window, 0);
+    XSetWindowBorderWidth(**otk::display, _window, 0);
 }
 
 
@@ -871,11 +871,11 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
     // compress changes into a single change
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
+    while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
       // XXX: it would be nice to compress ALL messages of a type, not just
       //      messages in a row without other message types between.
       if (ce.xclient.message_type != e.message_type) {
-        XPutBackEvent(otk::Display::display, &ce);
+        XPutBackEvent(**otk::display, &ce);
         break;
       }
       compress = true;
@@ -889,11 +889,11 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
     // compress changes into a single change 
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
+    while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
       // XXX: it would be nice to compress ALL messages of a type, not just
       //      messages in a row without other message types between.
       if (ce.xclient.message_type != e.message_type) {
-        XPutBackEvent(otk::Display::display, &ce);
+        XPutBackEvent(**otk::display, &ce);
         break;
       }
       compress = true;
@@ -998,7 +998,7 @@ void Client::resize(Corner anchor, int w, int h, int x, int y)
 
   _area.setSize(w, h);
 
-  XResizeWindow(otk::Display::display, _window, w, h);
+  XResizeWindow(**otk::display, _window, w, h);
 
   // resize the frame to match the request
   frame->adjustSize();
@@ -1018,7 +1018,7 @@ void Client::move(int x, int y)
     // yet)
     XEvent event;
     event.type = ConfigureNotify;
-    event.xconfigure.display = otk::Display::display;
+    event.xconfigure.display = **otk::display;
     event.xconfigure.event = _window;
     event.xconfigure.window = _window;
     event.xconfigure.x = x;
@@ -1049,7 +1049,7 @@ void Client::close()
 
   ce.xclient.type = ClientMessage;
   ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
-  ce.xclient.display = otk::Display::display;
+  ce.xclient.display = **otk::display;
   ce.xclient.window = _window;
   ce.xclient.format = 32;
   ce.xclient.data.l[0] = property->atom(otk::Property::wm_delete_window);
@@ -1057,7 +1057,7 @@ void Client::close()
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
-  XSendEvent(otk::Display::display, _window, false, NoEventMask, &ce);
+  XSendEvent(**otk::display, _window, false, NoEventMask, &ce);
 }
 
 
@@ -1123,7 +1123,7 @@ bool Client::focus() const
   if (_focused) return true;
 
   if (_can_focus)
-    XSetInputFocus(otk::Display::display, _window,
+    XSetInputFocus(**otk::display, _window,
                    RevertToNone, CurrentTime);
 
   if (_focus_notify) {
@@ -1132,7 +1132,7 @@ bool Client::focus() const
     
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
-    ce.xclient.display = otk::Display::display;
+    ce.xclient.display = **otk::display;
     ce.xclient.window = _window;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = property->atom(otk::Property::wm_take_focus);
@@ -1140,7 +1140,7 @@ bool Client::focus() const
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
-    XSendEvent(otk::Display::display, _window, False, NoEventMask, &ce);
+    XSendEvent(**otk::display, _window, False, NoEventMask, &ce);
   }
 
   return true;
@@ -1308,7 +1308,7 @@ void Client::reparentHandler(const XReparentEvent &e)
   // server to deal with after we unmanage the window
   XEvent ev;
   ev.xreparent = e;
-  XPutBackEvent(otk::Display::display, &ev);
+  XPutBackEvent(**otk::display, &ev);
   
   // this deletes us etc
   openbox->screen(_screen)->unmanageWindow(this);

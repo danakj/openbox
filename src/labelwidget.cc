@@ -14,8 +14,8 @@ LabelWidget::LabelWidget(otk::Widget *parent, WidgetBase::WidgetType type)
   : otk::Widget(parent),
     WidgetBase(type)
 {
-  const otk::ScreenInfo *info = otk::Display::screenInfo(_screen);
-  _xftdraw = XftDrawCreate(otk::Display::display, _window, info->visual(),
+  const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
+  _xftdraw = XftDrawCreate(**otk::display, _window, info->visual(),
                            info->colormap());
 }
 

@@ -98,7 +98,7 @@ bool Bindings::translate(const std::string &str, Binding &b,bool askey) const
       printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
       return false;
     }
-    if (!(b.key = XKeysymToKeycode(otk::Display::display, sym)))
+    if (!(b.key = XKeysymToKeycode(**otk::display, sym)))
       printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
     return b.key != 0;
   } else {
@@ -244,14 +244,14 @@ bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
     destroytree(tree);
   } else {
     // grab the server here to make sure no key pressed go missed
-    otk::Display::grab();
+    otk::display->grab();
     grabKeys(false);
 
     // assimilate this built tree into the main tree
     assimilate(tree); // assimilation destroys/uses the tree
 
     grabKeys(true); 
-    otk::Display::ungrab();
+    otk::display->ungrab();
   }
  
   Py_INCREF(callback);
@@ -277,7 +277,7 @@ bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
                                           callback);
     if (it != t->callbacks.end()) {
       // grab the server here to make sure no key pressed go missed
-      otk::Display::grab();
+      otk::display->grab();
       grabKeys(false);
       
       _curpos = &_keytree;
@@ -286,7 +286,7 @@ bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
       Py_XDECREF(*it);
       
       grabKeys(true);
-      otk::Display::ungrab();
+      otk::display->ungrab();
       
       return true;
     }
@@ -300,12 +300,12 @@ void Bindings::setResetKey(const std::string &key)
   Binding b(0, 0);
   if (translate(key, b)) {
     // grab the server here to make sure no key pressed go missed
-    otk::Display::grab();
+    otk::display->grab();
     grabKeys(false);
     _resetkey.key = b.key;
     _resetkey.modifiers = b.modifiers;
     grabKeys(true);
-    otk::Display::ungrab();
+    otk::display->ungrab();
   }
 }
 
@@ -342,28 +342,28 @@ void Bindings::removeAllKeys()
 void Bindings::grabKeys(bool grab)
 {
   for (int i = 0; i < openbox->screenCount(); ++i) {
-    Window root = otk::Display::screenInfo(i)->rootWindow();
+    Window root = otk::display->screenInfo(i)->rootWindow();
 
     KeyBindingTree *p = _curpos->first_child;
     while (p) {
       if (grab) {
-        otk::Display::grabKey(p->binding.key, p->binding.modifiers,
+        otk::display->grabKey(p->binding.key, p->binding.modifiers,
                                 root, false, GrabModeAsync, GrabModeAsync,
                                 false);
       }
       else
-        otk::Display::ungrabKey(p->binding.key, p->binding.modifiers,
+        otk::display->ungrabKey(p->binding.key, p->binding.modifiers,
                                   root);
       p = p->next_sibling;
     }
 
     if (_resetkey.key)
       if (grab)
-        otk::Display::grabKey(_resetkey.key, _resetkey.modifiers,
+        otk::display->grabKey(_resetkey.key, _resetkey.modifiers,
                                 root, false, GrabModeAsync, GrabModeAsync,
                                 false);
       else
-        otk::Display::ungrabKey(_resetkey.key, _resetkey.modifiers,
+        otk::display->ungrabKey(_resetkey.key, _resetkey.modifiers,
                                   root);
   }
 }
@@ -381,11 +381,11 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
         if (p->chain) {
           _timer.start(); // start/restart the timer
           // grab the server here to make sure no key pressed go missed
-          otk::Display::grab();
+          otk::display->grab();
           grabKeys(false);
           _curpos = p;
           grabKeys(true);
-          otk::Display::ungrab();
+          otk::display->ungrab();
         } else {
           Client *c = openbox->focusedClient();
           KeyData data(screen, c, time, modifiers, key);
@@ -405,11 +405,11 @@ void Bindings::resetChains(Bindings *self)
 {
   self->_timer.stop();
   // grab the server here to make sure no key pressed go missed
-  otk::Display::grab();
+  otk::display->grab();
   self->grabKeys(false);
   self->_curpos = &self->_keytree;
   self->grabKeys(true);
-  otk::Display::ungrab();
+  otk::display->ungrab();
 }
 
 
@@ -500,10 +500,10 @@ void Bindings::grabButton(bool grab, const Binding &b, MouseContext context,
     return;
   }
   if (grab)
-    otk::Display::grabButton(b.key, b.modifiers, win, false, mask, mode,
-                               GrabModeAsync, None, None, false);
+    otk::display->grabButton(b.key, b.modifiers, win, false, mask, mode,
+                             GrabModeAsync, None, None, false);
   else
-    otk::Display::ungrabButton(b.key, b.modifiers, win);
+    otk::display->ungrabButton(b.key, b.modifiers, win);
 }
 
 void Bindings::grabButtons(bool grab, Client *client)
@@ -519,7 +519,7 @@ void Bindings::fireButton(MouseData *data)
 {
   if (data->context == MC_Window) {
     // Replay the event, so it goes to the client, and ungrab the device.
-    XAllowEvents(otk::Display::display, ReplayPointer, data->time);
+    XAllowEvents(**otk::display, ReplayPointer, data->time);
   }
   
   ButtonBindingList::iterator it, end = _buttons[data->context].end();
@@ -541,7 +541,7 @@ bool Bindings::addEvent(EventAction action, PyObject *callback)
   }
 #ifdef    XKB
   if (action == EventBell && _eventlist[action].empty())
-    XkbSelectEvents(otk::Display::display, XkbUseCoreKbd,
+    XkbSelectEvents(**otk::display, XkbUseCoreKbd,
                     XkbBellNotifyMask, XkbBellNotifyMask);
 #endif // XKB
   _eventlist[action].push_back(callback);
@@ -563,7 +563,7 @@ bool Bindings::removeEvent(EventAction action, PyObject *callback)
     _eventlist[action].erase(it);
 #ifdef    XKB
     if (action == EventBell && _eventlist[action].empty())
-      XkbSelectEvents(otk::Display::display, XkbUseCoreKbd,
+      XkbSelectEvents(**otk::display, XkbUseCoreKbd,
                       XkbBellNotifyMask, 0);
 #endif // XKB
     return true;

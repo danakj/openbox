@@ -84,7 +84,7 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   if (c)
     screen = c->screen();
   else
-    screen = otk::Display::findScreen(e.root)->screen();
+    screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MousePress);
   openbox->bindings()->fireButton(&data);
@@ -122,7 +122,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
 
   // find the area of the window
   XWindowAttributes attr;
-  if (!XGetWindowAttributes(otk::Display::display, e.window, &attr)) return;
+  if (!XGetWindowAttributes(**otk::display, e.window, &attr)) return;
 
   // if not on the window any more, it isnt a CLICK
   if (!(e.same_screen && e.x >= 0 && e.y >= 0 &&
@@ -138,7 +138,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   if (c)
     screen = c->screen();
   else
-    screen = otk::Display::findScreen(e.root)->screen();
+    screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MouseClick);
   openbox->bindings()->fireButton(&data);
@@ -179,7 +179,7 @@ void Actions::enterHandler(const XCrossingEvent &e)
   if (c)
     screen = c->screen();
   else
-    screen = otk::Display::findScreen(e.root)->screen();
+    screen = otk::display->findScreen(e.root)->screen();
   EventData data(screen, c, EventEnterWindow, e.state);
   openbox->bindings()->fireEvent(&data);
 }
@@ -195,7 +195,7 @@ void Actions::leaveHandler(const XCrossingEvent &e)
   if (c)
     screen = c->screen();
   else
-    screen = otk::Display::findScreen(e.root)->screen();
+    screen = otk::display->findScreen(e.root)->screen();
   EventData data(screen, c, EventLeaveWindow, e.state);
   openbox->bindings()->fireEvent(&data);
 }
@@ -209,7 +209,7 @@ void Actions::keyPressHandler(const XKeyEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   openbox->bindings()->
-    fireKey(otk::Display::findScreen(e.root)->screen(),
+    fireKey(otk::display->findScreen(e.root)->screen(),
             state, e.keycode, e.time);
 }
 
@@ -224,9 +224,9 @@ void Actions::motionHandler(const XMotionEvent &e)
   
   // compress changes to a window into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
+  while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
     if (ce.xmotion.window != e.window) {
-      XPutBackEvent(otk::Display::display, &ce);
+      XPutBackEvent(**otk::display, &ce);
       break;
     } else {
       x_root = e.x_root;
@@ -248,7 +248,7 @@ void Actions::motionHandler(const XMotionEvent &e)
   if (c)
     screen = c->screen();
   else
-    screen = otk::Display::findScreen(e.root)->screen();
+    screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
                  x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
   openbox->bindings()->fireButton(&data);

@@ -154,7 +154,7 @@ public:
     this->client = client;
     this->time   = time;
     this->state  = state;
-    this->key    = XKeysymToString(XKeycodeToKeysym(otk::Display::display,
+    this->key    = XKeysymToString(XKeycodeToKeysym(**otk::display,
                                                     key, 0));
   }
 };

@@ -27,7 +27,7 @@ Frame::Frame(Client *client, otk::Style *style)
   : otk::Widget(openbox, style, Horizontal, 0, 1, true),
     WidgetBase(WidgetBase::Type_Frame),
     _client(client),
-    _screen(otk::Display::screenInfo(client->screen())),
+    _screen(otk::display->screenInfo(client->screen())),
     _plate(this, WidgetBase::Type_Plate),
     _titlebar(this, WidgetBase::Type_Titlebar),
     _button_close(&_titlebar, WidgetBase::Type_CloseButton),
@@ -43,7 +43,7 @@ Frame::Frame(Client *client, otk::Style *style)
   assert(client);
   assert(style);
 
-  XSelectInput(otk::Display::display, _window, Frame::event_mask);
+  XSelectInput(**otk::display, _window, Frame::event_mask);
 
   _grip_left.setCursor(openbox->cursors().ll_angle);
   _grip_right.setCursor(openbox->cursors().lr_angle);
@@ -361,13 +361,13 @@ void Frame::adjustShape()
   
   if (!_client->shaped()) {
     // clear the shape on the frame window
-    XShapeCombineMask(otk::Display::display, _window, ShapeBounding,
+    XShapeCombineMask(**otk::display, _window, ShapeBounding,
                       _innersize.left,
                       _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
-    XShapeCombineShape(otk::Display::display, _window, ShapeBounding,
+    XShapeCombineShape(**otk::display, _window, ShapeBounding,
                        _innersize.left,
                        _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);
@@ -391,7 +391,7 @@ void Frame::adjustShape()
       ++num;
     }
 
-    XShapeCombineRectangles(otk::Display::display, window(),
+    XShapeCombineRectangles(**otk::display, window(),
                             ShapeBounding, 0, 0, xrect, num,
                             ShapeUnion, Unsorted);
   }
@@ -402,7 +402,7 @@ void Frame::adjustShape()
 void Frame::grabClient()
 {
   // reparent the client to the frame
-  XReparentWindow(otk::Display::display, _client->window(),
+  XReparentWindow(**otk::display, _client->window(),
                   _plate.window(), 0, 0);
   /*
     When reparenting the client window, it is usually not mapped yet, since
@@ -416,11 +416,11 @@ void Frame::grabClient()
     _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config req's)
-  XSelectInput(otk::Display::display, _plate.window(),
+  XSelectInput(**otk::display, _plate.window(),
                SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
-  XMapWindow(otk::Display::display, _client->window());
+  XMapWindow(**otk::display, _client->window());
 
   adjustSize();
   adjustPosition();
@@ -432,15 +432,15 @@ void Frame::releaseClient()
   XEvent ev;
 
   // check if the app has already reparented its window away
-  if (XCheckTypedWindowEvent(otk::Display::display, _client->window(),
+  if (XCheckTypedWindowEvent(**otk::display, _client->window(),
                              ReparentNotify, &ev)) {
-    XPutBackEvent(otk::Display::display, &ev);
+    XPutBackEvent(**otk::display, &ev);
     // re-map the window since the unmanaging process unmaps it
-    XMapWindow(otk::Display::display, _client->window());  
+    XMapWindow(**otk::display, _client->window());  
   } else {
     // according to the ICCCM - if the client doesn't reparent itself, then we
     // will reparent the window to root for them
-    XReparentWindow(otk::Display::display, _client->window(),
+    XReparentWindow(**otk::display, _client->window(),
                     _screen->rootWindow(),
                     _client->area().x(), _client->area().y());
   }

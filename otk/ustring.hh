@@ -7,6 +7,7 @@
 */
 
 extern "C" {
+/*
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #else
@@ -14,17 +15,20 @@ extern "C" {
 #    include <sys/types.h>
 #  endif
 #endif
+*/
 }
 
 #include <string>
 
 namespace otk {
 
+/*
 #ifdef HAVE_STDINT_H
 typedef uint32_t unichar;
 #else
 typedef u_int32_t unichar;
 #endif
+*/
 
 #ifndef DOXYGEN_IGNORE
 
@@ -40,6 +44,8 @@ const char g_utf8_skip[256] = {
   3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
 };
 
+#endif // DOXYGEN_IGNORE
+
 //! The iterator type for ustring
 /*!
   Note this is not a random access iterator but a bidirectional one, since all
@@ -51,19 +57,21 @@ const char g_utf8_skip[256] = {
   write operation would invalidate all other iterators pointing into the same
   string.
 */
+/*
 template <class T>
 class ustring_Iterator
 {
 public:
   typedef std::bidirectional_iterator_tag   iterator_category;
-  typedef unichar                           value_type;
+  //typedef unichar                           value_type;
   typedef std::string::difference_type      difference_type;
-  typedef value_type                        reference;
+  //typedef value_type                        reference;
   typedef void                              pointer;
 
   inline ustring_Iterator() {}
   inline ustring_Iterator(const ustring_Iterator<std::string::iterator>&
 			  other) : _pos(other.base()) {}
+
 
   inline value_type operator*() const {
     // get a unicode character from the iterator's position
@@ -88,6 +96,7 @@ public:
     return result;
   }
 
+  
   inline ustring_Iterator<T> &     operator++() {
     pos_ += g_utf8_skip[static_cast<unsigned char>(*pos_)];
     return *this;
@@ -103,8 +112,7 @@ public:
 private:
   T _pos;
 };
-
-#endif // DOXYGEN_IGNORE
+*/
 
 //! This class provides a simple wrapper to a std::string that can be encoded
 //! as UTF-8. The ustring::utf() member specifies if the given string is UTF-8
@@ -127,12 +135,12 @@ public:
   typedef std::string::size_type                        size_type;
   typedef std::string::difference_type                  difference_type;
 
-  typedef unichar                                       value_type;
-  typedef unichar &                                     reference;
-  typedef const unichar &                               const_reference;
+  //typedef unichar                                       value_type;
+  //typedef unichar &                                     reference;
+  //typedef const unichar &                               const_reference;
 
-  typedef ustring_Iterator<std::string::iterator>       iterator;
-  typedef ustring_Iterator<std::string::const_iterator> const_iterator;
+  //typedef ustring_Iterator<std::string::iterator>       iterator;
+  //typedef ustring_Iterator<std::string::const_iterator> const_iterator;
 
   static const size_type npos = std::string::npos;
 
@@ -159,6 +167,15 @@ public:
   ustring::size_type capacity() const;
   ustring::size_type max_size() const;
 
+  // erase substrings
+
+  void clear();
+  ustring& erase(size_type i, size_type n=npos);
+
+  // change the string's size
+
+  void resize(size_type n, char c='\0');
+  
   // internal data
 
   const char* data()  const;

@@ -40,11 +40,10 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
         g_message("menu label %s", title);
 
         if (parse_attr_string("plugin", node, &plugin)) {
-            PluginMenuCreateData data = {
-                .doc = doc,
-                .node = node,
-                .parent = menu
-            };
+            PluginMenuCreateData data;
+            data.doc = doc;
+            data.node = node;
+            data.parent = menu;
             parent = plugin_create(plugin, &data);
             g_free(plugin);
         } else
@@ -367,8 +366,18 @@ void menu_hide(ObMenu *self) {
         self->shown = FALSE;
 	if (self->open_submenu)
 	    menu_hide(self->open_submenu);
-	if (self->parent && self->parent->open_submenu == self)
+	if (self->parent && self->parent->open_submenu == self) {
+            ObMenuEntry *e;
+
 	    self->parent->open_submenu = NULL;
+
+            e = menu_find_entry_by_submenu(self->parent, self);
+            if (self->parent->mouseover)
+                self->parent->mouseover(e, FALSE);
+            else
+                menu_control_mouseover(e, FALSE);
+            menu_entry_render(e);
+        }
 
         if (!(self->parent && self->parent->shown)) {
             grab_keyboard(FALSE);

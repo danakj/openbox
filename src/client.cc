@@ -1196,6 +1196,14 @@ bool Client::focus() const
 
   if (_focused) return true;
 
+  // do a check to see if the window has already been unmapped or destroyed
+  XEvent ev;
+  if (XCheckTypedWindowEvent(**otk::display, _window, UnmapNotify, &ev) ||
+      XCheckTypedWindowEvent(**otk::display, _window, DestroyNotify, &ev)) {
+    XPutBackEvent(**otk::display, &ev);
+    return false;
+  }
+
   if (_can_focus)
     XSetInputFocus(**otk::display, _window,
                    RevertToNone, CurrentTime);

@@ -56,6 +56,11 @@ AC_MSG_RESULT
 AC_MSG_RESULT([$PACKAGE version $VERSION configured successfully.])
 
 AC_MSG_RESULT
+if test "$DEBUG" = "yes"; then
+  AC_MSG_RESULT([Creating a DEBUG build.])
+else
+  AC_MSG_RESULT([Creating a RELEASE build.])
+fi
 AC_MSG_RESULT([Using '$prefix' for installation.])
 AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
 AC_MSG_RESULT([Building with '$CXXFLAGS' for C++ compiler flags.])

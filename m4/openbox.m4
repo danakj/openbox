@@ -16,10 +16,10 @@ AC_DEFUN([OB_DEBUG],
   
   if test "$DEBUG" = "yes"; then
     AC_MSG_RESULT([debug])
-    AC_DEFINE([DEBUG], [1], [Creating a debug build])
+    AC_DEFINE([DEBUG], [1], [Creating a DEBUG build])
   else
     AC_MSG_RESULT([release])
-    AC_DEFINE([NDEBUG], [1], [Creating a release build])
+    AC_DEFINE([NDEBUG], [1], [Creating a RELEASE build])
   fi
 ])
 

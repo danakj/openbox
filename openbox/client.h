@@ -269,6 +269,12 @@ typedef struct Client {
     */
     int functions;
 
+    /*! Saved decorations from before becoming fullscreen */
+    int pre_fs_decor;
+
+    /*! Saved functions from before becoming fullscreen */
+    int pre_fs_func;
+
     /*! Icons for the client as specified on the client window */
     Icon *icons;
     /*! The number of icons in icons */

@@ -1421,7 +1421,6 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
 void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 {
-    static int saved_func, saved_decor;
     int x, y, w, h;
 
     if (!(self->functions & Func_Fullscreen) || /* can't */
@@ -1432,11 +1431,11 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 
     if (fs) {
 	/* save the functions and remove them */
-	saved_func = self->functions;
+	self->pre_fs_func = self->functions;
 	self->functions &= (Func_Close | Func_Fullscreen |
 			    Func_Iconify);
 	/* save the decorations and remove them */
-	saved_decor = self->decorations;
+	self->pre_fs_decor = self->decorations;
 	self->decorations = 0;
 	if (savearea) {
 	    long dimensions[4];
@@ -1455,8 +1454,8 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     } else {
 	long *dimensions;
 
-	self->functions = saved_func;
-	self->decorations = saved_decor;
+	self->functions = self->pre_fs_func;
+	self->decorations = self->pre_fs_decor;
 	  
 	if (PROP_GET32A(self->window, openbox_premax, cardinal,
 			dimensions, 4)) {

@@ -59,6 +59,8 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
 			  "Focus New Windows"), 4);
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuFocusLast,
 			  "Focus Last Window on Workspace"), 5);
+  insert(i18n->getMessage(ConfigmenuSet, ConfigmenuHideToolbar,
+			  "Hide toolbar"), 6);
   update();
 
   setItemSelected(2, screen.getImageControl()->doDither());
@@ -66,6 +68,7 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
   setItemSelected(4, screen.doFullMax());
   setItemSelected(5, screen.doFocusNew());
   setItemSelected(6, screen.doFocusLast());
+  setItemSelected(7, screen.doToolbarHide());
 }
 
 Configmenu::~Configmenu(void) {
@@ -115,8 +118,13 @@ void Configmenu::itemSelected(int button, int index) {
   }
 
   case 5: { // focus last window on workspace
-    screen.saveFocusLast((! screen.doFocusLast()));
+    screen.saveFocusLast(!(screen.doFocusLast()));
     setItemSelected(index, screen.doFocusLast());
+    break;
+  }
+  case 6:{ //toggle toolbar hide
+    screen.saveToolbarHide(!(screen.doToolbarHide()));
+    setItemSelected(index, screen.doToolbarHide());
     break;
   }
   } // switch
@@ -205,7 +213,7 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm) :
   setLabel(i18n->getMessage(ConfigmenuSet, ConfigmenuWindowPlacement,
 			    "Window Placement"));
   setInternalMenu();
-
+  
   insert(i18n->getMessage(ConfigmenuSet, ConfigmenuSmartRows,
 			  "Smart Placement (Rows)"),
 	 BScreen::RowSmartPlacement);

@@ -67,7 +67,7 @@ public:
 
 class Toolbar : public TimeoutHandler {
 private:
-  Bool on_top, editing, hidden, do_auto_hide;
+  Bool on_top, editing, hidden, do_auto_hide, do_hide;
   Display *display;
 
   struct frame {
@@ -117,13 +117,17 @@ public:
 
   inline const unsigned int &getWidth(void) const { return frame.width; }
   inline const unsigned int &getHeight(void) const { return frame.height; }
-  inline const unsigned int &getExposedHeight(void) const
-  { return ((do_auto_hide) ? frame.bevel_w : frame.height); }
+  inline const unsigned int getExposedHeight(void) const {
+    if (do_hide) return 0;
+    else if (do_auto_hide) return frame.bevel_w;
+    else return frame.height;
+  }
+  
   inline const int &getX(void) const
   { return ((hidden) ? frame.x_hidden : frame.x); }
-  inline const int &getY(void) const
-  { return ((hidden) ? frame.y_hidden : frame.y); }
-
+  inline const int getY(void) const 
+    { return ((hidden || do_hide) ? frame.y_hidden : frame.y); }
+  
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);
   void enterNotifyEvent(XCrossingEvent *);
@@ -139,7 +143,8 @@ public:
   void redrawNextWindowButton(Bool = False, Bool = False);
   void edit(void);
   void reconfigure(void);
-
+  void mapToolbar(void);
+  void unMapToolbar(void);
 #ifdef    HAVE_STRFTIME
   void checkClock(Bool = False);
 #else //  HAVE_STRFTIME

@@ -38,3 +38,5 @@ $ #TopBottom
 # Top to Bottom
 $ #BottomTop
 # Bottom to Top
+$ #HideToolbar
+# Hide Toolbar

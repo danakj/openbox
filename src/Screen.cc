@@ -2257,10 +2257,20 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   }
 }
 
-
 void BScreen::hideGeometry(void) {
   if (geom_visible) {
     XUnmapWindow(getBaseDisplay().getXDisplay(), geom_window);
     geom_visible = False;
   }
+}
+
+void BScreen::saveToolbarHide(Bool b){
+  resource.toolbar_total_hide = b;
+  if (toolbar != NULL){
+    if (b)
+      toolbar->unMapToolbar();
+    else
+      toolbar->mapToolbar();
+  }
+
 }

@@ -1,6 +1,8 @@
 Changelog for Openbox:
 
 1.0.0:
+ * added a runtime option for hiding the toolbar.       (Scott Moynes)
+	
  * made shaded windows edge-snap correctly to the
    bottom for their size instead for their unshaded
    size.                                                (Ben Jansens)

@@ -133,7 +133,7 @@ private:
 
     Bool toolbar_on_top, toolbar_auto_hide, sloppy_focus, auto_raise,
       auto_edge_balance, image_dither, ordered_dither, opaque_move, full_max,
-      focus_new, focus_last;
+      focus_new, focus_last, toolbar_total_hide;
     BColor border_color;
     obResource styleconfig;
 
@@ -182,6 +182,8 @@ public:
   { return resource.toolbar_on_top; }
   inline const Bool &doToolbarAutoHide(void) const
   { return resource.toolbar_auto_hide; }
+  inline const Bool &doToolbarHide(void) const
+    {return resource.toolbar_total_hide;}
   inline const Bool &isSloppyFocus(void) const
   { return resource.sloppy_focus; }
   inline const Bool &isRootColormapInstalled(void) const
@@ -289,7 +291,6 @@ public:
   inline void saveFocusNew(Bool f) { resource.focus_new = f; }
   inline void saveFocusLast(Bool f) { resource.focus_last = f; }
   inline void iconUpdate(void) { iconmenu->update(); }
-
 #ifdef    HAVE_STRFTIME
   inline char *getStrftimeFormat(void) { return resource.strftime_format; }
   void saveStrftimeFormat(const char *);
@@ -328,7 +329,7 @@ public:
   void showPosition(int, int);
   void showGeometry(unsigned int, unsigned int);
   void hideGeometry(void);
-
+  void saveToolbarHide( Bool b);
   void updateNetizenCurrentWorkspace(void);
   void updateNetizenWorkspaceCount(void);
   void updateNetizenWindowFocus(void);

@@ -43,9 +43,9 @@
 
 #include <X11/keysym.h>
 
-#ifdef    HAVE_STRING_H
+#ifdef    STDC_HEADERS
 #  include <string.h>
-#endif // HAVE_STRING_H
+#endif // STDC_HEADERS
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
@@ -148,15 +148,24 @@ Toolbar::Toolbar(BScreen &scrn) : screen(scrn), openbox(scrn.getOpenbox()) {
     frame.pbutton = None;
 
   reconfigure();
-
-  XMapSubwindows(display, frame.window);
-  XMapWindow(display, frame.window);
+  mapToolbar();
 }
 
+inline void Toolbar::mapToolbar(){
+  if(!screen.doToolbarHide()){
+    do_hide=false;//not hidden, so windows should not maximize over the toolbar
+    XMapSubwindows(display, frame.window);
+    XMapWindow(display, frame.window);
+  }else
+    do_hide=true;
+}
+inline void Toolbar::unMapToolbar(){
+  do_hide=true; //hidden so we can maximize over the toolbar
+  XUnmapWindow(display, frame.window);
+}
 
 Toolbar::~Toolbar(void) {
-  XUnmapWindow(display, frame.window);
-
+  unMapToolbar();
   if (frame.base) image_ctrl->removeImage(frame.base);
   if (frame.label) image_ctrl->removeImage(frame.label);
   if (frame.wlabel) image_ctrl->removeImage(frame.wlabel);
@@ -467,7 +476,7 @@ void Toolbar::reconfigure(void) {
   XClearWindow(display, frame.nsbutton);
   XClearWindow(display, frame.pwbutton);
   XClearWindow(display, frame.nwbutton);
-
+  
   redrawWindowLabel();
   redrawWorkspaceLabel();
   redrawPrevWorkspaceButton();
@@ -475,7 +484,7 @@ void Toolbar::reconfigure(void) {
   redrawPrevWindowButton();
   redrawNextWindowButton();
   checkClock(True);
-
+  
   toolbarmenu->reconfigure();
 }
 

@@ -1072,6 +1072,11 @@ void Openbox::save_rc(void) {
     config.setValue(rc_string, screen->getToolbar()->doAutoHide() ?
                     "True" : "False");
 
+    sprintf(rc_string, "session.screen%d.toolbar.hide", screen_number);
+    config.setValue(rc_string, screen->doToolbarHide() ?
+                    "True" : "False");
+
+
     switch (screen->getToolbarPlacement()) {
     case Toolbar::TopLeft: placement = "TopLeft"; break;
     case Toolbar::BottomLeft: placement = "BottomLeft"; break;
@@ -1327,6 +1332,13 @@ void Openbox::load_rc(BScreen *screen) {
     screen->saveToolbarOnTop((Bool)b);
   else
     screen->saveToolbarOnTop(False);
+
+  sprintf(name_lookup,  "session.screen%d.toolbar.hide", screen_number);
+  sprintf(class_lookup, "Session.Screen%d.Toolbar.Hide", screen_number);
+  if (config.getValue(name_lookup, class_lookup, b))
+    screen->saveToolbarHide((Bool)b);
+  else
+    screen->saveToolbarHide(False);
 
   sprintf(name_lookup,  "session.screen%d.toolbar.autoHide", screen_number);
   sprintf(class_lookup, "Session.Screen%d.Toolbar.autoHide", screen_number);

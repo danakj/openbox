@@ -174,11 +174,13 @@ struct _ObAction {
    action_resize_relative_vert - the delta
 */
 
-ObAction *action_from_string(const gchar *name, ObUserAction uact);
-ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+ObAction* action_from_string(const gchar *name, ObUserAction uact);
+ObAction* action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        ObUserAction uact);
 void action_ref(ObAction *a);
 void action_unref(ObAction *a);
+
+ObAction* action_copy(const ObAction *a);
 
 /*! Executes a list of actions.
   @param c The client associated with the action. Can be NULL.
@@ -206,6 +208,10 @@ void action_run_list(GSList *acts, struct _ObClient *c, ObFrameContext context,
 
 #define action_run(a, c, s) \
     action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, FALSE, FALSE)
+
+/*! This is only for internal usage, i.e. not meant for user bindings and
+  such! */
+void action_run_string(const gchar *name, struct _ObClient *c);
 
 /* Execute */
 void action_execute(union ActionData *data);

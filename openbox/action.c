@@ -30,6 +30,7 @@
 #include "keyboard.h"
 #include "event.h"
 #include "config.h"
+#include "mainloop.h"
 
 #include <glib.h>
 
@@ -92,6 +93,21 @@ void action_unref(ObAction *a)
         g_free(a->data.showmenu.name);
 
     g_free(a);
+}
+
+ObAction* action_copy(const ObAction *src)
+{
+    ObAction *a = action_new(src->func);
+
+    a->data = src->data;
+
+    /* deal with pointers */
+    if (a->func == action_execute || a->func == action_restart)
+        a->data.execute.path = g_strdup(a->data.execute.path);
+    else if (a->func == action_showmenu)
+        a->data.showmenu.name = g_strdup(a->data.showmenu.name);
+
+    return a;
 }
 
 void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
@@ -346,7 +362,8 @@ void setup_action_move(ObAction **a, ObUserAction uact)
     (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.moveresize.move = TRUE;
     (*a)->data.moveresize.keyboard =
-        (uact == OB_USER_ACTION_KEYBOARD_KEY ||
+        (uact == OB_USER_ACTION_NONE ||
+         uact == OB_USER_ACTION_KEYBOARD_KEY ||
          uact == OB_USER_ACTION_MENU_SELECTION);
 }
 
@@ -355,7 +372,8 @@ void setup_action_resize(ObAction **a, ObUserAction uact)
     (*a)->data.moveresize.any.client_action = OB_CLIENT_ACTION_ALWAYS;
     (*a)->data.moveresize.move = FALSE;
     (*a)->data.moveresize.keyboard =
-        (uact == OB_USER_ACTION_KEYBOARD_KEY ||
+        (uact == OB_USER_ACTION_NONE ||
+         uact == OB_USER_ACTION_KEYBOARD_KEY ||
          uact == OB_USER_ACTION_MENU_SELECTION);
 }
 
@@ -903,9 +921,22 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                     keyboard_interactive_grab(state, a->data.any.c, a);
             }
 
-            a->func(&a->data);
+            ob_main_loop_queue_action(ob_main_loop, a);
         }
     }
+}
+
+void action_run_string(const gchar *name, struct _ObClient *c)
+{
+    ObAction *a;
+    GSList *l;
+
+    a = action_from_string(name, OB_USER_ACTION_NONE);
+    g_assert(a);
+
+    l = g_slist_append(NULL, a);
+
+    action_run(l, c, 0);
 }
 
 void action_execute(union ActionData *data)

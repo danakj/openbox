@@ -2,6 +2,7 @@
 #include <glib.h>
 #include "config.h"
 
+static char *yyfilename;
 static int yylineno = 1;
 static gboolean haserror = FALSE;
 static ConfigEntry entry = { NULL, -1 };
@@ -64,9 +65,10 @@ static void newline()
 {
     if (!haserror && entry.name != NULL && (signed)entry.type >= 0) {
         if (!config_set(entry.name, entry.type, entry.value))
-            g_warning("Invalid option in config file: '%s'\n", entry.name);
+            g_warning("Invalid option in '%s': '%s'\n",
+                      yyfilename, entry.name);
     } else {
-        printf("Parser error in config file on line %d\n", yylineno);
+        printf("Parser error in '%s' on line %d\n", yyfilename, yylineno);
     }
     g_free(entry.name);
     entry.name = NULL;
@@ -87,8 +89,9 @@ static int yywrap()
     return 1;
 }
 
-void cparse_go(FILE *file)
+void cparse_go(char *filename, FILE *file)
 {
+    yyfilename = filename;
     yyin = file;
     yylex();
 }

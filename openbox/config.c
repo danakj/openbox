@@ -17,7 +17,7 @@ static GData *config = NULL;
 static GData *config_def = NULL;
 
 /* provided by cparse.l */
-void cparse_go(FILE *);
+void cparse_go(char *filename, FILE *);
 
 
 void config_startup()
@@ -53,7 +53,7 @@ void config_parse()
     /* load the system wide rc file first */
     path = g_build_filename(RCDIR, "rc3", NULL);
     if ((file = fopen(path, "r")) != NULL) {
-        cparse_go(file);
+        cparse_go(path, file);
         fclose(file);
     }
     g_free(path);
@@ -61,7 +61,7 @@ void config_parse()
     /* then load the user one which can override it */
     path = g_build_filename(g_get_home_dir(), ".openbox", "rc3", NULL);
     if ((file = fopen(path, "r")) != NULL) {
-        cparse_go(file);
+        cparse_go(path, file);
         fclose(file);
     }
     g_free(path);

@@ -272,7 +272,10 @@ void OBClient::getMwmHints()
 void OBClient::getArea()
 {
   XWindowAttributes wattrib;
-  assert(XGetWindowAttributes(otk::OBDisplay::display, _window, &wattrib));
+  Status ret;
+  
+  ret = XGetWindowAttributes(otk::OBDisplay::display, _window, &wattrib);
+  assert(ret != BadWindow);
 
   _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
   _border_width = wattrib.border_width;

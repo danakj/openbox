@@ -118,6 +118,7 @@ private:
   friend class Toolbarmenu;
   friend class Toolbarmenu::Placementmenu;
 
+  void drawArrow(Drawable surface, bool left) const;
   void redrawPrevWorkspaceButton(bool pressed = False, bool redraw = False);
   void redrawNextWorkspaceButton(bool pressed = False, bool redraw = False);
   void redrawPrevWindowButton(bool preseed = False, bool redraw = False);

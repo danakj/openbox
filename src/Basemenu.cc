@@ -636,28 +636,31 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dosel && item->submenu()) {
+    const int bullet_size = 3;
+
     switch (screen->getMenuStyle()->bullet) {
     case Square:
-      XDrawRectangle(display, menu.frame, pen.gc(), sel_x, sel_y, half_w, half_w);
+      XDrawRectangle(display, menu.frame, pen.gc(), sel_x, sel_y,
+                     bullet_size * 2, bullet_size * 2);
       break;
 
     case Triangle:
       XPoint tri[3];
 
       if (screen->getMenuStyle()->bullet_pos == Right) {
-        tri[0].x = sel_x + quarter_w - 2;
-        tri[0].y = sel_y + quarter_w - 2;
-        tri[1].x = 4;
-        tri[1].y = 2;
-        tri[2].x = -4;
-        tri[2].y = 2;
+        tri[0].x = sel_x + quarter_w - bullet_size;
+        tri[0].y = sel_y + quarter_w - bullet_size;
+        tri[1].x = 2 * bullet_size;
+        tri[1].y = bullet_size;
+        tri[2].x = -(2 * bullet_size);
+        tri[2].y = bullet_size;
       } else {
-        tri[0].x = sel_x + quarter_w - 2;
+        tri[0].x = sel_x + quarter_w - bullet_size;
         tri[0].y = item_y + half_w;
-        tri[1].x = 4;
-        tri[1].y = 2;
+        tri[1].x = 2 * bullet_size;
+        tri[1].y = bullet_size;
         tri[2].x = 0;
-        tri[2].y = -4;
+        tri[2].y = -(2 * bullet_size);
       }
 
       XFillPolygon(display, menu.frame, pen.gc(), tri, 3, Convex,
@@ -667,14 +670,14 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
     case Diamond:
       XPoint dia[4];
 
-      dia[0].x = sel_x + quarter_w - 3;
+      dia[0].x = sel_x + quarter_w - bullet_size;
       dia[0].y = item_y + half_w;
-      dia[1].x = 3;
-      dia[1].y = -3;
-      dia[2].x = 3;
-      dia[2].y = 3;
-      dia[3].x = -3;
-      dia[3].y = 3;
+      dia[1].x = bullet_size;
+      dia[1].y = -bullet_size;
+      dia[2].x = bullet_size;
+      dia[2].y = bullet_size;
+      dia[3].x = -bullet_size;
+      dia[3].y = bullet_size;
 
       XFillPolygon(display, menu.frame, pen.gc(), dia, 4, Convex,
                    CoordModePrevious);

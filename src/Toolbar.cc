@@ -624,6 +624,32 @@ void Toolbar::redrawWorkspaceLabel(bool redraw) {
 }
 
 
+void Toolbar::drawArrow(Drawable surface, bool left) const {
+  int hh = frame.button_w / 2, hw = frame.button_w / 2;
+  XPoint pts[3];
+  const int bullet_size = 3;
+
+  if (left) {
+    pts[0].x = hw - bullet_size;
+    pts[0].y = hh;
+    pts[1].x = 2 * bullet_size;
+    pts[1].y = bullet_size;
+    pts[2].x = 0;
+    pts[2].y = -(2 * bullet_size);
+  } else {
+    pts[0].x = hw - bullet_size;
+    pts[0].y = hh - bullet_size;
+    pts[1].x = (2 * bullet_size);
+    pts[1].y =  bullet_size;
+    pts[2].x = -(2 * bullet_size);
+    pts[2].y = bullet_size;
+  }
+  
+  BPen pen(screen->getToolbarStyle()->b_pic);
+  XFillPolygon(display, surface, pen.gc(), pts, 3, Convex, CoordModePrevious);
+}
+
+
 void Toolbar::redrawPrevWorkspaceButton(bool pressed, bool redraw) {
   if (redraw) {
     if (pressed) {
@@ -640,17 +666,7 @@ void Toolbar::redrawPrevWorkspaceButton(bool pressed, bool redraw) {
     XClearWindow(display, frame.psbutton);
   }
 
-  int hh = frame.button_w / 2, hw = frame.button_w / 2;
-
-  XPoint pts[3];
-  pts[0].x = hw - 2; pts[0].y = hh;
-  pts[1].x = 4; pts[1].y = 2;
-  pts[2].x = 0; pts[2].y = -4;
-
-  ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic);
-  XFillPolygon(display, frame.psbutton, pen.gc(),
-               pts, 3, Convex, CoordModePrevious);
+  drawArrow(frame.psbutton, True);
 }
 
 
@@ -670,17 +686,7 @@ void Toolbar::redrawNextWorkspaceButton(bool pressed, bool redraw) {
     XClearWindow(display, frame.nsbutton);
   }
 
-  int hh = frame.button_w / 2, hw = frame.button_w / 2;
-
-  XPoint pts[3];
-  pts[0].x = hw - 2; pts[0].y = hh - 2;
-  pts[1].x = 4; pts[1].y =  2;
-  pts[2].x = -4; pts[2].y = 2;
-
-  ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic);
-  XFillPolygon(display, frame.nsbutton, pen.gc(),
-               pts, 3, Convex, CoordModePrevious);
+  drawArrow(frame.nsbutton, False);
 }
 
 
@@ -700,17 +706,7 @@ void Toolbar::redrawPrevWindowButton(bool pressed, bool redraw) {
     XClearWindow(display, frame.pwbutton);
   }
 
-  int hh = frame.button_w / 2, hw = frame.button_w / 2;
-
-  XPoint pts[3];
-  pts[0].x = hw - 2; pts[0].y = hh;
-  pts[1].x = 4; pts[1].y = 2;
-  pts[2].x = 0; pts[2].y = -4;
-
-  ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic);
-  XFillPolygon(display, frame.pwbutton, pen.gc(),
-               pts, 3, Convex, CoordModePrevious);
+  drawArrow(frame.pwbutton, True);
 }
 
 
@@ -730,17 +726,7 @@ void Toolbar::redrawNextWindowButton(bool pressed, bool redraw) {
     XClearWindow(display, frame.nwbutton);
   }
 
-  int hh = frame.button_w / 2, hw = frame.button_w / 2;
-
-  XPoint pts[3];
-  pts[0].x = hw - 2; pts[0].y = hh - 2;
-  pts[1].x = 4; pts[1].y =  2;
-  pts[2].x = -4; pts[2].y = 2;
-
-  ToolbarStyle *style = screen->getToolbarStyle();
-  BPen pen(style->b_pic);
-  XFillPolygon(display, frame.nwbutton, pen.gc(), pts, 3, Convex,
-               CoordModePrevious);
+  drawArrow(frame.nwbutton, False);
 }
 
 

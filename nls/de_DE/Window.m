@@ -11,7 +11,5 @@ $ #Unnamed
 # Ohne Titel
 $ #MapRequest
 # BlackboxWindow::mapRequestEvent() von 0x%lx\n
-$ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() von  0x%lx\n
 $ #ReparentNotify
 # BlackboxWindow::reparentNotifyEvent: 0x%lx nun Child des 0x%lx\n

@@ -151,7 +151,7 @@ Basemenu::~Basemenu(void) {
   MenuItems::const_iterator it = menuitems.begin();
   while (it != menuitems.end()) {
     BasemenuItem *item = *it;
-    if ((! internal_menu)) {
+    if (! internal_menu) {
       Basemenu *tmp = (Basemenu *) item->submenu();
       if (tmp) {
         if (! tmp->internal_menu) {
@@ -224,7 +224,7 @@ int Basemenu::remove(int index) {
   BasemenuItem *item = find(index);
   if (! item) return -1;
 
-  if ((! internal_menu)) {
+  if (! internal_menu) {
     Basemenu *tmp = (Basemenu *) item->submenu();
     if (tmp) {
       if (! tmp->internal_menu) {
@@ -385,10 +385,10 @@ void Basemenu::show(void) {
 
 
 void Basemenu::hide(void) {
-  if ((! torn) && hide_tree && parent && parent->isVisible()) {
+  if (! torn && hide_tree && parent && parent->isVisible()) {
     Basemenu *p = parent;
 
-    while (p->isVisible() && (! p->torn) && p->parent) p = p->parent;
+    while (p->isVisible() && ! p->torn && p->parent) p = p->parent;
     p->internal_hide();
   } else {
     internal_hide();
@@ -401,7 +401,7 @@ void Basemenu::internal_hide(void) {
   if (tmp)
     tmp->submenu()->internal_hide();
 
-  if (parent && (! torn)) {
+  if (parent && ! torn) {
     parent->drawItem(parent->which_sub, False, True);
 
     parent->which_sub = -1;
@@ -813,7 +813,7 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
   if (me->window == menu.title && (me->state & Button1Mask)) {
     if (movable) {
       if (! moving) {
-        if (parent && (! torn)) {
+        if (parent && ! torn) {
           parent->drawItem(parent->which_sub, False, True);
           parent->which_sub = -1;
         }
@@ -832,7 +832,7 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
           drawSubmenu(which_sub);
       }
     }
-  } else if ((! (me->state & Button1Mask)) && me->window == menu.frame &&
+  } else if (! (me->state & Button1Mask) && me->window == menu.frame &&
              me->x >= 0 && me->x < static_cast<signed>(menu.width) &&
              me->y >= 0 && me->y < static_cast<signed>(menu.frame_h)) {
     int sbl = (me->x / menu.item_w), i = (me->y / menu.item_h),
@@ -847,7 +847,7 @@ void Basemenu::motionNotifyEvent(XMotionEvent *me) {
         drawItem(p, False, True);
         if (item->submenu())
           if (item->submenu()->isVisible() &&
-              (! item->submenu()->isTorn())) {
+              ! item->submenu()->isTorn()) {
             item->submenu()->internal_hide();
             which_sub = -1;
           }
@@ -931,7 +931,7 @@ void Basemenu::enterNotifyEvent(XCrossingEvent *ce) {
         int sbl = (ce->x / menu.item_w), i = (ce->y / menu.item_h),
           w = (sbl * menu.persub) + i;
 
-        if (w != which_sub && (! tmp->submenu()->isTorn())) {
+        if (w != which_sub && ! tmp->submenu()->isTorn()) {
           tmp->submenu()->internal_hide();
 
           drawItem(which_sub, False, True);

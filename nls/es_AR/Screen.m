@@ -1,7 +1,7 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: ocurrió un error al cuestionar al servidor de X.\n Ya hay otro gestor de ventanas ejecutándose en la conexión de despliegue %s.\n
+# BScreen::BScreen: ocurrió un error al cuestionar al servidor de X.\n Ya hay otro gestor de ventanas ejecutándose en la conexión al display %s.\n
 $ #ManagingScreen
 # BScreen::BScreen: administrando la pantalla %d usando visual 0x%lx, profundidad %d\n
 $ #FontLoadFail

@@ -21,7 +21,9 @@ $ #ClickToFocus
 $ #SloppyFocus
 # Fokus folgt Maus
 $ #AutoRaise
-# Fenster automatisch in Vordergrund
+# Automatische Erhebung
+$ #ClickRaise
+# Klick Erhebung
 $ #SmartRows
 # Optimale Plazierung (Reihen)
 $ #SmartCols

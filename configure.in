@@ -252,6 +252,7 @@ nls/Makefile
 nls/C/Makefile
 nls/da_DK/Makefile
 nls/de_DE/Makefile
+nls/es_AR/Makefile
 nls/es_ES/Makefile
 nls/et_EE/Makefile
 nls/fr_FR/Makefile

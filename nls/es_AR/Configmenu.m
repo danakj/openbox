@@ -16,10 +16,12 @@ $ #FocusNew
 # Enfocar Nuevas Ventanas
 $ #FocusLast
 # Enfocar la Ultima Ventana en el Escritorio
+$ #DisableBindings
+# Deshabilitar Enlaces con Bloq Despl
 $ #ClickToFocus
 # Click Para Enfocar
 $ #SloppyFocus
-# Foco Sigue Al Ratón
+# Foco Sigue Al Mouse
 $ #AutoRaise
 # Elevar Automáticamente
 $ #ClickRaise

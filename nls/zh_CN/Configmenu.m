@@ -21,7 +21,9 @@ $ #ClickToFocus
 $ #SloppyFocus
 # 自动聚焦
 $ #AutoRaise
-# 自动放前
+# 自动升起
+$ #ClickRaise
+# 点击升起
 $ #SmartRows
 # 自动放置(行)
 $ #SmartCols

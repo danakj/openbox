@@ -11,6 +11,6 @@ $ #Aborting
 $ #XConnectFail
 # BaseDisplay::BaseDisplay: falló la conexión al servidor de X.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: no pude marcar la conexión de despliegue como close-on-exec\n
+# BaseDisplay::BaseDisplay: no pude marcar la conexión al display como close-on-exec\n
 $ #BadWindowRemove
 # BaseDisplay::eventLoop(): quitando ventana errónea de la lista de eventos\n

@@ -78,29 +78,33 @@ static void resist_move(Client *c, int *x, int *y)
                bottom-to-top in the stacking list
             */
             if (snapx == NULL) {
-                if (cl >= tr && l < tr && l >= tr - resist.integer)
-                    *x = tr, snapx = target;
-                else if (cr <= tl && r > tl && r <= tl + resist.integer)
-                    *x = tl - w + 1, snapx = target;
-                if (snapx != NULL) {
-                    /* try to corner snap to the window */
-                    if (ct > tt && t <= tt && t > tt - resist.integer)
-                        *y = tt + 1, snapy = target;
-                    else if (cb < tb && b >= tb && b < tb + resist.integer)
-                        *y = tb - h, snapy = target;
+                if (ct < tb && cb > tt) {
+                    if (cl >= tr && l < tr && l >= tr - resist.integer)
+                        *x = tr, snapx = target;
+                    else if (cr <= tl && r > tl && r <= tl + resist.integer)
+                        *x = tl - w + 1, snapx = target;
+                    if (snapx != NULL) {
+                        /* try to corner snap to the window */
+                        if (ct > tt && t <= tt && t > tt - resist.integer)
+                            *y = tt + 1, snapy = target;
+                        else if (cb < tb && b >= tb && b < tb + resist.integer)
+                            *y = tb - h, snapy = target;
+                    }
                 }
             }
             if (snapy == NULL) {
-                if (ct >= tb && t < tb && t >= tb - resist.integer)
-                    *y = tb, snapy = target;
-                else if (cb <= tt && b > tt && b <= tt + resist.integer)
-                    *y = tt - h + 1, snapy = target;
-                if (snapy != NULL) {
-                    /* try to corner snap to the window */
-                    if (cl > tl && l <= tl && l > tl - resist.integer)
-                        *x = tl + 1, snapx = target;
-                    else if (cr < tr && r >= tr && r < tr + resist.integer)
-                        *x = tr - w, snapx = target;
+                if (cl < tr && cr > tl) {
+                    if (ct >= tb && t < tb && t >= tb - resist.integer)
+                        *y = tb, snapy = target;
+                    else if (cb <= tt && b > tt && b <= tt + resist.integer)
+                        *y = tt - h + 1, snapy = target;
+                    if (snapy != NULL) {
+                        /* try to corner snap to the window */
+                        if (cl > tl && l <= tl && l > tl - resist.integer)
+                            *x = tl + 1, snapx = target;
+                        else if (cr < tr && r >= tr && r < tr + resist.integer)
+                            *x = tr - w, snapx = target;
+                    }
                 }
             }
 
@@ -128,10 +132,10 @@ static void resist_move(Client *c, int *x, int *y)
 static void resist_size(Client *c, int *w, int *h, Corner corn)
 {
     GList *it;
-    Client *t; /* target */
-    int lt, rb; /* my left/top and right/bottom sides */
+    Client *target; /* target */
+    int l, t, r, b; /* my left, top, right and bottom sides */
     int dlt, drb; /* my destination left/top and right/bottom sides */
-    int tlt, trb; /* target's left/top and right/bottom sides */
+    int tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides */
     Rect *area;
     int al, at, ar, ab; /* screen boundaries */
     Client *snapx = NULL, *snapy = NULL;
@@ -145,6 +149,11 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     if (!config_get("resistance.windows", Config_Bool, &window_resist))
         g_assert_not_reached();
 
+    l = c->frame->area.x;
+    r = l + c->frame->area.width - 1;
+    t = c->frame->area.y;
+    b = t + c->frame->area.height - 1;
+
     /* get the screen boundaries */
     area = screen_area(c->desktop);
     al = area->x;
@@ -152,107 +161,103 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     ar = al + area->width - 1;
     ab = at + area->height - 1;
 
-    /* horizontal snapping */
-
-    lt = c->frame->area.x;
-    rb = lt + c->frame->area.width - 1;
-
     /* snap to other windows */
     if (window_resist.bool) {
-        for (it = stacking_list; !snapx && it != NULL; it = it->next) {
-            t = it->data;
+        for (it = stacking_list; it != NULL; it = it->next) {
+            target = it->data;
 
             /* don't snap to invisibles or ourself */
-            if (!t->frame->visible || t == c) continue;
+            if (!target->frame->visible || target == c) continue;
 
-            switch (corn) {
-            case Corner_TopLeft:
-            case Corner_BottomLeft:
-                dlt = lt;
-                drb = rb + *w - c->frame->area.width;
-                tlt = t->frame->area.x;
-                if (rb < tlt && drb >= tlt && drb < tlt + resist.integer)
-                    *w = tlt - lt, snapx = t;
-                break;
-            case Corner_TopRight:
-            case Corner_BottomRight:
-                dlt = lt - *w + c->frame->area.width;
-                drb = rb;
-                trb = t->frame->area.x + t->frame->area.width - 1;
-                if (lt > trb && dlt <= trb && dlt > trb - resist.integer)
-                    *w = rb - trb, snapx = t;
-                break;
+            tl = target->frame->area.x;
+            tr = target->frame->area.x + target->frame->area.width - 1;
+            tt = target->frame->area.y;
+            tb = target->frame->area.y + target->frame->area.height - 1;
+
+            if (snapx == NULL) {
+                /* horizontal snapping */
+                if (t < tb && b > tt) {
+                    switch (corn) {
+                    case Corner_TopLeft:
+                    case Corner_BottomLeft:
+                        dlt = l;
+                        drb = r + *w - c->frame->area.width;
+                        if (r < tl && drb >= tl && drb < tl + resist.integer)
+                            *w = tl - l, snapx = target;
+                        break;
+                    case Corner_TopRight:
+                    case Corner_BottomRight:
+                        dlt = l - *w + c->frame->area.width;
+                        drb = r;
+                        if (l > tr && dlt <= tr && dlt > tr - resist.integer)
+                            *w = r - tr, snapx = target;
+                        break;
+                    }
+                }
             }
+
+            if (snapy == NULL) {
+                /* vertical snapping */
+                if (l < tr && r > tl) {
+                    switch (corn) {
+                    case Corner_TopLeft:
+                    case Corner_TopRight:
+                        dlt = t;
+                        drb = b + *h - c->frame->area.height;
+                        if (b < tt && drb >= tt && drb < tt + resist.integer)
+                            *h = tt - t, snapy = target;
+                        break;
+                    case Corner_BottomLeft:
+                    case Corner_BottomRight:
+                        dlt = t - *h + c->frame->area.height;
+                        drb = b;
+                        if (t > tb && dlt <= tb && dlt > tb - resist.integer)
+                            *h = b - tb, snapy = target;
+                        break;
+                    }
+                }
+            }
+
+            /* snapped both ways */
+            if (snapx && snapy) break;
         }
     }
 
     /* snap to screen edges */
+    
+    /* horizontal snapping */
     switch (corn) {
     case Corner_TopLeft:
     case Corner_BottomLeft:
-        dlt = lt;
-        drb = rb + *w - c->frame->area.width;
-        if (rb <= ar && drb > ar && drb <= ar + resist.integer)
-            *w = ar - lt + 1;
+        dlt = l;
+        drb = r + *w - c->frame->area.width;
+        if (r <= ar && drb > ar && drb <= ar + resist.integer)
+            *w = ar - l + 1;
         break;
     case Corner_TopRight:
     case Corner_BottomRight:
-        dlt = lt - *w + c->frame->area.width;
-        drb = rb;
-        if (lt >= al && dlt < al && dlt >= al - resist.integer)
-            *w = rb - al + 1;
+        dlt = l - *w + c->frame->area.width;
+        drb = r;
+        if (l >= al && dlt < al && dlt >= al - resist.integer)
+            *w = r - al + 1;
         break;
     }
 
     /* vertical snapping */
-
-    lt = c->frame->area.y;
-    rb = lt + c->frame->area.height - 1;
-
-    /* snap to other windows */
-    if (window_resist.bool) {
-        for (it = stacking_list; !snapy && it != NULL; it = it->next) {
-            t = it->data;
-
-            /* don't snap to invisibles or ourself */
-            if (!t->frame->visible || t == c) continue;
-
-            switch (corn) {
-            case Corner_TopLeft:
-            case Corner_TopRight:
-                dlt = lt;
-                drb = rb + *h - c->frame->area.height;
-                tlt = t->frame->area.y;
-                if (rb < tlt && drb >= tlt && drb < tlt + resist.integer)
-                    *h = tlt - lt, snapy = t;
-                break;
-            case Corner_BottomLeft:
-            case Corner_BottomRight:
-                dlt = lt - *h + c->frame->area.height;
-                drb = rb;
-                trb = t->frame->area.y + t->frame->area.height - 1;
-                if (lt > trb && dlt <= trb && dlt > trb - resist.integer)
-                    *h = rb - trb, snapy = t;
-                break;
-            }
-        }
-    }
-
-    /* snap to screen edges */
     switch (corn) {
     case Corner_TopLeft:
     case Corner_TopRight:
-        dlt = lt;
-        drb = rb + *h - c->frame->area.height;
-        if (rb <= ab && drb > ab && drb <= ab + resist.integer)
-            *h = ab - lt + 1;
+        dlt = t;
+        drb = b + *h - c->frame->area.height;
+        if (b <= ab && drb > ab && drb <= ab + resist.integer)
+            *h = ab - t + 1;
         break;
     case Corner_BottomLeft:
     case Corner_BottomRight:
-        dlt = lt - *h + c->frame->area.height;
-        drb = rb;
-        if (lt >= at && dlt < at && dlt >= at - resist.integer)
-            *h = rb - at + 1;
+        dlt = t - *h + c->frame->area.height;
+        drb = b;
+        if (t >= at && dlt < at && dlt >= at - resist.integer)
+            *h = b - at + 1;
         break;
     }
 

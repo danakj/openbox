@@ -529,6 +529,7 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
 {
     float pr,pg,pb;
     float sr, sg, sb;
+    float ar, ag, ab;
 
     pr = (float)sf->data.planar.primary->r/255.0;
     pg = (float)sf->data.planar.primary->g/255.0;
@@ -551,7 +552,7 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
         glVertex3i(x, y, 0);
         glEnd();
         return;
-    case Background_Vertical:
+    case Background_Horizontal:
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
         glVertex3i(x, y, 0);
@@ -565,7 +566,7 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
         glVertex3i(x, y, 0);
         glEnd();
         break;
-    case Background_Horizontal:
+    case Background_Vertical:
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
         glVertex3i(x, y, 0);
@@ -580,19 +581,78 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
         glEnd();
         break;
     case Background_Diagonal:
-printf("diagonal\n");
+	ar = (pr + sr) / 2.0;
+	ag = (pg + sg) / 2.0;
+	ab = (pb + sb) / 2.0;
+        glBegin(GL_TRIANGLES);
+        glColor3f(ar, ag, ab);
+        glVertex3i(x, y, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x+w, y, 0);
+        glColor3f(ar, ag, ab);
+        glVertex3i(x+w, y+h, 0);
+
+        glColor3f(ar, ag, ab);
+        glVertex3i(x+w, y+h, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x, y+h, 0);
+        glColor3f(ar, ag, ab);
+        glVertex3i(x, y, 0);
+        glEnd();
         break;
     case Background_CrossDiagonal:
-printf("crossdiagonal\n");
+	ar = (pr + sr) / 2.0;
+	ag = (pg + sg) / 2.0;
+	ab = (pb + sb) / 2.0;
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glColor3f(ar, ag, ab);
+        glVertex3i(x+w, y, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w, y+h, 0);
+
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w, y+h, 0);
+        glColor3f(ar, ag, ab);
+        glVertex3i(x, y+h, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glEnd();
         break;
     case Background_Pyramid:
 printf("pyramid\n");
         break;
     case Background_PipeCross:
-printf("pipecross\n");
         break;
     case Background_Rectangle:
-printf("rect\n");
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w/2, y+h/2, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y+h, 0);
+
+        glVertex3i(x, y+h, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w/2, y+h/2, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x+w, y+h, 0);
+
+        glVertex3i(x+w, y+h, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w/2, y+h/2, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x+w, y, 0);
+
+        glVertex3i(x+w, y, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w/2, y+h/2, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+
+        glEnd();
         break;
     default:
         g_message("unhandled gradient");

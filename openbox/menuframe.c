@@ -578,6 +578,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
         ObMenuExecuteFunc func = self->frame->menu->execute_func;
         gpointer data = self->frame->menu->data;
         GSList *acts = self->entry->data.normal.actions;
+        ObClient *client = self->frame->client;
 
         /* release grabs before executing the shit */
         menu_frame_hide_all();
@@ -590,7 +591,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
             for (it = acts; it; it = g_slist_next(it))
             {
                 ObAction *act = it->data;
-                act->data.any.c = self->frame->client;
+                act->data.any.c = client;
                 act->func(&act->data);
             }
         }

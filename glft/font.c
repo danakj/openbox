@@ -257,11 +257,12 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         if (!(font->spacing == FC_PROPORTIONAL)) {
             g->width = font->max_advance_width;
         } else {
-            g->width = font->face->glyph->advance.x;
-            g->width = TRUNC(ROUND(font->face->glyph->metrics.width));/* >> 6;*/
+            g->width = font->face->glyph->advance.x >> 6;
         }
+        g->x = font->face->glyph->metrics.horiBearingX >> 6;
+        g->y = font->face->glyph->metrics.horiBearingY >> 6;
         g->height = TRUNC(ROUND(font->face->glyph->metrics.height));/* >> 6;*/
-        g_message("%c = Width: %d Height: %d", *c, g->width, g->height);
+        g_message("%c = X %d Y %d Width: %d Height: %d", *c, g->x, g->y, g->width, g->height);
 
         g_hash_table_insert(font->glyph_map, &g->w, g);
     }
@@ -274,16 +275,19 @@ int GlftFontAdvance(struct GlftFont *font,
                     struct GlftGlyph *right)
 {
     FT_Vector v;
-    int k = left->width;
+    int k = 0;
 
-/*    font->kerning = 0;*/
+    if (left) k+= left->width;
+
     g_message("HAS KERNING: %d", font->kerning);
-
-    if (font->kerning && right) {
-        FT_Get_Kerning(font->face, left->glyph, right->glyph,
-                       FT_KERNING_UNFITTED, &v);
-/*x_scale  = pixel_size_x / EM_size*/
-        k += v.x >> 6;
+    if (right) {
+        k -= right->x;
+        if (font->kerning) {
+            FT_Get_Kerning(font->face, left->glyph, right->glyph,
+                           FT_KERNING_UNFITTED, &v);
+            k += v.x >> 6;
+        }
     }
+
     return k;
 }

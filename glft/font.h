@@ -48,6 +48,8 @@ struct GlftGlyph {
     /* The FT_Face glyph */
     FT_UInt glyph;
 
+    int x;
+    int y;
     int width;
     int height;
 };

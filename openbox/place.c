@@ -127,7 +127,7 @@ static gint area_cmp(gconstpointer p1, gconstpointer p2)
     gint ret;
     const Rect *a1 = p1, *a2 = p2;
 
-    ret = RECT_BOTTOM(*a1) - RECT_BOTTOM(*a2);
+    ret = RECT_TOP(*a1) - RECT_TOP(*a2);
     if (!ret)
         ret = RECT_LEFT(*a1) - RECT_LEFT(*a2);
     return ret;
@@ -137,7 +137,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
 {
     guint i;
     gboolean ret = FALSE;
-    GSList *spaces, *sit;
+    GSList *spaces = NULL, *sit;
     GList *it, *list;
 
     list = focus_order[client->desktop == DESKTOP_ALL ?
@@ -149,8 +149,10 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
     for (it = list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
 
-        if (c != client && !c->shaded && client_normal(c))
+        if (c != client && !c->shaded && client_normal(c)) {
             spaces = area_remove(spaces, &c->frame->area);
+            break;
+        }
     }
 
     spaces = g_slist_sort(spaces, area_cmp);
@@ -162,8 +164,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
             if (r->width >= client->frame->area.width &&
                 r->height >= client->frame->area.height) {
                 ret = TRUE;
-                *x = r->x;
-                *y = r->y;
+                *x = r->x + (r->width - client->frame->area.width) / 2;
+                *y = r->y + (r->height - client->frame->area.height) / 2;
             }
         }
 

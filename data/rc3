@@ -50,10 +50,6 @@
   <hideTimeout>300</hideTimeout>
 </dock>
 
-<urgent>
-  <action name="flash" />
-</urgent>
-
 <keyboard>
   <chainQuitKey>C-g</chainQuitKey>
 

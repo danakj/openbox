@@ -319,7 +319,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                         break;
                 if (fe.type == FocusOut) {
 #ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusOut");
+                    ob_debug("found pending FocusOut\n");
 #endif
                     if (!INVALID_FOCUSOUT(&fe)) {
                         /* if there is a VALID FocusOut still coming, don't
@@ -330,7 +330,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                     }
                 } else {
 #ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusIn");
+                    ob_debug("found pending FocusIn\n");
 #endif
                     /* is the focused window getting a FocusOut/In back to
                        itself?
@@ -348,7 +348,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                         if (focus_client) {
 #ifdef DEBUG_FOCUS
                             ob_debug("focused window got an Out/In back to "
-                                     "itself IGNORED both");
+                                     "itself IGNORED both\n");
 #endif
                             return TRUE;
                         } else {
@@ -356,7 +356,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 #ifdef DEBUG_FOCUS
                             ob_debug("focused window got an Out/In back to "
                                      "itself but focus_client was null "
-                                     "IGNORED just the Out");
+                                     "IGNORED just the Out\n");
 #endif
                             return TRUE;
                         }
@@ -376,7 +376,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             if (fallback) {
 #ifdef DEBUG_FOCUS
                 ob_debug("no valid FocusIn and no FocusOut events found, "
-                         "falling back");
+                         "falling back\n");
 #endif
                 focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             }
@@ -392,7 +392,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             (e->xcrossing.mode == NotifyUngrab &&
              e->xcrossing.detail == NotifyVirtual)) {
 #ifdef DEBUG_FOCUS
-            ob_debug("%sNotify mode %d detail %d on %lx IGNORED",
+            ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
                      (e->type == EnterNotify ? "Enter" : "Leave"),
                      e->xcrossing.mode,
                      e->xcrossing.detail, client?client->window:0);
@@ -400,7 +400,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             return TRUE;
         }
 #ifdef DEBUG_FOCUS
-        ob_debug("%sNotify mode %d detail %d on %lx",
+        ob_debug("%sNotify mode %d detail %d on %lx\n",
                  (e->type == EnterNotify ? "Enter" : "Leave"),
                  e->xcrossing.mode,
                  e->xcrossing.detail, client?client->window:0);

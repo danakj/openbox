@@ -124,13 +124,9 @@ static GSList* area_remove(GSList *list, Rect *a)
 
 static gint area_cmp(gconstpointer p1, gconstpointer p2)
 {
-    gint ret;
     const Rect *a1 = p1, *a2 = p2;
 
-    ret = RECT_TOP(*a1) - RECT_TOP(*a2);
-    if (!ret)
-        ret = RECT_LEFT(*a1) - RECT_LEFT(*a2);
-    return ret;
+    return a1->width * a1->height - a2->width * a2->height;
 }
 
 static gboolean place_smart(ObClient *client, gint *x, gint *y,

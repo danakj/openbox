@@ -437,36 +437,35 @@ void Frame::renderLabel()
   otk::ustring t = _client->title(); // the actual text to draw
   int x = geom.bevel;                // x coord for the text
 
-  if (x * 2 > geom.label_width) return; // no room at all
-
-  // find a string that will fit inside the area for text
-  otk::ustring::size_type text_len = t.size();
-  int length;
-  int maxsize = geom.label_width - geom.bevel * 2;
+  if (x * 2 < geom.label_width) {
+    // find a string that will fit inside the area for text
+    otk::ustring::size_type text_len = t.size();
+    int length;
+    int maxsize = geom.label_width - geom.bevel * 2;
       
-  do {
-    t.resize(text_len);
-    length = font->measureString(t);  // this returns an unsigned, so check < 0
-    if (length < 0) length = maxsize; // if the string's that long just adjust
-  } while (length > maxsize && text_len-- > 0);
+    do {
+      t.resize(text_len);
+      length = font->measureString(t);// this returns an unsigned, so check < 0
+      if (length < 0) length = maxsize;// if the string's that long just adjust
+    } while (length > maxsize && text_len-- > 0);
 
-  if (text_len <= 0) return; // won't fit anything
-
-  // justify the text
-  switch (style->labelTextJustify()) {
-  case otk::RenderStyle::RightBottomJustify:
-    x += maxsize - length;
-    break;
-  case otk::RenderStyle::CenterJustify:
-    x += (maxsize - length) / 2;
-    break;
-  case otk::RenderStyle::LeftTopJustify:
-    break;
-  }
+    // justify the text
+    switch (style->labelTextJustify()) {
+    case otk::RenderStyle::RightBottomJustify:
+      x += maxsize - length;
+      break;
+    case otk::RenderStyle::CenterJustify:
+      x += (maxsize - length) / 2;
+      break;
+    case otk::RenderStyle::LeftTopJustify:
+      break;
+    }
  
-  control->drawString(*s, *font, x, 0,
-                      *(_client->focused() ? style->textFocusColor() :
-                        style->textUnfocusColor()), t);
+    if (text_len > 0)
+      control->drawString(*s, *font, x, 0,
+                          *(_client->focused() ? style->textFocusColor() :
+                            style->textUnfocusColor()), t);
+  }
 
   XSetWindowBackgroundPixmap(**otk::display, _label, s->pixmap());
   XClearWindow(**otk::display, _label);

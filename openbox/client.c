@@ -323,6 +323,7 @@ void client_manage(Window window)
 
         place_client(self, &x, &y);
 
+        /* make sure the window is visible */
         client_find_onscreen(self, &x, &y,
                              self->frame->area.width,
                              self->frame->area.height,
@@ -333,9 +334,6 @@ void client_manage(Window window)
                              self->area.width, self->area.height,
                              TRUE, TRUE);
     }
-
-    /* make sure the window is visible */
-        client_move_onscreen(self, client_normal(self));
 
     client_showhide(self);
 

@@ -198,6 +198,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
     ObMenu *sub;
+    ObMenuFrame *frame = self->frame;
 
     item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                !self->entry->data.normal.enabled) ?
@@ -284,9 +285,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
         self->entry->data.normal.icon_data)
     {
-        XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
-                          self->frame->item_h,
-                          self->frame->item_h);
+        XMoveResizeWindow(ob_display, self->icon,
+                          PADDING, frame->item_margin.top,
+                          self->frame->item_h - frame->item_margin.top
+                          - frame->item_margin.bottom,
+                          self->frame->item_h - frame->item_margin.top
+                          - frame->item_margin.bottom);
         self->a_icon->texture[0].data.rgba.width =
             self->entry->data.normal.icon_width;
         self->a_icon->texture[0].data.rgba.height =
@@ -295,18 +299,24 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
             self->entry->data.normal.icon_data;
         self->a_icon->surface.parent = item_a;
         self->a_icon->surface.parentx = PADDING;
-        self->a_icon->surface.parenty = 0;
+        self->a_icon->surface.parenty = frame->item_margin.top;
         RrPaint(self->a_icon, self->icon,
-                self->frame->item_h, self->frame->item_h);
+                self->frame->item_h - frame->item_margin.top
+                - frame->item_margin.bottom,
+                self->frame->item_h - frame->item_margin.top
+                - frame->item_margin.bottom);
         XMapWindow(ob_display, self->icon);
     } else if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
                self->entry->data.normal.mask)
     {
         RrColor *c;
 
-        XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
-                          self->frame->item_h,
-                          self->frame->item_h);
+        XMoveResizeWindow(ob_display, self->icon,
+                          PADDING, frame->item_margin.top,
+                          self->frame->item_h - frame->item_margin.top
+                          - frame->item_margin.bottom,
+                          self->frame->item_h - frame->item_margin.top
+                          - frame->item_margin.bottom);
         self->a_mask->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
 
@@ -320,9 +330,12 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 
         self->a_mask->surface.parent = item_a;
         self->a_mask->surface.parentx = PADDING;
-        self->a_mask->surface.parenty = 0;
+        self->a_mask->surface.parenty = frame->item_margin.top;
         RrPaint(self->a_mask, self->icon,
-                self->frame->item_h, self->frame->item_h);
+                self->frame->item_h - frame->item_margin.top
+                - frame->item_margin.bottom,
+                self->frame->item_h - frame->item_margin.top
+                - frame->item_margin.bottom);
         XMapWindow(ob_display, self->icon);
     } else
         XUnmapWindow(ob_display, self->icon);
@@ -382,13 +395,36 @@ static void menu_frame_render(ObMenuFrame *self)
 
     XMoveWindow(ob_display, self->items, 0, h);
 
+    STRUT_SET(self->item_margin, 0, 0, 0, 0);
+
     if (self->entries) {
         ObMenuEntryFrame *e = self->entries->data;
+        gint l, t, r, b;
+
         e->a_text_normal->texture[0].data.text.string = "";
         RrMinsize(e->a_text_normal, &tw, &th);
         tw += 2*PADDING;
         th += 2*PADDING;
         self->item_h = th;
+
+        RrMargins(e->a_normal, &l, &t, &r, &b);
+        STRUT_SET(self->item_margin,
+                  MAX(self->item_margin.left, l),
+                  MAX(self->item_margin.top, t),
+                  MAX(self->item_margin.right, r),
+                  MAX(self->item_margin.bottom, b));
+        RrMargins(e->a_selected, &l, &t, &r, &b);
+        STRUT_SET(self->item_margin,
+                  MAX(self->item_margin.left, l),
+                  MAX(self->item_margin.top, t),
+                  MAX(self->item_margin.right, r),
+                  MAX(self->item_margin.bottom, b));
+        RrMargins(e->a_disabled, &l, &t, &r, &b);
+        STRUT_SET(self->item_margin,
+                  MAX(self->item_margin.left, l),
+                  MAX(self->item_margin.top, t),
+                  MAX(self->item_margin.right, r),
+                  MAX(self->item_margin.bottom, b));
     } else
         self->item_h = 0;
 

@@ -39,6 +39,7 @@ struct _ObMenuFrame
 
     /* On-screen area (including borders!) */
     Rect area;
+    Strut item_margin;
     gint inner_w; /* inside the borders */
     gint title_h; /* includes the bwidth below it */
     gint item_h;  /* height of all normal items */

@@ -164,6 +164,9 @@ void plugin_loadall()
         plugin_open("mouse");
         plugin_open("placement");
         plugin_open("resistance");
+
+        /* XXX rm me when the parser loads me magically */
+        plugin_open("client_menu");
     } else {
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==

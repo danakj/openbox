@@ -429,8 +429,6 @@ static void event_process(const XEvent *ec, gpointer data)
     ee = *ec;
     e = &ee;
 
-    g_message("Event %d", e->type);
-
     window = event_get_window(e);
     if ((obwin = g_hash_table_lookup(window_map, &window))) {
         switch (obwin->type) {

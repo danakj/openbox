@@ -1104,31 +1104,32 @@ static void event_handle_menu(Client *client, XEvent *e)
 }
 
 void event_add_fd_handler(event_fd_handler *h) {
-  g_datalist_id_set_data(&fd_handler_list, h->fd, h);
-  FD_SET(h->fd, &allset);
-  max_fd = MAX(max_fd, h->fd);
+    g_datalist_id_set_data(&fd_handler_list, h->fd, h);
+    FD_SET(h->fd, &allset);
+    max_fd = MAX(max_fd, h->fd);
 }
 
 static void find_max_fd_foreach(GQuark n, gpointer data, gpointer max)
 {
-  *((unsigned int *)max) = MAX(*((unsigned int *)max), n);
+    *((unsigned int *)max) = MAX(*((unsigned int *)max), n);
 }
 
 static void find_max_fd()
 { 
-  int tmpmax = -1;
-  g_datalist_foreach(&fd_handler_list, find_max_fd_foreach, (gpointer)&tmpmax);
-  max_fd = MAX(x_fd, tmpmax);
+    int tmpmax = -1;
+    g_datalist_foreach(&fd_handler_list, find_max_fd_foreach,
+                       (gpointer)&tmpmax);
+    max_fd = MAX(x_fd, tmpmax);
 #ifdef USE_SM
-  max_fd = MAX(ice_fd, tmpmax);
+    max_fd = MAX(ice_fd, tmpmax);
 #endif
 }
 
 void event_remove_fd(int n)
 {
-  FD_CLR(n, &allset);
-  g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
-  find_max_fd();
+    FD_CLR(n, &allset);
+    g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
+    find_max_fd();
 }
 
 static void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)

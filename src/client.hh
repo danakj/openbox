@@ -406,6 +406,10 @@ private:
   */
   void shade(bool shade);
 
+  //! Fires the urgent callbacks which lets the user do what they want with
+  //! urgent windows
+  void fireUrgent();
+  
   //! Fullscreen's or unfullscreen's the client window
   /*!
     @param fs true if the window should be made fullscreen; false if it should

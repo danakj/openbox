@@ -64,6 +64,7 @@ enum EventAction {
   EventKey,
   EventFocus,
   EventBell,
+  EventUrgentNotify,
   NUM_EVENTS
 };
 

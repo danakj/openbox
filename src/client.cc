@@ -8,6 +8,7 @@
 #include "frame.hh"
 #include "screen.hh"
 #include "openbox.hh"
+#include "bindings.hh"
 #include "otk/display.hh"
 #include "otk/property.hh"
 
@@ -44,6 +45,8 @@ Client::Client(int screen, Window window)
   _transient_for = 0;
   // pick a layer to start from
   _layer = Layer_Normal;
+  // default to not urgent
+  _urgent = false;
   
   getArea();
   getDesktop();
@@ -457,7 +460,7 @@ void Client::updateWMHints(bool initstate)
 
   // assume a window takes input if it doesnt specify
   _can_focus = true;
-  _urgent = false;
+  bool ur = false;
   
   if ((hints = XGetWMHints(**otk::display, _window)) != NULL) {
     if (hints->flags & InputHint)
@@ -468,7 +471,7 @@ void Client::updateWMHints(bool initstate)
       _iconic = hints->initial_state == IconicState;
 
     if (hints->flags & XUrgencyHint)
-      _urgent = true;
+      ur = true;
 
     if (hints->flags & WindowGroupHint) {
       if (hints->window_group != _group) {
@@ -480,6 +483,14 @@ void Client::updateWMHints(bool initstate)
       _group = None;
 
     XFree(hints);
+  }
+
+  if (ur != _urgent) {
+    _urgent = ur;
+    // fire the urgent callback if we're mapped, otherwise, wait until after
+    // we're mapped
+    if (_urgent && frame)
+      fireUrgent();
   }
 }
 
@@ -1174,6 +1185,8 @@ void Client::applyStartupState()
     _shaded = false;
     shade(true);
   }
+  if (_urgent)
+    fireUrgent();
   
   if (_max_vert); // XXX: incomplete
   if (_max_horz); // XXX: incomplete
@@ -1183,6 +1196,14 @@ void Client::applyStartupState()
   if (_modal);        // nothing to do for this
   if (_above);        // nothing to do for this
   if (_below);        // nothing to do for this
+}
+
+
+void Client::fireUrgent()
+{
+  // call the python UrgentNotify callbacks
+  EventData data(_screen, this, EventUrgentNotify, 0);
+  openbox->bindings()->fireEvent(&data);
 }
 
 

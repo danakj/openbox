@@ -914,6 +914,7 @@ EventShutdown = _openbox.EventShutdown
 EventKey = _openbox.EventKey
 EventFocus = _openbox.EventFocus
 EventBell = _openbox.EventBell
+EventUrgentNotify = _openbox.EventUrgentNotify
 NUM_EVENTS = _openbox.NUM_EVENTS
 class MouseData(_object):
     __swig_setmethods__ = {}

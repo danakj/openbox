@@ -12095,6 +12095,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"EventKey", (long) ob::EventKey, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventFocus", (long) ob::EventFocus, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventBell", (long) ob::EventBell, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventUrgentNotify", (long) ob::EventUrgentNotify, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL", (long) 11, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL_REVISION", (long) 0, 0, 0, 0},

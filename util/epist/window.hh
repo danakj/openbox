@@ -28,6 +28,7 @@ extern "C" {
 }
 
 #include <list>
+#include <string>
 
 class XWindow;
 
@@ -36,7 +37,13 @@ typedef std::list<XWindow *> WindowList;
 class XWindow {
 private:
   Window _window;
+  
   unsigned int _desktop;
+  std::string _title;
+  std::string _app_name;
+  std::string _app_class;
+
+  // states
   bool _shaded;
   bool _iconic;
   bool _max_vert;
@@ -49,7 +56,12 @@ public:
   virtual ~XWindow();
 
   inline Window window() const { return _window; }
+  
   inline unsigned int desktop() const { return _desktop; }
+  inline const std::string &title() const { return _title; }
+  inline const std::string &appName() const { return _app_name; }
+  inline const std::string &appClass() const { return _app_name; }
+  
   inline bool shaded() const { return _shaded; }
   inline bool iconic() const { return _iconic; }
   inline bool maxVert() const { return _max_vert; }
@@ -59,6 +71,8 @@ public:
 
   void updateState();
   void updateDesktop();
+  void updateTitle();
+  void updateClass();
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

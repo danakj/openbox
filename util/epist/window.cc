@@ -35,13 +35,14 @@ using std::endl;
 using std::hex;
 using std::dec;
 
-
 XWindow::XWindow(Window window) : _window(window) {
   _unmapped = false;
 
   XSelectInput(_display, _window, PropertyChangeMask | StructureNotifyMask);
   updateState();
   updateDesktop();
+  updateTitle();
+  updateClass();
 }
 
 
@@ -79,4 +80,33 @@ void XWindow::updateDesktop() {
   if (! _xatom->getValue(_window, XAtom::net_wm_desktop, XAtom::cardinal,
                          static_cast<unsigned long>(_desktop)))
     _desktop = 0;
+}
+
+
+void XWindow::updateTitle() {
+  _title = "";
+  
+  // try netwm
+  if (! _xatom->getValue(_window, XAtom::net_wm_name, XAtom::utf8, _title)) {
+    // try old x stuff
+    _xatom->getValue(_window, XAtom::wm_name, XAtom::ansi, _title);
+  }
+
+  if (_title.empty())
+    _title = "Unnamed";
+}
+
+
+void XWindow::updateClass() {
+  // set the defaults
+  _app_name = _app_class = "";
+
+  XAtom::StringVect v;
+  unsigned long num = 2;
+
+  if (! _xatom->getValue(_window, XAtom::wm_class, XAtom::ansi, num, v))
+    return;
+
+  if (num > 0) _app_name = v[0];
+  if (num > 1) _app_class = v[1];
 }

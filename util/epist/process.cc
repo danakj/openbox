@@ -41,18 +41,24 @@ WindowList _clients;
 WindowList::iterator _active = _clients.end();
 
 
-XWindow &findWindow(const XEvent &e) {
+XWindow *findWindow(const XEvent &e) {
   WindowList::iterator it, end = _clients.end();
   for (it = _clients.begin(); it != end; ++it)
     if (**it == e.xany.window)
       break;
-  assert(it != end);  // this means a client somehow got removed from the
-                      // list!
-  return **it;
+  if(it == end)
+    return 0;
+  return *it;
 }
 
 
 void processEvent(const XEvent &e) {
+  XWindow *window = 0;
+  if (e.xany.window != _root) {
+    window = findWindow(e);  // find the window
+    assert(window); // we caught an event for a window we don't know about!?
+  }
+
   switch (e.type) {
   case PropertyNotify:
     if (e.xany.window == _root) {
@@ -74,15 +80,19 @@ void processEvent(const XEvent &e) {
     } else {
       // a client window
       if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
-        findWindow(e).updateState();
-      if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
-        findWindow(e).updateDesktop();
+        window->updateState();
+      else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
+        window->updateDesktop();
+      else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_name) ||
+               e.xproperty.atom == _xatom->getAtom(XAtom::wm_name))
+        window->updateTitle();
+      else if (e.xproperty.atom == _xatom->getAtom(XAtom::wm_class))
+        window->updateClass();
     }
     break;
   case DestroyNotify:
   case UnmapNotify:
-    cout << "unmap notify\n";
-    findWindow(e).setUnmapped(true);
+    window->setUnmapped(true);
     break;
   }
 }

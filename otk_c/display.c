@@ -1,6 +1,8 @@
 // -*- mode: C; indent-tabs-mode: nil; -*-
 
+#include "../config.h"
 #include "display.h"
+#include "screeninfo.h"
 
 #include <X11/keysym.h>
 
@@ -118,7 +120,7 @@ line argument.\n\n"));
   // Get information on all the screens which are available.
   self->screenInfoList = PyList_New(ScreenCount(self->display));
   for (i = 0; i < ScreenCount(self->display); ++i)
-    PyList_Append(self->screenInfoList, OtkScreenInfo_New(i));
+    PyList_SetItem(self->screenInfoList, i, OtkScreenInfo_New(i));
 
   self->gccache = OtkGCCache_New(PyList_Size(self->screenInfoList));
   

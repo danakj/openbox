@@ -5,10 +5,13 @@
 #include <X11/Xlib.h>
 #include <Python.h>
 
-typedef OtkScreenInfo;
-typedef OtkGCCache;
+struct OtkScreenInfo;
+struct OtkGCCache;
+struct OtkDisplay;
 
-typedef struct {
+struct OtkDisplay *OBDisplay; // the global display XXX: move this to app.h and ob.h?
+
+typedef struct OtkDisplay {
   PyObject_HEAD
   
   //! The X display
@@ -41,7 +44,7 @@ typedef struct {
     @see BImageControl
     @see BTexture
   */
-  OtkGCCache *gccache;
+  struct OtkGCCache *gccache;
 } OtkDisplay;
 
 //! Creates a struct, opens the X display

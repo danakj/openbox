@@ -103,19 +103,14 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
   // pass focus to the next appropriate window
   if ((w->isFocused() || w == lastfocus) &&
       ! screen->getBlackbox()->doShutdown()) {
-    if (id == screen->getCurrentWorkspaceID()) {
-      // The window is on the visible workspace
-      focusFallback(w);
-    } else {
-      // The window is not on the visible workspace.
-      if (lastfocus == w) {
-        // The window was the last-focus target, so we need to replace it.
-        setLastFocusedWindow(stackingList.front());
-      }
-      // if the window focused on the current workspace, then reapply that
-      // workspace's focus too
-      if (w->isFocused())
-        screen->getCurrentWorkspace()->focusFallback(w);
+    focusFallback(w);
+
+    // if the window is sticky, then it needs to be removed on all other
+    // workspaces too!
+    if (w->isStuck()) {
+      for (unsigned int i = 0; i < screen->getWorkspaceCount(); ++i)
+        if (i != id)
+          screen->getWorkspace(i)->focusFallback(w);
     }
   }
 
@@ -141,31 +136,45 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
 void Workspace::focusFallback(const BlackboxWindow *old_window) {
   BlackboxWindow *newfocus = 0;
 
-  // if it's a transient, then try to focus its parent
-  if (old_window && old_window->isTransient()) {
-    newfocus = old_window->getTransientFor();
+  if (id == screen->getCurrentWorkspaceID()) {
+    // The window is on the visible workspace.
 
-    if (! newfocus ||
-        newfocus->isIconic() ||                  // do not focus icons
-        newfocus->getWorkspaceNumber() != id ||  // or other workspaces
-        ! newfocus->setInputFocus())
-      newfocus = 0;
-  }
+    // if it's a transient, then try to focus its parent
+    if (old_window && old_window->isTransient()) {
+      newfocus = old_window->getTransientFor();
 
-  if (! newfocus) {
-    BlackboxWindowList::iterator it = stackingList.begin(),
-                                end = stackingList.end();
-    for (; it != end; ++it) {
-      BlackboxWindow *tmp = *it;
-      if (tmp && tmp->setInputFocus()) {
-        // we found our new focus target
-        newfocus = tmp;
-        break;
+      if (! newfocus ||
+          newfocus->isIconic() ||                  // do not focus icons
+          newfocus->getWorkspaceNumber() != id ||  // or other workspaces
+          ! newfocus->setInputFocus())
+        newfocus = 0;
+    }
+
+    if (! newfocus) {
+      BlackboxWindowList::iterator it = stackingList.begin(),
+                                  end = stackingList.end();
+      for (; it != end; ++it) {
+        BlackboxWindow *tmp = *it;
+        if (tmp && tmp->setInputFocus()) {
+          // we found our new focus target
+          newfocus = tmp;
+          break;
+        }
       }
     }
-  }
 
-  screen->getBlackbox()->setFocusedWindow(newfocus);
+    screen->getBlackbox()->setFocusedWindow(newfocus);
+  } else {
+    // The window is not on the visible workspace.
+
+    if (old_window && lastfocus == old_window) {
+      // The window was the last-focus target, so we need to replace it.
+      BlackboxWindow *win = (BlackboxWindow*) 0;
+      if (! stackingList.empty())
+        win = stackingList.front();
+      setLastFocusedWindow(win);
+    }
+  }
 }
 
 

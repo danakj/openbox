@@ -422,7 +422,7 @@ Window BlackboxWindow::createToplevelWindow(void) {
                              ButtonMotionMask | EnterWindowMask;
 
   return XCreateWindow(blackbox->getXDisplay(), screen->getRootWindow(),
-                       -1, -1, 1, 1, frame.border_w, screen->getDepth(),
+                       0, 0, 1, 1, frame.border_w, screen->getDepth(),
                        InputOutput, screen->getVisual(), create_mask,
                        &attrib_create);
 }
@@ -462,10 +462,14 @@ void BlackboxWindow::associateClientWindow(void) {
   XSelectInput(blackbox->getXDisplay(), frame.plate, SubstructureRedirectMask);
 
   XGrabServer(blackbox->getXDisplay());
-  XSelectInput(blackbox->getXDisplay(), client.window, NoEventMask);
-  XReparentWindow(blackbox->getXDisplay(), client.window, frame.plate, 0, 0);
+
+  unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
+                             StructureNotifyMask;
   XSelectInput(blackbox->getXDisplay(), client.window,
-               PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
+               event_mask & ~StructureNotifyMask);
+  XReparentWindow(blackbox->getXDisplay(), client.window, frame.plate, 0, 0);
+  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
+
   XUngrabServer(blackbox->getXDisplay());
 
   XRaiseWindow(blackbox->getXDisplay(), frame.plate);
@@ -1636,11 +1640,13 @@ void BlackboxWindow::iconify(void) {
    * split second, leaving us with a ghost window... so, we need to do this
    * while the X server is grabbed
    */
+  unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
+                             StructureNotifyMask;
   XGrabServer(blackbox->getXDisplay());
-  XSelectInput(blackbox->getXDisplay(), client.window, NoEventMask);
-  XUnmapWindow(blackbox->getXDisplay(), client.window);
   XSelectInput(blackbox->getXDisplay(), client.window,
-               PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
+               event_mask & ~StructureNotifyMask);
+  XUnmapWindow(blackbox->getXDisplay(), client.window);
+  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
   XUngrabServer(blackbox->getXDisplay());
 
   XUnmapWindow(blackbox->getXDisplay(), frame.window);
@@ -1749,10 +1755,12 @@ void BlackboxWindow::withdraw(void) {
 
   XGrabServer(blackbox->getXDisplay());
 
-  XSelectInput(blackbox->getXDisplay(), client.window, NoEventMask);
-  XUnmapWindow(blackbox->getXDisplay(), client.window);
+  unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
+                             StructureNotifyMask;
   XSelectInput(blackbox->getXDisplay(), client.window,
-               PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
+               event_mask & ~StructureNotifyMask);
+  XUnmapWindow(blackbox->getXDisplay(), client.window);
+  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
 
   XUngrabServer(blackbox->getXDisplay());
 
@@ -3679,16 +3687,8 @@ BWindowGroup::BWindowGroup(Blackbox *b, Window _group)
     return;
   }
 
-  /*
-    watch for destroy notify on the group window (in addition to
-    any other events we are looking for)
-
-    since some managed windows can also be window group controllers,
-    we need to make sure that we don't clobber the event mask for the
-    managed window
-  */
   XSelectInput(blackbox->getXDisplay(), group,
-               wattrib.your_event_mask | StructureNotifyMask);
+               PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
 
   blackbox->saveGroupSearch(group, this);
 }

@@ -26,6 +26,12 @@ struct _RrInstance {
 
     gint pseudo_bpc;
     XColor *pseudo_colors;
+
+    GHashTable *color_hash;
 };
+
+guint       RrPseudoBPC    (const RrInstance *inst);
+XColor*     RrPseudoColors (const RrInstance *inst);
+GHashTable* RrColorHash    (const RrInstance *inst);
 
 #endif

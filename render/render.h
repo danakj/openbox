@@ -164,8 +164,6 @@ gint     RrBlueShift    (const RrInstance *inst);
 gint     RrRedMask      (const RrInstance *inst);
 gint     RrGreenMask    (const RrInstance *inst);
 gint     RrBlueMask     (const RrInstance *inst);
-guint    RrPseudoBPC    (const RrInstance *inst);
-XColor*  RrPseudoColors (const RrInstance *inst);
 
 RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
 RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);

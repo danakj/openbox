@@ -18,6 +18,8 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
 
     definst->pseudo_colors = NULL;
 
+    definst->color_hash = g_hash_table_new(g_int_hash, g_int_equal);
+
     switch (definst->visual->class) {
     case TrueColor:
         RrTrueColorSetup(definst);
@@ -157,6 +159,7 @@ void RrInstanceFree (RrInstance *inst)
     if (inst) {
         if (inst == definst) definst = NULL;
         g_free(inst->pseudo_colors);
+        g_hash_table_destroy(inst->color_hash);
     }
 }
 
@@ -243,4 +246,9 @@ guint RrPseudoBPC (const RrInstance *inst)
 XColor *RrPseudoColors (const RrInstance *inst)
 {
     return (inst ? inst : definst)->pseudo_colors;
+}
+
+GHashTable* RrColorHash (const RrInstance *inst)
+{
+    return (inst ? inst : definst)->color_hash;
 }

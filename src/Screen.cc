@@ -216,6 +216,9 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
     resource.wstyle.font = NULL;
   resource.root_command = NULL;
+#ifdef    HAVE_STRFTIME
+  resource.strftime_format = NULL;
+#endif // HAVE_STRFTIME
 
 #ifdef   SLIT
   slit = NULL;

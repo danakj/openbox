@@ -408,7 +408,6 @@ void frame_adjust_shape(ObFrame *self)
 
 void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 {
-    g_message("adjust_area: %d %d", moved, resized);
     if (resized) {
         if (self->frame.client->decorations & Decor_Border) {
             self->bwidth = s_bwidth;

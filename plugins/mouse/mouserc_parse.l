@@ -180,9 +180,11 @@ static void addbinding()
     } else if (!g_ascii_strcasecmp(action, "previousdesktoprowwrap")) {
         a = action_new(action_previous_desktop_row);
         a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "move")) {
+    } else if (!g_ascii_strcasecmp(action, "move") &&
+               mact == MouseAction_Motion) {
         a = action_new(action_move);
-    } else if (!g_ascii_strcasecmp(action, "resize")) {
+    } else if (!g_ascii_strcasecmp(action, "resize") &&
+               mact == MouseAction_Motion) {
         a = action_new(action_resize);
     } else {
         g_warning("Invalid action '%s' in '%s' on line %d", action, path,

@@ -290,7 +290,7 @@ void screen_set_desktop(guint num)
        from the switch so it doesnt mess with the focus */
     XSync(ob_display, FALSE);
     while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-    focus_fallback(TRUE);
+    focus_fallback(Fallback_Desktop);
 
     dispatch_ob(Event_Ob_Desktop, num, old);
 }

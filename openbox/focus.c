@@ -163,7 +163,7 @@ static gboolean focus_under_pointer()
     return FALSE;
 }
 
-void focus_fallback(gboolean switching_desks)
+void focus_fallback(FallbackType type)
 {
     GList *it;
     Client *old = NULL;
@@ -176,17 +176,12 @@ void focus_fallback(gboolean switching_desks)
     */
     focus_set_client(NULL);
 
-    if (switching_desks) {
-        /* don't skip any windows when switching desktops */
-        old = NULL;
-    }
-
-    if (!(switching_desks ? focus_last_on_desktop : focus_last)) {
+    if (!(type == Fallback_Desktop ? focus_last_on_desktop : focus_last)) {
         if (focus_follow) focus_under_pointer();
         return;
     }
 
-    if (old && old->transient_for) {
+    if (type == Fallback_Unfocusing && old && old->transient_for) {
         if (old->transient_for == TRAN_GROUP) {
             for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
                 GSList *sit;
@@ -196,14 +191,15 @@ void focus_fallback(gboolean switching_desks)
                         return;
             }
         } else {
-            if (client_focus(old->transient_for))
-                return;
+            if (client_normal(old->transient_for))
+                if (client_focus(old->transient_for))
+                    return;
         }
     }
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-        if (it->data != old && client_normal(it->data))
-            if (client_focus(it->data))
+        if (type != Fallback_Unfocusing || it->data != old)
+            if (client_normal(it->data) && client_focus(it->data))
                 return;
 
     /* nothing to focus */
@@ -249,11 +245,9 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         }
         ft = client_focus_target(it->data);
         if (ft == it->data && focus_client != ft && client_normal(ft) &&
-            client_focusable(ft)) {
-            if (client_focus(ft)) {
-                noreorder++; /* avoid reordering the focus_order */
-                return ft;
-            }
+            client_focus(ft)) {
+            noreorder++; /* avoid reordering the focus_order */
+            return ft;
         }
     } while (it != start);
     return NULL;

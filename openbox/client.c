@@ -139,7 +139,7 @@ void client_manage_all()
     client_startup_stack_size = 0;
 
     if (focus_new)
-        focus_fallback(FALSE);
+        focus_fallback(Fallback_NoFocus);
 }
 
 void client_manage(Window window)
@@ -312,7 +312,7 @@ void client_unmanage(Client *self)
         }
     }
 
-    focus_fallback(FALSE);
+    client_unfocus(self);
 
     /* remove from its group */
     if (self->group) {
@@ -2080,7 +2080,7 @@ void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
     g_message("client_unfocus");
-    focus_fallback(FALSE);
+    focus_fallback(Fallback_Unfocusing);
 }
 
 gboolean client_focused(Client *self)

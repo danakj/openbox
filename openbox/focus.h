@@ -27,8 +27,14 @@ void focus_shutdown();
   send focus anywhere, its called by the Focus event handlers */
 void focus_set_client(struct Client *client);
 
+typedef enum {
+    Fallback_Desktop,    /* switching desktops */
+    Fallback_Unfocusing, /* forcefully remove focus from the curernt window */
+    Fallback_NoFocus     /* nothing has focus for some reason */
+} FallbackType;
+
 /*! Call this when you need to focus something! */
-void focus_fallback(gboolean switching_desks);
+void focus_fallback(FallbackType type);
 
 /*! Cycle focus amongst windows
   Returns the Client to which focus has been cycled, or NULL if none. */

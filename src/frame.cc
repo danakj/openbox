@@ -52,8 +52,13 @@ void OBFrame::loadStyle(const otk::Style *style)
   _size.left = _size.top = _size.bottom = _size.right = 2;
 
   if (replace) {
+    resize();
+    
     XSetWindowBorderWidth(otk::OBDisplay::display, _window,
                           _style->getBorderWidth());
+
+    XMoveWindow(otk::OBDisplay::display, _client->window(),
+                _size.left, _size.top);
 
     // XXX: make everything redraw
   }
@@ -65,8 +70,6 @@ void OBFrame::resize()
   XResizeWindow(otk::OBDisplay::display, _window,
                 _size.left + _size.right + _client->area().width(),
                 _size.top + _size.bottom + _client->area().height());
-  XMoveWindow(otk::OBDisplay::display, _client->window(),
-              _size.left, _size.top);
   // XXX: more is gunna have to happen here
 }
 
@@ -88,7 +91,8 @@ void OBFrame::grabClient()
   // reparent the client to the frame
   XSelectInput(otk::OBDisplay::display, _client->window(),
                OBClient::event_mask & ~StructureNotifyMask);
-  XReparentWindow(otk::OBDisplay::display, _client->window(), _window, 0, 0);
+  XReparentWindow(otk::OBDisplay::display, _client->window(), _window,
+                  _size.left, _size.top);
   XSelectInput(otk::OBDisplay::display, _client->window(),
                OBClient::event_mask);
 

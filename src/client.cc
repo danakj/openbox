@@ -98,9 +98,11 @@ OBClient::~OBClient()
 {
   const otk::OBProperty *property = Openbox::instance->property();
 
-  // these values should not be persisted across a window unmapping/mapping
-  property->erase(_window, otk::OBProperty::net_wm_desktop);
-  property->erase(_window, otk::OBProperty::net_wm_state);
+  if (Openbox::instance->state() != Openbox::State_Exiting) {
+    // these values should not be persisted across a window unmapping/mapping
+    property->erase(_window, otk::OBProperty::net_wm_desktop);
+    property->erase(_window, otk::OBProperty::net_wm_state);
+  }
 }
 
 

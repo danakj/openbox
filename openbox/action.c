@@ -408,6 +408,8 @@ void action_move(union ActionData *data)
     int x = data->move.x;
     int y = data->move.y;
 
+    if (!client_normal(c)) return;
+
     dispatch_move(c, &x, &y);
 
     frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
@@ -420,6 +422,8 @@ void action_resize(union ActionData *data)
     Client *c = data->resize.c;
     int w = data->resize.x - c->frame->size.left - c->frame->size.right;
     int h = data->resize.y - c->frame->size.top - c->frame->size.bottom;
+ 
+    if (!client_normal(c)) return;
 
     /* XXX window snapping/struts */
 

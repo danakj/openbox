@@ -16,7 +16,7 @@ extern gboolean config_focus_follow;
 extern gboolean config_focus_last;
 /*! Focus the last focused window as a fallback when switching desktops */
 extern gboolean config_focus_last_on_desktop;
-/*! Timeout for focusing windows on focus follows mouse, in microseconds */
+/*! Timeout for focusing windows on focus follows mouse, in milliseconds */
 extern guint    config_focus_delay;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise

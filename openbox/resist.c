@@ -1,4 +1,3 @@
-#include "dispatch.h"
 #include "client.h"
 #include "frame.h"
 #include "stacking.h"

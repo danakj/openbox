@@ -249,6 +249,8 @@ void action_toggle_omnipresent(union ActionData *data);
 void action_move_relative_horz(union ActionData *data);
 /* MoveResizeRelative */
 void action_move_relative_vert(union ActionData *data);
+/* ClientAction */
+void action_move_to_center(union ActionData *data);
 /* MoveResizeRelative */
 void action_resize_relative_horz(union ActionData *data);
 /* MoveResizeRelative */

@@ -537,6 +537,11 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
+        "movetocenter",
+        action_move_to_center,
+        setup_client_action
+    },
+    {
         "resizerelativehorz",
         action_resize_relative_horz,
         setup_client_action
@@ -1149,6 +1154,17 @@ void action_move_relative_vert(union ActionData *data)
     ObClient *c = data->relative.any.c;
     client_action_start(data);
     client_move(c, c->area.x, c->area.y + data->relative.delta);
+    client_action_end(data);
+}
+
+void action_move_to_center(union ActionData *data)
+{
+    ObClient *c = data->client.any.c;
+    Rect *area;
+    area = screen_area_monitor(c->desktop, 0);
+    client_action_start(data);
+    client_move(c, area->width / 2 - c->area.width / 2,
+                area->height / 2 - c->area.height / 2);
     client_action_end(data);
 }
 

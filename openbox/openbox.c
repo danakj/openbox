@@ -150,9 +150,8 @@ int main(int argc, char **argv)
 	client_manage_all();
 
 	ob_state = State_Running;
-	while (!ob_shutdown) {
+	while (!ob_shutdown)
 	    event_loop();
-	}
 	ob_state = State_Exiting;
 
 	client_unmanage_all();
@@ -169,9 +168,9 @@ int main(int argc, char **argv)
 	timer_shutdown();
     }
 
-    XCloseDisplay(ob_display);
-
     dispatch_shutdown();
+
+    XCloseDisplay(ob_display);
 
     /* XXX if (ob_restart) */
      

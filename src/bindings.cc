@@ -21,7 +21,8 @@ static void print_branch(BindingTree *first, std::string str)
   while (p) {
     if (p->first_child)
       print_branch(p->first_child, str + " " + p->text);
-    printf("%d%s\n", p->id, (str + " " + p->text).c_str());
+    if (!p->chain)
+      printf("%d%s\n", p->id, (str + " " + p->text).c_str());
     BindingTree *s = p->next_sibling;
     delete p;
     p = s;
@@ -83,9 +84,8 @@ static BindingTree *buildtree(const OBBindings::StringVect &keylist, int id)
     p->chain = false;
   }
 
-  printf("<BUILDING>\n");
+  printf("BUILDING:\n");
   print_branch(ret, "");
-  printf("</BUILDING>\n");
   
   // successfully built a tree
   return ret;

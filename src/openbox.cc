@@ -150,8 +150,8 @@ Openbox::Openbox(int argc, char **argv)
   _bindings = new OBBindings();
 
   OBBindings::StringVect v;
-//  v.push_back("C-x");
-//  v.push_back("C-y");
+  v.push_back("C-x");
+  v.push_back("C-y");
   v.push_back("v");
   _bindings->add(v, 1);
   v.clear();
@@ -160,6 +160,7 @@ Openbox::Openbox(int argc, char **argv)
   v.push_back("a");
   _bindings->add(v, 2);
 
+  printf("CHAINS:\n");
   _bindings->display();
   ::exit(0);
 

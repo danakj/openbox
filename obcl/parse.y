@@ -53,6 +53,7 @@ stmt: TOK_ID list ';'
         s->u.lb.list = $2;
         s->u.lb.block = NULL;
         s->u.lb.id = $1;
+        s->lineno = yylineno;
         $$ = s;
     }
     | TOK_ID list block
@@ -62,6 +63,7 @@ stmt: TOK_ID list ';'
         s->u.lb.list = $2;
         s->u.lb.block = $3;
         s->u.lb.id = $1;
+        s->lineno = yylineno;
         $$ = s;
     }
     | TOK_ID block
@@ -71,6 +73,7 @@ stmt: TOK_ID list ';'
         s->u.lb.block = $2;
         s->u.lb.list = NULL;
         s->u.lb.id = $1;
+        s->lineno = yylineno;
         $$ = s;
     }
     ;
@@ -96,6 +99,7 @@ value: TOK_ID
         CLNode *node = g_new(CLNode,1);
         node->type = CL_ID;
         node->u.str = $1;
+        node->lineno = yylineno;
         $$ = node;
     }
     | TOK_STRING
@@ -103,6 +107,7 @@ value: TOK_ID
         CLNode *node = g_new(CLNode,1);
         node->type = CL_STR;
         node->u.str = $1;
+        node->lineno = yylineno;
         $$ = node;
     }
     | TOK_NUM
@@ -110,6 +115,7 @@ value: TOK_ID
         CLNode *node = g_new(CLNode,1);
         node->type = CL_NUM;
         node->u.num = $1;
+        node->lineno = yylineno;
         $$ = node;
     }
     ;

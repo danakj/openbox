@@ -640,11 +640,24 @@ ObFrameContext frame_context(ObClient *client, Window win)
 
     if (win == RootWindow(ob_display, ob_screen)) return OB_FRAME_CONTEXT_ROOT;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
-    if (win == client->window) return OB_FRAME_CONTEXT_CLIENT;
+    if (win == client->window) {
+        /* conceptually, this is the root window, as far as users are
+           concerned */
+        if (client->type == OB_CLIENT_TYPE_DESKTOP)
+            return OB_FRAME_CONTEXT_ROOT;
+        return OB_FRAME_CONTEXT_CLIENT;
+    }
 
     self = client->frame;
+    if (win == self->plate) {
+        /* conceptually, this is the root window, as far as users are
+           concerned */
+        if (client->type == OB_CLIENT_TYPE_DESKTOP)
+            return OB_FRAME_CONTEXT_ROOT;
+        return OB_FRAME_CONTEXT_CLIENT;
+    }
+
     if (win == self->window)   return OB_FRAME_CONTEXT_FRAME;
-    if (win == self->plate)    return OB_FRAME_CONTEXT_CLIENT;
     if (win == self->title)    return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->label)    return OB_FRAME_CONTEXT_TITLEBAR;
     if (win == self->handle)   return OB_FRAME_CONTEXT_HANDLE;

@@ -17,6 +17,10 @@ typedef struct {
     GSList *actions[OB_MOUSE_NUM_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
+#define CLIENT_CONTEXT(co, cl) (co == OB_FRAME_CONTEXT_CLIENT || \
+                                (co == OB_FRAME_CONTEXT_ROOT && \
+                                 cl->type == OB_CLIENT_TYPE_DESKTOP))
+
 /* Array of GSList*s of PointerBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
 
@@ -37,7 +41,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
                 win = client->frame->window;
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
-            } else if (i == OB_FRAME_CONTEXT_CLIENT) {
+            } else if (CLIENT_CONTEXT(i, client)) {
                 win = client->frame->plate;
                 mode = GrabModeSync; /* this is handled in event */
                 mask = ButtonPressMask; /* can't catch more than this with Sync
@@ -211,7 +215,7 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
                     e->xbutton.button,
                     e->xbutton.x_root, e->xbutton.y_root);
 
-        if (context == OB_FRAME_CONTEXT_CLIENT) {
+        if (CLIENT_CONTEXT(context, client)) {
             /* Replay the event, so it goes to the client*/
             XAllowEvents(ob_display, ReplayPointer, event_lasttime);
             /* Fall through to the release case! */

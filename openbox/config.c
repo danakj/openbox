@@ -386,6 +386,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer d)
 {
+    xmlNodePtr n;
     for (node = node->children; node; node = node->next) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
             gchar *c;

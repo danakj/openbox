@@ -185,6 +185,29 @@ def change_desktop(data, num):
     ob.send_client_msg(root, otk.atoms.net_current_desktop,
                        root, num)
 
+def show_desktop(data, show=1):
+    """Shows and focuses the desktop, hiding any client windows. Optionally,
+       if show is zero, this will hide the desktop, leaving show-desktop
+       mode."""
+    root = otk.display.screenInfo(data.screen).rootWindow()
+    ob.send_client_msg(root, otk.atoms.net_showing_desktop, root, show)
+
+def hide_desktop(data):
+    """Hides the desktop, re-showing the client windows. Leaves show-desktop
+       mode."""
+    show_desktop(data, 0)
+
+def toggle_show_desktop(data):
+    """Requests the Openbox to show the desktop, hiding the client windows, or
+       redisplay the clients."""
+    # get the current desktop state
+    root = otk.display.screenInfo(data.screen).rootWindow()
+    result, value = otk.Property_get(root, otk.atoms.net_showing_desktop,
+                                     otk.atoms.cardinal)
+    if not result: return
+    show = not value
+    ob.send_client_msg(root, otk.atoms.net_showing_desktop, root, show)
+
 def next_desktop(data, no_wrap=0):
     """Switches to the next desktop, optionally (by default) cycling around to
        the first when going past the last."""

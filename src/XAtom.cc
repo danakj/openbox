@@ -454,7 +454,7 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(False); return // unhandled StringType
+  default: assert(False); return; // unhandled StringType
   }
   
   unsigned char *value;

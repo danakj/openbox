@@ -10,7 +10,7 @@ extern int lineno;
 real [-0-9][0-9]*\.[0-9]+
 integer [-0-9][0-9]*
 string \"[^"\n]*\"
-identifier [a-zA-Z][-.a-zA-Z0-9]*
+identifier [a-zA-Z][-.a-zA-Z0-9_]*
 bool ([tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[yY][eE][sS]|[nN][oO]|[oO][nN]|[oO][fF][fF])
 
 %%

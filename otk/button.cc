@@ -38,8 +38,6 @@ void Button::release(unsigned int mouse_button)
 
   styleChanged(*RenderStyle::style(screen()));
   refresh();
-
-  clickHandler(_mouse_button);
 }
 
 void Button::buttonPressHandler(const XButtonEvent &e)
@@ -51,7 +49,11 @@ void Button::buttonPressHandler(const XButtonEvent &e)
 void Button::buttonReleaseHandler(const XButtonEvent &e)
 {
   Widget::buttonReleaseHandler(e);
+  bool p = _pressed;
   release(e.button);
+  if (p && !_pressed && e.x > 0 && e.y > 0 &&
+      e.x < area().width() && e.y < area().height())
+    clickHandler(_mouse_button);
 }
 
 void Button::styleChanged(const RenderStyle &style)

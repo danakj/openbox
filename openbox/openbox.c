@@ -271,6 +271,10 @@ void parse_args(int argc, char **argv)
                 g_printerr("-rc requires an argument\n");
             else
                 ob_rc_path = argv[++i];
+        } else {
+            g_printerr("Invalid option: '%s'\n\n", argv[i]);
+            print_help();
+            exit(1);
         }
     }
 }

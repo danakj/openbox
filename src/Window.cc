@@ -3224,13 +3224,17 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       const Rect &srect = *it;
 
       // if we're not in the rectangle then don't snap to it.
-      if (! srect.intersects(Rect(wleft, wtop, frame.rect.width(),
-                                  frame.rect.height())))
-        continue;
+      if (screen->doOpaqueMove()) {
+        if (! srect.contains(frame.rect))
+          continue;
+      } else {
+        if (! srect.contains(frame.changing))
+          continue;
+      }
 
-      int dleft = wleft - srect.left(),
+      int dleft = srect.left() - wleft,
          dright = wright - srect.right(),
-           dtop = wtop - srect.top(),
+           dtop = srect.top() - wtop,
         dbottom = wbottom - srect.bottom();
 
         // snap left?

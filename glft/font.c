@@ -50,10 +50,14 @@ static void GlftDefaultSubstitute(Display *d, int s, FcPattern *pat)
         FcPatternAddBool(pat, FC_MINSPACE, FcTrue);
     if (FcPatternGet(pat, FC_CHAR_WIDTH, 0, &v) == FcResultNoMatch)
         FcPatternAddInteger(pat, FC_CHAR_WIDTH, 0);
-    if (FcPatternGet(pat, GLFT_SHADOW, 0, &v) == FcResultNoMatch)
+    if (FcPatternGet(pat, GLFT_SHADOW, 0, &v) == FcResultNoMatch) {
         FcPatternAddBool(pat, GLFT_SHADOW, FcFalse);
-    if (FcPatternGet(pat, GLFT_SHADOW_OFFSET, 0, &v) == FcResultNoMatch)
-        FcPatternAddInteger(pat, GLFT_SHADOW_OFFSET, 2);
+        g_message("no shadow specified");
+    }
+    if (FcPatternGet(pat, GLFT_SHADOW_OFFSET, 0, &v) == FcResultNoMatch) {
+        FcPatternAddInteger(pat, GLFT_SHADOW_OFFSET, 1);
+        g_message("no shadow offset specified");
+    }
     if (FcPatternGet(pat, GLFT_SHADOW_ALPHA, 0, &v) == FcResultNoMatch)
         FcPatternAddDouble(pat, GLFT_SHADOW_ALPHA, 0.5);
 

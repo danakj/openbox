@@ -449,8 +449,10 @@ void Frame::renderLabel()
     src = _title_sur->pixelData() + w * (geom.bevel + 1) + geom.title_x;
     
     // get the background under the label
-    for (int y = 0; y < geom.button_size; ++y, src += w - geom.button_size)
-      for (int x = 0; x < geom.button_size; ++x, ++dest, ++src)
+    int xd = s->width();
+    int yd = s->height();
+    for (int y = 0; y < yd; ++y, src += w - xd)
+      for (int x = 0; x < xd; ++x, ++dest, ++src)
         *dest = *src;
     control->drawImage(*s, 0, 0, 0); // no image but draw the new background
   } else

@@ -153,6 +153,7 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
     guint i;
+    gboolean f;
 
     grab_server(TRUE);
 
@@ -240,22 +241,30 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state != State_Starting && client_normal(self)) {
-        if (config_focus_new)
-            client_focus(self);
-        else if (self->transient_for) {
+        f = FALSE;
+
+        if (self->transient_for) {
             if (self->transient_for != TRAN_GROUP) {/* transient of a window */
-                if (focus_client == self->transient_for)
+                if (focus_client == self->transient_for) {
                     client_focus(self);
+                    f = TRUE;
+                }
             } else { /* transient of a group */
                 GSList *it;
 
                 for (it = self->group->members; it; it = it->next)
                     if (focus_client == it->data) {
                         client_focus(self);
+                        f = TRUE;
                         break;
                     }
             }
         }
+        /* note the check against Type_Normal, not client_normal(self), which
+           would also include dialog types. in this case we want more strict
+           rules for focus */
+        if (!f && config_focus_new && self->type == Type_Normal)
+            client_focus(self);
     }
 
     /* update the list hints */

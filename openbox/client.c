@@ -2217,7 +2217,7 @@ void client_set_state(Client *self, Atom action, long data1, long data2)
     if (shaded != self->shaded)
 	client_shade(self, shaded);
     client_calc_layer(self);
-    client_change_state(self); /* change the hint to relect these changes */
+    client_change_state(self); /* change the hint to reflect these changes */
 }
 
 Client *client_focus_target(Client *self)

@@ -71,7 +71,7 @@ def _newwindow(data):
         
 def _closewindow(data):
     try:
-        focus._clients.remove(data.client.window())
+        _clients.remove(data.client.window())
     except ValueError: pass
 
 ob.ebind(ob.EventAction.NewWindow, _newwindow)

@@ -3,6 +3,7 @@
 #include "frame.h"
 #include "screen.h"
 #include "action.h"
+#include "snap.h"
 
 #include <glib.h>
 
@@ -401,8 +402,9 @@ void action_move(union ActionData *data)
     int x = data->move.x;
     int y = data->move.y;
 
-    /* XXX window snapping/struts */
+    snap_move(c, &x, &y, c->frame->area.width, c->frame->area.height);
 
+    frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
     client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
                      TRUE, data->move.final);
 }

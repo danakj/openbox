@@ -148,13 +148,10 @@ void plugin_loadall()
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==
                G_IO_STATUS_NORMAL) {
-            int i = 0;
-            while (name[++i-1] == ' ' || name[i-1] == '\t');
-            if (name[i] != '\0' && name[i] != '#') {
-                g_strstrip(name);
+            g_strstrip(name);
+            if (name[0] != '\0' && name[0] != '#')
                 plugin_open(name);
-                g_free(name);
-            }
+            g_free(name);
         }
         g_io_channel_unref(io);
     }

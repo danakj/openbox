@@ -282,7 +282,7 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
     char *raw, *p;
     guint num, i, count = 0;
 
-    if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
+    if (get_all(win, prop, prop_atoms.string, 8, (guchar**)&raw, &num)) {
 
         p = raw;
         while (p < raw + num - 1) {

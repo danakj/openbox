@@ -301,7 +301,7 @@ gboolean load()
 	s_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
 
     if (!read_mask(db, "window.button.max.mask", &s_max_mask)) {
-        char data []  = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f  };
+        char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f  };
         s_max_mask = pixmap_mask_new(7, 7, data);
     }
     if (!read_mask(db, "window.button.icon.mask", &s_icon_mask)) {

@@ -149,6 +149,7 @@ void frame_client_gravity(ObFrame *self, int *x, int *y);
 */
 void frame_frame_gravity(ObFrame *self, int *x, int *y);
 
-void frame_flash(ObFrame *self);
+void frame_flash_start(ObFrame *self);
+void frame_flash_stop(ObFrame *self);
 
 #endif

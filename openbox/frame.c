@@ -785,7 +785,6 @@ void frame_frame_gravity(ObFrame *self, int *x, int *y)
 static void flash_done(gpointer data)
 {
     ObFrame *self = data;
-    self->flashing = FALSE;
 
     if (self->focused != self->flash_on)
         frame_adjust_focus(self, self->focused);
@@ -795,21 +794,20 @@ static gboolean flash_timeout(gpointer data)
 {
     ObFrame *self = data;
     GTimeVal now;
-    gboolean focused;
-
-    g_message("flash");
 
     g_get_current_time(&now);
     if (now.tv_sec > self->flash_end.tv_sec ||
         (now.tv_sec == self->flash_end.tv_sec &&
-         now.tv_usec >= self->flash_end.tv_usec)) {
-        g_message("done flashing");
+         now.tv_usec >= self->flash_end.tv_usec))
+        self->flashing = FALSE;
+
+    if (!self->flashing)
         return FALSE; /* we are done */
-    }
 
     self->flash_on = !self->flash_on;
-    g_message("on %d", self->flash_on);
     {
+        gboolean focused;
+        
         focused = self->focused; /* save the focused flag */
         frame_adjust_focus(self, self->flash_on);
         self->focused = focused;
@@ -818,18 +816,23 @@ static gboolean flash_timeout(gpointer data)
     return TRUE; /* go again */
 }
 
-void frame_flash(ObFrame *self)
+void frame_flash_start(ObFrame *self)
 {
     self->flash_on = self->focused;
 
     if (!self->flashing)
         ob_main_loop_timeout_add(ob_main_loop,
-                                 G_USEC_PER_SEC / 2,
+                                 G_USEC_PER_SEC * 0.75,
                                  flash_timeout,
                                  self,
                                  flash_done);
     g_get_current_time(&self->flash_end);
-    g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 4);
+    g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
     
     self->flashing = TRUE;
+}
+
+void frame_flash_stop(ObFrame *self)
+{
+    self->flashing = FALSE;
 }

@@ -372,28 +372,52 @@ static rectList calcSpace(const Rect &win, const rectList &spaces) {
   return result;
 }
 
-
-bool incWidth(const Rect &first, const Rect &second) {
-  return first.x() < second.x();
+bool rowRLBT(const Rect &first, const Rect &second){
+  if (first.y()+first.h()==second.y()+second.h())
+     return first.x()+first.w()>second.x()+second.w();
+  return first.y()+first.h()>second.y()+second.h();
+}
+ 
+bool rowRLTB(const Rect &first, const Rect &second){
+  if (first.y()==second.y())
+     return first.x()+first.w()>second.x()+second.w();
+  return first.y()<second.y();
 }
 
-
-bool decWidth(const Rect &first, const Rect &second) {
-  if (second.x() == first.x())
-     return second.w() < first.w();
-  return second.x() < first.x();
+bool rowLRBT(const Rect &first, const Rect &second){
+  if (first.y()+first.h()==second.y()+second.h())
+     return first.x()<second.x();
+  return first.y()+first.h()>second.y()+second.h();
+}
+ 
+bool rowLRTB(const Rect &first, const Rect &second){
+  if (first.y()==second.y())
+     return first.x()<second.x();
+  return first.y()<second.y();
+}
+ 
+bool colLRTB(const Rect &first, const Rect &second){
+  if (first.x()==second.x())
+     return first.y()<second.y();
+  return first.x()<second.y();
+}
+ 
+bool colLRBT(const Rect &first, const Rect &second){
+  if (first.x()==second.x())
+     return first.y()+first.h()>second.y()+second.h();
+  return first.x()<second.y();
 }
 
-
-bool incHeight(const Rect &first, const Rect &second) {
-  return first.y() < second.y();
+bool colRLTB(const Rect &first, const Rect &second){
+  if (first.x()+first.w()==second.x()+second.w())
+     return first.y()<second.y();
+  return first.x()+first.w()>second.x()+second.w();
 }
-
-
-bool decHeight(const Rect &first, const Rect &second) {
-  if (second.y() == first.y())
-     return second.h() < first.h();
-  return second.y() < first.y();
+ 
+bool colRLBT(const Rect &first, const Rect &second){
+  if (first.x()+first.w()==second.x()+second.w())
+     return first.y()+first.h()>second.y()+second.h();
+  return first.x()+first.w()>second.x()+second.w();
 }
 
 
@@ -413,16 +437,6 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
      spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
                         spaces);
   
-  //Sort the spaces by placement choice
-  if (screen.rowPlacementDirection() == BScreen::TopBottom)
-     sort(spaces.begin(), spaces.end(), decHeight);
-  else
-     sort(spaces.begin(), spaces.end(), incHeight);
-  if (screen.colPlacementDirection() == BScreen::TopBottom)
-     stable_sort(spaces.begin(), spaces.end(), incHeight);
-  else
-     stable_sort(spaces.begin(), spaces.end(), decHeight);
-
   //Find first space that fits the window
   best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
@@ -466,123 +480,92 @@ Point *Workspace::underMousePlacement(const Size &win_size, const Rect &space) {
 }
 
 Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
-  bool placed=false;
-  int test_x, test_y, place_x = 0, place_y = 0;
-  int start_pos = 0;
-  int change_y =
-     ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
-  int change_x =
-     ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
-  int delta_x = 8, delta_y = 8;
+  const Rect *best;
+  rectList spaces;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  test_y = (screen.colPlacementDirection() == BScreen::TopBottom) ?
-    start_pos : screen.size().h() - win_size.h() - start_pos;
-
-  while(!placed &&
-        ((screen.colPlacementDirection() == BScreen::BottomTop) ?
-         test_y > 0 : test_y + win_size.h() < (signed) space.h())) {
-    test_x = (screen.rowPlacementDirection() == BScreen::LeftRight) ?
-      start_pos : space.w() - win_size.w() - start_pos;
-    while (!placed &&
-           ((screen.rowPlacementDirection() == BScreen::RightLeft) ?
-            test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
-      placed = true;
-
-      it.reset();
-      for (OpenboxWindow *curr = it.current(); placed && curr;
-           it++, curr = it.current()) {
-        int curr_w = curr->area().w() + (screen.getBorderWidth() * 4);
-        int curr_h = curr->area().h() + (screen.getBorderWidth() * 4);
-
-        if (curr->area().x() < test_x + win_size.w() &&
-            curr->area().x() + curr_w > test_x &&
-            curr->area().y() < test_y + win_size.h() &&
-            curr->area().y() + curr_h > test_y) {
-          placed = false;
-        }
-      }
-
-      // Removed code for checking toolbar and slit
-      // The space passed in should not include either
-
-      if (placed) {
-        place_x = test_x;
-        place_y = test_y;
-
-        break;
-      }   
-
-      test_x += (change_x * delta_x);
+  rectList::const_iterator siter;
+  spaces.push_back(space); //initially the entire screen is free
+  it.reset();
+  
+  //Find Free Spaces
+  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
+     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+                        spaces);
+  //Sort spaces by preference
+  if(screen.rowPlacementDirection() == BScreen::RightLeft)
+     if(screen.colPlacementDirection() == BScreen::TopBottom)
+        sort(spaces.begin(),spaces.end(),rowRLTB);
+     else
+        sort(spaces.begin(),spaces.end(),rowRLBT);
+  else
+     if(screen.colPlacementDirection() == BScreen::TopBottom)
+        sort(spaces.begin(),spaces.end(),rowLRTB);
+     else
+        sort(spaces.begin(),spaces.end(),rowLRBT);
+  best = NULL;
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
+    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
+      best = siter;
+      break;
     }
 
-    test_y += (change_y * delta_y);
-  }
-  if (placed)
-    return new Point(place_x, place_y);
-  else
-    return NULL; // fall back to cascade
+  if (best != NULL) {
+    Point *pt = new Point(best->origin());
+    if (screen.colPlacementDirection() != BScreen::TopBottom)
+      pt->setY(best->y() + best->h() - win_size.h());
+    if (screen.rowPlacementDirection() != BScreen::LeftRight)
+      pt->setX(best->x()+best->w()-win_size.w());
+    return pt;
+  } else
+    return NULL; //fall back to cascade
 }
 
 Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
-  Point *pt;
-  bool placed=false;
-  int test_x, test_y;
-  int start_pos = 0;
-  int change_y =
-    ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
-  int change_x =
-    ((screen.rowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
-  int delta_x = 8, delta_y = 8;
+  const Rect *best;
+  rectList spaces;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  test_x = (screen.rowPlacementDirection() == BScreen::LeftRight) ?
-    start_pos : screen.size().w() - win_size.w() - start_pos;
-
-  while(!placed &&
-        ((screen.rowPlacementDirection() == BScreen::RightLeft) ?
-         test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
-    test_y = (screen.colPlacementDirection() == BScreen::TopBottom) ?
-      start_pos : screen.size().h() - win_size.h() - start_pos;
-
-    while(!placed &&
-          ((screen.colPlacementDirection() == BScreen::BottomTop) ?
-           test_y > 0 : test_y + win_size.h() < (signed) space.h())){
-
-      placed = true;
-
-      it.reset();
-      for (OpenboxWindow *curr = it.current(); placed && curr;
-           it++, curr = it.current()) {
-        int curr_w = curr->area().w() + (screen.getBorderWidth() * 4);
-        int curr_h = curr->area().h() + (screen.getBorderWidth() * 4);
-
-        if (curr->area().x() < test_x + win_size.w() &&
-            curr->area().x() + curr_w > test_x &&
-            curr->area().y() < test_y + win_size.h() &&
-            curr->area().y() + curr_h > test_y) {
-          placed = False;
-        }
-      }
-
-      // Removed code checking for intersection with Toolbar and Slit
-      // The space passed to this method should not include either
-
-      if (placed) {
-        pt= new Point(test_x,test_y);
-
-        break;
-      }
-
-      test_y += (change_y * delta_y);
+  rectList::const_iterator siter;
+  spaces.push_back(space); //initially the entire screen is free
+  it.reset();
+  
+  //Find Free Spaces
+  for (OpenboxWindow *cur=it.current(); cur!=NULL; it++, cur=it.current())
+     spaces = calcSpace(cur->area().Inflate(screen.getBorderWidth() * 4),
+                        spaces);
+  //Sort spaces by user preference
+  if(screen.colPlacementDirection() == BScreen::TopBottom)
+     if(screen.rowPlacementDirection() == BScreen::LeftRight)
+        sort(spaces.begin(),spaces.end(),colLRTB);
+     else
+        sort(spaces.begin(),spaces.end(),colRLTB);
+  else
+     if(screen.rowPlacementDirection() == BScreen::LeftRight)
+        sort(spaces.begin(),spaces.end(),colLRBT);
+     else
+        sort(spaces.begin(),spaces.end(),colRLBT);
+  fprintf(stderr,"Spaces after sorting\n");
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
+     fprintf(stderr,"space(%d,%d)(%d,%d)\n",siter->x(),siter->y(),
+             siter->x()+siter->w(),siter->y()+siter->h());
+  //Find first space that fits the window
+  best = NULL;
+  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
+    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
+      best = siter;
+      break;
     }
 
-    test_x += (change_x * delta_x);
-  }
-  if (placed)
+  if (best != NULL) {
+    Point *pt = new Point(best->origin());
+    if (screen.colPlacementDirection() != BScreen::TopBottom)
+      pt->setY(pt->y() + (best->h() - win_size.h()));
+    if (screen.rowPlacementDirection() != BScreen::LeftRight)
+      pt->setX(pt->x() + (best->w() - win_size.w()));
     return pt;
-  else
-    return NULL;
+  } else
+    return NULL; //fall back to cascade
 }
 
 

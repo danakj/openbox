@@ -705,6 +705,11 @@ ActionString actionstrings[] =
         NULL
     },
     {
+        "flash",
+        action_flash,
+        NULL
+    },
+    {
         NULL,
         NULL,
         NULL
@@ -1267,4 +1272,10 @@ void action_vibrate(union ActionData *data)
             x += 1;
         }
     }
+}
+
+void action_flash(union ActionData *data)
+{
+    if (!data->client.any.c) return;
+    frame_flash(data->client.any.c->frame);
 }

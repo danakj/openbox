@@ -2,7 +2,6 @@
 #define __widget_hh
 
 #include "basewidget.hh"
-#include "eventdispatcher.hh"
 
 extern "C" {
 #include <assert.h>
@@ -10,7 +9,7 @@ extern "C" {
 
 namespace otk {
 
-class OtkWidget : public OtkBaseWidget, public OtkEventHandler {
+class OtkWidget : public OtkBaseWidget {
 
 public:
 
@@ -24,9 +23,6 @@ public:
   virtual ~OtkWidget();
 
   virtual void update(void);
-
-  void exposeHandler(const XExposeEvent &e);
-  void configureHandler(const XConfigureEvent &e);
 
   inline bool isStretchableHorz(void) const { return _stretchable_horz; }
   void setStretchableHorz(bool s_horz = true) { _stretchable_horz = s_horz; }

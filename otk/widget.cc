@@ -12,7 +12,6 @@ namespace otk {
 
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   : OtkBaseWidget(parent),
-    OtkEventHandler(),
     _direction(direction), _stretchable_vert(false), _stretchable_horz(false),
     _event_dispatcher(parent->getEventDispatcher())
 {
@@ -23,7 +22,6 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
 OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
                      Direction direction, Cursor cursor, int bevel_width)
   : OtkBaseWidget(style, cursor, bevel_width),
-    OtkEventHandler(),
     _direction(direction), _stretchable_vert(false), _stretchable_horz(false),
     _event_dispatcher(event_dispatcher)
 {
@@ -186,25 +184,5 @@ void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
   _event_dispatcher->registerHandler(_window, this);
 }
 
-void OtkWidget::exposeHandler(const XExposeEvent &e)
-{
-  OtkEventHandler::exposeHandler(e);
-  _dirty = true;
-  update();
-}
-
-void OtkWidget::configureHandler(const XConfigureEvent &e)
-{
-  OtkEventHandler::configureHandler(e);
-  if (_ignore_config) {
-    _ignore_config--;
-  } else {
-    if (!(e.width == _rect.width() && e.height == _rect.height())) {
-      _dirty = true;
-      _rect.setSize(e.width, e.height);
-    }
-    update();
-  }
-}
 
 }

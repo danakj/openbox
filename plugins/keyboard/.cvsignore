@@ -1,7 +1,0 @@
-keyboard.la
-.libs
-.deps
-.dirstamp
-plugins_keyboard_keyboard_la-keyboard.lo
-plugins_keyboard_keyboard_la-translate.lo
-plugins_keyboard_keyboard_la-tree.lo

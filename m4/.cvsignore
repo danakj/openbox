@@ -15,3 +15,5 @@ progtest.m4
 stdint_h.m4
 uintmax_t.m4
 ulonglong.m4
+Makefile
+Makefile.in

@@ -171,7 +171,8 @@ static void do_move(gboolean resist)
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
     client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
-                     start_cw, start_ch, TRUE, FALSE);
+                     moveresize_client->area.width,
+                     moveresize_client->area.height, TRUE, FALSE);
 }
 
 static void do_resize(gboolean resist)

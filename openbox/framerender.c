@@ -228,6 +228,10 @@ void framerender_popup_label(Window win, Size *sz, char *text)
     a->texture[0].data.text.string = text;
     RECT_SET(a->area, 0, 0, sz->width, sz->height);
     a->texture[0].position = a->area;
+    a->texture[0].position.x += theme_bevel;
+    a->texture[0].position.y += theme_bevel;
+    a->texture[0].position.width -= theme_bevel * 2;
+    a->texture[0].position.height -= theme_bevel * 2;
 
     XSetWindowBorderWidth(ob_display, win, theme_bwidth);
     XSetWindowBorder(ob_display, win, theme_b_color->pixel);

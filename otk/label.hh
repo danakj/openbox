@@ -14,6 +14,7 @@ namespace otk {
 class Label : public Widget {
 
 public:
+  Label(int screen, EventDispatcher *ed, int bevel = 3);
   Label(Widget *parent);
   virtual ~Label();
 

@@ -39,8 +39,8 @@ config:
   ;
 
 fields:
-  FIELD { $$ = g_list_prepend(NULL, $1); }
-  | fields FIELD { $$ = g_list_prepend($1, $2); }
+  FIELD { $$ = g_list_append(NULL, $1); }
+  | fields FIELD { $$ = g_list_append($1, $2); }
   ;
 
 %%

@@ -42,10 +42,10 @@ public:
     close, //done
     toggleshade, //done
     toggleomnipresent, //done
-    moveWindowUp,
-    moveWindowDown,
-    moveWindowLeft,
-    moveWindowRight,
+    moveWindowUp, //done
+    moveWindowDown, //done
+    moveWindowLeft, //done
+    moveWindowRight, //done
 
     toggleMaximizeFull,
     toggleMaximizeVertical,

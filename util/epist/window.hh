@@ -62,6 +62,8 @@ private:
   void updateTitle();
   void updateClass();
 
+  void findFramePosition(int &x, int &y) const;
+
 public:
   XWindow(epist *epist, screen *screen, Window window);
   virtual ~XWindow();
@@ -87,6 +89,7 @@ public:
   void iconify() const;
   void focus() const;
   void sendTo(unsigned int dest) const;
+  void move(int x, int y) const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

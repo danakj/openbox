@@ -141,7 +141,106 @@ void XWindow::processEvent(const XEvent &e) {
     break;
   }
 }
+
+
+void XWindow::findFramePosition(int &x, int &y) const {
+  Window win = _window, parent, root, last = None;
+  Window *children = 0;
+  unsigned int nchildren;
+  int gravity, top, bottom, left, right;
+  XWindowAttributes wattr;
+  XSizeHints size;
+  long ret;
+  unsigned int cwidth, cheight;
   
+  // get the location, size and gravity of the client window
+  if (! XGetWindowAttributes(_epist->getXDisplay(), _window, &wattr)) return;
+  cwidth = wattr.width;
+  cheight = wattr.height;
+  if (! XGetWMNormalHints(_epist->getXDisplay(), _window, &size, &ret)) return;
+  if (size.flags & PWinGravity)
+    gravity = size.win_gravity;
+  else
+    gravity = NorthWestGravity;
+    
+  while (XQueryTree(_epist->getXDisplay(), win, &root, &parent, &children,
+                    &nchildren)) {
+    if (children && nchildren > 0)
+      XFree(children); // don't care about the children
+
+    if (! parent) // no parent!?
+      return;
+
+    // if the parent window is the root window, stop here
+    if (parent == root)
+      break;
+
+    last = win;
+    win = parent;
+  }
+
+  if (! (XTranslateCoordinates(_epist->getXDisplay(), last, win, 0, 0,
+                               &left, &top, &parent) &&
+         XGetWindowAttributes(_epist->getXDisplay(), win, &wattr)))
+    return;
+
+  right = wattr.width - cwidth - left;
+  bottom = wattr.height - cheight - top;
+
+  left += wattr.border_width;
+  right += wattr.border_width;
+  top += wattr.border_width;
+  bottom += wattr.border_width;
+
+  // find the client's location
+  x = wattr.x + left;
+  y = wattr.y + top;
+
+  // this makes things work. why? i don't know. but you need them.
+  right -= 2;
+  bottom -= 2;
+
+  // find the frame's reference position based on the window's gravity
+  switch (gravity) {
+  case NorthWestGravity:
+    x -= left;
+    y -= top;
+    break;
+  case NorthGravity:
+    x += (left + right) / 2;
+    y -= top;
+    break;
+  case NorthEastGravity:
+    x += right;
+    y -= top;
+  case WestGravity:
+    x -= left;
+    y += (top + bottom) / 2;
+    break;
+  case CenterGravity:
+    x += (left + right) / 2;
+    y += (top + bottom) / 2;
+    break;
+  case EastGravity:
+    x += right;
+    y += (top + bottom) / 2;
+  case SouthWestGravity:
+    x -= left;
+    y += bottom;
+    break;
+  case SouthGravity:
+    x += (left + right) / 2;
+    y += bottom;
+    break;
+  case SouthEastGravity:
+    x += right;
+    y += bottom;
+    break;
+  default:
+    break;
+  }
+}
+
 
 void XWindow::shade(const bool sh) const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
@@ -182,4 +281,11 @@ void XWindow::focus() const {
 void XWindow::sendTo(unsigned int dest) const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_wm_desktop,
                             _window, dest);
+}
+
+
+void XWindow::move(int x, int y) const {
+  int fx, fy;
+  findFramePosition(fx, fy);
+  XMoveWindow(_epist->getXDisplay(), _window, fx + x, fy + y);
 }

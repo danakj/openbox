@@ -245,6 +245,22 @@ void screen::handleKeypress(const XEvent &e) {
             window->sendTo(0xffffffff);
           return;
 
+        case Action::moveWindowUp:
+          window->move(0, -it->number());
+          return;
+      
+        case Action::moveWindowDown:
+          window->move(0, it->number());
+          return;
+      
+        case Action::moveWindowLeft:
+          window->move(-it->number(), 0);
+          return;
+      
+        case Action::moveWindowRight:
+          window->move(it->number(), 0);
+          return;
+      
         case Action::toggleshade:
           window->shade(! window->shaded());
           return;

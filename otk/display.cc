@@ -158,6 +158,11 @@ void OBDisplay::destroy()
 }
 
 
+const ScreenInfo* OBDisplay::screenInfo(int snum) {
+  assert(snum >= 0);
+  assert(snum < static_cast<int>(_screenInfoList.size()));
+  return &_screenInfoList[snum];
+}
 
 
 

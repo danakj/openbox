@@ -22,7 +22,7 @@ extern "C" {
 namespace ob {
 
 // forward declaration
-class TimerQueueManager;
+class OBTimerQueueManager;
 
 class TimeoutHandler {
 public:
@@ -31,7 +31,7 @@ public:
 
 class BTimer {
 private:
-  TimerQueueManager *manager;
+  OBTimerQueueManager *manager;
   TimeoutHandler *handler;
   bool timing, recur;
 
@@ -41,7 +41,7 @@ private:
   BTimer& operator=(const BTimer&);
 
 public:
-  BTimer(TimerQueueManager *m, TimeoutHandler *h);
+  BTimer(OBTimerQueueManager *m, TimeoutHandler *h);
   virtual ~BTimer(void);
 
   void fireTimeout(void);
@@ -102,10 +102,17 @@ struct TimerLessThan {
 
 typedef _timer_queue<BTimer*, std::vector<BTimer*>, TimerLessThan> TimerQueue;
 
-class TimerQueueManager {
+class OBTimerQueueManager {
+private:
+  TimerQueue timerList;
 public:
-  virtual void addTimer(BTimer* timer) = 0;
-  virtual void removeTimer(BTimer* timer) = 0;
+  OBTimerQueueManager() {}
+  virtual ~OBTimerQueueManager() {}
+  
+  virtual void go();
+  
+  virtual void addTimer(BTimer* timer);
+  virtual void removeTimer(BTimer* timer);
 };
 
 }

@@ -4,12 +4,13 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
+#include "otk/display.hh"
 #include "timer.hh"
 #include "util.hh"
 
 namespace ob {
 
-BTimer::BTimer(TimerQueueManager *m, TimeoutHandler *h) {
+BTimer::BTimer(OBTimerQueueManager *m, TimeoutHandler *h) {
   manager = m;
   handler = h;
 
@@ -88,6 +89,62 @@ bool BTimer::shouldFire(const timeval &tm) const {
 
   return ! ((tm.tv_sec < end.tv_sec) ||
             (tm.tv_sec == end.tv_sec && tm.tv_usec < end.tv_usec));
+}
+
+
+void OBTimerQueueManager::go()
+{
+  fd_set rfds;
+  timeval now, tm, *timeout = (timeval *) 0;
+
+  const int xfd = ConnectionNumber(otk::OBDisplay::display);
+  
+  FD_ZERO(&rfds);
+  FD_SET(xfd, &rfds); // break on any x events
+
+  if (! timerList.empty()) {
+    const BTimer* const timer = timerList.top();
+
+    gettimeofday(&now, 0);
+    tm = timer->timeRemaining(now);
+
+    timeout = &tm;
+  }
+
+  select(xfd + 1, &rfds, 0, 0, timeout);
+
+  // check for timer timeout
+  gettimeofday(&now, 0);
+
+  // there is a small chance for deadlock here:
+  // *IF* the timer list keeps getting refreshed *AND* the time between
+  // timer->start() and timer->shouldFire() is within the timer's period
+  // then the timer will keep firing.  This should be VERY near impossible.
+  while (! timerList.empty()) {
+    BTimer *timer = timerList.top();
+    if (! timer->shouldFire(now))
+      break;
+
+    timerList.pop();
+
+    timer->fireTimeout();
+    timer->halt();
+    if (timer->isRecurring())
+      timer->start();
+  }
+}
+
+
+void OBTimerQueueManager::addTimer(BTimer *timer)
+{
+  assert(timer);
+  timerList.push(timer);
+}
+
+void OBTimerQueueManager::removeTimer(BTimer* timer)
+{
+  assert(timer);
+  timerList.release(timer);
 }
 
 }

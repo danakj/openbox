@@ -50,11 +50,7 @@ public:
     \param snum The screen number of the screen to retrieve info on
     \return Info on the requested screen, in a ScreenInfo class
   */
-  inline static const ScreenInfo* screenInfo(int snum) {
-    assert(snum >= 0);
-    assert(snum < static_cast<int>(_screenInfoList.size()));
-    return &_screenInfoList[snum];
-  }
+  static const ScreenInfo* screenInfo(int snum);
 
   //! Returns if the display has the shape extention available
   inline static bool shape() { return _shape; }

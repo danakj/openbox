@@ -10,7 +10,7 @@ namespace otk {
 class OtkEventHandler{
 public:
   //! Dispatches events to one of the other handlers based on their type.
-  int handle(const XEvent &e);
+  virtual int handle(const XEvent &e);
 
   //! Called whenever any key is pressed.
   virtual int keyPressHandler(const XKeyEvent &) {return 1;}

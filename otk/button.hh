@@ -39,6 +39,8 @@ public:
   void update(void);
   int exposeHandler(const XExposeEvent &e);
   int configureHandler(const XConfigureEvent &e);
+  int buttonPressHandler(const XButtonEvent &e);
+  int buttonReleaseHandler(const XButtonEvent &e);
 
 private:
 

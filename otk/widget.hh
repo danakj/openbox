@@ -96,6 +96,10 @@ public:
   inline Style *getStyle(void) const { return _style; }
   void setStyle(Style *style) { _style = style; }
 
+  inline OtkEventDispatcher *getEventDispatcher(void)
+  { return _event_dispatcher; }
+  void setEventDispatcher(OtkEventDispatcher *disp);
+
 private:
 
   void create(void);
@@ -136,6 +140,8 @@ private:
   bool _fixed_height;
 
   bool _dirty;
+
+  OtkEventDispatcher *_event_dispatcher;
 };
 
 }

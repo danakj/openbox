@@ -1,9 +1,11 @@
 #include "eventdispatcher.hh"
 #include "display.hh"
+#include <iostream>
 
 namespace otk {
 
 OtkEventDispatcher::OtkEventDispatcher()
+  : _fallback(0)
 {
 }
 

@@ -123,6 +123,11 @@ public:
   inline unsigned int getBorderWidth(void) const { return border_width; }
 
   inline const BFont &getFont() const { return *font; }
+
+  inline void setShadowFonts(bool fonts) { shadow_fonts = fonts; }
+  inline bool hasShadowFonts(void) const { return shadow_fonts; }
+
+  inline void setAAFonts(bool fonts) { aa_fonts = fonts; }
   inline bool hasAAFonts(void) const { return aa_fonts; }
 
   inline TextJustify textJustify(void) { return justify; }

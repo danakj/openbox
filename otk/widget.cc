@@ -17,10 +17,11 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
     _screen(parent->getScreen()), _fixed_width(false), _fixed_height(false),
-    _dirty(false)
+    _dirty(false), _event_dispatcher(parent->getEventDispatcher())
 {
   parent->addChild(this);
   create();
+  _event_dispatcher->registerHandler(_window, this);
 }
 
 OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
@@ -31,11 +32,12 @@ OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
     _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _screen(app->getStyle()->getScreen()),
-    _fixed_width(false), _fixed_height(false), _dirty(false)
+    _fixed_width(false), _fixed_height(false), _dirty(false),
+    _event_dispatcher(app)
 {
   assert(app);
   create();
-  app->registerHandler(_window, this);
+  _event_dispatcher->registerHandler(_window, this);
 }
 
 OtkWidget::OtkWidget(Style *style, Direction direction,
@@ -413,6 +415,14 @@ void OtkWidget::removeChild(OtkWidget *child)
     _children.erase(it);
 }
 
+void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
+{
+  if (_event_dispatcher)
+    _event_dispatcher->clearHandler(_window);
+  _event_dispatcher = disp;
+  _event_dispatcher->registerHandler(_window, this);
+}
+
 int OtkWidget::exposeHandler(const XExposeEvent &e)
 {
   OtkEventHandler::exposeHandler(e);
@@ -420,11 +430,6 @@ int OtkWidget::exposeHandler(const XExposeEvent &e)
     _dirty = true;
     update();
     return true;
-  } else {
-    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
-    for (; it != end; ++it)
-      if ((*it)->exposeHandler(e))
-        return true;
   }
   return false;
 }
@@ -436,7 +441,6 @@ int OtkWidget::configureHandler(const XConfigureEvent &e)
     if (_ignore_config) {
       _ignore_config--;
     } else {
-      std::cout << "configure\n";
       if (!(e.width == _rect.width() && e.height == _rect.height())) {
         _dirty = true;
         _rect.setSize(e.width, e.height);
@@ -444,12 +448,8 @@ int OtkWidget::configureHandler(const XConfigureEvent &e)
       update();
     }
     return true;
-  } else {
-    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
-    for (; it != end; ++it)
-      if ((*it)->configureHandler(e))
-        return true;
   }
+
   return false;
 }
 

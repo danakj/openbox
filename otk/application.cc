@@ -1,6 +1,8 @@
 #include "application.hh"
 #include "eventhandler.hh"
 
+#include <iostream>
+
 namespace otk {
 
 OtkApplication::OtkApplication(int argc, char **argv)
@@ -35,12 +37,23 @@ void OtkApplication::loadStyle(void)
   // find the style name as a property
   _style_conf->setFile("/usr/local/share/openbox/styles/artwiz");
   _style_conf->load();
-  _style->load(_style_conf);
+  _style->load(*_style_conf);
 }
 
 void OtkApplication::exec(void)
 {
-  dispatchEvents();
+  const int xfd = ConnectionNumber(OBDisplay::display);
+  fd_set rfds;
+  timeval *timeout = 0;
+
+  while (1) {
+    dispatchEvents();
+
+    FD_ZERO(&rfds);
+    FD_SET(xfd, &rfds);
+
+    select(xfd + 1, &rfds, 0, 0, timeout);
+  }
 }
 
 }

@@ -3,8 +3,9 @@
 #endif // HAVE_CONFIG_H
 
 #include <assert.h>
-#include "display.hh"
+#include <iostream>
 
+#include "display.hh"
 #include "util.hh"
 #include "style.hh"
 
@@ -256,7 +257,7 @@ BColor Style::readDatabaseColor(const std::string &rname,
 
 
 BFont *Style::readDatabaseFont(const std::string &rbasename,
-                                    const Configuration &style) {
+                               const Configuration &style) {
   std::string fontname;
 
   std::string s;

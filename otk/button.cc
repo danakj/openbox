@@ -1,3 +1,4 @@
+#include <iostream>
 #include "button.hh"
 
 namespace otk {
@@ -64,6 +65,22 @@ void OtkButton::update(void)
     OtkFocusWidget::update();
 
   _dirty = false;
+}
+
+int OtkButton::buttonPressHandler(const XButtonEvent &e)
+{
+  press();
+  _dirty = true;
+  update();
+  return OtkFocusWidget::buttonPressHandler(e);
+}
+
+int OtkButton::buttonReleaseHandler(const XButtonEvent &e)
+{
+  release();
+  _dirty = true;
+  update();
+  return OtkFocusWidget::buttonReleaseHandler(e);
 }
 
 int OtkButton::exposeHandler(const XExposeEvent &e)

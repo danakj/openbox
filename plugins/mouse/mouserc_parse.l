@@ -63,7 +63,7 @@ static void endofline()
 
 static void addbinding()
 {
-    Action *a;
+    Action *a = NULL;
     MouseAction mact;
 
     if (!g_ascii_strcasecmp(event, "press"))
@@ -82,107 +82,112 @@ static void addbinding()
         return;
     }
 
-    if (!g_ascii_strcasecmp(action, "focus")) {
-        a = action_new(action_focus);
-    } else if (!g_ascii_strcasecmp(action, "unfocus")) {
-        a = action_new(action_unfocus);
-    } else if (!g_ascii_strcasecmp(action, "iconify")) {
-        a = action_new(action_iconify);
-    } else if (!g_ascii_strcasecmp(action, "raise")) {
-        a = action_new(action_raise);
-    } else if (!g_ascii_strcasecmp(action, "lower")) {
-        a = action_new(action_lower);
-    } else if (!g_ascii_strcasecmp(action, "focusraise")) {
-        a = action_new(action_focusraise);
-    } else if (!g_ascii_strcasecmp(action, "close")) {
-        a = action_new(action_close);
-    } else if (!g_ascii_strcasecmp(action, "kill")) {
-        a = action_new(action_kill);
-    } else if (!g_ascii_strcasecmp(action, "shade")) {
-        a = action_new(action_shade);
-    } else if (!g_ascii_strcasecmp(action, "unshade")) {
-        a = action_new(action_unshade);
-    } else if (!g_ascii_strcasecmp(action, "toggleshade")) {
-        a = action_new(action_toggle_shade);
-    } else if (!g_ascii_strcasecmp(action, "toggleomnipresent")) {
-        a = action_new(action_toggle_omnipresent);
-    } else if (!g_ascii_strcasecmp(action, "maximizefull")) {
-        a = action_new(action_maximize_full);
-    } else if (!g_ascii_strcasecmp(action, "unmaximizefull")) {
-        a = action_new(action_unmaximize_full);
-    } else if (!g_ascii_strcasecmp(action, "togglemaximizefull")) {
-        a = action_new(action_toggle_maximize_full);
-    } else if (!g_ascii_strcasecmp(action, "maximizehorz")) {
-        a = action_new(action_maximize_horz);
-    } else if (!g_ascii_strcasecmp(action, "unmaximizehorz")) {
-        a = action_new(action_unmaximize_horz);
-    } else if (!g_ascii_strcasecmp(action, "togglemaximizehorz")) {
-        a = action_new(action_toggle_maximize_horz);
-    } else if (!g_ascii_strcasecmp(action, "maximizevert")) {
-        a = action_new(action_maximize_vert);
-    } else if (!g_ascii_strcasecmp(action, "unmaximizevert")) {
-        a = action_new(action_unmaximize_vert);
-    } else if (!g_ascii_strcasecmp(action, "togglemaximizevert")) {
-        a = action_new(action_toggle_maximize_vert);
-    } else if (!g_ascii_strcasecmp(action, "sendtonextdesktop")) {
-        a = action_new(action_send_to_next_desktop);
-        a->data.sendtonextprev.wrap = FALSE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "sendtonextdesktopwrap")) {
-        a = action_new(action_send_to_next_desktop);
-        a->data.sendtonextprev.wrap = TRUE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "sendtopreviousdesktop")) {
-        a = action_new(action_send_to_previous_desktop);
-        a->data.sendtonextprev.wrap = FALSE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "sendtopreviousdesktopwrap")) {
-        a = action_new(action_send_to_previous_desktop);
-        a->data.sendtonextprev.wrap = TRUE;
-        a->data.sendtonextprev.follow = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktop")) {
-        a = action_new(action_next_desktop);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktopwrap")) {
-        a = action_new(action_next_desktop);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktop")) {
-        a = action_new(action_previous_desktop);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktopwrap")) {
-        a = action_new(action_previous_desktop);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktopcolumn")) {
-        a = action_new(action_next_desktop_column);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktopcolumnwrap")) {
-        a = action_new(action_next_desktop_column);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktopcolumn")) {
-        a = action_new(action_previous_desktop_column);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktopcolumnwrap")) {
-        a = action_new(action_previous_desktop_column);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktoprow")) {
-        a = action_new(action_next_desktop_row);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "nextdesktoprowwrap")) {
-        a = action_new(action_next_desktop_row);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktoprow")) {
-        a = action_new(action_previous_desktop_row);
-        a->data.nextprevdesktop.wrap = FALSE;
-    } else if (!g_ascii_strcasecmp(action, "previousdesktoprowwrap")) {
-        a = action_new(action_previous_desktop_row);
-        a->data.nextprevdesktop.wrap = TRUE;
-    } else if (!g_ascii_strcasecmp(action, "move") &&
-               mact == MouseAction_Motion) {
-        a = action_new(action_move);
-    } else if (!g_ascii_strcasecmp(action, "resize") &&
-               mact == MouseAction_Motion) {
-        a = action_new(action_resize);
+    if (mact == MouseAction_Motion) {
+        if (!g_ascii_strcasecmp(action, "move") &&
+            mact == MouseAction_Motion) {
+            a = action_new(action_move);
+        } else if (!g_ascii_strcasecmp(action, "resize") &&
+                   mact == MouseAction_Motion) {
+            a = action_new(action_resize);
+        }
     } else {
+        if (!g_ascii_strcasecmp(action, "focus")) {
+            a = action_new(action_focus);
+        } else if (!g_ascii_strcasecmp(action, "unfocus")) {
+            a = action_new(action_unfocus);
+        } else if (!g_ascii_strcasecmp(action, "iconify")) {
+            a = action_new(action_iconify);
+        } else if (!g_ascii_strcasecmp(action, "raise")) {
+            a = action_new(action_raise);
+        } else if (!g_ascii_strcasecmp(action, "lower")) {
+            a = action_new(action_lower);
+        } else if (!g_ascii_strcasecmp(action, "focusraise")) {
+            a = action_new(action_focusraise);
+        } else if (!g_ascii_strcasecmp(action, "close")) {
+            a = action_new(action_close);
+        } else if (!g_ascii_strcasecmp(action, "kill")) {
+            a = action_new(action_kill);
+        } else if (!g_ascii_strcasecmp(action, "shade")) {
+            a = action_new(action_shade);
+        } else if (!g_ascii_strcasecmp(action, "unshade")) {
+            a = action_new(action_unshade);
+        } else if (!g_ascii_strcasecmp(action, "toggleshade")) {
+            a = action_new(action_toggle_shade);
+        } else if (!g_ascii_strcasecmp(action, "toggleomnipresent")) {
+            a = action_new(action_toggle_omnipresent);
+        } else if (!g_ascii_strcasecmp(action, "maximizefull")) {
+            a = action_new(action_maximize_full);
+        } else if (!g_ascii_strcasecmp(action, "unmaximizefull")) {
+            a = action_new(action_unmaximize_full);
+        } else if (!g_ascii_strcasecmp(action, "togglemaximizefull")) {
+            a = action_new(action_toggle_maximize_full);
+        } else if (!g_ascii_strcasecmp(action, "maximizehorz")) {
+            a = action_new(action_maximize_horz);
+        } else if (!g_ascii_strcasecmp(action, "unmaximizehorz")) {
+            a = action_new(action_unmaximize_horz);
+        } else if (!g_ascii_strcasecmp(action, "togglemaximizehorz")) {
+            a = action_new(action_toggle_maximize_horz);
+        } else if (!g_ascii_strcasecmp(action, "maximizevert")) {
+            a = action_new(action_maximize_vert);
+        } else if (!g_ascii_strcasecmp(action, "unmaximizevert")) {
+            a = action_new(action_unmaximize_vert);
+        } else if (!g_ascii_strcasecmp(action, "togglemaximizevert")) {
+            a = action_new(action_toggle_maximize_vert);
+        } else if (!g_ascii_strcasecmp(action, "sendtonextdesktop")) {
+            a = action_new(action_send_to_next_desktop);
+            a->data.sendtonextprev.wrap = FALSE;
+            a->data.sendtonextprev.follow = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "sendtonextdesktopwrap")) {
+            a = action_new(action_send_to_next_desktop);
+            a->data.sendtonextprev.wrap = TRUE;
+            a->data.sendtonextprev.follow = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "sendtopreviousdesktop")) {
+            a = action_new(action_send_to_previous_desktop);
+            a->data.sendtonextprev.wrap = FALSE;
+            a->data.sendtonextprev.follow = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "sendtopreviousdesktopwrap")) {
+            a = action_new(action_send_to_previous_desktop);
+            a->data.sendtonextprev.wrap = TRUE;
+            a->data.sendtonextprev.follow = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktop")) {
+            a = action_new(action_next_desktop);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktopwrap")) {
+            a = action_new(action_next_desktop);
+            a->data.nextprevdesktop.wrap = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktop")) {
+            a = action_new(action_previous_desktop);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktopwrap")) {
+            a = action_new(action_previous_desktop);
+            a->data.nextprevdesktop.wrap = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktopcolumn")) {
+            a = action_new(action_next_desktop_column);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktopcolumnwrap")) {
+            a = action_new(action_next_desktop_column);
+            a->data.nextprevdesktop.wrap = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktopcolumn")) {
+            a = action_new(action_previous_desktop_column);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktopcolumnwrap")) {
+            a = action_new(action_previous_desktop_column);
+            a->data.nextprevdesktop.wrap = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktoprow")) {
+            a = action_new(action_next_desktop_row);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "nextdesktoprowwrap")) {
+            a = action_new(action_next_desktop_row);
+            a->data.nextprevdesktop.wrap = TRUE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktoprow")) {
+            a = action_new(action_previous_desktop_row);
+            a->data.nextprevdesktop.wrap = FALSE;
+        } else if (!g_ascii_strcasecmp(action, "previousdesktoprowwrap")) {
+            a = action_new(action_previous_desktop_row);
+            a->data.nextprevdesktop.wrap = TRUE;
+        }
+    }
+    if (a == NULL) {
         g_warning("Invalid action '%s' in '%s' on line %d", action, path,
                   lineno);
         return;

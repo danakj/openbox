@@ -35,6 +35,9 @@ AC_SUBST(GMODULE_LIBS)
 AC_PATH_PROG([FLEX], [flex])
 test "$FLEX" || AC_MSG_ERROR([flex not found])
 
+AC_PATH_PROG([YACC], [yacc])
+test "YACC" || AC_MSG_ERROR([yacc not found])
+
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_PROG_INSTALL

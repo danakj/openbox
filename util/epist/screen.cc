@@ -59,6 +59,7 @@ screen::screen(epist *epist, int number)
   _number = number;
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
+  _grabbed = true;
 
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -151,8 +152,9 @@ void screen::handleKeypress(const XEvent &e) {
   // Mask out the lock modifiers. We want our keys to always work
   // This should be made an option
   unsigned int state = e.xkey.state & ~(LockMask|scrolllockMask|numlockMask);
-  const Action *it = _epist->getKeyTree().getAction(e, state, this);
-  
+  keytree &ktree = _epist->getKeyTree();
+  const Action *it = ktree.getAction(e, state, this);
+
   if (!it)
     return;
 
@@ -251,6 +253,17 @@ void screen::handleKeypress(const XEvent &e) {
     _xatom->sendClientMessage(rootWindow(), XAtom::openbox_show_workspace_menu,
                               None);
     return;
+
+  case Action::toggleGrabs: {
+    if (_grabbed) {
+      ktree.ungrabDefaults(this);
+      _grabbed = false;
+    } else {
+      ktree.grabDefaults(this);
+      _grabbed = true;
+    }
+    return;
+  }
 
   default:
     break;

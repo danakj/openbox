@@ -102,6 +102,7 @@ void parser::setAction(string act)
     { "showrootmenu", Action::showRootMenu },
     { "showworkspacemenu", Action::showWorkspaceMenu },
     { "toggledecorations", Action::toggleDecorations },
+    { "togglegrabs", Action::toggleGrabs },
     { "stringchain", Action::stringChain },
     { "keychain", Action::keyChain },
     { "numberchain", Action::numberChain },

@@ -53,6 +53,7 @@ class screen {
   unsigned int _num_desktops;
 
   bool _managed;
+  bool _grabbed; // used for keygrab toggle function
 
   XWindow *findWindow(const XEvent &e) const;
   void updateNumDesktops();

@@ -82,7 +82,7 @@ void keytree::ungrabDefaults(screen *scr)
 {
   ChildList::const_iterator it, end = _head->children.end();
   for (it = _head->children.begin(); it != end; ++it)
-    if ( (*it)->action )
+    if ( (*it)->action && (*it)->action->type() != Action::toggleGrabs)
       scr->ungrabKey( (*it)->action->keycode(), (*it)->action->modifierMask() );
 }
 
@@ -175,6 +175,14 @@ void keytree::addAction(Action::ActionType action, unsigned int mask,
                         string key, string arg)
 {
   keynode *tmp = new keynode;
+
+  if (action == Action::toggleGrabs && _current != _head) {
+    // the toggleGrabs key can only be set up as a root key, since if
+    // it was a chain key, we'd have to not ungrab the whole chain up
+    // to that key. which kinda defeats the purpose of this function.
+    return;
+  }
+
   tmp->action = new Action(action,
                            XKeysymToKeycode(_display,
                                             XStringToKeysym(key.c_str())),

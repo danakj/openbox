@@ -89,6 +89,7 @@ public:
     showWorkspaceMenu,
     toggleDecorations,
 
+    toggleGrabs,
     stringChain, 
     keyChain,
     numberChain,

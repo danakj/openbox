@@ -67,28 +67,28 @@
     <action name="ToggleShade"/>
   </keybind>
   <keybind key="C-A-Left">
-    <action name="DesktopLeft"/>
+    <action name="DesktopLeft"><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Right">
-    <action name="DesktopRight"/>
+    <action name="DesktopRight"><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Up">
-    <action name="DesktopUp"/>
+    <action name="DesktopUp"><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-Down">
-    <action name="DesktopDown"/>
+    <action name="DesktopDown"><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Left">
-    <action name="SendToDesktopLeft"/>
+    <action name="SendToDesktopLeft"><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Right">
-    <action name="SendToDesktopRight"/>
+    <action name="SendToDesktopRight"><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Up">
-    <action name="SendToDesktopUp"/>
+    <action name="SendToDesktopUp"><wrap>no</wrap></action>
   </keybind>
   <keybind key="S-A-Down">
-    <action name="SendToDesktopDown"/>
+    <action name="SendToDesktopDown"><wrap>no</wrap></action>
   </keybind>
   <keybind key="C-A-d">
     <action name="ToggleShowDesktop"/>

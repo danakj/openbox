@@ -41,7 +41,7 @@ extern "C" {
 #  include <unistd.h>
 #endif // HAVE_UNISTD_H
 
-#include "gettext.h"
+#include "../src/gettext.h"
 #define _(str) gettext(str)
 }
 

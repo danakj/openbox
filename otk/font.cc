@@ -24,7 +24,7 @@ extern "C" {
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#include "gettext.h"
+#include "../src/gettext.h"
 #define _(str) gettext(str)
 }
 

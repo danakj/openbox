@@ -27,7 +27,7 @@ extern "C" {
 #  include <process.h>
 #endif //   HAVE_PROCESS_H             __EMX__
 
-#include "gettext.h"
+#include "../src/gettext.h"
 #define _(str) gettext(str)
 
 #include <assert.h>

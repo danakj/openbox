@@ -15,7 +15,7 @@ extern "C" {
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
 
-#include "gettext.h"
+#include "../src/gettext.h"
 #define _(str) gettext(str)
 }
 

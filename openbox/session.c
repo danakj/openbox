@@ -92,17 +92,10 @@ static void save_commands()
         prop_res.vals[i].length = strlen(sm_argv[i]);
     }
 
-    if (save_file) {
-        prop_res.vals[i].value = "--sm-save-file";
-        prop_res.vals[i++].length = strlen("--sm-save-file");
-        prop_res.vals[i].value = save_file;
-        prop_res.vals[i++].length = strlen(save_file);
-    } else {
-        prop_res.vals[i].value = "--sm-client-id";
-        prop_res.vals[i++].length = strlen("--sm-client-id");
-        prop_res.vals[i].value = sm_id;
-        prop_res.vals[i++].length = strlen(sm_id);
-    }
+    prop_res.vals[i].value = "--sm-save-file";
+    prop_res.vals[i++].length = strlen("--sm-save-file");
+    prop_res.vals[i].value = save_file;
+    prop_res.vals[i++].length = strlen(save_file);
 
     props[0] = &prop_res;
     props[1] = &prop_cmd;
@@ -169,6 +162,17 @@ void session_startup(gint *argc, gchar ***argv)
 
     if (save_file)
         session_load(save_file);
+    else {
+        gchar *filename;
+
+        /* this algo is from metacity */
+        filename = g_strdup_printf("%d-%d-%u.obs",
+                                   (gint) time(NULL),
+                                   (gint) getpid(),
+                                   g_random_int());
+        save_file = g_build_filename(sm_sessions_path, filename, NULL);
+        g_free(filename);
+    }
 
     sm_argc = *argc;
     sm_argv = *argv;
@@ -315,21 +319,9 @@ static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 
 static gboolean session_save()
 {
-    gchar *filename;
     FILE *f;
     GList *it;
     gboolean success = TRUE;
-
-    if (save_file)
-        unlink(save_file);
-
-    /* this algo is from metacity */
-    filename = g_strdup_printf("%d-%d-%u.obs",
-                               (gint) time(NULL),
-                               (gint) getpid(),
-                               g_random_int());
-    save_file = g_build_filename(sm_sessions_path, filename, NULL);
-    g_free(filename);
 
     f = fopen(save_file, "w");
     if (!f) {

@@ -452,11 +452,31 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
   if (y < 0) y = 0;
 
   // XXX SCALING!@!&*(@! to make it fit on the surface
-  int orgw = w;
+  int oldw = w, oldh = h;
+  unsigned long *olddata = data;
   if (w > sfw) w = sfw;
   if (h > sfh) h = sfh;
+  unsigned long newdata[w*h];
+  if (w < oldw || h < oldh) {
+    double dx = oldw / (double)w;
+    double dy = oldh / (double)h;
+    double px = 0.0;
+    double py = 0.0;
+    int iy = 0;
+    for (i = 0, c = 0, e = w*h; i < e; ++i) {
+      newdata[i] = olddata[(int)px + iy];
+      if (++c >= w) {
+        c = 0;
+        px = 0;
+        py += dy;
+        iy = (int)py * oldw;
+      } else
+        px += dx;
+    }
+    data = newdata;
+  }
 
-  for (i = 0, c = 0, bgi = y * sfw + x, e = orgw*h; i < e; ++i, ++bgi) {
+  for (i = 0, c = 0, bgi = y * sfw + x, e = w*h; i < e; ++i, ++bgi) {
     unsigned char alpha = data[i] >> 24;
     unsigned char r = data[i] >> 16;
     unsigned char g = data[i] >> 8;
@@ -477,7 +497,6 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
     if (++c >= w) {
       c = 0;
       bgi += sfw - w;
-      i += orgw - w;
     }
   }
 

@@ -5,6 +5,10 @@
 #endif
 
 extern "C" {
+#ifdef    HAVE_STDIO_H
+#  include <stdio.h>
+#endif // HAVE_STDIO_H
+
 #include "gettext.h"
 #define _(str) gettext(str)
 }

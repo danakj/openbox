@@ -63,6 +63,8 @@ void OtkButton::update(void)
     ft.drawString(getWindow(), bevel, bevel, *text_color, _text);
   } else
     OtkFocusWidget::update();
+
+  _dirty = false;
 }
 
 bool OtkButton::expose(const XExposeEvent &e)

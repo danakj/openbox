@@ -16,6 +16,8 @@ void prop_startup()
     CREATE(atom, "ATOM");
     CREATE(string, "STRING");
     CREATE(utf8, "UTF8_STRING");
+
+    CREATE(manager, "MANAGER");
      
     CREATE(wm_colormap_windows, "WM_COLORMAP_WINDOWS");
     CREATE(wm_protocols, "WM_PROTOCOLS");
@@ -395,7 +397,7 @@ void prop_erase(Window win, Atom prop)
 }
 
 void prop_message(Window about, Atom messagetype, long data0, long data1,
-		  long data2, long data3)
+		  long data2, long data3, long mask)
 {
     XEvent ce;
     ce.xclient.type = ClientMessage;
@@ -408,5 +410,5 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
     XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
-	       SubstructureNotifyMask | SubstructureRedirectMask, &ce);
+	       mask, &ce);
 }

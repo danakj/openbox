@@ -17,6 +17,9 @@ typedef struct Atoms {
     Atom string;   /*!< The atom which represents ascii strings */
     Atom utf8;     /*!< The atom which represents utf8-encoded strings */
 
+    /* selection stuff */
+    Atom manager;
+
     /* window hints */
     Atom wm_colormap_windows;
     Atom wm_protocols;
@@ -157,7 +160,7 @@ void prop_set_strings_utf8(Window win, Atom prop, char **strs);
 void prop_erase(Window win, Atom prop);
 
 void prop_message(Window about, Atom messagetype, long data0, long data1,
-		  long data2, long data3);
+		  long data2, long data3, long mask);
 
 #define PROP_GET32(win, prop, type, ret) \
     (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))
@@ -181,6 +184,7 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
 #define PROP_ERASE(win, prop) prop_erase(win, prop_atoms.prop)
 
 #define PROP_MSG(about, msgtype, data0, data1, data2, data3) \
-  (prop_message(about, prop_atoms.msgtype, data0, data1, data2, data3))
+  (prop_message(about, prop_atoms.msgtype, data0, data1, data2, data3, \
+                SubstructureNotifyMask | SubstructureRedirectMask))
 
 #endif

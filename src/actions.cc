@@ -45,7 +45,9 @@ void OBActions::insertPress(const XButtonEvent &e)
   a->pos.setPoint(e.x_root, e.y_root);
 
   OBClient *c = Openbox::instance->findClient(e.window);
-  a->clientarea = c->area();
+  // if it's not defined, they should have clicked on the root window, so this
+  // area would be meaningless anyways
+  if (c) a->clientarea = c->area();
 }
 
 void OBActions::removePress(const XButtonEvent &e)

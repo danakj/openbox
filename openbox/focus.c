@@ -504,16 +504,28 @@ static gboolean valid_focus_target(ObClient *ft)
        focus an iconic window, but we want to be able to, so we just check
        if the focus flags on the window allow it, and its on the current
        desktop */
-    return ((ft->type == OB_CLIENT_TYPE_NORMAL ||
-             ft->type == OB_CLIENT_TYPE_DIALOG ||
-             (!client_has_group_siblings(ft) &&
-              (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
-               ft->type == OB_CLIENT_TYPE_MENU ||
-               ft->type == OB_CLIENT_TYPE_UTILITY))) &&
-            !ft->transients &&
-            ((ft->can_focus || ft->focus_notify) &&
-             !ft->skip_taskbar &&
-             (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)));
+    if ((ft->type == OB_CLIENT_TYPE_NORMAL ||
+         ft->type == OB_CLIENT_TYPE_DIALOG ||
+         (!client_has_group_siblings(ft) &&
+          (ft->type == OB_CLIENT_TYPE_TOOLBAR ||
+           ft->type == OB_CLIENT_TYPE_MENU ||
+           ft->type == OB_CLIENT_TYPE_UTILITY))) &&
+        ((ft->can_focus || ft->focus_notify) &&
+         !ft->skip_taskbar &&
+         (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)))
+    {
+        GSList *it;
+
+        for (it = ft->transients; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
+
+            if (c->frame->visible)
+                return FALSE;
+        }
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 void focus_cycle(gboolean forward, gboolean linear,

@@ -42,7 +42,7 @@ static void focus_fallback(gboolean switching_desks)
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (client_normal(it->data) && client_focus(it->data)) {
-            if (switching_desks && warp_on_desk_switch) {
+            if (switching_desks) {
                 XEvent e;
                 Client *c = it->data;
 
@@ -61,12 +61,14 @@ static void focus_fallback(gboolean switching_desks)
                     ++skip_enter;
                     }*/
 
-                /* I have to do this warp twice! Otherwise windows dont get
-                   Enter/Leave events when i warp on a desktop switch! */
-                XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
-                             c->area.width / 2, c->area.height / 2);
-                XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
-                             c->area.width / 2, c->area.height / 2);
+                if (warp_on_desk_switch) {
+                    /* I have to do this warp twice! Otherwise windows dont get
+                       Enter/Leave events when i warp on a desktop switch! */
+                    XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
+                                 c->area.width / 2, c->area.height / 2);
+                    XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
+                                 c->area.width / 2, c->area.height / 2);
+                }
             }
             break;
         }

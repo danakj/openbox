@@ -1,12 +1,12 @@
-#include "../kernel/openbox.h"
 #include "font.h"
-
-#include "../kernel/gettext.h"
+#include "kernel/openbox.h"
+#include "kernel/geom.h"
+#include "kernel/gettext.h"
 #define _(str) gettext(str)
 
 #include <X11/Xft/Xft.h>
 #include <glib.h>
-#include "../kernel/geom.h"
+#include <string.h>
 
 #define ELIPSES "..."
 #define ELIPSES_LENGTH(font, shadow, offset) \
@@ -167,7 +167,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,
-                          (FcChar8*)text->str, l);
+                          (FcChar8*)text->str, strlen(text->str));
     }  
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
@@ -177,6 +177,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
-                      (FcChar8*)text->str, l);
+                      (FcChar8*)text->str, strlen(text->str));
     return;
 }

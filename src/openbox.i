@@ -30,12 +30,11 @@
 namespace ob {
 void python_callback(PyObject *func, MouseData *data)
 {
-  PyObject *arglist;
-  PyObject *result;
+  PyObject *arglist, *result, *pdata;
 
-  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__MouseData,
-                                                    0));
+  pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__MouseData, 0);
+  arglist = Py_BuildValue("(O)", pdata);
+  Py_DECREF(pdata);
   
   // call the callback
   result = PyEval_CallObject(func, arglist);
@@ -50,12 +49,11 @@ void python_callback(PyObject *func, MouseData *data)
 
 void python_callback(PyObject *func, EventData *data)
 {
-  PyObject *arglist;
-  PyObject *result;
+  PyObject *arglist, *result, *pdata;
 
-  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__EventData,
-                                                    0));
+  pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__EventData, 0);
+  arglist = Py_BuildValue("(O)", pdata);
+  Py_DECREF(pdata);
   
   // call the callback
   result = PyEval_CallObject(func, arglist);
@@ -70,12 +68,11 @@ void python_callback(PyObject *func, EventData *data)
 
 void python_callback(PyObject *func, KeyData *data)
 {
-  PyObject *arglist;
-  PyObject *result;
+  PyObject *arglist, *result, *pdata;
 
-  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__KeyData,
-                                                    0));
+  pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__KeyData, 0);
+  arglist = Py_BuildValue("(O)", pdata);
+  Py_DECREF(pdata);
   
   // call the callback
   result = PyEval_CallObject(func, arglist);

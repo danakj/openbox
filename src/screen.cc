@@ -884,10 +884,25 @@ void Screen::showDesktop(bool show)
 {
   if (show == _showing_desktop) return; // no change
 
+  // save the window focus, and restore it when leaving the show-desktop mode
+  static Window saved_focus = 0;
+  if (show) {
+    Client *c = openbox->focusedClient();
+    if (c) saved_focus = c->window();
+  } else {
+    Client *c = openbox->findClient(saved_focus);
+    if (c) c->focus();
+  }
+  
   _showing_desktop = show;
   ClientList::iterator it, end = clients.end();
-  for (it = clients.begin(); it != end; ++it)
-    (*it)->showhide();
+  for (it = clients.begin(); it != end; ++it) {
+    if ((*it)->type() == Client::Type_Desktop) {
+      if (show)
+        (*it)->focus();
+    } else
+      (*it)->showhide();
+  }
 }
 
 void Screen::propertyHandler(const XPropertyEvent &e)

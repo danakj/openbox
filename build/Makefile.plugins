@@ -66,7 +66,6 @@ $(plugins_placement_dir)/%.lo: $(plugins_placement_srcdir)/%.c $(plugins_placeme
 
 $(plugins_placement_depdir)/%.d: $(plugins_placement_srcdir)/%.c
 	@echo Building dependancies for $<
-	echo $(plugins_depdir)
 	$(INSTALL) -d $(dir $@)
 	@$(CC) $(plugins_placement_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 

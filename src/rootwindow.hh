@@ -53,6 +53,9 @@ public:
   //! Destroys the OBRootWindow object
   virtual ~OBRootWindow();
 
+  //! Sets the name of all desktops
+  void setDesktopNames(const otk::OBProperty::StringVect &names);
+  
   //! Sets the name of a desktop
   /*!
     @param i The index of the desktop to set the name for (base 0)

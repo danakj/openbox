@@ -93,7 +93,7 @@ OBScreen::OBScreen(int screen)
   // set up notification of netwm support
   setSupportedAtoms();
 
-  // Set the netwm atoms for geomtery and viewport
+  // Set the netwm properties for geometry and viewport
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
   Openbox::instance->property()->set(_info->rootWindow(),
@@ -106,6 +106,11 @@ OBScreen::OBScreen(int screen)
                                      otk::OBProperty::Atom_Cardinal,
                                      viewport, 2);
 
+  // Set the net_desktop_names property
+  std::vector<std::string> names;
+  python_get_stringlist("desktop_names", &names);
+  _root.setDesktopNames(names);
+  
   // create the window which gets focus when no clients get it
   XSetWindowAttributes attr;
   attr.override_redirect = true;

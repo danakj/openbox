@@ -38,9 +38,8 @@ void OBRootWindow::updateDesktopNames()
                      otk::OBProperty::net_desktop_names,
                      otk::OBProperty::utf8, &num, &_names))
     _names.clear();
-  for (int i = 0; i < numWorkspaces; ++i)
-    if (i <= static_cast<int>(_names.size()))
-      _names.push_back("Unnamed workspace");
+  while ((signed)_names.size() < numWorkspaces)
+    _names.push_back("Unnamed");
 }
 
 
@@ -74,9 +73,17 @@ void OBRootWindow::clientMessageHandler(const XClientMessageEvent &e)
 
   //const otk::OBProperty *property = Openbox::instance->property();
   
-  // XXX: so many client messages to handle here!
+  // XXX: so many client messages to handle here! ..or not.. they go to clients
 }
 
+
+void OBRootWindow::setDesktopNames(const otk::OBProperty::StringVect &names)
+{
+  _names = names;
+  const otk::OBProperty *property = Openbox::instance->property();
+  property->set(_info->rootWindow(), otk::OBProperty::net_desktop_names,
+                otk::OBProperty::utf8, names);
+}
 
 void OBRootWindow::setDesktopName(int i, const std::string &name)
 {

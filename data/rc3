@@ -83,6 +83,9 @@ kbind (A-F4)		Close
 
 kbind (W-D)		ToggleDecorations
 
+kbind (A-Tab)           NextWindowLinear
+kbind (S-A-Tab)         PreviousWindowLinear
+
 [mouse]
 
 # the distance a drag must go before it is recognized

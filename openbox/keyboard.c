@@ -73,6 +73,7 @@ void keyboard_reset_chains()
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
 
     if (curpos) {
+        grab_keys(FALSE);
         curpos = NULL;
         grab_keys(TRUE);
     }
@@ -208,6 +209,7 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 /* 5 second timeout for chains */
                 ob_main_loop_timeout_add(ob_main_loop, 5 * G_USEC_PER_SEC,
                                          chain_timeout, NULL, NULL);
+                grab_keys(FALSE);
                 curpos = p;
                 grab_keys(TRUE);
             } else {

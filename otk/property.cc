@@ -77,7 +77,7 @@ void Property::initialize()
   atoms.net_wm_state = create("_NET_WM_STATE");
   atoms.net_wm_strut = create("_NET_WM_STRUT");
 //  atoms.net_wm_icon_geometry = create("_NET_WM_ICON_GEOMETRY");
-//  atoms.net_wm_icon = create("_NET_WM_ICON");
+  atoms.net_wm_icon = create("_NET_WM_ICON");
 //  atoms.net_wm_pid = create("_NET_WM_PID");
 //  atoms.net_wm_handled_icons = create("_NET_WM_HANDLED_ICONS");
   atoms.net_wm_allowed_actions = create("_NET_WM_ALLOWED_ACTIONS");

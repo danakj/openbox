@@ -3611,15 +3611,17 @@ void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
   } else if (flags.resizing) {
     doResize(me->x_root, me->y_root);
   } else {
-    if (!flags.resizing && me->state & Button1Mask && (functions & Func_Move) &&
+    if ((functions & Func_Move) &&
+       (me->state & Button1Mask) &&
         (frame.title == me->window || frame.label == me->window ||
          frame.handle == me->window || frame.window == me->window)) {
       beginMove(me->x_root, me->y_root);
     } else if ((functions & Func_Resize) &&
-               (me->state & Button1Mask && (me->window == frame.right_grip ||
-                                            me->window == frame.left_grip)) ||
-               (me->state & Button3Mask && me->state & mod_mask &&
-                me->window == frame.window)) {
+               ((me->state & Button1Mask) && (me->window == frame.right_grip ||
+                                              me->window == frame.left_grip)) ||
+               ((me->state & Button3Mask) && (me->state & mod_mask) &&
+                (frame.title == me->window || frame.label == me->window ||
+                 frame.handle == me->window || frame.window == me->window))) {
       unsigned int zones = screen->getResizeZones();
       Corner corner;
       

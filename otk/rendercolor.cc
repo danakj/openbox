@@ -47,6 +47,8 @@ void RenderColor::create()
 {
   unsigned long color = _blue | _green << 8 | _red << 16;
   
+  printf("CREATE COLOR: %lx\n", color);
+  
   // try get a gc from the cache
   CacheItem *item = _cache[_screen][color];
 
@@ -79,17 +81,21 @@ void RenderColor::create()
     assert(_gc);
 
     // insert into the cache
-    _cache[_screen][color] = new CacheItem(_gc);
+    item = new CacheItem(_gc);
+    _cache[_screen][color] = item;
+    ++item->count;
   }
 }
 
 RenderColor::~RenderColor()
 {
   unsigned long color = _blue | _green << 8 | _red << 16;
-  
+
   CacheItem *item = _cache[_screen][color];
   assert(item); // it better be in the cache ...
 
+  printf("DESTROY COLOR: %lx %d\n", color, item->count);
+  
   if (--item->count <= 0) {
     // remove from the cache
     XFreeGC(**display, _gc);

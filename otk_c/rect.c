@@ -7,9 +7,7 @@ extern PyTypeObject OtkRect_Type;
 
 PyObject *OtkRect_New(int x, int y, int width, int height)
 {
-  OtkRect* self;
-
-  self = PyObject_New(OtkRect, &OtkRect_Type);
+  OtkRect* self = PyObject_New(OtkRect, &OtkRect_Type);
 
   self->x = x;
   self->y = y;

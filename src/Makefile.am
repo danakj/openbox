@@ -15,7 +15,7 @@ bin_PROGRAMS= openbox
 
 openbox_LDADD=../otk/libotk.a @LIBINTL@
 
-openbox_SOURCES= basedisplay.cc configuration.cc screen.cc screeninfo.cc \
+openbox_SOURCES= configuration.cc screen.cc openbox.cc \
                  timer.cc util.cc window.cc workspace.cc xatom.cc blackbox.cc \
                  main.cc
 

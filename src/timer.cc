@@ -4,9 +4,10 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "basedisplay.hh"
 #include "timer.hh"
 #include "util.hh"
+
+namespace ob {
 
 BTimer::BTimer(TimerQueueManager *m, TimeoutHandler *h) {
   manager = m;
@@ -87,4 +88,6 @@ bool BTimer::shouldFire(const timeval &tm) const {
 
   return ! ((tm.tv_sec < end.tv_sec) ||
             (tm.tv_sec == end.tv_sec && tm.tv_usec < end.tv_usec));
+}
+
 }

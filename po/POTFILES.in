@@ -1,3 +1,4 @@
 # List of source files containing translatable strings.
 
-src/main.cc
+src/openbox.cc
+src/display.cc

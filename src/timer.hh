@@ -15,6 +15,12 @@ extern "C" {
 #endif // TIME_WITH_SYS_TIME
 }
 
+#include <queue>
+#include <algorithm>
+#include <vector>
+
+namespace ob {
+
 // forward declaration
 class TimerQueueManager;
 
@@ -64,9 +70,6 @@ public:
 };
 
 
-#include <queue>
-#include <algorithm>
-
 template <class _Tp, class _Sequence, class _Compare>
 class _timer_queue: protected std::priority_queue<_Tp, _Sequence, _Compare> {
 public:
@@ -97,7 +100,6 @@ struct TimerLessThan {
   }
 };
 
-#include <vector>
 typedef _timer_queue<BTimer*, std::vector<BTimer*>, TimerLessThan> TimerQueue;
 
 class TimerQueueManager {
@@ -105,5 +107,7 @@ public:
   virtual void addTimer(BTimer* timer) = 0;
   virtual void removeTimer(BTimer* timer) = 0;
 };
+
+}
 
 #endif // _BLACKBOX_Timer_hh

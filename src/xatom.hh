@@ -2,16 +2,19 @@
 #ifndef   __XAtom_h
 #define   __XAtom_h
 
+extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
 #include <assert.h>
+}
 
 #include <vector>
 #include <string>
 
-class Blackbox;
-class ScreenInfo;
+#include "otk/screeninfo.hh"
+
+namespace ob {
 
 class XAtom {
 public:
@@ -170,7 +173,7 @@ public:
 
   // setup support on a screen, each screen should call this once in its
   // constructor.
-  void setSupported(const ScreenInfo *screen);
+  void setSupported(const otk::ScreenInfo *screen);
   
   void setValue(Window win, Atoms atom, Atoms type, unsigned long value) const;
   void setValue(Window win, Atoms atom, Atoms type,
@@ -206,5 +209,7 @@ public:
   { assert(a >= 0 && a < NUM_ATOMS); Atom ret = _atoms[a];
     assert(ret != 0); return ret; }
 };
+
+}
 
 #endif // __XAtom_h

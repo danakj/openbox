@@ -35,6 +35,8 @@ extern "C" {
 using std::string;
 using std::abs;
 
+namespace ob {
+
 /*
  * Initializes the class with default values/the window's set initial values.
  */
@@ -64,7 +66,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   // fetch client size and placement
   XWindowAttributes wattrib;
-  if (! XGetWindowAttributes(blackbox->getXDisplay(),
+  if (! XGetWindowAttributes(otk::OBDisplay::display,
                              client.window, &wattrib) ||
       ! wattrib.screen || wattrib.override_redirect) {
 #ifdef    DEBUG
@@ -83,7 +85,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
                           StructureNotifyMask;
   attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
                                      ButtonMotionMask;
-  XChangeWindowAttributes(blackbox->getXDisplay(), client.window,
+  XChangeWindowAttributes(otk::OBDisplay::display, client.window,
                           CWEventMask|CWDontPropagate, &attrib_set);
 
   flags.moving = flags.resizing = flags.shaded = flags.visible =
@@ -214,11 +216,12 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   upsize();
 
   bool place_window = True;
-  if (blackbox->isStartup() || isTransient() ||
+  if (blackbox->state() == Openbox::State_Starting || isTransient() ||
       client.normal_hint_flags & (PPosition|USPosition)) {
     applyGravity(frame.rect);
 
-    if (blackbox->isStartup() || client.rect.intersects(screen->getRect()))
+    if (blackbox->state() == Openbox::State_Starting ||
+        client.rect.intersects(screen->getRect()))
       place_window = False;
   }
 
@@ -232,7 +235,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     We hold the grab until after we are done moving the window around.
   */
 
-  XGrabServer(blackbox->getXDisplay());
+  XGrabServer(otk::OBDisplay::display);
 
   associateClientWindow();
 
@@ -254,7 +257,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   positionWindows();
 
-  XUngrabServer(blackbox->getXDisplay());
+  XUngrabServer(otk::OBDisplay::display);
 
 #ifdef    SHAPE
   if (blackbox->hasShapeExtensions() && flags.shaped)
@@ -267,7 +270,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   grabButtons();
 
-  XMapSubwindows(blackbox->getXDisplay(), frame.window);
+  XMapSubwindows(otk::OBDisplay::display, frame.window);
 
   // this ensures the title, buttons, and other decor are properly displayed
   redrawWindowFrame();
@@ -355,12 +358,12 @@ BlackboxWindow::~BlackboxWindow(void) {
 
   if (frame.plate) {
     blackbox->removeWindowSearch(frame.plate);
-    XDestroyWindow(blackbox->getXDisplay(), frame.plate);
+    XDestroyWindow(otk::OBDisplay::display, frame.plate);
   }
 
   if (frame.window) {
     blackbox->removeWindowSearch(frame.window);
-    XDestroyWindow(blackbox->getXDisplay(), frame.window);
+    XDestroyWindow(otk::OBDisplay::display, frame.window);
   }
 
   blackbox->removeWindowSearch(client.window);
@@ -377,8 +380,8 @@ void BlackboxWindow::enableDecor(bool enable) {
     shade();
     
   if (flags.visible && frame.window) {
-    XMapSubwindows(blackbox->getXDisplay(), frame.window);
-    XMapWindow(blackbox->getXDisplay(), frame.window);
+    XMapSubwindows(otk::OBDisplay::display, frame.window);
+    XMapWindow(otk::OBDisplay::display, frame.window);
   }
 
   reconfigure();
@@ -448,7 +451,7 @@ Window BlackboxWindow::createToplevelWindow(void) {
     window's frame.
   */
 
-  return XCreateWindow(blackbox->getXDisplay(), screen->getRootWindow(),
+  return XCreateWindow(otk::OBDisplay::display, screen->getRootWindow(),
                        0, 0, 1, 1, frame.border_w, screen->getDepth(),
                        InputOutput, screen->getVisual(), create_mask,
                        &attrib_create);
@@ -474,20 +477,20 @@ Window BlackboxWindow::createChildWindow(Window parent,
     attrib_create.cursor = cursor;
   }
 
-  return XCreateWindow(blackbox->getXDisplay(), parent, 0, 0, 1, 1, 0,
+  return XCreateWindow(otk::OBDisplay::display, parent, 0, 0, 1, 1, 0,
                        screen->getDepth(), InputOutput, screen->getVisual(),
                        create_mask, &attrib_create);
 }
 
 
 void BlackboxWindow::associateClientWindow(void) {
-  XSetWindowBorderWidth(blackbox->getXDisplay(), client.window, 0);
+  XSetWindowBorderWidth(otk::OBDisplay::display, client.window, 0);
   getWMName();
   getWMIconName();
 
-  XChangeSaveSet(blackbox->getXDisplay(), client.window, SetModeInsert);
+  XChangeSaveSet(otk::OBDisplay::display, client.window, SetModeInsert);
 
-  XSelectInput(blackbox->getXDisplay(), frame.plate, SubstructureRedirectMask);
+  XSelectInput(otk::OBDisplay::display, frame.plate, SubstructureRedirectMask);
 
   /*
     note we used to grab around this call to XReparentWindow however the
@@ -495,24 +498,24 @@ void BlackboxWindow::associateClientWindow(void) {
   */
   unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
                              StructureNotifyMask;
-  XSelectInput(blackbox->getXDisplay(), client.window,
+  XSelectInput(otk::OBDisplay::display, client.window,
                event_mask & ~StructureNotifyMask);
-  XReparentWindow(blackbox->getXDisplay(), client.window, frame.plate, 0, 0);
-  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
+  XReparentWindow(otk::OBDisplay::display, client.window, frame.plate, 0, 0);
+  XSelectInput(otk::OBDisplay::display, client.window, event_mask);
 
-  XRaiseWindow(blackbox->getXDisplay(), frame.plate);
-  XMapSubwindows(blackbox->getXDisplay(), frame.plate);
+  XRaiseWindow(otk::OBDisplay::display, frame.plate);
+  XMapSubwindows(otk::OBDisplay::display, frame.plate);
 
 #ifdef    SHAPE
   if (blackbox->hasShapeExtensions()) {
-    XShapeSelectInput(blackbox->getXDisplay(), client.window,
+    XShapeSelectInput(otk::OBDisplay::display, client.window,
                       ShapeNotifyMask);
 
     Bool shaped = False;
     int foo;
     unsigned int ufoo;
 
-    XShapeQueryExtents(blackbox->getXDisplay(), client.window, &shaped,
+    XShapeQueryExtents(otk::OBDisplay::display, client.window, &shaped,
                        &foo, &foo, &ufoo, &ufoo, &foo, &foo, &foo,
                        &ufoo, &ufoo);
     flags.shaped = shaped;
@@ -522,7 +525,7 @@ void BlackboxWindow::associateClientWindow(void) {
 
 
 void BlackboxWindow::decorate(void) {
-  BTexture* texture;
+  otk::BTexture* texture;
 
   texture = &(screen->getWindowStyle()->b_focus);
   frame.fbutton = texture->render(frame.button_w, frame.button_w,
@@ -540,7 +543,7 @@ void BlackboxWindow::decorate(void) {
 
   texture = &(screen->getWindowStyle()->b_pressed_focus);
   
-  if (texture->texture() != BTexture::NoTexture) {
+  if (texture->texture() != otk::BTexture::NoTexture) {
     frame.pfbutton = texture->render(frame.button_w, frame.button_w,
                                      frame.pfbutton);
     if (! frame.pfbutton)
@@ -551,7 +554,7 @@ void BlackboxWindow::decorate(void) {
 
   texture = &(screen->getWindowStyle()->b_pressed_unfocus);
   
-  if (texture->texture() != BTexture::NoTexture) {
+  if (texture->texture() != otk::BTexture::NoTexture) {
     frame.pubutton = texture->render(frame.button_w, frame.button_w,
                                      frame.pubutton);
     if (! frame.pubutton)
@@ -594,7 +597,7 @@ void BlackboxWindow::decorate(void) {
     if (! frame.utitle)
       frame.utitle_pixel = texture->color().pixel();
 
-    XSetWindowBorder(blackbox->getXDisplay(), frame.title,
+    XSetWindowBorder(otk::OBDisplay::display, frame.title,
                      screen->getBorderColor()->pixel());
 
     decorateLabel();
@@ -628,21 +631,21 @@ void BlackboxWindow::decorate(void) {
     if (! frame.ugrip)
       frame.ugrip_pixel = texture->color().pixel();
 
-    XSetWindowBorder(blackbox->getXDisplay(), frame.handle,
+    XSetWindowBorder(otk::OBDisplay::display, frame.handle,
                      screen->getBorderColor()->pixel());
-    XSetWindowBorder(blackbox->getXDisplay(), frame.left_grip,
+    XSetWindowBorder(otk::OBDisplay::display, frame.left_grip,
                      screen->getBorderColor()->pixel());
-    XSetWindowBorder(blackbox->getXDisplay(), frame.right_grip,
+    XSetWindowBorder(otk::OBDisplay::display, frame.right_grip,
                      screen->getBorderColor()->pixel());
   }
 
-  XSetWindowBorder(blackbox->getXDisplay(), frame.window,
+  XSetWindowBorder(otk::OBDisplay::display, frame.window,
                    screen->getBorderColor()->pixel());
 }
 
 
 void BlackboxWindow::decorateLabel(void) {
-  BTexture *texture;
+  otk::BTexture *texture;
 
   texture = &(screen->getWindowStyle()->l_focus);
   frame.flabel = texture->render(frame.label_w, frame.label_h, frame.flabel);
@@ -694,12 +697,12 @@ void BlackboxWindow::destroyHandle(void) {
   blackbox->removeWindowSearch(frame.left_grip);
   blackbox->removeWindowSearch(frame.right_grip);
 
-  XDestroyWindow(blackbox->getXDisplay(), frame.left_grip);
-  XDestroyWindow(blackbox->getXDisplay(), frame.right_grip);
+  XDestroyWindow(otk::OBDisplay::display, frame.left_grip);
+  XDestroyWindow(otk::OBDisplay::display, frame.right_grip);
   frame.left_grip = frame.right_grip = None;
 
   blackbox->removeWindowSearch(frame.handle);
-  XDestroyWindow(blackbox->getXDisplay(), frame.handle);
+  XDestroyWindow(otk::OBDisplay::display, frame.handle);
   frame.handle = None;
 }
 
@@ -754,8 +757,8 @@ void BlackboxWindow::destroyTitlebar(void) {
   blackbox->removeWindowSearch(frame.title);
   blackbox->removeWindowSearch(frame.label);
 
-  XDestroyWindow(blackbox->getXDisplay(), frame.label);
-  XDestroyWindow(blackbox->getXDisplay(), frame.title);
+  XDestroyWindow(otk::OBDisplay::display, frame.label);
+  XDestroyWindow(otk::OBDisplay::display, frame.title);
   frame.title = frame.label = None;
 }
 
@@ -773,7 +776,7 @@ void BlackboxWindow::createCloseButton(void) {
 
 void BlackboxWindow::destroyCloseButton(void) {
   blackbox->removeWindowSearch(frame.close_button);
-  XDestroyWindow(blackbox->getXDisplay(), frame.close_button);
+  XDestroyWindow(otk::OBDisplay::display, frame.close_button);
   frame.close_button = None;
 }
 
@@ -791,7 +794,7 @@ void BlackboxWindow::createIconifyButton(void) {
 
 void BlackboxWindow::destroyIconifyButton(void) {
   blackbox->removeWindowSearch(frame.iconify_button);
-  XDestroyWindow(blackbox->getXDisplay(), frame.iconify_button);
+  XDestroyWindow(otk::OBDisplay::display, frame.iconify_button);
   frame.iconify_button = None;
 }
 
@@ -809,7 +812,7 @@ void BlackboxWindow::createMaximizeButton(void) {
 
 void BlackboxWindow::destroyMaximizeButton(void) {
   blackbox->removeWindowSearch(frame.maximize_button);
-  XDestroyWindow(blackbox->getXDisplay(), frame.maximize_button);
+  XDestroyWindow(otk::OBDisplay::display, frame.maximize_button);
   frame.maximize_button = None;
 }
 
@@ -825,7 +828,7 @@ void BlackboxWindow::createStickyButton(void) {
 
 void BlackboxWindow::destroyStickyButton(void) {
   blackbox->removeWindowSearch(frame.stick_button);
-  XDestroyWindow(blackbox->getXDisplay(), frame.stick_button);
+  XDestroyWindow(otk::OBDisplay::display, frame.stick_button);
   frame.stick_button = None;
 }
 
@@ -895,30 +898,30 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
     switch(*it) {
     case 'C':
       if (! frame.close_button) createCloseButton();
-      XMoveResizeWindow(blackbox->getXDisplay(), frame.close_button, x, by,
+      XMoveResizeWindow(otk::OBDisplay::display, frame.close_button, x, by,
                         frame.button_w, frame.button_w);
       x += frame.button_w + bsep;
       break;
     case 'I':
       if (! frame.iconify_button) createIconifyButton();
-      XMoveResizeWindow(blackbox->getXDisplay(), frame.iconify_button, x, by,
+      XMoveResizeWindow(otk::OBDisplay::display, frame.iconify_button, x, by,
                         frame.button_w, frame.button_w);
       x += frame.button_w + bsep;
       break;
     case 'S':
       if (! frame.stick_button) createStickyButton();
-      XMoveResizeWindow(blackbox->getXDisplay(), frame.stick_button, x, by,
+      XMoveResizeWindow(otk::OBDisplay::display, frame.stick_button, x, by,
                         frame.button_w, frame.button_w);
       x += frame.button_w + bsep;
       break;
     case 'M':
       if (! frame.maximize_button) createMaximizeButton();
-      XMoveResizeWindow(blackbox->getXDisplay(), frame.maximize_button, x, by,
+      XMoveResizeWindow(otk::OBDisplay::display, frame.maximize_button, x, by,
                         frame.button_w, frame.button_w);
       x += frame.button_w + bsep;
       break;
     case 'L':
-      XMoveResizeWindow(blackbox->getXDisplay(), frame.label, x, ty,
+      XMoveResizeWindow(otk::OBDisplay::display, frame.label, x, ty,
                         frame.label_w, frame.label_h);
       x += frame.label_w + bsep;
       break;
@@ -949,48 +952,48 @@ void BlackboxWindow::grabButtons(void) {
 
   if (! screen->isSloppyFocus() || screen->doClickRaise())
     // grab button 1 for changing focus/raising
-    blackbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
-                         GrabModeSync, GrabModeSync, frame.plate, None,
-                         screen->allowScrollLock());
+    otk::OBDisplay::grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
+                               GrabModeSync, GrabModeSync, frame.plate, None,
+                               screen->allowScrollLock());
   
   if (functions & Func_Move)
-    blackbox->grabButton(Button1, mod_mask, frame.window, True,
+    otk::OBDisplay::grabButton(Button1, mod_mask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
                          GrabModeAsync, frame.window, None,
                          screen->allowScrollLock());
   if (functions & Func_Resize)
-    blackbox->grabButton(Button3, mod_mask, frame.window, True,
+    otk::OBDisplay::grabButton(Button3, mod_mask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
                          GrabModeAsync, frame.window, None,
                          screen->allowScrollLock());
   // alt+middle lowers the window
-  blackbox->grabButton(Button2, mod_mask, frame.window, True,
+  otk::OBDisplay::grabButton(Button2, mod_mask, frame.window, True,
                        ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
                        frame.window, None, screen->allowScrollLock());
 }
 
 
 void BlackboxWindow::ungrabButtons(void) {
-  blackbox->ungrabButton(Button1, 0, frame.plate);
-  blackbox->ungrabButton(Button1, mod_mask, frame.window);
-  blackbox->ungrabButton(Button2, mod_mask, frame.window);
-  blackbox->ungrabButton(Button3, mod_mask, frame.window);
+  otk::OBDisplay::ungrabButton(Button1, 0, frame.plate);
+  otk::OBDisplay::ungrabButton(Button1, mod_mask, frame.window);
+  otk::OBDisplay::ungrabButton(Button2, mod_mask, frame.window);
+  otk::OBDisplay::ungrabButton(Button3, mod_mask, frame.window);
 }
 
 
 void BlackboxWindow::positionWindows(void) {
-  XMoveResizeWindow(blackbox->getXDisplay(), frame.window,
+  XMoveResizeWindow(otk::OBDisplay::display, frame.window,
                     frame.rect.x(), frame.rect.y(), frame.inside_w,
                     (flags.shaded) ? frame.title_h : frame.inside_h);
-  XSetWindowBorderWidth(blackbox->getXDisplay(), frame.window,
+  XSetWindowBorderWidth(otk::OBDisplay::display, frame.window,
                         frame.border_w);
-  XSetWindowBorderWidth(blackbox->getXDisplay(), frame.plate,
+  XSetWindowBorderWidth(otk::OBDisplay::display, frame.plate,
                         frame.mwm_border_w);
-  XMoveResizeWindow(blackbox->getXDisplay(), frame.plate,
+  XMoveResizeWindow(otk::OBDisplay::display, frame.plate,
                     frame.margin.left - frame.mwm_border_w - frame.border_w,
                     frame.margin.top - frame.mwm_border_w - frame.border_w,
                     client.rect.width(), client.rect.height());
-  XMoveResizeWindow(blackbox->getXDisplay(), client.window,
+  XMoveResizeWindow(otk::OBDisplay::display, client.window,
                     0, 0, client.rect.width(), client.rect.height());
   // ensure client.rect contains the real location
   client.rect.setPos(frame.rect.left() + frame.margin.left,
@@ -999,45 +1002,45 @@ void BlackboxWindow::positionWindows(void) {
   if (decorations & Decor_Titlebar) {
     if (frame.title == None) createTitlebar();
 
-    XSetWindowBorderWidth(blackbox->getXDisplay(), frame.title,
+    XSetWindowBorderWidth(otk::OBDisplay::display, frame.title,
                           frame.border_w);
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.title, -frame.border_w,
+    XMoveResizeWindow(otk::OBDisplay::display, frame.title, -frame.border_w,
                       -frame.border_w, frame.inside_w, frame.title_h);
 
     positionButtons();
-    XMapSubwindows(blackbox->getXDisplay(), frame.title);
-    XMapWindow(blackbox->getXDisplay(), frame.title);
+    XMapSubwindows(otk::OBDisplay::display, frame.title);
+    XMapWindow(otk::OBDisplay::display, frame.title);
   } else if (frame.title) {
     destroyTitlebar();
   }
   if (decorations & Decor_Handle) {
     if (frame.handle == None) createHandle();
-    XSetWindowBorderWidth(blackbox->getXDisplay(), frame.handle,
+    XSetWindowBorderWidth(otk::OBDisplay::display, frame.handle,
                           frame.border_w);
-    XSetWindowBorderWidth(blackbox->getXDisplay(), frame.left_grip,
+    XSetWindowBorderWidth(otk::OBDisplay::display, frame.left_grip,
                           frame.border_w);
-    XSetWindowBorderWidth(blackbox->getXDisplay(), frame.right_grip,
+    XSetWindowBorderWidth(otk::OBDisplay::display, frame.right_grip,
                           frame.border_w);
 
     // use client.rect here so the value is correct even if shaded
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.handle,
+    XMoveResizeWindow(otk::OBDisplay::display, frame.handle,
                       -frame.border_w,
                       client.rect.height() + frame.margin.top +
                       frame.mwm_border_w - frame.border_w,
                       frame.inside_w, frame.handle_h);
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.left_grip,
+    XMoveResizeWindow(otk::OBDisplay::display, frame.left_grip,
                       -frame.border_w, -frame.border_w,
                       frame.grip_w, frame.handle_h);
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.right_grip,
+    XMoveResizeWindow(otk::OBDisplay::display, frame.right_grip,
                       frame.inside_w - frame.grip_w - frame.border_w,
                       -frame.border_w, frame.grip_w, frame.handle_h);
 
-    XMapSubwindows(blackbox->getXDisplay(), frame.handle);
-    XMapWindow(blackbox->getXDisplay(), frame.handle);
+    XMapSubwindows(otk::OBDisplay::display, frame.handle);
+    XMapWindow(otk::OBDisplay::display, frame.handle);
   } else if (frame.handle) {
     destroyHandle();
   }
-  XSync(blackbox->getXDisplay(), False);
+  XSync(otk::OBDisplay::display, False);
 }
 
 
@@ -1169,7 +1172,7 @@ void BlackboxWindow::getWMProtocols(void) {
   Atom *proto;
   int num_return = 0;
 
-  if (XGetWMProtocols(blackbox->getXDisplay(), client.window,
+  if (XGetWMProtocols(otk::OBDisplay::display, client.window,
                       &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
       if (proto[i] == xatom->getAtom(XAtom::wm_delete_window)) {
@@ -1198,7 +1201,7 @@ void BlackboxWindow::getWMHints(void) {
   }
   client.window_group = None;
 
-  XWMHints *wmhint = XGetWMHints(blackbox->getXDisplay(), client.window);
+  XWMHints *wmhint = XGetWMHints(otk::OBDisplay::display, client.window);
   if (! wmhint) {
     return;
   }
@@ -1258,7 +1261,7 @@ void BlackboxWindow::getWMNormalHints(void) {
   client.max_height = (unsigned) -1;
 
 
-  if (! XGetWMNormalHints(blackbox->getXDisplay(), client.window,
+  if (! XGetWMNormalHints(otk::OBDisplay::display, client.window,
                           &sizehint, &icccm_mask))
     return;
 
@@ -1496,7 +1499,7 @@ void BlackboxWindow::getTransientInfo(void) {
   client.transient_for = (BlackboxWindow *) 0;
 
   Window trans_for;
-  if (! XGetTransientForHint(blackbox->getXDisplay(), client.window,
+  if (! XGetTransientForHint(otk::OBDisplay::display, client.window,
                              &trans_for)) {
     // transient_for hint not set
     return;
@@ -1598,7 +1601,7 @@ void BlackboxWindow::configure(int dx, int dy,
   } else {
     frame.rect.setPos(dx, dy);
 
-    XMoveWindow(blackbox->getXDisplay(), frame.window,
+    XMoveWindow(otk::OBDisplay::display, frame.window,
                 frame.rect.x(), frame.rect.y());
     /*
       we may have been called just after an opaque window move, so even though
@@ -1616,7 +1619,7 @@ void BlackboxWindow::configure(int dx, int dy,
     XEvent event;
     event.type = ConfigureNotify;
 
-    event.xconfigure.display = blackbox->getXDisplay();
+    event.xconfigure.display = otk::OBDisplay::display;
     event.xconfigure.event = client.window;
     event.xconfigure.window = client.window;
     event.xconfigure.x = client.rect.x();
@@ -1627,16 +1630,16 @@ void BlackboxWindow::configure(int dx, int dy,
     event.xconfigure.above = frame.window;
     event.xconfigure.override_redirect = False;
 
-    XSendEvent(blackbox->getXDisplay(), client.window, False,
+    XSendEvent(otk::OBDisplay::display, client.window, False,
                StructureNotifyMask, &event);
-    XFlush(blackbox->getXDisplay());
+    XFlush(otk::OBDisplay::display);
   }
 }
 
 
 #ifdef SHAPE
 void BlackboxWindow::configureShape(void) {
-  XShapeCombineShape(blackbox->getXDisplay(), frame.window, ShapeBounding,
+  XShapeCombineShape(otk::OBDisplay::display, frame.window, ShapeBounding,
                      frame.margin.left - frame.border_w,
                      frame.margin.top - frame.border_w,
                      client.window, ShapeBounding, ShapeSet);
@@ -1660,14 +1663,14 @@ void BlackboxWindow::configureShape(void) {
     ++num;
   }
 
-  XShapeCombineRectangles(blackbox->getXDisplay(), frame.window,
+  XShapeCombineRectangles(otk::OBDisplay::display, frame.window,
                           ShapeBounding, 0, 0, xrect, num,
                           ShapeUnion, Unsorted);
 }
 
 
 void BlackboxWindow::clearShape(void) {
-  XShapeCombineMask(blackbox->getXDisplay(), frame.window, ShapeBounding,
+  XShapeCombineMask(otk::OBDisplay::display, frame.window, ShapeBounding,
                     frame.margin.left - frame.border_w,
                     frame.margin.top - frame.border_w,
                     None, ShapeSet);
@@ -1703,7 +1706,7 @@ bool BlackboxWindow::setInputFocus(void) {
 
   bool ret = True;
   if (focus_mode == F_LocallyActive || focus_mode == F_Passive) {
-    XSetInputFocus(blackbox->getXDisplay(), client.window,
+    XSetInputFocus(otk::OBDisplay::display, client.window,
                    RevertToPointerRoot, CurrentTime);
   } else {
     /* we could set the focus to none, since the window doesn't accept focus,
@@ -1717,7 +1720,7 @@ bool BlackboxWindow::setInputFocus(void) {
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = xatom->getAtom(XAtom::wm_protocols);
-    ce.xclient.display = blackbox->getXDisplay();
+    ce.xclient.display = otk::OBDisplay::display;
     ce.xclient.window = client.window;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = xatom->getAtom(XAtom::wm_take_focus);
@@ -1725,9 +1728,9 @@ bool BlackboxWindow::setInputFocus(void) {
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
-    XSendEvent(blackbox->getXDisplay(), client.window, False,
+    XSendEvent(otk::OBDisplay::display, client.window, False,
                NoEventMask, &ce);
-    XFlush(blackbox->getXDisplay());
+    XFlush(otk::OBDisplay::display);
   }
 
   return ret;
@@ -1751,14 +1754,14 @@ void BlackboxWindow::iconify(void) {
    */
   unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
                              StructureNotifyMask;
-  XGrabServer(blackbox->getXDisplay());
-  XSelectInput(blackbox->getXDisplay(), client.window,
+  XGrabServer(otk::OBDisplay::display);
+  XSelectInput(otk::OBDisplay::display, client.window,
                event_mask & ~StructureNotifyMask);
-  XUnmapWindow(blackbox->getXDisplay(), client.window);
-  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
-  XUngrabServer(blackbox->getXDisplay());
+  XUnmapWindow(otk::OBDisplay::display, client.window);
+  XSelectInput(otk::OBDisplay::display, client.window, event_mask);
+  XUngrabServer(otk::OBDisplay::display);
 
-  XUnmapWindow(blackbox->getXDisplay(), frame.window);
+  XUnmapWindow(otk::OBDisplay::display, frame.window);
   flags.visible = False;
   flags.iconic = True;
 
@@ -1799,14 +1802,14 @@ void BlackboxWindow::show(void) {
   current_state = (flags.shaded) ? IconicState : NormalState;
   setState(current_state);
 
-  XMapWindow(blackbox->getXDisplay(), client.window);
-  XMapSubwindows(blackbox->getXDisplay(), frame.window);
-  XMapWindow(blackbox->getXDisplay(), frame.window);
+  XMapWindow(otk::OBDisplay::display, client.window);
+  XMapSubwindows(otk::OBDisplay::display, frame.window);
+  XMapWindow(otk::OBDisplay::display, frame.window);
 
 #if 0
   int real_x, real_y;
   Window child;
-  XTranslateCoordinates(blackbox->getXDisplay(), client.window,
+  XTranslateCoordinates(otk::OBDisplay::display, client.window,
                         screen->getRootWindow(),
                         0, 0, &real_x, &real_y, &child);
   fprintf(stderr, "%s -- assumed: (%d, %d), real: (%d, %d)\n", getTitle(),
@@ -1842,7 +1845,7 @@ void BlackboxWindow::close(void) {
   XEvent ce;
   ce.xclient.type = ClientMessage;
   ce.xclient.message_type =  xatom->getAtom(XAtom::wm_protocols);
-  ce.xclient.display = blackbox->getXDisplay();
+  ce.xclient.display = otk::OBDisplay::display;
   ce.xclient.window = client.window;
   ce.xclient.format = 32;
   ce.xclient.data.l[0] = xatom->getAtom(XAtom::wm_delete_window);
@@ -1850,8 +1853,8 @@ void BlackboxWindow::close(void) {
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
-  XSendEvent(blackbox->getXDisplay(), client.window, False, NoEventMask, &ce);
-  XFlush(blackbox->getXDisplay());
+  XSendEvent(otk::OBDisplay::display, client.window, False, NoEventMask, &ce);
+  XFlush(otk::OBDisplay::display);
 }
 
 
@@ -1866,18 +1869,18 @@ void BlackboxWindow::withdraw(void) {
 
   setState(current_state);
 
-  XUnmapWindow(blackbox->getXDisplay(), frame.window);
+  XUnmapWindow(otk::OBDisplay::display, frame.window);
 
-  XGrabServer(blackbox->getXDisplay());
+  XGrabServer(otk::OBDisplay::display);
 
   unsigned long event_mask = PropertyChangeMask | FocusChangeMask |
                              StructureNotifyMask;
-  XSelectInput(blackbox->getXDisplay(), client.window,
+  XSelectInput(otk::OBDisplay::display, client.window,
                event_mask & ~StructureNotifyMask);
-  XUnmapWindow(blackbox->getXDisplay(), client.window);
-  XSelectInput(blackbox->getXDisplay(), client.window, event_mask);
+  XUnmapWindow(otk::OBDisplay::display, client.window);
+  XSelectInput(otk::OBDisplay::display, client.window, event_mask);
 
-  XUngrabServer(blackbox->getXDisplay());
+  XUngrabServer(otk::OBDisplay::display);
 }
 
 
@@ -2035,7 +2038,7 @@ void BlackboxWindow::setWorkspace(unsigned int n) {
 
 void BlackboxWindow::shade(void) {
   if (flags.shaded) {
-    XResizeWindow(blackbox->getXDisplay(), frame.window,
+    XResizeWindow(otk::OBDisplay::display, frame.window,
                   frame.inside_w, frame.inside_h);
     flags.shaded = False;
     blackbox_attrib.flags ^= AttribShaded;
@@ -2050,7 +2053,7 @@ void BlackboxWindow::shade(void) {
     if (! (decorations & Decor_Titlebar))
       return; // can't shade it without a titlebar!
 
-    XResizeWindow(blackbox->getXDisplay(), frame.window,
+    XResizeWindow(otk::OBDisplay::display, frame.window,
                   frame.inside_w, frame.title_h);
     flags.shaded = True;
     blackbox_attrib.flags |= AttribShaded;
@@ -2123,20 +2126,20 @@ void BlackboxWindow::redrawWindowFrame(void) const {
   if (decorations & Decor_Titlebar) {
     if (flags.focused) {
       if (frame.ftitle)
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.title, frame.ftitle);
       else
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.title, frame.ftitle_pixel);
     } else {
       if (frame.utitle)
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.title, frame.utitle);
       else
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.title, frame.utitle_pixel);
     }
-    XClearWindow(blackbox->getXDisplay(), frame.title);
+    XClearWindow(otk::OBDisplay::display, frame.title);
 
     redrawLabel();
     redrawAllButtons();
@@ -2145,54 +2148,54 @@ void BlackboxWindow::redrawWindowFrame(void) const {
   if (decorations & Decor_Handle) {
     if (flags.focused) {
       if (frame.fhandle)
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.handle, frame.fhandle);
       else
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.handle, frame.fhandle_pixel);
 
       if (frame.fgrip) {
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.left_grip, frame.fgrip);
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.right_grip, frame.fgrip);
       } else {
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.left_grip, frame.fgrip_pixel);
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.right_grip, frame.fgrip_pixel);
       }
     } else {
       if (frame.uhandle)
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.handle, frame.uhandle);
       else
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.handle, frame.uhandle_pixel);
 
       if (frame.ugrip) {
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.left_grip, frame.ugrip);
-        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+        XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                    frame.right_grip, frame.ugrip);
       } else {
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.left_grip, frame.ugrip_pixel);
-        XSetWindowBackground(blackbox->getXDisplay(),
+        XSetWindowBackground(otk::OBDisplay::display,
                              frame.right_grip, frame.ugrip_pixel);
       }
     }
-    XClearWindow(blackbox->getXDisplay(), frame.handle);
-    XClearWindow(blackbox->getXDisplay(), frame.left_grip);
-    XClearWindow(blackbox->getXDisplay(), frame.right_grip);
+    XClearWindow(otk::OBDisplay::display, frame.handle);
+    XClearWindow(otk::OBDisplay::display, frame.left_grip);
+    XClearWindow(otk::OBDisplay::display, frame.right_grip);
   }
 
   if (decorations & Decor_Border) {
     if (flags.focused)
-      XSetWindowBorder(blackbox->getXDisplay(),
+      XSetWindowBorder(otk::OBDisplay::display,
                        frame.plate, frame.fborder_pixel);
     else
-      XSetWindowBorder(blackbox->getXDisplay(),
+      XSetWindowBorder(otk::OBDisplay::display,
                        frame.plate, frame.uborder_pixel);
   }
 }
@@ -2214,11 +2217,11 @@ void BlackboxWindow::setFocusFlag(bool focus) {
 
 void BlackboxWindow::installColormap(bool install) {
   int i = 0, ncmap = 0;
-  Colormap *cmaps = XListInstalledColormaps(blackbox->getXDisplay(),
+  Colormap *cmaps = XListInstalledColormaps(otk::OBDisplay::display,
                                             client.window, &ncmap);
   if (cmaps) {
     XWindowAttributes wattrib;
-    if (XGetWindowAttributes(blackbox->getXDisplay(),
+    if (XGetWindowAttributes(otk::OBDisplay::display,
                              client.window, &wattrib)) {
       if (install) {
         // install the window's colormap
@@ -2229,13 +2232,13 @@ void BlackboxWindow::installColormap(bool install) {
         }
         // otherwise, install the window's colormap
         if (install)
-          XInstallColormap(blackbox->getXDisplay(), wattrib.colormap);
+          XInstallColormap(otk::OBDisplay::display, wattrib.colormap);
       } else {
         // uninstall the window's colormap
         for (i = 0; i < ncmap; i++) {
           if (*(cmaps + i) == wattrib.colormap)
             // we found the colormap to uninstall
-            XUninstallColormap(blackbox->getXDisplay(), wattrib.colormap);
+            XUninstallColormap(otk::OBDisplay::display, wattrib.colormap);
         }
       }
     }
@@ -2409,7 +2412,7 @@ void BlackboxWindow::restoreAttributes(void) {
  * Positions the Rect r according the the client window position and
  * window gravity.
  */
-void BlackboxWindow::applyGravity(Rect &r) {
+void BlackboxWindow::applyGravity(otk::Rect &r) {
   // apply horizontal window gravity
   switch (client.win_gravity) {
   default:
@@ -2472,7 +2475,7 @@ void BlackboxWindow::applyGravity(Rect &r) {
  * Positions the Rect r according to the frame window position and
  * window gravity.
  */
-void BlackboxWindow::restoreGravity(Rect &r) {
+void BlackboxWindow::restoreGravity(otk::Rect &r) {
   // restore horizontal window gravity
   switch (client.win_gravity) {
   default:
@@ -2532,20 +2535,20 @@ void BlackboxWindow::restoreGravity(Rect &r) {
 void BlackboxWindow::redrawLabel(void) const {
   if (flags.focused) {
     if (frame.flabel)
-      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+      XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                  frame.label, frame.flabel);
     else
-      XSetWindowBackground(blackbox->getXDisplay(),
+      XSetWindowBackground(otk::OBDisplay::display,
                            frame.label, frame.flabel_pixel);
   } else {
     if (frame.ulabel)
-      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+      XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                  frame.label, frame.ulabel);
     else
-      XSetWindowBackground(blackbox->getXDisplay(),
+      XSetWindowBackground(otk::OBDisplay::display,
                            frame.label, frame.ulabel_pixel);
   }
-  XClearWindow(blackbox->getXDisplay(), frame.label);
+  XClearWindow(otk::OBDisplay::display, frame.label);
 
   WindowStyle *style = screen->getWindowStyle();
 
@@ -2593,9 +2596,9 @@ void BlackboxWindow::redrawButton(bool pressed, Window win,
   }
   
   if (p)
-    XSetWindowBackgroundPixmap(blackbox->getXDisplay(), win, p);
+    XSetWindowBackgroundPixmap(otk::OBDisplay::display, win, p);
   else
-    XSetWindowBackground(blackbox->getXDisplay(), win, pix);
+    XSetWindowBackground(otk::OBDisplay::display, win, pix);
 
 }
 
@@ -2606,25 +2609,25 @@ void BlackboxWindow::redrawIconifyButton(bool pressed) const {
                frame.fbutton, frame.fbutton_pixel,
                frame.ubutton, frame.ubutton_pixel);
 
-  XClearWindow(blackbox->getXDisplay(), frame.iconify_button);
-  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-             screen->getWindowStyle()->b_pic_unfocus);
+  XClearWindow(otk::OBDisplay::display, frame.iconify_button);
+  otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+                screen->getWindowStyle()->b_pic_unfocus);
 
   PixmapMask pm = screen->getWindowStyle()->icon_button;
   
   if (screen->getWindowStyle()->icon_button.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+    XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
 
-    XFillRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
+    XFillRectangle(otk::OBDisplay::display, frame.iconify_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
                    (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
 
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), None);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0);
+    XSetClipMask(otk::OBDisplay::display, pen.gc(), None);
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(), 0, 0);
   } else {
-    XDrawRectangle(blackbox->getXDisplay(), frame.iconify_button, pen.gc(),
+    XDrawRectangle(otk::OBDisplay::display, frame.iconify_button, pen.gc(),
                    2, (frame.button_w - 5), (frame.button_w - 5), 2);
   }
 }
@@ -2637,28 +2640,28 @@ void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
                frame.fbutton, frame.fbutton_pixel,
                frame.ubutton, frame.ubutton_pixel);
 
-  XClearWindow(blackbox->getXDisplay(), frame.maximize_button);
+  XClearWindow(otk::OBDisplay::display, frame.maximize_button);
 
-  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-           screen->getWindowStyle()->b_pic_unfocus);
+  otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+                screen->getWindowStyle()->b_pic_unfocus);
   
   PixmapMask pm = screen->getWindowStyle()->max_button;
     
   if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+    XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
 
-    XFillRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
+    XFillRectangle(otk::OBDisplay::display, frame.maximize_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
                    (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
     
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(), 0, 0 );
+    XSetClipMask( otk::OBDisplay::display, pen.gc(), None );
   } else {
-    XDrawRectangle(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
+    XDrawRectangle(otk::OBDisplay::display, frame.maximize_button, pen.gc(),
                    2, 2, (frame.button_w - 5), (frame.button_w - 5));
-    XDrawLine(blackbox->getXDisplay(), frame.maximize_button, pen.gc(),
+    XDrawLine(otk::OBDisplay::display, frame.maximize_button, pen.gc(),
               2, 3, (frame.button_w - 3), 3);
   }
 }
@@ -2671,29 +2674,29 @@ void BlackboxWindow::redrawCloseButton(bool pressed) const {
                frame.fbutton, frame.fbutton_pixel,
                frame.ubutton, frame.ubutton_pixel);
 
-  XClearWindow(blackbox->getXDisplay(), frame.close_button);
+  XClearWindow(otk::OBDisplay::display, frame.close_button);
 
-  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-           screen->getWindowStyle()->b_pic_unfocus);
+  otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+                screen->getWindowStyle()->b_pic_unfocus);
   
   PixmapMask pm = screen->getWindowStyle()->close_button;
 
   if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+    XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
     
-    XFillRectangle(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+    XFillRectangle(otk::OBDisplay::display, frame.close_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
                    (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
 
   
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(), 0, 0 );
+    XSetClipMask( otk::OBDisplay::display, pen.gc(), None );
   } else {
-    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+    XDrawLine(otk::OBDisplay::display, frame.close_button, pen.gc(),
               2, 2, (frame.button_w - 3), (frame.button_w - 3));
-    XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
+    XDrawLine(otk::OBDisplay::display, frame.close_button, pen.gc(),
               2, (frame.button_w - 3), (frame.button_w - 3), 2);
   }
 }
@@ -2705,27 +2708,27 @@ void BlackboxWindow::redrawStickyButton(bool pressed) const {
                frame.fbutton, frame.fbutton_pixel,
                frame.ubutton, frame.ubutton_pixel);
 
-  XClearWindow(blackbox->getXDisplay(), frame.stick_button);
+  XClearWindow(otk::OBDisplay::display, frame.stick_button);
 
-  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-           screen->getWindowStyle()->b_pic_unfocus);
+  otk::BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+                screen->getWindowStyle()->b_pic_unfocus);
   
   PixmapMask pm = screen->getWindowStyle()->stick_button;
 
   if (pm.mask != None) {
-    XSetClipMask(blackbox->getXDisplay(), pen.gc(), pm.mask);
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(),
+    XSetClipMask(otk::OBDisplay::display, pen.gc(), pm.mask);
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2);
     
-    XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
+    XFillRectangle(otk::OBDisplay::display, frame.stick_button, pen.gc(),
                    (frame.button_w - pm.w)/2, (frame.button_w - pm.h)/2,
                    (frame.button_w + pm.w)/2, (frame.button_w + pm.h)/2);
 
   
-    XSetClipOrigin(blackbox->getXDisplay(), pen.gc(), 0, 0 );
-    XSetClipMask( blackbox->getXDisplay(), pen.gc(), None );
+    XSetClipOrigin(otk::OBDisplay::display, pen.gc(), 0, 0 );
+    XSetClipMask( otk::OBDisplay::display, pen.gc(), None );
   } else {
-    XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
+    XFillRectangle(otk::OBDisplay::display, frame.stick_button, pen.gc(),
                    frame.button_w/2 - 1, frame.button_w/2 -1, 2, 2 );
   }
 }
@@ -2764,8 +2767,8 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
     show();
     screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     if (isNormal()) {
-      if (! blackbox->isStartup()) {
-        XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped
+      if (blackbox->state() != Openbox::State_Starting) {
+        XSync(otk::OBDisplay::display, False); // make sure the frame is mapped
         if (screen->doFocusNew() || (isTransient() && getTransientFor() &&
                                      getTransientFor()->isFocused())) {
           setInputFocus();
@@ -2774,7 +2777,7 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
           int x, y, rx, ry;
           Window c, r;
           unsigned int m;
-          XQueryPointer(blackbox->getXDisplay(), screen->getRootWindow(),
+          XQueryPointer(otk::OBDisplay::display, screen->getRootWindow(),
                         &r, &c, &rx, &ry, &x, &y, &m);
           beginMove(rx, ry);
         }
@@ -2822,7 +2825,7 @@ void BlackboxWindow::reparentNotifyEvent(const XReparentEvent *re) {
 
   XEvent ev;
   ev.xreparent = *re;
-  XPutBackEvent(blackbox->getXDisplay(), &ev);
+  XPutBackEvent(otk::OBDisplay::display, &ev);
   screen->unmanageWindow(this, True);
 }
 
@@ -2901,7 +2904,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
       setupDecor();
     }
 
-    Rect old_rect = frame.rect;
+    otk::Rect old_rect = frame.rect;
 
     upsize();
 
@@ -2919,7 +2922,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
         createCloseButton();
         if (decorations & Decor_Titlebar) {
           positionButtons(True);
-          XMapSubwindows(blackbox->getXDisplay(), frame.title);
+          XMapSubwindows(otk::OBDisplay::display, frame.title);
         }
       }
     } else if (pe->atom == xatom->getAtom(XAtom::net_wm_strut)) {
@@ -3044,7 +3047,7 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
     } else if (frame.plate == be->window) {
       screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
 
-      XAllowEvents(blackbox->getXDisplay(), ReplayPointer, be->time);
+      XAllowEvents(otk::OBDisplay::display, ReplayPointer, be->time);
     } else {
       if (frame.title == be->window || frame.label == be->window) {
         if (((be->time - lastButtonPressTime) <=
@@ -3126,7 +3129,7 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
     endResize();
   } else if (re->window == frame.window) {
     if (re->button == 2 && re->state == mod_mask)
-      XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
+      XUngrabPointer(otk::OBDisplay::display, CurrentTime);
   }
 }
 
@@ -3149,7 +3152,7 @@ void BlackboxWindow::beginMove(int x_root, int y_root) {
       changing->endResize();
   }
   
-  XGrabPointer(blackbox->getXDisplay(), frame.window, False,
+  XGrabPointer(otk::OBDisplay::display, frame.window, False,
                PointerMotionMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync,
                None, blackbox->getMoveCursor(), CurrentTime);
@@ -3158,12 +3161,12 @@ void BlackboxWindow::beginMove(int x_root, int y_root) {
   blackbox->setChangingWindow(this);
 
   if (! screen->doOpaqueMove()) {
-    XGrabServer(blackbox->getXDisplay());
+    XGrabServer(otk::OBDisplay::display);
 
     frame.changing = frame.rect;
     screen->showPosition(frame.changing.x(), frame.changing.y());
 
-    XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+    XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                    screen->getOpGC(),
                    frame.changing.x(),
                    frame.changing.y(),
@@ -3192,7 +3195,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
     configure(dx, dy, frame.rect.width(), frame.rect.height());
   } else {
-    XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+    XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                    screen->getOpGC(),
                    frame.changing.x(),
                    frame.changing.y(),
@@ -3204,7 +3207,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
     frame.changing.setPos(dx, dy);
 
-    XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+    XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                    screen->getOpGC(),
                    frame.changing.x(),
                    frame.changing.y(),
@@ -3251,19 +3254,19 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root, int &dx) {
   screen->changeWorkspaceID(dest);
 
   if (screen->doOpaqueMove())
-    XGrabServer(blackbox->getXDisplay());
+    XGrabServer(otk::OBDisplay::display);
 
-  XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
-  XWarpPointer(blackbox->getXDisplay(), None, 
+  XUngrabPointer(otk::OBDisplay::display, CurrentTime);
+  XWarpPointer(otk::OBDisplay::display, None, 
                screen->getRootWindow(), 0, 0, 0, 0,
                dest_x, y_root);
-  XGrabPointer(blackbox->getXDisplay(), frame.window, False,
+  XGrabPointer(otk::OBDisplay::display, frame.window, False,
                PointerMotionMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync,
                None, blackbox->getMoveCursor(), CurrentTime);
 
   if (screen->doOpaqueMove())
-    XUngrabServer(blackbox->getXDisplay());
+    XUngrabServer(otk::OBDisplay::display);
 
   if (focus)
     setInputFocus();
@@ -3285,7 +3288,8 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   const int snap_offset = screen->getSnapOffset();
 
   // find the geomeetery where the moving window currently is
-  const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;
+  const otk::Rect &moving =
+    screen->doOpaqueMove() ? frame.rect : frame.changing;
 
   // window corners
   const int wleft = dx,
@@ -3294,7 +3298,7 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           wbottom = dy + frame.rect.height() - 1;
 
   if (snap_to_windows) {
-    RectList rectlist;
+    otk::RectList rectlist;
 
     Workspace *w = screen->getWorkspace(getWorkspaceNumber());
     assert(w);
@@ -3306,11 +3310,11 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
       if (*st_it != this) // don't snap to ourself
         rectlist.push_back( (*st_it)->frameRect() );
 
-    RectList::const_iterator it, end = rectlist.end();
+    otk::RectList::const_iterator it, end = rectlist.end();
     for (it = rectlist.begin(); it != end; ++it) {
       bool snapped = False;
-      const Rect &winrect = *it;
-      Rect offsetrect;
+      const otk::Rect &winrect = *it;
+      otk::Rect offsetrect;
       offsetrect.setCoords(winrect.left() - snap_offset,
                            winrect.top() - snap_offset,
                            winrect.right() + snap_offset,
@@ -3461,7 +3465,7 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   }
 
   if (snap_to_edges) {
-    RectList rectlist;
+    otk::RectList rectlist;
 
     // snap to the screen edges (and screen boundaries for xinerama)
 #ifdef    XINERAMA
@@ -3473,10 +3477,10 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
 #endif // XINERAMA
       rectlist.push_back(screen->getRect());
 
-    RectList::const_iterator it, end = rectlist.end();
+    otk::RectList::const_iterator it, end = rectlist.end();
     for (it = rectlist.begin(); it != end; ++it) {
-      const Rect &srect = *it;
-      Rect offsetrect;
+      const otk::Rect &srect = *it;
+      otk::Rect offsetrect;
       offsetrect.setCoords(srect.left() + snap_offset,
                            srect.top() + snap_offset,
                            srect.right() - snap_offset,
@@ -3488,8 +3492,8 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           continue;
       } else { // BScreen::WindowSnap
         // if we're not in the rectangle then don't snap to it.
-        if (! srect.intersects(Rect(wleft, wtop, frame.rect.width(),
-                                    frame.rect.height())))
+        if (! srect.intersects(otk::Rect(wleft, wtop, frame.rect.width(),
+                                         frame.rect.height())))
           continue;
       }
 
@@ -3550,10 +3554,10 @@ void BlackboxWindow::endMove(void) {
      * so we need to subtract 1 from changing_w/changing_h every where we
      * draw the rubber band (for both moving and resizing)
      */
-    XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+    XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                    screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                    frame.changing.width() - 1, frame.changing.height() - 1);
-      XUngrabServer(blackbox->getXDisplay());
+      XUngrabServer(otk::OBDisplay::display);
   
       configure(frame.changing.x(), frame.changing.y(),
                 frame.changing.width(), frame.changing.height());
@@ -3563,12 +3567,12 @@ void BlackboxWindow::endMove(void) {
   }
   screen->hideGeometry();
 
-  XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
+  XUngrabPointer(otk::OBDisplay::display, CurrentTime);
 
   // if there are any left over motions from the move, drop them now
-  XSync(blackbox->getXDisplay(), false); // make sure we don't miss any
+  XSync(otk::OBDisplay::display, false); // make sure we don't miss any
   XEvent e;
-  while (XCheckTypedWindowEvent(blackbox->getXDisplay(), frame.window,
+  while (XCheckTypedWindowEvent(otk::OBDisplay::display, frame.window,
                                 MotionNotify, &e));
 }
 
@@ -3622,8 +3626,8 @@ void BlackboxWindow::beginResize(int x_root, int y_root, Corner dir) {
     return;        // unreachable, for the compiler
   }
   
-  XGrabServer(blackbox->getXDisplay());
-  XGrabPointer(blackbox->getXDisplay(), frame.window, False,
+  XGrabServer(otk::OBDisplay::display);
+  XGrabPointer(otk::OBDisplay::display, frame.window, False,
                PointerMotionMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync, None, cursor, CurrentTime);
 
@@ -3635,7 +3639,7 @@ void BlackboxWindow::beginResize(int x_root, int y_root, Corner dir) {
 
   constrain(anchor,  &gw, &gh);
 
-  XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+  XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                  screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                  frame.changing.width() - 1, frame.changing.height() - 1);
 
@@ -3650,7 +3654,7 @@ void BlackboxWindow::doResize(int x_root, int y_root) {
   assert(flags.resizing);
   assert(blackbox->getChangingWindow() == this);
 
-  XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+  XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                  screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                  frame.changing.width() - 1, frame.changing.height() - 1);
 
@@ -3694,7 +3698,7 @@ void BlackboxWindow::doResize(int x_root, int y_root) {
 
   constrain(anchor, &gw, &gh);
 
-  XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+  XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                  screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                  frame.changing.width() - 1, frame.changing.height() - 1);
 
@@ -3706,10 +3710,10 @@ void BlackboxWindow::endResize(void) {
   assert(flags.resizing);
   assert(blackbox->getChangingWindow() == this);
 
-  XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),
+  XDrawRectangle(otk::OBDisplay::display, screen->getRootWindow(),
                  screen->getOpGC(), frame.changing.x(), frame.changing.y(),
                  frame.changing.width() - 1, frame.changing.height() - 1);
-  XUngrabServer(blackbox->getXDisplay());
+  XUngrabServer(otk::OBDisplay::display);
 
   // unset maximized state after resized when fully maximized
   if (flags.maximized == 1)
@@ -3722,12 +3726,12 @@ void BlackboxWindow::endResize(void) {
             frame.changing.width(), frame.changing.height());
   screen->hideGeometry();
 
-  XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
+  XUngrabPointer(otk::OBDisplay::display, CurrentTime);
   
   // if there are any left over motions from the resize, drop them now
-  XSync(blackbox->getXDisplay(), false); // make sure we don't miss any
+  XSync(otk::OBDisplay::display, false); // make sure we don't miss any
   XEvent e;
-  while (XCheckTypedWindowEvent(blackbox->getXDisplay(), frame.window,
+  while (XCheckTypedWindowEvent(otk::OBDisplay::display, frame.window,
                                 MotionNotify, &e));
 }
 
@@ -3790,7 +3794,7 @@ void BlackboxWindow::enterNotifyEvent(const XCrossingEvent* ce) {
   XEvent e;
   bool leave = False, inferior = False;
 
-  while (XCheckTypedWindowEvent(blackbox->getXDisplay(), ce->window,
+  while (XCheckTypedWindowEvent(otk::OBDisplay::display, ce->window,
                                 LeaveNotify, &e)) {
     if (e.type == LeaveNotify && e.xcrossing.mode == NotifyNormal) {
       leave = True;
@@ -3843,14 +3847,14 @@ void BlackboxWindow::shapeEvent(XShapeEvent *e) {
 
 
 bool BlackboxWindow::validateClient(void) const {
-  XSync(blackbox->getXDisplay(), False);
+  XSync(otk::OBDisplay::display, False);
 
   XEvent e;
-  if (XCheckTypedWindowEvent(blackbox->getXDisplay(), client.window,
+  if (XCheckTypedWindowEvent(otk::OBDisplay::display, client.window,
                              DestroyNotify, &e) ||
-      XCheckTypedWindowEvent(blackbox->getXDisplay(), client.window,
+      XCheckTypedWindowEvent(otk::OBDisplay::display, client.window,
                              UnmapNotify, &e)) {
-    XPutBackEvent(blackbox->getXDisplay(), &e);
+    XPutBackEvent(otk::OBDisplay::display, &e);
 
     return False;
   }
@@ -3860,9 +3864,9 @@ bool BlackboxWindow::validateClient(void) const {
 
 
 void BlackboxWindow::restore(bool remap) {
-  XChangeSaveSet(blackbox->getXDisplay(), client.window, SetModeDelete);
-  XSelectInput(blackbox->getXDisplay(), client.window, NoEventMask);
-  XSelectInput(blackbox->getXDisplay(), frame.plate, NoEventMask);
+  XChangeSaveSet(otk::OBDisplay::display, client.window, SetModeDelete);
+  XSelectInput(otk::OBDisplay::display, client.window, NoEventMask);
+  XSelectInput(otk::OBDisplay::display, frame.plate, NoEventMask);
 
   // do not leave a shaded window as an icon unless it was an icon
   if (flags.shaded && ! flags.iconic)
@@ -3876,24 +3880,24 @@ void BlackboxWindow::restore(bool remap) {
 
   restoreGravity(client.rect);
 
-  XUnmapWindow(blackbox->getXDisplay(), frame.window);
-  XUnmapWindow(blackbox->getXDisplay(), client.window);
+  XUnmapWindow(otk::OBDisplay::display, frame.window);
+  XUnmapWindow(otk::OBDisplay::display, client.window);
 
-  XSetWindowBorderWidth(blackbox->getXDisplay(), client.window, client.old_bw);
+  XSetWindowBorderWidth(otk::OBDisplay::display, client.window, client.old_bw);
 
   XEvent ev;
-  if (XCheckTypedWindowEvent(blackbox->getXDisplay(), client.window,
+  if (XCheckTypedWindowEvent(otk::OBDisplay::display, client.window,
                              ReparentNotify, &ev)) {
     remap = True;
   } else {
     // according to the ICCCM - if the client doesn't reparent to
     // root, then we have to do it for them
-    XReparentWindow(blackbox->getXDisplay(), client.window,
+    XReparentWindow(otk::OBDisplay::display, client.window,
                     screen->getRootWindow(),
                     client.rect.x(), client.rect.y());
   }
 
-  if (remap) XMapWindow(blackbox->getXDisplay(), client.window);
+  if (remap) XMapWindow(otk::OBDisplay::display, client.window);
 }
 
 
@@ -4168,13 +4172,13 @@ void WindowStyle::doJustify(const std::string &text, int &start_pos,
 BWindowGroup::BWindowGroup(Blackbox *b, Window _group)
   : blackbox(b), group(_group) {
   XWindowAttributes wattrib;
-  if (! XGetWindowAttributes(blackbox->getXDisplay(), group, &wattrib)) {
+  if (! XGetWindowAttributes(otk::OBDisplay::display, group, &wattrib)) {
     // group window doesn't seem to exist anymore
     delete this;
     return;
   }
 
-  XSelectInput(blackbox->getXDisplay(), group,
+  XSelectInput(otk::OBDisplay::display, group,
                PropertyChangeMask | FocusChangeMask | StructureNotifyMask);
 
   blackbox->saveGroupSearch(group, this);
@@ -4209,4 +4213,6 @@ BWindowGroup::find(BScreen *screen, bool allow_transients) const {
   }
 
   return ret;
+}
+
 }

@@ -10,22 +10,15 @@ extern "C" {
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
-#ifdef    TIME_WITH_SYS_TIME
-#  include <sys/time.h>
-#  include <time.h>
-#else // !TIME_WITH_SYS_TIME
-#  ifdef    HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#  else // !HAVE_SYS_TIME_H
-#    include <time.h>
-#  endif // HAVE_SYS_TIME_H
-#endif // TIME_WITH_SYS_TIME
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif // HAVE_UNISTD_H
+
 #if defined(HAVE_PROCESS_H) && defined(__EMX__)
 #  include <process.h>
 #endif //   HAVE_PROCESS_H             __EMX__
@@ -39,98 +32,7 @@ extern "C" {
 
 using std::string;
 
-
-void Rect::setX(int x) {
-  _x2 += x - _x1;
-  _x1 = x;
-}
-
-
-void Rect::setY(int y)
-{
-  _y2 += y - _y1;
-  _y1 = y;
-}
-
-
-void Rect::setPos(int x, int y) {
-  _x2 += x - _x1;
-  _x1 = x;
-  _y2 += y - _y1;
-  _y1 = y;
-}
-
-
-void Rect::setWidth(unsigned int w) {
-  _x2 = w + _x1 - 1;
-}
-
-
-void Rect::setHeight(unsigned int h) {
-  _y2 = h + _y1 - 1;
-}
-
-
-void Rect::setSize(unsigned int w, unsigned int h) {
-  _x2 = w + _x1 - 1;
-  _y2 = h + _y1 - 1;
-}
-
-
-void Rect::setRect(int x, int y, unsigned int w, unsigned int h) {
-  *this = Rect(x, y, w, h);
-}
-
-
-void Rect::setCoords(int l, int t, int r, int b) {
-  _x1 = l;
-  _y1 = t;
-  _x2 = r;
-  _y2 = b;
-}
-
-
-Rect Rect::operator|(const Rect &a) const {
-  Rect b;
-
-  b._x1 = std::min(_x1, a._x1);
-  b._y1 = std::min(_y1, a._y1);
-  b._x2 = std::max(_x2, a._x2);
-  b._y2 = std::max(_y2, a._y2);
-
-  return b;
-}
-
-
-Rect Rect::operator&(const Rect &a) const {
-  Rect b;
-
-  b._x1 = std::max(_x1, a._x1);
-  b._y1 = std::max(_y1, a._y1);
-  b._x2 = std::min(_x2, a._x2);
-  b._y2 = std::min(_y2, a._y2);
-
-  return b;
-}
-
-
-bool Rect::intersects(const Rect &a) const {
-  return std::max(_x1, a._x1) <= std::min(_x2, a._x2) &&
-         std::max(_y1, a._y1) <= std::min(_y2, a._y2);
-}
-
-
-bool Rect::contains(int x, int y) const {
-  return x >= _x1 && x <= _x2 &&
-         y >= _y1 && y <= _y2;
-}
-
-
-bool Rect::contains(const Rect& a) const {
-  return a._x1 >= _x1 && a._x2 <= _x2 &&
-         a._y1 >= _y1 && a._y2 <= _y2;
-}
-
+namespace ob {
 
 string expandTilde(const string& s) {
   if (s[0] != '~') return s;
@@ -155,16 +57,6 @@ void bexec(const string& command, const string& displaystring) {
   spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", command.c_str(), NULL);
 #endif // !__EMX__
 }
-
-
-#ifndef   HAVE_BASENAME
-string basename (const string& path) {
-  string::size_type slash = path.rfind('/');
-  if (slash == string::npos)
-    return path;
-  return path.substr(slash+1);
-}
-#endif // HAVE_BASENAME
 
 
 string textPropertyToString(Display *display, XTextProperty& text_prop) {
@@ -231,3 +123,15 @@ string itostring(long i) {
     tmp.insert(tmp.begin(), '-');
   return tmp;
 }
+
+}
+
+#ifndef   HAVE_BASENAME
+string basename (const string& path) {
+  string::size_type slash = path.rfind('/');
+  if (slash == string::npos)
+    return path;
+  return path.substr(slash+1);
+}
+#endif // HAVE_BASENAME
+

@@ -20,15 +20,16 @@ extern "C" {
 #include <list>
 #include <vector>
 
-#include "color.hh"
-#include "texture.hh"
-#include "image.hh"
+#include "otk/color.hh"
+#include "otk/font.hh"
+#include "otk/texture.hh"
+#include "otk/image.hh"
 #include "timer.hh"
 #include "workspace.hh"
 #include "blackbox.hh"
 
-class Slit; // forward reference
-class BFont;
+namespace ob {
+
 class XAtom;
 struct Strut;
 
@@ -40,14 +41,14 @@ struct PixmapMask {
 };
 
 struct WindowStyle {
-  BColor l_text_focus, l_text_unfocus, b_pic_focus,
+  otk::BColor l_text_focus, l_text_unfocus, b_pic_focus,
     b_pic_unfocus;
-  BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
+  otk::BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, b_pressed_focus,
     b_pressed_unfocus, g_focus, g_unfocus;
 
   PixmapMask close_button, max_button, icon_button, stick_button;
-  BFont *font;
+  otk::BFont *font;
 
   TextJustify justify;
 
@@ -55,7 +56,7 @@ struct WindowStyle {
                  unsigned int max_length, unsigned int modifier) const;
 };
 
-class BScreen : public ScreenInfo {
+class BScreen : public otk::ScreenInfo {
 private:
   bool root_colormap_installed, managed, geom_visible;
   GC opGC;
@@ -63,7 +64,7 @@ private:
   Window geom_window;
 
   Blackbox *blackbox;
-  BImageControl *image_control;
+  otk::BImageControl *image_control;
   Configuration *config;
   XAtom *xatom;
 
@@ -77,7 +78,7 @@ private:
   unsigned int geom_w, geom_h;
   unsigned long event_mask;
 
-  Rect usableArea;
+  otk::Rect usableArea;
 #ifdef    XINERAMA
   RectList xineramaUsableArea;
 #endif // XINERAMA
@@ -98,7 +99,7 @@ private:
     int snap_to_windows, snap_to_edges;
     unsigned int snap_offset;
 
-    BColor border_color;
+    otk::BColor border_color;
 
     unsigned int workspaces;
     int placement_policy,
@@ -120,15 +121,15 @@ private:
                         PixmapMask &pixmapMask,
                         const Configuration &style);
   
-  BTexture readDatabaseTexture(const std::string &rname,
+  otk::BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
                                const Configuration &style, 
                                bool allowNoTexture = false);
-  BColor readDatabaseColor(const std::string &rname,
+  otk::BColor readDatabaseColor(const std::string &rname,
                            const std::string &default_color,
                            const Configuration &style);
-  BFont *readDatabaseFont(const std::string &rbasename,
-                          const Configuration &style);
+  otk::BFont *readDatabaseFont(const std::string &rbasename,
+                               const Configuration &style);
 
   void LoadStyle(void);
 
@@ -182,8 +183,8 @@ public:
   inline const GC &getOpGC(void) const { return opGC; }
 
   inline Blackbox *getBlackbox(void) { return blackbox; }
-  inline BColor *getBorderColor(void) { return &resource.border_color; }
-  inline BImageControl *getImageControl(void) { return image_control; }
+  inline otk::BColor *getBorderColor(void) { return &resource.border_color; }
+  inline otk::BImageControl *getImageControl(void) { return image_control; }
 
   Workspace *getWorkspace(unsigned int index) const;
 
@@ -264,7 +265,7 @@ public:
 
   // allAvailableAreas should be used whenever possible instead of this function
   // as then Xinerama will work correctly.
-  const Rect& availableArea(void) const;
+  const otk::Rect& availableArea(void) const;
 #ifdef    XINERAMA
   const RectList& allAvailableAreas(void) const;
 #endif // XINERAMA
@@ -308,5 +309,6 @@ public:
   void propertyNotifyEvent(const XPropertyEvent *pe);
 };
 
+}
 
 #endif // __Screen_hh

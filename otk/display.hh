@@ -62,6 +62,19 @@ public:
   inline static int shapeEventBase() { return _shape_event_basep; }
   //! Returns if the display has the xinerama extention available
   inline static bool xinerama() { return _xinerama; }
+
+
+
+
+  
+  /* TEMPORARY */
+  static void grabButton(unsigned int button, unsigned int modifiers,
+                  Window grab_window, bool owner_events,
+                  unsigned int event_mask, int pointer_mode,
+                  int keyboard_mode, Window confine_to, Cursor cursor,
+                  bool allow_scroll_lock);
+  static void ungrabButton(unsigned int button, unsigned int modifiers,
+                    Window grab_window);
 };
 
 }

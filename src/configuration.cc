@@ -17,6 +17,8 @@ extern "C" {
 
 using std::string;
 
+namespace ob {
+
 bool Configuration::_initialized = False;
 
 Configuration::Configuration(const string &file, bool autosave) {
@@ -230,4 +232,6 @@ char Configuration::toUpper(char c) const {
   if (c >= 'a' && c <= 'z')
     return c - 'a' + 'A';
   return c;
+}
+
 }

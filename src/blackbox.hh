@@ -25,7 +25,7 @@ extern "C" {
 #include <map>
 #include <string>
 
-#include "basedisplay.hh"
+#include "openbox.hh"
 #include "configuration.hh"
 #include "timer.hh"
 #include "xatom.hh"
@@ -47,6 +47,8 @@ extern "C" {
 #define DecorTiny         (2)
 #define DecorTool         (3)
 
+namespace ob {
+
 struct BlackboxHints {
   unsigned long flags, attrib, workspace, stack, decoration;
 };
@@ -67,7 +69,7 @@ class Blackbox;
 class BlackboxWindow;
 class BWindowGroup;
 
-class Blackbox : public BaseDisplay, public TimeoutHandler {
+class Blackbox : public Openbox, public TimeoutHandler, public TimerQueueManager  {
 private:
   struct BCursor {
     Cursor session, move, ll_angle, lr_angle, ul_angle, ur_angle;
@@ -79,7 +81,7 @@ private:
 
     std::string style_file;
     int colors_per_channel;
-    timeval auto_raise_delay;
+    ::timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
     std::string titlebar_layout;
     unsigned int mod_mask;  // modifier mask used for window-mouse interaction
@@ -127,7 +129,7 @@ private:
 
 
 public:
-  Blackbox(char **m_argv, char *dpy_name = 0, char *rc = 0);
+  Blackbox(int argc, char **m_argv, char *rc = 0);
   virtual ~Blackbox(void);
 
   BWindowGroup *searchGroup(Window window);
@@ -174,7 +176,7 @@ public:
   inline std::string getTitlebarLayout(void) const
     { return resource.titlebar_layout; }
 
-  inline const timeval &getAutoRaiseDelay(void) const
+  inline const ::timeval &getAutoRaiseDelay(void) const
     { return resource.auto_raise_delay; }
 
   inline unsigned long getCacheLife(void) const
@@ -214,7 +216,11 @@ public:
   virtual void timeout(void);
 
   enum { B_AmericanDate = 1, B_EuropeanDate };
+
+  virtual void addTimer(BTimer *timer);
+  virtual void removeTimer(BTimer *timer);
 };
 
+}
 
 #endif // __blackbox_hh

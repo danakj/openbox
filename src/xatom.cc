@@ -12,6 +12,8 @@ extern "C" {
 #include "screen.hh"
 #include "util.hh"
 
+namespace ob {
+
 XAtom::XAtom(Display *d) {
   _display = d;
 
@@ -168,7 +170,7 @@ Atom XAtom::create(const char *name) const {
 /*
  * Sets which atoms are supported for NETWM, by Openbox, on the root window.
  */
-void XAtom::setSupported(const ScreenInfo *screen) {
+void XAtom::setSupported(const otk::ScreenInfo *screen) {
   Window root = screen->getRootWindow();
 
   // create the netwm support window
@@ -508,4 +510,6 @@ void XAtom::sendClientMessage(Window target, Atoms type, Window about,
   XSendEvent(_display, target, False,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
+}
+
 }

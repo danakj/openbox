@@ -6,6 +6,8 @@
 #include <X11/Xresource.h>
 #include <string>
 
+namespace ob {
+
 /*
  * The Configuration class is a generic wrapper for configuration settings.
  *
@@ -73,5 +75,7 @@ private:
   bool _autosave;
   XrmDatabase _database;
 };
+
+}
 
 #endif // __Configuration_hh

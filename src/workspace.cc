@@ -25,13 +25,15 @@ extern "C" {
 using std::string;
 
 #include "blackbox.hh"
-#include "font.hh"
+#include "otk/font.hh"
+#include "otk/display.hh"
 #include "screen.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
 #include "xatom.hh"
 
+namespace ob {
 
 Workspace::Workspace(BScreen *scrn, unsigned int i) {
   screen = scrn;
@@ -99,7 +101,7 @@ void Workspace::removeWindow(BlackboxWindow *w, bool sticky) {
 
   // pass focus to the next appropriate window
   if ((w->isFocused() || w == lastfocus) &&
-      ! screen->getBlackbox()->doShutdown()) {
+      screen->getBlackbox()->state() != Openbox::State_Exiting) {
     focusFallback(w);
   }
     
@@ -188,7 +190,8 @@ void Workspace::showAll(void) {
     // sticky windows arent unmapped on a workspace change so we don't have ot
     // map them, but sometimes on a restart, another app can unmap our sticky
     // windows, so we map on startup always
-    if (! bw->isStuck() || screen->getBlackbox()->isStartup())
+    if (! bw->isStuck() ||
+        screen->getBlackbox()->state() == Openbox::State_Starting)
       bw->show();
   }
 }
@@ -465,13 +468,13 @@ void Workspace::setName(const string& new_name) {
 /*
  * Calculate free space available for window placement.
  */
-Workspace::rectList Workspace::calcSpace(const Rect &win,
+Workspace::rectList Workspace::calcSpace(const otk::Rect &win,
                                          const rectList &spaces) const {
-  Rect isect, extra;
+  otk::Rect isect, extra;
   rectList result;
   rectList::const_iterator siter, end = spaces.end();
   for (siter = spaces.begin(); siter != end; ++siter) {
-    const Rect &curr = *siter;
+    const otk::Rect &curr = *siter;
 
     if(! win.intersects(curr)) {
       result.push_back(curr);
@@ -509,56 +512,56 @@ Workspace::rectList Workspace::calcSpace(const Rect &win,
 }
 
 
-static bool rowRLBT(const Rect &first, const Rect &second) {
+static bool rowRLBT(const otk::Rect &first, const otk::Rect &second) {
   if (first.bottom() == second.bottom())
     return first.right() > second.right();
   return first.bottom() > second.bottom();
 }
 
-static bool rowRLTB(const Rect &first, const Rect &second) {
+static bool rowRLTB(const otk::Rect &first, const otk::Rect &second) {
   if (first.y() == second.y())
     return first.right() > second.right();
   return first.y() < second.y();
 }
 
-static bool rowLRBT(const Rect &first, const Rect &second) {
+static bool rowLRBT(const otk::Rect &first, const otk::Rect &second) {
   if (first.bottom() == second.bottom())
     return first.x() < second.x();
   return first.bottom() > second.bottom();
 }
 
-static bool rowLRTB(const Rect &first, const Rect &second) {
+static bool rowLRTB(const otk::Rect &first, const otk::Rect &second) {
   if (first.y() == second.y())
     return first.x() < second.x();
   return first.y() < second.y();
 }
 
-static bool colLRTB(const Rect &first, const Rect &second) {
+static bool colLRTB(const otk::Rect &first, const otk::Rect &second) {
   if (first.x() == second.x())
     return first.y() < second.y();
   return first.x() < second.x();
 }
 
-static bool colLRBT(const Rect &first, const Rect &second) {
+static bool colLRBT(const otk::Rect &first, const otk::Rect &second) {
   if (first.x() == second.x())
     return first.bottom() > second.bottom();
   return first.x() < second.x();
 }
 
-static bool colRLTB(const Rect &first, const Rect &second) {
+static bool colRLTB(const otk::Rect &first, const otk::Rect &second) {
   if (first.right() == second.right())
     return first.y() < second.y();
   return first.right() > second.right();
 }
 
-static bool colRLBT(const Rect &first, const Rect &second) {
+static bool colRLBT(const otk::Rect &first, const otk::Rect &second) {
   if (first.right() == second.right())
     return first.bottom() > second.bottom();
   return first.right() > second.right();
 }
 
 
-bool Workspace::smartPlacement(Rect& win) {
+bool Workspace::smartPlacement(otk::Rect& win) {
   rectList spaces;
  
   //initially the entire screen is free
@@ -579,7 +582,7 @@ bool Workspace::smartPlacement(Rect& win) {
   } else
 #endif // XINERAMA
   {
-    Rect r = screen->availableArea();
+    otk::Rect r = screen->availableArea();
     r.setRect(r.x() + screen->getSnapOffset(),
               r.y() + screen->getSnapOffset(),
               r.width() - screen->getSnapOffset(),
@@ -590,7 +593,7 @@ bool Workspace::smartPlacement(Rect& win) {
   //Find Free Spaces
   BlackboxWindowList::const_iterator wit = windowList.begin(),
     end = windowList.end();
-  Rect tmp;
+  otk::Rect tmp;
   for (; wit != end; ++wit) {
     const BlackboxWindow* const curr = *wit;
 
@@ -644,7 +647,7 @@ bool Workspace::smartPlacement(Rect& win) {
     return False;
 
   //set new position based on the empty space found
-  const Rect& where = *sit;
+  const otk::Rect& where = *sit;
   win.setX(where.x());
   win.setY(where.y());
 
@@ -664,14 +667,14 @@ bool Workspace::smartPlacement(Rect& win) {
 }
 
 
-bool Workspace::underMousePlacement(Rect &win) {
+bool Workspace::underMousePlacement(otk::Rect &win) {
   int x, y, rx, ry;
   Window c, r;
   unsigned int m;
-  XQueryPointer(screen->getBlackbox()->getXDisplay(), screen->getRootWindow(),
+  XQueryPointer(otk::OBDisplay::display, screen->getRootWindow(),
                 &r, &c, &rx, &ry, &x, &y, &m);
 
-  Rect area;
+  otk::Rect area;
 #ifdef    XINERAMA
   if (screen->isXineramaActive() &&
       screen->getBlackbox()->doXineramaPlacement()) {
@@ -705,8 +708,8 @@ bool Workspace::underMousePlacement(Rect &win) {
 }
 
 
-bool Workspace::cascadePlacement(Rect &win, const int offset) {
-  Rect area;
+bool Workspace::cascadePlacement(otk::Rect &win, const int offset) {
+  otk::Rect area;
   
 #ifdef    XINERAMA
   if (screen->isXineramaActive() &&
@@ -745,7 +748,7 @@ bool Workspace::cascadePlacement(Rect &win, const int offset) {
 
 
 void Workspace::placeWindow(BlackboxWindow *win) {
-  Rect new_win(0, 0, win->frameRect().width(), win->frameRect().height());
+  otk::Rect new_win(0, 0, win->frameRect().width(), win->frameRect().height());
   bool placed = False;
 
   switch (screen->getPlacementPolicy()) {
@@ -770,4 +773,6 @@ void Workspace::placeWindow(BlackboxWindow *win) {
     new_win.setY(screen->availableArea().top());
 
   win->configure(new_win.x(), new_win.y(), new_win.width(), new_win.height());
+}
+
 }

@@ -13,7 +13,6 @@ extern "C" {
 #include <vector>
 
 // forward declaration
-class BaseDisplay;
 class BGCCache;
 
 class BaseDisplay: public TimerQueueManager {

@@ -54,11 +54,12 @@ extern "C" {
 #include <string>
 using std::string;
 
-#include "blackbox.hh"
-#include "font.hh"
-#include "gccache.hh"
-#include "image.hh"
 #include "screen.hh"
+#include "otk/font.hh"
+#include "otk/gccache.hh"
+#include "otk/image.hh"
+#include "otk/assassin.hh"
+#include "openbox.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
@@ -69,6 +70,7 @@ using std::string;
 #define   FONT_ELEMENT_SIZE 50
 #endif // FONT_ELEMENT_SIZE
 
+namespace ob {
 
 static bool running = True;
 
@@ -84,7 +86,7 @@ static int anotherWMRunning(Display *display, XErrorEvent *) {
 }
 
 
-BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
+BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
   blackbox = bb;
   screenstr = "session.screen" + itostring(scrn) + '.';
   config = blackbox->getConfig();
@@ -94,8 +96,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
     SubstructureRedirectMask | ButtonPressMask | ButtonReleaseMask;
 
   XErrorHandler old = XSetErrorHandler((XErrorHandler) anotherWMRunning);
-  XSelectInput(getBaseDisplay()->getXDisplay(), getRootWindow(), event_mask);
-  XSync(getBaseDisplay()->getXDisplay(), False);
+  XSelectInput(otk::OBDisplay::display, getRootWindow(), event_mask);
+  XSync(otk::OBDisplay::display, False);
   XSetErrorHandler((XErrorHandler) old);
 
   managed = running;
@@ -106,7 +108,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
           getScreenNumber(), XVisualIDFromVisual(getVisual()),
           getDepth());
 
-  resource.wstyle.font = (BFont *) 0;
+  resource.wstyle.font = (otk::BFont *) 0;
 
   geom_pixmap = None;
 
@@ -124,14 +126,14 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
                   XAtom::cardinal, viewport, 2);
                   
 
-  XDefineCursor(blackbox->getXDisplay(), getRootWindow(),
+  XDefineCursor(otk::OBDisplay::display, getRootWindow(),
                 blackbox->getSessionCursor());
 
   updateAvailableArea();
 
   image_control =
-    new BImageControl(blackbox, this, True, blackbox->getColorsPerChannel(),
-                      blackbox->getCacheLife(), blackbox->getCacheMax());
+    new otk::BImageControl(this, True, blackbox->getColorsPerChannel(),
+                           blackbox->getCacheLife(), blackbox->getCacheMax());
   image_control->installRootColormap();
   root_colormap_installed = True;
 
@@ -139,11 +141,11 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   LoadStyle();
 
   XGCValues gcv;
-  gcv.foreground = WhitePixel(blackbox->getXDisplay(), getScreenNumber())
-    ^ BlackPixel(blackbox->getXDisplay(), getScreenNumber());
+  gcv.foreground = WhitePixel(otk::OBDisplay::display, getScreenNumber())
+    ^ BlackPixel(otk::OBDisplay::display, getScreenNumber());
   gcv.function = GXxor;
   gcv.subwindow_mode = IncludeInferiors;
-  opGC = XCreateGC(blackbox->getXDisplay(), getRootWindow(),
+  opGC = XCreateGC(otk::OBDisplay::display, getRootWindow(),
                    GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
   const char *s = "0: 0000 x 0: 0000";
@@ -156,23 +158,23 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   attrib.colormap = getColormap();
   attrib.save_under = True;
 
-  geom_window = XCreateWindow(blackbox->getXDisplay(), getRootWindow(),
+  geom_window = XCreateWindow(otk::OBDisplay::display, getRootWindow(),
                               0, 0, geom_w, geom_h, resource.border_width,
                               getDepth(), InputOutput, getVisual(),
                               mask, &attrib);
   geom_visible = False;
 
-  BTexture* texture = &(resource.wstyle.l_focus);
+  otk::BTexture* texture = &(resource.wstyle.l_focus);
   geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
   if (geom_pixmap == ParentRelative) {
     texture = &(resource.wstyle.t_focus);
     geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
   }
   if (! geom_pixmap)
-    XSetWindowBackground(blackbox->getXDisplay(), geom_window,
+    XSetWindowBackground(otk::OBDisplay::display, geom_window,
                          texture->color().pixel());
   else
-    XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+    XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                geom_window, geom_pixmap);
 
   if (resource.workspaces > 0) {
@@ -203,14 +205,14 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   unsigned int i, j, nchild;
   Window r, p, *children;
-  XQueryTree(blackbox->getXDisplay(), getRootWindow(), &r, &p,
+  XQueryTree(otk::OBDisplay::display, getRootWindow(), &r, &p,
              &children, &nchild);
 
   // preen the window list of all icon windows... for better dockapp support
   for (i = 0; i < nchild; i++) {
     if (children[i] == None) continue;
 
-    XWMHints *wmhints = XGetWMHints(blackbox->getXDisplay(),
+    XWMHints *wmhints = XGetWMHints(otk::OBDisplay::display,
                                     children[i]);
 
     if (wmhints) {
@@ -234,7 +236,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
       continue;
 
     XWindowAttributes attrib;
-    if (XGetWindowAttributes(blackbox->getXDisplay(), children[i], &attrib)) {
+    if (XGetWindowAttributes(otk::OBDisplay::display, children[i], &attrib)) {
       if (attrib.override_redirect) continue;
 
       if (attrib.map_state != IsUnmapped) {
@@ -257,12 +259,12 @@ BScreen::~BScreen(void) {
     image_control->removeImage(geom_pixmap);
 
   if (geom_window != None)
-    XDestroyWindow(blackbox->getXDisplay(), geom_window);
+    XDestroyWindow(otk::OBDisplay::display, geom_window);
 
   std::for_each(workspacesList.begin(), workspacesList.end(),
-                PointerAssassin());
+                otk::PointerAssassin());
 
-  std::for_each(iconList.begin(), iconList.end(), PointerAssassin());
+  std::for_each(iconList.begin(), iconList.end(), otk::PointerAssassin());
 
   while (! systrayWindowList.empty())
     removeSystrayWindow(systrayWindowList[0]);
@@ -273,19 +275,19 @@ BScreen::~BScreen(void) {
     delete resource.wstyle.font;
 
   if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.max_button.mask);
   if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.icon_button.mask);
   if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.stick_button.mask);
 
   resource.wstyle.max_button.mask = resource.wstyle.close_button.mask =
     resource.wstyle.icon_button.mask =
     resource.wstyle.stick_button.mask = None;
   
-  XFreeGC(blackbox->getXDisplay(), opGC);
+  XFreeGC(otk::OBDisplay::display, opGC);
 }
 
 
@@ -722,7 +724,7 @@ void BScreen::changeWorkspaceCount(unsigned int new_count) {
 void BScreen::reconfigure(void) {
   // don't reconfigure while saving the initial rc file, it's a waste and it
   // breaks somethings (workspace names)
-  if (blackbox->isStartup()) return;
+  if (blackbox->state() == Openbox::State_Starting) return;
 
   load_rc();
   LoadStyle();
@@ -732,11 +734,11 @@ void BScreen::reconfigure(void) {
   changeWorkspaceCount(resource.workspaces);
 
   XGCValues gcv;
-  gcv.foreground = WhitePixel(blackbox->getXDisplay(),
+  gcv.foreground = WhitePixel(otk::OBDisplay::display,
                               getScreenNumber());
   gcv.function = GXinvert;
   gcv.subwindow_mode = IncludeInferiors;
-  XChangeGC(blackbox->getXDisplay(), opGC,
+  XChangeGC(otk::OBDisplay::display, opGC,
             GCForeground | GCFunction | GCSubwindowMode, &gcv);
 
   const char *s = "0: 0000 x 0: 0000";
@@ -744,22 +746,22 @@ void BScreen::reconfigure(void) {
   geom_w = resource.wstyle.font->measureString(s) + resource.bevel_width * 2;
   geom_h = resource.wstyle.font->height() + resource.bevel_width * 2;
 
-  BTexture* texture = &(resource.wstyle.l_focus);
+  otk::BTexture* texture = &(resource.wstyle.l_focus);
   geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
   if (geom_pixmap == ParentRelative) {
     texture = &(resource.wstyle.t_focus);
     geom_pixmap = texture->render(geom_w, geom_h, geom_pixmap);
   }
   if (! geom_pixmap)
-    XSetWindowBackground(blackbox->getXDisplay(), geom_window,
+    XSetWindowBackground(otk::OBDisplay::display, geom_window,
                          texture->color().pixel());
   else
-    XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+    XSetWindowBackgroundPixmap(otk::OBDisplay::display,
                                geom_window, geom_pixmap);
 
-  XSetWindowBorderWidth(blackbox->getXDisplay(), geom_window,
+  XSetWindowBorderWidth(otk::OBDisplay::display, geom_window,
                         resource.border_width);
-  XSetWindowBorder(blackbox->getXDisplay(), geom_window,
+  XSetWindowBorder(otk::OBDisplay::display, geom_window,
                    resource.border_color.pixel());
 
   typedef std::vector<int> SubList;
@@ -836,13 +838,13 @@ void BScreen::LoadStyle(void) {
     readDatabaseTexture("window.button.pressed.unfocus", "black", style, true);
 
   if (resource.wstyle.close_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.close_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.close_button.mask);
   if (resource.wstyle.max_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.max_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.max_button.mask);
   if (resource.wstyle.icon_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.icon_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.icon_button.mask);
   if (resource.wstyle.stick_button.mask != None)
-    XFreePixmap(blackbox->getXDisplay(), resource.wstyle.stick_button.mask);
+    XFreePixmap(otk::OBDisplay::display, resource.wstyle.stick_button.mask);
 
   resource.wstyle.close_button.mask = resource.wstyle.max_button.mask =
     resource.wstyle.icon_button.mask =
@@ -859,14 +861,15 @@ void BScreen::LoadStyle(void) {
 
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
-  BColor color = readDatabaseColor("window.frame.focusColor", "white", style);
-  resource.wstyle.f_focus = BTexture("solid flat", getBaseDisplay(),
-                                     getScreenNumber(), image_control);
+  otk::BColor color = readDatabaseColor("window.frame.focusColor", "white",
+                                        style);
+  resource.wstyle.f_focus = otk::BTexture("solid flat", getScreenNumber(),
+                                          image_control);
   resource.wstyle.f_focus.setColor(color);
 
   color = readDatabaseColor("window.frame.unfocusColor", "white", style);
-  resource.wstyle.f_unfocus = BTexture("solid flat", getBaseDisplay(),
-                                       getScreenNumber(), image_control);
+  resource.wstyle.f_unfocus = otk::BTexture("solid flat", getScreenNumber(),
+                                            image_control);
   resource.wstyle.f_unfocus.setColor(color);
 
   resource.wstyle.l_text_focus =
@@ -887,13 +890,13 @@ void BScreen::LoadStyle(void) {
   }
 
   // sanity checks
-  if (resource.wstyle.t_focus.texture() == BTexture::Parent_Relative)
+  if (resource.wstyle.t_focus.texture() == otk::BTexture::Parent_Relative)
     resource.wstyle.t_focus = resource.wstyle.f_focus;
-  if (resource.wstyle.t_unfocus.texture() == BTexture::Parent_Relative)
+  if (resource.wstyle.t_unfocus.texture() == otk::BTexture::Parent_Relative)
     resource.wstyle.t_unfocus = resource.wstyle.f_unfocus;
-  if (resource.wstyle.h_focus.texture() == BTexture::Parent_Relative)
+  if (resource.wstyle.h_focus.texture() == otk::BTexture::Parent_Relative)
     resource.wstyle.h_focus = resource.wstyle.f_focus;
-  if (resource.wstyle.h_unfocus.texture() == BTexture::Parent_Relative)
+  if (resource.wstyle.h_unfocus.texture() == otk::BTexture::Parent_Relative)
     resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
 
   resource.border_color =
@@ -1021,12 +1024,12 @@ void BScreen::changeWorkspaceID(unsigned int id) {
   BlackboxWindow *win = (BlackboxWindow *) 0;
   bool f = False;
 
-  XSync(blackbox->getXDisplay(), False);
+  XSync(otk::OBDisplay::display, False);
 
   // If sloppy focus and we can find the client window under the pointer,
   // try to focus it.  
   if (resource.sloppy_focus &&
-      XQueryPointer(blackbox->getXDisplay(), getRootWindow(), &r, &c,
+      XQueryPointer(otk::OBDisplay::display, getRootWindow(), &r, &c,
                     &rx, &ry, &x, &y, &m) &&
       c != None) {
     if ( (win = blackbox->searchWindow(c)) )
@@ -1112,21 +1115,21 @@ void BScreen::updateStackingList(void) {
 
 
 void BScreen::addSystrayWindow(Window window) {
-  XGrabServer(blackbox->getXDisplay());
+  XGrabServer(otk::OBDisplay::display);
   
-  XSelectInput(blackbox->getXDisplay(), window, StructureNotifyMask);
+  XSelectInput(otk::OBDisplay::display, window, StructureNotifyMask);
   systrayWindowList.push_back(window);
   xatom->setValue(getRootWindow(), XAtom::kde_net_system_tray_windows,
                   XAtom::window,
                   &systrayWindowList[0], systrayWindowList.size());
   blackbox->saveSystrayWindowSearch(window, this);
 
-  XUngrabServer(blackbox->getXDisplay());
+  XUngrabServer(otk::OBDisplay::display);
 }
 
 
 void BScreen::removeSystrayWindow(Window window) {
-  XGrabServer(blackbox->getXDisplay());
+  XGrabServer(otk::OBDisplay::display);
   
   WindowList::iterator it = systrayWindowList.begin();
   const WindowList::iterator end = systrayWindowList.end();
@@ -1137,13 +1140,13 @@ void BScreen::removeSystrayWindow(Window window) {
                       XAtom::window,
                       &systrayWindowList[0], systrayWindowList.size());
       blackbox->removeSystrayWindowSearch(window);
-      XSelectInput(blackbox->getXDisplay(), window, NoEventMask);
+      XSelectInput(otk::OBDisplay::display, window, NoEventMask);
       break;
     }
 
   assert(it != end);    // not a systray window
 
-  XUngrabServer(blackbox->getXDisplay());
+  XUngrabServer(otk::OBDisplay::display);
 }
 
 
@@ -1157,7 +1160,7 @@ void BScreen::manageWindow(Window w) {
   }
 
   // is the window a docking app
-  XWMHints *wmhint = XGetWMHints(blackbox->getXDisplay(), w);
+  XWMHints *wmhint = XGetWMHints(otk::OBDisplay::display, w);
   if (wmhint && (wmhint->flags & StateHint) &&
       wmhint->initial_state == WithdrawnState) {
     //slit->addClient(w);
@@ -1183,7 +1186,9 @@ void BScreen::manageWindow(Window w) {
   
   XMapRequestEvent mre;
   mre.window = w;
-  if (blackbox->isStartup() && win->isNormal()) win->restoreAttributes();
+  if (blackbox->state() == Openbox::State_Starting &&
+      win->isNormal())
+    win->restoreAttributes();
   win->mapRequestEvent(&mre);
 }
 
@@ -1259,7 +1264,7 @@ void BScreen::updateWorkArea(void) {
     unsigned long *dims = new unsigned long[4 * workspacesList.size()];
     for (unsigned int i = 0, m = workspacesList.size(); i < m; ++i) {
       // XXX: this could be different for each workspace
-      const Rect &area = availableArea();
+      const otk::Rect &area = availableArea();
       dims[(i * 4) + 0] = area.x();
       dims[(i * 4) + 1] = area.y();
       dims[(i * 4) + 2] = area.width();
@@ -1309,7 +1314,7 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
   while (k--)
     *(session_stack + i++) = *(workspace_stack + k);
 
-  XRestackWindows(blackbox->getXDisplay(), session_stack, i);
+  XRestackWindows(otk::OBDisplay::display, session_stack, i);
 
   delete [] session_stack;
 
@@ -1323,7 +1328,7 @@ void BScreen::lowerWindows(Window *workspace_stack, unsigned int num) {
   Window *session_stack = new Window[(num + desktopWindowList.size())];
   unsigned int i = 0, k = num;
 
-  XLowerWindow(blackbox->getXDisplay(), workspace_stack[0]);
+  XLowerWindow(otk::OBDisplay::display, workspace_stack[0]);
 
   while (k--)
     *(session_stack + i++) = *(workspace_stack + k);
@@ -1333,7 +1338,7 @@ void BScreen::lowerWindows(Window *workspace_stack, unsigned int num) {
   for (; dit != d_end; ++dit)
     *(session_stack + i++) = *dit;
 
-  XRestackWindows(blackbox->getXDisplay(), session_stack, i);
+  XRestackWindows(otk::OBDisplay::display, session_stack, i);
 
   delete [] session_stack;
 
@@ -1438,8 +1443,8 @@ void BScreen::raiseFocus(void) const {
 
 
 void BScreen::shutdown(void) {
-  XSelectInput(blackbox->getXDisplay(), getRootWindow(), NoEventMask);
-  XSync(blackbox->getXDisplay(), False);
+  XSelectInput(otk::OBDisplay::display, getRootWindow(), NoEventMask);
+  XSync(otk::OBDisplay::display, False);
 
   while(! windowList.empty())
     unmanageWindow(windowList.front(), True);
@@ -1454,11 +1459,11 @@ void BScreen::shutdown(void) {
 
 void BScreen::showPosition(int x, int y) {
   if (! geom_visible) {
-    XMoveResizeWindow(blackbox->getXDisplay(), geom_window,
+    XMoveResizeWindow(otk::OBDisplay::display, geom_window,
                       (getWidth() - geom_w) / 2,
                       (getHeight() - geom_h) / 2, geom_w, geom_h);
-    XMapWindow(blackbox->getXDisplay(), geom_window);
-    XRaiseWindow(blackbox->getXDisplay(), geom_window);
+    XMapWindow(otk::OBDisplay::display, geom_window);
+    XRaiseWindow(otk::OBDisplay::display, geom_window);
 
     geom_visible = True;
   }
@@ -1467,7 +1472,7 @@ void BScreen::showPosition(int x, int y) {
 
   sprintf(label, "X: %4d x Y: %4d", x, y);
 
-  XClearWindow(blackbox->getXDisplay(), geom_window);
+  XClearWindow(otk::OBDisplay::display, geom_window);
 
   resource.wstyle.font->drawString(geom_window,
                                    resource.bevel_width, resource.bevel_width,
@@ -1478,11 +1483,11 @@ void BScreen::showPosition(int x, int y) {
 
 void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   if (! geom_visible) {
-    XMoveResizeWindow(blackbox->getXDisplay(), geom_window,
+    XMoveResizeWindow(otk::OBDisplay::display, geom_window,
                       (getWidth() - geom_w) / 2,
                       (getHeight() - geom_h) / 2, geom_w, geom_h);
-    XMapWindow(blackbox->getXDisplay(), geom_window);
-    XRaiseWindow(blackbox->getXDisplay(), geom_window);
+    XMapWindow(otk::OBDisplay::display, geom_window);
+    XRaiseWindow(otk::OBDisplay::display, geom_window);
 
     geom_visible = True;
   }
@@ -1491,7 +1496,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
 
   sprintf(label, "W: %4d x H: %4d", gx, gy);
 
-  XClearWindow(blackbox->getXDisplay(), geom_window);
+  XClearWindow(otk::OBDisplay::display, geom_window);
 
   resource.wstyle.font->drawString(geom_window,
                                    resource.bevel_width, resource.bevel_width,
@@ -1502,7 +1507,7 @@ void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
 
 void BScreen::hideGeometry(void) {
   if (geom_visible) {
-    XUnmapWindow(blackbox->getXDisplay(), geom_window);
+    XUnmapWindow(otk::OBDisplay::display, geom_window);
     geom_visible = False;
   }
 }
@@ -1518,7 +1523,7 @@ void BScreen::removeStrut(Strut *strut) {
 }
 
 
-const Rect& BScreen::availableArea(void) const {
+const otk::Rect& BScreen::availableArea(void) const {
   if (doFullMax())
     return getRect(); // return the full screen
   return usableArea;
@@ -1538,7 +1543,7 @@ const RectList& BScreen::allAvailableAreas(void) const {
 
 
 void BScreen::updateAvailableArea(void) {
-  Rect old_area = usableArea;
+  otk::Rect old_area = usableArea;
   usableArea = getRect(); // reset to full screen
 
 #ifdef    XINERAMA
@@ -1677,11 +1682,11 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
     if (s[0] != '/' && s[0] != '~')
     {
       std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
+      ret = XReadBitmapFile(otk::OBDisplay::display, getRootWindow(),
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     } else
-      ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
+      ret = XReadBitmapFile(otk::OBDisplay::display, getRootWindow(),
                             expandTilde(s).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     
@@ -1693,25 +1698,25 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
   pixmapMask.w = pixmapMask.h = 0;
 }
 
-BTexture BScreen::readDatabaseTexture(const string &rname,
-                                      const string &default_color,
-                                      const Configuration &style, 
-                                      bool allowNoTexture) {
-  BTexture texture;
+otk::BTexture BScreen::readDatabaseTexture(const string &rname,
+                                           const string &default_color,
+                                           const Configuration &style, 
+                                           bool allowNoTexture) {
+  otk::BTexture texture;
   string s;
 
   if (style.getValue(rname, s))
-    texture = BTexture(s);
+    texture = otk::BTexture(s);
   else if (allowNoTexture) //no default
-    texture.setTexture(BTexture::NoTexture);
+    texture.setTexture(otk::BTexture::NoTexture);
   else
-    texture.setTexture(BTexture::Solid | BTexture::Flat);
+    texture.setTexture(otk::BTexture::Solid | otk::BTexture::Flat);
 
   // associate this texture with this screen
-  texture.setDisplay(getBaseDisplay(), getScreenNumber());
+  texture.setScreen(getScreenNumber());
   texture.setImageControl(image_control);
 
-  if (texture.texture() != BTexture::NoTexture) {
+  if (texture.texture() != otk::BTexture::NoTexture) {
     texture.setColor(readDatabaseColor(rname + ".color", default_color,
                                        style));
     texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
@@ -1724,21 +1729,21 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
 }
 
 
-BColor BScreen::readDatabaseColor(const string &rname,
-                                  const string &default_color,
-                                  const Configuration &style) {
-  BColor color;
+otk::BColor BScreen::readDatabaseColor(const string &rname,
+                                       const string &default_color,
+                                       const Configuration &style) {
+  otk::BColor color;
   string s;
   if (style.getValue(rname, s))
-    color = BColor(s, getBaseDisplay(), getScreenNumber());
+    color = otk::BColor(s, getScreenNumber());
   else
-    color = BColor(default_color, getBaseDisplay(), getScreenNumber());
+    color = otk::BColor(default_color, getScreenNumber());
   return color;
 }
 
 
-BFont *BScreen::readDatabaseFont(const string &rbasename,
-                                 const Configuration &style) {
+otk::BFont *BScreen::readDatabaseFont(const string &rbasename,
+                                      const Configuration &style) {
   string fontname;
 
   string s;
@@ -1773,13 +1778,15 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
     }
 
     
-    BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic, dropShadow && resource.shadow_fonts, offset, 
-                         tint, resource.aa_fonts);
+    otk::BFont *b = new otk::BFont(getScreenNumber(), family, i, bold, italic,
+                                   dropShadow && resource.shadow_fonts,
+                                   offset, tint, resource.aa_fonts);
     if (b->valid())
       return b;
     delete b;
   }
     
   exit(2);  // can't continue without a font
+}
+
 }

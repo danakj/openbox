@@ -12,6 +12,8 @@ extern "C" {
 
 #include "xatom.hh"
 
+namespace ob {
+
 class BScreen;
 class Workspace;
 class BlackboxWindow;
@@ -42,13 +44,13 @@ private:
   void lowerTransients(const BlackboxWindow * const win,
                        StackVector::iterator &stack);
 
-  typedef std::vector<Rect> rectList;
-  rectList calcSpace(const Rect &win, const rectList &spaces) const;
+  typedef std::vector<otk::Rect> rectList;
+  rectList calcSpace(const otk::Rect &win, const rectList &spaces) const;
 
   void placeWindow(BlackboxWindow *win);
-  bool cascadePlacement(Rect& win, const int offset);
-  bool smartPlacement(Rect& win);
-  bool underMousePlacement(Rect& win);
+  bool cascadePlacement(otk::Rect& win, const int offset);
+  bool smartPlacement(otk::Rect& win);
+  bool underMousePlacement(otk::Rect& win);
 
 public:
   Workspace(BScreen *scrn, unsigned int i = 0);
@@ -91,6 +93,7 @@ public:
   void setName(const std::string& new_name);
 };
 
+}
 
 #endif // __Workspace_hh
 

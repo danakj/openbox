@@ -76,19 +76,22 @@ extern "C" {
 using std::string;
 
 #include "blackbox.hh"
-#include "gccache.hh"
-#include "image.hh"
+#include "otk/gccache.hh"
+#include "otk/image.hh"
+#include "otk/assassin.hh"
 #include "screen.hh"
 #include "util.hh"
 #include "window.hh"
 #include "workspace.hh"
 #include "xatom.hh"
 
+namespace ob {
+
 Blackbox *blackbox;
 
 
-Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
-  : BaseDisplay(m_argv[0], dpy_name) {
+Blackbox::Blackbox(int argc, char **m_argv, char *rc)
+  : Openbox(argc, m_argv) {
 
   if (! XSupportsLocale())
     fprintf(stderr, "X server does not support locale\n");
@@ -96,7 +99,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
   if (XSetLocaleModifiers("") == NULL)
     fprintf(stderr, "cannot set locale modifiers\n");
 
-  ::blackbox = this;
+  ob::blackbox = this;
   argv = m_argv;
 
   // try to make sure the ~/.openbox directory exists
@@ -117,16 +120,16 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
 
   load_rc();
 
-  xatom = new XAtom(getXDisplay());
+  xatom = new XAtom(otk::OBDisplay::display);
 
-  cursor.session = XCreateFontCursor(getXDisplay(), XC_left_ptr);
-  cursor.move = XCreateFontCursor(getXDisplay(), XC_fleur);
-  cursor.ll_angle = XCreateFontCursor(getXDisplay(), XC_ll_angle);
-  cursor.lr_angle = XCreateFontCursor(getXDisplay(), XC_lr_angle);
-  cursor.ul_angle = XCreateFontCursor(getXDisplay(), XC_ul_angle);
-  cursor.ur_angle = XCreateFontCursor(getXDisplay(), XC_ur_angle);
+  cursor.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
+  cursor.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);
+  cursor.ll_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ll_angle);
+  cursor.lr_angle = XCreateFontCursor(otk::OBDisplay::display, XC_lr_angle);
+  cursor.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
+  cursor.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
-  for (unsigned int i = 0; i < getNumberOfScreens(); i++) {
+  for (int i = 0; i < ScreenCount(otk::OBDisplay::display); i++) {
     BScreen *screen = new BScreen(this, i);
 
     if (! screen->isScreenManaged()) {
@@ -150,8 +153,8 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
   active_screen = screenList.front();
   setFocusedWindow(0);
 
-  XSynchronize(getXDisplay(), False);
-  XSync(getXDisplay(), False);
+  XSynchronize(otk::OBDisplay::display, False);
+  XSync(otk::OBDisplay::display, False);
 
   reconfigure_wait = False;
 
@@ -161,7 +164,7 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc)
 
 
 Blackbox::~Blackbox(void) {
-  std::for_each(screenList.begin(), screenList.end(), PointerAssassin());
+  std::for_each(screenList.begin(), screenList.end(), otk::PointerAssassin());
 
   delete xatom;
 
@@ -173,7 +176,7 @@ void Blackbox::process_event(XEvent *e) {
   switch (e->type) {
   case ButtonPress: {
     // strip the lock key modifiers
-    e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
+    //e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
 
     last_time = e->xbutton.time;
 
@@ -201,7 +204,7 @@ void Blackbox::process_event(XEvent *e) {
 
   case ButtonRelease: {
     // strip the lock key modifiers
-    e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
+    //e->xbutton.state &= ~(NumLockMask | ScrollLockMask | LockMask);
 
     last_time = e->xbutton.time;
 
@@ -230,7 +233,7 @@ void Blackbox::process_event(XEvent *e) {
         xwc.sibling = e->xconfigurerequest.above;
         xwc.stack_mode = e->xconfigurerequest.detail;
 
-        XConfigureWindow(getXDisplay(), e->xconfigurerequest.window,
+        XConfigureWindow(otk::OBDisplay::display, e->xconfigurerequest.window,
                          e->xconfigurerequest.value_mask, &xwc);
       }
     }
@@ -276,7 +279,7 @@ void Blackbox::process_event(XEvent *e) {
           the window is on
         */
         XWindowAttributes wattrib;
-        if (! XGetWindowAttributes(getXDisplay(), e->xmaprequest.window,
+        if (! XGetWindowAttributes(otk::OBDisplay::display, e->xmaprequest.window,
                                    &wattrib)) {
           // failed to get the window attributes, perhaps the window has
           // now been destroyed?
@@ -339,7 +342,7 @@ void Blackbox::process_event(XEvent *e) {
     // motion notify compression...
     XEvent realevent;
     unsigned int i = 0;
-    while (XCheckTypedWindowEvent(getXDisplay(), e->xmotion.window,
+    while (XCheckTypedWindowEvent(otk::OBDisplay::display, e->xmotion.window,
                                   MotionNotify, &realevent)) {
       i++;
     }
@@ -353,7 +356,7 @@ void Blackbox::process_event(XEvent *e) {
       break;
 
     // strip the lock key modifiers
-    e->xmotion.state &= ~(NumLockMask | ScrollLockMask | LockMask);
+    //e->xmotion.state &= ~(NumLockMask | ScrollLockMask | LockMask);
 
     last_time = e->xmotion.time;
 
@@ -415,7 +418,7 @@ void Blackbox::process_event(XEvent *e) {
     ey1 = e->xexpose.y;
     ex2 = ex1 + e->xexpose.width - 1;
     ey2 = ey1 + e->xexpose.height - 1;
-    while (XCheckTypedWindowEvent(getXDisplay(), e->xexpose.window,
+    while (XCheckTypedWindowEvent(otk::OBDisplay::display, e->xexpose.window,
                                   Expose, &realevent)) {
       i++;
 
@@ -515,7 +518,7 @@ void Blackbox::process_event(XEvent *e) {
         (the FocusIn event handler sets the window in the event
         structure to None to indicate this).
       */
-      if (XCheckTypedEvent(getXDisplay(), FocusIn, &event)) {
+      if (XCheckTypedEvent(otk::OBDisplay::display, FocusIn, &event)) {
 
         process_event(&event);
         if (event.xfocus.window == None) {
@@ -532,7 +535,7 @@ void Blackbox::process_event(XEvent *e) {
         BlackboxWindow *focus;
         Window w;
         int revert;
-        XGetInputFocus(getXDisplay(), &w, &revert);
+        XGetInputFocus(otk::OBDisplay::display, &w, &revert);
         focus = searchWindow(w);
         if (focus) {
           /*
@@ -870,8 +873,8 @@ bool Blackbox::handleSignal(int sig) {
 
 bool Blackbox::validateWindow(Window window) {
   XEvent event;
-  if (XCheckTypedWindowEvent(getXDisplay(), window, DestroyNotify, &event)) {
-    XPutBackEvent(getXDisplay(), &event);
+  if (XCheckTypedWindowEvent(otk::OBDisplay::display, window, DestroyNotify, &event)) {
+    XPutBackEvent(otk::OBDisplay::display, &event);
 
     return False;
   }
@@ -961,20 +964,20 @@ void Blackbox::restart(const char *prog) {
 
   // fall back in case the above execlp doesn't work
   execvp(argv[0], argv);
-  string name = basename(argv[0]);
+  string name = ::basename(argv[0]);
   execvp(name.c_str(), argv);
 }
 
 
 void Blackbox::shutdown(void) {
-  BaseDisplay::shutdown();
+  Openbox::shutdown();
 
-  XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
+  XSetInputFocus(otk::OBDisplay::display, PointerRoot, None, CurrentTime);
 
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::shutdown));
 
-  XSync(getXDisplay(), False);
+  XSync(otk::OBDisplay::display, False);
 }
 
 
@@ -983,9 +986,7 @@ void Blackbox::saveXineramaPlacement(bool x) {
   resource.xinerama_placement = x;
   config.setValue("session.xineramaSupport.windowPlacement",
                   resource.xinerama_placement);
-  reconfigure();  // make sure all screens get this change
-}
-
+  reconfigure();  // make sure all screens get this 
 
 void Blackbox::saveXineramaMaximizing(bool x) {
   resource.xinerama_maximize = x;
@@ -1125,7 +1126,7 @@ void Blackbox::load_rc(void) {
 void Blackbox::reconfigure(void) {
   // don't reconfigure while saving the initial rc file, it's a waste and it
   // breaks somethings (workspace names)
-  if (isStartup()) return;
+  if (state() == Openbox::State_Starting) return;
 
   reconfigure_wait = True;
 
@@ -1136,7 +1137,7 @@ void Blackbox::reconfigure(void) {
 void Blackbox::real_reconfigure(void) {
   load_rc();
   
-  gcCache()->purge();
+  otk::OBDisplay::gcCache()->purge();
 
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::reconfigure));
@@ -1188,18 +1189,18 @@ void Blackbox::setFocusedWindow(BlackboxWindow *win) {
     if (! old_screen) {
       if (active_screen) {
         // set input focus to the toolbar of the screen with mouse
-        XSetInputFocus(getXDisplay(),
+        XSetInputFocus(otk::OBDisplay::display,
                        active_screen->getRootWindow(),
                        RevertToPointerRoot, CurrentTime);
       } else {
         // set input focus to the toolbar of the first managed screen
-        XSetInputFocus(getXDisplay(),
+        XSetInputFocus(otk::OBDisplay::display,
                        screenList.front()->getRootWindow(),
                        RevertToPointerRoot, CurrentTime);
       }
     } else {
       // set input focus to the toolbar of the last screen
-      XSetInputFocus(getXDisplay(), old_screen->getRootWindow(),
+      XSetInputFocus(otk::OBDisplay::display, old_screen->getRootWindow(),
                      RevertToPointerRoot, CurrentTime);
     }
   }
@@ -1212,3 +1213,16 @@ void Blackbox::setFocusedWindow(BlackboxWindow *win) {
     old_screen->updateNetizenWindowFocus();
   }
 }
+
+
+void Blackbox::addTimer(BTimer *timer) {
+  (void)timer;
+}
+
+
+void Blackbox::removeTimer(BTimer *timer) {
+  (void)timer;
+}
+
+ 
+} 

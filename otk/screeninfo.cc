@@ -4,8 +4,14 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
+extern "C" {
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+}
+
 #include "screeninfo.hh"
 #include "display.hh"
+#include "src/util.hh"
 
 using std::string;
 
@@ -14,7 +20,7 @@ namespace otk {
 ScreenInfo::ScreenInfo(unsigned int num) {
   screen_number = num;
 
-  root_window = RootWindow(ob::OBDisplay::display, screen_number);
+  root_window = RootWindow(OBDisplay::display, screen_number);
 
   rect.setSize(WidthOfScreen(ScreenOfDisplay(OBDisplay::display,
                                              screen_number)),
@@ -73,7 +79,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
     default_string.resize(pos);
 
   display_string = string("DISPLAY=") + default_string + '.' +
-    itostring(static_cast<unsigned long>(screen_number));
+    ob::itostring(static_cast<unsigned long>(screen_number));
   
 #ifdef    XINERAMA
   xinerama_active = False;

@@ -39,7 +39,14 @@ extern "C" {
 namespace otk {
 
 
-Display *display = (Display*) 0;
+Display *OBDisplay::display = (Display*) 0;
+bool OBDisplay::_shape = false;
+int  OBDisplay::_shape_event_basep;
+bool OBDisplay::_xinerama = false;
+int  OBDisplay::_xinerama_event_basep;
+unsigned int OBDisplay::_mask_list[8];
+OBDisplay::ScreenInfoList OBDisplay::_screenInfoList;
+BGCCache *OBDisplay::_gccache = (BGCCache*) 0;
 
 
 int OBDisplay::xerrorHandler(Display *d, XErrorEvent *e)
@@ -90,14 +97,10 @@ line argument.\n\n"));
   // find the availability of X extensions we like to use
 #ifdef SHAPE
   _shape = XShapeQueryExtension(display, &_shape_event_basep, &junk);
-#else
-  _shape = false;
 #endif
 
 #ifdef XINERAMA
   _xinerama = XineramaQueryExtension(display, &_xinerama_event_basep, &junk);
-#else
-  _xinerama = false;
 #endif // XINERAMA
 
   // get lock masks that are defined by the display (not constant)
@@ -152,6 +155,48 @@ void OBDisplay::destroy()
 {
   delete _gccache;
   XCloseDisplay(display);
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Grabs a button, but also grabs the button in every possible combination
+ * with the keyboard lock keys, so that they do not cancel out the event.
+
+ * if allow_scroll_lock is true then only the top half of the lock mask
+ * table is used and scroll lock is ignored.  This value defaults to false.
+ */
+void OBDisplay::grabButton(unsigned int button, unsigned int modifiers,
+                         Window grab_window, bool owner_events,
+                         unsigned int event_mask, int pointer_mode,
+                         int keyboard_mode, Window confine_to,
+                         Cursor cursor, bool allow_scroll_lock) {
+  unsigned int length = (allow_scroll_lock) ? 8 / 2:
+                                              8;
+  for (size_t cnt = 0; cnt < length; ++cnt)
+    XGrabButton(otk::OBDisplay::display, button, modifiers | _mask_list[cnt],
+                grab_window, owner_events, event_mask, pointer_mode,
+                keyboard_mode, confine_to, cursor);
+}
+
+
+/*
+ * Releases the grab on a button, and ungrabs all possible combinations of the
+ * keyboard lock keys.
+ */
+void OBDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
+                           Window grab_window) {
+  for (size_t cnt = 0; cnt < 8; ++cnt)
+    XUngrabButton(otk::OBDisplay::display, button, modifiers | _mask_list[cnt],
+                  grab_window);
 }
 
 

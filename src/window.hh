@@ -12,7 +12,7 @@ extern "C" {
 
 #include <string>
 
-#include "basedisplay.hh"
+#include "blackbox.hh"
 #include "timer.hh"
 #include "util.hh"
 
@@ -33,6 +33,8 @@ extern "C" {
 #define MwmDecorMenu          (1l << 4) // not used
 #define MwmDecorIconify       (1l << 5)
 #define MwmDecorMaximize      (1l << 6)
+
+namespace ob {
 
 // this structure only contains 3 elements... the Motif 2.0 structure contains
 // 5... we only need the first 3... so that is all we will define
@@ -144,7 +146,7 @@ private:
 
     std::string title, icon_title;
 
-    Rect rect;
+    otk::Rect rect;
     Strut strut;
 
     int old_bw;                       // client's borderwidth
@@ -213,9 +215,9 @@ private:
      * size and location of the box drawn while the window dimensions or
      * location is being changed, ie. resized or moved
      */
-    Rect changing;
+    otk::Rect changing;
 
-    Rect rect;                  // frame geometry
+    otk::Rect rect;                  // frame geometry
     Strut margin;               // margins between the frame and client
 
     int grab_x, grab_y;         // where was the window when it was grabbed?
@@ -275,8 +277,8 @@ private:
   void redrawIconifyButton(bool pressed) const;
   void redrawMaximizeButton(bool pressed) const;
   void redrawStickyButton(bool pressed) const;
-  void applyGravity(Rect &r);
-  void restoreGravity(Rect &r);
+  void applyGravity(otk::Rect &r);
+  void restoreGravity(otk::Rect &r);
   void setAllowedActions(void);
   void setState(unsigned long new_state);
   void upsize(void);
@@ -338,8 +340,8 @@ public:
   { return blackbox_attrib.workspace; }
   inline unsigned int getWindowNumber(void) const { return window_number; }
 
-  inline const Rect &frameRect(void) const { return frame.rect; }
-  inline const Rect &clientRect(void) const { return client.rect; }
+  inline const otk::Rect &frameRect(void) const { return frame.rect; }
+  inline const otk::Rect &clientRect(void) const { return client.rect; }
 
   inline unsigned int getTitleHeight(void) const
   { return frame.title_h; }
@@ -406,5 +408,6 @@ public:
   virtual void timeout(void);
 };
 
+}
 
 #endif // __Window_hh

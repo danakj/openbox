@@ -5,7 +5,7 @@ INCLUDES= -I../src
 noinst_LIBRARIES=libotk.a
 
 libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
-                  imagecontrol.cc rect.cc texture.cc
+                  imagecontrol.cc rect.cc screeninfo.cc texture.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

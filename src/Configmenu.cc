@@ -74,18 +74,22 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 
 
 void Configmenu::setValues(void) {
-  setItemSelected(3, getScreen()->doImageDither());
-  setItemSelected(4, getScreen()->doOpaqueMove());
-  setItemSelected(5, getScreen()->doFullMax());
-  setItemSelected(6, getScreen()->doFocusNew());
-  setItemSelected(7, getScreen()->doFocusLast());
-  setItemSelected(8, getScreen()->getWindowToWindowSnap());
+  int index = 2;
+#ifdef    XINERAMA
+  ++index;
+#endif // XINERAMA
+  setItemSelected(index++, getScreen()->doImageDither());
+  setItemSelected(index++, getScreen()->doOpaqueMove());
+  setItemSelected(index++, getScreen()->doFullMax());
+  setItemSelected(index++, getScreen()->doFocusNew());
+  setItemSelected(index++, getScreen()->doFocusLast());
+  setItemSelected(index++, getScreen()->getWindowToWindowSnap());
 
-  setItemSelected(9, getScreen()->getWindowCornerSnap());
-  setItemEnabled(9, getScreen()->getWindowToWindowSnap());
+  setItemSelected(index, getScreen()->getWindowCornerSnap());
+  setItemEnabled(index++, getScreen()->getWindowToWindowSnap());
   
-  setItemSelected(10, getScreen()->allowScrollLock());
-  setItemSelected(11, getScreen()->doHideToolbar());
+  setItemSelected(index++, getScreen()->allowScrollLock());
+  setItemSelected(index++, getScreen()->doHideToolbar());
 }
 
 

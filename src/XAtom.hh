@@ -147,6 +147,7 @@ public:
 
     kde_net_system_tray_windows,
     kde_net_wm_system_tray_window_for,
+    kde_net_wm_window_type_override,
  
     // constant for how many atoms exist in the enumerator
     NUM_ATOMS

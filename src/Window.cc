@@ -1005,39 +1005,50 @@ void BlackboxWindow::updateStrut(void) {
 
 
 bool BlackboxWindow::getWindowType(void) {
-  unsigned long val;
+  window_type = (WindowType) -1;
+
+  unsigned long *val;
+  unsigned long num = (unsigned) -1;
   if (xatom->getValue(client.window, XAtom::net_wm_window_type, XAtom::atom,
-                      val)) {
-    if (val == xatom->getAtom(XAtom::net_wm_window_type_desktop))
-      window_type = Type_Desktop;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_dock))
-      window_type = Type_Dock;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_toolbar))
-      window_type = Type_Toolbar;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_menu))
-      window_type = Type_Menu;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_utility))
-      window_type = Type_Utility;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_splash))
-      window_type = Type_Splash;
-    else if (val == xatom->getAtom(XAtom::net_wm_window_type_dialog))
+                        num, &val)) {
+    for (unsigned long i = 0; i < num; ++i) {
+      if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_desktop))
+        window_type = Type_Desktop;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_dock))
+        window_type = Type_Dock;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_toolbar))
+        window_type = Type_Toolbar;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_menu))
+        window_type = Type_Menu;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_utility))
+        window_type = Type_Utility;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_splash))
+        window_type = Type_Splash;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_dialog))
+        window_type = Type_Dialog;
+      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_normal))
+        window_type = Type_Normal;
+      else if (val[i] ==
+               xatom->getAtom(XAtom::kde_net_wm_window_type_override))
+        mwm_decorations = 0; // prevent this window from getting any decor
+    }
+    delete val;
+  }
+    
+  if (window_type == (WindowType) -1) {
+    /*
+     * the window type hint was not set, which means we either classify ourself
+     * as a normal window or a dialog, depending on if we are a transient.
+     */
+    if (isTransient())
       window_type = Type_Dialog;
-    else //if (val[0] == xatom->getAtom(XAtom::net_wm_window_type_normal))
+    else
       window_type = Type_Normal;
 
-    return True;
+    return False;
   }
 
-  /*
-   * the window type hint was not set, which means we either classify ourself
-   * as a normal window or a dialog, depending on if we are a transient.
-   */
-  if (isTransient())
-    window_type = Type_Dialog;
-
-  window_type = Type_Normal;
-
-  return False;
+  return True;
 }
 
 

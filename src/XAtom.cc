@@ -151,6 +151,8 @@ XAtom::XAtom(Display *d) {
   _atoms[kde_net_system_tray_windows] = create("_KDE_NET_SYSTEM_TRAY_WINDOWS");
   _atoms[kde_net_wm_system_tray_window_for] =
     create("_KDE_NET_WM_SYSTEM_TRAY_WINDOW_FOR");
+  _atoms[kde_net_wm_window_type_override] =
+    create("_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 }
 
 

@@ -39,7 +39,7 @@ KeyBindingTree *keyboard_firstnode;
 typedef struct {
     guint state;
     ObClient *client;
-    ObAction *action;
+    GSList *actions;
     ObFrameContext context;
 } ObInteractiveState;
 
@@ -178,7 +178,7 @@ void keyboard_interactive_grab(guint state, ObClient *client,
 
     s->state = state;
     s->client = client;
-    s->action = action;
+    s->actions = g_slist_append(NULL, action);
 
     interactive_states = g_slist_append(interactive_states, s);
 }
@@ -186,8 +186,9 @@ void keyboard_interactive_grab(guint state, ObClient *client,
 void keyboard_interactive_end(ObInteractiveState *s,
                               guint state, gboolean cancel)
 {
-    action_run_interactive(s->action, s->client, state, cancel, TRUE);
+    action_run_interactive(s->actions, s->client, state, cancel, TRUE);
 
+    g_slist_free(s->actions);
     g_free(s);
 
     interactive_states = g_slist_remove(interactive_states, s);
@@ -276,13 +277,11 @@ void keyboard_event(ObClient *client, const XEvent *e)
                 curpos = p;
                 grab_keys(TRUE);
             } else {
-                GSList *it;
-
-                for (it = p->actions; it; it = it->next)
-                    action_run_key(it->data, client, e->xkey.state,
-                                   e->xkey.x_root, e->xkey.y_root);
 
                 keyboard_reset_chains();
+
+                action_run_key(p->actions, client, e->xkey.state,
+                               e->xkey.x_root, e->xkey.y_root);
             }
             break;
         }

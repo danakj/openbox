@@ -767,12 +767,8 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
 
         if (func)
             func(entry, state, data);
-        else {
-            GSList *it;
-
-            for (it = acts; it; it = g_slist_next(it))
-                action_run(it->data, client, state);
-        }
+        else
+            action_run(acts, client, state);
     }
 }
 

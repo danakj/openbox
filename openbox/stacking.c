@@ -2,6 +2,7 @@
 #include "prop.h"
 #include "focus.h"
 #include "client.h"
+#include "group.h"
 #include "frame.h"
 #include <glib.h>
 
@@ -85,12 +86,25 @@ void stacking_lower(Client *client)
 
     g_assert(stacking_list != NULL); /* this would be bad */
 
-    it = g_list_last(stacking_list);
-
     if (client->modal && client->transient_for) {
-	/* don't let a modal window lower below its transient_for */
-	it = g_list_find(stacking_list, client->transient_for);
-	g_assert(it != NULL);
+        if (client->transient_for == TRAN_GROUP) {
+            /* don't let a modal of the group lower below any other windows
+               in the group */
+            for (it = stacking_list; it; it = it->next) {
+                GSList *sit;
+                Client *c = it->data;
+
+                for (sit = c->group->members; sit; sit = sit->next)
+                    if (sit->data == it->data) break;
+                if (sit) break; /* got it */
+            }
+            if (it == NULL)
+                goto lower_no_parent;
+        } else {
+            /* don't let a modal window lower below its transient_for */
+            it = g_list_find(stacking_list, client->transient_for);
+        }
+        g_assert(it != NULL);
 
 	wins[0] = (it == stacking_list ? focus_backup :
 		   ((Client*)it->prev->data)->frame->window);
@@ -100,6 +114,10 @@ void stacking_lower(Client *client)
 	stacking_list = g_list_remove(stacking_list, client);
 	stacking_list = g_list_insert_before(stacking_list, it, client);
     } else {
+    lower_no_parent:
+
+        it = g_list_last(stacking_list);
+
 	while (it != stacking_list) {
 	    Client *c = it->data;
 	    if (client->layer <= c->layer)

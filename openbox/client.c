@@ -286,16 +286,30 @@ void client_unmanage(Client *client)
        influence */
     screen_update_struts();
 
-    /* tell our parent that we're gone */
-    if (client->transient_for != NULL)
+    /* tell our parent(s) that we're gone */
+    if (client->transient_for == TRAN_GROUP) { /* transient of group */
+        GSList *it;
+
+        for (it = client->group->members; it; it = it->next)
+            if (it->data != client)
+                ((Client*)it->data)->transients =
+                    g_slist_remove(((Client*)it->data)->transients, client);
+    } else if (client->transient_for) {        /* transient of window */
 	client->transient_for->transients =
 	    g_slist_remove(client->transient_for->transients, client);
+    }
 
     /* tell our transients that we're gone */
     for (it = client->transients; it != NULL; it = it->next) {
-	((Client*)it->data)->transient_for = NULL;
-	client_calc_layer(it->data);
+        if (((Client*)it->data)->transient_for != TRAN_GROUP) {
+            ((Client*)it->data)->transient_for = NULL;
+            client_calc_layer(it->data);
+        }
     }
+
+    /* remove from its group */
+    if (client->group)
+        group_remove(client->group, client);
 
     /* dispatch the unmapped event */
     dispatch_client(Event_Client_Unmapped, client, 0, 0);
@@ -319,10 +333,6 @@ void client_unmanage(Client *client)
 	if (client->iconic)
 	    XMapWindow(ob_display, client->window);
     }
-
-    /* remoev from its group */
-    if (client->group)
-        group_remove(client->group, client);
 
     /* free all data allocated in the client struct */
     g_slist_free(client->transients);
@@ -560,15 +570,14 @@ void client_update_transient_for(Client *self)
 	c = g_hash_table_lookup(client_map, &t);
 	g_assert(c != self);/* if this happens then we need to check for it*/
 
-	if (!c /*XXX: && _group*/) {
+	if (!c && self->group) {
 	    /* not transient to a client, see if it is transient for a
 	       group */
-	    if (/*t == _group->leader() || */
+	    if (t == self->group->leader ||
 		t == None ||
 		t == ob_root) {
 		/* window is a transient for its group! */
-		/* XXX: for now this is treated as non-transient.
-		   this needs to be fixed! */
+                c = TRAN_GROUP;
 	    }
 	}
     } else
@@ -576,15 +585,33 @@ void client_update_transient_for(Client *self)
 
     /* if anything has changed... */
     if (c != self->transient_for) {
-	if (self->transient_for)
+	if (self->transient_for == TRAN_GROUP) { /* transient of group */
+            GSList *it;
+
+	    /* remove from old parents */
+            for (it = self->group->members; it; it = it->next)
+                if (it->data != self)
+                    ((Client*)it->data)->transients =
+                        g_slist_remove(((Client*)it->data)->transients, self);
+        } else if (self->transient_for != NULL) { /* transient of window */
 	    /* remove from old parent */
 	    self->transient_for->transients =
                 g_slist_remove(self->transient_for->transients, self);
+        }
 	self->transient_for = c;
-	if (self->transient_for)
+	if (self->transient_for == TRAN_GROUP) { /* transient of group */
+            GSList *it;
+
+	    /* add to new parents */
+            for (it = self->group->members; it; it = it->next)
+                if (it->data != self)
+                    ((Client*)it->data)->transients =
+                        g_slist_append(((Client*)it->data)->transients, self);
+        } else if (self->transient_for != NULL) { /* transient of window */
 	    /* add to new parent */
 	    self->transient_for->transients =
                 g_slist_append(self->transient_for->transients, self);
+        }
     }
 }
 
@@ -944,16 +971,22 @@ void client_update_wmhints(Client *self)
 	if (hints->flags & XUrgencyHint)
 	    ur = TRUE;
 
-	if (hints->flags & WindowGroupHint) {
-	    if (hints->window_group !=
-                (self->group ? self->group->leader : None)) {
-		/* remove from the old group if there was one */
-                if (self->group != NULL)
-                    group_remove(self->group, self);
-		self->group = group_add(hints->window_group, self);
-	    }
-	} else /* no group! */
-	    self->group = None;
+	if (!(hints->flags & WindowGroupHint))
+            hints->window_group = None; /* no group */
+        /* did the group state change? */
+        if (hints->window_group != (self->group ? self->group->leader : None)){
+            /* remove from the old group if there was one */
+            if (self->group != NULL)
+                group_remove(self->group, self);
+            if (hints->window_group != None)
+                self->group = group_add(hints->window_group, self);
+
+            /* because the self->transient flag wont change from this call,
+               we don't need to update the window's type and such, only its
+               transient_for, and the transients lists of other windows in the
+               group may be affected */
+            client_update_transient_for(self);
+        }
 
 	if (hints->flags & IconPixmapHint) {
 	    client_update_kwm_icon(self);
@@ -1219,7 +1252,7 @@ void client_calc_layer(Client *self)
     /* are we fullscreen, or do we have a fullscreen transient parent? */
     c = self;
     fs = FALSE;
-    while (c) {
+    while (c && c != TRAN_GROUP) { /* XXX do smthng with the TRAN_GROUP case?*/
 	if (c->fullscreen) {
 	    fs = TRUE;
 	    break;
@@ -1999,7 +2032,9 @@ gboolean client_focus(Client *self)
 	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
+#ifdef DEBUG_FOCUS
     g_message("focusing %lx", self->window);
+#endif
 
     /* Cause the FocusIn to come back to us. Important for desktop switches,
        since otherwise we'll have no FocusIn on the queue and send it off to

@@ -29,53 +29,17 @@ void RrPlanarSet(struct RrSurface *sur,
 
 int RrPlanarHasAlpha(struct RrSurface *sur)
 {
-    if (RrColorHasAlpha(RrPlanarPrimaryColor(sur))) return 1;
-    if (!(RrPlanarColorType(sur) == RR_PLANAR_NONE ||
-          RrPlanarColorType(sur) == RR_PLANAR_SOLID))
-        if (RrColorHasAlpha(RrPlanarSecondaryColor(sur))) return 1;
+    if (!(RrPlanarColorType(sur) == RR_PLANAR_NONE)) {
+        if (RrColorHasAlpha(RrPlanarPrimaryColor(sur))) return 1;
+        if (!RrPlanarColorType(sur) == RR_PLANAR_SOLID)
+            if (RrColorHasAlpha(RrPlanarSecondaryColor(sur))) return 1;
+    }
     return 0;
 }
 
 static void copy_parent(struct RrSurface *sur)
 {
-    int ncols;
-    int copy;
-
-    switch (RrPlanarColorType(sur)) {
-    case RR_PLANAR_NONE:
-        return;
-    case RR_PLANAR_SOLID:
-        ncols = 1;
-        break;
-    case RR_PLANAR_HORIZONTAL:
-        ncols = 2;
-        break;
-    case RR_PLANAR_VERTICAL:
-        ncols = 2;
-        break;
-    case RR_PLANAR_DIAGONAL:
-        ncols = 2;
-        break;
-    case RR_PLANAR_CROSSDIAGONAL:
-        ncols = 2;
-        break;
-    case RR_PLANAR_PYRAMID:
-        ncols = 2;
-        break;
-    case RR_PLANAR_PIPECROSS:
-        ncols = 2;
-        break;
-    case RR_PLANAR_RECTANGLE:
-        ncols = 2;
-        break;
-    }
-
-    copy = 0;
-    if (ncols >= 1 && RrColorHasAlpha(RrPlanarPrimaryColor(sur)))
-        copy = 1;
-    if (ncols >= 1 && RrColorHasAlpha(RrPlanarSecondaryColor(sur)))
-        copy = 1;
-    if (copy) {
+    if (RrPlanarHasAlpha(sur)) {
         /*
         struct RrSurface *parent = RrSurfaceParent(sur);
 

@@ -17,9 +17,8 @@ openbox3_LDADD=-L../otk -lotk @LIBINTL@
 openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc python.cc bindings.cc
-noinst_HEADERS= actions.hh bindings.hh \
-                client.hh frame.hh openbox.hh python.hh \
-                screen.hh
+noinst_HEADERS= actions.hh bindings.hh client.hh frame.hh openbox.hh \
+                python.hh screen.hh
 
 MAINTAINERCLEANFILES= Makefile.in
 

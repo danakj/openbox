@@ -56,7 +56,21 @@ void render_startup(void)
       }
       XFree(vinfo_return);
     }  
-  truecolor_startup();
+  switch (render_visual->class) {
+  case TrueColor:
+    truecolor_startup();
+    break;
+  case PseudoColor:
+  case StaticColor:
+  case GrayScale:
+  case StaticGray:
+    pseudocolor_startup();
+    break;
+  default:
+    g_critical("unsupported visual class.\n");
+    exit(EXIT_FAILURE);
+
+  }
 }
 
 void truecolor_startup(void)
@@ -85,6 +99,89 @@ void truecolor_startup(void)
   while (green_mask) { green_mask >>= 1; render_green_shift--; }
   while (blue_mask)  { blue_mask  >>= 1; render_blue_shift--;  }
   XFree(timage);
+}
+
+void pseudocolor_startup(void)
+{
+  XColor icolors[256];
+  int tr, tg, tb, n, r, g, b, i, incolors, ii;
+  unsigned long dev;
+  int cpc, _ncolors;
+  g_message("Initializing PseudoColor RenderControl\n");
+
+  /* determine the number of colors and the bits-per-color */
+  pseudo_bpc = 2; /* XXX THIS SHOULD BE A USER OPTION */
+  g_assert(pseudo_bpc >= 1);
+  _ncolors = 1 << (pseudo_bpc * 3);
+
+  if (_ncolors > 1 << render_depth) {
+    g_warning("PseudoRenderControl: Invalid colormap size. Resizing.\n");
+    pseudo_bpc = 1 << (render_depth/3) >> 3;
+    _ncolors = 1 << (pseudo_bpc * 3);
+  }
+
+  /* build a color cube */
+  pseudo_colors = malloc(_ncolors * sizeof(XColor));
+  cpc = 1 << pseudo_bpc; /* colors per channel */
+
+  for (n = 0, r = 0; r < cpc; r++)
+    for (g = 0; g < cpc; g++)
+      for (b = 0; b < cpc; b++, n++) {
+        tr = (int)(((float)(r)/(float)(cpc-1)) * 0xFF);
+        tg = (int)(((float)(g)/(float)(cpc-1)) * 0xFF);
+        tb = (int)(((float)(b)/(float)(cpc-1)) * 0xFF);
+        pseudo_colors[n].red = tr | tr << 8;
+        pseudo_colors[n].green = tg | tg << 8;
+        pseudo_colors[n].blue = tb | tb << 8;
+        pseudo_colors[n].flags = DoRed|DoGreen|DoBlue; /* used to track 
+                                                          allocation */
+      }
+
+  /* allocate the colors */
+  for (i = 0; i < _ncolors; i++)
+    if (!XAllocColor(ob_display, render_colormap, &pseudo_colors[i]))
+      pseudo_colors[i].flags = 0; /* mark it as unallocated */
+
+  /* try allocate any colors that failed allocation above */
+
+  /* get the allocated values from the X server (only the first 256 XXX why!?)
+   */
+  incolors = (((1 << render_depth) > 256) ? 256 : (1 << render_depth));
+  for (i = 0; i < incolors; i++)
+    icolors[i].pixel = i;
+  XQueryColors(ob_display, render_colormap, icolors, incolors);
+
+  /* try match unallocated ones */
+  for (i = 0; i < _ncolors; i++) {
+    if (!pseudo_colors[i].flags) { /* if it wasn't allocated... */
+      unsigned long closest = 0xffffffff, close = 0;
+      for (ii = 0; ii < incolors; ii++) {
+        /* find deviations */
+        r = (pseudo_colors[i].red - icolors[ii].red) & 0xff;
+        g = (pseudo_colors[i].green - icolors[ii].green) & 0xff;
+        b = (pseudo_colors[i].blue - icolors[ii].blue) & 0xff;
+        /* find a weighted absolute deviation */
+        dev = (r * r) + (g * g) + (b * b);
+
+        if (dev < closest) {
+          closest = dev;
+          close = ii;
+        }
+      }
+
+      pseudo_colors[i].red = icolors[close].red;
+      pseudo_colors[i].green = icolors[close].green;
+      pseudo_colors[i].blue = icolors[close].blue;
+      pseudo_colors[i].pixel = icolors[close].pixel;
+
+      /* try alloc this closest color, it had better succeed! */
+      if (XAllocColor(ob_display, render_colormap, &pseudo_colors[i]))
+        pseudo_colors[i].flags = DoRed|DoGreen|DoBlue; /* mark as alloced */
+      else
+        g_assert(FALSE); /* wtf has gone wrong, its already alloced for
+                            chissake! */
+    }
+  }
 }
 
 void x_paint(Window win, Appearance *l)

@@ -153,6 +153,7 @@ Appearance *appearance_new(SurfaceType type, int numtex);
 Appearance *appearance_copy(Appearance *a);
 void appearance_free(Appearance *a);
 void truecolor_startup(void);
+void pseudocolor_startup(void);
 void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h);
 
 #endif /*__render_h*/

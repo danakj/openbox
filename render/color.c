@@ -3,6 +3,10 @@
 #include "render.h"
 #include "color.h"
 #include "../kernel/openbox.h"
+
+XColor *pseudo_colors;
+int pseudo_bpc;
+
 void color_allocate_gc(color_rgb *in)
 {
     XGCValues gcv;
@@ -65,7 +69,8 @@ void reduce_depth(pixel32 *data, XImage *im)
        array*/
     int r, g, b;
     int x,y;
-    pixel16 *p = (pixel16*) data;
+    pixel16 *p16 = (pixel16*) data;
+    unsigned char *p8 = (unsigned char *)data;
     switch (im->bits_per_pixel) {
     case 32:
         if ((render_red_offset != default_red_shift) ||
@@ -92,15 +97,35 @@ void reduce_depth(pixel32 *data, XImage *im)
                 g = g >> render_green_shift;
                 b = (data[x] >> default_blue_shift) & 0xFF;
                 b = b >> render_blue_shift;
-                p[x] = (r << render_red_offset)
+                p16[x] = (r << render_red_offset)
                     + (g << render_green_offset)
                     + (b << render_blue_offset);
             }
             data += im->width;
-            p += im->bytes_per_line/2;
+            p16 += im->bytes_per_line/2;
         }
-        break;
+    break;
+    case 8:
+        g_assert(render_visual->class != TrueColor);
+        for (y = 0; y < im->height; y++) {
+            for (x = 0; x < im->width; x++) {
+                p8[x] = pickColor(data[x] >> default_red_shift,
+                       data[x] >> default_green_shift,
+                       data[x] >> default_blue_shift)->pixel;
+        }
+        data += im->width;
+        p8 += im->bytes_per_line;
+  }
+
+    break;
     default:
         g_message("your bit depth is currently unhandled\n");
     }
+}
+XColor *pickColor(int r, int g, int b) 
+{
+  r = (r & 0xff) >> (8-pseudo_bpc);
+  g = (g & 0xff) >> (8-pseudo_bpc);
+  b = (b & 0xff) >> (8-pseudo_bpc);
+  return &pseudo_colors[(r << (2*pseudo_bpc)) + (g << (1*pseudo_bpc)) + b];
 }

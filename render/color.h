@@ -43,6 +43,7 @@ typedef struct color_rgb {
 } color_rgb;
 
 void color_allocate_gc(color_rgb *in);
+XColor *pickColor(int r, int g, int b);
 color_rgb *color_parse(char *colorname);
 color_rgb *color_new(int r, int g, int b);
 void color_free(color_rgb *in);
@@ -56,4 +57,6 @@ extern int render_red_shift;
 extern int render_green_shift;
 extern int render_blue_shift;
 
+extern int pseudo_bpc;
+extern XColor *pseudo_colors;
 #endif /* __color_h */

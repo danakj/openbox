@@ -170,3 +170,10 @@ void XWindow::iconify() const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::wm_change_state,
                             _window, IconicState);
 }
+
+
+void XWindow::focus() const {
+  // this will also unshade the window..
+  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
+                            _window);
+}

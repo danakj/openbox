@@ -47,8 +47,8 @@ public:
 
     nextWindow, //done for now
     prevWindow, //done for now
-    nextWindowOnAllWorkspaces,
-    prevWindowOnAllWorkspaces,
+    nextWindowOnAllWorkspaces, //done
+    prevWindowOnAllWorkspaces, //done
 
     nextWindowOfClass,
     prevWindowOfClass,

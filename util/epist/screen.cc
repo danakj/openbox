@@ -356,16 +356,8 @@ void screen::cycleWindow(const bool forward, const bool alldesktops) const {
            (*target)->iconic() ||
            (! alldesktops && (*target)->desktop() != _active_desktop));
   
-  if (target != _clients.end()) {
-    if ((*target)->desktop() != _active_desktop)
-      changeWorkspace((*target)->desktop());
-
-    // we dont send an ACTIVE_WINDOW client message because that would also
-    // unshade the window if it was shaded
-    XSetInputFocus(_epist->getXDisplay(), (*target)->window(), RevertToNone,
-                   CurrentTime);
-    XRaiseWindow(_epist->getXDisplay(), (*target)->window());
-  }
+  if (target != _clients.end())
+    (*target)->focus();
 }
 
 

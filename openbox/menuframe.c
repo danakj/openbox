@@ -514,6 +514,8 @@ static void menu_frame_render(ObMenuFrame *self)
     h += ob_rr_theme->bwidth * 2;
 
     RECT_SET_SIZE(self->area, w, h);
+
+    XFlush(ob_display);
 }
 
 static void menu_frame_update(ObMenuFrame *self)

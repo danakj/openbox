@@ -203,6 +203,8 @@ void framerender_frame(ObFrame *self)
                     ob_rr_theme->grip_width, ob_rr_theme->handle_height);
         }
     }
+
+    XFlush(ob_display);
 }
 
 static void framerender_label(ObFrame *self, RrAppearance *a)

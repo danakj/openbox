@@ -365,17 +365,17 @@ void action_toggle_maximize_vert(union ActionData *data)
 
 void action_send_to_desktop(union ActionData *data)
 {
-    if (data->sendto.c)
-        if (data->sendto.desktop < screen_num_desktops ||
-            data->sendto.desktop == DESKTOP_ALL)
-            client_set_desktop(data->sendto.c, data->sendto.desktop, TRUE);
+    if (data->desktop.c)
+        if (data->desktop.desk < screen_num_desktops ||
+            data->desktop.desk == DESKTOP_ALL)
+            client_set_desktop(data->desktop.c, data->desktop.desk, TRUE);
 }
 
 void action_send_to_next_desktop(union ActionData *data)
 {
     guint d;
 
-    if (!data->sendto.c) return;
+    if (!data->sendtonextprev.c) return;
 
     d = screen_desktop + 1;
     if (d >= screen_num_desktops) {
@@ -390,7 +390,7 @@ void action_send_to_previous_desktop(union ActionData *data)
 {
     guint d;
 
-    if (!data->sendto.c) return;
+    if (!data->sendtonextprev.c) return;
 
     d = screen_desktop - 1;
     if (d >= screen_num_desktops) {

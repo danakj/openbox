@@ -29,7 +29,7 @@ void plugin_setup_config()
 static Rect* pick_head(ObClient *c)
 {
     /* try direct parent first */
-    if (c->transient_for && c->transient_for != TRAN_GROUP) {
+    if (c->transient_for && c->transient_for != OB_TRAN_GROUP) {
         return screen_area_monitor(c->desktop,
                                    client_monitor(c->transient_for));
     }

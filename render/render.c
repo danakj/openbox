@@ -96,7 +96,6 @@ void x_paint(Window win, Appearance *l)
     int y = l->area.y;
     int w = l->area.width;
     int h = l->area.height;
-    int parenty = l->surface.data.planar.parenty;
 
     if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
 
@@ -119,10 +118,11 @@ void x_paint(Window win, Appearance *l)
     if (l->surface.data.planar.grad == Background_ParentRelative) {
         sw = l->surface.data.planar.parent->area.width;
         source = l->surface.data.planar.parent->surface.data.planar.pixel_data
-            + l->surface.data.planar.parentx + sw * parenty;
+            + l->surface.data.planar.parentx
+            + sw * l->surface.data.planar.parenty;
         dest = l->surface.data.planar.pixel_data;
-        for (i = parenty; i < parenty + h; i++, source += sw, dest += w) {
-            memcpy(dest, source, w * sizeof(pixel32));
+        for (i = 0; i < h; i++, source += sw, dest += w) {
+/*            memcpy(dest, source, w * sizeof(pixel32));*/
         }
     }
     else if (l->surface.data.planar.grad == Background_Solid)

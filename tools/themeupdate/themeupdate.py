@@ -201,7 +201,7 @@ def err_missing(data):
 
 
 def usage():
-    print 'Usage: ' + sys.argv[0] + ' /path/to/themerc > newthemerc'
+    print 'Usage: themupdate.py /path/to/themerc > newthemerc'
     print
     sys.exit()
 

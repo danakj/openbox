@@ -83,5 +83,7 @@ struct RrInstance *RrInit(Display *display,
 
 void RrDestroy(struct RrInstance *inst)
 {
-    RrInstanceFree(inst);
+    if (inst) {
+        RrInstanceFree(inst);
+    }
 }

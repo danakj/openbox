@@ -1451,7 +1451,7 @@ void client_update_title(ObClient *self)
         if (!PROP_GETS(self->window, wm_name, locale, &data))
             // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
             if (self->transient)
-                data = '\0';
+                data = g_strdup("");
             else
                 data = g_strdup("Unnamed Window");
 

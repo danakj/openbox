@@ -656,12 +656,30 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 
   const otk::OBProperty *property = Openbox::instance->property();
   
-  if (e.message_type == property->atom(otk::OBProperty::wm_change_state))
-    setWMState(e.data.l[0]);
-  else if (e.message_type ==
-             property->atom(otk::OBProperty::net_wm_desktop))
-    setDesktop(e.data.l[0]);
+  if (e.message_type == property->atom(otk::OBProperty::wm_change_state)) {
+    // compress changes into a single change
+    bool compress = false;
+    XEvent ce;
+    while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce))
+      compress = true;
+    if (compress)
+      setWMState(ce.xclientmessage.data.l[0]); // use the found event
+    else
+      setWMState(e.data.l[0]); // use the original event
+  } else if (e.message_type ==
+             property->atom(otk::OBProperty::net_wm_desktop)) {
+    // compress changes into a single change 
+    bool compress = false;
+    XEvent ce;
+    while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce))
+      compress = true;
+    if (compress)
+      setDesktop(e.data.l[0]); // use the found event
+    else
+      setDesktop(e.data.l[0]); // use the original event
+  }
   else if (e.message_type == property->atom(otk::OBProperty::net_wm_state))
+    // can't compress these
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
 }
 

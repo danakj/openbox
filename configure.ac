@@ -23,6 +23,7 @@ OB_DEBUG
 OB_COMPILER_FLAGS
 AC_C_BIGENDIAN
 
+AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_PROG_INSTALL
@@ -47,6 +48,7 @@ X11_EXT_XINERAMA
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
 		otk/Makefile
+		otk/wrap/Makefile
 		src/Makefile
 		scripts/Makefile
 		doc/Makefile

@@ -47,11 +47,6 @@
 Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
   openbox(scr.getOpenbox()), config(conf)
 {
-  // default values
-  m_placement = CenterRight;
-  m_direction = Vertical;
-  m_ontop = false;
-  m_hidden = m_autohide = false;
   load();
   
   display = screen.getBaseDisplay().getXDisplay();
@@ -293,7 +288,8 @@ void Slit::load() {
       m_placement = BottomRight;
     else if (0 == strncasecmp(s.c_str(), "CenterRight", s.length()))
       m_placement = CenterRight;
-  }
+  } else
+    m_placement = CenterRight;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "slit.direction" << ends;
@@ -303,19 +299,25 @@ void Slit::load() {
       m_direction = Horizontal;
     else if (0 == strncasecmp(s.c_str(), "Vertical", s.length()))
       m_direction = Vertical;
-  }
+  } else
+    m_direction = Vertical;
  
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "slit.onTop" << ends;
   rclass << rscreen.str() << "Slit.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_ontop = b;
+  else
+    m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "slit.autoHide" << ends;
   rclass << rscreen.str() << "Slit.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
+  else
+    m_hidden = m_autohide = false;
+
   rscreen.rdbuf()->freeze(0);
   rname.rdbuf()->freeze(0);
   rclass.rdbuf()->freeze(0);

@@ -182,11 +182,11 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   no_focus = False;
 
-  resource.menu_file = resource.style_file = (char *) 0;
-  resource.titlebar_layout = (char *) NULL;
+  resource.menu_file = resource.style_file = NULL;
+  resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
-  focused_window = masked_window = (OpenboxWindow *) 0;
+  focused_window = masked_window = NULL;
   masked = None;
 
   windowSearchList = new LinkedList<WindowSearch>;

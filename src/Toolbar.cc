@@ -68,11 +68,6 @@
 Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
   openbox(scrn.getOpenbox()), config(conf)
 {
-  // default values
-  m_width_percent =66;
-  m_placement = BottomCenter;
-  m_ontop = false;
-  m_hidden = m_autohide = false;
   load();
 
   // get the clock updating every minute
@@ -280,6 +275,8 @@ void Toolbar::load() {
   rclass << rscreen.str() << "Toolbar.WidthPercent" << ends;
   if (config.getValue(rname.str(), rclass.str(), l) && (l > 0 && l <= 100))
     m_width_percent = l;
+  else
+    m_width_percent =66;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "toolbar.placement" << ends;
@@ -297,19 +294,25 @@ void Toolbar::load() {
       m_placement = BottomRight;
     else if ( 0 == strncasecmp(s.c_str(), "BottomCenter", s.length()))
       m_placement = BottomCenter;
-  }
+  } else
+    m_placement = BottomCenter;
   
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "toolbar.onTop" << ends;
   rclass << rscreen.str() << "Toolbar.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_ontop = b;
+  else
+    m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "toolbar.autoHide" << ends;
   rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
+  else
+    m_hidden = m_autohide = false;
+
   rscreen.rdbuf()->freeze(0);
   rname.rdbuf()->freeze(0);
   rclass.rdbuf()->freeze(0);

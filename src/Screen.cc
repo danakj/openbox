@@ -189,28 +189,6 @@ static const char *getFontSize(const char *pattern, int *size) {
 BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   openbox(ob), config(conf)
 {
-  // default values
-  resource.full_max = false;
-  resource.focus_new = false;
-  resource.focus_last = false;
-  resource.row_direction = LeftRight;
-  resource.col_direction = TopBottom;
-  resource.workspaces = 1;
-  resource.sloppy_focus = true;
-  resource.auto_raise = false;
-  resource.zones = 1;
-  resource.placement_policy = CascadePlacement;
-#ifdef    HAVE_STRFTIME
-  resource.strftime_format = bstrdup("%I:%M %p");
-#else // !have_strftime
-  resource.date_format = B_AmericanDate;
-  resource.clock24hour =  false;
-#endif // HAVE_STRFTIME
-  resource.edge_snap_threshold = 4;
-  resource.image_dither = true;
-  resource.root_command = NULL;
-  resource.opaque_move = false;
-
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	       SubstructureRedirectMask | KeyPressMask | KeyReleaseMask |
 	       ButtonPressMask | ButtonReleaseMask;
@@ -1098,6 +1076,8 @@ void BScreen::load() {
   rclass << rscreen.str() << "HideToolbar" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.hide_toolbar = b;
+  else
+    resource.hide_toolbar = false;
   Toolbar *t = getToolbar();
   if (t != NULL) {
     if (resource.hide_toolbar)
@@ -1111,18 +1091,24 @@ void BScreen::load() {
   rclass << rscreen.str() << "FullMaximization" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.full_max = b;
+  else
+    resource.full_max = false;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "focusNewWindows" << ends;
   rclass << rscreen.str() << "FocusNewWindows" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.focus_new = b;
+  else
+    resource.focus_new = false;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "focusLastWindow" << ends;
   rclass << rscreen.str() << "FocusLastWindow" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.focus_last = b;
+  else
+    resource.focus_last = false;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "rowPlacementDirection" << ends;
@@ -1132,7 +1118,8 @@ void BScreen::load() {
       resource.row_direction = RightLeft;
     else if (0 == strncasecmp(s.c_str(), "LeftToRight", s.length()))
       resource.row_direction = LeftRight;
-  }
+  } else
+    resource.row_direction = LeftRight;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "colPlacementDirection" << ends;
@@ -1142,13 +1129,16 @@ void BScreen::load() {
       resource.col_direction = BottomTop;
     else if (0 == strncasecmp(s.c_str(), "TopToBottom", s.length()))
       resource.col_direction = TopBottom;
-  }
+  } else
+    resource.col_direction = TopBottom;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "workspaces" << ends;
   rclass << rscreen.str() << "Workspaces" << ends;
   if (config.getValue(rname.str(), rclass.str(), l))
     resource.workspaces = l;
+  else
+    resource.workspaces = 1;
 
   removeWorkspaceNames();
   rname.seekp(0); rclass.seekp(0);
@@ -1182,6 +1172,9 @@ void BScreen::load() {
       resource.sloppy_focus = true;
       resource.auto_raise = false;
     }
+  } else {
+    resource.sloppy_focus = true;
+    resource.auto_raise = false;
   }
 
   rname.seekp(0); rclass.seekp(0);
@@ -1189,6 +1182,8 @@ void BScreen::load() {
   rclass << rscreen.str() << "WindowZones" << ends;
   if (config.getValue(rname.str(), rclass.str(), l))
     resource.zones = (l == 1 || l == 2 || l == 4) ? l : 1;
+  else
+    resource.zones = 4;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "windowPlacement" << ends;
@@ -1202,21 +1197,21 @@ void BScreen::load() {
       resource.placement_policy = BestFitPlacement;
     else if (0 == strncasecmp(s.c_str(), "CascadePlacement", s.length()))
       resource.placement_policy = CascadePlacement;
-  }
+  } else
+    resource.placement_policy = CascadePlacement;
 
 #ifdef    HAVE_STRFTIME
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "strftimeFormat" << ends;
   rclass << rscreen.str() << "StrftimeFormat" << ends;
 
-  if (resource.strftime_format != NULL){
+  if (resource.strftime_format != NULL)
     delete [] resource.strftime_format;
-    resource.strftime_format=NULL;
-  }
 
-  if (config.getValue(rname.str(), rclass.str(), s)) {
+  if (config.getValue(rname.str(), rclass.str(), s))
     resource.strftime_format = bstrdup(s.c_str());
-  }
+  else
+    resource.strftime_format = bstrdup("%I:%M %p");
 #else // !HAVE_STRFTIME
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "dateFormat" << ends;
@@ -1226,7 +1221,8 @@ void BScreen::load() {
       resource.date_format = B_EuropeanDate;
     else if (strncasecmp(s.c_str(), "American", s.length()))
       resource.date_format = B_AmericanDate;
-  }
+  } else
+    resource.date_format = B_AmericanDate;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "clockFormat" << ends;
@@ -1236,6 +1232,8 @@ void BScreen::load() {
       resource.clock24hour = true;
     else if (clock == 12)
       resource.clock24hour =  false;
+  } else
+    resource.clock24hour =  false;
 #endif // HAVE_STRFTIME
 
   rname.seekp(0); rclass.seekp(0);
@@ -1243,30 +1241,37 @@ void BScreen::load() {
   rclass << rscreen.str() << "EdgeSnapThreshold" << ends;
   if (config.getValue(rname.str(), rclass.str(), l))
     resource.edge_snap_threshold = l;
+  else
+    resource.edge_snap_threshold = 4;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "imageDither" << ends;
   rclass << rscreen.str() << "ImageDither" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.image_dither = b;
+  else
+    resource.image_dither = true;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "rootCommand" << ends;
   rclass << rscreen.str() << "RootCommand" << ends;
 
-  if (resource.root_command != NULL){
+  if (resource.root_command != NULL)
     delete [] resource.root_command;
-    resource.root_command=NULL;
-  }
-  if (config.getValue(rname.str(), rclass.str(), s)) {
+  
+  if (config.getValue(rname.str(), rclass.str(), s))
     resource.root_command = bstrdup(s.c_str());
-  }
+  else
+    resource.root_command = NULL;
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "opaqueMove" << ends;
   rclass << rscreen.str() << "OpaqueMove" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.opaque_move = b;
+  else
+    resource.opaque_move = false;
+
   rscreen.rdbuf()->freeze(0);
   rname.rdbuf()->freeze(0);
   rclass.rdbuf()->freeze(0);

@@ -244,9 +244,13 @@ int main(int argc, char **argv)
             }
 
             /* load the theme specified in the rc file */
-            ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
-            if (ob_rr_theme == NULL)
-                ob_exit_with_error("Unable to load a theme.");
+            {
+                RrTheme *theme;
+                if ((theme = RrThemeNew(ob_rr_inst, config_theme)))
+                    ob_rr_theme = theme;
+                if (ob_rr_theme == NULL)
+                    ob_exit_with_error("Unable to load a theme.");
+            }
 
             moveresize_startup(reconfigure);
             screen_startup(reconfigure);

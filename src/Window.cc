@@ -142,7 +142,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
   mwm_decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-                    Decor_Iconify | Decor_Maximize | Decor_Close;
+                    Decor_Iconify | Decor_Maximize;
 
   client.normal_hint_flags = 0;
   client.window_group = None;
@@ -422,13 +422,12 @@ void BlackboxWindow::enableDecor(bool enable) {
 void BlackboxWindow::setupDecor() {
   if (blackbox_attrib.decoration != DecorNone) {
     // start with everything on
-    decorations =
+    decorations = Decor_Close |
       (mwm_decorations & Decor_Titlebar ? Decor_Titlebar : 0) |
       (mwm_decorations & Decor_Border ? Decor_Border : 0) |
       (mwm_decorations & Decor_Handle ? Decor_Handle : 0) |
       (mwm_decorations & Decor_Iconify ? Decor_Iconify : 0) |
-      (mwm_decorations & Decor_Maximize ? Decor_Maximize : 0) |
-      (mwm_decorations & Decor_Close ? Decor_Close : 0);
+      (mwm_decorations & Decor_Maximize ? Decor_Maximize : 0);
 
     if (! (functions & Func_Close)) decorations &= ~Decor_Close;
     if (! (functions & Func_Maximize)) decorations &= ~Decor_Maximize;
@@ -1311,7 +1310,7 @@ void BlackboxWindow::getMWMHints(void) {
   if (mwm_hint->flags & MwmHintsDecorations) {
     if (mwm_hint->decorations & MwmDecorAll) {
       mwm_decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-                        Decor_Iconify | Decor_Maximize | Decor_Close;
+                        Decor_Iconify | Decor_Maximize;
     } else {
       mwm_decorations = 0;
 

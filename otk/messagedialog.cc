@@ -168,9 +168,9 @@ void MessageDialog::keyPressHandler(const XKeyEvent &e)
     for (it = _buttons.begin(); it != end; ++it)
       if (it->isDefault()) {
 	_result = &(*it);
+	hide();
 	break;
       }
-    hide();
   } else if (e.keycode == _escape) {
     hide();
   }

@@ -247,7 +247,7 @@ void OtkWidget::adjustHorz(void)
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
-    if (tmp->isStretchableVert())
+    if (tmp->isStretchableVert() && _rect.height() > _bevel_width * 2)
       tmp->setHeight(_rect.height() - _bevel_width * 2);
     if (tmp->isStretchableHorz())
       stretchable.push_back(tmp);
@@ -302,7 +302,7 @@ void OtkWidget::adjustVert(void)
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
-    if (tmp->isStretchableHorz())
+    if (tmp->isStretchableHorz() && _rect.width() > _bevel_width * 2)
       tmp->setWidth(_rect.width() - _bevel_width * 2);
     if (tmp->isStretchableVert())
       stretchable.push_back(tmp);
@@ -345,15 +345,15 @@ void OtkWidget::adjustVert(void)
 
 void OtkWidget::update(void)
 {
-  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
-  for (; it != end; ++it)
-    (*it)->update();
-
   if (_dirty) {
     adjust();
     render();
     XClearWindow(OBDisplay::display, _window);
   }
+
+  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+  for (; it != end; ++it)
+    (*it)->update();
 
   _dirty = false;
 }

@@ -1348,7 +1348,7 @@ void client_update_icons(Client *self)
                     x = 0;
                     ++y;
                 }
-                self->icons[j].data[t] = (data[i] << 8) & (data[i] >> 24);
+                self->icons[j].data[t] = (data[i] << 8) | (data[i] >> 24);
             }
 	    g_assert(i <= num);
 	}

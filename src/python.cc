@@ -44,7 +44,6 @@ void python_init(char *argv0)
 
 void python_destroy()
 {
-  Py_DECREF(obdict);
   Py_Finalize();
 }
 

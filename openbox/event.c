@@ -55,12 +55,8 @@
 #include <X11/ICE/ICElib.h>
 #endif
 
-typedef struct
-{
-    gboolean ignored;
-} ObEventData;
-
 static void event_process(const XEvent *e, gpointer data);
+static void event_done(gpointer data);
 static void event_handle_root(XEvent *e);
 static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
@@ -72,14 +68,6 @@ static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 static gboolean menu_hide_delay_func(gpointer data);
-
-#define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
-                            (e)->xfocus.detail == NotifyAncestor || \
-                            (e)->xfocus.detail > NotifyNonlinearVirtual)
-#define INVALID_FOCUSOUT(e) ((e)->xfocus.mode == NotifyGrab || \
-                             (e)->xfocus.detail == NotifyInferior || \
-                             (e)->xfocus.detail == NotifyAncestor || \
-                             (e)->xfocus.detail > NotifyNonlinearVirtual)
 
 Time event_lasttime = 0;
 
@@ -99,6 +87,8 @@ static int mask_table_size;
 static guint ignore_enter_focus = 0;
 
 static gboolean menu_can_hide;
+
+static ObClient *focus_in, *focus_out;
 
 #ifdef USE_SM
 static void ice_handler(int fd, gpointer conn)
@@ -151,7 +141,7 @@ void event_startup(gboolean reconfig)
 	}
     }
 
-    ob_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
+    ob_main_loop_x_add(ob_main_loop, event_process, event_done, NULL, NULL);
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
@@ -309,126 +299,45 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
             return TRUE;
         break;
     case FocusIn:
-        /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
-           because of RevertToPointerRoot. If the focus ends up reverting to
-           pointer root on a workspace change, then the FocusIn event that we
-           want will be of type NotifyAncestor. This situation does not occur
-           for FocusOut, so it is safely ignored there.
-        */
-	if (INVALID_FOCUSIN(e) ||
-            client == NULL) {
-#ifdef DEBUG_FOCUS
-            ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
-                     e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
-            /* says a client was not found for the event (or a valid FocusIn
-               event was not found.
-            */
-            e->xfocus.window = None;
+        if (e->xfocus.detail > NotifyNonlinearVirtual)
             return TRUE;
-        }
-
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusIn on %lx mode %d detail %d\n", e->xfocus.window,
-                 e->xfocus.mode, e->xfocus.detail);
-#endif
         break;
     case FocusOut:
-	if (INVALID_FOCUSOUT(e)) {
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on %lx mode %d detail %d IGNORED\n",
-                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
+        if (e->xfocus.detail > NotifyNonlinearVirtual)
             return TRUE;
-        }
-
-#ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on %lx mode %d detail %d\n",
-                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
-#endif
-
-        {
-            XEvent fe;
-            gboolean fallback = TRUE;
-
-            while (TRUE) {
-                if (!XCheckTypedWindowEvent(ob_display, e->xfocus.window,
-                                            FocusOut, &fe))
-                    if (!XCheckTypedEvent(ob_display, FocusIn, &fe))
-                        break;
-                if (fe.type == FocusOut) {
-#ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusOut\n");
-#endif
-                    if (!INVALID_FOCUSOUT(&fe)) {
-                        /* if there is a VALID FocusOut still coming, don't
-                           fallback focus yet, we'll deal with it then */
-                        XPutBackEvent(ob_display, &fe);
-                        fallback = FALSE;
-                        break;
-                    }
-                } else {
-#ifdef DEBUG_FOCUS
-                    ob_debug("found pending FocusIn\n");
-#endif
-                    /* is the focused window getting a FocusOut/In back to
-                       itself?
-                    */
-                    if (fe.xfocus.window == e->xfocus.window &&
-                        !event_ignore(&fe, client)) {
-                        /*
-                          if focus_client is not set, then we can't do
-                          this. we need the FocusIn. This happens in the
-                          case when the set_focus_client(NULL) in the
-                          focus_fallback function fires and then
-                          focus_fallback picks the currently focused
-                          window (such as on a SendToDesktop-esque action.
-                        */
-                        if (focus_client) {
-#ifdef DEBUG_FOCUS
-                            ob_debug("focused window got an Out/In back to "
-                                     "itself IGNORED both\n");
-#endif
-                            return TRUE;
-                        } else {
-                            event_process(&fe, NULL);
-#ifdef DEBUG_FOCUS
-                            ob_debug("focused window got an Out/In back to "
-                                     "itself but focus_client was null "
-                                     "IGNORED just the Out\n");
-#endif
-                            return TRUE;
-                        }
-                    }
-
-                    {
-                        ObEventData d;
-
-                        /* once all the FocusOut's have been dealt with, if
-                           there is a FocusIn still left and it is valid, then
-                           use it */
-                        event_process(&fe, &d);
-                        if (!d.ignored) {
-#ifdef DEBUG_FOCUS
-                            ob_debug("FocusIn was OK, so don't fallback\n");
-#endif
-                            fallback = FALSE;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (fallback) {
-#ifdef DEBUG_FOCUS
-                ob_debug("no valid FocusIn and no FocusOut events found, "
-                         "falling back\n");
-#endif
-                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
-            }
-        }
+        if (e->xfocus.detail == NotifyInferior ||
+            e->xfocus.mode == NotifyGrab)
+            return TRUE;
         break;
     }
     return FALSE;
+}
+
+static void event_done(gpointer data)
+{
+    static ObClient *last = NULL;
+
+    if (focus_in) {
+        if (focus_in != focus_client) {
+            focus_set_client(focus_in);
+            frame_adjust_focus(focus_in->frame, TRUE);
+            client_calc_layer(focus_in);
+        }
+    } 
+    if (focus_out) {
+        if (focus_out == focus_client)
+            focus_set_client(NULL);
+        frame_adjust_focus(focus_out->frame, FALSE);
+        client_calc_layer(focus_out);
+    }
+
+    if (focus_client != last) {
+        if (!focus_client)
+            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+        last = focus_client;
+    }
+
+    focus_in = focus_out = NULL;
 }
 
 static void event_process(const XEvent *ec, gpointer data)
@@ -440,7 +349,6 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
     XEvent ee, *e;
-    ObEventData *ed = data;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -470,12 +378,8 @@ static void event_process(const XEvent *ec, gpointer data)
 
     event_set_lasttime(e);
     event_hack_mods(e);
-    if (event_ignore(e, client)) {
-        if (ed)
-            ed->ignored = TRUE;
+    if (event_ignore(e, client))
         return;
-    } else if (ed)
-            ed->ignored = FALSE;
 
     /* deal with it in the kernel */
     if (group)
@@ -669,20 +573,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case FocusIn:
 #ifdef DEBUG_FOCUS
-        ob_debug("FocusIn on client for %lx\n", client->window);
+        ob_debug("FocusIn on client for %lx (client %lx) mode %d detail %d\n",
+                 e->xfocus.window, client->window, e->xfocus.mode, e->xfocus.detail);
 #endif
-        if (client != focus_client) {
-            focus_set_client(client);
-            frame_adjust_focus(client->frame, TRUE);
-            client_calc_layer(client);
-        }
+        focus_in = client;
+        if (focus_out == client)
+            focus_out = NULL;
         break;
     case FocusOut:
 #ifdef DEBUG_FOCUS
-        ob_debug("FocusOut on client for %lx\n", client->window);
+        ob_debug("FocusOut on client for %lx (client %lx) mode %d detail %d\n",
+                 e->xfocus.window, client->window, e->xfocus.mode, e->xfocus.detail);
 #endif
-        frame_adjust_focus(client->frame, FALSE);
-        client_calc_layer(client);
+        if (focus_in == client)
+            focus_in = NULL;
+        if (client == focus_client)
+            focus_out = client;
         break;
     case LeaveNotify:
         con = frame_context(client, e->xcrossing.window);

@@ -25,6 +25,12 @@ def move(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
 
+    type = OBClient_type(client)
+    # these types of windows dont get moved
+    if type == OBClient_Type_Dock or \
+       type == OBClient_Type_Desktop:
+        return
+
     dx = data.xroot() - data.pressx()
     dy = data.yroot() - data.pressy()
     OBClient_move(client, data.press_clientx() + dx, data.press_clienty() + dy)
@@ -34,6 +40,12 @@ def resize(data):
        MouseMotion events"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
+
+    type = OBClient_type(client)
+    # these types of windows dont get resized
+    if type == OBClient_Type_Dock or \
+       type == OBClient_Type_Desktop:
+        return
 
     px = data.pressx()
     py = data.pressy()

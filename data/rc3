@@ -55,18 +55,18 @@ names = ("one" "two" "three" "four")
 
 [dock]
 # The position on the screen to place the dock. Options are:
-#   Floating - uses the floatingX and floatingY options to position itself
 #   TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left
 #     - the appropriate corner/edge of the screen
+#   Floating - uses the floatingX and floatingY options to position itself
 #position = "TopLeft"
 
 # When position is "Floating", this specifies the x-coordinate to place the
 # the dock at.
-#floatingx = 0
+#floatingX = 0
 
 # When position is "Floating", this specifies the y-coordinate to place the
 # the dock at.
-#floatingy = 0
+#floatingY = 0
 
 # The stacking layer that the dock will be in. Options are:
 #   Top - above all normal windows, same layer as panels

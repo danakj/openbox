@@ -1,17 +1,18 @@
 #include "../kernel/dispatch.h"
 #include "../kernel/screen.h"
 #include "../kernel/client.h"
+#include "../kernel/frame.h"
 #include "../kernel/focus.h"
 #include "../kernel/stacking.h"
 #include "../kernel/openbox.h"
 
 static int skip_enter = 0;
 
-static void focus_fallback(guint desk, gboolean warp)
+static void focus_fallback(gboolean warp)
 {
     GList *it;
 
-    for (it = focus_order[desk]; it != NULL; it = it->next)
+    for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (client_focus(it->data)) {
             if (warp) { /* XXX make this configurable */
                 XEvent e;
@@ -37,6 +38,29 @@ static void focus_fallback(guint desk, gboolean warp)
         }
 }
 
+static void focus_under_pointer()
+{
+    Window w;
+    int i, x, y;
+    guint u;
+    GList *it;
+
+    if (XQueryPointer(ob_display, ob_root, &w, &w, &x, &y, &i, &i, &u))
+    {
+        for (it = stacking_list; it != NULL; it = it->next) {
+            Client *c = it->data;
+            if (c->desktop == screen_desktop &&
+                RECT_CONTAINS(c->frame->area, x, y))
+                break;
+        }
+        if (it != NULL) {
+            client_focus(it->data);
+            return;
+        }
+    }
+    focus_fallback(FALSE);
+}
+
 static void events(ObEvent *e, void *foo)
 {
     switch (e->type) {
@@ -46,19 +70,28 @@ static void events(ObEvent *e, void *foo)
             client_focus(e->data.c.client);
         break;
 
-    case Event_Ob_Desktop:
-        /* focus the next available target */
-        focus_fallback(e->data.o.num[0], TRUE);
+    case Event_Client_Unmapped:
+        if (ob_state == State_Exiting) break;
+
+        if (e->data.c.client->focused) {
+            /* if sloppy focus... */
+            focus_under_pointer();
+
+            /* otherwise... */
+            /*
+              /\* nothing is left with focus! *\/
+              if (focus_client == NULL) 
+              /\* focus the next available target *\/
+              focus_fallback(screen_desktop, FALSE);
+            */
+        }
         break;
 
-    case Event_Client_Unfocus:
-        /* dont do this shit with sloppy focus... */
-        /*
-        /\* nothing is left with focus! *\/
-        if (focus_client == NULL) 
-            /\* focus the next available target *\/
-            focus_fallback(screen_desktop, FALSE);
-        */
+    case Event_Ob_Desktop:
+        /* focus the next available target if moving from the current
+           desktop. */
+        if ((unsigned)e->data.o.num[1] == screen_desktop)
+            focus_fallback(TRUE);
         break;
 
     case Event_X_EnterNotify:
@@ -77,7 +110,7 @@ void plugin_startup()
 {
     dispatch_register(Event_Client_Mapped | 
                       Event_Ob_Desktop | 
-                      Event_Client_Unfocus |
+                      Event_Client_Unmapped |
                       Event_X_EnterNotify,
                       (EventHandler)events, NULL);
 }

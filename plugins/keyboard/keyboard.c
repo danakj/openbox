@@ -217,15 +217,14 @@ static void event(ObEvent *e, void *foo)
                                 act->data.cycle.cancel = FALSE;
                             }
 
-                            act->data.any.c = focus_client;
-                            act->func(&act->data);
-
                             if (act->func == action_cycle_windows &&
                                 !grabbed_key) {
                                 grabbed_key = p;
                                 grab_keyboard(TRUE);
-                                break;
                             }
+
+                            act->data.any.c = focus_client;
+                            act->func(&act->data);
                         }
                     }
 

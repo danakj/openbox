@@ -2688,9 +2688,10 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
           (re->x >= 0) && ((unsigned) re->x <= frame.button_w) &&
           (re->y >= 0) && ((unsigned) re->y <= frame.button_h)) {
           close();
-      } else {
-        redrawCloseButton(False);
       }
+      //we should always redraw the close button. some applications
+      //eg. acroread don't honour the close.
+      redrawCloseButton(False);
     }
   // middle button released
   } else if (re->button == 2) {

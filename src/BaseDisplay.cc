@@ -379,6 +379,9 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
   
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
+#else
+  NumLockMask = Mod2Mask;
+  ScrollLockMask = Mod5Mask;
 #endif // NOCLOBBER
 }
 

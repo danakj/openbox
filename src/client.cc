@@ -1343,6 +1343,7 @@ bool Client::focus()
     XSendEvent(**otk::display, _window, False, NoEventMask, &ce);
   }
 
+  XSync(**otk::display, False);
   return true;
 }
 

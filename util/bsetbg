@@ -22,6 +22,8 @@
 
 PATH=$PATH:/usr/bin:/usr/local/bin:/usr/X11R6/bin
 
+img_apps="qiv xli xv wmsetbg Esetroot display xsetbg"
+
 display_full_cmd="display -geometry 800x600 -window root"
 display_tile_cmd="display -window root"
 display_center_cmd="display -backdrop -window root"
@@ -52,47 +54,52 @@ xli_tile_cmd="xli -onroot -quiet"
 xli_center_cmd="xli -center -onroot quiet"
 xli_default_cmd="$xli_center_cmd"
 
-xsetbg_full_cmd="xsetbg -fullscreen"
+xsetbg_full_cmd="xsetbg -fillscreen"
 xsetbg_tile_cmd="xsetbg"
 xsetbg_center_cmd="xsetbg -center"
 xsetbg_default_cmd="$xsetbg_center_cmd"
 
-img_apps="qiv xli xv wmsetbg Esetroot display xsetbg"
+##################################
+
 me=${0##*/}
-version=2.0
+version=2.1
 copyright="(c) 2000-$(date +%Y) by Timothy M. King (http://lordzork.com/)"
 config=$HOME/.bsetbgrc
 last_cmd_file=$HOME/.bsetbg_last_cmd
 refresh_cmd=xrefresh
 p=$me:
 
-quit() {
-    [ "$1" ] && rc=$1 && shift 1
-    [ "$*" ] && echo -e $*
-    exit ${rc:-0}
+quit() 
+{
+	[ "$1" ] && rc=$1 && shift 1
+	[ "$*" ] && echo -e $*
+	exit ${rc:-0}
 }
 
-bool() {
-    case $1 in
-            [yY][eE][sS]|1|[yY]|[tT][rR][uU][eE]|[oO][nN]) : ;;
-            *) return 1 ;;
-    esac
+bool() 
+{
+	case $1 in
+		[yY][eE][sS]|1|[yY]|[tT][rR][uU][eE]|[oO][nN]) : ;;
+		*) return 1 ;;
+	esac
 }
 
-check_exe_in_path() {
-    if [ -z "$1" ]; then
-    	return 1
-    elif [ -x "$(which $1 2>/dev/null)" ]; then
-    	return 0
-    elif [ -x "$(type $1 2>/dev/null)" ]; then
-    	return 0
-    else
-    	return 1
-    fi
+check_exe_in_path() 
+{
+	if [ -z "$1" ]; then
+    		return 1
+	elif [ -x "$(which $1 2>/dev/null)" ]; then
+    		return 0
+	elif [ -x "$(type $1 2>/dev/null)" ]; then
+    		return 0
+	else
+    		return 1
+	fi
 }
 
-help_msg() {
-    cat <<EOF
+help_msg() 
+{
+	cat <<EOF
 $me $version $copyright
 
   -center <file>           center an image on the desktop
@@ -104,356 +111,375 @@ $me $version $copyright
   -debug                   prints commands without executing them
 EOF
 
-# this is extremely lame, but probably more portable than grep -E   
-   bsetroot_help=$(bsetroot -help  2>&1| grep -v "^bsetroot" | grep -v "^  -help")
-   case $bsetroot_help in
-   	BaseDisplay*)	echo ;;
-	*-gradient*)	echo "$bsetroot_help"
-   esac
+	# this is extremely lame, but probably more portable than grep -E   
+	bsetroot_help=$(bsetroot -help  2>&1| grep -v "^bsetroot" | grep -v "^  -help")
+	case $bsetroot_help in
+   		BaseDisplay*)	echo ;;
+		*-gradient*)	echo "$bsetroot_help"
+	esac
 
-    cat <<EOF
+	cat <<EOF
   -generate <string>       generate a config file
   -help                    this message
   -version                 output version information
 EOF
-   quit ${1:-0}
+	quit ${1:-0}
 }
 
-get_apps() {
-    for a in $img_apps; do
-    	if check_exe_in_path $a; then
-		eval center_cmd=\$$a\_center_cmd
-		eval full_cmd=\$$a\_full_cmd
-		eval tile_cmd=\$$a\_tile_cmd
-		eval default_cmd=\$$a\_default_cmd
-		return 0
-	else
-		if [ "$not_found" ]; then
-			not_found="$not_found $a"
+get_apps() 
+{
+	for a in $img_apps; do
+    		if check_exe_in_path $a; then
+			eval center_cmd=\$$a\_center_cmd
+			eval full_cmd=\$$a\_full_cmd
+			eval tile_cmd=\$$a\_tile_cmd
+			eval default_cmd=\$$a\_default_cmd
+			return 0
 		else
-			not_found=$a
+			if [ "$not_found" ]; then
+				not_found="$not_found $a"
+			else
+				not_found=$a
+			fi
 		fi
-	fi
-    done
-    return 1
+	done
+	return 1
 }
 
-do_generate() {
-    echo -e "# created by $me $version on $(date)\n#"
-    echo -e "# seting NO_EXEC to a boolean value (eg true/false) will cause $me"
-    echo -e "# to never modify the root window\n#"
-    echo -e "#NO_EXEC=\n#"
-    echo -e "# POST_COMMAND can be set to a command that will be run run every time"
-    echo -e "# $me sets the root image\n#"
-    echo -e "#POST_COMMAND=\n#"
-    echo -e "# if LOG_LAST_CMD is set (boolean), bsetbg will keep a log of the last"
-    echo -e "# two successful commands.\n#"
-    echo -e "#LOG_LAST_CMD=\n#"
-    echo -e "# the LOGFILE specifies the file that bsetbg uses when LOG_LAST_CMD"
-    echo -e "# is defined. this defaults to ~/.bsetbg_last_cmd .\n#"
-    echo -e "#LOGFILE=\n#"
-    echo -e "# the following are default configuration values for the most popular image"
-    echo -e "# programs. See the man page of the respective application for more info.\n" 
+do_generate() 
+{
+	echo -e "# created by $me $version on $(date)\n#"
+	echo -e "# seting NO_EXEC to a boolean value (eg true/false) will cause $me"
+	echo -e "# to never modify the root window\n#"
+	echo -e "#NO_EXEC=\n#"
+	echo -e "# POST_COMMAND can be set to a command that will be run run every time"
+	echo -e "# $me sets the root image\n#"
+	echo -e "#POST_COMMAND=\n#"
+	echo -e "# if LOG_LAST_CMD is set (boolean), bsetbg will keep a log of the last"
+	echo -e "# two successful commands.\n#"
+	echo -e "#LOG_LAST_CMD=\n#"
+	echo -e "# the LOGFILE specifies the file that bsetbg uses when LOG_LAST_CMD"
+	echo -e "# is defined. this defaults to ~/.bsetbg_last_cmd .\n#"
+	echo -e "#LOGFILE=\n#"
+	echo -e "# the following are default configuration values for the most popular image"
+	echo -e "# programs. See the man page of the respective application for more info.\n" 
 
-    [ "$*" ] && img_apps="$*"
+	[ "$*" ] && img_apps="$*"
 
-    for a in $img_apps; do
-    	if check_exe_in_path $a; then
-		if ! bool $have_match; then
-			q='\"'
-			[ "$(eval echo \$$a\_center_cmd)" ] &&
-			eval echo CENTER=$q\$$a\_center_cmd$q &&
+	for a in $img_apps; do
+    		if check_exe_in_path $a; then
+			if ! bool $have_match; then
+				q='\"'
+				[ "$(eval echo \$$a\_center_cmd)" ] &&
+				eval echo CENTER=$q\$$a\_center_cmd$q &&
 			
-			[ "$(eval echo \$$a\_full_cmd)" ] &&
-			eval echo FULL=$q\$$a\_full_cmd$q &&
+				[ "$(eval echo \$$a\_full_cmd)" ] &&
+				eval echo FULL=$q\$$a\_full_cmd$q &&
 			
-			[ "$(eval echo \$$a\_tile_cmd)" ] &&
-			eval echo TILE=$q\$$a\_tile_cmd$q &&
+				[ "$(eval echo \$$a\_tile_cmd)" ] &&
+				eval echo TILE=$q\$$a\_tile_cmd$q &&
 			
-			[ "$(eval echo \$$a\_default_cmd)" ] &&
-			eval echo -e DEFAULT=$q\$$a\_default_cmd$q \\\\n &&
+				[ "$(eval echo \$$a\_default_cmd)" ] &&
+				eval echo -e DEFAULT=$q\$$a\_default_cmd$q \\\\n &&
 			
-			have_match=1
-		else
-			[ "$(eval echo \$$a\_center_cmd)" ] && 
-			eval echo \\#CENTER=$q\$$a\_center_cmd$q
+				have_match=1
+			else
+				[ "$(eval echo \$$a\_center_cmd)" ] && 
+				eval echo \\#CENTER=$q\$$a\_center_cmd$q
 			
-			[ "$(eval echo \$$a\_full_cmd)" ] &&
-			eval echo \\#FULL=$q\$$a\_full_cmd$q
+				[ "$(eval echo \$$a\_full_cmd)" ] &&
+				eval echo \\#FULL=$q\$$a\_full_cmd$q
 			
-			[ "$(eval echo \$$a\_tile_cmd)" ] &&
-			eval echo \\#TILE=$q\$$a\_tile_cmd$q
+				[ "$(eval echo \$$a\_tile_cmd)" ] &&
+				eval echo \\#TILE=$q\$$a\_tile_cmd$q
 			
-			[ "$(eval echo \$$a\_default_cmd)" ] &&
-			eval echo -e \\#DEFAULT=$q\$$a\_default_cmd$q \\\\n
+				[ "$(eval echo \$$a\_default_cmd)" ] &&
+				eval echo -e \\#DEFAULT=$q\$$a\_default_cmd$q \\\\n
+			fi
 		fi
-	fi
-    done
-    quit 0
+	done
+	quit 0
 }
 
-do_bsetroot() {
-    if check_exe_in_path bsetroot; then
-	read_config
+do_bsetroot() 
+{
+	if check_exe_in_path bsetroot; then
+		read_config
 
-	$debug bsetroot $* 2>/dev/null; rc=$?
+		$debug bsetroot $* 2>/dev/null; rc=$?
 		
-	if [ "$rc" -gt 0 ]; then
-		help_msg $rc
+		if [ "$rc" -gt 0 ]; then
+			help_msg $rc
+		else
+			log_cmd bsetroot $*; $refresh_cmd 2>/dev/null
+		fi
 	else
-		log_cmd bsetroot $*; $refresh_cmd 2>/dev/null
+    		quit 1 "couldn't find bsetroot in $PATH"
 	fi
-    else
-    	quit 1 "couldn't find bsetroot in $PATH"
-    fi
 }
 
-do_std() {
-    [ -z "$1" ] && help_msg 1
+do_standard() 
+{
+	[ -z "$1" ] && help_msg 1
 
-    bool $noconfig || read_config
+	bool $noconfig || read_config
 
-    get_img_command $1
-    check_img_command $do_this
+	get_img_command $1
+	check_img_command $do_this
 
-    case $# in
-    	1) file="$1" ;;
-	*) file="$2"
-    esac
+	case $# in
+    		1) file="$1" ;;
+		*) file="$2"
+	esac
 
-    if [ -f "$file" ]; then
-    	exec_img_command $do_this $file 
-    else
-    	quit 1 "$file does not exist"
-    fi
+	if [ -f "$file" ]; then
+    		exec_img_command $do_this $file 
+	else
+    		quit 1 "$file does not exist"
+	fi
 } 
 
-do_exec() {
-    [ "$#" -lt 3 ] && help_msg 3
+do_exec() 
+{
+	[ "$#" -lt 3 ] && help_msg 3
 
-    bool $noconfig || read_config
+	bool $noconfig || read_config
     
-    # check to see if -*c, -*f, or -*t were spcified, if so
-    # assume the last argument is a filename
-    b_arg=$(eval echo \$$(( $# - 1 )) )
-    app=$1
+	# check to see if -*c, -*f, or -*t were spcified, if so
+	# assume the last argument is a filename
+	b_arg=$(eval echo \$$(( $# - 1 )) )
+	app=$1
 
-    case $b_arg in
-    	-c|*-center|c|-t|*-tile*|t|-f|*-full|f)
-		eval file=\$$#
-		f_args="$b_arg $file"
-    esac
+	case $b_arg in
+    		-c|*-center|c|-t|*-tile*|t|-f|*-full|f)
+			eval file=\$$#
+			f_args="$b_arg $file"
+	esac
 
-    # put the rest of the arguments into the varialbe $e_args
-    while [ "$*" ]; do
-    	for a in "$*"; do
-    		case $1 in
-			$b_arg|$file) : ;;
-			*) e_args="$e_args "$1""
-		esac
-		shift 1
-    	done
-    done
+	# put the rest of the arguments into the varialbe $e_args
+	while [ "$*" ]; do
+    		for a in "$*"; do
+    			case $1 in
+				$b_arg|$file) : ;;
+				*) e_args="$e_args "$1""
+			esac
+			shift 1
+    		done
+	done
 
-    # with $f_args defined, check for image and do things normally
-    if [ "$f_args" ]; then
-	[ ! -f "$file" ] && quit 1 "$file does not exist"
+	# with $f_args defined, check for image and do things normally
+	if [ "$f_args" ]; then
+		[ ! -f "$file" ] && quit 1 "$file does not exist"
 	
-	if check_img_command $e_args; then
+		if check_img_command $e_args; then
+    			do_this="$e_args"
+    		else
+			read_config
+    			get_img_command $f_args
+			check_img_command $do_this
+			echo "$p couldn't find '$app' in path, using $type command instead"
+    		fi
+	# without $f_args, run the command blindly if it's in $PATH
+	elif check_exe_in_path $e_args; then
     		do_this="$e_args"
-    	else
-		read_config
-    		get_img_command $f_args
-		check_img_command $do_this
-		echo "$p couldn't find '$app' in path, using $type command instead"
-    	fi
-   # without $f_args, run the command blindly if it's in $PATH
-    elif check_exe_in_path $e_args; then
-    	do_this="$e_args"
-    else
-    	quit 1 "$p unable to run the following command: $e_args"
-    fi
+	else
+    		quit 1 "$p unable to run the following command: $e_args"
+	fi
 
-    exec_img_command $do_this $file
+	exec_img_command $do_this $file
 }    
 
-get_img_command() {
-    case $1 in
-	    *-full|-f|f)	type=full; do_this="$full_cmd" ;;
-	    *-tile|-t|t)	type=tile; do_this="$tile_cmd" ;;
-	    *-center|-c|c)	type=center; do_this="$center_cmd" ;;
-	    *)			type=default; do_this="$default_cmd"
-    esac
+get_img_command() 
+{
+	case $1 in
+		*-full|-f|f)	type=full; do_this="$full_cmd" ;;
+		*-tile|-t|t)	type=tile; do_this="$tile_cmd" ;;
+		*-center|-c|c)	type=center; do_this="$center_cmd" ;;
+		*)		type=default; do_this="$default_cmd"
+	esac
 }
 
-check_img_command() {
-    if check_exe_in_path $1; then
-    	do_this="$*"
-	rc=0
-    elif get_apps; then
-    	get_img_command $*
-	rc=1
-    else
-	quit 1 "$p couldn't find a suitable image program. tried the following:\\n
-	$(for a in $not_found; do echo "    $a\\n"; done)"
-    fi
-
-    if [ "$rc" -gt 0 -a -z "$e_args" ] && bool $read_config; then
-    	echo "$p couldn't find a suitable $type command in $config"
-    fi
-
-    return $rc
-}
-
-exec_img_command() {
-    unset rc
-    command=$*
-
-    if [ "$debug" ]; then
-    	$debug $command
-    else
-    	$command >/dev/null 2>&1; rc=$?
-    fi
-
-    if [ "$rc" -gt 0 ]; then
-    	echo "$p '$command' exited with status $rc"
-	get_apps
-	noconfig=1
-	parse_args ${f_args:-$my_args}
-	echo "$p using '$command' as $type"
-	$debug $command >/dev/null 2>&1; rc=$?
-	[ "$rc" =  0 ] && log_cmd $do_this $file && $refresh_cmd 2>/dev/null
-    else
-    	log_cmd $do_this $file; xrefresh 2>/dev/null
-    fi
-    return $rc
-}
-
-log_cmd() {
-    bool $LOG_LAST_CMD || return 1
-    [ "$debug" ] && return 1
-    echo -e "$prev_cmd\n$*" >$last_cmd_file
-    return $?
-}
-
-read_config() {
-    [ -f $config ] || return 1
-
-    if bool $read_config; then
-	unset read_config
-    else
-	read_config=1
-    fi
-
-    . $HOME/.bsetbgrc 2>/dev/null
-    check_no_exec
-
-    full_cmd=$FULL
-    center_cmd=$CENTER
-    tile_cmd=$TILE
-    default_cmd=$CENTER
-    last_cmd_file=${LOGFILE:-$last_cmd_file}
-    
-    bool $LOG_LAST_CMD && prev_cmd=$(tail -n 1 $last_cmd_file 2>/dev/null)    
-}
-
-check_no_exec() {
-    bool $NO_EXEC && 
-    quit 0 "$p no_exec mode. the root window will not be modified."
-}
-
-post_command() {
-    if [ -n "$POST_COMMAND" -a "$rc" -le 0 ]; then
-	if [ -n "$debug" ]; then
-		$debug "running post_command: $POST_COMMAND $post_args"
+check_img_command() 
+{
+	if check_exe_in_path $1; then
+    		do_this="$*"
+		rc=0
+	elif get_apps; then
+    		get_img_command $*
+		rc=1
 	else
-		$POST_COMMAND $post_args 2>/dev/null; erc=$?
-		[ "$erc" -gt 0 ] && 
-		echo "$p post-command '$POST_COMMAND $post_args' exited with status $erc"
+		quit 1 "$p couldn't find a suitable image program. tried the following:\\n
+		$(for a in $not_found; do echo "    $a\\n"; done)"
 	fi
-    fi
+
+	if [ "$rc" -gt 0 -a -z "$e_args" ] && bool $read_config; then
+    		echo "$p couldn't find a suitable $type command in $config"
+	fi
+
+    return $rc
 }
 
-add_arg() {
-    [ "$1" ] || return 1
-    if [ "$args" ]; then
-    	args="$args $1"
-    else
-    	args=$1
-    fi
+exec_img_command() 
+{
+	unset rc
+	command=$*
+
+	if [ "$debug" ]; then
+    		$debug $command
+	else
+    		$command >/dev/null 2>&1; rc=$?
+	fi
+
+	if [ "$rc" -gt 0 ]; then
+    		echo "$p '$command' exited with status $rc"
+		get_apps
+		noconfig=1
+		parse_args ${f_args:-$my_args}
+		echo "$p using '$command' as $type"
+		$debug $command >/dev/null 2>&1; rc=$?
+		[ "$rc" =  0 ] && log_cmd $do_this $file && $refresh_cmd 2>/dev/null
+	else
+    		log_cmd $do_this $file; xrefresh 2>/dev/null
+	fi
+	return $rc
+}
+
+log_cmd() 
+{
+	bool $LOG_LAST_CMD || return 1
+	[ "$debug" ] && return 1
+	echo -e "$prev_cmd\n$*" >$last_cmd_file
+	return $?
+}
+
+read_config() 
+{
+	[ -f $config ] || return 1
+
+	if bool $read_config; then
+		unset read_config
+	else
+		read_config=1
+	fi
+
+	. $HOME/.bsetbgrc 2>/dev/null
+	check_no_exec
+
+	full_cmd=$FULL
+	center_cmd=$CENTER
+	tile_cmd=$TILE
+	default_cmd=$CENTER
+	last_cmd_file=${LOGFILE:-$last_cmd_file}
+    
+	bool $LOG_LAST_CMD && prev_cmd=$(tail -n 1 $last_cmd_file 2>/dev/null)    
+}
+
+check_no_exec() 
+{
+	bool $NO_EXEC && 
+	quit 0 "$p no_exec mode. the root window will not be modified."
+}
+
+post_command() 
+{
+	if [ -n "$POST_COMMAND" -a "$rc" -le 0 ]; then
+		if [ -n "$debug" ]; then
+			$debug "running post_command: $POST_COMMAND $post_args"
+		else
+			post_command_output=$($POST_COMMAND $post_args 2>&1); erc=$?
+			if [ "$erc" -gt 0 ]; then
+				echo "$p post-command '$POST_COMMAND $post_args' exited with status $erc"
+				[ -n "$post_command_output" ] &&
+					echo "$POST_COMMAND $post_args: $post_command_output"
+			fi
+		fi
+	fi
+}
+
+add_arg() 
+{
+	[ "$1" ] || return 1
+	if [ "$args" ]; then
+    		args="$args $1"
+	else
+    		args=$1
+	fi
 }  
 
-add_post_arg() {
-    [ -z "$1" ] && return 1
-    if [ "$post_args" ]; then
-	post_args="$post_args $1"
-    else
-	post_args=$1
-    fi
+add_post_arg() 
+{
+	[ -z "$1" ] && return 1
+	if [ "$post_args" ]; then
+		post_args="$post_args $1"
+	else
+		post_args=$1
+	fi
 }
 
-check_cmd() {
-    if [ -z "$command" ]; then
-	command=${2:-$1}; eval ${3:-${2:-$1}}=1
-    elif bool $do_post; then
-	add_post_arg ${1}
-    else
-	finished=1
-    fi 
+check_cmd() 
+{
+	if [ -z "$command" ]; then
+		command=${2:-$1}; eval ${3:-${2:-$1}}=1
+	elif bool $do_post; then
+		add_post_arg ${1}
+	else
+		finished=1
+	fi 
 }
 
-parse_args() {
-    case $1 in
-    	-d|*-debug|d)
-		unset refresh_cmd; debug=echo\ $me\_debug: ;;
+parse_args() 
+{
+	case $1 in
+    		-d|*-debug|d)
+			unset refresh_cmd; debug=echo\ $me\_debug: ;;
 
-	-p|-*-post|p)			
-		unset finished do_std do_exec; do_post=1 ;;
+		-p|-*-post|p)			
+			unset finished do_standard do_exec; do_post=1 ;;
 				
-	-c|*-center|c|-t|*-tile*|t|-f|*-full|f)
-		case $command in
-			do_std|do_generate|do_bsetroot)
-				finished=1 ;;
-			do_exec)
-				if ! bool $got_fcmd; then
-					add_arg $1 args; got_fcmd=1
-				else
-					finished=1
-				fi ;;
-			*)	
-				add_arg $1; do_std=1; command=do_std
-		esac ;;		
+		-c|*-center|c|-t|*-tile*|t|-f|*-full|f)
+			case $command in
+				do_standard|do_generate|do_bsetroot)
+					finished=1 ;;
+				do_exec)
+					if ! bool $got_fcmd; then
+						add_arg $1 args; got_fcmd=1
+					else
+						finished=1
+					fi ;;
+				*)	
+					add_arg $1; do_standard=1; command=do_standard
+			esac ;;		
 		
-	-a|*-app|a|-e|*-exec|e)
-		check_cmd "do_exec" ;;
+		-a|*-app|a|-e|*-exec|e)
+			check_cmd "do_exec" ;;
 		
-	-mod|-gradient|-solid|-display)
-		check_cmd "do_bsetroot" && add_arg $1 ;;
+		-mod|-gradient|-solid|-display)
+			check_cmd "do_bsetroot" && add_arg $1 ;;
 
-	-g|*-generate*|g)
-		check_cmd $1 "do_generate" ;;
+		-g|*-generate*|g)
+			check_cmd $1 "do_generate" ;;
 		
-	-v|*-version|v)
-		[ -z "$command" ] && quit 0 $me $version $copyright ;;
+		-v|*-version|v)
+			[ -z "$command" ] && quit 0 $me $version $copyright ;;
 		
-	-h|*-help|h)
-		[ -z "$command" ] && help_msg ;;
+		-h|*-help|h)
+			[ -z "$command" ] && help_msg ;;
 		
-	*)	
-		bool $finished && return 1		
+		*)	
+			bool $finished && return 1		
 
-		case $1 in -*)
-			bool $do_exec || bool $do_bsetroot || bool $do_post || help_msg 1
-		esac
+			case $1 in -*)
+				bool $do_exec || bool $do_bsetroot || bool $do_post || help_msg 1
+			esac
 		
-		if bool $do_std || bool $do_exec || bool $do_bsetroot || bool $do_generate; then
-			add_arg $1
-		elif bool $do_post; then
-			add_post_arg $1
-		else
-			add_arg $1; command=do_std; finished=1
-		fi
-    esac
+			if bool $do_standard || bool $do_exec || bool $do_bsetroot || bool $do_generate; then
+				add_arg $1
+			elif bool $do_post; then
+				add_post_arg $1
+			else
+				add_arg $1; command=do_standard; finished=1
+			fi
+	esac
 }
 
 [ -z "$*" ] && help_msg 1

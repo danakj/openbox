@@ -88,7 +88,7 @@ void grab_button(guint button, guint state, Window win, guint mask,
 
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
-                    pointer_mode, GrabModeAsync, None, None);
+                    pointer_mode, GrabModeSync, None, None);
 }
 
 void ungrab_button(guint button, guint state, Window win)
@@ -107,7 +107,7 @@ void grab_key(guint keycode, guint state, int keyboard_mode)
     xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabKey(ob_display, keycode, state | mask_list[i], ob_root, FALSE,
-                 GrabModeAsync, keyboard_mode);
+                 GrabModeSync, keyboard_mode);
     xerror_set_ignore(FALSE);
     if (xerror_occured)
         g_warning("failed to grab keycode %d modifiers %d", keycode, state);

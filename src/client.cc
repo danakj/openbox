@@ -504,6 +504,17 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
   
   const otk::OBProperty *property = Openbox::instance->property();
 
+  // compress changes to a single property into a single change
+  XEvent ce;
+  while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce)) {
+    // XXX: it would be nice to compress ALL changes to a property, not just
+    //      changes in a row without other props between.
+    if (ce.xproperty.atom != e.atom) {
+      XPutBackEvent(otk::OBDisplay::display, &ce);
+      break;
+    }
+  }
+
   if (e.atom == XA_WM_NORMAL_HINTS)
     updateNormalHints();
   else if (e.atom == XA_WM_HINTS)

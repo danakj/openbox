@@ -22,6 +22,8 @@ void focus_startup()
        mapped. */
     XSetWindowAttributes attrib;
 
+    focus_client = NULL;
+
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
 				 -100, -100, 1, 1, 0, 0, InputOnly,

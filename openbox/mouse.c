@@ -14,7 +14,7 @@
 typedef struct {
     guint state;
     guint button;
-    GSList *actions[NUM_MOUSEACTION]; /* lists of Action pointers */
+    GSList *actions[OB_MOUSE_NUM_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
 /* Array of GSList*s of PointerBinding*s. */
@@ -70,7 +70,7 @@ static void clearall()
             int j;
 
             ObMouseBinding *b = it->data;
-            for (j = 0; j < NUM_MOUSEACTION; ++j) {
+            for (j = 0; j < OB_MOUSE_NUM_ACTIONS; ++j) {
                 GSList *it;
                 for (it = b->actions[j]; it; it = it->next) {
                     action_free(it->data);
@@ -204,7 +204,7 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
         button = e->xbutton.button;
         state = e->xbutton.state;
 
-        fire_button(MouseAction_Press, context,
+        fire_button(OB_MOUSE_ACTION_PRESS, context,
                     client, e->xbutton.state,
                     e->xbutton.button,
                     e->xbutton.x_root, e->xbutton.y_root);
@@ -249,18 +249,18 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
             state = 0;
             ltime = e->xbutton.time;
         }
-        fire_button(MouseAction_Release, context,
+        fire_button(OB_MOUSE_ACTION_RELEASE, context,
                     client, e->xbutton.state,
                     e->xbutton.button,
                     e->xbutton.x_root, e->xbutton.y_root);
         if (click)
-            fire_button(MouseAction_Click, context,
+            fire_button(OB_MOUSE_ACTION_CLICK, context,
                         client, e->xbutton.state,
                         e->xbutton.button,
                         e->xbutton.x_root,
                         e->xbutton.y_root);
         if (dclick)
-            fire_button(MouseAction_DClick, context,
+            fire_button(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
                         client, e->xbutton.state,
                         e->xbutton.button,
                         e->xbutton.x_root,
@@ -302,7 +302,7 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
                                     client->area.height +
                                     client->frame->size.top +
                                     client->frame->size.bottom);
-                fire_motion(MouseAction_Motion, context,
+                fire_motion(OB_MOUSE_ACTION_MOTION, context,
                             client, state, button, px, py, corner);
                 button = 0;
                 state = 0;

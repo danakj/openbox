@@ -133,22 +133,22 @@ static void parse_mouse(xmlDocPtr doc, xmlNodePtr node, void *d)
             if (!parse_attr_string("button", nbut, &buttonstr))
                 goto next_nbut;
             if (parse_attr_contains("press", nbut, "action"))
-                mact = MouseAction_Press;
+                mact = OB_MOUSE_ACTION_PRESS;
             else if (parse_attr_contains("release", nbut, "action"))
-                mact = MouseAction_Release;
+                mact = OB_MOUSE_ACTION_RELEASE;
             else if (parse_attr_contains("click", nbut, "action"))
-                mact = MouseAction_Click;
+                mact = OB_MOUSE_ACTION_CLICK;
             else if (parse_attr_contains("doubleclick", nbut,"action"))
-                mact = MouseAction_DClick;
+                mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
             else if (parse_attr_contains("drag", nbut, "action"))
-                mact = MouseAction_Motion;
+                mact = OB_MOUSE_ACTION_MOTION;
             else
                 goto next_nbut;
             nact = parse_find_node("action", nbut->xmlChildrenNode);
             while (nact) {
                 if ((action = action_parse(doc, nact))) {
                     /* validate that its okay for a mouse binding*/
-                    if (mact == MouseAction_Motion) {
+                    if (mact == OB_MOUSE_ACTION_MOTION) {
                         if (action->func != action_moveresize ||
                             action->data.moveresize.corner ==
                             prop_atoms.net_wm_moveresize_move_keyboard ||

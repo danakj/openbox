@@ -7,12 +7,12 @@
 #include <X11/Xlib.h>
 
 typedef enum {
-    MouseAction_Press,
-    MouseAction_Release,
-    MouseAction_Click,
-    MouseAction_DClick,
-    MouseAction_Motion,
-    NUM_MOUSEACTION
+    OB_MOUSE_ACTION_PRESS,
+    OB_MOUSE_ACTION_RELEASE,
+    OB_MOUSE_ACTION_CLICK,
+    OB_MOUSE_ACTION_DOUBLE_CLICK,
+    OB_MOUSE_ACTION_MOTION,
+    OB_MOUSE_NUM_ACTIONS
 } ObMouseAction;
 
 void mouse_startup();

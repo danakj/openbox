@@ -21,6 +21,7 @@ void dock_startup(gboolean reconfig)
     XSetWindowAttributes attrib;
 
     if (reconfig) {
+        stacking_add(DOCK_AS_WINDOW(dock));
         dock_configure();
         return;
     }
@@ -48,12 +49,14 @@ void dock_startup(gboolean reconfig)
 
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
-    stacking_raise(DOCK_AS_WINDOW(dock));
 }
 
 void dock_shutdown(gboolean reconfig)
 {
-    if (reconfig) return;
+    if (reconfig) {
+        stacking_remove(DOCK_AS_WINDOW(dock));
+        return;
+    }
 
     XDestroyWindow(ob_display, dock->frame);
     RrAppearanceFree(dock->a_frame);

@@ -684,12 +684,12 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
       }
     }
   }
-  if (! hasclose)
+  if (! hasclose && frame.close_button)
     destroyCloseButton();
-  if (! hasiconify)
-    destroyCloseButton();
-  if (! hasmaximize)
-    destroyCloseButton();
+  if (! hasiconify && frame.iconify_button)
+    destroyIconifyButton();
+  if (! hasmaximize && frame.maximize_button)
+    destroyMaximizeButton();
   if (! haslabel)
     parsed += 'L';      // require that the label be in the layout
 

@@ -1,3 +1,43 @@
+2003-08-23  Ben Jansens  <xor@zed.orodu.net>
+
+	* keyboard.c:
+	end the other action when starting a new interactive action while one was in place
+
+2003-08-22  Ben Jansens  <xor@zed.orodu.net>
+
+	* action.c: only use visible windows when calcing for raiselower
+
+	* action.c: maybe smarter
+
+	* action.c: make the raiselower action smarter
+
+2003-08-20  Ben Jansens  <xor@zed.orodu.net>
+
+	* keyboard.c:
+	better handling of starting a new interactive grab while one is in progress
+
+	* frame.c, frame.h, mouse.c: rename the 'root' context to 'desktop'
+
+	* action.c, action.h:
+	add the 'raiselower' action for raising obscured windows and lowering fully visible ones
+
+	* event.c, frame.c, frame.h:
+	add an obscured flag that tracks if the frame is at all obscured
+
+	* mouse.c: use the result from XGetGeometry correctly
+
+	* mouse.c: handle the XGetGeomtry failing for button releases
+
+	* mouse.c:
+	dont grab client context stuff on desktop windows. check that clint is non-null
+
+	* frame.c, mouse.c:
+	grab root mouse bindings on desktop windows also, since they are conceptually the desktop.
+
+	* screen.c: reset first to TRUE properly when the desktop popup is off
+
+	* moveresize.c: move the pointer while doing a keyboard move/resize
+
 2003-08-20  Ben Jansens  <xor@zed.orodu.net>
 
 	* keyboard.c:

@@ -1,8 +1,8 @@
-#include "debug.h"
 #include "client.h"
+#include "debug.h"
+#include "startupnotify.h"
 #include "dock.h"
 #include "xerror.h"
-#include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
 #include "place.h"
@@ -37,6 +37,7 @@ GSList     *client_destructors = NULL;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
+static void client_get_startup_id(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -165,35 +166,8 @@ void client_manage_all()
     }
     XFree(children);
 
-    /* stack them as they were on startup!
-       why with stacking_lower? Why, because then windows who aren't in the
-       stacking list are on the top where you can see them instead of buried
-       at the bottom! */
-    for (i = startup_stack_size; i > 0; --i) {
-        ObWindow *obw;
-
-        w = startup_stack_order[i-1];
-        obw = g_hash_table_lookup(window_map, &w);
-        if (obw) {
-            g_assert(WINDOW_IS_CLIENT(obw));
-            stacking_lower(CLIENT_AS_WINDOW(obw));
-        }
-    }
-    g_free(startup_stack_order);
-    startup_stack_order = NULL;
-    startup_stack_size = 0;
-
-    if (config_focus_new) {
-        ObWindow *active;
-
-        active = g_hash_table_lookup(window_map, &startup_active);
-        if (active) {
-            g_assert(WINDOW_IS_CLIENT(active));
-            if (!client_focus(WINDOW_AS_CLIENT(active)))
-                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
-        } else
-            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
-    }
+    if (config_focus_new)
+        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
 }
 
 void client_manage(Window window)
@@ -251,8 +225,17 @@ void client_manage(Window window)
     self->obwin.type = Window_Client;
     self->window = window;
 
+    /* non-zero defaults */
+    self->title_count = 1;
+    self->wmstate = NormalState;
+    self->layer = -1;
+    self->decorate = TRUE;
+    self->desktop = screen_num_desktops; /* always an invalid value */
+
     client_get_all(self);
     client_restore_session_state(self);
+
+    sn_app_started(self->class);
 
     client_change_state(self);
 
@@ -669,15 +652,10 @@ static void client_toggle_border(ObClient *self, gboolean show)
 
 static void client_get_all(ObClient *self)
 {
-    /* non-zero defaults */
-    self->title_count = 1;
-    self->wmstate = NormalState;
-    self->layer = -1;
-    self->decorate = TRUE;
-
     client_get_area(self);
     client_update_transient_for(self);
     client_update_wmhints(self);
+    client_get_startup_id(self);
     client_get_desktop(self);
     client_get_state(self);
     client_get_shaped(self);
@@ -699,6 +677,14 @@ static void client_get_all(ObClient *self)
     client_update_class(self);
     client_update_strut(self);
     client_update_icons(self);
+}
+
+static void client_get_startup_id(ObClient *self)
+{
+    if (!(PROP_GETS(self->window, net_startup_id, utf8, &self->startup_id)))
+        if (self->group)
+            PROP_GETS(self->group->leader,
+                      net_startup_id, utf8, &self->startup_id);
 }
 
 static void client_get_area(ObClient *self)
@@ -741,9 +727,16 @@ static void client_get_desktop(ObClient *self)
                     }
             }
        }
-       if (!trdesk)
-           /* defaults to the current desktop */
-           self->desktop = screen_desktop;
+       if (!trdesk) {
+           /* try get from the startup-notification protocol */
+           if (sn_get_desktop(self->startup_id, &self->desktop)) {
+               if (self->desktop >= screen_num_desktops &&
+                   self->desktop != DESKTOP_ALL)
+                   self->desktop = screen_num_desktops - 1;
+           } else
+               /* defaults to the current desktop */
+               self->desktop = screen_desktop;
+       }
     }
     if (self->desktop != d) {
         /* set the desktop hint, to make sure that it always exists */

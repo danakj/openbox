@@ -1,12 +1,13 @@
 Changelog for Openbox:
 2.2.0
  * Allow changing the appearance of buttons with xbm	(Scott Moynes)
-   bitmap files
- 
- * Fixed window menu placement bug			(Scott Moynes)
+   bitmap files. Can be disable with 
+   --disable-bitmap-buttons.
  
  * Added style textures for				(Scott Moynes)
    window.button.pressed.focus/unfocus:
+2.1.2
+ * Fixed window menu placement bug			(Scott Moynes)
 
 2.1.1:
  * A build fix for xftlsfonts.                          (Scott Moynes)

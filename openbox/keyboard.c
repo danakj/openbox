@@ -112,14 +112,20 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
 void keyboard_interactive_grab(guint state, ObClient *client,
                                ObFrameContext context, ObAction *action)
 {
-    if (!interactive_grab && grab_keyboard(TRUE)) {
+    if (!interactive_grab) {
+        if (!grab_keyboard(TRUE))
+            return;
+        if (!grab_pointer(TRUE, None)) {
+            grab_keyboard(FALSE);
+            return;
+        }
         interactive_grab = TRUE;
-        grabbed_state = state;
-        grabbed_client = client;
-        grabbed_action = action;
-        grabbed_context = context;
-        grab_pointer(TRUE, None);
     }
+
+    grabbed_state = state;
+    grabbed_client = client;
+    grabbed_action = action;
+    grabbed_context = context;
 }
 
 gboolean keyboard_process_interactive_grab(const XEvent *e,

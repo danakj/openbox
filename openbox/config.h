@@ -77,6 +77,8 @@ extern guint config_dock_app_move_modifiers;
 /* The name of the theme */
 extern gchar *config_theme;
 
+/* Show the onepixel border after toggleDecor */
+extern gboolean config_theme_keepborder;
 /* Titlebar button layout */
 extern gchar *config_title_layout;
 

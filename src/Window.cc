@@ -2611,6 +2611,13 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
           client.window);
 #endif // DEBUG
 
+  /*
+     Even thought the window wants to be shown, if it is not on the current
+     workspace, then it isn't going to be shown right now.
+  */
+  if (blackbox_attrib.workspace != screen->getCurrentWorkspaceID())
+    current_state = WithdrawnState;
+
   switch (current_state) {
   case IconicState:
     iconify();

@@ -57,7 +57,7 @@ def remove(data):
             invalid.append('menu.frame.justify')
             for inv in invalid:
                 if key.find(inv) != -1:
-                    out(key + ' is no longer supported. Remove (Y/n)? ')
+                    out(key + ' is no longer supported.\nRemove (Y/n)? ')
                     if read_bool():
                         out('Removing "' + key + '"\n')
                         data.pop(i)
@@ -76,7 +76,7 @@ def pressed(data):
             if key == 'window.button.pressed':
                 out('The window.button.pressed option has been replaced by ' +
                     'window.button.pressed.focus and ' +
-                    'window.button.pressed.unfocus. Update (Y/n)? ')
+                    'window.button.pressed.unfocus.\nUpdate (Y/n)? ')
                 if read_bool():
                     out('Removing "window.button.pressed"\n')
                     data.pop(i)
@@ -89,6 +89,28 @@ def pressed(data):
                     i += 1
                     n += 1
                 break
+        i += 1
+
+def fonts(data):
+    for l in data:
+        key, value = getkeyval(l)
+        if key and value:
+            if key == 'window.font':
+                out('You appear to specify fonts using the old X fonts ' +
+                    'syntax.\nShall I remove all fonts from the theme (Y/n)? ')
+                if not read_bool():
+                    return
+    i = 0
+    n = len(data)
+    while i < n:
+        l = data[i]
+        key, value = getkeyval(l)
+        if key and value:
+            if key.find('font') != -1:
+                out('Removing "' + key + '"\n')
+                data.pop(i)
+                i -= 1
+                n -= 1
         i += 1
 
 
@@ -107,10 +129,8 @@ def pressed(data):
 
 
 
-
-
 def usage():
-    print 'Usage: ' + sys.argv[0] + ' /path/to/themerc'
+    print 'Usage: ' + sys.argv[0] + ' /path/to/themerc > newthemerc'
     print
     sys.exit()
 
@@ -127,9 +147,10 @@ data = file.readlines()
 for i in range(len(data)):
     data[i] = data[i].strip()
 
-simple_replace(data)
-remove(data)
-pressed(data)
+#simple_replace(data)
+#remove(data)
+#pressed(data)
+fonts(data)
 
 for l in data:
     print l

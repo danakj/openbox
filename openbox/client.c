@@ -2118,7 +2118,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                           (user && (final ||
                                     (resized && config_resize_redraw))));
 
-    /* if the client is enlarging, the resize the client before the frame */
+    /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && user && (w > oldw || h > oldh))
         XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
 

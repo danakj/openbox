@@ -30,6 +30,9 @@ struct _ObParseInst;
 extern gboolean config_focus_new;
 /*! Focus windows when the mouse enters them */
 extern gboolean config_focus_follow;
+/*! Should focus stay under the mouse when there is nothing focused or go to
+ the last used window */
+extern gboolean config_focus_last;
 /*! Timeout for focusing windows on focus follows mouse, in microseconds */
 extern guint    config_focus_delay;
 /*! If windows should automatically be raised when they are focused in

@@ -114,6 +114,13 @@ void OBFrame::loadStyle(const otk::Style *style)
   XSetWindowBorder(otk::OBDisplay::display, _handle,
                    _style->getBorderColor().pixel());
   
+  // XXX: if (focused)
+    XSetWindowBackground(otk::OBDisplay::display, _window,
+                         _style->getFrameFocus().color().pixel());
+  // XXX: else  
+  // XXX:  XSetWindowBackground(otk::OBDisplay::display, _window,
+  // XXX:                       _style->getFrameUnfocus().color().pixel());
+
   // if !replace, then update() will get called after the client is grabbed!
   if (replace) {
     update();
@@ -144,13 +151,13 @@ void OBFrame::update()
     _titlebar_area.setRect(-_style->getBorderWidth(),
                            -_style->getBorderWidth(),
                            width,
-                           (_style->getFont()->height() +
+                           (_style->getFont().height() +
                             _style->getBevelWidth() * 2));
     _size.top += _titlebar_area.height() + _style->getBorderWidth();
 
     // set the label size
     _label_area.setRect(0, _style->getBevelWidth(),
-                        width, _style->getFont()->height());
+                        width, _style->getFont().height());
     // set the buttons sizes
     if (_decorations & OBClient::Decor_Iconify)
       _button_iconify_area.setRect(0, _style->getBevelWidth() + 1,
@@ -217,7 +224,8 @@ void OBFrame::update()
 
   if (_decorations & OBClient::Decor_Handle) {
     _handle_area.setRect(-_style->getBorderWidth(),
-                         _size.top + _client->area().height(),
+                         _size.top + _client->area().height() +
+                         _style->getFrameWidth(),
                          width, _style->getHandleWidth());
     _grip_left_area.setRect(-_style->getBorderWidth(),
                             -_style->getBorderWidth(),
@@ -337,14 +345,14 @@ void OBFrame::updateShape()
   if (!_client->shaped()) {
     // clear the shape on the frame window
     XShapeCombineMask(otk::OBDisplay::display, _window, ShapeBounding,
-                      _size.left - 2,//frame.margin.left - frame.border_w,
-                      _size.top - 2,//frame.margin.top - frame.border_w,
+                      _size.left,
+                      _size.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
     XShapeCombineShape(otk::OBDisplay::display, _window, ShapeBounding,
-                       _size.left - 2,
-                       _size.top - 2,
+                       _size.left,
+                       _size.top,
                        _client->window(), ShapeBounding, ShapeSet);
 
   int num = 0;
@@ -386,8 +394,7 @@ void OBFrame::grabClient()
   // reparent the client to the frame
   XSelectInput(otk::OBDisplay::display, _client->window(),
                OBClient::event_mask & ~StructureNotifyMask);
-  XReparentWindow(otk::OBDisplay::display, _client->window(), _window,
-                  _size.left, _size.top);
+  XReparentWindow(otk::OBDisplay::display, _client->window(), _window, 0, 0);
   XSelectInput(otk::OBDisplay::display, _client->window(),
                OBClient::event_mask);
 

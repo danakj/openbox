@@ -550,8 +550,6 @@ static gboolean hide_timeout(gpointer data)
 
 void dock_hide(gboolean hide)
 {
-    if (dock->hidden == hide || !config_dock_hide)
-        return;
     if (!hide) {
         /* show */
         dock->hidden = FALSE;
@@ -559,7 +557,7 @@ void dock_hide(gboolean hide)
 
         /* if was hiding, stop it */
         ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
-    } else {
+    } else if (!dock->hidden && config_dock_hide) {
         ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_timeout,
                                  hide_timeout, NULL, NULL);
     }

@@ -105,23 +105,23 @@ def unshade(data):
     if not client: return
     OBClient_shade(client, 0)
 
-def next_desktop(data):
+def next_desktop(data, no_wrap=0):
     screen = Openbox_screen(openbox, data.screen())
     d = OBScreen_desktop(screen)
     n = OBScreen_numDesktops(screen)
-    if (d == (n-1)):
-        d = 0
-    else:
+    if (d < (n-1)):
         d = d + 1
+    elif not no_wrap:
+        d = 0
     OBScreen_changeDesktop(screen, d)
     
-def prev_desktop(data):
+def prev_desktop(data, no_wrap=0):
     screen = Openbox_screen(openbox, data.screen())
     d = OBScreen_desktop(screen)
     n = OBScreen_numDesktops(screen)
     if (d > 0):
         d = d - 1
-    else:
+    elif not no_wrap:
         d = n - 1
     OBScreen_changeDesktop(screen, d)
     

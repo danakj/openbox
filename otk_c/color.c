@@ -86,7 +86,6 @@ static void parseColorName(OtkColor *self, const char *name) {
   }
 }
 
-#include <stdio.h>
 static void doCacheCleanup() {
   unsigned long *pixels;
   int i, ppos;
@@ -97,12 +96,9 @@ static void doCacheCleanup() {
   // ### TODO - support multiple displays!
   if (!PyDict_Size(colorcache)) return; // nothing to do
 
-  printf("Cleaning Cache...\n");
-  
   pixels = malloc(sizeof(unsigned long) * PyDict_Size(colorcache));
 
   for (i = 0; i < ScreenCount(OBDisplay->display); i++) {
-    printf("Screen %d\n", i);
     count = 0;
     ppos = 0;
 
@@ -110,19 +106,12 @@ static void doCacheCleanup() {
       // get the screen from the hash
       if (color->screen != i) continue; // wrong screen
 
-      printf("has %d refs\n", color->ob_refcnt);
-
       // does someone other than the cache have a reference? (the cache gets 2)
       if (color->ob_refcnt > 2)
         continue;
 
-      printf("ppos: %d\n", ppos);
-      printf("Cleaning pixel: %lx Count: %d\n", color->pixel, count+1);
-      
       pixels[count++] = color->pixel;
-      printf("pixref references before: %d\n", color->ob_refcnt);
       PyDict_DelItem(colorcache, key);
-      printf("pixref references after: %d\n", color->ob_refcnt);
       --ppos; // back up one in the iteration
     }
 
@@ -130,7 +119,6 @@ static void doCacheCleanup() {
       XFreeColors(OBDisplay->display,
                   OtkDisplay_ScreenInfo(OBDisplay, i)->colormap,
                   pixels, count, 0);
-    printf("Done Cleaning Cache. Cleaned %d pixels\n", count);
   }
 
   free(pixels);
@@ -141,8 +129,6 @@ static void allocate(OtkColor *self) {
   XColor xcol;
 
   assert(!self->allocated);
-
-  printf("allocating! %d\n", cleancache);
 
   // allocate color from rgb values
   xcol.red =   self->red   | self->red   << 8;

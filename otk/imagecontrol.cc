@@ -41,11 +41,10 @@ static unsigned long bsqrt(unsigned long x) {
 
 ImageControl *ctrl = 0;
 
-ImageControl::ImageControl(TimerQueueManager *timermanager,
-                             const ScreenInfo *scrn,
-                             bool _dither, int _cpc,
-                             unsigned long cache_timeout,
-                             unsigned long cmax) {
+ImageControl::ImageControl(const ScreenInfo *scrn,
+                           bool _dither, int _cpc,
+                           unsigned long cache_timeout,
+                           unsigned long cmax) {
   if (! ctrl) ctrl = this;
 
   screeninfo = scrn;
@@ -53,13 +52,10 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
   setColorsPerChannel(_cpc);
 
   cache_max = cmax;
-  if (cache_timeout) {
-    timer = new Timer(timermanager, (TimeoutHandler)timeout, this);
-    timer->setTimeout(cache_timeout);
-    timer->start();
-  } else {
+  if (cache_timeout)
+    timer = new Timer(cache_timeout, (Timer::TimeoutHandler)timeout, this);
+  else
     timer = (Timer *) 0;
-  }
 
   colors = (XColor *) 0;
   ncolors = 0;
@@ -350,10 +346,8 @@ ImageControl::~ImageControl(void) {
     for (; it != end; ++it)
       XFreePixmap(**display, it->pixmap);
   }
-  if (timer) {
-    timer->stop();
+  if (timer)
     delete timer;
-  }
 }
 
 

@@ -446,7 +446,6 @@ class Openbox(EventDispatcher,EventHandler):
     State_Normal = _openbox.Openbox_State_Normal
     State_Exiting = _openbox.Openbox_State_Exiting
     def state(*args): return apply(_openbox.Openbox_state,args)
-    def timerManager(*args): return apply(_openbox.Openbox_timerManager,args)
     def property(*args): return apply(_openbox.Openbox_property,args)
     def actions(*args): return apply(_openbox.Openbox_actions,args)
     def bindings(*args): return apply(_openbox.Openbox_bindings,args)

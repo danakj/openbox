@@ -145,17 +145,17 @@ KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
 Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
-    _timer(openbox->timerManager(),
-           (otk::TimeoutHandler)resetChains, this)
+    _timer((otk::Timer *) 0)
 {
-  _timer.setTimeout(5000); // chains reset after 5 seconds
-  
 //  setResetKey("C-g"); // set the default reset key
 }
 
 
 Bindings::~Bindings()
 {
+  if (_timer)
+    delete _timer;
+
   grabKeys(false);
   removeAllKeys();
 //  removeAllButtons(); XXX
@@ -379,7 +379,11 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
     while (p) {
       if (p->binding.key == key && p->binding.modifiers == modifiers) {
         if (p->chain) {
-          _timer.start(); // start/restart the timer
+	  if (_timer)
+            delete _timer;
+          _timer = new otk::Timer(5000, // 5 second timeout
+                                  (otk::Timer::TimeoutHandler)resetChains,
+                                  this);
           // grab the server here to make sure no key pressed go missed
           otk::display->grab();
           grabKeys(false);
@@ -403,7 +407,10 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
 
 void Bindings::resetChains(Bindings *self)
 {
-  self->_timer.stop();
+  if (self->_timer) {
+    delete self->_timer;
+    self->_timer = (otk::Timer *) 0;
+  }
   // grab the server here to make sure no key pressed go missed
   otk::display->grab();
   self->grabKeys(false);

@@ -2,6 +2,10 @@
 #ifndef   __timer_hh
 #define   __timer_hh
 
+/*! @file timer.hh
+  @brief Contains the Timer class, used for timed callbacks.
+*/
+
 extern "C" {
 #ifdef    TIME_WITH_SYS_TIME
 #  include <sys/time.h>
@@ -13,120 +17,109 @@ extern "C" {
 #    include <time.h>
 #  endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
+
+#ifdef    HAVE_UNISTD_H
+#  include <sys/types.h>
+#  include <unistd.h>
+#endif // HAVE_UNISTD_H
 }
+
+#include <queue>
+#include <vector>
 
 namespace otk {
 
-class TimerQueueManager;
-
-//! The data passed to the TimeoutHandler function.
+//! The Timer class implements timed callbacks.
 /*!
-  Note: this is a very useful place to put an object instance, and set the
-  event handler to a static function in the same class.
+  The Timer class can be used to have a callback fire after a given time
+  interval. A created Timer will fire repetitively until it is destroyed.
 */
-typedef void *TimeoutData;
-//! The type of function which can be set as the callback for a Timer firing
-typedef void (*TimeoutHandler)(TimeoutData);
-
-//! A Timer class which will fire a function when its time elapses
 class Timer {
+public:
+  //! Data type of Timer callback
+  typedef void (*TimeoutHandler)(void *data);
+
 private:
-  //! The manager which to add ourself to and remove ourself after we are done
-  TimerQueueManager *_manager;
-  //! The function to call when the time elapses
-  TimeoutHandler _handler;
-  //! The data which gets passed along to the TimeoutHandler
-  TimeoutData _data;
-  //! Determines if the timer is currently started
-  bool _timing;
-  //! When this is true, the timer will reset itself to fire again every time
-  bool _recur;
+  //! Compares two timeval structs
+  struct TimerCompare {
+     //! Compares two timeval structs
+     inline bool operator()(const Timer *a, const Timer *b) const {
+       return timercmp(&a->_timeout, &b->_timeout, >);
+     }
+  };
 
-  //! The time at which the timer started
-  timeval _start;
-  //! The time at which the timer is going to fire
-  timeval _timeout;
+  typedef
+  std::priority_queue<Timer*, std::vector<Timer*>, TimerCompare> TimerQ;
 
-  //! Disallows copying of Timer objects
-  Timer(const Timer&);
-  //! Disallows copying of Timer objects
-  Timer& operator=(const Timer&);
+  //! Milliseconds between timer firings
+  long _delay;
+  //! Callback for timer expiry
+  TimeoutHandler _action;
+  //! Data sent to callback
+  void *_data;
+  //! We overload the delete operator to just set this to true
+  bool _del_me;
+  //! The time the last fire should've been at
+  struct timeval _last;
+  //! When this timer will next trigger
+  struct timeval _timeout;
+
+  //! Queue of pending timers
+  static TimerQ _q;
+  //! Time next timer will expire
+  static timeval _nearest_timeout;
+  //! Time at start of current processing loop
+  static timeval _now;
+
+  //! Really delete something (not just flag for later)
+  /*!
+    @param self Timer to be deleted.
+  */
+  static void realDelete(Timer *self);
+
+  //! Adds a millisecond delay to a timeval structure
+  /*!
+    @param a Amount of time to increment.
+    @param msec Number of milliseconds to increment by.
+  */
+  static void timevalAdd(timeval &a, long msec);
 
 public:
-  //! Constructs a new Timer object
+  //! Constructs a new running timer and queues it
   /*!
-    @param m The TimerQueueManager with which to associate. The manager
-             specified will be resposible for making this timer fire.
-    @param h The function to call when the timer fires
-    @param d The data to pass along to the function call when the timer fires
+    @param delay Time in milliseconds between firings
+    @param cb The function to be called on fire.
+    @param data Data to be passed to the callback on fire.
   */
-  Timer(TimerQueueManager *m, TimeoutHandler h, TimeoutData d);
-  //! Destroys the Timer object
-  virtual ~Timer();
+  Timer(long delay, TimeoutHandler cb, void *data);
 
-  //! Fires the timer, calling its TimeoutHandler
-  void fire();
-
-  //! Returns if the Timer is started and timing
-  inline bool timing() const { return _timing; }
-  //! Returns if the Timer is going to repeat
-  inline bool recurring() const { return _recur; }
-
-  //! Gets the amount of time the Timer should last before firing
-  inline const timeval &timeout() const { return _timeout; }
-  //! Gets the time at which the Timer started
-  inline const timeval &startTime() const { return _start; }
-
-  //! Gets the amount of time left before the Timer fires
-  timeval remainingTime(const timeval &tm) const;
-  //! Returns if the Timer is past its timeout time, and should fire
-  bool shouldFire(const timeval &tm) const;
-
-  //! Gets the time at which the Timer will fire
-  timeval endTime() const;
-
-  //! Sets the Timer to repeat or not
+  //! Overloaded delete so we can leave deleted objects in queue for later reap
   /*!
-    @param b If true, the timer is set to repeat; otherwise, it will fire only
-             once
+    @param self Pointer to current instance of Timer.
   */
-  inline void setRecurring(bool b) { _recur = b; }
+  void operator delete(void *self);
 
-  //! Sets the amount of time for the Timer to last in milliseconds
+  //! Dispatches all elligible timers, then optionally waits for X events
   /*!
-    @param t The number of milliseconds the timer should last
+    @param wait Whether to wait for X events after processing timers.
   */
-  void setTimeout(long t);
-  //! Sets the amount of time the Timer should last before firing
-  /*!
-    @param t The amount of time the timer should last
-  */
-  void setTimeout(const timeval &t);
+  static void dispatchTimers(bool wait = true);
 
-  //! Causes the timer to begin
+  //! Returns a relative timeval (to pass select) of the next timer
   /*!
-    The timer fires after the time in Timer::getTimeout has passed since this
-    function was called.
-    Calling this function while the timer is already started will cause it to
-    restart its countdown.
+    @param tm Changed to hold the time until next timer.
+    @return true if there are any timers queued, and the timeout is being
+            returned in 'tm'. false if there are no timers queued.
   */
-  void start();  // manager acquires timer
-  //! Causes the timer to stop
-  /*!
-    The timer will no longer fire once this function has been called.
-    Calling this function more than once does not have any effect.
-  */
-  void stop();   // manager releases timer
+  static bool nearestTimeout(struct timeval &tm);
 
-  //! Determines if this Timer will fire before a second Timer object
-  /*!
-    @param other The second Timer with which to compare
-    @return true if this Timer will fire before 'other'; otherwise, false
-  */
-  bool operator<(const Timer& other) const
-  { return shouldFire(other.endTime()); }
+  //! Initializes internal data before use
+  static void initialize(void);
+
+  //! Deletes all waiting timers
+  static void destroy(void);
 };
 
 }
 
-#endif // __timer_hh
+#endif // __timer.hh

@@ -67,7 +67,7 @@ private:
 
   Binding _resetkey; // the key which resets the key chain status
 
-  otk::Timer _timer;
+  otk::Timer *_timer;
   
   KeyBindingTree *find(KeyBindingTree *search, bool *conflict) const;
   KeyBindingTree *buildtree(const StringVect &keylist,

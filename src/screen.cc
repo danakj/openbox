@@ -75,8 +75,7 @@ Screen::Screen(int screen)
                 openbox->cursors().session);
 
   // initialize the shit that is used for all drawing on the screen
-  _image_control = new otk::ImageControl(openbox->timerManager(),
-                                         _info, true);
+  _image_control = new otk::ImageControl(_info, true);
   _image_control->installRootColormap();
   _root_cmap_installed = True;
 

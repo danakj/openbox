@@ -16,7 +16,6 @@ extern "C" {
 
 #include "otk/display.hh"
 #include "otk/screeninfo.hh"
-#include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
 #include "otk/configuration.hh"
 #include "otk/eventdispatcher.hh"
@@ -109,13 +108,6 @@ private:
   //! A list of all the managed screens
   ScreenList _screens;
   
-  //! Manages all timers for the application
-  /*!
-    Use of the otk::TimerQueueManager::fire funtion in this object ensures
-    that all timers fire when their times elapse.
-  */
-  otk::TimerQueueManager _timermanager;
-
   //! Cached atoms on the display
   /*!
     This is a pointer because the Property class uses otk::Display::display
@@ -184,13 +176,6 @@ public:
 
   //! Returns the state of the window manager (starting, exiting, etc)
   inline RunState state() const { return _state; }
-
-  //! Returns the otk::TimerQueueManager for the application
-  /*!
-    All otk::Timer objects used in the application should be made to use this
-    otk::TimerQueueManager.
-  */
-  inline otk::TimerQueueManager *timerManager() { return &_timermanager; }
 
   //! Returns the otk::Property instance for the window manager
   inline const otk::Property *property() const { return _property; }

@@ -113,6 +113,7 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGINT, &action, (struct sigaction *) 0);
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
+  otk::Timer::initialize();
   _property = new otk::Property();
   _actions = new Actions();
   _bindings = new Bindings();
@@ -193,6 +194,8 @@ Openbox::~Openbox()
   // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
   // all im gunna do is the same.
   //otk::display->destroy();
+
+  otk::Timer::destroy();
 
   if (_restart) {
     if (!_restart_prog.empty()) {
@@ -320,7 +323,7 @@ void Openbox::eventLoop()
     XFlush(**otk::display); // flush here before we go wait for timers
     // don't wait if we're to shutdown
     if (_shutdown) break;
-    _timermanager.fire(!_sync); // wait if not in sync mode
+    otk::Timer::dispatchTimers(!_sync); // wait if not in sync mode
   }
 }
 

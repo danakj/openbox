@@ -77,11 +77,10 @@ public:
   };
 #endif
 
-  ImageControl(otk::TimerQueueManager *timermanager,
-                const otk::ScreenInfo *scrn,
-                bool _dither= False, int _cpc = 4,
-                unsigned long cache_timeout = 300000l,
-                unsigned long cmax = 200l);
+  ImageControl(const otk::ScreenInfo *scrn,
+               bool _dither= False, int _cpc = 4,
+               unsigned long cache_timeout = 300000l,
+               unsigned long cmax = 200l);
   virtual ~ImageControl(void);
 
   inline bool doDither(void) { return dither; }

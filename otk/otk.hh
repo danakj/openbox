@@ -26,8 +26,6 @@
 #include "style.hh"
 #include "texture.hh"
 #include "timer.hh"
-#include "timerqueue.hh"
-#include "timerqueuemanager.hh"
 #include "util.hh"
 #include "ustring.hh"
 #include "widget.hh"

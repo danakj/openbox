@@ -706,8 +706,7 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XMotionEvent swig_types[58] 
 #define  SWIGTYPE_p_XButtonEvent swig_types[59] 
 #define  SWIGTYPE_p_XSelectionEvent swig_types[60] 
-#define  SWIGTYPE_p_otk__TimerQueueManager swig_types[61] 
-static swig_type_info *swig_types[63];
+static swig_type_info *swig_types[62];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -5073,23 +5072,6 @@ static PyObject *_wrap_Openbox_state(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Openbox_timerManager(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
-    otk::TimerQueueManager *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:Openbox_timerManager",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::TimerQueueManager *)(arg1)->timerManager();
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__TimerQueueManager, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_Openbox_property(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Openbox *arg1 = (ob::Openbox *) 0 ;
@@ -8117,7 +8099,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Cursors_ur_angle_get", _wrap_Cursors_ur_angle_get, METH_VARARGS },
 	 { (char *)"Cursors_swigregister", Cursors_swigregister, METH_VARARGS },
 	 { (char *)"Openbox_state", _wrap_Openbox_state, METH_VARARGS },
-	 { (char *)"Openbox_timerManager", _wrap_Openbox_timerManager, METH_VARARGS },
 	 { (char *)"Openbox_property", _wrap_Openbox_property, METH_VARARGS },
 	 { (char *)"Openbox_actions", _wrap_Openbox_actions, METH_VARARGS },
 	 { (char *)"Openbox_bindings", _wrap_Openbox_bindings, METH_VARARGS },
@@ -8353,7 +8334,6 @@ static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "
 static swig_type_info _swigt__p_XMotionEvent[] = {{"_p_XMotionEvent", 0, "XMotionEvent *", 0},{"_p_XMotionEvent"},{0}};
 static swig_type_info _swigt__p_XButtonEvent[] = {{"_p_XButtonEvent", 0, "XButtonEvent *", 0},{"_p_XButtonEvent"},{0}};
 static swig_type_info _swigt__p_XSelectionEvent[] = {{"_p_XSelectionEvent", 0, "XSelectionEvent *", 0},{"_p_XSelectionEvent"},{0}};
-static swig_type_info _swigt__p_otk__TimerQueueManager[] = {{"_p_otk__TimerQueueManager", 0, "otk::TimerQueueManager *", 0},{"_p_otk__TimerQueueManager"},{0}};
 
 static swig_type_info *swig_types_initial[] = {
 _swigt__p_otk__Point, 
@@ -8417,7 +8397,6 @@ _swigt__p_p_unsigned_long,
 _swigt__p_XMotionEvent, 
 _swigt__p_XButtonEvent, 
 _swigt__p_XSelectionEvent, 
-_swigt__p_otk__TimerQueueManager, 
 0
 };
 

@@ -7,6 +7,7 @@
 #include "application.hh"
 #include "eventhandler.hh"
 #include "widget.hh"
+#include "timer.hh"
 
 extern "C" {
 #ifdef HAVE_STDLIB_H
@@ -29,8 +30,8 @@ Application::Application(int argc, char **argv)
 
   const ScreenInfo *s_info = _display.screenInfo(DefaultScreen(*_display));
 
-  _timer_manager = new TimerQueueManager();
-  _img_ctrl = new ImageControl(_timer_manager, s_info, True, 4, 5, 200);
+  Timer::initialize();
+  _img_ctrl = new ImageControl(s_info, True, 4, 5, 200);
   _style_conf = new Configuration(False);
   _style = new Style(_img_ctrl);
 
@@ -41,8 +42,8 @@ Application::~Application()
 {
   delete _style_conf;
   delete _img_ctrl;
-  delete _timer_manager;
   delete _style;
+  Timer::destroy();
 }
 
 void Application::loadStyle(void)
@@ -68,7 +69,7 @@ void Application::run(void)
 
   while (_appwidget_count > 0) {
     dispatchEvents();
-    _timer_manager->fire(); // fire pending events
+    Timer::dispatchTimers(); // fire pending events
   }
 }
 

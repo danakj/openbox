@@ -138,6 +138,10 @@ void event_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
 
+#ifdef USE_SM
+    IceRemoveConnectionWatch(ice_watch, NULL);
+#endif
+
     client_remove_destructor(focus_delay_client_dest);
     XFreeModifiermap(modmap);
 }

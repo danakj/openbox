@@ -23,6 +23,10 @@ titlebar_layout = "ILC"
 #                      perceived as a double-click
 double_click_delay = 300
 
+# desktop_names - the name of each desktop
+desktop_names = ["one", "two", "three", "four", "five", "six", "seven", \
+                 "eight", "nine", "ten", "eleven", "twelve"]
+
 #############################################################################
 ### Options that can be modified by the user to change the default hooks' ###
 ### behaviors.                                                            ###

@@ -2085,7 +2085,7 @@ size_t string_within(char begin, char end,
 
 bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
   char line[1024], keyword[1024], label[1024], command[1024];
-  bool done = False, readData = False;
+  bool done = False;
 
   while (! (done || feof(file))) {
     memset(line, 0, 1024);
@@ -2094,11 +2094,6 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
     if (! fgets(line, 1024, file))
       continue;
-
-    if (! readData) {
-      menu->clearMenu();
-      readData = True;
-    }
     
     if (line[0] == '#') // comment, skip it
       continue;

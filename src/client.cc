@@ -72,6 +72,10 @@ OBClient::~OBClient()
 {
   const otk::OBProperty *property = Openbox::instance->property();
 
+  // clean up parents reference to this
+  if (_transient_for)
+    _transient_for->_transients.remove(this); // remove from old parent
+  
   if (Openbox::instance->state() != Openbox::State_Exiting) {
     // these values should not be persisted across a window unmapping/mapping
     property->erase(_window, otk::OBProperty::net_wm_desktop);

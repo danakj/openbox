@@ -41,6 +41,7 @@ void OBBindings::display()
 bool OBBindings::translate(const std::string &str, Binding &b)
 {
   unsigned int mods = 0;
+  std::string modstring;
   
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -54,6 +55,7 @@ bool OBBindings::translate(const std::string &str, Binding &b)
     end = str.find_first_of('-', begin);
 
     std::string mod(str, begin, end-begin);
+    modstring += mod;
 
     if (mod == "C") {           // control
       mods |= ControlMask;
@@ -78,11 +80,11 @@ bool OBBindings::translate(const std::string &str, Binding &b)
                mod == "Mod5") {
       mods |= Mod5Mask;
     }
-    printf("got modifier: got modifier: %s\n", mod.c_str());
-    
     begin = end + 1;
   }
   
+  printf("got modifier: %s\n", modstring.c_str());
+    
   KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
   if (sym == NoSymbol) return false;
   b.modifiers = mods;

@@ -395,7 +395,7 @@ void setup_action_showmenu(ObAction **a, ObUserAction uact)
        a time! */
     if (uact == OB_USER_ACTION_MENU_SELECTION) {
         action_unref(*a);
-        a = NULL;
+        *a = NULL;
     }
 }
 
@@ -817,7 +817,8 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
             a = action_new(actionstrings[i].func);
             if (actionstrings[i].setup)
                 actionstrings[i].setup(&a, uact);
-            INTERACTIVE_LIMIT(a, uact);
+            if (a)
+                INTERACTIVE_LIMIT(a, uact);
             break;
         }
     if (!exist)

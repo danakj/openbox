@@ -568,7 +568,7 @@ char *theme_load(char *theme)
         g_free(str);
     }
 
-    font_str = "arial-10:bold";
+    font_str = "arial-8";
 
     theme_mfont_shadow = FALSE;
     if (read_string(db, "menu.frame.xft.flags", &str)) {

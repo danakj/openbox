@@ -16,7 +16,7 @@ extern gboolean config_focus_follow;
 extern gboolean config_focus_last;
 /*! Focus the last focused window as a fallback when switching desktops */
 extern gboolean config_focus_last_on_desktop;
-/*! Timeout for focusing windows on focus follows mouse, in milliseconds */
+/*! Timeout for focusing windows on focus follows mouse, in microseconds */
 extern guint    config_focus_delay;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise
@@ -39,7 +39,7 @@ extern gint config_dock_y;
 extern ObOrientation config_dock_orient;
 /*! Whether to auto-hide the dock when the pointer is not over it */
 extern gboolean config_dock_hide;
-/*! The number of milliseconds to wait before hiding the dock */
+/*! The number of microseconds to wait before hiding the dock */
 extern guint config_dock_hide_timeout;
 
 /* The name of the theme */

@@ -549,38 +549,28 @@ void Workspace::placeWindow(OpenboxWindow *win) {
        (slit->placement() == Slit::TopLeft ||
         slit->placement() == Slit::TopRight)) ||
       slit->placement() == Slit::TopCenter)
-    remove = 0;
+    // exclude top
+    space.setY(slit->area().h() + screen.getBorderWidth() * 2);
   else if ((slit->direction() == Slit::Vertical &&
             (slit->placement() == Slit::TopRight ||
              slit->placement() == Slit::BottomRight)) ||
            slit->placement() == Slit::CenterRight)
-    remove = 1;
+    // exclude right
+    space.setW(screen.size().w() -
+               (slit->area().w() + screen.getBorderWidth() * 2));
   else if ((slit->direction() == Slit::Horizontal &&
             (slit->placement() == Slit::BottomLeft ||
              slit->placement() == Slit::BottomRight)) ||
            slit->placement() == Slit::TopCenter)
-    remove = 2;
+    // exclude bottom
+    space.setH(screen.size().h() -
+               (slit->area().h() + screen.getBorderWidth() * 2));
   else// if ((slit->direction() == Slit::Vertical &&
       //      (slit->placement() == Slit::TopLeft ||
       //       slit->placement() == Slit::BottomLeft)) ||
       //     slit->placement() == Slit::CenterLeft)
-    remove = 3;
-  switch (remove) {
-  case 0: // top
-    space.setY(slit->area().h() + screen.getBorderWidth() * 2);
-    break;
-  case 1: // right
-    space.setW(screen.size().w() -
-               (slit->area().w() + screen.getBorderWidth() * 2));
-    break;
-  case 2: // bottom
-    space.setH(screen.size().h() -
-               (slit->area().h() + screen.getBorderWidth() * 2));
-    break;
-  case 3: // left
+    // exclude left
     space.setX(slit->area().w() + screen.getBorderWidth() * 2);
-    break;
-  }
 #endif
 
   Toolbar *toolbar = screen.getToolbar();

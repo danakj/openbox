@@ -46,6 +46,9 @@ static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 
+static gboolean focus_delay_func(gpointer data);
+static void focus_delay_client_dest(gpointer data);
+
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
                             (e)->xfocus.detail == NotifyAncestor || \
                             (e)->xfocus.detail > NotifyNonlinearVirtual)
@@ -137,10 +140,13 @@ void event_startup()
 #ifdef USE_LIBSN
     ob_main_loop_x_add(ob_main_loop, sn_handler, ob_sn_display, NULL);
 #endif
+
+    client_add_destructor(focus_delay_client_dest);
 }
 
 void event_shutdown()
 {
+    client_remove_destructor(focus_delay_client_dest);
     XFreeModifiermap(modmap);
 }
 
@@ -648,6 +654,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client->frame->close_hover = FALSE;
             frame_adjust_state(client->frame);
             break;
+        case OB_FRAME_CONTEXT_FRAME:
+            /* XXX if doing a 'reconfigure' make sure you kill this timer,
+               maybe all timers.. */
+            if (config_focus_delay)
+                ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
         default:
             break;
         }
@@ -690,7 +701,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     ob_debug("EnterNotify on %lx, focusing window\n",
                              client->window);
 #endif
-                    client_focus(client);
+                    if (config_focus_delay) {
+                        ob_main_loop_timeout_add(ob_main_loop,
+                                                 config_focus_delay,
+                                                 focus_delay_func,
+                                                 client,
+                                                 NULL);
+                    } else
+                        client_focus(client);
                 }
             }
             break;
@@ -1156,4 +1174,16 @@ static void event_handle_menu(XEvent *ev)
         }
         break;
     }
+}
+
+static gboolean focus_delay_func(gpointer data)
+{
+    ObClient *c = data;
+    client_focus(c);
+    return FALSE; /* no repeat */
+}
+
+static void focus_delay_client_dest(gpointer data)
+{
+    ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 }

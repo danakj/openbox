@@ -16,8 +16,9 @@ extern gboolean config_focus_follow;
 extern gboolean config_focus_last;
 /*! Focus the last focused window as a fallback when switching desktops */
 extern gboolean config_focus_last_on_desktop;
-/*! The number of slits to create 
-  extern int config_slit_number;*/
+/*! Timeout for focusing windows on focus follows mouse, in microseconds */
+extern guint    config_focus_delay;
+
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */
 extern gboolean config_redraw_resize;

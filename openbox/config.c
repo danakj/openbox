@@ -10,6 +10,7 @@ gboolean config_focus_new;
 gboolean config_focus_follow;
 gboolean config_focus_last;
 gboolean config_focus_last_on_desktop;
+guint    config_focus_delay;
 
 char *config_theme;
 
@@ -205,6 +206,8 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_focus_last = parse_bool(doc, n);
     if ((n = parse_find_node("focusLastOnDesktop", node)))
         config_focus_last_on_desktop = parse_bool(doc, n);
+    if ((n = parse_find_node("focusDelay", node)))
+        config_focus_delay = parse_int(doc, n);
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -358,6 +361,7 @@ void config_startup(ObParseInst *i)
     config_focus_follow = FALSE;
     config_focus_last = TRUE;
     config_focus_last_on_desktop = TRUE;
+    config_focus_delay = 150000;
 
     parse_register(i, "focus", parse_focus, NULL);
 

@@ -85,6 +85,9 @@ void OtkEventDispatcher::dispatchEvents(void)
       // find the actual window! e.xany.window is the parent window
       it = _map.find(e.xconfigurerequest.window);
 
+      if (_master)
+        _master->handle(e);
+
       if (it != _map.end())
         it->second->handle(e);
       else {

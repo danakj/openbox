@@ -211,6 +211,8 @@ void action_cycle_windows(union ActionData *data);
 void action_directional_focus(union ActionData *data);
 /* DirectionalAction */
 void action_movetoedge(union ActionData *data);
+/* DirectionalAction */
+void action_growtoedge(union ActionData *data);
 /* Layer */
 void action_send_to_layer(union ActionData *data);
 /* Layer */

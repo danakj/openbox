@@ -232,6 +232,26 @@ void setup_action_movetoedge_west(ObAction *a)
     a->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
+void setup_action_growtoedge_north(ObAction *a)
+{
+    a->data.diraction.direction = OB_DIRECTION_NORTH;
+}
+
+void setup_action_growtoedge_south(ObAction *a)
+{
+    a->data.diraction.direction = OB_DIRECTION_SOUTH;
+}
+
+void setup_action_growtoedge_east(ObAction *a)
+{
+    a->data.diraction.direction = OB_DIRECTION_EAST;
+}
+
+void setup_action_growtoedge_west(ObAction *a)
+{
+    a->data.diraction.direction = OB_DIRECTION_WEST;
+}
+
 void setup_action_top_layer(ObAction *a)
 {
     a->data.layer.layer = 1;
@@ -613,6 +633,26 @@ ActionString actionstrings[] =
         "movetoedgeeast",
         action_movetoedge,
         setup_action_movetoedge_east
+    },
+    {
+        "growtoedgenorth",
+        action_growtoedge,
+        setup_action_growtoedge_north
+    },
+    {
+        "growtoedgesouth",
+        action_growtoedge,
+        setup_action_growtoedge_south
+    },
+    {
+        "growtoedgewest",
+        action_growtoedge,
+        setup_action_growtoedge_west
+    },
+    {
+        "growtoedgeeast",
+        action_growtoedge,
+        setup_action_growtoedge_east
     },
     {
         NULL,
@@ -1173,7 +1213,7 @@ void action_directional_focus(union ActionData *data)
 
 void action_movetoedge(union ActionData *data)
 {
-    int x, y, h, w;
+    int x, y;
     ObClient *c = data->diraction.c;
 
     if (!c)
@@ -1181,20 +1221,20 @@ void action_movetoedge(union ActionData *data)
     x = c->frame->area.x;
     y = c->frame->area.y;
     
-    h = screen_area(c->desktop)->height;
-    w = screen_area(c->desktop)->width;
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
-        y = 0;
+        y = client_directional_edge_search(c, OB_DIRECTION_NORTH);
         break;
     case OB_DIRECTION_WEST:
-        x = 0;
+        x = client_directional_edge_search(c, OB_DIRECTION_WEST);
         break;
     case OB_DIRECTION_SOUTH:
-        y = h - c->frame->area.height;
+        y = client_directional_edge_search(c, OB_DIRECTION_SOUTH) -
+            c->frame->area.height;
         break;
     case OB_DIRECTION_EAST:
-        x = w - c->frame->area.width;
+        x = client_directional_edge_search(c, OB_DIRECTION_EAST) -
+            c->frame->area.width;
         break;
     default:
         g_assert_not_reached();
@@ -1203,6 +1243,66 @@ void action_movetoedge(union ActionData *data)
     client_configure(c, OB_CORNER_TOPLEFT,
                      x, y, c->area.width, c->area.height, TRUE, TRUE);
 
+}
+
+void action_growtoedge(union ActionData *data)
+{
+    int x, y, width, height, dest;
+    ObClient *c = data->diraction.c;
+    Rect *a = screen_area(c->desktop);
+
+    if (!c)
+        return;
+    
+    x = c->frame->area.x;
+    y = c->frame->area.y;
+    width = c->frame->area.width;
+    height = c->frame->area.height;
+
+    switch(data->diraction.direction) {
+    case OB_DIRECTION_NORTH:
+        dest = client_directional_edge_search(c, OB_DIRECTION_NORTH);
+        if(a->y > (y - c->size_inc.height))
+            height = c->frame->area.height / 2;
+        else {
+            height = c->frame->area.y + c->frame->area.height - dest;
+            y = dest;
+        }
+        break;
+    case OB_DIRECTION_WEST:
+        dest = client_directional_edge_search(c, OB_DIRECTION_WEST);
+        if(a->x > (x - c->size_inc.width))
+            width = c->frame->area.width / 2;
+        else {
+            width = c->frame->area.x + c->frame->area.width - dest;
+            x = dest;
+        }
+        break;
+    case OB_DIRECTION_SOUTH:
+        dest = client_directional_edge_search(c, OB_DIRECTION_SOUTH);
+        if(a->y + a->height <
+            (y + c->frame->area.height + c->size_inc.height)) {
+            height = c->frame->area.height / 2;
+            y = a->y + a->height - height;
+        } else
+            height = dest - c->frame->area.y;
+        break;
+    case OB_DIRECTION_EAST:
+        dest = client_directional_edge_search(c, OB_DIRECTION_EAST);
+        if(a->x + a->width <
+            (x + c->frame->area.width + c->size_inc.width)) {
+            width = c->frame->area.width / 2;
+            x = a->x + a->width - width;
+        } else
+            width = dest - c->frame->area.x;
+        break;
+    default:
+        g_assert_not_reached();
+    }
+    frame_frame_gravity(c->frame, &x, &y);
+    width -= c->frame->size.left + c->frame->size.right;
+    height -= c->frame->size.top + c->frame->size.bottom;
+    client_configure(c, OB_CORNER_TOPLEFT, x, y, width, height, TRUE, TRUE);
 }
 
 void action_send_to_layer(union ActionData *data)

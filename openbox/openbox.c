@@ -12,6 +12,7 @@
 #include "engine.h"
 #include "plugin.h"
 #include "timer.h"
+#include "group.h"
 #include "gettext.h"
 #include "../render/render.h"
 #include "../render/font.h"
@@ -172,6 +173,7 @@ int main(int argc, char **argv)
 	engine_load();
 
 	screen_startup();
+        group_startup();
 	client_startup();
 
         /* call startup for all the plugins */
@@ -189,6 +191,7 @@ int main(int argc, char **argv)
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
 	client_shutdown();
+        group_shutdown();
 	screen_shutdown();
 	focus_shutdown();
 	engine_shutdown();

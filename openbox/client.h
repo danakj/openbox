@@ -7,7 +7,7 @@
 #include <X11/Xlib.h>
 
 struct Frame;
-
+struct Group;
 
 /*! Holds an icon in ARGB format */
 typedef struct Icon {
@@ -114,7 +114,7 @@ typedef struct Client {
     int ignore_unmaps;
 
     /*! The id of the group the window belongs to */
-    Window  group;
+    struct Group *group;
     /*! Whether or not the client is a transient window. This is guaranteed to 
       be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
       transient_for == NULL. */

@@ -9,6 +9,7 @@
 #include "focus.h"
 #include "stacking.h"
 #include "dispatch.h"
+#include "group.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -319,6 +320,10 @@ void client_unmanage(Client *client)
 	    XMapWindow(ob_display, client->window);
     }
 
+    /* remoev from its group */
+    if (client->group)
+        group_remove(client->group, client);
+
     /* free all data allocated in the client struct */
     g_slist_free(client->transients);
     for (j = 0; j < client->nicons; ++j)
@@ -420,7 +425,7 @@ static void client_get_all(Client *self)
     self->urgent = FALSE;
     self->positioned = FALSE;
     self->disabled_decorations = 0;
-    self->group = None;
+    self->group = NULL;
     self->nicons = 0;
 
     client_get_area(self);
@@ -940,10 +945,12 @@ void client_update_wmhints(Client *self)
 	    ur = TRUE;
 
 	if (hints->flags & WindowGroupHint) {
-	    if (hints->window_group != self->group) {
-		/* XXX: remove from the old group if there was one */
-		self->group = hints->window_group;
-		/* XXX: do stuff with the group */
+	    if (hints->window_group !=
+                (self->group ? self->group->leader : None)) {
+		/* remove from the old group if there was one */
+                if (self->group != NULL)
+                    group_remove(self->group, self);
+		self->group = group_add(hints->window_group, self);
 	    }
 	} else /* no group! */
 	    self->group = None;
@@ -1554,6 +1561,14 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 
     dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
                     self, 0, 0);
+
+    /* iconify all transients */
+    if (self->transients) {
+        GSList *it;
+
+        for (it = self->transients; it != NULL; it = it->next)
+            if (it->data != self) client_iconify(it->data, iconic, curdesk);
+    }
 }
 
 void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)

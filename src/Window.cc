@@ -3080,9 +3080,15 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
     }
   }
 
-  const int snap_distance = screen->getEdgeSnapThreshold();
+  // how much resistance to edges to provide
+  const int resistance_size = screen->getEdgeSnapThreshold();
 
-  if (snap_distance) {
+  if (resistance_size > 0) {
+    RectList rectlist;
+
+    // the amount of space away from the edge to provide resistance
+    const int resistance_offset = screen->getEdgeSnapThreshold();
+  
     // window corners
     const int wleft = dx,
               wright = dx + frame.rect.width() - 1,
@@ -3093,17 +3099,13 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       Workspace *w = screen->getWorkspace(getWorkspaceNumber());
       assert(w);
 
-      RectList winsnaplist;
-
-      // try snap to another window
-
-      // add windows on the workspace to the snap list
+      // add windows on the workspace to the rect list
       const BlackboxWindowList& stack_list = w->getStackingList();
       BlackboxWindowList::const_iterator st_it, st_end = stack_list.end();
       for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
-        winsnaplist.push_back( (*st_it)->frameRect() );
+        rectlist.push_back( (*st_it)->frameRect() );
 
-      // add the toolbar and the slit to the snap list.
+      // add the toolbar and the slit to the rect list.
       // (only if they are not hidden)
       Toolbar *tbar = screen->getToolbar();
       Slit *slit = screen->getSlit();
@@ -3113,35 +3115,36 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       if (! (screen->doHideToolbar() || tbar->isHidden())) {
         tbar_rect.setRect(tbar->getX(), tbar->getY(), tbar->getWidth() + bwidth,
                           tbar->getHeight() + bwidth);
-        winsnaplist.push_back(tbar_rect);
+        rectlist.push_back(tbar_rect);
       }
 
       if (! slit->isHidden()) {
         slit_rect.setRect(slit->getX(), slit->getY(), slit->getWidth() + bwidth,
                           slit->getHeight() + bwidth);
-        winsnaplist.push_back(slit_rect);
+        rectlist.push_back(slit_rect);
       }
 
-      RectList::const_iterator it, end = winsnaplist.end();
-      for (it = winsnaplist.begin(); it != end; ++it) {
+      RectList::const_iterator it, end = rectlist.end();
+      for (it = rectlist.begin(); it != end; ++it) {
         bool snapped = False;
         
         const Rect &winrect = *it;
-        int dleft = abs(wright - winrect.left()),
-           dright = abs(wleft - winrect.right()),
-             dtop = abs(wbottom - winrect.top()),
-          dbottom = abs(wtop - winrect.bottom());
+        int dleft = wright - winrect.left(),
+           dright = wleft - winrect.right(),
+             dtop = wbottom - winrect.top(),
+          dbottom = wtop - winrect.bottom();
 
+        // if the windows are in the same plane vertically
         if (wtop >= (signed)(winrect.y() - frame.rect.height() + 1) &&
             wtop < (signed)(winrect.y() + winrect.height() - 1)) {
 
           // snap left of other window?
-          if (dleft < snap_distance && dleft <= dright) {
+          if (dleft < resistance_size && dleft > dright) {
             dx = winrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
-          else if (dright < snap_distance) {
+          else if (dright < resistance_size) {
             dx = winrect.right() + 1;
             snapped = True;
           }
@@ -3151,9 +3154,9 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
               // try corner-snap to its other sides
               dtop = abs(wtop - winrect.top());
               dbottom = abs(wbottom - winrect.bottom());
-              if (dtop < snap_distance && dtop <= dbottom)
+              if (dtop < resistance_size && dtop <= dbottom)
                 dy = winrect.top();
-              else if (dbottom < snap_distance)
+              else if (dbottom < resistance_size)
                 dy = winrect.bottom() - frame.rect.height() + 1;
             }
 
@@ -3161,16 +3164,17 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
           }
         }
 
+        // if the windows are on the same plane horizontally
         if (wleft >= (signed)(winrect.x() - frame.rect.width() + 1) &&
             wleft < (signed)(winrect.x() + winrect.width() - 1)) {
 
           // snap top of other window?
-          if (dtop < snap_distance && dtop <= dbottom) {
+          if (dtop < resistance_size && dtop > dbottom) {
             dy = winrect.top() - frame.rect.height();
             snapped = True;
           }
           // snap bottom of other window?
-          else if (dbottom < snap_distance) {
+          else if (dbottom < resistance_size) {
             dy = winrect.bottom() + 1;
             snapped = True;
           }
@@ -3180,9 +3184,9 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
               // try corner-snap to its other sides
               dleft = abs(wleft - winrect.left());
               dright = abs(wright - winrect.right());
-              if (dleft < snap_distance && dleft <= dright)
+              if (dleft < resistance_size && dleft <= dright)
                 dx = winrect.left();
-              else if (dright < snap_distance)
+              else if (dright < resistance_size)
                 dx = winrect.right() - frame.rect.width() + 1;
             }
 
@@ -3192,20 +3196,20 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       }
     }
 
-    RectList snaplist; // the list of rects we will try to snap to
-
     // snap to the screen edges (and screen boundaries for xinerama)
+    rectlist.clear();
+
 #ifdef    XINERAMA
     if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
-      snaplist.insert(snaplist.begin(),
+      rectlist.insert(rectlist.begin(),
                       screen->getXineramaAreas().begin(),
                       screen->getXineramaAreas().end());
     } else
 #endif // XINERAMA
-      snaplist.push_back(screen->getRect());
+      rectlist.push_back(screen->getRect());
 
-    RectList::const_iterator it, end = snaplist.end();
-    for (it = snaplist.begin(); it != end; ++it) {
+    RectList::const_iterator it, end = rectlist.end();
+    for (it = rectlist.begin(); it != end; ++it) {
       const Rect &srect = *it;
 
       // if we're not in the rectangle then don't snap to it.
@@ -3213,23 +3217,23 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
                                   frame.rect.height())))
         continue;
 
-      int dleft = abs(wleft - srect.left()),
-         dright = abs(wright - srect.right()),
-           dtop = abs(wtop - srect.top()),
-        dbottom = abs(wbottom - srect.bottom());
+      int dleft = wleft - srect.left(),
+         dright = wright - srect.right(),
+           dtop = wtop - srect.top(),
+        dbottom = wbottom - srect.bottom();
 
         // snap left?
-        if (dleft < snap_distance && dleft <= dright)
+        if (dleft < resistance_size && dleft > dright)
           dx = srect.left();
         // snap right?
-        else if (dright < snap_distance)
+        else if (dright < resistance_size)
           dx = srect.right() - frame.rect.width() + 1;
 
         // snap top?
-        if (dtop < snap_distance && dtop <= dbottom)
+        if (dtop < resistance_size && dtop > dbottom)
           dy = srect.top();
         // snap bottom?
-        else if (dbottom < snap_distance)
+        else if (dbottom < resistance_size)
           dy = srect.bottom() - frame.rect.height() + 1;
     }
   }

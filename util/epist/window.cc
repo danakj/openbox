@@ -44,8 +44,8 @@ XWindow::XWindow(epist *epist, screen *screen, Window window)
   XSelectInput(_epist->getXDisplay(), _window,
                PropertyChangeMask | StructureNotifyMask);
 
+  updateHints();
   updateDimentions();
-  updateGravity();
   updateState();
   updateDesktop();
   updateTitle();
@@ -77,15 +77,27 @@ void XWindow::updateDimentions() {
 }
 
 
-void XWindow::updateGravity() {
+void XWindow::updateHints() {
   XSizeHints size;
   long ret;
 
-  if (XGetWMNormalHints(_epist->getXDisplay(), _window, &size, &ret) &&
-      (size.flags & PWinGravity))
-    _gravity = size.win_gravity;
-  else
-    _gravity = NorthWestGravity;
+  // defaults
+  _gravity = NorthWestGravity;
+  _inc_x = _inc_y = 1;
+  _base_x = _base_y = 0;
+  
+  if (XGetWMNormalHints(_epist->getXDisplay(), _window, &size, &ret)) {
+    if (size.flags & PWinGravity)
+      _gravity = size.win_gravity;
+    if (size.flags & PBaseSize) {
+      _base_x = size.base_width;
+      _base_y = size.base_height;
+    }
+    if (size.flags & PResizeInc) {
+      _inc_x = size.width_inc;
+      _inc_y = size.height_inc;
+    }
+  }
 }
 
 
@@ -158,7 +170,7 @@ void XWindow::processEvent(const XEvent &e) {
     break;
   case PropertyNotify:
     if (e.xproperty.atom == XA_WM_NORMAL_HINTS)
-      updateGravity();
+      updateHints();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
       updateState();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))
@@ -307,7 +319,27 @@ void XWindow::move(int x, int y) const {
 
 
 void XWindow::resize(unsigned int width, unsigned int height) const {
-  XResizeWindow(_epist->getXDisplay(), _window, width, height);
+  // resize in increments if requested by the window
+
+  unsigned int wdest = width / _inc_x * _inc_x + _base_x;
+  unsigned int hdest = height / _inc_y * _inc_y + _base_y;
+
+  if (width > wdest) {
+    while (width > wdest)
+      wdest += _inc_x;
+  } else {
+    while (width < wdest)
+      wdest -= _inc_x;
+  }
+  if (height > hdest) {
+    while (height > hdest)
+      hdest += _inc_y;
+  } else {
+    while (height < hdest)
+      hdest -= _inc_y;
+  }
+  
+  XResizeWindow(_epist->getXDisplay(), _window, wdest, hdest);
 }
 
 

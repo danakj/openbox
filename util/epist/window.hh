@@ -57,6 +57,8 @@ private:
   std::string _app_name;
   std::string _app_class;
   Rect _rect;
+  int _inc_x, _inc_y; // resize increments
+  int _base_x, _base_y; // base size
   int _gravity;
 
   // states
@@ -68,7 +70,7 @@ private:
   bool _unmapped;
 
   void updateDimentions();
-  void updateGravity();
+  void updateHints();
   void updateState();
   void updateDesktop();
   void updateTitle();

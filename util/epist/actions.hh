@@ -46,8 +46,8 @@ public:
     moveWindowDown, //done
     moveWindowLeft, //done
     moveWindowRight, //done
-    resizeWindowWidth,
-    resizeWindowHeight,
+    resizeWindowWidth, //done
+    resizeWindowHeight, //done
 
     toggleMaximizeFull, //done
     toggleMaximizeVertical, //done

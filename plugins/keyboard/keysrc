@@ -102,12 +102,6 @@
 #      * Optionally takes a string argument "in quotes" that is the command to
 # 	 execute in place of restarting Openbox.
 #  * Exit - Exits Openbox
-#
-#  For drag Events only, these are valid:
-#  * Move - Move the client interactively, this can only be bound to the Drag
-#           Event
-#  * Resize - Resize the client interactively, this can only be bound to the
-#             Drag Event
 
 
 

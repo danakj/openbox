@@ -991,7 +991,7 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, data->sendtodir.follow);
+        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
         if (data->sendto.follow)
             screen_set_desktop(data->sendto.desk);
     }

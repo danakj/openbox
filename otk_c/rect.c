@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "../config.h"
 #include "rect.h"
@@ -79,14 +79,14 @@ PyTypeObject OtkRect_Type = {
   "OtkRect",
   sizeof(OtkRect),
   0,
-  otkrect_dealloc, /*tp_dealloc*/
-  0,          /*tp_print*/
-  otkrect_getattr, /*tp_getattr*/
-  0,          /*tp_setattr*/
-  0,          /*tp_compare*/
-  0,          /*tp_repr*/
-  0,          /*tp_as_number*/
-  0,          /*tp_as_sequence*/
-  0,          /*tp_as_mapping*/
-  0,          /*tp_hash */
+  otkrect_dealloc,     /*tp_dealloc*/
+  0,                   /*tp_print*/
+  otkrect_getattr,     /*tp_getattr*/
+  0,                   /*tp_setattr*/
+  0,                   /*tp_compare*/
+  0,                   /*tp_repr*/
+  0,                   /*tp_as_number*/
+  0,                   /*tp_as_sequence*/
+  0,                   /*tp_as_mapping*/
+  0,                   /*tp_hash */
 };

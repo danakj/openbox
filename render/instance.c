@@ -115,7 +115,7 @@ void RrTrueColorSetup (RrInstance *inst)
   XFree(timage);
 }
 
-#define RrPseudoNcolors(isnt) (1 << (inst->pseudo_bpc * 3))
+#define RrPseudoNcolors(inst) (1 << (inst->pseudo_bpc * 3))
 
 void RrPseudoColorSetup (RrInstance *inst)
 {

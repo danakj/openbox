@@ -12,7 +12,7 @@ engine_LTLIBRARIES=openbox.la
 openbox_la_LDFLAGS=-module -avoid-version
 openbox_la_SOURCES=openbox.c theme.c
 
-noinst_HEADERS=
+noinst_HEADERS=openbox.h theme.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

@@ -1984,7 +1984,7 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
-    focus_fallback(FALSE);
+    focus_set_client(NULL);
 }
 
 gboolean client_focused(Client *self)

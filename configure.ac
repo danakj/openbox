@@ -16,13 +16,13 @@ AC_PROG_INSTALL
 ALL_LINGUAS=""
 AM_GNU_GETTEXT
 
-# AC_LANG(C++)
+AC_LANG(C++)
 	
 # Check what compiler we are using
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
-  CFLAGS="$CFLAGS -Wall -W -pedantic"
+  CXXFLAGS="$CXXFLAGS -Wall -W -pedantic"
 else
   AC_MSG_RESULT([no, trying other compilers])
   AC_MSG_CHECKING(for MIPSpro)
@@ -31,11 +31,11 @@ else
     AC_MSG_RESULT([no])
   else
     AC_MSG_RESULT([yes, version $mips_pro_ver.])
-    AC_MSG_CHECKING(for -LANG:std in CFLAGS)
-    lang_std_not_set=`echo $CFLAGS | grep "\-LANG:std"`
+    AC_MSG_CHECKING(for -LANG:std in CXXFLAGS)
+    lang_std_not_set=`echo $CXXFLAGS | grep "\-LANG:std"`
     if test "x$lang_std_not_set" = "x"; then
       AC_MSG_RESULT([not set, setting.])
-      CFLAGS="${CFLAGS} -LANG:std"
+      CXXFLAGS="${CXXFLAGS} -LANG:std"
     else
       AC_MSG_RESULT([already set.])
     fi
@@ -71,7 +71,7 @@ AC_ARG_ENABLE([debug],
   AC_MSG_RESULT([no])
   DEBUG="-DNDEBUG"
 )
-CFLAGS="$CFLAGS $DEBUG"
+CXXFLAGS="$CXXFLAGS $DEBUG"
 
 # Check for Python
 AC_ARG_WITH([python],
@@ -151,7 +151,7 @@ test "$no_x" = "yes" && AC_MSG_ERROR([No Xlibs found.])
 test -z "$x_includes" && x_includes="/usr/include"
 test -z "$x_libraries" && x_libraries="/usr/lib"
      
-CFLAGS="$CFLAGS $X_CFLAGS"
+CXXFLAGS="$CXXFLAGS $X_CFLAGS"
 LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS"
 LDFLAGS="$LDFLAGS $X_PRE_LIBS $LIBS $X_EXTRA_LIBS"
 
@@ -179,14 +179,14 @@ AC_MSG_RESULT([yes])
 
 # Store these
 OLDLIBS=$LIBS
-OLDCFLAGS=$CFLAGS
+OLDCXXFLAGS=$CXXFLAGS
 
 XFT_CFLAGS="`pkg-config --cflags xft`"
 XFT_LIBS="`pkg-config --libs xft`"
 
 # Set these for checking with the tests below. They'll be restored after
 LIBS="$LIBS $XFT_LIBS"
-CFLAGS="$XFT_CFLAGS $CFLAGS"
+CXXFLAGS="$XFT_CFLAGS $CXXFLAGS"
 
 AC_CHECK_LIB([Xft], [XftFontOpenName],
   AC_MSG_CHECKING([for X11/Xft/Xft.h for Xft >= $XFT_MIN])
@@ -251,7 +251,7 @@ See http://www.fontconfig.org/
 )
 # Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
 LIBS=$OLDLIBS
-CFLAGS=$OLDCFLAGS
+CXXFLAGS=$OLDCXXFLAGS
 
 AC_SUBST([XFT_CFLAGS])
 AC_SUBST([XFT_LIBS])
@@ -332,8 +332,6 @@ AC_ARG_ENABLE([xinerama],
   AC_MSG_RESULT([no])
 )
 
-
-
 AC_CONFIG_FILES([Makefile
 		m4/Makefile 
 		po/Makefile.in
@@ -357,7 +355,7 @@ AC_MSG_RESULT([$PACKAGE version $VERSION configured successfully.])
 AC_MSG_RESULT
 AC_MSG_RESULT([Using '$prefix' for installation.])
 AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
-AC_MSG_RESULT([Building with '$CFLAGS' for C++ compiler flags.])
+AC_MSG_RESULT([Building with '$CXXFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
 AC_MSG_RESULT
 AC_MSG_RESULT([configure complete, now type \"make\"])

@@ -1,4 +1,4 @@
-CPPFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CPPFLAGS@
+CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@
 
 INCLUDES= -I../src
 
@@ -21,13 +21,13 @@ distclean-local:
 	rm -f *\~ *.orig *.rej .\#*
 
 otk_test: libotk.a otk_test.cc
-	$(CXX) $(CPPFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
+	$(CXX) $(CXXFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
 
 otk.i: $(wildcard *.hh)
 	touch $@
 
 otk_wrap.cc: otk.i
-	swig $(filter -I%,$(CFLAGS)) -python -c++ -o $@ $<
+	swig $(filter -I%,$(CXXFLAGS)) -python -c++ -o $@ $<
 
 # local dependencies
 application.o: application.cc application.hh eventdispatcher.hh \

@@ -3,7 +3,7 @@ scriptdir = $(libdir)/openbox/python
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CPPFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CPPFLAGS@ \
+CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -DLOCALEDIR=\"$(localedir)\" \
@@ -30,6 +30,6 @@ openbox.i: openbox.hh screen.hh client.hh
 	touch $@
 
 openbox_wrap.cc: openbox.i
-	swig $(filter -I%,$(CFLAGS)) -python -c++ -nodefault -o $@ $<
+	swig $(filter -I%,$(CXXFLAGS)) -python -c++ -nodefault -o $@ $<
 
 # local dependencies

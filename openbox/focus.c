@@ -28,8 +28,9 @@ void focus_startup()
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
-				 -100, -100, 1, 1, 0, 0, InputOnly,
-				 CopyFromParent, CWOverrideRedirect, &attrib);
+				 -100, -100, 1, 1, 0,
+                                 CopyFromParent, InputOutput, CopyFromParent,
+                                 CWOverrideRedirect, &attrib);
     XMapRaised(ob_display, focus_backup);
 
     /* start with nothing focused */
@@ -57,8 +58,6 @@ void focus_set_client(Client *client)
     Window active;
     Client *old;
     guint desktop;
-
-    if (client == focus_client) return;
 
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
@@ -98,18 +97,15 @@ static gboolean focus_under_pointer()
     guint u;
     GList *it;
 
-    if (XQueryPointer(ob_display, ob_root, &w, &w, &x, &y, &i, &i, &u))
-    {
+    if (XQueryPointer(ob_display, ob_root, &w, &w, &x, &y, &i, &i, &u)) {
         for (it = stacking_list; it != NULL; it = it->next) {
             Client *c = it->data;
             if (c->desktop == screen_desktop &&
                 RECT_CONTAINS(c->frame->area, x, y))
                 break;
         }
-        if (it != NULL) {
-            g_message("fallback (pointer) trying %lx", ((Client*)it->data)->window);
+        if (it != NULL)
             return client_normal(it->data) && client_focus(it->data);
-        }
     }
     return FALSE;
 }
@@ -118,9 +114,12 @@ void focus_fallback(gboolean switching_desks)
 {
     ConfigValue focus_follow;
     GList *it;
-    gboolean under = TRUE;
+    gboolean under = FALSE;
 
-    if (!switching_desks) {
+    if (switching_desks) {
+        /* don't skip any windows when switching desktops */
+        focus_client = NULL;
+    } else {
         if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
             g_assert_not_reached();
         if (focus_follow.bool)
@@ -129,11 +128,9 @@ void focus_fallback(gboolean switching_desks)
 
     if (!under) {
         for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-            if (it->data != focus_client && client_normal(it->data)) {
-                g_message("fallback trying %lx", ((Client*)it->data)->window);
+            if (it->data != focus_client && client_normal(it->data))
                 if (client_focus(it->data))
                     break;
-            }
         if (it == NULL) /* nothing to focus */
             focus_set_client(NULL);
     }

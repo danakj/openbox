@@ -145,9 +145,9 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   frame.ulabel = frame.flabel = frame.ubutton = frame.fbutton = None;
   frame.pbutton = frame.ugrip = frame.fgrip = None;
 
-  decorations = Decor_Titlebar | Decor_Border | Decor_Handle |
-                Decor_Iconify | Decor_Maximize;
   functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize;
+  mwm_decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+                    Decor_Iconify | Decor_Maximize | Decor_Close;
 
   client.normal_hint_flags = 0;
   client.window_group = None;
@@ -174,7 +174,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   // client
 
   if (! getBlackboxHints()) {
-    getMWMHints();
     getNetWMHints();
   }
 
@@ -194,58 +193,50 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   // determine the window's type, so we can decide its decorations and
   // functionality, or if we should not manage it at all
-  getWindowType();
+  if (getWindowType()) {
+    // adjust the window decorations/behavior based on the window type
+    switch (window_type) {
+    case Type_Desktop:
+    case Type_Dock:
+    case Type_Menu:
+      blackbox_attrib.workspace = 0;  // we do need to belong to a workspace
+      flags.stuck = True;             // we show up on all workspaces
+    case Type_Splash:
+      // none of these windows are manipulated by the window manager
+      functions = 0;
+      break;
 
-  // adjust the window decorations/behavior based on the window type
+    case Type_Toolbar:
+    case Type_Utility:
+      // these windows get less functionality
+      functions &= ~(Func_Maximize | Func_Resize | Func_Iconify);
+      break;
 
-  switch (window_type) {
-  case Type_Desktop:
-  case Type_Dock:
-  case Type_Menu:
-    blackbox_attrib.workspace = 0;  // we do need to belong to a workspace
-    flags.stuck = True;             // we show up on all workspaces
-  case Type_Splash:
-    // none of these windows are decorated or manipulated by the window manager
-    decorations = 0;
-    functions = 0;
-    break;
+    case Type_Dialog:
+      // dialogs cannot be maximized
+      functions &= ~Func_Maximize;
+      break;
 
-  case Type_Toolbar:
-  case Type_Utility:
-    // these windows get less decorations and functionality
-    decorations &= ~(Decor_Maximize | Decor_Handle | Decor_Iconify |
-                     Decor_Border);
-    functions &= ~(Func_Maximize | Func_Resize | Func_Iconify);
-    break;
-
-  case Type_Dialog:
-    // dialogs cannot be maximized, and don't display a handle
-    decorations &= ~(Decor_Maximize | Decor_Handle);
-    functions &= ~Func_Maximize;
-    break;
-
-  case Type_Normal:
-    // normal windows retain all of the possible decorations and functionality
-    break;
+    case Type_Normal:
+      // normal windows retain all of the possible decorations and functionality
+      break;
+    }
+  } else {
+    getMWMHints();
   }
   
-  setAllowedActions();
-
   // further adjeust the window's decorations/behavior based on window sizes
   if ((client.normal_hint_flags & PMinSize) &&
       (client.normal_hint_flags & PMaxSize) &&
       client.max_width <= client.min_width &&
       client.max_height <= client.min_height) {
-    decorations &= ~(Decor_Maximize | Decor_Handle);
     functions &= ~(Func_Resize | Func_Maximize);
   }
   
-  if (decorations & Decor_Titlebar)
-    createTitlebar();
+  setAllowedActions();
 
-  if (decorations & Decor_Handle)
-    createHandle();
-
+  enableDecor(True);
+  
   // apply the size and gravity hint to the frame
 
   upsize();
@@ -408,6 +399,56 @@ BlackboxWindow::~BlackboxWindow(void) {
   blackbox->removeWindowSearch(client.window);
 }
 
+
+void BlackboxWindow::enableDecor(bool enable) {
+  if (enable) {
+    // start with everything on
+    decorations =
+      (mwm_decorations & Decor_Titlebar ? Decor_Titlebar : 0) |
+      (mwm_decorations & Decor_Border ? Decor_Border : 0) |
+      (mwm_decorations & Decor_Handle ? Decor_Handle : 0) |
+      (mwm_decorations & Decor_Iconify ? Decor_Iconify : 0) |
+      (mwm_decorations & Decor_Maximize ? Decor_Maximize : 0) |
+      (mwm_decorations & Decor_Close ? Decor_Close : 0);
+
+    if (! (functions & Func_Close)) decorations &= ~Decor_Close;
+    if (! (functions & Func_Maximize)) decorations &= ~Decor_Maximize;
+    if (! (functions & Func_Iconify)) decorations &= ~Decor_Iconify;
+    if (! (functions & Func_Resize)) decorations &= ~Decor_Handle;
+
+    switch (window_type) {
+    case Type_Desktop:
+    case Type_Dock:
+    case Type_Menu:
+    case Type_Splash:
+      // none of these windows are decorated by the window manager at all
+      decorations = 0;
+      break;
+
+    case Type_Toolbar:
+    case Type_Utility:
+      decorations &= ~(Decor_Border);
+      break;
+
+    case Type_Dialog:
+      decorations &= ~Decor_Handle;
+      break;
+
+    case Type_Normal:
+      break;
+    }
+  } else {
+    decorations = 0;
+  }
+    
+  destroyTitlebar();
+  if (decorations & Decor_Titlebar)
+    createTitlebar();
+
+  destroyHandle();
+  if (decorations & Decor_Handle)
+    createHandle();
+}
 
 /*
  * Creates a new top level window, with a given location, size, and border
@@ -956,7 +997,7 @@ void BlackboxWindow::updateStrut(void) {
 }
 
 
-void BlackboxWindow::getWindowType(void) {
+bool BlackboxWindow::getWindowType(void) {
   unsigned long val;
   if (xatom->getValue(client.window, XAtom::net_wm_window_type, XAtom::atom,
                       val)) {
@@ -976,7 +1017,8 @@ void BlackboxWindow::getWindowType(void) {
       window_type = Type_Dialog;
     else //if (val[0] == xatom->getAtom(XAtom::net_wm_window_type_normal))
       window_type = Type_Normal;
-    return;
+
+    return True;
   }
 
   /*
@@ -987,6 +1029,8 @@ void BlackboxWindow::getWindowType(void) {
     window_type = Type_Dialog;
 
   window_type = Type_Normal;
+
+  return False;
 }
 
 
@@ -1258,21 +1302,21 @@ void BlackboxWindow::getMWMHints(void) {
 
   if (mwm_hint->flags & MwmHintsDecorations) {
     if (mwm_hint->decorations & MwmDecorAll) {
-      decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
-                    Decor_Iconify | Decor_Maximize | Decor_Close;
+      mwm_decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+                        Decor_Iconify | Decor_Maximize | Decor_Close;
     } else {
-      decorations = 0;
+      mwm_decorations = 0;
 
       if (mwm_hint->decorations & MwmDecorBorder)
-        decorations |= Decor_Border;
+        mwm_decorations |= Decor_Border;
       if (mwm_hint->decorations & MwmDecorHandle)
-        decorations |= Decor_Handle;
+        mwm_decorations |= Decor_Handle;
       if (mwm_hint->decorations & MwmDecorTitle)
-        decorations |= Decor_Titlebar;
+        mwm_decorations |= Decor_Titlebar;
       if (mwm_hint->decorations & MwmDecorIconify)
-        decorations |= Decor_Iconify;
+        mwm_decorations |= Decor_Iconify;
       if (mwm_hint->decorations & MwmDecorMaximize)
-        decorations |= Decor_Maximize;
+        mwm_decorations |= Decor_Maximize;
     }
   }
 
@@ -1345,27 +1389,14 @@ bool BlackboxWindow::getBlackboxHints(void) {
   if (blackbox_hint->flags & AttribDecoration) {
     switch (blackbox_hint->decoration) {
     case DecorNone:
-      decorations = 0;
+      enableDecor(False);
       break;
 
     case DecorTiny:
-      decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
-      functions &= ~(Func_Resize | Func_Maximize);
-
-      break;
-
     case DecorTool:
-      decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
-      functions &= ~(Func_Resize | Func_Maximize | Func_Iconify);
-
-      break;
-
     case DecorNormal:
     default:
-      decorations |= Decor_Titlebar | Decor_Border | Decor_Handle |
-                     Decor_Iconify | Decor_Maximize;
+      enableDecor(True);
       break;
     }
 
@@ -2278,43 +2309,23 @@ void BlackboxWindow::restoreAttributes(void) {
   if (net->flags & AttribDecoration) {
     switch (net->decoration) {
     case DecorNone:
-      decorations = 0;
-
+      enableDecor(False);
       break;
 
+    /* since tools only let you toggle this anyways, we'll just make that all
+       it supports for now.
+     */
     default:
     case DecorNormal:
-      decorations |= Decor_Titlebar | Decor_Handle | Decor_Border |
-        Decor_Iconify | Decor_Maximize;
-
-      break;
-
     case DecorTiny:
-      decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
-
-      break;
-
     case DecorTool:
-      decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
-
+      enableDecor(True);
       break;
     }
 
-    // sanity check the new decor
-    if (! (functions & Func_Resize) || isTransient())
-      decorations &= ~(Decor_Maximize | Decor_Handle);
-    if (! (functions & Func_Maximize))
-      decorations &= ~Decor_Maximize;
-
-    if (decorations & Decor_Titlebar) {
-      if (functions & Func_Close)   // close button is controlled by function
-        decorations |= Decor_Close; // not decor type
-    } else { 
-      if (flags.shaded) // we can not be shaded if we lack a titlebar
-        shade();
-    }
+    // we can not be shaded if we lack a titlebar
+    if (! (decorations & Decor_Titlebar) && flags.shaded)
+      shade();
 
     if (flags.visible && frame.window) {
       XMapSubwindows(blackbox->getXDisplay(), frame.window);
@@ -3103,27 +3114,26 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     setInputFocus();
 
   /*
-     If the XWarpPointer is done after the configure, we can end up
-     grabbing another window, so made sure you do it first.
-     */
+     We grab the X server here because we are moving the window and then the
+     mouse cursor. When one moves, it could end up putting the mouse cursor
+     over another window for a moment. This can cause the warp to iniate a
+     move on another window.
+  */
+  XGrabServer(blackbox->getXDisplay());
   int dest_x;
   if (x_root <= 0) {
     dest_x = screen->getRect().right() - 1;
-    XWarpPointer(blackbox->getXDisplay(), None, 
-                 screen->getRootWindow(), 0, 0, 0, 0,
-                 dest_x, y_root);
-
     configure(dx + (screen->getRect().width() - 1), dy,
               frame.rect.width(), frame.rect.height());
   } else {
     dest_x = 0;
-    XWarpPointer(blackbox->getXDisplay(), None, 
-                 screen->getRootWindow(), 0, 0, 0, 0,
-                 dest_x, y_root);
-
     configure(dx - (screen->getRect().width() - 1), dy,
               frame.rect.width(), frame.rect.height());
   }
+  XWarpPointer(blackbox->getXDisplay(), None, 
+               screen->getRootWindow(), 0, 0, 0, 0,
+               dest_x, y_root);
+  XUngrabServer(blackbox->getXDisplay());
 
   beginMove(dest_x, y_root);
   return true;
@@ -3792,44 +3802,14 @@ void BlackboxWindow::changeBlackboxHints(const BlackboxHints *net) {
   if (net->flags & AttribDecoration) {
     switch (net->decoration) {
     case DecorNone:
-      decorations = 0;
-
+      enableDecor(False);
       break;
 
     default:
     case DecorNormal:
-      decorations |= Decor_Titlebar | Decor_Border | Decor_Iconify;
-  
-      decorations = ((functions & Func_Resize) && !isTransient() ?
-                     decorations | Decor_Handle :
-                     decorations &= ~Decor_Handle);
-      decorations = (functions & Func_Maximize ?
-                     decorations | Decor_Maximize :
-                     decorations &= ~Decor_Maximize);
-
-      break;
-
     case DecorTiny:
-      decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle);
-      
-      decorations = (functions & Func_Maximize ?
-                     decorations | Decor_Maximize :
-                     decorations &= ~Decor_Maximize);
-
-      break;
-
     case DecorTool:
-      decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border);
-
-      decorations = ((functions & Func_Resize) && !isTransient() ?
-                     decorations | Decor_Handle :
-                     decorations &= ~Decor_Handle);
-      decorations = (functions & Func_Maximize ?
-                     decorations | Decor_Maximize :
-                     decorations &= ~Decor_Maximize);
-
+      enableDecor(True);
       break;
     }
 

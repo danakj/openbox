@@ -193,6 +193,7 @@ private:
    * the menu is not really decor, but it goes hand in hand with the decor
    */
   DecorationFlags decorations;
+  DecorationFlags mwm_decorations;
   Corner resize_dir;
   WindowType window_type;
 
@@ -256,7 +257,7 @@ private:
   Window createToplevelWindow();
   Window createChildWindow(Window parent, Cursor = None);
 
-  void getWindowType(void);
+  bool getWindowType(void);
   void updateStrut(void);
   void getWMName(void);
   void getWMIconName(void);
@@ -378,6 +379,7 @@ public:
 
   void beginMove(int x_root, int y_root);
   void beginResize(int x_root, int y_root, Corner dir);
+  void enableDecor(bool enable);
   void setFocusFlag(bool focus);
   void iconify(void);
   void deiconify(bool reassoc = True, bool raise = True);

@@ -58,7 +58,7 @@ static int xerrorHandler(::Display *d, XErrorEvent *e)
 
     //if (e->error_code != BadWindow)
     {
-      XGetErrorText(d, e->error_code, errtxt, 128);
+      XGetErrorText(d, e->error_code, errtxt, 127);
       printf("X Error: %s\n", errtxt);
       if (e->error_code != BadWindow)
         abort();

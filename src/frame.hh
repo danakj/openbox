@@ -25,6 +25,9 @@ namespace ob {
 
 //! Holds and decorates a frame around an OBClient (client window)
 /*!
+  The frame is responsible for calling XSelectInput on the client window's new
+  parent with the SubstructureRedirectMask so that structure events for the
+  client are sent to the window manager.
 */
 class OBFrame : public otk::OtkWidget {
 private:

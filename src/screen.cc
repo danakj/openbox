@@ -350,6 +350,8 @@ void OBScreen::manageWindow(Window window)
 
   // create the OBClient class, which gets all of the hints on the window
   Openbox::instance->addClient(window, client = new OBClient(_number, window));
+  // register for events
+  Openbox::instance->registerHandler(window, client);
 
   // we dont want a border on the client
   XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
@@ -384,6 +386,9 @@ void OBScreen::unmanageWindow(OBClient *client)
   OBFrame *frame = client->frame;
 
   // XXX: pass around focus if this window was focused
+
+  // unregister for handling events
+  Openbox::instance->clearHandler(client->window());
   
   // remove the window from our save set
   XChangeSaveSet(otk::OBDisplay::display, client->window(), SetModeDelete);

@@ -112,6 +112,8 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
 #include <stdio.h>
 void OBRootWindow::configureRequestHandler(const XConfigureRequestEvent &e)
 {
+  OtkEventHandler::configureRequestHandler(e);
+
   // when configure requests come to the root window, just pass them on
   XWindowChanges xwc;
 

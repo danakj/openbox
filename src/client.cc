@@ -6,6 +6,7 @@
 
 #include "client.hh"
 #include "frame.hh"
+#include "screen.hh"
 #include "bbscreen.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
@@ -29,8 +30,6 @@ OBClient::OBClient(int screen, Window window)
 {
   assert(screen >= 0);
   assert(window);
-
-  Openbox::instance->registerHandler(_window, this);
 
   ignore_unmaps = 0;
   
@@ -772,6 +771,8 @@ void OBClient::move(int x, int y)
 
 void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 {
+  OtkEventHandler::configureRequestHandler(e);
+  
   // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event
 
   if (e.value_mask & CWBorderWidth)
@@ -822,6 +823,32 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
       break;
     }
   }
+}
+
+
+void OBClient::unmapHandler(const XUnmapEvent &e)
+{
+#ifdef    DEBUG
+  printf("UnmapNotify for 0x%lx\n", e.window);
+#endif // DEBUG
+
+  OtkEventHandler::unmapHandler(e);
+
+  // this deletes us etc
+  Openbox::instance->screen(_screen)->unmanageWindow(this);
+}
+
+
+void OBClient::destroyHandler(const XDestroyWindowEvent &e)
+{
+#ifdef    DEBUG
+  printf("DestroyNotify for 0x%lx\n", e.window);
+#endif // DEBUG
+
+  OtkEventHandler::destroyHandler(e);
+
+  // this deletes us etc
+  Openbox::instance->screen(_screen)->unmanageWindow(this);
 }
 
 

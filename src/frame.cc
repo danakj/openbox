@@ -354,16 +354,15 @@ void OBFrame::adjustShape()
 void OBFrame::grabClient()
 {
   
-  // select the event mask on the frame
-  //XSelectInput(otk::OBDisplay::display, _window, SubstructureRedirectMask);
-
   // reparent the client to the frame
   XReparentWindow(otk::OBDisplay::display, _client->window(),
                   _plate.getWindow(), 0, 0);
   _client->ignore_unmaps++;
 
-  // raise the client above the frame
-  //XRaiseWindow(otk::OBDisplay::display, _client->window());
+  // select the event mask on the client's parent
+  //XSelectInput(otk::OBDisplay::display, _plate.getWindow(),
+  //             SubstructureRedirectMask);
+
   // map the client so it maps when the frame does
   XMapWindow(otk::OBDisplay::display, _client->window());
 

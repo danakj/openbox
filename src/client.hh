@@ -130,7 +130,8 @@ public:
   };
 
   //! The event mask to grab on client windows
-  static const long event_mask = PropertyChangeMask | FocusChangeMask;
+  static const long event_mask = PropertyChangeMask | FocusChangeMask |
+                                 StructureNotifyMask;
 
   //! The number of unmap events to ignore on the window
   int ignore_unmaps;
@@ -415,12 +416,11 @@ public:
   inline const otk::Rect &area() const { return _area; }
 
   virtual void propertyHandler(const XPropertyEvent &e);
-
   virtual void clientMessageHandler(const XClientMessageEvent &e);
-
   virtual void shapeHandler(const XShapeEvent &e);
-  
   virtual void configureRequestHandler(const XConfigureRequestEvent &e);
+  virtual void unmapHandler(const XUnmapEvent &e);
+  virtual void destroyHandler(const XDestroyWindowEvent &e);
 };
 
 }

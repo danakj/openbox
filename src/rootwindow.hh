@@ -52,20 +52,17 @@ public:
   //! Destroys the OBRootWindow object
   virtual ~OBRootWindow();
 
-  virtual void propertyHandler(const XPropertyEvent &e);
-
-  virtual void clientMessageHandler(const XClientMessageEvent &e);
-
-  virtual void mapRequestHandler(const XMapRequestEvent &);
-
-  virtual void configureRequestHandler(const XConfigureRequestEvent &e);
-
   //! Sets the name of a desktop
   /*!
     @param i The index of the desktop to set the name for (base 0)
     @param name The name to set for the desktop
   */
   void setDesktopName(int i, const std::string &name);
+
+  virtual void propertyHandler(const XPropertyEvent &e);
+  virtual void clientMessageHandler(const XClientMessageEvent &e);
+  virtual void mapRequestHandler(const XMapRequestEvent &);
+  virtual void configureRequestHandler(const XConfigureRequestEvent &e);
 };
 
 }

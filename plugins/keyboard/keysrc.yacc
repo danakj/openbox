@@ -89,7 +89,7 @@ static void addbinding(GList *keylist, char *action, char *apath, int num)
     else
         g_free(apath);
     if (a->func == action_desktop)
-        a->data.desktop.desk = (unsigned) num + 1;
+        a->data.desktop.desk = (unsigned) num - 1;
     if (a->func == action_move_relative_horz ||
         a->func == action_move_relative_vert ||
         a->func == action_resize_relative_horz ||

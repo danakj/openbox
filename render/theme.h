@@ -16,13 +16,13 @@ extern int theme_cbwidth;
 #define theme_button_size  (theme_label_height - 2)
 #define theme_grip_width   (theme_button_size * 2)
 
-extern color_rgb *theme_b_color;
-extern color_rgb *theme_cb_focused_color;
-extern color_rgb *theme_cb_unfocused_color;
-extern color_rgb *theme_title_focused_color;
-extern color_rgb *theme_title_unfocused_color;
-extern color_rgb *theme_titlebut_focused_color;
-extern color_rgb *theme_titlebut_unfocused_color;
+extern struct RrRGB theme_b_color;
+extern struct RrRGB theme_cb_focused_color;
+extern struct RrRGB theme_cb_unfocused_color;
+extern struct RrRGB theme_title_focused_color;
+extern struct RrRGB theme_title_unfocused_color;
+extern struct RrRGB theme_titlebut_focused_color;
+extern struct RrRGB theme_titlebut_unfocused_color;
 
 extern int theme_winfont_height;
 extern ObFont *theme_winfont;

@@ -14,13 +14,6 @@ static void framerender_close(Frame *self, Appearance *a);
 
 void framerender_frame(Frame *self)
 {
-    if (self->focused)
-        XSetWindowBorder(ob_display, self->plate,
-                         theme_cb_focused_color->pixel);
-    else
-        XSetWindowBorder(ob_display, self->plate,
-                         theme_cb_unfocused_color->pixel);
-
     if (self->client->decorations & Decor_Titlebar) {
         Appearance *t, *l, *m, *n, *i, *d, *s, *c;
 

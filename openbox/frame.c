@@ -133,10 +133,6 @@ Frame *frame_new()
     XMapWindow(ob_display, self->label);
 
     /* set colors/appearance/sizes for stuff that doesn't change */
-    XSetWindowBorder(ob_display, self->window, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->label, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->rgrip, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->lgrip, theme_b_color->pixel);
 
     XResizeWindow(ob_display, self->max, theme_button_size, theme_button_size);
     XResizeWindow(ob_display, self->iconify,

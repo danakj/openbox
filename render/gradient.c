@@ -11,14 +11,12 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
     float sr, sg, sb;
     float ar, ag, ab;
 
-    pr = (float)sf->data.planar.primary->r/255.0;
-    pg = (float)sf->data.planar.primary->g/255.0;
-    pb = (float)sf->data.planar.primary->b/255.0;
-    if (sf->data.planar.secondary) {
-        sr = (float)sf->data.planar.secondary->r/255.0;
-        sg = (float)sf->data.planar.secondary->g/255.0;
-        sb = (float)sf->data.planar.secondary->b/255.0;
-    }
+    pr = sf->data.planar.primary.r;
+    pg = sf->data.planar.primary.g;
+    pb = sf->data.planar.primary.b;
+    sr = sf->data.planar.secondary.r;
+    sg = sf->data.planar.secondary.g;
+    sb = sf->data.planar.secondary.b;
     switch (sf->data.planar.grad) {
     case Background_Solid: /* already handled */
         glBegin(GL_TRIANGLES);

@@ -5,19 +5,7 @@
 #include "color.h"
 #include "../kernel/openbox.h"
 
-XColor *pseudo_colors;
-int pseudo_bpc;
-
-void color_allocate_gc(color_rgb *in)
-{
-    XGCValues gcv;
-
-    gcv.foreground = in->pixel;
-    gcv.cap_style = CapProjecting;
-    in->gc = XCreateGC(ob_display, ob_root, GCForeground | GCCapStyle, &gcv);
-}
-
-color_rgb *color_parse(char *colorname)
+gboolean color_parse(char *colorname, struct RrRGB *ret)
 {
     XColor xcol;
 
@@ -28,42 +16,19 @@ color_rgb *color_parse(char *colorname)
     xcol.green = 0;
     xcol.blue = 0;
     xcol.pixel = 0;
-    if (!XParseColor(ob_display, render_colormap, colorname, &xcol)) {
+    if (!XParseColor(ob_display, 
+                     DefaultColormap(ob_display, ob_screen),
+                     colorname, &xcol)) {
         g_warning("unable to parse color '%s'", colorname);
-	return NULL;
+        ret->r = 0.0;
+        ret->g = 0.0;
+        ret->b = 0.0;
+	return FALSE;
     }
-    return color_new(xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
-}
-
-color_rgb *color_new(int r, int g, int b)
-{
-/* this should be replaced with something far cooler */
-    color_rgb *out;
-    XColor xcol;
-    xcol.red = (r << 8) | r;
-    xcol.green = (g << 8) | g;
-    xcol.blue = (b << 8) | b;
-    if (XAllocColor(ob_display, render_colormap, &xcol)) {
-        out = g_new(color_rgb, 1);
-        out->r = xcol.red >> 8;
-        out->g = xcol.green >> 8;
-        out->b = xcol.blue >> 8;
-        out->gc = None;
-        out->pixel = xcol.pixel;
-        return out;
-    }
-    return NULL;
-}
-
-/*XXX same color could be pointed to twice, this might have to be a refcount*/
-
-void color_free(color_rgb *c)
-{
-    if (c != NULL) {
-        if (c->gc != None)
-            XFreeGC(ob_display, c->gc);
-        g_free(c);
-    }
+    ret->r = (xcol.red >> 8)/255.0;
+    ret->g = (xcol.green >> 8)/255.0;
+    ret->b = (xcol.blue >> 8)/255.0;
+    return TRUE;
 }
 
 void reduce_depth(pixel32 *data, XImage *im)
@@ -109,6 +74,7 @@ void reduce_depth(pixel32 *data, XImage *im)
             p16 += im->bytes_per_line/2;
         }
     break;
+/*
     case 8:
         g_assert(render_visual->class != TrueColor);
         for (y = 0; y < im->height; y++) {
@@ -116,23 +82,15 @@ void reduce_depth(pixel32 *data, XImage *im)
                 p8[x] = pickColor(data[x] >> default_red_offset,
                        data[x] >> default_green_offset,
                        data[x] >> default_blue_offset)->pixel;
+            }
+            data += im->width;
+            p8 += im->bytes_per_line;
         }
-        data += im->width;
-        p8 += im->bytes_per_line;
-  }
-
+*/
     break;
     default:
         g_message("your bit depth is currently unhandled\n");
     }
-}
-
-XColor *pickColor(int r, int g, int b) 
-{
-  r = (r & 0xff) >> (8-pseudo_bpc);
-  g = (g & 0xff) >> (8-pseudo_bpc);
-  b = (b & 0xff) >> (8-pseudo_bpc);
-  return &pseudo_colors[(r << (2*pseudo_bpc)) + (g << (1*pseudo_bpc)) + b];
 }
 
 static void swap_byte_order(XImage *im)
@@ -177,7 +135,6 @@ void increase_depth(pixel32 *data, XImage *im)
     int x,y;
     pixel32 *p32 = (pixel32 *) im->data;
     pixel16 *p16 = (pixel16 *) im->data;
-    unsigned char *p8 = (unsigned char *)im->data;
 
     if (im->byte_order != render_endian)
         swap_byte_order(im);
@@ -217,6 +174,7 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     case 8:
+#if 0
         g_assert(render_visual->class != TrueColor);
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
@@ -253,7 +211,7 @@ void increase_depth(pixel32 *data, XImage *im)
         data += im->width;
         p8 += im->bytes_per_line;
   }
-
+#endif
     break;
     default:
         g_message("your bit depth is currently unhandled\n");

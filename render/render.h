@@ -47,17 +47,16 @@ typedef struct PlanarSurface {
     SurfaceColorType grad;
     ReliefType relief;
     BevelType bevel;
-    color_rgb *primary;
-    color_rgb *secondary;
-    color_rgb *border_color;
-    color_rgb *bevel_dark; 
-    color_rgb *bevel_light;
+    struct RrRGB primary;
+    struct RrRGB secondary;
+    struct RrRGB border_color;
+    struct RrRGB bevel_dark; 
+    struct RrRGB bevel_light;
     gboolean interlaced;
     gboolean border;
     struct Appearance *parent;
     int parentx;
     int parenty;
-    pixel32 *pixel_data;
 } PlanarSurface;
 
 typedef struct NonplanarSurface {
@@ -92,7 +91,7 @@ typedef struct TextureText {
     int shadow;
     char tint;
     unsigned char offset;
-    color_rgb *color;
+    struct RrRGB color;
     char *string;
 } TextureText;   
 
@@ -103,7 +102,7 @@ typedef struct {
 } pixmap_mask;
 
 typedef struct TextureMask {
-    color_rgb *color;
+    struct RrRGB color;
     pixmap_mask *mask;
 } TextureMask;
 

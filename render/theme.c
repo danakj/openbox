@@ -5,6 +5,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 
 /* style settings - geometry */
 int theme_bevel;
@@ -12,17 +15,17 @@ int theme_handle_height;
 int theme_bwidth;
 int theme_cbwidth;
 /* style settings - colors */
-color_rgb *theme_b_color;
-color_rgb *theme_cb_focused_color;
-color_rgb *theme_cb_unfocused_color;
-color_rgb *theme_title_focused_color;
-color_rgb *theme_title_unfocused_color;
-color_rgb *theme_titlebut_focused_color;
-color_rgb *theme_titlebut_unfocused_color;
-color_rgb *theme_menu_title_color;
-color_rgb *theme_menu_color;
-color_rgb *theme_menu_disabled_color;
-color_rgb *theme_menu_hilite_color;
+struct RrRGB theme_b_color;
+struct RrRGB theme_cb_focused_color;
+struct RrRGB theme_cb_unfocused_color;
+struct RrRGB theme_title_focused_color;
+struct RrRGB theme_title_unfocused_color;
+struct RrRGB theme_titlebut_focused_color;
+struct RrRGB theme_titlebut_unfocused_color;
+struct RrRGB theme_menu_title_color;
+struct RrRGB theme_menu_color;
+struct RrRGB theme_menu_disabled_color;
+struct RrRGB theme_menu_hilite_color;
 /* style settings - fonts */
 int theme_winfont_height;
 ObFont *theme_winfont;
@@ -101,11 +104,6 @@ Appearance *theme_app_icon;
 
 void theme_startup()
 {
-    theme_b_color = theme_cb_unfocused_color = theme_cb_focused_color = 
-        theme_title_unfocused_color = theme_title_focused_color = 
-        theme_titlebut_unfocused_color = theme_titlebut_focused_color = 
-        theme_menu_color = theme_menu_title_color = theme_menu_disabled_color =
-        theme_menu_hilite_color = NULL;
     theme_winfont = theme_mtitlefont = theme_mfont = NULL;
     theme_title_layout = NULL;
     theme_max_set_mask = theme_max_unset_mask = NULL;
@@ -164,18 +162,6 @@ void theme_startup()
 
 void theme_shutdown()
 {
-    color_free(theme_b_color);
-    color_free(theme_cb_unfocused_color);
-    color_free(theme_cb_focused_color);
-    color_free(theme_title_unfocused_color);
-    color_free(theme_title_focused_color);
-    color_free(theme_titlebut_unfocused_color);
-    color_free(theme_titlebut_focused_color);
-    color_free(theme_menu_color);
-    color_free(theme_menu_title_color);
-    color_free(theme_menu_disabled_color);
-    color_free(theme_menu_hilite_color);
-
     pixmap_mask_free(theme_max_set_mask);
     pixmap_mask_free(theme_max_unset_mask);
     pixmap_mask_free(theme_desk_set_mask);
@@ -303,7 +289,7 @@ static gboolean read_string(XrmDatabase db, char *rname, char **value)
     return ret;
 }
 
-static gboolean read_color(XrmDatabase db, char *rname, color_rgb **value)
+static gboolean read_color(XrmDatabase db, char *rname, struct RrRGB *value)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname);
@@ -311,14 +297,13 @@ static gboolean read_color(XrmDatabase db, char *rname, color_rgb **value)
     XrmValue retvalue;
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-	retvalue.addr != NULL) {
-	color_rgb *c = color_parse(retvalue.addr);
-	if (c != NULL) {
-	    *value = c;
-	    ret = TRUE;
-	}
+	retvalue.addr != NULL)
+	    ret = color_parse(retvalue.addr, value);
+    else {
+        value->r = 0.0;
+        value->g = 0.0;
+        value->b = 0.0;
     }
-
     g_free(rclass);
     return ret;
 }
@@ -460,14 +445,10 @@ static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
 			 &value->surface.data.planar.bevel,
 			 &value->surface.data.planar.interlaced,
 			 &value->surface.data.planar.border);
-	if (!read_color(db, cname, &value->surface.data.planar.primary))
-	    value->surface.data.planar.primary = color_new(0, 0, 0);
-	if (!read_color(db, ctoname, &value->surface.data.planar.secondary))
-	    value->surface.data.planar.secondary = color_new(0, 0, 0);
+	read_color(db, cname, &value->surface.data.planar.primary);
+	read_color(db, ctoname, &value->surface.data.planar.secondary);
 	if (value->surface.data.planar.border)
-	    if (!read_color(db, bcname,
-			    &value->surface.data.planar.border_color))
-		value->surface.data.planar.border_color = color_new(0, 0, 0);
+	    read_color(db, bcname, &value->surface.data.planar.border_color);
 	ret = TRUE;
     }
 
@@ -485,8 +466,8 @@ static void set_default_appearance(Appearance *a)
     a->surface.data.planar.bevel = Bevel1;
     a->surface.data.planar.interlaced = FALSE;
     a->surface.data.planar.border = FALSE;
-    a->surface.data.planar.primary = color_new(0, 0, 0);
-    a->surface.data.planar.secondary = color_new(0, 0, 0);
+    rr_color_set(a->surface.data.planar.primary, 0.0, 0.0, 0.0);
+    rr_color_set(a->surface.data.planar.secondary, 0.0, 0.0, 0.0);
 }
 
 char *theme_load(char *theme)
@@ -622,32 +603,25 @@ char *theme_load(char *theme)
 	theme_cbwidth < 0 || theme_cbwidth > 100) theme_cbwidth = theme_bevel;
 
     /* load colors */
-    if (!read_color(db, "borderColor", &theme_b_color))
-	theme_b_color = color_new(0, 0, 0);
+    read_color(db, "borderColor", &theme_b_color);
     if (!read_color(db, "window.frame.focusColor", &theme_cb_focused_color))
-	theme_cb_focused_color = color_new(0xff, 0xff, 0xff);
+	rr_color_set(theme_cb_focused_color, 1.0, 1.0, 1.0);
     if (!read_color(db, "window.frame.unfocusColor",&theme_cb_unfocused_color))
-	theme_cb_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.label.focus.textColor",
-                    &theme_title_focused_color))
-	theme_title_focused_color = color_new(0x0, 0x0, 0x0);
+	rr_color_set(theme_cb_unfocused_color, 1.0, 1.0, 1.0);
+    read_color(db, "window.label.focus.textColor", &theme_title_focused_color);
     if (!read_color(db, "window.label.unfocus.textColor",
                     &theme_title_unfocused_color))
-	theme_title_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.button.focus.picColor",
-                    &theme_titlebut_focused_color))
-	theme_titlebut_focused_color = color_new(0, 0, 0);
+	rr_color_set(theme_title_unfocused_color, 1.0, 1.0, 1.0);
+    read_color(db, "window.button.focus.picColor",
+               &theme_titlebut_focused_color);
     if (!read_color(db, "window.button.unfocus.picColor",
                     &theme_titlebut_unfocused_color))
-	theme_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "menu.title.textColor", &theme_menu_title_color))
-        theme_menu_title_color = color_new(0, 0, 0);
+	rr_color_set(theme_titlebut_unfocused_color, 1.0, 1.0, 1.0);
+    read_color(db, "menu.title.textColor", &theme_menu_title_color);
     if (!read_color(db, "menu.frame.textColor", &theme_menu_color))
-        theme_menu_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "menu.frame.disableColor", &theme_menu_disabled_color))
-        theme_menu_disabled_color = color_new(0, 0, 0);
-    if (!read_color(db, "menu.hilite.textColor", &theme_menu_hilite_color))
-        theme_menu_hilite_color = color_new(0, 0, 0);
+        rr_color_set(theme_menu_color, 1.0, 1.0, 1.0);
+    read_color(db, "menu.frame.disableColor", &theme_menu_disabled_color);
+    read_color(db, "menu.hilite.textColor", &theme_menu_hilite_color);
 
     if (read_mask(db, "window.button.max.mask", theme, &theme_max_unset_mask)){
         if (!read_mask(db, "window.button.max.toggled.mask", theme,

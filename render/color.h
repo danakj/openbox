@@ -36,19 +36,13 @@ typedef u_int16_t pixel16;
 #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 
 
-typedef struct color_rgb {
-    int r;
-    int g;
-    int b;
-    unsigned long pixel;
-    GC gc;
-} color_rgb;
+struct RrRGB {
+    float r,g,b;
+};
 
-void color_allocate_gc(color_rgb *in);
-XColor *pickColor(int r, int g, int b);
-color_rgb *color_parse(char *colorname);
-color_rgb *color_new(int r, int g, int b);
-void color_free(color_rgb *in);
+#define rr_color_set(col, x, y, z) (col).r = (x), (col).g = (y), (col).b = (z)
+
+gboolean color_parse(char *colorname, struct RrRGB *ret);
 void reduce_depth(pixel32 *data, XImage *im);
 void increase_depth(pixel32 *data, XImage *im);
 
@@ -64,7 +58,4 @@ extern int render_red_mask;
 extern int render_green_mask;
 extern int render_blue_mask;
 
-extern int pseudo_bpc;
-#define pseudo_ncolors() (1 << (pseudo_bpc * 3))
-extern XColor *pseudo_colors;
 #endif /* __color_h */

@@ -14,12 +14,12 @@
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif
+#include <stdio.h>
 
 int render_depth;
 XVisualInfo render_visual_info;
 
 Visual *render_visual;
-Colormap render_colormap;
 
 int render_red_offset = 0, render_green_offset = 0, render_blue_offset = 0;
 int render_red_shift, render_green_shift, render_blue_shift;
@@ -30,10 +30,8 @@ GLXContext render_glx_context;
 
 int render_glx_rating(XVisualInfo *v)
 {
-    int er;
     int rating = 0;
     int val;
-    printf("evaluating visual %d\n", v->visualid);
     glXGetConfig(ob_display, v, GLX_BUFFER_SIZE, &val);
     printf("buffer size %d\n", val);
 
@@ -84,7 +82,6 @@ void render_startup(void)
 
     render_depth = DefaultDepth(ob_display, ob_screen);
     render_visual = DefaultVisual(ob_display, ob_screen);
-    render_colormap = DefaultColormap(ob_display, ob_screen);
 
     vimatch.screen = ob_screen;
     vimatch.class = TrueColor;
@@ -108,8 +105,6 @@ void render_startup(void)
         printf("picked visual %d with rating %d\n", best, rate);
         render_depth = vilist[best].depth;
         render_visual = vilist[best].visual;
-        render_colormap = XCreateColormap(ob_display, ob_root, 
-                                          render_visual, AllocNone);
         render_visual_info = vilist[best];
         render_glx_context = glXCreateContext(ob_display, &render_visual_info,
                                               NULL, True);
@@ -166,7 +161,6 @@ void render_shutdown(void)
 
 Appearance *appearance_new(SurfaceType type, int numtex)
 {
-  PlanarSurface *p;
   Appearance *out;
 
   out = g_new(Appearance, 1);
@@ -175,65 +169,16 @@ Appearance *appearance_new(SurfaceType type, int numtex)
   if (numtex) out->texture = g_new0(Texture, numtex);
   else out->texture = NULL;
 
-  switch (type) {
-  case Surface_Planar:
-    p = &out->surface.data.planar;
-    p->primary = NULL;
-    p->secondary = NULL;
-    p->border_color = NULL;
-    p->bevel_dark = NULL;
-    p->bevel_light = NULL;
-    p->pixel_data = NULL;
-    break;
-  }
   return out;
 }
 
 Appearance *appearance_copy(Appearance *orig)
 {
-    PlanarSurface *spo, *spc;
     Appearance *copy = g_new(Appearance, 1);
     copy->surface.type = orig->surface.type;
     switch (orig->surface.type) {
     case Surface_Planar:
-        spo = &(orig->surface.data.planar);
-        spc = &(copy->surface.data.planar);
-        spc->grad = spo->grad;
-        spc->relief = spo->relief;
-        spc->bevel = spo->bevel;
-        if (spo->primary != NULL)
-            spc->primary = color_new(spo->primary->r,
-                                     spo->primary->g, 
-                                     spo->primary->b);
-        else spc->primary = NULL;
-
-        if (spo->secondary != NULL)
-            spc->secondary = color_new(spo->secondary->r,
-                                       spo->secondary->g,
-                                       spo->secondary->b);
-        else spc->secondary = NULL;
-
-        if (spo->border_color != NULL)
-            spc->border_color = color_new(spo->border_color->r,
-                                          spo->border_color->g,
-                                          spo->border_color->b);
-        else spc->border_color = NULL;
-
-        if (spo->bevel_dark != NULL)
-            spc->bevel_dark = color_new(spo->bevel_dark->r,
-                                        spo->bevel_dark->g,
-                                        spo->bevel_dark->b);
-        else spc->bevel_dark = NULL;
-
-        if (spo->bevel_light != NULL)
-            spc->bevel_light = color_new(spo->bevel_light->r,
-                                         spo->bevel_light->g,
-                                         spo->bevel_light->b);
-        else spc->bevel_light = NULL;
-
-        spc->interlaced = spo->interlaced;
-        spc->border = spo->border;
-        spc->pixel_data = NULL;
+        copy->surface.data.planar = orig->surface.data.planar;
     break;
     }
     copy->textures = orig->textures;
@@ -247,15 +192,6 @@ void appearance_free(Appearance *a)
         PlanarSurface *p;
         if (a->textures)
             g_free(a->texture);
-        if (a->surface.type == Surface_Planar) {
-            p = &a->surface.data.planar;
-            color_free(p->primary);
-            color_free(p->secondary);
-            color_free(p->border_color);
-            color_free(p->bevel_dark);
-            color_free(p->bevel_light);
-            g_free(p->pixel_data);
-        }
         g_free(a);
     }
 }

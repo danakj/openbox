@@ -1797,7 +1797,6 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             event.xconfigure.override_redirect = FALSE;
             XSendEvent(event.xconfigure.display, event.xconfigure.window,
                        FALSE, StructureNotifyMask, &event);
-            g_message ("SENT CONFIG");
 	}
     }
 }

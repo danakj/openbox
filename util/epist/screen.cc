@@ -444,7 +444,8 @@ void screen::updateActiveWindow() {
     }
   }
   _active = it;
-  _last_active = it;
+  if (it != end)
+    _last_active = it;
 
 /*  cout << "Active window is now: ";
   if (_active == _clients.end()) cout << "None\n";
@@ -514,7 +515,9 @@ void screen::cycleWindow(const bool forward, const bool allscreens,
       return;
   } while ((*target)->iconic() ||
            (! allscreens && (*target)->getScreen() != this) ||
-           (! alldesktops && (*target)->desktop() != _active_desktop) ||
+           (! alldesktops &&
+            (*target)->desktop() != _active_desktop &&
+            (*target)->desktop() != 0xffffffff) ||
            (sameclass && ! classname.empty() &&
             (*target)->appClass() != classname));
   

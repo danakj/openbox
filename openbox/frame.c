@@ -131,10 +131,6 @@ void frame_adjust_shape(Frame *self)
 #endif
 }
 
-void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
-{
-}
-
 void frame_adjust_state(Frame *self)
 {
     framerender_frame(self);
@@ -377,5 +373,69 @@ void frame_frame_gravity(Frame *self, int *x, int *y)
     case ForgetGravity:
 	*y += self->size.top;
 	break;
+    }
+}
+void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
+{
+    if (resized) {
+        if (self->client->decorations & Decor_Border) {
+            self->bwidth = theme_bwidth;
+            self->cbwidth = theme_cbwidth;
+        } else {
+            self->bwidth = self->cbwidth = 0;
+        }
+
+        self->width = self->client->area.width + self->cbwidth * 2;
+        g_assert(self->width > 0);
+    }
+    if (resized) {
+        /* move and resize the plate */
+/*        XMoveResizeWindow(ob_display, self->plate,
+                          self->innersize.left - self->cbwidth,
+                          self->innersize.top - self->cbwidth,
+                          self->client->area.width,
+                          self->client->area.height);
+*/
+        /* when the client has StaticGravity, it likes to move around. */
+        XMoveWindow(ob_display, self->client->window, 0, 0);
+    }
+
+    if (resized) {
+/*        STRUT_SET(self->size,
+                  self->innersize.left + self->bwidth,
+                  self->innersize.top + self->bwidth,
+                  self->innersize.right + self->bwidth,
+                  self->innersize.bottom + self->bwidth);
+*/
+    }
+
+    /* shading can change without being moved or resized */
+    RECT_SET_SIZE(self->area,
+		  self->client->area.width +
+		  self->size.left + self->size.right,
+		  (self->client->shaded ? theme_title_height + self->bwidth*2:
+                   self->client->area.height +
+                   self->size.top + self->size.bottom));
+
+    if (moved) {
+        /* find the new coordinates, done after setting the frame.size, for
+           frame_client_gravity. */
+        self->area.x = self->client->area.x;
+        self->area.y = self->client->area.y;
+        frame_client_gravity((Frame*)self,
+                             &self->area.x, &self->area.y);
+    }
+
+    /* move and resize the top level frame.
+       shading can change without being moved or resized */
+    XMoveResizeWindow(ob_display, self->window,
+                      self->area.x, self->area.y,
+                      self->width,
+                      self->area.height - self->bwidth * 2);
+
+    if (resized) {
+        framerender_frame(self);
+
+        frame_adjust_shape(self);
     }
 }

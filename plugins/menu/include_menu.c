@@ -46,7 +46,7 @@ void *plugin_create(PluginMenuCreateData *data)
     if (doc) {
         xmlNodePtr node = xmlDocGetRootElement(doc);
         if (node) {
-            parse_menu_full(doc, node, m, FALSE);
+            parse_menu_full(data->parse_inst, doc, node, m, FALSE);
         }
         xmlFreeDoc(doc);
     }

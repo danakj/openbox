@@ -6,6 +6,8 @@
 
 #include <glib.h>
 
+struct _ObParseInst;
+
 /*! Should new windows be focused */
 extern gboolean config_focus_new;
 /*! Focus windows when the mouse enters them */
@@ -65,7 +67,10 @@ extern gint config_mouse_threshold;
   double-click */
 extern gint config_mouse_dclicktime;
 
-void config_startup();
+/*! User-specified path to the menu file */
+extern gchar *config_menu_path;
+
+void config_startup(struct _ObParseInst *i);
 void config_shutdown();
 
 #endif

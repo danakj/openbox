@@ -83,9 +83,9 @@ static void clearall()
     }
 }
 
-static void fire_button(ObMouseAction a, ObFrameContext context,
-                        ObClient *c, guint state,
-                        guint button, int x, int y)
+static gboolean fire_button(ObMouseAction a, ObFrameContext context,
+                            ObClient *c, guint state,
+                            guint button, int x, int y)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -96,7 +96,7 @@ static void fire_button(ObMouseAction a, ObFrameContext context,
             break;
     }
     /* if not bound, then nothing to do! */
-    if (it == NULL) return;
+    if (it == NULL) return FALSE;
 
     for (it = b->actions[a]; it; it = it->next) {
         ObAction *act = it->data;
@@ -131,11 +131,12 @@ static void fire_button(ObMouseAction a, ObFrameContext context,
             act->func(&act->data);
         }
     }
+    return TRUE;
 }
 
-static void fire_motion(ObMouseAction a, ObFrameContext context, ObClient *c,
-                        guint state, guint button, int x_root, int y_root,
-                        guint32 corner)
+static gboolean fire_motion(ObMouseAction a, ObFrameContext context,
+                            ObClient *c, guint state, guint button,
+                            int x_root, int y_root, guint32 corner)
 {
     GSList *it;
     ObMouseBinding *b;
@@ -146,7 +147,7 @@ static void fire_motion(ObMouseAction a, ObFrameContext context, ObClient *c,
 		break;
     }
     /* if not bound, then nothing to do! */
-    if (it == NULL) return;
+    if (it == NULL) return FALSE;
 
     for (it = b->actions[a]; it; it = it->next) {
         ObAction *act = it->data;
@@ -170,6 +171,7 @@ static void fire_motion(ObMouseAction a, ObFrameContext context, ObClient *c,
             act->func(&act->data);
         }
     }
+    return TRUE;
 }
 
 static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)

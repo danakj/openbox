@@ -101,6 +101,7 @@ void fifo_menu_handler(int fd, void *d) {
                         num_realloc);
 
         if (num_read == 0) { /* eof */
+            ObParseInst *i;
             xmlDocPtr doc;
             xmlNodePtr node;
 
@@ -109,16 +110,15 @@ void fifo_menu_handler(int fd, void *d) {
 
             FIFO_MENU_DATA(menu)->buf[FIFO_MENU_DATA(menu)->buflen] = '\0';
 
-            doc = xmlParseMemory(FIFO_MENU_DATA(menu)->buf,
-                                 FIFO_MENU_DATA(menu)->buflen);
+            i = parse_startup();
 
-            node = xmlDocGetRootElement(doc);
-            
-            if (node &&
-                !xmlStrcasecmp(node->name, (const xmlChar*) "fifo_menu")) {
-                parse_menu_full(doc, node, menu, FALSE);
-            }
-            
+            if (parse_load_mem(FIFO_MENU_DATA(menu)->buf,
+                               FIFO_MENU_DATA(menu)->buflen,
+                               "fifo_menu", &doc, &node))
+                parse_menu_full(i, doc, node, menu, FALSE);
+
+            parse_shutdown(i);
+
             fifo_menu_clean_up(menu);
             
             event_remove_fd(FIFO_MENU_DATA(menu)->handler->fd);

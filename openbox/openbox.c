@@ -210,8 +210,10 @@ int main(int argc, char **argv)
     startup_save();
 
     if (screen_annex()) { /* it will be ours! */
+        ObParseInst *i;
+
         /* startup the parsing so everything can register sections of the rc */
-        parse_startup();
+        i = parse_startup();
 
         /* anything that is going to read data from the rc file needs to be 
            in this group */
@@ -224,16 +226,18 @@ int main(int argc, char **argv)
         window_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
-        plugin_loadall();
+        plugin_loadall(i);
 
         /* set up the kernel config shit */
-        config_startup();
-        menu_startup();
+        config_startup(i);
+        menu_startup(i);
         /* parse/load user options */
         if (parse_load_rc(&doc, &node))
-            parse_tree(doc, node->xmlChildrenNode, NULL);
+            parse_tree(i, doc, node->xmlChildrenNode);
         /* we're done with parsing now, kill it */
-        parse_shutdown();
+        parse_shutdown(i);
+
+        menu_parse();
 
         /* load the theme specified in the rc file */
         ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);

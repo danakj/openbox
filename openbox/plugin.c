@@ -1,4 +1,5 @@
 #include "plugins/interface.h"
+#include "parser/parse.h"
 
 #include <glib.h>
 #include <gmodule.h>
@@ -92,7 +93,7 @@ void plugin_shutdown()
     g_datalist_clear(&plugins);
 }
 
-gboolean plugin_open_full(char *name, gboolean reopen)
+gboolean plugin_open_full(char *name, gboolean reopen, ObParseInst *i)
 {
     Plugin *p;
 
@@ -107,18 +108,18 @@ gboolean plugin_open_full(char *name, gboolean reopen)
         g_warning("failed to load plugin '%s'", name);
         return FALSE;
     }
-    p->config();
+    p->config(i);
 
     g_datalist_set_data_full(&plugins, name, p, (GDestroyNotify) plugin_free);
     return TRUE;
 }
 
-gboolean plugin_open(char *name) {
-    return plugin_open_full(name, FALSE);
+gboolean plugin_open(char *name, ObParseInst *i) {
+    return plugin_open_full(name, FALSE, i);
 }
 
-gboolean plugin_open_reopen(char *name) {
-    return plugin_open_full(name, TRUE);
+gboolean plugin_open_reopen(char *name, ObParseInst *i) {
+    return plugin_open_full(name, TRUE, i);
 }
 
 void plugin_close(char *name)
@@ -136,7 +137,7 @@ void plugin_startall()
     g_datalist_foreach(&plugins, (GDataForeachFunc)foreach_start, NULL);
 }
 
-void plugin_loadall()
+void plugin_loadall(ObParseInst *i)
 {
     GIOChannel *io;
     GError *err;
@@ -156,18 +157,18 @@ void plugin_loadall()
 
     if (io == NULL) {
         /* load the default plugins */
-        plugin_open("placement");
-        plugin_open("resistance");
+        plugin_open("placement", i);
+        plugin_open("resistance", i);
 
         /* XXX rm me when the parser loads me magically */
-        plugin_open("client_menu");
+        plugin_open("client_menu", i);
     } else {
         /* load the plugins in the rc file */
         while (g_io_channel_read_line(io, &name, NULL, NULL, &err) ==
                G_IO_STATUS_NORMAL) {
             g_strstrip(name);
             if (name[0] != '\0' && name[0] != '#')
-                plugin_open(name);
+                plugin_open(name, i);
             g_free(name);
         }
         g_io_channel_unref(io);

@@ -125,6 +125,7 @@ void timed_menu_read_pipe(int fd, void *d)
                     TIMED_MENU_DATA(menu)->buf + TIMED_MENU_DATA(menu)->buflen,
                     num_realloc);
     if (num_read == 0) {
+        ObParseInst *i;
         xmlDocPtr doc;
         xmlNodePtr node;
 
@@ -133,15 +134,14 @@ void timed_menu_read_pipe(int fd, void *d)
 
         TIMED_MENU_DATA(menu)->buf[TIMED_MENU_DATA(menu)->buflen] = '\0';
 
-        doc = xmlParseMemory(TIMED_MENU_DATA(menu)->buf,
-                                       TIMED_MENU_DATA(menu)->buflen);
+        i = parse_startup();
 
-        node = xmlDocGetRootElement(doc);
+        if (parse_load_mem(TIMED_MENU_DATA(menu)->buf,
+                           TIMED_MENU_DATA(menu)->buflen,
+                           "timed_menu", &doc, &node))
+            parse_menu_full(i, doc, node, menu, FALSE);
 
-        if (node &&
-            !xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
-            parse_menu_full(doc, node, menu, FALSE);
-        }
+        parse_shutdown(i);
 
         timed_menu_clean_up(menu);
     } else if (num_read > 0) {
@@ -205,6 +205,7 @@ void timed_menu_timeout_handler(ObTimer *t, void *d)
                 }
 
                 if (stat_buf.st_mtime > TIMED_MENU_DATA(data)->mtime) {
+                    ObParseInst *i;
                     xmlDocPtr doc;
                     xmlNodePtr node;
 
@@ -214,14 +215,13 @@ void timed_menu_timeout_handler(ObTimer *t, void *d)
                     data->invalid = TRUE;
                     menu_clear(data);
 
-                    doc = xmlParseFile(TIMED_MENU_DATA(data)->command);
+                    i = parse_startup();
 
-                    node = xmlDocGetRootElement(doc);
+                    if (parse_load(TIMED_MENU_DATA(data)->command,
+                                   "timed_menu", &doc, &node))
+                        parse_menu_full(i, doc, node, data, FALSE);
 
-                    if (node &&
-                        !xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
-                        parse_menu_full(doc, node, data, FALSE);
-                    }
+                    parse_shutdown(i);
 
                     timed_menu_clean_up(data);
                 }

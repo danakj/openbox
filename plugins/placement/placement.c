@@ -10,7 +10,7 @@
 
 static gboolean history;
 
-static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_xml(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
@@ -19,11 +19,11 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
         history = parse_bool(doc, n);
 }
 
-void plugin_setup_config()
+void plugin_setup_config(ObParseInst *i)
 {
     history = TRUE;
 
-    parse_register("placement", parse_xml, NULL);
+    parse_register(i, "placement", parse_xml, NULL);
 }
 
 static Rect* pick_head(ObClient *c)

@@ -310,39 +310,8 @@
   </context>
 </mouse>
 
-<menu id="root" label="Openbox 3">
-  <menu id="apps" label="Applications">
-    <item label="Xterm">
-      <action name="execute"><execute>xterm</execute></action>
-    </item>
-    <item label="Mozilla">
-      <action name="execute"><execute>mozilla</execute></action>
-    </item>
-    <item label="Gaim">
-      <action name="execute"><execute>gaim</execute></action>
-    </item>
-    <item label="Quark">
-      <action name="execute"><execute>strange-quark</execute></action>
-    </item>
-  </menu>
-  <menu id="games" label="Games">
-    <item label="Crack-Attack">
-      <action name="execute"><execute>crack-attack</execute></action>
-    </item>
-    <item label="XFRisk">
-      <action name="execute"><execute>xfrisk</execute></action>
-    </item>
-    <item label="Quake III">
-      <action name="execute"><execute>quake3</execute></action>
-    </item>
-  </menu>
-  <item label="--" /> <!-- separator -->
-  <item label="Restart">
-    <action name="restart" />
-  </item>
-  <item label="Exit">
-    <action name="exit" />
-  </item>
+<menu>
+  <location>~/.openbox/menu</location>
 </menu>
 
 </openbox_config>

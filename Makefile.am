@@ -414,7 +414,8 @@ dist_om4ob_theme_DATA = \
 ## data ##
 
 dist_rc_DATA = \
-	data/rc3
+	data/rc3 \
+	data/menu
 
 dist_desktopfiles_DATA = \
 	data/openbox.desktop

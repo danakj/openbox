@@ -9,6 +9,7 @@
 #include <glib.h>
 
 struct _ObClient;
+struct _ObParseInst;
 
 typedef struct _ObMenu ObMenu;
 typedef struct _ObMenuEntry ObMenuEntry;
@@ -125,6 +126,7 @@ struct _ObMenuEntry
 } MenuEntry;
 
 typedef struct PluginMenuCreateData{
+    struct _ObParseInst *parse_inst;
     xmlDocPtr doc;
     xmlNodePtr node;
     ObMenu *parent;
@@ -133,6 +135,8 @@ typedef struct PluginMenuCreateData{
 
 void menu_startup();
 void menu_shutdown();
+
+void menu_parse();
 
 void menu_noop();
 
@@ -190,7 +194,8 @@ void menu_render(ObMenu *self);
 void menu_render_full(ObMenu *self);
 
 /*so plugins can call it? */
-void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data, gboolean new);
+void parse_menu_full(struct _ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                     void *data, gboolean new);
 void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
 void menu_control_keyboard_nav(unsigned int key);
 #endif

@@ -10,7 +10,7 @@
 static int win_resistance;
 static int edge_resistance;
 
-static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_xml(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
@@ -21,11 +21,11 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
         edge_resistance = parse_int(doc, n);
 }
 
-void plugin_setup_config()
+void plugin_setup_config(ObParseInst *i)
 {
     win_resistance = edge_resistance = DEFAULT_RESISTANCE;
 
-    parse_register("resistance", parse_xml, NULL);
+    parse_register(i, "resistance", parse_xml, NULL);
 }
 
 static void resist_move(ObClient *c, int *x, int *y)

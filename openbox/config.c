@@ -36,6 +36,18 @@ guint config_keyboard_reset_state;
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
+gchar *config_menu_path;
+
+gchar *expand_tilde(const gchar *f)
+{
+    if (!f)
+        return NULL;
+    else if (f[0] != '~')
+        return g_strdup(f);
+    else
+        return g_strconcat(g_get_home_dir(), f+1, NULL);
+}
+
 /*
 
 <keybind key="C-x">
@@ -46,7 +58,8 @@ gint config_mouse_dclicktime;
 
 */
 
-static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
+static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                      GList *keylist)
 {
     char *key;
     ObAction *action;
@@ -57,6 +70,7 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
         key = parse_string(doc, n);
         translate_key(key, &config_keyboard_reset_state,
                       &config_keyboard_reset_keycode);
+        g_free(key);
     }
 
     n = parse_find_node("keybind", node);
@@ -64,7 +78,7 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
         if (parse_attr_string("key", n, &key)) {
             keylist = g_list_append(keylist, key);
 
-            parse_key(doc, n->xmlChildrenNode, keylist);
+            parse_key(i, doc, n->xmlChildrenNode, keylist);
 
             it = g_list_last(keylist);
             g_free(it->data);
@@ -94,9 +108,10 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
     }
 }
 
-static void parse_keyboard(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                           void *d)
 {
-    parse_key(doc, node->xmlChildrenNode, NULL);
+    parse_key(i, doc, node->xmlChildrenNode, NULL);
 }
 
 /*
@@ -109,7 +124,8 @@ static void parse_keyboard(xmlDocPtr doc, xmlNodePtr node, void *d)
 
 */
 
-static void parse_mouse(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                        void *d)
 {
     xmlNodePtr n, nbut, nact;
     char *buttonstr;
@@ -182,7 +198,8 @@ static void parse_mouse(xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
 
-static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                        void *d)
 {
     xmlNodePtr n;
 
@@ -200,7 +217,8 @@ static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
         config_focus_popup = parse_bool(doc, n);
 }
 
-static void parse_theme(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                        void *d)
 {
     xmlNodePtr n;
 
@@ -216,7 +234,8 @@ static void parse_theme(xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
 
-static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                           void *d)
 {
     xmlNodePtr n;
 
@@ -244,7 +263,8 @@ static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
         config_desktop_popup = parse_bool(doc, n);
 }
 
-static void parse_resize(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                         void *d)
 {
     xmlNodePtr n;
 
@@ -254,7 +274,7 @@ static void parse_resize(xmlDocPtr doc, xmlNodePtr node, void *d)
         config_redraw_resize = parse_bool(doc, n);
 }
 
-static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
@@ -314,7 +334,21 @@ static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
         config_dock_hide_timeout = parse_int(doc, n);
 }
 
-void config_startup()
+static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
+{
+    xmlNodePtr n;
+
+    node = node->xmlChildrenNode;
+    if ((n = parse_find_node("location", node))) {
+        gchar *c;
+
+        c = parse_string(doc, n);
+        config_menu_path = expand_tilde(c);
+        g_free(c);
+    }
+}
+   
+void config_startup(ObParseInst *i)
 {
     config_focus_new = TRUE;
     config_focus_follow = FALSE;
@@ -322,23 +356,23 @@ void config_startup()
     config_focus_last_on_desktop = TRUE;
     config_focus_popup = TRUE;
 
-    parse_register("focus", parse_focus, NULL);
+    parse_register(i, "focus", parse_focus, NULL);
 
     config_theme = NULL;
 
     config_title_layout = g_strdup("NLIMC");
 
-    parse_register("theme", parse_theme, NULL);
+    parse_register(i, "theme", parse_theme, NULL);
 
     config_desktops_num = 4;
     config_desktops_names = NULL;
     config_desktop_popup = TRUE;
 
-    parse_register("desktops", parse_desktops, NULL);
+    parse_register(i, "desktops", parse_desktops, NULL);
 
     config_redraw_resize = TRUE;
 
-    parse_register("resize", parse_resize, NULL);
+    parse_register(i, "resize", parse_resize, NULL);
 
     config_dock_layer = OB_STACKING_LAYER_TOP;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
@@ -349,17 +383,21 @@ void config_startup()
     config_dock_hide = FALSE;
     config_dock_hide_timeout = 3000;
 
-    parse_register("dock", parse_dock, NULL);
+    parse_register(i, "dock", parse_dock, NULL);
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
-    parse_register("keyboard", parse_keyboard, NULL);
+    parse_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 3;
     config_mouse_dclicktime = 200;
 
-    parse_register("mouse", parse_mouse, NULL);
+    parse_register(i, "mouse", parse_mouse, NULL);
+
+    config_menu_path = NULL;
+
+    parse_register(i, "menu", parse_menu, NULL);
 }
 
 void config_shutdown()

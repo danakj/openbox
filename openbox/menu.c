@@ -4,10 +4,12 @@
 #include "stacking.h"
 #include "client.h"
 #include "grab.h"
+#include "config.h"
 #include "screen.h"
 #include "geom.h"
 #include "plugin.h"
 #include "misc.h"
+#include "parser/parse.h"
 
 GHashTable *menu_hash = NULL;
 GList *menu_visible = NULL;
@@ -18,14 +20,16 @@ GList *menu_visible = NULL;
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
-static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
+static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                       gpointer data)
 {
-    parse_menu_full(doc, node, data, TRUE);
+    g_message("%s", __FUNCTION__);
+    parse_menu_full(i, doc, node, data, TRUE);
 }
 
 
-void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
-                       gboolean newmenu)
+void parse_menu_full(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                     gpointer data, gboolean newmenu)
 {
     ObAction *act;
     xmlNodePtr nact;
@@ -42,11 +46,12 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
 
         if (parse_attr_string("plugin", node, &plugin)) {
             PluginMenuCreateData data;
+            data.parse_inst = i;
             data.doc = doc;
             data.node = node;
             data.parent = menu;
 
-            if (plugin_open_reopen(plugin))
+            if (plugin_open_reopen(plugin, i))
                 parent = plugin_create(plugin, &data);
             g_free(plugin);
         } else
@@ -67,12 +72,12 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
                 data.doc = doc;
                 data.node = node;
                 data.parent = menu;
-                if (plugin_open_reopen(plugin))
+                if (plugin_open_reopen(plugin, i))
                     parent = plugin_create(plugin, &data);
                 g_free(plugin);
             } else {
                 parent = menu;
-                parse_menu(doc, node, &parent);
+                parse_menu(i, doc, node, &parent);
                 menu_add_entry(menu, menu_entry_new_submenu(parent->label,
                                                             parent));
             }
@@ -147,20 +152,54 @@ void menu_entry_free(ObMenuEntry *self)
     XDestroyWindow(ob_display, self->submenu_pic);
     g_free(self);
 }
-    
-void menu_startup()
+ 
+void menu_startup(ObParseInst *i)
 {
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       (GDestroyNotify)menu_destroy_hash_key,
                                       (GDestroyNotify)menu_destroy_hash_value);
-
-    parse_register("menu", parse_menu, NULL);
-
 }
 
 void menu_shutdown()
 {
     g_hash_table_destroy(menu_hash);
+}
+
+void menu_parse()
+{
+    ObParseInst *i;
+    xmlDocPtr doc;
+    xmlNodePtr node;
+    gchar *p;
+    gboolean loaded = FALSE;
+
+    i = parse_startup();
+
+    if (config_menu_path)
+        if (!(loaded =
+              parse_load(config_menu_path, "openbox_menu", &doc, &node)))
+            g_warning("Failed to load menu from '%s'", config_menu_path);
+    if (!loaded) {
+        p = g_build_filename(g_get_home_dir(), ".openbox", "menu", NULL);
+        if (!(loaded =
+              parse_load(p, "openbox_menu", &doc, &node)))
+            g_warning("Failed to load menu from '%s'", p);
+        g_free(p);
+    }
+    if (!loaded) {
+        p = g_build_filename(RCDIR, "menu", NULL);
+        if (!(loaded =
+              parse_load(p, "openbox_menu", &doc, &node)))
+            g_warning("Failed to load menu from '%s'", p);
+        g_free(p);
+    }
+
+    if (loaded) {
+        parse_register(i, "menu", parse_menu, NULL);
+        parse_tree(i, doc, node->xmlChildrenNode);
+    }
+
+    parse_shutdown(i);
 }
 
 static Window createWindow(Window parent, unsigned long mask,

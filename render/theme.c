@@ -157,7 +157,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (theme->handle_height <= 0 || theme->handle_height > 100)
         theme->handle_height = 6;
     if (!read_int(db, "padding.width", &theme->padding) ||
-	theme->padding <= 0 || theme->padding > 100)
+	theme->padding < 0 || theme->padding > 100)
         theme->padding = 3;
     if (!read_int(db, "border.width", &theme->bwidth) ||
 	theme->bwidth < 0 || theme->bwidth > 100)
@@ -870,8 +870,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
         theme->label_height = theme->winfont_height
             + MAX(ft + fb, ut + ub);
+
+        /* this would be nice I think, since padding.width can now be 0,
+           but it breaks frame.c horribly and I don't feel like fixing that
+           right now, so if anyone complains, here is how to keep text from
+           going over the title's bevel/border with a padding.width of 0 and a
+           bevelless/borderless label
+        RrMargins(theme->a_focused_title, &fl, &ft, &fr, &fb);
+        RrMargins(theme->a_unfocused_title, &ul, &ut, &ur, &ub);
+        theme->title_height = theme->label_height +
+            MAX(MAX(theme->padding * 2, ft + fb),
+                MAX(theme->padding * 2, ut + ub));
+        */
+        theme->title_height = theme->label_height + theme->padding * 2;
     }
-    theme->title_height = theme->label_height + theme->padding * 2;
     theme->button_size = theme->label_height - 2;
     theme->grip_width = theme->title_height * 1.5;
 

@@ -1003,24 +1003,26 @@ void OBClient::move(int x, int y)
   _area.setPos(x, y);
 
   // move the frame to be in the requested position
-  if (frame) // this can be called while mapping, before frame exists
+  if (frame) { // this can be called while mapping, before frame exists
     frame->adjustPosition();
 
-  // send synthetic configure notify
-  XEvent event;
-  event.type = ConfigureNotify;
-  event.xconfigure.display = otk::OBDisplay::display;
-  event.xconfigure.event = _window;
-  event.xconfigure.window = _window;
-  event.xconfigure.x = x;
-  event.xconfigure.y = y;
-  event.xconfigure.width = _area.width();
-  event.xconfigure.height = _area.height();
-  event.xconfigure.border_width = _border_width;
-  event.xconfigure.above = frame->window();
-  event.xconfigure.override_redirect = False;
-  XSendEvent(event.xconfigure.display, event.xconfigure.window, False,
-             StructureNotifyMask, &event);
+    // send synthetic configure notify (we don't need to if we aren't mapped
+    // yet)
+    XEvent event;
+    event.type = ConfigureNotify;
+    event.xconfigure.display = otk::OBDisplay::display;
+    event.xconfigure.event = _window;
+    event.xconfigure.window = _window;
+    event.xconfigure.x = x;
+    event.xconfigure.y = y;
+    event.xconfigure.width = _area.width();
+    event.xconfigure.height = _area.height();
+    event.xconfigure.border_width = _border_width;
+    event.xconfigure.above = frame->window();
+    event.xconfigure.override_redirect = False;
+    XSendEvent(event.xconfigure.display, event.xconfigure.window, False,
+               StructureNotifyMask, &event);
+  }
 }
 
 

@@ -669,7 +669,7 @@ void Screen::unmanageWindow(Client *client)
   client->_modal = false;
   
   // unfocus the client (calls the focus callbacks)
-  client->unfocus();
+  if (client->focused()) client->unfocus();
 
 #ifdef DEBUG
   printf("Unmanaged window 0x%lx frame 0x%lx\n", client->window(), framewin);

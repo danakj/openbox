@@ -7,22 +7,26 @@
 #include "resistance.h"
 #include <glib.h>
 
-static int resistance;
+static int win_resistance;
+static int edge_resistance;
 static gboolean resist_windows;
 
 static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
     if ((n = parse_find_node("strength", node)))
-        resistance = parse_int(doc, n);
+        win_resistance = parse_int(doc, n);
+    if ((n = parse_find_node("screen_edge_strength", node)))
+        edge_resistance = parse_int(doc, n);
     if ((n = parse_find_node("windows", node)))
         resist_windows = parse_bool(doc, n);
 }
 
 void plugin_setup_config()
 {
-    resistance = DEFAULT_RESISTANCE;
+    win_resistance = edge_resistance = DEFAULT_RESISTANCE;
     resist_windows = DEFAULT_RESIST_WINDOWS;
 
     parse_register("resistance", parse_xml, NULL);
@@ -75,30 +79,30 @@ static void resist_move(ObClient *c, int *x, int *y)
             */
             if (snapx == NULL) {
                 if (ct < tb && cb > tt) {
-                    if (cl >= tr && l < tr && l >= tr - resistance)
+                    if (cl >= tr && l < tr && l >= tr - win_resistance)
                         *x = tr, snapx = target;
-                    else if (cr <= tl && r > tl && r <= tl + resistance)
+                    else if (cr <= tl && r > tl && r <= tl + win_resistance)
                         *x = tl - w + 1, snapx = target;
                     if (snapx != NULL) {
                         /* try to corner snap to the window */
-                        if (ct > tt && t <= tt && t > tt - resistance)
+                        if (ct > tt && t <= tt && t > tt - win_resistance)
                             *y = tt + 1, snapy = target;
-                        else if (cb < tb && b >= tb && b < tb + resistance)
+                        else if (cb < tb && b >= tb && b < tb + win_resistance)
                             *y = tb - h, snapy = target;
                     }
                 }
             }
             if (snapy == NULL) {
                 if (cl < tr && cr > tl) {
-                    if (ct >= tb && t < tb && t >= tb - resistance)
+                    if (ct >= tb && t < tb && t >= tb - win_resistance)
                         *y = tb, snapy = target;
-                    else if (cb <= tt && b > tt && b <= tt + resistance)
+                    else if (cb <= tt && b > tt && b <= tt + win_resistance)
                         *y = tt - h + 1, snapy = target;
                     if (snapy != NULL) {
                         /* try to corner snap to the window */
-                        if (cl > tl && l <= tl && l > tl - resistance)
+                        if (cl > tl && l <= tl && l > tl - win_resistance)
                             *x = tl + 1, snapx = target;
-                        else if (cr < tr && r >= tr && r < tr + resistance)
+                        else if (cr < tr && r >= tr && r < tr + win_resistance)
                             *x = tr - w, snapx = target;
                     }
                 }
@@ -120,13 +124,13 @@ static void resist_move(ObClient *c, int *x, int *y)
         ab = at + area->height - 1;
 
         /* snap to screen edges */
-        if (cl >= al && l < al && l >= al - resistance)
+        if (cl >= al && l < al && l >= al - edge_resistance)
             *x = al;
-        else if (cr <= ar && r > ar && r <= ar + resistance)
+        else if (cr <= ar && r > ar && r <= ar + edge_resistance)
             *x = ar - w + 1;
-        if (ct >= at && t < at && t >= at - resistance)
+        if (ct >= at && t < at && t >= at - edge_resistance)
             *y = at;
-        else if (cb <= ab && b > ab && b < ab + resistance)
+        else if (cb <= ab && b > ab && b < ab + edge_resistance)
             *y = ab - h + 1;
     }
 }
@@ -181,14 +185,14 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
                     case OB_CORNER_BOTTOMLEFT:
                         dlt = l;
                         drb = r + *w - c->frame->area.width;
-                        if (r < tl && drb >= tl && drb < tl + resistance)
+                        if (r < tl && drb >= tl && drb < tl + win_resistance)
                             *w = tl - l, snapx = target;
                         break;
                     case OB_CORNER_TOPRIGHT:
                     case OB_CORNER_BOTTOMRIGHT:
                         dlt = l - *w + c->frame->area.width;
                         drb = r;
-                        if (l > tr && dlt <= tr && dlt > tr - resistance)
+                        if (l > tr && dlt <= tr && dlt > tr - win_resistance)
                             *w = r - tr, snapx = target;
                         break;
                     }
@@ -203,14 +207,14 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
                     case OB_CORNER_TOPRIGHT:
                         dlt = t;
                         drb = b + *h - c->frame->area.height;
-                        if (b < tt && drb >= tt && drb < tt + resistance)
+                        if (b < tt && drb >= tt && drb < tt + win_resistance)
                             *h = tt - t, snapy = target;
                         break;
                     case OB_CORNER_BOTTOMLEFT:
                     case OB_CORNER_BOTTOMRIGHT:
                         dlt = t - *h + c->frame->area.height;
                         drb = b;
-                        if (t > tb && dlt <= tb && dlt > tb - resistance)
+                        if (t > tb && dlt <= tb && dlt > tb - win_resistance)
                             *h = b - tb, snapy = target;
                         break;
                     }
@@ -230,14 +234,14 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
     case OB_CORNER_BOTTOMLEFT:
         dlt = l;
         drb = r + *w - c->frame->area.width;
-        if (r <= ar && drb > ar && drb <= ar + resistance)
+        if (r <= ar && drb > ar && drb <= ar + edge_resistance)
             *w = ar - l + 1;
         break;
     case OB_CORNER_TOPRIGHT:
     case OB_CORNER_BOTTOMRIGHT:
         dlt = l - *w + c->frame->area.width;
         drb = r;
-        if (l >= al && dlt < al && dlt >= al - resistance)
+        if (l >= al && dlt < al && dlt >= al - edge_resistance)
             *w = r - al + 1;
         break;
     }
@@ -248,14 +252,14 @@ static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
     case OB_CORNER_TOPRIGHT:
         dlt = t;
         drb = b + *h - c->frame->area.height;
-        if (b <= ab && drb > ab && drb <= ab + resistance)
+        if (b <= ab && drb > ab && drb <= ab + edge_resistance)
             *h = ab - t + 1;
         break;
     case OB_CORNER_BOTTOMLEFT:
     case OB_CORNER_BOTTOMRIGHT:
         dlt = t - *h + c->frame->area.height;
         drb = b;
-        if (t >= at && dlt < at && dlt >= at - resistance)
+        if (t >= at && dlt < at && dlt >= at - edge_resistance)
             *h = b - at + 1;
         break;
     }

@@ -384,7 +384,6 @@ void screen_update_desktop_names()
         for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
     else
         i = 0;
-    g_message("I %d", i);
     if (i <= screen_num_desktops) {
         screen_desktop_names = g_renew(char*, screen_desktop_names,
                                        screen_num_desktops + 1);

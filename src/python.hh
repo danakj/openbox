@@ -37,7 +37,7 @@ struct MouseContext {
     Grip,
     Root,
     MenuItem
-#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+#ifndef DOXYGEN_IGNORE
     , NUM_MOUSE_CONTEXT
 #endif
   };
@@ -50,7 +50,7 @@ struct MouseAction {
     Click,
     DoubleClick,
     Motion
-#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+#ifndef DOXYGEN_IGNORE
     , NUM_MOUSE_ACTION
 #endif
   };
@@ -60,7 +60,7 @@ struct KeyContext {
   enum KC {
     Menu,
     All
-#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+#ifndef DOXYGEN_IGNORE
     , NUM_KEY_CONTEXT
 #endif
   };
@@ -70,7 +70,7 @@ struct KeyAction {
   enum KA {
     Press,
     Release
-#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+#ifndef DOXYGEN_IGNORE
     , NUM_KEY_ACTION
 #endif
   };
@@ -120,7 +120,7 @@ struct EventAction {
       The Client::urgent method can be used to get the status.
     */
     UrgentWindow
-#if ! (defined(DOXYGEN_IGNORE) || defined(SWIG))
+#ifndef DOXYGEN_IGNORE
     , NUM_EVENT_ACTION
 #endif
   };
@@ -227,14 +227,10 @@ typedef void (*MouseCallback)(MouseData*, void*);
 typedef void (*KeyCallback)(KeyData*, void*);
 typedef void (*EventCallback)(EventData*, void*);
 
-#ifndef SWIG
-
 void python_init(char *argv0);
 void python_destroy();
 //! Returns 0 for success, 1 for failing to open the file, 2 for an exception
 int python_exec(const std::string &path);
-
-#endif // SWIG
 
 }
 

@@ -3193,12 +3193,14 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           dright = offsetrect.right() - wleft;
 
           // snap left of other window?
-          if (dleft >= 0 && dleft < resistance_size) {
+          if (dleft >= 0 && dleft < resistance_size &&
+              dleft < (wright - wleft)) {
             dx = offsetrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
-          else if (dright >= 0 && dright < resistance_size) {
+          else if (dright >= 0 && dright < resistance_size &&
+                   dright < (wright - wleft)) {
             dx = offsetrect.right() + 1;
             snapped = True;
           }
@@ -3258,12 +3260,13 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
           dbottom = offsetrect.bottom() - wtop;
 
           // snap top of other window?
-          if (dtop >= 0 && dtop < resistance_size) {
+          if (dtop >= 0 && dtop < resistance_size && dtop < (wbottom - wtop)) {
             dy = offsetrect.top() - frame.rect.height();
             snapped = True;
           }
           // snap bottom of other window?
-          else if (dbottom >= 0 && dbottom < resistance_size) {
+          else if (dbottom >= 0 && dbottom < resistance_size &&
+                   dbottom < (wbottom - wtop)) {
             dy = offsetrect.bottom() + 1;
             snapped = True;
           }

@@ -1,5 +1,16 @@
 2003-09-22  Ben Jansens  <xor@zed.orodu.net>
 
+	* data/menu.xml.in, data/menu.xsd, data/rc.xml.in, data/rc.xsd:
+	fix capitalization
+
+	* data/rc.xsd: add focusLast and raiseOnFocus
+
+	* configure.ac: beta4
+
+	* ChangeLog: recent changes
+
+	* data/rc.xml.in: add focusLast and raiseOnFocus
+
 	* openbox/place.c: visible is in the frame struct
 
 	* openbox/place.c: ignore non-visible windows too
@@ -281,45 +292,6 @@
 	* openbox/place.c:
 	smart placement only avoids the focused window, and centers in its area
 
-2003-09-15  Ben Jansens  <xor@zed.orodu.net>
-
-	* data/rc.xml, openbox/config.c, openbox/config.h, openbox/event.c, openbox/focus.c, openbox/focus.h, openbox/screen.c:
-	remove focusLast and focusLastOnDesktop
-
-	* openbox/focus.c: fix directional focus when nothing is focused
-
-	* ChangeLog: recent changes
-
-	* configure.ac: beta3
-
-	* openbox/session.c: use the sm_client_id in the client struct
-
-	* openbox/client.c, openbox/client.h:
-	save the sm_client_id just like saving other properties, dont query each time its needed
-
-	* openbox/event.c:
-	propogate property changes on the group leader to the whole group
-
-	* openbox/popup.c: remove debug prints
-
-	* openbox/startupnotify.c: remove debug print
-
-	* openbox/event.c: sloppy focus fixes, ignore a few more enter events
-
-	* openbox/focus.c:
-	fix crashing when doing a directional focus with no windows on the desktop
-
-	* openbox/place.c: best fit only one direction
-
-	* openbox/place.c: no center in the first smart-place
-
-	* openbox/place.c: sort smallest to largest area
-
-	* openbox/place.c: 2 passes at smart placement
-
-	* openbox/place.c:
-	smart placement only avoids the focused window, and centers in its area
-
 	* openbox/stacking.h: whitespace
 
 	* openbox/place.c: fallback to random when focus follows mouse is off
@@ -452,7 +424,7 @@
 	* openbox/event.c, openbox/mouse.c, openbox/mouse.h:
 	frame context fallbacks when there is no binding on the context
 
-	* themes/allegro/themerc: requested update from safarial
+	* themes/Allegro/openbox-3/themerc: requested update from safarial
 
 	* openbox/event.c:
 	make menu hiding-on-release based on a timer rather than on where it is released (on the frame border)
@@ -509,7 +481,7 @@
 
 	* openbox/focus.h: remove comment that isnt right anymore
 
-	* openbox/frame.c, openbox/framerender.c, openbox/popup.c, render/theme.c, render/theme.h, themes/allegro/themerc, themes/artwiz/themerc, themes/blah41/themerc, themes/om4ob/themerc, themes/thebear/themerc, tools/themeupdate/themeupdate.py:
+	* openbox/frame.c, openbox/framerender.c, openbox/popup.c, render/theme.c, render/theme.h, themes/Allegro/openbox-3/themerc, themes/Artwiz/openbox-3/themerc, themes/Blah41/openbox-3/themerc, themes/Om4Ob/openbox-3/themerc, themes/TheBear/openbox-3/themerc, tools/themeupdate/themeupdate.py:
 	bigtime theme changes. bigtime.
 
 	* openbox/focus.c, openbox/focus.h: expose focus_cycle_client
@@ -724,7 +696,7 @@
 	add a reconfigure action, also reconfigure on SIGUSR2.
 	support reconfiguring throughout the entire codebase.
 
-	* themes/thebear/themerc: updates for thebear from merry
+	* themes/TheBear/openbox-3/themerc: updates for thebear from merry
 
 	* openbox/event.c:
 	make focusDelay check the destroying window properly before killing the timer
@@ -839,10 +811,10 @@
 
 	* data/rc3: make thebear the default theme
 
-	* themes/thebear/themerc:
+	* themes/TheBear/openbox-3/themerc:
 	add a menu overlap and smaller font size for the menu items
 
-	* themes/allegro/bullet.xbm, themes/allegro/themerc, themes/artwiz/themerc, themes/blah41/themerc, themes/om4ob/themerc, themes/thebear/themerc:
+	* themes/Allegro/openbox-3/bullet.xbm, themes/Allegro/openbox-3/themerc, themes/Artwiz/openbox-3/themerc, themes/Blah41/openbox-3/themerc, themes/Om4Ob/openbox-3/themerc, themes/TheBear/openbox-3/themerc:
 	add/fix themes for 3.0
 
 	* openbox/menuframe.c, openbox/popup.c, render/theme.c, render/theme.h:
@@ -1240,7 +1212,7 @@
 
 	* openbox/action.c: make the raiselower action smarter
 
-	* render/theme.c, render/theme.h, themes/om4ob/themerc, themes/thebear/themerc:
+	* render/theme.c, render/theme.h, themes/Om4Ob/openbox-3/themerc, themes/TheBear/openbox-3/themerc:
 	make focus and unfocus fonts for window titles. change 'xftfont' to 'font' in the themes.
 
 2003-08-20  Ben Jansens  <xor@zed.orodu.net>
@@ -1473,7 +1445,8 @@
 	* openbox/client.c, openbox/event.c:
 	use the frame size not the client size when figuring out if stuff fits on the screen
 
-	* themes/om4ob/themerc: add disabled button styles (from miklos)
+	* themes/Om4Ob/openbox-3/themerc:
+	add disabled button styles (from miklos)
 
 	* tools/kdetrayproxy/kdetrayproxy.c: missing sys/time.h
 
@@ -1481,7 +1454,7 @@
 
 	* ChangeLog: recent changes
 
-	* Makefile.am, themes/om4ob/close.xbm, themes/om4ob/close_hover.xbm, themes/om4ob/desk.xbm, themes/om4ob/desk_hover.xbm, themes/om4ob/desk_toggled.xbm, themes/om4ob/iconify.xbm, themes/om4ob/iconify_hover.xbm, themes/om4ob/iconify_pressed.xbm, themes/om4ob/max.xbm, themes/om4ob/max_disabled.xbm, themes/om4ob/max_hover.xbm, themes/om4ob/max_pressed.xbm, themes/om4ob/max_toggled.xbm, themes/om4ob/shade.xbm, themes/om4ob/shade_disabled.xbm, themes/om4ob/shade_hover.xbm, themes/om4ob/shade_toggled.xbm, themes/om4ob/themerc:
+	* Makefile.am, themes/Om4Ob/openbox-3/close.xbm, themes/Om4Ob/openbox-3/close_hover.xbm, themes/Om4Ob/openbox-3/desk.xbm, themes/Om4Ob/openbox-3/desk_hover.xbm, themes/Om4Ob/openbox-3/desk_toggled.xbm, themes/Om4Ob/openbox-3/iconify.xbm, themes/Om4Ob/openbox-3/iconify_hover.xbm, themes/Om4Ob/openbox-3/iconify_pressed.xbm, themes/Om4Ob/openbox-3/max.xbm, themes/Om4Ob/openbox-3/max_disabled.xbm, themes/Om4Ob/openbox-3/max_hover.xbm, themes/Om4Ob/openbox-3/max_pressed.xbm, themes/Om4Ob/openbox-3/max_toggled.xbm, themes/Om4Ob/openbox-3/shade.xbm, themes/Om4Ob/openbox-3/shade_disabled.xbm, themes/Om4Ob/openbox-3/shade_hover.xbm, themes/Om4Ob/openbox-3/shade_toggled.xbm, themes/Om4Ob/openbox-3/themerc:
 	add the om4ob theme
 
 	* ChangeLog: recent changes
@@ -1527,7 +1500,7 @@
 
 	* Makefile.am: install the .desktop file again
 
-	* themes/thebear/themerc: remove old stuff
+	* themes/TheBear/openbox-3/themerc: remove old stuff
 
 	* Makefile.am: install greenz theme
 
@@ -1536,7 +1509,7 @@
 	* render/theme.c, render/theme.h:
 	renamed the _t bitmaps, and added disabled and hover bitmaps
 
-	* Makefile.am, render/theme.c, themes/bbs, themes/bluebox, themes/cthulhain, themes/deep, themes/ebox, themes/fieron, themes/fieron2, themes/flux, themes/frobozz, themes/frobust, themes/mbdtex, themes/miklos, themes/nyz, themes/nyzclone, themes/ob20, themes/operation, themes/outcomes, themes/paper, themes/purplehaaze, themes/shade, themes/steelblue, themes/steelblue2, themes/the_orange, themes/thebear/themerc, themes/trisb, themes/twice, themes/warp-xp:
+	* Makefile.am, render/theme.c, themes/TheBear/openbox-3/themerc, themes/bbs, themes/bluebox, themes/cthulhain, themes/deep, themes/ebox, themes/fieron, themes/fieron2, themes/flux, themes/frobozz, themes/frobust, themes/mbdtex, themes/miklos, themes/nyz, themes/nyzclone, themes/ob20, themes/operation, themes/outcomes, themes/paper, themes/purplehaaze, themes/shade, themes/steelblue, themes/steelblue2, themes/the_orange, themes/trisb, themes/twice, themes/warp-xp:
 	make themes inside a directory
 
 	* Makefile.am, tools/kdetrayproxy/.cvsignore, tools/kdetrayproxy/Makefile, tools/kdetrayproxy/kdetrayproxy.c:

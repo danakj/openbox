@@ -18,6 +18,7 @@ typedef struct _ObMenuParseState ObMenuParseState;
 struct _ObMenuParseState
 {
     GSList *menus;
+    ObMenu *pipe_creator;
 };
 
 static GHashTable *menu_hash = NULL;
@@ -78,6 +79,7 @@ void menu_startup(gboolean reconfig)
     menu_parse_inst = parse_startup();
 
     menu_parse_state.menus = NULL;
+    menu_parse_state.pipe_creator = NULL;
     parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
     parse_register(menu_parse_inst, "item", parse_menu_item,
                    &menu_parse_state);
@@ -117,6 +119,12 @@ void menu_shutdown(gboolean reconfig)
     menu_hash = NULL;
 }
 
+static gboolean menu_pipe_submenu(gpointer key, gpointer val, gpointer data)
+{
+    ObMenu *menu = val;
+    return menu->pipe_creator == data;
+}
+
 void menu_pipe_execute(ObMenu *self)
 {
     xmlDocPtr doc;
@@ -137,14 +145,19 @@ void menu_pipe_execute(ObMenu *self)
     if (parse_load_mem(output, strlen(output),
                        "openbox_pipe_menu", &doc, &node))
     {
+        g_hash_table_foreach_remove(menu_hash, menu_pipe_submenu, self);
         menu_clear_entries(self);
 
+        menu_parse_state.pipe_creator = self;
         menu_parse_state.menus = g_slist_prepend(NULL, self);
         parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
         menu_parse_state.menus = g_slist_remove(menu_parse_state.menus, self);
+        menu_parse_state.pipe_creator = NULL;
         xmlFreeDoc(doc);
 
         g_assert(menu_parse_state.menus == NULL);
+    } else {
+        g_warning("Invalid output from pipe-menu: %s", self->execute);
     }
 }
 
@@ -204,6 +217,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             goto parse_menu_fail;
 
         if ((menu = menu_new(name, title, NULL))) {
+            menu->pipe_creator = state->pipe_creator;
             if (parse_attr_string("execute", node, &script)) {
                 menu->execute = ob_expand_tilde(script);
             } else {

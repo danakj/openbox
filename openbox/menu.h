@@ -42,6 +42,9 @@ struct _ObMenu
     ObMenuUpdateFunc update_func;
     ObMenuExecuteFunc execute_func;
     ObMenuDestroyFunc destroy_func;
+
+    /* Pipe-menu parent, we get destroyed when it is destroyed */
+    ObMenu *pipe_creator;
 };
 
 typedef enum

@@ -1,4 +1,6 @@
 3.3:
+  * Made edge resist and Send/MoveToEdge not hit windows at layers below
+    the current one, by default. This is now configurable.
   * Fixed directional focus not getting trapped in omnipresent windows
   * Fixed focus actions when bound to the mouse, normal focus cycle is always
     linear and directional focus is totally disabled, it makes no sense

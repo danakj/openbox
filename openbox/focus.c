@@ -322,8 +322,13 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         }
         /*ft = client_focus_target(it->data);*/
         ft = it->data;
+        /* we don't use client_can_focus here, because that doesn't let you
+           focus an iconic window, but we want to be able to, so we just check
+           if the focus flags on the window allow it, and its on the current
+           desktop */
         if (ft->transients == NULL && client_normal(ft) &&
-            client_can_focus(ft)) {
+            ((ft->can_focus || ft->focus_notify) &&
+             (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL))) {
             if (ft != focus_cycle_target) { /* prevents flicker */
                 if (focus_cycle_target)
                     frame_adjust_focus(focus_cycle_target->frame, FALSE);

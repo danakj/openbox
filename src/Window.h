@@ -316,8 +316,8 @@ public:
   
   inline void setWindowNumber(int n) { window_number = n; }
   
-  Bool validateClient();
-  Bool setInputFocus();
+  bool validateClient();
+  bool setInputFocus();
 
   void setFocusFlag(Bool);
   void iconify();

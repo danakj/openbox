@@ -1353,7 +1353,7 @@ void OpenboxWindow::configure(int dx, int dy,
 }
 
 
-Bool OpenboxWindow::setInputFocus(void) {
+bool OpenboxWindow::setInputFocus(void) {
   if (((signed) (frame.x + frame.width)) < 0) {
     if (((signed) (frame.y + frame.y_border)) < 0)
       configure(frame.border_w, frame.border_w, frame.width, frame.height);
@@ -1378,39 +1378,36 @@ Bool OpenboxWindow::setInputFocus(void) {
   openbox.grab();
   if (! validateClient()) return False;
 
-  Bool ret = False;
+  bool ret = false;
 
   if (client.transient && flags.modal) {
     ret = client.transient->setInputFocus();
   } else if (! flags.focused) {
-    if (focus_mode == F_LocallyActive || focus_mode == F_Passive)
+    if (focus_mode == F_LocallyActive || focus_mode == F_Passive) {
       XSetInputFocus(display, client.window,
                       RevertToPointerRoot, CurrentTime);
-    else
-      XSetInputFocus(display, screen->getRootWindow(),
-		     RevertToNone, CurrentTime);
+      openbox.focusWindow(this);
 
-    openbox.focusWindow(this);
+      if (flags.send_focus_message) {
+        XEvent ce;
+        ce.xclient.type = ClientMessage;
+        ce.xclient.message_type = openbox.getWMProtocolsAtom();
+        ce.xclient.display = display;
+        ce.xclient.window = client.window;
+        ce.xclient.format = 32;
+        ce.xclient.data.l[0] = openbox.getWMTakeFocusAtom();
+        ce.xclient.data.l[1] = openbox.getLastTime();
+        ce.xclient.data.l[2] = 0l;
+        ce.xclient.data.l[3] = 0l;
+        ce.xclient.data.l[4] = 0l;
+        XSendEvent(display, client.window, False, NoEventMask, &ce);
+      }
 
-    if (flags.send_focus_message) {
-      XEvent ce;
-      ce.xclient.type = ClientMessage;
-      ce.xclient.message_type = openbox.getWMProtocolsAtom();
-      ce.xclient.display = display;
-      ce.xclient.window = client.window;
-      ce.xclient.format = 32;
-      ce.xclient.data.l[0] = openbox.getWMTakeFocusAtom();
-      ce.xclient.data.l[1] = openbox.getLastTime();
-      ce.xclient.data.l[2] = 0l;
-      ce.xclient.data.l[3] = 0l;
-      ce.xclient.data.l[4] = 0l;
-      XSendEvent(display, client.window, False, NoEventMask, &ce);
+      if (screen->sloppyFocus() && screen->autoRaise())
+        timer->start();
+
+      ret = true;
     }
-
-    if (screen->sloppyFocus() && screen->autoRaise())
-      timer->start();
-
-    ret = True;
   }
 
   openbox.ungrab();
@@ -3015,7 +3012,7 @@ void OpenboxWindow::shapeEvent(XShapeEvent *) {
 #endif // SHAPE
 
 
-Bool OpenboxWindow::validateClient(void) {
+bool OpenboxWindow::validateClient(void) {
   XSync(display, False);
 
   XEvent e;
@@ -3024,10 +3021,10 @@ Bool OpenboxWindow::validateClient(void) {
     XPutBackEvent(display, &e);
     openbox.ungrab();
 
-    return False;
+    return false;
   }
 
-  return True;
+  return true;
 }
 
 

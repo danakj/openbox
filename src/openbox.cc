@@ -227,6 +227,8 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   timer->fireOnce(True);
 
   ungrab();
+
+  focusWindow((OpenboxWindow *) 0);
 }
 
 
@@ -865,7 +867,7 @@ void Openbox::restart(const char *prog) {
 void Openbox::shutdown() {
   BaseDisplay::shutdown();
 
-  XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
+  focusWindow((OpenboxWindow *) 0);
 
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::shutdown));
@@ -1094,8 +1096,10 @@ void Openbox::focusWindow(OpenboxWindow *win) {
     if (tbar)
       tbar->redrawWindowLabel(true);
     focused_screen->updateNetizenWindowFocus();
-  //} else {
-  //  focused_window = (OpenboxWindow *) 0;
+  } else {
+    ASSERT(focused_screen != (BScreen *) 0);
+    XSetInputFocus(getXDisplay(), focused_screen->getRootWindow(),
+                   None, CurrentTime);
   }
 
   if (old_tbar && old_tbar != tbar)

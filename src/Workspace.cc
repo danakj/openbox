@@ -119,8 +119,6 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
           _zorder.empty() ||                    // click focus but no windows
           !_zorder.front()->setInputFocus()) {  // tried window, but wont focus
 	screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
-        XSetInputFocus(screen.getOpenbox().getXDisplay(),
-                       PointerRoot, None, CurrentTime);
       }
     }
   }

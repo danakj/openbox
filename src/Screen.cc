@@ -483,9 +483,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
     }
   }
 
-  XSetInputFocus(getBaseDisplay().getXDisplay(),
-                 PointerRoot, None, CurrentTime);
-
   XFree(children);
   XFlush(getBaseDisplay().getXDisplay());
 }

@@ -1154,9 +1154,9 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
       if (openbox.focusedWindow()) {
         openbox.focusedWindow()->setInputFocus();
         openbox.focusedWindow()->setFocusFlag(True);
-      } else {
-        XSetInputFocus(display, PointerRoot, None, CurrentTime);
-      }
+      } else
+        openbox.focusWindow((OpenboxWindow *) 0);
+
       // check to make sure that new_name[0] != 0... otherwise we have a null
       // workspace name which causes serious problems, especially for the
       // Openbox::LoadRC() method.

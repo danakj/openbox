@@ -1049,7 +1049,7 @@ void BlackboxWindow::positionWindows(void) {
 void BlackboxWindow::updateStrut(void) {
   unsigned long num = 4;
   unsigned long *data;
-  if (! xatom->getValue(client.window, XAtom::net_wm_strut, XAtom::cardinal,
+  if (! xatom->getValue(client.window, OBAtom::net_wm_strut, OBAtom::cardinal,
                         num, &data))
     return;
  
@@ -1071,27 +1071,27 @@ bool BlackboxWindow::getWindowType(void) {
 
   unsigned long *val;
   unsigned long num = (unsigned) -1;
-  if (xatom->getValue(client.window, XAtom::net_wm_window_type, XAtom::atom,
+  if (xatom->getValue(client.window, OBAtom::net_wm_window_type, OBAtom::atom,
                         num, &val)) {
     for (unsigned long i = 0; i < num; ++i) {
-      if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_desktop))
+      if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_desktop))
         window_type = Type_Desktop;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_dock))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_dock))
         window_type = Type_Dock;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_toolbar))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_toolbar))
         window_type = Type_Toolbar;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_menu))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_menu))
         window_type = Type_Menu;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_utility))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_utility))
         window_type = Type_Utility;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_splash))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_splash))
         window_type = Type_Splash;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_dialog))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_dialog))
         window_type = Type_Dialog;
-      else if (val[i] == xatom->getAtom(XAtom::net_wm_window_type_normal))
+      else if (val[i] == xatom->getAtom(OBAtom::net_wm_window_type_normal))
         window_type = Type_Normal;
       else if (val[i] ==
-               xatom->getAtom(XAtom::kde_net_wm_window_type_override))
+               xatom->getAtom(OBAtom::kde_net_wm_window_type_override))
         mwm_decorations = 0; // prevent this window from getting any decor
     }
     delete val;
@@ -1115,21 +1115,21 @@ bool BlackboxWindow::getWindowType(void) {
 
 
 void BlackboxWindow::getWMName(void) {
-  if (xatom->getValue(client.window, XAtom::net_wm_name,
-                      XAtom::utf8, client.title) &&
+  if (xatom->getValue(client.window, OBAtom::net_wm_name,
+                      OBAtom::utf8, client.title) &&
       !client.title.empty()) {
-    xatom->eraseValue(client.window, XAtom::net_wm_visible_name);
+    xatom->eraseValue(client.window, OBAtom::net_wm_visible_name);
     return;
   }
   //fall through to using WM_NAME
-  if (xatom->getValue(client.window, XAtom::wm_name, XAtom::ansi, client.title)
+  if (xatom->getValue(client.window, OBAtom::wm_name, OBAtom::ansi, client.title)
       && !client.title.empty()) {
-    xatom->eraseValue(client.window, XAtom::net_wm_visible_name);
+    xatom->eraseValue(client.window, OBAtom::net_wm_visible_name);
     return;
   }
   // fall back to an internal default
   client.title = "Unnamed";
-  xatom->setValue(client.window, XAtom::net_wm_visible_name, XAtom::utf8,
+  xatom->setValue(client.window, OBAtom::net_wm_visible_name, OBAtom::utf8,
                   client.title);
 
 #ifdef DEBUG_WITH_ID
@@ -1143,22 +1143,22 @@ void BlackboxWindow::getWMName(void) {
 
 
 void BlackboxWindow::getWMIconName(void) {
-  if (xatom->getValue(client.window, XAtom::net_wm_icon_name,
-                      XAtom::utf8, client.icon_title) && 
+  if (xatom->getValue(client.window, OBAtom::net_wm_icon_name,
+                      OBAtom::utf8, client.icon_title) && 
       !client.icon_title.empty()) {
-    xatom->eraseValue(client.window, XAtom::net_wm_visible_icon_name);
+    xatom->eraseValue(client.window, OBAtom::net_wm_visible_icon_name);
     return;
   }
   //fall through to using WM_ICON_NAME
-  if (xatom->getValue(client.window, XAtom::wm_icon_name, XAtom::ansi,
+  if (xatom->getValue(client.window, OBAtom::wm_icon_name, OBAtom::ansi,
                       client.icon_title) && 
       !client.icon_title.empty()) {
-    xatom->eraseValue(client.window, XAtom::net_wm_visible_icon_name);
+    xatom->eraseValue(client.window, OBAtom::net_wm_visible_icon_name);
     return;
   }
   // fall back to using the main name
   client.icon_title = client.title;
-  xatom->setValue(client.window, XAtom::net_wm_visible_icon_name, XAtom::utf8,
+  xatom->setValue(client.window, OBAtom::net_wm_visible_icon_name, OBAtom::utf8,
                   client.icon_title);
 }
 
@@ -1177,10 +1177,10 @@ void BlackboxWindow::getWMProtocols(void) {
   if (XGetWMProtocols(otk::OBDisplay::display, client.window,
                       &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
-      if (proto[i] == xatom->getAtom(XAtom::wm_delete_window)) {
+      if (proto[i] == xatom->getAtom(OBAtom::wm_delete_window)) {
         decorations |= Decor_Close;
         functions |= Func_Close;
-      } else if (proto[i] == xatom->getAtom(XAtom::wm_take_focus))
+      } else if (proto[i] == xatom->getAtom(OBAtom::wm_take_focus))
         flags.send_focus_message = True;
     }
 
@@ -1318,7 +1318,7 @@ void BlackboxWindow::getWMNormalHints(void) {
 void BlackboxWindow::getNetWMHints(void) {
   unsigned long workspace;
 
-  if (xatom->getValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
+  if (xatom->getValue(client.window, OBAtom::net_wm_desktop, OBAtom::cardinal,
                       workspace)) {
     if (workspace == 0xffffffff)
       flags.stuck = True;
@@ -1328,26 +1328,26 @@ void BlackboxWindow::getNetWMHints(void) {
 
   unsigned long *state;
   unsigned long num = (unsigned) -1;
-  if (xatom->getValue(client.window, XAtom::net_wm_state, XAtom::atom,
+  if (xatom->getValue(client.window, OBAtom::net_wm_state, OBAtom::atom,
                       num, &state)) {
     bool vert = False,
          horz = False;
     for (unsigned long i = 0; i < num; ++i) {
-      if (state[i] == xatom->getAtom(XAtom::net_wm_state_modal))
+      if (state[i] == xatom->getAtom(OBAtom::net_wm_state_modal))
         flags.modal = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_shaded))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_shaded))
         flags.shaded = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_skip_taskbar))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_skip_taskbar))
         flags.skip_taskbar = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_skip_pager))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_skip_pager))
         flags.skip_pager = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_fullscreen))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_fullscreen))
         flags.fullscreen = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_hidden))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_hidden))
         setState(IconicState);
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_maximized_vert))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_maximized_vert))
         vert = True;
-      else if (state[i] == xatom->getAtom(XAtom::net_wm_state_maximized_horz))
+      else if (state[i] == xatom->getAtom(OBAtom::net_wm_state_maximized_horz))
         horz = True;
     }
     if (vert && horz)
@@ -1374,8 +1374,8 @@ void BlackboxWindow::getMWMHints(void) {
   MwmHints *mwm_hint;
 
   num = PropMwmHintsElements;
-  if (! xatom->getValue(client.window, XAtom::motif_wm_hints,
-                        XAtom::motif_wm_hints, num,
+  if (! xatom->getValue(client.window, OBAtom::motif_wm_hints,
+                        OBAtom::motif_wm_hints, num,
                         (unsigned long **)&mwm_hint))
     return;
   if (num < PropMwmHintsElements) {
@@ -1438,8 +1438,8 @@ bool BlackboxWindow::getBlackboxHints(void) {
   BlackboxHints *blackbox_hint;
 
   num = PropBlackboxHintsElements;
-  if (! xatom->getValue(client.window, XAtom::blackbox_hints,
-                        XAtom::blackbox_hints, num,
+  if (! xatom->getValue(client.window, OBAtom::blackbox_hints,
+                        OBAtom::blackbox_hints, num,
                         (unsigned long **)&blackbox_hint))
     return False;
   if (num < PropBlackboxHintsElements) {
@@ -1721,11 +1721,11 @@ bool BlackboxWindow::setInputFocus(void) {
   if (flags.send_focus_message) {
     XEvent ce;
     ce.xclient.type = ClientMessage;
-    ce.xclient.message_type = xatom->getAtom(XAtom::wm_protocols);
+    ce.xclient.message_type = xatom->getAtom(OBAtom::wm_protocols);
     ce.xclient.display = otk::OBDisplay::display;
     ce.xclient.window = client.window;
     ce.xclient.format = 32;
-    ce.xclient.data.l[0] = xatom->getAtom(XAtom::wm_take_focus);
+    ce.xclient.data.l[0] = xatom->getAtom(OBAtom::wm_take_focus);
     ce.xclient.data.l[1] = blackbox->getLastTime();
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
@@ -1846,11 +1846,11 @@ void BlackboxWindow::close(void) {
 
   XEvent ce;
   ce.xclient.type = ClientMessage;
-  ce.xclient.message_type =  xatom->getAtom(XAtom::wm_protocols);
+  ce.xclient.message_type =  xatom->getAtom(OBAtom::wm_protocols);
   ce.xclient.display = otk::OBDisplay::display;
   ce.xclient.window = client.window;
   ce.xclient.format = 32;
-  ce.xclient.data.l[0] = xatom->getAtom(XAtom::wm_delete_window);
+  ce.xclient.data.l[0] = xatom->getAtom(OBAtom::wm_delete_window);
   ce.xclient.data.l[1] = CurrentTime;
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
@@ -2034,7 +2034,7 @@ void BlackboxWindow::setWorkspace(unsigned int n) {
     */
     n = 0xffffffff;
   }
-  xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal, n);
+  xatom->setValue(client.window, OBAtom::net_wm_desktop, OBAtom::cardinal, n);
 }
 
 
@@ -2087,7 +2087,7 @@ void BlackboxWindow::stick(void) {
       screen->reassociateWindow(this, BSENTINEL, True);
     // temporary fix since sticky windows suck. set the hint to what we
     // actually hold in our data.
-    xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
+    xatom->setValue(client.window, OBAtom::net_wm_desktop, OBAtom::cardinal,
                     blackbox_attrib.workspace);
 
     setState(current_state);
@@ -2099,7 +2099,7 @@ void BlackboxWindow::stick(void) {
 
     // temporary fix since sticky windows suck. set the hint to a different
     // value than that contained in the class' data.
-    xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
+    xatom->setValue(client.window, OBAtom::net_wm_desktop, OBAtom::cardinal,
                     0xffffffff);
     
     for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
@@ -2254,20 +2254,20 @@ void BlackboxWindow::setAllowedActions(void) {
   Atom actions[7];
   int num = 0;
   
-  actions[num++] = xatom->getAtom(XAtom::net_wm_action_shade);
-  actions[num++] = xatom->getAtom(XAtom::net_wm_action_change_desktop);
-  actions[num++] = xatom->getAtom(XAtom::net_wm_action_close);
+  actions[num++] = xatom->getAtom(OBAtom::net_wm_action_shade);
+  actions[num++] = xatom->getAtom(OBAtom::net_wm_action_change_desktop);
+  actions[num++] = xatom->getAtom(OBAtom::net_wm_action_close);
 
   if (functions & Func_Move)
-    actions[num++] = xatom->getAtom(XAtom::net_wm_action_move);
+    actions[num++] = xatom->getAtom(OBAtom::net_wm_action_move);
   if (functions & Func_Resize)
-    actions[num++] = xatom->getAtom(XAtom::net_wm_action_resize);
+    actions[num++] = xatom->getAtom(OBAtom::net_wm_action_resize);
   if (functions & Func_Maximize) {
-    actions[num++] = xatom->getAtom(XAtom::net_wm_action_maximize_horz);
-    actions[num++] = xatom->getAtom(XAtom::net_wm_action_maximize_vert);
+    actions[num++] = xatom->getAtom(OBAtom::net_wm_action_maximize_horz);
+    actions[num++] = xatom->getAtom(OBAtom::net_wm_action_maximize_vert);
   }
 
-  xatom->setValue(client.window, XAtom::net_wm_allowed_actions, XAtom::atom,
+  xatom->setValue(client.window, OBAtom::net_wm_allowed_actions, OBAtom::atom,
                   actions, num);
 }
 
@@ -2278,37 +2278,37 @@ void BlackboxWindow::setState(unsigned long new_state) {
   unsigned long state[2];
   state[0] = current_state;
   state[1] = None;
-  xatom->setValue(client.window, XAtom::wm_state, XAtom::wm_state, state, 2);
+  xatom->setValue(client.window, OBAtom::wm_state, OBAtom::wm_state, state, 2);
  
-  xatom->setValue(client.window, XAtom::blackbox_attributes,
-                  XAtom::blackbox_attributes, (unsigned long *)&blackbox_attrib,
+  xatom->setValue(client.window, OBAtom::blackbox_attributes,
+                  OBAtom::blackbox_attributes, (unsigned long *)&blackbox_attrib,
                   PropBlackboxAttributesElements);
 
   Atom netstate[8];
   int num = 0;
   if (flags.modal)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_modal);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_modal);
   if (flags.shaded)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_shaded);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_shaded);
   if (flags.iconic)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_hidden);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_hidden);
   if (flags.skip_taskbar)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_skip_taskbar);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_skip_taskbar);
   if (flags.skip_pager)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_skip_pager);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_skip_pager);
   if (flags.fullscreen)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_fullscreen);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_fullscreen);
   if (flags.maximized == 1 || flags.maximized == 2)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_maximized_vert);
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_maximized_vert);
   if (flags.maximized == 1 || flags.maximized == 3)
-    netstate[num++] = xatom->getAtom(XAtom::net_wm_state_maximized_horz);
-  xatom->setValue(client.window, XAtom::net_wm_state, XAtom::atom,
+    netstate[num++] = xatom->getAtom(OBAtom::net_wm_state_maximized_horz);
+  xatom->setValue(client.window, OBAtom::net_wm_state, OBAtom::atom,
                   netstate, num);
 }
 
 
 bool BlackboxWindow::getState(void) {
-  bool ret = xatom->getValue(client.window, XAtom::wm_state, XAtom::wm_state,
+  bool ret = xatom->getValue(client.window, OBAtom::wm_state, OBAtom::wm_state,
                              current_state);
   if (! ret) current_state = 0;
   return ret;
@@ -2318,8 +2318,8 @@ bool BlackboxWindow::getState(void) {
 void BlackboxWindow::restoreAttributes(void) {
   unsigned long num = PropBlackboxAttributesElements;
   BlackboxAttributes *net;
-  if (! xatom->getValue(client.window, XAtom::blackbox_attributes,
-                        XAtom::blackbox_attributes, num,
+  if (! xatom->getValue(client.window, OBAtom::blackbox_attributes,
+                        OBAtom::blackbox_attributes, num,
                         (unsigned long **)&net))
     return;
   if (num < PropBlackboxAttributesElements) {
@@ -2875,7 +2875,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
     if (flags.iconic) screen->propagateWindowName(this);
     break;
 
-  case XAtom::net_wm_name:
+  case OBAtom::net_wm_name:
   case XA_WM_NAME:
     getWMName();
 
@@ -2917,7 +2917,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
   }
 
   default:
-    if (pe->atom == xatom->getAtom(XAtom::wm_protocols)) {
+    if (pe->atom == xatom->getAtom(OBAtom::wm_protocols)) {
       getWMProtocols();
 
       if ((decorations & Decor_Close) && (! frame.close_button)) {
@@ -2927,7 +2927,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
           XMapSubwindows(otk::OBDisplay::display, frame.title);
         }
       }
-    } else if (pe->atom == xatom->getAtom(XAtom::net_wm_strut)) {
+    } else if (pe->atom == xatom->getAtom(OBAtom::net_wm_strut)) {
       updateStrut();
     }
 
@@ -3876,8 +3876,8 @@ void BlackboxWindow::restore(bool remap) {
   // erase the netwm stuff that we read when a window maps, so that it
   // doesn't persist between mappings.
   // (these are the ones read in getNetWMFlags().)
-  xatom->eraseValue(client.window, XAtom::net_wm_desktop);
-  xatom->eraseValue(client.window, XAtom::net_wm_state);
+  xatom->eraseValue(client.window, OBAtom::net_wm_desktop);
+  xatom->eraseValue(client.window, OBAtom::net_wm_state);
 
   restoreGravity(client.rect);
 

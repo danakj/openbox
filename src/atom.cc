@@ -8,15 +8,14 @@ extern "C" {
 #include <assert.h>
 }
 
-#include "xatom.hh"
+#include "atom.hh"
 #include "screen.hh"
 #include "util.hh"
+#include "otk/display.hh"
 
 namespace ob {
 
-XAtom::XAtom(Display *d) {
-  _display = d;
-
+OBAtom::OBAtom() {
   // make sure asserts fire if there is a problem
   memset(_atoms, 0, sizeof(_atoms));
 
@@ -149,11 +148,11 @@ XAtom::XAtom(Display *d) {
 /*
  * clean up the class' members
  */
-XAtom::~XAtom() {
+OBAtom::~OBAtom() {
   while (!_support_windows.empty()) {
     // make sure we aren't fucking with this somewhere
     assert(_support_windows.back() != None);
-    XDestroyWindow(_display, _support_windows.back());
+    XDestroyWindow(otk::OBDisplay::display, _support_windows.back());
     _support_windows.pop_back();
   }
 }
@@ -162,19 +161,19 @@ XAtom::~XAtom() {
 /*
  * Returns an atom from the Xserver, creating it if necessary.
  */
-Atom XAtom::create(const char *name) const {
-  return XInternAtom(_display, name, False);
+Atom OBAtom::create(const char *name) const {
+  return XInternAtom(otk::OBDisplay::display, name, False);
 }
 
 
 /*
  * Sets which atoms are supported for NETWM, by Openbox, on the root window.
  */
-void XAtom::setSupported(const otk::ScreenInfo *screen) {
+void OBAtom::setSupported(const otk::ScreenInfo *screen) {
   Window root = screen->getRootWindow();
 
   // create the netwm support window
-  Window w = XCreateSimpleWindow(_display, root, 0, 0, 1, 1, 0, 0, 0);
+  Window w = XCreateSimpleWindow(otk::OBDisplay::display, root, 0, 0, 1, 1, 0, 0, 0);
   assert(w != None);
   _support_windows.push_back(w);
   
@@ -249,13 +248,13 @@ void XAtom::setSupported(const otk::ScreenInfo *screen) {
  * Sets a window property on a window, optionally appending to the existing
  * value.
  */
-void XAtom::setValue(Window win, Atom atom, Atom type,
+void OBAtom::setValue(Window win, Atom atom, Atom type,
                      unsigned char* data, int size, int nelements,
                      bool append) const {
   assert(win != None); assert(atom != None); assert(type != None);
   assert(nelements == 0 || (nelements > 0 && data != (unsigned char *) 0));
   assert(size == 8 || size == 16 || size == 32);
-  XChangeProperty(_display, win, atom, type, size,
+  XChangeProperty(otk::OBDisplay::display, win, atom, type, size,
                   (append ? PropModeAppend : PropModeReplace),
                   data, nelements);
 }
@@ -264,7 +263,7 @@ void XAtom::setValue(Window win, Atom atom, Atom type,
 /*
  * Set a 32-bit property value on a window.
  */
-void XAtom::setValue(Window win, Atoms atom, Atoms type,
+void OBAtom::setValue(Window win, Atoms atom, Atoms type,
                      unsigned long value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
@@ -276,7 +275,7 @@ void XAtom::setValue(Window win, Atoms atom, Atoms type,
 /*
  * Set an array of 32-bit properties value on a window.
  */
-void XAtom::setValue(Window win, Atoms atom, Atoms type,
+void OBAtom::setValue(Window win, Atoms atom, Atoms type,
                      unsigned long value[], int elements) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
@@ -288,7 +287,7 @@ void XAtom::setValue(Window win, Atoms atom, Atoms type,
 /*
  * Set an string property value on a window.
  */
-void XAtom::setValue(Window win, Atoms atom, StringType type,
+void OBAtom::setValue(Window win, Atoms atom, StringType type,
                      const std::string &value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -308,7 +307,7 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
 /*
  * Set an array of string property values on a window.
  */
-void XAtom::setValue(Window win, Atoms atom, StringType type,
+void OBAtom::setValue(Window win, Atoms atom, StringType type,
                      const StringVect &strings) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -340,7 +339,7 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
  * property did not exist on the window, or has a different type/size format
  * than the user tried to retrieve.
  */
-bool XAtom::getValue(Window win, Atom atom, Atom type,
+bool OBAtom::getValue(Window win, Atom atom, Atom type,
                      unsigned long &nelements, unsigned char **value,
                      int size) const {
   assert(win != None); assert(atom != None); assert(type != None);
@@ -355,7 +354,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   bool ret = False;
 
   // try get the first element
-  result = XGetWindowProperty(_display, win, atom, 0l, 1l, False,
+  result = XGetWindowProperty(otk::OBDisplay::display, win, atom, 0l, 1l, False,
                               AnyPropertyType, &ret_type, &ret_size,
                               &nelements, &ret_bytes, &c_val);
   ret = (result == Success && ret_type == type && ret_size == size &&
@@ -373,7 +372,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
       int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
       if (remain > size/8 * (signed)maxread) // dont get more than the max
         remain = size/8 * (signed)maxread;
-      result = XGetWindowProperty(_display, win, atom, 0l, remain, False, type,
+      result = XGetWindowProperty(otk::OBDisplay::display, win, atom, 0l, remain, False, type,
                                   &ret_type, &ret_size, &nelements, &ret_bytes,
                                   &c_val);
       ret = (result == Success && ret_type == type && ret_size == size &&
@@ -398,7 +397,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
 /*
  * Gets a 32-bit property's value from a window.
  */
-bool XAtom::getValue(Window win, Atoms atom, Atoms type,
+bool OBAtom::getValue(Window win, Atoms atom, Atoms type,
                          unsigned long &nelements,
                          unsigned long **value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -411,7 +410,7 @@ bool XAtom::getValue(Window win, Atoms atom, Atoms type,
 /*
  * Gets a single 32-bit property's value from a window.
  */
-bool XAtom::getValue(Window win, Atoms atom, Atoms type,
+bool OBAtom::getValue(Window win, Atoms atom, Atoms type,
                      unsigned long &value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
@@ -429,7 +428,7 @@ bool XAtom::getValue(Window win, Atoms atom, Atoms type,
 /*
  * Gets an string property's value from a window.
  */
-bool XAtom::getValue(Window win, Atoms atom, StringType type,
+bool OBAtom::getValue(Window win, Atoms atom, StringType type,
                      std::string &value) const {
   unsigned long n = 1;
   StringVect s;
@@ -441,7 +440,7 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
 }
 
 
-bool XAtom::getValue(Window win, Atoms atom, StringType type,
+bool OBAtom::getValue(Window win, Atoms atom, StringType type,
                      unsigned long &nelements, StringVect &strings) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
@@ -484,13 +483,13 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
 /*
  * Removes a property entirely from a window.
  */
-void XAtom::eraseValue(Window win, Atoms atom) const {
+void OBAtom::eraseValue(Window win, Atoms atom) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
-  XDeleteProperty(_display, win, _atoms[atom]);
+  XDeleteProperty(otk::OBDisplay::display, win, _atoms[atom]);
 }
 
 
-void XAtom::sendClientMessage(Window target, Atoms type, Window about,
+void OBAtom::sendClientMessage(Window target, Atoms type, Window about,
                               long data, long data1, long data2,
                               long data3, long data4) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -507,7 +506,7 @@ void XAtom::sendClientMessage(Window target, Atoms type, Window about,
   e.xclient.data.l[3] = data3;
   e.xclient.data.l[4] = data4;
 
-  XSendEvent(_display, target, False,
+  XSendEvent(otk::OBDisplay::display, target, False,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
 }

@@ -104,7 +104,7 @@ public:
 private:
   Blackbox *blackbox;
   BScreen *screen;
-  XAtom *xatom;
+  OBAtom *xatom;
   otk::OBTimer *timer;
   BlackboxAttributes blackbox_attrib;
 

@@ -1,6 +1,6 @@
-// XAtom.h for Openbox
-#ifndef   __XAtom_h
-#define   __XAtom_h
+// OBAtom.h for Openbox
+#ifndef   __atom_hh
+#define   __atom_hh
 
 /*! @file xatom.hh
   @brief Provides access to atoms on the display
@@ -20,7 +20,7 @@ extern "C" {
 
 namespace ob {
 
-class XAtom {
+class OBAtom {
 public:
   enum Atoms {
     // types
@@ -152,7 +152,6 @@ public:
 private:
   typedef std::vector<Window> SupportWindows;
   
-  Display              *_display;
   // windows used to specify support for NETWM
   SupportWindows        _support_windows;
   Atom                  _atoms[NUM_ATOMS];
@@ -166,14 +165,14 @@ private:
                 int size) const;
 
   // no copying!!
-  XAtom(const XAtom &);
-  XAtom& operator=(const XAtom&);
+  OBAtom(const OBAtom &);
+  OBAtom& operator=(const OBAtom&);
 
 public:
   typedef std::vector<std::string> StringVect;
   
-  XAtom(Display *d);
-  virtual ~XAtom();
+  OBAtom();
+  virtual ~OBAtom();
 
   // setup support on a screen, each screen should call this once in its
   // constructor.
@@ -216,4 +215,4 @@ public:
 
 }
 
-#endif // __XAtom_h
+#endif // __atom_hh

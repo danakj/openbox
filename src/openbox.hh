@@ -16,6 +16,7 @@ extern "C" {
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
 #include "xeventhandler.hh"
+#include "atom.hh"
 
 namespace ob {
 
@@ -112,7 +113,7 @@ public:
   //! The main function of the Openbox class
   /*!
     This function should be called after instantiating the Openbox class.
-    Loops indefinately while handling all events in the application.
+    It loops indefinately while handling all events for the application.
     The Openbox::shutdown method will cause this function to exit.
   */
   void eventLoop();

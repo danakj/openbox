@@ -10,7 +10,7 @@ extern "C" {
 #include <string>
 #include <vector>
 
-#include "xatom.hh"
+#include "atom.hh"
 
 namespace ob {
 
@@ -25,7 +25,7 @@ class Workspace {
 private:
   BScreen *screen;
   BlackboxWindow *lastfocus;
-  XAtom *xatom;
+  OBAtom *xatom;
 
   BlackboxWindowList stackingList, windowList;
 

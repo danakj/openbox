@@ -29,7 +29,7 @@ extern "C" {
 #include "openbox.hh"
 #include "configuration.hh"
 #include "timer.hh"
-#include "xatom.hh"
+#include "atom.hh"
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -112,7 +112,7 @@ private:
   BlackboxWindow *focused_window, *changing_window;
   otk::OBTimer *timer;
   Configuration config;
-  XAtom *xatom;
+  OBAtom *xatom;
 
   bool no_focus, reconfigure_wait;
   Time last_time;
@@ -158,7 +158,7 @@ public:
   void removeWindowSearch(Window window);
   void removeGroupSearch(Window window);
 
-  inline XAtom *getXAtom(void) { return xatom; }
+  inline OBAtom *getXAtom(void) { return xatom; }
 
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
   inline BlackboxWindow *getChangingWindow(void) { return changing_window; }

@@ -83,7 +83,7 @@ using std::string;
 #include "util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
-#include "xatom.hh"
+#include "atom.hh"
 
 namespace ob {
 
@@ -120,7 +120,7 @@ Blackbox::Blackbox(int argc, char **m_argv, char *rc)
 
   load_rc();
 
-  xatom = new XAtom(otk::OBDisplay::display);
+  xatom = new OBAtom();
 
   cursor.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
   cursor.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);
@@ -558,7 +558,7 @@ void Blackbox::process_event(XEvent *e) {
 
   case ClientMessage: {
     if (e->xclient.format == 32) {
-      if (e->xclient.message_type == xatom->getAtom(XAtom::wm_change_state)) {
+      if (e->xclient.message_type == xatom->getAtom(OBAtom::wm_change_state)) {
         // WM_CHANGE_STATE message
         BlackboxWindow *win = searchWindow(e->xclient.window);
         if (! win || ! win->validateClient()) return;
@@ -568,9 +568,9 @@ void Blackbox::process_event(XEvent *e) {
         if (e->xclient.data.l[0] == NormalState)
           win->deiconify();
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::blackbox_change_workspace) || 
+                 xatom->getAtom(OBAtom::blackbox_change_workspace) || 
                  e->xclient.message_type == 
-                 xatom->getAtom(XAtom::net_current_desktop)) {
+                 xatom->getAtom(OBAtom::net_current_desktop)) {
         // NET_CURRENT_DESKTOP message
         BScreen *screen = searchScreen(e->xclient.window);
 
@@ -578,14 +578,14 @@ void Blackbox::process_event(XEvent *e) {
         if (screen && workspace < screen->getWorkspaceCount())
           screen->changeWorkspaceID(workspace);
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::blackbox_change_window_focus)) {
+                 xatom->getAtom(OBAtom::blackbox_change_window_focus)) {
         // TEMP HACK TO KEEP BBKEYS WORKING
         BlackboxWindow *win = searchWindow(e->xclient.window);
 
         if (win && win->isVisible() && win->setInputFocus())
           win->installColormap(True);
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::net_active_window)) {
+                 xatom->getAtom(OBAtom::net_active_window)) {
         // NET_ACTIVE_WINDOW
         BlackboxWindow *win = searchWindow(e->xclient.window);
 
@@ -606,7 +606,7 @@ void Blackbox::process_event(XEvent *e) {
           }
         }
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::blackbox_cycle_window_focus)) {
+                 xatom->getAtom(OBAtom::blackbox_cycle_window_focus)) {
         // BLACKBOX_CYCLE_WINDOW_FOCUS
         BScreen *screen = searchScreen(e->xclient.window);
 
@@ -617,7 +617,7 @@ void Blackbox::process_event(XEvent *e) {
             screen->nextFocus();
         }
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::net_wm_desktop)) {
+                 xatom->getAtom(OBAtom::net_wm_desktop)) {
         // NET_WM_DESKTOP
         BlackboxWindow *win = searchWindow(e->xclient.window);
 
@@ -640,7 +640,7 @@ void Blackbox::process_event(XEvent *e) {
           }
         }
       } else if (e->xclient.message_type == 
-                 xatom->getAtom(XAtom::blackbox_change_attributes)) {
+                 xatom->getAtom(OBAtom::blackbox_change_attributes)) {
         // BLACKBOX_CHANGE_ATTRIBUTES
         BlackboxWindow *win = searchWindow(e->xclient.window);
 
@@ -655,45 +655,45 @@ void Blackbox::process_event(XEvent *e) {
           win->changeBlackboxHints(&net);
         }
       } else if (e->xclient.message_type == 
-                xatom->getAtom(XAtom::net_number_of_desktops)) {
+                xatom->getAtom(OBAtom::net_number_of_desktops)) {
         // NET_NUMBER_OF_DESKTOPS
         BScreen *screen = searchScreen(e->xclient.window);
         
         if (e->xclient.data.l[0] > 0)
           screen->changeWorkspaceCount((unsigned) e->xclient.data.l[0]);
       } else if (e->xclient.message_type ==
-                 xatom->getAtom(XAtom::net_close_window)) {
+                 xatom->getAtom(OBAtom::net_close_window)) {
         // NET_CLOSE_WINDOW
         BlackboxWindow *win = searchWindow(e->xclient.window);
         if (win && win->validateClient())
           win->close(); // could this be smarter?
       } else if (e->xclient.message_type ==
-                 xatom->getAtom(XAtom::net_wm_moveresize)) {
+                 xatom->getAtom(OBAtom::net_wm_moveresize)) {
         // NET_WM_MOVERESIZE
         BlackboxWindow *win = searchWindow(e->xclient.window);
         if (win && win->validateClient()) {
           int x_root = e->xclient.data.l[0],
               y_root = e->xclient.data.l[1];
           if ((Atom) e->xclient.data.l[2] ==
-              xatom->getAtom(XAtom::net_wm_moveresize_move)) {
+              xatom->getAtom(OBAtom::net_wm_moveresize_move)) {
             win->beginMove(x_root, y_root);
           } else {
             if ((Atom) e->xclient.data.l[2] ==
-                xatom->getAtom(XAtom::net_wm_moveresize_size_topleft))
+                xatom->getAtom(OBAtom::net_wm_moveresize_size_topleft))
               win->beginResize(x_root, y_root, BlackboxWindow::TopLeft);
             else if ((Atom) e->xclient.data.l[2] ==
-                     xatom->getAtom(XAtom::net_wm_moveresize_size_topright))
+                     xatom->getAtom(OBAtom::net_wm_moveresize_size_topright))
               win->beginResize(x_root, y_root, BlackboxWindow::TopRight);
             else if ((Atom) e->xclient.data.l[2] ==
-                     xatom->getAtom(XAtom::net_wm_moveresize_size_bottomleft))
+                     xatom->getAtom(OBAtom::net_wm_moveresize_size_bottomleft))
               win->beginResize(x_root, y_root, BlackboxWindow::BottomLeft);
             else if ((Atom) e->xclient.data.l[2] ==
-                xatom->getAtom(XAtom::net_wm_moveresize_size_bottomright))
+                xatom->getAtom(OBAtom::net_wm_moveresize_size_bottomright))
               win->beginResize(x_root, y_root, BlackboxWindow::BottomRight);
           }
         }
       } else if (e->xclient.message_type ==
-                 xatom->getAtom(XAtom::net_wm_state)) {
+                 xatom->getAtom(OBAtom::net_wm_state)) {
         // NET_WM_STATE
         BlackboxWindow *win = searchWindow(e->xclient.window);
         if (win && win->validateClient()) {
@@ -707,10 +707,10 @@ void Blackbox::process_event(XEvent *e) {
 
             if ((Atom) e->xclient.data.l[0] == 1) {
               // ADD
-              if (state[i] == xatom->getAtom(XAtom::net_wm_state_modal)) {
+              if (state[i] == xatom->getAtom(OBAtom::net_wm_state_modal)) {
                 win->setModal(True);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_vert)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_vert)) {
                 if (win->isMaximizedHoriz()) {
                   win->maximize(0); // unmaximize
                   win->maximize(1); // full
@@ -718,7 +718,7 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(2); // vert
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_horz)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_horz)) {
                 if (win->isMaximizedVert()) {
                   win->maximize(0); // unmaximize
                   win->maximize(1); // full
@@ -726,25 +726,25 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(3); // horiz
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_shaded)) {
+                         xatom->getAtom(OBAtom::net_wm_state_shaded)) {
                 if (! win->isShaded())
                   win->shade();
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_taskbar)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_taskbar)) {
                 win->setSkipTaskbar(True);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_pager)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_pager)) {
                 win->setSkipPager(True);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_fullscreen)) {
+                         xatom->getAtom(OBAtom::net_wm_state_fullscreen)) {
                 win->setFullscreen(True);
               }
             } else if (action == 0) {
               // REMOVE
-              if (state[i] == xatom->getAtom(XAtom::net_wm_state_modal)) {
+              if (state[i] == xatom->getAtom(OBAtom::net_wm_state_modal)) {
                 win->setModal(False);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_vert)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_vert)) {
                 if (win->isMaximizedFull()) {
                   win->maximize(0); // unmaximize
                   win->maximize(3); // horiz
@@ -752,7 +752,7 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(0); // unmaximize
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_horz)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_horz)) {
                 if (win->isMaximizedFull()) {
                   win->maximize(0); // unmaximize
                   win->maximize(2); // vert
@@ -760,25 +760,25 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(0); // unmaximize
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_shaded)) {
+                         xatom->getAtom(OBAtom::net_wm_state_shaded)) {
                 if (win->isShaded())
                   win->shade();
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_taskbar)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_taskbar)) {
                 win->setSkipTaskbar(False);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_pager)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_pager)) {
                 win->setSkipPager(False);
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_fullscreen)) {
+                         xatom->getAtom(OBAtom::net_wm_state_fullscreen)) {
                 win->setFullscreen(False);
               }
             } else if (action == 2) {
               // TOGGLE
-              if (state[i] == xatom->getAtom(XAtom::net_wm_state_modal)) {
+              if (state[i] == xatom->getAtom(OBAtom::net_wm_state_modal)) {
                 win->setModal(! win->isModal());
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_vert)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_vert)) {
                 if (win->isMaximizedFull()) {
                   win->maximize(0); // unmaximize
                   win->maximize(3); // horiz
@@ -791,7 +791,7 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(2); // vert
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_maximized_horz)) {
+                         xatom->getAtom(OBAtom::net_wm_state_maximized_horz)) {
                 if (win->isMaximizedFull()) {
                   win->maximize(0); // unmaximize
                   win->maximize(2); // vert
@@ -804,16 +804,16 @@ void Blackbox::process_event(XEvent *e) {
                   win->maximize(3); // horiz
                 }
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_shaded)) {
+                         xatom->getAtom(OBAtom::net_wm_state_shaded)) {
                 win->shade();
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_taskbar)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_taskbar)) {
                 win->setSkipTaskbar(! win->skipTaskbar());
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_skip_pager)) {
+                         xatom->getAtom(OBAtom::net_wm_state_skip_pager)) {
                 win->setSkipPager(! win->skipPager());
               } else if (state[i] ==
-                         xatom->getAtom(XAtom::net_wm_state_fullscreen)) {
+                         xatom->getAtom(OBAtom::net_wm_state_fullscreen)) {
                 win->setFullscreen(! win->isFullscreen());
               }
             }

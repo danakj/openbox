@@ -30,7 +30,7 @@ extern "C" {
 
 namespace ob {
 
-class XAtom;
+class OBAtom;
 struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
@@ -66,7 +66,7 @@ private:
   Blackbox *blackbox;
   otk::BImageControl *image_control;
   Configuration *config;
-  XAtom *xatom;
+  OBAtom *xatom;
 
   BlackboxWindowList iconList, windowList;
 

@@ -211,13 +211,13 @@ int main(int argc, char **argv)
                 }
             }
             event_startup(reconfigure);
-            grab_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             focus_startup(reconfigure);
             window_startup(reconfigure);
             sn_startup(reconfigure);
             screen_startup(reconfigure);
+            grab_startup(reconfigure);
             group_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
@@ -257,11 +257,11 @@ int main(int argc, char **argv)
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
             group_shutdown(reconfigure);
+            grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
-            grab_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
         } while (reconfigure);

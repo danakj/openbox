@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "prop.h"
+#include "config.h"
 #include "screen.h"
 #include "client.h"
 #include "frame.h"
@@ -148,13 +149,23 @@ gboolean screen_annex()
 
 void screen_startup()
 {
+    GSList *it;
+
     screen_desktop_names = g_ptr_array_new();
      
     /* get the initial size */
     screen_resize();
 
+    /* set the names */
+    for (it = config_desktops_names; it; it = it->next)
+        g_ptr_array_add(screen_desktop_names, it->data); /* dont strdup */
+    PROP_SETSA(ob_root, net_desktop_names, utf8, screen_desktop_names);
+    g_ptr_array_set_size(screen_desktop_names, 0); /* rm the ptrs so they dont
+                                                      get frees when we
+                                                      update the desktop
+                                                      names */
     screen_num_desktops = 0;
-    screen_set_num_desktops(4);
+    screen_set_num_desktops(config_desktops_num);
     screen_desktop = 0;
     screen_set_desktop(0);
 

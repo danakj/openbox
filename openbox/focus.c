@@ -1,6 +1,7 @@
 #include "event.h"
 #include "openbox.h"
 #include "client.h"
+#include "config.h"
 #include "frame.h"
 #include "screen.h"
 #include "group.h"
@@ -18,43 +19,8 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
 Window focus_backup = None;
-gboolean focus_new = TRUE;
-gboolean focus_follow = FALSE;
-static gboolean focus_last = TRUE;
-static gboolean focus_last_on_desktop = TRUE;
 
 static gboolean noreorder = 0;
-
-static void parse_assign(char *name, ParseToken *value)
-{
-    if (!g_ascii_strcasecmp(name, "focusnew")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            focus_new = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "followmouse")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            focus_follow = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "focuslast")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            focus_last = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "focuslastondesktop")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            focus_last_on_desktop = value->data.bool;
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
-}
 
 void focus_startup()
 {
@@ -64,10 +30,6 @@ void focus_startup()
     XSetWindowAttributes attrib;
 
     focus_client = NULL;
-    focus_new = TRUE;
-    focus_follow = FALSE;
-    focus_last = TRUE;
-    focus_last_on_desktop = TRUE;
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
@@ -78,8 +40,6 @@ void focus_startup()
 
     /* start with nothing focused */
     focus_set_client(NULL);
-
-    parse_reg_section("focus", NULL, parse_assign);
 }
 
 void focus_shutdown()
@@ -176,8 +136,9 @@ void focus_fallback(FallbackType type)
     */
     focus_set_client(NULL);
 
-    if (!(type == Fallback_Desktop ? focus_last_on_desktop : focus_last)) {
-        if (focus_follow) focus_under_pointer();
+    if (!(type == Fallback_Desktop ?
+          config_focus_last_on_desktop : config_focus_last)) {
+        if (config_focus_follow) focus_under_pointer();
         return;
     }
 

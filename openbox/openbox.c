@@ -13,6 +13,7 @@
 #include "plugin.h"
 #include "timer.h"
 #include "group.h"
+#include "config.h"
 #include "gettext.h"
 #include "../render/render.h"
 #include "../render/font.h"
@@ -159,11 +160,12 @@ int main(int argc, char **argv)
 	event_startup();
         grab_startup();
         engine_startup();
-	focus_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
         plugin_loadall();
 
+        /* set up the kernel config shit */
+        config_startup();
         /* parse/load user options */
         parse_rc();
         /* we're done with parsing now, kill it */
@@ -172,6 +174,7 @@ int main(int argc, char **argv)
         /* load the engine specified in the rc */
 	engine_load();
 
+	focus_startup();
 	screen_startup();
         group_startup();
 	client_startup();
@@ -199,6 +202,7 @@ int main(int argc, char **argv)
 	event_shutdown();
 	render_shutdown();
 	timer_shutdown();
+        config_shutdown();
     }
 
     dispatch_shutdown();

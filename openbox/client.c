@@ -10,6 +10,7 @@
 #include "stacking.h"
 #include "dispatch.h"
 #include "group.h"
+#include "config.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -138,7 +139,7 @@ void client_manage_all()
     client_startup_stack_order = NULL;
     client_startup_stack_size = 0;
 
-    if (focus_new)
+    if (config_focus_new)
         focus_fallback(Fallback_NoFocus);
 }
 
@@ -237,7 +238,7 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
 
-    if (ob_state != State_Starting && focus_new)
+    if (ob_state != State_Starting && config_focus_new)
         client_focus(self);
 
     /* update the list hints */
@@ -1811,13 +1812,13 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
         focus_order[old] = g_list_remove(focus_order[old], self);
     if (target == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i) {
-            if (focus_new)
+            if (config_focus_new)
                 focus_order[i] = g_list_prepend(focus_order[i], self);
             else
                 focus_order[i] = g_list_append(focus_order[i], self);
         }
     } else {
-        if (focus_new)
+        if (config_focus_new)
             focus_order[target] = g_list_prepend(focus_order[target], self);
         else
             focus_order[target] = g_list_append(focus_order[target], self);

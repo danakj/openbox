@@ -1,6 +1,6 @@
 #include "obengine.h"
 #include "kernel/openbox.h"
-#include "kernel/engine.h"
+#include "kernel/config.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -119,7 +119,7 @@ static gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
 
-	button_dir = g_strdup_printf("%s_buttons", engine_theme);
+	button_dir = g_strdup_printf("%s_buttons", config_engine_theme);
 
         s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
                              "openbox", button_dir, retvalue.addr, NULL);
@@ -136,8 +136,8 @@ static gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
                 char *themename;
 
                 g_free(s);
-                themename = g_path_get_basename(engine_theme);
-                s = g_strdup_printf("%s/%s_buttons/%s", engine_theme,
+                themename = g_path_get_basename(config_engine_theme);
+                s = g_strdup_printf("%s/%s_buttons/%s", config_engine_theme,
                                     themename, retvalue.addr);
                 g_free(themename);
                 if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
@@ -275,10 +275,10 @@ gboolean obtheme_load()
     Justify winjust;
     char *winjuststr;
 
-    if (engine_theme) {
-	db = loaddb(engine_theme);
+    if (config_engine_theme) {
+	db = loaddb(config_engine_theme);
         if (db == NULL) {
-	    g_warning("Failed to load the theme '%s'", engine_theme);
+	    g_warning("Failed to load the theme '%s'", config_engine_theme);
 	    g_message("Falling back to the default: '%s'", DEFAULT_THEME);
 	}
     }
@@ -289,15 +289,15 @@ gboolean obtheme_load()
 	    return FALSE;
 	}
         /* set it to what was loaded */
-        g_free(engine_theme);
-        engine_theme = g_strdup(DEFAULT_THEME);
+        g_free(config_engine_theme);
+        config_engine_theme = g_strdup(DEFAULT_THEME);
     }
 
     /* load the font, not from the theme file tho, its in the config */
 
-    ob_s_winfont = font_open(engine_font);
-    ob_s_winfont_height = font_height(ob_s_winfont, engine_shadow,
-                                      engine_shadow_offset);
+    ob_s_winfont = font_open(config_engine_font);
+    ob_s_winfont_height = font_height(ob_s_winfont, config_engine_shadow,
+                                      config_engine_shadow_offset);
 
     winjust = Justify_Left;
     if (read_string(db, "window.justify", &winjuststr)) {
@@ -494,32 +494,37 @@ gboolean obtheme_load()
     ob_a_focused_label->texture[0].type = Text;
     ob_a_focused_label->texture[0].data.text.justify = winjust;
     ob_a_focused_label->texture[0].data.text.font = ob_s_winfont;
-    ob_a_focused_label->texture[0].data.text.shadow = engine_shadow;
-    ob_a_focused_label->texture[0].data.text.offset = engine_shadow_offset;
-    ob_a_focused_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_a_focused_label->texture[0].data.text.shadow = config_engine_shadow;
+    ob_a_focused_label->texture[0].data.text.offset =
+        config_engine_shadow_offset;
+    ob_a_focused_label->texture[0].data.text.tint = config_engine_shadow_tint;
     ob_a_focused_label->texture[0].data.text.color = ob_s_title_focused_color;
     ob_app_hilite_label->texture[0].type = Text;
     ob_app_hilite_label->texture[0].data.text.justify = winjust;
     ob_app_hilite_label->texture[0].data.text.font = ob_s_winfont;
-    ob_app_hilite_label->texture[0].data.text.shadow = engine_shadow;
-    ob_app_hilite_label->texture[0].data.text.offset = engine_shadow_offset;
-    ob_app_hilite_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_app_hilite_label->texture[0].data.text.shadow = config_engine_shadow;
+    ob_app_hilite_label->texture[0].data.text.offset =
+        config_engine_shadow_offset;
+    ob_app_hilite_label->texture[0].data.text.tint = config_engine_shadow_tint;
     ob_app_hilite_label->texture[0].data.text.color = ob_s_title_focused_color;
 
     ob_a_unfocused_label->texture[0].type = Text;
     ob_a_unfocused_label->texture[0].data.text.justify = winjust;
     ob_a_unfocused_label->texture[0].data.text.font = ob_s_winfont;
-    ob_a_unfocused_label->texture[0].data.text.shadow = engine_shadow;
-    ob_a_unfocused_label->texture[0].data.text.offset = engine_shadow_offset;
-    ob_a_unfocused_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_a_unfocused_label->texture[0].data.text.shadow = config_engine_shadow;
+    ob_a_unfocused_label->texture[0].data.text.offset =
+        config_engine_shadow_offset;
+    ob_a_unfocused_label->texture[0].data.text.tint =config_engine_shadow_tint;
     ob_a_unfocused_label->texture[0].data.text.color =
         ob_s_title_unfocused_color;
     ob_app_unhilite_label->texture[0].type = Text;
     ob_app_unhilite_label->texture[0].data.text.justify = winjust;
     ob_app_unhilite_label->texture[0].data.text.font = ob_s_winfont;
-    ob_app_unhilite_label->texture[0].data.text.shadow = engine_shadow;
-    ob_app_unhilite_label->texture[0].data.text.offset = engine_shadow_offset;
-    ob_app_unhilite_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_app_unhilite_label->texture[0].data.text.shadow = config_engine_shadow;
+    ob_app_unhilite_label->texture[0].data.text.offset =
+        config_engine_shadow_offset;
+    ob_app_unhilite_label->texture[0].data.text.tint =
+        config_engine_shadow_tint;
     ob_app_unhilite_label->texture[0].data.text.color =
         ob_s_title_unfocused_color;
 

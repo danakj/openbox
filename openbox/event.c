@@ -2,6 +2,7 @@
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"
+#include "config.h"
 #include "screen.h"
 #include "frame.h"
 #include "engine.h"
@@ -388,7 +389,7 @@ static void event_handle_client(Client *client, XEvent *e)
                                                      client);
                 focus_order[desktop] = g_list_prepend(focus_order[desktop],
                                                       client);
-            } else if (focus_follow) {
+            } else if (config_focus_follow) {
 #ifdef DEBUG_FOCUS
                 g_message("EnterNotify on %lx, focusing window",
                           client->window);

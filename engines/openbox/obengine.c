@@ -4,7 +4,7 @@
 #include "kernel/openbox.h"
 #include "kernel/extensions.h"
 #include "kernel/dispatch.h"
-#include "kernel/engine.h"
+#include "kernel/config.h"
 
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
@@ -703,7 +703,7 @@ static void layout_title(ObFrame *self)
 
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_s_bevel + 1) * 2;
-    for (lc = engine_layout; *lc != '\0'; ++lc) {
+    for (lc = config_engine_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
@@ -761,7 +761,7 @@ static void layout_title(ObFrame *self)
     if (!c) XUnmapWindow(ob_display, self->close);
 
     x = ob_s_bevel + 1;
-    for (lc = engine_layout; *lc != '\0'; ++lc) {
+    for (lc = config_engine_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;

@@ -265,6 +265,20 @@ gboolean prop_get_strings(Window win, Atom prop, Atom type,
     return FALSE;
 }
 
+void prop_set_strings(Window win, Atom prop, Atom type, GPtrArray *data)
+{
+    GString *str;
+    guint i;
+
+    str = g_string_sized_new(0);
+    for (i = 0; i < data->len; ++i) {
+        str = g_string_append(str, data->pdata[i]);
+        str = g_string_append_c(str, '\0');
+    }
+    XChangeProperty(ob_display, win, prop, type, 8,
+                    PropModeReplace, (guchar*)str->str, str->len);
+}
+
 void prop_erase(Window win, Atom prop)
 {
     XDeleteProperty(ob_display, win, prop);

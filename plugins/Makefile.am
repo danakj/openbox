@@ -7,10 +7,6 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 
 plugin_LTLIBRARIES=resistance.la
 
-focus_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Focus\"
-focus_la_LDFLAGS=-module -avoid-version
-focus_la_SOURCES=focus.c
-
 resistance_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Resistance\"
 resistance_la_LDFLAGS=-module -avoid-version
 resistance_la_SOURCES=resistance.c

@@ -38,8 +38,8 @@
 #include "Workspacemenu.h"
 
 
-Clientmenu::Clientmenu(Workspace &ws) : Basemenu(*ws.getScreen()),
-  screen(*ws.getScreen()), wkspc(ws)
+Clientmenu::Clientmenu(Workspace &ws) : Basemenu(ws.getScreen()),
+  screen(ws.getScreen()), wkspc(ws)
 {
   setInternalMenu();
 }

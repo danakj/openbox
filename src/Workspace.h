@@ -35,7 +35,7 @@ class OpenboxWindow;
 
 class Workspace {
 private:
-  BScreen *screen;
+  BScreen &screen;
   OpenboxWindow *lastfocus;
   Clientmenu *clientmenu;
 
@@ -52,10 +52,10 @@ protected:
 
 
 public:
-  Workspace(BScreen *, int = 0);
+  Workspace(BScreen &, int = 0);
   ~Workspace(void);
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen &getScreen(void) { return screen; }
 
   inline OpenboxWindow *getLastFocusedWindow(void) { return lastfocus; }
   

@@ -394,12 +394,12 @@ BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
   Workspace *wkspc = (Workspace *) 0;
   if (resource.workspaces != 0) {
     for (int i = 0; i < resource.workspaces; ++i) {
-      wkspc = new Workspace(this, workspacesList->count());
+      wkspc = new Workspace(*this, workspacesList->count());
       workspacesList->insert(wkspc);
       workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
     }
   } else {
-    wkspc = new Workspace(this, workspacesList->count());
+    wkspc = new Workspace(*this, workspacesList->count());
     workspacesList->insert(wkspc);
     workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
   }
@@ -1338,7 +1338,7 @@ OpenboxWindow *BScreen::getIcon(int index) {
 
 
 int BScreen::addWorkspace(void) {
-  Workspace *wkspc = new Workspace(this, workspacesList->count());
+  Workspace *wkspc = new Workspace(*this, workspacesList->count());
   workspacesList->insert(wkspc);
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),

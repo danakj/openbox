@@ -59,8 +59,7 @@
 #include <vector>
 typedef vector<Rect> rectList;
 
-Workspace::Workspace(BScreen *scrn, int i) {
-  screen = scrn;
+Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
 
   cascade_x = cascade_y = 32;
 
@@ -73,7 +72,7 @@ Workspace::Workspace(BScreen *scrn, int i) {
   lastfocus = (OpenboxWindow *) 0;
 
   name = (char *) 0;
-  char *tmp = screen->getNameOfWorkspace(id);
+  char *tmp = screen.getNameOfWorkspace(id);
   setName(tmp);
 }
 
@@ -102,7 +101,7 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   clientmenu->insert((const char **) w->getTitle());
   clientmenu->update();
 
-  screen->updateNetizenWindowAdd(w->getClientWindow(), id);
+  screen.updateNetizenWindowAdd(w->getClientWindow(), id);
 
   raiseWindow(w);
 
@@ -119,14 +118,14 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
     if (w->isTransient() && w->getTransientFor() &&
 	w->getTransientFor()->isVisible()) {
       w->getTransientFor()->setInputFocus();
-    } else if (screen->isSloppyFocus()) {
-      screen->getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
+    } else if (screen.isSloppyFocus()) {
+      screen.getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
     } else {
       OpenboxWindow *top = stackingList->first();
       if (! top || ! top->setInputFocus()) {
-	screen->getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
-	XSetInputFocus(screen->getOpenbox().getXDisplay(),
-		       screen->getToolbar()->getWindowID(),
+	screen.getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
+	XSetInputFocus(screen.getOpenbox().getXDisplay(),
+		       screen.getToolbar()->getWindowID(),
 		       RevertToParent, CurrentTime);
       }
     }
@@ -139,7 +138,7 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
 
-  screen->updateNetizenWindowDel(w->getClientWindow());
+  screen.updateNetizenWindowDel(w->getClientWindow());
 
   LinkedListIterator<OpenboxWindow> it(windowList);
   OpenboxWindow *bw = it.current();
@@ -198,10 +197,10 @@ void Workspace::raiseWindow(OpenboxWindow *w) {
   win = bottom;
   while (True) {
     *(curr++) = win->getFrameWindow();
-    screen->updateNetizenWindowRaise(win->getClientWindow());
+    screen.updateNetizenWindowRaise(win->getClientWindow());
 
     if (! win->isIconic()) {
-      wkspc = screen->getWorkspace(win->getWorkspaceNumber());
+      wkspc = screen.getWorkspace(win->getWorkspaceNumber());
       wkspc->stackingList->remove(win);
       wkspc->stackingList->insert(win, 0);
     }
@@ -212,7 +211,7 @@ void Workspace::raiseWindow(OpenboxWindow *w) {
     win = win->getTransient();
   }
 
-  screen->raiseWindows(nstack, i);
+  screen.raiseWindows(nstack, i);
 
   delete [] nstack;
 }
@@ -237,10 +236,10 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
 
   while (True) {
     *(curr++) = win->getFrameWindow();
-    screen->updateNetizenWindowLower(win->getClientWindow());
+    screen.updateNetizenWindowLower(win->getClientWindow());
 
     if (! win->isIconic()) {
-      wkspc = screen->getWorkspace(win->getWorkspaceNumber());
+      wkspc = screen.getWorkspace(win->getWorkspaceNumber());
       wkspc->stackingList->remove(win);
       wkspc->stackingList->insert(win);
     }
@@ -251,12 +250,12 @@ void Workspace::lowerWindow(OpenboxWindow *w) {
     win = win->getTransientFor();
   }
 
-  screen->getOpenbox().grab();
+  screen.getOpenbox().grab();
 
-  XLowerWindow(screen->getBaseDisplay().getXDisplay(), *nstack);
-  XRestackWindows(screen->getBaseDisplay().getXDisplay(), nstack, i);
+  XLowerWindow(screen.getBaseDisplay().getXDisplay(), *nstack);
+  XRestackWindows(screen.getBaseDisplay().getXDisplay(), nstack, i);
 
-  screen->getOpenbox().ungrab();
+  screen.getOpenbox().ungrab();
 
   delete [] nstack;
 }
@@ -288,12 +287,12 @@ const int Workspace::getCount(void) {
 
 void Workspace::update(void) {
   clientmenu->update();
-  screen->getToolbar()->redrawWindowLabel(True);
+  screen.getToolbar()->redrawWindowLabel(True);
 }
 
 
 Bool Workspace::isCurrent(void) {
-  return (id == screen->getCurrentWorkspaceID());
+  return (id == screen.getCurrentWorkspaceID());
 }
 
 
@@ -302,7 +301,7 @@ Bool Workspace::isLastWindow(OpenboxWindow *w) {
 }
 
 void Workspace::setCurrent(void) {
-  screen->changeWorkspaceID(id);
+  screen.changeWorkspaceID(id);
 }
 
 
@@ -405,32 +404,32 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
   int test_x, test_y, place_x = 0, place_y = 0;
   int start_pos = 0;
   int change_y =
-     ((screen->getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
+     ((screen.getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1);
   int change_x =
-     ((screen->getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
+     ((screen.getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1);
   int delta_x = 8, delta_y = 8;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  test_y = (screen->getColPlacementDirection() == BScreen::TopBottom) ?
-    start_pos : screen->getHeight() - win_size.h() - start_pos;
+  test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
+    start_pos : screen.getHeight() - win_size.h() - start_pos;
 
   while(!placed &&
-        ((screen->getColPlacementDirection() == BScreen::BottomTop) ?
+        ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
          test_y > 0 : test_y + win_size.h() < (signed) space.h())) {
-     test_x = (screen->getRowPlacementDirection() == BScreen::LeftRight) ?
+     test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
               start_pos : space.w() - win_size.w() - start_pos;
      while (!placed &&
-            ((screen->getRowPlacementDirection() == BScreen::RightLeft) ?
+            ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
              test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
         placed = true;
     
         it.reset();
         for (OpenboxWindow *curr = it.current(); placed && curr;
              it++, curr = it.current()) {
-           int curr_w = curr->getWidth() + (screen->getBorderWidth() * 4);
+           int curr_w = curr->getWidth() + (screen.getBorderWidth() * 4);
            int curr_h =
              ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
-             (screen->getBorderWidth() * 4);
+             (screen.getBorderWidth() * 4);
    
            if (curr->getXFrame() < test_x + win_size.w() &&
                curr->getXFrame() + curr_w > test_x &&
@@ -463,39 +462,39 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 
   Bool placed = False;
 
-  const int win_w = win->getWidth() + (screen->getBorderWidth() * 4),
-    win_h = win->getHeight() + (screen->getBorderWidth() * 4),
+  const int win_w = win->getWidth() + (screen.getBorderWidth() * 4),
+    win_h = win->getHeight() + (screen.getBorderWidth() * 4),
 #ifdef    SLIT
-    slit_x = screen->getSlit()->getX() - screen->getBorderWidth(),
-    slit_y = screen->getSlit()->getY() - screen->getBorderWidth(),
-    slit_w = screen->getSlit()->getWidth() +
-      (screen->getBorderWidth() * 4),
-    slit_h = screen->getSlit()->getHeight() +
-      (screen->getBorderWidth() * 4),
+    slit_x = screen.getSlit()->getX() - screen.getBorderWidth(),
+    slit_y = screen.getSlit()->getY() - screen.getBorderWidth(),
+    slit_w = screen.getSlit()->getWidth() +
+      (screen.getBorderWidth() * 4),
+    slit_h = screen.getSlit()->getHeight() +
+      (screen.getBorderWidth() * 4),
 #endif // SLIT
-    toolbar_x = screen->getToolbar()->getX() - screen->getBorderWidth(),
-    toolbar_y = screen->getToolbar()->getY() - screen->getBorderWidth(),
-    toolbar_w = screen->getToolbar()->getWidth() +
-      (screen->getBorderWidth() * 4),
-    toolbar_h = screen->getToolbar()->getHeight() + 
-      (screen->getBorderWidth() * 4),
+    toolbar_x = screen.getToolbar()->getX() - screen.getBorderWidth(),
+    toolbar_y = screen.getToolbar()->getY() - screen.getBorderWidth(),
+    toolbar_w = screen.getToolbar()->getWidth() +
+      (screen.getBorderWidth() * 4),
+    toolbar_h = screen.getToolbar()->getHeight() + 
+      (screen.getBorderWidth() * 4),
     start_pos = 0,
     change_y =
-      ((screen->getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
+      ((screen.getColPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
     change_x =
-      ((screen->getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
+      ((screen.getRowPlacementDirection() == BScreen::LeftRight) ? 1 : -1),
     delta_x = 8, delta_y = 8;
 
   int test_x, test_y, place_x = 0, place_y = 0;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
   Rect space(0, 0,
-             screen->getWidth(),
-             screen->getHeight()
+             screen.getWidth(),
+             screen.getHeight()
             );
   Size window_size(win_w, win_h);
 
-  switch (screen->getPlacementPolicy()) {
+  switch (screen.getPlacementPolicy()) {
   case BScreen::BestFitPlacement: {
     Point *spot = bestFitPlacement(window_size, space);
     if (spot != NULL) {
@@ -518,18 +517,18 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   }
 
   case BScreen::ColSmartPlacement: {
-    test_x = (screen->getRowPlacementDirection() == BScreen::LeftRight) ?
-      start_pos : screen->getWidth() - win_w - start_pos;
+    test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
+      start_pos : screen.getWidth() - win_w - start_pos;
 
     while (!placed &&
-	   ((screen->getRowPlacementDirection() == BScreen::RightLeft) ?
-	    test_x > 0 : test_x + win_w < (signed) screen->getWidth())) {
-      test_y = (screen->getColPlacementDirection() == BScreen::TopBottom) ?
-	start_pos : screen->getHeight() - win_h - start_pos;
+	   ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
+	    test_x > 0 : test_x + win_w < (signed) screen.getWidth())) {
+      test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
+	start_pos : screen.getHeight() - win_h - start_pos;
       
       while (!placed &&
-	     ((screen->getColPlacementDirection() == BScreen::BottomTop) ?
-	      test_y > 0 : test_y + win_h < (signed) screen->getHeight())) {
+	     ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
+	      test_y > 0 : test_y + win_h < (signed) screen.getHeight())) {
         placed = True;
 
         it.reset();
@@ -537,10 +536,10 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 	     it++, curr = it.current()) {
           if (curr->isMaximizedFull()) // fully maximized, ignore it
             continue;
-          int curr_w = curr->getWidth() + (screen->getBorderWidth() * 4);
+          int curr_w = curr->getWidth() + (screen.getBorderWidth() * 4);
           int curr_h =
             ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
-            (screen->getBorderWidth() * 4);
+            (screen.getBorderWidth() * 4);
 
           if (curr->getXFrame() < test_x + win_w &&
               curr->getXFrame() + curr_w > test_x &&
@@ -583,8 +582,8 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   } // switch
 
   if (! placed) {
-    if (((unsigned) cascade_x > (screen->getWidth() / 2)) ||
-	((unsigned) cascade_y > (screen->getHeight() / 2)))
+    if (((unsigned) cascade_x > (screen.getWidth() / 2)) ||
+	((unsigned) cascade_y > (screen.getHeight() / 2)))
       cascade_x = cascade_y = 32;
 
     place_x = cascade_x;
@@ -594,10 +593,10 @@ void Workspace::placeWindow(OpenboxWindow *win) {
     cascade_y += win->getTitleHeight();
   }
   
-  if (place_x + win_w > (signed) screen->getWidth())
-    place_x = (((signed) screen->getWidth()) - win_w) / 2;
-  if (place_y + win_h > (signed) screen->getHeight())
-    place_y = (((signed) screen->getHeight()) - win_h) / 2;
+  if (place_x + win_w > (signed) screen.getWidth())
+    place_x = (((signed) screen.getWidth()) - win_w) / 2;
+  if (place_y + win_h > (signed) screen.getHeight())
+    place_y = (((signed) screen.getHeight()) - win_h) / 2;
 
   win->configure(place_x, place_y, win->getWidth(), win->getHeight());
 }

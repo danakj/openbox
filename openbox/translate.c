@@ -39,7 +39,7 @@ static guint translate_modifier(char *str)
     return 0;
 }
 
-gboolean translate_button(char *str, guint *state, guint *button)
+gboolean translate_button(const gchar *str, guint *state, guint *button)
 {
     char **parsed;
     char *l;
@@ -82,7 +82,7 @@ translation_fail:
     return ret;
 }
 
-gboolean translate_key(char *str, guint *state, guint *keycode)
+gboolean translate_key(const gchar *str, guint *state, guint *keycode)
 {
     char **parsed;
     char *l;

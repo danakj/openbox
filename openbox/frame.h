@@ -155,7 +155,7 @@ void frame_adjust_icon(ObFrame *self);
 void frame_grab_client(ObFrame *self, struct _ObClient *client);
 void frame_release_client(ObFrame *self, struct _ObClient *client);
 
-ObFrameContext frame_context_from_string(char *name);
+ObFrameContext frame_context_from_string(const gchar *name);
 
 ObFrameContext frame_context(struct _ObClient *self, Window win);
 

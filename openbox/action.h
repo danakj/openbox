@@ -164,7 +164,7 @@ struct _ObAction {
    action_resize_relative_vert - the delta
 */
 
-ObAction *action_from_string(char *name, ObUserAction uact);
+ObAction *action_from_string(const gchar *name, ObUserAction uact);
 ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        ObUserAction uact);
 void action_free(ObAction *a);

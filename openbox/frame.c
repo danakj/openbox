@@ -646,7 +646,7 @@ static void layout_title(ObFrame *self)
     }
 }
 
-ObFrameContext frame_context_from_string(char *name)
+ObFrameContext frame_context_from_string(const gchar *name)
 {
     if (!g_ascii_strcasecmp("Desktop", name))
         return OB_FRAME_CONTEXT_DESKTOP;

@@ -704,7 +704,7 @@ ActionString actionstrings[] =
     }
 };
 
-ObAction *action_from_string(char *name, ObUserAction uact)
+ObAction *action_from_string(const gchar *name, ObUserAction uact)
 {
     ObAction *a = NULL;
     gboolean exist = FALSE;

@@ -37,6 +37,7 @@ static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, Client *c, XEvent *e);
 
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
+                            (e)->xfocus.detail == NotifyAncestor || \
                             (e)->xfocus.detail > NotifyNonlinearVirtual)
 #define INVALID_FOCUSOUT(e) ((e)->xfocus.mode == NotifyGrab || \
                              (e)->xfocus.detail == NotifyInferior || \

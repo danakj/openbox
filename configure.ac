@@ -1,11 +1,17 @@
 AC_PREREQ([2.50])
 AC_INIT([src/main.cc])
 AC_CONFIG_HEADERS(config.h)
-AC_LANG(C++)
+AC_LANG([C++])
+AC_ENABLE_STATIC([no])
+AC_ENABLE_SHARED([yes])
+
+AC_PREFIX_DEFAULT([/usr/local])
+if test "$prefix" = "NONE"; then
+  prefix=$ac_default_prefix
+  ac_configure_args="$ac_configure_args --prefix $prefix"
+fi
 
 AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
-
-test "$prefix" = "NONE" && prefix="$ac_default_prefix"
 
 AC_PATH_PROG([regex_cmd], [sed])
 test "$regex_cmd" || AC_MSG_ERROR([sed not found])

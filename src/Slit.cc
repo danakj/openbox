@@ -490,106 +490,60 @@ void Slit::updateStrut(void) {
 
 
 void Slit::reposition(void) {
-  // place the slit in the appropriate place
+  int x = 0, y = 0;
+
   switch (placement) {
   case TopLeft:
-    frame.rect.setPos(0, 0);
-
-    if (direction == Vertical) {
-      frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                       - frame.rect.width();
-      frame.y_hidden = 0;
-    } else {
-      frame.x_hidden = 0;
-      frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                       - frame.rect.height();
-    }
-    break;
-
   case CenterLeft:
-    frame.rect.setPos(0, (screen->getHeight() - frame.rect.height()) / 2);
-
-    frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                     - frame.rect.width();
-    frame.y_hidden = frame.rect.y();
-    break;
-
   case BottomLeft:
-    frame.rect.setPos(0, (screen->getHeight() - frame.rect.height()
-                          - (screen->getBorderWidth() * 2)));
+    x = 0;
+    frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+      - frame.rect.width();
 
-    if (direction == Vertical) {
-      frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                       - frame.rect.width();
-      frame.y_hidden = frame.rect.y();
-    } else {
-      frame.x_hidden = 0;
-      frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
-                       - screen->getBorderWidth();
-    }
+    if (placement == TopLeft)
+      y = 0;
+    else if (placement == CenterLeft)
+      y = (screen->getHeight() - frame.rect.height()) / 2;
+    else
+      y = screen->getHeight() - frame.rect.height()
+  - (screen->getBorderWidth() * 2);
+
     break;
 
   case TopCenter:
-    frame.rect.setPos((screen->getWidth() - frame.rect.width()) / 2, 0);
-
-    frame.x_hidden = frame.rect.x();
-    frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                     - frame.rect.height();
-    break;
-
   case BottomCenter:
-    frame.rect.setPos((screen->getWidth() - frame.rect.width()) / 2,
-                      (screen->getHeight() - frame.rect.height()
-                       - (screen->getBorderWidth() * 2)));
-    frame.x_hidden = frame.rect.x();
-    frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
-                     - screen->getBorderWidth();
+    x = (screen->getWidth() - frame.rect.width()) / 2;
+    frame.x_hidden = x;
+
+    if (placement == TopCenter)
+      y = 0;
+    else
+      y = screen->getHeight() - frame.rect.height()
+  - (screen->getBorderWidth() * 2);
+
     break;
 
   case TopRight:
-    frame.rect.setPos((screen->getWidth() - frame.rect.width()
-                       - (screen->getBorderWidth() * 2)), 0);
-
-    if (direction == Vertical) {
-      frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
-                       - screen->getBorderWidth();
-      frame.y_hidden = 0;
-    } else {
-      frame.x_hidden = frame.rect.x();
-      frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
-                       - frame.rect.height();
-    }
-    break;
-
   case CenterRight:
-  default:
-    frame.rect.setPos((screen->getWidth() - frame.rect.width()
-                       - (screen->getBorderWidth() * 2)),
-                      (screen->getHeight() - frame.rect.height()) / 2);
-
-    frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
-                     - screen->getBorderWidth();
-    frame.y_hidden = frame.rect.y();
-    break;
-
   case BottomRight:
-    frame.rect.setPos((screen->getWidth() - frame.rect.width()
-                       - (screen->getBorderWidth() * 2)),
-                      (screen->getHeight() - frame.rect.height()
-                       - (screen->getBorderWidth() * 2)));
+    x = screen->getWidth() - frame.rect.width()
+      - (screen->getBorderWidth() * 2);
+    frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
+      - screen->getBorderWidth();
 
-    if (direction == Vertical) {
-      frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
-                       - screen->getBorderWidth();
-      frame.y_hidden = frame.rect.y();
-    } else {
-      frame.x_hidden = frame.rect.x();
-      frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
-                       - screen->getBorderWidth();
-    }
+    if (placement == TopRight)
+      y = 0;
+    else if (placement == CenterRight)
+      y = (screen->getHeight() - frame.rect.height()) / 2;
+    else
+      y = screen->getHeight() - frame.rect.height()
+  - (screen->getBorderWidth() * 2);
     break;
   }
 
+  frame.rect.setPos(x, y);
+
+  // we have to add the border to the rect as it is not accounted for
   Rect tbar_rect = screen->getToolbar()->getRect();
   tbar_rect.setSize(tbar_rect.width() + (screen->getBorderWidth() * 2),
                     tbar_rect.height() + (screen->getBorderWidth() * 2));
@@ -598,25 +552,32 @@ void Slit::reposition(void) {
                     slit_rect.height() + (screen->getBorderWidth() * 2));
 
   if (slit_rect.intersects(tbar_rect)) {
-    Toolbar *tbar = screen->getToolbar();
-    frame.y_hidden = frame.rect.y();
-
-    int delta = tbar->getExposedHeight() + (screen->getBorderWidth() * 2);
-    if (frame.rect.bottom() <= tbar_rect.bottom()) {
+    int delta = screen->getToolbar()->getExposedHeight() +
+      screen->getBorderWidth();
+    if (frame.rect.bottom() <= tbar_rect.bottom())
       delta = -delta;
-    }
+
     frame.rect.setY(frame.rect.y() + delta);
-    if (direction == Vertical)
-      frame.y_hidden += delta;
   }
+
+  if (placement == TopCenter)
+    frame.y_hidden = 0 - frame.rect.height() + screen->getBorderWidth() 
+      + screen->getBevelWidth();
+  else if (placement == BottomCenter)
+    frame.y_hidden = screen->getHeight() - screen->getBorderWidth()
+      - screen->getBevelWidth();
+  else
+    frame.y_hidden = frame.rect.y();
 
   updateStrut();
 
   if (hidden)
-    XMoveResizeWindow(display, frame.window, frame.x_hidden,
-                      frame.y_hidden, frame.rect.width(), frame.rect.height());
+    XMoveResizeWindow(display, frame.window,
+                      frame.x_hidden, frame.y_hidden,
+                      frame.rect.width(), frame.rect.height());
   else
-    XMoveResizeWindow(display, frame.window, frame.rect.x(), frame.rect.y(),
+    XMoveResizeWindow(display, frame.window,
+                      frame.rect.x(), frame.rect.y(),
                       frame.rect.width(), frame.rect.height());
 }
 

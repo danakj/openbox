@@ -18,6 +18,7 @@ extern "C" {
 #include <string>
 #include <vector>
 
+#include "widget.hh"
 #include "otk/screeninfo.hh"
 #include "otk/eventhandler.hh"
 #include "otk/property.hh"
@@ -32,7 +33,7 @@ namespace ob {
   <p>
   OBRootWindow also manages client messages for the root window.
 */
-class OBRootWindow : public otk::OtkEventHandler {
+class OBRootWindow : public otk::OtkEventHandler, public OBWidget {
 private:
   //! Information about this screen
   const otk::ScreenInfo *_info;

@@ -12,7 +12,8 @@
 namespace ob {
 
 OBRootWindow::OBRootWindow(int screen)
-  : _info(otk::OBDisplay::screenInfo(screen))
+  : OBWidget(OBWidget::Type_Root),
+    _info(otk::OBDisplay::screenInfo(screen))
 {
   updateDesktopNames();
 

@@ -18,7 +18,8 @@ public:
     Type_StickyButton,
     Type_LeftGrip,
     Type_RightGrip,
-    Type_Client
+    Type_Client,
+    Type_Root
   };
 
 private:

@@ -312,7 +312,8 @@ void client_unmanage(Client *self)
         }
     }
 
-    client_unfocus(self);
+    if (focus_client == self)
+        client_unfocus(self);
 
     /* remove from its group */
     if (self->group) {

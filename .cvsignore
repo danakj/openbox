@@ -16,3 +16,7 @@ libtool
 config.sub
 config.guess
 ltmain.sh
+mkinstalldirs
+missing
+install-sh
+depcomp

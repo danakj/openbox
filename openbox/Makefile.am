@@ -6,7 +6,7 @@ binary=openbox3
 url=http://icculus.org/openbox
 
 CPPFLAGS=$(X_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
-          @CPPFLAGS@ \
+         $(LIBSN_CFLAGS) @CPPFLAGS@ \
          -DLOCALEDIR=\"$(localedir)\" \
          -DRCDIR=\"$(rcdir)\" \
          -DPLUGINDIR=\"$(plugindir)\" \
@@ -15,8 +15,8 @@ CPPFLAGS=$(X_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
 
 INCLUDES=-I..
 LIBS=$(X_LIBS) $(XFT_LIBS) $(XINERAMA_LIBS) $(XKB_LIBS) $(XRANDR_LIBS) \
-	$(VIDMODE_LIBS) $(XSHAPE_LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) @LIBS@ \
-	@LIBINTL@
+	$(VIDMODE_LIBS) $(XSHAPE_LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) \
+	$(LIBSN_LIBS) @LIBS@ @LIBINTL@
 
 bin_PROGRAMS=$(binary)
 

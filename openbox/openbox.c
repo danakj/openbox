@@ -118,7 +118,11 @@ int main(int argc, char **argv)
 	g_critical("Failed to set display as close-on-exec.");
 	exit(1);
     }
-	  
+
+#ifdef USE_LIBSN
+    ob_sn_display = sn_display_new(ob_display, NULL, NULL);
+#endif
+
     ob_screen = DefaultScreen(ob_display);
     ob_root = RootWindow(ob_display, ob_screen);
 
@@ -140,6 +144,7 @@ int main(int argc, char **argv)
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
 
     ob_cursors.ptr = XCreateFontCursor(ob_display, XC_left_ptr);
+    ob_cursors.busy = XCreateFontCursor(ob_display, XC_watch);
     ob_cursors.move = XCreateFontCursor(ob_display, XC_fleur);
     ob_cursors.tl = XCreateFontCursor(ob_display, XC_top_left_corner);
     ob_cursors.tr = XCreateFontCursor(ob_display, XC_top_right_corner);

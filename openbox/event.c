@@ -21,6 +21,10 @@
 #include <X11/Xatom.h>
 #include <glib.h>
 
+#ifdef USE_LIBSN
+#  include <libsn/sn.h>
+#endif
+
 #ifdef HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif
@@ -128,6 +132,10 @@ void event_loop()
 		break;
 	}
 	XNextEvent(ob_display, &e);
+
+#ifdef USE_LIBSN
+        sn_display_process_event(ob_sn_display, &e);
+#endif
 
 	event_process(&e);
         had_event = TRUE;

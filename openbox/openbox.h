@@ -1,11 +1,21 @@
 #ifndef __openbox_h
 #define __openbox_h
 
+#ifdef USE_LIBSN
+#  define SN_API_NOT_YET_FROZEN
+#  include <libsn/sn.h>
+#endif
+
 #include <glib.h>
 #include <X11/Xlib.h>
 
 /*! The X display */
 extern Display *ob_display; 
+
+#ifdef USE_LIBSN
+SnDisplay *ob_sn_display;
+#endif
+
 /*! The number of the screen on which we're running */
 extern int      ob_screen;
 /*! The root window */
@@ -36,6 +46,7 @@ extern gboolean ob_sync;
 
 typedef struct Cursors {
     Cursor ptr;
+    Cursor busy;
     Cursor move;
     Cursor bl;
     Cursor br;

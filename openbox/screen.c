@@ -2,6 +2,7 @@
 #include "dock.h"
 #include "prop.h"
 #include "startup.h"
+#include "timer.h"
 #include "config.h"
 #include "screen.h"
 #include "client.h"
@@ -10,6 +11,11 @@
 #include "dispatch.h"
 #include "extensions.h"
 #include "../render/render.h"
+
+#ifdef USE_LIBSN
+#  define SN_API_NOT_YET_FROZEN
+#  include <libsn/sn.h>
+#endif
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -34,7 +40,16 @@ static Rect  *area = NULL;
 static Strut *strut = NULL;
 static Window support_window = None;
 
+#ifdef USE_LIBSN
+static SnMonitorContext *sn_context;
+static int sn_busy_cnt;
+static Timer *sn_timer = NULL;
+
+static void sn_event_func(SnMonitorEvent *event, void *data);
+#endif
+
 static void screen_update_area();
+static void set_root_cursor();
 
 static gboolean running;
 static int another_running(Display *d, XErrorEvent *e)
@@ -63,8 +78,7 @@ gboolean screen_annex()
 
     g_message("Managing screen %d", ob_screen);
 
-    /* set the mouse cursor for the root window (the default cursor) */
-    XDefineCursor(ob_display, ob_root, ob_cursors.ptr);
+    set_root_cursor();
 
     /* set the OPENBOX_PID hint */
     pid = getpid();
@@ -187,6 +201,12 @@ void screen_startup()
     PROP_SET32(ob_root, net_showing_desktop, cardinal, screen_showing_desktop);
 
     screen_update_layout();
+
+#ifdef USE_LIBSN
+    sn_context = sn_monitor_context_new(ob_sn_display, ob_screen,
+                                        sn_event_func, NULL, NULL);
+    sn_busy_cnt = 0;
+#endif
 }
 
 void screen_shutdown()
@@ -599,3 +619,68 @@ Strut *screen_strut(guint desktop)
     }
     return &strut[desktop];
 }
+
+static void set_root_cursor()
+{
+#ifdef USE_LIBSN
+        if (sn_busy_cnt)
+            XDefineCursor(ob_display, ob_root, ob_cursors.busy);
+        else
+#endif
+            XDefineCursor(ob_display, ob_root, ob_cursors.ptr);
+}
+
+#ifdef USE_LIBSN
+static void sn_timeout(void *data)
+{
+    timer_stop(sn_timer);
+    sn_timer = NULL;
+    sn_busy_cnt = 0;
+
+    set_root_cursor();
+}
+
+static void sn_event_func(SnMonitorEvent *ev, void *data)
+{
+    SnStartupSequence *seq;
+    const char *seq_id, *bin_name;
+    int cnt = sn_busy_cnt;
+
+    if (!(seq = sn_monitor_event_get_startup_sequence(ev)))
+        return;
+
+    seq_id = sn_startup_sequence_get_id(seq);
+    bin_name = sn_startup_sequence_get_binary_name(seq);
+    
+    if (!(seq_id && bin_name))
+        return;
+
+    switch (sn_monitor_event_get_type(ev)) {
+    case SN_MONITOR_EVENT_INITIATED:
+        ++sn_busy_cnt;
+        if (sn_timer)
+            timer_stop(sn_timer);
+        /* 30 second timeout for apps to start */
+        sn_timer = timer_start(30 * 1000000, sn_timeout, NULL);
+        break;
+    case SN_MONITOR_EVENT_CHANGED:
+        break;
+    case SN_MONITOR_EVENT_COMPLETED:
+        if (sn_busy_cnt) --sn_busy_cnt;
+        if (sn_timer) {
+            timer_stop(sn_timer);
+            sn_timer = NULL;
+        }
+        break;
+    case SN_MONITOR_EVENT_CANCELED:
+        if (sn_busy_cnt) --sn_busy_cnt;
+        if (sn_timer) {
+            timer_stop(sn_timer);
+            sn_timer = NULL;
+        }
+    };
+
+    if (sn_busy_cnt != cnt)
+        set_root_cursor();
+}
+#endif

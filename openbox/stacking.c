@@ -249,6 +249,7 @@ void stacking_raise(ObWindow *window)
         ObClient *c;
         ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
+        g_message("raising 0x%x", selected->window);
         /*c = client_search_top_transient(selected);*/ c = selected;
         wins = pick_windows(c, selected, TRUE);
         /*wins = g_list_concat(wins, pick_group_windows(c, selected, TRUE));*/

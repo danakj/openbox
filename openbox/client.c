@@ -1647,7 +1647,9 @@ static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
 
-    if (self->fullscreen) l = OB_STACKING_LAYER_FULLSCREEN;
+    if (self->fullscreen &&
+        (client_focused(self) || client_search_focus_tree(self)))
+        l = OB_STACKING_LAYER_FULLSCREEN;
     else if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
@@ -1669,7 +1671,9 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
 
     old = self->layer;
     own = calc_layer(self);
-    self->layer = l > own ? l : own;
+    self->layer = MAX(l, own);
+
+    g_message("calc for 0x%x %d %d", self->window, old, self->layer);
 
     for (it = self->transients; it; it = it->next)
         client_calc_layer_recursive(it->data, orig,
@@ -1677,7 +1681,6 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
 
     if (!raised && l != old)
 	if (orig->frame) { /* only restack if the original window is managed */
-            /* XXX add_non_intrusive ever? */
             stacking_remove(CLIENT_AS_WINDOW(self));
             stacking_add(CLIENT_AS_WINDOW(self));
         }
@@ -2526,13 +2529,14 @@ gboolean client_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (!client_can_focus(self)) {
-        if (!self->frame->visible) {
-            /* update the focus lists */
-            focus_order_to_top(self);
-        }
+    if (!self->frame->visible) {
+        /* update the focus lists */
+        focus_order_to_top(self);
         return FALSE;
     }
+
+    if (!client_can_focus(self))
+        return FALSE;
 
     if (self->can_focus) {
         /* RevertToPointerRoot causes much more headache than RevertToNone, so
@@ -2560,6 +2564,8 @@ gboolean client_focus(ObClient *self)
 	ce.xclient.data.l[4] = 0l;
 	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
+
+    focus_set_client(self);
 
 #ifdef DEBUG_FOCUS
     ob_debug("%sively focusing %lx at %d\n",

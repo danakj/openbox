@@ -1,4 +1,5 @@
 #include "mainloop.h"
+#include "focus.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,6 +100,7 @@ struct _ObMainLoopXHandlerType
     ObMainLoop *loop;
     gpointer data;
     ObMainLoopXHandler func;
+    ObMainLoopXDoneHandler done_func;
     GDestroyNotify destroy;
 };
 
@@ -263,6 +265,12 @@ void ob_main_loop_run(ObMainLoop *loop)
                     h->func(&e, h->data);
                 }
             } while (XPending(loop->display));
+
+            for (it = loop->x_handlers; it; it = g_slist_next(it)) {
+                ObMainLoopXHandlerType *h = it->data;
+                if (h->done_func)
+                    h->done_func(h->data);
+            }
         } else {
             /* this only runs if there were no x events received */
 
@@ -297,6 +305,7 @@ void ob_main_loop_exit(ObMainLoop *loop)
 
 void ob_main_loop_x_add(ObMainLoop *loop,
                         ObMainLoopXHandler handler,
+                        ObMainLoopXDoneHandler done_handler,
                         gpointer data,
                         GDestroyNotify notify)
 {
@@ -305,6 +314,7 @@ void ob_main_loop_x_add(ObMainLoop *loop,
     h = g_new(ObMainLoopXHandlerType, 1);
     h->loop = loop;
     h->func = handler;
+    h->done_func = done_handler;
     h->data = data;
     h->destroy = notify;
     loop->x_handlers = g_slist_prepend(loop->x_handlers, h);

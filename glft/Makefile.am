@@ -3,22 +3,22 @@ themedir=$(datadir)/openbox/themes
 theme=operation
 
 CPPFLAGS=$(FC_CFLAGS) $(GLIB_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
-         -DG_LOG_DOMAIN=\"Render\" \
+         -DG_LOG_DOMAIN=\"GlFt\" \
          -DDEFAULT_THEME=\"$(theme)\" \
          -DTHEMEDIR=\"$(themedir)\"
 
 INCLUDES=-I..
-LIBS=$(GLIB_LIBS) $(GL_LIBS) @LIBS@
+LIBS=$(FC_LIBS) $(GLIB_LIBS) $(GL_LIBS) @LIBS@
 
-noinst_PROGRAMS=rendertest
-rendertest_LDFLAGS=-lobrender2 -L.
-rendertest_SOURCES=test.c
+noinst_PROGRAMS=glfttest
+glfttest_LDFLAGS=-lglft -L.
+glfttest_SOURCES=test.c
 
-lib_LTLIBRARIES=libobrender2.la
-libobrender2_la_SOURCES=init.c instance.c
+lib_LTLIBRARIES=libglft.la
+libglft_la_SOURCES=init.c
 
 
-noinst_HEADERS=render.h instance.h
+noinst_HEADERS=glft.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

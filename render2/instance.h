@@ -1,5 +1,5 @@
-#ifndef __instance_h
-#define __instance_h
+#ifndef __render_instance_h
+#define __render_instance_h
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

@@ -1,0 +1,7 @@
+.libs
+.deps
+Makefile.in
+Makefile
+libglft.la
+init.lo
+glfttest

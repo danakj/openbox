@@ -11,6 +11,8 @@
 */
 
 struct RrInstance;
+struct RrRGB;
+struct RrFont;
 
 /*! Returns a struct to be used when calling members of the library.
   If the library fails to initialize, NULL is returned.

@@ -455,7 +455,7 @@ PyObject *ebind(ob::EventAction action, PyObject *func)
     return NULL;
   }
   
-  if (!ob::Openbox::instance->actions()->bind(action, func)) {
+  if (!ob::Openbox::instance->bindings()->addEvent(action, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
   }

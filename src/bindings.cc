@@ -147,6 +147,9 @@ OBBindings::OBBindings()
   _timer.setTimeout(5000); // chains reset after 5 seconds
   
   setResetKey("C-g"); // set the default reset key
+
+  for (int i = 0; i < NUM_EVENTS; ++i)
+    _events[i] = 0;
 }
 
 
@@ -155,6 +158,7 @@ OBBindings::~OBBindings()
   grabKeys(false);
   removeAllKeys();
   removeAllButtons();
+  removeAllEvents();
 }
 
 
@@ -491,6 +495,44 @@ void OBBindings::fireButton(ButtonData *data)
       if ((*it)->callback[data->action])
         python_callback((*it)->callback[data->action], (PyObject*)data);
     }
+}
+
+
+bool OBBindings::addEvent(EventAction action, PyObject *callback)
+{
+  if (action < 0 || action >= NUM_EVENTS) {
+    return false;
+  }
+
+  Py_XDECREF(_events[action]);
+  _events[action] = callback;
+  Py_INCREF(callback);
+  return true;
+}
+
+bool OBBindings::removeEvent(EventAction action)
+{
+  if (action < 0 || action >= NUM_EVENTS) {
+    return false;
+  }
+  
+  Py_XDECREF(_events[action]);
+  _events[action] = 0;
+  return true;
+}
+
+void OBBindings::removeAllEvents()
+{
+  for (int i = 0; i < NUM_EVENTS; ++i) {
+    Py_XDECREF(_events[i]);
+    _events[i] = 0;
+  }
+}
+
+void OBBindings::fireEvent(EventData *data)
+{
+  if (_events[data->action])
+    python_callback(_events[data->action], (PyObject*)data);
 }
 
 }

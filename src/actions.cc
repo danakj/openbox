@@ -23,9 +23,6 @@ OBActions::OBActions()
 {
   for (int i=0; i<BUTTONS; ++i)
     _posqueue[i] = new ButtonPressAction();
-
-  for (int i = 0; i < NUM_EVENTS; ++i)
-    _callback[i] = 0;
 }
 
 
@@ -150,11 +147,9 @@ void OBActions::enterHandler(const XCrossingEvent &e)
   OtkEventHandler::enterHandler(e);
   
   // run the ENTER python hook
-  if (_callback[EventEnterWindow]) {
-    EventData *data = new_event_data(e.window, EventEnterWindow, e.state);
-    python_callback(_callback[EventEnterWindow], (PyObject*)data);
-    Py_DECREF((PyObject*)data);
-  }
+  EventData *data = new_event_data(e.window, EventEnterWindow, e.state);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 
@@ -163,11 +158,9 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
   OtkEventHandler::leaveHandler(e);
 
   // run the LEAVE python hook
-  if (_callback[EventLeaveWindow]) {
-    EventData *data = new_event_data(e.window, EventLeaveWindow, e.state);
-    python_callback(_callback[EventLeaveWindow], (PyObject*)data);
-    Py_DECREF((PyObject*)data);
-  }
+  EventData *data = new_event_data(e.window, EventLeaveWindow, e.state);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 
@@ -221,64 +214,27 @@ void OBActions::mapRequestHandler(const XMapRequestEvent &e)
 {
   OtkEventHandler::mapRequestHandler(e);
 
-  if (_callback[EventNewWindow]) {
-    EventData *data = new_event_data(e.window, EventNewWindow, 0);
-    python_callback(_callback[EventNewWindow], (PyObject*)data);
-    Py_DECREF((PyObject*)data);
-  }
+  EventData *data = new_event_data(e.window, EventNewWindow, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 void OBActions::unmapHandler(const XUnmapEvent &e)
 {
   OtkEventHandler::unmapHandler(e);
 
-  if (_callback[EventCloseWindow]) {
-    EventData *data = new_event_data(e.window, EventCloseWindow, 0);
-    python_callback(_callback[EventCloseWindow], (PyObject*)data);
-    Py_DECREF((PyObject*)data);
-  }
+  EventData *data = new_event_data(e.window, EventCloseWindow, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 void OBActions::destroyHandler(const XDestroyWindowEvent &e)
 {
   OtkEventHandler::destroyHandler(e);
 
-  if (_callback[EventCloseWindow]) {
-    EventData *data = new_event_data(e.window, EventCloseWindow, 0);
-    python_callback(_callback[EventCloseWindow], (PyObject*)data);
-    Py_DECREF((PyObject*)data);
-  }
-}
-
-bool OBActions::bind(EventAction action, PyObject *func)
-{
-  if (action < 0 || action >= NUM_EVENTS) {
-    return false;
-  }
-
-  Py_XDECREF(_callback[action]);
-  _callback[action] = func;
-  Py_INCREF(func);
-  return true;
-}
-
-bool OBActions::unbind(EventAction action)
-{
-  if (action < 0 || action >= NUM_EVENTS) {
-    return false;
-  }
-  
-  Py_XDECREF(_callback[action]);
-  _callback[action] = 0;
-  return true;
-}
-
-void OBActions::unbindAll()
-{
-  for (int i = 0; i < NUM_EVENTS; ++i) {
-    Py_XDECREF(_callback[i]);
-    _callback[i] = 0;
-  }
+  EventData *data = new_event_data(e.window, EventCloseWindow, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_DECREF((PyObject*)data);
 }
 
 }

@@ -60,8 +60,6 @@ private:
   void insertPress(const XButtonEvent &e);
   void removePress(const XButtonEvent &e);
 
-  PyObject *_callback[NUM_EVENTS];
-
 public:
   //! Constructs an OBActions object
   OBActions();
@@ -82,14 +80,6 @@ public:
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
 
-  //! Bind a callback for an action
-  bool bind(EventAction action, PyObject *func);
-
-  //! Unbind the callback function from an action
-  bool unbind(EventAction action);
-
-  //! Remove all callback functions
-  void unbindAll();
 };
 
 }

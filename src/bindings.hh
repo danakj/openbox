@@ -84,6 +84,8 @@ private:
 
   void grabButton(bool grab, const Binding &b, MouseContext context,
                   OBClient *client);
+
+  PyObject *_events[NUM_EVENTS];
   
 public:
   //! Initializes an OBBindings object
@@ -127,6 +129,17 @@ public:
   void removeAllButtons();
 
   void fireButton(ButtonData *data);
+
+  //! Bind a callback for an event
+  bool addEvent(EventAction action, PyObject *callback);
+
+  //! Unbind the callback function from an event
+  bool removeEvent(EventAction action);
+
+  //! Remove all callback functions
+  void removeAllEvents();
+
+  void fireEvent(EventData *data);
 };
 
 }

@@ -3,7 +3,7 @@
 #include "extensions.h"
 #include "framerender.h"
 
-#define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
+#define PLATE_EVENTMASK (SubstructureRedirectMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask | ExposureMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
@@ -515,9 +515,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                     if (temp > be) te = temp;
                 break;
             }
-        }
 g_print("frame extends by %d, %d, %d, %d\n", le, te, le, be);
-    if (resized) {
         /*
         if (self->client->decorations & Decor_Border) {
             self->bwidth = theme_bwidth;
@@ -527,9 +525,7 @@ g_print("frame extends by %d, %d, %d, %d\n", le, te, le, be);
         }
         */
         STRUT_SET(self->size, le, te, re, be);
-    }
 
-    if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
                           self->size.left,

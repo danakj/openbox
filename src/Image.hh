@@ -37,7 +37,6 @@ extern "C" {
 
 class BImageControl;
 class BTexture;
-class BImageCache;
 
 class BImage {
 private:
@@ -59,6 +58,8 @@ private:
 #endif
 
   Pixmap renderPixmap(void);
+  Pixmap render_solid(const BTexture &texture);
+  Pixmap render_gradient(const BTexture &texture);
 
   XImage *renderXImage(void);
 
@@ -80,19 +81,6 @@ public:
   ~BImage(void);
 
   Pixmap render(const BTexture &texture);
-  Pixmap render_solid(const BTexture &texture);
-  Pixmap render_gradient(const BTexture &texture);
-
-  // static methods for the builtin cache
-  static unsigned long maximumCacheSize(void);
-  static void setMaximumCacheSize(const unsigned long cache_max);
-
-  static unsigned long cacheTimeout(void);
-  static void setCacheTimeout(const unsigned long cache_timeout);
-
-private:
-  // global image cache
-  static BImageCache *imagecache;
 };
 
 

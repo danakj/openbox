@@ -39,6 +39,8 @@ extern "C" {
 #endif // HAVE_STDIO_H
 }
 
+#include <cctype>
+
 #include "../src/i18n.hh"
 #include "../src/GCCache.hh"
 #include "../src/Texture.hh"
@@ -50,8 +52,6 @@ I18n i18n;
 
 bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
   : BaseDisplay(argv[0], dpy_name) {
-
-  grad = fore = back = (char *) 0;
 
   bool mod = False, sol = False, grd = False;
   int mod_x = 0, mod_y = 0;
@@ -115,9 +115,12 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
   for (unsigned int s = 0; s < getNumberOfScreens(); ++s)
     img_ctrl[s] = new BImageControl(this, getScreenInfo(s), True);
 
-  if (sol && fore) solid();
-  else if (mod && mod_x && mod_y && fore && back) modula(mod_x, mod_y);
-  else if (grd && grad && fore && back) gradient();
+  if (sol && ! fore.empty())
+    solid();
+  else if (mod && mod_x && mod_y && ! (fore.empty() || back.empty()))
+    modula(mod_x, mod_y);
+  else if (grd && ! (grad.empty() || fore.empty() || back.empty()))
+    gradient();
   else usage();
 }
 
@@ -289,8 +292,31 @@ void bsetroot::modula(int x, int y) {
 
 
 void bsetroot::gradient(void) {
+  /*
+    we have to be sure that neither raised nor sunken is specified otherwise
+    odd looking borders appear.  So we convert to lowercase then look for
+    'raised' or 'sunken' in the description and erase them.  To be paranoid
+    the search is done in a loop.
+  */
+  std::string descr;
+  descr.reserve(grad.size());
+
+  std::string::const_iterator it = grad.begin(), end = grad.end();
+  for (; it != end; ++it)
+    descr += std::tolower(*it);
+
+  std::string::size_type pos;
+  while ((pos = descr.find("raised")) != std::string::npos)
+    descr.erase(pos, 6); // 6 is strlen raised
+
+  while ((pos = descr.find("sunken")) != std::string::npos)
+    descr.erase(pos, 6);
+
+  // now add on 'flat' to prevent the bevels from being added
+  descr += "flat";
+
   for (unsigned int screen = 0; screen < getNumberOfScreens(); screen++) {
-    BTexture texture(grad, this, screen, img_ctrl[screen]);
+    BTexture texture(descr, this, screen, img_ctrl[screen]);
     const ScreenInfo *screen_info = getScreenInfo(screen);
 
     texture.setColor(BColor(fore, this, screen));

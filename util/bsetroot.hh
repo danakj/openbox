@@ -27,12 +27,13 @@
 #include "../src/BaseDisplay.hh"
 #include "../src/Image.hh"
 
+#include <string>
 
 class bsetroot : public BaseDisplay {
 private:
   BImageControl **img_ctrl;
 
-  char *fore, *back, *grad;
+  std::string fore, back, grad;
 
   // no copying!!
   bsetroot(const bsetroot &);

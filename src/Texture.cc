@@ -116,8 +116,6 @@ void BTexture::setDescription(const string &d) {
         addTexture(BTexture::PipeCross);
       else if (descr.find("elliptic") != string::npos)
         addTexture(BTexture::Elliptic);
-      else if (descr.find("diagonal") != string::npos)
-        addTexture(BTexture::Diagonal);
       else if (descr.find("horizontal") != string::npos)
         addTexture(BTexture::Horizontal);
       else if (descr.find("vertical") != string::npos)
@@ -128,9 +126,7 @@ void BTexture::setDescription(const string &d) {
       addTexture(BTexture::Solid);
     }
 
-    if (descr.find("raised") != string::npos)
-      addTexture(BTexture::Raised);
-    else if (descr.find("sunken") != string::npos)
+    if (descr.find("sunken") != string::npos)
       addTexture(BTexture::Sunken);
     else if (descr.find("flat") != string::npos)
       addTexture(BTexture::Flat);

@@ -65,8 +65,7 @@ BImageControl *ctrl = 0;
 BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
                              bool _dither, int _cpc,
                              unsigned long cache_timeout,
-                             unsigned long cmax)
-{
+                             unsigned long cmax) {
   if (! ctrl) ctrl = this;
 
   basedisplay = dpy;
@@ -364,8 +363,7 @@ BImageControl::~BImageControl(void) {
   if (colors) {
     unsigned long *pixels = new unsigned long [ncolors];
 
-    int i;
-    for (i = 0; i < ncolors; i++)
+    for (int i = 0; i < ncolors; i++)
       *(pixels + i) = (*(colors + i)).pixel;
 
     XFreeColors(basedisplay->getXDisplay(), colormap, pixels, ncolors, 0);
@@ -381,9 +379,8 @@ BImageControl::~BImageControl(void) {
     //#endif
     CacheContainer::iterator it = cache.begin();
     const CacheContainer::iterator end = cache.end();
-    for (; it != end; ++it) {
-      XFreePixmap(basedisplay->getXDisplay(), (*it).pixmap);
-    }
+    for (; it != end; ++it)
+      XFreePixmap(basedisplay->getXDisplay(), it->pixmap);
   }
 #ifdef    TIMEDCACHE
   if (timer) {
@@ -405,8 +402,8 @@ Pixmap BImageControl::searchCache(const unsigned int width,
   const CacheContainer::iterator end = cache.end();
   for (; it != end; ++it) {
     CachedImage& tmp = *it;
-    if ((tmp.width == width) && (tmp.height == height) &&
-        (tmp.texture == texture) && (tmp.pixel1 == c1.pixel()))
+    if (tmp.width == width && tmp.height == height &&
+        tmp.texture == texture && tmp.pixel1 == c1.pixel())
       if (texture & BTexture::Gradient) {
         if (tmp.pixel2 == c2.pixel()) {
           tmp.count++;
@@ -514,9 +511,8 @@ void BImageControl::getGradientBuffers(unsigned int w,
 				       unsigned int **ybuf)
 {
   if (w > grad_buffer_width) {
-    if (grad_xbuffer) {
+    if (grad_xbuffer)
       delete [] grad_xbuffer;
-    }
 
     grad_buffer_width = w;
 
@@ -524,9 +520,8 @@ void BImageControl::getGradientBuffers(unsigned int w,
   }
 
   if (h > grad_buffer_height) {
-    if (grad_ybuffer) {
+    if (grad_ybuffer)
       delete [] grad_ybuffer;
-    }
 
     grad_buffer_height = h;
 

@@ -44,8 +44,8 @@ using std::min;
 BImage::BImage(BImageControl *c, unsigned int w, unsigned int h) {
   control = c;
 
-  width = ((signed) w > 0) ? w : 1;
-  height = ((signed) h > 0) ? h : 1;
+  width = (w > 0) ? w : 1;
+  height = (h > 0) ? h : 1;
 
   red = new unsigned char[width * height];
   green = new unsigned char[width * height];
@@ -66,18 +66,18 @@ BImage::BImage(BImageControl *c, unsigned int w, unsigned int h) {
 
 
 BImage::~BImage(void) {
-  if (red) delete [] red;
-  if (green) delete [] green;
-  if (blue) delete [] blue;
+  delete [] red;
+  delete [] green;
+  delete [] blue;
 }
 
 
 Pixmap BImage::render(const BTexture &texture) {
-  if ((texture.texture() & BTexture::Parent_Relative))
+  if (texture.texture() & BTexture::Parent_Relative)
     return ParentRelative;
-  else if ((texture.texture() & BTexture::Solid))
+  else if (texture.texture() & BTexture::Solid)
     return render_solid(texture);
-  else if ((texture.texture() & BTexture::Gradient))
+  else if (texture.texture() & BTexture::Gradient)
     return render_gradient(texture);
   return None;
 }
@@ -103,8 +103,7 @@ Pixmap BImage::render_solid(const BTexture &texture) {
 
   if (texture.texture() & BTexture::Interlaced) {
     BPen peninterlace(texture.colorTo());
-    register unsigned int i = 0;
-    for (; i < height; i += 2)
+    for (unsigned int i = 0; i < height; i += 2)
       XDrawLine(display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
@@ -159,7 +158,7 @@ Pixmap BImage::render_solid(const BTexture &texture) {
 
 
 Pixmap BImage::render_gradient(const BTexture &texture) {
- int inverted = 0;
+  bool inverted = False;
 
   interlaced = texture.texture() & BTexture::Interlaced;
 
@@ -167,12 +166,12 @@ Pixmap BImage::render_gradient(const BTexture &texture) {
     from = texture.colorTo();
     to = texture.color();
 
-    if (! (texture.texture() & BTexture::Invert)) inverted = 1;
+    if (! (texture.texture() & BTexture::Invert)) inverted = True;
   } else {
     from = texture.color();
     to = texture.colorTo();
 
-    if (texture.texture() & BTexture::Invert) inverted = 1;
+    if (texture.texture() & BTexture::Invert) inverted = True;
   }
 
   control->getGradientBuffers(width, height, &xtable, &ytable);
@@ -191,9 +190,7 @@ Pixmap BImage::render_gradient(const BTexture &texture) {
 
   if (inverted) invert();
 
-  Pixmap pixmap = renderPixmap();
-
-  return pixmap;
+  return renderPixmap();
 
 }
 
@@ -461,6 +458,8 @@ XImage *BImage::renderXImage(void) {
   unsigned int o = image->bits_per_pixel +
     ((image->byte_order == MSBFirst) ? 1 : 0);
 
+  bool unsupported = False;
+
   if (control->doDither() && width > 1 && height > 1) {
     switch (control->getVisual()->c_class) {
     case TrueColor:
@@ -478,23 +477,18 @@ XImage *BImage::renderXImage(void) {
     }
 
     default:
-      fprintf(stderr, i18n(ImageSet, ImageUnsupVisual,
-                           "BImage::renderXImage: unsupported visual\n"));
-      delete [] d;
-      XDestroyImage(image);
-      return (XImage *) 0;
+      unsupported = True;
     }
   } else {
-    register unsigned int x, y, r, g, b, offset;
-
+    unsigned int x, y, r, g, b, offset;
     unsigned char *pixel_data = d, *ppixel_data = d;
     unsigned long pixel;
 
     switch (control->getVisual()->c_class) {
     case StaticColor:
     case PseudoColor:
-      for (y = 0, offset = 0; y < height; y++) {
-        for (x = 0; x < width; x++, offset++) {
+      for (y = 0, offset = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x, ++offset) {
   	  r = red_table[red[offset]];
           g = green_table[green[offset]];
 	  b = blue_table[blue[offset]];
@@ -542,15 +536,20 @@ XImage *BImage::renderXImage(void) {
       break;
 
     default:
-      fprintf(stderr, i18n(ImageSet, ImageUnsupVisual,
-                           "BImage::renderXImage: unsupported visual\n"));
-      delete [] d;
-      XDestroyImage(image);
-      return (XImage *) 0;
+      unsupported = True;
     }
   }
 
+  if (unsupported) {
+    fprintf(stderr, i18n(ImageSet, ImageUnsupVisual,
+                         "BImage::renderXImage: unsupported visual\n"));
+    delete [] d;
+    XDestroyImage(image);
+    return (XImage *) 0;
+  }
+
   image->data = (char *) d;
+
   return image;
 }
 
@@ -571,7 +570,9 @@ Pixmap BImage::renderPixmap(void) {
   if (! image) {
     XFreePixmap(control->getBaseDisplay()->getXDisplay(), pixmap);
     return None;
-  } else if (! image->data) {
+  }
+
+  if (! image->data) {
     XDestroyImage(image);
     XFreePixmap(control->getBaseDisplay()->getXDisplay(), pixmap);
     return None;

@@ -27,8 +27,9 @@ public:
 private:
   struct CacheItem {
     GC gc;
+    unsigned long pixel;
     int count;
-    CacheItem(GC g) : gc(g), count(0) {}
+    CacheItem(GC g, unsigned long p) : gc(g), pixel(p), count(0) {}
   };
   static std::map<unsigned long, CacheItem*> *_cache;
 

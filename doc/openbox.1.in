@@ -90,7 +90,7 @@ Start Openbox on the specified display.
 Programs started by Openbox will have the
 .B DISPLAY
 environment variable set to this value, too.
-.SH RUNNING BLACKBOX
+.SH RUNNING OPENBOX
 This program is usually started by the user's startup script, most times called
 .IR ~/.xinitrc .
 To run openbox, modify the script by adding
@@ -108,7 +108,7 @@ On exit or restart, Openbox will save user defaults in the file
 .I ~/.openbox/rc
 in the user's home directory.
 Some resources in this file can be edited by hand.
-.SH USING BLACKBOX
+.SH USING OPENBOX
 From version 0.60.x, Openbox does no keyboard handling by itself; instead, it
 relies on an external program
 .IR bbkeys (1)
@@ -805,4 +805,4 @@ This manpage was put together by Wilbert Berendsen
 .hy
 Numerous other languages will be available.
 .SH SEE ALSO
-.IR bsetroot (1), \ bbkeys (1)  \" not there, yet ;-(
+.IR bsetroot (1), \ bbkeys (1), \ xftlsfonts (1), \ epist (1)

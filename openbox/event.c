@@ -565,7 +565,7 @@ static void event_handle_client(Client *client, XEvent *e)
         ;
 #ifdef SHAPE
         if (extensions_shape && e->type == extensions_shape_event_basep) {
-            client->shaped = ((XShapeEvent*)&e)->shaped;
+            client->shaped = ((XShapeEvent*)e)->shaped;
             engine_frame_adjust_shape(client->frame);
         }
 #endif

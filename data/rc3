@@ -133,4 +133,4 @@ mbind	Frame		Click		A-Down	PreviousDesktopWrap
 mbind	Frame		Click		C-A-Up	SendToNextDesktopWrap
 mbind	Frame		Click		C-A-Down SendToPreviousDesktopWrap
 
-mbind	Root		Click		Left	execute "xterm"
+mbind	Root		Click		Right	ShowMenu "root"

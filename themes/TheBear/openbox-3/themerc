@@ -16,7 +16,7 @@ menu.items.disabled.text.color: #737573
 menu.items.active.bg: flat gradient vertical bevel1
 menu.items.active.bg.color: #4a5194
 menu.items.active.bg.colorTo: #5a71c5
-menu.items.active.text.color: #ffffff
+menu.items.active.text.color: #f2f2f9
 
 menu.overlap: 5
 
@@ -37,12 +37,12 @@ window.active.grip.bg.colorTo: #4a5194
 window.active.label.bg: parentrelative
 window.active.label.bg.color: #000000
 window.active.label.bg.colorTo: #000000
-window.active.label.text.color: #ffffff
+window.active.label.text.color: #f2f2f9
 
 window.active.button.unpressed.bg: parentrelative
 window.active.button.unpressed.bg.color: #000000
 window.active.button.unpressed.bg.colorTo: #000000
-window.active.button.unpressed.image.color: #d6d7ef
+window.active.button.unpressed.image.color: #f2f2f9
 
 window.active.button.pressed.bg: sunken solid bevel1
 window.active.button.pressed.bg.color: #4c59a6
@@ -76,11 +76,15 @@ window.inactive.button.pressed.bg.colorTo: #5a5a5a
 window.inactive.button.pressed.bg.border.color: #000000
 
 !#
-window.active.button.disabled.bg: parentrelative
-window.active.button.disabled.image.color: #839183
+window.active.button.disabled.bg: flat border
+window.active.button.disabled.bg.color: #5866b6
+window.active.button.disabled.image.color: #f2f2f9
+window.active.button.disabled.bg.border.color: #d6d7ef
 !#
-window.inactive.button.disabled.bg: parentrelative
-window.inactive.button.disabled.image.color:  #6a716a
+window.inactive.button.disabled.bg: flat border solid
+window.inactive.button.disabled.bg.color: #c4c3c4
+window.inactive.button.disabled.image.color:  #ffffff
+window.inactive.button.disabled.bg.border.color: #ffffff
 
 !# toggled
 window.active.button.toggled.bg: parentrelative
@@ -106,4 +110,4 @@ border.color: #222222
 window.active.label.text.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
 window.inactive.label.text.font:Bitstream Vera Sans:bold:pixelsize=9
 menu.items.font: Bitstream Vera Sans:pixelsize=10
-menu.title.text.font: Bitstream Vera Sans:bold:pixelsize=10
+menu.title.text.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75

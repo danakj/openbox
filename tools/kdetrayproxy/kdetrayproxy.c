@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/select.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 typedef struct IList {
     Window win;
@@ -180,7 +181,8 @@ void updatehint()
         wins = malloc(sizeof(int) * n);
         for (it = list, i = 0; it; it = it->next, ++i)
             wins[i] = it->win;
-    }
+    } else
+        wins = NULL;
     XChangeProperty(display, root, roothint, XA_WINDOW, 32, PropModeReplace,
                     (unsigned char*) wins, n);
 }

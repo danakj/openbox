@@ -441,42 +441,44 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
                                   unsigned long *data) const
 {
   pixel32 *bg = sf.pixelData();
-  int startx, x, y, c;
-  unsigned int i, e;
-  x = (sf.size().width() - w) / 2;
-  y = (sf.size().height() - h) / 2;
+  int x, y, c, sfw, sfh;
+  unsigned int i, e, bgi;
+  sfw = sf.size().width();
+  sfh = sf.size().height();
+  x = (sfw - w) / 2;
+  y = (sfh - h) / 2;
 
   if (x < 0) x = 0;
   if (y < 0) y = 0;
 
-  // XX SCALING!@!&*(@! to make it fit on the surface
+  // XXX SCALING!@!&*(@! to make it fit on the surface
+  int orgw = w;
+  if (w > sfw) w = sfw;
+  if (h > sfh) h = sfh;
 
-  startx = x;
-  
-  for (i = 0, c = 0, e = w*h; i < e; ++i) {
+  for (i = 0, c = 0, bgi = y * sfw + x, e = orgw*h; i < e; ++i, ++bgi) {
     unsigned char alpha = data[i] >> 24;
     unsigned char r = data[i] >> 16;
     unsigned char g = data[i] >> 8;
     unsigned char b = data[i];
 
     // background color
-    unsigned char bgr = bg[i] >> default_red_shift;
-    unsigned char bgg = bg[i] >> default_green_shift;
-    unsigned char bgb = bg[i] >> default_blue_shift;
+    unsigned char bgr = bg[bgi] >> default_red_shift;
+    unsigned char bgg = bg[bgi] >> default_green_shift;
+    unsigned char bgb = bg[bgi] >> default_blue_shift;
       
-    r = bgr + (r - bgr) * alpha >> 8;
-    g = bgg + (g - bgg) * alpha >> 8;
-    b = bgb + (b - bgb) * alpha >> 8;
+    r = bgr + (((r - bgr) * alpha) >> 8);
+    g = bgg + (((g - bgg) * alpha) >> 8);
+    b = bgb + (((b - bgb) * alpha) >> 8);
 
-    bg[i] = (r << default_red_shift) | (g << default_green_shift) |
+    bg[bgi] = (r << default_red_shift) | (g << default_green_shift) |
       (b << default_blue_shift);
 
     if (++c >= w) {
-      ++y;
-      x = startx;
       c = 0;
-    } else
-      ++x;
+      bgi += sfw - w;
+      i += orgw - w;
+    }
   }
 
   const ScreenInfo *info = display->screenInfo(_screen);

@@ -8,7 +8,8 @@ import windowplacement # use a routine in here to place windows
 focus.fallback = 1
 
 # set up the mouse buttons
-focusmodel.setup_sloppy_focus()
+focusmodel.setup_click_focus() # use focusmodel.setup_sloppy_focus() instead to
+                               # make focus follow the cursor
 behavior.setup_window_clicks()
 behavior.setup_window_buttons()
 behavior.setup_scroll()

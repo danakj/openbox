@@ -17,6 +17,8 @@ def setup_click_focus(click_raise = 1):
              ob.MouseAction.Press, callbacks.focus)
     ob.mbind("Left", ob.MouseContext.Window,
              ob.MouseAction.Press, callbacks.focus)
+    ob.mbind("Middle", ob.MouseContext.Window,
+             ob.MouseAction.Press, callbacks.focus)
     #ob.mbind("A-Left", ob.MouseContext.Frame, ob.MouseAction.Press, focus)
     if click_raise:
         ob.mbind("Left", ob.MouseContext.Titlebar,

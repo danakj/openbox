@@ -30,6 +30,8 @@ void RrTextureSetRGBA(struct RrSurface *sur,
                       int w,
                       int h)
 {
+    int i;
+    unsigned char *padbuf;
     unsigned int num;
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
     if (!tex) return;
@@ -39,6 +41,25 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     tex->data.rgba.y = y;
     tex->data.rgba.w = w;
     tex->data.rgba.h = h;
+    tex->data.rgba.padw = 1;
+    tex->data.rgba.padh = 1;
+
+    while (tex->data.rgba.padw < w)
+        tex->data.rgba.padw <<= 1;
+
+    while (tex->data.rgba.padh < h)
+        tex->data.rgba.padh <<= 1;
+
+    padbuf = malloc(sizeof(RrData32)
+           * tex->data.rgba.padh * tex->data.rgba.padw);
+    memset(padbuf, 0, sizeof(RrData32) * tex->data.rgba.padh * 
+           tex->data.rgba.padw);
+
+    for (i = 0; i < h; i++)
+        memcpy(padbuf + i*tex->data.rgba.padw,
+               data + i*w,
+               w);
+
     glGenTextures(1, &num);
     tex->data.rgba.texid = num;
     glBindTexture(GL_TEXTURE_2D, num);
@@ -48,8 +69,10 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                 tex->data.rgba.padw, tex->data.rgba.padh,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, padbuf);
+    free(padbuf);
 }
 
 void RrTextureSetText(struct RrSurface *sur,

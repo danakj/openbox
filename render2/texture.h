@@ -23,6 +23,8 @@ struct RrTextureRGBA {
     int y;
     int w;
     int h;
+    int padw;
+    int padh;
 };
 
 struct RrTexture;

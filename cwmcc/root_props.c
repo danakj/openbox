@@ -112,9 +112,32 @@ void cwmcc_root_get_active_window(Window win, Window *window)
     }
 }
 
-/*void cwmcc_root_get_workarea(Window win, Rect a)
+void cwmcc_root_get_workarea(Window win, int **x, int **y, int **w, int **h)
 {
-}*/
+    gulong *data = NULL, num;
+    gulong desks, i;
+
+    /* need the number of desktops */
+    cwmcc_root_get_number_of_desktops(win, &desks);
+
+    if (!prop_get_array32(win, CWMCC_ATOM(root, net_workarea),
+                    CWMCC_ATOM(type, cardinal), &data, &num)) {
+        g_warning("Failed to read NET_DESKTOP_LAYOUT from 0x%lx", win);
+    } else if (num != 4 * desks) {
+        g_warning("Read invalid NET_DESKTOP_LAYOUT from 0x%lx", win);
+    } else {
+        *x = g_new(int, desks);
+        *y = g_new(int, desks);
+        *w = g_new(int, desks);
+        *h = g_new(int, desks);
+        for (i = 0; i < desks; ++i) {
+            (*x)[i] = data[i * 4];
+            (*y)[i] = data[i * 4 + 1];
+            (*w)[i] = data[i * 4 + 2];
+            (*h)[i] = data[i * 4 + 3];
+        }
+    }
+}
 
 void cwmcc_root_get_supporting_wm_check(Window win, Window *window)
 {

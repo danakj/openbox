@@ -22,7 +22,7 @@ void cwmcc_root_get_desktop_names(Window win, char ***names);
 
 void cwmcc_root_get_active_window(Window win, Window *window);
 
-/*void cwmcc_root_get_workarea(Window win, Rect a)*/
+void cwmcc_root_get_workarea(Window win, int **x, int **y, int **w, int **h);
 
 void cwmcc_root_get_supporting_wm_check(Window win, Window *window);
 

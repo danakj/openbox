@@ -1,7 +1,9 @@
 #ifndef __engineinterface_h
 #define __engineinterface_h
 
-#include "../kernel/frame.h"
+#include "kernel/frame.h"
+#include "kernel/geom.h"
+#include <X11/Xlib.h>
 #include <glib.h>
 
 /* startup */
@@ -47,5 +49,11 @@ typedef void EngineFrameHide(Frame *self);
 
 /* get_context */
 typedef Context EngineGetContext(Client *client, Window win);
+
+typedef void EngineRenderLabel(Window win, Rect *area, char *text,
+                               gboolean hilight, gboolean toplevel);
+
+typedef void EngineSizeLabel(char *text, gboolean hilight, gboolean toplevel,
+                             Size *s);
 
 #endif

@@ -8,7 +8,7 @@
 RAISE_WINDOW = 1
 """When cycling focus, raise the window chosen as well as focusing it. This
    does not affect fallback focusing behavior."""
-# See focus.avoid_skip_taskbar
+# See focus.AVOID_SKIP_TASKBAR
 ###########################################################################
 
 def next(data, num=1):

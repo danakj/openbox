@@ -364,7 +364,12 @@ static void event_done(gpointer data)
 
             /* is focus anywhere valid? */
             XGetInputFocus(ob_display, &w, &r);
-            if (!w || w == RootWindow(ob_display, ob_screen))
+
+#ifdef DEBUG_FOCUS
+            ob_debug("Focus was found on 0x%x revert %d\n", w, r);
+#endif
+
+            if (!w || w == PointerRoot)
                 focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
         }
         last = focus_client;

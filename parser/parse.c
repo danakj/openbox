@@ -32,7 +32,7 @@ static GSList  *xdg_data_dir_paths;
 struct Callback {
     gchar *tag;
     ParseCallback func;
-    void *data;
+    gpointer data;
 };
 
 struct _ObParseInst {
@@ -62,7 +62,7 @@ void parse_shutdown(ObParseInst *i)
 }
 
 void parse_register(ObParseInst *i, const gchar *tag,
-                    ParseCallback func, void *data)
+                    ParseCallback func, gpointer data)
 {
     struct Callback *c;
 
@@ -296,7 +296,7 @@ static GSList* split_paths(const gchar *paths)
 
 void parse_paths_startup()
 {
-    gchar *path;
+    const gchar *path;
 
     if (xdg_start)
         return;

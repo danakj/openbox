@@ -1,124 +1,269 @@
-# Russian translation of Openbox
-# # Copyright (C) 2004 Mikael Magnusson
-# This file is distributed under the same license as the openbox package.
+# Russian translation of Obconf
+# Copyright (C) 2004 Ben Jansens
+# This file is distributed under the same license as the ObConf package.
 # Alexey Remizov <alexey@remizov.pp.ru>, 2004.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.2\n"
-"POT-Creation-Date: 2004-04-17 13:45+0200\n"
-"PO-Revision-Date: 2004-04-23 13:00+0300\n"
+"Project-Id-Version: obconf 1.5\n"
+"POT-Creation-Date: 2003-09-29 01:29-0400\n"
+"PO-Revision-Date: 2004-04-26 10:33+0300\n"
 "Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/client_list_menu.c:94
-msgid "Go there..."
-msgstr "Перейти..."
+#: src/strings.c:7
+msgid "Openbox Window Preferences"
+msgstr "Настройки окон Openbox"
 
-#: openbox/client_list_menu.c:160
+#: src/strings.c:8
+msgid "<span weight=\"bold\">Theme</span>"
+msgstr "<span weight=\"bold\">Тема</span>"
+
+#: src/strings.c:9
+#: src/strings.c:11
+#: src/strings.c:23
+#: src/strings.c:25
+#: src/strings.c:31
+#: src/strings.c:34
+#: src/strings.c:42
+#: src/strings.c:47
+#: src/strings.c:58
+#: src/strings.c:65
+#: src/strings.c:70
+#: src/strings.c:72
+msgid "    "
+msgstr "    "
+
+#: src/strings.c:10
+msgid "<span weight=\"bold\">Window Titles</span>"
+msgstr "<span weight=\"bold\">Заголовки окон</span>"
+
+#: src/strings.c:12
+msgid "Button _order:"
+msgstr "Порядок кнопок:"
+
+#: src/strings.c:13
+msgid ""
+"N - The window's icon\n"
+"D - The all-desktops (sticky) button\n"
+"S - The shade (roll up) button\n"
+"L - The label (window title)\n"
+"I - The iconify (minimize) button\n"
+"M - The maximize button\n"
+"C - The close button"
+msgstr ""
+"N - Иконка окна\n"
+"D - Поместить на все рабочие места (приклеить)\n"
+"S - Скрутить\n"
+"L - Заголовок окна\n"
+"I - Свернуть\n"
+"M - Развернуть\n"
+"C - Закрыть"
+
+#: src/strings.c:20
+msgid "*"
+msgstr "*"
+
+#: src/strings.c:21
+msgid "Appearance"
+msgstr "Внешний вид"
+
+#: src/strings.c:22
+msgid "<span weight=\"bold\">Focusing Windows</span>"
+msgstr "<span weight=\"bold\">Выбор окон</span>"
+
+#: src/strings.c:24
+msgid "Focus windows when the _mouse pointer moves over them"
+msgstr "Выбирать окно, когда указатель мыши находится над ним"
+
+#: src/strings.c:26
+msgid "_Raise windows when the mouse pointer moves over them"
+msgstr "Поднимать выбранное окно, когда указатель мыши находится над ним"
+
+#: src/strings.c:27
+msgid "_Delay before focusing and raising windows:"
+msgstr "Задержка перед поднятием:"
+
+#: src/strings.c:28
+#: src/strings.c:74
+msgid "ms"
+msgstr "мс"
+
+#: src/strings.c:29
+msgid "Focus _new windows when they appear"
+msgstr "Выбирать новое окно, когда оно появляется"
+
+#: src/strings.c:30
+msgid "<span weight=\"bold\">Placing Windows</span>"
+msgstr "<span weight=\"bold\">Расположение окон</span>"
+
+#: src/strings.c:32
+msgid "_Place new windows under the mouse pointer"
+msgstr "Располагать новые окна на месте указателя мыши"
+
+#: src/strings.c:33
+msgid "<span weight=\"bold\">Moving and Resizing Windows</span>"
+msgstr "<span weight=\"bold\">Перемещение и изменение размера окон</span>"
+
+#: src/strings.c:35
+msgid "Update the window c_ontents while resizing"
+msgstr "Показывать содержимое окна при изменении размера"
+
+#: src/strings.c:36
+msgid "Amount of resistance against other _windows:"
+msgstr "Зона сопротивления пересечению с окнами:"
+
+#: src/strings.c:37
+#: src/strings.c:39
+msgid "px"
+msgstr "px"
+
+#: src/strings.c:38
+msgid "Amount of resistance against screen _edges:"
+msgstr "Зона сопротивления выходу за границы экрана:"
+
+#: src/strings.c:40
+msgid "Behavior"
+msgstr "Поведение"
+
+#: src/strings.c:41
+msgid "<span weight=\"bold\">Desktops</span>"
+msgstr "<span weight=\"bold\">Рабочие места</span>"
+
+#: src/strings.c:43
+msgid "Number of _desktops: "
+msgstr "Количество рабочих мест:"
+
+#: src/strings.c:44
+msgid "Desktop _names:"
+msgstr "Названия рабочих мест:"
+
+#: src/strings.c:45
 msgid "Desktops"
 msgstr "Рабочие места"
 
-#: openbox/client_menu.c:78
-msgid "Restore"
-msgstr "Восстановить"
+#: src/strings.c:46
+msgid "<span weight=\"bold\">Position</span>"
+msgstr "<span weight=\"bold\">Позиция</span>"
 
-#: openbox/client_menu.c:78
-msgid "Maximize"
-msgstr "Развернуть на весь экран"
+#: src/strings.c:48
+msgid "_Position:"
+msgstr "Позиция:"
 
-#: openbox/client_menu.c:84
-msgid "Roll down"
-msgstr "Раскрутить"
+#: src/strings.c:49
+msgid "Top Left"
+msgstr "Вверху слева"
 
-#: openbox/client_menu.c:84
-msgid "Roll up"
-msgstr "Скрутить"
+#: src/strings.c:50
+msgid "Top"
+msgstr "Вверху"
 
-#: openbox/client_menu.c:146
-msgid "All desktops"
-msgstr "Все рабочие места"
+#: src/strings.c:51
+msgid "Top Right"
+msgstr "Вверху справа"
 
-#: openbox/client_menu.c:170
-msgid "Layer"
-msgstr "Расположить"
+#: src/strings.c:52
+msgid "Left"
+msgstr "Слева"
 
-#: openbox/client_menu.c:175
-msgid "Always on top"
-msgstr "Всегда на переднем плане"
+#: src/strings.c:53
+msgid "Right"
+msgstr "Справа"
 
-#: openbox/client_menu.c:180
-msgid "Normal"
-msgstr "Обычно"
+#: src/strings.c:54
+msgid "Bottom Left"
+msgstr "Внизу слева"
 
-#: openbox/client_menu.c:185
-msgid "Always on bottom"
-msgstr "Всегда на заднем плане"
+#: src/strings.c:55
+msgid "Bottom"
+msgstr "Внизу"
 
-#: openbox/client_menu.c:188
-msgid "Send to desktop"
-msgstr "Переместить на рабочее место"
+#: src/strings.c:56
+msgid "Bottom Right"
+msgstr "Внизу справа"
 
-#: openbox/client_menu.c:192
-msgid "Client menu"
-msgstr "Меню клиента"
+#: src/strings.c:57
+msgid "Floating"
+msgstr "Свободная"
 
-#: openbox/client_menu.c:205
-msgid "Iconify"
-msgstr "Свернуть"
+#: src/strings.c:59
+msgid "_Floating position:"
+msgstr "Свободная позиция:"
 
-#: openbox/client_menu.c:222
-msgid "Raise to top"
-msgstr "Поднять на передний план"
+#: src/strings.c:60
+msgid "x"
+msgstr "x"
 
-#: openbox/client_menu.c:226
-msgid "Lower to bottom"
-msgstr "Опустить на задний план"
+#: src/strings.c:61
+msgid "_Orientation: "
+msgstr "Ориентация"
 
-#: openbox/client_menu.c:239
-msgid "Decorate"
-msgstr "Убрать оформление"
+#: src/strings.c:62
+msgid "Vertical"
+msgstr "Вертикальная"
 
-#: openbox/client_menu.c:245
-msgid "Move"
-msgstr "Переместить"
+#: src/strings.c:63
+msgid "Horizontal"
+msgstr "Горизонтальная"
 
-#: openbox/client_menu.c:249
-msgid "Resize"
-msgstr "Изменить размер"
+#: src/strings.c:64
+msgid "<span weight=\"bold\">Stacking</span>"
+msgstr "<span weight=\"bold\">Расположение</span>"
 
-#: openbox/client_menu.c:255
-msgid "Close"
-msgstr "Закрыть"
+#: src/strings.c:66
+msgid "Keep dock _above other windows"
+msgstr "Всегда располагать док выше других окон"
 
-#: openbox/session.c:124
-msgid "--sm-client-id requires an argument\n"
-msgstr "--sm-client-id требует параметр\n"
+#: src/strings.c:67
+msgid "A_llow dock to be both above and below windows"
+msgstr "Располагать док как выше, так и ниже других окон"
 
-#: openbox/session.c:132
-msgid "--sm-save-file requires an argument\n"
-msgstr "--sm-save-file требует параметр\n"
+#: src/strings.c:68
+msgid "Keep dock _below other windows"
+msgstr "Всегда располагать док ниже других окон"
 
-#: openbox/session.c:160
-#, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "Невозможно создать каталог '%s': %s"
+#: src/strings.c:69
+msgid "<span weight=\"bold\">Hiding</span>"
+msgstr "<span weight=\"bold\">Скрытие</span>"
 
-#: render/font.c:50
-msgid "Couldn't initialize Xft."
-msgstr "Не удалось инициализировать Xft."
+#: src/strings.c:71
+msgid "_Hide off screen"
+msgstr "Скрывать экран"
 
-#: render/font.c:122
-#: render/font.c:127
-#, c-format
-msgid "Unable to load font: %s\n"
-msgstr "Невозможно загрузить шрифт: %s\n"
+#: src/strings.c:73
+msgid "_Delay before hiding:"
+msgstr "Задержка перед скрытием:"
 
-#: render/font.c:123
-#, c-format
-msgid "Trying fallback font: %s\n"
-msgstr "Попытка вернуть шрифт: %s\n"
+#: src/strings.c:75
+msgid "Dock"
+msgstr "Док приложений"
+
+#: src/strings.c:76
+msgid "About"
+msgstr "О программе"
+
+#: src/strings.c:77
+msgid "About ObConf"
+msgstr "О программе ObConf"
+
+#: src/strings.c:78
+msgid "<span weight=\"bold\" size=\"xx-large\">ObConf 3.0</span>"
+msgstr "<span weight=\"bold\" size=\"xx-large\">ObConf 3.0</span>"
+
+#: src/strings.c:79
+msgid "A preferences manager for Openbox"
+msgstr "Управление настройками Openbox"
+
+#: src/strings.c:80
+msgid ""
+"Copyright (c) 2003 \n"
+"Ben Jansens <ben@openbox.org>\n"
+"Tim Riley <tr@slackzone.org>"
+msgstr ""
+"Copyright (c) 2003 \n"
+"Ben Jansens <ben@openbox.org>\n"
+"Tim Riley <tr@slackzone.org>"
 

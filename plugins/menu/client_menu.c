@@ -165,7 +165,7 @@ void plugin_startup()
     acts = g_slist_prepend(NULL, action_from_string("Iconify"));
     menu_add_normal(CLIENT_MENU_NAME, CLIENT_ICONIFY, _("Iconify"), acts);
 
-    acts = g_slist_prepend(NULL, action_from_string("MaximizeFull"));
+    acts = g_slist_prepend(NULL, action_from_string("ToggleMaximizeFull"));
     menu_add_normal(CLIENT_MENU_NAME, CLIENT_MAXIMIZE, _("Maximize"), acts);
 
     acts = g_slist_prepend(NULL, action_from_string("Raise"));

@@ -30,6 +30,7 @@ int main () {
   XFlush(display);
   sleep(2);
 
+  printf("fullscreen\n");
   msg.xclient.type = ClientMessage;
   msg.xclient.message_type = _net_state;
   msg.xclient.display = display;
@@ -41,10 +42,11 @@ int main () {
   msg.xclient.data.l[3] = 0l;
   msg.xclient.data.l[4] = 0l;
   XSendEvent(display, RootWindow(display, 0), False,
-	     StructureNotifyMask | SubstructureNotifyMask, &msg);
+	     SubstructureNotifyMask | SubstructureRedirectMask, &msg);
   XFlush(display);
   sleep(2);
 
+  printf("restore\n");
   msg.xclient.type = ClientMessage;
   msg.xclient.message_type = _net_state;
   msg.xclient.display = display;
@@ -56,7 +58,7 @@ int main () {
   msg.xclient.data.l[3] = 0l;
   msg.xclient.data.l[4] = 0l;
   XSendEvent(display, RootWindow(display, 0), False,
-	     StructureNotifyMask | SubstructureNotifyMask, &msg);
+	     SubstructureNotifyMask | SubstructureRedirectMask, &msg);
 
   XSelectInput(display, win, ExposureMask | StructureNotifyMask);
 

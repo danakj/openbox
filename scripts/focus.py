@@ -162,7 +162,7 @@ def focus_next_stacked(data, forward=1):
                 _list_widget = otk.Widget(ob.openbox, style,
                                           otk.Widget.Vertical, 0,
                                           style.bevelWidth(), 1)
-                t = style.labelFocusBackground()
+                t = style.titlebarFocusBackground()
                 _list_widget.setTexture(t)
 
                 titles = []

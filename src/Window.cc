@@ -2582,26 +2582,28 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
         else if (dbottom < snap_distance)
           dy = srect.bottom() - frame.rect.height() + 1;
 
-        srect = screen->getRect(); // now get the full screen
+        if (! screen->doFullMax()) {
+          srect = screen->getRect(); // now get the full screen
 
-        dleft = std::abs(wleft - srect.left()),
-        dright = std::abs(wright - srect.right()),
-        dtop = std::abs(wtop - srect.top()),
-        dbottom = std::abs(wbottom - srect.bottom());
+          dleft = std::abs(wleft - srect.left()),
+          dright = std::abs(wright - srect.right()),
+          dtop = std::abs(wtop - srect.top()),
+          dbottom = std::abs(wbottom - srect.bottom());
 
-        // snap left?
-        if (dleft < snap_distance && dleft <= dright)
-          dx = srect.left();
-        // snap right?
-        else if (dright < snap_distance)
-          dx = srect.right() - frame.rect.width() + 1;
+          // snap left?
+          if (dleft < snap_distance && dleft <= dright)
+            dx = srect.left();
+          // snap right?
+          else if (dright < snap_distance)
+            dx = srect.right() - frame.rect.width() + 1;
 
-        // snap top?
-        if (dtop < snap_distance && dtop <= dbottom)
-          dy = srect.top();
-        // snap bottom?
-        else if (dbottom < snap_distance)
-          dy = srect.bottom() - frame.rect.height() + 1;
+          // snap top?
+          if (dtop < snap_distance && dtop <= dbottom)
+            dy = srect.top();
+          // snap bottom?
+          else if (dbottom < snap_distance)
+            dy = srect.bottom() - frame.rect.height() + 1;
+        }
       }
 
       if (screen->doOpaqueMove()) {

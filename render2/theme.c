@@ -22,7 +22,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     theme->title_layout = "NLIMC";
 
     theme->title_font = RrFontOpen(inst,
-                                  "arial:bold:pixelsize=10:"
+                                  "arial:bold:pixelsize=11:"
                                   "shadow=true:shadowoffset=1:shadowtint=0.1");
     theme->title_justify = RR_CENTER;
 

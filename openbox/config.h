@@ -12,6 +12,9 @@ extern gboolean config_focus_last;
 /*! Focus the last focused window as a fallback when switching desktops */
 extern gboolean config_focus_last_on_desktop;
 
+/* The name of the theme */
+char *config_theme;
+
 /*! The number of desktops */
 extern int config_desktops_num;
 /*! Names for the desktops */

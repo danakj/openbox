@@ -174,7 +174,7 @@ int main(int argc, char **argv)
         parse_shutdown();
 
         /* load the theme specified in the rc file */
-        theme = theme_load("ebox"); /* woot i like this theme :) */
+        theme = theme_load(config_theme);
         g_free(theme);
         if (!theme) return 1;
 

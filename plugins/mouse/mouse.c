@@ -1,15 +1,17 @@
-#include "../../kernel/openbox.h"
-#include "../../kernel/dispatch.h"
-#include "../../kernel/action.h"
-#include "../../kernel/event.h"
-#include "../../kernel/client.h"
-#include "../../kernel/frame.h"
-#include "../../kernel/grab.h"
-#include "../../kernel/engine.h"
-#include "../../kernel/config.h"
+#include "kernel/openbox.h"
+#include "kernel/dispatch.h"
+#include "kernel/action.h"
+#include "kernel/event.h"
+#include "kernel/client.h"
+#include "kernel/frame.h"
+#include "kernel/grab.h"
+#include "kernel/engine.h"
+#include "kernel/config.h"
+#include "kernel/parse.h"
+#include "kernel/frame.h"
 #include "translate.h"
 #include "mouse.h"
-#include "mouserc_parse.h"
+#include "mouseparse.h"
 #include <glib.h>
 
 void plugin_setup_config()
@@ -23,52 +25,43 @@ void plugin_setup_config()
                                   "The amount of time (in milliseconds) in "
                                   "which two clicks must occur to cause a "
                                   "DoubleClick event."));
+
+    parse_reg_section("mouse", mouseparse);
 }
 
-/* GData of GSList*s of PointerBinding*s. */
-static GData *bound_contexts;
+/* Array of GSList*s of PointerBinding*s. */
+static GSList *bound_contexts[NUM_CONTEXTS];
 
-struct foreach_grab_temp {
-    Client *client;
-    gboolean grab;
-};
-
-static void foreach_grab(GQuark key, gpointer data, gpointer user_data)
-{
-    struct foreach_grab_temp *d = user_data;
-    GSList *it;
-    for (it = data; it != NULL; it = it->next) {
-        /* grab/ungrab the button */
-	MouseBinding *b = it->data;
-        Window win;
-        int mode;
-        unsigned int mask;
-
-        if (key == g_quark_try_string("frame")) {
-            win = d->client->frame->window;
-            mode = GrabModeAsync;
-            mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
-        } else if (key == g_quark_try_string("client")) {
-            win = d->client->frame->plate;
-            mode = GrabModeSync; /* this is handled in event */
-            mask = ButtonPressMask; /* can't catch more than this with Sync
-                                       mode the release event is manufactured
-                                       in event */
-        } else return;
-
-        if (d->grab)
-            grab_button(b->button, b->state, win, mask, mode);
-        else
-            ungrab_button(b->button, b->state, win);
-    }
-}
-  
 static void grab_for_client(Client *client, gboolean grab)
 {
-    struct foreach_grab_temp bt;
-    bt.client = client;
-    bt.grab = grab;
-    g_datalist_foreach(&bound_contexts, foreach_grab, &bt);
+    int i;
+    GSList *it;
+
+    for (i = 0; i < NUM_CONTEXTS; ++i)
+        for (it = bound_contexts[i]; it != NULL; it = it->next) {
+            /* grab/ungrab the button */
+            MouseBinding *b = it->data;
+            Window win;
+            int mode;
+            unsigned int mask;
+
+            if (i == Context_Frame) {
+                win = client->frame->window;
+                mode = GrabModeAsync;
+                mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
+            } else if (i == Context_Client) {
+                win = client->frame->plate;
+                mode = GrabModeSync; /* this is handled in event */
+                mask = ButtonPressMask; /* can't catch more than this with Sync
+                                           mode the release event is
+                                           manufactured in event() */
+            } else continue;
+
+            if (grab)
+                grab_button(b->button, b->state, win, mask, mode);
+            else
+                ungrab_button(b->button, b->state, win);
+        }
 }
 
 static void grab_all_clients(gboolean grab)
@@ -79,30 +72,32 @@ static void grab_all_clients(gboolean grab)
 	grab_for_client(it->data, grab);
 }
 
-static void foreach_clear(GQuark key, gpointer data, gpointer user_data)
+static void clearall()
 {
+    int i;
     GSList *it;
-    user_data = user_data;
-    for (it = data; it != NULL; it = it->next) {
-	int i;
+    
+    for(i = 0; i < NUM_CONTEXTS; ++i) {
+        for (it = bound_contexts[i]; it != NULL; it = it->next) {
+            int j;
 
-        MouseBinding *b = it->data;
-	for (i = 0; i < NUM_MOUSEACTION; ++i)
-            if (b->action[i] != NULL)
-                action_free(b->action[i]);
-        g_free(b);
+            MouseBinding *b = it->data;
+            for (j = 0; j < NUM_MOUSEACTION; ++j)
+                if (b->action[j] != NULL)
+                    action_free(b->action[j]);
+            g_free(b);
+        }
+        g_slist_free(bound_contexts[i]);
     }
-    g_slist_free(data);
 }
 
-static void fire_button(MouseAction a, GQuark context, Client *c, guint state,
+static void fire_button(MouseAction a, Context context, Client *c, guint state,
                         guint button)
 {
     GSList *it;
     MouseBinding *b;
 
-    for (it = g_datalist_id_get_data(&bound_contexts, context);
-         it != NULL; it = it->next) {
+    for (it = bound_contexts[context]; it != NULL; it = it->next) {
         b = it->data;
         if (b->state == state && b->button == button)
             break;
@@ -124,7 +119,7 @@ static void fire_button(MouseAction a, GQuark context, Client *c, guint state,
    clicked, Corner_TopLeft if a good default if there is no client 
    Returns True or False for if a binding existed for the action or not.
 */
-static gboolean fire_motion(MouseAction a, GQuark context, Client *c,
+static gboolean fire_motion(MouseAction a, Context context, Client *c,
                             guint state, guint button, int cx, int cy,
                             int cw, int ch, int dx, int dy,
                             gboolean final, Corner corner)
@@ -132,8 +127,7 @@ static gboolean fire_motion(MouseAction a, GQuark context, Client *c,
     GSList *it;
     MouseBinding *b;
 
-    for (it = g_datalist_id_get_data(&bound_contexts, context);
-         it != NULL; it = it->next) {
+    for (it = bound_contexts[context]; it != NULL; it = it->next) {
         b = it->data;
         if (b->state == state && b->button == button)
 		break;
@@ -202,7 +196,7 @@ static void event(ObEvent *e, void *foo)
     ConfigValue dragthreshold;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
-    GQuark context;
+    Context context;
     
     if (!config_get("mouse.dragThreshold", Config_Integer, &dragthreshold))
         dragthreshold.integer = 3; /* default */
@@ -245,7 +239,7 @@ static void event(ObEvent *e, void *foo)
                     e->data.x.client, e->data.x.e->xbutton.state,
                     e->data.x.e->xbutton.button);
 
-        if (context == g_quark_try_string("client")) {
+        if (context == Context_Client) {
             /* Replay the event, so it goes to the client*/
             XAllowEvents(ob_display, ReplayPointer, event_lasttime);
             /* Fall through to the release case! */
@@ -334,7 +328,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
                Action *action)
 {
     guint state, button;
-    GQuark context;
+    Context context;
     MouseBinding *b;
     GSList *it;
 
@@ -344,7 +338,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     }
 
     contextstr = g_ascii_strdown(contextstr, -1);
-    context = g_quark_try_string(contextstr);
+    context = frame_context_from_string(contextstr);
     if (!context) {
         g_warning("invalid context '%s'", contextstr);
         g_free(contextstr);
@@ -352,8 +346,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     }
     g_free(contextstr);
 
-    for (it = g_datalist_id_get_data(&bound_contexts, context);
-	 it != NULL; it = it->next){
+    for (it = bound_contexts[context]; it != NULL; it = it->next){
 	b = it->data;
 	if (b->state == state && b->button == button) {
 	    /* already bound */
@@ -373,8 +366,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     b->state = state;
     b->button = button;
     b->action[mact] = action;
-    g_datalist_id_set_data(&bound_contexts, context, 
-        g_slist_append(g_datalist_id_get_data(&bound_contexts, context), b));
+    bound_contexts[context] = g_slist_append(bound_contexts[context], b);
 
     grab_all_clients(TRUE);
 
@@ -386,8 +378,6 @@ void plugin_startup()
     dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
                       Event_X_ButtonPress | Event_X_ButtonRelease |
                       Event_X_MotionNotify, (EventHandler)event, NULL);
-
-    mouserc_parse();
 }
 
 void plugin_shutdown()
@@ -395,5 +385,5 @@ void plugin_shutdown()
     dispatch_register(0, (EventHandler)event, NULL);
 
     grab_all_clients(FALSE);
-    g_datalist_foreach(&bound_contexts, foreach_clear, NULL);
+    clearall();
 }

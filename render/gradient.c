@@ -391,7 +391,7 @@ void gradient_solid(Appearance *l, int x, int y, int w, int h)
 void gradient_pyramid(Surface *sf, int inw, int inh)
 {
     pixel32 *data = sf->data.planar.pixel_data;
-    pixel32 *end = data + inw*inh;
+    pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
@@ -434,7 +434,7 @@ void gradient_pyramid(Surface *sf, int inw, int inh)
 void gradient_rectangle(Surface *sf, int inw, int inh)
 {
     pixel32 *data = sf->data.planar.pixel_data;
-    pixel32 *end = data + inw*inh;
+    pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
@@ -479,7 +479,7 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
 void gradient_pipecross(Surface *sf, int inw, int inh)
 {
     pixel32 *data = sf->data.planar.pixel_data;
-    pixel32 *end = data + inw*inh;
+    pixel32 *end = data + inw*inh - 1;
     pixel32 current;
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;

@@ -193,6 +193,7 @@ void Windowmenu::SendtoWorkspacemenu::update(void) {
     } else {
       changeItemLabel(i, getScreen()->getWorkspace(i)->getName());
     }
+    setItemEnabled(i, i != getScreen()->getCurrentWorkspaceID());
   }
 
   Basemenu::update();

@@ -46,7 +46,7 @@ Config::~Config()
 }
 
 
-bool Config::getStringValue(Config::StringType type, string &ret) const
+bool Config::getValue(Config::StringType type, string &ret) const
 {
   StringItemList::const_iterator it = string_items.begin(), end = string_items.end();
   for (; it != end; ++it) {
@@ -59,7 +59,7 @@ bool Config::getStringValue(Config::StringType type, string &ret) const
 }
 
 
-bool Config::getNumberValue(Config::NumberType type, int &ret) const
+bool Config::getValue(Config::NumberType type, int &ret) const
 {
   NumberItemList::const_iterator it = number_items.begin(), end = number_items.end();
   for (; it != end; ++it) {
@@ -72,7 +72,7 @@ bool Config::getNumberValue(Config::NumberType type, int &ret) const
 }
 
 
-bool Config::getBoolValue(Config::BoolType type, bool &ret) const
+bool Config::getValue(Config::BoolType type, bool &ret) const
 {
   BoolItemList::const_iterator it = bool_items.begin(), end = bool_items.end();
   for (; it != end; ++it) {

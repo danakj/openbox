@@ -222,7 +222,7 @@ void keytree::initialize(void)
 {
   int tval = 0;
 
-  _epist->getConfig()->getNumberValue(Config::chainTimeout, tval);
+  _epist->getConfig()->getValue(Config::chainTimeout, tval);
   _timer = new BTimer(_epist, this);
 
   if (tval <= 0)

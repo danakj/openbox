@@ -64,7 +64,7 @@ screen::screen(epist *epist, int number)
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
 
-  _config->getBoolValue(Config::stackedCycling, _stacked_cycling);
+  _config->getValue(Config::stackedCycling, _stacked_cycling);
 
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -672,7 +672,7 @@ void screen::changeWorkspaceVert(const int num) const {
   int active_desktop = (signed)_active_desktop;
   int wnum = 0;
 
-  _config->getNumberValue(Config::workspaceColumns, width);
+  _config->getValue(Config::workspaceColumns, width);
 
   if (width > num_desktops || width <= 0)
     return;
@@ -704,7 +704,7 @@ void screen::changeWorkspaceHorz(const int num) const {
   int active_desktop = (signed)_active_desktop;
   int wnum = 0;
 
-  _config->getNumberValue(Config::workspaceColumns, width);
+  _config->getValue(Config::workspaceColumns, width);
 
   if (width > num_desktops || width <= 0)
     return;

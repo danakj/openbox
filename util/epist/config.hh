@@ -63,9 +63,9 @@ public:
   Config();
   ~Config();
 
-  bool getBoolValue(BoolType, bool &) const;
-  bool getStringValue(StringType, std::string &) const;
-  bool getNumberValue(NumberType, int &) const;
+  bool getValue(BoolType, bool &) const;
+  bool getValue(StringType, std::string &) const;
+  bool getValue(NumberType, int &) const;
 
   void addOption(const std::string &, const std::string &);
 };

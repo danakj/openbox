@@ -327,9 +327,10 @@ static void event_process(XEvent *e)
         return;
 
     /* deal with it in the kernel */
-    if (menu)
+    if (menu) {
         event_handle_menu(menu, e);
-    else if (client)
+        return;
+    } else if (client)
 	event_handle_client(client, e);
     else if (window == ob_root)
 	event_handle_root(e);

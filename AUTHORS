@@ -6,6 +6,12 @@ Derek Foreman (manmower@openbox.org)
  - Rendering code
 Scott Moynes (smoynes@openbox.org)
  - Menus
+Tore Anderson (tore@linpro.no)
+ - Directional focus actions
+Audun Hove <audun@nlc.no>
+ - Actions code, move window to edge actions
+Mikael Magnusson <mikachu@comhem.se>
+ - Bug finding expert
 Marius Nita (marius@cs.pdx.edu)
  - Otk prototype code, design ideas.
 Mike Bacso (smakwel@yahoo.com)

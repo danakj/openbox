@@ -4,7 +4,7 @@
 #include <glib.h>
 #include <GL/glx.h>
 
-#define TPOINTS 15.0
+#define TPOINTS 5.0
 
 #define TOFLOAT(x) (((x) >> 6) + ((x) & 63)/64.0)
 
@@ -24,23 +24,19 @@ int GlftMoveToFunc(FT_Vector *to, void *user)
     printf("move to %f:%f\n", state.x, state.y);
     if (state.drawing) {
         glEnd();
-        state.drawing = 0;
     }
+    glBegin(GL_LINE_STRIP);
+    glVertex2f(state.x, state.y);
+    state.drawing = 1;
     return 0;
 }
 
 int GlftLineToFunc(FT_Vector *to, void *user)
 {
-    if (!state.drawing) {
-        glBegin(GL_LINES);
-        glVertex2f(state.x, state.y);
-        state.drawing = 1;
-    } else
-        glVertex2f(state.x, state.y);
     state.x = TOFLOAT(to->x);
     state.y = TOFLOAT(to->y);
-    printf("line to %f:%f\n", state.x, state.y);
     glVertex2f(state.x, state.y);
+    printf("line to %f:%f\n", state.x, state.y);
     return 0;
 }
 
@@ -51,11 +47,11 @@ int GlftConicToFunc(FT_Vector *c, FT_Vector *to, void *user)
     for (t = 0, u = 1; t < 1.0; t += 1.0/TPOINTS, u = 1.0-t) {
         x = u*u*state.x + 2*t*u*TOFLOAT(c->x) + t*t*TOFLOAT(to->x);
         y = u*u*state.y + 2*t*u*TOFLOAT(c->y) + t*t*TOFLOAT(to->y);
-/*printf("cone to %f, %f (%f, %f)\n", x, y, t, u);*/
         glVertex2f(x, y);
     }
     state.x = TOFLOAT(to->x);
     state.y = TOFLOAT(to->y);
+    glVertex2f(state.x, state.y);
     printf("conic the hedgehog!\n");
     return 0;
 }

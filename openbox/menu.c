@@ -21,7 +21,7 @@ static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
     Action *act;
     xmlNodePtr nact;
     gchar *id = NULL, *title = NULL, *label = NULL;
-    Menu *menu, *parent;
+    ObMenu *menu, *parent;
 
     if (!parse_attr_string("id", node->parent, &id))
         goto parse_menu_fail;
@@ -30,9 +30,9 @@ static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
 
     g_message("menu label %s", title);
 
-    menu = menu_new(title, id, data ? *((Menu**)data) : NULL);
+    menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
     if (data)
-        *((Menu**)data) = menu;
+        *((ObMenu**)data) = menu;
 
     while (node) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
@@ -62,14 +62,14 @@ parse_menu_fail:
     g_free(title);
 }
 
-void menu_control_show(Menu *self, int x, int y, ObClient *client);
+void menu_control_show(ObMenu *self, int x, int y, ObClient *client);
 
-void menu_destroy_hash_key(Menu *menu)
+void menu_destroy_hash_key(ObMenu *menu)
 {
     g_free(menu);
 }
 
-void menu_destroy_hash_value(Menu *self)
+void menu_destroy_hash_value(ObMenu *self)
 {
     GList *it;
 
@@ -94,7 +94,7 @@ void menu_destroy_hash_value(Menu *self)
     g_free(self);
 }
 
-void menu_entry_free(MenuEntry *self)
+void menu_entry_free(ObMenuEntry *self)
 {
     g_free(self->label);
     action_free(self->action);
@@ -112,9 +112,9 @@ void menu_entry_free(MenuEntry *self)
 void menu_startup()
 {
 /*
-    Menu *m;
-    Menu *s;
-    Menu *t;
+    ObMenu *m;
+    ObMenu *s;
+    ObMenu *t;
     Action *a;
 */
 
@@ -183,13 +183,13 @@ static Window createWindow(Window parent, unsigned long mask,
                        
 }
 
-Menu *menu_new_full(char *label, char *name, Menu *parent, 
+ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
                     menu_controller_show show, menu_controller_update update)
 {
     XSetWindowAttributes attrib;
-    Menu *self;
+    ObMenu *self;
 
-    self = g_new0(Menu, 1);
+    self = g_new0(ObMenu, 1);
     self->obwin.type = Window_Menu;
     self->label = g_strdup(label);
     self->name = g_strdup(name);
@@ -239,11 +239,11 @@ void menu_free(char *name)
     g_hash_table_remove(menu_hash, name);
 }
 
-MenuEntry *menu_entry_new_full(char *label, Action *action,
-                               MenuEntryRenderType render_type,
+ObMenuEntry *menu_entry_new_full(char *label, Action *action,
+                               ObMenuEntryRenderType render_type,
                                gpointer submenu)
 {
-    MenuEntry *menu_entry = g_new0(MenuEntry, 1);
+    ObMenuEntry *menu_entry = g_new0(ObMenuEntry, 1);
 
     menu_entry->label = g_strdup(label);
     menu_entry->render_type = render_type;
@@ -257,7 +257,7 @@ MenuEntry *menu_entry_new_full(char *label, Action *action,
     return menu_entry;
 }
 
-void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu)
+void menu_entry_set_submenu(ObMenuEntry *entry, ObMenu *submenu)
 {
     g_assert(entry != NULL);
     
@@ -267,7 +267,7 @@ void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu)
         entry->parent->invalid = TRUE;
 }
 
-void menu_add_entry(Menu *menu, MenuEntry *entry)
+void menu_add_entry(ObMenu *menu, ObMenuEntry *entry)
 {
     XSetWindowAttributes attrib;
 
@@ -291,7 +291,7 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
 
 void menu_show(char *name, int x, int y, ObClient *client)
 {
-    Menu *self;
+    ObMenu *self;
   
     self = g_hash_table_lookup(menu_hash, name);
     if (!self) {
@@ -303,7 +303,7 @@ void menu_show(char *name, int x, int y, ObClient *client)
     menu_show_full(self, x, y, client);
 }  
 
-void menu_show_full(Menu *self, int x, int y, ObClient *client)
+void menu_show_full(ObMenu *self, int x, int y, ObClient *client)
 {
     g_assert(self != NULL);
        
@@ -326,7 +326,7 @@ void menu_show_full(Menu *self, int x, int y, ObClient *client)
     }
 }
 
-void menu_hide(Menu *self) {
+void menu_hide(ObMenu *self) {
     if (self->shown) {
         XUnmapWindow(ob_display, self->frame);
         self->shown = FALSE;
@@ -343,11 +343,11 @@ void menu_hide(Menu *self) {
     }
 }
 
-void menu_clear(Menu *self) {
+void menu_clear(ObMenu *self) {
     GList *it;
   
     for (it = self->entries; it; it = it->next) {
-	MenuEntry *entry = it->data;
+	ObMenuEntry *entry = it->data;
 	menu_entry_free(entry);
     }
     self->entries = NULL;
@@ -355,19 +355,19 @@ void menu_clear(Menu *self) {
 }
 
 
-MenuEntry *menu_find_entry(Menu *menu, Window win)
+ObMenuEntry *menu_find_entry(ObMenu *menu, Window win)
 {
     GList *it;
 
     for (it = menu->entries; it; it = it->next) {
-        MenuEntry *entry = it->data;
+        ObMenuEntry *entry = it->data;
         if (entry->item == win)
             return entry;
     }
     return NULL;
 }
 
-MenuEntry *menu_find_entry_by_pos(Menu *menu, int x, int y)
+ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y)
 {
     if (x < 0 || x >= menu->size.width || y < 0 || y >= menu->size.height)
         return NULL;
@@ -379,9 +379,9 @@ MenuEntry *menu_find_entry_by_pos(Menu *menu, int x, int y)
     return g_list_nth_data(menu->entries, y / menu->item_h);
 }
 
-void menu_entry_fire(MenuEntry *self)
+void menu_entry_fire(ObMenuEntry *self)
 {
-    Menu *m;
+    ObMenu *m;
 
     if (self->action) {
         self->action->data.any.c = self->parent->client;
@@ -398,7 +398,7 @@ void menu_entry_fire(MenuEntry *self)
    Default menu controller action for showing.
 */
 
-void menu_control_show(Menu *self, int x, int y, ObClient *client) {
+void menu_control_show(ObMenu *self, int x, int y, ObClient *client) {
     guint i;
     Rect *a = NULL;
 
@@ -426,7 +426,7 @@ void menu_control_show(Menu *self, int x, int y, ObClient *client) {
     }
 }
 
-void menu_control_mouseover(MenuEntry *self, gboolean enter) {
+void menu_control_mouseover(ObMenuEntry *self, gboolean enter) {
     int x;
     Rect *a;
 

@@ -4,9 +4,9 @@
 #include "openbox.h"
 #include "render/theme.h"
 
-void menu_render_full(Menu *self);
+void menu_render_full(ObMenu *self);
 
-void menu_render(Menu *self) {
+void menu_render(ObMenu *self) {
     if (self->update) {
         self->update(self);
     } else if (self->invalid) {
@@ -14,7 +14,7 @@ void menu_render(Menu *self) {
     }
 }
 
-void menu_render_full(Menu *self) {
+void menu_render_full(ObMenu *self) {
     GList *it;
     int items_h = 0;
     int nitems = 0; /* each item, only one is used */
@@ -47,7 +47,7 @@ void menu_render_full(Menu *self) {
     }
 
     for (it = self->entries; it; it = it->next) {
-        MenuEntry *e = it->data;
+        ObMenuEntry *e = it->data;
         int h;
 
         if (e->a_item == NULL) {
@@ -95,7 +95,7 @@ void menu_render_full(Menu *self) {
 
     item_y = 0;
     for (it = self->entries; it; it = it->next) {
-        ((MenuEntry*)it->data)->y = item_y;
+        ((ObMenuEntry*)it->data)->y = item_y;
         menu_entry_render(it->data);
         item_y += self->item_h;
     }
@@ -103,24 +103,24 @@ void menu_render_full(Menu *self) {
     self->invalid = FALSE;
 }
 
-void menu_entry_render(MenuEntry *self)
+void menu_entry_render(ObMenuEntry *self)
 {
-    Menu *menu = self->parent;
+    ObMenu *menu = self->parent;
     RrAppearance *a;
     
     switch (self->render_type) {
-    case MenuEntryRenderType_Submenu:
+    case OB_MENU_ENTRY_RENDER_TYPE_SUBMENU:
 	/* TODO: submenu mask */
-    case MenuEntryRenderType_Boolean:
+    case OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN:
 	/* TODO: boolean check */
 	a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item) 
 	    : self->a_disabled;
 	break;
-    case MenuEntryRenderType_None:
+    case OB_MENU_ENTRY_RENDER_TYPE_NONE:
 	a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item )
 	    : self->a_disabled;
 	break;
-    case MenuEntryRenderType_Separator:
+    case OB_MENU_ENTRY_RENDER_TYPE_SEPARATOR:
 	a = self->a_item;
 	break;
 
@@ -128,7 +128,8 @@ void menu_entry_render(MenuEntry *self)
 	g_message("unhandled render_type");
 	a = !self->enabled ? self->a_disabled :
         (self->hilite && 
-         (self->action || self->render_type == MenuEntryRenderType_Submenu) ? 
+         (self->action ||
+          self->render_type == OB_MENU_ENTRY_RENDER_TYPE_SUBMENU) ? 
          self->a_hilite : self->a_item);
 	break;
     }

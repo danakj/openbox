@@ -10,32 +10,32 @@
 
 struct _ObClient;
 
-struct Menu;
-struct MenuEntry;
+typedef struct _ObMenu      ObMenu;
+typedef struct _ObMenuEntry ObMenuEntry;
 
-typedef void(*menu_controller_show)(struct Menu *self,
-                                    int x, int y, struct _ObClient *);
-typedef void(*menu_controller_update)(struct Menu *self);
-typedef void(*menu_controller_mouseover)(struct MenuEntry *self,
-                                         gboolean enter);
+typedef void(*menu_controller_show)(ObMenu *self, int x, int y,
+                                    struct _ObClient *);
+typedef void(*menu_controller_update)(ObMenu *self);
+typedef void(*menu_controller_mouseover)(ObMenuEntry *self, gboolean enter);
 
 extern GHashTable *menu_hash;
 extern GSList *menu_visible;
 
-typedef struct Menu {
+struct _ObMenu
+{
     ObWindow obwin;
 
-    char *label;
-    char *name;
+    gchar *label;
+    gchar *name;
     
     GList *entries;
 
     gboolean shown;
     gboolean invalid;
 
-    struct Menu *parent;
+    ObMenu *parent;
     
-    struct Menu *open_submenu;
+    ObMenu *open_submenu;
 
     /* place a menu on screen */
     menu_controller_show show;
@@ -52,11 +52,11 @@ typedef struct Menu {
     Window frame;
     Window title;
     RrAppearance *a_title;
-    int title_min_w, title_h;
+    gint title_min_w, title_h;
     Window items;
     RrAppearance *a_items;
-    int bullet_w;
-    int item_h;
+    gint bullet_w;
+    gint item_h;
     Point location;
     Size size;
     guint xin_area; /* index of the xinerama head/area */
@@ -64,38 +64,39 @@ typedef struct Menu {
     /* plugin stuff */
     char *plugin;
     void *plugin_data;
-} Menu;
+};
 
-typedef enum MenuEntryRenderType {
-    MenuEntryRenderType_None = 0,
-    MenuEntryRenderType_Submenu = 1 << 0,
-    MenuEntryRenderType_Boolean = 1 << 1,
-    MenuEntryRenderType_Separator = 1 << 2,
-    
-    MenuEntryRenderType_Other = 1 << 7
-} MenuEntryRenderType;
+typedef enum
+{
+    OB_MENU_ENTRY_RENDER_TYPE_NONE,
+    OB_MENU_ENTRY_RENDER_TYPE_SUBMENU,
+    OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN,
+    OB_MENU_ENTRY_RENDER_TYPE_SEPARATOR,
+    OB_MENU_ENTRY_RENDER_TYPE_OTHER /* XXX what is this? */
+} ObMenuEntryRenderType;
 
-typedef struct MenuEntry {
+struct _ObMenuEntry
+{
     char *label;
-    Menu *parent;
+    ObMenu *parent;
 
     Action *action;    
     
-    MenuEntryRenderType render_type;
+    ObMenuEntryRenderType render_type;
     gboolean hilite;
     gboolean enabled;
     gboolean boolean_value;
 
-    Menu *submenu;
+    ObMenu *submenu;
 
     /* render stuff */
     Window item;
     RrAppearance *a_item;
     RrAppearance *a_disabled;
     RrAppearance *a_hilite;
-    int y;
-    int min_w;
-} MenuEntry;
+    gint y;
+    gint min_w;
+};
 
 void menu_startup();
 void menu_shutdown();
@@ -103,48 +104,48 @@ void menu_shutdown();
 #define menu_new(l, n, p) \
   menu_new_full(l, n, p, NULL, NULL)
 
-Menu *menu_new_full(char *label, char *name, Menu *parent, 
+ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
                     menu_controller_show show, menu_controller_update update);
 void menu_free(char *name);
 
 void menu_show(char *name, int x, int y, struct _ObClient *client);
-void menu_show_full(Menu *menu, int x, int y, struct _ObClient *client);
+void menu_show_full(ObMenu *menu, int x, int y, struct _ObClient *client);
 
-void menu_hide(Menu *self);
+void menu_hide(ObMenu *self);
 
-void menu_clear(Menu *self);
+void menu_clear(ObMenu *self);
 
-MenuEntry *menu_entry_new_full(char *label, Action *action,
-                               MenuEntryRenderType render_type,
+ObMenuEntry *menu_entry_new_full(char *label, Action *action,
+                               ObMenuEntryRenderType render_type,
                                gpointer submenu);
 
 #define menu_entry_new(label, action) \
-menu_entry_new_full(label, action, MenuEntryRenderType_None, NULL)
+menu_entry_new_full(label, action, OB_MENU_ENTRY_RENDER_TYPE_NONE, NULL)
 
 #define menu_entry_new_separator(label) \
-menu_entry_new_full(label, NULL, MenuEntryRenderType_Separator, NULL)
+menu_entry_new_full(label, NULL, OB_MENU_ENTRY_RENDER_TYPE_SEPARATOR, NULL)
 
 #define menu_entry_new_submenu(label, submenu) \
-menu_entry_new_full(label, NULL, MenuEntryRenderType_Submenu, submenu)
+menu_entry_new_full(label, NULL, OB_MENU_ENTRY_RENDER_TYPE_SUBMENU, submenu)
 
 #define menu_entry_new_boolean(label, action) \
-menu_entry_new_full(label, action, MenuEntryRenderType_Boolean, NULL)
+menu_entry_new_full(label, action, OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN, NULL)
 
-void menu_entry_free(MenuEntry *entry);
+void menu_entry_free(ObMenuEntry *entry);
 
-void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu);
+void menu_entry_set_submenu(ObMenuEntry *entry, ObMenu *submenu);
 
-void menu_add_entry(Menu *menu, MenuEntry *entry);
+void menu_add_entry(ObMenu *menu, ObMenuEntry *entry);
 
-MenuEntry *menu_find_entry(Menu *menu, Window win);
-MenuEntry *menu_find_entry_by_pos(Menu *menu, int x, int y);
+ObMenuEntry *menu_find_entry(ObMenu *menu, Window win);
+ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y);
 
-void menu_entry_render(MenuEntry *self);
+void menu_entry_render(ObMenuEntry *self);
 
-void menu_entry_fire(MenuEntry *self);
+void menu_entry_fire(ObMenuEntry *self);
 
-void menu_render(Menu *self);
-void menu_render_full(Menu *self);
+void menu_render(ObMenu *self);
+void menu_render_full(ObMenu *self);
 
-void menu_control_mouseover(MenuEntry *entry, gboolean enter);
+void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
 #endif

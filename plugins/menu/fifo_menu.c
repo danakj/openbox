@@ -20,11 +20,11 @@ typedef struct Fifo_Menu_Data{
     event_fd_handler *handler;
 } Fifo_Menu_Data;
 
-#define FIFO_MENU(m) ((Menu *)m)
-#define FIFO_MENU_DATA(m) ((Fifo_Menu_Data *)((Menu *)m)->plugin_data)
+#define FIFO_MENU(m) ((ObMenu *)m)
+#define FIFO_MENU_DATA(m) ((Fifo_Menu_Data *)((ObMenu *)m)->plugin_data)
 
 
-void fifo_menu_clean_up(Menu *m) {
+void fifo_menu_clean_up(ObMenu *m) {
     if (FIFO_MENU_DATA(m)->buf != NULL) {
         g_free(FIFO_MENU_DATA(m)->buf);
         FIFO_MENU_DATA(m)->buf = NULL;
@@ -43,7 +43,7 @@ void plugin_startup()
 void plugin_shutdown() { }
 
 void fifo_menu_handler(int fd, void *d) {
-    Menu *menu = d;
+    ObMenu *menu = d;
     char *tmpbuf = NULL;
     unsigned long num_read;
 #ifdef DEBUG
@@ -116,7 +116,7 @@ void fifo_menu_handler(int fd, void *d) {
     }
 }
 
-void plugin_destroy (Menu *m)
+void plugin_destroy (ObMenu *m)
 {
     fifo_menu_clean_up(m);
     if (FIFO_MENU_DATA(m)->handler != NULL) {
@@ -141,7 +141,7 @@ void *plugin_create() /* TODO: need config */
     event_fd_handler *h;
     
     Fifo_Menu_Data *d = g_new(Fifo_Menu_Data, 1);
-    Menu *m = menu_new("", PLUGIN_NAME, NULL);
+    ObMenu *m = menu_new("", PLUGIN_NAME, NULL);
 
     d->fd = -1;
     d->buf = NULL;

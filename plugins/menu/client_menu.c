@@ -13,20 +13,20 @@
 static char *PLUGIN_NAME = "client_menu";
 #endif
 
-static Menu *send_to_menu;
-static Menu *layer_menu;
+static ObMenu *send_to_menu;
+static ObMenu *layer_menu;
 
 typedef struct {
     gint foo;
 } Client_Menu_Data;
 
-#define CLIENT_MENU(m) ((Menu *)m)
-#define CLIENT_MENU_DATA(m) ((Client_Menu_Data *)((Menu *)m)->plugin_data)
+#define CLIENT_MENU(m) ((ObMenu *)m)
+#define CLIENT_MENU_DATA(m) ((Client_Menu_Data *)((ObMenu *)m)->plugin_data)
 
-void client_menu_clean_up(Menu *m) {
+void client_menu_clean_up(ObMenu *m) {
 }
 
-void client_send_to_update(Menu *self)
+void client_send_to_update(ObMenu *self)
 {
     guint i = 0;
     GList *it = self->entries;
@@ -36,7 +36,7 @@ void client_send_to_update(Menu *self)
         if (i >= screen_num_desktops)
             break;
         if (strcmp(screen_desktop_names[i],
-                   ((MenuEntry *)it->data)->label) != 0)
+                   ((ObMenuEntry *)it->data)->label) != 0)
             break;
         ++i;
         it = it->next;
@@ -46,7 +46,7 @@ void client_send_to_update(Menu *self)
         menu_clear(self);
         g_message("update");
         for (i = 0; i < screen_num_desktops; ++i) {
-            MenuEntry *e;
+            ObMenuEntry *e;
             Action *a = action_from_string("sendtodesktop");
             a->data.sendto.desk = i;
             a->data.sendto.follow = FALSE;
@@ -59,7 +59,7 @@ void client_send_to_update(Menu *self)
 }
 
 #if 0
-void client_menu_show(Menu *self, int x, int y, Client *client)
+void client_menu_show(ObMenu *self, int x, int y, Client *client)
 {
     int newy;
     g_assert(!self->invalid);
@@ -91,13 +91,13 @@ void plugin_setup_config() { }
 
 void plugin_shutdown() { }
 
-void plugin_destroy (Menu *m)
+void plugin_destroy (ObMenu *m)
 {
 }
 
 void *plugin_create() /* TODO: need config */
 {
-    Menu *m = menu_new_full(NULL, "client-menu", NULL,
+    ObMenu *m = menu_new_full(NULL, "client-menu", NULL,
                             /*client_menu_show*/NULL, NULL);
     menu_add_entry(m, menu_entry_new_submenu("Send To Workspace",
                                              send_to_menu));
@@ -136,8 +136,8 @@ void *plugin_create() /* TODO: need config */
 
 void plugin_startup()
 {
-    Menu *t;
-    /* create a Send To Workspace Menu */
+    ObMenu *t;
+    /* create a Send To Workspace ObMenu */
     send_to_menu = menu_new_full(NULL, "send-to-workspace",
                           NULL, NULL, client_send_to_update);
     
@@ -149,6 +149,6 @@ void plugin_startup()
     menu_add_entry(layer_menu, menu_entry_new("Bottom Layer",
                                      action_from_string("sendtobottomlayer")));
                           
-    t = (Menu *)plugin_create("client_menu");
+    t = (ObMenu *)plugin_create("client_menu");
 }
 

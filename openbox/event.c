@@ -449,7 +449,7 @@ static void event_process(XEvent *e)
     ObClient *client = NULL;
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
-    Menu *menu = NULL;
+    ObMenu *menu = NULL;
     ObWindow *obwin = NULL;
 
     window = event_get_window(e);
@@ -963,9 +963,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
 static void event_handle_menu(ObClient *client, XEvent *e)
 {
-    static MenuEntry *over = NULL;
-    MenuEntry *entry;
-    Menu *top;
+    static ObMenuEntry *over = NULL;
+    ObMenuEntry *entry;
+    ObMenu *top;
     GSList *it;
 
     top = g_slist_nth_data(menu_visible, 0);
@@ -999,7 +999,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 	g_message("BUTTON RELEASED");
 
         for (it = menu_visible; it; it = g_slist_next(it)) {
-            Menu *m = it->data;
+            ObMenu *m = it->data;
             if (e->xbutton.x_root >= m->location.x - ob_rr_theme->bwidth &&
                 e->xbutton.y_root >= m->location.y - ob_rr_theme->bwidth &&
                 e->xbutton.x_root < m->location.x + m->size.width +
@@ -1046,7 +1046,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
     case MotionNotify:
         g_message("motion");
         for (it = menu_visible; it; it = g_slist_next(it)) {
-            Menu *m = it->data;
+            ObMenu *m = it->data;
             if ((entry = menu_find_entry_by_pos(it->data,
                                                 e->xmotion.x_root -
                                                 m->location.x,

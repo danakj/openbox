@@ -15,8 +15,8 @@
 #include "kernel/action.h"
 #include "kernel/event.h"
 
-#define TIMED_MENU(m) ((Menu *)m)
-#define TIMED_MENU_DATA(m) ((Timed_Menu_Data *)((Menu *)m)->plugin_data)
+#define TIMED_MENU(m) ((ObMenu *)m)
+#define TIMED_MENU_DATA(m) ((Timed_Menu_Data *)((ObMenu *)m)->plugin_data)
 static char *PLUGIN_NAME = "timed_menu";
 
 typedef enum {
@@ -41,7 +41,7 @@ void plugin_startup()
 { }
 void plugin_shutdown() { }
 
-void timed_menu_clean_up(Menu *m) {
+void timed_menu_clean_up(ObMenu *m) {
     if (TIMED_MENU_DATA(m)->buf != NULL) {
         fprintf(stderr, "%s", TIMED_MENU_DATA(m)->buf);
         g_free(TIMED_MENU_DATA(m)->buf);
@@ -66,7 +66,7 @@ void timed_menu_clean_up(Menu *m) {
 
 void timed_menu_read_pipe(int fd, void *d)
 {
-    Menu *menu = d;
+    ObMenu *menu = d;
     char *tmpbuf = NULL;
     unsigned long num_read;
 #ifdef DEBUG
@@ -125,7 +125,7 @@ void timed_menu_read_pipe(int fd, void *d)
 
 void timed_menu_timeout_handler(void *d)
 {
-    Menu *data = d;
+    ObMenu *data = d;
     if (!data->shown && TIMED_MENU_DATA(data)->fd == -1) {
         switch (TIMED_MENU_DATA(data)->type) {
             case (TIMED_MENU_PIPE): {
@@ -187,7 +187,7 @@ void timed_menu_timeout_handler(void *d)
 void *plugin_create()
 {
     Timed_Menu_Data *d = g_new(Timed_Menu_Data, 1);
-    Menu *m = menu_new("", PLUGIN_NAME, NULL);
+    ObMenu *m = menu_new("", PLUGIN_NAME, NULL);
     
     m->plugin = PLUGIN_NAME;
 

@@ -318,8 +318,8 @@ void client_unmanage_all()
 /* called by client_unmanage() to close any menus referencing this client */
 void client_close_menus(gpointer key, gpointer value, gpointer self)
 {
-    if (((Menu *)value)->client == (ObClient *)self)
-        menu_hide((Menu *)value);
+    if (((ObMenu *)value)->client == (ObClient *)self)
+        menu_hide((ObMenu *)value);
 }
 
 void client_unmanage(ObClient *self)

@@ -334,7 +334,7 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 static void gradient_horizontal(RrSurface *sf, int w, int h)
 {
     int x, y;
-    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *data = sf->RrPixel_data, *datav;
     RrPixel32 current;
 
     VARS(x);
@@ -342,8 +342,11 @@ static void gradient_horizontal(RrSurface *sf, int w, int h)
 
     for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
         current = COLOR(x);
-        for (y = h - 1; y >= 0; --y)  /* 0 -> h */
-            *(data + y * w) = current;
+        datav = data;
+        for (y = h - 1; y >= 0; --y) {  /* 0 -> h */
+            *datav = current;
+            datav += w;
+        }
         ++data;
 
         NEXT(x);

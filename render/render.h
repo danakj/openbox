@@ -158,7 +158,7 @@ void (*paint)(Window win, Appearance *l, int x, int y, int w, int h);
 
 void render_startup(void);
 void init_appearance(Appearance *l);
-void x_paint(Window win, Appearance *l, int w, int h);
+void x_paint(Window win, Appearance *l, int x, int y, int w, int h);
 void render_shutdown(void);
 Appearance *appearance_new(SurfaceType type, int numtex);
 Appearance *appearance_copy(Appearance *a);

@@ -61,7 +61,7 @@ int main()
 		return 0;
 	}
 
-	paint(win, look, 500, 500);
+	paint(win, look, 0, 0, 500, 500);
 	while (1) {
 		XNextEvent(ob_display, &report);
 		switch (report.type) {
@@ -70,7 +70,7 @@ int main()
 		case ConfigureNotify:
 			w = report.xconfigure.width;
 			h = report.xconfigure.height;
-			paint(win, look, w, h);
+			paint(win, look, 0, 0, w, h);
 			printf("confignotify %i:%i\n", w, h);
 		break;
 		}

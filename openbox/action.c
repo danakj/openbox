@@ -949,7 +949,11 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                     keyboard_interactive_grab(state, a->data.any.c, a);
             }
 
-            ob_main_loop_queue_action(ob_main_loop, a);
+            /* closing interactive actions are not queued */
+            if (!done)
+                ob_main_loop_queue_action(ob_main_loop, a);
+            else
+                a->func(&a->data);
         }
     }
 }

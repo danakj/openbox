@@ -100,6 +100,8 @@ int main(int argc, char **argv)
     textdomain(PACKAGE_NAME);
 
     g_set_prgname(argv[0]);
+
+    chdir(g_get_home_dir());
      
     parse_paths_startup();
 

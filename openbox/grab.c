@@ -77,6 +77,7 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
                                False, GRAB_PTR_MASK, GrabModeAsync,
                                GrabModeAsync, FALSE,
                                ob_cursor(cur), event_lasttime) == Success;
+            ob_debug("GRABBING\n");
             if (!ret)
                 --pgrabs;
         } else
@@ -84,6 +85,9 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
     } else if (pgrabs > 0) {
         if (--pgrabs == 0) {
             XUngrabPointer(ob_display, event_lasttime);
+
+            ob_debug("UNGRABBING\n");
+            event_ignore_queued_enters();
         }
         ret = TRUE;
     }

@@ -393,21 +393,21 @@ static void event_process(const XEvent *ec, gpointer data)
 
     /* deal with it in the kernel */
     if (group)
-	event_handle_group(group, e);
+        event_handle_group(group, e);
     else if (client)
-	event_handle_client(client, e);
+        event_handle_client(client, e);
     else if (dockapp)
-	event_handle_dockapp(dockapp, e);
+        event_handle_dockapp(dockapp, e);
     else if (dock)
-	event_handle_dock(dock, e);
+        event_handle_dock(dock, e);
     else if (window == RootWindow(ob_display, ob_screen))
-	event_handle_root(e);
+        event_handle_root(e);
     else if (e->type == MapRequest)
-	client_manage(window);
+        client_manage(window);
     else if (e->type == ConfigureRequest) {
-	/* unhandled configure requests must be used to configure the
-	   window directly */
-	XWindowChanges xwc;
+        /* unhandled configure requests must be used to configure the
+           window directly */
+        XWindowChanges xwc;
 	       
 	xwc.x = e->xconfigurerequest.x;
 	xwc.y = e->xconfigurerequest.y;
@@ -531,6 +531,7 @@ void event_enter_client(ObClient *client)
                                      config_focus_delay,
                                      focus_delay_func,
                                      client, NULL);
+            ob_debug("added focus timeout\n");
         } else
             focus_delay_func(client);
     }
@@ -679,10 +680,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
             } else {
 #ifdef DEBUG_FOCUS
                 ob_debug("%sNotify mode %d detail %d on %lx, "
-                         "focusing window\n",
+                         "focusing window: %d\n",
                          (e->type == EnterNotify ? "Enter" : "Leave"),
                          e->xcrossing.mode,
-                         e->xcrossing.detail, client?client->window:0);
+                         e->xcrossing.detail, (client?client->window:0),
+                         !nofocus);
 #endif
                 if (!nofocus && config_focus_follow)
                     event_enter_client(client);
@@ -1175,6 +1177,7 @@ static gboolean focus_delay_func(gpointer data)
 {
     ObClient *c = data;
 
+    ob_debug("focus timeout %d\n", focus_client != c);
     if (focus_client != c) {
         client_focus(c);
         if (config_focus_raise)
@@ -1195,12 +1198,23 @@ void event_ignore_queued_enters()
                 
     XSync(ob_display, FALSE);
 
+    ob_debug("Trying to ignore\n");
+
     /* count the events */
     while (TRUE) {
         e = g_new(XEvent, 1);
         if (XCheckTypedEvent(ob_display, EnterNotify, e)) {
+            ObWindow *win;
+            
+            win = g_hash_table_lookup(window_map, &e->xany.window);
+            if (win && WINDOW_IS_CLIENT(win)) {
+                ob_debug("skipping enter event on 0x%lx\n", e->xany.window);
+                ++ignore_enter_focus;
+            } else
+                ob_debug("NOT skipping enter event on 0x%lx\n",
+                         e->xany.window);
+            
             saved = g_slist_append(saved, e);
-            ++ignore_enter_focus;
         } else {
             g_free(e);
             break;

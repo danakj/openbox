@@ -9,7 +9,8 @@
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
-                           ButtonMotionMask | ExposureMask)
+                           ButtonMotionMask | ExposureMask | \
+                           EnterWindowMask | LeaveWindowMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
 		           f->cbwidth)
@@ -106,6 +107,8 @@ ObFrame *frame_new()
 
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = self->shade_press = FALSE;
+    self->max_hover = self->close_hover = self->desk_hover = 
+	self->iconify_hover = self->shade_hover = FALSE;
 
     return (ObFrame*)self;
 }

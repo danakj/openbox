@@ -95,6 +95,11 @@ struct _ObFrame
     gboolean  desk_press;
     gboolean  shade_press;
     gboolean  iconify_press;
+    gboolean  max_hover;
+    gboolean  close_hover;
+    gboolean  desk_hover;
+    gboolean  shade_hover;
+    gboolean  iconify_hover;
 
     gboolean  focused;
 };

@@ -658,36 +658,77 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_iconify(client, TRUE, TRUE);
         frame_adjust_focus(client->frame, FALSE);
 	break;
-    case EnterNotify:
+    case LeaveNotify:
+        con = frame_context(client, e->xcrossing.window);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
+            client->frame->max_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            client->frame->desk_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
         case OB_FRAME_CONTEXT_SHADE:
+            client->frame->shade_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
         case OB_FRAME_CONTEXT_ICONIFY:
+            client->frame->iconify_hover = FALSE;
+            frame_adjust_state(client->frame);
+            break;
         case OB_FRAME_CONTEXT_CLOSE:
-            g_message("hi");
+            client->frame->close_hover = FALSE;
             frame_adjust_state(client->frame);
             break;
         default:
             break;
         }
-        con = frame_context(client, e->xcrossing.subwindow);
-        if (client_normal(client)) {
-            if (ob_state() == OB_STATE_STARTING) {
-                /* move it to the top of the focus order */
-                guint desktop = client->desktop;
-                if (desktop == DESKTOP_ALL) desktop = screen_desktop;
-                focus_order[desktop] = g_list_remove(focus_order[desktop],
-                                                     client);
-                focus_order[desktop] = g_list_prepend(focus_order[desktop],
-                                                      client);
-            } else if (config_focus_follow) {
+        break;
+    case EnterNotify:
+        con = frame_context(client, e->xcrossing.window);
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            client->frame->max_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            client->frame->desk_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_SHADE:
+            client->frame->shade_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            client->frame->iconify_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_CLOSE:
+            client->frame->close_hover = TRUE;
+            frame_adjust_state(client->frame);
+            break;
+        case OB_FRAME_CONTEXT_FRAME:
+            if (client_normal(client)) {
+                if (ob_state() == OB_STATE_STARTING) {
+                    /* move it to the top of the focus order */
+                    guint desktop = client->desktop;
+                    if (desktop == DESKTOP_ALL) desktop = screen_desktop;
+                    focus_order[desktop] = g_list_remove(focus_order[desktop],
+                                                         client);
+                    focus_order[desktop] = g_list_prepend(focus_order[desktop],
+                                                          client);
+                } else if (config_focus_follow) {
 #ifdef DEBUG_FOCUS
-                ob_debug("EnterNotify on %lx, focusing window\n",
-                         client->window);
+                    ob_debug("EnterNotify on %lx, focusing window\n",
+                             client->window);
 #endif
-                client_focus(client);
+                    client_focus(client);
+                }
             }
+            break;
+        default:
+            break;
         }
         break;
     case ConfigureRequest:

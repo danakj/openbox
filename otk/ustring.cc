@@ -41,4 +41,54 @@ ustring::ustring(const char* src)
 {
 }
 
+static ustring::size_type find_offset(const char *str, const char *pos)
+{
+  ustring::size_type offset = 0;
+
+  while (str < pos) {
+    str += g_utf8_skip[*str];
+    offset += g_utf8_skip[*str];
+  }
+
+  return offset;
+}
+
+ustring::size_type ustring::size() const
+{
+  const char *const pdata = _string.data();
+  return find_offset(pdata, pdata + _string.size());
+}
+
+ustring::size_type ustring::length() const
+{
+  const char *const pdata = _string.data();
+  return find_offset(pdata, pdata + _string.size());
+}
+
+ustring::size_type ustring::bytes() const
+{
+  return _string.size();
+}
+
+ustring::size_type ustring::capacity() const
+{
+  return _string.capacity();
+}
+
+ustring::size_type ustring::max_size() const
+{
+  return _string.max_size();
+}
+
+
+const char* ustring::data() const
+{
+  return _string.data();
+}
+
+const char* ustring::c_str() const
+{
+  return _string.c_str();
+}
+
 }

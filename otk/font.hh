@@ -2,6 +2,8 @@
 #ifndef   __font_hh
 #define   __font_hh
 
+#include "ustring.hh"
+
 extern "C" {
 #include <X11/Xlib.h>
 #define _XFT_NO_COMPAT_ // no Xft 1 API
@@ -9,7 +11,6 @@ extern "C" {
 }
 
 #include <assert.h>
-#include <string>
 
 namespace otk {
 
@@ -57,8 +58,7 @@ public:
   unsigned int height() const;
   unsigned int maxCharWidth() const;
 
-  unsigned int measureString(const std::string &string,
-                             bool utf8 = false) const;
+  unsigned int measureString(const ustring &string) const;
 
   //! Draws a string into an XftDraw object
   /*!
@@ -66,7 +66,7 @@ public:
     different screens, you WILL have unpredictable results! :)
   */
   void drawString(XftDraw *d, int x, int y, const Color &color,
-                  const std::string &string, bool utf8 = false) const;
+                  const ustring &string) const;
 };
 
 }

@@ -20,6 +20,14 @@ extern "C" {
 
 namespace otk {
 
+#ifdef HAVE_STDINT_H
+typedef uint32_t unichar;
+#else
+typedef u_int32_t unichar;
+#endif
+
+#ifndef DOXYGEN_IGNORE
+
 //! The number of bytes to skip to find the next character in the string
 const char g_utf8_skip[256] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -31,12 +39,6 @@ const char g_utf8_skip[256] = {
   2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
   3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
 };
-
-#ifdef HAVE_STDINT_H
-typedef uint32_t unichar;
-#else
-typedef u_int32_t unichar;
-#endif
 
 //! The iterator type for ustring
 /*!
@@ -102,6 +104,8 @@ private:
   T _pos;
 };
 
+#endif // DOXYGEN_IGNORE
+
 //! This class provides a simple wrapper to a std::string that is encoded as
 //! UTF-8.
 /*!
@@ -140,6 +144,18 @@ public:
   ustring(const std::string& src);
   ustring::ustring(const char* src);
 
+  // sizes
+  
+  ustring::size_type size() const;
+  ustring::size_type length() const;
+  ustring::size_type bytes() const;
+  ustring::size_type capacity() const;
+  ustring::size_type max_size() const;
+
+  // internal data
+
+  const char* data()  const;
+  const char* c_str() const;
   
 };
 

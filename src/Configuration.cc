@@ -33,26 +33,26 @@
 
 using std::string;
 
-bool Configuration::m_initialized = false;
+bool Configuration::m_initialized = False;
 
 Configuration::Configuration(const string &file) {
   setFile(file);
-  m_modified = false;
+  m_modified = False;
   m_database = NULL;
-  m_autosave = true;
+  m_autosave = True;
   if (! m_initialized) {
     XrmInitialize();
-    m_initialized = true;
+    m_initialized = True;
   }
 }
 
 Configuration::Configuration() {
-  m_modified = false;
+  m_modified = False;
   m_database = NULL;
-  m_autosave = true;
+  m_autosave = True;
   if (! m_initialized) {
     XrmInitialize();
-    m_initialized = true;
+    m_initialized = True;
   }
 }
 
@@ -72,22 +72,22 @@ void Configuration::setAutoSave(bool autosave) {
 void Configuration::save() {
   assert(m_database != NULL);
   XrmPutFileDatabase(m_database, m_file.c_str());
-  m_modified = false;
+  m_modified = False;
 }
 
 bool Configuration::load() {
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
-  m_modified = false;
+  m_modified = False;
   if (NULL == (m_database = XrmGetFileDatabase(m_file.c_str())))
-    return false;
-  return true;
+    return False;
+  return True;
 }
 
 void Configuration::create() {
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
-  m_modified = false;
+  m_modified = False;
   assert(NULL != (m_database = XrmGetStringDatabase("")));
 }
 
@@ -98,7 +98,7 @@ void Configuration::setValue(const string &rname, bool value) {
   string rc_string = rname + ": " + val;
   XrmPutLineResource(&m_database, rc_string.c_str());
 
-  m_modified = true;
+  m_modified = True;
   if (m_autosave)
     save();
 }
@@ -109,7 +109,7 @@ void Configuration::setValue(const string &rname, unsigned long value) {
   string rc_string = rname + ": " + itostring(value);
   XrmPutLineResource(&m_database, rc_string.c_str());
 
-  m_modified = true;
+  m_modified = True;
   if (m_autosave)
     save();
 }
@@ -120,7 +120,7 @@ void Configuration::setValue(const string &rname, long value) {
   string rc_string = rname + ": " + itostring(value);
   XrmPutLineResource(&m_database, rc_string.c_str());
 
-  m_modified = true;
+  m_modified = True;
   if (m_autosave)
     save();
 }
@@ -132,7 +132,7 @@ void Configuration::setValue(const string &rname, const char *value) {
   string rc_string = rname + ": " + value;
   XrmPutLineResource(&m_database, rc_string.c_str());
 
-  m_modified = true;
+  m_modified = True;
   if (m_autosave)
     save();
 }
@@ -143,7 +143,7 @@ void Configuration::setValue(const string &rname, const string &value) {
   string rc_string = rname + ": " + value;
   XrmPutLineResource(&m_database, rc_string.c_str());
 
-  m_modified = true;
+  m_modified = True;
   if (m_autosave)
     save();
 }
@@ -157,13 +157,13 @@ bool Configuration::getValue(const string &rname, bool &value) const {
   XrmValue retvalue;
   if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
-    return false;
+    return False;
   string val = retvalue.addr;
-  if (val == "true" || val == "True")
-    value = true;
+  if (val == "True" || val == "True")
+    value = True;
   else
-    value = false;
-  return true;
+    value = False;
+  return True;
 }
 
 bool Configuration::getValue(const string &rname, long &value) const {
@@ -175,12 +175,12 @@ bool Configuration::getValue(const string &rname, long &value) const {
   XrmValue retvalue;
   if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
-    return false;
+    return False;
   char *end;
   value = strtol(retvalue.addr, &end, 10);
   if (end == retvalue.addr)
-    return false;
-  return true;
+    return False;
+  return True;
 }
 
 bool Configuration::getValue(const string &rname, unsigned long &value) const {
@@ -192,12 +192,12 @@ bool Configuration::getValue(const string &rname, unsigned long &value) const {
   XrmValue retvalue;
   if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
-    return false;
+    return False;
   char *end;
   value = strtoul(retvalue.addr, &end, 10);
   if (end == retvalue.addr)
-    return false;
-  return true;
+    return False;
+  return True;
 }
 
 bool Configuration::getValue(const string &rname,
@@ -210,9 +210,9 @@ bool Configuration::getValue(const string &rname,
   XrmValue retvalue;
   if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
-    return false;
+    return False;
   value = retvalue.addr;
-  return true;
+  return True;
 }
   
 
@@ -220,7 +220,7 @@ string Configuration::createClassName(const string &rname) const {
   string rclass(rname);
 
   string::iterator it = rclass.begin(), end = rclass.end();
-  while (true) {
+  while (True) {
     *it = toUpper(*it);
     ++it;
     if (it == end) break;

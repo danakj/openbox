@@ -276,7 +276,7 @@ void XAtom::setValue(Window win, Atoms atom, Atoms type,
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
   setValue(win, _atoms[atom], _atoms[type],
-           reinterpret_cast<unsigned char*>(&value), 32, 1, false);
+           reinterpret_cast<unsigned char*>(&value), 32, 1, False);
 }
 
 
@@ -288,7 +288,7 @@ void XAtom::setValue(Window win, Atoms atom, Atoms type,
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_ATOMS);
   setValue(win, _atoms[atom], _atoms[type],
-           reinterpret_cast<unsigned char*>(value), 32, elements, false);
+           reinterpret_cast<unsigned char*>(value), 32, elements, False);
 }
 
 
@@ -304,11 +304,11 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
+  default: assert(False); // unhandled StringType
   }
   setValue(win, _atoms[atom], t,
            reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
-           8, value.size() + 1, false); // add 1 to the size to include the null
+           8, value.size() + 1, False); // add 1 to the size to include the null
 }
 
 
@@ -324,7 +324,7 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
+  default: assert(False); // unhandled StringType
   }
 
   std::string value;
@@ -336,14 +336,14 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
 
   setValue(win, _atoms[atom], t,
            reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
-           8, value.size(), false);
+           8, value.size(), False);
 }
 
 
 /*
  * Internal getValue function used by all of the typed getValue functions.
  * Gets an property's value from a window.
- * Returns true if the property was successfully retrieved; false if the
+ * Returns True if the property was successfully retrieved; False if the
  * property did not exist on the window, or has a different type/size format
  * than the user tried to retrieve.
  */
@@ -368,7 +368,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
     // an error occured, the property does not exist on the window, or is empty,
     // or the wrong data is in property for the request
     if (c_val) XFree(c_val);
-    return false;
+    return False;
   }
   // the data is correct, now, is there more elements left?
   if (ret_bytes == 0 || maxread <= nelements) {
@@ -376,7 +376,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
     *value = new unsigned char[nelements * size/8 + 1];
     memcpy(*value, c_val, nelements * size/8 + 1);
     XFree(c_val);
-    return true;    
+    return True;    
   }
   // get the entire property since it is larger than one long
   XFree(c_val);
@@ -393,7 +393,7 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   *value = new unsigned char[nelements * size/8 + 1];
   memcpy(*value, c_val, nelements * size/8 + 1);
   XFree(c_val);
-  return true;    
+  return True;    
 }
 
 
@@ -421,10 +421,10 @@ bool XAtom::getValue(Window win, Atoms atom, Atoms type,
   unsigned long num = 1;
   if (! getValue(win, _atoms[atom], _atoms[type], num,
                  reinterpret_cast<unsigned char **>(&temp), 32))
-    return false;
+    return False;
   value = temp[0];
   delete [] temp;
-  return true;
+  return True;
 }
 
 
@@ -437,9 +437,9 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
   StringVect s;
   if (getValue(win, atom, type, n, s)) {
     value = s[0];
-    return true;
+    return True;
   }
-  return false;
+  return False;
 }
 
 
@@ -454,13 +454,13 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(false); // unhandled StringType
+  default: assert(False); // unhandled StringType
   }
   
   unsigned char *value;
   unsigned long elements = (unsigned) -1;
   if (!getValue(win, _atoms[atom], t, elements, &value, 8) || elements < 1)
-    return false;
+    return False;
 
   std::string s(reinterpret_cast<char *>(value), elements);
   delete [] value;
@@ -479,7 +479,7 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
 
   nelements = num;
 
-  return true;
+  return True;
 }
 
 

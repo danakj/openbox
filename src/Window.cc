@@ -1810,7 +1810,7 @@ void BlackboxWindow::maximize(unsigned int button) {
 
     frame.changing = *it;
   } else
-#endif
+#endif // XINERAMA
   frame.changing = screen->availableArea();
 
   switch(button) {
@@ -3044,17 +3044,25 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
     // snap to the strut (and screen boundaries for xinerama)
 #ifdef    XINERAMA
-    if (screen->isXineramaActive() && blackbox->doXineramaSnapping())
+    if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
+      if (! screen->doFullMax())
+        snaplist.insert(snaplist.begin(),
+                        screen->allAvailableAreas().begin(),
+                        screen->allAvailableAreas().end());
+
+      // always snap to the screen edges
       snaplist.insert(snaplist.begin(),
-                      screen->allAvailableAreas().begin(),
-                      screen->allAvailableAreas().end());
-    else
+                      screen->getXineramaAreas().begin(),
+                      screen->getXineramaAreas().end());
+    } else
 #endif // XINERAMA
+    {
       if (! screen->doFullMax())
         snaplist.push_back(screen->availableArea());
-    
-    // always snap to the screen edges
-    snaplist.push_back(screen->getRect());
+
+      // always snap to the screen edges
+      snaplist.push_back(screen->getRect());
+    }
 
     RectList::const_iterator it, end = snaplist.end();
     for (it = snaplist.begin(); it != end; ++it) {

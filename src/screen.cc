@@ -520,7 +520,8 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->bindings()->grabButtons(true, client);
 
   // XXX: make this optional or more intelligent
-  client->focus();
+  if (client->normal())
+    client->focus();
 
   // call the python NEWWINDOW binding
   EventData *data = new_event_data(window, EventNewWindow, 0);

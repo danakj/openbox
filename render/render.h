@@ -40,7 +40,8 @@ typedef enum {
 typedef enum {
     Bitmask,
     Text,
-    RGBA
+    RGBA,
+    NoTexture
 } TextureType;
 
 typedef struct PlanarSurface {

@@ -345,7 +345,7 @@ gboolean obtheme_load()
 	ob_s_cb_unfocused_color = color_new(0xff, 0xff, 0xff);
     if (!read_color(db, "window.label.focus.textColor",
                     &ob_s_title_focused_color))
-	ob_s_title_focused_color = color_new(0xff, 0xff, 0xff);
+	ob_s_title_focused_color = color_new(0x0, 0x0, 0x0);
     if (!read_color(db, "window.label.unfocus.textColor",
                     &ob_s_title_unfocused_color))
 	ob_s_title_unfocused_color = color_new(0xff, 0xff, 0xff);

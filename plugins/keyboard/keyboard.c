@@ -49,10 +49,8 @@ gboolean kbind(GList *keylist, Action *action)
     g_assert(keylist != NULL);
     g_assert(action != NULL);
 
-    if (!(tree = tree_build(keylist))) {
-        g_warning("invalid binding");
+    if (!(tree = tree_build(keylist)))
         return FALSE;
-    }
     if ((t = tree_find(tree, &conflict)) != NULL) {
 	/* already bound to something */
 	g_warning("keychain is already bound");

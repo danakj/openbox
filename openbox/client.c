@@ -2796,11 +2796,11 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
             his_edge_end = cur->frame->area.x + cur->frame->area.width;
             his_offset = cur->frame->area.y + cur->frame->area.height;
 
-            if(his_offset + c->size_inc.height > my_offset)
+            if(his_offset + 1 > my_offset)
                 continue;
 
             if(his_offset < dest)
-                    continue;
+                continue;
             
             if(his_edge_start >= my_edge_start &&
                his_edge_start <= my_edge_end)
@@ -2837,11 +2837,11 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
             his_offset = cur->frame->area.y;
 
 
-            if(his_offset - c->size_inc.height < my_offset)
+            if(his_offset - 1 < my_offset)
                 continue;
             
             if(his_offset > dest)
-                    continue;
+                continue;
             
             if(his_edge_start >= my_edge_start &&
                his_edge_start <= my_edge_end)
@@ -2877,11 +2877,11 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
             his_offset = cur->frame->area.x + cur->frame->area.width;
 
-            if(his_offset + c->size_inc.width > my_offset)
+            if(his_offset + 1 < my_offset)
                 continue;
             
             if(his_offset < dest)
-                    continue;
+                continue;
             
             if(his_edge_start >= my_edge_start &&
                his_edge_start <= my_edge_end)
@@ -2918,11 +2918,11 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
             his_edge_end = cur->frame->area.y + cur->frame->area.height;
             his_offset = cur->frame->area.x;
 
-            if(his_offset - c->size_inc.width < my_offset)
+            if(his_offset - 1 < my_offset)
                 continue;
             
             if(his_offset > dest)
-                    continue;
+                continue;
             
             if(his_edge_start >= my_edge_start &&
                his_edge_start <= my_edge_end)

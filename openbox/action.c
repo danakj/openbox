@@ -1262,7 +1262,7 @@ void action_growtoedge(union ActionData *data)
     switch(data->diraction.direction) {
     case OB_DIRECTION_NORTH:
         dest = client_directional_edge_search(c, OB_DIRECTION_NORTH);
-        if(a->y > (y - c->size_inc.height))
+        if (a->y == y)
             height = c->frame->area.height / 2;
         else {
             height = c->frame->area.y + c->frame->area.height - dest;
@@ -1271,7 +1271,7 @@ void action_growtoedge(union ActionData *data)
         break;
     case OB_DIRECTION_WEST:
         dest = client_directional_edge_search(c, OB_DIRECTION_WEST);
-        if(a->x > (x - c->size_inc.width))
+        if (a->x == x)
             width = c->frame->area.width / 2;
         else {
             width = c->frame->area.x + c->frame->area.width - dest;
@@ -1280,21 +1280,23 @@ void action_growtoedge(union ActionData *data)
         break;
     case OB_DIRECTION_SOUTH:
         dest = client_directional_edge_search(c, OB_DIRECTION_SOUTH);
-        if(a->y + a->height <
-            (y + c->frame->area.height + c->size_inc.height)) {
+        if (a->y + a->height == y + c->frame->area.height) {
             height = c->frame->area.height / 2;
             y = a->y + a->height - height;
         } else
             height = dest - c->frame->area.y;
+        y += (height - c->frame->area.height) % c->size_inc.height;
+        height -= (height - c->frame->area.height) % c->size_inc.height;
         break;
     case OB_DIRECTION_EAST:
         dest = client_directional_edge_search(c, OB_DIRECTION_EAST);
-        if(a->x + a->width <
-            (x + c->frame->area.width + c->size_inc.width)) {
+        if (a->x + a->width == x + c->frame->area.width) {
             width = c->frame->area.width / 2;
             x = a->x + a->width - width;
         } else
             width = dest - c->frame->area.x;
+        x += (width - c->frame->area.width) % c->size_inc.width;
+        width -= (width - c->frame->area.width) % c->size_inc.width;
         break;
     default:
         g_assert_not_reached();

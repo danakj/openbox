@@ -1,5 +1,36 @@
 2003-08-12  xor@zed.orodu.net  <xor@zed>
 
+	* configure.ac: alpha5
+
+	* kernel/screen.c: when cancelling return the first desktop
+
+	* kernel/action.c, kernel/action.h:
+	use the new client_directional_edge_search for the movetoedge actions.
+	add new growtoedge actions.
+
+	* kernel/client.c, kernel/client.h:
+	small bugfix to the directional focus code.
+	add the client_directional_edge_search function.
+
+	* kernel/keyboard.c:
+	only do shit with the grabbed_* when a grab is in place
+
+	* kernel/action.c, kernel/mouse.c, kernel/screen.c:
+	remove debug printings
+
+	* plugins/keyboard/.cvsignore, plugins/keyboard/Makefile, plugins/keyboard/keyboard.c, plugins/keyboard/keyboard.h, plugins/keyboard/translate.c, plugins/keyboard/translate.h, plugins/keyboard/tree.c, plugins/keyboard/tree.h:
+	remove the keyboard plugin shit
+
+	* ChangeLog, Makefile.am, kernel/.cvsignore, kernel/action.c, kernel/action.h, kernel/client.c, kernel/config.c, kernel/config.h, kernel/event.c, kernel/focus.c, kernel/keyboard.c, kernel/keyboard.h, kernel/keytree.c, kernel/keytree.h, kernel/menu.c, kernel/menu.h, kernel/mouse.c, kernel/mouse.h, kernel/openbox.c, kernel/plugin.c, kernel/screen.c, kernel/screen.h, kernel/translate.c, kernel/translate.h, plugins/menu/client_menu.c:
+	move the keyboard and mouse plugins into the kernel for mucho sexiness.
+	make workspace changing a grabbed/interactive process like focus cycling is, with the popup and all.
+	this is some hot shit.
+
+	* kernel/event.c:
+	keep event_lasttime at the last time an event has come in so far, don't regress when events come out of order. props to shrimpx for this patch.
+
+2003-08-12  xor@zed.orodu.net  <xor@zed>
+
 	* kernel/event.c:
 	keep event_lasttime at the last time an event has come in so far, don't regress when events come out of order. props to shrimpx for this patch.
 

@@ -2,7 +2,6 @@
 #include "atom.h"
 #include "prop.h"
 #include "client_props.h"
-#include "render/render.h"
 
 #include <X11/Xutil.h>
 #ifdef HAVE_STRING_H

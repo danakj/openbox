@@ -1,5 +1,5 @@
-#ifndef __prop_h
-#define __prop_h
+#ifndef __cwmcc_prop_h
+#define __cwmcc_prop_h
 
 #include <glib.h>
 #include <X11/Xlib.h>

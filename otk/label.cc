@@ -3,7 +3,7 @@
 namespace otk {
 
 OtkLabel::OtkLabel(OtkWidget *parent)
-  : OtkWidget(parent), _text(""), _dirty(false)
+  : OtkWidget(parent), _text("")
 {
   setTexture(getStyle()->getLabelUnfocus());
 }
@@ -52,21 +52,6 @@ void OtkLabel::update(void)
     ft.drawString(getWindow(), x, bevel, *getStyle()->getTextUnfocus(), t);
   } else
     OtkWidget::update();
-
-  _dirty = false;
-}
-
-int OtkLabel::exposeHandler(const XExposeEvent &e)
-{
-  _dirty = true;
-  return OtkWidget::exposeHandler(e);
-}
-
-int OtkLabel::configureHandler(const XConfigureEvent &e)
-{
-  if (!(e.width == width() && e.height == height()))
-    _dirty = true;
-  return OtkWidget::configureHandler(e);
 }
 
 }

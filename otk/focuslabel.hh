@@ -16,13 +16,10 @@ public:
   void setText(const std::string &text) { _text = text; _dirty = true; }
 
   void update(void);
-  int exposeHandler(const XExposeEvent &e);
-  int configureHandler(const XConfigureEvent &e);
 
 private:
 
   std::string _text;
-  bool _dirty;
 };
 
 }

@@ -100,6 +100,10 @@ public:
   { return _event_dispatcher; }
   void setEventDispatcher(OtkEventDispatcher *disp);
 
+protected:
+  
+  bool _dirty;
+
 private:
 
   void create(void);
@@ -138,8 +142,6 @@ private:
 
   bool _fixed_width;
   bool _fixed_height;
-
-  bool _dirty;
 
   OtkEventDispatcher *_event_dispatcher;
 };

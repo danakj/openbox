@@ -10,6 +10,7 @@ namespace otk {
 
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   : OtkEventHandler(),
+    _dirty(false),
     _parent(parent), _style(parent->getStyle()), _direction(direction),
     _cursor(parent->getCursor()), _bevel_width(parent->getBevelWidth()),
     _ignore_config(0),
@@ -17,7 +18,7 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
     _grabbed_keyboard(false), _stretchable_vert(false),
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
     _screen(parent->getScreen()), _fixed_width(false), _fixed_height(false),
-    _dirty(false), _event_dispatcher(parent->getEventDispatcher())
+    _event_dispatcher(parent->getEventDispatcher())
 {
   parent->addChild(this);
   create();
@@ -27,12 +28,13 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
 OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
                      Cursor cursor, int bevel_width)
   : OtkEventHandler(),
+    _dirty(false),
     _parent(0), _style(app->getStyle()), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
     _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _screen(app->getStyle()->getScreen()),
-    _fixed_width(false), _fixed_height(false), _dirty(false),
+    _fixed_width(false), _fixed_height(false), 
     _event_dispatcher(app)
 {
   assert(app);
@@ -43,12 +45,13 @@ OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
 OtkWidget::OtkWidget(Style *style, Direction direction,
                      Cursor cursor, int bevel_width)
   : OtkEventHandler(),
+    _dirty(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
     _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _screen(style->getScreen()),
-    _fixed_width(false), _fixed_height(false), _dirty(false)
+    _fixed_width(false), _fixed_height(false)
 {
   assert(style);
   create();
@@ -426,31 +429,25 @@ void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
 int OtkWidget::exposeHandler(const XExposeEvent &e)
 {
   OtkEventHandler::exposeHandler(e);
-  if (e.window == _window) {
-    _dirty = true;
-    update();
-    return true;
-  }
-  return false;
+  _dirty = true;
+  update();
+  return true;
 }
 
 int OtkWidget::configureHandler(const XConfigureEvent &e)
 {
   OtkEventHandler::configureHandler(e);
-  if (e.window == _window) {
-    if (_ignore_config) {
-      _ignore_config--;
-    } else {
-      if (!(e.width == _rect.width() && e.height == _rect.height())) {
-        _dirty = true;
-        _rect.setSize(e.width, e.height);
-      }
-      update();
+  if (_ignore_config) {
+    _ignore_config--;
+  } else {
+    if (!(e.width == _rect.width() && e.height == _rect.height())) {
+      _dirty = true;
+      _rect.setSize(e.width, e.height);
     }
-    return true;
+    update();
   }
 
-  return false;
+  return true;
 }
 
 }

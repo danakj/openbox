@@ -36,7 +36,7 @@ guint config_keyboard_reset_state;
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
-gchar *config_menu_path;
+GSList *config_menu_files;
 
 gint config_resist_win;
 gint config_resist_edge;
@@ -228,10 +228,14 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     node = node->xmlChildrenNode;
 
     if ((n = parse_find_node("theme", node))) {
+        gchar *c;
+
         g_free(config_theme);
-        config_theme = parse_string(doc, n);
+        c = parse_string(doc, n);
+        config_theme = expand_tilde(c);
+        g_free(c);
     }
-    if ((n = parse_find_node("titlelayout", node))) {
+    if ((n = parse_find_node("titleLayout", node))) {
         g_free(config_title_layout);
         config_title_layout = parse_string(doc, n);
     }
@@ -339,15 +343,15 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    xmlNodePtr n;
+    for (node = node->xmlChildrenNode; node; node = node->next) {
+        if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
+            gchar *c;
 
-    node = node->xmlChildrenNode;
-    if ((n = parse_find_node("location", node))) {
-        gchar *c;
-
-        c = parse_string(doc, n);
-        config_menu_path = expand_tilde(c);
-        g_free(c);
+            c = parse_string(doc, node);
+            config_menu_files = g_slist_append(config_menu_files,
+                                               expand_tilde(c));
+            g_free(c);
+        }
     }
 }
    
@@ -415,7 +419,7 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "resistance", parse_resistance, NULL);
 
-    config_menu_path = NULL;
+    config_menu_files = NULL;
 
     parse_register(i, "menu", parse_menu, NULL);
 }
@@ -426,7 +430,11 @@ void config_shutdown()
 
     g_free(config_theme);
 
-    for (it = config_desktops_names; it; it = it->next)
+    for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);
     g_slist_free(config_desktops_names);
+
+    for (it = config_menu_files; it; it = g_slist_next(it))
+        g_free(it->data);
+    g_slist_free(config_menu_files);
 }

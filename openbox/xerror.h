@@ -1,4 +1,4 @@
-/* -*- indent-tabs-mode: t; tab-width: 4; c-basic-offset: 4; -*-
+/* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    xerror.h for the Openbox window manager
    Copyright (c) 2003        Ben Jansens

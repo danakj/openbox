@@ -325,7 +325,10 @@ public:
 
   // is a 'normal' window? meaning, a standard client application
   inline bool isNormal(void) const
-  { return window_type == Type_Dialog || window_type == Type_Normal; }
+  { return window_type == Type_Dialog || window_type == Type_Normal ||
+           window_type == Type_Toolbar || window_type == Type_Utility; }
+  inline bool isTopmost(void) const
+  { return window_type == Type_Toolbar || window_type == Type_Utility; }
   inline bool isDesktop(void) const { return window_type == Type_Desktop; }
   
   inline bool hasTitlebar(void) const { return decorations & Decor_Titlebar; }

@@ -1313,6 +1313,9 @@ void BScreen::manageWindow(Window w) {
     // don't list non-normal windows as managed windows
     windowList.push_back(win);
     updateClientList();
+  
+    if (win->isTopmost())
+      specialWindowList.push_back(win->getFrameWindow());
   } else if (win->isDesktop()) {
     desktopWindowList.push_back(win->getFrameWindow());
   }
@@ -1345,6 +1348,17 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
     // we don't list non-normal windows as managed windows
     windowList.remove(w);
     updateClientList();
+
+    if (w->isTopmost()) {
+      WindowList::iterator it = specialWindowList.begin();
+      const WindowList::iterator end = specialWindowList.end();
+      for (; it != end; ++it)
+        if (*it == w->getFrameWindow()) {
+          specialWindowList.erase(it);
+          break;
+        }
+      assert(it != end);  // the window wasnt a special window?
+    }
   } else if (w->isDesktop()) {
     WindowList::iterator it = desktopWindowList.begin();
     const WindowList::iterator end = desktopWindowList.end();
@@ -1495,7 +1509,8 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #endif // XINERAMA
 
   Window *session_stack = new
-    Window[(num + workspacesList.size() + rootmenuList.size() + bbwins)];
+    Window[(num + workspacesList.size() + rootmenuList.size() +
+            specialWindowList.size() + bbwins)];
   unsigned int i = 0, k = num;
 
   XRaiseWindow(blackbox->getXDisplay(), iconmenu->getWindowID());
@@ -1535,6 +1550,10 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 
   if (slit->isOnTop())
     *(session_stack + i++) = slit->getWindowID();
+
+  WindowList::iterator sit, send = specialWindowList.end();
+  for (sit = specialWindowList.begin(); sit != send; ++sit)
+    *(session_stack + i++) = *sit;
 
   while (k--)
     *(session_stack + i++) = *(workspace_stack + k);

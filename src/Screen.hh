@@ -120,7 +120,7 @@ private:
   BlackboxWindowList iconList, windowList;
 
   typedef std::vector<Window> WindowList;
-  WindowList desktopWindowList, systrayWindowList;
+  WindowList specialWindowList, desktopWindowList, systrayWindowList;
 
   Slit *slit;
   Toolbar *toolbar;

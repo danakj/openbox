@@ -84,7 +84,7 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
   if (place) placeWindow(w);
 
   stackingList.push_front(w);
-    
+
   if (w->isNormal()) {
     if (! sticky) {
       w->setWorkspace(id);

@@ -202,14 +202,20 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   case Type_Desktop:
   case Type_Dock:
   case Type_Menu:
-  case Type_Toolbar:
-  case Type_Utility:
+    blackbox_attrib.workspace = 0;  // we do need to belong to a workspace
+    flags.stuck = True;             // we show up on all workspaces
   case Type_Splash:
     // none of these windows are decorated or manipulated by the window manager
     decorations = 0;
     functions = 0;
-    blackbox_attrib.workspace = 0;  // we do need to belong to a workspace
-    flags.stuck = True;             // we show up on all workspaces
+    break;
+
+  case Type_Toolbar:
+  case Type_Utility:
+    // these windows get less decorations and functionality
+    decorations &= ~(Decor_Maximize | Decor_Handle | Decor_Iconify |
+                     Decor_Border);
+    functions &= ~(Func_Maximize | Func_Resize | Func_Iconify);
     break;
 
   case Type_Dialog:
@@ -348,6 +354,9 @@ BlackboxWindow::~BlackboxWindow(void) {
 
   if (! timer) // window not managed...
     return;
+
+  if (flags.moving)
+    endMove();
 
   screen->removeStrut(&client.strut);
   screen->updateAvailableArea();

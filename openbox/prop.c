@@ -51,6 +51,8 @@ void prop_startup()
     CREATE(net_wm_moveresize, "_NET_WM_MOVERESIZE");
     CREATE(net_moveresize_window, "_NET_MOVERESIZE_WINDOW");
 
+    CREATE(net_startup_id, "_NET_STARTUP_ID");
+
     CREATE(net_wm_name, "_NET_WM_NAME");
     CREATE(net_wm_visible_name, "_NET_WM_VISIBLE_NAME");
     CREATE(net_wm_icon_name, "_NET_WM_ICON_NAME");

@@ -90,8 +90,9 @@ def _focused(data):
         desktop = ob.openbox.screen(_cyc_screen).desktop()
         for w in _clients:
             client = ob.openbox.findClient(w)
-            if client and (client.desktop() == desktop and \
-                           client.normal() and client.focus()):
+            if client and (client.desktop() == desktop or
+                           client.desktop() == 0xffffffff) \
+                           and client.normal() and client.focus()):
                 break
         if _doing_stacked:
             _cyc_w = 0
@@ -196,10 +197,11 @@ def _create_popup_list(data):
     for c in _clients:
         client = ob.openbox.findClient(c)
         desktop = ob.openbox.screen(data.screen).desktop()
-        if client and ((client.desktop() == desktop or
-                        client.desktop() == 0xffffffff) and \
-                       client.normal() and (client.canFocus() or
-                                            client.focusNotify())):
+        if client and not client.skipTaskbar() and \
+               ((client.desktop() == desktop or
+                 client.desktop() == 0xffffffff) and \
+                client.normal() and (client.canFocus() or
+                                     client.focusNotify())):
             t = client.title()
             if len(t) > 50: # limit the length of titles
                 t = t[:24] + "..." + t[-24:]
@@ -288,8 +290,9 @@ def focus_next(data, num=1, forward=1):
     curdesk = screen.desktop()
     while 1:
         client = screen.client(t)
-        if client.normal() and \
-               (client.desktop() == curdesk or client.desktop() == 0xffffffff)\
+        if not client.skipTaskbar() and client.normal() and \
+               (client.desktop() == curdesk or
+                client.desktop() == 0xffffffff)\
                and client.focus():
             if cycle_raise:
                 screen.raiseWindow(client)

@@ -1527,6 +1527,9 @@ void OpenboxWindow::withdraw(void) {
 
 
 void OpenboxWindow::maximize(unsigned int button) {
+  if (flags.moving)
+    endMove();
+  
   // handle case where menu is open then the max button is used instead
   if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 

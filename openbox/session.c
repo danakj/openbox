@@ -11,8 +11,7 @@ void session_load(char *path) {}
 void session_startup(int argc, char **argv) {}
 void session_shutdown() {}
 GList* session_state_find(ObClient *c) { return NULL; }
-gboolean session_state_cmp(ObSessionState *s, struct _ObClient *c)
-{ return FALSE; }
+gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
 void session_state_free(ObSessionState *state) {}
 
 #else

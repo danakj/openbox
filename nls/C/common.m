@@ -1,35 +1,35 @@
 $set 15 #Common
 
 $ #Yes
-# Sim
+# Да
 $ #No
-# NЦo
+# Нет
 
 $ #DirectionTitle
-# DireГЦo
+# Направление
 $ #DirectionHoriz
-# Horizontal
+# По горизонтали
 $ #DirectionVert
-# Vertical
+# По вертикали
 
 $ #AlwaysOnTop
-# Sempre Visivel
+# Всегда наверху
 
 $ #PlacementTitle
-# Posicionamento
+# Местоположение
 $ #PlacementTopLeft
-# No Alto a Esquerda
+# Слева вверху
 $ #PlacementCenterLeft
-# No Centro a Esquerda
+# Слева по центру
 $ #PlacementBottomLeft
-# Em Baixo a Esquerda
+# Слева внизу
 $ #PlacementTopCenter
-# No Alto e no Centro
+# Сверху по центру
 $ #PlacementBottomCenter
-# Em Baixo e no Centro
+# Снизу по центру
 $ #PlacementTopRight
-# No Alto a Direita
+# Справа сверху
 $ #PlacementCenterRight
-# No Meio a Direita
+# Справа по центру
 $ #PlacementBottomRight
-# Em Baixo a Direita
+# Справа внизу

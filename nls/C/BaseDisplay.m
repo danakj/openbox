@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  X erro: %s(%d) opcodes %d/%d\n  recurso 0x%lx\n
+# %s:  ошибка X сервера: %s(%d) значения %d/%d\n ресурс 0x%lx\n
 $ #SignalCaught
-# %s: recebeido sinal %d\n
+# %s: получен сигнал %d \n
 $ #ShuttingDown
-# desligando\n
+# отключение\n
 $ #Aborting
-# abortando... gerando arquivo core\n
+# Отмена... создается дамп core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: conecГЦo ao servidor X falhou.\n
+# BaseDisplay::BaseDisplay: соединение с X сервером провалено.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: impossivel marcar a conexЦo ao display como close-on-exec\n
+# BaseDisplay::BaseDisplay: нет возможности пометить активный дисплей как "закрытый-на-исполнение"\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): removendo mА janela da trilha de eventos\n
+# BaseDisplay::eventLoop(): плохое окно удаляется из очереди событий\n

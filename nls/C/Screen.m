@@ -1,48 +1,48 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: um erro occorreu enquanto chamando o servidor X.\n  \
-existe outro window menager rodando no display. %s.\n
+# BScreen::BScreen: произошла ошибка при обращении к X серверу.\n  \
+другой менеджер окон уже запущен на дисплее %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: managing screen %d using visual 0x%lx, depth %d\n
+# BScreen::BScreen: обслуживается экран %d, используемый тип визуализации 0x%lx, глубина цвета %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): impossivel carregar fonte '%s'\n
+# BScreen::LoadStyle(): нет возможности загрузить шрифт '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): impossivel carregar fonte padrЦo.\n
+# BScreen::LoadStyle(): нет возможности загрузить предопределенный шрифт.\n
 $ #EmptyMenuFile
-# %s: arquivo de menu vazio\n
+# %s: пустой файл меню\n
 $ #xterm
-# xterm
+# Xterm
 $ #Restart
-# Reiniciar
+# Перезапуск
 $ #Exit
-# Sair
+# Выход
 $ #EXECError
-# BScreen::parseMenuFile: [exec] erro, nЦo hА indicaГЦo definida no menu e/ou comando definido\n
+# BScreen::parseMenuFile: ошибка [exec], не определено название пункта меню и/или название комманды\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [exit], не определено название пункта меню\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] erro, nЦo hА indicaГЦo de menu e/ou nome de arquivo difinido\n
+# BScreen::parseMenuFile: ошибка [style], не определено название пункта меню и/или имя файла\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [config], не определено название пункта меню\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] erro, nome de arquivo nЦo definido\n
+# BScreen::parseMenuFile: ошибка [include], не определено имя файла\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] error, '%s' nЦo И um arquivo regular\n
+# BScreen::parseMenuFile: ошибка [include], '%s' не обычный файл\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [submenu], не определено название пункта меню\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [restart], не определено название пункта меню\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [reconfig], не определено название пункта меню\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, nЦo hА diretorio difinido\n
+# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], не определено имя директории\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' nЦo И um diretorio\n
+# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], '%s' не директория\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] erro, '%s' nЦo existe\n
+# BScreen::parseMenuFile: ошибка [stylesdir/stylesmenu], '%s' не существует\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] erro, nЦo hА indicaГЦo definida no menu\n
+# BScreen::parseMenuFile: ошибка [workspaces], не определено название пункта меню\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat

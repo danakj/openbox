@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# erro: '-rc' requer um argumento\n
+# ошибка: '-rc' требует наличие аргумента\n
 $ #DISPLAYRequiresArg
-# erro: '-display' requer um argumento\n
+# ошибка: '-display' требует наличие аргумента\n
 $ #WarnDisplaySet
-# aviso: nЦo foi possivel setar a variavel de ambiente 'DISPLAY'\n
+# предупреждение: невозможно установить переменную окружения 'DISPLAY'\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
                  2001 - 2002 Sean 'Shaleh' Perry\n\
                  1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tusar conexЦo com o display.\n\
-  -rc <string>\t\t\tusar arquivo alternativo de recursos.\n\
-  -version\t\t\tmostrar versao e sair.\n\
-  -help\t\t\t\tmostrar esta ajuda e sair.\n\n
+  -display <string>\t\tиспользовать заданный дисплей.\n\
+  -rc <string>\t\t\tиспользовать альтернативный файл ресурсов.\n\
+  -version\t\t\tвывести номер версии и выйти.\n\
+  -help\t\t\t\tвывести эту подсказку и выйти.\n\n
 $ #CompileOptions
-# OpГУes em tempo de compilaГЦo:\n\
-  InformaГУes extras para problemas:\t\t\t%s\n\
-  Forma:\t\t\t%s\n\
+# Compile time options:\n\
+  Debugging\t\t\t%s\n\
+  Shape:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
   Event Clobbering:\t\t%s\n\
-  8bpp SimulaГЦo ordenada de cores em imagens:\t%s\n\n
+  8bpp Ordered Dithering:\t%s\n\n

@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Areas de Trabalho
+# Рабочие столы
 $ #NewWorkspace
-# Nova Area de Trabalho
+# Новый рабочий стол
 $ #RemoveLast
-# Remover Ultima
+# Удалить последний

@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# ConfiguraГУes
+# Конфигурация
 $ #FocusModel
-# Modelo de Foco
+# Модель фокусировки
 $ #WindowPlacement
-# Posicionamento das Janelas
+# Положение окна
 $ #ImageDithering
-# SimulaГЦo de Cores em Imagens
+# Image Dithering
 $ #OpaqueMove
-# Movimento Opaco de Janelas
+# Перемещение заполненных окон
 $ #FullMax
-# MaximizaГЦo Total
+# Полная максимизация
 $ #FocusNew
-# Foco em Novas Janelas
+# Перемещать фокус на новые окна
 $ #FocusLast
-# Foco na Ultima Janela Da Area de Trabalho
+# Фокус на последнее окно рабочего стола
 $ #ClickToFocus
-# Foco na Janela Quando Clicada
+# Фокус по щелчку
 $ #SloppyFocus
-# Foco na Janela Quando Apontada
+# Фокус по перемещению
 $ #AutoRaise
-# Sobrepor Janela Quando Ativa
+# Автовсплытие
 $ #SmartRows
-# Posicionamento em Fila
+# "Умное" расположение (по горизонтали)
 $ #SmartCols
-# Posicionamento em Coluna
+# "Умное" расположение (по вертикали)
 $ #Cascade
-# Posicionamento em Cascata
+# Каскадом
 $ #LeftRight
-# Esquerda para Direita
+# Слева направо
 $ #RightLeft
-# Direita para Esquerda
+# Справа налево
 $ #TopBottom
-# Cima para Baixo
+# Сверху вниз
 $ #BottomTop
-# Baixo para Cima
+# Снизу вверх

@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: erro criando pixmap\n
+# BImage::render_solid: ошибка создания pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: erro criando XImage\n
+# BImage::renderXImage: ошибка создания XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: visual nЦo suportado\n
+# BImage::renderXImage: неподдерживаемый тип визуализации\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: erro criando pixmap\n
+# BImage::renderPixmap: ошибка создания pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: mapa de cores de tamanho invalido %d (%d/%d/%d) - reduzindo\n
+# BImageControl::BImageControl: неверный размер таблицы цветов %d (%d/%d/%d) - удаляется\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: erro localizando mapa de cores\n
+# BImageControl::BImageControl: ошибка размещения таблицы цветов\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: falha localizando cor %d/%d/%d\n
+# BImageControl::BImageControl: невозможно разместить цвет %d/%d/%d в памяти\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: reserva de pixmap cheia - liberando %d pixmaps\n
+# BImageControl::~BImageControl: кэш точечных изображений - освобождается %d блоков\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: reserva cheia, forГando limpeza\n
+# BImageControl::renderImage: переполнение кэша, производится быстрая очистка\n
 $ #ColorParseError
-# BImageControl::getColor: color parse error: '%s'\n
+# BImageControl::getColor: ошибка разбора строки, описывающей цвет: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: erro localizando cor: '%s'\n
+# BImageControl::getColor: ошибка размещения цвета в памяти: '%s'\n

@@ -38,6 +38,7 @@ static void client_get_gravity(Client *self);
 static void client_showhide(Client *self);
 static void client_change_allowed_actions(Client *self);
 static void client_change_state(Client *self);
+static void client_move_onscreen(Client *self);
 static Client *search_focus_tree(Client *node, Client *skip);
 static void client_apply_startup_state(Client *self);
 static Client *search_modal_tree(Client *node, Client *skip);
@@ -143,7 +144,7 @@ void client_manage_all()
 
 void client_manage(Window window)
 {
-    Client *client;
+    Client *self;
     XEvent e;
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
@@ -191,55 +192,58 @@ void client_manage(Window window)
 
     /* create the Client struct, and populate it from the hints on the
        window */
-    client = g_new(Client, 1);
-    client->window = window;
-    client_get_all(client);
+    self = g_new(Client, 1);
+    self->window = window;
+    client_get_all(self);
 
     /* remove the client's border (and adjust re gravity) */
-    client_toggle_border(client, FALSE);
+    client_toggle_border(self, FALSE);
      
     /* specify that if we exit, the window should not be destroyed and should
        be reparented back to root automatically */
     XChangeSaveSet(ob_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
-    client->frame = engine_frame_new();
+    self->frame = engine_frame_new();
 
-    engine_frame_grab_client(client->frame, client);
+    engine_frame_grab_client(self->frame, self);
 
-    client_apply_startup_state(client);
+    client_apply_startup_state(self);
 
     grab_server(FALSE);
      
-    client_list = g_list_append(client_list, client);
-    stacking_list = g_list_append(stacking_list, client);
-    g_assert(!g_hash_table_lookup(client_map, &client->window));
-    g_hash_table_insert(client_map, &client->window, client);
+    client_list = g_list_append(client_list, self);
+    stacking_list = g_list_append(stacking_list, self);
+    g_assert(!g_hash_table_lookup(client_map, &self->window));
+    g_hash_table_insert(client_map, &self->window, self);
 
     /* update the focus lists */
-    if (client->desktop == DESKTOP_ALL) {
+    if (self->desktop == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_append(focus_order[i], client);
+            focus_order[i] = g_list_append(focus_order[i], self);
     } else {
-        i = client->desktop;
-        focus_order[i] = g_list_append(focus_order[i], client);
+        i = self->desktop;
+        focus_order[i] = g_list_append(focus_order[i], self);
     }
 
-    stacking_raise(client);
+    stacking_raise(self);
 
     screen_update_struts();
 
-    dispatch_client(Event_Client_New, client, 0, 0);
+    dispatch_client(Event_Client_New, self, 0, 0);
 
-    client_showhide(client);
+    client_showhide(self);
 
-    dispatch_client(Event_Client_Mapped, client, 0, 0);
+    dispatch_client(Event_Client_Mapped, self, 0, 0);
 
     if (ob_state != State_Starting && focus_new)
-        client_focus(client);
+        client_focus(self);
 
     /* update the list hints */
     client_set_list();
+
+    /* make sure the window is visible */
+    client_move_onscreen(self);
 
 /*    g_message("Managed window 0x%lx", window);*/
 }
@@ -250,36 +254,36 @@ void client_unmanage_all()
 	client_unmanage(client_list->data);
 }
 
-void client_unmanage(Client *client)
+void client_unmanage(Client *self)
 {
     guint i;
     int j;
     GSList *it;
 
-/*    g_message("Unmanaging window: %lx", client->window);*/
+/*    g_message("Unmanaging window: %lx", self->window);*/
 
-    dispatch_client(Event_Client_Destroy, client, 0, 0);
-    g_assert(client != NULL);
+    dispatch_client(Event_Client_Destroy, self, 0, 0);
+    g_assert(self != NULL);
 
     /* remove the window from our save set */
-    XChangeSaveSet(ob_display, client->window, SetModeDelete);
+    XChangeSaveSet(ob_display, self->window, SetModeDelete);
 
     /* we dont want events no more */
-    XSelectInput(ob_display, client->window, NoEventMask);
+    XSelectInput(ob_display, self->window, NoEventMask);
 
-    engine_frame_hide(client->frame);
+    engine_frame_hide(self->frame);
 
-    client_list = g_list_remove(client_list, client);
-    stacking_list = g_list_remove(stacking_list, client);
-    g_hash_table_remove(client_map, &client->window);
+    client_list = g_list_remove(client_list, self);
+    stacking_list = g_list_remove(stacking_list, self);
+    g_hash_table_remove(client_map, &self->window);
 
     /* update the focus lists */
-    if (client->desktop == DESKTOP_ALL) {
+    if (self->desktop == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_remove(focus_order[i], client);
+            focus_order[i] = g_list_remove(focus_order[i], self);
     } else {
-        i = client->desktop;
-        focus_order[i] = g_list_remove(focus_order[i], client);
+        i = self->desktop;
+        focus_order[i] = g_list_remove(focus_order[i], self);
     }
 
     /* once the client is out of the list, update the struts to remove it's
@@ -287,20 +291,20 @@ void client_unmanage(Client *client)
     screen_update_struts();
 
     /* tell our parent(s) that we're gone */
-    if (client->transient_for == TRAN_GROUP) { /* transient of group */
+    if (self->transient_for == TRAN_GROUP) { /* transient of group */
         GSList *it;
 
-        for (it = client->group->members; it; it = it->next)
-            if (it->data != client)
+        for (it = self->group->members; it; it = it->next)
+            if (it->data != self)
                 ((Client*)it->data)->transients =
-                    g_slist_remove(((Client*)it->data)->transients, client);
-    } else if (client->transient_for) {        /* transient of window */
-	client->transient_for->transients =
-	    g_slist_remove(client->transient_for->transients, client);
+                    g_slist_remove(((Client*)it->data)->transients, self);
+    } else if (self->transient_for) {        /* transient of window */
+	self->transient_for->transients =
+	    g_slist_remove(self->transient_for->transients, self);
     }
 
     /* tell our transients that we're gone */
-    for (it = client->transients; it != NULL; it = it->next) {
+    for (it = self->transients; it != NULL; it = it->next) {
         if (((Client*)it->data)->transient_for != TRAN_GROUP) {
             ((Client*)it->data)->transient_for = NULL;
             client_calc_layer(it->data);
@@ -308,47 +312,71 @@ void client_unmanage(Client *client)
     }
 
     /* remove from its group */
-    if (client->group)
-        group_remove(client->group, client);
+    if (self->group) {
+        group_remove(self->group, self);
+        self->group = NULL;
+    }
 
     /* dispatch the unmapped event */
-    dispatch_client(Event_Client_Unmapped, client, 0, 0);
-    g_assert(client != NULL);
+    dispatch_client(Event_Client_Unmapped, self, 0, 0);
+    g_assert(self != NULL);
 
     /* give the client its border back */
-    client_toggle_border(client, TRUE);
+    client_toggle_border(self, TRUE);
 
     /* reparent the window out of the frame, and free the frame */
-    engine_frame_release_client(client->frame, client);
-    client->frame = NULL;
+    engine_frame_release_client(self->frame, self);
+    self->frame = NULL;
      
     if (ob_state != State_Exiting) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
-	prop_erase(client->window, prop_atoms.net_wm_desktop);
-	prop_erase(client->window, prop_atoms.net_wm_state);
+	prop_erase(self->window, prop_atoms.net_wm_desktop);
+	prop_erase(self->window, prop_atoms.net_wm_state);
     } else {
 	/* if we're left in an iconic state, the client wont be mapped. this is
 	   bad, since we will no longer be managing the window on restart */
-	if (client->iconic)
-	    XMapWindow(ob_display, client->window);
+	if (self->iconic)
+	    XMapWindow(ob_display, self->window);
     }
 
     /* free all data allocated in the client struct */
-    g_slist_free(client->transients);
-    for (j = 0; j < client->nicons; ++j)
-	g_free(client->icons[j].data);
-    if (client->nicons > 0)
-	g_free(client->icons);
-    g_free(client->title);
-    g_free(client->icon_title);
-    g_free(client->name);
-    g_free(client->class);
-    g_free(client->role);
-    g_free(client);
+    g_slist_free(self->transients);
+    for (j = 0; j < self->nicons; ++j)
+	g_free(self->icons[j].data);
+    if (self->nicons > 0)
+	g_free(self->icons);
+    g_free(self->title);
+    g_free(self->icon_title);
+    g_free(self->name);
+    g_free(self->class);
+    g_free(self->role);
+    g_free(self);
      
     /* update the list hints */
     client_set_list();
+}
+
+static void client_move_onscreen(Client *self)
+{
+    Rect *a;
+    int x = self->frame->area.x, y = self->frame->area.y;
+
+    a = screen_area(self->desktop);
+    if (x >= a->x + a->width - 1)
+        x = a->x + a->width - self->frame->area.width;
+    if (y >= a->y + a->height - 1)
+        y = a->y + a->height - self->frame->area.height;
+    if (x + self->frame->area.width - 1 < a->x)
+        x = a->x;
+    if (y + self->frame->area.height - 1< a->y)
+        y = a->y;
+
+    frame_frame_gravity(self->frame, &x, &y); /* get where the client
+                                              should be */
+    client_configure(self , Corner_TopLeft, x, y,
+                     self->area.width, self->area.height,
+                     TRUE, TRUE);
 }
 
 static void client_toggle_border(Client *self, gboolean show)

@@ -14,9 +14,11 @@ pixmap_mask *pixmap_mask_new(int w, int h, char *data)
 
 void pixmap_mask_free(pixmap_mask *m)
 {
-    XFreePixmap(ob_display, m->mask);
-    g_free(m->data);
-    g_free(m);
+    if (m) {
+        XFreePixmap(ob_display, m->mask);
+        g_free(m->data);
+        g_free(m);
+    }
 }
 
 void mask_draw(Pixmap p, TextureMask *m, Rect *position)

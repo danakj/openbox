@@ -146,14 +146,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     /* load direct dimensions */
     if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
 	theme->menu_overlap < 0 || theme->menu_overlap > 20)
-        theme->handle_height = 0;
+        theme->menu_overlap = 0;
     if (!read_int(db, "handleWidth", &theme->handle_height) ||
 	theme->handle_height < 0 || theme->handle_height > 100)
-        theme->handle_height = 6;
+        theme->handle_height = 3;
     if (!read_int(db, "bevelWidth", &theme->bevel) ||
-	theme->bevel <= 0 || theme->bevel > 100) theme->bevel = 3;
+	theme->bevel <= 0 || theme->bevel > 100)
+        theme->bevel = 3;
     if (!read_int(db, "borderWidth", &theme->bwidth) ||
-	theme->bwidth < 0 || theme->bwidth > 100) theme->bwidth = 1;
+	theme->bwidth < 0 || theme->bwidth > 100)
+        theme->bwidth = 1;
     if (!read_int(db, "frameWidth", &theme->cbwidth) ||
 	theme->cbwidth < 0 || theme->cbwidth > 100)
         theme->cbwidth = theme->bevel;

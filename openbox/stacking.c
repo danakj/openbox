@@ -112,6 +112,7 @@ void stacking_raise(ObWindow *window)
 
     if (WINDOW_IS_CLIENT(window)) {
         Client *client = WINDOW_AS_CLIENT(window);
+
         /* move up the transient chain as far as possible first */
         if (client->transient_for) {
             if (client->transient_for != TRAN_GROUP) {
@@ -119,15 +120,18 @@ void stacking_raise(ObWindow *window)
                 return;
             } else {
                 GSList *it;
+                gboolean raised = FALSE;
 
                 for (it = client->group->members; it; it = it->next) {
                     Client *c = it->data;
 
                     /* checking transient_for prevents infinate loops! */
-                    if (c != client && !c->transient_for)
+                    if (c != client && !c->transient_for) {
                         stacking_raise(it->data);
+                        raised = TRUE;
+                    }
                 }
-                if (it == NULL) return;
+                if (raised) return;
             }
         }
     }

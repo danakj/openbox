@@ -313,57 +313,60 @@ void ob_main_loop_run(ObMainLoop *loop)
                     h->func(&e, h->data);
                 }
             } while (XPending(loop->display));
-        } else if (loop->action_queue) {
-             /* only fire off one action at a time, then go back for more
-                X events, since the action might cause some X events (like
-                FocusIn :) */
-
-            do {
-                act = loop->action_queue->data;
-                if (act->data.any.client_action == OB_CLIENT_ACTION_ALWAYS &&
-                    !act->data.any.c)
-                {
-                    loop->action_queue =
-                        g_slist_delete_link(loop->action_queue,
-                                            loop->action_queue);
-                    action_unref(act);
-                    act = NULL;
-                }
-            } while (!act && loop->action_queue);
-
-            if  (act) {
-                act->func(&act->data);
-                loop->action_queue =
-                    g_slist_delete_link(loop->action_queue,
-                                        loop->action_queue);
-                action_unref(act);
-            }
         } else {
-            /* this only runs if there were no x events received */
-
             for (it = loop->x_handlers; it; it = g_slist_next(it)) {
                 ObMainLoopXHandlerType *h = it->data;
                 if (h->done_func)
                     h->done_func(h->data);
-            }            
+            }
 
-            timer_dispatch(loop, (GTimeVal**)&wait);
+            if (loop->action_queue) {
+                /* only fire off one action at a time, then go back for more
+                   X events, since the action might cause some X events (like
+                   FocusIn :) */
 
-            selset = loop->fd_set;
-            /* there is a small race condition here. if a signal occurs
-               between this if() and the select() then we will not process
-               the signal until 'wait' expires. possible solutions include
-               using GStaticMutex, and having the signal handler set 'wait'
-               to 0 */
-            if (!loop->signal_fired)
-                select(loop->fd_max + 1, &selset, NULL, NULL, wait);
+                do {
+                    act = loop->action_queue->data;
+                    if (act->data.any.client_action ==
+                        OB_CLIENT_ACTION_ALWAYS &&
+                        !act->data.any.c)
+                    {
+                        loop->action_queue =
+                            g_slist_delete_link(loop->action_queue,
+                                                loop->action_queue);
+                        action_unref(act);
+                        act = NULL;
+                    }
+                } while (!act && loop->action_queue);
 
-            /* handle the X events with highest prioirity */
-            if (FD_ISSET(loop->fd_x, &selset))
-                continue;
+                if  (act) {
+                    act->func(&act->data);
+                    loop->action_queue =
+                        g_slist_delete_link(loop->action_queue,
+                                            loop->action_queue);
+                    action_unref(act);
+                }
+            } else {
+                /* this only runs if there were no x events received */
 
-            g_hash_table_foreach(loop->fd_handlers,
-                                 fd_handle_foreach, &selset);
+                timer_dispatch(loop, (GTimeVal**)&wait);
+
+                selset = loop->fd_set;
+                /* there is a small race condition here. if a signal occurs
+                   between this if() and the select() then we will not process
+                   the signal until 'wait' expires. possible solutions include
+                   using GStaticMutex, and having the signal handler set 'wait'
+                   to 0 */
+                if (!loop->signal_fired)
+                    select(loop->fd_max + 1, &selset, NULL, NULL, wait);
+
+                /* handle the X events with highest prioirity */
+                if (FD_ISSET(loop->fd_x, &selset))
+                    continue;
+
+                g_hash_table_foreach(loop->fd_handlers,
+                                     fd_handle_foreach, &selset);
+            }
         }
     }
 

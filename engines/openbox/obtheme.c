@@ -137,14 +137,14 @@ static gboolean read_mask(XrmDatabase db, char *rname, pixmap_mask **value)
 
                 g_free(s);
                 themename = g_path_get_basename(engine_theme);
-                s = g_strdup_printf("%s_buttons/%s", engine_theme,
-                                    themename);
+                s = g_strdup_printf("%s/%s_buttons/%s", engine_theme,
+                                    themename, retvalue.addr);
                 g_free(themename);
                 if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
                     BitmapSuccess) 
                     ret = TRUE;
                 else
-                    g_message("Unable to find bitmap '%s'", s);
+                    g_message("Unable to find bitmap '%s'", retvalue.addr);
             }
         }
 

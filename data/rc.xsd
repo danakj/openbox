@@ -21,6 +21,8 @@
          use a namespace
      Fri Sep 19 14:36:33 EDT 2003 - xor(a)orodu.net
          use openbox.org for namespace
+     Mon Sep 22 02:34:53 EDT 2003 - xor(a)orodu.net
+         add the focusLast and raiseOnFocus options
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -65,8 +67,10 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="focusNew" type="ob:yesorno"/>
+            <xs:element name="focusLast" type="ob:yesorno"/>
             <xs:element name="followMouse" type="ob:yesorno"/>
             <xs:element name="focusDelay" type="xs:integer"/>
+            <xs:element name="raiseOnFocus" type="ob:yesorno"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="theme">

@@ -448,6 +448,7 @@ public:
   virtual void configureRequestHandler(const XConfigureRequestEvent &e);
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
+  virtual void reparentHandler(const XReparentEvent &e);
 };
 
 }

@@ -1,9 +1,12 @@
 :
 	* Closed bug #875 (RaiseLower fails to funtion on windows with dialogs)
+	* Added the <moveButton> option for moving dock apps around inside the
+	dock.
+	* Made the "Desktop" action show the pager/desktop dialog.
 
 3.0-beta6:
 	* Added _OB_WM_STATE_UNDECORATED hint, which can be read and controlled
-	  by external applications
+	by external applications
 	* Closed bug #874 (libtool won't install libobrender.la)
 	* Launch ObConf when selecting GNOME's Desktop Preferences for Windows
 	* Focus new children always if their direct parent is focused

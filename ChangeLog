@@ -1,3 +1,36 @@
+2003-08-02  xor@zed.orodu.net  <xor@zed>
+
+	* theme.c: oops indenting
+
+	* theme.c:
+	look in theme dirs first, use the theme as the path as a last attempt only!
+
+	* theme.h:
+	invisible resizing areas/grips in the top corners of the window
+
+	* theme.c: use the toggled mask for shade and desk buttons
+
+2003-08-01  xor@zed.orodu.net  <xor@zed>
+
+	* theme.c: look for masks only where the themerc was read from
+
+	* theme.c, theme.h: add pressed bitmaps. rename stick bitmaps to desk
+
+	* theme.c, theme.h: add toggled textuers for titlebar buttons
+
+	* gradient.c, render.c, render.h: move the dekstop file to data/
+
+	* theme.c, theme.h:
+	renamed the _t bitmaps, and added disabled and hover bitmaps
+
+	* theme.c: make themes inside a directory
+
+	* theme.c: add missing includes
+
+2003-07-31  xor@zed.orodu.net  <xor@zed>
+
+	* font.c: missing a header
+
 2003-07-31  xor@zed.orodu.net  <xor@zed>
 
 	* configure.ac: alpha3

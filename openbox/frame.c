@@ -68,7 +68,8 @@ Frame *frame_new()
     fd = &self->framedecor[0];
     fd->obwin.type = Window_Decoration;
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
-    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &sec, &pri);
+    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, RR_RAISED_OUTER, &sec, &pri,
+                0, NULL);
     RrTextureSetText(fd->surface, 0, foont, RR_LEFT,
                      "OPENBOX SUCKS because of me.");
     fd->window = RrSurfaceWindow(fd->surface);
@@ -84,7 +85,8 @@ Frame *frame_new()
     fd = &self->framedecor[1];
     fd->obwin.type = Window_Decoration;
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 0);
-    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, &pri, &sec);
+    RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, RR_RAISED_OUTER, &sec, &pri,
+                0, NULL);
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Bottom;

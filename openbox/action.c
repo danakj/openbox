@@ -1195,7 +1195,11 @@ void action_desktop_dir(union ActionData *data)
                              data->desktopdir.inter.any.interactive,
                              data->desktopdir.inter.final,
                              data->desktopdir.inter.cancel);
-    screen_set_desktop(d);
+    if (!data->sendtodir.inter.any.interactive ||
+        !data->sendtodir.inter.final)
+    {
+        screen_set_desktop(d);
+    }
 }
 
 void action_send_to_desktop_dir(union ActionData *data)
@@ -1210,9 +1214,13 @@ void action_send_to_desktop_dir(union ActionData *data)
                              data->sendtodir.inter.any.interactive,
                              data->sendtodir.inter.final,
                              data->sendtodir.inter.cancel);
-    client_set_desktop(c, d, data->sendtodir.follow);
-    if (data->sendtodir.follow)
-        screen_set_desktop(d);
+    if (!data->sendtodir.inter.any.interactive ||
+        !data->sendtodir.inter.final)
+    {
+        client_set_desktop(c, d, data->sendtodir.follow);
+        if (data->sendtodir.follow)
+            screen_set_desktop(d);
+    }
 }
 
 void action_desktop_last(union ActionData *data)

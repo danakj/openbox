@@ -924,6 +924,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 void RrThemeFree(RrTheme *theme)
 {
     if (theme) {
+        g_free(theme->path);
         g_free(theme->name);
 
         RrColorFree(theme->b_color);
@@ -1051,6 +1052,8 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->app_unhilite_fg);
         RrAppearanceFree(theme->app_hilite_label);
         RrAppearanceFree(theme->app_unhilite_label);
+
+        g_free(theme);
     }
 }
 

@@ -1339,7 +1339,7 @@ void client_update_title(ObClient *self)
         char *ndata;
         ndata = g_strdup_printf("%s - [%u]", data, self->title_count);
         g_free(data);
-        data = vdata;
+        data = ndata;
     }
 
     PROP_SETS(self->window, net_wm_visible_name, data);

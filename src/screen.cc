@@ -471,6 +471,9 @@ void Screen::manageWindow(Window window)
   // reparented back to root automatically
   XChangeSaveSet(**otk::display, window, SetModeInsert);
 
+  // create the decoration frame for the client window
+  client->frame = new Frame(client, &_style);
+
   if (!(openbox->state() == Openbox::State_Starting ||
         client->positionRequested())) {
     // position the window intelligenty .. hopefully :)
@@ -478,9 +481,6 @@ void Screen::manageWindow(Window window)
     EventData data(_number, client, EventPlaceWindow, 0);
     openbox->bindings()->fireEvent(&data);
   }
-
-  // create the decoration frame for the client window
-  client->frame = new Frame(client, &_style);
 
   // add to the wm's map
   openbox->addClient(client->frame->window(), client);

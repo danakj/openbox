@@ -18,7 +18,7 @@ bin_PROGRAMS= openbox3
 openbox3_LDADD=-L../otk -lotk @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
-                  main.cc rootwindow.cc backgroundwidget.cc labelwidget.cc \
+                  main.cc backgroundwidget.cc labelwidget.cc \
                   buttonwidget.cc python.cc bindings.cc \
                   openbox_wrap.cc
 

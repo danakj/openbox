@@ -9,6 +9,10 @@ extern "C" {
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
+#ifdef    HAVE_STRING_H
+#  include <string.h>
+#endif // HAVE_STRING_H
+
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -42,8 +46,8 @@ namespace ob {
 
 
 OBScreen::OBScreen(int screen)
-  : _number(screen),
-    _root(screen)
+  : OBWidget(OBWidget::Type_Root),
+    _number(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(otk::OBDisplay::display));
   _info = otk::OBDisplay::screenInfo(screen);
@@ -92,26 +96,33 @@ OBScreen::OBScreen(int screen)
   _style.load(sconfig);
 
   // set up notification of netwm support
-  setSupportedAtoms();
+  changeSupportedAtoms();
 
-  // Set the netwm properties for geometry and viewport
+  // Set the netwm properties for geometry
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_desktop_geometry,
                                      otk::OBProperty::Atom_Cardinal,
                                      geometry, 2);
-  unsigned long viewport[] = { 0, 0 };
-  Openbox::instance->property()->set(_info->rootWindow(),
-                                     otk::OBProperty::net_desktop_viewport,
-                                     otk::OBProperty::Atom_Cardinal,
-                                     viewport, 2);
 
   // Set the net_desktop_names property
   std::vector<std::string> names;
   python_get_stringlist("desktop_names", &names);
-  _root.setDesktopNames(names);
-  
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_desktop_names,
+                                     otk::OBProperty::utf8,
+                                     names);
+  // the above set() will cause the updateDesktopNames to fire right away so
+  // we have a list of desktop names
+
+  if (!python_get_long("number_of_desktops", &_num_desktops))
+    _num_desktops = 4;
+  changeNumDesktops(_num_desktops); // set the hint
+
+  _desktop = 0;
+  changeDesktop(0); // set the hint
+
   // create the window which gets focus when no clients get it
   XSetWindowAttributes attr;
   attr.override_redirect = true;
@@ -122,8 +133,11 @@ OBScreen::OBScreen(int screen)
   
   // these may be further updated if any pre-existing windows are found in
   // the manageExising() function
-  setClientList();     // initialize the client lists, which will be empty
+  changeClientList();  // initialize the client lists, which will be empty
   calcArea();          // initialize the available working area
+
+  // register this class as the event handler for the root window
+  Openbox::instance->registerHandler(_info->rootWindow(), this);
 }
 
 
@@ -250,11 +264,11 @@ void OBScreen::calcArea()
   if (old_area != _area)
     // XXX: re-maximize windows
 
-  setWorkArea();
+  changeWorkArea();
 }
 
 
-void OBScreen::setSupportedAtoms()
+void OBScreen::changeSupportedAtoms()
 {
   // create the netwm support window
   _supportwindow = XCreateSimpleWindow(otk::OBDisplay::display,
@@ -280,10 +294,8 @@ void OBScreen::setSupportedAtoms()
 
   
   Atom supported[] = {
-/*
       otk::OBProperty::net_current_desktop,
       otk::OBProperty::net_number_of_desktops,
-*/
       otk::OBProperty::net_desktop_geometry,
       otk::OBProperty::net_desktop_viewport,
       otk::OBProperty::net_active_window,
@@ -353,7 +365,7 @@ void OBScreen::setSupportedAtoms()
 }
 
 
-void OBScreen::setClientList()
+void OBScreen::changeClientList()
 {
   Window *windows;
   unsigned int size = clients.size();
@@ -379,11 +391,11 @@ void OBScreen::setClientList()
   if (size)
     delete [] windows;
 
-  setStackingList();
+  changeStackingList();
 }
 
 
-void OBScreen::setStackingList()
+void OBScreen::changeStackingList()
 {
   Window *windows;
   unsigned int size = _stacking.size();
@@ -414,32 +426,20 @@ void OBScreen::setStackingList()
 }
 
 
-void OBScreen::setWorkArea() {
-  unsigned long area[] = { _area.x(), _area.y(),
-                           _area.width(), _area.height() };
+void OBScreen::changeWorkArea() {
+  unsigned long *dims = new unsigned long[4 * _num_desktops];
+  for (long i = 0; i < _num_desktops; ++i) {
+    // XXX: this could be different for each workspace
+    dims[(i * 4) + 0] = _area.x();
+    dims[(i * 4) + 1] = _area.y();
+    dims[(i * 4) + 2] = _area.width();
+    dims[(i * 4) + 3] = _area.height();
+  }
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_workarea,
                                      otk::OBProperty::Atom_Cardinal,
-                                     area, 4);
-  /*
-  if (workspacesList.size() > 0) {
-    unsigned long *dims = new unsigned long[4 * workspacesList.size()];
-    for (unsigned int i = 0, m = workspacesList.size(); i < m; ++i) {
-      // XXX: this could be different for each workspace
-      const otk::Rect &area = availableArea();
-      dims[(i * 4) + 0] = area.x();
-      dims[(i * 4) + 1] = area.y();
-      dims[(i * 4) + 2] = area.width();
-      dims[(i * 4) + 3] = area.height();
-    }
-    xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
-               otk::OBProperty::Atom_Cardinal,
-               dims, 4 * workspacesList.size());
-    delete [] dims;
-  } else
-    xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
-               otk::OBProperty::Atom_Cardinal, 0, 0);
-  */
+                                     dims, 4 * _num_desktops);
+  delete [] dims;
 }
 
 
@@ -515,7 +515,7 @@ void OBScreen::manageWindow(Window window)
   _stacking.push_back(client);
   restack(true, client);
   // update the root properties
-  setClientList();
+  changeClientList();
 
   Openbox::instance->bindings()->grabButtons(true, client);
 
@@ -594,7 +594,7 @@ void OBScreen::unmanageWindow(OBClient *client)
   delete client;
 
   // update the root properties
-  setClientList();
+  changeClientList();
 }
 
 void OBScreen::restack(bool raise, OBClient *client)
@@ -621,7 +621,150 @@ void OBScreen::restack(bool raise, OBClient *client)
     wins.push_back((*it)->frame->window());
 
   XRestackWindows(otk::OBDisplay::display, &wins[0], wins.size());
-  setStackingList();
+  changeStackingList();
 }
 
+void OBScreen::changeDesktop(long desktop)
+{
+  assert(desktop >= 0 && desktop < _num_desktops);
+
+  if (!(desktop >= 0 && desktop < _num_desktops)) return;
+
+  long old = _desktop;
+  
+  _desktop = desktop;
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_current_desktop,
+                                     otk::OBProperty::Atom_Cardinal,
+                                     _desktop);
+
+  OBClient::List::iterator it, end = clients.end();
+  for (it = clients.begin(); it != end; ++it) {
+    if ((*it)->desktop() == old) {
+      // XXX hide
+    } else if ((*it)->desktop() == _desktop) {
+      // XXX show
+    }
+  }
+}
+
+void OBScreen::changeNumDesktops(long num)
+{
+  assert(num > 0);
+  
+  if (!(num > 0)) return;
+
+  _num_desktops = num;
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_number_of_desktops,
+                                     otk::OBProperty::Atom_Cardinal,
+                                     _num_desktops);
+
+  // set the viewport hint
+  unsigned long *viewport = new unsigned long[_num_desktops * 2];
+  memset(viewport, 0, sizeof(unsigned long) * _num_desktops * 2);
+  Openbox::instance->property()->set(_info->rootWindow(),
+                                     otk::OBProperty::net_desktop_viewport,
+                                     otk::OBProperty::Atom_Cardinal,
+                                     viewport, _num_desktops * 2);
+  delete [] viewport;
+
+  // update the work area hint
+  changeWorkArea();
+}
+
+
+void OBScreen::updateDesktopNames()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  unsigned long num = (unsigned) -1;
+  
+  if (!property->get(_info->rootWindow(),
+                     otk::OBProperty::net_desktop_names,
+                     otk::OBProperty::utf8, &num, &_desktop_names))
+    _desktop_names.clear();
+  while ((long)_desktop_names.size() < _num_desktops)
+    _desktop_names.push_back("Unnamed");
+}
+
+
+void OBScreen::setDesktopName(long i, const std::string &name)
+{
+  assert(i >= 0);
+
+  if (i >= _num_desktops) return;
+
+  const otk::OBProperty *property = Openbox::instance->property();
+  
+  otk::OBProperty::StringVect newnames = _desktop_names;
+  newnames[i] = name;
+  property->set(_info->rootWindow(), otk::OBProperty::net_desktop_names,
+                otk::OBProperty::utf8, newnames);
+}
+
+
+void OBScreen::propertyHandler(const XPropertyEvent &e)
+{
+  otk::OtkEventHandler::propertyHandler(e);
+
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  // compress changes to a single property into a single change
+  XEvent ce;
+  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+    // XXX: it would be nice to compress ALL changes to a property, not just
+    //      changes in a row without other props between.
+    if (ce.xproperty.atom != e.atom) {
+      XPutBackEvent(otk::OBDisplay::display, &ce);
+      break;
+    }
+  }
+
+  if (e.atom == property->atom(otk::OBProperty::net_desktop_names)) 
+    updateDesktopNames();
+}
+
+
+void OBScreen::clientMessageHandler(const XClientMessageEvent &e)
+{
+  otk::OtkEventHandler::clientMessageHandler(e);
+
+  if (e.format != 32) return;
+
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  if (e.message_type == property->atom(otk::OBProperty::net_current_desktop)) {
+    changeDesktop(e.data.l[0]);
+  } else if (e.message_type ==
+             property->atom(otk::OBProperty::net_number_of_desktops)) {
+    changeNumDesktops(e.data.l[0]);
+  }
+  // XXX: so many client messages to handle here! ..or not.. they go to clients
+}
+
+
+void OBScreen::mapRequestHandler(const XMapRequestEvent &e)
+{
+  otk::OtkEventHandler::mapRequestHandler(e);
+
+#ifdef    DEBUG
+  printf("MapRequest for 0x%lx\n", e.window);
+#endif // DEBUG
+
+  /*
+    MapRequest events come here even after the window exists instead of going
+    right to the client window, because of how they are sent and their struct
+    layout.
+  */
+  OBClient *c = Openbox::instance->findClient(e.window);
+
+  if (c) {
+    if (c->shaded())
+      c->shade(false);
+    // XXX: uniconify the window
+    c->focus();
+  } else
+    manageWindow(e.window);
+}
 }

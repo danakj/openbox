@@ -655,22 +655,23 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_ob__OBClient swig_types[7] 
 #define  SWIGTYPE_p_ob__Openbox swig_types[8] 
 #define  SWIGTYPE_p_otk__Strut swig_types[9] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[10] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[11] 
-#define  SWIGTYPE_p_otk__Rect swig_types[12] 
-#define  SWIGTYPE_p_ob__OBWidget swig_types[13] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[14] 
+#define  SWIGTYPE_p_XMapRequestEvent swig_types[10] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[11] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[12] 
+#define  SWIGTYPE_p_otk__Rect swig_types[13] 
+#define  SWIGTYPE_p_ob__OBWidget swig_types[14] 
 #define  SWIGTYPE_p_XClientMessageEvent swig_types[15] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[16] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[17] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[18] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[19] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[20] 
-#define  SWIGTYPE_p_PyObject swig_types[21] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[22] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[23] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[24] 
-static swig_type_info *swig_types[26];
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[16] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[17] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[18] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[19] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[20] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[21] 
+#define  SWIGTYPE_p_PyObject swig_types[22] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[23] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[25] 
+static swig_type_info *swig_types[27];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -1513,6 +1514,23 @@ static PyObject *_wrap_OBScreen_focuswindow(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBScreen_desktop(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    unsigned long result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBScreen_desktop",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned long)((ob::OBScreen const *)arg1)->desktop();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBScreen_updateStrut(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
@@ -1599,6 +1617,134 @@ static PyObject *_wrap_OBScreen_restack(PyObject *self, PyObject *args) {
     if (PyErr_Occurred()) SWIG_fail;
     if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     (arg1)->restack(arg2,arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_changeDesktop(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    long arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Ol:OBScreen_changeDesktop",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->changeDesktop(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_changeNumDesktops(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    long arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Ol:OBScreen_changeNumDesktops",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->changeNumDesktops(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_setDesktopName(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    long arg2 ;
+    std::string *arg3 = 0 ;
+    std::string temp3 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OlO:OBScreen_setDesktopName",&obj0,&arg2,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    {
+        if (PyString_Check(obj2)) {
+            temp3 = std::string(PyString_AsString(obj2));
+            arg3 = &temp3;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
+    }
+    (arg1)->setDesktopName(arg2,(std::string const &)*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_propertyHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    XPropertyEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_propertyHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XPropertyEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->propertyHandler((XPropertyEvent const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_clientMessageHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    XClientMessageEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_clientMessageHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XClientMessageEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->clientMessageHandler((XClientMessageEvent const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_mapRequestHandler(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    XMapRequestEvent *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_mapRequestHandler",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XMapRequestEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->mapRequestHandler((XMapRequestEvent const &)*arg2);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1873,12 +2019,12 @@ static PyObject *_wrap_OBClient_normal(PyObject *self, PyObject *args) {
 static PyObject *_wrap_OBClient_desktop(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
-    unsigned long result;
+    long result;
     PyObject * obj0  = 0 ;
     
     if(!PyArg_ParseTuple(args,(char *)"O:OBClient_desktop",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (unsigned long)((ob::OBClient const *)arg1)->desktop();
+    result = (long)((ob::OBClient const *)arg1)->desktop();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2754,11 +2900,18 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_area", _wrap_OBScreen_area, METH_VARARGS },
 	 { (char *)"OBScreen_style", _wrap_OBScreen_style, METH_VARARGS },
 	 { (char *)"OBScreen_focuswindow", _wrap_OBScreen_focuswindow, METH_VARARGS },
+	 { (char *)"OBScreen_desktop", _wrap_OBScreen_desktop, METH_VARARGS },
 	 { (char *)"OBScreen_updateStrut", _wrap_OBScreen_updateStrut, METH_VARARGS },
 	 { (char *)"OBScreen_manageExisting", _wrap_OBScreen_manageExisting, METH_VARARGS },
 	 { (char *)"OBScreen_manageWindow", _wrap_OBScreen_manageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_unmanageWindow", _wrap_OBScreen_unmanageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_restack", _wrap_OBScreen_restack, METH_VARARGS },
+	 { (char *)"OBScreen_changeDesktop", _wrap_OBScreen_changeDesktop, METH_VARARGS },
+	 { (char *)"OBScreen_changeNumDesktops", _wrap_OBScreen_changeNumDesktops, METH_VARARGS },
+	 { (char *)"OBScreen_setDesktopName", _wrap_OBScreen_setDesktopName, METH_VARARGS },
+	 { (char *)"OBScreen_propertyHandler", _wrap_OBScreen_propertyHandler, METH_VARARGS },
+	 { (char *)"OBScreen_clientMessageHandler", _wrap_OBScreen_clientMessageHandler, METH_VARARGS },
+	 { (char *)"OBScreen_mapRequestHandler", _wrap_OBScreen_mapRequestHandler, METH_VARARGS },
 	 { (char *)"OBScreen_swigregister", OBScreen_swigregister, METH_VARARGS },
 	 { (char *)"MwmHints_flags_set", _wrap_MwmHints_flags_set, METH_VARARGS },
 	 { (char *)"MwmHints_flags_get", _wrap_MwmHints_flags_get, METH_VARARGS },
@@ -2831,8 +2984,14 @@ static void *_p_ob__OBActionsTo_p_otk__OtkEventHandler(void *x) {
 static void *_p_ob__OpenboxTo_p_otk__OtkEventHandler(void *x) {
     return (void *)((otk::OtkEventHandler *)  ((ob::Openbox *) x));
 }
+static void *_p_ob__OBScreenTo_p_otk__OtkEventHandler(void *x) {
+    return (void *)((otk::OtkEventHandler *)  ((ob::OBScreen *) x));
+}
 static void *_p_ob__OBClientTo_p_otk__OtkEventHandler(void *x) {
     return (void *)((otk::OtkEventHandler *)  ((ob::OBClient *) x));
+}
+static void *_p_ob__OBScreenTo_p_ob__OBWidget(void *x) {
+    return (void *)((ob::OBWidget *)  ((ob::OBScreen *) x));
 }
 static void *_p_ob__OBClientTo_p_ob__OBWidget(void *x) {
     return (void *)((ob::OBWidget *)  ((ob::OBClient *) x));
@@ -2850,12 +3009,13 @@ static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XR
 static swig_type_info _swigt__p_ob__OBClient[] = {{"_p_ob__OBClient", 0, "ob::OBClient *", 0},{"_p_ob__OBClient"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
+static swig_type_info _swigt__p_XMapRequestEvent[] = {{"_p_XMapRequestEvent", 0, "XMapRequestEvent *", 0},{"_p_XMapRequestEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
-static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_ob__OBActions", _p_ob__OBActionsTo_p_otk__OtkEventHandler},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
+static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_ob__OBActions", _p_ob__OBActionsTo_p_otk__OtkEventHandler},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBScreen", _p_ob__OBScreenTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
 static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
-static swig_type_info _swigt__p_ob__OBWidget[] = {{"_p_ob__OBWidget", 0, "ob::OBWidget *", 0},{"_p_ob__OBWidget"},{"_p_ob__OBClient", _p_ob__OBClientTo_p_ob__OBWidget},{0}};
-static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
+static swig_type_info _swigt__p_ob__OBWidget[] = {{"_p_ob__OBWidget", 0, "ob::OBWidget *", 0},{"_p_ob__OBWidget"},{"_p_ob__OBScreen", _p_ob__OBScreenTo_p_ob__OBWidget},{"_p_ob__OBClient", _p_ob__OBClientTo_p_ob__OBWidget},{0}};
 static swig_type_info _swigt__p_XClientMessageEvent[] = {{"_p_XClientMessageEvent", 0, "XClientMessageEvent *", 0},{"_p_XClientMessageEvent"},{0}};
+static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
 static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventDispatcher[] = {{"_p_otk__OtkEventDispatcher", 0, "otk::OtkEventDispatcher *", 0},{"_p_otk__OtkEventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventDispatcher},{0}};
 static swig_type_info _swigt__p_XPropertyEvent[] = {{"_p_XPropertyEvent", 0, "XPropertyEvent *", 0},{"_p_XPropertyEvent"},{0}};
@@ -2877,12 +3037,13 @@ _swigt__p_XReparentEvent,
 _swigt__p_ob__OBClient, 
 _swigt__p_ob__Openbox, 
 _swigt__p_otk__Strut, 
+_swigt__p_XMapRequestEvent, 
 _swigt__p_XConfigureRequestEvent, 
 _swigt__p_otk__OtkEventHandler, 
 _swigt__p_otk__Rect, 
 _swigt__p_ob__OBWidget, 
-_swigt__p_XFocusChangeEvent, 
 _swigt__p_XClientMessageEvent, 
+_swigt__p_XFocusChangeEvent, 
 _swigt__p_otk__OBProperty, 
 _swigt__p_otk__OtkEventDispatcher, 
 _swigt__p_XPropertyEvent, 

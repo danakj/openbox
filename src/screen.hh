@@ -11,14 +11,17 @@ extern "C" {
 }
 
 #include "client.hh"
-#include "rootwindow.hh"
+#include "widget.hh"
 #include "otk/image.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/style.hh"
-#include "otk/configuration.hh" // TEMPORARY
+#include "otk/screeninfo.hh"
+#include "otk/eventhandler.hh"
+#include "otk/property.hh"
 
 #include <string>
+#include <list>
 
 namespace ob {
 
@@ -28,7 +31,7 @@ class OBRootWindow;
 //! Manages a single screen
 /*!
 */
-class OBScreen {
+class OBScreen : public otk::OtkEventHandler, public OBWidget {
 public:
   //! Holds a list of otk::Strut objects
   typedef std::list<otk::Strut*> StrutList;
@@ -61,9 +64,6 @@ private:
   //! The style with which to render on the screen
   otk::Style _style;
 
-  //! The screen's root window
-  OBRootWindow _root;
-  
   //! Is the root colormap currently installed?
   bool _root_cmap_installed;
 
@@ -83,26 +83,38 @@ private:
   //! A list of all managed clients on the screen, in their stacking order
   OBClient::List _stacking;
 
+  //! The desktop currently being displayed
+  long _desktop;
+
+  //! The number of desktops
+  long _num_desktops;
+
+  //! The names of all desktops
+  otk::OBProperty::StringVect _desktop_names;
+
   //! Calculate the OBScreen::_area member
   void calcArea();
   //! Set the list of supported NETWM atoms on the root window
-  void setSupportedAtoms();
+  void changeSupportedAtoms();
   //! Set the client list on the root window
   /*!
     Sets the _NET_CLIENT_LIST root window property.<br>
     Also calls OBScreen::updateStackingList.
   */
-  void setClientList();
+  void changeClientList();
   //! Set the client stacking list on the root window
   /*!
     Set the _NET_CLIENT_LIST_STACKING root window property.
   */
-  void setStackingList();
+  void changeStackingList();
   //! Set the work area hint on the root window
   /*!
     Set the _NET_WORKAREA root window property.
   */
-  void setWorkArea();
+  void changeWorkArea();
+
+  //! Get desktop names from the root window property
+  void updateDesktopNames();
 
 public:
 #ifndef SWIG
@@ -128,6 +140,8 @@ public:
   inline const otk::Style *style() const { return &_style; }
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
+  //! Returns the desktop being displayed
+  inline unsigned long desktop() const { return _desktop; }
 
   //! Update's the screen's combined strut of all the clients.
   /*!
@@ -152,6 +166,33 @@ public:
   //! Raises/Lowers a client window above/below all others in its stacking
   //! layer
   void restack(bool raise, OBClient *client);
+
+  //! Changes to the specified desktop, displaying windows on it and hiding
+  //! windows on the others.
+  /*!
+    @param desktop The number of the desktop to switch to (starts from 0).
+    If the desktop is out of valid range, it is ignored.
+  */
+  void changeDesktop(long desktop);
+
+  //! Changes the number of desktops.
+  /*!
+    @param num The number of desktops that should exist. This value must be
+               greater than 0 or it will be ignored.
+  */
+  void changeNumDesktops(long num);
+
+  //! Sets the name of a desktop
+  /*!
+    @param i The index of the desktop to set the name for (starts at 0)
+    @param name The name to set for the desktop
+    If the index is too large, it is simply ignored.
+  */
+  void setDesktopName(long i, const std::string &name);
+
+  virtual void propertyHandler(const XPropertyEvent &e);
+  virtual void clientMessageHandler(const XClientMessageEvent &e);
+  virtual void mapRequestHandler(const XMapRequestEvent &e);
 };
 
 }

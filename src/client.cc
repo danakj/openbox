@@ -93,7 +93,7 @@ void OBClient::getDesktop()
 
   property->get(_window, otk::OBProperty::net_wm_desktop,
                 otk::OBProperty::Atom_Cardinal,
-                &_desktop);
+                (long unsigned*)&_desktop);
 }
 
 

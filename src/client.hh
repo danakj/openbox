@@ -179,7 +179,7 @@ private:
   OBClient::List _transients;
 
   //! The desktop on which the window resides (0xffffffff for all desktops)
-  unsigned long _desktop;
+  long _desktop;
 
   //! Normal window title
   std::string  _title; // XXX: Have to keep track if this string is Utf8 or not
@@ -399,7 +399,7 @@ public:
     This value is a 0-based index.<br>
     A value of 0xffffffff indicates that the window exists on all desktops.
   */
-  inline unsigned long desktop() const { return _desktop; }
+  inline long desktop() const { return _desktop; }
   //! Returns the window's title
   inline const std::string &title() const { return _title; }
   //! Returns the window's title when it is iconified

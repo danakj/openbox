@@ -78,8 +78,10 @@ void OtkEventDispatcher::dispatchEvents(void)
       // any other types are not ones we're interested in
       if (e.xfocus.detail == NotifyNonlinear) {
         if (e.xfocus.window != focus) {
-          unfocus = focus;
+          if (focus)
+            unfocus = focus;
           focus = e.xfocus.window;
+          printf("FocusIn focus=%lx unfocus=%lx\n", focus, unfocus);
         }
       }
     } else if (e.type == FocusOut) {
@@ -88,6 +90,7 @@ void OtkEventDispatcher::dispatchEvents(void)
         if (e.xfocus.window == focus) {
           unfocus = focus;
           focus = None;
+          printf("FocusIn focus=%lx unfocus=%lx\n", focus, unfocus);
         }
       }
     } else {

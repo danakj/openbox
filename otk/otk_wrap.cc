@@ -3205,22 +3205,6 @@ static PyObject *_wrap_OtkWidget_setEventDispatcher(PyObject *self, PyObject *ar
 }
 
 
-static PyObject *_wrap_OtkWidget_unmanaged(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::OtkWidget *arg1 = (otk::OtkWidget *) 0 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:OtkWidget_unmanaged",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OtkWidget,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->unmanaged();
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject * OtkWidget_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -10049,42 +10033,6 @@ static PyObject *_wrap_Style_b_unfocus_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Style_b_pressed_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::Style *arg1 = (otk::Style *) 0 ;
-    otk::BTexture *arg2 = (otk::BTexture *) 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:Style_b_pressed_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__BTexture,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->b_pressed = *arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_Style_b_pressed_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::Style *arg1 = (otk::Style *) 0 ;
-    otk::BTexture *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:Style_b_pressed_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::BTexture *)& ((arg1)->b_pressed);
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__BTexture, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_Style_b_pressed_focus_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::Style *arg1 = (otk::Style *) 0 ;
@@ -12832,7 +12780,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OtkWidget_setStyle", _wrap_OtkWidget_setStyle, METH_VARARGS },
 	 { (char *)"OtkWidget_eventDispatcher", _wrap_OtkWidget_eventDispatcher, METH_VARARGS },
 	 { (char *)"OtkWidget_setEventDispatcher", _wrap_OtkWidget_setEventDispatcher, METH_VARARGS },
-	 { (char *)"OtkWidget_unmanaged", _wrap_OtkWidget_unmanaged, METH_VARARGS },
 	 { (char *)"OtkWidget_swigregister", OtkWidget_swigregister, METH_VARARGS },
 	 { (char *)"new_OtkFocusWidget", _wrap_new_OtkFocusWidget, METH_VARARGS },
 	 { (char *)"delete_OtkFocusWidget", _wrap_delete_OtkFocusWidget, METH_VARARGS },
@@ -13089,8 +13036,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Style_b_focus_get", _wrap_Style_b_focus_get, METH_VARARGS },
 	 { (char *)"Style_b_unfocus_set", _wrap_Style_b_unfocus_set, METH_VARARGS },
 	 { (char *)"Style_b_unfocus_get", _wrap_Style_b_unfocus_get, METH_VARARGS },
-	 { (char *)"Style_b_pressed_set", _wrap_Style_b_pressed_set, METH_VARARGS },
-	 { (char *)"Style_b_pressed_get", _wrap_Style_b_pressed_get, METH_VARARGS },
 	 { (char *)"Style_b_pressed_focus_set", _wrap_Style_b_pressed_focus_set, METH_VARARGS },
 	 { (char *)"Style_b_pressed_focus_get", _wrap_Style_b_pressed_focus_get, METH_VARARGS },
 	 { (char *)"Style_b_pressed_unfocus_set", _wrap_Style_b_pressed_unfocus_set, METH_VARARGS },

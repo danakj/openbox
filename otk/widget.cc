@@ -248,6 +248,8 @@ void OtkWidget::render(void)
 {
   if (!_texture) return;
 
+  printf("rendering %lx\n", _texture);
+
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
   if (_bg_pixmap)
@@ -386,8 +388,8 @@ void OtkWidget::adjustVert(void)
 void OtkWidget::update(void)
 {
   if (_dirty) {
-    if (!_unmanaged)
-      adjust();
+    printf("widget dirty, redrawing\n");
+    adjust();
     render();
     XClearWindow(OBDisplay::display, _window);
   }

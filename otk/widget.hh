@@ -120,8 +120,6 @@ public:
   { return _event_dispatcher; }
   void setEventDispatcher(otk::OtkEventDispatcher *disp);
 
-  void unmanaged(void) { _unmanaged = true; }
-
 protected:
   
   bool _dirty;
@@ -165,8 +163,6 @@ protected:
 
   bool _fixed_width;
   bool _fixed_height;
-
-  bool _unmanaged;
 
   OtkEventDispatcher *_event_dispatcher;
 };

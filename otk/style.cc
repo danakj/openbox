@@ -66,13 +66,21 @@ void Style::load(const Configuration &style) {
 
   b_focus = readDatabaseTexture("window.button.focus", "white", style);
   b_unfocus = readDatabaseTexture("window.button.unfocus", "black", style);
-  b_pressed = readDatabaseTexture("window.button.pressed", "black", style);
 
   //if neither of these can be found, we will use the previous resource
   b_pressed_focus = readDatabaseTexture("window.button.pressed.focus",
                                         "black", style, true);
+  if (b_pressed_focus.texture() == BTexture::NoTexture) {
+    b_pressed_focus = readDatabaseTexture("window.button.pressed", "black",
+                                          style);
+  }
+    
   b_pressed_unfocus = readDatabaseTexture("window.button.pressed.unfocus",
                                           "black", style, true);
+  if (b_pressed_unfocus.texture() == BTexture::NoTexture) {
+    b_pressed_unfocus = readDatabaseTexture("window.button.pressed", "black",
+                                            style);
+  }
 
   if (close_button.mask != None)
     XFreePixmap(OBDisplay::display, close_button.mask);

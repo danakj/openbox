@@ -47,7 +47,7 @@ public:
     l_focus, l_unfocus,
     h_focus, h_unfocus,
     b_focus, b_unfocus,
-    b_pressed, b_pressed_focus, b_pressed_unfocus,
+    b_pressed_focus, b_pressed_unfocus,
     g_focus, g_unfocus;
 
   PixmapMask close_button, max_button, icon_button, stick_button;
@@ -103,7 +103,7 @@ public:
   inline BTexture *getButtonUnfocus(void) { return &b_unfocus; }
 
   inline BTexture *getButtonPressedFocus(void)
-  { return &b_pressed; }
+  { return &b_pressed_focus; }
   inline BTexture *getButtonPressedUnfocus(void)
   { return &b_pressed_unfocus; }
 

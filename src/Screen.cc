@@ -1192,9 +1192,13 @@ void BScreen::load() {
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "strftimeFormat" << ends;
   rclass << rscreen.str() << "StrftimeFormat" << ends;
+
+  if (resource.strftime_format != NULL){
+    delete [] resource.strftime_format;
+    resource.strftime_format=NULL;
+  }
+
   if (config.getValue(rname.str(), rclass.str(), s)) {
-    if (resource.strftime_format != NULL)
-      delete [] resource.strftime_format;
     resource.strftime_format = bstrdup(s.c_str());
   }
 #else // !HAVE_STRFTIME
@@ -1233,9 +1237,12 @@ void BScreen::load() {
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "rootCommand" << ends;
   rclass << rscreen.str() << "RootCommand" << ends;
+
+  if (resource.root_command != NULL){
+    delete [] resource.root_command;
+    resource.root_command=NULL;
+  }
   if (config.getValue(rname.str(), rclass.str(), s)) {
-    if (resource.root_command != NULL)
-      delete [] resource.root_command;
     resource.root_command = bstrdup(s.c_str());
   }
 

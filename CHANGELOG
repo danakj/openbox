@@ -32,9 +32,8 @@ Changelog for Openbox:
    proportional fonts.                                  (Sean Perry, Ben Jansens)
 
  * added a --enable-clobber configuration option to
-   allow users to run off the event clobbering taking
-   place so that Openbox wont grab mouse events when
-   num lock or scroll lock are on.                      (Scott Moynes)
+   allow users to turn off the event clobbering by
+   hitting the numlock or scroll lock keys.		(Scott  Moynes)
 
  * window menu is inconsistant in that other menus
    ignore mouse button 2, but it did not, because of

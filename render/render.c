@@ -30,13 +30,10 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
 
     resized = (l->w != w || l->h != h);
 
-    if (resized) {
-        oldp = l->pixmap; /* save to free after changing the visible pixmap */
-        l->pixmap = XCreatePixmap(RrDisplay(l->inst),
-                                  RrRootWindow(l->inst),
-                                  w, h, RrDepth(l->inst));
-    } else
-        oldp = None;
+    oldp = l->pixmap; /* save to free after changing the visible pixmap */
+    l->pixmap = XCreatePixmap(RrDisplay(l->inst),
+                              RrRootWindow(l->inst),
+                              w, h, RrDepth(l->inst));
 
     g_assert(l->pixmap != None);
     l->w = w;
@@ -56,8 +53,8 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
         g_assert (l->surface.parent->w);
 
         sw = l->surface.parent->w;
-        source = (l->surface.parent->surface.RrPixel_data + l->surface.parentx +
-                  sw * l->surface.parenty);
+        source = (l->surface.parent->surface.RrPixel_data +
+                  l->surface.parentx + sw * l->surface.parenty);
         dest = l->surface.RrPixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(RrPixel32));

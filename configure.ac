@@ -90,6 +90,43 @@ AC_CHECK_LIB([X11], [XOpenDisplay],
   AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
 )
 
+
+dnl Check for Xft2
+AC_MSG_CHECKING([for Xft version 2])
+XFT2=""
+if pkg-config xft; then
+  AC_MSG_RESULT([yes])
+  XFT2="yes"
+  LIBS="$LIBS `pkg-config --libs xft`"
+  CXXFLAGS="`pkg-config --cflags xft` $CXXFLAGS"
+else
+  AC_MSG_RESULT([no])
+fi
+
+AC_CHECK_LIB([Xft], [XftFontOpenXlfd],
+  AC_MSG_CHECKING([for X11/Xft/Xft.h])
+  AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xft/Xft.h>
+    ],
+    [
+      XftFont foo
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      dnl This is for Xft version 1
+      test "$XFT2" = "yes" || LIBS="$LIBS -lXft"
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      AC_MSG_ERROR([Openbox requires the Xft font library.
+See http://www.fontconfig.org/
+])
+    ]
+  )
+)
+
 dnl Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])
@@ -165,6 +202,8 @@ AC_ARG_ENABLE([xinerama],
   fi,
   AC_MSG_RESULT([no])
 )
+
+
 
 AC_CONFIG_FILES([Makefile
 		m4/Makefile 

@@ -66,11 +66,17 @@ static void copy_parent(struct RrSurface *sur)
 void RrPlanarPaint(struct RrSurface *sur, int x, int y, int w, int h)
 {   
     struct RrColor *pri, *sec, avg;
+    int x, y, w, h;
 
     copy_parent(sur);
 
     pri = &RrPlanarPrimaryColor(sur);
     sec = &RrPlanarSecondaryColor(sur);
+
+    x = RrSurfaceX(sur);
+    y = RrSurfaceY(sur);
+    w = RrSurfaceWidth(sur);
+    h = RrSurfaceHeight(sur);
 
     switch (RrPlanarColorType(sur)) {
     case RR_PLANAR_NONE:

@@ -1,4 +1,4 @@
-.TH epistrc 5 "August 16, 2002"
+.TH epistrc 5 "August 24, 2002"
 .SH NAME
 epistrc \- Configuration file for Epist
 .SH SYNOPSIS
@@ -6,7 +6,11 @@ epistrc \- Configuration file for Epist
 .br
 .B @pkgdatadir@/epistrc
 .SH DESCRIPTION
-\fIepist\fR(1) grabs its configuration and bindings from the epistrc file.
+\fIepist\fR(1) grabs its configuration and bindings from the epistrc file. All
+options shown will work with any window manager that supports the NetWM/EWMH
+specification, with the exception of those marked with the
+.B [Openbox specific]
+tag.
 .SH SYNTAX
 The epistrc file contains 2 sections:
 .SS Options
@@ -158,6 +162,15 @@ used, the workspaceColumns action must be specified. See OPTIONS.
 Disables all keybindings except for the binding which runs this action, for
 the current screen. Enables keybindings when run again. This command cannot be
 part of a chain.
+
+.SS showRootMenu
+.B [Openbox specific]
+.br
+Opens the root menu under the mouse pointer.
+.SS showWorkspaceMenu
+.B [Openbox specific]
+.br
+Opens the workspace menu under the mouse pointer.
 
 .SH SEE ALSO
 \fIepist\fR(1) \fIopenbox\fR(1)

@@ -203,7 +203,7 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
     static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
-    
+
     switch (e->type) {
     case ButtonPress:
         px = e->xbutton.x_root;
@@ -229,12 +229,11 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
             int junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
-            Status s;
             xerror_set_ignore(TRUE);
-            s = XGetGeometry(ob_display, e->xbutton.window,
-                             &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
+            junk1 = XGetGeometry(ob_display, e->xbutton.window,
+                                 &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
             xerror_set_ignore(FALSE);
-            if (s == Success) {
+            if (junk1) {
                 if (e->xbutton.x >= (signed)-b &&
                     e->xbutton.y >= (signed)-b &&
                     e->xbutton.x < (signed)(w+b) &&

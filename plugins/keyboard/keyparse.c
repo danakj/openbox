@@ -21,7 +21,7 @@ void keyparse(ParseToken *token)
             top = token->data.identifier;
             return;
         } else {
-            yyerror("syntax error (expected Key)");
+            yyerror("syntax error (expected kbind)");
             err = TRUE;
         }
     } else if (chain == NULL) {
@@ -95,7 +95,7 @@ void keyparse(ParseToken *token)
         if (kbind(strchain, action))
             action = NULL; /* don't free this if kbind succeeds */
         else
-            yyerror("failed to add binding");
+            yyerror("failed to add key binding");
         /* free the char*'s */
         g_list_free(strchain);
 

@@ -849,6 +849,34 @@ static void client_get_state(ObClient *self)
 
         g_free(state);
     }
+
+    if (!(self->above || self->below)) {
+        if (client_has_group_siblings(self)) {
+            /* apply stuff from the group */
+            GSList *it;
+            gint layer = -1;
+
+            for (it = self->group->members; it; it = g_slist_next(it)) {
+                ObClient *c = it->data;
+                if (c != self && !client_search_transient(self, c))
+                    layer = MAX(layer,
+                                (c->above ? 1 : (c->below ? -1 : 0)));
+            }
+            switch (layer) {
+            case -1:
+                self->below = TRUE;
+                break;
+            case 0:
+                break;
+            case 1:
+                self->above = TRUE;
+                break;
+            default:
+                g_assert_not_reached();
+                break;
+            }
+        }
+    }
 }
 
 static void client_get_shaped(ObClient *self)

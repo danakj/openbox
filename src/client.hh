@@ -633,6 +633,13 @@ BB    @param window The window id that the Client class should handle
   */
   void resize(Corner anchor, int w, int h);
 
+  //! Reapplies the maximized state to the window
+  /*!
+    Use this to make the window readjust its maximized size to new
+    surroundings (struts, etc).
+  */
+  void remaximize();
+  
   //! Choose a mask of decorations to not display on the client
   /*!
     Pass a value of 0 to the function to turn all decorations back on. Note

@@ -1284,6 +1284,22 @@ void Client::changeAllowedActions(void)
 }
 
 
+void Client::remaximize()
+{
+  int dir;
+  if (_max_horz && _max_vert)
+    dir = 0;
+  else if (_max_horz)
+    dir = 1;
+  else if (_max_vert)
+    dir = 2;
+  else
+    return; // not maximized
+  _max_horz = _max_vert = false;
+  maximize(true, dir, false);
+}
+
+
 void Client::applyStartupState()
 {
   // these are in a carefully crafted order..

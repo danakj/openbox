@@ -162,8 +162,13 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
             if (r->width >= client->frame->area.width &&
                 r->height >= client->frame->area.height) {
                 ret = TRUE;
-                *x = r->x + (r->width - client->frame->area.width) / 2;
-                *y = r->y + (r->height - client->frame->area.height) / 2;
+                if (only_focused) {
+                    *x = r->x + (r->width - client->frame->area.width) / 2;
+                    *y = r->y + (r->height - client->frame->area.height) / 2;
+                } else {
+                    *x = r->x;
+                    *y = r->y;
+                }
             }
         }
 

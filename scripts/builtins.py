@@ -269,12 +269,12 @@ def setup_scroll():
     mbind("C-A-4", MC_Frame, MouseClick, send_to_next_desktop)
     mbind("C-A-5", MC_Frame, MouseClick, send_to_prev_desktop)
 
-focus_stack = []
 def setup_fallback_focus():
     """Sets up a focus fallback routine so that when no windows are focused,
        the last window on the desktop that had focus will be focused."""
+    focus_stack = []
     def focused(data):
-        global focus_stack
+        #global focus_stack
         if data.client:
             window = data.client.window()
             # add to front the stack

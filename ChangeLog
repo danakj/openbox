@@ -1,0 +1,4717 @@
+2003-06-29  xor@zed  <xor@zed>
+
+	* kernel/stacking.c:
+	waste of energy in stacking_add, and it even caused bugs. woops.
+
+2003-06-29  woodblock  <woodblock@zed>
+
+	* plugins/menu/client_menu.c:
+	Update the send-to window only if the workspaces have changed.
+
+	* kernel/menu.c, kernel/menu_render.c:
+	Handle menu events a little better: don't bother updating a submenu on
+	mouseover if it is already open, and call update on menus, even if
+	they aren't marked as invalid.
+
+2003-06-28  xor@zed  <xor@zed>
+
+	* kernel/openbox.c:
+	use fprintf not g_message in the signal handler. no mallocing allowed.
+
+	* render/font.c: remove debug print
+
+	* kernel/prop.c: set the values of the array at teh right indexes
+
+	* kernel/prop.c: fix memory bugs
+
+	* data/rc3: remove the switch to... menu
+
+	* render/font.c:
+	don't destroy font patterns, i think this is a double free
+
+	* kernel/stacking.c:
+	put group members above the window when lowering it
+
+	* kernel/stacking.c: set the stacking list when stacking changes
+
+	* themes/ebox_data/.cvsignore, themes/fieron2_data/.cvsignore, themes/fieron_data/.cvsignore:
+	ignore the generated makefiles
+
+	* themes/ebox_data/Makefile.am, themes/fieron2_data/Makefile.am, themes/fieron_data/Makefile.am:
+	add the makefiles for the themes' data dirs
+
+	* render/theme.h:
+	add the themes path to the struct. make the name never include a path
+
+	* configure.ac, themes/Makefile.am, themes/ebox_data/close.xbm, themes/ebox_data/iconify.xbm, themes/ebox_data/max.xbm, themes/fieron2_data/close.xbm, themes/fieron2_data/iconify.xbm, themes/fieron2_data/max.xbm, themes/fieron2_data/stick.xbm, themes/fieron_data/close.xbm, themes/fieron_data/iconify.xbm, themes/fieron_data/max.xbm, themes/fieron_data/stick.xbm:
+	adjust the themes with buttons to match how they are read now
+
+	* AUTHORS: simplify this shit
+
+	* render/theme.c: hardcode the button names for themes
+
+	* kernel/popup.c: dont need to raise after adding
+
+	* render/theme.c: rename the button_dir var to data_dir.. pointless :>
+
+	* plugins/resistance/resistance.c:
+	snap to all heads the window is present on
+
+2003-06-27  xor@zed  <xor@zed>
+
+	* kernel/Makefile.am: build 'openbox' instead of 'openbox3'.
+	add the openbox.desktop file for gnome compat.
+
+	* kernel/screen.c: set "Openbox" as the name no "Openbox3"
+
+	* kernel/openbox.desktop:
+	add a .desktop file which gets installed for gnome
+
+	* kernel/.cvsignore: add the openbox binary
+
+	* kernel/openbox.c: add a call to g_set_prgname
+
+	* kernel/stacking.c:
+	stacking changes, its more like the old code without being shitty and with support for raising groups at a time.
+
+	* kernel/stacking.c: core when the list gets out of order
+
+	* kernel/client.c, kernel/client.h, kernel/dock.c, kernel/extensions.c, kernel/extensions.h, kernel/focus.c, kernel/geom.h, kernel/menu.c, kernel/menu.h, kernel/moveresize.c, kernel/screen.c, kernel/screen.h, plugins/menu/client_menu.c, plugins/placement/placement.c, plugins/resistance/resistance.c:
+	xinerama support
+
+	* data/rc3: root menu on right click
+
+	* kernel/event.c: 4 space indents
+
+2003-06-26  xor@zed  <xor@zed>
+
+	* kernel/grab.c:
+	return true when ungrabbing so that it can ungrab them all on shutdown
+
+	* kernel/grab.c:
+	set ret to true when grabbing and we alerady have it grabbed
+
+	* render/font.c:
+	dont destroy the match pattern, it seems that Xft holds onto the pointer
+
+	* kernel/client.c:
+	check that extensions_vidmode is set before trying to use the vidmode functions
+
+	* plugins/keyboard/keyboard.c: if grab fails dont set grabbed_key
+
+	* kernel/grab.c, kernel/grab.h: return FALSE if a grab fails
+
+	* kernel/client.c:
+	set the desktop hint when the window already has a hint but its out of range
+
+	* kernel/event.c: clear the over item in the menu when executing shit
+
+	* kernel/stacking.h:
+	add NUM_STACKLAYER, fix some comments that dont apply
+
+	* kernel/menu.c: remove unused variable
+
+	* kernel/client.c:
+	remove/add instead of raising to put a window into a new layer
+
+	* kernel/stacking.c:
+	new stacking code that doesnt suck ass to look at, woot
+
+	* kernel/dock.c:
+	use the minsize to keep the stuff ni the dock off of the bevel edges etc
+
+	* render/theme.c: add comment
+
+	* render/font.c, render/font.h, render/render.c, render/render.h, render/theme.c, render/theme.h:
+	read fonts and titlebar layout from theme files
+
+2003-06-25  xor@zed  <xor@zed>
+
+	* data/rc3: add right click on icon to open the client menu
+
+	* render/font.c: set teh X so it gets used right
+
+	* render/font.c:
+	keep a small space on the sides of windows between the edge and the text
+
+	* kernel/event.c: only render if there was an over existing
+
+	* kernel/event.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c:
+	menus grab the keyboard and pointer, thus making only one menu visible at a time, and making them act like gtk menus and * menus do, where you can click and drag and release to select something as well as click-release to elave it open while you search around the menu
+
+	* data/rc3: show the client meun on "press" on the icon
+
+	* plugins/menu/client_menu.c:
+	use the stock shownig method for the client menu for now, makes it pop up under the cursor so a click-release works like expected
+
+	* plugins/mouse/mouse.c:
+	use the alst button press for clicks instead of teh fisrt. it make sno diff to me really and this makes it work when you grab the pointer on the click, without leaving the mouse plugin in a weird state.
+
+	* kernel/grab.c: grab all motion events for pointer grabs
+
+2003-06-24  xor@zed  <xor@zed>
+
+	* kernel/menu.c: position submenus correctly horizontally
+
+	* kernel/menu_render.c: menus were too short by a border width
+
+	* kernel/client.c:
+	check to make sure the window is on screen *after* positioning it
+
+	* render/gradient.c: do horz grads without any multipliaction
+
+	* render/gradient.c, render/render.h, render/test.c, render/theme.c:
+	made all the gradients work with integer math. removed the pipecross and rectangle gradietns tho cuz they are ugly and i dont want to code that bullshit cuz they are ugly.
+
+	* render/gradient.c, render/test.c:
+	integer math for gradients. horz vert and diags and pipecross work so far.
+
+2003-06-22  xor@zed  <xor@zed>
+
+	* kernel/menu.c, kernel/menu_render.c: add a simple menu parser.
+	while menu parsing, the theme does not exist so we can't do any theme stuff while creating menu stuff, so put that off for later, i.e when the menu is shown.
+
+	* kernel/openbox.c: reorder startup so menu goes before config parsing
+
+	* data/rc3: add a root menu
+
+2003-06-21  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/frame.c, kernel/frame.h:
+	add decoration state to the frame struct. make client_configure adjust the frame if the decorations do not match between the client and the frame, so that when they change it can send a configurenotify to the client.
+
+	* kernel/client.c:
+	make client_reconfigure a non-user-type client_configure
+
+	* kernel/action.c:
+	strdup the exec path cuz it gets freed by the time we restart otherwise
+
+	* kernel/event.c: moveresize messages are not user-requests
+
+	* kernel/client.c: remove debug print
+
+	* kernel/client.c:
+	send teh configure event to client on user-requested final configures even if not moved, cuz usualy the final isnt sent with a change, but just to end the move process.
+
+	* render/render.c:
+	always create the bg pixmap, X seems to not like it if i dont?
+
+	* kernel/openbox.c:
+	always use the session id from the session manager when setting the restart property
+
+	* kernel/openbox.c: add -sm-disable option
+
+	* kernel/openbox.c:
+	only show -sm-client-id in the help when session management is build in
+
+	* kernel/openbox.c:
+	session management works, and it can resume with its old ID, so it works with gnome-session
+
+	* configure.ac, kernel/Makefile.am, kernel/event.c, kernel/openbox.c, m4/x11.m4:
+	make session management optional
+
+	* kernel/openbox.c:
+	set the required properties so that session managers see openbox
+
+	* render/font.c, render/theme.c:
+	don't exit in the render lib, rather return a NULL font/theme on failure
+
+	* kernel/event.c, kernel/openbox.c:
+	add libSM *client* support, so we should work with gnome-session now!
+
+	* render/instance.c, render/render.c: more namespacing with Rr*
+
+	* render/color.c: use the pseudo shit in the instance now
+
+	* render/gradient.c, render/gradient.h, render/render.c, render/color.c, render/color.h:
+	more namespacing with Rr*
+
+	* plugins/keyboard/translate.c, plugins/mouse/translate.c:
+	dont use .. in include paths
+
+	* render/image.c, render/image.h, render/render.c, kernel/client.c, kernel/screen.c, render/color.c, render/color.h, render/font.c, render/gradient.c, render/render.h, render/theme.h:
+	more namespacing with Rr*
+
+	* kernel/menu.h, kernel/menu.c: kill a warning
+
+	* kernel/openbox.c, render/font.c, render/font.h, render/render.c, render/render.h, render/theme.c, render/theme.h:
+	more namespacing to Rr*
+
+	* kernel/menu.c: fix a warning
+
+	* kernel/client.c, kernel/client.h, render/color.c, render/color.h, render/gradient.c, render/gradient.h, render/image.c, render/image.h, render/render.c, render/render.h:
+	rename pixel32/16 to RrPixel32/16
+
+	* render/color.c, render/color.h, render/render.h, render/theme.c, render/theme.h:
+	rename color_rgb to RrColor
+
+	* kernel/dock.c, kernel/frame.c, kernel/framerender.c, kernel/menu.c, kernel/menu_render.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, plugins/menu/client_menu.c, render/font.c, render/font.h, render/theme.c, render/theme.h:
+	put the render theme into a struct
+
+	* kernel/client.c, kernel/dock.c, kernel/dock.h, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, kernel/screen.c:
+	fixed to accomodate the changes to the render/ API.
+
+2003-06-20  xor@zed  <xor@zed>
+
+	* render/.cvsignore, render/Makefile.am, render/color.c, render/color.h, render/font.c, render/font.h, render/gradient.c, render/gradient.h, render/image.c, render/image.h, render/instance.c, render/instance.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h:
+	this is going to break the kernel/ building.
+
+	lots of modifications to the render API, prefixing everything, making proper
+	names for everything. the structures are not hidden/opaque yet, but the naming scheme of the public API works much better now.
+
+	* render/font.c: oops typo
+
+	* render/font.c:
+	take the bevel width into account for the width available
+
+	* plugins/menu/client_menu.c: position the client menu right
+
+	* kernel/dock.c, kernel/frame.c, kernel/framerender.c, kernel/menu_render.c, kernel/popup.c, plugins/menu/client_menu.c, render/font.c, render/gradient.c, render/image.c, render/image.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h:
+	simply the render interface by not requiring the setting of all the areas. only take a w and h in paint(). best font layout ever.
+
+	* AUTHORS: miklos does themes like mad
+
+	* render/gradient.c:
+	slight optimizations, and make the last 4 gradients work properly
+
+	* render/font.c:
+	center text vertically. use the font's height because all that space is needed for some charcters
+
+	* kernel/frame.c, kernel/framerender.c, kernel/menu_render.c, kernel/popup.c, kernel/screen.c, render/gradient.c, render/render.c, render/render.h, render/test.c, render/theme.c:
+	remove non-planar surfaces
+
+2003-06-19  xor@zed  <xor@zed>
+
+	* configure.ac, m4/gl.m4: remove --enable-gl
+
+	* kernel/client.c:
+	fix for how base-size is used to comply with the icccm
+
+2003-06-18  xor@zed  <xor@zed>
+
+	* kernel/framerender.c: copy the frame's surface from the prototype
+
+2003-06-17  xor@zed  <xor@zed>
+
+	* bootstrap: export the WANT_AUTOMAKE var before running acloacl
+
+2003-06-17  manmower  <manmower@zed>
+
+	* kernel/client.c: wake up old icon grabbing code
+
+	* render/color.c: remove unneeded/uncompiled junk
+
+2003-06-09  manmower  <manmower@zed>
+
+	* kernel/client.c: try swapping bytes on textures
+
+	* kernel/client.c: | != &
+
+	* kernel/client.c: fix? color on icons
+
+	* kernel/client.c: remove bogus byte permutations in icon code
+
+2003-06-08  xor@zed  <xor@zed>
+
+	* kernel/focus.c:
+	remove an extra useless call to focus_set_client(NULL)
+
+	* kernel/client.c: describe the complicated if a bit :)
+
+	* kernel/client.c: more checks for when to do an XResizeWindow
+
+	* kernel/client.c:
+	send the configure notify for resizes too, just to be a little more safe
+
+	* kernel/client.c:
+	onlt send configurenotify if the client actually moved, to work around emacs, hopefully :)
+
+	* kernel/client.c:
+	some more fixes for resizing clients. aspect ratio is not the last thing checked and so rules all, that might need to change.. however, it now uses base-size only for aspect ratios and base-size/min-size for other sizing shit, as per the ICCCM.
+
+	* kernel/client.c: from icccm:
+	If a base size is not provided, the minimum size is to be used in its place and vice versa.
+
+	Added support for this.
+
+	* kernel/frame.c: missing another bwidth
+
+	* kernel/frame.c: position titlebars better, was missing a bwidth
+
+	* kernel/client.c: i was backwards
+
+	* kernel/event.c: this cnofigure is FINAL!
+
+	* kernel/client.c:
+	don't resize the client itself while doing a resize if its not final when config_opaque_resize is not on
+
+2003-06-04  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	better VIDMODE support, handle the cases where the functions fail
+
+	* kernel/client.c:
+	size fullscreen applications to the resolution with the VIDMODE extension
+
+	* kernel/client.c, kernel/client.h, kernel/screen.c:
+	remove the client_remaximize function, and replace it with the client_reconfigure function, which just calls client_configure with the window's current location and dimensions, user=TRUE and final=TRUE.
+
+	add support for the VIDMODE extension in client_configure, namely, fullscreen windows are positioned at the point of the viewport rather than at 0,0.
+	call client_reconfigure when uniconifying a window, so that fullscreen windows are put at the point of the view port.
+
+	* data/rc3, plugins/mouse/mouse.c, plugins/mouse/mouse.h, plugins/mouse/translate.c:
+	remove that fancy new leftHanded option, it should be done via xmodmap instead
+
+	* data/rc3, plugins/mouse/mouse.c, plugins/mouse/mouse.h, plugins/mouse/translate.c:
+	add a leftHanded option for mouse bindings, reverses the left/right keywords
+
+	* kernel/grab.c, kernel/grab.h:
+	make key grabbing per window instead of always root
+
+	* plugins/keyboard/keyboard.c:
+	grab bindings on each client's frame (and the focus_backup) instead of on the root window
+
+	* kernel/focus.c: allow cycling to iconic windows
+
+	* kernel/client.c:
+	use client_can_focus from client_focus to always get the same result
+
+	* kernel/client.c, kernel/client.h, kernel/focus.c:
+	reverting the transient focus cycle change, its just not.. right. add the parent's title to the transient's for the popup instead of just relpacing it
+
+	* kernel/focus.c:
+	better focus cycling for transients. use the parent instead of the transients in the list in case it has more than one, then after choosing it try focus a transient instead
+
+	* kernel/focus.c:
+	dont try change focus while looping thru the focus list
+
+	* kernel/client.c, kernel/client.h, kernel/focus.c:
+	allow focus_fallback to query if a client can be focused without changing the focus order on it
+
+	* plugins/keyboard/keyboard.c:
+	grab the keybaord before cycling focus for reduced latency
+
+2003-06-03  xor@zed  <xor@zed>
+
+	* kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/popup.c:
+	modifications to keep up with libobrender2
+
+	* kernel/popup.c: use theme stuff for the gfx/font
+
+	* kernel/frame.c: layout fixes
+
+	* kernel/frame.c: position the grips
+
+	* kernel/framerender.c: fix some theme colors/display
+
+	* kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, kernel/screen.c, kernel/window.c, m4/gl.m4, plugins/menu/client_menu.c, render/.cvsignore, render/Makefile.am, render/color.h, render/font.c, render/font.h, render/gradient.c, render/gradient.h, render/image.c, render/image.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h, COPYING, COPYING.FDL, COPYING.GPL, COPYING.LGPL, Makefile.am, README, configure.ac:
+	the kernel is using th gl shit to render itself, but with the old style frame shit here. in practice, the render and glft libraries needed some changes to be used better, these are incorporated.
+
+	* kernel/stacking.c: remove debug print
+
+	* render/color.c:
+	more unique error for unhandles image bit depths, remove debug prints
+
+	* render/color.c: handle increase_depth on 1bpp images
+
+	* kernel/client.c:
+	ignore xerrors while using the pixmaps specified by the client, since they can certainly be invalid and there's nothing i can do about it.
+
+	* kernel/client.c: rm g_messages.. ones that segfault.. :>
+
+2003-06-02  xor@zed  <xor@zed>
+
+	* kernel/client.c: also dont increment the nicons if the w*h is 0
+
+	* kernel/client.c: watch out for 0x0 icons, and skip them
+
+	* kernel/menu_render.c, kernel/popup.c:
+	create some temporary fonts to use for rendering text
+
+	* kernel/frame.c, kernel/menu_render.c, kernel/popup.c:
+	set colors for text
+
+	* kernel/frame.c, kernel/popup.c:
+	adjust for some api extensions in render2
+
+	* bootstrap: add env var to get automake 1.7
+
+2003-06-01  xor@zed  <xor@zed>
+
+	* COPYING, COPYING.FDL, COPYING.GPL, COPYING.LGPL, Makefile.am, README, configure.ac, kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, kernel/screen.c, kernel/window.c, kernel/window.h, m4/gl.m4, plugins/menu/client_menu.c, render/.cvsignore, render/Makefile.am, render/color.c, render/color.h, render/font.c, render/font.h, render/gradient.c, render/gradient.h, render/image.c, render/image.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h:
+	Merging in th gl2 branch. Adding a --enable-gl option to the configure script, which defaults off.
+
+2003-05-30  manmower  <manmower@zed>
+
+	* kernel/frame.c: adjust title bar text
+
+2003-05-30  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	adjust what gets raised on map a bit, a little less selective.
+
+2003-05-30  manmower  <manmower@zed>
+
+	* kernel/frame.c: add some test cases for the font crap
+
+2003-05-29  xor@zed  <xor@zed>
+
+	* m4/openbox.m4: better alpha/beta check :)
+
+	* m4/openbox.m4: look for 'alpha' and 'beta' releases also
+
+	* kernel/stacking.c:
+	only add non-nonintrusively when both windows share a stacking layer
+
+	* data/rc3: raise on client clicks
+
+2003-05-28  xor@zed  <xor@zed>
+
+	* COPYING: remove the generic COPYING
+
+	* COPYING.FDL, COPYING.GPL, COPYING.LGPL: New file.
+
+	* COPYING.FDL, COPYING.GPL, COPYING.LGPL, README:
+	specify different licenses for different directories
+
+	* kernel/action.c, kernel/action.h:
+	rm the 'focusraise' action, it is redundant.
+
+	* kernel/frame.c: use the new shape API from the render libs
+
+	* kernel/event.c:
+	pass expose events like i was before. cleanups in rendering to not render areas anymore. pass the surface's absx/y to planar's paint func
+
+	* kernel/frame.c:
+	no button mask on the plate, and some cleanups with redundant if's
+
+2003-05-28  manmower  <manmower@zed>
+
+	* kernel/frame.c: slightly improved theme
+
+2003-05-28  xor@zed  <xor@zed>
+
+	* kernel/popup.c: proper centering of the text in popups without icons
+
+2003-05-27  manmower  <manmower@zed>
+
+	* kernel/frame.c, kernel/frame.h: fixed the flicker in shape
+	(we use a shapewindow now.  it rules, I rule, fuck X, blah blah MOOOOOOO)
+
+2003-05-27  xor@zed  <xor@zed>
+
+	* kernel/frame.c: and typod
+
+	* kernel/frame.c, kernel/frame.h:
+	some cleanups, got rid of the border shit
+
+	* kernel/event.c: toss out expose events to render
+
+	* kernel/popup.c: no more seg
+
+	* kernel/frame.c, kernel/frame.h: some cleanups
+
+2003-05-27  manmower  <manmower@zed>
+
+	* kernel/frame.c: free decor when removing frame
+
+	* kernel/frame.c: HOW DO YOU LIKE MY SEXY NEW DECOR?!?
+
+	* kernel/frame.c: I get my events on decor again
+	and probably ruined exposure for some weird case. bwa ha ha
+
+	* kernel/frame.c, kernel/frame.h: how about some UGLY decor!
+
+2003-05-27  xor@zed  <xor@zed>
+
+	* kernel/popup.c: paints are now recursive
+
+2003-05-27  manmower  <manmower@zed>
+
+	* kernel/frame.h: surface pointer please
+
+2003-05-27  xor@zed  <xor@zed>
+
+	* kernel/popup.c: proper layout
+
+	* kernel/popup.c: i suck so much
+
+	* kernel/event.c, kernel/menu.c, kernel/popup.c: DRAWS!!
+
+2003-05-27  manmower  <manmower@zed>
+
+	* kernel/frame.c, kernel/frame.h: added shape support for decor
+
+2003-05-27  xor@zed  <xor@zed>
+
+	* kernel/popup.c: dont try use an icon when where isnt one
+
+	* kernel/client.c, kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h, kernel/popup.c, kernel/screen.c, kernel/window.c, plugins/menu/client_menu.c:
+	port to the new render stuff.. but this isnt complte since we don't have themes yet.
+
+	* Makefile.am, configure.ac, render/.cvsignore, render/Makefile.am, render/color.c, render/color.h, render/font.c, render/font.h, render/gradient.c, render/gradient.h, render/image.c, render/image.h, render/mask.c, render/mask.h, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h:
+	removing the old render stuffs
+
+2003-05-27  manmower  <manmower@zed>
+
+	* kernel/frame.c, kernel/frame.h: added % based decoration sizes
+
+	* kernel/frame.c, kernel/frame.h: fixed right decor anchors properly
+
+	* kernel/frame.c: fix right anchor point offsets
+
+	* kernel/frame.c: position windows for all anchor types
+
+	* kernel/frame.c: all decor anchors supported
+
+	* kernel/event.c, kernel/frame.c:
+	change event.c to use a frame pointer instead of client pointer in framedecor
+	frame.c now supports more decor anchors
+
+	yay for 1 to many commit logs
+
+2003-05-26  xor@zed  <xor@zed>
+
+	* kernel/Makefile.am: link render version 2
+
+2003-05-26  manmower  <manmower@zed>
+
+	* kernel/frame.c, kernel/frame.h:
+	frame pointer in framedecor instead of client pointer
+
+2003-05-26  xor@zed  <xor@zed>
+
+	* kernel/event.c, kernel/window.c: add case for Window_Decoration
+
+2003-05-26  manmower  <manmower@zed>
+
+	* kernel/frame.c, kernel/frame.h: client pointer in framedecor
+
+	* kernel/frame.c: crap
+
+	* kernel/frame.c, kernel/frame.h:
+	I can now map arbitrarily sized invalid space above my windows!
+	I suck.
+
+	* kernel/frame.c:
+	we now have no decor at all, but are otherwise functional
+
+2003-05-26  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	use frame->visible, not the desktop number, other states exist too, like show_desktop
+
+	* plugins/menu/client_menu.c, kernel/dock.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/menu.c, kernel/popup.c, kernel/screen.c, kernel/window.h:
+	merge in the changes made in the gl branch
+
+	* Makefile.am, configure.ac:
+	create the glft library. it will be using freetype and fontconfig to render fonts in GL.
+	flesh out render2 a bit more.. actually just in comments
+
+	* Makefile.am, configure.ac:
+	add a new render2 lib, which has a proper API and uses only OpenGL to render.
+
+	* render/render.c: remove GL from the old render lib for now
+
+	* configure.ac, m4/gl.m4:
+	gl support in configure, fontconfig instead of xft
+
+2003-05-26  manmower  <manmower@zed>
+
+	* kernel/frame.c: add back some frame adjust stuff
+
+	* kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/window.h, plugins/menu/client_menu.c:
+	complete destruction of all current frame functionality.
+	you're welcome.
+
+2003-05-25  manmower  <manmower@zed>
+
+	* render/gradient.c, render/mask.c, render/render.c, render/render.h, render/test.c, render/theme.c, render/theme.h, kernel/dock.c, kernel/frame.c, kernel/framerender.c, kernel/menu.c, kernel/popup.c, kernel/screen.c, render/color.c, render/color.h:
+	everything compiles.  everything is broken.
+
+	rendertest works, yay.
+
+	* render/render.c: now it even links.
+
+	* render/font.c, render/font.h, render/gradient.c, render/gradient.h, render/render.c, render/render.h:
+	once again it compiles.
+
+	no, it does not work
+
+	much has been removed.
+
+2003-05-25  xor@zed  <xor@zed>
+
+	* configure.ac, m4/gl.m4:
+	right branch. no more xft. fontconfig. gl. woot.
+
+	* configure.ac, m4/gl.m4: omg wrong branch!
+
+	* configure.ac, m4/gl.m4: always gl. fontconfig instead of xft.
+
+2003-05-25  manmower  <manmower@zed>
+
+	* render/gradient.c: gl.h shouldn't be required when not enabling gl
+
+2003-05-25  xor@zed  <xor@zed>
+
+	* README.CVS: add the glade/gtk deps for debian
+
+2003-05-25  manmower  <manmower@zed>
+
+	* render/gradient.c, render/test.c: all grads done
+
+	* render/gradient.c, render/test.c: pipecross
+
+	* render/gradient.c, render/test.c: rectangle and diagonal grads yay
+
+	gl > *
+
+2003-05-25  xor@zed  <xor@zed>
+
+	* data/rc3: Shade not Shaded
+
+	* README.CVS: add debian package list
+
+	* README.CVS: automake 1.7
+
+	* README.CVS: mention glib, xml, gtk and glade
+
+	* configure.ac:
+	make autoconf 2.54 required. makes automake1.6 get used on some systems
+
+2003-05-25  manmower  <manmower@zed>
+
+	* render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	gl is starting.  it's gonna get really ugly really fast, folks
+
+2003-05-24  xor@zed  <xor@zed>
+
+	* Makefile.am, configure.ac, kernel/Makefile.am, kernel/action.c, kernel/action.h, kernel/config.c, kernel/focus.c, kernel/openbox.c, kernel/parse.c, kernel/parse.h, kernel/plugin.c, parser/.cvsignore, parser/Makefile.am, parser/parse.c, parser/parse.h, plugins/Makefile.am, plugins/interface.h, plugins/keyboard/keyboard.c, plugins/menu/Makefile.am, plugins/mouse/mouse.c, plugins/obconf_interface.h, plugins/placement/history.c, plugins/placement/placement.c, plugins/resistance.c, plugins/resistance/.cvsignore, plugins/resistance/Makefile.am, plugins/resistance/resistance.c, plugins/resistance/resistance.glade, plugins/resistance/resistance.gladep, plugins/resistance/resistance.h, plugins/resistance/resistance_config.c, tools/.cvsignore, tools/Makefile.am, tools/obconf/.cvsignore, tools/obconf/Makefile.am, tools/obconf/about.c, tools/obconf/main.c, tools/obconf/obconf.glade, tools/obconf/obconf.gladep, tools/obconf/obconf.h, tools/obconf/plugins.c, tools/obconf/plugins.h:
+	this is a big one! im putting stats in here just cuz!
+	 59 files changed, 1691 insertions(+), 607 deletions(-)
+	Adding the beginings of ObConf. Adding a resistance-config plugin for ObConf.
+	Creating an obparser library that obrender can use, the kernel can use, plugins can use, and ObConf and its plugins can use. (its just code for using libXml2)
+
+	* kernel/action.c: convert shit from utf8 to filename before execing it
+
+	* configure.ac, data/rc3, kernel/Makefile.am, kernel/config.c, kernel/openbox.c, kernel/parse.c, kernel/parse.h, kernel/parse.l, kernel/parse.y, plugins/Makefile.am, plugins/keyboard/Makefile.am, plugins/keyboard/keyboard.c, plugins/mouse/Makefile.am, plugins/mouse/mouse.c, plugins/placement/Makefile.am, plugins/placement/history.c, plugins/placement/history.h, plugins/placement/placement.c, plugins/resistance.c:
+	ECKS EM ELL
+
+	* plugins/menu/client_menu.c:
+	let the client menu open below the top of the window, just limit it at the titlebar
+
+	* kernel/action.c, kernel/action.h: add actions for showing the desktop
+
+	* kernel/action.c, kernel/action.h: soem changes to desktop actions.
+	instead of having *wrap actions, just default to having wrap on, and let it be optionally placed into the rc to disable it.
+	instead of next/prev desktop, just have actions for desktop to the right/left/up/down. this applies to sendtodesktop actions too.
+
+	* kernel/focus.c: add a DEBUG_FOCUS print
+
+	* kernel/event.c:
+	there's this case where we DONT want to ignore both events or we end up without anything we know of being focused, even tho something is. this case is now covered. ps i hate focus so much.
+
+	* kernel/client.c: use the user friendly desktop number
+
+	* kernel/focus.c: clarify comment
+
+2003-05-23  xor@zed  <xor@zed>
+
+	* kernel/event.c:
+	dont refocus the focused window, that just causes so many problems (with alt-tab :)
+
+	* kernel/prop.c: validate utf8 strings before using them
+
+2003-05-23  woodblock  <woodblock@zed>
+
+	* plugins/menu/fifo_menu.c: Fixed missing includes
+
+2003-05-23  xor@zed  <xor@zed>
+
+	* configure.ac, kernel/Makefile.am, m4/gl.m4, plugins/Makefile.am, plugins/keyboard/Makefile.am, plugins/mouse/Makefile.am, plugins/placement/Makefile.am, render/Makefile.am:
+	add --enable-gl support, and put the flags/libs in the appropriate makefiles
+
+	* kernel/focus.c: remove a todo item that seems to be.. done!
+
+	* kernel/focus.c:
+	missed a case of using the stacking list and assuming that its all clients still. fixed that assumption now.
+
+	* kernel/event.c:
+	ignore ancestor FocusIn events. i get them sometimes when hitting alt-tab and that totally fucks it up cuz it cancels teh alt-tab process.
+
+	* plugins/keyboard/keyboard.c:
+	had some code inside the action for loop that didnt belong in there
+
+2003-05-23  woodblock  <woodblock@zed>
+
+	* plugins/menu/client_menu.c: Add toggle decor action to client menu
+
+2003-05-22  manmower  <manmower@zed>
+
+	* render/test.c: fix cut'n'paste bug
+
+2003-05-22  xor@zed  <xor@zed>
+
+	* kernel/event.c: only button 1 can use menu items
+
+	* plugins/menu/client_menu.c: watch out for border widths
+
+2003-05-22  manmower  <manmower@zed>
+
+	* render/render.c: removed a piece of code I suspect has never been run
+	this is for XServers that report less than 8 bpp default visual and support
+	8bpp or higher visuals
+
+	hopefully nothing is really that stupid.  we'll see.
+
+	* render/render.h, render/render.c:
+	keep XVisualInfo around in preparation for opengl stuff
+
+2003-05-22  xor@zed  <xor@zed>
+
+	* plugins/keyboard/keyboard.c: only grab C-g while in a chain
+
+	* plugins/menu/.cvsignore: add the client_menu stuff
+
+	* plugins/keyboard/keyboard.c:
+	async key grabs to avoid race conditions with the sync stuff. there are still possible rases (yay X) but they will be much harder to hit, i expect noone will ever hit them more than once/often enuogh to realise.
+
+	* configure.ac:
+	remove shit for my own makefiles that i dont need no more
+
+	* kernel/event.c: a missing break!
+
+2003-05-22  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, plugins/menu/client_menu.c: layers submenu on client
+
+2003-05-22  xor@zed  <xor@zed>
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h:
+	add actions for changing client layers to abov/below/normal
+
+	* kernel/client.c: typo
+
+	* kernel/plugin.c: load the client_menu by default for nowc
+
+2003-05-21  woodblock  <woodblock@zed>
+
+	* data/rc3, kernel/client.c, kernel/event.c, kernel/menu.c, kernel/menu.h, plugins/menu/Makefile.am, plugins/menu/client_menu.c:
+	Client menus
+	Add "client_menu" to pluginrc to use.
+
+2003-05-21  xor@zed  <xor@zed>
+
+	* render/font.c: optimize it a bit
+
+	* render/font.c:
+	pass the number of bytes, not characters to the xft draw functions
+
+	* kernel/action.c, kernel/action.h: add 'movetoedge' actions
+
+	* kernel/screen.c: add xerror.h
+
+	* kernel/screen.c:
+	Openbox3 in the WM name, FUCK OFF XINE, YA YOU HEARD ME.
+
+	* render/gradient.c: allocate the border_color's gc
+
+2003-05-20  xor@zed  <xor@zed>
+
+	* render/color.c, render/render.c:
+	put the devation back how it used to be, it aws definately no better..
+
+2003-05-20  manmower  <manmower@zed>
+
+	* render/gradient.c:
+	of by one error in pyramid, rectangle, and crosspipe
+
+2003-05-20  xor@zed  <xor@zed>
+
+	* render/gradient.c: remove debug prints
+
+	* render/gradient.c: reindent the file....
+	but while i'm at it:
+	  - add support for bevels/borders on solid textures.
+	  - reverse the colors in the rectangle gradient, the pipecross and pyramid
+	    ones may need to be reversed as well.
+
+	* render/render.c, render/render.h: remove the elliptic gradient type.
+	add bevel light/dark colors for solid textures with bevels
+
+	* render/theme.c:
+	use the rectangle gradient when the theme asks for elipse
+
+	* m4/openbox.m4: argh put it back right!*(
+
+	* m4/openbox.m4: fuck it, put it back
+
+	* m4/openbox.m4: smarter default debug value :)
+
+	* m4/openbox.m4: default debug off (for non-cvs builds!)
+
+	* kernel/screen.c:
+	ignore errors when playing with application defined colormaps
+
+2003-05-19  xor@zed  <xor@zed>
+
+	* kernel/dock.c: get the size for all the apps before positioning them
+
+	* kernel/dock.c:
+	set teh dock sizes before the app uses it for positioning
+
+	* kernel/dock.c: center dock apps
+
+	* plugins/menu/.cvsignore: add fifo_menu shit
+
+	* kernel/action.c: use the resize increment when resizing relative
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h:
+	2 in 1 again..
+	a) directional focus actions
+	b) action system changes i.e. use structs/arrays for convertings strings to actions instead of gross if-else chains
+
+2003-05-18  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, plugins/menu/Makefile.am, plugins/menu/fifo_menu.c, plugins/menu/fifo_menu.h:
+	Added a fifo_menu plugin
+
+2003-05-18  manmower  <manmower@zed>
+
+	* render/gradient.c, render/test.c: PipeCross
+
+	* render/gradient.c: there's the rect grad.  now stop bugging me :(
+
+	* render/gradient.c: is that a rectangle grad?  damned if I know
+
+2003-05-18  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/client.h, render/color.c, render/color.h, render/image.c, render/render.c, render/render.h:
+	make icons use pixel32 data, and image_draw takes pixel32 data.
+	client.c gets pixmap icons as a backup to netwm ones, and they are converted into pixel32 data.
+
+	* kernel/focus.c: include grab.h
+
+2003-05-18  manmower  <manmower@zed>
+
+	* render/test.c: whatever, it's a junk file.
+
+	* render/gradient.c: change badly named offsets
+	add stubs for rectangle and pipecross
+
+	* render/image.c: rename poorly named offsets
+
+	* render/gradient.h: add stubs for pipecross and rectangle
+
+	* render/color.h: fix poor naming of default offset
+
+	* render/color.c: fix poor naming of the default offset
+
+2003-05-18  woodblock  <woodblock@zed>
+
+	* kernel/client.c:
+	this is actually xor :) - fixing the focus search function to not return NULL if no valid group members exist to be a transient for
+
+2003-05-18  xor@zed  <xor@zed>
+
+	* kernel/stacking.c:
+	proper check to see if something was raised, the it==NULL would cause it to always return, incorrectly.
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/stacking.c, render/render.c, render/render.h:
+	2 in 1 deal :\
+
+	client.c stacking.c: fixing looping transient case for group transient windows. now a window which is transient for a group is *not* transient for any other transient windows in the group (perviously the other window had to be transient for the group to be excluded, now it can be transient for anything).
+
+	client.c/h event.c render.c/h: adjustnig icon handling a bit. will be converting the legacy pixmap icons into rgba data so they can be handled the same as netwm icons.
+
+2003-05-18  woodblock  <woodblock@zed>
+
+	* HACKING: Indentation stuff
+
+2003-05-18  xor@zed  <xor@zed>
+
+	* configure.ac: actually optional now.
+
+	* configure.ac: make LIBSN optional
+
+	* kernel/focus.c:
+	grab the mouse during focus cycling. this removes the bug of focusing following the mouse when the popup disappears and fuck up your cycling.
+
+	* render/Makefile.am: need the libsn flags
+
+	* plugins/Makefile.am, plugins/keyboard/Makefile.am, plugins/menu/Makefile.am, plugins/mouse/Makefile.am, plugins/placement/Makefile.am:
+	needs the libsn flags to use openbox.h now
+
+2003-05-18  woodblock  <woodblock@zed>
+
+	* plugins/menu/timed_menu.c: Clean up on destroy.
+
+2003-05-18  xor@zed  <xor@zed>
+
+	* configure.ac, kernel/Makefile.am, kernel/event.c, kernel/openbox.c, kernel/openbox.h, kernel/screen.c:
+	add (optional) support for showing a busy cursor via startup notification
+
+2003-05-18  woodblock  <woodblock@zed>
+
+	* plugins/menu/timed_menu.c: Added stat() based timed menu update.
+	Needs parser before it is useful.
+
+2003-05-17  xor@zed  <xor@zed>
+
+	* kernel/event.c, plugins/mouse/mouse.c:
+	disallow drag events on title buttons.
+	dont redraw title button when the wheel buttons are used on them.
+
+2003-05-16  xor@zed  <xor@zed>
+
+	* kernel/client.c: print the class not the name
+
+	* kernel/prop.c: get all the strings!
+
+	* kernel/client.c, kernel/dock.c, kernel/dock.h:
+	save the dock's class/name for future evil purposes!
+	also print names of windows being managed/unmanaged
+
+	* data/rc3: discourage floating a bit, capitalize better.
+
+	* kernel/dock.c: FUCK dock is not an array anymore!
+
+	* kernel/dock.c, kernel/dock.h, kernel/screen.c:
+	give the dock a strut and use it
+
+2003-05-16  woodblock  <woodblock@zed>
+
+	* plugins/menu/timed_menu.c: Fixed child wait.
+
+2003-05-16  xor@zed  <xor@zed>
+
+	* kernel/event.c: remove debug prints
+
+	* kernel/dock.c, kernel/dock.h, kernel/event.c:
+	dockapps are ObWindows now.
+	set the type when creating new dockapps.
+
+	* plugins/menu/timed_menu.c: add stdio.h
+
+	* data/rc3, kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/config.c, kernel/config.h, kernel/dock.c, kernel/dock.h, kernel/event.c, kernel/frame.c, kernel/menu.c, kernel/menu.h, kernel/openbox.c, kernel/screen.c, kernel/slit.c, kernel/slit.h, kernel/window.c, kernel/window.h:
+	rename "Slit" to "Dock".
+	add config options to the rc3 for the dock.
+	create a window_map, add DockApps to the ObWindow types, use the window_map for translating windows into objects for event handling (only one lookup now) and remove the old maps (client_map, menu_map).
+
+	* kernel/client.c, kernel/menu.c, kernel/moveresize.c, kernel/popup.c, kernel/slit.c, kernel/stacking.c, kernel/stacking.h:
+	add anotehr stacking_add function.
+	make stacking_add take care of raising also.
+	make new windows that dont get focus also not raise above the focused window.
+
+	* kernel/event.c: movnig shit around
+
+2003-05-14  xor@zed  <xor@zed>
+
+	* kernel/menu.c: watch out for not loading the timed_menu plugin
+
+	* kernel/client.c: pass teh correct values for config notify events
+
+2003-05-14  woodblock  <woodblock@zed>
+
+	* kernel/event.c, kernel/event.h, kernel/menu.c, plugins/menu/timed_menu.c:
+	Added a menu to read from a pipe.
+	File descriptors added to the event loop.
+
+2003-05-12  woodblock  <woodblock@zed>
+
+	* kernel/event.c, kernel/event.h, kernel/menu.c, plugins/menu/timed_menu.c:
+	woodblock's failed attempt at making pipes work
+
+2003-05-11  xor@zed  <xor@zed>
+
+	* plugins/resistance.c: watch out for stacking_list
+
+	* data/rc3, kernel/config.c, kernel/config.h, kernel/moveresize.c:
+	add opaque move/resize to the rc3
+
+	* kernel/stacking.c:
+	was using the frame window in the stacking list hint
+
+	* kernel/event.c, kernel/menu.c, kernel/moveresize.c, kernel/popup.c, kernel/stacking.c, kernel/window.c, kernel/window.h:
+	add internal popups n shit to the stacking list.
+	some cleanups for the stacking order hint.
+	add non-opaque move/resize. cant toggle it yet.
+
+	* kernel/menu.c: rm comment for shit i fixed
+
+	* TODO: updated... it sucks tho anyways
+
+	* kernel/screen.c:
+	not everything in the stacking_list is a client anymore
+
+	* kernel/event.c, kernel/menu.c:
+	Menus put themselves into the stacking list.
+	Clicking on the menu (but not on an entry) will raise it.
+
+	* kernel/Makefile.am, kernel/action.c, kernel/client.c, kernel/client.h, kernel/config.h, kernel/event.c, kernel/focus.c, kernel/menu.c, kernel/menu.h, kernel/openbox.c, kernel/slit.c, kernel/slit.h, kernel/stacking.c, kernel/stacking.h, kernel/window.c, kernel/window.h, plugins/resistance.c:
+	Clients Menus and Slits are all 'ObWindow's now.
+	Stacking is done with ObWindows.
+	Slits add themselves to the stacking order, as do clients of course.
+	Added some macros for adding/removing to the stacking order.
+
+	* kernel/slit.c:
+	garb press events so they dont break bindings... X sucks
+
+	* kernel/slit.c:
+	grab button events on the slit so they dont go through to root
+
+	* kernel/client.c, kernel/slit.c, kernel/slit.h:
+	use the size of the icon window for slit apps, not the client window
+
+	* plugins/keyboard/tree.c, plugins/menu/timed_menu.h: cleanups
+
+	* kernel/event.c, kernel/grab.c, kernel/grab.h, kernel/slit.c, kernel/slit.h, plugins/mouse/mouse.c:
+	can drag slit-apps around in the slit
+
+2003-05-10  xor@zed  <xor@zed>
+
+	* kernel/event.c, kernel/slit.c, kernel/slit.h, kernel/timer.h:
+	add autohiding to the slit
+
+	* kernel/event.c, kernel/slit.c, kernel/slit.h:
+	some slit fixes, support resizing slitapps
+
+	* Makefile.am, configure.ac: rm the tools dir
+
+	* tools/Makefile.am: rm this garbage...
+
+	* kernel/Makefile.am, kernel/client.c, kernel/event.c, kernel/frame.c, kernel/openbox.c, kernel/screen.c, kernel/slit.c, kernel/slit.h:
+	add a slit to the kernel
+
+	* plugins/menu/.cvsignore: ignore the build shit
+
+	* doc/.cvsignore: add the sgml dir
+
+	* kernel/menu.c: make the client menu not have a title
+
+	* kernel/event.c:
+	be more careful about ignoring focusin/out event pairs
+
+2003-05-10  woodblock  <woodblock@zed>
+
+	* plugins/Makefile.am: tyop
+
+	* kernel/menu.c, plugins/menu/timed_menu.c:
+	Turn off timed_menu by default
+
+	* kernel/menu.c, kernel/menu.h, plugins/menu/timed_menu.c:
+	Timed menu that reads output from a process while the window is hidden
+
+	* kernel/event.c, kernel/menu_render.c: whitespace
+
+2003-05-09  woodblock  <woodblock@zed>
+
+	* plugins/menu/Makefile.am, plugins/menu/Makefile.in: fixor
+
+2003-05-09  xor@zed  <xor@zed>
+
+	* configure.ac: nice merge
+
+2003-05-09  woodblock  <woodblock@zed>
+
+	* configure.ac, kernel/event.c, kernel/menu.c, kernel/menu.h, kernel/menu_render.c, kernel/plugin.c, kernel/plugin.h, kernel/timer.c, plugins/Makefile.am, plugins/menu/Makefile.in, plugins/menu/timed_menu.c, plugins/menu/timed_menu.h:
+	Menu uber patch
+	Since we have no menu parser see menu_startup() to customize
+
+2003-05-09  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/focus.c:
+	add a client_activate function, use it for net_wm_active mesgs and for focus cycling.
+
+	* kernel/focus.c: unshade windows when you cycle focus to them
+
+	* kernel/openbox.c, kernel/popup.c, kernel/popup.h, tools/Makefile.am:
+	add shit that i made in the last week!
+
+	* HACKING, Makefile.am, configure.ac, data/rc3, kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/config.c, kernel/config.h, kernel/event.c, kernel/extensions.c, kernel/extensions.h, kernel/focus.c, kernel/framerender.c, kernel/framerender.h, kernel/menu.c, kernel/moveresize.c, kernel/moveresize.h, kernel/openbox.c, kernel/parse.h, kernel/parse.l, kernel/parse.y, kernel/screen.c, kernel/screen.h, kernel/stacking.c, m4/x11.m4, plugins/keyboard/keyboard.c, plugins/keyboard/tree.c, plugins/keyboard/tree.h, plugins/mouse/mouse.c, plugins/mouse/mouse.h, render/font.c, render/image.c, render/render.c, render/render.h, render/theme.c, render/theme.h:
+	all my changes while i was offline.
+	better alt-tabbing. better transient handling. i dont even know. lots of fucking cool shit so WATCH the FUCK OUT.
+
+2003-04-28  xor@zed  <xor@zed>
+
+	* kernel/screen.c:
+	move windows before calcing struts. watch for windows on DESKTOP_ALL when removeing a desktop
+
+2003-04-27  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/stacking.c:
+	a more correct for the missing frame problem. don't restack windows when changing the window's layer while it is being managed.
+
+	* kernel/stacking.c:
+	watch for windows without frames, they can be in the transient order before they get fully managed
+
+	* doc/themerc.txt: no longer pertinent
+
+	* render/image.c, render/image.h, render/render.c:
+	fix window icon rendering, was using incorrect size.
+
+	* render/color.h: its G_BYTE_ORDER not G_ENDIAN.
+
+2003-04-26  xor@zed  <xor@zed>
+
+	* kernel/moveresize.c:
+	show the move coords for where the window will actually be
+
+2003-04-25  xor@zed  <xor@zed>
+
+	* kernel/client.c: only focus on startup if focus_new is true
+
+	* kernel/Makefile.am, kernel/client.c, kernel/openbox.c, kernel/screen.c, kernel/startup.c, kernel/startup.h:
+	restore the desktop and focused window on restarts if possible
+
+	* kernel/action.c, kernel/client.c, kernel/client.h, kernel/focus.c, kernel/focus.h:
+	add helper functions for manipulating the focus_order list.
+	move the focus popup into focus.c, out of action.c
+	allow cycling to iconic windows, which are kept at the bottom of the focus_order lists.
+
+	* kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c:
+	let the frame hold a focus state so that it can lie.
+	dont focus windows while cycling, just highlight them as if they are focused
+
+	* kernel/framerender.c: icons are not at +1 anymore
+
+2003-04-24  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	some more checks for transients looping on eachother when they are transients of a group
+
+2003-04-22  xor@zed  <xor@zed>
+
+	* kernel/prop.c:
+	client side shit ISNT 32 bits on 64 bit platforms, its 64 bits. fuck X so hard.
+
+2003-04-22  woodblock  <woodblock@zed>
+
+	* CHANGELOG: NLS update
+
+2003-04-22  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	even better checks for when to focus new windows. focus dialogs when they are the only member of their group
+
+2003-04-22  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, kernel/menu.h, kernel/menu_render.c:
+	More menu changes to facilitate plugins.
+
+	* kernel/Makefile.am, kernel/menu.c, kernel/menu.h, kernel/menu_render.c:
+	Render menus only when they are invalid.
+
+2003-04-21  xor@zed  <xor@zed>
+
+	* README.CVS: add automake
+
+	* data/rc3: focus on press onm the titlebar buttons
+
+	* kernel/client.c:
+	yet more changes to choosing to focus windows when they mapp
+
+	* kernel/parse.h, kernel/parse.y:
+	try avoid cicular includes with the bison shit
+
+2003-04-20  woodblock  <woodblock@zed>
+
+	* CHANGELOG: tyop
+
+2003-04-20  xor@zed  <xor@zed>
+
+	* kernel/frame.c, kernel/framerender.c:
+	make the icon larger than the buttons by one pixel in each direction, this makes it as tall as the label and lets it fit more image in
+
+	* kernel/client.c: new focus-new rules
+
+2003-04-20  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Update log
+
+2003-04-19  xor@zed  <xor@zed>
+
+	* kernel/client.c: i lied.. fuck @ those gnome dialogs
+
+	* kernel/client.c: lighten up a bit on the focus new windows criteria
+
+	* kernel/event.c: rm invalid comment
+
+	* kernel/event.c: only look for FocusOut events on the same window
+
+	* kernel/prop.c:
+	convert STRING properties from "ISO-8859-1" instead of from the current locale, since this is what they apparently are, according to gdk.
+
+	* kernel/prop.c: check the string not the pointer to it
+
+2003-04-18  xor@zed  <xor@zed>
+
+	* kernel/event.c: the mouse grab screws that up
+
+	* kernel/event.c: dispatch presses and releases during a move/resize
+
+	* kernel/event.c: kill the debug prints for now
+
+	* kernel/event.c: nm cant do it.. damn
+
+	* kernel/event.c:
+	ignore another type of crossing event, caused when leaving gtk popup menus
+
+	* kernel/focus.c: just formatting
+
+	* kernel/event.c:
+	yet MORE changes to how focusin/out's are handled. more edge case fixing, this time with focus fallback when unmapping a window in sloppy focus mode.
+
+	* kernel/client.c:
+	adjust choosing to focus new windows, make it more strict.
+	eat all Enter events when unmapping a window so focus fallback can be more smarter..
+
+	* kernel/screen.c: dont need to sync
+
+	* kernel/focus.c: check for client_normal before focusing
+
+	* kernel/focus.c:
+	when unfocusing a window (e.g. unmanaging) try fallback to transient relations, if that fails, try group relations, then fallback to other window.
+
+	* kernel/focus.c:
+	try focus other transients of the parent window when a transient falls back before focusing the parent
+
+	* kernel/moveresize.c: unset it AFTER using it...
+
+	* kernel/moveresize.c: unset the client when done moveresizing
+
+	* kernel/openbox.c:
+	don't wait(), the glib function does that for us woot.
+
+	* kernel/client.c:
+	more strict rules on what will be focused by the focusNew option in the rc3. only strictly NORMAL windows will be focused, not dialogs or anything else when they are mapped.
+
+	* kernel/focus.h: comment typo
+
+	* kernel/client.c, kernel/moveresize.c, kernel/moveresize.h:
+	watch out when unmanaging a window, that it is not being move/resized
+
+2003-04-17  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	a) put transient windows on the same desktop as their parent
+	b) if a window is attempted to be focused but it is not on the current desktop,
+	   then move it to the top of the focus order on its desktop
+
+	* kernel/screen.c:
+	distribute focus when entering/leaving show-the-desktop mode
+
+	* kernel/event.c: remove debug print
+
+	* kernel/moveresize.c, kernel/openbox.c, kernel/openbox.h:
+	add the left/right/top/bottom direction arrows and use them for resizing those ways
+
+	* plugins/mouse/mouse.c: net_WM!@^&(
+
+	* plugins/mouse/mouse.c: use the right client
+
+	* plugins/mouse/mouse.c: dont use the client if there is none
+
+	* kernel/event.c: dont ignore all Virtual pointer events
+
+	* kernel/action.c: 02:33 (@xor) omg yes
+	02:33 (@xor) grid workspace cycling of d3th
+
+	* kernel/action.c: fix grip workspace cycling
+
+	* kernel/event.c, kernel/grab.c, kernel/grab.h, kernel/moveresize.c, kernel/moveresize.h, plugins/mouse/mouseparse.c:
+	fix up support for moveresize. make keyboard grabs Async so that i can hit escape to cancel a moveresize process.
+
+	* kernel/openbox.c: do not shadow parameter pls
+
+	* kernel/moveresize.c: initialize start_x/y
+
+	* kernel/focus.c, kernel/moveresize.c, kernel/moveresize.h, kernel/openbox.c, kernel/openbox.h:
+	add support for interactive/keyboard move/resize
+
+	* kernel/event.c, kernel/prop.c, kernel/prop.h, kernel/screen.c:
+	add support for net_moveresize_window and net_wm_moveresize
+
+	* kernel/frame.c: use the new cursor defn's
+
+	* kernel/screen.c: use the new ptr cursor defn
+
+	* kernel/Makefile.am, kernel/action.c, kernel/action.h, kernel/event.c, kernel/moveresize.c, kernel/moveresize.h, kernel/prop.c, kernel/prop.h, plugins/keyboard/keyboard.c, plugins/keyboard/keyparse.c, plugins/mouse/mouse.c, plugins/mouse/mouseparse.c:
+	move the move/resize functionality into moveresize.c, for use with the netwm atoms. use it from teh plugins. combine the two actions.
+
+	* kernel/framerender.c: put text centered in the popup dialog properly
+
+	* data/rc3: make alt-middle the default resize binding
+
+	* kernel/openbox.c, kernel/openbox.h:
+	add more cursors for move/resizing, and use the arrows not the angle brackets
+
+	* kernel/action.c:
+	grab pointer during cycling to remove focus screwups from focus-follows-mouse.
+	grab during move/resize and assign a cursor while doing the move/resize too!
+
+	* plugins/mouse/mouse.c:
+	save the client and context during drags since a pointer grab will change them
+
+	* kernel/event.c: ignore virtual crossing events..
+
+	* kernel/focus.c: that was dumb, it was metacity's fault
+
+	* kernel/focus.c: only cycle to visible windows
+
+2003-04-16  xor@zed  <xor@zed>
+
+	* kernel/event.c: dont send menu events to plugins
+
+	* data/rc3: show the root menu on right click
+
+	* kernel/event.c, kernel/grab.c, kernel/grab.h, kernel/menu.c, kernel/menu.h:
+	menus works on some level. add a built-in root menu
+
+	* kernel/client.c: code cleanup
+
+	* kernel/client.c: when flags are not set assume bette defaults
+
+	* kernel/event.c, kernel/focus.c, kernel/menu.c, kernel/menu.h, kernel/openbox.c, kernel/stacking.c, kernel/stacking.h:
+	raise menus above clients.
+	hilight menu entries as the cursor passes over them.
+
+	* kernel/menu.c, kernel/menu.h:
+	save the window ids in a map for the menus
+
+	* kernel/client.c: only change the group info if the group flag is set
+
+	* kernel/client.c: only add transients if we are IN a group
+
+	* kernel/client.c: oops nm
+
+	* kernel/client.c: less ()s cleanup
+
+	* kernel/client.c:
+	remove transients before removing ourlselves from teh group
+
+	* kernel/client.c:
+	set the group to null when removeing ourselves from it
+
+2003-04-15  xor@zed  <xor@zed>
+
+	* kernel/action.c: watch out for missing a name
+
+	* render/theme.c: make menu font smaller and !bold for now
+
+	* kernel/action.c, kernel/action.h, kernel/framerender.c, kernel/menu.c, kernel/menu.h, kernel/openbox.c, plugins/keyboard/keyparse.c, plugins/mouse/mouse.c, plugins/mouse/mouseparse.c:
+	start of showing/rendering menus. woot!
+
+	* render/theme.c, render/theme.h: load menu style stuff
+
+	* render/render.c, render/render.h:
+	make minsize take int*'s not a Size*
+
+	* kernel/client.c:
+	remove transients of the group from teh window when it leaves the group
+
+	* kernel/client.c: add group transients when setting up the group
+
+	* kernel/client.c: bug in the search for transient_for's
+
+	* data/rc3: update the theme stuff
+
+2003-04-15  manmower  <manmower@zed>
+
+	* render/gradient.c: PYRAMID PARTY PART 2!!!
+
+	* render/gradient.c, render/gradient.h: PYRAMID PARTY!!!
+
+2003-04-15  xor@zed  <xor@zed>
+
+	* kernel/screen.c: remove debug print
+
+2003-04-14  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/prop.c, kernel/screen.c:
+	fixes for handling char**s
+
+	* render/font.c: indenting oopsie
+
+	* kernel/prop.c: dont get a null at the end of the data, so use strndup
+
+	* kernel/screen.c: fix a seg from ignoreing PROP_GETSS failure
+
+	* kernel/screen.c: more fixes for working with char**s
+
+	* kernel/screen.c: nullify the ends of the char**
+
+	* kernel/client.c, kernel/prop.h, kernel/screen.c:
+	remove casts from PROP defines. use proper vars and cast elsewhere if needed.
+
+	* render/font.c: text justification
+
+	* render/render.c:
+	shrink the area that the textures are rendered into by the bevels/borders
+
+	* kernel/client.c, kernel/prop.c, kernel/prop.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c:
+	rip the prop code i wrote in cwmcc out and make it all 64bit friendly (i think!). stop using gulong for values from the xserver, using guint32 instead.
+
+	* kernel/menu.c, kernel/menu.h:
+	these menus should not be removed, they are good and will be used.
+
+	* kernel/event.c: clean up this mess of crap a lot
+
+	* kernel/prop.c, kernel/prop.h:
+	do not commit bad char* foo that breaks on !32 bit platforms
+
+2003-04-14  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, kernel/menu.h: *** empty log message ***
+
+2003-04-14  xor@zed  <xor@zed>
+
+	* kernel/parse.l: allow _'s in identifiers
+
+	* kernel/stacking.c: raise and lower all transients along with parents
+
+	* kernel/client.c:
+	apply layers to all transients. only raise once on the highest window who's layer changed after applying layers to them all
+
+2003-04-13  xor@zed  <xor@zed>
+
+	* kernel/client.c: ifdef not ifndef
+
+	* kernel/stacking.c: keep all transient windows above their parents
+
+	* kernel/client.c: simple cleanups for the client_iconify function.
+	also dont follow into other groups when searching up the transient_for tree
+
+	* kernel/client.c: rm the unused vars
+
+	* kernel/client.c: onyl focus 'normal' windows on map
+
+	* kernel/client.c:
+	only keep fullscreen windows on top while they are focused
+
+	* kernel/client.c, kernel/client.h:
+	make fullscreen decorations and functions be calculated by the setup_decor_and_functions func
+
+	* kernel/group.c: rm the group debug prints
+
+	* kernel/client.c: only print that when debuggin focus
+
+	* .cvsignore, kernel/.cvsignore, plugins/.cvsignore, plugins/keyboard/.cvsignore, plugins/mouse/.cvsignore, plugins/placement/.cvsignore, render/.cvsignore:
+	ignore the remaining new shit from automaking everything again
+
+	* .cvsignore, INSTALL, Makefile.am, Makefile.in, bootstrap, configure.ac, data/.cvsignore, data/Makefile.am, kernel/.cvsignore, kernel/Makefile, kernel/Makefile.am, plugins/.cvsignore, plugins/Makefile, plugins/Makefile.am, plugins/keyboard/.cvsignore, plugins/keyboard/Makefile, plugins/keyboard/Makefile.am, plugins/mouse/.cvsignore, plugins/mouse/Makefile, plugins/mouse/Makefile.am, plugins/placement/.cvsignore, plugins/placement/Makefile, plugins/placement/Makefile.am, po/.cvsignore, render/.cvsignore, render/Makefile, render/Makefile.am, tests/Makefile, themes/.cvsignore, themes/Makefile.am:
+	back to automake
+
+	* AUTHORS: shrimpx above miklos?
+
+	* kernel/event.c, kernel/frame.c, kernel/frame.h, plugins/mouse/mouse.c:
+	pass the Client for frame_context cuz the client might be NULL
+
+	* themes/ebox: comment properly
+
+	* render/theme.c: load the font shadow stuff from the old ob2 shitz
+
+	* kernel/config.c, kernel/config.h, kernel/openbox.c:
+	let specify theme in the rc3 file. rm the other old engine options
+
+	* Makefile.in: break on errors
+
+	* Makefile.in, kernel/.cvsignore, kernel/action.c, kernel/client.c, kernel/config.h, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/frame.h, kernel/framerender.c, kernel/framerender.h, kernel/openbox.c, kernel/parse.l, kernel/parse.y, kernel/screen.c, plugins/keyboard/keyboard.c, plugins/mouse/mouse.c, render/.cvsignore, render/font.h, render/mask.h, render/render.h, render/theme.c, render/theme.h:
+	move the openbox engine into librender and the kernel. the theme is loaded and stored inside librender. the frame is decorated and managed inside the kernel.
+
+	* themes/ob20, themes/operation, themes/outcomes, themes/artwiz, themes/bbs, themes/bluebox, themes/cthulhain, themes/deep, themes/ebox, themes/fieron, themes/fieron2, themes/flux, themes/frobozz, themes/frobust, themes/mbdtex, themes/miklos, themes/nyz, themes/nyzclone, themes/paper, themes/purplehaaze, themes/shade, themes/steelblue, themes/steelblue2, themes/the_orange, themes/trisb, themes/twice, themes/warp-xp:
+	move the themes
+
+	* render/render.c: allow freeing NULL appearances
+
+	* render/font.c: allow closing NULL fonts
+
+	* render/mask.c: allow freeing NULL pixmap masks
+
+	* render/color.c: dont fux self in color_free if the color is NULL
+
+2003-04-12  xor@zed  <xor@zed>
+
+	* tests/fullscreen.c: set the right mask for the client msg!
+
+2003-04-12  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Fixed another damned focus bug. Pray.
+
+2003-04-11  xor@zed  <xor@zed>
+
+	* data/rc3: add right click in client focuses
+
+	* kernel/client.c: make utility windows able to be resized
+
+	* Makefile.in: rm the main Makefile in a distclean
+
+2003-04-10  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	deiconify transient parents when a child is deiconified.
+
+	* kernel/client.h: no fuck that it was working fine
+
+	* kernel/client.h: make the TRAN_GROUP an unsigned long
+
+	* kernel/event.c: add MapRequest print
+
+	* kernel/client.c:
+	some smarter rules for focusing new window when focus_new is not set
+
+2003-04-09  xor@zed  <xor@zed>
+
+	* plugins/keyboard/keyboard.c: buld fixes for the new libs
+
+	* Makefile.in, render/.cvsignore: add libcwmcc and libobcl
+
+	* HACKING: describe the code subdirs
+
+	* kernel/action.c:
+	dont show the focus popup when theres no target client
+
+2003-04-08  xor@zed  <xor@zed>
+
+	* kernel/event.c: rm debug print
+
+	* tests/.cvsignore: add override
+
+	* tests/override.c: add a test that maps an override redirect window
+
+	* kernel/client.c, kernel/config.c, kernel/config.h, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/focus.c, kernel/focus.h, kernel/openbox.c, kernel/prop.c, kernel/screen.c:
+	move config option loading for the kernel into config.c/h
+	add options for the number of desktops and the names of the desktops
+
+	* data/rc3: add the desktops options
+
+	* data/rc3: better clickfocus friendliness
+
+	* kernel/client.c: check for focus before unfocusing
+
+	* kernel/client.c, kernel/event.c, kernel/focus.c, kernel/focus.h, kernel/screen.c:
+	add more options for focus fallback, use an enum for all the types of fallbacks.
+
+	* kernel/focus.c: only cycle focus to normal windows
+
+	* data/rc3: make stacked cycling the default
+
+	* kernel/action.c: show a popup with the focus target while cycling
+
+	* kernel/focus.c, kernel/focus.h:
+	fallback to transients' parents when possible.
+	return the Client* which was focused from focus_cycle
+
+	* kernel/client.c: fallback focus while unmanaging the window
+
+2003-04-07  xor@zed  <xor@zed>
+
+	* data/rc3: FocusRaise to be more clickfocus friendly too
+
+	* data/rc3, kernel/focus.c, kernel/focus.h:
+	add focusLast and focusLastOnDesktop options in the [focus] section of the rc3. allows more customizaton of the focus model. default to click-focus style. add handling for focus cycling when nothing on the desktop is focused.
+
+	* kernel/event.c: ignore inferior enternotifies
+	add anotehr focusdebug print
+
+	* kernel/client.c: check for new windows always being onscreen.
+	rename the client pointer to self in teh manage unmanage functions for consistancy
+
+	* kernel/grab.c: rm debug prints
+
+2003-04-07  woodblock  <woodblock@zed>
+
+	* configure.in: bump version string
+
+2003-04-07  xor@zed  <xor@zed>
+
+	* plugins/placement/history.c:
+	dont check to make sure the window is on screen here
+
+	* HACKING: add comment about the two different area Rects
+
+	* HACKING: add new HACKING!
+	warn about Client.transient_for
+
+	* kernel/client.h, kernel/stacking.c, kernel/client.c:
+	support for transients of groups
+
+	* kernel/event.c: missed one
+
+	* kernel/event.c: put focus messages in ifdefs
+
+	* kernel/focus.c: remove debug print
+
+	* kernel/client.c, kernel/client.h, kernel/group.c, kernel/group.h, kernel/openbox.c:
+	track window groups
+	iconify all its transients when a window is iconified
+
+	* plugins/keyboard/keyboard.c:
+	once in a window-cycle, don't fire any other key bindings
+
+	* kernel/action.c, kernel/client.c, kernel/client.h, kernel/focus.c, kernel/focus.h:
+	put focus_cycle into focus.c, use it there in the action. improved it as well to handle odd cases like modal windows. added functions to client.c which are needed by the focus cycling routine.
+
+	* kernel/grab.c: grab the other device in Sync for button/key grabs
+
+2003-04-06  xor@zed  <xor@zed>
+
+	* plugins/placement/history.c: dont let windows be placed offscreen
+
+	* render/render.c: ifndef NOT IFNDEF GAH
+
+	* kernel/action.c: dont toggle when no client was passed to teh action
+
+	* kernel/event.c: nm that, pointless...
+
+	* kernel/event.c:
+	disable keyboard and mouse input while ob is starting or exiting
+
+2003-04-06  manmower  <manmower@zed>
+
+	* render/color.c, render/render.c:
+	Fix reduce color depth to not use original data
+	(and break parentrel)
+
+2003-04-06  xor@zed  <xor@zed>
+
+	* kernel/engine.c: print the error when the engine cant load
+
+	* render/render.c: add stdlib.h for exit()
+
+	* .cvsignore, configure.ac, install-sh:
+	stop using build/ dir configure shits all over itself for other people
+
+	* m4/x11.m4, m4/openbox.m4:
+	build fixes for finding Xlibs and for setting vars based on found Xlib info and Xinerama info
+
+	* configure.ac: more build system fixups
+
+	* .cvsignore, Makefile, Makefile.in, configure.ac, install-sh, m4/openbox.m4, render/.cvsignore:
+	fixes for build system. add themes to the install process. use the build/ dir for configures trash dump
+
+	* kernel/engine.c: clean up the module if load() fails
+
+	* render/render.c, render/render.h:
+	add function to give the minimum size of an appearance to fully render it's data
+
+	* plugins/mouse/mouse.c:
+	save the state at the start of a drag and use it throughout until the button is released
+
+	* kernel/action.c: add a coords popup for moving and resizing
+
+	* kernel/geom.h: add ()'s to the macros for more safety
+
+	* kernel/engine.c, kernel/engine.h:
+	add the ability to render and size text labels for non-window-decorations
+
+2003-04-06  woodblock  <woodblock@zed>
+
+	* bootstrap: Remove woodblock's local changes :P
+
+	* bootstrap: Moved to DESIGN/
+
+	* DESIGN/menu-thoughts.txt: some thoughts on menu stuff
+
+2003-04-06  manmower  <manmower@zed>
+
+	* render/gradient.c: remove asserts pending sanity check.
+
+	* render/gradient.c:
+	added flakey parentrel for solids and some mean spirited asserts
+
+	* render/color.c, render/color.h, render/render.c, render/render.h:
+	added superb pseudo-color (8bpp) support
+
+2003-04-06  xor@zed  <xor@zed>
+
+	* plugins/resistance.c: dont resize snap windows with size increments
+
+	* data/rc3, kernel/engine.c: make NLIMC the default titlebar layout
+
+2003-04-06  woodblock  <woodblock@zed>
+
+	* configure.in: Huge i18n patch from Mike Fabian.
+	We use utf8 everywhere now.
+
+2003-04-05  xor@zed  <xor@zed>
+
+	* kernel/action.c, kernel/focus.c, kernel/focus.h:
+	allow specifying that some focus events should be ignored for the focus order list
+
+	* kernel/action.c: stacked and linear cycling
+
+	* kernel/action.c, kernel/action.h, plugins/keyboard/keyboard.c:
+	linear focus cycling of the gods
+
+	* plugins/keyboard/keyboard.c:
+	add special shit for window cycling, grab the keyboard etc
+
+	* kernel/client.c: typo
+
+	* kernel/client.c: put it back
+
+	* kernel/client.c: make unfocus really unfocus everything
+
+	* data/rc3: add linear cycling for now
+
+	* data/rc3: rm the [foo] section
+
+	* data/rc3: update teh rc3 to reflect how the code works now
+
+	* kernel/engine.c: dont default to NULL for the engine name
+
+	* kernel/engine.c: add engine options to the new rc file
+
+	* Makefile, kernel/focus.c, kernel/openbox.c, kernel/parse.c:
+	add focus options to the new rc file
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h, kernel/config.c, kernel/config.h, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/focus.c, kernel/focus.h, kernel/openbox.c, kernel/parse.c, kernel/parse.h, kernel/parse.l, kernel/parse.y, kernel/screen.c, plugins/keyboard/keyboard.c, plugins/mouse/mouse.c, plugins/placement/history.c, plugins/placement/placement.c, plugins/resistance.c:
+	change how rc parsing will work. a=b will be parsed in any [section] and given to a separate parsing callback. no more general config infrastructure needed/
+
+	* render/render.h: make tint signed
+
+	* data/rc3: typo
+
+	* plugins/mouse/mouserc, plugins/mouse/mouserc_parse.c, plugins/mouse/mouserc_parse.h, plugins/mouse/mouserc_parse.l:
+	rm the old mouserc shit
+
+	* Makefile, data/rc3: add an rc3 which gets installed
+
+	* Makefile: make love
+
+	* plugins/mouse/.cvsignore: ignore more new shit
+
+	* plugins/mouse/translate.c:
+	use Button<num> instead of just <num> for specifying buttons by number
+
+	* plugins/keyboard/keyparse.c, plugins/mouse/mouseparse.c, plugins/mouse/mouseparse.h:
+	better error msgs
+
+	* kernel/frame.c, kernel/frame.h: use a context enum instead of quarks
+
+	* plugins/mouse/mouse.c:
+	not using quarks, using an array and a Context enum for contexts
+
+	* plugins/keyboard/keyparse.c: prefix key bindnigs with 'kbind'
+
+	* plugins/keyboard/keyboard.c, plugins/keyboard/translate.c:
+	initialize all vars.
+	change warnings to messages
+
+2003-04-04  xor@zed  <xor@zed>
+
+	* kernel/openbox.c:
+	reorder startup so that grabs are set up before parsing teh rc
+
+	* plugins/keyboard/keyparse.c: remove debug print
+
+	* kernel/parse.c, kernel/parse.y, plugins/keyboard/.cvsignore, plugins/keyboard/keyboard.c, plugins/keyboard/keyparse.c, plugins/keyboard/keyparse.h, plugins/keyboard/keysrc, plugins/keyboard/keysrc.h, plugins/keyboard/keysrc.l, plugins/keyboard/keysrc.yacc:
+	add the keyboard plugin into the build systems
+	keyboard bindings are parsed from the rc file
+
+	* configure.ac: clean up output
+
+	* configure.ac: properly
+
+	* configure.ac: add -DENABLE_NLS
+
+	* kernel/parse.c: more using of new token struct
+
+	* kernel/parse.c: use new token structs. free token lists.
+
+	* kernel/parse.c, kernel/parse.h, kernel/parse.y:
+	attempting to parse lists
+
+	* README.CVS: reflect the current requirements for building/using cvs
+
+2003-04-03  xor@zed  <xor@zed>
+
+	* kernel/parse.l: allow '-' in identifiers
+
+	* Makefile: engine builds
+
+	* Makefile: build the resistance/placement plugins
+
+	* kernel/parse.h: use the values from the yacc parser
+
+	* Makefile, kernel/.cvsignore, kernel/parse.y:
+	more build fixes, calling the other makefiles instead of including them
+
+	* kernel/parse.y: try accomidate more versions of bison
+
+	* .cvsignore, Makefile, kernel/.cvsignore, plugins/.cvsignore, plugins/placement/.cvsignore:
+	more build fixes
+
+	* configure.ac: use PACKAGE_FOO vars
+
+	* kernel/action.c: double break statements :) oops
+
+	* .cvsignore: add stuff that should be ignored at the toplevel
+
+	* bootstrap, install-sh: some build fixes
+
+	* .cvsignore, Makefile, Makefile.am, bootstrap, configure.ac, doc/.cvsignore, doc/Makefile.am, doc/doxygen/.cvsignore, doc/doxygen/Makefile.am, kernel/.cvsignore, kernel/Makefile, kernel/Makefile.am, kernel/openbox.c, kernel/parse.h, m4/openbox.m4, plugins/.cvsignore, plugins/Makefile, plugins/Makefile.am, plugins/keyboard/.cvsignore, plugins/keyboard/Makefile, plugins/keyboard/Makefile.am, plugins/mouse/.cvsignore, plugins/mouse/Makefile, plugins/mouse/Makefile.am, plugins/placement/.cvsignore, plugins/placement/Makefile, plugins/placement/Makefile.am, po/.cvsignore, render/.cvsignore, render/Makefile, render/Makefile.am, themes/.cvsignore, themes/Makefile.am:
+	new build system without automake
+
+	* data/.cvsignore, data/Makefile.am, data/README, data/README.menu, data/README.style, data/menu.in:
+	rm the data dir
+
+2003-04-02  xor@zed  <xor@zed>
+
+	* kernel/Makefile.am: BLEF HATE DIE
+
+	* kernel/Makefile.am: bison doesnt use y.tab.*
+
+	* configure.ac: use bison not yacc
+
+	* kernel/Makefile.am, kernel/parse.y, kernel/parse.yacc:
+	rename the parse.yacc to parse.y
+
+	* kernel/Makefile.am: make parse.h depend on y.tab.h
+
+	* kernel/parse.h, kernel/parse.l: this should seriously work
+
+	* kernel/parse.h, kernel/parse.yacc: undo that
+
+	* kernel/.cvsignore: ignore new lex/yacc gen'd files
+
+	* kernel/parse.h, kernel/parse.yacc:
+	don't include the y.tab.h inside the yacc file
+
+	* kernel/Makefile.am: add y.tab.h to the headers so the yacc shit runs
+
+	* kernel/Makefile.am: rm the generated files on clean
+
+	* kernel/Makefile.am: wrong .h for the make rule
+
+	* kernel/Makefile.am: deps the lex h on the c
+
+	* plugins/mouse/mouse.c:
+	make the drag threshold and double click time into rc options
+
+	* kernel/Makefile.am, kernel/config.c, kernel/config.h, kernel/cparse.l, kernel/openbox.c, kernel/parse.c, kernel/parse.h, kernel/parse.l, kernel/parse.yacc:
+	create a generic tokenizer/sectionizer for the config file. pass off the token to functions registered for each section to parse them further. some fixes for the engine irt font shadows, and fixed a bug with rendering the iconify button when it was not in the layout
+
+	* render/font.c: whitespace
+
+	* render/font.c: kill debug print
+
+	* render/font.c: use the tint properly for the shadow
+
+	* kernel/client.c: rm debug print
+
+	* render/render.c: will seg again
+
+	* render/render.c: stop copying. still segfault?
+
+	* render/render.c:
+	find the right offset in the source data for parent relative
+
+2003-04-02  manmower  <manmower@zed>
+
+	* render/render.c: let there be parentrelative
+
+2003-04-01  xor@zed  <xor@zed>
+
+	* TODO: more updates to current status
+
+2003-03-31  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouserc: add the Shade context to the comments
+
+	* kernel/client.c, kernel/client.h, plugins/mouse/mouserc:
+	add a shaded button
+
+	* TODO: add some current states
+
+	* plugins/resistance.c: dont resist to windows which we're not touching
+
+	* kernel/client.c:
+	only disallow shading when the function is not enabled, dont disallow unshading
+
+	* plugins/mouse/mouse.c:
+	use the client's size instead of the frames size so the real size is used, not the size of the frame (avoids shaded window problem)
+
+	* kernel/action.c: disallow resizing of windows which are shaded
+
+	* plugins/mouse/mouse.c: unser drag_used when drag is unset too
+
+	* plugins/mouse/mouse.c: add a space where it belongs
+
+	* plugins/mouse/mouse.c:
+	make realeases fire releases instead of presses. make drags prevent clicks only if there is something bound to the drag.
+
+	* plugins/keyboard/keysrc: no drag events for keysrc..
+
+	* kernel/client.c:
+	use the frame's position in the maximize function since they're converted to the client coords before getting to client_configure
+
+	* kernel/frame.c:
+	was not using the pointer properly. leaving the value untouched
+
+	* kernel/client.c:
+	set fullscreen and max positions properly for all gravities
+
+	* kernel/focus.c: rm a no-longer-valid comment
+
+	* kernel/event.c:
+	yet more haxes to make focus events work the way i want. this is rough shit.
+
+	* plugins/resistance.c:
+	extraneous ! causing resistance to be snapping in one case. rm a debug print
+
+2003-03-30  xor@zed  <xor@zed>
+
+	* render/font.c: use 'sans' as the fallback font instead of 'fixed'
+
+	* kernel/event.c, kernel/focus.c:
+	yet more focus fixings. RevertToPointerRoot could mess things up focusing a client and us ignoring the FocusIn of Pointer type. this is all handled now.
+
+2003-03-29  xor@zed  <xor@zed>
+
+	* kernel/action.c, kernel/action.h:
+	make SendToDesktop action work right, give the option of following
+
+	* render/mask.c, render/mask.h, render/render.h:
+	add pixmap_mask_copy, and add the data to the mask struct, since it is needed for allowing copies
+
+	* plugins/keyboard/keysrc:
+	better decribe bindings and list all the modifiers, was missing shift/control
+
+	* plugins/keyboard/keysrc:
+	add SendToDesktop to the comments. fix the type calling the Desktop action Desktops
+
+	* plugins/keyboard/keysrc.yacc: use the number for sendtodesktop
+
+	* kernel/action.c, kernel/action.h: rm a redundant actiondata struct
+
+	* kernel/menu.c: no //'s plz
+
+	* kernel/action.c: translate sendtodesktop actions
+
+	* plugins/resistance.c: use the top when snapping to the top
+
+	* kernel/openbox.c: create the dirs for themes in ~/.openbox on startup
+
+2003-03-29  woodblock  <woodblock@zed>
+
+	* tests/Makefile: Add include path
+
+2003-03-29  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouserc: add focusing if clicked on the grips
+
+	* plugins/resistance.c:
+	use the bottom of the screen for botom snapping! :)
+
+2003-03-29  woodblock  <woodblock@zed>
+
+	* kernel/Makefile.am, kernel/action.c, kernel/action.h, kernel/menu.c, kernel/menu.h:
+	Menu data structures basically completed.
+	Need the engine support still, parser, and controllers.
+
+2003-03-29  xor@zed  <xor@zed>
+
+	* plugins/keyboard/keysrc.yacc: rm the extra ;
+
+	* kernel/action.c, kernel/action.h, plugins/keyboard/keysrc, plugins/mouse/mouserc:
+	add unshaderaise and shadelower actions from Mikachu
+
+	* kernel/xerror.c, kernel/xerror.h: add a var to track errors
+
+	* kernel/grab.c: don't die when someone else has a key grabbed
+
+2003-03-28  xor@zed  <xor@zed>
+
+	* plugins/keyboard/keysrc, plugins/mouse/mouserc: add ToggleDecorations
+
+	* kernel/action.c, kernel/client.c, kernel/client.h:
+	rm client_disable_decorations.. it already had an action.
+	add the action to the action_from_string func
+
+	* kernel/client.c, kernel/client.h: add client_disable_decorations
+
+	* kernel/client.c:
+	onlt raise the window when sending to a desktop it wasnt already on
+
+	* kernel/event.c:
+	FocusOut's are NOT ignored. thats bullshit. fixing comment.
+
+	* kernel/event.c:
+	focus... works...? i have all cases of mozilla working, with RevertToPointerRoot sucking ass but.. working now.
+
+	* kernel/client.c:
+	RevertToPointerRoot is the worse error case, so use it always
+
+	* kernel/event.c: comment why NotifyAncestor is not ignored
+
+	* kernel/event.c:
+	yet MORE focus events reworkings. mozilla behaves now too. woot
+
+	* kernel/client.c: make the value boolean
+
+	* kernel/event.c:
+	more focus cleanups. ignored focusin's were not working right recursively.
+	also, when the focusin coming later is not for a valid window the fallback would not be called. both fixed.
+
+	* plugins/resistance.c: round down for size increments
+
+	* kernel/action.c, kernel/dispatch.c, kernel/dispatch.h:
+	add resizing event
+
+	* plugins/resistance.c:
+	resize resistance. size incs will fuck with it yet though.
+
+	* plugins/mouse/mouse.c: set lbutton from clicks
+
+	* plugins/mouse/mouse.c: rm debug prints
+
+	* kernel/client.c:
+	was not moving the window between desktop focus lists sometimes. bad news. now i always do. yay!
+
+	* kernel/focus.c: killa  debug print
+
+	* kernel/focus.c:
+	handle better the case of choosing the window to focus but it is already focused when switching desktops
+
+	* kernel/client.h: comment the new parameter
+
+	* kernel/action.c, kernel/client.c, kernel/client.h, kernel/event.c, kernel/screen.c:
+	let a window be 'moved' to a new desktop without actually show/hiding it. useful for sending a window when following it, so theres no flash/flicker
+
+	* kernel/stacking.c: oops that worked before i borked it bad
+
+	* kernel/stacking.c: frame is a pointer
+
+	* kernel/stacking.c: dont die if a non-visible window is raised/lowered
+
+	* plugins/mouse/mouse.c: take borders into account for figuring clicks
+
+	* kernel/geom.h: make better?
+
+	* kernel/focus.c: sync after focusing
+
+	* kernel/geom.h: make these things one 'command' without braces
+
+2003-03-28  manmower  <manmower@zed>
+
+	* render/render.c, render/render.h, render/test.c:
+	moved paint's arguments into the appearance struct
+
+2003-03-28  xor@zed  <xor@zed>
+
+	* kernel/stacking.c: dont lower below lower layers
+
+	* kernel/client.c:
+	use the struts to size the window correctly for maximized windows
+
+	* kernel/client.c: read struts properly
+
+2003-03-28  manmower  <manmower@zed>
+
+	* render/render.c, render/render.h: fix draw order in x_paint
+
+	* render/render.c: black.  not white.  oops
+
+	* render/render.c: black for parentrelative so we can test icons
+
+2003-03-28  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouserc: focus on middle click on client
+
+	* kernel/plugin.c: skip better
+
+	* kernel/plugin.c: skip comments and empty lines
+
+	* kernel/client.c:
+	only use the initial_state shit when NOT starting and when managing the window
+
+	* kernel/focus.c:
+	rm a bunch of prints. make switching to an empty desktop not kill focus
+
+	* kernel/event.c: dont focus !normal windows on enter events
+
+	* plugins/mouse/mouserc: add send-tos with the mouse wheel
+
+	* plugins/Makefile.am: focus plugin is gone
+
+	* kernel/client.c: mor fabulous focus fixings.
+	RevertToNone so that when the fallback stuff goes the window wont already have focus cuz it has the pointer in to
+
+	* kernel/event.c: fallback focus in superior fashion
+
+	* kernel/focus.c: better var naming
+
+	* kernel/focus.c:
+	dont rm focus when i actually found something to fall back to with the pointer
+
+2003-03-27  xor@zed  <xor@zed>
+
+	* kernel/event.c: watch for FocusIn's for unknown clients
+
+	* kernel/plugin.c: rm the focus plugin
+
+2003-03-27  manmower  <manmower@zed>
+
+	* render/render.h: prep for parentrelative
+
+2003-03-27  xor@zed  <xor@zed>
+
+	* kernel/event.c: missed the end of a comment
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/event.h:
+	handle focus in the kernel, no more plugin
+
+	* kernel/focus.c, kernel/focus.h: add code to fallback focus
+
+	* kernel/screen.c: focus a window on desktop switch
+
+	* plugins/Makefile.am, plugins/focus.c: rm the focus plugin
+
+	* kernel/config.c: add focus options
+
+	* kernel/event.c:
+	set the last time to CurrentTime for events that don't have time stamps
+
+	* kernel/client.c: rm debug print
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/event.c, kernel/event.h, kernel/focus.c, kernel/grab.c, kernel/keyboard.c, kernel/keyboard.h, kernel/pointer.c, kernel/pointer.h, plugins/keyboard/keyboard.c, plugins/mouse/mouse.c:
+	not using CurrentTime anywhere
+
+	* kernel/grab.c, plugins/keyboard/keyboard.c: use CurrentTime again?
+
+	* plugins/keyboard/keyboard.c: bind C-g for the rset key
+
+	* kernel/grab.c: ungrab with currenttime
+
+	* kernel/focus.c:
+	use the last event timestamp when focusing the focus_backup
+
+	* plugins/keyboard/keysrc.l: negatives that work!
+
+	* plugins/keyboard/keysrc: document the options
+
+	* plugins/keyboard/keysrc.l: better negatives
+
+	* plugins/keyboard/keysrc.l: allow negative numbers
+
+	* plugins/keyboard/keysrc.yacc: was reversing the keylist
+
+	* plugins/keyboard/keysrc.yacc:
+	subtract 1 from the given desktop number
+
+	* plugins/keyboard/keysrc.l: make parsing more generic
+
+	* plugins/keyboard/keysrc.yacc: free unused paths
+
+	* plugins/keyboard/keysrc.yacc: split up the relative functions.
+	make the parsing more generic, anything can have a string/numeric argument
+
+	* plugins/keyboard/keyboard.c: remove an extraneous g_warning
+
+	* plugins/mouse/mouserc_parse.l: split the relative functions
+
+	* plugins/keyboard/translate.c: check for invalid keys properly
+
+	* kernel/action.h:
+	comment that the relative move/resize amounts need to be set
+
+	* kernel/action.c, kernel/action.h:
+	split up the relative move/resize actions into horz/vert
+
+	* kernel/action.c, kernel/action.h: create actions from string names
+
+	* plugins/keyboard/.cvsignore, plugins/keyboard/Makefile.am, plugins/keyboard/keyboard.c, plugins/keyboard/keyboard.h, plugins/keyboard/keysrc, plugins/keyboard/keysrc.h, plugins/keyboard/keysrc.l, plugins/keyboard/keysrc.yacc, plugins/keyboard/tree.c:
+	load keybindings from keysrc
+
+	* plugins/mouse/mouserc: add exit/restart.
+	clarify which can be used for drag events
+
+	* plugins/mouse/mouserc_parse.l:
+	dont let bind to actionexecute or desktop cuz they require a parameter
+
+	* plugins/mouse/mouserc_parse.l: dont let bind to actiondesktop
+
+	* plugins/mouse/mouserc_parse.l: use the action_from_string helper
+
+	* kernel/action.c: let a be null for action_free
+
+	* kernel/cparse.l: use g_warning not printf
+
+	* plugins/mouse/mouserc_parse.l:
+	properly restrict bindings for motion events
+
+	* plugins/mouse/mouserc_parse.l: even beter
+
+	* plugins/mouse/mouserc_parse.l: better comment parsing
+
+	* plugins/mouse/mouserc_parse.l: sep is not used any more
+
+	* plugins/mouse/mouserc_parse.l: fix comment parsing
+
+	* plugins/mouse/mouserc_parse.l: dont set fields if in a comment
+
+	* kernel/client.c: kill the prints again for now
+
+	* plugins/mouse/Makefile.am: rm the lex .c on clean
+
+	* kernel/xerror.c: dont print bad window errors
+
+	* kernel/client.c, kernel/grab.c: put back map/unmap msgs
+
+	* configure.ac: look for yacc
+
+	* plugins/mouse/mouserc_parse.l: fields must not start or end with '-'
+
+	* kernel/event.c: dont let you got to numdesktops+1
+
+	* kernel/screen.c: rm the debug print
+
+	* kernel/event.c: kill debug prints
+
+	* plugins/keyboard/keyboard.c:
+	XAllowEvents with a timestamp, otherwise we end up with a grab in place that we dont want
+
+	* kernel/client.c: oops
+
+	* kernel/client.c: rm some debug prints
+
+	* kernel/event.c: use ungrab enter events
+
+2003-03-26  manmower  <manmower@zed>
+
+	* render/render.c: add rgba icon support
+
+	* render/image.c, render/image.h: rgba icon rendering
+
+	* render/Makefile.am: add image.c to the build process
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/client.h: use rgba icons for clients
+
+2003-03-26  manmower  <manmower@zed>
+
+	* render/render.h: added "NoTexture" type
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouserc: document the options
+
+	* plugins/mouse/mouserc_parse.l: only let bind Move and Resize to Drags
+
+	* plugins/mouse/.cvsignore, plugins/mouse/mouserc, plugins/mouse/mouserc_parse.l:
+	add the lexer
+
+	* kernel/action.c: check for no client
+
+2003-03-26  manmower  <manmower@zed>
+
+	* render/render.h: filled out rgba
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* plugins/mouse/Makefile.am, plugins/mouse/mouse.c, plugins/mouse/mouse.h, plugins/mouse/mouserc, plugins/mouse/mouserc_parse.c, plugins/mouse/mouserc_parse.h:
+	parse a mouserc file for mouse bindings
+
+	* plugins/mouse/.cvsignore: add new parsing shit
+
+	* kernel/.cvsignore: new output file from flex
+
+	* .cvsignore: wrong place
+
+	* .cvsignore, kernel/Makefile.am, kernel/cparse.l:
+	usnig flex directly, renaming symbols so that theres no clash with other lexers
+
+	* configure.ac: look for flex
+
+	* kernel/action.c: free the string for action_restart too
+
+2003-03-26  manmower  <manmower@zed>
+
+	* render/font.c, render/font.h, render/mask.c, render/mask.h, render/render.c:
+	add a Rect to the textures for positioning them
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* kernel/plugin.c: print a warning when a module fails to open
+
+2003-03-26  manmower  <manmower@zed>
+
+	* render/render.h: include appropriate header file for Rect
+
+	* render/render.h: added position to the textures
+
+2003-03-26  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouse.c: strdown the context name
+
+	* plugins/mouse/translate.c:
+	use names for mouse buttons, all case insensitive
+
+	* plugins/keyboard/translate.c: case insensitive
+
+2003-03-25  xor@zed  <xor@zed>
+
+	* kernel/event.c: dont change desktop when its out of range
+
+	* plugins/keyboard/keyboard.h, plugins/keyboard/tree.h:
+	move the def'n of the KeyBindingTree
+
+	* plugins/mouse/mouse.c:
+	presses work when clicks dont on the frame around the titlebar..
+
+	* plugins/keyboard/translate.c, plugins/mouse/translate.c:
+	translate "Control" and "Shift" for modifiers too
+
+	* render/font.c: bettr font alignment, i think
+
+	* plugins/keyboard/keyboard.c: i fucked that one up
+
+	* plugins/resistance.c: add 'corner snapping' resistance
+
+	* kernel/event.c: typo
+
+	* kernel/event.c: dont accept MapRequest's for !iconic windows
+
+	* kernel/client.c:
+	clarify using stacking_lower for restoring the stacking order
+
+	* kernel/client.c: free the startup stacking order after using it
+
+	* kernel/client.c:
+	read in the stacking order on startup, and use it to restore windows back to the order they were in before
+
+	* kernel/stacking.c:
+	dont change the stacking order hint while shuting down
+
+2003-03-24  xor@zed  <xor@zed>
+
+	* kernel/menu.h: add action.h for menu entries
+
+	* kernel/menu.h: you cant reference yourself as a type
+
+	* kernel/client.c, kernel/event.c: use g_hash_table properly
+
+2003-03-24  woodblock  <woodblock@zed>
+
+	* kernel/menu.c, kernel/menu.h: Added some menu structure.
+
+2003-03-24  xor@zed  <xor@zed>
+
+	* kernel/client.c:
+	make sure the ConfigureNotify is propogated even when there is no change
+
+	* kernel/client.c:
+	always send the event on a final configure even if there was no real move
+
+	* kernel/client.c:
+	make sure windows which cant be moved or resized also can't be fullscreened
+
+	* kernel/client.c: only configure the engine if something changed
+
+	* kernel/client.c, kernel/event.c:
+	only perform the actions necessary when performing an engine_adjust_area. pass whether the client has moved or resized
+
+	* kernel/event.c: double ptrs suck! yay shape!
+
+	* kernel/event.c: handle shape events
+
+	* kernel/action.c: dont move/resize !normal windows
+
+	* kernel/event.c: kill debug prints
+
+	* kernel/client.c: kill debug print
+
+	* kernel/client.c, kernel/client.h, kernel/dispatch.h, kernel/event.c, kernel/focus.c:
+	more focus improvements. everything seems to work!
+
+	* kernel/event.h: Time is declared in Xlib.h
+
+	* kernel/openbox.c: not.
+
+	* kernel/openbox.c: focus seems to work when not remote too now
+
+	* kernel/event.c, kernel/openbox.c:
+	more focus fixes. i wish this could end.
+
+	* kernel/client.c: no \n in g_message
+
+	* kernel/action.c, kernel/action.h: add restart and exit actions
+
+2003-03-23  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/client.h, kernel/event.c:
+	yet more improvements to focus handling
+
+	* render/test.c: gl aint used yet
+
+	* plugins/resistance.c: export config values
+
+	* plugins/focus.c, plugins/placement/placement.c: dont need the bool
+
+	* plugins/focus.c: typo
+
+	* plugins/placement/placement.c: make history placement optional
+
+	* plugins/focus.c: export its options and use them from the rc file
+
+	* plugins/mouse/mouse.c: raise AND focus
+
+	* plugins/focus.c: export focus options to the rc file
+
+	* render/font.c: seems to be better text placement than ever
+
+	* render/font.c:
+	found what seems to be a better vertical offset for the fonts
+
+	* kernel/stacking.c: compare it to null like i do elsewhere
+
+	* kernel/client.c: code optimization
+
+	* kernel/client.c:
+	when adjusting the trasient lists, set them, dont leave them hanging into space
+
+	* kernel/client.c: whitespace
+
+	* kernel/dispatch.c: use gnew0 to make life easy
+
+	* kernel/plugin.c: use the plugins' plugin_setup_config function
+
+	* render/gradient.c: dont render gradients that are missing
+
+	* plugins/focus.c, plugins/keyboard/keyboard.c, plugins/mouse/mouse.c, plugins/placement/placement.c, plugins/resistance.c:
+	add the plugin_setup_config function
+
+	* kernel/event.c: kill debug print
+
+	* kernel/event.c: handle multiple maprequests graciously
+
+	* kernel/screen.c: oops
+
+	* kernel/screen.c:
+	move windows when the number of desktops changes and they arent on a desktop anymore
+
+	* kernel/focus.c:
+	set focus_order back to null on shutdown so g_renew would work
+
+	* render/render.c: add more size checks
+
+2003-03-23  woodblock  <woodblock@zed>
+
+	* CHANGELOG:
+	Fix a bug that would put duplicate windows in the workspace menu.
+
+2003-03-23  xor@zed  <xor@zed>
+
+	* kernel/openbox.c, kernel/themerc.c, kernel/themerc.h:
+	rm the themerc stuff
+
+	* kernel/Makefile.am: rm themerc.[ch]
+
+	* kernel/config.c, kernel/cparse.l: better parsing errors
+
+	* kernel/config.c, kernel/config.h: add booleans
+
+	* kernel/cparse.l: properly parse comments!
+	parse booleans
+
+	* render/gradient.c: no \n in g_message
+
+	* kernel/config.c, kernel/config.h:
+	add descriptive names and long descriptions to config var def'ns. set these for the kernel config options.
+
+2003-03-22  xor@zed  <xor@zed>
+
+	* kernel/config.c, kernel/engine.c, kernel/openbox.c, kernel/plugin.c, kernel/plugin.h:
+	make the openbox engine use the new config shit instead of the themerc shit.
+	order te startup so that plugins can set up their config shit before parsing the config, then the config is parsed, engine is loaded, and finally the plugins are officially started.
+
+	* kernel/config.c: only load the system rc if the user rc didnt load
+
+	* kernel/config.c, kernel/engine.c, kernel/engine.h, kernel/openbox.c:
+	load the engine out of the config shit. tho the ordering is fucked atm
+
+	* kernel/cparse.l: parse lines that start with '#' as comments
+
+	* kernel/cparse.l: let identifiers have '.' in them
+
+	* kernel/config.c, kernel/cparse.l:
+	give the filename to the parser for errors
+
+	* kernel/cparse.l: remove debug print
+
+	* kernel/config.c: yah. fuck
+
+	* kernel/config.c: add a check for adding the same exact def'n twice
+
+	* kernel/Makefile.am, kernel/config.c, kernel/config.h:
+	config system fleshed out. many thanks to woodlbock for his code! yay!
+
+	* configure.ac: add const and inline checks for the compiler
+
+	* kernel/.cvsignore: ignore cparse.c
+
+	* kernel/cparse.c: didnt belong
+
+	* kernel/Makefile.am, kernel/config.c, kernel/config.h, kernel/cparse.c, kernel/cparse.l, kernel/openbox.c:
+	start the config system, add the config file parser
+
+	* configure.ac: check for stdio.h
+
+	* kernel/client.c: asserts in unmanage to try track a crash
+
+	* kernel/screen.c: blef
+
+	* kernel/action.c, kernel/action.h, kernel/client.c, kernel/client.h, plugins/mouse/mouse.c:
+	add the client_kill function, and the kill action, and bind it to the middle mouse button on the close button.
+
+	* plugins/placement/history.c, plugins/placement/placement.c:
+	history placement works. loads. saves. woot.
+
+	* configure.ac: look for sys/stat.h
+
+	* kernel/openbox.c: make the ~/.openbox dir on startup
+
+2003-03-22  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Bug fixes from 2_4. Merge point tag 2_4-to-2_3-03-21-2003.
+
+2003-03-22  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/client.h:
+	rename the res_name and res_class members to name and class
+
+2003-03-22  woodblock  <woodblock@zed>
+
+	* CHANGELOG:
+	Fixed some more menu lamity, and the infamous xmms focus crash. wunf.
+
+2003-03-21  xor@zed  <xor@zed>
+
+	* plugins/mouse/mouse.c: dont raise on client clicks
+
+	* data/Makefile.am, data/menu.in: use $(datadir)
+
+	* data/Makefile.am: install the menu in $(datadir)
+	build from $(srcdir)/menu.in
+
+	* data/Makefile.am: use the SED command
+
+	* kernel/event.c, kernel/openbox.c, kernel/plugin.c, kernel/timer.c, m4/openbox.m4, render/color.c, render/font.c, render/mask.c, render/render.c, render/test.c:
+	add strict ansi compliance
+
+	* configure.ac: find sed
+
+	* configure.ac: clean up configure.ac a bit
+
+	* configure.ac: rm the c/Makefile
+
+	* configure.ac: look for kernel/openbox.c instead of src/main.cc
+
+	* render/font.c: include gettext.h from the right place
+
+	* kernel/.cvsignore: ignore the openbox3 binary
+
+	* kernel/Makefile.am: build 'openbox3' instead of 'ob3'
+
+	* kernel/Makefile.am: build the binary called 'openbox3'
+
+	* tools/.cvsignore, tools/Makefile.am, tools/obsetroot.cc:
+	rm the obsetroot tool and the wrap shit from swig
+
+	* kernel/client.c, kernel/engine.c, kernel/engine.h:
+	always adjust the frames size and position together, so there is no more weird resizing before moving and edge flickering when resizing from the top/left
+
+	* kernel/screen.c:
+	dont focus anything in the kernel from showing-the-desktop mode
+
+	* plugins/focus.c:
+	focus windows when entering/leaving enter-the-desktop mode
+
+	* plugins/keyboard/keyboard.c: add an xlock binding
+
+	* kernel/dispatch.h: better comment for Event_Client_Moving
+
+	* kernel/openbox.c: choke on invalid options on the cmd line
+
+	* kernel/client.c: dont check for != NULL before freeing. pointless.
+
+	* kernel/screen.c: don't check for != NULL before freeing. pointless
+
+	* kernel/screen.c: defn vars at the top of funcs
+
+	* plugins/placement/placement.c:
+	dont reposition windows who know what they want
+
+	* kernel/client.c, kernel/client.h:
+	add the client_set_focused function.
+	make focus state be changed internally immediately after calling the X functions to make it so, basically, assume their success. this elimiates races all over the place with our state vs the server's state.
+
+	* kernel/event.c:
+	use the client_set_focused function when getting FocusIn/Out events
+
+	* kernel/focus.c: init the focus_client ptr in startup
+
+	* plugins/focus.c: dont focus !normal clients under the mouse
+
+	* kernel/screen.c: dont use the client's colormap if it is set to None!
+
+	* kernel/Makefile.am, kernel/action.c, kernel/dispatch.c, kernel/dispatch.h, kernel/openbox.c, kernel/snap.c, kernel/snap.h:
+	add a dispatched event for interactively moving a window.
+	move window snapping/resistance out of the kernel.
+	make the action_move dispatch the new event.
+
+	* plugins/resistance.c: rm debug print
+
+	* plugins/resistance.c: optimization!
+
+	* plugins/resistance.c: syntax error!
+
+	* plugins/resistance.c: don't snap to non-visibles
+
+	* plugins/resistance.c: dont snap to self
+
+	* plugins/resistance.c:
+	rm the edge_resistance option.. just dont load the plugin!
+
+	* plugins/focus.c, plugins/placement/placement.c:
+	make the event function static!
+
+	* plugins/Makefile.am, plugins/.cvsignore, plugins/resistance.c:
+	add a window resistance plugin
+
+	* plugins/placement/placement.c: rename event() to place_event()
+
+	* kernel/snap.c: snap window-to-window
+
+	* plugins/focus.c: focus new windows
+
+	* plugins/focus.c: rm debug prints
+
+	* kernel/event.c: rm debug print
+
+	* kernel/client.c: rm debug prints
+
+	* kernel/client.c, kernel/client.h, plugins/focus.c:
+	rm the focused member from the client struct, it was redundant with the focus_client variable around
+
+	* kernel/event.c: update engine last for focus events
+
+	* plugins/placement/.cvsignore, plugins/placement/Makefile.am, plugins/placement/history.c, plugins/placement/history.h:
+	set up the history place stuff's files
+
+	* plugins/placement/placement.c: start and stop the history plugin
+
+	* kernel/openbox.c:
+	dont set the restart path to "", load the placement plugin
+
+	* plugins/focus.c: dont skip enter events
+
+	* .cvsignore, configure.ac, kernel/openbox.c, plugins/Makefile.am, plugins/placement/.cvsignore, plugins/placement/Makefile.am, plugins/placement/placement.c:
+	add a window placement plugin
+
+2003-03-21  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Document unexpandTilde()
+
+	* CHANGELOG: Support _NET_WM_STATE_FULLSCREEN
+
+	* CHANGELOG: We'll call it 2.4, I guess.
+
+	* CHANGELOG: Display titles in the workspace menu as UTF8.
+
+2003-03-20  xor@zed  <xor@zed>
+
+	* plugins/focus.c: disable warping on desk switch
+
+	* plugins/focus.c: skip events more smarter
+
+	* plugins/focus.c: kill all enter events on a desktop switch
+
+	* kernel/screen.c: show windows before hiding when switching desktops
+
+	* plugins/keyboard/keyboard.c: alt bindings
+
+	* plugins/focus.c: skipping the right number of enters now i think
+
+	* plugins/focus.c:
+	skip all enter events for now.. need a clever tactic for this..
+
+	* kernel/openbox.c, kernel/openbox.h:
+	add -help -version -sync and -rc cmd line options
+
+	* kernel/Makefile.am: add the binary and urls to the Makefile and -D's
+
+	* kernel/geom.h: add RECT_CONTAINS
+
+	* kernel/client.c, kernel/client.h:
+	save decor and functions per client for fullscreening!
+
+	* kernel/client.c:
+	lock the size/position of maximized and fullscreen clients
+
+	* plugins/focus.c:
+	fallback super intelligently with focus when the focused
+
+	* kernel/client.c: lock the position/size of maximized windows
+
+	* kernel/openbox.c: restart and catch errors appropriately
+
+	* kernel/action.c: init the GError to NULL
+
+	* kernel/openbox.c: can restart now
+
+2003-03-19  manmower  <manmower@zed>
+
+	* render/color.c, render/color.h, render/render.c, render/render.h:
+	added depth reduction and startup for true color visuals
+	16bpp should now work
+
+2003-03-19  xor@zed  <xor@zed>
+
+	* kernel/openbox.c: restart will work soon
+
+	* kernel/client.c: no \n in g_messages
+
+	* kernel/event.c: MapRequest needs to activate the window
+
+	* plugins/mouse/mouse.c:
+	dont raise the window on a titlebar drag either
+
+	* plugins/mouse/mouse.c: add a drag threshold
+
+	* kernel/action.c: snap windows when moving them
+
+	* kernel/Makefile.am, kernel/snap.c, kernel/snap.h:
+	add code for snapping windows to screen edges
+
+	* plugins/keyboard/keyboard.c, plugins/mouse/mouse.c:
+	use the grab.h funcs to grab keys and buttons
+
+	* kernel/grab.h: add funcs to grab buttons and keys
+
+	* kernel/event.h: export the NumLock and ScrollLock masks
+
+	* kernel/event.c: dont need a mask_list here
+
+	* kernel/grab.c: grab all lock keys
+
+	* plugins/mouse/mouse.c: fewer context lookups
+
+	* kernel/event.c: break, dont return
+
+	* kernel/event.c: add code to make net_active_window events work
+
+	* kernel/action.c, kernel/action.h: add focusraise
+
+	* plugins/mouse/mouse.c:
+	add click on client binding. XAllow when clicking on the client
+
+	* kernel/screen.c: put the comment where it belongs
+
+	* kernel/screen.c:
+	on shutdown: destroy the net support window. clear a few more properties we dont want across restart. select NoEventMask on root.
+
+	* kernel/focus.c: oops
+
+	* kernel/focus.c: destroy the focus_backup
+
+	* kernel/screen.c:
+	erase the openbox_pid hint on the root window when we shutdown
+
+	* plugins/focus.c, plugins/mouse/mouse.c:
+	all the old ob2 mouse bindings are workin
+
+	* plugins/mouse/mouse.c: add mbinds for shading windows on the titlebar
+
+	* kernel/event.c: ignore !normal crossing events
+
+	* plugins/focus.c: simply out the events we dont need no more
+
+	* render/render.c: free the right pixel data yay!
+
+	* render/render.c: free the pixel data
+
+	* kernel/screen.c:
+	start with 0 desktops, so the focus_order stuff all gets initialized properly
+
+	* kernel/focus.c:
+	the focus_order shit is init'd by the screen_startup setting the number of desktops
+
+	* kernel/openbox.c: shutdown everything before closing the display
+
+	* render/render.c: can fit on one line
+
+	* render/render.c:
+	initialize texture to NULL if theres no textures. use g_memdup to copy it
+
+	* kernel/dispatch.c: comment what funcs is
+
+	* kernel/themerc.c: close the channel by unref'ing it
+
+	* render/font.c:
+	kill the const, use g_new instead of malloc, g_free the font in font_close()
+
+	* render/font.h: kill the const
+
+	* render/font.c: clean up comments regarding alpha
+
+	* kernel/client.c:
+	rm the comments pointer bindings stuff, thats in a plugin now
+
+	* kernel/client.c: add new windows to the back of the focus order list
+
+	* kernel/client.c, kernel/dispatch.h, kernel/focus.c, kernel/focus.h, kernel/openbox.c, kernel/screen.c, plugins/focus.c:
+	move the focus_order lists into the kernel
+
+	* kernel/action.c, kernel/action.h: add focus actions
+
+	* plugins/focus.c: add sloppy focus
+
+	* plugins/mouse/mouse.c: end drags
+
+	* plugins/mouse/mouse.c: dont clean up nulls
+
+	* plugins/keyboard/keyaction.c, plugins/keyboard/keyaction.h:
+	not using the KeyAction stuff no more
+
+	* kernel/action.c, kernel/action.h, kernel/grab.c, plugins/keyboard/Makefile.am, plugins/keyboard/keyboard.c, plugins/keyboard/keyboard.h, plugins/keyboard/translate.c, plugins/keyboard/translate.h, plugins/keyboard/tree.c, plugins/mouse/.cvsignore, plugins/mouse/Makefile.am, plugins/mouse/mouse.c, plugins/mouse/mouse.h, plugins/mouse/translate.c, plugins/mouse/translate.h:
+	mouse and key bindings plugins work. segfault somewhere still on shutdown
+
+	* kernel/openbox.c: reset focus to root before exiting
+
+2003-03-18  xor@zed  <xor@zed>
+
+	* plugins/.cvsignore: ignore shit
+
+	* configure.ac, plugins/mouse/.cvsignore, plugins/mouse/Makefile.am, plugins/mouse/mouse.c:
+	add the mouse plugin
+
+	* plugins/keyboard/keyboard.c: grab the keyboard not the server!
+
+	* plugins/keyboard/keyboard.c: use the grab_server function
+
+	* kernel/client.c, kernel/grab.c, kernel/grab.h:
+	add 'grab_server' for grabbing .. the .. server!
+
+	* kernel/Makefile.am, kernel/grab.c, kernel/grab.h, kernel/openbox.c:
+	provide functions for grabbing and ungrabbing the keyboard and pointer
+
+	* plugins/Makefile.am: set the log domain for each plugin properly
+
+	* plugins/focus.c:
+	warp the pointer on a workspace change to the focused window
+
+	* kernel/focus.c: kill some whitespace
+
+	* kernel/focus.c: kill a comment
+
+	* plugins/focus.c: focus fallback works when nothing is focused
+
+	* kernel/event.c: dont set the focused client if it's already set
+
+	* kernel/focus.c: send the right client for unfocus events
+
+	* kernel/focus.c: send unfocus events after focus events
+
+	* plugins/Makefile.am: generic domain
+
+	* kernel/Makefile.am, kernel/action.c, kernel/action.h, kernel/client.c, kernel/keyboard.c, kernel/openbox.c, kernel/screen.h:
+	add actions for key/mouse bindings etc
+
+	* plugins/keyboard/.cvsignore: add the new objects
+
+	* plugins/keyboard/Makefile.am, plugins/keyboard/keyaction.c, plugins/keyboard/keyaction.h, plugins/keyboard/keyboard.c, plugins/keyboard/keyboard.h, plugins/keyboard/translate.c, plugins/keyboard/translate.h, plugins/keyboard/tree.c, plugins/keyboard/tree.h:
+	keyboard bindings are functional
+
+	* configure.ac: dont need process.h, yay glib
+
+	* configure.ac: add process.h
+
+	* plugins/.cvsignore, plugins/keyboard/.cvsignore: add cvsignores
+
+	* configure.ac, kernel/client.c, kernel/client.h, kernel/dispatch.c, kernel/dispatch.h, kernel/engine.c, kernel/focus.c, kernel/openbox.c, kernel/plugin.c, kernel/screen.c, plugins/Makefile.am, plugins/keyboard/Makefile.am, plugins/keyboard/keyboard.c:
+	add a keyboard plugin
+
+	* plugins/focus.c:
+	focus new windows and focus windows on workspace change
+
+	* kernel/Makefile.am, kernel/dispatch.c, kernel/dispatch.h, kernel/engine.c, kernel/engine.h, kernel/openbox.c, kernel/plugin.c, kernel/plugin.h, plugins/Makefile.am, plugins/focus.c:
+	plugins work.
+	start a focus plugin.
+
+2003-03-17  xor@zed  <xor@zed>
+
+	* render/font.c: dont put \n's at the end of g_message
+
+	* kernel/dispatch.c: make sure theres always a client for client events
+
+	* kernel/dispatch.h: oops missing a */
+
+	* kernel/dispatch.h: fix comments
+
+	* kernel/clientwrap.c, kernel/clientwrap.h, kernel/configwrap.c, kernel/configwrap.h, kernel/hooks.c, kernel/hooks.h, kernel/openboxwrap.c, kernel/openboxwrap.h, kernel/python.c, kernel/python.h:
+	rming almost all the old python stuffs
+
+	* kernel/client.c, kernel/dispatch.c, kernel/dispatch.h, kernel/event.c, kernel/focus.c, kernel/openbox.c, kernel/screen.c:
+	all events are dispatched
+
+	* render/font.c: kill the debug print
+
+	* plugins/Makefile.am: add the plugins dir
+
+	* Makefile.am, configure.ac, kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/dispatch.c, kernel/dispatch.h, kernel/event.c, kernel/focus.c, kernel/openbox.c:
+	stop using python internally. add an event dispatcher
+
+	* DESIGN/plugins_vs_scripting.txt: kill the timestamps
+
+	* DESIGN/plugins_vs_scripting.txt: my rant..
+
+	* render/font.c, render/font.h, render/render.c:
+	pass the x,y,w,h to font_draw.
+	draw the text in the "right" place for now.. no justification yet
+
+	* render/font.c, render/render.h:
+	measure the font's height instead of listening to Xft
+
+	* kernel/event.c: dont skip ungrab corssing events
+
+2003-03-17  manmower  <manmower@zed>
+
+	* render/gradient.c, render/gradient.h, render/render.c:
+	solids should now work with offsets
+
+	* render/render.c: more random pokery
+
+	* render/render.c: either offsets work, or I've broken lots of things.
+
+	* render/render.h, render/test.c:
+	more changes wrt passing x, y, w, h to render
+
+	* render/color.c, render/render.c, render/render.h:
+	paint gets more parameters
+
+	* render/render.h: apparently my variable names were too verbose.
+
+	* render/render.h: offsets in planar surfaces
+
+2003-03-17  xor@zed  <xor@zed>
+
+	* kernel/hooks.c: declare variables first!
+
+	* render/color.c: decalre variables before code!
+
+	* kernel/client.c, kernel/client.h:
+	make client_showhide a static function
+
+	* kernel/client.c, kernel/client.h, kernel/screen.c:
+	speed up workspace switching by causing the minimal number of expose events (none for the hiding windows!)
+
+	* kernel/engine.c, kernel/engine.h, kernel/event.c:
+	give engines mouse event notifications. make the openbox engine display pressed buttons
+
+2003-03-17  manmower  <manmower@zed>
+
+	* render/render.h: added justification to textureText
+
+2003-03-17  xor@zed  <xor@zed>
+
+	* kernel/themerc.c: pixmap button masks work (hardcoded)
+
+	* render/mask.h: dont need those includes no more
+
+2003-03-17  manmower  <manmower@zed>
+
+	* render/mask.c, render/mask.h, render/render.c:
+	in keeping with my tradition of committing untested code, here is the
+	pixmap mask rendering code ported from the old otk dirs
+
+	* render/mask.c, render/mask.h, render/render.h:
+	move pixmap_mask typedef
+	add stub for draw_mask
+
+2003-03-17  xor@zed  <xor@zed>
+
+	* render/mask.c, render/mask.h: add funcs to create/free pixmap_masks
+
+	* render/mask.h: add glib.h for guint
+
+	* render/mask.h: include Xlib.h for Pixmap
+
+	* render/Makefile.am: add mask.[ch]
+
+	* render/mask.c, render/mask.h, render/render.h:
+	add a struct for pixmap masks
+
+2003-03-17  manmower  <manmower@zed>
+
+	* render/render.c: hack so text shows up
+
+2003-03-17  xor@zed  <xor@zed>
+
+	* render/render.c:
+	dont delete the pixmap until after changeing the visible one
+
+2003-03-17  manmower  <manmower@zed>
+
+	* render/render.c: add missing include, pass right args to font_draw
+
+2003-03-16  manmower  <manmower@zed>
+
+	* render/render.c: malloc.  yeah.
+
+2003-03-16  xor@zed  <xor@zed>
+
+	* kernel/openbox.c: will draw fonts when stop segging
+
+2003-03-16  manmower  <manmower@zed>
+
+	* render/render.c: copy textures in appearance_copy
+
+	* render/render.c: try to render fonts
+	destroy pixmaps and xftdraws in appearance_delete
+
+	* render/render.h: font changes
+
+	* render/gradient.c: remove printf and stdio.h
+
+	* render/font.c: add font_draw
+
+	* render/font.h: add font_draw
+	move font def'n to render.h
+
+2003-03-16  xor@zed  <xor@zed>
+
+	* kernel/Makefile.am, kernel/configwrap.c, kernel/configwrap.h, kernel/openbox.c, kernel/pointer.c:
+	pointer's variables are config vars
+
+2003-03-16  manmower  <manmower@zed>
+
+	* render/Makefile.am: font.h and font.c
+
+	* kernel/openbox.c: added font_startup
+
+	* render/render.h: filled out font texture
+
+	* render/font.c, render/font.h: added some font stuff
+
+2003-03-16  xor@zed  <xor@zed>
+
+	* themes/.cvsignore, themes/Makefile.am, Makefile.am, README.CVS, bootstrap, configure.ac, doc/Makefile.am, doc/bsetbg.1, doc/bsetroot.1, doc/openbox.1.in, doc/themerc.txt, kernel/.cvsignore, kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/clientwrap.c, kernel/clientwrap.h, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/event.h, kernel/extensions.c, kernel/extensions.h, kernel/focus.c, kernel/focus.h, kernel/frame.c, kernel/frame.h, kernel/geom.h, kernel/gettext.h, kernel/hooks.c, kernel/hooks.h, kernel/keyboard.c, kernel/keyboard.h, kernel/openbox.c, kernel/openbox.h, kernel/openboxwrap.c, kernel/openboxwrap.h, kernel/pointer.c, kernel/pointer.h, kernel/prop.c, kernel/prop.h, kernel/python.c, kernel/python.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, kernel/stacking.h, kernel/themerc.c, kernel/themerc.h, kernel/timer.c, kernel/timer.h, kernel/xerror.c, kernel/xerror.h, m4/openbox.m4, m4/swig.m4, render/.cvsignore, render/Makefile.am, render/color.c, render/color.h, render/font.c, render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	merge the C branch into HEAD
+
+	* kernel/openboxwrap.c: add functions for next/previous workspace
+
+	* kernel/pointer.c: no segfault with the cleaner code
+
+	* kernel/pointer.c: clean up pointer_event a little
+
+2003-03-12  xor@zed  <xor@zed>
+
+	* kernel/keyboard.c, render/render.c: blef
+
+2003-03-11  xor@zed  <xor@zed>
+
+	* kernel/pointer.c:
+	fire off pointer events and grabbed events, make work withthe new bindings model
+
+2003-03-08  xor@zed  <xor@zed>
+
+	* kernel/keyboard.c: use glib TRUE/FALSE
+
+	* kernel/keyboard.c: new keyboard model (the old old one basically..)
+
+	* kernel/clientwrap.c: compare 2 clients properly
+
+	* kernel/clientwrap.c:
+	return False when comparing a client to another object type
+
+	* kernel/keyboard.c: pass a KeyboardData instead of just the chain
+
+	* kernel/keyboard.c: typo in the port to C
+
+	* kernel/clientwrap.c: add __eq__ to Client
+
+	* kernel/openboxwrap.c: check for desktops out of range
+
+	* kernel/client.c:
+	OMG KILL ME PLZ THAT WAS SO FUCKING STUPID YA LETS USE TRUE AS THE INDEX FUCK YES THATS SO FUCKING BRILLIANT I THINK A MUTINY IS IN ORDER NOW
+
+	* kernel/openbox.c: must use a tuple for the argument list
+
+	* kernel/clientwrap.c: add the maximized() setMaximized() funcs
+
+	* kernel/pointer.c: add the drag threshold
+
+	* kernel/clientwrap.c: add Client.close()
+
+	* kernel/client.c: keep clients in the right range of desktops
+
+	* kernel/client.c: kill debug prints
+
+	* kernel/client.c: client_validate should return TRUE sometimes@!(
+
+	* kernel/event.c: *** empty log message ***
+
+	* kernel/client.c:
+	position the maximized window so that its client's left edge is at the edge of the screen
+
+	* kernel/client.c:
+	dont resize the client window unless its size changed
+
+	* kernel/client.c: dont resize the frame when not needed
+
+2003-03-08  manmower  <manmower@zed>
+
+	* render/render.c, render/test.c: solid.
+
+2003-03-08  xor@zed  <xor@zed>
+
+	* kernel/openbox.c: start render before the engine
+
+2003-03-08  manmower  <manmower@zed>
+
+	* render/gradient.c, render/render.c, render/render.h:
+	hopefuly pixmap management is improved.
+
+	* render/render.c: appearance_copy needs to copy the whole appearance.
+
+	* render/render.c: copy the original.  ugh
+
+	* render/gradient.c, render/render.c:
+	fix appearance_copy (check for null colors)
+
+	* render/gradient.c, render/render.c, render/render.h:
+	removed interlace_color
+	added appearance_copy
+
+	* render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	removed w,h from surface struct
+	it is now passed with paint()
+
+2003-03-08  xor@zed  <xor@zed>
+
+	* kernel/geom.h: kill an assert.h include
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/render.c: only free it if I allocated it!
+
+	* render/render.c: still retarded
+
+	* render/render.c, render/test.c: I hate being retarded
+
+	* render/color.c:
+	color_rgb now reflects the actually color, not requested
+
+	* render/color.c, render/color.h:
+	allocate colors on creation, added .pixel to color_rgb
+
+	* render/color.c, render/color.h, render/render.c, render/test.c:
+	added color_free, made appearance_free use it
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* render/color.h: add include for GC
+
+	* kernel/Makefile.am: use librender.a
+
+	* render/Makefile.am: make a librender.a
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/color.c, render/color.h, render/gradient.c, render/render.c, render/render.h, render/test.c:
+	added color new/destroy
+	made color_rgbs in appearance into pointers
+	updated the rest to follow
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* configure.ac: look for ctype.h for toupper
+
+	* kernel/themerc.c: use g_build_filename!
+
+	* kernel/themerc.c: dont need to check for path being set now
+
+	* kernel/engine.c, kernel/openbox.c, kernel/python.c, kernel/themerc.c:
+	use g_build_filename properly, gotta pass a NULL at the end
+
+	* kernel/event.c:
+	wait for the time until the next timer if there is a timer pending
+
+	* kernel/timer.c: if a callback fires, set the wait time to 0
+
+	* kernel/Makefile.am: add the render/color.o
+
+	* kernel/timer.c: oops stupid c++ iterators messing with me
+
+	* kernel/timer.c, kernel/timer.h: New file.
+
+	* kernel/Makefile.am, kernel/timer.c, kernel/timer.h: add timers
+
+	* kernel/themerc.c: fucked up an error message
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/render.c: XDestroyImage, not Xfree.  stop memleak
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* configure.ac: check for sys/time.h
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/color.c, render/color.h, render/font.c: New file.
+
+	* render/Makefile.am, render/color.c, render/color.h, render/font.c, render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	it was broken before, it is broken now.
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* kernel/engine.c, kernel/python.c, kernel/themerc.c:
+	build paths properly, and get the home dir properly
+
+	* render/test.c: enum changed
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/render.c, render/render.h: added appearance_new/free
+	changed assert to g_assert
+	changed enum and struct names to be friendlier
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* doc/themerc.txt: add a full example
+
+	* doc/themerc.txt: New file.
+
+	* doc/themerc.txt: add a doc for the themerc file
+
+	* kernel/engine.c, kernel/engine.h, kernel/openbox.c, kernel/themerc.c, kernel/themerc.h:
+	load the font and titlebarlayout from the themerc
+
+	* configure.ac, m4/openbox.m4, m4/swig.m4:
+	kill old swig shit for the build system. rm the endian check, glib does this
+
+	* m4/openbox.m4: dont set crazy mipspro flags.. this is C not C++!
+
+	* kernel/themerc.c: read home dir in the right order n shi
+
+	* kernel/themerc.c: read the file out of the homedir first
+
+	* kernel/themerc.c: print warnings for redefines in the themerc
+
+	* kernel/openbox.c, kernel/themerc.c, kernel/themerc.h:
+	themerc gets parsed
+
+	* kernel/themerc.c, kernel/themerc.h: New file.
+
+	* kernel/Makefile.am, kernel/engine.c, kernel/engine.h, kernel/openbox.c, kernel/python.c, kernel/themerc.c, kernel/themerc.h:
+	load the engine before the python
+
+	* kernel/client.c: fire the visible hook when requested
+
+	* kernel/engine.c, kernel/engine.h, kernel/openbox.c:
+	rm the engine interface from the python
+
+	* kernel/pointer.c: dont let invalid contexts through
+
+	* Makefile.am: build render before kernel
+
+2003-03-07  manmower  <manmower@zed>
+
+	* render/render.c, render/render.h, render/test.c:
+	removed a bunch of stuff that the rest of ob3 already does for us
+	renamed a couple of functions to match the rest of ob3's style
+
+2003-03-07  xor@zed  <xor@zed>
+
+	* kernel/client.c: map withdrawn/dock apps
+
+	* kernel/Makefile.am: link the .o's instead of building them again
+
+2003-03-06  xor@zed  <xor@zed>
+
+	* kernel/openbox.c: startup/shutdown the render stuff
+
+	* kernel/Makefile.am: build in the render/ sources
+
+	* themes/.cvsignore: New file.
+
+	* themes/.cvsignore: ignore new shit
+
+	* configure.ac: openbox engine loads a style, well, opens one
+
+	* kernel/event.c: catch xkb bell events, fire the hook
+
+	* themes/Makefile.am: New file.
+
+	* Makefile.am, configure.ac, themes/Makefile.am:
+	add themes for the openbox engine
+
+	* kernel/engine.c: clean up messages
+
+	* kernel/engine.c: dont save the internal char*'s
+
+	* kernel/pointer.c: allow any context
+
+	* render/Makefile.am: render/ doesnt need the locale or script dir
+
+	* render/Makefile.am: link in xft and find its headers
+
+	* kernel/Makefile.am: link in Xft
+
+	* kernel/client.c, kernel/client.h, kernel/screen.c, kernel/stacking.h:
+	show and hide windows in the order to cause the least expose events
+
+	* configure.ac, kernel/Makefile.am, kernel/client.c, kernel/clientwrap.c, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/pointer.c, kernel/stacking.c:
+	openbox engine works, fuck this tabs shit
+
+2003-03-05  xor@zed  <xor@zed>
+
+	* kernel/pointer.c: kill bad return
+
+	* kernel/client.c, kernel/clientwrap.c, kernel/frame.c, kernel/frame.h, kernel/pointer.c, kernel/stacking.c:
+	engines n shit
+
+	* kernel/engine.c:
+	staticify these vars.. they were causing a SIGILL..???!!? i blame gcc..
+
+2003-03-04  xor@zed  <xor@zed>
+
+	* kernel/client.c, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/frame.h, kernel/pointer.c, kernel/stacking.c:
+	allow a frame to have multiple top-level windows. provide functions for getting a clients parent, and all of a frames top-level windows.
+
+	* kernel/engine.c, kernel/engine.h: New file.
+
+	* configure.ac, kernel/Makefile.am, kernel/client.c, kernel/clientwrap.c, kernel/engine.c, kernel/engine.h, kernel/event.c, kernel/frame.c, kernel/frame.h, kernel/openbox.c, kernel/pointer.c:
+	make the pwm engine "work", however we have a race on startup..
+
+	* kernel/Makefile.am: add the enginedir
+
+	* kernel/pointer.c: generate release events for client clicks
+
+	* kernel/pointer.c:
+	XAllowEvents when we get one with the client context
+
+	* kernel/frame.c: plate is the client context
+
+	* kernel/pointer.c: dont let 3 clicks be 2 double clicks
+
+	* kernel/hooks.c: kill debug prints
+
+	* Makefile.am, configure.ac: add dirs for engines
+
+	* configure.ac: kill these dirs not using them
+
+2003-03-04  manmower  <manmower@zed>
+
+	* render/.cvsignore: New file.
+
+	* render/.cvsignore:
+	THIS IS MY LOG FILE ENTRY. THERE ARE MANY LIKE IT BUT THIS ONE IS MINE.
+
+	* Makefile.am: added render dir
+
+	* configure.ac: Added the render directory
+
+2003-03-04  xor@zed  <xor@zed>
+
+	* kernel/frame.c: kill debug prints
+
+2003-03-04  manmower  <manmower@zed>
+
+	* render/Makefile.am, render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	New file.
+
+	* render/Makefile.am, render/gradient.c, render/gradient.h, render/render.c, render/render.h, render/test.c:
+	the beginning of the new rendering stuff.
+
+2003-03-04  xor@zed  <xor@zed>
+
+	* kernel/frame.c: highlight the focused window
+
+	* kernel/pointer.c: cleanuo
+
+	* kernel/hooks.c: let hook functions remove themselves
+
+	* README.CVS: no mor swig, using C, etc.
+
+	* kernel/pointer.c:
+	some cleanups/reordering. get those events going right.
+
+2003-03-03  xor@zed  <xor@zed>
+
+	* kernel/pointer.c: grab all the requested grabs
+
+	* kernel/pointer.c: pass along the client's area including the frame!
+
+	* kernel/clientwrap.c, kernel/pointer.c: pointer events work for real
+
+	* kernel/event.c, kernel/pointer.c, kernel/pointer.h:
+	pointer events should work
+
+	* kernel/keyboard.c, kernel/keyboard.h, kernel/pointer.c, kernel/pointer.h:
+	New file.
+
+	* kernel/Makefile.am, kernel/client.c, kernel/event.c, kernel/hooks.c, kernel/hooks.h, kernel/kbind.c, kernel/kbind.h, kernel/keyboard.c, kernel/keyboard.h, kernel/mbind.c, kernel/mbind.h, kernel/openbox.c, kernel/pointer.c, kernel/pointer.h:
+	keyboard events work
+
+	* kernel/python.c: create the 'input' module
+
+	* kernel/clientwrap.c, kernel/openboxwrap.c: add the constants
+
+	* kernel/openbox.c, kernel/prop.c, kernel/prop.h:
+	s/prop_init/prop_startup/
+
+	* kernel/Makefile.am, kernel/client.c, kernel/client.h, kernel/clientwrap.c, kernel/clientwrap.h, kernel/event.c, kernel/focus.c, kernel/frame.c, kernel/hooks.c, kernel/hooks.h, kernel/openbox.c, kernel/openbox.h, kernel/openboxwrap.c, kernel/openboxwrap.h, kernel/prop.c, kernel/prop.h, kernel/python.c:
+	Client and Openbox python objects "done"
+
+	* kernel/clientwrap.c, kernel/clientwrap.h, kernel/openboxwrap.c, kernel/openboxwrap.h:
+	New file.
+
+2003-03-02  xor@zed  <xor@zed>
+
+	* kernel/client.c: typecast to get the proper aspect ratio
+
+2003-02-28  xor@zed  <xor@zed>
+
+	* kernel/Makefile.am: New file.
+
+	* Makefile.am, kernel/.cvsignore, kernel/Makefile.am:
+	add shit that was missing
+
+2003-02-27  xor@zed  <xor@zed>
+
+	* kernel/.cvsignore: New file.
+
+	* kernel/.cvsignore: add the cvsignore
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/event.h, kernel/extensions.c, kernel/extensions.h, kernel/focus.c, kernel/focus.h, kernel/frame.c, kernel/frame.h, kernel/geom.h, kernel/gettext.h, kernel/hooks.c, kernel/hooks.h, kernel/kbind.c, kernel/kbind.h, kernel/mbind.c, kernel/mbind.h, kernel/openbox.c, kernel/openbox.h, kernel/prop.c, kernel/prop.h, kernel/python.c, kernel/python.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, kernel/stacking.h, kernel/xerror.c, kernel/xerror.h:
+	New file.
+
+	* kernel/client.c, kernel/client.h, kernel/event.c, kernel/event.h, kernel/extensions.c, kernel/extensions.h, kernel/focus.c, kernel/focus.h, kernel/frame.c, kernel/frame.h, kernel/geom.h, kernel/gettext.h, kernel/hooks.c, kernel/hooks.h, kernel/kbind.c, kernel/kbind.h, kernel/mbind.c, kernel/mbind.h, kernel/openbox.c, kernel/openbox.h, kernel/prop.c, kernel/prop.h, kernel/python.c, kernel/python.h, kernel/screen.c, kernel/screen.h, kernel/stacking.c, kernel/stacking.h, kernel/xerror.c, kernel/xerror.h:
+	add the 'kernel' based on what's in c/. improved the Hook class for the hooks python module.
+
+	* Makefile.am, bootstrap, configure.ac, doc/Makefile.am:
+	updated interface completed hooks and keyboard/pointer
+
+2003-02-24  xor@zed  <xor@zed>
+
+	* doc/bsetbg.1, doc/bsetroot.1, doc/openbox.1.in: old out-of-date files
+
+2003-02-22  xor@zed  <xor@zed>
+
+	* configure.ac: rm the swig shit
+
+	* configure.ac: fixups
+
+	* m4/openbox.m4: got my warnings i want
+
+	* m4/openbox.m4:
+	python events en masse!! also, make it look for GCC not GXX now..
+
+2003-02-21  xor@zed  <xor@zed>
+
+	* configure.ac, m4/openbox.m4: new smarts for swig
+
+	* Makefile.am, configure.ac, m4/openbox.m4:
+	setup autotools build for C shit
+
+2003-02-19  xor@zed  <xor@zed>
+
+	* AUTHORS: nick's no longer the site designer
+
+	* README: add mention of being OSI Certified Open Source Software
+
+	* CHANGELOG: add mention of the new es_AR translations
+
+2003-02-16  xor@zed  <xor@zed>
+
+	* CHANGELOG: add the new german translations
+
+	* tools/obsetroot.cc: rm the warnings for now
+
+2003-02-14  xor@zed  <xor@zed>
+
+	* tools/Makefile.am, tools/obsetroot.cc, Makefile.am, configure.ac, tools/.cvsignore:
+	Add the "obsetroot" tool. Use it to set the root background.
+
+	* configure.in: call CHECK_FUNCS in C mode
+
+2003-02-11  xor@zed  <xor@zed>
+
+	* .cvsignore: add ABOUT-NLS
+
+	* tests/.cvsignore: add the icons app
+
+	* tests/icons.c, tests/icons.cpp: make the icons program a C app.
+
+	* tests/icons.cpp: add an app to display the icons for a window
+
+2003-02-10  xor@zed  <xor@zed>
+
+	* configure.in: require autoconf 2.5x
+
+2003-02-09  xor@zed  <xor@zed>
+
+	* README.CVS: mention that 2.9x is not supported
+
+	* configure.ac: use the c++ std cheaders
+
+2003-02-06  xor@zed  <xor@zed>
+
+	* AUTHORS: move marius from active developers to contributors :\
+
+	* Makefile.am, data/Makefile.am:
+	make "make dist" work, compiler flags cleanups
+
+2003-02-06  woodblock  <woodblock@zed>
+
+	* configure.in: Back port fixes from TESTING branch
+
+	* CHANGELOG: Updated changelog for 2.2.4 release
+
+2003-02-05  xor@zed  <xor@zed>
+
+	* ABOUT-NLS, INSTALL, Makefile.am: rm this thing
+
+	* configure.ac, data/Makefile.am, doc/Makefile.am, m4/swig.m4, m4/x11.m4:
+	new swig build system. much better. yay.
+
+	* README.CVS: you need swig at least 1.3.14
+
+	* README.CVS: require automake 1.7.1 for py-compile
+
+	* Makefile.am, configure.ac: dont make wrap a subdir of otk
+
+	* m4/openbox.m4: give output when building a cvs release
+
+	* configure.ac, m4/python.m4:
+	move the otk swig module into its own lib/directory
+
+	* .cvsignore: add py-compile
+
+	* doc/doxygen/.cvsignore: ignore the latex dir
+
+	* README.CVS: mention the swig wrapper warnings
+
+	* doc/doxygen/Makefile.am, doc/doxygen/comments, doc/doxygen/doxygen.conf.in:
+	add latex to the doc build process. fix namespace comments again.
+
+	* doc/doxygen/comments: fix up the otk description
+
+	* CHANGELOG.Blackbox, CHANGELOG.bsetbg, README.bbtools, README.bsetbg:
+	remove docs from old blackbox
+
+	* doc/doxygen/doxygen.conf.in: ignore the wrappers
+
+	* doc/doxygen/doxygen.conf: not needed, the .in is commited
+
+2003-02-04  woodblock  <woodblock@zed>
+
+	* CHANGELOG: updated changelog
+
+2003-02-03  woodblock  <woodblock@zed>
+
+	* doc/openbox.1.in: documentation update
+
+	* doc/openbox.1.in: update documentation
+
+	* CHANGELOG, configure.in: Version bump
+
+2003-02-03  xor@zed  <xor@zed>
+
+	* tests/.cvsignore: ignore the bins
+
+	* tests/Makefile, tests/aspect.c, tests/fullscreen.c, tests/grav.c, tests/modal.c, tests/modal2.c, tests/modal3.c, tests/urgent.c:
+	add some tests
+
+2003-02-03  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Updated changelog for shaded window bug fix
+
+2003-02-01  xor@zed  <xor@zed>
+
+	* README.CVS: add comment for configuration
+
+2003-02-01  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Fixed the image cache when dealing with borders.
+
+2003-02-01  xor@zed  <xor@zed>
+
+	* README.CVS: note about automake
+
+2003-01-29  xor@zed  <xor@zed>
+
+	* configure.ac: check for endian order
+
+	* po/POTFILES.in: update the list of src files with translations.
+
+	* data/Makefile.am: include shit in the dist
+
+	* doc/Makefile.am: include the openbox.1.in in the dist
+
+	* Makefile.am: remove LICENSE from the dist files
+
+	* doc/doxygen/Makefile.am: make the echo more noticable
+
+	* doc/doxygen/Makefile.am: make pwd work
+
+	* doc/doxygen/Makefile.am:
+	echo a message about where to find the generated docs
+
+	* doc/doxygen/doxygen.conf: add the doxygen configuration
+
+	* README.CVS: give the debian pkg names
+
+2003-01-28  xor@zed  <xor@zed>
+
+	* README.CVS: add version for automake
+
+2003-01-27  xor@zed  <xor@zed>
+
+	* README.CVS: use a built-in module to replace libswigpy
+
+2003-01-24  xor@zed  <xor@zed>
+
+	* DESIGN/glue.dia:
+	add some design ideas for a glue layer between the wm and the scripts
+
+	* README.CVS: add all teh steps
+
+	* README.CVS: add instructions for CVS compiling
+
+2003-01-22  xor@zed  <xor@zed>
+
+	* m4/openbox.m4: REMOVE -fno-rtti. we use that!
+
+	* m4/openbox.m4: -fno-rtti as in cxxflags too!
+
+	* m4/openbox.m4: fix the stupid spelling
+
+	* m4/openbox.m4: add -fno-check-new -fno-execptions to the g++ cxxflags
+
+2003-01-20  xor@zed  <xor@zed>
+
+	* DESIGN/render.dia: remove the XImage from Surface
+
+	* AUTHORS: new authors. this is how we dooo iiiit...
+
+2003-01-18  xor@zed  <xor@zed>
+
+	* DESIGN/ob3arch.png, DESIGN/render.dia, DESIGN/roadmap, DESIGN/thoughts:
+	add DESIGN from the openbox3 repository. add to that the render.dia, a design diagram for the new render code
+
+2003-01-17  xor@zed  <xor@zed>
+
+	* README: state the license. killall the old readme data
+
+2003-01-16  xor@zed  <xor@zed>
+
+	* m4/python.m4: use -export-dynamic when linking libpython.a
+
+2003-01-14  xor@zed  <xor@zed>
+
+	* m4/x11.m4: add comment
+
+	* m4/x11.m4: check for XftGetVersion
+
+	* configure.ac: rm the util directory
+
+2003-01-13  xor@zed  <xor@zed>
+
+	* m4/openbox.m4: keep the asserts for !debug builds..
+
+	* configure.ac: begin conversion to ustring. add some more members.
+
+2003-01-12  xor@zed  <xor@zed>
+
+	* LICENSE: omg im relicensing this shit as gpl. nobody hurt me.
+
+	* m4/python.m4: dont show find errors
+
+	* CHANGELOG: my utf shit for the titlebars and toolbar
+
+2003-01-11  xor@zed  <xor@zed>
+
+	* configure.ac: rm a blank line at the end
+
+	* configure.ac: add some more AC stuff
+
+	* m4/python.m4: used old vars
+
+	* m4/openbox.m4: caps
+
+	* configure.ac, m4/openbox.m4:
+	caps for giving the build target. show it at the end
+
+	* configure.ac: better ordering.. define te version before using it
+
+	* m4/openbox.m4: check for cvs in the version properly
+
+	* configure.ac: no caps in the package name!
+
+	* m4/openbox.m4: cvs builds are always debug
+
+	* m4/python.m4: use the right lib
+
+	* m4/openbox.m4, m4/python.m4, m4/x11.m4:
+	my newer better autoconf functions. woowoo
+
+	* m4/.cvsignore: adding my autoconf functions. woowoo
+
+	* .cvsignore, bootstrap, configure.ac, version.h.in:
+	new autoconf shit woowoo
+
+	* m4/x11.m4: add X_DEVEL and XFT_DEVEL m4 functions
+
+	* m4/openbox.m4: create OB_DEBUG and OB_COMPILER_FLAGS m4 functionc
+
+	* m4/python.m4: check for the python cflags and libs
+
+2003-01-09  xor@zed  <xor@zed>
+
+	* configure.ac: use default prefix.
+	better python library checks.
+
+2003-01-04  xor@zed  <xor@zed>
+
+	* Makefile.am, configure.ac, data/Makefile.am, doc/Makefile.am:
+	add buttons to the tree.rm stupid comments in Makefile.ams
+
+	* doc/Makefile.am, doc/xftlsfonts.1: rm the xftlsfonts manpage
+
+	* CHANGELOG: add proper whitespace
+
+	* configure.ac: line up text in --help
+
+2003-01-04  manmower  <manmower@zed>
+
+	* configure.ac: Check for XKB extension
+
+2003-01-01  woodblock  <woodblock@zed>
+
+	* CHANGELOG: Documented sendToWorkspace addition
+
+2002-12-28  xor@zed  <xor@zed>
+
+	* bootstrap: add --force for autopoint
+
+2002-12-26  xor@zed  <xor@zed>
+
+	* .cvsignore, po/.cvsignore: add newish stuff
+
+	* Makefile.am, bootstrap, configure.ac: better support for gettext
+
+	* config.rpath: removing generated file
+
+	* bootstrap: add gettextize here
+
+	* po/Makevars: readd Makevars
+
+	* po/LINGUAS, po/Makefile.in.in, po/Makevars, po/Makevars.template, po/Rules-quot, po/boldquot.sed, po/en@boldquot.header, po/en@quot.header, po/insert-header.sin, po/quot.sed, po/remove-potcdate.sin:
+	remove shit generated by gettextize
+
+	* m4/.cvsignore, m4/Makefile.am, m4/codeset.m4, m4/gettext.m4, m4/glibc21.m4, m4/iconv.m4, m4/intdiv0.m4, m4/inttypes-pri.m4, m4/inttypes.m4, m4/inttypes_h.m4, m4/isc-posix.m4, m4/lcmessage.m4, m4/lib-ld.m4, m4/lib-link.m4, m4/lib-prefix.m4, m4/progtest.m4, m4/stdint_h.m4, m4/uintmax_t.m4, m4/ulonglong.m4:
+	make bootstrap generate this shit
+
+2002-12-25  xor@zed  <xor@zed>
+
+	* configure.ac: conflicts with python too :\
+
+	* configure.ac:
+	no -pedantic :\ it fucks up on the python headers. sigh.
+
+	* configure.ac: set CXXFLAGS better
+
+	* Makefile.am, configure.ac:
+	global python scripts. client motion/resizing is all done via python now
+
+2002-12-24  xor@zed  <xor@zed>
+
+	* configure.ac: python. no more guile. python.
+
+	* CHANGELOG: add changelog for the netwm iconic windows bugfix
+
+	* configure.in: up version for next release
+
+2002-12-23  xor@zed  <xor@zed>
+
+	* configure.ac: using python and swig for now.
+
+2002-12-19  xor@zed  <xor@zed>
+
+	* configure.ac: python has begun!
+
+	* configure.ac: check for python. not for guile.
+
+2002-12-18  xor@zed  <xor@zed>
+
+	* configure.ac: guileize
+
+	* .cvsignore: add stuff i rm'd from cvs
+
+	* doc/doxygen/comments: erm
+
+2002-12-13  xor@zed  <xor@zed>
+
+	* Makefile.am: dist the bootstrap file for package maintainers
+
+2002-12-11  xor@zed  <xor@zed>
+
+	* mkinstalldirs: autogenned
+
+	* bootstrap: add --copy
+
+	* install-sh, missing: autogenned
+
+	* install-sh, missing, mkinstalldirs: this is genned bya automake
+
+2002-12-10  xor@zed  <xor@zed>
+
+	* CHANGELOG: fix for installation of pl locale
+
+	* configure.in: up the version
+
+2002-12-09  xor@zed  <xor@zed>
+
+	* CHANGELOG: work when strftime is not found
+
+2002-12-08  xor@zed  <xor@zed>
+
+	* doc/Makefile.am:
+	dont install the xftlsfonts manpage if we didnt build xftlsfonts
+
+2002-12-07  xor@zed  <xor@zed>
+
+	* .cvsignore: add depcomp
+
+	* Makefile.am: include depcomp in make dist
+
+	* bootstrap: copy, dont link
+
+	* configure.in: 2.2.2 release
+
+2002-12-03  xor@zed  <xor@zed>
+
+	* configure.ac: better xft checks. require xft version 2
+
+	* configure.in: reset the xft flags if it fails
+
+	* configure.in: link in xft only where appropriate
+
+	* configure.in: restore the CXXFLAGS/LIBS
+
+	* configure.in: more verbose, and better checks for Xft version 2/1
+
+	* configure.in:
+	better checks for Xft version 2/1 and more verbose warning if it fails
+
+	* po/POTFILES.in: xft2 works. and works good.
+
+2002-11-28  xor@zed  <xor@zed>
+
+	* CHANGELOG: change grammar or somesuch..
+
+2002-11-28  woodblock  <woodblock@zed>
+
+	* CHANGELOG:
+	Added an option to disable the window raise on alt-click. fonk.
+
+2002-11-26  xor@zed  <xor@zed>
+
+	* configure.in: had an extra ; that snuck in. i blame the commies
+
+2002-11-20  xor@zed  <xor@zed>
+
+	* data/Makefile.am:
+	addd more stuff to EXTRA_DIST. all the headers for instance
+
+	* Makefile.am, doc/Makefile.am:
+	add EXTRA_DIST tags all over to make 'make dist' possible
+
+	* CHANGELOG: doc the change in configure for xft2
+
+	* CHANGELOG, configure.in, data/Makefile.am:
+	add bitmap buttons, and put support for them in all the default styles
+
+	* configure.in: fix the []'s in the outputs
+
+	* CHANGELOG: fix menu redraw bug for real
+
+	* CHANGELOG: fix the mozilla crash from the default premax being 0
+
+2002-11-19  xor@zed  <xor@zed>
+
+	* .cvsignore: more ignore fodder
+
+2002-11-15  xor@zed  <xor@zed>
+
+	* configure.in: cleaner
+
+2002-11-14  xor@zed  <xor@zed>
+
+	* bootstrap: add libtoolize
+
+2002-11-13  xor@zed  <xor@zed>
+
+	* CHANGELOG: fix for windows changing from non-resizable to resizable
+
+	* CHANGELOG: add fix for clients making themselves resizable
+
+2002-11-11  xor@zed  <xor@zed>
+
+	* configure.ac: mad wicked xft checks
+
+	* configure.ac: look for xft
+
+	* configure.in: do tests using c++
+
+	* configure.in: dont build xftlsfonts when no xft found or xft2 found
+
+	* configure.in: support for Xft2!
+
+2002-11-10  xor@zed  <xor@zed>
+
+	* po/POTFILES.in: cleanups.
+	OBScreen almost ready for some action
+
+	* configure.ac: support for the shape extension works!
+
+2002-11-07  xor@zed  <xor@zed>
+
+	* bootstrap: reverse the automake/autoconf order.. for fun
+
+2002-11-06  xor@zed  <xor@zed>
+
+	* doc/openbox.1.in: s/@VERSION@/@version@/
+
+	* doc/openbox.1.in: s/@VERSION@/@version/
+
+	* po/POTFILES.in: moving strut into its own .hh. adding OBClient class
+
+2002-11-05  xor@zed  <xor@zed>
+
+	* doc/doxygen/Makefile.am, doc/doxygen/comments, doc/doxygen/doxygen.conf.in:
+	updated doxygen documentation
+
+	* doc/openbox.1.in: make urls bold
+
+	* doc/openbox.1.in:
+	fixes for menu doc. we dont have a menuFile in the rc anymore!
+	also fix urls
+
+	* doc/openbox.1.in: fix so url shows up
+
+	* doc/openbox.1.in:
+	we dont have menuFormat in the resource file anymore
+
+2002-11-04  xor@zed  <xor@zed>
+
+	* doc/doxygen/doxygen.conf.in: make doxygen skip stuff inside
+	#ifndef DOXYGEN_IGNORE
+	#endif
+	blocks
+
+	* doc/doxygen/doxygen.conf.in: documenting classes!
+
+	* doc/doxygen/doxygen.conf.in, doc/doxygen/style.css:
+	not using a custom stlyesheet anymore
+
+	* Makefile.am, TODO, configure.ac, doc/Makefile.am, doc/doxygen/.cvsignore, doc/doxygen/Makefile.am, doc/doxygen/doxygen.conf.in, doc/doxygen/style.css:
+	add doxygen to the project. 'make doc' builds the doxygen stuff. you need doxygen and graphviz installed to generate it properly
+
+2002-11-03  xor@zed  <xor@zed>
+
+	* CHANGELOG, configure.in:
+	stop using the Utf8 functions for drawing Xft fonts
+
+	* CHANGELOG, configure.in:
+	stop using the Xft Utf8 functions. They break the non-english locales.
+
+	* CHANGELOG: typo-typo
+
+	* CHANGELOG: typo
+
+	* Makefile.am:
+	new timer infrastructure. takes a function pointer for the timeout, with a void* parameter (useful for holding a class instance!)
+
+	* po/POTFILES.in:
+	WE DONT USE BASE DISPLAY FOR ANYTHING ANY MORE!!@^!*@*!! YAY
+
+2002-11-02  xor@zed  <xor@zed>
+
+	* TODO: updated with goals for 3.0
+
+	* Makefile.am: not using admin/ dir anymore
+
+	* mkinstalldirs, po/.cvsignore: stupid stuff
+
+2002-11-01  xor@zed  <xor@zed>
+
+	* configure.ac: put 'cvs' in the version tag
+
+	* m4/.cvsignore, po/.cvsignore: add cvs ignores for the new dirs
+
+	* m4/Makefile, m4/Makefile.in, Makefile.am, configure.ac, mkinstalldirs:
+	make gettext better. updates for autoconf
+
+	* m4/Makefile, po/LINGUAS: dont have any languages yet
+
+	* ABOUT-NLS, COPYING, configure.ac: add some text files..
+	dont have our own libintl
+
+	* Makefile.am, config.rpath, configure.ac, m4/Makefile, m4/Makefile.am, m4/Makefile.in, m4/codeset.m4, m4/gettext.m4, m4/glibc21.m4, m4/iconv.m4, m4/intdiv0.m4, m4/inttypes-pri.m4, m4/inttypes.m4, m4/inttypes_h.m4, m4/isc-posix.m4, m4/lcmessage.m4, m4/lib-ld.m4, m4/lib-link.m4, m4/lib-prefix.m4, m4/progtest.m4, m4/stdint_h.m4, m4/uintmax_t.m4, m4/ulonglong.m4, mkinstalldirs, po/LINGUAS, po/Makefile.in.in, po/Makevars, po/Makevars.template, po/POTFILES.in, po/Rules-quot, po/boldquot.sed, po/en@boldquot.header, po/en@quot.header, po/insert-header.sin, po/quot.sed, po/remove-potcdate.sin:
+	add gettext
+	change CXXFLAGS back to CPPFLAGS in the .am's
+
+	* configure.ac: update configure.ac to newer rules
+
+	* .cvsignore: libtool stuff
+
+2002-11-01  marius  <marius@zed>
+
+	* configure.ac: toolkit addition
+
+	* Makefile.am: changed for toolkit
+
+2002-11-01  xor@zed  <xor@zed>
+
+	* install-sh, missing, mkinstalldirs:
+	these files are generated by bootstrap
+
+	* CHANGELOG, configure.in: merge in changes in the 2_1 branch
+
+	* CHANGELOG, configure.in: make multibyte fonts the right size
+
+2002-10-31  xor@zed  <xor@zed>
+
+	* configure.ac: look for a CC to make automake happy
+
+	* configure.ac, configure.in: configure script changed to .ac
+
+	* Makefile.am: compiles now. uses xft2
+	remove the nls remainders
+
+2002-10-19  woodblock  <woodblock@zed>
+
+	* configure.in: bumped up version
+
+2002-10-05  xor@zed  <xor@zed>
+
+	* CHANGELOG: changes for openbox 2.1.2
+
+2002-10-04  woodblock  <woodblock@zed>
+
+	* CHANGELOG: tyop
+
+	* CHANGELOG: documentation for 2.2
+
+	* CHANGELOG: updated changelog for 2.2 release
+
+	* doc/openbox.1.in:
+	added documentation for the pressed focus/unfocus and fixed some minor
+	formatting errors
+
+2002-10-01  woodblock  <woodblock@zed>
+
+	* AUTHORS, CHANGELOG, CHANGELOG.Blackbox, configure.in:
+	merged with 2_1-merged-to-HEAD-2002-09-30
+
+2002-09-24  xor@zed  <xor@zed>
+
+	* configure.in: up the version for the next future release
+
+2002-09-23  xor@zed  <xor@zed>
+
+	* configure.in:
+	look for XftDrawStringUtf8 in libXft.so and set a configure variable based on whether it exists in the library (it doesnt on redhat 7.1)
+
+2002-09-22  xor@zed  <xor@zed>
+
+	* CHANGELOG: capitals
+
+	* configure.in: up version for the release
+
+	* CHANGELOG: add 2.1.1 changes
+
+2002-09-17  woodblock  <woodblock@zed>
+
+	* doc/openbox.1.in: Added titlebar layout documentation
+
+2002-09-16  xor@zed  <xor@zed>
+
+	* AUTHORS, CHANGELOG.Blackbox, configure.in: sync with bb 65-pre2
+
+2002-09-16  woodblock  <woodblock@zed>
+
+	* configure.in: fixed tyop
+
+2002-09-15  woodblock  <woodblock@zed>
+
+	* doc/openbox.1.in: Documented bitmap buttons in manpage
+
+2002-09-14  woodblock  <woodblock@zed>
+
+	* configure.in:
+	added a configure flag for enabling/disabling bitmap buttons
+
+	* CHANGELOG, configure.in: bumped up version number after bitmap merge
+
+	* CHANGELOG: merged bitmap buttons
+
+2002-09-11  woodblock  <woodblock@zed>
+
+	* .cvsignore, CHANGELOG: sync with HEAD
+	added checkmark bitmaps with menu.selected.mask:
+
+2002-09-11  xor@zed  <xor@zed>
+
+	* CHANGELOG: alt-rightclick resizing fix
+
+2002-09-09  xor@zed  <xor@zed>
+
+	* .cvsignore: add autom4te.cache
+
+2002-09-09  woodblock  <woodblock@zed>
+
+	* CHANGELOG: merged with HEAD
+
+2002-09-09  xor@zed  <xor@zed>
+
+	* CHANGELOG: add drop shadows
+
+2002-09-05  xor@zed  <xor@zed>
+
+	* CHANGELOG: state gnome 2 support
+
+2002-09-04  xor@zed  <xor@zed>
+
+	* CHANGELOG: gnoem2 fixes for taskbar
+
+	* CHANGELOG: new border code
+
+2002-09-03  xor@zed  <xor@zed>
+
+	* CHANGELOG: add woodblock's sticky button shit
+
+2002-08-31  xor@zed  <xor@zed>
+
+	* AUTHORS, configure.in, doc/bsetbg.1: sync with the 2.0 branch
+
+	* AUTHORS, CHANGELOG, CHANGELOG.Blackbox, configure.in, doc/bsetbg.1, version.h.in:
+	sync with bb-cvs
+
+2002-08-27  xor@zed  <xor@zed>
+
+	* CHANGELOG: systray windows fix
+
+	* CHANGELOG: latest changessssshape changes, give vR credit
+
+2002-08-26  xor@zed  <xor@zed>
+
+	* AUTHORS, CHANGELOG.Blackbox, configure.in: sync with bb-cvs
+
+2002-08-25  xor@zed  <xor@zed>
+
+	* CHANGELOG: config request with only resize honors window's gravity
+
+	* CHANGELOG: add recent fixes
+
+2002-08-22  xor@zed  <xor@zed>
+
+	* version.h.in: s/__openbox_version/OPENBOX_VERSION
+
+	* AUTHORS, CHANGELOG.Blackbox, configure.in: sync with bb-cvs
+
+	* configure.in: 2.1.0 is our next target
+
+2002-08-21  xor@zed  <xor@zed>
+
+	* CHANGELOG: warping is ruling!
+
+2002-08-20  xor@zed  <xor@zed>
+
+	* CHANGELOG: Fix send to menu, having deleted workspaces in it.
+	Fix workspace warping, move the mouse and window the same amount.
+	Fix workspace switching. Put old code back that worked better.
+
+2002-08-16  xor@zed  <xor@zed>
+
+	* AUTHORS: fix indenting and caps
+
+	* doc/openbox.1.in: mention epist with bbkeys
+
+	* doc/openbox.1.in: add epist and xftlsfonts in teh see also.
+	s/BLACK/OPEN/
+
+	* doc/xftlsfonts.1, doc/Makefile.am:
+	add manpages for epist and for xftlsfonts
+
+2002-08-15  xor@zed  <xor@zed>
+
+	* AUTHORS: authors updates
+
+	* CHANGELOG: caps
+
+	* data/README.menu: s/black/open
+
+	* AUTHORS: new 2.0 authors/contributors
+
+	* CHANGELOG: add all the changes made for 2.0.0 to the changelog
+
+	* CHANGELOG.Blackbox, CHANGELOG.bsetbg: sync with bb-cvs
+
+2002-08-02  xor@zed  <xor@zed>
+
+	* bootstrap: try make bootstrap work in one pass for other people..
+
+	* configure.in: make xft support default on
+
+2002-07-26  xor@zed  <xor@zed>
+
+	* configure.in: sync with bb-cvs
+
+2002-07-21  xor@zed  <xor@zed>
+
+	* configure.in:
+	add Xft-build-support and Xinerama-build-support to the -help output
+	add --enable-xinerama to configure
+
+	* configure.in: sync with bb-cvs.
+	Add option in config menu for disabling mouse input with scroll lock.
+	Remove compile-time flag for event clobbering since this solves that problem for now.
+
+2002-07-20  xor@zed  <xor@zed>
+
+	* .cvsignore: add some cvsignore's
+
+	* configure.in: add no_NO and ro_RO translations
+
+2002-07-18  xor@zed  <xor@zed>
+
+	* TODO:
+	updated todo. took out things we have done. added new goal for 3.0.
+
+2002-07-16  xor@zed  <xor@zed>
+
+	* TODO: adjust goals for 2.0
+
+	* configure.in: screw that change. the next releaase will be 2.0.0!
+
+	* configure.in:
+	change the version number back a bit. preparing for a testing release.
+
+2002-07-11  xor@zed  <xor@zed>
+
+	* configure.in: adding epist!
+
+	* configure.in: -fno-inline when compiling in debug mode
+
+2002-07-10  xor@zed  <xor@zed>
+
+	* config.h.in, aclocal.m4: regerenated fiels
+
+2002-07-08  xor@zed  <xor@zed>
+
+	* configure.in: add the korean translation dir to configure
+
+2002-07-07  xor@zed  <xor@zed>
+
+	* configure.in: make the Xft check actually work
+
+	* configure.in: make Xft default to off, you have ot --enable-xft now
+
+2002-07-03  xor@zed  <xor@zed>
+
+	* configure.in: look for the rigt function in the libxft
+
+	* configure.in: add BFont class, with Xft support
+
+2002-06-22  xor@zed  <xor@zed>
+
+	* ChangeLog:
+	fix resizing bug where windows would be resized smaller than they were supposed to be
+
+	* doc/Makefile.in, data/Makefile.in, CHANGELOG, Makefile.in, config.h.in:
+	add changelog entry for resize bug fix
+
+2002-06-20  xor@zed  <xor@zed>
+
+	* CHANGELOG: fix redraw problem when resizing a window
+
+2002-06-14  xor@zed  <xor@zed>
+
+	* CHANGELOG: add numbers for next version
+
+	* configure.in, configure: increment the version for next release
+
+2002-06-08  xor@zed  <xor@zed>
+
+	* configure.in, configure: add -fno-inline for debug builds!
+
+	* CHANGELOG: dont let setState() screw with the window mapping process.
+
+2002-06-07  xor@zed  <xor@zed>
+
+	* CHANGELOG:
+	windows which requested to be iconic + sticky/maximized at startup would randomly not be iconified when they were mapped because the current_state variable was left uninitialzied. Initiailizing it to WithdrawnState (0) fixes this problem.
+
+	* configure: update the version number by running autoconf
+
+2002-06-06  xor@zed  <xor@zed>
+
+	* CHANGELOG: add window-to-window and window-corner snapping.
+
+	* CHANGELOG:
+	more sticky windows fix. bbkeys ended up thinkng an extra window was left when removing a sticky window. fixed! AT LAST
+
+2002-06-05  xor@zed  <xor@zed>
+
+	* CHANGELOG:
+	last two changes: windows starting sticky. focus te root window, not PointerRoot.
+
+	* configure.in: increment version for next release
+
+	* CHANGELOG:
+	reset cascade when a workspace has no non-sticky windows left on it.
+	ignore fully maximized windows while placing.
+
+	* doc/Makefile.am, data/Makefile.am, Makefile.am:
+	syching with bb-cvs. rm .\#* on make dist-clean. nls updates.
+
+2002-06-04  xor@zed  <xor@zed>
+
+	* data/README, README: documentation fixups
+
+	* data/README, README: documentation fixes
+
+	* CHANGELOG: GIVING UP ON STICKY FUCKING CHRIST AARRGGH
+
+2002-06-03  xor@zed  <xor@zed>
+
+	* CHANGELOG:
+	change cascade behavior so it resets when the workspace is emptied and so it starts in 1 placement.
+
+	* CHANGELOG: add fix for bsetroot's support of the esetroot atom
+
+	* CHANGELOG:
+	save the current root menu position to an unlimited depth instead of the current 1.
+
+2002-06-02  xor@zed  <xor@zed>
+
+	* CHANGELOG: last 2 buig fixes
+
+	* CHANGELOG: fix crash when mapping an iconified window
+
+2002-05-29  xor@zed  <xor@zed>
+
+	* doc/openbox.1.in: put webpage in the man page. Also, a couple fixes.
+
+2002-05-28  xor@zed  <xor@zed>
+
+	* configure.in: updated nls to use openbox.cat
+
+	* doc/.cvsignore, data/.cvsignore, .cvsignore:
+	adding .cvsignore files to the repository to clean up the output whenever you commit some sort of cvs action
+
+	* configure.in:
+	use config.h for configuration options instead of a bunch of -D's on the compile command lines
+
+2002-05-26  cvs  <cvs@zed>
+
+	* configure, configure.in: increment version for next release
+
+	* doc/Makefile.in, data/Makefile.in, configure.in, Makefile.in, configure:
+	incrementing version for next release
+
+	* CHANGELOG: better description of chages to sticky windows
+
+2002-05-25  xor@zed  <xor@zed>
+
+	* bootstrap, configure.ac, configure.in:
+	using configure.ac causes problems. switching back to configure.in
+
+2002-05-24  xor@zed  <xor@zed>
+
+	* configure.in, stamp-h.in, BUGS, CodingStyle, Makefile.am, bootstrap, config.h.in, configure.ac:
+	new root dir based on bb-cvs
+
+2002-05-23  xor@zed  <xor@zed>
+
+	* CHANGELOG: fix for compiling with --disable-nls
+
+	* CHANGELOG: fix compiling with --disable-slit and --disable-nls
+
+	* CHANGELOG: fix compliling with --disable-slit
+
+	* CHANGELOG: merge the sticky window fix from 1.2.
+
+	* TODO: updated goals
+
+	* CHANGELOG: fixed sticky windows!
+
+2002-05-16  xor@zed  <xor@zed>
+
+	* CHANGELOG, configure.in: change next target version to 2.0.0!
+
+	* configure.in:
+	removing pendantic. thats just crazy. -Wall -W will suffice.
+
+	* bootstrap: adding --add-missing to automake call
+
+	* bootstrap:
+	adding bootstrap which generates all the auto* files such as configure
+
+	* doc/Makefile.in, data/Makefile.in, configure, Makefile.in, aclocal.m4:
+	removing auto-generated stuff from cvs
+
+	* BUGS: removed the fixed bug!
+
+	* doc/Makefile.in, data/Makefile.in, Makefile.in:
+	using automake --foreign -i
+
+	* CHANGELOG:
+	make a new autoRaiseDelay value take effect without having to restart
+
+	* CHANGELOG: make a new autoRaiseDelay value take effect on reconfigure
+
+	* CHANGELOG: fix loading autoRaiseDelay
+
+	* configure.in, configure: increment version for next release
+
+	* CHANGELOG: make autoRaiseDelay load
+
+	* configure.in, configure: increment version for next release
+
+	* ChangeLog, CHANGELOG: fix off-by-one window resizing bug
+
+	* CHANGELOG: typos
+
+	* aclocal.m4: readding aclocal. autoconf needs this thing
+
+	* ChangeLog: typos
+
+	* CHANGELOG: fix for slit direction menu not reconfiguring properly
+
+	* doc/Makefile.in, data/Makefile.in, Makefile.in, aclocal.m4:
+	*** empty log message ***
+
+2002-05-15  xor@zed  <xor@zed>
+
+	* CHANGELOG: moved menu from a rc file option to a command line option
+
+	* TODO: spelling error
+
+	* TODO: added future release goals to the TODO
+
+2002-05-14  xor@zed  <xor@zed>
+
+	* CHANGELOG: update changelog.
+	removed a redundant var from BaseDisplay.
+
+	* configure.in, configure:
+	compile with -Wall -W -pendantic when --enable-debug is set.
+
+	* CHANGELOG: fix creating/destroying the titlebar buttons
+
+	* ChangeLog:
+	fix titlebar button code so theyre created/destroyed properly
+
+2002-05-13  xor@zed  <xor@zed>
+
+	* CHANGELOG: fix segfaut from uninitialized focused_screen pointer
+
+	* CHANGELOG, TODO: fix multiple-screen segfault.
+
+2002-05-11  xor@zed  <xor@zed>
+
+	* CHANGELOG: make image dithering value load correctly
+
+	* configure.in, configure: increment version for next release
+
+	* CHANGELOG: make image dithering value load correctly
+
+2002-05-10  xor@zed  <xor@zed>
+
+	* CHANGELOG, configure, configure.in:
+	increment version for next release
+
+	* configure.in, CHANGELOG, configure:
+	fixed problems introduced in the attempt to be gcc 3 compatible. also, better solution for gcc3.
+
+	* configure.in, configure:
+	better gcc3 compat. using ostrstream again. and using namespace std;
+	some focus changes. workspace contains a focused window instead of openbox class. this fixes a seg
+
+2002-05-07  xor@zed  <xor@zed>
+
+	* configure.in, configure: increment version for the next release
+
+	* configure.in, configure: increment the version for the next release
+
+	* configure.in, configure: changed the version number
+
+	* configure: ran autoconf to regen configure
+
+	* doc/Makefile.in, data/Makefile.in, configure.in, Makefile.in, config.h.in, configure, CHANGELOG:
+	gcc 3 compatibility, converted strstreams to stringstreams
+
+	* CHANGELOG: converted ostrstreams into ostringstreams
+
+	* configure: removed check for strstream
+
+	* configure.in, config.h.in:
+	gcc3 compatibility. uses ostringstream instead of ostrstream
+
+	* doc/Makefile.in, data/Makefile.in, configure.in, configure, Makefile.in:
+	check for sstream and strstream in configure
+
+2002-04-30  xor@zed  <xor@zed>
+
+	* ChangeLog.bsetbg, ChangeLog-Blackbox, ChangeLog:
+	removing old files that got merged in
+
+	* CHANGELOG: save the titlebarLayout in the default config
+
+	* CHANGELOG: save the titlebarLayout in the default config file
+
+2002-04-29  xor@zed  <xor@zed>
+
+	* ChangeLog.bsetbg, configure.in, ChangeLog, ChangeLog-Blackbox, CHANGELOG:
+	changelog fixes
+
+	* configure.in, ChangeLog.bsetbg, ChangeLog-Blackbox, CHANGELOG, ChangeLog:
+	addded changelog entries for fixes
+
+	* ChangeLog, CHANGELOG: fix positioning of the window menu
+
+	* CHANGELOG:
+	better logic when changing a window's decoration level, for choosing what elements of decoration get placed on the window.
+
+	* CHANGELOG: improved logic for redecorating windows
+
+	* ChangeLog: improved logic when redecorating a window
+
+2002-04-28  xor@zed  <xor@zed>
+
+	* CHANGELOG: bsetroot supports transparent apps with root property
+
+	* CHANGELOG: added ClickMouse window placement policy
+
+	* CHANGELOG: added UnderMouse windwo placement.
+
+2002-04-21  xor@zed  <xor@zed>
+
+	* ChangeLog: typo in Changelog
+
+	* data/Makefile.am, data/Makefile.in: fixed some uninstall issues
+
+	* data/Makefile.am, data/Makefile.in: fixed some uninstall problems
+
+2002-04-21  woodblock  <woodblock@zed>
+
+	* CHANGELOG.bsetbg: *** empty log message ***
+
+	* CHANGELOG: tyops
+
+2002-04-20  xor@zed  <xor@zed>
+
+	* CHANGELOG:
+	added Changelog entry for the improved maximize-window code.
+
+2002-04-19  xor@zed  <xor@zed>
+
+	* TODO: updated TODO to match current cvs status. yay progress!
+
+2002-04-19  woodblock  <woodblock@zed>
+
+	* doc/bsetbg.1: added bsetbg makefile
+
+2002-04-18  woodblock  <woodblock@zed>
+
+	* Makefile.in, data/Makefile.in, doc/Makefile.am, doc/Makefile.in:
+	added new bsetbg manpage
+
+2002-04-17  xor@zed  <xor@zed>
+
+	* CHANGELOG: configuration changes "done"!!
+
+	on start, the config file is read entirely off the disc, and missing values are assigned defaults.
+	the config file is immediately written back to the disk to populate missing defaults in the file.
+	any time a config option is changed the control, the config file is re-written with the change.
+	choosing reconfig will reload the current config file on the disc.
+	on shutdown, nothing is written to the config file.
+
+2002-04-16  woodblock  <woodblock@zed>
+
+	* TODO: need translations for Hide Toolbar
+
+	* CHANGELOG:
+	Added a runtime option for hiding the toolbar totally. Will be cleaner
+	later. Stay tuned.
+
+2002-04-16  xor@zed  <xor@zed>
+
+	* CHANGELOG, CHANGELOG.Blackbox, CHANGELOG.bsetbg, ChangeLog, ChangeLog-Blackbox, ChangeLog.bsetbg:
+	renamed the Changelog files
+	get the latest version of bsetbg from the blackbox cvs
+
+	* TODO, configure, configure.in:
+	get rid of the STDC_HEADERS check... this failed on IRIX with MIPSpro, use checks for individual headers instead
+
+2002-04-15  xor@zed  <xor@zed>
+
+	* Makefile.in, data/Makefile.in, doc/Makefile.in:
+	apparently there were compiling problems with automake/autoconf. This should make those go away.
+
+2002-04-14  colophon  <colophon@zed>
+
+	* README: added some missing punctuation
+
+2002-04-14  xor@zed  <xor@zed>
+
+	* configure.in: changed version number to 0.99.1
+
+	* configure, configure.in:
+	changed version number to 1.0.0. fixed a warning in BaseMenu from pointer->reference conversion
+
+	* ChangeLog:
+	made shaded windows snap properly at their bottom, using their shaded height.
+	window.getHeight() now returns the different/correct value when a window is shaded.
+
+	* ChangeLog:
+	merged the changelog from the 0.99.0 (stable) branch (the code was previously merged)
+
+	* ChangeLog: added entry for new BestFit placement type
+
+	* AUTHORS: added first revision of the BestFit placement type.
+	moved RowSmart placement type out of placeWindow() to its own function like bestFit. Will continue moving other placement types into their own functions.
+
+2002-04-12  woodblock  <woodblock@zed>
+
+	* ChangeLog: added close redraw
+
+2002-04-11  xor@zed  <xor@zed>
+
+	* CodingStyle: adding rules on how to code this project.
+
+	* data/Makefile.am, data/Makefile.in, data/README, data/README.menu, data/README.style, data/menu.in:
+	New file.
+
+	* data/Makefile.am, data/Makefile.in, data/README, data/README.menu, data/README.style, data/menu.in:
+	initial import. ready for the 0.99.0 stable branch.
+
+	* AUTHORS, BUGS, ChangeLog, ChangeLog-Blackbox, ChangeLog.bsetbg, INSTALL, LICENSE, Makefile.am, Makefile.in, README, README.bbtools, README.bsetbg, TODO, aclocal.m4, config.h.in, configure, configure.in, doc/Makefile.am, doc/Makefile.in, doc/bsetroot.1, doc/openbox.1.in, install-sh, missing, mkinstalldirs, stamp-h.in, version.h.in:
+	New file.
+
+	* AUTHORS, BUGS, ChangeLog, ChangeLog-Blackbox, ChangeLog.bsetbg, INSTALL, LICENSE, Makefile.am, Makefile.in, README, README.bbtools, README.bsetbg, TODO, aclocal.m4, config.h.in, configure, configure.in, doc/Makefile.am, doc/Makefile.in, doc/bsetroot.1, doc/openbox.1.in, install-sh, missing, mkinstalldirs, stamp-h.in, version.h.in:
+	initial import. ready for the 0.99.0 stable branch.
+

@@ -145,5 +145,6 @@ void XWindow::processEvent(const XEvent &e) {
 
 void XWindow::shade(const bool sh) const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_wm_state,
-                            _window, (sh ? 1 : 0), XAtom::net_wm_state_shaded);
+                            _window, (sh ? 1 : 0),
+                            _xatom->getAtom(XAtom::net_wm_state_shaded));
 }

@@ -611,11 +611,6 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       dooppsel = False;
   }
 
-#ifdef    XFT
-  if (dotext)
-    XClearArea(display, menu.frame, text_x, text_y , text_w, text_h, False);
-#endif // XFT
-
   if (dohilite && highlight && (menu.hilite_pixmap != ParentRelative)) {
     if (menu.hilite_pixmap)
       XCopyArea(display, menu.hilite_pixmap, menu.frame,
@@ -945,8 +940,12 @@ void Basemenu::exposeEvent(XExposeEvent *ee) {
       for (int ii = id; ii <= id_d && it != end; ++it, ii++) {
         const int index = ii + (i * menu.persub);
         // redraw the item
-        drawItem(index, (which_sub == index), False,
-                 ee->x, ee->y, ee->width, ee->height);
+        drawItem(index, (which_sub == index),
+#ifdef XFT
+                 True);
+#else
+                 False, ee->x, ee->y, ee->width, ee->height);
+#endif // XFT
       }
     }
   }

@@ -316,7 +316,7 @@ void Basemenu::update(void) {
 
     while (((menu.item_h * (menuitems->count() + 1) / menu.sublevels)
 	    + menu.title_h + screen.getBorderWidth()) >
-	   screen.getHeight())
+	   screen.size().h())
       menu.sublevels++;
 
     if (menu.sublevels < menu.minsub) menu.sublevels = menu.minsub;
@@ -549,15 +549,15 @@ void Basemenu::drawSubmenu(int index) {
 	y = (((shifted) ? menu.y_shift : menu.y) +
 	     menu.height - item->submenu()->menu.height);
 
-      if ((x + item->submenu()->getWidth()) > screen.getWidth()) {
+      if ((x + item->submenu()->getWidth()) > screen.size().w()) {
 	x = ((shifted) ? menu.x_shift : menu.x) -
 	    item->submenu()->getWidth() - screen.getBorderWidth();
       }
       
       if (x < 0) x = 0;
 
-      if ((y + item->submenu()->getHeight()) > screen.getHeight())
-	y = screen.getHeight() - item->submenu()->getHeight() -
+      if ((y + item->submenu()->getHeight()) > screen.size().h())
+	y = screen.size().h() - item->submenu()->getHeight() -
 	    (screen.getBorderWidth() * 2);
       if (y < 0) y = 0;
       
@@ -963,8 +963,8 @@ void Basemenu::exposeEvent(XExposeEvent *ee) {
 void Basemenu::enterNotifyEvent(XCrossingEvent *ce) {
   if (ce->window == menu.frame) {
     menu.x_shift = menu.x, menu.y_shift = menu.y;
-    if (menu.x + menu.width > screen.getWidth()) {
-      menu.x_shift = screen.getWidth() - menu.width -
+    if (menu.x + menu.width > screen.size().w()) {
+      menu.x_shift = screen.size().w() - menu.width -
         screen.getBorderWidth();
       shifted = True;
     } else if (menu.x < 0) {
@@ -972,8 +972,8 @@ void Basemenu::enterNotifyEvent(XCrossingEvent *ce) {
       shifted = True;
     }
 
-    if (menu.y + menu.height > screen.getHeight()) {
-      menu.y_shift = screen.getHeight() - menu.height -
+    if (menu.y + menu.height > screen.size().h()) {
+      menu.y_shift = screen.size().h() - menu.height -
         screen.getBorderWidth();
       shifted = True;
     } else if (menu.y + (signed) menu.title_h < 0) {

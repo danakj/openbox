@@ -113,8 +113,8 @@ void Slit::addClient(Window w) {
     if (wmhints) {
       if ((wmhints->flags & IconWindowHint) &&
 	  (wmhints->icon_window != None)) {
-	XMoveWindow(display, client->client_window, screen.getWidth() + 10,
-		    screen.getHeight() + 10);
+	XMoveWindow(display, client->client_window, screen.size().w() + 10,
+		    screen.size().h() + 10);
 	XMapWindow(display, client->client_window);
 
 	client->icon_window = wmhints->icon_window;
@@ -382,7 +382,7 @@ void Slit::reposition(void) {
 
   case CenterLeft:
     frame.x = 0;
-    frame.y = (screen.getHeight() - frame.height) / 2;
+    frame.y = (screen.size().h() - frame.height) / 2;
     frame.x_hidden = screen.getBevelWidth() - screen.getBorderWidth()
 	             - frame.width;
     frame.y_hidden = frame.y;
@@ -390,7 +390,7 @@ void Slit::reposition(void) {
 
   case BottomLeft:
     frame.x = 0;
-    frame.y = screen.getHeight() - frame.height
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     if (screen.getSlitDirection() == Vertical) {
       frame.x_hidden = screen.getBevelWidth() - screen.getBorderWidth()
@@ -398,13 +398,13 @@ void Slit::reposition(void) {
       frame.y_hidden = frame.y;
     } else {
       frame.x_hidden = 0;
-      frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+      frame.y_hidden = screen.size().h() - screen.getBevelWidth()
 	               - screen.getBorderWidth();
     }
     break;
 
   case TopCenter:
-    frame.x = (screen.getWidth() - frame.width) / 2;
+    frame.x = (screen.size().w() - frame.width) / 2;
     frame.y = 0;
     frame.x_hidden = frame.x;
     frame.y_hidden = screen.getBevelWidth() - screen.getBorderWidth()
@@ -412,20 +412,20 @@ void Slit::reposition(void) {
     break;
 
   case BottomCenter:
-    frame.x = (screen.getWidth() - frame.width) / 2;
-    frame.y = screen.getHeight() - frame.height
+    frame.x = (screen.size().h() - frame.width) / 2;
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     frame.x_hidden = frame.x;
-    frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+    frame.y_hidden = screen.size().h() - screen.getBevelWidth()
                      - screen.getBorderWidth();
     break;
 
   case TopRight:
-    frame.x = screen.getWidth() - frame.width
+    frame.x = screen.size().w() - frame.width
       - (screen.getBorderWidth() * 2);
     frame.y = 0;
     if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.getWidth() - screen.getBevelWidth()
+      frame.x_hidden = screen.size().w() - screen.getBevelWidth()
 	               - screen.getBorderWidth();
       frame.y_hidden = 0;
     } else {
@@ -437,26 +437,26 @@ void Slit::reposition(void) {
 
   case CenterRight:
   default:
-    frame.x = screen.getWidth() - frame.width
+    frame.x = screen.size().w() - frame.width
       - (screen.getBorderWidth() * 2);
-    frame.y = (screen.getHeight() - frame.height) / 2;
-    frame.x_hidden = screen.getWidth() - screen.getBevelWidth()
+    frame.y = (screen.size().h() - frame.height) / 2;
+    frame.x_hidden = screen.size().w() - screen.getBevelWidth()
                      - screen.getBorderWidth();
     frame.y_hidden = frame.y;
     break;
 
   case BottomRight:
-    frame.x = screen.getWidth() - frame.width
+    frame.x = screen.size().w() - frame.width
       - (screen.getBorderWidth() * 2);
-    frame.y = screen.getHeight() - frame.height
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     if (screen.getSlitDirection() == Vertical) {
-      frame.x_hidden = screen.getWidth() - screen.getBevelWidth()
+      frame.x_hidden = screen.size().w() - screen.getBevelWidth()
 	               - screen.getBorderWidth();
       frame.y_hidden = frame.y;
     } else {
       frame.x_hidden = frame.x;
-      frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+      frame.y_hidden = screen.size().h() - screen.getBevelWidth()
                        - screen.getBorderWidth();
     }
     break;
@@ -517,13 +517,13 @@ void Slit::buttonPressEvent(XButtonEvent *e) {
 
       if (x < 0)
         x = 0;
-      else if (x + slitmenu->getWidth() > screen.getWidth())
-        x = screen.getWidth() - slitmenu->getWidth();
+      else if (x + slitmenu->getWidth() > screen.size().w())
+        x = screen.size().w() - slitmenu->getWidth();
 
       if (y < 0)
         y = 0;
-      else if (y + slitmenu->getHeight() > screen.getHeight())
-        y = screen.getHeight() - slitmenu->getHeight();
+      else if (y + slitmenu->getHeight() > screen.size().h())
+        y = screen.size().h() - slitmenu->getHeight();
 
       slitmenu->move(x, y);
       slitmenu->show();

@@ -574,16 +574,17 @@ void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
 }
 
 
-ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d) {
-  screen_number = num;
+ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d),
+  screen_number(num)
+{
 
   root_window = RootWindow(basedisplay.getXDisplay(), screen_number);
   depth = DefaultDepth(basedisplay.getXDisplay(), screen_number);
 
-  width =
-    WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(), screen_number));
-  height =
-    HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(), screen_number));
+  m_size = Size(WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                              screen_number)),
+                HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                               screen_number)));
 
   // search for a TrueColor Visual... if we can't find one... we will use the
   // default visual for the screen

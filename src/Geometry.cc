@@ -44,14 +44,14 @@ Size::Size() : m_w(0), m_h(0) {
 Size::Size(const Size &size) : m_w(size.m_w), m_h(size.m_h) {
 }
 
-Size::Size(const int w, const int h) : m_w(w), m_h(h) {
+Size::Size(const unsigned int w, const unsigned int h) : m_w(w), m_h(h) {
 }
 
-void Size::setW(const int w) {
+void Size::setW(const unsigned int w) {
   m_w = w;
 }
 
-void Size::setH(const int h) {
+void Size::setH(const unsigned int h) {
   m_h = h;
 }
 
@@ -62,8 +62,8 @@ Rect::Rect(const Point &origin, const Size &size) : m_origin(origin),
   m_size(size) {
 }
 
-Rect::Rect(const int x, const int y, const int w, const int h) : m_origin(x, y),
-  m_size(w, h) {
+Rect::Rect(const int x, const int y, const unsigned int w, const unsigned int h)
+  : m_origin(x, y), m_size(w, h) {
 }
 
 void Rect::setSize(const Size &size) {
@@ -82,11 +82,11 @@ void Rect::setY(const int y) {
   m_origin.setY(y);
 }
 
-void Rect::setW(int w) {
+void Rect::setW(unsigned int w) {
   m_size.setW(w);
 }
 
-void Rect::setH(int h) {
+void Rect::setH(unsigned int h) {
   m_size.setH(h);
 }
 

@@ -32,6 +32,7 @@ class ScreenInfo;
 
 #include "LinkedList.h"
 #include "Timer.h"
+#include "Geometry.h"
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -334,7 +335,7 @@ private:
   Colormap colormap;
 
   int depth, screen_number;
-  unsigned int width, height;
+  Size m_size;
 
 
 public:
@@ -349,8 +350,9 @@ public:
   inline const int &getDepth(void) const { return depth; }
   inline const int &getScreenNumber(void) const { return screen_number; }
 
-  inline const unsigned int &getWidth(void) const { return width; }
-  inline const unsigned int &getHeight(void) const { return height; }
+//  inline const unsigned int &getWidth(void) const { return width; }
+//  inline const unsigned int &getHeight(void) const { return height; }
+  inline const Size &size() const { return m_size; }
 };
 
 

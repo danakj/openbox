@@ -412,7 +412,7 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
   LinkedListIterator<OpenboxWindow> it(windowList);
 
   test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
-    start_pos : screen.getHeight() - win_size.h() - start_pos;
+    start_pos : screen.size().h() - win_size.h() - start_pos;
 
   while(!placed &&
         ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
@@ -488,8 +488,8 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   LinkedListIterator<OpenboxWindow> it(windowList);
 
   Rect space(0, 0,
-             screen.getWidth(),
-             screen.getHeight()
+             screen.size().w(),
+             screen.size().h()
             );
   Size window_size(win_w, win_h);
 
@@ -517,17 +517,17 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 
   case BScreen::ColSmartPlacement: {
     test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
-      start_pos : screen.getWidth() - win_w - start_pos;
+      start_pos : screen.size().w() - win_w - start_pos;
 
     while (!placed &&
 	   ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
-	    test_x > 0 : test_x + win_w < (signed) screen.getWidth())) {
+	    test_x > 0 : test_x + win_w < (signed) screen.size().w())) {
       test_y = (screen.getColPlacementDirection() == BScreen::TopBottom) ?
-	start_pos : screen.getHeight() - win_h - start_pos;
+	start_pos : screen.size().h() - win_h - start_pos;
       
       while (!placed &&
 	     ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
-	      test_y > 0 : test_y + win_h < (signed) screen.getHeight())) {
+	      test_y > 0 : test_y + win_h < (signed) screen.size().h())) {
         placed = True;
 
         it.reset();
@@ -581,8 +581,8 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   } // switch
 
   if (! placed) {
-    if (((unsigned) cascade_x > (screen.getWidth() / 2)) ||
-	((unsigned) cascade_y > (screen.getHeight() / 2)))
+    if (((unsigned) cascade_x > (screen.size().w() / 2)) ||
+	((unsigned) cascade_y > (screen.size().h() / 2)))
       cascade_x = cascade_y = 32;
 
     place_x = cascade_x;
@@ -592,10 +592,10 @@ void Workspace::placeWindow(OpenboxWindow *win) {
     cascade_y += win->getTitleHeight();
   }
   
-  if (place_x + win_w > (signed) screen.getWidth())
-    place_x = (((signed) screen.getWidth()) - win_w) / 2;
-  if (place_y + win_h > (signed) screen.getHeight())
-    place_y = (((signed) screen.getHeight()) - win_h) / 2;
+  if (place_x + win_w > (signed) screen.size().w())
+    place_x = (((signed) screen.size().w()) - win_w) / 2;
+  if (place_y + win_h > (signed) screen.size().h())
+    place_y = (((signed) screen.size().h()) - win_h) / 2;
 
   win->configure(place_x, place_y, win->size().w(), win->size().h());
 }

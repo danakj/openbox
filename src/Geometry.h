@@ -41,19 +41,19 @@ public:
 };
 
 class Size{
-  int m_w, m_h;
+  unsigned int m_w, m_h;
 public:
   Size();
   Size(const Size &size);
-  Size(const int w, const int h);
+  Size(const unsigned int w, const unsigned int h);
 
-  void setW(const int w);
-  inline int w() const {
+  void setW(const unsigned int w);
+  inline unsigned int w() const {
     return m_w;
   }
 
-  void setH(const int h);
-  inline int h() const {
+  void setH(const unsigned int h);
+  inline unsigned int h() const {
     return m_h;
   }
 };
@@ -64,7 +64,7 @@ class Rect{
 public:
   Rect();
   Rect(const Point &origin, const Size &size);
-  Rect(const int x, const int y, const int w, const int h);
+  Rect(const int x, const int y, const unsigned int w, const unsigned int h);
   
   void setSize(const Size &size);
   inline const Size &size() const {
@@ -86,13 +86,13 @@ public:
     return m_origin.y();
   }
 
-  void setW(const int w);
-  inline int w() const {
+  void setW(const unsigned int w);
+  inline unsigned int w() const {
     return m_size.w();
   }
 
-  void setH(const int h);
-  inline int h() const {
+  void setH(const unsigned int h);
+  inline unsigned int h() const {
     return m_size.h();
   }
 

@@ -338,14 +338,14 @@ void Openbox::process_event(XEvent *e) {
 	    if (my < 0) my = 0;
 
 	    if (mx + screen->getWorkspacemenu()->getWidth() >
-		screen->getWidth())
-	      mx = screen->getWidth() -
+		screen->size().w())
+	      mx = screen->size().w() -
 		screen->getWorkspacemenu()->getWidth() -
 		screen->getBorderWidth();
 
 	    if (my + screen->getWorkspacemenu()->getHeight() >
-		screen->getHeight())
-	      my = screen->getHeight() -
+		screen->size().h())
+	      my = screen->size().h() -
 		screen->getWorkspacemenu()->getHeight() -
 		screen->getBorderWidth();
 
@@ -364,13 +364,13 @@ void Openbox::process_event(XEvent *e) {
 	    if (mx < 0) mx = 0;
 	    if (my < 0) my = 0;
 
-	    if (mx + screen->getRootmenu()->getWidth() > screen->getWidth())
-	      mx = screen->getWidth() -
+	    if (mx + screen->getRootmenu()->getWidth() > screen->size().w())
+	      mx = screen->size().w() -
 		screen->getRootmenu()->getWidth() -
 		screen->getBorderWidth();
 
-	    if (my + screen->getRootmenu()->getHeight() > screen->getHeight())
-		my = screen->getHeight() -
+	    if (my + screen->getRootmenu()->getHeight() > screen->size().h())
+		my = screen->size().h() -
 		  screen->getRootmenu()->getHeight() -
 		  screen->getBorderWidth();
 

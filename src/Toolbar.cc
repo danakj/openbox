@@ -188,7 +188,7 @@ Toolbar::~Toolbar(void) {
 
 void Toolbar::reconfigure(void) {
   frame.bevel_w = screen.getBevelWidth();
-  frame.width = screen.getWidth() * screen.getToolbarWidthPercent() / 100;
+  frame.width = screen.size().w() * screen.getToolbarWidthPercent() / 100;
   
   if (i18n->multibyte())
     frame.height =
@@ -212,15 +212,15 @@ void Toolbar::reconfigure(void) {
 
   case BottomLeft:
     frame.x = 0;
-    frame.y = screen.getHeight() - frame.height
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     frame.x_hidden = 0;
-    frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+    frame.y_hidden = screen.size().h() - screen.getBevelWidth()
                      - screen.getBorderWidth();
     break;
 
   case TopCenter:
-    frame.x = (screen.getWidth() - frame.width) / 2;
+    frame.x = (screen.size().w() - frame.width) / 2;
     frame.y = 0;
     frame.x_hidden = frame.x;
     frame.y_hidden = screen.getBevelWidth() - screen.getBorderWidth()
@@ -229,16 +229,16 @@ void Toolbar::reconfigure(void) {
 
   case BottomCenter:
   default:
-    frame.x = (screen.getWidth() - frame.width) / 2;
-    frame.y = screen.getHeight() - frame.height
+    frame.x = (screen.size().w() - frame.width) / 2;
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     frame.x_hidden = frame.x;
-    frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+    frame.y_hidden = screen.size().h() - screen.getBevelWidth()
                      - screen.getBorderWidth();
     break;
 
   case TopRight:
-    frame.x = screen.getWidth() - frame.width
+    frame.x = screen.size().w() - frame.width
       - (screen.getBorderWidth() * 2);
     frame.y = 0;
     frame.x_hidden = frame.x;
@@ -247,12 +247,12 @@ void Toolbar::reconfigure(void) {
     break;
 
   case BottomRight:
-    frame.x = screen.getWidth() - frame.width
+    frame.x = screen.size().w() - frame.width
       - (screen.getBorderWidth() * 2);
-    frame.y = screen.getHeight() - frame.height
+    frame.y = screen.size().h() - frame.height
       - (screen.getBorderWidth() * 2);
     frame.x_hidden = frame.x;
-    frame.y_hidden = screen.getHeight() - screen.getBevelWidth()
+    frame.y_hidden = screen.size().h() - screen.getBevelWidth()
                      - screen.getBorderWidth();
     break;
   }
@@ -897,13 +897,13 @@ void Toolbar::buttonPressEvent(XButtonEvent *be) {
 
       if (x < 0)
         x = 0;
-      else if (x + toolbarmenu->getWidth() > screen.getWidth())
-        x = screen.getWidth() - toolbarmenu->getWidth();
+      else if (x + toolbarmenu->getWidth() > screen.size().w())
+        x = screen.size().w() - toolbarmenu->getWidth();
 
       if (y < 0)
         y = 0;
-      else if (y + toolbarmenu->getHeight() > screen.getHeight())
-        y = screen.getHeight() - toolbarmenu->getHeight();
+      else if (y + toolbarmenu->getHeight() > screen.size().h())
+        y = screen.size().h() - toolbarmenu->getHeight();
 
       toolbarmenu->move(x, y);
       toolbarmenu->show();

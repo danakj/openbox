@@ -224,8 +224,8 @@ OpenboxWindow::OpenboxWindow(Openbox &o, Window w, BScreen *s) : openbox(o) {
     if ((openbox.isStartup()) ||
 	(frame.x >= 0 &&
 	 (signed) (frame.y + frame.y_border) >= 0 &&
-	 frame.x <= (signed) screen->getWidth() &&
-	 frame.y <= (signed) screen->getHeight()))
+	 frame.x <= (signed) screen->size().w() &&
+	 frame.y <= (signed) screen->size().h()))
       place_window = False;
   }
 
@@ -1071,8 +1071,8 @@ void OpenboxWindow::getWMNormalHints(void) {
   client.min_width = client.min_height =
     client.base_width = client.base_height =
     client.width_inc = client.height_inc = 1;
-  client.max_width = screen->getWidth();
-  client.max_height = screen->getHeight();
+  client.max_width = screen->size().w();
+  client.max_height = screen->size().h();
   client.min_aspect_x = client.min_aspect_y =
     client.max_aspect_x = client.max_aspect_y = 1;
   client.win_gravity = NorthWestGravity;
@@ -1357,21 +1357,21 @@ Bool OpenboxWindow::setInputFocus(void) {
   if (((signed) (frame.x + frame.width)) < 0) {
     if (((signed) (frame.y + frame.y_border)) < 0)
       configure(frame.border_w, frame.border_w, frame.width, frame.height);
-    else if (frame.y > (signed) screen->getHeight())
-      configure(frame.border_w, screen->getHeight() - frame.height,
+    else if (frame.y > (signed) screen->size().h())
+      configure(frame.border_w, screen->size().h() - frame.height,
                 frame.width, frame.height);
     else
       configure(frame.border_w, frame.y + frame.border_w,
                 frame.width, frame.height);
-  } else if (frame.x > (signed) screen->getWidth()) {
+  } else if (frame.x > (signed) screen->size().w()) {
     if (((signed) (frame.y + frame.y_border)) < 0)
-      configure(screen->getWidth() - frame.width, frame.border_w,
+      configure(screen->size().w() - frame.width, frame.border_w,
                 frame.width, frame.height);
-    else if (frame.y > (signed) screen->getHeight())
-      configure(screen->getWidth() - frame.width,
-	        screen->getHeight() - frame.height, frame.width, frame.height);
+    else if (frame.y > (signed) screen->size().h())
+      configure(screen->size().w() - frame.width,
+	        screen->size().h() - frame.height, frame.width, frame.height);
     else
-      configure(screen->getWidth() - frame.width,
+      configure(screen->size().w() - frame.width,
                 frame.y + frame.border_w, frame.width, frame.height);
   }
 
@@ -1541,12 +1541,12 @@ void OpenboxWindow::maximize(unsigned int button) {
   openbox_attrib.premax_w = frame.width;
   openbox_attrib.premax_h = frame.height;
 
-  dw = screen->getWidth();
+  dw = screen->size().w();
   dw -= frame.border_w * 2;
   dw -= frame.mwm_border_w * 2;
   dw -= client.base_width;
 
-  dh = screen->getHeight();
+  dh = screen->size().h();
   dh -= frame.border_w * 2;
   dh -= frame.mwm_border_w * 2;
   dh -= ((frame.handle_h + frame.border_w) * decorations.handle);
@@ -1571,12 +1571,12 @@ void OpenboxWindow::maximize(unsigned int button) {
   dh += ((frame.handle_h + frame.border_w) * decorations.handle);
   dh += frame.mwm_border_w * 2;
 
-  dx += ((screen->getWidth() - dw) / 2) - frame.border_w;
+  dx += ((screen->size().w() - dw) / 2) - frame.border_w;
 
   if (screen->doFullMax()) {
-    dy += ((screen->getHeight() - dh) / 2) - frame.border_w;
+    dy += ((screen->size().h() - dh) / 2) - frame.border_w;
   } else {
-    dy += (((screen->getHeight() - screen->getToolbar()->getExposedHeight())
+    dy += (((screen->size().h() - screen->getToolbar()->getExposedHeight())
            - dh) / 2) - frame.border_w;
 
     switch (screen->getToolbarPlacement()) {
@@ -2807,14 +2807,14 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       unsigned int snap_w = frame.width + (frame.border_w * 2);
       unsigned int snap_h = size().h() + (frame.border_w * 2);
       if (snap_distance) {
-        int drx = screen->getWidth() - (dx + snap_w);
+        int drx = screen->size().w() - (dx + snap_w);
 
         if (dx < drx && (dx > 0 && dx < snap_distance) ||
                         (dx < 0 && dx > -snap_distance) )
           dx = 0;
         else if ( (drx > 0 && drx < snap_distance) ||
                   (drx < 0 && drx > -snap_distance) )
-          dx = screen->getWidth() - snap_w;
+          dx = screen->size().w() - snap_w;
 
         int dtty, dbby, dty, dby;
         switch (screen->getToolbarPlacement()) {
@@ -2823,7 +2823,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
         case Toolbar::TopRight:
           dtty = screen->getToolbar()->getExposedHeight() +
 	         frame.border_w;
-          dbby = screen->getHeight();
+          dbby = screen->size().h();
           break;
 
         default:

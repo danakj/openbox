@@ -1252,7 +1252,7 @@ void BScreen::LoadStyle(void) {
 
   // load bevel, border and handle widths
   if (conf.getValue("handleWidth", "HandleWidth", l)) {
-    if (l <= getWidth() / 2 && l != 0)
+    if (l <= size().w() / 2 && l != 0)
       resource.handle_width = l;
     else
       resource.handle_width = 6;
@@ -1265,7 +1265,7 @@ void BScreen::LoadStyle(void) {
     resource.border_width = 1;
 
   if (conf.getValue("bevelWidth", "BevelWidth", l)) {
-    if (l <= getWidth() / 2 && l != 0)
+    if (l <= size().w() / 2 && l != 0)
       resource.bevel_width = l;
     else
       resource.bevel_width = 3;
@@ -1273,7 +1273,7 @@ void BScreen::LoadStyle(void) {
     resource.bevel_width = 3;
 
   if (conf.getValue("frameWidth", "FrameWidth", l)) {
-    if (l <= getWidth() / 2)
+    if (l <= size().w() / 2)
       resource.frame_width = l;
     else
       resource.frame_width = resource.bevel_width;
@@ -2187,8 +2187,8 @@ void BScreen::shutdown(void) {
 void BScreen::showPosition(int x, int y) {
   if (! geom_visible) {
     XMoveResizeWindow(getBaseDisplay().getXDisplay(), geom_window,
-                      (getWidth() - geom_w) / 2,
-                      (getHeight() - geom_h) / 2, geom_w, geom_h);
+                      (size().w() - geom_w) / 2,
+                      (size().h() - geom_h) / 2, geom_w, geom_h);
     XMapWindow(getBaseDisplay().getXDisplay(), geom_window);
     XRaiseWindow(getBaseDisplay().getXDisplay(), geom_window);
 
@@ -2221,8 +2221,8 @@ void BScreen::showPosition(int x, int y) {
 void BScreen::showGeometry(unsigned int gx, unsigned int gy) {
   if (! geom_visible) {
     XMoveResizeWindow(getBaseDisplay().getXDisplay(), geom_window,
-                      (getWidth() - geom_w) / 2,
-                      (getHeight() - geom_h) / 2, geom_w, geom_h);
+                      (size().w() - geom_w) / 2,
+                      (size().h() - geom_h) / 2, geom_w, geom_h);
     XMapWindow(getBaseDisplay().getXDisplay(), geom_window);
     XRaiseWindow(getBaseDisplay().getXDisplay(), geom_window);
 

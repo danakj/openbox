@@ -479,7 +479,7 @@ AC_DEFUN([X11_SM],
       AC_CHECK_HEADERS([X11/SM/SMlib.h], [
         SM_CFLAGS="$X_CFLAGS"
         SM_LIBS="-lSM -lICE"
-        AC_DEFINE(USE_SM)
+        AC_DEFINE(USE_SM, 1, [Use session management])
         AC_SUBST(SM_CFLAGS)
         AC_SUBST(SM_LIBS)
         SM="yes"

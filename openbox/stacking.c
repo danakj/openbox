@@ -210,6 +210,7 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
     return ret;
 }
 
+#if 0
 static GList *pick_group_windows(ObClient *top, ObClient *selected,
                                  gboolean raise)
 {
@@ -238,6 +239,7 @@ static GList *pick_group_windows(ObClient *top, ObClient *selected,
     }
     return ret;
 }
+#endif
 
 void stacking_raise(ObWindow *window)
 {

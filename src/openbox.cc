@@ -172,9 +172,6 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
-  // return input focus to the root
-  XSetInputFocus(otk::OBDisplay::display, PointerRoot, None, CurrentTime);
-  
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
 
   delete _bindings;
@@ -183,11 +180,14 @@ Openbox::~Openbox()
 
   python_destroy();
 
-  XSync(otk::OBDisplay::display, False);
-  
-  // close the X display
-  otk::OBDisplay::destroy();
-  printf("Exiting!\n");
+  XSetInputFocus(otk::OBDisplay::display, PointerRoot, RevertToNone,
+                 CurrentTime);
+  XSync(otk::OBDisplay::display, false);
+
+  // this tends to block.. i honestly am not sure why. causing an x error in
+  // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
+  // all im gunna do is the same.
+  //otk::OBDisplay::destroy();
 }
 
 

@@ -162,6 +162,8 @@ line argument.\n\n"));
 void OBDisplay::destroy()
 {
   delete _gccache;
+  while (_grab_count > 0)
+    ungrab();
   XCloseDisplay(display);
 }
 

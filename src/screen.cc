@@ -123,13 +123,12 @@ OBScreen::~OBScreen()
   if (! _managed) return;
 
   XSelectInput(otk::OBDisplay::display, _info->rootWindow(), NoEventMask);
-  XSync(otk::OBDisplay::display, False);
   
-  XDestroyWindow(otk::OBDisplay::display, _focuswindow);
-
   // unmanage all windows
   while (!clients.empty())
     unmanageWindow(clients.front());
+
+  XDestroyWindow(otk::OBDisplay::display, _focuswindow);
 
   delete _image_control;
 }
@@ -425,7 +424,17 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   Openbox::instance->bindings()->grabButtons(false, client);
 
-  // XXX: pass around focus if this window was focused
+  // remove from the stacking order
+  _stacking.remove(client);
+  
+  // pass around focus if this window was focused XXX do this better!
+  if (Openbox::instance->focusedClient() == client) {
+    OBClient *newfocus = 0;
+    if (!_stacking.empty())
+      newfocus = _stacking.front();
+    if (! (newfocus && newfocus->focus()))
+      client->unfocus();
+  }
 
   // remove from the wm's map
   Openbox::instance->removeClient(client->window());
@@ -457,8 +466,7 @@ void OBScreen::unmanageWindow(OBClient *client)
   delete client->frame;
   client->frame = 0;
 
-  // remove from the screen's lists
-  _stacking.remove(client);
+  // remove from the screen's list
   clients.remove(client);
   delete client;
 

@@ -215,9 +215,9 @@ const RenderControl *Display::renderControl(int snum) const
 
 void Display::setIgnoreErrors(bool t)
 {
-  _ignore_errors = t;
   // sync up so that anything already sent is/isn't ignored!
   XSync(_display, false);
+  _ignore_errors = t;
 }
 
 void Display::grab()

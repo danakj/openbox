@@ -113,6 +113,12 @@ typedef struct _StrutPartial {
     ((s1).left == (s2).left && \
      (s1).top == (s2).top && \
      (s1).right == (s2).right && \
+     (s1).bottom == (s2).bottom)
+
+#define PARTIAL_STRUT_EQUAL(s1, s2) \
+    ((s1).left == (s2).left && \
+     (s1).top == (s2).top && \
+     (s1).right == (s2).right && \
      (s1).bottom == (s2).bottom && \
      (s1).left_start == (s2).left_start && \
      (s1).left_end == (s2).left_end && \

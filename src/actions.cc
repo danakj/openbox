@@ -95,9 +95,9 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
       ButtonRelease events, so instead we simply manufacture them here, so that
       clicks/doubleclicks etc still work.
     */
-    XButtonEvent ev = e;
-    ev.type = ButtonRelease;
-    buttonReleaseHandler(ev);
+    //XButtonEvent ev = e;
+    //ev.type = ButtonRelease;
+    buttonReleaseHandler(e);
   }
 }
   

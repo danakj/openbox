@@ -2134,6 +2134,23 @@ static PyObject *_wrap_OBClient_funtions(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_transientFor(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_transientFor",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *)((ob::OBClient const *)arg1)->transientFor();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_modal(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2795,6 +2812,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_positionRequested", _wrap_OBClient_positionRequested, METH_VARARGS },
 	 { (char *)"OBClient_decorations", _wrap_OBClient_decorations, METH_VARARGS },
 	 { (char *)"OBClient_funtions", _wrap_OBClient_funtions, METH_VARARGS },
+	 { (char *)"OBClient_transientFor", _wrap_OBClient_transientFor, METH_VARARGS },
 	 { (char *)"OBClient_modal", _wrap_OBClient_modal, METH_VARARGS },
 	 { (char *)"OBClient_shaded", _wrap_OBClient_shaded, METH_VARARGS },
 	 { (char *)"OBClient_iconic", _wrap_OBClient_iconic, METH_VARARGS },

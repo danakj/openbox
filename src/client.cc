@@ -237,7 +237,7 @@ void OBClient::getMwmHints()
                      (unsigned long **)&hints))
     return;
   
-  if (num == MwmHints::elements) {
+  if (num >= MwmHints::elements) {
     // retrieved the hints
     _mwmhints.flags = hints[0];
     _mwmhints.functions = hints[1];
@@ -608,6 +608,7 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
     getType();
     calcLayer(); // type may have changed, so update the layer
     setupDecorAndFunctions();
+    frame->adjustSize(); // this updates the frame for any new decor settings
   }
   else if (e.atom == property->atom(otk::OBProperty::net_wm_name) ||
            e.atom == property->atom(otk::OBProperty::wm_name))

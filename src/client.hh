@@ -442,6 +442,9 @@ public:
   //! Returns the functions that the user can perform on the window
   inline FunctionFlags funtions() const { return _functions; }
 
+  //! Return the client this window is transient for
+  inline OBClient *transientFor() const { return _transient_for; }
+
   //! Returns if the window is modal
   /*!
     If the window is modal, then no other windows that it is related to can get

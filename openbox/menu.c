@@ -65,8 +65,10 @@ void menu_entry_free(MenuEntry *self)
 void menu_startup()
 {
     Menu *m;
+/*
     Menu *s;
     Menu *t;
+*/
     Action *a;
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,

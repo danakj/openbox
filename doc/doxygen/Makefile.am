@@ -2,6 +2,7 @@ all:
 
 doc: doxygen.conf
 	@doxygen doxygen.conf
+	@$(MAKE) -C latex pdf
 	@echo
 	@echo Documentation generated in $(shell pwd)/html
 	@echo

@@ -104,7 +104,7 @@ TREEVIEW_WIDTH         = 200
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output
 #---------------------------------------------------------------------------
-GENERATE_LATEX         = NO
+GENERATE_LATEX         = YES
 LATEX_OUTPUT           = latex
 LATEX_CMD_NAME         = latex
 MAKEINDEX_CMD_NAME     = makeindex
@@ -112,7 +112,7 @@ COMPACT_LATEX          = NO
 PAPER_TYPE             = letter
 EXTRA_PACKAGES         = 
 LATEX_HEADER           = 
-PDF_HYPERLINKS         = NO
+PDF_HYPERLINKS         = YES
 USE_PDFLATEX           = NO
 LATEX_BATCHMODE        = NO
 #---------------------------------------------------------------------------

@@ -40,43 +40,51 @@ void action_free(ObAction *a)
 }
 
 void setup_action_directional_focus_north(ObAction *a)
-{
-    a->data.diraction.direction = OB_DIRECTION_NORTH;
+{ 
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_NORTH;
 }
 
 void setup_action_directional_focus_east(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_EAST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_EAST;
 }
 
 void setup_action_directional_focus_south(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_SOUTH;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_SOUTH;
 }
 
 void setup_action_directional_focus_west(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_WEST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_WEST;
 }
 
 void setup_action_directional_focus_northeast(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_NORTHEAST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
 }
 
 void setup_action_directional_focus_southeast(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_SOUTHEAST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
 }
 
 void setup_action_directional_focus_southwest(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_SOUTHWEST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
 }
 
 void setup_action_directional_focus_northwest(ObAction *a)
 {
-    a->data.diraction.direction = OB_DIRECTION_NORTHWEST;
+    a->data.interdiraction.inter.any.interactive = TRUE;
+    a->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
 }
 
 void setup_action_send_to_desktop(ObAction *a)
@@ -751,11 +759,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
             }
-
-            if (act->data.any.interactive) {
-                if ((n = parse_find_node("interactive",node->xmlChildrenNode)))
-                    act->data.any.interactive = parse_bool(doc, n);
-            }
         }
         g_free(actname);
     }
@@ -1089,22 +1092,17 @@ void action_showmenu(union ActionData *data)
 
 void action_cycle_windows(union ActionData *data)
 {
-    ObClient *c;
-    
-    c = focus_cycle(data->cycle.forward, data->cycle.linear,
-                    data->cycle.inter.any.interactive,
-                    data->cycle.inter.final, data->cycle.inter.cancel);
+    focus_cycle(data->cycle.forward, data->cycle.linear,
+                data->cycle.inter.any.interactive,
+                data->cycle.inter.final, data->cycle.inter.cancel);
 }
 
 void action_directional_focus(union ActionData *data)
 {
-    ObClient *nf;
-
-    if (!data->diraction.any.c)
-        return;
-    if ((nf = client_find_directional(data->diraction.any.c,
-                                      data->diraction.direction)))
-        client_activate(nf, FALSE);
+    focus_directional_cycle(data->interdiraction.direction,
+                            data->interdiraction.inter.any.interactive,
+                            data->interdiraction.inter.final,
+                            data->interdiraction.inter.cancel);
 }
 
 void action_movetoedge(union ActionData *data)

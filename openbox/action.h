@@ -22,6 +22,11 @@ struct InteractiveAction {
     gboolean cancel;
 };
 
+struct InterDirectionalAction{
+    struct InteractiveAction inter;
+    ObDirection direction;
+};
+
 struct DirectionalAction{
     struct AnyAction any;
     ObDirection direction;
@@ -101,6 +106,7 @@ struct CycleWindows {
 union ActionData {
     struct AnyAction any;
     struct InteractiveAction inter;
+    struct InterDirectionalAction interdiraction;
     struct DirectionalAction diraction;
     struct Execute execute;
     struct ClientAction client;
@@ -220,7 +226,7 @@ void action_exit(union ActionData *data);
 void action_showmenu(union ActionData *data);
 /* CycleWindows */
 void action_cycle_windows(union ActionData *data);
-/* DirectionalAction */
+/* InterDirectionalAction */
 void action_directional_focus(union ActionData *data);
 /* DirectionalAction */
 void action_movetoedge(union ActionData *data);

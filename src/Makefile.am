@@ -27,7 +27,7 @@ MAINTAINERCLEANFILES= Makefile.in
 distclean-local:
 	rm -f *\~ *.orig *.rej .\#*
 
-openbox.i: openbox.hh screen.hh client.hh
+openbox.i: openbox.hh screen.hh client.hh python.hh
 	touch $@
 
 openbox_wrap.cc: openbox.i

@@ -58,7 +58,7 @@ using std::string;
 
 epist::epist(char **argv, char *dpy_name, char *rc_file)
   : BaseDisplay(argv[0], dpy_name) {
-
+    
   _argv = argv;
 
   if (rc_file)
@@ -227,8 +227,7 @@ void epist::activateGrabs() {
     ActionList::const_iterator ait, end = _actions.end();
 
     for(ait = _actions.begin(); ait != end; ++ait) {
-      XGrabKey(getXDisplay(), ait->keycode(), ait->modifierMask(),
-               (*scrit)->rootWindow(), False, GrabModeAsync, GrabModeAsync);
+      (*scrit)->grabKey(ait->keycode(), ait->modifierMask());
     }
   }
 }

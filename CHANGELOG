@@ -11,6 +11,8 @@
 	* Closed bug #1007 (use g_snprintf in openbox/session.c instead of
 	sprintf)
 	* Closed bug #1001 (gimp crashes openbox)
+	* Closed bug #1005 (import -frame leaves windows in a temporary
+	"on top" state)
 
 3.0:
 	* Closed bug #908 (sometimes some weird grab is left)

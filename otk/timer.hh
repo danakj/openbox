@@ -42,6 +42,7 @@ private:
        return timercmp(&a->_timeout, &b->_timeout, >);
      }
   };
+  friend struct TimerCompare; // give access to _timeout for shitty compilers
 
   typedef
   std::priority_queue<Timer*, std::vector<Timer*>, TimerCompare> TimerQ;

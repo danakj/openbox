@@ -707,8 +707,10 @@ void action_exit(union ActionData *data)
 
 void action_showmenu(union ActionData *data)
 {
-    menu_show(data->showmenu.name, data->showmenu.x, data->showmenu.y,
-              data->showmenu.c);
+    if (data->showmenu.name) {
+        menu_show(data->showmenu.name, data->showmenu.x, data->showmenu.y,
+                  data->showmenu.c);
+    }
 }
 
 static void popup_cycle(Client *c, gboolean hide)

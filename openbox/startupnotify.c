@@ -50,6 +50,8 @@ void sn_shutdown(gboolean reconfig)
 
     if (reconfig) return;
 
+    ob_main_loop_x_remove(ob_main_loop, sn_handler);
+
     for (it = sn_waits; it; it = g_slist_next(it))
         wait_data_free(it->data);
     g_slist_free(sn_waits);

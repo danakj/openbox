@@ -94,7 +94,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
         im->byte_order = endian;
         im->data = l->surface.data.planar.pixel_data;
         XPutImage(ob_display, l->pixmap, DefaultGC(ob_display, ob_screen),
-                  im, 0, 0, 0, 0, w, h);
+                  im, 0, 0, x, y, w, h);
         im->data = NULL;
         XDestroyImage(im);
     }

@@ -74,14 +74,14 @@ void reduce_depth(pixel32 *data, XImage *im)
     unsigned char *p8 = (unsigned char *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
-        if ((render_red_offset != default_red_shift) ||
-            (render_blue_offset != default_blue_shift) ||
-            (render_green_offset != default_green_shift)) {
+        if ((render_red_offset != default_red_offset) ||
+            (render_blue_offset != default_blue_offset) ||
+            (render_green_offset != default_green_offset)) {
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
-                    r = (data[x] >> default_red_shift) & 0xFF;
-                    g = (data[x] >> default_green_shift) & 0xFF;
-                    b = (data[x] >> default_blue_shift) & 0xFF;
+                    r = (data[x] >> default_red_offset) & 0xFF;
+                    g = (data[x] >> default_green_offset) & 0xFF;
+                    b = (data[x] >> default_blue_offset) & 0xFF;
                     p32[x] = (r << render_red_offset)
                            + (g << render_green_offset)
                            + (b << render_blue_offset);
@@ -94,11 +94,11 @@ void reduce_depth(pixel32 *data, XImage *im)
     case 16:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                r = (data[x] >> default_red_shift) & 0xFF;
+                r = (data[x] >> default_red_offset) & 0xFF;
                 r = r >> render_red_shift;
-                g = (data[x] >> default_green_shift) & 0xFF;
+                g = (data[x] >> default_green_offset) & 0xFF;
                 g = g >> render_green_shift;
-                b = (data[x] >> default_blue_shift) & 0xFF;
+                b = (data[x] >> default_blue_offset) & 0xFF;
                 b = b >> render_blue_shift;
                 p16[x] = (r << render_red_offset)
                     + (g << render_green_offset)
@@ -112,9 +112,9 @@ void reduce_depth(pixel32 *data, XImage *im)
         g_assert(render_visual->class != TrueColor);
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                p8[x] = pickColor(data[x] >> default_red_shift,
-                       data[x] >> default_green_shift,
-                       data[x] >> default_blue_shift)->pixel;
+                p8[x] = pickColor(data[x] >> default_red_offset,
+                       data[x] >> default_green_offset,
+                       data[x] >> default_blue_offset)->pixel;
         }
         data += im->width;
         p8 += im->bytes_per_line;

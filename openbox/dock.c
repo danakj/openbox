@@ -49,6 +49,7 @@ void dock_startup(gboolean reconfig)
         stacking_add(DOCK_AS_WINDOW(dock));
 
         dock_configure();
+        dock_hide(TRUE);
         return;
     }
 

@@ -23,58 +23,70 @@ using std::endl;
 #include "color.hh"
 #include "screeninfo.hh"
 
+extern "C" {
+#ifdef    HAVE_STDIO_H
+#  include <stdio.h>
+#endif // HAVE_STDIO_H
+
+#include "gettext.h"
+#define _(str) gettext(str)
+}
+
 namespace otk {
 
-string      BFont::_fallback_font   = "fixed";
+string      BFont::_fallback_font = "fixed";
+bool        BFont::_xft_init      = false;
 
-BFont::BFont(int screen_num, const string &family, int size,
-             bool bold, bool italic, bool shadow, unsigned char offset, 
-             unsigned char tint, bool antialias) :
-                                          _screen_num(screen_num),
-                                          _family(family),
-                                          _simplename(False),
-                                          _size(size),
-                                          _bold(bold),
-                                          _italic(italic),
-                                          _antialias(antialias),
-                                          _shadow(shadow),
-                                          _offset(offset),
-                                          _tint(tint),
-                                          _xftfont(0) {
-  _valid = False;
+BFont::BFont(int screen_num, const string &fontstring,
+             bool shadow, unsigned char offset, unsigned char tint)
+  : _screen_num(screen_num),
+    _fontstring(fontstring),
+    _shadow(shadow),
+    _offset(offset),
+    _tint(tint),
+    _xftfont(0)
+{
+  assert(screen_num >= 0);
+  assert(tint <= CHAR_MAX);
+  
+  if (!_xft_init) {
+    if (!XftInit(0)) {
+      printf(_("Couldn't initialize Xft version %d.\n\n"), XftVersion);
+      ::exit(3);
+    }
+    printf(_("Using Xft %d.\n"), XftVersion);
+    _xft_init = true;
+  }
 
-  _xftfont = XftFontOpen(OBDisplay::display, _screen_num,
-                         XFT_FAMILY, XftTypeString,  _family.c_str(),
-                         XFT_SIZE,   XftTypeInteger, _size,
-                         XFT_WEIGHT, XftTypeInteger, (_bold ?
-                                                      XFT_WEIGHT_BOLD :
-                                                      XFT_WEIGHT_MEDIUM),
-                         XFT_SLANT,  XftTypeInteger, (_italic ?
-                                                      XFT_SLANT_ITALIC :
-                                                      XFT_SLANT_ROMAN),
-                         XFT_ANTIALIAS, XftTypeBool, _antialias,
-                         0);
-  if (! _xftfont)
-    return; // failure
+  if ((_xftfont = XftFontOpenName(OBDisplay::display, _screen_num,
+                                  _fontstring.c_str())))
+    return;
 
-  _valid = True;
+  printf(_("Unable to load font: %s"), _fontstring.c_str());
+  printf(_("Trying fallback font: %s\n"), _fallback_font.c_str());
+
+  if ((_xftfont = XftFontOpenName(OBDisplay::display, _screen_num,
+                                  _fallback_font.c_str())))
+    return;
+
+  printf(_("Unable to load font: %s"), _fallback_font.c_str());
+  printf(_("Aborting!.\n"));
+
+  ::exit(3); // can't continue without a font
 }
 
 
-BFont::~BFont(void) {
+BFont::~BFont(void)
+{
   if (_xftfont)
     XftFontClose(OBDisplay::display, _xftfont);
 }
 
 
-void BFont::drawString(Drawable d, int x, int y, const BColor &color,
-                       const string &string) const {
-  assert(_valid);
-
-  const ScreenInfo *info = OBDisplay::screenInfo(_screen_num);
-  XftDraw *draw = XftDrawCreate(OBDisplay::display, d,
-                                info->getVisual(), info->getColormap());
-  assert(draw);
+void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
+                       const string &string, bool utf8) const
+{
+  assert(d);
 
   if (_shadow) {
     XftColor c;
@@ -84,10 +96,14 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     c.color.alpha = _tint | _tint << 8; // transparent shadow
     c.pixel = BlackPixel(OBDisplay::display, _screen_num);
 
-    XftDrawString8(draw, &c, _xftfont, x + _offset,
-                   _xftfont->ascent + y + _offset,
-                   (XftChar8 *) string.c_str(),
-                   string.size());
+    if (utf8)
+      XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
+                        _xftfont->ascent + y + _offset,
+                        (const FcChar8*)string.c_str(), string.size());
+    else
+      XftDrawString8(d, &c, _xftfont, x + _offset,
+                     _xftfont->ascent + y + _offset,
+                     (const FcChar8*)string.c_str(), string.size());
   }
     
   XftColor c;
@@ -97,36 +113,40 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
   c.pixel = color.pixel();
   c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
 
-  XftDrawString8(draw, &c, _xftfont, x, _xftfont->ascent + y,
-                 (XftChar8 *) string.c_str(), string.size());
+  if (utf8)
+    XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
+                      (const FcChar8*)string.c_str(), string.size());
+  else
+    XftDrawString8(d, &c, _xftfont, x, _xftfont->ascent + y,
+                   (const FcChar8*)string.c_str(), string.size());
 
-  XftDrawDestroy(draw);
   return;
 }
 
 
-unsigned int BFont::measureString(const string &string) const {
-  assert(_valid);
-
+unsigned int BFont::measureString(const string &string, bool utf8) const
+{
   XGlyphInfo info;
 
-  XftTextExtents8(OBDisplay::display, _xftfont,
-                  (XftChar8 *) string.c_str(), string.size(), &info);
+  if (utf8)
+    XftTextExtentsUtf8(OBDisplay::display, _xftfont,
+                       (const FcChar8*)string.c_str(), string.size(), &info);
+  else
+    XftTextExtents8(OBDisplay::display, _xftfont,
+                    (const FcChar8*)string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }
 
 
-unsigned int BFont::height(void) const {
-  assert(_valid);
-
+unsigned int BFont::height(void) const
+{
   return _xftfont->height + (_shadow ? _offset : 0);
 }
 
 
-unsigned int BFont::maxCharWidth(void) const {
-  assert(_valid);
-
+unsigned int BFont::maxCharWidth(void) const
+{
   return _xftfont->max_advance_width;
 }
 

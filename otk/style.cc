@@ -234,53 +234,28 @@ BColor Style::readDatabaseColor(const std::string &rname,
 
 BFont *Style::readDatabaseFont(const std::string &rbasename,
                                const Configuration &style) {
-  std::string fontname;
+  std::string fontstring, s;
 
-  std::string s;
+  // XXX: load all this font stuff from the style...
 
-  int i;
-  if (style.getValue(rbasename + "xft.font", s) &&
-      style.getValue(rbasename + "xft.size", i)) {
-    std::string family = s;
-    bool bold = False;
-    bool italic = False;
-    bool dropShadow = False;
-
-    if (style.getValue(rbasename + "xft.flags", s)) {
-      if (s.find("bold") != std::string::npos)
-        bold = True;
-      if (s.find("italic") != std::string::npos)
-        italic = True;
-      if (s.find("shadow") != std::string::npos)
-        dropShadow = True;
-    }
+  bool dropShadow = True;
     
-    unsigned char offset = 1;
-    if (style.getValue(rbasename + "xft.shadow.offset", s)) {
-      offset = atoi(s.c_str()); //doesn't detect errors
-      if (offset > CHAR_MAX)
-        offset = 1;
-    }
-
-    unsigned char tint = 0x40;
-    if (style.getValue(rbasename + "xft.shadow.tint", s)) {
-      tint = atoi(s.c_str());
-    }
-
-    
-    BFont *b = new BFont(screen_number, family, i, bold, italic,
-                         dropShadow && shadow_fonts,
-                         offset, tint, aa_fonts);
-    if (b->valid())
-      return b;
-    delete b;
+  unsigned char offset = 1;
+  if (style.getValue(rbasename + "xft.shadow.offset", s)) {
+    offset = atoi(s.c_str()); //doesn't detect errors
+    if (offset > CHAR_MAX)
+      offset = 1;
   }
 
-  if (style.getValue(rbasename + "xft.font", s))
-    printf("Unable to load font \"%s\". Exiting\n", s.c_str());
-  else
-    printf("Font not defined by style. Exiting\n");
-  exit(2);  // can't continue without a font
+  unsigned char tint = 0x40;
+  if (style.getValue(rbasename + "xft.shadow.tint", s)) {
+    tint = atoi(s.c_str());
+  }
+
+  fontstring = "Arial,Sans-8:bold";
+
+  // if this fails, it ::exit()'s
+  return new BFont(screen_number, fontstring, dropShadow, offset, tint);
 }
 
 }

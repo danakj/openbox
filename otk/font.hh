@@ -4,6 +4,7 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+#define _XFT_NO_COMPAT_ // no Xft 1 API
 #include <X11/Xft/Xft.h>
 }
 
@@ -23,6 +24,7 @@ class BFont {
    */
 private:
   static std::string  _fallback_font;
+  static bool         _xft_init;
 
 public:
   // the fallback is only used for X fonts, not for Xft fonts, since it is
@@ -37,13 +39,8 @@ public:
 private:
   int               _screen_num;
 
-  std::string       _family;
-  bool              _simplename;  // true if not spec'd as a -*-* string
-  int               _size;
-  bool              _bold;
-  bool              _italic;
+  std::string       _fontstring;
 
-  bool              _antialias;
   bool              _shadow;
   unsigned char     _offset;
   unsigned char     _tint;
@@ -52,29 +49,27 @@ private:
 
   bool createXftFont(void);
   
-  bool              _valid;
-
 public:
   // loads an Xft font
-  BFont(int screen_num, const std::string &family, int size,
-        bool bold, bool italic, bool shadow, unsigned char offset, 
-        unsigned char tint, bool antialias = True);
-  virtual ~BFont(void);
+  BFont(int screen_num, const std::string &fontstring, bool shadow,
+        unsigned char offset, unsigned char tint);
+  virtual ~BFont();
 
-  inline bool valid(void) const { return _valid; }
+  inline const std::string &fontstring() const { return _fontstring; }
 
-  inline std::string family(void) const { assert(_valid); return _family; }
-  inline int size(void) const { assert(_valid); return _size; }
-  inline bool bold(void) const { assert(_valid); return _bold; }
-  inline bool italic(void) const { assert(_valid); return _italic; }
+  unsigned int height() const;
+  unsigned int maxCharWidth() const;
 
-  unsigned int height(void) const;
-  unsigned int maxCharWidth(void) const;
+  unsigned int measureString(const std::string &string,
+                             bool utf8 = false) const;
 
-  unsigned int measureString(const std::string &string) const;
-
-  void drawString(Drawable d, int x, int y, const BColor &color,
-                  const std::string &string) const;
+  //! Draws a string into an XftDraw object
+  /*!
+    Be Warned: If you use an XftDraw object and a color, or a font from
+    different screens, you WILL have unpredictable results! :)
+  */
+  void drawString(XftDraw *d, int x, int y, const BColor &color,
+                  const std::string &string, bool utf8 = false) const;
 };
 
 }

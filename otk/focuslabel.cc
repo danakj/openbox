@@ -5,18 +5,25 @@
 #endif
 
 #include "focuslabel.hh"
+#include "display.hh"
+#include "screeninfo.hh"
 
 namespace otk {
 
 OtkFocusLabel::OtkFocusLabel(OtkWidget *parent)
   : OtkFocusWidget(parent), _text("")
 {
+  const ScreenInfo *info = OBDisplay::screenInfo(getScreen());
+  _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
+                           info->getColormap());
+  
   setTexture(getStyle()->getLabelFocus());
   setUnfocusTexture(getStyle()->getLabelUnfocus());
 }
 
 OtkFocusLabel::~OtkFocusLabel()
 {
+  XftDrawDestroy(_xftdraw);
 }
 
 void OtkFocusLabel::update(void)
@@ -58,7 +65,7 @@ void OtkFocusLabel::update(void)
 
     OtkFocusWidget::update();
 
-    ft.drawString(getWindow(), x, bevel, *text_color, t);
+    ft.drawString(_xftdraw, x, bevel, *text_color, t);
   } else
     OtkFocusWidget::update();
 }

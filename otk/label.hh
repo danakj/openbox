@@ -2,6 +2,7 @@
 #define __label_hh
 
 #include "widget.hh"
+#include "font.hh"
 
 namespace otk {
 
@@ -18,7 +19,9 @@ public:
   void update(void);
 
 private:
-
+  //! Object used by Xft to render to the drawable
+  XftDraw *_xftdraw;
+  //! Text displayed in the label
   std::string _text;
 };
 

@@ -1,5 +1,6 @@
 # List of source files containing translatable strings.
-
+otk/display.cc
+otk/font.cc
 src/openbox.cc
 src/display.cc
 src/client.cc

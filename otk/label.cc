@@ -11,11 +11,16 @@ namespace otk {
 OtkLabel::OtkLabel(OtkWidget *parent)
   : OtkWidget(parent), _text("")
 {
+  const ScreenInfo *info = OBDisplay::screenInfo(getScreen());
+  _xftdraw = XftDrawCreate(OBDisplay::display, getWindow(), info->getVisual(),
+                           info->getColormap());
+  
   setTexture(getStyle()->getLabelUnfocus());
 }
 
 OtkLabel::~OtkLabel()
 {
+  XftDrawDestroy(_xftdraw);
 }
 
 void OtkLabel::update(void)
@@ -55,7 +60,7 @@ void OtkLabel::update(void)
 
     OtkWidget::update();
 
-    ft.drawString(getWindow(), x, bevel, *getStyle()->getTextUnfocus(), t);
+    ft.drawString(_xftdraw, x, bevel, *getStyle()->getTextUnfocus(), t);
   } else
     OtkWidget::update();
 }

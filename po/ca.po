@@ -1,0 +1,123 @@
+# Catalan messages for openbox.
+# Copyright (C) 2004 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# David Majà Martínez <kavid@iespana.es>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.1\n"
+"Report-Msgid-Bugs-To: mikachu@icculus.org\n"
+"POT-Creation-Date: 2004-11-25 10:29+0100\n"
+"PO-Revision-Date: 2004-01-25 20:41+0100\n"
+"Last-Translator: David Majà Martínez <kavid@iespana.es>\n"
+"Language-Team: None\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:95
+msgid "Go there..."
+msgstr "Anar aquí..."
+
+#: openbox/client_list_menu.c:161
+msgid "Desktops"
+msgstr "Escriptoris"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Restaura"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maximitza"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Desenrotlla"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Enrotlla"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Tots els escriptoris"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Capa"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Sempre a sobre"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Normal"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Sempre a sota"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "A l'escriptori"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Menú del client"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Minimitza"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Posa a sobre"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Posa a sota"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Decoració"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Mou"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Redimensiona"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Tanca"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id necessita un argument\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file necessita un argument\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "No és pot crear el directori '%s': %s"
+
+#: render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "No s'ha pogut inicialitzar Xft."
+
+#: render/font.c:170 render/font.c:175
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "No és pot carregar el tipus de lletra: %s\n"
+
+#: render/font.c:171
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "S'està carregant el tipus de lletra de recanvi: %s\n"

@@ -1089,8 +1089,6 @@ void action_lower(union ActionData *data)
     client_action_start(data);
     stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
     client_action_end(data);
-
-    focus_order_to_bottom(data->client.any.c);
 }
 
 void action_close(union ActionData *data)

@@ -260,6 +260,10 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   if (blackbox->hasShapeExtensions() && flags.shaped)
     configureShape();
 #endif // SHAPE
+  
+  // get the window's title before adding it to the workspace
+  getWMName();
+  getWMIconName();
 
   if (blackbox_attrib.workspace >= screen->getWorkspaceCount())
     screen->getCurrentWorkspace()->addWindow(this, place_window);
@@ -448,8 +452,6 @@ Window BlackboxWindow::createChildWindow(Window parent, Cursor cursor) {
 
 void BlackboxWindow::associateClientWindow(void) {
   XSetWindowBorderWidth(blackbox->getXDisplay(), client.window, 0);
-  getWMName();
-  getWMIconName();
 
   XChangeSaveSet(blackbox->getXDisplay(), client.window, SetModeInsert);
 

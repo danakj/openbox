@@ -1390,7 +1390,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     /* move/resize the frame to match the request */
     if (self->frame) {
-        engine_frame_adjust_area(self->frame, moved, resized);
+        if (moved || resized)
+            engine_frame_adjust_area(self->frame, moved, resized);
 
 	if (moved) {
 	    if (!user || final) {

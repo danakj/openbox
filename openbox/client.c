@@ -1613,13 +1613,6 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 	    PROP_SET32A(self->window, openbox_premax, cardinal,
 			dimensions, 4);
 	}
-
-        /* pass the client's current position info. the client_configure
-           will move/size stuff as appropriate for a maximized window */
-        x = self->area.x;
-        y = self->area.y;
-        w = self->area.width;
-        h = self->area.height;
     } else {
 	long *dimensions;
 

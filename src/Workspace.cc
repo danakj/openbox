@@ -184,20 +184,24 @@ void Workspace::focusFallback(const BlackboxWindow *old_window) {
 
 
 void Workspace::showAll(void) {
-  std::for_each(stackingList.begin(), stackingList.end(),
-                std::mem_fun(&BlackboxWindow::show));
+  BlackboxWindowList::iterator it = stackingList.begin();
+  const BlackboxWindowList::iterator end = stackingList.end();
+  for (; it != end; ++it) {
+    BlackboxWindow *bw = *it;
+    if (! bw->isStuck())
+      bw->show();
+  }
 }
 
 
 void Workspace::hideAll(void) {
   // withdraw in reverse order to minimize the number of Expose events
-
-  BlackboxWindowList lst(stackingList.rbegin(), stackingList.rend());
-
-  BlackboxWindowList::iterator it = lst.begin();
-  const BlackboxWindowList::iterator end = lst.end();
-  for (; it != end; ++it) {
+  BlackboxWindowList::reverse_iterator it = stackingList.rbegin();
+  const BlackboxWindowList::reverse_iterator end = stackingList.rend();
+  while (it != end) {
     BlackboxWindow *bw = *it;
+    ++it; // withdraw removes the current item from the list so we need the next
+          // iterator before that happens
     if (! bw->isStuck())
       bw->withdraw();
   }

@@ -40,7 +40,7 @@ void slit_shutdown();
 void slit_configure_all();
 void slit_hide(Slit *self, gboolean hide);
 
-void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib);
+void slit_add(Window win, XWMHints *wmhints);
 
 void slit_remove_all();
 void slit_remove(SlitApp *app, gboolean reparent);

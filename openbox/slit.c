@@ -86,10 +86,11 @@ void slit_shutdown()
     g_hash_table_destroy(slit_map);
 }
 
-void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib)
+void slit_add(Window win, XWMHints *wmhints)
 {
     Slit *s;
     SlitApp *app;
+    XWindowAttributes attrib;
 
     /* XXX pick a slit */
     s = &slit[0];
@@ -100,8 +101,12 @@ void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib)
     app->icon_win = (wmhints->flags & IconWindowHint) ?
         wmhints->icon_window : win;
     
-    app->w = attrib->width;
-    app->h = attrib->height;
+    if (XGetWindowAttributes(ob_display, app->icon_win, &attrib)) {
+        app->w = attrib.width;
+        app->h = attrib.height;
+    } else {
+        app->w = app->h = 64;
+    }
 
     s->slit_apps = g_list_append(s->slit_apps, app);
     slit_configure(s);

@@ -202,7 +202,7 @@ void client_manage(Window window)
     if ((wmhint = XGetWMHints(ob_display, window))) {
 	if ((wmhint->flags & StateHint) &&
 	    wmhint->initial_state == WithdrawnState) {
-            slit_add(window, wmhint, &attrib);
+            slit_add(window, wmhint);
             grab_server(FALSE);
 	    XFree(wmhint);
 	    return;

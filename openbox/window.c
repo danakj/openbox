@@ -25,6 +25,7 @@ Window window_top(ObWindow *self)
     case Window_Dock:
         return ((Dock*)self)->frame;
     case Window_DockApp:
+    case Window_Decoration:
         /* not to be used for stacking */
         g_assert_not_reached();
         break;
@@ -45,6 +46,7 @@ Window window_layer(ObWindow *self)
     case Window_Dock:
         return config_dock_layer;
     case Window_DockApp:
+    case Window_Decoration:
         /* not to be used for stacking */
         g_assert_not_reached();
         break;

@@ -442,6 +442,9 @@ static void event_process(XEvent *e)
         case Window_Client:
             client = WINDOW_AS_CLIENT(obwin);
             break;
+        case Window_Decoration:
+            client = WINDOW_AS_DECORATION(obwin)->client;
+            break;
         case Window_Internal:
             /* not to be used for events */
             g_assert_not_reached();

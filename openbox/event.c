@@ -966,27 +966,37 @@ static void event_handle_menu(ObClient *client, XEvent *e)
     static ObMenuEntry *over = NULL;
     ObMenuEntry *entry;
     ObMenu *top;
-    GSList *it;
+    GList *it = NULL;
 
-    top = g_slist_nth_data(menu_visible, 0);
+    top = g_list_nth_data(menu_visible, 0);
 
     g_message("EVENT %d", e->type);
     switch (e->type) {
     case KeyPress:
-        if (over) {
-            if (over->parent->mouseover)
-                over->parent->mouseover(over, FALSE);
-            else
-                menu_control_mouseover(over, FALSE);
-            menu_entry_render(over);
-            over = NULL;
-        }
+        if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
+            over = menu_control_keyboard_nav(over, OB_KEY_DOWN);
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
+            over = menu_control_keyboard_nav(over, OB_KEY_UP);
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+            over = menu_control_keyboard_nav(over, OB_KEY_RETURN);
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+            over = menu_control_keyboard_nav(over, OB_KEY_ESCAPE);
+        else {
+            if (over) {
+                if (over->parent->mouseover)
+                    over->parent->mouseover(over, FALSE);
+                else
+                    menu_control_mouseover(over, FALSE);
+                menu_entry_render(over);
+                over = NULL;
+            }
 /*
-        if (top->hide)
-            top->hide(top);
-        else
+  if (top->hide)
+  top->hide(top);
+  else
 */
             menu_hide(top);
+        }
         break;
     case ButtonPress:
         if (e->xbutton.button > 3) break;
@@ -998,7 +1008,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
 
 	g_message("BUTTON RELEASED");
 
-        for (it = menu_visible; it; it = g_slist_next(it)) {
+        for (it = menu_visible; it; it = g_list_next(it)) {
             ObMenu *m = it->data;
             if (e->xbutton.x_root >= m->location.x - ob_rr_theme->bwidth &&
                 e->xbutton.y_root >= m->location.y - ob_rr_theme->bwidth &&
@@ -1045,7 +1055,7 @@ static void event_handle_menu(ObClient *client, XEvent *e)
         break;
     case MotionNotify:
         g_message("motion");
-        for (it = menu_visible; it; it = g_slist_next(it)) {
+        for (it = menu_visible; it; it = g_list_next(it)) {
             ObMenu *m = it->data;
             if ((entry = menu_find_entry_by_pos(it->data,
                                                 e->xmotion.x_root -

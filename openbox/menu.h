@@ -19,7 +19,7 @@ typedef void(*menu_controller_update)(ObMenu *self);
 typedef void(*menu_controller_mouseover)(ObMenuEntry *self, gboolean enter);
 
 extern GHashTable *menu_hash;
-extern GSList *menu_visible;
+extern GList *menu_visible;
 
 struct _ObMenu
 {
@@ -157,4 +157,5 @@ void menu_render_full(ObMenu *self);
 //so plugins can call it?
 void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data, gboolean new);
 void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
+ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key);
 #endif

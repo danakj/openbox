@@ -240,7 +240,7 @@ void client_manage(Window window)
     client_showhide(self);
 
     /* focus the new window? */
-    if (ob_state != State_Starting && client_normal(self)) {
+    if (ob_state != State_Starting) {
         parent = NULL;
 
         if (self->transient_for) {
@@ -258,7 +258,7 @@ void client_manage(Window window)
         /* note the check against Type_Normal, not client_normal(self), which
            would also include dialog types. in this case we want more strict
            rules for focus */
-        if ((config_focus_new && self->type == Type_Normal) ||
+        if ((config_focus_new && client_normal(self)) ||
             (parent && (client_focused(parent) ||
                         search_focus_tree(parent, parent)))) {
             client_focus(self);

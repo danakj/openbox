@@ -5,6 +5,17 @@
 #include <assert.h>
 #include <GL/glx.h>
 
+void RrExpose(struct RrInstance *inst, XExposeEvent *e)
+{
+    struct RrSurface *sur;
+
+    if ((sur = RrInstaceLookupSurface(inst, e->window))) {
+        RrPaintArea(sur, e->x, e->y, e->width, e->height);
+    } else {
+        RrDebug("Unable to find surface for window 0x%lx\n", e->window);
+    }
+}
+
 /*! Paints the surface, and all its children */
 void RrPaint(struct RrSurface *sur)
 {

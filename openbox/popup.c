@@ -30,6 +30,7 @@ Popup *popup_new(gboolean hasicon)
 {
     XSetWindowAttributes attrib;
     Popup *self;
+    struct RrColor pri, sec;
 
     self = g_new(Popup, 1);
     self->obwin.type = Window_Internal;
@@ -40,10 +41,11 @@ Popup *popup_new(gboolean hasicon)
     stacking_raise(INTERNAL_AS_WINDOW(self));
 
     attrib.override_redirect = True;
+    attrib.event_mask = ExposureMask;
     self->bg = XCreateWindow(ob_display, ob_root,
                              0, 0, 1, 1, 0, RrInstanceDepth(ob_render_inst),
                              InputOutput, RrInstanceVisual(ob_render_inst),
-                             CWOverrideRedirect, &attrib);
+                             CWEventMask|CWOverrideRedirect, &attrib);
     self->s_bg = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR, self->bg, 0);
     self->s_text = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->s_bg, 1);
     self->text = RrSurfaceWindow(self->s_text);
@@ -53,6 +55,18 @@ Popup *popup_new(gboolean hasicon)
     } else {
         self->s_icon = NULL;
         self->icon = None;
+    }
+
+    RrColorSet(&pri, 1, 0, 0, 0);
+    RrColorSet(&pri, 0, 1, 0, 0);
+    RrPlanarSet(self->s_bg, RR_PLANAR_VERTICAL, &pri, &sec);
+    RrColorSet(&pri, 0, 0.5, 0, 1);
+    RrColorSet(&pri, 0.5, 0, 0.5, 1);
+    RrPlanarSet(self->s_text, RR_PLANAR_HORIZONTAL, &pri, &sec);
+    if (self->s_icon) {
+        RrColorSet(&pri, 0, 0, 1, 1);
+        RrColorSet(&pri, 0.5, 0.5, 0, 1);
+        RrPlanarSet(self->s_icon, RR_PLANAR_HORIZONTAL, &pri, &sec);
     }
 
     /* XXX COPY THE APPEARANCES FROM THE THEME...... LIKE THIS SORTA!
@@ -188,12 +202,16 @@ void popup_show(Popup *self, char *text, Icon *icon)
     if (!RrSurfaceVisible(self->s_bg)) {
         RrSurfaceShow(self->s_bg);
         stacking_raise(INTERNAL_AS_WINDOW(self));
+    } else {
+        /* XXX only need to paint top level surface in the future */
+        RrPaint(self->s_bg);
+        RrPaint(self->s_text);
+        if (self->s_icon)
+            RrPaint(self->s_icon);
     }
 }
 
 void popup_hide(Popup *self)
 {
-    if (RrSurfaceVisible(self->s_bg)) {
-        RrSurfaceHide(self->s_bg);
-    }
+    RrSurfaceHide(self->s_bg);
 }

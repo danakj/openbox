@@ -8,11 +8,11 @@
 
 GHashTable *menu_hash = NULL;
 
-#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
-			 LeaveWindowMask)
-#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
+#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
+			 LeaveWindowMask | ExposureMask)
+#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask | ExposureMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | ExposureMask)
 
 void menu_control_show(Menu *self, int x, int y, Client *client);
 

@@ -28,9 +28,13 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
 
 static Window create_window(struct RrInstance *inst, Window parent)
 {
-    Window win = XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
-                               RrDepth(inst), InputOutput, RrVisual(inst),
-                               0, NULL);
+    XSetWindowAttributes attrib;
+    Window win;
+
+    attrib.event_mask = ExposureMask;
+    win = XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
+                        RrDepth(inst), InputOutput, RrVisual(inst),
+                        CWEventMask, &attrib);
     return win;
 }
 
@@ -59,6 +63,8 @@ struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
     sur->win = win;
     sur->parent = NULL;
     sur->visible = 0;
+
+    RrInstaceAddSurface(sur);
     return sur;
 }
 
@@ -77,6 +83,8 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
     RrSurfaceShow(sur);
+
+    RrInstaceAddSurface(sur);
     return sur;
 }
 
@@ -115,6 +123,8 @@ struct RrSurface *RrSurfaceCopy(struct RrInstance *inst,
     sur->win = win;
     sur->parent = NULL;
     sur->visible = 0;
+
+    RrInstaceAddSurface(sur);
     return sur;
 }
 
@@ -132,6 +142,8 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
     RrSurfaceShow(sur);
+
+    RrInstaceAddSurface(sur);
     return sur;
 }
 
@@ -139,6 +151,7 @@ void RrSurfaceFree(struct RrSurface *sur)
 {
     int i;
     if (sur) {
+        RrInstaceRemoveSurface(sur);
         for (i = 0; i < sur->ntextures; ++i)
             RrTextureFreeContents(&sur->texture[i]);
         if (sur->ntextures)
@@ -198,6 +211,7 @@ void RrSurfaceMinSize(struct RrSurface *sur, int *w, int *h)
         break;
     }
 
+    minw = minh = 0;
     for (i = 0; i < sur->ntextures; ++i) {
         switch (sur->texture[i].type) {
         case RR_TEXTURE_NONE:

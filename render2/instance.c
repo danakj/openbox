@@ -1,4 +1,5 @@
 #include "instance.h"
+#include "surface.h"
 #include "debug.h"
 #include "glft/glft.h"
 #include <stdlib.h>
@@ -96,6 +97,7 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
                                      RrVisual(inst), AllocNone);
         inst->glx_context = glXCreateContext(display, &vilist[best],
                                              NULL, True);
+        inst->surface_map = g_hash_table_new(g_int_hash, g_int_equal);
 
         assert(inst->glx_context);
 
@@ -128,4 +130,19 @@ Colormap RrInstanceColormap(struct RrInstance *inst)
 Visual *RrInstanceVisual(struct RrInstance *inst)
 {
     return inst->visinfo.visual;
+}
+
+void RrInstaceAddSurface(struct RrSurface *sur)
+{
+    g_hash_table_replace(RrSurfaceInstance(sur)->surface_map, &sur->win, sur);
+}
+
+void RrInstaceRemoveSurface(struct RrSurface *sur)
+{
+    g_hash_table_remove(RrSurfaceInstance(sur)->surface_map, &sur->win);
+}
+
+struct RrSurface *RrInstaceLookupSurface(struct RrInstance *inst, Window win)
+{
+    return g_hash_table_lookup(inst->surface_map, &win);
 }

@@ -196,5 +196,6 @@ void RrPaintArea(struct RrSurface *sur,
                  int y,
                  int w,
                  int h);
+void RrExpose(struct RrInstance *inst, XExposeEvent *e);
 
 #endif

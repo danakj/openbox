@@ -5,12 +5,16 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
+#include <glib.h>
+
 struct RrInstance {
     Display *display;
     int screen;
     XVisualInfo visinfo;
     Colormap cmap;
     GLXContext glx_context;
+
+    GHashTable *surface_map;
 };
 
 #define RrDisplay(i)  ((i)->display)
@@ -23,5 +27,11 @@ struct RrInstance {
 #define RrVisual(i)   ((i)->visinfo.visual)
 #define RrColormap(i) ((i)->cmap)
 #define RrContext(i)  ((i)->glx_context)
+
+struct RrSurface;
+
+void RrInstaceAddSurface(struct RrSurface *sur);
+void RrInstaceRemoveSurface(struct RrSurface *sur);
+struct RrSurface *RrInstaceLookupSurface(struct RrInstance *inst, Window win);
 
 #endif

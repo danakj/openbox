@@ -8,7 +8,7 @@ CPPFLAGS=$(FC_CFLAGS) $(GLIB_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
          -DTHEMEDIR=\"$(themedir)\"
 
 INCLUDES=-I..
-LIBS=$(GL_LIBS) @LIBS@
+LIBS=$(GL_LIBS) $(GLIB_LIBS) @LIBS@
 
 noinst_PROGRAMS=rendertest
 rendertest_LDFLAGS=-lobrender2 -L.

@@ -427,6 +427,13 @@ static void event_process(XEvent *e)
     Menu *menu = NULL;
     ObWindow *obwin = NULL;
 
+    /* expose events aren't related to any internal stuff */
+    if (e->type == Expose) {
+        if (ob_state != State_Exiting)
+            RrExpose(ob_render_inst, &e->xexpose);
+        return;
+    }
+
     window = event_get_window(e);
     if ((obwin = g_hash_table_lookup(window_map, &window))) {
         switch (obwin->type) {

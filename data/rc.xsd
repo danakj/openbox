@@ -316,6 +316,7 @@
             <xs:enumeration value="Execute"/>
             <xs:enumeration value="Exit"/>
             <xs:enumeration value="Focus"/>
+            <xs:enumeration value="FocusToBottom"/>
             <xs:enumeration value="GrowToEdgeEast"/>
             <xs:enumeration value="GrowToEdgeNorth"/>
             <xs:enumeration value="GrowToEdgeSouth"/>

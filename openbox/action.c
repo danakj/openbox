@@ -472,6 +472,11 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
+        "focustobottom",
+        action_focus_order_to_bottom,
+        setup_client_action
+    },
+    {
         "raiselower",
         action_raiselower,
         setup_client_action
@@ -1050,6 +1055,11 @@ void action_iconify(union ActionData *data)
     client_action_start(data);
     client_iconify(data->client.any.c, TRUE, TRUE);
     client_action_end(data);
+}
+
+void action_focus_order_to_bottom(union ActionData *data)
+{
+    focus_order_to_bottom(data->client.any.c);
 }
 
 void action_raiselower(union ActionData *data)

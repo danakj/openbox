@@ -73,6 +73,9 @@ private:
   */
   static void timevalAdd(timeval &a, long msec);
 
+  // prevent people from using timers except as pointers
+  ~Timer() {}
+  
 public:
   //! Constructs a new running timer and queues it
   /*!

@@ -1117,9 +1117,6 @@ void BScreen::removeNetizen(Window w) {
 }
 
 
-  xatom->setValue(getRootWindow(), XAtom::net_number_of_desktops,
-                  XAtom::cardinal, workspacesList.size());
-
 void BScreen::updateNetizenCurrentWorkspace(void) {
   std::for_each(netizenList.begin(), netizenList.end(),
                 std::mem_fun(&Netizen::sendCurrentWorkspace));
@@ -1127,6 +1124,9 @@ void BScreen::updateNetizenCurrentWorkspace(void) {
 
 
 void BScreen::updateNetizenWorkspaceCount(void) {
+  xatom->setValue(getRootWindow(), XAtom::net_number_of_desktops,
+                  XAtom::cardinal, workspacesList.size());
+
   std::for_each(netizenList.begin(), netizenList.end(),
                 std::mem_fun(&Netizen::sendWorkspaceCount));
 }

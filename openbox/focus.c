@@ -260,6 +260,18 @@ static void popup_cycle(ObClient *c, gboolean show)
     }
 }
 
+static gboolean valid_focus_target(ObClient *ft)
+{
+    /* we don't use client_can_focus here, because that doesn't let you
+       focus an iconic window, but we want to be able to, so we just check
+       if the focus flags on the window allow it, and its on the current
+       desktop */
+    return (ft->transients == NULL && client_normal(ft) &&
+            ((ft->can_focus || ft->focus_notify) &&
+             !ft->skip_taskbar &&
+             (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)));
+}
+
 void focus_cycle(gboolean forward, gboolean linear,
                  gboolean dialog, gboolean done, gboolean cancel)
 {
@@ -283,9 +295,8 @@ void focus_cycle(gboolean forward, gboolean linear,
     if (!focus_order[screen_desktop])
         goto done_cycle;
 
-    if (!first) first = focus_order[screen_desktop]->data;
-    if (!focus_cycle_target) focus_cycle_target =
-                                 focus_order[screen_desktop]->data;
+    if (!first) first = focus_client;
+    if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (linear) list = client_list;
     else        list = focus_order[screen_desktop];
@@ -305,14 +316,7 @@ void focus_cycle(gboolean forward, gboolean linear,
         }
         /*ft = client_focus_target(it->data);*/
         ft = it->data;
-        /* we don't use client_can_focus here, because that doesn't let you
-           focus an iconic window, but we want to be able to, so we just check
-           if the focus flags on the window allow it, and its on the current
-           desktop */
-        if (ft->transients == NULL && client_normal(ft) &&
-            ((ft->can_focus || ft->focus_notify) &&
-             !ft->skip_taskbar &&
-             (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL))) {
+        if (valid_focus_target(ft)) {
             if (ft != focus_cycle_target) { /* prevents flicker */
                 if (focus_cycle_target)
                     frame_adjust_focus(focus_cycle_target->frame, FALSE);
@@ -343,7 +347,7 @@ void focus_directional_cycle(ObDirection dir,
                              gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
-    ObClient *ft;
+    ObClient *ft = NULL;
 
     if (cancel) {
         if (focus_cycle_target)
@@ -359,11 +363,20 @@ void focus_directional_cycle(ObDirection dir,
     if (!focus_order[screen_desktop])
         goto done_cycle;
 
-    if (!first) first = focus_order[screen_desktop]->data;
-    if (!focus_cycle_target) focus_cycle_target =
-                                 focus_order[screen_desktop]->data;
+    if (!first) first = focus_client;
+    if (!focus_cycle_target) focus_cycle_target = focus_client;
 
-    if ((ft = client_find_directional(focus_cycle_target, dir))) {
+    if (focus_cycle_target)
+        ft = client_find_directional(focus_cycle_target, dir);
+    else {
+        GList *it;
+
+        for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
+            if (valid_focus_target(it->data))
+                ft = it->data;
+    }
+        
+    if (ft) {
         if (ft != focus_cycle_target) {/* prevents flicker */
             if (focus_cycle_target)
                 frame_adjust_focus(focus_cycle_target->frame, FALSE);
@@ -371,9 +384,9 @@ void focus_directional_cycle(ObDirection dir,
             frame_adjust_focus(focus_cycle_target->frame, TRUE);
         }
         popup_cycle(ft, dialog);
+        if (dialog)
+            return;
     }
-    if (dialog)
-        return;
 
 done_cycle:
     if (done && focus_cycle_target)

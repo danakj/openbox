@@ -1444,7 +1444,11 @@ void client_update_title(ObClient *self)
     if (!PROP_GETS(self->window, net_wm_name, utf8, &data))
         /* try old x stuff */
         if (!PROP_GETS(self->window, wm_name, locale, &data))
-            data = g_strdup("Unnamed Window");
+            // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+            if (self->transient)
+                data = '\0';
+            else
+                data = g_strdup("Unnamed Window");
 
     /* did the title change? then reset the title_count */
     if (old_title && 0 != strncmp(old_title, data, strlen(data)))
@@ -1504,12 +1508,6 @@ void client_update_title(ObClient *self)
         g_free(data);
         data = vdata;
     }
-
-    // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-    if (self->transient)
-        data = '\0';
-    else
-        data = g_strdup("Unnamed Window");
 
     PROP_SETS(self->window, net_wm_visible_icon_name, data);
 

@@ -1968,6 +1968,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     /* if the client is shrinking, then resize the frame before the client */
     if (send_resize_client && (w <= oldw && h <= oldh))
 	XResizeWindow(ob_display, self->window, w, h);
+
+    XFlush(ob_display);
 }
 
 void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)

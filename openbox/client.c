@@ -1326,13 +1326,11 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         /* set the size and position if maximized */
         if (self->max_horz) {
             x = screen_area(self->desktop)->x - self->frame->size.left;
-            w = screen_area(self->desktop)->x +
-                screen_area(self->desktop)->width;
+            w = screen_area(self->desktop)->width;
         }
         if (self->max_vert) {
             y = screen_area(self->desktop)->y;
-            h = screen_area(self->desktop)->y +
-                screen_area(self->desktop)->height -
+            h = screen_area(self->desktop)->height -
                 self->frame->size.top - self->frame->size.bottom;
         }
     }

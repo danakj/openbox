@@ -98,9 +98,9 @@ borderColor:	#222222
 *.textColor:	#ffffff
 *.picColor: #f6eef6
 *xft.shadow.tint: 100
-#*menu.*.xft.shadow.tint: -50
-#*xft.flags: shadow
-#*title.xft.flags:	shadow
+!*menu.*.xft.shadow.tint: -50
+!*xft.flags: shadow
+!*title.xft.flags:	shadow
 
 !pixmap masks
 toolbar.button.left.mask:	bulletl.xbm

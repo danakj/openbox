@@ -23,10 +23,10 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = c->frame->area.x;
-    ct = c->frame->area.y;
-    cr = cl + c->frame->area.width - 1;
-    cb = ct + c->frame->area.height - 1;
+    cl = RECT_LEFT(c->frame->area);
+    ct = RECT_TOP(c->frame->area);
+    cr = RECT_RIGHT(c->frame->area);
+    cb = RECT_BOTTOM(c->frame->area);
     
     if (config_resist_win)
         for (it = stacking_list; it != NULL; it = it->next) {
@@ -39,10 +39,10 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
             /* don't snap to self or non-visibles */
             if (!target->frame->visible || target == c) continue; 
 
-            tl = target->frame->area.x - 1;
-            tt = target->frame->area.y - 1;
-            tr = tl + target->frame->area.width + 1;
-            tb = tt + target->frame->area.height + 1;
+            tl = RECT_LEFT(target->frame->area) - 1;
+            tt = RECT_TOP(target->frame->area) - 1;
+            tr = RECT_RIGHT(target->frame->area)+ 2;
+            tb = RECT_BOTTOM(target->frame->area) + 2;
 
             /* snapx and snapy ensure that the window snaps to the top-most
                window edge available, without going all the way from
@@ -106,10 +106,10 @@ void resist_move_monitors(ObClient *c, gint *x, gint *y)
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = c->frame->area.x;
-    ct = c->frame->area.y;
-    cr = cl + c->frame->area.width - 1;
-    cb = ct + c->frame->area.height - 1;
+    cl = RECT_LEFT(c->frame->area);
+    ct = RECT_TOP(c->frame->area);
+    cr = RECT_RIGHT(c->frame->area);
+    cb = RECT_BOTTOM(c->frame->area);
     
     if (config_resist_edge) {
         for (i = 0; i < screen_num_monitors; ++i) {
@@ -118,10 +118,10 @@ void resist_move_monitors(ObClient *c, gint *x, gint *y)
             if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
                 continue;
 
-            al = area->x;
-            at = area->y;
-            ar = al + area->width - 1;
-            ab = at + area->height - 1;
+            al = RECT_LEFT(*area);
+            at = RECT_TOP(*area);
+            ar = RECT_RIGHT(*area);
+            ab = RECT_BOTTOM(*area);
 
             if (cl >= al && l < al && l >= al - config_resist_edge)
                 *x = al;
@@ -148,10 +148,10 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
     incw = c->size_inc.width;
     inch = c->size_inc.height;
 
-    l = c->frame->area.x;
-    r = l + c->frame->area.width - 1;
-    t = c->frame->area.y;
-    b = t + c->frame->area.height - 1;
+    l = RECT_LEFT(c->frame->area);
+    r = RECT_RIGHT(c->frame->area);
+    t = RECT_TOP(c->frame->area);
+    b = RECT_BOTTOM(c->frame->area);
 
     if (config_resist_win) {
         for (it = stacking_list; it != NULL; it = it->next) {
@@ -162,10 +162,10 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
             /* don't snap to invisibles or ourself */
             if (!target->frame->visible || target == c) continue;
 
-            tl = target->frame->area.x;
-            tr = target->frame->area.x + target->frame->area.width - 1;
-            tt = target->frame->area.y;
-            tb = target->frame->area.y + target->frame->area.height - 1;
+            tl = RECT_LEFT(target->frame->area);
+            tr = RECT_RIGHT(target->frame->area);
+            tt = RECT_TOP(target->frame->area);
+            tb = RECT_BOTTOM(target->frame->area);
 
             if (snapx == NULL) {
                 /* horizontal snapping */
@@ -229,20 +229,20 @@ void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
     gint al, at, ar, ab; /* screen boundaries */
     gint incw, inch;
 
-    l = c->frame->area.x;
-    r = l + c->frame->area.width - 1;
-    t = c->frame->area.y;
-    b = t + c->frame->area.height - 1;
+    l = RECT_LEFT(c->frame->area);
+    r = RECT_RIGHT(c->frame->area);
+    t = RECT_TOP(c->frame->area);
+    b = RECT_BOTTOM(c->frame->area);
 
     incw = c->size_inc.width;
     inch = c->size_inc.height;
 
     /* get the screen boundaries */
     area = screen_area(c->desktop);
-    al = area->x;
-    at = area->y;
-    ar = al + area->width - 1;
-    ab = at + area->height - 1;
+    al = RECT_LEFT(*area);
+    at = RECT_TOP(*area);
+    ar = RECT_RIGHT(*area);
+    ab = RECT_BOTTOM(*area);
 
     if (config_resist_edge) {
         /* horizontal snapping */

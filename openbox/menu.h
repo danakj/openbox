@@ -2,16 +2,19 @@
 #define __menu_h
 
 #include "action.h"
+#include "window.h"
 #include "render/render.h"
 #include "geom.h"
 
 #include <glib.h>
 
+struct _ObClient;
+
 struct Menu;
 struct MenuEntry;
 
 typedef void(*menu_controller_show)(struct Menu *self,
-                                    int x, int y, ObClient *);
+                                    int x, int y, struct _ObClient *);
 typedef void(*menu_controller_update)(struct Menu *self);
 typedef void(*menu_controller_mouseover)(struct MenuEntry *self,
                                          gboolean enter);
@@ -45,7 +48,7 @@ typedef struct Menu {
 
 
     /* render stuff */
-    ObClient *client;
+    struct _ObClient *client;
     Window frame;
     Window title;
     RrAppearance *a_title;
@@ -104,8 +107,8 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
                     menu_controller_show show, menu_controller_update update);
 void menu_free(char *name);
 
-void menu_show(char *name, int x, int y, ObClient *client);
-void menu_show_full(Menu *menu, int x, int y, ObClient *client);
+void menu_show(char *name, int x, int y, struct _ObClient *client);
+void menu_show_full(Menu *menu, int x, int y, struct _ObClient *client);
 
 void menu_hide(Menu *self);
 

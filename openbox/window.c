@@ -41,7 +41,7 @@ Window window_layer(ObWindow *self)
 {
     switch (self->type) {
     case Window_Menu:
-        return Layer_Internal;
+        return OB_STACKING_LAYER_INTERNAL;
     case Window_Dock:
         return config_dock_layer;
     case Window_DockApp:
@@ -51,7 +51,7 @@ Window window_layer(ObWindow *self)
     case Window_Client:
         return ((ObClient*)self)->layer;
     case Window_Internal:
-        return Layer_Internal;
+        return OB_STACKING_LAYER_INTERNAL;
     }
     g_assert_not_reached();
     return None;

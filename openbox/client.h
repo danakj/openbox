@@ -223,7 +223,7 @@ struct _ObClient
 
     /*! The layer in which the window will be stacked, windows in lower layers
       are always below windows in higher layers. */
-    StackLayer layer;
+    ObStackingLayer layer;
 
     /*! A bitmask of values in the Decoration enum
       The values in the variable are the decorations that the client wants to

@@ -1,5 +1,6 @@
 #include "dispatch.h"
 #include "extensions.h"
+#include "client.h"
 
 #include <glib.h>
 

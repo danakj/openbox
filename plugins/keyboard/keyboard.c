@@ -4,6 +4,7 @@
 #include "kernel/openbox.h"
 #include "kernel/event.h"
 #include "kernel/grab.h"
+#include "kernel/client.h"
 #include "kernel/action.h"
 #include "kernel/prop.h"
 #include "kernel/timer.h"

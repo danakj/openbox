@@ -1485,27 +1485,28 @@ ObClient *client_search_focus_tree_full(ObClient *self)
     return client_search_focus_tree(self);
 }
 
-static StackLayer calc_layer(ObClient *self)
+static ObStackingLayer calc_layer(ObClient *self)
 {
-    StackLayer l;
+    ObStackingLayer l;
 
-    if (self->fullscreen) l = Layer_Fullscreen;
-    else if (self->type == OB_CLIENT_TYPE_DESKTOP) l = Layer_Desktop;
+    if (self->fullscreen) l = OB_STACKING_LAYER_FULLSCREEN;
+    else if (self->type == OB_CLIENT_TYPE_DESKTOP)
+        l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
-        if (!self->below) l = Layer_Top;
-        else l = Layer_Normal;
+        if (!self->below) l = OB_STACKING_LAYER_TOP;
+        else l = OB_STACKING_LAYER_NORMAL;
     }
-    else if (self->above) l = Layer_Above;
-    else if (self->below) l = Layer_Below;
-    else l = Layer_Normal;
+    else if (self->above) l = OB_STACKING_LAYER_ABOVE;
+    else if (self->below) l = OB_STACKING_LAYER_BELOW;
+    else l = OB_STACKING_LAYER_NORMAL;
 
     return l;
 }
 
 static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
-                                        StackLayer l, gboolean raised)
+                                        ObStackingLayer l, gboolean raised)
 {
-    StackLayer old, own;
+    ObStackingLayer old, own;
     GSList *it;
 
     old = self->layer;
@@ -1526,7 +1527,7 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
 
 void client_calc_layer(ObClient *self)
 {
-    StackLayer l;
+    ObStackingLayer l;
     ObClient *orig;
 
     orig = self;

@@ -15,14 +15,14 @@ GSList *config_desktops_names;
 gboolean config_opaque_move;
 gboolean config_opaque_resize;
 
-StackLayer    config_dock_layer;
-gboolean      config_dock_floating;
-ObDirection   config_dock_pos;
-int           config_dock_x;
-int           config_dock_y;
-ObOrientation config_dock_orient;
-gboolean      config_dock_hide;
-guint         config_dock_hide_timeout;
+ObStackingLayer config_dock_layer;
+gboolean        config_dock_floating;
+ObDirection     config_dock_pos;
+gint            config_dock_x;
+gint            config_dock_y;
+ObOrientation   config_dock_orient;
+gboolean        config_dock_hide;
+guint           config_dock_hide_timeout;
 
 static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
@@ -124,11 +124,11 @@ static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
     }
     if ((n = parse_find_node("stacking", node))) {
         if (parse_contains("top", doc, n))
-            config_dock_layer = Layer_Top;
+            config_dock_layer = OB_STACKING_LAYER_TOP;
         else if (parse_contains("normal", doc, n))
-            config_dock_layer = Layer_Normal;
+            config_dock_layer = OB_STACKING_LAYER_NORMAL;
         else if (parse_contains("bottom", doc, n))
-            config_dock_layer = Layer_Below;
+            config_dock_layer = OB_STACKING_LAYER_BELOW;
     }
     if ((n = parse_find_node("direction", node))) {
         if (parse_contains("horizontal", doc, n))
@@ -166,7 +166,7 @@ void config_startup()
 
     parse_register("moveresize", parse_moveresize, NULL);
 
-    config_dock_layer = Layer_Top;
+    config_dock_layer = OB_STACKING_LAYER_TOP;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
     config_dock_floating = FALSE;
     config_dock_x = 0;

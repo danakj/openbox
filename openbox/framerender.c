@@ -1,6 +1,7 @@
 #include "frame.h"
 #include "openbox.h"
 #include "screen.h"
+#include "client.h"
 #include "framerender.h"
 #include "render/theme.h"
 
@@ -16,10 +17,10 @@ void framerender_frame(ObFrame *self)
 {
     if (self->focused)
         XSetWindowBorder(ob_display, self->plate,
-                         ob_rr_theme->cb_focused_color->pixel);
+                         RrColorPixel(ob_rr_theme->cb_focused_color));
     else
         XSetWindowBorder(ob_display, self->plate,
-                         ob_rr_theme->cb_unfocused_color->pixel);
+                         RrColorPixel(ob_rr_theme->cb_unfocused_color));
 
     if (self->client->decorations & Decor_Titlebar) {
         RrAppearance *t, *l, *m, *n, *i, *d, *s, *c;

@@ -2,7 +2,6 @@
 #define __config_h
 
 #include "misc.h"
-#include "dock.h"
 #include "stacking.h"
 
 #include <glib.h>
@@ -27,17 +26,17 @@ extern gboolean config_opaque_move;
 extern gboolean config_opaque_resize;
 
 /*! The stacking layer the dock will reside in */
-extern StackLayer config_dock_layer;
+extern ObStackingLayer config_dock_layer;
 /*! Is the dock floating */
 extern gboolean config_dock_floating;
 /*! Where to place the dock if not floating */
 extern ObDirection config_dock_pos;
-/*! If config_dock_pos is DockPos_Floating, this is the top-left corner's
+/*! If config_dock_floating, this is the top-left corner's
   position */
-extern int config_dock_x;
-/*! If config_dock_pos is DockPos_Floating, this is the top-left corner's
+extern gint config_dock_x;
+/*! If config_dock_floating, this is the top-left corner's
   position */
-extern int config_dock_y;
+extern gint config_dock_y;
 /*! Whether the dock places the dockapps in it horizontally or vertically */
 extern ObOrientation config_dock_orient;
 /*! Whether to auto-hide the dock when the pointer is not over it */

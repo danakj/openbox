@@ -26,10 +26,12 @@ void menu_render_full(Menu *self) {
     if (self->a_title == NULL) {
         XSetWindowBorderWidth(ob_display, self->frame, ob_rr_theme->bwidth);
         XSetWindowBackground(ob_display, self->frame,
-                             ob_rr_theme->b_color->pixel);
+                             RrColorPixel(ob_rr_theme->b_color));
         XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);
-        XSetWindowBorder(ob_display, self->frame, ob_rr_theme->b_color->pixel);
-        XSetWindowBorder(ob_display, self->title, ob_rr_theme->b_color->pixel);
+        XSetWindowBorder(ob_display, self->frame,
+                         RrColorPixel(ob_rr_theme->b_color));
+        XSetWindowBorder(ob_display, self->title,
+                         RrColorPixel(ob_rr_theme->b_color));
 
         self->a_title = RrAppearanceCopy(ob_rr_theme->a_menu_title);
         self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);

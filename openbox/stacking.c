@@ -82,22 +82,22 @@ static void do_restack(GList *wins, GList *before)
 static void do_raise(GList *wins)
 {
     GList *it;
-    GList *layer[NUM_STACKLAYER] = {NULL};
+    GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
     int i;
 
     for (it = wins; it; it = g_list_next(it)) {
-        StackLayer l;
+        ObStackingLayer l;
 
         l = window_layer(it->data);
         layer[l] = g_list_append(layer[l], it->data);
     }
 
     it = stacking_list;
-    for (i = NUM_STACKLAYER - 1; i >= 0; --i) {
+    for (i = OB_NUM_STACKING_LAYERS - 1; i >= 0; --i) {
         if (layer[i]) {
             for (; it; it = g_list_next(it)) {
                 /* look for the top of the layer */
-                if (window_layer(it->data) <= (StackLayer) i)
+                if (window_layer(it->data) <= (ObStackingLayer) i)
                     break;
             }
             do_restack(layer[i], it);
@@ -109,22 +109,22 @@ static void do_raise(GList *wins)
 static void do_lower(GList *wins)
 {
     GList *it;
-    GList *layer[NUM_STACKLAYER] = {NULL};
+    GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
     int i;
 
     for (it = wins; it; it = g_list_next(it)) {
-        StackLayer l;
+        ObStackingLayer l;
 
         l = window_layer(it->data);
         layer[l] = g_list_append(layer[l], it->data);
     }
 
     it = stacking_list;
-    for (i = NUM_STACKLAYER - 1; i >= 0; --i) {
+    for (i = OB_NUM_STACKING_LAYERS - 1; i >= 0; --i) {
         if (layer[i]) {
             for (; it; it = g_list_next(it)) {
                 /* look for the top of the next layer down */
-                if (window_layer(it->data) < (StackLayer) i)
+                if (window_layer(it->data) < (ObStackingLayer) i)
                     break;
             }
             do_restack(layer[i], it);
@@ -264,7 +264,7 @@ void stacking_lower(ObWindow *window)
 
 void stacking_add(ObWindow *win)
 {
-    StackLayer l;
+    ObStackingLayer l;
     GList *wins;
 
     g_assert(focus_backup != None); /* make sure I dont break this in the

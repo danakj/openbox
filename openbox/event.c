@@ -662,7 +662,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* are we a fullscreen window or a transient of one? (checks layer)
            if we are then we need to be iconified since we are losing focus
          */
-        if (client->layer == Layer_Fullscreen && !client->iconic &&
+        if (client->layer == OB_STACKING_LAYER_FULLSCREEN && !client->iconic &&
             !client_search_focus_tree_full(client))
             /* iconify fullscreen windows when they and their transients
                aren't focused */

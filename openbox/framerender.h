@@ -1,8 +1,8 @@
 #ifndef __framerender_h
 #define __framerender_h
 
-#include "frame.h"
+struct _ObFrame;
 
-void framerender_frame(ObFrame *self);
+void framerender_frame(struct _ObFrame *self);
 
 #endif

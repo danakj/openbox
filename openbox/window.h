@@ -4,6 +4,9 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+typedef struct _ObWindow         ObWindow;
+typedef struct _ObInternalWindow ObInternalWindow;
+
 typedef enum {
     Window_Menu,
     Window_Dock,
@@ -12,9 +15,10 @@ typedef enum {
     Window_Internal /* used for stacking but not events */
 } Window_InternalType;
 
-typedef struct ObWindow {
+struct _ObWindow
+{
     Window_InternalType type;
-} ObWindow;
+};
 
 /* Wrapper for internal stuff. If its struct matches this then it can be used
    as an ObWindow */

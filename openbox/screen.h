@@ -3,7 +3,6 @@
 
 #include "misc.h"
 #include "geom.h"
-#include "client.h"
 
 struct _ObClient;
 

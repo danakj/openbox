@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "openbox.h"
 #include "stacking.h"
+#include "client.h"
 #include "grab.h"
 #include "screen.h"
 #include "geom.h"

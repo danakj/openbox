@@ -1,6 +1,8 @@
 #ifndef __extensions_h
 #define __extensions_h
 
+#include "geom.h"
+
 #include <X11/Xlib.h>
 #ifdef    XKB
 #include <X11/XKBlib.h>
@@ -17,6 +19,7 @@
 #ifdef    VIDMODE
 #include <X11/extensions/xf86vmode.h>
 #endif
+
 #include <glib.h>
 
 /*! Does the display have the XKB extension? */

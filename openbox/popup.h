@@ -1,9 +1,9 @@
 #ifndef __popup_h
 #define __popup_h
 
-#include "client.h"
-
 #include <glib.h>
+
+struct _ObClientIcon;
 
 typedef struct _ObPopup Popup;
 
@@ -21,7 +21,7 @@ void popup_position(Popup *self, gint gravity, gint x, gint y);
 void popup_size(Popup *self, gint w, gint h);
 void popup_size_to_string(Popup *self, gchar *text);
 
-void popup_show(Popup *self, gchar *text, ObClientIcon *icon);
+void popup_show(Popup *self, gchar *text, struct _ObClientIcon *icon);
 void popup_hide(Popup *self);
 
 #endif

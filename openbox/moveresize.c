@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "prop.h"
 #include "client.h"
+#include "frame.h"
 #include "dispatch.h"
 #include "openbox.h"
 #include "popup.h"

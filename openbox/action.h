@@ -1,7 +1,7 @@
 #ifndef __action_h
 #define __action_h
 
-#include "client.h"
+#include "misc.h"
 #include "parser/parse.h"
 
 /* These have to all have a Client* at the top even if they don't use it, so
@@ -10,57 +10,57 @@
 */
 
 struct AnyAction {
-    ObClient *c;
+    struct _ObClient *c;
 };
 
 struct DirectionalAction{
-    ObClient *c;
+    struct _ObClient *c;
     ObDirection direction;
 };
 
 struct Execute {
-    ObClient *c;
+    struct _ObClient *c;
     char *path;
 };
 
 struct ClientAction {
-    ObClient *c;
+    struct _ObClient *c;
 };
 
 struct MoveResizeRelative {
-    ObClient *c;
+    struct _ObClient *c;
     int delta;
 };
 
 struct SendToDesktop {
-    ObClient *c;
+    struct _ObClient *c;
     guint desk;
     gboolean follow;
 };
 
 struct SendToDesktopDirection {
-    ObClient *c;
+    struct _ObClient *c;
     gboolean wrap;
     gboolean follow;
 };
 
 struct Desktop {
-    ObClient *c;
+    struct _ObClient *c;
     guint desk;
 };
 
 struct Layer {
-    ObClient *c;
+    struct _ObClient *c;
     int layer; /* < 0 = below, 0 = normal, > 0 = above */
 };
 
 struct DesktopDirection {
-    ObClient *c;
+    struct _ObClient *c;
     gboolean wrap;
 };
 
 struct MoveResize {
-    ObClient *c;
+    struct _ObClient *c;
     int x;
     int y;
     guint32 corner; /* prop_atoms.net_wm_moveresize_* */
@@ -68,14 +68,14 @@ struct MoveResize {
 };
 
 struct ShowMenu {
-    ObClient *c;
+    struct _ObClient *c;
     char *name;
     int x;
     int y;
 };
 
 struct CycleWindows {
-    ObClient *c;
+    struct _ObClient *c;
     gboolean linear;
     gboolean forward;
     gboolean final;

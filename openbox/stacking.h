@@ -8,15 +8,15 @@
 
 /*! The possible stacking layers a client window can be a part of */
 typedef enum {
-    Layer_Desktop,    /*!< 0 - desktop windows */
-    Layer_Below,      /*!< 1 - normal windows w/ below */
-    Layer_Normal,     /*!< 2 - normal windows */
-    Layer_Above,      /*!< 3 - normal windows w/ above */
-    Layer_Top,        /*!< 4 - always-on-top-windows (docks?) */
-    Layer_Fullscreen, /*!< 5 - fullscreeen windows */
-    Layer_Internal,   /*!< 6 - openbox windows/menus */
-    NUM_STACKLAYER
-} StackLayer;
+    OB_STACKING_LAYER_DESKTOP,    /*!< 0 - desktop windows */
+    OB_STACKING_LAYER_BELOW,      /*!< 1 - normal windows w/ below */
+    OB_STACKING_LAYER_NORMAL,     /*!< 2 - normal windows */
+    OB_STACKING_LAYER_ABOVE,      /*!< 3 - normal windows w/ above */
+    OB_STACKING_LAYER_TOP,        /*!< 4 - always-on-top-windows (docks?) */
+    OB_STACKING_LAYER_FULLSCREEN, /*!< 5 - fullscreeen windows */
+    OB_STACKING_LAYER_INTERNAL,   /*!< 6 - openbox windows/menus */
+    OB_NUM_STACKING_LAYERS
+} ObStackingLayer;
 
 /* list of ObWindow*s in stacking order from highest to lowest */
 extern GList  *stacking_list;

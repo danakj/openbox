@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Докер
+# Re╬a
 $ #SlitDirection
-# Ориентация докера
+# Smer re╬e
 $ #SlitPlacement
-# Местоположения докера
+# Lega re╬e

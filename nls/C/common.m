@@ -1,35 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Да
+# Da
 $ #No
-# Нет
+# Ne
 
 $ #DirectionTitle
-# Направление
+# Smer
 $ #DirectionHoriz
-# По горизонтали
+# Vodoravno
 $ #DirectionVert
-# По вертикали
+# NavpiХno
 
 $ #AlwaysOnTop
-# Всегда наверху
+# Vselej na vrhu
 
 $ #PlacementTitle
-# Местоположение
+# Lega
 $ #PlacementTopLeft
-# Слева вверху
+# Na vrhu in levo poravnano
 $ #PlacementCenterLeft
-# Слева по центру
+# NavpiХno osredninjeno in levo poravnano
 $ #PlacementBottomLeft
-# Слева внизу
+# Na dnu in levo poravnano
 $ #PlacementTopCenter
-# Сверху по центру
+# Na vrhu in osredinjeno
 $ #PlacementBottomCenter
-# Снизу по центру
+# Na dnu in osredinjeno
 $ #PlacementTopRight
-# Справа сверху
+# Na vrhu in desno poravnano
 $ #PlacementCenterRight
-# Справа по центру
+# NavpiХno osredinjeno in desno poravnano
 $ #PlacementBottomRight
-# Справа внизу
+# Na dnu in desno poravnano
+
+$ #AutoHide
+# Samodejno skrivanje

@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Отправить на ...
+# Na delovno povr╧ino...
 $ #Shade
-# Свернуть в заголовок
+# Zastri
 $ #Iconify
-# Свернуть в иконку
+# Pomanj╧aj
 $ #Maximize
-# Максимизировать
+# PoveХaj
 $ #Raise
-# Поднять наверх
+# Prika╬i
 $ #Lower
-# Опустить вниз
+# Zakrij
 $ #Stick
-# Приклеить
+# Prilepi
 $ #KillClient
-# Убить клиентское приложение
+# Zaustavi 
 $ #Close
-# Закрыть
+# Zapusti

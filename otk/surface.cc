@@ -7,7 +7,7 @@
 #include "surface.hh"
 #include "display.hh"
 #include "screeninfo.hh"
-#include "gccache.hh"
+#include "rendercolor.hh"
 
 extern "C" {
 #include <X11/Xutil.h>
@@ -28,13 +28,12 @@ Surface::~Surface()
   destroyObjects();
 }
 
-void Surface::setPixmap(const Color &color)
+void Surface::setPixmap(const RenderColor &color)
 {
   if (_pixmap == None)
     createObjects();
 
-  Pen p(color);
-  XFillRectangle(**display, _pixmap, p.gc(), 0, 0,
+  XFillRectangle(**display, _pixmap, color.gc(), 0, 0,
                  _size.x(), _size.y());
 }
 

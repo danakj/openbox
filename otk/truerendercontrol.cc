@@ -9,6 +9,8 @@
 #include "screeninfo.hh"
 #include "surface.hh"
 
+#include "rendercolor.hh"
+
 extern "C" {
 #ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
@@ -127,7 +129,8 @@ void TrueRenderControl::drawBackground(Surface& sf,
 
   im->data = (char*) data;
 
-  sf.setPixmap(im);
+//  sf.setPixmap(im);
+  sf.setPixmap(RenderColor(_screen, 0xff, 0xff, 0));
 
   delete [] im->data;
   im->data = NULL;

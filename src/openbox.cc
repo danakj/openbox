@@ -14,6 +14,7 @@
 #include "otk/assassin.hh"
 #include "otk/property.hh"
 #include "otk/util.hh"
+#include "otk/rendercolor.hh"
 
 extern "C" {
 #include <X11/cursorfont.h>
@@ -126,6 +127,7 @@ Openbox::Openbox(int argc, char **argv)
   // anything that died while we were restarting won't give us a SIGCHLD
   while (waitpid(-1, NULL, WNOHANG) > 0);
 
+  otk::RenderColor::initialize();
   otk::Timer::initialize();
   otk::Property::initialize();
   _actions = new Actions();
@@ -208,6 +210,7 @@ Openbox::~Openbox()
   //otk::display->destroy();
 
   otk::Timer::destroy();
+  otk::RenderColor::destroy();
 
   if (_restart) {
     if (!_restart_prog.empty()) {

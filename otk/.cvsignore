@@ -37,3 +37,4 @@ rendertexture.lo
 rendertest
 renderstyle.lo
 rendercontrol.lo
+rendercolor.lo

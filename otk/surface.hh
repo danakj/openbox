@@ -14,6 +14,7 @@ extern "C" {
 namespace otk {
 
 class ScreenInfo;
+class RenderColor;
 
 class Surface {
   int _screen;
@@ -26,7 +27,7 @@ protected:
   void destroyObjects();
 
   void setPixmap(XImage *image);
-  void setPixmap(const Color &color);
+  void setPixmap(const RenderColor &color);
   
 public:
   Surface(int screen, const Point &size);

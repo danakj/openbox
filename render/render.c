@@ -106,7 +106,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
                 l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
                                         render_visual, render_colormap);
             }
-            font_draw(l->xftdraw, &l->texture[i].data.text);
+            font_draw(l->xftdraw, &l->texture[i].data.text, x, y, w, h);
         break;
         case Bitmask:
             if (l->texture[i].data.mask.color->gc == None)

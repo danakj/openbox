@@ -90,10 +90,15 @@ int font_max_char_width(ObFont *f)
     return (signed) f->xftfont->max_advance_width;
 }
 
-void font_draw(XftDraw *d, TextureText *t)
+void font_draw(XftDraw *d, TextureText *t, int x, int y, int w, int h)
 {
-    int x = 0, y = 0;
     XftColor c;
+
+    /* accomidate for areas bigger/smaller than Xft thinks the font is tall */
+    y += (h - t->font->xftfont->height) / 2;
+
+    x += 3; /* XXX figure out X with justification */
+
     if (t->shadow) {
         c.color.red = 0;
         c.color.green = 0;

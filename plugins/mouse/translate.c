@@ -50,7 +50,7 @@ gboolean translate_button(char *str, guint *state, guint *button)
     else if (!g_ascii_strcasecmp("Right", l)) *button = 3;
     else if (!g_ascii_strcasecmp("Up", l)) *button = 4;
     else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
-    else *button = atoi(l);
+    else if (!g_ascii_strncasecmp("Button", l, 6)) *button = atoi(l+6);
     if (!*button) {
 	g_warning("Invalid button '%s' in pointer binding.", l);
 	goto translation_fail;

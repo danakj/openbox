@@ -14,7 +14,6 @@ def focus(data):
     type = OBClient_type(client)
     # these types of windows dont get focus from window enter events
     if data.action() == EventEnterWindow:
-        print "enter window"
         if (type == OBClient_Type_Dock or \
             type == OBClient_Type_Desktop):
             return

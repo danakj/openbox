@@ -169,6 +169,7 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
     Rect *a;
     guint i;
     gint dx = 0, dy = 0;
+    gint pos, half;
 
     for (i = 0; i < screen_num_monitors; ++i) {
         a = screen_physical_area_monitor(i);
@@ -177,10 +178,23 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
     }
     if (!a) a = screen_physical_area_monitor(0);
 
-    dx = MIN(0, (a->x + a->width) - (self->area.x + self->area.width));
-    dy = MIN(0, (a->y + a->height) - (self->area.y + self->area.height));
-    if (!dx) dx = MAX(0, a->x - self->area.x);
-    if (!dy) dy = MAX(0, a->y - self->area.y);
+    half = g_list_length(self->entries) / 2;
+    pos = g_list_index(self->entries, self->selected);
+
+    /* if in the bottom half then check this shit first, will keep the bottom
+       edge of the menu visible */
+    if (pos > half) {
+        dx = MAX(dx, a->x - self->area.x);
+        dy = MAX(dy, a->y - self->area.y);
+    }
+    dx = MIN(dx, (a->x + a->width) - (self->area.x + self->area.width));
+    dy = MIN(dy, (a->y + a->height) - (self->area.y + self->area.height));
+    /* if in the top half then check this shit last, will keep the top
+       edge of the menu visible */
+    if (pos <= half) {
+        dx = MAX(dx, a->x - self->area.x);
+        dy = MAX(dy, a->y - self->area.y);
+    }
 
     if (dx || dy) {
         ObMenuFrame *f;

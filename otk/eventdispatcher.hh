@@ -31,6 +31,8 @@ public:
   otk::OtkEventHandler *getMasterHandler(void) const { return _master; }
 
   otk::OtkEventHandler *findHandler(Window win);
+
+  inline Time lastTime() const { return _lasttime; }
   
 private:
   OtkEventMap _map;
@@ -41,7 +43,7 @@ private:
   XEvent _crossing_e;
 
   //! The time at which the last XEvent with a time was received
-  Time _lasttime; // XXX: store this! also provide an accessor!
+  Time _lasttime;
 
   void dispatch(const XEvent &e);
 };

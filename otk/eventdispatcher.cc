@@ -56,6 +56,20 @@ void OtkEventDispatcher::dispatchEvents(void)
     printf("Event %d window %lx\n", e.type, e.xany.window);
 #endif
 
+    // grab the lasttime
+    switch (e.type) {
+    case ButtonPress:
+    case ButtonRelease:
+      _lasttime = e.xbutton.time; break;
+    case MotionNotify:
+      _lasttime = e.xmotion.time; break;
+    case PropertyNotify:
+      _lasttime = e.xproperty.time; break;
+    case EnterNotify:
+    case LeaveNotify:
+      _lasttime = e.xcrossing.time; break;
+    }
+
     // these ConfigureRequests require some special attention
     if (e.type == ConfigureRequest) {
       // find the actual window! e.xany.window is the parent window

@@ -684,53 +684,54 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__BGCCacheContext swig_types[36] 
 #define  SWIGTYPE_p_XCreateWindowEvent swig_types[37] 
 #define  SWIGTYPE_p_XDestroyWindowEvent swig_types[38] 
-#define  SWIGTYPE_p_XCirculateEvent swig_types[39] 
-#define  SWIGTYPE_p_XConfigureEvent swig_types[40] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[41] 
+#define  SWIGTYPE_p_Time swig_types[39] 
+#define  SWIGTYPE_p_XCirculateEvent swig_types[40] 
+#define  SWIGTYPE_p_XConfigureEvent swig_types[41] 
 #define  SWIGTYPE_p_long swig_types[42] 
-#define  SWIGTYPE_p_XTextProperty swig_types[43] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[44] 
-#define  SWIGTYPE_p_XCirculateRequestEvent swig_types[45] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[46] 
-#define  SWIGTYPE_p_XMapRequestEvent swig_types[47] 
-#define  SWIGTYPE_p_XResizeRequestEvent swig_types[48] 
-#define  SWIGTYPE_p_XSelectionRequestEvent swig_types[49] 
-#define  SWIGTYPE_otk__OBTimeoutHandler swig_types[50] 
-#define  SWIGTYPE_p_XftDraw swig_types[51] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[52] 
-#define  SWIGTYPE_p_otk__OtkFocusLabel swig_types[53] 
-#define  SWIGTYPE_p_otk__BTexture swig_types[54] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[55] 
-#define  SWIGTYPE_p_otk__BFont swig_types[56] 
-#define  SWIGTYPE_p_otk__Point swig_types[57] 
-#define  SWIGTYPE_p_p_char swig_types[58] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[59] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[60] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[61] 
-#define  SWIGTYPE_p_Pixmap swig_types[62] 
-#define  SWIGTYPE_p_GC swig_types[63] 
-#define  SWIGTYPE_p_otk__OBTimerQueueManager swig_types[64] 
-#define  SWIGTYPE_p_otk__OtkAppWidget swig_types[65] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[66] 
-#define  SWIGTYPE_p_unsigned_long swig_types[67] 
-#define  SWIGTYPE_p_XEvent swig_types[68] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[69] 
-#define  SWIGTYPE_p_std__string swig_types[70] 
-#define  SWIGTYPE_p_XCrossingEvent swig_types[71] 
-#define  SWIGTYPE_p_XMappingEvent swig_types[72] 
-#define  SWIGTYPE_p_otk__BGCCacheItem swig_types[73] 
-#define  SWIGTYPE_p_p_unsigned_int swig_types[74] 
-#define  SWIGTYPE_p_unsigned_int swig_types[75] 
-#define  SWIGTYPE_p_p_unsigned_char swig_types[76] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[77] 
-#define  SWIGTYPE_p_XGraphicsExposeEvent swig_types[78] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[43] 
+#define  SWIGTYPE_p_XTextProperty swig_types[44] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[45] 
+#define  SWIGTYPE_p_XSelectionRequestEvent swig_types[46] 
+#define  SWIGTYPE_p_XCirculateRequestEvent swig_types[47] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[48] 
+#define  SWIGTYPE_p_XMapRequestEvent swig_types[49] 
+#define  SWIGTYPE_p_XResizeRequestEvent swig_types[50] 
+#define  SWIGTYPE_otk__OBTimeoutHandler swig_types[51] 
+#define  SWIGTYPE_p_XftDraw swig_types[52] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[53] 
+#define  SWIGTYPE_p_otk__OtkFocusLabel swig_types[54] 
+#define  SWIGTYPE_p_otk__BTexture swig_types[55] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[56] 
+#define  SWIGTYPE_p_otk__BFont swig_types[57] 
+#define  SWIGTYPE_p_otk__Point swig_types[58] 
+#define  SWIGTYPE_p_p_char swig_types[59] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[60] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[61] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[62] 
+#define  SWIGTYPE_p_Pixmap swig_types[63] 
+#define  SWIGTYPE_p_GC swig_types[64] 
+#define  SWIGTYPE_p_otk__OBTimerQueueManager swig_types[65] 
+#define  SWIGTYPE_p_otk__OtkAppWidget swig_types[66] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[67] 
+#define  SWIGTYPE_p_unsigned_long swig_types[68] 
+#define  SWIGTYPE_p_XEvent swig_types[69] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[70] 
+#define  SWIGTYPE_p_std__string swig_types[71] 
+#define  SWIGTYPE_p_XCrossingEvent swig_types[72] 
+#define  SWIGTYPE_p_XMappingEvent swig_types[73] 
+#define  SWIGTYPE_p_otk__BGCCacheItem swig_types[74] 
+#define  SWIGTYPE_p_p_unsigned_int swig_types[75] 
+#define  SWIGTYPE_p_unsigned_int swig_types[76] 
+#define  SWIGTYPE_p_p_unsigned_char swig_types[77] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[78] 
 #define  SWIGTYPE_p_XExposeEvent swig_types[79] 
 #define  SWIGTYPE_p_XFocusChangeEvent swig_types[80] 
-#define  SWIGTYPE_p_XNoExposeEvent swig_types[81] 
-#define  SWIGTYPE_p_XMapEvent swig_types[82] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[83] 
-#define  SWIGTYPE_p_XColormapEvent swig_types[84] 
-static swig_type_info *swig_types[86];
+#define  SWIGTYPE_p_XGraphicsExposeEvent swig_types[81] 
+#define  SWIGTYPE_p_XNoExposeEvent swig_types[82] 
+#define  SWIGTYPE_p_XMapEvent swig_types[83] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[84] 
+#define  SWIGTYPE_p_XColormapEvent swig_types[85] 
+static swig_type_info *swig_types[87];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -1053,6 +1054,27 @@ static PyObject *_wrap_OtkEventDispatcher_findHandler(PyObject *self, PyObject *
     result = (otk::OtkEventHandler *)(arg1)->findHandler(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__OtkEventHandler, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OtkEventDispatcher_lastTime(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::OtkEventDispatcher *arg1 = (otk::OtkEventDispatcher *) 0 ;
+    Time result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OtkEventDispatcher_lastTime",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__OtkEventDispatcher,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = ((otk::OtkEventDispatcher const *)arg1)->lastTime();
+    
+    {
+        Time * resultptr;
+        resultptr = new Time((Time &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_Time, 1);
+    }
     return resultobj;
     fail:
     return NULL;
@@ -12823,6 +12845,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OtkEventDispatcher_setMasterHandler", _wrap_OtkEventDispatcher_setMasterHandler, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_getMasterHandler", _wrap_OtkEventDispatcher_getMasterHandler, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_findHandler", _wrap_OtkEventDispatcher_findHandler, METH_VARARGS },
+	 { (char *)"OtkEventDispatcher_lastTime", _wrap_OtkEventDispatcher_lastTime, METH_VARARGS },
 	 { (char *)"OtkEventDispatcher_swigregister", OtkEventDispatcher_swigregister, METH_VARARGS },
 	 { (char *)"OtkEventHandler_handle", _wrap_OtkEventHandler_handle, METH_VARARGS },
 	 { (char *)"OtkEventHandler_keyPressHandler", _wrap_OtkEventHandler_keyPressHandler, METH_VARARGS },
@@ -13380,17 +13403,18 @@ static swig_type_info _swigt__p_Window[] = {{"_p_Window", 0, "Window *", 0},{"_p
 static swig_type_info _swigt__p_otk__BGCCacheContext[] = {{"_p_otk__BGCCacheContext", 0, "otk::BGCCacheContext *", 0},{"_p_otk__BGCCacheContext"},{0}};
 static swig_type_info _swigt__p_XCreateWindowEvent[] = {{"_p_XCreateWindowEvent", 0, "XCreateWindowEvent *", 0},{"_p_XCreateWindowEvent"},{0}};
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
+static swig_type_info _swigt__p_Time[] = {{"_p_Time", 0, "Time *", 0},{"_p_Time"},{0}};
 static swig_type_info _swigt__p_XCirculateEvent[] = {{"_p_XCirculateEvent", 0, "XCirculateEvent *", 0},{"_p_XCirculateEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureEvent[] = {{"_p_XConfigureEvent", 0, "XConfigureEvent *", 0},{"_p_XConfigureEvent"},{0}};
-static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
 static swig_type_info _swigt__p_long[] = {{"_p_long", 0, "long *", 0},{"_p_long"},{0}};
+static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
 static swig_type_info _swigt__p_XTextProperty[] = {{"_p_XTextProperty", 0, "XTextProperty *", 0},{"_p_XTextProperty"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_otk__OtkEventHandler"},{"_p_otk__OtkButton", _p_otk__OtkButtonTo_p_otk__OtkEventHandler},{"_p_otk__OtkAppWidget", _p_otk__OtkAppWidgetTo_p_otk__OtkEventHandler},{"_p_otk__OtkWidget", _p_otk__OtkWidgetTo_p_otk__OtkEventHandler},{"_p_otk__OtkFocusWidget", _p_otk__OtkFocusWidgetTo_p_otk__OtkEventHandler},{"_p_otk__OtkFocusLabel", _p_otk__OtkFocusLabelTo_p_otk__OtkEventHandler},{0}};
+static swig_type_info _swigt__p_XSelectionRequestEvent[] = {{"_p_XSelectionRequestEvent", 0, "XSelectionRequestEvent *", 0},{"_p_XSelectionRequestEvent"},{0}};
 static swig_type_info _swigt__p_XCirculateRequestEvent[] = {{"_p_XCirculateRequestEvent", 0, "XCirculateRequestEvent *", 0},{"_p_XCirculateRequestEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
 static swig_type_info _swigt__p_XMapRequestEvent[] = {{"_p_XMapRequestEvent", 0, "XMapRequestEvent *", 0},{"_p_XMapRequestEvent"},{0}};
 static swig_type_info _swigt__p_XResizeRequestEvent[] = {{"_p_XResizeRequestEvent", 0, "XResizeRequestEvent *", 0},{"_p_XResizeRequestEvent"},{0}};
-static swig_type_info _swigt__p_XSelectionRequestEvent[] = {{"_p_XSelectionRequestEvent", 0, "XSelectionRequestEvent *", 0},{"_p_XSelectionRequestEvent"},{0}};
 static swig_type_info _swigt__otk__OBTimeoutHandler[] = {{"_otk__OBTimeoutHandler", 0, "otk::OBTimeoutHandler", 0},{"_otk__OBTimeoutHandler"},{0}};
 static swig_type_info _swigt__p_XftDraw[] = {{"_p_XftDraw", 0, "XftDraw *", 0},{"_p_XftDraw"},{0}};
 static swig_type_info _swigt__p_otk__ScreenInfo[] = {{"_p_otk__ScreenInfo", 0, "otk::ScreenInfo *", 0},{"_p_otk__ScreenInfo"},{0}};
@@ -13419,9 +13443,9 @@ static swig_type_info _swigt__p_p_unsigned_int[] = {{"_p_p_unsigned_int", 0, "un
 static swig_type_info _swigt__p_unsigned_int[] = {{"_p_unsigned_int", 0, "unsigned int *", 0},{"_p_unsigned_int"},{0}};
 static swig_type_info _swigt__p_p_unsigned_char[] = {{"_p_p_unsigned_char", 0, "unsigned char **", 0},{"_p_p_unsigned_char"},{0}};
 static swig_type_info _swigt__p_XClientMessageEvent[] = {{"_p_XClientMessageEvent", 0, "XClientMessageEvent *", 0},{"_p_XClientMessageEvent"},{0}};
-static swig_type_info _swigt__p_XGraphicsExposeEvent[] = {{"_p_XGraphicsExposeEvent", 0, "XGraphicsExposeEvent *", 0},{"_p_XGraphicsExposeEvent"},{0}};
 static swig_type_info _swigt__p_XExposeEvent[] = {{"_p_XExposeEvent", 0, "XExposeEvent *", 0},{"_p_XExposeEvent"},{0}};
 static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
+static swig_type_info _swigt__p_XGraphicsExposeEvent[] = {{"_p_XGraphicsExposeEvent", 0, "XGraphicsExposeEvent *", 0},{"_p_XGraphicsExposeEvent"},{0}};
 static swig_type_info _swigt__p_XNoExposeEvent[] = {{"_p_XNoExposeEvent", 0, "XNoExposeEvent *", 0},{"_p_XNoExposeEvent"},{0}};
 static swig_type_info _swigt__p_XMapEvent[] = {{"_p_XMapEvent", 0, "XMapEvent *", 0},{"_p_XMapEvent"},{0}};
 static swig_type_info _swigt__p_XUnmapEvent[] = {{"_p_XUnmapEvent", 0, "XUnmapEvent *", 0},{"_p_XUnmapEvent"},{0}};
@@ -13467,17 +13491,18 @@ _swigt__p_Window,
 _swigt__p_otk__BGCCacheContext, 
 _swigt__p_XCreateWindowEvent, 
 _swigt__p_XDestroyWindowEvent, 
+_swigt__p_Time, 
 _swigt__p_XCirculateEvent, 
 _swigt__p_XConfigureEvent, 
-_swigt__p_otk__OBProperty, 
 _swigt__p_long, 
+_swigt__p_otk__OBProperty, 
 _swigt__p_XTextProperty, 
 _swigt__p_otk__OtkEventHandler, 
+_swigt__p_XSelectionRequestEvent, 
 _swigt__p_XCirculateRequestEvent, 
 _swigt__p_XConfigureRequestEvent, 
 _swigt__p_XMapRequestEvent, 
 _swigt__p_XResizeRequestEvent, 
-_swigt__p_XSelectionRequestEvent, 
 _swigt__otk__OBTimeoutHandler, 
 _swigt__p_XftDraw, 
 _swigt__p_otk__ScreenInfo, 
@@ -13506,9 +13531,9 @@ _swigt__p_p_unsigned_int,
 _swigt__p_unsigned_int, 
 _swigt__p_p_unsigned_char, 
 _swigt__p_XClientMessageEvent, 
-_swigt__p_XGraphicsExposeEvent, 
 _swigt__p_XExposeEvent, 
 _swigt__p_XFocusChangeEvent, 
+_swigt__p_XGraphicsExposeEvent, 
 _swigt__p_XNoExposeEvent, 
 _swigt__p_XMapEvent, 
 _swigt__p_XUnmapEvent, 

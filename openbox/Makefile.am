@@ -40,7 +40,7 @@ lex.yy.c: parse.l
 
 parse.h: parse.tab.h
 
-parse.tab.h:parsey.tab.c
+parse.tab.h:parse.tab.c
 
 parse.tab.c: parse.y
 	$(YACC) -d $<

@@ -77,7 +77,7 @@ window.inactive.button.pressed.bg.border.color: #000000
 
 !#
 window.active.button.disabled.bg: parentrelative
-window.active.button.disabled.image.color: #dddddd
+window.active.button.disabled.image.color: #839183
 !#
 window.inactive.button.disabled.bg: parentrelative
 window.inactive.button.disabled.image.color:  #6a716a

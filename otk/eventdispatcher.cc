@@ -35,6 +35,7 @@ void OtkEventDispatcher::clearHandler(Window id)
 }
 
 //#include <stdio.h>
+#include <stdio.h>
 void OtkEventDispatcher::dispatchEvents(void)
 {
   XEvent e;
@@ -48,15 +49,42 @@ void OtkEventDispatcher::dispatchEvents(void)
     printf("Event %d window %lx\n", e.type, e.xany.window);
 #endif
 
-    it = _map.find(e.xany.window);
+    // these ConfigureRequests require some special attention
+    if (e.type == ConfigureRequest) {
+      // find the actual window! e.xany.window is the parent window
+      it = _map.find(e.xconfigurerequest.window);
 
-    if (it != _map.end())
-      handler = it->second;
-    else
-      handler = _fallback;
+      if (it != _map.end())
+        it->second->handle(e);
+      else {
+        // unhandled configure requests must be used to configure the window
+        // directly
+        XWindowChanges xwc;
 
-    if (handler)
-      handler->handle(e);
+        xwc.x = e.xconfigurerequest.x;
+        xwc.y = e.xconfigurerequest.y;
+        xwc.width = e.xconfigurerequest.width;
+        xwc.height = e.xconfigurerequest.height;
+        xwc.border_width = e.xconfigurerequest.border_width;
+        xwc.sibling = e.xconfigurerequest.above;
+        xwc.stack_mode = e.xconfigurerequest.detail;
+
+        XConfigureWindow(otk::OBDisplay::display, e.xconfigurerequest.window,
+                         e.xconfigurerequest.value_mask, &xwc);
+      }
+    } else {
+      // normal events
+      
+      it = _map.find(e.xany.window);
+
+      if (it != _map.end())
+        handler = it->second;
+      else
+        handler = _fallback;
+
+      if (handler)
+        handler->handle(e);
+    }
 
     if (_master)
       _master->handle(e);

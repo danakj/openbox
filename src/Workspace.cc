@@ -694,6 +694,7 @@ void Workspace::placeWindow(BlackboxWindow *win) {
     placed = smartPlacement(new_win, availableArea);
     break;
   case BScreen::UnderMousePlacement:
+  case BScreen::ClickMousePlacement:
     placed = underMousePlacement(new_win, availableArea);
   default:
     break; // handled below

@@ -221,6 +221,8 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm):
          BScreen::CascadePlacement);
   insert(i18n(ConfigmenuSet, ConfigmenuUnderMouse, "Under Mouse Placement"),
          BScreen::UnderMousePlacement);
+  insert(i18n(ConfigmenuSet, ConfigmenuClickMouse, "Click Mouse Placement"),
+         BScreen::ClickMousePlacement);
   insert(i18n(ConfigmenuSet, ConfigmenuLeftRight, "Left to Right"),
          BScreen::LeftRight);
   insert(i18n(ConfigmenuSet, ConfigmenuRightLeft, "Right to Left"),
@@ -246,23 +248,24 @@ void Configmenu::Placementmenu::setValues(void) {
   setItemSelected(1, placement == BScreen::ColSmartPlacement);
   setItemSelected(2, placement == BScreen::CascadePlacement);
   setItemSelected(3, placement == BScreen::UnderMousePlacement);
+  setItemSelected(4, placement == BScreen::ClickMousePlacement);
 
   bool rl = (getScreen()->getRowPlacementDirection() == BScreen::LeftRight),
        tb = (getScreen()->getColPlacementDirection() == BScreen::TopBottom),
        e = placement != BScreen::UnderMousePlacement;
 
-  setItemSelected(4, rl);
-  setItemSelected(5, ! rl);
-  setItemEnabled(4, e);
+  setItemSelected(5, rl);
+  setItemSelected(6, ! rl);
   setItemEnabled(5, e);
-
-  setItemSelected(6, tb);
-  setItemSelected(7, ! tb);
   setItemEnabled(6, e);
+
+  setItemSelected(7, tb);
+  setItemSelected(8, ! tb);
   setItemEnabled(7, e);
+  setItemEnabled(8, e);
   
-  setItemSelected(8, getScreen()->getPlaceIgnoreShaded());
-  setItemSelected(9, getScreen()->getPlaceIgnoreMaximized());
+  setItemSelected(9, getScreen()->getPlaceIgnoreShaded());
+  setItemSelected(10, getScreen()->getPlaceIgnoreMaximized());
 }
 
 
@@ -289,10 +292,11 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(1, false);
     setItemSelected(2, false);
     setItemSelected(3, false);
-    setItemEnabled(4, true);
+    setItemSelected(4, false);
     setItemEnabled(5, true);
     setItemEnabled(6, true);
     setItemEnabled(7, true);
+    setItemEnabled(8, true);
 
     break;
 
@@ -303,10 +307,11 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(1, true);
     setItemSelected(2, false);
     setItemSelected(3, false);
-    setItemEnabled(4, true);
+    setItemSelected(4, false);
     setItemEnabled(5, true);
     setItemEnabled(6, true);
     setItemEnabled(7, true);
+    setItemEnabled(8, true);
 
     break;
 
@@ -317,10 +322,11 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(1, false);
     setItemSelected(2, true);
     setItemSelected(3, false);
-    setItemEnabled(4, true);
+    setItemSelected(4, false);
     setItemEnabled(5, true);
     setItemEnabled(6, true);
     setItemEnabled(7, true);
+    setItemEnabled(8, true);
 
     break;
 
@@ -331,49 +337,65 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(1, false);
     setItemSelected(2, false);
     setItemSelected(3, true);
-    setItemEnabled(4, false);
+    setItemSelected(4, false);
     setItemEnabled(5, false);
     setItemEnabled(6, false);
     setItemEnabled(7, false);
+    setItemEnabled(8, false);
+
+    break;
+
+  case BScreen::ClickMousePlacement:
+    getScreen()->savePlacementPolicy(item->function());
+
+    setItemSelected(0, false);
+    setItemSelected(1, false);
+    setItemSelected(2, false);
+    setItemSelected(3, false);
+    setItemSelected(4, true);
+    setItemEnabled(5, false);
+    setItemEnabled(6, false);
+    setItemEnabled(7, false);
+    setItemEnabled(8, false);
 
     break;
 
   case BScreen::LeftRight:
     getScreen()->saveRowPlacementDirection(BScreen::LeftRight);
 
-    setItemSelected(4, true);
-    setItemSelected(5, false);
+    setItemSelected(5, true);
+    setItemSelected(6, false);
 
     break;
 
   case BScreen::RightLeft:
     getScreen()->saveRowPlacementDirection(BScreen::RightLeft);
 
-    setItemSelected(4, false);
-    setItemSelected(5, true);
+    setItemSelected(5, false);
+    setItemSelected(6, true);
 
     break;
 
   case BScreen::TopBottom:
     getScreen()->saveColPlacementDirection(BScreen::TopBottom);
 
-    setItemSelected(6, true);
-    setItemSelected(7, false);
+    setItemSelected(7, true);
+    setItemSelected(8, false);
 
     break;
 
   case BScreen::BottomTop:
     getScreen()->saveColPlacementDirection(BScreen::BottomTop);
 
-    setItemSelected(6, false);
-    setItemSelected(7, true);
+    setItemSelected(7, false);
+    setItemSelected(8, true);
 
     break;
   
   case BScreen::IgnoreShaded:
     getScreen()->savePlaceIgnoreShaded(! getScreen()->getPlaceIgnoreShaded());
 
-    setItemSelected(8, getScreen()->getPlaceIgnoreShaded());
+    setItemSelected(9, getScreen()->getPlaceIgnoreShaded());
 
     break;
 
@@ -381,7 +403,7 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     getScreen()->
       savePlaceIgnoreMaximized(! getScreen()->getPlaceIgnoreMaximized());
 
-    setItemSelected(9, getScreen()->getPlaceIgnoreMaximized());
+    setItemSelected(10, getScreen()->getPlaceIgnoreMaximized());
 
     break;
   }

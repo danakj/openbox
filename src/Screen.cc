@@ -444,6 +444,8 @@ void BScreen::savePlacementPolicy(int p) {
   const char *placement;
   switch (resource.placement_policy) {
   case CascadePlacement: placement = "CascadePlacement"; break;
+  case UnderMousePlacement: placement = "UnderMousePlacement"; break;
+  case ClickMousePlacement: placement = "ClickMousePlacement"; break;
   case ColSmartPlacement: placement = "ColSmartPlacement"; break;
   case RowSmartPlacement: default: placement = "RowSmartPlacement"; break;
   }
@@ -647,6 +649,10 @@ void BScreen::load_rc(void) {
   if (config->getValue(screenstr + "windowPlacement", s)) {
     if (s == "CascadePlacement")
       resource.placement_policy = CascadePlacement;
+    else if (s == "UnderMousePlacement")
+      resource.placement_policy = UnderMousePlacement;
+    else if (s == "ClickMousePlacement")
+      resource.placement_policy = UnderMousePlacement;
     else if (s == "ColSmartPlacement")
       resource.placement_policy = ColSmartPlacement;
     else //if (s == "RowSmartPlacement")

@@ -190,8 +190,8 @@ private:
   void updateWorkArea(void);
 public:
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
-         UnderMousePlacement, LeftRight, RightLeft, TopBottom, BottomTop,
-         IgnoreShaded, IgnoreMaximized };
+         UnderMousePlacement, ClickMousePlacement, LeftRight, RightLeft,
+         TopBottom, BottomTop, IgnoreShaded, IgnoreMaximized };
   enum { RoundBullet = 1, TriangleBullet, SquareBullet, NoBullet };
   enum { Restart = 1, RestartOther, Exit, Shutdown, Execute, Reconfigure,
          WindowShade, WindowIconify, WindowMaximize, WindowClose, WindowRaise,

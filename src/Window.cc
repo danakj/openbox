@@ -2542,6 +2542,12 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
       XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped..
       setInputFocus();
     }
+    int x, y, rx, ry;
+    Window c, r;
+    unsigned int m;
+    XQueryPointer(screen->getBlackbox()->getXDisplay(), screen->getRootWindow(),
+                  &r, &c, &rx, &ry, &x, &y, &m);
+    beginMove(rx, ry);
     break;
   }
 }

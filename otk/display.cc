@@ -52,21 +52,22 @@ Display *display = (Display*) 0;
 
 static int xerrorHandler(::Display *d, XErrorEvent *e)
 {
+  if (!display->ignoreErrors()) {
 #ifdef DEBUG
-  char errtxt[128];
+    char errtxt[128];
 
-  //if (e->error_code != BadWindow)
-  {
-    XGetErrorText(d, e->error_code, errtxt, 128);
-    printf("X Error: %s\n", errtxt);
-    if (e->error_code != BadWindow)
-      abort();
-  }
+    //if (e->error_code != BadWindow)
+    {
+      XGetErrorText(d, e->error_code, errtxt, 128);
+      printf("X Error: %s\n", errtxt);
+      if (e->error_code != BadWindow)
+        abort();
+    }
 #else
-  (void)d;
-  (void)e;
+    (void)d;
+    (void)e;
 #endif
-
+  }
   return false;
 }
 
@@ -216,10 +217,19 @@ const RenderControl *Display::renderControl(int snum) const
 }
 
 
+void Display::setIgnoreErrors(bool t)
+{
+  _ignore_errors = t;
+  // sync up so that anything already sent is/isn't ignored!
+  XSync(_display, false);
+}
+
 void Display::grab()
 {
-  if (_grab_count == 0)
+  if (_grab_count == 0) {
     XGrabServer(_display);
+    XSync(_display, false); // make sure it kicks in
+  }
   _grab_count++;
 }
 
@@ -228,8 +238,10 @@ void Display::ungrab()
 {
   if (_grab_count == 0) return;
   _grab_count--;
-  if (_grab_count == 0)
+  if (_grab_count == 0) {
     XUngrabServer(_display);
+    XFlush(_display); // ungrab as soon as possible
+  }
 }
 
 

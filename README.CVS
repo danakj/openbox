@@ -3,6 +3,7 @@ To build Openbox from CVS you need:
 A C Compiler (GNU GCC 3.2+ suggested)
 GNU Gettext
 GNU Autoconf 2.50+
+GNU Automake 1.6+
 GNU Libtool
 GNU Bison 1.875+
 GNU Flex

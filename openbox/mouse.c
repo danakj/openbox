@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "config.h"
+#include "xerror.h"
 #include "action.h"
 #include "event.h"
 #include "client.h"
@@ -228,27 +229,32 @@ void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
             int junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
-            XGetGeometry(ob_display, e->xbutton.window,
-                         &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
-            if (e->xbutton.x >= (signed)-b &&
-                e->xbutton.y >= (signed)-b &&
-                e->xbutton.x < (signed)(w+b) &&
-                e->xbutton.y < (signed)(h+b)) {
-                click = TRUE;
-                /* double clicks happen if there were 2 in a row! */
-                if (lbutton == button &&
-                    lwindow == e->xbutton.window &&
-                    e->xbutton.time - config_mouse_dclicktime <=
-                    ltime) {
-                    dclick = TRUE;
-                    lbutton = 0;
+            Status s;
+            xerror_set_ignore(TRUE);
+            s = XGetGeometry(ob_display, e->xbutton.window,
+                             &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
+            xerror_set_ignore(FALSE);
+            if (s == Success) {
+                if (e->xbutton.x >= (signed)-b &&
+                    e->xbutton.y >= (signed)-b &&
+                    e->xbutton.x < (signed)(w+b) &&
+                    e->xbutton.y < (signed)(h+b)) {
+                    click = TRUE;
+                    /* double clicks happen if there were 2 in a row! */
+                    if (lbutton == button &&
+                        lwindow == e->xbutton.window &&
+                        e->xbutton.time - config_mouse_dclicktime <=
+                        ltime) {
+                        dclick = TRUE;
+                        lbutton = 0;
+                    } else {
+                        lbutton = button;
+                        lwindow = e->xbutton.window;
+                    }
                 } else {
-                    lbutton = button;
-                    lwindow = e->xbutton.window;
+                    lbutton = 0;
+                    lwindow = None;
                 }
-            } else {
-                lbutton = 0;
-                lwindow = None;
             }
 
             button = 0;

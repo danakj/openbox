@@ -152,7 +152,7 @@ void grab_key(guint keycode, guint state, Window win, int keyboard_mode)
     xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabKey(ob_display, keycode, state | mask_list[i], win, FALSE,
-                 GrabModeSync, keyboard_mode);
+                 GrabModeAsync, keyboard_mode);
     xerror_set_ignore(FALSE);
     if (xerror_occured)
         g_warning("failed to grab keycode %d modifiers %d", keycode, state);

@@ -32,7 +32,6 @@ void RrTextureSetRGBA(struct RrSurface *sur,
 {
     unsigned int num;
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
-
     if (!tex) return;
     RrTextureFreeContents(tex);
     tex->type = RR_TEXTURE_RGBA;
@@ -96,6 +95,19 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
         RrFontRenderString(sur, tex->data.text.font, &tex->data.text.color,
                            tex->data.text.layout, tex->data.text.string,
                            x, y, w, h);
+        break;
+    case RR_TEXTURE_RGBA:
+        glColor3f(1.0, 1.0, 1.0);
+        glBegin(GL_TRIANGLES);
+        glVertex2i(x, y);
+        glVertex2i(x+w, y); 
+        glVertex2i(x+w, y+h);
+
+        glVertex2i(x+w, y+h);
+        glVertex2i(x, y+h);
+        glVertex2i(x, y);
+        glEnd();
+
         break;
     }
     glDisable(GL_TEXTURE_2D);

@@ -90,6 +90,9 @@ void Windowmenu::show(void) {
 
 
 void Windowmenu::itemSelected(int button, unsigned int index) {
+  if (button != 1)
+    return;
+  
   BasemenuItem *item = find(index);
 
   hide();
@@ -103,7 +106,7 @@ void Windowmenu::itemSelected(int button, unsigned int index) {
     break;
 
   case BScreen::WindowMaximize:
-    window->maximize(button);
+    window->maximize(1);        // full maximize
     break;
 
   case BScreen::WindowClose:

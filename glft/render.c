@@ -30,7 +30,9 @@ int GlftLineToFunc(FT_Vector *to, void *user)
     if (!state.drawing) {
         glBegin(GL_LINES);
         glVertex2f(state.x, state.y);
-    }
+        state.drawing = 1;
+    } else
+        glVertex2f(state.x, state.y);
     state.x = (to->x >> 6) + (to->x & 63)/64;
     state.y = (to->y >> 6) + (to->y & 63)/64;
     printf("line to %f:%f\n", state.x, state.y);

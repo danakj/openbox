@@ -96,7 +96,7 @@ int main(int argc, char **argv)
                 if ((Atom)report.xclient.data.l[0] == delete_win)
                     quit = 1;
         case Expose:
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
             GlftRenderString(font, argv[2], strlen(argv[2]), 0, 0);
             glXSwapBuffers(display, win);
         case ConfigureNotify:

@@ -57,6 +57,8 @@ void framerender_frame(Frame *self)
                           &ob_theme->title_color_f : &ob_theme->title_color),
                          self->client->title);
 
+        if (self->max_x >= 0)
+            RrSurfaceCopy(self->s_max, m);
         if (self->icon_x >= 0) {
             Icon *icon;
 

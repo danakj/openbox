@@ -67,7 +67,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     RrColorSet(&pri, 0.71, 0.7, 0.68, 1);
     RrPlanarSet(theme->max_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->max_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
+    RrPlanarSet(theme->max_p_f, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
@@ -79,7 +79,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     RrColorSet(&pri, 0.71, 0.7, 0.68, 1);
     RrPlanarSet(theme->iconify_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->iconify_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
+    RrPlanarSet(theme->iconify_p_f, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
@@ -91,7 +91,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     RrColorSet(&pri, 0.71, 0.7, 0.68, 1);
     RrPlanarSet(theme->close_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->close_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
+    RrPlanarSet(theme->close_p_f, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
@@ -103,7 +103,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     RrColorSet(&pri, 0.71, 0.7, 0.68, 1);
     RrPlanarSet(theme->desk_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->desk_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
+    RrPlanarSet(theme->desk_p_f, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
@@ -115,7 +115,7 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     RrColorSet(&pri, 0.71, 0.7, 0.68, 1);
     RrPlanarSet(theme->shade_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->shade_p, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
+    RrPlanarSet(theme->shade_p_f, RR_PLANAR_SOLID, RR_SUNKEN_OUTER,
                 &pri, NULL, 0, NULL);
 
     theme->frame = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
@@ -138,15 +138,15 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     theme->label = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
     theme->label_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
 
-    RrColorSet(&pri, 0.30, 0.34, 0.65, 1);
-    RrColorSet(&sec, 0.35, 0.43, 0.75, 1);
-    RrColorSet(&bor, 0, 0, 0, 1);
-    RrPlanarSet(theme->title, RR_PLANAR_VERTICAL, RR_BEVEL_NONE,
-                &pri, &sec, 1, &bor);
     RrColorSet(&pri, 0.70, 0.70, 0.68, 1);
     RrColorSet(&sec, 0.75, 0.73, 0.71, 1);
+    RrColorSet(&bor, 0, 0, 0, 1);
+    RrPlanarSet(theme->label, RR_PLANAR_VERTICAL, RR_BEVEL_NONE,
+                &pri, &sec, 1, &bor);
+    RrColorSet(&pri, 0.30, 0.34, 0.65, 1);
+    RrColorSet(&sec, 0.35, 0.43, 0.75, 1);
     RrColorSet(&bor, 0.42, 0.41, 0.42, 1);
-    RrPlanarSet(theme->title_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
+    RrPlanarSet(theme->label_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
                 &pri, &sec, 1, &bor);
 
 

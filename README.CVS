@@ -8,18 +8,7 @@ GNU Libtool
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Python library/headers (devel package) (http://www.python.org)
-
-Optional:
 SWIG 1.3.17+ (http://www.swig.org)
-  *** If you don't want to get swig, thats fine, unless you're going to be
-  *** editing stuff.
-  *** Without SWIG, before you build CVS _every time you update_ you need to:
-  ***
-  *** % touch src/openbox.i
-  *** % touch src/openbox_wrap.cc
-  ***
-  *** This is because of how CVS deals with timestamps.
-
 
 I recommend the latest version of all these packages.
 
@@ -27,10 +16,9 @@ Do the following to build and install Openbox in CVS:
 
 % ./bootstrap
 % ./configure
-<optional touch commands from above if you don't have SWIG>
 % make all install
 
-Don't try building it and running it from the src/ directory, it won't work. It
-needs to be installed.
+Don't try running it from the src/ directory without installing, it won't work.
+It needs to be installed before it is run.
 
 The installed binary is 'openbox3'.

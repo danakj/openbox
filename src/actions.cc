@@ -149,10 +149,12 @@ void OBActions::motionHandler(const XMotionEvent &e)
 {
   if (!e.same_screen) return; // this just gets stupid
 
+  _dx = e.x - _posqueue[0]->pos.x();
+  _dy = e.y - _posqueue[0]->pos.y();
+  
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   printf("GUILE: MOTION: win %lx modifiers %u x %d y %d\n",
-         (long)e.window, e.state,
-         e.x - _posqueue[0]->pos.x(), e.y - _posqueue[0]->pos.y());
+         (long)e.window, e.state, _dx, _dy);
 }
 
 

@@ -49,6 +49,8 @@ private:
     Used for motion events as the starting position.
   */
   ButtonPressAction *_posqueue[BUTTONS];
+  //! The delta x/y of the last motion sequence
+  int _dx, _dy;
 
   //! Insert a button/position in the _posqueue
   void insertPress(const XButtonEvent &e);

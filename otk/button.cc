@@ -66,17 +66,17 @@ void OtkButton::update(void)
   _dirty = false;
 }
 
-bool OtkButton::expose(const XExposeEvent &e)
+int OtkButton::exposeHandler(const XExposeEvent &e)
 {
   _dirty = true;
-  return OtkFocusWidget::expose(e);
+  return OtkFocusWidget::exposeHandler(e);
 }
 
-bool OtkButton::configure(const XConfigureEvent &e)
+int OtkButton::configureHandler(const XConfigureEvent &e)
 {
   if (!(e.width == width() && e.height == height()))
     _dirty = true;
-  return OtkFocusWidget::configure(e);
+  return OtkFocusWidget::configureHandler(e);
 }
 
 }

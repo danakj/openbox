@@ -7,7 +7,8 @@ noinst_LIBRARIES=libotk.a
 libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc property.cc \
                   imagecontrol.cc rect.cc screeninfo.cc texture.cc timer.cc \
                   timerqueuemanager.cc style.cc configuration.cc util.cc \
-                  widget.cc focuswidget.cc button.cc
+                  widget.cc focuswidget.cc button.cc eventhandler.cc \
+                  eventdispatcher.cc application.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -55,3 +56,6 @@ util.o: util.cc util.hh
 widget.o: widget.cc widget.hh rect.hh point.hh texture.hh color.hh \
  util.hh style.hh font.hh image.hh screeninfo.hh timer.hh \
  configuration.hh display.hh assassin.hh
+eventhandler.o: eventhandler.cc eventhandler.hh
+eventdispatcher.o: eventdispatcher.cc eventdispatcher.hh
+application.o: application.cc application.hh

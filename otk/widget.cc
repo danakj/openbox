@@ -9,7 +9,8 @@
 namespace otk {
 
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
-  : _parent(parent), _style(parent->getStyle()), _direction(direction),
+  : OtkEventHandler(),
+    _parent(parent), _style(parent->getStyle()), _direction(direction),
     _cursor(parent->getCursor()), _bevel_width(parent->getBevelWidth()),
     _ignore_config(0),
     _visible(false), _focused(false), _grabbed_mouse(false),
@@ -22,9 +23,25 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   create();
 }
 
+OtkWidget::OtkWidget(OtkApplication *app, Direction direction,
+                     Cursor cursor, int bevel_width)
+  : OtkEventHandler(),
+    _parent(0), _style(app->getStyle()), _direction(direction), _cursor(cursor),
+    _bevel_width(bevel_width), _ignore_config(0), _visible(false),
+    _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
+    _stretchable_vert(false), _stretchable_horz(false), _texture(0),
+    _bg_pixmap(0), _bg_pixel(0), _screen(app->getStyle()->getScreen()),
+    _fixed_width(false), _fixed_height(false), _dirty(false)
+{
+  assert(app);
+  create();
+  app->registerHandler(_window, this);
+}
+
 OtkWidget::OtkWidget(Style *style, Direction direction,
                      Cursor cursor, int bevel_width)
-  : _parent(0), _style(style), _direction(direction), _cursor(cursor),
+  : OtkEventHandler(),
+    _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
     _focused(false), _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
@@ -396,8 +413,9 @@ void OtkWidget::removeChild(OtkWidget *child)
     _children.erase(it);
 }
 
-bool OtkWidget::expose(const XExposeEvent &e)
+int OtkWidget::exposeHandler(const XExposeEvent &e)
 {
+  OtkEventHandler::exposeHandler(e);
   if (e.window == _window) {
     _dirty = true;
     update();
@@ -405,14 +423,15 @@ bool OtkWidget::expose(const XExposeEvent &e)
   } else {
     OtkWidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
-      if ((*it)->expose(e))
+      if ((*it)->exposeHandler(e))
         return true;
   }
   return false;
 }
 
-bool OtkWidget::configure(const XConfigureEvent &e)
+int OtkWidget::configureHandler(const XConfigureEvent &e)
 {
+  OtkEventHandler::configureHandler(e);
   if (e.window == _window) {
     if (_ignore_config) {
       _ignore_config--;
@@ -428,7 +447,7 @@ bool OtkWidget::configure(const XConfigureEvent &e)
   } else {
     OtkWidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
-      if ((*it)->configure(e))
+      if ((*it)->configureHandler(e))
         return true;
   }
   return false;

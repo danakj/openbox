@@ -1,3 +1,6 @@
+#ifndef __button_hh
+#define __button_hh
+
 #include "focuswidget.hh"
 //#include "pixmap.hh"
 
@@ -33,9 +36,9 @@ public:
   void press(void);
   void release(void);
 
-  virtual void update(void);
-  virtual bool expose(const XExposeEvent &e);
-  virtual bool configure(const XConfigureEvent &e);
+  void update(void);
+  int exposeHandler(const XExposeEvent &e);
+  int configureHandler(const XConfigureEvent &e);
 
 private:
 
@@ -52,3 +55,5 @@ private:
 };
 
 }
+
+#endif

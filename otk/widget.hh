@@ -1,5 +1,5 @@
-#ifndef __focus_hh
-#define __focus_hh
+#ifndef __widget_hh
+#define __widget_hh
 
 #include <string>
 #include <list>
@@ -8,10 +8,12 @@
 #include "point.hh"
 #include "texture.hh"
 #include "style.hh"
+#include "eventhandler.hh"
+#include "application.hh"
 
 namespace otk {
 
-class OtkWidget {
+class OtkWidget : public OtkEventHandler {
 
 public:
 
@@ -20,6 +22,8 @@ public:
   typedef std::list<OtkWidget *> OtkWidgetList;
 
   OtkWidget(OtkWidget *parent, Direction = Horizontal);
+  OtkWidget(OtkApplication *app, Direction direction = Horizontal,
+            Cursor cursor = 0, int bevel_width = 1);
   OtkWidget(Style *style, Direction direction = Horizontal,
             Cursor cursor = 0, int bevel_width = 1);
 
@@ -27,8 +31,8 @@ public:
 
   virtual void update(void);
 
-  virtual bool expose(const XExposeEvent &e);
-  virtual bool configure(const XConfigureEvent &e);
+  int exposeHandler(const XExposeEvent &e);
+  int configureHandler(const XConfigureEvent &e);
 
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }

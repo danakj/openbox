@@ -9,9 +9,7 @@
 
 #include "render/theme.h"
 
-#if 0
 static char *PLUGIN_NAME = "client_menu";
-#endif
 
 static ObMenu *send_to_menu;
 static ObMenu *layer_menu;
@@ -53,28 +51,34 @@ void client_send_to_update(ObMenu *self)
             e = menu_entry_new(screen_desktop_names[i], a);
             menu_add_entry(self, e);
         }
-
+        
         menu_render_full(self);
     }
 }
 
-#if 0
-void client_menu_show(ObMenu *self, int x, int y, Client *client)
+void client_menu_show(ObMenu *self, int x, int y, ObClient *client)
 {
-    int newy;
+    guint i, newy, newx;
+    Rect *a = NULL;
+
     g_assert(!self->invalid);
     g_assert(client);
     
-    newy = MAX(client->frame->area.y + client->frame->size.top, y);
-    newy -= ob_rr_theme->bwidth;
+    for (i = 0; i < screen_num_monitors; ++i) {
+        a = screen_physical_area_monitor(i);
+        if (RECT_CONTAINS(*a, x, y))
+            break;
+    }
+    g_assert(a != NULL);
+    self->xin_area = i;
+
+    newx = MAX(x, client->area.x);
+    newy = MAX(y, client->area.y);
+    POINT_SET(self->location,
+	      MIN(newx, client->area.x + client->area.width - self->size.width),
+	      MIN(newy, client->area.y + client->area.height -
+                  self->size.height));
     
-    /* XXX do xinerama shit like in menu.c! im not coding it now because
-       this function isnt even being used right now... */
-    POINT_SET(self->location, 
-	      MIN(x, screen_physical_size.width - self->size.width -
-                  ob_rr_theme->bwidth * 2), 
-	      MIN(newy, screen_physical_size.height - self->size.height -
-                  ob_rr_theme->bwidth * 2));
     XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
 
     if (!self->shown) {
@@ -85,7 +89,6 @@ void client_menu_show(ObMenu *self, int x, int y, Client *client)
 	menu_hide(self->open_submenu);
     }
 }
-#endif
 
 void plugin_setup_config() { }
 
@@ -98,7 +101,8 @@ void plugin_destroy (ObMenu *m)
 void *plugin_create() /* TODO: need config */
 {
     ObMenu *m = menu_new_full(NULL, "client-menu", NULL,
-                            /*client_menu_show*/NULL, NULL);
+                            client_menu_show, NULL);
+    m->plugin = PLUGIN_NAME;
     menu_add_entry(m, menu_entry_new_submenu("Send To Workspace",
                                              send_to_menu));
     send_to_menu->parent = m;

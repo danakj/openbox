@@ -319,6 +319,7 @@ def placewindows_random(data):
     if not data.client: return
     client_area = data.client.area()
     screen = display.screenInfo(data.screen)
+    # XXX - USE THE FRAME'S SIZE!!
     width = screen.width() - client_area.width()
     height = screen.height() - client_area.height()
     global ob_rand

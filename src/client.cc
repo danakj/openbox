@@ -39,22 +39,18 @@ Client::Client(int screen, Window window)
   
   // update EVERYTHING the first time!!
 
-  // we default to NormalState, visible
+  // defaults
   _wmstate = NormalState;
-  // start unfocused
   _focused = false;
-  // not a transient by default of course
   _transient_for = 0;
-  // pick a layer to start from
   _layer = Layer_Normal;
-  // default to not urgent
   _urgent = false;
-  // not positioned unless specified
   _positioned = false;
-  // nothing is disabled unless specified
   _disabled_decorations = 0;
-  // no modal children until they set themselves
+  _modal = false;
   _modal_child = 0;
+  _group = None;
+  _desktop = 0;
   
   getArea();
   getDesktop();

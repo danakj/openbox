@@ -2,8 +2,10 @@
 #include "openbox.h"
 #include "render/theme.h"
 
-GHashTable *menu_hash = NULL;
+static GHashTable *menu_hash = NULL;
+GHashTable *menu_map = NULL;
 
+#define TITLE_EVENTMASK (ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
@@ -12,36 +14,44 @@ void menu_destroy_hash_key(gpointer data)
     g_free(data);
 }
 
-void menu_free_entries(Menu *menu)
+void menu_destroy_hash_value(Menu *self)
 {
     GList *it;
+    MenuRenderData *data = self->render_data;
 
-    for (it = menu->entries; it; it = it->next)
-        menu_entry_free((MenuEntry *)it->data);
+    for (it = self->entries; it; it = it->next)
+        menu_entry_free(it->data);
+    g_list_free(self->entries);
 
-    g_list_free(menu->entries);
+    g_free(self->label);
+    g_free(self->name);
+
+    g_hash_table_remove(menu_map, &data->title);
+    g_hash_table_remove(menu_map, &data->frame);
+    g_hash_table_remove(menu_map, &data->items);
+
+    appearance_free(data->a_title);
+    XDestroyWindow(ob_display, data->title);
+    XDestroyWindow(ob_display, data->frame);
+    XDestroyWindow(ob_display, data->items);
+
+    g_free(self);
 }
 
-void menu_destroy_hash_value(gpointer data)
+void menu_entry_free(MenuEntry *self)
 {
-    Menu *del_menu = (Menu *)data;
-    MenuRenderData *rd = del_menu->render_data;
+    MenuEntryRenderData *data = self->render_data;
 
-    menu_free_entries(del_menu);
+    g_free(self->label);
+    g_free(self->render_data);
+    action_free(self->action);
 
-    g_free(del_menu->label);
-    g_free(del_menu->name);
+    g_hash_table_remove(menu_map, &data->item);
 
-    appearance_free(rd->a_title);
-    XDestroyWindow(ob_display, rd->title);
-    XDestroyWindow(ob_display, rd->frame);
-}
+    appearance_free(data->a_item);
+    XDestroyWindow(ob_display, data->item);
 
-void menu_entry_free(MenuEntry *entry)
-{
-    g_free(entry->label);
-    g_free(entry->render_data);
-    action_free(entry->action);
+    g_free(self);
 }
     
 void menu_startup()
@@ -50,7 +60,9 @@ void menu_startup()
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
                                       menu_destroy_hash_key,
-                                      menu_destroy_hash_value);
+                                      (GDestroyNotify)menu_destroy_hash_value);
+    menu_map = g_hash_table_new(g_int_hash, g_int_equal);
+
     m = menu_new("sex menu", "root", NULL);
     menu_add_entry(m, menu_entry_new("foo shit etc bleh",
                                      action_from_string("restart")));
@@ -65,6 +77,7 @@ void menu_startup()
 void menu_shutdown()
 {
     g_hash_table_destroy(menu_hash);
+    g_hash_table_destroy(menu_map);
 }
 
 static Window createWindow(Window parent, unsigned long mask,
@@ -96,7 +109,8 @@ Menu *menu_new(char *label, char *name, Menu *parent)
 
     attrib.override_redirect = TRUE;
     data->frame = createWindow(ob_root, CWOverrideRedirect, &attrib);
-    data->title = createWindow(data->frame, 0, &attrib);
+    attrib.event_mask = TITLE_EVENTMASK;
+    data->title = createWindow(data->frame, CWEventMask, &attrib);
     data->items = createWindow(data->frame, 0, &attrib);
 
     XSetWindowBorderWidth(ob_display, data->frame, theme_bwidth);
@@ -112,6 +126,9 @@ Menu *menu_new(char *label, char *name, Menu *parent)
 
     self->render_data = data;
 
+    g_hash_table_insert(menu_map, &data->frame, self);
+    g_hash_table_insert(menu_map, &data->title, self);
+    g_hash_table_insert(menu_map, &data->items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
     return self;
 }
@@ -166,6 +183,8 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
     entry->render_data = data;
 
     menu->invalid = TRUE;
+
+    g_hash_table_insert(menu_map, &data->item, menu);
 }
 
 void menu_show(char *name, int x, int y, Client *client)

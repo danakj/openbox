@@ -6,6 +6,8 @@
 
 #include <glib.h>
 
+extern GHashTable *menu_map;
+
 typedef struct Menu {
     char *label;
     char *name;

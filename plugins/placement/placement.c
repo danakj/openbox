@@ -37,6 +37,9 @@ static void event(ObEvent *e, void *foo)
 
     if (ob_state == State_Starting) return;
 
+    /* requested a position */
+    if (e->data.c.client->positioned) return;
+
     if (!place_history(e->data.c.client))
         place_random(e->data.c.client);
 }

@@ -236,6 +236,17 @@ private:
   */
   int _border_width;
 
+  //! The minimum aspect ratio the client window can be sized to.
+  /*!
+    A value of 0 means this is ignored.
+  */
+  float _min_ratio;
+  //! The maximum aspect ratio the client window can be sized to.
+  /*!
+    A value of 0 means this is ignored.
+  */
+  float _max_ratio;
+  
   //! The minimum size of the client window
   /*!
     If the min is > the max, then the window is not resizable
@@ -429,6 +440,8 @@ private:
     @param anchor The corner to keep in the same position when resizing.
     @param w The width component of the new size for the client.
     @param h The height component of the new size for the client.
+    @param user Specifies whether this is a user-requested change or a
+                program requested change.
     @param x An optional X coordinate to which the window will be moved
              after resizing.
     @param y An optional Y coordinate to which the window will be moved
@@ -436,7 +449,7 @@ private:
     The x and y coordinates must both be sepcified together, or they will have
     no effect. When they are specified, the anchor is ignored.
   */
-  void internal_resize(Corner anchor, int w, int h,
+  void internal_resize(Corner anchor, int w, int h, bool user = true,
                        int x = INT_MIN, int y = INT_MIN);
 
 public:

@@ -23,6 +23,8 @@ extern "C" {
 #define _(str) gettext(str)
 }
 
+#include <algorithm>
+
 namespace ob {
 
 Client::Client(int screen, Window window)
@@ -197,6 +199,11 @@ void Client::setupDecorAndFunctions()
   if (_delete_window) {
     _decorations |= Decor_Close;
     _functions |= Func_Close;
+  }
+
+  if (_min_size.x() > _max_size.x() || _min_size.y() > _max_size.y()) {
+    _decorations &= ~Decor_Maximize;
+    _functions &= ~(Func_Resize | Func_Maximize);
   }
   
   switch (_type) {
@@ -418,6 +425,8 @@ void Client::updateNormalHints()
   int oldgravity = _gravity;
 
   // defaults
+  _min_ratio = 0.0;
+  _max_ratio = 0.0;
   _size_inc.setPoint(1, 1);
   _base_size.setPoint(0, 0);
   _min_size.setPoint(0, 0);
@@ -441,6 +450,11 @@ void Client::updateNormalHints()
         frame->frameGravity(x, y);
         _area.setPos(x, y);
       }
+    }
+
+    if (size.flags & PAspect) {
+      if (size.min_aspect.y) _min_ratio = size.min_aspect.x/size.min_aspect.y;
+      if (size.max_aspect.y) _max_ratio = size.max_aspect.x/size.max_aspect.y;
     }
 
     if (size.flags & PMinSize)
@@ -497,7 +511,7 @@ void Client::updateWMHints(bool initstate)
 #endif
     // fire the urgent callback if we're mapped, otherwise, wait until after
     // we're mapped
-    if (_urgent && frame)
+    if (frame)
       fireUrgent();
   }
 }
@@ -634,9 +648,10 @@ void Client::propertyHandler(const XPropertyEvent &e)
     }
   }
 
-  if (e.atom == XA_WM_NORMAL_HINTS)
+  if (e.atom == XA_WM_NORMAL_HINTS) {
     updateNormalHints();
-  else if (e.atom == XA_WM_HINTS)
+    setupDecorAndFunctions(); // normal hints can make a window non-resizable
+  } else if (e.atom == XA_WM_HINTS)
     updateWMHints();
   else if (e.atom == XA_WM_TRANSIENT_FOR) {
     updateTransientFor();
@@ -980,7 +995,8 @@ void Client::resize(Corner anchor, int w, int h)
 }
 
 
-void Client::internal_resize(Corner anchor, int w, int h, int x, int y)
+void Client::internal_resize(Corner anchor, int w, int h, bool user,
+                             int x, int y)
 {
   w -= _base_size.x(); 
   h -= _base_size.y();
@@ -990,14 +1006,21 @@ void Client::internal_resize(Corner anchor, int w, int h, int x, int y)
   w += _size_inc.x() / 2;
   h += _size_inc.y() / 2;
 
-  // is the window resizable? if it is not, then don't check its sizes, the
-  // client can do what it wants and the user can't change it anyhow
-  if (_min_size.x() <= _max_size.x() && _min_size.y() <= _max_size.y()) {
+  if (user) {
+    // if this is a user-requested resize, then check against min/max sizes
+    // and aspect ratios
+
     // smaller than min size or bigger than max size?
     if (w < _min_size.x()) w = _min_size.x();
     else if (w > _max_size.x()) w = _max_size.x();
     if (h < _min_size.y()) h = _min_size.y();
     else if (h > _max_size.y()) h = _max_size.y();
+
+    // adjust the height ot match the width for the aspect ratios
+    if (_min_ratio)
+      if (h * _min_ratio > w) h = static_cast<int>(w / _min_ratio);
+    if (_max_ratio)
+      if (h * _max_ratio < w) h = static_cast<int>(w / _max_ratio);
   }
 
   // keep to the increments
@@ -1404,9 +1427,9 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
     if (e.value_mask & (CWX | CWY)) {
       int x = (e.value_mask & CWX) ? e.x : _area.x();
       int y = (e.value_mask & CWY) ? e.y : _area.y();
-      internal_resize(corner, w, h, x, y);
+      internal_resize(corner, w, h, false, x, y);
     } else // if JUST resizing...
-      internal_resize(corner, w, h);
+      internal_resize(corner, w, h, false);
   } else if (e.value_mask & (CWX | CWY)) { // if JUST moving...
     int x = (e.value_mask & CWX) ? e.x : _area.x();
     int y = (e.value_mask & CWY) ? e.y : _area.y();

@@ -76,7 +76,7 @@ Client::Client(int screen, Window window)
   updateStrut();
 
   // this makes sure that these windows appear on all desktops
-  if (_type == Type_Dock || _type == Type_Desktop)
+  if (/*_type == Type_Dock ||*/ _type == Type_Desktop)
     _desktop = 0xffffffff;
   
   // set the desktop hint, to make sure that it always exists, and to reflect
@@ -133,7 +133,7 @@ void Client::getDesktop()
                          otk::Property::atoms.cardinal,
                          (long unsigned*)&_desktop)) {
 #ifdef DEBUG
-    printf("DEBUG: Window requested desktop: %d\n", _desktop);
+    printf("DEBUG: Window requested desktop: %ld\n", _desktop);
 #endif
   }
 }
@@ -491,6 +491,10 @@ void Client::updateWMHints(bool initstate)
 
   if (ur != _urgent) {
     _urgent = ur;
+#ifdef DEBUG
+    printf("DEBUG: Urgent Hint for 0x%lx: %s\n",
+           (long)_window, _urgent ? "ON" : "OFF");
+#endif
     // fire the urgent callback if we're mapped, otherwise, wait until after
     // we're mapped
     if (_urgent && frame)

@@ -20,6 +20,8 @@ GList *menu_visible = NULL;
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
+void menu_control_show(ObMenu *self, int x, int y, ObClient *client);
+
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data)
 {
@@ -105,8 +107,6 @@ parse_menu_fail:
     g_free(id);
     g_free(title);
 }
-
-void menu_control_show(ObMenu *self, int x, int y, ObClient *client);
 
 void menu_destroy_hash_key(ObMenu *menu)
 {
@@ -523,11 +523,12 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 
             a = screen_physical_area_monitor(self->parent->xin_area);
 
-	    if (self->submenu->size.width + x >= a->x + a->width) {
+	    if (self->submenu->size.width + x + ob_rr_theme->bwidth >=
+                a->x + a->width) {
                 int newparentx = a->x + a->width
                     - self->submenu->size.width
                     - self->parent->size.width
-                    - ob_rr_theme->bwidth
+                    - ob_rr_theme->bwidth * 2
                     - ob_rr_theme->menu_overlap;
                 
                 x = a->x + a->width - self->submenu->size.width
@@ -540,7 +541,8 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
             }
 	    
 	    menu_show_full(self->submenu, x,
-			   self->parent->location.y + self->y,
+			   self->parent->location.y + self->y +
+                           self->parent->title_h + ob_rr_theme->bwidth,
                            self->parent->client);
 	}
         self->hilite = TRUE;

@@ -11,6 +11,13 @@ def focus(data):
     """Focuses the window on which the event occured"""
     client = Openbox_findClient(openbox, data.window())
     if not client: return
+    type = OBClient_type(client)
+    # these types of windows dont get focus from window enter events
+    if data.action() == EventEnterWindow:
+        print "enter window"
+        if (type == OBClient_Type_Dock or \
+            type == OBClient_Type_Desktop):
+            return
     OBClient_focus(client)
 
 def move(data):

@@ -133,65 +133,79 @@ static void do_lower(GList *wins)
     }
 }
 
-static GList *pick_windows(ObWindow *win)
+static GList *pick_windows(Client *top, Client *selected)
 {
     GList *ret = NULL;
     GList *it, *next;
     GSList *sit;
-    Client *c;
+    gboolean sel_trans;
     int i, n;
 
-    if (!WINDOW_IS_CLIENT(win)) {
-        ret = g_list_append(ret, win);
-        stacking_list = g_list_remove(stacking_list, win);
-        return ret;
+    /* remove first so we can't run into ourself */
+    stacking_list = g_list_remove(stacking_list, top);
+
+    /* is one of the transient windows the 'selected' one? */
+    sel_trans = g_slist_find(top->transients, selected) != NULL;
+
+    /* is the selected dude modal? if so then add it first */
+    if (sel_trans && selected->modal) {
+        ret = g_list_concat(ret, pick_windows(selected, selected));
+        sel_trans = FALSE;
     }
 
-    c = WINDOW_AS_CLIENT(win);
+    /* first add modal transient children in their stacking order */
+    i = 0;
+    n = g_slist_length(top->transients);
+    for (it = stacking_list; i < n && it; it = next) {
+        next = g_list_next(it);
+        if (((Client*)it->data)->modal) {
+            if ((sit = g_slist_find(top->transients, it->data))) {
+                ++i;
+                ret = g_list_concat(ret, pick_windows(sit->data, selected));
+                it = stacking_list;
+            }
+        }
+    }
 
-    /* remove first so we can't run into ourself */
-    stacking_list = g_list_remove(stacking_list, win);
+    /* if the selected dude is a transient but not modal, then add it after
+       the other modals */
+    if (sel_trans)
+        ret = g_list_concat(ret, pick_windows(selected, selected));    
 
     /* add transient children in their stacking order */
     i = 0;
-    n = g_slist_length(c->transients);
+    n = g_slist_length(top->transients);
     for (it = stacking_list; i < n && it; it = next) {
         next = g_list_next(it);
-        if ((sit = g_slist_find(c->transients, it->data))) {
+        if ((sit = g_slist_find(top->transients, it->data))) {
             ++i;
-            ret = g_list_concat(ret, pick_windows(sit->data));
+            ret = g_list_concat(ret, pick_windows(sit->data, selected));
             it = stacking_list;
         }
     }
 
     /* add itself */
-    ret = g_list_append(ret, win);
+    ret = g_list_append(ret, top);
 
     return ret;
 }
 
-static GList *pick_group_windows(ObWindow *win)
+static GList *pick_group_windows(Client *top, Client *selected)
 {
     GList *ret = NULL;
     GList *it, *next;
     GSList *sit;
-    Client *c;
     int i, n;
 
-    if (!WINDOW_IS_CLIENT(win))
-        return NULL;
-
-    c = WINDOW_AS_CLIENT(win);
-
     /* add group members in their stacking order */
-    if (c->group) {
+    if (top->group) {
         i = 0;
-        n = g_slist_length(c->group->members) - 1;
+        n = g_slist_length(top->group->members) - 1;
         for (it = stacking_list; i < n && it; it = next) {
             next = g_list_next(it);
-            if ((sit = g_slist_find(c->group->members, it->data))) {
+            if ((sit = g_slist_find(top->group->members, it->data))) {
                 ++i;
-                ret = g_list_concat(ret, pick_windows(sit->data)); 
+                ret = g_list_concat(ret, pick_windows(sit->data, selected)); 
                 it = stacking_list;
             }
         }
@@ -199,44 +213,21 @@ static GList *pick_group_windows(ObWindow *win)
     return ret;
 }
 
-static ObWindow *top_transient(ObWindow *window)
-{
-    Client *client;
-
-    if (!WINDOW_IS_CLIENT(window))
-        return window;
-
-    client = WINDOW_AS_CLIENT(window);
-
-    /* move up the transient chain as far as possible */
-    if (client->transient_for) {
-        if (client->transient_for != TRAN_GROUP) {
-            return top_transient(CLIENT_AS_WINDOW(client->transient_for));
-        } else {
-            GSList *it;
-
-            for (it = client->group->members; it; it = it->next) {
-                Client *c = it->data;
-
-                /* checking transient_for prevents infinate loops! */
-                if (c != client && !c->transient_for)
-                    break;
-            }
-            if (it)
-                return it->data;
-        }
-    }
-
-    return window;
-}
-
 void stacking_raise(ObWindow *window)
 {
     GList *wins;
 
-    window = top_transient(window);
-    wins = pick_windows(window);
-    wins = g_list_concat(wins, pick_group_windows(window));
+    if (WINDOW_IS_CLIENT(window)) {
+        Client *c;
+        Client *selected;
+        selected = WINDOW_AS_CLIENT(window);
+        c = client_search_top_transient(selected);
+        wins = pick_windows(c, selected);
+        wins = g_list_concat(wins, pick_group_windows(c, selected));
+    } else {
+        wins = g_list_append(NULL, window);
+        stacking_list = g_list_remove(stacking_list, window);
+    }
     do_raise(wins);
     g_list_free(wins);
 }
@@ -245,9 +236,17 @@ void stacking_lower(ObWindow *window)
 {
     GList *wins;
 
-    window = top_transient(window);
-    wins = pick_windows(window);
-    wins = g_list_concat(pick_group_windows(window), wins);
+    if (WINDOW_IS_CLIENT(window)) {
+        Client *c;
+        Client *selected;
+        selected = WINDOW_AS_CLIENT(window);
+        c = client_search_top_transient(selected);
+        wins = pick_windows(c, selected);
+        wins = g_list_concat(pick_group_windows(c, selected), wins);
+    } else {
+        wins = g_list_append(NULL, window);
+        stacking_list = g_list_remove(stacking_list, window);
+    }
     do_lower(wins);
     g_list_free(wins);
 }

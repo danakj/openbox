@@ -100,8 +100,6 @@ X11_EXT_VIDMODE
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
-GL_OPTION
-
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  themes/Makefile

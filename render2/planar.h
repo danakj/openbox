@@ -17,6 +17,7 @@ struct RrPlanarSurface {
 #define RrPlanarColorType(sur) ((sur)->data.planar.colortype)
 #define RrPlanarPrimaryColor(sur) ((sur)->data.planar.primary)
 #define RrPlanarSecondaryColor(sur) ((sur)->data.planar.secondary)
+#define RrPlanarBevelType(sur) ((sur)->data.planar.bevel)
 
 void RrPlanarPaint(struct RrSurface *sur, int absx, int absy);
 

@@ -179,8 +179,9 @@ Openbox::Openbox(int argc, char **argv)
   Py_Initialize();
   init_otk();
   init_openbox();
-  PyRun_String("from _otk import *; from _openbox import *;", Py_file_input,
-               PyEval_GetGlobals(), PyEval_GetGlobals());
+  // i wish...
+  //PyRun_String("from _otk import *; from _openbox import *;", Py_file_input,
+  //             Py_None, Py_None);
   FILE *rcpyfd = fopen("/home/natas/.openbox/user.py", "r");
   if (!rcpyfd) {
     printf("failed to load python file /home/natas/.openbox/user.py\n");

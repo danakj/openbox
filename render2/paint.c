@@ -50,7 +50,7 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
 
     switch (RrSurfaceType(sur)) {
     case RR_SURFACE_PLANAR:
-        RrPlanarPaint(sur, x, y, w, h);
+        RrPlanarPaint(sur, RrSurfaceX(sur) + x, RrSurfaceY(sur) + y, w, h);
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);

@@ -24,7 +24,7 @@ int main()
 {
     Display *display;
     Window win;
-    XEvent report;
+    XEvent report, report2;
     XClassHint chint;
     Atom delete_win, protocols;
     int quit;
@@ -78,9 +78,20 @@ int main()
                 if ((Atom)report.xclient.data.l[0] == delete_win)
                     quit = 1;
         case Expose:
-            RrPaint(sur);
-            break;
+            if (XCheckTypedWindowEvent(display, win, ConfigureNotify,
+                                       &report2)) {
+                XPutBackEvent(display, &report);
+                XPutBackEvent(display, &report2);
+                /* fall through ... */
+            } else {
+                while (XCheckTypedWindowEvent(display, win, Expose, &report));
+                RrPaintArea(sur, report.xexpose.x, report.xexpose.y,
+                            report.xexpose.width, report.xexpose.height);
+                break;
+            }
         case ConfigureNotify:
+            while (XCheckTypedWindowEvent(display, win, ConfigureNotify,
+                                          &report));
             RrSurfaceSetArea(sur,
                              report.xconfigure.x,
                              report.xconfigure.y,

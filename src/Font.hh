@@ -73,7 +73,7 @@ private:
   bool              _antialias;
   bool              _shadow;
   unsigned char     _offset;
-  unsigned char     _tint;
+  int               _tint;
 
   XftFont          *_xftfont;
 
@@ -99,7 +99,7 @@ public:
   // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
         bool bold, bool italic, bool shadow, unsigned char offset, 
-        unsigned char tint, bool antialias = True);
+        int tint, bool antialias = True);
 #endif
   // loads a standard X font
   BFont(Display *d, BScreen *screen, const std::string &xlfd);

@@ -2750,11 +2750,13 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
         offset = 1;
     }
 
-    unsigned char tint = 0x40;
+    int tint = 25;
     if (style.getValue(rbasename + "xft.shadow.tint", s)) {
       tint = atoi(s.c_str());
     }
 
+    if (tint > 100) tint = 100;
+    if (tint < -100) tint = -100;
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
                          italic, dropShadow && resource.shadow_fonts, offset, 

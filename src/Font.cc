@@ -49,7 +49,7 @@ string      BFont::_fallback_font   = "fixed";
 #ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
              bool bold, bool italic, bool shadow, unsigned char offset, 
-             unsigned char tint, bool antialias) :
+             int tint, bool antialias) :
                                           _display(d),
                                           _screen(screen),
                                           _family(family),
@@ -265,14 +265,22 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
                                   _screen->getColormap());
     assert(draw);
 
+
     if (_shadow) {
       XftColor c;
-      c.color.red = 0;
-      c.color.green = 0;
-      c.color.blue = 0;
-      c.color.alpha = _tint | _tint << 8; // transparent shadow
-      c.pixel = BlackPixel(_display, _screen->getScreenNumber());
-
+      if (_tint >= 0) {
+        c.color.red = 0;
+        c.color.green =  0;
+        c.color.blue = 0;
+        c.color.alpha = 0xffff * _tint/100; // transparent shadow
+        c.pixel = BlackPixel(_display, _screen->getScreenNumber());
+      } else {
+        c.color.red = 0xffff * -_tint/100;
+        c.color.green = 0xffff * -_tint/100;
+        c.color.blue = 0xffff * -_tint/100;
+        c.color.alpha = 0xffff * -_tint/100;
+        c.pixel = WhitePixel(_display, _screen->getScreenNumber());
+      }
 #ifdef XFT_UTF8
       XftDrawStringUtf8(
 #else

@@ -1,5 +1,13 @@
 Woop, a HACKING document for openbox at last!
 
+dirs:
+	kernel - core of the WM
+	render - librender, rendering routines for the WM and for apps
+	cwmcc  - client-wm-client communication. netwm/icccm helper routines
+		 for the WM and apps
+	obcf   - openbox config format, generic parser for config files
+	plugins - various plugins
+
 Beware the Client.transient_for. It can be set to a !NULL value of TRAN_GROUP,
 which is not a valid pointer. You must ALWAYS check for TRAN_GROUP before
 following transient_for. When TRAN_GROUP is found, Client.group will always

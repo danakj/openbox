@@ -61,6 +61,7 @@ void focus_cycle(gboolean forward, gboolean linear,
                  gboolean dialog, gboolean done, gboolean cancel);
 void focus_directional_cycle(ObDirection dir,
                              gboolean dialog, gboolean done, gboolean cancel);
+void focus_cycle_draw_indicator();
 
 /*! Add a new client into the focus order */
 void focus_order_add_new(struct _ObClient *c);

@@ -28,6 +28,11 @@
 #ifdef HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
+
+#include <X11/ICE/ICElib.h>
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
@@ -35,6 +40,10 @@ static void event_handle_dock(Dock *s, XEvent *e);
 static void event_handle_dockapp(DockApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, Client *c, XEvent *e);
+static void fd_event_handle();
+static void ice_watch(IceConn conn, IcePointer data, Bool opening,
+                      IcePointer *watch_data);
+static void find_max_fd();
 
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
                             (e)->xfocus.detail == NotifyAncestor || \
@@ -60,10 +69,25 @@ static const int mask_table[] = {
 static int mask_table_size;
 
 static fd_set selset, allset;
-static int max_fd, x_fd;
+static IceConn ice_conn;
+static int max_fd, x_fd, ice_fd;
 static GData *fd_handler_list;
 
-void fd_event_handle();
+
+static void ice_watch(IceConn conn, IcePointer data, Bool opening,
+                      IcePointer *watch_data)
+{
+    if (opening) {
+        g_assert (ice_fd < 0);
+        ice_conn = conn;
+        ice_fd = IceConnectionNumber(conn);
+        FD_SET(ice_fd, &allset);
+    } else {
+        FD_CLR(ice_fd, &allset);
+        ice_fd = -1;
+    }
+    find_max_fd();
+}
 
 void event_startup()
 {
@@ -95,6 +119,10 @@ void event_startup()
     FD_ZERO(&allset);
     max_fd = x_fd = ConnectionNumber(ob_display);
     FD_SET(x_fd, &allset);
+
+    ice_fd = -1;
+    IceAddConnectionWatch(ice_watch, NULL);
+
     g_datalist_init(&fd_handler_list);
 }
 
@@ -150,6 +178,11 @@ void event_loop()
         /* handle the X events as soon as possible? */
         if (FD_ISSET(x_fd, &selset))
             return;
+
+        if (ice_fd >= 0 && FD_ISSET(ice_fd, &selset)) {
+            Bool b;
+            IceProcessMessages(ice_conn, NULL, &b);
+        }
 
         fd_event_handle();
     }
@@ -993,21 +1026,27 @@ void event_add_fd_handler(event_fd_handler *h) {
   max_fd = MAX(max_fd, h->fd);
 }
 
-void find_max_fd_foreach(GQuark n, gpointer data, gpointer max)
+static void find_max_fd_foreach(GQuark n, gpointer data, gpointer max)
 {
   *((unsigned int *)max) = MAX(*((unsigned int *)max), n);
 }
 
-void event_remove_fd(int n)
-{
-  int tmpmax = 0;
-  FD_CLR(n, &allset);
-  g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
+static void find_max_fd()
+{ 
+  int tmpmax = -1;
   g_datalist_foreach(&fd_handler_list, find_max_fd_foreach, (gpointer)&tmpmax);
   max_fd = MAX(x_fd, tmpmax);
+  max_fd = MAX(ice_fd, tmpmax);
 }
 
-void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
+void event_remove_fd(int n)
+{
+  FD_CLR(n, &allset);
+  g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
+  find_max_fd();
+}
+
+static void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
 {
     if (FD_ISSET( (int)n, &selset)) {
         event_fd_handler *h = (event_fd_handler *)data;
@@ -1016,7 +1055,7 @@ void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
     }
 }
 
-void fd_event_handle()
+static void fd_event_handle()
 {
     g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
 }

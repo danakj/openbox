@@ -42,8 +42,12 @@
 #  include <sys/types.h>
 #endif
 
+#include <X11/SM/SMlib.h>
 #include <X11/cursorfont.h>
 
+#define SM_ERR_LEN 1024
+
+SmcConn     ob_sm_conn;
 RrInstance *ob_rr_inst = NULL;
 RrTheme    *ob_rr_theme = NULL;
 Display    *ob_display = NULL;
@@ -58,8 +62,14 @@ gboolean    ob_sync     = FALSE;
 Cursors     ob_cursors;
 char       *ob_rc_path  = NULL;
 
-void signal_handler(const ObEvent *e, void *data);
-void parse_args(int argc, char **argv);
+static void signal_handler(const ObEvent *e, void *data);
+static void parse_args(int argc, char **argv);
+static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
+                             Bool shutdown, int interact_style, Bool fast);
+static void sm_die(SmcConn conn, SmPointer data);
+static void sm_save_complete(SmcConn conn, SmPointer data);
+static void sm_shutdown_cancelled(SmcConn conn, SmPointer data);
+static void exit_with_error(gchar *msg);
 
 int main(int argc, char **argv)
 {
@@ -68,6 +78,9 @@ int main(int argc, char **argv)
     char *path;
     xmlDocPtr doc;
     xmlNodePtr node;
+    SmcCallbacks cb;
+    char sm_err[SM_ERR_LEN];
+    char *sm_id;
 
     ob_state = State_Starting;
 
@@ -110,16 +123,34 @@ int main(int argc, char **argv)
     parse_args(argc, argv);
 
     ob_display = XOpenDisplay(NULL);
-    if (ob_display == NULL) {
-	/* print a message and exit */
-	g_critical("Failed to open the display.");
-	exit(1);
-    }
-    if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1) {
-	/* print a message and exit */
-	g_critical("Failed to set display as close-on-exec.");
-	exit(1);
-    }
+    if (ob_display == NULL)
+	exit_with_error("Failed to open the display.");
+    if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
+        exit_with_error("Failed to set display as close-on-exec.");
+
+    cb.save_yourself.callback = sm_save_yourself;
+    cb.save_yourself.client_data = NULL;
+
+    cb.die.callback = sm_die;
+    cb.die.client_data = NULL;
+
+    cb.save_complete.callback = sm_save_complete;
+    cb.save_complete.client_data = NULL;
+
+    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
+    cb.shutdown_cancelled.client_data = NULL;
+
+    ob_sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
+                                   SmcSaveYourselfProcMask |
+                                   SmcDieProcMask |
+                                   SmcSaveCompleteProcMask |
+                                   SmcShutdownCancelledProcMask,
+                                   &cb, NULL, &sm_id, SM_ERR_LEN, sm_err);
+    if (ob_sm_conn == NULL)
+        g_warning("Failed to connect to session manager: %s", sm_err);
+    else
+        g_message("Connected to session manager with id %s", sm_id);
+    g_free (sm_id);
 
 #ifdef USE_LIBSN
     ob_sn_display = sn_display_new(ob_display, NULL, NULL);
@@ -129,10 +160,8 @@ int main(int argc, char **argv)
     ob_root = RootWindow(ob_display, ob_screen);
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
-    if (ob_rr_inst == NULL) {
-        g_critical("Failed to initialize the render library.");
-        exit(1);
-    }
+    if (ob_rr_inst == NULL)
+        exit_with_error("Failed to initialize the render library.");
 
     /* XXX fork self onto other screens */
      
@@ -192,10 +221,8 @@ int main(int argc, char **argv)
 
         /* load the theme specified in the rc file */
         ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
-        if (ob_rr_theme == NULL) {
-            g_critical("Unable to load a theme.");
-            exit(1);
-        }
+        if (ob_rr_theme == NULL)
+            exit_with_error("Unable to load a theme.");
 
         window_startup();
         menu_startup();
@@ -241,6 +268,9 @@ int main(int argc, char **argv)
 
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
+
+    if (ob_sm_conn)
+        SmcCloseConnection(ob_sm_conn, 0, NULL);
     XCloseDisplay(ob_display);
 
     if (ob_restart) {
@@ -267,7 +297,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void signal_handler(const ObEvent *e, void *data)
+static void signal_handler(const ObEvent *e, void *data)
 {
     int s;
 
@@ -293,7 +323,7 @@ void signal_handler(const ObEvent *e, void *data)
     }
 }
 
-void print_version()
+static void print_version()
 {
     g_print("Openbox %s\n\n", PACKAGE_VERSION);
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
@@ -301,7 +331,7 @@ void print_version()
     g_print("under certain conditions. See the file COPYING for details.\n\n");
 }
 
-void print_help()
+static void print_help()
 {
     print_version();
     g_print("Syntax: %s [options]\n\n", BINARY);
@@ -314,7 +344,7 @@ void print_help()
     g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
-void parse_args(int argc, char **argv)
+static void parse_args(int argc, char **argv)
 {
     int i;
 
@@ -347,4 +377,35 @@ gboolean ob_pointer_pos(int *x, int *y)
     guint u;
 
     return !!XQueryPointer(ob_display, ob_root, &w, &w, x, y, &i, &i, &u);
+}
+
+static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
+                             Bool shutdown, int interact_style, Bool fast)
+{
+    g_message("got SAVE YOURSELF from session manager");
+    SmcSaveYourselfDone(conn, TRUE);
+}
+
+static void sm_die(SmcConn conn, SmPointer data)
+{
+    ob_shutdown = TRUE;
+    g_message("got DIE from session manager");
+}
+
+static void sm_save_complete(SmcConn conn, SmPointer data)
+{
+    g_message("got SAVE COMPLETE from session manager");
+}
+
+static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
+{
+    g_message("got SHUTDOWN CANCELLED from session manager");
+}
+
+static void exit_with_error(gchar *msg)
+{
+    g_critical(msg);
+    if (ob_sm_conn)
+        SmcCloseConnection(ob_sm_conn, 1, &msg);
+    exit(EXIT_FAILURE);
 }

@@ -57,6 +57,7 @@
 
 static void event_process(const XEvent *e, gpointer data);
 static void event_done(gpointer data);
+static void event_client_dest(ObClient *client, gpointer data);
 static void event_handle_root(XEvent *e);
 static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
@@ -148,6 +149,7 @@ void event_startup(gboolean reconfig)
 #endif
 
     client_add_destructor(focus_delay_client_dest, NULL);
+    client_add_destructor(event_client_dest, NULL);
 }
 
 void event_shutdown(gboolean reconfig)
@@ -311,6 +313,14 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
         break;
     }
     return FALSE;
+}
+
+static void event_client_dest(ObClient *client, gpointer data)
+{
+    if (client == focus_in)
+        focus_in = NULL;
+    if (client == focus_out)
+        focus_out = NULL;
 }
 
 static void event_done(gpointer data)

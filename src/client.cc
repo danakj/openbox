@@ -51,6 +51,8 @@ Client::Client(int screen, Window window)
   _urgent = false;
   // not positioned unless specified
   _positioned = false;
+  // nothing is disabled unless specified
+  _disabled_decorations = 0;
   
   getArea();
   getDesktop();
@@ -306,6 +308,12 @@ void Client::setupDecorAndFunctions()
     _decorations &= ~Decor_Close;
 
   changeAllowedActions();
+
+  if (frame) {
+    frame->adjustSize(); // change the decors on the frame
+    frame->adjustPosition(); // with more/less decorations, we may need to be
+                             // moved
+  }
 }
 
 
@@ -624,8 +632,11 @@ void Client::updateStrut()
     _strut.right = data[1];
     _strut.top = data[2];
     _strut.bottom = data[3]; 
-   
-    openbox->screen(_screen)->updateStrut();
+
+    // updating here is pointless while we're being mapped cuz we're not in
+    // the screen's client list yet
+    if (frame)
+      openbox->screen(_screen)->updateStrut();
   }
 
   delete [] data;
@@ -695,7 +706,6 @@ void Client::propertyHandler(const XPropertyEvent &e)
     getType();
     calcLayer(); // type may have changed, so update the layer
     setupDecorAndFunctions();
-    frame->adjustSize(); // this updates the frame for any new decor settings
   }
   else if (e.atom == otk::Property::atoms.net_wm_name ||
            e.atom == otk::Property::atoms.wm_name)
@@ -708,7 +718,6 @@ void Client::propertyHandler(const XPropertyEvent &e)
   else if (e.atom == otk::Property::atoms.wm_protocols) {
     updateProtocols();
     setupDecorAndFunctions();
-    frame->adjustSize(); // update the decorations
   }
   else if (e.atom == otk::Property::atoms.net_wm_strut)
     updateStrut();
@@ -1343,8 +1352,6 @@ void Client::disableDecorations(DecorationFlags flags)
 {
   _disabled_decorations = flags;
   setupDecorAndFunctions();
-  if (frame)
-    frame->adjustSize(); // change the decors on the frame
 }
 
 

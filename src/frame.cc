@@ -128,7 +128,8 @@ void Frame::adjustSize()
   int width;   // the width of the client and its border
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
-  int butsize=0; // width and height of the titlebar buttons
+  int fontheight = _style->labelFont()->height(); // height of the font
+  int butsize = fontheight - 2; // width and height of the titlebar buttons
   const int bevel = _style->bevelWidth();
   
   if (_decorations & Client::Decor_Border) {
@@ -157,9 +158,8 @@ void Frame::adjustSize()
     _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size
-    _label.setGeometry(0, bevel, width, _style->labelFont()->height());
+    _label.setGeometry(0, bevel, width, fontheight);
     // set the buttons sizes
-    butsize = _label.height() - 2;
     if (_decorations & Client::Decor_Iconify)
       _button_iconify.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & Client::Decor_Maximize)

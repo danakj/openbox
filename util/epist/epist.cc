@@ -124,22 +124,38 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("O")),
                            Mod1Mask | ControlMask));
-  _actions.push_back(Action(Action::sendToWorkspace,
+  _actions.push_back(Action(Action::changeWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("1")),
                            Mod1Mask | ControlMask, 0));
-  _actions.push_back(Action(Action::sendToWorkspace,
+  _actions.push_back(Action(Action::changeWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("2")),
                            Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::sendToWorkspace,
+  _actions.push_back(Action(Action::changeWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("3")),
                            Mod1Mask | ControlMask, 2));
-  _actions.push_back(Action(Action::sendToWorkspace,
+  _actions.push_back(Action(Action::changeWorkspace,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("4")),
                            Mod1Mask | ControlMask, 3));
+  _actions.push_back(Action(Action::sendToWorkspace,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("1")),
+                           Mod1Mask | ControlMask | ShiftMask, 0));
+  _actions.push_back(Action(Action::sendToWorkspace,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("2")),
+                           Mod1Mask | ControlMask | ShiftMask, 1));
+  _actions.push_back(Action(Action::sendToWorkspace,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("3")),
+                           Mod1Mask | ControlMask | ShiftMask, 2));
+  _actions.push_back(Action(Action::sendToWorkspace,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("4")),
+                           Mod1Mask | ControlMask | ShiftMask, 3));
   activateGrabs();
 }
 

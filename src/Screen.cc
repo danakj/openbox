@@ -1487,6 +1487,16 @@ void BScreen::updateStackingList(void) {
     if (i != getCurrentWorkspaceID())
       getWorkspace(i)->appendStackOrder(stack_order);
 
+  /*
+    Add the icons windows to the list too. When all the windows aren't in the
+    stacking list, the list is considered unstable, i.e. broken, and apps like
+    to just freeze up and wait for it to be right.
+  */
+  BlackboxWindowList::iterator icon_it = iconList.begin(),
+                               icon_end = iconList.end();
+  for (; icon_it != icon_end; ++icon_it)
+    stack_order.push_back(*icon_it);
+
   if (stack_order.size() > 0) {
     // set the client list atoms
     Window *windows = new Window[stack_order.size()];

@@ -995,7 +995,9 @@ void Openbox::save() {
   for (BScreen *s = it.current(); s != NULL; it++, s = it.current()) {
     s->save();
     s->getToolbar()->save();
+#ifdef    SLIT
     s->getSlit()->save();
+#endif // SLIT
   }
 
   config.setAutoSave(true);

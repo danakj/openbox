@@ -338,7 +338,7 @@ static gboolean event_ignore(XEvent *e, Client *client)
             e->xcrossing.detail == NotifyInferior ||
             (e->xcrossing.mode == NotifyUngrab &&
              e->xcrossing.detail == NotifyVirtual)) {
-#ifndef DEBUG_FOCUS
+#ifdef DEBUG_FOCUS
             g_message("%sNotify mode %d detail %d on %lx IGNORED",
                       (e->type == EnterNotify ? "Enter" : "Leave"),
                       e->xcrossing.mode,
@@ -346,7 +346,7 @@ static gboolean event_ignore(XEvent *e, Client *client)
 #endif
             return TRUE;
         }
-#ifndef DEBUG_FOCUS
+#ifdef DEBUG_FOCUS
         g_message("%sNotify mode %d detail %d on %lx",
                   (e->type == EnterNotify ? "Enter" : "Leave"),
                   e->xcrossing.mode,

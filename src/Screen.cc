@@ -828,7 +828,7 @@ XFontSet BScreen::createFontSet(const char *fontname) {
 
 void BScreen::setSloppyFocus(bool b) {
   resource.sloppy_focus = b;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".focusModel" << ends;
   config.setValue(s.str(),
                   (resource.sloppy_focus ?
@@ -840,7 +840,7 @@ void BScreen::setSloppyFocus(bool b) {
 
 void BScreen::setAutoRaise(bool a) {
   resource.auto_raise = a;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".focusModel" << ends;
   config.setValue(s.str(),
                   (resource.sloppy_focus ?
@@ -852,7 +852,7 @@ void BScreen::setAutoRaise(bool a) {
 
 void BScreen::setImageDither(bool d) {
   resource.image_dither = d;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
   config.setValue(s.str(), resource.image_dither);
   s.rdbuf()->freeze(0);
@@ -861,7 +861,7 @@ void BScreen::setImageDither(bool d) {
 
 void BScreen::setOpaqueMove(bool o) {
   resource.opaque_move = o;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".opaqueMove" << ends;
   config.setValue(s.str(), resource.opaque_move);
   s.rdbuf()->freeze(0);
@@ -870,7 +870,7 @@ void BScreen::setOpaqueMove(bool o) {
 
 void BScreen::setFullMax(bool f) {
   resource.full_max = f;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".fullMaximization" << ends;
   config.setValue(s.str(), resource.full_max);
   s.rdbuf()->freeze(0);
@@ -879,7 +879,7 @@ void BScreen::setFullMax(bool f) {
 
 void BScreen::setFocusNew(bool f) {
   resource.focus_new = f;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".focusNewWindows" << ends;
   config.setValue(s.str(), resource.focus_new);
   s.rdbuf()->freeze(0);
@@ -888,7 +888,7 @@ void BScreen::setFocusNew(bool f) {
 
 void BScreen::setFocusLast(bool f) {
   resource.focus_last = f;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".focusLastWindow" << ends;
   config.setValue(s.str(), resource.focus_last);
   s.rdbuf()->freeze(0);
@@ -897,7 +897,7 @@ void BScreen::setFocusLast(bool f) {
 
 void BScreen::setWindowZones(int z) {
   resource.zones = z;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".windowZones" << ends;
   config.setValue(s.str(), resource.zones);
   s.rdbuf()->freeze(0);
@@ -906,7 +906,7 @@ void BScreen::setWindowZones(int z) {
 
 void BScreen::setWorkspaceCount(int w) {
   resource.workspaces = w;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".workspaces" << ends;
   config.setValue(s.str(), resource.workspaces);
   s.rdbuf()->freeze(0);
@@ -915,7 +915,7 @@ void BScreen::setWorkspaceCount(int w) {
 
 void BScreen::setPlacementPolicy(int p) {
   resource.placement_policy = p;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".windowPlacement" << ends;
   const char *placement;
   switch (resource.placement_policy) {
@@ -932,7 +932,7 @@ void BScreen::setPlacementPolicy(int p) {
 
 void BScreen::setEdgeSnapThreshold(int t) {
   resource.edge_snap_threshold = t;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".edgeSnapThreshold" << ends;
   config.setValue(s.str(), resource.edge_snap_threshold);
   s.rdbuf()->freeze(0);
@@ -941,7 +941,7 @@ void BScreen::setEdgeSnapThreshold(int t) {
 
 void BScreen::setRowPlacementDirection(int d) {
   resource.row_direction = d;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".rowPlacementDirection" <<
     ends;
   config.setValue(s.str(),
@@ -953,7 +953,7 @@ void BScreen::setRowPlacementDirection(int d) {
 
 void BScreen::setColPlacementDirection(int d) {
   resource.col_direction = d;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".colPlacementDirection" <<
     ends;
   config.setValue(s.str(),
@@ -982,7 +982,7 @@ void BScreen::setStrftimeFormat(const char *f) {
     delete [] resource.strftime_format;
 
   resource.strftime_format = bstrdup(f);
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".strftimeFormat" << ends;
   config.setValue(s.str(), resource.strftime_format);
   s.rdbuf()->freeze(0);
@@ -991,7 +991,7 @@ void BScreen::setStrftimeFormat(const char *f) {
 #else // !HAVE_STRFTIME
 void BScreen::setDateFormat(int f) {
   resource.date_format = f;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".dateFormat" << ends;
   config.setValue(s.str(), resource.date_format == B_EuropeanDate ?
                   "European" : "American");
@@ -1000,7 +1000,7 @@ void BScreen::setDateFormat(int f) {
 
 void BScreen::setClock24Hour(Bool c) {
   resource.clock24hour = c;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".clockFormat" << ends;
   config.setValue(s.str(), resource.clock24hour ? 24 : 12);
   s.rdbuf()->freeze(0);
@@ -1013,14 +1013,14 @@ void BScreen::setHideToolbar(bool b) {
     getToolbar()->unMapToolbar();
   else
     getToolbar()->mapToolbar();
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".hideToolbar" << ends;
   config.setValue(s.str(), resource.hide_toolbar ? "True" : "False");
   s.rdbuf()->freeze(0);
 }
 
 void BScreen::saveWorkspaceNames() {
-  ostrstream rc, names;
+  std::ostrstream rc, names;
 
   for (int i = 0; i < resource.workspaces; i++) {
     Workspace *w = getWorkspace(i);

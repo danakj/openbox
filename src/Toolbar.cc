@@ -215,7 +215,7 @@ Toolbar::~Toolbar() {
 
 void Toolbar::setOnTop(bool b) {
   m_ontop = b;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
   s.rdbuf()->freeze(0);
@@ -223,7 +223,7 @@ void Toolbar::setOnTop(bool b) {
 
 void Toolbar::setAutoHide(bool b) {
   m_autohide = b;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide" <<
     ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
@@ -232,7 +232,7 @@ void Toolbar::setAutoHide(bool b) {
 
 void Toolbar::setWidthPercent(int w) {
   m_width_percent = w;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.widthPercent"
     << ends;
   config.setValue(s.str(), m_width_percent);
@@ -241,7 +241,7 @@ void Toolbar::setWidthPercent(int w) {
 
 void Toolbar::setPlacement(int p) {
   m_placement = p;
-  ostrstream s;
+  std::ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement" <<
     ends;
   const char *placement;

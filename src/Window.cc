@@ -212,7 +212,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
       break;
 
     case Type_Normal:
-      // normal windows retain all of the possible decorations and functionality
+      // normal windows retain all of the possible decorations and
+      // functionality
       break;
     }
   } else {

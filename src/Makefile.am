@@ -24,6 +24,7 @@ DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
 CPPFLAGS=@CPPFLAGS@ @DEBUG@ \
 -DLOCALEPATH=\"$(pkgdatadir)/nls\" \
+-DBUTTONSDIR=\"$(pkgdatadir)/buttons\" \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 

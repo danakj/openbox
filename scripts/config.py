@@ -20,15 +20,19 @@ theme = "/usr/local/share/openbox/styles/fieron2"
 titlebar_layout = "ILC"
 
 # double_click_delay - the number of milliseconds in which 2 clicks are
-#                      perceived as a double-click
+#                      perceived as a double-click.
 double_click_delay = 300
+
+# drag_threshold - the amount of pixels that you have to drag the mouse before
+#                  motion events will start occuring.
+drag_threshold = 3
 
 # desktop_names - the name of each desktop
 desktop_names = ["one", "two", "three", "four", "five", "six", "seven", \
                  "eight", "nine", "ten", "eleven", "twelve"]
 
 # number_of_desktops - the number of desktops/workspaces which can be scrolled
-#                      between
+#                      between.
 number_of_desktops = 4
 
 #############################################################################

@@ -43,7 +43,8 @@ struct _RrTheme {
     RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
     RrColor *menu_color;
-    RrColor *menu_bullet_color;
+    RrColor *menu_bullet_normal_color;
+    RrColor *menu_bullet_selected_color;
     RrColor *menu_disabled_color;
     RrColor *menu_selected_color;
 
@@ -143,13 +144,14 @@ struct _RrTheme {
     RrAppearance *a_unfocused_handle;
     RrAppearance *a_menu_title;
     RrAppearance *a_menu;
-    RrAppearance *a_menu_item;
+    RrAppearance *a_menu_normal;
     RrAppearance *a_menu_disabled;
     RrAppearance *a_menu_selected;
-    RrAppearance *a_menu_text_item;
+    RrAppearance *a_menu_text_normal;
     RrAppearance *a_menu_text_disabled;
     RrAppearance *a_menu_text_selected;
-    RrAppearance *a_menu_bullet;
+    RrAppearance *a_menu_bullet_normal;
+    RrAppearance *a_menu_bullet_selected;
     RrAppearance *a_clear;     /* clear with no texture */
     RrAppearance *a_clear_tex; /* clear with a texture */
 

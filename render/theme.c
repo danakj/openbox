@@ -58,13 +58,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_unfocused_handle = RrAppearanceNew(inst, 0);
     theme->a_menu = RrAppearanceNew(inst, 0);
     theme->a_menu_title = RrAppearanceNew(inst, 1);
-    theme->a_menu_item = RrAppearanceNew(inst, 0);
+    theme->a_menu_normal = RrAppearanceNew(inst, 0);
     theme->a_menu_disabled = RrAppearanceNew(inst, 0);
     theme->a_menu_selected = RrAppearanceNew(inst, 0);
-    theme->a_menu_text_item = RrAppearanceNew(inst, 1);
+    theme->a_menu_text_normal = RrAppearanceNew(inst, 1);
     theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);
     theme->a_menu_text_selected = RrAppearanceNew(inst, 1);
-    theme->a_menu_bullet = RrAppearanceNew(inst, 1);
+    theme->a_menu_bullet_normal = RrAppearanceNew(inst, 1);
+    theme->a_menu_bullet_selected = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
 
@@ -256,14 +257,26 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "menu.items.textColor", &theme->menu_color))
         theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "menu.bullet.imageColor", &theme->menu_bullet_color))
-        theme->menu_bullet_color = RrColorNew(inst, 0, 0, 0);
-    if (!read_color(db, inst,
                     "menu.disabled.textColor", &theme->menu_disabled_color))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "menu.selected.textColor", &theme->menu_selected_color))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "menu.bullet.imageColor",
+                    &theme->menu_bullet_normal_color))
+        theme->menu_bullet_normal_color = RrColorNew(inst,
+                                                     theme->menu_color->r,
+                                                     theme->menu_color->g,
+                                                     theme->menu_color->b);
+    if (!read_color(db, inst,
+                    "menu.bullet.selected.imageColor",
+                    &theme->menu_bullet_selected_color))
+        theme->menu_bullet_selected_color =
+            RrColorNew(inst,
+                       theme->menu_selected_color->r,
+                       theme->menu_selected_color->g,
+                       theme->menu_selected_color->b);
 
     
     if (read_mask(inst, "max.xbm", theme, &theme->max_mask)) {
@@ -624,12 +637,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_icon->surface.grad =
         theme->a_clear->surface.grad =
         theme->a_clear_tex->surface.grad =
-        theme->a_menu_item->surface.grad =
+        theme->a_menu_normal->surface.grad =
         theme->a_menu_disabled->surface.grad =
-        theme->a_menu_text_item->surface.grad =
+        theme->a_menu_text_normal->surface.grad =
         theme->a_menu_text_disabled->surface.grad =
         theme->a_menu_text_selected->surface.grad =
-        theme->a_menu_bullet->surface.grad = RR_SURFACE_PARENTREL;
+        theme->a_menu_bullet_normal->surface.grad =
+        theme->a_menu_bullet_selected->surface.grad = RR_SURFACE_PARENTREL;
 
     /* set up the textures */
     theme->a_focused_label->texture[0].type = 
@@ -660,23 +674,25 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_title->texture[0].data.text.font = theme->mtitlefont;
     theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
 
-    theme->a_menu_text_item->texture[0].type =
+    theme->a_menu_text_normal->texture[0].type =
         theme->a_menu_text_disabled->texture[0].type = 
         theme->a_menu_text_selected->texture[0].type = RR_TEXTURE_TEXT;
-    theme->a_menu_text_item->texture[0].data.text.justify = 
+    theme->a_menu_text_normal->texture[0].data.text.justify = 
         theme->a_menu_text_disabled->texture[0].data.text.justify = 
         theme->a_menu_text_selected->texture[0].data.text.justify =
         RR_JUSTIFY_LEFT;
-    theme->a_menu_text_item->texture[0].data.text.font =
+    theme->a_menu_text_normal->texture[0].data.text.font =
         theme->a_menu_text_disabled->texture[0].data.text.font =
         theme->a_menu_text_selected->texture[0].data.text.font = theme->mfont;
-    theme->a_menu_text_item->texture[0].data.text.color = theme->menu_color;
+    theme->a_menu_text_normal->texture[0].data.text.color = theme->menu_color;
     theme->a_menu_text_disabled->texture[0].data.text.color =
         theme->menu_disabled_color;
     theme->a_menu_text_selected->texture[0].data.text.color =
         theme->menu_selected_color;
-    theme->a_menu_bullet->texture[0].data.mask.color =
-        theme->menu_bullet_color;
+    theme->a_menu_bullet_normal->texture[0].data.mask.color =
+        theme->menu_bullet_normal_color;
+    theme->a_menu_bullet_selected->texture[0].data.mask.color =
+        theme->menu_bullet_selected_color;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 
@@ -724,7 +740,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_focused_pressed_iconify->texture[0].type = 
         theme->a_unfocused_unpressed_iconify->texture[0].type = 
         theme->a_unfocused_pressed_iconify->texture[0].type =
-        theme->a_menu_bullet->texture[0].type = RR_TEXTURE_MASK;
+        theme->a_menu_bullet_normal->texture[0].type =
+        theme->a_menu_bullet_selected->texture[0].type = RR_TEXTURE_MASK;
     
     theme->a_disabled_focused_max->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_max->texture[0].data.mask.mask = 
@@ -795,7 +812,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->iconify_mask;
-    theme->a_menu_bullet->texture[0].data.mask.mask = 
+    theme->a_menu_bullet_normal->texture[0].data.mask.mask = 
+    theme->a_menu_bullet_selected->texture[0].data.mask.mask = 
         theme->menu_bullet_mask;
     theme->a_disabled_focused_max->texture[0].data.mask.color = 
         theme->a_disabled_focused_close->texture[0].data.mask.color = 
@@ -853,8 +871,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_unfocused_pressed_shade->texture[0].data.mask.color = 
         theme->a_unfocused_pressed_iconify->texture[0].data.mask.color =
         theme->titlebut_unfocused_pressed_color;
-    theme->a_menu_bullet->texture[0].data.mask.color = 
-        theme->menu_bullet_color;
+    theme->a_menu_bullet_normal->texture[0].data.mask.color = 
+        theme->menu_bullet_normal_color;
+    theme->a_menu_bullet_selected->texture[0].data.mask.color = 
+        theme->menu_bullet_selected_color;
 
     XrmDestroyDatabase(db);
 
@@ -890,7 +910,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_title_color);
         RrColorFree(theme->menu_disabled_color);
         RrColorFree(theme->menu_selected_color);
-        RrColorFree(theme->menu_bullet_color);
+        RrColorFree(theme->menu_bullet_normal_color);
+        RrColorFree(theme->menu_bullet_selected_color);
 
         RrPixmapMaskFree(theme->max_mask);
         RrPixmapMaskFree(theme->max_toggled_mask);
@@ -979,12 +1000,14 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_unfocused_handle);
         RrAppearanceFree(theme->a_menu);
         RrAppearanceFree(theme->a_menu_title);
-        RrAppearanceFree(theme->a_menu_item);
+        RrAppearanceFree(theme->a_menu_normal);
         RrAppearanceFree(theme->a_menu_disabled);
         RrAppearanceFree(theme->a_menu_selected);
-        RrAppearanceFree(theme->a_menu_text_item);
+        RrAppearanceFree(theme->a_menu_text_normal);
         RrAppearanceFree(theme->a_menu_text_disabled);
         RrAppearanceFree(theme->a_menu_text_selected);
+        RrAppearanceFree(theme->a_menu_bullet_normal);
+        RrAppearanceFree(theme->a_menu_bullet_selected);
         RrAppearanceFree(theme->a_clear);
         RrAppearanceFree(theme->a_clear_tex);
         RrAppearanceFree(theme->app_hilite_bg);

@@ -158,8 +158,10 @@ struct _RrTheme {
 
     RrAppearance *app_hilite_bg;
     RrAppearance *app_unhilite_bg;
-    RrAppearance *app_hilite_label;
-    RrAppearance *app_unhilite_label;
+    RrAppearance *app_hilite_fg; /* never parent relative */
+    RrAppearance *app_unhilite_fg; /* never parent relative */
+    RrAppearance *app_hilite_label; /* can be parent relative */
+    RrAppearance *app_unhilite_label; /* can be parent relative */
 
 };
 

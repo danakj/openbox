@@ -73,6 +73,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     theme->app_hilite_bg = RrAppearanceNew(inst, 0);
     theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
+    theme->app_hilite_fg = RrAppearanceNew(inst, 0);
+    theme->app_unhilite_fg = RrAppearanceNew(inst, 0);
     theme->app_hilite_label = RrAppearanceNew(inst, 1);
     theme->app_unhilite_label = RrAppearanceNew(inst, 1);
 
@@ -478,12 +480,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.active.label.bg", theme->app_hilite_label,
                          TRUE))
         set_default_appearance(theme->app_hilite_label);
+    if (!read_appearance(db, inst,
+                         "window.active.label.bg", theme->app_hilite_fg,
+                         TRUE))
+        set_default_appearance(theme->app_hilite_fg);
     else if (theme->app_hilite_label->surface.grad == RR_SURFACE_PARENTREL) {
         if (!read_appearance(db, inst,
                              "window.active.title.bg",
-                             theme->app_hilite_label,
+                             theme->app_hilite_fg,
                              FALSE))
-            set_default_appearance(theme->app_hilite_label);
+            set_default_appearance(theme->app_hilite_fg);
     }
     if (!read_appearance(db, inst,
                          "window.inactive.title.bg", theme->app_unhilite_bg,
@@ -493,12 +499,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                          "window.inactive.label.bg", theme->app_unhilite_label,
                          TRUE))
         set_default_appearance(theme->app_unhilite_label);
+    if (!read_appearance(db, inst,
+                         "window.inactive.label.bg", theme->app_unhilite_fg,
+                         TRUE))
+        set_default_appearance(theme->app_unhilite_fg);
     else if (theme->app_unhilite_label->surface.grad == RR_SURFACE_PARENTREL) {
         if (!read_appearance(db, inst,
                              "window.inactive.title.bg",
-                             theme->app_unhilite_label,
+                             theme->app_unhilite_fg,
                              FALSE))
-            set_default_appearance(theme->app_unhilite_label);
+            set_default_appearance(theme->app_unhilite_fg);
     }
         
 
@@ -1037,6 +1047,8 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_clear_tex);
         RrAppearanceFree(theme->app_hilite_bg);
         RrAppearanceFree(theme->app_unhilite_bg);
+        RrAppearanceFree(theme->app_hilite_fg);
+        RrAppearanceFree(theme->app_unhilite_fg);
         RrAppearanceFree(theme->app_hilite_label);
         RrAppearanceFree(theme->app_unhilite_label);
     }

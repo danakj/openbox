@@ -79,6 +79,8 @@ bool OBBindings::translate(const std::string &str, Binding &b)
     } else if (mod == "M5" ||   // mod5
                mod == "Mod5") {
       mods |= Mod5Mask;
+    } else {                    // invalid
+      return false;
     }
     begin = end + 1;
   }

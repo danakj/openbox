@@ -180,22 +180,38 @@ void focus_fallback(ObFocusFallbackType type)
     focus_set_client(NULL);
 
     if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
-        /* try for transient relations */
         if (old->transient_for) {
-            if (old->transient_for == OB_TRAN_GROUP) {
-                for (it = focus_order[screen_desktop]; it; it = it->next) {
-                    GSList *sit;
+            gboolean trans = FALSE;
 
-                    for (sit = old->group->members; sit; sit = sit->next)
-                        if (sit->data == it->data)
-                            if (focus_fallback_transient(sit->data, old))
-                                return;
+            if (config_focus_last || !config_focus_follow)
+                trans = TRUE;
+            else {
+                ObClient *c;
+
+                if ((c = client_under_pointer()) &&
+                    client_search_transient(client_search_top_transient(c),
+                                            old))
+                    trans = TRUE;
+            }
+
+            /* try for transient relations */
+            if (trans) {
+                if (old->transient_for == OB_TRAN_GROUP) {
+                    for (it = focus_order[screen_desktop]; it; it = it->next) {
+                        GSList *sit;
+
+                        for (sit = old->group->members; sit; sit = sit->next)
+                            if (sit->data == it->data)
+                                if (focus_fallback_transient(sit->data, old))
+                                    return;
+                    }
+                } else {
+                    if (focus_fallback_transient(old->transient_for, old))
+                        return;
                 }
-            } else {
-                if (focus_fallback_transient(old->transient_for, old))
-                    return;
             }
         }
+    }
 
     if (!config_focus_last && config_focus_follow)
         if (focus_under_pointer())
@@ -217,7 +233,6 @@ void focus_fallback(ObFocusFallbackType type)
                             }
         }
 #endif
-    }
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)

@@ -243,8 +243,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
     if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
-                          self->size.left - self->cbwidth,
-                          self->size.top - self->cbwidth,
+                          self->size.left, self->size.top,
                           self->client->area.width,
                           self->client->area.height);
         /* when the client has StaticGravity, it likes to move around. */
@@ -388,7 +387,7 @@ void frame_release_client(Frame *self, Client *client)
 static void layout_title(Frame *self)
 {
     char *lc;
-    int x;
+    int x, y;
     gboolean n, d, i, l, m, c, s;
 
     n = d = i = l = m = c = s = FALSE;
@@ -457,12 +456,13 @@ static void layout_title(Frame *self)
 
 
     x = ob_theme->bevel + 1;
+    y = ob_theme->bevel + ob_theme->bwidth + 1;
     for (lc = ob_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;
 	    self->icon_x = x;
-            RrSurfaceSetArea(self->s_icon, x, ob_theme->bevel,
+            RrSurfaceSetArea(self->s_icon, x, y - 1,
                              RrThemeButtonSize(ob_theme) + 2,
                              RrThemeButtonSize(ob_theme) + 2);
             RrSurfaceShow(self->s_icon);
@@ -471,7 +471,7 @@ static void layout_title(Frame *self)
 	case 'D':
 	    if (!d) break;
 	    self->desk_x = x;
-            RrSurfaceSetArea(self->s_desk, x, ob_theme->bevel + 1,
+            RrSurfaceSetArea(self->s_desk, x, y,
                              RrThemeButtonSize(ob_theme),
                              RrThemeButtonSize(ob_theme));
             RrSurfaceShow(self->s_desk);
@@ -480,7 +480,7 @@ static void layout_title(Frame *self)
 	case 'S':
 	    if (!s) break;
 	    self->shade_x = x;
-            RrSurfaceSetArea(self->s_shade, x, ob_theme->bevel + 1,
+            RrSurfaceSetArea(self->s_shade, x, y,
                              RrThemeButtonSize(ob_theme),
                              RrThemeButtonSize(ob_theme));
             RrSurfaceShow(self->s_shade);
@@ -489,7 +489,7 @@ static void layout_title(Frame *self)
 	case 'I':
 	    if (!i) break;
 	    self->iconify_x = x;
-            RrSurfaceSetArea(self->s_iconify, x, ob_theme->bevel + 1,
+            RrSurfaceSetArea(self->s_iconify, x, y,
                              RrThemeButtonSize(ob_theme),
                              RrThemeButtonSize(ob_theme));
             RrSurfaceShow(self->s_iconify);
@@ -498,7 +498,7 @@ static void layout_title(Frame *self)
 	case 'L':
 	    if (!l) break;
 	    self->label_x = x;
-            RrSurfaceSetArea(self->s_label, x, ob_theme->bevel,
+            RrSurfaceSetArea(self->s_label, x, y - 1,
                              self->label_width, RrThemeLabelHeight(ob_theme));
             RrSurfaceShow(self->s_label);
 	    x += self->label_width + ob_theme->bevel + 1;
@@ -506,7 +506,7 @@ static void layout_title(Frame *self)
 	case 'M':
 	    if (!m) break;
 	    self->max_x = x;
-            RrSurfaceSetArea(self->s_max, x, ob_theme->bevel + 1,
+            RrSurfaceSetArea(self->s_max, x, y,
                              RrThemeButtonSize(ob_theme),
                              RrThemeButtonSize(ob_theme));
             RrSurfaceShow(self->s_max);
@@ -515,7 +515,7 @@ static void layout_title(Frame *self)
 	case 'C':
 	    if (!c) break;
 	    self->close_x = x;
-            RrSurfaceSetArea(self->s_close, x, ob_theme->bevel + 1,
+            RrSurfaceSetArea(self->s_close, x, y,
                              RrThemeButtonSize(ob_theme),
                              RrThemeButtonSize(ob_theme));
             RrSurfaceShow(self->s_close);

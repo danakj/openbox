@@ -70,10 +70,10 @@ void Configmenu::setValues(void) {
   setItemSelected(4, getScreen()->doFullMax());
   setItemSelected(5, getScreen()->doFocusNew());
   setItemSelected(6, getScreen()->doFocusLast());
-  setItemSelected(7, getScreen()->getBlackbox()->getWindowToWindowSnap());
+  setItemSelected(7, getScreen()->getWindowToWindowSnap());
 
-  setItemSelected(8, getScreen()->getBlackbox()->getWindowCornerSnap());
-  setItemEnabled(8, getScreen()->getBlackbox()->getWindowToWindowSnap());
+  setItemSelected(8, getScreen()->getWindowCornerSnap());
+  setItemEnabled(8, getScreen()->getWindowToWindowSnap());
   
   setItemSelected(9, getScreen()->doHideToolbar());
 }
@@ -94,58 +94,47 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     return;
 
   switch(item->function()) {
-  case 1: { // dither
+  case 1: // dither
     getScreen()->saveImageDither(! getScreen()->doImageDither());
     setItemSelected(index, getScreen()->doImageDither());
     break;
-  }
 
-  case 2: { // opaque move
+  case 2: // opaque move
     getScreen()->saveOpaqueMove(! getScreen()->doOpaqueMove());
     setItemSelected(index, getScreen()->doOpaqueMove());
     break;
-  }
 
-  case 3: { // full maximization
+  case 3: // full maximization
     getScreen()->saveFullMax(! getScreen()->doFullMax());
     setItemSelected(index, getScreen()->doFullMax());
     break;
-  }
-  case 4: { // focus new windows
+
+  case 4: // focus new windows
     getScreen()->saveFocusNew(! getScreen()->doFocusNew());
     setItemSelected(index, getScreen()->doFocusNew());
     break;
-  }
 
-  case 5: { // focus last window on workspace
+  case 5: // focus last window on workspace
     getScreen()->saveFocusLast(! getScreen()->doFocusLast());
     setItemSelected(index, getScreen()->doFocusLast());
     break;
-  }
 
-  case 6: { // window-to-window snapping
-    getScreen()->getBlackbox()->
-      saveWindowToWindowSnap(! getScreen()->getBlackbox()->
-                             getWindowToWindowSnap());
-    setItemSelected(index, getScreen()->getBlackbox()->getWindowToWindowSnap());
-    setItemEnabled(index + 1,
-                   getScreen()->getBlackbox()->getWindowToWindowSnap());
+  case 6: // window-to-window snapping
+    getScreen()->saveWindowToWindowSnap(! getScreen()->getWindowToWindowSnap());
+    setItemSelected(index, getScreen()->getWindowToWindowSnap());
+    setItemEnabled(index + 1, getScreen()->getWindowToWindowSnap());
     break;
-  }
 
-  case 7: { // window corner snapping
-    getScreen()->getBlackbox()->
-      saveWindowCornerSnap(! getScreen()->getBlackbox()->getWindowCornerSnap());
-    setItemSelected(index, getScreen()->getBlackbox()->getWindowCornerSnap());
+  case 7: // window corner snapping
+    getScreen()->saveWindowCornerSnap(! getScreen()->getWindowCornerSnap());
+    setItemSelected(index, getScreen()->getWindowCornerSnap());
     break;
-  }
 
-  case 8: { // hide toolbar
+  case 8: // hide toolbar
     getScreen()->saveHideToolbar(! getScreen()->doHideToolbar());
     setItemSelected(index, getScreen()->doHideToolbar());
     break;
   }
-  } // switch
 }
 
 

@@ -152,8 +152,8 @@ private:
     MenuStyle mstyle;
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
-         opaque_move, full_max, focus_new, focus_last, click_raise,
-         hide_toolbar;
+      opaque_move, full_max, focus_new, focus_last, click_raise,
+      hide_toolbar, window_to_window_snap, window_corner_snap;
     BColor border_color;
 
     unsigned int workspaces;
@@ -216,6 +216,10 @@ public:
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
   inline bool doHideToolbar(void) const { return resource.hide_toolbar; }
+  inline bool getWindowToWindowSnap(void) const
+    { return resource.window_to_window_snap; }
+  inline bool getWindowCornerSnap(void) const
+    { return resource.window_corner_snap; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
@@ -273,6 +277,8 @@ public:
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);
   void saveHideToolbar(bool h);
+  void saveWindowToWindowSnap(bool s);
+  void saveWindowCornerSnap(bool s);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

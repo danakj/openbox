@@ -424,6 +424,20 @@ void BScreen::saveHideToolbar(bool h) {
 }
 
 
+void BScreen::saveWindowToWindowSnap(bool s) {
+  resource.window_to_window_snap = s;
+  config->setValue(screenstr + "windowToWindowSnap",
+                   resource.window_to_window_snap);
+}
+
+
+void BScreen::saveWindowCornerSnap(bool s) {
+  resource.window_corner_snap = s;
+  config->setValue(screenstr + "windowCornerSnap",
+                   resource.window_corner_snap);
+}
+
+
 void BScreen::saveWorkspaces(unsigned int w) {
   resource.workspaces = w;
   config->setValue(screenstr + "workspaces", resource.workspaces);
@@ -510,6 +524,8 @@ void BScreen::save_rc(void) {
   saveFocusNew(resource.focus_new);
   saveFocusLast(resource.focus_last);
   saveHideToolbar(resource.hide_toolbar);
+  saveWindowToWindowSnap(resource.window_to_window_snap);
+  saveWindowCornerSnap(resource.window_corner_snap);
   saveWorkspaces(resource.workspaces);
   savePlacementPolicy(resource.placement_policy);
   saveEdgeSnapThreshold(resource.edge_snap_threshold);
@@ -548,6 +564,14 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
     resource.hide_toolbar = false;
+
+  if (! config->getValue(screenstr + "windowToWindowSnap",
+                         resource.window_to_window_snap))
+    resource.window_to_window_snap = true;
+
+  if (! config->getValue(screenstr + "windowCornerSnap",
+                         resource.window_corner_snap))
+    resource.window_corner_snap = true;
 
   if (! config->getValue(screenstr + "imageDither", b))
     b = true;

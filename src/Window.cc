@@ -2524,7 +2524,7 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
         Workspace *w = screen->getWorkspace(getWorkspaceNumber());
         assert(w);
 
-        if (blackbox->getWindowToWindowSnap()) {
+        if (screen->getWindowToWindowSnap()) {
           // try snap to another window
           for (unsigned int i = 0, c = w->getCount(); i < c; ++i) {
             BlackboxWindow *snapwin = w->getWindow(i);
@@ -2537,51 +2537,18 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
                  dtop = std::abs(wbottom - winrect.top()),
               dbottom = std::abs(wtop - winrect.bottom());
 
-            // snap left of other window?
-            if (dleft < snap_distance && dleft <= dright) {
-              dx = winrect.left() - frame.rect.width();
-
-              if (blackbox->getWindowCornerSnap()) {
-                // try corner-snap to its other sides
-                dtop = std::abs(wtop - winrect.top());
-                dbottom = std::abs(wbottom - winrect.bottom());
-                if (dtop < snap_distance && dtop <= dbottom)
-                  dy = winrect.top();
-                else if (dbottom < snap_distance)
-                  dy = winrect.bottom() - frame.rect.height();
-              }
-
-              continue;
-            }
-            // snap right of other window?
-            else if (dright < snap_distance) {
-              dx = winrect.right() + 1;
-
-              if (blackbox->getWindowCornerSnap()) {
-                // try corner-snap to its other sides
-                dtop = std::abs(wtop - winrect.top());
-                dbottom = std::abs(wbottom - winrect.bottom());
-                if (dtop < snap_distance && dtop <= dbottom)
-                  dy = winrect.top();
-                else if (dbottom < snap_distance)
-                  dy = winrect.bottom() - frame.rect.height();
-              }
-
-              continue;
-            }
-
             // snap top of other window?
             if (dtop < snap_distance && dtop <= dbottom) {
               dy = winrect.top() - frame.rect.height();
 
-              if (blackbox->getWindowCornerSnap()) {
+              if (screen->getWindowCornerSnap()) {
                 // try corner-snap to its other sides
                 dleft = std::abs(wleft - winrect.left());
                 dright = std::abs(wright - winrect.right());
                 if (dleft < snap_distance && dleft <= dright)
                   dx = winrect.left();
                 else if (dright < snap_distance)
-                  dx = winrect.right() - frame.rect.width();
+                  dx = winrect.right() - frame.rect.width() + 1;
               }
 
               continue;
@@ -2590,14 +2557,47 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
             else if (dbottom < snap_distance) {
               dy = winrect.bottom() + 1;
 
-              if (blackbox->getWindowCornerSnap()) {
+              if (screen->getWindowCornerSnap()) {
                 // try corner-snap to its other sides
                 dleft = std::abs(wleft - winrect.left());
                 dright = std::abs(wright - winrect.right());
                 if (dleft < snap_distance && dleft <= dright)
                   dx = winrect.left();
                 else if (dright < snap_distance)
-                  dx = winrect.right() - frame.rect.width();
+                  dx = winrect.right() - frame.rect.width() + 1;
+              }
+
+              continue;
+            }
+
+            // snap left of other window?
+            if (dleft < snap_distance && dleft <= dright) {
+              dx = winrect.left() - frame.rect.width();
+
+              if (screen->getWindowCornerSnap()) {
+                // try corner-snap to its other sides
+                dtop = std::abs(wtop - winrect.top());
+                dbottom = std::abs(wbottom - winrect.bottom());
+                if (dtop < snap_distance && dtop <= dbottom)
+                  dy = winrect.top();
+                else if (dbottom < snap_distance)
+                  dy = winrect.bottom() - frame.rect.height() + 1;
+              }
+
+              continue;
+            }
+            // snap right of other window?
+            else if (dright < snap_distance) {
+              dx = winrect.right() + 1;
+
+              if (screen->getWindowCornerSnap()) {
+                // try corner-snap to its other sides
+                dtop = std::abs(wtop - winrect.top());
+                dbottom = std::abs(wbottom - winrect.bottom());
+                if (dtop < snap_distance && dtop <= dbottom)
+                  dy = winrect.top();
+                else if (dbottom < snap_distance)
+                  dy = winrect.bottom() - frame.rect.height() + 1;
               }
 
               continue;

@@ -115,8 +115,6 @@ private:
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
     std::string titlebar_layout;
-    bool window_to_window_snap;
-    bool window_corner_snap;
   } resource;
 
   typedef std::map<Window, BlackboxWindow*> WindowLookup;
@@ -217,11 +215,6 @@ public:
   inline unsigned long getCacheMax(void) const
     { return resource.cache_max; }
 
-  inline bool getWindowToWindowSnap(void) const
-    { return resource.window_to_window_snap; }
-  inline bool getWindowCornerSnap(void) const
-    { return resource.window_corner_snap; }
-
   inline void setNoFocus(bool f) { no_focus = f; }
 
   inline Cursor getSessionCursor(void) const
@@ -236,8 +229,6 @@ public:
   void setFocusedWindow(BlackboxWindow *w);
   void shutdown(void);
   void saveStyleFilename(const std::string& filename);
-  void saveWindowToWindowSnap(bool);
-  void saveWindowCornerSnap(bool);
   void addMenuTimestamp(const std::string& filename);
   void restart(const char *prog = 0);
   void reconfigure(void);

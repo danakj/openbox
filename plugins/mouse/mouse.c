@@ -384,9 +384,7 @@ static void event(ObEvent *e, void *foo)
                                     e->data.x.client->frame->size.top +
                                     e->data.x.client->frame->size.bottom);
                 fire_motion(MouseAction_Motion, context,
-                            e->data.x.client, state, button,
-                            e->data.x.e->xmotion.x_root, 
-                            e->data.x.e->xmotion.y_root, corner);
+                            e->data.x.client, state, button, px, py, corner);
                 button = 0;
                 state = 0;
             }

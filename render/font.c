@@ -115,7 +115,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *area)
     /* center vertically */
     y = area->y +
         (area->height - font_height(t->font, t->shadow, t->offset)) / 2;
-    w = area->width - theme-bevel * 2;
+    w = area->width - theme_bevel * 2;
     h = area->height;
 
     text = g_string_new(t->string);

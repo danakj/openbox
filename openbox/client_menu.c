@@ -128,6 +128,7 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
     guint i;
     GSList *acts;
     ObAction *act;
+    ObMenuEntry *e;;
 
     menu_clear_entries(menu);
 
@@ -153,13 +154,10 @@ static void send_to_update(ObMenuFrame *frame, gpointer data)
         act->data.sendto.desk = desk;
         act->data.sendto.follow = FALSE;
         acts = g_slist_prepend(NULL, act);
-        menu_add_normal(menu, desk, name, acts);
+        e = menu_add_normal(menu, desk, name, acts);
 
-        if (frame->client->desktop == desk) {
-            ObMenuEntry *e = menu_find_entry_id(menu, desk);
-            g_assert(e);
+        if (frame->client->desktop == desk)
             e->data.normal.enabled = FALSE;
-        }
     }
 }
 

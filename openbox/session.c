@@ -318,7 +318,7 @@ static gboolean session_save()
             gint32 *dimensions;
             gint prex, prey, prew, preh;
             ObClient *c;
-            gchar *client_id, *t;
+            gchar *t;
 
             if (WINDOW_IS_CLIENT(it->data))
                 c = WINDOW_AS_CLIENT(it->data);
@@ -328,7 +328,7 @@ static gboolean session_save()
             if (!client_normal(c))
                 continue;
 
-            if (!(client_id = client_get_sm_client_id(c)))
+            if (!c->sm_client_id)
                 continue;
 
             prex = c->area.x;
@@ -346,7 +346,7 @@ static gboolean session_save()
                 g_free(dimensions);
             }
 
-            fprintf(f, "<window id=\"%s\">\n", client_id);
+            fprintf(f, "<window id=\"%s\">\n", c->sm_client_id);
 
             t = g_markup_escape_text(c->name, -1);
             fprintf(f, "\t<name>%s</name>\n", t);
@@ -387,8 +387,6 @@ static gboolean session_save()
             fprintf(f, "</window>\n\n");
 
             ++stack_pos;
-
-            g_free(client_id);
         }
 
         fprintf(f, "</openbox_session>\n");
@@ -418,22 +416,11 @@ void session_state_free(ObSessionState *state)
 
 gboolean session_state_cmp(ObSessionState *s, ObClient *c)
 {
-    gchar *client_id;
-
-    if (!(client_id = client_get_sm_client_id(c)))
-        return FALSE;
-    if (strcmp(s->id, client_id)) {
-        g_free(client_id);
-        return FALSE;
-    }
-    g_free(client_id);
-    if (strcmp(s->name, c->name))
-        return FALSE;
-    if (strcmp(s->class, c->class))
-        return FALSE;
-    if (strcmp(s->role, c->role))
-        return FALSE;
-    return TRUE;
+    return (c->sm_client_id &&
+            !strcmp(s->id, c->sm_client_id) &&
+            !strcmp(s->name, c->name) &&
+            !strcmp(s->class, c->class) &&
+            !strcmp(s->role, c->role));
 }
 
 GList* session_state_find(ObClient *c)

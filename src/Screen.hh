@@ -199,7 +199,7 @@ private:
   bool parseMenuFile(FILE *file, Rootmenu *menu);
 
 #ifdef    BITMAPBUTTONS
-  void readDatabaseMask(const string &rname,
+  void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
                         const Configuration &style);
 #endif // BITMAPBUTTONS

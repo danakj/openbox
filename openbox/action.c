@@ -84,26 +84,15 @@ void setup_action_send_to_desktop(Action *a)
     a->data.sendto.follow = TRUE;
 }
 
-void setup_action_send_to_np_desktop(Action *a)
+void setup_action_send_to_desktop_direction(Action *a)
 {
-    a->data.sendtonextprev.wrap = FALSE;
-    a->data.sendtonextprev.follow = TRUE;
+    a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
-void setup_action_send_to_np_desktop_wrap(Action *a)
+void setup_action_desktop_direction(Action *a)
 {
-    a->data.sendtonextprev.wrap = TRUE;
-    a->data.sendtonextprev.follow = TRUE;
-}
-
-void setup_action_np_desktop(Action *a)
-{
-    a->data.nextprevdesktop.wrap = FALSE;
-}
-
-void setup_action_np_desktop_wrap(Action *a)
-{
-    a->data.nextprevdesktop.wrap = TRUE;
+    a->data.desktopdir.wrap = TRUE;
 }
 
 void setup_action_move_keyboard(Action *a)
@@ -373,24 +362,24 @@ ActionString actionstrings[] =
         setup_action_send_to_desktop
     },
     {
-        "sendtonextdesktop",
-        action_send_to_next_desktop,
-        setup_action_send_to_np_desktop
+        "sendtodesktopright",
+        action_send_to_desktop_right,
+        setup_action_send_to_desktop_direction
     },
     {
-        "sendtonextdesktopwrap",
-        action_send_to_next_desktop,
-        setup_action_send_to_np_desktop_wrap
+        "sendtodesktopleft",
+        action_send_to_desktop_left,
+        setup_action_send_to_desktop_direction
     },
     {
-        "sendtopreviousdesktop",
-        action_send_to_previous_desktop,
-        setup_action_send_to_np_desktop
+        "sendtodesktopup",
+        action_send_to_desktop_up,
+        setup_action_send_to_desktop_direction
     },
     {
-        "sendtopreviousdesktopwrap",
-        action_send_to_previous_desktop,
-        setup_action_send_to_np_desktop_wrap
+        "sendtodesktopdown",
+        action_send_to_desktop_down,
+        setup_action_send_to_desktop_direction
     },
     {
         "desktop",
@@ -398,64 +387,24 @@ ActionString actionstrings[] =
         NULL
     },
     {
-        "nextdesktop",
-        action_next_desktop,
-        setup_action_np_desktop
+        "desktopright",
+        action_desktop_right,
+        setup_action_desktop_direction
     },
     {
-        "nextdesktopwrap",
-        action_next_desktop,
-        setup_action_np_desktop_wrap
+        "desktopleft",
+        action_desktop_left,
+        setup_action_desktop_direction
     },
     {
-        "previousdesktop",
-        action_previous_desktop,
-        setup_action_np_desktop
+        "desktopup",
+        action_desktop_up,
+        setup_action_desktop_direction
     },
     {
-        "previousdesktopwrap",
-        action_previous_desktop,
-        setup_action_np_desktop_wrap
-    },
-    {
-        "nextdesktopcolumn",
-        action_next_desktop_column,
-        setup_action_np_desktop
-    },
-    {
-        "nextdesktopcolumnwrap",
-        action_next_desktop_column,
-        setup_action_np_desktop_wrap
-    },
-    {
-        "previousdesktopcolumn",
-        action_previous_desktop_column,
-        setup_action_np_desktop
-    },
-    {
-        "previousdesktopcolumnwrap",
-        action_previous_desktop_column,
-        setup_action_np_desktop_wrap
-    },
-    {
-        "nextdesktoprow",
-        action_next_desktop_row,
-        setup_action_np_desktop
-    },
-    {
-        "nextdesktoprowwrap",
-        action_next_desktop_row,
-        setup_action_np_desktop_wrap
-    },
-    {
-        "previousdesktoprow",
-        action_previous_desktop_row,
-        setup_action_np_desktop
-    },
-    {
-        "previousdesktoprowwrap",
-        action_previous_desktop_row,
-        setup_action_np_desktop_wrap
+        "desktopdown",
+        action_desktop_down,
+        setup_action_desktop_direction
     },
     {
         "toggledecorations",
@@ -797,65 +746,11 @@ void action_send_to_desktop(union ActionData *data)
     }
 }
 
-void action_send_to_next_desktop(union ActionData *data)
-{
-    guint d;
-
-    if (!data->sendtonextprev.c) return;
-
-    d = screen_desktop + 1;
-    if (d >= screen_num_desktops) {
-        if (!data->sendtonextprev.wrap) return;
-        d = 0;
-    }
-    client_set_desktop(data->sendtonextprev.c, d, data->sendtonextprev.follow);
-    if (data->sendtonextprev.follow) screen_set_desktop(d);
-}
-
-void action_send_to_previous_desktop(union ActionData *data)
-{
-    guint d;
-
-    if (!data->sendtonextprev.c) return;
-
-    d = screen_desktop - 1;
-    if (d >= screen_num_desktops) {
-        if (!data->sendtonextprev.wrap) return;
-        d = screen_num_desktops - 1;
-    }
-    client_set_desktop(data->sendtonextprev.c, d, data->sendtonextprev.follow);
-    if (data->sendtonextprev.follow) screen_set_desktop(d);
-}
-
 void action_desktop(union ActionData *data)
 {
     if (data->desktop.desk < screen_num_desktops ||
         data->desktop.desk == DESKTOP_ALL)
         screen_set_desktop(data->desktop.desk);
-}
-
-void action_next_desktop(union ActionData *data)
-{
-    guint d;
-
-    d = screen_desktop + 1;
-    if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
-        d = 0;
-    }
-    screen_set_desktop(d);
-}
-
-void action_previous_desktop(union ActionData *data)
-{
-    guint d;
-
-    d = screen_desktop - 1;
-    if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
-        d = screen_num_desktops - 1;
-    }
-    screen_set_desktop(d);
 }
 
 static void cur_row_col(guint *r, guint *c)
@@ -966,17 +861,19 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-void action_next_desktop_column(union ActionData *data)
+void action_desktop_right(union ActionData *data)
 {
     guint r, c, d;
 
     cur_row_col(&r, &c);
     ++c;
-    if (c >= screen_desktop_layout.columns)
+    if (c >= screen_desktop_layout.columns) {
+        if (!data->desktopdir.wrap) return;
         c = 0;
+    }
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
+        if (!data->desktopdir.wrap) return;
         ++c;
     }
     d = translate_row_col(r, c);
@@ -984,17 +881,43 @@ void action_next_desktop_column(union ActionData *data)
         screen_set_desktop(d);
 }
 
-void action_previous_desktop_column(union ActionData *data)
+void action_send_to_desktop_right(union ActionData *data)
+{
+    guint r, c, d;
+
+    if (data->sendtodir.c) {
+        cur_row_col(&r, &c);
+        ++c;
+        if (c >= screen_desktop_layout.columns) {
+            if (!data->sendtodir.wrap) return;
+            c = 0;
+        }
+        d = translate_row_col(r, c);
+        if (d >= screen_num_desktops) {
+            if (!data->sendtodir.wrap) return;
+            ++c;
+        }
+        d = translate_row_col(r, c);
+        if (d < screen_num_desktops) {
+            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
+            if (data->sendtodir.follow) screen_set_desktop(d);
+        }
+    }
+}
+
+void action_desktop_left(union ActionData *data)
 {
     guint r, c, d;
 
     cur_row_col(&r, &c);
     --c;
-    if (c >= screen_desktop_layout.columns)
+    if (c >= screen_desktop_layout.columns) {
+        if (!data->desktopdir.wrap) return;
         c = screen_desktop_layout.columns - 1;
+    }
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
+        if (!data->desktopdir.wrap) return;
         --c;
     }
     d = translate_row_col(r, c);
@@ -1002,17 +925,43 @@ void action_previous_desktop_column(union ActionData *data)
         screen_set_desktop(d);
 }
 
-void action_next_desktop_row(union ActionData *data)
+void action_send_to_desktop_left(union ActionData *data)
+{
+    guint r, c, d;
+
+    if (data->sendtodir.c) {
+        cur_row_col(&r, &c);
+        --c;
+        if (c >= screen_desktop_layout.columns) {
+            if (!data->sendtodir.wrap) return;
+            c = screen_desktop_layout.columns - 1;
+        }
+        d = translate_row_col(r, c);
+        if (d >= screen_num_desktops) {
+            if (!data->sendtodir.wrap) return;
+            --c;
+        }
+        d = translate_row_col(r, c);
+        if (d < screen_num_desktops) {
+            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
+            if (data->sendtodir.follow) screen_set_desktop(d);
+        }
+    }
+}
+
+void action_desktop_down(union ActionData *data)
 {
     guint r, c, d;
 
     cur_row_col(&r, &c);
     ++r;
-    if (r >= screen_desktop_layout.rows)
+    if (r >= screen_desktop_layout.rows) {
+        if (!data->desktopdir.wrap) return;
         r = 0;
+    }
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
+        if (!data->desktopdir.wrap) return;
         ++r;
     }
     d = translate_row_col(r, c);
@@ -1020,22 +969,72 @@ void action_next_desktop_row(union ActionData *data)
         screen_set_desktop(d);
 }
 
-void action_previous_desktop_row(union ActionData *data)
+void action_send_to_desktop_down(union ActionData *data)
+{
+    guint r, c, d;
+
+    if (data->sendtodir.c) {
+        cur_row_col(&r, &c);
+        ++r;
+        if (r >= screen_desktop_layout.rows) {
+            if (!data->sendtodir.wrap) return;
+            r = 0;
+        }
+        d = translate_row_col(r, c);
+        if (d >= screen_num_desktops) {
+            if (!data->sendtodir.wrap) return;
+            ++r;
+        }
+        d = translate_row_col(r, c);
+        if (d < screen_num_desktops) {
+            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
+            if (data->sendtodir.follow) screen_set_desktop(d);
+        }
+    }
+}
+
+void action_desktop_up(union ActionData *data)
 {
     guint r, c, d;
 
     cur_row_col(&r, &c);
     --r;
-    if (r >= screen_desktop_layout.rows)
+    if (r >= screen_desktop_layout.rows) {
+        if (!data->desktopdir.wrap) return;
         r = screen_desktop_layout.rows - 1;
+    }
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
-        if (!data->nextprevdesktop.wrap) return;
+        if (!data->desktopdir.wrap) return;
         --r;
     }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
         screen_set_desktop(d);
+}
+
+void action_send_to_desktop_up(union ActionData *data)
+{
+    guint r, c, d;
+
+    if (data->sendtodir.c) {
+        cur_row_col(&r, &c);
+        --r;
+        if (r >= screen_desktop_layout.rows) {
+            if (!data->sendtodir.wrap) return;
+            r = screen_desktop_layout.rows - 1;
+        }
+        d = translate_row_col(r, c);
+        if (d >= screen_num_desktops) {
+            if (!data->sendtodir.wrap) return;
+            --r;
+        }
+        d = translate_row_col(r, c);
+        if (d < screen_num_desktops) {
+            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
+            if (data->sendtodir.follow) screen_set_desktop(d);
+        }
+    }
 }
 
 void action_toggle_decorations(union ActionData *data)

@@ -37,7 +37,7 @@ struct SendToDesktop {
     gboolean follow;
 };
 
-struct SendToNextPreviousDesktop {
+struct SendToDesktopDirection {
     Client *c;
     gboolean wrap;
     gboolean follow;
@@ -53,7 +53,7 @@ struct Layer {
     int layer; /* < 0 = below, 0 = normal, > 0 = above */
 };
 
-struct NextPreviousDesktop {
+struct DesktopDirection {
     Client *c;
     gboolean wrap;
 };
@@ -88,9 +88,9 @@ union ActionData {
     struct ClientAction client;
     struct MoveResizeRelative relative;
     struct SendToDesktop sendto;
-    struct SendToNextPreviousDesktop sendtonextprev;
+    struct SendToDesktopDirection sendtodir;
     struct Desktop desktop;
-    struct NextPreviousDesktop nextprevdesktop;
+    struct DesktopDirection desktopdir;
     struct MoveResize moveresize;
     struct ShowMenu showmenu;
     struct CycleWindows cycle;
@@ -180,24 +180,24 @@ void action_unmaximize_vert(union ActionData *data);
 void action_toggle_maximize_vert(union ActionData *data);
 /* SendToDesktop */
 void action_send_to_desktop(union ActionData *data);
-/* SendToNextPreviousDesktop */
-void action_send_to_next_desktop(union ActionData *data);
-/* SendToNextPreviousDesktop */
-void action_send_to_previous_desktop(union ActionData *data);
+/* SendToDesktopDirection */
+void action_send_to_desktop_right(union ActionData *data);
+/* SendToDesktopDirection */
+void action_send_to_desktop_left(union ActionData *data);
+/* SendToDesktopDirection */
+void action_send_to_desktop_up(union ActionData *data);
+/* SendToDesktopDirection */
+void action_send_to_desktop_down(union ActionData *data);
 /* Desktop */
 void action_desktop(union ActionData *data);
-/* NextPreviousDesktop */
-void action_next_desktop(union ActionData *data);
-/* NextPreviousDesktop */
-void action_previous_desktop(union ActionData *data);
-/* NextPreviousDesktop */
-void action_next_desktop_column(union ActionData *data);
-/* NextPreviousDesktop */
-void action_previous_desktop_column(union ActionData *data);
-/* NextPreviousDesktop */
-void action_next_desktop_row(union ActionData *data);
-/* NextPreviousDesktop */
-void action_previous_desktop_row(union ActionData *data);
+/* DesktopDirection */
+void action_desktop_right(union ActionData *data);
+/* DesktopDirection */
+void action_desktop_left(union ActionData *data);
+/* DesktopDirection */
+void action_desktop_up(union ActionData *data);
+/* DesktopDirection */
+void action_desktop_down(union ActionData *data);
 /* ClientAction */
 void action_toggle_decorations(union ActionData *data);
 /* MoveResize */

@@ -173,14 +173,48 @@ static void manageWindow(Window window)
 
 static void unmanageWindow(OBClient *client)
 {
+  bool remap = false; // remap the window when we're done?
+  
   Window window = client->window();
+
+  // XXX: pass around focus if this window was focused
+  
+  // remove the window from our save set
+  XChangeSaveSet(otk::OBDisplay::display, window, SetModeDelete);
+
+  // we dont want events no more
+  XSelectInput(otk::OBDisplay::display, window, NoEventMask);
+
+  // XXX: XUnmapWindow(otk::OBDisplay::display, FRAME);
+  XUnmapWindow(otk::OBDisplay::display, window);
   
   // we dont want a border on the client
   XSetWindowBorderWidth(otk::OBDisplay::display, window,client->borderWidth());
 
-  // remove the window from our save set
-  XChangeSaveSet(otk::OBDisplay::display, window, SetModeDelete);
-  
+  // remove the client class from the search list
+  Openbox::instance->removeClient(window);
+
+  // check if the app has already reparented its window to the root window
+  XEvent ev;
+  if (XCheckTypedWindowEvent(otk::OBDisplay::display, window, ReparentNotify,
+                             &ev)) {
+    remap = true; // XXX: why do we remap the window if they already
+                  // reparented to root?
+  } else {
+    // according to the ICCCM - if the client doesn't reparent to
+    // root, then we have to do it for them
+    XReparentWindow(otk::OBDisplay::display, window,
+                    RootWindow(otk::OBDisplay::display,
+                               DefaultScreen(otk::OBDisplay::display)),
+                    // XXX: screen->getRootWindow(),
+                    client->area().x(), client->area().y());
+  }
+
+  // if we want to remap the window, do so now
+  if (remap)
+    XMapWindow(otk::OBDisplay::display, window);
+
+  delete client;
 }
 
 void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
@@ -254,8 +288,7 @@ void OBXEventHandler::unmapNotify(const XUnmapEvent &e)
   OBClient *client = Openbox::instance->findClient(e.window);
   if (!client) return;
   
-  // XXX: unmanage the window, i.e. ungrab events n reparent n shit
-  Openbox::instance->removeClient(e.window);
+  unmanageWindow(client);
 }
 
 
@@ -266,8 +299,7 @@ void OBXEventHandler::destroyNotify(const XDestroyWindowEvent &e)
   OBClient *client = Openbox::instance->findClient(e.window);
   if (!client) return;
   
-  // XXX: unmanage the window, i.e. ungrab events n reparent n shit
-  Openbox::instance->removeClient(e.window);
+  unmanageWindow(client);
 }
 
 

@@ -280,8 +280,12 @@ void focus_cycle(gboolean forward, gboolean linear,
         goto done_cycle;
     }
 
-    if (!first) first = focus_client;
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
+    if (!focus_order[screen_desktop])
+        goto done_cycle;
+
+    if (!first) first = focus_order[screen_desktop]->data;
+    if (!focus_cycle_target) focus_cycle_target =
+                                 focus_order[screen_desktop]->data;
 
     if (linear) list = client_list;
     else        list = focus_order[screen_desktop];
@@ -352,8 +356,12 @@ void focus_directional_cycle(ObDirection dir,
         goto done_cycle;
     }
 
-    if (!first) first = focus_client;
-    if (!focus_cycle_target) focus_cycle_target = focus_client;
+    if (!focus_order[screen_desktop])
+        goto done_cycle;
+
+    if (!first) first = focus_order[screen_desktop]->data;
+    if (!focus_cycle_target) focus_cycle_target =
+                                 focus_order[screen_desktop]->data;
 
     if ((ft = client_find_directional(focus_cycle_target, dir))) {
         if (ft != focus_cycle_target) {/* prevents flicker */

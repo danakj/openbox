@@ -474,6 +474,7 @@ void screen::cycleWindow(const bool forward, const int increment,
                          const bool allscreens, const bool alldesktops,
                          const bool sameclass, const string &cn) const {
   assert(_managed);
+  assert(increment > 0);
 
   if (_clients.empty()) return;
 
@@ -485,7 +486,7 @@ void screen::cycleWindow(const bool forward, const int increment,
     begin = _clients.begin(),
     end = _clients.end();
 
-  const XWindow *t;
+  const XWindow *t = 0;
   
   for (int x = 0; x < increment; ++x) {
     while (1) {
@@ -530,8 +531,10 @@ void screen::cycleWindow(const bool forward, const int increment,
 }
 
 
-void screen::cycleWorkspace(const bool forward, const int increment, const bool loop) const {
+void screen::cycleWorkspace(const bool forward, const int increment,
+                            const bool loop) const {
   assert(_managed);
+  assert(increment > 0);
 
   unsigned int destination = _active_desktop;
 

@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __eventdispatcher
 #define __eventdispatcher
 
@@ -7,37 +8,37 @@
 
 namespace otk {
 
-typedef std::map<unsigned int, OtkEventHandler *> OtkEventMap;
+typedef std::map<unsigned int, EventHandler *> EventMap;
 
-class OtkEventDispatcher {
+class EventDispatcher {
 public:
 
-  OtkEventDispatcher();
-  virtual ~OtkEventDispatcher();
+  EventDispatcher();
+  virtual ~EventDispatcher();
 
   virtual void clearAllHandlers(void);
-  virtual void registerHandler(Window id, otk::OtkEventHandler *handler);
+  virtual void registerHandler(Window id, EventHandler *handler);
   virtual void clearHandler(Window id);
   virtual void dispatchEvents(void);
 
-  inline void setFallbackHandler(otk::OtkEventHandler *fallback)
+  inline void setFallbackHandler(EventHandler *fallback)
   { _fallback = fallback; }
-  otk::OtkEventHandler *getFallbackHandler(void) const { return _fallback; }
+  EventHandler *getFallbackHandler(void) const { return _fallback; }
 
   //! Sets an event handler that gets all events for all handlers after
   //! any specific handlers have received them
-  inline void setMasterHandler(otk::OtkEventHandler *master)
+  inline void setMasterHandler(EventHandler *master)
   { _master = master; }
-  otk::OtkEventHandler *getMasterHandler(void) const { return _master; }
+  EventHandler *getMasterHandler(void) const { return _master; }
 
-  otk::OtkEventHandler *findHandler(Window win);
+  EventHandler *findHandler(Window win);
 
   inline Time lastTime() const { return _lasttime; }
   
 private:
-  OtkEventMap _map;
-  OtkEventHandler *_fallback;
-  OtkEventHandler *_master;
+  EventMap _map;
+  EventHandler *_fallback;
+  EventHandler *_master;
 
   //! The time at which the last XEvent with a time was received
   Time _lasttime;

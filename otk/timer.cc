@@ -33,7 +33,7 @@ static timeval normalizeTimeval(const timeval &tm)
 }
 
 
-OBTimer::OBTimer(OBTimerQueueManager *m, OBTimeoutHandler h, OBTimeoutData d)
+Timer::Timer(TimerQueueManager *m, TimeoutHandler h, TimeoutData d)
 {
   _manager = m;
   _handler = h;
@@ -43,13 +43,13 @@ OBTimer::OBTimer(OBTimerQueueManager *m, OBTimeoutHandler h, OBTimeoutData d)
 }
 
 
-OBTimer::~OBTimer(void)
+Timer::~Timer(void)
 {
   if (_timing) stop();
 }
 
 
-void OBTimer::setTimeout(long t)
+void Timer::setTimeout(long t)
 {
   _timeout.tv_sec = t / 1000;
   _timeout.tv_usec = t % 1000;
@@ -57,14 +57,14 @@ void OBTimer::setTimeout(long t)
 }
 
 
-void OBTimer::setTimeout(const timeval &t)
+void Timer::setTimeout(const timeval &t)
 {
   _timeout.tv_sec = t.tv_sec;
   _timeout.tv_usec = t.tv_usec;
 }
 
 
-void OBTimer::start(void)
+void Timer::start(void)
 {
   gettimeofday(&_start, 0);
 
@@ -75,7 +75,7 @@ void OBTimer::start(void)
 }
 
 
-void OBTimer::stop(void)
+void Timer::stop(void)
 {
   if (_timing) {
     _timing = false;
@@ -85,14 +85,14 @@ void OBTimer::stop(void)
 }
 
 
-void OBTimer::fire(void)
+void Timer::fire(void)
 {
   if (_handler)
     _handler(_data);
 }
 
 
-timeval OBTimer::remainingTime(const timeval &tm) const
+timeval Timer::remainingTime(const timeval &tm) const
 {
   timeval ret = endTime();
 
@@ -103,7 +103,7 @@ timeval OBTimer::remainingTime(const timeval &tm) const
 }
 
 
-timeval OBTimer::endTime(void) const
+timeval Timer::endTime(void) const
 {
   timeval ret;
 
@@ -114,7 +114,7 @@ timeval OBTimer::endTime(void) const
 }
 
 
-bool OBTimer::shouldFire(const timeval &tm) const
+bool Timer::shouldFire(const timeval &tm) const
 {
   timeval end = endTime();
 

@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __eventhandler__hh
 #define __eventhandler__hh
 
@@ -16,7 +17,7 @@ extern "C" {
 
 namespace otk {
 
-class OtkEventHandler {
+class EventHandler {
 public:
   //! Dispatches events to one of the other handlers based on their type.
   virtual void handle(const XEvent &e);
@@ -134,14 +135,14 @@ public:
   virtual void xkbHandler(const XkbEvent &) {}
 #endif // XKB
 
-  virtual ~OtkEventHandler();
+  virtual ~EventHandler();
 
 protected:
-  /*! Constructor for the OtkEventHandler class.
-    This is protected so that OtkEventHandlers can't be instantiated on their
+  /*! Constructor for the EventHandler class.
+    This is protected so that EventHandlers can't be instantiated on their
     own.
   */
-  OtkEventHandler();
+  EventHandler();
 
 private:
 };

@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef   __atom_hh
 #define   __atom_hh
 
@@ -21,7 +21,7 @@ extern "C" {
 namespace otk {
 
 //! Provides easy access to window properties.
-class OBProperty {
+class Property {
 public:
   //! The atoms on the X server which this class will cache
   enum Atoms {
@@ -160,7 +160,7 @@ public:
 
 private:
   //! The value of all atoms on the X server that exist in the
-  //! OBProperty::Atoms enum
+  //! Property::Atoms enum
   Atom _atoms[NUM_ATOMS];
 
   //! Gets the value of an Atom from the X server, creating it if nessesary
@@ -178,21 +178,21 @@ public:
   //! A list of strings
   typedef std::vector<std::string> StringVect;
 
-  //! Constructs a new OBAtom object
+  //! Constructs a new Atom object
   /*!
-    CAUTION: This constructor uses OBDisplay::display, so ensure that it is
+    CAUTION: This constructor uses Display::display, so ensure that it is
     initialized before initializing this class!
   */
-  OBProperty();
-  //! Destroys the OBAtom object
-  virtual ~OBProperty();
+  Property();
+  //! Destroys the Atom object
+  virtual ~Property();
 
   //! Sets a single-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to set
-    @param type A member of the OBProperty::Atoms enum that specifies the type
+    @param type A member of the Property::Atoms enum that specifies the type
                 of the property to set
     @param value The value to set the property to
   */
@@ -200,9 +200,9 @@ public:
   //! Sets an multiple-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to set
-    @param type A member of the OBProperty::Atoms enum that specifies the type
+    @param type A member of the Property::Atoms enum that specifies the type
                 of the property to set
     @param value Any array of values to set the property to. The array must
                  contain <i>elements</i> number of elements
@@ -213,9 +213,9 @@ public:
   //! Sets a string property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to set
-    @param type A member of the OBProperty::StringType enum that specifies the
+    @param type A member of the Property::StringType enum that specifies the
                 type of the string the property is being set to
     @param value The string to set the property to
   */
@@ -224,9 +224,9 @@ public:
   //! Sets a string-array property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to set
-    @param type A member of the OBProperty::StringType enum that specifies the
+    @param type A member of the Property::StringType enum that specifies the
                 type of the string the property is being set to
     @param strings A list of strings to set the property to
   */
@@ -236,9 +236,9 @@ public:
   //! Gets the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to retrieve
-    @param type A member of the OBProperty::Atoms enum that specifies the type
+    @param type A member of the Property::Atoms enum that specifies the type
                 of the property to retrieve
     @param nelements The maximum number of elements to retrieve from the
                      property (assuming it has more than 1 value in it). To
@@ -260,9 +260,9 @@ public:
   //! Gets a single element from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to retrieve
-    @param type A member of the OBProperty::Atoms enum that specifies the type
+    @param type A member of the Property::Atoms enum that specifies the type
                 of the property to retrieve
     @param value If the function returns true, then this contains the first
                  (and possibly only) element in the value of the specified
@@ -274,9 +274,9 @@ public:
   //! Gets a single string from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to retrieve
-    @param type A member of the OBProperty::StringType enum that specifies the
+    @param type A member of the Property::StringType enum that specifies the
                 type of the string property to retrieve
     @param value If the function returns true, then this contains the first
                  (and possibly only) string in the value of the specified
@@ -288,9 +288,9 @@ public:
   //! Gets strings from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to retrieve
-    @param type A member of the OBProperty::StringType enum that specifies the
+    @param type A member of the Property::StringType enum that specifies the
                 type of the string property to retrieve
     @param nelements The maximum number of strings to retrieve from the
                      property (assuming it has more than 1 string in it). To
@@ -308,14 +308,14 @@ public:
   //! Removes a property from a window
   /*!
     @param win The window id of the window to remove the property from
-    @param atom A member of the OBProperty::Atoms enum that specifies which
+    @param atom A member of the Property::Atoms enum that specifies which
                 property to remove from the window
   */
   void erase(Window win, Atoms atom) const;
 
   //! Gets the value of an atom on the X server
   /*!
-    @param a A member of the OBProperty::Atoms enum that specifies which Atom's
+    @param a A member of the Property::Atoms enum that specifies which Atom's
              value to return
     @return The value of the specified Atom
   */

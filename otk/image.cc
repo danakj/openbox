@@ -19,7 +19,7 @@ using std::min;
 
 namespace otk {
 
-BImage::BImage(BImageControl *c, int w, int h) {
+Image::Image(ImageControl *c, int w, int h) {
   control = c;
 
   width = (w > 0) ? w : 1;
@@ -43,95 +43,95 @@ BImage::BImage(BImageControl *c, int w, int h) {
 }
 
 
-BImage::~BImage(void) {
+Image::~Image(void) {
   delete [] red;
   delete [] green;
   delete [] blue;
 }
 
 
-Pixmap BImage::render(const BTexture &texture) {
-  if (texture.texture() & BTexture::Parent_Relative)
+Pixmap Image::render(const Texture &texture) {
+  if (texture.texture() & Texture::Parent_Relative)
     return ParentRelative;
-  else if (texture.texture() & BTexture::Solid)
+  else if (texture.texture() & Texture::Solid)
     return render_solid(texture);
-  else if (texture.texture() & BTexture::Gradient)
+  else if (texture.texture() & Texture::Gradient)
     return render_gradient(texture);
   return None;
 }
 
 
-Pixmap BImage::render_solid(const BTexture &texture) {
-  Pixmap pixmap = XCreatePixmap(OBDisplay::display,
+Pixmap Image::render_solid(const Texture &texture) {
+  Pixmap pixmap = XCreatePixmap(Display::display,
 				control->getDrawable(), width,
 				height, control->getDepth());
   if (pixmap == None) {
-    fprintf(stderr, "BImage::render_solid: error creating pixmap\n");
+    fprintf(stderr, "Image::render_solid: error creating pixmap\n");
     return None;
   }
 
-  BPen pen(texture.color());
-  BPen penlight(texture.lightColor());
-  BPen penshadow(texture.shadowColor());
+  Pen pen(texture.color());
+  Pen penlight(texture.lightColor());
+  Pen penshadow(texture.shadowColor());
 
-  XFillRectangle(OBDisplay::display, pixmap, pen.gc(), 0, 0, width, height);
+  XFillRectangle(Display::display, pixmap, pen.gc(), 0, 0, width, height);
 
-  if (texture.texture() & BTexture::Interlaced) {
-    BPen peninterlace(texture.colorTo());
+  if (texture.texture() & Texture::Interlaced) {
+    Pen peninterlace(texture.colorTo());
     for (unsigned int i = 0; i < height; i += 2)
-      XDrawLine(OBDisplay::display, pixmap, peninterlace.gc(), 0, i, width, i);
+      XDrawLine(Display::display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
   int left = 0, top = 0, right = width - 1, bottom = height - 1;
 
-  if (texture.texture() & BTexture::Border) {
-    BPen penborder(texture.borderColor());
-    XDrawRectangle(OBDisplay::display, pixmap, penborder.gc(),
+  if (texture.texture() & Texture::Border) {
+    Pen penborder(texture.borderColor());
+    XDrawRectangle(Display::display, pixmap, penborder.gc(),
                    left, top, right, bottom);
   }
 
-  if (texture.texture() & BTexture::Bevel1) {
-    if (texture.texture() & BTexture::Raised) {
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+  if (texture.texture() & Texture::Bevel1) {
+    if (texture.texture() & Texture::Raised) {
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left, top, right, top);
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left, bottom, left, top);
-    } else if (texture.texture() & BTexture::Sunken) {
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+    } else if (texture.texture() & Texture::Sunken) {
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left, top, right, top);
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left, bottom, left, top);
     }
-  } else if (texture.texture() & BTexture::Bevel2) {
-    if (texture.texture() & BTexture::Raised) {
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+  } else if (texture.texture() & Texture::Bevel2) {
+    if (texture.texture() & Texture::Raised) {
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
-    } else if (texture.texture() & BTexture::Sunken) {
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+    } else if (texture.texture() & Texture::Sunken) {
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
+      XDrawLine(Display::display, pixmap, penlight.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
+      XDrawLine(Display::display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
     }
   }
@@ -140,38 +140,38 @@ Pixmap BImage::render_solid(const BTexture &texture) {
 }
 
 
-Pixmap BImage::render_gradient(const BTexture &texture) {
+Pixmap Image::render_gradient(const Texture &texture) {
   bool inverted = False;
 
-  interlaced = texture.texture() & BTexture::Interlaced;
+  interlaced = texture.texture() & Texture::Interlaced;
 
-  if (texture.texture() & BTexture::Sunken) {
+  if (texture.texture() & Texture::Sunken) {
     from = texture.colorTo();
     to = texture.color();
 
-    if (! (texture.texture() & BTexture::Invert)) inverted = True;
+    if (! (texture.texture() & Texture::Invert)) inverted = True;
   } else {
     from = texture.color();
     to = texture.colorTo();
 
-    if (texture.texture() & BTexture::Invert) inverted = True;
+    if (texture.texture() & Texture::Invert) inverted = True;
   }
 
   control->getGradientBuffers(width, height, &xtable, &ytable);
 
-  if (texture.texture() & BTexture::Diagonal) dgradient();
-  else if (texture.texture() & BTexture::Elliptic) egradient();
-  else if (texture.texture() & BTexture::Horizontal) hgradient();
-  else if (texture.texture() & BTexture::Pyramid) pgradient();
-  else if (texture.texture() & BTexture::Rectangle) rgradient();
-  else if (texture.texture() & BTexture::Vertical) vgradient();
-  else if (texture.texture() & BTexture::CrossDiagonal) cdgradient();
-  else if (texture.texture() & BTexture::PipeCross) pcgradient();
+  if (texture.texture() & Texture::Diagonal) dgradient();
+  else if (texture.texture() & Texture::Elliptic) egradient();
+  else if (texture.texture() & Texture::Horizontal) hgradient();
+  else if (texture.texture() & Texture::Pyramid) pgradient();
+  else if (texture.texture() & Texture::Rectangle) rgradient();
+  else if (texture.texture() & Texture::Vertical) vgradient();
+  else if (texture.texture() & Texture::CrossDiagonal) cdgradient();
+  else if (texture.texture() & Texture::PipeCross) pcgradient();
 
-  if (texture.texture() & BTexture::Bevel1) bevel1();
-  else if (texture.texture() & BTexture::Bevel2) bevel2();
+  if (texture.texture() & Texture::Bevel1) bevel1();
+  else if (texture.texture() & Texture::Bevel2) bevel2();
 
-  if (texture.texture() & BTexture::Border) border(texture);
+  if (texture.texture() & Texture::Border) border(texture);
 
   if (inverted) invert();
 
@@ -246,7 +246,7 @@ void assignPixelData(unsigned int bit_depth, unsigned char **data,
 // algorithm: ordered dithering... many many thanks to rasterman
 // (raster@rasterman.com) for telling me about this... portions of this
 // code is based off of his code in Imlib
-void BImage::TrueColorDither(unsigned int bit_depth, int bytes_per_line,
+void Image::TrueColorDither(unsigned int bit_depth, int bytes_per_line,
 			     unsigned char *pixel_data) {
   unsigned int x, y, dithx, dithy, r, g, b, er, eg, eb, offset;
   unsigned char *ppixel_data = pixel_data;
@@ -293,7 +293,7 @@ const static unsigned char dither8[8][8] = {
   { 63, 31, 55, 23, 61, 29, 53, 21}
 };
 
-void BImage::OrderedPseudoColorDither(int bytes_per_line,
+void Image::OrderedPseudoColorDither(int bytes_per_line,
 				      unsigned char *pixel_data) {
   unsigned int x, y, dithx, dithy, r, g, b, er, eg, eb, offset;
   unsigned long pixel;
@@ -330,7 +330,7 @@ void BImage::OrderedPseudoColorDither(int bytes_per_line,
 }
 #endif
 
-void BImage::PseudoColorDither(int bytes_per_line, unsigned char *pixel_data) {
+void Image::PseudoColorDither(int bytes_per_line, unsigned char *pixel_data) {
   short *terr,
     *rerr = new short[width + 2],
     *gerr = new short[width + 2],
@@ -423,14 +423,14 @@ void BImage::PseudoColorDither(int bytes_per_line, unsigned char *pixel_data) {
   delete [] nberr;
 }
 
-XImage *BImage::renderXImage(void) {
+XImage *Image::renderXImage(void) {
   XImage *image =
-    XCreateImage(OBDisplay::display,
+    XCreateImage(Display::display,
                  control->getVisual(), control->getDepth(), ZPixmap, 0, 0,
                  width, height, 32, 0);
 
   if (! image) {
-    fprintf(stderr, "BImage::renderXImage: error creating XImage\n");
+    fprintf(stderr, "Image::renderXImage: error creating XImage\n");
     return (XImage *) 0;
   }
 
@@ -525,7 +525,7 @@ XImage *BImage::renderXImage(void) {
   }
 
   if (unsupported) {
-    fprintf(stderr, "BImage::renderXImage: unsupported visual\n");
+    fprintf(stderr, "Image::renderXImage: unsupported visual\n");
     delete [] d;
     XDestroyImage(image);
     return (XImage *) 0;
@@ -537,31 +537,31 @@ XImage *BImage::renderXImage(void) {
 }
 
 
-Pixmap BImage::renderPixmap(void) {
+Pixmap Image::renderPixmap(void) {
   Pixmap pixmap =
-    XCreatePixmap(OBDisplay::display,
+    XCreatePixmap(Display::display,
                   control->getDrawable(), width, height, control->getDepth());
 
   if (pixmap == None) {
-    fprintf(stderr, "BImage::renderPixmap: error creating pixmap\n");
+    fprintf(stderr, "Image::renderPixmap: error creating pixmap\n");
     return None;
   }
 
   XImage *image = renderXImage();
 
   if (! image) {
-    XFreePixmap(OBDisplay::display, pixmap);
+    XFreePixmap(Display::display, pixmap);
     return None;
   }
 
   if (! image->data) {
     XDestroyImage(image);
-    XFreePixmap(OBDisplay::display, pixmap);
+    XFreePixmap(Display::display, pixmap);
     return None;
   }
 
-  XPutImage(OBDisplay::display, pixmap,
-	    DefaultGC(OBDisplay::display,
+  XPutImage(Display::display, pixmap,
+	    DefaultGC(Display::display,
 		      control->getScreenInfo()->screen()),
             image, 0, 0, 0, 0, width, height);
 
@@ -576,7 +576,7 @@ Pixmap BImage::renderPixmap(void) {
 }
 
 
-void BImage::bevel1(void) {
+void Image::bevel1(void) {
   if (width > 2 && height > 2) {
     unsigned char *pr = red, *pg = green, *pb = blue;
 
@@ -714,7 +714,7 @@ void BImage::bevel1(void) {
 }
 
 
-void BImage::bevel2(void) {
+void Image::bevel2(void) {
   if (width > 4 && height > 4) {
     unsigned char r, g, b, rr ,gg ,bb, *pr = red + width + 1,
       *pg = green + width + 1, *pb = blue + width + 1;
@@ -793,7 +793,7 @@ void BImage::bevel2(void) {
 }
 
 
-void BImage::border(const BTexture &texture) {
+void Image::border(const Texture &texture) {
   if (width < 2 || height < 2) return;
   
   register unsigned int i;
@@ -837,7 +837,7 @@ void BImage::border(const BTexture &texture) {
 }
 
 
-void BImage::invert(void) {
+void Image::invert(void) {
   register unsigned int i, j, wh = (width * height) - 1;
   unsigned char tmp;
 
@@ -857,7 +857,7 @@ void BImage::invert(void) {
 }
 
 
-void BImage::dgradient(void) {
+void Image::dgradient(void) {
   // diagonal gradient code was written by Mike Cole <mike@mydot.com>
   // modified for interlacing by Brad Hughes
 
@@ -958,7 +958,7 @@ void BImage::dgradient(void) {
 }
 
 
-void BImage::hgradient(void) {
+void Image::hgradient(void) {
   float drx, dgx, dbx,
     xr = (float) from.red(),
     xg = (float) from.green(),
@@ -1050,7 +1050,7 @@ void BImage::hgradient(void) {
 }
 
 
-void BImage::vgradient(void) {
+void Image::vgradient(void) {
   float dry, dgy, dby,
     yr = (float) from.red(),
     yg = (float) from.green(),
@@ -1123,7 +1123,7 @@ void BImage::vgradient(void) {
 }
 
 
-void BImage::pgradient(void) {
+void Image::pgradient(void) {
   // pyramid gradient -  based on original dgradient, written by
   // Mosfet (mosfet@kde.org)
   // adapted from kde sources for Blackbox by Brad Hughes
@@ -1233,7 +1233,7 @@ void BImage::pgradient(void) {
 }
 
 
-void BImage::rgradient(void) {
+void Image::rgradient(void) {
   // rectangle gradient -  based on original dgradient, written by
   // Mosfet (mosfet@kde.org)
   // adapted from kde sources for Blackbox by Brad Hughes
@@ -1342,7 +1342,7 @@ void BImage::rgradient(void) {
 }
 
 
-void BImage::egradient(void) {
+void Image::egradient(void) {
   // elliptic gradient -  based on original dgradient, written by
   // Mosfet (mosfet@kde.org)
   // adapted from kde sources for Blackbox by Brad Hughes
@@ -1462,7 +1462,7 @@ void BImage::egradient(void) {
 }
 
 
-void BImage::pcgradient(void) {
+void Image::pcgradient(void) {
   // pipe cross gradient -  based on original dgradient, written by
   // Mosfet (mosfet@kde.org)
   // adapted from kde sources for Blackbox by Brad Hughes
@@ -1573,7 +1573,7 @@ void BImage::pcgradient(void) {
 }
 
 
-void BImage::cdgradient(void) {
+void Image::cdgradient(void) {
   // cross diagonal gradient -  based on original dgradient, written by
   // Mosfet (mosfet@kde.org)
   // adapted from kde sources for Blackbox by Brad Hughes

@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __appwidget_hh
 #define __appwidget_hh
 
@@ -5,14 +6,14 @@
 
 namespace otk {
 
-class OtkApplication;
+class Application;
 
-class OtkAppWidget : public OtkWidget {
+class AppWidget : public Widget {
 
 public:
-  OtkAppWidget(OtkApplication *app, Direction direction = Horizontal,
-               Cursor cursor = 0, int bevel_width = 1);
-  virtual ~OtkAppWidget();
+  AppWidget(Application *app, Direction direction = Horizontal,
+            Cursor cursor = 0, int bevel_width = 1);
+  virtual ~AppWidget();
 
   virtual void show(void);
   virtual void hide(void);
@@ -21,7 +22,7 @@ public:
   
 private:
 
-  OtkApplication *_application;
+  Application *_application;
   Atom _wm_protocols;
   Atom _wm_delete;
 };

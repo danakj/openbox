@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __otk_hh
 #define __otk_hh
 

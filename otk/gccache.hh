@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef GCCACHE_HH
-#define GCCACHE_HH
+#ifndef __gccache_hh
+#define __gccache_hh
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -11,18 +11,18 @@ extern "C" {
 
 namespace otk {
 
-class BGCCacheItem;
+class GCCacheItem;
 
-class BGCCacheContext {
+class GCCacheContext {
 public:
-  void set(const BColor &_color, const XFontStruct * const _font,
+  void set(const Color &_color, const XFontStruct * const _font,
            const int _function, const int _subwindow, const int _linewidth);
   void set(const XFontStruct * const _font);
 
-  ~BGCCacheContext(void);
+  ~GCCacheContext(void);
 
 private:
-  BGCCacheContext()
+  GCCacheContext()
     : gc(0), pixel(0ul), fontid(0ul),
       function(0), subwindow(0), used(false), screen(~(0u)), linewidth(0) {}
 
@@ -35,47 +35,47 @@ private:
   unsigned int screen;
   int linewidth;
 
-  BGCCacheContext(const BGCCacheContext &_nocopy);
-  BGCCacheContext &operator=(const BGCCacheContext &_nocopy);
+  GCCacheContext(const GCCacheContext &_nocopy);
+  GCCacheContext &operator=(const GCCacheContext &_nocopy);
 
-  friend class BGCCache;
-  friend class BGCCacheItem;
+  friend class GCCache;
+  friend class GCCacheItem;
 };
 
-class BGCCacheItem {
+class GCCacheItem {
 public:
   inline const GC &gc(void) const { return ctx->gc; }
 
 private:
-  BGCCacheItem(void) : ctx(0), count(0), hits(0), fault(false) { }
+  GCCacheItem(void) : ctx(0), count(0), hits(0), fault(false) { }
 
-  BGCCacheContext *ctx;
+  GCCacheContext *ctx;
   unsigned int count;
   unsigned int hits;
   bool fault;
 
-  BGCCacheItem(const BGCCacheItem &_nocopy);
-  BGCCacheItem &operator=(const BGCCacheItem &_nocopy);
+  GCCacheItem(const GCCacheItem &_nocopy);
+  GCCacheItem &operator=(const GCCacheItem &_nocopy);
 
-  friend class BGCCache;
+  friend class GCCache;
 };
 
-class BGCCache {
+class GCCache {
 public:
-  BGCCache(unsigned int screen_count);
-  ~BGCCache(void);
+  GCCache(unsigned int screen_count);
+  ~GCCache(void);
 
   // cleans up the cache
   void purge(void);
 
-  BGCCacheItem *find(const BColor &_color, const XFontStruct * const _font = 0,
+  GCCacheItem *find(const Color &_color, const XFontStruct * const _font = 0,
                      int _function = GXcopy, int _subwindow = ClipByChildren,
                      int _linewidth = 0);
-  void release(BGCCacheItem *_item);
+  void release(GCCacheItem *_item);
 
 private:
-  BGCCacheContext *nextContext(unsigned int _screen);
-  void release(BGCCacheContext *ctx);
+  GCCacheContext *nextContext(unsigned int _screen);
+  void release(GCCacheContext *ctx);
 
   // this is closely modelled after the Qt GC cache, but with some of the
   // complexity stripped out
@@ -83,19 +83,19 @@ private:
   const unsigned int cache_size;
   const unsigned int cache_buckets;
   const unsigned int cache_total_size;
-  BGCCacheContext **contexts;
-  BGCCacheItem **cache;
+  GCCacheContext **contexts;
+  GCCacheItem **cache;
 };
 
-class BPen {
+class Pen {
 public:
-  inline BPen(const BColor &_color,  const XFontStruct * const _font = 0,
+  inline Pen(const Color &_color,  const XFontStruct * const _font = 0,
               int _linewidth = 0, int _function = GXcopy,
               int _subwindow = ClipByChildren)
     : color(_color), font(_font), linewidth(_linewidth), function(_function),
-      subwindow(_subwindow), cache(OBDisplay::gcCache()), item(0) { }
+      subwindow(_subwindow), cache(Display::gcCache()), item(0) { }
 
-  inline ~BPen(void) { if (item) cache->release(item); }
+  inline ~Pen(void) { if (item) cache->release(item); }
 
   inline const GC &gc(void) const {
     if (! item) item = cache->find(color, font, function, subwindow,
@@ -104,16 +104,16 @@ public:
   }
 
 private:
-  const BColor &color;
+  const Color &color;
   const XFontStruct *font;
   int linewidth;
   int function;
   int subwindow;
 
-  mutable BGCCache *cache;
-  mutable BGCCacheItem *item;
+  mutable GCCache *cache;
+  mutable GCCacheItem *item;
 };
 
 }
 
-#endif // GCCACHE_HH
+#endif // __gccache_hh

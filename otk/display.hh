@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef   __display_hh
 #define   __display_hh
 
@@ -11,7 +11,7 @@ extern "C" {
 namespace otk {
 
 class ScreenInfo;
-class BGCCache;
+class GCCache;
 
 //! Manages a single X11 display.
 /*!
@@ -19,11 +19,11 @@ class BGCCache;
   Use the initialize() method to open the display and ready it for use.
   Use the destroy() method to close it and clean up the class' data.
 */
-class OBDisplay
+class Display
 {
 public:
   //! The X display
-  static Display *display;
+  static ::Display *display;
   
   //! A List of ScreenInfo instances
   typedef std::vector<ScreenInfo> ScreenInfoList;
@@ -61,27 +61,27 @@ private:
 
   //! A cache for re-using GCs, used by the drawing objects
   /*!
-    @see BPen
-    @see BFont
-    @see BImage
-    @see BImageControl
-    @see BTexture
+    @see Pen
+    @see Font
+    @see Image
+    @see ImageControl
+    @see Texture
   */
-  static BGCCache *_gccache;
+  static GCCache *_gccache;
 
   //! Handles X errors on the display
   /*!
     Displays the error if compiled for debugging.
   */
-  static int xerrorHandler(Display *d, XErrorEvent *e);
+  static int xerrorHandler(::Display *d, XErrorEvent *e);
 
   //! Prevents instantiation of the class
-  OBDisplay();
+  Display();
 
 public:
   //! Initializes the class, opens the X display
   /*!
-    @see OBDisplay::display
+    @see Display::display
     @param name The name of the X display to open. If it is null, the DISPLAY
                 environment variable is used instead.
   */
@@ -90,7 +90,7 @@ public:
   static void destroy();
 
   //! Returns the GC cache for the application
-  inline static BGCCache *gcCache() { return _gccache; }
+  inline static GCCache *gcCache() { return _gccache; }
 
   //! Gets information on a specific screen
   /*!

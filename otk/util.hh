@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef _BLACKBOX_UTIL_HH
-#define _BLACKBOX_UTIL_HH
+#ifndef __util_hh
+#define __util_hh
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -17,7 +17,6 @@ extern "C" {
 #  endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 }
-
 
 #include <string>
 #include <vector>
@@ -46,4 +45,4 @@ std::string basename(const std::string& path);
 
 }
 
-#endif
+#endif // __util_hh

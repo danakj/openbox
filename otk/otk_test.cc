@@ -10,38 +10,38 @@
 #include "button.hh"
 
 int main(int argc, char **argv) {
-  otk::OtkApplication app(argc, argv);
+  otk::Application app(argc, argv);
 
-  otk::OtkAppWidget foo(&app);
+  otk::AppWidget foo(&app);
 
   foo.resize(600, 500);
   foo.setTexture(app.getStyle()->getTitleFocus());
 //  foo.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
 
   foo.setBevelWidth(2);
-  foo.setDirection(otk::OtkWidget::Horizontal);
+  foo.setDirection(otk::Widget::Horizontal);
 
-  otk::OtkFocusWidget left(&foo);
-  otk::OtkFocusWidget right(&foo);
+  otk::FocusWidget left(&foo);
+  otk::FocusWidget right(&foo);
 
-  left.setDirection(otk::OtkWidget::Horizontal);
+  left.setDirection(otk::Widget::Horizontal);
   left.setStretchableVert(true);
   left.setStretchableHorz(true);
   left.setTexture(app.getStyle()->getTitleFocus());
   left.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
  
-  right.setDirection(otk::OtkWidget::Vertical);
+  right.setDirection(otk::Widget::Vertical);
   right.setBevelWidth(10);
   right.setStretchableVert(true);
   right.setWidth(300);
   right.setTexture(app.getStyle()->getTitleFocus());
   right.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
 
-  otk::OtkButton iconb(&left);
+  otk::Button iconb(&left);
   iconb.resize(40,20);
-  otk::OtkFocusWidget label(&left);
-  otk::OtkButton maxb(&left);
-  otk::OtkButton closeb(&left);
+  otk::FocusWidget label(&left);
+  otk::Button maxb(&left);
+  otk::Button closeb(&left);
   
   // fixed size
   iconb.setText("foo");
@@ -60,9 +60,9 @@ int main(int argc, char **argv) {
   // fixed size
   closeb.setText("fuubar");
 
-  otk::OtkFocusWidget rblef(&right);
-  otk::OtkButton rbutt1(&right);
-  otk::OtkButton rbutt2(&right);
+  otk::FocusWidget rblef(&right);
+  otk::Button rbutt1(&right);
+  otk::Button rbutt2(&right);
 
   rblef.setStretchableHorz(true);
   rblef.setHeight(50);

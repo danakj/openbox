@@ -17,7 +17,7 @@ Style::Style() : font(NULL)
 {
 }
 
-Style::Style(BImageControl *ctrl)
+Style::Style(ImageControl *ctrl)
   : image_control(ctrl), font(0),
     screen_number(ctrl->getScreenInfo()->screen())
 {
@@ -28,13 +28,13 @@ Style::~Style() {
     delete font;
 
   if (close_button.mask != None)
-    XFreePixmap(OBDisplay::display, close_button.mask);
+    XFreePixmap(Display::display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(OBDisplay::display, max_button.mask);
+    XFreePixmap(Display::display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(OBDisplay::display, icon_button.mask);
+    XFreePixmap(Display::display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(OBDisplay::display, stick_button.mask);
+    XFreePixmap(Display::display, stick_button.mask);
 
   max_button.mask = None;
   close_button.mask = None;
@@ -70,26 +70,26 @@ void Style::load(const Configuration &style) {
   //if neither of these can be found, we will use the previous resource
   b_pressed_focus = readDatabaseTexture("window.button.pressed.focus",
                                         "black", style, true);
-  if (b_pressed_focus.texture() == BTexture::NoTexture) {
+  if (b_pressed_focus.texture() == Texture::NoTexture) {
     b_pressed_focus = readDatabaseTexture("window.button.pressed", "black",
                                           style);
   }
     
   b_pressed_unfocus = readDatabaseTexture("window.button.pressed.unfocus",
                                           "black", style, true);
-  if (b_pressed_unfocus.texture() == BTexture::NoTexture) {
+  if (b_pressed_unfocus.texture() == Texture::NoTexture) {
     b_pressed_unfocus = readDatabaseTexture("window.button.pressed", "black",
                                             style);
   }
 
   if (close_button.mask != None)
-    XFreePixmap(OBDisplay::display, close_button.mask);
+    XFreePixmap(Display::display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(OBDisplay::display, max_button.mask);
+    XFreePixmap(Display::display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(OBDisplay::display, icon_button.mask);
+    XFreePixmap(Display::display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(OBDisplay::display, stick_button.mask);
+    XFreePixmap(Display::display, stick_button.mask);
 
   close_button.mask = max_button.mask = icon_button.mask
                     = icon_button.mask = None;
@@ -101,13 +101,13 @@ void Style::load(const Configuration &style) {
 
   // we create the window.frame texture by hand because it exists only to
   // make the code cleaner and is not actually used for display
-  BColor color = readDatabaseColor("window.frame.focusColor", "white",
+  Color color = readDatabaseColor("window.frame.focusColor", "white",
                                         style);
-  f_focus = BTexture("solid flat", screen_number, image_control);
+  f_focus = Texture("solid flat", screen_number, image_control);
   f_focus.setColor(color);
 
   color = readDatabaseColor("window.frame.unfocusColor", "white", style);
-  f_unfocus = BTexture("solid flat", screen_number, image_control);
+  f_unfocus = Texture("solid flat", screen_number, image_control);
   f_unfocus.setColor(color);
 
   l_text_focus = readDatabaseColor("window.label.focus.textColor",
@@ -130,20 +130,20 @@ void Style::load(const Configuration &style) {
   }
 
   // sanity checks
-  if (t_focus.texture() == BTexture::Parent_Relative)
+  if (t_focus.texture() == Texture::Parent_Relative)
     t_focus = f_focus;
-  if (t_unfocus.texture() == BTexture::Parent_Relative)
+  if (t_unfocus.texture() == Texture::Parent_Relative)
     t_unfocus = f_unfocus;
-  if (h_focus.texture() == BTexture::Parent_Relative)
+  if (h_focus.texture() == Texture::Parent_Relative)
     h_focus = f_focus;
-  if (h_unfocus.texture() == BTexture::Parent_Relative)
+  if (h_unfocus.texture() == Texture::Parent_Relative)
     h_unfocus = f_unfocus;
 
   border_color = readDatabaseColor("borderColor", "black", style);
 
   // load bevel, border and handle widths
 
-  const ScreenInfo *s_info = OBDisplay::screenInfo(screen_number);
+  const ScreenInfo *s_info = Display::screenInfo(screen_number);
   unsigned int width = s_info->rect().width();
 
   if (! style.getValue("handleWidth", handle_width) ||
@@ -168,7 +168,7 @@ void Style::load(const Configuration &style) {
 
 void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
                              const Configuration &style) {
-  Window root_window = OBDisplay::screenInfo(screen_number)->rootWindow();
+  Window root_window = Display::screenInfo(screen_number)->rootWindow();
   std::string s;
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.
@@ -176,17 +176,17 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
   if (style.getValue(rname, s)) {
     if (s[0] != '/' && s[0] != '~') {
       std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(OBDisplay::display, root_window,
+      ret = XReadBitmapFile(Display::display, root_window,
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
       if (ret != BitmapSuccess) {
         xbmFile = std::string(BUTTONSDIR) + "/" + s;
-        ret = XReadBitmapFile(OBDisplay::display, root_window,
+        ret = XReadBitmapFile(Display::display, root_window,
                               xbmFile.c_str(), &pixmapMask.w,
                               &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
       }
     } else
-      ret = XReadBitmapFile(OBDisplay::display, root_window,
+      ret = XReadBitmapFile(Display::display, root_window,
                             expandTilde(s).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     
@@ -199,26 +199,26 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
 }
 
 
-BTexture Style::readDatabaseTexture(const std::string &rname,
-                                         const std::string &default_color,
-                                         const Configuration &style, 
-                                         bool allowNoTexture)
+Texture Style::readDatabaseTexture(const std::string &rname,
+                                   const std::string &default_color,
+                                   const Configuration &style, 
+                                   bool allowNoTexture)
 {
-  BTexture texture;
+  Texture texture;
   std::string s;
 
   if (style.getValue(rname, s))
-    texture = BTexture(s);
+    texture = Texture(s);
   else if (allowNoTexture) //no default
-    texture.setTexture(BTexture::NoTexture);
+    texture.setTexture(Texture::NoTexture);
   else
-    texture.setTexture(BTexture::Solid | BTexture::Flat);
+    texture.setTexture(Texture::Solid | Texture::Flat);
 
   // associate this texture with this screen
   texture.setScreen(screen_number);
   texture.setImageControl(image_control);
 
-  if (texture.texture() != BTexture::NoTexture) {
+  if (texture.texture() != Texture::NoTexture) {
     texture.setColor(readDatabaseColor(rname + ".color", default_color,
                                        style));
     texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
@@ -231,21 +231,21 @@ BTexture Style::readDatabaseTexture(const std::string &rname,
 }
 
 
-BColor Style::readDatabaseColor(const std::string &rname,
-                                     const std::string &default_color,
-                                     const Configuration &style) {
-  BColor color;
+Color Style::readDatabaseColor(const std::string &rname,
+                               const std::string &default_color,
+                               const Configuration &style) {
+  Color color;
   std::string s;
   if (style.getValue(rname, s))
-    color = BColor(s, screen_number);
+    color = Color(s, screen_number);
   else
-    color = BColor(default_color, screen_number);
+    color = Color(default_color, screen_number);
   return color;
 }
 
 
-BFont *Style::readDatabaseFont(const std::string &rbasename,
-                               const Configuration &style) {
+Font *Style::readDatabaseFont(const std::string &rbasename,
+                              const Configuration &style) {
   std::string fontstring, s;
 
   // XXX: load all this font stuff from the style...
@@ -267,7 +267,7 @@ BFont *Style::readDatabaseFont(const std::string &rbasename,
   fontstring = "Arial,Sans-9:bold";
 
   // if this fails, it ::exit()'s
-  return new BFont(screen_number, fontstring, dropShadow, offset, tint);
+  return new Font(screen_number, fontstring, dropShadow, offset, tint);
 }
 
 }

@@ -48,22 +48,22 @@ extern "C" {
 namespace otk {
 
 
-Display *OBDisplay::display = (Display*) 0;
-bool OBDisplay::_xkb = false;
-int  OBDisplay::_xkb_event_basep = 0;
-bool OBDisplay::_shape = false;
-int  OBDisplay::_shape_event_basep = 0;
-bool OBDisplay::_xinerama = false;
-int  OBDisplay::_xinerama_event_basep = 0;
-unsigned int OBDisplay::_mask_list[8];
-unsigned int OBDisplay::_scrollLockMask = 0;
-unsigned int OBDisplay::_numLockMask = 0;
-OBDisplay::ScreenInfoList OBDisplay::_screenInfoList;
-BGCCache *OBDisplay::_gccache = (BGCCache*) 0;
-int OBDisplay::_grab_count = 0;
+::Display *Display::display = (::Display*) 0;
+bool Display::_xkb = false;
+int  Display::_xkb_event_basep = 0;
+bool Display::_shape = false;
+int  Display::_shape_event_basep = 0;
+bool Display::_xinerama = false;
+int  Display::_xinerama_event_basep = 0;
+unsigned int Display::_mask_list[8];
+unsigned int Display::_scrollLockMask = 0;
+unsigned int Display::_numLockMask = 0;
+Display::ScreenInfoList Display::_screenInfoList;
+GCCache *Display::_gccache = (GCCache*) 0;
+int Display::_grab_count = 0;
 
 
-int OBDisplay::xerrorHandler(Display *d, XErrorEvent *e)
+int Display::xerrorHandler(::Display *d, XErrorEvent *e)
 {
 #ifdef DEBUG
   char errtxt[128];
@@ -84,7 +84,7 @@ int OBDisplay::xerrorHandler(Display *d, XErrorEvent *e)
 }
 
 
-void OBDisplay::initialize(char *name)
+void Display::initialize(char *name)
 {
   int junk;
   (void)junk;
@@ -166,11 +166,11 @@ line argument.\n\n"));
   for (int i = 0; i < ScreenCount(display); ++i)
     _screenInfoList.push_back(ScreenInfo(i));
 
-  _gccache = new BGCCache(_screenInfoList.size());
+  _gccache = new GCCache(_screenInfoList.size());
 }
 
 
-void OBDisplay::destroy()
+void Display::destroy()
 {
   delete _gccache;
   while (_grab_count > 0)
@@ -179,14 +179,14 @@ void OBDisplay::destroy()
 }
 
 
-const ScreenInfo* OBDisplay::screenInfo(int snum) {
+const ScreenInfo* Display::screenInfo(int snum) {
   assert(snum >= 0);
   assert(snum < static_cast<int>(_screenInfoList.size()));
   return &_screenInfoList[snum];
 }
 
 
-const ScreenInfo* OBDisplay::findScreen(Window root)
+const ScreenInfo* Display::findScreen(Window root)
 {
   ScreenInfoList::iterator it, end = _screenInfoList.end();
   for (it = _screenInfoList.begin(); it != end; ++it)
@@ -196,7 +196,7 @@ const ScreenInfo* OBDisplay::findScreen(Window root)
 }
 
 
-void OBDisplay::grab()
+void Display::grab()
 {
   if (_grab_count == 0)
     XGrabServer(display);
@@ -204,7 +204,7 @@ void OBDisplay::grab()
 }
 
 
-void OBDisplay::ungrab()
+void Display::ungrab()
 {
   if (_grab_count == 0) return;
   _grab_count--;
@@ -225,7 +225,7 @@ void OBDisplay::ungrab()
  * if allow_scroll_lock is true then only the top half of the lock mask
  * table is used and scroll lock is ignored.  This value defaults to false.
  */
-void OBDisplay::grabButton(unsigned int button, unsigned int modifiers,
+void Display::grabButton(unsigned int button, unsigned int modifiers,
                          Window grab_window, bool owner_events,
                          unsigned int event_mask, int pointer_mode,
                          int keyboard_mode, Window confine_to,
@@ -233,7 +233,7 @@ void OBDisplay::grabButton(unsigned int button, unsigned int modifiers,
   unsigned int length = (allow_scroll_lock) ? 8 / 2:
                                               8;
   for (size_t cnt = 0; cnt < length; ++cnt)
-    XGrabButton(otk::OBDisplay::display, button, modifiers | _mask_list[cnt],
+    XGrabButton(Display::display, button, modifiers | _mask_list[cnt],
                 grab_window, owner_events, event_mask, pointer_mode,
                 keyboard_mode, confine_to, cursor);
 }
@@ -243,14 +243,14 @@ void OBDisplay::grabButton(unsigned int button, unsigned int modifiers,
  * Releases the grab on a button, and ungrabs all possible combinations of the
  * keyboard lock keys.
  */
-void OBDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
+void Display::ungrabButton(unsigned int button, unsigned int modifiers,
                            Window grab_window) {
   for (size_t cnt = 0; cnt < 8; ++cnt)
-    XUngrabButton(otk::OBDisplay::display, button, modifiers | _mask_list[cnt],
+    XUngrabButton(Display::display, button, modifiers | _mask_list[cnt],
                   grab_window);
 }
 
-void OBDisplay::grabKey(unsigned int keycode, unsigned int modifiers,
+void Display::grabKey(unsigned int keycode, unsigned int modifiers,
                         Window grab_window, bool owner_events,
                         int pointer_mode, int keyboard_mode,
                         bool allow_scroll_lock)
@@ -258,15 +258,15 @@ void OBDisplay::grabKey(unsigned int keycode, unsigned int modifiers,
   unsigned int length = (allow_scroll_lock) ? 8 / 2:
                                               8;
   for (size_t cnt = 0; cnt < length; ++cnt)
-    XGrabKey(otk::OBDisplay::display, keycode, modifiers | _mask_list[cnt],
+    XGrabKey(Display::display, keycode, modifiers | _mask_list[cnt],
                 grab_window, owner_events, pointer_mode, keyboard_mode);
 }
 
-void OBDisplay::ungrabKey(unsigned int keycode, unsigned int modifiers,
+void Display::ungrabKey(unsigned int keycode, unsigned int modifiers,
                           Window grab_window)
 {
   for (size_t cnt = 0; cnt < 8; ++cnt)
-    XUngrabKey(otk::OBDisplay::display, keycode, modifiers | _mask_list[cnt],
+    XUngrabKey(Display::display, keycode, modifiers | _mask_list[cnt],
                grab_window);
 }
 

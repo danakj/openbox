@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __button_hh
 #define __button_hh
 
@@ -5,25 +6,25 @@
 
 namespace otk {
 
-class OtkButton : public OtkFocusLabel {
+class Button : public FocusLabel {
 
 public:
 
-  OtkButton(OtkWidget *parent);
-  ~OtkButton();
+  Button(Widget *parent);
+  ~Button();
 
-  inline const otk::BTexture *getPressedFocusTexture(void) const
+  inline const Texture *getPressedFocusTexture(void) const
   { return _pressed_focus_tx; }
-  void setPressedFocusTexture(otk::BTexture *texture)
+  void setPressedFocusTexture(Texture *texture)
   { _pressed_focus_tx = texture; }
 
-  inline const otk::BTexture *getPressedUnfocusTexture(void) const
+  inline const Texture *getPressedUnfocusTexture(void) const
   { return _pressed_unfocus_tx; }
-  void setPressedUnfocusTexture(otk::BTexture *texture)
+  void setPressedUnfocusTexture(Texture *texture)
   { _pressed_unfocus_tx = texture; }
 
-  void setTexture(otk::BTexture *texture);
-  void setUnfocusTexture(otk::BTexture *texture);
+  void setTexture(Texture *texture);
+  void setUnfocusTexture(Texture *texture);
 
   inline bool isPressed(void) const { return _pressed; }
   void press(unsigned int mouse_button);
@@ -32,18 +33,18 @@ public:
   void buttonPressHandler(const XButtonEvent &e);
   void buttonReleaseHandler(const XButtonEvent &e);
 
-  virtual void setStyle(otk::Style *style);
+  virtual void setStyle(Style *style);
   
 private:
 
   bool _pressed;
   unsigned int _mouse_button;
 
-  BTexture *_pressed_focus_tx;
-  BTexture *_pressed_unfocus_tx;
+  Texture *_pressed_focus_tx;
+  Texture *_pressed_unfocus_tx;
 
-  BTexture *_unpr_focus_tx;
-  BTexture *_unpr_unfocus_tx;
+  Texture *_unpr_focus_tx;
+  Texture *_unpr_unfocus_tx;
 };
 
 }

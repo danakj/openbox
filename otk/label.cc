@@ -8,31 +8,31 @@
 
 namespace otk {
 
-OtkLabel::OtkLabel(OtkWidget *parent)
-  : OtkWidget(parent), _text("")
+Label::Label(Widget *parent)
+  : Widget(parent), _text("")
 {
-  const ScreenInfo *info = OBDisplay::screenInfo(screen());
-  _xftdraw = XftDrawCreate(OBDisplay::display, window(), info->visual(),
+  const ScreenInfo *info = Display::screenInfo(screen());
+  _xftdraw = XftDrawCreate(Display::display, window(), info->visual(),
                            info->colormap());
 }
 
-OtkLabel::~OtkLabel()
+Label::~Label()
 {
   XftDrawDestroy(_xftdraw);
 }
 
-void OtkLabel::setStyle(Style *style)
+void Label::setStyle(Style *style)
 {
-  OtkWidget::setStyle(style);
+  Widget::setStyle(style);
 
   setTexture(style->getLabelUnfocus());
 }
 
 
-void OtkLabel::update(void)
+void Label::update(void)
 {
   if (_dirty) {
-    const BFont *ft = style()->getFont();
+    const Font *ft = style()->getFont();
     unsigned int sidemargin = style()->getBevelWidth() * 2;
 
     std::string t = _text; // the actual text to draw
@@ -64,11 +64,11 @@ void OtkLabel::update(void)
       }
     }
 
-    OtkWidget::update();
+    Widget::update();
 
     ft->drawString(_xftdraw, x, 0, *style()->getTextUnfocus(), t);
   } else
-    OtkWidget::update();
+    Widget::update();
 }
 
 }

@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __label_hh
 #define __label_hh
 
@@ -6,12 +7,12 @@
 
 namespace otk {
 
-class OtkLabel : public OtkWidget {
+class Label : public Widget {
 
 public:
 
-  OtkLabel(OtkWidget *parent);
-  ~OtkLabel();
+  Label(Widget *parent);
+  ~Label();
 
   inline const std::string &getText(void) const { return _text; }
   void setText(const std::string &text) { _text = text; _dirty = true; }

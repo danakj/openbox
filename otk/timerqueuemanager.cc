@@ -9,19 +9,19 @@
 
 namespace otk {
 
-void OBTimerQueueManager::fire(bool wait)
+void TimerQueueManager::fire(bool wait)
 {
   fd_set rfds;
   timeval now, tm, *timeout = (timeval *) 0;
 
-  const int xfd = ConnectionNumber(otk::OBDisplay::display);
+  const int xfd = ConnectionNumber(Display::display);
   
   FD_ZERO(&rfds);
   FD_SET(xfd, &rfds); // break on any x events
 
   if (wait) {
     if (! timerList.empty()) {
-      const OBTimer* const timer = timerList.top();
+      const Timer* const timer = timerList.top();
       
       gettimeofday(&now, 0);
       tm = timer->remainingTime(now);
@@ -40,7 +40,7 @@ void OBTimerQueueManager::fire(bool wait)
   // timer->start() and timer->shouldFire() is within the timer's period
   // then the timer will keep firing.  This should be VERY near impossible.
   while (! timerList.empty()) {
-    OBTimer *timer = timerList.top();
+    Timer *timer = timerList.top();
     if (! timer->shouldFire(now))
       break;
 
@@ -53,13 +53,13 @@ void OBTimerQueueManager::fire(bool wait)
 }
 
 
-void OBTimerQueueManager::addTimer(OBTimer *timer)
+void TimerQueueManager::addTimer(Timer *timer)
 {
   assert(timer);
   timerList.push(timer);
 }
 
-void OBTimerQueueManager::removeTimer(OBTimer* timer)
+void TimerQueueManager::removeTimer(Timer* timer)
 {
   assert(timer);
   timerList.release(timer);

@@ -1,6 +1,6 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
-#ifndef   __Image_hh
-#define   __Image_hh
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+#ifndef __image_hh
+#define __image_hh
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -15,17 +15,17 @@ extern "C" {
 
 namespace otk {
 
-class BImageControl;
-class BTexture;
+class ImageControl;
+class Texture;
 class ScreenInfo;
 
-class BImage {
+class Image {
 private:
-  BImageControl *control;
+  ImageControl *control;
   bool interlaced;
   XColor *colors;
 
-  BColor from, to;
+  Color from, to;
   int red_offset, green_offset, blue_offset, red_bits, green_bits, blue_bits,
     ncolors, cpc, cpccpc;
   unsigned char *red, *green, *blue, *red_table, *green_table, *blue_table;
@@ -39,15 +39,15 @@ private:
 #endif
 
   Pixmap renderPixmap(void);
-  Pixmap render_solid(const BTexture &texture);
-  Pixmap render_gradient(const BTexture &texture);
+  Pixmap render_solid(const Texture &texture);
+  Pixmap render_gradient(const Texture &texture);
 
   XImage *renderXImage(void);
 
   void invert(void);
   void bevel1(void);
   void bevel2(void);
-  void border(const BTexture &texture);
+  void border(const Texture &texture);
   void dgradient(void);
   void egradient(void);
   void hgradient(void);
@@ -59,14 +59,14 @@ private:
 
 
 public:
-  BImage(BImageControl *c, int w, int h);
-  ~BImage(void);
+  Image(ImageControl *c, int w, int h);
+  ~Image(void);
 
-  Pixmap render(const BTexture &texture);
+  Pixmap render(const Texture &texture);
 };
 
 
-class BImageControl {
+class ImageControl {
 public:
 #ifndef SWIG
   struct CachedImage {
@@ -77,12 +77,12 @@ public:
   };
 #endif
 
-  BImageControl(otk::OBTimerQueueManager *timermanager,
+  ImageControl(otk::TimerQueueManager *timermanager,
                 const otk::ScreenInfo *scrn,
                 bool _dither= False, int _cpc = 4,
                 unsigned long cache_timeout = 300000l,
                 unsigned long cmax = 200l);
-  virtual ~BImageControl(void);
+  virtual ~ImageControl(void);
 
   inline bool doDither(void) { return dither; }
 
@@ -100,7 +100,7 @@ public:
   unsigned long getSqrt(unsigned int x);
 
   Pixmap renderImage(unsigned int width, unsigned int height,
-                     const otk::BTexture &texture);
+                     const Texture &texture);
 
   void installRootColormap(void);
   void removeImage(Pixmap pixmap);
@@ -114,12 +114,12 @@ public:
   void setDither(bool d) { dither = d; }
   void setColorsPerChannel(int cpc);
 
-  static void timeout(BImageControl *t);
+  static void timeout(ImageControl *t);
 
 private:
   bool dither;
   const ScreenInfo *screeninfo;
-  OBTimer *timer;
+  Timer *timer;
 
   Colormap colormap;
 
@@ -139,10 +139,10 @@ private:
 
   Pixmap searchCache(const unsigned int width, const unsigned int height,
                      const unsigned long texture,
-                     const BColor &c1, const BColor &c2);
+                     const Color &c1, const Color &c2);
 };
 
 }
 
-#endif // __Image_hh
+#endif // __image_hh
 

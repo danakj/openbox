@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef   __timer_hh
 #define   __timer_hh
 
@@ -17,26 +17,26 @@ extern "C" {
 
 namespace otk {
 
-class OBTimerQueueManager;
+class TimerQueueManager;
 
-//! The data passed to the OBTimeoutHandler function.
+//! The data passed to the TimeoutHandler function.
 /*!
   Note: this is a very useful place to put an object instance, and set the
   event handler to a static function in the same class.
 */
-typedef void *OBTimeoutData;
-//! The type of function which can be set as the callback for an OBTimer firing
-typedef void (*OBTimeoutHandler)(OBTimeoutData);
+typedef void *TimeoutData;
+//! The type of function which can be set as the callback for a Timer firing
+typedef void (*TimeoutHandler)(TimeoutData);
 
 //! A Timer class which will fire a function when its time elapses
-class OBTimer {
+class Timer {
 private:
   //! The manager which to add ourself to and remove ourself after we are done
-  OBTimerQueueManager *_manager;
+  TimerQueueManager *_manager;
   //! The function to call when the time elapses
-  OBTimeoutHandler _handler;
-  //! The data which gets passed along to the OBTimeoutHandler
-  OBTimeoutData _data;
+  TimeoutHandler _handler;
+  //! The data which gets passed along to the TimeoutHandler
+  TimeoutData _data;
   //! Determines if the timer is currently started
   bool _timing;
   //! When this is true, the timer will reset itself to fire again every time
@@ -47,57 +47,57 @@ private:
   //! The time at which the timer is going to fire
   timeval _timeout;
 
-  //! Disallows copying of OBTimer objects
-  OBTimer(const OBTimer&);
-  //! Disallows copying of OBTimer objects
-  OBTimer& operator=(const OBTimer&);
+  //! Disallows copying of Timer objects
+  Timer(const Timer&);
+  //! Disallows copying of Timer objects
+  Timer& operator=(const Timer&);
 
 public:
-  //! Constructs a new OBTimer object
+  //! Constructs a new Timer object
   /*!
-    @param m The OBTimerQueueManager with which to associate. The manager
+    @param m The TimerQueueManager with which to associate. The manager
              specified will be resposible for making this timer fire.
     @param h The function to call when the timer fires
     @param d The data to pass along to the function call when the timer fires
   */
-  OBTimer(OBTimerQueueManager *m, OBTimeoutHandler h, OBTimeoutData d);
-  //! Destroys the OBTimer object
-  virtual ~OBTimer();
+  Timer(TimerQueueManager *m, TimeoutHandler h, TimeoutData d);
+  //! Destroys the Timer object
+  virtual ~Timer();
 
-  //! Fires the timer, calling its OBTimeoutHandler
+  //! Fires the timer, calling its TimeoutHandler
   void fire();
 
-  //! Returns if the OBTimer is started and timing
+  //! Returns if the Timer is started and timing
   inline bool timing() const { return _timing; }
-  //! Returns if the OBTimer is going to repeat
+  //! Returns if the Timer is going to repeat
   inline bool recurring() const { return _recur; }
 
-  //! Gets the amount of time the OBTimer should last before firing
+  //! Gets the amount of time the Timer should last before firing
   inline const timeval &timeout() const { return _timeout; }
-  //! Gets the time at which the OBTimer started
+  //! Gets the time at which the Timer started
   inline const timeval &startTime() const { return _start; }
 
-  //! Gets the amount of time left before the OBTimer fires
+  //! Gets the amount of time left before the Timer fires
   timeval remainingTime(const timeval &tm) const;
-  //! Returns if the OBTimer is past its timeout time, and should fire
+  //! Returns if the Timer is past its timeout time, and should fire
   bool shouldFire(const timeval &tm) const;
 
-  //! Gets the time at which the OBTimer will fire
+  //! Gets the time at which the Timer will fire
   timeval endTime() const;
 
-  //! Sets the OBTimer to repeat or not
+  //! Sets the Timer to repeat or not
   /*!
     @param b If true, the timer is set to repeat; otherwise, it will fire only
              once
   */
   inline void setRecurring(bool b) { _recur = b; }
 
-  //! Sets the amount of time for the OBTimer to last in milliseconds
+  //! Sets the amount of time for the Timer to last in milliseconds
   /*!
     @param t The number of milliseconds the timer should last
   */
   void setTimeout(long t);
-  //! Sets the amount of time the OBTimer should last before firing
+  //! Sets the amount of time the Timer should last before firing
   /*!
     @param t The amount of time the timer should last
   */
@@ -105,7 +105,7 @@ public:
 
   //! Causes the timer to begin
   /*!
-    The timer fires after the time in OBTimer::getTimeout has passed since this
+    The timer fires after the time in Timer::getTimeout has passed since this
     function was called.
     Calling this function while the timer is already started will cause it to
     restart its countdown.
@@ -118,12 +118,12 @@ public:
   */
   void stop();   // manager releases timer
 
-  //! Determines if this OBTimer will fire before a second OBTimer object
+  //! Determines if this Timer will fire before a second Timer object
   /*!
-    @param other The second OBTimer with which to compare
-    @return true if this OBTimer will fire before 'other'; otherwise, false
+    @param other The second Timer with which to compare
+    @return true if this Timer will fire before 'other'; otherwise, false
   */
-  bool operator<(const OBTimer& other) const
+  bool operator<(const Timer& other) const
   { return shouldFire(other.endTime()); }
 };
 

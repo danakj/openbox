@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __application_hh
 #define __application_hh
 
@@ -10,14 +11,14 @@
 
 namespace otk {
 
-class OtkAppWidget;
+class AppWidget;
 
-class OtkApplication : public OtkEventDispatcher {
+class Application : public EventDispatcher {
 
 public:
 
-  OtkApplication(int argc, char **argv);
-  virtual ~OtkApplication();
+  Application(int argc, char **argv);
+  virtual ~Application();
 
   virtual void run(void);
   // more bummy cool functionality
@@ -25,21 +26,21 @@ public:
   void setDockable(bool dockable) { _dockable = dockable; }
   inline bool isDockable(void) const { return _dockable; }
 
-  inline otk::Style *getStyle(void) const { return _style; }
+  inline Style *getStyle(void) const { return _style; }
   // more accessors
 
 private:
   void loadStyle(void);
 
-  OBTimerQueueManager *_timer_manager;
-  BImageControl *_img_ctrl;
+  TimerQueueManager *_timer_manager;
+  ImageControl *_img_ctrl;
   Configuration *_style_conf;
   Style *_style;
   bool _dockable;
 
   int _appwidget_count;
 
-  friend class OtkAppWidget;
+  friend class AppWidget;
 };
 
 }

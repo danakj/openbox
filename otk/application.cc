@@ -18,37 +18,37 @@ extern "C" {
 
 namespace otk {
 
-OtkApplication::OtkApplication(int argc, char **argv)
-  : OtkEventDispatcher(),
+Application::Application(int argc, char **argv)
+  : EventDispatcher(),
     _dockable(false),
     _appwidget_count(0)
 {
-  argc = argc;
-  argv = argv;
+  (void)argc;
+  (void)argv;
 
-  OBDisplay::initialize(0);
+  Display::initialize(0);
   const ScreenInfo *s_info =
-    OBDisplay::screenInfo(DefaultScreen(OBDisplay::display));
+    Display::screenInfo(DefaultScreen(Display::display));
 
-  _timer_manager = new OBTimerQueueManager();
-  _img_ctrl = new BImageControl(_timer_manager, s_info, True, 4, 5, 200);
+  _timer_manager = new TimerQueueManager();
+  _img_ctrl = new ImageControl(_timer_manager, s_info, True, 4, 5, 200);
   _style_conf = new Configuration(False);
   _style = new Style(_img_ctrl);
 
   loadStyle();
 }
 
-OtkApplication::~OtkApplication()
+Application::~Application()
 {
   delete _style_conf;
   delete _img_ctrl;
   delete _timer_manager;
   delete _style;
   
-  OBDisplay::destroy();
+  Display::destroy();
 }
 
-void OtkApplication::loadStyle(void)
+void Application::loadStyle(void)
 {
   // find the style name as a property
   std::string style = "/usr/local/share/openbox/styles/artwiz";
@@ -60,12 +60,12 @@ void OtkApplication::loadStyle(void)
   _style->load(*_style_conf);
 }
 
-void OtkApplication::run(void)
+void Application::run(void)
 {
   if (_appwidget_count <= 0) {
     std::cerr << "ERROR: No main widgets exist. You must create and show() " <<
-      "an OtkAppWidget for the OtkApplication before calling " <<
-      "OtkApplication::run().\n";
+      "an AppWidget for the Application before calling " <<
+      "Application::run().\n";
     ::exit(1);
   }
 

@@ -9,9 +9,9 @@
 
 namespace otk {
 
-class BImageControl;
+class ImageControl;
 
-class BTexture {
+class Texture {
 public:
   enum Type {
     // No texture
@@ -45,36 +45,36 @@ public:
     Interlaced          = (1l<<18)
   };
 
-  BTexture(unsigned int _screen = ~(0u), BImageControl* _ctrl = 0);
-  BTexture(const std::string &_description,
-           unsigned int _screen = ~(0u), BImageControl* _ctrl = 0);
+  Texture(unsigned int _screen = ~(0u), ImageControl* _ctrl = 0);
+  Texture(const std::string &_description,
+           unsigned int _screen = ~(0u), ImageControl* _ctrl = 0);
 
-  void setColor(const BColor &_color);
-  void setColorTo(const BColor &_colorTo) { ct = _colorTo; }
-  void setBorderColor(const BColor &_borderColor) { bc = _borderColor; }
+  void setColor(const Color &_color);
+  void setColorTo(const Color &_colorTo) { ct = _colorTo; }
+  void setBorderColor(const Color &_borderColor) { bc = _borderColor; }
 
-  const BColor &color(void) const { return c; }
-  const BColor &colorTo(void) const { return ct; }
-  const BColor &lightColor(void) const { return lc; }
-  const BColor &shadowColor(void) const { return sc; }
-  const BColor &borderColor(void) const { return bc; }
+  const Color &color(void) const { return c; }
+  const Color &colorTo(void) const { return ct; }
+  const Color &lightColor(void) const { return lc; }
+  const Color &shadowColor(void) const { return sc; }
+  const Color &borderColor(void) const { return bc; }
 
   unsigned long texture(void) const { return t; }
   void setTexture(const unsigned long _texture) { t  = _texture; }
   void addTexture(const unsigned long _texture) { t |= _texture; }
 
 #ifndef SWIG
-  BTexture &operator=(const BTexture &tt);
+  Texture &operator=(const Texture &tt);
 #endif
-  inline bool operator==(const BTexture &tt)
+  inline bool operator==(const Texture &tt)
   { return (c == tt.c && ct == tt.ct && lc == tt.lc &&
             sc == tt.sc && t == tt.t); }
-  inline bool operator!=(const BTexture &tt)
+  inline bool operator!=(const Texture &tt)
   { return (! operator==(tt)); }
 
   unsigned int screen(void) const { return scrn; }
   void setScreen(const unsigned int _screen);
-  void setImageControl(BImageControl* _ctrl) { ctrl = _ctrl; }
+  void setImageControl(ImageControl* _ctrl) { ctrl = _ctrl; }
   const std::string &description(void) const { return descr; }
   void setDescription(const std::string &d);
 
@@ -82,10 +82,10 @@ public:
                 const Pixmap old = 0);
 
 private:
-  BColor c, ct, lc, sc, bc;
+  Color c, ct, lc, sc, bc;
   std::string descr;
   unsigned long t;
-  BImageControl *ctrl;
+  ImageControl *ctrl;
   unsigned int scrn;
 };
 

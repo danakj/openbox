@@ -1,6 +1,6 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
-#ifndef   __Font_hh
-#define   __Font_hh
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+#ifndef   __font_hh
+#define   __font_hh
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -13,12 +13,9 @@ extern "C" {
 
 namespace otk {
 
-class BGCCache;
-class BGCCacheItem;
-class BColor;
-class ScreenInfo;
+class Color;
 
-class BFont {
+class Font {
   /*
    * static members
    */
@@ -51,9 +48,9 @@ private:
   
 public:
   // loads an Xft font
-  BFont(int screen_num, const std::string &fontstring, bool shadow,
+  Font(int screen_num, const std::string &fontstring, bool shadow,
         unsigned char offset, unsigned char tint);
-  virtual ~BFont();
+  virtual ~Font();
 
   inline const std::string &fontstring() const { return _fontstring; }
 
@@ -68,10 +65,10 @@ public:
     Be Warned: If you use an XftDraw object and a color, or a font from
     different screens, you WILL have unpredictable results! :)
   */
-  void drawString(XftDraw *d, int x, int y, const BColor &color,
+  void drawString(XftDraw *d, int x, int y, const Color &color,
                   const std::string &string, bool utf8 = false) const;
 };
 
 }
 
-#endif // __Font_hh
+#endif // __font_hh

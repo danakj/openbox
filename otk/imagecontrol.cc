@@ -39,9 +39,9 @@ static unsigned long bsqrt(unsigned long x) {
   }
 }
 
-BImageControl *ctrl = 0;
+ImageControl *ctrl = 0;
 
-BImageControl::BImageControl(OBTimerQueueManager *timermanager,
+ImageControl::ImageControl(TimerQueueManager *timermanager,
                              const ScreenInfo *scrn,
                              bool _dither, int _cpc,
                              unsigned long cache_timeout,
@@ -54,11 +54,11 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 
   cache_max = cmax;
   if (cache_timeout) {
-    timer = new OBTimer(timermanager, (OBTimeoutHandler)timeout, this);
+    timer = new Timer(timermanager, (TimeoutHandler)timeout, this);
     timer->setTimeout(cache_timeout);
     timer->start();
   } else {
-    timer = (OBTimer *) 0;
+    timer = (Timer *) 0;
   }
 
   colors = (XColor *) 0;
@@ -75,7 +75,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
   colormap = screeninfo->colormap();
 
   int count;
-  XPixmapFormatValues *pmv = XListPixmapFormats(OBDisplay::display,
+  XPixmapFormatValues *pmv = XListPixmapFormats(Display::display,
                                                 &count);
   if (pmv) {
     bits_per_pixel = 0;
@@ -129,7 +129,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 
     if (colors_per_channel < 2 || ncolors > (1 << screen_depth)) {
       fprintf(stderr,
-	      "BImageControl::BImageControl: invalid colormap size %d "
+	      "ImageControl::ImageControl: invalid colormap size %d "
               "(%d/%d/%d) - reducing",
 	      ncolors, colors_per_channel, colors_per_channel,
 	      colors_per_channel);
@@ -139,7 +139,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 
     colors = new XColor[ncolors];
     if (! colors) {
-      fprintf(stderr, "BImageControl::BImageControl: error allocating "
+      fprintf(stderr, "ImageControl::ImageControl: error allocating "
               "colormap\n");
       exit(1);
     }
@@ -168,7 +168,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 	}
 
     for (i = 0; i < ncolors; i++) {
-      if (! XAllocColor(OBDisplay::display, colormap, &colors[i])) {
+      if (! XAllocColor(Display::display, colormap, &colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
 	colors[i].flags = 0;
@@ -183,7 +183,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(OBDisplay::display, colormap, icolors, incolors);
+    XQueryColors(Display::display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -205,7 +205,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(OBDisplay::display, colormap,
+	    if (XAllocColor(Display::display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -234,7 +234,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 
     if (colors_per_channel < 2 || ncolors > (1 << screen_depth)) {
       fprintf(stderr,
-              "BImageControl::BImageControl: invalid colormap size %d "
+              "ImageControl::ImageControl: invalid colormap size %d "
               "(%d/%d/%d) - reducing",
 	      ncolors, colors_per_channel, colors_per_channel,
 	      colors_per_channel);
@@ -245,7 +245,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
     colors = new XColor[ncolors];
     if (! colors) {
       fprintf(stderr,
-              "BImageControl::BImageControl: error allocating colormap\n");
+              "ImageControl::ImageControl: error allocating colormap\n");
       exit(1);
     }
 
@@ -262,7 +262,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
       colors[i].blue = (i * 0xffff) / (colors_per_channel - 1);;
       colors[i].flags = DoRed|DoGreen|DoBlue;
 
-      if (! XAllocColor(OBDisplay::display, colormap,
+      if (! XAllocColor(Display::display, colormap,
 			&colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
@@ -279,7 +279,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(OBDisplay::display, colormap, icolors, incolors);
+    XQueryColors(Display::display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -301,7 +301,7 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(OBDisplay::display, colormap,
+	    if (XAllocColor(Display::display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -315,14 +315,14 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
   }
 
   default:
-    fprintf(stderr, "BImageControl::BImageControl: unsupported visual %d\n",
+    fprintf(stderr, "ImageControl::ImageControl: unsupported visual %d\n",
 	    getVisual()->c_class);
     exit(1);
   }
 }
 
 
-BImageControl::~BImageControl(void) {
+ImageControl::~ImageControl(void) {
   delete [] sqrt_table;
 
   delete [] grad_xbuffer;
@@ -335,20 +335,20 @@ BImageControl::~BImageControl(void) {
     for (int i = 0; i < ncolors; i++)
       *(pixels + i) = (*(colors + i)).pixel;
 
-    XFreeColors(OBDisplay::display, colormap, pixels, ncolors, 0);
+    XFreeColors(Display::display, colormap, pixels, ncolors, 0);
 
     delete [] colors;
   }
 
   if (! cache.empty()) {
     //#ifdef DEBUG
-    fprintf(stderr, "BImageContol::~BImageControl: pixmap cache - "
+    fprintf(stderr, "ImageContol::~ImageControl: pixmap cache - "
             "releasing %d pixmaps\n", cache.size());
     //#endif
     CacheContainer::iterator it = cache.begin();
     const CacheContainer::iterator end = cache.end();
     for (; it != end; ++it)
-      XFreePixmap(OBDisplay::display, it->pixmap);
+      XFreePixmap(Display::display, it->pixmap);
   }
   if (timer) {
     timer->stop();
@@ -357,10 +357,10 @@ BImageControl::~BImageControl(void) {
 }
 
 
-Pixmap BImageControl::searchCache(const unsigned int width,
+Pixmap ImageControl::searchCache(const unsigned int width,
                                   const unsigned int height,
                                   const unsigned long texture,
-                                  const BColor &c1, const BColor &c2) {
+                                  const Color &c1, const Color &c2) {
   if (cache.empty())
     return None;
 
@@ -370,7 +370,7 @@ Pixmap BImageControl::searchCache(const unsigned int width,
     CachedImage& tmp = *it;
     if (tmp.width == width && tmp.height == height &&
         tmp.texture == texture && tmp.pixel1 == c1.pixel())
-      if (texture & BTexture::Gradient) {
+      if (texture & Texture::Gradient) {
         if (tmp.pixel2 == c2.pixel()) {
           tmp.count++;
           return tmp.pixmap;
@@ -384,15 +384,15 @@ Pixmap BImageControl::searchCache(const unsigned int width,
 }
 
 
-Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
-                                  const BTexture &texture) {
-  if (texture.texture() & BTexture::Parent_Relative) return ParentRelative;
+Pixmap ImageControl::renderImage(unsigned int width, unsigned int height,
+                                  const Texture &texture) {
+  if (texture.texture() & Texture::Parent_Relative) return ParentRelative;
 
   Pixmap pixmap = searchCache(width, height, texture.texture(),
 			      texture.color(), texture.colorTo());
   if (pixmap) return pixmap;
 
-  BImage image(this, width, height);
+  Image image(this, width, height);
   pixmap = image.render(texture);
 
   if (! pixmap)
@@ -407,7 +407,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
   tmp.texture = texture.texture();
   tmp.pixel1 = texture.color().pixel();
 
-  if (texture.texture() & BTexture::Gradient)
+  if (texture.texture() & Texture::Gradient)
     tmp.pixel2 = texture.colorTo().pixel();
   else
     tmp.pixel2 = 0l;
@@ -416,7 +416,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
 
   if (cache.size() > cache_max) {
 #ifdef    DEBUG
-    fprintf(stderr, "BImageControl::renderImage: cache is large, "
+    fprintf(stderr, "ImageControl::renderImage: cache is large, "
       "forcing cleanout\n");
 #endif // DEBUG
 
@@ -427,7 +427,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
 }
 
 
-void BImageControl::removeImage(Pixmap pixmap) {
+void ImageControl::removeImage(Pixmap pixmap) {
   if (! pixmap)
     return;
 
@@ -444,7 +444,7 @@ void BImageControl::removeImage(Pixmap pixmap) {
 }
 
 
-void BImageControl::getColorTables(unsigned char **rmt, unsigned char **gmt,
+void ImageControl::getColorTables(unsigned char **rmt, unsigned char **gmt,
 				   unsigned char **bmt,
 				   int *roff, int *goff, int *boff,
                                    int *rbit, int *gbit, int *bbit) {
@@ -462,13 +462,13 @@ void BImageControl::getColorTables(unsigned char **rmt, unsigned char **gmt,
 }
 
 
-void BImageControl::getXColorTable(XColor **c, int *n) {
+void ImageControl::getXColorTable(XColor **c, int *n) {
   if (c) *c = colors;
   if (n) *n = ncolors;
 }
 
 
-void BImageControl::getGradientBuffers(unsigned int w,
+void ImageControl::getGradientBuffers(unsigned int w,
 				       unsigned int h,
 				       unsigned int **xbuf,
 				       unsigned int **ybuf)
@@ -496,10 +496,10 @@ void BImageControl::getGradientBuffers(unsigned int w,
 }
 
 
-void BImageControl::installRootColormap(void) {
+void ImageControl::installRootColormap(void) {
   int ncmap = 0;
   Colormap *cmaps =
-    XListInstalledColormaps(OBDisplay::display, window, &ncmap);
+    XListInstalledColormaps(Display::display, window, &ncmap);
 
   if (cmaps) {
     bool install = True;
@@ -508,14 +508,14 @@ void BImageControl::installRootColormap(void) {
 	install = False;
 
     if (install)
-      XInstallColormap(OBDisplay::display, colormap);
+      XInstallColormap(Display::display, colormap);
 
     XFree(cmaps);
   }
 }
 
 
-void BImageControl::setColorsPerChannel(int cpc) {
+void ImageControl::setColorsPerChannel(int cpc) {
   if (cpc < 2) cpc = 2;
   if (cpc > 6) cpc = 6;
 
@@ -523,7 +523,7 @@ void BImageControl::setColorsPerChannel(int cpc) {
 }
 
 
-unsigned long BImageControl::getSqrt(unsigned int x) {
+unsigned long ImageControl::getSqrt(unsigned int x) {
   if (! sqrt_table) {
     // build sqrt table for use with elliptic gradient
 
@@ -538,7 +538,7 @@ unsigned long BImageControl::getSqrt(unsigned int x) {
 
 
 struct ZeroRefCheck {
-  inline bool operator()(const BImageControl::CachedImage &image) const {
+  inline bool operator()(const ImageControl::CachedImage &image) const {
     return (image.count == 0);
   }
 };
@@ -546,14 +546,14 @@ struct ZeroRefCheck {
 struct CacheCleaner {
   ZeroRefCheck ref_check;
   CacheCleaner() {}
-  inline void operator()(const BImageControl::CachedImage& image) const {
+  inline void operator()(const ImageControl::CachedImage& image) const {
     if (ref_check(image))
-      XFreePixmap(OBDisplay::display, image.pixmap);
+      XFreePixmap(Display::display, image.pixmap);
   }
 };
 
 
-void BImageControl::timeout(BImageControl *t) {
+void ImageControl::timeout(ImageControl *t) {
   CacheCleaner cleaner;
   std::for_each(t->cache.begin(), t->cache.end(), cleaner);
   t->cache.remove_if(cleaner.ref_check);

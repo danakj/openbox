@@ -10,36 +10,36 @@
 
 namespace otk {
 
-OtkEventDispatcher::OtkEventDispatcher()
+EventDispatcher::EventDispatcher()
   : _fallback(0), _master(0)
 {
 }
 
-OtkEventDispatcher::~OtkEventDispatcher()
+EventDispatcher::~EventDispatcher()
 {
 }
 
-void OtkEventDispatcher::clearAllHandlers(void)
+void EventDispatcher::clearAllHandlers(void)
 {
   _map.clear();
 }
 
-void OtkEventDispatcher::registerHandler(Window id, OtkEventHandler *handler)
+void EventDispatcher::registerHandler(Window id, EventHandler *handler)
 {
-  _map.insert(std::pair<Window, OtkEventHandler*>(id, handler));
+  _map.insert(std::pair<Window, EventHandler*>(id, handler));
 }
 
-void OtkEventDispatcher::clearHandler(Window id)
+void EventDispatcher::clearHandler(Window id)
 {
   _map.erase(id);
 }
 
-void OtkEventDispatcher::dispatchEvents(void)
+void EventDispatcher::dispatchEvents(void)
 {
   XEvent e;
 
-  while (XPending(OBDisplay::display)) {
-    XNextEvent(OBDisplay::display, &e);
+  while (XPending(Display::display)) {
+    XNextEvent(Display::display, &e);
 
 #if 0//defined(DEBUG)
     printf("Event %d window %lx\n", e.type, e.xany.window);
@@ -71,17 +71,17 @@ void OtkEventDispatcher::dispatchEvents(void)
       case ButtonPress:
       case ButtonRelease:
         _lasttime = e.xbutton.time;
-        e.xbutton.state &= ~(LockMask | OBDisplay::numLockMask() |
-                             OBDisplay::scrollLockMask());
+        e.xbutton.state &= ~(LockMask | Display::numLockMask() |
+                             Display::scrollLockMask());
         break;
       case KeyPress:
-        e.xkey.state &= ~(LockMask | OBDisplay::numLockMask() |
-                          OBDisplay::scrollLockMask());
+        e.xkey.state &= ~(LockMask | Display::numLockMask() |
+                          Display::scrollLockMask());
         break;
       case MotionNotify:
         _lasttime = e.xmotion.time;
-        e.xmotion.state &= ~(LockMask | OBDisplay::numLockMask() |
-                             OBDisplay::scrollLockMask());
+        e.xmotion.state &= ~(LockMask | Display::numLockMask() |
+                             Display::scrollLockMask());
         break;
       case PropertyNotify:
         _lasttime = e.xproperty.time;
@@ -97,7 +97,7 @@ void OtkEventDispatcher::dispatchEvents(void)
   }
 }
 
-void OtkEventDispatcher::dispatchFocus(const XEvent &e)
+void EventDispatcher::dispatchFocus(const XEvent &e)
 {
   if (e.type == FocusIn) {
     //printf("Got FocusIn!\n");
@@ -116,7 +116,7 @@ void OtkEventDispatcher::dispatchFocus(const XEvent &e)
     // FocusOut events just make us look for FocusIn events. They are ignored
     // otherwise.
     XEvent fi;
-    if (XCheckTypedEvent(OBDisplay::display, FocusIn, &fi)) {
+    if (XCheckTypedEvent(Display::display, FocusIn, &fi)) {
       //printf("Found FocusIn\n");
       dispatchFocus(fi);
       // dont unfocus the window we just focused!
@@ -129,10 +129,10 @@ void OtkEventDispatcher::dispatchFocus(const XEvent &e)
   }
 }
 
-void OtkEventDispatcher::dispatch(Window win, const XEvent &e)
+void EventDispatcher::dispatch(Window win, const XEvent &e)
 {
-  OtkEventHandler *handler = 0;
-  OtkEventMap::iterator it;
+  EventHandler *handler = 0;
+  EventMap::iterator it;
 
   // master gets everything first
   if (_master)
@@ -157,7 +157,7 @@ void OtkEventDispatcher::dispatch(Window win, const XEvent &e)
     xwc.sibling = e.xconfigurerequest.above;
     xwc.stack_mode = e.xconfigurerequest.detail;
       
-    XConfigureWindow(otk::OBDisplay::display, e.xconfigurerequest.window,
+    XConfigureWindow(otk::Display::display, e.xconfigurerequest.window,
                      e.xconfigurerequest.value_mask, &xwc);
   } else {
     // grab a falback if it exists
@@ -168,9 +168,9 @@ void OtkEventDispatcher::dispatch(Window win, const XEvent &e)
     handler->handle(e);
 }
 
-OtkEventHandler *OtkEventDispatcher::findHandler(Window win)
+EventHandler *EventDispatcher::findHandler(Window win)
 {
-  OtkEventMap::iterator it = _map.find(win);
+  EventMap::iterator it = _map.find(win);
   if (it != _map.end())
     return it->second;
   return 0;

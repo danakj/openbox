@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __timerqueue_hh
 #define __timerqueue_hh
 
@@ -37,13 +37,12 @@ private:
 };
 
 struct TimerLessThan {
-  bool operator()(const OBTimer* const l, const OBTimer* const r) const {
+  bool operator()(const Timer* const l, const Timer* const r) const {
     return *r < *l;
   }
 };
 
-typedef _timer_queue<OBTimer*,
-                     std::vector<OBTimer*>, TimerLessThan> TimerQueue;
+typedef _timer_queue<Timer*, std::vector<Timer*>, TimerLessThan> TimerQueue;
 
 }
 

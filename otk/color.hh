@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef COLOR_HH
-#define COLOR_HH
+#ifndef __color_hh
+#define __color_hh
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -11,12 +11,12 @@ extern "C" {
 
 namespace otk {
 
-class BColor {
+class Color {
 public:
-  BColor(unsigned int _screen = ~(0u));
-  BColor(int _r, int _g, int _b, unsigned int _screen = ~(0u));
-  BColor(const std::string &_name, unsigned int _screen = ~(0u));
-  ~BColor(void);
+  Color(unsigned int _screen = ~(0u));
+  Color(int _r, int _g, int _b, unsigned int _screen = ~(0u));
+  Color(const std::string &_name, unsigned int _screen = ~(0u));
+  ~Color(void);
 
   inline const std::string &name(void) const { return colorname; }
 
@@ -41,11 +41,11 @@ public:
 
   // operators
 #ifndef SWIG
-  BColor &operator=(const BColor &c);
+  Color &operator=(const Color &c);
 #endif
-  inline bool operator==(const BColor &c) const
+  inline bool operator==(const Color &c) const
   { return (r == c.r && b == c.b && b == c.b); }
-  inline bool operator!=(const BColor &c) const
+  inline bool operator!=(const Color &c) const
   { return (! operator==(c)); }
 
   static void cleanupColorCache(void);
@@ -99,4 +99,4 @@ private:
 
 }
 
-#endif // COLOR_HH
+#endif // __color_hh

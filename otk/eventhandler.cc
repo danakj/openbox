@@ -9,17 +9,17 @@
 
 namespace otk {
 
-OtkEventHandler::OtkEventHandler()
+EventHandler::EventHandler()
 {
 }
 
 
-OtkEventHandler::~OtkEventHandler()
+EventHandler::~EventHandler()
 {
 }
 
 
-void OtkEventHandler::handle(const XEvent &e)
+void EventHandler::handle(const XEvent &e)
 {
   switch(e.type){
   case KeyPress:
@@ -88,11 +88,11 @@ void OtkEventHandler::handle(const XEvent &e)
     return selectionRequestHandler(e.xselectionrequest);
   default:
 #ifdef    SHAPE
-    if (e.type == otk::OBDisplay::shapeEventBase())
+    if (e.type == Display::shapeEventBase())
       return shapeHandler((*(XShapeEvent*)&e));
 #endif // SHAPE
 #ifdef    XKB
-    if (e.type == otk::OBDisplay::xkbEventBase())
+    if (e.type == Display::xkbEventBase())
       return xkbHandler((*(XkbEvent*)&e));
 #endif // XKB
     ;
@@ -100,7 +100,7 @@ void OtkEventHandler::handle(const XEvent &e)
 }
 
 
-void OtkEventHandler::clientMessageHandler(const XClientMessageEvent &)
+void EventHandler::clientMessageHandler(const XClientMessageEvent &)
 {
   
 }

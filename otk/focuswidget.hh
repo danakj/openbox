@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __focuswidget_hh
 #define __focuswidget_hh
 
@@ -6,27 +7,27 @@
 
 namespace otk {
 
-class OtkFocusWidget : public OtkWidget {
+class FocusWidget : public Widget {
 
 public:
 
-  OtkFocusWidget(otk::OtkWidget *parent, Direction = Horizontal);
-  virtual ~OtkFocusWidget();
+  FocusWidget(Widget *parent, Direction = Horizontal);
+  virtual ~FocusWidget();
 
   virtual void focus(void);
   virtual void unfocus(void);
 
-  virtual void setTexture(otk::BTexture *texture);
-  virtual void setBorderColor(const otk::BColor *color);
+  virtual void setTexture(Texture *texture);
+  virtual void setBorderColor(const Color *color);
 
-  inline void setUnfocusTexture(otk::BTexture *texture)
+  inline void setUnfocusTexture(Texture *texture)
   { _unfocus_texture = texture; }
-  inline otk::BTexture *getUnfocusTexture(void) const
+  inline Texture *getUnfocusTexture(void) const
   { return _unfocus_texture; }
 
-  inline void setUnfocusBorderColor(const otk::BColor *color)
+  inline void setUnfocusBorderColor(const Color *color)
   { _unfocus_bcolor = color; }
-  inline const otk::BColor *getUnfocusBorderColor(void) const
+  inline const Color *getUnfocusBorderColor(void) const
   { return _unfocus_bcolor; }
 
   inline bool isFocused(void) const { return _focused; }
@@ -34,11 +35,11 @@ public:
 
 private:
 
-  BTexture *_unfocus_texture;
-  BTexture *_focus_texture;
+  Texture *_unfocus_texture;
+  Texture *_focus_texture;
 
-  const BColor *_unfocus_bcolor;
-  const BColor *_focus_bcolor;
+  const Color *_unfocus_bcolor;
+  const Color *_focus_bcolor;
 };
 
 }

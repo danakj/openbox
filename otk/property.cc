@@ -15,9 +15,9 @@ extern "C" {
 
 namespace otk {
 
-OBProperty::OBProperty()
+Property::Property()
 {
-  assert(OBDisplay::display);
+  assert(Display::display);
 
   // make sure asserts fire if there is a problem
   memset(_atoms, 0, sizeof(_atoms));
@@ -153,7 +153,7 @@ OBProperty::OBProperty()
 /*
  * clean up the class' members
  */
-OBProperty::~OBProperty()
+Property::~Property()
 {
 }
 
@@ -161,9 +161,9 @@ OBProperty::~OBProperty()
 /*
  * Returns an atom from the Xserver, creating it if necessary.
  */
-Atom OBProperty::create(const char *name) const
+Atom Property::create(const char *name) const
 {
-  Atom a = XInternAtom(OBDisplay::display, name, False);
+  Atom a = XInternAtom(Display::display, name, False);
   assert(a);
   return a;
 }
@@ -174,14 +174,14 @@ Atom OBProperty::create(const char *name) const
  * Sets a window property on a window, optionally appending to the existing
  * value.
  */
-void OBProperty::set(Window win, Atom atom, Atom type,
+void Property::set(Window win, Atom atom, Atom type,
                           unsigned char* data, int size, int nelements,
                           bool append) const
 {
   assert(win != None); assert(atom != None); assert(type != None);
   assert(nelements == 0 || (nelements > 0 && data != (unsigned char *) 0));
   assert(size == 8 || size == 16 || size == 32);
-  XChangeProperty(OBDisplay::display, win, atom, type, size,
+  XChangeProperty(Display::display, win, atom, type, size,
                   (append ? PropModeAppend : PropModeReplace),
                   data, nelements);
 }
@@ -190,7 +190,7 @@ void OBProperty::set(Window win, Atom atom, Atom type,
 /*
  * Set a 32-bit property value on a window.
  */
-void OBProperty::set(Window win, Atoms atom, Atoms type,
+void Property::set(Window win, Atoms atom, Atoms type,
                           unsigned long value) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -203,7 +203,7 @@ void OBProperty::set(Window win, Atoms atom, Atoms type,
 /*
  * Set an array of 32-bit properties value on a window.
  */
-void OBProperty::set(Window win, Atoms atom, Atoms type,
+void Property::set(Window win, Atoms atom, Atoms type,
                           unsigned long value[], int elements) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -216,7 +216,7 @@ void OBProperty::set(Window win, Atoms atom, Atoms type,
 /*
  * Set an string property value on a window.
  */
-void OBProperty::set(Window win, Atoms atom, StringType type,
+void Property::set(Window win, Atoms atom, StringType type,
                           const std::string &value) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -237,7 +237,7 @@ void OBProperty::set(Window win, Atoms atom, StringType type,
 /*
  * Set an array of string property values on a window.
  */
-void OBProperty::set(Window win, Atoms atom, StringType type,
+void Property::set(Window win, Atoms atom, StringType type,
                      const StringVect &strings) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -270,7 +270,7 @@ void OBProperty::set(Window win, Atoms atom, StringType type,
  * property did not exist on the window, or has a different type/size format
  * than the user tried to retrieve.
  */
-bool OBProperty::get(Window win, Atom atom, Atom type,
+bool Property::get(Window win, Atom atom, Atom type,
                           unsigned long *nelements, unsigned char **value,
                           int size) const
 {
@@ -286,7 +286,7 @@ bool OBProperty::get(Window win, Atom atom, Atom type,
   bool ret = False;
 
   // try get the first element
-  result = XGetWindowProperty(OBDisplay::display, win, atom, 0l, 1l,
+  result = XGetWindowProperty(Display::display, win, atom, 0l, 1l,
                               False, AnyPropertyType, &ret_type, &ret_size,
                               nelements, &ret_bytes, &c_val);
   ret = (result == Success && ret_type == type && ret_size == size &&
@@ -304,7 +304,7 @@ bool OBProperty::get(Window win, Atom atom, Atom type,
       int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
       if (remain > size/8 * (signed)maxread) // dont get more than the max
         remain = size/8 * (signed)maxread;
-      result = XGetWindowProperty(OBDisplay::display, win, atom, 0l,
+      result = XGetWindowProperty(Display::display, win, atom, 0l,
                                   remain, False, type, &ret_type, &ret_size,
                                   nelements, &ret_bytes, &c_val);
       ret = (result == Success && ret_type == type && ret_size == size &&
@@ -329,7 +329,7 @@ bool OBProperty::get(Window win, Atom atom, Atom type,
 /*
  * Gets a 32-bit property's value from a window.
  */
-bool OBProperty::get(Window win, Atoms atom, Atoms type,
+bool Property::get(Window win, Atoms atom, Atoms type,
                           unsigned long *nelements,
                           unsigned long **value) const
 {
@@ -343,7 +343,7 @@ bool OBProperty::get(Window win, Atoms atom, Atoms type,
 /*
  * Gets a single 32-bit property's value from a window.
  */
-bool OBProperty::get(Window win, Atoms atom, Atoms type,
+bool Property::get(Window win, Atoms atom, Atoms type,
                      unsigned long *value) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -362,7 +362,7 @@ bool OBProperty::get(Window win, Atoms atom, Atoms type,
 /*
  * Gets an string property's value from a window.
  */
-bool OBProperty::get(Window win, Atoms atom, StringType type,
+bool Property::get(Window win, Atoms atom, StringType type,
                      std::string *value) const
 {
   unsigned long n = 1;
@@ -375,7 +375,7 @@ bool OBProperty::get(Window win, Atoms atom, StringType type,
 }
 
 
-bool OBProperty::get(Window win, Atoms atom, StringType type,
+bool Property::get(Window win, Atoms atom, StringType type,
                      unsigned long *nelements, StringVect *strings) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
@@ -419,10 +419,10 @@ bool OBProperty::get(Window win, Atoms atom, StringType type,
 /*
  * Removes a property entirely from a window.
  */
-void OBProperty::erase(Window win, Atoms atom) const
+void Property::erase(Window win, Atoms atom) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
-  XDeleteProperty(OBDisplay::display, win, _atoms[atom]);
+  XDeleteProperty(Display::display, win, _atoms[atom]);
 }
 
 }

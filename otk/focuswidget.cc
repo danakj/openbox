@@ -8,56 +8,56 @@
 
 namespace otk {
 
-OtkFocusWidget::OtkFocusWidget(OtkWidget *parent, Direction direction)
-  : OtkWidget(parent, direction), _unfocus_texture(0), _unfocus_bcolor(0)
+FocusWidget::FocusWidget(Widget *parent, Direction direction)
+  : Widget(parent, direction), _unfocus_texture(0), _unfocus_bcolor(0)
 {
   _focused = true;
   _focus_texture = parent->texture();
   _focus_bcolor = parent->borderColor();
 }
 
-OtkFocusWidget::~OtkFocusWidget()
+FocusWidget::~FocusWidget()
 {
 }
 
 #include <stdio.h>
-void OtkFocusWidget::focus(void)
+void FocusWidget::focus(void)
 {
   if (_focused)
     return;
 
-  OtkWidget::focus();
+  Widget::focus();
 
   if (_focus_bcolor)
-    OtkWidget::setBorderColor(_focus_bcolor);
+    Widget::setBorderColor(_focus_bcolor);
 
-  OtkWidget::setTexture(_focus_texture);
+  Widget::setTexture(_focus_texture);
   update();
 }
 
-void OtkFocusWidget::unfocus(void)
+void FocusWidget::unfocus(void)
 {
   if (!_focused)
     return;
 
-  OtkWidget::unfocus();
+  Widget::unfocus();
 
   if (_unfocus_bcolor)
-    OtkWidget::setBorderColor(_unfocus_bcolor);
+    Widget::setBorderColor(_unfocus_bcolor);
 
-  OtkWidget::setTexture(_unfocus_texture);
+  Widget::setTexture(_unfocus_texture);
   update();
 }
 
-void OtkFocusWidget::setTexture(BTexture *texture)
+void FocusWidget::setTexture(Texture *texture)
 {
-  OtkWidget::setTexture(texture);
+  Widget::setTexture(texture);
   _focus_texture = texture;
 }
 
-void OtkFocusWidget::setBorderColor(const BColor *color)
+void FocusWidget::setBorderColor(const Color *color)
 {
-  OtkWidget::setBorderColor(color);
+  Widget::setBorderColor(color);
   _focus_bcolor = color;
 }
 

@@ -10,34 +10,34 @@
 
 namespace otk {
 
-OtkFocusLabel::OtkFocusLabel(OtkWidget *parent)
-  : OtkFocusWidget(parent), _text("")
+FocusLabel::FocusLabel(Widget *parent)
+  : FocusWidget(parent), _text("")
 {
-  const ScreenInfo *info = OBDisplay::screenInfo(screen());
-  _xftdraw = XftDrawCreate(OBDisplay::display, window(), info->visual(),
+  const ScreenInfo *info = Display::screenInfo(screen());
+  _xftdraw = XftDrawCreate(Display::display, window(), info->visual(),
                            info->colormap());
 }
 
-OtkFocusLabel::~OtkFocusLabel()
+FocusLabel::~FocusLabel()
 {
   XftDrawDestroy(_xftdraw);
 }
 
 
-void OtkFocusLabel::setStyle(Style *style)
+void FocusLabel::setStyle(Style *style)
 {
-  OtkFocusWidget::setStyle(style);
+  FocusWidget::setStyle(style);
   
   setTexture(style->getLabelFocus());
   setUnfocusTexture(style->getLabelUnfocus());
 }
 
 
-void OtkFocusLabel::update(void)
+void FocusLabel::update(void)
 {
   if (_dirty) {
-    const BFont *ft = style()->getFont();
-    BColor *text_color = (isFocused() ? style()->getTextFocus()
+    const Font *ft = style()->getFont();
+    Color *text_color = (isFocused() ? style()->getTextFocus()
                           : style()->getTextUnfocus());
     unsigned int sidemargin = style()->getBevelWidth() * 2;
 
@@ -70,11 +70,11 @@ void OtkFocusLabel::update(void)
       }
     }
 
-    OtkFocusWidget::update();
+    FocusWidget::update();
 
     ft->drawString(_xftdraw, x, 0, *text_color, t);
   } else
-    OtkFocusWidget::update();
+    FocusWidget::update();
 }
 
 }

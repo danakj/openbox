@@ -1,3 +1,4 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __style_hh
 #define __style_hh
 
@@ -31,17 +32,17 @@ public:
 
 // private:
 
-  BImageControl *image_control;
+  ImageControl *image_control;
 
-  BColor
+  Color
     l_text_focus, l_text_unfocus,
     b_pic_focus, b_pic_unfocus;
   
-  BColor border_color;
+  Color border_color;
 
-  BFont *font;
+  Font *font;
 
-  BTexture
+  Texture
     f_focus, f_unfocus,
     t_focus, t_unfocus,
     l_focus, l_unfocus,
@@ -63,23 +64,23 @@ public:
 public:
 
   Style();
-  Style(BImageControl *);
+  Style(ImageControl *);
   ~Style();
 
   void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
                         const Configuration &style);
   
-  BTexture readDatabaseTexture(const std::string &rname,
+  Texture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
                                const Configuration &style, 
                                bool allowNoTexture = false);
 
-  BColor readDatabaseColor(const std::string &rname,
+  Color readDatabaseColor(const std::string &rname,
                            const std::string &default_color,
                            const Configuration &style);
 
-  BFont *readDatabaseFont(const std::string &rbasename,
+  Font *readDatabaseFont(const std::string &rbasename,
                           const Configuration &style);
 
   void load(const Configuration &style);
@@ -89,38 +90,38 @@ public:
   inline PixmapMask *getIconifyButtonMask(void) { return &icon_button; }
   inline PixmapMask *getStickyButtonMask(void) { return &stick_button; }
 
-  inline BColor *getTextFocus(void) { return &l_text_focus; }
-  inline BColor *getTextUnfocus(void) { return &l_text_unfocus; }
+  inline Color *getTextFocus(void) { return &l_text_focus; }
+  inline Color *getTextUnfocus(void) { return &l_text_unfocus; }
 
-  inline BColor *getButtonPicFocus(void) { return &b_pic_focus; }
-  inline BColor *getButtonPicUnfocus(void) { return &b_pic_unfocus; }
+  inline Color *getButtonPicFocus(void) { return &b_pic_focus; }
+  inline Color *getButtonPicUnfocus(void) { return &b_pic_unfocus; }
 
-  inline BTexture *getTitleFocus(void) { return &t_focus; }
-  inline BTexture *getTitleUnfocus(void) { return &t_unfocus; }
+  inline Texture *getTitleFocus(void) { return &t_focus; }
+  inline Texture *getTitleUnfocus(void) { return &t_unfocus; }
 
-  inline BTexture *getLabelFocus(void) { return &l_focus; }
-  inline BTexture *getLabelUnfocus(void) { return &l_unfocus; }
+  inline Texture *getLabelFocus(void) { return &l_focus; }
+  inline Texture *getLabelUnfocus(void) { return &l_unfocus; }
 
-  inline BTexture *getHandleFocus(void) { return &h_focus; }
-  inline BTexture *getHandleUnfocus(void) { return &h_unfocus; }
+  inline Texture *getHandleFocus(void) { return &h_focus; }
+  inline Texture *getHandleUnfocus(void) { return &h_unfocus; }
 
-  inline BTexture *getButtonFocus(void) { return &b_focus; }
-  inline BTexture *getButtonUnfocus(void) { return &b_unfocus; }
+  inline Texture *getButtonFocus(void) { return &b_focus; }
+  inline Texture *getButtonUnfocus(void) { return &b_unfocus; }
 
-  inline BTexture *getButtonPressedFocus(void)
+  inline Texture *getButtonPressedFocus(void)
   { return &b_pressed_focus; }
-  inline BTexture *getButtonPressedUnfocus(void)
+  inline Texture *getButtonPressedUnfocus(void)
   { return &b_pressed_unfocus; }
 
-  inline BTexture *getGripFocus(void) { return &g_focus; }
-  inline BTexture *getGripUnfocus(void) { return &g_unfocus; }
+  inline Texture *getGripFocus(void) { return &g_focus; }
+  inline Texture *getGripUnfocus(void) { return &g_unfocus; }
 
   inline unsigned int getHandleWidth(void) const { return handle_width; }
   inline unsigned int getBevelWidth(void) const { return bevel_width; }
   inline unsigned int getFrameWidth(void) const { return frame_width; }
   inline unsigned int getBorderWidth(void) const { return border_width; }
 
-  inline const BFont *getFont() const { return font; }
+  inline const Font *getFont() const { return font; }
 
   inline void setShadowFonts(bool fonts) { shadow_fonts = fonts; }
   inline bool hasShadowFonts(void) const { return shadow_fonts; }
@@ -131,12 +132,12 @@ public:
   inline TextJustify textJustify(void) { return justify; }
   inline BulletType bulletType(void) { return bullet_type; }
 
-  inline const BColor *getBorderColor() const { return &border_color; }
+  inline const Color *getBorderColor() const { return &border_color; }
 
-  inline const BTexture *getFrameFocus() const { return &f_focus; }
-  inline const BTexture *getFrameUnfocus() const { return &f_unfocus; }
+  inline const Texture *getFrameFocus() const { return &f_focus; }
+  inline const Texture *getFrameUnfocus() const { return &f_unfocus; }
 
-  inline void setImageControl(BImageControl *c) {
+  inline void setImageControl(ImageControl *c) {
     image_control = c;
     screen_number = c->getScreenInfo()->screen();
   }

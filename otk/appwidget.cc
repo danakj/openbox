@@ -13,44 +13,44 @@ extern "C" {
 
 namespace otk {
 
-OtkAppWidget::OtkAppWidget(OtkApplication *app, Direction direction,
+AppWidget::AppWidget(Application *app, Direction direction,
                            Cursor cursor, int bevel_width)
-  : OtkWidget(app, app->getStyle(), direction, cursor, bevel_width),
+  : Widget(app, app->getStyle(), direction, cursor, bevel_width),
     _application(app)
 {
   assert(app);
 
-  _wm_protocols = XInternAtom(OBDisplay::display, "WM_PROTOCOLS", false);
-  _wm_delete = XInternAtom(OBDisplay::display, "WM_DELETE_WINDOW", false);
+  _wm_protocols = XInternAtom(Display::display, "WM_PROTOCOLS", false);
+  _wm_delete = XInternAtom(Display::display, "WM_DELETE_WINDOW", false);
 
   // set WM Protocols on the window
   Atom protocols[2];
   protocols[0] = _wm_protocols;
   protocols[1] = _wm_delete;
-  XSetWMProtocols(OBDisplay::display, window(), protocols, 2);
+  XSetWMProtocols(Display::display, window(), protocols, 2);
 }
 
-OtkAppWidget::~OtkAppWidget()
+AppWidget::~AppWidget()
 {
 }
 
-void OtkAppWidget::show(void)
+void AppWidget::show(void)
 {
-  OtkWidget::show(true);
+  Widget::show(true);
 
   _application->_appwidget_count++;
 }
 
-void OtkAppWidget::hide(void)
+void AppWidget::hide(void)
 {
-  OtkWidget::hide();
+  Widget::hide();
 
   _application->_appwidget_count--;
 }
 
-void OtkAppWidget::clientMessageHandler(const XClientMessageEvent &e)
+void AppWidget::clientMessageHandler(const XClientMessageEvent &e)
 {
-  OtkEventHandler::clientMessageHandler(e);
+  EventHandler::clientMessageHandler(e);
   if (e.message_type == _wm_protocols &&
       static_cast<Atom>(e.data.l[0]) == _wm_delete)
     hide();

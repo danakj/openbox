@@ -34,10 +34,10 @@ extern "C" {
 
 namespace otk {
 
-string      BFont::_fallback_font = "fixed";
-bool        BFont::_xft_init      = false;
+string      Font::_fallback_font = "fixed";
+bool        Font::_xft_init      = false;
 
-BFont::BFont(int screen_num, const string &fontstring,
+Font::Font(int screen_num, const string &fontstring,
              bool shadow, unsigned char offset, unsigned char tint)
   : _screen_num(screen_num),
     _fontstring(fontstring),
@@ -60,14 +60,14 @@ BFont::BFont(int screen_num, const string &fontstring,
     _xft_init = true;
   }
 
-  if ((_xftfont = XftFontOpenName(OBDisplay::display, _screen_num,
+  if ((_xftfont = XftFontOpenName(Display::display, _screen_num,
                                   _fontstring.c_str())))
     return;
 
   printf(_("Unable to load font: %s\n"), _fontstring.c_str());
   printf(_("Trying fallback font: %s\n"), _fallback_font.c_str());
 
-  if ((_xftfont = XftFontOpenName(OBDisplay::display, _screen_num,
+  if ((_xftfont = XftFontOpenName(Display::display, _screen_num,
                                   _fallback_font.c_str())))
     return;
 
@@ -78,14 +78,14 @@ BFont::BFont(int screen_num, const string &fontstring,
 }
 
 
-BFont::~BFont(void)
+Font::~Font(void)
 {
   if (_xftfont)
-    XftFontClose(OBDisplay::display, _xftfont);
+    XftFontClose(Display::display, _xftfont);
 }
 
 
-void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
+void Font::drawString(XftDraw *d, int x, int y, const Color &color,
                        const string &string, bool utf8) const
 {
   assert(d);
@@ -96,7 +96,7 @@ void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
     c.color.green = 0;
     c.color.blue = 0;
     c.color.alpha = _tint | _tint << 8; // transparent shadow
-    c.pixel = BlackPixel(OBDisplay::display, _screen_num);
+    c.pixel = BlackPixel(Display::display, _screen_num);
 
     if (utf8)
       XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
@@ -113,7 +113,7 @@ void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
   c.color.green = color.green() | color.green() << 8;
   c.color.blue = color.blue() | color.blue() << 8;
   c.pixel = color.pixel();
-  c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
+  c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
 
   if (utf8)
     XftDrawStringUtf8(d, &c, _xftfont, x, _xftfont->ascent + y,
@@ -126,28 +126,28 @@ void BFont::drawString(XftDraw *d, int x, int y, const BColor &color,
 }
 
 
-unsigned int BFont::measureString(const string &string, bool utf8) const
+unsigned int Font::measureString(const string &string, bool utf8) const
 {
   XGlyphInfo info;
 
   if (utf8)
-    XftTextExtentsUtf8(OBDisplay::display, _xftfont,
+    XftTextExtentsUtf8(Display::display, _xftfont,
                        (FcChar8*)string.c_str(), string.size(), &info);
   else
-    XftTextExtents8(OBDisplay::display, _xftfont,
+    XftTextExtents8(Display::display, _xftfont,
                     (FcChar8*)string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }
 
 
-unsigned int BFont::height(void) const
+unsigned int Font::height(void) const
 {
   return _xftfont->height + (_shadow ? _offset : 0);
 }
 
 
-unsigned int BFont::maxCharWidth(void) const
+unsigned int Font::maxCharWidth(void) const
 {
   return _xftfont->max_advance_width;
 }

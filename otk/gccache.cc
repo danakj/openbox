@@ -17,16 +17,16 @@ extern "C" {
 
 namespace otk {
 
-BGCCacheContext::~BGCCacheContext(void) {
+GCCacheContext::~GCCacheContext(void) {
   if (gc)
-    XFreeGC(OBDisplay::display, gc);
+    XFreeGC(Display::display, gc);
 }
 
 
-void BGCCacheContext::set(const BColor &_color,
-                          const XFontStruct * const _font,
-                          const int _function, const int _subwindow,
-                          int _linewidth) {
+void GCCacheContext::set(const Color &_color,
+                         const XFontStruct * const _font,
+                         const int _function, const int _subwindow,
+                         int _linewidth) {
   XGCValues gcv;
   pixel = gcv.foreground = _color.pixel();
   function = gcv.function = _function;
@@ -44,11 +44,11 @@ void BGCCacheContext::set(const BColor &_color,
     fontid = 0;
   }
 
-  XChangeGC(OBDisplay::display, gc, mask, &gcv);
+  XChangeGC(Display::display, gc, mask, &gcv);
 }
 
 
-void BGCCacheContext::set(const XFontStruct * const _font) {
+void GCCacheContext::set(const XFontStruct * const _font) {
   if (! _font) {
     fontid = 0;
     return;
@@ -56,28 +56,28 @@ void BGCCacheContext::set(const XFontStruct * const _font) {
 
   XGCValues gcv;
   fontid = gcv.font = _font->fid;
-  XChangeGC(OBDisplay::display, gc, GCFont, &gcv);
+  XChangeGC(Display::display, gc, GCFont, &gcv);
 }
 
 
-BGCCache::BGCCache(unsigned int screen_count)
+GCCache::GCCache(unsigned int screen_count)
   : context_count(128u), cache_size(16u), cache_buckets(8u * screen_count),
     cache_total_size(cache_size * cache_buckets) {
 
-  contexts = new BGCCacheContext*[context_count];
+  contexts = new GCCacheContext*[context_count];
   unsigned int i;
   for (i = 0; i < context_count; i++) {
-    contexts[i] = new BGCCacheContext();
+    contexts[i] = new GCCacheContext();
   }
 
-  cache = new BGCCacheItem*[cache_total_size];
+  cache = new GCCacheItem*[cache_total_size];
   for (i = 0; i < cache_total_size; ++i) {
-    cache[i] = new BGCCacheItem;
+    cache[i] = new GCCacheItem;
   }
 }
 
 
-BGCCache::~BGCCache(void) {
+GCCache::~GCCache(void) {
   std::for_each(contexts, contexts + context_count, PointerAssassin());
   std::for_each(cache, cache + cache_total_size, PointerAssassin());
   delete [] cache;
@@ -85,16 +85,16 @@ BGCCache::~BGCCache(void) {
 }
 
 
-BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
-  Window hd = OBDisplay::screenInfo(scr)->rootWindow();
+GCCacheContext *GCCache::nextContext(unsigned int scr) {
+  Window hd = Display::screenInfo(scr)->rootWindow();
 
-  BGCCacheContext *c;
+  GCCacheContext *c;
 
   for (unsigned int i = 0; i < context_count; ++i) {
     c = contexts[i];
 
     if (! c->gc) {
-      c->gc = XCreateGC(OBDisplay::display, hd, 0, 0);
+      c->gc = XCreateGC(Display::display, hd, 0, 0);
       c->used = false;
       c->screen = scr;
     }
@@ -102,26 +102,26 @@ BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
       return c;
   }
 
-  fprintf(stderr, "BGCCache: context fault!\n");
+  fprintf(stderr, "GCCache: context fault!\n");
   abort();
-  return (BGCCacheContext*) 0; // not reached
+  return (GCCacheContext*) 0; // not reached
 }
 
 
-void BGCCache::release(BGCCacheContext *ctx) {
+void GCCache::release(GCCacheContext *ctx) {
   ctx->used = false;
 }
 
 
-BGCCacheItem *BGCCache::find(const BColor &_color,
-                             const XFontStruct * const _font,
-                             int _function, int _subwindow, int _linewidth) {
+GCCacheItem *GCCache::find(const Color &_color,
+                           const XFontStruct * const _font,
+                           int _function, int _subwindow, int _linewidth) {
   const unsigned long pixel = _color.pixel();
   const unsigned int screen = _color.screen();
   const int key = _color.red() ^ _color.green() ^ _color.blue();
   int k = (key % cache_size) * cache_buckets;
   unsigned int i = 0; // loop variable
-  BGCCacheItem *c = cache[ k ], *prev = 0;
+  GCCacheItem *c = cache[ k ], *prev = 0;
 
   /*
     this will either loop cache_buckets times then return/abort or
@@ -146,7 +146,7 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
       return c;
     }
     // cache fault!
-    fprintf(stderr, "BGCCache: cache fault, count: %d, screen: %d, item screen: %d\n", c->count, screen, c->ctx->screen);
+    fprintf(stderr, "GCCache: cache fault, count: %d, screen: %d, item screen: %d\n", c->count, screen, c->ctx->screen);
     abort();
   }
 
@@ -172,14 +172,14 @@ BGCCacheItem *BGCCache::find(const BColor &_color,
 }
 
 
-void BGCCache::release(BGCCacheItem *_item) {
+void GCCache::release(GCCacheItem *_item) {
   _item->count--;
 }
 
 
-void BGCCache::purge(void) {
+void GCCache::purge(void) {
   for (unsigned int i = 0; i < cache_total_size; ++i) {
-    BGCCacheItem *d = cache[ i ];
+    GCCacheItem *d = cache[ i ];
 
     if (d->ctx && d->count == 0) {
       release(d->ctx);

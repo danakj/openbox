@@ -16,31 +16,31 @@ extern "C" {
 
 namespace otk {
 
-BColor::ColorCache BColor::colorcache;
-bool BColor::cleancache = false;
+Color::ColorCache Color::colorcache;
+bool Color::cleancache = false;
 
-BColor::BColor(unsigned int _screen)
+Color::Color(unsigned int _screen)
   : allocated(false), r(-1), g(-1), b(-1), p(0), scrn(_screen)
 {}
 
-BColor::BColor(int _r, int _g, int _b, unsigned int _screen)
+Color::Color(int _r, int _g, int _b, unsigned int _screen)
   : allocated(false), r(_r), g(_g), b(_b), p(0), scrn(_screen)
 {}
 
 
-BColor::BColor(const std::string &_name, unsigned int _screen)
+Color::Color(const std::string &_name, unsigned int _screen)
   : allocated(false), r(-1), g(-1), b(-1), p(0), scrn(_screen),
     colorname(_name) {
   parseColorName();
 }
 
 
-BColor::~BColor(void) {
+Color::~Color(void) {
   deallocate();
 }
 
 
-void BColor::setScreen(unsigned int _screen) {
+void Color::setScreen(unsigned int _screen) {
   if (_screen == screen()) {
     // nothing to do
     return;
@@ -56,10 +56,10 @@ void BColor::setScreen(unsigned int _screen) {
 }
 
 
-unsigned long BColor::pixel(void) const {
+unsigned long Color::pixel(void) const {
   if (! allocated) {
     // mutable
-    BColor *that = (BColor *) this;
+    Color *that = (Color *) this;
     that->allocate();
   }
 
@@ -67,15 +67,15 @@ unsigned long BColor::pixel(void) const {
 }
 
 
-void BColor::parseColorName(void) {
+void Color::parseColorName(void) {
   if (colorname.empty()) {
-    fprintf(stderr, "BColor: empty colorname, cannot parse (using black)\n");
+    fprintf(stderr, "Color: empty colorname, cannot parse (using black)\n");
     setRGB(0, 0, 0);
   }
 
   if (scrn == ~(0u))
-    scrn = DefaultScreen(OBDisplay::display);
-  Colormap colormap = OBDisplay::screenInfo(scrn)->colormap();
+    scrn = DefaultScreen(Display::display);
+  Colormap colormap = Display::screenInfo(scrn)->colormap();
 
   // get rgb values from colorname
   XColor xcol;
@@ -84,9 +84,9 @@ void BColor::parseColorName(void) {
   xcol.blue = 0;
   xcol.pixel = 0;
 
-  if (! XParseColor(OBDisplay::display, colormap,
+  if (! XParseColor(Display::display, colormap,
                     colorname.c_str(), &xcol)) {
-    fprintf(stderr, "BColor::allocate: color parse error: \"%s\"\n",
+    fprintf(stderr, "Color::allocate: color parse error: \"%s\"\n",
             colorname.c_str());
     setRGB(0, 0, 0);
     return;
@@ -96,13 +96,13 @@ void BColor::parseColorName(void) {
 }
 
 
-void BColor::allocate(void) {
-  if (scrn == ~(0u)) scrn = DefaultScreen(OBDisplay::display);
-  Colormap colormap = OBDisplay::screenInfo(scrn)->colormap();
+void Color::allocate(void) {
+  if (scrn == ~(0u)) scrn = DefaultScreen(Display::display);
+  Colormap colormap = Display::screenInfo(scrn)->colormap();
 
   if (! isValid()) {
     if (colorname.empty()) {
-      fprintf(stderr, "BColor: cannot allocate invalid color (using black)\n");
+      fprintf(stderr, "Color: cannot allocate invalid color (using black)\n");
       setRGB(0, 0, 0);
     } else {
       parseColorName();
@@ -127,8 +127,8 @@ void BColor::allocate(void) {
   xcol.blue =  b | b << 8;
   xcol.pixel = 0;
 
-  if (! XAllocColor(OBDisplay::display, colormap, &xcol)) {
-    fprintf(stderr, "BColor::allocate: color alloc error: rgb:%x/%x/%x\n",
+  if (! XAllocColor(Display::display, colormap, &xcol)) {
+    fprintf(stderr, "Color::allocate: color alloc error: rgb:%x/%x/%x\n",
             r, g, b);
     xcol.pixel = 0;
   }
@@ -143,7 +143,7 @@ void BColor::allocate(void) {
 }
 
 
-void BColor::deallocate(void) {
+void Color::deallocate(void) {
   if (! allocated)
     return;
 
@@ -160,7 +160,7 @@ void BColor::deallocate(void) {
 }
 
 
-BColor &BColor::operator=(const BColor &c) {
+Color &Color::operator=(const Color &c) {
   deallocate();
 
   setRGB(c.r, c.g, c.b);
@@ -170,12 +170,12 @@ BColor &BColor::operator=(const BColor &c) {
 }
 
 
-void BColor::cleanupColorCache(void) {
+void Color::cleanupColorCache(void) {
   cleancache = true;
 }
 
 
-void BColor::doCacheCleanup(void) {
+void Color::doCacheCleanup(void) {
   // ### TODO - support multiple displays!
   ColorCache::iterator it = colorcache.begin();
   if (it == colorcache.end()) {
@@ -187,7 +187,7 @@ void BColor::doCacheCleanup(void) {
   int i;
   unsigned count;
 
-  for (i = 0; i < ScreenCount(OBDisplay::display); i++) {
+  for (i = 0; i < ScreenCount(Display::display); i++) {
     count = 0;
     it = colorcache.begin();
 
@@ -204,8 +204,8 @@ void BColor::doCacheCleanup(void) {
     }
 
     if (count > 0)
-      XFreeColors(OBDisplay::display,
-                  OBDisplay::screenInfo(i)->colormap(),
+      XFreeColors(Display::display,
+                  Display::screenInfo(i)->colormap(),
                   pixels, count, 0);
   }
 

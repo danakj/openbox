@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 #ifndef __timerqueuemanager_hh
 #define __timerqueuemanager_hh
 
@@ -6,21 +6,21 @@
 
 namespace otk {
 
-//! Manages a queue of OBTimer objects
+//! Manages a queue of Timer objects
 /*!
-  All OBTimer objects add themself to an OBTimerQueueManager. The manager is
+  All Timer objects add themself to a TimerQueueManager. The manager is
   what fires the timers when their time has elapsed. This is done by having the
-  application call the OBTimerQueueManager::fire class in its main event loop.
+  application call the TimerQueueManager::fire class in its main event loop.
 */
-class OBTimerQueueManager {
+class TimerQueueManager {
 private:
   //! A priority queue of all timers being managed by this class.
   TimerQueue timerList;
 public:
-  //! Constructs a new OBTimerQueueManager
-  OBTimerQueueManager() {}
-  //! Destroys the OBTimerQueueManager
-  virtual ~OBTimerQueueManager() {}
+  //! Constructs a new TimerQueueManager
+  TimerQueueManager() {}
+  //! Destroys the TimerQueueManager
+  virtual ~TimerQueueManager() {}
 
   //! Fire the next timer in the queue.
   /*!
@@ -31,14 +31,14 @@ public:
 
   //! Adds a new timer to the queue
   /*!
-    @param timer An OBTimer to add to the queue
+    @param timer An Timer to add to the queue
   */
-  virtual void addTimer(OBTimer* timer);
+  virtual void addTimer(Timer* timer);
   //! Removes a timer from the queue
   /*!
-    @param timer An OBTimer already in the queue to remove
+    @param timer An Timer already in the queue to remove
   */
-  virtual void removeTimer(OBTimer* timer);
+  virtual void removeTimer(Timer* timer);
 };
 
 }

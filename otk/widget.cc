@@ -14,8 +14,8 @@
 
 namespace otk {
 
-OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
-  : OtkEventHandler(),
+Widget::Widget(Widget *parent, Direction direction)
+  : EventHandler(),
     _dirty(false), _focused(false),
     _parent(parent), _style(parent->style()), _direction(direction),
     _cursor(parent->cursor()), _bevel_width(parent->bevelWidth()),
@@ -33,10 +33,10 @@ OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)
   setStyle(_style); // let the widget initialize stuff
 }
 
-OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
+Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
                      Direction direction, Cursor cursor, int bevel_width,
                      bool override_redirect)
-  : OtkEventHandler(),
+  : EventHandler(),
     _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
     _bevel_width(bevel_width), _ignore_config(0), _visible(false),
@@ -53,7 +53,7 @@ OtkWidget::OtkWidget(OtkEventDispatcher *event_dispatcher, Style *style,
   setStyle(_style); // let the widget initialize stuff
 }
 
-OtkWidget::~OtkWidget()
+Widget::~Widget()
 {
   if (_visible)
     hide();
@@ -65,12 +65,12 @@ OtkWidget::~OtkWidget()
   if (_parent)
     _parent->removeChild(this);
 
-  XDestroyWindow(otk::OBDisplay::display, _window);
+  XDestroyWindow(Display::display, _window);
 }
 
-void OtkWidget::create(bool override_redirect)
+void Widget::create(bool override_redirect)
 {
-  const ScreenInfo *scr_info = otk::OBDisplay::screenInfo(_screen);
+  const ScreenInfo *scr_info = Display::screenInfo(_screen);
   Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
 
   _rect.setRect(0, 0, 1, 1); // just some initial values
@@ -93,71 +93,71 @@ void OtkWidget::create(bool override_redirect)
     attrib_create.cursor = _cursor;
   }
 
-  _window = XCreateWindow(otk::OBDisplay::display, p_window, _rect.x(),
+  _window = XCreateWindow(Display::display, p_window, _rect.x(),
                           _rect.y(), _rect.width(), _rect.height(), 0,
                           scr_info->depth(), InputOutput,
                           scr_info->visual(), create_mask, &attrib_create);
   _ignore_config++;
 }
 
-void OtkWidget::setWidth(int w)
+void Widget::setWidth(int w)
 {
   assert(w > 0);
   _fixed_width = true;  
   setGeometry(_rect.x(), _rect.y(), w, _rect.height());
 }
 
-void OtkWidget::setHeight(int h)
+void Widget::setHeight(int h)
 {
   assert(h > 0);
   _fixed_height = true;
   setGeometry(_rect.x(), _rect.y(), _rect.width(), h);
 }
 
-void OtkWidget::move(const Point &to)
+void Widget::move(const Point &to)
 {
   move(to.x(), to.y());
 }
 
-void OtkWidget::move(int x, int y)
+void Widget::move(int x, int y)
 {
   _rect.setPos(x, y);
-  XMoveWindow(otk::OBDisplay::display, _window, x, y);
+  XMoveWindow(Display::display, _window, x, y);
   _ignore_config++;
 }
 
-void OtkWidget::resize(const Point &to)
+void Widget::resize(const Point &to)
 {
   resize(to.x(), to.y());
 }
 
-void OtkWidget::resize(int w, int h)
+void Widget::resize(int w, int h)
 {
   assert(w > 0 && h > 0);
   _fixed_width = _fixed_height = true;
   setGeometry(_rect.x(), _rect.y(), w, h);
 }
 
-void OtkWidget::setGeometry(const Rect &new_geom)
+void Widget::setGeometry(const Rect &new_geom)
 {
   setGeometry(new_geom.x(), new_geom.y(), new_geom.width(), new_geom.height());
 }
  
-void OtkWidget::setGeometry(const Point &topleft, int width, int height)
+void Widget::setGeometry(const Point &topleft, int width, int height)
 {
   setGeometry(topleft.x(), topleft.y(), width, height);
 }
 
-void OtkWidget::setGeometry(int x, int y, int width, int height)
+void Widget::setGeometry(int x, int y, int width, int height)
 {
   _rect = Rect(x, y, width, height);
   _dirty = true;
 
-  XMoveResizeWindow(otk::OBDisplay::display, _window, x, y, width, height);
+  XMoveResizeWindow(Display::display, _window, x, y, width, height);
   _ignore_config++;
 }
 
-void OtkWidget::show(bool recursive)
+void Widget::show(bool recursive)
 {
   if (_visible)
     return;
@@ -167,53 +167,53 @@ void OtkWidget::show(bool recursive)
     update();
 
   if (recursive) {
-    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    WidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
       (*it)->show();
   }
 
-  XMapWindow(otk::OBDisplay::display, _window);
+  XMapWindow(Display::display, _window);
   _visible = true;
 }
 
-void OtkWidget::hide(bool recursive)
+void Widget::hide(bool recursive)
 {
   if (! _visible)
     return;
 
   if (recursive) {
-    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    WidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
       (*it)->hide();
   }
   
-  XUnmapWindow(otk::OBDisplay::display, _window);
+  XUnmapWindow(Display::display, _window);
   _visible = false;
 }
 
-void OtkWidget::focus(void)
+void Widget::focus(void)
 {
   _focused = true;
   
-  OtkWidget::OtkWidgetList::iterator it = _children.begin(),
+  Widget::WidgetList::iterator it = _children.begin(),
     end = _children.end();
   for (; it != end; ++it)
     (*it)->focus();
 }
 
-void OtkWidget::unfocus(void)
+void Widget::unfocus(void)
 {
   _focused = false;
   
-  OtkWidget::OtkWidgetList::iterator it = _children.begin(),
+  Widget::WidgetList::iterator it = _children.begin(),
     end = _children.end();
   for (; it != end; ++it)
     (*it)->unfocus();
 }
 
-bool OtkWidget::grabMouse(void)
+bool Widget::grabMouse(void)
 {
-  Status ret = XGrabPointer(otk::OBDisplay::display, _window, True,
+  Status ret = XGrabPointer(Display::display, _window, True,
                             (ButtonPressMask | ButtonReleaseMask |
                              ButtonMotionMask | EnterWindowMask |
                              LeaveWindowMask | PointerMotionMask),
@@ -223,52 +223,52 @@ bool OtkWidget::grabMouse(void)
   return _grabbed_mouse;
 }
 
-void OtkWidget::ungrabMouse(void)
+void Widget::ungrabMouse(void)
 {
   if (! _grabbed_mouse)
     return;
 
-  XUngrabPointer(otk::OBDisplay::display, CurrentTime);
+  XUngrabPointer(Display::display, CurrentTime);
   _grabbed_mouse = false;
 }
 
-bool OtkWidget::grabKeyboard(void)
+bool Widget::grabKeyboard(void)
 {
-  Status ret = XGrabKeyboard(otk::OBDisplay::display, _window, True,
+  Status ret = XGrabKeyboard(Display::display, _window, True,
                              GrabModeSync, GrabModeAsync, CurrentTime);
   _grabbed_keyboard = (ret == GrabSuccess);
   return _grabbed_keyboard;
 
 }
 
-void OtkWidget::ungrabKeyboard(void)
+void Widget::ungrabKeyboard(void)
 {
   if (! _grabbed_keyboard)
     return;
 
-  XUngrabKeyboard(otk::OBDisplay::display, CurrentTime);
+  XUngrabKeyboard(Display::display, CurrentTime);
   _grabbed_keyboard = false;
 }
 
-void OtkWidget::render(void)
+void Widget::render(void)
 {
   if (!_texture) return;
 
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
   if (_bg_pixmap) {
-    XSetWindowBackgroundPixmap(otk::OBDisplay::display, _window, _bg_pixmap);
+    XSetWindowBackgroundPixmap(Display::display, _window, _bg_pixmap);
     _bg_pixel = None;
   } else {
     unsigned int pix = _texture->color().pixel();
     if (pix != _bg_pixel) {
       _bg_pixel = pix;
-      XSetWindowBackground(otk::OBDisplay::display, _window, pix);
+      XSetWindowBackground(Display::display, _window, pix);
     }
   }
 }
 
-void OtkWidget::adjust(void)
+void Widget::adjust(void)
 {
   if (_direction == Horizontal)
     adjustHorz();
@@ -276,17 +276,17 @@ void OtkWidget::adjust(void)
     adjustVert();
 }
 
-void OtkWidget::adjustHorz(void)
+void Widget::adjustHorz(void)
 {
   if (_children.size() == 0)
     return;
 
-  OtkWidget *tmp;
-  OtkWidgetList::iterator it, end = _children.end();
+  Widget *tmp;
+  WidgetList::iterator it, end = _children.end();
 
   int tallest = 0;
   int width = _bevel_width;
-  OtkWidgetList stretchable;
+  WidgetList stretchable;
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
@@ -303,7 +303,7 @@ void OtkWidget::adjustHorz(void)
   }
 
   if (stretchable.size() > 0) {
-    OtkWidgetList::iterator str_it = stretchable.begin(),
+    WidgetList::iterator str_it = stretchable.begin(),
       str_end = stretchable.end();
 
     int str_width = _rect.width() - width / stretchable.size();
@@ -313,7 +313,7 @@ void OtkWidget::adjustHorz(void)
                           : _bevel_width);
   }
 
-  OtkWidget *prev_widget = 0;
+  Widget *prev_widget = 0;
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
@@ -333,17 +333,17 @@ void OtkWidget::adjustHorz(void)
   internalResize(width, tallest + _bevel_width * 2);
 }
 
-void OtkWidget::adjustVert(void)
+void Widget::adjustVert(void)
 {
   if (_children.size() == 0)
     return;
 
-  OtkWidget *tmp;
-  OtkWidgetList::iterator it, end = _children.end();
+  Widget *tmp;
+  WidgetList::iterator it, end = _children.end();
 
   int widest = 0;
   int height = _bevel_width;
-  OtkWidgetList stretchable;
+  WidgetList stretchable;
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
@@ -360,7 +360,7 @@ void OtkWidget::adjustVert(void)
   }
 
   if (stretchable.size() > 0) {
-    OtkWidgetList::iterator str_it = stretchable.begin(),
+    WidgetList::iterator str_it = stretchable.begin(),
       str_end = stretchable.end();
 
     int str_height = _rect.height() - height / stretchable.size();
@@ -370,7 +370,7 @@ void OtkWidget::adjustVert(void)
                            str_height - _bevel_width : _bevel_width);
   }
 
-  OtkWidget *prev_widget = 0;
+  Widget *prev_widget = 0;
 
   for (it = _children.begin(); it != end; ++it) {
     tmp = *it;
@@ -390,22 +390,22 @@ void OtkWidget::adjustVert(void)
   internalResize(widest + _bevel_width * 2, height);
 }
 
-void OtkWidget::update(void)
+void Widget::update(void)
 {
   if (_dirty) {
     adjust();
     render();
-    XClearWindow(OBDisplay::display, _window);
+    XClearWindow(Display::display, _window);
   }
 
-  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+  WidgetList::iterator it = _children.begin(), end = _children.end();
   for (; it != end; ++it)
     (*it)->update();
 
   _dirty = false;
 }
 
-void OtkWidget::internalResize(int w, int h)
+void Widget::internalResize(int w, int h)
 {
   assert(w > 0 && h > 0);
 
@@ -417,7 +417,7 @@ void OtkWidget::internalResize(int w, int h)
     resize(_rect.width(), h);
 }
 
-void OtkWidget::addChild(OtkWidget *child, bool front)
+void Widget::addChild(Widget *child, bool front)
 {
   assert(child);
   if (front)
@@ -426,10 +426,10 @@ void OtkWidget::addChild(OtkWidget *child, bool front)
     _children.push_back(child);
 }
 
-void OtkWidget::removeChild(OtkWidget *child)
+void Widget::removeChild(Widget *child)
 {
   assert(child);
-  OtkWidgetList::iterator it, end = _children.end();
+  WidgetList::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it) {
     if ((*it) == child)
       break;
@@ -439,19 +439,19 @@ void OtkWidget::removeChild(OtkWidget *child)
     _children.erase(it);
 }
 
-void OtkWidget::setStyle(Style *style)
+void Widget::setStyle(Style *style)
 {
   assert(style);
   _style = style;
   _dirty = true;
 
-  OtkWidgetList::iterator it, end = _children.end();
+  WidgetList::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it)
     (*it)->setStyle(style);
 }
 
 
-void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
+void Widget::setEventDispatcher(EventDispatcher *disp)
 {
   if (_event_dispatcher)
     _event_dispatcher->clearHandler(_window);
@@ -459,16 +459,16 @@ void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
   _event_dispatcher->registerHandler(_window, this);
 }
 
-void OtkWidget::exposeHandler(const XExposeEvent &e)
+void Widget::exposeHandler(const XExposeEvent &e)
 {
-  OtkEventHandler::exposeHandler(e);
+  EventHandler::exposeHandler(e);
   _dirty = true;
   update();
 }
 
-void OtkWidget::configureHandler(const XConfigureEvent &e)
+void Widget::configureHandler(const XConfigureEvent &e)
 {
-  OtkEventHandler::configureHandler(e);
+  EventHandler::configureHandler(e);
   if (_ignore_config) {
     _ignore_config--;
   } else {

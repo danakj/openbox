@@ -20,7 +20,6 @@ extern "C" {
 
 namespace otk {
 
-std::string Font::_fallback_font = "fixed";
 bool        Font::_xft_init      = false;
 
 Font::Font(int screen_num, const std::string &fontstring,
@@ -52,13 +51,13 @@ Font::Font(int screen_num, const std::string &fontstring,
     return;
 
   printf(_("Unable to load font: %s\n"), _fontstring.c_str());
-  printf(_("Trying fallback font: %s\n"), _fallback_font.c_str());
+  printf(_("Trying fallback font: %s\n"), "fixed");
 
   if ((_xftfont = XftFontOpenName(**display, _screen_num,
-                                  _fallback_font.c_str())))
+                                  "fixed")))
     return;
 
-  printf(_("Unable to load font: %s\n"), _fallback_font.c_str());
+  printf(_("Unable to load font: %s\n"), "fixed");
   printf(_("Aborting!.\n"));
 
   ::exit(3); // can't continue without a font

@@ -23,20 +23,8 @@ class Font {
    * static members
    */
 private:
-  static std::string  _fallback_font;
-  static bool         _xft_init;
+  static bool       _xft_init;
 
-public:
-  // the fallback is only used for X fonts, not for Xft fonts, since it is
-  // assumed that X fonts will be the fallback from Xft.
-  inline static std::string fallbackFont(void) { return _fallback_font; }
-  inline static void setFallbackFont(const std::string &f)
-    { _fallback_font = f; }
-
-  /*
-   * instance members
-   */
-private:
   int               _screen_num;
 
   std::string       _fontstring;

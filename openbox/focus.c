@@ -248,7 +248,8 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             if (it == NULL) it = g_list_last(list);
         }
         ft = client_focus_target(it->data);
-        if (ft == it->data && focus_client != ft && client_focusable(ft)) {
+        if (ft == it->data && focus_client != ft && client_normal(ft) &&
+            client_focusable(ft)) {
             if (client_focus(ft)) {
                 noreorder++; /* avoid reordering the focus_order */
                 return ft;

@@ -424,6 +424,16 @@ void screen_show_desktop(gboolean show)
 	}
     }
 
+    if (show) {
+        /* focus desktop */
+        for (it = focus_order[screen_desktop]; it; it = it->next)
+            if (((Client*)it->data)->type == Type_Desktop &&
+                client_focus(it->data))
+                break;
+    } else {
+        focus_fallback(Fallback_NoFocus);
+    }
+
     show = !!show; /* make it boolean */
     PROP_SET32(ob_root, net_showing_desktop, cardinal, show);
 

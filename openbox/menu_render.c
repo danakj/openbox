@@ -2,7 +2,7 @@
 
 #include "menu.h"
 #include "openbox.h"
-#include "render/theme.h"
+#include "render2/theme.h"
 
 void menu_render_full(Menu *self);
 
@@ -28,10 +28,13 @@ void menu_render_full(Menu *self) {
 
     /* set texture data and size them mofos out */
     if (self->label) {
-	self->a_title->texture[0].data.text.string = self->label;
-	appearance_minsize(self->a_title, &self->title_min_w, &self->title_h);
-	self->title_min_w += theme_bevel * 2;
-	self->title_h += theme_bevel * 2;
+        RrSurfaceCopy(self->s_title, ob_theme->menu_title);
+        RrTextureSetText(self->s_title, 0, ob_theme->title_font,
+                         ob_theme->title_justify, &ob_theme->title_color_f,
+                         self->label);
+        RrSurfaceMinSize(self->s_title, &self->title_min_w, &self->title_h);
+	self->title_min_w += (ob_theme->bevel + ob_theme->bwidth) * 2;
+	self->title_h += (ob_theme->bevel + ob_theme->bwidth) * 2;
 	self->size.width = MAX(self->size.width, self->title_min_w);
     }
 
@@ -39,50 +42,43 @@ void menu_render_full(Menu *self) {
         MenuEntry *e = it->data;
         int h;
 
-        e->a_item->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_item, &e->min_w, &self->item_h);
+        RrTextureSetText(e->s_text, 0, ob_theme->title_font,
+                         ob_theme->title_justify, &ob_theme->title_color_f,
+                         e->label);
+
+        RrSurfaceCopy(e->s_item, ob_theme->menu_item);
+        RrSurfaceMinSize(e->s_item, &e->min_w, &self->item_h);
         self->size.width = MAX(self->size.width, e->min_w);
 
-        e->a_disabled->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_disabled, &e->min_w, &h);
+        RrSurfaceCopy(e->s_item, ob_theme->menu_disabled);
+        RrSurfaceMinSize(e->s_item, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 	
-        e->a_hilite->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_hilite, &e->min_w, &h);
+        RrSurfaceCopy(e->s_item, ob_theme->menu_hilite);
+        RrSurfaceMinSize(e->s_item, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
-
-        e->min_w += theme_bevel * 2;
+	
+        e->min_w += ob_theme->bevel * 2;
         ++nitems;
     }
-    self->bullet_w = self->item_h + theme_bevel;
-    self->size.width += 2 * self->bullet_w + 2 * theme_bevel;
-    self->item_h += theme_bevel * 2;
+    self->bullet_w = self->item_h + ob_theme->bevel;
+    self->size.width += 2 * self->bullet_w + 2 * ob_theme->bevel;
+    self->item_h += ob_theme->bevel * 2;
     items_h = self->item_h * MAX(nitems, 1);
 
+    RrSurfaceSetArea(self->s_frame, self->location.x, self->location.y,
+                     self->size.width, MAX(self->title_h + items_h, 1));
+
     if (self->label) {
-	RECT_SET(self->a_title->area, 0, 0, self->size.width, 
-		 self->title_h);
-	RECT_SET(self->a_title->texture[0].position, 0, 0, self->size.width,
-		 self->title_h);
-    }
+        RrSurfaceSetArea(self->s_title, 0, 0, self->size.width, self->title_h);
+        RrSurfaceShow(self->s_title);
+    } else
+        RrSurfaceHide(self->s_title);
 
-    RECT_SET(self->a_items->area, 0, 0, self->size.width, items_h);
-
-    XResizeWindow(ob_display, self->frame, self->size.width,
-		  MAX(self->title_h + items_h, 1));
-    if (self->label)
-	XMoveResizeWindow(ob_display, self->title, -theme_bwidth,
-			  -theme_bwidth, self->size.width, self->title_h);
-
-    XMoveResizeWindow(ob_display, self->items, 0, 
-		      self->title_h + theme_bwidth, self->size.width, 
-		      items_h);
-
-    if (self->label)
-	paint(self->title, self->a_title);
-    paint(self->items, self->a_items);
+    RrSurfaceSetArea(self->s_items, 0, self->title_h + ob_theme->bwidth,
+                     self->size.width, items_h);
 
     item_y = 0;
     for (it = self->entries; it; it = it->next) {
@@ -98,44 +94,39 @@ void menu_render_full(Menu *self) {
 void menu_entry_render(MenuEntry *self)
 {
     Menu *menu = self->parent;
-    Appearance *a;
+    struct RrSurface *s;
     
     switch (self->render_type) {
     case MenuEntryRenderType_Submenu:
 	/* TODO: submenu mask */
     case MenuEntryRenderType_Boolean:
 	/* TODO: boolean check */
-	a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item) 
-	    : self->a_disabled;
+	s = self->enabled ?
+            (self->hilite ? ob_theme->menu_hilite : ob_theme->menu_item) :
+	    ob_theme->menu_disabled;
 	break;
     case MenuEntryRenderType_None:
-	a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item )
-	    : self->a_disabled;
+	s = self->enabled ?
+            (self->hilite ? ob_theme->menu_hilite : ob_theme->menu_item) :
+	    ob_theme->menu_disabled;
 	break;
     case MenuEntryRenderType_Separator:
-	a = self->a_item;
+	s = ob_theme->menu_item;
 	break;
 
     default:
 	g_message("unhandled render_type");
-	a = !self->enabled ? self->a_disabled :
-        (self->hilite && 
-         (self->action || self->render_type == MenuEntryRenderType_Submenu) ? 
-         self->a_hilite : self->a_item);
+	s = !self->enabled ? ob_theme->menu_disabled :
+            (self->hilite && 
+             (self->action ||
+              self->render_type == MenuEntryRenderType_Submenu) ? 
+             ob_theme->menu_hilite : ob_theme->menu_item);
 	break;
     }
 
-    RECT_SET(a->area, 0, 0, menu->size.width,
-             menu->item_h);
-    RECT_SET(a->texture[0].position, menu->bullet_w,
-             0, menu->size.width - 2 * menu->bullet_w,
-             menu->item_h);
+    RrSurfaceCopy(self->s_item, s);
 
-    XMoveResizeWindow(ob_display, self->item, 0, self->y,
-                      menu->size.width, menu->item_h);
-    a->surface.data.planar.parent = menu->a_items;
-    a->surface.data.planar.parentx = 0;
-    a->surface.data.planar.parenty = self->y;
-
-    paint(self->item, a);
+    RrSurfaceSetArea(self->s_item, 0, self->y, menu->size.width, menu->item_h);
+    RrSurfaceSetArea(self->s_text, menu->bullet_w, 0,
+                     menu->size.width - 2 * menu->bullet_w, menu->item_h);
 }

@@ -5,7 +5,7 @@
 #include "window.h"
 #include "stacking.h"
 #include "geom.h"
-#include "render/render.h"
+#include "render2/render.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -27,7 +27,7 @@ typedef struct Dock {
     ObWindow obwin;
 
     Window frame;
-    Appearance *a_frame;
+    struct RrSurface *s_frame;
 
     /* actual position (when not auto-hidden) */
     int x, y;

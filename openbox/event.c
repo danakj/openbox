@@ -138,6 +138,9 @@ void event_loop()
         sn_display_process_event(ob_sn_display, &e);
 #endif
 
+        if (ob_state == State_Running && e.type == Expose)
+            RrExpose(ob_render_inst, &e.xexpose);
+
 	event_process(&e);
         had_event = TRUE;
     }

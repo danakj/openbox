@@ -2,18 +2,18 @@
 #include "openbox.h"
 #include "stacking.h"
 #include "grab.h"
-#include "render/theme.h"
 #include "screen.h"
 #include "geom.h"
 #include "plugin.h"
+#include "render2/theme.h"
 
 GHashTable *menu_hash = NULL;
 
-#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
-			 LeaveWindowMask)
-#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
+#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
+			 LeaveWindowMask | ExposureMask)
+#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask | ExposureMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | ExposureMask)
 
 void menu_control_show(Menu *self, int x, int y, Client *client);
 
@@ -33,16 +33,16 @@ void menu_destroy_hash_value(Menu *self)
     g_free(self->label);
     g_free(self->name);
 
-    g_hash_table_remove(window_map, &self->title);
-    g_hash_table_remove(window_map, &self->frame);
-    g_hash_table_remove(window_map, &self->items);
+    g_hash_table_remove(window_map, &self->w_title);
+    g_hash_table_remove(window_map, &self->w_frame);
+    g_hash_table_remove(window_map, &self->w_items);
 
     stacking_remove(self);
 
-    appearance_free(self->a_title);
-    XDestroyWindow(ob_display, self->title);
-    XDestroyWindow(ob_display, self->frame);
-    XDestroyWindow(ob_display, self->items);
+    RrSurfaceFree(self->s_items);
+    RrSurfaceFree(self->s_title);
+    RrSurfaceFree(self->s_frame);
+    XDestroyWindow(ob_display, self->w_frame);
 
     g_free(self);
 }
@@ -52,12 +52,10 @@ void menu_entry_free(MenuEntry *self)
     g_free(self->label);
     action_free(self->action);
 
-    g_hash_table_remove(window_map, &self->item);
+    g_hash_table_remove(window_map, &self->w_item);
+    g_hash_table_remove(window_map, &self->w_text);
 
-    appearance_free(self->a_item);
-    appearance_free(self->a_disabled);
-    appearance_free(self->a_hilite);
-    XDestroyWindow(ob_display, self->item);
+    RrSurfaceFree(self->s_item);
 
     g_free(self);
 }
@@ -125,8 +123,8 @@ static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 render_depth, InputOutput, render_visual,
-			 mask, attrib);
+			 RrInstanceDepth(ob_render_inst), InputOutput,
+                         RrInstanceVisual(ob_render_inst), mask, attrib);
                        
 }
 
@@ -159,26 +157,22 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
 
     attrib.override_redirect = TRUE;
     attrib.event_mask = FRAME_EVENTMASK;
-    self->frame = createWindow(ob_root, CWOverrideRedirect|CWEventMask, &attrib);
-    attrib.event_mask = TITLE_EVENTMASK;
-    self->title = createWindow(self->frame, CWEventMask, &attrib);
-    self->items = createWindow(self->frame, 0, &attrib);
+    self->w_frame = createWindow(ob_root,
+                                 CWOverrideRedirect|CWEventMask, &attrib);
+    self->s_frame = RrSurfaceNew(ob_render_inst, 0, self->w_frame, 0);
 
-    XSetWindowBorderWidth(ob_display, self->frame, theme_bwidth);
-    XSetWindowBackground(ob_display, self->frame, theme_b_color->pixel);
-    XSetWindowBorderWidth(ob_display, self->title, theme_bwidth);
-    XSetWindowBorder(ob_display, self->frame, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->title, theme_b_color->pixel);
+    self->s_title = RrSurfaceNewChild(0, self->s_frame, 0);
+    self->w_title = RrSurfaceWindow(self->s_title);
+    XSelectInput(ob_display, self->w_title, TITLE_EVENTMASK);
 
-    XMapWindow(ob_display, self->title);
-    XMapWindow(ob_display, self->items);
+    self->s_items = RrSurfaceNewChild(0, self->s_frame, 0);
+    self->w_items = RrSurfaceWindow(self->s_items);
 
-    self->a_title = appearance_copy(theme_a_menu_title);
-    self->a_items = appearance_copy(theme_a_menu);
+    RrSurfaceShow(self->s_items);
 
-    g_hash_table_insert(window_map, &self->frame, self);
-    g_hash_table_insert(window_map, &self->title, self);
-    g_hash_table_insert(window_map, &self->items, self);
+    g_hash_table_insert(window_map, &self->w_frame, self);
+    g_hash_table_insert(window_map, &self->w_title, self);
+    g_hash_table_insert(window_map, &self->w_items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
 
     stacking_add(MENU_AS_WINDOW(self));
@@ -222,25 +216,33 @@ void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu)
 
 void menu_add_entry(Menu *menu, MenuEntry *entry)
 {
-    XSetWindowAttributes attrib;
+    struct RrColor c;
 
     g_assert(menu != NULL);
     g_assert(entry != NULL);
-    g_assert(entry->item == None);
+    g_assert(entry->w_item == None);
 
     menu->entries = g_list_append(menu->entries, entry);
     entry->parent = menu;
 
-    attrib.event_mask = ENTRY_EVENTMASK;
-    entry->item = createWindow(menu->items, CWEventMask, &attrib);
-    XMapWindow(ob_display, entry->item);
-    entry->a_item = appearance_copy(theme_a_menu_item);
-    entry->a_disabled = appearance_copy(theme_a_menu_disabled);
-    entry->a_hilite = appearance_copy(theme_a_menu_hilite);
+    entry->s_item = RrSurfaceNewChild(0, menu->s_items, 0);
+    entry->w_item = RrSurfaceWindow(entry->s_item);
+    XSelectInput(ob_display, entry->w_item, ENTRY_EVENTMASK);
+
+    entry->s_text = RrSurfaceNewChild(RR_SURFACE_PLANAR, entry->s_item, 1);
+    entry->w_text = RrSurfaceWindow(entry->s_text);
+    XSelectInput(ob_display, entry->w_text, ENTRY_EVENTMASK);
+    RrColorSet(&c, 0, 0, 0, 0); /* clear */
+    RrPlanarSet(entry->s_text, RR_PLANAR_SOLID, RR_BEVEL_NONE, &c, NULL,
+                0, NULL);
+
+    RrSurfaceShow(entry->s_item);
+    RrSurfaceShow(entry->s_text);
 
     menu->invalid = TRUE;
 
-    g_hash_table_insert(window_map, &entry->item, menu);
+    g_hash_table_insert(window_map, &entry->w_item, menu);
+    g_hash_table_insert(window_map, &entry->w_text, menu);
 }
 
 void menu_show(char *name, int x, int y, Client *client)
@@ -274,7 +276,7 @@ void menu_show_full(Menu *self, int x, int y, Client *client)
 
 void menu_hide(Menu *self) {
     if (self->shown) {
-        XUnmapWindow(ob_display, self->frame);
+        RrSurfaceHide(self->s_frame);
         self->shown = FALSE;
 	if (self->open_submenu)
 	    menu_hide(self->open_submenu);
@@ -302,7 +304,7 @@ MenuEntry *menu_find_entry(Menu *menu, Window win)
 
     for (it = menu->entries; it; it = it->next) {
         MenuEntry *entry = it->data;
-        if (entry->item == win)
+        if (entry->w_item == win || entry->w_text == win)
             return entry;
     }
     return NULL;
@@ -329,16 +331,15 @@ void menu_entry_fire(MenuEntry *self)
 
 void menu_control_show(Menu *self, int x, int y, Client *client) {
     g_assert(!self->invalid);
-    
-    XMoveWindow(ob_display, self->frame, 
-		MIN(x, screen_physical_size.width - self->size.width), 
-		MIN(y, screen_physical_size.height - self->size.height));
+
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width), 
 	      MIN(y, screen_physical_size.height - self->size.height));
+    self->invalid = TRUE;
+    menu_render(self);
 
     if (!self->shown) {
-	XMapWindow(ob_display, self->frame);
+        RrSurfaceShow(self->s_frame);
         stacking_raise(MENU_AS_WINDOW(self));
 	self->shown = TRUE;
     } else if (self->shown && self->open_submenu) {
@@ -363,14 +364,14 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* TODO: I don't understand why these bevels should be here.
 	       Something must be wrong in the width calculation */
 	    x = self->parent->location.x + self->parent->size.width + 
-		theme_bevel;
+		ob_theme->bevel;
 
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
 
 	    if (self->submenu->size.width + x > screen_physical_size.width)
 		x = self->parent->location.x - self->submenu->size.width - 
-		    theme_bevel;
+		    ob_theme->bevel;
 	    
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,

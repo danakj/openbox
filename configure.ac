@@ -49,9 +49,15 @@ PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
 AC_SUBST(GMODULE_CFLAGS)
 AC_SUBST(GMODULE_LIBS)
 
+PKG_CHECK_MODULES(FC, [fontconfig])
+AC_SUBST(FC_CFLAGS)
+AC_SUBST(FC_LIBS)
+
+## XXX REMOVE ME PLS XXX ##
 PKG_CHECK_MODULES(XFT, [xft])
 AC_SUBST(XFT_CFLAGS)
 AC_SUBST(XFT_LIBS)
+## XXX REMOVE ME PLS XXX ##
 
 PKG_CHECK_MODULES(XML, [libxml-2.0])
 AC_SUBST(XML_CFLAGS)
@@ -100,13 +106,14 @@ X11_EXT_VIDMODE
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
-GL_OPTION
+GL_DEVEL
 
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  themes/Makefile
 		 data/Makefile
-                 render/Makefile
+		 glft/Makefile
+                 render2/Makefile
 		 parser/Makefile
                  kernel/Makefile
 		 plugins/Makefile

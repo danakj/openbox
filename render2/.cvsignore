@@ -1,0 +1,16 @@
+rendertest
+librender.a
+.libs
+Makefile.in
+.deps
+Makefile
+libobrender2.la
+instance.lo
+init.lo
+debug.lo
+color.lo
+font.lo
+surface.lo
+paint.lo
+texture.lo
+planar.lo

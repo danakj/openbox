@@ -2,11 +2,11 @@
 #include "openbox.h"
 #include "extensions.h"
 #include "framerender.h"
-#include "render/theme.h"
+#include "render2/theme.h"
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | ExposureMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 
@@ -14,65 +14,6 @@ static void layout_title(Frame *self);
 
 void frame_startup()
 {
-    RECT_SET(theme_a_focused_pressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_desk->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_shade->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_iconify->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_set_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_set_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_max->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_pressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_focused_unpressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_pressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-    RECT_SET(theme_a_unfocused_unpressed_close->area, 0, 0,
-             theme_button_size, theme_button_size);
-
-    RECT_SET(theme_a_focused_grip->area, 0, 0,
-             theme_grip_width, theme_handle_height);
-    RECT_SET(theme_a_unfocused_grip->area, 0, 0,
-             theme_grip_width, theme_handle_height);
 }
 
 void frame_shutdown()
@@ -83,8 +24,8 @@ static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 render_depth, InputOutput, render_visual,
-			 mask, attrib);
+			 RrInstanceDepth(ob_render_inst), InputOutput,
+                         RrInstanceVisual(ob_render_inst), mask, attrib);
                        
 }
 
@@ -107,61 +48,53 @@ Frame *frame_new()
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
 
-    mask = CWEventMask;
-    attrib.event_mask = ELEMENT_EVENTMASK;
-    self->title = createWindow(self->window, mask, &attrib);
-    self->label = createWindow(self->title, mask, &attrib);
-    self->max = createWindow(self->title, mask, &attrib);
-    self->close = createWindow(self->title, mask, &attrib);
-    self->desk = createWindow(self->title, mask, &attrib);
-    self->shade = createWindow(self->title, mask, &attrib);
-    self->icon = createWindow(self->title, mask, &attrib);
-    self->iconify = createWindow(self->title, mask, &attrib);
-    self->handle = createWindow(self->window, mask, &attrib);
-    mask |= CWCursor;
-    attrib.cursor = ob_cursors.bl;
-    self->lgrip = createWindow(self->handle, mask, &attrib);
-    attrib.cursor = ob_cursors.br;
-    self->rgrip = createWindow(self->handle, mask, &attrib);
+    self->s_frame = RrSurfaceNew(ob_render_inst, 0, self->window, 0);
+    self->s_title = RrSurfaceNewChild(0, self->s_frame, 0);
+    self->s_label = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_max = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_close = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_desk = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_shade = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_iconify = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_icon = RrSurfaceNewChild(0, self->s_title, 0);
+    self->s_handle = RrSurfaceNewChild(0, self->s_frame, 0);
+    self->s_lgrip = RrSurfaceNewChild(0, self->s_handle, 0);
+    self->s_rgrip = RrSurfaceNewChild(0, self->s_handle, 0);
+
+    self->w_title = RrSurfaceWindow(self->s_title);
+    self->w_label = RrSurfaceWindow(self->s_label);
+    self->w_max = RrSurfaceWindow(self->s_max);
+    self->w_close = RrSurfaceWindow(self->s_close);
+    self->w_desk = RrSurfaceWindow(self->s_desk);
+    self->w_shade = RrSurfaceWindow(self->s_shade);
+    self->w_iconify = RrSurfaceWindow(self->s_iconify);
+    self->w_icon = RrSurfaceWindow(self->s_icon);
+    self->w_handle = RrSurfaceWindow(self->s_handle);
+    self->w_lgrip = RrSurfaceWindow(self->s_lgrip);
+    self->w_rgrip = RrSurfaceWindow(self->s_rgrip);
+
+    XSelectInput(ob_display, self->w_title, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_label, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_max, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_close, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_desk, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_shade, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_iconify, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_icon, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_handle, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_lgrip, ELEMENT_EVENTMASK);
+    XSelectInput(ob_display, self->w_rgrip, ELEMENT_EVENTMASK);
+
+    XDefineCursor(ob_display, self->w_lgrip, ob_cursors.bl);
+    XDefineCursor(ob_display, self->w_rgrip, ob_cursors.br);
 
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
     XMapWindow(ob_display, self->plate);
-    XMapWindow(ob_display, self->lgrip);
-    XMapWindow(ob_display, self->rgrip);
-    XMapWindow(ob_display, self->label);
-
-    /* set colors/appearance/sizes for stuff that doesn't change */
-    XSetWindowBorder(ob_display, self->window, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->label, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->rgrip, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, self->lgrip, theme_b_color->pixel);
-
-    XResizeWindow(ob_display, self->max, theme_button_size, theme_button_size);
-    XResizeWindow(ob_display, self->iconify,
-                  theme_button_size, theme_button_size);
-    XResizeWindow(ob_display, self->icon,
-                  theme_button_size + 2, theme_button_size + 2);
-    XResizeWindow(ob_display, self->close,
-                  theme_button_size, theme_button_size);
-    XResizeWindow(ob_display, self->desk,
-                  theme_button_size, theme_button_size);
-    XResizeWindow(ob_display, self->shade,
-                  theme_button_size, theme_button_size);
-    XResizeWindow(ob_display, self->lgrip,
-                  theme_grip_width, theme_handle_height);
-    XResizeWindow(ob_display, self->rgrip,
-                  theme_grip_width, theme_handle_height);
-
-    /* set up the dynamic appearances */
-    self->a_unfocused_title = appearance_copy(theme_a_unfocused_title);
-    self->a_focused_title = appearance_copy(theme_a_focused_title);
-    self->a_unfocused_label = appearance_copy(theme_a_unfocused_label);
-    self->a_focused_label = appearance_copy(theme_a_focused_label);
-    self->a_unfocused_handle = appearance_copy(theme_a_unfocused_handle);
-    self->a_focused_handle = appearance_copy(theme_a_focused_handle);
-    self->a_icon = appearance_copy(theme_a_icon);
+    RrSurfaceShow(self->s_label);
+    RrSurfaceShow(self->s_lgrip);
+    RrSurfaceShow(self->s_rgrip);
 
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = self->shade_press = FALSE;
@@ -171,14 +104,20 @@ Frame *frame_new()
 
 static void frame_free(Frame *self)
 {
-    appearance_free(self->a_unfocused_title); 
-    appearance_free(self->a_focused_title);
-    appearance_free(self->a_unfocused_label);
-    appearance_free(self->a_focused_label);
-    appearance_free(self->a_unfocused_handle);
-    appearance_free(self->a_focused_handle);
-    appearance_free(self->a_icon);
+    RrSurfaceFree(self->s_rgrip);
+    RrSurfaceFree(self->s_lgrip);
+    RrSurfaceFree(self->s_handle);
+    RrSurfaceFree(self->s_icon);
+    RrSurfaceFree(self->s_iconify);
+    RrSurfaceFree(self->s_shade);
+    RrSurfaceFree(self->s_desk);
+    RrSurfaceFree(self->s_close);
+    RrSurfaceFree(self->s_max);
+    RrSurfaceFree(self->s_label);
+    RrSurfaceFree(self->s_title);
+    RrSurfaceFree(self->s_frame);
 
+    XDestroyWindow(ob_display, self->plate);
     XDestroyWindow(ob_display, self->window);
 
     g_free(self);
@@ -188,7 +127,7 @@ void frame_show(Frame *self)
 {
     if (!self->visible) {
 	self->visible = TRUE;
-	XMapWindow(ob_display, self->window);
+        RrSurfaceShow(self->s_frame);
     }
 }
 
@@ -197,7 +136,7 @@ void frame_hide(Frame *self)
     if (self->visible) {
 	self->visible = FALSE;
 	self->client->ignore_unmaps++;
-	XUnmapWindow(ob_display, self->window);
+        RrSurfaceHide(self->s_frame);
     }
 }
 
@@ -210,33 +149,31 @@ void frame_adjust_shape(Frame *self)
     if (!self->client->shaped) {
 	/* clear the shape on the frame window */
 	XShapeCombineMask(ob_display, self->window, ShapeBounding,
-			  self->innersize.left,
-			  self->innersize.top,
+			  self->size.left,
+			  self->size.top,
 			  None, ShapeSet);
     } else {
 	/* make the frame's shape match the clients */
 	XShapeCombineShape(ob_display, self->window, ShapeBounding,
-			   self->innersize.left,
-			   self->innersize.top,
+			   self->size.left,
+			   self->size.top,
 			   self->client->window,
 			   ShapeBounding, ShapeSet);
 
 	num = 0;
 	if (self->client->decorations & Decor_Titlebar) {
-	    xrect[0].x = -theme_bevel;
-	    xrect[0].y = -theme_bevel;
-	    xrect[0].width = self->width + self->bwidth * 2;
-	    xrect[0].height = theme_title_height +
-		self->bwidth * 2;
+	    xrect[0].x = 0;
+	    xrect[0].y = 0;
+	    xrect[0].width = self->area.width;
+	    xrect[0].height = self->size.top - ob_theme->bwidth;
 	    ++num;
 	}
 
 	if (self->client->decorations & Decor_Handle) {
-	    xrect[1].x = -theme_bevel;
+	    xrect[1].x = 0;
 	    xrect[1].y = FRAME_HANDLE_Y(self);
-	    xrect[1].width = self->width + self->bwidth * 2;
-	    xrect[1].height = theme_handle_height +
-		self->bwidth * 2;
+	    xrect[1].width = self->area.width;
+	    xrect[1].height = self->size.bottom - ob_theme->bwidth;
 	    ++num;
 	}
 
@@ -251,24 +188,20 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 {
     if (resized) {
         if (self->client->decorations & Decor_Border) {
-            self->bwidth = theme_bwidth;
-            self->cbwidth = theme_cbwidth;
+            self->bwidth = ob_theme->bwidth;
+            self->cbwidth = ob_theme->cbwidth;
         } else {
             self->bwidth = self->cbwidth = 0;
         }
-        STRUT_SET(self->innersize, self->cbwidth, self->cbwidth,
-                  self->cbwidth, self->cbwidth);
-        self->width = self->client->area.width + self->cbwidth * 2;
+        STRUT_SET(self->size,
+                  self->bwidth + self->cbwidth,
+                  self->bwidth + self->cbwidth,
+                  self->bwidth + self->cbwidth,
+                  self->bwidth + self->cbwidth);
+        self->width = self->client->area.width +
+            (self->bwidth + self->cbwidth) * 2;
         g_assert(self->width > 0);
 
-        /* set border widths */
-        XSetWindowBorderWidth(ob_display, self->plate,  self->cbwidth);
-        XSetWindowBorderWidth(ob_display, self->window, self->bwidth);
-        XSetWindowBorderWidth(ob_display, self->title,  self->bwidth);
-        XSetWindowBorderWidth(ob_display, self->handle, self->bwidth);
-        XSetWindowBorderWidth(ob_display, self->lgrip,  self->bwidth);
-        XSetWindowBorderWidth(ob_display, self->rgrip,  self->bwidth);
-  
         /* position/size and map/unmap all the windows */
 
         /* they all default off, they're turned on in layout_title */
@@ -281,82 +214,48 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
         self->close_x = -1;
 
         if (self->client->decorations & Decor_Titlebar) {
-            XMoveResizeWindow(ob_display, self->title,
-                              -self->bwidth, -self->bwidth,
-                              self->width, theme_title_height);
-            self->innersize.top += theme_title_height + self->bwidth;
-            XMapWindow(ob_display, self->title);
-
-            RECT_SET(self->a_focused_title->area, 0, 0,
-                     self->width, theme_title_height);
-            RECT_SET(self->a_unfocused_title->area, 0, 0,
-                     self->width, theme_title_height);
+            RrSurfaceSetArea(self->s_title, 0, 0,
+                             self->width, RrThemeTitleHeight(ob_theme));
+            self->size.top += RrThemeTitleHeight(ob_theme) - self->bwidth;
+            RrSurfaceShow(self->s_title);
 
             /* layout the title bar elements */
             layout_title(self);
         } else
-            XUnmapWindow(ob_display, self->title);
+            RrSurfaceHide(self->s_title);
 
         if (self->client->decorations & Decor_Handle) {
-            XMoveResizeWindow(ob_display, self->handle,
-                              -self->bwidth, FRAME_HANDLE_Y(self),
-                              self->width, theme_handle_height);
-            XMoveWindow(ob_display, self->lgrip,
-                        -self->bwidth, -self->bwidth);
-            XMoveWindow(ob_display, self->rgrip,
-                        -self->bwidth + self->width -
-                        theme_grip_width, -self->bwidth);
-            self->innersize.bottom += theme_handle_height +
-                self->bwidth;
-            XMapWindow(ob_display, self->handle);
-
-            if (theme_a_focused_grip->surface.data.planar.grad ==
-                Background_ParentRelative)
-                RECT_SET(self->a_focused_handle->area, 0, 0,
-                         self->width, theme_handle_height);
-            else
-                RECT_SET(self->a_focused_handle->area,
-                         theme_grip_width + self->bwidth, 0,
-                         self->width - (theme_grip_width + self->bwidth) * 2,
-                         theme_handle_height);
-            if (theme_a_unfocused_grip->surface.data.planar.grad ==
-                Background_ParentRelative)
-                RECT_SET(self->a_unfocused_handle->area, 0, 0,
-                         self->width, theme_handle_height);
-            else
-                RECT_SET(self->a_unfocused_handle->area,
-                         theme_grip_width + self->bwidth, 0,
-                         self->width - (theme_grip_width + self->bwidth) * 2,
-                         theme_handle_height);
-
+            RrSurfaceSetArea(self->s_handle, 0, FRAME_HANDLE_Y(self),
+                             self->width, ob_theme->handle_height);
+            RrSurfaceSetArea(self->s_lgrip, 0, 0,
+                             RrThemeGripWidth(ob_theme),
+                             ob_theme->handle_height);
+            RrSurfaceSetArea(self->s_lgrip,
+                             self->width - RrThemeGripWidth(ob_theme), 0,
+                             RrThemeGripWidth(ob_theme),
+                             ob_theme->handle_height);
+            self->size.bottom += ob_theme->handle_height - ob_theme->bwidth;
+            RrSurfaceShow(self->s_handle);
         } else
-            XUnmapWindow(ob_display, self->handle);
+            RrSurfaceHide(self->s_handle);
     }
 
     if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
-                          self->innersize.left - self->cbwidth,
-                          self->innersize.top - self->cbwidth,
+                          self->size.left - self->cbwidth,
+                          self->size.top - self->cbwidth,
                           self->client->area.width,
                           self->client->area.height);
         /* when the client has StaticGravity, it likes to move around. */
         XMoveWindow(ob_display, self->client->window, 0, 0);
     }
 
-    if (resized) {
-        STRUT_SET(self->size,
-                  self->innersize.left + self->bwidth,
-                  self->innersize.top + self->bwidth,
-                  self->innersize.right + self->bwidth,
-                  self->innersize.bottom + self->bwidth);
-    }
-
     /* shading can change without being moved or resized */
     RECT_SET_SIZE(self->area,
 		  self->client->area.width +
 		  self->size.left + self->size.right,
-		  (self->client->shaded ? theme_title_height + self->bwidth*2:
+		  (self->client->shaded ? RrThemeTitleHeight(ob_theme) :
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
@@ -371,10 +270,8 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 
     /* move and resize the top level frame.
        shading can change without being moved or resized */
-    XMoveResizeWindow(ob_display, self->window,
-                      self->area.x, self->area.y,
-                      self->width,
-                      self->area.height - self->bwidth * 2);
+    RrSurfaceSetArea(self->s_frame, self->area.x, self->area.y,
+                     self->area.width, self->area.height);
 
     if (resized) {
         framerender_frame(self);
@@ -433,17 +330,17 @@ void frame_grab_client(Frame *self, Client *client)
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, client);
     g_hash_table_insert(window_map, &self->plate, client);
-    g_hash_table_insert(window_map, &self->title, client);
-    g_hash_table_insert(window_map, &self->label, client);
-    g_hash_table_insert(window_map, &self->max, client);
-    g_hash_table_insert(window_map, &self->close, client);
-    g_hash_table_insert(window_map, &self->desk, client);
-    g_hash_table_insert(window_map, &self->shade, client);
-    g_hash_table_insert(window_map, &self->icon, client);
-    g_hash_table_insert(window_map, &self->iconify, client);
-    g_hash_table_insert(window_map, &self->handle, client);
-    g_hash_table_insert(window_map, &self->lgrip, client);
-    g_hash_table_insert(window_map, &self->rgrip, client);
+    g_hash_table_insert(window_map, &self->w_title, client);
+    g_hash_table_insert(window_map, &self->w_label, client);
+    g_hash_table_insert(window_map, &self->w_max, client);
+    g_hash_table_insert(window_map, &self->w_close, client);
+    g_hash_table_insert(window_map, &self->w_desk, client);
+    g_hash_table_insert(window_map, &self->w_shade, client);
+    g_hash_table_insert(window_map, &self->w_iconify, client);
+    g_hash_table_insert(window_map, &self->w_icon, client);
+    g_hash_table_insert(window_map, &self->w_handle, client);
+    g_hash_table_insert(window_map, &self->w_lgrip, client);
+    g_hash_table_insert(window_map, &self->w_rgrip, client);
 }
 
 void frame_release_client(Frame *self, Client *client)
@@ -473,17 +370,17 @@ void frame_release_client(Frame *self, Client *client)
     /* remove all the windows for the frame from the window_map */
     g_hash_table_remove(window_map, &self->window);
     g_hash_table_remove(window_map, &self->plate);
-    g_hash_table_remove(window_map, &self->title);
-    g_hash_table_remove(window_map, &self->label);
-    g_hash_table_remove(window_map, &self->max);
-    g_hash_table_remove(window_map, &self->close);
-    g_hash_table_remove(window_map, &self->desk);
-    g_hash_table_remove(window_map, &self->shade);
-    g_hash_table_remove(window_map, &self->icon);
-    g_hash_table_remove(window_map, &self->iconify);
-    g_hash_table_remove(window_map, &self->handle);
-    g_hash_table_remove(window_map, &self->lgrip);
-    g_hash_table_remove(window_map, &self->rgrip);
+    g_hash_table_remove(window_map, &self->w_title);
+    g_hash_table_remove(window_map, &self->w_label);
+    g_hash_table_remove(window_map, &self->w_max);
+    g_hash_table_remove(window_map, &self->w_close);
+    g_hash_table_remove(window_map, &self->w_desk);
+    g_hash_table_remove(window_map, &self->w_shade);
+    g_hash_table_remove(window_map, &self->w_icon);
+    g_hash_table_remove(window_map, &self->w_iconify);
+    g_hash_table_remove(window_map, &self->w_handle);
+    g_hash_table_remove(window_map, &self->w_lgrip);
+    g_hash_table_remove(window_map, &self->w_rgrip);
 
     frame_free(self);
 }
@@ -497,32 +394,36 @@ static void layout_title(Frame *self)
     n = d = i = l = m = c = s = FALSE;
 
     /* figure out whats being shown, and the width of the label */
-    self->label_width = self->width - (theme_bevel + 1) * 2;
-    for (lc = theme_title_layout; *lc != '\0'; ++lc) {
+    self->label_width = self->width - (ob_theme->bevel + 1) * 2;
+    for (lc = ob_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->client->decorations & Decor_Icon)) break;
             if (n) { *lc = ' '; break; } /* rm duplicates */
 	    n = TRUE;
-	    self->label_width -= theme_button_size + 2 + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) + 2 +
+                ob_theme->bevel + 1;
 	    break;
 	case 'D':
 	    if (!(self->client->decorations & Decor_AllDesktops)) break;
             if (d) { *lc = ' '; break; } /* rm duplicates */
 	    d = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) +
+                ob_theme->bevel + 1;
 	    break;
 	case 'S':
 	    if (!(self->client->decorations & Decor_Shade)) break;
             if (s) { *lc = ' '; break; } /* rm duplicates */
 	    s = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) +
+                ob_theme->bevel + 1;
 	    break;
 	case 'I':
 	    if (!(self->client->decorations & Decor_Iconify)) break;
             if (i) { *lc = ' '; break; } /* rm duplicates */
 	    i = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) +
+                ob_theme->bevel + 1;
 	    break;
 	case 'L':
             if (l) { *lc = ' '; break; } /* rm duplicates */
@@ -532,90 +433,96 @@ static void layout_title(Frame *self)
 	    if (!(self->client->decorations & Decor_Maximize)) break;
             if (m) { *lc = ' '; break; } /* rm duplicates */
 	    m = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) +
+                ob_theme->bevel + 1;
 	    break;
 	case 'C':
 	    if (!(self->client->decorations & Decor_Close)) break;
             if (c) { *lc = ' '; break; } /* rm duplicates */
 	    c = TRUE;
-	    self->label_width -= theme_button_size + theme_bevel + 1;
+	    self->label_width -= RrThemeButtonSize(ob_theme) +
+                ob_theme->bevel + 1;
 	    break;
 	}
     }
     if (self->label_width < 1) self->label_width = 1;
 
-    XResizeWindow(ob_display, self->label, self->label_width,
-                  theme_label_height);
-  
-    if (!n) XUnmapWindow(ob_display, self->icon);
-    if (!d) XUnmapWindow(ob_display, self->desk);
-    if (!s) XUnmapWindow(ob_display, self->shade);
-    if (!i) XUnmapWindow(ob_display, self->iconify);
-    if (!l) XUnmapWindow(ob_display, self->label);
-    if (!m) XUnmapWindow(ob_display, self->max);
-    if (!c) XUnmapWindow(ob_display, self->close);
+    if (!n) RrSurfaceHide(self->s_icon);
+    if (!d) RrSurfaceHide(self->s_desk);
+    if (!s) RrSurfaceHide(self->s_shade);
+    if (!i) RrSurfaceHide(self->s_iconify);
+    if (!l) RrSurfaceHide(self->s_label);
+    if (!m) RrSurfaceHide(self->s_max);
+    if (!c) RrSurfaceHide(self->s_close);
 
-    x = theme_bevel + 1;
-    for (lc = theme_title_layout; *lc != '\0'; ++lc) {
+
+    x = ob_theme->bevel + 1;
+    for (lc = ob_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;
 	    self->icon_x = x;
-            RECT_SET(self->a_icon->area, 0, 0,
-                     theme_button_size + 2, theme_button_size + 2);
-	    XMapWindow(ob_display, self->icon);
-	    XMoveWindow(ob_display, self->icon, x, theme_bevel);
-	    x += theme_button_size + 2 + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_icon, x, ob_theme->bevel,
+                             RrThemeButtonSize(ob_theme) + 2,
+                             RrThemeButtonSize(ob_theme) + 2);
+            RrSurfaceShow(self->s_icon);
+	    x += RrThemeButtonSize(ob_theme) + 2 + ob_theme->bevel + 1;
 	    break;
 	case 'D':
 	    if (!d) break;
 	    self->desk_x = x;
-	    XMapWindow(ob_display, self->desk);
-	    XMoveWindow(ob_display, self->desk, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_desk, x, ob_theme->bevel + 1,
+                             RrThemeButtonSize(ob_theme),
+                             RrThemeButtonSize(ob_theme));
+            RrSurfaceShow(self->s_desk);
+	    x += RrThemeButtonSize(ob_theme) + ob_theme->bevel + 1;
 	    break;
 	case 'S':
 	    if (!s) break;
 	    self->shade_x = x;
-	    XMapWindow(ob_display, self->shade);
-	    XMoveWindow(ob_display, self->shade, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_shade, x, ob_theme->bevel + 1,
+                             RrThemeButtonSize(ob_theme),
+                             RrThemeButtonSize(ob_theme));
+            RrSurfaceShow(self->s_shade);
+	    x += RrThemeButtonSize(ob_theme) + ob_theme->bevel + 1;
 	    break;
 	case 'I':
 	    if (!i) break;
 	    self->iconify_x = x;
-	    XMapWindow(ob_display, self->iconify);
-	    XMoveWindow(ob_display, self->iconify, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_iconify, x, ob_theme->bevel + 1,
+                             RrThemeButtonSize(ob_theme),
+                             RrThemeButtonSize(ob_theme));
+            RrSurfaceShow(self->s_iconify);
+	    x += RrThemeButtonSize(ob_theme) + ob_theme->bevel + 1;
 	    break;
 	case 'L':
 	    if (!l) break;
 	    self->label_x = x;
-	    XMapWindow(ob_display, self->label);
-	    XMoveWindow(ob_display, self->label, x, theme_bevel);
-	    x += self->label_width + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_label, x, ob_theme->bevel,
+                             self->label_width, RrThemeLabelHeight(ob_theme));
+            RrSurfaceShow(self->s_label);
+	    x += self->label_width + ob_theme->bevel + 1;
 	    break;
 	case 'M':
 	    if (!m) break;
 	    self->max_x = x;
-	    XMapWindow(ob_display, self->max);
-	    XMoveWindow(ob_display, self->max, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_max, x, ob_theme->bevel + 1,
+                             RrThemeButtonSize(ob_theme),
+                             RrThemeButtonSize(ob_theme));
+            RrSurfaceShow(self->s_max);
+	    x += RrThemeButtonSize(ob_theme) + ob_theme->bevel + 1;
 	    break;
 	case 'C':
 	    if (!c) break;
 	    self->close_x = x;
-	    XMapWindow(ob_display, self->close);
-	    XMoveWindow(ob_display, self->close, x, theme_bevel + 1);
-	    x += theme_button_size + theme_bevel + 1;
+            RrSurfaceSetArea(self->s_close, x, ob_theme->bevel + 1,
+                             RrThemeButtonSize(ob_theme),
+                             RrThemeButtonSize(ob_theme));
+            RrSurfaceShow(self->s_close);
+	    x += RrThemeButtonSize(ob_theme) + ob_theme->bevel + 1;
 	    break;
 	}
     }
-
-    RECT_SET(self->a_focused_label->area, 0, 0,
-             self->label_width, theme_label_height);
-    RECT_SET(self->a_unfocused_label->area, 0, 0,
-             self->label_width, theme_label_height);
 }
 
 Context frame_context_from_string(char *name)
@@ -662,19 +569,19 @@ Context frame_context(Client *client, Window win)
     if (win == client->window) return Context_Client;
 
     self = client->frame;
-    if (win == self->window) return Context_Frame;
-    if (win == self->plate)  return Context_Client;
-    if (win == self->title)  return Context_Titlebar;
-    if (win == self->label)  return Context_Titlebar;
-    if (win == self->handle) return Context_Handle;
-    if (win == self->lgrip)  return Context_BLCorner;
-    if (win == self->rgrip)  return Context_BRCorner;
-    if (win == self->max)    return Context_Maximize;
-    if (win == self->iconify)return Context_Iconify;
-    if (win == self->close)  return Context_Close;
-    if (win == self->icon)   return Context_Icon;
-    if (win == self->desk)   return Context_AllDesktops;
-    if (win == self->shade)  return Context_Shade;
+    if (win == self->window)   return Context_Frame;
+    if (win == self->plate)    return Context_Client;
+    if (win == self->w_title)  return Context_Titlebar;
+    if (win == self->w_label)  return Context_Titlebar;
+    if (win == self->w_handle) return Context_Handle;
+    if (win == self->w_lgrip)  return Context_BLCorner;
+    if (win == self->w_rgrip)  return Context_BRCorner;
+    if (win == self->w_max)    return Context_Maximize;
+    if (win == self->w_iconify)return Context_Iconify;
+    if (win == self->w_close)  return Context_Close;
+    if (win == self->w_icon)   return Context_Icon;
+    if (win == self->w_desk)   return Context_AllDesktops;
+    if (win == self->w_shade)  return Context_Shade;
 
     return Context_None;
 }

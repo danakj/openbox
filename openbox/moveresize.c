@@ -7,8 +7,8 @@
 #include "openbox.h"
 #include "popup.h"
 #include "config.h"
-#include "render/render.h"
-#include "render/theme.h"
+#include "render2/render.h"
+#include "render2/theme.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -53,14 +53,16 @@ void moveresize_startup()
 
     attrib.save_under = True;
     opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
-                                      render_depth, InputOutput, render_visual,
+                                      RrInstanceDepth(ob_render_inst),
+                                      InputOutput,
+                                      RrInstanceVisual(ob_render_inst),
                                       CWSaveUnder, &attrib);
     stacking_add(INTERNAL_AS_WINDOW(&opaque_window));
     stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));
 
     /* a GC to invert stuff */
     gcv.function = GXxor;
-    gcv.line_width = theme_bwidth;
+    gcv.line_width = ob_theme->bwidth;
     gcv.foreground = (WhitePixel(ob_display, ob_screen) ^
                       BlackPixel(ob_display, ob_screen));
     opaque_gc = XCreateGC(ob_display, opaque_window.win,

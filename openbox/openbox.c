@@ -19,9 +19,8 @@
 #include "config.h"
 #include "gettext.h"
 #include "parser/parse.h"
-#include "render/render.h"
-#include "render/font.h"
-#include "render/theme.h"
+#include "render2/render.h"
+#include "render2/theme.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -45,6 +44,9 @@
 
 #include <X11/cursorfont.h>
 
+struct RrInstance *ob_render_inst;
+struct RrTheme    *ob_theme;
+
 Display *ob_display  = NULL;
 int      ob_screen;
 Window   ob_root;
@@ -65,7 +67,6 @@ int main(int argc, char **argv)
     struct sigaction action;
     sigset_t sigset;
     char *path;
-    char *theme;
     xmlDocPtr doc;
     xmlNodePtr node;
 
@@ -141,6 +142,12 @@ int main(int argc, char **argv)
     /* set our error handler */
     XSetErrorHandler(xerror_handler);
 
+    ob_render_inst = RrInstanceNew(ob_display, ob_screen);
+    if (!ob_render_inst) {
+        g_critical("Unable to initialize GL rendering subsystem.");
+        exit(1);
+    }
+
     /* set the DISPLAY environment variable for any lauched children, to the
        display we're using, so they open in the right place. */
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
@@ -170,9 +177,6 @@ int main(int argc, char **argv)
         /* anything that is going to read data from the rc file needs to be 
            in this group */
 	timer_startup();
-	render_startup();
-	font_startup();
-        theme_startup();
 	event_startup();
         grab_startup();
         plugin_startup();
@@ -188,9 +192,11 @@ int main(int argc, char **argv)
         parse_shutdown();
 
         /* load the theme specified in the rc file */
-        theme = theme_load(config_theme);
-        g_free(theme);
-        if (!theme) return 1;
+        ob_theme = RrThemeLoad(ob_render_inst, config_theme);
+        if (!ob_theme) {
+            g_critical("Unable to load a theme.");
+            exit(1);
+        }
 
         window_startup();
         menu_startup();
@@ -228,11 +234,11 @@ int main(int argc, char **argv)
         window_shutdown();
         grab_shutdown();
 	event_shutdown();
-        theme_shutdown();
-	render_shutdown();
 	timer_shutdown();
         config_shutdown();
     }
+
+    RrInstanceFree(ob_render_inst);
 
     dispatch_shutdown();
 

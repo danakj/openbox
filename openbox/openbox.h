@@ -12,6 +12,11 @@
 /*! The X display */
 extern Display *ob_display; 
 
+struct RrInstance;
+extern struct RrInstance *ob_render_inst;
+struct RrTheme;
+extern struct RrTheme *ob_theme;
+
 #ifdef USE_LIBSN
 SnDisplay *ob_sn_display;
 #endif

@@ -3,7 +3,7 @@
 
 #include "geom.h"
 #include "stacking.h"
-#include "render/color.h"
+#include "render2/render.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -18,7 +18,7 @@ struct Group;
 /*! Holds an icon in ARGB format */
 typedef struct Icon {
     int width, height;
-    pixel32 *data;
+    RrData32 *data;
 } Icon;
      
 /*! The MWM Hints as retrieved from the window property

@@ -11,7 +11,8 @@
 #include "focus.h"
 #include "dispatch.h"
 #include "extensions.h"
-#include "../render/render.h"
+#include "render2/render.h"
+
 
 #ifdef USE_LIBSN
 #  define SN_API_NOT_YET_FROZEN
@@ -482,9 +483,9 @@ void screen_install_colormap(Client *client, gboolean install)
 
     if (client == NULL) {
 	if (install)
-	    XInstallColormap(ob_display, render_colormap);
+	    XInstallColormap(ob_display, RrInstanceColormap(ob_render_inst));
 	else
-	    XUninstallColormap(ob_display, render_colormap);
+	    XUninstallColormap(ob_display, RrInstanceColormap(ob_render_inst));
     } else {
 	if (XGetWindowAttributes(ob_display, client->window, &wa) &&
             wa.colormap != None) {

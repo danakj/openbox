@@ -3,7 +3,7 @@
 
 #include "geom.h"
 #include "client.h"
-#include "render/render.h"
+#include "render2/render.h"
 
 typedef enum {
     Context_None,
@@ -25,7 +25,7 @@ typedef enum {
     NUM_CONTEXTS
 } Context;
 
-#define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
+#define FRAME_HANDLE_Y(f) (f->size.top + f->client->area.height + \
 		           f->cbwidth)
 
 typedef struct Frame {
@@ -38,27 +38,30 @@ typedef struct Frame {
     Rect   area;
     gboolean visible;
 
-    Window title;
-    Window label;
-    Window max;
-    Window close;
-    Window desk;
-    Window shade;
-    Window icon;
-    Window iconify;
-    Window handle;
-    Window lgrip;
-    Window rgrip;
+    struct RrSurface *s_frame;
+    struct RrSurface *s_title;
+    struct RrSurface *s_label;
+    struct RrSurface *s_max;
+    struct RrSurface *s_close;
+    struct RrSurface *s_desk;
+    struct RrSurface *s_shade;
+    struct RrSurface *s_iconify;
+    struct RrSurface *s_icon;
+    struct RrSurface *s_handle;
+    struct RrSurface *s_lgrip;
+    struct RrSurface *s_rgrip;
 
-    Appearance *a_unfocused_title;
-    Appearance *a_focused_title;
-    Appearance *a_unfocused_label;
-    Appearance *a_focused_label;
-    Appearance *a_icon;
-    Appearance *a_unfocused_handle;
-    Appearance *a_focused_handle;
-
-    Strut  innersize;
+    Window w_title;
+    Window w_label;
+    Window w_max;
+    Window w_close;
+    Window w_desk;
+    Window w_shade;
+    Window w_iconify;
+    Window w_icon;
+    Window w_handle;
+    Window w_lgrip;
+    Window w_rgrip;
 
     GSList *clients;
 

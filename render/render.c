@@ -141,6 +141,7 @@ Appearance *appearance_new(SurfaceType type, int numtex)
   out->textures = numtex;
   out->xftdraw = NULL;
   if (numtex) out->texture = g_new(Texture, numtex);
+  else out->texture = NULL;
   out->pixmap = None;
 
   switch (type) {
@@ -191,10 +192,8 @@ Appearance *appearance_copy(Appearance *orig)
     break;
     }
     copy->textures = orig->textures;
-    if (orig->textures) {
-        copy->texture = malloc(orig->textures * sizeof(Texture));
-        memcpy(copy->texture, orig->texture, orig->textures * sizeof(Texture));
-    } else copy->texture = NULL;
+    copy->texture = g_memdup(orig->texture,
+                             orig->textures * sizeof(Texture));
     copy->pixmap = None;
     copy->xftdraw = NULL;
     return copy;

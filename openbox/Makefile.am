@@ -38,6 +38,8 @@ noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \
 lex.yy.c: parse.l
 	$(FLEX) $^
 
+parse.h: y.tab.h
+
 y.tab.h: y.tab.c
 
 y.tab.c: parse.yacc

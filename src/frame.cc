@@ -116,6 +116,7 @@ void OBFrame::unfocus()
 
 void OBFrame::adjust()
 {
+  // the party all happens in adjustSize
 }
 
 
@@ -128,6 +129,7 @@ void OBFrame::adjustSize()
   int width;   // the width of the client and its border
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
+  const int bevel = _style->getBevelWidth();
   
   if (_decorations & OBClient::Decor_Border) {
     bwidth = _style->getBorderWidth();
@@ -151,33 +153,31 @@ void OBFrame::adjustSize()
     _titlebar.setGeometry(-bwidth,
                           -bwidth,
                           width,
-                          (_style->getFont()->height() +
-                           _style->getBevelWidth() * 2));
+                          _style->getFont()->height() + bevel * 2);
     _innersize.top += _titlebar.height() + bwidth;
 
     // set the label size
-    _label.setGeometry(0, _style->getBevelWidth(),
-                       width, _style->getFont()->height());
+    _label.setGeometry(0, bevel, width, _style->getFont()->height());
     // set the buttons sizes
     if (_decorations & OBClient::Decor_Iconify)
-      _button_iconify.setGeometry(0, _style->getBevelWidth() + 1,
+      _button_iconify.setGeometry(0, bevel + 1,
                                   _label.height() - 2,
                                   _label.height() - 2);
     if (_decorations & OBClient::Decor_Maximize)
-      _button_max.setGeometry(0, _style->getBevelWidth() + 1,
+      _button_max.setGeometry(0, bevel + 1,
                               _label.height() - 2,
                               _label.height() - 2);
     if (_decorations & OBClient::Decor_Sticky)
-      _button_stick.setGeometry(0, _style->getBevelWidth() + 1,
+      _button_stick.setGeometry(0, bevel + 1,
                                 _label.height() - 2,
                                 _label.height() - 2);
     if (_decorations & OBClient::Decor_Close)
-      _button_close.setGeometry(0, _style->getBevelWidth() + 1,
+      _button_close.setGeometry(0, bevel + 1,
                                 _label.height() - 2,
                                 _label.height() - 2);
 
     // separation between titlebar elements
-    const int sep = _style->getBevelWidth() + 1;
+    const int sep = bevel + 1;
 
     std::string layout = "SLIMC"; // XXX: get this from somewhere
     // XXX: it is REQUIRED that by this point, the string only has one of each
@@ -284,8 +284,6 @@ void OBFrame::adjustSize()
   else
     _handle.hide(true);
   
-  // XXX: more is gunna have to happen here
-
   _size.left   = _innersize.left + bwidth;
   _size.right  = _innersize.right + bwidth;
   _size.top    = _innersize.top + bwidth;

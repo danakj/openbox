@@ -93,8 +93,9 @@ public:
   //! Set the style to decorate the frame with
   virtual void setStyle(otk::Style *style);
 
-  //! Realign children
+  //! Empty overridden method to prevent automatic alignment of children
   virtual void adjust();
+  
   //! Displays focused decorations
   virtual void focus();
   //! Displays unfocused decorations

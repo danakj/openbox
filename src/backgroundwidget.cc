@@ -81,7 +81,7 @@ void OBBackgroundWidget::unfocus()
 
 void OBBackgroundWidget::adjust()
 {
-  // XXX: adjust shit
+  // nothing to adjust here. its done in OBFrame::adjustSize
 }
 
 }

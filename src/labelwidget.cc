@@ -113,7 +113,7 @@ void OBLabelWidget::update()
 
 void OBLabelWidget::adjust()
 {
-  // XXX: adjust shit
+  // nothing to adjust. no children.
 }
 
 }

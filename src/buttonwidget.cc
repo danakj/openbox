@@ -132,7 +132,7 @@ void OBButtonWidget::update()
 
 void OBButtonWidget::adjust()
 {
-  // XXX: adjust shit
+  // nothing to adjust. no children.
 }
 
 

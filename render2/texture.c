@@ -1,5 +1,7 @@
 #include "texture.h"
 #include "surface.h"
+#include <stdlib.h>
+#include <string.h>
 
 void texture_free(struct RrTexture *tex)
 {
@@ -9,7 +11,7 @@ void texture_free(struct RrTexture *tex)
     case RR_TEXTURE_TEXT:
         free(tex->data.text.string);
         break;
-    case RR_TEXTUER_RGBA:
+    case RR_TEXTURE_RGBA:
         break;
     }
     tex->type = RR_TEXTURE_NONE;

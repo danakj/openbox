@@ -18,6 +18,10 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
         memset(sur->texture, 0, sizeof(struct RrTexture) * numtex);
     } else
         sur->texture = NULL;
+    sur->x = 0;
+    sur->y = 0;
+    sur->w = 1;
+    sur->h = 1;
     return sur;
 }
 
@@ -70,8 +74,6 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
     sur->inst = parent->inst;
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
-    sur->parentx = 0;
-    sur->parenty = 0;
     return sur;
 }
 
@@ -135,6 +137,18 @@ void RrSurfaceFree(struct RrSurface *sur)
             XDestroyWindow(RrDisplay(sur->inst), sur->win);
         free(sur);
     }
+}
+
+void RrSurfaceSetArea(struct RrSurface *sur,
+                      int x,
+                      int y,
+                      int w,
+                      int h)
+{
+    sur->x = x;
+    sur->y = y;
+    sur->w = w;
+    sur->h = h;
 }
 
 Window RrSurfaceWindow(struct RrSurface *sur)

@@ -11,3 +11,5 @@ debug.lo
 color.lo
 font.lo
 surface.lo
+paint.lo
+texture.lo

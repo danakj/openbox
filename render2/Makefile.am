@@ -22,7 +22,8 @@ libobrender2_la_SOURCES=\
 	debug.c \
 	font.c \
 	surface.c \
-	texture.h
+	texture.c \
+	paint.c
 
 noinst_HEADERS=\
 	render.h \

@@ -21,6 +21,10 @@ void RrInstanceFree(struct RrInstance *inst);
 
 #define RrDisplay(i)  ((i)->display)
 #define RrScreen(i)   ((i)->screen)
+#define RrScreenWidth(i) (WidthOfScreen(ScreenOfDisplay((i)->display, \
+                                                        (i)->screen)))
+#define RrScreenHeight(i) (HeightOfScreen(ScreenOfDisplay((i)->display, \
+                                                          (i)->screen)))
 #define RrDepth(i)    ((i)->visinfo.depth)
 #define RrVisual(i)   ((i)->visinfo.visual)
 #define RrColormap(i) ((i)->cmap)

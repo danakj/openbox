@@ -38,10 +38,27 @@ struct RrSurface {
     struct RrTexture *texture;
 
     struct RrSurface *parent;
-    int parentx;
-    int parenty;
+
+    int x;
+    int y;
+    int w;
+    int h;
 };
 
 struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
+
+#define RrSurfaceInstance(sur) ((sur)->inst)
+#define RrSurfaceType(sur) ((sur)->type)
+
+#define RrSurfaceParent(sur) ((sur)->parent)
+
+#define RrSurfaceX(sur) ((sur)->x)
+#define RrSurfaceY(sur) ((sur)->y)
+#define RrSurfaceWidth(sur) ((sur)->w)
+#define RrSurfaceHeight(sur) ((sur)->h)
+
+#define RrPlanarColorType(sur) ((sur)->data.planar.colortype)
+#define RrPlanarPrimaryColor(sur) ((sur)->data.planar.primary)
+#define RrPlanarSecondaryColor(sur) ((sur)->data.planar.primary)
 
 #endif

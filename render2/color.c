@@ -13,10 +13,12 @@ int RrColorParse(struct RrInstance *inst, const char *colorname,
         ret->r = 0.0;
         ret->g = 0.0;
         ret->b = 0.0;
+        ret->a = 0.0;
         return 0;
     }
     ret->r = (xcol.red >> 8) / 255.0;
     ret->g = (xcol.green >> 8) / 255.0;
     ret->b = (xcol.blue >> 8) / 255.0;
+    ret->a = 0.0;
     return 1;
 }

@@ -40,13 +40,15 @@ struct RrColor {
 };
 
 /*! Returns the red component for an RrColor */
-#define RrColorRed(c) (c)->r
+#define RrColorRed(c) (c).r
 /*! Returns the green component for an RrColor */
-#define RrColorGreen(c) (c)->g
+#define RrColorGreen(c) (c).g
 /*! Returns the blue component for an RrColor */
-#define RrColorBlue(c) (c)->b
+#define RrColorBlue(c) (c).b
 /*! Returns the alpha component for an RrColor */
-#define RrColorAlpha(c) (c)->a
+#define RrColorAlpha(c) (c).a
+/*! Returns if an RrColor is non-opaque */
+#define RrColorHasAlpha(c) ((c).a > 0.0000001)
 
 /*! Sets the values of all components for an RrColor */
 #define RrColorSet(c, w, x, y, z) (c)->r = (w), (c)->g = (x), \
@@ -127,6 +129,12 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *sur,
                                      struct RrSurface *parent);
 void RrSurfaceFree(struct RrSurface *sur);
 
+void RrSurfaceSetArea(struct RrSurface *sur,
+                      int x,
+                      int y,
+                      int w,
+                      int h);
+
 Window RrSurfaceWindow(struct RrSurface *sur);
 
 /* textures */
@@ -161,5 +169,16 @@ void RrTextureSetText(struct RrSurface *sur,
                       struct RrFont *font,
                       enum RrLayout layout,
                       const char *text);
+
+/* drawing */
+
+/*! Paints the surface, and all its children */
+void RrSurfacePaint(struct RrSurface *sur);
+/*! Paints the surface, and all its children, but only in the given area. */
+void RrSurfacePaintArea(struct RrSurface *sur,
+                        int x,
+                        int y,
+                        int w,
+                        int h);
 
 #endif

@@ -87,7 +87,6 @@ static void press(ObEvent *e, void *foo)
     if (e->data.x.e->xkey.keycode == reset_key &&
         e->data.x.e->xkey.state == reset_state) {
         reset_chains();
-        XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
     } else {
         KeyBindingTree *p;
         if (curpos == NULL)
@@ -104,7 +103,6 @@ static void press(ObEvent *e, void *foo)
                         grabbed = TRUE;
                     }
                     curpos = p;
-                    XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                 } else {
                     if (p->action->func != NULL) {
                         p->action->data.any.c = focus_client;
@@ -115,7 +113,6 @@ static void press(ObEvent *e, void *foo)
                         p->action->func(&p->action->data);
                     }
 
-                    XAllowEvents(ob_display, AsyncKeyboard, CurrentTime);
                     reset_chains();
                 }
                 break;
@@ -123,6 +120,7 @@ static void press(ObEvent *e, void *foo)
             p = p->next_sibling;
         }
     }
+    XAllowEvents(ob_display, AsyncKeyboard, e->data.x.e->xkey.time);
 }
 
 static void binddef()

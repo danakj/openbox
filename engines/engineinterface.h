@@ -50,4 +50,13 @@ typedef void EngineFrameHide(Frame *self);
 /* get_context */
 typedef GQuark EngineGetContext(Client *client, Window win);
 
+/* frame_mouse_enter */
+typedef void EngineMouseEnter(Frame *self, Window win);
+/* frame_mouse_leave */
+typedef void EngineMouseLeave(Frame *self, Window win);
+/* frame_mouse_press */
+typedef void EngineMousePress(Frame *self, Window win, int x, int y);
+/* frame_mouse_release */
+typedef void EngineMouseRelease(Frame *self, Window win, int x, int y);
+
 #endif

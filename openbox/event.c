@@ -12,6 +12,7 @@
 #include "hooks.h"
 #include "extensions.h"
 #include "timer.h"
+#include "engine.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -286,13 +287,25 @@ void event_process(XEvent *e)
     /* dispatch Crossing, Pointer and Key events to the hooks */
     switch(e->type) {
     case EnterNotify:
+        if (client != NULL) engine_mouse_enter(client->frame, window);
 	HOOKFIRECLIENT(pointerenter, client);
 	break;
     case LeaveNotify:
+        if (client != NULL) engine_mouse_leave(client->frame, window);
 	HOOKFIRECLIENT(pointerleave, client);
 	break;
     case ButtonPress:
+        if (client != NULL) 
+            engine_mouse_press(client->frame, window,
+                               e->xbutton.x, e->xbutton.y);
+	pointer_event(e, client);
+        break;
     case ButtonRelease:
+        if (client != NULL)
+            engine_mouse_release(client->frame, window,
+                                 e->xbutton.x, e->xbutton.y);
+	pointer_event(e, client);
+        break;
     case MotionNotify:
 	pointer_event(e, client);
 	break;

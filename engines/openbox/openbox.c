@@ -865,3 +865,51 @@ GQuark get_context(Client *client, Window win)
 
     return g_quark_try_string("none");
 }
+
+void frame_mouse_enter(ObFrame *self, Window win)
+{
+}
+
+void frame_mouse_leave(ObFrame *self, Window win)
+{
+}
+
+void frame_mouse_press(ObFrame *self, Window win, int x, int y)
+{
+    if (win == self->max) {
+        self->max_press = TRUE;
+        render_max(self);
+    }
+    else if (win == self->close) {
+        self->close_press = TRUE;
+        render_close(self);
+    }
+    else if (win == self->iconify) {
+        self->iconify_press = TRUE;
+        render_iconify(self);
+    }
+    else if (win == self->desk) { 
+        self->desk_press = TRUE;
+        render_desk(self);
+    }
+}
+
+void frame_mouse_release(ObFrame *self, Window win, int x, int y)
+{
+    if (win == self->max) {
+        self->max_press = FALSE;
+        render_max(self);
+    }
+    else if (win == self->close) {
+        self->close_press = FALSE; 
+        render_close(self);
+    }
+    else if (win == self->iconify) {
+        self->iconify_press = FALSE;
+        render_iconify(self);
+    }
+    else if (win == self->desk) {
+        self->desk_press = FALSE;
+        render_desk(self);
+    }
+}

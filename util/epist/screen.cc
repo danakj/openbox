@@ -602,25 +602,26 @@ void screen::changeWorkspaceVert(const int num) const {
   assert(_managed);
   const Config *conf = _epist->getConfig();
   int width = conf->getNumberValue(Config::workspaceColumns);
+  int num_desktops = (signed)_num_desktops;
+  int active_desktop = (signed)_active_desktop;
+  int wnum = 0;
 
-  if (width > _num_desktops || width <= 0)
+  if (width > num_desktops || width <= 0)
     return;
 
-  int wnum;
-  
   // a cookie to the person that makes this pretty
   if (num < 0) {
-    wnum = _active_desktop - width;
+    wnum = active_desktop - width;
     if (wnum < 0) {
-      wnum = _num_desktops/width * width + _active_desktop;
-      if (wnum >= _num_desktops)
-        wnum = _num_desktops - 1;
+      wnum = num_desktops/width * width + active_desktop;
+      if (wnum >= num_desktops)
+        wnum = num_desktops - 1;
     }
   }
   else {
-    wnum = _active_desktop + width;
-    if (wnum >= _num_desktops) {
-      wnum = (_active_desktop + width) % _num_desktops - 1;
+    wnum = active_desktop + width;
+    if (wnum >= num_desktops) {
+      wnum = (active_desktop + width) % num_desktops - 1;
       if (wnum < 0)
         wnum = 0;
     }
@@ -632,28 +633,30 @@ void screen::changeWorkspaceHorz(const int num) const {
   assert(_managed);
   const Config *conf = _epist->getConfig();
   int width = conf->getNumberValue(Config::workspaceColumns);
-  int wnum;
+  int num_desktops = (signed)_num_desktops;
+  int active_desktop = (signed)_active_desktop;
+  int wnum = 0;
   
-  if (width > _num_desktops || width <= 0)
+  if (width > num_desktops || width <= 0)
     return;
 
   if (num < 0) {
-    if (_active_desktop % width != 0)
-      changeWorkspace(_active_desktop - 1);
+    if (active_desktop % width != 0)
+      changeWorkspace(active_desktop - 1);
     else {
-      wnum = _active_desktop + width - 1;
-      if (wnum >= _num_desktops)
-        wnum = _num_desktops - 1;
+      wnum = active_desktop + width - 1;
+      if (wnum >= num_desktops)
+        wnum = num_desktops - 1;
     }
   }
   else {
-    if (_active_desktop % width != width - 1) {
-      wnum = _active_desktop + 1;
-      if (wnum >= _num_desktops)
-        wnum = _num_desktops / width * width;
+    if (active_desktop % width != width - 1) {
+      wnum = active_desktop + 1;
+      if (wnum >= num_desktops)
+        wnum = num_desktops / width * width;
     }
     else
-      wnum = _active_desktop - width + 1;
+      wnum = active_desktop - width + 1;
   }
   changeWorkspace(wnum);
 }

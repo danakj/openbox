@@ -34,7 +34,7 @@ static void resist(Client *c, int *x, int *y)
     int al, at, ar, ab; /* screen area edges */
     int cl, ct, cr, cb; /* current edges */
     int w, h; /* current size */
-    gboolean snapx = FALSE, snapy = FALSE;
+    Client *snapx = NULL, *snapy = NULL;
     ConfigValue resist, window_resist;
 
     if (!config_get("resistance", Config_Integer, &resist) ||
@@ -77,14 +77,32 @@ static void resist(Client *c, int *x, int *y)
                window edge available, without going all the way from
                bottom-to-top in the stacking list
             */
-            if (!snapx && cl >= tr && l < tr && l >= tr - resist.integer)
-                *x = tr, snapx = TRUE;
-            else if (!snapx && cr <= tl && r > tl && r <= tl + resist.integer)
-                *x = tl - w + 1, snapx = TRUE;
-            else if (!snapy && ct >= tb && t < tb && t >= tb - resist.integer)
-                *y = tb, snapy = TRUE;
-            else if (!snapy && cb <= tt && b > tt && b <= tt + resist.integer)
-                *y = tt - h + 1, snapy = TRUE;
+            if (snapx == NULL) {
+                if (cl >= tr && l < tr && l >= tr - resist.integer)
+                    *x = tr, snapx = target;
+                else if (cr <= tl && r > tl && r <= tl + resist.integer)
+                    *x = tl - w + 1, snapx = target;
+                if (snapx != NULL) {
+                    /* try to corner snap to the window */
+                    if (ct > tt && t <= tt && t > tt - resist.integer)
+                        *y = tt + 1, snapy = target;
+                    else if (cb < tb && b >= tb && b < tb + resist.integer)
+                        *y = tb - h, snapy = target;
+                }
+            }
+            if (snapy == NULL) {
+                if (ct >= tb && t < tb && t >= tb - resist.integer)
+                    *y = tb, snapy = target;
+                else if (!cb <= tt && b > tt && b <= tt + resist.integer)
+                    *y = tt - h + 1, snapy = target;
+                if (snapy != NULL) {
+                    /* try to corner snap to the window */
+                    if (cl > tl && l <= tl && l > tl - resist.integer)
+                        *x = tl + 1, snapx = target;
+                    else if (cr < tr && r >= tr && r < tr + resist.integer)
+                        *x = tr - w, snapx = target;
+                }
+            }
 
             if (snapx && snapy) break;
         }

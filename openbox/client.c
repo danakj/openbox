@@ -2777,7 +2777,7 @@ void client_raise(ObClient *self)
 
 void client_lower(ObClient *self)
 {
-    action_run_string("Raise", self);
+    action_run_string("Lower", self);
 }
 
 gboolean client_focused(ObClient *self)

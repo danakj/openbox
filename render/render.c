@@ -361,8 +361,10 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
     if (mask) {
         xm = XGetImage(RrDisplay(inst), mask,
                        0, 0, mw, mh, 0xffffffff, ZPixmap);
-        if (!xm)
+        if (!xm) {
+            XDestroyImage(xi);
             return FALSE;
+        }
     }
 
     *data = g_new(RrPixel32, pw * ph);
@@ -382,6 +384,10 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
 
     *w = pw;
     *h = ph;
+
+    XDestroyImage(xi);
+    if (mask)
+        XDestroyImage(xm);
 
     return TRUE;
 }

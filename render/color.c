@@ -54,6 +54,11 @@ RrColor *RrColorParse(const RrInstance *inst, gchar *colorname)
     return RrColorNew(inst, xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
 }
 
+/*#define NO_COLOR_CACHE*/
+#ifdef DEBUG
+gint id;
+#endif
+
 RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 {
     /* this should be replaced with something far cooler */
@@ -62,9 +67,11 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     gint key;
 
     key = (r << 24) + (g << 16) + (b << 8);
+#ifndef NO_COLOR_CACHE
     if ((out = g_hash_table_lookup(RrColorHash(inst), &key))) {
         out->refcount++;
     } else {
+#endif
         xcol.red = (r << 8) | r;
         xcol.green = (g << 8) | g;
         xcol.blue = (b << 8) | b;
@@ -78,8 +85,13 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
             out->pixel = xcol.pixel;
             out->key = key;
             out->refcount = 1;
+#ifdef DEBUG
+            out->id = id++;
+#endif
+#ifndef NO_COLOR_CACHE
             g_hash_table_insert(RrColorHash(inst), &out->key, out);
         }
+#endif
     }
     return out;
 }
@@ -88,8 +100,10 @@ void RrColorFree(RrColor *c)
 {
     if (c) {
         if (--c->refcount < 1) {
+#ifndef NO_COLOR_CACHE
             g_assert(g_hash_table_lookup(RrColorHash(c->inst), &c->key));
             g_hash_table_remove(RrColorHash(c->inst), &c->key);
+#endif
             if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
                                       &c->pixel, 1, 0);
             if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);

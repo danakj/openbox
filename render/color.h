@@ -37,6 +37,10 @@ struct _RrColor {
 
     gint key;
     gint refcount;
+
+#ifdef DEBUG
+    gint id;
+#endif
 };
 
 void RrColorAllocateGC(RrColor *in);

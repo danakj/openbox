@@ -377,17 +377,23 @@ void appearance_free(Appearance *a)
 
 void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
 {
+    unsigned char *scratch;
     XImage *im = NULL;
     im = XCreateImage(ob_display, render_visual, render_depth,
                       ZPixmap, 0, NULL, w, h, 32, 0);
     g_assert(im != NULL);
     im->byte_order = endian;
-    im->data = (char *)in;
-    reduce_depth((pixel32*)im->data, im);
+/* this malloc is a complete waste of time on normal 32bpp
+   as reduce_depth just sets im->data = data and returns
+*/
+    scratch = malloc(im->width * im->height * sizeof(pixel32));
+    im->data = scratch;
+    reduce_depth(in, im);
     XPutImage(ob_display, out, DefaultGC(ob_display, ob_screen),
               im, 0, 0, x, y, w, h);
     im->data = NULL;
     XDestroyImage(im);
+    free(scratch);
 }
 
 void appearance_minsize(Appearance *l, Size *s)

@@ -65,12 +65,11 @@ void color_free(color_rgb *c)
 
 void reduce_depth(pixel32 *data, XImage *im)
 {
-    /* since pixel32 is the largest possible pixel size, we can share the
-       array*/
     int r, g, b;
     int x,y;
-    pixel16 *p16 = (pixel16*) data;
-    unsigned char *p8 = (unsigned char *)data;
+    pixel32 *p32 = (pixel32 *) im->data;
+    pixel16 *p16 = (pixel16 *) im->data;
+    unsigned char *p8 = (unsigned char *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
         if ((render_red_offset != default_red_shift) ||
@@ -81,12 +80,14 @@ void reduce_depth(pixel32 *data, XImage *im)
                     r = (data[x] >> default_red_shift) & 0xFF;
                     g = (data[x] >> default_green_shift) & 0xFF;
                     b = (data[x] >> default_blue_shift) & 0xFF;
-                    data[x] = (r << render_red_offset) + (g << render_green_offset) +
-                        (b << render_blue_offset);
+                    p32[x] = (r << render_red_offset)
+                           + (g << render_green_offset)
+                           + (b << render_blue_offset);
                 }
                 data += im->width;
+                p32 += im->width;
             } 
-        }
+        } else im->data = data;
         break;
     case 16:
         for (y = 0; y < im->height; y++) {

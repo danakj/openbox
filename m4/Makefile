@@ -34,9 +34,9 @@ oldincludedir = /usr/include
 
 DESTDIR =
 
-pkgdatadir = $(datadir)/
-pkglibdir = $(libdir)/
-pkgincludedir = $(includedir)/
+pkgdatadir = $(datadir)/openbox
+pkglibdir = $(libdir)/openbox
+pkgincludedir = $(includedir)/openbox
 
 top_builddir = ..
 
@@ -90,13 +90,13 @@ MAKEINFO = makeinfo
 MKINSTALLDIRS = ./mkinstalldirs
 OBJDUMP = @OBJDUMP@
 OBJEXT = o
-PACKAGE = 
+PACKAGE = openbox
 POSUB = po
 RANLIB = ranlib
 STRIP = strip
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = yes
-VERSION = 
+VERSION = 2.90.0
 regex_cmd = sed
 
 EXTRA_DIST = codeset.m4 gettext.m4 glibc21.m4 iconv.m4 intdiv0.m4 inttypes.m4 inttypes_h.m4 inttypes-pri.m4 isc-posix.m4 lcmessage.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 progtest.m4 stdint_h.m4 uintmax_t.m4 ulonglong.m4

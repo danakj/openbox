@@ -124,8 +124,8 @@ public:
   virtual ~OtkEventHandler();
 
 protected:
-  /*! Constructor for the XEventHandler class.
-    This is protected so that XEventHandlers can't be instantiated on their
+  /*! Constructor for the OtkEventHandler class.
+    This is protected so that OtkEventHandlers can't be instantiated on their
     own.
   */
   OtkEventHandler();

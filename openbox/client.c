@@ -135,10 +135,11 @@ void client_manage_all()
     startup_stack_order = NULL;
     startup_stack_size = 0;
 
-    active = g_hash_table_lookup(client_map, &startup_active);
-    if (!active || !client_focus(active))
-        if (config_focus_new)
+    if (config_focus_new) {
+        active = g_hash_table_lookup(client_map, &startup_active);
+        if (!active || !client_focus(active))
             focus_fallback(Fallback_NoFocus);
+    }
 }
 
 void client_manage(Window window)

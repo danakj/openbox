@@ -162,9 +162,6 @@ void keyboard_interactive_grab(guint state, ObClient *client,
 
     g_assert(action->data.any.interactive);
 
-    if (moveresize_in_progress)
-        moveresize_end(FALSE);
-
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
             return;

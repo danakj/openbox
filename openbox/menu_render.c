@@ -34,7 +34,9 @@ void menu_render_full(Menu *self) {
 
     /* set texture data and size them mofos out */
     if (self->label) {
-        RrTextureSetText(self->s_title, 0, NULL, RR_CENTER,
+        struct RrColor c;
+        RrColorSet(&c, 0, 0, 0, 1.0);
+        RrTextureSetText(self->s_title, 0, NULL, RR_CENTER, &c,
                          self->label);
         RrSurfaceMinSize(self->s_title, &self->title_min_w, &self->title_h);
 	self->title_min_w += theme_bevel * 2;
@@ -46,18 +48,20 @@ void menu_render_full(Menu *self) {
 
     for (it = self->entries; it; it = it->next) {
         MenuEntry *e = it->data;
+        struct RrColor c;
         int h;
 
-        RrTextureSetText(e->s_item, 0, NULL, RR_LEFT, e->label);
+        RrColorSet(&c, 0, 0, 0, 1.0);
+        RrTextureSetText(e->s_item, 0, NULL, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_item, &e->min_w, &self->item_h);
         self->size.width = MAX(self->size.width, e->min_w);
 
-        RrTextureSetText(e->s_disabled, 0, NULL, RR_LEFT, e->label);
+        RrTextureSetText(e->s_disabled, 0, NULL, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_disabled, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 	
-        RrTextureSetText(e->s_hilite, 0, NULL, RR_LEFT, e->label);
+        RrTextureSetText(e->s_hilite, 0, NULL, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_hilite, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);

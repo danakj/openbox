@@ -60,17 +60,17 @@ Popup *popup_new(gboolean hasicon)
     /* XXX COPY THE APPEARANCES FROM THE THEME...... LIKE THIS SORTA!
     self->a_text = appearance_copy(theme_app_hilite_label);
     */
-    RrColorSet(&pri, 1, 0, 0, 0);
-    RrColorSet(&sec, 0, 1, 0, 0);
+    RrColorSet(&pri, 1, 0, 0, 1.0);
+    RrColorSet(&sec, 0, 1, 0, 1.0);
     RrPlanarSet(self->s_bg, RR_PLANAR_VERTICAL, RR_SUNKEN_INNER, &pri, &sec,
                 1, &pri);
-    RrColorSet(&pri, 0, 0.5, 0, 0.7);
-    RrColorSet(&sec, 0.5, 0, 0.5, 0.7);
+    RrColorSet(&pri, 0, 0.5, 0, 0.3);
+    RrColorSet(&sec, 0.5, 0, 0.5, 0.3);
     RrPlanarSet(self->s_text, RR_PLANAR_HORIZONTAL, RR_BEVEL_NONE, &pri, &sec,
                 0, NULL);
     if (self->s_icon) {
-        RrColorSet(&pri, 0, 0, 1, 0.7);
-        RrColorSet(&sec, 0.5, 0.5, 0, 0.7);
+        RrColorSet(&pri, 0, 0, 1, 0.3);
+        RrColorSet(&sec, 0.5, 0.5, 0, 0.3);
         RrPlanarSet(self->s_icon, RR_PLANAR_HORIZONTAL, RR_BEVEL_NONE, &pri,
                     &sec, 0, NULL);
     }
@@ -105,8 +105,10 @@ void popup_size_to_string(Popup *self, char *text)
 {
     int textw, texth;
     int iconw;
+    struct RrColor c;
 
-    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, text);
+    RrColorSet(&c, 0, 0, 0, 1.0);
+    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, &c, text);
     RrSurfaceMinSize(self->s_text, &textw, &texth);
     textw += theme_bevel * 2;
     texth += theme_bevel * 2;
@@ -121,9 +123,11 @@ void popup_show(Popup *self, char *text, Icon *icon)
     int x, y, w, h;
     int textw, texth;
     int iconw;
+    struct RrColor c;
 
     /* set up the textures */
-    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, text);
+    RrColorSet(&c, 0, 0, 0, 1.0);
+    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, &c, text);
 
     /* measure the shit out */
     RrSurfaceMinSize(self->s_text, &textw, &texth);

@@ -53,8 +53,8 @@ Frame *frame_new()
     self->shapewindow = createWindow(ob_root, mask, &attrib);
     self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_NONE,
                                  self->window, 0);
-    RrColorSet(&pri, 1, 0, 0, 0);
-    RrColorSet(&sec, 1, 0, 1, 0);
+    RrColorSet(&pri, 1, 0, 0, 1.0);
+    RrColorSet(&sec, 1, 0, 1, 1.0);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -70,7 +70,7 @@ Frame *frame_new()
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_HORIZONTAL, RR_RAISED_OUTER, &sec, &pri,
                 0, NULL);
-    RrTextureSetText(fd->surface, 0, foont, RR_LEFT,
+    RrTextureSetText(fd->surface, 0, foont, RR_LEFT, &pri,
                      "OPENBOX SUCKS because of me.");
     fd->window = RrSurfaceWindow(fd->surface);
     XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);

@@ -221,12 +221,7 @@ void focus_fallback(ObFocusFallbackType type)
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
-            if (client_normal(it->data) &&
-                /* dont fall back to 'anonymous' fullscreen windows. theres no
-                   checks for this is in transient/group fallbacks, so they can
-                   be fallback targets there. */
-                !((ObClient*)it->data)->fullscreen &&
-                client_can_focus(it->data)) {
+            if (client_normal(it->data) && client_can_focus(it->data)) {
                 gboolean r = client_focus(it->data);
                 assert(r);
                 return;

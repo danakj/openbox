@@ -7,6 +7,7 @@
 #include "prop.h"
 #include "screen.h"
 #include "focus.h"
+#include "moveresize.h"
 #include "frame.h"
 #include "extensions.h"
 #include "parse.h"
@@ -165,6 +166,7 @@ int main(int argc, char **argv)
 	font_startup();
         theme_startup();
 	event_startup();
+        moveresize_startup();
         grab_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
@@ -321,4 +323,13 @@ void parse_args(int argc, char **argv)
             exit(1);
         }
     }
+}
+
+gboolean ob_pointer_pos(int *x, int *y)
+{
+    Window w;
+    int i, x, y;
+    guint u;
+
+    return !!XQueryPointer(ob_display, ob_root, &w, &w, x, y, &i, &i, &u);
 }

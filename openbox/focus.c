@@ -106,12 +106,10 @@ void focus_set_client(Client *client)
 
 static gboolean focus_under_pointer()
 {
-    Window w;
-    int i, x, y;
-    guint u;
+    int x, y;
     GList *it;
 
-    if (XQueryPointer(ob_display, ob_root, &w, &w, &x, &y, &i, &i, &u)) {
+    if (ob_pointer_pos(&x, &y)) {
         for (it = stacking_list; it != NULL; it = it->next) {
             Client *c = it->data;
             if (c->desktop == screen_desktop &&

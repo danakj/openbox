@@ -47,4 +47,7 @@ extern Cursors ob_cursors;
 /*! The path of the rc file. If NULL the default paths are searched for one. */
 extern char *ob_rc_path;
 
+/* cuz i have nowhere better to put it right now... */
+gboolean ob_pointer_pos(int *x, int *y);
+
 #endif

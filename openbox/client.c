@@ -1281,6 +1281,16 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 {
     gboolean moved = FALSE, resized = FALSE;
 
+    /* lock if maximized */
+    if (self->max_horz) {
+        x = self->area.x;
+        w = self->area.width;
+    }
+    if (self->max_vert) {
+        y = self->area.y;
+        h = self->area.height;
+    }
+
     w -= self->base_size.width;
     h -= self->base_size.height;
 

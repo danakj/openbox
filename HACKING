@@ -5,3 +5,11 @@ which is not a valid pointer. You must ALWAYS check for TRAN_GROUP before
 following transient_for. When TRAN_GROUP is found, Client.group will always
 be !NULL. Some smart action should be taken using all members of the group in
 this case.
+
+When using coordinates/sizes of windows, make sure you use the right area. The
+Client.area rect is the reference point and size of the *CLIENT* window. This
+value is not what you see in any shape or form, and gravity is applied to it to
+translate it into what you see. The Client.frame.area is the actual position
+and size of the entire frame. This is usually the value you want to use, unless
+you are in client.c (probably) and adjusting/using the position or size from
+the client's perspective.

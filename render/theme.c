@@ -404,7 +404,7 @@ static void parse_appearance(char *tex, SurfaceColorType *grad,
 	    else if (strstr(tex, "pipecross") != NULL)
 		*grad = Background_PipeCross;
 	    else if (strstr(tex, "elliptic") != NULL)
-		*grad = Background_Elliptic;
+		*grad = Background_Rectangle;
 	    else if (strstr(tex, "horizontal") != NULL)
 		*grad = Background_Horizontal;
 	    else if (strstr(tex, "vertical") != NULL)

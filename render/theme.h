@@ -29,9 +29,13 @@ struct _RrTheme {
     RrColor *title_focused_color;
     RrColor *title_unfocused_color;
     RrColor *titlebut_disabled_focused_color;
-    RrColor *titlebut_disabled_unfocused_color;
-    RrColor *titlebut_focused_color;
-    RrColor *titlebut_unfocused_color;
+    RrColor *titlebut_disabled_unfocused_color; 
+    RrColor *titlebut_hover_focused_color;
+    RrColor *titlebut_hover_unfocused_color;
+    RrColor *titlebut_focused_pressed_color;
+    RrColor *titlebut_unfocused_pressed_color;
+    RrColor *titlebut_focused_unpressed_color;
+    RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
     RrColor *menu_color;
     RrColor *menu_disabled_color;
@@ -61,6 +65,8 @@ struct _RrTheme {
     /* global appearances */
     RrAppearance *a_disabled_focused_max;
     RrAppearance *a_disabled_unfocused_max;
+    RrAppearance *a_hover_focused_max;
+    RrAppearance *a_hover_unfocused_max;
     RrAppearance *a_focused_unpressed_max;
     RrAppearance *a_focused_pressed_max;
     RrAppearance *a_focused_pressed_set_max;
@@ -69,12 +75,16 @@ struct _RrTheme {
     RrAppearance *a_unfocused_pressed_set_max;
     RrAppearance *a_disabled_focused_close;
     RrAppearance *a_disabled_unfocused_close;
+    RrAppearance *a_hover_focused_close;
+    RrAppearance *a_hover_unfocused_close;
     RrAppearance *a_focused_unpressed_close;
     RrAppearance *a_focused_pressed_close;
     RrAppearance *a_unfocused_unpressed_close;
     RrAppearance *a_unfocused_pressed_close;
     RrAppearance *a_disabled_focused_desk;
     RrAppearance *a_disabled_unfocused_desk;
+    RrAppearance *a_hover_focused_desk;
+    RrAppearance *a_hover_unfocused_desk;
     RrAppearance *a_focused_unpressed_desk;
     RrAppearance *a_focused_pressed_desk;
     RrAppearance *a_focused_pressed_set_desk;
@@ -83,6 +93,8 @@ struct _RrTheme {
     RrAppearance *a_unfocused_pressed_set_desk;
     RrAppearance *a_disabled_focused_shade;
     RrAppearance *a_disabled_unfocused_shade;
+    RrAppearance *a_hover_focused_shade;
+    RrAppearance *a_hover_unfocused_shade;
     RrAppearance *a_focused_unpressed_shade;
     RrAppearance *a_focused_pressed_shade;
     RrAppearance *a_focused_pressed_set_shade;
@@ -91,6 +103,8 @@ struct _RrTheme {
     RrAppearance *a_unfocused_pressed_set_shade;
     RrAppearance *a_disabled_focused_iconify;
     RrAppearance *a_disabled_unfocused_iconify;
+    RrAppearance *a_hover_focused_iconify;
+    RrAppearance *a_hover_unfocused_iconify;
     RrAppearance *a_focused_unpressed_iconify;
     RrAppearance *a_focused_pressed_iconify;
     RrAppearance *a_unfocused_unpressed_iconify;

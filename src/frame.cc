@@ -405,8 +405,7 @@ void Frame::adjustState()
 void Frame::grabClient()
 {
   // reparent the client to the frame
-  XReparentWindow(**otk::display, _client->window(),
-                  _plate.window(), 0, 0);
+  XReparentWindow(**otk::display, _client->window(), _plate.window(), 0, 0);
   /*
     When reparenting the client window, it is usually not mapped yet, since
     this occurs from a MapRequest. However, in the case where Openbox is
@@ -418,9 +417,8 @@ void Frame::grabClient()
   if (openbox->state() == Openbox::State_Starting)
     _client->ignore_unmaps += 2;
 
-  // select the event mask on the client's parent (to receive config req's)
-  XSelectInput(**otk::display, _plate.window(),
-               SubstructureRedirectMask);
+  // select the event mask on the client's parent (to receive config/map req's)
+  XSelectInput(**otk::display, _plate.window(), SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
   XMapWindow(**otk::display, _client->window());

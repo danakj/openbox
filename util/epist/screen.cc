@@ -151,22 +151,27 @@ void screen::handleKeypress(const XEvent &e) {
       switch (it->type()) {
       case Action::nextWorkspace:
         cycleWorkspace(true);
-        break;
+        return;
 
       case Action::prevWorkspace:
         cycleWorkspace(false);
-        break;
+        return;
 
       case Action::changeWorkspace:
         changeWorkspace(it->number());
-        break;
-
-      case Action::shade:
-        (*_active)->shade(! (*_active)->shaded());
-        break;
+        return;
       }
 
-      break;
+      // these actions require an active window
+      if (_active != _clients.end()) {
+        XWindow *window = *_active;
+
+        switch (it->type()) {
+        case Action::shade:
+          window->shade(! window->shaded());
+          return;
+        }
+      }
     }
   }
 }

@@ -1033,38 +1033,40 @@ void client_update_wmhints(Client *self)
 	if (hints->flags & XUrgencyHint)
 	    ur = TRUE;
 
-	if (!(hints->flags & WindowGroupHint))
-            hints->window_group = None; /* no group */
-        /* did the group state change? */
-        if (hints->window_group != (self->group ? self->group->leader : None)){
-            /* remove from the old group if there was one */
-            if (self->group != NULL) {
-                /* remove transients of the group */
-                for (it = self->group->members; it; it = it->next)
-                    if (it->data != self &&
-                        ((Client*)it->data)->transient_for == TRAN_GROUP) {
-                        self->transients = g_slist_remove(self->transients,
-                                                          it->data);
-                    }
-                group_remove(self->group, self);
-                self->group = NULL;
-            }
-            if (hints->window_group != None) {
-                self->group = group_add(hints->window_group, self);
+	if (hints->flags & WindowGroupHint) {
+            /* did the group state change? */
+            if (hints->window_group !=
+                (self->group ? self->group->leader : None)) {
+                /* remove from the old group if there was one */
+                if (self->group != NULL) {
+                    /* remove transients of the group */
+                    for (it = self->group->members; it; it = it->next)
+                        if (it->data != self &&
+                            ((Client*)it->data)->transient_for == TRAN_GROUP) {
+                            self->transients = g_slist_remove(self->transients,
+                                                              it->data);
+                        }
+                    group_remove(self->group, self);
+                    self->group = NULL;
+                }
+                if (hints->window_group != None) {
+                    self->group = group_add(hints->window_group, self);
 
-                /* add other transients of the group that are already set up */
-                for (it = self->group->members; it; it = it->next)
-                    if (it->data != self &&
-                        ((Client*)it->data)->transient_for == TRAN_GROUP)
-                        self->transients = g_slist_append(self->transients,
-                                                          it->data);
-            }
+                    /* add other transients of the group that are already
+                       set up */
+                    for (it = self->group->members; it; it = it->next)
+                        if (it->data != self &&
+                            ((Client*)it->data)->transient_for == TRAN_GROUP)
+                            self->transients = g_slist_append(self->transients,
+                                                              it->data);
+                }
 
-            /* because the self->transient flag wont change from this call,
-               we don't need to update the window's type and such, only its
-               transient_for, and the transients lists of other windows in the
-               group may be affected */
-            client_update_transient_for(self);
+                /* because the self->transient flag wont change from this call,
+                   we don't need to update the window's type and such, only its
+                   transient_for, and the transients lists of other windows in
+                   the group may be affected */
+                client_update_transient_for(self);
+            }
         }
 
 	if (hints->flags & IconPixmapHint) {

@@ -37,9 +37,6 @@ typedef enum {
     Decor_BottomRight
 } Anchor;
 
-#define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
-		           f->cbwidth)
-
 struct Frame;
 
 typedef enum {
@@ -72,6 +69,7 @@ typedef struct Frame {
     Rect   area;
     gboolean visible;
 
+    struct RrSurface *surface;
     int framedecors;
     struct FrameDecor *framedecor;
 

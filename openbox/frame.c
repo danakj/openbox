@@ -34,9 +34,11 @@ static Window createWindow(Window parent, unsigned long mask,
 
 Frame *frame_new()
 {
+    struct RrColor pri,sec;
     XSetWindowAttributes attrib;
     unsigned long mask;
     Frame *self;
+    FrameDecor *fd;
 
     self = g_new(Frame, 1);
 
@@ -48,6 +50,11 @@ Frame *frame_new()
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
 
+    self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR, self->window, 0);
+    RrColorSet(&pri, 1, 0, 0, 0);
+    RrColorSet(&sec, 1, 0, 1, 0);
+    RrPlanarSet(self->surface, RR_PLANAR_VERTICAL, &pri, &sec);
+
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
     XMapWindow(ob_display, self->plate);
@@ -55,29 +62,46 @@ Frame *frame_new()
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
 
-    self->framedecors = 2;
+    self->framedecors = 3;
     self->framedecor = g_new(FrameDecor, self->framedecors);
-    self->framedecor[0].obwin.type = Window_Decoration;
-    self->framedecor[0].window = createWindow(self->window, mask, &attrib);
-    self->framedecor[0].anchor = Decor_Top;
-    RECT_SET(self->framedecor[0].area, 0, 0, 150, 5);
-    self->framedecor[0].type = Decor_Titlebar;
-    self->framedecor[0].context = Context_Titlebar;
-    self->framedecor[0].sizetypex = Decor_Absolute;
-    self->framedecor[0].sizetypey = Decor_Relative;
-    self->framedecor[0].frame = self;
-    XMapWindow(ob_display, self->framedecor[0].window);
+    fd = &self->framedecor[0];
+    fd->obwin.type = Window_Decoration;
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
+    fd->window = RrSurfaceWindow(fd->surface);
+    fd->anchor = Decor_Top;
+    RECT_SET(fd->area, 0, 0, 120, 20);
+    fd->type = Decor_Titlebar;
+    fd->context = Context_Titlebar;
+    fd->sizetypex = Decor_Relative;
+    fd->sizetypey = Decor_Absolute;
+    fd->frame = self;
 
-    self->framedecor[1].obwin.type = Window_Decoration;
-    self->framedecor[1].window = createWindow(self->window, mask, &attrib);
-    self->framedecor[1].anchor = Decor_Right;
-    RECT_SET(self->framedecor[1].area, 0, 0, 10, 100);
-    self->framedecor[1].type = Decor_Titlebar;
-    self->framedecor[1].context = Context_Titlebar;
-    self->framedecor[1].sizetypex = Decor_Absolute;
-    self->framedecor[1].sizetypey = Decor_Relative;
-    self->framedecor[1].frame = self;
-    XMapWindow(ob_display, self->framedecor[1].window);
+    fd = &self->framedecor[1];
+    fd->obwin.type = Window_Decoration;
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
+    fd->window = RrSurfaceWindow(fd->surface);
+    fd->anchor = Decor_Right;
+    RECT_SET(fd->area, 0, 0, 5, 100);
+    fd->type = Decor_Titlebar;
+    fd->context = Context_Titlebar;
+    fd->sizetypex = Decor_Absolute;
+    fd->sizetypey = Decor_Relative;
+    fd->frame = self;
+
+    fd = &self->framedecor[2];
+    fd->obwin.type = Window_Decoration;
+    fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
+    RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
+    fd->window = RrSurfaceWindow(fd->surface);
+    fd->anchor = Decor_BottomLeft;
+    RECT_SET(fd->area, 0, 0, 30, 30);
+    fd->type = Decor_Titlebar;
+    fd->context = Context_Titlebar;
+    fd->sizetypex = Decor_Absolute;
+    fd->sizetypey = Decor_Absolute;
+    fd->frame = self;
 
     self->focused = FALSE;
 
@@ -555,7 +579,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
             cr = &self->client->area;
             decor_calculate_size(dec, &area);
             if (!(dec->type & self->client->decorations))
-                XUnmapWindow(ob_display, dec->window);
+                RrSurfaceHide(dec->surface);
             else
                 switch (dec->anchor) {
                     case Decor_TopLeft:
@@ -563,7 +587,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     y = self->size.top - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -574,7 +598,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     y = self->size.top - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -585,7 +609,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     y = self->size.top - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -597,7 +621,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.height/2;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -608,7 +632,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.height/2;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -619,7 +643,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -631,7 +655,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                       - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width,
                                       area.height);
                     break;
@@ -641,14 +665,14 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     y = self->size.top + cr->height - area.y - area.height;
                     dec->xoff = x;
                     dec->yoff = y;
-                    XMoveResizeWindow(ob_display, dec->window, x, y,
+                    RrSurfaceSetArea(dec->surface, x, y,
                                       area.width, area.height);
                     break;
                 }
         }
     /* move and resize the top level frame.
        shading can change without being moved or resized */
-    XMoveResizeWindow(ob_display, self->window,
+    RrSurfaceSetArea(self->surface,
                       self->area.x, self->area.y,
                       self->width,
                       self->area.height - self->bwidth * 2);

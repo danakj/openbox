@@ -882,8 +882,14 @@ void OBClient::unfocus()
 }
 
 
-void OBClient::focusHandler(const XFocusChangeEvent &)
+void OBClient::focusHandler(const XFocusChangeEvent &e)
 {
+#ifdef    DEBUG
+  printf("FocusIn for 0x%lx\n", e.window);
+#endif // DEBUG
+  
+  OtkEventHandler::focusHandler(e);
+
   frame->focus();
   _focused = true;
 
@@ -891,8 +897,14 @@ void OBClient::focusHandler(const XFocusChangeEvent &)
 }
 
 
-void OBClient::unfocusHandler(const XFocusChangeEvent &)
+void OBClient::unfocusHandler(const XFocusChangeEvent &e)
 {
+#ifdef    DEBUG
+  printf("FocusOut for 0x%lx\n", e.window);
+#endif // DEBUG
+  
+  OtkEventHandler::unfocusHandler(e);
+
   frame->unfocus();
   _focused = false;
 }
@@ -900,6 +912,10 @@ void OBClient::unfocusHandler(const XFocusChangeEvent &)
 
 void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 {
+#ifdef    DEBUG
+  printf("ConfigureRequest for 0x%lx\n", e.window);
+#endif // DEBUG
+  
   OtkEventHandler::configureRequestHandler(e);
 
   // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event

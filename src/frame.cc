@@ -103,6 +103,7 @@ void OBFrame::focus()
 {
   otk::OtkWidget::focus();
   update();
+  _handle.update();
 }
 
 

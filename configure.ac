@@ -1,4 +1,4 @@
-AC_PREREQ([2.50])
+AC_PREREQ([2.54])
 AC_INIT([openbox], [2.90.0cvs], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([kernel/openbox.c])

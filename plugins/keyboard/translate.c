@@ -51,7 +51,7 @@ gboolean translate_key(char *str, guint *state, guint *keycode)
 	goto translation_fail;
     }
     *keycode = XKeysymToKeycode(ob_display, sym);
-    if (!keycode) {
+    if (!*keycode) {
 	g_warning("Key '%s' does not exist on the display.", l); 
 	goto translation_fail;
     }

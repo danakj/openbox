@@ -96,7 +96,7 @@ borderWidth: 1
 bevelWidth: 1
 handleWidth: 3
 frameWidth: 0
-
+menuOverlap: 5
 
 !! Miscellaneous settings
 borderColor: #222222
@@ -104,5 +104,5 @@ borderColor: #222222
 !! font me!
 window.label.focus.font:Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
 window.label.unfocus.font:Bitstream Vera Sans:bold:pixelsize=9
-menu.items.font: National First Font:pixelsize=15
+menu.items.font: National First Font:pixelsize=12
 menu.title.font: Bitstream Vera Sans:bold:pixelsize=10

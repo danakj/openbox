@@ -14,7 +14,8 @@ typedef enum {
     Layer_Above,      /*!< 3 - normal windows w/ above */
     Layer_Top,        /*!< 4 - always-on-top-windows (docks?) */
     Layer_Fullscreen, /*!< 5 - fullscreeen windows */
-    Layer_Internal    /*!< 6 - openbox windows/menus */
+    Layer_Internal,   /*!< 6 - openbox windows/menus */
+    NUM_STACKLAYER
 } StackLayer;
 
 /* list of ObWindow*s in stacking order from highest to lowest */
@@ -28,13 +29,7 @@ void stacking_add(ObWindow *win);
 void stacking_add_nonintrusive(ObWindow *win);
 #define stacking_remove(win) stacking_list = g_list_remove(stacking_list, win);
 
-/*! Raises a window above all others in its stacking layer
-  raiseWindow has a couple of constraints that lowerWindow does not.<br>
-  1) raiseWindow can be called after changing a Window's stack layer, and
-     the list will be reorganized properly.<br>
-  2) raiseWindow guarantees that XRestackWindows() will <i>always</i> be
-     called for the specified window.
-*/
+/*! Raises a window above all others in its stacking layer */
 void stacking_raise(ObWindow *window);
 
 /*! Lowers a client window below all others in its stacking layer */

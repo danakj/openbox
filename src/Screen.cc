@@ -2643,7 +2643,7 @@ void BScreen::toggleFocusModel(FocusModel model) {
 #ifdef    BITMAPBUTTONS
 void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
                                const Configuration &style) {
-  string s;
+  std::string s;
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.
   
@@ -2651,10 +2651,17 @@ void BScreen::readDatabaseMask(const string &rname, PixmapMask &pixmapMask,
   {
     if (s[0] != '/' && s[0] != '~')
     {
-      std::string xbmFile = std::string("~/.openbox/buttons/") + s;
+      std::string xbmFile;
+      xbmFile = "~/.openbox/buttons/" + s;
       ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+      if (ret != BitmapSuccess) {
+        xbmFile = std::string(BUTTONSDIR) + "/" + s;
+        ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
+                              expandTilde(xbmFile).c_str(), &pixmapMask.w,
+                              &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
+      }
     } else
       ret = XReadBitmapFile(blackbox->getXDisplay(), getRootWindow(),
                             expandTilde(s).c_str(), &pixmapMask.w,

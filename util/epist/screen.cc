@@ -830,13 +830,9 @@ bool screen::nothingIsPressed(void) const
   XQueryKeymap(_epist->getXDisplay(), keys);
 
   for (int i = 0; i < 32; ++i) {
-    if (keys[i] != 0) {
-      cout << "debug: not all keys have been released.\n";
+    if (keys[i] != 0)
       return false;
-    }
   }
-
-  cout << "debug: all keys have been released.\n";
 
   return true;
 }

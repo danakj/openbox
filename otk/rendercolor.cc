@@ -28,7 +28,8 @@ RenderColor::RenderColor(int screen, unsigned char red,
     _red(red),
     _green(green),
     _blue(blue),
-    _allocated(false)
+    _allocated(false),
+    _created(false)
 {
 }
 
@@ -37,7 +38,8 @@ RenderColor::RenderColor(int screen, RGB rgb)
     _red(rgb.r),
     _green(rgb.g),
     _blue(rgb.b),
-    _allocated(false)
+    _allocated(false),
+    _created(false)
 {
 }
 
@@ -68,7 +70,8 @@ void RenderColor::create() const
       fprintf(stderr, "RenderColor: color alloc error: rgb:%x/%x/%x\n",
 	      _red, _green, _blue);
       xcol.pixel = 0;
-    }
+    } else
+      _allocated = true;
 
     _pixel = xcol.pixel;
     gcv.foreground = _pixel;
@@ -83,18 +86,18 @@ void RenderColor::create() const
     ++item->count;
   }
 
-  _allocated = true;
+  _created = true;
 }
 
 unsigned long RenderColor::pixel() const
 {
-  if (!_allocated) create();
+  if (!_created) create();
   return _pixel;
 }
 
 GC RenderColor::gc() const
 {
-  if (!_allocated) create();
+  if (!_created) create();
   return _gc;
 }
 
@@ -102,7 +105,7 @@ RenderColor::~RenderColor()
 {
   unsigned long color = _blue | _green << 8 | _red << 16;
 
-  if (_allocated) {
+  if (_created) {
     CacheItem *item = _cache[_screen][color];
     assert(item); // better be...
 
@@ -112,8 +115,10 @@ RenderColor::~RenderColor()
       _cache[_screen][color] = 0;
       delete item;
 
-      const ScreenInfo *info = display->screenInfo(_screen);
-      XFreeColors(**display, info->colormap(), &_pixel, 1, 0);
+      if (_allocated) {
+        const ScreenInfo *info = display->screenInfo(_screen);
+        XFreeColors(**display, info->colormap(), &_pixel, 1, 0);
+      }
     }
   }
 }

@@ -69,6 +69,13 @@ static void do_restack(GList *wins, GList *before)
         stacking_list = g_list_insert_before(stacking_list, before, it->data);
     }
 
+    /* XXX some debug checking of the stacking list's order */
+    for (it = stacking_list; ; it = next) {
+        next = g_list_next(it);
+        if (!next) break;
+        g_assert(window_layer(it->data) >= window_layer(next->data));
+    }
+
     XRestackWindows(ob_display, win, i);
     g_free(win);
 }

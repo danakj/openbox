@@ -1402,22 +1402,25 @@ Client *client_search_focus_tree_full(Client *self)
             return client_search_focus_tree_full(self->transient_for);
         } else {
             GSList *it;
+            gboolean recursed = FALSE;
         
             for (it = self->group->members; it; it = it->next)
                 if (!((Client*)it->data)->transient_for) {
                     Client *c;
                     if ((c = client_search_focus_tree_full(it->data)))
                         return c;
+                    recursed = TRUE;
                 }
-            return NULL;
+            if (recursed)
+              return NULL;
         }
-    } else {
-        /* this function checks the whole tree, the client_search_focus_tree
-           does not, so we need to check this window */
-        if (client_focused(self))
-            return self;
-        return client_search_focus_tree(self);
     }
+
+    /* this function checks the whole tree, the client_search_focus_tree~
+       does not, so we need to check this window */
+    if (client_focused(self))
+      return self;
+    return client_search_focus_tree(self);
 }
 
 static StackLayer calc_layer(Client *self)

@@ -526,12 +526,12 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  bool dotext = True, dohilite = True, dosel = True;
+  bool dotext = True, dohilite = True, dosel = True, dooppsel = True;
   const char *text = item->label();
   int sbl = index / menu.persub, i = index - (sbl * menu.persub);
   int item_x = (sbl * menu.item_w), item_y = (i * menu.item_h);
   int hilite_x = item_x, hilite_y = item_y, hoff_x = 0, hoff_y = 0;
-  int text_x = 0, text_y = 0, sel_x = 0, sel_y = 0;
+  int text_x = 0, text_y = 0, sel_x = 0, oppsel_x = 0, sel_y = 0;
   unsigned int hilite_w = menu.item_w, hilite_h = menu.item_h, text_w = 0,
     text_h = 0;
   unsigned int half_w = menu.item_h / 2, quarter_w = menu.item_h / 4;
@@ -569,6 +569,11 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   if (screen->getMenuStyle()->bullet_pos == Right)
     sel_x += (menu.item_w - menu.item_h - menu.bevel_w);
   sel_x += quarter_w;
+  oppsel_x = sel_x;
+  if (screen->getMenuStyle()->bullet_pos == Right)
+    oppsel_x -= (menu.item_w - menu.item_h - menu.bevel_w);
+  else
+    oppsel_x += (menu.item_w - menu.item_h - menu.bevel_w);
   sel_y = item_y + quarter_w;
 
   if (clear) {
@@ -598,6 +603,12 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
     if (! (max(sel_x, x) <= min<signed>(sel_x + half_w, x + w) &&
            max(sel_y, y) <= min<signed>(sel_y + half_w, y + h)))
       dosel = False;
+    
+    // check if we need to redraw the select pixmap/menu bullet
+    // on the opposite side of the menu
+    if (! (max(oppsel_x, x) <= min<signed>(oppsel_x + half_w, x + w) &&
+           max(sel_y, y) <= min<signed>(sel_y + half_w, y + h)))
+      dooppsel = False;
   }
 
   if (dohilite && highlight && (menu.hilite_pixmap != ParentRelative)) {
@@ -610,17 +621,10 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
                      hilite_x, hilite_y, hilite_w, hilite_h);
   }
   
-  if (dosel && item->isSelected()) {
+  if (dooppsel && item->isSelected()) {
       XPoint pts[6];
 
-      // put the check mark on the opposite side of the menu
-      int x = sel_x;
-      if (screen->getMenuStyle()->bullet_pos == Right)
-        x -= (menu.item_w - menu.item_h - menu.bevel_w);
-      else
-        x += (menu.item_w - menu.item_h - menu.bevel_w);
-
-      pts[0].x = x + 0;
+      pts[0].x = oppsel_x + 0;
       pts[0].y = sel_y + 2;
       
       pts[1].x = 0;

@@ -91,7 +91,7 @@ Openbox::Openbox(int argc, char **argv)
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
 
-  _pyclients = PyDict_New();
+  _pyclients = (PyDictObject*) PyDict_New();
   assert(_pyclients);
 
   parseCommandLine(argc, argv);
@@ -282,7 +282,8 @@ void Openbox::addClient(Window window, OBClient *client)
   PyClientObject* pyclient = PyObject_New(PyClientObject, &PyClient_Type);
   pyclient->window = window;
   pyclient->client = client;
-  PyDict_SetItem(_pyclients, PyLong_FromLong(window), (PyObject*)pyclient);
+  PyDict_SetItem((PyObject*)_pyclients, PyLong_FromLong(window),
+                 (PyObject*)pyclient);
 }
 
 

@@ -94,7 +94,7 @@ private:
 
   //! A list of all managed clients
   ClientMap _clients;
-  PyObject *_pyclients; // PyDictObject
+  PyDictObject *_pyclients;
 
   //! A list of all the managed screens
   ScreenList _screens;

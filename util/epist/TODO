@@ -1,4 +1,0 @@
-- Make sure the parser doesn't puke on invalid actions (doesn't grab
-  keys or stop parsing)
-
-- Implement the workspace grid using the new netwm spec

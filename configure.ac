@@ -48,8 +48,6 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		otk/Makefile
 		src/Makefile
 		scripts/Makefile
-		util/Makefile
-		util/epist/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile
 		data/Makefile

@@ -126,7 +126,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
     y = area->y +
         (area->height - RrFontHeight(t->font, t->shadow, t->offset)) / 2;
     /* the +2 and -4 leave a small blank edge on the sides */
-    x += 2;
+    x = area->x + 2;
     w = area->width - 4;
     h = area->height;
 
@@ -152,13 +152,12 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, Rect *area)
 
     switch (t->justify) {
     case RR_JUSTIFY_LEFT:
-        x = area->x;
         break;
     case RR_JUSTIFY_RIGHT:
-        x = area->x + (w - mw);
+        x += (w - mw);
         break;
     case RR_JUSTIFY_CENTER:
-        x = area->x + (w - mw) / 2;
+        x += (w - mw) / 2;
         break;
     }
 

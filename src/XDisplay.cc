@@ -131,3 +131,25 @@ void XDisplay::ungrab() {
   if (--_grabs == 0)
     XUngrabServer(_display);
 }
+
+
+/*
+ * Gets the next event on the queue from the X server.
+ * 
+ * Returns: true if e contains a new event; false if there is no event to be
+ *          returned.
+ */
+bool XDisplay::nextEvent(XEvent &e) {
+  if(!XPending(_display))
+    return false;
+  XNextEvent(_display, &e);
+  if (_last_bad_window != None) {
+    if (e.xany.window == _last_bad_window) {
+      cerr << "XDisplay::nextEvent(): Removing event for bad window from " <<
+        "event queue\n";
+      return false;
+    } else
+      _last_bad_window = None;
+  }
+  return true;
+}

@@ -77,6 +77,8 @@ public:
   
   void grab();
   void ungrab();
+
+  bool nextEvent(XEvent &e);
 };
 
 #endif // _XDisplay_h

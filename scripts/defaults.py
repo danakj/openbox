@@ -3,6 +3,7 @@ import focusmodel # default focus models
 import behavior   # defines default behaviors for interaction with windows
 import callbacks  # a lib of functions that can be used as binding callbacks
 import windowplacement # use a routine in here to place windows
+import historyplacement # history window placement
 
 # try focus something when nothing is focused
 focus.fallback = 1
@@ -15,7 +16,14 @@ behavior.setup_window_buttons()
 behavior.setup_scroll()
 
 # my window placement algorithm
-ob.ebind(ob.EventAction.PlaceWindow, windowplacement.random)
+#ob.ebind(ob.EventAction.PlaceWindow, windowplacement.random)
+ob.ebind(ob.EventAction.PlaceWindow, historyplacement.place)
+# don't place terminals by history placement (xterm,aterm,rxvt)
+def histplace(data):
+    if data.client.appClass() == "XTerm": return 0
+    return 1
+historyplacement.confirm_callback = histplace
+
 
 # run xterm from root clicks
 ob.mbind("Left", ob.MouseContext.Root, ob.MouseAction.Click,

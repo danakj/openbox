@@ -876,11 +876,56 @@ void screen_install_colormap(ObClient *client, gboolean install)
     }
 }
 
+static inline void
+screen_area_add_strut_left(const StrutPartial *s, const Rect *monitor_area,
+                           gint edge, Strut *ret)
+{
+    if (s->left &&
+        ((s->left_end <= s->left_start) ||
+         (RECT_TOP(*monitor_area) < s->left_end &&
+          RECT_BOTTOM(*monitor_area) > s->left_start)))
+        ret->left = MAX(ret->left, edge);
+}
+
+static inline void
+screen_area_add_strut_top(const StrutPartial *s, const Rect *monitor_area,
+                          gint edge, Strut *ret)
+{
+    if (s->top &&
+        ((s->top_end <= s->top_start) ||
+         (RECT_LEFT(*monitor_area) < s->top_end &&
+          RECT_RIGHT(*monitor_area) > s->top_start)))
+        ret->top = MAX(ret->top, edge);
+}
+
+static inline void
+screen_area_add_strut_right(const StrutPartial *s, const Rect *monitor_area,
+                            gint edge, Strut *ret)
+{
+    if (s->right &&
+        ((s->right_end <= s->right_start) ||
+         (RECT_TOP(*monitor_area) < s->right_end &&
+          RECT_BOTTOM(*monitor_area) > s->right_start)))
+        ret->right = MAX(ret->right, edge);
+}
+
+static inline void
+screen_area_add_strut_bottom(const StrutPartial *s, const Rect *monitor_area,
+                             gint edge, Strut *ret)
+{
+    if (s->bottom &&
+        ((s->bottom_end <= s->bottom_start) ||
+         (RECT_LEFT(*monitor_area) < s->bottom_end &&
+          RECT_RIGHT(*monitor_area) > s->bottom_start)))
+        ret->bottom = MAX(ret->bottom, edge);
+}
+
 void screen_update_areas()
 {
     guint i, x;
     guint32 *dims;
     GList *it;
+    gint o;
 
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
@@ -893,14 +938,16 @@ void screen_update_areas()
 
     area = g_new(Rect*, screen_num_desktops + 2);
     for (i = 0; i < screen_num_desktops + 1; ++i)
-        area[i] = g_new(Rect, screen_num_monitors + 1);
+        area[i] = g_new0(Rect, screen_num_monitors + 1);
     area[i] = NULL;
      
     dims = g_new(guint32, 4 * screen_num_desktops);
 
     for (i = 0; i < screen_num_desktops + 1; ++i) {
-        Strut s;
-        int l, r, t, b;
+        Strut *struts;
+        gint l, r, t, b;
+
+        struts = g_new0(Strut, screen_num_monitors);
 
         /* calc the xinerama areas */
         for (x = 0; x < screen_num_monitors; ++x) {
@@ -919,105 +966,114 @@ void screen_update_areas()
         }
         RECT_SET(area[i][x], l, t, r - l + 1, b - t + 1);
 
-        /* apply struts */
-        STRUT_SET(s, 0, 0, 0, 0);
-        for (it = client_list; it; it = it->next)
-            STRUT_ADD(s, ((ObClient*)it->data)->strut);
-        STRUT_ADD(s, dock_strut);
+        /* apply the struts */
 
-        if (s.left) {
-            int o;
+        /* find the left-most xin heads, i do this in 2 loops :| */
+        o = area[i][0].x;
+        for (x = 1; x < screen_num_monitors; ++x)
+            o = MIN(o, area[i][x].x);
 
-            /* find the left-most xin heads, i do this in 2 loops :| */
-            o = area[i][0].x;
-            for (x = 1; x < screen_num_monitors; ++x)
-                o = MIN(o, area[i][x].x);
-
-            for (x = 0; x < screen_num_monitors; ++x) {
-                int edge = o + s.left - area[i][x].x;
-                if (edge > 0) {
-                    area[i][x].x += edge;
-                    area[i][x].width -= edge;
-                }
-            }
-
-            area[i][screen_num_monitors].x += s.left;
-            area[i][screen_num_monitors].width -= s.left;
-        }
-        if (s.top) {
-            int o;
-
-            /* find the left-most xin heads, i do this in 2 loops :| */
-            o = area[i][0].y;
-            for (x = 1; x < screen_num_monitors; ++x)
-                o = MIN(o, area[i][x].y);
-
-            for (x = 0; x < screen_num_monitors; ++x) {
-                int edge = o + s.top - area[i][x].y;
-                if (edge > 0) {
-                    area[i][x].y += edge;
-                    area[i][x].height -= edge;
-                }
-            }
-
-            area[i][screen_num_monitors].y += s.top;
-            area[i][screen_num_monitors].height -= s.top;
-        }
-        if (s.right) {
-            int o;
-
-            /* find the bottom-most xin heads, i do this in 2 loops :| */
-            o = area[i][0].x + area[i][0].width - 1;
-            for (x = 1; x < screen_num_monitors; ++x)
-                o = MAX(o, area[i][x].x + area[i][x].width - 1);
-
-            for (x = 0; x < screen_num_monitors; ++x) {
-                int edge = (area[i][x].x + area[i][x].width - 1) -
-                    (o - s.right);
-                if (edge > 0)
-                    area[i][x].width -= edge;
-            }
-
-            area[i][screen_num_monitors].width -= s.right;
-        }
-        if (s.bottom) {
-            int o;
-
-            /* find the bottom-most xin heads, i do this in 2 loops :| */
-            o = area[i][0].y + area[i][0].height - 1;
-            for (x = 1; x < screen_num_monitors; ++x)
-                o = MAX(o, area[i][x].y + area[i][x].height - 1);
-
-            for (x = 0; x < screen_num_monitors; ++x) {
-                int edge = (area[i][x].y + area[i][x].height - 1) -
-                    (o - s.bottom);
-                if (edge > 0)
-                    area[i][x].height -= edge;
-            }
-
-            area[i][screen_num_monitors].height -= s.bottom;
-        }
-
-        /* XXX when dealing with partial struts, if its in a single
-           xinerama area, then only subtract it from that area's space
         for (x = 0; x < screen_num_monitors; ++x) {
-	    GList *it;
-
-
-               do something smart with it for the 'all xinerama areas' one...
-
-	    for (it = client_list; it; it = it->next) {
-
-                XXX if gunna test this shit, then gotta worry about when
-                the client moves between xinerama heads..
-
-                if (RECT_CONTAINS_RECT(((ObClient*)it->data)->frame->area,
-                                       area[i][x])) {
-
-                }            
+            for (it = client_list; it; it = it->next) {
+                ObClient *c = it->data;
+                screen_area_add_strut_left(&c->strut,
+                                           &monitor_area[x],
+                                           o + c->strut.left - area[i][x].x,
+                                           &struts[x]);
             }
+            screen_area_add_strut_left(&dock_strut,
+                                       &monitor_area[x],
+                                       o + dock_strut.left - area[i][x].x,
+                                       &struts[x]);
+
+            area[i][x].x += struts[x].left;
+            area[i][x].width -= struts[x].left;
         }
-        */
+
+        /* find the top-most xin heads, i do this in 2 loops :| */
+        o = area[i][0].y;
+        for (x = 1; x < screen_num_monitors; ++x)
+            o = MIN(o, area[i][x].y);
+
+        for (x = 0; x < screen_num_monitors; ++x) {
+            for (it = client_list; it; it = it->next) {
+                ObClient *c = it->data;
+                screen_area_add_strut_top(&c->strut,
+                                           &monitor_area[x],
+                                           o + c->strut.top - area[i][x].y,
+                                           &struts[x]);
+            }
+            screen_area_add_strut_top(&dock_strut,
+                                      &monitor_area[x],
+                                      o + dock_strut.top - area[i][x].y,
+                                      &struts[x]);
+
+            area[i][x].y += struts[x].top;
+            area[i][x].height -= struts[x].top;
+        }
+
+        /* find the right-most xin heads, i do this in 2 loops :| */
+        o = area[i][0].x + area[i][0].width - 1;
+        for (x = 1; x < screen_num_monitors; ++x)
+            o = MAX(o, area[i][x].x + area[i][x].width - 1);
+
+        for (x = 0; x < screen_num_monitors; ++x) {
+            for (it = client_list; it; it = it->next) {
+                ObClient *c = it->data;
+                screen_area_add_strut_right(&c->strut,
+                                           &monitor_area[x],
+                                           (area[i][x].x +
+                                            area[i][x].width - 1) -
+                                            (o - c->strut.right),
+                                            &struts[x]);
+            }
+            screen_area_add_strut_right(&dock_strut,
+                                        &monitor_area[x],
+                                        (area[i][x].x +
+                                         area[i][x].width - 1) -
+                                        (o - dock_strut.right),
+                                        &struts[x]);
+
+            area[i][x].width -= struts[x].right;
+        }
+
+        /* find the bottom-most xin heads, i do this in 2 loops :| */
+        o = area[i][0].y + area[i][0].height - 1;
+        for (x = 1; x < screen_num_monitors; ++x)
+            o = MAX(o, area[i][x].y + area[i][x].height - 1);
+
+        for (x = 0; x < screen_num_monitors; ++x) {
+            for (it = client_list; it; it = it->next) {
+                ObClient *c = it->data;
+                screen_area_add_strut_bottom(&c->strut,
+                                             &monitor_area[x],
+                                             (area[i][x].y +
+                                              area[i][x].height - 1) - \
+                                             (o - c->strut.bottom),
+                                             &struts[x]);
+            }
+            screen_area_add_strut_bottom(&dock_strut,
+                                         &monitor_area[x],
+                                         (area[i][x].y +
+                                          area[i][x].height - 1) - \
+                                         (o - dock_strut.bottom),
+                                         &struts[x]);
+
+            area[i][x].height -= struts[x].bottom;
+        }
+
+        l = RECT_LEFT(area[i][0]);
+        t = RECT_TOP(area[i][0]);
+        r = RECT_RIGHT(area[i][0]);
+        b = RECT_BOTTOM(area[i][0]);
+        for (x = 1; x < screen_num_monitors; ++x) {
+            l = MIN(l, RECT_LEFT(area[i][x]));
+            t = MIN(l, RECT_TOP(area[i][x]));
+            r = MAX(r, RECT_RIGHT(area[i][x]));
+            b = MAX(b, RECT_BOTTOM(area[i][x]));
+        }
+        RECT_SET(area[i][screen_num_monitors], l, t,
+                 r - l + 1, b - t + 1);
 
         /* XXX optimize when this is run? */
 
@@ -1038,7 +1094,10 @@ void screen_update_areas()
             dims[(i * 4) + 2] = area[i][screen_num_monitors].width;
             dims[(i * 4) + 3] = area[i][screen_num_monitors].height;
         }
+
+        g_free(struts);
     }
+
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
                 dims, 4 * screen_num_desktops);
 

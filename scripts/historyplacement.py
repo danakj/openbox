@@ -75,10 +75,8 @@ def _load(data):
                     _data.append([])
                 _data[data.screen].append(state)
                 
-            except ValueError:
-                pass
-            except IndexError:
-                pass
+            except ValueError: pass
+            except IndexError: pass
         file.close()
 
 def _save(data):

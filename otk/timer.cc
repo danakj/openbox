@@ -77,9 +77,9 @@ void Timer::dispatchTimers(bool wait)
     if (!timercmp(&_now, &_nearest_timeout, >))
       break;
 
-    /* we set the last fired time to delay msec after the previous firing, then 
-       re-insert.  timers maintain their order and may trigger more than once if 
-       they've waited more than one delay's worth of time.
+    /* we set the last fired time to delay msec after the previous firing, then
+       re-insert.  timers maintain their order and may trigger more than once
+       if they've waited more than one delay's worth of time.
     */
     _q.pop();
     timevalAdd(curr->_last, curr->_delay);

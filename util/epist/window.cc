@@ -177,3 +177,9 @@ void XWindow::focus() const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
                             _window);
 }
+
+
+void XWindow::sendTo(unsigned int dest) const {
+  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_wm_desktop,
+                            _window, dest);
+}

@@ -40,6 +40,7 @@ public:
     lower, //done
     close, //done
     toggleshade, //done
+    toggleomnipresent, //done
     moveWindowUp,
     moveWindowDown,
     moveWindowLeft,

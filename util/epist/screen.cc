@@ -221,6 +221,13 @@ void screen::handleKeypress(const XEvent &e) {
           window->lower();
           return;
 
+        case Action::toggleomnipresent:
+          if (window->desktop() == 0xffffffff)
+            window->sendTo(_active_desktop);
+          else
+            window->sendTo(0xffffffff);
+          return;
+
         case Action::toggleshade:
           window->shade(! window->shaded());
           return;

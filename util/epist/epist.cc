@@ -120,6 +120,10 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("I")),
                            Mod1Mask | ControlMask));
+  _actions.push_back(Action(Action::toggleomnipresent,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("O")),
+                           Mod1Mask | ControlMask));
   activateGrabs();
 }
 

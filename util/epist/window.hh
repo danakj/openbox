@@ -86,6 +86,7 @@ public:
   void lower() const;
   void iconify() const;
   void focus() const;
+  void sendTo(unsigned int dest) const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

@@ -1,13 +1,13 @@
 plugindir=$(libdir)/openbox/plugins
 
-SUBDIRS = keyboard
+SUBDIRS = keyboard mouse
 
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
--DPLUGINDIR=\"$(plugindir)\" \
--DG_LOG_DOMAIN=\"Plugin\"
+-DPLUGINDIR=\"$(plugindir)\"
 
 plugin_LTLIBRARIES=focus.la
 
+focus_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Focus\"
 focus_la_LDFLAGS=-module -avoid-version
 focus_la_SOURCES=focus.c
 

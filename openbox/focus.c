@@ -9,7 +9,6 @@
 #include "screen.h"
 #include "group.h"
 #include "prop.h"
-#include "dispatch.h"
 #include "focus.h"
 #include "stacking.h"
 #include "popup.h"
@@ -96,11 +95,6 @@ void focus_set_client(ObClient *client)
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
     }
-
-    if (focus_client != NULL)
-        dispatch_client(Event_Client_Focus, focus_client, 0, 0);
-    if (old != NULL)
-        dispatch_client(Event_Client_Unfocus, old, 0, 0);
 }
 
 static gboolean focus_under_pointer()

@@ -12,7 +12,6 @@
 #include "frame.h"
 #include "focus.h"
 #include "popup.h"
-#include "dispatch.h"
 #include "extensions.h"
 #include "render/render.h"
 
@@ -402,8 +401,6 @@ void screen_set_num_desktops(guint num)
     /* change our struts/area to match (after moving windows) */
     screen_update_areas();
 
-    dispatch_ob(Event_Ob_NumDesktops, num, old);
-
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
 	screen_set_desktop(num - 1);
@@ -456,8 +453,6 @@ void screen_set_desktop(guint num)
 #ifdef DEBUG_FOCUS
     ob_debug("/switch fallback\n");
 #endif
-
-    dispatch_ob(Event_Ob_Desktop, num, old);
 }
 
 static void get_row_col(guint d, guint *r, guint *c)
@@ -847,8 +842,6 @@ void screen_show_desktop(gboolean show)
     show = !!show; /* make it boolean */
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_showing_desktop, cardinal, show);
-
-    dispatch_ob(Event_Ob_ShowDesktop, show, 0);
 }
 
 void screen_install_colormap(ObClient *client, gboolean install)

@@ -5,7 +5,6 @@
 #include "event.h"
 #include "menu.h"
 #include "client.h"
-#include "dispatch.h"
 #include "xerror.h"
 #include "prop.h"
 #include "startup.h"
@@ -66,7 +65,7 @@ static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
 static gchar    *sm_save_file;
 
-static void signal_handler(const ObEvent *e, void *data);
+static void signal_handler(int signal);
 static void parse_args(int argc, char **argv);
 
 int main(int argc, char **argv)
@@ -90,13 +89,9 @@ int main(int argc, char **argv)
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
 
-    /* start our event dispatcher and register for signals */
-    dispatch_startup();
-    dispatch_register(Event_Signal, signal_handler, NULL);
-
     /* set up signal handler */
     sigemptyset(&sigset);
-    action.sa_handler = dispatch_signal;
+    action.sa_handler = signal_handler;
     action.sa_mask = sigset;
     action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
     sigaction(SIGUSR1, &action, (struct sigaction *) NULL);
@@ -284,8 +279,6 @@ int main(int argc, char **argv)
         config_shutdown();
     }
 
-    dispatch_shutdown();
-
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
@@ -321,12 +314,9 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void signal_handler(const ObEvent *e, void *data)
+static void signal_handler(int sig)
 {
-    int s;
-
-    s = e->data.s.signal;
-    switch (s) {
+    switch (sig) {
     case SIGUSR1:
 	fprintf(stderr, "Caught SIGUSR1 signal. Restarting.");
         ob_restart();
@@ -336,13 +326,13 @@ static void signal_handler(const ObEvent *e, void *data)
     case SIGINT:
     case SIGTERM:
     case SIGPIPE:
-	fprintf(stderr, "Caught signal %d. Exiting.", s);
+	fprintf(stderr, "Caught signal %d. Exiting.", sig);
         ob_exit();
 	break;
 
     case SIGFPE:
     case SIGSEGV:
-        fprintf(stderr, "Caught signal %d. Aborting and dumping core.", s);
+        fprintf(stderr, "Caught signal %d. Aborting and dumping core.", sig);
         abort();
     }
 }

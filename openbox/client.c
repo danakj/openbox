@@ -5,6 +5,7 @@
 #include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
+#include "place.h"
 #include "prop.h"
 #include "extensions.h"
 #include "frame.h"
@@ -13,7 +14,6 @@
 #include "grab.h"
 #include "focus.h"
 #include "stacking.h"
-#include "dispatch.h"
 #include "openbox.h"
 #include "group.h"
 #include "config.h"
@@ -254,9 +254,9 @@ void client_manage(Window window)
 
     frame_grab_client(self->frame, self);
 
-    client_apply_startup_state(self);
-
     grab_server(FALSE);
+
+    client_apply_startup_state(self);
 
     /* update the focus lists */
     focus_order_add_new(self);
@@ -306,10 +306,24 @@ void client_manage(Window window)
 #endif
     }
 
-    dispatch_client(Event_Client_New, self, 0, 0);
+    if (ob_state() == OB_STATE_RUNNING) {
+        int x = self->area.x, ox = x;
+        int y = self->area.y, oy = y;
+
+        place_client(self, &x, &y);
+
+        client_find_onscreen(self, &x, &y,
+                             self->frame->area.width,
+                             self->frame->area.height,
+                             client_normal(self));
+
+        if (x != ox || y != oy)
+            client_configure(self, OB_CORNER_TOPLEFT, x, y,
+                             self->area.width, self->area.height,
+                             TRUE, TRUE);
+    }
 
     /* make sure the window is visible */
-    if (ob_state() == OB_STATE_RUNNING)
         client_move_onscreen(self, client_normal(self));
 
     client_showhide(self);
@@ -339,8 +353,6 @@ void client_manage(Window window)
     keyboard_grab_for_client(self, TRUE);
     mouse_grab_for_client(self, TRUE);
 
-    dispatch_client(Event_Client_Mapped, self, 0, 0);
-
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
 }
 
@@ -357,7 +369,6 @@ void client_unmanage(ObClient *self)
 
     ob_debug("Unmanaging window: %lx (%s)\n", self->window, self->class);
 
-    dispatch_client(Event_Client_Destroy, self, 0, 0);
     g_assert(self != NULL);
 
     keyboard_grab_for_client(self, FALSE);
@@ -424,10 +435,6 @@ void client_unmanage(ObClient *self)
         group_remove(self->group, self);
         self->group = NULL;
     }
-
-    /* dispatch the unmapped event */
-    dispatch_client(Event_Client_Unmapped, self, 0, 0);
-    g_assert(self != NULL);
 
     /* give the client its border back */
     client_toggle_border(self, TRUE);
@@ -1280,8 +1287,9 @@ void client_update_wmhints(ObClient *self)
                  ur ? "ON" : "OFF");
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
-	if (self->frame)
-            dispatch_client(Event_Client_Urgent, self, self->urgent, 0);
+	if (self->frame) {
+            /* XXX do shit */
+        }
     }
 }
 
@@ -1705,7 +1713,7 @@ static void client_apply_startup_state(ObClient *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-        dispatch_client(Event_Client_Urgent, self, self->urgent, 0);
+        /* XXX do shit */;
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;
@@ -2062,9 +2070,6 @@ static void client_iconify_recursive(ObClient *self,
         client_change_state(self);
         client_showhide(self);
         screen_update_areas();
-
-        dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
-                        self, 0, 0);
     }
 
     /* iconify all transients */
@@ -2266,8 +2271,6 @@ void client_set_desktop_recursive(ObClient *self,
             focus_order_to_top(self);
         else
             focus_order_to_bottom(self);
-
-        dispatch_client(Event_Client_Desktop, self, target, old);
     }
 
     /* move all transients */

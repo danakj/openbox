@@ -4,7 +4,6 @@
 #include "prop.h"
 #include "client.h"
 #include "frame.h"
-#include "dispatch.h"
 #include "openbox.h"
 #include "resist.h"
 #include "popup.h"
@@ -157,8 +156,6 @@ static void do_move(gboolean resist)
     if (resist)
         resist_move(moveresize_client, &cur_x, &cur_y);
 
-    dispatch_move(moveresize_client, &cur_x, &cur_y);
-
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
     client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
@@ -174,21 +171,20 @@ static void do_move(gboolean resist)
 
 static void do_resize(gboolean resist)
 {
-    /* dispatch_resize needs the frame size */
-    cur_x += moveresize_client->frame->size.left +
-        moveresize_client->frame->size.right;
-    cur_y += moveresize_client->frame->size.top +
-        moveresize_client->frame->size.bottom;
+    if (resist) {
+        /* resist_size needs the frame size */
+        cur_x += moveresize_client->frame->size.left +
+            moveresize_client->frame->size.right;
+        cur_y += moveresize_client->frame->size.top +
+            moveresize_client->frame->size.bottom;
 
-    if (resist)
         resist_size(moveresize_client, &cur_x, &cur_y, lockcorner);
 
-    dispatch_resize(moveresize_client, &cur_x, &cur_y, lockcorner);
-
-    cur_x -= moveresize_client->frame->size.left +
-        moveresize_client->frame->size.right;
-    cur_y -= moveresize_client->frame->size.top +
-        moveresize_client->frame->size.bottom;
+        cur_x -= moveresize_client->frame->size.left +
+            moveresize_client->frame->size.right;
+        cur_y -= moveresize_client->frame->size.top +
+            moveresize_client->frame->size.bottom;
+    }
     
     client_configure(moveresize_client, lockcorner, 
                      moveresize_client->area.x, moveresize_client->area.y,

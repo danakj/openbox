@@ -17,7 +17,6 @@
 #include "stacking.h"
 #include "extensions.h"
 #include "timer.h"
-#include "dispatch.h"
 #include "event.h"
 
 #include <X11/Xlib.h>
@@ -523,45 +522,29 @@ static void event_process(XEvent *e)
 	xerror_set_ignore(FALSE);
     }
 
-    if (menu_frame_visible)
-        if (e->type == MotionNotify || e->type == ButtonRelease ||
-            e->type == ButtonPress ||
-            e->type == KeyPress || e->type == KeyRelease) {
-            event_handle_menu(e);
-
-            return; /* no dispatch! */
-        }
-
-    if (moveresize_in_progress)
-        if (e->type == MotionNotify || e->type == ButtonRelease ||
-            e->type == ButtonPress ||
-            e->type == KeyPress || e->type == KeyRelease) {
-            moveresize_event(e);
-
-            return; /* no dispatch! */
-        }
-
     /* user input (action-bound) events */
     if (e->type == ButtonPress || e->type == ButtonRelease ||
         e->type == MotionNotify || e->type == KeyPress ||
         e->type == KeyRelease)
     {
-        ObFrameContext context;
+        if (menu_frame_visible)
+            event_handle_menu(e);
+        else if (moveresize_in_progress)
+            moveresize_event(e);
+        else {
+            ObFrameContext context;
 
-        context = frame_context(client, e->xany.window);
+            context = frame_context(client, e->xany.window);
 
-        if (!keyboard_process_interactive_grab(e, &client, &context)) {
-
-            if (e->type == ButtonPress || e->type == ButtonRelease ||
-                e->type == MotionNotify)
-                mouse_event(client, context, e);
-            else if (e->type == KeyPress)
-                keyboard_event(client, e);
+            if (!keyboard_process_interactive_grab(e, &client, &context)) {
+                if (e->type == ButtonPress || e->type == ButtonRelease ||
+                    e->type == MotionNotify)
+                    mouse_event(client, context, e);
+                else if (e->type == KeyPress)
+                    keyboard_event(client, e);
+            }
         }
     }
-
-    /* dispatch the event to registered handlers */
-    dispatch_x(e, client);
 }
 
 static void event_handle_root(XEvent *e)

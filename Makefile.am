@@ -132,8 +132,6 @@ kernel_openbox_SOURCES = \
 	kernel/config.h \
 	kernel/debug.c \
 	kernel/debug.h \
-	kernel/dispatch.c \
-	kernel/dispatch.h \
 	kernel/dock.c \
 	kernel/dock.h \
 	kernel/event.c \

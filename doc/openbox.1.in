@@ -29,7 +29,7 @@
 .if n .sp 1
 .if t .sp .5
 ..
-.TH openbox 1 "April 8th, 2002" "@VERSION@"
+.TH openbox 1 "April 8th, 2002" "@version@"
 .SH NAME
 openbox \- a window manager for X11
 .SH SYNOPSIS
@@ -212,21 +212,13 @@ A default menu file is installed in
 .IR @defaultmenu@ .
 Of course, this system-wide menu can be customized for all users at once.
 But it is also possible to create a personal menu.
-It is a convention to use the directory
-.IR "~/.openbox/"
-in your home directory, and to create a menu file, e.g.
-.I menu
-in this directory, or copy the system-wide menu file to this location.
-Next, we have to tell Openbox to load our menu file instead of the default.
-This is accomplished by adding (or changing) a resource value in the
-.I ~/.openbox/rc
-file, e.g.:
-.EX
-session.menuFile:       ~/.openbox/menu
-.EE
-For this change to take effect, Openbox has to be restarted.
+Openbox looks for a menu in your home directory under the location
+.IR "~/.openbox/menu" .
+You can copy the system-wide menu file to this location or create it by hand.
+The next time you start/restart Openbox, it will use your custom menu file
+instead of the system-wide one.
 Be sure that your menu is usable, then choose `Restart' from the default
-Openbox root menu.
+Openbox root menu to see your new menu in action.
 .SS Menu syntax
 The menu syntax is very simple and very effective.
 There are up to three fields in a menu line.
@@ -728,85 +720,10 @@ All options from the
 .B [config]
 menu (from 0.60.x on), the last selected style file, your workspace names and
 so on are saved automatically in this file.
-However, there are some resources in it you might want to edit yourself:
-.TP
-.B session.menuFile:
-This tells Openbox where to look for its menu file.
-.TP
-.B session.screen0.toolbar.widthPercent:
-This determines the amount (in %) of space the toolbar will take.
-Default value is:
-.IR 66 .
-.TP
-.B session.screen0.strftimeFormat:
-This adjusts the way the current time is displayed in the toolbar.
-The
-.IR strftime (3)
-format is used.
-Default value is:
-.IR "%I:%M %p" .
-.TP
-.B session.autoRaiseDelay:
-This adjusts the delay (in ms) before focused windows will raise when using the
-Auto Raise option.
-Default value is:
-.IR 250 .
-.TP
-.B session.doubleClickInterval:
-This adjusts the delay (in ms) between mouse clicks for Openbox to consider a double click.
-Default value is:
-.IR 250 .
-.TP
-.B session.screen0.edgeSnapThreshold:
-When moving a window across your screen, Openbox is able to have it `snap' to
-the edges of the screen for easy placement.
-This variable tells Openbox the distance (in pixels) at which the window will
-jump to the edge.
-Default value is:
-.IR 0 .
-.TP
-.B session.cacheMax:
-This tells Openbox how much memory (in Kb) it may use to store cached pixmaps on
-the X server.
-If your machine runs short of memory, you may lower this value.
-Default value is:
-.IR 200 .
-.TP
-.B session.cacheLife:
-This tells Openbox how long (in minutes) unused pixmaps may stay in the X
-server's memory.
-Default value is:
-.IR 5 .
-.TP
-.B session.titleBarLayout:
-The order of the elements of window titlebars. This is a string built
-of the following characters:
-.IP
-.nf I: Iconify button
-L: Label (window title)
-M: Maximize button
-S: Sticky button
-C: Close button 
-.fi
-.IP
-The order in which these character appear in the string is the order they will appear in window titlebars. You can also omit an item to not have it appear in the titlebar at all, except for the label which will always appear.
-Default value is:
-.IR ILMC
-.TP
-.B session.colorsPerChannel:
-This tells Openbox how many colors to take from the X server on pseudocolor
-displays.  A channel would be red, green, or blue.
-Openbox will allocate this variable ^ 3 colors and make them always available.
-This value must be between 2 and 6.
-When you run Openbox on an 8-bit display, you must set this resource to 4.
-Default value is:
-.IR 4.
 .PP
-When running Openbox in a multiple desktop environment, the
-.B screen0
-key can also be
-.B screen1, 2
-etc. for any appropriate desktop.
+For a complete description of all of the resource file's options, see the
+documentation at
+.B http://icculus.org/openbox/rc.php
 .SH ENVIRONMENT
 .TP
 .B HOME
@@ -814,7 +731,9 @@ Openbox uses
 .RB $ HOME
 to find its
 .I .openbox/rc
-file, and to resolve style file and directory names.
+and
+.I .openbox/menu
+files, and to resolve style file and directory names.
 .TP
 .B DISPLAY
 When no other display was given on the command line, Openbox will start on the
@@ -842,7 +761,7 @@ many individuals around the world.
 .PP
 The official Openbox website:
 .nh
-.B http://openbox.sunsite.dk/
+.B http://icculus.org/openbox
 .hy
 .br
 Many themes and other contributions:
@@ -856,4 +775,4 @@ This manpage was put together by Wilbert Berendsen
 .hy
 Numerous other languages will be available.
 .SH SEE ALSO
-.IR bsetroot (1), \ bbkeys (1), \ xftlsfonts (1), \ epist (1)
+.IR epist (1), \ bsetbg(1), \ bsetroot (1), \ xftlsfonts (1), \ bbkeys (1)

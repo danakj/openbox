@@ -87,3 +87,8 @@ frameWidth:                       0
 rootCommand:                      bsetbg -gradient flatinterlacedhorizontalgradient -from rgb:35/34/33 -to rgb:57/56/55
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

@@ -5,20 +5,6 @@ const char *VERSION = "1.0";
 #include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#ifndef   XFT
-#include <iostream>
-using std::cout;
-using std::endl;
-
-int main(int, char **) {
-  cout << NAME << " version " << VERSION << endl;
-  cout << "Copyright (c) 2002, Ben Jansens <ben@orodu.net>" << endl;
-  cout << endl;
-  cout << "Openbox was built without support for Xft fonts. This utility must"
-    << endl;
-  cout << "must be built with Xft support in order to function." << endl;
-}
-#else  // XFT
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xft/Xft.h>
@@ -128,14 +114,9 @@ int main(int argc, char **argv) {
           cout << val.u.b;
           break;
 
-#ifdef XFT_UTF8
-        case XftTypeMatrix:
-          cout << "xx(" << val.u.m->xx << ") ";
-          cout << "xy(" << val.u.m->xy << ") ";
-          cout << "yx(" << val.u.m->yx << ") ";
-          cout << "yy(" << val.u.m->yy << ")";
+        default:
+          cout << "unable to display";
           break;
-#endif
         }
       } while ((vallist = vallist->next));
       cout << endl;
@@ -149,5 +130,3 @@ int main(int argc, char **argv) {
   XCloseDisplay(display);
   return 0;
 }
-#endif // XFT
-

@@ -239,6 +239,11 @@ static void event(ObEvent *e, void *foo)
                                 act->data.cycle.cancel = FALSE;
                             }
 
+                            if (act->func == action_moveresize) {
+                                screen_pointer_pos(&act->data.moveresize.x,
+                                                   &act->data.moveresize.y);
+                            }
+
                             if (act->func == action_cycle_windows &&
                                 !grabbed_key && grab_keyboard(TRUE)) {
                                 grabbed_key = p;

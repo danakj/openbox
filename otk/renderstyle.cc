@@ -500,8 +500,8 @@ void RenderStyle::defaultStyle(RenderStyle *s, int screen)
   s->_root_args = "#000000";
   s->_text_color_focus = new RenderColor(screen, 0xffffff);
   s->_text_color_unfocus = new RenderColor(screen, 0xffffff);
-  s->_button_color_focus = new RenderColor(screen, 0);
-  s->_button_color_unfocus = new RenderColor(screen, 0);
+  s->_button_color_focus = new RenderColor(screen, 0xffffff);
+  s->_button_color_unfocus = new RenderColor(screen, 0xffffff);
   s->_frame_border_color = new RenderColor(screen, 0);
   s->_frame_border_width = 1;
   s->_client_border_color_focus = new RenderColor(screen, 0);

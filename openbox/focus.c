@@ -75,8 +75,7 @@ void focus_shutdown(gboolean reconfig)
         g_free(focus_order);
 
         /* reset focus to root */
-        XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,
-                       event_lasttime);
+        XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
     }
 }
 
@@ -104,8 +103,11 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(client, TRUE);
 
     if (client == NULL) {
-	/* when nothing will be focused, send focus to the backup target */
-	XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
+#ifdef DEBUG_FOCUS
+        ob_debug("actively focusing NONWINDOW\n");
+#endif
+        /* when nothing will be focused, send focus to the backup target */
+        XSetInputFocus(ob_display, screen_support_win, RevertToNone,
                        event_lasttime);
         XSync(ob_display, FALSE);
     }

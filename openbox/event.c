@@ -16,7 +16,9 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "event.h"
 #include "debug.h"
+#include "window.h"
 #include "openbox.h"
 #include "dock.h"
 #include "client.h"
@@ -36,7 +38,6 @@
 #include "group.h"
 #include "stacking.h"
 #include "extensions.h"
-#include "event.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -693,9 +694,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            /* XXX if doing a 'reconfigure' make sure you kill this timer,
-               maybe all timers.. */
-            if (config_focus_delay && client == focus_delay_client) {
+            if (client == focus_delay_client) {
                 ob_main_loop_timeout_remove_data(ob_main_loop,
                                                  focus_delay_func,
                                                  focus_delay_client);
@@ -737,7 +736,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (!nofocus && client_normal(client) && config_focus_follow) {
+            if (!nofocus && config_focus_follow &&
+                client_normal(client) && client_can_focus(client)) {
                 if (e->xcrossing.mode == NotifyGrab ||
                     e->xcrossing.detail == NotifyInferior ||
                     e->xcrossing.mode == NotifyUngrab)
@@ -762,8 +762,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                                  focus_delay_func,
                                                  client, NULL);
                         focus_delay_client = client;
-                    } else
+                    } else {
                         client_focus(client);
+                        if (config_focus_raise)
+                            stacking_raise
+                                (CLIENT_AS_WINDOW(focus_delay_client));
+                    }
                 }
             }
             break;
@@ -1248,7 +1252,11 @@ static gboolean menu_hide_delay_func(gpointer data)
 
 static gboolean focus_delay_func(gpointer data)
 {
-    client_focus(focus_delay_client);
+    if (data == focus_delay_client) {
+        client_focus(focus_delay_client);
+        if (config_focus_raise)
+            stacking_raise(CLIENT_AS_WINDOW(focus_delay_client));
+    }
     return FALSE; /* no repeat */
 }
 

@@ -26,7 +26,7 @@ void plugin_setup_config()
     config_set("resistance.windows", Config_Bool, val);
 }
 
-static void resist(Client *c, int *x, int *y)
+static void resist_move(Client *c, int *x, int *y)
 {
     GList *it;
     Rect *area;
@@ -125,16 +125,151 @@ static void resist(Client *c, int *x, int *y)
         *y = ab - h + 1;
 }
 
+static void resist_size(Client *c, int *w, int *h, Corner corn)
+{
+    GList *it;
+    Client *t; /* target */
+    int lt, rb; /* my left/top and right/bottom sides */
+    int dlt, drb; /* my destination left/top and right/bottom sides */
+    int tlt, trb; /* target's left/top and right/bottom sides */
+    Rect *area;
+    int al, at, ar, ab; /* screen boundaries */
+    Client *snapx = NULL, *snapy = NULL;
+    ConfigValue resist, window_resist;
+
+    if (!config_get("resistance", Config_Integer, &resist) ||
+        resist.integer < 0) {
+        resist.integer = DEFAULT_RESISTANCE;
+        config_set("resistance", Config_Integer, resist);
+    }
+    if (!config_get("resistance.windows", Config_Bool, &window_resist))
+        g_assert_not_reached();
+
+    /* get the screen boundaries */
+    area = screen_area(c->desktop);
+    al = area->x;
+    at = area->y;
+    ar = al + area->width - 1;
+    ab = at + area->height - 1;
+
+    /* horizontal snapping */
+
+    lt = c->frame->area.x;
+    rb = lt + c->frame->area.width - 1;
+
+    /* snap to other windows */
+    if (window_resist.bool) {
+        for (it = stacking_list; !snapx && it != NULL; it = it->next) {
+            t = it->data;
+
+            /* don't snap to invisibles or ourself */
+            if (!t->frame->visible || t == c) continue;
+
+            switch (corn) {
+            case Corner_TopLeft:
+            case Corner_BottomLeft:
+                dlt = lt;
+                drb = rb + *w - c->frame->area.width;
+                tlt = t->frame->area.x;
+                if (rb < tlt && drb >= tlt && drb < tlt + resist.integer)
+                    *w = tlt - lt, snapx = t;
+                break;
+            case Corner_TopRight:
+            case Corner_BottomRight:
+                dlt = lt - *w + c->frame->area.width;
+                drb = rb;
+                trb = t->frame->area.x + t->frame->area.width - 1;
+                if (lt > trb && dlt <= trb && dlt > trb - resist.integer)
+                    *w = rb - trb, snapx = t;
+                break;
+            }
+        }
+    }
+
+    /* snap to screen edges */
+    switch (corn) {
+    case Corner_TopLeft:
+    case Corner_BottomLeft:
+        dlt = lt;
+        drb = rb + *w - c->frame->area.width;
+        if (rb <= ar && drb > ar && drb <= ar + resist.integer)
+            *w = ar - lt + 1;
+        break;
+    case Corner_TopRight:
+    case Corner_BottomRight:
+        dlt = lt - *w + c->frame->area.width;
+        drb = rb;
+        if (lt >= al && dlt < al && dlt >= al - resist.integer)
+            *w = rb - al + 1;
+        break;
+    }
+
+    /* vertical snapping */
+
+    lt = c->frame->area.y;
+    rb = lt + c->frame->area.height - 1;
+
+    /* snap to other windows */
+    if (window_resist.bool) {
+        for (it = stacking_list; !snapy && it != NULL; it = it->next) {
+            t = it->data;
+
+            /* don't snap to invisibles or ourself */
+            if (!t->frame->visible || t == c) continue;
+
+            switch (corn) {
+            case Corner_TopLeft:
+            case Corner_TopRight:
+                dlt = lt;
+                drb = rb + *h - c->frame->area.height;
+                tlt = t->frame->area.y;
+                if (rb < tlt && drb >= tlt && drb < tlt + resist.integer)
+                    *h = tlt - lt, snapy = t;
+                break;
+            case Corner_BottomLeft:
+            case Corner_BottomRight:
+                dlt = lt - *h + c->frame->area.height;
+                drb = rb;
+                trb = t->frame->area.y + t->frame->area.height - 1;
+                if (lt > trb && dlt <= trb && dlt > trb - resist.integer)
+                    *h = rb - trb, snapy = t;
+                break;
+            }
+        }
+    }
+
+    /* snap to screen edges */
+    switch (corn) {
+    case Corner_TopLeft:
+    case Corner_TopRight:
+        dlt = lt;
+        drb = rb + *h - c->frame->area.height;
+        if (rb <= ab && drb > ab && drb <= ab + resist.integer)
+            *h = ar - lt + 1;
+        break;
+    case Corner_BottomLeft:
+    case Corner_BottomRight:
+        dlt = lt - *h + c->frame->area.height;
+        drb = rb;
+        if (lt >= at && dlt < at && dlt >= at - resist.integer)
+            *h = rb - al + 1;
+        break;
+    }
+}
+
 static void event(ObEvent *e, void *foo)
 {
-    g_assert(e->type == Event_Client_Moving);
-
-    resist(e->data.c.client, &e->data.c.num[0], &e->data.c.num[1]);
+    if (e->type == Event_Client_Moving)
+        resist_move(e->data.c.client, &e->data.c.num[0], &e->data.c.num[1]);
+    else if (e->type == Event_Client_Resizing)
+        resist_size(e->data.c.client, &e->data.c.num[0], &e->data.c.num[1],
+                    e->data.c.num[2]);
 }
 
 void plugin_startup()
 {
-    dispatch_register(Event_Client_Moving, (EventHandler)event, NULL);
+    dispatch_register(Event_Client_Moving | Event_Client_Resizing,
+                      (EventHandler)event, NULL);
 }
 
 void plugin_shutdown()

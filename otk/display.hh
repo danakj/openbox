@@ -6,8 +6,6 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include <vector>
-
 namespace otk {
 
 class ScreenInfo;
@@ -54,11 +52,11 @@ private:
   int _grab_count;
 
   //! A list of information for all screens on the display
-  std::vector<ScreenInfo> _screenInfoList;
+  ScreenInfo** _screeninfo_list;
 
   //! A list of RenderControl objects, which are used for all graphics on a
   //! screen
-  std::vector<RenderControl*> _renderControlList;
+  RenderControl** _rendercontrol_list;
 
   //! A cache for re-using GCs, used by the drawing objects
   /*!

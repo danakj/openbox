@@ -84,8 +84,8 @@ Display::Display()
     _num_lock_mask(0),
     _scroll_lock_mask(0),
     _grab_count(0),
-    _screenInfoList(),
-    _renderControlList(),
+    _screeninfo_list(0),
+    _rendercontrol_list(0),
     _gccache((GCCache*) 0)
 {
   int junk;
@@ -167,16 +167,16 @@ DISPLAY environment variable approriately.\n\n"));
   _mask_list[6] = _scroll_lock_mask | _num_lock_mask;
   _mask_list[7] = _scroll_lock_mask | LockMask | _num_lock_mask;
 
-  // Get information on all the screens which are available.
-  _screenInfoList.reserve(ScreenCount(_display));
-  for (int i = 0; i < ScreenCount(_display); ++i)
-    _screenInfoList.push_back(i);
+  // Get information on all the screens which are available, and create their
+  // RenderControl
+  _screeninfo_list = new ScreenInfo*[ScreenCount(_display)];
+  _rendercontrol_list = new RenderControl*[ScreenCount(_display)];
+  for (int i = 0; i < ScreenCount(_display); ++i) {
+    _screeninfo_list[i] = new ScreenInfo(i);
+    _rendercontrol_list[i] = RenderControl::getRenderControl(i);
+  }
 
-  _renderControlList.reserve(ScreenCount(_display));
-  for (int i = 0; i < ScreenCount(_display); ++i)
-    _renderControlList.push_back(RenderControl::getRenderControl(i));
-
-  _gccache = new GCCache(_screenInfoList.size());
+  _gccache = new GCCache(ScreenCount(_display));
 }
 
 
@@ -185,6 +185,14 @@ Display::~Display()
   delete _gccache;
   while (_grab_count > 0)
     ungrab();
+
+  for (int i = 0; i < ScreenCount(_display); ++i) {
+    delete _rendercontrol_list[i];
+    delete _screeninfo_list[i];
+  }
+  delete [] _rendercontrol_list;
+  delete [] _screeninfo_list;
+  
   XCloseDisplay(_display);
 }
 
@@ -192,17 +200,16 @@ Display::~Display()
 const ScreenInfo* Display::screenInfo(int snum)
 {
   assert(snum >= 0);
-  assert(snum < static_cast<int>(_screenInfoList.size()));
-  return &_screenInfoList[snum];
+  assert(snum < (signed) ScreenCount(_display));
+  return _screeninfo_list[snum];
 }
 
 
 const ScreenInfo* Display::findScreen(Window root)
 {
-  std::vector<ScreenInfo>::iterator it, end = _screenInfoList.end();
-  for (it = _screenInfoList.begin(); it != end; ++it)
-    if (it->rootWindow() == root)
-      return &(*it);
+  for (int i = 0; i < ScreenCount(_display); ++i)
+    if (_screeninfo_list[i]->rootWindow() == root)
+      return _screeninfo_list[i];
   return 0;
 }
 
@@ -210,8 +217,8 @@ const ScreenInfo* Display::findScreen(Window root)
 const RenderControl *Display::renderControl(int snum)
 {
   assert(snum >= 0);
-  assert(snum < (signed) _renderControlList.size());
-  return _renderControlList[snum];
+  assert(snum < (signed) ScreenCount(_display));
+  return _rendercontrol_list[snum];
 }
 
 

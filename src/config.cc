@@ -28,7 +28,6 @@ bool python_get_string(const char *name, otk::ustring *value)
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
   if (!(val && PyString_Check(val))) return false;
 
-  printf("PYLENGTH %d\n", PyString_Size(val));
   std::string temp(PyString_AsString(val), PyString_Size(val));
   *value = temp;
   return true;
@@ -81,13 +80,11 @@ Config::Config()
     default_icon[0] = w;
     default_icon[1] = h;
     memcpy(default_icon + 2, s.data(), s.bytes());
-    printf("%d %d\n", default_icon[0], default_icon[1]);
   } else {
     default_icon = 0;
   }
       
   icon_length = s.bytes();
-  printf("LENGTH %d\n", icon_length);
 }
 
 Config::~Config()

@@ -232,7 +232,7 @@ static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
     in = l->surface.RrPixel_data;
     out = l->pixmap;
 
-    im->byte_order = RrEndian;
+    im->byte_order = LSBFirst;
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */

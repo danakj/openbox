@@ -77,8 +77,8 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
             (RrGreenOffset(inst) != RrDefaultGreenOffset)) {
             g_message("CONVERSION %d->%d %d->%d %d->%d",
                       RrDefaultRedOffset, RrRedOffset(inst),
-                      RrDefaultBlueOffset, RrGreenOffset(inst),
-                      RrDefaultGreenOffset, RrBlueOffset(inst));
+                      RrDefaultGreenOffset, RrGreenOffset(inst),
+                      RrDefaultBlueOffset, RrBlueOffset(inst));
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;
@@ -183,7 +183,7 @@ void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     RrPixel16 *p16 = (RrPixel16 *) im->data;
     unsigned char *p8 = (unsigned char *)im->data;
 
-    if (im->byte_order != RrEndian)
+    if (im->byte_order != LSBFirst)
         swap_byte_order(im);
 
     switch (im->bits_per_pixel) {

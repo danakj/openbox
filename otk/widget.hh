@@ -118,6 +118,9 @@ public:
   inline RenderStyle *style(void) const { return _style; }
   virtual void setStyle(RenderStyle *style);
 
+  inline long eventMask(void) const { return _event_mask; }
+  void setEventMask(long e);
+
   inline EventDispatcher *eventDispatcher(void)
     { return _event_dispatcher; }
   void setEventDispatcher(EventDispatcher *disp);
@@ -166,6 +169,8 @@ protected:
 
   bool _fixed_width;
   bool _fixed_height;
+
+  long _event_mask;
 
   Surface *_surface;
 

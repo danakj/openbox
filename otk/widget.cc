@@ -25,6 +25,8 @@ Widget::Widget(Widget *parent, Direction direction)
     _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
     _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1), _screen(parent->screen()),
     _fixed_width(false), _fixed_height(false),
+    _event_mask(ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
+                ExposureMask | StructureNotifyMask),
     _surface(0),
     _event_dispatcher(parent->eventDispatcher())
 {
@@ -45,6 +47,8 @@ Widget::Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1),
     _screen(style->screen()), _fixed_width(false), _fixed_height(false),
+    _event_mask(ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
+                ExposureMask | StructureNotifyMask),
     _surface(0),
     _event_dispatcher(event_dispatcher)
 {
@@ -84,8 +88,7 @@ void Widget::create(bool override_redirect)
 
   attrib_create.background_pixmap = None;
   attrib_create.colormap = scr_info->colormap();
-  attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
-    ButtonMotionMask | ExposureMask | StructureNotifyMask;
+  attrib_create.event_mask = _event_mask;
 
   if (override_redirect) {
     create_mask |= CWOverrideRedirect;
@@ -102,6 +105,12 @@ void Widget::create(bool override_redirect)
                           scr_info->depth(), InputOutput,
                           scr_info->visual(), create_mask, &attrib_create);
   _ignore_config++;
+}
+
+void Widget::setEventMask(long e)
+{
+  XSelectInput(**display, _window, e);
+  _event_mask = e;
 }
 
 void Widget::setWidth(int w)
@@ -266,7 +275,10 @@ void Widget::ungrabKeyboard(void)
 
 void Widget::render(void)
 {
-  if (!_texture) return;
+  if (!_texture) {
+    XSetWindowBackgroundPixmap(**display, _window, ParentRelative);
+    return;
+  }
 
   Surface *s = _surface; // save the current surface
   
@@ -381,6 +393,8 @@ void Widget::adjustVert(void)
       (*str_it)->setHeight(str_height > _bevel_width ?
                            str_height - _bevel_width : _bevel_width);
   }
+  if (stretchable.size() > 0)
+    height = _rect.height();
 
   Widget *prev_widget = 0;
 

@@ -96,7 +96,7 @@ static void save_commands()
 
     props[0] = &prop_res;
     props[1] = &prop_cmd;
-    SmcSetProperties(sm_conn, 1, props);
+    SmcSetProperties(sm_conn, 2, props);
 
     g_free(prop_res.vals);
     g_free(prop_cmd.vals);

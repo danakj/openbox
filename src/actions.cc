@@ -15,8 +15,8 @@ const unsigned int OBActions::DOUBLECLICKDELAY = 300;
 OBActions::OBActions()
   : _button(0), _enter_win(0)
 {
-  _presses[0] = new MousePressAction();
-  _presses[1] = new MousePressAction();
+  for (int i = 0; i < 2; ++i)
+    _presses[i] = new MousePressAction();
 
   // XXX: load a configuration out of somewhere
 

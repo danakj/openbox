@@ -352,7 +352,8 @@ tools_obconf_obconf_LDADD = \
 	parser/libobparser.la
 tools_obconf_obconf_SOURCES = \
 	gettext.h \
-	tools/obconf/main.c
+	tools/obconf/main.c \
+	plugins/obconf_interface.h
 
 
 ## kdetrayproxy ##
@@ -434,8 +435,7 @@ EXTRA_DIST = \
 	mkinstalldirs \
 	README \
 	COPYING \
-	AUTHORS \
-	plugins/obconf_interface.h
+	AUTHORS
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

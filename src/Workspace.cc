@@ -391,11 +391,14 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space)
   //Find first space that fits the window
   best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
-    if ((siter->w() >= win_size.w()) &&
-        (siter->h() >= win_size.h()))
-      best = siter;
+    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
+      if (best == NULL)
+        best = siter;
+      else if (win_size.w() * win_size.h() - siter->w() * siter->h() <
+               best->w() + best->h())
+        best = siter;
+    }
   }
-
   if (best != NULL) {
     Point *pt = new Point(best->origin());
     if (screen.colPlacementDirection() != BScreen::TopBottom)

@@ -17,9 +17,9 @@ libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
 
 libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS)
 
-script_DATA = otk.py
+#script_DATA = otk.py
 
-EXTRA_DIST = $(script_DATA)
+#EXTRA_DIST = $(script_DATA)
 
 MAINTAINERCLEANFILES= Makefile.in
 

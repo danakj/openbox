@@ -10,6 +10,8 @@ struct _ObClient;
 
 /*! The client which is currently focused */
 extern struct _ObClient *focus_client;
+/*! The client which appears focused during a focus cycle operation */
+extern struct _ObClient *focus_cycle_target;
 
 /*! The recent focus order on each desktop */
 extern GList **focus_order;

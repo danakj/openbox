@@ -20,8 +20,8 @@
 ObClient *focus_client;
 GList **focus_order; /* these lists are created when screen_startup
                         sets the number of desktops */
+ObClient *focus_cycle_target;
 
-static ObClient *focus_cycle_target;
 static Popup *focus_cycle_popup;
 
 void focus_startup(gboolean reconfig)

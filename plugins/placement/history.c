@@ -2,6 +2,7 @@
 #include "kernel/dispatch.h"
 #include "kernel/frame.h"
 #include "kernel/client.h"
+#include "kernel/screen.h"
 #include <glib.h>
 #include <string.h>
 #ifdef HAVE_STDLIB_H
@@ -54,6 +55,13 @@ gboolean place_history(Client *c)
         if (ob_state != State_Starting) {
             x = hi->x;
             y = hi->y;
+
+            /* make sure the window is on the display */
+            if (x >= screen_physical_size.width ||
+                y >= screen_physical_size.height ||
+                x + c->frame->area.width < 1 ||
+                y + c->frame->area.height < 1)
+                return FALSE;
 
             frame_frame_gravity(c->frame, &x, &y); /* get where the client
                                                       should be */

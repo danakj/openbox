@@ -46,7 +46,7 @@ void focus_shutdown()
     XDestroyWindow(ob_display, focus_backup);
 
     /* reset focus to root */
-    XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
+    XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
 }
 
 void focus_set_client(Client *client)

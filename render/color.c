@@ -80,9 +80,9 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;
                     g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
                     b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
-                    p32[x] = (r << RrRedShift(inst))
-                           + (g << RrGreenShift(inst))
-                           + (b << RrBlueShift(inst));
+                    p32[x] = (r << RrRedOffset(inst))
+                           + (g << RrGreenOffset(inst))
+                           + (b << RrBlueOffset(inst));
                 }
                 data += im->width;
                 p32 += im->width;

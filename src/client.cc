@@ -756,9 +756,13 @@ void Client::toggleClientBorder(bool addborder)
   // reversed.
   int x = _area.x(), y = _area.y();
   switch(_gravity) {
+  default:
   case NorthWestGravity:
   case WestGravity:
   case SouthWestGravity:
+  case NorthGravity:
+  case CenterGravity:
+  case SouthGravity:
     break;
   case NorthEastGravity:
   case EastGravity:
@@ -766,11 +770,20 @@ void Client::toggleClientBorder(bool addborder)
     if (addborder) x -= _border_width * 2;
     else           x += _border_width * 2;
     break;
+  case ForgetGravity:
+  case StaticGravity:
+    if (addborder) x -= _border_width;
+    else           x += _border_width;
+    break;
   }
   switch(_gravity) {
+  default:
   case NorthWestGravity:
+  case WestGravity:
   case NorthGravity:
+  case CenterGravity:
   case NorthEastGravity:
+  case EastGravity:
     break;
   case SouthWestGravity:
   case SouthGravity:
@@ -778,8 +791,10 @@ void Client::toggleClientBorder(bool addborder)
     if (addborder) y -= _border_width * 2;
     else           y += _border_width * 2;
     break;
-  default:
-    // no change for StaticGravity etc.
+  case ForgetGravity:
+  case StaticGravity:
+    if (addborder) y -= _border_width;
+    else           y += _border_width;
     break;
   }
   _area.setPos(x, y);

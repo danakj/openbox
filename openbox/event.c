@@ -344,15 +344,18 @@ static void event_done(gpointer data)
             frame_adjust_focus(focus_in->frame, TRUE);
             client_calc_layer(focus_in);
         }
+
+        focus_hilite = focus_in;
     } 
     if (focus_out) {
         if (focus_out == focus_client)
             focus_set_client(NULL);
         frame_adjust_focus(focus_out->frame, FALSE);
         client_calc_layer(focus_out);
-    }
 
-    focus_hilite = focus_in;
+        if (!focus_in)
+            focus_hilite = NULL;
+    }
 
     if (focus_client != last) {
         if (!focus_client) {
@@ -615,7 +618,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                  e->xfocus.window, client->window,
                  e->xfocus.mode, e->xfocus.detail);
 #endif
-        focus_out = client;
+        g_message("hilite %x client %x", focus_hilite, client);
+        if (focus_hilite == client)
+            focus_out = client;
         if (focus_in == client)
             focus_in = NULL;
         break;

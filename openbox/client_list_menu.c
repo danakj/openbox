@@ -25,6 +25,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     DesktopData *d = data;
     GList *it;
     gint i;
+    gboolean icons = FALSE;
 
     menu_clear_entries(menu);
 
@@ -35,6 +36,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             ObAction* act;
             ObMenuEntry *e;
             ObClientIcon *icon;
+
+            if (!icons && c->iconic) {
+                icons = TRUE;
+                menu_add_separator(menu, -1);
+            }
 
             act = action_from_string("activate");
             act->data.activate.any.c = c;

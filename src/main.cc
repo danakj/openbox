@@ -178,8 +178,9 @@ int main(int argc, char **argv) {
       }
     } else if (! strcmp(argv[i], "-version")) {
       // print current version string
-      printf("Openbox %s : (c) 1997 - 2000 Brad Hughes\n"
-             "\t\t\t  2001 - 2002 Sean 'Shaleh' Perry\n",
+      printf("Openbox %s : (c) 2002 - 2002 Ben Jansens\n"
+             "\t\t    2001 - 2002 Sean 'Shaleh' Perry\n"
+             "\t\t    1997 - 2000 Brad Hughes\n",
              __openbox_version);
 
       ::exit(0);

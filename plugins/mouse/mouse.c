@@ -397,7 +397,7 @@ static void binddef()
     a = action_new(action_shade);
     mbind("4", "titlebar", MouseAction_Press, a);
     a = action_new(action_unshade);
-    mbind("5", "titlebar", MouseAction_Click, a);
+    mbind("5", "titlebar", MouseAction_Press, a);
 
     a = action_new(action_toggle_maximize_full);
     mbind("1", "maximize", MouseAction_Click, a);

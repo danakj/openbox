@@ -86,9 +86,9 @@ def resize(data):
                        data.press_clientwidth + dx,
                        data.press_clientheight + dy);
 
-def restart(data):
-    """Restarts openbox"""
-    openbox.restart("")
+def restart(data, other = ""):
+    """Restarts openbox, optionally starting another window manager."""
+    openbox.restart(other)
 
 def raise_win(data):
     """Raises the window on which the event occured"""

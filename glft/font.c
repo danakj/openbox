@@ -14,11 +14,11 @@ struct GHashTable *glyph_map = NULL;
 #define TRUNC(x)    ((x) >> 6)
 #define ROUND(x)    (((x)+32) & -64)
 
-void dest_glyph_map_value(gpointer data)
+void dest_glyph_map_value(gpointer key, gpointer val, gpointer data)
 {
-    struct GlftGlyph *g = data;
+    struct GlftGlyph *g = val;
     glDeleteLists(g->dlist, 1);    
-    free(data);
+    free(g);
 }
 
 struct GlftFont *GlftFontOpen(const char *name)
@@ -187,9 +187,6 @@ struct GlftFont *GlftFontOpen(const char *name)
         goto openfail0;
     }
 
-    font->glyph_map = g_hash_table_new_full(g_int_hash, g_int_equal, NULL,
-                                            dest_glyph_map_value);
-
     if (font->char_width)
         font->max_advance_width = font->char_width; 
     else
@@ -198,6 +195,8 @@ struct GlftFont *GlftFontOpen(const char *name)
     font->ascent = font->face->size->metrics.ascender >> 6;
     if (font->minspace) font->height = font->ascent + font->descent;
     else                font->height = font->face->size->metrics.height >> 6;
+
+    font->glyph_map = g_hash_table_new(g_int_hash, g_int_equal);
 
     return font;
 
@@ -213,6 +212,7 @@ void GlftFontClose(struct GlftFont *font)
         FT_Done_Face(font->face);
         FcPatternDestroy(font->pat);
         FcCharSetDestroy(font->chars);
+        g_hash_table_foreach(font->glyph_map, dest_glyph_map_value, NULL);
         g_hash_table_destroy(font->glyph_map);
         free(font);
     }

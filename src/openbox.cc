@@ -163,10 +163,10 @@ Openbox::Openbox(int argc, char **argv)
   v.push_back("C-a");
   _bindings->add_key(v, 3);
 
-//  _bindings->add_mouse("A-1", 1);
+  _bindings->add_mouse("A-1", 1);
 
-//  printf("CHAINS:\n");
-//  _bindings->display();
+  printf("CHAINS:\n");
+  _bindings->display();
   ::exit(0);
 
   setMasterHandler(_actions); // set as the master event handler

@@ -211,7 +211,6 @@ void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
-  printf("node=%lx\n", (long)node);
   if (!_keytree.first_child) {
     // there are no nodes at this level yet
     _keytree.first_child = node;
@@ -220,7 +219,6 @@ void OBBindings::assimilate(BindingTree *node)
     last = a;
     b = node;
     while (a) {
-  printf("in while.. b=%lx\n", (long)b);
       last = a;
       if (a->binding != b->binding) {
         a = a->next_sibling;
@@ -231,20 +229,18 @@ void OBBindings::assimilate(BindingTree *node)
         a = a->first_child;
       }
     }
-  printf("after while.. b=%lx\n", (long)b);
     if (last->binding != b->binding)
       last->next_sibling = b;
-    else
+    else {
       last->first_child = b->first_child;
-    delete b;
+      delete b;
+    }
   }
 }
 
 
 int OBBindings::find_key(BindingTree *search) const {
   BindingTree *a, *b;
-  print_branch(&_keytree, " Searching:");
-  print_branch(search, " for...");
   a = _keytree.first_child;
   b = search;
   while (a && b) {
@@ -253,11 +249,9 @@ int OBBindings::find_key(BindingTree *search) const {
     } else {
       if (a->chain == b->chain) {
 	if (!a->chain) {
-          printf("Match found with %s\n", a->text.c_str());
 	  return a->id; // found it! (return the actual id, not the search's)
         }
       } else {
-        printf("Conflict found with %s\n", a->text.c_str());
         return -2; // the chain status' don't match (conflict!)
       }
       b = b->first_child;
@@ -274,11 +268,8 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
-  print_branch(tree, " Adding: ");
-  
   if (find_key(tree) != -1) {
     // conflicts with another binding
-    printf("Conflict\n");
     destroytree(tree);
     return false;
   }
@@ -286,10 +277,6 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
   // assimilate this built tree into the main tree
   assimilate(tree); // assimilation destroys/uses the tree
 
-  printf("Added!\n");
-  print_branch(&_keytree, "");
-  printf("\n");
-  
   return true;
 }
 

@@ -590,8 +590,8 @@ void BlackboxWindow::decorate(void) {
   }
 
   if (decorations & Decor_Border) {
-    frame.fborder_pixel = screen->getWindowStyle()->f_focus.pixel();
-    frame.uborder_pixel = screen->getWindowStyle()->f_unfocus.pixel();
+    frame.fborder_pixel = screen->getWindowStyle()->f_focus.color().pixel();
+    frame.uborder_pixel = screen->getWindowStyle()->f_unfocus.color().pixel();
   }
 
   if (decorations & Decor_Handle) {
@@ -2710,7 +2710,7 @@ void BlackboxWindow::reparentNotifyEvent(const XReparentEvent *re) {
 
 
 void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
-  if (pe->state == PropertyDelete)
+  if (pe->state == PropertyDelete || ! validateClient())
     return;
 
 #if 0

@@ -69,6 +69,8 @@ nls contributors:
 	 - man pages and Dutch (nl_NL) nls support
 	Øyvind Stegard <oyvind.stegard@bluezone.no>
 	 - Norwegian (no_NO) nls support
+    Wojciech Krygier <wkrygie@kis.p.lodz.pl>
+     - Polish (pl_PL) nls support
 	Ciprian Popovici <ciprian@zuavra.net>
 	 - Romanian (ro_RO) nls support
 	Ales Kosir <ales.kosir@telemach.net>

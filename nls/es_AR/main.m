@@ -5,13 +5,13 @@ $ #RCRequiresArg
 $ #DISPLAYRequiresArg
 # error: '-display' requiere un argumento\n
 $ #WarnDisplaySet
-# warning: no pude establecer la variable de entorno 'DISPLAY'\n
+# Aviso: no pude establecer la variable de entorno 'DISPLAY'\n
 $ #Usage
 # Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
   -display <cadena>\t\tusar la conexión al display.\n\
   -rc <cadena>\t\t\tusar otro archivo de recursos.\n\
-  -version\t\t\tmostrar version y salir.\n\
+  -version\t\t\tmostrar versin y salir.\n\
   -help\t\t\t\tmostrar este texto de ayuda y salir.\n\n
 $ #CompileOptions
 # Opciones de Tiempo de Compilación:\n\

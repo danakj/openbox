@@ -974,10 +974,19 @@ void BScreen::LoadStyle(void) {
     readDatabaseTexture("window.button.unfocus", "black", style);
   resource.wstyle.b_pressed =
     readDatabaseTexture("window.button.pressed", "black", style);
-  resource.wstyle.f_focus =
-    readDatabaseColor("window.frame.focusColor", "white", style);
-  resource.wstyle.f_unfocus =
-    readDatabaseColor("window.frame.unfocusColor", "black", style);
+
+  // we create the window.frame texture by hand because it exists only to
+  // make the code cleaner and is not actually used for display
+  BColor color = readDatabaseColor("window.frame.focusColor", "white", style);
+  resource.wstyle.f_focus = BTexture("solid flat", getBaseDisplay(),
+                                     getScreenNumber(), image_control);
+  resource.wstyle.f_focus.setColor(color);
+
+  color = readDatabaseColor("window.frame.unfocusColor", "white", style);
+  resource.wstyle.f_unfocus = BTexture("solid flat", getBaseDisplay(),
+                                       getScreenNumber(), image_control);
+  resource.wstyle.f_unfocus.setColor(color);
+
   resource.wstyle.l_text_focus =
     readDatabaseColor("window.label.focus.textColor", "black", style);
   resource.wstyle.l_text_unfocus =
@@ -995,7 +1004,17 @@ void BScreen::LoadStyle(void) {
       resource.wstyle.justify = CenterJustify;
   }
 
-  // load toolbar config
+  // sanity checks
+  if (resource.wstyle.t_focus.texture() == BTexture::Parent_Relative)
+    resource.wstyle.t_focus = resource.wstyle.f_focus;
+  if (resource.wstyle.t_unfocus.texture() == BTexture::Parent_Relative)
+    resource.wstyle.t_unfocus = resource.wstyle.f_unfocus;
+  if (resource.wstyle.h_focus.texture() == BTexture::Parent_Relative)
+    resource.wstyle.h_focus = resource.wstyle.f_focus;
+  if (resource.wstyle.h_unfocus.texture() == BTexture::Parent_Relative)
+    resource.wstyle.h_unfocus = resource.wstyle.f_unfocus;
+
+// load toolbar config
   resource.tstyle.toolbar =
     readDatabaseTexture("toolbar", "black", style);
   resource.tstyle.label =
@@ -1023,6 +1042,14 @@ void BScreen::LoadStyle(void) {
       resource.tstyle.justify = RightJustify;
     else if (s == "center" || s == "Center")
       resource.tstyle.justify = CenterJustify;
+  }
+
+  // sanity checks
+  if (resource.tstyle.toolbar.texture() == BTexture::Parent_Relative) {
+    resource.tstyle.toolbar = BTexture("solid flat", getBaseDisplay(),
+                                       getScreenNumber(), image_control);
+    resource.tstyle.toolbar.setColor(BColor("black", getBaseDisplay(),
+                                            getScreenNumber()));
   }
 
   // load menu config
@@ -1071,6 +1098,14 @@ void BScreen::LoadStyle(void) {
   if (style.getValue("menu.bullet.position", s)) {
     if (s == "right" || s == "Right")
       resource.mstyle.bullet_pos = Basemenu::Right;
+  }
+
+  // sanity checks
+  if (resource.mstyle.frame.texture() == BTexture::Parent_Relative) {
+    resource.mstyle.frame = BTexture("solid flat", getBaseDisplay(),
+                                     getScreenNumber(), image_control);
+    resource.mstyle.frame.setColor(BColor("black", getBaseDisplay(),
+                                          getScreenNumber()));
   }
 
   resource.border_color =
@@ -2422,18 +2457,10 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
   texture.setDisplay(getBaseDisplay(), getScreenNumber());
   texture.setImageControl(image_control);
 
-  if (texture.texture() & BTexture::Solid) {
-    texture.setColor(readDatabaseColor(rname + ".color",
-                                       default_color, style));
-    texture.setColorTo(readDatabaseColor(rname + ".colorTo",
-                                         default_color, style));
-  } else if (texture.texture() & BTexture::Gradient) {
-    texture.setColor(readDatabaseColor(rname + ".color",
-                                       default_color, style));
-    texture.setColorTo(readDatabaseColor(rname + ".colorTo",
-                                         default_color, style));
-  }
-
+  texture.setColor(readDatabaseColor(rname + ".color", default_color, style));
+  texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
+                                       style));
+  
   return texture;
 }
 

@@ -62,10 +62,10 @@ struct Strut;
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
 struct WindowStyle {
-  BColor f_focus, f_unfocus, l_text_focus, l_text_unfocus, b_pic_focus,
+  BColor l_text_focus, l_text_unfocus, b_pic_focus,
     b_pic_unfocus;
-  BTexture t_focus, t_unfocus, l_focus, l_unfocus, h_focus, h_unfocus,
-    b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
+  BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
+    h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
   BFont *font;
 

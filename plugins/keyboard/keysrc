@@ -40,6 +40,9 @@
 #  * MaximizeVert - Maximize the focused window vertically
 #  * UnmaximizeVert - Restore the focused window vertically
 #  * ToggleMaximizeVert - Maximize or restore the focused window vertically
+#  * SendToDesktop - Sends the focused window to a specified desktop
+#      * Takes a number argument which specifies the desktop to send the window
+#        to (starting at 1).
 #  * SendToNextDesktop - Sends the focused window to the next desktop
 #  * SendToNextDesktopWrap - Sends the focused window to the next desktop
 #                            (wrapping around the first and last desktops)
@@ -47,6 +50,9 @@
 #  * SendToPreviousDesktopWrap - Sends the focused window to the previous
 #                                desktop (wrapping around the first and last
 #                                desktops)
+#  * Desktop - Switches to the specified desktop
+#      * Takes a number argument which specifies the desktop to switch to
+#	 (starting at 1).
 #  * NextDesktop - Switches to the next desktop
 #  * NextDesktopWrap - Switches to the next desktop (wrapping around the first
 #		       and last desktops)
@@ -87,9 +93,6 @@
 #  * ResizeRelativeVert - Resizes the focused client vertically
 #      * Takes a number argument which specifies the amount to resize the
 #        window. A positive number grows it, a negative number shrinks it.
-#  * Desktops - Switches to the specified desktop
-#      * Takes a number argument which specifies the desktop to switch to
-#	 (starting at 1).
 #  * Execute - Executes a command
 #      * Takes a string argument "in quotes" that is the command to execute.
 #  * Restart - Restarts Openbox

@@ -9,6 +9,10 @@
 #include "mouse.h"
 #include <glib.h>
 
+void plugin_setup_config()
+{
+}
+
 static int drag_threshold = 3;
 
 /* GData of GSList*s of PointerBinding*s. */

@@ -5,6 +5,10 @@
 #include "../kernel/screen.h"
 #include <glib.h>
 
+void plugin_setup_config()
+{
+}
+
 static int resistance = 10;
 static gboolean window_resistance = TRUE; /* window-to-window */
 

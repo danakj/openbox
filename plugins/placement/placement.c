@@ -8,6 +8,10 @@
 
 gboolean history = TRUE;
 
+void plugin_setup_config()
+{
+}
+
 static void place_random(Client *c)
 {
     int l, r, t, b;

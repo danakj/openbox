@@ -7,6 +7,10 @@
 #include "keyboard.h"
 #include <glib.h>
 
+void plugin_setup_config()
+{
+}
+
 KeyBindingTree *firstnode;
 
 static KeyBindingTree *curpos;

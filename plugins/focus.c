@@ -5,6 +5,22 @@
 #include "../kernel/focus.h"
 #include "../kernel/stacking.h"
 #include "../kernel/openbox.h"
+#include "../kernel/config.h"
+
+void plugin_setup_config()
+{
+    config_def_set(config_def_new("focus.followMouse", Config_Bool,
+                                  "Focus Follows Mouse",
+                                  "Focus windows when the mouse pointer "
+                                  "enters them."));
+    config_def_set(config_def_new("focus.focusNew", Config_Bool,
+                                  "Focus New Windows",
+                                  "Focus windows when they first appear "));
+    config_def_set(config_def_new("focus.warpOnDeskSwitch", Config_Bool,
+                                  "Warp Pointer On Desktop Switch",
+                                  "Warps the pointer to the focused window "
+                                  "when switching desktops."));
+}
 
 /* config options */
 static gboolean follow_mouse = TRUE;

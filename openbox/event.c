@@ -224,14 +224,15 @@ void event_process(XEvent *e)
         g_message("FocusIn on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
 	if (e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail == NotifyAncestor ||
+            /*e->xfocus.detail == NotifyAncestor ||*/
             e->xfocus.detail > NotifyNonlinearVirtual) return;
             g_message("FocusIn on %lx", window);
         break;
     case FocusOut:
         g_message("FocusOut on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
-	if (e->xfocus.detail == NotifyInferior ||
+	if (e->xfocus.mode == NotifyGrab ||
+            e->xfocus.detail == NotifyInferior ||
             e->xfocus.detail == NotifyAncestor ||
             e->xfocus.detail > NotifyNonlinearVirtual) return;
 
@@ -244,8 +245,17 @@ void event_process(XEvent *e)
 		event_process(&fi);
 
                 /* secret magic way of event_process telling us that no client
-                   was found for the FocusIn event */
-                if (fi.xfocus.window != None)
+                   was found for the FocusIn event.
+                   
+                   it should be noted!! that focus events of invalud types
+                   (the ones that cause a return in the FocusIn case above)
+                   will not cause this focus_fallback to be called. it will
+                   be assumed that focus is going someplace sane still, or
+                   there are more focus events coming to fix up the situation.
+                   this may not be perfect.. but its working! and focus events
+                   are too much headache to take that for granted. ktnx. ^_^
+                */
+                if (fi.xfocus.window == None)
                     focus_fallback(FALSE);
                 if (fi.xfocus.window == e->xfocus.window)
                     return;
@@ -274,6 +284,8 @@ void event_process(XEvent *e)
 	event_handle_root(e);
     else if (e->type == MapRequest)
 	client_manage(window);
+    else if (e->type == FocusIn)
+	e->xfocus.window = None; /* says a client was found for the event! */
     else if (e->type == ConfigureRequest) {
 	/* unhandled configure requests must be used to configure the
 	   window directly */
@@ -345,8 +357,6 @@ static void event_handle_client(Client *client, XEvent *e)
         /* focus state can affect the stacking layer */
         client_calc_layer(client);
         engine_frame_adjust_focus(client->frame);
-
-	e->xfocus.window = None; /* says a client was found for the event! */
 	break;
     case EnterNotify:
         if (client_normal(client)) {

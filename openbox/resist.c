@@ -7,13 +7,10 @@
 
 #include <glib.h>
 
-void resist_move(ObClient *c, gint *x, gint *y)
+void resist_move_windows(ObClient *c, gint *x, gint *y)
 {
     GList *it;
-    Rect *area;
-    guint i;
     gint l, t, r, b; /* requested edges */
-    gint al, at, ar, ab; /* screen area edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
     ObClient *snapx = NULL, *snapy = NULL;
@@ -31,7 +28,6 @@ void resist_move(ObClient *c, gint *x, gint *y)
     cr = cl + c->frame->area.width - 1;
     cb = ct + c->frame->area.height - 1;
     
-    /* snap to other clients */
     if (config_resist_win)
         for (it = stacking_list; it != NULL; it = it->next) {
             ObClient *target;
@@ -91,8 +87,30 @@ void resist_move(ObClient *c, gint *x, gint *y)
 
             if (snapx && snapy) break;
         }
+}
 
-    /* get the screen boundaries */
+void resist_move_monitors(ObClient *c, gint *x, gint *y)
+{
+    Rect *area;
+    guint i;
+    gint l, t, r, b; /* requested edges */
+    gint al, at, ar, ab; /* screen area edges */
+    gint cl, ct, cr, cb; /* current edges */
+    gint w, h; /* current size */
+
+    w = c->frame->area.width;
+    h = c->frame->area.height;
+
+    l = *x;
+    t = *y;
+    r = l + w - 1;
+    b = t + h - 1;
+
+    cl = c->frame->area.x;
+    ct = c->frame->area.y;
+    cr = cl + c->frame->area.width - 1;
+    cb = ct + c->frame->area.height - 1;
+    
     if (config_resist_edge) {
         for (i = 0; i < screen_num_monitors; ++i) {
             area = screen_area_monitor(c->desktop, i);
@@ -105,7 +123,6 @@ void resist_move(ObClient *c, gint *x, gint *y)
             ar = al + area->width - 1;
             ab = at + area->height - 1;
 
-            /* snap to screen edges */
             if (cl >= al && l < al && l >= al - config_resist_edge)
                 *x = al;
             else if (cr <= ar && r > ar && r <= ar + config_resist_edge)
@@ -118,34 +135,24 @@ void resist_move(ObClient *c, gint *x, gint *y)
     }
 }
 
-void resist_size(ObClient *c, gint *w, gint *h, ObCorner corn)
+void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
 {
     GList *it;
     ObClient *target; /* target */
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
     gint tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides*/
-    Rect *area;
-    gint al, at, ar, ab; /* screen boundaries */
+    gint incw, inch;
     ObClient *snapx = NULL, *snapy = NULL;
 
-    /* don't snap windows with size increments */
-    if (c->size_inc.width > 1 || c->size_inc.height > 1)
-        return;
+    incw = c->size_inc.width;
+    inch = c->size_inc.height;
 
     l = c->frame->area.x;
     r = l + c->frame->area.width - 1;
     t = c->frame->area.y;
     b = t + c->frame->area.height - 1;
 
-    /* get the screen boundaries */
-    area = screen_area(c->desktop);
-    al = area->x;
-    at = area->y;
-    ar = al + area->width - 1;
-    ab = at + area->height - 1;
-
-    /* snap to other windows */
     if (config_resist_win) {
         for (it = stacking_list; it != NULL; it = it->next) {
             if (!WINDOW_IS_CLIENT(it->data))
@@ -212,8 +219,30 @@ void resist_size(ObClient *c, gint *w, gint *h, ObCorner corn)
             if (snapx && snapy) break;
         }
     }
+}
 
-    /* snap to screen edges */
+void resist_size_monitors(ObClient *c, gint *w, gint *h, ObCorner corn)
+{
+    gint l, t, r, b; /* my left, top, right and bottom sides */
+    gint dlt, drb; /* my destination left/top and right/bottom sides */
+    Rect *area;
+    gint al, at, ar, ab; /* screen boundaries */
+    gint incw, inch;
+
+    l = c->frame->area.x;
+    r = l + c->frame->area.width - 1;
+    t = c->frame->area.y;
+    b = t + c->frame->area.height - 1;
+
+    incw = c->size_inc.width;
+    inch = c->size_inc.height;
+
+    /* get the screen boundaries */
+    area = screen_area(c->desktop);
+    al = area->x;
+    at = area->y;
+    ar = al + area->width - 1;
+    ab = at + area->height - 1;
 
     if (config_resist_edge) {
         /* horizontal snapping */
@@ -222,6 +251,8 @@ void resist_size(ObClient *c, gint *w, gint *h, ObCorner corn)
         case OB_CORNER_BOTTOMLEFT:
             dlt = l;
             drb = r + *w - c->frame->area.width;
+            g_message("r %d drb %d ar %d res %d",
+                      r, drb, ar, config_resist_edge);
             if (r <= ar && drb > ar && drb <= ar + config_resist_edge)
                 *w = ar - l + 1;
             break;

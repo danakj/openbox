@@ -105,8 +105,8 @@ def _place_popup():
         except: x = y = 0
         if x < 0: x += area.right() - size.width() + 2
         if y < 0: y += area.bottom() - size.height() + 2
-        x += area.position.x()
-        y += area.position.y()
+        x += area.position().x()
+        y += area.position().y()
     _popwidget.moveresize(otk.Rect(x, y, size.width(), size.height()))
 
 def _motion_grab(data):

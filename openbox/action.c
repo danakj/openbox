@@ -51,6 +51,12 @@ void action_iconify(union ActionData *data)
     client_iconify(data->client.c, TRUE, TRUE);
 }
 
+void action_focusraise(union ActionData *data)
+{
+    client_focus(data->client.c);
+    stacking_raise(data->client.c);
+}
+
 void action_raise(union ActionData *data)
 {
     stacking_raise(data->client.c);
@@ -395,6 +401,8 @@ void action_move(union ActionData *data)
     int x = data->move.x;
     int y = data->move.y;
 
+    /* XXX window snapping/struts */
+
     client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
                      TRUE, data->move.final);
 }
@@ -404,6 +412,8 @@ void action_resize(union ActionData *data)
     Client *c = data->resize.c;
     int w = data->resize.x - c->frame->size.left - c->frame->size.right;
     int h = data->resize.y - c->frame->size.top - c->frame->size.bottom;
+
+    /* XXX window snapping/struts */
 
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);

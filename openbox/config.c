@@ -43,6 +43,7 @@ GSList *config_desktops_names;
 gint    config_screen_firstdesk;
 
 gboolean config_resize_redraw;
+gboolean config_resize_four_corners;
 gint     config_resize_popup_show;
 gint     config_resize_popup_pos;
 
@@ -300,6 +301,8 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     
     if ((n = parse_find_node("drawContents", node)))
         config_resize_redraw = parse_bool(doc, n);
+    if ((n = parse_find_node("fourCorner", node)))
+        config_resize_four_corners = parse_bool(doc, n);
     if ((n = parse_find_node("popupShow", node))) {
         config_resize_popup_show = parse_int(doc, n);
         if (parse_contains("Always", doc, n))
@@ -559,6 +562,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
+    config_resize_four_corners = FALSE;
     config_resize_popup_show = 1; /* nonpixel increments */
     config_resize_popup_pos = 0;  /* center of client */
 

@@ -44,6 +44,7 @@
 
 <resize>
   <drawContents>yes</drawContents>
+  <fourCorners>no</fourCorners>
 </resize>
 
 <dock>

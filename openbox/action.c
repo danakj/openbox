@@ -1344,25 +1344,40 @@ void action_toggle_decorations(union ActionData *data)
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch)
 {
-    if ((cw / 3 < 1) || (x - cx > cw / 3 * 2)) {
-        if ((ch / 3 < 1) || (y - cy > ch / 3 * 2))
-            return prop_atoms.net_wm_moveresize_size_bottomright;
-        else if (y - cy < ch / 3)
-            return prop_atoms.net_wm_moveresize_size_topright;
-        else
-            return prop_atoms.net_wm_moveresize_size_right;
-    } else if (x - cx < cw / 3) {
-        if (y - cy > ch / 3 * 2)
-            return prop_atoms.net_wm_moveresize_size_bottomleft;
-        else if (y - cy < ch / 3)
-            return prop_atoms.net_wm_moveresize_size_topleft;
-        else
-            return prop_atoms.net_wm_moveresize_size_left;
+    if (config_resize_four_corners) {
+        if (x - cx > cw / 2) {
+            if (y - cy > ch / 2)
+                return prop_atoms.net_wm_moveresize_size_bottomright;
+            else
+                return prop_atoms.net_wm_moveresize_size_topright;
+        } else {
+            if (y - cy > ch / 2)
+                return prop_atoms.net_wm_moveresize_size_bottomleft;
+            else
+                return prop_atoms.net_wm_moveresize_size_topleft;
+        }
     } else {
-        if (y - cy > ch / 2)
-            return prop_atoms.net_wm_moveresize_size_bottom;
-        else
-            return prop_atoms.net_wm_moveresize_size_top;
+        if (x - cx > cw * 2 / 3) {
+            if (y - cy > ch * 2 / 3)
+                return prop_atoms.net_wm_moveresize_size_bottomright;
+            else if (y - cy < ch / 3)
+                return prop_atoms.net_wm_moveresize_size_topright;
+            else
+                return prop_atoms.net_wm_moveresize_size_right;
+        } else if (x - cx < cw / 3) {
+            if (y - cy > ch * 2 / 3)
+                return prop_atoms.net_wm_moveresize_size_bottomleft;
+            else if (y - cy < ch / 3)
+                return prop_atoms.net_wm_moveresize_size_topleft;
+            else
+                return prop_atoms.net_wm_moveresize_size_left;
+        } else
+            if (y - cy > ch * 2 / 3)
+                return prop_atoms.net_wm_moveresize_size_bottom;
+            else if (y - cy < ch / 3)
+                return prop_atoms.net_wm_moveresize_size_top;
+            else
+                return prop_atoms.net_wm_moveresize_move;
     }
 }
 

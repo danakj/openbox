@@ -31,6 +31,8 @@
      Sun Oct 31 10:08:34 UTC 2004 - mikachu(a)openbox.org
          we haven't remembered to update this changelog in a while,
          adding desktopMenuIcons.
+     Thu Nov  4 12:07:08 UTC 2004 - mikachu(a)openbox.org
+         Add fourCorners to resize context.
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     targetNamespace="http://openbox.org/"
@@ -114,6 +116,7 @@
     <xs:complexType name="resize">
         <xs:sequence>
             <xs:element name="drawContents" type="ob:yesorno"/>
+            <xs:element name="fourCorners" type="ob:yesorno"/>
             <xs:element name="popupShow" type="ob:popupshow"/>
             <xs:element name="popupPosition" type="ob:popupposition"/>
         </xs:sequence>

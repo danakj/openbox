@@ -1,23 +1,23 @@
 # Spanish messages for openbox.
-# Copyright (C) 2004 Mikael Magnusson
+# Copyright (C) 2005 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# Miguel Calleja Gomez <mcg79@lycos.es>, 2004.
+# Miguel Calleja GÃ³mez <mcg79@lycos.es>, 2005.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.1\n"
+"Project-Id-Version: Openbox 3.3\n"
 "Report-Msgid-Bugs-To: mikachu@icculus.org\n"
-"POT-Creation-Date: 2004-11-07 12:52+0100\n"
-"PO-Revision-Date: 2004-01-25 20:41+0100\n"
-"Last-Translator: Miguel Calleja Gomez <mcg79@lycos.es>\n"
+"POT-Creation-Date: 2005-03-25 00:39+0100\n"
+"PO-Revision-Date: 2005-03-25 09:31+0100\n"
+"Last-Translator: Miguel Calleja GÃ³mez <mcg79@lycos.es>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: openbox/client_list_menu.c:95
 msgid "Go there..."
-msgstr "Ir ahí..."
+msgstr "Ir ahÃ­..."
 
 #: openbox/client_list_menu.c:161
 msgid "Desktops"
@@ -65,7 +65,7 @@ msgstr "Enviar a escritorio"
 
 #: openbox/client_menu.c:192
 msgid "Client menu"
-msgstr "Menú del cliente"
+msgstr "MenÃº del cliente"
 
 #: openbox/client_menu.c:205
 msgid "Iconify"
@@ -77,7 +77,7 @@ msgstr "Poner en primer plano"
 
 #: openbox/client_menu.c:226
 msgid "Lower to bottom"
-msgstr "Poner en último plano"
+msgstr "Poner en Ãºltimo plano"
 
 #: openbox/client_menu.c:239
 msgid "Decorate"
@@ -110,14 +110,14 @@ msgstr "No se puede crear el directorio '%s': %s"
 
 #: render/font.c:50
 msgid "Couldn't initialize Xft."
-msgstr ""
+msgstr "No se pudo iniciar Xft."
 
-#: render/font.c:122 render/font.c:127
+#: render/font.c:164 render/font.c:169
 #, c-format
 msgid "Unable to load font: %s\n"
-msgstr ""
+msgstr "No se puede cargar la fuente: %s\n"
 
-#: render/font.c:123
+#: render/font.c:165
 #, c-format
 msgid "Trying fallback font: %s\n"
-msgstr ""
+msgstr "Intentando recurrir a la fuente: %s\n"

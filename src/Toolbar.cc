@@ -581,6 +581,11 @@ void Toolbar::checkClock(bool redraw, bool date) {
 
     int pos = frame.bevel_w * 2; // this is modified by doJustify()
     style->doJustify(t, pos, frame.clock_w, frame.bevel_w * 4);
+
+#ifdef    XFT
+    XClearWindow(display, frame.clock);
+#endif // XFT
+
     style->font->drawString(frame.clock, pos, 1, style->c_text, t);
   }
 }
@@ -592,6 +597,10 @@ void Toolbar::redrawWindowLabel(bool redraw) {
     XClearWindow(display, frame.window_label);
     return;
   }
+
+#ifdef    XFT
+  redraw = true;
+#endif // XFT
 
   if (redraw)
     XClearWindow(display, frame.window_label);
@@ -609,6 +618,10 @@ void Toolbar::redrawWindowLabel(bool redraw) {
 
 void Toolbar::redrawWorkspaceLabel(bool redraw) {
   const string& name = screen->getCurrentWorkspace()->getName();
+
+#ifdef    XFT
+  redraw = true;
+#endif // XFT
 
   if (redraw)
     XClearWindow(display, frame.workspace_label);

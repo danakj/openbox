@@ -192,7 +192,7 @@ string BFont::buildXlfd(void) const {
 string BFont::buildMultibyteXlfd(void) const {
   string weight = _bold ? "bold" : "medium";
   string slant = _italic ? "i" : "r";
-  string sizestr= _size ? itostring(_size) : "*";
+  string sizestr= _size ? itostring(_size * 10) : "*";
 
   return _family + ','
     + "-*-*-" + weight + "-" + slant + "-*-*-*-" + sizestr +

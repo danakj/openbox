@@ -1916,16 +1916,9 @@ void BScreen::prevFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
-  if (focused) {
-    // if window is not on this screen, ignore it
-    if (focused->getScreen()->getScreenNumber() != getScreenNumber())
-      focused = (BlackboxWindow*) 0;
-  }
-  
   if (focused &&
       focused->getScreen()->getScreenNumber() == getScreenNumber() &&
       current_workspace->getCount() > 1) {
-    // next is the next window to receive focus, current is a place holder
     do {
       next = current_workspace->getPrevWindowInList(next);
     } while (next != focused && ! next->setInputFocus());

@@ -1,15 +1,24 @@
 Changelog for Openbox:
-2.2.0
+
+2.2.1:
+ * Fix bug with mutltibyte fonts being realy tiny.      (Ben Jansens)
+
+ * Fix menu redraw bug when dragging them off-screen or (Scott Moynes)
+   under other menus, with Xft fonts.
+
+ * Build fixes for xftlsfonts and for openbox on        (Marius Nita)
+   redhat systems.
+
+2.2.0:
  * Allow changing the appearance of buttons with xbm	(Scott Moynes)
    bitmap files. Can be disabled with 
    --disable-bitmap-buttons.
  
  * Added style textures for				(Scott Moynes)
    window.button.pressed.focus/unfocus:
-2.1.2
+
  * Fixed window menu placement bug			(Scott Moynes)
 
-2.1.1:
  * A build fix for xftlsfonts.                          (Scott Moynes)
 
  * Add a configuration menu for changing Xft font       (Ben Jansens)

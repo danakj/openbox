@@ -10,6 +10,12 @@ GNU Flex
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Pkg-Config
+Glib 2.0+
+libxml2 2.0+
+
+Optionally, if you want to build the configuration tool (this is recommended):
+GTK+ 2.0+
+libglade 2.0+
 
 I recommend the latest version of all these packages.
 
@@ -25,16 +31,5 @@ It needs to be installed before it is run.
 The installed binary is 'openbox3'.
 
 
-
-----
-Here's the packages from Debian (sid):
-  gcc
-  gettext
-  autoconf
-  libtool
-  bison
-  flex
-  libxft2-dev
-  pkg-config
 
 ----

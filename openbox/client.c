@@ -494,7 +494,8 @@ void client_move_onscreen(ObClient *self, gboolean rude)
     int x = self->area.x;
     int y = self->area.y;
     if (client_find_onscreen(self, &x, &y,
-                             self->area.width, self->area.height, rude)) {
+                             self->frame->area.width,
+                             self->frame->area.height, rude)) {
         client_configure(self, OB_CORNER_TOPLEFT, x, y,
                          self->area.width, self->area.height,
                          TRUE, TRUE);

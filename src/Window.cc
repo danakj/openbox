@@ -2701,7 +2701,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
   if (pe->state == PropertyDelete)
     return;
 
-#ifdef    DEBUG
+#if 0
   fprintf(stderr, "BlackboxWindow::propertyNotifyEvent(): for 0x%lx\n",
           client.window);
 #endif
@@ -2802,7 +2802,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
 
 
 void BlackboxWindow::exposeEvent(const XExposeEvent *ee) {
-#ifdef DEBUG
+#if 0
   fprintf(stderr, "BlackboxWindow::exposeEvent() for 0x%lx\n", client.window);
 #endif
 
@@ -3611,7 +3611,7 @@ void BlackboxWindow::endResize(void) {
 
 
 void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
-#ifdef DEBUG
+#if 0
   fprintf(stderr, "BlackboxWindow::motionNotifyEvent() for 0x%lx\n",
           client.window);
 #endif
@@ -3729,6 +3729,12 @@ void BlackboxWindow::restore(bool remap) {
   // do not leave a shaded window as an icon unless it was an icon
   if (flags.shaded && ! flags.iconic)
     setState(NormalState);
+
+  // erase the netwm stuff that we read when a window maps, so that it
+  // doesn't persist between mappings.
+  // (these are the ones read in getNetWMFlags().)
+  xatom->eraseValue(client.window, XAtom::net_wm_desktop);
+  xatom->eraseValue(client.window, XAtom::net_wm_state);
 
   restoreGravity(client.rect);
 

@@ -566,6 +566,8 @@ static gboolean nearest_timeout_wait(ObMainLoop *loop, GTimeVal *tm)
 
 static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 {
+    gboolean fired = FALSE;
+
     g_get_current_time(&loop->now);
 
     while (loop->timers != NULL) {
@@ -600,15 +602,16 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
             g_free(curr);
         }
 
+        fired = TRUE;
+    }
+
+    if (fired) {
 	/* if at least one timer fires, then don't wait on X events, as there
 	   may already be some in the queue from the timer callbacks.
 	*/
 	loop->ret_wait.tv_sec = loop->ret_wait.tv_usec = 0;
 	*wait = &loop->ret_wait;
-	return;
-    }
-
-    if (nearest_timeout_wait(loop, &loop->ret_wait))
+    } else if (nearest_timeout_wait(loop, &loop->ret_wait))
 	*wait = &loop->ret_wait;
     else
 	*wait = NULL;

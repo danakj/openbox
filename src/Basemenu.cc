@@ -982,6 +982,6 @@ void Basemenu::reconfigure(void) {
 
 void Basemenu::changeItemLabel(unsigned int index, const string& label) {
   BasemenuItem *item = find(index);
-  assert(item);
-  item->newLabel(label);
+  if (item)
+    item->newLabel(label);
 }

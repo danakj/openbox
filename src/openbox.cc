@@ -943,7 +943,7 @@ void Openbox::load() {
   else
     resource.double_click_interval = 250;
 
-  if (!config.getValue("session.autoRaiseDelay", "Session.AutoRaiseDelay", l))
+  if (config.getValue("session.autoRaiseDelay", "Session.AutoRaiseDelay", l))
     resource.auto_raise_delay.tv_usec = l;
   else
     resource.auto_raise_delay.tv_usec = 400;

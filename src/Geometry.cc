@@ -30,11 +30,11 @@ Point::Point(const Point &point) : m_x(point.m_x), m_y(point.m_y) {
 Point::Point(const int x, const int y) : m_x(x), m_y(y) {
 }
 
-inline void Point::setX(const int x) {
+void Point::setX(const int x) {
   m_x = x;
 }
 
-inline void Point::setY(const int y) {
+void Point::setY(const int y) {
   m_y = y;
 }
 
@@ -47,11 +47,11 @@ Size::Size(const Size &size) : m_w(size.m_w), m_h(size.m_h) {
 Size::Size(const int w, const int h) : m_w(w), m_h(h) {
 }
 
-inline void Size::setW(const int w) {
+void Size::setW(const int w) {
   m_w = w;
 }
 
-inline void Size::setH(const int h) {
+void Size::setH(const int h) {
   m_h = h;
 }
 

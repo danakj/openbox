@@ -2805,7 +2805,7 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       int snap_distance = screen->getEdgeSnapThreshold();
       // width/height of the snapping window
       unsigned int snap_w = frame.width + (frame.border_w * 2);
-      unsigned int snap_h = getHeight() + (frame.border_w * 2);
+      unsigned int snap_h = size().h() + (frame.border_w * 2);
       if (snap_distance) {
         int drx = screen->getWidth() - (dx + snap_w);
 

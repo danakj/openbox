@@ -334,33 +334,33 @@ static rectList calcSpace(const OpenboxWindow &win, const rectList &spaces) {
   rectList result;
   rectList::const_iterator siter;
   for(siter=spaces.begin(); siter!=spaces.end(); ++siter) {
-    if(win.getArea().Intersect(*siter)) {
+    if(win.area().Intersect(*siter)) {
       //Check for space to the left of the window
-      if(win.getXFrame() > siter->x())
+      if(win.origin().x() > siter->x())
         result.push_back(Rect(siter->x(), siter->y(),
-                              win.getXFrame() - siter->x() - 1,
+                              win.origin().x() - siter->x() - 1,
                               siter->h()));
       //Check for space above the window
-      if(win.getYFrame() > siter->y())
+      if(win.origin().y() > siter->y())
         result.push_back(Rect(siter->x(), siter->y(),
                               siter->w(),
-                              win.getYFrame() - siter->y() - 1));
+                              win.origin().y() - siter->y() - 1));
       //Check for space to the right of the window
-      if((win.getXFrame()+win.getWidth()) <
+      if((win.origin().x()+win.size().w()) <
          (siter->x()+siter->w()))
-        result.push_back(Rect(win.getXFrame() + win.getWidth() + 1,
+        result.push_back(Rect(win.origin().x() + win.size().w() + 1,
                               siter->y(),
                               siter->x() + siter->w() -
-                              win.getXFrame() - win.getWidth() - 1,
+                              win.origin().x() - win.size().w() - 1,
                               siter->h()));
       //Check for space below the window
-      if((win.getYFrame()+win.getHeight()) <
+      if((win.origin().y()+win.size().h()) <
          (siter->y()+siter->h()))
         result.push_back(Rect(siter->x(),
-                              win.getYFrame() + win.getHeight() + 1,
+                              win.origin().y() + win.size().h() + 1,
                               siter->w(),
                               siter->y() + siter->h()-
-                              win.getYFrame() - win.getHeight() - 1));
+                              win.origin().y() - win.size().h() - 1));
 
     }
     else
@@ -417,43 +417,41 @@ inline Point *Workspace::rowSmartPlacement(const Size &win_size,
   while(!placed &&
         ((screen.getColPlacementDirection() == BScreen::BottomTop) ?
          test_y > 0 : test_y + win_size.h() < (signed) space.h())) {
-     test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
-              start_pos : space.w() - win_size.w() - start_pos;
-     while (!placed &&
-            ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
-             test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
-        placed = true;
-    
-        it.reset();
-        for (OpenboxWindow *curr = it.current(); placed && curr;
-             it++, curr = it.current()) {
-           int curr_w = curr->getWidth() + (screen.getBorderWidth() * 4);
-           int curr_h =
-             ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
-             (screen.getBorderWidth() * 4);
-   
-           if (curr->getXFrame() < test_x + win_size.w() &&
-               curr->getXFrame() + curr_w > test_x &&
-               curr->getYFrame() < test_y + win_size.h() &&
-               curr->getYFrame() + curr_h > test_y) {
-              placed = false;
-           }
-        }
- 
-        // Removed code for checking toolbar and slit
-        // The space passed in should not include either
-        
-        if (placed) {
-           place_x = test_x;
-           place_y = test_y;
- 
-           break;
-        }   
-        
-        test_x += (change_x * delta_x);
-     }
+    test_x = (screen.getRowPlacementDirection() == BScreen::LeftRight) ?
+      start_pos : space.w() - win_size.w() - start_pos;
+    while (!placed &&
+           ((screen.getRowPlacementDirection() == BScreen::RightLeft) ?
+            test_x > 0 : test_x + win_size.w() < (signed) space.w())) {
+      placed = true;
 
-     test_y += (change_y * delta_y);
+      it.reset();
+      for (OpenboxWindow *curr = it.current(); placed && curr;
+           it++, curr = it.current()) {
+        int curr_w = curr->size().w() + (screen.getBorderWidth() * 4);
+        int curr_h = curr->size().h() + (screen.getBorderWidth() * 4);
+
+        if (curr->origin().x() < test_x + win_size.w() &&
+            curr->origin().x() + curr_w > test_x &&
+            curr->origin().y() < test_y + win_size.h() &&
+            curr->origin().y() + curr_h > test_y) {
+          placed = false;
+        }
+      }
+
+      // Removed code for checking toolbar and slit
+      // The space passed in should not include either
+
+      if (placed) {
+        place_x = test_x;
+        place_y = test_y;
+
+        break;
+      }   
+
+      test_x += (change_x * delta_x);
+    }
+
+    test_y += (change_y * delta_y);
   }
   return new Point(place_x, place_y);
 }
@@ -463,8 +461,8 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 
   Bool placed = False;
 
-  const int win_w = win->getWidth() + (screen.getBorderWidth() * 4),
-    win_h = win->getHeight() + (screen.getBorderWidth() * 4),
+  const int win_w = win->size().w() + (screen.getBorderWidth() * 4),
+    win_h = win->size().h() + (screen.getBorderWidth() * 4),
 #ifdef    SLIT
     slit_x = screen.getSlit()->getX() - screen.getBorderWidth(),
     slit_y = screen.getSlit()->getY() - screen.getBorderWidth(),
@@ -537,15 +535,15 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 	     it++, curr = it.current()) {
           if (curr->isMaximizedFull()) // fully maximized, ignore it
             continue;
-          int curr_w = curr->getWidth() + (screen.getBorderWidth() * 4);
+          int curr_w = curr->size().w() + (screen.getBorderWidth() * 4);
           int curr_h =
-            ((curr->isShaded()) ? curr->getTitleHeight() : curr->getHeight()) +
+            ((curr->isShaded()) ? curr->getTitleHeight() : curr->size().h()) +
             (screen.getBorderWidth() * 4);
 
-          if (curr->getXFrame() < test_x + win_w &&
-              curr->getXFrame() + curr_w > test_x &&
-              curr->getYFrame() < test_y + win_h &&
-              curr->getYFrame() + curr_h > test_y) {
+          if (curr->origin().x() < test_x + win_w &&
+              curr->origin().x() + curr_w > test_x &&
+              curr->origin().y() < test_y + win_h &&
+              curr->origin().y() + curr_h > test_y) {
             placed = False;
 	  }
         }
@@ -599,5 +597,5 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   if (place_y + win_h > (signed) screen.getHeight())
     place_y = (((signed) screen.getHeight()) - win_h) / 2;
 
-  win->configure(place_x, place_y, win->getWidth(), win->getHeight());
+  win->configure(place_x, place_y, win->size().w(), win->size().h());
 }

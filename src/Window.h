@@ -271,43 +271,44 @@ public:
 
   inline char **getTitle(void) { return &client.title; }
   inline char **getIconTitle(void) { return &client.icon_title; }
-  inline const int &getXFrame(void) const { return frame.x; }
-  inline const int &getYFrame(void) const { return frame.y; }
-  inline const int &getXClient(void) const { return client.x; }
-  inline const int &getYClient(void) const { return client.y; }
+  //inline const int &getXFrame(void) const { return frame.x; }
+  //inline const int &getYFrame(void) const { return frame.y; }
+  //inline const int &getXClient(void) const { return client.x; }
+  //inline const int &getYClient(void) const { return client.y; }
   inline const int &getWorkspaceNumber(void) const { return workspace_number; }
   inline const int &getWindowNumber(void) const { return window_number; }
 
-  inline const unsigned int &getWidth(void) const { return frame.width; }
-  inline const unsigned int &getHeight(void) const {
-    if (!flags.shaded)
-      return frame.height;
-    else
-      return frame.title_h;
-  }
-  inline const unsigned int &getClientHeight(void) const
-  { return client.height; }
-  inline const unsigned int &getClientWidth(void) const
-  { return client.width; }
+  //inline const unsigned int &getWidth(void) const { return frame.width; }
+  //inline const unsigned int &getHeight(void) const {
+  //  if (!flags.shaded)
+  //    return frame.height;
+  //  else
+  //    return frame.title_h;
+  //}
+  //inline const unsigned int &getClientHeight(void) const
+  //{ return client.height; }
+  //inline const unsigned int &getClientWidth(void) const
+  //{ return client.width; }
   inline const unsigned int &getTitleHeight(void) const
   { return frame.title_h; }
 
-  inline const Point getOrigin() const {
+  inline const Point origin() const {
     return Point(frame.x, frame.y);
   }
-  inline const Point getClientOrigin() const {
+  inline const Point clientOrigin() const {
     return Point(client.x, client.y);
   }
-  inline const Size getSize() const {
-    return Size(frame.width, frame.height);
+  inline const Size size() const {
+    return Size(frame.width, flags.shaded ? frame.title_h : frame.height);
   }
-  inline const Size getClientSize() const {
+  inline const Size clientSize() const {
     return Size(client.width, client.height);
   }
-  inline const Rect getArea() const {
-    return Rect(frame.x, frame.y, frame.width, frame.height);
+  inline const Rect area() const {
+    return Rect(frame.x, frame.y, frame.width,
+                flags.shaded ? frame.title_h : frame.height);
   }
-  inline const Rect getClientArea() const {
+  inline const Rect clientArea() const {
     return Rect(client.x, client.y, client.width, client.height);
   }
   

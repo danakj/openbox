@@ -127,7 +127,7 @@ class _Cycle:
 
         # show or hide the list and its child widgets
         if len(self.items) > 1:
-            size = self.screeninfo.size()
+            size = self.screen.size()
             self.widget.moveresize(otk.Rect((size.width() - width) / 2,
                                             (size.height() - height) / 2,
                                             width, height))
@@ -145,7 +145,6 @@ class _Cycle:
            preferably caching it.  Data is what's given to callback functions.
            """
         self.screen = ob.openbox.screen(data.screen)
-        self.screeninfo = otk.display.screenInfo(data.screen)
 
     def chooseStartPos(self):
         """Set self.menupos to a number between 0 and len(self.items) - 1.
@@ -346,17 +345,13 @@ class _CycleWindows(_Cycle):
         # move the to client's desktop if required
         if not (client.iconic() or client.desktop() == 0xffffffff or \
                 client.desktop() == self.screen.desktop()):
-            root = self.screeninfo.rootWindow()
-            ob.send_client_msg(root, otk.atoms.net_current_desktop,
-                               root, client.desktop())
+            self.screen.changeDesktop(client.desktop())
         
         # send a net_active_window message for the target
         if final or not client.iconic():
             if final: r = self.RAISE_WINDOW
             else: r = 0
-            ob.send_client_msg(self.screeninfo.rootWindow(),
-                               otk.atoms.openbox_active_window,
-                               client.window(), final, r)
+            client.focus(final, r)
             if not final:
                 focus._skip += 1
 
@@ -468,9 +463,7 @@ class _CycleDesktops(_Cycle):
             desktop = self.items[self.menupos]
         except IndexError: return
 
-        root = self.screeninfo.rootWindow()
-        ob.send_client_msg(root, otk.atoms.net_current_desktop,
-                           root, desktop.index)
+        self.screen.changeDesktop(desktop.index)
 
 CycleDesktops = _CycleDesktops()
 

@@ -1,5 +1,5 @@
 // -*- mode++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-// Window.cc for Blackbox - an X11 Window manager
+// bsetroot.cc for Blackbox - an X11 Window manager
 // Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh at debian.org>
 // Copyright (c) 1997 - 2000, 2002 Brad Hughes <bhughes at trolltech.com>
 //
@@ -150,11 +150,19 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
 
   /* Clear out the old pixmap */
   XGetWindowProperty(getXDisplay(), screen_info->getRootWindow(),
-                     rootpmap_id, 0L, 1L, False, XA_PIXMAP,
-                     &type, &format, &length, &after, &data);
-  if (type == XA_PIXMAP && format == 32) {
-    XKillClient(getXDisplay(), *((Pixmap *) data));
-    XSync(getXDisplay(), False);
+		     rootpmap_id, 0L, 1L, False, AnyPropertyType,
+		     &type, &format, &length, &after, &data);
+
+  if ((type == XA_PIXMAP) && (format == 32) && (length == 1)) {
+    unsigned char* data_esetroot = 0;
+    XGetWindowProperty(getXDisplay(), screen_info->getRootWindow(),
+                       esetroot_id, 0L, 1L, False, AnyPropertyType,
+                       &type, &format, &length, &after, &data_esetroot);
+    if (data && data_esetroot && *((Pixmap *) data)) {
+      XKillClient(getXDisplay(), *((Pixmap *) data));
+      XSync(getXDisplay(), False);
+      XFree(data_esetroot);
+    }
     XFree(data);
   }
 

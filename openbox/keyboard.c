@@ -17,13 +17,17 @@
 
 KeyBindingTree *keyboard_firstnode;
 
+typedef struct {
+    guint state;
+    ObClient *client;
+    ObAction *action;
+    ObFrameContext context;
+} ObInteractiveState;
+
+static GSList *interactive_states;
+
 static KeyBindingTree *curpos;
 static ObTimer *chain_timer;
-static gboolean interactive_grab;
-static guint grabbed_state;
-static ObClient *grabbed_client;
-static ObAction *grabbed_action;
-static ObFrameContext grabbed_context;
 
 static void grab_for_window(Window win, gboolean grab)
 {
@@ -112,83 +116,75 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
 void keyboard_interactive_grab(guint state, ObClient *client,
                                ObFrameContext context, ObAction *action)
 {
-    if (!interactive_grab) {
+    ObInteractiveState *s;
+
+    if (!interactive_states) {
         if (!grab_keyboard(TRUE))
             return;
         if (!grab_pointer(TRUE, None)) {
             grab_keyboard(FALSE);
             return;
         }
-        interactive_grab = TRUE;
-    } else if (action != grabbed_action) {
-        /* finish it */
-        if (grabbed_action->func == action_cycle_windows) {
-            grabbed_action->data.cycle.final = TRUE;
-        }
-        if (grabbed_action->func == action_desktop_dir) {
-            grabbed_action->data.desktopdir.final = TRUE;
-        }
-        if (grabbed_action->func == action_send_to_desktop_dir) {
-            grabbed_action->data.sendtodir.final = TRUE;
-        }
-        grabbed_action->func(&grabbed_action->data);
     }
 
-    grabbed_state = state;
-    grabbed_client = client;
-    grabbed_action = action;
-    grabbed_context = context;
+    s = g_new(ObInteractiveState, 1);
+
+    s->state = state;
+    s->client = client;
+    s->action = action;
+    s->context = context;
+
+    interactive_states = g_slist_append(interactive_states, s);
 }
 
 gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            ObClient **client,
                                            ObFrameContext *context)
 {
+    GSList *it, *next;
     gboolean handled = FALSE;
     gboolean done = FALSE;
+    gboolean cancel = FALSE;
 
-    if (interactive_grab) {
-        *client = grabbed_client;
-        *context = grabbed_context;
+    for (it = interactive_states; it; it = next) {
+        ObInteractiveState *s = it->data;
+
+        next = g_slist_next(it);
+        
+        *client = s->client;
+        *context = s->context;
 
         if ((e->type == KeyRelease && 
-             !(grabbed_state & e->xkey.state)))
+             !(s->state & e->xkey.state)))
             done = TRUE;
         else if (e->type == KeyPress) {
             if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
                 done = TRUE;
-            else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
-                if (grabbed_action->func == action_cycle_windows) {
-                    grabbed_action->data.cycle.cancel = TRUE;
-                }
-                if (grabbed_action->func == action_desktop_dir) {
-                    grabbed_action->data.desktopdir.cancel = TRUE;
-                }
-                if (grabbed_action->func == action_send_to_desktop_dir)
-                {
-                    grabbed_action->data.sendtodir.cancel = TRUE;
-                }
-                done = TRUE;
-            }
+            else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+                cancel = done = TRUE;
         }
-        if (done) { 
-            if (grabbed_action->func == action_cycle_windows) {
-                grabbed_action->data.cycle.final = TRUE;
+        if (done) {
+            if (s->action->func == action_cycle_windows) {
+                s->action->data.cycle.cancel = cancel;
+                s->action->data.cycle.final = TRUE;
             }
-            if (grabbed_action->func == action_desktop_dir) {
-                grabbed_action->data.desktopdir.final = TRUE;
+            if (s->action->func == action_desktop_dir) {
+                s->action->data.desktopdir.cancel = cancel;
+                s->action->data.desktopdir.final = TRUE;
             }
-            if (grabbed_action->func == action_send_to_desktop_dir) {
-                grabbed_action->data.sendtodir.final = TRUE;
+            if (s->action->func == action_send_to_desktop_dir) {
+                s->action->data.sendtodir.cancel = cancel;
+                s->action->data.sendtodir.final = TRUE;
             }
 
-            grabbed_action->func(&grabbed_action->data);
+            s->action->func(&s->action->data);
 
-            interactive_grab = FALSE;
             grab_keyboard(FALSE);
             grab_pointer(FALSE, None);
             keyboard_reset_chains();
 
+            g_free(s);
+            interactive_states = g_slist_delete_link(interactive_states, it);
             handled = TRUE;
         }
     }

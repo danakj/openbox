@@ -395,6 +395,7 @@ void pager_popup_free(ObPagerPopup *self)
 
         for (i = 0; i < self->desks; ++i)
             XDestroyWindow(ob_display, self->wins[i]);
+        g_free(self->wins);
         RrAppearanceFree(self->hilight);
         RrAppearanceFree(self->unhilight);
         popup_free(self->popup);

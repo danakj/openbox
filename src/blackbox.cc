@@ -712,7 +712,7 @@ void Blackbox::process_event(XEvent *e) {
           BScreen *screen = win->getScreen();
 
           if (win->isIconic())
-            win->deiconify(False, True);
+            win->deiconify(False, False);
           if (! win->isStuck() &&
               (win->getWorkspaceNumber() != screen->getCurrentWorkspaceID()))
             screen->changeWorkspaceID(win->getWorkspaceNumber());

@@ -237,12 +237,13 @@ void Workspace::showAll(void) {
 
 void Workspace::hideAll(void) {
   // withdraw in reverse order to minimize the number of Expose events
-  BlackboxWindowList::reverse_iterator it = stackingList.rbegin();
-  const BlackboxWindowList::reverse_iterator end = stackingList.rend();
-  while (it != end) {
+
+  BlackboxWindowList lst(stackingList.rbegin(), stackingList.rend());
+
+  BlackboxWindowList::iterator it = lst.begin();
+  const BlackboxWindowList::iterator end = lst.end();
+  for (; it != end; ++it) {
     BlackboxWindow *bw = *it;
-    ++it; // withdraw removes the current item from the list so we need the next
-          // iterator before that happens
     // not normal windows cant focus from mouse enters anyways, so we dont
     // need to unmap/remap them on workspace changes
     if (! bw->isStuck() || bw->isNormal())

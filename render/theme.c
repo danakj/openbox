@@ -6,6 +6,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
 
 static XrmDatabase loaddb(RrTheme *theme, char *name);
 static gboolean read_int(XrmDatabase db, char *rname, int *value);

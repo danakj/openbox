@@ -178,10 +178,8 @@ public:
     This removes the window's frame, reparents it to root, unselects events on
     it, etc.
     @param client The client to unmanage
-    @param reparented true if the client's window has already reparented
-                      itself; false if it has not.
   */
-  void unmanageWindow(OBClient *client, bool reparented = false);
+  void unmanageWindow(OBClient *client);
 
   //! Raises/Lowers a client window above/below all others in its stacking
   //! layer

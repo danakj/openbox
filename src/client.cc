@@ -1288,7 +1288,6 @@ void Client::changeAllowedActions(void)
 
 void Client::remaximize()
 {
-  printf("REMAXIMIZE!!!!!!!!!!!!!!!!!!!\n");
   int dir;
   if (_max_horz && _max_vert)
     dir = 0;

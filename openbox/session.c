@@ -112,13 +112,13 @@ static void save_commands()
     g_free(prop_cmd.vals);
 }
 
-static void remove_two_args(int *argc, char ***argv, int index)
+static void remove_args(int *argc, char ***argv, int index, int num)
 {
     int i;
 
-    for (i = index; i < index + 2; ++i)
-        (*argv)[i] = (*argv)[i+2];
-    *argc -= 2;
+    for (i = index; i < index + num; ++i)
+        (*argv)[i] = (*argv)[i+num];
+    *argc -= num;
 }
 
 static void parse_args(int *argc, char ***argv)
@@ -131,7 +131,7 @@ static void parse_args(int *argc, char ***argv)
                 g_printerr(_("--sm-client-id requires an argument\n"));
             else {
                 sm_id = g_strdup((*argv)[i+1]);
-                remove_two_args(argc, argv, i);
+                remove_args(argc, argv, i, 2);
                 ++i;
             }
         } else if (!strcmp((*argv)[i], "--sm-save-file")) {
@@ -139,11 +139,12 @@ static void parse_args(int *argc, char ***argv)
                 g_printerr(_("--sm-save-file requires an argument\n"));
             else {
                 save_file = g_strdup((*argv)[i+1]);
-                remove_two_args(argc, argv, i);
+                remove_args(argc, argv, i, 2);
                 ++i;
             }
         } else if (!strcmp((*argv)[i], "--sm-disable")) {
             sm_disable = TRUE;
+            remove_args(argc, argv, i, 1);
         }
     }
 }

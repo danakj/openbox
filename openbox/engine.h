@@ -3,7 +3,23 @@
 
 #include "../engines/engineinterface.h"
 
+/* The engine to load */
+extern char *engine_name;
+/* The theme to load */
+extern char *engine_theme;
+/* The titlebar layout */
+extern char *engine_layout;
+/* The titlebar font */
+extern char *engine_font;
+/* The titlebar font's shadow */
+extern gboolean engine_shadow;
+/* The titlebar font's shadow offset */
+extern int engine_shadow_offset;
+/* The titlebar font's shadow transparency */
+extern int engine_shadow_tint;
+
 void engine_startup();
+void engine_load();
 void engine_shutdown();
 
 EngineFrameNew *engine_frame_new;

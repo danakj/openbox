@@ -6,7 +6,6 @@
 #include "kernel/frame.h"
 #include "kernel/grab.h"
 #include "kernel/engine.h"
-#include "kernel/config.h"
 #include "kernel/parse.h"
 #include "kernel/frame.h"
 #include "translate.h"
@@ -14,19 +13,35 @@
 #include "mouseparse.h"
 #include <glib.h>
 
+static int threshold;
+static int dclicktime;
+
+static void parse_assign(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "dragthreshold")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            if (value->data.integer >= 0)
+                threshold = value->data.integer;
+        }
+    } else if (!g_ascii_strcasecmp(name, "doubleclicktime")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            if (value->data.integer >= 0)
+                dclicktime = value->data.integer;
+        }
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
+
 void plugin_setup_config()
 {
-    config_def_set(config_def_new("mouse.dragThreshold", Config_Integer,
-                                  "Drag Threshold",
-                                  "The drag threshold in pixels before a Drag "
-                                  "event starts."));
-    config_def_set(config_def_new("mouse.doubleClickTime", Config_Integer,
-                                  "Double Click Interval",
-                                  "The amount of time (in milliseconds) in "
-                                  "which two clicks must occur to cause a "
-                                  "DoubleClick event."));
-
-    parse_reg_section("mouse", mouseparse);
+    threshold = 3;
+    dclicktime = 200;
+    parse_reg_section("mouse", mouseparse, parse_assign);
 }
 
 /* Array of GSList*s of PointerBinding*s. */
@@ -66,7 +81,7 @@ static void grab_for_client(Client *client, gboolean grab)
 
 static void grab_all_clients(gboolean grab)
 {
-    GSList *it;
+    GList *it;
 
     for (it = client_list; it != NULL; it = it->next)
 	grab_for_client(it->data, grab);
@@ -192,17 +207,10 @@ static void event(ObEvent *e, void *foo)
     static guint button = 0, lbutton = 0;
     static gboolean drag = FALSE, drag_used = FALSE;
     static Corner corner = Corner_TopLeft;
-    ConfigValue doubleclicktime;
-    ConfigValue dragthreshold;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
     Context context;
     
-    if (!config_get("mouse.dragThreshold", Config_Integer, &dragthreshold))
-        dragthreshold.integer = 3; /* default */
-    if (!config_get("mouse.doubleClickTime", Config_Integer, &doubleclicktime))
-        doubleclicktime.integer = 200; /* default */
-
     switch (e->type) {
     case Event_Client_Mapped:
         grab_for_client(e->data.c.client, TRUE);
@@ -273,8 +281,7 @@ static void event(ObEvent *e, void *foo)
                     click = TRUE;
                     /* double clicks happen if there were 2 in a row! */
                     if (lbutton == button &&
-                        e->data.x.e->xbutton.time - doubleclicktime.integer <=
-                        ltime) {
+                        e->data.x.e->xbutton.time - dclicktime <= ltime) {
                         dclick = TRUE;
                         lbutton = 0;
                     } else
@@ -304,8 +311,7 @@ static void event(ObEvent *e, void *foo)
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
             if (!drag &&
-                (ABS(dx) >= dragthreshold.integer ||
-                 ABS(dy) >= dragthreshold.integer))
+                (ABS(dx) >= threshold || ABS(dy) >= threshold))
                 drag = TRUE;
             if (drag) {
                 context = engine_get_context(e->data.x.client,

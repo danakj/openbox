@@ -1,5 +1,4 @@
 #include "event.h"
-#include "config.h"
 #include "openbox.h"
 #include "client.h"
 #include "frame.h"
@@ -16,6 +15,8 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
 Window focus_backup = None;
+gboolean focus_new = TRUE;
+gboolean focus_follow = TRUE;
 
 void focus_startup()
 {
@@ -25,6 +26,8 @@ void focus_startup()
     XSetWindowAttributes attrib;
 
     focus_client = NULL;
+    focus_new = TRUE;
+    focus_follow = TRUE;
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
@@ -113,7 +116,6 @@ static gboolean focus_under_pointer()
 
 void focus_fallback(gboolean switching_desks)
 {
-    ConfigValue focus_follow;
     GList *it;
     gboolean under = FALSE;
     Client *old = NULL;
@@ -130,9 +132,7 @@ void focus_fallback(gboolean switching_desks)
         /* don't skip any windows when switching desktops */
         old = NULL;
     } else {
-        if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
-            g_assert_not_reached();
-        if (focus_follow.bool)
+        if (focus_follow)
             under = focus_under_pointer();
     }
 

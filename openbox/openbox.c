@@ -7,7 +7,6 @@
 #include "screen.h"
 #include "focus.h"
 #include "extensions.h"
-#include "config.h"
 #include "parse.h"
 #include "grab.h"
 #include "engine.h"
@@ -149,11 +148,11 @@ int main(int argc, char **argv)
 
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
-        config_startup();
 	render_startup();
 	font_startup();
 	event_startup();
         grab_startup();
+        engine_startup();
         plugin_startup();
 
         /* startup the parsing so plugins can register sections of the rc */
@@ -167,7 +166,9 @@ int main(int argc, char **argv)
         /* we're done with parsing now, kill it */
         parse_shutdown();
 
-	engine_startup();
+        /* load the engine specified in the rc */
+	engine_load();
+
 	screen_startup();
 	focus_startup();
 	client_startup();
@@ -193,7 +194,6 @@ int main(int argc, char **argv)
         grab_shutdown();
 	event_shutdown();
 	render_shutdown();
-        config_shutdown();
 	timer_shutdown();
     }
 

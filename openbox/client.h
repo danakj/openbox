@@ -285,7 +285,7 @@ typedef struct Client {
     Pixmap pixmap_icon_mask;
 } Client;
 
-extern GSList *client_list;
+extern GList *client_list;
 extern GHashTable *client_map;
 
 void client_startup();

@@ -31,6 +31,7 @@ static ParseToken t;
 
 /* in parse.c */
 void parse_token(ParseToken *token);
+void parse_assign(char *name, ParseToken *token);
 void parse_set_section(char *section);
 %}
 
@@ -54,31 +55,32 @@ void parse_set_section(char *section);
 %%
 
 sections:
-  | sections '[' IDENTIFIER ']' { parse_set_section($3); } '\n' lines
+  | sections '[' IDENTIFIER ']' { parse_set_section($3); } '\n'
+    { ++yylineno; } lines
   ;
 
 lines:
-  | lines tokens '\n' { t.type = $3; t.data.character = $3; parse_token(&t); }
+  | lines tokens { t.type='\n'; t.data.character='\n'; parse_token(&t); } '\n'
+    { ++yylineno; }
+  | lines IDENTIFIER '=' listtoken { parse_assign($2, &t); } '\n'
+    { ++yylineno; }
   ;
 
 tokens:
-    tokens token
-  | token
+    tokens token { parse_token(&t); }
+  | token        { parse_token(&t); }
   ;
 
 token:
-    REAL       { t.type = TOKEN_REAL; t.data.real = $1; parse_token(&t); }
-  | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1;
-                 parse_token(&t); }
-  | STRING     { t.type = TOKEN_STRING; t.data.string = $1; parse_token(&t); }
-  | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1;
-                 parse_token(&t);}
-  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; parse_token(&t); }
-  | list       { t.type = TOKEN_LIST; t.data.list = $1; parse_token(&t); }
-  | '{'        { t.type = $1; t.data.character = $1; parse_token(&t); }
-  | '}'        { t.type = $1; t.data.character = $1; parse_token(&t); }
-  | '='        { t.type = $1; t.data.character = $1; parse_token(&t); }
-  | ','        { t.type = $1; t.data.character = $1; parse_token(&t); }
+    REAL       { t.type = TOKEN_REAL; t.data.real = $1; }
+  | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1; }
+  | STRING     { t.type = TOKEN_STRING; t.data.string = $1; }
+  | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1; }
+  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; }
+  | list       { t.type = TOKEN_LIST; t.data.list = $1; }
+  | '{'        { t.type = $1; t.data.character = $1; }
+  | '}'        { t.type = $1; t.data.character = $1; }
+  | ','        { t.type = $1; t.data.character = $1; }
   ;
 
 list:
@@ -107,7 +109,6 @@ listtoken:
   | list       { t.type = TOKEN_LIST; t.data.list = $1; }
   | '{'        { t.type = $1; t.data.character = $1; }
   | '}'        { t.type = $1; t.data.character = $1; }
-  | '='        { t.type = $1; t.data.character = $1; }
   | ','        { t.type = $1; t.data.character = $1; }
   ;
 

@@ -8,7 +8,7 @@ LIBS += $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS)
 LDFLAGS = -export-dynamic
 
 target = openbox3
-sources = action.c client.c config.c dispatch.c engine.c event.c \
+sources = action.c client.c dispatch.c engine.c event.c \
           extensions.c focus.c frame.c grab.c menu.c openbox.c \
           parse.c plugin.c prop.c screen.c stacking.c timer.c xerror.c \
           parse.lex.c parse.tab.c

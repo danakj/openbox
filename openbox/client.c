@@ -2,7 +2,6 @@
 #include "screen.h"
 #include "prop.h"
 #include "extensions.h"
-#include "config.h"
 #include "frame.h"
 #include "engine.h"
 #include "event.h"
@@ -21,7 +20,7 @@
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
 				ButtonMotionMask)
 
-GSList     *client_list      = NULL;
+GList      *client_list      = NULL;
 GHashTable *client_map       = NULL;
 
 static Window *client_startup_stack_order = NULL;
@@ -65,8 +64,8 @@ void client_shutdown()
 void client_set_list()
 {
     Window *windows, *win_it;
-    GSList *it;
-    guint size = g_slist_length(client_list);
+    GList *it;
+    guint size = g_list_length(client_list);
 
     /* create an array of the window ids */
     if (size > 0) {
@@ -87,7 +86,6 @@ void client_set_list()
 
 void client_manage_all()
 {
-    ConfigValue focus_new;
     unsigned int i, j, nchild;
     Window w, *children;
     XWMHints *wmhints;
@@ -138,9 +136,7 @@ void client_manage_all()
     client_startup_stack_order = NULL;
     client_startup_stack_size = 0;
 
-    if (!config_get("focusNew", Config_Bool, &focus_new))
-        g_assert_not_reached();
-    if (focus_new.bool)
+    if (focus_new)
         focus_fallback(FALSE);
 }
 
@@ -152,7 +148,6 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
     guint i;
-    ConfigValue focus_new;
 
     grab_server(TRUE);
 
@@ -215,7 +210,7 @@ void client_manage(Window window)
 
     grab_server(FALSE);
      
-    client_list = g_slist_append(client_list, client);
+    client_list = g_list_append(client_list, client);
     stacking_list = g_list_append(stacking_list, client);
     g_assert(!g_hash_table_lookup(client_map, &client->window));
     g_hash_table_insert(client_map, &client->window, client);
@@ -239,9 +234,7 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, client, 0, 0);
 
-    if (!config_get("focusNew", Config_Bool, &focus_new))
-        g_assert_not_reached();
-    if (ob_state != State_Starting && focus_new.bool)
+    if (ob_state != State_Starting && focus_new)
         client_focus(client);
 
     /* update the list hints */
@@ -275,7 +268,7 @@ void client_unmanage(Client *client)
 
     engine_frame_hide(client->frame);
 
-    client_list = g_slist_remove(client_list, client);
+    client_list = g_list_remove(client_list, client);
     stacking_list = g_list_remove(stacking_list, client);
     g_hash_table_remove(client_map, &client->window);
 
@@ -1708,7 +1701,6 @@ void client_kill(Client *self)
 void client_set_desktop(Client *self, guint target, gboolean donthide)
 {
     guint old, i;
-    ConfigValue focus_new;
 
     if (target == self->desktop) return;
   
@@ -1730,8 +1722,6 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     screen_update_struts();
 
     /* update the focus lists */
-    if (!config_get("focusNew", Config_Bool, &focus_new))
-        g_assert_not_reached();
     if (old == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
             focus_order[i] = g_list_remove(focus_order[i], self);
@@ -1739,13 +1729,13 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
         focus_order[old] = g_list_remove(focus_order[old], self);
     if (target == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i) {
-            if (focus_new.bool)
+            if (focus_new)
                 focus_order[i] = g_list_prepend(focus_order[i], self);
             else
                 focus_order[i] = g_list_append(focus_order[i], self);
         }
     } else {
-        if (focus_new.bool)
+        if (focus_new)
             focus_order[target] = g_list_prepend(focus_order[target], self);
         else
             focus_order[target] = g_list_append(focus_order[target], self);

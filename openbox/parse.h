@@ -13,7 +13,6 @@ typedef enum {
     TOKEN_LIST,
     TOKEN_LBRACE     = '{',
     TOKEN_RBRACE     = '}',
-    TOKEN_EQUALS     = '=',
     TOKEN_COMMA      = ',',
     TOKEN_NEWLINE    = '\n'
 } ParseTokenType;
@@ -24,6 +23,7 @@ typedef struct {
 } ParseToken;
 
 typedef void (*ParseFunc)(ParseToken *token);
+typedef void (*AssignParseFunc)(char *name, ParseToken *value);
 
 void parse_startup();
 void parse_shutdown();
@@ -33,7 +33,7 @@ void parse_shutdown();
 */
 void parse_rc();
 
-void parse_reg_section(char *section, ParseFunc func);
+void parse_reg_section(char *section, ParseFunc func, AssignParseFunc afunc);
 
 
 /* Free a parsed token's allocated memory */

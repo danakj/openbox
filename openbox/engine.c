@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "config.h"
 
 #include <glib.h>
 #include <gmodule.h>
@@ -7,9 +6,17 @@
 #  include <stdlib.h>
 #endif
 
-static GModule *module;
-static EngineStartup *estartup;
-static EngineShutdown *eshutdown;
+char *engine_name = NULL;
+char *engine_theme = NULL;
+char *engine_layout = "NDSLIMC";
+char *engine_font = "Sans-7";
+gboolean engine_shadow = FALSE;
+int engine_shadow_offset = 1;
+int engine_shadow_tint = 25;
+
+static GModule *module = NULL;
+static EngineStartup *estartup = NULL;
+static EngineShutdown *eshutdown = NULL;
 
 #define LOADSYM(name, var) \
     if (!g_module_symbol(module, #name, (gpointer*)&var)) { \
@@ -61,16 +68,15 @@ static gboolean load(char *name)
 
 void engine_startup()
 {
-    ConfigValue engine;
-
     module = NULL;
+}
 
-    if (config_get("engine", Config_String, &engine)) {
-	if (load(engine.string))
-	    return;
-	g_warning("Failed to load the engine '%s'", engine.string);
-	g_message("Falling back to the default: '%s'", DEFAULT_ENGINE);
-    }
+void engine_load()
+{
+    if (load(engine_name))
+        return;
+    g_warning("Failed to load the engine '%s'", engine_name);
+    g_message("Falling back to the default: '%s'", DEFAULT_ENGINE);
     if (!load(DEFAULT_ENGINE)) {
 	g_critical("Failed to load the engine '%s'. Aborting", DEFAULT_ENGINE);
 	exit(1);
@@ -79,6 +85,7 @@ void engine_startup()
 
 void engine_shutdown()
 {
+    g_free(engine_name);
     if (module != NULL) {
 	eshutdown();
 	g_module_close(module);

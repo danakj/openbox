@@ -208,7 +208,7 @@ void screen_set_num_desktops(guint num)
 {
     guint i, old;
     gulong *viewport;
-    GSList *it;
+    GList *it;
 
     g_assert(num > 0);
 
@@ -424,7 +424,7 @@ void screen_install_colormap(Client *client, gboolean install)
 
 void screen_update_struts()
 {
-    GSList *it;
+    GList *it;
     guint i;
      
     g_free(strut);
@@ -496,7 +496,7 @@ static void screen_update_area()
 */
 	if (!RECT_EQUAL(old_area, area[i])) {
 	    /* the area has changed, adjust all the maximized windows */
-	    GSList *it;
+	    GList *it;
 	    for (it = client_list; it; it = it->next) {
 		Client *c = it->data;
 		if (i < screen_num_desktops) {

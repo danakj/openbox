@@ -1,6 +1,5 @@
 #include "openbox.h"
 #include "client.h"
-#include "config.h"
 #include "xerror.h"
 #include "prop.h"
 #include "screen.h"
@@ -356,7 +355,6 @@ static void event_handle_client(Client *client, XEvent *e)
     XEvent ce;
     Atom msgtype;
     int i=0;
-    ConfigValue focus_follow;
      
     switch (e->type) {
     case FocusIn:
@@ -378,12 +376,8 @@ static void event_handle_client(Client *client, XEvent *e)
                                                      client);
                 focus_order[desktop] = g_list_prepend(focus_order[desktop],
                                                       client);
-            } else {
-                if (!config_get("focusFollowsMouse",Config_Bool,&focus_follow))
-                    g_assert_not_reached();
-                if (focus_follow.bool)
-                    client_focus(client);
-            }
+            } else if (focus_follow)
+                client_focus(client);
         }
         break;
     case ConfigureRequest:

@@ -1,7 +1,7 @@
-#include "../../kernel/openbox.h"
-#include "../../kernel/dispatch.h"
-#include "../../kernel/frame.h"
-#include "../../kernel/client.h"
+#include "kernel/openbox.h"
+#include "kernel/dispatch.h"
+#include "kernel/frame.h"
+#include "kernel/client.h"
 #include <glib.h>
 #include <string.h>
 #ifdef HAVE_STDLIB_H

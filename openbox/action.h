@@ -65,7 +65,14 @@ struct Resize {
 
 struct ShowMenu {
     Client *c;
-    char * menuName;
+    char *menuName;
+};
+
+struct CycleWindows {
+    Client *c;
+    gboolean linear;
+    gboolean forward;
+    gboolean final;
 };
 
 union ActionData {
@@ -80,6 +87,7 @@ union ActionData {
     struct Move move;
     struct Resize resize;
     struct ShowMenu showMenu;
+    struct CycleWindows cycle;
 };
 
 typedef struct {
@@ -194,4 +202,6 @@ void action_restart(union ActionData *data);
 void action_exit(union ActionData *data);
 /* ShowMenu */
 void action_showmenu(union ActionData *data);
+/* CycleWindows */
+void action_cycle_windows(union ActionData *data);
 #endif

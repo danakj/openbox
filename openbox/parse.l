@@ -35,7 +35,7 @@ bool ([tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[yY][eE][sS]|[nN][oO]|[oO][nN]|[oO][
              }
 {identifier} { yylval.identifier = g_strdup(yytext); return IDENTIFIER; }
 [{}()\[\]=,] { yylval.character = *yytext; return *yytext; }
-\n           { yylval.character = *yytext; ++yylineno; return *yytext; }
+\n           { yylval.character = *yytext; return *yytext; }
 .            { return INVALID; }
 
 %%

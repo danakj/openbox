@@ -1,10 +1,10 @@
 #include "obtheme.h"
 #include "obrender.h"
 #include "obengine.h"
-#include "../../kernel/openbox.h"
-#include "../../kernel/extensions.h"
-#include "../../kernel/dispatch.h"
-#include "../../kernel/config.h"
+#include "kernel/openbox.h"
+#include "kernel/extensions.h"
+#include "kernel/dispatch.h"
+#include "kernel/engine.h"
 
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
@@ -34,9 +34,6 @@ color_rgb *ob_s_titlebut_focused_color;
 color_rgb *ob_s_titlebut_unfocused_color;
 /* style settings - fonts */
 int ob_s_winfont_height;
-int ob_s_winfont_shadow;
-int ob_s_winfont_shadow_offset;
-int ob_s_winfont_shadow_tint;
 ObFont *ob_s_winfont;
 /* style settings - masks */
 pixmap_mask *ob_s_max_set_mask;
@@ -694,16 +691,12 @@ static void layout_title(ObFrame *self)
     char *lc;
     int x;
     gboolean n, d, i, l, m, c, s;
-    ConfigValue layout;
 
     n = d = i = l = m = c = s = FALSE;
 
-    if (!config_get("titlebar.layout", Config_String, &layout))
-        g_assert_not_reached();
-
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_s_bevel + 1) * 2;
-    for (lc = layout.string; *lc != '\0'; ++lc) {
+    for (lc = engine_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
@@ -761,7 +754,7 @@ static void layout_title(ObFrame *self)
     if (!c) XUnmapWindow(ob_display, self->close);
 
     x = ob_s_bevel + 1;
-    for (lc = layout.string; *lc != '\0'; ++lc) {
+    for (lc = engine_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!n) break;

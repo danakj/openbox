@@ -1,29 +1,39 @@
-#include "../kernel/dispatch.h"
-#include "../kernel/client.h"
-#include "../kernel/frame.h"
-#include "../kernel/stacking.h"
-#include "../kernel/screen.h"
-#include "../kernel/config.h"
+#include "kernel/dispatch.h"
+#include "kernel/client.h"
+#include "kernel/frame.h"
+#include "kernel/parse.h"
+#include "kernel/stacking.h"
+#include "kernel/screen.h"
 #include <glib.h>
 
-#define DEFAULT_RESISTANCE 10
+static int resistance;
+static gboolean resist_windows;
+
+static void parse_assign(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "strength")) {
+        if (value->type != TOKEN_INTEGER)
+            yyerror("invalid value");
+        else {
+            if (value->data.integer >= 0)
+                resistance = value->data.integer;
+        }
+    } else if  (!g_ascii_strcasecmp(name, "windows")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else
+            resist_windows = value->data.bool;
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
 
 void plugin_setup_config()
 {
-    ConfigValue val;
+    resistance = 10;
+    resist_windows = TRUE;
 
-    config_def_set(config_def_new("resistance", Config_Integer,
-                                  "Edge Resistance",
-                                  "The amount of resistance to provide when "
-                                  "moving windows past edges."
-                                  "positioned."));
-    config_def_set(config_def_new("resistance.windows", Config_Bool,
-                                  "Edge Resistance On Windows",
-                                  "Whether to provide edge resistance when "
-                                  "moving windows past the edge of another "
-                                  "window."));
-    val.bool = TRUE;
-    config_set("resistance.windows", Config_Bool, val);
+    parse_reg_section("resistance", NULL, parse_assign);
 }
 
 static void resist_move(Client *c, int *x, int *y)
@@ -35,15 +45,6 @@ static void resist_move(Client *c, int *x, int *y)
     int cl, ct, cr, cb; /* current edges */
     int w, h; /* current size */
     Client *snapx = NULL, *snapy = NULL;
-    ConfigValue resist, window_resist;
-
-    if (!config_get("resistance", Config_Integer, &resist) ||
-        resist.integer < 0) {
-        resist.integer = DEFAULT_RESISTANCE;
-        config_set("resistance", Config_Integer, resist);
-    }
-    if (!config_get("resistance.windows", Config_Bool, &window_resist))
-        g_assert_not_reached();
 
     w = c->frame->area.width;
     h = c->frame->area.height;
@@ -59,7 +60,7 @@ static void resist_move(Client *c, int *x, int *y)
     cb = ct + c->frame->area.height - 1;
     
     /* snap to other clients */
-    if (window_resist.bool)
+    if (resist_windows)
         for (it = stacking_list; it != NULL; it = it->next) {
             Client *target;
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
@@ -79,30 +80,30 @@ static void resist_move(Client *c, int *x, int *y)
             */
             if (snapx == NULL) {
                 if (ct < tb && cb > tt) {
-                    if (cl >= tr && l < tr && l >= tr - resist.integer)
+                    if (cl >= tr && l < tr && l >= tr - resistance)
                         *x = tr, snapx = target;
-                    else if (cr <= tl && r > tl && r <= tl + resist.integer)
+                    else if (cr <= tl && r > tl && r <= tl + resistance)
                         *x = tl - w + 1, snapx = target;
                     if (snapx != NULL) {
                         /* try to corner snap to the window */
-                        if (ct > tt && t <= tt && t > tt - resist.integer)
+                        if (ct > tt && t <= tt && t > tt - resistance)
                             *y = tt + 1, snapy = target;
-                        else if (cb < tb && b >= tb && b < tb + resist.integer)
+                        else if (cb < tb && b >= tb && b < tb + resistance)
                             *y = tb - h, snapy = target;
                     }
                 }
             }
             if (snapy == NULL) {
                 if (cl < tr && cr > tl) {
-                    if (ct >= tb && t < tb && t >= tb - resist.integer)
+                    if (ct >= tb && t < tb && t >= tb - resistance)
                         *y = tb, snapy = target;
-                    else if (cb <= tt && b > tt && b <= tt + resist.integer)
+                    else if (cb <= tt && b > tt && b <= tt + resistance)
                         *y = tt - h + 1, snapy = target;
                     if (snapy != NULL) {
                         /* try to corner snap to the window */
-                        if (cl > tl && l <= tl && l > tl - resist.integer)
+                        if (cl > tl && l <= tl && l > tl - resistance)
                             *x = tl + 1, snapx = target;
-                        else if (cr < tr && r >= tr && r < tr + resist.integer)
+                        else if (cr < tr && r >= tr && r < tr + resistance)
                             *x = tr - w, snapx = target;
                     }
                 }
@@ -119,13 +120,13 @@ static void resist_move(Client *c, int *x, int *y)
     ab = at + area->height - 1;
 
     /* snap to screen edges */
-    if (cl >= al && l < al && l >= al - resist.integer)
+    if (cl >= al && l < al && l >= al - resistance)
         *x = al;
-    else if (cr <= ar && r > ar && r <= ar + resist.integer)
+    else if (cr <= ar && r > ar && r <= ar + resistance)
             *x = ar - w + 1;
-    if (ct >= at && t < at && t >= at - resist.integer)
+    if (ct >= at && t < at && t >= at - resistance)
         *y = at;
-    else if (cb <= ab && b > ab && b < ab + resist.integer)
+    else if (cb <= ab && b > ab && b < ab + resistance)
         *y = ab - h + 1;
 }
 
@@ -139,15 +140,6 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     Rect *area;
     int al, at, ar, ab; /* screen boundaries */
     Client *snapx = NULL, *snapy = NULL;
-    ConfigValue resist, window_resist;
-
-    if (!config_get("resistance", Config_Integer, &resist) ||
-        resist.integer < 0) {
-        resist.integer = DEFAULT_RESISTANCE;
-        config_set("resistance", Config_Integer, resist);
-    }
-    if (!config_get("resistance.windows", Config_Bool, &window_resist))
-        g_assert_not_reached();
 
     l = c->frame->area.x;
     r = l + c->frame->area.width - 1;
@@ -162,7 +154,7 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     ab = at + area->height - 1;
 
     /* snap to other windows */
-    if (window_resist.bool) {
+    if (resist_windows) {
         for (it = stacking_list; it != NULL; it = it->next) {
             target = it->data;
 
@@ -182,14 +174,14 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
                     case Corner_BottomLeft:
                         dlt = l;
                         drb = r + *w - c->frame->area.width;
-                        if (r < tl && drb >= tl && drb < tl + resist.integer)
+                        if (r < tl && drb >= tl && drb < tl + resistance)
                             *w = tl - l, snapx = target;
                         break;
                     case Corner_TopRight:
                     case Corner_BottomRight:
                         dlt = l - *w + c->frame->area.width;
                         drb = r;
-                        if (l > tr && dlt <= tr && dlt > tr - resist.integer)
+                        if (l > tr && dlt <= tr && dlt > tr - resistance)
                             *w = r - tr, snapx = target;
                         break;
                     }
@@ -204,14 +196,14 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
                     case Corner_TopRight:
                         dlt = t;
                         drb = b + *h - c->frame->area.height;
-                        if (b < tt && drb >= tt && drb < tt + resist.integer)
+                        if (b < tt && drb >= tt && drb < tt + resistance)
                             *h = tt - t, snapy = target;
                         break;
                     case Corner_BottomLeft:
                     case Corner_BottomRight:
                         dlt = t - *h + c->frame->area.height;
                         drb = b;
-                        if (t > tb && dlt <= tb && dlt > tb - resist.integer)
+                        if (t > tb && dlt <= tb && dlt > tb - resistance)
                             *h = b - tb, snapy = target;
                         break;
                     }
@@ -231,14 +223,14 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     case Corner_BottomLeft:
         dlt = l;
         drb = r + *w - c->frame->area.width;
-        if (r <= ar && drb > ar && drb <= ar + resist.integer)
+        if (r <= ar && drb > ar && drb <= ar + resistance)
             *w = ar - l + 1;
         break;
     case Corner_TopRight:
     case Corner_BottomRight:
         dlt = l - *w + c->frame->area.width;
         drb = r;
-        if (l >= al && dlt < al && dlt >= al - resist.integer)
+        if (l >= al && dlt < al && dlt >= al - resistance)
             *w = r - al + 1;
         break;
     }
@@ -249,14 +241,14 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     case Corner_TopRight:
         dlt = t;
         drb = b + *h - c->frame->area.height;
-        if (b <= ab && drb > ab && drb <= ab + resist.integer)
+        if (b <= ab && drb > ab && drb <= ab + resistance)
             *h = ab - t + 1;
         break;
     case Corner_BottomLeft:
     case Corner_BottomRight:
         dlt = t - *h + c->frame->area.height;
         drb = b;
-        if (t >= at && dlt < at && dlt >= at - resist.integer)
+        if (t >= at && dlt < at && dlt >= at - resistance)
             *h = b - at + 1;
         break;
     }

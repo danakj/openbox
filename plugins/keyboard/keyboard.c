@@ -13,7 +13,7 @@
 
 void plugin_setup_config()
 {
-    parse_reg_section("keyboard", keyparse);
+    parse_reg_section("keyboard", keyparse, NULL);
 }
 
 KeyBindingTree *firstnode = NULL;

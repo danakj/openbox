@@ -15,6 +15,11 @@ extern struct Client *focus_client;
 /*! The recent focus order on each desktop */
 extern GList **focus_order;
 
+/*! Should new windows be focused */
+extern gboolean focus_new;
+/*! Should focus follow the mouse pointer */
+extern gboolean focus_follow;
+
 void focus_startup();
 void focus_shutdown();
 

@@ -157,9 +157,16 @@ Action *action_from_string(char *name)
         a = action_new(action_restart);
     } else if (!g_ascii_strcasecmp(name, "exit")) {
         a = action_new(action_exit);
-    }
-    else if (!g_ascii_strcasecmp(name, "showmenu")) {
+    } else if (!g_ascii_strcasecmp(name, "showmenu")) {
         a = action_new(action_showmenu);
+    } else if (!g_ascii_strcasecmp(name, "nextwindowlinear")) {
+        a = action_new(action_cycle_windows);
+        a->data.cycle.linear = TRUE;
+        a->data.cycle.forward = TRUE;
+    } else if (!g_ascii_strcasecmp(name, "previouswindowlinear")) {
+        a = action_new(action_cycle_windows);
+        a->data.cycle.linear = TRUE;
+        a->data.cycle.forward = FALSE;
     }
     
     return a;
@@ -655,3 +662,27 @@ void action_showmenu(union ActionData *data)
 {
     g_message(__FUNCTION__);
 }
+
+void action_cycle_windows(union ActionData *data)
+{
+    if (data->cycle.linear) {
+        if (!data->cycle.final) {
+            GList *it, *start;
+
+            start = it = g_list_find(client_list, data->cycle.c);
+            do {
+                if (data->cycle.forward) {
+                    it = it->next;
+                    if (it == NULL) it = client_list;
+                } else {
+                    it = it->prev;
+                    if (it == NULL) it = g_list_last(client_list);
+                }
+                if (client_focus(it->data))
+                    break;
+            } while (it != start);
+        }
+    } else {
+    }
+}
+

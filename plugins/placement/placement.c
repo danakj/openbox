@@ -1,24 +1,31 @@
-#include "../../kernel/dispatch.h"
-#include "../../kernel/client.h"
-#include "../../kernel/frame.h"
-#include "../../kernel/screen.h"
-#include "../../kernel/openbox.h"
-#include "../../kernel/config.h"
+#include "kernel/dispatch.h"
+#include "kernel/client.h"
+#include "kernel/frame.h"
+#include "kernel/screen.h"
+#include "kernel/openbox.h"
+#include "kernel/parse.h"
 #include "history.h"
 #include <glib.h>
 
-gboolean history = TRUE;
+static gboolean history;
+
+static void parse_assign(char *name, ParseToken *value)
+{
+    if  (!g_ascii_strcasecmp(name, "remember")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else
+            history = value->data.bool;
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
 
 void plugin_setup_config()
 {
-    ConfigValue val;
+    history = TRUE;
 
-    config_def_set(config_def_new("placement.remember", Config_Bool,
-                                  "Remember Window Positions",
-                                  "Place windows where they last were "
-                                  "positioned."));
-    val.bool = TRUE;
-    config_set("placement.remember", Config_Bool, val);
+    parse_reg_section("placement", NULL, parse_assign);
 }
 
 static void place_random(Client *c)
@@ -48,17 +55,12 @@ static void place_random(Client *c)
 
 static void event(ObEvent *e, void *foo)
 {
-    ConfigValue remember;
-
     g_assert(e->type == Event_Client_New);
 
     /* requested a position */
     if (e->data.c.client->positioned) return;
 
-    if (!config_get("placement.remember", Config_Bool, &remember))
-        g_assert_not_reached();
-
-    if (!remember.bool || !place_history(e->data.c.client))
+    if (!history || !place_history(e->data.c.client))
         place_random(e->data.c.client);
 }
 

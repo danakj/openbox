@@ -56,7 +56,6 @@ static void numbervalue()
 
 static void identifier()
 {
-    g_print("identifier: %s\n", yytext);
     entry.name = g_strdup(yytext);
     entry.type = -1;
 }

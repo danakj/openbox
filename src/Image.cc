@@ -822,6 +822,8 @@ void BImage::bevel2(void) {
 
 
 void BImage::border(const BTexture &texture) {
+  if (width < 2 || height < 2) return;
+  
   register unsigned int i;
   int r = texture.borderColor().red(),
     g = texture.borderColor().green(),
@@ -839,17 +841,19 @@ void BImage::border(const BTexture &texture) {
     *pb++ = b;
   }
 
-  // left and right lines (pr,pg,pb are already lined up)
-  for (i = 1; i < height - 1; ++i) {
-    *pr = r;
-    *pg = g;
-    *pb = b;
-    pr += width - 1;
-    pg += width - 1;
-    pb += width - 1;
-    *pr++ = r;
-    *pg++ = g;
-    *pb++ = b;
+  if (height > 2) {
+    // left and right lines (pr,pg,pb are already lined up)
+    for (i = 1; i < height - 1; ++i) {
+      *pr = r;
+      *pg = g;
+      *pb = b;
+      pr += width - 1;
+      pg += width - 1;
+      pb += width - 1;
+      *pr++ = r;
+      *pg++ = g;
+      *pb++ = b;
+    }
   }
 
   // bottom line (pr,pg,pb are already lined up)

@@ -1125,7 +1125,6 @@ void BlackboxWindow::getWMName(void) {
   xatom->setValue(client.window, XAtom::net_wm_visible_name, XAtom::utf8,
                   client.title);
 
-#define DEBUG_WITH_ID 1
 #ifdef DEBUG_WITH_ID
   // the 16 is the 8 chars of the debug text plus the number
   char *tmp = new char[client.title.length() + 16];

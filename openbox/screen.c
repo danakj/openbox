@@ -261,8 +261,6 @@ void screen_set_desktop(guint num)
      
     g_assert(num < screen_num_desktops);
 
-    g_message("Moving to desktop %u", num);
-  
     old = screen_desktop;
     screen_desktop = num;
     PROP_SET32(ob_root, net_current_desktop, cardinal, num);

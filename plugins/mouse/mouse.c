@@ -213,7 +213,16 @@ static void event(ObEvent *e, void *foo)
                                        e->data.x.e->xbutton.window),
                     e->data.x.client, e->data.x.e->xbutton.state,
                     e->data.x.e->xbutton.button);
-        break;
+
+        /* XXX dont look up the context so many times */
+        if (engine_get_context(e->data.x.client,
+                               e->data.x.e->xbutton.window) ==
+            g_quark_try_string("client")) {
+            /* Replay the event, so it goes to the client*/
+            XAllowEvents(ob_display, ReplayPointer, CurrentTime);
+            /* Fall through to the release case! */
+        } else
+            break;
 
     case Event_X_ButtonRelease:
         if (e->data.x.e->xbutton.button == button) {
@@ -367,9 +376,9 @@ static void binddef()
     a = action_new(action_resize);
     mbind("A-3", "frame", MouseAction_Motion, a);
 
-    a = action_new(action_raise);
+    a = action_new(action_focusraise);
     mbind("1", "titlebar", MouseAction_Press, a);
-    a = action_new(action_raise);
+    a = action_new(action_focusraise);
     mbind("1", "handle", MouseAction_Press, a);
     a = action_new(action_lower);
     mbind("2", "titlebar", MouseAction_Press, a);
@@ -379,6 +388,9 @@ static void binddef()
     mbind("A-1", "frame", MouseAction_Click, a);
     a = action_new(action_lower);
     mbind("A-3", "frame", MouseAction_Click, a);
+
+    a = action_new(action_focusraise);
+    mbind("1", "client", MouseAction_Press, a);
 
     a = action_new(action_toggle_shade);
     mbind("1", "titlebar", MouseAction_DClick, a);

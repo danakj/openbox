@@ -90,7 +90,7 @@ void framerender_frame(Frame *self)
 
         n->surface.data.planar.parent = t;
         n->surface.data.planar.parentx = self->icon_x;
-        n->surface.data.planar.parenty = theme_bevel + 1;
+        n->surface.data.planar.parenty = theme_bevel;
 
         i->surface.data.planar.parent = t;
         i->surface.data.planar.parentx = self->iconify_x;

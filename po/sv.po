@@ -1,6 +1,6 @@
-# Svensk översättning.
-# Copyright (C) YEAR COPYRIGHT_HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# Swedish messages for openbox
+# Copyright (C) 2004 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
 # Mikael Magnusson <mikachu@comhem.se>, 2004.
 #
 msgid ""

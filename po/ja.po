@@ -1,5 +1,5 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2003 Ben Jansens
+# Japanese messages for openbox.
+# Copyright (C) 2004 Mikael Magnusson
 # This file is distributed under the same license as the Openbox package.
 # Yukihiro Nakai <nakai@gnome.gr.jp>, 2003.
 #

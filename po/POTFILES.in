@@ -3,3 +3,4 @@ openbox/client_list_menu.c
 openbox/client_menu.c
 openbox/openbox.c
 openbox/session.c
+render/font.c

@@ -22,7 +22,7 @@ AC_C_CONST
 AC_C_INLINE
 
 # XXX ADD --disable-nls option to this XXX
-CPPFLAGS=${CPPFLAGS} -DENABLE_NLS
+CPPFLAGS="$CPPFLAGS -DENABLE_NLS"
 # XXX                                  XXX
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0])

@@ -66,7 +66,30 @@ def remove(data):
                     break
         i += 1
 
-
+def pressed(data):
+    i = 0
+    n = len(data)
+    while i < n:
+        l = data[i]
+        key, value = getkeyval(l)
+        if key and value:
+            if key == 'window.button.pressed':
+                out('The window.button.pressed option has been replaced by ' +
+                    'window.button.pressed.focus and ' +
+                    'window.button.pressed.unfocus. Update (Y/n)? ')
+                if read_bool():
+                    out('Removing "window.button.pressed"\n')
+                    data.pop(i)
+                    out('Adding "window.button.pressed.unfocus"\n')
+                    data.insert(i, l.replace('window.button.pressed',
+                                             'window.button.pressed.unfocus'))
+                    out('Adding "window.button.pressed.focus"\n')
+                    data.insert(i, l.replace('window.button.pressed',
+                                             'window.button.pressed.focus'))
+                    i += 1
+                    n += 1
+                break
+        i += 1
 
 
 
@@ -106,6 +129,7 @@ for i in range(len(data)):
 
 simple_replace(data)
 remove(data)
+pressed(data)
 
 for l in data:
     print l

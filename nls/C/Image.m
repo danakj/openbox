@@ -1,25 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: napaka pri izdelavi slike (pixmap)\n
+# BImage::render_solid: fel under skapande av pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: napaka pri izdelavi slike (XImage)\n
+# BImage::renderXImage: fel under skapande av XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: nepodprt videz\n
+# BImage::renderXImage: ej stöd för färgdjup\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: napaka pri izdelavi slike (pixmap)\n
+# BImage::renderPixmap: fel under skapande av pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: prevelika barvna paleta %d (%d/%d/%d) - krèim\n
+# BImageControl::BImageControl: ogiltig färgkarta storlek %d (%d/%d/%d) - reducerar\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: napaka pri dodeljevanju palete\n
+# BImageControl::BImageControl: fel under allokering av färgkarta\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: napaka pri dodeljevanju barve %d/%d/%d\n
+# BImageControl::BImageControl: misslyckades att allokera färg %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: medpomnilnik slik - zavr¾enih je %d slik\n
+# BImageControl::~BImageControl: pixmap cache - släpper %d pixmappar\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: medpomnilnik je zrasel, prisilno èi¹èenje\n
+# BImageControl::renderImage: stor cache, tvingar upprensning\n
 $ #ColorParseError
-# BImageControl::getColor: napaka pri branju barve: '%s'\n
+# BImageControl::getColor: färgfel: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: napaka pri dodeljevanju barve: '%s'\n
-
+# BImageControl::getColor: färgallokeringsfel: '%s'\n

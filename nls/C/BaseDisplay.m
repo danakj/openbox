@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  Napaka v sistemu oken X: %s(%d) operacijska koda %d/%d\n  vir 0x%lx\n
+# %s:  X-fel: %s(%d) opkod %d/%d\n  resurs 0x%lx\n
 $ #SignalCaught
-# %s: prejet signal %d\n
+# %s: signal %d fångad\n
 $ #ShuttingDown
-# zaustavitev\n
+# stänger ner\n
 $ #Aborting
-# prekinitev... izmet posmrtnih ostankov core\n
+# avbryter... dumpar kärna\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: neuspe¹na povezava do stre¾nika X.\n
+# BaseDisplay::BaseDisplay: anslutning till X server misslyckades.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: povezave do prikazovalnika ni moè pripraviti do samodejne prekinitve ob zaustavitvi\n
+# BaseDisplay::BaseDisplay: kunde inte markera skärmanslutning som stäng-vid-exekvering\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): pokvarjeno okno je odstranjeno iz dogodkovne vrste\n
+# BaseDisplay::eventLoop(): tar bort dåligt fönster från händelsekön\n

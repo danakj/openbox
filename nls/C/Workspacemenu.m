@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Delovne povr¹ine
+# Skrivbord
 $ #NewWorkspace
-# Nova delovna povr¹ina
+# Nytt skrivbord
 $ #RemoveLast
-# Odstrani zadnjo 
+# Ta bort sista

@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Orodna letev
+# Verktygslist
 $ #EditWkspcName
-# Uredi ime trenutnega namizja
+# Ändra namn på skrivbordet
 $ #ToolbarPlacement
-# Lega orodne letve
+# Verktygslistens placering

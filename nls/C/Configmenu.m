@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Конфигурация
+# Nastavitvene izbire
 $ #FocusModel
-# Модель фокусировки
+# NaХin fokusiranja
 $ #WindowPlacement
-# Положение окна
+# Postavitev oken
 $ #ImageDithering
-# Image Dithering
+# Prelivanje slik
 $ #OpaqueMove
-# Перемещение заполненных окон
+# Premikanje prosojnih oken
 $ #FullMax
-# Полная максимизация
+# NajveХje okno
 $ #FocusNew
-# Перемещать фокус на новые окна
+# Novo okno dobi fokus
 $ #FocusLast
-# Фокус на последнее окно рабочего стола
+# Spremenjeni fokus okna na namizju
 $ #ClickToFocus
-# Фокус по щелчку
+# Za fokus kliknite
 $ #SloppyFocus
-# Фокус по перемещению
+# Povr╧ni fokus
 $ #AutoRaise
-# Автовсплытие
+# Samodejno odkrivanje
 $ #SmartRows
-# "Умное" расположение (по горизонтали)
+# Pametno postavljanje (vrstice)
 $ #SmartCols
-# "Умное" расположение (по вертикали)
+# Pametno postavljanje (stolpci)
 $ #Cascade
-# Каскадом
+# Kaskadno postavljanje
 $ #LeftRight
-# Слева направо
+# Od leve proti desni
 $ #RightLeft
-# Справа налево
+# Od desne proti levi
 $ #TopBottom
-# Сверху вниз
+# Od zgoraj navzdol
 $ #BottomTop
-# Снизу вверх
+# Od spodaj navzgor

@@ -71,7 +71,7 @@ public:
   inline unsigned int desktop() const { return _desktop; }
   inline const std::string &title() const { return _title; }
   inline const std::string &appName() const { return _app_name; }
-  inline const std::string &appClass() const { return _app_name; }
+  inline const std::string &appClass() const { return _app_class; }
   
   inline bool shaded() const { return _shaded; }
   inline bool iconic() const { return _iconic; }

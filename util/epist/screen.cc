@@ -25,6 +25,10 @@
 #endif // HAVE_CONFIG_H
 
 extern "C" {
+#ifdef    HAVE_STDIO_H
+#  include <stdio.h>
+#endif // HAVE_STDIO_H
+
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -204,6 +208,9 @@ void screen::handleKeypress(const XEvent &e) {
       case Action::execute:
         execCommand(it->string());
         return;
+
+      default:
+        break;
       }
 
       // these actions require an active window
@@ -241,6 +248,10 @@ void screen::handleKeypress(const XEvent &e) {
         case Action::toggleshade:
           window->shade(! window->shaded());
           return;
+      
+        default:
+          assert(false);  // unhandled action type!
+          break;
         }
       }
     }
@@ -389,6 +400,10 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
     
   WindowList::const_iterator target = _active;
 
+  string classname;
+  if (sameclass && target != _clients.end())
+    classname = (*target)->appClass();
+
   if (target == _clients.end())
     target = _clients.begin();
  
@@ -405,8 +420,8 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
   } while (target == _clients.end() ||
            (*target)->iconic() ||
            (! alldesktops && (*target)->desktop() != _active_desktop) ||
-           (sameclass && _active != _clients.end() &&
-            (*target)->appClass() != (*_active)->appClass()));
+           (sameclass && ! classname.empty() &&
+            (*target)->appClass() != classname));
   
   if (target != _clients.end())
     (*target)->focus();

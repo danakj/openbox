@@ -1631,6 +1631,14 @@ void BlackboxWindow::configureShape(void) {
                           ShapeBounding, 0, 0, xrect, num,
                           ShapeUnion, Unsorted);
 }
+
+
+void BlackboxWindow::clearShape(void) {
+  XShapeCombineMask(blackbox->getXDisplay(), frame.window, ShapeBounding,
+                    frame.margin.left - frame.border_w,
+                    frame.margin.top - frame.border_w,
+                    None, ShapeSet);
+}
 #endif // SHAPE
 
 
@@ -3785,9 +3793,15 @@ void BlackboxWindow::leaveNotifyEvent(const XCrossingEvent*) {
 
 
 #ifdef    SHAPE
-void BlackboxWindow::shapeEvent(XShapeEvent *) {
-  if (blackbox->hasShapeExtensions() && flags.shaped) {
-    configureShape();
+void BlackboxWindow::shapeEvent(XShapeEvent *e) {
+  if (blackbox->hasShapeExtensions()) {
+    if (! e->shaped && flags.shaped) {
+      clearShape();
+      flags.shaped = False;
+    } else if (e->shaped) {
+      configureShape();
+      flags.shaped = True;
+    }
   }
 }
 #endif // SHAPE

@@ -1712,6 +1712,11 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 {
     gboolean moved = FALSE, resized = FALSE;
 
+    /* make the frame recalculate its dimentions n shit without changing
+       anything visible for real, this way the constraints below can work with
+       the updated frame dimensions. */
+    frame_adjust_area(self->frame, TRUE, TRUE, TRUE);
+
     /* gets the frame's position */
     frame_client_gravity(self->frame, &x, &y);
 
@@ -1757,8 +1762,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
         /* set the size and position if maximized */
         if (self->max_horz) {
-            x = a->x - self->frame->size.left;
-            w = a->width;
+            x = a->x;
+            w = a->width - self->frame->size.left - self->frame->size.right;
         }
         if (self->max_vert) {
             y = a->y;
@@ -1900,7 +1905,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
             moved = resized = TRUE;
 
         if (moved || resized)
-            frame_adjust_area(self->frame, moved, resized);
+            frame_adjust_area(self->frame, moved, resized, FALSE);
 
         if (!resized && (force_reply || ((!user && moved) || (user && final))))
         {
@@ -2170,7 +2175,7 @@ void client_shade(ObClient *self, gboolean shade)
     self->shaded = shade;
     client_change_state(self);
     /* resize the frame to just the titlebar */
-    frame_adjust_area(self->frame, FALSE, FALSE);
+    frame_adjust_area(self->frame, FALSE, FALSE, FALSE);
 }
 
 void client_close(ObClient *self)

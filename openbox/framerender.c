@@ -21,7 +21,6 @@ void framerender_frame(ObFrame *self)
         px = (self->focused ?
               RrColorPixel(ob_rr_theme->cb_focused_color) :
               RrColorPixel(ob_rr_theme->cb_unfocused_color));
-        XSetWindowBorder(ob_display, self->plate, px);
         XSetWindowBackground(ob_display, self->plate, px);
     }
 

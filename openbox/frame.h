@@ -93,7 +93,9 @@ struct _ObFrame
     gint      max_x;         /* x-position of the window maximize button */
     gint      close_x;       /* x-position of the window close button */
     gint      bwidth;        /* border width */
-    gint      cbwidth;       /* client border width */
+    gint      rbwidth;       /* title border width */
+    gint      cbwidth_x;     /* client border width */
+    gint      cbwidth_y;     /* client border width */
 
     gboolean  max_press;
     gboolean  close_press;
@@ -113,7 +115,8 @@ ObFrame *frame_new();
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
-void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized);
+void frame_adjust_area(ObFrame *self, gboolean moved,
+                       gboolean resized, gboolean fake);
 void frame_adjust_state(ObFrame *self);
 void frame_adjust_focus(ObFrame *self, gboolean hilite);
 void frame_adjust_title(ObFrame *self);

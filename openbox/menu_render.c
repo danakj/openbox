@@ -35,8 +35,10 @@ void menu_render_full(Menu *self) {
     /* set texture data and size them mofos out */
     if (self->label) {
         struct RrColor c;
+        struct RrFont *font;
         RrColorSet(&c, 0, 0, 0, 1.0);
-        RrTextureSetText(self->s_title, 0, NULL, RR_CENTER, &c,
+        font = RrFontOpen(ob_render_inst, "arial-10:bold"); /* XXX mem leak! */
+        RrTextureSetText(self->s_title, 0, font, RR_CENTER, &c,
                          self->label);
         RrSurfaceMinSize(self->s_title, &self->title_min_w, &self->title_h);
 	self->title_min_w += theme_bevel * 2;
@@ -49,19 +51,21 @@ void menu_render_full(Menu *self) {
     for (it = self->entries; it; it = it->next) {
         MenuEntry *e = it->data;
         struct RrColor c;
+        struct RrFont *font;
         int h;
 
         RrColorSet(&c, 0, 0, 0, 1.0);
-        RrTextureSetText(e->s_item, 0, NULL, RR_LEFT, &c, e->label);
+        font = RrFontOpen(ob_render_inst, "arial-10:bold"); /* XXX mem leak! */
+        RrTextureSetText(e->s_item, 0, font, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_item, &e->min_w, &self->item_h);
         self->size.width = MAX(self->size.width, e->min_w);
 
-        RrTextureSetText(e->s_disabled, 0, NULL, RR_LEFT, &c, e->label);
+        RrTextureSetText(e->s_disabled, 0, font, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_disabled, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 	
-        RrTextureSetText(e->s_hilite, 0, NULL, RR_LEFT, &c, e->label);
+        RrTextureSetText(e->s_hilite, 0, font, RR_LEFT, &c, e->label);
         RrSurfaceMinSize(e->s_hilite, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);

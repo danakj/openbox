@@ -124,10 +124,12 @@ void popup_show(Popup *self, char *text, Icon *icon)
     int textw, texth;
     int iconw;
     struct RrColor c;
+    struct RrFont *font;
 
     /* set up the textures */
     RrColorSet(&c, 0, 0, 0, 1.0);
-    RrTextureSetText(self->s_text, 0, NULL, RR_LEFT, &c, text);
+    font = RrFontOpen(ob_render_inst, "arial-10:bold"); /* XXX mem leak! */
+    RrTextureSetText(self->s_text, 0, font, RR_LEFT, &c, text);
 
     /* measure the shit out */
     RrSurfaceMinSize(self->s_text, &textw, &texth);

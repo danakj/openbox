@@ -125,17 +125,17 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
         glColor3f(1.0, 1.0, 1.0);
         glBindTexture(GL_TEXTURE_2D, rgba->texid);
         glBegin(GL_TRIANGLES);
-        glTexCoord2f(rgba->w/(float)rgba->padw, rgba->h/(float)rgba->padh);
-        glVertex2i(x, y);
         glTexCoord2f(0, rgba->h/(float)rgba->padh);
+        glVertex2i(x, y);
+        glTexCoord2f(rgba->w/(float)rgba->padw, rgba->h/(float)rgba->padh);
         glVertex2i(x+w, y);
-        glTexCoord2f(0, 0);
+        glTexCoord2f(rgba->w/(float)rgba->padw, 0);
         glVertex2i(x+w, y+h);
 
         glVertex2i(x+w, y+h);
-        glTexCoord2f(rgba->w/(float)rgba->padw, 0);
+        glTexCoord2f(0, 0);
         glVertex2i(x, y+h);
-        glTexCoord2f(rgba->w/(float)rgba->padw, rgba->h/(float)rgba->padh);
+        glTexCoord2f(0, rgba->h/(float)rgba->padh);
         glVertex2i(x, y);
         glEnd();
 

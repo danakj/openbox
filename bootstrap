@@ -4,12 +4,13 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
+export WANT_AUTOMAKE=1.7
+
 sh autopoint --force # for GNU gettext
 sh libtoolize --copy --force --automake
 sh aclocal -I m4
 #sh autoheader
 sh autoconf
-export WANT_AUTOMAKE=1.7
 sh automake --foreign --include-deps --add-missing --copy
 
 echo

@@ -52,7 +52,7 @@ xli_tile_cmd="xli -onroot -quiet"
 xli_center_cmd="xli -center -onroot quiet"
 xli_default_cmd="$xli_center_cmd"
 
-xsetbg_full_cmd="xsetbg -fillscreen"
+xsetbg_full_cmd="xsetbg -fullscreen"
 xsetbg_tile_cmd="xsetbg"
 xsetbg_center_cmd="xsetbg -center"
 xsetbg_default_cmd="$xsetbg_center_cmd"

@@ -42,6 +42,22 @@ void RrRender(RrAppearance *a, int w, int h)
         return;
     }
   
+    if (a->surface.interlaced) {
+        int i;
+        RrPixel32 *p;
+
+        r = a->surface.interlace_color->r;
+        g = a->surface.interlace_color->g;
+        b = a->surface.interlace_color->b;
+        current = (r << RrDefaultRedOffset)
+            + (g << RrDefaultGreenOffset)
+            + (b << RrDefaultBlueOffset);
+        p = data;
+        for (i = 0; i < h; i += 2, p += w)
+            for (x = 0; x < w; ++x, ++p)
+                *p = current;
+    }
+
     if (a->surface.relief == RR_RELIEF_FLAT && a->surface.border) {
         r = a->surface.border_color->r;
         g = a->surface.border_color->g;
@@ -82,23 +98,6 @@ void RrRender(RrAppearance *a, int w, int h)
                           a->surface.relief==RR_RELIEF_RAISED);
         }
     }
-
-    if (a->surface.interlaced) {
-        int i;
-        RrPixel32 *p;
-
-        r = a->surface.interlace_color->r;
-        g = a->surface.interlace_color->g;
-        b = a->surface.interlace_color->b;
-        current = (r << RrDefaultRedOffset)
-            + (g << RrDefaultGreenOffset)
-            + (b << RrDefaultBlueOffset);
-        p = data;
-        for (i = 0; i < h; i += 2, p += w)
-            for (x = 0; x < w; ++x, ++p)
-                *p = current;
-    }
-
 }
 
 static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)

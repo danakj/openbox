@@ -866,9 +866,11 @@ void action_raise(union ActionData *data)
 void action_unshaderaise(union ActionData *data)
 {
     if (data->client.any.c) {
-        if (data->client.any.c->shaded)
+        if (data->client.any.c->shaded) {
+            grab_pointer(TRUE, OB_CURSOR_NONE);
             client_shade(data->client.any.c, FALSE);
-        else
+            grab_pointer(FALSE, OB_CURSOR_NONE);
+        } else
             stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
     }
 }
@@ -878,8 +880,11 @@ void action_shadelower(union ActionData *data)
     if (data->client.any.c) {
         if (data->client.any.c->shaded)
             stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
-        else
+        else {
+            grab_pointer(TRUE, OB_CURSOR_NONE);
             client_shade(data->client.any.c, TRUE);
+            grab_pointer(FALSE, OB_CURSOR_NONE);
+        }
     }
 }
 
@@ -903,20 +908,29 @@ void action_kill(union ActionData *data)
 
 void action_shade(union ActionData *data)
 {
-    if (data->client.any.c)
+    if (data->client.any.c) { 
+        grab_pointer(TRUE, OB_CURSOR_NONE);
         client_shade(data->client.any.c, TRUE);
+        grab_pointer(FALSE, OB_CURSOR_NONE);
+    }
 }
 
 void action_unshade(union ActionData *data)
 {
-    if (data->client.any.c)
+    if (data->client.any.c) {
+        grab_pointer(TRUE, OB_CURSOR_NONE);
         client_shade(data->client.any.c, FALSE);
+        grab_pointer(FALSE, OB_CURSOR_NONE);
+    }
 }
 
 void action_toggle_shade(union ActionData *data)
 {
-    if (data->client.any.c)
+    if (data->client.any.c) {
+        grab_pointer(TRUE, OB_CURSOR_NONE);
         client_shade(data->client.any.c, !data->client.any.c->shaded);
+        grab_pointer(FALSE, OB_CURSOR_NONE);
+    }
 }
 
 void action_toggle_omnipresent(union ActionData *data)

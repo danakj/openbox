@@ -365,6 +365,10 @@ void client_manage(Window window)
         event_halt_focus_delay();
 
         client_focus(self);
+        /* since focus can change the stacking orders, if we focus the window
+           then the standard raise it gets is not enough, we need to queue one
+           for after the focus change takes place */
+        client_raise(self);
     }
 
     /* client_activate does this but we aret using it so we have to do it

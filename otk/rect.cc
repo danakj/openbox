@@ -136,6 +136,12 @@ bool Rect::contains(int x, int y) const
 }
 
 
+bool Rect::contains(const Point &p) const
+{
+  return contains(p.x(), p.y());
+}
+
+
 bool Rect::contains(const Rect& a) const
 {
   return a._x1 >= _x1 && a._x2 <= _x2 &&

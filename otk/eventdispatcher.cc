@@ -34,7 +34,7 @@ void OtkEventDispatcher::clearHandler(Window id)
   _map.erase(id);
 }
 
-#include <stdio.h>
+//#include <stdio.h>
 void OtkEventDispatcher::dispatchEvents(void)
 {
   XEvent e;
@@ -44,7 +44,7 @@ void OtkEventDispatcher::dispatchEvents(void)
   while (XPending(OBDisplay::display)) {
     XNextEvent(OBDisplay::display, &e);
 
-#ifdef DEBUG
+#if defined(DEBUG) && 0
     printf("Event %d window %lx\n", e.type, e.xany.window);
 #endif
 

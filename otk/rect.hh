@@ -213,6 +213,14 @@ public:
     @return true if the point is contained within this Rect; otherwise, false
   */
   bool contains(int x, int y) const;
+  //! Determines if this Rect contains a point
+  /*!
+    The rectangle contains the point if it falls within the rectangle's
+    boundaries.
+    @param p The point to operate on
+    @return true if the point is contained within this Rect; otherwise, false
+  */
+  bool contains(const Point &p) const;
   //! Determines if this Rect contains another Rect entirely
   /*!
     This rectangle contains the second rectangle if it is entirely within this

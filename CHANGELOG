@@ -1,0 +1,178 @@
+Changelog for Openbox:
+
+1.2.2:
+ * ignore fully maximized windows while placing new
+   windows.                                             (Ben Jansens)
+
+ * change cascade's behavior to be less likely to place
+   over a window and to reset when the workspace is
+   empty.                                               (Ben Jansens)
+
+ * fixes for bsetroot support of Eterm/Esetroot atoms.  (Ben Jansens)
+
+ * make reconfigure save where you are in the menu
+   properly, and restore it as best it can (i.e. it
+   used to save only 1 level, now it saves them all).   (Ben Jansens)
+
+ * fix bug when removing a workspace with windows. (stl
+   misuse, an iterator became invalidated.)             (Ben Jansens)
+
+ * back out all changes for sticky windows as it is not
+   about to work. This will be implemented in the next
+   development series instead. Use a slightly improved
+   focus model for sticky windows, in the meantime.     (Ben Jansens)
+
+1.2.1:
+ * fix compiling with --disable-slit and --disable-nls. (Ben Jansens)
+
+ * better sticky windows behavior. Sticky windows
+   appear in the window lists on all workspaces and
+   obey focus order rules on each workspace the same as
+   non-sticky windows.                                  (Ben Jansens)
+
+ * make reconfigure reset the timeout values for
+   windows, the slit, and the toolbar, so that a new
+   autoRaiseDelay value will take effect without having
+   to restart.                                          (Ben Jansens)
+
+ * fix for loading the autoRaiseDelay value.            (Ben Jansens)
+
+1.2.0:
+ * fix off-by-one window resizing bug.                  (Ben Jansens)
+
+ * fix for slit menu not using the correct style when
+   the style changed.                                   (Ben Jansens)
+
+ * changed the menu from an rcfile option to a command-
+   line option. use 'openbox -menu <file>' to select an
+   alternate menu. The default menu used is
+   ~/.openbox/menu. If the default, or the file you
+   specify does not exist, the global menu is tried.
+   And if the global menu also does not exist, a
+   simple, internal menu is used instead.               (Ben Jansens)
+
+ * new version of bsetroot ported from blackbox cvs
+   with intent to support Eterm/Esetroot.               (Sean Perry)
+
+ * make bsetroot behave properly with Eterm/Esetroot.   (Ben Jansens)
+
+ * new version of bsetbg.                               (Timothy King)
+
+ * fix the 'wrong window move' bug displayed by apps
+   such as bbkeys.                                      (Sean Perry)
+
+ * fix bug when removing and then readding a titlebar
+   button without restarting (by reconfiguring).        (Ben Jansens)
+
+ * more focus code changes. also fixes a segfault from
+   last round of focus changes.                         (Ben Jansens)
+ 
+ * make image dithering value load correctly.           (Ben Jansens)
+
+ * fix segfault with multiple screens.                  (Sean Perry)
+
+1.1.0:
+ * improved focused window logic to remove a segfault
+   when the focused window on an inactive workspace
+   closes, and focusLastWindow is enabled.              (Ben Jansens)
+
+ * bsetroot supports transparent applications by
+   setting the xrootpmap_id property on the root
+   window                                               (Sean Perry)
+
+ * added ClickMouse window placement algorithm/type.    (Ben Jansens)
+ 
+ * added UnderMouse window placement algorithm/type.    (Ben Jansens)
+
+ * improved logic for decorating windows when the
+   decoration level is changed                          (Ben Jansens)
+
+ * fix positioning of the window menu                   (Ben Jansens)
+
+ * save the titlebarLayout in the default config file.  (Ben Jansens)
+
+ * gcc 3 compatibilty                                   (Ben Jansens)
+
+1.0.0:
+ * maximizing windows takes the slit into account as
+   well as the toolbar when 'Full Maximization' is off  (Ben Jansens)
+
+ * better handling of the rc file and its configuration
+   options. The file is written each time an option in
+   the file is changed, instead of being written at
+   shutdown. This means that you can edit the file by
+   hand while in Openbox, and then choose reconfig or
+   restart to have it use the new rc file.              (Ben Jansens)
+
+ * added a runtime option for hiding the toolbar.       (Scott Moynes)
+	
+ * made shaded windows edge-snap correctly to the
+   bottom for their size instead for their unshaded
+   size.                                                (Ben Jansens)
+
+ * added BestFit window placement algorithm/type.       (Ruhi Bloodworth)
+
+ * forced a redraw of the close button after pressing
+   it. Some applications (eg. acroread) ignore the
+   close request and you end up with a funky close
+   button.                                              (Scott Moynes)
+
+ * fix positioning of the window menu                   (Ben Jansens)
+
+0.99.0:
+ * renamed header files from *.hh to *.h.               (Ben Jansens)
+
+ * fix clipping of the date/time in the toolbar with
+   proportional fonts.                                  (Sean Perry, Ben Jansens)
+
+ * added a --enable-clobber configuration option to
+   allow users to turn off the event clobbering by
+   hitting the numlock or scroll lock keys.		(Scott  Moynes)
+
+ * window menu is inconsistant in that other menus
+   ignore mouse button 2, but it did not, because of
+   the maximize option. Now all options in the window
+   menu ignore mouse button 2 to be consistant.         (Scott Moynes)
+
+ * changed the default configuration file from
+   ~/.blackboxrc to ~/.openbox/rc.                      (Ben Jansens)
+
+ * ignore fully-maximized windows when smart
+   placing windows.                                     (Ben Jansens)
+      
+ * windows snaps to both sides of the screen's edge,
+   i.e. they have double the snapping area, half
+   inside and half outside the visible screen.          (Ben Jansens)
+      
+ * a rootCommand per-screen in the rc file which
+   will override the rootCommand in styles for that
+   screen.                                              (Ben Jansens)
+      
+ * rolling the mouse wheel on a window's title bar
+   will shade/unshade the window. rolling the mouse
+   wheel on the root window will change workspaces      (John Kennis, Ben Jansens)
+      
+ * new button press/release code in Window class,
+   gives window buttons more consistent behavior.       (Ben Jansens)
+     
+ * custom ordering of windows' titlebar elements
+   with a titlebarLayout option added to the
+   rc file                                              (MrFab, Ben Jansens)
+    
+ * when resizing a window in non-opaque mode, fixed
+   the drawn rectangle so that it is drawn entirely
+   within the bounds of the new window. it used to
+   be drawn in the area of the window + 1.              (Ben Jansens)
+      
+ * changed the background of the toolbar's workspace
+   label when it is being edited. The text color
+   being used was that of the active window label,
+   but the background remained that of the toolbar.
+   Changed to use the background of the active
+   window label.                                        (Ben Jansens)
+
+ * added windowZones to the rc file specifying
+   the number of zones to divide a window into for
+   alt-drag resizing, and code to resize windows
+   with the number of zones specified.                  (Nicolas Delon, Ben Jansens)
+    

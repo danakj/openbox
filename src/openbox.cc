@@ -55,15 +55,22 @@
 #include "Window.h"
 #include "Workspace.h"
 #include "Workspacemenu.h"
+#include "Util.h"
+
+#include <string>
+#include <algorithm>
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
@@ -144,8 +151,8 @@ static Bool queueScanner(Display *, XEvent *e, char *args) {
 Openbox *openbox;
 
 
-Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
-  : BaseDisplay(m_argv[0], dpy_name) {
+Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc,
+                 char *menu) : BaseDisplay(m_argv[0], dpy_name) {
   grab();
 
   if (! XSupportsLocale())
@@ -157,124 +164,110 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   ::openbox = this;
   argc = m_argc;
   argv = m_argv;
-  if (rc == NULL) {
+  if (rc == NULL || menu == NULL) {
     char *homedir = getenv("HOME");
-
-    rc_file = new char[strlen(homedir) + strlen("/.openbox/rc") + 1];
-    sprintf(rc_file, "%s/.openbox", homedir);
-
+    char *configdir = new char[strlen(homedir) + strlen("/.openbox") + 1];
+    sprintf(configdir, "%s/.openbox", homedir);
     // try to make sure the ~/.openbox directory exists
-    mkdir(rc_file, S_IREAD | S_IWRITE | S_IEXEC | S_IRGRP | S_IWGRP | S_IXGRP |
+    mkdir(configdir, S_IREAD | S_IWRITE | S_IEXEC |
+          S_IRGRP | S_IWGRP | S_IXGRP |
           S_IROTH | S_IWOTH | S_IXOTH);
     
-    sprintf(rc_file, "%s/.openbox/rc", homedir);
-  } else {
-    rc_file = bstrdup(rc);
-  }
 
+    if (rc == NULL) {
+      rc_file = new char[strlen(configdir) + strlen("/rc") + 1];
+      sprintf(rc_file, "%s/rc", configdir);
+    } else
+      rc_file = bstrdup(rc);
+
+    if (menu == NULL) {
+      menu_file = new char[strlen(configdir) + strlen("/menu") + 1];
+      sprintf(menu_file, "%s/menu", configdir);
+    } else
+      menu_file = bstrdup(menu);
+
+    delete [] configdir;
+  }
+  config.setFile(rc_file);
+  
   no_focus = False;
 
-  resource.menu_file = resource.style_file = (char *) 0;
-  resource.titlebar_layout = (char *) NULL;
+  resource.style_file = NULL;
+  resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
-  focused_window = masked_window = (OpenboxWindow *) 0;
+  current_screen = (BScreen *) 0;
+  masked_window = (OpenboxWindow *) 0;
   masked = None;
 
-  windowSearchList = new LinkedList<WindowSearch>;
-  menuSearchList = new LinkedList<MenuSearch>;
-
-#ifdef    SLIT
-  slitSearchList = new LinkedList<SlitSearch>;
-#endif // SLIT
-
-  toolbarSearchList = new LinkedList<ToolbarSearch>;
-  groupSearchList = new LinkedList<WindowSearch>;
-
-  menuTimestamps = new LinkedList<MenuTimestamp>;
-
-  XrmInitialize();
-  load_rc();
+  load();
 
 #ifdef    HAVE_GETPID
   openbox_pid = XInternAtom(getXDisplay(), "_BLACKBOX_PID", False);
 #endif // HAVE_GETPID
 
-  screenList = new LinkedList<BScreen>;
-  for (int i = 0; i < getNumberOfScreens(); i++) {
-    BScreen *screen = new BScreen(this, i);
+  for (unsigned int s = 0; s < numberOfScreens(); s++) {
+    BScreen *screen = new BScreen(*this, s, config);
 
     if (! screen->isScreenManaged()) {
       delete screen;
       continue;
     }
 
-    screenList->insert(screen);
+    screenList.push_back(screen);
   }
 
-  if (! screenList->count()) {
+  if (screenList.empty()) {
     fprintf(stderr,
 	    i18n->getMessage(openboxSet, openboxNoManagableScreens,
 	       "Openbox::Openbox: no managable screens found, aborting.\n"));
     ::exit(3);
   }
+  current_screen = screenList.front();
 
+  // save current settings and default values
+  save();
+  
   XSynchronize(getXDisplay(), False);
   XSync(getXDisplay(), False);
 
   reconfigure_wait = reread_menu_wait = False;
 
-  timer = new BTimer(this, this);
+  timer = new BTimer(*this, *this);
   timer->setTimeout(0);
   timer->fireOnce(True);
 
   ungrab();
+
+  focusWindow(0);
 }
 
 
-Openbox::~Openbox(void) {
-  while (screenList->count())
-    delete screenList->remove(0);
+Openbox::~Openbox() {
+  for_each(screenList.begin(), screenList.end(),
+           PointerAssassin());
 
-  while (menuTimestamps->count()) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
-
-    if (ts->filename)
-      delete [] ts->filename;
-
-    delete ts;
-  }
-
-  if (resource.menu_file)
-    delete [] resource.menu_file;
+  for_each(menuTimestamps.begin(), menuTimestamps.end(),
+           PointerAssassin());
 
   if (resource.style_file)
     delete [] resource.style_file;
 
+  if (resource.titlebar_layout)
+    delete [] resource.titlebar_layout;
+
   delete timer;
 
-  delete screenList;
-  delete menuTimestamps;
-
-  delete windowSearchList;
-  delete menuSearchList;
-  delete toolbarSearchList;
-  delete groupSearchList;
-
   delete [] rc_file;
-
-#ifdef    SLIT
-  delete slitSearchList;
-#endif // SLIT
+  delete [] menu_file;
 }
 
 
 void Openbox::process_event(XEvent *e) {
-  if ((masked == e->xany.window) && masked_window &&
+  if ((masked == e->xany.window && masked_window) &&
       (e->type == MotionNotify)) {
     last_time = e->xmotion.time;
     masked_window->motionNotifyEvent(&e->xmotion);
-
     return;
   }
 
@@ -310,9 +303,9 @@ void Openbox::process_event(XEvent *e) {
     } else if ((tbar = searchToolbar(e->xbutton.window))) {
       tbar->buttonPressEvent(&e->xbutton);
     } else {
-      LinkedListIterator<BScreen> it(screenList);
-      BScreen *screen = it.current();
-      for (; screen; it++, screen = it.current()) {
+      ScreenList::iterator it;
+      for (it = screenList.begin(); it != screenList.end(); ++it) {
+        BScreen *screen = *it;
 	if (e->xbutton.window == screen->getRootWindow()) {
 	  if (e->xbutton.button == 1) {
             if (! screen->isRootColormapInstalled())
@@ -333,14 +326,14 @@ void Openbox::process_event(XEvent *e) {
 	    if (my < 0) my = 0;
 
 	    if (mx + screen->getWorkspacemenu()->getWidth() >
-		screen->getWidth())
-	      mx = screen->getWidth() -
+		screen->size().w())
+	      mx = screen->size().w() -
 		screen->getWorkspacemenu()->getWidth() -
 		screen->getBorderWidth();
 
 	    if (my + screen->getWorkspacemenu()->getHeight() >
-		screen->getHeight())
-	      my = screen->getHeight() -
+		screen->size().h())
+	      my = screen->size().h() -
 		screen->getWorkspacemenu()->getHeight() -
 		screen->getBorderWidth();
 
@@ -359,13 +352,13 @@ void Openbox::process_event(XEvent *e) {
 	    if (mx < 0) mx = 0;
 	    if (my < 0) my = 0;
 
-	    if (mx + screen->getRootmenu()->getWidth() > screen->getWidth())
-	      mx = screen->getWidth() -
+	    if (mx + screen->getRootmenu()->getWidth() > screen->size().w())
+	      mx = screen->size().w() -
 		screen->getRootmenu()->getWidth() -
 		screen->getBorderWidth();
 
-	    if (my + screen->getRootmenu()->getHeight() > screen->getHeight())
-		my = screen->getHeight() -
+	    if (my + screen->getRootmenu()->getHeight() > screen->size().h())
+		my = screen->size().h() -
 		  screen->getRootmenu()->getHeight() -
 		  screen->getBorderWidth();
 
@@ -376,15 +369,16 @@ void Openbox::process_event(XEvent *e) {
 	      screen->getRootmenu()->show();
 	    }
           } else if (e->xbutton.button == 4) {
-            if ((screen->getCurrentWorkspaceID()-1)<0)
-              screen->changeWorkspaceID(screen->getCount()-1);
-            else
-              screen->changeWorkspaceID(screen->getCurrentWorkspaceID()-1);
-          } else if (e->xbutton.button == 5) {
-            if ((screen->getCurrentWorkspaceID()+1)>screen->getCount()-1)
+            if ((screen->getCurrentWorkspaceID() + 1) >
+                screen->getWorkspaceCount() - 1)
               screen->changeWorkspaceID(0);
             else
-              screen->changeWorkspaceID(screen->getCurrentWorkspaceID()+1);
+              screen->changeWorkspaceID(screen->getCurrentWorkspaceID() + 1);
+          } else if (e->xbutton.button == 5) {
+            if ((screen->getCurrentWorkspaceID() - 1) < 0)
+              screen->changeWorkspaceID(screen->getWorkspaceCount() - 1);
+            else
+              screen->changeWorkspaceID(screen->getCurrentWorkspaceID() - 1);
           }
         }
       }
@@ -463,7 +457,7 @@ void Openbox::process_event(XEvent *e) {
     OpenboxWindow *win = searchWindow(e->xmaprequest.window);
 
     if (! win)
-      win = new OpenboxWindow(this, e->xmaprequest.window);
+      win = new OpenboxWindow(*this, e->xmaprequest.window);
 
     if ((win = searchWindow(e->xmaprequest.window)))
       win->mapRequestEvent(&e->xmaprequest);
@@ -489,8 +483,6 @@ void Openbox::process_event(XEvent *e) {
 
     if ((win = searchWindow(e->xunmap.window))) {
       win->unmapNotifyEvent(&e->xunmap);
-      if (focused_window == win)
-	focused_window = (OpenboxWindow *) 0;
 #ifdef    SLIT
     } else if ((slit = searchSlit(e->xunmap.window))) {
       slit->removeClient(e->xunmap.window);
@@ -510,8 +502,6 @@ void Openbox::process_event(XEvent *e) {
 
     if ((win = searchWindow(e->xdestroywindow.window))) {
       win->destroyNotifyEvent(&e->xdestroywindow);
-      if (focused_window == win)
-	focused_window = (OpenboxWindow *) 0;
 #ifdef    SLIT
     } else if ((slit = searchSlit(e->xdestroywindow.window))) {
       slit->removeClient(e->xdestroywindow.window, False);
@@ -575,7 +565,7 @@ void Openbox::process_event(XEvent *e) {
 	(screen = searchScreen(e->xcrossing.window))) {
       screen->getImageControl()->installRootColormap();
     } else if ((win = searchWindow(e->xcrossing.window))) {
-      if (win->getScreen()->isSloppyFocus() &&
+      if (win->getScreen()->sloppyFocus() &&
 	  (! win->isFocused()) && (! no_focus)) {
 	grab();
 
@@ -661,8 +651,8 @@ void Openbox::process_event(XEvent *e) {
       break;
 
     OpenboxWindow *win = searchWindow(e->xfocus.window);
-    if (win && ! win->isFocused())
-      setFocusedWindow(win);
+    if (win && !win->isFocused())
+      focusWindow(win);
 
     break;
   }
@@ -684,7 +674,7 @@ void Openbox::process_event(XEvent *e) {
 	BScreen *screen = searchScreen(e->xclient.window);
 
 	if (screen && e->xclient.data.l[0] >= 0 &&
-	    e->xclient.data.l[0] < screen->getCount())
+	    e->xclient.data.l[0] < screen->getWorkspaceCount())
 	  screen->changeWorkspaceID(e->xclient.data.l[0]);
       } else if (e->xclient.message_type == getOpenboxChangeWindowFocusAtom()) {
 	OpenboxWindow *win = searchWindow(e->xclient.window);
@@ -740,11 +730,8 @@ void Openbox::process_event(XEvent *e) {
 Bool Openbox::handleSignal(int sig) {
   switch (sig) {
   case SIGHUP:
-    reconfigure();
-    break;
-
   case SIGUSR1:
-    reload_rc();
+    reconfigure();
     break;
 
   case SIGUSR2:
@@ -767,170 +754,107 @@ Bool Openbox::handleSignal(int sig) {
 
 
 BScreen *Openbox::searchScreen(Window window) {
-  LinkedListIterator<BScreen> it(screenList);
-
-  for (BScreen *curr = it.current(); curr; it++, curr = it.current()) {
-    if (curr->getRootWindow() == window) {
-      return curr;
-    }
-  }
-
+  ScreenList::iterator it;
+  for (it = screenList.begin(); it != screenList.end(); ++it)
+    if ((*it)->getRootWindow() == window)
+      return *it;
   return (BScreen *) 0;
 }
 
 
 OpenboxWindow *Openbox::searchWindow(Window window) {
-  LinkedListIterator<WindowSearch> it(windowSearchList);
-
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-      if (tmp->getWindow() == window) {
-	return tmp->getData();
-      }
-  }
-
-  return (OpenboxWindow *) 0;
+  WindowLookup::iterator it = windowSearchList.find(window);
+  if (it == windowSearchList.end())
+    return (OpenboxWindow *) 0;
+  return it->second;
 }
 
 
 OpenboxWindow *Openbox::searchGroup(Window window, OpenboxWindow *win) {
-  OpenboxWindow *w = (OpenboxWindow *) 0;
-  LinkedListIterator<WindowSearch> it(groupSearchList);
-
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      w = tmp->getData();
-      if (w->getClientWindow() != win->getClientWindow())
-        return win;
-    }
-  }
-
+  WindowLookup::iterator it = groupSearchList.find(window);
+  if (it != groupSearchList.end())
+    if (it->second->getClientWindow() != win->getClientWindow())
+      return win;
   return (OpenboxWindow *) 0;
 }
 
 
 Basemenu *Openbox::searchMenu(Window window) {
-  LinkedListIterator<MenuSearch> it(menuSearchList);
-
-  for (MenuSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Basemenu *) 0;
+  MenuLookup::iterator it = menuSearchList.find(window);
+  if (it == menuSearchList.end())
+    return (Basemenu *) 0;
+  return it->second;
 }
 
 
 Toolbar *Openbox::searchToolbar(Window window) {
-  LinkedListIterator<ToolbarSearch> it(toolbarSearchList);
-
-  for (ToolbarSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Toolbar *) 0;
+  ToolbarLookup::iterator it = toolbarSearchList.find(window);
+  if (it == toolbarSearchList.end())
+    return (Toolbar *) 0;
+  return it->second;
 }
 
 
 #ifdef    SLIT
 Slit *Openbox::searchSlit(Window window) {
-  LinkedListIterator<SlitSearch> it(slitSearchList);
-
-  for (SlitSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window)
-      return tmp->getData();
-  }
-
-  return (Slit *) 0;
+  SlitLookup::iterator it = slitSearchList.find(window);
+  if (it == slitSearchList.end())
+    return (Slit *) 0;
+  return it->second;
 }
 #endif // SLIT
 
 
 void Openbox::saveWindowSearch(Window window, OpenboxWindow *data) {
-  windowSearchList->insert(new WindowSearch(window, data));
+  windowSearchList.insert(WindowLookupPair(window, data));
 }
 
 
 void Openbox::saveGroupSearch(Window window, OpenboxWindow *data) {
-  groupSearchList->insert(new WindowSearch(window, data));
+  groupSearchList.insert(WindowLookupPair(window, data));
 }
 
 
 void Openbox::saveMenuSearch(Window window, Basemenu *data) {
-  menuSearchList->insert(new MenuSearch(window, data));
+  menuSearchList.insert(MenuLookupPair(window, data));
 }
 
 
 void Openbox::saveToolbarSearch(Window window, Toolbar *data) {
-  toolbarSearchList->insert(new ToolbarSearch(window, data));
+  toolbarSearchList.insert(ToolbarLookupPair(window, data));
 }
 
 
 #ifdef    SLIT
 void Openbox::saveSlitSearch(Window window, Slit *data) {
-  slitSearchList->insert(new SlitSearch(window, data));
+  slitSearchList.insert(SlitLookupPair(window, data));
 }
 #endif // SLIT
 
 
 void Openbox::removeWindowSearch(Window window) {
-  LinkedListIterator<WindowSearch> it(windowSearchList);
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      windowSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  windowSearchList.erase(window);
 }
 
 
 void Openbox::removeGroupSearch(Window window) {
-  LinkedListIterator<WindowSearch> it(groupSearchList);
-  for (WindowSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      groupSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  groupSearchList.erase(window);
 }
 
 
 void Openbox::removeMenuSearch(Window window) {
-  LinkedListIterator<MenuSearch> it(menuSearchList);
-  for (MenuSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      menuSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  menuSearchList.erase(window);
 }
 
 
 void Openbox::removeToolbarSearch(Window window) {
-  LinkedListIterator<ToolbarSearch> it(toolbarSearchList);
-  for (ToolbarSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      toolbarSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  toolbarSearchList.erase(window);
 }
 
 
 #ifdef    SLIT
 void Openbox::removeSlitSearch(Window window) {
-  LinkedListIterator<SlitSearch> it(slitSearchList);
-  for (SlitSearch *tmp = it.current(); tmp; it++, tmp = it.current()) {
-    if (tmp->getWindow() == window) {
-      slitSearchList->remove(tmp);
-      delete tmp;
-      break;
-    }
-  }
+  slitSearchList.erase(window);
 }
 #endif // SLIT
 
@@ -949,788 +873,144 @@ void Openbox::restart(const char *prog) {
 }
 
 
-void Openbox::shutdown(void) {
+void Openbox::shutdown() {
   BaseDisplay::shutdown();
 
-  XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::shutdown));
 
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *s = it.current(); s; it++, s = it.current())
-    s->shutdown();
-
+  focusWindow(0);
+  
   XSync(getXDisplay(), False);
-
-  save_rc();
 }
 
 
-void Openbox::save_rc(void) {
-  XrmDatabase new_openboxrc = (XrmDatabase) 0;
-  char rc_string[1024];
-
-  load_rc();
-
-  sprintf(rc_string, "session.menuFile:  %s", resource.menu_file);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.colorsPerChannel:  %d",
-          resource.colors_per_channel);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.titlebarLayout:  %s",
-          resource.titlebar_layout);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.doubleClickInterval:  %lu",
-          resource.double_click_interval);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.autoRaiseDelay:  %lu",
+void Openbox::save() {
+  config.setAutoSave(false);
+  
+  // save all values as they are so that the defaults will be written to the rc
+  // file
+  
+  config.setValue("session.colorsPerChannel",
+                  resource.colors_per_channel);
+  config.setValue("session.styleFile", resource.style_file);
+  config.setValue("session.titlebarLayout", resource.titlebar_layout);
+  config.setValue("session.doubleClickInterval",
+                  (long)resource.double_click_interval);
+  config.setValue("session.autoRaiseDelay",
           ((resource.auto_raise_delay.tv_sec * 1000) +
            (resource.auto_raise_delay.tv_usec / 1000)));
-  XrmPutLineResource(&new_openboxrc, rc_string);
+  config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
+  config.setValue("session.cacheMax", (long)resource.cache_max);
 
-  sprintf(rc_string, "session.cacheLife: %lu", resource.cache_life / 60000);
-  XrmPutLineResource(&new_openboxrc, rc_string);
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::save));
 
-  sprintf(rc_string, "session.cacheMax: %lu", resource.cache_max);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current()) {
-    int screen_number = screen->getScreenNumber();
-
-#ifdef    SLIT
-    char *slit_placement = (char *) 0;
-
-    switch (screen->getSlitPlacement()) {
-    case Slit::TopLeft: slit_placement = "TopLeft"; break;
-    case Slit::CenterLeft: slit_placement = "CenterLeft"; break;
-    case Slit::BottomLeft: slit_placement = "BottomLeft"; break;
-    case Slit::TopCenter: slit_placement = "TopCenter"; break;
-    case Slit::BottomCenter: slit_placement = "BottomCenter"; break;
-    case Slit::TopRight: slit_placement = "TopRight"; break;
-    case Slit::BottomRight: slit_placement = "BottomRight"; break;
-    case Slit::CenterRight: default: slit_placement = "CenterRight"; break;
-    }
-
-    sprintf(rc_string, "session.screen%d.slit.placement: %s", screen_number,
-	    slit_placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.slit.direction: %s", screen_number,
-            ((screen->getSlitDirection() == Slit::Horizontal) ? "Horizontal" :
-                                                                "Vertical"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    const char *rootcmd;
-    if ((rootcmd = screen->getRootCommand()) != NULL) {
-      sprintf(rc_string, "session.screen%d.rootCommand: %s", screen_number,
-              rootcmd);
-      XrmPutLineResource(&new_openboxrc, rc_string);
-    }
-
-    sprintf(rc_string, "session.screen%d.slit.onTop: %s", screen_number,
-            ((screen->getSlit()->isOnTop()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.slit.autoHide: %s", screen_number,
-            ((screen->getSlit()->doAutoHide()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-#endif // SLIT
-
-    sprintf(rc_string, "session.opaqueMove: %s",
-	    ((screen->doOpaqueMove()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.imageDither: %s",
-	    ((screen->getImageControl()->doDither()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.fullMaximization: %s", screen_number,
-	    ((screen->doFullMax()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.focusNewWindows: %s", screen_number,
-            ((screen->doFocusNew()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.focusLastWindow: %s", screen_number,
-	    ((screen->doFocusLast()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.rowPlacementDirection: %s",
-	    screen_number,
-	    ((screen->getRowPlacementDirection() == BScreen::LeftRight) ?
-	     "LeftToRight" : "RightToLeft"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.colPlacementDirection: %s",
-	    screen_number,
-	    ((screen->getColPlacementDirection() == BScreen::TopBottom) ?
-	     "TopToBottom" : "BottomToTop"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    char *placement = (char *) 0;
-    switch (screen->getPlacementPolicy()) {
-    case BScreen::CascadePlacement:
-      placement = "CascadePlacement";
-      break;
-
-    case BScreen::ColSmartPlacement:
-      placement = "ColSmartPlacement";
-      break;
-
-    case BScreen::RowSmartPlacement:
-    default:
-      placement = "RowSmartPlacement";
-      break;
-    }
-    sprintf(rc_string, "session.screen%d.windowPlacement:  %s", screen_number,
-	    placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.windowZones:  %i", screen_number,
-	    screen->getWindowZones());
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.focusModel:  %s", screen_number,
-	    ((screen->isSloppyFocus()) ?
-	     ((screen->doAutoRaise()) ? "AutoRaiseSloppyFocus" :
-	      "SloppyFocus") :
-	     "ClickToFocus"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.workspaces:  %d", screen_number,
-	    screen->getCount());
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.toolbar.onTop:  %s", screen_number,
-	    ((screen->getToolbar()->isOnTop()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.toolbar.autoHide:  %s", screen_number,
-	    ((screen->getToolbar()->doAutoHide()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    char *toolbar_placement = (char *) 0;
-
-    switch (screen->getToolbarPlacement()) {
-    case Toolbar::TopLeft: toolbar_placement = "TopLeft"; break;
-    case Toolbar::BottomLeft: toolbar_placement = "BottomLeft"; break;
-    case Toolbar::TopCenter: toolbar_placement = "TopCenter"; break;
-    case Toolbar::TopRight: toolbar_placement = "TopRight"; break;
-    case Toolbar::BottomRight: toolbar_placement = "BottomRight"; break;
-    case Toolbar::BottomCenter: default:
-      toolbar_placement = "BottomCenter"; break;
-    }
-
-    sprintf(rc_string, "session.screen%d.toolbar.placement: %s", screen_number,
-            toolbar_placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    load_rc(screen);
-
-    // these are static, but may not be saved in the users .openbox/rc,
-    // writing these resources will allow the user to edit them at a later
-    // time... but loading the defaults before saving allows us to rewrite the
-    // users changes...
-
-#ifdef    HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.strftimeFormat: %s", screen_number,
-	    screen->getStrftimeFormat());
-    XrmPutLineResource(&new_openboxrc, rc_string);
-#else // !HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.dateFormat:  %s", screen_number,
-	    ((screen->getDateFormat() == B_EuropeanDate) ?
-	     "European" : "American"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.clockFormat:  %d", screen_number,
-	    ((screen->isClock24Hour()) ? 24 : 12));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-#endif // HAVE_STRFTIME
-
-    sprintf(rc_string, "session.screen%d.edgeSnapThreshold: %d", screen_number,
-	    screen->getEdgeSnapThreshold());
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.toolbar.widthPercent:  %d",
-            screen_number, screen->getToolbarWidthPercent());
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    // write out the users workspace names
-    int i, len = 0;
-    for (i = 0; i < screen->getCount(); i++)
-      len += strlen((screen->getWorkspace(i)->getName()) ?
-		    screen->getWorkspace(i)->getName() : "Null") + 1;
-
-    char *resource_string = new char[len + 1024],
-      *save_string = new char[len], *save_string_pos = save_string,
-      *name_string_pos;
-    if (save_string) {
-      for (i = 0; i < screen->getCount(); i++) {
-	len = strlen((screen->getWorkspace(i)->getName()) ?
-		     screen->getWorkspace(i)->getName() : "Null") + 1;
-	name_string_pos =
-	  (char *) ((screen->getWorkspace(i)->getName()) ?
-		    screen->getWorkspace(i)->getName() : "Null");
-
-	while (--len) *(save_string_pos++) = *(name_string_pos++);
-	*(save_string_pos++) = ',';
-      }
-    }
-
-    *(--save_string_pos) = '\0';
-
-    sprintf(resource_string, "session.screen%d.workspaceNames:  %s",
-	    screen_number, save_string);
-    XrmPutLineResource(&new_openboxrc, resource_string);
-
-    delete [] resource_string;
-    delete [] save_string;
-  }
-
-  XrmDatabase old_openboxrc = XrmGetFileDatabase(rc_file);
-
-  XrmMergeDatabases(new_openboxrc, &old_openboxrc);
-  XrmPutFileDatabase(old_openboxrc, rc_file);
-  XrmDestroyDatabase(old_openboxrc);
+  config.setAutoSave(true);
+  config.save();
 }
 
+void Openbox::load() {
+  if (!config.load())
+    config.create();
 
-void Openbox::load_rc(void) {
-  XrmDatabase database = (XrmDatabase) 0;
-
-  database = XrmGetFileDatabase(rc_file);
-
-  XrmValue value;
-  char *value_type;
-
-  if (resource.menu_file)
-    delete [] resource.menu_file;
-
-  if (XrmGetResource(database, "session.menuFile", "Session.MenuFile",
-		     &value_type, &value))
-    resource.menu_file = bstrdup(value.addr);
+  std::string s;
+  long l;
+  
+  if (config.getValue("session.colorsPerChannel", "Session.ColorsPerChannel",
+                      l))
+    resource.colors_per_channel = (l < 2 ? 2 : (l > 6 ? 6 : l)); // >= 2, <= 6
   else
-    resource.menu_file = bstrdup(DEFAULTMENU);
-
-  if (XrmGetResource(database, "session.colorsPerChannel",
-		     "Session.ColorsPerChannel", &value_type, &value)) {
-    if (sscanf(value.addr, "%d", &resource.colors_per_channel) != 1) {
-      resource.colors_per_channel = 4;
-    } else {
-      if (resource.colors_per_channel < 2) resource.colors_per_channel = 2;
-      if (resource.colors_per_channel > 6) resource.colors_per_channel = 6;
-    }
-  } else {
     resource.colors_per_channel = 4;
-  }
 
   if (resource.style_file)
     delete [] resource.style_file;
-
-  if (XrmGetResource(database, "session.styleFile", "Session.StyleFile",
-		     &value_type, &value))
-    resource.style_file = bstrdup(value.addr);
+  if (config.getValue("session.styleFile", "Session.StyleFile", s))
+    resource.style_file = bstrdup(s.c_str());
   else
     resource.style_file = bstrdup(DEFAULTSTYLE);
 
-  if (XrmGetResource(database, "session.titlebarLayout",
-                     "Session.TitlebarLayout", &value_type, &value)) {
-    resource.titlebar_layout = bstrdup(value.addr == NULL ? "ILMC" :
-                                       value.addr);
-  } else {
+  if (resource.titlebar_layout)
+    delete [] resource.titlebar_layout;
+  if (config.getValue("session.titlebarLayout", "Session.TitlebarLayout", s))
+    resource.titlebar_layout = bstrdup(s.c_str());
+  else
     resource.titlebar_layout = bstrdup("ILMC");
-  }
 
-  if (XrmGetResource(database, "session.doubleClickInterval",
-		     "Session.DoubleClickInterval", &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.double_click_interval) != 1)
-      resource.double_click_interval = 250;
-  } else {
+  if (config.getValue("session.doubleClickInterval",
+                      "Session.DoubleClickInterval", l))
+    resource.double_click_interval = l;
+  else
     resource.double_click_interval = 250;
-  }
 
-  if (XrmGetResource(database, "session.autoRaiseDelay",
-                     "Session.AutoRaiseDelay", &value_type, &value)) {
-    if (sscanf(value.addr, "%ld", &resource.auto_raise_delay.tv_usec) != 1)
-      resource.auto_raise_delay.tv_usec = 400;
-  } else {
+  if (config.getValue("session.autoRaiseDelay", "Session.AutoRaiseDelay", l))
+    resource.auto_raise_delay.tv_usec = l;
+  else
     resource.auto_raise_delay.tv_usec = 400;
-  }
-
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec / 1000;
   resource.auto_raise_delay.tv_usec -=
     (resource.auto_raise_delay.tv_sec * 1000);
   resource.auto_raise_delay.tv_usec *= 1000;
 
-  if (XrmGetResource(database, "session.cacheLife", "Session.CacheLife",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.cache_life) != 1)
-      resource.cache_life = 5l;
-  } else {
-    resource.cache_life = 5l;
-  }
-
+  if (config.getValue("session.cacheLife", "Session.CacheLife", l))
+    resource.cache_life = l;
+  else
+    resource.cache_life = 51;
   resource.cache_life *= 60000;
 
-  if (XrmGetResource(database, "session.cacheMax", "Session.CacheMax",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%lu", &resource.cache_max) != 1)
-      resource.cache_max = 200;
-  } else {
+  if (config.getValue("session.cacheMax", "Session.CacheMax", l))
+    resource.cache_max = l;
+  else
     resource.cache_max = 200;
-  }
 }
 
 
-void Openbox::load_rc(BScreen *screen) {
-  XrmDatabase database = (XrmDatabase) 0;
-
-  database = XrmGetFileDatabase(rc_file);
-
-  XrmValue value;
-  char *value_type, name_lookup[1024], class_lookup[1024];
-  int screen_number = screen->getScreenNumber();
-
-  sprintf(name_lookup,  "session.screen%d.fullMaximization", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FullMaximization", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "true", value.size))
-      screen->saveFullMax(True);
-    else
-      screen->saveFullMax(False);
-  } else {
-    screen->saveFullMax(False);
-  }
-  sprintf(name_lookup,  "session.screen%d.focusNewWindows", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FocusNewWindows", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "true", value.size))
-      screen->saveFocusNew(True);
-    else
-      screen->saveFocusNew(False);
-  } else {
-    screen->saveFocusNew(False);
-  }
-  sprintf(name_lookup,  "session.screen%d.focusLastWindow", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.focusLastWindow", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "true", value.size))
-      screen->saveFocusLast(True);
-    else
-      screen->saveFocusLast(False);
-  } else {
-    screen->saveFocusLast(False);
-  }
-  sprintf(name_lookup,  "session.screen%d.rowPlacementDirection",
-	  screen_number);
-  sprintf(class_lookup, "Session.Screen%d.RowPlacementDirection",
-	  screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "righttoleft", value.size))
-      screen->saveRowPlacementDirection(BScreen::RightLeft);
-    else
-      screen->saveRowPlacementDirection(BScreen::LeftRight);
-  } else {
-    screen->saveRowPlacementDirection(BScreen::LeftRight);
-  }
-  sprintf(name_lookup,  "session.screen%d.colPlacementDirection",
-	  screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ColPlacementDirection",
-	  screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "bottomtotop", value.size))
-      screen->saveColPlacementDirection(BScreen::BottomTop);
-    else
-      screen->saveColPlacementDirection(BScreen::TopBottom);
-  } else {
-    screen->saveColPlacementDirection(BScreen::TopBottom);
-  }
-  sprintf(name_lookup,  "session.screen%d.workspaces", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Workspaces", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    int i;
-    if (sscanf(value.addr, "%d", &i) != 1) i = 1;
-    screen->saveWorkspaces(i);
-  } else {
-    screen->saveWorkspaces(1);
-  }
-  sprintf(name_lookup,  "session.screen%d.toolbar.widthPercent",
-          screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.WidthPercent",
-          screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    int i;
-    if (sscanf(value.addr, "%d", &i) != 1) i = 66;
-
-    if (i <= 0 || i > 100)
-      i = 66;
-
-    screen->saveToolbarWidthPercent(i);
-  } else {
-    screen->saveToolbarWidthPercent(66);
-  }
-  sprintf(name_lookup, "session.screen%d.toolbar.placement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.Placement", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "TopLeft", value.size))
-      screen->saveToolbarPlacement(Toolbar::TopLeft);
-    else if (! strncasecmp(value.addr, "BottomLeft", value.size))
-      screen->saveToolbarPlacement(Toolbar::BottomLeft);
-    else if (! strncasecmp(value.addr, "TopCenter", value.size))
-      screen->saveToolbarPlacement(Toolbar::TopCenter);
-    else if (! strncasecmp(value.addr, "TopRight", value.size))
-      screen->saveToolbarPlacement(Toolbar::TopRight);
-    else if (! strncasecmp(value.addr, "BottomRight", value.size))
-      screen->saveToolbarPlacement(Toolbar::BottomRight);
-    else
-      screen->saveToolbarPlacement(Toolbar::BottomCenter);
-  } else {
-    screen->saveToolbarPlacement(Toolbar::BottomCenter);
-  }
-  screen->removeWorkspaceNames();
-
-  sprintf(name_lookup,  "session.screen%d.workspaceNames", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WorkspaceNames", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    char *search = bstrdup(value.addr);
-
-    for (int i = 0; i < screen->getNumberOfWorkspaces(); i++) {
-      char *nn;
-
-      if (! i) nn = strtok(search, ",");
-      else nn = strtok(NULL, ",");
-
-      if (nn) screen->addWorkspaceName(nn);
-      else break;
-    }
-
-    delete [] search;
-  }
-
-  sprintf(name_lookup,  "session.screen%d.toolbar.onTop", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.OnTop", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "true", value.size))
-      screen->saveToolbarOnTop(True);
-    else
-      screen->saveToolbarOnTop(False);
-  } else {
-    screen->saveToolbarOnTop(False);
-  }
-  sprintf(name_lookup,  "session.screen%d.toolbar.autoHide", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Toolbar.autoHide", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "true", value.size))
-      screen->saveToolbarAutoHide(True);
-    else
-      screen->saveToolbarAutoHide(False);
-  } else {
-    screen->saveToolbarAutoHide(False);
-  }
-  sprintf(name_lookup,  "session.screen%d.focusModel", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.FocusModel", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "clicktofocus", value.size)) {
-      screen->saveAutoRaise(False);
-      screen->saveSloppyFocus(False);
-    } else if (! strncasecmp(value.addr, "autoraisesloppyfocus", value.size)) {
-      screen->saveSloppyFocus(True);
-      screen->saveAutoRaise(True);
-    } else {
-      screen->saveSloppyFocus(True);
-      screen->saveAutoRaise(False);
-    }
-  } else {
-    screen->saveSloppyFocus(True);
-    screen->saveAutoRaise(False);
-  }
-
-  sprintf(name_lookup,  "session.screen%d.windowZones", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WindowZones", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    int i = atoi(value.addr);
-    screen->saveWindowZones((i == 1 || i == 2 || i == 4) ? i : 1);
-  } else {
-    screen->saveWindowZones(1);
-  }
-  
-  sprintf(name_lookup,  "session.screen%d.windowPlacement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.WindowPlacement", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "RowSmartPlacement", value.size))
-      screen->savePlacementPolicy(BScreen::RowSmartPlacement);
-    else if (! strncasecmp(value.addr, "ColSmartPlacement", value.size))
-      screen->savePlacementPolicy(BScreen::ColSmartPlacement);
-    else
-      screen->savePlacementPolicy(BScreen::CascadePlacement);
-  } else {
-    screen->savePlacementPolicy(BScreen::RowSmartPlacement);
-  }
-#ifdef    SLIT
-  sprintf(name_lookup, "session.screen%d.slit.placement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.Placement", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (! strncasecmp(value.addr, "TopLeft", value.size))
-      screen->saveSlitPlacement(Slit::TopLeft);
-    else if (! strncasecmp(value.addr, "CenterLeft", value.size))
-      screen->saveSlitPlacement(Slit::CenterLeft);
-    else if (! strncasecmp(value.addr, "BottomLeft", value.size))
-      screen->saveSlitPlacement(Slit::BottomLeft);
-    else if (! strncasecmp(value.addr, "TopCenter", value.size))
-      screen->saveSlitPlacement(Slit::TopCenter);
-    else if (! strncasecmp(value.addr, "BottomCenter", value.size))
-      screen->saveSlitPlacement(Slit::BottomCenter);
-    else if (! strncasecmp(value.addr, "TopRight", value.size))
-      screen->saveSlitPlacement(Slit::TopRight);
-    else if (! strncasecmp(value.addr, "BottomRight", value.size))
-      screen->saveSlitPlacement(Slit::BottomRight);
-    else
-      screen->saveSlitPlacement(Slit::CenterRight);
-  } else {
-    screen->saveSlitPlacement(Slit::CenterRight);
-  }
-  sprintf(name_lookup, "session.screen%d.slit.direction", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.Direction", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "Horizontal", value.size))
-      screen->saveSlitDirection(Slit::Horizontal);
-    else
-      screen->saveSlitDirection(Slit::Vertical);
-  } else {
-    screen->saveSlitDirection(Slit::Vertical);
-  }
-  sprintf(name_lookup, "session.screen%d.slit.onTop", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.OnTop", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "True", value.size))
-      screen->saveSlitOnTop(True);
-    else
-      screen->saveSlitOnTop(False);
-  } else {
-    screen->saveSlitOnTop(False);
-  }
-  sprintf(name_lookup, "session.screen%d.slit.autoHide", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.AutoHide", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    if (! strncasecmp(value.addr, "True", value.size))
-      screen->saveSlitAutoHide(True);
-    else
-      screen->saveSlitAutoHide(False);
-  } else {
-    screen->saveSlitAutoHide(False);
-  }
-#endif // SLIT
-
-#ifdef    HAVE_STRFTIME
-  sprintf(name_lookup,  "session.screen%d.strftimeFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.StrftimeFormat", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    screen->saveStrftimeFormat(value.addr);
-  } else {
-    screen->saveStrftimeFormat("%I:%M %p");
-  }
-#else //  HAVE_STRFTIME
-  sprintf(name_lookup,  "session.screen%d.dateFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.DateFormat", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    if (strncasecmp(value.addr, "european", value.size))
-      screen->saveDateFormat(B_AmericanDate);
-    else
-      screen->saveDateFormat(B_EuropeanDate);
-  } else {
-    screen->saveDateFormat(B_AmericanDate);
-  }
-  sprintf(name_lookup,  "session.screen%d.clockFormat", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ClockFormat", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    int clock;
-    if (sscanf(value.addr, "%d", &clock) != 1) screen->saveClock24Hour(False);
-    else if (clock == 24) screen->saveClock24Hour(True);
-    else screen->saveClock24Hour(False);
-  } else {
-    screen->saveClock24Hour(False);
-  }
-#endif // HAVE_STRFTIME
-
-  sprintf(name_lookup,  "session.screen%d.edgeSnapThreshold", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.EdgeSnapThreshold", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-		     &value)) {
-    int threshold;
-    if (sscanf(value.addr, "%d", &threshold) != 1)
-      screen->saveEdgeSnapThreshold(0);
-    else
-      screen->saveEdgeSnapThreshold(threshold);
-  } else {
-    screen->saveEdgeSnapThreshold(0);
-  }
-  sprintf(name_lookup,  "session.screen%d.imageDither", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.ImageDither", screen_number);
-  if (XrmGetResource(database, "session.imageDither", "Session.ImageDither",
-		     &value_type, &value)) {
-    if (! strncasecmp("true", value.addr, value.size))
-      screen->saveImageDither(True);
-    else
-      screen->saveImageDither(False);
-  } else {
-    screen->saveImageDither(True);
-  }
-
-  sprintf(name_lookup, "session.screen%d.rootCommand", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.RootCommand", screen_number);
-  if (XrmGetResource(database, name_lookup, class_lookup, &value_type,
-                     &value)) {
-    screen->saveRootCommand(value.addr);
-  } else
-    screen->saveRootCommand(NULL);
-
-  if (XrmGetResource(database, "session.opaqueMove", "Session.OpaqueMove",
-                     &value_type, &value)) {
-    if (! strncasecmp("true", value.addr, value.size))
-      screen->saveOpaqueMove(True);
-    else
-      screen->saveOpaqueMove(False);
-  } else {
-    screen->saveOpaqueMove(False);
-  }
-  XrmDestroyDatabase(database);
-}
-
-
-void Openbox::reload_rc(void) {
-  load_rc();
-  reconfigure();
-}
-
-
-void Openbox::reconfigure(void) {
+void Openbox::reconfigure() {
   reconfigure_wait = True;
 
   if (! timer->isTiming()) timer->start();
 }
 
 
-void Openbox::real_reconfigure(void) {
+void Openbox::real_reconfigure() {
   grab();
 
-  XrmDatabase new_openboxrc = (XrmDatabase) 0;
-  char style[MAXPATHLEN + 64];
+  load();
+  
+  for_each(menuTimestamps.begin(), menuTimestamps.end(),
+           PointerAssassin());
+  menuTimestamps.clear();
 
-  sprintf(style, "session.styleFile: %s", resource.style_file);
-  XrmPutLineResource(&new_openboxrc, style);
-
-  XrmDatabase old_openboxrc = XrmGetFileDatabase(rc_file);
-
-  XrmMergeDatabases(new_openboxrc, &old_openboxrc);
-  XrmPutFileDatabase(old_openboxrc, rc_file);
-  if (old_openboxrc) XrmDestroyDatabase(old_openboxrc);
-
-  for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
-
-    if (ts) {
-      if (ts->filename)
-	delete [] ts->filename;
-
-      delete ts;
-    }
-  }
-
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current()) {
-    screen->reconfigure();
-  }
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::reconfigure));
 
   ungrab();
 }
 
 
-void Openbox::checkMenu(void) {
-  Bool reread = False;
-  LinkedListIterator<MenuTimestamp> it(menuTimestamps);
-  for (MenuTimestamp *tmp = it.current(); tmp && (! reread);
-       it++, tmp = it.current()) {
+void Openbox::checkMenu() {
+  MenuTimestampList::iterator it;
+  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it) {
     struct stat buf;
 
-    if (! stat(tmp->filename, &buf)) {
-      if (tmp->timestamp != buf.st_ctime)
-        reread = True;
-    } else {
-      reread = True;
+    if (stat((*it)->filename, &buf) || (*it)->timestamp != buf.st_ctime) {
+      rereadMenu();
+      return;
     }
   }
-
-  if (reread) rereadMenu();
 }
 
 
-void Openbox::rereadMenu(void) {
-  reread_menu_wait = True;
+void Openbox::addMenuTimestamp(const char *filename) {
+  bool found = false;
 
-  if (! timer->isTiming()) timer->start();
-}
-
-
-void Openbox::real_rereadMenu(void) {
-  for (int i = 0, n = menuTimestamps->count(); i < n; i++) {
-    MenuTimestamp *ts = menuTimestamps->remove(0);
-
-    if (ts) {
-      if (ts->filename)
-	delete [] ts->filename;
-
-      delete ts;
+  MenuTimestampList::iterator it;
+  for (it = menuTimestamps.begin(); it != menuTimestamps.end(); ++it)
+    if (! strcmp((*it)->filename, filename)) {
+      found = true;
+      break;
     }
-  }
-
-  LinkedListIterator<BScreen> it(screenList);
-  for (BScreen *screen = it.current(); screen; it++, screen = it.current())
-    screen->rereadMenu();
-}
-
-
-void Openbox::saveStyleFilename(const char *filename) {
-  if (resource.style_file)
-    delete [] resource.style_file;
-
-  resource.style_file = bstrdup(filename);
-}
-
-
-void Openbox::saveMenuFilename(const char *filename) {
-  Bool found = False;
-
-  LinkedListIterator<MenuTimestamp> it(menuTimestamps);
-  for (MenuTimestamp *tmp = it.current(); tmp && (! found);
-       it++, tmp = it.current()) {
-    if (! strcmp(tmp->filename, filename)) found = True;
-  }
-  if (! found) {
+  if (!found) {
     struct stat buf;
 
     if (! stat(filename, &buf)) {
@@ -1739,13 +1019,38 @@ void Openbox::saveMenuFilename(const char *filename) {
       ts->filename = bstrdup(filename);
       ts->timestamp = buf.st_ctime;
 
-      menuTimestamps->insert(ts);
+      menuTimestamps.push_back(ts);
     }
   }
 }
 
+void Openbox::rereadMenu() {
+  reread_menu_wait = True;
 
-void Openbox::timeout(void) {
+  if (! timer->isTiming()) timer->start();
+}
+
+
+void Openbox::real_rereadMenu() {
+  std::for_each(menuTimestamps.begin(), menuTimestamps.end(),
+                PointerAssassin());
+  menuTimestamps.clear();
+
+  std::for_each(screenList.begin(), screenList.end(),
+                std::mem_fun(&BScreen::rereadMenu));
+}
+
+
+void Openbox::setStyleFilename(const char *filename) {
+  if (resource.style_file)
+    delete [] resource.style_file;
+
+  resource.style_file = bstrdup(filename);
+  config.setValue("session.styleFile", resource.style_file);
+}
+
+
+void Openbox::timeout() {
   if (reconfigure_wait)
     real_reconfigure();
 
@@ -1756,42 +1061,49 @@ void Openbox::timeout(void) {
 }
 
 
-void Openbox::setFocusedWindow(OpenboxWindow *win) {
-  BScreen *old_screen = (BScreen *) 0, *screen = (BScreen *) 0;
-  OpenboxWindow *old_win = (OpenboxWindow *) 0;
+OpenboxWindow *Openbox::focusedWindow() {
+  Workspace *w;
+  if (current_screen)
+    if ((w = current_screen->getCurrentWorkspace()))
+      return w->focusedWindow();
+  return (OpenboxWindow *) 0;
+}
+
+
+void Openbox::focusWindow(OpenboxWindow *win) {
+  BScreen *old_screen = (BScreen *) 0;
   Toolbar *old_tbar = (Toolbar *) 0, *tbar = (Toolbar *) 0;
   Workspace *old_wkspc = (Workspace *) 0, *wkspc = (Workspace *) 0;
 
-  if (focused_window) {
-    old_win = focused_window;
+  OpenboxWindow *old_win = focusedWindow();
+  if (old_win != (OpenboxWindow *) 0) {
     old_screen = old_win->getScreen();
-    old_tbar = old_screen->getToolbar();
     old_wkspc = old_screen->getWorkspace(old_win->getWorkspaceNumber());
+    old_tbar = old_screen->getToolbar();
 
-    old_win->setFocusFlag(False);
-    old_wkspc->getMenu()->setItemSelected(old_win->getWindowNumber(), False);
+    old_win->setFocusFlag(false);
+    old_wkspc->focusWindow((OpenboxWindow *) 0);
   }
 
-  if (win && ! win->isIconic()) {
-    screen = win->getScreen();
-    tbar = screen->getToolbar();
-    wkspc = screen->getWorkspace(win->getWorkspaceNumber());
-
-    focused_window = win;
-
-    win->setFocusFlag(True);
-    wkspc->getMenu()->setItemSelected(win->getWindowNumber(), True);
+  if (win && !win->isIconic()) {
+    current_screen = win->getScreen();
+    tbar = current_screen->getToolbar();
+    if (win->isStuck())
+      wkspc = current_screen->getCurrentWorkspace();
+    else
+      wkspc = current_screen->getWorkspace(win->getWorkspaceNumber());
+    win->setFocusFlag(true);
+    wkspc->focusWindow(win);
+    
+    if (tbar)
+      tbar->redrawWindowLabel(true);
+    current_screen->updateNetizenWindowFocus();
   } else {
-    focused_window = (OpenboxWindow *) 0;
+    XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
   }
-
-  if (tbar)
-    tbar->redrawWindowLabel(True);
-  if (screen)
-    screen->updateNetizenWindowFocus();
 
   if (old_tbar && old_tbar != tbar)
-    old_tbar->redrawWindowLabel(True);
-  if (old_screen && old_screen != screen)
+    old_tbar->redrawWindowLabel(true);
+  if (old_screen && old_screen != current_screen)
     old_screen->updateNetizenWindowFocus();
 }

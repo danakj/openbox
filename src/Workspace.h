@@ -25,54 +25,58 @@
 
 #include <X11/Xlib.h>
 
-#include "LinkedList.h"
+#include <vector>
+#include <list>
 
 class BScreen;
 class Clientmenu;
 class Workspace;
 class OpenboxWindow;
+class Size;
+class Rect;
 
 class Workspace {
 private:
-  BScreen *screen;
-  OpenboxWindow *lastfocus;
+  BScreen &screen;
   Clientmenu *clientmenu;
 
-  LinkedList<OpenboxWindow> *stackingList, *windowList;
+  typedef std::vector<OpenboxWindow *> winVect;
+  winVect _windows;
+  typedef std::list<OpenboxWindow *> winList;
+  winList _zorder;
 
   char *name;
   int id, cascade_x, cascade_y;
 
+  OpenboxWindow *_focused, *_last;      // last is the same as focused except
+                                        // that when focus is removed from all
+                                        // windows on the workspace, last doesnt
+                                        // change to NULL
 
 protected:
-  void placeWindow(OpenboxWindow *);
-
+  void placeWindow(OpenboxWindow &);
+  Point *bestFitPlacement(const Size &win_size, const Rect &space);
+  Point *underMousePlacement(const Size &win_size, const Rect &space);
+  Point *rowSmartPlacement(const Size &win_size, const Rect &space);
+  Point *colSmartPlacement(const Size &win_size, const Rect &space);
+  Point *const cascadePlacement(const OpenboxWindow &window, const Rect &space);
 
 public:
-  Workspace(BScreen *, int = 0);
+  Workspace(BScreen &, int = 0);
   ~Workspace(void);
 
-  inline BScreen *getScreen(void) { return screen; }
-
-  inline OpenboxWindow *getLastFocusedWindow(void) { return lastfocus; }
-  
+  inline BScreen &getScreen(void) { return screen; }
   inline Clientmenu *getMenu(void) { return clientmenu; }
-
   inline const char *getName(void) const { return name; }
-
-  inline const int &getWorkspaceID(void) const { return id; }
-  
-  inline void setLastFocusedWindow(OpenboxWindow *w) { lastfocus = w; }
-
+  inline int getWorkspaceID(void) const { return id; }
+  inline OpenboxWindow *focusedWindow() { return _focused; }
+  inline OpenboxWindow *lastFocusedWindow() { return _last; }
+  void focusWindow(OpenboxWindow *win);
   OpenboxWindow *getWindow(int);
-
-  Bool isCurrent(void);
-  Bool isLastWindow(OpenboxWindow *);
-  
-  const int addWindow(OpenboxWindow *, Bool = False);
-  const int removeWindow(OpenboxWindow *);
-  const int getCount(void);
-
+  bool isCurrent(void);
+  void addWindow(OpenboxWindow *, bool = false);
+  int removeWindow(OpenboxWindow *);
+  int getCount(void);
   void showAll(void);
   void hideAll(void);
   void removeAll(void);
@@ -81,7 +85,7 @@ public:
   void reconfigure();
   void update();
   void setCurrent(void);
-  void setName(char *);
+  void setName(const char *);
   void shutdown(void);
 };
 

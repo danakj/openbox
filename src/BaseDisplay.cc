@@ -48,10 +48,13 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    STDC_HEADERS
+#ifdef    HAVE_STDLIB_H
 #  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+
+#ifdef    HAVE_STRING_H
 #  include <string.h>
-#endif // STDC_HEADERS
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
@@ -85,8 +88,9 @@
 
 #include "i18n.h"
 #include "BaseDisplay.h"
-#include "LinkedList.h"
 #include "Timer.h"
+
+#include <algorithm>
 
 // X error handler to handle any and all X errors while the application is
 // running
@@ -191,8 +195,8 @@ char *bstrdup(const char *s) {
   return n;
 }
 
-BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
-  application_name = app_name;
+BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
+  application_name = bstrdup(app_name);
 
   _startup = True;
   _shutdown = False;
@@ -241,7 +245,6 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
     ::exit(2);
   }
 
-  number_of_screens = ScreenCount(display);
   display_name = XDisplayName(dpy_name);
 
 #ifdef    SHAPE
@@ -333,13 +336,9 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
 
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
-  timerList = new LinkedList<BTimer>;
-
-  screenInfoList = new LinkedList<ScreenInfo>;
-  for (int i = 0; i < number_of_screens; i++) {
-    ScreenInfo *screeninfo = new ScreenInfo(this, i);
-    screenInfoList->insert(screeninfo);
-  }
+  screenInfoList.reserve(numberOfScreens());
+  for (unsigned int s = 0; s < numberOfScreens(); s++)
+    screenInfoList.push_back(new ScreenInfo(*this, s));
 
 #ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
@@ -379,25 +378,20 @@ BaseDisplay::BaseDisplay(char *app_name, char *dpy_name) {
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
   
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
+#else
+  NumLockMask = Mod2Mask;
+  ScrollLockMask = Mod5Mask;
 #endif // NOCLOBBER
 }
 
 
 BaseDisplay::~BaseDisplay(void) {
-  while (screenInfoList->count()) {
-    ScreenInfo *si = screenInfoList->first();
-
-    screenInfoList->remove(si);
-    delete si;
-  }
-
-  delete screenInfoList;
-
+  std::for_each(screenInfoList.begin(), screenInfoList.end(),
+                PointerAssassin());
   // we don't create the BTimers, we don't delete them
-  while (timerList->count())
-    timerList->remove(0);
-
-  delete timerList;
+  
+  if (application_name != NULL)
+    delete [] application_name;
 
   XCloseDisplay(display);
 }
@@ -431,12 +425,13 @@ void BaseDisplay::eventLoop(void) {
       FD_ZERO(&rfds);
       FD_SET(xfd, &rfds);
 
-      if (timerList->count()) {
+      if (!timerList.empty()) {
         gettimeofday(&now, 0);
 
         tm.tv_sec = tm.tv_usec = 0l;
 
-        BTimer *timer = timerList->first();
+        BTimer *timer = timerList.front();
+        ASSERT(timer != NULL);
 
         tm.tv_sec = timer->getStartTime().tv_sec +
           timer->getTimeout().tv_sec - now.tv_sec;
@@ -466,8 +461,11 @@ void BaseDisplay::eventLoop(void) {
       // check for timer timeout
       gettimeofday(&now, 0);
 
-      LinkedListIterator<BTimer> it(timerList);
-      for(BTimer *timer = it.current(); timer; it++, timer = it.current()) {
+      TimerList::iterator it;
+      for (it = timerList.begin(); it != timerList.end(); ++it) {
+        BTimer *timer = *it;
+        ASSERT(timer != NULL);
+
         tm.tv_sec = timer->getStartTime().tv_sec +
           timer->getTimeout().tv_sec;
         tm.tv_usec = timer->getStartTime().tv_usec +
@@ -480,8 +478,16 @@ void BaseDisplay::eventLoop(void) {
         timer->fireTimeout();
 
         // restart the current timer so that the start time is updated
-        if (! timer->doOnce()) timer->start();
-        else timer->stop();
+        if (! timer->doOnce()) {
+          // reorder
+          removeTimer(timer);
+          addTimer(timer);
+          timer->start();
+        } else
+          timer->stop();
+        it = timerList.begin(); // we no longer have any idea if the iterator is
+                                // valid, but what was at the front() is no
+                                // longer.
       }
     }
   }
@@ -509,28 +515,28 @@ void BaseDisplay::grab(void) {
 void BaseDisplay::ungrab(void) {
   if (! --server_grabs)
     XUngrabServer(display);
-
-  if (server_grabs < 0) server_grabs = 0;
 }
 
 
 void BaseDisplay::addTimer(BTimer *timer) {
-  if (! timer) return;
+  ASSERT(timer != (BTimer *) 0);
 
-  LinkedListIterator<BTimer> it(timerList);
-  int index = 0;
-  for (BTimer *tmp = it.current(); tmp; it++, index++, tmp = it.current())
+  TimerList::iterator it;
+  for (it = timerList.begin(); it != timerList.end(); ++it) {
+    BTimer *tmp = *it;
     if ((tmp->getTimeout().tv_sec > timer->getTimeout().tv_sec) ||
         ((tmp->getTimeout().tv_sec == timer->getTimeout().tv_sec) &&
          (tmp->getTimeout().tv_usec >= timer->getTimeout().tv_usec)))
       break;
+  }
 
-  timerList->insert(timer, index);
+  timerList.insert(it, timer);
 }
 
 
 void BaseDisplay::removeTimer(BTimer *timer) {
-  timerList->remove(timer);
+  ASSERT(timer != (BTimer *) 0);
+  timerList.remove(timer);
 }
 
 
@@ -571,17 +577,17 @@ void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
 }
 
 
-ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
-  basedisplay = d;
-  screen_number = num;
+ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d),
+  screen_number(num)
+{
 
-  root_window = RootWindow(basedisplay->getXDisplay(), screen_number);
-  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
+  root_window = RootWindow(basedisplay.getXDisplay(), screen_number);
+  depth = DefaultDepth(basedisplay.getXDisplay(), screen_number);
 
-  width =
-    WidthOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
-  height =
-    HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(), screen_number));
+  m_size = Size(WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                              screen_number)),
+                HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
+                                               screen_number)));
 
   // search for a TrueColor Visual... if we can't find one... we will use the
   // default visual for the screen
@@ -593,7 +599,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
 
   visual = (Visual *) 0;
 
-  if ((vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
+  if ((vinfo_return = XGetVisualInfo(basedisplay.getXDisplay(),
                                      VisualScreenMask | VisualClassMask,
                                      &vinfo_template, &vinfo_nitems)) &&
       vinfo_nitems > 0) {
@@ -608,10 +614,10 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, int num) {
   }
 
   if (visual) {
-    colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
+    colormap = XCreateColormap(basedisplay.getXDisplay(), root_window,
 			       visual, AllocNone);
   } else {
-    visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
-    colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
+    visual = DefaultVisual(basedisplay.getXDisplay(), screen_number);
+    colormap = DefaultColormap(basedisplay.getXDisplay(), screen_number);
   }
 }

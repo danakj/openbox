@@ -1,0 +1,130 @@
+.TH bsetbg 1 "February 2002" "bsetbg" "v2.0"
+.SH NAME
+bsetbg \- utility to manipulate the appearance of the X11 desktop's root window.
+.SH SYNOPSIS
+\fBbsetbg\fR [options] \fIimage\fR
+.SH DESCRIPTION
+\fBbsetbg\fR is intended to provide a standard method for the \fIBlackbox\fR
+window manager to alter the background of the root window
+(although it will work with any other window manager as well). \fBbsetbg\fR
+acts as a wrapper both to \fIbsetroot\fR
+and to a flexible variety of third-party applications that it uses when handling images files.
+
+.SH OPTIONS
+.TP
+\fB\-f\fR, \fB\-full\fR \fIimage\fR
+\fIimage\fR is stretched to fill the entire desktop.
+.TP
+\fB\-t\fR, \fB\-tile\fR \fIimage\fR
+\fIimage\fR is tiled on the desktop.
+.TP
+\fB\-c\fR, \fB\-center\fR \fIimage\fR
+\fIimage\fR is centered on the desktop.
+.TP
+\fB\-e\fR, \fB\-exec\fR \fIprogram\fR \fIoptions\fR \fIfallback\-\fIarg\fR \fIimage\fR
+This option tells \fBbsetbg\fR to run a seperate command by executing \fIprogram\fR with 
+\fIoptions\fR, where \fIoptions\fR are arguments to \fIprogram\fR.
+
+If a \fIfallback\-arg\fR is supplied (\fB\-full\fR, \fB\-tile\fR, or \fB\-center\fR
+as described above),
+\fBbsetbg\fR will assume that the last argument is a filename. In the case that
+\fIprogram\fR exits non-zero or isn't available on the target system, \fBbsetbg\fR 
+will try to handle the file with the fallback argument.
+
+See the \fBEXAMPLES\fR section for more information on \fB\-exec\fR.
+.TP
+\fB\-p\fR, \fB\-post\fR \fIlist\fR
+Specifies a list of arguments to pass to the $POST_COMMAND.
+.TP
+\fB\-d\fR, \fB\-debug\fR
+Debugging mode. \fBbsetbg\fR will print commands without executing them.
+.TP
+\fB\-g\fR, \fB\-generate\fR \fIlist\fR
+Output a list of default configuration values, suitable for redirecting into 
+\fI~/.bsetbgrc\fR. Any arguments that are supplied will be considered applications 
+to search for in the system path, overriding \fBbsetbg\fR's internal defaults.
+.TP
+\fB\-v\fR, \fB\-version\fR
+Output version number.
+.TP
+\fB\-h\fR, \fB\-help\fR
+Output a brief usage message.
+
+.SH OTHER OPTIONS
+\fBbsetbg\fR will also accept all of the arguments for \fIbsetroot\fR.
+Consult the \fIbsetroot\fR(1) man page for further information.
+
+.SH CONFIGURATION
+\fBbsetbg\fR will read its configuration values from the file \fI~/.bsetbgrc\fR
+if it exists. Otherwise, it will scan the 
+system path for a pre-defined list of image applications to use 
+(currently this list consists of qiv, xli, xv, wmsetbg, Esetroot, 
+display, and xsetbg).
+\fP
+\fI~/.bsetbgrc\fR should contain the following variables:
+.TP
+\fB    CENTER=\fR\fI"string"\fR
+Application and arguments to be used to center an image on the root window
+when the \fB-center\fR argument is specified.
+
+.TP
+\fB    FULL=\fR\fI"string"\fR
+Application and arguments to be used to stretch an image to fill the root window
+when the \fB-full\fR argument is specified.
+
+.TP
+\fB    TILE=\fR\fI"string"\fR
+Application and arguments to be used to tile an image on the root window
+when the \fB-tile\fR argument is specified.
+
+.TP
+\fB    DEFAULT=\fR\fI"string"\fR
+Action to take place by default if none of the above have been specified.
+
+.TP
+The following variables are optional:
+
+.TP
+\fB    NO_EXEC=\fR\fI"boolean"\fR
+If this variable is set, bsetbg will never modify the root window.
+
+.TP
+\fB    POST_COMMAND=\fR\fI"string"\fR
+This variable specifies a command that \fBbsetbg\fR will run after every
+successful modification of the root window.
+
+.TP
+\fB    LOG_LAST_CMD=\fR\fI"boolean"\fR
+If this variable is set, \fBbsetbg\fR will keep a logfile of the last two
+successful commands.
+
+.TP
+\fB    LOGFILE=\fR\fI"string"\fR
+This variable can specify the logfile to be used when $LOG_LAST_CMD is defined.
+The default is ~/.bsetbg_last_cmd .
+
+.TP
+As mentioned above, \fBbsetbg\fR will function perfectly for the majority of users without having a configuration file. Power users who want more control over \fBbsetbg\fR's behavior should run \fBbsetbg -g\fR and use the output to create a \fI~/.bsetbgrc\fR which may then be tweaked by hand.
+
+.SH EXAMPLES
+In this example, bsetbg will set the image in centered mode:
+
+    bsetbg -center foo.png
+
+An example of the \fB-exec\fR argument:
+
+    bsetbg -exec xv -root -quit -rmode 5 -rbg rgb:2/2/2 \\
+	-center foo.png
+
+An example in which bsetbg creates a configuration file using xv and qiv:
+
+	bsetbg -g xv qiv > ~/.bsetbgrc
+
+.SH AUTHOR
+The author of
+.B bsetbg
+may be reached at \fItmk@lordzork.com\fR.
+
+.SH SEE ALSO
+\fIblackbox\fR(1), \fIbsetroot\fR(1), \fIqiv\fR(1), \fIxli\fR(1), \fIxv\fR(1), \fIdisplay\fR(1), 
+\fIwmsetbg\fR(1)

@@ -27,7 +27,8 @@
 #include <X11/Xutil.h>
 
 #include "Basemenu.h"
-#include "LinkedList.h"
+#include "Geometry.h"
+#include <list>
 
 // forward declaration
 class Slit;
@@ -37,30 +38,32 @@ class Slitmenu : public Basemenu {
 private: 
   class Directionmenu : public Basemenu {
   private:
-    Slitmenu *slitmenu;
+    Slitmenu &slitmenu;
 
   protected:
     virtual void itemSelected(int, int);
+    virtual void setValues();
 
   public:
-    Directionmenu(Slitmenu *);
+    Directionmenu(Slitmenu &);
+    void reconfigure();
   };
 
   class Placementmenu : public Basemenu {
   private:
-    Slitmenu *slitmenu;
+    Slitmenu &slitmenu;
 
   protected: 
     virtual void itemSelected(int, int);
 
   public:
-    Placementmenu(Slitmenu *);
+    Placementmenu(Slitmenu &);
   };
 
   Directionmenu *directionmenu;
   Placementmenu *placementmenu;
 
-  Slit *slit;
+  Slit &slit;
 
   friend class Directionmenu;
   friend class Placementmenu;
@@ -69,17 +72,17 @@ private:
 
 protected:
   virtual void itemSelected(int, int);
-  virtual void internal_hide(void);
-
+  virtual void internal_hide();
+  virtual void setValues();
 
 public:
-  Slitmenu(Slit *);
-  virtual ~Slitmenu(void);
+  Slitmenu(Slit &);
+  virtual ~Slitmenu();
 
-  inline Basemenu *getDirectionmenu(void) { return directionmenu; }
-  inline Basemenu *getPlacementmenu(void) { return placementmenu; }
+  inline Basemenu *getDirectionmenu() { return directionmenu; }
+  inline Basemenu *getPlacementmenu() { return placementmenu; }
 
-  void reconfigure(void);
+  void reconfigure();
 };
 
 
@@ -93,23 +96,27 @@ private:
     unsigned int width, height;
   };
 
-  Bool on_top, hidden, do_auto_hide;
+  bool m_ontop, m_autohide, m_hidden;
+  int m_direction, m_placement; 
   Display *display;
 
-  Openbox *openbox;
-  BScreen *screen;
+  Openbox &openbox;
+  BScreen &screen;
+  Resource &config;
   BTimer *timer;
 
-  LinkedList<SlitClient> *clientList;
+  typedef std::list<SlitClient *> slitClientList;
+  slitClientList clientList;
   Slitmenu *slitmenu;
 
   struct frame {
     Pixmap pixmap;
     Window window;
 
-    int x, y, x_hidden, y_hidden;
-    unsigned int width, height;
+    Rect area;
+    Point hidden;
   } frame;
+
 
   friend class Slitmenu;
   friend class Slitmenu::Directionmenu;
@@ -117,38 +124,47 @@ private:
 
 
 public:
-  Slit(BScreen *);
+  Slit(BScreen &, Resource &);
   virtual ~Slit();
-
-  inline const Bool &isOnTop(void) const { return on_top; }
-  inline const Bool &isHidden(void) const { return hidden; }
-  inline const Bool &doAutoHide(void) const { return do_auto_hide; }
 
   inline Slitmenu *getMenu() { return slitmenu; }
 
   inline const Window &getWindowID() const { return frame.window; }
 
-  inline const int &getX(void) const
-  { return ((hidden) ? frame.x_hidden : frame.x); }
-  inline const int &getY(void) const
-  { return ((hidden) ? frame.y_hidden : frame.y); }
-
-  inline const unsigned int &getWidth(void) const { return frame.width; }
-  inline const unsigned int &getHeight(void) const { return frame.height; }
+  inline const Point &origin() const { return frame.area.origin(); }
+  inline const Size &size() const { return frame.area.size(); }
+  inline const Rect &area() const { return frame.area; }
+  inline const Point &hiddenOrigin() const { return frame.hidden; }
 
   void addClient(Window);
   void removeClient(SlitClient *, Bool = True);
   void removeClient(Window, Bool = True);
-  void reconfigure(void);
-  void reposition(void);
-  void shutdown(void);
+  void reconfigure();
+  void load();
+  void save();
+  void reposition();
+  void shutdown();
 
   void buttonPressEvent(XButtonEvent *);
   void enterNotifyEvent(XCrossingEvent *);
   void leaveNotifyEvent(XCrossingEvent *);
   void configureRequestEvent(XConfigureRequestEvent *);
 
-  virtual void timeout(void);
+  virtual void timeout();
+
+  inline bool isHidden() const { return m_hidden; }
+
+  inline bool onTop() const { return m_ontop; }
+  void setOnTop(bool);
+  
+  inline bool autoHide() const { return m_autohide; }
+  void setAutoHide(bool);
+  
+  inline int placement() const { return m_placement; }
+  void setPlacement(int);
+
+  inline int direction() const { return m_direction; }
+  void setDirection(int);
 
   enum { Vertical = 1, Horizontal };
   enum { TopLeft = 1, CenterLeft, BottomLeft, TopCenter, BottomCenter,

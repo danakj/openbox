@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # viga: '-rc' vajab argumenti\n
+$ #MENURequiresArg
+# viga: '-menu' vajab argumenti\n
 $ #DISPLAYRequiresArg
 # viga: '-display' vajab argumenti\n
 $ #WarnDisplaySet
@@ -12,6 +14,7 @@ $ #Usage
   \t\t\t  1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\tkasuta displei ühendust.\n\
   -rc <string>\t\t\tkasuta alternatiivseid resursse.\n\
+  -menu <string>\t\t\tkasuta alternatiivseid menu.\n\
   -version\t\t\tnäita versiooninumber ja välju.\n\
   -help\t\t\t\tnäita seda abiteksti ja välju.\n\n
 $ #CompileOptions

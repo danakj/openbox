@@ -24,8 +24,8 @@
                         'AC_FUNC_SETVBUF_REVERSED' => 1,
                         'AC_HEADER_SYS_WAIT' => 1,
                         'AC_TYPE_UID_T' => 1,
-                        'AM_CONDITIONAL' => 1,
                         'AC_CHECK_LIB' => 1,
+                        'AM_CONDITIONAL' => 1,
                         'AC_PROG_LN_S' => 1,
                         'AC_FUNC_MEMCMP' => 1,
                         'AC_FUNC_FORK' => 1,
@@ -47,8 +47,8 @@
                         'AC_TYPE_MODE_T' => 1,
                         'AC_CHECK_TYPES' => 1,
                         'AC_PROG_YACC' => 1,
-                        'AC_TYPE_PID_T' => 1,
                         'AC_FUNC_STRERROR_R' => 1,
+                        'AC_TYPE_PID_T' => 1,
                         'AC_STRUCT_ST_BLOCKS' => 1,
                         'AC_PROG_GCC_TRADITIONAL' => 1,
                         'AC_TYPE_SIGNAL' => 1,
@@ -83,11 +83,11 @@
                         'AC_FUNC_MALLOC' => 1,
                         'AC_FUNC_ERROR_AT_LINE' => 1,
                         'AC_FUNC_FSEEKO' => 1,
-                        'AC_FUNC_MMAP' => 1,
                         'AC_STRUCT_TM' => 1,
+                        'AC_FUNC_MMAP' => 1,
                         'AC_SUBST' => 1,
-                        'AC_PROG_CC' => 1,
-                        'AC_PROG_LIBTOOL' => 1
+                        'AC_PROG_LIBTOOL' => 1,
+                        'AC_PROG_CC' => 1
                       }
                     ], 'Request' )
            );

@@ -35,18 +35,18 @@ class Toolbar;
 
 class Windowmenu : public Basemenu {
 private:
-  OpenboxWindow *window;
-  BScreen *screen;
+  OpenboxWindow &window;
+  BScreen &screen;
 
   class SendtoWorkspacemenu : public Basemenu {
   private:
-    Windowmenu *windowmenu;
+    Windowmenu &windowmenu;
 
   protected:
     virtual void itemSelected(int, int);
 
   public:
-    SendtoWorkspacemenu(Windowmenu *);
+    SendtoWorkspacemenu(Windowmenu &);
 
     void update(void);
 
@@ -63,7 +63,7 @@ protected:
 
 
 public:
-  Windowmenu(OpenboxWindow *);
+  Windowmenu(OpenboxWindow &);
   virtual ~Windowmenu(void);
 
   inline Basemenu *getSendToMenu(void) { return (Basemenu *) sendToMenu; }

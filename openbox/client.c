@@ -1833,7 +1833,6 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     if (!(w == self->area.width && h == self->area.height)) {
         int basew, baseh, minw, minh;
-        int mw, mh, aw, ah;
 
         /* base size is substituted with min size if not specified */
         if (self->base_size.width || self->base_size.height) {
@@ -1852,23 +1851,6 @@ void client_configure_full(ObClient *self, ObCorner anchor,
             minh = self->base_size.height;
         }
 
-        /* for interactive resizing. have to move half an increment in each
-           direction. */
-
-        /* how far we are towards the next size inc */
-        mw = (w - basew) % self->size_inc.width; 
-        mh = (h - baseh) % self->size_inc.height;
-        /* amount to add */
-        aw = self->size_inc.width / 2;
-        ah = self->size_inc.height / 2;
-        /* don't let us move into a new size increment */
-        if (mw + aw >= self->size_inc.width)
-            aw = self->size_inc.width - mw - 1;
-        if (mh + ah >= self->size_inc.height)
-            ah = self->size_inc.height - mh - 1;
-        w += aw;
-        h += ah;
-    
         /* if this is a user-requested resize, then check against min/max
            sizes */
 

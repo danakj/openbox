@@ -79,8 +79,8 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
     moveresize_client = c;
     start_cx = c->frame->area.x;
     start_cy = c->frame->area.y;
-    start_cw = c->area.width;
-    start_ch = c->area.height;
+    start_cw = c->area.width + (c->size_inc.width + 1) / 2;
+    start_ch = c->area.height + (c->size_inc.height + 1) / 2;
     start_x = x;
     start_y = y;
     corner = cnr;
@@ -164,7 +164,8 @@ static void do_move(gboolean resist)
     Rect *a;
 
     if (resist)
-        resist_move(moveresize_client, &cur_x, &cur_y);
+        resist_move_windows(moveresize_client, &cur_x, &cur_y);
+    resist_move_monitors(moveresize_client, &cur_x, &cur_y);
 
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
@@ -181,20 +182,20 @@ static void do_move(gboolean resist)
 
 static void do_resize(gboolean resist)
 {
-    if (resist) {
-        /* resist_size needs the frame size */
-        cur_x += moveresize_client->frame->size.left +
-            moveresize_client->frame->size.right;
-        cur_y += moveresize_client->frame->size.top +
-            moveresize_client->frame->size.bottom;
+    /* resist_size_* needs the frame size */
+    cur_x += moveresize_client->frame->size.left +
+        moveresize_client->frame->size.right;
+    cur_y += moveresize_client->frame->size.top +
+        moveresize_client->frame->size.bottom;
 
-        resist_size(moveresize_client, &cur_x, &cur_y, lockcorner);
+    if (resist)
+        resist_size_windows(moveresize_client, &cur_x, &cur_y, lockcorner);
+    resist_size_monitors(moveresize_client, &cur_x, &cur_y, lockcorner);
 
-        cur_x -= moveresize_client->frame->size.left +
-            moveresize_client->frame->size.right;
-        cur_y -= moveresize_client->frame->size.top +
-            moveresize_client->frame->size.bottom;
-    }
+    cur_x -= moveresize_client->frame->size.left +
+        moveresize_client->frame->size.right;
+    cur_y -= moveresize_client->frame->size.top +
+        moveresize_client->frame->size.bottom;
     
     client_configure(moveresize_client, lockcorner, 
                      moveresize_client->area.x, moveresize_client->area.y,

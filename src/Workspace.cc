@@ -382,6 +382,7 @@ void Workspace::setName(const string& new_name) {
 
   clientmenu->setLabel(name);
   clientmenu->update();
+  screen->saveWorkspaceNames();
 }
 
 

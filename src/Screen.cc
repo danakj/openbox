@@ -231,6 +231,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
     workspacesList.push_back(wkspc);
     workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
   }
+  saveWorkspaceNames();
 
   workspacemenu->insert(i18n(IconSet, IconIcons, "Icons"), iconmenu);
   workspacemenu->update();
@@ -472,10 +473,15 @@ void BScreen::saveClock24Hour(Bool c) {
 
 
 void BScreen::saveWorkspaceNames() {
-  string save_string = getWorkspace(0)->getName();
-  for (unsigned int i = 1; i < getWorkspaceCount(); ++i)
-    save_string += ',' + getWorkspace(i)->getName();
- config->setValue(screenstr + "workspaceNames", save_string);
+  string names;
+  WorkspaceList::iterator it;
+  WorkspaceList::iterator last = workspacesList.end() - 1;
+  for (it = workspacesList.begin(); it != workspacesList.end(); ++it) {
+    names += (*it)->getName();
+    if (it != last)
+      names += ',';
+  }
+  config->setValue(screenstr + "workspaceNames", names);
 }
 
 

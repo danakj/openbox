@@ -3124,7 +3124,7 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
   const int snap_to_windows = screen->getWindowToWindowSnap();
   const int snap_to_edges = screen->getWindowToEdgeSnap();
   // the amount of space away from the edge to provide resistance/snap
-  const int snap_offset = 0;
+  const int snap_offset = screen->getSnapOffset();
 
   // find the geomeetery where the moving window currently is
   const Rect &moving = screen->doOpaqueMove() ? frame.rect : frame.changing;

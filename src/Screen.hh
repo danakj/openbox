@@ -151,6 +151,7 @@ private:
       ignore_shaded, ignore_maximized, workspace_warping;
 
     int snap_to_windows, snap_to_edges;
+    unsigned int snap_offset;
 
     BColor border_color;
 
@@ -270,6 +271,8 @@ public:
   { return resource.workspaces; }
   inline int getPlacementPolicy(void) const
   { return resource.placement_policy; }
+  inline int getSnapOffset(void) const
+  { return resource.snap_offset; }
   inline int getSnapThreshold(void) const
   { return resource.snap_threshold; }
   inline int getResistanceSize(void) const
@@ -290,6 +293,7 @@ public:
   void saveRowPlacementDirection(int d);
   void saveColPlacementDirection(int d);
   void saveSnapThreshold(int t);
+  void saveSnapOffset(int o);
   void saveResistanceSize(int s);
   void saveImageDither(bool d);
   void saveAAFonts(bool f);

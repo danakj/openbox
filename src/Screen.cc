@@ -490,6 +490,13 @@ void BScreen::saveSnapThreshold(int t) {
 }
 
 
+void BScreen::saveSnapOffset(int t) {
+  resource.snap_offset = t;
+  config->setValue(screenstr + "edgeSnapOffset",
+                   resource.snap_offset);
+}
+
+
 void BScreen::saveRowPlacementDirection(int d) {
   resource.row_direction = d;
   config->setValue(screenstr + "rowPlacementDirection",
@@ -599,6 +606,7 @@ void BScreen::save_rc(void) {
   saveWorkspaces(resource.workspaces);
   savePlacementPolicy(resource.placement_policy);
   saveSnapThreshold(resource.snap_threshold);
+  saveSnapOffset(resource.snap_offset);
   saveResistanceSize(resource.resistance_size);
   saveRowPlacementDirection(resource.row_direction);
   saveColPlacementDirection(resource.col_direction);
@@ -673,6 +681,10 @@ void BScreen::load_rc(void) {
     b = true;
   image_control->setDither(b);
 
+  if (! config->getValue(screenstr + "edgeSnapOffset",
+                        resource.snap_offset))
+    resource.snap_offset = 0;
+  
   if (! config->getValue(screenstr + "edgeSnapThreshold",
                         resource.snap_threshold))
     resource.snap_threshold = 4;

@@ -235,7 +235,7 @@ void OBClient::updateNormalHints()
   _inc_x = _inc_y = 1;
   _base_x = _base_y = 0;
   _min_x = _min_y = 0;
-  _max_x = _max_y = (unsigned) -1;
+  _max_x = _max_y = INT_MAX;
 
   // get the hints from the window
   if (XGetWMNormalHints(otk::OBDisplay::display, _window, &size, &ret)) {

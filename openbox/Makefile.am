@@ -20,7 +20,7 @@ LIBS=$(X_LIBS) $(XFT_LIBS) $(XINERAMA_LIBS) $(XKB_LIBS) $(XRANDR_LIBS) \
 
 bin_PROGRAMS=$(binary)
 
-openbox3_LDADD=-lobrender -L../render -lobparser -L../parser
+openbox3_LDADD=-lobrender2 -L../render2 -lobparser -L../parser
 openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES=action.c client.c config.c \
                  extensions.c focus.c frame.c grab.c menu.c menu_render.c \

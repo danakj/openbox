@@ -125,8 +125,10 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
         break;
     }
 
+    glEnable(GL_BLEND);
     for (i = 0; i < sur->ntextures; ++i)
         RrTexturePaint(sur, &sur->texture[i], x, y, w, h);
+    glDisable(GL_BLEND);
 
     glPopMatrix();
 

@@ -52,13 +52,13 @@ void RrTextureSetRGBA(struct RrSurface *sur,
 
     padbuf = malloc(sizeof(RrData32)
            * tex->data.rgba.padh * tex->data.rgba.padw);
-    memset(padbuf, 0, sizeof(RrData32) * tex->data.rgba.padh * 
+    memset(padbuf, 0xFF, sizeof(RrData32) * tex->data.rgba.padh * 
            tex->data.rgba.padw);
 
     for (i = 0; i < h; i++)
-        memcpy(padbuf + i*tex->data.rgba.padw,
+        memcpy(padbuf + i*tex->data.rgba.padw * sizeof(RrData32),
                data + i*w,
-               w);
+               w * sizeof(RrData32));
 
     glGenTextures(1, &num);
     tex->data.rgba.texid = num;
@@ -68,7 +68,7 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  tex->data.rgba.padw, tex->data.rgba.padh,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, padbuf);
@@ -109,35 +109,33 @@ void RrTextureSetNone(struct RrSurface *sur,
 void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
                     int x, int y, int w, int h)
 {
+    struct RrTextureRGBA *rgba;
     glEnable(GL_TEXTURE_2D);
     
     switch (tex->type) {
     case RR_TEXTURE_NONE:
         break;
     case RR_TEXTURE_TEXT:
-glEnable(GL_BLEND);
         RrFontRenderString(sur, tex->data.text.font, &tex->data.text.color,
                            tex->data.text.layout, tex->data.text.string,
                            x, y, w, h);
-glDisable(GL_BLEND);
         break;
     case RR_TEXTURE_RGBA:
-glDisable(GL_BLEND);
+        rgba = &tex->data.rgba;
         glColor3f(1.0, 1.0, 1.0);
-        glBindTexture(GL_TEXTURE_2D, tex->data.rgba.texid);
+        glBindTexture(GL_TEXTURE_2D, rgba->texid);
         glBegin(GL_TRIANGLES);
-        glTexCoord2f(0, 0);
+        glTexCoord2f(rgba->w/(float)rgba->padw, rgba->h/(float)rgba->padh);
         glVertex2i(x, y);
-        glTexCoord2f(w/(float)tex->data.rgba.padw, 0);
-        glVertex2i(x+w, y); 
-        glTexCoord2f(w/(float)tex->data.rgba.padw,
-                     h/(float)tex->data.rgba.padh);
+        glTexCoord2f(0, rgba->h/(float)rgba->padh);
+        glVertex2i(x+w, y);
+        glTexCoord2f(0, 0);
         glVertex2i(x+w, y+h);
 
         glVertex2i(x+w, y+h);
-        glTexCoord2f(0, h/(float)tex->data.rgba.padh);
+        glTexCoord2f(rgba->w/(float)rgba->padw, 0);
         glVertex2i(x, y+h);
-        glTexCoord2f(0, 0);
+        glTexCoord2f(rgba->w/(float)rgba->padw, rgba->h/(float)rgba->padh);
         glVertex2i(x, y);
         glEnd();
 

@@ -2237,7 +2237,7 @@ gboolean client_focus(Client *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
-    if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop) {
+    if (!self->frame->visible) {
         /* update the focus lists */
         focus_order_to_top(self);
         return FALSE;

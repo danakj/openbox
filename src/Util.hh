@@ -28,7 +28,7 @@
 #include <X11/Xutil.h>
 
 #include <string>
-#include <list>
+#include <vector>
 
 class Rect {
 public:
@@ -79,7 +79,7 @@ private:
   int _x1, _y1, _x2, _y2;
 };
 
-typedef std::list<Rect> RectList;
+typedef std::vector<Rect> RectList;
 
 struct Strut {
   unsigned int top, bottom, left, right;

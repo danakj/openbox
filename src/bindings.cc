@@ -23,15 +23,15 @@ namespace ob {
 
 static bool buttonvalue(const std::string &button, unsigned int *val)
 {
-  if (button == "1" || button == "Button1") {
+  if (button == "Left" || button == "1" || button == "Button1") {
     *val |= Button1;
-  } else if (button == "2" || button == "Button2") {
+  } else if (button == "Middle" || button == "2" || button == "Button2") {
     *val |= Button2;
-  } else if (button == "3" || button == "Button3") {
+  } else if (button == "Right" || button == "3" || button == "Button3") {
     *val |= Button3;
-  } else if (button == "4" || button == "Button4") {
+  } else if (button == "Up" || button == "4" || button == "Button4") {
     *val |= Button4;
-  } else if (button == "5" || button == "Button5") {
+  } else if (button == "Down" || button == "5" || button == "Button5") {
     *val |= Button5;
   } else
     return false;

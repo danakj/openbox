@@ -64,8 +64,10 @@ Screen::Screen(int screen)
   _managed = !::running;
   if (! _managed) return; // was unable to manage the screen
 
+#ifdef DEBUG
   printf(_("Managing screen %d: visual 0x%lx, depth %d\n"),
          _number, XVisualIDFromVisual(_info->visual()), _info->depth());
+#endif
 
   otk::Property::set(_info->rootWindow(), otk::Property::atoms.openbox_pid,
                      otk::Property::atoms.cardinal, (unsigned long) getpid());

@@ -15,14 +15,14 @@ GSList *config_desktops_names;
 gboolean config_opaque_move;
 gboolean config_opaque_resize;
 
-StackLayer   config_dock_layer;
-gboolean     config_dock_floating;
-ObDirection  config_dock_pos;
-int          config_dock_x;
-int          config_dock_y;
-gboolean     config_dock_horz;
-gboolean     config_dock_hide;
-guint        config_dock_hide_timeout;
+StackLayer    config_dock_layer;
+gboolean      config_dock_floating;
+ObDirection   config_dock_pos;
+int           config_dock_x;
+int           config_dock_y;
+ObOrientation config_dock_orient;
+gboolean      config_dock_hide;
+guint         config_dock_hide_timeout;
 
 static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
@@ -132,9 +132,9 @@ static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
     }
     if ((n = parse_find_node("direction", node))) {
         if (parse_contains("horizontal", doc, n))
-            config_dock_horz = TRUE;
+            config_dock_orient = OB_ORIENTATION_HORZ;
         else if (parse_contains("vertical", doc, n))
-            config_dock_horz = FALSE;
+            config_dock_orient = OB_ORIENTATION_VERT;
     }
     if ((n = parse_find_node("autoHide", node)))
         config_dock_hide = parse_bool(doc, n);
@@ -171,7 +171,7 @@ void config_startup()
     config_dock_floating = FALSE;
     config_dock_x = 0;
     config_dock_y = 0;
-    config_dock_horz = FALSE;
+    config_dock_orient = OB_ORIENTATION_VERT;
     config_dock_hide = FALSE;
     config_dock_hide_timeout = 3000;
 

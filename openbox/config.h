@@ -39,7 +39,7 @@ extern int config_dock_x;
   position */
 extern int config_dock_y;
 /*! Whether the dock places the dockapps in it horizontally or vertically */
-extern gboolean config_dock_horz;
+extern ObOrientation config_dock_orient;
 /*! Whether to auto-hide the dock when the pointer is not over it */
 extern gboolean config_dock_hide;
 /*! The number of milliseconds to wait before hiding the dock */

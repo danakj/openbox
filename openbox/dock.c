@@ -161,28 +161,34 @@ void dock_configure()
     /* get the size */
     for (it = dock->dock_apps; it; it = it->next) {
         ObDockApp *app = it->data;
-        if (config_dock_horz) {
+        switch (config_dock_orient) {
+        case OB_ORIENTATION_HORZ:
             dock->w += app->w;
             dock->h = MAX(dock->h, app->h);
-        } else {
+            break;
+        case OB_ORIENTATION_VERT:
             dock->w = MAX(dock->w, app->w);
             dock->h += app->h;
+            break;
         }
     }
 
-    spot = (config_dock_horz ? minw : minh) / 2;
+    spot = (config_dock_orient == OB_ORIENTATION_HORZ ? minw : minh) / 2;
 
     /* position the apps */
     for (it = dock->dock_apps; it; it = it->next) {
         ObDockApp *app = it->data;
-        if (config_dock_horz) {
+        switch (config_dock_orient) {
+        case OB_ORIENTATION_HORZ:
             app->x = spot;
             app->y = (dock->h - app->h) / 2;
             spot += app->w;
-        } else {
+            break;
+        case OB_ORIENTATION_VERT:
             app->x = (dock->w - app->w) / 2;
             app->y = spot;
             spot += app->h;
+            break;
         }
 
         XMoveWindow(ob_display, app->icon_win, app->x, app->y);
@@ -273,19 +279,27 @@ void dock_configure()
         if (!config_dock_floating) {
             switch (config_dock_pos) {
             case OB_DIRECTION_NORTHWEST:
-                if (config_dock_horz)
+                switch (config_dock_orient) {
+                case OB_ORIENTATION_HORZ:
                     dock->y -= dock->h - ob_rr_theme->bwidth;
-                else
+                    break;
+                case OB_ORIENTATION_VERT:
                     dock->x -= dock->w - ob_rr_theme->bwidth;
+                    break;
+                }
                 break;
             case OB_DIRECTION_NORTH:
                 dock->y -= dock->h - ob_rr_theme->bwidth;
                 break;
             case OB_DIRECTION_NORTHEAST:
-                if (config_dock_horz)
+                switch (config_dock_orient) {
+                case OB_ORIENTATION_HORZ:
                     dock->y -= dock->h - ob_rr_theme->bwidth;
-                else
+                    break;
+                case OB_ORIENTATION_VERT:
                     dock->x += dock->w - ob_rr_theme->bwidth;
+                    break;
+                }
                 break;
             case OB_DIRECTION_WEST:
                 dock->x -= dock->w - ob_rr_theme->bwidth;
@@ -294,19 +308,26 @@ void dock_configure()
                 dock->x += dock->w - ob_rr_theme->bwidth;
                 break;
             case OB_DIRECTION_SOUTHWEST:
-                if (config_dock_horz)
+                switch (config_dock_orient) {
+                case OB_ORIENTATION_HORZ:
                     dock->y += dock->h - ob_rr_theme->bwidth;
-                else
+                    break;
+                case OB_ORIENTATION_VERT:
                     dock->x -= dock->w - ob_rr_theme->bwidth;
-                break;
+                    break;
+                } break;
             case OB_DIRECTION_SOUTH:
                 dock->y += dock->h - ob_rr_theme->bwidth;
                 break;
             case OB_DIRECTION_SOUTHEAST:
-                if (config_dock_horz)
+                switch (config_dock_orient) {
+                case OB_ORIENTATION_HORZ:
                     dock->y += dock->h - ob_rr_theme->bwidth;
-                else
+                    break;
+                case OB_ORIENTATION_VERT:
                     dock->x += dock->w - ob_rr_theme->bwidth;
+                    break;
+                }
                 break;
             }    
         }
@@ -325,19 +346,27 @@ void dock_configure()
     } else {
         switch (config_dock_pos) {
         case OB_DIRECTION_NORTHWEST:
-            if (config_dock_horz)
+            switch (config_dock_orient) {
+            case OB_ORIENTATION_HORZ:
                 STRUT_SET(dock_strut, 0, strh, 0, 0);
-            else
+                break;
+            case OB_ORIENTATION_VERT:
                 STRUT_SET(dock_strut, strw, 0, 0, 0);
+                break;
+            }
             break;
         case OB_DIRECTION_NORTH:
             STRUT_SET(dock_strut, 0, strh, 0, 0);
             break;
         case OB_DIRECTION_NORTHEAST:
-            if (config_dock_horz)
+            switch (config_dock_orient) {
+            case OB_ORIENTATION_HORZ:
                 STRUT_SET(dock_strut, 0, strh, 0, 0);
-            else
+                break;
+            case OB_ORIENTATION_VERT:
                 STRUT_SET(dock_strut, 0, 0, strw, 0);
+                break;
+            }
             break;
         case OB_DIRECTION_WEST:
             STRUT_SET(dock_strut, strw, 0, 0, 0);
@@ -346,19 +375,27 @@ void dock_configure()
             STRUT_SET(dock_strut, 0, 0, strw, 0);
             break;
         case OB_DIRECTION_SOUTHWEST:
-            if (config_dock_horz)
+            switch (config_dock_orient) {
+            case OB_ORIENTATION_HORZ:
                 STRUT_SET(dock_strut, 0, 0, 0, strh);
-            else
+                break;
+            case OB_ORIENTATION_VERT:
                 STRUT_SET(dock_strut, strw, 0, 0, 0);
+                break;
+            }
             break;
         case OB_DIRECTION_SOUTH:
             STRUT_SET(dock_strut, 0, 0, 0, strh);
             break;
         case OB_DIRECTION_SOUTHEAST:
-            if (config_dock_horz)
+            switch (config_dock_orient) {
+            case OB_ORIENTATION_HORZ:
                 STRUT_SET(dock_strut, 0, 0, 0, strh);
-            else
+                break;
+            case OB_ORIENTATION_VERT:
                 STRUT_SET(dock_strut, 0, 0, strw, 0);
+                break;
+            }
             break;
         }
     }
@@ -399,6 +436,7 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     GList *it;
     gint x, y;
     gboolean after;
+    gboolean stop;
 
     x = e->x_root;
     y = e->y_root;
@@ -414,14 +452,18 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     y -= dock->y;
 
     /* which dock app are we on top of? */
-    for (it = dock->dock_apps; it; it = it->next) {
+    stop = FALSE;
+    for (it = dock->dock_apps; it && !stop; it = it->next) {
         over = it->data;
-        if (config_dock_horz) {
+        switch (config_dock_orient) {
+        case OB_ORIENTATION_HORZ:
             if (x >= over->x && x < over->x + over->w)
-                break;
-        } else {
+                stop = TRUE;
+            break;
+        case OB_ORIENTATION_VERT:
             if (y >= over->y && y < over->y + over->h)
-                break;
+                stop = TRUE;
+            break;
         }
     }
     if (!it || app == over) return;
@@ -429,10 +471,14 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     x -= over->x;
     y -= over->y;
 
-    if (config_dock_horz)
+    switch (config_dock_orient) {
+    case OB_ORIENTATION_HORZ:
         after = (x > over->w / 2);
-    else
+        break;
+    case OB_ORIENTATION_VERT:
         after = (y > over->h / 2);
+        break;
+    }
 
     /* remove before doing the it->next! */
     dock->dock_apps = g_list_remove(dock->dock_apps, app);

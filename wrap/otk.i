@@ -22,11 +22,6 @@
 %include "otk_property.i"
 %include "otk_timer.i"
 
-%immutable otk::Property::atoms;
-
-%ignore TimerLessThan;
-
-
 // for Window etc
 %import "X11/X.h"
 

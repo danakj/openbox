@@ -149,6 +149,8 @@
 
 namespace otk {
 
+%immutable otk::Property::atoms;
+
 %ignore Property::NUM_STRING_TYPE;
 %ignore Property::initialize();
 

@@ -3,6 +3,10 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif // SHAPE
 }
 
 namespace otk {
@@ -93,9 +97,6 @@ public:
   //! Called when the colormap changes, or is installed or unistalled
   virtual void colorMapHandler(const XColormapEvent &) {}
 
-  //! Called when a client calls XSendEvent
-  virtual void clientMessageHandler(const XClientMessageEvent &) {}
-
   //! Called when a property of a window changes
   virtual void propertyHandler(const XPropertyEvent &) {}
 
@@ -107,6 +108,18 @@ public:
 
   //! Called when a SelectionEvent occurs
   virtual void selectionRequestHandler(const XSelectionRequestEvent &) {}
+
+  //! Called when a client calls XSendEvent
+  /*!
+    Some types of client messages are filtered out and sent to more specific
+    event handler functions.
+  */
+  virtual void clientMessageHandler(const XClientMessageEvent &);
+
+#if defined(SHAPE) || defined(DOXYGEN_IGNORE)
+  //! Called when a shape extention event fires
+  virtual void shapeHandler(const XShapeEvent &) {};
+#endif // SHAPE 
 
   virtual ~OtkEventHandler();
 

@@ -1,15 +1,19 @@
 #ifndef __widget_hh
 #define __widget_hh
 
-#include <string>
-#include <list>
-
 #include "rect.hh"
 #include "point.hh"
 #include "texture.hh"
 #include "style.hh"
 #include "eventdispatcher.hh"
 #include "application.hh"
+
+extern "C" {
+#include <assert.h>
+}
+
+#include <string>
+#include <list>
 
 namespace otk {
 
@@ -78,10 +82,10 @@ public:
   virtual void removeChild(OtkWidget *child);
 
   inline bool isStretchableHorz(void) const { return _stretchable_horz; }
-  void setStretchableHorz(bool s_horz) { _stretchable_horz = s_horz; }
+  void setStretchableHorz(bool s_horz = true) { _stretchable_horz = s_horz; }
 
   inline bool isStretchableVert(void) const { return _stretchable_vert; }
-  void setStretchableVert(bool s_vert)  { _stretchable_vert = s_vert; }
+  void setStretchableVert(bool s_vert = true)  { _stretchable_vert = s_vert; }
 
   inline Cursor getCursor(void) const { return _cursor; }
 
@@ -93,7 +97,7 @@ public:
   void setDirection(Direction dir) { _direction = dir; }
 
   inline Style *getStyle(void) const { return _style; }
-  void setStyle(Style *style) { _style = style; }
+  void setStyle(Style *style) { assert(style); _style = style; }
 
   inline OtkEventDispatcher *getEventDispatcher(void)
   { return _event_dispatcher; }

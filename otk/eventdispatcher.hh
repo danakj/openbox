@@ -28,6 +28,8 @@ private:
   OtkEventMap _map;
   OtkEventHandler *_fallback;
 
+  //! The time at which the last XEvent with a time was received
+  Time _lasttime; // XXX: store this! also provide an accessor!
 };
 
 }

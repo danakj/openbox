@@ -1,3 +1,9 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+
+#ifdef HAVE_CONFIG_H
+# include "../config.h"
+#endif
+
 #include "appwidget.hh"
 #include "application.hh"
 

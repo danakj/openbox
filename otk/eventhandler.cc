@@ -1,5 +1,11 @@
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+
+#ifdef HAVE_CONFIG_H
+# include "../config.h"
+#endif
+
+#include "display.hh"
 #include "eventhandler.hh"
-#include <iostream>
 
 namespace otk {
 
@@ -78,7 +84,19 @@ void OtkEventHandler::handle(const XEvent &e)
     return selectionHandler(e.xselection);
   case SelectionRequest:
     return selectionRequestHandler(e.xselectionrequest);
-  };
+  default:
+#ifdef    SHAPE
+    if (e.type == otk::OBDisplay::shapeEventBase())
+      return shapeHandler((*(XShapeEvent*)&e));
+#endif // SHAPE
+    ;
+  }
+}
+
+
+void OtkEventHandler::clientMessageHandler(const XClientMessageEvent &)
+{
+  
 }
 
 }

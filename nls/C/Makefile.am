@@ -5,6 +5,7 @@ CLEANFILES = openbox.cat
 MAINTAINERCLEANFILES = Makefile.in Translation.m
 DISTCLEANFILES = Translation.m
 MFILES = @srcdir@/BaseDisplay.m @srcdir@/Basemenu.m @srcdir@/Configmenu.m @srcdir@/Icon.m @srcdir@/Image.m @srcdir@/Screen.m @srcdir@/Slit.m @srcdir@/Toolbar.m @srcdir@/Window.m @srcdir@/Windowmenu.m @srcdir@/Workspace.m @srcdir@/Workspacemenu.m @srcdir@/blackbox.m @srcdir@/common.m @srcdir@/main.m @srcdir@/bsetroot.m
+EXTRA_DIST= BaseDisplay.m Basemenu.m Configmenu.m Icon.m Image.m Screen.m Slit.m Toolbar.m Window.m Windowmenu.m Workspace.m Workspacemenu.m blackbox.m bsetroot.m common.m main.m
 
 all-local: Translation.m openbox.cat
 install-data-local: openbox.cat

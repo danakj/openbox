@@ -7,6 +7,8 @@ style_DATA = artwiz bbs bluebox cthulhain deep fieron fieron2 flux frobozz \
         purplehaaze shade steelblue steelblue2 steelblue3 the_orange trisb \
         twice warp-xp
 
+EXTRA_DIST = $(style_DATA)
+
 distclean-local:
 	rm -f *\~ .\#*
 uninstall-am:

@@ -13,12 +13,14 @@ man_MANS = epist.1 epistrc.5
 
 epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc yacc_parser.cc parser.cc keytree.cc lex.yy.c config.cc
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
-					../../src/Util.o ../../src/i18n.o ../../src/Timer.o \
-					../../src/GCCache.o ../../src/Color.o
-#					../../src/Texture.o \
-#					../../src/Image.o ../../src/ImageControl.o
+			../../src/Util.o ../../src/i18n.o ../../src/Timer.o \
+			../../src/GCCache.o ../../src/Color.o
+#			../../src/Texture.o \
+#			../../src/Image.o ../../src/ImageControl.o
 
 MAINTAINERCLEANFILES =	Makefile.in
+
+EXTRA_DIST = epistrc epist.1.in epistrc.5.in
 
 distclean-local:
 	rm -f *\~ .\#*

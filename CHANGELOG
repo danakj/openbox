@@ -1,4 +1,9 @@
 :
+	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)
+	* Allow resizing of windows in only vertical/horizontal directions
+	(via Alt-MiddleClick-Drag with the default bindings)
+
+3.0-rc2:
 	* Closed bug #885 (raiseOnFocus is flawed)
 	* Closed bug #887 (Mouse-wheel scrolling only changes 1 desktop when
 	using "dialog" option)

@@ -234,8 +234,17 @@ gint RrFontHeight(const RrFont *f)
      g_object_unref(context);
      return result;
  */
-    return f->xftfont->ascent + f->xftfont->descent +
-        (f->shadow ? f->offset : 0);
+#ifndef ANNOYING_QUESTION
+// Obviously you either remove this or pass -DANNOYING_QUESTION to actually
+// compile the code.
+#error XXX Does anyone have any idea how the above is supposed to work?
+#else
+#warning XXX Using very ugly workaround in the meantime.
+#endif
+
+    gint x, y;
+    font_measure_full(f, " ", &x, &y);
+    return y;
 
 #endif /* USE_PANGO */
 }

@@ -2,14 +2,14 @@ plugindir=$(libdir)/openbox/plugins
 
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\" \
--DG_LOG_DOMAIN=\"Openbox-Plugin\"
+-DG_LOG_DOMAIN=\"Plugin-Keyboard\"
 
-plugin_LTLIBRARIES=focus.la
+plugin_LTLIBRARIES=keyboard.la
 
-focus_la_LDFLAGS=-module -avoid-version
-focus_la_SOURCES=focus.c
+keyboard_la_LDFLAGS=-module -avoid-version
+keyboard_la_SOURCES=keyboard.c tree.c translate.c keyaction.c
 
-noinst_HEADERS=
+noinst_HEADERS=keyboard.h tree.h translate.h keyaction.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

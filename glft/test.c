@@ -64,6 +64,9 @@ int main(int argc, char **argv)
                         CopyFromParent,   /* visual */
                         0,                /* valuemask */
                         0);               /* attributes */
+    chint.res_name = "glfttest";
+    chint.res_class = "Glfttest";
+    XSetClassHint(display, win, &chint);
     XSelectInput(display, win, ExposureMask | StructureNotifyMask);
     XMapWindow(display, win);
 
@@ -74,12 +77,6 @@ int main(int argc, char **argv)
     if (cont == NULL)
         printf("context creation failed\n");
     glXMakeCurrent(display, win, cont);
-
-
-
-    chint.res_name = "glfttest";
-    chint.res_class = "Glfttest";
-    XSetClassHint(display, win, &chint);
 
     delete_win = XInternAtom(display, "WM_DELETE_WINDOW", False);
     protocols = XInternAtom(display, "WM_PROTOCOLS", False);

@@ -470,7 +470,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_hover_focused_iconify =
         RrAppearanceCopy(theme->a_hover_focused_max);
     theme->a_hover_unfocused_iconify =
-        RrAppearanceCopy(theme->a_hover_focused_max);
+        RrAppearanceCopy(theme->a_hover_unfocused_max);
     theme->a_unfocused_unpressed_iconify =
         RrAppearanceCopy(theme->a_unfocused_unpressed_max);
     theme->a_unfocused_pressed_iconify =

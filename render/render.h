@@ -2,8 +2,6 @@
 #define __render_h
 
 #include <X11/Xlib.h>
-#define _XFT_NO_COMPAT_ /* no Xft 1 API */
-#include <X11/Xft/Xft.h>
 #include <glib.h>
 #include "color.h"
 #include "kernel/geom.h"
@@ -78,7 +76,6 @@ typedef struct Surface {
 } Surface;
 
 typedef struct {
-    XftFont *xftfont;
     int height;
     int elipses_length;
 } ObFont;
@@ -137,8 +134,6 @@ typedef struct Appearance {
     Rect area;
     int textures;
     Texture *texture;
-    Pixmap pixmap;
-    XftDraw *xftdraw;
 } Appearance;
 
 extern Visual *render_visual;

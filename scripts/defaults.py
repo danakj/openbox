@@ -10,7 +10,7 @@ setup_fallback_focus()
 ebind(EventPlaceWindow, placewindows_random)
 
 # run xterm from root clicks
-mbind("1", MC_Root, MouseClick, execute("xterm"))
+mbind("1", MC_Root, MouseClick, lambda(d): execute("xterm"))
 
 kbind(["A-F4"], KC_All, close)
 

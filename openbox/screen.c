@@ -74,6 +74,8 @@ static gboolean replace_wm()
     g_free(wm_sn);
 
     current_wm_sn_owner = XGetSelectionOwner(ob_display, wm_sn_atom);
+    if (current_wm_sn_owner == screen_support_win)
+        current_wm_sn_owner = None;
     if (current_wm_sn_owner) {
         if (!ob_replace_wm) {
             g_warning("A window manager is already running on screen %d",

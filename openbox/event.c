@@ -725,7 +725,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 					       CWX | CWY)) {
 	    int x, y, w, h;
 	    ObCorner corner;
-            Rect *a;
 
 	    x = (e->xconfigurerequest.value_mask & CWX) ?
 		e->xconfigurerequest.x : client->area.x;
@@ -736,15 +735,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    h = (e->xconfigurerequest.value_mask & CWHeight) ?
 		e->xconfigurerequest.height : client->area.height;
 
-            /* dont let windows move above/left into the strut unless they are
-               bigger than the available area */
-            a = screen_area(client->desktop);
-            if (e->xconfigurerequest.value_mask & CWX &&
-                w <= a->width && x < a->x)
-                x = a->x;
-            if (e->xconfigurerequest.value_mask & CWY &&
-                h <= a->height && y < a->y)
-                y = a->y;
+            {
+                int newx = x;
+                int newy = y;
+                client_find_onscreen(client, &newx, &newy, w, h, TRUE);
+                if (e->xconfigurerequest.value_mask & CWX)
+                    x = newx;
+                if (e->xconfigurerequest.value_mask & CWY)
+                    y = newy;
+            }
 	       
 	    switch (client->gravity) {
 	    case NorthEastGravity:
@@ -910,7 +909,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         } else if (msgtype == prop_atoms.net_moveresize_window) {
             int oldg = client->gravity;
             int tmpg, x, y, w, h;
-            Rect *a;
 
             if (e->xclient.data.l[0] & 0xff)
                 tmpg = e->xclient.data.l[0] & 0xff;
@@ -935,22 +933,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 h = client->area.y;
             client->gravity = tmpg;
 
-            /* get the frame position */
-            frame_client_gravity(client->frame, &x, &y);
-
-            /* dont let windows move above/left into the strut unless they are
-               bigger than the available area */
-            a = screen_area(client->desktop);
-            if (e->xconfigurerequest.value_mask & CWX &&
-                w <= a->width && x < a->x)
-                x = a->x;
-            if (e->xconfigurerequest.value_mask & CWY &&
-                h <= a->height && y < a->y)
-                y = a->y;
+            {
+                int newx = x;
+                int newy = y;
+                client_find_onscreen(client, &newx, &newy, w, h, TRUE);
+                if (e->xclient.data.l[0] & 1 << 8)
+                    x = newx;
+                if (e->xclient.data.l[0] & 1 << 9)
+                    y = newy;
+            }
 	       
-            /* go back to the client position */
-            frame_frame_gravity(client->frame, &x, &y);
-
             client_configure(client, OB_CORNER_TOPLEFT,
                              x, y, w, h, FALSE, TRUE);
 

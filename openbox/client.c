@@ -300,7 +300,7 @@ void client_manage(Window window)
     dispatch_client(Event_Client_New, self, 0, 0);
 
     /* make sure the window is visible */
-    client_move_onscreen(self);
+    client_move_onscreen(self, TRUE);
 
     screen_update_areas();
 
@@ -454,27 +454,61 @@ void client_unmanage(ObClient *self)
     client_set_list();
 }
 
-void client_move_onscreen(ObClient *self)
+void client_move_onscreen(ObClient *self, gboolean rude)
+{
+    int x = self->area.x;
+    int y = self->area.y;
+    if (client_find_onscreen(self, &x, &y,
+                             self->area.width, self->area.height, rude)) {
+        client_configure(self, OB_CORNER_TOPLEFT, x, y,
+                         self->area.width, self->area.height,
+                         TRUE, TRUE);
+    }
+}
+
+gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
+                              gboolean rude)
 {
     Rect *a;
-    int x = self->frame->area.x, y = self->frame->area.y;
+    int ox = *x, oy = *y;
+
+    frame_client_gravity(self->frame, x, y); /* get where the frame
+                                                would be */
 
     /* XXX watch for xinerama dead areas */
-    a = screen_area(self->desktop);
-    if (x >= a->x + a->width - 1)
-        x = a->x + a->width - self->frame->area.width;
-    if (y >= a->y + a->height - 1)
-        y = a->y + a->height - self->frame->area.height;
-    if (x + self->frame->area.width - 1 < a->x)
-        x = a->x;
-    if (y + self->frame->area.height - 1< a->y)
-        y = a->y;
 
-    frame_frame_gravity(self->frame, &x, &y); /* get where the client
-                                                 should be */
-    client_configure(self, OB_CORNER_TOPLEFT, x, y,
-                     self->area.width, self->area.height,
-                     TRUE, TRUE);
+    a = screen_area(self->desktop);
+    if (*x >= a->x + a->width - 1)
+        *x = a->x + a->width - self->frame->area.width;
+    if (*y >= a->y + a->height - 1)
+        *y = a->y + a->height - self->frame->area.height;
+    if (*x + self->frame->area.width - 1 < a->x)
+        *x = a->x;
+    if (*y + self->frame->area.height - 1 < a->y)
+        *y = a->y;
+
+    if (rude) {
+        /* this is my MOZILLA BITCHSLAP. oh ya it fucking feels good.
+           Java can suck it too. */
+
+        /* dont let windows map/move into the strut unless they
+           are bigger than the available area */
+        if (w <= a->width) {
+            if (*x < a->x) *x = a->x;
+            if (*x + w > a->x + a->width)
+                *x = a->x + a->width - w;
+        }
+        if (h <= a->height) {
+            if (*y < a->y) *y = a->y;
+            if (*y + h > a->y + a->height)
+                *y = a->y + a->height - h;
+        }
+    }
+
+    frame_frame_gravity(self->frame, x, y); /* get where the client
+                                               should be */
+
+    return ox != *x || oy != *y;
 }
 
 static void client_toggle_border(ObClient *self, gboolean show)
@@ -891,22 +925,7 @@ void client_update_normal_hints(ObClient *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
-        if (size.flags & (PPosition|USPosition)) {
-            Rect *a;
-            
-            /* this is my MOZILLA BITCHSLAP. oh ya it fucking feels good.
-               Java can suck it too. */
-
-            /* dont let windows map above/left into the strut unless they
-               are bigger than the available area */
-            a = screen_area(self->desktop);
-            if (self->area.width <= a->width && self->area.x < a->x)
-                self->area.x = a->x;
-            if (self->area.height <= a->height && self->area.y < a->y)
-                self->area.y = a->y;
-
-            self->positioned = TRUE;
-        }
+        self->positioned = !!(size.flags & (PPosition|USPosition));
 
 	if (size.flags & PWinGravity) {
 	    self->gravity = size.win_gravity;

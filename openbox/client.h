@@ -284,10 +284,28 @@ void client_configure(ObClient *self, ObCorner anchor,
 
 void client_reconfigure(ObClient *self);
 
+/*! Finds coordinates to keep a client on the screen.
+  @param self The client
+  @param x The x coord of the client, may be changed.
+  @param y The y coord of the client, may be changed.
+  @param w The width of the client.
+  @param w The height of the client.
+  @param rude Be rude about it. If false, it is only moved if it is entirely
+              not visible. If true, then make sure the window is inside the
+              struts if possible.
+  @return true if the client was moved to be on-screen; false if not.
+*/
+gboolean client_find_onscreen(ObClient *self, int *x, int *y, int w, int h,
+                              gboolean rude);
+
 /*! Moves a client so that it is on screen if it is entirely out of the
   viewable screen.
+  @param self The client to move
+  @param rude Be rude about it. If false, it is only moved if it is entirely
+              not visible. If true, then make sure the window is inside the
+              struts if possible.
 */
-void client_move_onscreen(ObClient *self);
+void client_move_onscreen(ObClient *self, gboolean rude);
 
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should

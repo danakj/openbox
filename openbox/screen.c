@@ -357,7 +357,7 @@ void screen_resize()
     screen_update_areas();
 
     for (it = client_list; it; it = it->next)
-        client_move_onscreen(it->data);
+        client_move_onscreen(it->data, FALSE);
 }
 
 void screen_set_num_desktops(guint num)

@@ -23,7 +23,7 @@ void OBTimerQueueManager::fire()
     const OBTimer* const timer = timerList.top();
 
     gettimeofday(&now, 0);
-    tm = timer->timeRemaining(now);
+    tm = timer->remainingTime(now);
 
     timeout = &tm;
   }
@@ -44,8 +44,8 @@ void OBTimerQueueManager::fire()
 
     timerList.pop();
 
-    timer->fireTimeout();
-    if (timer->isRecurring())
+    timer->fire();
+    if (timer->recurring())
       timer->start();
   }
 }

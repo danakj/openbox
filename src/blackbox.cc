@@ -1132,7 +1132,7 @@ void Blackbox::reconfigure(void) {
 
   reconfigure_wait = True;
 
-  if (! timer->isTiming()) timer->start();
+  if (! timer->timing()) timer->start();
 }
 
 

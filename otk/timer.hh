@@ -32,15 +32,15 @@ typedef void (*OBTimeoutHandler)(OBTimeoutData);
 class OBTimer {
 private:
   //! The manager which to add ourself to and remove ourself after we are done
-  OBTimerQueueManager *manager;
+  OBTimerQueueManager *_manager;
   //! The function to call when the time elapses
-  OBTimeoutHandler handler;
+  OBTimeoutHandler _handler;
   //! The data which gets passed along to the OBTimeoutHandler
-  OBTimeoutData data;
+  OBTimeoutData _data;
   //! Determines if the timer is currently started
-  bool timing;
+  bool _timing;
   //! When this is true, the timer will reset itself to fire again every time
-  bool recur;
+  bool _recur;
 
   //! The time at which the timer started
   timeval _start;
@@ -65,32 +65,32 @@ public:
   virtual ~OBTimer();
 
   //! Fires the timer, calling its OBTimeoutHandler
-  void fireTimeout();
+  void fire();
 
   //! Returns if the OBTimer is started and timing
-  inline bool isTiming() const { return timing; }
+  inline bool timing() const { return _timing; }
   //! Returns if the OBTimer is going to repeat
-  inline bool isRecurring() const { return recur; }
+  inline bool recurring() const { return _recur; }
 
   //! Gets the amount of time the OBTimer should last before firing
-  inline const timeval &getTimeout() const { return _timeout; }
+  inline const timeval &timeout() const { return _timeout; }
   //! Gets the time at which the OBTimer started
-  inline const timeval &getStartTime() const { return _start; }
+  inline const timeval &startTime() const { return _start; }
 
   //! Gets the amount of time left before the OBTimer fires
-  timeval timeRemaining(const timeval &tm) const;
+  timeval remainingTime(const timeval &tm) const;
   //! Returns if the OBTimer is past its timeout time, and should fire
   bool shouldFire(const timeval &tm) const;
 
   //! Gets the time at which the OBTimer will fire
-  timeval endpoint() const;
+  timeval endTime() const;
 
   //! Sets the OBTimer to repeat or not
   /*!
     @param b If true, the timer is set to repeat; otherwise, it will fire only
              once
   */
-  inline void recurring(bool b) { recur = b; }
+  inline void setRecurring(bool b) { _recur = b; }
 
   //! Sets the amount of time for the OBTimer to last in milliseconds
   /*!
@@ -124,7 +124,7 @@ public:
     @return true if this OBTimer will fire before 'other'; otherwise, false
   */
   bool operator<(const OBTimer& other) const
-  { return shouldFire(other.endpoint()); }
+  { return shouldFire(other.endTime()); }
 };
 
 }

@@ -3828,8 +3828,7 @@ void BlackboxWindow::leaveNotifyEvent(const XCrossingEvent*) {
 
   installColormap(False);
 
-  if (timer->isTiming())
-    timer->stop();
+  timer->stop();
 }
 
 

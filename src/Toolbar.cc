@@ -270,7 +270,6 @@ void Toolbar::reconfigure(void) {
       char t[1025], *time_string = (char *) 0;
       int len = strftime(t, 1024, screen->getStrftimeFormat(), tt);
       t[len++-1] = ' ';   // add a space to the string for padding
-      t[len++-1] = ' ';   // add a space to the string for padding
       t[len] = '\0';
 
       if (i18n->multibyte()) {

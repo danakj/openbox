@@ -112,11 +112,11 @@ typedef struct TextureMask {
 typedef struct TextureRGBA {
     guint width;
     guint height;
-    unsigned long *data;
+    pixel32 *data;
 /* cached scaled so we don't have to scale often */
     guint cwidth;
     guint cheight;
-    unsigned long *cache;
+    pixel32 *cache;
 } TextureRGBA;
 
 typedef union {
@@ -159,7 +159,7 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h);
 
 void appearance_minsize(Appearance *l, int *w, int *h);
 
-void render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
-                           int *w, int *h, gulong **data);
+gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
+                               int *w, int *h, pixel32 **data);
 
 #endif /*__render_h*/

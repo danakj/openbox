@@ -19,6 +19,7 @@ Visual *render_visual;
 Colormap render_colormap;
 int render_red_offset = 0, render_green_offset = 0, render_blue_offset = 0;
 int render_red_shift, render_green_shift, render_blue_shift;
+int render_red_mask, render_green_mask, render_blue_mask;
 
 void render_startup(void)
 {
@@ -87,9 +88,9 @@ void truecolor_startup(void)
                         ZPixmap, 0, NULL, 1, 1, 32, 0);
   g_assert(timage != NULL);
   /* find the offsets for each color in the visual's masks */
-  red_mask = timage->red_mask;
-  green_mask = timage->green_mask;
-  blue_mask = timage->blue_mask;
+  render_red_mask = red_mask = timage->red_mask;
+  render_green_mask = green_mask = timage->green_mask;
+  render_blue_mask = blue_mask = timage->blue_mask;
 
   render_red_offset = 0;
   render_green_offset = 0;
@@ -117,7 +118,7 @@ void pseudocolor_startup(void)
   /* determine the number of colors and the bits-per-color */
   pseudo_bpc = 2; /* XXX THIS SHOULD BE A USER OPTION */
   g_assert(pseudo_bpc >= 1);
-  _ncolors = 1 << (pseudo_bpc * 3);
+  _ncolors = pseudo_ncolors();
 
   if (_ncolors > 1 << render_depth) {
     g_warning("PseudoRenderControl: Invalid colormap size. Resizing.\n");
@@ -166,7 +167,9 @@ void pseudocolor_startup(void)
         g = (pseudo_colors[i].green - icolors[ii].green) & 0xff;
         b = (pseudo_colors[i].blue - icolors[ii].blue) & 0xff;
         /* find a weighted absolute deviation */
-        dev = (r * r) + (g * g) + (b * b);
+        dev = (r * r) * (0xff - (icolors[ii].red & 0xff)) +
+            (g * g) * (0xff - (icolors[ii].green & 0xff)) +
+            (b * b) * (0xff - (icolors[ii].blue & 0xff));
 
         if (dev < closest) {
           closest = dev;
@@ -400,23 +403,23 @@ void appearance_free(Appearance *a)
 
 void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
 {
-    unsigned char *scratch;
+    pixel32 *scratch;
     XImage *im = NULL;
     im = XCreateImage(ob_display, render_visual, render_depth,
                       ZPixmap, 0, NULL, w, h, 32, 0);
     g_assert(im != NULL);
-    im->byte_order = endian;
+    im->byte_order = render_endian;
 /* this malloc is a complete waste of time on normal 32bpp
    as reduce_depth just sets im->data = data and returns
 */
-    scratch = malloc(im->width * im->height * sizeof(pixel32));
+    scratch = g_new(pixel32, im->width * im->height);
     im->data = (char*) scratch;
     reduce_depth(in, im);
     XPutImage(ob_display, out, DefaultGC(ob_display, ob_screen),
               im, 0, 0, x, y, w, h);
     im->data = NULL;
     XDestroyImage(im);
-    free(scratch);
+    g_free(scratch);
 }
 
 void appearance_minsize(Appearance *l, int *w, int *h)
@@ -468,9 +471,50 @@ void appearance_minsize(Appearance *l, int *w, int *h)
     }
 }
 
-void render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
-                           int *w, int *h, gulong **data)
+gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
+                               int *w, int *h, pixel32 **data)
 {
-    *w = *h = 0;
-    *data = NULL;
+    Window xr;
+    int xx, xy;
+    guint pw, ph, mw, mh, xb, xd, i, x, y, di;
+    XImage *xi, *xm = NULL;
+
+    if (!XGetGeometry(ob_display, pmap, &xr, &xx, &xy, &pw, &ph, &xb, &xd))
+        return FALSE;
+    if (mask) {
+        if (!XGetGeometry(ob_display, mask, &xr, &xx, &xy, &mw, &mh, &xb, &xd))
+            return FALSE;
+        if (pw != mw || ph != mh || xd != 1)
+            return FALSE;
+    }
+
+    xi = XGetImage(ob_display, pmap, 0, 0, pw, ph, 0xffffffff, ZPixmap);
+    if (!xi)
+        return FALSE;
+
+    if (mask) {
+        xm = XGetImage(ob_display, mask, 0, 0, mw, mh, 0xffffffff, ZPixmap);
+        if (!xm)
+            return FALSE;
+    }
+
+    *data = g_new(pixel32, pw * ph);
+    increase_depth(*data, xi);
+
+    if (mask) {
+        /* apply transparency from the mask */
+        di = 0;
+        for (i = 0, y = 0; y < ph; ++y) {
+            for (x = 0; x < pw; ++x, ++i) {
+                if (!((((unsigned)xm->data[di + x / 8]) >> (x % 8)) & 0x1))
+                    (*data)[i] &= ~(0xff << default_alpha_offset);
+            }
+            di += xm->bytes_per_line;
+        }
+    }
+
+    *w = pw;
+    *h = ph;
+
+    return TRUE;
 }

@@ -5,7 +5,7 @@
 void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
                 Rect *surarea)
 {
-    gulong *draw = rgba->data;
+    pixel32 *draw = rgba->data;
     guint c, i, e, t, sfw, sfh;
     sfw = position->width;
     sfh = position->height;
@@ -50,10 +50,10 @@ void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *position,
         for (i = 0, c = 0, t = position->x, e = sfw*sfh; i < e; ++i, ++t) {
             guchar alpha, r, g, b, bgr, bgg, bgb;
 
-            alpha = draw[i] >> 24;
-            r = draw[i] >> 16;
-            g = draw[i] >> 8;
-            b = draw[i];
+            alpha = draw[i] >> default_alpha_offset;
+            r = draw[i] >> default_red_offset;
+            g = draw[i] >> default_green_offset;
+            b = draw[i] >> default_blue_offset;
 
             if (c >= sfw) {
                 c = 0;

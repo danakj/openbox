@@ -1,5 +1,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <string.h>
 #include "render.h"
 #include "color.h"
 #include "../kernel/openbox.h"
@@ -82,9 +83,9 @@ void reduce_depth(pixel32 *data, XImage *im)
                     r = (data[x] >> default_red_offset) & 0xFF;
                     g = (data[x] >> default_green_offset) & 0xFF;
                     b = (data[x] >> default_blue_offset) & 0xFF;
-                    p32[x] = (r << render_red_offset)
-                           + (g << render_green_offset)
-                           + (b << render_blue_offset);
+                    p32[x] = (r << render_red_shift)
+                           + (g << render_green_shift)
+                           + (b << render_blue_shift);
                 }
                 data += im->width;
                 p32 += im->width;
@@ -125,10 +126,138 @@ void reduce_depth(pixel32 *data, XImage *im)
         g_message("your bit depth is currently unhandled\n");
     }
 }
+
 XColor *pickColor(int r, int g, int b) 
 {
   r = (r & 0xff) >> (8-pseudo_bpc);
   g = (g & 0xff) >> (8-pseudo_bpc);
   b = (b & 0xff) >> (8-pseudo_bpc);
   return &pseudo_colors[(r << (2*pseudo_bpc)) + (g << (1*pseudo_bpc)) + b];
+}
+
+static void swap_byte_order(XImage *im)
+{
+    int x, y, di;
+
+    g_message("SWAPPING BYTE ORDER");
+
+    di = 0;
+    for (y = 0; y < im->height; ++y) {
+        for (x = 0; x < im->height; ++x) {
+            char *c = &im->data[di + x * im->bits_per_pixel / 8];
+            char t;
+
+            switch (im->bits_per_pixel) {
+            case 32:
+                t = c[2];
+                c[2] = c[3];
+                c[3] = t;
+            case 16:
+                t = c[0];
+                c[0] = c[1];
+                c[1] = t;
+            case 8:
+                break;
+            default:
+                g_message("your bit depth is currently unhandled\n");
+            }
+        }
+        di += im->bytes_per_line;
+    }
+
+    if (im->byte_order == LSBFirst)
+        im->byte_order = MSBFirst;
+    else
+        im->byte_order = LSBFirst;
+}
+
+void increase_depth(pixel32 *data, XImage *im)
+{
+    int r, g, b;
+    int x,y;
+    pixel32 *p32 = (pixel32 *) im->data;
+    pixel16 *p16 = (pixel16 *) im->data;
+    unsigned char *p8 = (unsigned char *)im->data;
+
+    if (im->byte_order != render_endian)
+        swap_byte_order(im);
+
+    switch (im->bits_per_pixel) {
+    case 32:
+        for (y = 0; y < im->height; y++) {
+            for (x = 0; x < im->width; x++) {
+                r = (p32[x] >> render_red_offset) & 0xff;
+                g = (p32[x] >> render_green_offset) & 0xff;
+                b = (p32[x] >> render_blue_offset) & 0xff;
+                data[x] = (r << default_red_offset)
+                    + (g << default_green_offset)
+                    + (b << default_blue_offset)
+                    + (0xff << default_alpha_offset);
+            }
+            data += im->width;
+            p32 += im->bytes_per_line/4;
+        }
+        break;
+    case 16:
+        for (y = 0; y < im->height; y++) {
+            for (x = 0; x < im->width; x++) {
+                r = (p16[x] & render_red_mask) >> render_red_offset <<
+                    render_red_shift;
+                g = (p16[x] & render_green_mask) >> render_green_offset <<
+                    render_green_shift;
+                b = (p16[x] & render_blue_mask) >> render_blue_offset <<
+                    render_blue_shift;
+                data[x] = (r << default_red_offset)
+                    + (g << default_green_offset)
+                    + (b << default_blue_offset)
+                    + (0xff << default_alpha_offset);
+            }
+            data += im->width;
+            p16 += im->bytes_per_line/2;
+        }
+        break;
+    case 8:
+        g_assert(render_visual->class != TrueColor);
+        for (y = 0; y < im->height; y++) {
+            for (x = 0; x < im->width; x++) {
+                XColor icolor;
+                int ii, r, g, b;
+                gulong dev, closest = 0xffffffff, close = 0;
+
+                icolor.pixel = p8[x];
+                XQueryColor(ob_display, render_colormap, &icolor);
+
+                /* find the nearest color match */
+                for (ii = 0; ii < pseudo_ncolors(); ii++) {
+                    /* find deviations */
+                    r = (pseudo_colors[ii].red - icolor.red) & 0xff;
+                    g = (pseudo_colors[ii].green - icolor.green) & 0xff;
+                    b = (pseudo_colors[ii].blue - icolor.blue) & 0xff;
+                    /* find a weighted absolute deviation */
+                    dev = (r * r) * (0xff - (icolor.red & 0xff)) +
+                        (g * g) * (0xff - (icolor.green & 0xff)) +
+                        (b * b) * (0xff - (icolor.blue & 0xff));
+
+                    if (dev < closest) {
+                        closest = dev;
+                        close = ii;
+                    }
+                }
+                data[x] =
+                    (pseudo_colors[close].red & 0xff <<
+                     default_red_offset) +
+                    (pseudo_colors[close].green & 0xff <<
+                       default_green_offset) +
+                    (pseudo_colors[close].blue & 0xff <<
+                       default_blue_offset) +
+                    (0xff << default_alpha_offset);
+        }
+        data += im->width;
+        p8 += im->bytes_per_line;
+  }
+
+    break;
+    default:
+        g_message("your bit depth is currently unhandled\n");
+    }
 }

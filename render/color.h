@@ -25,12 +25,14 @@ typedef u_int16_t pixel16;
 #define default_red_offset 0
 #define default_green_offset 8
 #define default_blue_offset 16
-#define endian MSBFirst  
+#define default_alpha_offset 24
+#define render_endian MSBFirst  
 #else
+#define default_alpha_offset 24
 #define default_red_offset 16
 #define default_green_offset 8
 #define default_blue_offset 0
-#define endian LSBFirst
+#define render_endian LSBFirst
 #endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 
 
@@ -48,6 +50,7 @@ color_rgb *color_parse(char *colorname);
 color_rgb *color_new(int r, int g, int b);
 void color_free(color_rgb *in);
 void reduce_depth(pixel32 *data, XImage *im);
+void increase_depth(pixel32 *data, XImage *im);
 
 extern int render_red_offset;
 extern int render_green_offset;
@@ -57,6 +60,11 @@ extern int render_red_shift;
 extern int render_green_shift;
 extern int render_blue_shift;
 
+extern int render_red_mask;
+extern int render_green_mask;
+extern int render_blue_mask;
+
 extern int pseudo_bpc;
+#define pseudo_ncolors() (1 << (pseudo_bpc * 3))
 extern XColor *pseudo_colors;
 #endif /* __color_h */

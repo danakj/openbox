@@ -1142,6 +1142,9 @@ void client_update_wmhints(Client *self)
                                                           it->data);
             }
 
+            /* the WM_HINTS can contain an icon */
+            client_update_icons(self);
+
             /* because the self->transient flag wont change from this call,
                we don't need to update the window's type and such, only its
                transient_for, and the transients lists of other windows in
@@ -1317,11 +1320,23 @@ void client_update_icons(Client *self)
 	/* store the icons */
 	i = 0;
 	for (j = 0; j < self->nicons; ++j) {
+            guint x, y, t;
+
 	    w = self->icons[j].width = data[i++];
 	    h = self->icons[j].height = data[i++];
-	    self->icons[j].data =
-		g_memdup(&data[i], w * h * sizeof(gulong));
-	    i += w * h;
+
+	    self->icons[j].data = g_new(pixel32, w * h);
+            for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
+                if (x >= w) {
+                    x = 0;
+                    ++y;
+                }
+                self->icons[j].data[t] =
+                    (((data[i] >> 24) & 0xff) << default_alpha_offset) +
+                    (((data[i] >> 16) & 0xff) << default_red_offset) +
+                    (((data[i] >> 8) & 0xff) << default_green_offset) +
+                    (((data[i] >> 0) & 0xff) << default_blue_offset);
+            }
 	    g_assert(i <= num);
 	}
 
@@ -1331,13 +1346,34 @@ void client_update_icons(Client *self)
         if (num == 2) {
             self->nicons++;
             self->icons = g_new(Icon, self->nicons);
-            /* XXX WHAT IF THIS FAILS YOU TWIT!@!*()@ */
-            render_pixmap_to_rgba(data[0], data[1],
-                                  &self->icons[self->nicons-1].width,
-                                  &self->icons[self->nicons-1].height,
-                                  &self->icons[self->nicons-1].data);
+            if (!render_pixmap_to_rgba(data[0], data[1],
+                                       &self->icons[self->nicons-1].width,
+                                       &self->icons[self->nicons-1].height,
+                                       &self->icons[self->nicons-1].data)) {
+                g_free(&self->icons[self->nicons-1]);
+                self->nicons--;
+            }
         }
         g_free(data);
+    } else {
+        XWMHints *hints;
+
+        if ((hints = XGetWMHints(ob_display, self->window))) {
+            if (hints->flags & IconPixmapHint) {
+                self->nicons++;
+                self->icons = g_new(Icon, self->nicons);
+                if (!render_pixmap_to_rgba(hints->icon_pixmap,
+                                           (hints->flags & IconMaskHint ?
+                                            hints->icon_mask : None),
+                                           &self->icons[self->nicons-1].width,
+                                           &self->icons[self->nicons-1].height,
+                                           &self->icons[self->nicons-1].data)){
+                    g_free(&self->icons[self->nicons-1]);
+                    self->nicons--;
+                }
+            }
+            XFree(hints);
+        }
     }
 
     if (self->frame)

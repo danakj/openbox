@@ -99,7 +99,7 @@ struct SendToDesktopDirection {
 };
 
 struct Desktop {
-    struct AnyAction any;
+    struct InteractiveAction inter;
     guint desk;
 };
 

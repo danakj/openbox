@@ -201,6 +201,11 @@ void setup_action_send_to_desktop_down(ObAction **a, ObUserAction uact)
     (*a)->data.sendtodir.follow = TRUE;
 }
 
+void setup_action_desktop(ObAction **a, ObUserAction uact)
+{
+    (*a)->data.desktop.inter.any.interactive = TRUE;
+}
+
 void setup_action_desktop_prev(ObAction **a, ObUserAction uact)
 {
     (*a)->data.desktopdir.inter.any.interactive = TRUE;
@@ -589,7 +594,7 @@ ActionString actionstrings[] =
     {
         "desktop",
         action_desktop,
-        NULL
+        setup_action_desktop
     },
     {
         "desktopnext",
@@ -770,7 +775,9 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
             a = action_new(actionstrings[i].func, uact);
             if (actionstrings[i].setup)
                 actionstrings[i].setup(&a, uact);
-            /* only key bindings can be interactive. thus saith the xor. */
+            /* only key bindings can be interactive. thus saith the xor.
+             because of how the mouse is grabbed, mouse events dont even get
+             read during interactive events, so no dice! >:) */
             if (uact != OB_USER_ACTION_KEYBOARD_KEY)
                 a->data.any.interactive = FALSE;
             break;
@@ -1162,9 +1169,29 @@ void action_send_to_desktop(union ActionData *data)
 
 void action_desktop(union ActionData *data)
 {
-    if (data->desktop.desk < screen_num_desktops ||
-        data->desktop.desk == DESKTOP_ALL)
-        screen_set_desktop(data->desktop.desk);
+    static guint first = (unsigned) -1;
+
+    if (data->inter.any.interactive && first == (unsigned) -1)
+        first = screen_desktop;
+
+    if (!data->inter.any.interactive ||
+        (!data->inter.cancel && !data->inter.final))
+    {
+        if (data->desktop.desk < screen_num_desktops ||
+            data->desktop.desk == DESKTOP_ALL)
+        {
+            screen_set_desktop(data->desktop.desk);
+            if (data->inter.any.interactive)
+                screen_desktop_popup(data->desktop.desk, TRUE);
+        }
+    } else if (data->inter.cancel) {
+        screen_set_desktop(first);
+    }
+
+    if (data->inter.any.interactive && data->inter.final) {
+        screen_desktop_popup(0, FALSE);
+        first = (unsigned) -1;
+    }
 }
 
 void action_desktop_dir(union ActionData *data)

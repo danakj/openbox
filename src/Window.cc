@@ -1422,6 +1422,9 @@ Bool OpenboxWindow::setInputFocus(void) {
 void OpenboxWindow::iconify(void) {
   if (flags.iconic) return;
 
+  if (flags.moving)
+    endMove();
+
   if (windowmenu) windowmenu->hide();
 
   setState(IconicState);

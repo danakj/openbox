@@ -31,40 +31,6 @@ void render_startup(void)
     render_visual = DefaultVisual(ob_display, ob_screen);
     render_colormap = DefaultColormap(ob_display, ob_screen);
 
-    if (render_depth < 8) {
-      XVisualInfo vinfo_template, *vinfo_return;
-      /* search for a TrueColor Visual... if we can't find one...
-         we will use the default visual for the screen */
-      int vinfo_nitems;
-      int best = -1;
-
-      vinfo_template.screen = ob_screen;
-      vinfo_template.class = TrueColor;
-      vinfo_return = XGetVisualInfo(ob_display,
-                                    VisualScreenMask | VisualClassMask,
-                                    &vinfo_template, &vinfo_nitems);
-      if (vinfo_return) {
-        int i;
-        int max_depth = 1;
-        for (i = 0; i < vinfo_nitems; ++i) {
-          if (vinfo_return[i].depth > max_depth) {
-            if (max_depth == 24 && vinfo_return[i].depth > 24)
-                break;          /* prefer 24 bit over 32 */
-            max_depth = vinfo_return[i].depth;
-            best = i;
-          }
-        }
-        if (max_depth < render_depth) best = -1;
-      }
-      if (best != -1) {
-        render_depth = vinfo_return[best].depth;
-        render_visual = vinfo_return[best].visual;
-        render_colormap = XCreateColormap(ob_display, ob_root, render_visual,
-                                          AllocNone);
-        render_visual_info = vinfo_return[best];
-      }
-      XFree(vinfo_return);
-    }  
   switch (render_visual->class) {
   case TrueColor:
     truecolor_startup();

@@ -16,8 +16,6 @@
 %}
 
 %include "stl.i"
-//%include std_list.i
-//%template(ClientList) std::list<Client*>;
 %include "callback.i"
 
 %immutable ob::openbox;
@@ -28,23 +26,19 @@
 %};
 */
 
-%ignore ob::Screen::clients;
-%{
-  #include <iterator>
-%}
-%extend ob::Screen {
-  Client *client(int i) {
-    if (i < 0 || i >= (int)self->clients.size())
-      return NULL;
-    ob::Client::List::iterator it = self->clients.begin();
-    std::advance(it,i);
-    return *it;
-  }
-  int clientCount() const {
-    return (int) self->clients.size();
-  }
-};
+%typemap(python,out) std::list<ob::Client*> {
+  unsigned int s = $1.size();
+  PyObject *l = PyList_New(s);
 
+  std::list<ob::Client*>::const_iterator it = $1.begin(), end = $1.end();
+  for (unsigned int i = 0; i < s; ++i, ++it) {
+    PyObject *pdata = SWIG_NewPointerObj((void *) *it,
+                                         SWIGTYPE_p_ob__Client, 0);
+    PyList_SET_ITEM(l, i, pdata);
+ }
+  $result = l;
+}
+ 
 // do this through events
 %ignore ob::Screen::showDesktop(bool);
 

@@ -78,8 +78,38 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
         else
             ret = TRUE;
     } else if (pgrabs > 0) {
-        if (--pgrabs == 0)
+        if (--pgrabs == 0) {
             XUngrabPointer(ob_display, event_lasttime);
+
+            /* ignore all enter events caused by ungrabbing the pointer */
+            {
+                GSList *saved = NULL, *it;
+                XEvent *e;
+                guint n = 0;
+                
+                XSync(ob_display, FALSE);
+
+                /* count the events */
+                while (TRUE) {
+                    e = g_new(XEvent, 1);
+                    if (XCheckTypedEvent(ob_display, EnterNotify, e)) {
+                        saved = g_slist_append(saved, e);
+                        ++n;
+                    } else {
+                        g_free(e);
+                        break;
+                    }
+                }
+                /* put the events back */
+                for (it = saved; it; it = g_slist_next(it)) {
+                    XPutBackEvent(ob_display, it->data);
+                    g_free(it->data);
+                }
+                g_slist_free(saved);
+                /* ignore the events */
+                event_ignore_enter_focus(n);
+            }
+        }
         ret = TRUE;
     }
     return ret;

@@ -248,9 +248,9 @@ void event_process(XEvent *e)
                 /* secret magic way of event_process telling us that no client
                    was found for the FocusIn event */
                 if (fi.xfocus.window == None)
-                    focus_set_client(NULL);
+                    focus_fallback(FALSE);
             } else
-                focus_set_client(NULL);
+                focus_fallback(FALSE);
         }
 	break;
     case EnterNotify:

@@ -23,8 +23,8 @@ public:
   inline const ustring& label() const { return _label; }
   inline const bool& isDefault() const { return _default; }
 
-  bool operator==(const DialogButton &o) { return _label == o._label; }
-  bool operator!=(const DialogButton &o) { return !(_label == o._label); }
+  bool operator==(const DialogButton &o) const { return  _label == o._label;  }
+  bool operator!=(const DialogButton &o) const { return!(_label == o._label); }
 };
 
 class MessageDialog : public Widget {

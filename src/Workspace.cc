@@ -68,7 +68,7 @@ Workspace::Workspace(BScreen *scrn, int i) {
 
   stackingList = new LinkedList<OpenboxWindow>;
   windowList = new LinkedList<OpenboxWindow>;
-  clientmenu = new Clientmenu(this);
+  clientmenu = new Clientmenu(*this);
 
   lastfocus = (OpenboxWindow *) 0;
 

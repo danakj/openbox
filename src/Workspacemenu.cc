@@ -38,9 +38,7 @@
 #include "Workspace.h"
 
 
-Workspacemenu::Workspacemenu(BScreen *scrn) : Basemenu(scrn) {
-  screen = scrn;
-
+Workspacemenu::Workspacemenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
   setInternalMenu();
 
   setLabel(i18n->getMessage(WorkspacemenuSet, WorkspacemenuWorkspacesTitle,
@@ -57,13 +55,13 @@ void Workspacemenu::itemSelected(int button, int index) {
     return;
 
   if (index == 0)
-    screen->addWorkspace();
+    screen.addWorkspace();
   else if (index == 1)
-    screen->removeLastWorkspace();
-  else if ((screen->getCurrentWorkspace()->getWorkspaceID() !=
-	    (index - 2)) && ((index - 2) < screen->getWorkspaceCount()))
-    screen->changeWorkspaceID(index - 2);
+    screen.removeLastWorkspace();
+  else if ((screen.getCurrentWorkspace()->getWorkspaceID() !=
+	    (index - 2)) && ((index - 2) < screen.getWorkspaceCount()))
+    screen.changeWorkspaceID(index - 2);
 
-  if (! (screen->getWorkspacemenu()->isTorn() || isTorn()))
+  if (! (screen.getWorkspacemenu()->isTorn() || isTorn()))
     hide();
 }

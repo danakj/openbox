@@ -69,14 +69,14 @@ Toolbar::Toolbar(BScreen *scrn) {
   openbox = screen->getOpenbox();
 
   // get the clock updating every minute
-  clock_timer = new BTimer(openbox, this);
+  clock_timer = new BTimer(*openbox, *this);
   timeval now;
   gettimeofday(&now, 0);
   clock_timer->setTimeout((60 - (now.tv_sec % 60)) * 1000);
   clock_timer->start();
 
   hide_handler.toolbar = this;
-  hide_timer = new BTimer(openbox, &hide_handler);
+  hide_timer = new BTimer(*openbox, hide_handler);
   hide_timer->setTimeout(openbox->getAutoRaiseDelay());
   hide_timer->fireOnce(True);
 
@@ -90,7 +90,7 @@ Toolbar::Toolbar(BScreen *scrn) {
   new_name_pos = 0;
   frame.grab_x = frame.grab_y = 0;
 
-  toolbarmenu = new Toolbarmenu(this);
+  toolbarmenu = new Toolbarmenu(*this);
 
   display = openbox->getXDisplay();
   XSetWindowAttributes attrib;
@@ -1140,13 +1140,11 @@ void Toolbar::HideHandler::timeout(void) {
 }
 
 
-Toolbarmenu::Toolbarmenu(Toolbar *tb) : Basemenu(tb->screen) {
-  toolbar = tb;
-
+Toolbarmenu::Toolbarmenu(Toolbar &tb) : Basemenu(*tb.screen), toolbar(tb) {
   setLabel(i18n->getMessage(ToolbarSet, ToolbarToolbarTitle, "Toolbar"));
   setInternalMenu();
 
-  placementmenu = new Placementmenu(this);
+  placementmenu = new Placementmenu(*this);
 
   insert(i18n->getMessage(CommonSet, CommonPlacementTitle, "Placement"),
 	 placementmenu);
@@ -1157,8 +1155,8 @@ Toolbarmenu::Toolbarmenu(Toolbar *tb) : Basemenu(tb->screen) {
 
   update();
 
-  if (toolbar->isOnTop()) setItemSelected(1, True);
-  if (toolbar->doAutoHide()) setItemSelected(2, True);
+  if (toolbar.isOnTop()) setItemSelected(1, True);
+  if (toolbar.doAutoHide()) setItemSelected(2, True);
 }
 
 
@@ -1176,27 +1174,27 @@ void Toolbarmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    Bool change = ((toolbar->isOnTop()) ? False : True);
-    toolbar->on_top = change;
+    Bool change = ((toolbar.isOnTop()) ? False : True);
+    toolbar.on_top = change;
     setItemSelected(1, change);
 
-    if (toolbar->isOnTop()) toolbar->screen->raiseWindows((Window *) 0, 0);
+    if (toolbar.isOnTop()) toolbar.screen->raiseWindows((Window *) 0, 0);
     break;
   }
 
   case 2: { // auto hide
-    Bool change = ((toolbar->doAutoHide()) ?  False : True);
-    toolbar->do_auto_hide = change;
+    Bool change = ((toolbar.doAutoHide()) ?  False : True);
+    toolbar.do_auto_hide = change;
     setItemSelected(2, change);
 
 #ifdef    SLIT
-    toolbar->screen->getSlit()->reposition();
+    toolbar.screen->getSlit()->reposition();
 #endif // SLIT
     break;
   }
 
   case 3: { // edit current workspace name
-    toolbar->edit();
+    toolbar.edit();
     hide();
 
     break;
@@ -1207,8 +1205,8 @@ void Toolbarmenu::itemSelected(int button, int index) {
 
 void Toolbarmenu::internal_hide(void) {
   Basemenu::internal_hide();
-  if (toolbar->doAutoHide() && ! toolbar->isEditing())
-    toolbar->hide_handler.timeout();
+  if (toolbar.doAutoHide() && ! toolbar.isEditing())
+    toolbar.hide_handler.timeout();
 }
 
 
@@ -1219,10 +1217,8 @@ void Toolbarmenu::reconfigure(void) {
 }
 
 
-Toolbarmenu::Placementmenu::Placementmenu(Toolbarmenu *tm)
-  : Basemenu(tm->toolbar->screen) {
-  toolbarmenu = tm;
-
+Toolbarmenu::Placementmenu::Placementmenu(Toolbarmenu &tm)
+  : Basemenu(*tm.toolbar.screen), toolbarmenu(tm) {
   setLabel(i18n->getMessage(ToolbarSet, ToolbarToolbarPlacement,
 			    "Toolbar Placement"));
   setInternalMenu();
@@ -1251,13 +1247,13 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, int index) {
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  toolbarmenu->toolbar->screen->saveToolbarPlacement(item->function());
+  toolbarmenu.toolbar.screen->saveToolbarPlacement(item->function());
   hide();
-  toolbarmenu->toolbar->reconfigure();
+  toolbarmenu.toolbar.reconfigure();
 
 #ifdef    SLIT
   // reposition the slit as well to make sure it doesn't intersect the
   // toolbar
-  toolbarmenu->toolbar->screen->getSlit()->reposition();
+  toolbarmenu.toolbar.screen->getSlit()->reposition();
 #endif // SLIT
 }

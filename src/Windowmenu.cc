@@ -42,15 +42,15 @@
 #endif // STDC_HEADERS
 
 
-Windowmenu::Windowmenu(OpenboxWindow *win) : Basemenu(win->getScreen()) {
-  window = win;
-  screen = window->getScreen();
+Windowmenu::Windowmenu(OpenboxWindow &win) : Basemenu(*win.getScreen()),
+  window(win), screen(*win.getScreen())
+{
 
   setTitleVisibility(False);
   setMovable(False);
   setInternalMenu();
 
-  sendToMenu = new SendtoWorkspacemenu(this);
+  sendToMenu = new SendtoWorkspacemenu(*this);
   insert(i18n->getMessage(WindowmenuSet, WindowmenuSendTo, "Send To ..."),
 	 sendToMenu);
   insert(i18n->getMessage(WindowmenuSet, WindowmenuShade, "Shade"),
@@ -72,10 +72,10 @@ Windowmenu::Windowmenu(OpenboxWindow *win) : Basemenu(win->getScreen()) {
 
   update();
 
-  setItemEnabled(1, window->hasTitlebar());
-  setItemEnabled(2, window->isIconifiable());
-  setItemEnabled(3, window->isMaximizable());
-  setItemEnabled(8, window->isClosable());
+  setItemEnabled(1, window.hasTitlebar());
+  setItemEnabled(2, window.isIconifiable());
+  setItemEnabled(3, window.isMaximizable());
+  setItemEnabled(8, window.isClosable());
 }
 
 
@@ -85,9 +85,9 @@ Windowmenu::~Windowmenu(void) {
 
 
 void Windowmenu::show(void) {
-  if (isItemEnabled(1)) setItemSelected(1, window->isShaded());
-  if (isItemEnabled(3)) setItemSelected(3, window->isMaximized());
-  if (isItemEnabled(6)) setItemSelected(6, window->isStuck());
+  if (isItemEnabled(1)) setItemSelected(1, window.isShaded());
+  if (isItemEnabled(3)) setItemSelected(3, window.isMaximized());
+  if (isItemEnabled(6)) setItemSelected(6, window.isStuck());
 
   Basemenu::show();
 }
@@ -106,50 +106,50 @@ void Windowmenu::itemSelected(int button, int index) {
     hide();
     switch (item->function()) {
     case BScreen::WindowShade:
-      window->shade();
+      window.shade();
       break;
 
     case BScreen::WindowIconify:
-      window->iconify();
+      window.iconify();
       break;
 
     case BScreen::WindowMaximize:
-      window->maximize((unsigned int) button);
+      window.maximize((unsigned int) button);
       break;
 
     case BScreen::WindowClose:
-      window->close();
+      window.close();
       break;
 
     case BScreen::WindowRaise:
-      screen->getWorkspace(window->getWorkspaceNumber())->raiseWindow(window);
+      screen.getWorkspace(window.getWorkspaceNumber())->raiseWindow(&window);
       break;
 
     case BScreen::WindowLower:
-      screen->getWorkspace(window->getWorkspaceNumber())->lowerWindow(window);
+      screen.getWorkspace(window.getWorkspaceNumber())->lowerWindow(&window);
       break;
 
     case BScreen::WindowStick:
-      window->stick();
+      window.stick();
       break;
 
     case BScreen::WindowKill:
-      XKillClient(screen->getBaseDisplay()->getXDisplay(),
-                  window->getClientWindow());
+      XKillClient(screen.getBaseDisplay()->getXDisplay(),
+                  window.getClientWindow());
       break;
     }
   } else if (item->function() == BScreen::WindowMaximize) {
     hide();
-    window->maximize((unsigned int) button);
+    window.maximize((unsigned int) button);
   }
 }
 
 
 void Windowmenu::reconfigure(void) {
-  setItemEnabled(1, window->hasTitlebar());
-  setItemEnabled(2, window->isIconifiable());
-  setItemEnabled(3, window->isMaximizable());
-  setItemEnabled(8, window->isClosable());
+  setItemEnabled(1, window.hasTitlebar());
+  setItemEnabled(2, window.isIconifiable());
+  setItemEnabled(3, window.isMaximizable());
+  setItemEnabled(8, window.isClosable());
 
   sendToMenu->reconfigure();
 
@@ -157,10 +157,8 @@ void Windowmenu::reconfigure(void) {
 }
 
 
-Windowmenu::SendtoWorkspacemenu::SendtoWorkspacemenu(Windowmenu *w)
-  : Basemenu(w->screen) {
-  windowmenu = w;
-
+Windowmenu::SendtoWorkspacemenu::SendtoWorkspacemenu(Windowmenu &w)
+  : Basemenu(w.screen), windowmenu(w) {
   setTitleVisibility(False);
   setMovable(False);
   setInternalMenu();
@@ -171,13 +169,13 @@ Windowmenu::SendtoWorkspacemenu::SendtoWorkspacemenu(Windowmenu *w)
 void Windowmenu::SendtoWorkspacemenu::itemSelected(int button, int index) {
   if (button > 2) return;
 
-  if (index <= windowmenu->screen->getWorkspaceCount()) {
-    if (index == windowmenu->screen->getCurrentWorkspaceID()) return;
-    if (windowmenu->window->isStuck()) windowmenu->window->stick();
+  if (index <= windowmenu.screen.getWorkspaceCount()) {
+    if (index == windowmenu.screen.getCurrentWorkspaceID()) return;
+    if (windowmenu.window.isStuck()) windowmenu.window.stick();
 
-    if (button == 1) windowmenu->window->withdraw();
-    windowmenu->screen->reassociateWindow(windowmenu->window, index, True);
-    if (button == 2) windowmenu->screen->changeWorkspaceID(index);
+    if (button == 1) windowmenu.window.withdraw();
+    windowmenu.screen.reassociateWindow(&(windowmenu.window), index, True);
+    if (button == 2) windowmenu.screen.changeWorkspaceID(index);
   }
   hide();
 }
@@ -190,8 +188,8 @@ void Windowmenu::SendtoWorkspacemenu::update(void) {
     for (i = 0; i < r; ++i)
       remove(0);
 
-  for (i = 0; i < windowmenu->screen->getWorkspaceCount(); ++i)
-    insert(windowmenu->screen->getWorkspace(i)->getName());
+  for (i = 0; i < windowmenu.screen.getWorkspaceCount(); ++i)
+    insert(windowmenu.screen.getWorkspace(i)->getName());
 
   Basemenu::update();
 }

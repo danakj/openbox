@@ -37,30 +37,30 @@ class Slitmenu : public Basemenu {
 private: 
   class Directionmenu : public Basemenu {
   private:
-    Slitmenu *slitmenu;
+    Slitmenu &slitmenu;
 
   protected:
     virtual void itemSelected(int, int);
 
   public:
-    Directionmenu(Slitmenu *);
+    Directionmenu(Slitmenu &);
   };
 
   class Placementmenu : public Basemenu {
   private:
-    Slitmenu *slitmenu;
+    Slitmenu &slitmenu;
 
   protected: 
     virtual void itemSelected(int, int);
 
   public:
-    Placementmenu(Slitmenu *);
+    Placementmenu(Slitmenu &);
   };
 
   Directionmenu *directionmenu;
   Placementmenu *placementmenu;
 
-  Slit *slit;
+  Slit &slit;
 
   friend class Directionmenu;
   friend class Placementmenu;
@@ -73,7 +73,7 @@ protected:
 
 
 public:
-  Slitmenu(Slit *);
+  Slitmenu(Slit &);
   virtual ~Slitmenu(void);
 
   inline Basemenu *getDirectionmenu(void) { return directionmenu; }

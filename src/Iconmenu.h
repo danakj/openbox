@@ -31,13 +31,13 @@ class BScreen;
 
 class Iconmenu : public Basemenu {
 private:
-  BScreen *screen;
+  BScreen &screen;
 
 protected:
   virtual void itemSelected(int, int);
 
 public:
-  Iconmenu(BScreen *);
+  Iconmenu(BScreen &);
 };
 
 

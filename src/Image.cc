@@ -1774,7 +1774,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, ScreenInfo *scrn, Bool _dither,
   cache_max = cmax;
 #ifdef    TIMEDCACHE
   if (cache_timeout) {
-    timer = new BTimer(basedisplay, this);
+    timer = new BTimer(*basedisplay, *this);
     timer->setTimeout(cache_timeout);
     timer->start();
   } else

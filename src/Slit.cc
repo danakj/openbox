@@ -52,13 +52,13 @@ Slit::Slit(BScreen *scr) {
   display = screen->getBaseDisplay()->getXDisplay();
   frame.window = frame.pixmap = None;
 
-  timer = new BTimer(openbox, this);
+  timer = new BTimer(*openbox, *this);
   timer->setTimeout(openbox->getAutoRaiseDelay());
   timer->fireOnce(True);
 
   clientList = new LinkedList<SlitClient>;
 
-  slitmenu = new Slitmenu(this);
+  slitmenu = new Slitmenu(*this);
 
   XSetWindowAttributes attrib;
   unsigned long create_mask = CWBackPixmap | CWBackPixel | CWBorderPixel |
@@ -609,14 +609,12 @@ void Slit::timeout(void) {
 }
 
 
-Slitmenu::Slitmenu(Slit *sl) : Basemenu(sl->screen) {
-  slit = sl;
-
+Slitmenu::Slitmenu(Slit &sl) : Basemenu(*sl.screen), slit(sl) {
   setLabel(i18n->getMessage(SlitSet, SlitSlitTitle, "Slit"));
   setInternalMenu();
 
-  directionmenu = new Directionmenu(this);
-  placementmenu = new Placementmenu(this);
+  directionmenu = new Directionmenu(*this);
+  placementmenu = new Placementmenu(*this);
 
   insert(i18n->getMessage(CommonSet, CommonDirectionTitle, "Direction"),
 	 directionmenu);
@@ -627,8 +625,8 @@ Slitmenu::Slitmenu(Slit *sl) : Basemenu(sl->screen) {
 
   update();
 
-  if (slit->isOnTop()) setItemSelected(2, True);
-  if (slit->doAutoHide()) setItemSelected(3, True);
+  if (slit.isOnTop()) setItemSelected(2, True);
+  if (slit.doAutoHide()) setItemSelected(3, True);
 }
 
 
@@ -647,17 +645,17 @@ void Slitmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    Bool change = ((slit->isOnTop()) ?  False : True);
-    slit->on_top = change;
+    Bool change = ((slit.isOnTop()) ?  False : True);
+    slit.on_top = change;
     setItemSelected(2, change);
 
-    if (slit->isOnTop()) slit->screen->raiseWindows((Window *) 0, 0);
+    if (slit.isOnTop()) slit.screen->raiseWindows((Window *) 0, 0);
     break;
   }
 
   case 2: { // auto hide
-    Bool change = ((slit->doAutoHide()) ?  False : True);
-    slit->do_auto_hide = change;
+    Bool change = ((slit.doAutoHide()) ?  False : True);
+    slit.do_auto_hide = change;
     setItemSelected(3, change);
 
     break;
@@ -668,8 +666,8 @@ void Slitmenu::itemSelected(int button, int index) {
 
 void Slitmenu::internal_hide(void) {
   Basemenu::internal_hide();
-  if (slit->doAutoHide())
-    slit->timeout();
+  if (slit.doAutoHide())
+    slit.timeout();
 }
 
 
@@ -681,10 +679,8 @@ void Slitmenu::reconfigure(void) {
 }
 
 
-Slitmenu::Directionmenu::Directionmenu(Slitmenu *sm)
-  : Basemenu(sm->slit->screen) {
-  slitmenu = sm;
-
+Slitmenu::Directionmenu::Directionmenu(Slitmenu &sm)
+  : Basemenu(*sm.slit.screen), slitmenu(sm) {
   setLabel(i18n->getMessage(SlitSet, SlitSlitDirection, "Slit Direction"));
   setInternalMenu();
 
@@ -695,7 +691,7 @@ Slitmenu::Directionmenu::Directionmenu(Slitmenu *sm)
 
   update();
 
-  if (sm->slit->screen->getSlitDirection() == Slit::Horizontal)
+  if (sm.slit.screen->getSlitDirection() == Slit::Horizontal)
     setItemSelected(0, True);
   else
     setItemSelected(1, True);
@@ -709,7 +705,7 @@ void Slitmenu::Directionmenu::itemSelected(int button, int index) {
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  slitmenu->slit->screen->saveSlitDirection(item->function());
+  slitmenu.slit.screen->saveSlitDirection(item->function());
 
   if (item->function() == Slit::Horizontal) {
     setItemSelected(0, True);
@@ -720,13 +716,12 @@ void Slitmenu::Directionmenu::itemSelected(int button, int index) {
   }
 
   hide();
-  slitmenu->slit->reconfigure();
+  slitmenu.slit.reconfigure();
 }
 
 
-Slitmenu::Placementmenu::Placementmenu(Slitmenu *sm)
-  : Basemenu(sm->slit->screen) {
-  slitmenu = sm;
+Slitmenu::Placementmenu::Placementmenu(Slitmenu &sm)
+  : Basemenu(*sm.slit.screen), slitmenu(sm) {
 
   setLabel(i18n->getMessage(SlitSet, SlitSlitPlacement, "Slit Placement"));
   setMinimumSublevels(3);
@@ -764,9 +759,9 @@ void Slitmenu::Placementmenu::itemSelected(int button, int index) {
   BasemenuItem *item = find(index);
   if (! (item && item->function())) return;
 
-  slitmenu->slit->screen->saveSlitPlacement(item->function());
+  slitmenu.slit.screen->saveSlitPlacement(item->function());
   hide();
-  slitmenu->slit->reconfigure();
+  slitmenu.slit.reconfigure();
 }
 
 

@@ -180,8 +180,8 @@ static const char *getFontSize(const char *pattern, int *size) {
 }
 
 
-BScreen::BScreen(Openbox *bb, int scrn) : ScreenInfo(bb, scrn) {
-  openbox = bb;
+BScreen::BScreen(Openbox *ob, int scrn) : ScreenInfo(ob, scrn) {
+  openbox = ob;
 
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	       SubstructureRedirectMask | KeyPressMask | KeyReleaseMask |
@@ -389,9 +389,9 @@ BScreen::BScreen(Openbox *bb, int scrn) : ScreenInfo(bb, scrn) {
     }
   }
 
-  workspacemenu = new Workspacemenu(this);
-  iconmenu = new Iconmenu(this);
-  configmenu = new Configmenu(this);
+  workspacemenu = new Workspacemenu(*this);
+  iconmenu = new Iconmenu(*this);
+  configmenu = new Configmenu(*this);
 
   Workspace *wkspc = (Workspace *) 0;
   if (resource.workspaces != 0) {
@@ -1696,7 +1696,7 @@ void BScreen::InitMenu(void) {
     while (rootmenu->getCount())
       rootmenu->remove(0);
   } else {
-    rootmenu = new Rootmenu(this);
+    rootmenu = new Rootmenu(*this);
   }
   Bool defaultMenu = True;
 
@@ -1984,7 +1984,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 	      continue;
 	    }
 
-	    Rootmenu *submenu = new Rootmenu(this);
+	    Rootmenu *submenu = new Rootmenu(*this);
 
 	    if (*command)
 	      submenu->setLabel(command);
@@ -2075,7 +2075,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                 Rootmenu *stylesmenu;
 
                 if (newmenu)
-                  stylesmenu = new Rootmenu(this);
+                  stylesmenu = new Rootmenu(*this);
                 else
                   stylesmenu = menu;
 

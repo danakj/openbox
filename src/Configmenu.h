@@ -54,8 +54,7 @@ private:
     Placementmenu(Configmenu *);
   };
 
-  Openbox *openbox;
-  BScreen *screen;
+  BScreen &screen;
   Focusmenu *focusmenu;
   Placementmenu *placementmenu;
 
@@ -66,7 +65,7 @@ protected:
   virtual void itemSelected(int, int);
 
 public:
-  Configmenu(BScreen *);
+  Configmenu(BScreen &);
   virtual ~Configmenu(void);
 
   inline Basemenu *getFocusmenu(void) { return focusmenu; }

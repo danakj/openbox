@@ -36,10 +36,8 @@
 #include "Window.h"
 
 
-Iconmenu::Iconmenu(BScreen *scrn) : Basemenu(scrn) {
+Iconmenu::Iconmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
   setInternalMenu();
-
-  screen = scrn;
 
   setLabel(i18n->getMessage(IconSet, IconIcons, "Icons"));
   update();
@@ -50,8 +48,8 @@ void Iconmenu::itemSelected(int button, int index) {
   if (button != 1)
     return;
 
-  if (index >= 0 && index < screen->getIconCount()) {
-    OpenboxWindow *win = screen->getIcon(index);
+  if (index >= 0 && index < screen.getIconCount()) {
+    OpenboxWindow *win = screen.getIcon(index);
 
     if (win) {
       win->deiconify();
@@ -59,6 +57,6 @@ void Iconmenu::itemSelected(int button, int index) {
     }
   }
 
-  if (! (screen->getWorkspacemenu()->isTorn() || isTorn()))
+  if (! (screen.getWorkspacemenu()->isTorn() || isTorn()))
     hide();
 }

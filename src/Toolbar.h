@@ -35,16 +35,16 @@ class Toolbarmenu : public Basemenu {
 private:
   class Placementmenu : public Basemenu {
   private:
-    Toolbarmenu *toolbarmenu;
+    Toolbarmenu &toolbarmenu;
 
   protected:
     virtual void itemSelected(int, int);
 
   public:
-    Placementmenu(Toolbarmenu *);
+    Placementmenu(Toolbarmenu &);
   };
 
-  Toolbar *toolbar;
+  Toolbar &toolbar;
   Placementmenu *placementmenu;
 
   friend class Placementmenu;
@@ -56,7 +56,7 @@ protected:
   virtual void internal_hide(void);
 
 public:
-  Toolbarmenu(Toolbar *);
+  Toolbarmenu(Toolbar &);
   ~Toolbarmenu(void);
 
   inline Basemenu *getPlacementmenu(void) { return placementmenu; }

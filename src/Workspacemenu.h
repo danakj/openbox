@@ -31,13 +31,13 @@ class Toolbar;
 
 class Workspacemenu : public Basemenu {
 private:
-  BScreen *screen;
+  BScreen &screen;
 
 protected:
   virtual void itemSelected(int, int);
 
 public:
-  Workspacemenu(BScreen *);
+  Workspacemenu(BScreen &);
 };
 
 

@@ -36,10 +36,10 @@ class BasemenuItem;
 class Basemenu {
 private:
   LinkedList<BasemenuItem> *menuitems;
-  Openbox *openbox;
+  Openbox &openbox;
   Basemenu *parent;
   BImageControl *image_ctrl;
-  BScreen *screen;
+  BScreen &screen;
 
   Bool moving, visible, movable, torn, internal_menu, title_vis, shifted,
     hide_tree;
@@ -74,13 +74,13 @@ protected:
 
 
 public:
-  Basemenu(BScreen *);
+  Basemenu(BScreen &);
   virtual ~Basemenu(void);
 
   inline const Bool &isTorn(void) const { return torn; }
   inline const Bool &isVisible(void) const { return visible; }
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen &getScreen(void) { return screen; }
 
   inline const Window &getWindowID(void) const { return menu.window; }
 

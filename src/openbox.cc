@@ -228,7 +228,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   reconfigure_wait = reread_menu_wait = False;
 
-  timer = new BTimer(this, this);
+  timer = new BTimer(*this, *this);
   timer->setTimeout(0);
   timer->fireOnce(True);
 

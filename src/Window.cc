@@ -152,7 +152,7 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
   lastButtonPressTime = 0;
   image_ctrl = screen->getImageControl();
 
-  timer = new BTimer(openbox, this);
+  timer = new BTimer(*openbox, *this);
   timer->setTimeout(openbox->getAutoRaiseDelay());
   timer->fireOnce(True);
 
@@ -280,7 +280,7 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
   XMapSubwindows(display, frame.window);
 
   if (decorations.menu)
-    windowmenu = new Windowmenu(this);
+    windowmenu = new Windowmenu(*this);
 
   decorate();
 

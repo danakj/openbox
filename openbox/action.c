@@ -784,7 +784,7 @@ void action_raiselower(union ActionData *data)
         ObClient *cit = it->data;
 
         if (cit == c) break;
-        if (client_normal(cit) && cit->layer == c->layer) {
+        if (client_normal(cit) == client_normal(c) && cit->layer == c->layer) {
             if (RECT_INTERSECTS_RECT(cit->frame->area, c->frame->area)) {
                 raise = TRUE;
                 break;

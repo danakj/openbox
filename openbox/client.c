@@ -290,10 +290,10 @@ void client_manage(Window window)
 
     screen_update_struts();
 
+    dispatch_client(Event_Client_New, self, 0, 0);
+
     /* make sure the window is visible */
     client_move_onscreen(self);
-
-    dispatch_client(Event_Client_New, self, 0, 0);
 
     client_showhide(self);
 

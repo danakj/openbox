@@ -67,7 +67,7 @@ static void showHelp(int exitval) {
               "  -rc <string>\t\t\tuse alternate resource file.\n"
               "  -version\t\t\tdisplay version and exit.\n"
               "  -help\t\t\t\tdisplay this help text and exit.\n\n"),
-         __blackbox_version);
+         __openbox_version);
 
   // some people have requested that we print out compile options
   // as well

@@ -164,3 +164,9 @@ void XWindow::raise() const {
 void XWindow::lower() const {
   XLowerWindow(_epist->getXDisplay(), _window);
 }
+
+
+void XWindow::iconify() const {
+  _xatom->sendClientMessage(_screen->rootWindow(), XAtom::wm_change_state,
+                            _window, IconicState);
+}

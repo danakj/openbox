@@ -175,6 +175,10 @@ void screen::handleKeypress(const XEvent &e) {
         XWindow *window = *_active;
 
         switch (it->type()) {
+        case Action::iconify:
+          window->iconify();
+          return;
+
         case Action::close:
           window->close();
           return;

@@ -35,7 +35,7 @@ public:
   enum ActionType {
     noaction = 0,
     execute,
-    iconify,
+    iconify, //done
     raise, //done
     lower, //done
     close, //done

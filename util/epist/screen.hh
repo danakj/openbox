@@ -60,6 +60,7 @@ public:
   
   inline Window rootWindow() const { return _root; }
   inline bool managed() const { return _managed; }
+  inline int number() const { return _number; }
   
   void processEvent(const XEvent &e);
 

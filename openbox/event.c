@@ -935,20 +935,6 @@ static void event_handle_menu(Menu *menu, XEvent *e)
     }
 }
 
-static void event_handle_slit(Slit *s, XEvent *e)
-{
-    switch (e->type) {
-    case ButtonPress:
-        stacking_raise(SLIT_AS_WINDOW(s));
-    case EnterNotify:
-        slit_hide(s, FALSE);
-        break;
-    case LeaveNotify:
-        slit_hide(s, TRUE);
-        break;
-    }
-}
-
 void event_add_fd_handler(event_fd_handler *h) {
   g_datalist_id_set_data(&fd_handler_list, h->fd, h);
   FD_SET(h->fd, &allset);
@@ -981,6 +967,20 @@ void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
 void fd_event_handle()
 {
     g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
+}
+
+static void event_handle_slit(Slit *s, XEvent *e)
+{
+    switch (e->type) {
+    case ButtonPress:
+        stacking_raise(SLIT_AS_WINDOW(s));
+    case EnterNotify:
+        slit_hide(s, FALSE);
+        break;
+    case LeaveNotify:
+        slit_hide(s, TRUE);
+        break;
+    }
 }
 
 static void event_handle_slitapp(SlitApp *app, XEvent *e)

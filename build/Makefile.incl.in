@@ -55,6 +55,6 @@ themedir = $(datadir)/openbox/themes
 COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
 DEPCOMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
-LINK = $(LIBTOOL) --mode=link $(CC)
+LINK = $(LIBTOOL) --mode=link $(CC) $(LIBS)
 LTCLEAN = $(LIBTOOL) --mode=clean $(RM)
 LTRM = $(LIBTOOL) --mode=uninstall $(RM)

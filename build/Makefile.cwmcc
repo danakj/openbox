@@ -3,9 +3,10 @@ include build/Makefile.incl
 dir = cwmcc
 
 CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"CWMCC\"
+LIBS += $(GLIB_LIBS)
 
 target = libcwmcc.la
-sources = cwmcc.c
+sources = cwmcc.c atom.c
 
 srcdir := $(srcdir)/$(dir)
 target := $(addprefix $(dir)/, $(target))

@@ -1621,7 +1621,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         int dot;
         XF86VidModeModeLine mode;
 
-        if (XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode)) {
+        if (extensions_vidmode &&
+            XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode)) {
             w = mode.hdisplay;
             h = mode.vdisplay;
             if (mode.privsize) XFree(mode.private);
@@ -1632,7 +1633,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 #endif
 #ifdef VIDMODE
         }
-        if (!XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y)) {
+        if (!(extensions_vidmode &&
+              XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y))) {
             x = y = 0;
 #endif
         }

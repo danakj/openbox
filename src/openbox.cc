@@ -12,6 +12,7 @@
 #include "python.hh"
 #include "otk/property.hh"
 #include "otk/assassin.hh"
+#include "otk/property.hh"
 #include "otk/util.hh"
 
 extern "C" {
@@ -114,7 +115,7 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
   otk::Timer::initialize();
-  _property = new otk::Property();
+  otk::Property::initialize();
   _actions = new Actions();
   _bindings = new Bindings();
 
@@ -182,7 +183,6 @@ Openbox::~Openbox()
 
   delete _bindings;
   delete _actions;
-  delete _property;
 
   python_destroy();
 
@@ -370,9 +370,9 @@ void Openbox::setFocusedClient(Client *c)
   for (it = _screens.begin(); it != end; ++it) {
     int num = (*it)->number();
     Window root = otk::display->screenInfo(num)->rootWindow();
-    _property->set(root, otk::Property::net_active_window,
-                   otk::Property::Atom_Window,
-                   (c && _focused_screen == *it) ? c->window() : None);
+    otk::Property::set(root, otk::Property::atoms.net_active_window,
+                       otk::Property::atoms.window,
+                       (c && _focused_screen == *it) ? c->window() : None);
   }
 
   // call the python Focus callbacks

@@ -192,21 +192,14 @@ void set_reset_key(const std::string &key)
   ob::openbox->bindings()->setResetKey(key);
 }
 
-PyObject *send_client_msg(Window target, int type, Window about,
+PyObject *send_client_msg(Window target, Atom type, Window about,
                           long data, long data1, long data2,
                           long data3, long data4)
 {
-  if (type < 0 || type >= otk::Property::NUM_ATOMS) {
-      PyErr_SetString(PyExc_TypeError,
-                     "Invalid atom type. Must be from otk::Property::Atoms");
-      return NULL;
-  }
-  
   XEvent e;
   e.xclient.type = ClientMessage;
   e.xclient.format = 32;
-  e.xclient.message_type =
-    openbox->property()->atom((otk::Property::Atoms)type);
+  e.xclient.message_type = type;
   e.xclient.window = about;
   e.xclient.data.l[0] = data;
   e.xclient.data.l[1] = data1;

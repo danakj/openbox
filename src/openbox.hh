@@ -16,7 +16,6 @@ extern "C" {
 
 #include "otk/display.hh"
 #include "otk/screeninfo.hh"
-#include "otk/property.hh"
 #include "otk/configuration.hh"
 #include "otk/eventdispatcher.hh"
 #include "otk/eventhandler.hh"
@@ -108,14 +107,6 @@ private:
   //! A list of all the managed screens
   ScreenList _screens;
   
-  //! Cached atoms on the display
-  /*!
-    This is a pointer because the Property class uses otk::Display::display
-    in its constructor, so, it needs to be initialized <b>after</b> the display
-    is initialized in this class' constructor.
-  */
-  otk::Property *_property;
-
   //! The action interface through which all user-available actions occur
   Actions *_actions;
 
@@ -176,9 +167,6 @@ public:
 
   //! Returns the state of the window manager (starting, exiting, etc)
   inline RunState state() const { return _state; }
-
-  //! Returns the otk::Property instance for the window manager
-  inline const otk::Property *property() const { return _property; }
 
   //! Returns the Actions instance for the window manager
   inline Actions *actions() const { return _actions; }

@@ -11,7 +11,6 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-#include <X11/Xatom.h>
 
 #include <assert.h>
 }
@@ -20,135 +19,114 @@ extern "C" {
 
 namespace otk {
 
+//! The atoms on the X server which this class will cache
+struct Atoms {
+  // types
+  Atom cardinal; //!< The atom which represents the Cardinal data type
+  Atom window;   //!< The atom which represents window ids
+  Atom pixmap;   //!< The atom which represents pixmap ids
+  Atom atom;     //!< The atom which represents atom values
+  Atom string;   //!< The atom which represents ascii strings
+  Atom utf8;     //!< The atom which represents utf8-encoded strings
+
+  Atom openbox_pid;
+
+  // window hints
+  Atom wm_colormap_windows;
+  Atom wm_protocols;
+  Atom wm_state;
+  Atom wm_delete_window;
+  Atom wm_take_focus;
+  Atom wm_change_state;
+  Atom wm_name;
+  Atom wm_icon_name;
+  Atom wm_class;
+  Atom wm_window_role;
+  Atom motif_wm_hints;
+
+  Atom openbox_show_root_menu;
+  Atom openbox_show_workspace_menu;
+
+  // NETWM atoms
+  // root window properties
+  Atom net_supported;
+  Atom net_client_list;
+  Atom net_client_list_stacking;
+  Atom net_number_of_desktops;
+  Atom net_desktop_geometry;
+  Atom net_desktop_viewport;
+  Atom net_current_desktop;
+  Atom net_desktop_names;
+  Atom net_active_window;
+  Atom net_workarea;
+  Atom net_supporting_wm_check;
+//  Atom net_virtual_roots;
+  // root window messages
+  Atom net_close_window;
+  Atom net_wm_moveresize;
+  // application window properties
+//  Atom net_properties;
+  Atom net_wm_name;
+  Atom net_wm_visible_name;
+  Atom net_wm_icon_name;
+  Atom net_wm_visible_icon_name;
+  Atom net_wm_desktop;
+  Atom net_wm_window_type;
+  Atom net_wm_state;
+  Atom net_wm_strut;
+//  Atom net_wm_icon_geometry;
+//  Atom net_wm_icon;
+//  Atom net_wm_pid;
+//  Atom net_wm_handled_icons;
+  Atom net_wm_allowed_actions;
+  // application protocols
+//  Atom   Atom net_wm_ping;
+
+  Atom net_wm_window_type_desktop;
+  Atom net_wm_window_type_dock;
+  Atom net_wm_window_type_toolbar;
+  Atom net_wm_window_type_menu;
+  Atom net_wm_window_type_utility;
+  Atom net_wm_window_type_splash;
+  Atom net_wm_window_type_dialog;
+  Atom net_wm_window_type_normal;
+
+  Atom net_wm_moveresize_size_topleft;
+  Atom net_wm_moveresize_size_topright;
+  Atom net_wm_moveresize_size_bottomleft;
+  Atom net_wm_moveresize_size_bottomright;
+  Atom net_wm_moveresize_move;
+
+  Atom net_wm_action_move;
+  Atom net_wm_action_resize;
+  Atom net_wm_action_shade;
+  Atom net_wm_action_maximize_horz;
+  Atom net_wm_action_maximize_vert;
+  Atom net_wm_action_change_desktop;
+  Atom net_wm_action_close;
+
+  Atom net_wm_state_modal;
+  Atom net_wm_state_sticky;
+  Atom net_wm_state_maximized_vert;
+  Atom net_wm_state_maximized_horz;
+  Atom net_wm_state_shaded;
+  Atom net_wm_state_skip_taskbar;
+  Atom net_wm_state_skip_pager;
+  Atom net_wm_state_hidden;
+  Atom net_wm_state_fullscreen;
+  Atom net_wm_state_above;
+  Atom net_wm_state_below;
+
+  Atom kde_net_system_tray_windows;
+  Atom kde_net_wm_system_tray_window_for;
+  Atom kde_net_wm_window_type_override;
+};
+
+
 //! Provides easy access to window properties.
 class Property {
 public:
-  //! The atoms on the X server which this class will cache
-  enum Atoms {
-    // types
-    Atom_Cardinal, //!< The atom which represents the Cardinal data type
-    Atom_Window,   //!< The atom which represents window ids
-    Atom_Pixmap,   //!< The atom which represents pixmap ids
-    Atom_Atom,     //!< The atom which represents atom values
-    Atom_String,   //!< The atom which represents ascii strings
-    Atom_Utf8,     //!< The atom which represents utf8-encoded strings
-    
-    openbox_pid,
-
-    // window hints
-    wm_colormap_windows,
-    wm_protocols,
-    wm_state,
-    wm_delete_window,
-    wm_take_focus,
-    wm_change_state,
-    wm_name,
-    wm_icon_name,
-    wm_class,
-    wm_window_role,
-    motif_wm_hints,
-    blackbox_attributes,
-    blackbox_change_attributes,
-    blackbox_hints,
-
-    // blackbox-protocol atoms (wm -> client)
-    blackbox_structure_messages,
-    blackbox_notify_startup,
-    blackbox_notify_window_add,
-    blackbox_notify_window_del,
-    blackbox_notify_window_focus,
-    blackbox_notify_current_workspace,
-    blackbox_notify_workspace_count,
-    blackbox_notify_window_raise,
-    blackbox_notify_window_lower,
-    // blackbox-protocol atoms (client -> wm)
-    blackbox_change_workspace,
-    blackbox_change_window_focus,
-    blackbox_cycle_window_focus,
-
-    openbox_show_root_menu,
-    openbox_show_workspace_menu,
-
-    // NETWM atoms
-    // root window properties
-    net_supported,
-    net_client_list,
-    net_client_list_stacking,
-    net_number_of_desktops,
-    net_desktop_geometry,
-    net_desktop_viewport,
-    net_current_desktop,
-    net_desktop_names,
-    net_active_window,
-    net_workarea,
-    net_supporting_wm_check,
-//    net_virtual_roots,
-    // root window messages
-    net_close_window,
-    net_wm_moveresize,
-    // application window properties
-//    net_properties,
-    net_wm_name,
-    net_wm_visible_name,
-    net_wm_icon_name,
-    net_wm_visible_icon_name,
-    net_wm_desktop,
-    net_wm_window_type,
-    net_wm_state,
-    net_wm_strut,
-//  net_wm_icon_geometry,
-//  net_wm_icon,
-//  net_wm_pid,
-//  net_wm_handled_icons,
-    net_wm_allowed_actions,
-    // application protocols
-//    net_wm_ping,
-
-    net_wm_window_type_desktop,
-    net_wm_window_type_dock,
-    net_wm_window_type_toolbar,
-    net_wm_window_type_menu,
-    net_wm_window_type_utility,
-    net_wm_window_type_splash,
-    net_wm_window_type_dialog,
-    net_wm_window_type_normal,
-
-    net_wm_moveresize_size_topleft,
-    net_wm_moveresize_size_topright,
-    net_wm_moveresize_size_bottomleft,
-    net_wm_moveresize_size_bottomright,
-    net_wm_moveresize_move,
-
-    net_wm_action_move,
-    net_wm_action_resize,
-    net_wm_action_shade,
-    net_wm_action_maximize_horz,
-    net_wm_action_maximize_vert,
-    net_wm_action_change_desktop,
-    net_wm_action_close,
-
-    net_wm_state_modal,
-    net_wm_state_sticky,
-    net_wm_state_maximized_vert,
-    net_wm_state_maximized_horz,
-    net_wm_state_shaded,
-    net_wm_state_skip_taskbar,
-    net_wm_state_skip_pager,
-    net_wm_state_hidden,
-    net_wm_state_fullscreen,
-    net_wm_state_above,
-    net_wm_state_below,
-
-    kde_net_system_tray_windows,
-    kde_net_wm_system_tray_window_for,
-    kde_net_wm_window_type_override,
- 
-#ifndef DOXYGEN_IGNORE
-    // constant for how many atoms exist in the enumerator
-    NUM_ATOMS
-#endif
-  };
-
+  
   //! The possible types/encodings of strings
   enum StringType {
     ascii, //!< Standard 8-bit ascii string
@@ -158,88 +136,83 @@ public:
 #endif
   };
 
-private:
-  //! The value of all atoms on the X server that exist in the
-  //! Property::Atoms enum
-  Atom _atoms[NUM_ATOMS];
-
-  //! Gets the value of an Atom from the X server, creating it if nessesary
-  Atom create(const char *name) const;
-
-  //! Sets a property on a window
-  void set(Window win, Atom atom, Atom type, unsigned char *data,
-           int size, int nelements, bool append) const;
-  //! Gets a property's value from a window
-  bool get(Window win, Atom atom, Atom type,
-           unsigned long *nelements, unsigned char **value,
-           int size) const;
-
-public:
-  //! A list of strings
+  //! A list of ustrings
   typedef std::vector<ustring> StringVect;
 
-  //! Constructs a new Atom object
+  //! The value of all atoms on the X server that exist in the
+  //! Atoms struct
+  static Atoms atoms;
+
+private:
+  //! Sets a property on a window
+  static void set(Window win, Atom atom, Atom type, unsigned char *data,
+                  int size, int nelements, bool append);
+  //! Gets a property's value from a window
+  static bool get(Window win, Atom atom, Atom type,
+                  unsigned long *nelements, unsigned char **value,
+                  int size);
+
+public:
+  //! Initializes the Property class.
   /*!
-    CAUTION: This constructor uses Display::display, so ensure that it is
-    initialized before initializing this class!
+    CAUTION: This function uses otk::Display, so ensure that
+    otk::Display::initialize has been called before initializing this class!
   */
-  Property();
-  //! Destroys the Atom object
-  virtual ~Property();
+  static void initialize();
 
   //! Sets a single-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to set
-    @param type A member of the Property::Atoms enum that specifies the type
-                of the property to set
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
+    @param type The Atom value of the property type. This can be found in the
+                struct returned by Property::atoms.
     @param value The value to set the property to
   */
-  void set(Window win, Atoms atom, Atoms type, unsigned long value) const;
+  static void set(Window win, Atom atom, Atom type, unsigned long value);
   //! Sets an multiple-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to set
-    @param type A member of the Property::Atoms enum that specifies the type
-                of the property to set
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
+    @param type The Atom value of the property type. This can be found in the
+                struct returned by Property::atoms.
     @param value Any array of values to set the property to. The array must
                  contain <i>elements</i> number of elements
     @param elements The number of elements in the <i>value</i> array
   */
-  void set(Window win, Atoms atom, Atoms type,
-           unsigned long value[], int elements) const;
+  static void set(Window win, Atom atom, Atom type,
+                  unsigned long value[], int elements);
   //! Sets a string property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to set
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
     @param type A member of the Property::StringType enum that specifies the
                 type of the string the property is being set to
     @param value The string to set the property to
   */
-  void set(Window win, Atoms atom, StringType type,
-           const ustring &value) const;
+  static void set(Window win, Atom atom, StringType type,
+                  const ustring &value);
   //! Sets a string-array property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to set
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
     @param type A member of the Property::StringType enum that specifies the
                 type of the string the property is being set to
     @param strings A list of strings to set the property to
   */
-  void set(Window win, Atoms atom, StringType type,
-           const StringVect &strings) const;
+  static void set(Window win, Atom atom, StringType type,
+                  const StringVect &strings);
 
   //! Gets the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to retrieve
-    @param type A member of the Property::Atoms enum that specifies the type
-                of the property to retrieve
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
+    @param type The Atom value of the property type. This can be found in the
+                struct returned by Property::atoms.
     @param nelements The maximum number of elements to retrieve from the
                      property (assuming it has more than 1 value in it). To
                      retrieve all possible elements, use "(unsigned) -1".<br>
@@ -255,27 +228,27 @@ public:
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, Atoms type,
-           unsigned long *nelements, unsigned long **value) const;
+  static bool get(Window win, Atom atom, Atom type,
+                  unsigned long *nelements, unsigned long **value);
   //! Gets a single element from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to retrieve
-    @param type A member of the Property::Atoms enum that specifies the type
-                of the property to retrieve
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
+    @param type The Atom value of the property type. This can be found in the
+                struct returned by Property::atoms.
     @param value If the function returns true, then this contains the first
                  (and possibly only) element in the value of the specified
                  property.
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, Atoms type, unsigned long *value) const;
+  static bool get(Window win, Atom atom, Atom type, unsigned long *value);
   //! Gets a single string from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to retrieve
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
     @param type A member of the Property::StringType enum that specifies the
                 type of the string property to retrieve
     @param value If the function returns true, then this contains the first
@@ -284,12 +257,12 @@ public:
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, StringType type, ustring *value) const;
+  static bool get(Window win, Atom atom, StringType type, ustring *value);
   //! Gets strings from the value of a property on a window
   /*!
     @param win The window id of the window to get the property value from
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to retrieve
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
     @param type A member of the Property::StringType enum that specifies the
                 type of the string property to retrieve
     @param nelements The maximum number of strings to retrieve from the
@@ -302,27 +275,16 @@ public:
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
-  bool get(Window win, Atoms atom, StringType type,
-           unsigned long *nelements, StringVect *strings) const;
+  static bool get(Window win, Atom atom, StringType type,
+                  unsigned long *nelements, StringVect *strings);
 
   //! Removes a property from a window
   /*!
     @param win The window id of the window to remove the property from
-    @param atom A member of the Property::Atoms enum that specifies which
-                property to remove from the window
+    @param atom The Atom value of the property to set. This can be found in the
+                struct returned by Property::atoms.
   */
-  void erase(Window win, Atoms atom) const;
-
-  //! Gets the value of an atom on the X server
-  /*!
-    @param a A member of the Property::Atoms enum that specifies which Atom's
-             value to return
-    @return The value of the specified Atom
-  */
-  inline Atom atom(Atoms a) const {
-    assert(a >= 0 && a < NUM_ATOMS); Atom ret = _atoms[a]; assert(ret != 0);
-    return ret;
-  }
+  static void erase(Window win, Atom atom);
 };
 
 }

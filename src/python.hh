@@ -187,7 +187,7 @@ PyObject *ebind(ob::EventAction action, PyObject *func);
 
 void set_reset_key(const std::string &key);
 
-PyObject *send_client_msg(Window target, int type, Window about,
+PyObject *send_client_msg(Window target, Atom type, Window about,
                           long data, long data1 = 0, long data2 = 0,
                           long data3 = 0, long data4 = 0);
 }

@@ -699,14 +699,15 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
 #define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
 #define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[54] 
-#define  SWIGTYPE_p_otk__Strut swig_types[55] 
-#define  SWIGTYPE_p_unsigned_long swig_types[56] 
-#define  SWIGTYPE_p_p_unsigned_long swig_types[57] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[58] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[59] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[60] 
-static swig_type_info *swig_types[62];
+#define  SWIGTYPE_p_otk__Atoms swig_types[54] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[55] 
+#define  SWIGTYPE_p_otk__Strut swig_types[56] 
+#define  SWIGTYPE_p_unsigned_long swig_types[57] 
+#define  SWIGTYPE_p_p_unsigned_long swig_types[58] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[59] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[60] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[61] 
+static swig_type_info *swig_types[63];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -882,10 +883,13 @@ void python_callback(PyObject *func, KeyData *data)
   #include <iterator>
 
 
+#include "ustring.hh"
+
+
   otk::Display *Display_instance() { return otk::display; }
 
 
-#include "ustring.hh"
+  const otk::Atoms& Property_atoms() { return otk::Property::atoms; }
 
 ob::Client *ob_Screen_client(ob::Screen *self,int i){
     if (i < 0 || i >= (int)self->clients.size())
@@ -922,6 +926,23 @@ static PyObject *_wrap_Display_instance(PyObject *self, PyObject *args) {
     result = (otk::Display *)Display_instance();
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Display, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Property_atoms(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":Property_atoms")) goto fail;
+    {
+        otk::Atoms const &_result_ref = Property_atoms();
+        result = (otk::Atoms *) &_result_ref;
+    }
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Atoms, 0);
     return resultobj;
     fail:
     return NULL;
@@ -1488,28 +1509,2830 @@ static PyObject * Point_swigregister(PyObject *self, PyObject *args) {
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
-static PyObject *_wrap_new_Property(PyObject *self, PyObject *args) {
+static PyObject *_wrap_Atoms_cardinal_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *result;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)":new_Property")) goto fail;
-    result = (otk::Property *)new otk::Property();
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_cardinal_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->cardinal = arg2;
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Property, 1);
+    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
 }
 
 
-static PyObject *_wrap_delete_Property(PyObject *self, PyObject *args) {
+static PyObject *_wrap_Atoms_cardinal_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:delete_Property",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    delete arg1;
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_cardinal_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->cardinal);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_window_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_window_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->window = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_window_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_window_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->window);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_pixmap_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_pixmap_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->pixmap = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_pixmap_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_pixmap_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->pixmap);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_atom_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_atom_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->atom = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_atom_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_atom_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->atom);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_string_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_string_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->string = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_string_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_string_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->string);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_utf8_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_utf8_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->utf8 = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_utf8_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_utf8_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->utf8);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_pid_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_openbox_pid_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->openbox_pid = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_pid_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_openbox_pid_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->openbox_pid);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_colormap_windows_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_colormap_windows_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_colormap_windows = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_colormap_windows_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_colormap_windows_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_colormap_windows);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_protocols_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_protocols_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_protocols = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_protocols_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_protocols_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_protocols);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_delete_window_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_delete_window_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_delete_window = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_delete_window_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_delete_window_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_delete_window);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_take_focus_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_take_focus_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_take_focus = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_take_focus_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_take_focus_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_take_focus);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_change_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_change_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_change_state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_change_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_change_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_change_state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_icon_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_icon_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_icon_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_icon_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_icon_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_icon_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_class_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_class_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_class = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_class_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_class_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_class);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_window_role_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_wm_window_role_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->wm_window_role = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_wm_window_role_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_wm_window_role_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->wm_window_role);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_motif_wm_hints_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_motif_wm_hints_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->motif_wm_hints = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_motif_wm_hints_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_motif_wm_hints_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->motif_wm_hints);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_show_root_menu_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_openbox_show_root_menu_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->openbox_show_root_menu = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_show_root_menu_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_openbox_show_root_menu_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->openbox_show_root_menu);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_show_workspace_menu_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_openbox_show_workspace_menu_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->openbox_show_workspace_menu = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_openbox_show_workspace_menu_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_openbox_show_workspace_menu_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->openbox_show_workspace_menu);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_supported_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_supported_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_supported = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_supported_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_supported_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_supported);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_client_list_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_client_list_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_client_list = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_client_list_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_client_list_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_client_list);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_client_list_stacking_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_client_list_stacking_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_client_list_stacking = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_client_list_stacking_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_client_list_stacking_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_client_list_stacking);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_number_of_desktops_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_number_of_desktops_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_number_of_desktops = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_number_of_desktops_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_number_of_desktops_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_number_of_desktops);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_geometry_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_desktop_geometry_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_desktop_geometry = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_geometry_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_desktop_geometry_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_desktop_geometry);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_viewport_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_desktop_viewport_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_desktop_viewport = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_viewport_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_desktop_viewport_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_desktop_viewport);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_current_desktop_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_current_desktop_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_current_desktop = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_current_desktop_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_current_desktop_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_current_desktop);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_names_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_desktop_names_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_desktop_names = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_desktop_names_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_desktop_names_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_desktop_names);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_active_window_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_active_window_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_active_window = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_active_window_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_active_window_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_active_window);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_workarea_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_workarea_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_workarea = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_workarea_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_workarea_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_workarea);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_supporting_wm_check_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_supporting_wm_check_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_supporting_wm_check = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_supporting_wm_check_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_supporting_wm_check_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_supporting_wm_check);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_close_window_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_close_window_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_close_window = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_close_window_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_close_window_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_close_window);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_visible_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_visible_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_visible_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_visible_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_visible_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_visible_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_icon_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_icon_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_icon_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_icon_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_icon_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_icon_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_visible_icon_name_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_visible_icon_name_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_visible_icon_name = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_visible_icon_name_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_visible_icon_name_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_visible_icon_name);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_desktop_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_desktop_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_desktop = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_desktop_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_desktop_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_desktop);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_strut_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_strut_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_strut = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_strut_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_strut_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_strut);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_allowed_actions_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_allowed_actions_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_allowed_actions = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_allowed_actions_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_allowed_actions_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_allowed_actions);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_desktop_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_desktop_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_desktop = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_desktop_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_desktop_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_desktop);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_dock_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_dock_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_dock = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_dock_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_dock_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_dock);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_toolbar_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_toolbar_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_toolbar = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_toolbar_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_toolbar_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_toolbar);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_menu_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_menu_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_menu = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_menu_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_menu_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_menu);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_utility_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_utility_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_utility = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_utility_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_utility_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_utility);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_splash_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_splash_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_splash = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_splash_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_splash_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_splash);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_dialog_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_dialog_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_dialog = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_dialog_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_dialog_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_dialog);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_normal_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_window_type_normal_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_window_type_normal = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_window_type_normal_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_window_type_normal_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_window_type_normal);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_topleft_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_size_topleft_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize_size_topleft = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_topleft_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_size_topleft_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize_size_topleft);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_topright_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_size_topright_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize_size_topright = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_topright_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_size_topright_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize_size_topright);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_bottomleft_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_size_bottomleft_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize_size_bottomleft = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_bottomleft_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_size_bottomleft_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize_size_bottomleft);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_bottomright_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_size_bottomright_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize_size_bottomright = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_size_bottomright_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_size_bottomright_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize_size_bottomright);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_move_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_moveresize_move_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_moveresize_move = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_moveresize_move_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_moveresize_move_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_moveresize_move);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_move_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_move_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_move = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_move_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_move_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_move);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_resize_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_resize_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_resize = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_resize_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_resize_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_resize);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_shade_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_shade_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_shade = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_shade_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_shade_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_shade);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_maximize_horz_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_maximize_horz_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_maximize_horz = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_maximize_horz_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_maximize_horz_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_maximize_horz);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_maximize_vert_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_maximize_vert_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_maximize_vert = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_maximize_vert_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_maximize_vert_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_maximize_vert);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_change_desktop_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_change_desktop_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_change_desktop = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_change_desktop_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_change_desktop_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_change_desktop);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_close_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_action_close_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_action_close = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_action_close_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_action_close_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_action_close);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_modal_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_modal_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_modal = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_modal_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_modal_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_modal);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_sticky_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_sticky_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_sticky = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_sticky_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_sticky_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_sticky);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_maximized_vert_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_maximized_vert_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_maximized_vert = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_maximized_vert_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_maximized_vert_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_maximized_vert);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_maximized_horz_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_maximized_horz_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_maximized_horz = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_maximized_horz_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_maximized_horz_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_maximized_horz);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_shaded_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_shaded_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_shaded = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_shaded_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_shaded_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_shaded);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_skip_taskbar_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_skip_taskbar_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_skip_taskbar = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_skip_taskbar_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_skip_taskbar_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_skip_taskbar);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_skip_pager_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_skip_pager_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_skip_pager = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_skip_pager_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_skip_pager_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_skip_pager);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_hidden_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_hidden_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_hidden = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_hidden_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_hidden_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_hidden);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_fullscreen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_fullscreen_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_fullscreen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_fullscreen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_fullscreen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_fullscreen);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_above_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_above_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_above = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_above_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_above_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_above);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_below_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_net_wm_state_below_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->net_wm_state_below = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_net_wm_state_below_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_net_wm_state_below_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->net_wm_state_below);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_system_tray_windows_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_kde_net_system_tray_windows_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->kde_net_system_tray_windows = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_system_tray_windows_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_kde_net_system_tray_windows_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->kde_net_system_tray_windows);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_wm_system_tray_window_for_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_kde_net_wm_system_tray_window_for_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->kde_net_wm_system_tray_window_for = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_wm_system_tray_window_for_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_kde_net_wm_system_tray_window_for_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->kde_net_wm_system_tray_window_for);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_wm_window_type_override_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Atoms_kde_net_wm_window_type_override_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->kde_net_wm_window_type_override = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Atoms_kde_net_wm_window_type_override_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Atoms *arg1 = (otk::Atoms *) 0 ;
+    Atom result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Atoms_kde_net_wm_window_type_override_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Atoms,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Atom) ((arg1)->kde_net_wm_window_type_override);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * Atoms_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_otk__Atoms, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
+static PyObject *_wrap_Property_initialize(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    
+    if(!PyArg_ParseTuple(args,(char *)":Property_initialize")) goto fail;
+    otk::Property::initialize();
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1520,22 +4343,25 @@ static PyObject *_wrap_delete_Property(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_set__SWIG_0(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
-    int arg3 ;
-    int arg4 ;
-    unsigned long arg5 ;
+    Window arg1 ;
+    Atom arg2 ;
+    Atom arg3 ;
+    unsigned long arg4 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiO:Property_set",&obj0,&obj1,&arg3,&arg4,&obj4)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOOO:Property_set",&obj0,&obj1,&obj2,&obj3)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    arg5 = (unsigned long) PyInt_AsLong(obj4);
+    arg2 = (Atom) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::Atoms )arg4,arg5);
+    arg3 = (Atom) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg4 = (unsigned long) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    otk::Property::set(arg1,arg2,arg3,arg4);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1546,22 +4372,25 @@ static PyObject *_wrap_Property_set__SWIG_0(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_set__SWIG_1(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
-    int arg3 ;
-    int arg4 ;
-    unsigned long *arg5 ;
-    int arg6 ;
+    Window arg1 ;
+    Atom arg2 ;
+    Atom arg3 ;
+    unsigned long *arg4 ;
+    int arg5 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiOi:Property_set",&obj0,&obj1,&arg3,&arg4,&obj4,&arg6)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOOOi:Property_set",&obj0,&obj1,&obj2,&obj3,&arg5)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::Atoms )arg4,arg5,arg6);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg3 = (Atom) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    otk::Property::set(arg1,arg2,arg3,arg4,arg5);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1572,29 +4401,29 @@ static PyObject *_wrap_Property_set__SWIG_1(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
+    Window arg1 ;
+    Atom arg2 ;
     int arg3 ;
-    int arg4 ;
-    otk::ustring *arg5 = 0 ;
-    otk::ustring temp5 ;
+    otk::ustring *arg4 = 0 ;
+    otk::ustring temp4 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiO:Property_set",&obj0,&obj1,&arg3,&arg4,&obj4)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOiO:Property_set",&obj0,&obj1,&arg3,&obj3)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
     {
-        if (PyString_Check(obj4)) {
-            temp5 = otk::ustring(PyString_AsString(obj4));
-            arg5 = &temp5;
+        if (PyString_Check(obj3)) {
+            temp4 = otk::ustring(PyString_AsString(obj3));
+            arg4 = &temp4;
         }else {
             SWIG_exception(SWIG_TypeError, "ustring expected");
         }
     }
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(otk::ustring const &)*arg5);
+    otk::Property::set(arg1,arg2,(otk::Property::StringType )arg3,(otk::ustring const &)*arg4);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1605,24 +4434,24 @@ static PyObject *_wrap_Property_set__SWIG_2(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_set__SWIG_3(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
+    Window arg1 ;
+    Atom arg2 ;
     int arg3 ;
-    int arg4 ;
-    otk::Property::StringVect *arg5 = 0 ;
+    otk::Property::StringVect *arg4 = 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiO:Property_set",&obj0,&obj1,&arg3,&arg4,&obj4)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOiO:Property_set",&obj0,&obj1,&arg3,&obj3)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_otk__Property__StringVect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg5 == NULL) {
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_otk__Property__StringVect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg4 == NULL) {
         PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
     }
-    ((otk::Property const *)arg1)->set(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,(otk::Property::StringVect const &)*arg5);
+    otk::Property::set(arg1,arg2,(otk::Property::StringType )arg3,(otk::Property::StringVect const &)*arg4);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
@@ -1633,23 +4462,47 @@ static PyObject *_wrap_Property_set__SWIG_3(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
     int argc;
-    PyObject *argv[7];
+    PyObject *argv[6];
     int ii;
     
     argc = PyObject_Length(args);
-    for (ii = 0; (ii < argc) && (ii < 6); ii++) {
+    for (ii = 0; (ii < argc) && (ii < 5); ii++) {
         argv[ii] = PyTuple_GetItem(args,ii);
     }
-    if (argc == 5) {
+    if (argc == 4) {
         int _v;
         {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
             }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
+                        }
+                    }
+                    if (_v) {
+                        return _wrap_Property_set__SWIG_3(self,args);
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 4) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
         }
         if (_v) {
             {
@@ -1664,33 +4517,16 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                         _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
                     }
                     if (_v) {
-                        {
-                            void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
-                                _v = 0;
-                                PyErr_Clear();
-                            }else {
-                                _v = 1;
-                            }
-                        }
-                        if (_v) {
-                            return _wrap_Property_set__SWIG_3(self,args);
-                        }
+                        return _wrap_Property_set__SWIG_0(self,args);
                     }
                 }
             }
         }
     }
-    if (argc == 5) {
+    if (argc == 4) {
         int _v;
         {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
         }
         if (_v) {
             {
@@ -1702,95 +4538,44 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
                 }
                 if (_v) {
                     {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                        _v = PyString_Check(argv[3]) ? 1 : 0;
+                    }
+                    if (_v) {
+                        return _wrap_Property_set__SWIG_2(self,args);
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 5) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
+                        }
                     }
                     if (_v) {
                         {
                             _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
                         }
                         if (_v) {
-                            return _wrap_Property_set__SWIG_0(self,args);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (argc == 5) {
-        int _v;
-        {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
-        }
-        if (_v) {
-            {
-                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
-            }
-            if (_v) {
-                {
-                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
-                }
-                if (_v) {
-                    {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
-                    }
-                    if (_v) {
-                        {
-                            _v = PyString_Check(argv[4]) ? 1 : 0;
-                        }
-                        if (_v) {
-                            return _wrap_Property_set__SWIG_2(self,args);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (argc == 6) {
-        int _v;
-        {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
-        }
-        if (_v) {
-            {
-                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
-            }
-            if (_v) {
-                {
-                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
-                }
-                if (_v) {
-                    {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
-                    }
-                    if (_v) {
-                        {
-                            void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
-                                _v = 0;
-                                PyErr_Clear();
-                            }else {
-                                _v = 1;
-                            }
-                        }
-                        if (_v) {
-                            {
-                                _v = (PyInt_Check(argv[5]) || PyLong_Check(argv[5])) ? 1 : 0;
-                            }
-                            if (_v) {
-                                return _wrap_Property_set__SWIG_1(self,args);
-                            }
+                            return _wrap_Property_set__SWIG_1(self,args);
                         }
                     }
                 }
@@ -1805,25 +4590,28 @@ static PyObject *_wrap_Property_set(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_get__SWIG_0(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
-    int arg3 ;
-    int arg4 ;
-    unsigned long *arg5 = (unsigned long *) 0 ;
-    unsigned long **arg6 = (unsigned long **) 0 ;
+    Window arg1 ;
+    Atom arg2 ;
+    Atom arg3 ;
+    unsigned long *arg4 = (unsigned long *) 0 ;
+    unsigned long **arg5 = (unsigned long **) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     PyObject * obj4  = 0 ;
-    PyObject * obj5  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiOO:Property_get",&obj0,&obj1,&arg3,&arg4,&obj4,&obj5)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOOOO:Property_get",&obj0,&obj1,&obj2,&obj3,&obj4)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj5,(void **) &arg6, SWIGTYPE_p_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((otk::Property const *)arg1)->get(arg2,(otk::Property::Atoms )arg3,(otk::Property::Atoms )arg4,arg5,arg6);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg3 = (Atom) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)otk::Property::get(arg1,arg2,arg3,arg4,arg5);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1834,22 +4622,25 @@ static PyObject *_wrap_Property_get__SWIG_0(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_get__SWIG_1(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
-    int arg3 ;
-    int arg4 ;
-    unsigned long *arg5 = (unsigned long *) 0 ;
+    Window arg1 ;
+    Atom arg2 ;
+    Atom arg3 ;
+    unsigned long *arg4 = (unsigned long *) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiO:Property_get",&obj0,&obj1,&arg3,&arg4,&obj4)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOOO:Property_get",&obj0,&obj1,&obj2,&obj3)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((otk::Property const *)arg1)->get(arg2,(otk::Property::Atoms )arg3,(otk::Property::Atoms )arg4,arg5);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg3 = (Atom) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)otk::Property::get(arg1,arg2,arg3,arg4);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1860,22 +4651,22 @@ static PyObject *_wrap_Property_get__SWIG_1(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_get__SWIG_2(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
+    Window arg1 ;
+    Atom arg2 ;
     int arg3 ;
-    int arg4 ;
-    otk::ustring *arg5 = (otk::ustring *) 0 ;
+    otk::ustring *arg4 = (otk::ustring *) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
-    PyObject * obj4  = 0 ;
+    PyObject * obj3  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiO:Property_get",&obj0,&obj1,&arg3,&arg4,&obj4)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOiO:Property_get",&obj0,&obj1,&arg3,&obj3)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_otk__ustring,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((otk::Property const *)arg1)->get(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,arg5);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_otk__ustring,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)otk::Property::get(arg1,arg2,(otk::Property::StringType )arg3,arg4);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1886,25 +4677,25 @@ static PyObject *_wrap_Property_get__SWIG_2(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_get__SWIG_3(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
+    Window arg1 ;
+    Atom arg2 ;
     int arg3 ;
-    int arg4 ;
-    unsigned long *arg5 = (unsigned long *) 0 ;
-    otk::Property::StringVect *arg6 = (otk::Property::StringVect *) 0 ;
+    unsigned long *arg4 = (unsigned long *) 0 ;
+    otk::Property::StringVect *arg5 = (otk::Property::StringVect *) 0 ;
     bool result;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
+    PyObject * obj3  = 0 ;
     PyObject * obj4  = 0 ;
-    PyObject * obj5  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOiiOO:Property_get",&obj0,&obj1,&arg3,&arg4,&obj4,&obj5)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OOiOO:Property_get",&obj0,&obj1,&arg3,&obj3,&obj4)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj5,(void **) &arg6, SWIGTYPE_p_otk__Property__StringVect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((otk::Property const *)arg1)->get(arg2,(otk::Property::Atoms )arg3,(otk::Property::StringType )arg4,arg5,arg6);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj3,(void **) &arg4, SWIGTYPE_p_unsigned_long,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj4,(void **) &arg5, SWIGTYPE_p_otk__Property__StringVect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)otk::Property::get(arg1,arg2,(otk::Property::StringType )arg3,arg4,arg5);
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -1915,23 +4706,17 @@ static PyObject *_wrap_Property_get__SWIG_3(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
     int argc;
-    PyObject *argv[7];
+    PyObject *argv[6];
     int ii;
     
     argc = PyObject_Length(args);
-    for (ii = 0; (ii < argc) && (ii < 6); ii++) {
+    for (ii = 0; (ii < argc) && (ii < 5); ii++) {
         argv[ii] = PyTuple_GetItem(args,ii);
     }
-    if (argc == 5) {
+    if (argc == 4) {
         int _v;
         {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
         }
         if (_v) {
             {
@@ -1943,21 +4728,46 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                 }
                 if (_v) {
                     {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
+                        }
                     }
                     if (_v) {
-                        {
-                            void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
-                                _v = 0;
-                                PyErr_Clear();
-                            }else {
-                                _v = 1;
-                            }
+                        return _wrap_Property_get__SWIG_1(self,args);
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 4) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_otk__ustring, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
                         }
-                        if (_v) {
-                            return _wrap_Property_get__SWIG_1(self,args);
-                        }
+                    }
+                    if (_v) {
+                        return _wrap_Property_get__SWIG_2(self,args);
                     }
                 }
             }
@@ -1966,13 +4776,7 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
     if (argc == 5) {
         int _v;
         {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
         }
         if (_v) {
             {
@@ -1984,12 +4788,18 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                 }
                 if (_v) {
                     {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
+                        }
                     }
                     if (_v) {
                         {
                             void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__ustring, 0) == -1) {
+                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_p_unsigned_long, 0) == -1) {
                                 _v = 0;
                                 PyErr_Clear();
                             }else {
@@ -1997,23 +4807,17 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                             }
                         }
                         if (_v) {
-                            return _wrap_Property_get__SWIG_2(self,args);
+                            return _wrap_Property_get__SWIG_0(self,args);
                         }
                     }
                 }
             }
         }
     }
-    if (argc == 6) {
+    if (argc == 5) {
         int _v;
         {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
         }
         if (_v) {
             {
@@ -2025,12 +4829,18 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                 }
                 if (_v) {
                     {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                        void *ptr;
+                        if (SWIG_ConvertPtr(argv[3], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
+                            _v = 0;
+                            PyErr_Clear();
+                        }else {
+                            _v = 1;
+                        }
                     }
                     if (_v) {
                         {
                             void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
+                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
                                 _v = 0;
                                 PyErr_Clear();
                             }else {
@@ -2038,70 +4848,7 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
                             }
                         }
                         if (_v) {
-                            {
-                                void *ptr;
-                                if (SWIG_ConvertPtr(argv[5], (void **) &ptr, SWIGTYPE_p_p_unsigned_long, 0) == -1) {
-                                    _v = 0;
-                                    PyErr_Clear();
-                                }else {
-                                    _v = 1;
-                                }
-                            }
-                            if (_v) {
-                                return _wrap_Property_get__SWIG_0(self,args);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (argc == 6) {
-        int _v;
-        {
-            void *ptr;
-            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Property, 0) == -1) {
-                _v = 0;
-                PyErr_Clear();
-            }else {
-                _v = 1;
-            }
-        }
-        if (_v) {
-            {
-                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
-            }
-            if (_v) {
-                {
-                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
-                }
-                if (_v) {
-                    {
-                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
-                    }
-                    if (_v) {
-                        {
-                            void *ptr;
-                            if (SWIG_ConvertPtr(argv[4], (void **) &ptr, SWIGTYPE_p_unsigned_long, 0) == -1) {
-                                _v = 0;
-                                PyErr_Clear();
-                            }else {
-                                _v = 1;
-                            }
-                        }
-                        if (_v) {
-                            {
-                                void *ptr;
-                                if (SWIG_ConvertPtr(argv[5], (void **) &ptr, SWIGTYPE_p_otk__Property__StringVect, 0) == -1) {
-                                    _v = 0;
-                                    PyErr_Clear();
-                                }else {
-                                    _v = 1;
-                                }
-                            }
-                            if (_v) {
-                                return _wrap_Property_get__SWIG_3(self,args);
-                            }
+                            return _wrap_Property_get__SWIG_3(self,args);
                         }
                     }
                 }
@@ -2116,37 +4863,19 @@ static PyObject *_wrap_Property_get(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_Property_erase(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    Window arg2 ;
-    int arg3 ;
+    Window arg1 ;
+    Atom arg2 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OOi:Property_erase",&obj0,&obj1,&arg3)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Window) PyInt_AsLong(obj1);
+    if(!PyArg_ParseTuple(args,(char *)"OO:Property_erase",&obj0,&obj1)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
     if (PyErr_Occurred()) SWIG_fail;
-    ((otk::Property const *)arg1)->erase(arg2,(otk::Property::Atoms )arg3);
+    arg2 = (Atom) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    otk::Property::erase(arg1,arg2);
     
     Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_Property_atom(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::Property *arg1 = (otk::Property *) 0 ;
-    int arg2 ;
-    Atom result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Oi:Property_atom",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Property,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (Atom)((otk::Property const *)arg1)->atom((otk::Property::Atoms )arg2);
-    
-    resultobj = PyInt_FromLong((long)result);
     return resultobj;
     fail:
     return NULL;
@@ -5072,23 +7801,6 @@ static PyObject *_wrap_Openbox_state(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Openbox_property(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
-    otk::Property *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:Openbox_property",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::Property *)((ob::Openbox const *)arg1)->property();
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Property, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_Openbox_actions(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Openbox *arg1 = (ob::Openbox *) 0 ;
@@ -7925,7 +10637,7 @@ static PyObject *_wrap_set_reset_key(PyObject *self, PyObject *args) {
 static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     Window arg1 ;
-    int arg2 ;
+    Atom arg2 ;
     Window arg3 ;
     long arg4 ;
     long arg5 = (long) 0 ;
@@ -7934,10 +10646,13 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
     long arg8 = (long) 0 ;
     PyObject *result;
     PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OiOl|llll:send_client_msg",&obj0,&arg2,&obj2,&arg4,&arg5,&arg6,&arg7,&arg8)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OOOl|llll:send_client_msg",&obj0,&obj1,&obj2,&arg4,&arg5,&arg6,&arg7,&arg8)) goto fail;
     arg1 = (Window) PyInt_AsLong(obj0);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg2 = (Atom) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
     arg3 = (Window) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
@@ -7953,6 +10668,7 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
 	 { (char *)"Display_instance", _wrap_Display_instance, METH_VARARGS },
+	 { (char *)"Property_atoms", _wrap_Property_atoms, METH_VARARGS },
 	 { (char *)"new_Display", _wrap_new_Display, METH_VARARGS },
 	 { (char *)"delete_Display", _wrap_delete_Display, METH_VARARGS },
 	 { (char *)"Display_gcCache", _wrap_Display_gcCache, METH_VARARGS },
@@ -7980,12 +10696,163 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Point_y", _wrap_Point_y, METH_VARARGS },
 	 { (char *)"Point_setPoint", _wrap_Point_setPoint, METH_VARARGS },
 	 { (char *)"Point_swigregister", Point_swigregister, METH_VARARGS },
-	 { (char *)"new_Property", _wrap_new_Property, METH_VARARGS },
-	 { (char *)"delete_Property", _wrap_delete_Property, METH_VARARGS },
+	 { (char *)"Atoms_cardinal_set", _wrap_Atoms_cardinal_set, METH_VARARGS },
+	 { (char *)"Atoms_cardinal_get", _wrap_Atoms_cardinal_get, METH_VARARGS },
+	 { (char *)"Atoms_window_set", _wrap_Atoms_window_set, METH_VARARGS },
+	 { (char *)"Atoms_window_get", _wrap_Atoms_window_get, METH_VARARGS },
+	 { (char *)"Atoms_pixmap_set", _wrap_Atoms_pixmap_set, METH_VARARGS },
+	 { (char *)"Atoms_pixmap_get", _wrap_Atoms_pixmap_get, METH_VARARGS },
+	 { (char *)"Atoms_atom_set", _wrap_Atoms_atom_set, METH_VARARGS },
+	 { (char *)"Atoms_atom_get", _wrap_Atoms_atom_get, METH_VARARGS },
+	 { (char *)"Atoms_string_set", _wrap_Atoms_string_set, METH_VARARGS },
+	 { (char *)"Atoms_string_get", _wrap_Atoms_string_get, METH_VARARGS },
+	 { (char *)"Atoms_utf8_set", _wrap_Atoms_utf8_set, METH_VARARGS },
+	 { (char *)"Atoms_utf8_get", _wrap_Atoms_utf8_get, METH_VARARGS },
+	 { (char *)"Atoms_openbox_pid_set", _wrap_Atoms_openbox_pid_set, METH_VARARGS },
+	 { (char *)"Atoms_openbox_pid_get", _wrap_Atoms_openbox_pid_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_colormap_windows_set", _wrap_Atoms_wm_colormap_windows_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_colormap_windows_get", _wrap_Atoms_wm_colormap_windows_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_protocols_set", _wrap_Atoms_wm_protocols_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_protocols_get", _wrap_Atoms_wm_protocols_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_state_set", _wrap_Atoms_wm_state_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_state_get", _wrap_Atoms_wm_state_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_delete_window_set", _wrap_Atoms_wm_delete_window_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_delete_window_get", _wrap_Atoms_wm_delete_window_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_take_focus_set", _wrap_Atoms_wm_take_focus_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_take_focus_get", _wrap_Atoms_wm_take_focus_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_change_state_set", _wrap_Atoms_wm_change_state_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_change_state_get", _wrap_Atoms_wm_change_state_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_name_set", _wrap_Atoms_wm_name_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_name_get", _wrap_Atoms_wm_name_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_icon_name_set", _wrap_Atoms_wm_icon_name_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_icon_name_get", _wrap_Atoms_wm_icon_name_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_class_set", _wrap_Atoms_wm_class_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_class_get", _wrap_Atoms_wm_class_get, METH_VARARGS },
+	 { (char *)"Atoms_wm_window_role_set", _wrap_Atoms_wm_window_role_set, METH_VARARGS },
+	 { (char *)"Atoms_wm_window_role_get", _wrap_Atoms_wm_window_role_get, METH_VARARGS },
+	 { (char *)"Atoms_motif_wm_hints_set", _wrap_Atoms_motif_wm_hints_set, METH_VARARGS },
+	 { (char *)"Atoms_motif_wm_hints_get", _wrap_Atoms_motif_wm_hints_get, METH_VARARGS },
+	 { (char *)"Atoms_openbox_show_root_menu_set", _wrap_Atoms_openbox_show_root_menu_set, METH_VARARGS },
+	 { (char *)"Atoms_openbox_show_root_menu_get", _wrap_Atoms_openbox_show_root_menu_get, METH_VARARGS },
+	 { (char *)"Atoms_openbox_show_workspace_menu_set", _wrap_Atoms_openbox_show_workspace_menu_set, METH_VARARGS },
+	 { (char *)"Atoms_openbox_show_workspace_menu_get", _wrap_Atoms_openbox_show_workspace_menu_get, METH_VARARGS },
+	 { (char *)"Atoms_net_supported_set", _wrap_Atoms_net_supported_set, METH_VARARGS },
+	 { (char *)"Atoms_net_supported_get", _wrap_Atoms_net_supported_get, METH_VARARGS },
+	 { (char *)"Atoms_net_client_list_set", _wrap_Atoms_net_client_list_set, METH_VARARGS },
+	 { (char *)"Atoms_net_client_list_get", _wrap_Atoms_net_client_list_get, METH_VARARGS },
+	 { (char *)"Atoms_net_client_list_stacking_set", _wrap_Atoms_net_client_list_stacking_set, METH_VARARGS },
+	 { (char *)"Atoms_net_client_list_stacking_get", _wrap_Atoms_net_client_list_stacking_get, METH_VARARGS },
+	 { (char *)"Atoms_net_number_of_desktops_set", _wrap_Atoms_net_number_of_desktops_set, METH_VARARGS },
+	 { (char *)"Atoms_net_number_of_desktops_get", _wrap_Atoms_net_number_of_desktops_get, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_geometry_set", _wrap_Atoms_net_desktop_geometry_set, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_geometry_get", _wrap_Atoms_net_desktop_geometry_get, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_viewport_set", _wrap_Atoms_net_desktop_viewport_set, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_viewport_get", _wrap_Atoms_net_desktop_viewport_get, METH_VARARGS },
+	 { (char *)"Atoms_net_current_desktop_set", _wrap_Atoms_net_current_desktop_set, METH_VARARGS },
+	 { (char *)"Atoms_net_current_desktop_get", _wrap_Atoms_net_current_desktop_get, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_names_set", _wrap_Atoms_net_desktop_names_set, METH_VARARGS },
+	 { (char *)"Atoms_net_desktop_names_get", _wrap_Atoms_net_desktop_names_get, METH_VARARGS },
+	 { (char *)"Atoms_net_active_window_set", _wrap_Atoms_net_active_window_set, METH_VARARGS },
+	 { (char *)"Atoms_net_active_window_get", _wrap_Atoms_net_active_window_get, METH_VARARGS },
+	 { (char *)"Atoms_net_workarea_set", _wrap_Atoms_net_workarea_set, METH_VARARGS },
+	 { (char *)"Atoms_net_workarea_get", _wrap_Atoms_net_workarea_get, METH_VARARGS },
+	 { (char *)"Atoms_net_supporting_wm_check_set", _wrap_Atoms_net_supporting_wm_check_set, METH_VARARGS },
+	 { (char *)"Atoms_net_supporting_wm_check_get", _wrap_Atoms_net_supporting_wm_check_get, METH_VARARGS },
+	 { (char *)"Atoms_net_close_window_set", _wrap_Atoms_net_close_window_set, METH_VARARGS },
+	 { (char *)"Atoms_net_close_window_get", _wrap_Atoms_net_close_window_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_set", _wrap_Atoms_net_wm_moveresize_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_get", _wrap_Atoms_net_wm_moveresize_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_name_set", _wrap_Atoms_net_wm_name_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_name_get", _wrap_Atoms_net_wm_name_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_visible_name_set", _wrap_Atoms_net_wm_visible_name_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_visible_name_get", _wrap_Atoms_net_wm_visible_name_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_icon_name_set", _wrap_Atoms_net_wm_icon_name_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_icon_name_get", _wrap_Atoms_net_wm_icon_name_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_visible_icon_name_set", _wrap_Atoms_net_wm_visible_icon_name_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_visible_icon_name_get", _wrap_Atoms_net_wm_visible_icon_name_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_desktop_set", _wrap_Atoms_net_wm_desktop_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_desktop_get", _wrap_Atoms_net_wm_desktop_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_set", _wrap_Atoms_net_wm_window_type_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_get", _wrap_Atoms_net_wm_window_type_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_set", _wrap_Atoms_net_wm_state_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_get", _wrap_Atoms_net_wm_state_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_strut_set", _wrap_Atoms_net_wm_strut_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_strut_get", _wrap_Atoms_net_wm_strut_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_allowed_actions_set", _wrap_Atoms_net_wm_allowed_actions_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_allowed_actions_get", _wrap_Atoms_net_wm_allowed_actions_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_desktop_set", _wrap_Atoms_net_wm_window_type_desktop_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_desktop_get", _wrap_Atoms_net_wm_window_type_desktop_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_dock_set", _wrap_Atoms_net_wm_window_type_dock_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_dock_get", _wrap_Atoms_net_wm_window_type_dock_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_toolbar_set", _wrap_Atoms_net_wm_window_type_toolbar_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_toolbar_get", _wrap_Atoms_net_wm_window_type_toolbar_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_menu_set", _wrap_Atoms_net_wm_window_type_menu_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_menu_get", _wrap_Atoms_net_wm_window_type_menu_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_utility_set", _wrap_Atoms_net_wm_window_type_utility_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_utility_get", _wrap_Atoms_net_wm_window_type_utility_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_splash_set", _wrap_Atoms_net_wm_window_type_splash_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_splash_get", _wrap_Atoms_net_wm_window_type_splash_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_dialog_set", _wrap_Atoms_net_wm_window_type_dialog_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_dialog_get", _wrap_Atoms_net_wm_window_type_dialog_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_normal_set", _wrap_Atoms_net_wm_window_type_normal_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_window_type_normal_get", _wrap_Atoms_net_wm_window_type_normal_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_topleft_set", _wrap_Atoms_net_wm_moveresize_size_topleft_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_topleft_get", _wrap_Atoms_net_wm_moveresize_size_topleft_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_topright_set", _wrap_Atoms_net_wm_moveresize_size_topright_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_topright_get", _wrap_Atoms_net_wm_moveresize_size_topright_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_bottomleft_set", _wrap_Atoms_net_wm_moveresize_size_bottomleft_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_bottomleft_get", _wrap_Atoms_net_wm_moveresize_size_bottomleft_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_bottomright_set", _wrap_Atoms_net_wm_moveresize_size_bottomright_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_size_bottomright_get", _wrap_Atoms_net_wm_moveresize_size_bottomright_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_move_set", _wrap_Atoms_net_wm_moveresize_move_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_moveresize_move_get", _wrap_Atoms_net_wm_moveresize_move_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_move_set", _wrap_Atoms_net_wm_action_move_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_move_get", _wrap_Atoms_net_wm_action_move_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_resize_set", _wrap_Atoms_net_wm_action_resize_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_resize_get", _wrap_Atoms_net_wm_action_resize_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_shade_set", _wrap_Atoms_net_wm_action_shade_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_shade_get", _wrap_Atoms_net_wm_action_shade_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_maximize_horz_set", _wrap_Atoms_net_wm_action_maximize_horz_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_maximize_horz_get", _wrap_Atoms_net_wm_action_maximize_horz_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_maximize_vert_set", _wrap_Atoms_net_wm_action_maximize_vert_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_maximize_vert_get", _wrap_Atoms_net_wm_action_maximize_vert_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_change_desktop_set", _wrap_Atoms_net_wm_action_change_desktop_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_change_desktop_get", _wrap_Atoms_net_wm_action_change_desktop_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_close_set", _wrap_Atoms_net_wm_action_close_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_action_close_get", _wrap_Atoms_net_wm_action_close_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_modal_set", _wrap_Atoms_net_wm_state_modal_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_modal_get", _wrap_Atoms_net_wm_state_modal_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_sticky_set", _wrap_Atoms_net_wm_state_sticky_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_sticky_get", _wrap_Atoms_net_wm_state_sticky_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_maximized_vert_set", _wrap_Atoms_net_wm_state_maximized_vert_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_maximized_vert_get", _wrap_Atoms_net_wm_state_maximized_vert_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_maximized_horz_set", _wrap_Atoms_net_wm_state_maximized_horz_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_maximized_horz_get", _wrap_Atoms_net_wm_state_maximized_horz_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_shaded_set", _wrap_Atoms_net_wm_state_shaded_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_shaded_get", _wrap_Atoms_net_wm_state_shaded_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_skip_taskbar_set", _wrap_Atoms_net_wm_state_skip_taskbar_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_skip_taskbar_get", _wrap_Atoms_net_wm_state_skip_taskbar_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_skip_pager_set", _wrap_Atoms_net_wm_state_skip_pager_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_skip_pager_get", _wrap_Atoms_net_wm_state_skip_pager_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_hidden_set", _wrap_Atoms_net_wm_state_hidden_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_hidden_get", _wrap_Atoms_net_wm_state_hidden_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_fullscreen_set", _wrap_Atoms_net_wm_state_fullscreen_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_fullscreen_get", _wrap_Atoms_net_wm_state_fullscreen_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_above_set", _wrap_Atoms_net_wm_state_above_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_above_get", _wrap_Atoms_net_wm_state_above_get, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_below_set", _wrap_Atoms_net_wm_state_below_set, METH_VARARGS },
+	 { (char *)"Atoms_net_wm_state_below_get", _wrap_Atoms_net_wm_state_below_get, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_system_tray_windows_set", _wrap_Atoms_kde_net_system_tray_windows_set, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_system_tray_windows_get", _wrap_Atoms_kde_net_system_tray_windows_get, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_wm_system_tray_window_for_set", _wrap_Atoms_kde_net_wm_system_tray_window_for_set, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_wm_system_tray_window_for_get", _wrap_Atoms_kde_net_wm_system_tray_window_for_get, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_wm_window_type_override_set", _wrap_Atoms_kde_net_wm_window_type_override_set, METH_VARARGS },
+	 { (char *)"Atoms_kde_net_wm_window_type_override_get", _wrap_Atoms_kde_net_wm_window_type_override_get, METH_VARARGS },
+	 { (char *)"Atoms_swigregister", Atoms_swigregister, METH_VARARGS },
+	 { (char *)"Property_initialize", _wrap_Property_initialize, METH_VARARGS },
 	 { (char *)"Property_set", _wrap_Property_set, METH_VARARGS },
 	 { (char *)"Property_get", _wrap_Property_get, METH_VARARGS },
 	 { (char *)"Property_erase", _wrap_Property_erase, METH_VARARGS },
-	 { (char *)"Property_atom", _wrap_Property_atom, METH_VARARGS },
 	 { (char *)"Property_swigregister", Property_swigregister, METH_VARARGS },
 	 { (char *)"new_Rect", _wrap_new_Rect, METH_VARARGS },
 	 { (char *)"Rect_left", _wrap_Rect_left, METH_VARARGS },
@@ -8099,7 +10966,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Cursors_ur_angle_get", _wrap_Cursors_ur_angle_get, METH_VARARGS },
 	 { (char *)"Cursors_swigregister", Cursors_swigregister, METH_VARARGS },
 	 { (char *)"Openbox_state", _wrap_Openbox_state, METH_VARARGS },
-	 { (char *)"Openbox_property", _wrap_Openbox_property, METH_VARARGS },
 	 { (char *)"Openbox_actions", _wrap_Openbox_actions, METH_VARARGS },
 	 { (char *)"Openbox_bindings", _wrap_Openbox_bindings, METH_VARARGS },
 	 { (char *)"Openbox_screen", _wrap_Openbox_screen, METH_VARARGS },
@@ -8327,6 +11193,7 @@ static swig_type_info _swigt__p_XCreateWindowEvent[] = {{"_p_XCreateWindowEvent"
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
 static swig_type_info _swigt__p_otk__Property__StringVect[] = {{"_p_otk__Property__StringVect", 0, "otk::Property::StringVect *", 0},{"_p_otk__Property__StringVect"},{0}};
 static swig_type_info _swigt__p_ob__WidgetBase[] = {{"_p_ob__WidgetBase", 0, "ob::WidgetBase *", 0},{"_p_ob__WidgetBase"},{"_p_ob__Client", _p_ob__ClientTo_p_ob__WidgetBase},{"_p_ob__Screen", _p_ob__ScreenTo_p_ob__WidgetBase},{0}};
+static swig_type_info _swigt__p_otk__Atoms[] = {{"_p_otk__Atoms", 0, "otk::Atoms *", 0},{"_p_otk__Atoms"},{0}};
 static swig_type_info _swigt__p_XKeyEvent[] = {{"_p_XKeyEvent", 0, "XKeyEvent *", 0},{"_p_XKeyEvent"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
 static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
@@ -8390,6 +11257,7 @@ _swigt__p_XCreateWindowEvent,
 _swigt__p_XDestroyWindowEvent, 
 _swigt__p_otk__Property__StringVect, 
 _swigt__p_ob__WidgetBase, 
+_swigt__p_otk__Atoms, 
 _swigt__p_XKeyEvent, 
 _swigt__p_otk__Strut, 
 _swigt__p_unsigned_long, 
@@ -8404,98 +11272,6 @@ _swigt__p_XSelectionEvent,
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (END) -------- */
 
 static swig_const_info swig_const_table[] = {
-{ SWIG_PY_INT,     (char *)"Property_Atom_Cardinal", (long) otk::Property::Atom_Cardinal, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_Atom_Window", (long) otk::Property::Atom_Window, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_Atom_Pixmap", (long) otk::Property::Atom_Pixmap, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_Atom_Atom", (long) otk::Property::Atom_Atom, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_Atom_String", (long) otk::Property::Atom_String, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_Atom_Utf8", (long) otk::Property::Atom_Utf8, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_openbox_pid", (long) otk::Property::openbox_pid, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_colormap_windows", (long) otk::Property::wm_colormap_windows, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_protocols", (long) otk::Property::wm_protocols, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_state", (long) otk::Property::wm_state, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_delete_window", (long) otk::Property::wm_delete_window, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_take_focus", (long) otk::Property::wm_take_focus, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_change_state", (long) otk::Property::wm_change_state, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_name", (long) otk::Property::wm_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_icon_name", (long) otk::Property::wm_icon_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_class", (long) otk::Property::wm_class, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_wm_window_role", (long) otk::Property::wm_window_role, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_motif_wm_hints", (long) otk::Property::motif_wm_hints, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_attributes", (long) otk::Property::blackbox_attributes, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_change_attributes", (long) otk::Property::blackbox_change_attributes, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_hints", (long) otk::Property::blackbox_hints, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_structure_messages", (long) otk::Property::blackbox_structure_messages, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_startup", (long) otk::Property::blackbox_notify_startup, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_window_add", (long) otk::Property::blackbox_notify_window_add, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_window_del", (long) otk::Property::blackbox_notify_window_del, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_window_focus", (long) otk::Property::blackbox_notify_window_focus, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_current_workspace", (long) otk::Property::blackbox_notify_current_workspace, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_workspace_count", (long) otk::Property::blackbox_notify_workspace_count, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_window_raise", (long) otk::Property::blackbox_notify_window_raise, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_notify_window_lower", (long) otk::Property::blackbox_notify_window_lower, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_change_workspace", (long) otk::Property::blackbox_change_workspace, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_change_window_focus", (long) otk::Property::blackbox_change_window_focus, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_blackbox_cycle_window_focus", (long) otk::Property::blackbox_cycle_window_focus, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_openbox_show_root_menu", (long) otk::Property::openbox_show_root_menu, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_openbox_show_workspace_menu", (long) otk::Property::openbox_show_workspace_menu, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_supported", (long) otk::Property::net_supported, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_client_list", (long) otk::Property::net_client_list, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_client_list_stacking", (long) otk::Property::net_client_list_stacking, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_number_of_desktops", (long) otk::Property::net_number_of_desktops, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_desktop_geometry", (long) otk::Property::net_desktop_geometry, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_desktop_viewport", (long) otk::Property::net_desktop_viewport, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_current_desktop", (long) otk::Property::net_current_desktop, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_desktop_names", (long) otk::Property::net_desktop_names, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_active_window", (long) otk::Property::net_active_window, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_workarea", (long) otk::Property::net_workarea, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_supporting_wm_check", (long) otk::Property::net_supporting_wm_check, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_close_window", (long) otk::Property::net_close_window, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize", (long) otk::Property::net_wm_moveresize, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_name", (long) otk::Property::net_wm_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_visible_name", (long) otk::Property::net_wm_visible_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_icon_name", (long) otk::Property::net_wm_icon_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_visible_icon_name", (long) otk::Property::net_wm_visible_icon_name, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_desktop", (long) otk::Property::net_wm_desktop, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type", (long) otk::Property::net_wm_window_type, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state", (long) otk::Property::net_wm_state, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_strut", (long) otk::Property::net_wm_strut, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_allowed_actions", (long) otk::Property::net_wm_allowed_actions, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_desktop", (long) otk::Property::net_wm_window_type_desktop, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_dock", (long) otk::Property::net_wm_window_type_dock, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_toolbar", (long) otk::Property::net_wm_window_type_toolbar, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_menu", (long) otk::Property::net_wm_window_type_menu, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_utility", (long) otk::Property::net_wm_window_type_utility, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_splash", (long) otk::Property::net_wm_window_type_splash, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_dialog", (long) otk::Property::net_wm_window_type_dialog, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_window_type_normal", (long) otk::Property::net_wm_window_type_normal, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize_size_topleft", (long) otk::Property::net_wm_moveresize_size_topleft, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize_size_topright", (long) otk::Property::net_wm_moveresize_size_topright, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize_size_bottomleft", (long) otk::Property::net_wm_moveresize_size_bottomleft, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize_size_bottomright", (long) otk::Property::net_wm_moveresize_size_bottomright, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_moveresize_move", (long) otk::Property::net_wm_moveresize_move, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_move", (long) otk::Property::net_wm_action_move, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_resize", (long) otk::Property::net_wm_action_resize, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_shade", (long) otk::Property::net_wm_action_shade, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_maximize_horz", (long) otk::Property::net_wm_action_maximize_horz, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_maximize_vert", (long) otk::Property::net_wm_action_maximize_vert, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_change_desktop", (long) otk::Property::net_wm_action_change_desktop, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_action_close", (long) otk::Property::net_wm_action_close, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_modal", (long) otk::Property::net_wm_state_modal, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_sticky", (long) otk::Property::net_wm_state_sticky, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_maximized_vert", (long) otk::Property::net_wm_state_maximized_vert, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_maximized_horz", (long) otk::Property::net_wm_state_maximized_horz, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_shaded", (long) otk::Property::net_wm_state_shaded, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_skip_taskbar", (long) otk::Property::net_wm_state_skip_taskbar, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_skip_pager", (long) otk::Property::net_wm_state_skip_pager, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_hidden", (long) otk::Property::net_wm_state_hidden, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_fullscreen", (long) otk::Property::net_wm_state_fullscreen, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_above", (long) otk::Property::net_wm_state_above, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_net_wm_state_below", (long) otk::Property::net_wm_state_below, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_kde_net_system_tray_windows", (long) otk::Property::kde_net_system_tray_windows, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_kde_net_wm_system_tray_window_for", (long) otk::Property::kde_net_wm_system_tray_window_for, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_kde_net_wm_window_type_override", (long) otk::Property::kde_net_wm_window_type_override, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Property_NUM_ATOMS", (long) otk::Property::NUM_ATOMS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Property_ascii", (long) otk::Property::ascii, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Property_utf8", (long) otk::Property::utf8, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Property_NUM_STRING_TYPE", (long) otk::Property::NUM_STRING_TYPE, 0, 0, 0},

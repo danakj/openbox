@@ -14,6 +14,7 @@
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/Xatom.h>
 
 #include <assert.h>
 
@@ -72,8 +73,6 @@ Client::Client(int screen, Window window)
 
 Client::~Client()
 {
-  const otk::Property *property = openbox->property();
-
   // clean up childrens' references
   while (!_transients.empty()) {
     _transients.front()->_transient_for = 0;
@@ -86,72 +85,56 @@ Client::~Client()
   
   if (openbox->state() != Openbox::State_Exiting) {
     // these values should not be persisted across a window unmapping/mapping
-    property->erase(_window, otk::Property::net_wm_desktop);
-    property->erase(_window, otk::Property::net_wm_state);
+    otk::Property::erase(_window, otk::Property::atoms.net_wm_desktop);
+    otk::Property::erase(_window, otk::Property::atoms.net_wm_state);
   }
 }
 
 
 void Client::getDesktop()
 {
-  const otk::Property *property = openbox->property();
-
   // defaults to the current desktop
   _desktop = openbox->screen(_screen)->desktop();
 
-  if (!property->get(_window, otk::Property::net_wm_desktop,
-                     otk::Property::Atom_Cardinal,
-                     (long unsigned*)&_desktop)) {
+  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_desktop,
+                          otk::Property::atoms.cardinal,
+                          (long unsigned*)&_desktop)) {
     // make sure the hint exists
-    openbox->property()->set(_window,
-                                       otk::Property::net_wm_desktop,
-                                       otk::Property::Atom_Cardinal,
-                                       (unsigned)_desktop);
+    otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
+                       otk::Property::atoms.cardinal, (unsigned)_desktop);
   }
 }
 
 
 void Client::getType()
 {
-  const otk::Property *property = openbox->property();
-
   _type = (WindowType) -1;
   
   unsigned long *val;
   unsigned long num = (unsigned) -1;
-  if (property->get(_window, otk::Property::net_wm_window_type,
-                    otk::Property::Atom_Atom,
-                    &num, &val)) {
+  if (otk::Property::get(_window, otk::Property::atoms.net_wm_window_type,
+                         otk::Property::atoms.atom, &num, &val)) {
     // use the first value that we know about in the array
     for (unsigned long i = 0; i < num; ++i) {
-      if (val[i] ==
-          property->atom(otk::Property::net_wm_window_type_desktop))
+      if (val[i] == otk::Property::atoms.net_wm_window_type_desktop)
         _type = Type_Desktop;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_dock))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_dock)
         _type = Type_Dock;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_toolbar))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_toolbar)
         _type = Type_Toolbar;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_menu))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_menu)
         _type = Type_Menu;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_utility))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_utility)
         _type = Type_Utility;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_splash))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_splash)
         _type = Type_Splash;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_dialog))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_dialog)
         _type = Type_Dialog;
-      else if (val[i] ==
-               property->atom(otk::Property::net_wm_window_type_normal))
+      else if (val[i] == otk::Property::atoms.net_wm_window_type_normal)
         _type = Type_Normal;
-//      else if (val[i] ==
-//               property->atom(otk::Property::kde_net_wm_window_type_override))
-//        mwm_decorations = 0; // prevent this window from getting any decor
-      // XXX: make this work again
+//    XXX: make this work again
+//    else if (val[i] == otk::Property::atoms.kde_net_wm_window_type_override)
+//      mwm_decorations = 0; // prevent this window from getting any decor
       if (_type != (WindowType) -1)
         break; // grab the first known type
     }
@@ -245,16 +228,14 @@ void Client::setupDecorAndFunctions()
 
 void Client::getMwmHints()
 {
-  const otk::Property *property = openbox->property();
-
   unsigned long num = MwmHints::elements;
   unsigned long *hints;
 
   _mwmhints.flags = 0; // default to none
   
-  if (!property->get(_window, otk::Property::motif_wm_hints,
-                     otk::Property::motif_wm_hints, &num,
-                     (unsigned long **)&hints))
+  if (!otk::Property::get(_window, otk::Property::atoms.motif_wm_hints,
+                          otk::Property::atoms.motif_wm_hints, &num,
+                          (unsigned long **)&hints))
     return;
   
   if (num >= MwmHints::elements) {
@@ -283,43 +264,33 @@ void Client::getArea()
 
 void Client::getState()
 {
-  const otk::Property *property = openbox->property();
-
   _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
     _skip_taskbar = _skip_pager = false;
   
   unsigned long *state;
   unsigned long num = (unsigned) -1;
   
-  if (property->get(_window, otk::Property::net_wm_state,
-                    otk::Property::Atom_Atom, &num, &state)) {
+  if (otk::Property::get(_window, otk::Property::atoms.net_wm_state,
+                         otk::Property::atoms.atom, &num, &state)) {
     for (unsigned long i = 0; i < num; ++i) {
-      if (state[i] == property->atom(otk::Property::net_wm_state_modal))
+      if (state[i] == otk::Property::atoms.net_wm_state_modal)
         _modal = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_shaded)) {
+      else if (state[i] == otk::Property::atoms.net_wm_state_shaded) {
         _shaded = true;
         _wmstate = IconicState;
-      } else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_skip_taskbar))
+      } else if (state[i] == otk::Property::atoms.net_wm_state_skip_taskbar)
         _skip_taskbar = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_skip_pager))
+      else if (state[i] == otk::Property::atoms.net_wm_state_skip_pager)
         _skip_pager = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_fullscreen))
+      else if (state[i] == otk::Property::atoms.net_wm_state_fullscreen)
         _fullscreen = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_maximized_vert))
+      else if (state[i] == otk::Property::atoms.net_wm_state_maximized_vert)
         _max_vert = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_maximized_horz))
+      else if (state[i] == otk::Property::atoms.net_wm_state_maximized_horz)
         _max_horz = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_above))
+      else if (state[i] == otk::Property::atoms.net_wm_state_above)
         _above = true;
-      else if (state[i] ==
-               property->atom(otk::Property::net_wm_state_below))
+      else if (state[i] == otk::Property::atoms.net_wm_state_below)
         _below = true;
     }
 
@@ -376,8 +347,6 @@ void Client::calcLayer() {
 
 void Client::updateProtocols()
 {
-  const otk::Property *property = openbox->property();
-
   Atom *proto;
   int num_return = 0;
 
@@ -387,12 +356,12 @@ void Client::updateProtocols()
 
   if (XGetWMProtocols(**otk::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
-      if (proto[i] == property->atom(otk::Property::wm_delete_window)) {
+      if (proto[i] == otk::Property::atoms.wm_delete_window) {
         _decorations |= Decor_Close;
         _functions |= Func_Close;
         if (frame)
           frame->adjustSize(); // update the decorations
-      } else if (proto[i] == property->atom(otk::Property::wm_take_focus))
+      } else if (proto[i] == otk::Property::atoms.wm_take_focus)
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus
         _focus_notify = true;
@@ -480,16 +449,14 @@ void Client::updateWMHints()
 
 void Client::updateTitle()
 {
-  const otk::Property *property = openbox->property();
-
   _title = "";
   
   // try netwm
-  if (! property->get(_window, otk::Property::net_wm_name,
-                      otk::Property::utf8, &_title)) {
+  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_name,
+                          otk::Property::utf8, &_title)) {
     // try old x stuff
-    property->get(_window, otk::Property::wm_name,
-                  otk::Property::ascii, &_title);
+    otk::Property::get(_window, otk::Property::atoms.wm_name,
+                       otk::Property::ascii, &_title);
   }
 
   if (_title.empty())
@@ -502,16 +469,14 @@ void Client::updateTitle()
 
 void Client::updateIconTitle()
 {
-  const otk::Property *property = openbox->property();
-
   _icon_title = "";
   
   // try netwm
-  if (! property->get(_window, otk::Property::net_wm_icon_name,
-                      otk::Property::utf8, &_icon_title)) {
+  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_icon_name,
+                          otk::Property::utf8, &_icon_title)) {
     // try old x stuff
-    property->get(_window, otk::Property::wm_icon_name,
-                  otk::Property::ascii, &_icon_title);
+    otk::Property::get(_window, otk::Property::atoms.wm_icon_name,
+                       otk::Property::ascii, &_icon_title);
   }
 
   if (_title.empty())
@@ -521,24 +486,22 @@ void Client::updateIconTitle()
 
 void Client::updateClass()
 {
-  const otk::Property *property = openbox->property();
-
   // set the defaults
   _app_name = _app_class = _role = "";
 
   otk::Property::StringVect v;
   unsigned long num = 2;
 
-  if (property->get(_window, otk::Property::wm_class,
-                    otk::Property::ascii, &num, &v)) {
+  if (otk::Property::get(_window, otk::Property::atoms.wm_class,
+                         otk::Property::ascii, &num, &v)) {
     if (num > 0) _app_name = v[0].c_str();
     if (num > 1) _app_class = v[1].c_str();
   }
 
   v.clear();
   num = 1;
-  if (property->get(_window, otk::Property::wm_window_role,
-                    otk::Property::ascii, &num, &v)) {
+  if (otk::Property::get(_window, otk::Property::atoms.wm_window_role,
+                         otk::Property::ascii, &num, &v)) {
     if (num > 0) _role = v[0].c_str();
   }
 }
@@ -548,10 +511,8 @@ void Client::updateStrut()
 {
   unsigned long num = 4;
   unsigned long *data;
-  if (!openbox->property()->get(_window,
-                                          otk::Property::net_wm_strut,
-                                          otk::Property::Atom_Cardinal,
-                                          &num, &data))
+  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_strut,
+                          otk::Property::atoms.cardinal, &num, &data))
     return;
 
   if (num == 4) {
@@ -606,8 +567,6 @@ void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
   
-  const otk::Property *property = openbox->property();
-
   // compress changes to a single property into a single change
   XEvent ce;
   while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
@@ -630,17 +589,17 @@ void Client::propertyHandler(const XPropertyEvent &e)
     setupDecorAndFunctions();
     frame->adjustSize(); // this updates the frame for any new decor settings
   }
-  else if (e.atom == property->atom(otk::Property::net_wm_name) ||
-           e.atom == property->atom(otk::Property::wm_name))
+  else if (e.atom == otk::Property::atoms.net_wm_name ||
+           e.atom == otk::Property::atoms.wm_name)
     updateTitle();
-  else if (e.atom == property->atom(otk::Property::net_wm_icon_name) ||
-           e.atom == property->atom(otk::Property::wm_icon_name))
+  else if (e.atom == otk::Property::atoms.net_wm_icon_name ||
+           e.atom == otk::Property::atoms.wm_icon_name)
     updateIconTitle();
-  else if (e.atom == property->atom(otk::Property::wm_class))
+  else if (e.atom == otk::Property::atoms.wm_class)
     updateClass();
-  else if (e.atom == property->atom(otk::Property::wm_protocols))
+  else if (e.atom == otk::Property::atoms.wm_protocols)
     updateProtocols();
-  else if (e.atom == property->atom(otk::Property::net_wm_strut))
+  else if (e.atom == otk::Property::atoms.net_wm_strut)
     updateStrut();
 }
 
@@ -671,10 +630,8 @@ void Client::setDesktop(long target)
   
   _desktop = target;
 
-  openbox->property()->set(_window,
-                                     otk::Property::net_wm_desktop,
-                                     otk::Property::Atom_Cardinal,
-                                     (unsigned)_desktop);
+  otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
+                     otk::Property::atoms.cardinal, (unsigned)_desktop);
   
   // 'move' the window to the new desktop
   if (_desktop == openbox->screen(_screen)->desktop() ||
@@ -687,7 +644,6 @@ void Client::setDesktop(long target)
 
 void Client::setState(StateAction action, long data1, long data2)
 {
-  const otk::Property *property = openbox->property();
   bool shadestate = _shaded;
 
   if (!(action == State_Add || action == State_Remove ||
@@ -701,106 +657,85 @@ void Client::setState(StateAction action, long data1, long data2)
 
     // if toggling, then pick whether we're adding or removing
     if (action == State_Toggle) {
-      if (state == property->atom(otk::Property::net_wm_state_modal))
+      if (state == otk::Property::atoms.net_wm_state_modal)
         action = _modal ? State_Remove : State_Add;
-      else if (state ==
-               property->atom(otk::Property::net_wm_state_maximized_vert))
+      else if (state == otk::Property::atoms.net_wm_state_maximized_vert)
         action = _max_vert ? State_Remove : State_Add;
-      else if (state ==
-               property->atom(otk::Property::net_wm_state_maximized_horz))
+      else if (state == otk::Property::atoms.net_wm_state_maximized_horz)
         action = _max_horz ? State_Remove : State_Add;
-      else if (state == property->atom(otk::Property::net_wm_state_shaded))
+      else if (state == otk::Property::atoms.net_wm_state_shaded)
         action = _shaded ? State_Remove : State_Add;
-      else if (state ==
-               property->atom(otk::Property::net_wm_state_skip_taskbar))
+      else if (state == otk::Property::atoms.net_wm_state_skip_taskbar)
         action = _skip_taskbar ? State_Remove : State_Add;
-      else if (state ==
-               property->atom(otk::Property::net_wm_state_skip_pager))
+      else if (state == otk::Property::atoms.net_wm_state_skip_pager)
         action = _skip_pager ? State_Remove : State_Add;
-      else if (state ==
-               property->atom(otk::Property::net_wm_state_fullscreen))
+      else if (state == otk::Property::atoms.net_wm_state_fullscreen)
         action = _fullscreen ? State_Remove : State_Add;
-      else if (state == property->atom(otk::Property::net_wm_state_above))
+      else if (state == otk::Property::atoms.net_wm_state_above)
         action = _above ? State_Remove : State_Add;
-      else if (state == property->atom(otk::Property::net_wm_state_below))
+      else if (state == otk::Property::atoms.net_wm_state_below)
         action = _below ? State_Remove : State_Add;
     }
     
     if (action == State_Add) {
-      if (state == property->atom(otk::Property::net_wm_state_modal)) {
+      if (state == otk::Property::atoms.net_wm_state_modal) {
         if (_modal) continue;
         _modal = true;
         // XXX: give it focus if another window has focus that shouldnt now
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_maximized_vert)){
+      } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         if (_max_vert) continue;
         _max_vert = true;
         // XXX: resize the window etc
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_maximized_horz)){
+      } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
         if (_max_horz) continue;
         _max_horz = true;
         // XXX: resize the window etc
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_shaded)) {
+      } else if (state == otk::Property::atoms.net_wm_state_shaded) {
         if (_shaded) continue;
         // shade when we're all thru here
         shadestate = true;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_skip_taskbar)) {
+      } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
         _skip_taskbar = true;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_skip_pager)) {
+      } else if (state == otk::Property::atoms.net_wm_state_skip_pager) {
         _skip_pager = true;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_fullscreen)) {
+      } else if (state == otk::Property::atoms.net_wm_state_fullscreen) {
         if (_fullscreen) continue;
         _fullscreen = true;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_above)) {
+      } else if (state == otk::Property::atoms.net_wm_state_above) {
         if (_above) continue;
         _above = true;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_below)) {
+      } else if (state == otk::Property::atoms.net_wm_state_below) {
         if (_below) continue;
         _below = true;
       }
 
     } else { // action == State_Remove
-      if (state == property->atom(otk::Property::net_wm_state_modal)) {
+      if (state == otk::Property::atoms.net_wm_state_modal) {
         if (!_modal) continue;
         _modal = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_maximized_vert)){
+      } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         if (!_max_vert) continue;
         _max_vert = false;
         // XXX: resize the window etc
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_maximized_horz)){
+      } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
         if (!_max_horz) continue;
         _max_horz = false;
         // XXX: resize the window etc
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_shaded)) {
+      } else if (state == otk::Property::atoms.net_wm_state_shaded) {
         if (!_shaded) continue;
         // unshade when we're all thru here
         shadestate = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_skip_taskbar)) {
+      } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
         _skip_taskbar = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_skip_pager)) {
+      } else if (state == otk::Property::atoms.net_wm_state_skip_pager) {
         _skip_pager = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_fullscreen)) {
+      } else if (state == otk::Property::atoms.net_wm_state_fullscreen) {
         if (!_fullscreen) continue;
         _fullscreen = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_above)) {
+      } else if (state == otk::Property::atoms.net_wm_state_above) {
         if (!_above) continue;
         _above = false;
-      } else if (state ==
-                 property->atom(otk::Property::net_wm_state_below)) {
+      } else if (state == otk::Property::atoms.net_wm_state_below) {
         if (!_below) continue;
         _below = false;
       }
@@ -865,9 +800,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
   
   if (e.format != 32) return;
 
-  const otk::Property *property = openbox->property();
-  
-  if (e.message_type == property->atom(otk::Property::wm_change_state)) {
+  if (e.message_type == otk::Property::atoms.wm_change_state) {
     // compress changes into a single change
     bool compress = false;
     XEvent ce;
@@ -884,8 +817,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
       setWMState(ce.xclient.data.l[0]); // use the found event
     else
       setWMState(e.data.l[0]); // use the original event
-  } else if (e.message_type ==
-             property->atom(otk::Property::net_wm_desktop)) {
+  } else if (e.message_type == otk::Property::atoms.net_wm_desktop) {
     // compress changes into a single change 
     bool compress = false;
     XEvent ce;
@@ -902,7 +834,7 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
       setDesktop(e.data.l[0]); // use the found event
     else
       setDesktop(e.data.l[0]); // use the original event
-  } else if (e.message_type == property->atom(otk::Property::net_wm_state)) {
+  } else if (e.message_type == otk::Property::atoms.net_wm_state) {
     // can't compress these
 #ifdef DEBUG
     printf("net_wm_state %s %ld %ld for 0x%lx\n",
@@ -911,14 +843,12 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
            e.data.l[1], e.data.l[2], _window);
 #endif
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
-  } else if (e.message_type ==
-             property->atom(otk::Property::net_close_window)) {
+  } else if (e.message_type == otk::Property::atoms.net_close_window) {
 #ifdef DEBUG
     printf("net_close_window for 0x%lx\n", _window);
 #endif
     close();
-  } else if (e.message_type ==
-             property->atom(otk::Property::net_active_window)) {
+  } else if (e.message_type == otk::Property::atoms.net_active_window) {
 #ifdef DEBUG
     printf("net_active_window for 0x%lx\n", _window);
 #endif
@@ -1041,7 +971,6 @@ void Client::move(int x, int y)
 void Client::close()
 {
   XEvent ce;
-  const otk::Property *property = openbox->property();
 
   if (!(_functions & Func_Close)) return;
 
@@ -1052,11 +981,11 @@ void Client::close()
   // explicitly killed.
 
   ce.xclient.type = ClientMessage;
-  ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
+  ce.xclient.message_type =  otk::Property::atoms.wm_protocols;
   ce.xclient.display = **otk::display;
   ce.xclient.window = _window;
   ce.xclient.format = 32;
-  ce.xclient.data.l[0] = property->atom(otk::Property::wm_delete_window);
+  ce.xclient.data.l[0] = otk::Property::atoms.wm_delete_window;
   ce.xclient.data.l[1] = CurrentTime;
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
@@ -1067,41 +996,36 @@ void Client::close()
 
 void Client::changeState()
 {
-  const otk::Property *property = openbox->property();
-
   unsigned long state[2];
   state[0] = _wmstate;
   state[1] = None;
-  property->set(_window, otk::Property::wm_state, otk::Property::wm_state,
-                state, 2);
+  otk::Property::set(_window, otk::Property::atoms.wm_state,
+                     otk::Property::atoms.wm_state, state, 2);
   
   Atom netstate[10];
   int num = 0;
   if (_modal)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_modal);
+    netstate[num++] = otk::Property::atoms.net_wm_state_modal;
   if (_shaded)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_shaded);
+    netstate[num++] = otk::Property::atoms.net_wm_state_shaded;
   if (_iconic)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_hidden);
+    netstate[num++] = otk::Property::atoms.net_wm_state_hidden;
   if (_skip_taskbar)
-    netstate[num++] =
-      property->atom(otk::Property::net_wm_state_skip_taskbar);
+    netstate[num++] = otk::Property::atoms.net_wm_state_skip_taskbar;
   if (_skip_pager)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_skip_pager);
+    netstate[num++] = otk::Property::atoms.net_wm_state_skip_pager;
   if (_fullscreen)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_fullscreen);
+    netstate[num++] = otk::Property::atoms.net_wm_state_fullscreen;
   if (_max_vert)
-    netstate[num++] =
-      property->atom(otk::Property::net_wm_state_maximized_vert);
+    netstate[num++] = otk::Property::atoms.net_wm_state_maximized_vert;
   if (_max_horz)
-    netstate[num++] =
-      property->atom(otk::Property::net_wm_state_maximized_horz);
+    netstate[num++] = otk::Property::atoms.net_wm_state_maximized_horz;
   if (_above)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_above);
+    netstate[num++] = otk::Property::atoms.net_wm_state_above;
   if (_below)
-    netstate[num++] = property->atom(otk::Property::net_wm_state_below);
-  property->set(_window, otk::Property::net_wm_state,
-                otk::Property::Atom_Atom, netstate, num);
+    netstate[num++] = otk::Property::atoms.net_wm_state_below;
+  otk::Property::set(_window, otk::Property::atoms.net_wm_state,
+                     otk::Property::atoms.atom, netstate, num);
 
   calcLayer();
 }
@@ -1132,14 +1056,12 @@ bool Client::focus() const
 
   if (_focus_notify) {
     XEvent ce;
-    const otk::Property *property = openbox->property();
-    
     ce.xclient.type = ClientMessage;
-    ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
+    ce.xclient.message_type = otk::Property::atoms.wm_protocols;
     ce.xclient.display = **otk::display;
     ce.xclient.window = _window;
     ce.xclient.format = 32;
-    ce.xclient.data.l[0] = property->atom(otk::Property::wm_take_focus);
+    ce.xclient.data.l[0] = otk::Property::atoms.wm_take_focus;
     ce.xclient.data.l[1] = openbox->lastTime();
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;

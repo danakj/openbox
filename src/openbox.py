@@ -31,6 +31,8 @@ Openbox_instance = _openbox.Openbox_instance
 
 Display_instance = _openbox.Display_instance
 
+Property_atoms = _openbox.Property_atoms
+
 class Display(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Display, name, value)
@@ -93,117 +95,279 @@ class PointPtr(Point):
         self.__class__ = Point
 _openbox.Point_swigregister(PointPtr)
 
+class Atoms(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Atoms, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, Atoms, name)
+    __swig_setmethods__["cardinal"] = _openbox.Atoms_cardinal_set
+    __swig_getmethods__["cardinal"] = _openbox.Atoms_cardinal_get
+    if _newclass:cardinal = property(_openbox.Atoms_cardinal_get,_openbox.Atoms_cardinal_set)
+    __swig_setmethods__["window"] = _openbox.Atoms_window_set
+    __swig_getmethods__["window"] = _openbox.Atoms_window_get
+    if _newclass:window = property(_openbox.Atoms_window_get,_openbox.Atoms_window_set)
+    __swig_setmethods__["pixmap"] = _openbox.Atoms_pixmap_set
+    __swig_getmethods__["pixmap"] = _openbox.Atoms_pixmap_get
+    if _newclass:pixmap = property(_openbox.Atoms_pixmap_get,_openbox.Atoms_pixmap_set)
+    __swig_setmethods__["atom"] = _openbox.Atoms_atom_set
+    __swig_getmethods__["atom"] = _openbox.Atoms_atom_get
+    if _newclass:atom = property(_openbox.Atoms_atom_get,_openbox.Atoms_atom_set)
+    __swig_setmethods__["string"] = _openbox.Atoms_string_set
+    __swig_getmethods__["string"] = _openbox.Atoms_string_get
+    if _newclass:string = property(_openbox.Atoms_string_get,_openbox.Atoms_string_set)
+    __swig_setmethods__["utf8"] = _openbox.Atoms_utf8_set
+    __swig_getmethods__["utf8"] = _openbox.Atoms_utf8_get
+    if _newclass:utf8 = property(_openbox.Atoms_utf8_get,_openbox.Atoms_utf8_set)
+    __swig_setmethods__["openbox_pid"] = _openbox.Atoms_openbox_pid_set
+    __swig_getmethods__["openbox_pid"] = _openbox.Atoms_openbox_pid_get
+    if _newclass:openbox_pid = property(_openbox.Atoms_openbox_pid_get,_openbox.Atoms_openbox_pid_set)
+    __swig_setmethods__["wm_colormap_windows"] = _openbox.Atoms_wm_colormap_windows_set
+    __swig_getmethods__["wm_colormap_windows"] = _openbox.Atoms_wm_colormap_windows_get
+    if _newclass:wm_colormap_windows = property(_openbox.Atoms_wm_colormap_windows_get,_openbox.Atoms_wm_colormap_windows_set)
+    __swig_setmethods__["wm_protocols"] = _openbox.Atoms_wm_protocols_set
+    __swig_getmethods__["wm_protocols"] = _openbox.Atoms_wm_protocols_get
+    if _newclass:wm_protocols = property(_openbox.Atoms_wm_protocols_get,_openbox.Atoms_wm_protocols_set)
+    __swig_setmethods__["wm_state"] = _openbox.Atoms_wm_state_set
+    __swig_getmethods__["wm_state"] = _openbox.Atoms_wm_state_get
+    if _newclass:wm_state = property(_openbox.Atoms_wm_state_get,_openbox.Atoms_wm_state_set)
+    __swig_setmethods__["wm_delete_window"] = _openbox.Atoms_wm_delete_window_set
+    __swig_getmethods__["wm_delete_window"] = _openbox.Atoms_wm_delete_window_get
+    if _newclass:wm_delete_window = property(_openbox.Atoms_wm_delete_window_get,_openbox.Atoms_wm_delete_window_set)
+    __swig_setmethods__["wm_take_focus"] = _openbox.Atoms_wm_take_focus_set
+    __swig_getmethods__["wm_take_focus"] = _openbox.Atoms_wm_take_focus_get
+    if _newclass:wm_take_focus = property(_openbox.Atoms_wm_take_focus_get,_openbox.Atoms_wm_take_focus_set)
+    __swig_setmethods__["wm_change_state"] = _openbox.Atoms_wm_change_state_set
+    __swig_getmethods__["wm_change_state"] = _openbox.Atoms_wm_change_state_get
+    if _newclass:wm_change_state = property(_openbox.Atoms_wm_change_state_get,_openbox.Atoms_wm_change_state_set)
+    __swig_setmethods__["wm_name"] = _openbox.Atoms_wm_name_set
+    __swig_getmethods__["wm_name"] = _openbox.Atoms_wm_name_get
+    if _newclass:wm_name = property(_openbox.Atoms_wm_name_get,_openbox.Atoms_wm_name_set)
+    __swig_setmethods__["wm_icon_name"] = _openbox.Atoms_wm_icon_name_set
+    __swig_getmethods__["wm_icon_name"] = _openbox.Atoms_wm_icon_name_get
+    if _newclass:wm_icon_name = property(_openbox.Atoms_wm_icon_name_get,_openbox.Atoms_wm_icon_name_set)
+    __swig_setmethods__["wm_class"] = _openbox.Atoms_wm_class_set
+    __swig_getmethods__["wm_class"] = _openbox.Atoms_wm_class_get
+    if _newclass:wm_class = property(_openbox.Atoms_wm_class_get,_openbox.Atoms_wm_class_set)
+    __swig_setmethods__["wm_window_role"] = _openbox.Atoms_wm_window_role_set
+    __swig_getmethods__["wm_window_role"] = _openbox.Atoms_wm_window_role_get
+    if _newclass:wm_window_role = property(_openbox.Atoms_wm_window_role_get,_openbox.Atoms_wm_window_role_set)
+    __swig_setmethods__["motif_wm_hints"] = _openbox.Atoms_motif_wm_hints_set
+    __swig_getmethods__["motif_wm_hints"] = _openbox.Atoms_motif_wm_hints_get
+    if _newclass:motif_wm_hints = property(_openbox.Atoms_motif_wm_hints_get,_openbox.Atoms_motif_wm_hints_set)
+    __swig_setmethods__["openbox_show_root_menu"] = _openbox.Atoms_openbox_show_root_menu_set
+    __swig_getmethods__["openbox_show_root_menu"] = _openbox.Atoms_openbox_show_root_menu_get
+    if _newclass:openbox_show_root_menu = property(_openbox.Atoms_openbox_show_root_menu_get,_openbox.Atoms_openbox_show_root_menu_set)
+    __swig_setmethods__["openbox_show_workspace_menu"] = _openbox.Atoms_openbox_show_workspace_menu_set
+    __swig_getmethods__["openbox_show_workspace_menu"] = _openbox.Atoms_openbox_show_workspace_menu_get
+    if _newclass:openbox_show_workspace_menu = property(_openbox.Atoms_openbox_show_workspace_menu_get,_openbox.Atoms_openbox_show_workspace_menu_set)
+    __swig_setmethods__["net_supported"] = _openbox.Atoms_net_supported_set
+    __swig_getmethods__["net_supported"] = _openbox.Atoms_net_supported_get
+    if _newclass:net_supported = property(_openbox.Atoms_net_supported_get,_openbox.Atoms_net_supported_set)
+    __swig_setmethods__["net_client_list"] = _openbox.Atoms_net_client_list_set
+    __swig_getmethods__["net_client_list"] = _openbox.Atoms_net_client_list_get
+    if _newclass:net_client_list = property(_openbox.Atoms_net_client_list_get,_openbox.Atoms_net_client_list_set)
+    __swig_setmethods__["net_client_list_stacking"] = _openbox.Atoms_net_client_list_stacking_set
+    __swig_getmethods__["net_client_list_stacking"] = _openbox.Atoms_net_client_list_stacking_get
+    if _newclass:net_client_list_stacking = property(_openbox.Atoms_net_client_list_stacking_get,_openbox.Atoms_net_client_list_stacking_set)
+    __swig_setmethods__["net_number_of_desktops"] = _openbox.Atoms_net_number_of_desktops_set
+    __swig_getmethods__["net_number_of_desktops"] = _openbox.Atoms_net_number_of_desktops_get
+    if _newclass:net_number_of_desktops = property(_openbox.Atoms_net_number_of_desktops_get,_openbox.Atoms_net_number_of_desktops_set)
+    __swig_setmethods__["net_desktop_geometry"] = _openbox.Atoms_net_desktop_geometry_set
+    __swig_getmethods__["net_desktop_geometry"] = _openbox.Atoms_net_desktop_geometry_get
+    if _newclass:net_desktop_geometry = property(_openbox.Atoms_net_desktop_geometry_get,_openbox.Atoms_net_desktop_geometry_set)
+    __swig_setmethods__["net_desktop_viewport"] = _openbox.Atoms_net_desktop_viewport_set
+    __swig_getmethods__["net_desktop_viewport"] = _openbox.Atoms_net_desktop_viewport_get
+    if _newclass:net_desktop_viewport = property(_openbox.Atoms_net_desktop_viewport_get,_openbox.Atoms_net_desktop_viewport_set)
+    __swig_setmethods__["net_current_desktop"] = _openbox.Atoms_net_current_desktop_set
+    __swig_getmethods__["net_current_desktop"] = _openbox.Atoms_net_current_desktop_get
+    if _newclass:net_current_desktop = property(_openbox.Atoms_net_current_desktop_get,_openbox.Atoms_net_current_desktop_set)
+    __swig_setmethods__["net_desktop_names"] = _openbox.Atoms_net_desktop_names_set
+    __swig_getmethods__["net_desktop_names"] = _openbox.Atoms_net_desktop_names_get
+    if _newclass:net_desktop_names = property(_openbox.Atoms_net_desktop_names_get,_openbox.Atoms_net_desktop_names_set)
+    __swig_setmethods__["net_active_window"] = _openbox.Atoms_net_active_window_set
+    __swig_getmethods__["net_active_window"] = _openbox.Atoms_net_active_window_get
+    if _newclass:net_active_window = property(_openbox.Atoms_net_active_window_get,_openbox.Atoms_net_active_window_set)
+    __swig_setmethods__["net_workarea"] = _openbox.Atoms_net_workarea_set
+    __swig_getmethods__["net_workarea"] = _openbox.Atoms_net_workarea_get
+    if _newclass:net_workarea = property(_openbox.Atoms_net_workarea_get,_openbox.Atoms_net_workarea_set)
+    __swig_setmethods__["net_supporting_wm_check"] = _openbox.Atoms_net_supporting_wm_check_set
+    __swig_getmethods__["net_supporting_wm_check"] = _openbox.Atoms_net_supporting_wm_check_get
+    if _newclass:net_supporting_wm_check = property(_openbox.Atoms_net_supporting_wm_check_get,_openbox.Atoms_net_supporting_wm_check_set)
+    __swig_setmethods__["net_close_window"] = _openbox.Atoms_net_close_window_set
+    __swig_getmethods__["net_close_window"] = _openbox.Atoms_net_close_window_get
+    if _newclass:net_close_window = property(_openbox.Atoms_net_close_window_get,_openbox.Atoms_net_close_window_set)
+    __swig_setmethods__["net_wm_moveresize"] = _openbox.Atoms_net_wm_moveresize_set
+    __swig_getmethods__["net_wm_moveresize"] = _openbox.Atoms_net_wm_moveresize_get
+    if _newclass:net_wm_moveresize = property(_openbox.Atoms_net_wm_moveresize_get,_openbox.Atoms_net_wm_moveresize_set)
+    __swig_setmethods__["net_wm_name"] = _openbox.Atoms_net_wm_name_set
+    __swig_getmethods__["net_wm_name"] = _openbox.Atoms_net_wm_name_get
+    if _newclass:net_wm_name = property(_openbox.Atoms_net_wm_name_get,_openbox.Atoms_net_wm_name_set)
+    __swig_setmethods__["net_wm_visible_name"] = _openbox.Atoms_net_wm_visible_name_set
+    __swig_getmethods__["net_wm_visible_name"] = _openbox.Atoms_net_wm_visible_name_get
+    if _newclass:net_wm_visible_name = property(_openbox.Atoms_net_wm_visible_name_get,_openbox.Atoms_net_wm_visible_name_set)
+    __swig_setmethods__["net_wm_icon_name"] = _openbox.Atoms_net_wm_icon_name_set
+    __swig_getmethods__["net_wm_icon_name"] = _openbox.Atoms_net_wm_icon_name_get
+    if _newclass:net_wm_icon_name = property(_openbox.Atoms_net_wm_icon_name_get,_openbox.Atoms_net_wm_icon_name_set)
+    __swig_setmethods__["net_wm_visible_icon_name"] = _openbox.Atoms_net_wm_visible_icon_name_set
+    __swig_getmethods__["net_wm_visible_icon_name"] = _openbox.Atoms_net_wm_visible_icon_name_get
+    if _newclass:net_wm_visible_icon_name = property(_openbox.Atoms_net_wm_visible_icon_name_get,_openbox.Atoms_net_wm_visible_icon_name_set)
+    __swig_setmethods__["net_wm_desktop"] = _openbox.Atoms_net_wm_desktop_set
+    __swig_getmethods__["net_wm_desktop"] = _openbox.Atoms_net_wm_desktop_get
+    if _newclass:net_wm_desktop = property(_openbox.Atoms_net_wm_desktop_get,_openbox.Atoms_net_wm_desktop_set)
+    __swig_setmethods__["net_wm_window_type"] = _openbox.Atoms_net_wm_window_type_set
+    __swig_getmethods__["net_wm_window_type"] = _openbox.Atoms_net_wm_window_type_get
+    if _newclass:net_wm_window_type = property(_openbox.Atoms_net_wm_window_type_get,_openbox.Atoms_net_wm_window_type_set)
+    __swig_setmethods__["net_wm_state"] = _openbox.Atoms_net_wm_state_set
+    __swig_getmethods__["net_wm_state"] = _openbox.Atoms_net_wm_state_get
+    if _newclass:net_wm_state = property(_openbox.Atoms_net_wm_state_get,_openbox.Atoms_net_wm_state_set)
+    __swig_setmethods__["net_wm_strut"] = _openbox.Atoms_net_wm_strut_set
+    __swig_getmethods__["net_wm_strut"] = _openbox.Atoms_net_wm_strut_get
+    if _newclass:net_wm_strut = property(_openbox.Atoms_net_wm_strut_get,_openbox.Atoms_net_wm_strut_set)
+    __swig_setmethods__["net_wm_allowed_actions"] = _openbox.Atoms_net_wm_allowed_actions_set
+    __swig_getmethods__["net_wm_allowed_actions"] = _openbox.Atoms_net_wm_allowed_actions_get
+    if _newclass:net_wm_allowed_actions = property(_openbox.Atoms_net_wm_allowed_actions_get,_openbox.Atoms_net_wm_allowed_actions_set)
+    __swig_setmethods__["net_wm_window_type_desktop"] = _openbox.Atoms_net_wm_window_type_desktop_set
+    __swig_getmethods__["net_wm_window_type_desktop"] = _openbox.Atoms_net_wm_window_type_desktop_get
+    if _newclass:net_wm_window_type_desktop = property(_openbox.Atoms_net_wm_window_type_desktop_get,_openbox.Atoms_net_wm_window_type_desktop_set)
+    __swig_setmethods__["net_wm_window_type_dock"] = _openbox.Atoms_net_wm_window_type_dock_set
+    __swig_getmethods__["net_wm_window_type_dock"] = _openbox.Atoms_net_wm_window_type_dock_get
+    if _newclass:net_wm_window_type_dock = property(_openbox.Atoms_net_wm_window_type_dock_get,_openbox.Atoms_net_wm_window_type_dock_set)
+    __swig_setmethods__["net_wm_window_type_toolbar"] = _openbox.Atoms_net_wm_window_type_toolbar_set
+    __swig_getmethods__["net_wm_window_type_toolbar"] = _openbox.Atoms_net_wm_window_type_toolbar_get
+    if _newclass:net_wm_window_type_toolbar = property(_openbox.Atoms_net_wm_window_type_toolbar_get,_openbox.Atoms_net_wm_window_type_toolbar_set)
+    __swig_setmethods__["net_wm_window_type_menu"] = _openbox.Atoms_net_wm_window_type_menu_set
+    __swig_getmethods__["net_wm_window_type_menu"] = _openbox.Atoms_net_wm_window_type_menu_get
+    if _newclass:net_wm_window_type_menu = property(_openbox.Atoms_net_wm_window_type_menu_get,_openbox.Atoms_net_wm_window_type_menu_set)
+    __swig_setmethods__["net_wm_window_type_utility"] = _openbox.Atoms_net_wm_window_type_utility_set
+    __swig_getmethods__["net_wm_window_type_utility"] = _openbox.Atoms_net_wm_window_type_utility_get
+    if _newclass:net_wm_window_type_utility = property(_openbox.Atoms_net_wm_window_type_utility_get,_openbox.Atoms_net_wm_window_type_utility_set)
+    __swig_setmethods__["net_wm_window_type_splash"] = _openbox.Atoms_net_wm_window_type_splash_set
+    __swig_getmethods__["net_wm_window_type_splash"] = _openbox.Atoms_net_wm_window_type_splash_get
+    if _newclass:net_wm_window_type_splash = property(_openbox.Atoms_net_wm_window_type_splash_get,_openbox.Atoms_net_wm_window_type_splash_set)
+    __swig_setmethods__["net_wm_window_type_dialog"] = _openbox.Atoms_net_wm_window_type_dialog_set
+    __swig_getmethods__["net_wm_window_type_dialog"] = _openbox.Atoms_net_wm_window_type_dialog_get
+    if _newclass:net_wm_window_type_dialog = property(_openbox.Atoms_net_wm_window_type_dialog_get,_openbox.Atoms_net_wm_window_type_dialog_set)
+    __swig_setmethods__["net_wm_window_type_normal"] = _openbox.Atoms_net_wm_window_type_normal_set
+    __swig_getmethods__["net_wm_window_type_normal"] = _openbox.Atoms_net_wm_window_type_normal_get
+    if _newclass:net_wm_window_type_normal = property(_openbox.Atoms_net_wm_window_type_normal_get,_openbox.Atoms_net_wm_window_type_normal_set)
+    __swig_setmethods__["net_wm_moveresize_size_topleft"] = _openbox.Atoms_net_wm_moveresize_size_topleft_set
+    __swig_getmethods__["net_wm_moveresize_size_topleft"] = _openbox.Atoms_net_wm_moveresize_size_topleft_get
+    if _newclass:net_wm_moveresize_size_topleft = property(_openbox.Atoms_net_wm_moveresize_size_topleft_get,_openbox.Atoms_net_wm_moveresize_size_topleft_set)
+    __swig_setmethods__["net_wm_moveresize_size_topright"] = _openbox.Atoms_net_wm_moveresize_size_topright_set
+    __swig_getmethods__["net_wm_moveresize_size_topright"] = _openbox.Atoms_net_wm_moveresize_size_topright_get
+    if _newclass:net_wm_moveresize_size_topright = property(_openbox.Atoms_net_wm_moveresize_size_topright_get,_openbox.Atoms_net_wm_moveresize_size_topright_set)
+    __swig_setmethods__["net_wm_moveresize_size_bottomleft"] = _openbox.Atoms_net_wm_moveresize_size_bottomleft_set
+    __swig_getmethods__["net_wm_moveresize_size_bottomleft"] = _openbox.Atoms_net_wm_moveresize_size_bottomleft_get
+    if _newclass:net_wm_moveresize_size_bottomleft = property(_openbox.Atoms_net_wm_moveresize_size_bottomleft_get,_openbox.Atoms_net_wm_moveresize_size_bottomleft_set)
+    __swig_setmethods__["net_wm_moveresize_size_bottomright"] = _openbox.Atoms_net_wm_moveresize_size_bottomright_set
+    __swig_getmethods__["net_wm_moveresize_size_bottomright"] = _openbox.Atoms_net_wm_moveresize_size_bottomright_get
+    if _newclass:net_wm_moveresize_size_bottomright = property(_openbox.Atoms_net_wm_moveresize_size_bottomright_get,_openbox.Atoms_net_wm_moveresize_size_bottomright_set)
+    __swig_setmethods__["net_wm_moveresize_move"] = _openbox.Atoms_net_wm_moveresize_move_set
+    __swig_getmethods__["net_wm_moveresize_move"] = _openbox.Atoms_net_wm_moveresize_move_get
+    if _newclass:net_wm_moveresize_move = property(_openbox.Atoms_net_wm_moveresize_move_get,_openbox.Atoms_net_wm_moveresize_move_set)
+    __swig_setmethods__["net_wm_action_move"] = _openbox.Atoms_net_wm_action_move_set
+    __swig_getmethods__["net_wm_action_move"] = _openbox.Atoms_net_wm_action_move_get
+    if _newclass:net_wm_action_move = property(_openbox.Atoms_net_wm_action_move_get,_openbox.Atoms_net_wm_action_move_set)
+    __swig_setmethods__["net_wm_action_resize"] = _openbox.Atoms_net_wm_action_resize_set
+    __swig_getmethods__["net_wm_action_resize"] = _openbox.Atoms_net_wm_action_resize_get
+    if _newclass:net_wm_action_resize = property(_openbox.Atoms_net_wm_action_resize_get,_openbox.Atoms_net_wm_action_resize_set)
+    __swig_setmethods__["net_wm_action_shade"] = _openbox.Atoms_net_wm_action_shade_set
+    __swig_getmethods__["net_wm_action_shade"] = _openbox.Atoms_net_wm_action_shade_get
+    if _newclass:net_wm_action_shade = property(_openbox.Atoms_net_wm_action_shade_get,_openbox.Atoms_net_wm_action_shade_set)
+    __swig_setmethods__["net_wm_action_maximize_horz"] = _openbox.Atoms_net_wm_action_maximize_horz_set
+    __swig_getmethods__["net_wm_action_maximize_horz"] = _openbox.Atoms_net_wm_action_maximize_horz_get
+    if _newclass:net_wm_action_maximize_horz = property(_openbox.Atoms_net_wm_action_maximize_horz_get,_openbox.Atoms_net_wm_action_maximize_horz_set)
+    __swig_setmethods__["net_wm_action_maximize_vert"] = _openbox.Atoms_net_wm_action_maximize_vert_set
+    __swig_getmethods__["net_wm_action_maximize_vert"] = _openbox.Atoms_net_wm_action_maximize_vert_get
+    if _newclass:net_wm_action_maximize_vert = property(_openbox.Atoms_net_wm_action_maximize_vert_get,_openbox.Atoms_net_wm_action_maximize_vert_set)
+    __swig_setmethods__["net_wm_action_change_desktop"] = _openbox.Atoms_net_wm_action_change_desktop_set
+    __swig_getmethods__["net_wm_action_change_desktop"] = _openbox.Atoms_net_wm_action_change_desktop_get
+    if _newclass:net_wm_action_change_desktop = property(_openbox.Atoms_net_wm_action_change_desktop_get,_openbox.Atoms_net_wm_action_change_desktop_set)
+    __swig_setmethods__["net_wm_action_close"] = _openbox.Atoms_net_wm_action_close_set
+    __swig_getmethods__["net_wm_action_close"] = _openbox.Atoms_net_wm_action_close_get
+    if _newclass:net_wm_action_close = property(_openbox.Atoms_net_wm_action_close_get,_openbox.Atoms_net_wm_action_close_set)
+    __swig_setmethods__["net_wm_state_modal"] = _openbox.Atoms_net_wm_state_modal_set
+    __swig_getmethods__["net_wm_state_modal"] = _openbox.Atoms_net_wm_state_modal_get
+    if _newclass:net_wm_state_modal = property(_openbox.Atoms_net_wm_state_modal_get,_openbox.Atoms_net_wm_state_modal_set)
+    __swig_setmethods__["net_wm_state_sticky"] = _openbox.Atoms_net_wm_state_sticky_set
+    __swig_getmethods__["net_wm_state_sticky"] = _openbox.Atoms_net_wm_state_sticky_get
+    if _newclass:net_wm_state_sticky = property(_openbox.Atoms_net_wm_state_sticky_get,_openbox.Atoms_net_wm_state_sticky_set)
+    __swig_setmethods__["net_wm_state_maximized_vert"] = _openbox.Atoms_net_wm_state_maximized_vert_set
+    __swig_getmethods__["net_wm_state_maximized_vert"] = _openbox.Atoms_net_wm_state_maximized_vert_get
+    if _newclass:net_wm_state_maximized_vert = property(_openbox.Atoms_net_wm_state_maximized_vert_get,_openbox.Atoms_net_wm_state_maximized_vert_set)
+    __swig_setmethods__["net_wm_state_maximized_horz"] = _openbox.Atoms_net_wm_state_maximized_horz_set
+    __swig_getmethods__["net_wm_state_maximized_horz"] = _openbox.Atoms_net_wm_state_maximized_horz_get
+    if _newclass:net_wm_state_maximized_horz = property(_openbox.Atoms_net_wm_state_maximized_horz_get,_openbox.Atoms_net_wm_state_maximized_horz_set)
+    __swig_setmethods__["net_wm_state_shaded"] = _openbox.Atoms_net_wm_state_shaded_set
+    __swig_getmethods__["net_wm_state_shaded"] = _openbox.Atoms_net_wm_state_shaded_get
+    if _newclass:net_wm_state_shaded = property(_openbox.Atoms_net_wm_state_shaded_get,_openbox.Atoms_net_wm_state_shaded_set)
+    __swig_setmethods__["net_wm_state_skip_taskbar"] = _openbox.Atoms_net_wm_state_skip_taskbar_set
+    __swig_getmethods__["net_wm_state_skip_taskbar"] = _openbox.Atoms_net_wm_state_skip_taskbar_get
+    if _newclass:net_wm_state_skip_taskbar = property(_openbox.Atoms_net_wm_state_skip_taskbar_get,_openbox.Atoms_net_wm_state_skip_taskbar_set)
+    __swig_setmethods__["net_wm_state_skip_pager"] = _openbox.Atoms_net_wm_state_skip_pager_set
+    __swig_getmethods__["net_wm_state_skip_pager"] = _openbox.Atoms_net_wm_state_skip_pager_get
+    if _newclass:net_wm_state_skip_pager = property(_openbox.Atoms_net_wm_state_skip_pager_get,_openbox.Atoms_net_wm_state_skip_pager_set)
+    __swig_setmethods__["net_wm_state_hidden"] = _openbox.Atoms_net_wm_state_hidden_set
+    __swig_getmethods__["net_wm_state_hidden"] = _openbox.Atoms_net_wm_state_hidden_get
+    if _newclass:net_wm_state_hidden = property(_openbox.Atoms_net_wm_state_hidden_get,_openbox.Atoms_net_wm_state_hidden_set)
+    __swig_setmethods__["net_wm_state_fullscreen"] = _openbox.Atoms_net_wm_state_fullscreen_set
+    __swig_getmethods__["net_wm_state_fullscreen"] = _openbox.Atoms_net_wm_state_fullscreen_get
+    if _newclass:net_wm_state_fullscreen = property(_openbox.Atoms_net_wm_state_fullscreen_get,_openbox.Atoms_net_wm_state_fullscreen_set)
+    __swig_setmethods__["net_wm_state_above"] = _openbox.Atoms_net_wm_state_above_set
+    __swig_getmethods__["net_wm_state_above"] = _openbox.Atoms_net_wm_state_above_get
+    if _newclass:net_wm_state_above = property(_openbox.Atoms_net_wm_state_above_get,_openbox.Atoms_net_wm_state_above_set)
+    __swig_setmethods__["net_wm_state_below"] = _openbox.Atoms_net_wm_state_below_set
+    __swig_getmethods__["net_wm_state_below"] = _openbox.Atoms_net_wm_state_below_get
+    if _newclass:net_wm_state_below = property(_openbox.Atoms_net_wm_state_below_get,_openbox.Atoms_net_wm_state_below_set)
+    __swig_setmethods__["kde_net_system_tray_windows"] = _openbox.Atoms_kde_net_system_tray_windows_set
+    __swig_getmethods__["kde_net_system_tray_windows"] = _openbox.Atoms_kde_net_system_tray_windows_get
+    if _newclass:kde_net_system_tray_windows = property(_openbox.Atoms_kde_net_system_tray_windows_get,_openbox.Atoms_kde_net_system_tray_windows_set)
+    __swig_setmethods__["kde_net_wm_system_tray_window_for"] = _openbox.Atoms_kde_net_wm_system_tray_window_for_set
+    __swig_getmethods__["kde_net_wm_system_tray_window_for"] = _openbox.Atoms_kde_net_wm_system_tray_window_for_get
+    if _newclass:kde_net_wm_system_tray_window_for = property(_openbox.Atoms_kde_net_wm_system_tray_window_for_get,_openbox.Atoms_kde_net_wm_system_tray_window_for_set)
+    __swig_setmethods__["kde_net_wm_window_type_override"] = _openbox.Atoms_kde_net_wm_window_type_override_set
+    __swig_getmethods__["kde_net_wm_window_type_override"] = _openbox.Atoms_kde_net_wm_window_type_override_get
+    if _newclass:kde_net_wm_window_type_override = property(_openbox.Atoms_kde_net_wm_window_type_override_get,_openbox.Atoms_kde_net_wm_window_type_override_set)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C Atoms instance at %s>" % (self.this,)
+
+class AtomsPtr(Atoms):
+    def __init__(self,this):
+        self.this = this
+        if not hasattr(self,"thisown"): self.thisown = 0
+        self.__class__ = Atoms
+_openbox.Atoms_swigregister(AtomsPtr)
+
 class Property(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Property, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, Property, name)
-    Atom_Cardinal = _openbox.Property_Atom_Cardinal
-    Atom_Window = _openbox.Property_Atom_Window
-    Atom_Pixmap = _openbox.Property_Atom_Pixmap
-    Atom_Atom = _openbox.Property_Atom_Atom
-    Atom_String = _openbox.Property_Atom_String
-    Atom_Utf8 = _openbox.Property_Atom_Utf8
-    openbox_pid = _openbox.Property_openbox_pid
-    wm_colormap_windows = _openbox.Property_wm_colormap_windows
-    wm_protocols = _openbox.Property_wm_protocols
-    wm_state = _openbox.Property_wm_state
-    wm_delete_window = _openbox.Property_wm_delete_window
-    wm_take_focus = _openbox.Property_wm_take_focus
-    wm_change_state = _openbox.Property_wm_change_state
-    wm_name = _openbox.Property_wm_name
-    wm_icon_name = _openbox.Property_wm_icon_name
-    wm_class = _openbox.Property_wm_class
-    wm_window_role = _openbox.Property_wm_window_role
-    motif_wm_hints = _openbox.Property_motif_wm_hints
-    blackbox_attributes = _openbox.Property_blackbox_attributes
-    blackbox_change_attributes = _openbox.Property_blackbox_change_attributes
-    blackbox_hints = _openbox.Property_blackbox_hints
-    blackbox_structure_messages = _openbox.Property_blackbox_structure_messages
-    blackbox_notify_startup = _openbox.Property_blackbox_notify_startup
-    blackbox_notify_window_add = _openbox.Property_blackbox_notify_window_add
-    blackbox_notify_window_del = _openbox.Property_blackbox_notify_window_del
-    blackbox_notify_window_focus = _openbox.Property_blackbox_notify_window_focus
-    blackbox_notify_current_workspace = _openbox.Property_blackbox_notify_current_workspace
-    blackbox_notify_workspace_count = _openbox.Property_blackbox_notify_workspace_count
-    blackbox_notify_window_raise = _openbox.Property_blackbox_notify_window_raise
-    blackbox_notify_window_lower = _openbox.Property_blackbox_notify_window_lower
-    blackbox_change_workspace = _openbox.Property_blackbox_change_workspace
-    blackbox_change_window_focus = _openbox.Property_blackbox_change_window_focus
-    blackbox_cycle_window_focus = _openbox.Property_blackbox_cycle_window_focus
-    openbox_show_root_menu = _openbox.Property_openbox_show_root_menu
-    openbox_show_workspace_menu = _openbox.Property_openbox_show_workspace_menu
-    net_supported = _openbox.Property_net_supported
-    net_client_list = _openbox.Property_net_client_list
-    net_client_list_stacking = _openbox.Property_net_client_list_stacking
-    net_number_of_desktops = _openbox.Property_net_number_of_desktops
-    net_desktop_geometry = _openbox.Property_net_desktop_geometry
-    net_desktop_viewport = _openbox.Property_net_desktop_viewport
-    net_current_desktop = _openbox.Property_net_current_desktop
-    net_desktop_names = _openbox.Property_net_desktop_names
-    net_active_window = _openbox.Property_net_active_window
-    net_workarea = _openbox.Property_net_workarea
-    net_supporting_wm_check = _openbox.Property_net_supporting_wm_check
-    net_close_window = _openbox.Property_net_close_window
-    net_wm_moveresize = _openbox.Property_net_wm_moveresize
-    net_wm_name = _openbox.Property_net_wm_name
-    net_wm_visible_name = _openbox.Property_net_wm_visible_name
-    net_wm_icon_name = _openbox.Property_net_wm_icon_name
-    net_wm_visible_icon_name = _openbox.Property_net_wm_visible_icon_name
-    net_wm_desktop = _openbox.Property_net_wm_desktop
-    net_wm_window_type = _openbox.Property_net_wm_window_type
-    net_wm_state = _openbox.Property_net_wm_state
-    net_wm_strut = _openbox.Property_net_wm_strut
-    net_wm_allowed_actions = _openbox.Property_net_wm_allowed_actions
-    net_wm_window_type_desktop = _openbox.Property_net_wm_window_type_desktop
-    net_wm_window_type_dock = _openbox.Property_net_wm_window_type_dock
-    net_wm_window_type_toolbar = _openbox.Property_net_wm_window_type_toolbar
-    net_wm_window_type_menu = _openbox.Property_net_wm_window_type_menu
-    net_wm_window_type_utility = _openbox.Property_net_wm_window_type_utility
-    net_wm_window_type_splash = _openbox.Property_net_wm_window_type_splash
-    net_wm_window_type_dialog = _openbox.Property_net_wm_window_type_dialog
-    net_wm_window_type_normal = _openbox.Property_net_wm_window_type_normal
-    net_wm_moveresize_size_topleft = _openbox.Property_net_wm_moveresize_size_topleft
-    net_wm_moveresize_size_topright = _openbox.Property_net_wm_moveresize_size_topright
-    net_wm_moveresize_size_bottomleft = _openbox.Property_net_wm_moveresize_size_bottomleft
-    net_wm_moveresize_size_bottomright = _openbox.Property_net_wm_moveresize_size_bottomright
-    net_wm_moveresize_move = _openbox.Property_net_wm_moveresize_move
-    net_wm_action_move = _openbox.Property_net_wm_action_move
-    net_wm_action_resize = _openbox.Property_net_wm_action_resize
-    net_wm_action_shade = _openbox.Property_net_wm_action_shade
-    net_wm_action_maximize_horz = _openbox.Property_net_wm_action_maximize_horz
-    net_wm_action_maximize_vert = _openbox.Property_net_wm_action_maximize_vert
-    net_wm_action_change_desktop = _openbox.Property_net_wm_action_change_desktop
-    net_wm_action_close = _openbox.Property_net_wm_action_close
-    net_wm_state_modal = _openbox.Property_net_wm_state_modal
-    net_wm_state_sticky = _openbox.Property_net_wm_state_sticky
-    net_wm_state_maximized_vert = _openbox.Property_net_wm_state_maximized_vert
-    net_wm_state_maximized_horz = _openbox.Property_net_wm_state_maximized_horz
-    net_wm_state_shaded = _openbox.Property_net_wm_state_shaded
-    net_wm_state_skip_taskbar = _openbox.Property_net_wm_state_skip_taskbar
-    net_wm_state_skip_pager = _openbox.Property_net_wm_state_skip_pager
-    net_wm_state_hidden = _openbox.Property_net_wm_state_hidden
-    net_wm_state_fullscreen = _openbox.Property_net_wm_state_fullscreen
-    net_wm_state_above = _openbox.Property_net_wm_state_above
-    net_wm_state_below = _openbox.Property_net_wm_state_below
-    kde_net_system_tray_windows = _openbox.Property_kde_net_system_tray_windows
-    kde_net_wm_system_tray_window_for = _openbox.Property_kde_net_wm_system_tray_window_for
-    kde_net_wm_window_type_override = _openbox.Property_kde_net_wm_window_type_override
-    NUM_ATOMS = _openbox.Property_NUM_ATOMS
     ascii = _openbox.Property_ascii
     utf8 = _openbox.Property_utf8
     NUM_STRING_TYPE = _openbox.Property_NUM_STRING_TYPE
-    def __init__(self,*args):
-        self.this = apply(_openbox.new_Property,args)
-        self.thisown = 1
-    def __del__(self, destroy= _openbox.delete_Property):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-    def set(*args): return apply(_openbox.Property_set,args)
-    def get(*args): return apply(_openbox.Property_get,args)
-    def erase(*args): return apply(_openbox.Property_erase,args)
-    def atom(*args): return apply(_openbox.Property_atom,args)
+    __swig_getmethods__["initialize"] = lambda x: _openbox.Property_initialize
+    if _newclass:initialize = staticmethod(_openbox.Property_initialize)
+    __swig_getmethods__["set"] = lambda x: _openbox.Property_set
+    if _newclass:set = staticmethod(_openbox.Property_set)
+    __swig_getmethods__["set"] = lambda x: _openbox.Property_set
+    if _newclass:set = staticmethod(_openbox.Property_set)
+    __swig_getmethods__["set"] = lambda x: _openbox.Property_set
+    if _newclass:set = staticmethod(_openbox.Property_set)
+    __swig_getmethods__["set"] = lambda x: _openbox.Property_set
+    if _newclass:set = staticmethod(_openbox.Property_set)
+    __swig_getmethods__["get"] = lambda x: _openbox.Property_get
+    if _newclass:get = staticmethod(_openbox.Property_get)
+    __swig_getmethods__["get"] = lambda x: _openbox.Property_get
+    if _newclass:get = staticmethod(_openbox.Property_get)
+    __swig_getmethods__["get"] = lambda x: _openbox.Property_get
+    if _newclass:get = staticmethod(_openbox.Property_get)
+    __swig_getmethods__["get"] = lambda x: _openbox.Property_get
+    if _newclass:get = staticmethod(_openbox.Property_get)
+    __swig_getmethods__["erase"] = lambda x: _openbox.Property_erase
+    if _newclass:erase = staticmethod(_openbox.Property_erase)
+    def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C Property instance at %s>" % (self.this,)
 
@@ -213,6 +377,14 @@ class PropertyPtr(Property):
         if not hasattr(self,"thisown"): self.thisown = 0
         self.__class__ = Property
 _openbox.Property_swigregister(PropertyPtr)
+Property_initialize = _openbox.Property_initialize
+
+Property_set = _openbox.Property_set
+
+Property_get = _openbox.Property_get
+
+Property_erase = _openbox.Property_erase
+
 
 class Rect(_object):
     __swig_setmethods__ = {}
@@ -446,7 +618,6 @@ class Openbox(EventDispatcher,EventHandler):
     State_Normal = _openbox.Openbox_State_Normal
     State_Exiting = _openbox.Openbox_State_Exiting
     def state(*args): return apply(_openbox.Openbox_state,args)
-    def property(*args): return apply(_openbox.Openbox_property,args)
     def actions(*args): return apply(_openbox.Openbox_actions,args)
     def bindings(*args): return apply(_openbox.Openbox_bindings,args)
     def screen(*args): return apply(_openbox.Openbox_screen,args)

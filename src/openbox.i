@@ -109,12 +109,17 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
+%include "../otk/ustring.i"
+
 %ignore otk::display;
 %inline %{
   otk::Display *Display_instance() { return otk::display; }
 %};
 
-%include "../otk/ustring.i"
+%ignore otk::Property::atoms;
+%inline %{
+  const otk::Atoms& Property_atoms() { return otk::Property::atoms; }
+%};
 
 %include "../otk/display.hh"
 %include "../otk/point.hh"

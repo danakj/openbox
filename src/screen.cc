@@ -29,6 +29,7 @@ extern "C" {
 #include "bindings.hh"
 #include "python.hh"
 #include "otk/display.hh"
+#include "otk/property.hh"
 
 #include <vector>
 #include <algorithm>
@@ -65,10 +66,8 @@ Screen::Screen(int screen)
   printf(_("Managing screen %d: visual 0x%lx, depth %d\n"),
          _number, XVisualIDFromVisual(_info->visual()), _info->depth());
 
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::openbox_pid,
-                                     otk::Property::Atom_Cardinal,
-                                     (unsigned long) getpid());
+  otk::Property::set(_info->rootWindow(), otk::Property::atoms.openbox_pid,
+                     otk::Property::atoms.cardinal, (unsigned long) getpid());
 
   // set the mouse cursor for the root window (the default cursor)
   XDefineCursor(**otk::display, _info->rootWindow(),
@@ -100,18 +99,16 @@ Screen::Screen(int screen)
   // Set the netwm properties for geometry
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_desktop_geometry,
-                                     otk::Property::Atom_Cardinal,
-                                     geometry, 2);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_desktop_geometry,
+                     otk::Property::atoms.cardinal, geometry, 2);
 
   // Set the net_desktop_names property
   std::vector<otk::ustring> names;
   python_get_stringlist("desktop_names", &names);
-  openbox->property()->set(_info->rootWindow(),
-                           otk::Property::net_desktop_names,
-                           otk::Property::utf8,
-                           names);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_desktop_names,
+                     otk::Property::utf8, names);
   // the above set() will cause the updateDesktopNames to fire right away so
   // we have a list of desktop names
 
@@ -283,91 +280,80 @@ void Screen::changeSupportedAtoms()
                                        0, 0, 1, 1, 0, 0, 0);
 
   // set supporting window
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_supporting_wm_check,
-                                     otk::Property::Atom_Window,
-                                     _supportwindow);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_supporting_wm_check,
+                     otk::Property::atoms.window, _supportwindow);
 
   //set properties on the supporting window
-  openbox->property()->set(_supportwindow,
-                                     otk::Property::net_wm_name,
-                                     otk::Property::utf8,
-                                     "Openbox");
-  openbox->property()->set(_supportwindow,
-                                     otk::Property::net_supporting_wm_check,
-                                     otk::Property::Atom_Window,
-                                     _supportwindow);
+  otk::Property::set(_supportwindow, otk::Property::atoms.net_wm_name,
+                     otk::Property::utf8, "Openbox");
+  otk::Property::set(_supportwindow,
+                     otk::Property::atoms.net_supporting_wm_check,
+                     otk::Property::atoms.window, _supportwindow);
 
   
   Atom supported[] = {
-      otk::Property::net_current_desktop,
-      otk::Property::net_number_of_desktops,
-      otk::Property::net_desktop_geometry,
-      otk::Property::net_desktop_viewport,
-      otk::Property::net_active_window,
-      otk::Property::net_workarea,
-      otk::Property::net_client_list,
-      otk::Property::net_client_list_stacking,
-      otk::Property::net_desktop_names,
-      otk::Property::net_close_window,
-      otk::Property::net_wm_name,
-      otk::Property::net_wm_visible_name,
-      otk::Property::net_wm_icon_name,
-      otk::Property::net_wm_visible_icon_name,
+    otk::Property::atoms.net_current_desktop,
+    otk::Property::atoms.net_number_of_desktops,
+    otk::Property::atoms.net_desktop_geometry,
+    otk::Property::atoms.net_desktop_viewport,
+    otk::Property::atoms.net_active_window,
+    otk::Property::atoms.net_workarea,
+    otk::Property::atoms.net_client_list,
+    otk::Property::atoms.net_client_list_stacking,
+    otk::Property::atoms.net_desktop_names,
+    otk::Property::atoms.net_close_window,
+    otk::Property::atoms.net_wm_name,
+    otk::Property::atoms.net_wm_visible_name,
+    otk::Property::atoms.net_wm_icon_name,
+    otk::Property::atoms.net_wm_visible_icon_name,
 /*
-      otk::Property::net_wm_desktop,
+    otk::Property::atoms.net_wm_desktop,
 */
-      otk::Property::net_wm_strut,
-      otk::Property::net_wm_window_type,
-      otk::Property::net_wm_window_type_desktop,
-      otk::Property::net_wm_window_type_dock,
-      otk::Property::net_wm_window_type_toolbar,
-      otk::Property::net_wm_window_type_menu,
-      otk::Property::net_wm_window_type_utility,
-      otk::Property::net_wm_window_type_splash,
-      otk::Property::net_wm_window_type_dialog,
-      otk::Property::net_wm_window_type_normal,
+    otk::Property::atoms.net_wm_strut,
+    otk::Property::atoms.net_wm_window_type,
+    otk::Property::atoms.net_wm_window_type_desktop,
+    otk::Property::atoms.net_wm_window_type_dock,
+    otk::Property::atoms.net_wm_window_type_toolbar,
+    otk::Property::atoms.net_wm_window_type_menu,
+    otk::Property::atoms.net_wm_window_type_utility,
+    otk::Property::atoms.net_wm_window_type_splash,
+    otk::Property::atoms.net_wm_window_type_dialog,
+    otk::Property::atoms.net_wm_window_type_normal,
 /*
-      otk::Property::net_wm_moveresize,
-      otk::Property::net_wm_moveresize_size_topleft,
-      otk::Property::net_wm_moveresize_size_topright,
-      otk::Property::net_wm_moveresize_size_bottomleft,
-      otk::Property::net_wm_moveresize_size_bottomright,
-      otk::Property::net_wm_moveresize_move,
+    otk::Property::atoms.net_wm_moveresize,
+    otk::Property::atoms.net_wm_moveresize_size_topleft,
+    otk::Property::atoms.net_wm_moveresize_size_topright,
+    otk::Property::atoms.net_wm_moveresize_size_bottomleft,
+    otk::Property::atoms.net_wm_moveresize_size_bottomright,
+    otk::Property::atoms.net_wm_moveresize_move,
 */
 /*
-      otk::Property::net_wm_allowed_actions,
-      otk::Property::net_wm_action_move,
-      otk::Property::net_wm_action_resize,
-      otk::Property::net_wm_action_shade,
-      otk::Property::net_wm_action_maximize_horz,
-      otk::Property::net_wm_action_maximize_vert,
-      otk::Property::net_wm_action_change_desktop,
-      otk::Property::net_wm_action_close,
+    otk::Property::atoms.net_wm_allowed_actions,
+    otk::Property::atoms.net_wm_action_move,
+    otk::Property::atoms.net_wm_action_resize,
+    otk::Property::atoms.net_wm_action_shade,
+    otk::Property::atoms.net_wm_action_maximize_horz,
+    otk::Property::atoms.net_wm_action_maximize_vert,
+    otk::Property::atoms.net_wm_action_change_desktop,
+    otk::Property::atoms.net_wm_action_close,
 */
-      otk::Property::net_wm_state,
-      otk::Property::net_wm_state_modal,
-      otk::Property::net_wm_state_maximized_vert,
-      otk::Property::net_wm_state_maximized_horz,
-      otk::Property::net_wm_state_shaded,
-      otk::Property::net_wm_state_skip_taskbar,
-      otk::Property::net_wm_state_skip_pager,
-      otk::Property::net_wm_state_hidden,
-      otk::Property::net_wm_state_fullscreen,
-      otk::Property::net_wm_state_above,
-      otk::Property::net_wm_state_below,
-    };
+    otk::Property::atoms.net_wm_state,
+    otk::Property::atoms.net_wm_state_modal,
+    otk::Property::atoms.net_wm_state_maximized_vert,
+    otk::Property::atoms.net_wm_state_maximized_horz,
+    otk::Property::atoms.net_wm_state_shaded,
+    otk::Property::atoms.net_wm_state_skip_taskbar,
+    otk::Property::atoms.net_wm_state_skip_pager,
+    otk::Property::atoms.net_wm_state_hidden,
+    otk::Property::atoms.net_wm_state_fullscreen,
+    otk::Property::atoms.net_wm_state_above,
+    otk::Property::atoms.net_wm_state_below,
+  };
   const int num_supported = sizeof(supported)/sizeof(Atom);
 
-  // convert to the atom values
-  for (int i = 0; i < num_supported; ++i)
-    supported[i] =
-      openbox->property()->atom((otk::Property::Atoms)supported[i]);
-  
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_supported,
-                                     otk::Property::Atom_Atom,
-                                     supported, num_supported);
+  otk::Property::set(_info->rootWindow(), otk::Property::atoms.net_supported,
+                     otk::Property::atoms.atom, supported, num_supported);
 }
 
 
@@ -389,10 +375,8 @@ void Screen::changeClientList()
   } else
     windows = (Window*) 0;
 
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_client_list,
-                                     otk::Property::Atom_Window,
-                                     windows, size);
+  otk::Property::set(_info->rootWindow(), otk::Property::atoms.net_client_list,
+                     otk::Property::atoms.window, windows, size);
 
   if (size)
     delete [] windows;
@@ -422,10 +406,9 @@ void Screen::changeStackingList()
   } else
     windows = (Window*) 0;
 
-  openbox->property()->set(_info->rootWindow(),
-                           otk::Property::net_client_list_stacking,
-                           otk::Property::Atom_Window,
-                           windows, size);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_client_list_stacking,
+                     otk::Property::atoms.window, windows, size);
 
   if (size)
     delete [] windows;
@@ -441,10 +424,8 @@ void Screen::changeWorkArea() {
     dims[(i * 4) + 2] = _area.width();
     dims[(i * 4) + 3] = _area.height();
   }
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_workarea,
-                                     otk::Property::Atom_Cardinal,
-                                     dims, 4 * _num_desktops);
+  otk::Property::set(_info->rootWindow(), otk::Property::atoms.net_workarea,
+                     otk::Property::atoms.cardinal, dims, 4 * _num_desktops);
   delete [] dims;
 }
 
@@ -645,10 +626,9 @@ void Screen::changeDesktop(long desktop)
   long old = _desktop;
   
   _desktop = desktop;
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_current_desktop,
-                                     otk::Property::Atom_Cardinal,
-                                     _desktop);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_current_desktop,
+                     otk::Property::atoms.cardinal, _desktop);
 
   if (old == _desktop) return;
 
@@ -675,18 +655,17 @@ void Screen::changeNumDesktops(long num)
   // XXX: move windows on desktops that will no longer exist!
   
   _num_desktops = num;
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_number_of_desktops,
-                                     otk::Property::Atom_Cardinal,
-                                     _num_desktops);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_number_of_desktops,
+                     otk::Property::atoms.cardinal, _num_desktops);
 
   // set the viewport hint
   unsigned long *viewport = new unsigned long[_num_desktops * 2];
   memset(viewport, 0, sizeof(unsigned long) * _num_desktops * 2);
-  openbox->property()->set(_info->rootWindow(),
-                                     otk::Property::net_desktop_viewport,
-                                     otk::Property::Atom_Cardinal,
-                                     viewport, _num_desktops * 2);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_desktop_viewport,
+                     otk::Property::atoms.cardinal,
+                     viewport, _num_desktops * 2);
   delete [] viewport;
 
   // update the work area hint
@@ -696,13 +675,11 @@ void Screen::changeNumDesktops(long num)
 
 void Screen::updateDesktopNames()
 {
-  const otk::Property *property = openbox->property();
-
   unsigned long num = (unsigned) -1;
   
-  if (!property->get(_info->rootWindow(),
-                     otk::Property::net_desktop_names,
-                     otk::Property::utf8, &num, &_desktop_names))
+  if (!otk::Property::get(_info->rootWindow(),
+                          otk::Property::atoms.net_desktop_names,
+                          otk::Property::utf8, &num, &_desktop_names))
     _desktop_names.clear();
   while ((long)_desktop_names.size() < _num_desktops)
     _desktop_names.push_back("Unnamed");
@@ -715,20 +692,17 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
 
   if (i >= _num_desktops) return;
 
-  const otk::Property *property = openbox->property();
-  
   otk::Property::StringVect newnames = _desktop_names;
   newnames[i] = name;
-  property->set(_info->rootWindow(), otk::Property::net_desktop_names,
-                otk::Property::utf8, newnames);
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_desktop_names,
+                     otk::Property::utf8, newnames);
 }
 
 
 void Screen::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
-
-  const otk::Property *property = openbox->property();
 
   // compress changes to a single property into a single change
   XEvent ce;
@@ -741,7 +715,7 @@ void Screen::propertyHandler(const XPropertyEvent &e)
     }
   }
 
-  if (e.atom == property->atom(otk::Property::net_desktop_names)) 
+  if (e.atom == otk::Property::atoms.net_desktop_names)
     updateDesktopNames();
 }
 
@@ -752,12 +726,9 @@ void Screen::clientMessageHandler(const XClientMessageEvent &e)
 
   if (e.format != 32) return;
 
-  const otk::Property *property = openbox->property();
-
-  if (e.message_type == property->atom(otk::Property::net_current_desktop)) {
+  if (e.message_type == otk::Property::atoms.net_current_desktop) {
     changeDesktop(e.data.l[0]);
-  } else if (e.message_type ==
-             property->atom(otk::Property::net_number_of_desktops)) {
+  } else if (e.message_type == otk::Property::atoms.net_number_of_desktops) {
     changeNumDesktops(e.data.l[0]);
   }
   // XXX: so many client messages to handle here! ..or not.. they go to clients
@@ -783,8 +754,7 @@ void Screen::mapRequestHandler(const XMapRequestEvent &e)
     // send a net_active_window message
     XEvent ce;
     ce.xclient.type = ClientMessage;
-    ce.xclient.message_type =
-      openbox->property()->atom(otk::Property::net_active_window);
+    ce.xclient.message_type = otk::Property::atoms.net_active_window;
     ce.xclient.display = **otk::display;
     ce.xclient.window = c->window();
     ce.xclient.format = 32;

@@ -265,7 +265,6 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
     Client *ft;
 
     if (cancel) {
-        /*if (first) client_focus(first); XXX*/
         if (focus_cycle_target)
             frame_adjust_focus(focus_cycle_target->frame, FALSE);
         if (focus_client)

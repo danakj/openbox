@@ -56,17 +56,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_unfocused_handle = RrAppearanceNew(inst, 0);
     theme->a_menu = RrAppearanceNew(inst, 0);
     theme->a_menu_title = RrAppearanceNew(inst, 1);
-    theme->a_menu_item = RrAppearanceNew(inst, 1);
-    theme->a_menu_disabled = RrAppearanceNew(inst, 1);
-    theme->a_menu_hilite = RrAppearanceNew(inst, 1);
+    theme->a_menu_item = RrAppearanceNew(inst, 0);
+    theme->a_menu_disabled = RrAppearanceNew(inst, 0);
+    theme->a_menu_hilite = RrAppearanceNew(inst, 0);
+    theme->a_menu_text_item = RrAppearanceNew(inst, 1);
+    theme->a_menu_text_disabled = RrAppearanceNew(inst, 1);
+    theme->a_menu_text_hilite = RrAppearanceNew(inst, 1);
     theme->a_menu_bullet = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
+    theme->a_clear_tex = RrAppearanceNew(inst, 1);
 
     theme->app_hilite_bg = RrAppearanceNew(inst, 0);
     theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
     theme->app_hilite_label = RrAppearanceNew(inst, 1);
     theme->app_unhilite_label = RrAppearanceNew(inst, 1);
-    theme->app_icon = RrAppearanceNew(inst, 1);
 
     if (name) {
 	db = loaddb(theme, name);
@@ -607,8 +610,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_focused_pressed_iconify =
         RrAppearanceCopy(theme->a_focused_pressed_max);
 
-    theme->a_icon->surface.grad = RR_SURFACE_PARENTREL;
-    theme->a_clear->surface.grad = RR_SURFACE_PARENTREL;
+    theme->a_icon->surface.grad =
+        theme->a_clear->surface.grad =
+        theme->a_clear_tex->surface.grad =
+        theme->a_menu_item->surface.grad =
+        theme->a_menu_disabled->surface.grad =
+        theme->a_menu_text_item->surface.grad =
+        theme->a_menu_text_disabled->surface.grad =
+        theme->a_menu_text_hilite->surface.grad =
+        theme->a_menu_bullet->surface.grad = RR_SURFACE_PARENTREL;
 
     /* set up the textures */
     theme->a_focused_label->texture[0].type = 
@@ -638,24 +648,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_title->texture[0].data.text.font = theme->mtitlefont;
     theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
 
-    theme->a_menu_item->surface.grad = 
-        theme->a_menu_disabled->surface.grad =
-        theme->a_menu_bullet->surface.grad =
-        theme->app_icon->surface.grad = RR_SURFACE_PARENTREL;
-
-    theme->a_menu_item->texture[0].type =
-        theme->a_menu_disabled->texture[0].type = 
-        theme->a_menu_hilite->texture[0].type = RR_TEXTURE_TEXT;
-    theme->a_menu_item->texture[0].data.text.justify = 
-        theme->a_menu_disabled->texture[0].data.text.justify = 
-        theme->a_menu_hilite->texture[0].data.text.justify = mjust;
-    theme->a_menu_item->texture[0].data.text.font =
-        theme->a_menu_disabled->texture[0].data.text.font =
-        theme->a_menu_hilite->texture[0].data.text.font = theme->mfont;
-    theme->a_menu_item->texture[0].data.text.color = theme->menu_color;
-    theme->a_menu_disabled->texture[0].data.text.color =
+    theme->a_menu_text_item->texture[0].type =
+        theme->a_menu_text_disabled->texture[0].type = 
+        theme->a_menu_text_hilite->texture[0].type = RR_TEXTURE_TEXT;
+    theme->a_menu_text_item->texture[0].data.text.justify = 
+        theme->a_menu_text_disabled->texture[0].data.text.justify = 
+        theme->a_menu_text_hilite->texture[0].data.text.justify = mjust;
+    theme->a_menu_text_item->texture[0].data.text.font =
+        theme->a_menu_text_disabled->texture[0].data.text.font =
+        theme->a_menu_text_hilite->texture[0].data.text.font = theme->mfont;
+    theme->a_menu_text_item->texture[0].data.text.color = theme->menu_color;
+    theme->a_menu_text_disabled->texture[0].data.text.color =
         theme->menu_disabled_color;
-    theme->a_menu_hilite->texture[0].data.text.color =
+    theme->a_menu_text_hilite->texture[0].data.text.color =
         theme->menu_hilite_color;
     theme->a_menu_bullet->texture[0].data.mask.color =
         theme->menu_bullet_color;
@@ -843,7 +848,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->label_height = theme->winfont_height;
     theme->title_height = theme->label_height + theme->bevel * 2;
     theme->button_size = theme->label_height - 2;
-    theme->grip_width = theme->button_size * 2;
+    theme->grip_width = theme->title_height * 1.5;
 
     return theme;
 }
@@ -963,12 +968,15 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->a_menu_item);
         RrAppearanceFree(theme->a_menu_disabled);
         RrAppearanceFree(theme->a_menu_hilite);
+        RrAppearanceFree(theme->a_menu_text_item);
+        RrAppearanceFree(theme->a_menu_text_disabled);
+        RrAppearanceFree(theme->a_menu_text_hilite);
         RrAppearanceFree(theme->a_clear);
+        RrAppearanceFree(theme->a_clear_tex);
         RrAppearanceFree(theme->app_hilite_bg);
         RrAppearanceFree(theme->app_unhilite_bg);
         RrAppearanceFree(theme->app_hilite_label);
         RrAppearanceFree(theme->app_unhilite_label);
-        RrAppearanceFree(theme->app_icon);
     }
 }
 

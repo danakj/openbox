@@ -26,12 +26,12 @@ bin_PROGRAMS = \
 	tools/kdetrayproxy/kdetrayproxy
 
 plugin_LTLIBRARIES = \
-	plugins/placement/placement.la \
-	plugins/menu/timed_menu.la \
-	plugins/menu/fifo_menu.la \
-	plugins/menu/client_menu.la \
-	plugins/menu/include_menu.la \
-	plugins/menu/client_list_menu.la
+	plugins/placement/placement.la
+#	plugins/menu/timed_menu.la \
+#	plugins/menu/fifo_menu.la \
+#	plugins/menu/client_menu.la \
+#	plugins/menu/include_menu.la \
+#	plugins/menu/client_list_menu.la
 
 if OBCONF
 bin_PROGRAMS += \
@@ -156,9 +156,10 @@ kernel_openbox_SOURCES = \
 	kernel/keyboard.h \
 	kernel/keytree.c \
 	kernel/keytree.h \
+	kernel/menuframe.c \
+	kernel/menuframe.h \
 	kernel/menu.c \
 	kernel/menu.h \
-	kernel/menu_render.c \
 	kernel/misc.h \
 	kernel/mouse.c \
 	kernel/mouse.h \
@@ -277,7 +278,7 @@ plugins_menu_client_list_menu_la_LDFLAGS = \
 	-module \
 	-avoid-version
 plugins_menu_client_list_menu_la_SOURCES = \
-	plugins/menu/client_list_menu.c
+o	plugins/menu/client_list_menu.c
 
 
 ## obconf ##

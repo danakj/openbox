@@ -38,7 +38,7 @@ struct _ObDock;
 struct _ObDockApp;
 struct _ObClient;
 
-#define WINDOW_AS_MENU(win) ((struct _ObMenu*)win)
+#define WINDOW_AS_MENU(win) ((struct _ObMenuFrame*)win)
 #define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
 #define WINDOW_AS_DOCKAPP(win) ((struct _ObDockApp*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)

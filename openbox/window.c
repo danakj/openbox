@@ -1,5 +1,5 @@
 #include "window.h"
-#include "menu.h"
+#include "menuframe.h"
 #include "config.h"
 #include "dock.h"
 #include "client.h"
@@ -21,7 +21,7 @@ Window window_top(ObWindow *self)
 {
     switch (self->type) {
     case Window_Menu:
-        return ((ObMenu*)self)->frame;
+        return ((ObMenuFrame*)self)->window;
     case Window_Dock:
         return ((ObDock*)self)->frame;
     case Window_DockApp:

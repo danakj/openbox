@@ -127,7 +127,7 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
     if (!self->a_bg)
         self->a_bg = RrAppearanceCopy(ob_rr_theme->app_hilite_bg);
     if (self->hasicon && !self->a_icon)
-        self->a_icon = RrAppearanceCopy(ob_rr_theme->app_icon);
+        self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     if (!self->a_text)
         self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
 

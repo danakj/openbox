@@ -8,6 +8,7 @@
 #include "screen.h"
 #include "frame.h"
 #include "menu.h"
+#include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "framerender.h"
@@ -41,10 +42,10 @@
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
+static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_menu(ObClient *c, XEvent *e);
 static void fd_event_handle();
 #ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
@@ -298,6 +299,7 @@ static void event_hack_mods(XEvent *e)
 	break;
     case MotionNotify:
         STRIP_MODS(e->xmotion.state);
+#if 0
 	/* compress events */
         {
             XEvent ce;
@@ -307,6 +309,7 @@ static void event_hack_mods(XEvent *e)
                 e->xmotion.y_root = ce.xmotion.y_root;
             }
 	}
+#endif
 	break;
     }
 }
@@ -461,7 +464,6 @@ static void event_process(XEvent *e)
     ObClient *client = NULL;
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
-    ObMenu *menu = NULL;
     ObWindow *obwin = NULL;
 
     window = event_get_window(e);
@@ -473,12 +475,10 @@ static void event_process(XEvent *e)
         case Window_DockApp:
             dockapp = WINDOW_AS_DOCKAPP(obwin);
             break;
-        case Window_Menu:
-            menu = WINDOW_AS_MENU(obwin);
-            break;
         case Window_Client:
             client = WINDOW_AS_CLIENT(obwin);
             break;
+        case Window_Menu:
         case Window_Internal:
             /* not to be used for events */
             g_assert_not_reached();
@@ -523,11 +523,11 @@ static void event_process(XEvent *e)
 	xerror_set_ignore(FALSE);
     }
 
-    if (menu_visible)
+    if (menu_frame_visible)
         if (e->type == MotionNotify || e->type == ButtonRelease ||
             e->type == ButtonPress ||
             e->type == KeyPress || e->type == KeyRelease) {
-            event_handle_menu(client, e);
+            event_handle_menu(e);
 
             return; /* no dispatch! */
         }
@@ -539,7 +539,6 @@ static void event_process(XEvent *e)
             moveresize_event(e);
 
             return; /* no dispatch! */
-            
         }
 
     /* user input (action-bound) events */
@@ -1081,74 +1080,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
     }
 }
 
-static void event_handle_menu(ObClient *client, XEvent *e)
-{
-    ObMenuEntry *entry;
-    ObMenu *top;
-    GList *it = NULL;
-
-    top = g_list_nth_data(menu_visible, 0);
-
-    ob_debug("EVENT %d\n", e->type);
-    switch (e->type) {
-    case KeyPress:
-        menu_control_keyboard_nav(e->xkey.keycode);
-        break;
-    case ButtonPress:
-	ob_debug("BUTTON PRESS\n");
-
-        break;
-    case ButtonRelease:
-	ob_debug("BUTTON RELEASED\n");
-
-        for (it = menu_visible; it; it = g_list_next(it)) {
-            ObMenu *m = it->data;
-            if (e->xbutton.x_root >= m->location.x - ob_rr_theme->bwidth &&
-                e->xbutton.y_root >= m->location.y - ob_rr_theme->bwidth &&
-                e->xbutton.x_root < m->location.x + m->size.width +
-                ob_rr_theme->bwidth &&
-                e->xbutton.y_root < m->location.y + m->size.height +
-                ob_rr_theme->bwidth) {
-                if ((entry = menu_find_entry_by_pos(it->data,
-                                                    e->xbutton.x_root -
-                                                    m->location.x,
-                                                    e->xbutton.y_root -
-                                                    m->location.y))) {
-                    m->selected(entry, e->xbutton.button,
-                                e->xbutton.x_root,
-                                e->xbutton.y_root);
-                    break;
-                }
-                break;
-            }
-        }
-
-        /* will call the menu_hide() for each submenu as well */
-        if (!it)
-            menu_control_keyboard_nav(ob_keycode(OB_KEY_ESCAPE));
-	
-        break;
-    case MotionNotify:
-        ob_debug("motion\n");
-        for (it = menu_visible; it; it = g_list_next(it)) {
-            ObMenu *m = it->data;
-            if ((entry = menu_find_entry_by_pos(it->data,
-                                                e->xmotion.x_root -
-                                                m->location.x,
-                                                e->xmotion.y_root -
-                                                m->location.y))) {
-                if (m->over && m->over->data != entry)
-                    m->mouseover(m->over->data, FALSE);
-
-                m->mouseover(entry, TRUE);
-                break;
-            }
-        }
-
-        break;
-    }
-}
-
 void event_add_fd_handler(event_fd_handler *h) {
     g_datalist_id_set_data(&fd_handler_list, h->fd, h);
     FD_SET(h->fd, &allset);
@@ -1228,6 +1159,34 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
 	break;
     case ConfigureNotify:
         dock_app_configure(app, e->xconfigure.width, e->xconfigure.height);
+        break;
+    }
+}
+
+static void event_handle_menu(XEvent *ev)
+{
+    ObMenuFrame *f;
+    ObMenuEntryFrame *e;
+
+    switch (ev->type) {
+    case ButtonRelease:
+        if (!(f = menu_frame_under(ev->xmotion.x_root,
+                                   ev->xmotion.y_root)))
+            menu_frame_hide_all();
+        else {
+            if ((e = menu_entry_frame_under(ev->xmotion.x_root,
+                                            ev->xmotion.y_root)))
+                menu_entry_frame_execute(e);
+        }
+        break;
+    case MotionNotify:
+        if ((f = menu_frame_under(ev->xmotion.x_root,
+                                  ev->xmotion.y_root))) {
+            menu_frame_move_on_screen(f);
+            if (e = menu_entry_frame_under(ev->xmotion.x_root,
+                                           ev->xmotion.y_root))
+                menu_frame_select(f, e);
+        }
         break;
     }
 }

@@ -143,14 +143,17 @@ struct _RrTheme {
     RrAppearance *a_menu_item;
     RrAppearance *a_menu_disabled;
     RrAppearance *a_menu_hilite;
+    RrAppearance *a_menu_text_item;
+    RrAppearance *a_menu_text_disabled;
+    RrAppearance *a_menu_text_hilite;
     RrAppearance *a_menu_bullet;
-    RrAppearance *a_clear;
+    RrAppearance *a_clear;     /* clear with no texture */
+    RrAppearance *a_clear_tex; /* clear with a texture */
 
     RrAppearance *app_hilite_bg;
     RrAppearance *app_unhilite_bg;
     RrAppearance *app_hilite_label;
     RrAppearance *app_unhilite_label;
-    RrAppearance *app_icon;
 
 };
 

@@ -133,7 +133,7 @@ int RrFontMeasureString(const RrFont *f, const gchar *str)
 {
     gint x, y;
     font_measure_full (f, str, &x, &y);
-    return x;
+    return x + 4;
 }
 
 int RrFontHeight(const RrFont *f)

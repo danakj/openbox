@@ -6,172 +6,116 @@
 #include "grab.h"
 #include "config.h"
 #include "screen.h"
+#include "menuframe.h"
 #include "geom.h"
 #include "plugin.h"
 #include "misc.h"
 #include "parser/parse.h"
 
 GHashTable *menu_hash = NULL;
-GList *menu_visible = NULL;
 
-#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
-			 LeaveWindowMask)
-#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
-#define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+typedef struct _ObMenuParseState ObMenuParseState;
 
-void menu_control_show(ObMenu *self, int x, int y, ObClient *client);
+struct _ObMenuParseState
+{
+    GSList *menus;
+};
+
+static void menu_clear_entries_internal(ObMenu *self);
+
+static ObMenu* menu_from_name(gchar *name)
+{
+    ObMenu *self = NULL;
+
+    g_assert(name != NULL);
+
+    if (!(self = g_hash_table_lookup(menu_hash, name)))
+        g_warning("Attempted to access menu '%s' but it does not exist.",
+                  name);
+    return self;
+}  
+
+static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                            gpointer data)
+{
+    ObMenuParseState *state = data;
+    gchar *label;
+    
+    if (state->menus) {
+        if (parse_attr_string("label", node, &label)) {
+            GSList *acts = NULL;
+            
+            for (node = node->xmlChildrenNode; node; node = node->next)
+                if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
+                    acts = g_slist_append(acts, action_parse(doc, node));
+            menu_add_normal(state->menus->data, label, acts);
+            g_free(label);
+        }
+    }
+}
+
+static void parse_menu_separator(ObParseInst *i,
+                                 xmlDocPtr doc, xmlNodePtr node,
+                                 gpointer data)
+{
+    ObMenuParseState *state = data;
+    
+    if (state->menus)
+        menu_add_separator(state->menus->data);
+}
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data)
 {
-    g_message("%s", __FUNCTION__);
-    parse_menu_full(i, doc, node, data, TRUE);
-}
+    ObMenuParseState *state = data;
+    gchar *name = NULL, *title = NULL;
 
+    if (!parse_attr_string("id", node, &name))
+        goto parse_menu_fail;
 
-void parse_menu_full(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                     gpointer data, gboolean newmenu)
-{
-    ObAction *act;
-    xmlNodePtr nact;
-
-    gchar *id = NULL, *title = NULL, *label = NULL, *plugin;
-    ObMenu *menu = NULL, *parent = NULL;
-
-    if (newmenu == TRUE) {
-        if (!parse_attr_string("id", node, &id))
-            goto parse_menu_fail;
+    if (!g_hash_table_lookup(menu_hash, name)) {
         if (!parse_attr_string("label", node, &title))
             goto parse_menu_fail;
-        ob_debug("menu label %s\n", title);
 
-        if (parse_attr_string("plugin", node, &plugin)) {
-            PluginMenuCreateData data;
-            data.parse_inst = i;
-            data.doc = doc;
-            data.node = node;
-            data.parent = menu;
-
-            if (plugin_open_reopen(plugin, i))
-                menu = plugin_create(plugin, &data);
-            g_free(plugin);
-        } else
-            menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
-            
-        if (data && menu)
-            *((ObMenu**)data) = menu;
-    } else {
-        menu = (ObMenu *)data;
+        if (menu_new(name, title, NULL)) {
+            state->menus = g_slist_prepend(state->menus, name);
+            parse_tree(i, doc, node->xmlChildrenNode);
+            state->menus = g_slist_delete_link(state->menus, state->menus);
+        }
     }
 
-    node = node->xmlChildrenNode;
-    
-    while (node) {
-        if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
-            if (parse_attr_string("plugin", node, &plugin)) {
-                PluginMenuCreateData data;
-                data.doc = doc;
-                data.node = node;
-                data.parent = menu;
-                if (plugin_open_reopen(plugin, i))
-                    parent = plugin_create(plugin, &data);
-                g_free(plugin);
-            } else {
-                parent = menu;
-                parse_menu(i, doc, node, &parent);
-            }
-
-            if (parent)
-                menu_add_entry(menu, menu_entry_new_submenu(parent->label,
-                                                            parent));
-
-        }
-        else if (!xmlStrcasecmp(node->name, (const xmlChar*) "item")) {
-            if (parse_attr_string("label", node, &label)) {
-                if ((nact = parse_find_node("action", node->xmlChildrenNode)))
-                    act = action_parse(doc, nact);
-                else
-                    act = NULL;
-                if (act)
-                    menu_add_entry(menu, menu_entry_new(label, act));
-                else
-                    menu_add_entry(menu, menu_entry_new_separator(label));
-                g_free(label);
-            }
-        }
-        node = node->next;
-    }
+    if (state->menus)
+        menu_add_submenu(state->menus->data, name);
 
 parse_menu_fail:
-    g_free(id);
+    g_free(name);
     g_free(title);
 }
 
-void menu_destroy_hash_key(ObMenu *menu)
-{
-    g_free(menu);
-}
 
 void menu_destroy_hash_value(ObMenu *self)
 {
-    GList *it;
-
-    if (self->destroy) self->destroy(self);
-
-    for (it = self->entries; it; it = it->next)
-        menu_entry_free(it->data);
-    g_list_free(self->entries);
-
-    g_free(self->label);
+    menu_clear_entries_internal(self);
     g_free(self->name);
-
-    g_hash_table_remove(window_map, &self->title);
-    g_hash_table_remove(window_map, &self->frame);
-    g_hash_table_remove(window_map, &self->items);
-
-    stacking_remove(self);
-
-    RrAppearanceFree(self->a_title);
-    RrAppearanceFree(self->a_items);
-    XDestroyWindow(ob_display, self->title);
-    XDestroyWindow(ob_display, self->frame);
-    XDestroyWindow(ob_display, self->items);
-
-    g_free(self);
+    g_free(self->title);
 }
 
-void menu_entry_free(ObMenuEntry *self)
-{
-    g_free(self->label);
-    action_free(self->action);
-
-    g_hash_table_remove(window_map, &self->item);
-
-    RrAppearanceFree(self->a_item);
-    RrAppearanceFree(self->a_disabled);
-    RrAppearanceFree(self->a_hilite);
-    RrAppearanceFree(self->a_submenu);
-    XDestroyWindow(ob_display, self->item);
-    XDestroyWindow(ob_display, self->submenu_pic);
-    g_free(self);
-}
- 
 void menu_startup(ObParseInst *i)
 {
-    menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                      (GDestroyNotify)menu_destroy_hash_key,
+    menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                       (GDestroyNotify)menu_destroy_hash_value);
 }
 
 void menu_shutdown()
 {
+    menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);
 }
 
 void menu_parse()
 {
     ObParseInst *i;
+    ObMenuParseState parse_state;
     xmlDocPtr doc;
     xmlNodePtr node;
     gchar *p;
@@ -199,460 +143,137 @@ void menu_parse()
     }
 
     if (loaded) {
-        parse_register(i, "menu", parse_menu, NULL);
+        parse_state.menus = NULL;
+
+        parse_register(i, "menu", parse_menu, &parse_state);
+        parse_register(i, "item", parse_menu_item, &parse_state);
+        parse_register(i, "separator", parse_menu_separator, &parse_state);
         parse_tree(i, doc, node->xmlChildrenNode);
     }
 
     parse_shutdown(i);
 }
 
-static Window createWindow(Window parent, unsigned long mask,
-			   XSetWindowAttributes *attrib)
+gboolean menu_new(gchar *name, gchar *title, gpointer data)
 {
-    return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 RrDepth(ob_rr_inst), InputOutput,
-                         RrVisual(ob_rr_inst), mask, attrib);
-                       
-}
-
-ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
-                      menu_controller_show show, menu_controller_update update,
-                      menu_controller_selected selected,
-                      menu_controller_hide hide,
-                      menu_controller_mouseover mouseover,
-                      menu_controller_destroy destroy)
-{
-    XSetWindowAttributes attrib;
     ObMenu *self;
 
+    if (g_hash_table_lookup(menu_hash, name)) return FALSE;
+
     self = g_new0(ObMenu, 1);
-    self->obwin.type = Window_Menu;
-    self->label = g_strdup(label);
     self->name = g_strdup(name);
-    self->parent = parent;
-    self->open_submenu = NULL;
-    self->over = NULL;
+    self->title = g_strdup(title);
+    self->data = data;
 
-    self->entries = NULL;
-    self->shown = FALSE;
-    self->invalid = TRUE;
+    g_hash_table_insert(menu_hash, self->name, self);
 
-    /* default controllers */
-    self->destroy = destroy;
-    self->show = (show != NULL ? show : menu_show_full);
-    self->hide = (hide != NULL ? hide : menu_hide);
-    self->update = (update != NULL ? update : menu_render);
-    self->mouseover = (mouseover != NULL ? mouseover :
-                       menu_control_mouseover);
-    self->selected = (selected != NULL ? selected : menu_entry_fire);
+    return TRUE;
+}
 
-    self->plugin = NULL;
-    self->plugin_data = NULL;
+void menu_show(gchar *name, gint x, gint y, ObClient *client)
+{
+    ObMenu *self;
+    ObMenuFrame *frame;
 
-    attrib.override_redirect = TRUE;
-    attrib.event_mask = FRAME_EVENTMASK;
-    self->frame = createWindow(RootWindow(ob_display, ob_screen),
-                               CWOverrideRedirect|CWEventMask, &attrib);
-    attrib.event_mask = TITLE_EVENTMASK;
-    self->title = createWindow(self->frame, CWEventMask, &attrib);
-    self->items = createWindow(self->frame, 0, &attrib);
+    if (!(self = menu_from_name(name))) return;
 
-    self->a_title = self->a_items = NULL;
+    /* XXX update entries */
 
-    XMapWindow(ob_display, self->title);
-    XMapWindow(ob_display, self->items);
+    frame = menu_frame_new(self, client);
+    menu_frame_move(frame, x, y);
+    menu_frame_show(frame, NULL);
+}
 
-    g_hash_table_insert(window_map, &self->frame, self);
-    g_hash_table_insert(window_map, &self->title, self);
-    g_hash_table_insert(window_map, &self->items, self);
-    g_hash_table_insert(menu_hash, g_strdup(name), self);
+static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type)
+{
+    ObMenuEntry *self;
 
-    stacking_add(MENU_AS_WINDOW(self));
-    stacking_raise(MENU_AS_WINDOW(self));
+    g_assert(menu);
 
+    self = g_new0(ObMenuEntry, 1);
+    self->type = type;
+    self->menu = menu;
+    self->enabled = TRUE;
     return self;
 }
 
-void menu_free(char *name)
+static void menu_entry_free(ObMenuEntry *self)
 {
-    g_hash_table_remove(menu_hash, name);
+    if (self) {
+        switch (self->type) {
+        case OB_MENU_ENTRY_TYPE_NORMAL:
+            g_free(self->data.normal.label);
+            while (self->data.normal.actions) {
+                action_free(self->data.normal.actions->data);
+                self->data.normal.actions =
+                    g_slist_delete_link(self->data.normal.actions,
+                                        self->data.normal.actions);
+            }
+            break;
+        case OB_MENU_ENTRY_TYPE_SUBMENU:
+        case OB_MENU_ENTRY_TYPE_SEPARATOR:
+            break;
+        }
+
+        g_free(self);
+    }
 }
 
-ObMenuEntry *menu_entry_new_full(char *label, ObAction *action,
-                               ObMenuEntryRenderType render_type,
-                               gpointer submenu)
-{
-    ObMenuEntry *menu_entry = g_new0(ObMenuEntry, 1);
-
-    menu_entry->label = g_strdup(label);
-    menu_entry->render_type = render_type;
-    menu_entry->action = action;
-
-    menu_entry->hilite = FALSE;
-    menu_entry->enabled = TRUE;
-
-    menu_entry->submenu = submenu;
-
-    return menu_entry;
-}
-
-void menu_entry_set_submenu(ObMenuEntry *entry, ObMenu *submenu)
-{
-    g_assert(entry != NULL);
-    
-    entry->submenu = submenu;
-
-    if(entry->parent != NULL)
-        entry->parent->invalid = TRUE;
-}
-
-void menu_add_entry(ObMenu *menu, ObMenuEntry *entry)
-{
-    XSetWindowAttributes attrib;
-
-    g_assert(menu != NULL);
-    g_assert(entry != NULL);
-    g_assert(entry->item == None);
-
-    menu->entries = g_list_append(menu->entries, entry);
-    entry->parent = menu;
-
-    attrib.event_mask = ENTRY_EVENTMASK;
-    entry->item = createWindow(menu->items, CWEventMask, &attrib);
-    entry->submenu_pic = createWindow(menu->items, CWEventMask, &attrib);
-    XMapWindow(ob_display, entry->item);
-    XMapWindow(ob_display, entry->submenu_pic);
-
-    entry->a_item = entry->a_disabled = entry->a_hilite = entry->a_submenu
-        = NULL;
-
-    menu->invalid = TRUE;
-
-    g_hash_table_insert(window_map, &entry->item, menu);
-    g_hash_table_insert(window_map, &entry->submenu_pic, menu);
-}
-
-void menu_show(char *name, int x, int y, ObClient *client)
+void menu_clear_entries(gchar *name)
 {
     ObMenu *self;
-  
-    self = g_hash_table_lookup(menu_hash, name);
-    if (!self) {
-        g_warning("Attempted to show menu '%s' but it does not exist.",
-                  name);
-        return;
-    }
 
-    menu_show_full(self, x, y, client);
-}  
+    if (!(self = menu_from_name(name))) return;
 
-void menu_show_full(ObMenu *self, int x, int y, ObClient *client)
+    menu_clear_entries_internal(self);
+}
+
+static void menu_clear_entries_internal(ObMenu *self)
 {
-    g_assert(self != NULL);
-       
-    self->update(self);
-    
-    self->client = client;
+    /* XXX assert that the menu isn't visible */
 
-    if (!self->shown) {
-        if (!(self->parent && self->parent->shown)) {
-            grab_pointer(TRUE, None);
-            grab_keyboard(TRUE);
-        }
-        menu_visible = g_list_append(menu_visible, self);
-    }
-
-    menu_control_show(self, x, y, client);
-}
-
-void menu_hide(ObMenu *self) {
-    if (self->shown) {
-        XUnmapWindow(ob_display, self->frame);
-        self->shown = FALSE;
-	if (self->open_submenu)
-	    self->open_submenu->hide(self->open_submenu);
-	if (self->parent && self->parent->open_submenu == self) {
-	    self->parent->open_submenu = NULL;
-        }
-
-        if (!(self->parent && self->parent->shown)) {
-            grab_keyboard(FALSE);
-            grab_pointer(FALSE, None);
-        }
-        menu_visible = g_list_remove(menu_visible, self);
-        if (self->over) {
-            ((ObMenuEntry *)self->over->data)->hilite = FALSE;
-            menu_entry_render(self->over->data);
-            self->over = NULL;
-        }
+    while (self->entries) {
+	menu_entry_free(self->entries->data);
+        self->entries = g_list_delete_link(self->entries, self->entries);
     }
 }
 
-void menu_clear(ObMenu *self) {
-    GList *it;
-  
-    for (it = self->entries; it; it = it->next) {
-	ObMenuEntry *entry = it->data;
-	menu_entry_free(entry);
-    }
-    self->entries = NULL;
-    self->invalid = TRUE;
-}
-
-
-ObMenuEntry *menu_find_entry(ObMenu *menu, Window win)
+void menu_add_normal(gchar *name, gchar *label, GSList *actions)
 {
-    GList *it;
-
-    for (it = menu->entries; it; it = it->next) {
-        ObMenuEntry *entry = it->data;
-        if (entry->item == win)
-            return entry;
-    }
-    return NULL;
-}
-
-ObMenuEntry *menu_find_entry_by_submenu(ObMenu *menu, ObMenu *submenu)
-{
-    GList *it;
-
-    for (it = menu->entries; it; it = it->next) {
-        ObMenuEntry *entry = it->data;
-        if (entry->submenu == submenu)
-            return entry;
-    }
-    return NULL;
-}
-
-ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y)
-{
-    if (x < 0 || x >= menu->size.width || y < 0 || y >= menu->size.height)
-        return NULL;
-
-    y -= menu->title_h + ob_rr_theme->bwidth;
-    if (y < 0) return NULL;
-    
-    ob_debug("%d %p\n", y/menu->item_h,
-             g_list_nth_data(menu->entries, y / menu->item_h));
-    return g_list_nth_data(menu->entries, y / menu->item_h);
-}
-
-void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
-                     unsigned int y)
-{
-    ObMenu *m;
-
-    /* ignore wheel scrolling */
-    if (button == 4 || button == 5) return;
-
-    if (self->action) {
-        self->action->data.any.c = self->parent->client;
-        self->action->func(&self->action->data);
-
-        /* hide the whole thing */
-        m = self->parent;
-        while (m->parent) m = m->parent;
-        m->hide(m);
-    }
-}
-
-/* 
-   Default menu controller action for showing.
-*/
-
-void menu_control_show(ObMenu *self, int x, int y, ObClient *client)
-{
-    guint i;
-    Rect *a = NULL;
-
-    g_assert(!self->invalid);
-    
-    for (i = 0; i < screen_num_monitors; ++i) {
-        a = screen_physical_area_monitor(i);
-        if (RECT_CONTAINS(*a, x, y))
-            break;
-    }
-    g_assert(a != NULL);
-    self->xin_area = i;
-
-    POINT_SET(self->location,
-	      MIN(x, a->x + a->width - 1 - self->size.width), 
-	      MIN(y, a->y + a->height - 1 - self->size.height));
-    XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
-
-    if (!self->shown) {
-	XMapWindow(ob_display, self->frame);
-        stacking_raise(MENU_AS_WINDOW(self));
-	self->shown = TRUE;
-    } else if (self->shown && self->open_submenu) {
-	self->open_submenu->hide(self->open_submenu);
-    }
-}
-
-void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
-{
-    int x;
-    Rect *a;
+    ObMenu *self;
     ObMenuEntry *e;
 
-    g_assert(self != NULL);
-    
-    if (enter) {
-        /* TODO: we prolly don't need open_submenu */
-	if (self->parent->open_submenu && self->submenu 
-	    != self->parent->open_submenu)
-        {
-            e = (ObMenuEntry *) self->parent->over->data;
-            e->hilite = FALSE;
-            menu_entry_render(e);
-	    self->parent->open_submenu->hide(self->parent->open_submenu);
-        }
-	
-	if (self->submenu && self->parent->open_submenu != self->submenu) {
-	    self->parent->open_submenu = self->submenu;
+    if (!(self = menu_from_name(name))) return;
 
-	    /* shouldn't be invalid since it must be displayed */
-	    g_assert(!self->parent->invalid);
-	    /* TODO: I don't understand why these bevels should be here.
-	       Something must be wrong in the width calculation */
-	    x = self->parent->location.x + self->parent->size.width + 
-		ob_rr_theme->bwidth - ob_rr_theme->menu_overlap;
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL);
+    e->data.normal.label = g_strdup(label);
+    e->data.normal.actions = actions;
 
-	    /* need to get the width. is this bad?*/
-	    self->submenu->update(self->submenu);
-
-            a = screen_physical_area_monitor(self->parent->xin_area);
-
-	    if (self->submenu->size.width + x + ob_rr_theme->bwidth >=
-                a->x + a->width) {
-                int newparentx = a->x + a->width
-                    - self->submenu->size.width
-                    - self->parent->size.width
-                    - ob_rr_theme->bwidth * 2
-                    - ob_rr_theme->menu_overlap;
-                
-                x = a->x + a->width - self->submenu->size.width
-                    - ob_rr_theme->menu_overlap;
-                XWarpPointer(ob_display, None, None, 0, 0, 0, 0,
-                             newparentx - self->parent->location.x, 0);
-
-                menu_show_full(self->parent, newparentx,
-                               self->parent->location.y, self->parent->client);
-            }
-	    
-	    menu_show_full(self->submenu, x,
-			   self->parent->location.y + self->y +
-                           self->parent->title_h + ob_rr_theme->bwidth,
-                           self->parent->client);
-	}
-        self->hilite = TRUE;
-        self->parent->over = g_list_find(self->parent->entries, self);
-        
-    } else
-        self->hilite = FALSE;
-    
-    menu_entry_render(self);
+    self->entries = g_list_append(self->entries, e);
 }
 
-void menu_control_keyboard_nav(unsigned int key)
+void menu_add_submenu(gchar *name, gchar *submenu)
 {
-    static ObMenu *current_menu = NULL;
-    ObMenuEntry *e = NULL;
+    ObMenu *self, *sub;
+    ObMenuEntry *e;
 
-    ObKey obkey = OB_NUM_KEYS;
+    if (!(self = menu_from_name(name))) return;
+    if (!(sub = menu_from_name(submenu))) return;
 
-    /* hrmm. could be fixed */
-    if (key == ob_keycode(OB_KEY_DOWN))
-        obkey = OB_KEY_DOWN;
-    else if (key == ob_keycode(OB_KEY_UP))
-        obkey = OB_KEY_UP;
-    else if (key == ob_keycode(OB_KEY_RIGHT)) /* fuck */
-        obkey = OB_KEY_RIGHT;
-    else if (key == ob_keycode(OB_KEY_LEFT)) /* users */
-        obkey = OB_KEY_LEFT;
-    else if (key == ob_keycode(OB_KEY_RETURN))
-        obkey = OB_KEY_RETURN;
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU);
+    e->data.submenu.submenu = sub;
 
-    
-    if (current_menu == NULL)
-        current_menu = menu_visible->data;
-    
-    switch (obkey) {
-    case OB_KEY_DOWN: {
-        if (current_menu->over) {
-            current_menu->mouseover(current_menu->over->data, FALSE);
-            current_menu->over = (current_menu->over->next != NULL ?
-                          current_menu->over->next :
-                          current_menu->entries);
-        }
-        else
-            current_menu->over = current_menu->entries;
-
-        if (current_menu->over)
-            current_menu->mouseover(current_menu->over->data, TRUE);
-        
-        break;
-    }
-    case OB_KEY_UP: {
-        if (current_menu->over) {
-            current_menu->mouseover(current_menu->over->data, FALSE);
-            current_menu->over = (current_menu->over->prev != NULL ?
-                          current_menu->over->prev :
-                g_list_last(current_menu->entries));
-        } else
-            current_menu->over = g_list_last(current_menu->entries);
-
-        if (current_menu->over)
-            current_menu->mouseover(current_menu->over->data, TRUE);
-        
-        break;
-    }
-    case OB_KEY_RIGHT: {
-        if (current_menu->over == NULL)
-            return;
-        e = (ObMenuEntry *)current_menu->over->data;
-        if (e->submenu) {
-            current_menu->mouseover(e, TRUE);
-            current_menu = e->submenu;
-            current_menu->over = current_menu->entries;
-            if (current_menu->over)
-                current_menu->mouseover(current_menu->over->data, TRUE);
-        }
-        break;
-    }
-
-    case OB_KEY_RETURN: {
-        if (current_menu->over == NULL)
-            return;
-        e = (ObMenuEntry *)current_menu->over->data;
-
-        current_menu->mouseover(e, FALSE);
-        current_menu->over = NULL;
-        /* zero is enter */
-        menu_entry_fire(e, 0, 0, 0);
-    }
-        
-    case OB_KEY_LEFT: {
-        if (current_menu->over != NULL) {
-            current_menu->mouseover(current_menu->over->data, FALSE);
-            current_menu->over = NULL;
-        }
-        
-        current_menu->hide(current_menu);
-
-        if (current_menu->parent)
-            current_menu = current_menu->parent;
-        
-        break;
-    }
-    default:
-        ((ObMenu *)menu_visible->data)->hide(menu_visible->data);
-        current_menu = NULL;
-    }
-    return;
+    self->entries = g_list_append(self->entries, e);
 }
 
-void menu_noop()
+void menu_add_separator(gchar *name)
 {
-    /* This noop brought to you by OLS 2003 Email Garden. */
+    ObMenu *self;
+    ObMenuEntry *e;
+
+    if (!(self = menu_from_name(name))) return;
+
+    e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SEPARATOR);
+
+    self->entries = g_list_append(self->entries, e);
 }

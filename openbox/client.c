@@ -350,13 +350,6 @@ void client_unmanage_all()
 	client_unmanage(client_list->data);
 }
 
-/* called by client_unmanage() to close any menus referencing this client */
-void client_close_menus(gpointer key, gpointer value, gpointer self)
-{
-    if (((ObMenu *)value)->client == (ObClient *)self)
-        menu_hide((ObMenu *)value);
-}
-
 void client_unmanage(ObClient *self)
 {
     guint j;
@@ -413,9 +406,7 @@ void client_unmanage(ObClient *self)
     if (moveresize_client == self)
         moveresize_end(TRUE);
 
-    /* close any windows that are attached to this window */
-    g_hash_table_foreach(menu_hash, client_close_menus, self);
-
+    /* XXX close any windows that are attached to this window */
     
     if (focus_client == self) {
         XEvent e;

@@ -9,199 +9,82 @@
 #include <glib.h>
 
 struct _ObClient;
-struct _ObParseInst;
+struct _ObMenuFrame;
 
 typedef struct _ObMenu ObMenu;
 typedef struct _ObMenuEntry ObMenuEntry;
+typedef struct _ObNormalMenuEntry ObNormalMenuEntry;
+typedef struct _ObSubmenuMenuEntry ObSubmenuMenuEntry;
+typedef struct _ObSeparatorMenuEntry ObSeparatorMenuEntry;
 
-typedef void(*menu_controller_destroy)(ObMenu *self);
-typedef void(*menu_controller_show)(ObMenu *self, int x, int y,
-                                    struct _ObClient *);
-typedef void(*menu_controller_update)(ObMenu *self);
-typedef void(*menu_controller_mouseover)(ObMenuEntry *self, gboolean enter);
-typedef void(*menu_controller_selected)(ObMenuEntry *entry,
-                                        unsigned int button,
-                                        unsigned int x, unsigned int y);
-typedef void(*menu_controller_hide)(ObMenu *self);
-
-
-extern GHashTable *menu_hash;
 extern GList *menu_visible;
+
+
 
 struct _ObMenu
 {
-    ObWindow obwin;
-
-    /* The title displayed above the menu.
-       NULL for no titlebar */
-    gchar *label;
-
-    /* Name of the menu.
-       Used in the action showmenu */
+    /* Name of the menu. Used in the showmenu action. */
     gchar *name;
+    /* Displayed title */
+    gchar *title;
 
     /* ObMenuEntry list */
     GList *entries;
 
-    /* If the menu is currently displayed */
-    gboolean shown;
-
-    /* If the rendering of the menu has changed and needs to be rerendered. */
-    gboolean invalid;
-
-    /* Kind of lame.Each menu can only be a submenu, and each menu can only
-       have one submenu open */
-    ObMenu *parent;
-    ObMenu *open_submenu;
-    GList *over;
-    
-    /* destructor */
-    menu_controller_destroy destroy;
-
-    /* behaviour callbacks
-       TODO: Document and split code that HAS to be in the overridden callback */
-    /* place a menu on screen */
-    menu_controller_show show;
-    /* Hide the menu */
-    menu_controller_hide hide;
-    /* render a menu */
-    menu_controller_update update;
-    /* Event for a mouse enter/exit on an entry
-       TODO: May have to split from simple render updating?
-    */
-    menu_controller_mouseover mouseover;
-    /* Entry is clicked/hit enter on */
-    menu_controller_selected selected;
-
-
-    /* render stuff */
-    struct _ObClient *client;
-    Window frame;
-    Window title;
-    RrAppearance *a_title;
-    gint title_min_w, title_h;
-    Window items;
-    RrAppearance *a_items;
-    gint bullet_w;
-    gint item_h;
-    Point location;
-    Size size;
-    guint xin_area; /* index of the xinerama head/area */
-
-    /* Name of plugin for menu */
-    char *plugin;
-    /* plugin's data */
-    void *plugin_data;
+    /* plugin data */
+    gpointer data;
 };
 
 typedef enum
 {
-    OB_MENU_ENTRY_RENDER_TYPE_NONE,
-    OB_MENU_ENTRY_RENDER_TYPE_SUBMENU,
-    OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN,
-    OB_MENU_ENTRY_RENDER_TYPE_SEPARATOR,
-    OB_MENU_ENTRY_RENDER_TYPE_OTHER /* XXX what is this? */
-} ObMenuEntryRenderType;
+    OB_MENU_ENTRY_TYPE_NORMAL,
+    OB_MENU_ENTRY_TYPE_SUBMENU,
+    OB_MENU_ENTRY_TYPE_SEPARATOR
+} ObMenuEntryType;
+
+struct _ObNormalMenuEntry {
+    gchar *label;
+
+    /* List of ObActions */
+    GSList *actions;
+};
+
+struct _ObSubmenuMenuEntry {
+    ObMenu *submenu;
+};
+
+struct _ObSeparatorMenuEntry {
+    gchar foo; /* placeholder */
+};
 
 struct _ObMenuEntry
 {
-    char *label;
-    ObMenu *parent;
+    ObMenuEntryType type;
+    ObMenu *menu;
 
-    ObAction *action;    
-    
-    ObMenuEntryRenderType render_type;
-    gboolean hilite;
+    /* state */
     gboolean enabled;
-    gboolean boolean_value;
 
-    ObMenu *submenu;
-
-    /* render stuff */
-    Window item;
-    Window submenu_pic;
-    
-    RrAppearance *a_item;
-    RrAppearance *a_disabled;
-    RrAppearance *a_hilite;
-    RrAppearance *a_submenu;
-    gint y;
-    gint min_w;
-} MenuEntry;
-
-typedef struct PluginMenuCreateData{
-    struct _ObParseInst *parse_inst;
-    xmlDocPtr doc;
-    xmlNodePtr node;
-    ObMenu *parent;
-} PluginMenuCreateData;
-
+    union u {
+        ObNormalMenuEntry normal;
+        ObSubmenuMenuEntry submenu;
+        ObSeparatorMenuEntry separator;
+    } data;
+};
 
 void menu_startup();
 void menu_shutdown();
 
 void menu_parse();
 
-void menu_noop();
+gboolean menu_new(gchar *name, gchar *title, gpointer data);
 
-#define menu_new(l, n, p) \
-  menu_new_full(l, n, p, menu_show_full, menu_render, menu_entry_fire, \
-                menu_hide, menu_control_mouseover, NULL)
+void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
 
-ObMenu *menu_new_full(char *label, char *name, ObMenu *parent, 
-                      menu_controller_show show,
-                      menu_controller_update update,
-                      menu_controller_selected selected,
-                      menu_controller_hide hide,
-                      menu_controller_mouseover mouseover,
-                      menu_controller_destroy destroy);
+/* functions for building menus */
+void menu_clear_entries(gchar *name);
+void menu_add_normal(gchar *name, gchar *label, GSList *actions);
+void menu_add_submenu(gchar *name, gchar *submenu);
+void menu_add_separator(gchar *name);
 
-void menu_free(char *name);
-
-void menu_show(char *name, int x, int y, struct _ObClient *client);
-void menu_show_full(ObMenu *menu, int x, int y, struct _ObClient *client);
-
-void menu_hide(ObMenu *self);
-
-void menu_clear(ObMenu *self);
-
-ObMenuEntry *menu_entry_new_full(char *label, ObAction *action,
-                               ObMenuEntryRenderType render_type,
-                               gpointer submenu);
-
-#define menu_entry_new(label, action) \
-menu_entry_new_full(label, action, OB_MENU_ENTRY_RENDER_TYPE_NONE, NULL)
-
-#define menu_entry_new_separator(label) \
-menu_entry_new_full(label, NULL, OB_MENU_ENTRY_RENDER_TYPE_SEPARATOR, NULL)
-
-#define menu_entry_new_submenu(label, submenu) \
-menu_entry_new_full(label, NULL, OB_MENU_ENTRY_RENDER_TYPE_SUBMENU, submenu)
-
-#define menu_entry_new_boolean(label, action) \
-menu_entry_new_full(label, action, OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN, NULL)
-
-void menu_entry_free(ObMenuEntry *entry);
-
-void menu_entry_set_submenu(ObMenuEntry *entry, ObMenu *submenu);
-
-void menu_add_entry(ObMenu *menu, ObMenuEntry *entry);
-
-ObMenuEntry *menu_find_entry(ObMenu *menu, Window win);
-ObMenuEntry *menu_find_entry_by_submenu(ObMenu *menu, ObMenu *submenu);
-ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y);
-
-void menu_entry_render(ObMenuEntry *self);
-
-void menu_entry_fire(ObMenuEntry *entry,
-                     unsigned int button, unsigned int x, unsigned int y);
-
-void menu_render(ObMenu *self);
-void menu_render_full(ObMenu *self);
-
-/*so plugins can call it? */
-void parse_menu_full(struct _ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                     void *data, gboolean new);
-void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
-void menu_control_keyboard_nav(unsigned int key);
 #endif

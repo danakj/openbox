@@ -145,7 +145,6 @@ void screen::processEvent(const XEvent &e) {
 void screen::handleKeypress(const XEvent &e) {
   ActionList::const_iterator it = _epist->actions().begin();
   ActionList::const_iterator end = _epist->actions().end();
-  cout << "key press\n";
   for (; it != end; ++it) {
     if (e.xkey.keycode == it->keycode() &&
         e.xkey.state == it->modifierMask()) {

@@ -581,11 +581,11 @@ static void screen_update_area()
 		Client *c = it->data;
 		if (i < screen_num_desktops) {
 		    if (c->desktop == i)
-			client_remaximize(c);
+                        client_reconfigure(c);
 		} else {
 		    /* the 'all desktops' size */
 		    if (c->desktop == DESKTOP_ALL)
-			client_remaximize(c);
+                        client_reconfigure(c);
 		}
 	    }
 	}

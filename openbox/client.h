@@ -318,11 +318,6 @@ void client_unmanage(Client *client);
 /*! Sets the client list on the root window from the client_list */
 void client_set_list();
 
-/*! Reapplies the maximized state to the window
-  Use this to make the window readjust its maximized size to new
-  surroundings (struts, etc). */
-void client_remaximize(Client *self);
-
 /*! Determines if the client should be shown or hidden currently.
   @return TRUE if it should be visible; otherwise, FALSE.
 */
@@ -353,6 +348,8 @@ gboolean client_focused(Client *self);
 */
 void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 		      gboolean user, gboolean final);
+
+void client_reconfigure(Client *self);
 
 /*! Moves a client so that it is on screen if it is entirely out of the
   viewable screen.

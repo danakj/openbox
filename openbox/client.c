@@ -1031,7 +1031,7 @@ void client_setup_decor_and_functions(Client *self)
            we may also need to be repositioned */
 	frame_adjust_area(self->frame, TRUE, TRUE);
 	/* with new decor, the window's maximized size may change */
-	client_remaximize(self);
+	client_reconfigure(self);
     } else {
         /* this makes sure that these windows appear on all desktops */
         if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
@@ -1089,19 +1089,10 @@ static void client_change_allowed_actions(Client *self)
     }
 }
 
-void client_remaximize(Client *self)
+void client_reconfigure(Client *self)
 {
-    int dir;
-    if (self->max_horz && self->max_vert)
-	dir = 0;
-    else if (self->max_horz)
-	dir = 1;
-    else if (self->max_vert)
-	dir = 2;
-    else
-	return; /* not maximized */
-    self->max_horz = self->max_vert = FALSE;
-    client_maximize(self, TRUE, dir, FALSE);
+    client_configure(self, Corner_TopLeft, self->area.x, self->area.y,
+                     self->area.width, self->area.height, TRUE, TRUE);
 }
 
 void client_update_wmhints(Client *self)
@@ -1618,8 +1609,12 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
+#ifdef VIDMODE
+        XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y);
+#else
 	x = 0;
 	y = 0;
+#endif
 	w = screen_physical_size.width;
 	h = screen_physical_size.height;
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
@@ -1867,6 +1862,11 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
         /* this puts it after the current focused window */
         focus_order_remove(self);
         focus_order_add_new(self);
+
+        /* this is here cuz with the VIDMODE extension, the viewport can change
+           while a fullscreen window is iconic, and when it uniconifies, it
+           would be nice if it did so to the new position of the viewport */
+        client_reconfigure(self);
     }
     client_change_state(self);
     client_showhide(self);

@@ -62,11 +62,9 @@
 # endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 
-#ifdef    HAVE_SSTREAM
-#  include <sstream>
-#endif // HAVE_SSTREAM
-
+#include <strstream>
 #include <string>
+using namespace std;
 
 Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
   openbox(scrn.getOpenbox()), config(conf)
@@ -217,30 +215,35 @@ Toolbar::~Toolbar() {
 
 void Toolbar::setOnTop(bool b) {
   m_ontop = b;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setAutoHide(bool b) {
   m_autohide = b;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide"
+    << ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setWidthPercent(int w) {
   m_width_percent = w;
-  std::ostringstream s;
+  ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.widthPercent"
-   ;
+    << ends;
   config.setValue(s.str(), m_width_percent);
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setPlacement(int p) {
   m_placement = p;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement"
+    << ends;
   const char *placement;
   switch (m_placement) {
   case TopLeft: placement = "TopLeft"; break;
@@ -251,6 +254,7 @@ void Toolbar::setPlacement(int p) {
   case BottomCenter: default: placement = "BottomCenter"; break;
   }
   config.setValue(s.str(), placement);
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::save() {
@@ -261,22 +265,22 @@ void Toolbar::save() {
 }
 
 void Toolbar::load() {
-  std::ostringstream rscreen, rname, rclass;
-  std::string s;
+  ostrstream rscreen, rname, rclass;
+  string s;
   bool b;
   long l;
-  rscreen << "session.screen" << screen.getScreenNumber() << '.';
+  rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
 
-  rname << rscreen.str() << "toolbar.widthPercent";
-  rclass << rscreen.str() << "Toolbar.WidthPercent";
+  rname << rscreen.str() << "toolbar.widthPercent" << ends;
+  rclass << rscreen.str() << "Toolbar.WidthPercent" << ends;
   if (config.getValue(rname.str(), rclass.str(), l) && (l > 0 && l <= 100))
     m_width_percent = l;
   else
     m_width_percent =66;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.placement";
-  rclass << rscreen.str() << "Toolbar.Placement";
+  rname << rscreen.str() << "toolbar.placement" << ends;
+  rclass << rscreen.str() << "Toolbar.Placement" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
       m_placement = TopLeft;
@@ -294,20 +298,24 @@ void Toolbar::load() {
     m_placement = BottomCenter;
   
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.onTop";
-  rclass << rscreen.str() << "Toolbar.OnTop";
+  rname << rscreen.str() << "toolbar.onTop" << ends;
+  rclass << rscreen.str() << "Toolbar.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_ontop = b;
   else
     m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.autoHide";
-  rclass << rscreen.str() << "Toolbar.AutoHide";
+  rname << rscreen.str() << "toolbar.autoHide" << ends;
+  rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
   else
     m_hidden = m_autohide = false;
+
+  rscreen.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0);
+  rclass.rdbuf()->freeze(0);
 }
 
 void Toolbar::reconfigure() {
@@ -714,11 +722,11 @@ void Toolbar::checkClock(Bool redraw, Bool date) {
 
 
 void Toolbar::redrawWindowLabel(Bool redraw) {
-  if (screen.getOpenbox().getFocusedWindow()) {
+  if (screen.getOpenbox().focusedWindow()) {
     if (redraw)
       XClearWindow(display, frame.window_label);
 
-    OpenboxWindow *foc = screen.getOpenbox().getFocusedWindow();
+    OpenboxWindow *foc = screen.getOpenbox().focusedWindow();
     if (foc->getScreen() != &screen) return;
 
     int dx = (frame.bevel_w * 2), dlen = strlen(*foc->getTitle());
@@ -967,8 +975,8 @@ void Toolbar::edit() {
   XClearWindow(display, frame.workspace_label);
 
   openbox.setNoFocus(True);
-  if (openbox.getFocusedWindow())
-    openbox.getFocusedWindow()->setFocusFlag(False);
+  if (openbox.focusedWindow())
+    openbox.focusedWindow()->setFocusFlag(False);
 
   XDrawRectangle(display, frame.workspace_label,
                  screen.getWindowStyle()->l_text_focus_gc,
@@ -1143,9 +1151,9 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
       m_editing = False;
 
       openbox.setNoFocus(False);
-      if (openbox.getFocusedWindow()) {
-        openbox.getFocusedWindow()->setInputFocus();
-        openbox.getFocusedWindow()->setFocusFlag(True);
+      if (openbox.focusedWindow()) {
+        openbox.focusedWindow()->setInputFocus();
+        openbox.focusedWindow()->setFocusFlag(True);
       } else {
         XSetInputFocus(display, PointerRoot, None, CurrentTime);
       }

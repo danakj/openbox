@@ -103,7 +103,8 @@ private:
   LinkedList<MenuTimestamp> *menuTimestamps;
   LinkedList<BScreen> *screenList;
 
-  OpenboxWindow *focused_window, *masked_window;
+  BScreen *focused_screen;
+  OpenboxWindow *masked_window;
   BTimer *timer;
 
 #ifdef    HAVE_GETPID
@@ -139,7 +140,8 @@ public:
 
   OpenboxWindow *searchGroup(Window, OpenboxWindow *);
   OpenboxWindow *searchWindow(Window);
-  inline OpenboxWindow *getFocusedWindow() { return focused_window; }
+  OpenboxWindow *focusedWindow();
+  void focusWindow(OpenboxWindow *w);
 
   BScreen *getScreen(int);
   BScreen *searchScreen(Window);
@@ -178,7 +180,6 @@ public:
     { masked = w; masked_window = bw; }
   inline void setNoFocus(Bool f) { no_focus = f; }
 
-  void setFocusedWindow(OpenboxWindow *w);
   void shutdown();
   void setStyleFilename(const char *);
   void setMenuFilename(const char *);

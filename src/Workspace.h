@@ -26,12 +26,13 @@
 #include <X11/Xlib.h>
 
 #include "LinkedList.h"
-#include "Geometry.h"
 
 class BScreen;
 class Clientmenu;
 class Workspace;
 class OpenboxWindow;
+class Size;
+class Rect;
 
 class Workspace {
 private:
@@ -44,6 +45,7 @@ private:
   char *name;
   int id, cascade_x, cascade_y;
 
+  OpenboxWindow *_focused;
 
 protected:
   void placeWindow(OpenboxWindow &);
@@ -58,26 +60,19 @@ public:
   ~Workspace(void);
 
   inline BScreen &getScreen(void) { return screen; }
-
   inline OpenboxWindow *getLastFocusedWindow(void) { return lastfocus; }
-  
   inline Clientmenu *getMenu(void) { return clientmenu; }
-
   inline const char *getName(void) const { return name; }
-
   inline const int &getWorkspaceID(void) const { return id; }
-  
   inline void setLastFocusedWindow(OpenboxWindow *w) { lastfocus = w; }
-
+  inline OpenboxWindow *focusedWindow() { return _focused; }
+  void focusWindow(OpenboxWindow *win);
   OpenboxWindow *getWindow(int);
-
   Bool isCurrent(void);
   Bool isLastWindow(OpenboxWindow *);
-  
   const int addWindow(OpenboxWindow *, Bool = False);
   const int removeWindow(OpenboxWindow *);
   const int getCount(void);
-
   void showAll(void);
   void hideAll(void);
   void removeAll(void);

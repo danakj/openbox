@@ -63,9 +63,8 @@
 typedef std::vector<Rect> rectList;
 
 Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
-
   cascade_x = cascade_y = 0;
-
+  _focused = (OpenboxWindow *) 0;
   id = i;
 
   stackingList = new LinkedList<OpenboxWindow>;
@@ -122,11 +121,11 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
 	w->getTransientFor()->isVisible()) {
       w->getTransientFor()->setInputFocus();
     } else if (screen.sloppyFocus()) {
-      screen.getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
+      screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
     } else {
       OpenboxWindow *top = stackingList->first();
       if (! top || ! top->setInputFocus()) {
-	screen.getOpenbox().setFocusedWindow((OpenboxWindow *) 0);
+	screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
 	XSetInputFocus(screen.getOpenbox().getXDisplay(),
 		       screen.getToolbar()->getWindowID(),
 		       RevertToParent, CurrentTime);
@@ -149,6 +148,15 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
     bw->setWindowNumber(i);
 
   return windowList->count();
+}
+
+
+void Workspace::focusWindow(OpenboxWindow *win) {
+  if (win != (OpenboxWindow *) 0)
+    clientmenu->setItemSelected(win->getWindowNumber(), true);
+  if (_focused != (OpenboxWindow *) 0)
+    clientmenu->setItemSelected(_focused->getWindowNumber(), false);
+  _focused = win;
 }
 
 
@@ -506,7 +514,7 @@ Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
   best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
     if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
-      best = siter;
+      best = &*siter;
       break;
     }
 
@@ -550,7 +558,7 @@ Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
   best = NULL;
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
     if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
-      best = siter;
+      best = &*siter;
       break;
     }
 

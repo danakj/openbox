@@ -186,7 +186,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
-  focused_window = masked_window = NULL;
+  masked_window = NULL;
   masked = None;
 
   windowSearchList = new LinkedList<WindowSearch>;
@@ -225,6 +225,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 	       "Openbox::Openbox: no managable screens found, aborting.\n"));
     ::exit(3);
   }
+  focused_screen = screenList->first();
 
   // save current settings and default values
   save();
@@ -502,8 +503,6 @@ void Openbox::process_event(XEvent *e) {
 
     if ((win = searchWindow(e->xunmap.window))) {
       win->unmapNotifyEvent(&e->xunmap);
-      if (focused_window == win)
-	focused_window = (OpenboxWindow *) 0;
 #ifdef    SLIT
     } else if ((slit = searchSlit(e->xunmap.window))) {
       slit->removeClient(e->xunmap.window);
@@ -523,8 +522,6 @@ void Openbox::process_event(XEvent *e) {
 
     if ((win = searchWindow(e->xdestroywindow.window))) {
       win->destroyNotifyEvent(&e->xdestroywindow);
-      if (focused_window == win)
-	focused_window = (OpenboxWindow *) 0;
 #ifdef    SLIT
     } else if ((slit = searchSlit(e->xdestroywindow.window))) {
       slit->removeClient(e->xdestroywindow.window, False);
@@ -674,8 +671,8 @@ void Openbox::process_event(XEvent *e) {
       break;
 
     OpenboxWindow *win = searchWindow(e->xfocus.window);
-    if (win && ! win->isFocused())
-      setFocusedWindow(win);
+    if (win && !win->isFocused())
+      focusWindow(win);
 
     break;
   }
@@ -1185,42 +1182,44 @@ void Openbox::timeout() {
 }
 
 
-void Openbox::setFocusedWindow(OpenboxWindow *win) {
-  BScreen *old_screen = (BScreen *) 0, *screen = (BScreen *) 0;
-  OpenboxWindow *old_win = (OpenboxWindow *) 0;
+OpenboxWindow *Openbox::focusedWindow() {
+  if (focused_screen == (BScreen *) 0)
+    return (OpenboxWindow *) 0;
+  return focused_screen->getCurrentWorkspace()->focusedWindow();
+}
+
+
+void Openbox::focusWindow(OpenboxWindow *win) {
+  BScreen *old_screen = (BScreen *) 0;
   Toolbar *old_tbar = (Toolbar *) 0, *tbar = (Toolbar *) 0;
   Workspace *old_wkspc = (Workspace *) 0, *wkspc = (Workspace *) 0;
 
-  if (focused_window) {
-    old_win = focused_window;
+  OpenboxWindow *old_win = focusedWindow();
+  if (old_win != (OpenboxWindow *) 0) {
     old_screen = old_win->getScreen();
-    old_tbar = old_screen->getToolbar();
     old_wkspc = old_screen->getWorkspace(old_win->getWorkspaceNumber());
+    old_tbar = old_screen->getToolbar();
 
     old_win->setFocusFlag(False);
-    old_wkspc->getMenu()->setItemSelected(old_win->getWindowNumber(), False);
+    old_wkspc->focusWindow((OpenboxWindow *) 0);
   }
 
-  if (win && ! win->isIconic()) {
-    screen = win->getScreen();
-    tbar = screen->getToolbar();
-    wkspc = screen->getWorkspace(win->getWorkspaceNumber());
-
-    focused_window = win;
-
-    win->setFocusFlag(True);
-    wkspc->getMenu()->setItemSelected(win->getWindowNumber(), True);
-  } else {
-    focused_window = (OpenboxWindow *) 0;
+  if (win && !win->isIconic()) {
+    focused_screen = win->getScreen();
+    tbar = focused_screen->getToolbar();
+    wkspc = focused_screen->getWorkspace(win->getWorkspaceNumber());
+    win->setFocusFlag(true);
+    wkspc->focusWindow(win);
+    
+    if (tbar)
+      tbar->redrawWindowLabel(true);
+    focused_screen->updateNetizenWindowFocus();
+  //} else {
+  //  focused_window = (OpenboxWindow *) 0;
   }
-
-  if (tbar)
-    tbar->redrawWindowLabel(True);
-  if (screen)
-    screen->updateNetizenWindowFocus();
 
   if (old_tbar && old_tbar != tbar)
-    old_tbar->redrawWindowLabel(True);
-  if (old_screen && old_screen != screen)
+    old_tbar->redrawWindowLabel(true);
+  if (old_screen && old_screen != focused_screen)
     old_screen->updateNetizenWindowFocus();
 }

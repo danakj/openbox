@@ -56,6 +56,9 @@
 #endif // SLIT
 #include "Util.h"
 
+#include <iostream>
+using namespace std;
+
 /*
  * Initializes the class with default values/the window's set initial values.
  */
@@ -1390,7 +1393,7 @@ Bool OpenboxWindow::setInputFocus(void) {
       XSetInputFocus(display, screen->getRootWindow(),
 		     RevertToNone, CurrentTime);
 
-    openbox.setFocusedWindow(this);
+    openbox.focusWindow(this);
 
     if (flags.send_focus_message) {
       XEvent ce;

@@ -41,11 +41,9 @@
 #include "Slit.h"
 #include "Toolbar.h"
 
-#ifdef    HAVE_SSTREAM
-#  include <sstream>
-#endif // HAVE_SSTREAM
-
+#include <strstream>
 #include <string>
+using namespace std;
 
 Slit::Slit(BScreen &scr, Resource &conf) : screen(scr),
   openbox(scr.getOpenbox()), config(conf)
@@ -214,22 +212,25 @@ void Slit::removeClient(Window w, Bool remap) {
 
 void Slit::setOnTop(bool b) {
   m_ontop = b;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.onTop";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".slit.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setAutoHide(bool b) {
   m_autohide = b;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.autoHide";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".slit.autoHide" << ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setPlacement(int p) {
   m_placement = p;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.placement";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".slit.placement"
+    << ends;
   const char *placement;
   switch (m_placement) {
   case TopLeft: placement = "TopLeft"; break;
@@ -242,14 +243,17 @@ void Slit::setPlacement(int p) {
   case CenterRight: default: placement = "CenterRight"; break;
   }
   config.setValue(s.str(), placement);
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setDirection(int d) {
   m_direction = d;
-  std::ostringstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.direction";
+  ostrstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".slit.direction"
+    << ends;
   config.setValue(s.str(),
                   m_direction == Horizontal ? "Horizontal" : "Vertical");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::save() {
@@ -260,13 +264,13 @@ void Slit::save() {
 }
 
 void Slit::load() {
-  std::ostringstream rscreen, rname, rclass;
-  std::string s;
+  ostrstream rscreen, rname, rclass;
+  string s;
   bool b;
-  rscreen << "session.screen" << screen.getScreenNumber() << '.';
+  rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
 
-  rname << rscreen.str() << "slit.placement";
-  rclass << rscreen.str() << "Slit.Placement";
+  rname << rscreen.str() << "slit.placement" << ends;
+  rclass << rscreen.str() << "Slit.Placement" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
       m_placement = TopLeft;
@@ -288,8 +292,8 @@ void Slit::load() {
     m_placement = CenterRight;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "slit.direction";
-  rclass << rscreen.str() << "Slit.Direction";
+  rname << rscreen.str() << "slit.direction" << ends;
+  rclass << rscreen.str() << "Slit.Direction" << ends;
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "Horizontal", s.length()))
       m_direction = Horizontal;
@@ -299,20 +303,24 @@ void Slit::load() {
     m_direction = Vertical;
  
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "slit.onTop";
-  rclass << rscreen.str() << "Slit.OnTop";
+  rname << rscreen.str() << "slit.onTop" << ends;
+  rclass << rscreen.str() << "Slit.OnTop" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_ontop = b;
   else
     m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "slit.autoHide";
-  rclass << rscreen.str() << "Slit.AutoHide";
+  rname << rscreen.str() << "slit.autoHide" << ends;
+  rclass << rscreen.str() << "Slit.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
   else
     m_hidden = m_autohide = false;
+
+  rscreen.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0);
+  rclass.rdbuf()->freeze(0);
 }
 
 void Slit::reconfigure(void) {

@@ -3,7 +3,7 @@
 CLEANFILES = openbox.1
 MAINTAINERCLEANFILES = Makefile.in
 man_MANS = openbox.1 bsetroot.1 bsetbg.1 xftlsfonts.1
-SUBDIRS = 
+SUBDIRS = doxygen
 
 DEFAULT_MENU=$(pkgdatadir)/menu
 

@@ -3,6 +3,11 @@
 SUBDIRS = intl po m4 data doc otk src
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
+.PHONY: doc
+
+doc:
+	$(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
+
 uninstall-local:
 	-rmdir $(pkgdatadir)
 

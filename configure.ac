@@ -175,6 +175,7 @@ AC_CONFIG_FILES([Makefile
 		util/Makefile
 		util/epist/Makefile
 		doc/Makefile
+		doc/doxygen/Makefile
 		data/Makefile
 		data/styles/Makefile
 		version.h

@@ -21,6 +21,9 @@ Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
   e.g. add _BLACKBOX_STYLE and _BLACKBOX_MENU atoms so that bbtools, bbconf,
   etc. can get the current path to the style in use and menu.
 
+* keep track of what strings are Utf8 and what aren't and use the appropriate
+  functions!
+
 4.0:
 * have plugins/scripts for most everything as deemed appropriate.
 

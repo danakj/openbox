@@ -15,6 +15,7 @@ void cwmcc_client_get_protocols(Window win, Atom **protocols)
 
     if (!prop_get_array32(win, CWMCC_ATOM(client, wm_protocols),
                           CWMCC_ATOM(type, atom), protocols, &num)) {
+        g_warning("Failed to read WM_PROTOCOLS from 0x%lx", win);
         *protocols = NULL;
     }
 }
@@ -212,7 +213,7 @@ void cwmcc_client_get_strut(Window win, int *l, int *t, int *r, int *b)
         *t = data[2];
         *b = data[3];
     }
-    g_free(l);
+    g_free(data);
 }
 
 static void convert_pixmap_to_icon(Pixmap pix, Pixmap mask,

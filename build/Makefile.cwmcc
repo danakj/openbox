@@ -6,7 +6,7 @@ CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"CWMCC\"
 LIBS += $(GLIB_LIBS)
 
 target = libcwmcc.la
-sources = cwmcc.c atom.c prop.c client_props.c
+sources = cwmcc.c atom.c prop.c client_props.c root_props.c
 
 srcdir := $(srcdir)/$(dir)
 target := $(addprefix $(dir)/, $(target))

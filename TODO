@@ -1,8 +1,6 @@
 Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
 2.0:
-* rewrite of the window manager. complete class reorganization and cleanup.
-  Separate X class layer (XDisplay/XScreen/XWindow/etc)  which does all
-  interaction with the X server.
+* Add XEventHandler class to make event handling better than ever!
 
 * using std::string instead of char *'s. bool instead of Bool. proper consting
   everywhere where appropriate. unsigned ints where appropriate. etc.
@@ -12,6 +10,8 @@ Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
 * separate Font class with support for Xfonts, xfontsets, and xft.
 
 3.0:
+* reorganization of class model. Add XWidget class (contains an X drawable).
+
 * key/mouse/action bindings
 
 * break the themeing into a replaceable plugin/script of some form and possibly

@@ -12,9 +12,6 @@ public:
   Button(Widget *parent);
   virtual ~Button();
 
-  virtual inline bool isDefault() const { return _default; }
-  virtual void setDefault(bool d);
-  
   virtual inline bool isPressed() const { return _pressed; }
 
   virtual void press(unsigned int mouse_button);
@@ -26,7 +23,6 @@ public:
   virtual void styleChanged(const RenderStyle &style);
  
 private:
-  bool _default;
   bool _pressed;
   unsigned int _mouse_button;
 };

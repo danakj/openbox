@@ -9,8 +9,10 @@
 namespace otk {
 
 Button::Button(Widget *parent)
-  : Label(parent), _default(false), _pressed(false)
+  : Label(parent),
+    _pressed(false)
 {
+  setHighlighted(false);
   setHorizontalJustify(RenderStyle::CenterJustify);
   setVerticalJustify(RenderStyle::CenterJustify);
   styleChanged(*RenderStyle::style(screen()));
@@ -53,16 +55,9 @@ void Button::buttonReleaseHandler(const XButtonEvent &e)
   release(e.button);
 }
 
-void Button::setDefault(bool d)
-{
-  _default = d;
-  styleChanged(*RenderStyle::style(screen()));
-  refresh();
-}
-
 void Button::styleChanged(const RenderStyle &style)
 {
-  if (_default) {
+  if (isHighlighted()) {
     if (_pressed)
       _texture = style.buttonPressFocusBackground();
     else

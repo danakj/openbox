@@ -20,6 +20,9 @@ public:
   inline const ustring& getText(void) const { return _text; }
   void setText(const ustring &text);
 
+  virtual inline bool isHighlighted() const { return _highlight; }
+  virtual void setHighlighted(bool h);
+  
   RenderStyle::Justify horizontalJustify() const { return _justify_horz; }
   virtual void setHorizontalJustify(RenderStyle::Justify j);
   RenderStyle::Justify verticalJustify() const { return _justify_vert; }
@@ -53,6 +56,8 @@ private:
   RenderStyle::Justify _justify_vert;
   //! The drawing offset for the text
   int _drawx;
+  //! If the widget is highlighted or not
+  bool _highlight;
 };
 
 }

@@ -112,10 +112,10 @@ class _cycledata:
             w = otk.Label(self.widget)
             if current and c.window() == current.window():
                 self.menupos = i
-                #w.focus() XXX
+                w.setHighlighted(1)
                 pass
             else:
-                #w.unfocus() XXX
+                w.setHighlighted(0)
                 pass
             self.menuwidgets.append(w)
 
@@ -192,7 +192,7 @@ class _cycledata:
 
         if not len(self.clients): return # don't both doing anything
         
-        #self.menuwidgets[self.menupos].unfocus() XXX
+        self.menuwidgets[self.menupos].setHighlighted(0)
         if forward:
             self.menupos += 1
         else:
@@ -200,7 +200,7 @@ class _cycledata:
         # wrap around
         if self.menupos < 0: self.menupos = len(self.clients) - 1
         elif self.menupos >= len(self.clients): self.menupos = 0
-        #self.menuwidgets[self.menupos].focus() XXX
+        self.menuwidgets[self.menupos].setHighlighted(1)
         if ACTIVATE_WHILE_CYCLING:
             self.activatetarget(0) # activate, but dont deiconify/unshade/raise
 

@@ -16,7 +16,8 @@ Label::Label(Widget *parent)
   : Widget(parent),
     _text(""),
     _justify_horz(RenderStyle::LeftTopJustify),
-    _justify_vert(RenderStyle::LeftTopJustify)
+    _justify_vert(RenderStyle::LeftTopJustify),
+    _highlight(true)
 {
   styleChanged(*RenderStyle::style(screen()));
 }
@@ -34,6 +35,13 @@ void Label::setHorizontalJustify(RenderStyle::Justify j)
 void Label::setVerticalJustify(RenderStyle::Justify j)
 {
   _justify_vert = j;
+  refresh();
+}
+
+void Label::setHighlighted(bool h)
+{
+  _highlight = h;
+  styleChanged(*RenderStyle::style(screen()));
   refresh();
 }
 
@@ -77,8 +85,13 @@ void Label::calcDefaultSizes()
   
 void Label::styleChanged(const RenderStyle &style)
 {
-  _texture = style.labelFocusBackground();
-  _forecolor = style.textFocusColor();
+  if (_highlight) {
+    _texture = style.labelFocusBackground();
+    _forecolor = style.textFocusColor();
+  } else {
+    _texture = style.labelUnfocusBackground();
+    _forecolor = style.textUnfocusColor();
+  }
   _font = style.labelFont();
   Widget::styleChanged(style);
   calcDefaultSizes();

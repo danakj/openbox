@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
   ob::Openbox openbox(argc, argv);
   //ob::Blackbox blackbox(argc, argv, 0);
-  
+
   //Blackbox blackbox(argv, session_display, rc_file);
   openbox.eventLoop();
 

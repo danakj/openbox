@@ -75,7 +75,7 @@ CFLAGS="$CFLAGS $DEBUG"
 
 dnl Check for Python
 AC_CHECK_HEADER([python2.2/Python.h],
-  PYTHON_CFLAGS="-Ipython2.2",
+  ,
   AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
 See http://www.python.org
 ]))
@@ -84,7 +84,6 @@ AC_CHECK_LIB([python2.2], [Py_Initialize],
   AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
 See http://www.python.org
 ]))
-AC_SUBST([PYTHON_CFLAGS])
 AC_SUBST([PYTHON_LDFLAGS])
 
 dnl Check for X headers and libraries

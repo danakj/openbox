@@ -18,6 +18,7 @@ extern "C" {
 #include <vector>
 #include <map>
 
+#include "python.hh"
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
 #include "otk/property.hh"
@@ -93,6 +94,7 @@ private:
 
   //! A list of all managed clients
   ClientMap _clients;
+  PyObject *_pyclients; // PyDictObject
 
   //! A list of all the managed screens
   ScreenList _screens;
@@ -168,6 +170,8 @@ public:
 
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }
+
+  inline PyObject *pyclients() const { return _pyclients; }
 
   //! The main function of the Openbox class
   /*!

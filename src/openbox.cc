@@ -9,6 +9,7 @@
 #include "client.hh"
 #include "screen.hh"
 #include "actions.hh"
+#include "python_client.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
@@ -90,6 +91,9 @@ Openbox::Openbox(int argc, char **argv)
   _doshutdown = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
 
+  _pyclients = PyDict_New();
+  assert(_pyclients);
+
   parseCommandLine(argc, argv);
 
   // TEMPORARY: using the xrdb rc3
@@ -149,7 +153,19 @@ Openbox::Openbox(int argc, char **argv)
     printf(_("No screens were found without a window manager. Exiting.\n"));
     ::exit(1);
   }
-  
+
+  // initialize the python interface
+  Py_SetProgramName(argv[0]);
+  Py_Initialize();
+  initopenbox(); // initialize the static 'openbox' module
+  FILE *rcpyfd = fopen("/home/natas/.openbox/user.py", "r");
+  if (!rcpyfd) {
+    printf("failed to load python file /home/natas/.openbox/user.py\n");
+  } else {
+    PyRun_SimpleFile(rcpyfd, "/home/natas/.openbox/user.py");
+    fclose(rcpyfd);
+  }
+
   _state = State_Normal; // done starting
 }
 
@@ -261,6 +277,12 @@ void Openbox::eventLoop()
 void Openbox::addClient(Window window, OBClient *client)
 {
   _clients[window] = client;
+
+  // maintain the python list here too
+  PyClientObject* pyclient = PyObject_New(PyClientObject, &PyClient_Type);
+  pyclient->window = window;
+  pyclient->client = client;
+  PyDict_SetItem(_pyclients, PyLong_FromLong(window), (PyObject*)pyclient);
 }
 
 

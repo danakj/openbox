@@ -1668,7 +1668,7 @@ bool BlackboxWindow::setInputFocus(void) {
 
 
 void BlackboxWindow::iconify(void) {
-  if (flags.iconic) return;
+  if (flags.iconic || ! (functions & Func_Iconify)) return;
 
   // We don't need to worry about resizing because resizing always grabs the X
   // server. This should only ever happen if using opaque moving.
@@ -1772,6 +1772,8 @@ void BlackboxWindow::deiconify(bool reassoc, bool raise) {
 
 
 void BlackboxWindow::close(void) {
+  if (! (functions & Func_Close)) return;
+
   XEvent ce;
   ce.xclient.type = ClientMessage;
   ce.xclient.message_type =  xatom->getAtom(XAtom::wm_protocols);
@@ -1817,6 +1819,8 @@ void BlackboxWindow::withdraw(void) {
 
 
 void BlackboxWindow::maximize(unsigned int button) {
+  if (! (functions & Func_Maximize)) return;
+
   // We don't need to worry about resizing because resizing always grabs the X
   // server. This should only ever happen if using opaque moving.
   if (flags.moving)
@@ -3017,6 +3021,8 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
 
 
 void BlackboxWindow::beginMove(int x_root, int y_root) {
+  if (! (functions & Func_Move)) return;
+
   assert(! (flags.resizing || flags.moving));
 
   /*
@@ -3478,11 +3484,14 @@ void BlackboxWindow::endMove(void) {
 
 
 void BlackboxWindow::beginResize(int x_root, int y_root, Corner dir) {
+  if (! (functions & Func_Resize)) return;
+
   assert(! (flags.resizing || flags.moving));
 
   /*
-    Only one window can be moved/resized at a time. If another window is already
-    being moved or resized, then stop it before whating to work with this one.
+    Only one window can be moved/resized at a time. If another window is
+    already being moved or resized, then stop it before whating to work with
+    this one.
   */
   BlackboxWindow *changing = blackbox->getChangingWindow();
   if (changing && changing != this) {

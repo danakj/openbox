@@ -67,8 +67,6 @@ static gchar    *sm_save_file;
 static void signal_handler(const ObEvent *e, void *data);
 static void parse_args(int argc, char **argv);
 
-static void exit_with_error(gchar *msg);
-
 int main(int argc, char **argv)
 {
     struct sigaction action;
@@ -132,7 +130,7 @@ int main(int argc, char **argv)
     if (ob_display == NULL)
 	exit_with_error("Failed to open the display.");
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
-        exit_with_error("Failed to set display as close-on-exec.");
+        ob_exit_with_error("Failed to set display as close-on-exec.");
 
     if (sm_save_file)
         session_load(sm_save_file);
@@ -146,7 +144,7 @@ int main(int argc, char **argv)
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
-        exit_with_error("Failed to initialize the render library.");
+        ob_exit_with_error("Failed to initialize the render library.");
 
     /* XXX fork self onto other screens */
      
@@ -238,7 +236,7 @@ int main(int argc, char **argv)
         /* load the theme specified in the rc file */
         ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
         if (ob_rr_theme == NULL)
-            exit_with_error("Unable to load a theme.");
+            ob_exit_with_error("Unable to load a theme.");
 
         moveresize_startup();
 	screen_startup();
@@ -404,7 +402,7 @@ static void parse_args(int argc, char **argv)
     }
 }
 
-static void exit_with_error(gchar *msg)
+void ob_exit_with_error(gchar *msg)
 {
     g_critical(msg);
     session_shutdown();

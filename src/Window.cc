@@ -1587,7 +1587,8 @@ void OpenboxWindow::maximize(unsigned int button) {
                slit->placement() == Slit::BottomRight)) ||
              slit->placement() == Slit::BottomCenter) {
       // exclude bottom
-      space.setH(space.h() - (screen->size().h() - slit_y));
+      space.setH(space.h() - ((screen->size().h() - slit_y) > tbarh ?
+                              screen->size().h() - slit_y : tbarh));
     } else {// if ((slit->direction() == Slit::Vertical &&
       //      (slit->placement() == Slit::TopLeft ||
       //       slit->placement() == Slit::BottomLeft)) ||

@@ -40,6 +40,8 @@ typedef enum {
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
 		           f->cbwidth)
 
+struct Frame;
+
 typedef struct FrameDecor {
     ObWindow obwin;
     Window window;
@@ -48,7 +50,7 @@ typedef struct FrameDecor {
     Anchor anchor;
     Rect position;
     Decoration type;
-    Client *client;
+    struct Frame *frame;
 } FrameDecor;
 
 typedef struct Frame {
@@ -62,7 +64,7 @@ typedef struct Frame {
     gboolean visible;
 
     int framedecors;
-    FrameDecor *framedecor;
+    struct FrameDecor *framedecor;
 
     int width;         /* width of client + borders */
     int height;         /* height of client + borders */

@@ -90,11 +90,11 @@ void menu_startup()
 
     menu_add_entry(m, menu_entry_new_submenu("subz", s));
 
-    /*
     t = (Menu *)plugin_create("timed_menu");
     a = action_from_string("execute");
     a->data.execute.path = g_strdup("xeyes");
-    menu_add_entry(t, menu_entry_new("xeyes", a));*/
+    menu_add_entry(t, menu_entry_new("xeyes", a));
+    menu_add_entry(m, menu_entry_new_submenu("timed", t));
 
     s = menu_new("empty", "chub", m);
     menu_add_entry(m, menu_entry_new_submenu("empty", s));
@@ -292,6 +292,17 @@ void menu_hide(Menu *self) {
 
     }
 }
+
+void menu_clear(Menu *self) {
+    GList *it;
+  
+    for (it = self->entries; it; it = it->next) {
+	MenuEntry *entry = it->data;
+	menu_entry_free(entry);
+    }
+    self->entries = NULL;
+}
+
 
 MenuEntry *menu_find_entry(Menu *menu, Window win)
 {

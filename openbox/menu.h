@@ -104,6 +104,8 @@ void menu_show_full(Menu *menu, int x, int y, Client *client);
 
 void menu_hide(Menu *self);
 
+void menu_clear(Menu *self);
+
 MenuEntry *menu_entry_new_full(char *label, Action *action,
                                MenuEntryRenderType render_type,
                                gpointer submenu);

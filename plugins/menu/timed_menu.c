@@ -1,8 +1,12 @@
+#include <glib.h>
+
 #include "kernel/menu.h"
 #include "kernel/timer.h"
 #include "timed_menu.h"
 #include "kernel/action.h"
 
+#define TIMED_MENU(m) ((Menu *)m)
+#define TIMED_MENU_DATA(m) ((Timed_Menu_Data *)((Menu *)m)->plugin_data)
 static char *PLUGIN_NAME = "timed_menu";
 
 typedef enum {
@@ -17,6 +21,7 @@ typedef enum {
 typedef struct {
     Timed_Menu_Type type;
     Timer *timer; /* timer code handles free */
+    char *command; /* for the PIPE */
 } Timed_Menu_Data;
 
 
@@ -28,24 +33,54 @@ void plugin_shutdown() { }
 void timed_menu_timeout_handler(void *data)
 {
     Action *a;
-    printf("woop timer %s\n", ((Menu *)data)->name);
     ((Menu *)data)->invalid = TRUE;
 
-    if (((Menu *)data)->shown) {
-	a = action_from_string("execute");
-	a->data.execute.path = g_strdup("xeyes");
-	menu_add_entry((Menu *)data, menu_entry_new("xeyes", a));
+    if (!TIMED_MENU(data)->shown) {
+        switch (TIMED_MENU_DATA(data)->type) {
+            case (TIMED_MENU_PIPE):
+            {
+                /* if the menu is not shown, run a process and use its output
+                   as menu */
+                char *args[] = {"/bin/sh", "-c", "ls", NULL};
+                GIOChannel *io;
+                char *line;
+                gint child, c_stdout, line_len, terminator_pos;
+                GIOStatus status;
+                /* this blocks for now, until the event stuff can handle it */
+                if (!g_spawn_async_with_pipes(NULL,
+                        args,
+                        NULL,
+                        G_SPAWN_DO_NOT_REAP_CHILD,
+                        NULL, NULL,
+                        &child, NULL, &c_stdout, NULL,
+                        NULL)) {
+                    g_warning("%s: Unable to run timed_menu program",
+                        __FUNCTION__);
+                    break;
+                }
+                
+                io = g_io_channel_unix_new(c_stdout);
+                if (io == NULL) {
+                    g_error("%s: Unable to get IO channel", __FUNCTION__);
+                    break;
+                }
 
-	menu_show_full( (Menu *)data, ((Menu *)data)->location.x,
-			((Menu *)data)->location.y, NULL);
-    } else {
-	GList *it;
-
-	for (it = ((Menu *)data)->entries; it; it = it->next) {
-	    MenuEntry *entry = it->data;
-	    menu_entry_free(entry);
-	}
-	((Menu *)data)->entries = NULL;
+                menu_clear(TIMED_MENU(data));
+                
+                while ( G_IO_STATUS_NORMAL == (status =
+                            g_io_channel_read_line
+                            (io, &line, &line_len, &terminator_pos, NULL))
+                    ) {
+                    /* the \n looks ugly */
+                    line[terminator_pos] = '\0';
+                    menu_add_entry(TIMED_MENU(data),
+                        menu_entry_new_separator(line));
+                    g_message("%s", line);
+                    g_free(line);
+                }
+                break;
+            }
+        }
     }
 }
 
@@ -67,7 +102,7 @@ void *plugin_create()
 void plugin_destroy (void *m)
 {
     /* this will be freed by timer_* */
-    timer_stop( ((Timed_Menu_Data *)((Menu *)m)->plugin_data)->timer);
+    timer_stop( ((Timed_Menu_Data *)TIMED_MENU(m)->plugin_data)->timer);
     
-    g_free( ((Menu *)m)->plugin_data );
+    g_free( TIMED_MENU(m)->plugin_data );
 }

@@ -19,6 +19,8 @@
 		           f->cbwidth_y)
 
 static void layout_title(ObFrame *self);
+static void flash_done(gpointer data);
+static gboolean flash_timeout(gpointer data);
 
 static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
@@ -474,6 +476,8 @@ void frame_release_client(ObFrame *self, ObClient *client)
     g_hash_table_remove(window_map, &self->rgrip);
     g_hash_table_remove(window_map, &self->tlresize);
     g_hash_table_remove(window_map, &self->trresize);
+
+    ob_main_loop_timeout_remove(ob_main_loop, flash_timeout);
 
     frame_free(self);
 }

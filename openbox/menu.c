@@ -97,6 +97,11 @@ void menu_startup()
         menu_add_entry(t, menu_entry_new("xeyes", a));
         menu_add_entry(m, menu_entry_new_submenu("timed", t));
     }
+
+    t = (Menu *)plugin_create("fifo_menu");
+    if (t) {
+        menu_add_entry(m, menu_entry_new_submenu("fifo", t));
+    }
     
     s = menu_new("empty", "chub", m);
     menu_add_entry(m, menu_entry_new_submenu("empty", s));

@@ -956,7 +956,7 @@ void BScreen::setImageDither(bool d, bool reconfig) {
   image_control->setDither(d);
   ostrstream s;
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
-  config.setValue(s.str(), d);
+  config.setValue(s.str(), imageDither());
   if (reconfig)
     reconfigure();
   s.rdbuf()->freeze(0);

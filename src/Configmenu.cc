@@ -67,7 +67,7 @@ Configmenu::Configmenu(BScreen &scr) : Basemenu(scr), screen(scr)
 }
 
 void Configmenu::setValues() {
-  setItemSelected(2, screen.getImageControl()->doDither());
+  setItemSelected(2, screen.imageDither());
   setItemSelected(3, screen.opaqueMove());
   setItemSelected(4, screen.fullMax());
   setItemSelected(5, screen.focusNew());
@@ -91,9 +91,9 @@ void Configmenu::itemSelected(int button, int index) {
 
   switch(item->function()) {
   case 1: { // dither
-    screen.setImageDither(!screen.getImageControl()->doDither());
+    screen.setImageDither(!screen.imageDither());
 
-    setItemSelected(index, screen.getImageControl()->doDither());
+    setItemSelected(index, screen.imageDither());
 
     break;
   }

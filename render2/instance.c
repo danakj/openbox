@@ -1,6 +1,7 @@
 #include "instance.h"
 #include "surface.h"
 #include "debug.h"
+#include "color.h"
 #include "glft/glft.h"
 #include <stdlib.h>
 #include <assert.h>
@@ -93,8 +94,13 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         inst->display = display;
         inst->screen = screen;
         inst->visinfo = vilist[best];
+        inst->depth = vilist[best].depth;
+        inst->visual = vilist[best].visual;
         inst->cmap = XCreateColormap(display, RootWindow(display, screen),
                                      RrVisual(inst), AllocNone);
+
+        RrColorInspect(inst);
+
         inst->glx_context = glXCreateContext(display, &vilist[best],
                                              NULL, True);
         inst->shape_window = XCreateWindow(display,RootWindow(display, screen),

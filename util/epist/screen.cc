@@ -384,16 +384,19 @@ void screen::handleKeyrelease(const XEvent &) {
   // the only keyrelease event we care about (for now) is when we do stacked
   // cycling and the modifier is released
   if (_stacked_cycling && _cycling && nothingIsPressed()) {
-    XWindow *w = *_active;
-
     // all modifiers have been released. ungrab the keyboard, move the
     // focused window to the top of the Z-order and raise it
     ungrabModifiers();
 
-    _clients.remove(w);
-    _clients.push_front(w);
-    _active = _clients.begin();
-    w->raise();
+    if (_active != _clients.end()) {
+      XWindow *w = *_active;
+      bool e = _last_active == _active;
+      _clients.remove(w);
+      _clients.push_front(w);
+      _active = _clients.begin();
+      if (e) _last_active = _active;
+      w->raise();
+    }
 
     _cycling = false;
   }

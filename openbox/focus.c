@@ -116,9 +116,11 @@ void focus_fallback(gboolean switching_desks)
     ConfigValue focus_follow;
     GList *it;
     gboolean under = FALSE;
+    Client *old = NULL;
 
     if (switching_desks) {
         /* don't skip any windows when switching desktops */
+        old = focus_client;
         focus_client = NULL;
     } else {
         if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
@@ -128,10 +130,19 @@ void focus_fallback(gboolean switching_desks)
     }
 
     if (!under) {
-        for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-            if (it->data != focus_client && client_normal(it->data))
-                if (client_focus(it->data))
+        for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
+            g_message("fallback trying 0x%lx", ((Client*)it->data)->window);
+            if (it->data != focus_client && client_normal(it->data)) {
+                /* if we're switching desktops, and we get the already focused
+                   window, then we wont get a FocusIn for it, so just restore
+                   the focus_client so that we know it is focused */
+                if (it->data == old) {
+                    focus_client = old;
                     break;
+                } else if (client_focus(it->data))
+                    break;
+            }
+        }
         if (it == NULL) /* nothing to focus */
             focus_set_client(NULL);
     }

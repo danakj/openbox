@@ -95,19 +95,19 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     if (corner == prop_atoms.net_wm_moveresize_size_topleft)
         cur = ob_cursors.tl;
     else if (corner == prop_atoms.net_wm_moveresize_size_top)
-        cur = ob_cursors.tl;
+        cur = ob_cursors.t;
     else if (corner == prop_atoms.net_wm_moveresize_size_topright)
         cur = ob_cursors.tr;
     else if (corner == prop_atoms.net_wm_moveresize_size_right)
-        cur = ob_cursors.tr;
+        cur = ob_cursors.r;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
         cur = ob_cursors.br;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
-        cur = ob_cursors.br;
+        cur = ob_cursors.b;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
         cur = ob_cursors.bl;
     else if (corner == prop_atoms.net_wm_moveresize_size_left)
-        cur = ob_cursors.bl;
+        cur = ob_cursors.l;
     else if (corner == prop_atoms.net_wm_moveresize_size_keyboard)
         cur = ob_cursors.br;
     else if (corner == prop_atoms.net_wm_moveresize_move)
@@ -183,7 +183,7 @@ void moveresize_event(XEvent *e)
             button = e->xbutton.button; /* this will end it now */
         }
     } else if (e->type == ButtonRelease) {
-        if (e->xbutton.button == button) {
+        if (!button || e->xbutton.button == button) {
             end_moveresize(FALSE);
         }
     } else if (e->type == MotionNotify) {

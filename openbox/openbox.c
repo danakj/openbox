@@ -151,6 +151,10 @@ int main(int argc, char **argv)
     ob_cursors.tr = XCreateFontCursor(ob_display, XC_top_right_corner);
     ob_cursors.bl = XCreateFontCursor(ob_display, XC_bottom_left_corner);
     ob_cursors.br = XCreateFontCursor(ob_display, XC_bottom_right_corner);
+    ob_cursors.t = XCreateFontCursor(ob_display, XC_top_side);
+    ob_cursors.r = XCreateFontCursor(ob_display, XC_right_side);
+    ob_cursors.b = XCreateFontCursor(ob_display, XC_bottom_side);
+    ob_cursors.l = XCreateFontCursor(ob_display, XC_left_side);
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */

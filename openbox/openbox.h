@@ -41,6 +41,10 @@ typedef struct Cursors {
     Cursor br;
     Cursor tl;
     Cursor tr;
+    Cursor t;
+    Cursor r;
+    Cursor b;
+    Cursor l;
 } Cursors;
 extern Cursors ob_cursors;
 

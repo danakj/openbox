@@ -1107,7 +1107,7 @@ void OBClient::unfocus()
 void OBClient::focusHandler(const XFocusChangeEvent &e)
 {
 #ifdef    DEBUG
-  printf("FocusIn for 0x%lx\n", e.window);
+//  printf("FocusIn for 0x%lx\n", e.window);
 #endif // DEBUG
   
   OtkEventHandler::focusHandler(e);
@@ -1122,7 +1122,7 @@ void OBClient::focusHandler(const XFocusChangeEvent &e)
 void OBClient::unfocusHandler(const XFocusChangeEvent &e)
 {
 #ifdef    DEBUG
-  printf("FocusOut for 0x%lx\n", e.window);
+//  printf("FocusOut for 0x%lx\n", e.window);
 #endif // DEBUG
   
   OtkEventHandler::unfocusHandler(e);
@@ -1236,7 +1236,10 @@ void OBClient::destroyHandler(const XDestroyWindowEvent &e)
 void OBClient::reparentHandler(const XReparentEvent &e)
 {
   // this is when the client is first taken captive in the frame
-  if (e.parent == frame->plate()) return;
+  if (e.parent == frame->plate()) {
+    printf("Ignored ReparentNotify for 0x%lx\n", e.window);
+    return;
+  }
 
 #ifdef    DEBUG
   printf("ReparentNotify for 0x%lx\n", e.window);
@@ -1253,19 +1256,6 @@ void OBClient::reparentHandler(const XReparentEvent &e)
 
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);
-}
-
-
-void OBClient::mapRequestHandler(const XMapRequestEvent &e)
-{
-  printf("\nMAP REQUEST\n\n");
-  
-  otk::OtkEventHandler::mapRequestHandler(e);
-
-  if (_shaded)
-    shade(false);
-  // XXX: uniconify the window
-  focus();
 }
 
 }

@@ -527,6 +527,8 @@ void OBScreen::manageWindow(Window window)
   EventData *data = new_event_data(window, EventNewWindow, 0);
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
+
+  printf("Managed window 0x%lx\n", window);
 }
 
 

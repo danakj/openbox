@@ -109,7 +109,20 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
   printf("MapRequest for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  Openbox::instance->screen(_info->screen())->manageWindow(e.window);
+  /*
+    MapRequest events come here even after the window exists instead of going
+    right to the client window, because of how they are sent and their struct
+    layout.
+  */
+  OBClient *c = Openbox::instance->findClient(e.window);
+
+  if (c) {
+    if (c->shaded())
+      c->shade(false);
+    // XXX: uniconify the window
+    c->focus();
+  } else
+    Openbox::instance->screen(_info->screen())->manageWindow(e.window);
 }
 
 }

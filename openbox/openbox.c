@@ -58,7 +58,7 @@ gchar      *ob_sm_id;
 RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 Display    *ob_display;
-int         ob_screen;
+gint        ob_screen;
 Window      ob_root;
 ObState     ob_state;
 Cursor      ob_cursors[OB_NUM_CURSORS];

@@ -25,7 +25,7 @@ SnDisplay *ob_sn_display;
 #endif
 
 /*! The number of the screen on which we're running */
-extern int      ob_screen;
+extern gint     ob_screen;
 /*! The root window */
 extern Window   ob_root;
 

@@ -3,15 +3,18 @@ include build/Makefile.incl
 all clean distclean:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.keyboard $@
 
 install:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.keyboard $@
 	$(LIBTOOL) --mode=finish $(DESTDIR)$(plugindir)
 
 uninstall:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.keyboard $@
 	-rmdir $(DESTDIR)$(plugindir)
 
 .PHONY: all clean distclean install uninstall

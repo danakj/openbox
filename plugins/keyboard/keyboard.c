@@ -1,17 +1,19 @@
-#include "../../kernel/focus.h"
-#include "../../kernel/dispatch.h"
-#include "../../kernel/openbox.h"
-#include "../../kernel/event.h"
-#include "../../kernel/grab.h"
-#include "../../kernel/action.h"
+#include "kernel/focus.h"
+#include "kernel/dispatch.h"
+#include "kernel/openbox.h"
+#include "kernel/event.h"
+#include "kernel/grab.h"
+#include "kernel/action.h"
+#include "kernel/parse.h"
 #include "tree.h"
 #include "keyboard.h"
-#include "keysrc.h"
+#include "keyparse.h"
 #include "translate.h"
 #include <glib.h>
 
 void plugin_setup_config()
 {
+    parse_reg_section("keyboard", keyparse);
 }
 
 KeyBindingTree *firstnode;
@@ -131,8 +133,6 @@ void plugin_startup()
     dispatch_register(Event_X_KeyPress, (EventHandler)press, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
-
-    keysrc_parse();
 }
 
 void plugin_shutdown()

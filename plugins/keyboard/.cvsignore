@@ -3,3 +3,5 @@ keyboard.la
 tree.lo
 translate.lo
 keyaction.lo
+.libs
+keyparse.lo

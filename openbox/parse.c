@@ -33,7 +33,7 @@ void parse_reg_section(char *section, ParseFunc func)
 
 void parse_free_token(ParseToken *token)
 {
-    GSList *it;
+    GList *it;
 
     switch (token->type) {
     case TOKEN_STRING:
@@ -47,7 +47,7 @@ void parse_free_token(ParseToken *token)
             parse_free_token(it->data);
             g_free(it->data);
         }
-        g_slist_free(token->data.list);
+        g_list_free(token->data.list);
         break;
     case TOKEN_REAL:
     case TOKEN_INTEGER:

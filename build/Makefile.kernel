@@ -25,6 +25,10 @@ all: $(target)
 $(target): $(objects) render/librender.a
 	$(LINK) -o $@ $^ $(LIBS) $(LDFLAGS)
 
+# kill the implicit .c.y rule
+$(srcdir)/%.c: $(srcdir)/%.y
+	@
+
 $(dir)/%.o: $(srcdir)/%.c $(depdir)/%.d
 	$(COMPILE) -c -o $@ $<
 
@@ -58,4 +62,4 @@ distclean:
 
 -include $(deps)
 
-.PHONY: kernel-install kernel-uninstall kernel-clean
+.PHONY: all install uninstall clean distclean

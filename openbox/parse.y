@@ -13,7 +13,7 @@
     char *identifier;
     gboolean bool;
     char character;
-    GSList *list;
+    GList *list;
 }
 
 %{
@@ -89,12 +89,12 @@ listtokens:
     listtokens listtoken { ParseToken *nt = g_new(ParseToken, 1);
                            nt->type = t.type;
                            nt->data = t.data;
-                           $$ = g_slist_append($1, nt);
+                           $$ = g_list_append($1, nt);
                          }
-  | token                { ParseToken *nt = g_new(ParseToken, 1);
+  | listtoken            { ParseToken *nt = g_new(ParseToken, 1);
                            nt->type = t.type;
                            nt->data = t.data;
-                           $$ = g_slist_append(NULL, nt);
+                           $$ = g_list_append(NULL, nt);
                          }
   ;
 

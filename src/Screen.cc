@@ -1205,6 +1205,7 @@ void BScreen::load() {
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "opaqueMove" << ends;
   rclass << rscreen.str() << "OpaqueMove" << ends;
+  if (config.getValue(rname.str(), rclass.str(), b))
     resource.opaque_move = b;
 }
 

@@ -300,4 +300,9 @@ void Display::ungrabKey(unsigned int keycode, unsigned int modifiers,
                grab_window);
 }
 
+void Display::ungrabAllKeys(Window grab_window) const
+{
+  XUngrabKey(_display, AnyKey, AnyModifier, grab_window);
+}
+
 }

@@ -133,6 +133,7 @@ public:
                bool allow_scroll_lock) const;
   void ungrabKey(unsigned int keycode, unsigned int modifiers,
                  Window grab_window) const;
+  void ungrabAllKeys(Window grab_window) const;
 };
 
 }

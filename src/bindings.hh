@@ -116,7 +116,9 @@ private:
   EventCallbackList _eventlist[EventAction::NUM_EVENT_ACTION];
 
   KeyCallbackData _keybgrab_callback;
-  
+
+  bool _grabbed;
+
 public:
   //! Initializes an Bindings object
   Bindings();

@@ -145,9 +145,10 @@ Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
     _timer((otk::Timer *) 0),
-    _keybgrab_callback(0, 0)
+    _keybgrab_callback(0, 0),
+    _grabbed(0)
 {
-//  setResetKey("C-g"); // set the default reset key
+  setResetKey("C-g"); // set the default reset key
 }
 
 
@@ -155,7 +156,10 @@ Bindings::~Bindings()
 {
   if (_timer)
     delete _timer;
-
+  if (_grabbed) {
+    _grabbed = false;
+    XUngrabKeyboard(**otk::display, CurrentTime);
+  }
   removeAllKeys();
   //removeAllButtons(); // this is done by each client as they are unmanaged
   removeAllEvents();
@@ -296,13 +300,8 @@ void Bindings::setResetKey(const std::string &key)
 {
   Binding b(0, 0);
   if (translate(key, b)) {
-    // grab the server here to make sure no key pressed go missed
-    otk::display->grab();
-    grabKeys(false);
     _resetkey.key = b.key;
     _resetkey.modifiers = b.modifiers;
-    grabKeys(true);
-    otk::display->ungrab();
   }
 }
 
@@ -341,28 +340,17 @@ void Bindings::grabKeys(bool grab)
     Screen *sc = openbox->screen(i);
     if (!sc) continue; // not a managed screen
     Window root = otk::display->screenInfo(i)->rootWindow();
-
-    KeyBindingTree *p = _curpos->first_child;
+    if (!grab) {
+      otk::display->ungrabAllKeys(root);
+      continue;
+    }
+    KeyBindingTree *p = _keytree.first_child;
     while (p) {
-      if (grab) {
-        otk::display->grabKey(p->binding.key, p->binding.modifiers,
-                                root, false, GrabModeAsync, GrabModeAsync,
-                                false);
-      }
-      else
-        otk::display->ungrabKey(p->binding.key, p->binding.modifiers,
-                                  root);
+      otk::display->grabKey(p->binding.key, p->binding.modifiers,
+                              root, false, GrabModeAsync, GrabModeSync,
+                              false);
       p = p->next_sibling;
     }
-
-    if (_resetkey.key)
-      if (grab)
-        otk::display->grabKey(_resetkey.key, _resetkey.modifiers,
-                                root, false, GrabModeAsync, GrabModeAsync,
-                                false);
-      else
-        otk::display->ungrabKey(_resetkey.key, _resetkey.modifiers,
-                                  root);
   }
 }
 
@@ -390,7 +378,8 @@ void Bindings::ungrabKeyboard()
   if (!_keybgrab_callback.callback) return; // not grabbed
 
   _keybgrab_callback = KeyCallbackData(0, 0);
-  XUngrabKeyboard(**otk::display, CurrentTime);
+  if (!_grabbed)  /* don't release out from under keychains */
+    XUngrabKeyboard(**otk::display, CurrentTime);
   XUngrabPointer(**otk::display, CurrentTime);
 }
 
@@ -421,12 +410,13 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
     KeyData data(screen, c, time, modifiers, key, action);
     _keybgrab_callback.fire(&data);
   }
-  
+
   // KeyRelease events only occur during keyboard grabs
   if (action == KeyAction::Release) return;
     
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     resetChains(this);
+    XAllowEvents(**otk::display, AsyncKeyboard, CurrentTime);
   } else {
     KeyBindingTree *p = _curpos->first_child;
     while (p) {
@@ -437,18 +427,23 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           _timer = new otk::Timer(5000, // 5 second timeout
                                   (otk::Timer::TimeoutHandler)resetChains,
                                   this);
-          // grab the server here to make sure no key presses get missed
-          otk::display->grab();
-          grabKeys(false);
-          _curpos = p;
-          grabKeys(true);
-          otk::display->ungrab();
+          if (!_grabbed && !_keybgrab_callback.callback) {
+            Window root = otk::display->screenInfo(screen)->rootWindow();
+            //grab should never fail because we should have a sync grab at 
+            //this point
+            XGrabKeyboard(**otk::display, root, 0, GrabModeAsync, 
+                          GrabModeSync, CurrentTime);
+            _grabbed = true;
+            _curpos = p;
+          }
+          XAllowEvents(**otk::display, AsyncKeyboard, CurrentTime);
         } else {
           Client *c = openbox->focusedClient();
           KeyData data(screen, c, time, modifiers, key, action);
           KeyCallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
             it->fire(&data);
+          XAllowEvents(**otk::display, AsyncKeyboard, CurrentTime);
           resetChains(this);
         }
         break;
@@ -464,12 +459,12 @@ void Bindings::resetChains(Bindings *self)
     delete self->_timer;
     self->_timer = (otk::Timer *) 0;
   }
-  // grab the server here to make sure no key pressed go missed
-  otk::display->grab();
-  self->grabKeys(false);
   self->_curpos = &self->_keytree;
-  self->grabKeys(true);
-  otk::display->ungrab();
+  if (self->_grabbed) {
+    self->_grabbed = false;
+    if (!self->_keybgrab_callback.callback)
+      XUngrabKeyboard(**otk::display, CurrentTime);
+  }
 }
 
 

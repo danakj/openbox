@@ -496,6 +496,8 @@ Client *client_search_focus_tree_full(Client *self);
 */
 Client *client_search_modal_child(Client *self);
 
+Client *client_search_top_transient(Client *self);
+
 /*! Return the "closest" client in the given direction */
 Client *client_find_directional(Client *c, Direction dir);
 

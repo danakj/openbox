@@ -595,7 +595,7 @@ static void client_get_desktop(Client *self)
 	    self->desktop = screen_num_desktops - 1;
         else
             self->desktop = d;
-    } else { 
+    } else {
         gboolean trdesk = FALSE;
 
        if (self->transient_for) {
@@ -1494,8 +1494,8 @@ static StackLayer calc_layer(Client *self)
     return l;
 }
 
-static void calc_recursive(Client *self, Client *orig, StackLayer l,
-                           gboolean raised)
+static void client_calc_layer_recursive(Client *self, Client *orig,
+                                        StackLayer l, gboolean raised)
 {
     StackLayer old, own;
     GSList *it;
@@ -1505,7 +1505,8 @@ static void calc_recursive(Client *self, Client *orig, StackLayer l,
     self->layer = l > own ? l : own;
 
     for (it = self->transients; it; it = it->next)
-        calc_recursive(it->data, orig, l, raised ? raised : l != old);
+        client_calc_layer_recursive(it->data, orig,
+                                    l, raised ? raised : l != old);
 
     if (!raised && l != old)
 	if (orig->frame) { /* only restack if the original window is managed */
@@ -1523,24 +1524,11 @@ void client_calc_layer(Client *self)
     orig = self;
 
     /* transients take on the layer of their parents */
-    if (self->transient_for) {
-        if (self->transient_for != TRAN_GROUP) {
-            self = self->transient_for;
-        } else {
-            GSList *it;
-
-            for (it = self->group->members; it; it = it->next)
-                if (it->data != self &&
-                    !((Client*)it->data)->transient_for) {
-                    self = it->data;
-                    break;
-                }
-        }
-    }
+    self = client_search_top_transient(self);
 
     l = calc_layer(self);
 
-    calc_recursive(self, orig, l, FALSE);
+    client_calc_layer_recursive(self, orig, l, FALSE);
 }
 
 gboolean client_should_show(Client *self)
@@ -1883,74 +1871,76 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     client_focus(self);
 }
 
-void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
+static void client_iconify_recursive(Client *self,
+                                     gboolean iconic, gboolean curdesk)
 {
     GSList *it;
+    gboolean changed = FALSE;
 
-    /* move up the transient chain as far as possible first */
-    if (self->transient_for) {
-        if (self->transient_for != TRAN_GROUP) {
-            if (self->transient_for->iconic != iconic) {
-                client_iconify(self->transient_for, iconic, curdesk);
-                return;
+
+    if (self->iconic != iconic) {
+        g_message("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
+                  self->window);
+
+        self->iconic = iconic;
+
+        if (iconic) {
+            if (self->functions & Func_Iconify) {
+                self->wmstate = IconicState;
+                self->ignore_unmaps++;
+                /* we unmap the client itself so that we can get MapRequest
+                   events, and because the ICCCM tells us to! */
+                XUnmapWindow(ob_display, self->window);
+
+                /* update the focus lists.. iconic windows go to the bottom of
+                   the list, put the new iconic window at the 'top of the
+                   bottom'. */
+                focus_order_to_top(self);
+
+                changed = TRUE;
             }
         } else {
-            GSList *it;
+            if (curdesk)
+                client_set_desktop(self, screen_desktop, FALSE);
+            self->wmstate = self->shaded ? IconicState : NormalState;
+            XMapWindow(ob_display, self->window);
 
-            for (it = self->group->members; it; it = it->next) {
-                Client *c = it->data;
-                if (c != self && c->iconic != iconic &&
-                    !c->transient_for) {
-                    client_iconify(it->data, iconic, curdesk);
-                    break;
-                }
-            }
-            if (it != NULL) return;
+            /* this puts it after the current focused window */
+            focus_order_remove(self);
+            focus_order_add_new(self);
+
+            /* this is here cuz with the VIDMODE extension, the viewport can
+               change while a fullscreen window is iconic, and when it
+               uniconifies, it would be nice if it did so to the new position
+               of the viewport */
+            client_reconfigure(self);
+
+            changed = TRUE;
         }
     }
 
-    if (self->iconic == iconic) return; /* nothing to do */
+    if (changed) {
+        client_change_state(self);
+        client_showhide(self);
+        screen_update_areas();
 
-    g_message("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
-	      self->window);
-
-    self->iconic = iconic;
-
-    if (iconic) {
-	self->wmstate = IconicState;
-	self->ignore_unmaps++;
-	/* we unmap the client itself so that we can get MapRequest events,
-	   and because the ICCCM tells us to! */
-	XUnmapWindow(ob_display, self->window);
-
-        /* update the focus lists.. iconic windows go to the bottom of the
-         list, put the new iconic window at the 'top of the bottom'. */
-        focus_order_to_top(self);
-    } else {
-	if (curdesk)
-	    client_set_desktop(self, screen_desktop, FALSE);
-	self->wmstate = self->shaded ? IconicState : NormalState;
-	XMapWindow(ob_display, self->window);
-
-        /* this puts it after the current focused window */
-        focus_order_remove(self);
-        focus_order_add_new(self);
-
-        /* this is here cuz with the VIDMODE extension, the viewport can change
-           while a fullscreen window is iconic, and when it uniconifies, it
-           would be nice if it did so to the new position of the viewport */
-        client_reconfigure(self);
+        dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
+                        self, 0, 0);
     }
-    client_change_state(self);
-    client_showhide(self);
-    screen_update_areas();
-
-    dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
-                    self, 0, 0);
 
     /* iconify all transients */
     for (it = self->transients; it != NULL; it = it->next)
-        if (it->data != self) client_iconify(it->data, iconic, curdesk);
+        if (it->data != self) client_iconify_recursive(it->data,
+                                                       iconic, curdesk);
+}
+
+void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
+{
+    /* move up the transient chain as far as possible first */
+    self = client_search_top_transient(self);
+
+    client_iconify_recursive(client_search_top_transient(self),
+                             iconic, curdesk);
 }
 
 void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
@@ -2101,39 +2091,53 @@ void client_kill(Client *self)
     XKillClient(ob_display, self->window);
 }
 
-void client_set_desktop(Client *self, guint target, gboolean donthide)
+void client_set_desktop_recursive(Client *self,
+                                  guint target, gboolean donthide)
 {
     guint old;
+    GSList *it;
 
-    if (target == self->desktop) return;
-  
-    g_message("Setting desktop %u", target+1);
+    if (target != self->desktop) {
 
-    g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
+        g_message("Setting desktop %u", target+1);
 
-    /* remove from the old desktop(s) */
-    focus_order_remove(self);
+        g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
-    old = self->desktop;
-    self->desktop = target;
-    PROP_SET32(self->window, net_wm_desktop, cardinal, target);
-    /* the frame can display the current desktop state */
-    frame_adjust_state(self->frame);
-    /* 'move' the window to the new desktop */
-    if (!donthide)
-        client_showhide(self);
-    /* raise if it was not already on the desktop */
-    if (old != DESKTOP_ALL)
-        stacking_raise(CLIENT_AS_WINDOW(self));
-    screen_update_areas();
+        /* remove from the old desktop(s) */
+        focus_order_remove(self);
 
-    /* add to the new desktop(s) */
-    if (config_focus_new)
-        focus_order_to_top(self);
-    else
-        focus_order_to_bottom(self);
+        old = self->desktop;
+        self->desktop = target;
+        PROP_SET32(self->window, net_wm_desktop, cardinal, target);
+        /* the frame can display the current desktop state */
+        frame_adjust_state(self->frame);
+        /* 'move' the window to the new desktop */
+        if (!donthide)
+            client_showhide(self);
+        /* raise if it was not already on the desktop */
+        if (old != DESKTOP_ALL)
+            stacking_raise(CLIENT_AS_WINDOW(self));
+        screen_update_areas();
 
-    dispatch_client(Event_Client_Desktop, self, target, old);
+        /* add to the new desktop(s) */
+        if (config_focus_new)
+            focus_order_to_top(self);
+        else
+            focus_order_to_bottom(self);
+
+        dispatch_client(Event_Client_Desktop, self, target, old);
+    }
+
+    /* move all transients */
+    for (it = self->transients; it != NULL; it = it->next)
+        if (it->data != self) client_set_desktop_recursive(it->data,
+                                                           target, donthide);
+}
+
+void client_set_desktop(Client *self, guint target, gboolean donthide)
+{
+    client_set_desktop_recursive(client_search_top_transient(self),
+                                 target, donthide);
 }
 
 Client *client_search_modal_child(Client *self)
@@ -2574,4 +2578,28 @@ guint client_xinerama_area(Client *self)
     if (i == screen_num_xin_areas) i = 0;
     g_assert(i < screen_num_xin_areas);
     return i;
+}
+
+Client *client_search_top_transient(Client *self)
+{
+    /* move up the transient chain as far as possible */
+    if (self->transient_for) {
+        if (self->transient_for != TRAN_GROUP) {
+            return client_search_top_transient(self->transient_for);
+        } else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next) {
+                Client *c = it->data;
+
+                /* checking transient_for prevents infinate loops! */
+                if (c != self && !c->transient_for)
+                    break;
+            }
+            if (it)
+                return it->data;
+        }
+    }
+
+    return self;
 }

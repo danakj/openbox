@@ -1,5 +1,8 @@
 Changelog for Openbox:
 
+1.2.0:
+ * make image dithering value load correctly
+
 1.1.0:
  * improved focused window logic to remove a segfault
    when the focused window on an inactive workspace

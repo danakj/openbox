@@ -953,11 +953,10 @@ void BScreen::setAutoRaise(bool a) {
 
 
 void BScreen::setImageDither(bool d, bool reconfig) {
-  resource.image_dither = d;
   image_control->setDither(d);
   ostrstream s;
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
-  config.setValue(s.str(), resource.image_dither);
+  config.setValue(s.str(), d);
   if (reconfig)
     reconfigure();
   s.rdbuf()->freeze(0);
@@ -1146,7 +1145,7 @@ void BScreen::saveWorkspaceNames() {
 void BScreen::save() {
   setSloppyFocus(resource.sloppy_focus);
   setAutoRaise(resource.auto_raise);
-  setImageDither(resource.image_dither, false);
+  setImageDither(imageDither(), false);
   setOpaqueMove(resource.opaque_move);
   setFullMax(resource.full_max);
   setFocusNew(resource.focus_new);
@@ -1373,9 +1372,9 @@ void BScreen::load() {
   rname << rscreen.str() << "imageDither" << ends;
   rclass << rscreen.str() << "ImageDither" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
-    resource.image_dither = b;
+    image_control->setDither(b);
   else
-    resource.image_dither = true;
+    image_control->setDither(true);
 
   rname.seekp(0); rclass.seekp(0);
   rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);

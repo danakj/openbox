@@ -132,7 +132,7 @@ private:
     ToolbarStyle tstyle;
     MenuStyle mstyle;
 
-    bool sloppy_focus, auto_raise, auto_edge_balance, image_dither, focus_last,
+    bool sloppy_focus, auto_raise, auto_edge_balance, focus_last,
       ordered_dither, opaque_move, hide_toolbar, full_max, focus_new;
     BColor border_color;
     Resource styleconfig;
@@ -220,7 +220,7 @@ public:
   inline bool autoRaise() const { return resource.auto_raise; }
   void setAutoRaise(bool a);
   
-  inline bool imageDither() const { return resource.image_dither; }
+  inline bool imageDither() const { return image_control->doDither(); }
   void setImageDither(bool d, bool reconfig = true);
   
   inline bool orderedDither() const { return resource.ordered_dither; }

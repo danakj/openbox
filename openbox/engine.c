@@ -127,7 +127,7 @@ void engine_startup()
     module = NULL;
     engine_name = g_strdup(DEFAULT_ENGINE);
     engine_theme = NULL;
-    engine_layout = g_strdup("NDSLIMC");
+    engine_layout = g_strdup("NLIMC");
     engine_font = g_strdup("Sans-7");
     engine_shadow = FALSE;
     engine_shadow_offset = 1;

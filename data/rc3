@@ -35,7 +35,7 @@
 # I - iconify button
 # M - maximize button
 # C - close button
-#titlebarLayout = "NDSLIMC"
+#titlebarLayout = "NLIMC"
 
 # the font for the window titlebars
 #font.title = "arial-8:bold"

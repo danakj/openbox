@@ -2,3 +2,5 @@ Makefile
 Makefile.in
 .deps
 otk_test
+otk_wrap.cc
+otk.py

@@ -53,8 +53,6 @@ RrTheme    *ob_rr_theme;
 ObMainLoop *ob_main_loop;
 Display    *ob_display;
 gint        ob_screen;
-gboolean    ob_sm_use = TRUE;
-gchar      *ob_sm_id;
 gboolean    ob_replace_wm;
 
 static ObState   state;
@@ -64,7 +62,6 @@ static gboolean  restart;
 static char     *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
-static gchar    *sm_save_file;
 
 static void signal_handler(int signal, gpointer data);
 static void parse_args(int argc, char **argv);
@@ -123,9 +120,7 @@ int main(int argc, char **argv)
     ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL, NULL);
 
-    if (sm_save_file)
-        session_load(sm_save_file);
-    session_startup(argc, argv);
+    session_startup(&argc, &argv);
 
     ob_screen = DefaultScreen(ob_display);
 
@@ -283,7 +278,6 @@ int main(int argc, char **argv)
     RrInstanceFree(ob_rr_inst);
 
     session_shutdown();
-    g_free(ob_sm_id);
 
     XCloseDisplay(ob_display);
 
@@ -305,6 +299,7 @@ int main(int argc, char **argv)
 
         /* re-run me */
         execvp(argv[0], argv); /* try how we were run */
+        execlp(argv[0], g_path_get_basename(argv[0])); /* last resort */
     }
      
     return 0;
@@ -372,20 +367,6 @@ static void parse_args(int argc, char **argv)
             xsync = TRUE;
         } else if (!strcmp(argv[i], "--debug")) {
             ob_debug_show_output(TRUE);
-#ifdef USE_SM
-        } else if (!strcmp(argv[i], "--sm-client-id")) {
-            if (i == argc - 1) /* no args left */
-                g_printerr(_("--sm-client-id requires an argument\n"));
-            else
-                ob_sm_id = g_strdup(argv[++i]);
-        } else if (!strcmp(argv[i], "--sm-save-file")) {
-            if (i == argc - 1) /* no args left */
-                g_printerr(_("--sm-save-file requires an argument\n"));
-            else
-                sm_save_file = argv[++i];
-        } else if (!strcmp(argv[i], "--sm-disable")) {
-            ob_sm_use = FALSE;
-#endif
         } else {
             g_printerr("Invalid option: '%s'\n\n", argv[i]);
             print_help();

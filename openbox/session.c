@@ -7,8 +7,7 @@
 
 GList *session_saved_state;
 
-void session_load(char *path) {}
-void session_startup(int argc, char **argv) {}
+void session_startup(int *argc, char ***argv) {}
 void session_shutdown() {}
 GList* session_state_find(ObClient *c) { return NULL; }
 gboolean session_state_cmp(ObSessionState *s, ObClient *c) { return FALSE; }
@@ -21,6 +20,7 @@ void session_state_free(ObSessionState *state) {}
 #include "session.h"
 #include "client.h"
 #include "prop.h"
+#include "gettext.h"
 #include "parser/parse.h"
 
 #include <time.h>
@@ -36,11 +36,14 @@ void session_state_free(ObSessionState *state) {}
 
 GList *session_saved_state;
 
+static gboolean    sm_disable;
 static SmcConn     sm_conn;
 static gchar      *save_file;
+static gchar      *sm_id;
 static gint        sm_argc;
 static gchar     **sm_argv;
 
+static void session_load(char *path);
 static gboolean session_save();
 
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
@@ -54,54 +57,32 @@ static void save_commands()
     SmProp *props[2];
     SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
     SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8, };
-    gint i, j, n;
-    gboolean has_id = FALSE, has_file = FALSE;
+    gint i;
 
-    for (i = 1; !has_id && !has_file && i < sm_argc - 1; ++i) {
-        if (!has_id && strcmp(sm_argv[i], "--sm-client-id") == 0)
-            has_id = TRUE;
-        if (!has_file && strcmp(sm_argv[i], "--sm-save-file") == 0)
-            has_file = TRUE;
+    prop_cmd.vals = g_new(SmPropValue, sm_argc);
+    prop_cmd.num_vals = sm_argc;
+    for (i = 0; i < sm_argc; ++i) {
+        prop_cmd.vals[i].value = sm_argv[i];
+        prop_cmd.vals[i].length = strlen(sm_argv[i]);
     }
 
-    n = (has_file ? sm_argc-2 : sm_argc);
-    n = (has_id ? n-2 : n);
-    prop_cmd.vals = g_new(SmPropValue, n);
-    prop_cmd.num_vals = n;
-    for (i = 0, j = 0; i < sm_argc; ++i, ++j) {
-        if (strcmp (sm_argv[i], "--sm-client-id") == 0 ||
-            strcmp (sm_argv[i], "--sm-save-file") == 0) {
-            ++i, --j; /* skip the next as well, keep j where it is */
-        } else {
-            prop_cmd.vals[j].value = sm_argv[i];
-            prop_cmd.vals[j].length = strlen(sm_argv[i]);
-        }
-    }
-
-    n = (has_file ? sm_argc : sm_argc+2);
-    n = (has_id ? n-2 : n);
-    prop_res.vals = g_new(SmPropValue, n);
-    prop_res.num_vals = n;
-    for (i = 0, j = 0; i < sm_argc; ++i, ++j) { 
-        if (strcmp (sm_argv[i], "--sm-client-id") == 0 ||
-            strcmp (sm_argv[i], "--sm-save-file") == 0) {
-            ++i, --j; /* skip the next as well, keep j where it is */
-        } else {
-            prop_res.vals[j].value = sm_argv[i];
-            prop_res.vals[j].length = strlen(sm_argv[i]);
-        }
+    prop_res.vals = g_new(SmPropValue, sm_argc + 2);
+    prop_res.num_vals = sm_argc + 2;
+    for (i = 0; i < sm_argc; ++i) { 
+        prop_res.vals[i].value = sm_argv[i];
+        prop_res.vals[i].length = strlen(sm_argv[i]);
     }
 
     if (save_file) {
-        prop_res.vals[j].value = "--sm-save-file";
-        prop_res.vals[j++].length = strlen("--sm-save-file");
-        prop_res.vals[j].value = save_file;
-        prop_res.vals[j++].length = strlen(save_file);
+        prop_res.vals[i].value = "--sm-save-file";
+        prop_res.vals[i++].length = strlen("--sm-save-file");
+        prop_res.vals[i].value = save_file;
+        prop_res.vals[i++].length = strlen(save_file);
     } else {
-        prop_res.vals[j].value = "--sm-client-id";
-        prop_res.vals[j++].length = strlen("--sm-client-id");
-        prop_res.vals[j].value = ob_sm_id;
-        prop_res.vals[j++].length = strlen(ob_sm_id);
+        prop_res.vals[i].value = "--sm-client-id";
+        prop_res.vals[i++].length = strlen("--sm-client-id");
+        prop_res.vals[i].value = sm_id;
+        prop_res.vals[i++].length = strlen(sm_id);
     }
 
     props[0] = &prop_res;
@@ -112,15 +93,59 @@ static void save_commands()
     g_free(prop_cmd.vals);
 }
 
-void session_startup(int argc, char **argv)
+static void remove_two_args(int *argc, char ***argv, int index)
+{
+    int i;
+
+    for (i = index; i < index + 2; ++i)
+        (*argv)[i] = (*argv)[i+2];
+    *argc -= 2;
+}
+
+static void parse_args(int *argc, char ***argv)
+{
+    int i;
+
+    for (i = 1; i < *argc; ++i) {
+        if (!strcmp((*argv)[i], "--sm-client-id")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--sm-client-id requires an argument\n"));
+            else {
+                sm_id = g_strdup((*argv)[i+1]);
+                remove_two_args(argc, argv, i);
+                ++i;
+            }
+        } else if (!strcmp((*argv)[i], "--sm-save-file")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--sm-save-file requires an argument\n"));
+            else {
+                save_file = g_strdup((*argv)[i+1]);
+                remove_two_args(argc, argv, i);
+                ++i;
+            }
+        } else if (!strcmp((*argv)[i], "--sm-disable")) {
+            sm_disable = TRUE;
+        }
+    }
+}
+
+void session_startup(int *argc, char ***argv)
 {
 #define SM_ERR_LEN 1024
 
     SmcCallbacks cb;
     char sm_err[SM_ERR_LEN];
 
-    sm_argc = argc;
-    sm_argv = argv;
+    parse_args(argc, argv);
+
+    if (sm_disable)
+        return;
+
+    if (save_file)
+        session_load(save_file);
+
+    sm_argc = *argc;
+    sm_argv = *argv;
 
     cb.save_yourself.callback = sm_save_yourself;
     cb.save_yourself.client_data = NULL;
@@ -139,7 +164,7 @@ void session_startup(int argc, char **argv)
                                 SmcDieProcMask |
                                 SmcSaveCompleteProcMask |
                                 SmcShutdownCancelledProcMask,
-                                &cb, ob_sm_id, &ob_sm_id,
+                                &cb, sm_id, &sm_id,
                                 SM_ERR_LEN, sm_err);
     if (sm_conn == NULL)
         g_warning("Failed to connect to session manager: %s", sm_err);
@@ -158,8 +183,8 @@ void session_startup(int argc, char **argv)
         gchar hint, pri;
         gchar pid[32];
 
-        val_prog.value = argv[0];
-        val_prog.length = strlen(argv[0]);
+        val_prog.value = sm_argv[0];
+        val_prog.length = strlen(sm_argv[0]);
 
         val_uid.value = g_strdup(g_get_user_name());
         val_uid.length = strlen(val_uid.value);
@@ -200,6 +225,7 @@ void session_startup(int argc, char **argv)
 void session_shutdown()
 {
     g_free(save_file);
+    g_free(sm_id);
 
     if (sm_conn) {
         SmPropValue val_hint;
@@ -285,7 +311,7 @@ static gboolean session_save()
         guint stack_pos = 0;
 
         fprintf(f, "<?xml version=\"1.0\"?>\n\n");
-        fprintf(f, "<openbox_session id=\"%s\">\n\n", ob_sm_id);
+        fprintf(f, "<openbox_session id=\"%s\">\n\n", sm_id);
 
         for (it = stacking_list; it; it = g_list_next(it)) {
             guint num;
@@ -429,18 +455,19 @@ static gint stack_sort(const ObSessionState *s1, const ObSessionState *s2)
     return s1->stacking - s2->stacking;
 }
 
-void session_load(char *path)
+static void session_load(char *path)
 {
     xmlDocPtr doc;
     xmlNodePtr node, n;
-    gchar *sm_id;
+    gchar *id;
 
     if (!parse_load(path, "openbox_session", &doc, &node))
         return;
 
-    if (!parse_attr_string("id", node, &sm_id))
+    if (!parse_attr_string("id", node, &id))
         return;
-    ob_sm_id = g_strdup(sm_id);
+    g_free(sm_id);
+    sm_id = id;
 
     node = parse_find_node("window", node->xmlChildrenNode);
     while (node) {

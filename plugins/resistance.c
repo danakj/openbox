@@ -244,8 +244,9 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     case Corner_TopRight:
         dlt = lt;
         drb = rb + *h - c->frame->area.height;
+        g_message("dlt %d drb %d rb %d ab %d", dlt, drb, rb, ab);
         if (rb <= ab && drb > ab && drb <= ab + resist.integer)
-            *h = ar - lt + 1;
+            *h = ab - lt + 1;
         break;
     case Corner_BottomLeft:
     case Corner_BottomRight:

@@ -80,7 +80,7 @@ Toolbar::Toolbar(BScreen &scrn, Resource &conf) : openbox(scrn.getOpenbox()),
 
   hide_handler.toolbar = this;
   hide_timer = new BTimer(openbox, hide_handler);
-  hide_timer->setTimeout(openbox.getAutoRaiseDelay());
+  // the time out is set in ::reconfigure()
   hide_timer->fireOnce(True);
 
   image_ctrl = screen.getImageControl();
@@ -321,6 +321,8 @@ void Toolbar::load() {
 }
 
 void Toolbar::reconfigure() {
+  hide_timer->setTimeout(openbox.getAutoRaiseDelay());
+
   frame.bevel_w = screen.getBevelWidth();
   frame.width = screen.size().w() * m_width_percent / 100;
   

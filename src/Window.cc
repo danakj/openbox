@@ -845,6 +845,9 @@ void OpenboxWindow::reconfigure(void) {
     windowmenu->move(windowmenu->getX(), frame.y + frame.title_h);
     windowmenu->reconfigure();
   }
+  
+  // re-get the timeout delay
+  timer->setTimeout(openbox.getAutoRaiseDelay());
 }
 
 

@@ -1,7 +1,12 @@
 Changelog for Openbox:
 
 1.3.0:
- * fix for loading autoRaiseDelay value.                (Ben Jansens)
+ * make reconfigure reset the timeout values for
+   windows, the slit, and the toolbar, so that a new
+   autoRaiseDelay value will take effect without having
+   to restart.                                          (Ben Jansens)
+
+ * fix for loading the autoRaiseDelay value.            (Ben Jansens)
 
 1.2.0:
  * fix off-by-one window resizing bug.                  (Ben Jansens)

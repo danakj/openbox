@@ -54,7 +54,7 @@ Slit::Slit(BScreen &scr, Resource &conf) : openbox(scr.getOpenbox()),
   frame.window = frame.pixmap = None;
 
   timer = new BTimer(openbox, *this);
-  timer->setTimeout(openbox.getAutoRaiseDelay());
+  // the time out is set in ::reconfigure()
   timer->fireOnce(True);
 
   slitmenu = new Slitmenu(*this);
@@ -326,6 +326,8 @@ void Slit::load() {
 }
 
 void Slit::reconfigure(void) {
+  timer->setTimeout(openbox.getAutoRaiseDelay());
+
   frame.area.setSize(0, 0);
   slitClientList::const_iterator it;
 

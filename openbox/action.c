@@ -677,6 +677,11 @@ ActionString actionstrings[] =
         setup_action_resize
     },
     {
+        "toggledockautohide",
+        action_toggle_dockautohide,
+        NULL
+    },
+    {
         "toggleshowdesktop",
         action_toggle_show_desktop,
         NULL
@@ -1534,6 +1539,12 @@ void action_toggle_layer(union ActionData *data)
     else if (data->layer.layer > 0)
         client_set_layer(c, c->above ? 0 : 1);
     client_action_end(data);
+}
+
+void action_toggle_dockautohide(union ActionData *data)
+{
+    config_dock_hide = !config_dock_hide;
+    dock_configure();
 }
 
 void action_toggle_show_desktop(union ActionData *data)

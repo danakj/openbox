@@ -306,6 +306,8 @@ void action_send_to_layer(union ActionData *data);
 /* Layer */
 void action_toggle_layer(union ActionData *data);
 /* Any */
+void action_toggle_dockautohide(union ActionData *data);
+/* Any */
 void action_toggle_show_desktop(union ActionData *data);
 /* Any */
 void action_show_desktop(union ActionData *data);

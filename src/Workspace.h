@@ -38,7 +38,6 @@ class Rect;
 class Workspace {
 private:
   BScreen &screen;
-  OpenboxWindow *lastfocus;
   Clientmenu *clientmenu;
 
   typedef std::vector<OpenboxWindow *> winVect;
@@ -49,7 +48,10 @@ private:
   char *name;
   int id, cascade_x, cascade_y;
 
-  OpenboxWindow *_focused;
+  OpenboxWindow *_focused, *_last;      // last is the same as focused except
+                                        // that when focus is removed from all
+                                        // windows on the workspace, last doesnt
+                                        // change to NULL
 
 protected:
   void placeWindow(OpenboxWindow &);
@@ -64,12 +66,11 @@ public:
   ~Workspace(void);
 
   inline BScreen &getScreen(void) { return screen; }
-  inline OpenboxWindow *getLastFocusedWindow(void) { return lastfocus; }
   inline Clientmenu *getMenu(void) { return clientmenu; }
   inline const char *getName(void) const { return name; }
   inline const int &getWorkspaceID(void) const { return id; }
-  inline void setLastFocusedWindow(OpenboxWindow *w) { lastfocus = w; }
   inline OpenboxWindow *focusedWindow() { return _focused; }
+  inline OpenboxWindow *lastFocusedWindow() { return _last; }
   void focusWindow(OpenboxWindow *win);
   OpenboxWindow *getWindow(int);
   Bool isCurrent(void);

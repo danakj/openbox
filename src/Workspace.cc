@@ -63,12 +63,10 @@ typedef std::vector<Rect> rectList;
 
 Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
   cascade_x = cascade_y = 0;
-  _focused = (OpenboxWindow *) 0;
+  _focused = _last = (OpenboxWindow *) 0;
   id = i;
 
   clientmenu = new Clientmenu(*this);
-
-  lastfocus = (OpenboxWindow *) 0;
 
   name = (char *) 0;
   setName(screen.getNameOfWorkspace(id));
@@ -86,6 +84,8 @@ Workspace::~Workspace(void) {
 const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
   if (! w) return -1;
 
+  if (place) placeWindow(*w);
+
   w->setWorkspace(id);
   w->setWindowNumber(_windows.size());
 
@@ -99,8 +99,6 @@ const int Workspace::addWindow(OpenboxWindow *w, Bool place) {
 
   raiseWindow(w);
 
-  if (place) placeWindow(*w);
-
   return w->getWindowNumber();
 }
 
@@ -111,21 +109,22 @@ const int Workspace::removeWindow(OpenboxWindow *w) {
   _zorder.remove(w);
 
   if (w->isFocused()) {
+    if (w == _last)
+      _last = (OpenboxWindow *) 0;
+    
+    OpenboxWindow *fw = (OpenboxWindow *) 0;
     if (w->isTransient() && w->getTransientFor() &&
-	w->getTransientFor()->isVisible()) {
-      w->getTransientFor()->setInputFocus();
-    } else {
-      if (screen.sloppyFocus() ||               // sloppy focus
-          _zorder.empty() ||                    // click focus but no windows
-          !_zorder.front()->setInputFocus()) {  // tried window, but wont focus
-	screen.getOpenbox().focusWindow((OpenboxWindow *) 0);
-      }
-    }
+	w->getTransientFor()->isVisible())
+      fw = w->getTransientFor();
+    else if (screen.sloppyFocus())             // sloppy focus
+      fw = (OpenboxWindow *) 0;
+    else if (!_zorder.empty())                 // click focus
+      fw = _zorder.front();
+
+    if (!(fw != (OpenboxWindow *) 0 && fw->setInputFocus()))
+      screen.getOpenbox().focusWindow(0);
   }
   
-  if (lastfocus == w)
-    lastfocus = (OpenboxWindow *) 0;
-
   _windows.erase(_windows.begin() + w->getWindowNumber());
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
@@ -146,6 +145,8 @@ void Workspace::focusWindow(OpenboxWindow *win) {
   if (_focused != (OpenboxWindow *) 0)
     clientmenu->setItemSelected(_focused->getWindowNumber(), false);
   _focused = win;
+  if (win != (OpenboxWindow *) 0)
+    _last = win;
 }
 
 

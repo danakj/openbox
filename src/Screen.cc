@@ -1979,8 +1979,7 @@ void BScreen::changeWorkspaceID(int id) {
     if (openbox.focusedWindow() &&
 	openbox.focusedWindow()->getScreen() == this &&
         (! openbox.focusedWindow()->isStuck())) {
-      current_workspace->setLastFocusedWindow(openbox.focusedWindow());
-      openbox.focusWindow((OpenboxWindow *) 0);
+      openbox.focusWindow(0);
     }
 
     current_workspace = getWorkspace(id);
@@ -1991,9 +1990,9 @@ void BScreen::changeWorkspaceID(int id) {
 
     current_workspace->showAll();
 
-    if (resource.focus_last && current_workspace->getLastFocusedWindow()) {
+    if (resource.focus_last && current_workspace->lastFocusedWindow()) {
       XSync(openbox.getXDisplay(), False);
-      current_workspace->getLastFocusedWindow()->setInputFocus();
+      current_workspace->lastFocusedWindow()->setInputFocus();
     }
   }
 

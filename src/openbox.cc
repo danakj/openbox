@@ -186,8 +186,8 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
   resource.titlebar_layout = NULL;
   resource.auto_raise_delay.tv_sec = resource.auto_raise_delay.tv_usec = 0;
 
-  focused_screen = (BScreen *) 0;
-  masked_window = NULL;
+  current_screen = (BScreen *) 0;
+  masked_window = (OpenboxWindow *) 0;
   masked = None;
 
   load();
@@ -213,7 +213,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 	       "Openbox::Openbox: no managable screens found, aborting.\n"));
     ::exit(3);
   }
-  focused_screen = screenList.front();
+  current_screen = screenList.front();
 
   // save current settings and default values
   save();
@@ -229,7 +229,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   ungrab();
 
-  focusWindow((OpenboxWindow *) 0);
+  focusWindow(0);
 }
 
 
@@ -868,11 +868,11 @@ void Openbox::restart(const char *prog) {
 void Openbox::shutdown() {
   BaseDisplay::shutdown();
 
-  focusWindow((OpenboxWindow *) 0);
-
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::shutdown));
 
+  focusWindow(0);
+  
   XSync(getXDisplay(), False);
 }
 
@@ -1063,12 +1063,11 @@ void Openbox::timeout() {
 
 
 OpenboxWindow *Openbox::focusedWindow() {
-  if (focused_screen == (BScreen *) 0)
-    return (OpenboxWindow *) 0;
-  Workspace *w = focused_screen->getCurrentWorkspace();
-  if (w == (Workspace *) 0)
-    return (OpenboxWindow *) 0;
-  return w->focusedWindow();
+  Workspace *w;
+  if (current_screen)
+    if ((w = current_screen->getCurrentWorkspace()))
+      return w->focusedWindow();
+  return (OpenboxWindow *) 0;
 }
 
 
@@ -1083,28 +1082,26 @@ void Openbox::focusWindow(OpenboxWindow *win) {
     old_wkspc = old_screen->getWorkspace(old_win->getWorkspaceNumber());
     old_tbar = old_screen->getToolbar();
 
-    old_win->setFocusFlag(False);
+    old_win->setFocusFlag(false);
     old_wkspc->focusWindow((OpenboxWindow *) 0);
   }
 
   if (win && !win->isIconic()) {
-    focused_screen = win->getScreen();
-    tbar = focused_screen->getToolbar();
-    wkspc = focused_screen->getWorkspace(win->getWorkspaceNumber());
+    current_screen = win->getScreen();
+    tbar = current_screen->getToolbar();
+    wkspc = current_screen->getWorkspace(win->getWorkspaceNumber());
     win->setFocusFlag(true);
     wkspc->focusWindow(win);
     
     if (tbar)
       tbar->redrawWindowLabel(true);
-    focused_screen->updateNetizenWindowFocus();
+    current_screen->updateNetizenWindowFocus();
   } else {
-    ASSERT(focused_screen != (BScreen *) 0);
-    XSetInputFocus(getXDisplay(), focused_screen->getRootWindow(),
-                   None, CurrentTime);
+    XSetInputFocus(getXDisplay(), PointerRoot, None, CurrentTime);
   }
 
   if (old_tbar && old_tbar != tbar)
     old_tbar->redrawWindowLabel(true);
-  if (old_screen && old_screen != focused_screen)
+  if (old_screen && old_screen != current_screen)
     old_screen->updateNetizenWindowFocus();
 }

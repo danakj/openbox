@@ -1264,15 +1264,15 @@ void Blackbox::load_rc(void) {
 #ifdef    XINERAMA
   if (! config.getValue("session.xineramaSupport.windowPlacement",
                         resource.xinerama_placement))
-    resource.xinerama_placement = true;
+    resource.xinerama_placement = false;
 
   if (! config.getValue("session.xineramaSupport.windowMaximizing",
                         resource.xinerama_maximize))
-    resource.xinerama_maximize = true;
+    resource.xinerama_maximize = false;
 
   if (! config.getValue("session.xineramaSupport.windowSnapping",
                         resource.xinerama_snap))
-    resource.xinerama_snap = true;
+    resource.xinerama_snap = false;
 #endif // XINERAMA
 }
 

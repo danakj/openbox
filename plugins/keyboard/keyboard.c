@@ -16,7 +16,7 @@ void plugin_setup_config()
     parse_reg_section("keyboard", keyparse);
 }
 
-KeyBindingTree *firstnode;
+KeyBindingTree *firstnode = NULL;
 
 static KeyBindingTree *curpos;
 static guint reset_key, reset_state;
@@ -58,12 +58,12 @@ gboolean kbind(GList *keylist, Action *action)
         return FALSE;
     if ((t = tree_find(tree, &conflict)) != NULL) {
 	/* already bound to something */
-	g_warning("keychain is already bound");
+	g_message("keychain is already bound");
         tree_destroy(tree);
         return FALSE;
     }
     if (conflict) {
-        g_warning("conflict with binding");
+        g_message("conflict with binding");
         tree_destroy(tree);
         return FALSE;
     }
@@ -130,6 +130,9 @@ static void press(ObEvent *e, void *foo)
 
 void plugin_startup()
 {
+    curpos = NULL;
+    grabbed = FALSE;
+
     dispatch_register(Event_X_KeyPress, (EventHandler)press, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);

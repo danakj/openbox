@@ -8,7 +8,6 @@
 <resistance>
   <strength>10</strength>
   <screen_edge_strength>10</screen_edge_strength>
-  <windows>yes</windows>
 </resistance>
 
 <placement>

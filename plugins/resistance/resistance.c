@@ -9,7 +9,6 @@
 
 static int win_resistance;
 static int edge_resistance;
-static gboolean resist_windows;
 
 static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
@@ -20,14 +19,11 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
         win_resistance = parse_int(doc, n);
     if ((n = parse_find_node("screen_edge_strength", node)))
         edge_resistance = parse_int(doc, n);
-    if ((n = parse_find_node("windows", node)))
-        resist_windows = parse_bool(doc, n);
 }
 
 void plugin_setup_config()
 {
     win_resistance = edge_resistance = DEFAULT_RESISTANCE;
-    resist_windows = DEFAULT_RESIST_WINDOWS;
 
     parse_register("resistance", parse_xml, NULL);
 }
@@ -57,7 +53,7 @@ static void resist_move(ObClient *c, int *x, int *y)
     cb = ct + c->frame->area.height - 1;
     
     /* snap to other clients */
-    if (resist_windows)
+    if (win_resistance)
         for (it = stacking_list; it != NULL; it = it->next) {
             ObClient *target;
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
@@ -112,26 +108,28 @@ static void resist_move(ObClient *c, int *x, int *y)
         }
 
     /* get the screen boundaries */
-    for (i = 0; i < screen_num_monitors; ++i) {
-        area = screen_area_monitor(c->desktop, i);
+    if (edge_resistance) {
+        for (i = 0; i < screen_num_monitors; ++i) {
+            area = screen_area_monitor(c->desktop, i);
 
-        if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
-            continue;
+            if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
+                continue;
 
-        al = area->x;
-        at = area->y;
-        ar = al + area->width - 1;
-        ab = at + area->height - 1;
+            al = area->x;
+            at = area->y;
+            ar = al + area->width - 1;
+            ab = at + area->height - 1;
 
-        /* snap to screen edges */
-        if (cl >= al && l < al && l >= al - edge_resistance)
-            *x = al;
-        else if (cr <= ar && r > ar && r <= ar + edge_resistance)
-            *x = ar - w + 1;
-        if (ct >= at && t < at && t >= at - edge_resistance)
-            *y = at;
-        else if (cb <= ab && b > ab && b < ab + edge_resistance)
-            *y = ab - h + 1;
+            /* snap to screen edges */
+            if (cl >= al && l < al && l >= al - edge_resistance)
+                *x = al;
+            else if (cr <= ar && r > ar && r <= ar + edge_resistance)
+                *x = ar - w + 1;
+            if (ct >= at && t < at && t >= at - edge_resistance)
+                *y = at;
+            else if (cb <= ab && b > ab && b < ab + edge_resistance)
+                *y = ab - h + 1;
+        }
     }
 }
 

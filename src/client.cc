@@ -315,9 +315,12 @@ void OBClient::getShaped()
 
 void OBClient::calcLayer() {
   if (_iconic) _layer = OBScreen::Layer_Icon;
-  else if (_type == Type_Desktop) _layer = OBScreen::Layer_Desktop;
-  else if (_type == Type_Dock) _layer = OBScreen::Layer_Top;
   else if (_fullscreen) _layer = OBScreen::Layer_Fullscreen;
+  else if (_type == Type_Desktop) _layer = OBScreen::Layer_Desktop;
+  else if (_type == Type_Dock) {
+    if (!_below) _layer = OBScreen::Layer_Top;
+    else _layer = OBScreen::Layer_Normal;
+  }
   else if (_above) _layer = OBScreen::Layer_Above;
   else if (_below) _layer = OBScreen::Layer_Below;
   else _layer = OBScreen::Layer_Normal;

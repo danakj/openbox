@@ -27,15 +27,17 @@ TrueRenderControl::TrueRenderControl(int screen)
     _green_offset(0),
     _blue_offset(0)
 {
+  const ScreenInfo *info = display->screenInfo(_screen);
+  XImage *timage = XCreateImage(**display, info->visual(), info->depth(),
+                                ZPixmap, 0, NULL, 1, 1, 32, 0);
   printf("Initializing TrueColor RenderControl\n");
 
-  Visual *visual = display->screenInfo(_screen)->visual();
   unsigned long red_mask, green_mask, blue_mask;
 
   // find the offsets for each color in the visual's masks
-  red_mask = visual->red_mask;
-  green_mask = visual->green_mask;
-  blue_mask = visual->blue_mask;
+  red_mask = timage->red_mask;
+  green_mask = timage->green_mask;
+  blue_mask = timage->blue_mask;
 
   while (! (red_mask & 1))   { _red_offset++;   red_mask   >>= 1; }
   while (! (green_mask & 1)) { _green_offset++; green_mask >>= 1; }
@@ -45,6 +47,7 @@ TrueRenderControl::TrueRenderControl(int screen)
   while (red_mask)   { red_mask   >>= 1; _red_shift--;   }
   while (green_mask) { green_mask >>= 1; _green_shift--; }
   while (blue_mask)  { blue_mask  >>= 1; _blue_shift--;  }
+  XFree(timage);
 }
 
 TrueRenderControl::~TrueRenderControl()

@@ -882,6 +882,9 @@ void python_callback(PyObject *func, KeyData *data)
 
   #include <iterator>
 
+
+  Display *OBDisplay_display() { return otk::OBDisplay::display; }
+
 ob::OBClient *ob_OBScreen_client(ob::OBScreen *self,int i){
     if (i >= (int)self->clients.size())
       return NULL;
@@ -909,24 +912,17 @@ static PyObject *_wrap_Openbox_instance(PyObject *self, PyObject *args) {
 }
 
 
-static int _wrap_OBDisplay_display_set(PyObject *_val) {
-    {
-        void *temp;
-        if ((SWIG_ConvertPtr(_val,(void **) &temp, SWIGTYPE_p_Display, SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN)) == -1) {
-            PyErr_SetString(PyExc_TypeError, "C variable 'otk::OBDisplay::display (Display *)'");
-            return 1;
-        }
-        otk::OBDisplay::display = (Display *) temp;
-    }
-    return 0;
-}
-
-
-static PyObject *_wrap_OBDisplay_display_get() {
-    PyObject *pyobj;
+static PyObject *_wrap_OBDisplay_display(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    Display *result;
     
-    pyobj = SWIG_NewPointerObj((void *) otk::OBDisplay::display, SWIGTYPE_p_Display, 0);
-    return pyobj;
+    if(!PyArg_ParseTuple(args,(char *)":OBDisplay_display")) goto fail;
+    result = (Display *)OBDisplay_display();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_Display, 0);
+    return resultobj;
+    fail:
+    return NULL;
 }
 
 
@@ -8105,6 +8101,7 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
+	 { (char *)"OBDisplay_display", _wrap_OBDisplay_display, METH_VARARGS },
 	 { (char *)"OBDisplay_initialize", _wrap_OBDisplay_initialize, METH_VARARGS },
 	 { (char *)"OBDisplay_destroy", _wrap_OBDisplay_destroy, METH_VARARGS },
 	 { (char *)"OBDisplay_gcCache", _wrap_OBDisplay_gcCache, METH_VARARGS },
@@ -9117,7 +9114,6 @@ SWIGEXPORT(void) SWIG_init(void) {
     SWIG_InstallConstants(d,swig_const_table);
     
     PyDict_SetItemString(d,(char*)"cvar", SWIG_globals);
-    SWIG_addvarlink(SWIG_globals,(char*)"OBDisplay_display",_wrap_OBDisplay_display_get, _wrap_OBDisplay_display_set);
     SWIG_addvarlink(SWIG_globals,(char*)"BSENTINEL",_wrap_BSENTINEL_get, _wrap_BSENTINEL_set);
 }
 

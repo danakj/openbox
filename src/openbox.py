@@ -29,6 +29,8 @@ except AttributeError:
 
 Openbox_instance = _openbox.Openbox_instance
 
+OBDisplay_display = _openbox.OBDisplay_display
+
 class OBDisplay(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, OBDisplay, name, value)
@@ -80,7 +82,6 @@ class OBDisplayPtr(OBDisplay):
         if not hasattr(self,"thisown"): self.thisown = 0
         self.__class__ = OBDisplay
 _openbox.OBDisplay_swigregister(OBDisplayPtr)
-cvar = _openbox.cvar
 OBDisplay_initialize = _openbox.OBDisplay_initialize
 
 OBDisplay_destroy = _openbox.OBDisplay_destroy
@@ -432,6 +433,7 @@ class OtkEventHandlerPtr(OtkEventHandler):
         if not hasattr(self,"thisown"): self.thisown = 0
         self.__class__ = OtkEventHandler
 _openbox.OtkEventHandler_swigregister(OtkEventHandlerPtr)
+cvar = _openbox.cvar
 BSENTINEL = cvar.BSENTINEL
 
 class OtkEventDispatcher(_object):

@@ -92,14 +92,14 @@ mbind	Frame		Drag		A-Left	Move
 
 mbind	BLCorner	Drag		Left	Resize
 mbind	BRCorner	Drag		Left	Resize
-mbind	Frame		Drag		A-Right	Resize
+mbind	Frame		Drag		A-Middle Resize
 
 mbind	Titlebar	Click		Left	Raise
 mbind	Titlebar	Press		Middle	Lower
 mbind	Handle		Click		Left	Raise
 mbind	Handle		Press		Middle	Lower
 mbind	Frame		Click		A-Left	Raise
-mbind	Frame		Click		A-Right	Lower
+mbind	Frame		Click		A-Middle Lower
 
 mbind	Titlebar	Press		Left	Focus
 mbind	Handle		Press		Left	Focus

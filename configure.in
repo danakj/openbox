@@ -82,6 +82,36 @@ if test x$SHAPE = "xyes"; then
   AC_DEFINE(SHAPE,1,Enable support of the XShape extension)
 fi
 
+dnl Check for Xinerama extension support and proper library files.
+XINERAMA=""
+AC_MSG_CHECKING([whether to build support for the Xinerama extension])
+AC_ARG_ENABLE(
+  xinerama, [  --enable-xinerama       enable support of the Xinerama extension [default=no]],
+  if test x$enableval = "xyes"; then
+	AC_MSG_RESULT([yes])
+
+	AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
+	  AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
+	  AC_TRY_LINK(
+#include <X11/Xlib.h>
+#include <X11/extensions/Xinerama.h>
+, XineramaScreenInfo foo,
+		AC_MSG_RESULT([yes])
+		XINERAMA="yes"
+		LIBS="$LIBS -lXinerama",
+		AC_MSG_RESULT([no])
+	  )
+	)
+
+  else
+	AC_MSG_RESULT([no])
+  fi,
+  AC_MSG_RESULT([no])
+)
+if test x$XINERAMA = "xyes"; then
+  AC_DEFINE(XINERAMA,1,Enable support of the Xinerama extension)
+fi
+
 dnl Check for Xft extension support and proper library files.
 XFT=""
 AC_MSG_CHECKING([whether to build support for the Xft extension])

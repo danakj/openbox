@@ -21,4 +21,6 @@ $ #CompileOptions
 # Opciones durante la compilación:\n\
   Información extra para depuración:               %s\n\
   Forma:                                           %s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
   8bpp simulación ordenada de colores en imágenes: %s\n\n

@@ -77,6 +77,8 @@ static void showHelp(int exitval) {
               "Compile time options:\n"
               "  Debugging:\t\t\t%s\n"
               "  Shape:\t\t\t%s\n"
+              "  Xft:\t\t\t\t%s\n"
+              "  Xinerama:\t\t\t%s\n"
               "  8bpp Ordered Dithering:\t%s\n\n"),
 #ifdef    DEBUG
          i18n(CommonSet, CommonYes, "yes"),
@@ -89,6 +91,18 @@ static void showHelp(int exitval) {
 #else // !SHAPE
          i18n(CommonSet, CommonNo, "no"),
 #endif // SHAPE
+
+#ifdef    XFT
+         i18n(CommonSet, CommonYes, "yes"),
+#else // !XFT
+         i18n(CommonSet, CommonNo, "no"),
+#endif // XFT
+
+#ifdef    XINERAMA
+         i18n(CommonSet, CommonYes, "yes"),
+#else // !XINERAMA
+         i18n(CommonSet, CommonNo, "no"),
+#endif // XINERAMA
 
 #ifdef    ORDEREDPSEUDO
          i18n(CommonSet, CommonYes, "yes")

@@ -21,4 +21,6 @@ $ #CompileOptions
 # Denetleme seçenekleri :\n\
   Bilgilendirme\t\t\t%s\n\
   Gölgeleme:\t\t\t%s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
   R8b'e göre týzla:\t%s\n\n

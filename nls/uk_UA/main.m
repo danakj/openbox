@@ -22,4 +22,6 @@ $ #CompileOptions
   Debugging\t\t\t%s\n\
   Interlacing:\t\t\t%s\n\
   Shape:\t\t\t%s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
   8bpp Ordered Dithering:\t%s\n\n

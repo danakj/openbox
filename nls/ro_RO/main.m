@@ -20,4 +20,6 @@ $ #CompileOptions
 # Optiuni stabilite la compilare:\n\
   Depanare\t\t\t%s\n\
   Forma:\t\t\t%s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
   Intretesere ordonata pentru 8bpp:\t%s\n\n

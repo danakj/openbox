@@ -21,4 +21,6 @@ $ #CompileOptions
 # Kompilerad med:\n\
   Avlusning\t\t\t%s\n\
   Form:\t\t\t\t%s\n\
+  Xft:\t\t\t\t%s\n\
+  Xinerama:\t\t\t%s\n\
   8bpp ordnad dithering:\t%s\n\n

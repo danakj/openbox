@@ -21,4 +21,6 @@ $ #CompileOptions
 # Gecompileerd met instellingen:\n\
   Debugging:               %s\n\
   Shape:                   %s\n\
+  Xft:                     %s\n\
+  Xinerama:                %s\n\
   8bpp Ordered Dithering:  %s\n\n

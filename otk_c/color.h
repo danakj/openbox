@@ -12,14 +12,11 @@ typedef struct OtkColor {
   PyObject_HEAD
   int red, green, blue;
   int screen;
-  Bool allocated;
   unsigned long pixel;
 } OtkColor;
 
 PyObject *OtkColor_FromRGB(int r, int g, int b, int screen);
 PyObject *OtkColor_FromName(const char *name, int screen);
-
-unsigned long OtkColor_Pixel(OtkColor *self);
 
 void OtkColor_CleanupColorCache();
 

@@ -75,8 +75,6 @@ static void doCacheCleanup() {
 static void allocate(OtkColor *self) {
   XColor xcol;
 
-  assert(!self->allocated);
-
   // allocate color from rgb values
   xcol.red =   self->red   | self->red   << 8;
   xcol.green = self->green | self->green << 8;
@@ -92,7 +90,6 @@ static void allocate(OtkColor *self) {
   }
   
   self->pixel = xcol.pixel;
-  self->allocated = True;
   
   if (cleancache)
     doCacheCleanup();
@@ -108,11 +105,9 @@ PyObject *OtkColor_FromRGB(int r, int g, int b, int screen)
 
   if (!colorcache) colorcache = PyDict_New();
 
-  self->allocated = False;
   self->red = r;
   self->green = g;
   self->blue = b;
-  self->pixel = 0;
   self->screen = screen;
 
   // does this color already exist in the cache?
@@ -124,6 +119,7 @@ PyObject *OtkColor_FromRGB(int r, int g, int b, int screen)
 
   // add it to the cache
   PyDict_SetItem(colorcache, (PyObject*)self, (PyObject*)self);
+  allocate(self);
   return (PyObject*)self;
 }
 
@@ -136,11 +132,9 @@ PyObject *OtkColor_FromName(const char *name, int screen)
 
   if (!colorcache) colorcache = PyDict_New();
   
-  self->allocated = False;
   self->red = -1;
   self->green = -1;
   self->blue = -1;
-  self->pixel = 0;
   self->screen = screen;
 
   parseColorName(self, name);
@@ -154,14 +148,8 @@ PyObject *OtkColor_FromName(const char *name, int screen)
 
   // add it to the cache
   PyDict_SetItem(colorcache, (PyObject*)self, (PyObject*)self);
+  allocate(self);
   return (PyObject*)self;
-}
-
-unsigned long OtkColor_Pixel(OtkColor *self)
-{
-  if (!self->allocated)
-    allocate(self);
-  return self->pixel;
 }
 
 void OtkColor_CleanupColorCache()

@@ -1,12 +1,13 @@
-prefix=/tmp/ob
-exec_prefix=$(prefix)
-libdir=$(exec_prefix)/lib
+prefix = /tmp/ob
+exec_prefix = $(prefix)
+libdir = $(exec_prefix)/lib
 
 targets = libotk.so libotk.a
-sources = init.c display.c screeninfo.c rect.c gccache.c color.c
-headers = init.h display.h screeninfo.h rect.h gccache.h color.h
+sources = init.c display.c screeninfo.c rect.c gccache.c color.c font.c
+headers = init.h display.h screeninfo.h rect.h gccache.h color.h font.h
 
-CFLAGS+=-g -I/usr/gwar/include/python2.2 -W -Wall
+CFLAGS += -g -W -Wall -I/usr/gwar/include/python2.2 `pkg-config --cflags xft`
+LDFLAGS += `pkg-config --libs xft`
 
 .PHONY: all install clean
 

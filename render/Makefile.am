@@ -2,13 +2,13 @@ themedir=$(datadir)/openbox/themes
 
 theme=operation
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
          -DG_LOG_DOMAIN=\"Render\" \
          -DDEFAULT_THEME=\"$(theme)\" \
          -DTHEMEDIR=\"$(themedir)\"
 
 INCLUDES=-I..
-LIBS=$(XFT_LIBS) $(GLIB_LIBS) @LIBS@
+LIBS=$(XFT_LIBS) $(GLIB_LIBS) $(GL_LIBS) @LIBS@
 
 noinst_PROGRAMS=rendertest
 rendertest_LDFLAGS=-lobrender -L.

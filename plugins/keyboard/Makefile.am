@@ -1,6 +1,6 @@
 plugindir=$(libdir)/openbox/plugins
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
          -DG_LOG_DOMAIN=\"Plugin-Keyboard\"
 
 INCLUDES=-I../..

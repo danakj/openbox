@@ -77,7 +77,7 @@ public:
 
   virtual void exposeHandler(const XExposeEvent &e);
   virtual void configureHandler(const XConfigureEvent &e);
-  virtual void styleChanged(const RenderStyle &) {}
+  virtual void styleChanged(const RenderStyle &style);
 
 protected:
   virtual void addChild(Widget *w) { assert(w); _children.push_back(w); }
@@ -85,7 +85,7 @@ protected:
 
   //! Find the default min/max sizes for the widget. Useful after the in-use
   //! style has changed.
-  virtual void calcDefaultSizes() {};
+  virtual void calcDefaultSizes();
 
   virtual void setMinSize(const Size &s);
 

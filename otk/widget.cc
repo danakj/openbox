@@ -37,6 +37,7 @@ Widget::Widget(int screen, EventDispatcher *ed, Direction direction, int bevel,
 {
   createWindow(overrideredir);
   _dispatcher->registerHandler(_window, this);
+  styleChanged(*RenderStyle::style(_screen));
 }
 
 Widget::Widget(Widget *parent, Direction direction, int bevel)
@@ -63,6 +64,7 @@ Widget::Widget(Widget *parent, Direction direction, int bevel)
   parent->addChild(this);
   if (parent->visible()) parent->layout();
   _dispatcher->registerHandler(_window, this);
+  styleChanged(*RenderStyle::style(_screen));
 }
 
 Widget::~Widget()
@@ -86,6 +88,10 @@ void Widget::show(bool children)
   }
   if (!_visible) {
     _visible = true;
+    if (_parent) _parent->calcDefaultSizes();
+    else {
+      resize(_min_size);
+    }
     XMapWindow(**display, _window);
     update();
   }
@@ -96,7 +102,10 @@ void Widget::hide()
   if (_visible) {
     _visible = false;
     XUnmapWindow(**display, _window);
-    if (_parent) _parent->layout();
+    if (_parent) {
+      _parent->calcDefaultSizes();
+      _parent->layout();
+    }
   }
 } 
 
@@ -110,9 +119,10 @@ void Widget::update()
 {
   if (!_visible) return;
   _dirty = true;
-  if (parent())
-    parent()->layout(); // relay-out us and our siblings
-  else {
+  if (_parent) {
+    _parent->calcDefaultSizes();
+    _parent->layout(); // relay-out us and our siblings
+  } else {
     render();
     layout();
   }
@@ -121,8 +131,8 @@ void Widget::update()
 void Widget::moveresize(const Rect &r)
 {
   int w, h;
-  w = std::min(std::max(r.width(), minSize().width()), maxSize().width());
-  h = std::min(std::max(r.height(), minSize().height()), maxSize().height());
+  w = std::max(std::min(r.width(), maxSize().width()), minSize().width());
+  h = std::max(std::min(r.height(), maxSize().height()), minSize().height());
 
   if (r.x() == area().x() && r.y() == area().y() &&
       w == area().width() && h == area().height()) {
@@ -140,9 +150,15 @@ void Widget::internal_moveresize(int x, int y, int w, int h)
   assert(h > 0);
   assert(_borderwidth >= 0);
   _dirty = true;
-  XMoveResizeWindow(**display, _window, x, y,
-                    w - _borderwidth * 2,
-                    h - _borderwidth * 2);
+  if (!(x == _area.x() && y == _area.y())) {
+    if (!(w == _area.width() && h == _area.height()))
+      XMoveResizeWindow(**display, _window, x, y,
+                        w - _borderwidth * 2,
+                        h - _borderwidth * 2);
+    else
+      XMoveWindow(**display, _window, x, y);
+  } else
+    XResizeWindow(**display, _window, w - _borderwidth*2, h - _borderwidth*2);
   _ignore_config++;
 
   _area = Rect(x, y, w, h);
@@ -183,6 +199,48 @@ void Widget::createWindow(bool overrideredir)
                           &attrib);
   assert(_window != None);
   ++_ignore_config;
+}
+
+void Widget::calcDefaultSizes()
+{
+  std::list<Widget*>::const_iterator it, end = _children.end();
+  int min_biggest = 0, max_biggest = 0;
+  int min_sum = _bevel + _borderwidth * 2;
+  int max_sum = _bevel + _borderwidth * 2;
+  bool fullmax = false;
+
+  for (it = _children.begin(); it != end; ++it) {
+    const otk::Size &min = (*it)->minSize();
+    const otk::Size &max = (*it)->maxSize();
+    if (_direction == Horizontal) {
+      if (min.height() > min_biggest) min_biggest = min.height();
+      if (max.height() > max_biggest) max_biggest = max.height();
+      min_sum += _bevel + min.width();
+      if (max.width() == INT_MAX)
+        fullmax = true;
+      else if (!fullmax)
+        max_sum += _bevel + max.width();
+    } else {
+      if (min.width() > min_biggest) min_biggest = min.width();
+      if (max.width() > max_biggest) max_biggest = max.width();
+      min_sum += _bevel + min.height();
+      if (max.height() == INT_MAX)
+        fullmax = true;
+      else if (!fullmax)
+        max_sum += _bevel + max.height();
+    }
+  }
+  if (_direction == Horizontal) {
+    _min_size = otk::Size(min_sum, min_biggest + (_bevel + _borderwidth) * 2);
+    _max_size = otk::Size((fullmax ? INT_MAX :
+                           max_sum  + (_bevel + _borderwidth) * 2),
+                          max_biggest);
+  } else {
+    _min_size = otk::Size(min_biggest, min_sum + (_bevel + _borderwidth) * 2);
+    _max_size = otk::Size(max_biggest, (fullmax ? INT_MAX : max_sum +
+                                        (_bevel + _borderwidth) * 2));
+  }
+  update();
 }
 
 void Widget::setBorderWidth(int w)
@@ -427,11 +485,7 @@ void Widget::layoutVert()
 
 void Widget::render()
 {
-  if (!_dirty) return;
-  if (!_texture) {
-    XSetWindowBackgroundPixmap(**display, _window, ParentRelative);
-    return;
-  }
+  if (!_texture || !_dirty) return;
   if (_borderwidth * 2 > _area.width() ||
       _borderwidth * 2 > _area.height())
     return; // no surface to draw on
@@ -458,6 +512,11 @@ void Widget::renderChildren()
   std::list<Widget*>::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it)
     (*it)->render();
+}
+
+void Widget::styleChanged(const RenderStyle &style)
+{
+  _texture = style.titlebarUnfocusBackground();
 }
 
 void Widget::exposeHandler(const XExposeEvent &e)

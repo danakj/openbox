@@ -17,7 +17,7 @@ public:
   Label(Widget *parent);
   virtual ~Label();
 
-  inline const ustring& getText(void) const { return _text; }
+  inline const ustring& text(void) const { return _text; }
   void setText(const ustring &text);
 
   virtual inline bool isHighlighted() const { return _highlight; }

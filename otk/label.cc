@@ -55,7 +55,14 @@ void Label::setText(const ustring &text)
   std::string::size_type p = 0;
   while (p != std::string::npos) {
     std::string::size_type p2 = s.find('\n', p);
-    _parsedtext.push_back(s.substr(p, (p2==std::string::npos?p2:p2-p)));
+    std::string s(s.substr(p, (p2==std::string::npos?p2:p2-p)));
+
+    // turn tabs into spaces (multiples of 8)
+    std::string::size_type t;
+    while ((t = s.find('\t')) != std::string::npos)
+      s.replace(t, 1, std::string(8 - t % 8, ' '));
+
+    _parsedtext.push_back(s);
     _parsedtext.back().setUtf8(utf);
     p = (p2==std::string::npos?p2:p2+1);
   }

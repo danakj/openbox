@@ -30,26 +30,18 @@ AppWidget::~AppWidget()
 {
 }
 
-void AppWidget::render()
-{
-  XSetWindowBackground(**display, window(),
-                       RenderStyle::style(screen())->
-                       titlebarUnfocusBackground()->color().pixel());
-  Widget::render();
-}
-
 void AppWidget::show()
 {
-  Widget::show(true);
-
+  if (!visible())
   _application->_appwidget_count++;
+  Widget::show(true);
 }
 
 void AppWidget::hide()
 {
+  if (visible())
+    _application->_appwidget_count--;
   Widget::hide();
-
-  _application->_appwidget_count--;
 }
 
 void AppWidget::clientMessageHandler(const XClientMessageEvent &e)

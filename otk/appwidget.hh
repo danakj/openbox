@@ -14,8 +14,6 @@ public:
   AppWidget(Application *app, Direction direction = Horizontal, int bevel = 0);
   virtual ~AppWidget();
 
-  virtual void render();
-
   virtual void show();
   virtual void hide();
 

@@ -9,5 +9,6 @@ void grab_shutdown();
 
 void grab_keyboard(gboolean grab);
 void grab_pointer(gboolean grab, Cursor cur);
+void grab_server(gboolean grab);
 
 #endif

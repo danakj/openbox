@@ -5,6 +5,7 @@
 #include "frame.h"
 #include "engine.h"
 #include "event.h"
+#include "grab.h"
 #include "focus.h"
 #include "stacking.h"
 #include "dispatch.h"
@@ -120,9 +121,8 @@ void client_manage(Window window)
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
-     
-    XGrabServer(ob_display);
-    XSync(ob_display, FALSE);
+
+    grab_server(TRUE);
 
     /* check if it has already been unmapped by the time we started mapping
        the grab does a sync so we don't have to here */
@@ -130,16 +130,14 @@ void client_manage(Window window)
 	XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e)) {
 	XPutBackEvent(ob_display, &e);
     
-	XUngrabServer(ob_display);
-	XFlush(ob_display);
+        grab_server(FALSE);
 	return; /* don't manage it */
     }
 
     /* make sure it isn't an override-redirect window */
     if (!XGetWindowAttributes(ob_display, window, &attrib) ||
 	attrib.override_redirect) {
-	XUngrabServer(ob_display);
-	XFlush(ob_display);
+        grab_server(FALSE);
 	return; /* don't manage it */
     }
   
@@ -148,8 +146,7 @@ void client_manage(Window window)
 	if ((wmhint->flags & StateHint) &&
 	    wmhint->initial_state == WithdrawnState) {
 	    /\* XXX: make dock apps work! *\/
-	    XUngrabServer(ob_display);
-	    XFlush(ob_display);
+            grab_server(FALSE);
 	    XFree(wmhint);
 	    return;
 	}
@@ -184,8 +181,7 @@ void client_manage(Window window)
 
     client_apply_startup_state(client);
 
-    XUngrabServer(ob_display);
-    XFlush(ob_display);
+    grab_server(FALSE);
      
     client_list = g_slist_append(client_list, client);
     stacking_list = g_list_append(stacking_list, client);

@@ -6,13 +6,14 @@
 
 %}
 
-%union ParseToken {
+%union ParseTokenData {
     float real;
     int integer;
     char *string;
     char *identifier;
     gboolean bool;
     char character;
+    GSList *list;
 }
 
 %{
@@ -26,10 +27,10 @@ extern int yylineno;
 extern FILE *yyin;
 
 static char *path;
-static union ParseToken t;
+static ParseToken t;
 
 /* in parse.c */
-void parse_token(ParseTokenType type, union ParseToken token);
+void parse_token(ParseToken *token);
 void parse_set_section(char *section);
 %}
 
@@ -47,6 +48,9 @@ void parse_set_section(char *section);
 %token <character> '\n'
 %token INVALID
 
+%type <list> list
+%type <list> listtokens
+
 %%
 
 sections:
@@ -54,7 +58,7 @@ sections:
   ;
 
 lines:
-  | lines tokens '\n' { t.character = $3; parse_token($3, t); }
+  | lines tokens '\n' { t.type = $3; t.data.character = $3; parse_token(&t); }
   ;
 
 tokens:
@@ -63,18 +67,50 @@ tokens:
   ;
 
 token:
-    REAL       { t.real = $1; parse_token(REAL, t); }
-  | INTEGER    { t.integer = $1; parse_token(INTEGER, t); }
-  | STRING     { t.string = $1; parse_token(STRING, t); }
-  | IDENTIFIER { t.identifier = $1; parse_token(IDENTIFIER, t); }
-  | BOOL       { t.bool = $1; parse_token(BOOL, t); }
-  | '('        { t.character = $1; parse_token($1, t); }
-  | ')'        { t.character = $1; parse_token($1, t); }
-  | '{'        { t.character = $1; parse_token($1, t); }
-  | '}'        { t.character = $1; parse_token($1, t); }
-  | '='        { t.character = $1; parse_token($1, t); }
-  | ','        { t.character = $1; parse_token($1, t); }
+    REAL       { t.type = TOKEN_REAL; t.data.real = $1; parse_token(&t); }
+  | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1;
+                 parse_token(&t); }
+  | STRING     { t.type = TOKEN_STRING; t.data.string = $1; parse_token(&t); }
+  | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1;
+                 parse_token(&t);}
+  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; parse_token(&t); }
+  | list       { t.type = TOKEN_LIST; t.data.list = $1; parse_token(&t); }
+  | '{'        { t.type = $1; t.data.character = $1; parse_token(&t); }
+  | '}'        { t.type = $1; t.data.character = $1; parse_token(&t); }
+  | '='        { t.type = $1; t.data.character = $1; parse_token(&t); }
+  | ','        { t.type = $1; t.data.character = $1; parse_token(&t); }
   ;
+
+list:
+    '(' listtokens ')' { $$ = $2; }
+  ;
+
+listtokens:
+    listtokens listtoken { ParseToken *nt = g_new(ParseToken, 1);
+                           nt->type = t.type;
+                           nt->data = t.data;
+                           $$ = g_slist_append($1, nt);
+                         }
+  | token                { ParseToken *nt = g_new(ParseToken, 1);
+                           nt->type = t.type;
+                           nt->data = t.data;
+                           $$ = g_slist_append(NULL, nt);
+                         }
+  ;
+
+listtoken:
+    REAL       { t.type = TOKEN_REAL; t.data.real = $1; }
+  | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1; }
+  | STRING     { t.type = TOKEN_STRING; t.data.string = $1; }
+  | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1; }
+  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; }
+  | list       { t.type = TOKEN_LIST; t.data.list = $1; }
+  | '{'        { t.type = $1; t.data.character = $1; }
+  | '}'        { t.type = $1; t.data.character = $1; }
+  | '='        { t.type = $1; t.data.character = $1; }
+  | ','        { t.type = $1; t.data.character = $1; }
+  ;
+
 
 %%
 

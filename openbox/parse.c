@@ -65,7 +65,7 @@ void parse_token(ParseTokenType type, union ParseToken token)
         func(type, token);
 }
 
-static void parse_rc_token(ParseTokenType type, union ParseToken token)
+static void parse_rc_token(ParseToken *token)
 {
     static int got_eq = FALSE;
     static ParseTokenType got_val = 0;
@@ -74,35 +74,35 @@ static void parse_rc_token(ParseTokenType type, union ParseToken token)
     static gboolean b;
 
     if (id == NULL) {
-        if (type == TOKEN_IDENTIFIER) {
+        if (token->type == TOKEN_IDENTIFIER) {
             id = token.identifier;
             return;
         } else {
             yyerror("syntax error");
         }
     } else if (!got_eq) {
-        if (type == TOKEN_EQUALS) {
+        if (token->type == TOKEN_EQUALS) {
             got_eq = TRUE;
             return;
         } else {
             yyerror("syntax error");
         }
     } else if (!got_val) {
-        if (type == TOKEN_STRING) {
+        if (token->type == TOKEN_STRING) {
             s = token.string;
             got_val = type;
             return;
-        } else if (type == TOKEN_BOOL) {
+        } else if (token->type == TOKEN_BOOL) {
             b = token.bool;
             got_val = type;
             return;
-        } else if (type == TOKEN_INTEGER) {
+        } else if (token->type == TOKEN_INTEGER) {
             i = token.integer;
             got_val = type;
             return;
         } else
             yyerror("syntax error");
-    } else if (type != TOKEN_NEWLINE) {
+    } else if (token->type != TOKEN_NEWLINE) {
         yyerror("syntax error");
     } else {
         ConfigValue v;
@@ -133,5 +133,5 @@ static void parse_rc_token(ParseTokenType type, union ParseToken token)
     id = s = NULL;
     got_eq = FALSE;
     got_val = 0;
-    parse_free_token(type, token);
+    parse_free_token(token->type, token);
 }

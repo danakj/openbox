@@ -10,8 +10,7 @@ typedef enum {
     TOKEN_STRING     = STRING,
     TOKEN_IDENTIFIER = IDENTIFIER,
     TOKEN_BOOL       = BOOL,
-    TOKEN_LBRACKET   = '(',
-    TOKEN_RBRACKET   = ')',
+    TOKEN_LIST,
     TOKEN_LBRACE     = '{',
     TOKEN_RBRACE     = '}',
     TOKEN_EQUALS     = '=',
@@ -19,7 +18,12 @@ typedef enum {
     TOKEN_NEWLINE    = '\n'
 } ParseTokenType;
 
-typedef void (*ParseFunc)(ParseTokenType type, union ParseToken token);
+typedef struct {
+    ParseTokenType type;
+    union ParseTokenData data;
+} ParseToken;
+
+typedef void (*ParseFunc)(ParseToken *token);
 
 void parse_startup();
 void parse_shutdown();
@@ -33,7 +37,7 @@ void parse_reg_section(char *section, ParseFunc func);
 
 
 /* Free a parsed token's allocated memory */
-void parse_free_token(ParseTokenType type, union ParseToken token);
+void parse_free_token(ParseToken *token);
 
 /* Display an error message while parsing.
    found in parse.yacc */

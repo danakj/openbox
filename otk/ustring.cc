@@ -229,6 +229,21 @@ ustring::value_type ustring::operator[](ustring::size_type i) const
   return utf8_get_char(utf8_offset_to_ptr(_string.data(), i));
 }
 
+bool ustring::operator==(const ustring &other) const
+{
+  return _string == other._string && _utf8 == other._utf8;
+}
+
+bool ustring::operator==(const std::string &other) const
+{
+  return _string == other;
+}
+
+bool ustring::operator==(const char *other) const
+{
+  return _string == other;
+}
+
 const char* ustring::data() const
 {
   return _string.data();

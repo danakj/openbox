@@ -155,6 +155,12 @@ public:
   // No reference return; use replace() to write characters.
   value_type operator[](size_type i) const;
 
+  // compare strings
+
+  bool operator==(const ustring &other) const;
+  bool operator==(const std::string &other) const;
+  bool operator==(const char *other) const;
+
   // internal data
 
   const char* data()  const;

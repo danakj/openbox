@@ -3184,8 +3184,6 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
         my = screen->getHeight() - windowmenu->getHeight() -
           (screen->getBorderWidth() * 2);
 
-
-      cout << my << endl;
       windowmenu->move(mx, my);
       windowmenu->show();
       XRaiseWindow(blackbox->getXDisplay(), windowmenu->getWindowID());

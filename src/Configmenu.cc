@@ -68,7 +68,7 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
   insert(i18n(ConfigmenuSet, ConfigmenuOpaqueMove,
               "Opaque Window Moving"), 2);
   insert(i18n(ConfigmenuSet, ConfigmenuModMove,
-              "Raise Window on Alt-Click Move"), 3);
+              "Raise Window on Move/Resize"), 3);
   insert(i18n(ConfigmenuSet, ConfigmenuWorkspaceWarping,
               "Workspace Warping"), 4);
   insert(i18n(ConfigmenuSet, ConfigmenuFullMax,
@@ -96,7 +96,7 @@ void Configmenu::setValues(void) {
 #endif // XFT
   setItemSelected(index++, getScreen()->doImageDither());
   setItemSelected(index++, getScreen()->doOpaqueMove());
-  setItemSelected(index++, getScreen()->doRaiseOnMove());
+  setItemSelected(index++, getScreen()->doRaiseOnMoveResize());
   setItemSelected(index++, getScreen()->doWorkspaceWarping());
   setItemSelected(index++, getScreen()->doFullMax());
   setItemSelected(index++, getScreen()->doFocusNew());
@@ -141,8 +141,8 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     break;
 
   case 3: // raise on alt-move
-    getScreen()->saveRaiseOnMove(! getScreen()->doRaiseOnMove());
-    setItemSelected(index, getScreen()->doRaiseOnMove());
+    getScreen()->saveRaiseOnMoveResize(! getScreen()->doRaiseOnMoveResize());
+    setItemSelected(index, getScreen()->doRaiseOnMoveResize());
 
   case 4: // workspace wrapping
     getScreen()->saveWorkspaceWarping(! getScreen()->doWorkspaceWarping());

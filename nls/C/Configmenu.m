@@ -13,7 +13,7 @@ $ #ImageDithering
 $ #OpaqueMove
 # Opaque Window Moving
 $ #ModMove
-# Raise Window on Alt-Click Move
+# Raise Window on Move/Resize
 $ #FullMax
 # Full Maximization
 $ #FocusNew

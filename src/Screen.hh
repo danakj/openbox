@@ -236,7 +236,7 @@ public:
 
   inline bool isSloppyFocus(void) const { return resource.sloppy_focus; }
   inline bool isRootColormapInstalled(void) const
-  { return root_colormap_installed; }
+    { return root_colormap_installed; }
   inline bool doAutoRaise(void) const { return resource.auto_raise; }
   inline bool doClickRaise(void) const { return resource.click_raise; }
   inline bool isScreenManaged(void) const { return managed; }
@@ -245,7 +245,8 @@ public:
   inline bool doImageDither(void) const { return image_control->doDither(); }
   inline bool doOrderedDither(void) const { return resource.ordered_dither; }
   inline bool doOpaqueMove(void) const { return resource.opaque_move; }
-  inline bool doRaiseOnMove(void) const { return resource.raise_on_move; }
+  inline bool doRaiseOnMoveResize(void) const
+    { return resource.raise_on_move; }
   inline bool doFullMax(void) const { return resource.full_max; }
   inline bool doFocusNew(void) const { return resource.focus_new; }
   inline bool doFocusLast(void) const { return resource.focus_last; }
@@ -256,7 +257,8 @@ public:
     { return resource.snap_to_edges; }
   inline bool getWindowCornerSnap(void) const
     { return resource.window_corner_snap; }
-  inline bool allowScrollLock(void) const { return resource.allow_scroll_lock; }
+  inline bool allowScrollLock(void) const
+    { return resource.allow_scroll_lock; }
   inline bool doWorkspaceWarping(void) const
     { return resource.workspace_warping; }
   inline int rootScrollDirection(void) const { return resource.root_scroll; }
@@ -333,7 +335,7 @@ public:
   void saveShadowFonts(bool f);
   void saveAAFonts(bool f);
   void saveOpaqueMove(bool o);
-  void saveRaiseOnMove(bool r);
+  void saveRaiseOnMoveResize(bool r);
   void saveFullMax(bool f);
   void saveFocusNew(bool f);
   void saveFocusLast(bool f);

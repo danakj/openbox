@@ -3123,7 +3123,8 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
     } else if (frame.plate == be->window) {
       if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 
-      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
+      if (be->state != mod_mask || getScreen()->doRaiseOnMoveResize())
+        screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
 
       XAllowEvents(blackbox->getXDisplay(), ReplayPointer, be->time);
     } else {
@@ -3140,7 +3141,7 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
 
       if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
       
-      if ( (be->state == mod_mask && getScreen()->doRaiseOnMove()))
+      if (be->state == mod_mask && getScreen()->doRaiseOnMoveResize())
         screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
   } else if (be->button == 2 && (be->window != frame.iconify_button) &&

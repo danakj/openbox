@@ -109,7 +109,9 @@ void RrPaint(RrAppearance *a, Window win, gint w, gint h)
         case RR_TEXTURE_RGBA:
             g_assert(!transferred);
             RrImageDraw(a->surface.pixel_data,
-                        &a->texture[i].data.rgba, &tarea);
+                        &a->texture[i].data.rgba,
+                        a->w, a->h,
+                        &tarea);
         break;
         }
     }
@@ -203,7 +205,6 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
                              orig->textures * sizeof(RrTexture));
     for (i = 0; i < copy->textures; ++i)
         if (copy->texture[i].type == RR_TEXTURE_RGBA) {
-            g_free(copy->texture[i].data.rgba.cache);
             copy->texture[i].data.rgba.cache = NULL;
         }
     copy->pixmap = None;

@@ -85,7 +85,7 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
                       int x, int y)
 {
     const char *c;
-    struct GlftGlyph *g;
+    struct GlftGlyph *g, *n;
 
     if (!g_utf8_validate(str, bytes, NULL)) {
         GlftDebug("Invalid UTF-8 in string\n");
@@ -97,9 +97,10 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
     c = str;
     while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
+        n = (c - str < bytes - 1) ? GlftFontGlyph(font, c+1) : 0;
         if (g) {
             glCallList(g->dlist);
-            glTranslatef(g->width, 0.0, 0.0);
+            if (n) glTranslatef(GlftFontAdvance(font, g, n), 0.0, 0.0);
         } else
             glTranslatef(font->max_advance_width, 0.0, 0.0);
         c = g_utf8_next_char(c);
@@ -115,7 +116,7 @@ void GlftMeasureString(struct GlftFont *font,
                        int *h)
 {
     const char *c;
-    struct GlftGlyph *g;
+    struct GlftGlyph *g, *n;
 
     if (!g_utf8_validate(str, bytes, NULL)) {
         GlftDebug("Invalid UTF-8 in string\n");
@@ -128,8 +129,9 @@ void GlftMeasureString(struct GlftFont *font,
     c = str;
     while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
+        n = (c - str < bytes - 1) ? GlftFontGlyph(font, c+1) : 0;
         if (g) {
-            *w += g->width;
+            *w += GlftFontAdvance(font, g, n);
             *h = MAX(g->height, *h);
         } else {
             *w += font->max_advance_width;

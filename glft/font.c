@@ -174,9 +174,14 @@ struct GlftFont *GlftFontOpen(const char *name)
         GlftDebug("failed to open FT face\n");
         goto openfail0;
     }
+    assert(FT_IS_SCALABLE(font->face));
+    if (!FT_IS_SCALABLE(font->face)) {
+        GlftDebug("got a non-scalable face");
+        goto openfail1;
+    }
     if (FT_Set_Char_Size(font->face, 0, font->ftcharsize, 0, 0)) {
         GlftDebug("failed to set char size on FT face\n");
-        goto openfail0;
+        goto openfail1;
     }
 
     if (!FcPatternGetCharSet(match, FC_CHARSET, 0, &font->chars) !=
@@ -184,7 +189,7 @@ struct GlftFont *GlftFontOpen(const char *name)
         font->chars = FcFreeTypeCharSet(font->face, FcConfigGetBlanks(NULL));
     if (!font->chars) {
         GlftDebug("failed to get a valid CharSet\n");
-        goto openfail0;
+        goto openfail1;
     }
 
     if (font->char_width)
@@ -196,10 +201,14 @@ struct GlftFont *GlftFontOpen(const char *name)
     if (font->minspace) font->height = font->ascent + font->descent;
     else                font->height = font->face->size->metrics.height >> 6;
 
+    font->kerning = FT_HAS_KERNING(font->face);
+
     font->glyph_map = g_hash_table_new(g_int_hash, g_int_equal);
 
     return font;
 
+openfail1:
+    FT_Done_Face(font->face);
 openfail0:
     FcPatternDestroy(match);
     free(font);
@@ -239,8 +248,6 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         }
     }
     if (!g) {
-        assert(font->face->face_flags & FT_FACE_FLAG_SCALABLE);
-
         g = malloc(sizeof(struct GlftGlyph));
         g->w = w;
         g->dlist = glGenLists(1);
@@ -250,14 +257,33 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
         if (!(font->spacing == FC_PROPORTIONAL)) {
             g->width = font->max_advance_width;
         } else {
-            /*g->width = TRUNC(ROUND(font->face->glyph->advance.x));*/
-            g->width = font->face->glyph->metrics.width >> 6;
-            g_message("Width: %c = %d", *c, g->width);
+            g->width = font->face->glyph->advance.x;
+            g->width = TRUNC(ROUND(font->face->glyph->metrics.width));/* >> 6;*/
         }
-        g->height = -(font->face->glyph->metrics.height >> 6);
+        g->height = TRUNC(ROUND(font->face->glyph->metrics.height));/* >> 6;*/
+        g_message("%c = Width: %d Height: %d", *c, g->width, g->height);
 
         g_hash_table_insert(font->glyph_map, &g->w, g);
     }
 
     return g;
+}
+
+int GlftFontAdvance(struct GlftFont *font,
+                    struct GlftGlyph *left,
+                    struct GlftGlyph *right)
+{
+    FT_Vector v;
+    int k = left->width;
+
+/*    font->kerning = 0;*/
+    g_message("HAS KERNING: %d", font->kerning);
+
+    if (font->kerning && right) {
+        FT_Get_Kerning(font->face, left->glyph, right->glyph,
+                       FT_KERNING_UNFITTED, &v);
+/*x_scale  = pixel_size_x / EM_size*/
+        k += v.x >> 6;
+    }
+    return k;
 }

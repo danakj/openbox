@@ -31,6 +31,8 @@ struct GlftFont {
 
     GHashTable *glyph_map;
 
+    int kerning : 1;
+
     /* public shit */
     int ascent;
     int descent;
@@ -43,6 +45,8 @@ struct GlftGlyph {
     FcChar32 w;
     /* OpenGL display list for the character */
     unsigned int dlist;
+    /* The FT_Face glyph */
+    FT_UInt glyph;
 
     int width;
     int height;
@@ -51,5 +55,9 @@ struct GlftGlyph {
 /*! Takes a character in UTF-8 encoding and returns an OpenGL display list
  for it */
 struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c);
+
+int GlftFontAdvance(struct GlftFont *font,
+                    struct GlftGlyph *left,
+                    struct GlftGlyph *right);
 
 #endif

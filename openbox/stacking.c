@@ -110,6 +110,8 @@ void stacking_raise(ObWindow *window)
 {
     g_assert(stacking_list != NULL); /* this would be bad */
 
+    g_message("RAISING");
+
     if (WINDOW_IS_CLIENT(window)) {
         Client *client = WINDOW_AS_CLIENT(window);
 
@@ -243,23 +245,25 @@ void stacking_add_nonintrusive(ObWindow *win)
         if (!(it_before = g_list_find(stacking_list, parent))) {
             /* no parent to put above, try find the focused client to go
                under */
-            if ((it_before = g_list_find(stacking_list, focus_client)))
-                it_before = it_before->next;
-            else {
-                /* out of ideas, just add it normally... */
-                stacking_add(win);
-                return;
+            if (focus_client && focus_client->layer == client->layer) {
+                if ((it_before = g_list_find(stacking_list, focus_client)))
+                    it_before = it_before->next;
             }
         }
-        stacking_list = g_list_insert_before(stacking_list, it_before, win);
+        if (!it_before) {
+            /* out of ideas, just add it normally... */
+            stacking_add(win);
+        } else {
+            stacking_list = g_list_insert_before(stacking_list, it_before,win);
 
-        it_before = g_list_find(stacking_list, win)->prev;
-        if (!it_before)
-            wins[0] = focus_backup;
-        else
-            wins[0] = window_top(it_before->data);
-        wins[1] = window_top(win);
+            it_before = g_list_find(stacking_list, win)->prev;
+            if (!it_before)
+                wins[0] = focus_backup;
+            else
+                wins[0] = window_top(it_before->data);
+            wins[1] = window_top(win);
 
-        XRestackWindows(ob_display, wins, 2);
+            XRestackWindows(ob_display, wins, 2);
+        }
     }
 }

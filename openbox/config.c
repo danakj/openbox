@@ -89,13 +89,12 @@ gboolean config_set(char *name, ConfigValueType type, ConfigValue value)
     gboolean ret = FALSE;
 
     name = g_ascii_strdown(name, -1);
-    g_message("Setting %s", name);
 
     /*g_datalist_foreach(&config_def, print_config, NULL);*/
     def = g_datalist_get_data(&config_def, name);
 
     if (def == NULL) {
-        g_message("Invalid config option '%s'", name);
+        g_warning("Invalid config option '%s'", name);
     } else {
         if (def->hasList) {
             gboolean found = FALSE;
@@ -111,10 +110,12 @@ gboolean config_set(char *name, ConfigValueType type, ConfigValue value)
             } while ((it = it->next));
 
             if (!found)
-                g_message("Invalid value '%s' for config option '%s'",
+                g_warning("Invalid value '%s' for config option '%s'",
                           value.string, name);
             else
                 ret = TRUE;
+        } else if (type != def->type) {
+            g_warning("Incorrect type of value for config option '%s'", name);
         } else
             ret = TRUE;
 

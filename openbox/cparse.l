@@ -90,10 +90,10 @@ static void newline()
     if (!comment) {
         if (!haserror && entry.name != NULL && (signed)entry.type >= 0) {
             if (!config_set(entry.name, entry.type, entry.value))
-                g_warning("Invalid option in '%s': '%s'\n",
-                          yyfilename, entry.name);
+                g_warning("Parser error in '%s' on line %d\n", yyfilename,
+                          yylineno);
         } else {
-            printf("Parser error in '%s' on line %d\n", yyfilename, yylineno);
+            g_warning("Parser error in '%s' on line %d", yyfilename, yylineno);
         }
         g_free(entry.name);
         entry.name = NULL;

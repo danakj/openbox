@@ -14,8 +14,6 @@ def random(data):
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area()
-    print str(screen_area.x()) + " " + str(screen_area.y()) + " " + \
-          str(screen_area.width()) + " " + str(screen_area.height())
     width = screen_area.width() - (client_area.width() +
                                    frame_size.left + frame_size.right)
     height = screen_area.height() - (client_area.height() + 

@@ -213,6 +213,10 @@ static void event(ObEvent *e, void *foo)
         }
         context = engine_get_context(e->data.x.client,
                                      e->data.x.e->xbutton.window);
+        g_message("press %d frame %d client %d",
+                  context, 
+                  g_quark_try_string("frame"),
+                  g_quark_try_string("client"));
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
@@ -228,6 +232,10 @@ static void event(ObEvent *e, void *foo)
     case Event_X_ButtonRelease:
         context = engine_get_context(e->data.x.client,
                                      e->data.x.e->xbutton.window);
+        g_message("release %d frame %d client %d",
+                  context, 
+                  g_quark_try_string("frame"),
+                  g_quark_try_string("client"));
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
             if (drag) {
@@ -240,22 +248,20 @@ static void event(ObEvent *e, void *foo)
                 lbutton = 0;
             } else {
                 /* clicks are only valid if its released over the window */
-                if (e->data.x.e->xbutton.x >= 0 &&
-                    e->data.x.e->xbutton.y >= 0) {
-                    int junk;
-                    Window wjunk;
-                    guint ujunk, w, h;
-                    XGetGeometry(ob_display, e->data.x.e->xbutton.window,
-                                 &wjunk, &junk, &junk, &w, &h, &ujunk, &ujunk);
-                    if (e->data.x.e->xbutton.x < (signed)w &&
-                        e->data.x.e->xbutton.y < (signed)h) {
-                        click =TRUE;
-                        /* double clicks happen if there were 2 in a row! */
-                        if (lbutton == button &&
-                            e->data.x.e->xbutton.time - 300 <= ltime)
-                            dclick = TRUE;
-                    }
-                    lbutton = button;
+                int junk;
+                Window wjunk;
+                guint ujunk, b, w, h;
+                XGetGeometry(ob_display, e->data.x.e->xbutton.window,
+                             &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
+                if (e->data.x.e->xbutton.x >= (signed)-b &&
+                    e->data.x.e->xbutton.y >= (signed)-b &&
+                    e->data.x.e->xbutton.x < (signed)(w+b) &&
+                    e->data.x.e->xbutton.y < (signed)(h+b)) {
+                    click =TRUE;
+                    /* double clicks happen if there were 2 in a row! */
+                    if (lbutton == button &&
+                        e->data.x.e->xbutton.time - 300 <= ltime)
+                        dclick = TRUE;
                 } else
                     lbutton = 0;
             }

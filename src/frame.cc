@@ -58,7 +58,8 @@ Frame::Frame(Client *client)
     _desk_press(false),
     _iconify_press(false),
     _icon_press(false),
-    _close_press(false)
+    _close_press(false),
+    _press_button(0)
 {
   assert(client);
 
@@ -153,6 +154,60 @@ void Frame::hide()
   if (_visible) {
     _visible = false;
     XUnmapWindow(**otk::display, _frame);
+  }
+}
+
+void Frame::buttonPressHandler(const XButtonEvent &e)
+{
+  if (_press_button) return;
+  _press_button = e.button;
+  
+  if (e.window == _max) {
+    _max_press = true;
+    renderMax();
+  }
+  if (e.window == _close) {
+    _close_press = true;
+    renderClose();
+  }
+  if (e.window == _desk) {
+    _desk_press = true;
+    renderDesk();
+  }
+  if (e.window == _iconify) {
+    _iconify_press = true;
+    renderIconify();
+  }
+  if (e.window == _icon) {
+    _icon_press = true;
+    renderIcon();
+  }
+}
+
+void Frame::buttonReleaseHandler(const XButtonEvent &e)
+{
+  if (e.button != _press_button) return;
+  _press_button = 0;
+
+  if (e.window == _max) {
+    _max_press = false;
+    renderMax();
+  }
+  if (e.window == _close) {
+    _close_press = false;
+    renderClose();
+  }
+  if (e.window == _desk) {
+    _desk_press = false;
+    renderDesk();
+  }
+  if (e.window == _iconify) {
+    _iconify_press = false;
+    renderIconify();
+  }
+  if (e.window == _icon) {
+    _icon_press = false;
+    renderIcon();
   }
 }
 

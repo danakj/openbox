@@ -94,11 +94,13 @@ private:
   otk::Surface  *_close_sur;
 
   std::string _layout; // layout of the titlebar
+
   bool _max_press;
   bool _desk_press;
   bool _iconify_press;
   bool _icon_press;
   bool _close_press;
+  unsigned int _press_button; // mouse button that started the press
 
   FrameGeometry geom;
   
@@ -167,6 +169,9 @@ public:
   void show();
   //! Hides the frame
   void hide();
+
+  void buttonPressHandler(const XButtonEvent &e);
+  void buttonReleaseHandler(const XButtonEvent &e);
 
   //! Returns the MouseContext for the given window id
   /*!

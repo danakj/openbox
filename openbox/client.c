@@ -1743,7 +1743,6 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
 
     if (!raised && l != old)
         if (orig->frame) { /* only restack if the original window is managed */
-            /* XXX add_non_intrusive ever? */
             stacking_remove(CLIENT_AS_WINDOW(self));
             stacking_add(CLIENT_AS_WINDOW(self));
         }
@@ -2441,6 +2440,7 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
     gboolean undecorated = self->undecorated;
     gboolean max_horz = self->max_horz;
     gboolean max_vert = self->max_vert;
+    gboolean modal = self->modal;
     int i;
 
     if (!(action == prop_atoms.net_wm_state_add ||
@@ -2457,7 +2457,7 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
         /* if toggling, then pick whether we're adding or removing */
         if (action == prop_atoms.net_wm_state_toggle) {
             if (state == prop_atoms.net_wm_state_modal)
-                action = self->modal ? prop_atoms.net_wm_state_remove :
+                action = modal ? prop_atoms.net_wm_state_remove :
                     prop_atoms.net_wm_state_add;
             else if (state == prop_atoms.net_wm_state_maximized_vert)
                 action = self->max_vert ? prop_atoms.net_wm_state_remove :
@@ -2493,8 +2493,7 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
     
         if (action == prop_atoms.net_wm_state_add) {
             if (state == prop_atoms.net_wm_state_modal) {
-                /* XXX raise here or something? */
-                self->modal = TRUE;
+                modal = TRUE;
             } else if (state == prop_atoms.net_wm_state_maximized_vert) {
                 max_vert = TRUE;
             } else if (state == prop_atoms.net_wm_state_maximized_horz) {
@@ -2517,7 +2516,7 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
 
         } else { /* action == prop_atoms.net_wm_state_remove */
             if (state == prop_atoms.net_wm_state_modal) {
-                self->modal = FALSE;
+                modal = FALSE;
             } else if (state == prop_atoms.net_wm_state_maximized_vert) {
                 max_vert = FALSE;
             } else if (state == prop_atoms.net_wm_state_maximized_horz) {
@@ -2564,6 +2563,12 @@ void client_set_state(ObClient *self, Atom action, long data1, long data2)
         client_shade(self, shaded);
     if (undecorated != self->undecorated)
         client_set_undecorated(self, undecorated);
+    if (modal != self->modal) {
+        self->modal = modal;
+        /* when a window changes modality, then its stacking order with its
+           transients needs to change */
+        client_raise(self);
+    }
     client_calc_layer(self);
     client_change_state(self); /* change the hint to reflect these changes */
 }

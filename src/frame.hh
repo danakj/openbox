@@ -32,6 +32,11 @@ struct FrameGeometry {
   int label_height() { return font_height; }
   int handle_height; // static, from the style
   int icon_x;        // x-position of the window icon button
+  int title_x;       // x-position of the window title
+  int iconify_x;     // x-position of the window iconify button
+  int desktop_x;     // x-position of the window all-desktops button
+  int max_x;         // x-position of the window maximize button
+  int close_x;       // x-position of the window close button
   int handle_y;
   int button_size;   // static, from the style
   int grip_width() { return button_size * 2; }

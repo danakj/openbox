@@ -301,8 +301,12 @@ static void render(int screen, const otk::Size &size, Window win,
                    const otk::RenderTexture &texture, bool freedata=true)
 {
   otk::Surface *s = new otk::Surface(screen, size);
-  otk::display->renderControl(screen)->drawBackground(*s, texture);
-  XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
+  if (texture.parentRelative())
+    XSetWindowBackgroundPixmap(**otk::display, win, ParentRelative);
+  else {
+    otk::display->renderControl(screen)->drawBackground(*s, texture);
+    XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
+  }
   XClearWindow(**otk::display, win);
   if (*surface) delete *surface;
   if (freedata) s->freePixelData();
@@ -409,7 +413,12 @@ void Frame::adjustSize()
     render(screen, otk::Size(geom.grip_width(), geom.handle_height), _lgrip,
            &_grip_sur, *(focus ? style->gripFocusBackground() :
                          style->gripUnfocusBackground()));
-    XSetWindowBackgroundPixmap(**otk::display, _rgrip, _grip_sur->pixmap());
+    if ((focus ? style->gripFocusBackground() :
+         style->gripUnfocusBackground())->parentRelative())
+      XSetWindowBackgroundPixmap(**otk::display, _rgrip, ParentRelative);
+    else {
+      XSetWindowBackgroundPixmap(**otk::display, _rgrip, _grip_sur->pixmap());
+    }
     XClearWindow(**otk::display, _rgrip);
   }
 
@@ -430,9 +439,23 @@ void Frame::renderLabel()
   otk::Surface *s = new otk::Surface(_client->screen(),
                                      otk::Size(geom.label_width,
                                                geom.label_height()));
-  control->drawBackground(*s, *(_client->focused() ?
-                                style->labelFocusBackground() :
-                                style->labelUnfocusBackground()));
+  const otk::RenderTexture *tx = (_client->focused() ?
+                                  style->labelFocusBackground() :
+                                  style->labelUnfocusBackground());
+  if (tx->parentRelative()) {
+    otk::pixel32 *dest = s->pixelData(), *src;
+    int w = _title_sur->size().width();
+  
+    src = _title_sur->pixelData() + w * (geom.bevel + 1) + geom.title_x;
+    
+    // get the background under the label
+    for (int y = 0; y < geom.button_size; ++y, src += w - geom.button_size)
+      for (int x = 0; x < geom.button_size; ++x, ++dest, ++src)
+        *dest = *src;
+    control->drawImage(*s, 0, 0, 0); // no image but draw the new background
+  } else
+    control->drawBackground(*s, *tx);
+  control->drawBackground(*s, *tx);
 
   otk::ustring t = _client->title(); // the actual text to draw
   int x = geom.bevel;                // x coord for the text
@@ -476,7 +499,8 @@ void Frame::renderLabel()
 
 static void renderButton(int screen, bool focus, bool press, Window win,
                          otk::Surface **sur, int butsize,
-                         const otk::PixmapMask *mask)
+                         const otk::PixmapMask *mask, int xoffset, int yoffset,
+                         otk::Surface *bgsurface)
 {
   const otk::RenderStyle *style = otk::RenderStyle::style(screen);
   const otk::RenderControl *control = otk::display->renderControl(screen);
@@ -492,7 +516,19 @@ static void renderButton(int screen, bool focus, bool press, Window win,
   const otk::RenderColor *maskcolor = (focus ?
                                        style->buttonFocusColor() :
                                        style->buttonUnfocusColor());
-  control->drawBackground(*s, *tx);
+  if (tx->parentRelative()) {
+    otk::pixel32 *dest = s->pixelData(), *src;
+    int w = bgsurface->size().width();
+  
+    src = bgsurface->pixelData() + w * yoffset + xoffset;
+    
+    // get the background under the button
+    for (int y = 0; y < butsize; ++y, src += w - butsize)
+      for (int x = 0; x < butsize; ++x, ++dest, ++src)
+        *dest = *src;
+    control->drawImage(*s, 0, 0, 0); // no image but draw the new background
+  } else
+    control->drawBackground(*s, *tx);
   control->drawMask(*s, *maskcolor, *mask);
 
   XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
@@ -508,7 +544,8 @@ void Frame::renderMax()
   bool press = _max_press || _client->maxVert() || _client->maxHorz();
   renderButton(_client->screen(), _client->focused(), press, _max,
                &_max_sur, geom.button_size,
-               otk::RenderStyle::style(_client->screen())->maximizeMask());
+               otk::RenderStyle::style(_client->screen())->maximizeMask(),
+               geom.max_x, (geom.bevel + 1), _title_sur);
 }
 
 void Frame::renderDesk()
@@ -517,7 +554,8 @@ void Frame::renderDesk()
   bool press = _desk_press || _client->desktop() == 0xffffffff;
   renderButton(_client->screen(), _client->focused(), press, _desk,
                &_desk_sur, geom.button_size,
-               otk::RenderStyle::style(_client->screen())->alldesktopsMask());
+               otk::RenderStyle::style(_client->screen())->alldesktopsMask(),
+               geom.desktop_x, (geom.bevel + 1), _title_sur);
 }
 
 void Frame::renderIconify()
@@ -525,7 +563,8 @@ void Frame::renderIconify()
   if (!(_decorations & Client::Decor_Iconify)) return;
   renderButton(_client->screen(), _client->focused(), _iconify_press, _iconify,
                &_iconify_sur, geom.button_size,
-               otk::RenderStyle::style(_client->screen())->iconifyMask());
+               otk::RenderStyle::style(_client->screen())->iconifyMask(),
+               geom.iconify_x, (geom.bevel + 1), _title_sur);
 }
 
 void Frame::renderClose()
@@ -533,7 +572,8 @@ void Frame::renderClose()
   if (!(_decorations & Client::Decor_Close)) return;
   renderButton(_client->screen(), _client->focused(), _close_press, _close,
                &_close_sur, geom.button_size,
-               otk::RenderStyle::style(_client->screen())->closeMask());
+               otk::RenderStyle::style(_client->screen())->closeMask(),
+               geom.close_x, (geom.bevel + 1), _title_sur);
 }
 
 void Frame::renderIcon()
@@ -654,6 +694,7 @@ void Frame::layoutTitle()
     case 'd':
     case 'D':
       if (!d) break;
+      geom.desktop_x = x;
       XMapWindow(**otk::display, _desk);
       XMoveWindow(**otk::display, _desk, x, geom.bevel + 1);
       x += geom.button_size + geom.bevel;
@@ -661,6 +702,7 @@ void Frame::layoutTitle()
     case 'i':
     case 'I':
       if (!i) break;
+      geom.iconify_x = x;
       XMapWindow(**otk::display, _iconify);
       XMoveWindow(**otk::display, _iconify, x, geom.bevel + 1);
       x += geom.button_size + geom.bevel;
@@ -668,6 +710,7 @@ void Frame::layoutTitle()
     case 't':
     case 'T':
       if (!t) break;
+      geom.title_x = x;
       XMapWindow(**otk::display, _label);
       XMoveWindow(**otk::display, _label, x, geom.bevel);
       x += geom.label_width + geom.bevel;
@@ -675,6 +718,7 @@ void Frame::layoutTitle()
     case 'm':
     case 'M':
       if (!m) break;
+      geom.max_x = x;
       XMapWindow(**otk::display, _max);
       XMoveWindow(**otk::display, _max, x, geom.bevel + 1);
       x += geom.button_size + geom.bevel;
@@ -682,6 +726,7 @@ void Frame::layoutTitle()
     case 'c':
     case 'C':
       if (!c) break;
+      geom.close_x = x;
       XMapWindow(**otk::display, _close);
       XMoveWindow(**otk::display, _close, x, geom.bevel + 1);
       x += geom.button_size + geom.bevel;

@@ -1452,7 +1452,7 @@ void OpenboxWindow::iconify(void) {
 }
 
 
-void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
+void OpenboxWindow::deiconify(bool reassoc, bool raise, bool initial) {
   if (flags.iconic || reassoc)
     screen->reassociateWindow(this, -1, False);
   else if (workspace_number != screen->getCurrentWorkspace()->getWorkspaceID())
@@ -1470,8 +1470,8 @@ void OpenboxWindow::deiconify(Bool reassoc, Bool raise) {
 
   // if we're using the click to place placement type, then immediately
   // after the window is mapped, we need to start interactively moving it
-  if (screen->placementPolicy() == BScreen::ClickMousePlacement &&
-      place_window && !(flags.iconic || reassoc)) {
+  if (initial && place_window &&
+      screen->placementPolicy() == BScreen::ClickMousePlacement) {
     // if the last window wasn't placed yet, or we're just moving a window
     // already, finish off that move cleanly
     OpenboxWindow *w = openbox.getFocusedWindow();
@@ -2243,7 +2243,8 @@ void OpenboxWindow::mapRequestEvent(XMapRequestEvent *re) {
     case InactiveState:
     case ZoomState:
     default:
-      deiconify(False);
+      deiconify(False, True, True);     // specify that we're initializing the
+                                        // window
       break;
     }
 

@@ -321,7 +321,7 @@ public:
 
   void setFocusFlag(Bool);
   void iconify();
-  void deiconify(Bool reassoc = True, Bool raise = True);
+  void deiconify(bool reassoc = true, bool raise = true, bool initial = false);
   void close();
   void withdraw();
   void maximize(unsigned int button);

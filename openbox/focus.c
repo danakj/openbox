@@ -81,6 +81,10 @@ void focus_set_client(Client *client)
     Window active;
     Client *old;
 
+#ifdef DEBUG_FOCUS
+    g_message("focus_set_client 0x%lx", client ? client->window : 0);
+#endif
+
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);

@@ -214,7 +214,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     node = node->xmlChildrenNode;
 
-    if ((n = parse_find_node("theme", node))) {
+    if ((n = parse_find_node("name", node))) {
         gchar *c;
 
         g_free(config_theme);

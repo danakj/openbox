@@ -126,8 +126,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   blackbox_attrib.workspace = window_number = BSENTINEL;
 
-  blackbox_attrib.flags = blackbox_attrib.attrib = blackbox_attrib.stack
-    = blackbox_attrib.decoration = 0l;
+  blackbox_attrib.flags = blackbox_attrib.attrib = blackbox_attrib.stack = 0l;
+  blackbox_attrib.decoration = DecorNormal;
   blackbox_attrib.premax_x = blackbox_attrib.premax_y = 0;
   blackbox_attrib.premax_w = blackbox_attrib.premax_h = 0;
 
@@ -173,9 +173,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   // get size, aspect, minimum/maximum size and other hints set by the
   // client
 
-  if (! getBlackboxHints()) {
+  if (! getBlackboxHints())
     getNetWMHints();
-  }
 
   getWMProtocols();
   getWMHints();
@@ -235,7 +234,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   
   setAllowedActions();
 
-  enableDecor(True);
+  setupDecor();
   
   if (decorations & Decor_Titlebar)
     createTitlebar();
@@ -407,7 +406,26 @@ BlackboxWindow::~BlackboxWindow(void) {
 
 
 void BlackboxWindow::enableDecor(bool enable) {
-  if (enable) {
+  blackbox_attrib.flags |= AttribDecoration;
+  blackbox_attrib.decoration = enable ? DecorNormal : DecorNone;
+  setupDecor();
+    
+  // we can not be shaded if we lack a titlebar
+  if (! (decorations & Decor_Titlebar) && flags.shaded)
+    shade();
+    
+  if (flags.visible && frame.window) {
+    XMapSubwindows(blackbox->getXDisplay(), frame.window);
+    XMapWindow(blackbox->getXDisplay(), frame.window);
+  }
+
+  reconfigure();
+  setState(current_state);
+}
+
+
+void BlackboxWindow::setupDecor() {
+  if (blackbox_attrib.decoration != DecorNone) {
     // start with everything on
     decorations =
       (mwm_decorations & Decor_Titlebar ? Decor_Titlebar : 0) |
@@ -580,11 +598,6 @@ void BlackboxWindow::decorate(void) {
   if (decorations & Decor_Border) {
     frame.fborder_pixel = screen->getWindowStyle()->f_focus.pixel();
     frame.uborder_pixel = screen->getWindowStyle()->f_unfocus.pixel();
-    blackbox_attrib.flags |= AttribDecoration;
-    blackbox_attrib.decoration = DecorNormal;
-  } else {
-    blackbox_attrib.flags |= AttribDecoration;
-    blackbox_attrib.decoration = DecorNone;
   }
 
   if (decorations & Decor_Handle) {
@@ -1387,18 +1400,16 @@ bool BlackboxWindow::getBlackboxHints(void) {
   if (blackbox_hint->flags & AttribDecoration) {
     switch (blackbox_hint->decoration) {
     case DecorNone:
-      enableDecor(False);
+      blackbox_attrib.decoration = DecorNone;
       break;
 
     case DecorTiny:
     case DecorTool:
     case DecorNormal:
     default:
-      enableDecor(True);
+      // blackbox_attrib.decoration defaults to DecorNormal
       break;
     }
-
-    reconfigure();
   }
   
   delete [] blackbox_hint;
@@ -2320,18 +2331,6 @@ void BlackboxWindow::restoreAttributes(void) {
       enableDecor(True);
       break;
     }
-
-    // we can not be shaded if we lack a titlebar
-    if (! (decorations & Decor_Titlebar) && flags.shaded)
-      shade();
-
-    if (flags.visible && frame.window) {
-      XMapSubwindows(blackbox->getXDisplay(), frame.window);
-      XMapWindow(blackbox->getXDisplay(), frame.window);
-    }
-
-    reconfigure();
-    setState(current_state);
   }
 
   // with the state set it will then be the map event's job to read the
@@ -2718,7 +2717,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
     if (isTransient()) {
       functions &= ~Func_Maximize;
       setAllowedActions();
-      enableDecor(True);
+      setupDecor();
     }
 
     reconfigure();
@@ -2762,7 +2761,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
       }
       grabButtons();
       setAllowedActions();
-      enableDecor(True);
+      setupDecor();
     }
 
     Rect old_rect = frame.rect;
@@ -3808,18 +3807,6 @@ void BlackboxWindow::changeBlackboxHints(const BlackboxHints *net) {
       enableDecor(True);
       break;
     }
-
-    // we can not be shaded if we lack a titlebar
-    if (flags.shaded && ! (decorations & Decor_Titlebar))
-      shade();
-
-    if (flags.visible && frame.window) {
-      XMapSubwindows(blackbox->getXDisplay(), frame.window);
-      XMapWindow(blackbox->getXDisplay(), frame.window);
-    }
-
-    reconfigure();
-    setState(current_state);
   }
 }
 

@@ -190,7 +190,6 @@ private:
   /*
    * what decorations do we have?
    * this is based on the type of the client window as well as user input
-   * the menu is not really decor, but it goes hand in hand with the decor
    */
   DecorationFlags decorations;
   DecorationFlags mwm_decorations;
@@ -380,6 +379,7 @@ public:
   void beginMove(int x_root, int y_root);
   void beginResize(int x_root, int y_root, Corner dir);
   void enableDecor(bool enable);
+  void setupDecor();
   void setFocusFlag(bool focus);
   void iconify(void);
   void deiconify(bool reassoc = True, bool raise = True);

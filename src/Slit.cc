@@ -551,7 +551,7 @@ void Slit::reposition(void) {
   slit_rect.setSize(slit_rect.width() + (screen->getBorderWidth() * 2),
                     slit_rect.height() + (screen->getBorderWidth() * 2));
 
-  if (slit_rect.intersects(tbar_rect)) {
+  if (! screen->doHideToolbar() && slit_rect.intersects(tbar_rect)) {
     int delta = screen->getToolbar()->getExposedHeight() +
       screen->getBorderWidth();
     if (frame.rect.bottom() <= tbar_rect.bottom())

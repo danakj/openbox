@@ -1601,6 +1601,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 		      gboolean user, gboolean final)
 {
     gboolean moved = FALSE, resized = FALSE;
+    int basew, baseh, minw, minh;
 
     /* gets the frame's position */
     frame_client_gravity(self->frame, &x, &y);
@@ -1657,9 +1658,25 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         }
     }
 
+    /* find the base and min sizes */
+    if (self->base_size.width || self->base_size.height) {
+        basew = self->base_size.width;
+        baseh = self->base_size.height;
+    } else {
+        basew = self->min_size.width;
+        baseh = self->min_size.height;
+    }
+    if (self->min_size.width || self->min_size.height) {
+        minw = self->min_size.width;
+        minh = self->min_size.height;
+    } else {
+        minw = self->base_size.width;
+        minh = self->base_size.height;
+    }
+
     if (!(w == self->area.width && h == self->area.height)) {
-        w -= self->base_size.width;
-        h -= self->base_size.height;
+        w -= basew;
+        h -= baseh;
 
         if (user) {
             /* for interactive resizing. have to move half an increment in each
@@ -1684,9 +1701,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
             /* smaller than min size or bigger than max size? */
             if (w > self->max_size.width) w = self->max_size.width;
-            if (w < self->min_size.width) w = self->min_size.width;
+            if (w < minw) w = minw;
             if (h > self->max_size.height) h = self->max_size.height;
-            if (h < self->min_size.height) h = self->min_size.height;
+            if (h < minh) h = minh;
 
             /* adjust the height ot match the width for the aspect ratios */
             if (self->min_ratio)
@@ -1709,8 +1726,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         w *= self->size_inc.width;
         h *= self->size_inc.height;
 
-        w += self->base_size.width;
-        h += self->base_size.height;
+        w += basew;
+        h += baseh;
     }
 
     switch (anchor) {

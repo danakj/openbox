@@ -1730,19 +1730,20 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     if (old == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
             focus_order[i] = g_list_remove(focus_order[i], self);
+    } else
+        focus_order[old] = g_list_remove(focus_order[old], self);
+    if (target == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i) {
+            if (focus_new.bool)
+                focus_order[i] = g_list_prepend(focus_order[i], self);
+            else
+                focus_order[i] = g_list_append(focus_order[i], self);
+        }
+    } else {
         if (focus_new.bool)
             focus_order[target] = g_list_prepend(focus_order[target], self);
         else
             focus_order[target] = g_list_append(focus_order[target], self);
-    } else {
-        focus_order[old] = g_list_remove(focus_order[old], self);
-        if (target == DESKTOP_ALL)
-            for (i = 0; i < screen_num_desktops; ++i) {
-                if (focus_new.bool)
-                    focus_order[i] = g_list_prepend(focus_order[i], self);
-                else
-                    focus_order[i] = g_list_append(focus_order[i], self);
-            }
     }
 
     dispatch_client(Event_Client_Desktop, self, target, old);

@@ -401,15 +401,11 @@ void client_unmanage(ObClient *self)
        influence */
     screen_update_areas();
 
-    if (focus_client == self) {
-        XEvent e;
-
-        /* focus the last focused window on the desktop, and ignore enter
-           events from the unmap so it doesnt mess with the focus */
-        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-        client_unfocus(self);
+    for (it = client_destructors; it; it = g_slist_next(it)) {
+        GDestroyNotify func = (GDestroyNotify) it->data;
+        func(self);
     }
-
+        
     /* tell our parent(s) that we're gone */
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
         GSList *it;
@@ -419,8 +415,8 @@ void client_unmanage(ObClient *self)
                 ((ObClient*)it->data)->transients =
                     g_slist_remove(((ObClient*)it->data)->transients, self);
     } else if (self->transient_for) {        /* transient of window */
-	self->transient_for->transients =
-	    g_slist_remove(self->transient_for->transients, self);
+        self->transient_for->transients =
+            g_slist_remove(self->transient_for->transients, self);
     }
 
     /* tell our transients that we're gone */
@@ -431,15 +427,19 @@ void client_unmanage(ObClient *self)
         }
     }
 
-    for (it = client_destructors; it; it = g_slist_next(it)) {
-        GDestroyNotify func = (GDestroyNotify) it->data;
-        func(self);
-    }
-        
     /* remove from its group */
     if (self->group) {
         group_remove(self->group, self);
         self->group = NULL;
+    }
+
+    if (focus_client == self) {
+        XEvent e;
+
+        /* focus the last focused window on the desktop, and ignore enter
+           events from the unmap so it doesnt mess with the focus */
+        while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+        client_unfocus(self);
     }
 
     /* give the client its border back */

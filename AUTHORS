@@ -1,15 +1,12 @@
 Openbox authors/contributors:
 
-Project Maintainer:
-	Ben Jansens (ben@orodu.net)
-
-Developers:
-	Ben Jansens (ben@orodu.net)
-	Derek Foreman (derek@signalmarketing.com)
-	Scott Moynes (smoynes@nexus.carleton.ca)
-
-Contributors:
-	Marius Nita (marius@cs.pdx.edu)
-	- Otk prototype code, design ideas.
-	Mike Bacso (smakwel@yahoo.com)
-	- Themes
+Ben Jansens (ben@openbox.org)
+ - Lead Developer
+Derek Foreman (manmower@openbox.org)
+ - Rendering code
+Scott Moynes (smoynes@openbox.org)
+ - Menus
+Marius Nita (marius@cs.pdx.edu)
+ - Otk prototype code, design ideas.
+Mike Bacso (smakwel@yahoo.com)
+ - Themes

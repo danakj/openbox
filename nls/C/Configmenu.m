@@ -38,6 +38,8 @@ $ #Cascade
 # Cascade Placement
 $ #UnderMouse
 # Under Mouse Placement
+$ #ClickMouse
+# Click Mouse Placement
 $ #LeftRight
 # Left to Right
 $ #RightLeft

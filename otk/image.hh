@@ -9,9 +9,9 @@ extern "C" {
 
 #include <list>
 
-#include "timer.hh"
 #include "color.hh"
 #include "screeninfo.hh"
+#include "src/timer.hh"
 
 namespace otk {
 
@@ -66,7 +66,7 @@ public:
 };
 
 
-class BImageControl : public TimeoutHandler {
+class BImageControl : public ob::TimeoutHandler {
 public:
   struct CachedImage {
     Pixmap pixmap;
@@ -116,7 +116,7 @@ public:
 private:
   bool dither;
   const ScreenInfo *screeninfo;
-  BTimer *timer;
+  ob::BTimer *timer;
 
   Colormap colormap;
 

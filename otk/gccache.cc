@@ -10,7 +10,7 @@ extern "C" {
 
 #include "gccache.hh"
 #include "color.hh"
-#include "util.hh"
+#include "assassin.hh"
 #include "screeninfo.hh"
 
 namespace otk {

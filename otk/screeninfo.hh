@@ -2,7 +2,7 @@
 #ifndef   __screeninfo_hh
 #define   __screeninfo_hh
 
-#include "util.hh"
+#include "rect.hh"
 
 extern "C" {
 #include <X11/Xlib.h>

@@ -1,11 +1,2 @@
 # List of source files containing translatable strings.
-otk/display.cc
-otk/font.cc
-otk/rendercontrol.cc
-otk/truerendercontrol.cc
-otk/util.cc
-src/bindings.cc
-src/client.cc
-src/main.cc
-src/openbox.cc
-src/screen.cc
+kernel/openbox.c

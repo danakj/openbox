@@ -1960,8 +1960,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                                     (resized && config_redraw_resize))));
 
     /* if the client is enlarging, the resize the client before the frame */
-    if (send_resize_client && (w > oldw || h > oldh))
-	XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
+    if (!user || (send_resize_client && (w > oldw || h > oldh)))
+        XResizeWindow(ob_display, self->window, MAX(w, oldw), MAX(h, oldh));
 
     /* move/resize the frame to match the request */
     if (self->frame) {
@@ -1991,12 +1991,12 @@ void client_configure_full(ObClient *self, ObCorner anchor,
             event.xconfigure.override_redirect = FALSE;
             XSendEvent(event.xconfigure.display, event.xconfigure.window,
                        FALSE, StructureNotifyMask, &event);
-	}
+        }
     }
 
     /* if the client is shrinking, then resize the frame before the client */
-    if (send_resize_client && (w <= oldw || h <= oldh))
-	XResizeWindow(ob_display, self->window, w, h);
+    if (user && (send_resize_client && (w <= oldw || h <= oldh)))
+        XResizeWindow(ob_display, self->window, w, h);
 
     XFlush(ob_display);
 }

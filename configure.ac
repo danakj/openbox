@@ -52,8 +52,8 @@ AC_HEADER_TIME
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL
 
-dnl Look for gettext
-AM_GNU_GETTEXT
+dnl Look for gettext, using external libintl
+AM_GNU_GETTEXT([external])
 
 dnl Check whether to include debugging code
 DEBUG=""
@@ -171,7 +171,7 @@ AC_ARG_ENABLE([xinerama],
 
 dnl Output files
 AM_CONFIG_HEADER(config.h)
-AC_CONFIG_FILES([ intl/Makefile 
+AC_CONFIG_FILES([
   Makefile
   m4/Makefile 
   po/Makefile.in

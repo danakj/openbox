@@ -22,7 +22,7 @@ Do the following to build and install Openbox in CVS:
 Don't try running it from the src/ directory without installing, it won't work.
 It needs to be installed before it is run.
 
-The installed binary is 'openbox3'.
+The installed binary is 'openbox'.
 
 
 

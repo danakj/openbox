@@ -878,7 +878,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     XrmDestroyDatabase(db);
 
-    theme->label_height = theme->winfont_height;
+    {
+        gint fl, ft, fr, fb;
+        gint ul, ut, ur, ub;
+
+        RrMargins(theme->a_focused_label, &fl, &ft, &fr, &fb);
+        RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
+        theme->label_height = theme->winfont_height
+            + MAX(ft + fb, ut + ub);
+    }
     theme->title_height = theme->label_height + theme->bevel * 2;
     theme->button_size = theme->label_height - 2;
     theme->grip_width = theme->title_height * 1.5;

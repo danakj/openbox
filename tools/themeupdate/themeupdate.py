@@ -147,9 +147,9 @@ data = file.readlines()
 for i in range(len(data)):
     data[i] = data[i].strip()
 
-#simple_replace(data)
-#remove(data)
-#pressed(data)
+simple_replace(data)
+remove(data)
+pressed(data)
 fonts(data)
 
 for l in data:

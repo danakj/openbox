@@ -33,9 +33,9 @@ typedef struct _Rect {
 			    (r1).width == (r2).width && \
                             (r1).height == (r2).height)
 
-#define RECT_CONTAINS(r, x, y) \
-    ((x) >= (r).x && (x) < (r).x + (r).width && \
-     (y) >= (r).y && (y) < (r).y + (r).height)
+#define RECT_CONTAINS(r, px, py) \
+    ((px) >= (r).x && (px) < (r).x + (r).width && \
+     (py) >= (r).y && (py) < (r).y + (r).height)
 #define RECT_CONTAINS_RECT(r, o) \
     ((o).x >= (r).x && (o).x + (o).width <= (r).x + (r).width && \
      (o).y >= (r).y && (o).y + (o).height <= (r).y + (r).height)

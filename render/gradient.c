@@ -543,41 +543,41 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
     case Background_Solid: /* already handled */
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
-        glVertex3i(x+w, y, 0);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x, y);
+        glVertex2i(x+w, y);
+        glVertex2i(x+w, y+h);
 
-        glVertex3i(x+w, y+h, 0);
-        glVertex3i(x, y+h, 0);
-        glVertex3i(x, y, 0);
+        glVertex2i(x+w, y+h);
+        glVertex2i(x, y+h);
+        glVertex2i(x, y);
         glEnd();
         return;
     case Background_Horizontal:
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w, y, 0);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y);
+        glVertex2i(x+w, y+h);
 
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y+h, 0);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y+h);
+        glVertex2i(x, y);
         glEnd();
         break;
     case Background_Vertical:
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
-        glVertex3i(x+w, y, 0);
+        glVertex2i(x, y);
+        glVertex2i(x+w, y);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
 
-        glVertex3i(x+w, y+h, 0);
-        glVertex3i(x, y+h, 0);
+        glVertex2i(x+w, y+h);
+        glVertex2i(x, y+h);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glEnd();
         break;
     case Background_Diagonal:
@@ -586,18 +586,18 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
 	ab = (pb + sb) / 2.0;
         glBegin(GL_TRIANGLES);
         glColor3f(ar, ag, ab);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glColor3f(pr, pg, pb);
-        glVertex3i(x+w, y, 0);
+        glVertex2i(x+w, y);
         glColor3f(ar, ag, ab);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
 
         glColor3f(ar, ag, ab);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
         glColor3f(sr, sg, sb);
-        glVertex3i(x, y+h, 0);
+        glVertex2i(x, y+h);
         glColor3f(ar, ag, ab);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glEnd();
         break;
     case Background_CrossDiagonal:
@@ -606,51 +606,93 @@ void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
 	ab = (pb + sb) / 2.0;
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glColor3f(ar, ag, ab);
-        glVertex3i(x+w, y, 0);
+        glVertex2i(x+w, y);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
 
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
         glColor3f(ar, ag, ab);
-        glVertex3i(x, y+h, 0);
+        glVertex2i(x, y+h);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glEnd();
         break;
     case Background_Pyramid:
 printf("pyramid\n");
         break;
     case Background_PipeCross:
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glVertex2i(x, y+h/2);
+
+        glVertex2i(x, y+h/2);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y+h);
+
+        glVertex2i(x, y+h);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glVertex2i(x+w/2, y+h);
+
+        glVertex2i(x+w/2, y+h);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x+w, y+h);
+
+        glVertex2i(x+w, y+h);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glVertex2i(x+w, y+h/2);
+
+        glVertex2i(x+w, y+h/2);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x+w, y);
+
+        glVertex2i(x+w, y);
+        glColor3f(sr, sg, sb);
+        glVertex2i(x+w/2, y+h/2);
+        glVertex2i(x+w/2, y);
+
+        glVertex2i(x+w/2, y);
+        glVertex2i(x+w/2, y+h/2);
+        glColor3f(pr, pg, pb);
+        glVertex2i(x, y);
+        glEnd();
         break;
     case Background_Rectangle:
         glBegin(GL_TRIANGLES);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w/2, y+h/2, 0);
+        glVertex2i(x+w/2, y+h/2);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y+h, 0);
+        glVertex2i(x, y+h);
 
-        glVertex3i(x, y+h, 0);
+        glVertex2i(x, y+h);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w/2, y+h/2, 0);
+        glVertex2i(x+w/2, y+h/2);
         glColor3f(pr, pg, pb);
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
 
-        glVertex3i(x+w, y+h, 0);
+        glVertex2i(x+w, y+h);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w/2, y+h/2, 0);
+        glVertex2i(x+w/2, y+h/2);
         glColor3f(pr, pg, pb);
-        glVertex3i(x+w, y, 0);
+        glVertex2i(x+w, y);
 
-        glVertex3i(x+w, y, 0);
+        glVertex2i(x+w, y);
         glColor3f(sr, sg, sb);
-        glVertex3i(x+w/2, y+h/2, 0);
+        glVertex2i(x+w/2, y+h/2);
         glColor3f(pr, pg, pb);
-        glVertex3i(x, y, 0);
+        glVertex2i(x, y);
 
         glEnd();
         break;

@@ -59,6 +59,9 @@ Widget::~Widget()
   if (_visible)
     hide();
 
+  if (_surface)
+    delete _surface;
+  
   _event_dispatcher->clearHandler(_window);
 
   std::for_each(_children.begin(), _children.end(), PointerAssassin());

@@ -179,6 +179,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
     rc_file = bstrdup(rc);
   }
   config.setFile(rc_file);
+  config.load();
 
   no_focus = False;
 
@@ -209,7 +210,7 @@ Openbox::Openbox(int m_argc, char **m_argv, char *dpy_name, char *rc)
 
   screenList = new LinkedList<BScreen>;
   for (int i = 0; i < getNumberOfScreens(); i++) {
-    BScreen *screen = new BScreen(*this, i);
+    BScreen *screen = new BScreen(*this, i, config);
 
     if (! screen->isScreenManaged()) {
       delete screen;
@@ -994,33 +995,6 @@ void Openbox::save_rc(void) {
     char rc_string[1024];
     const int screen_number = screen->getScreenNumber();
 
-    char *placement = (char *) 0;
-
-    switch (screen->getSlitPlacement()) {
-    case Slit::TopLeft: placement = "TopLeft"; break;
-    case Slit::CenterLeft: placement = "CenterLeft"; break;
-    case Slit::BottomLeft: placement = "BottomLeft"; break;
-    case Slit::TopCenter: placement = "TopCenter"; break;
-    case Slit::BottomCenter: placement = "BottomCenter"; break;
-    case Slit::TopRight: placement = "TopRight"; break;
-    case Slit::BottomRight: placement = "BottomRight"; break;
-    case Slit::CenterRight: default: placement = "CenterRight"; break;
-    }
-    sprintf(rc_string, "session.screen%d.slit.placement", screen_number);
-    config.setValue(rc_string, placement);
-
-    sprintf(rc_string, "session.screen%d.slit.direction", screen_number);
-    config.setValue(rc_string,
-                    screen->getSlitDirection() == Slit::Horizontal ?
-                    "Horizontal" : "Vertical");
-
-    sprintf(rc_string, "session.screen%d.slit.onTop", screen_number);
-    config.setValue(rc_string, screen->getSlit()->isOnTop() ? "True" : "False");
-
-    sprintf(rc_string, "session.screen%d.slit.autoHide", screen_number);
-    config.setValue(rc_string, screen->getSlit()->doAutoHide() ?
-                    "True" : "False");
-
     config.setValue("session.opaqueMove",
                     (screen->doOpaqueMove()) ? "True" : "False");
     config.setValue("session.imageDither",
@@ -1045,6 +1019,7 @@ void Openbox::save_rc(void) {
                     screen->getColPlacementDirection() == BScreen::TopBottom ?
                     "TopToBottom" : "BottomToTop");
 
+    const char *placement;
     switch (screen->getPlacementPolicy()) {
     case BScreen::CascadePlacement: placement = "CascadePlacement"; break;
     case BScreen::BestFitPlacement: placement = "BestFitPlacement"; break;
@@ -1388,51 +1363,6 @@ void Openbox::load_rc(BScreen *screen) {
     screen->savePlacementPolicy(BScreen::RowSmartPlacement);
 
 #ifdef    SLIT
-  sprintf(name_lookup, "session.screen%d.slit.placement", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.Placement", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
-      screen->saveSlitPlacement(Slit::TopLeft);
-    else if (0 == strncasecmp(s.c_str(), "CenterLeft", s.length()))
-      screen->saveSlitPlacement(Slit::CenterLeft);
-    else if (0 == strncasecmp(s.c_str(), "BottomLeft", s.length()))
-      screen->saveSlitPlacement(Slit::BottomLeft);
-    else if (0 == strncasecmp(s.c_str(), "TopCenter", s.length()))
-      screen->saveSlitPlacement(Slit::TopCenter);
-    else if (0 == strncasecmp(s.c_str(), "BottomCenter", s.length()))
-      screen->saveSlitPlacement(Slit::BottomCenter);
-    else if (0 == strncasecmp(s.c_str(), "TopRight", s.length()))
-      screen->saveSlitPlacement(Slit::TopRight);
-    else if (0 == strncasecmp(s.c_str(), "BottomRight", s.length()))
-      screen->saveSlitPlacement(Slit::BottomRight);
-    else
-      screen->saveSlitPlacement(Slit::CenterRight);
-  } else
-    screen->saveSlitPlacement(Slit::CenterRight);
-
-  sprintf(name_lookup, "session.screen%d.slit.direction", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.Direction", screen_number);
-  if (config.getValue(name_lookup, class_lookup, s)) {
-    if (0 == strncasecmp(s.c_str(), "Horizontal", s.length()))
-      screen->saveSlitDirection(Slit::Horizontal);
-    else
-      screen->saveSlitDirection(Slit::Vertical);
-  } else
-    screen->saveSlitDirection(Slit::Vertical);
-  
-  sprintf(name_lookup, "session.screen%d.slit.onTop", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.OnTop", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveSlitOnTop((Bool)b);
-  else
-    screen->saveSlitOnTop(False);
-
-  sprintf(name_lookup, "session.screen%d.slit.autoHide", screen_number);
-  sprintf(class_lookup, "Session.Screen%d.Slit.AutoHide", screen_number);
-  if (config.getValue(name_lookup, class_lookup, b))
-    screen->saveSlitAutoHide((Bool)b);
-  else
-    screen->saveSlitAutoHide(False);
 #endif // SLIT
 
 #ifdef    HAVE_STRFTIME

@@ -185,7 +185,9 @@ static const char *getFontSize(const char *pattern, int *size) {
 }
 
 
-BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
+BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
+  openbox(ob), config(conf)
+{
   event_mask = ColormapChangeMask | EnterWindowMask | PropertyChangeMask |
 	       SubstructureRedirectMask | KeyPressMask | KeyReleaseMask |
 	       ButtonPressMask | ButtonReleaseMask;
@@ -419,7 +421,7 @@ BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
   toolbar = new Toolbar(*this);
 
 #ifdef    SLIT
-  slit = new Slit(*this);
+  slit = new Slit(*this, config);
 #endif // SLIT
 
   InitMenu();
@@ -1545,7 +1547,7 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
     *(session_stack + i++) = toolbar->getWindowID();
 
 #ifdef    SLIT
-  if (slit->isOnTop())
+  if (slit->onTop())
     *(session_stack + i++) = slit->getWindowID();
 #endif // SLIT
 

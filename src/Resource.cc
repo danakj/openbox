@@ -116,6 +116,7 @@ void Resource::setValue(const std::string &rname, long value) {
 
 void Resource::setValue(const std::string &rname, const char *value) {
   ASSERT(m_database != NULL);
+  ASSERT(value != NULL);
   
   std::string rc_string = rname + ": " + value;
   XrmPutLineResource(&m_database, rc_string.c_str());

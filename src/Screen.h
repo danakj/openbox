@@ -103,6 +103,7 @@ private:
   Window geom_window;
 
   Openbox &openbox;
+  Resource &config;
   BImageControl *image_control;
   Configmenu *configmenu;
   Iconmenu *iconmenu;
@@ -175,7 +176,7 @@ protected:
 
 
 public:
-  BScreen(Openbox &, int);
+  BScreen(Openbox &, int, Resource &);
   ~BScreen(void);
 
   inline const Bool &isToolbarOnTop(void) const
@@ -207,18 +208,7 @@ public:
   inline Rootmenu *getRootmenu(void) { return rootmenu; }
 
 #ifdef   SLIT
-  inline const Bool &isSlitOnTop(void) const { return resource.slit_on_top; }
-  inline const Bool &doSlitAutoHide(void) const
-  { return resource.slit_auto_hide; }
   inline Slit *getSlit(void) { return slit; }
-  inline const int &getSlitPlacement(void) const
-  { return resource.slit_placement; }
-  inline const int &getSlitDirection(void) const
-  { return resource.slit_direction; }
-  inline void saveSlitPlacement(int p) { resource.slit_placement = p; }
-  inline void saveSlitDirection(int d) { resource.slit_direction = d; }
-  inline void saveSlitOnTop(Bool t)    { resource.slit_on_top = t; }
-  inline void saveSlitAutoHide(Bool t) { resource.slit_auto_hide = t; }
 #endif // SLIT
 
   inline int getWindowZones(void) const

@@ -58,14 +58,14 @@ Popup *popup_new(gboolean hasicon)
     }
 
     RrColorSet(&pri, 1, 0, 0, 0);
-    RrColorSet(&pri, 0, 1, 0, 0);
+    RrColorSet(&sec, 0, 1, 0, 0);
     RrPlanarSet(self->s_bg, RR_PLANAR_VERTICAL, &pri, &sec);
     RrColorSet(&pri, 0, 0.5, 0, 1);
-    RrColorSet(&pri, 0.5, 0, 0.5, 1);
+    RrColorSet(&sec, 0.5, 0, 0.5, 1);
     RrPlanarSet(self->s_text, RR_PLANAR_HORIZONTAL, &pri, &sec);
     if (self->s_icon) {
         RrColorSet(&pri, 0, 0, 1, 1);
-        RrColorSet(&pri, 0.5, 0.5, 0, 1);
+        RrColorSet(&sec, 0.5, 0.5, 0, 1);
         RrPlanarSet(self->s_icon, RR_PLANAR_HORIZONTAL, &pri, &sec);
     }
 

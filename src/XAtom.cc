@@ -304,7 +304,7 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(False); // unhandled StringType
+  default: assert(False); return; // unhandled StringType
   }
   setValue(win, _atoms[atom], t,
            reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
@@ -454,7 +454,7 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
   switch (type) {
   case ansi: t = _atoms[string]; break;
   case utf8: t = _atoms[utf8_string]; break;
-  default: assert(False); return; // unhandled StringType
+  default: assert(False); return False; // unhandled StringType
   }
   
   unsigned char *value;

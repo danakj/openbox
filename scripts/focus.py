@@ -71,11 +71,11 @@ def focus_next(data, num=1, forward=1):
                 screen.raiseWindow(client)
             return
         if forward:
-            t += 1
-            if t == count: t = 0
+            t += num
+            if t >= count: t -= count
         else:
             t -= 1
-            if t < 0: t = count - 1
+            if t < 0: t += count
         if t == target: return # nothing to focus
 
 def focus_prev(data, num=1):

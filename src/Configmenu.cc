@@ -162,7 +162,9 @@ void Configmenu::reconfigure(void) {
   setValues();
   focusmenu->reconfigure();
   placementmenu->reconfigure();
+#ifdef    XINERAMA
   xineramamenu->reconfigure();
+#endif // XINERAMA
 
   Basemenu::reconfigure();
 }

@@ -6,6 +6,8 @@ $ #FocusModel
 # Focus Model
 $ #WindowPlacement
 # Window Placement
+$ #XineramaSupport
+# Xinerama Support
 $ #ImageDithering
 # Image Dithering
 $ #OpaqueMove
@@ -54,3 +56,9 @@ $ #IgnoreShaded
 # Ignore Shaded Windows
 $ #IgnoreMax
 # Ignore Full-Maximized Windows
+$ #XineramaPlacement
+# Window Placement
+$ #XineramaMaximizing
+# Window Maximizing
+$ #XineramaSnapping
+# Window Snapping

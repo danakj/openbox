@@ -338,8 +338,6 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
-  timerList = new LinkedList<BTimer>;
-
   screenInfoList.reserve(ScreenCount(display));
   for (int i = 0; i < number_of_screens; i++)
     screenInfoList.push_back(new ScreenInfo(*this, i));
@@ -392,12 +390,7 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 BaseDisplay::~BaseDisplay(void) {
   std::for_each(screenInfoList.begin(), screenInfoList.end(),
                 PointerAssassin());
-
   // we don't create the BTimers, we don't delete them
-  while (timerList->count())
-    timerList->remove(0);
-
-  delete timerList;
   
   if (application_name != NULL)
     delete [] application_name;
@@ -434,12 +427,13 @@ void BaseDisplay::eventLoop(void) {
       FD_ZERO(&rfds);
       FD_SET(xfd, &rfds);
 
-      if (timerList->count()) {
+      if (!timerList.empty()) {
         gettimeofday(&now, 0);
 
         tm.tv_sec = tm.tv_usec = 0l;
 
-        BTimer *timer = timerList->first();
+        BTimer *timer = timerList.front();
+        ASSERT(timer != NULL);
 
         tm.tv_sec = timer->getStartTime().tv_sec +
           timer->getTimeout().tv_sec - now.tv_sec;
@@ -469,8 +463,11 @@ void BaseDisplay::eventLoop(void) {
       // check for timer timeout
       gettimeofday(&now, 0);
 
-      LinkedListIterator<BTimer> it(timerList);
-      for(BTimer *timer = it.current(); timer; it++, timer = it.current()) {
+      TimerList::iterator it;
+      for (it = timerList.begin(); it != timerList.end(); ) {
+        BTimer *timer = *it;
+        ++it;   // the timer may be removed from the list, so move ahead now
+        ASSERT(timer != NULL);
         tm.tv_sec = timer->getStartTime().tv_sec +
           timer->getTimeout().tv_sec;
         tm.tv_usec = timer->getStartTime().tv_usec +
@@ -483,8 +480,12 @@ void BaseDisplay::eventLoop(void) {
         timer->fireTimeout();
 
         // restart the current timer so that the start time is updated
-        if (! timer->doOnce()) timer->start();
-        else timer->stop();
+        if (! timer->doOnce())
+          timer->start();
+        else {
+          timer->stop();
+//          delete timer; // USE THIS?
+        }
       }
     }
   }
@@ -518,22 +519,25 @@ void BaseDisplay::ungrab(void) {
 
 
 void BaseDisplay::addTimer(BTimer *timer) {
-  if (! timer) return;
+  ASSERT(timer != (BTimer *) 0);
+  printf("ADDING TIMER\n");
 
-  LinkedListIterator<BTimer> it(timerList);
-  int index = 0;
-  for (BTimer *tmp = it.current(); tmp; it++, index++, tmp = it.current())
+  TimerList::iterator it;
+  for (it = timerList.begin(); it != timerList.end(); ++it) {
+    BTimer *tmp = *it;
     if ((tmp->getTimeout().tv_sec > timer->getTimeout().tv_sec) ||
         ((tmp->getTimeout().tv_sec == timer->getTimeout().tv_sec) &&
          (tmp->getTimeout().tv_usec >= timer->getTimeout().tv_usec)))
       break;
+  }
 
-  timerList->insert(timer, index);
+  timerList.insert(it, timer);
 }
 
 
 void BaseDisplay::removeTimer(BTimer *timer) {
-  timerList->remove(timer);
+  printf("REMOVING TIMER\n");
+  timerList.remove(timer);
 }
 
 

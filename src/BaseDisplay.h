@@ -30,11 +30,11 @@
 class BaseDisplay;
 class ScreenInfo;
 
-#include "LinkedList.h"
 #include "Timer.h"
 #include "Geometry.h"
 #include "Util.h"
 #include <vector>
+#include <list>
 
 #define AttribShaded      (1l << 0)
 #define AttribMaxHoriz    (1l << 1)
@@ -133,7 +133,8 @@ private:
   typedef std::vector<ScreenInfo*> ScreenInfoList;
   ScreenInfoList screenInfoList;
  
-  LinkedList<BTimer> *timerList;
+  typedef std::list<BTimer*> TimerList;
+  TimerList timerList;
 
   char *display_name, *application_name;
   int number_of_screens, server_grabs, colors_per_channel;

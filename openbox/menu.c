@@ -320,7 +320,7 @@ void menu_hide(ObMenu *self) {
         XUnmapWindow(ob_display, self->frame);
         self->shown = FALSE;
 	if (self->open_submenu)
-	    menu_hide(self->open_submenu);
+	    self->open_submenu->hide(self->open_submenu);
 	if (self->parent && self->parent->open_submenu == self) {
 	    self->parent->open_submenu = NULL;
         }
@@ -392,7 +392,7 @@ void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
 {
     ObMenu *m;
 
-    if (button != 1) return;
+    if (button > 3) return;
 
     if (self->action) {
         self->action->data.any.c = self->parent->client;
@@ -401,7 +401,7 @@ void menu_entry_fire(ObMenuEntry *self, unsigned int button, unsigned int x,
         /* hide the whole thing */
         m = self->parent;
         while (m->parent) m = m->parent;
-        menu_hide(m);
+        m->hide(m);
     }
 }
 
@@ -434,7 +434,7 @@ void menu_control_show(ObMenu *self, int x, int y, ObClient *client)
         stacking_raise(MENU_AS_WINDOW(self));
 	self->shown = TRUE;
     } else if (self->shown && self->open_submenu) {
-	menu_hide(self->open_submenu);
+	self->open_submenu->hide(self->open_submenu);
     }
 }
 
@@ -454,7 +454,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
             e = (ObMenuEntry *) self->parent->over->data;
             e->hilite = FALSE;
             menu_entry_render(e);
-	    menu_hide(self->parent->open_submenu);
+	    self->parent->open_submenu->hide(self->parent->open_submenu);
         }
 	
 	if (self->submenu && self->parent->open_submenu != self->submenu) {
@@ -505,6 +505,9 @@ void menu_control_keyboard_nav(unsigned int key)
         obkey = OB_KEY_RIGHT;
     else if (key == ob_keycode(OB_KEY_LEFT)) /* users */
         obkey = OB_KEY_LEFT;
+    else if (key == ob_keycode(OB_KEY_RETURN))
+        obkey = OB_KEY_RETURN;
+
     
     if (current_menu == NULL)
         current_menu = menu_visible->data;
@@ -544,6 +547,7 @@ void menu_control_keyboard_nav(unsigned int key)
             return;
         e = (ObMenuEntry *)current_menu->over->data;
         if (e->submenu) {
+            current_menu->mouseover(e, TRUE);
             current_menu = e->submenu;
             current_menu->over = current_menu->entries;
             if (current_menu->over)
@@ -561,15 +565,15 @@ void menu_control_keyboard_nav(unsigned int key)
         current_menu->over = NULL;
         /* zero is enter */
         menu_entry_fire(e, 0, 0, 0);
-
     }
+        
     case OB_KEY_LEFT: {
         if (current_menu->over != NULL) {
             current_menu->mouseover(current_menu->over->data, FALSE);
             current_menu->over = NULL;
         }
         
-        menu_hide(current_menu);
+        current_menu->hide(current_menu);
 
         if (current_menu->parent)
             current_menu = current_menu->parent;
@@ -578,7 +582,7 @@ void menu_control_keyboard_nav(unsigned int key)
     }
     default:
         if (current_menu)
-            menu_hide(current_menu);
+            current_menu->hide(current_menu);
     }
     return;
 }

@@ -29,4 +29,27 @@ class Action {
  int param;
  Action next;
 }
-	
+
+option <name> <value>;
+
+action [name] <key> <type> <parameter>;
+
+chain [name] <key> {
+	<action name>,
+	<action name>,
+	...
+	}
+
+eg:
+ action emacs C-e exec emacs;
+ action C-a exec aterm -fn smoothansi;
+ action xmms C-x exec xmms;
+
+chain M-q {
+	emacs,
+	xmms
+	}
+
+Would produce M-q C-e -> emacs, M-q C-x -> xmms, C-a -> aterm.
+
+

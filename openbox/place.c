@@ -324,9 +324,9 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     b = area->y + area->height - client->frame->area.height;
 
     *x = px - client->area.width / 2 - client->frame->size.left;
-    *x = MIN(MAX(*x, l), r);
+//    *x = MIN(MAX(*x, l), r);
     *y = py - client->area.height / 2 - client->frame->size.top;
-    *y = MIN(MAX(*y, t), b);
+//    *y = MIN(MAX(*y, t), b);
 
     return TRUE;
 }
@@ -375,8 +375,9 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
 
 void place_client(ObClient *client, gint *x, gint *y)
 {
+    gint rude = 1;
     if (client->positioned)
-        return;
+        rude = 0;
     if (place_transient(client, x, y)             ||
         ((config_place_policy == OB_PLACE_POLICY_MOUSE) ?
          place_under_mouse(client, x, y) :

@@ -2906,15 +2906,25 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 guint client_monitor(ObClient *self)
 {
     guint i;
+    guint most = 0;
+    guint mostv = 0;
 
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *area = screen_physical_area_monitor(i);
-        if (RECT_INTERSECTS_RECT(*area, self->frame->area))
-            break;
+        if (RECT_INTERSECTS_RECT(*area, self->frame->area)) {
+            Rect r;
+            guint v;
+
+            RECT_SET_INTERSECTION(r, *area, self->frame->area);
+            v = r.width * r.height;
+
+            if (v > mostv) {
+                mostv = v;
+                most = i;
+            }
+        }
     }
-    if (i == screen_num_monitors) i = 0;
-    g_assert(i < screen_num_monitors);
-    return i;
+    return most;
 }
 
 ObClient *client_search_top_transient(ObClient *self)

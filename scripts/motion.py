@@ -97,8 +97,8 @@ def _do_move():
     global _screen, _client, _cx, _cy, _dx, _dy
 
     # get destination x/y for the *frame*
-    x = _cx + _dx + _client.frame.rect().x() - _client.area().x()
-    y = _cy + _dy + _client.frame.rect().y() - _client.area().y()
+    x = _cx + _dx + _client.frame.area().x() - _client.area().x()
+    y = _cy + _dy + _client.frame.area().y() - _client.area().y()
 
     global _last_x, _last_y
     if EDGE_RESISTANCE:
@@ -140,25 +140,17 @@ def _do_move():
 
     if MOVE_POPUP:
         global _popwidget, _poplabel
-        style = ob.openbox.screen(_screen).style()
-        font = style.labelFont()
         text = "X: " + str(x) + " Y: " + str(y)
-        length = font.measureString(text)
         if not _popwidget:
-            _popwidget = otk.Widget(ob.openbox, style,
-                                    otk.Widget.Horizontal, 0,
-                                    style.bevelWidth(), 1)
-            _popwidget.setTexture(style.titlebarFocusBackground())
-            _poplabel = otk.FocusLabel(_popwidget)
-            _poplabel.focus()
-        _poplabel.fitString(text)
+            _popwidget = otk.Widget(_screen, ob.openbox, 
+                                    otk.Widget.Horizontal, 0, 1)
+            _poplabel = otk.Label(_popwidget)
         _poplabel.setText(text)
-        _popwidget.update() 
-        area = otk.display.screenInfo(_screen).rect()
-        _popwidget.move(area.x() + (area.width() -
-                                    _popwidget.width()) / 2,
-                        area.y() + (area.height() -
-                                    _popwidget.height()) / 2)
+        scsize = otk.display.screenInfo(_screen).size()
+        size = _poplabel.minSize()
+        _popwidget.resize(_poplabel.minSize())
+        _popwidget.move(otk.Point((scsize.width() - size.width()) / 2,
+                                  (scsize.height() - size.height()) / 2))
         _popwidget.show(1)
 
 def _move(data):
@@ -221,6 +213,8 @@ def _do_resize():
 
     w = _cw + dx
     h = _ch + dy
+    if w < 0: w = 0
+    if h < 0: h = 0
 
     if RESIZE_RUBBERBAND:
         # draw the outline ...
@@ -230,24 +224,18 @@ def _do_resize():
 
     if RESIZE_POPUP:
         global _popwidget, _poplabel
-        style = ob.openbox.screen(_screen).style()
         ls = _client.logicalSize()
-        text = "W: " + str(ls.x()) + " H: " + str(ls.y())
+        text = "W: " + str(ls.width()) + " H: " + str(ls.height())
         if not _popwidget:
-            _popwidget = otk.Widget(ob.openbox, style,
-                                    otk.Widget.Horizontal, 0,
-                                    style.bevelWidth(), 1)
-            _popwidget.setTexture(style.titlebarFocusBackground())
-            _poplabel = otk.FocusLabel(_popwidget)
-            _poplabel.focus()
-        _poplabel.fitString(text)
+            _popwidget = otk.Widget(_screen, ob.openbox, 
+                                    otk.Widget.Horizontal, 0, 1)
+            _poplabel = otk.Label(_popwidget)
         _poplabel.setText(text)
-        area = otk.display.screenInfo(_screen).rect()
-        _popwidget.update() 
-        _popwidget.move(area.x() + (area.width() -
-                                    _popwidget.width()) / 2,
-                        area.y() + (area.height() -
-                                    _popwidget.height()) / 2)
+        scsize = otk.display.screenInfo(_screen).size()
+        size = _poplabel.minSize()
+        _popwidget.resize(_poplabel.minSize())
+        _popwidget.move(otk.Point((scsize.width() - size.width()) / 2,
+                                  (scsize.height() - size.height()) / 2))
         _popwidget.show(1)
 
 def _resize(data):

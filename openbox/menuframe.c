@@ -571,7 +571,9 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
 
 void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
 {
-    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+        self->entry->data.normal.enabled)
+    {
         /* grab all this shizzle, cuz when the menu gets hidden, 'self'
            gets freed */
         ObMenuEntry *entry = self->entry;

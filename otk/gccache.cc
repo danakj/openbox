@@ -19,7 +19,7 @@ namespace otk {
 
 GCCacheContext::~GCCacheContext(void) {
   if (gc)
-    XFreeGC(Display::display, gc);
+    XFreeGC(**display, gc);
 }
 
 
@@ -44,7 +44,7 @@ void GCCacheContext::set(const Color &_color,
     fontid = 0;
   }
 
-  XChangeGC(Display::display, gc, mask, &gcv);
+  XChangeGC(**display, gc, mask, &gcv);
 }
 
 
@@ -56,7 +56,7 @@ void GCCacheContext::set(const XFontStruct * const _font) {
 
   XGCValues gcv;
   fontid = gcv.font = _font->fid;
-  XChangeGC(Display::display, gc, GCFont, &gcv);
+  XChangeGC(**display, gc, GCFont, &gcv);
 }
 
 
@@ -86,7 +86,7 @@ GCCache::~GCCache(void) {
 
 
 GCCacheContext *GCCache::nextContext(unsigned int scr) {
-  Window hd = Display::screenInfo(scr)->rootWindow();
+  Window hd = display->screenInfo(scr)->rootWindow();
 
   GCCacheContext *c;
 
@@ -94,7 +94,7 @@ GCCacheContext *GCCache::nextContext(unsigned int scr) {
     c = contexts[i];
 
     if (! c->gc) {
-      c->gc = XCreateGC(Display::display, hd, 0, 0);
+      c->gc = XCreateGC(**display, hd, 0, 0);
       c->used = false;
       c->screen = scr;
     }

@@ -62,8 +62,7 @@ Pixmap Image::render(const Texture &texture) {
 
 
 Pixmap Image::render_solid(const Texture &texture) {
-  Pixmap pixmap = XCreatePixmap(Display::display,
-				control->getDrawable(), width,
+  Pixmap pixmap = XCreatePixmap(**display, control->getDrawable(), width,
 				height, control->getDepth());
   if (pixmap == None) {
     fprintf(stderr, "Image::render_solid: error creating pixmap\n");
@@ -74,64 +73,64 @@ Pixmap Image::render_solid(const Texture &texture) {
   Pen penlight(texture.lightColor());
   Pen penshadow(texture.shadowColor());
 
-  XFillRectangle(Display::display, pixmap, pen.gc(), 0, 0, width, height);
+  XFillRectangle(**display, pixmap, pen.gc(), 0, 0, width, height);
 
   if (texture.texture() & Texture::Interlaced) {
     Pen peninterlace(texture.colorTo());
     for (unsigned int i = 0; i < height; i += 2)
-      XDrawLine(Display::display, pixmap, peninterlace.gc(), 0, i, width, i);
+      XDrawLine(**display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
   int left = 0, top = 0, right = width - 1, bottom = height - 1;
 
   if (texture.texture() & Texture::Border) {
     Pen penborder(texture.borderColor());
-    XDrawRectangle(Display::display, pixmap, penborder.gc(),
+    XDrawRectangle(**display, pixmap, penborder.gc(),
                    left, top, right, bottom);
   }
 
   if (texture.texture() & Texture::Bevel1) {
     if (texture.texture() & Texture::Raised) {
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left, top, right, top);
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left, bottom, left, top);
     } else if (texture.texture() & Texture::Sunken) {
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left, top, right, top);
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left, bottom, left, top);
     }
   } else if (texture.texture() & Texture::Bevel2) {
     if (texture.texture() & Texture::Raised) {
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
     } else if (texture.texture() & Texture::Sunken) {
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(Display::display, pixmap, penlight.gc(),
+      XDrawLine(**display, pixmap, penlight.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(Display::display, pixmap, penshadow.gc(),
+      XDrawLine(**display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
     }
   }
@@ -425,9 +424,8 @@ void Image::PseudoColorDither(int bytes_per_line, unsigned char *pixel_data) {
 
 XImage *Image::renderXImage(void) {
   XImage *image =
-    XCreateImage(Display::display,
-                 control->getVisual(), control->getDepth(), ZPixmap, 0, 0,
-                 width, height, 32, 0);
+    XCreateImage(**display, control->getVisual(), control->getDepth(),
+                 ZPixmap, 0, 0,width, height, 32, 0);
 
   if (! image) {
     fprintf(stderr, "Image::renderXImage: error creating XImage\n");
@@ -539,8 +537,8 @@ XImage *Image::renderXImage(void) {
 
 Pixmap Image::renderPixmap(void) {
   Pixmap pixmap =
-    XCreatePixmap(Display::display,
-                  control->getDrawable(), width, height, control->getDepth());
+    XCreatePixmap(**display, control->getDrawable(), width, height,
+                  control->getDepth());
 
   if (pixmap == None) {
     fprintf(stderr, "Image::renderPixmap: error creating pixmap\n");
@@ -550,19 +548,18 @@ Pixmap Image::renderPixmap(void) {
   XImage *image = renderXImage();
 
   if (! image) {
-    XFreePixmap(Display::display, pixmap);
+    XFreePixmap(**display, pixmap);
     return None;
   }
 
   if (! image->data) {
     XDestroyImage(image);
-    XFreePixmap(Display::display, pixmap);
+    XFreePixmap(**display, pixmap);
     return None;
   }
 
-  XPutImage(Display::display, pixmap,
-	    DefaultGC(Display::display,
-		      control->getScreenInfo()->screen()),
+  XPutImage(**display, pixmap,
+            DefaultGC(**display, control->getScreenInfo()->screen()),
             image, 0, 0, 0, 0, width, height);
 
   if (image->data) {

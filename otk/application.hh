@@ -32,6 +32,7 @@ public:
 private:
   void loadStyle(void);
 
+  Display _display;
   TimerQueueManager *_timer_manager;
   ImageControl *_img_ctrl;
   Configuration *_style_conf;

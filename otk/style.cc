@@ -28,13 +28,13 @@ Style::~Style() {
     delete font;
 
   if (close_button.mask != None)
-    XFreePixmap(Display::display, close_button.mask);
+    XFreePixmap(**display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(Display::display, max_button.mask);
+    XFreePixmap(**display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(Display::display, icon_button.mask);
+    XFreePixmap(**display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(Display::display, stick_button.mask);
+    XFreePixmap(**display, stick_button.mask);
 
   max_button.mask = None;
   close_button.mask = None;
@@ -83,13 +83,13 @@ void Style::load(const Configuration &style) {
   }
 
   if (close_button.mask != None)
-    XFreePixmap(Display::display, close_button.mask);
+    XFreePixmap(**display, close_button.mask);
   if (max_button.mask != None)
-    XFreePixmap(Display::display, max_button.mask);
+    XFreePixmap(**display, max_button.mask);
   if (icon_button.mask != None)
-    XFreePixmap(Display::display, icon_button.mask);
+    XFreePixmap(**display, icon_button.mask);
   if (stick_button.mask != None)
-    XFreePixmap(Display::display, stick_button.mask);
+    XFreePixmap(**display, stick_button.mask);
 
   close_button.mask = max_button.mask = icon_button.mask
                     = icon_button.mask = None;
@@ -143,7 +143,7 @@ void Style::load(const Configuration &style) {
 
   // load bevel, border and handle widths
 
-  const ScreenInfo *s_info = Display::screenInfo(screen_number);
+  const ScreenInfo *s_info = display->screenInfo(screen_number);
   unsigned int width = s_info->rect().width();
 
   if (! style.getValue("handleWidth", handle_width) ||
@@ -168,7 +168,7 @@ void Style::load(const Configuration &style) {
 
 void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
                              const Configuration &style) {
-  Window root_window = Display::screenInfo(screen_number)->rootWindow();
+  Window root_window = display->screenInfo(screen_number)->rootWindow();
   std::string s;
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.
@@ -176,17 +176,17 @@ void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
   if (style.getValue(rname, s)) {
     if (s[0] != '/' && s[0] != '~') {
       std::string xbmFile = std::string("~/.openbox/buttons/") + s;
-      ret = XReadBitmapFile(Display::display, root_window,
+      ret = XReadBitmapFile(**display, root_window,
                             expandTilde(xbmFile).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
       if (ret != BitmapSuccess) {
         xbmFile = std::string(BUTTONSDIR) + "/" + s;
-        ret = XReadBitmapFile(Display::display, root_window,
+        ret = XReadBitmapFile(**display, root_window,
                               xbmFile.c_str(), &pixmapMask.w,
                               &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
       }
     } else
-      ret = XReadBitmapFile(Display::display, root_window,
+      ret = XReadBitmapFile(**display, root_window,
                             expandTilde(s).c_str(), &pixmapMask.w,
                             &pixmapMask.h, &pixmapMask.mask, &hx, &hy);
     

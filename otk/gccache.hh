@@ -93,7 +93,7 @@ public:
               int _linewidth = 0, int _function = GXcopy,
               int _subwindow = ClipByChildren)
     : color(_color), font(_font), linewidth(_linewidth), function(_function),
-      subwindow(_subwindow), cache(Display::gcCache()), item(0) { }
+      subwindow(_subwindow), cache(display->gcCache()), item(0) { }
 
   inline ~Pen(void) { if (item) cache->release(item); }
 

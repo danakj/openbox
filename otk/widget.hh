@@ -83,13 +83,13 @@ public:
   inline const Color *borderColor(void) const { return _bcolor; }
   virtual void setBorderColor(const Color *color) {
     assert(color); _bcolor = color;
-    XSetWindowBorder(Display::display, _window, color->pixel());
+    XSetWindowBorder(**display, _window, color->pixel());
   }
 
   inline int borderWidth(void) const { return _bwidth; }
   void setBorderWidth(int width) {
     _bwidth = width;
-    XSetWindowBorderWidth(Display::display, _window, width);
+    XSetWindowBorderWidth(**display, _window, width);
   }
 
   virtual void addChild(Widget *child, bool front = false);
@@ -104,7 +104,7 @@ public:
   inline Cursor cursor(void) const { return _cursor; }
   void setCursor(Cursor cursor) {
     _cursor = cursor;
-    XDefineCursor(Display::display, _window, _cursor);
+    XDefineCursor(**display, _window, _cursor);
   }
 
   inline int bevelWidth(void) const { return _bevel_width; }

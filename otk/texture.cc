@@ -164,7 +164,7 @@ Pixmap Texture::render(const unsigned int width, const unsigned int height,
     return ParentRelative;
 
   if (screen() == ~(0u))
-    scrn = DefaultScreen(Display::display);
+    scrn = DefaultScreen(**display);
 
   assert(ctrl != 0);
   Pixmap ret = ctrl->renderImage(width, height, *this);

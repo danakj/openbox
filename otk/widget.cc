@@ -65,12 +65,12 @@ Widget::~Widget()
   if (_parent)
     _parent->removeChild(this);
 
-  XDestroyWindow(Display::display, _window);
+  XDestroyWindow(**display, _window);
 }
 
 void Widget::create(bool override_redirect)
 {
-  const ScreenInfo *scr_info = Display::screenInfo(_screen);
+  const ScreenInfo *scr_info = display->screenInfo(_screen);
   Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
 
   _rect.setRect(0, 0, 1, 1); // just some initial values
@@ -93,7 +93,7 @@ void Widget::create(bool override_redirect)
     attrib_create.cursor = _cursor;
   }
 
-  _window = XCreateWindow(Display::display, p_window, _rect.x(),
+  _window = XCreateWindow(**display, p_window, _rect.x(),
                           _rect.y(), _rect.width(), _rect.height(), 0,
                           scr_info->depth(), InputOutput,
                           scr_info->visual(), create_mask, &attrib_create);
@@ -122,7 +122,7 @@ void Widget::move(const Point &to)
 void Widget::move(int x, int y)
 {
   _rect.setPos(x, y);
-  XMoveWindow(Display::display, _window, x, y);
+  XMoveWindow(**display, _window, x, y);
   _ignore_config++;
 }
 
@@ -153,7 +153,7 @@ void Widget::setGeometry(int x, int y, int width, int height)
   _rect = Rect(x, y, width, height);
   _dirty = true;
 
-  XMoveResizeWindow(Display::display, _window, x, y, width, height);
+  XMoveResizeWindow(**display, _window, x, y, width, height);
   _ignore_config++;
 }
 
@@ -172,7 +172,7 @@ void Widget::show(bool recursive)
       (*it)->show();
   }
 
-  XMapWindow(Display::display, _window);
+  XMapWindow(**display, _window);
   _visible = true;
 }
 
@@ -187,7 +187,7 @@ void Widget::hide(bool recursive)
       (*it)->hide();
   }
   
-  XUnmapWindow(Display::display, _window);
+  XUnmapWindow(**display, _window);
   _visible = false;
 }
 
@@ -213,7 +213,7 @@ void Widget::unfocus(void)
 
 bool Widget::grabMouse(void)
 {
-  Status ret = XGrabPointer(Display::display, _window, True,
+  Status ret = XGrabPointer(**display, _window, True,
                             (ButtonPressMask | ButtonReleaseMask |
                              ButtonMotionMask | EnterWindowMask |
                              LeaveWindowMask | PointerMotionMask),
@@ -228,13 +228,13 @@ void Widget::ungrabMouse(void)
   if (! _grabbed_mouse)
     return;
 
-  XUngrabPointer(Display::display, CurrentTime);
+  XUngrabPointer(**display, CurrentTime);
   _grabbed_mouse = false;
 }
 
 bool Widget::grabKeyboard(void)
 {
-  Status ret = XGrabKeyboard(Display::display, _window, True,
+  Status ret = XGrabKeyboard(**display, _window, True,
                              GrabModeSync, GrabModeAsync, CurrentTime);
   _grabbed_keyboard = (ret == GrabSuccess);
   return _grabbed_keyboard;
@@ -246,7 +246,7 @@ void Widget::ungrabKeyboard(void)
   if (! _grabbed_keyboard)
     return;
 
-  XUngrabKeyboard(Display::display, CurrentTime);
+  XUngrabKeyboard(**display, CurrentTime);
   _grabbed_keyboard = false;
 }
 
@@ -257,13 +257,13 @@ void Widget::render(void)
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
   if (_bg_pixmap) {
-    XSetWindowBackgroundPixmap(Display::display, _window, _bg_pixmap);
+    XSetWindowBackgroundPixmap(**display, _window, _bg_pixmap);
     _bg_pixel = None;
   } else {
     unsigned int pix = _texture->color().pixel();
     if (pix != _bg_pixel) {
       _bg_pixel = pix;
-      XSetWindowBackground(Display::display, _window, pix);
+      XSetWindowBackground(**display, _window, pix);
     }
   }
 }
@@ -395,7 +395,7 @@ void Widget::update(void)
   if (_dirty) {
     adjust();
     render();
-    XClearWindow(Display::display, _window);
+    XClearWindow(**display, _window);
   }
 
   WidgetList::iterator it = _children.begin(), end = _children.end();

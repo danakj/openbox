@@ -74,8 +74,8 @@ void Color::parseColorName(void) {
   }
 
   if (scrn == ~(0u))
-    scrn = DefaultScreen(Display::display);
-  Colormap colormap = Display::screenInfo(scrn)->colormap();
+    scrn = DefaultScreen(**display);
+  Colormap colormap = display->screenInfo(scrn)->colormap();
 
   // get rgb values from colorname
   XColor xcol;
@@ -84,7 +84,7 @@ void Color::parseColorName(void) {
   xcol.blue = 0;
   xcol.pixel = 0;
 
-  if (! XParseColor(Display::display, colormap,
+  if (! XParseColor(**display, colormap,
                     colorname.c_str(), &xcol)) {
     fprintf(stderr, "Color::allocate: color parse error: \"%s\"\n",
             colorname.c_str());
@@ -97,8 +97,8 @@ void Color::parseColorName(void) {
 
 
 void Color::allocate(void) {
-  if (scrn == ~(0u)) scrn = DefaultScreen(Display::display);
-  Colormap colormap = Display::screenInfo(scrn)->colormap();
+  if (scrn == ~(0u)) scrn = DefaultScreen(**display);
+  Colormap colormap = display->screenInfo(scrn)->colormap();
 
   if (! isValid()) {
     if (colorname.empty()) {
@@ -127,7 +127,7 @@ void Color::allocate(void) {
   xcol.blue =  b | b << 8;
   xcol.pixel = 0;
 
-  if (! XAllocColor(Display::display, colormap, &xcol)) {
+  if (! XAllocColor(**display, colormap, &xcol)) {
     fprintf(stderr, "Color::allocate: color alloc error: rgb:%x/%x/%x\n",
             r, g, b);
     xcol.pixel = 0;
@@ -187,7 +187,7 @@ void Color::doCacheCleanup(void) {
   int i;
   unsigned count;
 
-  for (i = 0; i < ScreenCount(Display::display); i++) {
+  for (i = 0; i < ScreenCount(**display); i++) {
     count = 0;
     it = colorcache.begin();
 
@@ -204,8 +204,7 @@ void Color::doCacheCleanup(void) {
     }
 
     if (count > 0)
-      XFreeColors(Display::display,
-                  Display::screenInfo(i)->colormap(),
+      XFreeColors(**display, display->screenInfo(i)->colormap(),
                   pixels, count, 0);
   }
 

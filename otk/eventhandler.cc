@@ -88,11 +88,11 @@ void EventHandler::handle(const XEvent &e)
     return selectionRequestHandler(e.xselectionrequest);
   default:
 #ifdef    SHAPE
-    if (e.type == Display::shapeEventBase())
+    if (e.type == display->shapeEventBase())
       return shapeHandler((*(XShapeEvent*)&e));
 #endif // SHAPE
 #ifdef    XKB
-    if (e.type == Display::xkbEventBase())
+    if (e.type == display->xkbEventBase())
       return xkbHandler((*(XkbEvent*)&e));
 #endif // XKB
     ;

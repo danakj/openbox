@@ -20,14 +20,14 @@ AppWidget::AppWidget(Application *app, Direction direction,
 {
   assert(app);
 
-  _wm_protocols = XInternAtom(Display::display, "WM_PROTOCOLS", false);
-  _wm_delete = XInternAtom(Display::display, "WM_DELETE_WINDOW", false);
+  _wm_protocols = XInternAtom(**display, "WM_PROTOCOLS", false);
+  _wm_delete = XInternAtom(**display, "WM_DELETE_WINDOW", false);
 
   // set WM Protocols on the window
   Atom protocols[2];
   protocols[0] = _wm_protocols;
   protocols[1] = _wm_delete;
-  XSetWMProtocols(Display::display, window(), protocols, 2);
+  XSetWMProtocols(**display, window(), protocols, 2);
 }
 
 AppWidget::~AppWidget()

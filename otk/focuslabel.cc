@@ -13,8 +13,8 @@ namespace otk {
 FocusLabel::FocusLabel(Widget *parent)
   : FocusWidget(parent), _text("")
 {
-  const ScreenInfo *info = Display::screenInfo(screen());
-  _xftdraw = XftDrawCreate(Display::display, window(), info->visual(),
+  const ScreenInfo *info = display->screenInfo(screen());
+  _xftdraw = XftDrawCreate(**display, window(), info->visual(),
                            info->colormap());
 }
 

@@ -38,8 +38,8 @@ void EventDispatcher::dispatchEvents(void)
 {
   XEvent e;
 
-  while (XPending(Display::display)) {
-    XNextEvent(Display::display, &e);
+  while (XPending(**display)) {
+    XNextEvent(**display, &e);
 
 #if 0//defined(DEBUG)
     printf("Event %d window %lx\n", e.type, e.xany.window);
@@ -71,17 +71,17 @@ void EventDispatcher::dispatchEvents(void)
       case ButtonPress:
       case ButtonRelease:
         _lasttime = e.xbutton.time;
-        e.xbutton.state &= ~(LockMask | Display::numLockMask() |
-                             Display::scrollLockMask());
+        e.xbutton.state &= ~(LockMask | display->numLockMask() |
+                             display->scrollLockMask());
         break;
       case KeyPress:
-        e.xkey.state &= ~(LockMask | Display::numLockMask() |
-                          Display::scrollLockMask());
+        e.xkey.state &= ~(LockMask | display->numLockMask() |
+                          display->scrollLockMask());
         break;
       case MotionNotify:
         _lasttime = e.xmotion.time;
-        e.xmotion.state &= ~(LockMask | Display::numLockMask() |
-                             Display::scrollLockMask());
+        e.xmotion.state &= ~(LockMask | display->numLockMask() |
+                             display->scrollLockMask());
         break;
       case PropertyNotify:
         _lasttime = e.xproperty.time;
@@ -116,7 +116,7 @@ void EventDispatcher::dispatchFocus(const XEvent &e)
     // FocusOut events just make us look for FocusIn events. They are ignored
     // otherwise.
     XEvent fi;
-    if (XCheckTypedEvent(Display::display, FocusIn, &fi)) {
+    if (XCheckTypedEvent(**display, FocusIn, &fi)) {
       //printf("Found FocusIn\n");
       dispatchFocus(fi);
       // dont unfocus the window we just focused!
@@ -157,7 +157,7 @@ void EventDispatcher::dispatch(Window win, const XEvent &e)
     xwc.sibling = e.xconfigurerequest.above;
     xwc.stack_mode = e.xconfigurerequest.detail;
       
-    XConfigureWindow(otk::Display::display, e.xconfigurerequest.window,
+    XConfigureWindow(**display, e.xconfigurerequest.window,
                      e.xconfigurerequest.value_mask, &xwc);
   } else {
     // grab a falback if it exists

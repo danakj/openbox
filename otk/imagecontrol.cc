@@ -75,7 +75,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
   colormap = screeninfo->colormap();
 
   int count;
-  XPixmapFormatValues *pmv = XListPixmapFormats(Display::display,
+  XPixmapFormatValues *pmv = XListPixmapFormats(**display,
                                                 &count);
   if (pmv) {
     bits_per_pixel = 0;
@@ -168,7 +168,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
 	}
 
     for (i = 0; i < ncolors; i++) {
-      if (! XAllocColor(Display::display, colormap, &colors[i])) {
+      if (! XAllocColor(**display, colormap, &colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
 	colors[i].flags = 0;
@@ -183,7 +183,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(Display::display, colormap, icolors, incolors);
+    XQueryColors(**display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -205,7 +205,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(Display::display, colormap,
+	    if (XAllocColor(**display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -262,7 +262,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
       colors[i].blue = (i * 0xffff) / (colors_per_channel - 1);;
       colors[i].flags = DoRed|DoGreen|DoBlue;
 
-      if (! XAllocColor(Display::display, colormap,
+      if (! XAllocColor(**display, colormap,
 			&colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
@@ -279,7 +279,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(Display::display, colormap, icolors, incolors);
+    XQueryColors(**display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -301,7 +301,7 @@ ImageControl::ImageControl(TimerQueueManager *timermanager,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(Display::display, colormap,
+	    if (XAllocColor(**display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -335,7 +335,7 @@ ImageControl::~ImageControl(void) {
     for (int i = 0; i < ncolors; i++)
       *(pixels + i) = (*(colors + i)).pixel;
 
-    XFreeColors(Display::display, colormap, pixels, ncolors, 0);
+    XFreeColors(**display, colormap, pixels, ncolors, 0);
 
     delete [] colors;
   }
@@ -348,7 +348,7 @@ ImageControl::~ImageControl(void) {
     CacheContainer::iterator it = cache.begin();
     const CacheContainer::iterator end = cache.end();
     for (; it != end; ++it)
-      XFreePixmap(Display::display, it->pixmap);
+      XFreePixmap(**display, it->pixmap);
   }
   if (timer) {
     timer->stop();
@@ -499,7 +499,7 @@ void ImageControl::getGradientBuffers(unsigned int w,
 void ImageControl::installRootColormap(void) {
   int ncmap = 0;
   Colormap *cmaps =
-    XListInstalledColormaps(Display::display, window, &ncmap);
+    XListInstalledColormaps(**display, window, &ncmap);
 
   if (cmaps) {
     bool install = True;
@@ -508,7 +508,7 @@ void ImageControl::installRootColormap(void) {
 	install = False;
 
     if (install)
-      XInstallColormap(Display::display, colormap);
+      XInstallColormap(**display, colormap);
 
     XFree(cmaps);
   }
@@ -548,7 +548,7 @@ struct CacheCleaner {
   CacheCleaner() {}
   inline void operator()(const ImageControl::CachedImage& image) const {
     if (ref_check(image))
-      XFreePixmap(Display::display, image.pixmap);
+      XFreePixmap(**display, image.pixmap);
   }
 };
 

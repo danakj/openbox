@@ -20,11 +20,11 @@ namespace otk {
 ScreenInfo::ScreenInfo(unsigned int num) {
   _screen = num;
 
-  _root_window = RootWindow(Display::display, _screen);
+  _root_window = RootWindow(**display, _screen);
 
-  _rect.setSize(WidthOfScreen(ScreenOfDisplay(Display::display,
+  _rect.setSize(WidthOfScreen(ScreenOfDisplay(**display,
                                               _screen)),
-               HeightOfScreen(ScreenOfDisplay(Display::display,
+               HeightOfScreen(ScreenOfDisplay(**display,
                                               _screen)));
   /*
     If the default depth is at least 8 we will use that,
@@ -32,9 +32,9 @@ ScreenInfo::ScreenInfo(unsigned int num) {
     Preference is given to 24 bit over larger depths if 24 bit is an option.
   */
 
-  _depth = DefaultDepth(Display::display, _screen);
-  _visual = DefaultVisual(Display::display, _screen);
-  _colormap = DefaultColormap(Display::display, _screen);
+  _depth = DefaultDepth(**display, _screen);
+  _visual = DefaultVisual(**display, _screen);
+  _colormap = DefaultColormap(**display, _screen);
   
   if (_depth < 8) {
     // search for a TrueColor Visual... if we can't find one...
@@ -46,7 +46,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
     vinfo_template.screen = _screen;
     vinfo_template.c_class = TrueColor;
 
-    vinfo_return = XGetVisualInfo(Display::display,
+    vinfo_return = XGetVisualInfo(**display,
                                   VisualScreenMask | VisualClassMask,
                                   &vinfo_template, &vinfo_nitems);
     if (vinfo_return) {
@@ -65,7 +65,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
     if (best != -1) {
       _depth = vinfo_return[best].depth;
       _visual = vinfo_return[best].visual;
-      _colormap = XCreateColormap(Display::display, _root_window, _visual,
+      _colormap = XCreateColormap(**display, _root_window, _visual,
                                   AllocNone);
     }
 
@@ -73,7 +73,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
   }
 
   // get the default display string and strip the screen number
-  string default_string = DisplayString(Display::display);
+  string default_string = DisplayString(**display);
   const string::size_type pos = default_string.rfind(".");
   if (pos != string::npos)
     default_string.resize(pos);
@@ -93,7 +93,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
         in future versions we should be able, so the 'activeness' is checked
         on a pre-screen basis anyways.
       */
-      if (XineramaIsActive(Display::display)) {
+      if (XineramaIsActive(**display)) {
         /*
           If Xinerama is being used, there there is only going to be one screen
           present. We still, of course, want to use the screen class, but that
@@ -101,8 +101,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
           never be more than one screen present with Xinerama active.
         */
         int num;
-        XineramaScreenInfo *info = XineramaQueryScreens(Display::display,
-                                                        &num);
+        XineramaScreenInfo *info = XineramaQueryScreens(**display, &num);
         if (num > 0 && info) {
           _xinerama_areas.reserve(num);
           for (int i = 0; i < num; ++i) {

@@ -13,6 +13,11 @@ namespace otk {
 class ScreenInfo;
 class GCCache;
 
+class Display;
+
+//! The display instance for the library
+extern Display *display;
+
 //! Manages a single X11 display.
 /*!
   This class is static, and cannot be instantiated.
@@ -22,42 +27,42 @@ class GCCache;
 class Display
 {
 public:
-  //! The X display
-  static ::Display *display;
-  
   //! A List of ScreenInfo instances
   typedef std::vector<ScreenInfo> ScreenInfoList;
 
 private:
+  //! The X display
+  ::Display *_display;
+  
   //! Does the display have the XKB extension?
-  static bool _xkb;
+  bool _xkb;
   //! Base for events for the XKB extension
-  static int  _xkb_event_basep;
+  int  _xkb_event_basep;
 
   //! Does the display have the Shape extension?
-  static bool _shape;
+  bool _shape;
   //! Base for events for the Shape extension
-  static int  _shape_event_basep;
+  int  _shape_event_basep;
 
   //! Does the display have the Xinerama extension?
-  static bool _xinerama;
+  bool _xinerama;
   //! Base for events for the Xinerama extension
-  static int  _xinerama_event_basep;
+  int  _xinerama_event_basep;
 
   //! A list of all possible combinations of keyboard lock masks
-  static unsigned int _mask_list[8];
+  unsigned int _mask_list[8];
 
   //! The value of the mask for the NumLock modifier
-  static unsigned int _numLockMask;
+  unsigned int _num_lock_mask;
 
   //! The value of the mask for the ScrollLock modifier
-  static unsigned int _scrollLockMask;
+  unsigned int _scroll_lock_mask;
 
   //! The number of requested grabs on the display
-  static int _grab_count;
+  int _grab_count;
 
   //! A list of information for all screens on the display
-  static ScreenInfoList _screenInfoList;
+  ScreenInfoList _screenInfoList;
 
   //! A cache for re-using GCs, used by the drawing objects
   /*!
@@ -67,30 +72,26 @@ private:
     @see ImageControl
     @see Texture
   */
-  static GCCache *_gccache;
+  GCCache *_gccache;
 
   // Handles X errors on the display
   /*
     Displays the error if compiled for debugging.
   */
-  //static int xerrorHandler(::Display *d, XErrorEvent *e);
-
-  //! Prevents instantiation of the class
-  Display();
+  //int xerrorHandler(::Display *d, XErrorEvent *e);
 
 public:
   //! Initializes the class, opens the X display
   /*!
+    The DISPLAY environment variable is used to choose the display.
     @see Display::display
-    @param name The name of the X display to open. If it is null, the DISPLAY
-                environment variable is used instead.
   */
-  static void initialize(char *name);
+  Display();
   //! Destroys the class, closes the X display
-  static void destroy();
+  ~Display();
 
   //! Returns the GC cache for the application
-  inline static GCCache *gcCache() { return _gccache; }
+  inline GCCache *gcCache() const { return _gccache; }
 
   //! Gets information on a specific screen
   /*!
@@ -99,47 +100,50 @@ public:
     @param snum The screen number of the screen to retrieve info on
     @return Info on the requested screen, in a ScreenInfo class
   */
-  static const ScreenInfo* screenInfo(int snum);
+  const ScreenInfo* screenInfo(int snum);
 
   //! Find a ScreenInfo based on a root window
-  static const ScreenInfo* findScreen(Window root);
+  const ScreenInfo* findScreen(Window root);
 
   //! Returns if the display has the xkb extension available
-  inline static bool xkb() { return _xkb; }
+  inline bool xkb() const { return _xkb; }
   //! Returns the xkb extension's event base
-  inline static int xkbEventBase() { return _xkb_event_basep; }
+  inline int xkbEventBase() const { return _xkb_event_basep; }
 
   //! Returns if the display has the shape extension available
-  inline static bool shape() { return _shape; }
+  inline bool shape() const { return _shape; }
   //! Returns the shape extension's event base
-  inline static int shapeEventBase() { return _shape_event_basep; }
+  inline int shapeEventBase() const { return _shape_event_basep; }
   //! Returns if the display has the xinerama extension available
-  inline static bool xinerama() { return _xinerama; }
+  inline bool xinerama() const { return _xinerama; }
 
-  inline static unsigned int numLockMask() { return _numLockMask; }
-  inline static unsigned int scrollLockMask() { return _scrollLockMask; }
+  inline unsigned int numLockMask() const { return _num_lock_mask; }
+  inline unsigned int scrollLockMask() const { return _scroll_lock_mask; }
+
+  inline ::Display* operator*() const { return _display; }
 
   //! Grabs the display
-  static void grab();
+  void grab();
 
   //! Ungrabs the display
-  static void ungrab();
+  void ungrab();
 
 
   
   /* TEMPORARY */
-  static void grabButton(unsigned int button, unsigned int modifiers,
+  void grabButton(unsigned int button, unsigned int modifiers,
                   Window grab_window, bool owner_events,
                   unsigned int event_mask, int pointer_mode,
                   int keyboard_mode, Window confine_to, Cursor cursor,
-                  bool allow_scroll_lock);
-  static void ungrabButton(unsigned int button, unsigned int modifiers,
-                    Window grab_window);
-  static void grabKey(unsigned int keycode, unsigned int modifiers,
-                  Window grab_window, bool owner_events,
-                  int pointer_mode, int keyboard_mode, bool allow_scroll_lock);
-  static void ungrabKey(unsigned int keycode, unsigned int modifiers,
-                        Window grab_window);
+                  bool allow_scroll_lock) const;
+  void ungrabButton(unsigned int button, unsigned int modifiers,
+                    Window grab_window) const;
+  void grabKey(unsigned int keycode, unsigned int modifiers,
+               Window grab_window, bool owner_events,
+               int pointer_mode, int keyboard_mode,
+               bool allow_scroll_lock) const;
+  void ungrabKey(unsigned int keycode, unsigned int modifiers,
+                 Window grab_window) const;
 };
 
 }

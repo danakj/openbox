@@ -14,7 +14,7 @@ void TimerQueueManager::fire(bool wait)
   fd_set rfds;
   timeval now, tm, *timeout = (timeval *) 0;
 
-  const int xfd = ConnectionNumber(Display::display);
+  const int xfd = ConnectionNumber(**display);
   
   FD_ZERO(&rfds);
   FD_SET(xfd, &rfds); // break on any x events

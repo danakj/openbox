@@ -56,14 +56,14 @@ Font::Font(int screen_num, const std::string &fontstring,
     _xft_init = true;
   }
 
-  if ((_xftfont = XftFontOpenName(Display::display, _screen_num,
+  if ((_xftfont = XftFontOpenName(**display, _screen_num,
                                   _fontstring.c_str())))
     return;
 
   printf(_("Unable to load font: %s\n"), _fontstring.c_str());
   printf(_("Trying fallback font: %s\n"), _fallback_font.c_str());
 
-  if ((_xftfont = XftFontOpenName(Display::display, _screen_num,
+  if ((_xftfont = XftFontOpenName(**display, _screen_num,
                                   _fallback_font.c_str())))
     return;
 
@@ -77,7 +77,7 @@ Font::Font(int screen_num, const std::string &fontstring,
 Font::~Font(void)
 {
   if (_xftfont)
-    XftFontClose(Display::display, _xftfont);
+    XftFontClose(**display, _xftfont);
 }
 
 
@@ -92,7 +92,7 @@ void Font::drawString(XftDraw *d, int x, int y, const Color &color,
     c.color.green = 0;
     c.color.blue = 0;
     c.color.alpha = _tint | _tint << 8; // transparent shadow
-    c.pixel = BlackPixel(Display::display, _screen_num);
+    c.pixel = BlackPixel(**display, _screen_num);
 
     if (string.utf8())
       XftDrawStringUtf8(d, &c, _xftfont, x + _offset,
@@ -127,10 +127,10 @@ unsigned int Font::measureString(const ustring &string) const
   XGlyphInfo info;
 
   if (string.utf8())
-    XftTextExtentsUtf8(Display::display, _xftfont,
+    XftTextExtentsUtf8(**display, _xftfont,
                        (FcChar8*)string.c_str(), string.size(), &info);
   else
-    XftTextExtents8(Display::display, _xftfont,
+    XftTextExtents8(**display, _xftfont,
                     (FcChar8*)string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);

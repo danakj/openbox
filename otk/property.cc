@@ -17,7 +17,7 @@ namespace otk {
 
 Property::Property()
 {
-  assert(Display::display);
+  assert(**display);
 
   // make sure asserts fire if there is a problem
   memset(_atoms, 0, sizeof(_atoms));
@@ -163,7 +163,7 @@ Property::~Property()
  */
 Atom Property::create(const char *name) const
 {
-  Atom a = XInternAtom(Display::display, name, False);
+  Atom a = XInternAtom(**display, name, False);
   assert(a);
   return a;
 }
@@ -181,7 +181,7 @@ void Property::set(Window win, Atom atom, Atom type,
   assert(win != None); assert(atom != None); assert(type != None);
   assert(nelements == 0 || (nelements > 0 && data != (unsigned char *) 0));
   assert(size == 8 || size == 16 || size == 32);
-  XChangeProperty(Display::display, win, atom, type, size,
+  XChangeProperty(**display, win, atom, type, size,
                   (append ? PropModeAppend : PropModeReplace),
                   data, nelements);
 }
@@ -291,7 +291,7 @@ bool Property::get(Window win, Atom atom, Atom type,
   bool ret = False;
 
   // try get the first element
-  result = XGetWindowProperty(Display::display, win, atom, 0l, 1l,
+  result = XGetWindowProperty(**display, win, atom, 0l, 1l,
                               False, AnyPropertyType, &ret_type, &ret_size,
                               nelements, &ret_bytes, &c_val);
   ret = (result == Success && ret_type == type && ret_size == size &&
@@ -309,7 +309,7 @@ bool Property::get(Window win, Atom atom, Atom type,
       int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
       if (remain > size/8 * (signed)maxread) // dont get more than the max
         remain = size/8 * (signed)maxread;
-      result = XGetWindowProperty(Display::display, win, atom, 0l,
+      result = XGetWindowProperty(**display, win, atom, 0l,
                                   remain, False, type, &ret_type, &ret_size,
                                   nelements, &ret_bytes, &c_val);
       ret = (result == Success && ret_type == type && ret_size == size &&
@@ -430,7 +430,7 @@ bool Property::get(Window win, Atoms atom, StringType type,
 void Property::erase(Window win, Atoms atom) const
 {
   assert(atom >= 0 && atom < NUM_ATOMS);
-  XDeleteProperty(Display::display, win, _atoms[atom]);
+  XDeleteProperty(**display, win, _atoms[atom]);
 }
 
 }

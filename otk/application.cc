@@ -20,15 +20,14 @@ namespace otk {
 
 Application::Application(int argc, char **argv)
   : EventDispatcher(),
+    _display(),
     _dockable(false),
     _appwidget_count(0)
 {
   (void)argc;
   (void)argv;
 
-  Display::initialize(0);
-  const ScreenInfo *s_info =
-    Display::screenInfo(DefaultScreen(Display::display));
+  const ScreenInfo *s_info = _display.screenInfo(DefaultScreen(*_display));
 
   _timer_manager = new TimerQueueManager();
   _img_ctrl = new ImageControl(_timer_manager, s_info, True, 4, 5, 200);
@@ -44,8 +43,6 @@ Application::~Application()
   delete _img_ctrl;
   delete _timer_manager;
   delete _style;
-  
-  Display::destroy();
 }
 
 void Application::loadStyle(void)

@@ -62,12 +62,13 @@ xsetbg_default_cmd="$xsetbg_center_cmd"
 ##################################
 
 me=${0##*/}
-version=2.1
+version=2.2
 copyright="(c) 2000-$(date +%Y) by Timothy M. King (http://lordzork.com/)"
 config=$HOME/.bsetbgrc
 last_cmd_file=$HOME/.bsetbg_last_cmd
 refresh_cmd=xrefresh
 p=$me:
+#debug=echo
 
 quit() 
 {
@@ -109,16 +110,18 @@ $me $version $copyright
   -app  <app>              specify the image application to use
   -post <string>           arguments to be passed to the post-command
   -debug                   prints commands without executing them
-EOF
 
-	# this is extremely lame, but probably more portable than grep -E   
-	bsetroot_help=$(bsetroot -help  2>&1| grep -v "^bsetroot" | grep -v "^  -help")
-	case $bsetroot_help in
-   		BaseDisplay*)	echo ;;
-		*-gradient*)	echo "$bsetroot_help"
-	esac
+  -display <string>        use display connection
+  -mod <x> <y>             modula pattern
+  -foreground, -fg <color> modula foreground color
+  -background, -bg <color> modula background color
 
-	cat <<EOF
+  -gradient <texture>      gradient texture
+  -from <color>            gradient start color
+  -to <color>              gradient end color
+
+  -solid <color>           solid color
+
   -generate <string>       generate a config file
   -help                    this message
   -version                 output version information
@@ -382,7 +385,9 @@ check_no_exec()
 
 post_command() 
 {
-	if [ -n "$POST_COMMAND" -a "$rc" -le 0 ]; then
+	bool $noconfig || read_config
+
+	if [ -n "$POST_COMMAND" -a "$1" = 0 ]; then
 		if [ -n "$debug" ]; then
 			$debug "running post_command: $POST_COMMAND $post_args"
 		else
@@ -422,7 +427,9 @@ check_cmd()
 		command=${2:-$1}; eval ${3:-${2:-$1}}=1
 	elif bool $do_post; then
 		add_post_arg ${1}
-	else
+	elif [ "$command" = do_exec ]; then
+		do_exec=1		
+	elif [ "$command" != do_bsetroot ]; then
 		finished=1
 	fi 
 }
@@ -433,7 +440,7 @@ parse_args()
     		-d|*-debug|d)
 			unset refresh_cmd; debug=echo\ $me\_debug: ;;
 
-		-p|-*-post|p)			
+		-p|*-post|p)	
 			unset finished do_standard do_exec; do_post=1 ;;
 				
 		-c|*-center|c|-t|*-tile*|t|-f|*-full|f)
@@ -451,7 +458,7 @@ parse_args()
 			esac ;;		
 		
 		-a|*-app|a|-e|*-exec|e)
-			check_cmd "do_exec" ;;
+			command=do_exec; check_cmd ;;
 		
 		-mod|-gradient|-solid|-display)
 			check_cmd "do_bsetroot" && add_arg $1 ;;
@@ -493,7 +500,7 @@ done
 
 [ "$debug" ] && echo
 
-$command $args
-post_command $rc
+$debug $command $args
+post_command ${rc:-0}
 
 quit $rc

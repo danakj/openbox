@@ -34,6 +34,7 @@ void python_init(char *argv0)
   PyRun_SimpleString("from openbox import *;");
   // set up convenience global variables
   PyRun_SimpleString("openbox = Openbox_instance()");
+  PyRun_SimpleString("display = Display_instance()");
 
   // set up access to the python global variables
   PyObject *obmodule = PyImport_AddModule("__main__");

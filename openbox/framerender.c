@@ -15,12 +15,15 @@ static void framerender_close(ObFrame *self, RrAppearance *a);
 
 void framerender_frame(ObFrame *self)
 {
-    if (self->focused)
-        XSetWindowBorder(ob_display, self->plate,
-                         RrColorPixel(ob_rr_theme->cb_focused_color));
-    else
-        XSetWindowBorder(ob_display, self->plate,
-                         RrColorPixel(ob_rr_theme->cb_unfocused_color));
+    {
+        unsigned long px;
+
+        px = (self->focused ?
+              RrColorPixel(ob_rr_theme->cb_focused_color) :
+              RrColorPixel(ob_rr_theme->cb_unfocused_color));
+        XSetWindowBorder(ob_display, self->plate, px);
+        XSetWindowBackground(ob_display, self->plate, px);
+    }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
         RrAppearance *t, *l, *m, *n, *i, *d, *s, *c;

@@ -24,6 +24,19 @@ static RrInstance *definst = NULL;
 static void RrTrueColorSetup (RrInstance *inst);
 static void RrPseudoColorSetup (RrInstance *inst);
 
+#ifdef DEBUG
+#include "color.h"
+#endif
+static void
+dest(gpointer data)
+{
+#ifdef DEBUG
+    RrColor *c = data;
+    if (c->refcount > 0)
+        g_error("removing color from hash table with references");
+#endif
+}
+
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {
     definst = g_new (RrInstance, 1);
@@ -36,7 +49,8 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
 
     definst->pseudo_colors = NULL;
 
-    definst->color_hash = g_hash_table_new(g_int_hash, g_int_equal);
+    definst->color_hash = g_hash_table_new_full(g_int_hash, g_int_equal,
+                                                NULL, dest);
 
     switch (definst->visual->class) {
     case TrueColor:

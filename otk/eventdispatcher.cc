@@ -33,7 +33,7 @@ void OtkEventDispatcher::clearHandler(Window id)
 {
   _map.erase(id);
 }
-
+#include <stdio.h>
 void OtkEventDispatcher::dispatchEvents(void)
 {
   XEvent e;
@@ -42,6 +42,7 @@ void OtkEventDispatcher::dispatchEvents(void)
 
   while (XPending(OBDisplay::display)) {
     XNextEvent(OBDisplay::display, &e);
+
     it = _map.find(e.xany.window);
 
     if (it != _map.end())
@@ -51,6 +52,23 @@ void OtkEventDispatcher::dispatchEvents(void)
 
     if (handler)
       handler->handle(e);
+    else {
+      // some events have to be handled anyways!
+      if (e.type == ConfigureRequest) {
+        XWindowChanges xwc;
+
+        xwc.x = e.xconfigurerequest.x;
+        xwc.y = e.xconfigurerequest.y;
+        xwc.width = e.xconfigurerequest.width;
+        xwc.height = e.xconfigurerequest.height;
+        xwc.border_width = e.xconfigurerequest.border_width;
+        xwc.sibling = e.xconfigurerequest.above;
+        xwc.stack_mode = e.xconfigurerequest.detail;
+
+        XConfigureWindow(OBDisplay::display, e.xconfigurerequest.window,
+                         e.xconfigurerequest.value_mask, &xwc);
+      }
+    }
   }
 }
 

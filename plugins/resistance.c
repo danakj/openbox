@@ -38,6 +38,7 @@ static void resist(Client *c, int *x, int *y)
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
             target = it->data;
+            if (target == c) continue; /* don't snap to self */
 
             tl = target->frame->area.x - 1;
             tt = target->frame->area.y - 1;

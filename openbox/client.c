@@ -2025,7 +2025,7 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
 
     if (target == self->desktop) return;
   
-    g_message("Setting desktop %u", target);
+    g_message("Setting desktop %u", target+1);
 
     g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 

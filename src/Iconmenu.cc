@@ -1,4 +1,4 @@
-// Icon.cc for Openbox
+// Iconmenu.cc for Openbox
 // Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //

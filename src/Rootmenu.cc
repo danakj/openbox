@@ -102,7 +102,7 @@ void Rootmenu::itemSelected(int button, int index) {
 
   case BScreen::SetStyle:
     if (item->exec())
-      openbox.saveStyleFilename(item->exec());
+      openbox.setStyleFilename(item->exec());
 
   case BScreen::Reconfigure:
     openbox.reconfigure();

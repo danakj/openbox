@@ -178,8 +178,8 @@ public:
 
   void setFocusedWindow(OpenboxWindow *w);
   void shutdown();
-  void saveStyleFilename(const char *);
-  void saveMenuFilename(const char *);
+  void setStyleFilename(const char *);
+  void setMenuFilename(const char *);
   void saveMenuSearch(Window, Basemenu *);
   void saveWindowSearch(Window, OpenboxWindow *);
   void saveToolbarSearch(Window, Toolbar *);

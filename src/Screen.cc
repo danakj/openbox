@@ -2160,7 +2160,7 @@ void BScreen::InitMenu(void) {
     rootmenu->insert(i18n->getMessage(ScreenSet, ScreenExit, "Exit"),
 		     BScreen::Exit);
   } else {
-    openbox.saveMenuFilename(openbox.getMenuFilename());
+    openbox.setMenuFilename(openbox.getMenuFilename());
   }
 }
 
@@ -2361,7 +2361,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
 		if (! feof(submenufile)) {
 		  if (! parseMenuFile(submenufile, menu))
-		    openbox.saveMenuFilename(newfile);
+		    openbox.setMenuFilename(newfile);
 
 		  fclose(submenufile);
 		}
@@ -2520,7 +2520,7 @@ Bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
                   rootmenuList->insert(stylesmenu);
                 }
 
-                openbox.saveMenuFilename(stylesdir);
+                openbox.setMenuFilename(stylesdir);
               } else {
                 fprintf(stderr, i18n->getMessage(ScreenSet,
 						 ScreenSTYLESDIRErrorNotDir,

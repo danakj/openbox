@@ -1137,15 +1137,16 @@ void Openbox::real_rereadMenu() {
 }
 
 
-void Openbox::saveStyleFilename(const char *filename) {
+void Openbox::setStyleFilename(const char *filename) {
   if (resource.style_file)
     delete [] resource.style_file;
 
   resource.style_file = bstrdup(filename);
+  config.setValue("session.styleFile", resource.style_file);
 }
 
 
-void Openbox::saveMenuFilename(const char *filename) {
+void Openbox::setMenuFilename(const char *filename) {
   Bool found = False;
 
   LinkedListIterator<MenuTimestamp> it(menuTimestamps);

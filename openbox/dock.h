@@ -39,6 +39,8 @@ typedef struct Dock {
 } Dock;
 
 typedef struct DockApp {
+    ObWindow obwin;
+
     int ignore_unmaps;
 
     Window icon_win;

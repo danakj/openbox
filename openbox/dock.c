@@ -50,6 +50,7 @@ void dock_add(Window win, XWMHints *wmhints)
     XWindowAttributes attrib;
 
     app = g_new0(DockApp, 1);
+    app->obwin.type = Window_DockApp;
     app->win = win;
     app->icon_win = (wmhints->flags & IconWindowHint) ?
         wmhints->icon_window : win;

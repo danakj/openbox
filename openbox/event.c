@@ -275,8 +275,6 @@ void event_process(XEvent *e)
 	xwc.sibling = e->xconfigurerequest.above;
 	xwc.stack_mode = e->xconfigurerequest.detail;
        
-	g_message("Proxying configure event for 0x%lx", window);
-       
 	/* we are not to be held responsible if someone sends us an
 	   invalid request! */
 	xerror_set_ignore(TRUE);
@@ -323,6 +321,7 @@ static void event_handle_client(Client *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
+        int i=0;
      
     switch (e->type) {
     case FocusIn:
@@ -330,10 +329,10 @@ static void event_handle_client(Client *client, XEvent *e)
         client_set_focused(client, e->type == FocusIn);
 	break;
     case ConfigureRequest:
-	g_message("ConfigureRequest for window %lx", client->window);
 	/* compress these */
 	while (XCheckTypedWindowEvent(ob_display, client->window,
 				      ConfigureRequest, &ce)) {
+            ++i;
 	    /* XXX if this causes bad things.. we can compress config req's
 	       with the same mask. */
 	    e->xconfigurerequest.value_mask |=
@@ -352,6 +351,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	    if (ce.xconfigurerequest.value_mask & CWStackMode)
 		e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
 	}
+        if (i) g_message("Compressed %d Configures", i);
 
 	/* if we are iconic (or shaded (fvwm does this)) ignore the event */
 	if (client->iconic || client->shaded) return;

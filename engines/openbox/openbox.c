@@ -406,75 +406,81 @@ void frame_adjust_shape(ObFrame *self)
 #endif
 }
 
-void frame_adjust_area(ObFrame *self)
+void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 {
-    if (self->frame.client->decorations & Decor_Border) {
-	self->bwidth = s_bwidth;
-	self->cbwidth = s_cbwidth;
-    } else {
-	self->bwidth = self->cbwidth = 0;
-    }
-    STRUT_SET(self->innersize, self->cbwidth, self->cbwidth,
-	      self->cbwidth, self->cbwidth);
-    self->width = self->frame.client->area.width + self->cbwidth * 2;
-    g_assert(self->width > 0);
+    if (resized) {
+        if (self->frame.client->decorations & Decor_Border) {
+            self->bwidth = s_bwidth;
+            self->cbwidth = s_cbwidth;
+        } else {
+            self->bwidth = self->cbwidth = 0;
+        }
+        STRUT_SET(self->innersize, self->cbwidth, self->cbwidth,
+                  self->cbwidth, self->cbwidth);
+        self->width = self->frame.client->area.width + self->cbwidth * 2;
+        g_assert(self->width > 0);
 
-    /* set border widths */
-    XSetWindowBorderWidth(ob_display, self->frame.plate,  self->cbwidth);
-    XSetWindowBorderWidth(ob_display, self->frame.window, self->bwidth);
-    XSetWindowBorderWidth(ob_display, self->title,  self->bwidth);
-    XSetWindowBorderWidth(ob_display, self->handle, self->bwidth);
-    XSetWindowBorderWidth(ob_display, self->lgrip,  self->bwidth);
-    XSetWindowBorderWidth(ob_display, self->rgrip,  self->bwidth);
+        /* set border widths */
+        XSetWindowBorderWidth(ob_display, self->frame.plate,  self->cbwidth);
+        XSetWindowBorderWidth(ob_display, self->frame.window, self->bwidth);
+        XSetWindowBorderWidth(ob_display, self->title,  self->bwidth);
+        XSetWindowBorderWidth(ob_display, self->handle, self->bwidth);
+        XSetWindowBorderWidth(ob_display, self->lgrip,  self->bwidth);
+        XSetWindowBorderWidth(ob_display, self->rgrip,  self->bwidth);
   
-    /* position/size and map/unmap all the windows */
+        /* position/size and map/unmap all the windows */
 
-    /* they all default off, they're turned on in layout_title */
-    self->icon_x = -1;
-    self->desk_x = -1;
-    self->icon_x = -1;
-    self->label_x = -1;
-    self->max_x = -1;
-    self->close_x = -1;
-    
-    if (self->frame.client->decorations & Decor_Titlebar) {
-	XMoveResizeWindow(ob_display, self->title,
-			  -self->bwidth, -self->bwidth,
-			  self->width, TITLE_HEIGHT);
-	self->innersize.top += TITLE_HEIGHT + self->bwidth;
-	XMapWindow(ob_display, self->title);
+        /* they all default off, they're turned on in layout_title */
+        self->icon_x = -1;
+        self->desk_x = -1;
+        self->icon_x = -1;
+        self->label_x = -1;
+        self->max_x = -1;
+        self->close_x = -1;
 
-	/* layout the title bar elements */
-	layout_title(self);
-    } else {
-	XUnmapWindow(ob_display, self->title);
-	/* make all the titlebar stuff not render */
-	self->frame.client->decorations &= ~(Decor_Icon | Decor_Iconify |
-			       Decor_Maximize | Decor_Close |
-			       Decor_AllDesktops);
+        if (self->frame.client->decorations & Decor_Titlebar) {
+            XMoveResizeWindow(ob_display, self->title,
+                              -self->bwidth, -self->bwidth,
+                              self->width, TITLE_HEIGHT);
+            self->innersize.top += TITLE_HEIGHT + self->bwidth;
+            XMapWindow(ob_display, self->title);
+
+            /* layout the title bar elements */
+            layout_title(self);
+        } else {
+            XUnmapWindow(ob_display, self->title);
+            /* make all the titlebar stuff not render */
+            self->frame.client->decorations &= ~(Decor_Icon | Decor_Iconify |
+                                                 Decor_Maximize | Decor_Close |
+                                                 Decor_AllDesktops);
+        }
+
+        if (self->frame.client->decorations & Decor_Handle) {
+            XMoveResizeWindow(ob_display, self->handle,
+                              -self->bwidth, HANDLE_Y(self),
+                              self->width, s_handle_height);
+            XMoveWindow(ob_display, self->lgrip,
+                        -self->bwidth, -self->bwidth);
+            XMoveWindow(ob_display, self->rgrip,
+                        -self->bwidth + self->width -
+                        GRIP_WIDTH, -self->bwidth);
+            self->innersize.bottom += s_handle_height +
+                self->bwidth;
+            XMapWindow(ob_display, self->handle);
+        } else
+            XUnmapWindow(ob_display, self->handle);
     }
 
-    if (self->frame.client->decorations & Decor_Handle) {
-	XMoveResizeWindow(ob_display, self->handle,
-			  -self->bwidth, HANDLE_Y(self),
-			  self->width, s_handle_height);
-	XMoveWindow(ob_display, self->lgrip,
-		    -self->bwidth, -self->bwidth);
-	XMoveWindow(ob_display, self->rgrip,
-		    -self->bwidth + self->width -
-		    GRIP_WIDTH, -self->bwidth);
-	self->innersize.bottom += s_handle_height +
-	    self->bwidth;
-	XMapWindow(ob_display, self->handle);
-    } else
-	XUnmapWindow(ob_display, self->handle);
+    if (moved) {
+        /* find the new coordinates */
+        self->frame.area.x = self->frame.client->area.x;
+        self->frame.area.y = self->frame.client->area.y;
+        frame_client_gravity((Frame*)self,
+                             &self->frame.area.x, &self->frame.area.y);
+    }
 
-    /* find the new coordinates */
-    self->frame.area.x = self->frame.client->area.x;
-    self->frame.area.y = self->frame.client->area.y;
-    frame_client_gravity((Frame*)self,
-			 &self->frame.area.x, &self->frame.area.y);
-    /* move and resize the top level frame */
+    /* move and resize the top level frame.
+       shading can change without being moved or resized */
     XMoveResizeWindow(ob_display, self->frame.window,
                       self->frame.area.x, self->frame.area.y,
                       self->width,
@@ -482,30 +488,38 @@ void frame_adjust_area(ObFrame *self)
                        self->innersize.top + self->innersize.bottom +
                        self->frame.client->area.height));
 
-    /* move and resize the plate */
-    XMoveResizeWindow(ob_display, self->frame.plate,
-                      self->innersize.left - self->cbwidth,
-                      self->innersize.top - self->cbwidth,
-                      self->frame.client->area.width,
-                      self->frame.client->area.height);
-    /* when the client has StaticGravity, it likes to move around. */
-    XMoveWindow(ob_display, self->frame.client->window, 0, 0);
+    if (resized) {
+        /* move and resize the plate */
+        XMoveResizeWindow(ob_display, self->frame.plate,
+                          self->innersize.left - self->cbwidth,
+                          self->innersize.top - self->cbwidth,
+                          self->frame.client->area.width,
+                          self->frame.client->area.height);
+        /* when the client has StaticGravity, it likes to move around. */
+        XMoveWindow(ob_display, self->frame.client->window, 0, 0);
+    }
 
-    STRUT_SET(self->frame.size,
-	      self->innersize.left + self->bwidth,
-	      self->innersize.top + self->bwidth,
-	      self->innersize.right + self->bwidth,
-	      self->innersize.bottom + self->bwidth);
+    if (resized) {
+        STRUT_SET(self->frame.size,
+                  self->innersize.left + self->bwidth,
+                  self->innersize.top + self->bwidth,
+                  self->innersize.right + self->bwidth,
+                  self->innersize.bottom + self->bwidth);
+    }
 
+    /* shading can change without being moved or resized */
     RECT_SET_SIZE(self->frame.area,
 		  self->frame.client->area.width +
 		  self->frame.size.left + self->frame.size.right,
-		  self->frame.client->area.height +
-		  self->frame.size.top + self->frame.size.bottom);
+		  (self->frame.client->shaded ? TITLE_HEIGHT :
+                   self->frame.client->area.height +
+                   self->frame.size.top + self->frame.size.bottom));
 
-    render(self);
+    if (resized) {
+        render(self);
 
-    frame_adjust_shape(self);
+        frame_adjust_shape(self);
+    }
 }
 
 void frame_adjust_state(ObFrame *self)
@@ -553,7 +567,7 @@ void frame_grab_client(ObFrame *self, Client *client)
     /* map the client so it maps when the frame does */
     XMapWindow(ob_display, client->window);
 
-    frame_adjust_area(self);
+    frame_adjust_area(self, TRUE, TRUE);
 
     /* set all the windows for the frame in the client_map */
     g_hash_table_insert(client_map, (gpointer)self->frame.window, client);

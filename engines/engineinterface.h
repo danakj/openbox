@@ -20,7 +20,8 @@ typedef void EngineFrameReleaseClient(Frame *self, Client *client);
 
 /* frame_adjust_area */
 /*! Update the frame's size/position to match the client */
-typedef void EngineFrameAdjustArea(Frame *self);
+typedef void EngineFrameAdjustArea(Frame *self, gboolean moved,
+                                   gboolean resized);
 /* frame_adjust_shape */
 /*! Shape the frame window to the client window */
 typedef void EngineFrameAdjustShape(Frame *self);

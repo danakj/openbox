@@ -18,9 +18,7 @@ class DialogButton {
 public:
   DialogButton(char *label) : _label(label), _default(false)
     {}
-  DialogButton(ustring label) : _label(label), _default(false)
-    {}
-  DialogButton(ustring label, bool def) : _label(label), _default(def)
+  DialogButton(char *label, bool def) : _label(label), _default(def)
     {}
   inline const ustring& label() const { return _label; }
   inline const bool& isDefault() const { return _default; }

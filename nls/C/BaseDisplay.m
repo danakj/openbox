@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  Erreur de X %s(%d) opcodes %d/%d\n  ressource 0x%lx\n
+# %s: errore di X: %s(%d) opcodes %d/%d\n  risorsa 0x%lx\n
 $ #SignalCaught
-# %s: signal %d capturé\n
+# %s: segnale %d intercettato\n
 $ #ShuttingDown
-# arrêt du programme\n
+# arresto del programma\n
 $ #Aborting
-# annulation... génération du fichier core\n
+# Annullamento...generazione file core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: échec de la connexion au serveur X\n
+# BaseDisplay::BaseDisplay: connessione al server X fallita.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: impossible d'attribuer close-on-exec à l'affichage\n
+# BaseDisplay::BaseDisplay: non e' possibile contrassegnare la connessione al display come close-on-exec\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): suppression d'une mauvaise fenêtre de la queue des événements\n
+# BaseDisplay::eventLoop(): rimozione finestra difettosa dalla coda degli eventi\n

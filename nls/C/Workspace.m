@@ -1,4 +1,4 @@
 $set 11 #Workspace
 
 $ #DefaultNameFormat
-# Espace de travail %d
+# Area di Lavoro %d

@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# Erreur: '-rc' nécessite un argument\n
+# errore: '-rc' richiede un argomento\n
 $ #DISPLAYRequiresArg
-# Erreur: '-display' nécessite un argument\n
+# errore: '-display' richiede an argomento\n
 $ #WarnDisplaySet
-# Attention: impossible d'attribuer la variable d'environnement 'DISPLAY'\n
+# attenzione: impossibile impostare la variabile d'ambiente 'DISPLAY'\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
                  2001 - 2002 Sean 'Shaleh' Perry\n\
                  1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <chaîne>\t\tutilise la connexion à l'affichage.\n\
-  -rc <chaîne>\t\t\tutilise un autre fichier de configuration.\n\
-  -version\t\t\taffiche la version et quitte.\n\
-  -help\t\t\t\taffiche ce texte d'aide et quitte.\n\n
+  -display <string>\t\tusa connessione display.\n\
+  -rc <string>\t\t\tusa un file risorsa alternativo.\n\
+  -version\t\t\tmostra la versione e esci.\n\
+  -help\t\t\t\tmostra questo aiuto e esci.\n\n
 $ #CompileOptions
-# Options de compilation:\n\
-  Debugage\t\t\t%s\n\
+# Opzioni in fase di compilazione:\n\
+  Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\
   Event Clobbering:\t\t%s\n\
-  8bpp Lissage ordonné:\t%s\n\n
+  8bpp Ordered Dithering:\t%s\n\n

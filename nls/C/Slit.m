@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Fente
+# Slit
 $ #SlitDirection
-# Orientation de la Fente
+# Direzione Slit
 $ #SlitPlacement
-# Disposition de la Fente
+# Posizionamento Slit

@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Envoie vers ...
+# Manda in ...
 $ #Shade
-# Fantôme
+# Arrotola
 $ #Iconify
-# Iconifie
+# Riduci a Icona
 $ #Maximize
-# Maximise
+# Ingrandisci
 $ #Raise
-# Élève
+# Alza
 $ #Lower
-# Abaisse
+# Abbassa
 $ #Stick
-# Épingle
+# Fissa
 $ #KillClient
-# Massacre
+# Uccidi Programma
 $ #Close
-# Ferme
+# Chiudi

@@ -92,8 +92,9 @@ _last_y = 0
 def _do_move():
     global _screen, _client, _cx, _cy, _dx, _dy
 
-    x = _cx + _dx
-    y = _cy + _dy
+    # get destination x/y for the *frame*
+    x = _cx + _dx + _client.frame.rect().x() - _client.area().x()
+    y = _cy + _dy + _client.frame.rect().y() - _client.area().y()
 
     global edge_resistance
     global _last_x, _last_y
@@ -133,7 +134,8 @@ def _do_move():
         # draw the outline ...
         f=0
     else:
-        _client.move(x, y)
+        print "moving " + str(x) + " " + str(y)
+        _client.move(x, y, 1) # move the frame to the position
 
     global move_popup
     if move_popup:

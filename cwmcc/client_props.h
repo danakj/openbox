@@ -1,7 +1,8 @@
 #ifndef __cwmcc_client_get_props_h
 #define __cwmcc_client_get_props_h
 
-void cwmcc_client_get_protocols(Window win, Atom **protocols);
+void cwmcc_client_get_protocols(Window win, Atom **protocols, gulong *num);
+void cwmcc_client_set_protocols(Window win, Atom *protocols, gulong num);
 
 void cwmcc_client_get_wm_state(Window win, gulong *state);
 void cwmcc_client_set_wm_state(Window win, gulong state);
@@ -60,13 +61,14 @@ void cwmcc_client_get_mwmhints(Window win, struct Cwmcc_MwmHints *hints);
 void cwmcc_client_get_desktop(Window win, gulong *desk);
 void cwmcc_client_set_desktop(Window win, gulong desk);
 
-void cwmcc_client_get_type(Window win, gulong **types);
-void cwmcc_client_set_type(Window win, gulong *types);
+void cwmcc_client_get_type(Window win, gulong **types, gulong *num);
+void cwmcc_client_set_type(Window win, gulong *types, gulong num);
 
-void cwmcc_client_get_state(Window win, gulong **states);
-void cwmcc_client_set_state(Window win, gulong *states);
+void cwmcc_client_get_state(Window win, gulong **states, gulong *num);
+void cwmcc_client_set_state(Window win, gulong *states, gulong num);
 
 void cwmcc_client_get_strut(Window win, int *l, int *t, int *r, int *b);
+void cwmcc_client_set_strut(Window win, int l, int t, int r, int b);
 
 /*! Holds an icon in ARGB format */
 struct Cwmcc_Icon {
@@ -76,7 +78,7 @@ struct Cwmcc_Icon {
 
 /* Returns an array of Cwms_Icons. The array is terminated by a Cwmcc_Icon with
    its data member set to NULL */
-void cwmcc_client_get_icon(Window win, struct Cwmcc_Icon **icons);
+void cwmcc_client_get_icon(Window win, struct Cwmcc_Icon **icons, gulong *num);
 
 void cwmcc_client_get_premax(Window win, int *x, int *y, int *w, int *h);
 void cwmcc_client_set_premax(Window win, int x, int y, int w, int h);

@@ -108,18 +108,18 @@ static gboolean get_stringlist(Window win, Atom prop, char ***list, int *nstr)
     return ret;
 }
 
-gboolean prop_get32(Window win, Atom prop, Atom type, gulong *ret)
+gboolean cwmcc_prop_get32(Window win, Atom prop, Atom type, gulong *ret)
 {
     return get_prealloc(win, prop, type, 32, (guchar*)ret, 1);
 }
 
-gboolean prop_get_array32(Window win, Atom prop, Atom type, gulong **ret,
+gboolean cwmcc_prop_get_array32(Window win, Atom prop, Atom type, gulong **ret,
                           gulong *nret)
 {
     return get_all(win, prop, type, 32, (guchar**)ret, nret);
 }
 
-gboolean prop_get_string_locale(Window win, Atom prop, char **data)
+gboolean cwmcc_prop_get_string_locale(Window win, Atom prop, char **data)
 {
     char **list;
     int nstr;
@@ -132,7 +132,7 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **data)
     return FALSE;
 }
 
-gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
+gboolean cwmcc_prop_get_string_utf8(Window win, Atom prop, char **ret)
 {
     char *raw;
     gulong num;
@@ -145,7 +145,7 @@ gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
     return FALSE;
 }
 
-gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
+gboolean cwmcc_prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 {
     char *raw, *p;
     gulong num, i;
@@ -165,7 +165,7 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
     return FALSE;
 }
 
-gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
+gboolean cwmcc_prop_get_strings_locale(Window win, Atom prop, char ***ret)
 {
     char *raw, *p;
     gulong num, i;
@@ -191,7 +191,26 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
     return FALSE;
 }
 
-void prop_set_strings_utf8(Window win, Atom prop, char **strs)
+void cwmcc_prop_set32(Window win, Atom prop, Atom type, gulong val)
+{
+    XChangeProperty(cwmcc_display, win, prop, type, 32, PropModeReplace,
+                    (guchar*)&val, 1);
+}
+
+void cwmcc_prop_set_array32(Window win, Atom prop, Atom type,
+                            gulong *val, gulong num)
+{
+    XChangeProperty(cwmcc_display, win, prop, type, 32, PropModeReplace,
+                    (guchar*)val, num);
+}
+
+void cwmcc_prop_set_string_utf8(Window win, Atom prop, char *val)
+{
+    XChangeProperty(cwmcc_display, win, prop, CWMCC_ATOM(type, utf8), 8,
+                    PropModeReplace, (guchar*)val, strlen(val));
+}
+
+void cwmcc_prop_set_strings_utf8(Window win, Atom prop, char **strs)
 {
     GString *str;
     guint i;
@@ -205,7 +224,7 @@ void prop_set_strings_utf8(Window win, Atom prop, char **strs)
                     PropModeReplace, (guchar*)str->str, str->len);
 }
 
-void prop_erase(Window win, Atom prop)
+void cwmcc_prop_erase(Window win, Atom prop)
 {
     XDeleteProperty(cwmcc_display, win, prop);
 }

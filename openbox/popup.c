@@ -263,19 +263,12 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
         / screen_desktop_layout.rows;
     /* make them squares */
     eachw = eachh = MIN(eachw, eachh);
-    g_message("dif %d %d %d %d ",
-              (screen_desktop_layout.columns * (eachw + ob_rr_theme->bwidth) +
-               ob_rr_theme->bwidth), w,
-              (screen_desktop_layout.rows * (eachh + ob_rr_theme->bwidth) +
-               ob_rr_theme->bwidth), h);
 
     /* center */
     px += (w - (screen_desktop_layout.columns * (eachw + ob_rr_theme->bwidth) +
                 ob_rr_theme->bwidth)) / 2;
     py += (h - (screen_desktop_layout.rows * (eachh + ob_rr_theme->bwidth) +
                 ob_rr_theme->bwidth)) / 2;
-
-    g_message("%d %d %d %d", px, py, eachw, eachh);
 
     if (eachw <= 0 || eachh <= 0)
         return;
@@ -336,8 +329,6 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
         break;
     }
 
-    g_message("%d %d %d", n, horz_inc, vert_inc);
-
     rown = n;
     i = 0;
     for (r = 0, y = 0; r < screen_desktop_layout.rows;
@@ -347,8 +338,6 @@ static void pager_popup_draw_icon(gint px, gint py, gint w, gint h,
              ++c, x += eachw + ob_rr_theme->bwidth)
         {
             RrAppearance *a;
-
-            g_message("i %d n %d", i, n);
 
             if (i >= self->desks)
                 break;

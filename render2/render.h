@@ -219,6 +219,7 @@ void RrTextureSetText(struct RrSurface *sur,
                       int texnum,
                       struct RrFont *font,
                       enum RrLayout layout,
+                      struct RrColor *color,
                       const char *text);
 void RrTextureSetNone(struct RrSurface *sur,
                       int texnum);

@@ -54,6 +54,7 @@ void RrTextureSetText(struct RrSurface *sur,
                       int texnum,
                       struct RrFont *font,
                       enum RrLayout layout,
+                      struct RrColor *color,
                       const char *text)
 {
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
@@ -64,6 +65,7 @@ void RrTextureSetText(struct RrSurface *sur,
     tex->type = RR_TEXTURE_TEXT;
     tex->data.text.font = font;
     tex->data.text.layout = layout;
+    tex->data.text.color = *color;
 
     l = strlen(text) + 1;
     tex->data.text.string = malloc(l);

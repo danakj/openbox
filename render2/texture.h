@@ -13,6 +13,7 @@ enum RrTextureType {
 struct RrTextureText {
     struct RrFont *font;
     enum RrLayout layout;
+    struct RrColor color;
     char *string;
 };
 

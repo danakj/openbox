@@ -19,6 +19,7 @@
 #include "parse.h"
 #include <glib.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -386,21 +387,45 @@ gchar *parse_expand_tilde(const gchar *f)
     return ret;
 }
 
-void parse_mkdir_path(const gchar *path, gint mode)
+gboolean parse_mkdir(const gchar *path, gint mode)
 {
-    gchar *c, *e;
+    gboolean ret = TRUE;
 
-    g_assert(path[0] == '/');
+    g_return_val_if_fail(path != NULL, FALSE);
+    g_return_val_if_fail(path[0] != '\0', FALSE);
 
-    c = g_strdup(path);
-    e = c;
-    while ((e = strchr(e + 1, '/'))) {
-        *e = '\0';
-        mkdir(c, mode);
-        *e = '/';
+    if (!g_file_test(path, G_FILE_TEST_IS_DIR))
+        if (mkdir(path, mode) == -1)
+            ret = FALSE;
+
+    return ret;
+}
+
+gboolean parse_mkdir_path(const gchar *path, gint mode)
+{
+    gboolean ret = TRUE;
+
+    g_return_val_if_fail(path != NULL, FALSE);
+    g_return_val_if_fail(path[0] == '/', FALSE);
+
+    if (!g_file_test(path, G_FILE_TEST_IS_DIR)) {
+        gchar *c, *e;
+
+        c = g_strdup(path);
+        e = c;
+        while ((e = strchr(e + 1, '/'))) {
+            *e = '\0';
+            if (!(ret = parse_mkdir(c, mode)))
+                goto parse_mkdir_path_end;
+            *e = '/';
+        }
+        ret = parse_mkdir(c, mode);
+
+    parse_mkdir_path_end:
+        g_free(c);
     }
-    mkdir(c, mode);
-    g_free(c);
+
+    return ret;
 }
 
 const gchar* parse_xdg_config_home_path()

@@ -79,8 +79,10 @@ GSList* parse_xdg_data_dir_paths();
 /*! Expands the ~ character to the home directory throughout the given
   string */
 gchar *parse_expand_tilde(const gchar *f);
+/*! Makes a directory */
+gboolean parse_mkdir(const gchar *path, gint mode);
 /*! Makes a directory and all its parents */
-void parse_mkdir_path(const gchar *path, gint mode);
+gboolean parse_mkdir_path(const gchar *path, gint mode);
 
 G_END_DECLS
 

@@ -6,20 +6,32 @@ Project Maintainer:
 Developers:
 	Ben Jansens (ben@orodu.net)
 	Scott Moynes (smoynes@nexus.carleton.ca)
-	Ruhi Bloodworth (ruhi@colophon.cjb.net)
+	Marius Nita (marius@cs.pdx.edu)
 
-Webmaster:
+Contributors:
 	Nick Jansens (jex@orodu.net)
+	 - web site design
+	Ruhi Bloodworth (ruhi@colophon.cjb.net)
+	 - smart window placement routines
+	Miklos (miklos@miklosbox.org)
+	 - Openbox styles
 
 -==============================================================================-
 
 Openbox was previously known as Blackbox. Here are the authors/contributors
 from that era:
 
-Previous Maintainer:
+Project Maintainer:
 	Sean 'Shaleh' Perry <shaleh@debian.org>
 
-Previous Contributors:
+Developers:
+        Brad Hughes <bhughes@trolltech.com>
+	Sean 'Shaleh' Perry <shaleh@debian.org>
+
+Interim author for the 0.61.x series:
+        Jeff Raven <jraven@psu.edu>
+
+Contributors:
 	Ben 'xOr' Jansens <xor@orodu.net>
 	- metric tons of code patches
         John Kennis <jkennis@chello.nl>
@@ -28,18 +40,45 @@ Previous Contributors:
 	- bbkeys, ideas, support
 	Chris Mecca <flip@linuxguide.org>
 	 - use of his irix machine for testing
- 	Wilbert Berendsen <wbsoft@xs4all.nl>
-	 - man pages and dutch nls file
-	Luca Marrazzo <marra.luca@libero.it>
-	 - italian nls files
-	Ales Kosir <ales.kosir@telemach.net>
-	 - Slovenian man pages and nls
-	SATO Satoru <ssato@adachi.ne.jp>
-	 - Japanese nls and man pages
+	Dale P. Smith <dsmith@altustech.com>
+	 - bsetroot now sets xrootpmap_id atom
+	Matt Wilson <mwilson@quicksilver.net.nz>
+	 - for noticing all of the little things
+
+
+nls contributors:
+	Mads Martin Joergensen <mmj@suse.de>
+	 - Danish (da_DK) nls support
 	Jan Schaumann <jschauma@netmeister.org>
-	 - German nls support
+	 - German (de_DE) nls support
+	Adriano Varoli Piazza <adrianovaroli@redusers.com>
+	 - Spanish nls support (submitted as es_AR, ES and MX)
+	Duret Bertrand <bertrand.duret@libertysurf.fr>
+	 - updated French (fr_FR) nls and added French man pages
+	Bodnar Istvan <piggy@dub.hu>
+	 - Hungarian (hu_HU) support
+	Luca Marrazzo <marra.luca@libero.it>
+	 - Italian (it_IT) nls support
+	SATO Satoru <ssato@adachi.ne.jp>
+	 - Japanese (ja_JP) nls support and man pages
+	Hyun Suk Noh <tzesti@users.sourceforge.net>
+	 - Korean (ko_KR) nls support
+ 	Wilbert Berendsen <wbsoft@xs4all.nl>
+	 - man pages and Dutch (nl_NL) nls support
+	Øyvind Stegard <oyvind.stegard@bluezone.no>
+	 - Norwegian (no_NO) nls support
+	Ciprian Popovici <ciprian@zuavra.net>
+	 - Romanian (ro_RO) nls support
+	Ales Kosir <ales.kosir@telemach.net>
+	 - Slovenian man pages and (sl_SI) nls support
+	Volodymyr M. Lisivka <lvm@mystery.lviv.net>
+	 - Ukrainian (uk_UA) nls support
 	Wang Tiejun <wtj@dept3.buaa.edu.cn>
-	 - Chinese nls support
+	 - Chinese (zh_CN) nls support
+	Moto Chen <han_yi_chen@yahoo.com.tw>
+	 - Taiwan Chinese (zh_TW) support
+
+Past Contributors:
         Jeffrey Sean Connell <ankh@canuck.gen.nz>
           - debugger class code (ommited from sources)
         Frank Belew <frb@umr.edu>
@@ -68,12 +107,6 @@ Previous Contributors:
         - author of bbtools/beta testing/bug reports
 	Wilbert Berendsen <wbsoft@xs4all.nl>
 	- author of blackbox/bsetroot manpages
-
-Second Author:
-        Jeff Raven <jraven@psu.edu>
-
-Original Author:
-        Brad Hughes <bhughes@trolltech.com>
 
 (Brad's original message):
 I would also like to thank the creators of WindowMaker.  Reading the existing

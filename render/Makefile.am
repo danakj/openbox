@@ -2,7 +2,7 @@ themedir=$(datadir)/openbox/themes
 
 theme=operation
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) @CPPFLAGS@ \
          -DG_LOG_DOMAIN=\"Render\" \
          -DDEFAULT_THEME=\"$(theme)\" \
          -DTHEMEDIR=\"$(themedir)\"

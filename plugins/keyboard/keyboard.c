@@ -1,4 +1,5 @@
 #include "kernel/focus.h"
+#include "kernel/frame.h"
 #include "kernel/dispatch.h"
 #include "kernel/openbox.h"
 #include "kernel/event.h"
@@ -80,19 +81,30 @@ static KeyBindingTree *curpos;
 static guint reset_key, reset_state, button_return, button_escape;
 static Timer *chain_timer;
 
-static void grab_keys()
+static void grab_for_window(Window win, gboolean grab)
 {
     KeyBindingTree *p;
 
-    ungrab_all_keys();
+    ungrab_all_keys(win);
 
-    p = curpos ? curpos->first_child : firstnode;
-    while (p) {
-        grab_key(p->key, p->state, GrabModeAsync);
-        p = p->next_sibling;
+    if (grab) {
+        p = curpos ? curpos->first_child : firstnode;
+        while (p) {
+            grab_key(p->key, p->state, win, GrabModeAsync);
+            p = p->next_sibling;
+        }
+        if (curpos)
+            grab_key(reset_key, reset_state, win, GrabModeAsync);
     }
-    if (curpos)
-        grab_key(reset_key, reset_state, GrabModeAsync);
+}
+
+static void grab_keys(gboolean grab)
+{
+    GList *it;
+
+    grab_for_window(focus_backup, grab);
+    for (it = client_list; it; it = g_list_next(it))
+        grab_for_window(((Client*)it->data)->frame->window, grab);
 }
 
 static void reset_chains()
@@ -103,7 +115,7 @@ static void reset_chains()
     }
     if (curpos) {
         curpos = NULL;
-        grab_keys();
+        grab_keys(TRUE);
     }
 }
 
@@ -149,6 +161,14 @@ gboolean kbind(GList *keylist, Action *action)
 static void event(ObEvent *e, void *foo)
 {
     static KeyBindingTree *grabbed_key = NULL;
+
+    if (e->type == Event_Client_Mapped) {
+        grab_for_window(e->data.c.client->window, TRUE);
+        return;
+    } else if (e->type == Event_Client_Destroy) {
+        grab_for_window(e->data.c.client->window, FALSE);
+        return;
+    }
 
     if (grabbed_key) {
         gboolean done = FALSE;
@@ -204,7 +224,7 @@ static void event(ObEvent *e, void *foo)
                     chain_timer = timer_start(5000*1000, chain_timeout,
                                               NULL);
                     curpos = p;
-                    grab_keys();
+                    grab_keys(TRUE);
                 } else {
                     GSList *it;
                     for (it = p->actions; it; it = it->next) {
@@ -244,14 +264,15 @@ void plugin_startup()
     curpos = NULL;
     chain_timer = NULL;
 
-    dispatch_register(Event_X_KeyPress | Event_X_KeyRelease,
+    dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
+                      Event_X_KeyPress | Event_X_KeyRelease,
                       (EventHandler)event, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
     translate_key("Escape", &i, &button_escape);
     translate_key("Return", &i, &button_return);
 
-    grab_keys();
+    grab_keys(TRUE);
 }
 
 void plugin_shutdown()
@@ -260,6 +281,6 @@ void plugin_shutdown()
 
     tree_destroy(firstnode);
     firstnode = NULL;
-    ungrab_all_keys();
+    grab_keys(FALSE);
 }
 

@@ -227,6 +227,7 @@ static void event(ObEvent *e, void *foo)
                             e->data.x.client, e->data.x.e->xbutton.state,
                             e->data.x.e->xbutton.button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
+                drag = FALSE;
             }
 
             /* clicks are only valid if its released over the window */

@@ -184,6 +184,7 @@ void increase_depth(pixel32 *data, XImage *im)
 
     switch (im->bits_per_pixel) {
     case 32:
+        g_message("increase 32");
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (p32[x] >> render_red_offset) & 0xff;
@@ -199,6 +200,7 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     case 16:
+        g_message("increase 16");
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (p16[x] & render_red_mask) >> render_red_offset <<
@@ -217,44 +219,20 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     case 8:
-        g_assert(render_visual->class != TrueColor);
+        g_message("this bit depth is currently unhandled\n");
+        break;
+    case 1:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                XColor icolor;
-                int ii, r, g, b;
-                gulong dev, closest = 0xffffffff, close = 0;
-
-                icolor.pixel = p8[x];
-                XQueryColor(ob_display, render_colormap, &icolor);
-
-                /* find the nearest color match */
-                for (ii = 0; ii < pseudo_ncolors(); ii++) {
-                    /* find deviations */
-                    r = (pseudo_colors[ii].red - icolor.red) & 0xff;
-                    g = (pseudo_colors[ii].green - icolor.green) & 0xff;
-                    b = (pseudo_colors[ii].blue - icolor.blue) & 0xff;
-                    /* find a weighted absolute deviation */
-                    dev = (r * r) + (g * g) + (b * b);
-
-                    if (dev < closest) {
-                        closest = dev;
-                        close = ii;
-                    }
-                }
-                data[x] =
-                    (pseudo_colors[close].red & 0xff <<
-                     default_red_offset) +
-                    (pseudo_colors[close].green & 0xff <<
-                       default_green_offset) +
-                    (pseudo_colors[close].blue & 0xff <<
-                       default_blue_offset) +
-                    (0xff << default_alpha_offset);
+                if (!(((p8[x / 8]) >> (x % 8)) & 0x1))
+                    data[x] = 0xff << default_alpha_offset; /* black */
+                else
+                    data[x] = 0xffffffff; /* white */
+            }
+            data += im->width;
+            p8 += im->bytes_per_line;
         }
-        data += im->width;
-        p8 += im->bytes_per_line;
-  }
-
-    break;
+        break;
     default:
         g_message("your bit depth is currently unhandled\n");
     }

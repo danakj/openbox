@@ -10,8 +10,6 @@ static void gradient_horizontal(RrSurface *sf, int w, int h);
 static void gradient_diagonal(RrSurface *sf, int w, int h);
 static void gradient_crossdiagonal(RrSurface *sf, int w, int h);
 static void gradient_pyramid(RrSurface *sf, int inw, int inh);
-static void gradient_rectangle(RrSurface *sf, int inw, int inh);
-static void gradient_pipecross(RrSurface *sf, int inw, int inh);
 
 void RrRender(RrAppearance *a, int w, int h)
 {
@@ -38,12 +36,6 @@ void RrRender(RrAppearance *a, int w, int h)
         break;
     case RR_SURFACE_PYRAMID:
         gradient_pyramid(&a->surface, w, h);
-        break;
-    case RR_SURFACE_PIPECROSS:
-        gradient_pipecross(&a->surface, w, h);
-        break;
-    case RR_SURFACE_RECTANGLE:
-        gradient_rectangle(&a->surface, w, h);
         break;
     default:
         g_message("unhandled gradient");
@@ -544,117 +536,3 @@ static void gradient_pyramid(RrSurface *sf, int inw, int inh)
     *(end-(inw-x)) = current;
 }
 
-static void gradient_rectangle(RrSurface *sf, int inw, int inh)
-{
-    int x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 *end = data + inw*inh - 1;
-    RrPixel32 current;
-    RrColor left, right;
-    RrColor extracorner;
-
-    VARS(lefty);
-    VARS(righty);
-    VARS(x);
-
-    extracorner.r = (sf->primary->r + sf->secondary->r) / 2;
-    extracorner.g = (sf->primary->g + sf->secondary->g) / 2;
-    extracorner.b = (sf->primary->b + sf->secondary->b) / 2;
-
-    SETUP(lefty, (&extracorner), sf->secondary, h);
-    SETUP(righty, sf->primary, (&extracorner), h);
-
-    for (y = h - 1; y > 0; --y) {  /* 0 -> h-1 */
-        COLOR_RR(lefty, (&left));
-        COLOR_RR(righty, (&right));
-
-        SETUP(x, (&left), (&right), w);
-
-        for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-            current = COLOR(x);
-            *(data+x) = current;
-            *(data+inw-x) = current;
-            *(end-x) = current;
-            *(end-(inw-x)) = current;
-
-            NEXT(x);
-        }
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
-
-        data+=inw;
-        end-=inw;
-
-        NEXT(lefty);
-        NEXT(righty);
-    }
-    COLOR_RR(lefty, (&left));
-    COLOR_RR(righty, (&right));
-
-    SETUP(x, (&left), (&right), w);
-
-    for (x = w - 1; x > 0; --x) {  /* 0 -> w-1 */
-        current = COLOR(x);
-        *(data+x) = current;
-        *(data+inw-x) = current;
-        *(end-x) = current;
-        *(end-(inw-x)) = current;
-        
-        NEXT(x);
-    }
-    *(data+x) = current;
-    *(data+inw-x) = current;
-    *(end-x) = current;
-    *(end-(inw-x)) = current;
-}
-
-static void gradient_pipecross(RrSurface *sf, int inw, int inh)
-{
-    RrPixel32 *data = sf->RrPixel_data;
-    RrPixel32 *end = data + inw*inh - 1;
-    RrPixel32 current;
-    float drx, dgx, dbx, dry, dgy, dby;
-    unsigned int r,g,b;
-    int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
-
-    drx = (float)(sf->secondary->r -
-                  sf->primary->r);
-    dry = drx/(float)h;
-    drx/= (float)w;
-
-    dgx = (float)(sf->secondary->g -
-                  sf->primary->g);
-    dgy = dgx/(float)h;
-    dgx/= (float)w;
-
-    dbx = (float)(sf->secondary->b -
-                  sf->primary->b);
-    dby = dbx/(float)h;
-    dbx/= (float)w;
-
-    for (y = 0; y < h; ++y) {
-        for (x = 0; x < w; ++x, data) {
-            if ((float)x/(float)w > (float)y/(float)h) {
-                r = sf->primary->r + (drx * x);
-                g = sf->primary->g + (dgx * x);
-                b = sf->primary->b + (dbx * x);
-            } else {
-                r = sf->primary->r + (dry * x);
-                g = sf->primary->g + (dgy * x);
-                b = sf->primary->b + (dby * x);
-            }
-            current = (r << RrDefaultRedOffset)
-                + (g << RrDefaultGreenOffset)
-                + (b << RrDefaultBlueOffset);
-            *(data+x) = current;
-            *(data+inw-x) = current;
-            *(end-x) = current;
-            *(end-(inw-x)) = current;
-        }
-        data+=inw;
-        end-=inw;
-    }
-}

@@ -871,14 +871,8 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
 	if (strstr(tex, "gradient") != NULL) {
 	    if (strstr(tex, "crossdiagonal") != NULL)
 		*grad = RR_SURFACE_CROSS_DIAGONAL;
-	    else if (strstr(tex, "rectangle") != NULL)
-		*grad = RR_SURFACE_RECTANGLE;
 	    else if (strstr(tex, "pyramid") != NULL)
 		*grad = RR_SURFACE_PYRAMID;
-	    else if (strstr(tex, "pipecross") != NULL)
-		*grad = RR_SURFACE_PIPECROSS;
-	    else if (strstr(tex, "elliptic") != NULL)
-		*grad = RR_SURFACE_PIPECROSS;
 	    else if (strstr(tex, "horizontal") != NULL)
 		*grad = RR_SURFACE_HORIZONTAL;
 	    else if (strstr(tex, "vertical") != NULL)

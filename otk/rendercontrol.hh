@@ -82,6 +82,14 @@ public:
   virtual void drawBackground(Surface &sf,
 			      const RenderTexture &texture) const = 0;
 
+  //! Draws an image onto the surface
+  /*!
+    This function will overwrite the entire surface.<br>
+    The image must be specified in 32-bit packed ARGB format. The current
+    background will be used for applying the alpha.
+  */
+  virtual void drawImage(Surface &sf, int w, int h, unsigned long *data) const;
+  
   //! Draws a string onto a Surface
   virtual void drawString(Surface &sf, const Font &font, int x, int y,
 			  const RenderColor &color,

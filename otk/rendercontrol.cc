@@ -214,4 +214,9 @@ void RenderControl::drawMask(Surface &sf, const RenderColor &color,
   XSetClipOrigin(**display, color.gc(), 0, 0);
 }
 
+void RenderControl::drawImage(Surface &sf, int w, int h,
+                              unsigned long *data) const
+{
+}
+
 }

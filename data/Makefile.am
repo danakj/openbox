@@ -4,6 +4,8 @@ SUBDIRS = styles buttons
 CLEANFILES = menu
 MAINTAINERCLEANFILES = Makefile.in
 
+EXTRA_DIST = README.menu README.style menu.in
+
 all-local: menu
 
 distclean-local:

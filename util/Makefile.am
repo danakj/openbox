@@ -20,6 +20,8 @@ bsetroot_LDADD =	../src/BaseDisplay.o ../src/Color.o ../src/GCCache.o ../src/Tex
 
 MAINTAINERCLEANFILES =	Makefile.in
 
+EXTRA_DIST = bsetroot.hh
+
 distclean-local:
 	rm -f *\~ .\#*
 

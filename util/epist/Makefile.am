@@ -20,7 +20,7 @@ epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \
 
 MAINTAINERCLEANFILES =	Makefile.in
 
-EXTRA_DIST = epistrc epist.1.in epistrc.5.in
+EXTRA_DIST = epistrc epist.1.in epistrc.5.in actions.hh config.hh epist.hh keytree.hh parser.hh screen.hh window.hh yacc_parser.hh
 
 distclean-local:
 	rm -f *\~ .\#*

@@ -3200,3 +3200,8 @@ ObClient* client_under_pointer()
     }
     return ret;
 }
+
+gboolean client_has_group_siblings(ObClient *self)
+{
+    return self->group && self->group->members->next;
+}

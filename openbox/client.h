@@ -563,4 +563,6 @@ void client_update_sm_client_id(ObClient *self);
 
 ObClient* client_under_pointer();
 
+gboolean client_has_group_siblings(ObClient *self);
+
 #endif

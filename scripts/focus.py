@@ -56,7 +56,6 @@ def _focused(data):
         return
 
     if data.client:
-        print data.client.window()
         # move it to the top
         try:
             _remove(data.client)

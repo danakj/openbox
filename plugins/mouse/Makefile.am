@@ -20,5 +20,8 @@ noinst_HEADERS=mouse.h translate.h mouserc_parse.h
 
 MAINTAINERCLEANFILES= Makefile.in
 
+clean-local:
+	$(RM) lex.mparse.c
+
 distclean-local:
 	$(RM) *\~ *.orig *.rej .\#*

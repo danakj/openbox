@@ -132,7 +132,7 @@ void client_manage_all()
 
         w = client_startup_stack_order[i-1];
         c = g_hash_table_lookup(client_map, &w);
-        g_message("0x%lx %d", c->window, c->iconic);
+        g_message("0x%lx %d %d", c->window, c->iconic, c->shaded);
         if (c) stacking_lower(c);
     }
     g_free(client_startup_stack_order);
@@ -307,11 +307,6 @@ void client_unmanage(Client *client)
     /* dispatch the unmapped event */
     dispatch_client(Event_Client_Unmapped, client, 0, 0);
     g_assert(client != NULL);
-
-    /* unfocus the client (dispatchs the focus event) (we're out of the
-     transient lists already, so being modal doesn't matter) */
-    if (client_focused(client))
-	client_unfocus(client);
 
     /* give the client its border back */
     client_toggle_border(client, TRUE);
@@ -1947,7 +1942,9 @@ gboolean client_focus(Client *self)
     }
 
     if (self->can_focus)
-	XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
+        /* RevertToNone is used so that windows dont get focused inadvertantly
+           by having the pointer in them, and then FocusIn events go missing */
+	XSetInputFocus(ob_display, self->window, RevertToNone,
                        event_lasttime);
 
     if (self->focus_notify) {

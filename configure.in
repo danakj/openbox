@@ -189,7 +189,7 @@ if test "$XFT" = "yes"; then
   dnl fi
 fi
 AM_CONDITIONAL(XFT, test "$XFT" = "yes")
-AM_CONDITIONAL(XFT2, test "$XFT2" = "yes");
+AM_CONDITIONAL(XFT2, test "$XFT2" = "yes")
 	
 dnl Check for ordered 8bpp dithering
 ORDEREDPSEUDO=""

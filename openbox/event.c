@@ -349,17 +349,21 @@ static void event_handle_client(Client *client, XEvent *e)
         engine_frame_adjust_focus(client->frame);
 	break;
     case EnterNotify:
-        if (ob_state == State_Starting) {
-            /* move it to the top of the focus order */
-            guint desktop = client->desktop;
-            if (desktop == DESKTOP_ALL) desktop = screen_desktop;
-            focus_order[desktop] = g_list_remove(focus_order[desktop], client);
-            focus_order[desktop] = g_list_prepend(focus_order[desktop],client);
-        } else {
-            if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
-                g_assert_not_reached();
-            if (focus_follow.bool)
-                client_focus(client);
+        if (client_normal(client)) {
+            if (ob_state == State_Starting) {
+                /* move it to the top of the focus order */
+                guint desktop = client->desktop;
+                if (desktop == DESKTOP_ALL) desktop = screen_desktop;
+                focus_order[desktop] = g_list_remove(focus_order[desktop],
+                                                     client);
+                focus_order[desktop] = g_list_prepend(focus_order[desktop],
+                                                      client);
+            } else {
+                if (!config_get("focusFollowsMouse",Config_Bool,&focus_follow))
+                    g_assert_not_reached();
+                if (focus_follow.bool)
+                    client_focus(client);
+            }
         }
         break;
     case ConfigureRequest:

@@ -19,12 +19,12 @@ fieron_buttons_sources := $(addprefix $(fieron_buttons_srcdir)/,$(fieron_buttons
 fieron2_buttons_dir:=$(dir)/fieron2_buttons
 fieron2_buttons_srcdir:=$(srcdir)/fieron2_buttons
 fieron2_buttons:=close.xbm icon.xbm max.xbm stick.xbm
-fieron_buttons_sources := $(addprefix $(fieron2_buttons_srcdir)/,$(fieron2_buttons))
+fieron2_buttons_sources := $(addprefix $(fieron2_buttons_srcdir)/,$(fieron2_buttons))
 
 ebox_buttons_dir:=$(dir)/ebox_buttons
 ebox_buttons_srcdir:=$(srcdir)/ebox_buttons
 ebox_buttons:=close.xbm icon.xbm max.xbm
-fieron_buttons_sources := $(addprefix $(ebox_buttons_srcdir)/,$(ebox_buttons))
+ebox_buttons_sources := $(addprefix $(ebox_buttons_srcdir)/,$(ebox_buttons))
 
 all:
 
@@ -35,11 +35,11 @@ install:
 	done
 
 	$(INSTALL) -d $(fieron_buttons_dir)
-	for i in $(fireon_buttons_sources); do \
+	for i in $(fieron_buttons_sources); do \
 		$(INSTALL) $$i $(fieron_buttons_dir); \
 	done
 	$(INSTALL) -d $(fieron2_buttons_dir)
-	for i in $(fireon2_buttons_sources); do \
+	for i in $(fieron2_buttons_sources); do \
 		$(INSTALL) $$i $(fieron2_buttons_dir); \
 	done
 	$(INSTALL) -d $(ebox_buttons_dir)

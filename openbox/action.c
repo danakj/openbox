@@ -1203,7 +1203,7 @@ void action_growtoedge(union ActionData *data)
     frame_frame_gravity(c->frame, &x, &y);
     width -= c->frame->size.left + c->frame->size.right;
     height -= c->frame->size.top + c->frame->size.bottom;
-    client_move(c, x, y);
+    client_move_resize(c, x, y, width, height);
 }
 
 void action_send_to_layer(union ActionData *data)

@@ -23,182 +23,114 @@ gboolean     config_dock_horz;
 gboolean     config_dock_hide;
 guint        config_dock_hide_timeout;
 
-static void parse_focus(char *name, ParseToken *value)
+static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "focusnew")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_focus_new = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "followmouse")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_focus_follow = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "focuslast")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_focus_last = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "focuslastondesktop")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_focus_last_on_desktop = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "cyclingdialog")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_focus_popup = value->data.bool;
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("focusNew", node)))
+        config_focus_new = parse_bool(doc, n);
+    if ((n = parse_find_node("followMouse", node)))
+        config_focus_follow = parse_bool(doc, n);
+    if ((n = parse_find_node("focusLast", node)))
+        config_focus_last = parse_bool(doc, n);
+    if ((n = parse_find_node("focusLastOnDesktop", node)))
+        config_focus_last_on_desktop = parse_bool(doc, n);
+    if ((n = parse_find_node("cyclingDialog", node)))
+        config_focus_popup = parse_bool(doc, n);
 }
 
-static void parse_theme(char *name, ParseToken *value)
+static void parse_theme(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "theme")) {
-        if (value->type != TOKEN_STRING)
-            yyerror("invalid value");
-        else {
-            g_free(config_theme);
-            config_theme = g_strdup(value->data.string);
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("theme", node))) {
+        g_free(config_theme);
+        config_theme = parse_string(doc, n);
+    }
 }
 
-static void parse_desktops(char *name, ParseToken *value)
+static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    GList *it;
+    xmlNodePtr n;
 
-    if (!g_ascii_strcasecmp(name, "number")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            config_desktops_num = value->data.integer;
+    if ((n = parse_find_node("number", node)))
+        config_desktops_num = parse_int(doc, n);
+    if ((n = parse_find_node("names", node))) {
+        GSList *it;
+        xmlNodePtr nname;
+
+        for (it = config_desktops_names; it; it = it->next)
+            g_free(it->data);
+        g_slist_free(config_desktops_names);
+        config_desktops_names = NULL;
+
+        nname = parse_find_node("name", n->xmlChildrenNode);
+        while (nname) {
+            config_desktops_names = g_slist_append(config_desktops_names,
+                                                   parse_string(doc, nname));
+            nname = parse_find_node("name", nname->next);
         }
-    } else if (!g_ascii_strcasecmp(name, "names")) {
-        if (value->type == TOKEN_LIST) {
-            for (it = value->data.list; it; it = it->next)
-                if (((ParseToken*)it->data)->type != TOKEN_STRING) break;
-            if (it == NULL) {
-                /* build a string list */
-                g_free(config_desktops_names);
-                for (it = value->data.list; it; it = it->next)
-                    config_desktops_names =
-                        g_slist_append(config_desktops_names,
-                                       g_strdup
-                                       (((ParseToken*)it->data)->data.string));
-            } else {
-                yyerror("invalid string in names list");
-            }
-        } else {
-            yyerror("syntax error (expected list of strings)");
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    }
 }
 
-static void parse_moveresize(char *name, ParseToken *value)
+static void parse_moveresize(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "opaque_move")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_opaque_move = value->data.integer;
-        }
-    } else if (!g_ascii_strcasecmp(name, "opaque_resize")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_opaque_resize = value->data.integer;
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("opaqueMove", node)))
+        config_opaque_move = parse_bool(doc, n);
+    if ((n = parse_find_node("opaqueResize", node)))
+        config_opaque_resize = parse_bool(doc, n);
 }
 
-static void parse_dock(char *name, ParseToken *value)
+static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "stacking")) {
-        if (value->type != TOKEN_STRING)
-            yyerror("invalid value");
-        else {
-            if (!g_ascii_strcasecmp(value->data.string, "bottom"))
-                config_dock_layer = Layer_Below;
-            else if (!g_ascii_strcasecmp(value->data.string, "normal"))
-                config_dock_layer = Layer_Normal;
-            else if (!g_ascii_strcasecmp(value->data.string, "top"))
-                config_dock_layer = Layer_Top;
-            else
-                yyerror("invalid layer");
-        }
-    } else if (!g_ascii_strcasecmp(name, "position")) {
-        if (value->type != TOKEN_STRING)
-            yyerror("invalid value");
-        else {
-            if (!g_ascii_strcasecmp(value->data.string, "topleft"))
-                config_dock_pos = DockPos_TopLeft;
-            else if (!g_ascii_strcasecmp(value->data.string, "top"))
-                config_dock_pos = DockPos_Top;
-            else if (!g_ascii_strcasecmp(value->data.string, "topright"))
-                config_dock_pos = DockPos_TopRight;
-            else if (!g_ascii_strcasecmp(value->data.string, "right"))
-                config_dock_pos = DockPos_Right;
-            else if (!g_ascii_strcasecmp(value->data.string, "bottomright"))
-                config_dock_pos = DockPos_BottomRight;
-            else if (!g_ascii_strcasecmp(value->data.string, "bottom"))
-                config_dock_pos = DockPos_Bottom;
-            else if (!g_ascii_strcasecmp(value->data.string, "bottomleft"))
-                config_dock_pos = DockPos_BottomLeft;
-            else if (!g_ascii_strcasecmp(value->data.string, "left"))
-                config_dock_pos = DockPos_Left;
-            else if (!g_ascii_strcasecmp(value->data.string, "floating"))
-                config_dock_pos = DockPos_Floating;
-            else
-                yyerror("invalid position");
-        }
-    } else if (!g_ascii_strcasecmp(name, "floatingx")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            config_dock_x = value->data.integer;
-        }
-    } else if (!g_ascii_strcasecmp(name, "floatingy")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            config_dock_y = value->data.integer;
-        }
-    } else if (!g_ascii_strcasecmp(name, "horizontal")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_dock_horz = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "autohide")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else {
-            config_dock_hide = value->data.bool;
-        }
-    } else if (!g_ascii_strcasecmp(name, "hidetimeout")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            config_dock_hide_timeout = value->data.integer;
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("position", node))) {
+        if (parse_contains("TopLeft", doc, n))
+            config_dock_pos = DockPos_TopLeft;
+        else if (parse_contains("Top", doc, n))
+            config_dock_pos = DockPos_Top;
+        else if (parse_contains("TopRight", doc, n))
+            config_dock_pos = DockPos_TopRight;
+        else if (parse_contains("Right", doc, n))
+            config_dock_pos = DockPos_Right;
+        else if (parse_contains("BottomRight", doc, n))
+            config_dock_pos = DockPos_BottomRight;
+        else if (parse_contains("Bottom", doc, n))
+            config_dock_pos = DockPos_Bottom;
+        else if (parse_contains("BottomLeft", doc, n))
+            config_dock_pos = DockPos_BottomLeft;
+        else if (parse_contains("Left", doc, n))
+            config_dock_pos = DockPos_Left;
+        else if (parse_contains("Floating", doc, n))
+            config_dock_pos = DockPos_Floating;
+    }
+    if (config_dock_pos == DockPos_Floating) {
+        if ((n = parse_find_node("floatingX", node)))
+            config_dock_x = parse_int(doc, n);
+        if ((n = parse_find_node("floatingY", node)))
+            config_dock_y = parse_int(doc, n);
+    }
+    if ((n = parse_find_node("stacking", node))) {
+        if (parse_contains("top", doc, n))
+            config_dock_layer = Layer_Top;
+        else if (parse_contains("normal", doc, n))
+            config_dock_layer = Layer_Normal;
+        else if (parse_contains("bottom", doc, n))
+            config_dock_layer = Layer_Below;
+    }
+    if ((n = parse_find_node("direction", node))) {
+        if (parse_contains("horizontal", doc, n))
+            config_dock_horz = TRUE;
+        else if (parse_contains("vertical", doc, n))
+            config_dock_horz = FALSE;
+    }
+    if ((n = parse_find_node("autoHide", node)))
+        config_dock_hide = parse_bool(doc, n);
+    if ((n = parse_find_node("hideTimeout", node)))
+        config_dock_hide_timeout = parse_int(doc, n);
 }
 
 void config_startup()
@@ -209,21 +141,21 @@ void config_startup()
     config_focus_last_on_desktop = TRUE;
     config_focus_popup = TRUE;
 
-    parse_reg_section("focus", NULL, parse_focus);
+    parse_register("focus", parse_focus, NULL);
 
     config_theme = NULL;
 
-    parse_reg_section("theme", NULL, parse_theme);
+    parse_register("theme", parse_theme, NULL);
 
     config_desktops_num = 4;
     config_desktops_names = NULL;
 
-    parse_reg_section("desktops", NULL, parse_desktops);
+    parse_register("desktops", parse_desktops, NULL);
 
     config_opaque_move = TRUE;
     config_opaque_resize = TRUE;
 
-    parse_reg_section("moveresize", NULL, parse_moveresize);
+    parse_register("moveresize", parse_moveresize, NULL);
 
     config_dock_layer = Layer_Top;
     config_dock_pos = DockPos_TopRight;
@@ -233,7 +165,7 @@ void config_startup()
     config_dock_hide = FALSE;
     config_dock_hide_timeout = 3000;
 
-    parse_reg_section("dock", NULL, parse_dock);
+    parse_register("dock", parse_dock, NULL);
 }
 
 void config_shutdown()

@@ -9,38 +9,97 @@
 #include "kernel/frame.h"
 #include "translate.h"
 #include "mouse.h"
-#include "mouseparse.h"
 #include <glib.h>
 
 static int threshold;
 static int dclicktime;
 
-static void parse_assign(char *name, ParseToken *value)
+/*
+
+<context name="Titlebar"> 
+  <mousebind button="Left" action="Press">
+    <action name="Raise"></action>
+  </mousebind>
+</context>
+
+*/
+
+static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "dragthreshold")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            if (value->data.integer >= 0)
-                threshold = value->data.integer;
+    xmlNodePtr n, nbut, nact;
+    char *buttonstr;
+    char *contextstr;
+    MouseAction mact;
+    Action *action;
+
+    if ((n = parse_find_node("dragThreshold", node)))
+        threshold = parse_int(doc, n);
+    if ((n = parse_find_node("doubleClickTime", node)))
+        dclicktime = parse_int(doc, n);
+
+    n = parse_find_node("context", node);
+    while (n) {
+        if (!parse_attr_string("name", n, &contextstr))
+            goto next_n;
+        nbut = parse_find_node("mousebind", n->xmlChildrenNode);
+        while (nbut) {
+            if (!parse_attr_string("button", nbut, &buttonstr))
+                goto next_nbut;
+            if (parse_attr_contains("press", nbut, "action"))
+                mact = MouseAction_Press;
+            else if (parse_attr_contains("release", nbut, "action"))
+                mact = MouseAction_Release;
+            else if (parse_attr_contains("click", nbut, "action"))
+                mact = MouseAction_Click;
+            else if (parse_attr_contains("doubleclick", nbut,"action"))
+                mact = MouseAction_DClick;
+            else if (parse_attr_contains("drag", nbut, "action"))
+                mact = MouseAction_Motion;
+            else
+                goto next_nbut;
+            nact = parse_find_node("action", nbut->xmlChildrenNode);
+            while (nact) {
+                if ((action = parse_action(doc, nact))) {
+                    /* validate that its okay for a mouse binding*/
+                    if (mact == MouseAction_Motion) {
+                        if (action->func != action_moveresize ||
+                            action->data.moveresize.corner ==
+                            prop_atoms.net_wm_moveresize_move_keyboard ||
+                            action->data.moveresize.corner ==
+                            prop_atoms.net_wm_moveresize_size_keyboard) {
+                            action_free(action);
+                            action = NULL;
+                        }
+                    } else {
+                        if (action->func == action_moveresize &&
+                            action->data.moveresize.corner !=
+                            prop_atoms.net_wm_moveresize_move_keyboard &&
+                            action->data.moveresize.corner !=
+                            prop_atoms.net_wm_moveresize_size_keyboard) {
+                            action_free(action);
+                            action = NULL;
+                        }
+                    }
+                    if (action)
+                        mbind(buttonstr, contextstr, mact, action);
+                }
+                nact = parse_find_node("action", nact->next);
+            }
+            g_free(buttonstr);
+        next_nbut:
+            nbut = parse_find_node("mousebind", nbut->next);
         }
-    } else if (!g_ascii_strcasecmp(name, "doubleclicktime")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            if (value->data.integer >= 0)
-                dclicktime = value->data.integer;
-        }
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+        g_free(contextstr);
+    next_n:
+        n = parse_find_node("context", n->next);
+    }
 }
 
 void plugin_setup_config()
 {
     threshold = 3;
     dclicktime = 200;
-    parse_reg_section("mouse", mouseparse, parse_assign);
+    parse_register("mouse", parse_xml, NULL);
 }
 
 /* Array of GSList*s of PointerBinding*s. */
@@ -240,11 +299,11 @@ static void event(ObEvent *e, void *foo)
                                 e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
             /* clicks are only valid if its released over the window */
-            int junk;
+            int junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
             XGetGeometry(ob_display, e->data.x.e->xbutton.window,
-                         &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
+                         &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);
             if (e->data.x.e->xbutton.x >= (signed)-b &&
                 e->data.x.e->xbutton.y >= (signed)-b &&
                 e->data.x.e->xbutton.x < (signed)(w+b) &&

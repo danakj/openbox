@@ -1,6 +1,7 @@
 plugindir=$(libdir)/openbox/plugins
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
+         $(XML_CFLAGS) @CPPFLAGS@ \
          -DG_LOG_DOMAIN=\"Plugin-Keyboard\"
 
 INCLUDES=-I../..
@@ -8,7 +9,7 @@ INCLUDES=-I../..
 plugin_LTLIBRARIES=keyboard.la
 
 keyboard_la_LDFLAGS=-module -avoid-version
-keyboard_la_SOURCES=keyboard.c keyparse.c translate.c tree.c
+keyboard_la_SOURCES=keyboard.c translate.c tree.c
 
 noinst_HEADERS=keyboard.h keyparse.h translate.h tree.h
 

@@ -9,23 +9,14 @@
 static int resistance;
 static gboolean resist_windows;
 
-static void parse_assign(char *name, ParseToken *value)
+static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if (!g_ascii_strcasecmp(name, "strength")) {
-        if (value->type != TOKEN_INTEGER)
-            yyerror("invalid value");
-        else {
-            if (value->data.integer >= 0)
-                resistance = value->data.integer;
-        }
-    } else if  (!g_ascii_strcasecmp(name, "windows")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else
-            resist_windows = value->data.bool;
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("strength", node)))
+        resistance = parse_int(doc, n);
+    if ((n = parse_find_node("windows", node)))
+        resist_windows = parse_bool(doc, n);
 }
 
 void plugin_setup_config()
@@ -33,7 +24,7 @@ void plugin_setup_config()
     resistance = 10;
     resist_windows = TRUE;
 
-    parse_reg_section("resistance", NULL, parse_assign);
+    parse_register("resistance", parse_xml, NULL);
 }
 
 static void resist_move(Client *c, int *x, int *y)

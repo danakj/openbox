@@ -1,7 +1,7 @@
 #ifndef __plugin_placement_history_h
 #define __plugin_placement_history_h
 
-#include "../../kernel/client.h"
+#include "kernel/client.h"
 #include <glib.h>
 
 void history_startup();

@@ -2,7 +2,8 @@ plugindir=$(libdir)/openbox/plugins
 
 SUBDIRS = keyboard mouse placement menu
 
-CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) \
+         $(XML_CFLAGS)  @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\"
 
 INCLUDES=-I..

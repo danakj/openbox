@@ -1,48 +1,38 @@
 #ifndef __parse_h
 #define __parse_h
 
+#include "action.h"
+
+#include <libxml/parser.h>
 #include <glib.h>
-#ifndef NO_TAB_H
-#include "parse.tab.h"
-#endif
 
-typedef enum {
-    TOKEN_REAL       = REAL,
-    TOKEN_INTEGER    = INTEGER,
-    TOKEN_STRING     = STRING,
-    TOKEN_IDENTIFIER = IDENTIFIER,
-    TOKEN_BOOL       = BOOLEAN,
-    TOKEN_LIST,
-    TOKEN_LBRACE     = '{',
-    TOKEN_RBRACE     = '}',
-    TOKEN_COMMA      = ',',
-    TOKEN_NEWLINE    = '\n'
-} ParseTokenType;
-
-typedef struct {
-    ParseTokenType type;
-    union ParseTokenData data;
-} ParseToken;
-
-typedef void (*ParseFunc)(ParseToken *token);
-typedef void (*AssignParseFunc)(char *name, ParseToken *value);
+typedef void (*ParseCallback)(xmlDocPtr doc, xmlNodePtr node, void *data);
 
 void parse_startup();
 void parse_shutdown();
 
-/* Parse the RC file
-   found in parse.yacc
-*/
-void parse_rc();
+void parse_register(const char *tag, ParseCallback func, void *data);
 
-void parse_reg_section(char *section, ParseFunc func, AssignParseFunc afunc);
+void parse_config();
+
+void parse_tree(xmlDocPtr doc, xmlNodePtr node, void *nothing);
 
 
-/* Free a parsed token's allocated memory */
-void parse_free_token(ParseToken *token);
+/* helpers */
 
-/* Display an error message while parsing.
-   found in parse.yacc */
-void yyerror(char *err);
+xmlNodePtr parse_find_node(const char *tag, xmlNodePtr node);
+
+char *parse_string(xmlDocPtr doc, xmlNodePtr node);
+int parse_int(xmlDocPtr doc, xmlNodePtr node);
+gboolean parse_bool(xmlDocPtr doc, xmlNodePtr node);
+
+gboolean parse_contains(const char *val, xmlDocPtr doc, xmlNodePtr node);
+gboolean parse_attr_contains(const char *val, xmlNodePtr node,
+                             const char *name);
+
+gboolean parse_attr_string(const char *name, xmlNodePtr node, char **value);
+gboolean parse_attr_int(const char *name, xmlNodePtr node, int *value);
+
+Action *parse_action(xmlDocPtr doc, xmlNodePtr node);
 
 #endif

@@ -9,23 +9,19 @@
 
 static gboolean history;
 
-static void parse_assign(char *name, ParseToken *value)
+static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    if  (!g_ascii_strcasecmp(name, "remember")) {
-        if (value->type != TOKEN_BOOL)
-            yyerror("invalid value");
-        else
-            history = value->data.bool;
-    } else
-        yyerror("invalid option");
-    parse_free_token(value);
+    xmlNodePtr n;
+
+    if ((n = parse_find_node("remember", node)))
+        history = parse_bool(doc, n);
 }
 
 void plugin_setup_config()
 {
     history = TRUE;
 
-    parse_reg_section("placement", NULL, parse_assign);
+    parse_register("placement", parse_xml, NULL);
 }
 
 static void place_random(Client *c)

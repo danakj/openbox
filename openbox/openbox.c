@@ -180,7 +180,7 @@ int main(int argc, char **argv)
         /* set up the kernel config shit */
         config_startup();
         /* parse/load user options */
-        parse_rc();
+        parse_config();
         /* we're done with parsing now, kill it */
         parse_shutdown();
 

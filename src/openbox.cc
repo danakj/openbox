@@ -150,6 +150,7 @@ Openbox::Openbox(int argc, char **argv)
   python_exec(SCRIPTDIR"/config.py"); // load openbox config values
   // run all of the python scripts
   python_exec(SCRIPTDIR"/builtins.py"); // builtin callbacks
+  python_exec(SCRIPTDIR"/focus.py"); // focus helpers
   // run the user's script or the system defaults if that fails
   if (!python_exec(_scriptfilepath.c_str()))
     python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors

@@ -1008,7 +1008,7 @@ static PyObject *_wrap_Display_screenInfo(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"Oi:Display_screenInfo",&obj0,&arg2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::ScreenInfo *)(arg1)->screenInfo(arg2);
+    result = (otk::ScreenInfo *)((otk::Display const *)arg1)->screenInfo(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
     return resultobj;
@@ -1029,7 +1029,7 @@ static PyObject *_wrap_Display_findScreen(PyObject *self, PyObject *args) {
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (Window) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
-    result = (otk::ScreenInfo *)(arg1)->findScreen(arg2);
+    result = (otk::ScreenInfo *)((otk::Display const *)arg1)->findScreen(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
     return resultobj;
@@ -1047,7 +1047,7 @@ static PyObject *_wrap_Display_renderControl(PyObject *self, PyObject *args) {
     
     if(!PyArg_ParseTuple(args,(char *)"Oi:Display_renderControl",&obj0,&arg2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::RenderControl *)(arg1)->renderControl(arg2);
+    result = (otk::RenderControl *)((otk::Display const *)arg1)->renderControl(arg2);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__RenderControl, 0);
     return resultobj;
@@ -11144,6 +11144,40 @@ static PyObject *_wrap_KeyData_key_get(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_KeyData_action_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:KeyData_action_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->action = (ob::EventAction )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_action_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_action_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->action);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_new_KeyData(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     int arg1 ;
@@ -11781,6 +11815,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"KeyData_state_get", _wrap_KeyData_state_get, METH_VARARGS },
 	 { (char *)"KeyData_key_set", _wrap_KeyData_key_set, METH_VARARGS },
 	 { (char *)"KeyData_key_get", _wrap_KeyData_key_get, METH_VARARGS },
+	 { (char *)"KeyData_action_set", _wrap_KeyData_action_set, METH_VARARGS },
+	 { (char *)"KeyData_action_get", _wrap_KeyData_action_get, METH_VARARGS },
 	 { (char *)"new_KeyData", _wrap_new_KeyData, METH_VARARGS },
 	 { (char *)"KeyData_swigregister", KeyData_swigregister, METH_VARARGS },
 	 { (char *)"mbind", _wrap_mbind, METH_VARARGS },
@@ -12053,6 +12089,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"EventCloseWindow", (long) ob::EventCloseWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventStartup", (long) ob::EventStartup, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventShutdown", (long) ob::EventShutdown, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventKey", (long) ob::EventKey, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventFocus", (long) ob::EventFocus, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventBell", (long) ob::EventBell, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},

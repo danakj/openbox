@@ -61,6 +61,7 @@ enum EventAction {
   EventCloseWindow,
   EventStartup,
   EventShutdown,
+  EventKey,
   EventFocus,
   EventBell,
   NUM_EVENTS
@@ -147,6 +148,7 @@ public:
   Time time;
   unsigned int state;
   std::string key;
+  EventAction action; // this is here so that all the Data structs have .action
 
   KeyData(int screen, Client *client, Time time, unsigned int state,
           unsigned int key) {
@@ -156,6 +158,7 @@ public:
     this->state  = state;
     this->key    = XKeysymToString(XKeycodeToKeysym(**otk::display,
                                                     key, 0));
+    this->action = EventKey;
   }
 };
 

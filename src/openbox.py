@@ -910,6 +910,7 @@ EventNewWindow = _openbox.EventNewWindow
 EventCloseWindow = _openbox.EventCloseWindow
 EventStartup = _openbox.EventStartup
 EventShutdown = _openbox.EventShutdown
+EventKey = _openbox.EventKey
 EventFocus = _openbox.EventFocus
 EventBell = _openbox.EventBell
 NUM_EVENTS = _openbox.NUM_EVENTS
@@ -1026,6 +1027,9 @@ class KeyData(_object):
     __swig_setmethods__["key"] = _openbox.KeyData_key_set
     __swig_getmethods__["key"] = _openbox.KeyData_key_get
     if _newclass:key = property(_openbox.KeyData_key_get,_openbox.KeyData_key_set)
+    __swig_setmethods__["action"] = _openbox.KeyData_action_set
+    __swig_getmethods__["action"] = _openbox.KeyData_action_get
+    if _newclass:action = property(_openbox.KeyData_action_get,_openbox.KeyData_action_set)
     def __init__(self,*args):
         self.this = apply(_openbox.new_KeyData,args)
         self.thisown = 1

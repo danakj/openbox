@@ -2221,6 +2221,12 @@ void BScreen::shutdown(void) {
   while(! windowList.empty())
     unmanageWindow(windowList.front(), True);
 
+  while(! desktopWindowList.empty()) {
+    BlackboxWindow *win = blackbox->searchWindow(desktopWindowList.front());
+    assert(win);
+    unmanageWindow(win, True);
+  }
+
   slit->shutdown();
 }
 

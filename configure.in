@@ -1,7 +1,7 @@
 dnl configure.in for Openbox
 dnl Initialize autoconf and automake
 AC_INIT(src/blackbox.cc)
-AM_INIT_AUTOMAKE(openbox,2.0.0,no-define)
+AM_INIT_AUTOMAKE(openbox,1.90.0,no-define)
 
 dnl Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"

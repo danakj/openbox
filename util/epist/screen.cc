@@ -60,9 +60,6 @@ screen::screen(epist *epist, int number)
   _info = _epist->getScreenInfo(_number);
   _root = _info->getRootWindow();
   
-  cout << "root window on screen " << _number << ": 0x" << hex << _root << 
-    dec << endl;
-  
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
   _managed = false;

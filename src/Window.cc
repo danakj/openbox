@@ -179,7 +179,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   blackbox->saveWindowSearch(frame.window, this);
   
-  frame.plate = createChildWindow(frame.window);
+  frame.plate = createChildWindow(frame.window, ExposureMask);
   blackbox->saveWindowSearch(frame.plate, this);
 
   // determine if this is a transient window
@@ -474,9 +474,7 @@ Window BlackboxWindow::createToplevelWindow(void) {
   attrib_create.background_pixmap = None;
   attrib_create.colormap = screen->getColormap();
   attrib_create.override_redirect = True;
-  attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
-                             ButtonMotionMask |
-                             EnterWindowMask | LeaveWindowMask;
+  attrib_create.event_mask = EnterWindowMask | LeaveWindowMask;
 
   return XCreateWindow(blackbox->getXDisplay(), screen->getRootWindow(),
                        0, 0, 1, 1, frame.border_w, screen->getDepth(),
@@ -489,14 +487,15 @@ Window BlackboxWindow::createToplevelWindow(void) {
  * Creates a child window, and optionally associates a given cursor with
  * the new window.
  */
-Window BlackboxWindow::createChildWindow(Window parent, Cursor cursor) {
+Window BlackboxWindow::createChildWindow(Window parent,
+                                         unsigned long event_mask,
+                                         Cursor cursor) {
   XSetWindowAttributes attrib_create;
   unsigned long create_mask = CWBackPixmap | CWBorderPixel |
                               CWEventMask;
 
   attrib_create.background_pixmap = None;
-  attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
-                             ButtonMotionMask | ExposureMask;
+  attrib_create.event_mask = event_mask;
 
   if (cursor) {
     create_mask |= CWCursor;
@@ -647,15 +646,23 @@ void BlackboxWindow::decorateLabel(void) {
 
 
 void BlackboxWindow::createHandle(void) {
-  frame.handle = createChildWindow(frame.window);
+  frame.handle = createChildWindow(frame.window,
+                                   ButtonPressMask | ButtonReleaseMask |
+                                   ButtonMotionMask | ExposureMask);
   blackbox->saveWindowSearch(frame.handle, this);
 
   frame.left_grip =
-    createChildWindow(frame.handle, blackbox->getLowerLeftAngleCursor());
+    createChildWindow(frame.handle,
+                      ButtonPressMask | ButtonReleaseMask |
+                      ButtonMotionMask | ExposureMask,
+                      blackbox->getLowerLeftAngleCursor());
   blackbox->saveWindowSearch(frame.left_grip, this);
 
   frame.right_grip =
-    createChildWindow(frame.handle, blackbox->getLowerRightAngleCursor());
+    createChildWindow(frame.handle,
+                      ButtonPressMask | ButtonReleaseMask |
+                      ButtonMotionMask | ExposureMask,
+                      blackbox->getLowerRightAngleCursor());
   blackbox->saveWindowSearch(frame.right_grip, this);
 }
 
@@ -687,8 +694,12 @@ void BlackboxWindow::destroyHandle(void) {
 
 
 void BlackboxWindow::createTitlebar(void) {
-  frame.title = createChildWindow(frame.window);
-  frame.label = createChildWindow(frame.title);
+  frame.title = createChildWindow(frame.window,
+                                  ButtonPressMask | ButtonReleaseMask |
+                                  ButtonMotionMask | ExposureMask);
+  frame.label = createChildWindow(frame.title,
+                                  ButtonPressMask | ButtonReleaseMask |
+                                  ButtonMotionMask | ExposureMask);
   blackbox->saveWindowSearch(frame.title, this);
   blackbox->saveWindowSearch(frame.label, this);
 
@@ -740,7 +751,10 @@ void BlackboxWindow::destroyTitlebar(void) {
 
 void BlackboxWindow::createCloseButton(void) {
   if (frame.title != None) {
-    frame.close_button = createChildWindow(frame.title);
+    frame.close_button = createChildWindow(frame.title,
+                                           ButtonPressMask |
+                                           ButtonReleaseMask |
+                                           ButtonMotionMask | ExposureMask);
     blackbox->saveWindowSearch(frame.close_button, this);
   }
 }
@@ -755,7 +769,10 @@ void BlackboxWindow::destroyCloseButton(void) {
 
 void BlackboxWindow::createIconifyButton(void) {
   if (frame.title != None) {
-    frame.iconify_button = createChildWindow(frame.title);
+    frame.iconify_button = createChildWindow(frame.title,
+                                             ButtonPressMask |
+                                             ButtonReleaseMask |
+                                             ButtonMotionMask | ExposureMask);
     blackbox->saveWindowSearch(frame.iconify_button, this);
   }
 }
@@ -770,7 +787,10 @@ void BlackboxWindow::destroyIconifyButton(void) {
 
 void BlackboxWindow::createMaximizeButton(void) {
   if (frame.title != None) {
-    frame.maximize_button = createChildWindow(frame.title);
+    frame.maximize_button = createChildWindow(frame.title,
+                                              ButtonPressMask |
+                                              ButtonReleaseMask |
+                                              ButtonMotionMask | ExposureMask);
     blackbox->saveWindowSearch(frame.maximize_button, this);
   }
 }
@@ -909,8 +929,7 @@ void BlackboxWindow::grabButtons(void) {
   // alt+middle lowers the window
   blackbox->grabButton(Button2, mod_mask, frame.window, True,
                        ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
-                       frame.window, None,
-                       screen->allowScrollLock());
+                       frame.window, None, screen->allowScrollLock());
 }
 
 
@@ -1070,6 +1089,15 @@ void BlackboxWindow::getWMName(void) {
   client.title = i18n(WindowSet, WindowUnnamed, "Unnamed");
   xatom->setValue(client.window, XAtom::net_wm_visible_name, XAtom::utf8,
                   client.title);
+
+#define DEBUG_WITH_ID 1
+#ifdef DEBUG_WITH_ID
+  // the 16 is the 8 chars of the debug text plus the number
+  char *tmp = new char[client.title.length() + 16];
+  sprintf(tmp, "%s; id: 0x%lx", client.title.c_str(), client.window);
+  client.title = tmp;
+  delete tmp;
+#endif
 }
 
 
@@ -1190,14 +1218,9 @@ void BlackboxWindow::getWMNormalHints(void) {
     client.max_aspect_x = client.max_aspect_y = 1;
 #endif
 
-  /*
-    use the full screen, not the strut modified size. otherwise when the
-    availableArea changes max_width/height will be incorrect and lead to odd
-    rendering bugs.
-  */
-  const Rect& screen_area = screen->getRect();
-  client.max_width = screen_area.width();
-  client.max_height = screen_area.height();
+  // set no limit to how big a window can be by default
+  client.max_width = (unsigned) -1;
+  client.max_height = (unsigned) -1;
 
   if (! XGetWMNormalHints(blackbox->getXDisplay(), client.window,
                           &sizehint, &icccm_mask))

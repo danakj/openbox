@@ -300,6 +300,7 @@ void Openbox::eventLoop()
 {
   while (!_doshutdown) {
     dispatchEvents(); // from OtkEventDispatcher
+    XFlush(otk::OBDisplay::display); // flush here before we go wait for timers
     _timermanager.fire();
   }
 }

@@ -10,7 +10,7 @@ cycle_raise = 1                                                         ###
 # raise as you cycle in stacked mode                                    ###
 stacked_cycle_raise = 0                                                 ###
 # show a pop-up list of windows while cycling                           ###
-cycle_popup_list = 1
+stacked_cycle_popup_list = 1                                            ###
 # send focus somewhere when nothing is left with the focus, if possible ###
 fallback = 0                                                            ###
 ###                                                                     ###
@@ -211,8 +211,8 @@ def focus_next_stacked(data, forward=1):
         _cyc_screen = data.screen
         _doing_stacked = 1
 
-        global cycle_popup_list
-        if cycle_popup_list:
+        global stacked_cycle_popup_list
+        if stacked_cycle_popup_list:
             _create_popup_list(data)
 
         ob.kgrab(data.screen, _focus_stacked_ungrab)

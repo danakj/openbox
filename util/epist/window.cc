@@ -34,7 +34,7 @@ using std::dec;
 #include "epist.hh"
 #include "screen.hh"
 #include "window.hh"
-#include "../../src/XAtom.hh"
+#include "../../src/xatom.hh"
 
   // defined by black/openbox
 const unsigned long XWindow::PropBlackboxAttributesElements;

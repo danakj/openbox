@@ -30,7 +30,7 @@ extern "C" {
 #include <list>
 #include <string>
 
-#include "../../src/Util.hh"
+#include "../../src/util.hh"
 
 class epist;
 class screen;

@@ -24,7 +24,7 @@
 #define _keytree_hh
 
 #include <list>
-#include "../../src/Timer.hh"
+#include "../../src/timer.hh"
 #include "actions.hh"
 #include "screen.hh"
 

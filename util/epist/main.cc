@@ -48,15 +48,10 @@ using std::string;
 
 #include "../../version.h"
 #include "epist.hh"
-#include "../../src/i18n.hh"
-
-I18n i18n;
 
 static void usage();
 
 int main(int argc, char **argv) {
-  i18n.openCatalog("openbox.cat");
-
   // parse the command line
   char *display_name = 0;
   char *rc_file = 0;
@@ -65,15 +60,13 @@ int main(int argc, char **argv) {
     const string argvi(argv[i]);
     if (argvi == "-display") {
       if (++i >= argc) {
-        fprintf(stderr, i18n(mainSet, mainDISPLAYRequiresArg,
-                             "error: '-display' requires an argument\n"));
+        fprintf(stderr, "error: '-display' requires an argument\n");
         exit(1);
       }
       display_name = argv[i];
     } else if (argvi == "-rc") {
       if (++i >= argc) {
-        fprintf(stderr, i18n(mainSet, mainRCRequiresArg,
-                             "error: '-rc' requires an argument\n"));
+        fprintf(stderr, "error: '-rc' requires an argument\n");
         exit(1);
       }
       rc_file = argv[i];

@@ -65,7 +65,7 @@ using std::string;
 #include "screen.hh"
 #include "window.hh"
 #include "parser.hh"
-#include "../../src/XAtom.hh"
+#include "../../src/xatom.hh"
 
 
 epist::epist(char **argv, char *dpy_name, char *rc_file)

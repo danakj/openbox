@@ -1,8 +1,8 @@
 # util/Makefile.am for Blackbox - an X11 Window manager
 
-CPPFLAGS= @CPPFLAGS@ @DEBUG@
+CXXFLAGS= @CXXFLAGS@
 
-SUBDIRS = 			epist
+SUBDIRS = 		epist
 bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot xftlsfonts
 

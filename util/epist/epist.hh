@@ -35,7 +35,7 @@ extern "C" {
 #include "keytree.hh"
 #include "config.hh"
 
-#include "../../src/BaseDisplay.hh"
+#include "../../src/basedisplay.hh"
 
 class XAtom;
 class screen;

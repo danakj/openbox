@@ -17,7 +17,7 @@ namespace otk {
         if (PyString_Check($input))
             $1 = otk::ustring(PyString_AsString($input));
         else
-            SWIG_exception(SWIG_TypeError, "ustring expected");
+            SWIG_exception(SWIG_TypeError, "string expected");
     }
 
     %typemap(in) const ustring & (otk::ustring temp) {
@@ -25,7 +25,7 @@ namespace otk {
             temp = otk::ustring(PyString_AsString($input));
             $1 = &temp;
         } else {
-            SWIG_exception(SWIG_TypeError, "ustring expected");
+            SWIG_exception(SWIG_TypeError, "string expected");
         }
     }
 

@@ -1251,7 +1251,8 @@ void action_desktop_dir(union ActionData *data)
                              data->desktopdir.inter.final,
                              data->desktopdir.inter.cancel);
     if (!data->sendtodir.inter.any.interactive ||
-        !data->sendtodir.inter.final)
+        !data->sendtodir.inter.final ||
+        data->sendtodir.inter.cancel)
     {
         screen_set_desktop(d);
     }
@@ -1270,7 +1271,8 @@ void action_send_to_desktop_dir(union ActionData *data)
                              data->sendtodir.inter.final,
                              data->sendtodir.inter.cancel);
     if (!data->sendtodir.inter.any.interactive ||
-        !data->sendtodir.inter.final)
+        !data->sendtodir.inter.final ||
+        data->sendtodir.inter.cancel)
     {
         client_set_desktop(c, d, data->sendtodir.follow);
         if (data->sendtodir.follow)

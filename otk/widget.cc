@@ -153,8 +153,9 @@ void Widget::setGeometry(int x, int y, int width, int height)
   _rect = Rect(x, y, width, height);
   _dirty = true;
 
-  XMoveResizeWindow(**display, _window, x, y, width, height);
-  _ignore_config++;
+  XResizeWindow(**display, _window, width, height);
+  XMoveWindow(**display, _window, x, y);
+  _ignore_config+=2;
 }
 
 void Widget::show(bool recursive)

@@ -41,7 +41,8 @@ void timed_menu_timeout_handler(void *data)
             {
                 /* if the menu is not shown, run a process and use its output
                    as menu */
-                char *args[] = {"/bin/sh", "-c", "ls", NULL};
+                char *args[] = {"/bin/sh", "-c", TIMED_MENU_DATA(data)->command,
+                                NULL};
                 GIOChannel *io;
                 char *line;
                 gint child, c_stdout, line_len, terminator_pos;
@@ -93,6 +94,7 @@ void *plugin_create()
 
     d->type = TIMED_MENU_PIPE;
     d->timer = timer_start(1000000, &timed_menu_timeout_handler, m);
+    d->command = "ls";
     
     m->plugin_data = (void *)d;
   

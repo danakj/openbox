@@ -418,7 +418,6 @@ void screen_set_desktop(guint num)
 {
     GList *it;
     guint old;
-    ObClient *target;
      
     g_assert(num < screen_num_desktops);
 
@@ -458,17 +457,17 @@ void screen_set_desktop(guint num)
 
     event_ignore_queued_enters();
 
-    target = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS);
-    if (target) {
-        frame_adjust_focus(target->frame, TRUE);
+    focus_hilite = focus_fallback_target(OB_FOCUS_FALLBACK_NOFOCUS);
+    if (focus_hilite) {
+        frame_adjust_focus(focus_hilite->frame, TRUE);
 
         /*!
           When this focus_client check is not used, you can end up with races,
           as demonstrated with gnome-panel, sometmies the window you click on
           another desktop ends up losing focus cuz of the focus change here.
         */
-        if (!focus_client)
-            client_focus(target);
+        /*if (!focus_client)*/
+        client_focus(focus_hilite);
     }
 }
 

@@ -386,6 +386,7 @@ bool Bindings::grabKeyboard(int screen, PyObject *callback)
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
                     GrabModeAsync, CurrentTime))
     return false;
+  // the pointer grab causes pointer events during the keyboard grab to go away
   XGrabPointer(**otk::display, root, false, 0, GrabModeAsync,
                GrabModeAsync, None, None, CurrentTime);
   _keybgrab_callback = callback;

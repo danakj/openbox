@@ -304,8 +304,10 @@ static gboolean event_ignore(XEvent *e, Client *client)
     case LeaveNotify:
         /* NotifyUngrab occurs when a mouse button is released and the event is
            caused, like when lowering a window */
+        /* NotifyVirtual occurs when ungrabbing the pointer */
         if (e->xcrossing.mode == NotifyGrab ||
-            e->xcrossing.detail == NotifyInferior)
+            e->xcrossing.detail == NotifyInferior ||
+            e->xcrossing.detail == NotifyVirtual)
             return TRUE;
 	break;
     }

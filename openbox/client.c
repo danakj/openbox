@@ -2071,7 +2071,14 @@ static void client_iconify_recursive(ObClient *self,
 
         if (iconic) {
             if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
+                long old;
+
+                old = self->wmstate;
                 self->wmstate = IconicState;
+                if (old != self->wmstate)
+                    PROP_MSG(self->window, kde_wm_change_state,
+                             self->wmstate, 1, 0, 0);
+
                 self->ignore_unmaps++;
                 /* we unmap the client itself so that we can get MapRequest
                    events, and because the ICCCM tells us to! */
@@ -2085,9 +2092,17 @@ static void client_iconify_recursive(ObClient *self,
                 changed = TRUE;
             }
         } else {
+            long old;
+
             if (curdesk)
                 client_set_desktop(self, screen_desktop, FALSE);
+
+            old = self->wmstate;
             self->wmstate = self->shaded ? IconicState : NormalState;
+            if (old != self->wmstate)
+                PROP_MSG(self->window, kde_wm_change_state,
+                         self->wmstate, 1, 0, 0);
+
             XMapWindow(ob_display, self->window);
 
             /* this puts it after the current focused window */
@@ -2236,8 +2251,16 @@ void client_shade(ObClient *self, gboolean shade)
 	self->shaded == shade) return;     /* already done */
 
     /* when we're iconic, don't change the wmstate */
-    if (!self->iconic)
-	self->wmstate = shade ? IconicState : NormalState;
+    if (!self->iconic) {
+        long old;
+
+        old = self->wmstate;
+        self->wmstate = shade ? IconicState : NormalState;
+        if (old != self->wmstate)
+            PROP_MSG(self->window, kde_wm_change_state,
+                     self->wmstate, 1, 0, 0);
+    }
+
     self->shaded = shade;
     client_change_state(self);
     /* resize the frame to just the titlebar */

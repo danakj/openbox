@@ -320,6 +320,12 @@ void Workspace::reconfigure(void) {
 }
 
 
+void Workspace::updateFocusModel(void) {
+  std::for_each(windowList.begin(), windowList.end(),
+                std::mem_fun(&BlackboxWindow::updateFocusModel));
+}
+
+
 BlackboxWindow *Workspace::getWindow(unsigned int index) {
   if (index < windowList.size()) {
     BlackboxWindowList::iterator it = windowList.begin();

@@ -38,11 +38,6 @@ extern "C" {
 #include "Timer.hh"
 #include "Util.hh"
 #include "Windowmenu.hh"
-#include "Workspace.hh"
-#include "Screen.hh"
-
-class XAtom;
-class BInput;
 
 #define MwmHintsFunctions     (1l << 0)
 #define MwmHintsDecorations   (1l << 1)
@@ -131,7 +126,6 @@ private:
   Blackbox *blackbox;
   BScreen *screen;
   XAtom *xatom;
-  BInput *input;
   BTimer *timer;
   BlackboxAttributes blackbox_attrib;
 
@@ -324,7 +318,6 @@ public:
   inline bool isIconifiable(void) const { return functions & Func_Iconify; }
   inline bool isMaximizable(void) const { return functions & Func_Maximize; }
   inline bool isResizable(void) const { return functions & Func_Resize; }
-  inline bool isMovable(void) const { return functions & Func_Move; }
   inline bool isClosable(void) const { return functions & Func_Close; }
   inline bool isDesktop(void) const { return window_type == Type_Desktop; }
 
@@ -379,18 +372,14 @@ public:
   void iconify(void);
   void deiconify(bool reassoc = True, bool raise = True);
   void show(void);
-  void showWindowMenu(int root_x, int root_y);
   void close(void);
   void withdraw(void);
   void maximize(unsigned int button);
   void remaximize(void);
   void shade(void);
   void stick(void);
-  void raise(void);
-  void lower(void);
   void reconfigure(void);
-  void grabButtons(void);
-  void ungrabButtons(void);
+  void updateFocusModel(void);
   void installColormap(bool install);
   void restore(bool remap);
   void configure(int dx, int dy, unsigned int dw, unsigned int dh);

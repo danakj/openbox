@@ -102,6 +102,7 @@ public:
   void raiseWindow(BlackboxWindow *w);
   void lowerWindow(BlackboxWindow *w);
   void reconfigure(void);
+  void updateFocusModel(void);
   void setCurrent(void);
   void setName(const std::string& new_name);
 };

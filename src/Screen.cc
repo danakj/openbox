@@ -88,7 +88,6 @@ using std::string;
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
 #include "XAtom.hh"
-#include "Input.hh"
 
 #ifndef   FONT_ELEMENT_SIZE
 #define   FONT_ELEMENT_SIZE 50
@@ -314,7 +313,6 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   // call this again just in case a window we found updates the Strut list
   updateAvailableArea();
-  updateFocusModel();
 }
 
 
@@ -2184,31 +2182,8 @@ void BScreen::toggleFocusModel(FocusModel model) {
 
 void BScreen::updateFocusModel()
 {
-  std::for_each(iconList.begin(), iconList.end(),
-                std::mem_fun(&BlackboxWindow::ungrabButtons));
-  std::for_each(windowList.begin(), windowList.end(),
-                std::mem_fun(&BlackboxWindow::ungrabButtons));
-  
-  if (! resource.sloppy_focus) {
-    blackbox->getInput()->add(Button1, 0, BInput::WindowClientPress,
-                              BInput::Raise);
-    blackbox->getInput()->add(Button1, 0, BInput::WindowClientPress,
-                              BInput::Focus);
-  } else {
-    if (resource.click_raise)
-      blackbox->getInput()->add(Button1, 0, BInput::WindowClientPress,
-                                BInput::Raise);
-    else
-      blackbox->getInput()->remove(Button1, 0, BInput::WindowClientPress,
-                                   BInput::Raise);
-    blackbox->getInput()->remove(Button1, 0, BInput::WindowClientPress,
-                                 BInput::Focus);
-  }
-  
-  std::for_each(iconList.begin(), iconList.end(),
-                std::mem_fun(&BlackboxWindow::grabButtons));
-  std::for_each(windowList.begin(), windowList.end(),
-                std::mem_fun(&BlackboxWindow::grabButtons));
+  std::for_each(workspacesList.begin(), workspacesList.end(),
+                std::mem_fun(&Workspace::updateFocusModel));
 }
 
 

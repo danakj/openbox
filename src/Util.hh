@@ -71,7 +71,6 @@ public:
   inline bool valid(void) const { return _x2 > _x1 && _y2 > _y1; }
 
   bool intersects(const Rect &a) const;
-  bool contains(int _x, int _y) const;
 
 private:
   int _x1, _y1, _x2, _y2;

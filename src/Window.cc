@@ -54,8 +54,6 @@ extern "C" {
 #include "Windowmenu.hh"
 #include "Workspace.hh"
 #include "Slit.hh"
-#include "XAtom.hh"
-#include "Input.hh"
 
 using std::string;
 
@@ -80,7 +78,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   client.window = w;
   screen = s;
   xatom = blackbox->getXAtom();
-  input = blackbox->getInput();
 
   if (! validateClient()) {
     delete this;
@@ -273,7 +270,25 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   }
 #endif // SHAPE
 
-  grabButtons();
+  if ((! screen->isSloppyFocus()) || screen->doClickRaise()) {
+    // grab button 1 for changing focus/raising
+    blackbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
+                         GrabModeSync, GrabModeSync, None, None);
+  }
+
+  if (functions & Func_Move)
+    blackbox->grabButton(Button1, Mod1Mask, frame.window, True,
+                         ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
+                         GrabModeAsync, frame.window,
+                         blackbox->getMoveCursor());
+  blackbox->grabButton(Button2, Mod1Mask, frame.window, True,
+                       ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
+                       None, None);
+  if (functions & Func_Resize)
+    blackbox->grabButton(Button3, Mod1Mask, frame.window, True,
+                         ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
+                         GrabModeAsync, None,
+                         blackbox->getLowerRightAngleCursor());
 
   positionWindows();
   decorate();
@@ -836,6 +851,17 @@ void BlackboxWindow::reconfigure(void) {
   if (windowmenu) {
     windowmenu->move(windowmenu->getX(), frame.rect.y() + frame.title_h);
     windowmenu->reconfigure();
+  }
+}
+
+
+void BlackboxWindow::updateFocusModel(void) {
+  if ((! screen->isSloppyFocus()) || screen->doClickRaise()) {
+    // grab button 1 for changing focus/raising
+    blackbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
+                         GrabModeSync, GrabModeSync, None, None);
+  } else {
+    blackbox->ungrabButton(Button1, 0, frame.plate);
   }
 }
 
@@ -1623,7 +1649,7 @@ void BlackboxWindow::show(void) {
 }
 
 
-void BlackboxWindow::deiconify(bool reassoc, bool doraise) {
+void BlackboxWindow::deiconify(bool reassoc, bool raise) {
   if (flags.iconic || reassoc)
     screen->reassociateWindow(this, BSENTINEL, False);
   else if (blackbox_attrib.workspace != screen->getCurrentWorkspace()->getID())
@@ -1639,18 +1665,8 @@ void BlackboxWindow::deiconify(bool reassoc, bool doraise) {
     }
   }
 
-  if (doraise)
-    raise();
-}
-
-
-void BlackboxWindow::raise(void) {
-  screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
-}
-
-
-void BlackboxWindow::lower(void) {
-  screen->getWorkspace(blackbox_attrib.workspace)->lowerWindow(this);
+  if (raise)
+    screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
 }
 
 
@@ -1774,7 +1790,7 @@ void BlackboxWindow::maximize(unsigned int button) {
   configure(frame.changing.x(), frame.changing.y(),
             frame.changing.width(), frame.changing.height());
   if (flags.focused)
-    raise();
+    screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
   redrawAllButtons(); // in case it is not called in configure()
   setState(current_state);
 }
@@ -2454,7 +2470,7 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
   case ZoomState:
   default:
     show();
-    raise();
+    screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     if (! blackbox->isStartup() && (isTransient() || screen->doFocusNew())) {
       XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped..
       setInputFocus();
@@ -2638,58 +2654,13 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
     switch (cr->detail) {
     case Below:
     case BottomIf:
-      lower();
+      screen->getWorkspace(blackbox_attrib.workspace)->lowerWindow(this);
       break;
 
     case Above:
     case TopIf:
     default:
-      raise();
-      break;
-    }
-  }
-}
-
-
-void BlackboxWindow::grabButtons(void) {
-  const BInput::MouseBindingList &mbindings = input->getMouseBindings();
-  
-  BInput::MouseBindingList::const_iterator mit = mbindings.begin();
-  const BInput::MouseBindingList::const_iterator mend = mbindings.end();
-  for (; mit != mend; ++mit) {
-    // dont grab for an action the window can't perform
-    //if (! (mit->action == BInput::BeginMove && functions & Func_Move) &&
-    //    ! (mit->action == BInput::BeginResize && functions & Func_Resize)) {
-      switch (mit->event) {
-      case BInput::WindowClientPress:
-        blackbox->grabButton(mit->button, mit->state, frame.plate, True,
-                             ButtonPressMask, GrabModeSync, GrabModeSync,
-                             frame.plate, None);
-        break;
-      case BInput::WindowDrag:
-        blackbox->grabButton(mit->button, mit->state, frame.window, True,
-                             ButtonMotionMask, GrabModeAsync, GrabModeAsync,
-                             frame.window, None);
-      default:
-        break;
-      }
-  }
-}
-
-
-void BlackboxWindow::ungrabButtons(void) {
-  const BInput::MouseBindingList &mbindings = input->getMouseBindings();
-  
-  BInput::MouseBindingList::const_iterator mit = mbindings.begin();
-  const BInput::MouseBindingList::const_iterator mend = mbindings.end();
-  for (; mit != mend; ++mit) {
-    switch (mit->event) {
-    case BInput::WindowClientPress:
-      blackbox->ungrabButton(mit->button, mit->state, frame.plate);
-      break;
-    case BInput::WindowDrag:
-      blackbox->ungrabButton(mit->button, mit->state, frame.window);
-    default:
+      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
       break;
     }
   }
@@ -2697,169 +2668,136 @@ void BlackboxWindow::ungrabButtons(void) {
 
 
 void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
-  if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
-  
   if (frame.maximize_button == be->window) {
-    if (input->hasAction(be->button, be->state, BInput::MaximizeButtonClick))
-      redrawMaximizeButton(True);
-  } else if (frame.iconify_button == be->window) {
-    if (input->hasAction(be->button, be->state, BInput::IconifyButtonClick))
+    redrawMaximizeButton(True);
+  } else if (be->button == 1 || (be->button == 3 && be->state == Mod1Mask)) {
+    if (! flags.focused)
+      setInputFocus();
+
+    if (frame.iconify_button == be->window) {
       redrawIconifyButton(True);
-  } else if (frame.close_button == be->window) {
-    if (input->hasAction(be->button, be->state, BInput::CloseButtonClick))
+    } else if (frame.close_button == be->window) {
       redrawCloseButton(True);
-  } else if (frame.title == be->window || frame.label == be->window) {
-    if (be->time - lastButtonPressTime <= blackbox->getDoubleClickInterval()) {
-      lastButtonPressTime = 0;
-      input->doAction(this, be->button, be->state,
-                      BInput::WindowTitleDoublePress);
+    } else if (frame.plate == be->window) {
+      if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
+
+      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
+
+      XAllowEvents(blackbox->getXDisplay(), ReplayPointer, be->time);
     } else {
-      lastButtonPressTime = be->time;
-      input->doAction(this, be->button, be->state,
-                      BInput::WindowTitlePress);
+      if (frame.title == be->window || frame.label == be->window) {
+        if (((be->time - lastButtonPressTime) <=
+             blackbox->getDoubleClickInterval()) ||
+            (be->state & ControlMask)) {
+          lastButtonPressTime = 0;
+          shade();
+        } else {
+          lastButtonPressTime = be->time;
+        }
+      }
+
+      if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
+
+      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
-  } else if (frame.plate == be->window) {
-    input->doAction(this, be->button, be->state, BInput::WindowClientPress);
-    // buttons on the client window are grabbed in Sync mode, so we need to let
-    // events back through again
-    XAllowEvents(blackbox->getXDisplay(), ReplayPointer, be->time);
-  } else if (frame.window == be->window || frame.handle == be->window) {
-    input->doAction(this, be->button, be->state, BInput::WindowFramePress);
+  } else if (be->button == 2 && (be->window != frame.iconify_button) &&
+             (be->window != frame.close_button)) {
+    screen->getWorkspace(blackbox_attrib.workspace)->lowerWindow(this);
+  } else if (windowmenu && be->button == 3 &&
+             (frame.title == be->window || frame.label == be->window ||
+              frame.handle == be->window || frame.window == be->window)) {
+    int mx = 0, my = 0;
+
+    if (frame.title == be->window || frame.label == be->window) {
+      mx = be->x_root - (windowmenu->getWidth() / 2);
+      my = frame.rect.y() + frame.title_h + frame.border_w;
+    } else if (frame.handle == be->window) {
+      mx = be->x_root - (windowmenu->getWidth() / 2);
+      my = frame.rect.bottom() - frame.handle_h - (frame.border_w * 3) -
+           windowmenu->getHeight();
+    } else {
+      mx = be->x_root - (windowmenu->getWidth() / 2);
+
+      if (be->y <= static_cast<signed>(frame.bevel_w))
+        my = frame.rect.y() + frame.title_h;
+      else
+        my = be->y_root - (windowmenu->getHeight() / 2);
+    }
+
+    // snap the window menu into a corner if necessary - we check the
+    // position of the menu with the coordinates of the client to
+    // make the comparisions easier.
+    // XXX: this needs some work!
+    if (mx > client.rect.right() -
+        static_cast<signed>(windowmenu->getWidth()))
+      mx = frame.rect.right() - windowmenu->getWidth() - frame.border_w + 1;
+    if (mx < client.rect.left())
+      mx = frame.rect.x();
+
+    if (my > client.rect.bottom() -
+        static_cast<signed>(windowmenu->getHeight()))
+      my = frame.rect.bottom() - windowmenu->getHeight() - frame.border_w + 1;
+    if (my < client.rect.top())
+      my = frame.rect.y() + ((decorations & Decor_Titlebar) ?
+                             frame.title_h : 0);
+
+    if (windowmenu) {
+      if (! windowmenu->isVisible()) {
+        windowmenu->move(mx, my);
+        windowmenu->show();
+        XRaiseWindow(blackbox->getXDisplay(), windowmenu->getWindowID());
+        XRaiseWindow(blackbox->getXDisplay(),
+                     windowmenu->getSendToMenu()->getWindowID());
+      } else {
+        windowmenu->hide();
+      }
+    }
+  // mouse wheel up
+  } else if (be->button == 4) {
+    if ((be->window == frame.label ||
+         be->window == frame.title) &&
+        ! flags.shaded)
+      shade();
+  // mouse wheel down
+  } else if (be->button == 5) {
+    if ((be->window == frame.label ||
+         be->window == frame.title) &&
+        flags.shaded)
+      shade();
   }
-}
-
-
-void BlackboxWindow::showWindowMenu(int root_x, int root_y) {
-  if (! windowmenu || windowmenu->isVisible())
-    return;
-  
-  root_x -= windowmenu->getWidth() / 2;
-  root_y -= windowmenu->getHeight() / 2;
-
-  // snap the window menu into a corner/side if necessary
-  int left_edge, right_edge, top_edge, bottom_edge;
-  
-  left_edge = frame.rect.x();
-  right_edge = frame.rect.right() - windowmenu->getWidth() - frame.border_w - 1;
-  if (decorations & Decor_Titlebar)
-    top_edge = frame.rect.y() + frame.title_h + frame.border_w;
-  else
-    top_edge = frame.rect.y() + frame.border_w;
-  if (decorations & Decor_Handle)
-    bottom_edge = frame.rect.bottom() - frame.handle_h - (frame.border_w * 3) -
-      windowmenu->getHeight();
-  else
-    bottom_edge = frame.rect.bottom() - windowmenu->getHeight() -
-      frame.border_w + 1;
-   
-  if (root_x > right_edge)
-    root_x = right_edge;
-  if (root_x < left_edge)
-    root_x = left_edge;
-
-  if (root_y > bottom_edge)
-    root_y = bottom_edge;
-  if (root_y < top_edge)
-    root_y = top_edge;
-
-
-  windowmenu->move(root_x, root_y);
-  windowmenu->show();
-  XRaiseWindow(blackbox->getXDisplay(), windowmenu->getWindowID());
-  XRaiseWindow(blackbox->getXDisplay(),
-               windowmenu->getSendToMenu()->getWindowID());
 }
 
 
 void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
-  // get the proper state, without the button that was released
-  unsigned int state;
-  switch (re->button) {
-  case Button1:
-    state = re->state & ~Button1Mask;
-    break;
-  case Button2:
-    state = re->state & ~Button2Mask;
-    break;
-  case Button3:
-    state = re->state & ~Button3Mask;
-    break;
-  case Button4:
-    state = re->state & ~Button4Mask;
-    break;
-  case Button5:
-    state = re->state & ~Button5Mask;
-    break;
-  default:
-    assert(false);  // unhandled button
-  }
-
-  if (frame.maximize_button == re->window) {
-    if ((re->x < 0 || re->x >= static_cast<signed>(frame.button_w)) ||
-        (re->y < 0 || re->y >= static_cast<signed>(frame.button_w)) ||
-        ! input->doAction(this, re->button, state,
-                          BInput::MaximizeButtonClick))
+  if (re->window == frame.maximize_button) {
+    if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
+        (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w))) {
+      maximize(re->button);
+    } else {
       redrawMaximizeButton(flags.maximized);
-  } else if (frame.iconify_button == re->window) {
-    if ((re->x < 0 || re->x >= static_cast<signed>(frame.button_w)) ||
-        (re->y < 0 || re->y >= static_cast<signed>(frame.button_w)) ||
-        ! input->doAction(this, re->button, state,
-                          BInput::IconifyButtonClick))
+    }
+  } else if (re->window == frame.iconify_button) {
+    if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
+        (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w))) {
+      iconify();
+    } else {
       redrawIconifyButton(False);
-  } else if (frame.close_button == re->window) {
-    if (! ((re->x < 0 || re->x >= static_cast<signed>(frame.button_w)) ||
-           (re->y < 0 || re->y >= static_cast<signed>(frame.button_w))))
-      input->doAction(this, re->button, state, BInput::CloseButtonClick);
-      redrawCloseButton(False);
+    }
+  } else if (re->window == frame.close_button) {
+    if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
+        (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w)))
+      close();
+    redrawCloseButton(False);
   } else if (flags.moving) {
     endMove();
   } else if (flags.resizing) {
     endResize();
+  } else if (re->window == frame.window) {
+    if (re->button == 2 && re->state == Mod1Mask)
+      XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
   }
 }
 
-
-void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
-  // get the button that is being used
-  // get the proper state, without the button that is being used
-  unsigned int button;
-  unsigned int state;
-  if (me->state & Button1Mask) {
-    button = Button1;
-    state = me->state & ~Button1Mask;
-  } else if (me->state & Button2Mask) {
-    button = Button2;
-    state = me->state & ~Button2Mask;
-  } else if (me->state & Button3Mask) {
-    button = Button3;
-    state = me->state & ~Button3Mask;
-  } else if (me->state & Button4Mask) {
-    button = Button4;
-    state = me->state & ~Button4Mask;
-  } else if (me->state & Button5Mask) {
-    button = Button5;
-    state = me->state & ~Button5Mask;
-  } else {
-    return;
-  }
-  
-  if (flags.moving) {
-    doMove(me->x_root, me->y_root);
-  } else if (flags.resizing) {
-    doResize(me->x_root, me->y_root);
-  } else {
-    if (frame.title == me->window || frame.label == me->window)
-      input->doAction(this, button, state, BInput::WindowTitleDrag);
-    else if (frame.handle == me->window)
-      input->doAction(this, button, state, BInput::WindowHandleDrag);
-    else if (frame.left_grip == me->window)
-      input->doAction(this, button, state, BInput::WindowLeftGripDrag);
-    else if (frame.right_grip == me->window)
-      input->doAction(this, button, state, BInput::WindowRightGripDrag);
-    else if (frame.window == me->window)
-      input->doAction(this, button, state, BInput::WindowDrag);
-  }
-}
 
 
 void BlackboxWindow::beginMove(int x_root, int y_root) {
@@ -3252,6 +3190,30 @@ void BlackboxWindow::endResize(void) {
 }
 
 
+void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
+  if (flags.moving) {
+    doMove(me->x_root, me->y_root);
+  } else if (flags.resizing) {
+    doResize(me->x_root, me->y_root);
+  } else {
+    if (! flags.resizing && (me->state & Button1Mask) &&
+        (functions & Func_Move) &&
+        (frame.title == me->window || frame.label == me->window ||
+         frame.handle == me->window || frame.window == me->window)) {
+      beginMove(me->x_root, me->y_root);
+    } else if ((functions & Func_Resize) &&
+               (((me->state & Button1Mask) &&
+                 (me->window == frame.right_grip ||
+                  me->window == frame.left_grip)) ||
+                (me->state & (Mod1Mask | Button3Mask) &&
+                 me->window == frame.window))) {
+      beginResize(me->x_root, me->y_root,
+                  (me->window == frame.left_grip) ? BottomLeft : BottomRight);
+    }
+  }
+}
+
+
 #ifdef    SHAPE
 void BlackboxWindow::shapeEvent(XShapeEvent *) {
   if (blackbox->hasShapeExtensions() && flags.shaped) {
@@ -3308,7 +3270,7 @@ void BlackboxWindow::restore(bool remap) {
 
 // timer for autoraise
 void BlackboxWindow::timeout(void) {
-  raise();
+  screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
 }
 
 
@@ -3351,7 +3313,7 @@ void BlackboxWindow::changeBlackboxHints(BlackboxHints *net) {
       withdraw();
     } else {
       show();
-      raise();
+      screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
   }
 

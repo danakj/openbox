@@ -141,12 +141,6 @@ bool Rect::intersects(const Rect &a) const {
 }
 
 
-bool Rect::contains(int __x, int __y) const {
-  return __x >= _x1 && __x <= _x2 &&
-         __y >= _y1 && __y <= _y2;
-}
-
-
 string expandTilde(const string& s) {
   if (s[0] != '~') return s;
 

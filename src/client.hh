@@ -62,6 +62,7 @@ public:
   };
 
 private:
+  //! The actual window that this class is wrapping up
   Window   _window;
 
   //! The id of the group the window belongs to

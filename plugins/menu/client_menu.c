@@ -94,6 +94,8 @@ void *plugin_create() /* TODO: need config */
                                      action_from_string("toggleshade")));
     menu_add_entry(m, menu_entry_new("Omnipresent",
                                      action_from_string("toggleomnipresent")));
+    menu_add_entry(m, menu_entry_new("Decorations",
+                                     action_from_string("toggledecorations")));
     menu_add_entry(m, menu_entry_new_submenu("Layers",
                                              layer_menu));
     layer_menu->parent = m;

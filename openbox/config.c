@@ -398,7 +398,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "mouse", parse_mouse, NULL);
 
     config_resist_win = 10;
-    config_resist_edge = 10;
+    config_resist_edge = 20;
 
     parse_register(i, "resistance", parse_resistance, NULL);
 

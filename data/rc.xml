@@ -7,7 +7,7 @@
 
 <resistance>
   <strength>10</strength>
-  <screen_edge_strength>10</screen_edge_strength>
+  <screen_edge_strength>20</screen_edge_strength>
 </resistance>
 
 <placement>

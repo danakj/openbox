@@ -35,24 +35,25 @@ public:
   enum Type {
     // bevel options
     Flat                = (1l<<0),
-    FlatBorder          = (1l<<1),
-    Sunken              = (1l<<2),
-    Raised              = (1l<<3),
+    Sunken              = (1l<<1),
+    Raised              = (1l<<2),
     // textures
-    Solid               = (1l<<4),
-    Gradient            = (1l<<5),
+    Solid               = (1l<<3),
+    Gradient            = (1l<<4),
     // gradients
-    Horizontal          = (1l<<6),
-    Vertical            = (1l<<7),
-    Diagonal            = (1l<<8),
-    CrossDiagonal       = (1l<<9),
-    Rectangle           = (1l<<10),
-    Pyramid             = (1l<<11),
-    PipeCross           = (1l<<12),
-    Elliptic            = (1l<<13),
+    Horizontal          = (1l<<5),
+    Vertical            = (1l<<6),
+    Diagonal            = (1l<<7),
+    CrossDiagonal       = (1l<<8),
+    Rectangle           = (1l<<9),
+    Pyramid             = (1l<<10),
+    PipeCross           = (1l<<11),
+    Elliptic            = (1l<<12),
     // bevel types
-    Bevel1              = (1l<<14),
-    Bevel2              = (1l<<15),
+    Bevel1              = (1l<<13),
+    Bevel2              = (1l<<14),
+    // flat border
+    Border              = (1l<<15),
     // inverted image
     Invert              = (1l<<16),
     // parent relative image
@@ -69,11 +70,13 @@ public:
 
   void setColor(const BColor &_color);
   void setColorTo(const BColor &_colorTo) { ct = _colorTo; }
+  void setBorderColor(const BColor &_borderColor) { bc = _borderColor; }
 
   const BColor &color(void) const { return c; }
   const BColor &colorTo(void) const { return ct; }
   const BColor &lightColor(void) const { return lc; }
   const BColor &shadowColor(void) const { return sc; }
+  const BColor &borderColor(void) const { return bc; }
 
   unsigned long texture(void) const { return t; }
   void setTexture(const unsigned long _texture) { t  = _texture; }
@@ -98,7 +101,7 @@ public:
                 const Pixmap old = 0);
 
 private:
-  BColor c, ct, lc, sc;
+  BColor c, ct, lc, sc, bc;
   std::string descr;
   unsigned long t;
   const BaseDisplay *dpy;

@@ -66,6 +66,7 @@ private:
   void invert(void);
   void bevel1(void);
   void bevel2(void);
+  void border(const BTexture &texture);
   void dgradient(void);
   void egradient(void);
   void hgradient(void);

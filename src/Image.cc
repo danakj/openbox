@@ -107,54 +107,57 @@ Pixmap BImage::render_solid(const BTexture &texture) {
       XDrawLine(display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
-  if (texture.texture() & BTexture::FlatBorder) {
-    BPen penborder(texture.colorTo());
-    XDrawRectangle(display, pixmap, penborder.gc(), 0, 0, width-1, height-1);
+  int left = 0, top = 0, right = width - 1, bottom = height - 1;
+
+  if (texture.texture() & BTexture::Border) {
+    BPen penborder(texture.borderColor());
+    XDrawRectangle(display, pixmap, penborder.gc(),
+                   left, top, right, bottom);
   }
 
   if (texture.texture() & BTexture::Bevel1) {
     if (texture.texture() & BTexture::Raised) {
       XDrawLine(display, pixmap, penshadow.gc(),
-                0, height - 1, width - 1, height - 1);
+                left, bottom, right, bottom);
       XDrawLine(display, pixmap, penshadow.gc(),
-                width - 1, height - 1, width - 1, 0);
+                right, bottom, right, top);
 
       XDrawLine(display, pixmap, penlight.gc(),
-                0, 0, width - 1, 0);
+                left, top, right, top);
       XDrawLine(display, pixmap, penlight.gc(),
-                0, height - 1, 0, 0);
+                left, bottom, left, top);
     } else if (texture.texture() & BTexture::Sunken) {
       XDrawLine(display, pixmap, penlight.gc(),
-                0, height - 1, width - 1, height - 1);
+                left, bottom, right, bottom);
       XDrawLine(display, pixmap, penlight.gc(),
-                width - 1, height - 1, width - 1, 0);
+                right, bottom, right, top);
 
       XDrawLine(display, pixmap, penshadow.gc(),
-                0, 0, width - 1, 0);
+                left, top, right, top);
       XDrawLine(display, pixmap, penshadow.gc(),
-                0, height - 1, 0, 0);
+                left, bottom, left, top);
     }
   } else if (texture.texture() & BTexture::Bevel2) {
     if (texture.texture() & BTexture::Raised) {
       XDrawLine(display, pixmap, penshadow.gc(),
-                1, height - 3, width - 3, height - 3);
+                left + 1, bottom - 2, right - 2, bottom - 2);
       XDrawLine(display, pixmap, penshadow.gc(),
-                width - 3, height - 3, width - 3, 1);
+                right - 2, bottom - 2, right - 2, top + 1);
 
       XDrawLine(display, pixmap, penlight.gc(),
-                1, 1, width - 3, 1);
+                left + 1, top + 1, right - 2, top + 1);
       XDrawLine(display, pixmap, penlight.gc(),
-                1, height - 3, 1, 1);
+                left + 1, bottom - 2, left + 1, top + 1);
     } else if (texture.texture() & BTexture::Sunken) {
       XDrawLine(display, pixmap, penlight.gc(),
-                1, height - 3, width - 3, height - 3);
+                left + 1, bottom - 2, right - 2, bottom - 2);
       XDrawLine(display, pixmap, penlight.gc(),
-                width - 3, height - 3, width - 3, 1);
+                right - 2, bottom - 2, right - 2, top + 1);
 
       XDrawLine(display, pixmap, penshadow.gc(),
-                1, 1, width - 3, 1);
+                left + 1, top + 1, right - 2, top + 1);
       XDrawLine(display, pixmap, penshadow.gc(),
-                1, height - 3, 1, 1);
+                left + 1, bottom - 2, left + 1, top + 1);
     }
   }
 
@@ -192,6 +195,8 @@ Pixmap BImage::render_gradient(const BTexture &texture) {
 
   if (texture.texture() & BTexture::Bevel1) bevel1();
   else if (texture.texture() & BTexture::Bevel2) bevel2();
+
+  if (texture.texture() & BTexture::Border) border(texture);
 
   if (inverted) invert();
 
@@ -812,6 +817,46 @@ void BImage::bevel2(void) {
 
       pr++; pg++; pb++;
     }
+  }
+}
+
+
+void BImage::border(const BTexture &texture) {
+  register unsigned int i;
+  int r = texture.borderColor().red(),
+    g = texture.borderColor().green(),
+    b = texture.borderColor().blue();
+
+  unsigned char *pr, *pg, *pb;
+
+  // top line
+  pr = red;
+  pg = green;
+  pb = blue;
+  for (i = 0; i < width; ++i) {
+    *pr++ = r;
+    *pg++ = g;
+    *pb++ = b;
+  }
+
+  // left and right lines (pr,pg,pb are already lined up)
+  for (i = 1; i < height - 1; ++i) {
+    *pr = r;
+    *pg = g;
+    *pb = b;
+    pr += width - 1;
+    pg += width - 1;
+    pb += width - 1;
+    *pr++ = r;
+    *pg++ = g;
+    *pb++ = b;
+  }
+
+  // bottom line (pr,pg,pb are already lined up)
+  for (i = 0; i < width; ++i) {
+    *pr++ = r;
+    *pg++ = g;
+    *pb++ = b;
   }
 }
 

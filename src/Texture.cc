@@ -46,14 +46,14 @@ using std::string;
 BTexture::BTexture(const BaseDisplay * const _display,
                    unsigned int _screen, BImageControl* _ctrl)
   : c(_display, _screen), ct(_display, _screen),
-    lc(_display, _screen), sc(_display, _screen), t(0),
+    lc(_display, _screen), sc(_display, _screen), bc(_display, _screen), t(0),
     dpy(_display), ctrl(_ctrl), scrn(_screen) { }
 
 
 BTexture::BTexture(const string &d, const BaseDisplay * const _display,
                    unsigned int _screen, BImageControl* _ctrl)
   : c(_display, _screen), ct(_display, _screen),
-    lc(_display, _screen), sc(_display, _screen), t(0),
+    lc(_display, _screen), sc(_display, _screen), bc(_display, _screen), t(0),
     dpy(_display), ctrl(_ctrl), scrn(_screen) {
   setDescription(d);
 }
@@ -128,14 +128,15 @@ void BTexture::setDescription(const string &d) {
 
     if (descr.find("sunken") != string::npos)
       addTexture(BTexture::Sunken);
-    else if (descr.find("flatborder") != string::npos)
-      addTexture(BTexture::FlatBorder);
     else if (descr.find("flat") != string::npos)
       addTexture(BTexture::Flat);
     else
       addTexture(BTexture::Raised);
 
-    if (! (texture() & (BTexture::Flat | BTexture::FlatBorder))) {
+    if (texture() & BTexture::Flat) {
+      if (descr.find("border") != string::npos)
+        addTexture(BTexture::Border);
+    } else {
       if (descr.find("bevel2") != string::npos)
         addTexture(BTexture::Bevel2);
       else
@@ -160,6 +161,7 @@ void BTexture::setDisplay(const BaseDisplay * const _display,
   ct.setDisplay(_display, _screen);
   lc.setDisplay(_display, _screen);
   sc.setDisplay(_display, _screen);
+  bc.setDisplay(_display, _screen);
 }
 
 
@@ -168,6 +170,7 @@ BTexture& BTexture::operator=(const BTexture &tt) {
   ct = tt.ct;
   lc = tt.lc;
   sc = tt.sc;
+  bc = tt.bc;
   descr = tt.descr;
   t  = tt.t;
   dpy = tt.dpy;

@@ -2520,6 +2520,8 @@ BTexture BScreen::readDatabaseTexture(const string &rname,
   texture.setColor(readDatabaseColor(rname + ".color", default_color, style));
   texture.setColorTo(readDatabaseColor(rname + ".colorTo", default_color,
                                        style));
+  texture.setBorderColor(readDatabaseColor(rname + ".borderColor",
+                                           default_color, style));
   
   return texture;
 }

@@ -61,53 +61,53 @@ extern "C" {
 using std::string;
 
 
-void Rect::setX(int __x) {
-  _x2 += __x - _x1;
-  _x1 = __x;
+void Rect::setX(int x) {
+  _x2 += x - _x1;
+  _x1 = x;
 }
 
 
-void Rect::setY(int __y)
+void Rect::setY(int y)
 {
-  _y2 += __y - _y1;
-  _y1 = __y;
+  _y2 += y - _y1;
+  _y1 = y;
 }
 
 
-void Rect::setPos(int __x, int __y) {
-  _x2 += __x - _x1;
-  _x1 = __x;
-  _y2 += __y - _y1;
-  _y1 = __y;
+void Rect::setPos(int x, int y) {
+  _x2 += x - _x1;
+  _x1 = x;
+  _y2 += y - _y1;
+  _y1 = y;
 }
 
 
-void Rect::setWidth(unsigned int __w) {
-  _x2 = __w + _x1 - 1;
+void Rect::setWidth(unsigned int w) {
+  _x2 = w + _x1 - 1;
 }
 
 
-void Rect::setHeight(unsigned int __h) {
-  _y2 = __h + _y1 - 1;
+void Rect::setHeight(unsigned int h) {
+  _y2 = h + _y1 - 1;
 }
 
 
-void Rect::setSize(unsigned int __w, unsigned int __h) {
-  _x2 = __w + _x1 - 1;
-  _y2 = __h + _y1 - 1;
+void Rect::setSize(unsigned int w, unsigned int h) {
+  _x2 = w + _x1 - 1;
+  _y2 = h + _y1 - 1;
 }
 
 
-void Rect::setRect(int __x, int __y, unsigned int __w, unsigned int __h) {
-  *this = Rect(__x, __y, __w, __h);
+void Rect::setRect(int x, int y, unsigned int w, unsigned int h) {
+  *this = Rect(x, y, w, h);
 }
 
 
-void Rect::setCoords(int __l, int __t, int __r, int __b) {
-  _x1 = __l;
-  _y1 = __t;
-  _x2 = __r;
-  _y2 = __b;
+void Rect::setCoords(int l, int t, int r, int b) {
+  _x1 = l;
+  _y1 = t;
+  _x2 = r;
+  _y2 = b;
 }
 
 
@@ -141,9 +141,9 @@ bool Rect::intersects(const Rect &a) const {
 }
 
 
-bool Rect::contains(int __x, int __y) const {
-  return __x >= _x1 && __x <= _x2 &&
-         __y >= _y1 && __y <= _y2;
+bool Rect::contains(int x, int y) const {
+  return x >= _x1 && x <= _x2 &&
+         y >= _y1 && y <= _y2;
 }
 
 

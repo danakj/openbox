@@ -10,7 +10,7 @@ extern "C" {
 #include <vector>
 
 #include "otk/screeninfo.hh"
-#include "otk/timermanager.hh"
+#include "otk/timerqueuemanager.hh"
 
 namespace ob {
 

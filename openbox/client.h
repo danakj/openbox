@@ -12,6 +12,7 @@
 
 struct _ObFrame;
 struct _ObGroup;
+struct _ObSessionState;
 
 typedef struct _ObClient     ObClient;
 typedef struct _ObClientIcon ObClientIcon;
@@ -67,6 +68,10 @@ struct _ObClient
 
     /*! The id of the group the window belongs to */
     struct _ObGroup *group;
+
+    /*! Saved session data to apply to this client */
+    struct _ObSessionState *session;
+
     /*! Whether or not the client is a transient window. This is guaranteed to 
       be TRUE if transient_for != NULL, but not guaranteed to be FALSE if
       transient_for == NULL. */

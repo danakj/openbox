@@ -47,6 +47,7 @@ static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
+static void client_restore_session_stacking(ObClient *self);
 
 void client_startup()
 {
@@ -261,6 +262,7 @@ void client_manage(Window window)
     focus_order_add_new(self);
 
     stacking_add(CLIENT_AS_WINDOW(self));
+    client_restore_session_stacking(self);
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING && config_focus_new &&
@@ -472,30 +474,55 @@ void client_unmanage(ObClient *self)
 
 static void client_restore_session_state(ObClient *self)
 {
-    ObSessionState *s;
+    GList *it;
 
-    s = session_state_find(self);
-    if (!(s)) return;
+    if (!(it = session_state_find(self)))
+        return;
 
-    RECT_SET(self->area, s->x, s->y, s->w, s->h);
+    self->session = it->data;
+
+    RECT_SET(self->area, self->session->x, self->session->y,
+             self->session->w, self->session->h);
     self->positioned = TRUE;
-    XResizeWindow(ob_display, self->window, s->w, s->h);
+    XResizeWindow(ob_display, self->window,
+                  self->session->w, self->session->h);
 
-    self->desktop = s->desktop == DESKTOP_ALL ? s->desktop :
-        MIN(screen_num_desktops - 1, s->desktop);
+    self->desktop = (self->session->desktop == DESKTOP_ALL ?
+                     self->session->desktop :
+                     MIN(screen_num_desktops - 1, self->session->desktop));
     PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
 
-    self->shaded = s->shaded;
-    self->iconic = s->iconic;
-    self->skip_pager = s->skip_pager;
-    self->skip_taskbar = s->skip_taskbar;
-    self->fullscreen = s->fullscreen;
-    self->above = s->above;
-    self->below = s->below;
-    self->max_horz = s->max_horz;
-    self->max_vert = s->max_vert;
+    self->shaded = self->session->shaded;
+    self->iconic = self->session->iconic;
+    self->skip_pager = self->session->skip_pager;
+    self->skip_taskbar = self->session->skip_taskbar;
+    self->fullscreen = self->session->fullscreen;
+    self->above = self->session->above;
+    self->below = self->session->below;
+    self->max_horz = self->session->max_horz;
+    self->max_vert = self->session->max_vert;
+}
 
-    session_state_free(s);
+static void client_restore_session_stacking(ObClient *self)
+{
+    GList *it;
+
+    if (!self->session) return;
+
+    it = g_list_find(session_saved_state, self->session);
+    for (it = g_list_previous(it); it; it = g_list_previous(it)) {
+        GList *cit;
+
+        for (cit = client_list; cit; cit = g_list_next(cit))
+            if (session_state_cmp(it->data, cit->data))
+                break;
+        if (cit) {
+            client_calc_layer(self);
+            stacking_below(CLIENT_AS_WINDOW(self),
+                           CLIENT_AS_WINDOW(cit->data));
+            break;
+        }
+    }
 }
 
 void client_move_onscreen(ObClient *self, gboolean rude)
@@ -630,6 +657,7 @@ static void client_get_all(ObClient *self)
   
     /* defaults */
     self->frame = NULL;
+    self->session = NULL;
     self->title = self->icon_title = NULL;
     self->title_count = 1;
     self->name = self->class = self->role = NULL;

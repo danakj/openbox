@@ -1,6 +1,10 @@
 Changelog for Openbox:
 
 1.1.0:
+ * improved focused window logic to remove a segfault
+   when the focused window on an inactive workspace
+   closes, and focusLastWindow is enabled.              (Ben Jansens)
+
  * bsetroot supports transparent applications by
    setting the xrootpmap_id property on the root
    window                                               (Sean Perry)

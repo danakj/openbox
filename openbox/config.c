@@ -40,7 +40,7 @@ gint    config_desktops_num;
 GSList *config_desktops_names;
 gint    config_screen_firstdesk;
 
-gboolean config_redraw_resize;
+gboolean config_resize_redraw;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -291,7 +291,7 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     node = node->children;
     
     if ((n = parse_find_node("drawContents", node)))
-        config_redraw_resize = parse_bool(doc, n);
+        config_resize_redraw = parse_bool(doc, n);
 }
 
 static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -530,7 +530,7 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "desktops", parse_desktops, NULL);
 
-    config_redraw_resize = TRUE;
+    config_resize_redraw = TRUE;
 
     parse_register(i, "resize", parse_resize, NULL);
 

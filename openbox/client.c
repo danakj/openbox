@@ -2116,7 +2116,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
        resizing in redraw mode */
     send_resize_client = ((!user && resized) ||
                           (user && (final ||
-                                    (resized && config_redraw_resize))));
+                                    (resized && config_resize_redraw))));
 
     /* if the client is enlarging, the resize the client before the frame */
     if (send_resize_client && user && (w > oldw || h > oldh))

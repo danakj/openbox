@@ -217,9 +217,11 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
     if (dx || dy) {
         ObMenuFrame *f;
 
+        /* move the current menu frame to fit, but dont touch parents yet */
         menu_frame_move(self, self->area.x + dx, self->area.y + dy);
         if (!config_menu_xorstyle)
-            dy = 0;
+            dy = 0; /* if we want to be like xor, move parents in y- *
+                     * and x-direction, otherwise just in x-dir      */
         for (f = self->parent; f; f = f->parent)
             menu_frame_move(f, f->area.x + dx, f->area.y + dy);
         for (f = self->child; f; f = f->child)

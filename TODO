@@ -34,12 +34,13 @@ Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
   functions!
   - done.
 
+* make moving/resizing cancellable with a binding
+  -done
+
 4.0:
 * have plugins/scripts for most everything as deemed appropriate.
 
 Openbox TODO list:
-* make moving/resizing cancellable with a binding
-
 * add asserts all throughout the code to catch bugs.
 
 * make it possible to cycle workspaces by moving the mouse past the edge of

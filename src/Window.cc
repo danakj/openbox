@@ -3135,6 +3135,9 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root, int &dx) {
     screen->reassociateWindow(this, dest, False);
   screen->changeWorkspaceID(dest);
 
+  if (screen->doOpaqueMove())
+    XGrabServer(blackbox->getXDisplay());
+
   XUngrabPointer(blackbox->getXDisplay(), CurrentTime);
   XWarpPointer(blackbox->getXDisplay(), None, 
                screen->getRootWindow(), 0, 0, 0, 0,
@@ -3143,6 +3146,9 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root, int &dx) {
                PointerMotionMask | ButtonReleaseMask,
                GrabModeAsync, GrabModeAsync,
                None, blackbox->getMoveCursor(), CurrentTime);
+
+  if (screen->doOpaqueMove())
+    XUngrabServer(blackbox->getXDisplay());
 
   if (focus)
     setInputFocus();

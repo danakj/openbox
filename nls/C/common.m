@@ -1,38 +1,35 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# Evet
 $ #No
-# Nej
+# Hayýr
 
 $ #DirectionTitle
-# Riktning
+# Yön
 $ #DirectionHoriz
-# Horisontell
+# Ufki
 $ #DirectionVert
-# Vertikal
+# Dikey
 
 $ #AlwaysOnTop
-# Alltid överst
+# Her zaman üstte
 
 $ #PlacementTitle
-# Placering
+# Yerleþim
 $ #PlacementTopLeft
-# Uppe till vänster
+# Sol üst
 $ #PlacementCenterLeft
-# Mitten till vänster
+# Sol orta 
 $ #PlacementBottomLeft
-# Nere till vänster
+# Sol alt
 $ #PlacementTopCenter
-# Uppe i mitten
+# Üst orta
 $ #PlacementBottomCenter
-# Nere i mitten
+# Alt orta
 $ #PlacementTopRight
-# Uppe till höger
+# Sað üst
 $ #PlacementCenterRight
-# Mitten till höger
+# Sað orta
 $ #PlacementBottomRight
-# Nere till höger
-
-$ #AutoHide
-# Göm automatiskt
+# Sað üst

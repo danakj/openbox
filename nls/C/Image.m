@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: fel under skapande av pixmap\n
+# BImage::render_solid : resmi yaratamadým\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: fel under skapande av XImage\n
+# BImage::renderXImage : XImage'i yaratamadým\n
 $ #UnsupVisual
-# BImage::renderXImage: ej stöd för färgdjup\n
+# BImage::renderXImage : desteklenmeyen görünüþ( renk derinliði )\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: fel under skapande av pixmap\n
+# BImage::renderPixmap : resmi yaratamadým\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: ogiltig färgkarta storlek %d (%d/%d/%d) - reducerar\n
+# BImageControl::BImageControl : geçersiz renk haritasý büyüklüðü %d (%d/%d/%d) - azaltýyorum\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: fel under allokering av färgkarta\n
+# BImageControl::BImageControl : renk haritasý ayrýlanamadý\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: misslyckades att allokera färg %d/%d/%d\n
+# BImageControl::BImageControl : rengi ayrýrken hata oldu : %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: pixmap cache - släpper %d pixmappar\n
+# BImageControl::~BImageControl : resim arabelleði - %d resim temizlendi\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: stor cache, tvingar upprensning\n
+# BImageControl::renderImage : arabellek büyük, temizlemeye baþlýyorum\n
 $ #ColorParseError
-# BImageControl::getColor: färgfel: '%s'\n
+# BImageControl::getColor : renk tarama hatasý : '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: färgallokeringsfel: '%s'\n
+# BImageControl::getColor : renk ayýrma hatasý : '%s'\n

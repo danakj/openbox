@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Skicka till...
+# Gönder ...
 $ #Shade
-# Skugga
+# Topla
 $ #Iconify
-# Ikonifiera
+# Ikonalaþtýr
 $ #Maximize
-# Maximera
+# Azamileþtir
 $ #Raise
-# Höj
+# Alçalt
 $ #Lower
-# Sänk
+# Yükselt
 $ #Stick
-# Klibbig
+# Yapýþýk
 $ #KillClient
-# Döda klient
+# Öldür
 $ #Close
-# Stäng
+# Kapat

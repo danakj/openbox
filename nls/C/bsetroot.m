@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s: fel: måste specifiera en av: -solid, -mod, -gradient\n
+# %s : hata : -solid, -mod yada -gradient'den birisini belirlemek zorundasýn\n
 $ #Usage
-# %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
-  -display <string>        skärmanslutning\n\
-  -mod <x> <y>             modulamönster\n\
-  -foreground, -fg <color> förgrundsfärg för modulamönster\n\
-  -background, -bg <color> bakgrundsfärg för modulamönster\n\n\
-  -gradient <texture>      texturlutning\n\
-  -from <color>            startfärg\n\
-  -to <color>              slutfärg\n\n\
-  -solid <color>           solid färg\n\n\
-  -help                    visa denna hjälptext och avsluta\n
+# %s 2.0 : Tel'if hakký (c) 1997-2000 Brad Hughes\n\n\
+  -display <metin>         ekran belirlemesi\n\
+  -mod <x> <y>             bölüþüm iþlemi\n\
+  -foreground, -fg <renk>  bölüþüm önalaný\n\
+  -background, -bg <renk>  bölüþüm ardalaný\n\n\
+  -gradient <kaplam>       geçiþim kaplamý\n\
+  -from <renk>             geçiþim baþlama rengi\n\
+  -to <renk>               geçiþim bitiþ rengi\n\n\
+  -solid <renk>            tek renk\n\n\
+  -help                    bu yardým iletisini göster ve çýk\n
 

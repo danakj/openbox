@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Verktygslist
+# Blackbox çubuðu
 $ #EditWkspcName
-# Ändra namn på skrivbordet
+# Geçerli masaüstü ismini deðiþtir
 $ #ToolbarPlacement
-# Verktygslistens placering
+# Blackbox çubuðunun yerleþimi

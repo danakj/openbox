@@ -314,12 +314,18 @@ gboolean load()
     }
 
     /* load the font, not from the theme file tho, its in the config */
-    s_winfont_shadow = 1; /* XXX read from themrc */
+
+    if (!config_get("font.shadow", Config_Bool, &shadow)) {
+        shadow.bool = TRUE; /* default */
+        config_set("font.shadow", Config_Bool, shadow);
+    }
+    s_winfont_shadow = shadow.bool;
     if (!config_get("font.shadow.offset", Config_Integer, &offset) ||
         offset.integer < 0 || offset.integer >= 10) {
-        s_winfont_shadow_offset = 1; /* default */
+        offset.integer = 1; /* default */
+        config_set("font.shadow.offset", Config_Integer, offset);
     }
-    
+    s_winfont_shadow_offset = offset.integer;
     if (!config_get("font", Config_String, &font)) {
         font.string = DEFAULT_FONT;
         config_set("font", Config_String, font);

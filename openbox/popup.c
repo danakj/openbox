@@ -57,21 +57,20 @@ Popup *popup_new(gboolean hasicon)
         self->icon = None;
     }
 
-    RrColorSet(&pri, 1, 0, 0, 0);
-    RrColorSet(&sec, 0, 1, 0, 0);
-    RrPlanarSet(self->s_bg, RR_PLANAR_VERTICAL, &pri, &sec);
-    RrColorSet(&pri, 0, 0.5, 0, 1);
-    RrColorSet(&sec, 0.5, 0, 0.5, 1);
-    RrPlanarSet(self->s_text, RR_PLANAR_HORIZONTAL, &pri, &sec);
-    if (self->s_icon) {
-        RrColorSet(&pri, 0, 0, 1, 1);
-        RrColorSet(&sec, 0.5, 0.5, 0, 1);
-        RrPlanarSet(self->s_icon, RR_PLANAR_HORIZONTAL, &pri, &sec);
-    }
-
     /* XXX COPY THE APPEARANCES FROM THE THEME...... LIKE THIS SORTA!
     self->a_text = appearance_copy(theme_app_hilite_label);
     */
+    RrColorSet(&pri, 1, 0, 0, 0);
+    RrColorSet(&sec, 0, 1, 0, 0);
+    RrPlanarSet(self->s_bg, RR_PLANAR_VERTICAL, &pri, &sec);
+    RrColorSet(&pri, 0, 0.5, 0, 0.7);
+    RrColorSet(&sec, 0.5, 0, 0.5, 0.7);
+    RrPlanarSet(self->s_text, RR_PLANAR_HORIZONTAL, &pri, &sec);
+    if (self->s_icon) {
+        RrColorSet(&pri, 0, 0, 1, 0.7);
+        RrColorSet(&sec, 0.5, 0.5, 0, 0.7);
+        RrPlanarSet(self->s_icon, RR_PLANAR_HORIZONTAL, &pri, &sec);
+    }
 
     return self;
 }
@@ -132,15 +131,17 @@ void popup_show(Popup *self, char *text, Icon *icon)
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (theme_bevel * 2);
+        texth = h - (theme_bevel * 2) - theme_bwidth * 2;
     } else
-        h = texth + theme_bevel * 2;
+        h = texth + theme_bevel * 2 + theme_bwidth * 2;
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (iconw + theme_bevel * (self->hasicon ? 3 : 2));
+        textw = w - (iconw + theme_bevel * (self->hasicon ? 3 : 2)) -
+            theme_bwidth * 2;
     } else
-        w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2);
+        w = textw + iconw + theme_bevel * (self->hasicon ? 3 : 2) +
+            theme_bwidth * 2;
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -181,7 +182,7 @@ void popup_show(Popup *self, char *text, Icon *icon)
     RrSurfaceSetArea(self->s_bg, x, y, w, h);
 
     RrSurfaceSetArea(self->s_text,
-                     iconw + theme_bevel * (self->hasicon ? 3 : 2) +
+                     iconw + theme_bevel * (self->hasicon ? 2 : 1) +
                      theme_bwidth,
                      theme_bevel + theme_bwidth,
                      textw, texth);

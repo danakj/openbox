@@ -338,11 +338,10 @@ void TrueRenderControl::drawImage(Surface &sf, int w, int h,
   startx = x;
   
   for (i = 0, c = 0, e = w*h; i < e; ++i) {
-    printf("%d, %d\n", x, y);
     unsigned char alpha = data[i] >> 24;
-    unsigned char r = data[i];
+    unsigned char r = data[i] >> 16;
     unsigned char g = data[i] >> 8;
-    unsigned char b = data[i] >> 16;
+    unsigned char b = data[i];
 
     // background color
     unsigned char bgr = bg[i] >> default_red_shift;
@@ -353,7 +352,7 @@ void TrueRenderControl::drawImage(Surface &sf, int w, int h,
     g = bgg + (g - bgg) * alpha >> 8;
     b = bgb + (b - bgb) * alpha >> 8;
 
-    bg[i] = (r << default_red_shift) & (g << default_green_shift) &
+    bg[i] = (r << default_red_shift) | (g << default_green_shift) |
       (b << default_blue_shift);
 
     if (++c >= w) {

@@ -12,12 +12,12 @@ void font_startup(void)
     int version;
 #endif /* DEBUG */
     if (!XftInit(0)) {
-        g_warning(_("Couldn't initialize Xft.\n\n"));
+        g_warning(_("Couldn't initialize Xft.\n"));
         exit(3);
     }
 #ifdef DEBUG
     version = XftGetVersion();
-    g_message("Using Xft %d.%d.%d (Built against %d.%d.%d).\n",
+    g_message("Using Xft %d.%d.%d (Built against %d.%d.%d).",
               version / 10000 % 100, version / 100 % 100, version % 100,
               XFT_MAJOR, XFT_MINOR, XFT_REVISION);
 #endif

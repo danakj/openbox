@@ -133,7 +133,8 @@ static gint area_cmp(gconstpointer p1, gconstpointer p2)
     return ret;
 }
 
-static gboolean place_smart(ObClient *client, gint *x, gint *y)
+static gboolean place_smart(ObClient *client, gint *x, gint *y,
+                            gboolean only_focused)
 {
     guint i;
     gboolean ret = FALSE;
@@ -151,7 +152,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
 
         if (c != client && !c->shaded && client_normal(c)) {
             spaces = area_remove(spaces, &c->frame->area);
-            break;
+            if (only_focused)
+                break;
         }
     }
 
@@ -269,9 +271,10 @@ void place_client(ObClient *client, gint *x, gint *y)
 {
     if (client->positioned)
         return;
-    if (place_transient(client, x, y) ||
-        place_dialog(client, x, y)    ||
-        place_smart(client, x, y)     ||
+    if (place_transient(client, x, y)    ||
+        place_dialog(client, x, y)       ||
+        place_smart(client, x, y, FALSE) ||
+        place_smart(client, x, y, TRUE)  ||
         (config_focus_follow ?
          place_under_mouse(client, x, y) :
          place_random(client, x, y)))

@@ -202,7 +202,7 @@ int Basemenu::insert(BasemenuItem *item, int pos) {
   if (pos < 0) {
     menuitems.push_back(item);
   } else {
-    assert(pos < static_cast<signed>(menuitems.size()));
+    assert(pos <= static_cast<signed>(menuitems.size()));
     menuitems.insert((menuitems.begin() + pos), item);
   }
   return menuitems.size();

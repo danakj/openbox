@@ -104,6 +104,7 @@ public:
   void lowerWindow(BlackboxWindow *w);
   void reconfigure(void);
   void setCurrent(void);
+  void readName();
   void setName(const std::string& new_name);
 };
 

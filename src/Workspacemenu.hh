@@ -29,6 +29,7 @@
 // forward declaration
 class Workspacemenu;
 class Toolbar;
+class Workspace;
 
 class Workspacemenu : public Basemenu {
 private:
@@ -40,6 +41,10 @@ protected:
 
 public:
   Workspacemenu(BScreen *scrn);
+
+  void changeWorkspaceLabel(unsigned int index, const std::string& label);
+  void insertWorkspace(Workspace *wkspc);
+  void removeWorkspace(Workspace *wkspc);
 };
 
 

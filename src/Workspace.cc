@@ -70,8 +70,7 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
 
   lastfocus = (BlackboxWindow *) 0;
 
-  setName("");
-  fprintf(stderr, "WORKSPACE NAME: %s\n", name.c_str());
+  readName();
 }
 
 
@@ -420,43 +419,48 @@ void Workspace::setCurrent(void) {
 }
 
 
-void Workspace::setName(const string& new_name) {
-  if (! new_name.empty()) {
-    name = new_name;
-  } else {
-    // attempt to get from the _NET_WM_DESKTOP_NAMES property
-    XAtom::StringVect namesList;
-    unsigned long numnames = id + 1;
-    if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
-                        XAtom::utf8, numnames, namesList) &&
-        namesList.size() > id) {
-      name = namesList[id];
-    } else {
-      string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat,
-                       "Workspace %d");
-      assert(tmp.length() < 32);
-      char default_name[32];
-      sprintf(default_name, tmp.c_str(), id + 1);
-      name = default_name;
-    }
-  }
+void Workspace::readName(void) {
+  XAtom::StringVect namesList;
+  unsigned long numnames = id + 1;
+    
+  // attempt to get from the _NET_WM_DESKTOP_NAMES property
+  if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
+                      XAtom::utf8, numnames, namesList) &&
+      namesList.size() > id) {
+    name = namesList[id];
   
-  // reset the property with the new name
+    clientmenu->setLabel(name);
+    clientmenu->update();
+  } else {
+    /*
+       Use a default name. This doesn't actually change the class. That will
+       happen after the setName changes the root property, and that change
+       makes its way back to this function.
+    */
+    string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat,
+                     "Workspace %d");
+    assert(tmp.length() < 32);
+    char default_name[32];
+    sprintf(default_name, tmp.c_str(), id + 1);
+    
+    setName(default_name);  // save this into the _NET_WM_DESKTOP_NAMES property
+  }
+}
+
+
+void Workspace::setName(const string& new_name) {
+  // set the _NET_WM_DESKTOP_NAMES property with the new name
   XAtom::StringVect namesList;
   unsigned long numnames = (unsigned) -1;
   if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
                       XAtom::utf8, numnames, namesList) &&
       namesList.size() > id)
-    namesList[id] = name;
+    namesList[id] = new_name;
   else
-    namesList.push_back(name);
+    namesList.push_back(new_name);
 
   xatom->setValue(screen->getRootWindow(), XAtom::net_desktop_names,
                   XAtom::utf8, namesList);
-
-  clientmenu->setLabel(name);
-  clientmenu->update();
-  screen->saveWorkspaceNames();
 }
 
 

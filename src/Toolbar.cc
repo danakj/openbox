@@ -916,13 +916,9 @@ void Toolbar::keyPressEvent(const XKeyEvent *ke) {
         blackbox->setFocusedWindow(0);
       }
 
-      Workspace *wkspc = screen->getCurrentWorkspace();
-      wkspc->setName(new_workspace_name);
-      wkspc->getMenu()->hide();
-
-      screen->getWorkspacemenu()->changeItemLabel(wkspc->getID() + 2,
-                                                  wkspc->getName());
-      screen->getWorkspacemenu()->update();
+      // the toolbar will be reconfigured when the change to the workspace name
+      // gets caught in the PropertyNotify event handler
+      screen->getCurrentWorkspace()->setName(new_workspace_name);
 
       new_workspace_name.erase();
       new_name_pos = 0;
@@ -938,7 +934,6 @@ void Toolbar::keyPressEvent(const XKeyEvent *ke) {
       else
         XSetWindowBackgroundPixmap(display, frame.workspace_label,
                                    frame.wlabel);
-      reconfigure();
     } else if (! (ks == XK_Shift_L || ks == XK_Shift_R ||
                   ks == XK_Control_L || ks == XK_Control_R ||
                   ks == XK_Caps_Lock || ks == XK_Shift_Lock ||

@@ -27,6 +27,7 @@
 
 #include "i18n.hh"
 #include "blackbox.hh"
+#include "Clientmenu.hh"
 #include "Screen.hh"
 #include "Toolbar.hh"
 #include "Workspacemenu.hh"
@@ -51,6 +52,8 @@ void Workspacemenu::itemSelected(int button, unsigned int index) {
   } else if (index == 1) {
     getScreen()->removeLastWorkspace();
   } else {
+    // subtract 2 because the workspace menu has 2 extra items at the top before
+    // the list of the workspace names
     index -= 2;
     const Workspace* const wkspc = getScreen()->getCurrentWorkspace();
     if (wkspc->getID() != index && index < getScreen()->getWorkspaceCount())
@@ -58,4 +61,28 @@ void Workspacemenu::itemSelected(int button, unsigned int index) {
   }
   if (! (getScreen()->getWorkspacemenu()->isTorn() || isTorn()))
     hide();
+}
+  
+
+void Workspacemenu::changeWorkspaceLabel(unsigned int index,
+                                         const std::string& label) {
+  // add 2 because the workspace menu has 2 extra items at the top before the
+  // list of the workspace names
+  changeItemLabel(index + 2, label);
+}
+  
+
+void Workspacemenu::insertWorkspace(Workspace *wkspc) {
+  assert(wkspc);
+  // add 2 because the workspace menu has 2 extra items at the top before the
+  // list of the workspace names
+  insert(wkspc->getName(), wkspc->getMenu(), wkspc->getID() + 2);
+}
+
+
+void Workspacemenu::removeWorkspace(Workspace *wkspc) {
+  assert(wkspc);
+  // add 2 because the workspace menu has 2 extra items at the top before the
+  // list of the workspace names
+  remove(wkspc->getID() + 2);
 }

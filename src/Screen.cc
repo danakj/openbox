@@ -205,17 +205,19 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   iconmenu = new Iconmenu(this);
   configmenu = new Configmenu(this);
 
-  Workspace *wkspc = (Workspace *) 0;
   if (resource.workspaces != 0) {
     for (unsigned int i = 0; i < resource.workspaces; ++i) {
-      wkspc = new Workspace(this, workspacesList.size());
+      Workspace *wkspc = new Workspace(this, workspacesList.size());
       workspacesList.push_back(wkspc);
-      workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
+      workspacemenu->insertWorkspace(wkspc);
+      workspacemenu->update();
+
     }
   } else {
-    wkspc = new Workspace(this, workspacesList.size());
+    Workspace *wkspc = new Workspace(this, workspacesList.size());
     workspacesList.push_back(wkspc);
-    workspacemenu->insert(wkspc->getName(), wkspc->getMenu());
+    workspacemenu->insertWorkspace(wkspc);
+    workspacemenu->update();
   }
   saveWorkspaceNames();
 
@@ -496,18 +498,14 @@ void BScreen::saveClock24Hour(Bool c) {
 
 
 void BScreen::saveWorkspaceNames() {
-  XAtom::StringVect nameList;
-  unsigned long numnames = (unsigned) -1;
   string names;
  
-  if (numnames > 0 &&
-      xatom->getValue(getRootWindow(), XAtom::net_desktop_names, XAtom::utf8,
-                      numnames, nameList)) {
-    for (unsigned int i = 0; i < nameList.size(); ++i) {
-      if (i > 0) names += ",";
-      names += nameList[i];
-    }
+  for (unsigned int i = 0; i < workspacesList.size(); ++i) {
+    names += workspacesList[i]->getName();
+    if (i < workspacesList.size() - 1)
+      names += ',';
   }
+
   config->setValue(screenstr + "workspaceNames", names);
 }
 
@@ -980,9 +978,9 @@ unsigned int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(this, workspacesList.size());
   workspacesList.push_back(wkspc);
   saveWorkspaces(getWorkspaceCount());
+  saveWorkspaceNames();
 
-  workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
-                        wkspc->getID() + 2);
+  workspacemenu->insertWorkspace(wkspc);
   workspacemenu->update();
 
   toolbar->reconfigure();
@@ -1004,13 +1002,14 @@ unsigned int BScreen::removeLastWorkspace(void) {
 
   wkspc->removeAll();
 
-  workspacemenu->remove(wkspc->getID() + 2);
+  workspacemenu->removeWorkspace(wkspc);
   workspacemenu->update();
 
   workspacesList.pop_back();
   delete wkspc;
 
   saveWorkspaces(getWorkspaceCount());
+  saveWorkspaceNames();
 
   toolbar->reconfigure();
 
@@ -2114,6 +2113,23 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
       changeWorkspaceID(getWorkspaceCount() - 1);
     else
       changeWorkspaceID(getCurrentWorkspaceID() - 1);
+  }
+}
+
+
+void BScreen::propertyNotifyEvent(const XPropertyEvent *pe) {
+  if (pe->atom == xatom->getAtom(XAtom::net_desktop_names)) {
+    // _NET_WM_DESKTOP_NAMES
+    fprintf(stderr, "UPDATING WORKSPACE NAMES\n");
+    WorkspaceList::iterator it = workspacesList.begin();
+    const WorkspaceList::iterator end = workspacesList.end();
+    for (; it != end; ++it) {
+      (*it)->readName(); // re-read its name from the window property
+      workspacemenu->changeWorkspaceLabel((*it)->getID(), (*it)->getName());
+    }
+    workspacemenu->update();
+    toolbar->reconfigure();
+    saveWorkspaceNames();
   }
 }
 

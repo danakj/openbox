@@ -462,9 +462,13 @@ void Blackbox::process_event(XEvent *e) {
   case PropertyNotify: {
     last_time = e->xproperty.time;
 
-    BlackboxWindow *win = searchWindow(e->xproperty.window);
-    if (win)
+    BlackboxWindow *win = (BlackboxWindow *) 0;
+    BScreen *screen = (BScreen *) 0;
+
+    if ((win = searchWindow(e->xproperty.window)))
       win->propertyNotifyEvent(&e->xproperty);
+    else if ((screen = searchScreen(e->xproperty.window)))
+      screen->propertyNotifyEvent(&e->xproperty);
     break;
   }
 

@@ -344,6 +344,7 @@ public:
   void hideGeometry(void);
 
   void buttonPressEvent(const XButtonEvent *xbutton);
+  void propertyNotifyEvent(const XPropertyEvent *pe);
 
   void updateNetizenCurrentWorkspace(void);
   void updateNetizenWorkspaceCount(void);

@@ -245,15 +245,18 @@ static GList *pick_group_windows(ObClient *top, ObClient *selected,
             next = g_list_next(it);
 
             if ((sit = g_slist_find(top->group->members, it->data))) {
+                ObClient *c;
                 ObClientType t;
 
                 ++i;
+                c = it->data;
+                t = c->type;
 
-                t = ((ObClient*)it->data)->type;
-
-                if (t == OB_CLIENT_TYPE_TOOLBAR ||
-                    t == OB_CLIENT_TYPE_MENU ||
-                    t == OB_CLIENT_TYPE_UTILITY)
+                if ((c->desktop == selected->desktop ||
+                     c->desktop == DESKTOP_ALL) &&
+                    (t == OB_CLIENT_TYPE_TOOLBAR ||
+                     t == OB_CLIENT_TYPE_MENU ||
+                     t == OB_CLIENT_TYPE_UTILITY))
                 {
                     ret = g_list_concat(ret,
                                         pick_windows(sit->data,

@@ -47,7 +47,7 @@ public:
   };
 
 private:
-  enum Action::ActionType _type;
+  enum ActionType _type;
   const KeyCode _keycode;
   const int _modifierMask;
   

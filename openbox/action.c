@@ -633,7 +633,8 @@ void action_resize_relative_horz(union ActionData *data)
     Client *c = data->relative.c;
     if (c)
         client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
-                         c->area.width + data->relative.delta,
+                         c->area.width +
+                         data->relative.delta * c->size_inc.width,
                          c->area.height, TRUE, TRUE);
 }
 
@@ -642,7 +643,8 @@ void action_resize_relative_vert(union ActionData *data)
     Client *c = data->relative.c;
     if (c && !c->shaded)
         client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
-                         c->area.width, c->area.height + data->relative.delta,
+                         c->area.width, c->area.height +
+                         data->relative.delta * c->size_inc.height,
                          TRUE, TRUE);
 }
 

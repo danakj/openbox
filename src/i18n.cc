@@ -46,7 +46,6 @@ extern "C" {
 }
 
 #include <string>
-using std::string;
 
 #include "i18n.h"
 
@@ -89,15 +88,11 @@ I18n::~I18n() {
 
 #if defined(NLS) && defined(HAVE_CATOPEN)
 void I18n::openCatalog(const char *catalog) {
-  int lp = strlen(LOCALEPATH), lc = strlen(locale),
-      ct = strlen(catalog), len = lp + lc + ct + 3;
-  catalog_filename = new char[len];
-
-  strncpy(catalog_filename, LOCALEPATH, lp);
-  *(catalog_filename + lp) = '/';
-  strncpy(catalog_filename + lp + 1, locale, lc);
-  *(catalog_filename + lp + lc + 1) = '/';
-  strncpy(catalog_filename + lp + lc + 2, catalog, ct + 1);
+  std::string catalog_filename = LOCALEPATH;
+  catalog_filename += '/';
+  catalog_filename += locale;
+  catalog_filename += '/';
+  catalog_filename += catalog;
 
 #  ifdef    MCLoadBySet
   catalog_fd = catopen(catalog_filename.c_str(), MCLoadBySet);
@@ -108,22 +103,20 @@ void I18n::openCatalog(const char *catalog) {
   if (catalog_fd == (nl_catd) -1)
     fprintf(stderr, "failed to open catalog, using default messages\n");
 }
-#else // !HAVE_CATOPEN
+#else
 void I18n::openCatalog(const char *) {
-  catalog_filename = (char *) 0;
 }
 #endif // HAVE_CATOPEN
 
-
 #if   defined(NLS) && defined(HAVE_CATGETS)
-const char *I18n::getMessage(int set, int msg, const char *msgString) const {
+const char* I18n::operator()(int set, int msg, const char *msgString) const {
   if (catalog_fd != (nl_catd) -1)
     return catgets(catalog_fd, set, msg, msgString);
   else
     return msgString;
 }
 #else
-const char *I18n::getMessage(int, int, const char *msgString) const {
+const char* I18n::operator()(int, int, const char *msgString) const {
   return msgString;
 }
 #endif

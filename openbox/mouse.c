@@ -128,7 +128,7 @@ static void grab_all_clients(gboolean grab)
 	mouse_grab_for_client(it->data, grab);
 }
 
-static void clearall()
+void mouse_unbind_all()
 {
     int i;
     GSList *it;
@@ -295,8 +295,8 @@ void mouse_event(ObClient *client, XEvent *e)
     }
 }
 
-gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
-                    ObAction *action)
+gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
+                    ObMouseAction mact, ObAction *action)
 {
     guint state, button;
     ObFrameContext context;
@@ -347,5 +347,5 @@ void mouse_startup(gboolean reconfig)
 void mouse_shutdown(gboolean reconfig)
 {
     grab_all_clients(FALSE);
-    clearall();
+    mouse_unbind_all();
 }

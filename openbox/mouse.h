@@ -28,8 +28,9 @@
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);
 
-gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
-                    ObAction *action);
+gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
+                    ObMouseAction mact, ObAction *action);
+void mouse_unbind_all();
 
 void mouse_event(struct _ObClient *client, XEvent *e);
 

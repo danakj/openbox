@@ -98,6 +98,14 @@ void keyboard_reset_chains()
     }
 }
 
+void keyboard_unbind_all()
+{
+    tree_destroy(keyboard_firstnode);
+    keyboard_firstnode = NULL;
+    grab_keys(FALSE);
+    curpos = NULL;
+}
+
 gboolean keyboard_bind(GList *keylist, ObAction *action)
 {
     KeyBindingTree *tree, *t;
@@ -297,16 +305,13 @@ void keyboard_shutdown(gboolean reconfig)
     if (!reconfig)
         client_remove_destructor(keyboard_interactive_end_client);
 
-    tree_destroy(keyboard_firstnode);
-    keyboard_firstnode = NULL;
-
     for (it = interactive_states; it; it = g_slist_next(it))
         g_free(it->data);
     g_slist_free(interactive_states);
     interactive_states = NULL;
 
     ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
-    grab_keys(FALSE);
-    curpos = NULL;
+
+    keyboard_unbind_all();
 }
 

@@ -608,6 +608,10 @@ void Screen::unmanageWindow(Client *client)
   // remove from the screen's list
   clients.remove(client);
 
+  // once the client is out of the list, update our strut to remove it's
+  // influence
+  updateStrut();
+
   // unfocus the client (calls the focus callbacks)
   client->unfocus();
 

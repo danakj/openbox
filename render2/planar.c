@@ -27,7 +27,8 @@ void RrPlanarSet(struct RrSurface *sur,
 {
     sur->data.planar.colortype = type;
     sur->data.planar.bevel = bevel;
-    sur->data.planar.primary = *primary;
+    if (!(type == RR_PLANAR_NONE))
+        sur->data.planar.primary = *primary;
     if (!(type == RR_PLANAR_NONE || type == RR_PLANAR_SOLID))
         sur->data.planar.secondary = *secondary;
     assert(borderwidth >= 0);
@@ -134,6 +135,8 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
 
     switch (RrPlanarColorType(sur)) {
     case RR_PLANAR_NONE:
+        if (RrPlanarBorderWidth(sur))
+            RrBorderPaint(sur);
         return;
     case RR_PLANAR_SOLID:
         glBegin(GL_TRIANGLES);

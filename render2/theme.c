@@ -123,8 +123,8 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
 
     RrColorSet(&pri, 0.9, 0.91, 0.9, 1);
     RrColorSet(&bor, 0, 0, 0, 1);
-    RrPlanarSet(theme->frame, RR_PLANAR_SOLID, RR_BEVEL_NONE,
-                &pri, NULL, 1, &bor);
+    RrPlanarSet(theme->frame, RR_PLANAR_NONE, RR_BEVEL_NONE,
+                NULL, NULL, 1, &bor);
 
     theme->title = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
     theme->title_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
@@ -139,11 +139,10 @@ struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
     theme->plate = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
     theme->plate_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 0);
 
-    RrColorSet(&pri, 0, 0, 0, 1);
-    RrPlanarSet(theme->plate, RR_PLANAR_SOLID, RR_BEVEL_NONE,
-                &pri, NULL, 0, NULL);
-    RrPlanarSet(theme->plate_f, RR_PLANAR_SOLID, RR_BEVEL_NONE,
-                &pri, NULL, 0, NULL);
+    RrPlanarSet(theme->plate, RR_PLANAR_NONE, RR_BEVEL_NONE,
+                NULL, NULL, 0, NULL);
+    RrPlanarSet(theme->plate_f, RR_PLANAR_NONE, RR_BEVEL_NONE,
+                NULL, NULL, 0, NULL);
 
     theme->label = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);
     theme->label_f = RrSurfaceNewProto(RR_SURFACE_PLANAR, 1);

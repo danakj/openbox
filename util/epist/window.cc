@@ -235,7 +235,6 @@ void XWindow::iconify() const {
 
 
 void XWindow::focus() const {
-  cout << "Focusing window: 0x" << hex << _window << dec << endl;
   // this will cause the window to be uniconified also
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
                             _window);

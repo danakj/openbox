@@ -425,8 +425,8 @@ void client_unmanage(ObClient *self)
     if (ob_state() != OB_STATE_EXITING) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
-	prop_erase(self->window, prop_atoms.net_wm_desktop);
-	prop_erase(self->window, prop_atoms.net_wm_state);
+	PROP_ERASE(self->window, net_wm_desktop);
+	PROP_ERASE(self->window, net_wm_state);
     } else {
 	/* if we're left in an iconic state, the client wont be mapped. this is
 	   bad, since we will no longer be managing the window on restart */

@@ -72,9 +72,7 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
 {
     ObCursor cur;
 
-    g_assert(!moveresize_in_progress);
-
-    if (!c->frame->visible)
+    if (moveresize_in_progress || !c->frame->visible)
         return;
 
     moveresize_client = c;

@@ -556,12 +556,6 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   Openbox::instance->bindings()->grabButtons(false, client);
 
-  // remove from the stacking order
-  _stacking.remove(client);
-
-  // unfocus the client
-  client->unfocus();
-
   // remove from the wm's map
   Openbox::instance->removeClient(client->window());
   Openbox::instance->removeClient(frame->window());
@@ -592,8 +586,15 @@ void OBScreen::unmanageWindow(OBClient *client)
   delete client->frame;
   client->frame = 0;
 
+  // remove from the stacking order
+  _stacking.remove(client);
+
   // remove from the screen's list
   clients.remove(client);
+
+  // unfocus the client (calls the focus callbacks)
+  client->unfocus();
+
   delete client;
 
   // update the root properties

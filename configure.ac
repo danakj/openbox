@@ -1,5 +1,5 @@
 AC_PREREQ([2.50])
-AC_INIT([src/main.cc])
+AC_INIT([kernel/openbox.c])
 #AC_CONFIG_HEADERS(config.h)
 AC_LANG([C])
 AC_ENABLE_STATIC([no])

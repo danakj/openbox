@@ -7,10 +7,10 @@
 #include <X11/Xresource.h>
 
 /* style settings - geometry */
-int theme_bevel;
-int theme_handle_height;
-int theme_bwidth;
-int theme_cbwidth;
+gint theme_bevel;
+gint theme_handle_height;
+gint theme_bwidth;
+gint theme_cbwidth;
 /* style settings - colors */
 color_rgb *theme_b_color;
 color_rgb *theme_cb_focused_color;
@@ -24,83 +24,87 @@ color_rgb *theme_menu_color;
 color_rgb *theme_menu_disabled_color;
 color_rgb *theme_menu_hilite_color;
 /* style settings - fonts */
-int theme_winfont_height;
-ObFont *theme_winfont;
+gint theme_winfont_height;
+RrFont *theme_winfont;
 gboolean theme_winfont_shadow;
-int theme_winfont_shadow_offset;
-int theme_winfont_shadow_tint;
-int theme_mtitlefont_height;
-ObFont *theme_mtitlefont;
+gint theme_winfont_shadow_offset;
+gint theme_winfont_shadow_tint;
+gint theme_mtitlefont_height;
+RrFont *theme_mtitlefont;
 gboolean theme_mtitlefont_shadow;
-int theme_mtitlefont_shadow_offset;
-int theme_mtitlefont_shadow_tint;
-int theme_mfont_height;
-ObFont *theme_mfont;
+gint theme_mtitlefont_shadow_offset;
+gint theme_mtitlefont_shadow_tint;
+gint theme_mfont_height;
+RrFont *theme_mfont;
 gboolean theme_mfont_shadow;
-int theme_mfont_shadow_offset;
-int theme_mfont_shadow_tint;
+gint theme_mfont_shadow_offset;
+gint theme_mfont_shadow_tint;
 /* style settings - title layout */
-char *theme_title_layout;
+gchar *theme_title_layout;
 /* style settings - masks */
-pixmap_mask *theme_max_set_mask;
-pixmap_mask *theme_max_unset_mask;
-pixmap_mask *theme_iconify_mask;
-pixmap_mask *theme_desk_set_mask;
-pixmap_mask *theme_desk_unset_mask;
-pixmap_mask *theme_shade_set_mask;
-pixmap_mask *theme_shade_unset_mask;
-pixmap_mask *theme_close_mask;
+RrPixmapMask *theme_max_set_mask;
+RrPixmapMask *theme_max_unset_mask;
+RrPixmapMask *theme_iconify_mask;
+RrPixmapMask *theme_desk_set_mask;
+RrPixmapMask *theme_desk_unset_mask;
+RrPixmapMask *theme_shade_set_mask;
+RrPixmapMask *theme_shade_unset_mask;
+RrPixmapMask *theme_close_mask;
 
 /* global appearances */
-Appearance *theme_a_focused_unpressed_max;
-Appearance *theme_a_focused_pressed_max;
-Appearance *theme_a_focused_pressed_set_max;
-Appearance *theme_a_unfocused_unpressed_max;
-Appearance *theme_a_unfocused_pressed_max;
-Appearance *theme_a_unfocused_pressed_set_max;
-Appearance *theme_a_focused_unpressed_close;
-Appearance *theme_a_focused_pressed_close;
-Appearance *theme_a_unfocused_unpressed_close;
-Appearance *theme_a_unfocused_pressed_close;
-Appearance *theme_a_focused_unpressed_desk;
-Appearance *theme_a_focused_pressed_desk;
-Appearance *theme_a_focused_pressed_set_desk;
-Appearance *theme_a_unfocused_unpressed_desk;
-Appearance *theme_a_unfocused_pressed_desk;
-Appearance *theme_a_unfocused_pressed_set_desk;
-Appearance *theme_a_focused_unpressed_shade;
-Appearance *theme_a_focused_pressed_shade;
-Appearance *theme_a_focused_pressed_set_shade;
-Appearance *theme_a_unfocused_unpressed_shade;
-Appearance *theme_a_unfocused_pressed_shade;
-Appearance *theme_a_unfocused_pressed_set_shade;
-Appearance *theme_a_focused_unpressed_iconify;
-Appearance *theme_a_focused_pressed_iconify;
-Appearance *theme_a_unfocused_unpressed_iconify;
-Appearance *theme_a_unfocused_pressed_iconify;
-Appearance *theme_a_focused_grip;
-Appearance *theme_a_unfocused_grip;
-Appearance *theme_a_focused_title;
-Appearance *theme_a_unfocused_title;
-Appearance *theme_a_focused_label;
-Appearance *theme_a_unfocused_label;
-Appearance *theme_a_icon; /* always parentrelative, so no focused/unfocused */
-Appearance *theme_a_focused_handle;
-Appearance *theme_a_unfocused_handle;
-Appearance *theme_a_menu_title;
-Appearance *theme_a_menu;
-Appearance *theme_a_menu_item;
-Appearance *theme_a_menu_disabled;
-Appearance *theme_a_menu_hilite;
+RrAppearance *theme_a_focused_unpressed_max;
+RrAppearance *theme_a_focused_pressed_max;
+RrAppearance *theme_a_focused_pressed_set_max;
+RrAppearance *theme_a_unfocused_unpressed_max;
+RrAppearance *theme_a_unfocused_pressed_max;
+RrAppearance *theme_a_unfocused_pressed_set_max;
+RrAppearance *theme_a_focused_unpressed_close;
+RrAppearance *theme_a_focused_pressed_close;
+RrAppearance *theme_a_unfocused_unpressed_close;
+RrAppearance *theme_a_unfocused_pressed_close;
+RrAppearance *theme_a_focused_unpressed_desk;
+RrAppearance *theme_a_focused_pressed_desk;
+RrAppearance *theme_a_focused_pressed_set_desk;
+RrAppearance *theme_a_unfocused_unpressed_desk;
+RrAppearance *theme_a_unfocused_pressed_desk;
+RrAppearance *theme_a_unfocused_pressed_set_desk;
+RrAppearance *theme_a_focused_unpressed_shade;
+RrAppearance *theme_a_focused_pressed_shade;
+RrAppearance *theme_a_focused_pressed_set_shade;
+RrAppearance *theme_a_unfocused_unpressed_shade;
+RrAppearance *theme_a_unfocused_pressed_shade;
+RrAppearance *theme_a_unfocused_pressed_set_shade;
+RrAppearance *theme_a_focused_unpressed_iconify;
+RrAppearance *theme_a_focused_pressed_iconify;
+RrAppearance *theme_a_unfocused_unpressed_iconify;
+RrAppearance *theme_a_unfocused_pressed_iconify;
+RrAppearance *theme_a_focused_grip;
+RrAppearance *theme_a_unfocused_grip;
+RrAppearance *theme_a_focused_title;
+RrAppearance *theme_a_unfocused_title;
+RrAppearance *theme_a_focused_label;
+RrAppearance *theme_a_unfocused_label;
+RrAppearance *theme_a_icon; /* always parentrelative, so no focused/unfocused */
+RrAppearance *theme_a_focused_handle;
+RrAppearance *theme_a_unfocused_handle;
+RrAppearance *theme_a_menu_title;
+RrAppearance *theme_a_menu;
+RrAppearance *theme_a_menu_item;
+RrAppearance *theme_a_menu_disabled;
+RrAppearance *theme_a_menu_hilite;
 
-Appearance *theme_app_hilite_bg;
-Appearance *theme_app_unhilite_bg;
-Appearance *theme_app_hilite_label;
-Appearance *theme_app_unhilite_label;
-Appearance *theme_app_icon;
+RrAppearance *theme_app_hilite_bg;
+RrAppearance *theme_app_unhilite_bg;
+RrAppearance *theme_app_hilite_label;
+RrAppearance *theme_app_unhilite_label;
+RrAppearance *theme_app_icon;
 
-void theme_startup()
+static const RrInstance *theme_inst = NULL;
+
+void theme_startup(const RrInstance *inst)
 {
+    theme_inst = inst;
+
     theme_b_color = theme_cb_unfocused_color = theme_cb_focused_color = 
         theme_title_unfocused_color = theme_title_focused_color = 
         theme_titlebut_unfocused_color = theme_titlebut_focused_color = 
@@ -113,12 +117,12 @@ void theme_startup()
     theme_shade_set_mask = theme_shade_unset_mask = NULL;
     theme_iconify_mask = theme_close_mask = NULL;
 
-    theme_a_focused_unpressed_max = appearance_new(1);
-    theme_a_focused_pressed_max = appearance_new(1);
-    theme_a_focused_pressed_set_max = appearance_new(1);
-    theme_a_unfocused_unpressed_max = appearance_new(1);
-    theme_a_unfocused_pressed_max = appearance_new(1);
-    theme_a_unfocused_pressed_set_max = appearance_new(1);
+    theme_a_focused_unpressed_max = RrAppearanceNew(inst, 1);
+    theme_a_focused_pressed_max = RrAppearanceNew(inst, 1);
+    theme_a_focused_pressed_set_max = RrAppearanceNew(inst, 1);
+    theme_a_unfocused_unpressed_max = RrAppearanceNew(inst, 1);
+    theme_a_unfocused_pressed_max = RrAppearanceNew(inst, 1);
+    theme_a_unfocused_pressed_set_max = RrAppearanceNew(inst, 1);
     theme_a_focused_unpressed_close = NULL;
     theme_a_focused_pressed_close = NULL;
     theme_a_unfocused_unpressed_close = NULL;
@@ -139,51 +143,51 @@ void theme_startup()
     theme_a_focused_pressed_iconify = NULL;
     theme_a_unfocused_unpressed_iconify = NULL;
     theme_a_unfocused_pressed_iconify = NULL;
-    theme_a_focused_grip = appearance_new(0);
-    theme_a_unfocused_grip = appearance_new(0);
-    theme_a_focused_title = appearance_new(0);
-    theme_a_unfocused_title = appearance_new(0);
-    theme_a_focused_label = appearance_new(1);
-    theme_a_unfocused_label = appearance_new(1);
-    theme_a_icon = appearance_new(1);
-    theme_a_focused_handle = appearance_new(0);
-    theme_a_unfocused_handle = appearance_new(0);
-    theme_a_menu = appearance_new(0);
-    theme_a_menu_title = appearance_new(1);
-    theme_a_menu_item = appearance_new(1);
-    theme_a_menu_disabled = appearance_new(1);
-    theme_a_menu_hilite = appearance_new(1);
+    theme_a_focused_grip = RrAppearanceNew(inst, 0);
+    theme_a_unfocused_grip = RrAppearanceNew(inst, 0);
+    theme_a_focused_title = RrAppearanceNew(inst, 0);
+    theme_a_unfocused_title = RrAppearanceNew(inst, 0);
+    theme_a_focused_label = RrAppearanceNew(inst, 1);
+    theme_a_unfocused_label = RrAppearanceNew(inst, 1);
+    theme_a_icon = RrAppearanceNew(inst, 1);
+    theme_a_focused_handle = RrAppearanceNew(inst, 0);
+    theme_a_unfocused_handle = RrAppearanceNew(inst, 0);
+    theme_a_menu = RrAppearanceNew(inst, 0);
+    theme_a_menu_title = RrAppearanceNew(inst, 1);
+    theme_a_menu_item = RrAppearanceNew(inst, 1);
+    theme_a_menu_disabled = RrAppearanceNew(inst, 1);
+    theme_a_menu_hilite = RrAppearanceNew(inst, 1);
 
-    theme_app_hilite_bg = appearance_new(0);
-    theme_app_unhilite_bg = appearance_new(0);
-    theme_app_hilite_label = appearance_new(1);
-    theme_app_unhilite_label = appearance_new(1);
-    theme_app_icon = appearance_new(1);
+    theme_app_hilite_bg = RrAppearanceNew(inst, 0);
+    theme_app_unhilite_bg = RrAppearanceNew(inst, 0);
+    theme_app_hilite_label = RrAppearanceNew(inst, 1);
+    theme_app_unhilite_label = RrAppearanceNew(inst, 1);
+    theme_app_icon = RrAppearanceNew(inst, 1);
 
 }
 
 void theme_shutdown()
 {
-    color_free(theme_b_color);
-    color_free(theme_cb_unfocused_color);
-    color_free(theme_cb_focused_color);
-    color_free(theme_title_unfocused_color);
-    color_free(theme_title_focused_color);
-    color_free(theme_titlebut_unfocused_color);
-    color_free(theme_titlebut_focused_color);
-    color_free(theme_menu_color);
-    color_free(theme_menu_title_color);
-    color_free(theme_menu_disabled_color);
-    color_free(theme_menu_hilite_color);
+    RrColorFree(theme_b_color);
+    RrColorFree(theme_cb_unfocused_color);
+    RrColorFree(theme_cb_focused_color);
+    RrColorFree(theme_title_unfocused_color);
+    RrColorFree(theme_title_focused_color);
+    RrColorFree(theme_titlebut_unfocused_color);
+    RrColorFree(theme_titlebut_focused_color);
+    RrColorFree(theme_menu_color);
+    RrColorFree(theme_menu_title_color);
+    RrColorFree(theme_menu_disabled_color);
+    RrColorFree(theme_menu_hilite_color);
 
-    pixmap_mask_free(theme_max_set_mask);
-    pixmap_mask_free(theme_max_unset_mask);
-    pixmap_mask_free(theme_desk_set_mask);
-    pixmap_mask_free(theme_desk_unset_mask);
-    pixmap_mask_free(theme_shade_set_mask);
-    pixmap_mask_free(theme_shade_unset_mask);
-    pixmap_mask_free(theme_iconify_mask);
-    pixmap_mask_free(theme_close_mask);
+    RrPixmapMaskFree(theme_max_set_mask);
+    RrPixmapMaskFree(theme_max_unset_mask);
+    RrPixmapMaskFree(theme_desk_set_mask);
+    RrPixmapMaskFree(theme_desk_unset_mask);
+    RrPixmapMaskFree(theme_shade_set_mask);
+    RrPixmapMaskFree(theme_shade_unset_mask);
+    RrPixmapMaskFree(theme_iconify_mask);
+    RrPixmapMaskFree(theme_close_mask);
 
     font_close(theme_winfont);
     font_close(theme_mtitlefont);
@@ -191,47 +195,47 @@ void theme_shutdown()
 
     g_free(theme_title_layout);
 
-    appearance_free(theme_a_focused_unpressed_max);
-    appearance_free(theme_a_focused_pressed_max);
-    appearance_free(theme_a_focused_pressed_set_max);
-    appearance_free(theme_a_unfocused_unpressed_max);
-    appearance_free(theme_a_unfocused_pressed_max);
-    appearance_free(theme_a_unfocused_pressed_set_max);
-    appearance_free(theme_a_focused_unpressed_close);
-    appearance_free(theme_a_focused_pressed_close);
-    appearance_free(theme_a_unfocused_unpressed_close);
-    appearance_free(theme_a_unfocused_pressed_close);
-    appearance_free(theme_a_focused_unpressed_desk);
-    appearance_free(theme_a_focused_pressed_desk);
-    appearance_free(theme_a_unfocused_unpressed_desk);
-    appearance_free(theme_a_unfocused_pressed_desk);
-    appearance_free(theme_a_focused_unpressed_shade);
-    appearance_free(theme_a_focused_pressed_shade);
-    appearance_free(theme_a_unfocused_unpressed_shade);
-    appearance_free(theme_a_unfocused_pressed_shade);
-    appearance_free(theme_a_focused_unpressed_iconify);
-    appearance_free(theme_a_focused_pressed_iconify);
-    appearance_free(theme_a_unfocused_unpressed_iconify);
-    appearance_free(theme_a_unfocused_pressed_iconify);
-    appearance_free(theme_a_focused_grip);
-    appearance_free(theme_a_unfocused_grip);
-    appearance_free(theme_a_focused_title);
-    appearance_free(theme_a_unfocused_title);
-    appearance_free(theme_a_focused_label);
-    appearance_free(theme_a_unfocused_label);
-    appearance_free(theme_a_icon);
-    appearance_free(theme_a_focused_handle);
-    appearance_free(theme_a_unfocused_handle);
-    appearance_free(theme_a_menu);
-    appearance_free(theme_a_menu_title);
-    appearance_free(theme_a_menu_item);
-    appearance_free(theme_a_menu_disabled);
-    appearance_free(theme_a_menu_hilite);
-    appearance_free(theme_app_hilite_bg);
-    appearance_free(theme_app_unhilite_bg);
-    appearance_free(theme_app_hilite_label);
-    appearance_free(theme_app_unhilite_label);
-    appearance_free(theme_app_icon);
+    RrAppearanceFree(theme_a_focused_unpressed_max);
+    RrAppearanceFree(theme_a_focused_pressed_max);
+    RrAppearanceFree(theme_a_focused_pressed_set_max);
+    RrAppearanceFree(theme_a_unfocused_unpressed_max);
+    RrAppearanceFree(theme_a_unfocused_pressed_max);
+    RrAppearanceFree(theme_a_unfocused_pressed_set_max);
+    RrAppearanceFree(theme_a_focused_unpressed_close);
+    RrAppearanceFree(theme_a_focused_pressed_close);
+    RrAppearanceFree(theme_a_unfocused_unpressed_close);
+    RrAppearanceFree(theme_a_unfocused_pressed_close);
+    RrAppearanceFree(theme_a_focused_unpressed_desk);
+    RrAppearanceFree(theme_a_focused_pressed_desk);
+    RrAppearanceFree(theme_a_unfocused_unpressed_desk);
+    RrAppearanceFree(theme_a_unfocused_pressed_desk);
+    RrAppearanceFree(theme_a_focused_unpressed_shade);
+    RrAppearanceFree(theme_a_focused_pressed_shade);
+    RrAppearanceFree(theme_a_unfocused_unpressed_shade);
+    RrAppearanceFree(theme_a_unfocused_pressed_shade);
+    RrAppearanceFree(theme_a_focused_unpressed_iconify);
+    RrAppearanceFree(theme_a_focused_pressed_iconify);
+    RrAppearanceFree(theme_a_unfocused_unpressed_iconify);
+    RrAppearanceFree(theme_a_unfocused_pressed_iconify);
+    RrAppearanceFree(theme_a_focused_grip);
+    RrAppearanceFree(theme_a_unfocused_grip);
+    RrAppearanceFree(theme_a_focused_title);
+    RrAppearanceFree(theme_a_unfocused_title);
+    RrAppearanceFree(theme_a_focused_label);
+    RrAppearanceFree(theme_a_unfocused_label);
+    RrAppearanceFree(theme_a_icon);
+    RrAppearanceFree(theme_a_focused_handle);
+    RrAppearanceFree(theme_a_unfocused_handle);
+    RrAppearanceFree(theme_a_menu);
+    RrAppearanceFree(theme_a_menu_title);
+    RrAppearanceFree(theme_a_menu_item);
+    RrAppearanceFree(theme_a_menu_disabled);
+    RrAppearanceFree(theme_a_menu_hilite);
+    RrAppearanceFree(theme_app_hilite_bg);
+    RrAppearanceFree(theme_app_unhilite_bg);
+    RrAppearanceFree(theme_app_hilite_label);
+    RrAppearanceFree(theme_app_unhilite_label);
+    RrAppearanceFree(theme_app_icon);
 }
 
 static XrmDatabase loaddb(char *theme)
@@ -303,7 +307,8 @@ static gboolean read_string(XrmDatabase db, char *rname, char **value)
     return ret;
 }
 
-static gboolean read_color(XrmDatabase db, char *rname, color_rgb **value)
+static gboolean read_color(XrmDatabase db, const RrInstance *inst,
+                           gchar *rname, color_rgb **value)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname);
@@ -312,7 +317,7 @@ static gboolean read_color(XrmDatabase db, char *rname, color_rgb **value)
   
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
-	color_rgb *c = color_parse(retvalue.addr);
+	color_rgb *c = RrColorParse(inst, retvalue.addr);
 	if (c != NULL) {
 	    *value = c;
 	    ret = TRUE;
@@ -323,8 +328,9 @@ static gboolean read_color(XrmDatabase db, char *rname, color_rgb **value)
     return ret;
 }
 
-static gboolean read_mask(XrmDatabase db, char *rname, char *theme,
-                          pixmap_mask **value)
+static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
+                           gchar *rname, gchar *theme,
+                          RrPixmapMask **value)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname);
@@ -369,7 +375,7 @@ static gboolean read_mask(XrmDatabase db, char *rname, char *theme,
         }
 
         if (ret) {
-            *value = pixmap_mask_new(w, h, (char*)b);
+            *value = RrPixmapMaskNew(inst, w, h, (char*)b);
             XFree(b);
         }
       
@@ -381,8 +387,8 @@ static gboolean read_mask(XrmDatabase db, char *rname, char *theme,
     return ret;
 }
 
-static void parse_appearance(char *tex, SurfaceColorType *grad,
-                             ReliefType *relief, BevelType *bevel,
+static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
+                             RrReliefType *relief, RrBevelType *bevel,
                              gboolean *interlaced, gboolean *border)
 {
     char *t;
@@ -392,45 +398,45 @@ static void parse_appearance(char *tex, SurfaceColorType *grad,
 	*t = g_ascii_tolower(*t);
 
     if (strstr(tex, "parentrelative") != NULL) {
-	*grad = Background_ParentRelative;
+	*grad = RR_SURFACE_PARENTREL;
     } else {
 	if (strstr(tex, "gradient") != NULL) {
 	    if (strstr(tex, "crossdiagonal") != NULL)
-		*grad = Background_CrossDiagonal;
+		*grad = RR_SURFACE_CROSS_DIAGONAL;
 	    else if (strstr(tex, "rectangle") != NULL)
-		*grad = Background_Rectangle;
+		*grad = RR_SURFACE_RECTANGLE;
 	    else if (strstr(tex, "pyramid") != NULL)
-		*grad = Background_Pyramid;
+		*grad = RR_SURFACE_PYRAMID;
 	    else if (strstr(tex, "pipecross") != NULL)
-		*grad = Background_PipeCross;
+		*grad = RR_SURFACE_PIPECROSS;
 	    else if (strstr(tex, "elliptic") != NULL)
-		*grad = Background_Rectangle;
+		*grad = RR_SURFACE_PIPECROSS;
 	    else if (strstr(tex, "horizontal") != NULL)
-		*grad = Background_Horizontal;
+		*grad = RR_SURFACE_HORIZONTAL;
 	    else if (strstr(tex, "vertical") != NULL)
-		*grad = Background_Vertical;
+		*grad = RR_SURFACE_VERTICAL;
 	    else
-		*grad = Background_Diagonal;
+		*grad = RR_SURFACE_DIAGONAL;
 	} else {
-	    *grad = Background_Solid;
+	    *grad = RR_SURFACE_SOLID;
 	}
 
 	if (strstr(tex, "sunken") != NULL)
-	    *relief = Sunken;
+	    *relief = RR_RELIEF_SUNKEN;
 	else if (strstr(tex, "flat") != NULL)
-	    *relief = Flat;
+	    *relief = RR_RELIEF_FLAT;
 	else
-	    *relief = Raised;
+	    *relief = RR_RELIEF_RAISED;
 	
 	*border = FALSE;
-	if (*relief == Flat) {
+	if (*relief == RR_RELIEF_FLAT) {
 	    if (strstr(tex, "border") != NULL)
 		*border = TRUE;
 	} else {
 	    if (strstr(tex, "bevel2") != NULL)
-		*bevel = Bevel2;
+		*bevel = RR_BEVEL_2;
 	    else
-		*bevel = Bevel1;
+		*bevel = RR_BEVEL_1;
 	}
 
 	if (strstr(tex, "interlaced") != NULL)
@@ -441,7 +447,8 @@ static void parse_appearance(char *tex, SurfaceColorType *grad,
 }
 
 
-static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
+static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
+                           gchar *rname, RrAppearance *value)
 {
     gboolean ret = FALSE;
     char *rclass = create_class_name(rname), *cname, *ctoname, *bcname;
@@ -460,14 +467,14 @@ static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
 			 &value->surface.bevel,
 			 &value->surface.interlaced,
 			 &value->surface.border);
-	if (!read_color(db, cname, &value->surface.primary))
-	    value->surface.primary = color_new(0, 0, 0);
-	if (!read_color(db, ctoname, &value->surface.secondary))
-	    value->surface.secondary = color_new(0, 0, 0);
+	if (!read_color(db, inst, cname, &value->surface.primary))
+	    value->surface.primary = RrColorNew(inst, 0, 0, 0);
+	if (!read_color(db, inst, ctoname, &value->surface.secondary))
+	    value->surface.secondary = RrColorNew(inst, 0, 0, 0);
 	if (value->surface.border)
-	    if (!read_color(db, bcname,
+	    if (!read_color(db, inst, bcname,
 			    &value->surface.border_color))
-		value->surface.border_color = color_new(0, 0, 0);
+		value->surface.border_color = RrColorNew(inst, 0, 0, 0);
 	ret = TRUE;
     }
 
@@ -478,24 +485,25 @@ static gboolean read_appearance(XrmDatabase db, char *rname, Appearance *value)
     return ret;
 }
 
-static void set_default_appearance(Appearance *a)
+static void set_default_appearance(RrAppearance *a)
 {
-    a->surface.grad = Background_Solid;
-    a->surface.relief = Flat;
-    a->surface.bevel = Bevel1;
+    a->surface.grad = RR_SURFACE_SOLID;
+    a->surface.relief = RR_RELIEF_FLAT;
+    a->surface.bevel = RR_BEVEL_1;
     a->surface.interlaced = FALSE;
     a->surface.border = FALSE;
-    a->surface.primary = color_new(0, 0, 0);
-    a->surface.secondary = color_new(0, 0, 0);
+    a->surface.primary = RrColorNew(a->inst, 0, 0, 0);
+    a->surface.secondary = RrColorNew(a->inst, 0, 0, 0);
 }
 
-char *theme_load(char *theme)
+gchar *theme_load(gchar *theme)
 {
     XrmDatabase db = NULL;
-    char *loaded = NULL;
-    Justify winjust, mtitlejust, mjust;
-    char *str;
-    char *font_str;
+    gchar *loaded = NULL;
+    RrJustify winjust, mtitlejust, mjust;
+    gchar *str;
+    gchar *font_str;
+    const RrInstance *inst = theme_inst;
 
     if (theme) {
 	db = loaddb(theme);
@@ -536,12 +544,12 @@ char *theme_load(char *theme)
     theme_winfont_height = font_height(theme_winfont, theme_winfont_shadow,
                                        theme_winfont_shadow_offset);
 
-    winjust = Justify_Left;
+    winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.justify", &str)) {
         if (!g_ascii_strcasecmp(str, "right"))
-            winjust = Justify_Right;
+            winjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
-            winjust = Justify_Center;
+            winjust = RR_JUSTIFY_CENTER;
         g_free(str);
     }
 
@@ -568,12 +576,12 @@ char *theme_load(char *theme)
                                           theme_mtitlefont_shadow,
                                           theme_mtitlefont_shadow_offset);
 
-    mtitlejust = Justify_Left;
+    mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.justify", &str)) {
         if (!g_ascii_strcasecmp(str, "right"))
-            mtitlejust = Justify_Right;
+            mtitlejust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
-            mtitlejust = Justify_Center;
+            mtitlejust = RR_JUSTIFY_CENTER;
         g_free(str);
     }
 
@@ -599,12 +607,12 @@ char *theme_load(char *theme)
     theme_mfont_height = font_height(theme_mfont, theme_mfont_shadow,
                                      theme_mfont_shadow_offset);
 
-    mjust = Justify_Left;
+    mjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.frame.justify", &str)) {
         if (!g_ascii_strcasecmp(str, "right"))
-            mjust = Justify_Right;
+            mjust = RR_JUSTIFY_RIGHT;
         else if (!g_ascii_strcasecmp(str, "center"))
-            mjust = Justify_Center;
+            mjust = RR_JUSTIFY_CENTER;
         g_free(str);
     }
 
@@ -622,201 +630,237 @@ char *theme_load(char *theme)
 	theme_cbwidth < 0 || theme_cbwidth > 100) theme_cbwidth = theme_bevel;
 
     /* load colors */
-    if (!read_color(db, "borderColor", &theme_b_color))
-	theme_b_color = color_new(0, 0, 0);
-    if (!read_color(db, "window.frame.focusColor", &theme_cb_focused_color))
-	theme_cb_focused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.frame.unfocusColor",&theme_cb_unfocused_color))
-	theme_cb_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.label.focus.textColor",
+    if (!read_color(db, inst,
+                    "borderColor", &theme_b_color))
+	theme_b_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "window.frame.focusColor", &theme_cb_focused_color))
+	theme_cb_focused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "window.frame.unfocusColor",&theme_cb_unfocused_color))
+	theme_cb_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "window.label.focus.textColor",
                     &theme_title_focused_color))
-	theme_title_focused_color = color_new(0x0, 0x0, 0x0);
-    if (!read_color(db, "window.label.unfocus.textColor",
+	theme_title_focused_color = RrColorNew(inst, 0x0, 0x0, 0x0);
+    if (!read_color(db, inst,
+                    "window.label.unfocus.textColor",
                     &theme_title_unfocused_color))
-	theme_title_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "window.button.focus.picColor",
+	theme_title_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "window.button.focus.picColor",
                     &theme_titlebut_focused_color))
-	theme_titlebut_focused_color = color_new(0, 0, 0);
-    if (!read_color(db, "window.button.unfocus.picColor",
+	theme_titlebut_focused_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "window.button.unfocus.picColor",
                     &theme_titlebut_unfocused_color))
-	theme_titlebut_unfocused_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "menu.title.textColor", &theme_menu_title_color))
-        theme_menu_title_color = color_new(0, 0, 0);
-    if (!read_color(db, "menu.frame.textColor", &theme_menu_color))
-        theme_menu_color = color_new(0xff, 0xff, 0xff);
-    if (!read_color(db, "menu.frame.disableColor", &theme_menu_disabled_color))
-        theme_menu_disabled_color = color_new(0, 0, 0);
-    if (!read_color(db, "menu.hilite.textColor", &theme_menu_hilite_color))
-        theme_menu_hilite_color = color_new(0, 0, 0);
+	theme_titlebut_unfocused_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "menu.title.textColor", &theme_menu_title_color))
+        theme_menu_title_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "menu.frame.textColor", &theme_menu_color))
+        theme_menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
+    if (!read_color(db, inst,
+                    "menu.frame.disableColor", &theme_menu_disabled_color))
+        theme_menu_disabled_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "menu.hilite.textColor", &theme_menu_hilite_color))
+        theme_menu_hilite_color = RrColorNew(inst, 0, 0, 0);
 
-    if (read_mask(db, "window.button.max.mask", theme, &theme_max_unset_mask)){
-        if (!read_mask(db, "window.button.max.toggled.mask", theme,
+    if (read_mask(db, inst,
+                  "window.button.max.mask", theme, &theme_max_unset_mask)){
+        if (!read_mask(db, inst,
+                       "window.button.max.toggled.mask", theme,
                        &theme_max_set_mask)) {
-            theme_max_set_mask = pixmap_mask_copy(theme_max_unset_mask);
+            theme_max_set_mask = RrPixmapMaskCopy(theme_max_unset_mask);
         }
     } else {
         {
             char data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
-            theme_max_unset_mask = pixmap_mask_new(7, 7, data);
+            theme_max_unset_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
         {
             char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
-            theme_max_set_mask = pixmap_mask_new(7, 7, data);
+            theme_max_set_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
     }
 
-    if (!read_mask(db, "window.button.icon.mask", theme,
+    if (!read_mask(db, inst,
+                   "window.button.icon.mask", theme,
                    &theme_iconify_mask)) {
         char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
-        theme_iconify_mask = pixmap_mask_new(7, 7, data);
+        theme_iconify_mask = RrPixmapMaskNew(inst, 7, 7, data);
     }
 
-    if (read_mask(db, "window.button.stick.mask", theme,
+    if (read_mask(db, inst,
+                  "window.button.stick.mask", theme,
                    &theme_desk_unset_mask)) {
-        if (!read_mask(db, "window.button.stick.toggled.mask", theme,
+        if (!read_mask(db, inst, "window.button.stick.toggled.mask", theme,
                        &theme_desk_set_mask)) {
             theme_desk_set_mask =
-                pixmap_mask_copy(theme_desk_unset_mask);
+                RrPixmapMaskCopy(theme_desk_unset_mask);
         }
     } else {
         {
             char data[] = { 0x63, 0x63, 0x00, 0x00, 0x00, 0x63, 0x63 };
-            theme_desk_unset_mask = pixmap_mask_new(7, 7, data);
+            theme_desk_unset_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
         {
             char data[] = { 0x00, 0x36, 0x36, 0x08, 0x36, 0x36, 0x00 };
-            theme_desk_set_mask = pixmap_mask_new(7, 7, data);
+            theme_desk_set_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
     }
 
-    if (read_mask(db, "window.button.shade.mask", theme,
+    if (read_mask(db, inst, "window.button.shade.mask", theme,
                    &theme_shade_unset_mask)) {
-        if (!read_mask(db, "window.button.shade.toggled.mask", theme,
+        if (!read_mask(db, inst, "window.button.shade.toggled.mask", theme,
                        &theme_shade_set_mask)) {
             theme_shade_set_mask =
-                pixmap_mask_copy(theme_shade_unset_mask);
+                RrPixmapMaskCopy(theme_shade_unset_mask);
         }
     } else {
         {
             char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00 };
-            theme_shade_unset_mask = pixmap_mask_new(7, 7, data);
+            theme_shade_unset_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
         {
             char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
-            theme_shade_set_mask = pixmap_mask_new(7, 7, data);
+            theme_shade_set_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
     }
 
-    if (!read_mask(db, "window.button.close.mask", theme,
+    if (!read_mask(db, inst, "window.button.close.mask", theme,
                    &theme_close_mask)) {
         char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-        theme_close_mask = pixmap_mask_new(7, 7, data);
+        theme_close_mask = RrPixmapMaskNew(inst, 7, 7, data);
     }        
 
     /* read the decoration textures */
-    if (!read_appearance(db, "window.title.focus", theme_a_focused_title))
+    if (!read_appearance(db, inst,
+                         "window.title.focus", theme_a_focused_title))
 	set_default_appearance(theme_a_focused_title);
-    if (!read_appearance(db, "window.title.unfocus", theme_a_unfocused_title))
+    if (!read_appearance(db, inst,
+                         "window.title.unfocus", theme_a_unfocused_title))
 	set_default_appearance(theme_a_unfocused_title);
-    if (!read_appearance(db, "window.label.focus", theme_a_focused_label))
+    if (!read_appearance(db, inst,
+                         "window.label.focus", theme_a_focused_label))
 	set_default_appearance(theme_a_focused_label);
-    if (!read_appearance(db, "window.label.unfocus", theme_a_unfocused_label))
+    if (!read_appearance(db, inst,
+                         "window.label.unfocus", theme_a_unfocused_label))
 	set_default_appearance(theme_a_unfocused_label);
-    if (!read_appearance(db, "window.handle.focus", theme_a_focused_handle))
+    if (!read_appearance(db, inst,
+                         "window.handle.focus", theme_a_focused_handle))
 	set_default_appearance(theme_a_focused_handle);
-    if (!read_appearance(db, "window.handle.unfocus",theme_a_unfocused_handle))
+    if (!read_appearance(db, inst,
+                         "window.handle.unfocus",theme_a_unfocused_handle))
 	set_default_appearance(theme_a_unfocused_handle);
-    if (!read_appearance(db, "window.grip.focus", theme_a_focused_grip))
+    if (!read_appearance(db, inst,
+                         "window.grip.focus", theme_a_focused_grip))
 	set_default_appearance(theme_a_focused_grip);
-    if (!read_appearance(db, "window.grip.unfocus", theme_a_unfocused_grip))
+    if (!read_appearance(db, inst,
+                         "window.grip.unfocus", theme_a_unfocused_grip))
 	set_default_appearance(theme_a_unfocused_grip);
-    if (!read_appearance(db, "menu.frame", theme_a_menu))
+    if (!read_appearance(db, inst,
+                         "menu.frame", theme_a_menu))
 	set_default_appearance(theme_a_menu);
-    if (!read_appearance(db, "menu.title", theme_a_menu_title))
+    if (!read_appearance(db, inst,
+                         "menu.title", theme_a_menu_title))
 	set_default_appearance(theme_a_menu_title);
-    if (!read_appearance(db, "menu.hilite", theme_a_menu_hilite))
+    if (!read_appearance(db, inst,
+                         "menu.hilite", theme_a_menu_hilite))
 	set_default_appearance(theme_a_menu_hilite);
 
     /* read the appearances for rendering non-decorations */
-    if (!read_appearance(db, "window.title.focus", theme_app_hilite_bg))
+    if (!read_appearance(db, inst,
+                         "window.title.focus", theme_app_hilite_bg))
         set_default_appearance(theme_app_hilite_bg);
-    if (!read_appearance(db, "window.label.focus", theme_app_hilite_label))
+    if (!read_appearance(db, inst,
+                         "window.label.focus", theme_app_hilite_label))
         set_default_appearance(theme_app_hilite_label);
-    if (!read_appearance(db, "window.title.unfocus", theme_app_unhilite_bg))
+    if (!read_appearance(db, inst,
+                         "window.title.unfocus", theme_app_unhilite_bg))
         set_default_appearance(theme_app_unhilite_bg);
-    if (!read_appearance(db, "window.label.unfocus", theme_app_unhilite_label))
+    if (!read_appearance(db, inst,
+                         "window.label.unfocus", theme_app_unhilite_label))
         set_default_appearance(theme_app_unhilite_label);
 
     /* read buttons textures */
-    if (!read_appearance(db, "window.button.pressed.focus",
+    if (!read_appearance(db, inst,
+                         "window.button.pressed.focus",
 			 theme_a_focused_pressed_max))
-	if (!read_appearance(db, "window.button.pressed",
+	if (!read_appearance(db, inst,
+                             "window.button.pressed",
                              theme_a_focused_pressed_max))
 	    set_default_appearance(theme_a_focused_pressed_max);
-    if (!read_appearance(db, "window.button.pressed.unfocus",
+    if (!read_appearance(db, inst,
+                         "window.button.pressed.unfocus",
 			 theme_a_unfocused_pressed_max))
-	if (!read_appearance(db, "window.button.pressed",
+	if (!read_appearance(db, inst,
+                             "window.button.pressed",
 			     theme_a_unfocused_pressed_max))
 	    set_default_appearance(theme_a_unfocused_pressed_max);
-    if (!read_appearance(db, "window.button.focus",
+    if (!read_appearance(db, inst,
+                         "window.button.focus",
 			 theme_a_focused_unpressed_max))
 	set_default_appearance(theme_a_focused_unpressed_max);
-    if (!read_appearance(db, "window.button.unfocus",
+    if (!read_appearance(db, inst,
+                         "window.button.unfocus",
 			 theme_a_unfocused_unpressed_max))
 	set_default_appearance(theme_a_unfocused_unpressed_max);
 
     theme_a_unfocused_unpressed_close =
-        appearance_copy(theme_a_unfocused_unpressed_max);
+        RrAppearanceCopy(theme_a_unfocused_unpressed_max);
     theme_a_unfocused_pressed_close =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_focused_unpressed_close =
-        appearance_copy(theme_a_focused_unpressed_max);
+        RrAppearanceCopy(theme_a_focused_unpressed_max);
     theme_a_focused_pressed_close =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_unfocused_unpressed_desk =
-        appearance_copy(theme_a_unfocused_unpressed_max);
+        RrAppearanceCopy(theme_a_unfocused_unpressed_max);
     theme_a_unfocused_pressed_desk =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_unfocused_pressed_set_desk =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_focused_unpressed_desk =
-        appearance_copy(theme_a_focused_unpressed_max);
+        RrAppearanceCopy(theme_a_focused_unpressed_max);
     theme_a_focused_pressed_desk =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_focused_pressed_set_desk =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_unfocused_unpressed_shade =
-        appearance_copy(theme_a_unfocused_unpressed_max);
+        RrAppearanceCopy(theme_a_unfocused_unpressed_max);
     theme_a_unfocused_pressed_shade =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_unfocused_pressed_set_shade =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_focused_unpressed_shade =
-        appearance_copy(theme_a_focused_unpressed_max);
+        RrAppearanceCopy(theme_a_focused_unpressed_max);
     theme_a_focused_pressed_shade =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_focused_pressed_set_shade =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_unfocused_unpressed_iconify =
-        appearance_copy(theme_a_unfocused_unpressed_max);
+        RrAppearanceCopy(theme_a_unfocused_unpressed_max);
     theme_a_unfocused_pressed_iconify =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_focused_unpressed_iconify =
-        appearance_copy(theme_a_focused_unpressed_max);
+        RrAppearanceCopy(theme_a_focused_unpressed_max);
     theme_a_focused_pressed_iconify =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
     theme_a_unfocused_pressed_set_max =
-        appearance_copy(theme_a_unfocused_pressed_max);
+        RrAppearanceCopy(theme_a_unfocused_pressed_max);
     theme_a_focused_pressed_set_max =
-        appearance_copy(theme_a_focused_pressed_max);
+        RrAppearanceCopy(theme_a_focused_pressed_max);
 
-    theme_a_icon->surface.grad = Background_ParentRelative;
+    theme_a_icon->surface.grad = RR_SURFACE_PARENTREL;
 
     /* set up the textures */
     theme_a_focused_label->texture[0].type = 
-        theme_app_hilite_label->texture[0].type = Text;
+        theme_app_hilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme_a_focused_label->texture[0].data.text.justify = winjust;
-    theme_app_hilite_label->texture[0].data.text.justify = Justify_Left;
+    theme_app_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme_a_focused_label->texture[0].data.text.font =
         theme_app_hilite_label->texture[0].data.text.font = theme_winfont;
     theme_a_focused_label->texture[0].data.text.shadow =
@@ -833,9 +877,9 @@ char *theme_load(char *theme)
         theme_title_focused_color;
 
     theme_a_unfocused_label->texture[0].type =
-        theme_app_unhilite_label->texture[0].type = Text;
+        theme_app_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme_a_unfocused_label->texture[0].data.text.justify = winjust;
-    theme_app_unhilite_label->texture[0].data.text.justify = Justify_Left;
+    theme_app_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme_a_unfocused_label->texture[0].data.text.font =
         theme_app_unhilite_label->texture[0].data.text.font = theme_winfont;
     theme_a_unfocused_label->texture[0].data.text.shadow =
@@ -851,7 +895,7 @@ char *theme_load(char *theme)
         theme_app_unhilite_label->texture[0].data.text.color =
         theme_title_unfocused_color;
 
-    theme_a_menu_title->texture[0].type = Text;
+    theme_a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
     theme_a_menu_title->texture[0].data.text.justify = mtitlejust;
     theme_a_menu_title->texture[0].data.text.font = theme_mtitlefont;
     theme_a_menu_title->texture[0].data.text.shadow = theme_mtitlefont_shadow;
@@ -863,11 +907,11 @@ char *theme_load(char *theme)
 
     theme_a_menu_item->surface.grad = 
         theme_a_menu_disabled->surface.grad =
-        theme_app_icon->surface.grad = Background_ParentRelative;
+        theme_app_icon->surface.grad = RR_SURFACE_PARENTREL;
 
     theme_a_menu_item->texture[0].type =
         theme_a_menu_disabled->texture[0].type = 
-        theme_a_menu_hilite->texture[0].type = Text;
+        theme_a_menu_hilite->texture[0].type = RR_TEXTURE_TEXT;
     theme_a_menu_item->texture[0].data.text.justify = 
         theme_a_menu_disabled->texture[0].data.text.justify = 
         theme_a_menu_hilite->texture[0].data.text.justify = mjust;
@@ -915,7 +959,7 @@ char *theme_load(char *theme)
         theme_a_focused_unpressed_iconify->texture[0].type = 
         theme_a_focused_pressed_iconify->texture[0].type = 
         theme_a_unfocused_unpressed_iconify->texture[0].type = 
-        theme_a_unfocused_pressed_iconify->texture[0].type = Bitmask;
+        theme_a_unfocused_pressed_iconify->texture[0].type = RR_TEXTURE_MASK;
     theme_a_focused_unpressed_max->texture[0].data.mask.mask = 
         theme_a_unfocused_unpressed_max->texture[0].data.mask.mask = 
         theme_a_focused_pressed_max->texture[0].data.mask.mask = 

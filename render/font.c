@@ -30,7 +30,7 @@ void font_startup(void)
 #endif
 }
 
-static void measure_height(ObFont *f)
+static void measure_height(RrFont *f)
 {
     XGlyphInfo info;
 
@@ -40,13 +40,13 @@ static void measure_height(ObFont *f)
     f->elipses_length = (signed) info.xOff;
 }
 
-ObFont *font_open(char *fontstring)
+RrFont *font_open(char *fontstring)
 {
-    ObFont *out;
+    RrFont *out;
     XftFont *xf;
     
     if ((xf = XftFontOpenName(ob_display, ob_screen, fontstring))) {
-        out = g_new(ObFont, 1);
+        out = g_new(RrFont, 1);
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -55,7 +55,7 @@ ObFont *font_open(char *fontstring)
     g_warning(_("Trying fallback font: %s\n"), "sans");
 
     if ((xf = XftFontOpenName(ob_display, ob_screen, "sans"))) {
-        out = g_new(ObFont, 1);
+        out = g_new(RrFont, 1);
         out->xftfont = xf;
         measure_height(out);
         return out;
@@ -66,7 +66,7 @@ ObFont *font_open(char *fontstring)
     exit(3); /* can't continue without a font */
 }
 
-void font_close(ObFont *f)
+void font_close(RrFont *f)
 {
     if (f) {
         XftFontClose(ob_display, f->xftfont);
@@ -74,7 +74,7 @@ void font_close(ObFont *f)
     }
 }
 
-void font_measure_full(ObFont *f, char *str, int shadow, int offset,
+void font_measure_full(RrFont *f, char *str, int shadow, int offset,
                        int *x, int *y)
 {
     XGlyphInfo info;
@@ -86,24 +86,24 @@ void font_measure_full(ObFont *f, char *str, int shadow, int offset,
     *y = info.height + (shadow ? ABS(offset) : 0);
 }
 
-int font_measure_string(ObFont *f, char *str, int shadow, int offset)
+int font_measure_string(RrFont *f, char *str, int shadow, int offset)
 {
     int x, y;
     font_measure_full (f, str, shadow, offset, &x, &y);
     return x;
 }
 
-int font_height(ObFont *f, int shadow, int offset)
+int font_height(RrFont *f, int shadow, int offset)
 {
     return f->xftfont->ascent + f->xftfont->descent + (shadow ? offset : 0);
 }
 
-int font_max_char_width(ObFont *f)
+int font_max_char_width(RrFont *f)
 {
     return (signed) f->xftfont->max_advance_width;
 }
 
-void font_draw(XftDraw *d, TextureText *t, Rect *area)
+void font_draw(XftDraw *d, RrTextureText *t, Rect *area)
 {
     int x,y,w,h;
     XftColor c;
@@ -139,13 +139,13 @@ void font_draw(XftDraw *d, TextureText *t, Rect *area)
     if (!l) return;
 
     switch (t->justify) {
-    case Justify_Left:
+    case RR_JUSTIFY_LEFT:
         x = area->x + theme_bevel;
         break;
-    case Justify_Right:
+    case RR_JUSTIFY_RIGHT:
         x = area->x + (w - mw) - theme_bevel;
         break;
-    case Justify_Center:
+    case RR_JUSTIFY_CENTER:
         x = area->x + (w - mw) / 2;
         break;
     }

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "render.h"
 #include "color.h"
-#include "../kernel/openbox.h"
 
 XColor *pseudo_colors;
 int pseudo_bpc;
@@ -14,10 +13,12 @@ void color_allocate_gc(color_rgb *in)
 
     gcv.foreground = in->pixel;
     gcv.cap_style = CapProjecting;
-    in->gc = XCreateGC(ob_display, ob_root, GCForeground | GCCapStyle, &gcv);
+    in->gc = XCreateGC(RrDisplay(in->inst),
+                       RrRootWindow(in->inst),
+                       GCForeground | GCCapStyle, &gcv);
 }
 
-color_rgb *color_parse(char *colorname)
+color_rgb *RrColorParse(const RrInstance *inst, gchar *colorname)
 {
     XColor xcol;
 
@@ -28,45 +29,44 @@ color_rgb *color_parse(char *colorname)
     xcol.green = 0;
     xcol.blue = 0;
     xcol.pixel = 0;
-    if (!XParseColor(ob_display, render_colormap, colorname, &xcol)) {
+    if (!XParseColor(RrDisplay(inst), RrColormap(inst), colorname, &xcol)) {
         g_warning("unable to parse color '%s'", colorname);
 	return NULL;
     }
-    return color_new(xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
+    return RrColorNew(inst, xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
 }
 
-color_rgb *color_new(int r, int g, int b)
+color_rgb *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
 {
-/* this should be replaced with something far cooler */
-    color_rgb *out;
+    /* this should be replaced with something far cooler */
+    color_rgb *out = NULL;
     XColor xcol;
     xcol.red = (r << 8) | r;
     xcol.green = (g << 8) | g;
     xcol.blue = (b << 8) | b;
-    if (XAllocColor(ob_display, render_colormap, &xcol)) {
+    if (XAllocColor(RrDisplay(inst), RrColormap(inst), &xcol)) {
         out = g_new(color_rgb, 1);
+        out->inst = inst;
         out->r = xcol.red >> 8;
         out->g = xcol.green >> 8;
         out->b = xcol.blue >> 8;
         out->gc = None;
         out->pixel = xcol.pixel;
-        return out;
     }
-    return NULL;
+    return out;
 }
 
 /*XXX same color could be pointed to twice, this might have to be a refcount*/
 
-void color_free(color_rgb *c)
+void RrColorFree(color_rgb *c)
 {
-    if (c != NULL) {
-        if (c->gc != None)
-            XFreeGC(ob_display, c->gc);
+    if (c) {
+        if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);
         g_free(c);
     }
 }
 
-void reduce_depth(pixel32 *data, XImage *im)
+void reduce_depth(const RrInstance *inst, pixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;
@@ -75,17 +75,17 @@ void reduce_depth(pixel32 *data, XImage *im)
     unsigned char *p8 = (unsigned char *)im->data;
     switch (im->bits_per_pixel) {
     case 32:
-        if ((render_red_offset != default_red_offset) ||
-            (render_blue_offset != default_blue_offset) ||
-            (render_green_offset != default_green_offset)) {
+        if ((RrRedOffset(inst) != default_red_offset) ||
+            (RrBlueOffset(inst) != default_blue_offset) ||
+            (RrGreenOffset(inst) != default_green_offset)) {
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> default_red_offset) & 0xFF;
                     g = (data[x] >> default_green_offset) & 0xFF;
                     b = (data[x] >> default_blue_offset) & 0xFF;
-                    p32[x] = (r << render_red_shift)
-                           + (g << render_green_shift)
-                           + (b << render_blue_shift);
+                    p32[x] = (r << RrRedShift(inst))
+                           + (g << RrGreenShift(inst))
+                           + (b << RrBlueShift(inst));
                 }
                 data += im->width;
                 p32 += im->width;
@@ -96,26 +96,27 @@ void reduce_depth(pixel32 *data, XImage *im)
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (data[x] >> default_red_offset) & 0xFF;
-                r = r >> render_red_shift;
+                r = r >> RrRedShift(inst);
                 g = (data[x] >> default_green_offset) & 0xFF;
-                g = g >> render_green_shift;
+                g = g >> RrGreenShift(inst);
                 b = (data[x] >> default_blue_offset) & 0xFF;
-                b = b >> render_blue_shift;
-                p16[x] = (r << render_red_offset)
-                    + (g << render_green_offset)
-                    + (b << render_blue_offset);
+                b = b >> RrBlueShift(inst);
+                p16[x] = (r << RrRedOffset(inst))
+                       + (g << RrGreenOffset(inst))
+                       + (b << RrBlueOffset(inst));
             }
             data += im->width;
             p16 += im->bytes_per_line/2;
         }
     break;
     case 8:
-        g_assert(render_visual->class != TrueColor);
+        g_assert(RrVisual(inst)->class != TrueColor);
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                p8[x] = pickColor(data[x] >> default_red_offset,
-                       data[x] >> default_green_offset,
-                       data[x] >> default_blue_offset)->pixel;
+                p8[x] = pickColor(inst,
+                                  data[x] >> default_red_offset,
+                                  data[x] >> default_green_offset,
+                                  data[x] >> default_blue_offset)->pixel;
         }
         data += im->width;
         p8 += im->bytes_per_line;
@@ -127,12 +128,14 @@ void reduce_depth(pixel32 *data, XImage *im)
     }
 }
 
-XColor *pickColor(int r, int g, int b) 
+XColor *pickColor(const RrInstance *inst, gint r, gint g, gint b) 
 {
   r = (r & 0xff) >> (8-pseudo_bpc);
   g = (g & 0xff) >> (8-pseudo_bpc);
   b = (b & 0xff) >> (8-pseudo_bpc);
-  return &pseudo_colors[(r << (2*pseudo_bpc)) + (g << (1*pseudo_bpc)) + b];
+  return &RrPseudoColors(inst)[(r << (2*pseudo_bpc)) +
+                               (g << (1*pseudo_bpc)) +
+                               b];
 }
 
 static void swap_byte_order(XImage *im)
@@ -171,7 +174,7 @@ static void swap_byte_order(XImage *im)
         im->byte_order = LSBFirst;
 }
 
-void increase_depth(pixel32 *data, XImage *im)
+void increase_depth(const RrInstance *inst, pixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;
@@ -186,9 +189,9 @@ void increase_depth(pixel32 *data, XImage *im)
     case 32:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                r = (p32[x] >> render_red_offset) & 0xff;
-                g = (p32[x] >> render_green_offset) & 0xff;
-                b = (p32[x] >> render_blue_offset) & 0xff;
+                r = (p32[x] >> RrRedOffset(inst)) & 0xff;
+                g = (p32[x] >> RrGreenOffset(inst)) & 0xff;
+                b = (p32[x] >> RrBlueOffset(inst)) & 0xff;
                 data[x] = (r << default_red_offset)
                     + (g << default_green_offset)
                     + (b << default_blue_offset)
@@ -201,12 +204,15 @@ void increase_depth(pixel32 *data, XImage *im)
     case 16:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                r = (p16[x] & render_red_mask) >> render_red_offset <<
-                    render_red_shift;
-                g = (p16[x] & render_green_mask) >> render_green_offset <<
-                    render_green_shift;
-                b = (p16[x] & render_blue_mask) >> render_blue_offset <<
-                    render_blue_shift;
+                r = (p16[x] & RrRedMask(inst)) >>
+                    RrRedOffset(inst) <<
+                    RrRedShift(inst);
+                g = (p16[x] & RrGreenMask(inst)) >>
+                    RrGreenOffset(inst) <<
+                    RrGreenShift(inst);
+                b = (p16[x] & RrBlueMask(inst)) >>
+                    RrBlueOffset(inst) <<
+                    RrBlueShift(inst);
                 data[x] = (r << default_red_offset)
                     + (g << default_green_offset)
                     + (b << default_blue_offset)

@@ -13,3 +13,4 @@ theme.lo
 Makefile.in
 .deps
 Makefile
+instance.lo

@@ -1,11 +1,13 @@
-#include <glib.h>
 #include "../kernel/geom.h"
 #include "image.h"
+#include "color.h"
 
-void image_draw(pixel32 *target, TextureRGBA *rgba, Rect *area)
+#include <glib.h>
+
+void image_draw(pixel32 *target, RrTextureRGBA *rgba, Rect *area)
 {
     pixel32 *draw = rgba->data;
-    guint c, i, e, t, sfw, sfh;
+    gint c, i, e, t, sfw, sfh;
     sfw = area->width;
     sfh = area->height;
 

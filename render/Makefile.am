@@ -15,8 +15,22 @@ rendertest_LDFLAGS=-lobrender -L.
 rendertest_SOURCES=test.c
 
 lib_LTLIBRARIES=libobrender.la
-libobrender_la_SOURCES=color.c font.c gradient.c image.c mask.c render.c \
-                       theme.c
+libobrender_la_SOURCES=\
+  color.h \
+  color.c \
+  font.h \
+  font.c \
+  gradient.h \
+  gradient.c \
+  image.h \
+  image.c \
+  mask.h \
+  mask.c \
+  render.h \
+  render.c \
+  theme.c \
+  instance.h \
+  instance.c
 
 
 noinst_HEADERS=render.h gradient.h color.h font.h mask.h image.h

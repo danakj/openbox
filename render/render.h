@@ -1,49 +1,67 @@
 #ifndef __render_h
 #define __render_h
 
-#include <X11/Xlib.h>
 #define _XFT_NO_COMPAT_ /* no Xft 1 API */
 #include <X11/Xft/Xft.h>
+#include <X11/Xlib.h>
 #include <glib.h>
-#include "color.h"
-#include "kernel/geom.h"
+
+typedef union  _RrTextureData      RrTextureData;
+typedef struct _RrAppearance       RrAppearance;
+typedef struct _RrSurface          RrSurface;
+typedef struct _RrFont             RrFont;
+typedef struct _RrTexture          RrTexture;
+typedef struct _RrTextureMask      RrTextureMask;
+typedef struct _RrTextureRGBA      RrTextureRGBA;
+typedef struct _RrTextureText      RrTextureText;
+typedef struct _RrPixmapMask       RrPixmapMask;
+typedef struct _RrInstance         RrInstance;
+typedef struct _RrColor            color_rgb; /* XXX ugly */
+
+typedef guint32 pixel32; /* XXX prefix */
+typedef guint16 pixel16;
 
 typedef enum {
-    Flat,
-    Raised,
-    Sunken
-} ReliefType;
+    RR_RELIEF_FLAT,
+    RR_RELIEF_RAISED,
+    RR_RELIEF_SUNKEN
+} RrReliefType;
 
 typedef enum {
-    Bevel1,
-    Bevel2
-} BevelType;
+    RR_BEVEL_1,
+    RR_BEVEL_2
+} RrBevelType;
 
 typedef enum {
-    Background_ParentRelative,
-    Background_Solid,
-    Background_Horizontal,
-    Background_Vertical,
-    Background_Diagonal,
-    Background_CrossDiagonal,
-    Background_PipeCross,
-    Background_Rectangle,
-    Background_Pyramid
-} SurfaceColorType;
+    RR_SURFACE_NONE,
+    RR_SURFACE_PARENTREL,
+    RR_SURFACE_SOLID,
+    RR_SURFACE_HORIZONTAL,
+    RR_SURFACE_VERTICAL,
+    RR_SURFACE_DIAGONAL,
+    RR_SURFACE_CROSS_DIAGONAL,
+    RR_SURFACE_PIPECROSS,
+    RR_SURFACE_RECTANGLE,
+    RR_SURFACE_PYRAMID
+} RrSurfaceColorType;
 
 typedef enum {
-    Bitmask,
-    Text,
-    RGBA,
-    NoTexture
-} TextureType;
+    RR_TEXTURE_NONE,
+    RR_TEXTURE_MASK,
+    RR_TEXTURE_TEXT,
+    RR_TEXTURE_RGBA
+} RrTextureType;
 
-struct Appearance;
+typedef enum {
+    RR_JUSTIFY_LEFT,
+    RR_JUSTIFY_CENTER,
+    RR_JUSTIFY_RIGHT
+} RrJustify;
 
-typedef struct Surface {
-    SurfaceColorType grad;
-    ReliefType relief;
-    BevelType bevel;
+struct _RrSurface {
+    RrSurfaceColorType grad;
+    RrReliefType relief;
+    RrBevelType bevel;
     color_rgb *primary;
     color_rgb *secondary;
     color_rgb *border_color;
@@ -51,95 +69,103 @@ typedef struct Surface {
     color_rgb *bevel_light;
     gboolean interlaced;
     gboolean border;
-    struct Appearance *parent;
-    int parentx;
-    int parenty;
+    RrAppearance *parent;
+    gint parentx;
+    gint parenty;
     pixel32 *pixel_data;
-} Surface;
+};
 
-typedef struct {
-    XftFont *xftfont;
-    int elipses_length;
-} ObFont;
-
-typedef enum {
-    Justify_Center,
-    Justify_Left,
-    Justify_Right
-} Justify;
-
-typedef struct TextureText {
-    ObFont *font;
-    Justify justify;
-    int shadow;
-    char tint;
-    unsigned char offset;
+struct _RrTextureText {
+    RrFont *font;
+    RrJustify justify;
+    gint shadow;
+    gchar tint;
+    guchar offset;
     color_rgb *color;
-    char *string;
-} TextureText;   
+    gchar *string;
+};
 
-typedef struct {
+struct _RrPixmapMask {
+    const RrInstance *inst;
     Pixmap mask;
-    guint w, h;
-    char *data;
-} pixmap_mask;
+    gint width;
+    gint height;
+    gchar *data;
+};
 
-typedef struct TextureMask {
+struct _RrTextureMask {
     color_rgb *color;
-    pixmap_mask *mask;
-} TextureMask;
+    RrPixmapMask *mask;
+};
 
-typedef struct TextureRGBA {
-    guint width;
-    guint height;
+struct _RrTextureRGBA {
+    gint width;
+    gint height;
     pixel32 *data;
 /* cached scaled so we don't have to scale often */
-    guint cwidth;
-    guint cheight;
+    gint cwidth;
+    gint cheight;
     pixel32 *cache;
-} TextureRGBA;
+};
 
-typedef union {
-    TextureRGBA rgba;
-    TextureText text;
-    TextureMask mask;
-} TextureData;
+union _RrTextureData {
+    RrTextureRGBA rgba;
+    RrTextureText text;
+    RrTextureMask mask;
+};
 
-typedef struct Texture {
-    TextureType type;
-    TextureData data;
-} Texture;
+struct _RrTexture {
+    RrTextureType type;
+    RrTextureData data;
+};
 
-typedef struct Appearance {
-    Surface surface;
-    int textures;
-    Texture *texture;
+struct _RrAppearance {
+    const RrInstance *inst;
+
+    RrSurface surface;
+    gint textures;
+    RrTexture *texture;
     Pixmap pixmap;
     XftDraw *xftdraw;
 
     /* cached for internal use */
-    int w, h;
-} Appearance;
+    gint w, h;
+};
 
-extern Visual *render_visual;
-extern XVisualInfo render_visual_info;
-extern int render_depth;
-extern Colormap render_colormap;
+RrInstance* RrInstanceNew (Display *display, gint screen);
+void        RrInstanceFree (RrInstance *inst);
 
-void render_startup(void);
-void init_appearance(Appearance *l);
-void paint(Window win, Appearance *l, int w, int h);
-void render_shutdown(void);
-Appearance *appearance_new(int numtex);
-Appearance *appearance_copy(Appearance *a);
-void appearance_free(Appearance *a);
-void truecolor_startup(void);
-void pseudocolor_startup(void);
-void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h);
+Display* RrDisplay      (const RrInstance *inst);
+gint     RrScreen       (const RrInstance *inst);
+Window   RrRootWindow   (const RrInstance *inst);
+Visual*  RrVisual       (const RrInstance *inst);
+gint     RrDepth        (const RrInstance *inst);
+Colormap RrColormap     (const RrInstance *inst);
+gint     RrRedOffset    (const RrInstance *inst);
+gint     RrGreenOffset  (const RrInstance *inst);
+gint     RrBlueOffset   (const RrInstance *inst);
+gint     RrRedShift     (const RrInstance *inst);
+gint     RrGreenShift   (const RrInstance *inst);
+gint     RrBlueShift    (const RrInstance *inst);
+gint     RrRedMask      (const RrInstance *inst);
+gint     RrGreenMask    (const RrInstance *inst);
+gint     RrBlueMask     (const RrInstance *inst);
+guint    RrPseudoBPC    (const RrInstance *inst);
+XColor*  RrPseudoColors (const RrInstance *inst);
 
-void appearance_minsize(Appearance *l, int *w, int *h);
+color_rgb *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
+color_rgb *RrColorParse (const RrInstance *inst, gchar *colorname);
+void       RrColorFree  (color_rgb *in);
 
-gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
-                               int *w, int *h, pixel32 **data);
+RrAppearance *RrAppearanceNew  (const RrInstance *inst, gint numtex);
+RrAppearance *RrAppearanceCopy (RrAppearance *a);
+void          RrAppearanceFree (RrAppearance *a);
+
+void RrPaint   (RrAppearance *l, Window win, gint w, gint h);
+void RrMinsize (RrAppearance *l, gint *w, gint *h);
+
+gboolean RrPixmapToRGBA(const RrInstance *inst,
+                        Pixmap pmap, Pixmap mask,
+                        gint *w, gint *h, pixel32 **data);
 
 #endif /*__render_h*/

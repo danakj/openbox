@@ -1,57 +1,63 @@
+#include "render.h"
+#include "color.h"
 #include "mask.h"
-#include "../kernel/openbox.h"
 
-pixmap_mask *pixmap_mask_new(int w, int h, char *data)
+RrPixmapMask *RrPixmapMaskNew(const RrInstance *inst,
+                              gint w, gint h, const gchar *data)
 {
-    pixmap_mask *m = g_new(pixmap_mask, 1);
-    m->w = w;
-    m->h = h;
+    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    m->inst = inst;
+    m->width = w;
+    m->height = h;
     /* round up to nearest byte */
     m->data = g_memdup(data, (w * h + 7) / 8);
-    m->mask = XCreateBitmapFromData(ob_display, ob_root, data, w, h);
+    m->mask = XCreateBitmapFromData(RrDisplay(inst), RrRootWindow(inst),
+                                    data, w, h);
     return m;
 }
 
-void pixmap_mask_free(pixmap_mask *m)
+void RrPixmapMaskFree(RrPixmapMask *m)
 {
     if (m) {
-        XFreePixmap(ob_display, m->mask);
+        XFreePixmap(RrDisplay(m->inst), m->mask);
         g_free(m->data);
         g_free(m);
     }
 }
 
-void mask_draw(Pixmap p, TextureMask *m, Rect *position)
+void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const Rect *area)
 {
     int x, y;
     if (m->mask == None) return; /* no mask given */
 
     /* set the clip region */
-    x = position->x + (position->width - m->mask->w) / 2;
-    y = position->y + (position->height - m->mask->h) / 2;
+    x = area->x + (area->width - m->mask->width) / 2;
+    y = area->y + (area->height - m->mask->height) / 2;
 
     if (x < 0) x = 0;
     if (y < 0) y = 0;
 
-    XSetClipMask(ob_display, m->color->gc, m->mask->mask);
-    XSetClipOrigin(ob_display, m->color->gc, x, y);
+    XSetClipMask(RrDisplay(m->mask->inst), m->color->gc, m->mask->mask);
+    XSetClipOrigin(RrDisplay(m->mask->inst), m->color->gc, x, y);
 
     /* fill in the clipped region */
-    XFillRectangle(ob_display, p, m->color->gc, x, y,
-                   x + m->mask->w, y + m->mask->h);
+    XFillRectangle(RrDisplay(m->mask->inst), p, m->color->gc, x, y,
+                   x + m->mask->width, y + m->mask->height);
 
     /* unset the clip region */
-    XSetClipMask(ob_display, m->color->gc, None);
-    XSetClipOrigin(ob_display, m->color->gc, 0, 0);
+    XSetClipMask(RrDisplay(m->mask->inst), m->color->gc, None);
+    XSetClipOrigin(RrDisplay(m->mask->inst), m->color->gc, 0, 0);
 }
 
-pixmap_mask *pixmap_mask_copy(pixmap_mask *src)
+RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src)
 {
-    pixmap_mask *m = g_new(pixmap_mask, 1);
-    m->w = src->w;
-    m->h = src->h;
+    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    m->inst = src->inst;
+    m->width = src->width;
+    m->height = src->height;
     /* round up to nearest byte */
-    m->data = g_memdup(src->data, (src->w * src->h + 7) / 8);
-    m->mask = XCreateBitmapFromData(ob_display, ob_root, m->data, m->w, m->h);
+    m->data = g_memdup(src->data, (src->width * src->height + 7) / 8);
+    m->mask = XCreateBitmapFromData(RrDisplay(m->inst), RrRootWindow(m->inst),
+                                    m->data, m->width, m->height);
     return m;
 }

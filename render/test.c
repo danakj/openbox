@@ -21,7 +21,8 @@ Window ob_root;
 int main()
 {
 	Window win;
-	Appearance *look;
+        RrInstance *inst;
+	RrAppearance *look;
 
 	Window root;
 	XEvent report;
@@ -42,32 +43,35 @@ int main()
 	XMapWindow(ob_display, win);
 	XSelectInput(ob_display, win, ExposureMask | StructureNotifyMask);
 	root = RootWindow (ob_display, DefaultScreen (ob_display));
-	render_startup();
+        inst = RrInstanceNew(ob_display, ob_screen);
 
-	look = appearance_new(0);
-	look->surface.grad = Background_Pyramid;
-	look->surface.secondary = color_parse("Yellow");
-	look->surface.primary = color_parse("Blue");
+	look = RrAppearanceNew(inst, 0);
+	look->surface.grad = RR_SURFACE_PYRAMID;
+	look->surface.secondary = RrColorParse(inst, "Yellow");
+	look->surface.primary = RrColorParse(inst, "Blue");
         look->surface.interlaced = FALSE;
 	if (ob_display == NULL) {
 		fprintf(stderr, "couldn't connect to X server :0\n");
 		return 0;
 	}
 
-	paint(win, look, w, h);
+	RrPaint(look, win, w, h);
 	while (1) {
 		XNextEvent(ob_display, &report);
 		switch (report.type) {
 		case Expose:
 		break;
 		case ConfigureNotify:
-			paint(win, look,
-                              report.xconfigure.width,
-                              report.xconfigure.height);
+                    RrPaint(look, win,
+                            report.xconfigure.width,
+                            report.xconfigure.height);
 		break;
 		}
 
 	}
+
+        RrAppearanceFree (look);
+        RrInstanceFree (inst);
 
 	return 1;
 }

@@ -56,7 +56,7 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _button_close.setText("X");
   _button_iconify.setText("I");
   _button_max.setText("M");
-  _button_stick.setText("C");
+  _button_stick.setText("S");
   _label.setText(_client->title());
 
   _style = 0;

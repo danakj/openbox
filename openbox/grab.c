@@ -23,7 +23,7 @@ void grab_keyboard(gboolean grab)
     } else if (kgrabs > 0) {
         if (--kgrabs == 0) {
             g_message("UNGRABBING KEYBOARD %d", kgrabs);
-            XUngrabKeyboard(ob_display, event_lasttime);
+            XUngrabKeyboard(ob_display, CurrentTime);
         } else
             g_message("NOT UNGRABBING KEYBOARD %d", kgrabs);
     }
@@ -37,7 +37,7 @@ void grab_pointer(gboolean grab, Cursor cur)
                          GrabModeAsync, FALSE, cur, event_lasttime);
     } else if (pgrabs > 0) {
         if (--pgrabs == 0)
-            XUngrabPointer(ob_display, event_lasttime);
+            XUngrabPointer(ob_display, CurrentTime);
     }
 }
 

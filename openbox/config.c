@@ -22,21 +22,16 @@ void cparse_go(char *filename, FILE *);
 
 void config_startup()
 {
-    /* test definition */
-    ConfigDefEntry *def;
+    /* set up built in variables! and their default values! */
 
-    def = config_def_new("test", Config_String);
-    config_def_set(def);
+    config_def_set(config_def_new("engine", Config_String));
+    config_def_set(config_def_new("theme", Config_String));
+    config_def_set(config_def_new("font", Config_String));
+    config_def_set(config_def_new("font.shadow.offset", Config_Integer));
+    config_def_set(config_def_new("font.shadow.tint", Config_Integer));
+    config_def_set(config_def_new("titlebar.layout", Config_String));
 
-    def = config_def_new("test", Config_String);
-    config_def_set(def);
-
-    def = config_def_new("testlist", Config_String);
-    config_def_add_value(def, "one");
-    config_def_add_value(def, "two");
-    config_def_set(def);
-
-    g_datalist_foreach(&config_def, print_config, NULL);
+    /*g_datalist_foreach(&config_def, print_config, NULL);*/
 }
 
 void config_shutdown()
@@ -75,7 +70,7 @@ gboolean config_set(char *name, ConfigValueType type, ConfigValue value)
     name = g_ascii_strdown(name, -1);
     g_message("Setting %s", name);
 
-    g_datalist_foreach(&config_def, print_config, NULL);
+    /*g_datalist_foreach(&config_def, print_config, NULL);*/
     def = g_datalist_get_data(&config_def, name);
 
     if (def == NULL) {

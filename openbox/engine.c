@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "config.h"
 
 #include <glib.h>
 #include <gmodule.h>
@@ -58,14 +59,17 @@ static gboolean load(char *name)
     return TRUE;
 }
 
-void engine_startup(char *engine)
+void engine_startup()
 {
-    module = NULL;
+    ConfigValue engine;
 
-    if (engine != NULL) {
-	if (load(engine))
+    module = NULL;
+    g_message("ENGINE STARTUP");
+    if (config_get("engine", Config_String, &engine)) {
+        g_warning("GOT ENGINE %s", engine.string);
+	if (load(engine.string))
 	    return;
-	g_warning("Failed to load the engine '%s'", engine);
+	g_warning("Failed to load the engine '%s'", engine.string);
 	g_message("Falling back to the default: '%s'", DEFAULT_ENGINE);
     }
     if (!load(DEFAULT_ENGINE)) {

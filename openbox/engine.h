@@ -3,7 +3,7 @@
 
 #include "../engines/engineinterface.h"
 
-void engine_startup(char *engine);
+void engine_startup();
 void engine_shutdown();
 
 EngineFrameNew *engine_frame_new;

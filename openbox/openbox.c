@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 	render_startup();
 	font_startup();
 	themerc_startup();
-	engine_startup(themerc_engine);
+	engine_startup();
 	event_startup();
 	screen_startup();
 	focus_startup();
@@ -156,14 +156,14 @@ int main(int argc, char **argv)
         grab_startup();
         plugin_startup();
 
-        config_parse();
-
         /* XXX load all plugins!! */
         plugin_open("focus");
         plugin_open("keyboard");
         plugin_open("mouse");
         plugin_open("placement");
         plugin_open("resistance");
+
+        config_parse();
 
 	/* get all the existing windows */
 	client_manage_all();

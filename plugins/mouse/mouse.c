@@ -185,6 +185,7 @@ static void event(ObEvent *e, void *foo)
     static Corner corner = Corner_TopLeft;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
+    GQuark context;
 
     switch (e->type) {
     case Event_Client_Mapped:
@@ -208,16 +209,14 @@ static void event(ObEvent *e, void *foo)
             }
             button = e->data.x.e->xbutton.button;
         }
-        fire_button(MouseAction_Press,
-                    engine_get_context(e->data.x.client,
-                                       e->data.x.e->xbutton.window),
+        context = engine_get_context(e->data.x.client,
+                                     e->data.x.e->xbutton.window);
+
+        fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
                     e->data.x.e->xbutton.button);
 
-        /* XXX dont look up the context so many times */
-        if (engine_get_context(e->data.x.client,
-                               e->data.x.e->xbutton.window) ==
-            g_quark_try_string("client")) {
+        if (context == g_quark_try_string("client")) {
             /* Replay the event, so it goes to the client*/
             XAllowEvents(ob_display, ReplayPointer, CurrentTime);
             /* Fall through to the release case! */
@@ -225,12 +224,12 @@ static void event(ObEvent *e, void *foo)
             break;
 
     case Event_X_ButtonRelease:
+        context = engine_get_context(e->data.x.client,
+                                     e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
             if (drag) {
-                fire_motion(MouseAction_Motion,
-                            engine_get_context(e->data.x.client,
-                                               e->data.x.e->xbutton.window),
+                fire_motion(MouseAction_Motion, context,
                             e->data.x.client, e->data.x.e->xbutton.state,
                             e->data.x.e->xbutton.button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
@@ -262,21 +261,15 @@ static void event(ObEvent *e, void *foo)
             button = 0;
             ltime = e->data.x.e->xbutton.time;
         }
-        fire_button(MouseAction_Press,
-                    engine_get_context(e->data.x.client,
-                                       e->data.x.e->xbutton.window),
+        fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
                     e->data.x.e->xbutton.button);
         if (click)
-            fire_button(MouseAction_Click,
-                        engine_get_context(e->data.x.client,
-                                           e->data.x.e->xbutton.window),
+            fire_button(MouseAction_Click, context,
                         e->data.x.client, e->data.x.e->xbutton.state,
                         e->data.x.e->xbutton.button);
         if (dclick)
-            fire_button(MouseAction_DClick,
-                        engine_get_context(e->data.x.client,
-                                           e->data.x.e->xbutton.window),
+            fire_button(MouseAction_DClick, context,
                         e->data.x.client, e->data.x.e->xbutton.state,
                         e->data.x.e->xbutton.button);
         break;
@@ -286,9 +279,9 @@ static void event(ObEvent *e, void *foo)
             drag = TRUE;
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
-            fire_motion(MouseAction_Motion,
-                        engine_get_context(e->data.x.client,
-                                           e->data.x.e->xbutton.window),
+            context = engine_get_context(e->data.x.client,
+                                         e->data.x.e->xbutton.window);
+            fire_motion(MouseAction_Motion, context,
                         e->data.x.client, e->data.x.e->xmotion.state,
                         button, cx, cy, cw, ch, dx, dy, FALSE, corner);
         }

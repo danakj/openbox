@@ -183,7 +183,6 @@ void frame_adjust_theme(ObFrame *self)
 {
     free_theme_statics(self);
     set_theme_statics(self);
-    frame_adjust_area(self, TRUE, TRUE, FALSE);
 }
 
 void frame_adjust_shape(ObFrame *self)

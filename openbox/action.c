@@ -1041,7 +1041,10 @@ void action_raiselower(union ActionData *data)
         }
     }
 
-    action_run_string((raise ? "Raise" : "Lower"), c);
+    if (raise)
+        action_raise(data);
+    else
+        action_lower(data);
 }
 
 void action_raise(union ActionData *data)
@@ -1054,17 +1057,17 @@ void action_raise(union ActionData *data)
 void action_unshaderaise(union ActionData *data)
 {
     if (data->client.any.c->shaded)
-        action_run_string("Unshade", data->client.any.c);
+        action_unshade(data);
     else
-        action_run_string("Raise", data->client.any.c);
+        action_raise(data);
 }
 
 void action_shadelower(union ActionData *data)
 {
     if (data->client.any.c->shaded)
-        action_run_string("Lower", data->client.any.c);
+        action_lower(data);
     else
-        action_run_string("Shade", data->client.any.c);
+        action_shade(data);
 }
 
 void action_lower(union ActionData *data)

@@ -533,6 +533,7 @@ static void gradient_pyramid(RrSurface *sf, int inw, int inh)
         
         NEXT(x);
     }
+    current = COLOR(x);
     *(data+x) = current;
     *(data+inw-x) = current;
     *(end-x) = current;

@@ -16,7 +16,6 @@ extern "C" {
 
 #include "otk/display.hh"
 #include "otk/screeninfo.hh"
-#include "otk/configuration.hh"
 #include "otk/eventdispatcher.hh"
 #include "otk/eventhandler.hh"
 

@@ -783,6 +783,7 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
   } else if (e.message_type ==
              property->atom(otk::OBProperty::net_active_window)) {
     focus();
+    Openbox::instance->screen(_screen)->restack(true, this); // raise
   }
 }
 

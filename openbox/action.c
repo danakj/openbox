@@ -1234,7 +1234,7 @@ void action_desktop(union ActionData *data)
         screen_set_desktop(first);
     }
 
-    if (data->inter.any.interactive && data->inter.final) {
+    if (!data->inter.any.interactive || data->inter.final) {
         screen_desktop_popup(0, FALSE);
         first = (unsigned) -1;
     }

@@ -947,13 +947,11 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
                 a->data.inter.final = done;
                 if (!(cancel || done))
                     keyboard_interactive_grab(state, a->data.any.c, a);
-            }
 
-            /* closing interactive actions are not queued */
-            if (!done)
-                ob_main_loop_queue_action(ob_main_loop, a);
-            else
+                /* interactive actions are not queued */
                 a->func(&a->data);
+            } else
+                ob_main_loop_queue_action(ob_main_loop, a);
         }
     }
 }
@@ -1306,16 +1304,25 @@ void action_toggle_decorations(union ActionData *data)
 
 static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
 {
-    if (x - cx > cw / 2) {
-        if (y - cy > ch / 2)
+    if (x - cx > cw / 3 * 2) {
+        if (y - cy > ch / 3 * 2)
             return prop_atoms.net_wm_moveresize_size_bottomright;
-        else
+        else if (y - cy < ch / 3)
             return prop_atoms.net_wm_moveresize_size_topright;
+        else
+            return prop_atoms.net_wm_moveresize_size_right;
+    } else if (x - cx < cw / 3) {
+        if (y - cy > ch / 3 * 2)
+            return prop_atoms.net_wm_moveresize_size_bottomleft;
+        else if (y - cy < ch / 3)
+            return prop_atoms.net_wm_moveresize_size_topleft;
+        else
+            return prop_atoms.net_wm_moveresize_size_left;
     } else {
         if (y - cy > ch / 2)
-            return prop_atoms.net_wm_moveresize_size_bottomleft;
+            return prop_atoms.net_wm_moveresize_size_bottom;
         else
-            return prop_atoms.net_wm_moveresize_size_topleft;
+            return prop_atoms.net_wm_moveresize_size_top;
     }
 }
 

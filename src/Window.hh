@@ -98,7 +98,7 @@ public:
                   Func_Iconify  = (1l << 2),
                   Func_Maximize = (1l << 3),
                   Func_Close    = (1l << 4) };
-  typedef unsigned int FunctionFlags;
+  typedef unsigned char FunctionFlags;
 
   enum Decoration { Decor_Titlebar = (1l << 0),
                     Decor_Handle   = (1l << 1),
@@ -106,7 +106,7 @@ public:
                     Decor_Iconify  = (1l << 3),
                     Decor_Maximize = (1l << 4),
                     Decor_Close    = (1l << 5) };
-  typedef unsigned int DecorationFlags;
+  typedef unsigned char DecorationFlags;
 
 private:
   Blackbox *blackbox;
@@ -293,13 +293,13 @@ public:
   { return client.transientList; }
   BlackboxWindow *getTransientFor(void) const;
 
-  inline BScreen *getScreen(void) { return screen; }
+  inline BScreen *getScreen(void) const { return screen; }
 
   inline Window getFrameWindow(void) const { return frame.window; }
   inline Window getClientWindow(void) const { return client.window; }
   inline Window getGroupWindow(void) const { return client.window_group; }
 
-  inline Windowmenu * getWindowmenu(void) { return windowmenu; }
+  inline Windowmenu * getWindowmenu(void) const { return windowmenu; }
 
   inline const char *getTitle(void) const
   { return client.title.c_str(); }
@@ -318,7 +318,7 @@ public:
 
   inline void setWindowNumber(int n) { window_number = n; }
 
-  bool validateClient(void);
+  bool validateClient(void) const;
   bool setInputFocus(void);
 
   void setFocusFlag(bool focus);

@@ -2698,7 +2698,7 @@ void BlackboxWindow::shapeEvent(XShapeEvent *) {
 #endif // SHAPE
 
 
-bool BlackboxWindow::validateClient(void) {
+bool BlackboxWindow::validateClient(void) const {
   XSync(blackbox->getXDisplay(), False);
 
   XEvent e;
@@ -2802,21 +2802,37 @@ void BlackboxWindow::changeBlackboxHints(BlackboxHints *net) {
 
     default:
     case DecorNormal:
-      decorations |= Decor_Titlebar | Decor_Handle | Decor_Border |
-                     Decor_Iconify | Decor_Maximize;
+      decorations |= Decor_Titlebar | Decor_Border | Decor_Iconify;
+  
+      decorations = ((functions & Func_Resize) && !isTransient() ?
+                     decorations | Decor_Handle :
+                     decorations &= ~Decor_Handle);
+      decorations = (functions & Func_Maximize ?
+                     decorations | Decor_Maximize :
+                     decorations &= ~Decor_Maximize);
 
       break;
 
     case DecorTiny:
       decorations |= Decor_Titlebar | Decor_Iconify;
-      decorations &= ~(Decor_Border | Decor_Handle | Decor_Maximize);
+      decorations &= ~(Decor_Border | Decor_Handle);
+      
+      decorations = (functions & Func_Maximize ?
+                     decorations | Decor_Maximize :
+                     decorations &= ~Decor_Maximize);
 
       break;
 
     case DecorTool:
       decorations |= Decor_Titlebar;
-      decorations &= ~(Decor_Iconify | Decor_Border | Decor_Handle);
-      functions |= Func_Move;
+      decorations &= ~(Decor_Iconify | Decor_Border);
+
+      decorations = ((functions & Func_Resize) && !isTransient() ?
+                     decorations | Decor_Handle :
+                     decorations &= ~Decor_Handle);
+      decorations = (functions & Func_Maximize ?
+                     decorations | Decor_Maximize :
+                     decorations &= ~Decor_Maximize);
 
       break;
     }

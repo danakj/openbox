@@ -229,9 +229,9 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
              !(s->state & e->xkey.state)))
             done = TRUE;
         else if (e->type == KeyPress) {
-            if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
+            /*if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
                 done = TRUE;
-            else if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+            else */if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
                 cancel = done = TRUE;
         }
         if (done) {

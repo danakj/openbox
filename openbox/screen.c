@@ -278,18 +278,20 @@ void screen_set_desktop(guint num)
 
     if (old == num) return;
 
-    /* hide windows from bottom to top */
-    for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
-        Client *c = it->data;
-	if (c->frame->visible && !client_should_show(c))
-            engine_frame_hide(c->frame);
-    }
+    /* show windows before hiding the rest to lessen the enter/leave events */
 
     /* show windows from top to bottom */
     for (it = stacking_list; it != NULL; it = it->next) {
         Client *c = it->data;
 	if (!c->frame->visible && client_should_show(c))
             engine_frame_show(c->frame);
+    }
+
+    /* hide windows from bottom to top */
+    for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+        Client *c = it->data;
+	if (c->frame->visible && !client_should_show(c))
+            engine_frame_hide(c->frame);
     }
 
     dispatch_ob(Event_Ob_Desktop, num, old);

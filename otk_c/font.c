@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "../config.h"
 #include "font.h"
@@ -135,7 +135,7 @@ static PyObject *otkfont_getattr(PyObject *obj, char *name)
   return Py_FindMethod(get_methods, obj, name);
 }
 
-PyTypeObject Otkfont_Type = {
+PyTypeObject OtkFont_Type = {
   PyObject_HEAD_INIT(NULL)
   0,
   "OtkFont",

@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "../config.h"
 #include "gccache.h"
@@ -40,7 +40,7 @@ void OtkGCCacheContext_Set(OtkGCCacheContext *self,
   XGCValues gcv;
   unsigned long mask;
   
-  self->pixel = gcv.foreground = OtkColor_Pixel(color);
+  self->pixel = gcv.foreground = color->pixel;
   self->function = gcv.function = function;
   self->subwindow = gcv.subwindow_mode = subwindow;
   self->linewidth = gcv.line_width = linewidth;
@@ -156,7 +156,7 @@ static void OtkGCCache_InternalRelease(OtkGCCacheContext *ctx)
 OtkGCCacheItem *OtkGCCache_Find(OtkColor *color, XFontStruct *font,
 				int function, int subwindow, int linewidth)
 {
-  const unsigned long pixel = OtkColor_Pixel(color);
+  const unsigned long pixel = color->pixel;
   const int screen = color->screen;
   const int key = color->red ^ color->green ^ color->blue;
   int k = (key % gccache->cache_size) * gccache->cache_buckets;

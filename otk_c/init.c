@@ -6,6 +6,10 @@
 #include "color.h"
 #include "gccache.h"
 #include "font.h"
+#include "rect.h"
+#include "timer.h"
+#include "timerqueue.h"
+#include "imagecontrol.h"
 
 #include <X11/Xlib.h>
 #include <Python.h>
@@ -24,9 +28,12 @@ void initotk(char *display)
   OtkScreenInfo_Type.ob_type = &PyType_Type;
   OtkColor_Type.ob_type = &PyType_Type;
   OtkFont_Type.ob_type = &PyType_Type;
+  OtkTimer_Type.ob_type = &PyType_Type;
+  OtkImageControl_Type.ob_type = &PyType_Type;
 
   Py_InitModule("otk", otk_methods);
 
+  OtkTimerQueue_Initialize();
   OtkDisplay_Initialize(display);
   assert(OBDisplay);
   OtkGCCache_Initialize();

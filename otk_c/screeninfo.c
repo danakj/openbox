@@ -1,4 +1,4 @@
-// -*- mode: C; indent-tabs-mode: nil; -*-
+// -*- mode: C; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #include "../config.h"
 #include "screeninfo.h"

@@ -10,6 +10,7 @@ extern PyTypeObject OtkScreenInfo_Type;
 struct OtkRect;
 
 typedef struct OtkScreenInfo {
+  PyObject_HEAD
   int screen;
   Window root_window;
 

@@ -148,6 +148,7 @@ void OtkDisplay_Ungrab(OtkDisplay *self)
 
 OtkScreenInfo *OtkDisplay_ScreenInfo(OtkDisplay *self, int num)
 {
+  assert(num >= 0);
   return (OtkScreenInfo*)PyList_GetItem((PyObject*)self->screenInfoList, num);
 }
 

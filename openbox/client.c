@@ -714,11 +714,12 @@ static void client_get_all(ObClient *self)
     client_update_wmhints(self);
     client_get_startup_id(self);
     client_get_desktop(self);
-    client_get_state(self);
     client_get_shaped(self);
 
     client_get_mwm_hints(self);
     client_get_type(self);/* this can change the mwmhints for special cases */
+
+    client_get_state(self);
 
     {
         /* a couple type-based defaults for new windows */
@@ -2565,7 +2566,9 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 fullscreen = TRUE;
             } else if (state == prop_atoms.net_wm_state_above) {
                 self->above = TRUE;
+                self->below = FALSE;
             } else if (state == prop_atoms.net_wm_state_below) {
+                self->above = FALSE;
                 self->below = TRUE;
             } else if (state == prop_atoms.ob_wm_state_undecorated) {
                 undecorated = TRUE;

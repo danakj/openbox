@@ -213,6 +213,7 @@ void mouse_event(ObClient *client, XEvent *e)
             int junk1, junk2;
             Window wjunk;
             guint ujunk, b, w, h;
+            /* this can cause errors to occur when the window closes */
             xerror_set_ignore(TRUE);
             junk1 = XGetGeometry(ob_display, e->xbutton.window,
                                  &wjunk, &junk1, &junk2, &w, &h, &b, &ujunk);

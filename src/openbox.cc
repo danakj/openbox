@@ -288,7 +288,8 @@ void Openbox::showHelp()
   printf(_("Compile time options:\n\
   Debugging: %s\n\
   Shape:     %s\n\
-  Xinerama:  %s\n"),
+  Xinerama:  %s\n\
+  Xkb:       %s\n"),
 #ifdef    DEBUG
          _("yes"),
 #else // !DEBUG
@@ -302,10 +303,16 @@ void Openbox::showHelp()
 #endif // SHAPE
 
 #ifdef    XINERAMA
-         _("yes")
+         _("yes"),
 #else // !XINERAMA
-         _("no")
+         _("no"),
 #endif // XINERAMA
+
+#ifdef    XKB
+         _("yes")
+#else // !XKB
+         _("no")
+#endif // XKB
     );
 }
 
@@ -368,11 +375,8 @@ void Openbox::setFocusedClient(OBClient *c)
   }
 
   // call the python Focus callbacks
-  EventData *data = new_event_data(_focused_screen->number(),
-                                   c ? c->window() : 0,
-                                   EventFocus, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_XDECREF((PyObject*)data);
+  EventData data(_focused_screen->number(), c, EventFocus, 0);
+  Openbox::instance->bindings()->fireEvent(&data);
 }
 
 void Openbox::execute(int screen, const std::string &bin)

@@ -5481,6 +5481,34 @@ static PyObject *_wrap_OBDisplay_findScreen(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBDisplay_xkb(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    bool result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":OBDisplay_xkb")) goto fail;
+    result = (bool)otk::OBDisplay::xkb();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBDisplay_xkbEventBase(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":OBDisplay_xkbEventBase")) goto fail;
+    result = (int)otk::OBDisplay::xkbEventBase();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBDisplay_shape(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     bool result;
@@ -12960,6 +12988,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBDisplay_gcCache", _wrap_OBDisplay_gcCache, METH_VARARGS },
 	 { (char *)"OBDisplay_screenInfo", _wrap_OBDisplay_screenInfo, METH_VARARGS },
 	 { (char *)"OBDisplay_findScreen", _wrap_OBDisplay_findScreen, METH_VARARGS },
+	 { (char *)"OBDisplay_xkb", _wrap_OBDisplay_xkb, METH_VARARGS },
+	 { (char *)"OBDisplay_xkbEventBase", _wrap_OBDisplay_xkbEventBase, METH_VARARGS },
 	 { (char *)"OBDisplay_shape", _wrap_OBDisplay_shape, METH_VARARGS },
 	 { (char *)"OBDisplay_shapeEventBase", _wrap_OBDisplay_shapeEventBase, METH_VARARGS },
 	 { (char *)"OBDisplay_xinerama", _wrap_OBDisplay_xinerama, METH_VARARGS },

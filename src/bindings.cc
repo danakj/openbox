@@ -387,14 +387,11 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           grabKeys(true);
           otk::OBDisplay::ungrab();
         } else {
-          Window win = None;
           OBClient *c = Openbox::instance->focusedClient();
-          if (c) win = c->window();
-          KeyData *data = new_key_data(screen, win, time, modifiers, key);
+          KeyData data(screen, c, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
-            python_callback(*it, (PyObject*)data);
-          Py_XDECREF((PyObject*)data);
+            python_callback(*it, &data);
           resetChains(this);
         }
         break;
@@ -540,7 +537,11 @@ bool OBBindings::addEvent(EventAction action, PyObject *callback)
   if (action < 0 || action >= NUM_EVENTS) {
     return false;
   }
-
+#ifdef    XKB
+  if (action == EventBell && _eventlist[action].empty())
+    XkbSelectEvents(otk::OBDisplay::display, XkbUseCoreKbd,
+                    XkbBellNotifyMask, XkbBellNotifyMask);
+#endif // XKB
   _eventlist[action].push_back(callback);
   Py_INCREF(callback);
   return true;
@@ -558,6 +559,11 @@ bool OBBindings::removeEvent(EventAction action, PyObject *callback)
   if (it != _eventlist[action].end()) {
     Py_XDECREF(*it);
     _eventlist[action].erase(it);
+#ifdef    XKB
+    if (action == EventBell && _eventlist[action].empty())
+      XkbSelectEvents(otk::OBDisplay::display, XkbUseCoreKbd,
+                      XkbBellNotifyMask, 0);
+#endif // XKB
     return true;
   }
   return false;
@@ -577,7 +583,7 @@ void OBBindings::fireEvent(EventData *data)
 {
   CallbackList::iterator c_it, c_end = _eventlist[data->action].end();
   for (c_it = _eventlist[data->action].begin(); c_it != c_end; ++c_it)
-    python_callback(*c_it, (PyObject*)data);
+    python_callback(*c_it, data);
 }
 
 }

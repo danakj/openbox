@@ -7,6 +7,11 @@ extern "C" {
 #ifdef    SHAPE
 #include <X11/extensions/shape.h>
 #endif // SHAPE
+
+#ifdef    XKB
+#include <X11/XKBlib.h>
+#endif // XKB
+
 }
 
 namespace otk {
@@ -120,9 +125,14 @@ public:
   virtual void clientMessageHandler(const XClientMessageEvent &);
 
 #if defined(SHAPE) || defined(DOXYGEN_IGNORE)
-  //! Called when a shape extention event fires
+  //! Called when a shape extension event fires
   virtual void shapeHandler(const XShapeEvent &) {}
 #endif // SHAPE 
+
+#if defined(XKB) || defined(DOXYGEN_IGNORE)
+  //! Called when an xkb extension event fires
+  virtual void xkbHandler(const XkbEvent &) {}
+#endif // XKB
 
   virtual ~OtkEventHandler();
 

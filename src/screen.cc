@@ -140,9 +140,8 @@ OBScreen::OBScreen(int screen)
   Openbox::instance->registerHandler(_info->rootWindow(), this);
 
   // call the python Startup callbacks
-  EventData *data = new_event_data(_number, 0, EventShutdown, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_XDECREF((PyObject*)data);
+  EventData data(_number, 0, EventShutdown, 0);
+  Openbox::instance->bindings()->fireEvent(&data);
 }
 
 
@@ -157,9 +156,8 @@ OBScreen::~OBScreen()
     unmanageWindow(clients.front());
 
   // call the python Shutdown callbacks
-  EventData *data = new_event_data(_number, 0, EventShutdown, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_XDECREF((PyObject*)data);
+  EventData data(_number, 0, EventShutdown, 0);
+  Openbox::instance->bindings()->fireEvent(&data);
 
   XDestroyWindow(otk::OBDisplay::display, _focuswindow);
   XDestroyWindow(otk::OBDisplay::display, _supportwindow);
@@ -497,9 +495,8 @@ void OBScreen::manageWindow(Window window)
         client->positionRequested())) {
     // position the window intelligenty .. hopefully :)
     // call the python PLACEWINDOW binding
-    EventData *data = new_event_data(_number, window, EventPlaceWindow, 0);
-    Openbox::instance->bindings()->fireEvent(data);
-    Py_DECREF((PyObject*)data);
+    EventData data(_number, client, EventPlaceWindow, 0);
+    Openbox::instance->bindings()->fireEvent(&data);
   }
 
   // create the decoration frame for the client window
@@ -542,9 +539,8 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->bindings()->grabButtons(true, client);
 
   // call the python NEWWINDOW binding
-  EventData *data = new_event_data(_number, window, EventNewWindow, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_DECREF((PyObject*)data);
+  EventData data(_number, client, EventNewWindow, 0);
+  Openbox::instance->bindings()->fireEvent(&data);
 
 #ifdef DEBUG
   printf("Managed window 0x%lx\n", window);
@@ -557,10 +553,8 @@ void OBScreen::unmanageWindow(OBClient *client)
   OBFrame *frame = client->frame;
 
   // call the python CLOSEWINDOW binding 
-  EventData *data = new_event_data(_number, client->window(),
-                                   EventCloseWindow, 0);
-  Openbox::instance->bindings()->fireEvent(data);
-  Py_DECREF((PyObject*)data);
+  EventData data(_number, client, EventCloseWindow, 0);
+  Openbox::instance->bindings()->fireEvent(&data);
 
   Openbox::instance->bindings()->grabButtons(false, client);
 

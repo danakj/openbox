@@ -12,6 +12,8 @@
 #include "client.hh"
 #include "bindings.hh"
 #include "actions.hh"
+#include "python.hh"
+#include "otk/display.hh"
 %}
 
 %include "stl.i"
@@ -22,6 +24,91 @@
 %inline %{
   ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
 %};
+
+%{
+namespace ob {
+void python_callback(PyObject *func, MotionData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__MotionData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, ButtonData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__ButtonData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, EventData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__EventData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, KeyData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__KeyData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+}
+%}
 
 %ignore ob::OBScreen::clients;
 %{

@@ -29,14 +29,19 @@ public:
   typedef std::vector<ScreenInfo> ScreenInfoList;
 
 private:
-  //! Does the display have the Shape extention?
+  //! Does the display have the XKB extension?
+  static bool _xkb;
+  //! Base for events for the XKB extension
+  static int  _xkb_event_basep;
+
+  //! Does the display have the Shape extension?
   static bool _shape;
-  //! Base for events for the Shape extention
+  //! Base for events for the Shape extension
   static int  _shape_event_basep;
 
-  //! Does the display have the Xinerama extention?
+  //! Does the display have the Xinerama extension?
   static bool _xinerama;
-  //! Base for events for the Xinerama extention
+  //! Base for events for the Xinerama extension
   static int  _xinerama_event_basep;
 
   //! A list of all possible combinations of keyboard lock masks
@@ -99,11 +104,16 @@ public:
   //! Find a ScreenInfo based on a root window
   static const ScreenInfo* findScreen(Window root);
 
-  //! Returns if the display has the shape extention available
+  //! Returns if the display has the xkb extension available
+  inline static bool xkb() { return _xkb; }
+  //! Returns the xkb extension's event base
+  inline static int xkbEventBase() { return _xkb_event_basep; }
+
+  //! Returns if the display has the shape extension available
   inline static bool shape() { return _shape; }
   //! Returns the shape extension's event base
   inline static int shapeEventBase() { return _shape_event_basep; }
-  //! Returns if the display has the xinerama extention available
+  //! Returns if the display has the xinerama extension available
   inline static bool xinerama() { return _xinerama; }
 
   inline static unsigned int numLockMask() { return _numLockMask; }

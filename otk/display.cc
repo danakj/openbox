@@ -11,6 +11,10 @@
 extern "C" {
 #include <X11/keysym.h>
 
+#ifdef    XKB
+#include <X11/XKBlib.h>
+#endif // XKB
+
 #ifdef    SHAPE
 #include <X11/extensions/shape.h>
 #endif // SHAPE
@@ -44,6 +48,8 @@ namespace otk {
 
 
 Display *OBDisplay::display = (Display*) 0;
+bool OBDisplay::_xkb = false;
+int  OBDisplay::_xkb_event_basep = 0;
 bool OBDisplay::_shape = false;
 int  OBDisplay::_shape_event_basep = 0;
 bool OBDisplay::_xinerama = false;
@@ -107,6 +113,11 @@ line argument.\n\n"));
   }
   
   // find the availability of X extensions we like to use
+#ifdef XKB
+  _xkb = XkbQueryExtension(display, &junk, &_xkb_event_basep, &junk, NULL, 
+                           NULL);
+#endif
+
 #ifdef SHAPE
   _shape = XShapeQueryExtension(display, &_shape_event_basep, &junk);
 #endif

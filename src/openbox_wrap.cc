@@ -652,26 +652,32 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__Style swig_types[4] 
 #define  SWIGTYPE_p_ob__OBFrame swig_types[5] 
 #define  SWIGTYPE_p_XReparentEvent swig_types[6] 
-#define  SWIGTYPE_p_ob__OBClient swig_types[7] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[8] 
-#define  SWIGTYPE_p_otk__Strut swig_types[9] 
-#define  SWIGTYPE_p_XMapRequestEvent swig_types[10] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[11] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[12] 
-#define  SWIGTYPE_p_otk__Rect swig_types[13] 
-#define  SWIGTYPE_p_ob__OBWidget swig_types[14] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[15] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[16] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[17] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[18] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[19] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[20] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[21] 
-#define  SWIGTYPE_p_PyObject swig_types[22] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[23] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[25] 
-static swig_type_info *swig_types[27];
+#define  SWIGTYPE_p_ob__MotionData swig_types[7] 
+#define  SWIGTYPE_p_ob__OBClient swig_types[8] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[9] 
+#define  SWIGTYPE_p_otk__Strut swig_types[10] 
+#define  SWIGTYPE_p_ob__KeyData swig_types[11] 
+#define  SWIGTYPE_p_XMapRequestEvent swig_types[12] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[13] 
+#define  SWIGTYPE_p_otk__Point swig_types[14] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[15] 
+#define  SWIGTYPE_p_std__string swig_types[16] 
+#define  SWIGTYPE_p_otk__Rect swig_types[17] 
+#define  SWIGTYPE_p_ob__OBWidget swig_types[18] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[19] 
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[20] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[21] 
+#define  SWIGTYPE_p_ob__EventData swig_types[22] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[23] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[24] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[25] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[26] 
+#define  SWIGTYPE_p_PyObject swig_types[27] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[28] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[29] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[30] 
+#define  SWIGTYPE_p_ob__ButtonData swig_types[31] 
+static swig_type_info *swig_types[33];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -692,6 +698,8 @@ static swig_type_info *swig_types[27];
 #include "client.hh"
 #include "bindings.hh"
 #include "actions.hh"
+#include "python.hh"
+#include "otk/display.hh"
 
 
 #define  SWIG_MemoryError    1
@@ -776,6 +784,90 @@ static std::string SwigString_AsString(PyObject* o) {
 
 
   ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
+
+
+namespace ob {
+void python_callback(PyObject *func, MotionData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__MotionData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, ButtonData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__ButtonData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, EventData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__EventData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+void python_callback(PyObject *func, KeyData *data)
+{
+  PyObject *arglist;
+  PyObject *result;
+
+  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
+                                                    SWIGTYPE_p_ob__KeyData,
+                                                    0));
+  
+  // call the callback
+  result = PyEval_CallObject(func, arglist);
+  if (!result || PyErr_Occurred()) {
+    // an exception occured in the script, display it
+    PyErr_Print();
+  }
+
+  Py_XDECREF(result);
+  Py_DECREF(arglist);
+}
+
+}
 
 
   #include <iterator>
@@ -2696,6 +2788,1256 @@ static PyObject * OBClient_swigregister(PyObject *self, PyObject *args) {
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
+static PyObject *_wrap_MotionData_screen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_screen_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->screen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_screen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_screen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->screen);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_client_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_client_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
+    if (arg1) (arg1)->client = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_client_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_client_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *) ((arg1)->client);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_time_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    Time arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_time_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Time) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->time = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_time_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    Time result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_time_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Time) ((arg1)->time);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_button_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_button_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->button = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_button_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_button_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->button);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_context_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_context_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->context = (ob::MouseContext )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_context_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_context_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->context);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_action_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_action_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->action = (ob::MouseAction )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_action_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_action_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->action);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_xroot_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_xroot_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->xroot = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_xroot_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_xroot_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->xroot);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_yroot_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_yroot_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->yroot = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_yroot_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_yroot_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->yroot);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_pressx_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_pressx_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->pressx = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_pressx_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_pressx_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->pressx);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_pressy_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_pressy_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->pressy = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_pressy_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_pressy_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->pressy);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientx_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientx_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->press_clientx = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientx_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientx_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->press_clientx);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clienty_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clienty_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->press_clienty = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clienty_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clienty_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->press_clienty);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientwidth_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientwidth_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->press_clientwidth = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientwidth_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientwidth_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->press_clientwidth);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientheight_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientheight_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->press_clientheight = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_MotionData_press_clientheight_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientheight_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->press_clientheight);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_MotionData(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    Time arg3 ;
+    unsigned int arg4 ;
+    unsigned int arg5 ;
+    int arg6 ;
+    int arg7 ;
+    int arg8 ;
+    int arg9 ;
+    otk::Point *arg10 = 0 ;
+    otk::Rect *arg11 = 0 ;
+    ob::MotionData *result;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
+    PyObject * obj4  = 0 ;
+    PyObject * obj9  = 0 ;
+    PyObject * obj10  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOiiiiOO:new_MotionData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7,&arg8,&arg9,&obj9,&obj10)) goto fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg3 = (Time) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg4 = (unsigned int) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg5 = (unsigned int) PyInt_AsLong(obj4);
+    if (PyErr_Occurred()) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj9,(void **) &arg10, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg10 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj10,(void **) &arg11, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg11 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (ob::MotionData *)new ob::MotionData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7,arg8,arg9,(otk::Point const &)*arg10,(otk::Rect const &)*arg11);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__MotionData, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * MotionData_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_ob__MotionData, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
+static PyObject *_wrap_ButtonData_screen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_screen_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->screen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_screen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_screen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->screen);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_client_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_client_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
+    if (arg1) (arg1)->client = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_client_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_client_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *) ((arg1)->client);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_time_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    Time arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_time_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Time) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->time = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_time_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    Time result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_time_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Time) ((arg1)->time);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_button_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_button_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->button = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_button_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_button_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->button);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_context_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_context_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->context = (ob::MouseContext )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_context_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_context_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->context);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_action_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_action_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->action = (ob::MouseAction )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_ButtonData_action_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_action_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->action);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_ButtonData(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    Time arg3 ;
+    unsigned int arg4 ;
+    unsigned int arg5 ;
+    int arg6 ;
+    int arg7 ;
+    ob::ButtonData *result;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
+    PyObject * obj4  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOii:new_ButtonData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7)) goto fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg3 = (Time) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg4 = (unsigned int) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg5 = (unsigned int) PyInt_AsLong(obj4);
+    if (PyErr_Occurred()) SWIG_fail;
+    result = (ob::ButtonData *)new ob::ButtonData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__ButtonData, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * ButtonData_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_ob__ButtonData, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
+static PyObject *_wrap_EventData_screen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:EventData_screen_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->screen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_screen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:EventData_screen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->screen);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_client_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:EventData_client_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
+    if (arg1) (arg1)->client = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_client_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:EventData_client_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *) ((arg1)->client);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:EventData_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:EventData_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_action_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:EventData_action_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->action = (ob::EventAction )arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_EventData_action_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::EventData *arg1 = (ob::EventData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:EventData_action_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__EventData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->action);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_EventData(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    int arg3 ;
+    unsigned int arg4 ;
+    ob::EventData *result;
+    PyObject * obj1  = 0 ;
+    PyObject * obj3  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iOiO:new_EventData",&arg1,&obj1,&arg3,&obj3)) goto fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg4 = (unsigned int) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    result = (ob::EventData *)new ob::EventData(arg1,arg2,(ob::EventAction )arg3,arg4);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__EventData, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * EventData_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_ob__EventData, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
+static PyObject *_wrap_KeyData_screen_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:KeyData_screen_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->screen = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_screen_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_screen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int) ((arg1)->screen);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_client_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:KeyData_client_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
+    if (arg1) (arg1)->client = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_client_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    ob::OBClient *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_client_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (ob::OBClient *) ((arg1)->client);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_time_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    Time arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:KeyData_time_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (Time) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->time = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_time_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    Time result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_time_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (Time) ((arg1)->time);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_state_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    unsigned int arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:KeyData_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (unsigned int) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    if (arg1) (arg1)->state = arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_state_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    unsigned int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (unsigned int) ((arg1)->state);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_key_set(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    std::string *arg2 = (std::string *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:KeyData_key_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_std__string,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1) (arg1)->key = *arg2;
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_KeyData_key_get(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::KeyData *arg1 = (ob::KeyData *) 0 ;
+    std::string *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:KeyData_key_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__KeyData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (std::string *)& ((arg1)->key);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_std__string, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_KeyData(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    Time arg3 ;
+    unsigned int arg4 ;
+    unsigned int arg5 ;
+    ob::KeyData *result;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    PyObject * obj3  = 0 ;
+    PyObject * obj4  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iOOOO:new_KeyData",&arg1,&obj1,&obj2,&obj3,&obj4)) goto fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg3 = (Time) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg4 = (unsigned int) PyInt_AsLong(obj3);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg5 = (unsigned int) PyInt_AsLong(obj4);
+    if (PyErr_Occurred()) SWIG_fail;
+    result = (ob::KeyData *)new ob::KeyData(arg1,arg2,arg3,arg4,arg5);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__KeyData, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * KeyData_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_ob__KeyData, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
 static PyObject *_wrap_mbind(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     std::string *arg1 = 0 ;
@@ -2922,6 +4264,76 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_destroyHandler", _wrap_OBClient_destroyHandler, METH_VARARGS },
 	 { (char *)"OBClient_reparentHandler", _wrap_OBClient_reparentHandler, METH_VARARGS },
 	 { (char *)"OBClient_swigregister", OBClient_swigregister, METH_VARARGS },
+	 { (char *)"MotionData_screen_set", _wrap_MotionData_screen_set, METH_VARARGS },
+	 { (char *)"MotionData_screen_get", _wrap_MotionData_screen_get, METH_VARARGS },
+	 { (char *)"MotionData_client_set", _wrap_MotionData_client_set, METH_VARARGS },
+	 { (char *)"MotionData_client_get", _wrap_MotionData_client_get, METH_VARARGS },
+	 { (char *)"MotionData_time_set", _wrap_MotionData_time_set, METH_VARARGS },
+	 { (char *)"MotionData_time_get", _wrap_MotionData_time_get, METH_VARARGS },
+	 { (char *)"MotionData_state_set", _wrap_MotionData_state_set, METH_VARARGS },
+	 { (char *)"MotionData_state_get", _wrap_MotionData_state_get, METH_VARARGS },
+	 { (char *)"MotionData_button_set", _wrap_MotionData_button_set, METH_VARARGS },
+	 { (char *)"MotionData_button_get", _wrap_MotionData_button_get, METH_VARARGS },
+	 { (char *)"MotionData_context_set", _wrap_MotionData_context_set, METH_VARARGS },
+	 { (char *)"MotionData_context_get", _wrap_MotionData_context_get, METH_VARARGS },
+	 { (char *)"MotionData_action_set", _wrap_MotionData_action_set, METH_VARARGS },
+	 { (char *)"MotionData_action_get", _wrap_MotionData_action_get, METH_VARARGS },
+	 { (char *)"MotionData_xroot_set", _wrap_MotionData_xroot_set, METH_VARARGS },
+	 { (char *)"MotionData_xroot_get", _wrap_MotionData_xroot_get, METH_VARARGS },
+	 { (char *)"MotionData_yroot_set", _wrap_MotionData_yroot_set, METH_VARARGS },
+	 { (char *)"MotionData_yroot_get", _wrap_MotionData_yroot_get, METH_VARARGS },
+	 { (char *)"MotionData_pressx_set", _wrap_MotionData_pressx_set, METH_VARARGS },
+	 { (char *)"MotionData_pressx_get", _wrap_MotionData_pressx_get, METH_VARARGS },
+	 { (char *)"MotionData_pressy_set", _wrap_MotionData_pressy_set, METH_VARARGS },
+	 { (char *)"MotionData_pressy_get", _wrap_MotionData_pressy_get, METH_VARARGS },
+	 { (char *)"MotionData_press_clientx_set", _wrap_MotionData_press_clientx_set, METH_VARARGS },
+	 { (char *)"MotionData_press_clientx_get", _wrap_MotionData_press_clientx_get, METH_VARARGS },
+	 { (char *)"MotionData_press_clienty_set", _wrap_MotionData_press_clienty_set, METH_VARARGS },
+	 { (char *)"MotionData_press_clienty_get", _wrap_MotionData_press_clienty_get, METH_VARARGS },
+	 { (char *)"MotionData_press_clientwidth_set", _wrap_MotionData_press_clientwidth_set, METH_VARARGS },
+	 { (char *)"MotionData_press_clientwidth_get", _wrap_MotionData_press_clientwidth_get, METH_VARARGS },
+	 { (char *)"MotionData_press_clientheight_set", _wrap_MotionData_press_clientheight_set, METH_VARARGS },
+	 { (char *)"MotionData_press_clientheight_get", _wrap_MotionData_press_clientheight_get, METH_VARARGS },
+	 { (char *)"new_MotionData", _wrap_new_MotionData, METH_VARARGS },
+	 { (char *)"MotionData_swigregister", MotionData_swigregister, METH_VARARGS },
+	 { (char *)"ButtonData_screen_set", _wrap_ButtonData_screen_set, METH_VARARGS },
+	 { (char *)"ButtonData_screen_get", _wrap_ButtonData_screen_get, METH_VARARGS },
+	 { (char *)"ButtonData_client_set", _wrap_ButtonData_client_set, METH_VARARGS },
+	 { (char *)"ButtonData_client_get", _wrap_ButtonData_client_get, METH_VARARGS },
+	 { (char *)"ButtonData_time_set", _wrap_ButtonData_time_set, METH_VARARGS },
+	 { (char *)"ButtonData_time_get", _wrap_ButtonData_time_get, METH_VARARGS },
+	 { (char *)"ButtonData_state_set", _wrap_ButtonData_state_set, METH_VARARGS },
+	 { (char *)"ButtonData_state_get", _wrap_ButtonData_state_get, METH_VARARGS },
+	 { (char *)"ButtonData_button_set", _wrap_ButtonData_button_set, METH_VARARGS },
+	 { (char *)"ButtonData_button_get", _wrap_ButtonData_button_get, METH_VARARGS },
+	 { (char *)"ButtonData_context_set", _wrap_ButtonData_context_set, METH_VARARGS },
+	 { (char *)"ButtonData_context_get", _wrap_ButtonData_context_get, METH_VARARGS },
+	 { (char *)"ButtonData_action_set", _wrap_ButtonData_action_set, METH_VARARGS },
+	 { (char *)"ButtonData_action_get", _wrap_ButtonData_action_get, METH_VARARGS },
+	 { (char *)"new_ButtonData", _wrap_new_ButtonData, METH_VARARGS },
+	 { (char *)"ButtonData_swigregister", ButtonData_swigregister, METH_VARARGS },
+	 { (char *)"EventData_screen_set", _wrap_EventData_screen_set, METH_VARARGS },
+	 { (char *)"EventData_screen_get", _wrap_EventData_screen_get, METH_VARARGS },
+	 { (char *)"EventData_client_set", _wrap_EventData_client_set, METH_VARARGS },
+	 { (char *)"EventData_client_get", _wrap_EventData_client_get, METH_VARARGS },
+	 { (char *)"EventData_state_set", _wrap_EventData_state_set, METH_VARARGS },
+	 { (char *)"EventData_state_get", _wrap_EventData_state_get, METH_VARARGS },
+	 { (char *)"EventData_action_set", _wrap_EventData_action_set, METH_VARARGS },
+	 { (char *)"EventData_action_get", _wrap_EventData_action_get, METH_VARARGS },
+	 { (char *)"new_EventData", _wrap_new_EventData, METH_VARARGS },
+	 { (char *)"EventData_swigregister", EventData_swigregister, METH_VARARGS },
+	 { (char *)"KeyData_screen_set", _wrap_KeyData_screen_set, METH_VARARGS },
+	 { (char *)"KeyData_screen_get", _wrap_KeyData_screen_get, METH_VARARGS },
+	 { (char *)"KeyData_client_set", _wrap_KeyData_client_set, METH_VARARGS },
+	 { (char *)"KeyData_client_get", _wrap_KeyData_client_get, METH_VARARGS },
+	 { (char *)"KeyData_time_set", _wrap_KeyData_time_set, METH_VARARGS },
+	 { (char *)"KeyData_time_get", _wrap_KeyData_time_get, METH_VARARGS },
+	 { (char *)"KeyData_state_set", _wrap_KeyData_state_set, METH_VARARGS },
+	 { (char *)"KeyData_state_get", _wrap_KeyData_state_get, METH_VARARGS },
+	 { (char *)"KeyData_key_set", _wrap_KeyData_key_set, METH_VARARGS },
+	 { (char *)"KeyData_key_get", _wrap_KeyData_key_get, METH_VARARGS },
+	 { (char *)"new_KeyData", _wrap_new_KeyData, METH_VARARGS },
+	 { (char *)"KeyData_swigregister", KeyData_swigregister, METH_VARARGS },
 	 { (char *)"mbind", _wrap_mbind, METH_VARARGS },
 	 { (char *)"kbind", _wrap_kbind, METH_VARARGS },
 	 { (char *)"ebind", _wrap_ebind, METH_VARARGS },
@@ -2961,17 +4373,22 @@ static swig_type_info _swigt__p_ob__OBScreen[] = {{"_p_ob__OBScreen", 0, "ob::OB
 static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
 static swig_type_info _swigt__p_ob__OBFrame[] = {{"_p_ob__OBFrame", 0, "ob::OBFrame *", 0},{"_p_ob__OBFrame"},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
+static swig_type_info _swigt__p_ob__MotionData[] = {{"_p_ob__MotionData", 0, "ob::MotionData *", 0},{"_p_ob__MotionData"},{0}};
 static swig_type_info _swigt__p_ob__OBClient[] = {{"_p_ob__OBClient", 0, "ob::OBClient *", 0},{"_p_ob__OBClient"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
+static swig_type_info _swigt__p_ob__KeyData[] = {{"_p_ob__KeyData", 0, "ob::KeyData *", 0},{"_p_ob__KeyData"},{0}};
 static swig_type_info _swigt__p_XMapRequestEvent[] = {{"_p_XMapRequestEvent", 0, "XMapRequestEvent *", 0},{"_p_XMapRequestEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
+static swig_type_info _swigt__p_otk__Point[] = {{"_p_otk__Point", 0, "otk::Point *", 0},{"_p_otk__Point"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_ob__OBActions", _p_ob__OBActionsTo_p_otk__OtkEventHandler},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBScreen", _p_ob__OBScreenTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
+static swig_type_info _swigt__p_std__string[] = {{"_p_std__string", 0, "std::string *", 0},{"_p_std__string"},{0}};
 static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
 static swig_type_info _swigt__p_ob__OBWidget[] = {{"_p_ob__OBWidget", 0, "ob::OBWidget *", 0},{"_p_ob__OBWidget"},{"_p_ob__OBScreen", _p_ob__OBScreenTo_p_ob__OBWidget},{"_p_ob__OBClient", _p_ob__OBClientTo_p_ob__OBWidget},{0}};
 static swig_type_info _swigt__p_XClientMessageEvent[] = {{"_p_XClientMessageEvent", 0, "XClientMessageEvent *", 0},{"_p_XClientMessageEvent"},{0}};
 static swig_type_info _swigt__p_XFocusChangeEvent[] = {{"_p_XFocusChangeEvent", 0, "XFocusChangeEvent *", 0},{"_p_XFocusChangeEvent"},{0}};
 static swig_type_info _swigt__p_otk__OBProperty[] = {{"_p_otk__OBProperty", 0, "otk::OBProperty *", 0},{"_p_otk__OBProperty"},{0}};
+static swig_type_info _swigt__p_ob__EventData[] = {{"_p_ob__EventData", 0, "ob::EventData *", 0},{"_p_ob__EventData"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventDispatcher[] = {{"_p_otk__OtkEventDispatcher", 0, "otk::OtkEventDispatcher *", 0},{"_p_otk__OtkEventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventDispatcher},{0}};
 static swig_type_info _swigt__p_XPropertyEvent[] = {{"_p_XPropertyEvent", 0, "XPropertyEvent *", 0},{"_p_XPropertyEvent"},{0}};
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
@@ -2980,6 +4397,7 @@ static swig_type_info _swigt__p_PyObject[] = {{"_p_PyObject", 0, "PyObject *", 0
 static swig_type_info _swigt__p_ob__OBBindings[] = {{"_p_ob__OBBindings", 0, "ob::OBBindings *", 0},{"_p_ob__OBBindings"},{0}};
 static swig_type_info _swigt__p_ob__MwmHints[] = {{"_p_ob__MwmHints", 0, "ob::MwmHints *", 0},{"_p_ob__MwmHints"},{0}};
 static swig_type_info _swigt__p_XUnmapEvent[] = {{"_p_XUnmapEvent", 0, "XUnmapEvent *", 0},{"_p_XUnmapEvent"},{0}};
+static swig_type_info _swigt__p_ob__ButtonData[] = {{"_p_ob__ButtonData", 0, "ob::ButtonData *", 0},{"_p_ob__ButtonData"},{0}};
 
 static swig_type_info *swig_types_initial[] = {
 _swigt__p_otk__OBTimerQueueManager, 
@@ -2989,17 +4407,22 @@ _swigt__p_ob__OBScreen,
 _swigt__p_otk__Style, 
 _swigt__p_ob__OBFrame, 
 _swigt__p_XReparentEvent, 
+_swigt__p_ob__MotionData, 
 _swigt__p_ob__OBClient, 
 _swigt__p_ob__Openbox, 
 _swigt__p_otk__Strut, 
+_swigt__p_ob__KeyData, 
 _swigt__p_XMapRequestEvent, 
 _swigt__p_XConfigureRequestEvent, 
+_swigt__p_otk__Point, 
 _swigt__p_otk__OtkEventHandler, 
+_swigt__p_std__string, 
 _swigt__p_otk__Rect, 
 _swigt__p_ob__OBWidget, 
 _swigt__p_XClientMessageEvent, 
 _swigt__p_XFocusChangeEvent, 
 _swigt__p_otk__OBProperty, 
+_swigt__p_ob__EventData, 
 _swigt__p_otk__OtkEventDispatcher, 
 _swigt__p_XPropertyEvent, 
 _swigt__p_XDestroyWindowEvent, 
@@ -3008,6 +4431,7 @@ _swigt__p_PyObject,
 _swigt__p_ob__OBBindings, 
 _swigt__p_ob__MwmHints, 
 _swigt__p_XUnmapEvent, 
+_swigt__p_ob__ButtonData, 
 0
 };
 
@@ -3099,6 +4523,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"EventStartup", (long) ob::EventStartup, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventShutdown", (long) ob::EventShutdown, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventFocus", (long) ob::EventFocus, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventBell", (long) ob::EventBell, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL", (long) 11, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL_REVISION", (long) 0, 0, 0, 0},

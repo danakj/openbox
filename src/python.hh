@@ -9,6 +9,7 @@
 #include "otk/point.hh"
 #include "otk/rect.hh"
 #include "otk/property.hh"
+#include "otk/display.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -19,6 +20,8 @@ extern "C" {
 #include <vector>
 
 namespace ob {
+
+class OBClient;
 
 enum MouseContext {
   MC_Frame,
@@ -58,16 +61,15 @@ enum EventAction {
   EventStartup,
   EventShutdown,
   EventFocus,
+  EventBell,
   NUM_EVENTS
 };
 
-#ifndef SWIG
-
 // *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
-typedef struct {
-  PyObject_HEAD;
+class MotionData {
+public:
   int screen;
-  Window window;
+  OBClient *client;
   Time time;
   unsigned int state;
   unsigned int button;
@@ -81,60 +83,106 @@ typedef struct {
   int press_clienty;
   int press_clientwidth;
   int press_clientheight;
-} MotionData;
+
+  MotionData(int screen, OBClient *client, Time time, unsigned int state,
+             unsigned int button, MouseContext context, MouseAction action,
+             int xroot, int yroot, const otk::Point &initpos,
+             const otk::Rect &initarea) {
+    this->screen = screen;
+    this->client = client;
+    this->time   = time;
+    this->state  = state;
+    this->button = button;
+    this->context= context;
+    this->action = action;
+    this->xroot  = xroot;
+    this->yroot  = yroot;
+    this->pressx = initpos.x();
+    this->pressy = initpos.y();
+    this->press_clientx      = initarea.x();
+    this->press_clienty      = initarea.y();
+    this->press_clientwidth  = initarea.width();
+    this->press_clientheight = initarea.height();
+  }
+};
 
 // *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
-typedef struct {
-  PyObject_HEAD;
+class ButtonData {
+public:
   int screen;
-  Window window;
+  OBClient *client;
   Time time;
   unsigned int state;
   unsigned int button;
   MouseContext context;
   MouseAction action;
-} ButtonData;
 
-typedef struct {
-  PyObject_HEAD;
+  ButtonData(int screen, OBClient *client, Time time, unsigned int state,
+             unsigned int button, MouseContext context, MouseAction action) {
+    this->screen = screen;
+    this->client = client;
+    this->time   = time;
+    this->state  = state;
+    this->button = button;
+    this->context= context;
+    this->action = action;
+  }
+};
+
+class EventData {
+public:
   int screen;
-  Window window;
+  OBClient *client;
   unsigned int state;
   EventAction action;
-} EventData;
 
-typedef struct {
-  PyObject_HEAD;
+  EventData(int screen, OBClient *client, EventAction action,
+            unsigned int state) {
+    this->screen = screen;
+    this->client = client;
+    this->action = action;
+    this->state  = state;
+  }
+};
+
+class KeyData {
+public:
   int screen;
-  Window window;
+  OBClient *client;
   Time time;
   unsigned int state;
-  unsigned int key;
-} KeyData;
+  std::string key;
+
+  KeyData(int screen, OBClient *client, Time time, unsigned int state,
+          unsigned int key) {
+    this->screen = screen;
+    this->client = client;
+    this->time   = time;
+    this->state  = state;
+    this->key    = XKeysymToString(XKeycodeToKeysym(otk::OBDisplay::display,
+                                                    key, 0));
+  }
+};
+
+#ifndef SWIG
 
 void python_init(char *argv0);
 void python_destroy();
 bool python_exec(const std::string &path);
-                 
-MotionData *new_motion_data(int screen, Window window, Time time,
-                            unsigned int state, unsigned int button,
-                            MouseContext context, MouseAction action,
-                            int xroot, int yroot, const otk::Point &initpos,
-                            const otk::Rect &initarea);
-ButtonData *new_button_data(int screen, Window window, Time time,
-                            unsigned int state, unsigned int button,
-                            MouseContext context, MouseAction action);
-EventData *new_event_data(int screen, Window window, EventAction action,
-                          unsigned int state);
-KeyData *new_key_data(int screen, Window window, Time time, unsigned int state,
-                      unsigned int key);
-
-void python_callback(PyObject *func, PyObject *data);
 
 bool python_get_long(const char *name, long *value);
 bool python_get_string(const char *name, std::string *value);
 bool python_get_stringlist(const char *name, std::vector<std::string> *value);
-#endif
+
+/***********************************************
+ * These are found in openbox.i, not python.cc *
+ ***********************************************/
+void python_callback(PyObject *func, MotionData *data);
+void python_callback(PyObject *func, ButtonData *data);
+void python_callback(PyObject *func, EventData *data);
+void python_callback(PyObject *func, KeyData *data);
+
+#endif // SWIG
 
 PyObject *mbind(const std::string &button, ob::MouseContext context,
                 ob::MouseAction action, PyObject *func);
@@ -148,7 +196,7 @@ void set_reset_key(const std::string &key);
 PyObject *send_client_msg(Window target, int type, Window about,
                           long data, long data1 = 0, long data2 = 0,
                           long data3 = 0, long data4 = 0);
-
 }
+
 
 #endif // __python_hh

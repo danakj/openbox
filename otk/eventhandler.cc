@@ -91,6 +91,10 @@ void OtkEventHandler::handle(const XEvent &e)
     if (e.type == otk::OBDisplay::shapeEventBase())
       return shapeHandler((*(XShapeEvent*)&e));
 #endif // SHAPE
+#ifdef    XKB
+    if (e.type == otk::OBDisplay::xkbEventBase())
+      return xkbHandler((*(XkbEvent*)&e));
+#endif // XKB
     ;
   }
 }

@@ -324,7 +324,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
         if (parse_contains("top", doc, n))
             config_dock_layer = OB_STACKING_LAYER_DOCK_ABOVE;
         else if (parse_contains("normal", doc, n))
-            config_dock_layer = OB_STACKING_LAYER_NORMAL;
+            config_dock_layer = OB_STACKING_LAYER_DOCK_NORMAL;
         else if (parse_contains("bottom", doc, n))
             config_dock_layer = OB_STACKING_LAYER_DOCK_BELOW;
     }

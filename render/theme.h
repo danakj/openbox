@@ -29,7 +29,7 @@ struct _RrTheme {
     RrColor *title_focused_color;
     RrColor *title_unfocused_color;
     RrColor *titlebut_disabled_focused_color;
-    RrColor *titlebut_disabled_unfocused_color; 
+    RrColor *titlebut_disabled_unfocused_color;
     RrColor *titlebut_hover_focused_color;
     RrColor *titlebut_hover_unfocused_color;
     RrColor *titlebut_focused_pressed_color;

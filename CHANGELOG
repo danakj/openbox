@@ -1,5 +1,11 @@
 Changelog for Openbox:
 
+2.1.1:
+ * a build fix for xftlsfonts.                          (Scott Moynes)
+
+ * add a configuration menu for changing Xft font       (Ben Jansens)
+   options, when Xft is compiled in.
+
 2.1.0:
  * make alt-right-click resizing work on bottom window  (Ben Jansens)
    handles.

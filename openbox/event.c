@@ -22,12 +22,10 @@ static void event_handle_client(Client *c, XEvent *e);
 
 Time event_lasttime = 0;
 
-/*! A list of all possible combinations of keyboard lock masks */
-static unsigned int mask_list[8];
 /*! The value of the mask for the NumLock modifier */
-static unsigned int NumLockMask;
+unsigned int NumLockMask;
 /*! The value of the mask for the ScrollLock modifier */
-static unsigned int ScrollLockMask;
+unsigned int ScrollLockMask;
 /*! The key codes for the modifier keys */
 static XModifierKeymap *modmap;
 /*! Table of the constant modifier masks */
@@ -63,15 +61,6 @@ void event_startup()
 		ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
 	}
     }
-
-    mask_list[0] = 0;
-    mask_list[1] = LockMask;
-    mask_list[2] = NumLockMask;
-    mask_list[3] = LockMask | NumLockMask;
-    mask_list[4] = ScrollLockMask;
-    mask_list[5] = ScrollLockMask | LockMask;
-    mask_list[6] = ScrollLockMask | NumLockMask;
-    mask_list[7] = ScrollLockMask | LockMask | NumLockMask;
 }
 
 void event_shutdown()

@@ -75,9 +75,6 @@ private:
   */
   void releaseClient(bool remap);
 
-  //! Shape the frame window to the client window
-  void adjustShape();
-
 public:
   //! Constructs an OBFrame object, and reparents the client to itself
   /*!
@@ -105,6 +102,8 @@ public:
   void adjustSize();
   //! Update the frame's position to match the client
   void adjustPosition();
+  //! Shape the frame window to the client window
+  void adjustShape();
 
   //! Applies gravity to the client's position to find where the frame should
   //! be positioned.

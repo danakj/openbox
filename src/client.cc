@@ -339,7 +339,8 @@ void OBClient::updateProtocols()
       if (proto[i] == property->atom(otk::OBProperty::wm_delete_window)) {
         _decorations |= Decor_Close;
         _functions |= Func_Close;
-        // XXX: update the decor?
+        if (frame)
+          frame->adjustSize(); // update the decorations
       } else if (proto[i] == property->atom(otk::OBProperty::wm_take_focus))
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus
@@ -785,16 +786,18 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
              property->atom(otk::OBProperty::net_active_window)) {
     focus();
     Openbox::instance->screen(_screen)->restack(true, this); // raise
+  } else {
   }
 }
 
 
-#if defined(SHAPE) || defined(DOXYGEN_IGNORE)
+#if defined(SHAPE)
 void OBClient::shapeHandler(const XShapeEvent &e)
 {
   otk::OtkEventHandler::shapeHandler(e);
   
   _shaped = e.shaped;
+  frame->adjustShape();
 }
 #endif
 

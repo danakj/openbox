@@ -457,11 +457,13 @@ public:
   virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);
-  virtual void shapeHandler(const XShapeEvent &e);
   virtual void configureRequestHandler(const XConfigureRequestEvent &e);
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
   virtual void reparentHandler(const XReparentEvent &e);
+#if defined(SHAPE)
+  virtual void shapeHandler(const XShapeEvent &e);
+#endif // SHAPE 
 };
 
 }

@@ -655,23 +655,22 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_ob__OBClient swig_types[7] 
 #define  SWIGTYPE_p_ob__Openbox swig_types[8] 
 #define  SWIGTYPE_p_otk__Strut swig_types[9] 
-#define  SWIGTYPE_p_XShapeEvent swig_types[10] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[11] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[12] 
-#define  SWIGTYPE_p_otk__Rect swig_types[13] 
-#define  SWIGTYPE_p_ob__OBWidget swig_types[14] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[15] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[16] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[17] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[18] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[19] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[20] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[21] 
-#define  SWIGTYPE_p_PyObject swig_types[22] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[23] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[24] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[25] 
-static swig_type_info *swig_types[27];
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[10] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[11] 
+#define  SWIGTYPE_p_otk__Rect swig_types[12] 
+#define  SWIGTYPE_p_ob__OBWidget swig_types[13] 
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[14] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[15] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[16] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[17] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[18] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[19] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[20] 
+#define  SWIGTYPE_p_PyObject swig_types[21] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[22] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[23] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[24] 
+static swig_type_info *swig_types[26];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -2453,28 +2452,6 @@ static PyObject *_wrap_OBClient_clientMessageHandler(PyObject *self, PyObject *a
 }
 
 
-static PyObject *_wrap_OBClient_shapeHandler(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
-    XShapeEvent *arg2 = 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBClient_shapeHandler",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_XShapeEvent,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg2 == NULL) {
-        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
-    }
-    (arg1)->shapeHandler((XShapeEvent const &)*arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_OBClient_configureRequestHandler(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2756,7 +2733,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_unfocusHandler", _wrap_OBClient_unfocusHandler, METH_VARARGS },
 	 { (char *)"OBClient_propertyHandler", _wrap_OBClient_propertyHandler, METH_VARARGS },
 	 { (char *)"OBClient_clientMessageHandler", _wrap_OBClient_clientMessageHandler, METH_VARARGS },
-	 { (char *)"OBClient_shapeHandler", _wrap_OBClient_shapeHandler, METH_VARARGS },
 	 { (char *)"OBClient_configureRequestHandler", _wrap_OBClient_configureRequestHandler, METH_VARARGS },
 	 { (char *)"OBClient_unmapHandler", _wrap_OBClient_unmapHandler, METH_VARARGS },
 	 { (char *)"OBClient_destroyHandler", _wrap_OBClient_destroyHandler, METH_VARARGS },
@@ -2797,7 +2773,6 @@ static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XR
 static swig_type_info _swigt__p_ob__OBClient[] = {{"_p_ob__OBClient", 0, "ob::OBClient *", 0},{"_p_ob__OBClient"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
-static swig_type_info _swigt__p_XShapeEvent[] = {{"_p_XShapeEvent", 0, "XShapeEvent *", 0},{"_p_XShapeEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
 static swig_type_info _swigt__p_otk__OtkEventHandler[] = {{"_p_otk__OtkEventHandler", 0, "otk::OtkEventHandler *", 0},{"_p_ob__OBActions", _p_ob__OBActionsTo_p_otk__OtkEventHandler},{"_p_otk__OtkEventHandler"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__OtkEventHandler},{"_p_ob__OBClient", _p_ob__OBClientTo_p_otk__OtkEventHandler},{0}};
 static swig_type_info _swigt__p_otk__Rect[] = {{"_p_otk__Rect", 0, "otk::Rect *", 0},{"_p_otk__Rect"},{0}};
@@ -2825,7 +2800,6 @@ _swigt__p_XReparentEvent,
 _swigt__p_ob__OBClient, 
 _swigt__p_ob__Openbox, 
 _swigt__p_otk__Strut, 
-_swigt__p_XShapeEvent, 
 _swigt__p_XConfigureRequestEvent, 
 _swigt__p_otk__OtkEventHandler, 
 _swigt__p_otk__Rect, 

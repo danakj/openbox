@@ -364,13 +364,13 @@ void OBFrame::adjustShape()
   
   if (!_client->shaped()) {
     // clear the shape on the frame window
-    XShapeCombineMask(otk::OBDisplay::display, window(), ShapeBounding,
+    XShapeCombineMask(otk::OBDisplay::display, _window, ShapeBounding,
                       _innersize.left,
                       _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
-    XShapeCombineShape(otk::OBDisplay::display, window(), ShapeBounding,
+    XShapeCombineShape(otk::OBDisplay::display, _window, ShapeBounding,
                        _innersize.left,
                        _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);

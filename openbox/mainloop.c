@@ -566,18 +566,25 @@ static gboolean nearest_timeout_wait(ObMainLoop *loop, GTimeVal *tm)
 
 static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 {
+    GSList *it, *next;
+
     gboolean fired = FALSE;
 
     g_get_current_time(&loop->now);
 
-    while (loop->timers != NULL) {
-	ObMainLoopTimer *curr = loop->timers->data; /* get the top element */
+    for (it = loop->timers; it; it = next) {
+	ObMainLoopTimer *curr;
+        
+        next = g_slist_next(it);
+
+	curr = it->data;
+
 	/* since timer_stop doesn't actually free the timer, we have to do our
 	   real freeing in here.
 	*/
 	if (curr->del_me) {
             /* delete the top */
-	    loop->timers = g_slist_delete_link(loop->timers, loop->timers); 
+	    loop->timers = g_slist_delete_link(loop->timers, it); 
 	    g_free(curr);
 	    continue;
 	}
@@ -591,7 +598,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 	   then re-insert.  timers maintain their order and may trigger more
 	   than once if they've waited more than one delay's worth of time.
 	*/
-	loop->timers = g_slist_delete_link(loop->timers, loop->timers);
+	loop->timers = g_slist_delete_link(loop->timers, it);
 	g_time_val_add(&curr->last, curr->delay);
 	if (curr->func(curr->data)) {
             g_time_val_add(&curr->timeout, curr->delay);

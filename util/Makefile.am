@@ -1,7 +1,7 @@
 # util/Makefile.am for Openbox
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@ @NLS@ @TIMEDCACHE@ @NEWWMSPEC@ @INTERLACE@ \
-@ORDEREDPSEUDO@
+@ORDEREDPSEUDO@ @CLOBBER@
 
 bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot

@@ -70,6 +70,8 @@ public:
     Iconify,
     Close,
     ShowWindowMenu,
+    NextWorkspace,
+    PrevWorkspace,
     
     BeginMove,
     BeginResizeUL,

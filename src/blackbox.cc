@@ -1145,6 +1145,7 @@ void Blackbox::restart(const char *prog) {
   shutdown();
 
   if (prog) {
+    putenv(const_cast<char *>(screenList.front()->displayString().c_str()));
     execlp(prog, prog, NULL);
     perror(prog);
   }

@@ -254,8 +254,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   bool place_window = True;
   if (blackbox->isStartup() || isTransient() ||
       client.normal_hint_flags & (PPosition|USPosition)) {
-    setGravityOffsets();
-
+    applyGravity(frame.rect);
 
     if (blackbox->isStartup() ||
         client.rect.intersects(screen->availableArea()))
@@ -315,7 +314,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   if (flags.shaded) {
     flags.shaded = False;
     shade();
-    
+
     /*
       Because the iconic'ness of shaded windows is lost, we need to set the
       state to NormalState so that shaded windows on other workspaces will not
@@ -345,7 +344,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     window was iconified previously.
   */
 
-  setFocusFlag(False);
+  redrawWindowFrame();
 }
 
 
@@ -829,8 +828,7 @@ void BlackboxWindow::reconfigure(void) {
   positionWindows();
   decorate();
 
-  XClearWindow(blackbox->getXDisplay(), frame.window);
-  setFocusFlag(flags.focused);
+  redrawWindowFrame();
 
   configure(frame.rect.x(), frame.rect.y(),
             frame.rect.width(), frame.rect.height());
@@ -846,7 +844,8 @@ void BlackboxWindow::positionWindows(void) {
   XMoveResizeWindow(blackbox->getXDisplay(), frame.window,
                     frame.rect.x(), frame.rect.y(), frame.inside_w,
                     (flags.shaded) ? frame.title_h : frame.inside_h);
-  XSetWindowBorderWidth(blackbox->getXDisplay(), frame.window, frame.border_w);
+  XSetWindowBorderWidth(blackbox->getXDisplay(), frame.window,
+                        frame.border_w);
   XSetWindowBorderWidth(blackbox->getXDisplay(), frame.plate,
                         frame.mwm_border_w);
   XMoveResizeWindow(blackbox->getXDisplay(), frame.plate,
@@ -1405,9 +1404,9 @@ BlackboxWindow *BlackboxWindow::getTransientFor(void) const {
 
 void BlackboxWindow::configure(int dx, int dy,
                                unsigned int dw, unsigned int dh) {
-  bool send_event = (frame.rect.x() != dx || frame.rect.y() != dy);
+  bool send_event = False;
 
-  if ((dw != frame.rect.width()) || (dh != frame.rect.height())) {
+  if (dw != frame.rect.width() || dh != frame.rect.height()) {
     frame.rect.setRect(dx, dy, dw, dh);
     frame.inside_w = frame.rect.width() - (frame.border_w * 2);
     frame.inside_h = frame.rect.height() - (frame.border_w * 2);
@@ -1428,15 +1427,14 @@ void BlackboxWindow::configure(int dx, int dy,
 
     positionWindows();
     decorate();
-    setFocusFlag(flags.focused);
-    redrawAllButtons();
-  } else {
+    redrawWindowFrame();
+  } else if (frame.rect.x() != dx || frame.rect.y() != dy) {
+    send_event = True;
+
     frame.rect.setPos(dx, dy);
 
     XMoveWindow(blackbox->getXDisplay(), frame.window,
                 frame.rect.x(), frame.rect.y());
-
-    if (! flags.moving) send_event = True;
   }
 
   if (send_event && ! flags.moving) {
@@ -1457,8 +1455,8 @@ void BlackboxWindow::configure(int dx, int dy,
     event.xconfigure.above = frame.window;
     event.xconfigure.override_redirect = False;
 
-    XSendEvent(blackbox->getXDisplay(), client.window, True,
-               NoEventMask, &event);
+    XSendEvent(blackbox->getXDisplay(), client.window, False,
+               StructureNotifyMask, &event);
 
     screen->updateNetizenConfigNotify(&event);
   }
@@ -1511,7 +1509,7 @@ bool BlackboxWindow::setInputFocus(void) {
     return True;
   }
 
-  if (! client.rect.intersects(screen->getRect())) {
+  if (! frame.rect.intersects(screen->getRect())) {
     // client is outside the screen, move it to the center
     configure((screen->getWidth() - frame.rect.width()) / 2,
               (screen->getHeight() - frame.rect.height()) / 2,
@@ -1725,7 +1723,7 @@ void BlackboxWindow::maximize(unsigned int button) {
     blackbox_attrib.premax_x = blackbox_attrib.premax_y = 0;
     blackbox_attrib.premax_w = blackbox_attrib.premax_h = 0;
 
-    redrawAllButtons();
+    redrawAllButtons(); // in case it is not called in configure()
     setState(current_state);
     return;
   }
@@ -1739,7 +1737,6 @@ void BlackboxWindow::maximize(unsigned int button) {
 
   const Rect &screen_area = screen->availableArea();
   frame.changing = screen_area;
-  constrain(TopLeft);
 
   switch(button) {
   case 1:
@@ -1764,6 +1761,8 @@ void BlackboxWindow::maximize(unsigned int button) {
     break;
   }
 
+  constrain(TopLeft);
+
   if (flags.shaded) {
     blackbox_attrib.flags ^= AttribShaded;
     blackbox_attrib.attrib ^= AttribShaded;
@@ -1776,7 +1775,7 @@ void BlackboxWindow::maximize(unsigned int button) {
             frame.changing.width(), frame.changing.height());
   if (flags.focused)
     raise();
-  redrawAllButtons();
+  redrawAllButtons(); // in case it is not called in configure()
   setState(current_state);
 }
 
@@ -1823,7 +1822,7 @@ void BlackboxWindow::shade(void) {
                          frame.margin.bottom);
   } else {
     if (! (decorations & Decor_Titlebar))
-      return;
+      return; // can't shade it without a titlebar!
 
     XResizeWindow(blackbox->getXDisplay(), frame.window,
                   frame.inside_w, frame.title_h);
@@ -1884,13 +1883,7 @@ void BlackboxWindow::stick(void) {
 }
 
 
-void BlackboxWindow::setFocusFlag(bool focus) {
-  // only focus a window if it is visible
-  if (focus && !flags.visible)
-    return;
-
-  flags.focused = focus;
-
+void BlackboxWindow::redrawWindowFrame(void) const {
   if (decorations & Decor_Titlebar) {
     if (flags.focused) {
       if (frame.ftitle)
@@ -1966,6 +1959,17 @@ void BlackboxWindow::setFocusFlag(bool focus) {
       XSetWindowBorder(blackbox->getXDisplay(),
                        frame.plate, frame.uborder_pixel);
   }
+}
+
+
+void BlackboxWindow::setFocusFlag(bool focus) {
+  // only focus a window if it is visible
+  if (focus && !flags.visible)
+    return;
+
+  flags.focused = focus;
+
+  redrawWindowFrame();
 
   if (screen->isSloppyFocus() && screen->doAutoRaise()) {
     if (isFocused()) timer->start();
@@ -1981,8 +1985,8 @@ void BlackboxWindow::installColormap(bool install) {
   int i = 0, ncmap = 0;
   Colormap *cmaps = XListInstalledColormaps(blackbox->getXDisplay(),
                                             client.window, &ncmap);
-  XWindowAttributes wattrib;
   if (cmaps) {
+    XWindowAttributes wattrib;
     if (XGetWindowAttributes(blackbox->getXDisplay(),
                              client.window, &wattrib)) {
       if (install) {
@@ -2146,88 +2150,138 @@ void BlackboxWindow::restoreAttributes(void) {
     blackbox_attrib.premax_h = h;
   }
 
-  // with the state set it will then be the map events job to read the window's
-  // state and behave accordingly
+  // with the state set it will then be the map event's job to read the
+  // window's state and behave accordingly
 
   delete net;
 }
 
 
 /*
- * Positions the frame according the the client window position and window
- * gravity.
+ * Positions the Rect r according the the client window position and
+ * window gravity.
  */
-void BlackboxWindow::setGravityOffsets(void) {
-  // x coordinates for each gravity type
-  const int x_west = client.rect.x();
-  const int x_east = client.rect.right() - frame.inside_w + 1;
-  const int x_center = client.rect.left() +
-    ((client.rect.width() - frame.rect.width()) / 2);
-  // y coordinates for each gravity type
-  const int y_north = client.rect.y();
-  const int y_south = client.rect.bottom() - frame.inside_h + 1;
-  const int y_center = client.rect.top() +
-    ((client.rect.height() - frame.rect.height()) / 2);
-
+void BlackboxWindow::applyGravity(Rect &r) {
+  // apply horizontal window gravity
   switch (client.win_gravity) {
   default:
-  case NorthWestGravity: frame.rect.setPos(x_west,   y_north);  break;
-  case NorthGravity:     frame.rect.setPos(x_center, y_north);  break;
-  case NorthEastGravity: frame.rect.setPos(x_east,   y_north);  break;
-  case SouthWestGravity: frame.rect.setPos(x_west,   y_south);  break;
-  case SouthGravity:     frame.rect.setPos(x_center, y_south);  break;
-  case SouthEastGravity: frame.rect.setPos(x_east,   y_south);  break;
-  case WestGravity:      frame.rect.setPos(x_west,   y_center); break;
-  case CenterGravity:    frame.rect.setPos(x_center, y_center); break;
-  case EastGravity:      frame.rect.setPos(x_east,   y_center); break;
+  case NorthWestGravity:
+  case SouthWestGravity:
+  case WestGravity:
+    r.setX(client.rect.x());
+    break;
+
+  case NorthGravity:
+  case SouthGravity:
+  case CenterGravity:
+    r.setX(client.rect.x() - (frame.margin.left + frame.margin.right) / 2);
+    break;
+
+  case NorthEastGravity:
+  case SouthEastGravity:
+  case EastGravity:
+    r.setX(client.rect.x() - frame.margin.left - frame.margin.right);
+    break;
 
   case ForgetGravity:
   case StaticGravity:
-    frame.rect.setPos(client.rect.x() - frame.margin.left,
-                      client.rect.y() - frame.margin.top);
+    r.setX(client.rect.x() - frame.margin.left);
+    break;
+  }
+
+  // apply vertical window gravity
+  switch (client.win_gravity) {
+  default:
+  case NorthWestGravity:
+  case NorthEastGravity:
+  case NorthGravity:
+    r.setY(client.rect.y());
+    break;
+
+  case CenterGravity:
+  case EastGravity:
+  case WestGravity:
+    r.setY(client.rect.y() - (frame.margin.top + frame.margin.bottom) / 2);
+    break;
+
+  case SouthWestGravity:
+  case SouthEastGravity:
+  case SouthGravity:
+    r.setY(client.rect.y() - frame.margin.top - frame.margin.bottom);
+    break;
+
+  case ForgetGravity:
+  case StaticGravity:
+    r.setY(client.rect.y() - frame.margin.top);
     break;
   }
 }
 
 
 /*
- * The reverse of the setGravityOffsets function. Uses the frame window's
- * position to find the window's reference point.
+ * The reverse of the applyGravity function.
+ *
+ * Positions the Rect r according to the frame window position and
+ * window gravity.
  */
-void BlackboxWindow::restoreGravity(void) {
-  // x coordinates for each gravity type
-  const int x_west = frame.rect.x();
-  const int x_east = frame.rect.x() + frame.inside_w - client.rect.width();
-  const int x_center = frame.rect.x() -
-    ((client.rect.width() - frame.rect.width()) / 2);
-  // y coordinates for each gravity type
-  const int y_north = frame.rect.y();
-  const int y_south = frame.rect.y() + frame.inside_h - client.rect.height();
-  const int y_center = frame.rect.y() -
-    ((client.rect.height() - frame.rect.height()) / 2);
-
-  switch(client.win_gravity) {
+void BlackboxWindow::restoreGravity(Rect &r) {
+  // restore horizontal window gravity
+  switch (client.win_gravity) {
   default:
-  case NorthWestGravity: client.rect.setPos(x_west,   y_north);  break;
-  case NorthGravity:     client.rect.setPos(x_center, y_north);  break;
-  case NorthEastGravity: client.rect.setPos(x_east,   y_north);  break;
-  case SouthWestGravity: client.rect.setPos(x_west,   y_south);  break;
-  case SouthGravity:     client.rect.setPos(x_center, y_south);  break;
-  case SouthEastGravity: client.rect.setPos(x_east,   y_south);  break;
-  case WestGravity:      client.rect.setPos(x_west,   y_center); break;
-  case CenterGravity:    client.rect.setPos(x_center, y_center); break;
-  case EastGravity:      client.rect.setPos(x_east,   y_center); break;
+  case NorthWestGravity:
+  case SouthWestGravity:
+  case WestGravity:
+    r.setX(frame.rect.x());
+    break;
+
+  case NorthGravity:
+  case SouthGravity:
+  case CenterGravity:
+    r.setX(frame.rect.x() + (frame.margin.left + frame.margin.right) / 2);
+    break;
+
+  case NorthEastGravity:
+  case SouthEastGravity:
+  case EastGravity:
+    r.setX(frame.rect.x() + frame.margin.left + frame.margin.right);
+    break;
 
   case ForgetGravity:
   case StaticGravity:
-    client.rect.setPos(frame.rect.left() + frame.margin.left,
-                       frame.rect.top() + frame.margin.top);
+    r.setX(frame.rect.x() + frame.margin.left);
+    break;
+  }
+
+  // restore vertical window gravity
+  switch (client.win_gravity) {
+  default:
+  case NorthWestGravity:
+  case NorthEastGravity:
+  case NorthGravity:
+    r.setY(frame.rect.y());
+    break;
+
+  case CenterGravity:
+  case EastGravity:
+  case WestGravity:
+    r.setY(frame.rect.y() + (frame.margin.top + frame.margin.bottom) / 2);
+    break;
+
+  case SouthWestGravity:
+  case SouthEastGravity:
+  case SouthGravity:
+    r.setY(frame.rect.y() + frame.margin.top + frame.margin.bottom);
+    break;
+
+  case ForgetGravity:
+  case StaticGravity:
+    r.setY(frame.rect.y() + frame.margin.top);
     break;
   }
 }
 
 
-void BlackboxWindow::redrawLabel(void) {
+void BlackboxWindow::redrawLabel(void) const {
   if (flags.focused) {
     if (frame.flabel)
       XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
@@ -2264,14 +2318,14 @@ void BlackboxWindow::redrawLabel(void) {
 }
 
 
-void BlackboxWindow::redrawAllButtons(void) {
+void BlackboxWindow::redrawAllButtons(void) const {
   if (frame.iconify_button) redrawIconifyButton(False);
   if (frame.maximize_button) redrawMaximizeButton(flags.maximized);
   if (frame.close_button) redrawCloseButton(False);
 }
 
 
-void BlackboxWindow::redrawIconifyButton(bool pressed) {
+void BlackboxWindow::redrawIconifyButton(bool pressed) const {
   if (! pressed) {
     if (flags.focused) {
       if (frame.fbutton)
@@ -2305,7 +2359,7 @@ void BlackboxWindow::redrawIconifyButton(bool pressed) {
 }
 
 
-void BlackboxWindow::redrawMaximizeButton(bool pressed) {
+void BlackboxWindow::redrawMaximizeButton(bool pressed) const {
   if (! pressed) {
     if (flags.focused) {
       if (frame.fbutton)
@@ -2341,7 +2395,7 @@ void BlackboxWindow::redrawMaximizeButton(bool pressed) {
 }
 
 
-void BlackboxWindow::redrawCloseButton(bool pressed) {
+void BlackboxWindow::redrawCloseButton(bool pressed) const {
   if (! pressed) {
     if (flags.focused) {
       if (frame.fbutton)
@@ -2556,26 +2610,29 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
   if (cr->window != client.window || flags.iconic)
     return;
 
-  int cx = frame.rect.x(), cy = frame.rect.y();
-  unsigned int cw = frame.rect.width(), ch = frame.rect.height();
-
   if (cr->value_mask & CWBorderWidth)
     client.old_bw = cr->border_width;
 
-  if (cr->value_mask & CWX)
-    cx = cr->x - frame.margin.left;
+  if (cr->value_mask & (CWX | CWY | CWWidth | CWHeight)) {
+    Rect req = frame.rect;
 
-  if (cr->value_mask & CWY)
-    cy = cr->y - frame.margin.top;
+    if (cr->value_mask & (CWX | CWY)) {
+      if (cr->value_mask & CWX)
+        client.rect.setX(cr->x);
+      if (cr->value_mask & CWY)
+        client.rect.setY(cr->y);
 
-  if (cr->value_mask & CWWidth)
-    cw = cr->width + frame.margin.left + frame.margin.right;
+      applyGravity(req);
+    }
 
-  if (cr->value_mask & CWHeight)
-    ch = cr->height + frame.margin.top + frame.margin.bottom;
+    if (cr->value_mask & CWWidth)
+      req.setWidth(cr->width + frame.margin.left + frame.margin.right);
 
-  if (frame.rect != Rect(cx, cy, cw, ch))
-    configure(cx, cy, cw, ch);
+    if (cr->value_mask & CWHeight)
+      req.setHeight(cr->height + frame.margin.top + frame.margin.bottom);
+
+    configure(req.x(), req.y(), req.width(), req.height());
+  }
 
   if (cr->value_mask & CWStackMode) {
     switch (cr->detail) {
@@ -3226,7 +3283,7 @@ void BlackboxWindow::restore(bool remap) {
   XSelectInput(blackbox->getXDisplay(), client.window, NoEventMask);
   XSelectInput(blackbox->getXDisplay(), frame.plate, NoEventMask);
 
-  restoreGravity();
+  restoreGravity(client.rect);
 
   XUnmapWindow(blackbox->getXDisplay(), frame.window);
   XUnmapWindow(blackbox->getXDisplay(), client.window);
@@ -3347,7 +3404,7 @@ void BlackboxWindow::changeBlackboxHints(BlackboxHints *net) {
     if (flags.shaded && ! (decorations & Decor_Titlebar))
       shade();
 
-    if (frame.window) {
+    if (flags.visible && frame.window) {
       XMapSubwindows(blackbox->getXDisplay(), frame.window);
       XMapWindow(blackbox->getXDisplay(), frame.window);
     }
@@ -3476,8 +3533,18 @@ void BlackboxWindow::constrain(Corner anchor, int *pw, int *ph) {
   dh -= base_height;
   dh /= client.height_inc;
 
-  if (pw) *pw = dw;
-  if (ph) *ph = dh;
+  if (pw) {
+    if (client.width_inc == 1)
+      *pw = dw + base_width;
+    else
+      *pw = dw;
+  }
+  if (ph) {
+    if (client.height_inc == 1)
+      *ph = dh + base_height;
+    else
+      *ph = dh;
+  }
 
   dw *= client.width_inc;
   dw += base_width;

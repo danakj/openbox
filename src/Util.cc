@@ -188,8 +188,9 @@ string textPropertyToString(Display *display, XTextProperty& text_prop) {
   string ret;
 
   if (text_prop.value && text_prop.nitems > 0) {
-    ret = (char *) text_prop.value;
-    if (text_prop.encoding != XA_STRING) {
+    if (text_prop.encoding == XA_STRING) {
+      ret = (char *) text_prop.value;
+    } else {
       text_prop.nitems = strlen((char *) text_prop.value);
 
       char **list;

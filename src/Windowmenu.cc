@@ -92,7 +92,7 @@ void Windowmenu::show(void) {
 void Windowmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
     return;
-  
+
   BasemenuItem *item = find(index);
 
   hide();
@@ -114,13 +114,15 @@ void Windowmenu::itemSelected(int button, unsigned int index) {
     break;
 
   case BScreen::WindowRaise: {
-    Workspace *wkspc = getScreen()->getWorkspace(window->getWorkspaceNumber());
+    Workspace *wkspc =
+      getScreen()->getWorkspace(window->getWorkspaceNumber());
     wkspc->raiseWindow(window);
   }
     break;
 
   case BScreen::WindowLower: {
-    Workspace *wkspc = getScreen()->getWorkspace(window->getWorkspaceNumber());
+    Workspace *wkspc =
+      getScreen()->getWorkspace(window->getWorkspaceNumber());
     wkspc->lowerWindow(window);
   }
     break;

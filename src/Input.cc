@@ -253,6 +253,32 @@ void BInput::doAction(BlackboxWindow *window, Action action) const {
     if (window && window->isClosable()) window->close();
     return;
 
+  case NextWorkspace: {
+    BScreen *s;
+    unsigned int w;
+    s = _blackbox->getFocusedScreen();
+    if (s) {
+      w = s->getCurrentWorkspaceID();
+      if (++w >= s->getWorkspaceCount())
+        w = 0;
+      s->changeWorkspaceID(w);
+    }
+    return;
+  }
+
+  case PrevWorkspace: {
+    BScreen *s;
+    int w;
+    s = _blackbox->getFocusedScreen();
+    if (s) {
+      w = s->getCurrentWorkspaceID();
+      if (w-- == 0)
+        w = s->getWorkspaceCount() - 1;
+      s->changeWorkspaceID(w);
+    }
+    return;
+  }
+
   case BeginMove:
     if (window && window->isMovable()) {
       Window root_return, child_return;

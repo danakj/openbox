@@ -417,7 +417,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
                HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(),
                                               screen_number)));
   /*
-    If the default depth is at least 15 we will use that,
+    If the default depth is at least 8 we will use that,
     otherwise we try to find the largest TrueColor visual.
     Preference is given to 24 bit over larger depths if 24 bit is an option.
   */
@@ -426,7 +426,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
   visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
   colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
   
-  if (depth < 15) {
+  if (depth < 8) {
     // search for a TrueColor Visual... if we can't find one...
     // we will use the default visual for the screen
     XVisualInfo vinfo_template, *vinfo_return;

@@ -1791,8 +1791,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
   
         /* store the logical size */
         SIZE_SET(self->logical_size,
-                 w + basew / self->size_inc.width,
-                 h + baseh / self->size_inc.height);
+                 self->size_inc.width ? w : w + basew,
+                 self->size_inc.height ? h : h + baseh);
 
         w *= self->size_inc.width;
         h *= self->size_inc.height;

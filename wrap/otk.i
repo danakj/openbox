@@ -67,7 +67,6 @@ namespace otk {
 %include "screeninfo.hh"
 %include "strut.hh"
 
-%apply unsigned long *INOUT { unsigned long *nelements };
 %apply unsigned long *OUTPUT { unsigned long *value };
 %include "property.hh"
 

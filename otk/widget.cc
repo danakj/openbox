@@ -414,7 +414,8 @@ bool OtkWidget::configure(const XConfigureEvent &e)
       _ignore_config--;
     } else {
       std::cout << "configure\n";
-      _dirty = true;
+      if (!(e.width == width() && e.height == height()))
+        _dirty = true;
       _rect.setRect(e.x, e.y, e.width, e.height);
       update();
     }

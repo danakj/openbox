@@ -21,3 +21,4 @@ missing
 install-sh
 depcomp
 config.rpath
+py-compile

@@ -1,3 +1,16 @@
+:
+	* Closed bug #908 (sometimes some weird grab is left)
+	* Closed bug #945 (xawtv overlay visible on every desktop)
+	* Closed bug #944 (remove restarting/reconfiguring messages from
+	openbox.c)
+	* Closed bug #946 (use g_strsplit in parse.c:split_paths())
+	* Closed bug #943 (consistent glib type (gint, gchar, etc.) usage)
+	* Closed bug #951 (stale openbox session files)
+	* Closed bug #947 (Sloppyfocus can yield two windows at the same time
+	with focus (!))
+	* Closed bug #948 (Gets stuck in 'move' mode if mouse is let up while
+	dragged away from title bar)
+
 3.0-rc4:
 	* Closed bug #921 (focus rectangle stays on the screen after modifier
 	 release)
@@ -13,6 +26,8 @@
 	* Don't wrap around in the default keyboard desktop switching bindings
 	* Place parentless dialogs so they avoid always-on-top windows
 	* Ignore fullscreen windows in placing new ones
+	* Closed bug #940 (actions dont work on desktops with no client
+	windows)
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

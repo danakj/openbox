@@ -48,7 +48,7 @@ struct GlftGlyph {
     /* The character in UCS-4 encoding */
     FcChar32 w;
     /* OpenGL display list for the character */
-    unsigned int dlist;
+    unsigned int tnum;
     /* The FT_Face glyph */
     FT_UInt glyph;
 

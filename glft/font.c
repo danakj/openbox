@@ -21,7 +21,7 @@ struct GHashTable *glyph_map = NULL;
 void dest_glyph_map_value(gpointer key, gpointer val, gpointer data)
 {
     struct GlftGlyph *g = val;
-    glDeleteLists(g->dlist, 1);    
+    glDeleteTextures(1, &g->tnum);    
     free(g);
 }
 
@@ -287,9 +287,9 @@ struct GlftGlyph *GlftFontGlyph(struct GlftFont *font, const char *c)
     if (!g) {
         g = malloc(sizeof(struct GlftGlyph));
         g->w = w;
-        g->dlist = glGenLists(1);
+        glGenTextures(1, &g->tnum);
 
-        GlftRenderGlyph(font->face, g->dlist);
+        GlftRenderGlyph(font->face, g->tnum);
 
         if (!(font->spacing == FC_PROPORTIONAL)) {
             g->width = font->max_advance_width;

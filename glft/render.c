@@ -8,83 +8,38 @@
 
 #define TOFLOAT(x) (((x) >> 6) + ((x) & 63)/64.0)
 
-#include FT_OUTLINE_H
-
-struct GlftWalkState {
-    int drawing;
-    float x, y;
-};
-
-static struct GlftWalkState state;
-
-int GlftMoveToFunc(FT_Vector *to, void *user)
+void GlftRenderGlyph(FT_Face face, unsigned int tnum)
 {
-    state.x = TOFLOAT(to->x);
-    state.y = TOFLOAT(to->y);
-    if (state.drawing) {
-        glEnd();
-    }
-    glBegin(GL_LINE_STRIP);
-    glVertex2f(state.x, state.y);
-    state.drawing = 1;
-    return 0;
-}
-
-int GlftLineToFunc(FT_Vector *to, void *user)
-{
-    state.x = TOFLOAT(to->x);
-    state.y = TOFLOAT(to->y);
-    glVertex2f(state.x, state.y);
-    return 0;
-}
-
-int GlftConicToFunc(FT_Vector *c, FT_Vector *to, void *user)
-{
-    float t, u, x, y;
-
-    for (t = 0, u = 1; t < 1.0; t += 1.0/TPOINTS, u = 1.0-t) {
-        x = u*u*state.x + 2*t*u*TOFLOAT(c->x) + t*t*TOFLOAT(to->x);
-        y = u*u*state.y + 2*t*u*TOFLOAT(c->y) + t*t*TOFLOAT(to->y);
-        glVertex2f(x, y);
-    }
-    state.x = TOFLOAT(to->x);
-    state.y = TOFLOAT(to->y);
-    glVertex2f(state.x, state.y);
-    return 0;
-}
-
-int GlftCubicToFunc(FT_Vector *c1, FT_Vector *c2, FT_Vector *to, void 
-*user)
-{
-    GlftLineToFunc(to, user);
-    g_message("cubic not currently rendered properly\n");
-    return 0;
-}
-
-FT_Outline_Funcs GlftFuncs = {
-    GlftMoveToFunc,
-    GlftLineToFunc,
-    GlftConicToFunc,
-    GlftCubicToFunc,
-    0,
-    0
-};
-
-void GlftRenderGlyph(FT_Face face, unsigned int dlist)
-{
+    unsigned char *padbuf;
+    int padx = 1, pady = 1, i;
     int err;
     FT_GlyphSlot slot = face->glyph;
 
-    state.x = 0;
-    state.y = 0;
-    state.drawing = 0;
+    err = FT_Render_Glyph( slot, ft_render_mode_normal );
+        g_assert(!err);
+    printf("bitmap with dims %d, %d\n", slot->bitmap.rows, 
+           slot->bitmap.width);
+    while (padx < slot->bitmap.width)
+       padx <<= 1;
+    while (pady < slot->bitmap.rows)
+       pady <<= 1;
+    printf("padding to %d, %d\n", padx, pady);
+    padbuf = g_new(unsigned char, padx * pady);
+    for (i = 0; i < slot->bitmap.rows; i++)
+        memcpy(padbuf + i*padx,
+               slot->bitmap.buffer + i*slot->bitmap.width,
+               slot->bitmap.width);
+    glBindTexture(GL_TEXTURE_2D, tnum);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, padx, pady,
+                 0, GL_GREEN, GL_UNSIGNED_BYTE, padbuf);
 
-    glNewList(dlist, GL_COMPILE);
-    err = FT_Outline_Decompose(&slot->outline, &GlftFuncs, NULL);
-    g_assert(!err);
-    if (state.drawing)
-        glEnd();
-    glEndList();
+    g_free(padbuf);
 }
 
 void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
@@ -105,7 +60,22 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
         g = GlftFontGlyph(font, c);
         if (g) {
             glTranslatef(GlftFontAdvance(font, p, g), 0.0, 0.0);
-            glCallList(g->dlist);
+            glBindTexture(GL_TEXTURE_2D, g->tnum);
+            glBegin(GL_QUADS);
+            glColor3f(1.0, 1.0, 1.0);
+
+            glTexCoord2i(0, 1);
+            glVertex2i(g->x, g->y);
+
+            glTexCoord2i(1, 1);
+            glVertex2i(g->x + g->width, g->y);
+
+            glTexCoord2i(1, 0);
+            glVertex2i(g->x + g->width ,g->y + g->height);
+
+            glTexCoord2i(0, 0);
+            glVertex2i(g->x, g->y + g->height);
+            glEnd();
         } else
             glTranslatef(font->max_advance_width, 0.0, 0.0);
         p = g;

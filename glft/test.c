@@ -85,6 +85,7 @@ int main(int argc, char **argv)
     glLoadIdentity();
     glOrtho(0, W, -100, H-100, 0, 10);
     glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_TEXTURE_2D);
     quit = 0;
     while (!quit) {
         XNextEvent(display, &report);

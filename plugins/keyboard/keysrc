@@ -2,9 +2,12 @@
 
 # Key [Key...] Action [Argument]
 
-# Key: A list of keys to form a key chain, or just a single key.
-# Each Key a string composed of [<modifier>-]<key>. A Key can have 0 or more
-# modifiers. Valid modifiers are Mod1 ('A' is an alias for this), Mod2, Mod3,
+# Key: A list of keys to form a key chain, or just a single key. Each key in
+# the chain is separated by a space.
+#
+# Each Key is a string composed of [<modifier>-]<key>. A Key can have 0 or more
+# modifiers. Valid modifiers are Control ('C' is an alias for this), Shift
+# ('S' is an alias for this), Mod1 ('A' is an alias for this), Mod2, Mod3,
 # Mod4 ('W' is an alias for this), and Mod5. Valid buttons are defined by the
 # X server. The 'xev' utility can be used to look up the name of a key.
 #

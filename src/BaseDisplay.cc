@@ -91,12 +91,11 @@ using std::string;
 // X error handler to handle any and all X errors while the application is
 // running
 static bool internal_error = False;
-static Window last_bad_window = None;
 
 BaseDisplay *base_display;
 
-#ifdef    DEBUG
 static int handleXErrors(Display *d, XErrorEvent *e) {
+#ifdef    DEBUG
   char errtxt[128];
 
   XGetErrorText(d, e->error_code, errtxt, 128);
@@ -106,10 +105,11 @@ static int handleXErrors(Display *d, XErrorEvent *e) {
           base_display->getApplicationName(), errtxt, e->error_code,
           e->request_code, e->minor_code, e->resourceid);
 #else
-static int handleXErrors(Display *, XErrorEvent *e) {
+  // shutup gcc
+  (void) d;
+  (void) e;
 #endif // DEBUG
 
-  if (e->error_code == BadWindow) last_bad_window = e->resourceid;
   if (internal_error) abort();
 
   return(False);
@@ -179,7 +179,6 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   application_name = app_name;
 
   run_state = STARTUP;
-  last_bad_window = None;
 
   ::base_display = this;
 
@@ -302,11 +301,6 @@ void BaseDisplay::eventLoop(void) {
     if (XPending(display)) {
       XEvent e;
       XNextEvent(display, &e);
-
-      if (last_bad_window != None && e.xany.window == last_bad_window)
-        continue;
-
-      last_bad_window = None;
       process_event(&e);
     } else {
       fd_set rfds;

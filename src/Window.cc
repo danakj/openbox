@@ -1881,11 +1881,13 @@ void BlackboxWindow::setGravityOffsets(void) {
   // x coordinates for each gravity type
   const int x_west = client.rect.x();
   const int x_east = client.rect.right() - frame.inside_w + 1;
-  const int x_center = client.rect.right() - (frame.rect.width()/2) + 1;
+  const int x_center = client.rect.left() +
+    ((client.rect.width() - frame.rect.width()) / 2);
   // y coordinates for each gravity type
   const int y_north = client.rect.y();
   const int y_south = client.rect.bottom() - frame.inside_h + 1;
-  const int y_center = client.rect.bottom() - (frame.rect.height()/2) + 1;
+  const int y_center = client.rect.top() +
+    ((client.rect.height() - frame.rect.height()) / 2);
 
   switch (client.win_gravity) {
   default:
@@ -1916,13 +1918,13 @@ void BlackboxWindow::restoreGravity(void) {
   // x coordinates for each gravity type
   const int x_west = frame.rect.x();
   const int x_east = frame.rect.x() + frame.inside_w - client.rect.width();
-  const int x_center = frame.rect.x() + (frame.rect.width()/2) -
-                       client.rect.width();
+  const int x_center = frame.rect.x() -
+    ((client.rect.width() - frame.rect.width()) / 2);
   // y coordinates for each gravity type
   const int y_north = frame.rect.y();
   const int y_south = frame.rect.y() + frame.inside_h - client.rect.height();
-  const int y_center = frame.rect.y() + (frame.rect.height()/2) -
-                       client.rect.height();
+  const int y_center = frame.rect.y() -
+    ((client.rect.height() - frame.rect.height()) / 2);
 
   switch(client.win_gravity) {
   default:
@@ -2381,7 +2383,7 @@ void BlackboxWindow::buttonPressEvent(XButtonEvent *be) {
     // snap the window menu into a corner if necessary - we check the
     // position of the menu with the coordinates of the client to
     // make the comparisions easier.
-    // ### this needs some work!
+    // XXX: this needs some work!
     if (mx > client.rect.right() -
         static_cast<signed>(windowmenu->getWidth()))
       mx = frame.rect.right() - windowmenu->getWidth() - frame.border_w + 1;

@@ -488,11 +488,14 @@ bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
   spaces.push_back(availableArea); //initially the entire screen is free
 
   //Find Free Spaces
-  BlackboxWindowList::iterator wit = windowList.begin(),
-                               end = windowList.end();
+  BlackboxWindowList::const_iterator wit = windowList.begin(),
+    end = windowList.end();
   Rect tmp;
   for (; wit != end; ++wit) {
     const BlackboxWindow* const curr = *wit;
+
+    if (curr->isShaded()) continue;
+
     tmp.setRect(curr->frameRect().x(), curr->frameRect().y(),
                 curr->frameRect().width() + screen->getBorderWidth(),
                 curr->frameRect().height() + screen->getBorderWidth());

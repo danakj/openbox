@@ -349,6 +349,7 @@
             <xs:enumeration value="ToggleAlwaysOnBottom"/>
             <xs:enumeration value="ToggleAlwaysOnTop"/>
             <xs:enumeration value="ToggleDecorations"/>
+            <xs:enumeration value="ToggleFullscreen"/>
             <xs:enumeration value="ToggleMaximizeFull"/>
             <xs:enumeration value="ToggleMaximizeHorz"/>
             <xs:enumeration value="ToggleMaximizeVert"/>

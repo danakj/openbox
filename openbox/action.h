@@ -271,6 +271,8 @@ void action_maximize_vert(union ActionData *data);
 void action_unmaximize_vert(union ActionData *data);
 /* ClientAction */
 void action_toggle_maximize_vert(union ActionData *data);
+/* ClientAction */
+void action_toggle_fullscreen(union ActionData *data);
 /* SendToDesktop */
 void action_send_to_desktop(union ActionData *data);
 /* SendToDesktopDirection */

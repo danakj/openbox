@@ -592,6 +592,11 @@ ActionString actionstrings[] =
         setup_client_action
     },
     {
+        "togglefullscreen",
+        action_toggle_fullscreen,
+        setup_client_action
+    },
+    {
         "sendtodesktop",
         action_send_to_desktop,
         setup_action_send_to_desktop
@@ -1231,6 +1236,14 @@ void action_toggle_maximize_vert(union ActionData *data)
     client_action_start(data);
     client_maximize(data->client.any.c,
                     !data->client.any.c->max_vert, 2, TRUE);
+    client_action_end(data);
+}
+
+void action_toggle_fullscreen(union ActionData *data)
+{
+    client_action_start(data);
+    client_fullscreen(data->client.any.c,
+                      !(data->client.any.c->fullscreen), TRUE);
     client_action_end(data);
 }
 

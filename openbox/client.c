@@ -1953,27 +1953,46 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         h -= self->base_size.height;
 
         if (self->min_ratio)
-            if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
+            if (h * self->min_ratio > w) {
+                h = (int)(w / self->min_ratio);
+
+                /* you cannot resize to nothing */
+                if (h < 1) {
+                    h = 1;
+                    w = (int)(h * self->min_ratio);
+                }
+            }
         if (self->max_ratio)
-            if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
+            if (h * self->max_ratio < w) {
+                h = (int)(w / self->max_ratio);
+
+                /* you cannot resize to nothing */
+                if (h < 1) {
+                    h = 1;
+                    w = (int)(h * self->min_ratio);
+                }
+            }
 
         w += self->base_size.width;
         h += self->base_size.height;
     }
 
+    g_assert(w > 0);
+    g_assert(h > 0);
+
     switch (anchor) {
     case OB_CORNER_TOPLEFT:
-	break;
+        break;
     case OB_CORNER_TOPRIGHT:
-	x -= w - self->area.width;
-	break;
+        x -= w - self->area.width;
+        break;
     case OB_CORNER_BOTTOMLEFT:
-	y -= h - self->area.height;
-	break;
+        y -= h - self->area.height;
+        break;
     case OB_CORNER_BOTTOMRIGHT:
-	x -= w - self->area.width;
-	y -= h - self->area.height;
-	break;
+        x -= w - self->area.width;
+        y -= h - self->area.height;
+        break;
     }
 
     moved = x != self->area.x || y != self->area.y;

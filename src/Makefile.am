@@ -1,19 +1,18 @@
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
+CXXFLAGS=@CXXFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
--DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
--Dmultibyte\(\)=True
-
-LDFLAGS=`pkg-config --libs xft`
+-DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
 
 INCLUDES= -I../otk
 
 bin_PROGRAMS= openbox
 
 openbox_LDADD=../otk/libotk.a
-openbox_SOURCES= basedisplay.cc configuration.cc screen.cc timer.cc util.cc window.cc workspace.cc xatom.cc blackbox.cc main.cc
+
+openbox_SOURCES= basedisplay.cc configuration.cc screen.cc timer.cc util.cc \
+                 window.cc workspace.cc xatom.cc blackbox.cc main.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

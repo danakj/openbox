@@ -1,9 +1,4 @@
-DEFAULT_MENU=$(pkgdatadir)/menu
-DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
-
 CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
--DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
--DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\" \
 -Dmultibyte\(\)=True
 
 INCLUDES= -I../src
@@ -12,7 +7,8 @@ LDFLAGS=`pkg-config --libs xft`
 
 noinst_LIBRARIES=libotk.a
 
-libotk_a_SOURCES= color.cc font.cc gccache.cc image.cc imagecontrol.cc texture.cc
+libotk_a_SOURCES= color.cc font.cc gccache.cc image.cc imagecontrol.cc \
+                  texture.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

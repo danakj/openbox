@@ -184,6 +184,14 @@ void OBFrame::update()
     // possible letter, all of the letters are valid, and L exists somewhere in
     // the string!
 
+    // the size of the label. this ASSUMES the layout has only buttons other
+    // that the ONE LABEL!!
+    // adds an extra sep so that there's a space on either side of the
+    // titlebar.. note: x = sep, below.
+    _label_area.setWidth(_label_area.width() -
+                         ((_button_iconify_area.width() + sep) *
+                          (layout.size() - 1) + sep));
+
     int x = sep;
     for (int i = 0, len = layout.size(); i < len; ++i) {
       otk::Rect *area;
@@ -216,8 +224,6 @@ void OBFrame::update()
         continue; // just to fuck with g++
       }
       area->setX(x);
-      if (layout[i] != 'L')
-        _label_area.setWidth(_label_area.width() - area->width());
       x += sep + area->width();
     }
   }

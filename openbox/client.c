@@ -1091,8 +1091,11 @@ static void client_change_allowed_actions(Client *self)
 
 void client_reconfigure(Client *self)
 {
+    /* by making this pass FALSE for user, we avoid the emacs event storm where
+       every configurenotify causes an update in its normal hints, i think this
+       is generally what we want anyways... */
     client_configure(self, Corner_TopLeft, self->area.x, self->area.y,
-                     self->area.width, self->area.height, TRUE, TRUE);
+                     self->area.width, self->area.height, FALSE, TRUE);
 }
 
 void client_update_wmhints(Client *self)

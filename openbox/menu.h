@@ -145,6 +145,7 @@ void menu_entry_set_submenu(ObMenuEntry *entry, ObMenu *submenu);
 void menu_add_entry(ObMenu *menu, ObMenuEntry *entry);
 
 ObMenuEntry *menu_find_entry(ObMenu *menu, Window win);
+ObMenuEntry *menu_find_entry_by_submenu(ObMenu *menu, ObMenu *submenu);
 ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y);
 
 void menu_entry_render(ObMenuEntry *self);
@@ -154,7 +155,7 @@ void menu_entry_fire(ObMenuEntry *self);
 void menu_render(ObMenu *self);
 void menu_render_full(ObMenu *self);
 
-//so plugins can call it?
+/*so plugins can call it? */
 void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data, gboolean new);
 void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
 ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key);

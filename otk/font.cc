@@ -51,11 +51,12 @@ BFont::BFont(int screen_num, const string &fontstring,
   
   if (!_xft_init) {
     if (!XftInit(0)) {
-      printf(_("Couldn't initialize Xft version %d.%d.%d.\n\n"),
-             XFT_MAJOR, XFT_MINOR, XFT_REVISION);
+      printf(_("Couldn't initialize Xft.\n\n"));
       ::exit(3);
     }
-    printf(_("Using Xft %d.%d.%d.\n"), XFT_MAJOR, XFT_MINOR, XFT_REVISION);
+    int version = XftGetVersion();
+    printf(_("Using Xft %d.%d.%d.\n"),
+           version / 10000 % 100, version / 100 % 100, version % 100);
     _xft_init = true;
   }
 

@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Nastavitvene izbire
+# Inställningar
 $ #FocusModel
-# Naèin fokusiranja
+# Fokusmodell
 $ #WindowPlacement
-# Postavitev oken
+# Fönsterplacering
 $ #ImageDithering
-# Prelivanje slik
+# Bilddithering
 $ #OpaqueMove
-# Premikanje prosojnih oken
+# Ogenomskinlig fönsterförflyttning
 $ #FullMax
-# Najveèje okno
+# Full maximering
 $ #FocusNew
-# Novo okno dobi fokus
+# Fokus på nya fönster
 $ #FocusLast
-# Spremenjeni fokus okna na namizju
+# Fokusera fönster vid skrivbordsbyte
 $ #ClickToFocus
-# Za fokus kliknite
+# Klicka för fokus
 $ #SloppyFocus
-# Povr¹ni fokus
+# Hafsig fokus
 $ #AutoRaise
-# Samodejno odkrivanje
+# Höj automatiskt
 $ #SmartRows
-# Pametno postavljanje (vrstice)
+# Smart placering (Rader)
 $ #SmartCols
-# Pametno postavljanje (stolpci)
+# Smart placering (Kolumner)
 $ #Cascade
-# Kaskadno postavljanje
+# Kaskadplacering
 $ #LeftRight
-# Od leve proti desni
+# Från vänster
 $ #RightLeft
-# Od desne proti levi
+# Från höger
 $ #TopBottom
-# Od zgoraj navzdol
+# Uppifrån
 $ #BottomTop
-# Od spodaj navzgor
+# Nerifrån

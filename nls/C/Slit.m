@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Re¾a
+# Slit
 $ #SlitDirection
-# Smer re¾e
+# Slitriktning
 $ #SlitPlacement
-# Lega re¾e
+# Slitplacering

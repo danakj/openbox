@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Da
+# Ja
 $ #No
-# Ne
+# Nej
 
 $ #DirectionTitle
-# Smer
+# Riktning
 $ #DirectionHoriz
-# Vodoravno
+# Horisontell
 $ #DirectionVert
-# Navpièno
+# Vertikal
 
 $ #AlwaysOnTop
-# Vselej na vrhu
+# Alltid överst
 
 $ #PlacementTitle
-# Lega
+# Placering
 $ #PlacementTopLeft
-# Na vrhu in levo poravnano
+# Uppe till vänster
 $ #PlacementCenterLeft
-# Navpièno osredninjeno in levo poravnano
+# Mitten till vänster
 $ #PlacementBottomLeft
-# Na dnu in levo poravnano
+# Nere till vänster
 $ #PlacementTopCenter
-# Na vrhu in osredinjeno
+# Uppe i mitten
 $ #PlacementBottomCenter
-# Na dnu in osredinjeno
+# Nere i mitten
 $ #PlacementTopRight
-# Na vrhu in desno poravnano
+# Uppe till höger
 $ #PlacementCenterRight
-# Navpièno osredinjeno in desno poravnano
+# Mitten till höger
 $ #PlacementBottomRight
-# Na dnu in desno poravnano
+# Nere till höger
 
 $ #AutoHide
-# Samodejno skrivanje
+# Göm automatiskt

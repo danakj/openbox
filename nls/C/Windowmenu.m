@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Na delovno povr¹ino...
+# Skicka till...
 $ #Shade
-# Zastri
+# Skugga
 $ #Iconify
-# Pomanj¹aj
+# Ikonifiera
 $ #Maximize
-# Poveèaj
+# Maximera
 $ #Raise
-# Prika¾i
+# Höj
 $ #Lower
-# Zakrij
+# Sänk
 $ #Stick
-# Prilepi
+# Klibbig
 $ #KillClient
-# Zaustavi 
+# Döda klient
 $ #Close
-# Zapusti
+# Stäng

@@ -1,48 +1,48 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: napaka pri poizvedovanju stre¾nika za X.\n  \
-nek upravljalnik oken ¾e teèe v prikazovalniku %s.\n
+# BScreen::BScreen: ett fel inträffade under en förfrågan till X servern.\n  \
+en annan fönsterhanterare körs redan på skärmen %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: upravljenje zaslona %d z videzem 0x%lx globine %d\n
+# BScreen::BScreen: hanterar skärm %d med visuell 0x%lx, färgdjup %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): pisave '%s' ni moè nalo¾iti\n
+# BScreen::LoadStyle(): kunde inte ladda font '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): privzete pisave ni moè nalo¾iti.\n
+# BScreen::LoadStyle(): kunde inte ladda standardfont.\n
 $ #EmptyMenuFile
-# %s: prazna menujska datoteka\n
+# %s: tom menyfil\n
 $ #xterm
 # xterm
 $ #Restart
-# Ponovni zagon
+# Starta om
 $ #Exit
-# Izhod
+# Avsluta
 $ #EXECError
-# BScreen::parseMenuFile: [exec] napaka: oznaki menuja ali ukaza nista doloèeni\n
+# BScreen::parseMenuFile: [exec] fel, ingen menyetikett och/eller kommando definierat\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [exit] fel, ingen menyetikett definierad\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] napaka: oznaki menuja ali datoteke nista doloèeni\n
+# BScreen::parseMenuFile: [style] fel, ingen menyetikett och/eller filnamn definierat\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [config] fel, ingen menyetikett definierad\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] napaka: ime datoteke ni doloèeno\n
+# BScreen::parseMenuFile: [include] fel, inget filnamn definierat\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] napaka: '%s' ni prava datoteka\n
+# BScreen::parseMenuFile: [include] fel, '%s' är inte en vanlig fil\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [submenu] fel, ingen menyetikett definierad\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [restart] fel, ingen menyetikett definiera\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [reconfig] fel, ingen menyetikett definierad\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka: imenik ni doloèen\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fel, ingen katalog definierad\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka: '%s' ni imenik\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fel, '%s' är inte en katalog\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] napaka:, '%s' ne obstaja\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fel, '%s' existerar inte\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] napaka: oznaka menuja ni doloèena\n
+# BScreen::parseMenuFile: [workspaces] fel, ingen menyetikett definierad\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat

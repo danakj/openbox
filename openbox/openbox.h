@@ -32,14 +32,6 @@ extern Window   ob_root;
 /* The state of execution of the window manager */
 extern ObState ob_state;
 
-/*! When set to true, Openbox will exit */
-extern gboolean ob_shutdown;
-/*! When set to true, Openbox will restart instead of shutting down */
-extern gboolean ob_restart;
-/*! When restarting, if this is not NULL, it will be executed instead of
-  restarting Openbox. */
-extern char *ob_restart_path;
-
 /*! Runtime option to specify running on a remote display */
 extern gboolean ob_remote;
 /*! Runtime option to run in synchronous mode */
@@ -47,6 +39,10 @@ extern gboolean ob_sync;
 
 /*! The path of the rc file. If NULL the default paths are searched for one. */
 extern char *ob_rc_path;
+
+void ob_restart_other(const gchar *path);
+void ob_restart();
+void ob_exit();
 
 Cursor ob_cursor(ObCursor cursor);
 

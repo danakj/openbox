@@ -52,23 +52,23 @@
 #ifdef USE_SM
 gboolean    ob_sm_use = TRUE;
 SmcConn     ob_sm_conn;
-gchar      *ob_sm_id = NULL;
+gchar      *ob_sm_id;
 #endif
 
-RrInstance *ob_rr_inst = NULL;
-RrTheme    *ob_rr_theme = NULL;
-Display    *ob_display = NULL;
+RrInstance *ob_rr_inst;
+RrTheme    *ob_rr_theme;
+Display    *ob_display;
 int         ob_screen;
 Window      ob_root;
 ObState     ob_state;
-gboolean    ob_shutdown = FALSE;
-gboolean    ob_restart  = FALSE;
-char       *ob_restart_path = NULL;
-gboolean    ob_remote   = TRUE;
-gboolean    ob_sync     = FALSE;
+gboolean    ob_sync;
 Cursor      ob_cursors[OB_NUM_CURSORS];
 KeyCode     ob_keys[OB_NUM_KEYS];
-char       *ob_rc_path  = NULL;
+char       *ob_rc_path;
+
+static gboolean  shutdown;
+static gboolean  restart;
+static char     *restart_path;
 
 static void signal_handler(const ObEvent *e, void *data);
 static void parse_args(int argc, char **argv);
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
 	client_manage_all();
 
 	ob_state = OB_STATE_RUNNING;
-	while (!ob_shutdown)
+	while (!shutdown)
 	    event_loop();
 	ob_state = OB_STATE_EXITING;
 
@@ -292,18 +292,18 @@ int main(int argc, char **argv)
 
     XCloseDisplay(ob_display);
 
-    if (ob_restart) {
-        if (ob_restart_path != NULL) {
+    if (restart) {
+        if (restart_path != NULL) {
             int argcp;
             char **argvp;
             GError *err = NULL;
 
             /* run other shit */
-            if (g_shell_parse_argv(ob_restart_path, &argcp, &argvp, &err)) {
+            if (g_shell_parse_argv(restart_path, &argcp, &argvp, &err)) {
                 execvp(argvp[0], argvp);
                 g_strfreev(argvp);
             } else {
-                g_warning("failed to execute '%s': %s", ob_restart_path,
+                g_warning("failed to execute '%s': %s", restart_path,
                           err->message);
             }
         }
@@ -473,7 +473,7 @@ static void signal_handler(const ObEvent *e, void *data)
     switch (s) {
     case SIGUSR1:
 	fprintf(stderr, "Caught SIGUSR1 signal. Restarting.");
-	ob_shutdown = ob_restart = TRUE;
+        ob_restart();
 	break;
 
     case SIGHUP:
@@ -481,7 +481,7 @@ static void signal_handler(const ObEvent *e, void *data)
     case SIGTERM:
     case SIGPIPE:
 	fprintf(stderr, "Caught signal %d. Exiting.", s);
-	ob_shutdown = TRUE;
+        ob_exit();
 	break;
 
     case SIGFPE:
@@ -570,7 +570,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
 
 static void sm_die(SmcConn conn, SmPointer data)
 {
-    ob_shutdown = TRUE;
+    ob_exit();
     g_message("got DIE from session manager");
 }
 
@@ -590,6 +590,23 @@ static void exit_with_error(gchar *msg)
     g_critical(msg);
     sm_shutdown();
     exit(EXIT_FAILURE);
+}
+
+void ob_restart_other(const gchar *path)
+{
+    restart_path = g_strdup(path);
+    ob_restart();
+}
+
+void ob_restart()
+{
+    restart = TRUE;
+    ob_exit();
+}
+
+void ob_exit()
+{
+    shutdown = TRUE;
 }
 
 Cursor ob_cursor(ObCursor cursor)

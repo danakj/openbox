@@ -149,28 +149,7 @@ void event_loop()
     struct timeval *wait;
     gboolean had_event = FALSE;
 
-    while (TRUE) {
-	/*
-	  There are slightly different event retrieval semantics here for
-	  local (or high bandwidth) versus remote (or low bandwidth)
-	  connections to the display/Xserver.
-	*/
-	if (ob_remote) {
-	    if (!XPending(ob_display))
-		break;
-	} else {
-	    /*
-	      This XSync allows for far more compression of events, which
-	      makes things like Motion events perform far far better. Since
-	      it also means network traffic for every event instead of every
-	      X events (where X is the number retrieved at a time), it
-	      probably should not be used for setups where Openbox is
-	      running on a remote/low bandwidth display/Xserver.
-	    */
-	    XSync(ob_display, FALSE);
-	    if (!XEventsQueued(ob_display, QueuedAlready))
-		break;
-	}
+    while (XPending(ob_display)) {
 	XNextEvent(ob_display, &e);
 
 #ifdef USE_LIBSN

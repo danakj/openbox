@@ -1121,13 +1121,12 @@ void action_moveresize(union ActionData *data)
 
 void action_restart(union ActionData *data)
 {
-    ob_restart_path = g_strdup(data->execute.path);
-    ob_shutdown = ob_restart = TRUE;
+    ob_restart_other(data->execute.path);
 }
 
 void action_exit(union ActionData *data)
 {
-    ob_shutdown = TRUE;
+    ob_exit();
 }
 
 void action_showmenu(union ActionData *data)

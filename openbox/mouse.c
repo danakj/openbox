@@ -142,7 +142,7 @@ void mouse_unbind_all()
                 GSList *it;
 
                 for (it = b->actions[j]; it; it = it->next)
-                    action_free(it->data);
+                    action_unref(it->data);
                 g_slist_free(b->actions[j]);
             }
             g_free(b);

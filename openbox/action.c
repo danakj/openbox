@@ -65,18 +65,25 @@ typedef struct
     void (*setup)(ObAction **, ObUserAction uact);
 } ActionString;
 
-static ObAction *action_new(void (*func)(union ActionData *data),
-                            ObUserAction uact)
+static ObAction *action_new(void (*func)(union ActionData *data))
 {
     ObAction *a = g_new0(ObAction, 1);
+    a->ref = 1;
     a->func = func;
 
     return a;
 }
 
-void action_free(ObAction *a)
+void action_ref(ObAction *a)
+{
+    ++a->ref;
+}
+
+void action_unref(ObAction *a)
 {
     if (a == NULL) return;
+
+    if (--a->ref > 0) return;
 
     /* deal with pointers */
     if (a->func == action_execute || a->func == action_restart)
@@ -359,7 +366,7 @@ void setup_action_showmenu(ObAction **a, ObUserAction uact)
        assumptions that there is only one menu (and submenus) open at
        a time! */
     if (uact == OB_USER_ACTION_MENU_SELECTION) {
-        action_free(*a);
+        action_unref(*a);
         a = NULL;
     }
 }
@@ -772,7 +779,7 @@ ObAction *action_from_string(const gchar *name, ObUserAction uact)
     for (i = 0; actionstrings[i].name; i++)
         if (!g_ascii_strcasecmp(name, actionstrings[i].name)) {
             exist = TRUE;
-            a = action_new(actionstrings[i].func, uact);
+            a = action_new(actionstrings[i].func);
             if (actionstrings[i].setup)
                 actionstrings[i].setup(&a, uact);
             /* only key bindings can be interactive. thus saith the xor.

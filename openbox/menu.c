@@ -326,7 +326,7 @@ void menu_entry_free(ObMenuEntry *self)
         case OB_MENU_ENTRY_TYPE_NORMAL:
             g_free(self->data.normal.label);
             while (self->data.normal.actions) {
-                action_free(self->data.normal.actions->data);
+                action_unref(self->data.normal.actions->data);
                 self->data.normal.actions =
                     g_slist_delete_link(self->data.normal.actions,
                                         self->data.normal.actions);

@@ -152,7 +152,8 @@ union ActionData {
 };
 
 struct _ObAction {
-    ObUserAction act;
+    guint ref;
+
     /* The func member acts like an enum to tell which one of the structs in
        the data union are valid.
     */
@@ -176,7 +177,8 @@ struct _ObAction {
 ObAction *action_from_string(const gchar *name, ObUserAction uact);
 ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        ObUserAction uact);
-void action_free(ObAction *a);
+void action_ref(ObAction *a);
+void action_unref(ObAction *a);
 
 /*! Executes a list of actions.
   @param c The client associated with the action. Can be NULL.

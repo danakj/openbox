@@ -30,6 +30,8 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
     sur->h = 1;
     sur->visible = 0;
     sur->children = NULL;
+    sur->pixmap = None;
+    sur->glxpixmap = None;
     return sur;
 }
 
@@ -55,6 +57,8 @@ struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
     sur->win = None;
     sur->parent = NULL;
     sur->visible = 0;
+    sur->pixmap = None;
+    sur->glxpixmap = None;
     return sur;
 }
 
@@ -70,6 +74,8 @@ struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
     sur->win = win;
     sur->parent = NULL;
     sur->visible = 0;
+    sur->pixmap = None;
+    sur->glxpixmap = None;
 
     RrInstaceAddSurface(sur);
     return sur;
@@ -89,6 +95,8 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
     sur->inst = parent->inst;
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
+    sur->pixmap = None;
+    sur->glxpixmap = None;
     RrSurfaceShow(sur);
 
     parent->children = g_slist_append(parent->children, sur);
@@ -99,6 +107,8 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
 
 void RrSurfaceCopy(struct RrSurface *dest, struct RrSurface *src)
 {
+    int i;
+
     dest->type = src->type;
     switch (dest->type) {
     case RR_SURFACE_PLANAR:
@@ -110,11 +120,20 @@ void RrSurfaceCopy(struct RrSurface *dest, struct RrSurface *src)
     case RR_SURFACE_NONE:
         break;
     }
+    for (i = 0; i < dest->ntextures; i++)
+        RrTextureFreeContents(&dest->texture[i]);
     free(dest->texture);
     dest->ntextures = src->ntextures;
-    dest->texture = malloc(sizeof(struct RrTexture) * dest->ntextures);
+    if (dest->ntextures)
+        dest->texture = malloc(sizeof(struct RrTexture) * dest->ntextures);
     memcpy(dest->texture, src->texture,
            sizeof(struct RrTexture) * dest->ntextures);
+    if (dest->pixmap) {
+        glXDestroyGLXPixmap(RrDisplay(dest->inst), dest->glxpixmap);
+        XFreePixmap(RrDisplay(dest->inst), dest->pixmap);
+    }
+    dest->pixmap = None;
+    dest->glxpixmap = None;
 }
 
 void RrSurfaceFree(struct RrSurface *sur)
@@ -131,6 +150,14 @@ void RrSurfaceFree(struct RrSurface *sur)
             free(sur->texture);
         if (sur->parent && sur->win)
             XDestroyWindow(RrDisplay(sur->inst), sur->win);
+        if (sur->glxpixmap != None) {
+            glXDestroyGLXPixmap(RrDisplay(sur->inst), sur->glxpixmap);
+            sur->glxpixmap = None;
+        }
+        if (sur->pixmap != None) {
+            XFreePixmap(RrDisplay(sur->inst), sur->pixmap);
+            sur->pixmap = None;
+        }
         free(sur);
     }
 }

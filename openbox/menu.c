@@ -582,6 +582,7 @@ void menu_control_keyboard_nav(unsigned int key)
     }
     default:
         ((ObMenu *)menu_visible->data)->hide(menu_visible->data);
+        current_menu = NULL;
     }
     return;
 }

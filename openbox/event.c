@@ -251,6 +251,9 @@ void event_process(XEvent *e)
            caused, like when lowering a window */
         if (e->xcrossing.mode == NotifyGrab) return;
 	break;
+    default:
+        event_lasttime = CurrentTime;
+        break;
     }
 
     client = g_hash_table_lookup(client_map, &window);

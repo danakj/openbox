@@ -21,24 +21,39 @@ typedef struct {
 #define CLIENT_MENU(m) ((Menu *)m)
 #define CLIENT_MENU_DATA(m) ((Client_Menu_Data *)((Menu *)m)->plugin_data)
 
-
 void client_menu_clean_up(Menu *m) {
 }
 
 void client_send_to_update(Menu *self)
 {
-    guint i;
+    guint i = 0;
+    GList *it = self->entries;
     
-    for (i = 0; i < screen_num_desktops; ++i) {
-        MenuEntry *e;
-        Action *a = action_from_string("sendtodesktop");
-        a->data.sendto.desk = i;
-        a->data.sendto.follow = FALSE;
-        e = menu_entry_new(screen_desktop_names[i], a);
-        menu_add_entry(self, e);
+    /* check if we have to update. lame */
+    while (it != NULL) {
+        if (i >= screen_num_desktops)
+            break;
+        if (strcmp(screen_desktop_names[i],
+                   ((MenuEntry *)it->data)->label) != 0)
+            break;
+        ++i;
+        it = it->next;
     }
 
-    menu_render_full(self);
+    if (it != NULL || i != screen_num_desktops) {
+        menu_clear(self);
+        g_message("update");
+        for (i = 0; i < screen_num_desktops; ++i) {
+            MenuEntry *e;
+            Action *a = action_from_string("sendtodesktop");
+            a->data.sendto.desk = i;
+            a->data.sendto.follow = FALSE;
+            e = menu_entry_new(screen_desktop_names[i], a);
+            menu_add_entry(self, e);
+        }
+
+        menu_render_full(self);
+    }
 }
 
 void client_menu_show(Menu *self, int x, int y, Client *client)

@@ -438,6 +438,8 @@ static void event_handle_client(Client *client, XEvent *e)
 	client_unmanage(client);
 	break;
     case MapRequest:
+        if (!client->iconic) break; /* this normal doesn't happen, but if it
+                                       does, we don't want it! */
         if (screen_showing_desktop)
             screen_show_desktop(FALSE);
         client_iconify(client, FALSE, TRUE);

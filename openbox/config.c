@@ -44,22 +44,26 @@ void config_parse()
 {
     FILE *file;
     char *path;
+    gboolean load = FALSE;
 
-    /* load the system wide rc file first */
-    path = g_build_filename(RCDIR, "rc3", NULL);
-    if ((file = fopen(path, "r")) != NULL) {
-        cparse_go(path, file);
-        fclose(file);
-    }
-    g_free(path);
-
-    /* then load the user one which can override it */
+    /* load the user rc */
     path = g_build_filename(g_get_home_dir(), ".openbox", "rc3", NULL);
     if ((file = fopen(path, "r")) != NULL) {
         cparse_go(path, file);
         fclose(file);
+        load = TRUE;
     }
     g_free(path);
+    g_free(path);
+
+    if (!load) {
+        /* load the system wide rc */
+        path = g_build_filename(RCDIR, "rc3", NULL);
+        if ((file = fopen(path, "r")) != NULL) {
+            cparse_go(path, file);
+            fclose(file);
+        }
+    }
 }
 
 gboolean config_set(char *name, ConfigValueType type, ConfigValue value)

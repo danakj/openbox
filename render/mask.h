@@ -9,4 +9,7 @@ typedef struct {
   guint w, h;
 } pixmap_mask;
 
+pixmap_mask *pixmap_mask_new(int w, int h, char *data);
+void pixmap_mask_free(pixmap_mask *m);
+
 #endif

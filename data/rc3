@@ -291,7 +291,7 @@
     <mousebind button="A-Down" action="click">
       <action name="desktopleft"/>
     </mousebind>
-    <mousebind button="Middle" action="press">
+    <mousebind button="Right" action="press">
       <action name="showmenu"><menu>root</menu></action>
     </mousebind>
   </context>

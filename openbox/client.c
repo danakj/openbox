@@ -253,7 +253,8 @@ void client_manage(Window window)
     focus_order_add_new(self);
 
     /* focus the new window? */
-    if (ob_state != State_Starting && config_focus_new) {
+    if (ob_state != State_Starting && config_focus_new &&
+        (self->type == Type_Normal || self->type == Type_Dialog)) {
         gboolean group_foc = FALSE;
         
         if (self->group) {
@@ -268,11 +269,9 @@ void client_manage(Window window)
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
-        if (((self->type == Type_Normal ||
-              (self->type == Type_Dialog &&
-               (group_foc ||
-                (!self->transient_for && (!self->group ||
-                                          !self->group->members->next)))))) ||
+        if ((group_foc ||
+             (!self->transient_for && (!self->group ||
+                                       !self->group->members->next))) ||
             client_search_focus_tree_full(self) ||
             !focus_client ||
             !client_normal(focus_client)) {

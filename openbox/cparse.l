@@ -16,7 +16,7 @@ static int yywrap();
 
 number [0-9]+
 string \"[^"\n]*\"
-identifier [a-zA-Z][a-zA-Z0-9_]*
+identifier [a-zA-Z][a-zA-Z0-9_.]*
 white [ \t]*
 assign {white}={white}
 

@@ -2721,3 +2721,12 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
     }
     return NULL;
 }
+
+gchar* client_get_sm_client_id(ObClient *self)
+{
+    gchar *id = NULL;
+
+    if (!PROP_GETS(self->window, sm_client_id, locale, &id) && self->group)
+        PROP_GETS(self->group->leader, sm_client_id, locale, &id);
+    return id;
+}

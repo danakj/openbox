@@ -469,4 +469,6 @@ void client_set_layer(ObClient *self, int layer);
 
 guint client_monitor(ObClient *self);
 
+gchar* client_get_sm_client_id(ObClient *self);
+
 #endif

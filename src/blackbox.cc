@@ -328,7 +328,8 @@ void Blackbox::process_event(XEvent *e) {
         focus = True;
       }
 
-      if (focus && (win->isTransient() || win->getScreen()->doFocusNew()))
+      if (focus && (win->isTransient() || win->getScreen()->doFocusNew()) &&
+          win->isVisible())
         win->setInputFocus();
     } else {
       BScreen *screen = searchScreen(e->xmaprequest.parent);

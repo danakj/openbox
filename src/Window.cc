@@ -1541,8 +1541,8 @@ void BlackboxWindow::configureShape(void) {
 bool BlackboxWindow::setInputFocus(void) {
   if (flags.focused) return True;
 
-  assert((flags.stuck ||  // window must be on the current workspace or sticky
-          blackbox_attrib.workspace == screen->getCurrentWorkspaceID()));
+  assert(flags.stuck ||  // window must be on the current workspace or sticky
+         blackbox_attrib.workspace == screen->getCurrentWorkspaceID());
 
   /*
      We only do this check for normal windows and dialogs because other windows

@@ -1223,7 +1223,7 @@ void action_send_to_desktop_up(union ActionData *data)
 
 void action_toggle_decorations(union ActionData *data)
 {
-    ObClient *c = data->client.c;;
+    ObClient *c = data->client.c;
 
     if (!c) return;
 

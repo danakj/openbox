@@ -5,7 +5,7 @@ SUBDIRS = keyboard mouse placement
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\"
 
-plugin_LTLIBRARIES=focus.la resistance.la
+plugin_LTLIBRARIES=resistance.la
 
 focus_la_CPPFLAGS=-DG_LOG_DOMAIN=\"Plugin-Focus\"
 focus_la_LDFLAGS=-module -avoid-version

@@ -1465,7 +1465,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 {
     if (self->iconic == iconic) return; /* nothing to do */
 
-    g_message("%sconifying window: 0x%lx\n", (iconic ? "I" : "Uni"),
+    g_message("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
 	      self->window);
 
     self->iconic = iconic;

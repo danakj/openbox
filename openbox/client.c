@@ -2209,8 +2209,18 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
     h = self->area.height;
 
     if (max) {
-        if (savearea)
-            self->pre_max_area = self->area;
+        if (savearea) {
+            if ((dir == 0 || dir == 1) && !self->max_horz) { /* horz */
+                RECT_SET(self->pre_max_area,
+                         self->area.x, self->pre_max_area.y,
+                         self->area.width, self->pre_max_area.height);
+            }
+            if ((dir == 0 || dir == 2) && !self->max_vert) { /* vert */
+                RECT_SET(self->pre_max_area,
+                         self->pre_max_area.x, self->area.y,
+                         self->pre_max_area.width, self->area.height);
+            }
+        }
     } else {
         Rect *a;
 

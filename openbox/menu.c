@@ -1,11 +1,12 @@
 #include "menu.h"
 #include "openbox.h"
+#include "stacking.h"
 #include "render/theme.h"
 
 static GHashTable *menu_hash = NULL;
 GHashTable *menu_map = NULL;
 
-#define TITLE_EVENTMASK (ButtonMotionMask)
+#define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 
@@ -17,7 +18,6 @@ void menu_destroy_hash_key(gpointer data)
 void menu_destroy_hash_value(Menu *self)
 {
     GList *it;
-    MenuRenderData *data = self->render_data;
 
     for (it = self->entries; it; it = it->next)
         menu_entry_free(it->data);
@@ -26,30 +26,29 @@ void menu_destroy_hash_value(Menu *self)
     g_free(self->label);
     g_free(self->name);
 
-    g_hash_table_remove(menu_map, &data->title);
-    g_hash_table_remove(menu_map, &data->frame);
-    g_hash_table_remove(menu_map, &data->items);
+    g_hash_table_remove(menu_map, &self->title);
+    g_hash_table_remove(menu_map, &self->frame);
+    g_hash_table_remove(menu_map, &self->items);
 
-    appearance_free(data->a_title);
-    XDestroyWindow(ob_display, data->title);
-    XDestroyWindow(ob_display, data->frame);
-    XDestroyWindow(ob_display, data->items);
+    appearance_free(self->a_title);
+    XDestroyWindow(ob_display, self->title);
+    XDestroyWindow(ob_display, self->frame);
+    XDestroyWindow(ob_display, self->items);
 
     g_free(self);
 }
 
 void menu_entry_free(MenuEntry *self)
 {
-    MenuEntryRenderData *data = self->render_data;
-
     g_free(self->label);
-    g_free(self->render_data);
     action_free(self->action);
 
-    g_hash_table_remove(menu_map, &data->item);
+    g_hash_table_remove(menu_map, &self->item);
 
-    appearance_free(data->a_item);
-    XDestroyWindow(ob_display, data->item);
+    appearance_free(self->a_item);
+    appearance_free(self->a_disabled);
+    appearance_free(self->a_hilite);
+    XDestroyWindow(ob_display, self->item);
 
     g_free(self);
 }
@@ -93,7 +92,6 @@ Menu *menu_new(char *label, char *name, Menu *parent)
 {
     XSetWindowAttributes attrib;
     Menu *self;
-    MenuRenderData *data;
 
     self = g_new0(Menu, 1);
     self->label = g_strdup(label);
@@ -105,30 +103,26 @@ Menu *menu_new(char *label, char *name, Menu *parent)
     self->invalid = FALSE;
     /* default controllers? */
 
-    data = g_new(MenuRenderData, 1);
-
     attrib.override_redirect = TRUE;
-    data->frame = createWindow(ob_root, CWOverrideRedirect, &attrib);
+    self->frame = createWindow(ob_root, CWOverrideRedirect, &attrib);
     attrib.event_mask = TITLE_EVENTMASK;
-    data->title = createWindow(data->frame, CWEventMask, &attrib);
-    data->items = createWindow(data->frame, 0, &attrib);
+    self->title = createWindow(self->frame, CWEventMask, &attrib);
+    self->items = createWindow(self->frame, 0, &attrib);
 
-    XSetWindowBorderWidth(ob_display, data->frame, theme_bwidth);
-    XSetWindowBorderWidth(ob_display, data->title, theme_bwidth);
-    XSetWindowBorder(ob_display, data->frame, theme_b_color->pixel);
-    XSetWindowBorder(ob_display, data->title, theme_b_color->pixel);
+    XSetWindowBorderWidth(ob_display, self->frame, theme_bwidth);
+    XSetWindowBorderWidth(ob_display, self->title, theme_bwidth);
+    XSetWindowBorder(ob_display, self->frame, theme_b_color->pixel);
+    XSetWindowBorder(ob_display, self->title, theme_b_color->pixel);
 
-    XMapWindow(ob_display, data->title);
-    XMapWindow(ob_display, data->items);
+    XMapWindow(ob_display, self->title);
+    XMapWindow(ob_display, self->items);
 
-    data->a_title = appearance_copy(theme_a_menu_title);
-    data->a_items = appearance_copy(theme_a_menu);
+    self->a_title = appearance_copy(theme_a_menu_title);
+    self->a_items = appearance_copy(theme_a_menu);
 
-    self->render_data = data;
-
-    g_hash_table_insert(menu_map, &data->frame, self);
-    g_hash_table_insert(menu_map, &data->title, self);
-    g_hash_table_insert(menu_map, &data->items, self);
+    g_hash_table_insert(menu_map, &self->frame, self);
+    g_hash_table_insert(menu_map, &self->title, self);
+    g_hash_table_insert(menu_map, &self->items, self);
     g_hash_table_insert(menu_hash, g_strdup(name), self);
     return self;
 }
@@ -142,13 +136,15 @@ MenuEntry *menu_entry_new_full(char *label, Action *action,
                                MenuEntryRenderType render_type,
                                gpointer submenu)
 {
-    MenuEntry *menu_entry = g_new(MenuEntry, 1);
+    MenuEntry *menu_entry = g_new0(MenuEntry, 1);
 
     menu_entry->label = g_strdup(label);
     menu_entry->render_type = render_type;
     menu_entry->action = action;
 
-    menu_entry->render_data = NULL;
+    menu_entry->hilite = FALSE;
+    menu_entry->enabled = TRUE;
+
     menu_entry->submenu = submenu;
 
     return menu_entry;
@@ -166,37 +162,32 @@ void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu)
 
 void menu_add_entry(Menu *menu, MenuEntry *entry)
 {
-    MenuEntryRenderData *data;
     XSetWindowAttributes attrib;
 
-    g_assert(menu != NULL && entry != NULL && entry->render_data == NULL);
+    g_assert(menu != NULL && entry != NULL && entry->item == None);
 
     menu->entries = g_list_append(menu->entries, entry);
     entry->parent = menu;
 
-    data = g_new(MenuEntryRenderData, 1);
-    data->item = createWindow(((MenuRenderData*)menu->render_data)->items,
-                              0, &attrib);
-    XMapWindow(ob_display, data->item);
-    data->a_item = appearance_copy(theme_a_menu_item);
-
-    entry->render_data = data;
+    attrib.event_mask = ENTRY_EVENTMASK;
+    entry->item = createWindow(menu->items, CWEventMask, &attrib);
+    XMapWindow(ob_display, entry->item);
+    entry->a_item = appearance_copy(theme_a_menu_item);
+    entry->a_disabled = appearance_copy(theme_a_menu_disabled);
+    entry->a_hilite = appearance_copy(theme_a_menu_hilite);
 
     menu->invalid = TRUE;
 
-    g_hash_table_insert(menu_map, &data->item, menu);
+    g_hash_table_insert(menu_map, &entry->item, menu);
 }
 
 void menu_show(char *name, int x, int y, Client *client)
 {
     Menu *self;
-    MenuRenderData *data;
     GList *it;
-    int w = 1;
     int items_h;
-    int item_h = 0, nitems = 0; /* each item, only one is used */
+    int nitems = 0; /* each item, only one is used */
     int item_y;
-    int bullet_w;
 
     self = g_hash_table_lookup(menu_hash, name);
     if (!self) {
@@ -205,58 +196,99 @@ void menu_show(char *name, int x, int y, Client *client)
         return;
     }
 
-    data = self->render_data;
+    self->width = 1;
+    self->item_h = 0;
 
     /* set texture data and size them mofos out */
-    data->a_title->texture[0].data.text.string = self->label;
-    appearance_minsize(data->a_title, &data->title_min_w, &data->title_h);
-    data->title_min_w += theme_bevel * 2;
-    data->title_h += theme_bevel * 2;
-    w = MAX(w, data->title_min_w);
+    self->a_title->texture[0].data.text.string = self->label;
+    appearance_minsize(self->a_title, &self->title_min_w, &self->title_h);
+    self->title_min_w += theme_bevel * 2;
+    self->title_h += theme_bevel * 2;
+    self->width = MAX(self->width, self->title_min_w);
 
     for (it = self->entries; it; it = it->next) {
-        MenuEntryRenderData *r = ((MenuEntry*)it->data)->render_data;
+        MenuEntry *e = it->data;
+        int h;
 
-        r->a_item->texture[0].data.text.string = ((MenuEntry*)it->data)->label;
-        appearance_minsize(r->a_item, &r->min_w, &item_h);
-        r->min_w += theme_bevel * 2;
-        item_h += theme_bevel * 2;
-        w = MAX(w, r->min_w);
+        e->a_item->texture[0].data.text.string = e->label;
+        appearance_minsize(e->a_item, &e->min_w, &self->item_h);
+        self->width = MAX(self->width, e->min_w);
+
+        e->a_disabled->texture[0].data.text.string = e->label;
+        appearance_minsize(e->a_disabled, &e->min_w, &h);
+        self->item_h = MAX(self->item_h, h);
+        self->width = MAX(self->width, e->min_w);
+
+        e->a_hilite->texture[0].data.text.string = e->label;
+        appearance_minsize(e->a_hilite, &e->min_w, &h);
+        self->item_h = MAX(self->item_h, h);
+        self->width = MAX(self->width, e->min_w);
+
+        e->min_w += theme_bevel * 2;
         ++nitems;
     }
-    bullet_w = item_h + theme_bevel;
-    w += 2 * bullet_w;
-    items_h = item_h * nitems;
+    self->bullet_w = self->item_h + theme_bevel;
+    self->width += 2 * self->bullet_w;
+    self->item_h += theme_bevel * 2;
+    items_h = self->item_h * nitems;
 
-    /* size appearances */
-    RECT_SET(data->a_title->area, 0, 0, w, data->title_h);
-    RECT_SET(data->a_title->texture[0].position, 0, 0, w, data->title_h);
-    RECT_SET(data->a_items->area, 0, 0, w, items_h);
+    RECT_SET(self->a_title->area, 0, 0, self->width, self->title_h);
+    RECT_SET(self->a_title->texture[0].position, 0, 0, self->width,
+             self->title_h);
+    RECT_SET(self->a_items->area, 0, 0, self->width, items_h);
+
+    XMoveResizeWindow(ob_display, self->frame, x, y, self->width,
+                      self->title_h + items_h);
+    XMoveResizeWindow(ob_display, self->title, -theme_bwidth, -theme_bwidth,
+                      self->width, self->title_h);
+    XMoveResizeWindow(ob_display, self->items, 0, self->title_h + theme_bwidth,
+                      self->width, items_h);
+
+    paint(self->title, self->a_title);
+    paint(self->items, self->a_items);
+
+    item_y = 0;
     for (it = self->entries; it; it = it->next) {
-        MenuEntryRenderData *r = ((MenuEntry*)it->data)->render_data;
-        RECT_SET(r->a_item->area, 0, 0, w, item_h);
-        RECT_SET(r->a_item->texture[0].position, bullet_w, 0,
-                 w - 2 * bullet_w, item_h);
+        ((MenuEntry*)it->data)->y = item_y;
+        menu_entry_render(it->data);
+        item_y += self->item_h;
     }
 
-    /* size windows and paint the suckers */
-    XMoveResizeWindow(ob_display, data->frame, x, y, w,
-                      data->title_h + items_h);
-    XMoveResizeWindow(ob_display, data->title, -theme_bwidth, -theme_bwidth,
-                      w, data->title_h);
-    paint(data->title, data->a_title);
-    XMoveResizeWindow(ob_display, data->items, 0, data->title_h + theme_bwidth,
-                      w, items_h);
-    paint(data->items, data->a_items);
-    for (item_y = 0, it = self->entries; it; item_y += item_h, it = it->next) {
-        MenuEntryRenderData *r = ((MenuEntry*)it->data)->render_data;
-        XMoveResizeWindow(ob_display, r->item, 0, item_y, w, item_h);
-        r->a_item->surface.data.planar.parent = data->a_items;
-        r->a_item->surface.data.planar.parentx = 0;
-        r->a_item->surface.data.planar.parenty = item_y;
-        paint(r->item, r->a_item);
+    stacking_raise_internal(self->frame);
+    XMapWindow(ob_display, self->frame);
+}
+
+MenuEntry *menu_find_entry(Menu *menu, Window win)
+{
+    GList *it;
+
+    for (it = menu->entries; it; it = it->next) {
+        MenuEntry *entry = it->data;
+        if (entry->item == win)
+            return entry;
     }
+    return NULL;
+}
 
+void menu_entry_render(MenuEntry *self)
+{
+    Menu *menu = self->parent;
+    Appearance *a;
 
-    XMapWindow(ob_display, data->frame);
+    a = !self->enabled ? self->a_disabled :
+        (self->hilite ? self->a_hilite : self->a_item);
+
+    RECT_SET(a->area, 0, 0, menu->width,
+             menu->item_h);
+    RECT_SET(a->texture[0].position, menu->bullet_w,
+             0, menu->width - 2 * menu->bullet_w,
+             menu->item_h);
+
+    XMoveResizeWindow(ob_display, self->item, 0, self->y,
+                      menu->width, menu->item_h);
+    a->surface.data.planar.parent = menu->a_items;
+    a->surface.data.planar.parentx = 0;
+    a->surface.data.planar.parenty = self->y;
+
+    paint(self->item, a);
 }

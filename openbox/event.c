@@ -5,6 +5,7 @@
 #include "config.h"
 #include "screen.h"
 #include "frame.h"
+#include "menu.h"
 #include "framerender.h"
 #include "focus.h"
 #include "stacking.h"
@@ -22,6 +23,7 @@
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
+static void event_handle_menu(Menu *menu, XEvent *e);
 
 Time event_lasttime = 0;
 
@@ -310,16 +312,20 @@ static void event_process(XEvent *e)
 {
     Window window;
     Client *client;
+    Menu *menu = NULL;
 
     window = event_get_window(e);
-    client = g_hash_table_lookup(client_map, &window);
+    if (!(client = g_hash_table_lookup(client_map, &window)))
+        menu = g_hash_table_lookup(menu_map, &window);
     event_set_lasttime(e);
     event_hack_mods(e);
     if (event_ignore(e, client))
         return;
 
     /* deal with it in the kernel */
-    if (client)
+    if (menu)
+        event_handle_menu(menu, e);
+    else if (client)
 	event_handle_client(client, e);
     else if (window == ob_root)
 	event_handle_root(e);
@@ -698,5 +704,22 @@ static void event_handle_client(Client *client, XEvent *e)
             frame_adjust_shape(client->frame);
         }
 #endif
+    }
+}
+
+static void event_handle_menu(Menu *menu, XEvent *e)
+{
+    MenuEntry *entry;
+
+    switch (e->type) {
+    case EnterNotify:
+    case LeaveNotify:
+        g_message("enter/leave");
+        entry = menu_find_entry(menu, e->xcrossing.window);
+        if (entry) {
+            entry->hilite = e->type == EnterNotify;
+            menu_entry_render(entry);
+        }
+        break;
     }
 }

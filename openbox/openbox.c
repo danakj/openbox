@@ -181,6 +181,7 @@ int main(int argc, char **argv)
 
         menu_startup();
         frame_startup();
+        stacking_startup();
 	focus_startup();
 	screen_startup();
         group_startup();
@@ -204,6 +205,7 @@ int main(int argc, char **argv)
         group_shutdown();
 	screen_shutdown();
 	focus_shutdown();
+        stacking_shutdown();
         frame_shutdown();
         menu_shutdown();
         grab_shutdown();

@@ -8,6 +8,24 @@
 
 GList  *stacking_list = NULL;
 
+static Window top_window = None;
+
+void stacking_startup()
+{
+    XSetWindowAttributes attrib;
+    attrib.override_redirect = TRUE;
+    top_window =  XCreateWindow(ob_display, ob_root,
+                                -100, -100, 1, 1, 0,
+                                CopyFromParent, InputOutput, CopyFromParent,
+                                CWOverrideRedirect, &attrib);
+    XMapWindow(ob_display, top_window);
+}
+
+void stacking_shutdown()
+{
+    XDestroyWindow(ob_display, top_window);
+}
+
 void stacking_set_list()
 {
     Window *windows, *win_it;
@@ -30,7 +48,8 @@ void stacking_set_list()
     } else
 	windows = NULL;
 
-    PROP_SETA32(ob_root, net_client_list_stacking, window, windows, size);
+    PROP_SETA32(ob_root, net_client_list_stacking, window,
+                (guint32*)windows, size);
 
     if (windows)
 	g_free(windows);
@@ -183,3 +202,12 @@ void stacking_lower(Client *client)
     stacking_set_list();
 }
 
+void stacking_raise_internal(Window win)
+{
+    Window wins[2];  /* only ever restack 2 windows. */
+
+    wins[0] = top_window;
+    wins[1] = win;
+
+    XRestackWindows(ob_display, wins, 2);
+}

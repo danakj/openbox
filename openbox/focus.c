@@ -9,6 +9,7 @@
 #include "dispatch.h"
 #include "focus.h"
 #include "parse.h"
+#include "stacking.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -35,7 +36,8 @@ void focus_startup()
 				 -100, -100, 1, 1, 0,
                                  CopyFromParent, InputOutput, CopyFromParent,
                                  CWOverrideRedirect, &attrib);
-    XMapRaised(ob_display, focus_backup);
+    XMapWindow(ob_display, focus_backup);
+    stacking_raise_internal(focus_backup);
 
     /* start with nothing focused */
     focus_set_client(NULL);

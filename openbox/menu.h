@@ -18,7 +18,6 @@ typedef struct Menu {
     /* ? */
     gboolean shown;
     gboolean invalid;
-    gpointer render_data; /* where the engine can store anything it likes */
 
     struct Menu *parent;
 
@@ -28,17 +27,19 @@ typedef struct Menu {
     void (*update)( /* some bummu */);
     void (*mouseover)( /* some bummu */);
     void (*selected)( /* some bummu */);
-} Menu;
 
-typedef struct MenuRenderData {
+
+    /* render stuff */
     Window frame;
     Window title;
     Appearance *a_title;
     int title_min_w, title_h;
     Window items;
     Appearance *a_items;
+    int bullet_w;
     int item_h;
-} MenuRenderData;
+    int width;
+} Menu;
 
 typedef enum MenuEntryRenderType {
     MenuEntryRenderType_None = 0,
@@ -56,18 +57,20 @@ typedef struct {
     Action *action;    
     
     MenuEntryRenderType render_type;
+    gboolean hilite;
     gboolean enabled;
     gboolean boolean_value;
-    gpointer render_data; /* where the engine can store anything it likes */
 
     Menu *submenu;
-} MenuEntry;
 
-typedef struct MenuEntryRenderData {
+    /* render stuff */
     Window item;
     Appearance *a_item;
+    Appearance *a_disabled;
+    Appearance *a_hilite;
+    int y;
     int min_w;
-} MenuEntryRenderData;
+} MenuEntry;
 
 void menu_startup();
 void menu_shutdown();
@@ -89,4 +92,9 @@ void menu_entry_free(MenuEntry *entry);
 void menu_entry_set_submenu(MenuEntry *entry, Menu *submenu);
 
 void menu_add_entry(Menu *menu, MenuEntry *entry);
+
+MenuEntry *menu_find_entry(Menu *menu, Window win);
+
+void menu_entry_render(MenuEntry *self);
+
 #endif

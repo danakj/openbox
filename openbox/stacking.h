@@ -2,6 +2,7 @@
 #define __stacking_h
 
 #include <glib.h>
+#include <X11/Xlib.h>
 
 struct Client;
 
@@ -20,6 +21,9 @@ typedef enum {
 /* list of Client*s in stacking order from highest to lowest */
 extern GList  *stacking_list;
 
+void stacking_startup();
+void stacking_shutdown();
+
 /*! Sets the client stacking list on the root window from the
   stacking_clientlist */
 void stacking_set_list();
@@ -35,5 +39,8 @@ void stacking_raise(struct Client *client);
 
 /*! Lowers a client window below all others in its stacking layer */
 void stacking_lower(struct Client *client);
+
+/*! Raises an internal window (e.g. menus) */
+void stacking_raise_internal(Window win);
 
 #endif

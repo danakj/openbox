@@ -4,7 +4,6 @@
 # include "../config.h"
 #endif
 
-#include "../version.h"
 #include "openbox.hh"
 #include "client.hh"
 #include "screen.hh"
@@ -265,7 +264,7 @@ void Openbox::parseCommandLine(int argc, char **argv)
 
 void Openbox::showVersion()
 {
-  printf(_("Openbox - version %s\n"), OPENBOX_VERSION);
+  printf(_("Openbox - version %s\n"), VERSION);
   printf("    (c) 2002 - 2002 Ben Jansens\n\n");
 }
 

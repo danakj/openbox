@@ -2,9 +2,10 @@ CPPFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CPPFLAGS@
 
 INCLUDES= -I../src
 
-noinst_LIBRARIES=libotk.a
+#noinst_LIBRARIES=libotk.a
+noinst_LTLIBRARIES=libotk.la
 
-libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
+libotk_la_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   property.cc imagecontrol.cc rect.cc screeninfo.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
@@ -12,7 +13,7 @@ libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   label.cc focuslabel.cc application.cc appwidget.cc \
                   otk_wrap.cc
 
-#libotk_a_LDFLAGS = $(PYTHON_LDFLAGS)
+libotk_la_LDFLAGS = $(XFT_LIBS) $(PYTHON_LIBS)
 
 MAINTAINERCLEANFILES= Makefile.in
 

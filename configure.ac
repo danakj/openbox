@@ -16,9 +16,9 @@ AC_PROG_INSTALL
 ALL_LINGUAS=""
 AM_GNU_GETTEXT
 
-dnl AC_LANG(C++)
+# AC_LANG(C++)
 	
-dnl Check what compiler we are using
+# Check what compiler we are using
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
@@ -42,17 +42,17 @@ else
   fi
 fi
 
-dnl Determine if maintainer portions of the Makefiles should be included.
+# Determine if maintainer portions of the Makefiles should be included.
 AM_MAINTAINER_MODE
 
-dnl Check for system header files
+# Check for system header files
 AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdio.h stdlib.h string.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
 AC_HEADER_TIME
 
-dnl Determine the return type of signal handlers
+# Determine the return type of signal handlers
 AC_TYPE_SIGNAL
 
-dnl Check whether to include debugging code
+# Check whether to include debugging code
 DEBUG=""
 AC_MSG_CHECKING([whether to include verbose debugging code])
 AC_ARG_ENABLE([debug],
@@ -73,26 +73,78 @@ AC_ARG_ENABLE([debug],
 )
 CFLAGS="$CFLAGS $DEBUG"
 
-dnl Check for Python
-AC_CHECK_HEADER([python2.2/Python.h],
-  ,
-  AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
+# Check for Python
+AC_ARG_WITH([python],
+	[  --with-python=path       Set location of Python executable],
+	[PYTHON="$withval"],
+	[PYTHON=])
+
+# Find the python bin
+if ! test "$PYTHON"; then
+  AC_CHECK_PROGS(PYTHON, $prefix/bin/python python python2.4 python2.3 python2.2 python2.1 python2.0 python1.6 python1.5 python1.4)
+fi
+if ! test "$PYTHON"; then
+   AC_MSG_ERROR([Openbox requires the use of Python. This is its secret special formula for extreme sexiness.
 See http://www.python.org
-]))
-AC_CHECK_LIB([python2.2], [Py_Initialize],
-  PYTHON_LDFLAGS="-lpython2.2",
-dnl -Xlinker -export-dynamic",
-  AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
-See http://www.python.org
-]))
-PYTHON_CFLAGS="-I/usr/include/python2.2 -I/usr/gwar/include/python2.2"
+])
+fi
+
+# Find our python paths
+AC_MSG_CHECKING([for Python version])
+# Need to do this hack since autoconf replaces __file__ with the name of the configure file
+filehack="file__"
+PYVERSION=`($PYTHON -c "import string,operator; print operator.getitem(string.split(string.__$filehack,'/'),-2)")`
+AC_MSG_RESULT([$PYVERSION])
+
+AC_MSG_CHECKING([for Python prefix])
+PYPREFIX=`($PYTHON -c "import sys; print sys.prefix") 2>/dev/null`
+AC_MSG_RESULT([$PYPREFIX])
+AC_MSG_CHECKING([for Python exec-prefix])
+PYEPREFIX=`($PYTHON -c "import sys; print sys.exec_prefix") 2>/dev/null`
+AC_MSG_RESULT([$PYEPREFIX])
+
+# Find the include directory
+AC_MSG_CHECKING([for Python header files])
+if test -r "$PYPREFIX/include/$PYVERSION/Python.h"; then
+  PYTHON_CFLAGS="-I$PYPREFIX/include/$PYVERSION"
+fi
+if test -z "$PYTHON_CFLAGS"; then
+  if test -r "$PYPREFIX/include/Py/Python.h"; then
+    PYTHON_CFLAGS="-I$PYPREFIX/include/Py"
+  fi
+fi
+if ! test "$PYTHON_CFLAGS"; then
+  AC_MSG_ERROR([Not found])
+else
+  AC_MSG_RESULT([$PYTHON_CFLAGS])
+fi
+
+# Set the library directory blindly.   This probably won't work with older versions
+AC_MSG_CHECKING([for Python library])
+dirs="$PYVERSION/config $PYVERSION/lib python/lib"
+for i in $dirs; do
+  if test -d "$PYEPREFIX/lib/$i"; then
+    PYLIB="$PYEPREFIX/lib/$i"
+    break
+  fi
+done
+if ! test "$PYLIB"; then
+  AC_MSG_ERROR([Not found])
+else
+  AC_MSG_RESULT([$PYLIB])
+fi
+
+# Check for really old versions
+if test -r "$PYLIB/libPython.a"; then
+    PYTHON_LIBS="-L$PYLIB -lModules -lPython -lObjects -lParser"
+else
+    PYTHON_LIBS="-L$PYLIB -l$PYVERSION"
+fi
+
 AC_SUBST([PYTHON_CFLAGS])
-AC_SUBST([PYTHON_LDFLAGS])
+AC_SUBST([PYTHON_LIBS])
 
-dnl Check for guile
-GUILE_FLAGS
-
-dnl Check for X headers and libraries
+# Check for X headers and libraries
 AC_PATH_X
 AC_PATH_XTRA
 test "$no_x" = "yes" && AC_MSG_ERROR([No Xlibs found.])
@@ -103,14 +155,14 @@ CFLAGS="$CFLAGS $X_CFLAGS"
 LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS"
 LDFLAGS="$LDFLAGS $X_PRE_LIBS $LIBS $X_EXTRA_LIBS"
 
-dnl Check for required functions in -lX11
+# Check for required functions in -lX11
 AC_CHECK_LIB([X11], [XOpenDisplay],
   ,
   AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
 )
 
 
-dnl Check for Xft >= 2
+# Check for Xft >= 2
 XFT_MIN_MAJOR=2
 XFT_MIN_MINOR=0
 XFT_MIN_REVISION=0
@@ -125,14 +177,14 @@ fi
 
 AC_MSG_RESULT([yes])
 
-dnl Store these
+# Store these
 OLDLIBS=$LIBS
 OLDCFLAGS=$CFLAGS
 
 XFT_CFLAGS="`pkg-config --cflags xft`"
 XFT_LIBS="`pkg-config --libs xft`"
 
-dnl Set these for checking with the tests below. They'll be restored after
+# Set these for checking with the tests below. They'll be restored after
 LIBS="$LIBS $XFT_LIBS"
 CFLAGS="$XFT_CFLAGS $CFLAGS"
 
@@ -197,14 +249,14 @@ See http://www.fontconfig.org/
     ]
   )
 )
-dnl Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
+# Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
 LIBS=$OLDLIBS
 CFLAGS=$OLDCFLAGS
 
 AC_SUBST([XFT_CFLAGS])
 AC_SUBST([XFT_LIBS])
 
-dnl Check for XShape extension support
+# Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])
   AC_TRY_LINK(
@@ -235,7 +287,7 @@ else
   AC_MSG_RESULT([no])
 fi
 
-dnl Check for Xinerama extension support
+# Check for Xinerama extension support
 AC_MSG_CHECKING([whether to build support for the Xinerama extension])
 XINERAMA="no"
 AC_ARG_ENABLE([xinerama],

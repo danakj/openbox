@@ -50,6 +50,26 @@ namespace otk {
 %rename(itostring_unsigned) itostring(unsigned int);
 %rename(itostring_long) itostring(long);
 %rename(itostring_unsigned_long) itostring(unsigned long);
+
+// these are needed for guile, but not needed for python!
+%rename(equals) BColor::operator==;
+%rename(equals) Rect::operator==;
+%rename(equals) BTexture::operator==;
+%ignore BColor::operator!=;
+%ignore BTexture::operator!=;
+%ignore Rect::operator!=;
+%ignore Rect::operator|;
+%ignore Rect::operator|=;
+%ignore Rect::operator&;
+%ignore Rect::operator&=;
+%ignore OBTimer::operator<;
+%ignore TimerLessThan;
+
+/*
+%rename(set_multi) OtkProperty::set(Window, Atoms, Atoms, unsigned long[], int);
+%rename(set_string) OtkProperty::set(Window, Atoms, StringType, const std::string &);
+%rename(set_string_multi) OtkProperty::set(Window, Atoms, StringType, const StringVect &);
+*/
 }
 
 %include "eventdispatcher.hh"

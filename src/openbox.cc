@@ -44,10 +44,14 @@ extern "C" {
 
 //#include <guile/gh.h>
 
+//extern void SWIG_init();
+
 #include <Python.h>
   
 // The initializer in openbox_wrap.cc
 extern void init_openbox(void);
+// The initializer in otk_wrap.cc
+extern void init_otk(void);
 
 #include "gettext.h"
 #define _(str) gettext(str)
@@ -157,7 +161,7 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
-  /*
+/*  
   // make our guile interfaces exist
   SWIG_init();
   
@@ -169,12 +173,14 @@ Openbox::Openbox(int argc, char **argv)
     fclose(rcpyfd);
     gh_load("/home/natas/.openbox/user.scm");
   }
-  */
+*/
   
   Py_SetProgramName(argv[0]);
   Py_Initialize();
-  //initopenbox(); // initialize the static 'openbox' module
+  init_otk();
   init_openbox();
+  PyRun_String("from _otk import *; from _openbox import *;", Py_file_input,
+               PyEval_GetGlobals(), PyEval_GetGlobals());
   FILE *rcpyfd = fopen("/home/natas/.openbox/user.py", "r");
   if (!rcpyfd) {
     printf("failed to load python file /home/natas/.openbox/user.py\n");

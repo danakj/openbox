@@ -20,6 +20,10 @@
 %ignore ob::Openbox::instance;
 %ignore ob::OBScreen::clients;
 
+%import "../otk/eventdispatcher.hh"
+%import "../otk/eventhandler.hh"
+%import "widget.hh"
+
 %include "openbox.hh"
 %include "screen.hh"
 %include "client.hh"

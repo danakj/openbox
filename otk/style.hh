@@ -125,10 +125,10 @@ public:
   inline TextJustify textJustify(void) { return justify; }
   inline BulletType bulletType(void) { return bullet_type; }
 
-  inline const BColor &getBorderColor() const { return border_color; }
+  inline const BColor *getBorderColor() const { return &border_color; }
 
-  inline const BTexture &getFrameFocus() const { return f_focus; }
-  inline const BTexture &getFrameUnfocus() const { return f_unfocus; }
+  inline const BTexture *getFrameFocus() const { return &f_focus; }
+  inline const BTexture *getFrameUnfocus() const { return &f_unfocus; }
 
   inline void setImageControl(BImageControl *c) {
     image_control = c;

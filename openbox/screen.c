@@ -446,8 +446,7 @@ void screen_update_struts()
     GSList *it;
     guint i;
      
-    if (strut != NULL)
-	g_free(strut);
+    g_free(strut);
     strut = g_new0(Strut, screen_num_desktops + 1);
 
     for (it = client_list; it; it = it->next) {
@@ -471,9 +470,8 @@ static void screen_update_area()
 {
     guint i;
     gulong *dims;
-     
-    if (area != NULL)
-	g_free(area);
+
+    g_free(area);
     area = g_new0(Rect, screen_num_desktops + 1);
      
     dims = g_new(unsigned long, 4 * screen_num_desktops);

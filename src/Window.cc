@@ -3065,7 +3065,6 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   assert(flags.moving);
   assert(blackbox->getChangingWindow() == this);
 
-  bool warp = False;
   int dx = x_root - frame.grab_x, dy = y_root - frame.grab_y;
   dx -= frame.border_w;
   dy -= frame.border_w;
@@ -3074,7 +3073,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
   if (screen->doOpaqueMove()) {
     if (screen->doWorkspaceWarping())
-      warp = doWorkspaceWarping(x_root, y_root, dx, dy);
+      doWorkspaceWarping(x_root, y_root, dx);
 
     configure(dx, dy, frame.rect.width(), frame.rect.height());
   } else {
@@ -3086,7 +3085,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
                    frame.changing.height() - 1);
 
     if (screen->doWorkspaceWarping())
-      warp = doWorkspaceWarping(x_root, y_root, dx, dy);
+      doWorkspaceWarping(x_root, y_root, dx);
 
     frame.changing.setPos(dx, dy);
 
@@ -3102,8 +3101,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 }
 
 
-bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
-                                        int &dx, int dy) {
+void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root, int &dx) {
   // workspace warping
   bool warp = False;
   unsigned int dest = screen->getCurrentWorkspaceID();
@@ -3120,7 +3118,7 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     else dest = 0;
   }
   if (! warp)
-    return False;
+    return;
 
   bool focus = flags.focused; // had focus while moving?
 
@@ -3132,11 +3130,6 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     dest_x -= screen->getRect().width() - 1;
     dx -= screen->getRect().width() - 1;
   }
-
-  /*
-     We grab the X server here so that we dont end up magically grabbing
-     a different window dring the warp.
-  */
 
   if (! flags.stuck)
     screen->reassociateWindow(this, dest, False);
@@ -3154,7 +3147,6 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
   if (focus)
     setInputFocus();
 
-  return True;
 }
 
 

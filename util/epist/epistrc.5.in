@@ -9,23 +9,23 @@ epistrc \- Configuration file for Epist
 \fIepist\fR(1) grabs its configuration and bindings from the epistrc file.
 .SH SYNTAX
 The epistrc file contains 2 sections:
-.SS options
+.SS Options
 All of the options for epist are contained inside a clause such as this:
-.br
+.PP
 options {
 .br
-	blef 5;
+	<option name> <option value>;
 .br
 }
 .PP
-.B NOTE: options is not yet supported by epist. This will exist in the next release.
-.SS bindings
+The option name is a string of characters, and the option value can be either a string in double quotes or a number.
+.SS Bindings
 Bindings are specified in this format:
-.br
+.PP
 <key> <action> <optional parameter>;
 .PP
 Bindings with chains are specified in this format:
-.br
+.PP
 <root key> {
 .br
 	<key> <action> <optional parameter>;
@@ -34,8 +34,10 @@ Bindings with chains are specified in this format:
 .PP
 The <key> is made up of a list of modifiers and a single key. The possible modifiers are: \fIControl\fR, \fIShift\fR, \fIMod1\fR (usually the Alt key), \fIMod2\fR, \fIMod3\fR, \fIMod4\fR (usually the "windows" key), and \fIMod5\fR. You may also specify a <key> without any modifiers.
 .PP
-You may also nest as many chains as you want. Some examples of bindings are:
-.br
+Comments can be added by prefixing the commented line with a "#".
+.PP
+You may nest as many chains as you want. Some examples of bindings are:
+.PP
 Mod1-Tab nextWindow;
 .br
 Mod1-Shift-Tab prevWindow;
@@ -52,9 +54,19 @@ Control-Mod1-x {
 .br
 	r raise;
 .br
-	l lower;
+	Mod1-x { l lower; }
 .br
 }
+.SH OPTIONS
+.SS chainTimeout
+Specifies the period of time after which a started key chain will
+be timed out. It takes a number argument specifying the number of
+milliseconds to wait. It defaults to 4000.
+.SS workspaceColumns
+Specifies the number of columns of your workspace layout if you are using
+your workspaces in a 2-dimensional manner. This option must exist if one of
+the prevWorkspaceColumn, prevWorkspaceRow, nextWorkspaceColumn,
+nextWorkspaceRow commands are used.
 .SH COMMANDS
 .SS execute
 Runs a shell command. Takes a single string argument, in ""s.
@@ -66,9 +78,9 @@ Raises the currently focused window to the top of the stacking order.
 Lowers the currently focused window to the bottom of the stacking order.
 .SS close
 Closes the currently focused window.
-.SS toggleshade
+.SS toggleShade
 Shades and Unshades the currently focused window.
-.SS toggleomnipresent
+.SS toggleOmnipresent
 Sends the window to all workspaces, or moves it from all workspaces to the
 current one.
 .SS moveWindowUp
@@ -136,6 +148,16 @@ a value of 1 is assumed.
 .SS nextScreen
 .SS prevScreen
 Cycles focus to the next/previous screen (in a multi-head setup).
+.SS prevWorkspaceColumn
+.SS nextWorkspaceColumn
+.SS prevWorkspaceRow
+.SS nextWorkspaceRow
+Used to navigate the workspaces in a 2-dimensional manner. If these commands are
+used, the workspaceColumns action must be specified. See OPTIONS.
+.SS toggleGrabs
+Disables all keybindings except for the binding which runs this action, for
+the current screen. Enables keybindings when run again. This command cannot be
+part of a chain.
 
 .SH SEE ALSO
 \fIepist\fR(1) \fIopenbox\fR(1)

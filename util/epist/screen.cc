@@ -568,6 +568,12 @@ void screen::updateActiveWindow() {
 void screen::execCommand(const string &cmd) const {
   pid_t pid;
   if ((pid = fork()) == 0) {
+    // disconnect the child from epist's session and the tty
+    if (setsid() == -1) {
+      cout << "warning: could not start a new process group\n";
+      perror("setsid");
+    }
+
     // make the command run on the correct screen
     if (putenv(const_cast<char*>(_info->displayString().c_str()))) {
       cout << "warning: couldn't set environment variable 'DISPLAY'\n";

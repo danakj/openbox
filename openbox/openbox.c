@@ -470,7 +470,9 @@ static void print_help()
     g_print("Syntax: %s [options]\n\n", BINARY);
     g_print("Options:\n\n");
     g_print("  -rc PATH          Specify the path to the rc file to use\n");
+#ifdef USE_SM
     g_print("  -sm-client-id ID  Specify the session manager ID\n");
+#endif
     g_print("  -help             Display this help and exit\n");
     g_print("  -version          Display the version and exit\n");
     g_print("  -sync             Run in synchronous mode (this is slow and\n"

@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "grab.h"
 #include "openbox.h"
+#include "config.h"
 #include "render/theme.h"
 
 #define PADDING 2

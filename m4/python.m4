@@ -43,8 +43,8 @@ AC_DEFUN([PYTHON_DEVEL],
       PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION"
       break
     else
-      if test -r "$i/lib$PYVERSION.a"; then
-        PYLIB="$i/lib$PYVERSION.a"
+      if test -r "$i/libpython$PYTHON_VERSION.a"; then
+        PYLIB="$i/libpython$PYTHON_VERSION.a"
         PYTHON_LIBS="-L$i -lpython$PYTHON_VERSION -lpthread -ldl -lutil -lm"
         break
       else
@@ -57,7 +57,7 @@ AC_DEFUN([PYTHON_DEVEL],
       fi
     fi
   done
-  if test "$python_path"
+  if test "$PYLIB"
   then
     AC_MSG_RESULT([$PYLIB])
   else

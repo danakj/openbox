@@ -2289,7 +2289,7 @@ void client_set_desktop_recursive(ObClient *self,
             client_showhide(self);
         /* raise if it was not already on the desktop */
         if (old != DESKTOP_ALL)
-            stacking_raise(CLIENT_AS_WINDOW(self));
+            action_run_string("Raise", self);
         screen_update_areas();
 
         /* add to the new desktop(s) */

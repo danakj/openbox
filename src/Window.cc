@@ -2596,7 +2596,7 @@ void OpenboxWindow::buttonPressEvent(XButtonEvent *be) {
           mx = be->x_root - windowmenu->getWidth() / 2;
           if (be->window == frame.title || be->window == frame.label) {
             my = frame.y + frame.title_h;
-          } else if (be->window = frame.handle) {
+          } else if (be->window == frame.handle) {
             my = frame.y + frame.y_handle - windowmenu->getHeight();
           } else { // (be->window == frame.window)
             if (be->y <= (signed) frame.bevel_w) {

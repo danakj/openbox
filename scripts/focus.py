@@ -53,7 +53,9 @@ def _focused(data):
 
     if data.client:
         # move it to the top
-        _remove(data.client)
+        try:
+            _remove(data.client)
+        except ValueError: pass # happens if _focused comes before _newwindow
         _clients.insert(0, data.client)
     elif FALLBACK:
         # pass around focus
@@ -63,6 +65,11 @@ def _focused(data):
                 break
 
 def _newwindow(data):
+    # make sure its not already in the list
+    win = client.window()
+    for i in range(len(_clients)):
+        if _clients[i].window() == win:
+            return
     _clients.append(data.client)
         
 def _closewindow(data):

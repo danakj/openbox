@@ -17,18 +17,24 @@ distclean-local:
 
 # local dependencies
 
-epist.o: epist.cc epist.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
-  ../../src/Util.hh screen.hh window.hh ../../src/XAtom.hh
-main.o: main.cc epist.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
-  ../../src/Util.hh ../../src/i18n.hh ../../nls/blackbox-nls.hh
-screen.o: screen.cc ../../src/XAtom.hh screen.hh window.hh epist.hh \
-  ../../src/BaseDisplay.hh ../../src/Timer.hh ../../src/Util.hh
-window.o: window.cc window.hh epist.hh ../../src/BaseDisplay.hh \
-  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
-yacc_parser.o: yacc_parser.cc yacc_parser.hh epist.hh ../../src/BaseDisplay.hh \
-  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
-keytree.o: keytree.cc keytree.hh epist.hh ../../src/BaseDisplay.hh \
-  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
-parser.o: parser.cc parser.hh epist.hh ../../src/BaseDisplay.hh \
-  ../../src/Timer.hh ../../src/Util.hh ../../src/XAtom.hh
-lex.yy.o: lex.yy.c
+actions.o: actions.cc actions.hh
+epist.o: epist.cc actions.hh epist.hh window.hh ../../src/Util.hh \
+  keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
+  parser.hh ../../src/XAtom.hh
+keytree.o: keytree.cc keytree.hh actions.hh screen.hh window.hh \
+  ../../src/Util.hh
+main.o: main.cc epist.hh actions.hh window.hh ../../src/Util.hh \
+  keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
+  ../../src/i18n.hh ../../nls/blackbox-nls.hh
+parser.o: parser.cc parser.hh actions.hh keytree.hh screen.hh window.hh \
+  ../../src/Util.hh
+screen.o: screen.cc ../../src/BaseDisplay.hh ../../src/Timer.hh \
+  ../../src/Util.hh ../../src/XAtom.hh screen.hh window.hh epist.hh \
+  actions.hh keytree.hh
+window.o: window.cc epist.hh actions.hh window.hh ../../src/Util.hh \
+  keytree.hh screen.hh ../../src/BaseDisplay.hh ../../src/Timer.hh \
+  ../../src/XAtom.hh
+yacc_parser.cc: epist.y
+	yacc -d epist.y -o yacc_parser.cc
+lex.yy.c: epist.l
+	lex epist.l

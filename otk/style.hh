@@ -89,6 +89,8 @@ public:
 
   inline const BFont *getFont() const { return font; }
 
+  inline const BColor &getBorderColor() const { return border_color; }
+
   inline void setImageControl(BImageControl *c) { image_control = c; }
   inline void setScreenNumber(unsigned int scr) { screen_number = scr; }
 

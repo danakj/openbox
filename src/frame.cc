@@ -27,9 +27,6 @@ OBFrame::OBFrame(const OBClient *client, const otk::Style *style)
  
   _decorations = client->decorations();
  
-  _style = 0;
-  loadStyle(style);
-
   // create the base frame parent window
   _window = createFrame();
   assert(_window);
@@ -57,23 +54,28 @@ OBFrame::OBFrame(const OBClient *client, const otk::Style *style)
   assert(_grip_right);
   XMapSubwindows(otk::OBDisplay::display, _handle);
   
+  _style = 0;
+  loadStyle(style);
+
   grabClient();
 }
 
 
 OBFrame::~OBFrame()
 {
-  releaseClient(false);
-
-  XDestroyWindow(otk::OBDisplay::display, _titlebar);
   XDestroyWindow(otk::OBDisplay::display, _button_iconify);
   XDestroyWindow(otk::OBDisplay::display, _button_max);
   XDestroyWindow(otk::OBDisplay::display, _button_stick);
   XDestroyWindow(otk::OBDisplay::display, _button_close);
   XDestroyWindow(otk::OBDisplay::display, _label);
-  XDestroyWindow(otk::OBDisplay::display, _handle);
+  XDestroyWindow(otk::OBDisplay::display, _titlebar);
   XDestroyWindow(otk::OBDisplay::display, _grip_left);
   XDestroyWindow(otk::OBDisplay::display, _grip_right);
+  XDestroyWindow(otk::OBDisplay::display, _handle);
+
+  releaseClient(false);
+
+  XDestroyWindow(otk::OBDisplay::display, _window);
 }
 
 
@@ -83,7 +85,6 @@ void OBFrame::loadStyle(const otk::Style *style)
 
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
-  // NOTE: if this is false, then DO NOT DO SHIT WITH _window, it doesnt exist
   bool replace = (_style);
 
   if (replace) {
@@ -92,12 +93,31 @@ void OBFrame::loadStyle(const otk::Style *style)
   
   _style = style;
 
+  XSetWindowBorderWidth(otk::OBDisplay::display, _window,
+                        _style->getBorderWidth());
+  XSetWindowBorder(otk::OBDisplay::display, _window,
+                   _style->getBorderColor().pixel());
+  XSetWindowBorderWidth(otk::OBDisplay::display, _titlebar,
+                        _style->getBorderWidth());
+  XSetWindowBorder(otk::OBDisplay::display, _titlebar,
+                   _style->getBorderColor().pixel());
+  XSetWindowBorderWidth(otk::OBDisplay::display, _grip_left,
+                        _style->getBorderWidth());
+  XSetWindowBorder(otk::OBDisplay::display, _grip_left,
+                   _style->getBorderColor().pixel());
+  XSetWindowBorderWidth(otk::OBDisplay::display, _grip_right,
+                        _style->getBorderWidth());
+  XSetWindowBorder(otk::OBDisplay::display, _grip_right,
+                   _style->getBorderColor().pixel());
+  XSetWindowBorderWidth(otk::OBDisplay::display, _handle,
+                        _style->getBorderWidth());
+  XSetWindowBorder(otk::OBDisplay::display, _handle,
+                   _style->getBorderColor().pixel());
+  
+  // if !replace, then update() will get called after the client is grabbed!
   if (replace) {
     update();
     
-    XSetWindowBorderWidth(otk::OBDisplay::display, _window,
-                          _style->getBorderWidth());
-
     // XXX: make everything redraw
   }
 }
@@ -112,7 +132,7 @@ void OBFrame::update()
   
   if (_decorations & OBClient::Decor_Border) {
     _size.left = _size.top = _size.bottom = _size.right =
-      _style->getBorderWidth() + _style->getFrameWidth();
+      _style->getFrameWidth();
     width = _client->area().width() + _style->getFrameWidth() * 2;
   } else {
     _size.left = _size.top = _size.bottom = _size.right = 0;
@@ -120,15 +140,17 @@ void OBFrame::update()
   }
 
   if (_decorations & OBClient::Decor_Titlebar) {
-    _titlebar_area.setRect(0, 0, width,
+    // set the titlebar size
+    _titlebar_area.setRect(-_style->getBorderWidth(),
+                           -_style->getBorderWidth(),
+                           width,
                            (_style->getFont()->height() +
-                            _style->getFrameWidth() * 2));
+                            _style->getBevelWidth() * 2));
     _size.top += _titlebar_area.height() + _style->getBorderWidth();
 
     // set the label size
     _label_area.setRect(0, _style->getBevelWidth(),
-                        width, (_titlebar_area.height() -
-                                _style->getBevelWidth() * 2));
+                        width, _style->getFont()->height());
     // set the buttons sizes
     if (_decorations & OBClient::Decor_Iconify)
       _button_iconify_area.setRect(0, _style->getBevelWidth() + 1,
@@ -187,30 +209,30 @@ void OBFrame::update()
         continue; // just to fuck with g++
       }
       area->setX(x);
+      if (layout[i] != 'L')
+        _label_area.setWidth(_label_area.width() - area->width());
       x += sep + area->width();
     }
   }
 
   if (_decorations & OBClient::Decor_Handle) {
-    _handle_area.setRect(0, _size.top + _client->area().height() +
-                         _style->getBorderWidth(),
+    _handle_area.setRect(-_style->getBorderWidth(),
+                         _size.top + _client->area().height(),
                          width, _style->getHandleWidth());
-    _grip_left_area.setRect(0,
-                            _handle_area.y() + _handle_area.height() +
-                            _style->getBorderWidth(),
+    _grip_left_area.setRect(-_style->getBorderWidth(),
+                            -_style->getBorderWidth(),
                             // XXX: get a Point class in otk and use that for
                             // the 'buttons size' since theyre all the same
                             _button_iconify_area.width() * 2,
                             _handle_area.height());
     _grip_right_area.setRect(((_handle_area.right() + 1) -
                               _button_iconify_area.width() * 2),
-                             _handle_area.y() + _handle_area.height() +
-                             _style->getBorderWidth(),
+                             -_style->getBorderWidth(),
                              // XXX: get a Point class in otk and use that for
                              // the 'buttons size' since theyre all the same
                              _button_iconify_area.width() * 2,
                              _handle_area.height());
-    _size.bottom += _handle_area.height() + _style->getBorderWidth() * 2;
+    _size.bottom += _handle_area.height() + _style->getBorderWidth();
   }
   
 
@@ -266,9 +288,6 @@ void OBFrame::update()
 
   // map/unmap all the windows
   if (_decorations & OBClient::Decor_Titlebar) {
-    XMapWindow(otk::OBDisplay::display, _titlebar);
-    XSetWindowBorder(otk::OBDisplay::display, _titlebar,
-                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _label);
     if (_decorations & OBClient::Decor_Iconify)
       XMapWindow(otk::OBDisplay::display, _button_iconify);
@@ -286,6 +305,7 @@ void OBFrame::update()
       XMapWindow(otk::OBDisplay::display, _button_close);
     else
       XUnmapWindow(otk::OBDisplay::display, _button_close);
+    XMapWindow(otk::OBDisplay::display, _titlebar);
   } else {
     XUnmapWindow(otk::OBDisplay::display, _titlebar);
     XUnmapWindow(otk::OBDisplay::display, _label);
@@ -296,15 +316,9 @@ void OBFrame::update()
   }
 
   if (_decorations & OBClient::Decor_Handle) {
-    XMapWindow(otk::OBDisplay::display, _handle);
-    XSetWindowBorder(otk::OBDisplay::display, _handle,
-                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _grip_left);
-    XSetWindowBorder(otk::OBDisplay::display, _grip_left,
-                     _style->getBorderWidth());
     XMapWindow(otk::OBDisplay::display, _grip_right);
-    XSetWindowBorder(otk::OBDisplay::display, _grip_right,
-                     _style->getBorderWidth());
+    XMapWindow(otk::OBDisplay::display, _handle);
   } else {
     XUnmapWindow(otk::OBDisplay::display, _handle);
     XUnmapWindow(otk::OBDisplay::display, _grip_left);
@@ -424,9 +438,11 @@ Window OBFrame::createChild(Window parent, Cursor cursor)
     attrib_create.cursor = cursor;
   }
 
-  return XCreateWindow(otk::OBDisplay::display, parent, 0, 0, 1, 1, 0,
-                       _screen->getDepth(), InputOutput, _screen->getVisual(),
-                       create_mask, &attrib_create);
+  Window w = XCreateWindow(otk::OBDisplay::display, parent, 0, 0, 1, 1, 0,
+                           _screen->getDepth(), InputOutput,
+                           _screen->getVisual(), create_mask, &attrib_create);
+  XRaiseWindow(otk::OBDisplay::display, w); // raise above the parent
+  return w;
 }
 
 
@@ -447,7 +463,7 @@ Window OBFrame::createFrame()
   */
 
   return XCreateWindow(otk::OBDisplay::display, _screen->getRootWindow(),
-                       0, 0, 1, 1, _style->getBorderWidth(),
+                       0, 0, 1, 1, 0,
                        _screen->getDepth(), InputOutput, _screen->getVisual(),
                        create_mask, &attrib_create);
 }

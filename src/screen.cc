@@ -110,11 +110,12 @@ Screen::Screen(int screen)
   // the above set() will cause the updateDesktopNames to fire right away so
   // we have a list of desktop names
 
+  _desktop = 0;
+  
   if (!python_get_long("number_of_desktops", &_num_desktops))
     _num_desktops = 1;
   changeNumDesktops(_num_desktops); // set the hint
 
-  _desktop = 0;
   changeDesktop(0); // set the hint
 
   // create the window which gets focus when no clients get it

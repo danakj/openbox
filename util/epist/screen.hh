@@ -45,10 +45,14 @@ class screen {
   
   WindowList _clients;
   WindowList::iterator _active;
+  unsigned int _active_desktop;
+  unsigned int _num_desktops;
 
   bool _managed;
 
   XWindow *findWindow(const XEvent &e) const;
+  void updateNumDesktops();
+  void updateActiveDesktop();
   void updateClientList();
   void updateActiveWindow();
   bool doAddWindow(Window window) const;
@@ -66,8 +70,8 @@ public:
 
   void handleKeypress(const XEvent &e);
 
-  void cycleWindow(const bool forward) const;
-  void cycleWorkspace(const bool forward) const;
+  void cycleWindow(const bool forward, const bool alldesktops) const;
+  void cycleWorkspace(const bool forward, const bool loop = true) const;
   void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;
 };

@@ -70,7 +70,9 @@ screen::screen(epist *epist, int number) {
   }
  
   XSelectInput(_epist->getXDisplay(), _root, PropertyChangeMask);
-    
+
+  updateNumDesktops();
+  updateActiveDesktop();
   updateClientList();
   updateActiveWindow();
 }
@@ -121,6 +123,10 @@ void screen::processEvent(const XEvent &e) {
   switch (e.type) {
   case PropertyNotify:
     // root window
+    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_number_of_desktops))
+      updateNumDesktops();
+    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_current_desktop))
+      updateActiveDesktop();
     if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
       updateActiveWindow();
     if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list)) {
@@ -158,11 +164,19 @@ void screen::handleKeypress(const XEvent &e) {
         return;
 
       case Action::nextWindow:
-        cycleWindow(true);
+        cycleWindow(true, false);
         return;
 
       case Action::prevWindow:
-        cycleWindow(false);
+        cycleWindow(false, false);
+        return;
+
+      case Action::nextWindowOnAllWorkspaces:
+        cycleWindow(true, true);
+        return;
+
+      case Action::prevWindowOnAllWorkspaces:
+        cycleWindow(false, true);
         return;
 
       case Action::changeWorkspace:
@@ -214,6 +228,25 @@ bool screen::doAddWindow(Window window) const {
     return False;
 
   return True;
+}
+
+
+void screen::updateNumDesktops() {
+  assert(_managed);
+
+  if (! _xatom->getValue(_root, XAtom::net_number_of_desktops, XAtom::cardinal,
+                         (unsigned long)_num_desktops))
+    _num_desktops = 1;  // assume that there is at least 1 desktop!
+}
+
+
+void screen::updateActiveDesktop() {
+  assert(_managed);
+
+  if (! _xatom->getValue(_root, XAtom::net_current_desktop, XAtom::cardinal,
+                         (unsigned long)_active_desktop))
+    _active_desktop = 0;  // there must be at least one desktop, and it must
+                          // be the current one
 }
 
 
@@ -299,7 +332,9 @@ void screen::updateActiveWindow() {
  */
 
 
-void screen::cycleWindow(const bool forward) const {
+void screen::cycleWindow(const bool forward, const bool alldesktops) const {
+  assert(_managed);
+
   if (_clients.empty()) return;
     
   WindowList::const_iterator target = _active;
@@ -317,9 +352,14 @@ void screen::cycleWindow(const bool forward) const {
         target = _clients.end();
       --target;
     }
-  } while (target == _clients.end() || (*target)->iconic());
+  } while (target == _clients.end() ||
+           (*target)->iconic() ||
+           (! alldesktops && (*target)->desktop() != _active_desktop));
   
   if (target != _clients.end()) {
+    if ((*target)->desktop() != _active_desktop)
+      changeWorkspace((*target)->desktop());
+
     // we dont send an ACTIVE_WINDOW client message because that would also
     // unshade the window if it was shaded
     XSetInputFocus(_epist->getXDisplay(), (*target)->window(), RevertToNone,
@@ -329,30 +369,30 @@ void screen::cycleWindow(const bool forward) const {
 }
 
 
-void screen::cycleWorkspace(const bool forward) const {
-  unsigned long currentDesktop = 0;
-  unsigned long numDesktops = 0;
-  
-  if (_xatom->getValue(_root, XAtom::net_current_desktop, XAtom::cardinal,
-                       currentDesktop)) {
-    if (forward)     
-      ++currentDesktop;
-    else
-      --currentDesktop;
+void screen::cycleWorkspace(const bool forward, const bool loop) const {
+  assert(_managed);
 
-    _xatom->getValue(_root, XAtom::net_number_of_desktops, XAtom::cardinal,
-                     numDesktops);
-    
-    if ( ( (signed)currentDesktop) == -1)
-      currentDesktop = numDesktops - 1;
-    else if (currentDesktop >= numDesktops)
-      currentDesktop = 0;
+  unsigned int destination = _active_desktop;
 
-    changeWorkspace(currentDesktop);
+  if (forward) {
+    if (destination < _num_desktops - 1)
+      ++destination;
+    else if (loop)
+      destination = 0;
+  } else {
+    if (destination > 0)
+      --destination;
+    else if (loop)
+      destination = _num_desktops - 1;
   }
+
+  if (destination != _active_desktop) 
+    changeWorkspace(destination);
 }
 
 
 void screen::changeWorkspace(const int num) const {
+  assert(_managed);
+
   _xatom->sendClientMessage(_root, XAtom::net_current_desktop, _root, num);
 }

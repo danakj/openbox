@@ -4,7 +4,9 @@
 #include "config.h"
 #include "grab.h"
 #include "openbox.h"
-#include "render/theme.h"
+
+/* XXX temp */
+static int theme_bwidth = 3;
 
 #define DOCK_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
                          EnterWindowMask | LeaveWindowMask)
@@ -28,11 +30,15 @@ void dock_startup()
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
     dock->frame = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
-                                render_depth, InputOutput, render_visual,
+                                RrInstanceDepth(ob_render_inst), InputOutput,
+                                RrInstanceVisual(ob_render_inst),
                                 CWOverrideRedirect | CWEventMask,
                                 &attrib);
+    dock->s_frame = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR,
+                                 dock->frame, 0);
+    /* XXX COPY THE APPEARANCE FROM THE THEME !#&*(# LIKE THIS SORTA...
     dock->a_frame = appearance_copy(theme_a_unfocused_title);
-    XSetWindowBorderWidth(ob_display, dock->frame, theme_bwidth);
+    */
 
     g_hash_table_insert(window_map, &dock->frame, dock);
     stacking_add(DOCK_AS_WINDOW(dock));
@@ -41,8 +47,8 @@ void dock_startup()
 
 void dock_shutdown()
 {
+    RrSurfaceFree(dock->s_frame);
     XDestroyWindow(ob_display, dock->frame);
-    appearance_free(dock->a_frame);
     g_hash_table_remove(window_map, &dock->frame);
     stacking_remove(dock);
 }
@@ -163,6 +169,9 @@ void dock_configure()
         }
     }
 
+    dock->w += theme_bwidth * 2;
+    dock->h += theme_bwidth * 2;
+
     /* position the apps */
     for (it = dock->dock_apps; it; it = it->next) {
         struct DockApp *app = it->data;
@@ -178,10 +187,6 @@ void dock_configure()
 
         XMoveWindow(ob_display, app->icon_win, app->x, app->y);
     }
-
-    /* used for calculating offsets */
-    dock->w += theme_bwidth * 2;
-    dock->h += theme_bwidth * 2;
 
     /* calculate position */
     switch (config_dock_pos) {
@@ -343,23 +348,11 @@ void dock_configure()
         break;
     }
 
-    /* not used for actually sizing shit */
-    dock->w -= theme_bwidth * 2;
-    dock->h -= theme_bwidth * 2;
-
     if (dock->w > 0 && dock->h > 0) {
-        RECT_SET(dock->a_frame->area, 0, 0, dock->w, dock->h);
-        XMoveResizeWindow(ob_display, dock->frame,
-                          dock->x, dock->y, dock->w, dock->h);
-
-        paint(dock->frame, dock->a_frame);
-        XMapWindow(ob_display, dock->frame);
+        RrSurfaceSetArea(dock->s_frame, dock->x, dock->y, dock->w, dock->h);
+        RrSurfaceShow(dock->s_frame);
     } else
-        XUnmapWindow(ob_display, dock->frame);
-
-    /* but they are useful outside of this function! */
-    dock->w += theme_bwidth * 2;
-    dock->h += theme_bwidth * 2;
+        RrSurfaceHide(dock->s_frame);
 
     screen_update_struts();
 }

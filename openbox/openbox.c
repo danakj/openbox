@@ -19,9 +19,7 @@
 #include "config.h"
 #include "gettext.h"
 #include "parser/parse.h"
-#include "render/render.h"
-#include "render/font.h"
-#include "render/theme.h"
+#include "render2/render.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -48,6 +46,7 @@
 Display *ob_display  = NULL;
 int      ob_screen;
 Window   ob_root;
+struct RrInstance *ob_render_inst = NULL;
 State    ob_state;
 gboolean ob_shutdown = FALSE;
 gboolean ob_restart  = FALSE;
@@ -164,15 +163,14 @@ int main(int argc, char **argv)
     startup_save();
 
     if (screen_annex()) { /* it will be ours! */
+        ob_render_inst = RrInstanceNew(ob_display, ob_screen);
+
         /* startup the parsing so everything can register sections of the rc */
         parse_startup();
 
         /* anything that is going to read data from the rc file needs to be 
            in this group */
 	timer_startup();
-	render_startup();
-	font_startup();
-        theme_startup();
 	event_startup();
         grab_startup();
         plugin_startup();
@@ -188,9 +186,11 @@ int main(int argc, char **argv)
         parse_shutdown();
 
         /* load the theme specified in the rc file */
+/*
         theme = theme_load(config_theme);
         g_free(theme);
         if (!theme) return 1;
+*/
 
         window_startup();
         menu_startup();
@@ -228,10 +228,10 @@ int main(int argc, char **argv)
         window_shutdown();
         grab_shutdown();
 	event_shutdown();
-        theme_shutdown();
-	render_shutdown();
 	timer_shutdown();
         config_shutdown();
+
+        RrInstanceFree(ob_render_inst);
     }
 
     dispatch_shutdown();

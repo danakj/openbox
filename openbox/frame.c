@@ -2,13 +2,17 @@
 #include "openbox.h"
 #include "extensions.h"
 #include "framerender.h"
-#include "render/theme.h"
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
+
+/* XXX temp */
+static int theme_bwidth = 3;
+static int theme_cbwidth = 3;
+static int theme_title_height = 8;
 
 void frame_startup()
 {
@@ -22,7 +26,8 @@ static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 render_depth, InputOutput, render_visual,
+			 RrInstanceDepth(ob_render_inst),
+                         InputOutput, RrInstanceVisual(ob_render_inst),
 			 mask, attrib);
                        
 }
@@ -294,12 +299,12 @@ Context frame_context(Client *client, Window win)
     g_assert(obwin);
 
     if (client->frame->window == win) {
-printf("frame context\n");
+g_print("frame context\n");
         return Context_Frame;
     }
     if (client->frame->plate == win)
         return Context_Client;
-printf("decoration clicked\n");
+g_print("decoration clicked\n");
     g_assert(WINDOW_IS_DECORATION(obwin));
     return WINDOW_AS_DECORATION(obwin)->context;
 }
@@ -430,7 +435,7 @@ void decor_calculate_size(FrameDecor *d, Rect *r)
        r->height = d->frame->client->area.height * d->area.height / 100;
     break;
     }
-printf("area of decoration is %d, %d, %d, %d\n", r->x, r->y, r->width, 
+g_print("area of decoration is %d, %d, %d, %d\n", r->x, r->y, r->width, 
 r->height);
 }
 

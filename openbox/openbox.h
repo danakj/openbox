@@ -21,6 +21,9 @@ extern int      ob_screen;
 /*! The root window */
 extern Window   ob_root;
 
+struct RrInstance;
+extern struct RrInstance *ob_render_inst;
+
 /*! States of execution for Openbox */
 typedef enum {
     State_Starting,

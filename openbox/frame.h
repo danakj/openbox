@@ -3,7 +3,7 @@
 
 #include "geom.h"
 #include "client.h"
-#include "render/render.h"
+/*#include "render2/render.h"*/
 #include "window.h"
 
 typedef enum {

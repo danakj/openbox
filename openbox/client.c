@@ -15,7 +15,7 @@
 #include "group.h"
 #include "config.h"
 #include "menu.h"
-#include "render/render.h"
+#include "render2/render.h"
 
 #include <glib.h>
 #include <X11/Xutil.h>
@@ -1337,23 +1337,25 @@ void client_update_icons(Client *self)
 	    w = self->icons[j].width = data[i++];
 	    h = self->icons[j].height = data[i++];
 
-	    self->icons[j].data = g_new(pixel32, w * h);
+	    self->icons[j].data = g_new(RrData32, w * h);
             for (x = 0, y = 0, t = 0; t < w * h; ++t, ++x, ++i) {
                 if (x >= w) {
                     x = 0;
                     ++y;
                 }
+                /* XXX optimize me, less shifts pls */
                 self->icons[j].data[t] =
-                    (((data[i] >> 24) & 0xff) << default_alpha_offset) +
-                    (((data[i] >> 16) & 0xff) << default_red_offset) +
-                    (((data[i] >> 8) & 0xff) << default_green_offset) +
-                    (((data[i] >> 0) & 0xff) << default_blue_offset);
+                    (((data[i] >> 24) & 0xff) << 0) +
+                    (((data[i] >> 16) & 0xff) << 24) +
+                    (((data[i] >> 8) & 0xff) << 16) +
+                    (((data[i] >> 0) & 0xff) << 8);
             }
 	    g_assert(i <= num);
 	}
 
 	g_free(data);
-    } else if (PROP_GETA32(self->window, kwm_win_icon,
+    }/* XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
+       else if (PROP_GETA32(self->window, kwm_win_icon,
                            kwm_win_icon, &data, &num)) {
         if (num == 2) {
             self->nicons++;
@@ -1387,6 +1389,7 @@ void client_update_icons(Client *self)
             XFree(hints);
         }
     }
+*/
 
     if (self->frame)
 	frame_adjust_icon(self->frame);

@@ -2,8 +2,8 @@
 #define __menu_h
 
 #include "action.h"
-#include "render/render.h"
 #include "geom.h"
+#include "render2/render.h"
 
 #include <glib.h>
 
@@ -44,12 +44,13 @@ typedef struct Menu {
 
     /* render stuff */
     Client *client;
-    Window frame;
-    Window title;
-    Appearance *a_title;
+    struct RrSurface *s_frame;
+    Window w_frame;
+    struct RrSurface *s_title;
+    Window w_title;
+    struct RrSurface *s_items;
+    Window w_items;
     int title_min_w, title_h;
-    Window items;
-    Appearance *a_items;
     int bullet_w;
     int item_h;
     Point location;
@@ -69,7 +70,7 @@ typedef enum MenuEntryRenderType {
     MenuEntryRenderType_Other = 1 << 7
 } MenuEntryRenderType;
 
-typedef struct {
+typedef struct MenuEntry {
     char *label;
     Menu *parent;
 
@@ -83,10 +84,12 @@ typedef struct {
     Menu *submenu;
 
     /* render stuff */
-    Window item;
-    Appearance *a_item;
-    Appearance *a_disabled;
-    Appearance *a_hilite;
+    struct RrSurface *s_item;
+    Window w_item;
+    struct RrSurface *s_disabled;
+    Window w_disabled;
+    struct RrSurface *s_hilite;
+    Window w_hilite;
     int y;
     int min_w;
 } MenuEntry;

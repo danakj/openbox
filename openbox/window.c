@@ -21,7 +21,7 @@ Window window_top(ObWindow *self)
 {
     switch (self->type) {
     case Window_Menu:
-        return ((Menu*)self)->frame;
+        return ((Menu*)self)->w_frame;
     case Window_Dock:
         return ((Dock*)self)->frame;
     case Window_DockApp:

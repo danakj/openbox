@@ -7,8 +7,6 @@
 
 #include "kernel/frame.h"
 
-#include "render/theme.h"
-
 static char *PLUGIN_NAME = "client_menu";
 
 static Menu *send_to_menu;
@@ -47,25 +45,20 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     g_assert(!self->invalid);
     g_assert(client);
 
-/* XXX    
-    newy = MAX(client->frame->area.y +
-               client->frame->a_focused_title->area.height + theme_bwidth,
-               y - theme_bwidth);
-XXX */
-    
+    newy = MAX(client->frame->area.y + client->frame->size.top, y);
+
     POINT_SET(self->location, 
-	      MIN(x, screen_physical_size.width - self->size.width -
-                  theme_bwidth * 2), 
-	      MIN(newy, screen_physical_size.height - self->size.height -
-                  theme_bwidth * 2));
-    XMoveWindow(ob_display, self->frame, self->location.x, self->location.y);
+	      MIN(x, screen_physical_size.width - self->size.width), 
+	      MIN(newy, screen_physical_size.height - self->size.height));
+    menu_render(self);
 
     if (!self->shown) {
-	XMapWindow(ob_display, self->frame);
+        RrSurfaceShow(self->s_frame);
         stacking_raise(MENU_AS_WINDOW(self));
 	self->shown = TRUE;
-    } else if (self->shown && self->open_submenu) {
-	menu_hide(self->open_submenu);
+    } else if (self->shown && self->open_submenu) { /* XXX is this right? */
+        RrSurfaceHide(self->s_frame);
+        self->shown = FALSE;
     }
 }
 

@@ -189,4 +189,84 @@ def execute(bin, screen = 0):
        is beyond your range of screens, the default is used instead."""
     openbox.execute(screen, bin)
 
+def setup_click_focus(click_raise = 1):
+    """Sets up for focusing windows by clicking on or in the window.
+       Optionally, clicking on or in a window can raise the window to the
+       front of its stacking layer."""
+    mbind("1", MC_Titlebar, MousePress, focus)
+    mbind("1", MC_Handle, MousePress, focus)
+    mbind("1", MC_Grip, MousePress, focus)
+    mbind("1", MC_Window, MousePress, focus)
+    if click_raise:
+        mbind("1", MC_Titlebar, MousePress, raise_win)
+        mbind("1", MC_Handle, MousePress, raise_win)
+        mbind("1", MC_Grip, MousePress, raise_win)
+        mbind("1", MC_Window, MousePress, raise_win)
+
+def setup_sloppy_focus(click_focus = 1, click_raise = 0):
+    """Sets up for focusing windows when the mouse pointer enters them.
+       Optionally, clicking on or in a window can focus it if your pointer
+       ends up inside a window without focus. Also, optionally, clicking on or
+       in a window can raise the window to the front of its stacking layer."""
+    ebind(EventEnterWindow, focus)
+    if click_focus:
+        setup_click_focus(click_raise)
+
+def setup_window_clicks():
+    """Sets up the default bindings for various mouse buttons for various
+       contexts.
+       This includes:
+        * Alt-left drag anywhere on a window will move it
+        * Alt-right drag anywhere on a window will resize it
+        * Left drag on a window's titlebar/handle will move it
+        * Left drag on a window's handle grips will resize it
+        * Alt-left press anywhere on a window's will raise it to the front of
+          its stacking layer.
+        * Left press on a window's titlebar/handle will raise it to the front
+          of its stacking layer.
+        * Alt-middle click anywhere on a window's will lower it to the bottom
+          of its stacking layer.
+        * Middle click on a window's titlebar/handle will lower it to the
+          bottom of its stacking layer.
+        * Double-left click on a window's titlebar will toggle shading it
+    """
+    mbind("A-1", MC_Frame, MouseMotion, move)
+    mbind("1", MC_Titlebar, MouseMotion, move)
+    mbind("1", MC_Handle, MouseMotion, move)
+
+    mbind("A-3", MC_Frame, MouseMotion, resize)
+    mbind("1", MC_Grip, MouseMotion, resize)
+
+    mbind("1", MC_Titlebar, MousePress, raise_win)
+    mbind("1", MC_Handle, MousePress, raise_win)
+    mbind("A-1", MC_Frame, MousePress, raise_win)
+    mbind("A-2", MC_Frame, MouseClick, lower_win)
+    mbind("2", MC_Titlebar, MouseClick, lower_win)
+    mbind("2", MC_Handle, MouseClick, lower_win)
+
+    mbind("1", MC_Titlebar, MouseDoubleClick, toggle_shade)
+
+def setup_window_buttons():
+    """Sets up the default behaviors for the buttons in the window titlebar."""
+    mbind("1", MC_CloseButton, MouseClick, close)
+
+def setup_scroll():
+    """Sets up the default behaviors for the mouse scroll wheel.
+       This includes:
+        * scrolling on a window titlebar will shade/unshade it
+        * alt-scrolling anywhere will switch to the next/previous desktop
+        * control-alt-scrolling on a window will send it to the next/previous
+          desktop, and switch to the desktop with the window
+    """
+    mbind("4", MC_Titlebar, MouseClick, shade)
+    mbind("5", MC_Titlebar, MouseClick, unshade)
+
+    mbind("A-4", MC_Frame, MouseClick, next_desktop)
+    mbind("A-4", MC_Root, MouseClick, next_desktop)
+    mbind("A-5", MC_Frame, MouseClick, prev_desktop)
+    mbind("A-5", MC_Root, MouseClick, prev_desktop)
+
+    mbind("C-A-4", MC_Frame, MouseClick, send_to_next_desktop)
+    mbind("C-A-5", MC_Frame, MouseClick, send_to_prev_desktop)
+
 print "Loaded builtins.py"

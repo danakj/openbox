@@ -10,6 +10,12 @@
 
 namespace otk {
 
+struct PixmapMask {
+  Pixmap mask;
+  unsigned int w, h;
+  PixmapMask() { mask = None; w = h = 0; }
+};
+
 class RenderStyle {
 public:
   enum TextJustify {
@@ -54,6 +60,11 @@ private:
 
   Font *_label_font;
   TextJustify _label_justify;
+
+  PixmapMask *_max_mask;
+  PixmapMask *_icon_mask;
+  PixmapMask *_stick_mask;
+  PixmapMask *_close_mask;
 
   int _handle_width;
   int _bevel_width;
@@ -101,12 +112,17 @@ public:
   inline RenderTexture *buttonPressUnfocusBackground() const
     { return _button_press_unfocus; }
 
-  inline RenderTexture *gripdFocusBackground() const { return _grip_focus; }
+  inline RenderTexture *gripFocusBackground() const { return _grip_focus; }
   inline RenderTexture *gripUnfocusBackground() const { return _grip_unfocus; }
 
   inline Font *labelFont() const { return _label_font; }
   inline TextJustify labelTextJustify() const { return _label_justify; }
 
+  inline PixmapMask *maximizeMask() const { return _max_mask; }
+  inline PixmapMask *iconifyMask() const { return _icon_mask; }
+  inline PixmapMask *stickyMask() const { return _stick_mask; }
+  inline PixmapMask *closeMask() const { return _close_mask; }
+  
   inline int handleWidth() const { return _handle_width; }
   inline int bevelWidth() const { return _bevel_width; }
 };

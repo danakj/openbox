@@ -5,6 +5,8 @@
 #endif // HAVE_CONFIG_H
 
 #include "renderstyle.hh"
+#include "display.hh"
+#include "screeninfo.hh"
 
 namespace otk {
 
@@ -166,6 +168,82 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     0x0);
 
   _label_font = new Font(_screen, "Arial,Sans-9:bold", true, 1, 0x40);
+
+  XImage *image = XCreateImage(**display,
+                               display->screenInfo(_screen)->visual(),
+                               2, XYBitmap, 0, NULL, 8, 8, 0, 0);
+  assert(image);
+  
+  _max_mask = new PixmapMask();
+  _max_mask->w = _max_mask->h = 8;
+  {
+    unsigned char data[] = {
+      0,1,1,1,1,1,1,0,
+      1,1,1,1,1,1,1,1,
+      1,1,0,0,0,0,1,1,
+      1,1,0,0,0,0,1,1,
+      1,1,0,0,0,0,1,1,
+      1,1,0,0,0,0,1,1,
+      1,1,1,1,1,1,1,1,
+      0,1,1,1,1,1,1,0 };
+    image->data = (char*)data;
+    XPutImage(**display, _max_mask->mask, DefaultGC(**display, _screen),
+              image, 0, 0, 0, 0, 8, 8);
+  }
+
+  _icon_mask = new PixmapMask();
+  _icon_mask->w = _icon_mask->h = 8;
+  {
+    unsigned char data[] = {
+      0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,
+      1,1,0,0,0,0,1,1,
+      1,1,1,0,0,1,1,1,
+      0,1,1,1,1,1,1,0,
+      0,0,1,1,1,1,0,0,
+      0,0,0,1,1,0,0,0,
+      0,0,0,0,0,0,0,0 };
+    image->data = (char*)data;
+    XPutImage(**display, _icon_mask->mask, DefaultGC(**display, _screen),
+              image, 0, 0, 0, 0, 8, 8);
+  }
+  
+  _stick_mask = new PixmapMask();
+  _stick_mask->w = _stick_mask->h = 8;
+  {
+    unsigned char data[] = {
+      0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0,
+      0,0,0,1,1,0,0,0,
+      0,0,1,1,1,1,0,0,
+      0,0,1,1,1,1,0,0,
+      0,0,0,1,1,0,0,0,
+      0,0,0,0,0,0,0,0,
+      0,0,0,0,0,0,0,0 };    
+    image->data = (char*)data;
+    XPutImage(**display, _stick_mask->mask, DefaultGC(**display, _screen),
+              image, 0, 0, 0, 0, 8, 8);
+  }
+  
+  _close_mask = new PixmapMask();
+  _close_mask->w = _close_mask->h = 8;
+  {
+    unsigned char data[] = {
+      1,1,0,0,0,0,1,1,
+      1,1,1,0,0,1,1,1,
+      0,1,1,1,1,1,1,0,
+      0,0,1,1,1,1,0,0,
+      0,0,1,1,1,1,0,0,
+      0,1,1,1,1,1,1,0,
+      1,1,1,0,0,1,1,1,
+      1,1,0,0,0,0,1,1 };
+    image->data = (char*)data;
+    XPutImage(**display, _close_mask->mask, DefaultGC(**display, _screen),
+              image, 0, 0, 0, 0, 8, 8);
+  }
+
+  image->data = NULL;
+  XDestroyImage(image);
 }
 
 RenderStyle::~RenderStyle()
@@ -199,6 +277,11 @@ RenderStyle::~RenderStyle()
   delete _grip_unfocus;
 
   delete _label_font;
+
+  delete _max_mask;
+  delete _icon_mask;
+  delete _stick_mask;
+  delete _close_mask;
 }
 
 }

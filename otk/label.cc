@@ -27,6 +27,8 @@ void Label::setStyle(RenderStyle *style)
 
 void Label::renderForeground(void)
 {
+  otk::Widget::renderForeground();
+
   const Font *ft = style()->labelFont();
   unsigned int sidemargin = style()->bevelWidth() * 2;
 

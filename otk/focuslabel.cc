@@ -31,6 +31,8 @@ void FocusLabel::setStyle(RenderStyle *style)
 
 void FocusLabel::renderForeground()
 {
+  otk::Widget::renderForeground();
+
   const Font *ft = style()->labelFont();
   RenderColor *text_color = (isFocused() ? style()->textFocusColor()
                              : style()->textUnfocusColor());

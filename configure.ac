@@ -53,6 +53,12 @@ PKG_CHECK_MODULES(FC, [fontconfig])
 AC_SUBST(FC_CFLAGS)
 AC_SUBST(FC_LIBS)
 
+## XXX REMOVE ME PLS XXX ##
+PKG_CHECK_MODULES(XFT, [xft])
+AC_SUBST(XFT_CFLAGS)
+AC_SUBST(XFT_LIBS)
+## XXX REMOVE ME PLS XXX ##
+
 PKG_CHECK_MODULES(XML, [libxml-2.0])
 AC_SUBST(XML_CFLAGS)
 AC_SUBST(XML_LIBS)
@@ -106,7 +112,8 @@ AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  themes/Makefile
 		 data/Makefile
-                 render/Makefile
+                 render/Makefile	
+                 render2/Makefile
 		 parser/Makefile
                  kernel/Makefile
 		 plugins/Makefile

@@ -1,4 +1,4 @@
-SUBDIRS = po themes data render parser kernel plugins tools
+SUBDIRS = po themes data render render2 parser kernel plugins tools
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
 doc:

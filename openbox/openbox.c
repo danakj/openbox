@@ -26,6 +26,7 @@
 #  include <fcntl.h>
 #endif
 #ifdef HAVE_SIGNAL_H
+#define __USE_UNIX98
 #  include <signal.h>
 #endif
 #ifdef HAVE_STDLIB_H
@@ -108,10 +109,10 @@ int main(int argc, char **argv)
     sigemptyset(&sigset);
     action.sa_handler = dispatch_signal;
     action.sa_mask = sigset;
-    action.sa_flags = SA_NOCLDSTOP;
+    action.sa_flags = SA_NOCLDSTOP | SA_NODEFER;
     sigaction(SIGUSR1, &action, (struct sigaction *) NULL);
     sigaction(SIGPIPE, &action, (struct sigaction *) NULL);
-    sigaction(SIGSEGV, &action, (struct sigaction *) NULL);
+/*    sigaction(SIGSEGV, &action, (struct sigaction *) NULL);*/
     sigaction(SIGFPE, &action, (struct sigaction *) NULL);
     sigaction(SIGTERM, &action, (struct sigaction *) NULL);
     sigaction(SIGINT, &action, (struct sigaction *) NULL);
@@ -442,7 +443,7 @@ static void signal_handler(const ObEvent *e, void *data)
     s = e->data.s.signal;
     switch (s) {
     case SIGUSR1:
-	g_message("Caught SIGUSR1 signal. Restarting.");
+	fprintf(stderr, "Caught SIGUSR1 signal. Restarting.");
 	ob_shutdown = ob_restart = TRUE;
 	break;
 
@@ -450,13 +451,13 @@ static void signal_handler(const ObEvent *e, void *data)
     case SIGINT:
     case SIGTERM:
     case SIGPIPE:
-	g_message("Caught signal %d. Exiting.", s);
+	fprintf(stderr, "Caught signal %d. Exiting.", s);
 	ob_shutdown = TRUE;
 	break;
 
     case SIGFPE:
     case SIGSEGV:
-	g_message("Caught signal %d. Aborting and dumping core.", s);
+        fprintf(stderr, "Caught signal %d. Aborting and dumping core.", s);
         abort();
     }
 }

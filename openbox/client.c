@@ -152,7 +152,6 @@ void client_manage(Window window)
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
-    guint i;
 
     grab_server(TRUE);
 
@@ -222,13 +221,7 @@ void client_manage(Window window)
     g_hash_table_insert(client_map, &self->window, self);
 
     /* update the focus lists */
-    if (self->desktop == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_insert(focus_order[i], self, 1);
-    } else {
-        i = self->desktop;
-        focus_order[i] = g_list_insert(focus_order[i], self, 1);
-    }
+    focus_order_add_new(self);
 
     stacking_raise(self);
 
@@ -300,7 +293,6 @@ void client_unmanage_all()
 
 void client_unmanage(Client *self)
 {
-    guint i;
     int j;
     GSList *it;
 
@@ -322,13 +314,7 @@ void client_unmanage(Client *self)
     g_hash_table_remove(client_map, &self->window);
 
     /* update the focus lists */
-    if (self->desktop == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_remove(focus_order[i], self);
-    } else {
-        i = self->desktop;
-        focus_order[i] = g_list_remove(focus_order[i], self);
-    }
+    focus_order_remove(self);
 
     /* once the client is out of the list, update the struts to remove it's
        influence */
@@ -1750,6 +1736,9 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 	/* we unmap the client itself so that we can get MapRequest events,
 	   and because the ICCCM tells us to! */
 	XUnmapWindow(ob_display, self->window);
+
+        /* update the focus lists.. iconic windows go to the bottom */
+        focus_order_to_bottom(self);
     } else {
 	if (curdesk)
 	    client_set_desktop(self, screen_desktop, FALSE);
@@ -1918,13 +1907,16 @@ void client_kill(Client *self)
 
 void client_set_desktop(Client *self, guint target, gboolean donthide)
 {
-    guint old, i;
+    guint old;
 
     if (target == self->desktop) return;
   
     g_message("Setting desktop %u", target);
 
     g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
+
+    /* remove from the old desktop(s) */
+    focus_order_remove(self);
 
     old = self->desktop;
     self->desktop = target;
@@ -1939,25 +1931,11 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
         stacking_raise(self);
     screen_update_struts();
 
-    /* update the focus lists */
-    if (old == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_remove(focus_order[i], self);
-    } else
-        focus_order[old] = g_list_remove(focus_order[old], self);
-    if (target == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i) {
-            if (config_focus_new)
-                focus_order[i] = g_list_prepend(focus_order[i], self);
-            else
-                focus_order[i] = g_list_append(focus_order[i], self);
-        }
-    } else {
-        if (config_focus_new)
-            focus_order[target] = g_list_prepend(focus_order[target], self);
-        else
-            focus_order[target] = g_list_append(focus_order[target], self);
-    }
+    /* add to the new desktop(s) */
+    if (config_focus_new)
+        focus_order_to_top(self);
+    else
+        focus_order_to_bottom(self);
 
     dispatch_client(Event_Client_Desktop, self, target, old);
 }
@@ -2144,38 +2122,23 @@ Client *client_focus_target(Client *self)
     return self;
 }
 
-gboolean client_focusable(Client *self)
-{
-    /* won't try focus if the client doesn't want it, or if the window isn't
-       visible on the screen */
-    return self->frame->visible &&
-        (self->can_focus || self->focus_notify);
-}
-
 gboolean client_focus(Client *self)
 {
     XEvent ev;
-    guint i;
 
     /* choose the correct target */
     self = client_focus_target(self);
 
     if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop) {
         /* update the focus lists */
-        if (self->desktop == DESKTOP_ALL) {
-            for (i = 0; i < screen_num_desktops; ++i) {
-                focus_order[i] = g_list_remove(focus_order[i], self);
-                focus_order[i] = g_list_prepend(focus_order[i], self);
-            }
-        } else {
-            i = self->desktop;
-            focus_order[i] = g_list_remove(focus_order[i], self);
-            focus_order[i] = g_list_prepend(focus_order[i], self);
-        }
+        focus_order_to_top(self);
         return FALSE;
     }
 
-    if (!client_focusable(self))
+    if (!((self->can_focus || self->focus_notify) &&
+          (self->desktop == screen_desktop ||
+           self->desktop == DESKTOP_ALL) &&
+          !self->iconic))
 	return FALSE;
 
     /* do a check to see if the window has already been unmapped or destroyed

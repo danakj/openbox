@@ -1,5 +1,7 @@
 #include "event.h"
 #include "openbox.h"
+#include "grab.h"
+#include "framerender.h"
 #include "client.h"
 #include "config.h"
 #include "frame.h"
@@ -132,12 +134,10 @@ static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
     Client *ret;
 
     for (it = c->transients; it; it = it->next) {
-        g_message("looking");
         if (it->data == top) return NULL;
         ret = find_transient_recursive(it->data, top, skip);
         if (ret && ret != skip && client_normal(ret)) return ret;
         if (it->data != skip && client_normal(it->data)) return it->data;
-        g_message("not found");
     }
     return NULL;
 }
@@ -213,6 +213,43 @@ void focus_fallback(FallbackType type)
     focus_set_client(NULL);
 }
 
+static void popup_cycle(Client *c, gboolean show)
+{
+    XSetWindowAttributes attrib;
+    static Window coords = None;
+
+    if (coords == None) {
+        attrib.override_redirect = TRUE;
+        coords = XCreateWindow(ob_display, ob_root,
+                               0, 0, 1, 1, 0, render_depth, InputOutput,
+                               render_visual, CWOverrideRedirect, &attrib);
+        g_assert(coords != None);
+
+        grab_pointer(TRUE, None);
+
+        XMapWindow(ob_display, coords);
+    }
+
+    if (!show) {
+        XDestroyWindow(ob_display, coords);
+        coords = None;
+
+        grab_pointer(FALSE, None);
+    } else {
+        Rect *a;
+        Size s;
+
+        a = screen_area(c->desktop);
+
+        framerender_size_popup_label(c->title, &s);
+        XMoveResizeWindow(ob_display, coords,
+                          a->x + (a->width - s.width) / 2,
+                          a->y + (a->height - s.height) / 2,
+                          s.width, s.height);
+        framerender_popup_label(coords, &s, c->title);
+    }
+}
+
 Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
                     gboolean cancel)
 {
@@ -231,6 +268,8 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
         goto done_cycle;
     } else if (done) {
         if (focus_cycle_target) {
+            if (focus_cycle_target->iconic)
+                client_iconify(focus_cycle_target, FALSE, FALSE);
             client_focus(focus_cycle_target);
             stacking_raise(focus_cycle_target);
         }
@@ -250,23 +289,23 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
     do {
         if (forward) {
             it = it->next;
-            if (it == NULL) it = list;
+            if (it == NULL) it = g_list_first(list);
         } else {
             it = it->prev;
             if (it == NULL) it = g_list_last(list);
         }
         ft = client_focus_target(it->data);
-        if (ft == it->data && client_normal(ft) && client_focusable(ft)) {
+        if (ft == it->data && client_normal(ft) &&
+            (ft->can_focus || ft->focus_notify) &&
+            (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) {
             if (focus_cycle_target)
                 frame_adjust_focus(focus_cycle_target->frame, FALSE);
-            else if (focus_client)
-                frame_adjust_focus(focus_client->frame, FALSE);
             focus_cycle_target = ft;
             frame_adjust_focus(focus_cycle_target->frame, TRUE);
+            popup_cycle(ft, TRUE);
             return ft;
         }
     } while (it != start);
-    return NULL;
 
 done_cycle:
     t = NULL;
@@ -274,5 +313,95 @@ done_cycle:
     focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;
+    popup_cycle(ft, FALSE);
     return NULL;
+}
+
+void focus_order_add_new(Client *c)
+{
+    guint d, i;
+
+    if (c->iconic)
+        focus_order_to_top(c);
+    else {
+        d = c->desktop;
+        if (d == DESKTOP_ALL) {
+            for (i = 0; i < screen_num_desktops; ++i) {
+                if (focus_order[i] && ((Client*)focus_order[i]->data)->iconic)
+                    focus_order[i] = g_list_insert(focus_order[i], c, 0);
+                else
+                    focus_order[i] = g_list_insert(focus_order[i], c, 1);
+            }
+        } else
+             if (focus_order[d] && ((Client*)focus_order[d]->data)->iconic)
+                focus_order[d] = g_list_insert(focus_order[d], c, 0);
+            else
+                focus_order[d] = g_list_insert(focus_order[d], c, 1);
+    }
+}
+
+void focus_order_remove(Client *c)
+{
+    guint d, i;
+
+    d = c->desktop;
+    if (d == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            focus_order[i] = g_list_remove(focus_order[i], c);
+    } else
+        focus_order[d] = g_list_remove(focus_order[d], c);
+}
+
+static void to_top(Client *c, guint d)
+{
+    focus_order[d] = g_list_remove(focus_order[d], c);
+    if (!c->iconic) {
+        focus_order[d] = g_list_prepend(focus_order[d], c);
+    } else {
+        GList *it;
+
+        /* insert before first iconic window */
+        for (it = focus_order[d];
+             it && !((Client*)it->data)->iconic; it = it->next);
+        g_list_insert_before(focus_order[d], it, c);
+    }
+}
+
+void focus_order_to_top(Client *c)
+{
+    guint d, i;
+
+    d = c->desktop;
+    if (d == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            to_top(c, i);
+    } else
+        to_top(c, d);
+}
+
+static void to_bottom(Client *c, guint d)
+{
+    focus_order[d] = g_list_remove(focus_order[d], c);
+    if (c->iconic) {
+        focus_order[d] = g_list_append(focus_order[d], c);
+    } else {
+        GList *it;
+
+        /* insert before first iconic window */
+        for (it = focus_order[d];
+             it && !((Client*)it->data)->iconic; it = it->next);
+        g_list_insert_before(focus_order[d], it, c);
+    }
+}
+
+void focus_order_to_bottom(Client *c)
+{
+    guint d, i;
+
+    d = c->desktop;
+    if (d == DESKTOP_ALL) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            to_bottom(c, i);
+    } else
+        to_bottom(c, d);
 }

@@ -36,4 +36,17 @@ void focus_fallback(FallbackType type);
 struct Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
                            gboolean cancel);
 
+/*! Add a new client into the focus order */
+void focus_order_add_new(struct Client *c);
+
+/*! Remove a client from the focus order */
+void focus_order_remove(struct Client *c);
+
+/*! Move a client to the top of the focus order */
+void focus_order_to_top(struct Client *c);
+
+/*! Move a client to the bottom of the focus order (keeps iconic windows at the
+  very bottom always though). */
+void focus_order_to_bottom(struct Client *c);
+
 #endif

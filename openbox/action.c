@@ -1,12 +1,10 @@
 #include "client.h"
-#include "grab.h"
 #include "focus.h"
 #include "moveresize.h"
 #include "menu.h"
 #include "prop.h"
 #include "stacking.h"
 #include "frame.h"
-#include "framerender.h"
 #include "screen.h"
 #include "action.h"
 #include "dispatch.h"
@@ -683,49 +681,11 @@ void action_showmenu(union ActionData *data)
     }
 }
 
-static void popup_cycle(Client *c, gboolean hide)
-{
-    XSetWindowAttributes attrib;
-    static Window coords = None;
-
-    if (coords == None) {
-        attrib.override_redirect = TRUE;
-        coords = XCreateWindow(ob_display, ob_root,
-                               0, 0, 1, 1, 0, render_depth, InputOutput,
-                               render_visual, CWOverrideRedirect, &attrib);
-        g_assert(coords != None);
-
-        grab_pointer(TRUE, None);
-
-        XMapWindow(ob_display, coords);
-    }
-
-    if (hide) {
-        XDestroyWindow(ob_display, coords);
-        coords = None;
-
-        grab_pointer(FALSE, None);
-    } else {
-        Rect *a;
-        Size s;
-
-        a = screen_area(c->desktop);
-
-        framerender_size_popup_label(c->title, &s);
-        XMoveResizeWindow(ob_display, coords,
-                          a->x + (a->width - s.width) / 2,
-                          a->y + (a->height - s.height) / 2,
-                          s.width, s.height);
-        framerender_popup_label(coords, &s, c->title);
-    }
-}
-
 void action_cycle_windows(union ActionData *data)
 {
     Client *c;
     
     c = focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
                     data->cycle.cancel);
-    popup_cycle(c, !c || data->cycle.final || data->cycle.cancel);
 }
 

@@ -139,7 +139,7 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
 void moveresize_end(gboolean cancel)
 {
     grab_keyboard(FALSE);
-    grab_pointer(FALSE, None);
+    grab_pointer(FALSE, OB_CURSOR_NONE);
 
     popup_hide(popup);
 

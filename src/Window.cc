@@ -3899,6 +3899,7 @@ void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
   if (flags.moving) {
     doMove(me->x_root, me->y_root);
   } else if (flags.resizing) {
+    if (flags.shaded) shade(); //unshade
     doResize(me->x_root, me->y_root);
   } else {
     if ((functions & Func_Move) &&

@@ -947,8 +947,7 @@ void client_update_title(Client *self)
 {
     gchar *data = NULL;
 
-    if (self->title != NULL)
-	g_free(self->title);
+    g_free(self->title);
      
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_name, utf8, data)) {
@@ -982,8 +981,7 @@ void client_update_icon_title(Client *self)
 {
     gchar *data = NULL;
 
-    if (self->icon_title != NULL)
-	g_free(self->icon_title);
+    g_free(self->icon_title);
      
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_icon_name, utf8, data)) {

@@ -11,9 +11,9 @@ GList  *stacking_list = NULL;
 
 void stacking_set_list()
 {
-    Window *windows, *win_it;
+    Window *windows = NULL;
     GList *it;
-    guint size = g_list_length(stacking_list);
+    guint i = 0;
 
     /* on shutdown, don't update the properties, so that we can read it back
        in on startup and re-stack the windows as they were before we shut down
@@ -22,23 +22,18 @@ void stacking_set_list()
 
     /* create an array of the window ids (from bottom to top,
        reverse order!) */
-    if (size > 0) {
-	windows = g_new(Window, size);
-	win_it = windows;
-	for (it = g_list_last(stacking_list); it != NULL;
-             it = it->prev)
-            if (WINDOW_IS_CLIENT(it->data)) {
-                *win_it = WINDOW_AS_CLIENT(it->data)->window;
-                ++win_it;
-            }
-    } else
-	windows = win_it = NULL;
+    if (stacking_list) {
+	windows = g_new(Window, g_list_length(stacking_list));
+        for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
+            if (WINDOW_IS_CLIENT(it->data))
+                windows[i++] = WINDOW_AS_CLIENT(it->data)->window;
+        }
+    }
 
     PROP_SETA32(ob_root, net_client_list_stacking, window,
-                (guint32*)windows, win_it - windows);
+                (guint32*)windows, i);
 
-    if (windows)
-	g_free(windows);
+    g_free(windows);
 }
 
 static void do_restack(GList *wins, GList *before)
@@ -78,6 +73,8 @@ static void do_restack(GList *wins, GList *before)
 
     XRestackWindows(ob_display, win, i);
     g_free(win);
+
+    stacking_set_list();
 }
 
 static void raise(GList *wins)

@@ -154,6 +154,8 @@ void event_process(XEvent *e)
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
+        if (ob_state != State_Running) return;
+
 	event_lasttime = e->xbutton.time;
 	e->xbutton.state &= ~(LockMask | NumLockMask | ScrollLockMask);
 	/* kill off the Button1Mask etc, only want the modifiers */
@@ -161,6 +163,8 @@ void event_process(XEvent *e)
 			     Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
 	break;
     case KeyPress:
+        if (ob_state != State_Running) return;
+
 	event_lasttime = e->xkey.time;
 	e->xkey.state &= ~(LockMask | NumLockMask | ScrollLockMask);
 	/* kill off the Button1Mask etc, only want the modifiers */
@@ -185,6 +189,8 @@ void event_process(XEvent *e)
 
 	break;
     case KeyRelease:
+        if (ob_state != State_Running) return;
+
 	event_lasttime = e->xkey.time;
 	e->xkey.state &= ~(LockMask | NumLockMask | ScrollLockMask);
 	/* kill off the Button1Mask etc, only want the modifiers */
@@ -207,6 +213,8 @@ void event_process(XEvent *e)
 	}
 	break;
     case MotionNotify:
+        if (ob_state != State_Running) return;
+
 	event_lasttime = e->xmotion.time;
 	e->xmotion.state &= ~(LockMask | NumLockMask | ScrollLockMask);
 	/* kill off the Button1Mask etc, only want the modifiers */

@@ -846,14 +846,14 @@ void client_setup_decor_and_functions(Client *self)
 	break;
 
     case Type_Dialog:
-	/* dialogs cannot be maximized */
+    case Type_Utility:
+	/* these windows cannot be maximized */
 	self->decorations &= ~Decor_Maximize;
 	self->functions &= ~Func_Maximize;
 	break;
 
     case Type_Menu:
     case Type_Toolbar:
-    case Type_Utility:
 	/* these windows get less functionality */
 	self->decorations &= ~(Decor_Iconify | Decor_Handle);
 	self->functions &= ~(Func_Iconify | Func_Resize);

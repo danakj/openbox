@@ -32,7 +32,7 @@
   OBClient *client(int i) {
     if (i >= (int)self->clients.size())
       return NULL;
-    ob::OBScreen::ClientList::iterator it = self->clients.begin();
+    ob::OBClient::List::iterator it = self->clients.begin();
     std::advance(it,i);
     return *it;
   }

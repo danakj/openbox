@@ -783,7 +783,7 @@ static std::string SwigString_AsString(PyObject* o) {
 ob::OBClient *ob_OBScreen_client(ob::OBScreen *self,int i){
     if (i >= (int)self->clients.size())
       return NULL;
-    ob::OBScreen::ClientList::iterator it = self->clients.begin();
+    ob::OBClient::List::iterator it = self->clients.begin();
     std::advance(it,i);
     return *it;
   }
@@ -2911,16 +2911,16 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Openbox_State_Normal", (long) ob::Openbox::State_Normal, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Exiting", (long) ob::Openbox::State_Exiting, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBScreen_event_mask", (long) ob::OBScreen::event_mask, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Icon", (long) ob::OBScreen::Layer_Icon, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Desktop", (long) ob::OBScreen::Layer_Desktop, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Below", (long) ob::OBScreen::Layer_Below, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Normal", (long) ob::OBScreen::Layer_Normal, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Above", (long) ob::OBScreen::Layer_Above, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Top", (long) ob::OBScreen::Layer_Top, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Fullscreen", (long) ob::OBScreen::Layer_Fullscreen, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Internal", (long) ob::OBScreen::Layer_Internal, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"OBScreen_NUM_LAYERS", (long) ob::OBScreen::NUM_LAYERS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MwmHints_elements", (long) ob::MwmHints::elements, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Icon", (long) ob::OBClient::Layer_Icon, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Desktop", (long) ob::OBClient::Layer_Desktop, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Below", (long) ob::OBClient::Layer_Below, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Normal", (long) ob::OBClient::Layer_Normal, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Above", (long) ob::OBClient::Layer_Above, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Top", (long) ob::OBClient::Layer_Top, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Fullscreen", (long) ob::OBClient::Layer_Fullscreen, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_Layer_Internal", (long) ob::OBClient::Layer_Internal, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBClient_NUM_LAYERS", (long) ob::OBClient::NUM_LAYERS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBClient_TopLeft", (long) ob::OBClient::TopLeft, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBClient_TopRight", (long) ob::OBClient::TopRight, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBClient_BottomLeft", (long) ob::OBClient::BottomLeft, 0, 0, 0},

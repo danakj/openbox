@@ -410,7 +410,7 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
     // grab the button on all clients
     for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
       OBScreen *s = Openbox::instance->screen(sn);
-      OBScreen::ClientList::iterator c_it, c_end = s->clients.end();
+      OBClient::List::iterator c_it, c_end = s->clients.end();
       for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
         grabButton(true, bind->binding, context, *c_it);
       }
@@ -435,7 +435,7 @@ void OBBindings::removeAllButtons()
       // ungrab the button on all clients
       for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
         OBScreen *s = Openbox::instance->screen(sn);
-        OBScreen::ClientList::iterator c_it, c_end = s->clients.end();
+        OBClient::List::iterator c_it, c_end = s->clients.end();
         for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
           grabButton(false, (*it)->binding, (MouseContext)i, *c_it);
         }

@@ -10,6 +10,7 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
+#include "client.hh"
 #include "rootwindow.hh"
 #include "otk/image.hh"
 #include "otk/strut.hh"
@@ -29,8 +30,6 @@ class OBRootWindow;
 */
 class OBScreen {
 public:
-  //! Holds a list of OBClient objects
-  typedef std::list<OBClient*> ClientList;
   //! Holds a list of otk::Strut objects
   typedef std::list<otk::Strut*> StrutList;
 
@@ -43,20 +42,8 @@ public:
                                           ButtonPressMask |
                                           ButtonReleaseMask;
 
-  enum StackLayer {
-    Layer_Icon,       // 0 - iconified windows, in any order at all
-    Layer_Desktop,    // 1 - desktop windows
-    Layer_Below,      // 2 - normal windows w/ below
-    Layer_Normal,     // 3 - normal windows
-    Layer_Above,      // 4 - normal windows w/ above
-    Layer_Top,        // 5 - always-on-top-windows (docks?)
-    Layer_Fullscreen, // 6 - fullscreeen windows
-    Layer_Internal,   // 7 - openbox windows/menus
-    NUM_LAYERS
-  };
-
   //! All managed clients on the screen (in order of being mapped)
-  ClientList clients;
+  OBClient::List clients;
   
 private:
   //! Was %Openbox able to manage the screen?
@@ -94,7 +81,7 @@ private:
   Window _supportwindow;
 
   //! A list of all managed clients on the screen, in their stacking order
-  ClientList _stacking;
+  OBClient::List _stacking;
 
   //! Calculate the OBScreen::_area member
   void calcArea();

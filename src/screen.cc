@@ -196,7 +196,7 @@ void OBScreen::updateStrut()
 {
   _strut.left = _strut.right = _strut.top = _strut.bottom = 0;
 
-  ClientList::iterator it, end = clients.end();
+  OBClient::List::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     const otk::Strut &s = (*it)->strut();
     _strut.left = std::max(_strut.left, s.left);
@@ -364,8 +364,8 @@ void OBScreen::setClientList()
     
     windows = new Window[size];
     win_it = windows;
-    ClientList::const_iterator it = clients.begin();
-    const ClientList::const_iterator end = clients.end();
+    OBClient::List::const_iterator it = clients.begin();
+    const OBClient::List::const_iterator end = clients.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -397,8 +397,8 @@ void OBScreen::setStackingList()
     
     windows = new Window[size];
     win_it = windows;
-    ClientList::const_iterator it = _stacking.begin();
-    const ClientList::const_iterator end = _stacking.end();
+    OBClient::List::const_iterator it = _stacking.begin();
+    const OBClient::List::const_iterator end = _stacking.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -547,7 +547,7 @@ void OBScreen::unmanageWindow(OBClient *client)
   // pass around focus if this window was focused XXX do this better!
   if (Openbox::instance->focusedClient() == client) {
     OBClient *newfocus = 0;
-    ClientList::iterator it, end = _stacking.end();
+    OBClient::List::iterator it, end = _stacking.end();
     for (it = _stacking.begin(); it != end; ++it)
       if ((*it)->normal() && (*it)->focus()) {
         newfocus = *it;
@@ -604,7 +604,7 @@ void OBScreen::restack(bool raise, OBClient *client)
 
   // the stacking list is from highest to lowest
   
-  ClientList::iterator it = _stacking.begin(), end = _stacking.end();
+  OBClient::List::iterator it = _stacking.begin(), end = _stacking.end();
   // insert the windows above this window
   for (; it != end; ++it) {
     if ((*it)->layer() < layer || (raise && (*it)->layer() == layer))

@@ -7,6 +7,12 @@
   property changes on the window and some client messages
 */
 
+#include "widget.hh"
+#include "otk/point.hh"
+#include "otk/strut.hh"
+#include "otk/rect.hh"
+#include "otk/eventhandler.hh"
+
 extern "C" {
 #include <X11/Xlib.h>
 
@@ -16,13 +22,7 @@ extern "C" {
 }
 
 #include <string>
-
-#include "screen.hh"
-#include "widget.hh"
-#include "otk/point.hh"
-#include "otk/strut.hh"
-#include "otk/rect.hh"
-#include "otk/eventhandler.hh"
+#include <list>
 
 namespace ob {
 
@@ -40,7 +40,6 @@ struct MwmHints {
   unsigned long functions;  //!< A bitmask of OBClient::MwmFunctions values
   unsigned long decorations;//!< A bitmask of OBClient::MwmDecorations values
 };
-
 
 //! Maintains the state of a client window.
 /*!
@@ -62,6 +61,22 @@ public:
     NOTE: This should NEVER be used inside the client class's constructor!
   */
   OBFrame *frame;
+
+  //! Holds a list of OBClients
+  typedef std::list<OBClient*> List;
+
+  //! The possible stacking layers a client window can be a part of
+  enum StackLayer {
+    Layer_Icon,       //!< 0 - iconified windows, in any order at all
+    Layer_Desktop,    //!< 1 - desktop windows
+    Layer_Below,      //!< 2 - normal windows w/ below
+    Layer_Normal,     //!< 3 - normal windows
+    Layer_Above,      //!< 4 - normal windows w/ above
+    Layer_Top,        //!< 5 - always-on-top-windows (docks?)
+    Layer_Fullscreen, //!< 6 - fullscreeen windows
+    Layer_Internal,   //!< 7 - openbox windows/menus
+    NUM_LAYERS
+  };
 
   //! Corners of the client window, used for anchor positions
   enum Corner { TopLeft,
@@ -157,7 +172,11 @@ private:
   //! The id of the group the window belongs to
   Window   _group;
 
-  // XXX: transient_for, transients
+  //! The client which this client is a transient (child) for
+  OBClient *_transient_for;
+
+  //! The clients which are transients (children) of this client
+  OBClient::List _transients;
 
   //! The desktop on which the window resides (0xffffffff for all desktops)
   unsigned long _desktop;
@@ -272,7 +291,7 @@ private:
   //! The window should be underneath other windows of the same type
   bool _below;
 
-  OBScreen::StackLayer _layer;
+  StackLayer _layer;
 
   //! A bitmask of values in the OBClient::Decoration enum
   /*!
@@ -327,9 +346,10 @@ private:
   void updateIconTitle();
   //! Updates the window's application name and class
   void updateClass();
-  // XXX: updateTransientFor();
   //! Updates the strut for the client
   void updateStrut();
+  //! Updates the window's transient status, and any parents of it
+  void updateTransientFor();
 
   //! Change the client's state hints to match the class' data
   void changeState();
@@ -435,7 +455,7 @@ public:
   //! Returns if the window is maximized horizontally
   inline bool maxHorz() const { return _max_horz; }
   //! Returns the window's stacking layer
-  inline OBScreen::StackLayer layer() const { return _layer; }
+  inline StackLayer layer() const { return _layer; }
 
   //! Removes or reapplies the client's border to its window
   /*!

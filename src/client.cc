@@ -41,11 +41,15 @@ OBClient::OBClient(int screen, Window window)
   _decorations = _functions = 0;
   // start unfocused
   _focused = false;
+  // not a transient by default of course
+  _transient_for = 0;
   
   getArea();
   getDesktop();
-  // XXX: updateTransientFor();
+  updateTransientFor();
   getType();
+
+  // XXX: changeAllowedActions();
 
   // set the decorations and functions
   _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
@@ -171,10 +175,9 @@ void OBClient::getType()
      * the window type hint was not set, which means we either classify ourself
      * as a normal window or a dialog, depending on if we are a transient.
      */
-    // XXX: make this code work!
-    //if (isTransient())
-    //  _type = Type_Dialog;
-    //else
+    if (_transient_for)
+      _type = Type_Dialog;
+    else
       _type = Type_Normal;
   }
 }
@@ -315,16 +318,16 @@ void OBClient::getShaped()
 
 
 void OBClient::calcLayer() {
-  if (_iconic) _layer = OBScreen::Layer_Icon;
-  else if (_fullscreen) _layer = OBScreen::Layer_Fullscreen;
-  else if (_type == Type_Desktop) _layer = OBScreen::Layer_Desktop;
+  if (_iconic) _layer = Layer_Icon;
+  else if (_fullscreen) _layer = Layer_Fullscreen;
+  else if (_type == Type_Desktop) _layer = Layer_Desktop;
   else if (_type == Type_Dock) {
-    if (!_below) _layer = OBScreen::Layer_Top;
-    else _layer = OBScreen::Layer_Normal;
+    if (!_below) _layer = Layer_Top;
+    else _layer = Layer_Normal;
   }
-  else if (_above) _layer = OBScreen::Layer_Above;
-  else if (_below) _layer = OBScreen::Layer_Below;
-  else _layer = OBScreen::Layer_Normal;
+  else if (_above) _layer = Layer_Above;
+  else if (_below) _layer = Layer_Below;
+  else _layer = Layer_Normal;
 }
 
 
@@ -521,6 +524,41 @@ void OBClient::updateStrut()
 }
 
 
+void OBClient::updateTransientFor()
+{
+  Window t = 0;
+  OBClient *c = 0;
+
+  if (XGetTransientForHint(otk::OBDisplay::display, _window, &t) &&
+      t != _window) { // cant be transient to itself!
+    c = Openbox::instance->findClient(t);
+    assert(c != this); // if this happens then we need to check for it
+
+    if (!c /*XXX: && _group*/) {
+      // not transient to a client, see if it is transient for a group
+      if (//t == _group->leader() ||
+        t == None ||
+        t == otk::OBDisplay::screenInfo(_screen)->rootWindow()) {
+        // window is a transient for its group!
+        // XXX: for now this is treated as non-transient.
+        //      this needs to be fixed!
+      }
+    }
+  }
+
+  // if anything has changed...
+  if (c != _transient_for) {
+    if (_transient_for)
+      _transient_for->_transients.remove(this); // remove from old parent
+    _transient_for = c;
+    if (_transient_for)
+      _transient_for->_transients.push_back(this); // add to new parent
+
+    // XXX: change decor status?
+  }
+}
+
+
 void OBClient::propertyHandler(const XPropertyEvent &e)
 {
   otk::OtkEventHandler::propertyHandler(e);
@@ -542,6 +580,8 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
     updateNormalHints();
   else if (e.atom == XA_WM_HINTS)
     updateWMHints();
+  else if (e.atom == XA_WM_TRANSIENT_FOR)
+    updateTransientFor();
   else if (e.atom == property->atom(otk::OBProperty::net_wm_name) ||
            e.atom == property->atom(otk::OBProperty::wm_name))
     updateTitle();
@@ -552,10 +592,8 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
     updateClass();
   else if (e.atom == property->atom(otk::OBProperty::wm_protocols))
     updateProtocols();
-  // XXX: transient for hint
   else if (e.atom == property->atom(otk::OBProperty::net_wm_strut))
     updateStrut();
-  // XXX: strut hint
 }
 
 
@@ -563,7 +601,8 @@ void OBClient::setWMState(long state)
 {
   if (state == _wmstate) return; // no change
   
-  switch (state) {
+  _wmstate = state;
+  switch (_wmstate) {
   case IconicState:
     // XXX: cause it to iconify
     break;
@@ -571,7 +610,6 @@ void OBClient::setWMState(long state)
     // XXX: cause it to uniconify
     break;
   }
-  _wmstate = state;
 }
 
 

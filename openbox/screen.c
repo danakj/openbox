@@ -247,7 +247,7 @@ void screen_resize()
     screen_physical_size.height = geometry[1] = h;
     PROP_SETA32(ob_root, net_desktop_geometry, cardinal, geometry, 2);
 
-    if (ob_state == State_Starting)
+    if (ob_state == OB_STATE_STARTING)
 	return;
 
     dock_configure();
@@ -355,33 +355,42 @@ void screen_set_desktop(guint num)
 
 void screen_update_layout()
 {
-    guint32 *data = NULL;
+    ObOrientation orient;
+    ObCorner corner;
+    guint rows;
+    guint cols;
+    guint32 *data;
     guint num;
-
-    /* defaults */
-    screen_desktop_layout.orientation = prop_atoms.net_wm_orientation_horz;
-    screen_desktop_layout.start_corner = prop_atoms.net_wm_topleft;
-    screen_desktop_layout.rows = 1;
-    screen_desktop_layout.columns = screen_num_desktops;
+    gboolean valid = FALSE;
 
     if (PROP_GETA32(ob_root, net_desktop_layout, cardinal, &data, &num)) {
         if (num == 3 || num == 4) {
+
             if (data[0] == prop_atoms.net_wm_orientation_vert)
-                screen_desktop_layout.orientation = data[0];
-            if (num == 3)
-                screen_desktop_layout.start_corner =
-                    prop_atoms.net_wm_topright;
+                orient = OB_ORIENTATION_VERT;
+            else if (data[0] == prop_atoms.net_wm_orientation_horz)
+                orient = OB_ORIENTATION_HORZ;
+            else
+                goto screen_update_layout_bail;
+
+            if (num < 4)
+                corner = OB_CORNER_TOPLEFT;
             else {
                 if (data[3] == prop_atoms.net_wm_topright)
-                    screen_desktop_layout.start_corner = data[3];
+                    corner = OB_CORNER_TOPRIGHT;
                 else if (data[3] == prop_atoms.net_wm_bottomright)
-                    screen_desktop_layout.start_corner = data[3];
+                    corner = OB_CORNER_BOTTOMRIGHT;
                 else if (data[3] == prop_atoms.net_wm_bottomleft)
-                    screen_desktop_layout.start_corner = data[3];
+                    corner = OB_CORNER_BOTTOMLEFT;
+                else
+                    goto screen_update_layout_bail;
             }
 
             /* fill in a zero rows/columns */
-            if (!(data[1] == 0 && data[2] == 0)) { /* both 0's is bad data.. */
+            if ((data[1] == 0 && data[2] == 0) || /* both 0's is bad data.. */
+                (data[1] != 0 && data[2] != 0)) { /* no 0's is bad data.. */
+                goto screen_update_layout_bail;
+            } else {
                 if (data[1] == 0) {
                     data[1] = (screen_num_desktops +
                                screen_num_desktops % data[2]) / data[2];
@@ -389,38 +398,39 @@ void screen_update_layout()
                     data[2] = (screen_num_desktops +
                                screen_num_desktops % data[1]) / data[1];
                 }
-                screen_desktop_layout.columns = data[1];
-                screen_desktop_layout.rows = data[2];
+                cols = data[1];
+                rows = data[2];
             }
 
             /* bounds checking */
-            if (screen_desktop_layout.orientation ==
-                prop_atoms.net_wm_orientation_horz) {
-                if (screen_desktop_layout.rows > screen_num_desktops)
-                    screen_desktop_layout.rows = screen_num_desktops;
-                if (screen_desktop_layout.columns >
-                    ((screen_num_desktops + screen_num_desktops %
-                      screen_desktop_layout.rows) /
-                     screen_desktop_layout.rows))
-                    screen_desktop_layout.columns =
-                        (screen_num_desktops + screen_num_desktops %
-                         screen_desktop_layout.rows) /
-                        screen_desktop_layout.rows;
+            if (orient == OB_ORIENTATION_HORZ) {
+                rows = MIN(rows, screen_num_desktops);
+                cols = MIN(cols, ((screen_num_desktops +
+                                     (screen_num_desktops % rows)) / rows));
             } else {
-                if (screen_desktop_layout.columns > screen_num_desktops)
-                    screen_desktop_layout.columns = screen_num_desktops;
-                if (screen_desktop_layout.rows >
-                    ((screen_num_desktops + screen_num_desktops %
-                      screen_desktop_layout.columns) /
-                     screen_desktop_layout.columns))
-                    screen_desktop_layout.rows =
-                        (screen_num_desktops + screen_num_desktops %
-                         screen_desktop_layout.columns) /
-                        screen_desktop_layout.columns;
+                cols = MIN(cols, screen_num_desktops);
+                rows = MIN(rows, ((screen_num_desktops +
+                                     (screen_num_desktops % cols)) / cols));
             }
+
+            valid = TRUE;
         }
-	g_free(data);
+    screen_update_layout_bail:
+        g_free(data);
     }
+
+    if (!valid) {
+        /* defaults */
+        orient = OB_ORIENTATION_HORZ;
+        corner = OB_CORNER_TOPLEFT;
+        rows = 1;
+        cols = screen_num_desktops;
+    }
+
+    screen_desktop_layout.orientation = orient;
+    screen_desktop_layout.start_corner = corner;
+    screen_desktop_layout.rows = rows;
+    screen_desktop_layout.columns = cols;
 }
 
 void screen_update_desktop_names()
@@ -715,10 +725,10 @@ static void set_root_cursor()
 {
 #ifdef USE_LIBSN
         if (sn_busy_cnt)
-            XDefineCursor(ob_display, ob_root, ob_cursors.busy);
+            XDefineCursor(ob_display, ob_root, ob_cursor(OB_CURSOR_BUSY));
         else
 #endif
-            XDefineCursor(ob_display, ob_root, ob_cursors.ptr);
+            XDefineCursor(ob_display, ob_root, ob_cursor(OB_CURSOR_POINTER));
 }
 
 #ifdef USE_LIBSN

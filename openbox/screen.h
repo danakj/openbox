@@ -1,6 +1,7 @@
 #ifndef __screen_h
 #define __screen_h
 
+#include "misc.h"
 #include "geom.h"
 #include "client.h"
 
@@ -17,15 +18,9 @@ extern guint screen_desktop;
 /*! Are we in showing-desktop mode? */
 extern gboolean screen_showing_desktop;
 
-/*! Orientation of the desktops */
-typedef enum {
-    Orientation_Horz = 0,
-    Orientation_Vert = 1
-} Orientation;
-
 typedef struct DesktopLayout {
-    Orientation orientation;
-    Corner start_corner;
+    ObOrientation orientation;
+    ObCorner start_corner;
     guint rows;
     guint columns;
 } DesktopLayout;

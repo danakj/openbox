@@ -91,7 +91,7 @@ void dock_add(Window win, XWMHints *wmhints)
       member set the root window, and one set to the client, but both get
       handled and need to be ignored.
     */
-    if (ob_state == State_Starting)
+    if (ob_state == OB_STATE_STARTING)
 	app->ignore_unmaps += 2;
 
     if (app->win != app->icon_win) {
@@ -109,7 +109,7 @@ void dock_add(Window win, XWMHints *wmhints)
 
     grab_button_full(2, 0, app->icon_win,
                      ButtonPressMask | ButtonReleaseMask | ButtonMotionMask,
-                     GrabModeAsync, ob_cursors.move);
+                     GrabModeAsync, OB_CURSOR_MOVE);
 
     g_hash_table_insert(window_map, &app->icon_win, app);
 

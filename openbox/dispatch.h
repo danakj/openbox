@@ -98,6 +98,6 @@ void dispatch_signal(int signal);
 void dispatch_move(Client *c, int *x, int *y);
 /* *w and *h should be set with the destination of the window, they may be
    changed by the event handlers */
-void dispatch_resize(Client *c, int *w, int *h, Corner corner);
+void dispatch_resize(Client *c, int *w, int *h, ObCorner corner);
 
 #endif

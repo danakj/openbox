@@ -61,9 +61,9 @@ Frame *frame_new()
     self->iconify = createWindow(self->title, mask, &attrib);
     self->handle = createWindow(self->window, mask, &attrib);
     mask |= CWCursor;
-    attrib.cursor = ob_cursors.bl;
+    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, mask, &attrib);
-    attrib.cursor = ob_cursors.br;
+    attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
     self->rgrip = createWindow(self->handle, mask, &attrib);
 
     self->focused = FALSE;
@@ -344,7 +344,7 @@ void frame_grab_client(Frame *self, Client *client)
       member set the root window, and one set to the client, but both get
       handled and need to be ignored.
     */
-    if (ob_state == State_Starting)
+    if (ob_state == OB_STATE_STARTING)
 	client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map

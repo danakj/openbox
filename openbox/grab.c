@@ -32,7 +32,7 @@ gboolean grab_keyboard(gboolean grab)
     return ret;
 }
 
-gboolean grab_pointer(gboolean grab, Cursor cur)
+gboolean grab_pointer(gboolean grab, ObCursor cur)
 {
     static guint pgrabs = 0;
     gboolean ret = FALSE;
@@ -40,7 +40,8 @@ gboolean grab_pointer(gboolean grab, Cursor cur)
     if (grab) {
         if (pgrabs++ == 0)
             ret = XGrabPointer(ob_display, ob_root, False, GRAB_PTR_MASK,
-                               GrabModeAsync, GrabModeAsync, FALSE, cur,
+                               GrabModeAsync, GrabModeAsync, FALSE,
+                               ob_cursor(cur),
                                event_lasttime) == Success;
         else
             ret = TRUE;
@@ -52,7 +53,7 @@ gboolean grab_pointer(gboolean grab, Cursor cur)
     return ret;
 }
 
-gboolean grab_pointer_window(gboolean grab, Cursor cur, Window win)
+gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
 {
     static guint pgrabs = 0;
     gboolean ret = FALSE;
@@ -60,7 +61,8 @@ gboolean grab_pointer_window(gboolean grab, Cursor cur, Window win)
     if (grab) {
         if (pgrabs++ == 0)
             ret = XGrabPointer(ob_display, win, False, GRAB_PTR_MASK,
-                               GrabModeAsync, GrabModeAsync, TRUE, cur,
+                               GrabModeAsync, GrabModeAsync, TRUE,
+                               ob_cursor(cur),
                                event_lasttime) == Success;
         else
             ret = TRUE;
@@ -113,13 +115,13 @@ void grab_shutdown()
 }
 
 void grab_button_full(guint button, guint state, Window win, guint mask,
-                      int pointer_mode, Cursor cursor)
+                      int pointer_mode, ObCursor cur)
 {
     guint i;
 
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
-                    pointer_mode, GrabModeSync, None, cursor);
+                    pointer_mode, GrabModeSync, None, ob_cursor(cur));
 }
 
 void grab_button(guint button, guint state, Window win, guint mask)

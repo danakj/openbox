@@ -254,7 +254,7 @@ void client_manage(Window window)
     focus_order_add_new(self);
 
     /* focus the new window? */
-    if (ob_state != State_Starting && config_focus_new &&
+    if (ob_state != OB_STATE_STARTING && config_focus_new &&
         (self->type == Type_Normal || self->type == Type_Dialog)) {
         gboolean group_foc = FALSE;
         
@@ -403,7 +403,7 @@ void client_unmanage(Client *self)
     frame_release_client(self->frame, self);
     self->frame = NULL;
      
-    if (ob_state != State_Exiting) {
+    if (ob_state != OB_STATE_EXITING) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
 	prop_erase(self->window, prop_atoms.net_wm_desktop);
@@ -453,7 +453,7 @@ void client_move_onscreen(Client *self)
 
     frame_frame_gravity(self->frame, &x, &y); /* get where the client
                                                  should be */
-    client_configure(self , Corner_TopLeft, x, y,
+    client_configure(self, OB_CORNER_TOPLEFT, x, y,
                      self->area.width, self->area.height,
                      TRUE, TRUE);
 }
@@ -1095,7 +1095,7 @@ void client_reconfigure(Client *self)
     /* by making this pass FALSE for user, we avoid the emacs event storm where
        every configurenotify causes an update in its normal hints, i think this
        is generally what we want anyways... */
-    client_configure(self, Corner_TopLeft, self->area.x, self->area.y,
+    client_configure(self, OB_CORNER_TOPLEFT, self->area.x, self->area.y,
                      self->area.width, self->area.height, FALSE, TRUE);
 }
 
@@ -1114,7 +1114,7 @@ void client_update_wmhints(Client *self)
 
 	/* only do this when first managing the window *AND* when we aren't
            starting up! */
-	if (ob_state != State_Starting && self->frame == NULL)
+	if (ob_state != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
 
@@ -1594,7 +1594,8 @@ static void client_apply_startup_state(Client *self)
     */
 }
 
-void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
+void client_configure(Client *self, ObCorner anchor,
+                      int x, int y, int w, int h,
 		      gboolean user, gboolean final)
 {
     gboolean moved = FALSE, resized = FALSE;
@@ -1753,15 +1754,15 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
     }
 
     switch (anchor) {
-    case Corner_TopLeft:
+    case OB_CORNER_TOPLEFT:
 	break;
-    case Corner_TopRight:
+    case OB_CORNER_TOPRIGHT:
 	x -= w - self->area.width;
 	break;
-    case Corner_BottomLeft:
+    case OB_CORNER_BOTTOMLEFT:
 	y -= h - self->area.height;
 	break;
-    case Corner_BottomRight:
+    case OB_CORNER_BOTTOMRIGHT:
 	x -= w - self->area.width;
 	y -= h - self->area.height;
 	break;
@@ -1865,7 +1866,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 
     client_setup_decor_and_functions(self);
 
-    client_configure(self, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
+    client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE);
 
     /* try focus us when we go into fullscreen mode */
     client_focus(self);
@@ -2042,7 +2043,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 
     /* figure out where the client should be going */
     frame_frame_gravity(self->frame, &x, &y);
-    client_configure(self, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
+    client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE);
 }
 
 void client_shade(Client *self, gboolean shade)
@@ -2457,7 +2458,7 @@ Icon *client_icon(Client *self, int w, int h)
 }
 
 /* this be mostly ripped from fvwm */
-Client *client_find_directional(Client *c, Direction dir) 
+Client *client_find_directional(Client *c, ObDirection dir) 
 {
     int my_cx, my_cy, his_cx, his_cy;
     int offset = 0;
@@ -2512,21 +2513,23 @@ Client *client_find_directional(Client *c, Direction dir)
         }
 
         switch(dir) {
-        case Direction_North :
-        case Direction_South :
-        case Direction_NorthEast :
-        case Direction_SouthWest :
+        case OB_DIRECTION_NORTH:
+        case OB_DIRECTION_SOUTH:
+        case OB_DIRECTION_NORTHEAST:
+        case OB_DIRECTION_SOUTHWEST:
             offset = (his_cx < 0) ? -his_cx : his_cx;
-            distance = (dir == Direction_North || dir == Direction_NorthEast) ?
-                -his_cy : his_cy;
+            distance = ((dir == OB_DIRECTION_NORTH ||
+                        dir == OB_DIRECTION_NORTHEAST) ?
+                        -his_cy : his_cy);
             break;
-        case Direction_East :
-        case Direction_West :
-        case Direction_SouthEast :
-        case Direction_NorthWest :
+        case OB_DIRECTION_EAST:
+        case OB_DIRECTION_WEST:
+        case OB_DIRECTION_SOUTHEAST:
+        case OB_DIRECTION_NORTHWEST:
             offset = (his_cy < 0) ? -his_cy : his_cy;
-            distance = (dir == Direction_West || dir == Direction_NorthWest) ?
-                -his_cx : his_cx;
+            distance = ((dir == OB_DIRECTION_WEST ||
+                        dir == OB_DIRECTION_NORTHWEST) ?
+                        -his_cx : his_cx);
             break;
         }
 

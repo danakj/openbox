@@ -131,7 +131,7 @@ static void resist_move(Client *c, int *x, int *y)
     }
 }
 
-static void resist_size(Client *c, int *w, int *h, Corner corn)
+static void resist_size(Client *c, int *w, int *h, ObCorner corn)
 {
     GList *it;
     Client *target; /* target */
@@ -177,15 +177,15 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
                 /* horizontal snapping */
                 if (t < tb && b > tt) {
                     switch (corn) {
-                    case Corner_TopLeft:
-                    case Corner_BottomLeft:
+                    case OB_CORNER_TOPLEFT:
+                    case OB_CORNER_BOTTOMLEFT:
                         dlt = l;
                         drb = r + *w - c->frame->area.width;
                         if (r < tl && drb >= tl && drb < tl + resistance)
                             *w = tl - l, snapx = target;
                         break;
-                    case Corner_TopRight:
-                    case Corner_BottomRight:
+                    case OB_CORNER_TOPRIGHT:
+                    case OB_CORNER_BOTTOMRIGHT:
                         dlt = l - *w + c->frame->area.width;
                         drb = r;
                         if (l > tr && dlt <= tr && dlt > tr - resistance)
@@ -199,15 +199,15 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
                 /* vertical snapping */
                 if (l < tr && r > tl) {
                     switch (corn) {
-                    case Corner_TopLeft:
-                    case Corner_TopRight:
+                    case OB_CORNER_TOPLEFT:
+                    case OB_CORNER_TOPRIGHT:
                         dlt = t;
                         drb = b + *h - c->frame->area.height;
                         if (b < tt && drb >= tt && drb < tt + resistance)
                             *h = tt - t, snapy = target;
                         break;
-                    case Corner_BottomLeft:
-                    case Corner_BottomRight:
+                    case OB_CORNER_BOTTOMLEFT:
+                    case OB_CORNER_BOTTOMRIGHT:
                         dlt = t - *h + c->frame->area.height;
                         drb = b;
                         if (t > tb && dlt <= tb && dlt > tb - resistance)
@@ -226,15 +226,15 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     
     /* horizontal snapping */
     switch (corn) {
-    case Corner_TopLeft:
-    case Corner_BottomLeft:
+    case OB_CORNER_TOPLEFT:
+    case OB_CORNER_BOTTOMLEFT:
         dlt = l;
         drb = r + *w - c->frame->area.width;
         if (r <= ar && drb > ar && drb <= ar + resistance)
             *w = ar - l + 1;
         break;
-    case Corner_TopRight:
-    case Corner_BottomRight:
+    case OB_CORNER_TOPRIGHT:
+    case OB_CORNER_BOTTOMRIGHT:
         dlt = l - *w + c->frame->area.width;
         drb = r;
         if (l >= al && dlt < al && dlt >= al - resistance)
@@ -244,15 +244,15 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
 
     /* vertical snapping */
     switch (corn) {
-    case Corner_TopLeft:
-    case Corner_TopRight:
+    case OB_CORNER_TOPLEFT:
+    case OB_CORNER_TOPRIGHT:
         dlt = t;
         drb = b + *h - c->frame->area.height;
         if (b <= ab && drb > ab && drb <= ab + resistance)
             *h = ab - t + 1;
         break;
-    case Corner_BottomLeft:
-    case Corner_BottomRight:
+    case OB_CORNER_BOTTOMLEFT:
+    case OB_CORNER_BOTTOMRIGHT:
         dlt = t - *h + c->frame->area.height;
         drb = b;
         if (t >= at && dlt < at && dlt >= at - resistance)

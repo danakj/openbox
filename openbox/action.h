@@ -15,7 +15,7 @@ struct AnyAction {
 
 struct DirectionalAction{
     Client *c;
-    int direction;
+    ObDirection direction;
 };
 
 struct Execute {

@@ -30,7 +30,7 @@ static void place_random(Client *c)
     int x, y;
     Rect *area;
 
-    if (ob_state == State_Starting) return;
+    if (ob_state == OB_STATE_STARTING) return;
 
     area = screen_area_monitor(c->desktop,
                                g_random_int_range(0, screen_num_monitors));
@@ -46,7 +46,7 @@ static void place_random(Client *c)
     else       y = 0;
 
     frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
-    client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
+    client_configure(c, OB_CORNER_TOPLEFT, x, y, c->area.width, c->area.height,
                      TRUE, TRUE);
 }
 

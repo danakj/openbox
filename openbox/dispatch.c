@@ -238,7 +238,7 @@ void dispatch_move(Client *c, int *x, int *y)
     *y = obe.data.c.num[1];
 }
 
-void dispatch_resize(Client *c, int *w, int *h, Corner corner)
+void dispatch_resize(Client *c, int *w, int *h, ObCorner corner)
 {
     guint i;
     GSList *it;

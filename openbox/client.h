@@ -1,6 +1,7 @@
 #ifndef __client_h
 #define __client_h
 
+#include "misc.h"
 #include "geom.h"
 #include "stacking.h"
 #include "render/color.h"
@@ -64,14 +65,6 @@ typedef enum {
     MwmDecor_Maximize = 1 << 6  /*!< Show a maximize button */
 } MemDecorations;
 
-/*! Corners of the client window, used for anchor positions */
-typedef enum {
-    Corner_TopLeft,
-    Corner_TopRight,
-    Corner_BottomLeft,
-    Corner_BottomRight
-} Corner;
-
 /*! Possible window types */
 typedef enum {
     Type_Desktop, /*!< A desktop (bottom-most window) */
@@ -109,18 +102,6 @@ typedef enum {
     Decor_Shade       = 1 << 7, /*!< Displays a shade button */
     Decor_Close       = 1 << 8  /*!< Display a close button */
 } Decoration;
-
-/*! The directions used by client_find_directional */
-typedef enum {
-    Direction_North,
-    Direction_East,
-    Direction_South,
-    Direction_West,
-    Direction_NorthEast,
-    Direction_SouthEast,
-    Direction_SouthWest,
-    Direction_NorthWest
-} Direction;
 
 typedef struct Client {
     ObWindow obwin;
@@ -346,7 +327,8 @@ gboolean client_focused(Client *self);
 	       interactive move/resize, and then be TRUE for the last call
 	       only.
 */
-void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
+void client_configure(Client *self, ObCorner anchor,
+                      int x, int y, int w, int h,
 		      gboolean user, gboolean final);
 
 void client_reconfigure(Client *self);
@@ -499,7 +481,7 @@ Client *client_search_modal_child(Client *self);
 Client *client_search_top_transient(Client *self);
 
 /*! Return the "closest" client in the given direction */
-Client *client_find_directional(Client *c, Direction dir);
+Client *client_find_directional(Client *c, ObDirection dir);
 
 /*! Set a client window to be above/below other clients.
   @layer < 0 indicates the client should be placed below other clients.<br>

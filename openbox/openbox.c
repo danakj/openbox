@@ -60,13 +60,14 @@ RrTheme    *ob_rr_theme = NULL;
 Display    *ob_display = NULL;
 int         ob_screen;
 Window      ob_root;
-State       ob_state;
+ObState     ob_state;
 gboolean    ob_shutdown = FALSE;
 gboolean    ob_restart  = FALSE;
 char       *ob_restart_path = NULL;
 gboolean    ob_remote   = TRUE;
 gboolean    ob_sync     = FALSE;
-Cursors     ob_cursors;
+Cursor      ob_cursors[OB_NUM_CURSORS];
+KeyCode     ob_keys[OB_NUM_KEYS];
 char       *ob_rc_path  = NULL;
 
 static void signal_handler(const ObEvent *e, void *data);
@@ -92,7 +93,7 @@ int main(int argc, char **argv)
     xmlDocPtr doc;
     xmlNodePtr node;
 
-    ob_state = State_Starting;
+    ob_state = OB_STATE_STARTING;
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
@@ -170,17 +171,43 @@ int main(int argc, char **argv)
        display we're using, so they open in the right place. */
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
 
-    ob_cursors.ptr = XCreateFontCursor(ob_display, XC_left_ptr);
-    ob_cursors.busy = XCreateFontCursor(ob_display, XC_watch);
-    ob_cursors.move = XCreateFontCursor(ob_display, XC_fleur);
-    ob_cursors.tl = XCreateFontCursor(ob_display, XC_top_left_corner);
-    ob_cursors.tr = XCreateFontCursor(ob_display, XC_top_right_corner);
-    ob_cursors.bl = XCreateFontCursor(ob_display, XC_bottom_left_corner);
-    ob_cursors.br = XCreateFontCursor(ob_display, XC_bottom_right_corner);
-    ob_cursors.t = XCreateFontCursor(ob_display, XC_top_side);
-    ob_cursors.r = XCreateFontCursor(ob_display, XC_right_side);
-    ob_cursors.b = XCreateFontCursor(ob_display, XC_bottom_side);
-    ob_cursors.l = XCreateFontCursor(ob_display, XC_left_side);
+    /* create available cursors */
+    ob_cursors[OB_CURSOR_POINTER] =
+        XCreateFontCursor(ob_display, XC_left_ptr);
+    ob_cursors[OB_CURSOR_BUSY] =
+        XCreateFontCursor(ob_display, XC_watch);
+    ob_cursors[OB_CURSOR_MOVE] =
+        XCreateFontCursor(ob_display, XC_fleur);
+    ob_cursors[OB_CURSOR_NORTH] =
+        XCreateFontCursor(ob_display, XC_top_side);
+    ob_cursors[OB_CURSOR_NORTHEAST] =
+        XCreateFontCursor(ob_display, XC_top_right_corner);
+    ob_cursors[OB_CURSOR_EAST] =
+        XCreateFontCursor(ob_display, XC_right_side);
+    ob_cursors[OB_CURSOR_SOUTHEAST] =
+        XCreateFontCursor(ob_display, XC_bottom_right_corner);
+    ob_cursors[OB_CURSOR_SOUTH] =
+        XCreateFontCursor(ob_display, XC_bottom_side);
+    ob_cursors[OB_CURSOR_SOUTHWEST] =
+        XCreateFontCursor(ob_display, XC_bottom_left_corner);
+    ob_cursors[OB_CURSOR_WEST] =
+        XCreateFontCursor(ob_display, XC_left_side);
+    ob_cursors[OB_CURSOR_NORTHWEST] =
+        XCreateFontCursor(ob_display, XC_top_left_corner);
+
+    /* create available keycodes */
+    ob_keys[OB_KEY_RETURN] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Return"));
+    ob_keys[OB_KEY_ESCAPE] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Escape"));
+    ob_keys[OB_KEY_LEFT] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Left"));
+    ob_keys[OB_KEY_RIGHT] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Right"));
+    ob_keys[OB_KEY_UP] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Up"));
+    ob_keys[OB_KEY_DOWN] =
+        XKeysymToKeycode(ob_display, XStringToKeysym("Down"));
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
@@ -232,10 +259,10 @@ int main(int argc, char **argv)
 	/* get all the existing windows */
 	client_manage_all();
 
-	ob_state = State_Running;
+	ob_state = OB_STATE_RUNNING;
 	while (!ob_shutdown)
 	    event_loop();
-	ob_state = State_Exiting;
+	ob_state = OB_STATE_EXITING;
 
         dock_remove_all();
 	client_unmanage_all();
@@ -563,4 +590,16 @@ static void exit_with_error(gchar *msg)
     g_critical(msg);
     sm_shutdown();
     exit(EXIT_FAILURE);
+}
+
+Cursor ob_cursor(ObCursor cursor)
+{
+    g_assert(cursor < OB_NUM_CURSORS);
+    return ob_cursors[cursor];
+}
+
+KeyCode ob_keycode(ObKey key)
+{
+    g_assert(key < OB_NUM_KEYS);
+    return ob_keys[key];
 }

@@ -78,7 +78,7 @@ void plugin_setup_config()
 KeyBindingTree *firstnode = NULL;
 
 static KeyBindingTree *curpos;
-static guint reset_key, reset_state, button_return, button_escape;
+static guint reset_key, reset_state;
 static Timer *chain_timer;
 
 static void grab_for_window(Window win, gboolean grab)
@@ -177,9 +177,9 @@ static void event(ObEvent *e, void *foo)
              !(grabbed_key->state & e->data.x.e->xkey.state)))
             done = TRUE;
         else if (e->type == Event_X_KeyPress) {
-            if (e->data.x.e->xkey.keycode == button_return)
+            if (e->data.x.e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
                 done = TRUE;
-            else if (e->data.x.e->xkey.keycode == button_escape) {
+            else if (e->data.x.e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
                 GSList *it;
                 for (it = grabbed_key->actions; it; it = it->next) {
                     Action *act = it->data;
@@ -258,8 +258,6 @@ static void event(ObEvent *e, void *foo)
 
 void plugin_startup()
 {
-    guint i;
-
     curpos = NULL;
     chain_timer = NULL;
 
@@ -268,8 +266,6 @@ void plugin_startup()
                       (EventHandler)event, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
-    translate_key("Escape", &i, &button_escape);
-    translate_key("Return", &i, &button_return);
 
     grab_keys(TRUE);
 }

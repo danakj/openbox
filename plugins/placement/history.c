@@ -58,7 +58,7 @@ gboolean place_history(Client *c)
 
     if (hi && !(hi->flags & PLACED)) {
         hi->flags |= PLACED;
-        if (ob_state != State_Starting) {
+        if (ob_state != OB_STATE_STARTING) {
             if (hi->flags & HAVE_POSITION ||
                 hi->flags & HAVE_SIZE) {
                 if (hi->flags & HAVE_POSITION) {
@@ -77,7 +77,7 @@ gboolean place_history(Client *c)
                     w = c->area.width;
                     h = c->area.height;
                 }
-                client_configure(c, Corner_TopLeft, x, y, w, h,
+                client_configure(c, OB_CORNER_TOPLEFT, x, y, w, h,
                                  TRUE, TRUE);
             }
             if (hi->flags & HAVE_DESKTOP) {

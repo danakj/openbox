@@ -41,42 +41,42 @@ void action_free(Action *a)
 
 void setup_action_directional_focus_north(Action *a)
 {
-    a->data.diraction.direction = Direction_North;
+    a->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
 void setup_action_directional_focus_east(Action *a)
 {
-    a->data.diraction.direction = Direction_East;
+    a->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
 void setup_action_directional_focus_south(Action *a)
 {
-    a->data.diraction.direction = Direction_South;
+    a->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
 void setup_action_directional_focus_west(Action *a)
 {
-    a->data.diraction.direction = Direction_West;
+    a->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
 void setup_action_directional_focus_northeast(Action *a)
 {
-    a->data.diraction.direction = Direction_NorthEast;
+    a->data.diraction.direction = OB_DIRECTION_NORTHEAST;
 }
 
 void setup_action_directional_focus_southeast(Action *a)
 {
-    a->data.diraction.direction = Direction_SouthEast;
+    a->data.diraction.direction = OB_DIRECTION_SOUTHEAST;
 }
 
 void setup_action_directional_focus_southwest(Action *a)
 {
-    a->data.diraction.direction = Direction_SouthWest;
+    a->data.diraction.direction = OB_DIRECTION_SOUTHWEST;
 }
 
 void setup_action_directional_focus_northwest(Action *a)
 {
-    a->data.diraction.direction = Direction_NorthWest;
+    a->data.diraction.direction = OB_DIRECTION_NORTHWEST;
 }
 
 void setup_action_send_to_desktop(Action *a)
@@ -141,22 +141,22 @@ void setup_action_cycle_windows_previous(Action *a)
 
 void setup_action_movetoedge_north(Action *a)
 {
-    a->data.diraction.direction = Direction_North;
+    a->data.diraction.direction = OB_DIRECTION_NORTH;
 }
 
 void setup_action_movetoedge_south(Action *a)
 {
-    a->data.diraction.direction = Direction_South;
+    a->data.diraction.direction = OB_DIRECTION_SOUTH;
 }
 
 void setup_action_movetoedge_east(Action *a)
 {
-    a->data.diraction.direction = Direction_East;
+    a->data.diraction.direction = OB_DIRECTION_EAST;
 }
 
 void setup_action_movetoedge_west(Action *a)
 {
-    a->data.diraction.direction = Direction_West;
+    a->data.diraction.direction = OB_DIRECTION_WEST;
 }
 
 void setup_action_top_layer(Action *a)
@@ -702,7 +702,7 @@ void action_move_relative_horz(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c)
-        client_configure(c, Corner_TopLeft,
+        client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x + data->relative.delta, c->area.y,
                          c->area.width, c->area.height, TRUE, TRUE);
 }
@@ -711,7 +711,7 @@ void action_move_relative_vert(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c)
-        client_configure(c, Corner_TopLeft,
+        client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x, c->area.y + data->relative.delta,
                          c->area.width, c->area.height, TRUE, TRUE);
 }
@@ -720,7 +720,7 @@ void action_resize_relative_horz(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c)
-        client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
+        client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width +
                          data->relative.delta * c->size_inc.width,
                          c->area.height, TRUE, TRUE);
@@ -730,7 +730,7 @@ void action_resize_relative_vert(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c && !c->shaded)
-        client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
+        client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width, c->area.height +
                          data->relative.delta * c->size_inc.height,
                          TRUE, TRUE);
@@ -815,23 +815,23 @@ void action_desktop(union ActionData *data)
 static void cur_row_col(guint *r, guint *c)
 {
     switch (screen_desktop_layout.orientation) {
-    case Orientation_Horz:
+    case OB_ORIENTATION_HORZ:
         switch (screen_desktop_layout.start_corner) {
-        case Corner_TopLeft:
+        case OB_CORNER_TOPLEFT:
             *r = screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop % screen_desktop_layout.columns;
             break;
-        case Corner_BottomLeft:
+        case OB_CORNER_BOTTOMLEFT:
             *r = screen_desktop_layout.rows - 1 -
                 screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop % screen_desktop_layout.columns;
             break;
-        case Corner_TopRight:
+        case OB_CORNER_TOPRIGHT:
             *r = screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop_layout.columns - 1 -
                 screen_desktop % screen_desktop_layout.columns;
             break;
-        case Corner_BottomRight:
+        case OB_CORNER_BOTTOMRIGHT:
             *r = screen_desktop_layout.rows - 1 -
                 screen_desktop / screen_desktop_layout.columns;
             *c = screen_desktop_layout.columns - 1 -
@@ -839,23 +839,23 @@ static void cur_row_col(guint *r, guint *c)
             break;
         }
         break;
-    case Orientation_Vert:
+    case OB_ORIENTATION_VERT:
         switch (screen_desktop_layout.start_corner) {
-        case Corner_TopLeft:
+        case OB_CORNER_TOPLEFT:
             *r = screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop / screen_desktop_layout.rows;
             break;
-        case Corner_BottomLeft:
+        case OB_CORNER_BOTTOMLEFT:
             *r = screen_desktop_layout.rows - 1 -
                 screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop / screen_desktop_layout.rows;
             break;
-        case Corner_TopRight:
+        case OB_CORNER_TOPRIGHT:
             *r = screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop_layout.columns - 1 -
                 screen_desktop / screen_desktop_layout.rows;
             break;
-        case Corner_BottomRight:
+        case OB_CORNER_BOTTOMRIGHT:
             *r = screen_desktop_layout.rows - 1 -
                 screen_desktop % screen_desktop_layout.rows;
             *c = screen_desktop_layout.columns - 1 -
@@ -869,46 +869,46 @@ static void cur_row_col(guint *r, guint *c)
 static guint translate_row_col(guint r, guint c)
 {
     switch (screen_desktop_layout.orientation) {
-    case Orientation_Horz:
+    case OB_ORIENTATION_HORZ:
         switch (screen_desktop_layout.start_corner) {
-        case Corner_TopLeft:
+        case OB_CORNER_TOPLEFT:
             return r % screen_desktop_layout.rows *
                 screen_desktop_layout.columns +
                 c % screen_desktop_layout.columns;
-        case Corner_BottomLeft:
+        case OB_CORNER_BOTTOMLEFT:
             return (screen_desktop_layout.rows - 1 -
                     r % screen_desktop_layout.rows) *
                 screen_desktop_layout.columns +
                 c % screen_desktop_layout.columns;
-        case Corner_TopRight:
+        case OB_CORNER_TOPRIGHT:
             return r % screen_desktop_layout.rows *
                 screen_desktop_layout.columns +
                 (screen_desktop_layout.columns - 1 -
                  c % screen_desktop_layout.columns);
-        case Corner_BottomRight:
+        case OB_CORNER_BOTTOMRIGHT:
             return (screen_desktop_layout.rows - 1 -
                     r % screen_desktop_layout.rows) *
                 screen_desktop_layout.columns +
                 (screen_desktop_layout.columns - 1 -
                  c % screen_desktop_layout.columns);
         }
-    case Orientation_Vert:
+    case OB_ORIENTATION_VERT:
         switch (screen_desktop_layout.start_corner) {
-        case Corner_TopLeft:
+        case OB_CORNER_TOPLEFT:
             return c % screen_desktop_layout.columns *
                 screen_desktop_layout.rows +
                 r % screen_desktop_layout.rows;
-        case Corner_BottomLeft:
+        case OB_CORNER_BOTTOMLEFT:
             return c % screen_desktop_layout.columns *
                 screen_desktop_layout.rows +
                 (screen_desktop_layout.rows - 1 -
                  r % screen_desktop_layout.rows);
-        case Corner_TopRight:
+        case OB_CORNER_TOPRIGHT:
             return (screen_desktop_layout.columns - 1 -
                     c % screen_desktop_layout.columns) *
                 screen_desktop_layout.rows +
                 r % screen_desktop_layout.rows;
-        case Corner_BottomRight:
+        case OB_CORNER_BOTTOMRIGHT:
             return (screen_desktop_layout.columns - 1 -
                     c % screen_desktop_layout.columns) *
                 screen_desktop_layout.rows +
@@ -1167,21 +1167,23 @@ void action_movetoedge(union ActionData *data)
     h = screen_area(c->desktop)->height;
     w = screen_area(c->desktop)->width;
     switch(data->diraction.direction) {
-    case Direction_North:
+    case OB_DIRECTION_NORTH:
         y = 0;
         break;
-    case Direction_West:
+    case OB_DIRECTION_WEST:
         x = 0;
         break;
-    case Direction_South:
+    case OB_DIRECTION_SOUTH:
         y = h - c->frame->area.height;
         break;
-    case Direction_East:
+    case OB_DIRECTION_EAST:
         x = w - c->frame->area.width;
         break;
+    default:
+        g_assert_not_reached();
     }
     frame_frame_gravity(c->frame, &x, &y);
-    client_configure(c, Corner_TopLeft,
+    client_configure(c, OB_CORNER_TOPLEFT,
                      x, y, c->area.width, c->area.height, TRUE, TRUE);
 
 }

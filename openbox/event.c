@@ -671,7 +671,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	break;
     case EnterNotify:
         if (client_normal(client)) {
-            if (ob_state == State_Starting) {
+            if (ob_state == OB_STATE_STARTING) {
                 /* move it to the top of the focus order */
                 guint desktop = client->desktop;
                 if (desktop == DESKTOP_ALL) desktop = screen_desktop;
@@ -722,7 +722,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
 					       CWX | CWY)) {
 	    int x, y, w, h;
-	    Corner corner;
+	    ObCorner corner;
 	       
 	    x = (e->xconfigurerequest.value_mask & CWX) ?
 		e->xconfigurerequest.x : client->area.x;
@@ -736,17 +736,17 @@ static void event_handle_client(Client *client, XEvent *e)
 	    switch (client->gravity) {
 	    case NorthEastGravity:
 	    case EastGravity:
-		corner = Corner_TopRight;
+		corner = OB_CORNER_TOPRIGHT;
 		break;
 	    case SouthWestGravity:
 	    case SouthGravity:
-		corner = Corner_BottomLeft;
+		corner = OB_CORNER_BOTTOMLEFT;
 		break;
 	    case SouthEastGravity:
-		corner = Corner_BottomRight;
+		corner = OB_CORNER_BOTTOMRIGHT;
 		break;
 	    default:     /* NorthWest, Static, etc */
-		corner = Corner_TopLeft;
+		corner = OB_CORNER_TOPLEFT;
 	    }
 
 	    client_configure(client, corner, x, y, w, h, FALSE, TRUE);
@@ -920,7 +920,8 @@ static void event_handle_client(Client *client, XEvent *e)
             else
                 h = client->area.y;
             client->gravity = tmpg;
-            client_configure(client, Corner_TopLeft, x, y, w, h, FALSE, TRUE);
+            client_configure(client, OB_CORNER_TOPLEFT,
+                             x, y, w, h, FALSE, TRUE);
             client->gravity = oldg;
         }
 	break;

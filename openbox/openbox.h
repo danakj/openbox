@@ -1,6 +1,8 @@
 #ifndef __openbox_h
 #define __openbox_h
 
+#include "misc.h"
+
 #include "render/render.h"
 #include "render/theme.h"
 
@@ -27,15 +29,8 @@ extern int      ob_screen;
 /*! The root window */
 extern Window   ob_root;
 
-/*! States of execution for Openbox */
-typedef enum {
-    State_Starting,
-    State_Exiting,
-    State_Running
-} State;
-
 /* The state of execution of the window manager */
-extern State ob_state;
+extern ObState ob_state;
 
 /*! When set to true, Openbox will exit */
 extern gboolean ob_shutdown;
@@ -50,23 +45,12 @@ extern gboolean ob_remote;
 /*! Runtime option to run in synchronous mode */
 extern gboolean ob_sync;
 
-typedef struct Cursors {
-    Cursor ptr;
-    Cursor busy;
-    Cursor move;
-    Cursor bl;
-    Cursor br;
-    Cursor tl;
-    Cursor tr;
-    Cursor t;
-    Cursor r;
-    Cursor b;
-    Cursor l;
-} Cursors;
-extern Cursors ob_cursors;
-
 /*! The path of the rc file. If NULL the default paths are searched for one. */
 extern char *ob_rc_path;
+
+Cursor ob_cursor(ObCursor cursor);
+
+KeyCode ob_keycode(ObKey key);
 
 /* cuz i have nowhere better to put it right now... */
 gboolean ob_pointer_pos(int *x, int *y);

@@ -22,10 +22,7 @@ static int start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static int cur_x, cur_y;
 static guint button;
 static guint32 corner;
-static Corner lockcorner;
-
-static guint button_return, button_escape, button_left, button_right,
-    button_up, button_down;
+static ObCorner lockcorner;
 
 static Popup *popup = NULL;
 static InternalWindow opaque_window = { { Window_Internal }, None };
@@ -39,13 +36,6 @@ void moveresize_startup()
 {
     XSetWindowAttributes attrib;
     XGCValues gcv;
-
-    button_return = XKeysymToKeycode(ob_display, XStringToKeysym("Return"));
-    button_escape = XKeysymToKeycode(ob_display, XStringToKeysym("Escape"));
-    button_left = XKeysymToKeycode(ob_display, XStringToKeysym("Left"));
-    button_right = XKeysymToKeycode(ob_display, XStringToKeysym("Right"));
-    button_up = XKeysymToKeycode(ob_display, XStringToKeysym("Up"));
-    button_down = XKeysymToKeycode(ob_display, XStringToKeysym("Down"));
 
     popup = popup_new(FALSE);
     popup_size_to_string(popup, "W:  0000  W:  0000");
@@ -91,7 +81,7 @@ static void popup_coords(char *format, int a, int b)
 
 void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
 {
-    Cursor cur;
+    ObCursor cur;
     Rect *a;
 
     g_assert(!moveresize_in_progress);
@@ -124,27 +114,27 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     moveresize_in_progress = TRUE;
 
     if (corner == prop_atoms.net_wm_moveresize_size_topleft)
-        cur = ob_cursors.tl;
+        cur = OB_CURSOR_NORTHWEST;
     else if (corner == prop_atoms.net_wm_moveresize_size_top)
-        cur = ob_cursors.t;
+        cur = OB_CURSOR_NORTH;
     else if (corner == prop_atoms.net_wm_moveresize_size_topright)
-        cur = ob_cursors.tr;
+        cur = OB_CURSOR_NORTHEAST;
     else if (corner == prop_atoms.net_wm_moveresize_size_right)
-        cur = ob_cursors.r;
+        cur = OB_CURSOR_EAST;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottomright)
-        cur = ob_cursors.br;
+        cur = OB_CURSOR_SOUTHEAST;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottom)
-        cur = ob_cursors.b;
+        cur = OB_CURSOR_SOUTH;
     else if (corner == prop_atoms.net_wm_moveresize_size_bottomleft)
-        cur = ob_cursors.bl;
+        cur = OB_CURSOR_SOUTHWEST;
     else if (corner == prop_atoms.net_wm_moveresize_size_left)
-        cur = ob_cursors.l;
+        cur = OB_CURSOR_WEST;
     else if (corner == prop_atoms.net_wm_moveresize_size_keyboard)
-        cur = ob_cursors.br;
+        cur = OB_CURSOR_SOUTHEAST;
     else if (corner == prop_atoms.net_wm_moveresize_move)
-        cur = ob_cursors.move;
+        cur = OB_CURSOR_MOVE;
     else if (corner == prop_atoms.net_wm_moveresize_move_keyboard)
-        cur = ob_cursors.move;
+        cur = OB_CURSOR_MOVE;
     else
         g_assert_not_reached();
 
@@ -177,7 +167,7 @@ void moveresize_end(gboolean cancel)
     popup_hide(popup);
 
     if (moving) {
-        client_configure(moveresize_client, Corner_TopLeft,
+        client_configure(moveresize_client, OB_CORNER_TOPLEFT,
                          (cancel ? start_cx : cur_x),
                          (cancel ? start_cy : cur_y),
                          start_cw, start_ch, TRUE, TRUE);
@@ -205,7 +195,7 @@ static void do_move()
     oldh = moveresize_client->frame->area.height;
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
-    client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
+    client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
     /* draw the new one */
     if (moveresize_client->frame->area.x != oldx ||
@@ -297,72 +287,72 @@ void moveresize_event(XEvent *e)
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);
                 cur_y = start_ch - (e->xmotion.y_root - start_y);
-                lockcorner = Corner_BottomRight;
+                lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_top) {
                 cur_x = start_cw;
                 cur_y = start_ch - (e->xmotion.y_root - start_y);
-                lockcorner = Corner_BottomRight;
+                lockcorner = OB_CORNER_BOTTOMRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_topright) {
                 cur_x = start_cw + (e->xmotion.x_root - start_x);
                 cur_y = start_ch - (e->xmotion.y_root - start_y);
-                lockcorner = Corner_BottomLeft;
+                lockcorner = OB_CORNER_BOTTOMLEFT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_right) { 
                 cur_x = start_cw + (e->xmotion.x_root - start_x);
                 cur_y = start_ch;
-                lockcorner = Corner_BottomLeft;
+                lockcorner = OB_CORNER_BOTTOMLEFT;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomright) {
                 cur_x = start_cw + (e->xmotion.x_root - start_x);
                 cur_y = start_ch + (e->xmotion.y_root - start_y);
-                lockcorner = Corner_TopLeft;
+                lockcorner = OB_CORNER_TOPLEFT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_bottom) {
                 cur_x = start_cw;
                 cur_y = start_ch + (e->xmotion.y_root - start_y);
-                lockcorner = Corner_TopLeft;
+                lockcorner = OB_CORNER_TOPLEFT;
             } else if (corner ==
                        prop_atoms.net_wm_moveresize_size_bottomleft) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);
                 cur_y = start_ch + (e->xmotion.y_root - start_y);
-                lockcorner = Corner_TopRight;
+                lockcorner = OB_CORNER_TOPRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_left) {
                 cur_x = start_cw - (e->xmotion.x_root - start_x);
                 cur_y = start_ch;
-                lockcorner = Corner_TopRight;
+                lockcorner = OB_CORNER_TOPRIGHT;
             } else if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
                 cur_x = start_cw + (e->xmotion.x_root - start_x);
                 cur_y = start_ch + (e->xmotion.y_root - start_y);
-                lockcorner = Corner_TopLeft;
+                lockcorner = OB_CORNER_TOPLEFT;
             } else
                 g_assert_not_reached();
 
             do_resize();
         }
     } else if (e->type == KeyPress) {
-        if (e->xkey.keycode == button_escape)
+        if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
             moveresize_end(TRUE);
-        else if (e->xkey.keycode == button_return)
+        else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN))
             moveresize_end(FALSE);
         else {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
-                if (e->xkey.keycode == button_right)
+                if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     cur_x += MAX(4, moveresize_client->size_inc.width);
-                else if (e->xkey.keycode == button_left)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
                     cur_x -= MAX(4, moveresize_client->size_inc.width);
-                else if (e->xkey.keycode == button_down)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
                     cur_y += MAX(4, moveresize_client->size_inc.height);
-                else if (e->xkey.keycode == button_up)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
                     cur_y -= MAX(4, moveresize_client->size_inc.height);
                 else
                     return;
                 do_resize();
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
-                if (e->xkey.keycode == button_right)
+                if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
                     cur_x += 4;
-                else if (e->xkey.keycode == button_left)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
                     cur_x -= 4;
-                else if (e->xkey.keycode == button_down)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
                     cur_y += 4;
-                else if (e->xkey.keycode == button_up)
+                else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
                     cur_y -= 4;
                 else
                     return;

@@ -25,11 +25,6 @@ kbind(["C-A-Left"], KC_All, lambda(d): prev_desktop(d))
 kbind(["C-S-A-Right"], KC_All, lambda(d): send_to_next_desktop(d))
 kbind(["C-S-A-Left"], KC_All, lambda(d): send_to_prev_desktop(d))
 
-# Python Demo #1!!!!!!! YAY SHRIMPX
-def rev(lst):
-    lst.reverse()
-    return lst
-
 # focus new windows
 def focusnew(data):
     if not data.client: return

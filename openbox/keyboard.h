@@ -43,6 +43,7 @@ void keyboard_interactive_grab(guint state, struct _ObClient *client,
                                struct _ObAction *action);
 gboolean keyboard_process_interactive_grab(const XEvent *e,
                                            struct _ObClient **client);
+gboolean keyboard_interactive_grab_in_progress();
 
 void keyboard_grab_for_client(struct _ObClient *c, gboolean grab);
 

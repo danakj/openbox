@@ -144,9 +144,12 @@ int main(int argc, char **argv)
        display we're using, so they open in the right place. */
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
 
-    ob_cursors.left_ptr = XCreateFontCursor(ob_display, XC_left_ptr);
-    ob_cursors.ll_angle = XCreateFontCursor(ob_display, XC_ll_angle);
-    ob_cursors.lr_angle = XCreateFontCursor(ob_display, XC_lr_angle);
+    ob_cursors.ptr = XCreateFontCursor(ob_display, XC_left_ptr);
+    ob_cursors.move = XCreateFontCursor(ob_display, XC_fleur);
+    ob_cursors.tl = XCreateFontCursor(ob_display, XC_top_left_corner);
+    ob_cursors.tr = XCreateFontCursor(ob_display, XC_top_right_corner);
+    ob_cursors.bl = XCreateFontCursor(ob_display, XC_bottom_left_corner);
+    ob_cursors.br = XCreateFontCursor(ob_display, XC_bottom_right_corner);
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */

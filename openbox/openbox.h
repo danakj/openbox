@@ -35,9 +35,12 @@ extern gboolean ob_remote;
 extern gboolean ob_sync;
 
 typedef struct Cursors {
-    Cursor left_ptr;
-    Cursor ll_angle;
-    Cursor lr_angle;
+    Cursor ptr;
+    Cursor move;
+    Cursor bl;
+    Cursor br;
+    Cursor tl;
+    Cursor tr;
 } Cursors;
 extern Cursors ob_cursors;
 

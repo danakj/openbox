@@ -259,7 +259,7 @@ static void event(ObEvent *e, void *foo)
 {
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
-    static lwindow = None;
+    static Window lwindow = None;
     static int px, py;
     gboolean click = FALSE;
     gboolean dclick = FALSE;

@@ -224,7 +224,7 @@ void dock_configure()
     dock->w = dock->h = 0;
 
     /* get the size */
-    for (it = dock->dock_apps; it; it = it->next) {
+    for (it = dock->dock_apps; it; it = g_list_next(it)) {
         ObDockApp *app = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
@@ -241,7 +241,7 @@ void dock_configure()
     spot = (config_dock_orient == OB_ORIENTATION_HORZ ? minw : minh) / 2;
 
     /* position the apps */
-    for (it = dock->dock_apps; it; it = it->next) {
+    for (it = dock->dock_apps; it; it = g_list_next(it)) {
         ObDockApp *app = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
@@ -550,7 +550,7 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
 
     /* which dock app are we on top of? */
     stop = FALSE;
-    for (it = dock->dock_apps; it; it = it->next) {
+    for (it = dock->dock_apps; it; it = g_list_next(it)) {
         over = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:

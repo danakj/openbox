@@ -119,7 +119,7 @@ void client_set_list()
     if (size > 0) {
         windows = g_new(Window, size);
         win_it = windows;
-        for (it = client_list; it != NULL; it = it->next, ++win_it)
+        for (it = client_list; it; it = g_list_next(it), ++win_it)
             *win_it = ((ObClient*)it->data)->window;
     } else
         windows = NULL;
@@ -138,7 +138,7 @@ void client_set_list()
   {
   GSList *it;
 
-  for (it = self->transients; it; it = it->next) {
+  for (it = self->transients; it; it = g_slist_next(it)) {
   if (!func(it->data, data)) return;
   client_foreach_transient(it->data, func, data);
   }
@@ -153,7 +153,7 @@ void client_set_list()
   } else {
   GSList *it;
 
-  for (it = self->group->members; it; it = it->next)
+  for (it = self->group->members; it; it = g_slist_next(it))
   if (it->data != self &&
   !((ObClient*)it->data)->transient_for) {
   if (!func(it->data, data)) return;
@@ -314,7 +314,7 @@ void client_manage(Window window)
             if (self->group) {
                 GSList *it;
 
-                for (it = self->group->members; it; it = it->next)
+                for (it = self->group->members; it; it = g_slist_next(it))
                 {
                     if (client_focused(it->data))
                     {
@@ -457,7 +457,7 @@ void client_unmanage(ObClient *self)
     if (self->transient_for == OB_TRAN_GROUP) { /* transient of group */
         GSList *it;
 
-        for (it = self->group->members; it; it = it->next)
+        for (it = self->group->members; it; it = g_slist_next(it))
             if (it->data != self)
                 ((ObClient*)it->data)->transients =
                     g_slist_remove(((ObClient*)it->data)->transients, self);
@@ -467,7 +467,7 @@ void client_unmanage(ObClient *self)
     }
 
     /* tell our transients that we're gone */
-    for (it = self->transients; it != NULL; it = it->next) {
+    for (it = self->transients; it; it = g_slist_next(it)) {
         if (((ObClient*)it->data)->transient_for != OB_TRAN_GROUP) {
             ((ObClient*)it->data)->transient_for = NULL;
             client_calc_layer(it->data);
@@ -786,7 +786,7 @@ static void client_get_desktop(ObClient *self)
             } else {
                 GSList *it;
 
-                for (it = self->group->members; it; it = it->next)
+                for (it = self->group->members; it; it = g_slist_next(it))
                     if (it->data != self &&
                         !((ObClient*)it->data)->transient_for) {
                         self->desktop = ((ObClient*)it->data)->desktop;
@@ -1353,13 +1353,15 @@ void client_update_wmhints(ObClient *self)
             /* remove from the old group if there was one */
             if (self->group != NULL) {
                 /* remove transients of the group */
-                for (it = self->group->members; it; it = it->next)
+                for (it = self->group->members; it; it = g_slist_next(it))
                     self->transients = g_slist_remove(self->transients,
                                                       it->data);
 
                 /* remove myself from parents in the group */
                 if (self->transient_for == OB_TRAN_GROUP) {
-                    for (it = self->group->members; it; it = it->next) {
+                    for (it = self->group->members; it;
+                         it = g_slist_next(it))
+                    {
                         ObClient *c = it->data;
 
                         if (c != self && !c->transient_for)
@@ -1379,7 +1381,9 @@ void client_update_wmhints(ObClient *self)
                 if (!self->transient_for) {
                     /* add other transients of the group that are already
                        set up */
-                    for (it = self->group->members; it; it = it->next) {
+                    for (it = self->group->members; it;
+                         it = g_slist_next(it))
+                    {
                         ObClient *c = it->data;
                         if (c != self && c->transient_for == OB_TRAN_GROUP)
                             self->transients =
@@ -1433,7 +1437,7 @@ void client_update_title(ObClient *self)
 
     /* look for duplicates and append a number */
     nums = 0;
-    for (it = client_list; it; it = it->next)
+    for (it = client_list; it; it = g_list_next(it))
         if (it->data != self) {
             ObClient *c = it->data;
             if (0 == strncmp(c->title, data, strlen(data)))
@@ -1714,7 +1718,7 @@ ObClient *client_search_focus_tree(ObClient *self)
     GSList *it;
     ObClient *ret;
 
-    for (it = self->transients; it != NULL; it = it->next) {
+    for (it = self->transients; it; it = g_slist_next(it)) {
         if (client_focused(it->data)) return it->data;
         if ((ret = client_search_focus_tree(it->data))) return ret;
     }
@@ -1730,7 +1734,7 @@ ObClient *client_search_focus_tree_full(ObClient *self)
             GSList *it;
             gboolean recursed = FALSE;
         
-            for (it = self->group->members; it; it = it->next)
+            for (it = self->group->members; it; it = g_slist_next(it))
                 if (!((ObClient*)it->data)->transient_for) {
                     ObClient *c;
                     if ((c = client_search_focus_tree_full(it->data)))
@@ -1780,7 +1784,7 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
     own = calc_layer(self);
     self->layer = l > own ? l : own;
 
-    for (it = self->transients; it; it = it->next)
+    for (it = self->transients; it; it = g_slist_next(it))
         client_calc_layer_recursive(it->data, orig,
                                     l, raised ? raised : l != old);
 
@@ -2243,7 +2247,7 @@ static void client_iconify_recursive(ObClient *self,
     }
 
     /* iconify all transients */
-    for (it = self->transients; it != NULL; it = it->next)
+    for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self) client_iconify_recursive(it->data,
                                                        iconic, curdesk);
 }
@@ -2435,7 +2439,7 @@ void client_set_desktop_recursive(ObClient *self,
     }
 
     /* move all transients */
-    for (it = self->transients; it != NULL; it = it->next)
+    for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self) client_set_desktop_recursive(it->data,
                                                            target, donthide);
 }
@@ -2451,7 +2455,7 @@ ObClient *client_search_modal_child(ObClient *self)
     GSList *it;
     ObClient *ret;
   
-    for (it = self->transients; it != NULL; it = it->next) {
+    for (it = self->transients; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
         if ((ret = client_search_modal_child(c))) return ret;
         if (c->modal) return c;
@@ -2858,7 +2862,7 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
     best_score = -1;
     best_client = NULL;
 
-    for(it = g_list_first(client_list); it; it = it->next) {
+    for(it = g_list_first(client_list); it; it = g_list_next(it)) {
         cur = it->data;
 
         /* the currently selected window isn't interesting */
@@ -2995,7 +2999,7 @@ ObClient *client_search_top_transient(ObClient *self)
 
             g_assert(self->group);
 
-            for (it = self->group->members; it; it = it->next) {
+            for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
                 /* checking transient_for prevents infinate loops! */
@@ -3019,7 +3023,7 @@ ObClient *client_search_focus_parent(ObClient *self)
         } else {
             GSList *it;
 
-            for (it = self->group->members; it; it = it->next) {
+            for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
                 /* checking transient_for prevents infinate loops! */
@@ -3042,7 +3046,7 @@ ObClient *client_search_parent(ObClient *self, ObClient *search)
         } else {
             GSList *it;
 
-            for (it = self->group->members; it; it = it->next) {
+            for (it = self->group->members; it; it = g_slist_next(it)) {
                 ObClient *c = it->data;
 
                 /* checking transient_for prevents infinate loops! */
@@ -3105,7 +3109,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* default: top of screen */
         dest = a->y;
 
-        for(it = g_list_first(client_list); it; it = it->next) {
+        for(it = client_list; it; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3146,7 +3150,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* default: bottom of screen */
         dest = a->y + a->height;
 
-        for(it = g_list_first(client_list); it; it = it->next) {
+        for(it = client_list; it; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3188,7 +3192,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* default: leftmost egde of screen */
         dest = a->x;
 
-        for(it = g_list_first(client_list); it; it = it->next) {
+        for(it = client_list; it; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3230,7 +3234,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
         /* default: rightmost edge of screen */
         dest = a->x + a->width;
 
-        for(it = g_list_first(client_list); it; it = it->next) {
+        for(it = client_list; it; it = g_list_next(it)) {
             gint his_edge_start, his_edge_end, his_offset;
             ObClient *cur = it->data;
 
@@ -3281,7 +3285,7 @@ ObClient* client_under_pointer()
     ObClient *ret = NULL;
 
     if (screen_pointer_pos(&x, &y)) {
-        for (it = stacking_list; it != NULL; it = it->next) {
+        for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
                 if (c->frame->visible &&

@@ -50,7 +50,7 @@ KeyBindingTree *tree_build(GList *keylist)
     if (g_list_length(keylist) <= 0)
 	return NULL; /* nothing in the list.. */
 
-    for (it = g_list_last(keylist); it != NULL; it = it->prev) {
+    for (it = g_list_last(keylist); it; it = g_list_previous(it)) {
 	p = ret;
 	ret = g_new0(KeyBindingTree, 1);
 	if (p == NULL) {
@@ -58,7 +58,7 @@ KeyBindingTree *tree_build(GList *keylist)
 
 	    /* this is the first built node, the bottom node of the tree */
 	    ret->keylist = g_list_copy(keylist); /* shallow copy */
-	    for (it = ret->keylist; it != NULL; it = it->next) /* deep copy */
+	    for (it = ret->keylist; it; it = g_list_next(it)) /* deep copy */
 		it->data = g_strdup(it->data);
 	}
 	ret->first_child = p;

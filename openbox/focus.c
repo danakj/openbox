@@ -216,7 +216,7 @@ static ObClient *find_transient_recursive(ObClient *c, ObClient *top,
     GSList *it;
     ObClient *ret;
 
-    for (it = c->transients; it; it = it->next) {
+    for (it = c->transients; it; it = g_slist_next(it)) {
         if (it->data == top) return NULL;
         ret = find_transient_recursive(it->data, top, skip);
         if (ret && ret != skip && client_normal(ret)) return ret;
@@ -266,14 +266,19 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
             /* try for transient relations */
             if (trans) {
                 if (old->transient_for == OB_TRAN_GROUP) {
-                    for (it = focus_order[screen_desktop]; it; it = it->next) {
+                    for (it = focus_order[screen_desktop]; it;
+                         it = g_list_next(it))
+                    {
                         GSList *sit;
 
-                        for (sit = old->group->members; sit; sit = sit->next)
+                        for (sit = old->group->members; sit;
+                             sit = g_slist_next(sit))
+                        {
                             if (sit->data == it->data)
                                 if ((target =
                                      focus_fallback_transient(sit->data, old)))
                                     return target;
+                        }
                     }
                 } else {
                     if ((target =
@@ -295,8 +300,8 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         if (old->group) {
             GSList *sit;
 
-            for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-                for (sit = old->group->members; sit; sit = sit->next)
+            for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
+                for (sit = old->group->members; sit; sit = g_slist_next(sit))
                     if (sit->data == it->data)
                         if (sit->data != old && client_normal(sit->data))
                             if (client_can_focus(sit->data))
@@ -304,7 +309,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         }
 #endif
 
-    for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
+    for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
         if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
             if (client_normal(it->data) && client_can_focus(it->data))
                 return it->data;
@@ -699,7 +704,7 @@ static void to_top(ObClient *c, guint d)
 
         /* insert before first iconic window */
         for (it = focus_order[d];
-             it && !((ObClient*)it->data)->iconic; it = it->next);
+             it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
         focus_order[d] = g_list_insert_before(focus_order[d], it, c);
     }
 }
@@ -726,7 +731,7 @@ static void to_bottom(ObClient *c, guint d)
 
         /* insert before first iconic window */
         for (it = focus_order[d];
-             it && !((ObClient*)it->data)->iconic; it = it->next);
+             it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
         g_list_insert_before(focus_order[d], it, c);
     }
 }

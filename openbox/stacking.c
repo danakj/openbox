@@ -360,10 +360,11 @@ void stacking_add_nonintrusive(ObWindow *win)
             GList *it;
 
             if (client->group)
-                for (it = stacking_list; !parent && it; it = it->next) {
+                for (it = stacking_list; !parent && it; it = g_list_next(it)) {
                     if ((sit = g_slist_find(client->group->members, it->data)))
                 for (sit = client->group->members; !parent && sit;
-                     sit = sit->next) {
+                     sit = g_slist_next(sit))
+                {
                     ObClient *c = sit->data;
                     /* checking transient_for prevents infinate loops! */
                     if (sit->data == it->data && !c->transient_for)

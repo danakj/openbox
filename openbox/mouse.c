@@ -93,7 +93,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
     GSList *it;
 
     for (i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i)
-        for (it = bound_contexts[i]; it != NULL; it = g_slist_next(it)) {
+        for (it = bound_contexts[i]; it; it = g_slist_next(it)) {
             /* grab/ungrab the button */
             ObMouseBinding *b = it->data;
             Window win;
@@ -124,7 +124,7 @@ static void grab_all_clients(gboolean grab)
 {
     GList *it;
 
-    for (it = client_list; it != NULL; it = it->next)
+    for (it = client_list; it; it = g_list_next(it))
 	mouse_grab_for_client(it->data, grab);
 }
 
@@ -134,14 +134,14 @@ void mouse_unbind_all()
     GSList *it;
     
     for(i = 0; i < OB_FRAME_NUM_CONTEXTS; ++i) {
-        for (it = bound_contexts[i]; it != NULL; it = it->next) {
+        for (it = bound_contexts[i]; it; it = g_slist_next(it)) {
             ObMouseBinding *b = it->data;
             gint j;
 
             for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j) {
                 GSList *it;
 
-                for (it = b->actions[j]; it; it = it->next)
+                for (it = b->actions[j]; it; it = g_slist_next(it))
                     action_unref(it->data);
                 g_slist_free(b->actions[j]);
             }
@@ -159,7 +159,7 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     GSList *it;
     ObMouseBinding *b;
 
-    for (it = bound_contexts[context]; it != NULL; it = it->next) {
+    for (it = bound_contexts[context]; it; it = g_slist_next(it)) {
         b = it->data;
         if (b->state == state && b->button == button)
             break;
@@ -314,7 +314,7 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
         return FALSE;
     }
 
-    for (it = bound_contexts[context]; it != NULL; it = it->next){
+    for (it = bound_contexts[context]; it; it = g_slist_next(it)) {
 	b = it->data;
 	if (b->state == state && b->button == button) {
             b->actions[mact] = g_slist_append(b->actions[mact], action);

@@ -283,7 +283,7 @@ void screen_startup(gboolean reconfig)
     /* set the names */
     screen_desktop_names = g_new(gchar*,
                                  g_slist_length(config_desktops_names) + 1);
-    for (i = 0, it = config_desktops_names; it; ++i, it = it->next)
+    for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
         screen_desktop_names[i] = it->data; /* dont strdup */
     screen_desktop_names[i] = NULL;
     PROP_SETSS(RootWindow(ob_display, ob_screen),
@@ -360,7 +360,7 @@ void screen_resize()
     screen_update_areas();
     dock_configure();
 
-    for (it = client_list; it; it = it->next)
+    for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);
 }
 
@@ -392,7 +392,7 @@ void screen_set_num_desktops(guint num)
     screen_update_desktop_names();
 
     /* move windows on desktops that will no longer exist! */
-    for (it = client_list; it != NULL; it = it->next) {
+    for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         if (c->desktop >= num && c->desktop != DESKTOP_ALL)
             client_set_desktop(c, num - 1, FALSE);
@@ -868,7 +868,7 @@ void screen_show_desktop(gboolean show)
 
     if (show) {
         /* bottom to top */
-        for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
+        for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
                 if (client->frame->visible && !client_should_show(client))
@@ -877,7 +877,7 @@ void screen_show_desktop(gboolean show)
         }
     } else {
         /* top to bottom */
-        for (it = stacking_list; it != NULL; it = it->next) {
+        for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *client = it->data;
                 if (!client->frame->visible && client_should_show(client))
@@ -888,7 +888,7 @@ void screen_show_desktop(gboolean show)
 
     if (show) {
         /* focus desktop */
-        for (it = focus_order[screen_desktop]; it; it = it->next)
+        for (it = focus_order[screen_desktop]; it; it = g_list_next(it))
             if (((ObClient*)it->data)->type == OB_CLIENT_TYPE_DESKTOP &&
                 client_focus(it->data))
                 break;
@@ -1021,7 +1021,7 @@ void screen_update_areas()
             o = MIN(o, area[i][x].x);
 
         for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = it->next) {
+            for (it = client_list; it; it = g_list_next(it)) {
                 ObClient *c = it->data;
                 screen_area_add_strut_left(&c->strut,
                                            &monitor_area[x],
@@ -1043,7 +1043,7 @@ void screen_update_areas()
             o = MIN(o, area[i][x].y);
 
         for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = it->next) {
+            for (it = client_list; it; it = g_list_next(it)) {
                 ObClient *c = it->data;
                 screen_area_add_strut_top(&c->strut,
                                            &monitor_area[x],
@@ -1065,7 +1065,7 @@ void screen_update_areas()
             o = MAX(o, area[i][x].x + area[i][x].width - 1);
 
         for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = it->next) {
+            for (it = client_list; it; it = g_list_next(it)) {
                 ObClient *c = it->data;
                 screen_area_add_strut_right(&c->strut,
                                            &monitor_area[x],
@@ -1090,7 +1090,7 @@ void screen_update_areas()
             o = MAX(o, area[i][x].y + area[i][x].height - 1);
 
         for (x = 0; x < screen_num_monitors; ++x) {
-            for (it = client_list; it; it = it->next) {
+            for (it = client_list; it; it = g_list_next(it)) {
                 ObClient *c = it->data;
                 screen_area_add_strut_bottom(&c->strut,
                                              &monitor_area[x],
@@ -1126,7 +1126,7 @@ void screen_update_areas()
 
         /* the area has changed, adjust all the maximized 
            windows */
-        for (it = client_list; it; it = it->next) {
+        for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data; 
             if (i < screen_num_desktops) {
                 if (c->desktop == i)

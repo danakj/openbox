@@ -346,7 +346,7 @@ static gboolean place_transient(ObClient *client, gint *x, gint *y)
             GSList *it;
             gboolean first = TRUE;
             gint l, r, t, b;
-            for (it = client->group->members; it; it = it->next) {
+            for (it = client->group->members; it; it = g_slist_next(it)) {
                 ObClient *m = it->data;
                 if (!(m == client || m->transient_for)) {
                     if (first) {

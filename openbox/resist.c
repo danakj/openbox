@@ -47,7 +47,7 @@ void resist_move_windows(ObClient *c, gint *x, gint *y)
     cb = RECT_BOTTOM(c->frame->area);
     
     if (config_resist_win)
-        for (it = stacking_list; it != NULL; it = it->next) {
+        for (it = stacking_list; it; it = g_list_next(it)) {
             ObClient *target;
             gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
@@ -187,7 +187,7 @@ void resist_size_windows(ObClient *c, gint *w, gint *h, ObCorner corn)
     b = RECT_BOTTOM(c->frame->area);
 
     if (config_resist_win) {
-        for (it = stacking_list; it != NULL; it = it->next) {
+        for (it = stacking_list; it; it = g_list_next(it)) {
             if (!WINDOW_IS_CLIENT(it->data))
                 continue;
             target = it->data;

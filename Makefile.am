@@ -22,7 +22,8 @@ lib_LTLIBRARIES = \
 	parser/libobparser.la
 
 bin_PROGRAMS = \
-	kernel/openbox
+	kernel/openbox \
+	tools/kdetrayproxy/kdetrayproxy
 
 plugin_LTLIBRARIES = \
 	plugins/resistance/resistance.la \
@@ -352,6 +353,16 @@ tools_obconf_obconf_LDADD = \
 tools_obconf_obconf_SOURCES = \
 	gettext.h \
 	tools/obconf/main.c
+
+
+## kdetrayproxy ##
+
+tools_kdetrayproxy_kdetrayproxy_CPPFLAGS = \
+	$(X_CFLAGS)
+tools_kdetrayproxy_kdetrayproxy_LDADD = \
+	$(X_LIBS)
+tools_kdetrayproxy_kdetrayproxy_SOURCES = \
+	tools/kdetrayproxy/kdetrayproxy.c
 
 
 ## themes ##

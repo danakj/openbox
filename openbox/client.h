@@ -485,6 +485,12 @@ void client_get_type(ObClient *self);
 
 ObClientIcon *client_icon(ObClient *self, int w, int h);
 
+/*! Searches a client's direct parents for a focused window. The function does
+  not check for the passed client, only for *ONE LEVEL* of its parents.
+  If no focused parentt is found, NULL is returned.
+*/
+ObClient *client_search_focus_parent(ObClient *self);
+
 /*! Searches a client's transients for a focused window. The function does not
   check for the passed client, only for its transients.
   If no focused transient is found, NULL is returned.
@@ -504,6 +510,10 @@ ObClient *client_search_focus_tree_full(ObClient *self);
 ObClient *client_search_modal_child(ObClient *self);
 
 ObClient *client_search_top_transient(ObClient *self);
+
+/*! Search for a parent of a client. This only searches up *ONE LEVEL*, and
+  returns the searched for parent if it is a parent, or NULL if not. */
+ObClient *client_search_parent(ObClient *self, ObClient *search);
 
 /*! Search for a transient of a client. The transient is returned if it is one,
   NULL is returned if the given search is not a transient of the client. */

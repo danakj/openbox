@@ -277,9 +277,7 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state() != OB_STATE_STARTING &&
-        (config_focus_new || (self->transient_for &&
-                              self->transient_for != OB_TRAN_GROUP &&
-                              client_focused(self->transient_for))) &&
+        (config_focus_new || client_search_focus_parent(self)) &&
         /* note the check against Type_Normal/Dialog, not client_normal(self),
            which would also include other types. in this case we want more
            strict rules for focus */
@@ -2805,6 +2803,52 @@ ObClient *client_search_top_transient(ObClient *self)
     }
 
     return self;
+}
+
+ObClient *client_search_focus_parent(ObClient *self)
+{
+    if (self->transient_for) {
+        if (self->transient_for != OB_TRAN_GROUP) {
+            if (client_focused(self->transient_for))
+                return self->transient_for;
+        } else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next) {
+                ObClient *c = it->data;
+
+                /* checking transient_for prevents infinate loops! */
+                if (c != self && !c->transient_for)
+                    if (client_focused(c))
+                        return c;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+ObClient *client_search_parent(ObClient *self, ObClient *search)
+{
+    if (self->transient_for) {
+        if (self->transient_for != OB_TRAN_GROUP) {
+            if (self->transient_for == search)
+                return search;
+        } else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next) {
+                ObClient *c = it->data;
+
+                /* checking transient_for prevents infinate loops! */
+                if (c != self && !c->transient_for)
+                    if (c == search)
+                        return search;
+            }
+        }
+    }
+
+    return NULL;
 }
 
 ObClient *client_search_transient(ObClient *self, ObClient *search)

@@ -11,10 +11,13 @@ void tree_destroy(KeyBindingTree *tree)
 	c = tree->first_child;
 	if (c == NULL) {
 	    GList *it;
+            GSList *sit;
 	    for (it = tree->keylist; it != NULL; it = it->next)
 		g_free(it->data);
 	    g_list_free(tree->keylist);
-            action_free(tree->action);
+	    for (it = tree->actions; it != NULL; it = it->next)
+                action_free(it->data);
+	    g_slist_free(tree->actions);
 	}
 	g_free(tree);
 	tree = c;

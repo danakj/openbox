@@ -1,6 +1,5 @@
 #include "event.h"
 #include "openbox.h"
-#include "grab.h"
 #include "framerender.h"
 #include "client.h"
 #include "config.h"
@@ -12,6 +11,7 @@
 #include "focus.h"
 #include "parse.h"
 #include "stacking.h"
+#include "popup.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -23,6 +23,7 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 Window focus_backup = None;
 
 static Client *focus_cycle_target = NULL;
+static Popup *focus_cycle_popup = NULL;
 
 void focus_startup()
 {
@@ -32,6 +33,7 @@ void focus_startup()
     XSetWindowAttributes attrib;
 
     focus_client = NULL;
+    focus_cycle_popup = popup_new(TRUE);
 
     attrib.override_redirect = TRUE;
     focus_backup = XCreateWindow(ob_display, ob_root,
@@ -53,6 +55,9 @@ void focus_shutdown()
         g_list_free(focus_order[i]);
     g_free(focus_order);
     focus_order = NULL;
+
+    popup_free(focus_cycle_popup);
+    focus_cycle_popup = NULL;
 
     XDestroyWindow(ob_display, focus_backup);
 
@@ -98,9 +103,11 @@ void focus_set_client(Client *client)
     if (client != NULL)
         push_to_top(client);
 
-    /* set the NET_ACTIVE_WINDOW hint */
-    active = client ? client->window : None;
-    PROP_SET32(ob_root, net_active_window, window, active);
+    /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
+    if (ob_state != State_Exiting) {
+        active = client ? client->window : None;
+        PROP_SET32(ob_root, net_active_window, window, active);
+    }
 
     if (focus_client != NULL)
         dispatch_client(Event_Client_Focus, focus_client, 0, 0);
@@ -206,7 +213,11 @@ void focus_fallback(FallbackType type)
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (type != Fallback_Unfocusing || it->data != old)
-            if (client_normal(it->data) && client_focus(it->data))
+            if (client_normal(it->data) &&
+                /* dont fall back to 'anonymous' fullscreen windows. theres no
+                   checks for this is in transient/group fallbacks. */
+                !((Client*)it->data)->fullscreen &&
+                client_focus(it->data))
                 return;
 
     /* nothing to focus */
@@ -215,38 +226,28 @@ void focus_fallback(FallbackType type)
 
 static void popup_cycle(Client *c, gboolean show)
 {
-    XSetWindowAttributes attrib;
-    static Window coords = None;
-
-    if (coords == None) {
-        attrib.override_redirect = TRUE;
-        coords = XCreateWindow(ob_display, ob_root,
-                               0, 0, 1, 1, 0, render_depth, InputOutput,
-                               render_visual, CWOverrideRedirect, &attrib);
-        g_assert(coords != None);
-
-        grab_pointer(TRUE, None);
-
-        XMapWindow(ob_display, coords);
-    }
-
     if (!show) {
-        XDestroyWindow(ob_display, coords);
-        coords = None;
-
-        grab_pointer(FALSE, None);
+        popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
-        Size s;
 
         a = screen_area(c->desktop);
+        popup_position(focus_cycle_popup, CenterGravity,
+                       a->x + a->width / 2, a->y + a->height / 2);
+/*        popup_size(focus_cycle_popup, a->height/2, a->height/16);
+        popup_show(focus_cycle_popup, c->title,
+                   client_icon(c, a->height/16, a->height/16));
+*/
+        /* XXX the size and the font extents need to be related on some level
+         */
+        popup_size(focus_cycle_popup, 320, 48);
 
-        framerender_size_popup_label(c->title, &s);
-        XMoveResizeWindow(ob_display, coords,
-                          a->x + (a->width - s.width) / 2,
-                          a->y + (a->height - s.height) / 2,
-                          s.width, s.height);
-        framerender_popup_label(coords, &s, c->title);
+        /* use the transient's parent's title/icon */
+        while (c->transient_for && c->transient_for != TRAN_GROUP)
+            c = c->transient_for;
+
+        popup_show(focus_cycle_popup, (c->iconic ? c->icon_title : c->title),
+                   client_icon(c, 48, 48));
     }
 }
 
@@ -294,15 +295,18 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             it = it->prev;
             if (it == NULL) it = g_list_last(list);
         }
-        ft = client_focus_target(it->data);
-        if (ft == it->data && client_normal(ft) &&
+        /*ft = client_focus_target(it->data);*/
+        ft = it->data;
+        if (ft->transients == NULL && /*ft == it->data &&*/client_normal(ft) &&
             (ft->can_focus || ft->focus_notify) &&
             (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)) {
-            if (focus_cycle_target)
-                frame_adjust_focus(focus_cycle_target->frame, FALSE);
-            focus_cycle_target = ft;
-            frame_adjust_focus(focus_cycle_target->frame, TRUE);
-            popup_cycle(ft, TRUE);
+            if (ft != focus_cycle_target) { /* prevents flicker */
+                if (focus_cycle_target)
+                    frame_adjust_focus(focus_cycle_target->frame, FALSE);
+                focus_cycle_target = ft;
+                frame_adjust_focus(focus_cycle_target->frame, TRUE);
+            }
+            popup_cycle(ft, config_focus_popup);
             return ft;
         }
     } while (it != start);

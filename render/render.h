@@ -79,6 +79,7 @@ typedef struct Surface {
 typedef struct {
     XftFont *xftfont;
     int height;
+    int elipses_length;
 } ObFont;
 
 typedef enum {
@@ -109,12 +110,12 @@ typedef struct TextureMask {
 } TextureMask;
 
 typedef struct TextureRGBA {
-    int width;
-    int height;
+    guint width;
+    guint height;
     unsigned long *data;
 /* cached scaled so we don't have to scale often */
-    int cwidth;
-    int cheight;
+    guint cwidth;
+    guint cheight;
     unsigned long *cache;
 } TextureRGBA;
 

@@ -41,7 +41,7 @@ void parse_set_section(char *section);
 %token <integer> INTEGER
 %token <string> STRING
 %token <identifier> IDENTIFIER
-%token <bool> BOOL
+%token <bool> BOOLEAN
 %token <character> '('
 %token <character> ')'
 %token <character> '{'
@@ -78,7 +78,7 @@ token:
   | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1; }
   | STRING     { t.type = TOKEN_STRING; t.data.string = $1; }
   | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1; }
-  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; }
+  | BOOLEAN    { t.type = TOKEN_BOOL; t.data.bool = $1; }
   | list       { t.type = TOKEN_LIST; t.data.list = $1; }
   | '{'        { t.type = $1; t.data.character = $1; }
   | '}'        { t.type = $1; t.data.character = $1; }
@@ -107,7 +107,7 @@ listtoken:
   | INTEGER    { t.type = TOKEN_INTEGER; t.data.integer = $1; }
   | STRING     { t.type = TOKEN_STRING; t.data.string = $1; }
   | IDENTIFIER { t.type = TOKEN_IDENTIFIER; t.data.identifier = $1; }
-  | BOOL       { t.type = TOKEN_BOOL; t.data.bool = $1; }
+  | BOOLEAN    { t.type = TOKEN_BOOL; t.data.bool = $1; }
   | list       { t.type = TOKEN_LIST; t.data.list = $1; }
   | '{'        { t.type = $1; t.data.character = $1; }
   | '}'        { t.type = $1; t.data.character = $1; }

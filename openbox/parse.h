@@ -11,7 +11,7 @@ typedef enum {
     TOKEN_INTEGER    = INTEGER,
     TOKEN_STRING     = STRING,
     TOKEN_IDENTIFIER = IDENTIFIER,
-    TOKEN_BOOL       = BOOL,
+    TOKEN_BOOL       = BOOLEAN,
     TOKEN_LIST,
     TOKEN_LBRACE     = '{',
     TOKEN_RBRACE     = '}',

@@ -38,10 +38,7 @@ static void client_get_gravity(Client *self);
 static void client_showhide(Client *self);
 static void client_change_allowed_actions(Client *self);
 static void client_change_state(Client *self);
-static void client_move_onscreen(Client *self);
-static Client *search_focus_tree(Client *node, Client *skip);
 static void client_apply_startup_state(Client *self);
-static Client *search_modal_tree(Client *node, Client *skip);
 
 static guint map_hash(Window *w) { return *w; }
 static gboolean map_key_comp(Window *w1, Window *w2) { return *w1 == *w2; }
@@ -81,6 +78,37 @@ void client_set_list()
 
     stacking_set_list();
 }
+
+/*
+void client_foreach_transient(Client *self, ClientForeachFunc func, void *data)
+{
+    GSList *it;
+
+    for (it = self->transients; it; it = it->next) {
+        if (!func(it->data, data)) return;
+        client_foreach_transient(it->data, func, data);
+    }
+}
+
+void client_foreach_ancestor(Client *self, ClientForeachFunc func, void *data)
+{
+    if (self->transient_for) {
+        if (self->transient_for != TRAN_GROUP) {
+            if (!func(self->transient_for, data)) return;
+            client_foreach_ancestor(self->transient_for, func, data);
+        } else {
+            GSList *it;
+
+            for (it = self->group->members; it; it = it->next)
+                if (it->data != self &&
+                    ((Client*)it->data)->transient_for != TRAN_GROUP) {
+                    if (!func(it->data, data)) return;
+                    client_foreach_ancestor(it->data, func, data);
+                }
+        }
+    }
+}
+*/
 
 void client_manage_all()
 {
@@ -137,7 +165,7 @@ void client_manage_all()
 
     if (config_focus_new) {
         active = g_hash_table_lookup(client_map, &startup_active);
-        if (!active || !client_focus(active))
+        if (!(active && client_focus(active)))
             focus_fallback(Fallback_NoFocus);
     }
 }
@@ -266,7 +294,7 @@ void client_manage(Window window)
                 (!parent && (!self->group ||
                              !self->group->members->next)))))) ||
             (parent && (client_focused(parent) ||
-                        search_focus_tree(parent, parent)))) {
+                        client_search_focus_tree(parent)))) {
             client_focus(self);
         }
     }
@@ -399,7 +427,7 @@ void client_unmanage(Client *self)
     client_set_list();
 }
 
-static void client_move_onscreen(Client *self)
+void client_move_onscreen(Client *self)
 {
     Rect *a;
     int x = self->frame->area.x, y = self->frame->area.y;
@@ -415,7 +443,7 @@ static void client_move_onscreen(Client *self)
         y = a->y;
 
     frame_frame_gravity(self->frame, &x, &y); /* get where the client
-                                              should be */
+                                                 should be */
     client_configure(self , Corner_TopLeft, x, y,
                      self->area.width, self->area.height,
                      TRUE, TRUE);
@@ -496,6 +524,7 @@ static void client_get_all(Client *self)
     /* defaults */
     self->frame = NULL;
     self->title = self->icon_title = NULL;
+    self->title_count = 1;
     self->name = self->class = self->role = NULL;
     self->wmstate = NormalState;
     self->transient = FALSE;
@@ -529,7 +558,6 @@ static void client_get_all(Client *self)
     client_setup_decor_and_functions(self);
   
     client_update_title(self);
-    client_update_icon_title(self);
     client_update_class(self);
     client_update_strut(self);
     client_update_icons(self);
@@ -782,10 +810,6 @@ void client_get_type(Client *self)
 	else
 	    self->type = Type_Normal;
     }
-
-    /* this makes sure that these windows appear on all desktops */
-    if (self->type == Type_Desktop)
-	self->desktop = DESKTOP_ALL;
 }
 
 void client_update_protocols(Client *self)
@@ -991,11 +1015,19 @@ void client_setup_decor_and_functions(Client *self)
     client_change_allowed_actions(self);
 
     if (self->frame) {
+        /* this makes sure that these windows appear on all desktops */
+        if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
+            client_set_desktop(self, DESKTOP_ALL, FALSE);
+
 	/* change the decors on the frame, and with more/less decorations,
            we may also need to be repositioned */
 	frame_adjust_area(self->frame, TRUE, TRUE);
 	/* with new decor, the window's maximized size may change */
 	client_remaximize(self);
+    } else {
+        /* this makes sure that these windows appear on all desktops */
+        if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
+            self->desktop = DESKTOP_ALL;
     }
 }
 
@@ -1004,7 +1036,9 @@ static void client_change_allowed_actions(Client *self)
     guint32 actions[9];
     int num = 0;
 
-    actions[num++] = prop_atoms.net_wm_action_change_desktop;
+    /* desktop windows are kept on all desktops */
+    if (self->type != Type_Desktop)
+        actions[num++] = prop_atoms.net_wm_action_change_desktop;
 
     if (self->functions & Func_Shade)
 	actions[num++] = prop_atoms.net_wm_action_shade;
@@ -1154,6 +1188,9 @@ void client_update_wmhints(Client *self)
 
 void client_update_title(Client *self)
 {
+    GList *it;
+    guint32 nums;
+    guint i;
     char *data = NULL;
 
     g_free(self->title);
@@ -1165,6 +1202,29 @@ void client_update_title(Client *self)
 	    data = g_strdup("Unnamed Window");
 
     /* look for duplicates and append a number */
+    nums = 0;
+    for (it = client_list; it; it = it->next)
+        if (it->data != self) {
+            Client *c = it->data;
+            if (0 == strncmp(c->title, data, strlen(data)))
+                nums |= 1 << c->title_count;
+        }
+    /* find first free number */
+    for (i = 1; i <= 32; ++i)
+        if (!(nums & (1 << i))) {
+            if (self->title_count == 1 || i == 1)
+                self->title_count = i;
+            break;
+        }
+    /* dont display the number for the first window */
+    if (self->title_count > 1) {
+        char *vdata, *ndata;
+        ndata = g_strdup_printf(" - [%u]", self->title_count);
+        vdata = g_strconcat(data, ndata, NULL);
+        g_free(ndata);
+        g_free(data);
+        data = vdata;
+    }
 
     PROP_SETS(self->window, net_wm_visible_name, data);
 
@@ -1172,12 +1232,9 @@ void client_update_title(Client *self)
 
     if (self->frame)
 	frame_adjust_title(self->frame);
-}
 
-void client_update_icon_title(Client *self)
-{
-    char *data = NULL;
-
+    /* update the icon title */
+    data = NULL;
     g_free(self->icon_title);
      
     /* try netwm */
@@ -1185,6 +1242,16 @@ void client_update_icon_title(Client *self)
 	/* try old x stuff */
 	if (!PROP_GETS(self->window, wm_icon_name, locale, &data))
             data = g_strdup("Unnamed Window");
+
+    /* append the title count, dont display the number for the first window */
+    if (self->title_count > 1) {
+        char *vdata, *ndata;
+        ndata = g_strdup_printf(" - [%u]", self->title_count);
+        vdata = g_strconcat(data, ndata, NULL);
+        g_free(ndata);
+        g_free(data);
+        data = vdata;
+    }
 
     PROP_SETS(self->window, net_wm_visible_icon_name, data);
 
@@ -1342,28 +1409,70 @@ static void client_change_state(Client *self)
 	frame_adjust_state(self->frame);
 }
 
-static Client *search_focus_tree(Client *node, Client *skip)
+Client *client_search_focus_tree(Client *self)
 {
     GSList *it;
     Client *ret;
 
-    for (it = node->transients; it != NULL; it = it->next) {
-	Client *c = it->data;
-	if (c == skip) continue; /* circular? */
-	if ((ret = search_focus_tree(c, skip))) return ret;
-	if (client_focused(c)) return c;
+    for (it = self->transients; it != NULL; it = it->next) {
+	if (client_focused(it->data)) return it->data;
+	if ((ret = client_search_focus_tree(it->data))) return ret;
     }
     return NULL;
+}
+
+Client *client_search_focus_tree_full(Client *self)
+{
+    if (self->transient_for) {
+        if (self->transient_for != TRAN_GROUP) {
+            return client_search_focus_tree_full(self->transient_for);
+        } else {
+            GSList *it;
+        
+            for (it = self->group->members; it; it = it->next)
+                if (((Client*)it->data)->transient_for != TRAN_GROUP) {
+                    Client *c;
+                    if ((c = client_search_focus_tree_full(it->data)))
+                        return c;
+                }
+            return NULL;
+        }
+    } else {
+        /* this function checks the whole tree, the client_search_focus_tree
+           does not, so we need to check this window */
+        if (client_focused(self))
+            return self;
+        return client_search_focus_tree(self);
+    }
+}
+
+static StackLayer calc_layer(Client *self)
+{
+    StackLayer l;
+
+    if (self->iconic) l = Layer_Icon;
+    else if (self->fullscreen) l = Layer_Fullscreen;
+    else if (self->type == Type_Desktop) l = Layer_Desktop;
+    else if (self->type == Type_Dock) {
+        if (!self->below) l = Layer_Top;
+        else l = Layer_Normal;
+    }
+    else if (self->above) l = Layer_Above;
+    else if (self->below) l = Layer_Below;
+    else l = Layer_Normal;
+
+    return l;
 }
 
 static void calc_recursive(Client *self, Client *orig, StackLayer l,
                            gboolean raised)
 {
-    StackLayer old;
+    StackLayer old, own;
     GSList *it;
 
     old = self->layer;
-    self->layer = l;
+    own = calc_layer(self);
+    self->layer = l > own ? l : own;
 
     for (it = self->transients; it; it = it->next)
         calc_recursive(it->data, orig, l, raised ? raised : l != old);
@@ -1376,7 +1485,6 @@ static void calc_recursive(Client *self, Client *orig, StackLayer l,
 void client_calc_layer(Client *self)
 {
     StackLayer l;
-    gboolean f;
     Client *orig;
 
     orig = self;
@@ -1397,25 +1505,7 @@ void client_calc_layer(Client *self)
         }
     }
 
-    /* is us or one of our transients focused? */
-    if (client_focused(self))
-        f = TRUE;
-    else if (search_focus_tree(self, self))
-        f = TRUE;
-    else
-        f = FALSE;
-
-    if (self->iconic) l = Layer_Icon;
-    /* fullscreen windows are only in the fullscreen layer while focused */
-    else if (self->fullscreen && f) l = Layer_Fullscreen;
-    else if (self->type == Type_Desktop) l = Layer_Desktop;
-    else if (self->type == Type_Dock) {
-        if (!self->below) l = Layer_Top;
-        else l = Layer_Normal;
-    }
-    else if (self->above) l = Layer_Above;
-    else if (self->below) l = Layer_Below;
-    else l = Layer_Normal;
+    l = calc_layer(self);
 
     calc_recursive(self, orig, l, FALSE);
 }
@@ -1698,31 +1788,30 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 {
     GSList *it;
 
-    /* move up the transient chain as far as possible first if deiconifying */
-    if (!iconic)
-        while (self->transient_for) {
-            if (self->transient_for != TRAN_GROUP) {
-                if (self->transient_for->iconic == iconic)
-                    break;
-                self = self->transient_for;
-            } else {
-                GSList *it;
-
-                /* the check for TRAN_GROUP is to prevent an infinate loop with
-                   2 transients of the same group at the head of the group's
-                   members list */
-                for (it = self->group->members; it; it = it->next) {
-                    Client *c = it->data;
-
-                    if (c != self && c->transient_for->iconic != iconic &&
-                        c->transient_for != TRAN_GROUP) {
-                        self = it->data;
-                        break;
-                    }
-                }
-                if (it == NULL) break;
+    /* move up the transient chain as far as possible first */
+    if (self->transient_for) {
+        if (self->transient_for != TRAN_GROUP) {
+            if (self->transient_for->iconic != iconic) {
+                client_iconify(self->transient_for, iconic, curdesk);
+                return;
             }
+        } else {
+            GSList *it;
+
+            /* the check for TRAN_GROUP is to prevent an infinate loop with
+               2 transients of the same group at the head of the group's
+               members list */
+            for (it = self->group->members; it; it = it->next) {
+                Client *c = it->data;
+                if (c != self && c->iconic != iconic &&
+                    c->transient_for != TRAN_GROUP) {
+                    client_iconify(it->data, iconic, curdesk);
+                    break;
+                }
+            }
+            if (it != NULL) return;
         }
+    }
 
     if (self->iconic == iconic) return; /* nothing to do */
 
@@ -1738,13 +1827,18 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 	   and because the ICCCM tells us to! */
 	XUnmapWindow(ob_display, self->window);
 
-        /* update the focus lists.. iconic windows go to the bottom */
-        focus_order_to_bottom(self);
+        /* update the focus lists.. iconic windows go to the bottom of the
+         list, put the new iconic window at the 'top of the bottom'. */
+        focus_order_to_top(self);
     } else {
 	if (curdesk)
 	    client_set_desktop(self, screen_desktop, FALSE);
 	self->wmstate = self->shaded ? IconicState : NormalState;
 	XMapWindow(ob_display, self->window);
+
+        /* this puts it after the current focused window */
+        focus_order_remove(self);
+        focus_order_add_new(self);
     }
     client_change_state(self);
     client_showhide(self);
@@ -1941,23 +2035,17 @@ void client_set_desktop(Client *self, guint target, gboolean donthide)
     dispatch_client(Event_Client_Desktop, self, target, old);
 }
 
-static Client *search_modal_tree(Client *node, Client *skip)
+Client *client_search_modal_child(Client *self)
 {
     GSList *it;
     Client *ret;
   
-    for (it = node->transients; it != NULL; it = it->next) {
+    for (it = self->transients; it != NULL; it = it->next) {
 	Client *c = it->data;
-	if (c == skip) continue; /* circular? */
-	if ((ret = search_modal_tree(c, skip))) return ret;
+	if ((ret = client_search_modal_child(c))) return ret;
 	if (c->modal) return c;
     }
     return NULL;
-}
-
-Client *client_find_modal_child(Client *self)
-{
-    return search_modal_tree(self, self);
 }
 
 gboolean client_validate(Client *self)
@@ -2118,7 +2206,7 @@ Client *client_focus_target(Client *self)
     Client *child;
      
     /* if we have a modal child, then focus it, not us */
-    child = client_find_modal_child(self);
+    child = client_search_modal_child(self);
     if (child) return child;
     return self;
 }

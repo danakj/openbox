@@ -11,6 +11,8 @@ extern gboolean config_focus_follow;
 extern gboolean config_focus_last;
 /*! Focus the last focused window as a fallback when switching desktops */
 extern gboolean config_focus_last_on_desktop;
+/*! Show a popup dialog while cycling focus */
+extern gboolean config_focus_popup;
 
 /* The name of the theme */
 char *config_theme;

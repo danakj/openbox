@@ -5,6 +5,7 @@ gboolean config_focus_new;
 gboolean config_focus_follow;
 gboolean config_focus_last;
 gboolean config_focus_last_on_desktop;
+gboolean config_focus_popup;
 
 char *config_theme;
 
@@ -36,6 +37,12 @@ static void parse_focus(char *name, ParseToken *value)
             yyerror("invalid value");
         else {
             config_focus_last_on_desktop = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "cyclingdialog")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            config_focus_popup = value->data.bool;
         }
     } else
         yyerror("invalid option");
@@ -95,6 +102,7 @@ void config_startup()
     config_focus_follow = FALSE;
     config_focus_last = TRUE;
     config_focus_last_on_desktop = TRUE;
+    config_focus_popup = TRUE;
 
     parse_reg_section("focus", NULL, parse_focus);
 

@@ -211,6 +211,11 @@ AC_DEFUN([X11_EXT_XKB],
       AC_MSG_RESULT([yes])
       XKB="yes"
       AC_DEFINE([XKB], [1], [Found the XKB extension])
+
+      XKB_CFLAGS=""
+      XKB_LIBS=""
+      AC_SUBST(XKB_CFLAGS)
+      AC_SUBST(XKB_LIBS)
     ],
     [ 
       AC_MSG_RESULT([no])
@@ -223,6 +228,63 @@ AC_DEFUN([X11_EXT_XKB],
 
   AC_MSG_CHECKING([for the Xkb extension])
   if test "$XKB" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+# X11_EXT_XRANDR()
+#
+# Check for the presence of the "XRandR" X Window System extension.
+# Defines "XRANDR" and sets the $(XRANDR) variable to "yes" if the extension is
+# present.
+AC_DEFUN([X11_EXT_XRANDR],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext -lXrender -lXrandr"
+
+  AC_CHECK_LIB([Xrandr], [XRRSelectInput],
+    AC_MSG_CHECKING([for X11/extensions/Xrandr.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/extensions/Xrandr.h>
+    ],
+    [
+      Display *d;
+      Drawable r;
+      int i;
+      XRRQueryExtension(d, &i, &i);
+      XRRGetScreenInfo(d, r);
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      XRANDR="yes"
+      AC_DEFINE([XRANDR], [1], [Found the XRandR extension])
+
+      XRANDR_CFLAGS=""
+      XRANDR_LIBS="-lXext -lXrender -lXrandr"
+      AC_SUBST(XRANDR_CFLAGS)
+      AC_SUBST(XRANDR_LIBS)
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      XRANDR="no"
+    ])
+  )
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
+  AC_MSG_CHECKING([for the XRandR extension])
+  if test "$XRANDR" = "yes"; then
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])
@@ -260,7 +322,11 @@ AC_DEFUN([X11_EXT_SHAPE],
       AC_MSG_RESULT([yes])
       SHAPE="yes"
       AC_DEFINE([SHAPE], [1], [Found the XShape extension])
-      LIBS="$LIBS -lXext"
+
+      XSHAPE_CFLAGS=""
+      XSHAPE_LIBS="-lXext"
+      AC_SUBST(XSHAPE_CFLAGS)
+      AC_SUBST(XSHAPE_LIBS)
     ],
     [ 
       AC_MSG_RESULT([no])
@@ -271,7 +337,7 @@ AC_DEFUN([X11_EXT_SHAPE],
   LIBS=$OLDLIBS
   CPPFLAGS=$OLDCPPFLAGS
  
- AC_MSG_CHECKING([for the Shape extension])
+  AC_MSG_CHECKING([for the Shape extension])
   if test "$SHAPE" = "yes"; then
     AC_MSG_RESULT([yes])
   else
@@ -325,6 +391,62 @@ AC_DEFUN([X11_EXT_XINERAMA],
 
   AC_MSG_CHECKING([for the Xinerama extension])
   if test "$XINERAMA" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+# VIDMODE()
+#
+# Check for the presence of the "VidMode" X Window System extension.
+# Defines "VIDMODE" and sets the $(VIDMODE) variable to "yes" if the extension
+# is present.
+AC_DEFUN([X11_EXT_VIDMODE],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext -lXxf86vm"
+
+  AC_CHECK_LIB([Xxf86vm], [XF86VidModeGetViewPort],
+    AC_MSG_CHECKING([for X11/extensions/xf86vmode.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/extensions/xf86vmode.h>
+    ],
+    [
+      Display *d;
+      int i;
+      XF86VidModeQueryExtension(d, &i, &i);
+      XF86VidModeGetViewPort(d, i, &i, &i);
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      VIDMODE="yes"
+      AC_DEFINE([VIDMODE], [1], [Found the VidMode extension])
+
+      VIDMODE_CFLAGS=""
+      VIDMODE_LIBS="-lXext -lXxf86vm"
+      AC_SUBST(VIDMODE_CFLAGS)
+      AC_SUBST(VIDMODE_LIBS)
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      VIDMODE="no"
+    ])
+  )
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
+  AC_MSG_CHECKING([for the VidMode extension])
+  if test "$VIDMODE" = "yes"; then
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])

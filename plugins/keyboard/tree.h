@@ -8,7 +8,7 @@ typedef struct KeyBindingTree {
     guint state;
     guint key;
     GList *keylist;
-    Action *action;
+    GSList *actions; /* list of Action pointers */
 
     /* the next binding in the tree at the same level */
     struct KeyBindingTree *next_sibling; 

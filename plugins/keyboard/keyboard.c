@@ -56,12 +56,15 @@ gboolean kbind(GList *keylist, Action *action)
 
     if (!(tree = tree_build(keylist)))
         return FALSE;
+
     if ((t = tree_find(tree, &conflict)) != NULL) {
-	/* already bound to something */
-	g_message("keychain is already bound");
+	/* already bound to something, use the existing tree */
         tree_destroy(tree);
-        return FALSE;
-    }
+        tree = NULL;
+    } else
+        t = tree;
+    while (t->first_child) t = t->first_child;
+
     if (conflict) {
         g_message("conflict with binding");
         tree_destroy(tree);
@@ -73,12 +76,10 @@ gboolean kbind(GList *keylist, Action *action)
     grab_keys(FALSE);
 
     /* set the action */
-    t = tree;
-    while (t->first_child) t = t->first_child;
-    t->action = action;
+    t->actions = g_slist_append(t->actions, action);
     /* assimilate this built tree into the main tree. assimilation
        destroys/uses the tree */
-    tree_assimilate(tree);
+    if (tree) tree_assimilate(tree);
 
     grab_keys(TRUE); 
     grab_server(FALSE);
@@ -100,17 +101,25 @@ static void event(ObEvent *e, void *foo)
             if (e->data.x.e->xkey.keycode == button_return)
                 done = TRUE;
             else if (e->data.x.e->xkey.keycode == button_escape) {
-                grabbed_key->action->data.cycle.cancel = TRUE;
+                GSList *it;
+                for (it = grabbed_key->actions; it; it = it->next) {
+                    Action *act = it->data;
+                    act->data.cycle.cancel = TRUE;
+                }
                 done = TRUE;
             }
         }
-        if (done) {
-            grabbed_key->action->data.cycle.final = TRUE;
-            grabbed_key->action->func(&grabbed_key->action->data);
-            grab_keyboard(FALSE);
-            grabbed_key = NULL;
-            reset_chains();
-            return; 
+        if (done) { 
+            GSList *it;
+            for (it = grabbed_key->actions; it; it = it->next) {
+                Action *act = it->data;
+                act->data.cycle.final = TRUE;
+                act->func(&act->data);
+                grab_keyboard(FALSE);
+                grabbed_key = NULL;
+                reset_chains();
+                return;
+            }
         }
     }
     if (e->type == Event_X_KeyRelease)
@@ -140,20 +149,24 @@ static void event(ObEvent *e, void *foo)
                     }
                     curpos = p;
                 } else {
-                    if (p->action->func != NULL) {
-                        p->action->data.any.c = focus_client;
+                    GSList *it;
+                    for (it = p->actions; it; it = it->next) {
+                        Action *act = it->data;
+                        if (act->func != NULL) {
+                            act->data.any.c = focus_client;
 
-                        if (p->action->func == action_cycle_windows) {
-                            p->action->data.cycle.final = FALSE;
-                            p->action->data.cycle.cancel = FALSE;
-                        }
+                            if (act->func == action_cycle_windows) {
+                                act->data.cycle.final = FALSE;
+                                act->data.cycle.cancel = FALSE;
+                            }
 
-                        p->action->func(&p->action->data);
+                            act->func(&act->data);
 
-                        if (p->action->func == action_cycle_windows &&
-                            !grabbed_key) {
-                            grab_keyboard(TRUE);
-                            grabbed_key = p;
+                            if (act->func == action_cycle_windows &&
+                                !grabbed_key) {
+                                grab_keyboard(TRUE);
+                                grabbed_key = p;
+                            }
                         }
                     }
 

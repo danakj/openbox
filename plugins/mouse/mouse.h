@@ -15,7 +15,7 @@ typedef enum {
 typedef struct {
     guint state;
     guint button;
-    Action *action[NUM_MOUSEACTION];
+    GSList *actions[NUM_MOUSEACTION]; /* lists of Action pointers */
 } MouseBinding;
 
 gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,

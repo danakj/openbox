@@ -78,8 +78,11 @@ extern Appearance *theme_a_menu_item;
 extern Appearance *theme_a_menu_disabled;
 extern Appearance *theme_a_menu_hilite;
 
+extern Appearance *theme_app_hilite_bg;
+extern Appearance *theme_app_unhilite_bg;
 extern Appearance *theme_app_hilite_label;
 extern Appearance *theme_app_unhilite_label;
+extern Appearance *theme_app_icon;
 
 void theme_startup();
 void theme_shutdown();

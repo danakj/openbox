@@ -144,6 +144,9 @@ static Window event_get_window(XEvent *e)
     case ConfigureRequest:
 	window = e->xconfigurerequest.window;
 	break;
+    case ConfigureNotify:
+        window = e->xconfigure.window;
+        break;
     default:
 #ifdef XKB
 	if (extensions_xkb && e->type == extensions_xkb_event_basep) {
@@ -308,6 +311,16 @@ static gboolean event_ignore(XEvent *e, Client *client)
 #ifdef DEBUG_FOCUS
                     g_message("found pending FocusIn");
 #endif
+                    /* is the focused window getting a FocusOut/In back to
+                       itself? */
+                    if (fe.xfocus.window == e->xfocus.window) {
+#ifdef DEBUG_FOCUS
+                        g_message("focused window got an Out/In back to "
+                                  "itself IGNORED both");
+#endif
+                        return TRUE;
+                    }
+
                     /* once all the FocusOut's have been dealt with, if there
                        is a FocusIn still left and it is valid, then use it */
                     event_process(&fe);
@@ -451,6 +464,21 @@ static void event_handle_root(XEvent *e)
 	else if (e->xproperty.atom == prop_atoms.net_desktop_layout)
 	    screen_update_layout();
 	break;
+    case ConfigureNotify:
+#ifdef XRANDR
+        XRRUpdateConfiguration(e);
+#endif
+        if (e->xconfigure.width != screen_physical_size.width ||
+            e->xconfigure.height != screen_physical_size.height)
+            screen_resize(e->xconfigure.width, e->xconfigure.height);
+        break;
+    default:
+        ;
+#ifdef VIDMODE
+        if (extensions_vidmode && e->type == extensions_vidmode_event_basep) {
+            g_message("VIDMODE EVENT");
+        }
+#endif
     }
 }
 
@@ -490,15 +518,25 @@ static void event_handle_client(Client *client, XEvent *e)
         }
         break;
     case FocusIn:
+#ifdef DEBUG_FOCUS
+        g_message("FocusIn on client for %lx", client->window);
+#endif
         focus_set_client(client);
+        frame_adjust_focus(client->frame, TRUE);
+        break;
     case FocusOut:
 #ifdef DEBUG_FOCUS
-        g_message("Focus%s on client for %lx", (e->type==FocusIn?"In":"Out"),
-                  client->window);
+        g_message("FocusOut on client for %lx", client->window);
 #endif
-        /* focus state can affect the stacking layer */
-        client_calc_layer(client);
-        frame_adjust_focus(client->frame, e->type == FocusIn);
+        /* are we a fullscreen window or a transient of one? (checks layer)
+           if we are then we need to be iconified since we are losing focus
+         */
+        if (client->layer == Layer_Fullscreen && !client->iconic &&
+            !client_search_focus_tree_full(client))
+            /* iconify fullscreen windows when they and their transients
+               aren't focused */
+            client_iconify(client, TRUE, TRUE);
+        frame_adjust_focus(client->frame, FALSE);
 	break;
     case EnterNotify:
         if (client_normal(client)) {
@@ -797,11 +835,10 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client_setup_decor_and_functions(client);
 	}
 	else if (msgtype == prop_atoms.net_wm_name ||
-		 msgtype == prop_atoms.wm_name)
-	    client_update_title(client);
-	else if (msgtype == prop_atoms.net_wm_icon_name ||
+		 msgtype == prop_atoms.wm_name ||
+                 msgtype == prop_atoms.net_wm_icon_name ||
 		 msgtype == prop_atoms.wm_icon_name)
-	    client_update_icon_title(client);
+	    client_update_title(client);
 	else if (msgtype == prop_atoms.wm_class)
 	    client_update_class(client);
 	else if (msgtype == prop_atoms.wm_protocols) {

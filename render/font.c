@@ -8,6 +8,10 @@
 #include <glib.h>
 #include "../kernel/geom.h"
 
+#define ELIPSES "..."
+#define ELIPSES_LENGTH(font, shadow, offset) \
+    (font->elipses_length + (shadow ? offset : 0))
+
 void font_startup(void)
 {
 #ifdef DEBUG
@@ -38,6 +42,11 @@ static void measure_height(ObFont *f)
     XftTextExtentsUtf8(ob_display, f->xftfont,
                        (FcChar8*)str, strlen(str), &info);
     f->height = (signed) info.height;
+
+    /* measure an elipses */
+    XftTextExtentsUtf8(ob_display, f->xftfont,
+                       (FcChar8*)ELIPSES, strlen(ELIPSES), &info);
+    f->elipses_length = (signed) info.xOff;
 }
 
 ObFont *font_open(char *fontstring)
@@ -98,9 +107,10 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
 {
     int x,y,w,h;
     XftColor c;
-    char *text;
-    int m;
+    GString *text;
+    int m, em;
     size_t l;
+    gboolean shortened = FALSE;
 
     y = position->y;
     w = position->width;
@@ -110,12 +120,22 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     y -= (2 * (t->font->xftfont->ascent + t->font->xftfont->descent) -
           (t->font->height + h) - 1) / 2;
 
-    text = g_strdup(t->string);
-    l = strlen(text);
-    m = font_measure_string(t->font, text, t->shadow, t->offset);
+    text = g_string_new(t->string);
+    l = g_utf8_strlen(text->str, -1);
+    m = font_measure_string(t->font, text->str, t->shadow, t->offset);
     while (l && m > position->width) {
-        text[--l] = '\0';
-        m = font_measure_string(t->font, text, t->shadow, t->offset);
+        shortened = TRUE;
+        /* remove a character from the middle */
+        text = g_string_erase(text, l-- / 2, 1);
+        em = ELIPSES_LENGTH(t->font, t->shadow, t->offset);
+        /* if the elipses are too large, don't show them at all */
+        if (em > position->width)
+            shortened = FALSE;
+        m = font_measure_string(t->font, text->str, t->shadow, t->offset) + em;
+    }
+    if (shortened) {
+        text = g_string_insert(text, (l + 1) / 2, ELIPSES);
+        l += 3;
     }
     if (!l) return;
 
@@ -147,7 +167,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,
-                          (FcChar8*)text, l);
+                          (FcChar8*)text->str, l);
     }  
     c.color.red = t->color->r | t->color->r << 8;
     c.color.green = t->color->g | t->color->g << 8;
@@ -157,6 +177,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
                      
     XftDrawStringUtf8(d, &c, t->font->xftfont, x,
                       t->font->xftfont->ascent + y,
-                      (FcChar8*)text, l);
+                      (FcChar8*)text->str, l);
     return;
 }

@@ -93,8 +93,11 @@ Appearance *theme_a_menu_item;
 Appearance *theme_a_menu_disabled;
 Appearance *theme_a_menu_hilite;
 
+Appearance *theme_app_hilite_bg;
+Appearance *theme_app_unhilite_bg;
 Appearance *theme_app_hilite_label;
 Appearance *theme_app_unhilite_label;
+Appearance *theme_app_icon;
 
 void theme_startup()
 {
@@ -151,8 +154,11 @@ void theme_startup()
     theme_a_menu_disabled = appearance_new(Surface_Planar, 1);
     theme_a_menu_hilite = appearance_new(Surface_Planar, 1);
 
+    theme_app_hilite_bg = appearance_new(Surface_Planar, 0);
+    theme_app_unhilite_bg = appearance_new(Surface_Planar, 0);
     theme_app_hilite_label = appearance_new(Surface_Planar, 1);
     theme_app_unhilite_label = appearance_new(Surface_Planar, 1);
+    theme_app_icon = appearance_new(Surface_Planar, 1);
 
 }
 
@@ -221,8 +227,11 @@ void theme_shutdown()
     appearance_free(theme_a_menu_item);
     appearance_free(theme_a_menu_disabled);
     appearance_free(theme_a_menu_hilite);
+    appearance_free(theme_app_hilite_bg);
+    appearance_free(theme_app_unhilite_bg);
     appearance_free(theme_app_hilite_label);
     appearance_free(theme_app_unhilite_label);
+    appearance_free(theme_app_icon);
 }
 
 static XrmDatabase loaddb(char *theme)
@@ -330,7 +339,7 @@ static gboolean read_mask(XrmDatabase db, char *rname, char *theme,
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
 
-	button_dir = g_strdup_printf("%s_buttons", theme);
+	button_dir = g_strdup_printf("%s_data", theme);
 
         s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
                              button_dir, retvalue.addr, NULL);
@@ -348,7 +357,7 @@ static gboolean read_mask(XrmDatabase db, char *rname, char *theme,
 
                 g_free(s);
                 themename = g_path_get_basename(theme);
-                s = g_strdup_printf("%s/%s_buttons/%s", theme,
+                s = g_strdup_printf("%s/%s_data/%s", theme,
                                     themename, retvalue.addr);
                 g_free(themename);
                 if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
@@ -728,26 +737,15 @@ char *theme_load(char *theme)
     if (!read_appearance(db, "menu.hilite", theme_a_menu_hilite))
 	set_default_appearance(theme_a_menu_hilite);
 
-    /* read the appearances for rendering non-decorations. these cannot be
-       parent-relative */
-    if (theme_a_focused_label->surface.data.planar.grad !=
-        Background_ParentRelative) {
-        if (!read_appearance(db, "window.label.focus", theme_app_hilite_label))
-            set_default_appearance(theme_app_hilite_label);
-    } else {
-        if (!read_appearance(db, "window.title.focus", theme_app_hilite_label))
-            set_default_appearance(theme_app_hilite_label);
-    }
-    if (theme_a_unfocused_label->surface.data.planar.grad !=
-        Background_ParentRelative) {
-        if (!read_appearance(db, "window.label.unfocus",
-                             theme_app_unhilite_label))
-            set_default_appearance(theme_app_unhilite_label);
-    } else {
-        if (!read_appearance(db, "window.title.unfocus",
-                             theme_app_unhilite_label))
-            set_default_appearance(theme_app_unhilite_label);
-    }
+    /* read the appearances for rendering non-decorations */
+    if (!read_appearance(db, "window.title.focus", theme_app_hilite_bg))
+        set_default_appearance(theme_app_hilite_bg);
+    if (!read_appearance(db, "window.label.focus", theme_app_hilite_label))
+        set_default_appearance(theme_app_hilite_label);
+    if (!read_appearance(db, "window.title.unfocus", theme_app_unhilite_bg))
+        set_default_appearance(theme_app_unhilite_bg);
+    if (!read_appearance(db, "window.label.unfocus", theme_app_unhilite_label))
+        set_default_appearance(theme_app_unhilite_label);
 
     /* read buttons textures */
     if (!read_appearance(db, "window.button.pressed.focus",
@@ -817,8 +815,8 @@ char *theme_load(char *theme)
     /* set up the textures */
     theme_a_focused_label->texture[0].type = 
         theme_app_hilite_label->texture[0].type = Text;
-    theme_a_focused_label->texture[0].data.text.justify =
-        theme_app_hilite_label->texture[0].data.text.justify = winjust;
+    theme_a_focused_label->texture[0].data.text.justify = winjust;
+    theme_app_hilite_label->texture[0].data.text.justify = Justify_Left;
     theme_a_focused_label->texture[0].data.text.font =
         theme_app_hilite_label->texture[0].data.text.font = theme_winfont;
     theme_a_focused_label->texture[0].data.text.shadow =
@@ -836,8 +834,8 @@ char *theme_load(char *theme)
 
     theme_a_unfocused_label->texture[0].type =
         theme_app_unhilite_label->texture[0].type = Text;
-    theme_a_unfocused_label->texture[0].data.text.justify =
-        theme_app_unhilite_label->texture[0].data.text.justify = winjust;
+    theme_a_unfocused_label->texture[0].data.text.justify = winjust;
+    theme_app_unhilite_label->texture[0].data.text.justify = Justify_Left;
     theme_a_unfocused_label->texture[0].data.text.font =
         theme_app_unhilite_label->texture[0].data.text.font = theme_winfont;
     theme_a_unfocused_label->texture[0].data.text.shadow =
@@ -865,6 +863,7 @@ char *theme_load(char *theme)
 
     theme_a_menu_item->surface.data.planar.grad = 
         theme_a_menu_disabled->surface.data.planar.grad =
+        theme_app_icon->surface.data.planar.grad =
         Background_ParentRelative;
 
     theme_a_menu_item->texture[0].type =

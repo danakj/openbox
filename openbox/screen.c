@@ -7,6 +7,7 @@
 #include "frame.h"
 #include "focus.h"
 #include "dispatch.h"
+#include "extensions.h"
 #include "../render/render.h"
 
 #include <X11/Xlib.h>
@@ -16,7 +17,7 @@
 #endif
 
 /*! The event mask to grab on the root window */
-#define ROOT_EVENTMASK (/*ColormapChangeMask |*/ PropertyChangeMask | \
+#define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
 			EnterWindowMask | LeaveWindowMask | \
 			SubstructureNotifyMask | SubstructureRedirectMask | \
 			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
@@ -160,7 +161,8 @@ void screen_startup()
     guint i;
 
     /* get the initial size */
-    screen_resize();
+    screen_resize(WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen)),
+                  HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen)));
 
     /* set the names */
     screen_desktop_names = g_new(char*,
@@ -201,14 +203,14 @@ void screen_shutdown()
     g_free(area);
 }
 
-void screen_resize()
+void screen_resize(int w, int h)
 {
-    /* XXX RandR support here? */
+    GList *it;
     guint32 geometry[2];
 
     /* Set the _NET_DESKTOP_GEOMETRY hint */
-    geometry[0] = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
-    geometry[1] = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+    geometry[0] = w;
+    geometry[1] = h;
     PROP_SETA32(ob_root, net_desktop_geometry, cardinal, geometry, 2);
     screen_physical_size.width = geometry[0];
     screen_physical_size.height = geometry[1];
@@ -218,7 +220,8 @@ void screen_resize()
 
     screen_update_struts();
 
-    /* XXX adjust more stuff ? */
+    for (it = client_list; it; it = it->next)
+        client_move_onscreen(it->data);
 }
 
 void screen_set_num_desktops(guint num)

@@ -112,6 +112,7 @@ typedef enum {
 typedef struct Client {
     Window  window;
 
+    /*! The window's decorations. NULL while the window is being managed! */
     struct Frame *frame;
 
     /*! The number of unmap events to ignore on the window */
@@ -133,10 +134,13 @@ typedef struct Client {
     GSList *transients;
     /*! The desktop on which the window resides (0xffffffff for all
       desktops) */
-    unsigned int desktop;
+    guint desktop;
 
     /*! Normal window title */
     gchar *title;
+    /*! The count for the title. When another window with the same title
+      exists, a count will be appended to it. */
+    guint title_count;
     /*! Window title when iconified */
     gchar *icon_title;
 
@@ -341,6 +345,11 @@ gboolean client_focused(Client *self);
 void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 		      gboolean user, gboolean final);
 
+/*! Moves a client so that it is on screen if it is entirely out of the
+  viewable screen.
+*/
+void client_move_onscreen(Client *self);
+
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should
             be returned to normal state.
@@ -389,11 +398,6 @@ void client_kill(Client *self);
          desktop has been changed. Generally this should be FALSE. */
 void client_set_desktop(Client *self, guint target, gboolean donthide);
 
-/*! Return a modal child of the client window
-    @return A modal child of the client window, or 0 if none was found.
-*/
-Client *client_find_modal_child(Client *self);
-
 /*! Validate client, by making sure no Destroy or Unmap events exist in
   the event queue for the window.
   @return true if the client is valid; false if the client has already
@@ -440,10 +444,8 @@ void client_update_normal_hints(Client *self);
 		   process.
 */
 void client_update_wmhints(Client *self);
-/*! Updates the window's title */
+/*! Updates the window's title and icon title */
 void client_update_title(Client *self);
-/*! Updates the window's icon title */
-void client_update_icon_title(Client *self);
 /*! Updates the window's application name and class */
 void client_update_class(Client *self);
 /*! Updates the strut for the client */
@@ -463,5 +465,22 @@ void client_setup_decor_and_functions(Client *self);
 void client_get_type(Client *self);
 
 Icon *client_icon(Client *self, int w, int h);
+
+/*! Searches a client's transients for a focused window. The function does not
+  check for the passed client, only for its transients.
+  If no focused transient is found, NULL is returned.
+*/
+Client *client_search_focus_tree(Client *self);
+
+/*! Searches a client's transient tree for a focused window. The function
+  searches up the tree and down other branches as well as the passed client's.
+  If no focused client is found, NULL is returned.
+*/
+Client *client_search_focus_tree_full(Client *self);
+
+/*! Return a modal child of the client window
+    @return A modal child of the client window, or 0 if none was found.
+*/
+Client *client_search_modal_child(Client *self);
 
 #endif

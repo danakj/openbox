@@ -70,7 +70,7 @@ static GList *find_lowest_transient(Client *c)
 static void raise_recursive(Client *client)
 {
     Window wins[2];  /* only ever restack 2 windows. */
-    GList *it;
+    GList *it, *low;
     GSList *sit;
 
     g_assert(stacking_list != NULL); /* this would be bad */
@@ -86,15 +86,15 @@ static void raise_recursive(Client *client)
     /* find 'it' where it is the positiion in the stacking order where
        'client' will be inserted *before* */
 
-    it = find_lowest_transient(client);
-    if (it)
-        it = it->next;
-    else {
-        /* the stacking list is from highest to lowest */
-        for (it = stacking_list; it; it = it->next) {
-            if (client->layer >= ((Client*)it->data)->layer)
-                break;
+    low = find_lowest_transient(client);
+    /* the stacking list is from highest to lowest */
+    for (it = g_list_last(stacking_list); it; it = it->prev) {
+        if (it == low || client->layer < ((Client*)it->data)->layer) {
+            it = it->next;
+            break;
         }
+        if (it == stacking_list)
+            break;
     }
 
     /*

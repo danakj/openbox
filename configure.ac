@@ -57,6 +57,8 @@ AC_SUBST(XFT_LIBS)
 
 # Check for X11 extensions
 X11_EXT_XKB
+X11_EXT_XRANDR
+X11_EXT_VIDMODE
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 
@@ -69,7 +71,9 @@ AC_CONFIG_FILES([Makefile
 		 plugins/Makefile
 		 plugins/placement/Makefile
 		 plugins/mouse/Makefile
-		 plugins/keyboard/Makefile])
+		 plugins/keyboard/Makefile
+		 tools/Makefile
+		 tools/slit/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT

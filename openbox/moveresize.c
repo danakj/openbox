@@ -4,6 +4,7 @@
 #include "client.h"
 #include "dispatch.h"
 #include "openbox.h"
+#include "popup.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -13,7 +14,6 @@ Client *moveresize_client = NULL;
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
-static Window coords = None;
 static int start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static int cur_x, cur_y;
 static guint button;
@@ -22,6 +22,8 @@ static Corner lockcorner;
 
 static guint button_return, button_escape, button_left, button_right,
     button_up, button_down;
+
+static Popup *popup = NULL;
 
 #define POPUP_X (10)
 #define POPUP_Y (10)
@@ -34,29 +36,24 @@ void moveresize_startup()
     button_right = XKeysymToKeycode(ob_display, XStringToKeysym("Right"));
     button_up = XKeysymToKeycode(ob_display, XStringToKeysym("Up"));
     button_down = XKeysymToKeycode(ob_display, XStringToKeysym("Down"));
+
+    popup = popup_new(FALSE);
+    popup_size_to_string(popup, "W:  0000  W:  0000");
+    popup_position(popup, NorthWestGravity, POPUP_X, POPUP_Y);
+}
+
+void moveresize_shutdown()
+{
+    popup_free(popup);
+    popup = NULL;
 }
 
 static void popup_coords(char *format, int a, int b)
 {
-    XSetWindowAttributes attrib;
-    Size s;
     char *text;
 
-    if (coords == None) {
-        attrib.override_redirect = TRUE;
-        coords = XCreateWindow(ob_display, ob_root,
-                               0, 0, 1, 1, 0, render_depth, InputOutput,
-                               render_visual, CWOverrideRedirect, &attrib);
-        g_assert(coords != None);
-
-        XMapWindow(ob_display, coords);
-    }
-
     text = g_strdup_printf(format, a, b);
-    framerender_size_popup_label(text, &s);
-    XMoveResizeWindow(ob_display, coords,
-                      POPUP_X, POPUP_Y, s.width, s.height);
-    framerender_popup_label(coords, &s, text);
+    popup_show(popup, text, NULL);
     g_free(text);
 }
 
@@ -127,8 +124,7 @@ void moveresize_end(gboolean cancel)
     grab_keyboard(FALSE);
     grab_pointer(FALSE, None);
 
-    XDestroyWindow(ob_display, coords);
-    coords = None;
+    popup_hide(popup);
 
     if (moving) {
         client_configure(moveresize_client, Corner_TopLeft,
@@ -156,7 +152,9 @@ static void do_move()
     client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
 
-    popup_coords("X:  %d  Y:  %d", moveresize_client->frame->area.x,
+    /* this would be better with a fixed width font ... XXX can do it better
+       if there are 2 text boxes */
+    popup_coords("X:  %4d  Y:  %4d", moveresize_client->frame->area.x,
                  moveresize_client->frame->area.y);
 }
 
@@ -178,7 +176,9 @@ static void do_resize()
     client_configure(moveresize_client, lockcorner, moveresize_client->area.x,
                      moveresize_client->area.y, cur_x, cur_y, TRUE, FALSE);
 
-    popup_coords("W:  %d  H:  %d", moveresize_client->logical_size.width,
+    /* this would be better with a fixed width font ... XXX can do it better
+       if there are 2 text boxes */
+    popup_coords("W:  %4d  H:  %4d", moveresize_client->logical_size.width,
                  moveresize_client->logical_size.height);
 }
 

@@ -7,6 +7,7 @@
 #include "mask.h"
 #include "color.h"
 #include "image.h"
+#include "theme.h"
 #include "kernel/openbox.h"
 
 #ifdef HAVE_STDLIB_H
@@ -421,6 +422,7 @@ void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
 void appearance_minsize(Appearance *l, int *w, int *h)
 {
     int i;
+    int m;
     *w = *h = 1;
 
     switch (l->surface.type) {
@@ -437,20 +439,22 @@ void appearance_minsize(Appearance *l, int *w, int *h)
         } else if (l->surface.data.planar.border)
             *w = *h = 2;
 
-        for (i = 0; i < l->textures; ++i)
+        for (i = 0; i < l->textures; ++i) {
             switch (l->texture[i].type) {
             case Bitmask:
                 *w += l->texture[i].data.mask.mask->w;
                 *h += l->texture[i].data.mask.mask->h;
                 break;
             case Text:
-                *w +=font_measure_string(l->texture[i].data.text.font,
-                                         l->texture[i].data.text.string,
-                                         l->texture[i].data.text.shadow,
-                                         l->texture[i].data.text.offset);
-                *h +=  font_height(l->texture[i].data.text.font,
-                                   l->texture[i].data.text.shadow,
-                                   l->texture[i].data.text.offset);
+                m = font_measure_string(l->texture[i].data.text.font,
+                                        l->texture[i].data.text.string,
+                                        l->texture[i].data.text.shadow,
+                                        l->texture[i].data.text.offset);
+                *w += m;
+                m = font_height(l->texture[i].data.text.font,
+                                l->texture[i].data.text.shadow,
+                                l->texture[i].data.text.offset);
+                *h += m;
                 break;
             case RGBA:
                 *w += l->texture[i].data.rgba.width;
@@ -458,7 +462,8 @@ void appearance_minsize(Appearance *l, int *w, int *h)
                 break;
             case NoTexture:
                 break;
-            }            
+            }
+        }
         break;
     }
 }

@@ -166,7 +166,6 @@ int main(int argc, char **argv)
 	font_startup();
         theme_startup();
 	event_startup();
-        moveresize_startup();
         grab_startup();
         plugin_startup();
         /* load the plugins specified in the pluginrc */
@@ -187,6 +186,7 @@ int main(int argc, char **argv)
         menu_startup();
         frame_startup();
         stacking_startup();
+        moveresize_startup();
 	focus_startup();
 	screen_startup();
         group_startup();
@@ -210,6 +210,7 @@ int main(int argc, char **argv)
         group_shutdown();
 	screen_shutdown();
 	focus_shutdown();
+        moveresize_shutdown();
         stacking_shutdown();
         frame_shutdown();
         menu_shutdown();

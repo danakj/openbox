@@ -31,7 +31,7 @@ bool ([tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[yY][eE][sS]|[nN][oO]|[oO][nN]|[oO][
 {bool}       { yylval.bool = (!g_ascii_strcasecmp("true", yytext) ||
                               !g_ascii_strcasecmp("yes", yytext) ||
                               !g_ascii_strcasecmp("on", yytext));
-               return BOOL;
+               return BOOLEAN;
              }
 {identifier} { yylval.identifier = g_strdup(yytext); return IDENTIFIER; }
 [{}()\[\]=,] { yylval.character = *yytext; return *yytext; }

@@ -218,34 +218,3 @@ static void framerender_close(Frame *self, Appearance *a)
              theme_button_size, theme_button_size);
     paint(self->close, a);
 }
-
-void framerender_popup_label(Window win, Size *sz, char *text)
-{
-    Appearance *a;
-
-    a = theme_app_hilite_label;
-    a->texture[0].data.text.string = text;
-    RECT_SET(a->area, 0, 0, sz->width, sz->height);
-    a->texture[0].position = a->area;
-    a->texture[0].position.x += theme_bevel;
-    a->texture[0].position.y += theme_bevel;
-    a->texture[0].position.width -= theme_bevel * 2;
-    a->texture[0].position.height -= theme_bevel * 2;
-
-    XSetWindowBorderWidth(ob_display, win, theme_bwidth);
-    XSetWindowBorder(ob_display, win, theme_b_color->pixel);
-
-    paint(win, a);
-}
-
-void framerender_size_popup_label(char *text, Size *sz)
-{
-    Appearance *a;
-
-    a = theme_app_hilite_label;
-    a->texture[0].data.text.string = text;
-
-    appearance_minsize(a, &sz->width, &sz->height);
-    sz->width += theme_bevel * 2;
-    sz->height += theme_bevel * 2;
-}

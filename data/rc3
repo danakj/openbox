@@ -27,6 +27,9 @@
 # set, the previously focused window on the desktop is focused when switching
 #focusLastOnDesktop = yes
 
+# shows a helpful dialog while cycling focus
+#cyclingDialog = yes
+
 [desktops]
 
 # The number of virtual desktops to use

@@ -96,9 +96,13 @@ static void clearall()
             int j;
 
             MouseBinding *b = it->data;
-            for (j = 0; j < NUM_MOUSEACTION; ++j)
-                if (b->action[j] != NULL)
-                    action_free(b->action[j]);
+            for (j = 0; j < NUM_MOUSEACTION; ++j) {
+                GSList *it;
+                for (it = b->actions[j]; it; it = it->next) {
+                    action_free(it->data);
+                }
+                g_slist_free(b->actions[j]);
+            }
             g_free(b);
         }
         g_slist_free(bound_contexts[i]);
@@ -119,17 +123,20 @@ static void fire_button(MouseAction a, Context context, Client *c, guint state,
     /* if not bound, then nothing to do! */
     if (it == NULL) return;
 
-    if (b->action[a] != NULL && b->action[a]->func != NULL) {
-        b->action[a]->data.any.c = c;
+    for (it = b->actions[a]; it; it = it->next) {
+        Action *act = it->data;
+        if (act->func != NULL) {
+            act->data.any.c = c;
 
-        g_assert(b->action[a]->func != action_moveresize);
+            g_assert(act->func != action_moveresize);
 
-        if (b->action[a]->func == action_showmenu) {
-            b->action[a]->data.showmenu.x = x;
-            b->action[a]->data.showmenu.y = y;
+            if (act->func == action_showmenu) {
+                act->data.showmenu.x = x;
+                act->data.showmenu.y = y;
+            }
+
+            act->func(&act->data);
         }
-
-        b->action[a]->func(&b->action[a]->data);
     }
 }
 
@@ -148,24 +155,27 @@ static void fire_motion(MouseAction a, Context context, Client *c,
     /* if not bound, then nothing to do! */
     if (it == NULL) return;
 
-    if (b->action[a] != NULL && b->action[a]->func != NULL) {
-        b->action[a]->data.any.c = c;
+    for (it = b->actions[a]; it; it = it->next) {
+        Action *act = it->data;
+        if (act->func != NULL) {
+            act->data.any.c = c;
 
-        if (b->action[a]->func == action_moveresize) {
-            b->action[a]->data.moveresize.x = x_root;
-            b->action[a]->data.moveresize.y = y_root;
-            b->action[a]->data.moveresize.button = button;
-            if (!(b->action[a]->data.moveresize.corner ==
-                  prop_atoms.net_wm_moveresize_move ||
-                  b->action[a]->data.moveresize.corner ==
-                  prop_atoms.net_wm_moveresize_move_keyboard ||
-                  b->action[a]->data.moveresize.corner ==
-                  prop_atoms.net_wm_moveresize_size_keyboard))
-                b->action[a]->data.moveresize.corner = corner;
-        } else
-            g_assert_not_reached();
+            if (act->func == action_moveresize) {
+                act->data.moveresize.x = x_root;
+                act->data.moveresize.y = y_root;
+                act->data.moveresize.button = button;
+                if (!(act->data.moveresize.corner ==
+                      prop_atoms.net_wm_moveresize_move ||
+                      act->data.moveresize.corner ==
+                      prop_atoms.net_wm_moveresize_move_keyboard ||
+                      act->data.moveresize.corner ==
+                      prop_atoms.net_wm_moveresize_size_keyboard))
+                    act->data.moveresize.corner = corner;
+            } else
+                g_assert_not_reached();
 
-        b->action[a]->func(&b->action[a]->data);
+            act->func(&act->data);
+        }
     }
 }
 
@@ -338,12 +348,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     for (it = bound_contexts[context]; it != NULL; it = it->next){
 	b = it->data;
 	if (b->state == state && b->button == button) {
-	    /* already bound */
-            if (b->action[mact] != NULL) {
-                g_warning("duplicate binding");
-                return FALSE;
-            }
-            b->action[mact] = action;
+            b->actions[mact] = g_slist_append(b->actions[mact], action);
             return TRUE;
 	}
     }
@@ -354,7 +359,7 @@ gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     b = g_new0(MouseBinding, 1);
     b->state = state;
     b->button = button;
-    b->action[mact] = action;
+    b->actions[mact] = g_slist_append(NULL, action);
     bound_contexts[context] = g_slist_append(bound_contexts[context], b);
 
     grab_all_clients(TRUE);

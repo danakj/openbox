@@ -76,6 +76,16 @@ void menu_startup()
     menu_add_entry(m, menu_entry_new("--", NULL));
     a = action_from_string("exit");
     menu_add_entry(m, menu_entry_new("exit", a));
+
+    m = menu_new("client menu", "client", NULL);
+    a = action_from_string("iconify");
+    menu_add_entry(m, menu_entry_new("iconify", a));
+    a = action_from_string("toggleshade");
+    menu_add_entry(m, menu_entry_new("(un)shade", a));
+    a = action_from_string("togglemaximizefull");
+    menu_add_entry(m, menu_entry_new("(un)maximize", a));
+    a = action_from_string("close");
+    menu_add_entry(m, menu_entry_new("close", a));
 }
 
 void menu_shutdown()

@@ -43,7 +43,7 @@ void screen_startup();
 void screen_shutdown();
 
 /*! Figure out the new size of the screen and adjust stuff for it */
-void screen_resize();
+void screen_resize(int w, int h);
 
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);

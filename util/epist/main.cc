@@ -46,10 +46,13 @@ using std::cout;
 using std::endl;
 using std::string;
 
+#include "../../version.h"
 #include "epist.hh"
 #include "../../src/i18n.hh"
 
 I18n i18n;
+
+static void usage();
 
 int main(int argc, char **argv) {
   i18n.openCatalog("openbox.cat");
@@ -59,24 +62,48 @@ int main(int argc, char **argv) {
   char *rc_file = 0;
 
   for (int i = 1; i < argc; ++i) {
-    if (string(argv[i]) == "-display") {
+    const string argvi(argv[i]);
+    if (argvi == "-display") {
       if (++i >= argc) {
         fprintf(stderr, i18n(mainSet, mainDISPLAYRequiresArg,
                              "error: '-display' requires an argument\n"));
         exit(1);
       }
       display_name = argv[i];
-    } else if (string(argv[i]) == "-rc") {
+    } else if (argvi == "-rc") {
       if (++i >= argc) {
         fprintf(stderr, i18n(mainSet, mainRCRequiresArg,
                              "error: '-rc' requires an argument\n"));
         exit(1);
       }
       rc_file = argv[i];
+    } else if (argvi == "-help") {
+      usage();
+    } else if (argvi == "-version") {
+      fprintf(stderr, "epist - shipped with openbox %s\n",
+              __openbox_version);
+      exit(0);
     }
+    else
+      usage();
   }
   
   epist ep(argv, display_name, rc_file);
   ep.eventLoop();
   return 0;
+}
+
+static void usage()
+{
+  cout << "usage: epist OPTIONS" << endl;
+  cout << endl;
+  cout << "Options:" << endl;
+  cout <<
+    "  -rc RCFILE         Specifies the path to an alternate rc file to load"
+       << endl <<
+    "  -display DISPLAY   Specifies the X display to run on" << endl <<
+    "  -help              Display this help and exit" << endl <<
+    "  -version           Display the version and exit" << endl <<
+    endl;
+  exit(0);
 }

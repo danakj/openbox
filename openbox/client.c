@@ -228,6 +228,7 @@ void client_unmanage(Client *client)
     g_message("Unmanaging window: %lx", client->window);
 
     dispatch_client(Event_Client_Destroy, client, 0, 0);
+    g_assert(client != NULL);
 
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, client->window, SetModeDelete);
@@ -239,6 +240,7 @@ void client_unmanage(Client *client)
 
     /* dispatch the unmapped event */
     dispatch_client(Event_Client_Unmapped, client, 0, 0);
+    g_assert(client != NULL);
 
     /* give the client its border back */
     client_toggle_border(client, TRUE);

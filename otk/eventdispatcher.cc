@@ -160,6 +160,9 @@ void OtkEventDispatcher::dispatch(const XEvent &e) {
   OtkEventHandler *handler;
   OtkEventMap::iterator it;
 
+  if (_master)
+    _master->handle(e);
+
   it = _map.find(e.xany.window);
   
   if (it != _map.end())
@@ -169,9 +172,6 @@ void OtkEventDispatcher::dispatch(const XEvent &e) {
 
   if (handler)
     handler->handle(e);
-
-  if (_master)
-    _master->handle(e);
 }
 
 OtkEventHandler *OtkEventDispatcher::findHandler(Window win)

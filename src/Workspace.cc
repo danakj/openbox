@@ -624,8 +624,8 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   }
 #endif // SLIT
 
-  const Size window_size(win->size().w()+screen.getBorderWidth() * 4,
-                         win->size().h()+screen.getBorderWidth() * 4);
+  const Size window_size(win->area().w()+screen.getBorderWidth() * 4,
+                         win->area().h()+screen.getBorderWidth() * 4);
   Point *place = NULL;
   LinkedListIterator<OpenboxWindow> it(windowList);
 
@@ -650,6 +650,6 @@ void Workspace::placeWindow(OpenboxWindow *win) {
   if (place->y() + window_size.h() > (signed) screen.size().h())
     place->setY(((signed) screen.size().h() - window_size.h()) / 2);
 
-  win->configure(place->x(), place->y(), win->size().w(), win->size().h());
+  win->configure(place->x(), place->y(), win->area().w(), win->area().h());
   delete place;
 }

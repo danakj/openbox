@@ -559,13 +559,13 @@ void Slit::reposition(void) {
   Toolbar *tbar = screen.getToolbar();
   int sw = frame.area.w() + (screen.getBorderWidth() * 2),
       sh = frame.area.h() + (screen.getBorderWidth() * 2),
-      tw = tbar->getWidth() + screen.getBorderWidth(),
-      th = tbar->getHeight() + screen.getBorderWidth();
+      tw = tbar->area().w() + screen.getBorderWidth(),
+      th = tbar->area().h() + screen.getBorderWidth();
 
-  if (tbar->getX() < frame.area.x() + sw &&
-      tbar->getX() + tw > frame.area.x() &&
-      tbar->getY() < frame.area.y() + sh &&
-      tbar->getY() + th > frame.area.y()) {
+  if (tbar->area().x() < frame.area.x() + sw &&
+      tbar->area().x() + tw > frame.area.x() &&
+      tbar->area().y() < frame.area.y() + sh &&
+      tbar->area().y() + th > frame.area.y()) {
     if (frame.area.y() < th) {
       frame.area.setY(frame.area.y() + tbar->getExposedHeight());
       if (m_direction == Vertical)

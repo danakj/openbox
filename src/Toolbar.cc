@@ -154,14 +154,13 @@ Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
   mapToolbar();
 }
 
-int Toolbar::getX() const {
-  return ((m_hidden) ? frame.x_hidden : frame.x);
-}
-
-int Toolbar::getY() const {
-  if (screen.hideToolbar()) return screen.size().h();
-  else if (m_hidden) return frame.y_hidden;
-  else return frame.y;
+Rect Toolbar::area() const {
+  int x = ((m_hidden) ? frame.x_hidden : frame.x);
+  int y;
+  if (screen.hideToolbar()) y = screen.size().h();
+  else if (m_hidden) y = frame.y_hidden;
+  else y = frame.y;
+  return Rect(x, y, frame.width, frame.height);
 }
 
 unsigned int Toolbar::getExposedHeight() const {

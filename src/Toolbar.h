@@ -29,6 +29,7 @@
 #include "Timer.h"
 #include "Resource.h"
 #include "Screen.h"
+#include "Geometry.h"
 
 // forward declaration
 class Toolbar;
@@ -114,12 +115,16 @@ public:
 
   inline const Window &getWindowID() const { return frame.window; }
 
-  inline unsigned int getWidth() const { return frame.width; }
-  inline unsigned int getHeight() const { return frame.height; }
+  //inline unsigned int getWidth() const { return frame.width; }
+  //inline unsigned int getHeight() const { return frame.height; }
   unsigned int getExposedHeight() const;
   
-  int getX() const;
-  int getY() const;
+  //int getX() const;
+  //int getY() const;
+
+  Rect area() const;
+  //Size size() const { return area().size(); }
+  //Point origin() const { return area().origin(); }
   
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);

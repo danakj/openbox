@@ -292,18 +292,18 @@ public:
   inline const unsigned int &getTitleHeight(void) const
   { return frame.title_h; }
 
-  inline const Point origin() const {
-    return Point(frame.x, frame.y);
-  }
-  inline const Point clientOrigin() const {
-    return Point(client.x, client.y);
-  }
-  inline const Size size() const {
-    return Size(frame.width, flags.shaded ? frame.title_h : frame.height);
-  }
-  inline const Size clientSize() const {
-    return Size(client.width, client.height);
-  }
+  //inline const Point origin() const {
+  //  return Point(frame.x, frame.y);
+  //}
+  //inline const Point clientOrigin() const {
+  //  return Point(client.x, client.y);
+  //}
+  //inline const Size size() const {
+  //  return Size(frame.width, flags.shaded ? frame.title_h : frame.height);
+  //}
+  //inline const Size clientSize() const {
+  //  return Size(client.width, client.height);
+  //}
   inline const Rect area() const {
     return Rect(frame.x, frame.y, frame.width,
                 flags.shaded ? frame.title_h : frame.height);

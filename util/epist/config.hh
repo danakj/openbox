@@ -26,50 +26,63 @@
 #include <string>
 #include <list>
 
-class ConfigItem;
+// forward declarations
+struct BoolItem;
+struct StringItem;
+struct NumberItem;
 
 class Config {
 public:
-  enum ItemType {
-    noType,
+  enum BoolType {
+    NO_BOOL_TYPE,
+    stackedCycling,
+    NUM_BOOL_TYPES
+  };
+
+  enum StringType {
+    NO_STRING_TYPE,
+    NUM_STRING_TYPES
+  };
+
+  enum NumberType {
+    NO_NUMBER_TYPE,
     chainTimeout,
     workspaceColumns,
-    numTypes
+    NUM_NUMBER_TYPES
   };
 
 private:
-  typedef std::list<ConfigItem *> ItemList;
-  ItemList items;
+  typedef std::list<BoolItem *> BoolItemList;
+  typedef std::list<StringItem *> StringItemList;
+  typedef std::list<NumberItem *> NumberItemList;
+  BoolItemList bool_items;
+  StringItemList string_items;
+  NumberItemList number_items;
 
 public:
   Config();
   ~Config();
 
-  bool getStringValue(Config::ItemType, std::string &) const;
-  int getNumberValue(Config::ItemType) const;
-  void addOption(ConfigItem *);
+  bool getBoolValue(BoolType, bool &) const;
+  bool getStringValue(StringType, std::string &) const;
+  bool getNumberValue(NumberType, int &) const;
+
   void addOption(const std::string &, const std::string &);
 };
 
+struct BoolItem {
+  Config::BoolType type;
+  bool value;
+};
 
-class ConfigItem {
-private:
-  Config::ItemType _type;
-  std::string _value;
+struct StringItem {
+  Config::StringType type;
+  std::string value;
+};
 
-public:
-  ConfigItem(Config::ItemType type, std::string value)
-    : _type(type), _value(value) {}
-  ~ConfigItem() {}
-
-  inline const std::string &getStringValue() const
-  { return _value; }
-
-  inline int getNumberValue() const
-  { return atoi(_value.c_str()); }
-
-  inline Config::ItemType getType() const
-  { return _type; }
+struct NumberItem {
+  Config::NumberType type;
+  int value;
 };
 
 #endif // __config_hh

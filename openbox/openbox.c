@@ -325,13 +325,13 @@ int main(int argc, char **argv)
 static void signal_handler(int signal, gpointer data)
 {
     if (signal == SIGUSR1) {
-	fprintf(stderr, "Caught signal %d. Restarting.\n", signal);
+        ob_debug("Caught signal %d. Restarting.\n", signal);
         ob_restart();
     } else if (signal == SIGUSR2) {
-	fprintf(stderr, "Caught signal %d. Reconfiguring.\n", signal);
+        ob_debug("Caught signal %d. Reconfiguring.\n", signal);
         ob_reconfigure();
     } else {
-	fprintf(stderr, "Caught signal %d. Exiting.\n", signal);
+        ob_debug("Caught signal %d. Exiting.\n", signal);
         /* TERM and INT return a 0 code */
         ob_exit(!(signal == SIGTERM || signal == SIGINT));
     }

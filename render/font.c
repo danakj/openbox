@@ -47,12 +47,10 @@ ObFont *font_open(char *fontstring)
     exit(3); // can't continue without a font
 }
 
-
 void font_close(ObFont *f)
 {
     XftFontClose(ob_display, f->xftfont);
 }
-
 
 int font_measure_string(ObFont *f, const char *str, int shadow, int offset)
 {
@@ -64,14 +62,38 @@ int font_measure_string(ObFont *f, const char *str, int shadow, int offset)
     return (signed) info.xOff + (shadow ? offset : 0);
 }
 
-
 int font_height(ObFont *f, int shadow, int offset)
 {
-  return (signed) f->xftfont->height + (shadow ? offset : 0);
+    return (signed) f->xftfont->height + (shadow ? offset : 0);
 }
-
 
 int font_max_char_width(ObFont *f)
 {
-  return (signed) f->xftfont->max_advance_width;
+    return (signed) f->xftfont->max_advance_width;
+}
+
+void font_draw(XftDraw *d, TextureText *t)
+{
+    int x = 0, y = 0;
+    XftColor c;
+    if (t->shadow) {
+        c.color.red = 0;
+        c.color.green = 0;
+        c.color.blue = 0;
+        c.color.alpha = t->tint | t->tint << 8; // transparent shadow
+        c.pixel = BlackPixel(ob_display, ob_screen);
+  
+        XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
+                          t->font->xftfont->ascent + y + t->offset,
+                          (FcChar8*)t->string, strlen(t->string));
+    }  
+    c.color.red = t->color->r | t->color->r << 8;
+    c.color.green = t->color->g | t->color->g << 8;
+    c.color.blue = t->color->b | t->color->b << 8;
+    c.pixel = t->color->pixel;
+    c.color.alpha = 0xff | 0xff << 8; // no transparency in Color yet
+                     
+    XftDrawStringUtf8(d, &c, t->font->xftfont, x, t->font->xftfont->ascent + y,
+                     (FcChar8*)t->string, strlen(t->string));
+    return;
 }

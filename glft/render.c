@@ -21,7 +21,6 @@ int GlftMoveToFunc(FT_Vector *to, void *user)
 {
     state.x = TOFLOAT(to->x);
     state.y = TOFLOAT(to->y);
-    printf("move to %f:%f\n", state.x, state.y);
     if (state.drawing) {
         glEnd();
     }
@@ -36,7 +35,6 @@ int GlftLineToFunc(FT_Vector *to, void *user)
     state.x = TOFLOAT(to->x);
     state.y = TOFLOAT(to->y);
     glVertex2f(state.x, state.y);
-    printf("line to %f:%f\n", state.x, state.y);
     return 0;
 }
 
@@ -52,7 +50,6 @@ int GlftConicToFunc(FT_Vector *c, FT_Vector *to, void *user)
     state.x = TOFLOAT(to->x);
     state.y = TOFLOAT(to->y);
     glVertex2f(state.x, state.y);
-    printf("conic the hedgehog!\n");
     return 0;
 }
 
@@ -60,7 +57,7 @@ int GlftCubicToFunc(FT_Vector *c1, FT_Vector *c2, FT_Vector *to, void
 *user)
 {
     GlftLineToFunc(to, user);
-    printf("cubic\n");
+    g_message("cubic not currently rendered properly\n");
     return 0;
 }
 

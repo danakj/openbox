@@ -169,7 +169,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     0x0,
                                     0x0);
 
-  _label_font = new Font(_screen, "Arial,Sans-9:bold", true, 1, 0x40);
+  _label_font = new Font(_screen, "Arial,Sans-8", true, 1, 0x40);
   _label_justify = RightJustify;
 
   _max_mask = new PixmapMask();

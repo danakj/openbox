@@ -706,7 +706,7 @@ void client_update_normal_hints(Client *self)
 
     /* get the hints from the window */
     if (XGetWMNormalHints(ob_display, self->window, &size, &ret)) {
-	self->positioned = (size.flags & (PPosition|USPosition));
+	self->positioned = !!(size.flags & (PPosition|USPosition));
 
 	if (size.flags & PWinGravity) {
 	    self->gravity = size.win_gravity;

@@ -14,6 +14,18 @@ namespace otk {
 
 // helper functions
 
+// The number of bytes to skip to find the next character in the string
+static const char utf8_skip[256] = {
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
+};
+
 // takes a pointer into a utf8 string and returns a unicode character for the
 // first character at the pointer
 unichar utf8_get_char (const char *p)
@@ -41,7 +53,7 @@ static ustring::size_type utf8_ptr_to_offset(const char *str, const char *pos)
   ustring::size_type offset = 0;
 
   while (str < pos) {
-    str += utf8_skip[*str];
+    str += utf8_skip[static_cast<unsigned char>(*str)];
     offset++;
   }
 
@@ -52,7 +64,7 @@ static ustring::size_type utf8_ptr_to_offset(const char *str, const char *pos)
 const char *utf8_offset_to_ptr(const char *str, ustring::size_type offset)
 {
   while (offset--)
-    str += utf8_skip[*str];
+    str += utf8_skip[static_cast<unsigned char>(*str)];
   return str;
 }
 
@@ -69,7 +81,7 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
     if(*p == '\0')
       return ustring::npos;
 
-    p += utf8_skip[*p];
+    p += utf8_skip[static_cast<unsigned char>(*p)];
   }
 
   return (p - str);
@@ -90,7 +102,7 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
     if(p >= pend)
       return ustring::npos;
 
-    p += utf8_skip[*p];
+    p += utf8_skip[static_cast<unsigned char>(*p)];
   }
 
   return (p - str);

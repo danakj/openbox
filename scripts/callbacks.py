@@ -9,14 +9,6 @@ StateRemove = 0
 StateAdd = 1
 StateToggle = 2
 
-def restart(data=0, other = ""):
-    """Restarts Openbox, optionally starting another window manager."""
-    ob.openbox.restart(other)
-
-def exit(data=0):
-    """Exits Openbox."""
-    ob.openbox.shutdown()
-
 def state_above(data, add=StateAdd):
     """Toggles, adds or removes the 'above' state on a window.
        The second paramater should one of: StateRemove, StateAdd, or
@@ -263,5 +255,13 @@ def send_to_prev_desktop(data, no_wrap=0, follow=1):
     send_to_desktop(data, d)
     if follow:
         change_desktop(data, d)
+
+def restart(data=0, other = ""):
+    """Restarts Openbox, optionally starting another window manager."""
+    ob.openbox.restart(other)
+
+def exit(data=0):
+    """Exits Openbox."""
+    ob.openbox.shutdown()
 
 print "Loaded callbacks.py"

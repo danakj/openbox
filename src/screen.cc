@@ -639,8 +639,6 @@ void Screen::restack(bool raise, Client *client)
 
 void Screen::changeDesktop(long desktop)
 {
-  assert(desktop >= 0 && desktop < _num_desktops);
-
   if (!(desktop >= 0 && desktop < _num_desktops)) return;
 
   printf("Moving to desktop %ld\n", desktop);

@@ -57,6 +57,11 @@ private:
   virtual bool handleSignal(int sig);
 
   void activateGrabs();
+  void addAction(Action::ActionType act, unsigned int modifiers,
+                 std::string key, int number = 0);
+  void addAction(Action::ActionType act, unsigned int modifiers,
+                 std::string key, std::string str);
+
 public:
   epist(char **argv, char *display_name, char *rc_file);
   virtual ~epist();

@@ -78,139 +78,51 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
     ::exit(1);
   }
 
-  _actions.push_back(Action(Action::nextWorkspace,
-                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                            ControlMask));
-  _actions.push_back(Action(Action::prevWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                           ControlMask | ShiftMask));
-  _actions.push_back(Action(Action::toggleshade,
-                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("F5")),
-                            Mod1Mask));
-  _actions.push_back(Action(Action::close,
-                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("F4")),
-                            Mod1Mask));
-  _actions.push_back(Action(Action::nextWindow,
-                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                            Mod1Mask));
-  _actions.push_back(Action(Action::prevWindow,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                           Mod1Mask | ShiftMask));
-  _actions.push_back(Action(Action::nextWindowOnAllWorkspaces,
-                            XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                            Mod1Mask | ControlMask));
-  _actions.push_back(Action(Action::prevWindowOnAllWorkspaces,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Tab")),
-                           Mod1Mask | ShiftMask | ControlMask));
-  _actions.push_back(Action(Action::raise,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Up")),
-                           Mod1Mask));
-  _actions.push_back(Action(Action::lower,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Down")),
-                           Mod1Mask));
-  _actions.push_back(Action(Action::moveWindowUp,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Up")),
-                           Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::moveWindowDown,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Down")),
-                           Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::moveWindowLeft,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Left")),
-                           Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::moveWindowRight,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Right")),
-                           Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::resizeWindowHeight,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Up")),
-                           ShiftMask | Mod1Mask | ControlMask, -1));
-  _actions.push_back(Action(Action::resizeWindowHeight,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Down")),
-                           ShiftMask | Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::resizeWindowWidth,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Left")),
-                           ShiftMask | Mod1Mask | ControlMask, -1));
-  _actions.push_back(Action(Action::resizeWindowWidth,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Right")),
-                           ShiftMask | Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::iconify,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("I")),
-                           Mod1Mask | ControlMask));
-  _actions.push_back(Action(Action::toggleomnipresent,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("O")),
-                           Mod1Mask | ControlMask));
-  _actions.push_back(Action(Action::toggleMaximizeHorizontal,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("X")),
-                           ShiftMask | Mod1Mask));
-  _actions.push_back(Action(Action::toggleMaximizeVertical,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("X")),
-                           ShiftMask | ControlMask));
-  _actions.push_back(Action(Action::toggleMaximizeFull,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("X")),
-                           Mod1Mask | ControlMask));
-  _actions.push_back(Action(Action::changeWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("1")),
-                           Mod1Mask | ControlMask, 0));
-  _actions.push_back(Action(Action::changeWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("2")),
-                           Mod1Mask | ControlMask, 1));
-  _actions.push_back(Action(Action::changeWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("3")),
-                           Mod1Mask | ControlMask, 2));
-  _actions.push_back(Action(Action::changeWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("4")),
-                           Mod1Mask | ControlMask, 3));
-  _actions.push_back(Action(Action::sendToWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("1")),
-                           Mod1Mask | ControlMask | ShiftMask, 0));
-  _actions.push_back(Action(Action::sendToWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("2")),
-                           Mod1Mask | ControlMask | ShiftMask, 1));
-  _actions.push_back(Action(Action::sendToWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("3")),
-                           Mod1Mask | ControlMask | ShiftMask, 2));
-  _actions.push_back(Action(Action::sendToWorkspace,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("4")),
-                           Mod1Mask | ControlMask | ShiftMask, 3));
-  _actions.push_back(Action(Action::execute,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("Escape")),
-                           Mod1Mask | ControlMask,
-                           "sleep 1 && xset dpms force off"));
-  _actions.push_back(Action(Action::execute,
-                           XKeysymToKeycode(getXDisplay(),
-                                             XStringToKeysym("space")),
-                           Mod1Mask, "rxvt"));
+  addAction(Action::nextWorkspace, ControlMask, "Tab");
+  addAction(Action::prevWorkspace, ControlMask | ShiftMask, "Tab");
+  addAction(Action::nextWindow, Mod1Mask, "Tab");
+  addAction(Action::prevWindow, Mod1Mask | ShiftMask, "Tab");
+  addAction(Action::toggleshade, Mod1Mask, "F5");
+  addAction(Action::close, Mod1Mask, "F4");
+  addAction(Action::nextWindowOnAllWorkspaces, Mod1Mask | ControlMask, "Tab");
+  addAction(Action::prevWindowOnAllWorkspaces,
+            Mod1Mask | ShiftMask | ControlMask, "Tab");
+  addAction(Action::raise, Mod1Mask, "Up");
+  addAction(Action::lower, Mod1Mask, "Down");
+  addAction(Action::moveWindowUp, Mod1Mask | ControlMask, "Up", 1);
+  addAction(Action::moveWindowDown, Mod1Mask | ControlMask, "Down", 1);
+  addAction(Action::moveWindowLeft, Mod1Mask | ControlMask, "Left", 1);
+  addAction(Action::moveWindowRight, Mod1Mask | ControlMask, "Right", 1);
+  addAction(Action::resizeWindowHeight, ShiftMask | Mod1Mask | ControlMask,
+            "Up", -1);
+  addAction(Action::resizeWindowHeight, ShiftMask | Mod1Mask | ControlMask,
+            "Down", 1);
+  addAction(Action::resizeWindowWidth, ShiftMask | Mod1Mask | ControlMask,
+            "Left", -1);
+  addAction(Action::resizeWindowWidth, ShiftMask | Mod1Mask | ControlMask,
+            "Right", 1);
+  addAction(Action::iconify, Mod1Mask | ControlMask, "I");
+  addAction(Action::toggleomnipresent, Mod1Mask | ControlMask, "O");
+  addAction(Action::toggleMaximizeHorizontal, ShiftMask | Mod1Mask, "X");
+  addAction(Action::toggleMaximizeVertical, ShiftMask | ControlMask, "X");
+  addAction(Action::toggleMaximizeFull, Mod1Mask | ControlMask, "X");
+  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "1", 0);
+  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "2", 1);
+  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "3", 2);
+  addAction(Action::changeWorkspace, Mod1Mask | ControlMask, "4", 3);
+  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
+            "1", 0);
+  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
+            "2", 1);
+  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
+            "3", 2);
+  addAction(Action::sendToWorkspace, Mod1Mask | ControlMask | ShiftMask,
+            "4", 3);
+  addAction(Action::execute, Mod1Mask | ControlMask, "Escape",
+            "sleep 1 && xset dpms force off");
+  addAction(Action::execute, Mod1Mask, "space",
+            "rxvt");
+
   activateGrabs();
 }
 
@@ -283,4 +195,19 @@ XWindow *epist::findWindow(Window window) const {
     return it->second;
 
   return 0;
+}
+
+void epist::addAction(Action::ActionType act, unsigned int modifiers,
+                      string key, int number) {
+  _actions.push_back(Action(act, XKeysymToKeycode(getXDisplay(),
+                                                  XStringToKeysym(key.c_str())),
+                            modifiers, number));
+}
+
+
+void epist::addAction(Action::ActionType act, unsigned int modifiers,
+                      string key, std::string str) {
+  _actions.push_back(Action(act, XKeysymToKeycode(getXDisplay(),
+                                                  XStringToKeysym(key.c_str())),
+                            modifiers, str));
 }

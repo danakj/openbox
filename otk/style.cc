@@ -15,12 +15,12 @@ Style::Style() : font(NULL)
 }
 
 Style::Style(unsigned int screen)
-  : font(NULL), screen_number(screen)
+  : font(0), screen_number(screen)
 {
 }
 
 Style::Style(unsigned int screen, BImageControl *ctrl)
-  : image_control(ctrl), font(NULL), screen_number(screen)
+  : image_control(ctrl), font(0), screen_number(screen)
 {
 }
 

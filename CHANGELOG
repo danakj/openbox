@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 2.2.1:
+ * Make configure look for Xft version 2 libraries and  (Ben Jansens)
+   use them if they are available.
+
  * Add bitmap button support to all the default styles. (Ben Jansens)
 
  * Change the default premax values to be larger than 0 (Ben Jansens)

@@ -1,4 +1,5 @@
 #include "client.h"
+#include "grab.h"
 #include "focus.h"
 #include "menu.h"
 #include "stacking.h"
@@ -627,7 +628,7 @@ void action_toggle_decorations(union ActionData *data)
     client_setup_decor_and_functions(c);
 }
 
-static void popup_coords(char *format, int a, int b, gboolean hide)
+static void popup_coords(char *format, Cursor cur, int a, int b, gboolean hide)
 {
     XSetWindowAttributes attrib;
     static Window coords = None;
@@ -638,11 +639,18 @@ static void popup_coords(char *format, int a, int b, gboolean hide)
                                0, 0, 1, 1, 0, render_depth, InputOutput,
                                render_visual, CWOverrideRedirect, &attrib);
         g_assert(coords != None);
+
+        grab_pointer(TRUE, cur);
+
+        XMapWindow(ob_display, coords);
     }
 
-    if (hide)
-        XUnmapWindow(ob_display, coords);
-    else {
+    if (hide) {
+        XDestroyWindow(ob_display, coords);
+        coords = None;
+
+        grab_pointer(FALSE, None);
+    } else {
         Size s;
         char *text;
 
@@ -652,8 +660,6 @@ static void popup_coords(char *format, int a, int b, gboolean hide)
                           10, 10, s.width, s.height);
         framerender_popup_label(coords, &s, text);
         g_free(text);
-
-        XMapWindow(ob_display, coords);
     }
 }
 
@@ -667,7 +673,7 @@ void action_move(union ActionData *data)
 
     dispatch_move(c, &x, &y);
 
-    popup_coords("X:  %d  Y:  %d", x, y, data->move.final);
+    popup_coords("X:  %d  Y:  %d", ob_cursors.move, x, y, data->move.final);
 
     frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
     client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
@@ -677,6 +683,7 @@ void action_move(union ActionData *data)
 void action_resize(union ActionData *data)
 {
     Client *c = data->resize.c;
+    Cursor cur;
     int w = data->resize.x;
     int h = data->resize.y;
  
@@ -690,7 +697,22 @@ void action_resize(union ActionData *data)
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);
 
-    popup_coords("W:  %d  H:  %d", c->logical_size.width,
+    switch (data->resize.corner) {
+    case Corner_TopLeft:
+        cur = ob_cursors.br;
+        break;
+    case Corner_TopRight:
+        cur = ob_cursors.bl;
+        break;
+    case Corner_BottomLeft:
+        cur = ob_cursors.tr;
+        break;
+    case Corner_BottomRight:
+        cur = ob_cursors.tl;
+        break;
+    }
+
+    popup_coords("W:  %d  H:  %d", cur, c->logical_size.width,
                  c->logical_size.height, data->move.final);
 }
 
@@ -724,11 +746,18 @@ static void popup_cycle(Client *c, gboolean hide)
                                0, 0, 1, 1, 0, render_depth, InputOutput,
                                render_visual, CWOverrideRedirect, &attrib);
         g_assert(coords != None);
+
+        grab_pointer(TRUE, None);
+
+        XMapWindow(ob_display, coords);
     }
 
-    if (hide)
-        XUnmapWindow(ob_display, coords);
-    else {
+    if (hide) {
+        XDestroyWindow(ob_display, coords);
+        coords = None;
+
+        grab_pointer(FALSE, None);
+    } else {
         Rect *a;
         Size s;
 
@@ -740,8 +769,6 @@ static void popup_cycle(Client *c, gboolean hide)
                           a->y + (a->height - s.height) / 2,
                           s.width, s.height);
         framerender_popup_label(coords, &s, c->title);
-
-        XMapWindow(ob_display, coords);
     }
 }
 

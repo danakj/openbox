@@ -12,6 +12,7 @@
 #include "keytree.h"
 #include "keyboard.h"
 #include "translate.h"
+#include "moveresize.h"
 
 #include <glib.h>
 
@@ -129,11 +130,14 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
 }
 
 void keyboard_interactive_grab(guint state, ObClient *client,
-                               ObFrameContext context, ObAction *action)
+                               ObAction *action)
 {
     ObInteractiveState *s;
 
     g_assert(action->data.any.interactive);
+
+    if (moveresize_in_progress)
+        moveresize_end(FALSE);
 
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
@@ -149,14 +153,11 @@ void keyboard_interactive_grab(guint state, ObClient *client,
     s->state = state;
     s->client = client;
     s->action = action;
-    s->context = context;
 
     interactive_states = g_slist_append(interactive_states, s);
 }
 
-gboolean keyboard_process_interactive_grab(const XEvent *e,
-                                           ObClient **client,
-                                           ObFrameContext *context)
+gboolean keyboard_process_interactive_grab(const XEvent *e)
 {
     GSList *it, *next;
     gboolean handled = FALSE;
@@ -168,9 +169,6 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
 
         next = g_slist_next(it);
         
-        *client = s->client;
-        *context = s->context;
-
         if ((e->type == KeyRelease && 
              !(s->state & e->xkey.state)))
             done = TRUE;

@@ -767,7 +767,6 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 void action_run_full(ObAction *a, struct _ObClient *c,
-                     ObFrameContext context,
                      guint state, guint button, gint x, gint y,
                      gboolean cancel, gboolean done)
 {
@@ -784,7 +783,7 @@ void action_run_full(ObAction *a, struct _ObClient *c,
         a->data.inter.cancel = cancel;
         a->data.inter.final = done;
         if (!(cancel || done))
-            keyboard_interactive_grab(state, c, context, a);
+            keyboard_interactive_grab(state, c, a);
     }
 
     a->func(&a->data);

@@ -153,7 +153,6 @@ void action_free(ObAction *a);
 
 /*! Executes an action.
   @param c The client associated with the action. Can be NULL.
-  @param context The context in which the user action occured.
   @param state The keyboard modifiers state at the time the user action occured
   @param button The mouse button used to execute the action.
   @param x The x coord at which the user action occured.
@@ -164,21 +163,20 @@ void action_free(ObAction *a);
          affects interactive actions, but should generally always be FALSE.
 */
 void action_run_full(ObAction *a, struct _ObClient *c,
-                     ObFrameContext context,
                      guint state, guint button, gint x, gint y,
                      gboolean cancel, gboolean done);
 
-#define action_run_mouse(a, c, t, s, b, x, y) \
-    action_run_full(a, c, t, s, b, x, y, FALSE, FALSE)
+#define action_run_mouse(a, c, s, b, x, y) \
+    action_run_full(a, c, s, b, x, y, FALSE, FALSE)
 
 #define action_run_interactive(a, c, s, n, d) \
-    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, n, d)
+    action_run_full(a, c, s, 0, -1, -1, n, d)
 
 #define action_run_key(a, c, s, x, y) \
-    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, x, y, FALSE,FALSE)
+    action_run_full(a, c, s, 0, x, y, FALSE,FALSE)
 
 #define action_run(a, c, s) \
-    action_run_full(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, FALSE,FALSE)
+    action_run_full(a, c, s, 0, -1, -1, FALSE,FALSE)
 
 /* Execute */
 void action_execute(union ActionData *data);

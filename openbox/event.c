@@ -487,17 +487,14 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         if (menu_frame_visible)
             event_handle_menu(e);
-        else if (moveresize_in_progress)
-            moveresize_event(e);
         else {
-            ObFrameContext context;
+            if (!keyboard_process_interactive_grab(e)) {
+                if (moveresize_in_progress)
+                    moveresize_event(e);
 
-            context = frame_context(client, e->xany.window);
-
-            if (!keyboard_process_interactive_grab(e, &client, &context)) {
                 if (e->type == ButtonPress || e->type == ButtonRelease ||
                     e->type == MotionNotify)
-                    mouse_event(client, context, e);
+                    mouse_event(client, e);
                 else if (e->type == KeyPress)
                     /* when in the middle of a focus cycling action, this
                        causes the window which appears to be focused to be

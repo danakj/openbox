@@ -13,7 +13,7 @@ void mouse_shutdown(gboolean reconfig);
 gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
                     ObAction *action);
 
-void mouse_event(struct _ObClient *client, ObFrameContext context, XEvent *e);
+void mouse_event(struct _ObClient *client, XEvent *e);
 
 void mouse_grab_for_client(struct _ObClient *client, gboolean grab);
 

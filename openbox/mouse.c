@@ -107,19 +107,22 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     if (it == NULL) return FALSE;
 
     for (it = b->actions[a]; it; it = it->next)
-        action_run_mouse(it->data, c, context, state, button, x, y);
+        action_run_mouse(it->data, c, state, button, x, y);
     return TRUE;
 }
 
-void mouse_event(ObClient *client, ObFrameContext context, XEvent *e)
+void mouse_event(ObClient *client, XEvent *e)
 {
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
-
     static Window lwindow = None;
     static int px, py;
+
+    ObFrameContext context;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
+
+    context = frame_context(client, e->xany.window);
 
     switch (e->type) {
     case ButtonPress:

@@ -5,6 +5,7 @@
 #include "prop.h"
 #include "grab.h"
 #include "startupnotify.h"
+#include "moveresize.h"
 #include "config.h"
 #include "screen.h"
 #include "client.h"
@@ -409,6 +410,9 @@ void screen_set_desktop(guint num)
     screen_last_desktop = old;
 
     ob_debug("Moving to desktop %d\n", num+1);
+
+    if (moveresize_client)
+        client_set_desktop(moveresize_client, num, TRUE);
 
     /* show windows before hiding the rest to lessen the enter/leave events */
 

@@ -361,6 +361,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         XMapWindow(ob_display, self->bullet);
     } else
         XUnmapWindow(ob_display, self->bullet);
+
+    XFlush(ob_display);
 }
 
 static void menu_frame_render(ObMenuFrame *self)

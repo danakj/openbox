@@ -96,9 +96,13 @@ def setup_scroll():
              ob.MouseAction.Click, callbacks.next_desktop)
     ob.mbind("A-Up", ob.MouseContext.Root,
              ob.MouseAction.Click, callbacks.next_desktop)
+    ob.mbind("Up", ob.MouseContext.Root,
+             ob.MouseAction.Click, callbacks.next_desktop)
     ob.mbind("A-Down", ob.MouseContext.Frame,
              ob.MouseAction.Click, callbacks.prev_desktop)
     ob.mbind("A-Down", ob.MouseContext.Root,
+             ob.MouseAction.Click, callbacks.prev_desktop)
+    ob.mbind("Down", ob.MouseContext.Root,
              ob.MouseAction.Click, callbacks.prev_desktop)
 
     ob.mbind("C-A-Up", ob.MouseContext.Frame,

@@ -91,36 +91,81 @@ AC_CHECK_LIB([X11], [XOpenDisplay],
 )
 
 
-dnl Check for Xft2
-AC_MSG_CHECKING([for Xft version 2])
+dnl Check for Xft >= 2
+XFT_MIN_MAJOR=2
+XFT_MIN_MINOR=0
+XFT_MIN_REVISION=0
+XFT_MIN=$XFT_MIN_MAJOR.$XFT_MIN_MINOR.$XFT_MIN_REVISION
+AC_MSG_CHECKING([for Xft version >= $XFT_MIN])
+if ! pkg-config --atleast-version $XFT_MIN xft; then
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Openbox requires the Xft version >= $XFT_MIN font library.
+See http://www.fontconfig.org/
+])
+fi
+
+AC_MSG_RESULT([yes])
+
 dnl Store these
 OLDLIBS=$LIBS
 OLDCPPFLAGS=$CPPFLAGS
-XFT2=""
-XFT_CFLAGS=""
-XFT_LIBS=""
-if pkg-config xft; then
-  AC_MSG_RESULT([yes])
-  XFT_CFLAGS="`pkg-config --cflags xft`"
-  XFT_LIBS="`pkg-config --libs xft`"
 
-  dnl Set these for checking with the tests below. They'll be restored after
-  LIBS="$LIBS $XFT_LIBS"
-  CPPFLAGS="$XFT_CFLAGS $CPPFLAGS"
-else
-  dnl This is for Xft version 1
-  XFT_LIBS="-lXft"
-  AC_MSG_RESULT([no])
-fi
+XFT_CFLAGS="`pkg-config --cflags xft`"
+XFT_LIBS="`pkg-config --libs xft`"
 
-AC_CHECK_LIB([Xft], [XftFontOpenXlfd],
-  AC_MSG_CHECKING([for X11/Xft/Xft.h])
+dnl Set these for checking with the tests below. They'll be restored after
+LIBS="$LIBS $XFT_LIBS"
+CPPFLAGS="$XFT_CFLAGS $CPPFLAGS"
+
+AC_CHECK_LIB([Xft], [XftFontOpenName],
+  AC_MSG_CHECKING([for X11/Xft/Xft.h for Xft >= $XFT_MIN])
+  AC_TRY_COMPILE(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xft/Xft.h>
+    ],
+    [
+      #if !defined(XFT_MAJOR)
+      # error Xft.h is too old
+      #endif
+      #if XFT_MAJOR < $XFT_MIN_MAJOR
+      # error Xft.h is too old
+      #endif
+      #if XFT_MAJOR == $XFT_MIN_MAJOR
+      # if XFT_MINOR < $XFT_MIN_MINOR
+      #  error Xft.h is too old
+      # endif
+      #endif
+      #if XFT_MAJOR == $XFT_MIN_MAJOR
+      # if XFT_MAJOR == $XFT_MIN_MINOR
+      #  if XFT_REVISION < $XFT_MIN_REVISION
+      #   error Xft.h is too old
+      #  endif
+      # endif
+      #endif
+      
+      int i = XFT_MAJOR;
+      XftFont foo;
+    ],
+    [
+      AC_MSG_RESULT([yes])
+    ],
+    [
+      AC_MSG_RESULT([no])
+      AC_MSG_ERROR([Openbox requires the Xft version >= $XFT_MIN font library.
+See http://www.fontconfig.org/
+])
+    ]
+  )
+
+  AC_MSG_CHECKING([if we can compile with Xft])
   AC_TRY_LINK(
     [
       #include <X11/Xlib.h>
       #include <X11/Xft/Xft.h>
     ],
     [
+      int i = XFT_MAJOR;
       XftFont foo
     ],
     [
@@ -128,8 +173,7 @@ AC_CHECK_LIB([Xft], [XftFontOpenXlfd],
     ],
     [ 
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Openbox requires the Xft font library.
-See http://www.fontconfig.org/
+      AC_MSG_ERROR([Unable to compile with the Xft library.
 ])
     ]
   )

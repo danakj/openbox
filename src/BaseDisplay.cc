@@ -483,6 +483,8 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
     itostring(static_cast<unsigned long>(screen_number));
   
 #ifdef    XINERAMA
+  xinerama_active = False;
+
   if (d->hasXineramaExtensions()) {
     if (d->getXineramaMajorVersion() == 1) {
       // we know the version 1(.1?) protocol
@@ -492,8 +494,7 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
          in future versions we should be able, so the 'activeness' is checked
          on a pre-screen basis anyways.
       */
-      xinerama_active = XineramaIsActive(d->getXDisplay());
-      if (xinerama_active) {
+      if (XineramaIsActive(d->getXDisplay())) {
         /*
            If Xinerama is being used, there there is only going to be one screen
            present. We still, of course, want to use the screen class, but that
@@ -503,11 +504,16 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
         int num;
         XineramaScreenInfo *info = XineramaQueryScreens(d->getXDisplay(), &num);
         if (num > 0 && info) {
+          xinerama_areas.reserve(num);
           for (int i = 0; i < num; ++i) {
             xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
                                           info[i].width, info[i].height));
           }
           XFree(info);
+
+          // if we can't find any xinerama regions, then we act as if it is not
+          // active, even though it said it was
+          xinerama_active = True;
         }
       }
     }

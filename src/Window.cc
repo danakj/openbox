@@ -788,14 +788,17 @@ void OpenboxWindow::positionButtons() {
   if (!hasclose && frame.close_button) {
     openbox.removeWindowSearch(frame.close_button);
     XDestroyWindow(display, frame.close_button);
+    frame.close_button = None;
   }
   if (!hasiconify && frame.iconify_button) {
     openbox.removeWindowSearch(frame.iconify_button);
     XDestroyWindow(display, frame.iconify_button);
+    frame.iconify_button = None;
   }
   if (!hasmaximize && frame.iconify_button) {
     openbox.removeWindowSearch(frame.maximize_button);
     XDestroyWindow(display, frame.maximize_button);                 
+    frame.maximize_button = None;
   }
 
   redrawLabel();

@@ -86,8 +86,22 @@ gboolean kbind(GList *keylist, Action *action)
     return TRUE;
 }
 
-static void press(ObEvent *e, void *foo)
+static void event(ObEvent *e, void *foo)
 {
+    static KeyBindingTree *grabbed_key = NULL;
+
+    if (e->type == Event_X_KeyRelease) {
+        if (grabbed_key) {
+            if (!(grabbed_key->state & e->data.x.e->xkey.state)) {
+                grabbed_key->action->data.cycle.final = TRUE;
+                grabbed_key->action->func(&grabbed_key->action->data);
+                grab_keyboard(FALSE);
+                grabbed_key = FALSE;
+            }
+        }
+        return;
+    }
+
     if (e->data.x.e->xkey.keycode == reset_key &&
         e->data.x.e->xkey.state == reset_state) {
         reset_chains();
@@ -116,7 +130,15 @@ static void press(ObEvent *e, void *foo)
                         g_assert(!(p->action->func == action_move ||
                                    p->action->func == action_resize));
 
+                        if (p->action->func == action_cycle_windows)
+                            p->action->data.cycle.final = FALSE;
+
                         p->action->func(&p->action->data);
+
+                        if (p->action->func == action_cycle_windows) {
+                            grab_keyboard(TRUE);
+                            grabbed_key = p;
+                        }
                     }
 
                     reset_chains();
@@ -133,14 +155,14 @@ void plugin_startup()
     curpos = NULL;
     grabbed = FALSE;
 
-    dispatch_register(Event_X_KeyPress, (EventHandler)press, NULL);
+    dispatch_register(Event_X_KeyPress | Event_X_KeyRelease, (EventHandler)event, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
 }
 
 void plugin_shutdown()
 {
-    dispatch_register(0, (EventHandler)press, NULL);
+    dispatch_register(0, (EventHandler)event, NULL);
 
     grab_keys(FALSE);
     tree_destroy(firstnode);

@@ -474,14 +474,6 @@ void Screen::manageWindow(Window window)
   // create the decoration frame for the client window
   client->frame = new Frame(client, &_style);
 
-  if (!(openbox->state() == Openbox::State_Starting ||
-        client->positionRequested())) {
-    // position the window intelligenty .. hopefully :)
-    // call the python PLACEWINDOW binding
-    EventData data(_number, client, EventPlaceWindow, 0);
-    openbox->bindings()->fireEvent(&data);
-  }
-
   // add to the wm's map
   openbox->addClient(client->frame->window(), client);
   openbox->addClient(client->frame->plate(), client);
@@ -497,6 +489,14 @@ void Screen::manageWindow(Window window)
 
   // reparent the client to the frame
   client->frame->grabClient();
+
+  if (!(openbox->state() == Openbox::State_Starting ||
+        client->positionRequested())) {
+    // position the window intelligenty .. hopefully :)
+    // call the python PLACEWINDOW binding
+    EventData data(_number, client, EventPlaceWindow, 0);
+    openbox->bindings()->fireEvent(&data);
+  }
 
   // if on the current desktop.. (or all desktops)
   if (client->desktop() == _desktop ||

@@ -37,7 +37,8 @@ import stackedcycle # functions for doing stacked 'kde-style' cycling
 ob.kbind(["A-Tab"], ob.KeyContext.All, stackedcycle.next)
 ob.kbind(["A-S-Tab"], ob.KeyContext.All, stackedcycle.previous
 
-# if you want linear cycling instead of stacked cycling ...
+# if you want linear cycling instead of stacked cycling, comment out the focus
+# bindings above, and use these instead.
 #import focuscycle
 #focuscycle.raise_window = 0 # don't raise windows when they're activated
 #ob.kbind(["A-Tab"], ob.KeyContext.All, focuscycle.next)

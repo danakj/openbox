@@ -49,7 +49,7 @@ uninstall:
 
 clean:
 	$(LTCLEAN) $(target)
-	$(RM) $(objects) $(dir)/*\~
+	$(RM) $(objects) $(srcdir)/*\~
 	$(RM) $(filter %.lex.c, $(sources))
 	$(RM) $(filter %.tab.c, $(sources))
 	$(RM) $(patsubst %.c,%.h, $(filter %.tab.c, $(sources)))

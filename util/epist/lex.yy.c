@@ -427,13 +427,17 @@ char *yytext;
 #line 1 "epist.l"
 #define INITIAL 0
 #line 2 "epist.l"
+#ifdef    HAVE_CONFIG_H
+#  include "../../config.h"
+#endif // HAVE_CONFIG_H
+
 #include <stdio.h>
 #include <string.h>
 #include "yacc_parser.hh"
 
 extern YYSTYPE yylval;
     
-#line 437 "lex.yy.c"
+#line 441 "lex.yy.c"
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -584,10 +588,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 10 "epist.l"
+#line 14 "epist.l"
 
 
-#line 591 "lex.yy.c"
+#line 595 "lex.yy.c"
 
 	if ( yy_init )
 		{
@@ -672,116 +676,116 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "epist.l"
+#line 16 "epist.l"
 return OBRACE;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 13 "epist.l"
+#line 17 "epist.l"
 return EBRACE;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 14 "epist.l"
+#line 18 "epist.l"
 return SEMICOLON;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "epist.l"
+#line 19 "epist.l"
 return DASH;
 	YY_BREAK
 case 5:
-#line 17 "epist.l"
+#line 21 "epist.l"
 case 6:
 YY_RULE_SETUP
-#line 17 "epist.l"
+#line 21 "epist.l"
 return OPTIONS;
 	YY_BREAK
 case 7:
-#line 19 "epist.l"
-case 8:
-#line 20 "epist.l"
-case 9:
-#line 21 "epist.l"
-case 10:
-#line 22 "epist.l"
-case 11:
 #line 23 "epist.l"
-case 12:
+case 8:
 #line 24 "epist.l"
-case 13:
+case 9:
 #line 25 "epist.l"
-case 14:
+case 10:
 #line 26 "epist.l"
-case 15:
+case 11:
 #line 27 "epist.l"
-case 16:
+case 12:
 #line 28 "epist.l"
-case 17:
+case 13:
 #line 29 "epist.l"
+case 14:
+#line 30 "epist.l"
+case 15:
+#line 31 "epist.l"
+case 16:
+#line 32 "epist.l"
+case 17:
+#line 33 "epist.l"
 case 18:
 YY_RULE_SETUP
-#line 29 "epist.l"
+#line 33 "epist.l"
 yylval = (int) strdup(yytext); return BINDING;
 	YY_BREAK
 case 19:
-#line 31 "epist.l"
+#line 35 "epist.l"
 case 20:
-#line 32 "epist.l"
+#line 36 "epist.l"
 case 21:
-#line 33 "epist.l"
+#line 37 "epist.l"
 case 22:
 YY_RULE_SETUP
-#line 33 "epist.l"
+#line 37 "epist.l"
 yylval = (int) strdup(yytext); return TRUE;
 	YY_BREAK
 case 23:
-#line 35 "epist.l"
+#line 39 "epist.l"
 case 24:
-#line 36 "epist.l"
+#line 40 "epist.l"
 case 25:
-#line 37 "epist.l"
+#line 41 "epist.l"
 case 26:
 YY_RULE_SETUP
-#line 37 "epist.l"
+#line 41 "epist.l"
 yylval = (int) strdup(yytext); return FALSE;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 38 "epist.l"
+#line 42 "epist.l"
 yylval = (int) strdup(yytext); return NUMBER;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 39 "epist.l"
+#line 43 "epist.l"
 yylval = (int) strdup(yytext); return QUOTES;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 40 "epist.l"
+#line 44 "epist.l"
 yylval = (int) strdup(yytext); return WORD;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 41 "epist.l"
+#line 45 "epist.l"
 /* ignore */
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 42 "epist.l"
+#line 46 "epist.l"
 /* ignore */
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 43 "epist.l"
+#line 47 "epist.l"
 /* */
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 44 "epist.l"
+#line 48 "epist.l"
 ECHO;
 	YY_BREAK
-#line 785 "lex.yy.c"
+#line 789 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1667,6 +1671,6 @@ int main()
 	return 0;
 	}
 #endif
-#line 44 "epist.l"
+#line 48 "epist.l"
 
 

@@ -17,6 +17,7 @@
 */
 
 #include "mainloop.h"
+#include "action.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,6 +87,8 @@ struct _ObMainLoop
     gboolean signal_fired;
     guint signals_fired[NUM_SIGNALS];
     GSList *signal_handlers[NUM_SIGNALS];
+
+    GQueue *action_queue;
 };
 
 struct _ObMainLoopTimer
@@ -175,6 +178,8 @@ ObMainLoop *ob_main_loop_new(Display *display)
 
     all_loops = g_slist_prepend(all_loops, loop);
 
+    loop->action_queue = g_queue_new();
+
     return loop;
 }
 
@@ -225,6 +230,8 @@ void ob_main_loop_destroy(ObMainLoop *loop)
             }
         }
 
+        g_queue_free(loop->action_queue);
+
         g_free(loop);
     }
 }
@@ -240,12 +247,18 @@ static void fd_handle_foreach(gpointer key,
         h->func(h->fd, h->data);
 }
 
+void ob_main_loop_queue_action(ObMainLoop *loop, ObAction *act)
+{
+    g_queue_push_tail(loop->action_queue, action_copy(act));
+}
+
 void ob_main_loop_run(ObMainLoop *loop)
 {
     XEvent e;
     struct timeval *wait;
     fd_set selset;
     GSList *it;
+    ObAction *act;
 
     loop->run = TRUE;
     loop->running = TRUE;
@@ -281,10 +294,17 @@ void ob_main_loop_run(ObMainLoop *loop)
                     h->func(&e, h->data);
                 }
             } while (XPending(loop->display));
+        } else if ((act = g_queue_pop_head(loop->action_queue))) {
+             /* only fire off one action at a time, then go back for more
+                X events, since the action might cause some X events (like
+                FocusIn :) */
+            act->func(&act->data);
+            action_unref(act);
         } else {
             /* this only runs if there were no x events received */
 
             timer_dispatch(loop, (GTimeVal**)&wait);
+
             selset = loop->fd_set;
             /* there is a small race condition here. if a signal occurs
                between this if() and the select() then we will not process

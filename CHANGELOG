@@ -1,4 +1,6 @@
 Changelog for Openbox:
+2.2.0
+ * Bitmap buttons					(Scott Moynes)
 
 2.1.0:
  * make alt-right-click resizing work on bottom window  (Ben Jansens)

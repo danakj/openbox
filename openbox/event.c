@@ -829,7 +829,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         ob_debug("MapRequest for 0x%lx\n", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it! */
-        client_activate(client, TRUE);
+        client_activate(client, FALSE);
         break;
     case ClientMessage:
         /* validate cuz we query stuff off the client here */

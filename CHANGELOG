@@ -1,3 +1,9 @@
+3.3:
+  * Fixed directional focus not getting trapped in omnipresent windows
+  * Fixed focus actions when bound to the mouse, normal focus cycle is always
+    linear and directional focus is totally disabled, it makes no sense
+    anyway, just move the mouse.
+
 3.2:
   * Added spanish and swedish translations
   * Changed "Unnamed Desktop" to "Desktop n" where n is the actual

@@ -24,28 +24,30 @@ GList **focus_order; /* these lists are created when screen_startup
 static ObClient *focus_cycle_target;
 static Popup *focus_cycle_popup;
 
-void focus_startup()
+void focus_startup(gboolean reconfig)
 {
-
     focus_cycle_popup = popup_new(TRUE);
 
-    /* start with nothing focused */
-    focus_set_client(NULL);
+    if (!reconfig)
+        /* start with nothing focused */
+        focus_set_client(NULL);
 }
 
-void focus_shutdown()
+void focus_shutdown(gboolean reconfig)
 {
     guint i;
 
-    for (i = 0; i < screen_num_desktops; ++i)
-        g_list_free(focus_order[i]);
-    g_free(focus_order);
-
     popup_free(focus_cycle_popup);
 
-    /* reset focus to root */
-    XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,
-                   event_lasttime);
+    if (!reconfig) {
+        for (i = 0; i < screen_num_desktops; ++i)
+            g_list_free(focus_order[i]);
+        g_free(focus_order);
+
+        /* reset focus to root */
+        XSetInputFocus(ob_display, PointerRoot, RevertToPointerRoot,
+                       event_lasttime);
+    }
 }
 
 static void push_to_top(ObClient *client)

@@ -34,16 +34,18 @@ static void client_dest(gpointer client)
         moveresize_end(TRUE);    
 }
 
-void moveresize_startup()
+void moveresize_startup(gboolean reconfig)
 {
     popup = popup_new(FALSE);
 
-    client_add_destructor(client_dest);
+    if (!reconfig)
+        client_add_destructor(client_dest);
 }
 
-void moveresize_shutdown()
+void moveresize_shutdown(gboolean reconfig)
 {
-    client_remove_destructor(client_dest);
+    if (!reconfig)
+        client_remove_destructor(client_dest);
 
     popup_free(popup);
     popup = NULL;

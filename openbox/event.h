@@ -11,7 +11,7 @@ extern guint NumLockMask;
 /*! The value of the mask for the ScrollLock modifier */
 extern guint ScrollLockMask;
 
-void event_startup();
-void event_shutdown();
+void event_startup(gboolean reconfig);
+void event_shutdown(gboolean reconfig);
 
 #endif

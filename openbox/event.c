@@ -106,8 +106,10 @@ static void sn_handler(const XEvent *e, gpointer display)
 #endif
 
 
-void event_startup()
+void event_startup(gboolean reconfig)
 {
+    if (reconfig) return;
+
     mask_table_size = sizeof(mask_table) / sizeof(mask_table[0]);
      
     /* get lock masks that are defined by the display (not constant) */
@@ -146,8 +148,10 @@ void event_startup()
     client_add_destructor(focus_delay_client_dest);
 }
 
-void event_shutdown()
+void event_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
     client_remove_destructor(focus_delay_client_dest);
     XFreeModifiermap(modmap);
 }

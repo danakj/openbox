@@ -51,12 +51,14 @@ static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
 static void client_urgent_notify(ObClient *self);
 
-void client_startup()
+void client_startup(gboolean reconfig)
 {
+    if (reconfig) return;
+
     client_set_list();
 }
 
-void client_shutdown()
+void client_shutdown(gboolean reconfig)
 {
 }
 

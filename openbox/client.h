@@ -240,8 +240,8 @@ struct _ObClient
 
 extern GList *client_list;
 
-void client_startup();
-void client_shutdown();
+void client_startup(gboolean reconfig);
+void client_shutdown(gboolean reconfig);
 
 void client_add_destructor(GDestroyNotify func);
 void client_remove_destructor(GDestroyNotify func);

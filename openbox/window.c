@@ -7,13 +7,17 @@
 
 GHashTable *window_map;
 
-void window_startup()
+void window_startup(gboolean reconfig)
 {
+    if (reconfig) return;
+
     window_map = g_hash_table_new(g_int_hash, g_int_equal);
 }
 
-void window_shutdown()
+void window_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
     g_hash_table_destroy(window_map);
 }
 

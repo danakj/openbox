@@ -261,15 +261,16 @@ gboolean screen_annex()
     return TRUE;
 }
 
-void screen_startup()
+void screen_startup(gboolean reconfig)
 {
     GSList *it;
     guint i;
 
     desktop_cycle_popup = popup_new(FALSE);
 
-    /* get the initial size */
-    screen_resize();
+    if (!reconfig)
+        /* get the initial size */
+        screen_resize();
 
     /* set the names */
     screen_desktop_names = g_new(char*,
@@ -282,48 +283,60 @@ void screen_startup()
     g_free(screen_desktop_names); /* dont free the individual strings */
     screen_desktop_names = NULL;
 
-    screen_num_desktops = 0;
+    if (!reconfig)
+        screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
-    if (startup_desktop >= screen_num_desktops)
-        startup_desktop = 0;
-    screen_desktop = startup_desktop;
-    screen_set_desktop(startup_desktop);
+    if (!reconfig) {
+        if (startup_desktop >= screen_num_desktops)
+            startup_desktop = 0;
+        screen_desktop = startup_desktop;
+        screen_set_desktop(startup_desktop);
 
-    /* don't start in showing-desktop mode */
-    screen_showing_desktop = FALSE;
-    PROP_SET32(RootWindow(ob_display, ob_screen),
-               net_showing_desktop, cardinal, screen_showing_desktop);
+        /* don't start in showing-desktop mode */
+        screen_showing_desktop = FALSE;
+        PROP_SET32(RootWindow(ob_display, ob_screen),
+                   net_showing_desktop, cardinal, screen_showing_desktop);
 
-    screen_update_layout();
+        screen_update_layout();
 
 #ifdef USE_LIBSN
-    sn_context = sn_monitor_context_new(ob_sn_display, ob_screen,
-                                        sn_event_func, NULL, NULL);
-    sn_busy_cnt = 0;
+        sn_context = sn_monitor_context_new(ob_sn_display, ob_screen,
+                                            sn_event_func, NULL, NULL);
+        sn_busy_cnt = 0;
 #endif
+    }
 }
 
-void screen_shutdown()
+void screen_shutdown(gboolean reconfig)
 {
     Rect **r;
 
     popup_free(desktop_cycle_popup);
 
-    XSelectInput(ob_display, RootWindow(ob_display, ob_screen), NoEventMask);
+    if (!reconfig) {
+#ifdef USE_LIBSN
+        sn_monitor_context_unref(sn_context);
+#endif
 
-    /* we're not running here no more! */
-    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
-    /* not without us */
-    PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
-    /* don't keep this mode */
-    PROP_ERASE(RootWindow(ob_display, ob_screen), net_showing_desktop);
+        XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
+                     NoEventMask);
 
-    XDestroyWindow(ob_display, screen_support_win);
+        /* we're not running here no more! */
+        PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
+        /* not without us */
+        PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
+        /* don't keep this mode */
+        PROP_ERASE(RootWindow(ob_display, ob_screen), net_showing_desktop);
+
+        XDestroyWindow(ob_display, screen_support_win);
+    }
 
     g_strfreev(screen_desktop_names);
+    screen_desktop_names = NULL;
     for (r = area; *r; ++r)
         g_free(*r);
     g_free(area);
+    area = NULL;
 }
 
 void screen_resize()

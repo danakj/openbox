@@ -16,9 +16,14 @@ static ObDock *dock;
 
 StrutPartial dock_strut;
 
-void dock_startup()
+void dock_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
+
+    if (reconfig) {
+        dock_configure();
+        return;
+    }
 
     STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                       0, 0, 0, 0, 0, 0, 0, 0);
@@ -46,8 +51,10 @@ void dock_startup()
     stacking_raise(DOCK_AS_WINDOW(dock));
 }
 
-void dock_shutdown()
+void dock_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
     XDestroyWindow(ob_display, dock->frame);
     RrAppearanceFree(dock->a_frame);
     g_hash_table_remove(window_map, &dock->frame);

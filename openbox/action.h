@@ -220,6 +220,8 @@ void action_desktop_last(union ActionData *data);
 void action_toggle_decorations(union ActionData *data);
 /* MoveResize */
 void action_moveresize(union ActionData *data);
+/* Any */
+void action_reconfigure(union ActionData *data);
 /* Execute */
 void action_restart(union ActionData *data);
 /* Any */

@@ -123,6 +123,7 @@ struct _ObFrame
 ObFrame *frame_new();
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
+void frame_adjust_theme(ObFrame *self);
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);

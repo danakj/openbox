@@ -62,7 +62,7 @@ static void client_dest(gpointer client)
     menu_frame_hide_all_client(client);
 }
 
-void menu_startup()
+void menu_startup(gboolean reconfig)
 {
     xmlDocPtr doc;
     xmlNodePtr node;
@@ -100,12 +100,14 @@ void menu_startup()
     
     g_assert(menu_parse_state.menus == NULL);
 
-    client_add_destructor(client_dest);
+    if (!reconfig)
+        client_add_destructor(client_dest);
 }
 
-void menu_shutdown()
+void menu_shutdown(gboolean reconfig)
 {
-    client_remove_destructor(client_dest);
+    if (!reconfig)
+        client_remove_destructor(client_dest);
 
     parse_shutdown(menu_parse_inst);
     menu_parse_inst = NULL;

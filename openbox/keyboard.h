@@ -12,8 +12,8 @@ struct _ObAction;
 
 extern KeyBindingTree *keyboard_firstnode;
 
-void keyboard_startup();
-void keyboard_shutdown();
+void keyboard_startup(gboolean reconfig);
+void keyboard_shutdown(gboolean reconfig);
 
 gboolean keyboard_bind(GList *keylist, ObAction *action);
 

@@ -50,8 +50,8 @@ struct _ObDockApp {
 
 extern StrutPartial dock_strut;
 
-void dock_startup();
-void dock_shutdown();
+void dock_startup(gboolean reconfig);
+void dock_shutdown(gboolean reconfig);
 
 void dock_configure();
 void dock_hide(gboolean hide);

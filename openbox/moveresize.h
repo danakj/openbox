@@ -8,8 +8,8 @@ struct _ObClient;
 extern gboolean moveresize_in_progress;
 extern struct _ObClient *moveresize_client;
 
-void moveresize_startup();
-void moveresize_shutdown();
+void moveresize_startup(gboolean reconfig);
+void moveresize_shutdown(gboolean reconfig);
 
 void moveresize_start(struct _ObClient *c,
                       int x, int y, guint button, guint32 corner);

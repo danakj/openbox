@@ -14,8 +14,8 @@ extern struct _ObClient *focus_client;
 /*! The recent focus order on each desktop */
 extern GList **focus_order;
 
-void focus_startup();
-void focus_shutdown();
+void focus_startup(gboolean reconfig);
+void focus_shutdown(gboolean reconfig);
 
 /*! Specify which client is currently focused, this doesn't actually
   send focus anywhere, its called by the Focus event handlers */

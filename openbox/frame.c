@@ -22,6 +22,9 @@ static void layout_title(ObFrame *self);
 static void flash_done(gpointer data);
 static gboolean flash_timeout(gpointer data);
 
+static void set_theme_statics(ObFrame *self);
+static void free_theme_statics(ObFrame *self);
+
 static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
@@ -88,6 +91,18 @@ ObFrame *frame_new()
     XMapWindow(ob_display, self->rgrip);
     XMapWindow(ob_display, self->label);
 
+    self->max_press = self->close_press = self->desk_press = 
+	self->iconify_press = self->shade_press = FALSE;
+    self->max_hover = self->close_hover = self->desk_hover = 
+	self->iconify_hover = self->shade_hover = FALSE;
+
+    set_theme_statics(self);
+
+    return (ObFrame*)self;
+}
+
+static void set_theme_statics(ObFrame *self)
+{
     /* set colors/appearance/sizes for stuff that doesn't change */
     XSetWindowBorder(ob_display, self->window, ob_rr_theme->b_color->pixel);
     XSetWindowBorder(ob_display, self->title, ob_rr_theme->b_color->pixel);
@@ -125,16 +140,9 @@ ObFrame *frame_new()
         RrAppearanceCopy(ob_rr_theme->a_unfocused_handle);
     self->a_focused_handle = RrAppearanceCopy(ob_rr_theme->a_focused_handle);
     self->a_icon = RrAppearanceCopy(ob_rr_theme->a_icon);
-
-    self->max_press = self->close_press = self->desk_press = 
-	self->iconify_press = self->shade_press = FALSE;
-    self->max_hover = self->close_hover = self->desk_hover = 
-	self->iconify_hover = self->shade_hover = FALSE;
-
-    return (ObFrame*)self;
 }
 
-static void frame_free(ObFrame *self)
+static void free_theme_statics(ObFrame *self)
 {
     RrAppearanceFree(self->a_unfocused_title); 
     RrAppearanceFree(self->a_focused_title);
@@ -143,6 +151,11 @@ static void frame_free(ObFrame *self)
     RrAppearanceFree(self->a_unfocused_handle);
     RrAppearanceFree(self->a_focused_handle);
     RrAppearanceFree(self->a_icon);
+}
+
+static void frame_free(ObFrame *self)
+{
+    free_theme_statics(self);
 
     XDestroyWindow(ob_display, self->window);
 
@@ -164,6 +177,13 @@ void frame_hide(ObFrame *self)
 	self->client->ignore_unmaps++;
 	XUnmapWindow(ob_display, self->window);
     }
+}
+
+void frame_adjust_theme(ObFrame *self)
+{
+    free_theme_statics(self);
+    set_theme_statics(self);
+    frame_adjust_area(self, TRUE, TRUE, FALSE);
 }
 
 void frame_adjust_shape(ObFrame *self)

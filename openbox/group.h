@@ -18,8 +18,8 @@ struct _ObGroup
 
 extern GHashTable *group_map;
 
-void group_startup();
-void group_shutdown();
+void group_startup(gboolean reconfig);
+void group_shutdown(gboolean reconfig);
 
 ObGroup *group_add(Window leader, struct _ObClient *client);
 

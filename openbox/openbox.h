@@ -42,6 +42,8 @@ void ob_restart_other(const gchar *path);
 void ob_restart();
 void ob_exit();
 
+void ob_reconfigure();
+
 void ob_exit_with_error(gchar *msg);
 
 Cursor ob_cursor(ObCursor cursor);

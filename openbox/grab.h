@@ -6,8 +6,8 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-void grab_startup();
-void grab_shutdown();
+void grab_startup(gboolean reconfig);
+void grab_shutdown(gboolean reconfig);
 
 gboolean grab_keyboard(gboolean grab);
 gboolean grab_pointer(gboolean grab, ObCursor cur);

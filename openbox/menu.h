@@ -95,8 +95,8 @@ struct _ObMenuEntry
     } data;
 };
 
-void menu_startup();
-void menu_shutdown();
+void menu_startup(gboolean reconfig);
+void menu_shutdown(gboolean reconfig);
 
 ObMenu* menu_new(gchar *name, gchar *title, gpointer data);
 void menu_free(ObMenu *menu);

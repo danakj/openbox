@@ -36,9 +36,9 @@ extern char **screen_desktop_names;
 gboolean screen_annex();
 
 /*! Once the screen is ours, set up its initial state */
-void screen_startup();
+void screen_startup(gboolean reconfig);
 /*! Free resources */
-void screen_shutdown();
+void screen_shutdown(gboolean reconfig);
 
 /*! Figure out the new size of the screen and adjust stuff for it */
 void screen_resize();

@@ -15,8 +15,8 @@ typedef enum {
     OB_MOUSE_NUM_ACTIONS
 } ObMouseAction;
 
-void mouse_startup();
-void mouse_shutdown();
+void mouse_startup(gboolean reconfig);
+void mouse_shutdown(gboolean reconfig);
 
 gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
                     ObAction *action);

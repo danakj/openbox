@@ -15,6 +15,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "extensions.h"
+#include "menuframe.h"
 #include "grab.h"
 #include "group.h"
 #include "config.h"
@@ -58,6 +59,7 @@ gboolean    ob_replace_wm;
 
 static ObState   state;
 static gboolean  xsync;
+static gboolean  reconfigure;
 static gboolean  restart;
 static char     *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
@@ -70,8 +72,6 @@ static void parse_args(int argc, char **argv);
 int main(int argc, char **argv)
 {
     char *path;
-    xmlDocPtr doc;
-    xmlNodePtr node;
 
 #ifdef DEBUG
     ob_debug_show_output(TRUE);
@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 
     /* set up signal handler */
     ob_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL, NULL);
+    ob_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
@@ -198,64 +199,84 @@ int main(int argc, char **argv)
     startup_save();
 
     if (screen_annex()) { /* it will be ours! */
-        ObParseInst *i;
+        do {
+            event_startup(reconfigure);
+            grab_startup(reconfigure);
+            /* focus_backup is used for stacking, so this needs to come before
+               anything that calls stacking_add */
+            focus_startup(reconfigure);
+            window_startup(reconfigure);
 
-        /* startup the parsing so everything can register sections of the rc */
-        i = parse_startup();
+            {
+                ObParseInst *i;
+                xmlDocPtr doc;
+                xmlNodePtr node;
 
-	event_startup();
-        grab_startup();
-        /* focus_backup is used for stacking, so this needs to come before
-           anything that calls stacking_add */
-	focus_startup();
-        window_startup();
+                /* startup the parsing so everything can register sections
+                   of the rc */
+                i = parse_startup();
 
-        /* set up the kernel config shit */
-        config_startup(i);
-        /* parse/load user options */
-        if (parse_load_rc(&doc, &node))
-            parse_tree(i, doc, node->xmlChildrenNode);
-        /* we're done with parsing now, kill it */
-        xmlFreeDoc(doc);
-        parse_shutdown(i);
+                config_startup(i);
+                /* parse/load user options */
+                if (parse_load_rc(&doc, &node))
+                    parse_tree(i, doc, node->xmlChildrenNode);
+                /* we're done with parsing now, kill it */
+                xmlFreeDoc(doc);
+                parse_shutdown(i);
+            }
 
-        /* load the theme specified in the rc file */
-        ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
-        if (ob_rr_theme == NULL)
-            ob_exit_with_error("Unable to load a theme.");
+            /* load the theme specified in the rc file */
+            ob_rr_theme = RrThemeNew(ob_rr_inst, config_theme);
+            if (ob_rr_theme == NULL)
+                ob_exit_with_error("Unable to load a theme.");
 
-        moveresize_startup();
-	screen_startup();
-        group_startup();
-	client_startup();
-        dock_startup();
-        keyboard_startup();
-        mouse_startup();
-        menu_startup();
+            moveresize_startup(reconfigure);
+            screen_startup(reconfigure);
+            group_startup(reconfigure);
+            client_startup(reconfigure);
+            dock_startup(reconfigure);
+            keyboard_startup(reconfigure);
+            mouse_startup(reconfigure);
+            menu_startup(reconfigure);
 
-	/* get all the existing windows */
-	client_manage_all();
+            if (!reconfigure) {
+                /* get all the existing windows */
+                client_manage_all();
+            } else {
+                GList *it;
 
-	state = OB_STATE_RUNNING;
-        ob_main_loop_run(ob_main_loop);
-	state = OB_STATE_EXITING;
+                /* redecorate all existing windows */
+                for (it = client_list; it; it = g_list_next(it)) {
+                    ObClient *c = it->data;
+                    frame_adjust_theme(c->frame);
+                }
+            }
 
-        dock_remove_all();
-	client_unmanage_all();
+            reconfigure = FALSE;
 
-        menu_shutdown();
-        mouse_shutdown();
-        keyboard_shutdown();
-        dock_shutdown();
-	client_shutdown();
-        group_shutdown();
-	screen_shutdown();
-	focus_shutdown();
-        moveresize_shutdown();
-        window_shutdown();
-        grab_shutdown();
-	event_shutdown();
-        config_shutdown();
+            state = OB_STATE_RUNNING;
+            ob_main_loop_run(ob_main_loop);
+            state = OB_STATE_EXITING;
+
+            if (!reconfigure) {
+                dock_remove_all();
+                client_unmanage_all();
+            }
+
+            menu_shutdown(reconfigure);
+            mouse_shutdown(reconfigure);
+            keyboard_shutdown(reconfigure);
+            dock_shutdown(reconfigure);
+            client_shutdown(reconfigure);
+            group_shutdown(reconfigure);
+            screen_shutdown(reconfigure);
+            focus_shutdown(reconfigure);
+            moveresize_shutdown(reconfigure);
+            window_shutdown(reconfigure);
+            grab_shutdown(reconfigure);
+            event_shutdown(reconfigure);
+            config_shutdown();
+        } while (reconfigure);
     }
 
     RrThemeFree(ob_rr_theme);
@@ -298,6 +319,9 @@ static void signal_handler(int signal, gpointer data)
     if (signal == SIGUSR1) {
 	fprintf(stderr, "Caught signal %d. Restarting.\n", signal);
         ob_restart();
+    } else if (signal == SIGUSR2) {
+	fprintf(stderr, "Caught signal %d. Reconfiguring.\n", signal);
+        ob_reconfigure();
     } else {
 	fprintf(stderr, "Caught signal %d. Exiting.\n", signal);
         ob_exit();
@@ -428,4 +452,10 @@ gchar *ob_expand_tilde(const gchar *f)
     g_free(mid);
     g_strfreev(spl);
     return ret;
+}
+
+void ob_reconfigure()
+{
+    reconfigure = TRUE;
+    ob_exit();
 }

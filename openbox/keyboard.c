@@ -264,15 +264,25 @@ void keyboard_event(ObClient *client, const XEvent *e)
     }
 }
 
-void keyboard_startup()
+void keyboard_startup(gboolean reconfig)
 {
     grab_keys(TRUE);
 }
 
-void keyboard_shutdown()
+void keyboard_shutdown(gboolean reconfig)
 {
+    GSList *it;
+
     tree_destroy(keyboard_firstnode);
     keyboard_firstnode = NULL;
+
+    for (it = interactive_states; it; it = g_slist_next(it))
+        g_free(it->data);
+    g_slist_free(interactive_states);
+    interactive_states = NULL;
+
+    ob_main_loop_timeout_remove(ob_main_loop, chain_timeout);
     grab_keys(FALSE);
+    curpos = NULL;
 }
 

@@ -52,8 +52,8 @@ struct _ObClient;
 
 extern GHashTable *window_map;
 
-void window_startup();
-void window_shutdown();
+void window_startup(gboolean reconfig);
+void window_shutdown(gboolean reconfig);
 
 Window window_top(ObWindow *self);
 Window window_layer(ObWindow *self);

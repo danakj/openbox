@@ -6,14 +6,18 @@ GHashTable *group_map = NULL;
 static guint map_hash(Window *w) { return *w; }
 static gboolean map_key_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 
-void group_startup()
+void group_startup(gboolean reconfig)
 {
+    if (reconfig) return;
+
     group_map = g_hash_table_new((GHashFunc)map_hash,
                                  (GEqualFunc)map_key_comp);
 }
 
-void group_shutdown()
+void group_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
     g_hash_table_destroy(group_map);
 }
 

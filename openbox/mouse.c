@@ -87,6 +87,7 @@ static void clearall()
             g_free(b);
         }
         g_slist_free(bound_contexts[i]);
+        bound_contexts[i] = NULL;
     }
 }
 
@@ -367,11 +368,11 @@ gboolean mouse_bind(char *buttonstr, char *contextstr, ObMouseAction mact,
     return TRUE;
 }
 
-void mouse_startup()
+void mouse_startup(gboolean reconfig)
 {
 }
 
-void mouse_shutdown()
+void mouse_shutdown(gboolean reconfig)
 {
     grab_all_clients(FALSE);
     clearall();

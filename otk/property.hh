@@ -181,7 +181,7 @@ public:
   //! Destroys the OBAtom object
   virtual ~OBProperty();
 
-  //! Sets a property on a window to a new value
+  //! Sets a single-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
     @param atom A member of the OBProperty::Atoms enum that specifies which
@@ -191,7 +191,7 @@ public:
     @param value The value to set the property to
   */
   void set(Window win, Atoms atom, Atoms type, unsigned long value) const;
-  //! Sets a property on a window to a new value
+  //! Sets an multiple-value property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
     @param atom A member of the OBProperty::Atoms enum that specifies which
@@ -204,7 +204,7 @@ public:
   */
   void set(Window win, Atoms atom, Atoms type,
            unsigned long value[], int elements) const;
-  //! Sets a property on a window to a new value
+  //! Sets a string property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
     @param atom A member of the OBProperty::Atoms enum that specifies which
@@ -215,7 +215,7 @@ public:
   */
   void set(Window win, Atoms atom, StringType type,
            const std::string &value) const;
-  //! Sets a property on a window to a new value
+  //! Sets a string-array property on a window to a new value
   /*!
     @param win The window id of the window on which to set the property's value
     @param atom A member of the OBProperty::Atoms enum that specifies which

@@ -16,24 +16,30 @@ extern "C" {
 #define _(str) gettext(str)
 }
 
+#include <cstdlib>
 #include <algorithm>
 
 namespace ob {
 
 static bool buttonvalue(const std::string &button, unsigned int *val)
 {
-  if (button == "Left" || button == "1" || button == "Button1") {
-    *val |= Button1;
-  } else if (button == "Middle" || button == "2" || button == "Button2") {
-    *val |= Button2;
-  } else if (button == "Right" || button == "3" || button == "Button3") {
-    *val |= Button3;
-  } else if (button == "Up" || button == "4" || button == "Button4") {
-    *val |= Button4;
-  } else if (button == "Down" || button == "5" || button == "Button5") {
-    *val |= Button5;
-  } else
-    return false;
+  if (button == "Left")
+    *val = 1;
+  else if (button == "Middle")
+    *val = 2;
+  else if (button == "Right")
+    *val = 3;
+  else if (button == "Up")
+    *val = 4;
+  else if (button == "Down")
+    *val = 5;
+  else {
+    // try convert to number
+    int i = atoi(button.c_str());
+    if (i <= 0)
+      return false;
+    *val = i;
+  }
   return true;
 }
 

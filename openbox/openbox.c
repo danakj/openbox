@@ -35,6 +35,9 @@
 #ifdef HAVE_LOCALE_H
 #  include <locale.h>
 #endif
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
 
 #include <X11/cursorfont.h>
 
@@ -174,9 +177,20 @@ int main(int argc, char **argv)
 
     if (ob_restart) {
         if (ob_restart_path != NULL) {
+            int argcp;
+            char **argvp;
+            GError *err;
+
             /* run other shit */
+            if (g_shell_parse_argv(ob_restart_path, &argcp, &argvp, &err))
+                execvp(argvp[0], argvp);
+
+            g_strfreev(argvp);
         }
+
         /* re-run me */
+        execvp(argv[0], argv); /* try how we were run */
+        execlp("ob3", "ob3", NULL); /* try this as a last resort */
     }
      
     return 0;

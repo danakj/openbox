@@ -171,7 +171,14 @@ public:
   //! Returns a managed screen
   inline OBScreen *screen(int num) {
     assert(num >= 0); assert(num < (signed)_screens.size());
+    if (num >= screenCount())
+      return NULL;
     return _screens[num];
+  }
+
+  //! Returns the number of managed screens
+  inline int screenCount() const {
+    return (signed)_screens.size();
   }
 
   //! Returns the mouse cursors used throughout Openbox

@@ -2615,8 +2615,24 @@ void client_activate(ObClient *self, gboolean here)
         return;
     if (self->shaded)
         client_shade(self, FALSE);
-    action_run_string("Focus", self);
-    action_run_string("Raise", self);
+
+    client_focus(self);
+
+    /* we do this an action here. this is rather important. this is because
+       we want the results from the focus change to take place BEFORE we go
+       about raising the window. when a fullscreen window loses focus, we need
+       this or else the raise wont be able to raise above the to-lose-focus
+       fullscreen window. */
+    {
+        ObAction *a;
+        GSList *l = NULL;
+
+        a = action_from_string("Raise", OB_USER_ACTION_NONE);
+        g_assert(a);
+        l = g_slist_append(NULL, a);
+
+        action_run(l, self, 0);
+    }
 }
 
 gboolean client_focused(ObClient *self)

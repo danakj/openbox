@@ -58,6 +58,7 @@ struct InteractiveAction {
 struct InterDirectionalAction{
     struct InteractiveAction inter;
     ObDirection direction;
+    gboolean dialog;
 };
 
 struct DirectionalAction{
@@ -130,6 +131,7 @@ struct CycleWindows {
     struct InteractiveAction inter;
     gboolean linear;
     gboolean forward;
+    gboolean dialog;
 };
 
 union ActionData {

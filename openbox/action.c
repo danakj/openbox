@@ -114,48 +114,56 @@ void setup_action_directional_focus_north(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTH;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_east(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_EAST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_south(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTH;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_west(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_WEST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_northeast(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHEAST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_southeast(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHEAST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_southwest(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_SOUTHWEST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_directional_focus_northwest(ObAction **a, ObUserAction uact)
 {
     (*a)->data.interdiraction.inter.any.interactive = TRUE;
     (*a)->data.interdiraction.direction = OB_DIRECTION_NORTHWEST;
+    (*a)->data.interdiraction.dialog = TRUE;
 }
 
 void setup_action_send_to_desktop(ObAction **a, ObUserAction uact)
@@ -282,6 +290,7 @@ void setup_action_cycle_windows_next(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.inter.any.interactive = TRUE;
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = TRUE;
+    (*a)->data.cycle.dialog = TRUE;
 }
 
 void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
@@ -289,6 +298,7 @@ void setup_action_cycle_windows_previous(ObAction **a, ObUserAction uact)
     (*a)->data.cycle.inter.any.interactive = TRUE;
     (*a)->data.cycle.linear = FALSE;
     (*a)->data.cycle.forward = FALSE;
+    (*a)->data.cycle.dialog = TRUE;
 }
 
 void setup_action_movetoedge_north(ObAction **a, ObUserAction uact)
@@ -843,6 +853,9 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.desktop.desk = parse_int(doc, n);
                 if (act->data.desktop.desk > 0) act->data.desktop.desk--;
+                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
+                    act->data.desktop.inter.any.interactive =
+                        parse_bool(doc, n);
            } else if (act->func == action_send_to_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.sendto.desk = parse_int(doc, n);
@@ -852,17 +865,28 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             } else if (act->func == action_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.desktopdir.wrap = parse_bool(doc, n); 
+                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
+                    act->data.desktopdir.inter.any.interactive =
+                        parse_bool(doc, n);
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
                 if ((n = parse_find_node("follow", node->xmlChildrenNode)))
                     act->data.sendtodir.follow = parse_bool(doc, n);
+                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
+                    act->data.sendtodir.inter.any.interactive =
+                        parse_bool(doc, n);
             } else if (act->func == action_activate) {
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
             } else if (act->func == action_cycle_windows) {
                 if ((n = parse_find_node("linear", node->xmlChildrenNode)))
                     act->data.cycle.linear = parse_bool(doc, n);
+                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
+                    act->data.cycle.dialog = parse_bool(doc, n);
+            } else if (act->func == action_directional_focus) {
+                if ((n = parse_find_node("dialog", node->xmlChildrenNode)))
+                    act->data.cycle.dialog = parse_bool(doc, n);
             }
         }
         g_free(actname);
@@ -1222,7 +1246,7 @@ void action_desktop_dir(union ActionData *data)
 
     d = screen_cycle_desktop(data->desktopdir.dir,
                              data->desktopdir.wrap,
-                             data->sendtodir.linear,
+                             data->desktopdir.linear,
                              data->desktopdir.inter.any.interactive,
                              data->desktopdir.inter.final,
                              data->desktopdir.inter.cancel);
@@ -1338,14 +1362,14 @@ void action_showmenu(union ActionData *data)
 void action_cycle_windows(union ActionData *data)
 {
     focus_cycle(data->cycle.forward, data->cycle.linear,
-                data->cycle.inter.any.interactive,
+                data->cycle.dialog,
                 data->cycle.inter.final, data->cycle.inter.cancel);
 }
 
 void action_directional_focus(union ActionData *data)
 {
     focus_directional_cycle(data->interdiraction.direction,
-                            data->interdiraction.inter.any.interactive,
+                            data->interdiraction.dialog,
                             data->interdiraction.inter.final,
                             data->interdiraction.inter.cancel);
 }

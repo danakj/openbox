@@ -19,11 +19,6 @@ class Display;
 extern Display *display;
 
 //! Manages a single X11 display.
-/*!
-  This class is static, and cannot be instantiated.
-  Use the initialize() method to open the display and ready it for use.
-  Use the destroy() method to close it and clean up the class' data.
-*/
 class Display
 {
 public:

@@ -203,6 +203,7 @@ void *plugin_create()
 
 void plugin_destroy (void *m)
 {
+    timed_menu_clean_up(m);
     /* this will be freed by timer_* */
     timer_stop( ((Timed_Menu_Data *)TIMED_MENU(m)->plugin_data)->timer);
     

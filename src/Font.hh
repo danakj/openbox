@@ -87,9 +87,6 @@ private:
   bool createFont(void);
   bool parseFontString(const std::string &xlfd);
   
-  mutable BGCCache *_cache;
-  mutable BGCCacheItem *_item;
-
   bool              _valid;
 
 public:

@@ -61,9 +61,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
 #endif // XFT
                                        _font(0),
                                        _fontset(0),
-                                       _fontset_extents(0),
-                                       _cache(0),
-                                       _item(0) {
+                                       _fontset_extents(0) {
   _valid = init();
 }
 
@@ -76,9 +74,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
 #endif // XFT
                                        _font(0),
                                        _fontset(0),
-                                       _fontset_extents(0),
-                                       _cache(0),
-                                       _item(0) {
+                                       _fontset_extents(0) {
   string int_xlfd;
   if (xlfd.empty())
     int_xlfd = _fallback_font;
@@ -160,9 +156,6 @@ BFont::~BFont() {
     XFreeFontSet(_display, _fontset);
   if (_font)
     XFreeFont(_display, _font);
-
-  if (_item)
-    _cache->release(_item);
 }
 
 
@@ -262,10 +255,8 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
   }
 #endif // XFT
 
-  if (! _cache)
-    _cache = color.display()->gcCache();
-  if (! _item)
-    _item = _cache->find(color, _font, GXcopy, ClipByChildren);
+  BGCCache *_cache = color.display()->gcCache();
+  BGCCacheItem *_item = _cache->find(color, _font, GXcopy, ClipByChildren);
 
   assert(_cache);
   assert(_item);
@@ -278,6 +269,8 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     XDrawString(_display, d, _item->gc(),
                 x, _font->ascent + y,
                 string.c_str(), string.size());
+
+  _cache->release(_item);
 }
 
 

@@ -681,11 +681,31 @@ void BScreen::reconfigure(void) {
   workspacemenu->reconfigure();
   iconmenu->reconfigure();
 
-  int remember_sub = rootmenu->getCurrentSubmenu();
+  typedef std::vector<int> SubList;
+  SubList remember_subs;
+
+  // save the current open menus
+  Basemenu *menu = rootmenu;
+  int submenu;
+  while ((submenu = menu->getCurrentSubmenu()) >= 0) {
+    remember_subs.push_back(submenu);
+    menu = menu->find(submenu)->submenu();
+    assert(menu);
+  }
+  
   InitMenu();
   raiseWindows(0, 0);
   rootmenu->reconfigure();
-  rootmenu->drawSubmenu(remember_sub);
+
+  // reopen the saved menus
+  menu = rootmenu;
+  const SubList::iterator subs_end = remember_subs.end();
+  for (SubList::iterator it = remember_subs.begin(); it != subs_end; ++it) {
+    menu->drawSubmenu(*it);
+    menu = menu->find(*it)->submenu();
+    if (! menu)
+      break;
+  }
 
   configmenu->reconfigure();
 

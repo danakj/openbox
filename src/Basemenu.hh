@@ -67,7 +67,6 @@ private:
   Basemenu& operator=(const Basemenu&);
 
 protected:
-  BasemenuItem *find(int index);
   inline void setTitleVisibility(bool b) { title_vis = b; }
   inline void setMovable(bool b) { movable = b; }
   inline void setHideTree(bool h) { hide_tree = h; }
@@ -106,6 +105,7 @@ public:
   inline int getY(void) const { return menu.y; }
   inline unsigned int getCount(void) { return menuitems.size(); }
   inline int getCurrentSubmenu(void) const { return which_sub; }
+  BasemenuItem *find(int index);
 
   inline unsigned int getWidth(void) const { return menu.width; }
   inline unsigned int getHeight(void) const { return menu.height; }

@@ -1,6 +1,6 @@
 AC_PREREQ([2.50])
 AC_INIT([kernel/openbox.c])
-#AC_CONFIG_HEADERS(config.h)
+# AC_CONFIG_HEADERS(config.h)
 AC_LANG([C])
 AC_ENABLE_STATIC([no])
 AC_ENABLE_SHARED([yes])
@@ -13,10 +13,8 @@ fi
 
 AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
-##AC_PATH_PROG([awk_cmd], [awk]) # used by swig.m4
-##test "$awk_cmd" || AC_MSG_ERROR([awk not found])
-AC_PATH_PROG([regex_cmd], [sed])
-test "$regex_cmd" || AC_MSG_ERROR([sed not found])
+AC_CHECK_PROG([SED], [sed])
+test "$SED" || AC_MSG_ERROR([sed not found])
 
 AM_MAINTAINER_MODE
 # Determine build target
@@ -32,7 +30,6 @@ PKG_CHECK_MODULES(GMODULE, gmodule-2.0)
 AC_SUBST(GMODULE_CFLAGS)
 AC_SUBST(GMODULE_LIBS)
 	
-AC_PROG_LN_S
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_PROG_INSTALL
@@ -69,8 +66,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		data/Makefile
 		data/buttons/Makefile
 		themes/Makefile
-		themes/openbox/Makefile
-		])
+		themes/openbox/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT

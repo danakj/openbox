@@ -26,7 +26,7 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
 
   img_ctrl = new BImageControl*[getNumberOfScreens()];
   for (; i < getNumberOfScreens(); i++)
-    img_ctrl[i] = new BImageControl(this, getScreenInfo(i), True);
+    img_ctrl[i] = new BImageControl(*this, *getScreenInfo(i), True);
 
   for (i = 1; i < argc; i++) {
     if (! strcmp("-help", argv[i])) {

@@ -10927,6 +10927,74 @@ static PyObject *_wrap_Style_load(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Style_getCloseButtonMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Style *arg1 = (otk::Style *) 0 ;
+    otk::PixmapMask *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Style_getCloseButtonMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::PixmapMask *)(arg1)->getCloseButtonMask();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PixmapMask, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Style_getMaximizeButtonMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Style *arg1 = (otk::Style *) 0 ;
+    otk::PixmapMask *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Style_getMaximizeButtonMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::PixmapMask *)(arg1)->getMaximizeButtonMask();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PixmapMask, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Style_getIconifyButtonMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Style *arg1 = (otk::Style *) 0 ;
+    otk::PixmapMask *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Style_getIconifyButtonMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::PixmapMask *)(arg1)->getIconifyButtonMask();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PixmapMask, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Style_getStickyButtonMask(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Style *arg1 = (otk::Style *) 0 ;
+    otk::PixmapMask *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Style_getStickyButtonMask",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Style,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (otk::PixmapMask *)(arg1)->getStickyButtonMask();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__PixmapMask, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Style_getTextFocus(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     otk::Style *arg1 = (otk::Style *) 0 ;
@@ -13077,6 +13145,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Style_readDatabaseColor", _wrap_Style_readDatabaseColor, METH_VARARGS },
 	 { (char *)"Style_readDatabaseFont", _wrap_Style_readDatabaseFont, METH_VARARGS },
 	 { (char *)"Style_load", _wrap_Style_load, METH_VARARGS },
+	 { (char *)"Style_getCloseButtonMask", _wrap_Style_getCloseButtonMask, METH_VARARGS },
+	 { (char *)"Style_getMaximizeButtonMask", _wrap_Style_getMaximizeButtonMask, METH_VARARGS },
+	 { (char *)"Style_getIconifyButtonMask", _wrap_Style_getIconifyButtonMask, METH_VARARGS },
+	 { (char *)"Style_getStickyButtonMask", _wrap_Style_getStickyButtonMask, METH_VARARGS },
 	 { (char *)"Style_getTextFocus", _wrap_Style_getTextFocus, METH_VARARGS },
 	 { (char *)"Style_getTextUnfocus", _wrap_Style_getTextUnfocus, METH_VARARGS },
 	 { (char *)"Style_getButtonPicFocus", _wrap_Style_getButtonPicFocus, METH_VARARGS },

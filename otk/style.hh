@@ -84,6 +84,11 @@ public:
 
   void load(const Configuration &style);
 
+  inline PixmapMask *getCloseButtonMask(void) { return &close_button; }
+  inline PixmapMask *getMaximizeButtonMask(void) { return &max_button; }
+  inline PixmapMask *getIconifyButtonMask(void) { return &icon_button; }
+  inline PixmapMask *getStickyButtonMask(void) { return &stick_button; }
+
   inline BColor *getTextFocus(void) { return &l_text_focus; }
   inline BColor *getTextUnfocus(void) { return &l_text_unfocus; }
 

@@ -22,6 +22,8 @@ public:
 
   virtual void adjust();
 
+  virtual void update();
+  
   virtual void focus();
   virtual void unfocus();
 

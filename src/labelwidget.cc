@@ -72,41 +72,38 @@ void OBLabelWidget::unfocus()
 
 void OBLabelWidget::update()
 {
-  if (_dirty) {
-    std::string t = _text;
-    int x = _sidemargin;    // x coord for the text
+  OtkWidget::update();
 
-    // find a string that will fit inside the area for text
-    int max_length = width() - _sidemargin * 2;
-    if (max_length <= 0) {
-      t = ""; // can't fit anything
-    } else {
-      size_t text_len = t.size();
-      int length;
+  std::string t = _text;
+  int x = _sidemargin;    // x coord for the text
+
+  // find a string that will fit inside the area for text
+  int max_length = width() - _sidemargin * 2;
+  if (max_length <= 0) {
+    t = ""; // can't fit anything
+  } else {
+    size_t text_len = t.size();
+    int length;
       
-      do {
-        t.resize(text_len);
-        length = _font->measureString(t);
-      } while (length > max_length && text_len-- > 0);
+    do {
+      t.resize(text_len);
+      length = _font->measureString(t);
+    } while (length > max_length && text_len-- > 0);
 
-      // justify the text
-      switch (_justify) {
-      case otk::Style::RightJustify:
-        x += max_length - length;
-        break;
-      case otk::Style::CenterJustify:
-        x += (max_length - length) / 2;
-        break;
-      case otk::Style::LeftJustify:
-        break;
-      }
+    // justify the text
+    switch (_justify) {
+    case otk::Style::RightJustify:
+      x += max_length - length;
+      break;
+    case otk::Style::CenterJustify:
+      x += (max_length - length) / 2;
+      break;
+    case otk::Style::LeftJustify:
+      break;
     }
+  }
 
-    OtkWidget::update();
-
-    _font->drawString(_xftdraw, x, 0, *_text_color, t);
-  } else
-    OtkWidget::update();
+  _font->drawString(_xftdraw, x, 0, *_text_color, t);
 }
 
 

@@ -1009,14 +1009,14 @@ void OBClient::destroyHandler(const XDestroyWindowEvent &e)
 
 void OBClient::reparentHandler(const XReparentEvent &e)
 {
+  // this is when the client is first taken captive in the frame
+  if (e.parent == frame->plate()) return;
+
 #ifdef    DEBUG
   printf("ReparentNotify for 0x%lx\n", e.window);
 #endif // DEBUG
 
   OtkEventHandler::reparentHandler(e);
-
-  // this is when the client is first taken captive in the frame
-  if (e.parent == frame->plate()) return;
 
   /*
     This event is quite rare and is usually handled in unmapHandler.

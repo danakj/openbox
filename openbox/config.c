@@ -227,8 +227,11 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     node = node->children;
     
-    if ((n = parse_find_node("number", node)))
-        config_desktops_num = parse_int(doc, n);
+    if ((n = parse_find_node("number", node))) {
+        guint d = parse_int(doc, n);
+        if (d > 0)
+            config_desktops_num = d;
+    }
     if ((n = parse_find_node("names", node))) {
         GSList *it;
         xmlNodePtr nname;

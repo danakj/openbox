@@ -23,6 +23,7 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     assert(inst);
     if (!inst) return;
 
+    /* bounds checking */
     assert(x >= 0 && y >= 0);
     if (!(x >= 0 && y >= 0)) return;
     assert(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur));

@@ -506,7 +506,7 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
 
   // compress changes to a single property into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce)) {
+  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
     // XXX: it would be nice to compress ALL changes to a property, not just
     //      changes in a row without other props between.
     if (ce.xproperty.atom != e.atom) {
@@ -671,10 +671,17 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
     // compress changes into a single change
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce))
+    while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+      // XXX: it would be nice to compress ALL messages of a type, not just
+      //      messages in a row without other message types between.
+      if (ce.xclient.message_type != e.message_type) {
+        XPutBackEvent(otk::OBDisplay::display, &ce);
+        break;
+      }
       compress = true;
+    }
     if (compress)
-      setWMState(ce.xclientmessage.data.l[0]); // use the found event
+      setWMState(ce.xclient.data.l[0]); // use the found event
     else
       setWMState(e.data.l[0]); // use the original event
   } else if (e.message_type ==
@@ -682,8 +689,15 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
     // compress changes into a single change 
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::OBDisplay::display, e.message_type, &ce))
+    while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+      // XXX: it would be nice to compress ALL messages of a type, not just
+      //      messages in a row without other message types between.
+      if (ce.xclient.message_type != e.message_type) {
+        XPutBackEvent(otk::OBDisplay::display, &ce);
+        break;
+      }
       compress = true;
+    }
     if (compress)
       setDesktop(e.data.l[0]); // use the found event
     else

@@ -427,7 +427,11 @@ void Widget::layoutVert()
 
 void Widget::render()
 {
-  if (!_texture || !_dirty) return;
+  if (!_dirty) return;
+  if (!_texture) {
+    XSetWindowBackgroundPixmap(**display, _window, ParentRelative);
+    return;
+  }
   if (_borderwidth * 2 > _area.width() ||
       _borderwidth * 2 > _area.height())
     return; // no surface to draw on

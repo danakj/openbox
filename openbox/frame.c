@@ -81,8 +81,6 @@ ObFrame *frame_new()
     XMapWindow(ob_display, self->lgrip);
     XMapWindow(ob_display, self->rgrip);
     XMapWindow(ob_display, self->label);
-    XMapWindow(ob_display, self->tlresize);
-    XMapWindow(ob_display, self->trresize);
 
     /* set colors/appearance/sizes for stuff that doesn't change */
     XSetWindowBorder(ob_display, self->window, ob_rr_theme->b_color->pixel);
@@ -271,10 +269,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                   self->width, ob_rr_theme->title_height);
                 XMapWindow(ob_display, self->title);
 
-                XMoveWindow(ob_display, self->tlresize, 0, 0);
-                XMoveWindow(ob_display, self->trresize,
-                            self->width - ob_rr_theme->grip_width, 0);
-
+                if (self->decorations & OB_FRAME_DECOR_GRIPS) {
+                    XMoveWindow(ob_display, self->tlresize, 0, 0);
+                    XMoveWindow(ob_display, self->trresize,
+                                self->width - ob_rr_theme->grip_width, 0);
+                    XMapWindow(ob_display, self->tlresize);
+                    XMapWindow(ob_display, self->trresize);
+                } else {
+                    XUnmapWindow(ob_display, self->tlresize);
+                    XUnmapWindow(ob_display, self->trresize);
+                }
             } else
                 XUnmapWindow(ob_display, self->title);
         }

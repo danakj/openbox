@@ -289,7 +289,9 @@ void event_process(XEvent *e)
 	event_lasttime = e->xcrossing.time;
         /* NotifyUngrab occurs when a mouse button is released and the event is
            caused, like when lowering a window */
-        if (e->xcrossing.mode == NotifyGrab) return;
+        if (e->xcrossing.mode == NotifyGrab ||
+            e->xcrossing.detail == NotifyInferior)
+            return;
 	break;
     default:
         event_lasttime = CurrentTime;
@@ -386,8 +388,13 @@ static void event_handle_client(Client *client, XEvent *e)
                                                      client);
                 focus_order[desktop] = g_list_prepend(focus_order[desktop],
                                                       client);
-            } else if (focus_follow)
+            } else if (focus_follow) {
+#ifdef DEBUG_FOCUS
+                g_message("EnterNotify on %lx, focusing window",
+                          client->window);
+#endif
                 client_focus(client);
+            }
         }
         break;
     case ConfigureRequest:

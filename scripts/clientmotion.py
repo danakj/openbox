@@ -20,31 +20,23 @@ def def_motion_release(action, win, type, modifiers, button, xroot, yroot,
 			posqueue.remove(i)
 			break
 
-def def_do_motion(client, xroot, yroot):
-	global posqueue
-	dx = xroot - posqueue[0][1]
-	dy = yroot - posqueue[0][2]
-	area = posqueue[0][3] # A Rect
-	OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
-
-def def_do_resize(client, xroot, yroot, anchor_corner):
-	global posqueue
-	dx = xroot - posqueue[0][1]
-	dy = yroot - posqueue[0][2]
-	area = posqueue[0][3] # A Rect
-	OBClient_resize(client, anchor_corner,
-			Rect_width(area) - dx, Rect_height(area) + dy)
-
 def def_motion(action, win, type, modifiers, xroot, yroot, time):
 	client = Openbox_findClient(openbox, win)
 	if not client: return
 
+	global posqueue
+	dx = xroot - posqueue[0][1]
+	dy = yroot - posqueue[0][2]
+
+	area = posqueue[0][3] # A Rect
 	if (type == Type_Titlebar) or (type == Type_Label):
-		def_do_motion(client, xroot, yroot)
+		OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
 	elif type == Type_LeftGrip:
-		def_do_resize(client, xroot, yroot, OBClient_TopRight)
+		OBClient_resize(client, OBClient_TopRight,
+				Rect_width(area) - dx, Rect_height(area) + dy)
 	elif type == Type_RightGrip:
-		def_do_resize(client, xroot, yroot, OBClient_TopLeft)
+		OBClient_resize(client, OBClient_TopLeft,
+				Rect_width(area) + dx, Rect_height(area) + dy)
 
 def def_enter(action, win, type, modifiers):
 	client = Openbox_findClient(openbox, win)

@@ -271,7 +271,8 @@ void signal_handler(const ObEvent *e, void *data)
 
     case SIGFPE:
     case SIGSEGV:
-	g_error("Caught signal %d. Aborting and dumping core.", s);
+	g_message("Caught signal %d. Aborting and dumping core.", s);
+        abort();
     }
 }
 

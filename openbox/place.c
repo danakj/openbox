@@ -3,6 +3,7 @@
 #include "screen.h"
 #include "frame.h"
 #include "focus.h"
+#include "config.h"
 
 static Rect* pick_head(ObClient *c)
 {
@@ -38,6 +39,7 @@ static Rect* pick_head(ObClient *c)
     return NULL;
 }
 
+#if 0
 static gboolean place_random(ObClient *client, gint *x, gint *y)
 {
     int l, r, t, b;
@@ -63,6 +65,7 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
 
     return TRUE;
 }
+#endif
 
 static GSList* area_add(GSList *list, Rect *a)
 {
@@ -178,6 +181,18 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
     return ret;
 }
 
+static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
+{
+    int px, py;
+
+    screen_pointer_pos(&px, &py);
+
+    *x = px - client->area.width / 2 - client->frame->size.left;
+    *y = py - client->area.height / 2 - client->frame->size.top;
+
+    return TRUE;
+}
+
 static gboolean place_transient(ObClient *client, gint *x, gint *y)
 {
     if (client->transient_for) {
@@ -247,7 +262,7 @@ void place_client(ObClient *client, gint *x, gint *y)
         return;
     if (place_smart(client, x, y))
         return;
-    if (place_random(client, x, y))
+    if (place_under_mouse(client, x, y))
         return;
     g_assert_not_reached(); /* the last one better succeed */
 }

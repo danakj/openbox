@@ -475,14 +475,14 @@ void frame_adjust_area(ObFrame *self)
                        self->innersize.top + self->innersize.bottom +
                        self->frame.client->area.height));
 
-    /* do this in two steps because clients whose gravity is set to
-       'Static' don't end up getting moved at all with an XMoveResizeWindow */
-    XMoveWindow(ob_display, self->frame.plate,
-		self->innersize.left - self->cbwidth,
-		self->innersize.top - self->cbwidth);
-    XResizeWindow(ob_display, self->frame.plate,
-		  self->frame.client->area.width,
-		  self->frame.client->area.height);
+    /* move and resize the plate */
+    XMoveResizeWindow(ob_display, self->frame.plate,
+                      self->innersize.left - self->cbwidth,
+                      self->innersize.top - self->cbwidth,
+                      self->frame.client->area.width,
+                      self->frame.client->area.height);
+    /* when the client has StaticGravity, it likes to move around. */
+    XMoveWindow(ob_display, self->frame.client->window, 0, 0);
 
     STRUT_SET(self->frame.size,
 	      self->innersize.left + self->bwidth,
@@ -497,7 +497,7 @@ void frame_adjust_area(ObFrame *self)
 		  self->frame.size.top + self->frame.size.bottom);
 
     render(self);
-     
+
     frame_adjust_shape(self);
 }
 

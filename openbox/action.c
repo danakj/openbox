@@ -750,6 +750,6 @@ void action_cycle_windows(union ActionData *data)
     
     c = focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
                     data->cycle.cancel);
-    popup_cycle(c, !c && (data->cycle.final||data->cycle.cancel));
+    popup_cycle(c, !c || data->cycle.final || data->cycle.cancel);
 }
 

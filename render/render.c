@@ -89,8 +89,7 @@ void truecolor_startup(void)
 
 void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
 {
-    int i;
-    XImage *im = NULL;
+    int i, transferred = 0;
     Pixmap oldp;
 
     if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
@@ -118,25 +117,15 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
         gradient_solid(l, x, y, w, h);
     else gradient_render(&l->surface, w, h);
 
-/*this is not the right place for this code, it's only here so
-  text rendering shows up for now.
-*/
-    if (l->surface.data.planar.grad != Background_Solid) {
-        im = XCreateImage(ob_display, render_visual, render_depth,
-                          ZPixmap, 0, NULL, w, h, 32, 0);
-        g_assert(im != NULL);
-        im->byte_order = endian;
-        im->data = (char *)l->surface.data.planar.pixel_data;
-        reduce_depth((pixel32*)im->data, im);
-        XPutImage(ob_display, l->pixmap, DefaultGC(ob_display, ob_screen),
-                  im, 0, 0, x, y, w, h);
-        im->data = NULL;
-        XDestroyImage(im);
-    }
-
     for (i = 0; i < l->textures; i++) {
         switch (l->texture[i].type) {
         case Text:
+            if (!transferred) {
+                transferred = 1;
+                if (l->surface.data.planar.grad != Background_Solid)
+                    pixel32_to_pixmap(l->surface.data.planar.pixel_data, 
+                                      l->pixmap,x,y,w,h);
+            }
             if (l->xftdraw == NULL) {
                 l->xftdraw = XftDrawCreate(ob_display, l->pixmap, 
                                         render_visual, render_colormap);
@@ -145,6 +134,12 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
                       &l->texture[i].position);
         break;
         case Bitmask:
+            if (!transferred) {
+                transferred = 1;
+                if (l->surface.data.planar.grad != Background_Solid)
+                    pixel32_to_pixmap(l->surface.data.planar.pixel_data, 
+                                      l->pixmap,x,y,w,h);
+            }
             if (l->texture[i].data.mask.color->gc == None)
                 color_allocate_gc(l->texture[i].data.mask.color);
             mask_draw(l->pixmap, &l->texture[i].data.mask,
@@ -157,6 +152,15 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
         break;
         }
     }
+
+    if (!transferred) {
+        transferred = 1;
+        if (l->surface.data.planar.grad != Background_Solid)
+            pixel32_to_pixmap(l->surface.data.planar.pixel_data, l->pixmap
+                              ,x,y,w,h);
+    }
+
+
     XSetWindowBackgroundPixmap(ob_display, win, l->pixmap);
     XClearWindow(ob_display, win);
     if (oldp != None) XFreePixmap(ob_display, oldp);
@@ -255,4 +259,20 @@ void appearance_free(Appearance *a)
         if (p->pixel_data != NULL) g_free(p->pixel_data);
     }
     g_free(a);
+}
+
+
+void pixel32_to_pixmap(pixel32 *in, Pixmap out, int x, int y, int w, int h)
+{
+    XImage *im = NULL;
+    im = XCreateImage(ob_display, render_visual, render_depth,
+                      ZPixmap, 0, NULL, w, h, 32, 0);
+    g_assert(im != NULL);
+    im->byte_order = endian;
+    im->data = (char *)in;
+    reduce_depth((pixel32*)im->data, im);
+    XPutImage(ob_display, out, DefaultGC(ob_display, ob_screen),
+              im, 0, 0, x, y, w, h);
+    im->data = NULL;
+    XDestroyImage(im);
 }

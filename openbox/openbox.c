@@ -167,7 +167,9 @@ int main(int argc, char **argv)
 	render_shutdown();
 	timer_shutdown();
     }
-	  
+
+    /* reset focus to root before exiting */
+    XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);
     XCloseDisplay(ob_display);
 
     dispatch_shutdown();

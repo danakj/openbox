@@ -1,3 +1,6 @@
+:
+	* Closed bug #875 (RaiseLower fails to funtion on windows with dialogs)
+
 3.0-beta6:
 	* Added _OB_WM_STATE_UNDECORATED hint, which can be read and controlled
 	  by external applications

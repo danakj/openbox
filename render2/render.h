@@ -183,6 +183,8 @@ void RrTextureSetText(struct RrSurface *sur,
                       struct RrFont *font,
                       enum RrLayout layout,
                       const char *text);
+void RrTextureSetNone(struct RrSurface *sur,
+                      int texnum);
 
 /* drawing */
 

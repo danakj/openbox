@@ -56,3 +56,12 @@ void RrTextureSetText(struct RrSurface *sur,
     tex->data.text.string = malloc(l);
     memcpy(tex->data.text.string, text, l);
 }
+
+void RrTextureSetNone(struct RrSurface *sur,
+                      int texnum)
+{
+    struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
+
+    if (!tex) return;
+    RrTextureFreeContents(tex);
+}

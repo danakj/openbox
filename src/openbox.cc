@@ -148,6 +148,8 @@ Openbox::Openbox(int argc, char **argv)
     python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors
 
   // initialize all the screens
+  _focused_screen = 0;
+
   for (int i = 0, max = ScreenCount(**otk::display); i < max; ++i) {
     Screen *screen;
     if (_single && i != DefaultScreen(**otk::display)) {
@@ -155,13 +157,17 @@ Openbox::Openbox(int argc, char **argv)
       continue;
     }
     screen = new Screen(i);
-    if (screen->managed())
+    if (screen->managed()) {
       _screens.push_back(screen);
-    else {
+      if (!_focused_screen) // set this to the first screen managed
+        _focused_screen = screen;
+    } else {
       delete screen;
       _screens.push_back(0);
     }
   }
+
+  assert(_focused_screen);
 
   if (_screens.empty()) {
     printf(_("No screens were found without a window manager. Exiting.\n"));
@@ -177,7 +183,6 @@ Openbox::Openbox(int argc, char **argv)
   _bindings->grabKeys(true);
 
   // set up input focus
-  _focused_screen = _screens[0];
   setFocusedClient(0);
   
   _state = State_Normal; // done starting

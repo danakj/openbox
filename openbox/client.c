@@ -131,6 +131,9 @@ void client_manage_all()
         c = g_hash_table_lookup(client_map, &w);
         if (c) stacking_lower(c);
     }
+    g_free(client_startup_stack_order);
+    client_startup_stack_order = NULL;
+    client_startup_stack_size = 0;
 }
 
 void client_manage(Window window)

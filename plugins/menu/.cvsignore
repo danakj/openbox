@@ -1,0 +1,6 @@
+.deps
+.libs
+Makefile
+Makefile.in
+timed_menu.la
+timed_menu.lo

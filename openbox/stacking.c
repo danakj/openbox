@@ -110,8 +110,6 @@ void stacking_raise(ObWindow *window)
 {
     g_assert(stacking_list != NULL); /* this would be bad */
 
-    g_message("RAISING");
-
     if (WINDOW_IS_CLIENT(window)) {
         Client *client = WINDOW_AS_CLIENT(window);
 

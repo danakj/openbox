@@ -5,7 +5,7 @@
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | ExposureMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask)
 
@@ -42,15 +42,14 @@ Frame *frame_new()
 
     self = g_new(Frame, 1);
 
-    self->visible = FALSE;
-
     /* create all of the decor windows */
     mask = CWOverrideRedirect | CWEventMask;
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
 
-    self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR, self->window, 0);
+    self->surface = RrSurfaceNew(ob_render_inst, RR_SURFACE_PLANAR,
+                                 self->window, 0);
     RrColorSet(&pri, 1, 0, 0, 0);
     RrColorSet(&sec, 1, 0, 1, 0);
     RrPlanarSet(self->surface, RR_PLANAR_VERTICAL, &pri, &sec);
@@ -135,6 +134,7 @@ Frame *frame_new()
     fd->frame = self;
 
 
+    self->visible = FALSE;
     self->focused = FALSE;
 
     self->max_press = self->close_press = self->desk_press = 
@@ -145,9 +145,11 @@ Frame *frame_new()
 static void frame_free(Frame *self)
 {
     int i;
-    for (i = 0; i < self->framedecors; i++) {
+
+    for (i = 0; i < self->framedecors; i++)
         RrSurfaceFree(self->framedecor[i].surface);
-    }
+    RrSurfaceFree(self->surface);
+    XDestroyWindow(ob_display, self->plate);
     XDestroyWindow(ob_display, self->window);
     g_free(self->framedecor);
     g_free(self);
@@ -157,7 +159,7 @@ void frame_show(Frame *self)
 {
     if (!self->visible) {
 	self->visible = TRUE;
-	XMapWindow(ob_display, self->window);
+        RrSurfaceShow(self->surface);
         XSync(ob_display, FALSE);
     }
 }
@@ -167,7 +169,7 @@ void frame_hide(Frame *self)
     if (self->visible) {
 	self->visible = FALSE;
 	self->client->ignore_unmaps++;
-	XUnmapWindow(ob_display, self->window);
+        RrSurfaceHide(self->surface);
     }
 }
 
@@ -329,17 +331,13 @@ Context frame_context(Client *client, Window win)
     if (client == NULL) return Context_None;
     if (win == client->window) return Context_Client;
 
-    obwin = g_hash_table_lookup(window_map, &win);
-    g_assert(obwin);
-
-    if (client->frame->window == win) {
-g_print("frame context\n");
+    if (client->frame->window == win)
         return Context_Frame;
-    }
     if (client->frame->plate == win)
         return Context_Client;
-g_print("decoration clicked\n");
-    g_assert(WINDOW_IS_DECORATION(obwin));
+
+    obwin = g_hash_table_lookup(window_map, &win);
+    g_assert(obwin && WINDOW_IS_DECORATION(obwin));
     return WINDOW_AS_DECORATION(obwin)->context;
 }
 

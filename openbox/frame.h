@@ -60,14 +60,17 @@ typedef struct FrameDecor {
 } FrameDecor;
 
 typedef struct Frame {
+    /* external stuff */
     Client *client;
 
     Window window;
-    Window plate;
 
     Strut  size;
     Rect   area;
     gboolean visible;
+
+    /* internal stuff */
+    Window plate;
 
     struct RrSurface *surface;
     int framedecors;

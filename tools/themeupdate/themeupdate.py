@@ -59,12 +59,22 @@ def simple_replace(data):
 def remove(data):
     invalid = []
     invalid.append('toolbar')
-    invalid.append('menu.bullet')
-    invalid.append('rootCommand')
-    invalid.append('menu.frame.justify')
     for inv in invalid:
         while 1:
             i, key, nul = find_key(data, inv)
+            if i >= 0:
+                out(key + ' is no longer supported.\nRemove (Y/n)? ')
+                if read_bool():
+                    out('Removing "' + key + '"\n')
+                    data.pop(i)
+            else:
+                break
+    invalid.append('rootCommand')
+    invalid.append('menu.bullet')
+    invalid.append('menu.frame.justify')
+    for inv in invalid:
+        while 1:
+            i, key, nul = find_key(data, inv, True)
             if i >= 0:
                 out(key + ' is no longer supported.\nRemove (Y/n)? ')
                 if read_bool():

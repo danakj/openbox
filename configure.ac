@@ -77,7 +77,7 @@ CXXFLAGS="$CXXFLAGS $DEBUG"
 
 # Check for Python
 AC_ARG_WITH([python],
-	[  --with-python=path       Set location of Python executable],
+	[  --with-python=path      Set location of Python executable],
 	[PYTHON="$withval"],
 	[PYTHON=])
 

@@ -41,6 +41,7 @@ void focus_shutdown()
     for (i = 0; i < screen_num_desktops; ++i)
         g_list_free(focus_order[i]);
     g_free(focus_order);
+    focus_order = NULL;
 
     XDestroyWindow(ob_display, focus_backup);
 

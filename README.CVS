@@ -18,6 +18,10 @@ Do the following to build and install Openbox in CVS:
 % ./configure
 % make all install
 
+When building the SWIG generated wrappers (*_wrap.cc), a huge number of
+compiler warnings will be generated. Don't be phased by this, it doesn't mean
+anything is broken unless you get an actual error.
+
 Don't try running it from the src/ directory without installing, it won't work.
 It needs to be installed before it is run.
 

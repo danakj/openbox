@@ -446,7 +446,7 @@ char *theme_load(char *theme)
     XrmDatabase db = NULL;
     char *loaded = NULL;
     Justify winjust;
-    char *winjust_str;
+    char *str;
     char *winfont_str;
 
     if (theme) {
@@ -468,21 +468,33 @@ char *theme_load(char *theme)
 
     /* load the font stuff */
     winfont_str = "arial-8:bold";
+
     theme_winfont_shadow = FALSE;
-    theme_winfont_shadow_offset = 1;
-    theme_winfont_shadow_tint = 25;
+    if (read_string(db, "window.xft.flags", &str)) {
+        if (g_strrstr(str, "shadow"))
+            theme_winfont_shadow = TRUE;
+        g_free(str);
+    }
+ 
+    if (!read_int(db, "window.xft.shadow.offset",
+                  &theme_winfont_shadow_offset))
+        theme_winfont_shadow_offset = 1;
+    if (!read_int(db, "window.xft.shadow.tint",
+                  &theme_winfont_shadow_tint) ||
+        theme_winfont_shadow_tint < 100 || theme_winfont_shadow_tint > 100)
+        theme_winfont_shadow_tint = 25;
 
     theme_winfont = font_open(winfont_str);
     theme_winfont_height = font_height(theme_winfont, theme_winfont_shadow,
                                       theme_winfont_shadow_offset);
 
     winjust = Justify_Left;
-    if (read_string(db, "window.justify", &winjust_str)) {
-        if (!g_ascii_strcasecmp(winjust_str, "right"))
+    if (read_string(db, "window.justify", &str)) {
+        if (!g_ascii_strcasecmp(str, "right"))
             winjust = Justify_Right;
-        else if (!g_ascii_strcasecmp(winjust_str, "center"))
+        else if (!g_ascii_strcasecmp(str, "center"))
             winjust = Justify_Center;
-        g_free(winjust_str);
+        g_free(str);
     }
 
     /* load the title layout */

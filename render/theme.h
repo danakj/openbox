@@ -20,6 +20,7 @@ struct _RrTheme {
     gint title_height;
     gint button_size;
     gint grip_width;
+    gint menu_overlap;
 
     /* style settings - colors */
     RrColor *b_color;

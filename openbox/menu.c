@@ -11,7 +11,7 @@
 GHashTable *menu_hash = NULL;
 GList *menu_visible = NULL;
 
-#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
+#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
 			 LeaveWindowMask)
 #define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
@@ -473,7 +473,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 	    /* TODO: I don't understand why these bevels should be here.
 	       Something must be wrong in the width calculation */
 	    x = self->parent->location.x + self->parent->size.width + 
-		ob_rr_theme->bwidth;
+		ob_rr_theme->bwidth - ob_rr_theme->menu_overlap;
 
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
@@ -482,7 +482,7 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 
 	    if (self->submenu->size.width + x >= a->x + a->width)
 		x = self->parent->location.x - self->submenu->size.width - 
-		    ob_rr_theme->bwidth;
+		    ob_rr_theme->bwidth + ob_rr_theme->menu_overlap;
 	    
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,

@@ -135,6 +135,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->title_layout = g_strdup(font_str);
 
     /* load direct dimensions */
+    if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
+	theme->menu_overlap < 0 || theme->menu_overlap > 20)
+        theme->handle_height = 0;
     if (!read_int(db, "handleWidth", &theme->handle_height) ||
 	theme->handle_height < 0 || theme->handle_height > 100)
         theme->handle_height = 6;

@@ -4,6 +4,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "kernel/menu.h"
 #include "kernel/event.h"

@@ -1,5 +1,53 @@
 2003-07-31  xor@zed.orodu.net  <xor@zed>
 
+	* configure.ac: alpha3
+
+	* kernel/frame.c: fix a long-lurknig gravity bug
+
+	* tools/obconf/main.c: dont inlcude these headers they arent needed yet
+
+	* ChangeLog: recent changes
+
+	* kernel/openbox.c: oops missed one
+
+	* kernel/openbox.c, kernel/openbox.h: expose exit_with_error
+
+	* plugins/placement/history.c: kill warnings
+
+	* kernel/session.c: kill some output
+
+	* kernel/openbox.c:
+	only load the session from file if a file was provided
+
+	* render/font.c: missing a header
+
+	* README.CVS: remove shit i no longer use
+
+	* parser/parse.c: always return a string from parse_string
+
+	* kernel/client.c:
+	set the desktop hint if the desktop is changed by the session code
+
+	* kernel/client.c:
+	set the desktop hint after everything is read/setup even session stuff
+
+	* kernel/client.c:
+	add the window to the lists before setting the client list hint
+
+	* kernel/session.c:
+	declare functions that are needed when built without session support
+
+	* kernel/session.c:
+	use the new sm_client_id function so all windows who should save state do. session save/load seems to be working with gnome-session rather well.
+
+	* kernel/client.c, kernel/client.h:
+	add a function to retrieve the sm_client_id value
+
+	* plugins/placement/history.c:
+	dont save/load history. its slow and its stupid.
+
+2003-07-31  xor@zed.orodu.net  <xor@zed>
+
 	* kernel/openbox.c: oops missed one
 
 	* kernel/openbox.c, kernel/openbox.h: expose exit_with_error

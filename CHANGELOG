@@ -1,6 +1,10 @@
 Changelog for Openbox:
 
 2.2.4:
+ * Draw window titles in the titlebars and toolbar with (Ben Jansens)
+   UTF encoding when they are set with the NETWM (UTF)
+   hints.
+
  * Fix for NETWM/EWMH compliancy. Fixes bug with        (Ben Jansens)
    iconified windows causing some client apps to 'lock'.
 

@@ -82,6 +82,7 @@ void setup_action_directional_focus_northwest(ObAction *a)
 
 void setup_action_send_to_desktop(ObAction *a)
 {
+    a->data.sendto.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_prev(ObAction *a)
@@ -89,6 +90,7 @@ void setup_action_send_to_desktop_prev(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_WEST;
     a->data.sendtodir.linear = TRUE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_next(ObAction *a)
@@ -96,6 +98,7 @@ void setup_action_send_to_desktop_next(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_EAST;
     a->data.sendtodir.linear = TRUE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_left(ObAction *a)
@@ -103,6 +106,7 @@ void setup_action_send_to_desktop_left(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_WEST;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_right(ObAction *a)
@@ -110,6 +114,7 @@ void setup_action_send_to_desktop_right(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_EAST;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_up(ObAction *a)
@@ -117,6 +122,7 @@ void setup_action_send_to_desktop_up(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_NORTH;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_send_to_desktop_down(ObAction *a)
@@ -124,6 +130,7 @@ void setup_action_send_to_desktop_down(ObAction *a)
     a->data.sendtodir.dir = OB_DIRECTION_SOUTH;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
+    a->data.sendtodir.follow = TRUE;
 }
 
 void setup_action_desktop_prev(ObAction *a)
@@ -718,9 +725,14 @@ ObAction *action_parse(xmlDocPtr doc, xmlNodePtr node)
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode))) {
                     act->data.desktopdir.wrap = parse_bool(doc, n);
                 }
+            } else if (act->func == action_send_to_desktop) {
+                if ((n = parse_find_node("follow", node->xmlChildrenNode)))
+                    act->data.sendto.follow = parse_bool(doc, n);
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
+                if ((n = parse_find_node("follow", node->xmlChildrenNode)))
+                    act->data.sendtodir.follow = parse_bool(doc, n);
             } else if (act->func == action_activate) {
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
@@ -974,8 +986,9 @@ void action_send_to_desktop(union ActionData *data)
 
     if (data->sendto.desk < screen_num_desktops ||
         data->sendto.desk == DESKTOP_ALL) {
-        client_set_desktop(c, data->sendto.desk, TRUE);
-        screen_set_desktop(data->sendto.desk);
+        client_set_desktop(c, data->sendto.desk, data->sendtodir.follow);
+        if (data->sendto.follow)
+            screen_set_desktop(data->sendto.desk);
     }
 }
 
@@ -1006,8 +1019,9 @@ void action_send_to_desktop_dir(union ActionData *data)
     d = screen_cycle_desktop(data->sendtodir.dir, data->sendtodir.wrap,
                              data->sendtodir.linear,
                              data->sendtodir.final, data->sendtodir.cancel);
-    client_set_desktop(c, d, TRUE);
-    screen_set_desktop(d);
+    client_set_desktop(c, d, data->sendtodir.follow);
+    if (data->sendtodir.follow)
+        screen_set_desktop(d);
 }
 
 #if 0

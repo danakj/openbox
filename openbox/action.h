@@ -52,6 +52,7 @@ struct SendToDesktopDirection {
     gboolean linear;
     gboolean final;
     gboolean cancel;
+    gboolean follow;
 };
 
 struct Desktop {

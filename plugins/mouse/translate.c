@@ -5,13 +5,17 @@
 
 static guint translate_modifier(char *str)
 {
-    if (!strcmp("Mod1", str) || !strcmp("A", str)) return Mod1Mask;
-    else if (!strcmp("Mod2", str)) return Mod2Mask;
-    else if (!strcmp("Mod3", str)) return Mod3Mask;
-    else if (!strcmp("Mod4", str) || !strcmp("W", str)) return Mod4Mask;
-    else if (!strcmp("Mod5", str)) return Mod5Mask;
-    else if (!strcmp("Control", str) || !strcmp("C", str)) return ControlMask;
-    else if (!strcmp("Shift", str) || !strcmp("S", str)) return ShiftMask;
+    if (!g_ascii_strcasecmp("Mod1", str) ||
+        !g_ascii_strcasecmp("A", str)) return Mod1Mask;
+    else if (!g_ascii_strcasecmp("Mod2", str)) return Mod2Mask;
+    else if (!g_ascii_strcasecmp("Mod3", str)) return Mod3Mask;
+    else if (!g_ascii_strcasecmp("Mod4", str) ||
+             !g_ascii_strcasecmp("W", str)) return Mod4Mask;
+    else if (!g_ascii_strcasecmp("Mod5", str)) return Mod5Mask;
+    else if (!g_ascii_strcasecmp("Control", str) ||
+             !g_ascii_strcasecmp("C", str)) return ControlMask;
+    else if (!g_ascii_strcasecmp("Shift", str) ||
+             !g_ascii_strcasecmp("S", str)) return ShiftMask;
     g_warning("Invalid modifier '%s' in binding.", str);
     return 0;
 }
@@ -41,7 +45,12 @@ gboolean translate_button(char *str, guint *state, guint *button)
     }
 
     /* figure out the button */
-    *button = atoi(l);
+    if (!g_ascii_strcasecmp("Left", l)) *button = 1;
+    else if (!g_ascii_strcasecmp("Middle", l)) *button = 2;
+    else if (!g_ascii_strcasecmp("Right", l)) *button = 3;
+    else if (!g_ascii_strcasecmp("Up", l)) *button = 4;
+    else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
+    else *button = atoi(l);
     if (!*button) {
 	g_warning("Invalid button '%s' in pointer binding.", l);
 	goto translation_fail;

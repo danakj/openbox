@@ -7,6 +7,7 @@
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define ELIPSES "..."
 #define ELIPSES_LENGTH(font) \

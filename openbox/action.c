@@ -1308,8 +1308,8 @@ void action_toggle_decorations(union ActionData *data)
 
 static guint32 pick_corner(int x, int y, int cx, int cy, int cw, int ch)
 {
-    if (x - cx > cw / 3 * 2) {
-        if (y - cy > ch / 3 * 2)
+    if ((cw / 3 < 1) || (x - cx > cw / 3 * 2)) {
+        if ((ch / 3 < 1) || (y - cy > ch / 3 * 2))
             return prop_atoms.net_wm_moveresize_size_bottomright;
         else if (y - cy < ch / 3)
             return prop_atoms.net_wm_moveresize_size_topright;

@@ -100,10 +100,10 @@ void RrPaint(struct RrSurface *sur)
         break;
     }
 
-    glPopMatrix();
-
     for (i = 0; i < sur->ntextures; ++i)
         RrTexturePaint(sur, &sur->texture[i]);
+
+    glPopMatrix();
 
     glXSwapBuffers(RrDisplay(inst), RrSurfaceWindow(sur));
 }

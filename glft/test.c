@@ -81,16 +81,10 @@ int main(int argc, char **argv)
     delete_win = XInternAtom(display, "WM_DELETE_WINDOW", False);
     protocols = XInternAtom(display, "WM_PROTOCOLS", False);
     XSetWMProtocols(display, win, &delete_win, 1);
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-    glColor3f(0.0, 0.0, 0.0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, W, -100, H+100, 0, 10);
     glMatrixMode(GL_MODELVIEW);
-    glEnable(GL_LINE_SMOOTH);
-    glLineWidth(0.5);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     quit = 0;
     while (!quit) {
         XNextEvent(display, &report);

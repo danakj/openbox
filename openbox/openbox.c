@@ -521,6 +521,8 @@ static void parse_args(int argc, char **argv)
         } else if (!strcmp(argv[i], "--help")) {
             print_help();
             exit(0);
+        } else if (!strcmp(argv[i], "--g-fatal-warnings")) {
+            g_log_set_always_fatal(G_LOG_LEVEL_CRITICAL);
         } else if (!strcmp(argv[i], "--sync")) {
             xsync = TRUE;
 #ifdef USE_SM

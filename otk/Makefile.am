@@ -14,7 +14,7 @@ MAINTAINERCLEANFILES= Makefile.in
 distclean-local:
 	rm -f *\~ *.orig *.rej .\#*
 
-otk_test: libotk.a
+otk_test: libotk.a otk_test.cc
 	$(CXX) $(CPPFLAGS) -DHAVE_CONFIG_H -I. -I. -I.. -I../src $(XFT_CFLAGS) -Wall -W -pedantic -DNDEBUG -g -O2 -o otk_test otk_test.cc $(XFT_LIBS) ./libotk.a 
 
 # local dependencies

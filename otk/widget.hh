@@ -88,6 +88,10 @@ public:
   void setStretchableVert(bool s_vert = true)  { _stretchable_vert = s_vert; }
 
   inline Cursor getCursor(void) const { return _cursor; }
+  void setCursor(Cursor cursor) {
+    _cursor = cursor;
+    XDefineCursor(OBDisplay::display, _window, _cursor);
+  }
 
   inline int getBevelWidth(void) const { return _bevel_width; }
   void setBevelWidth(int bevel_width)

@@ -51,6 +51,9 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _grip_right.unmanaged();
   _plate.unmanaged();
 
+  _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
+  _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
+  
   _plate.show();
 
   _button_close.setText("X");

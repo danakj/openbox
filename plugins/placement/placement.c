@@ -49,15 +49,14 @@ static void place_random(Client *c)
 static void event(ObEvent *e, void *foo)
 {
     ConfigValue remember;
-    gboolean r;
 
     g_assert(e->type == Event_Client_New);
 
     /* requested a position */
     if (e->data.c.client->positioned) return;
 
-    r = config_get("placement.remember", Config_Bool, &remember);
-    g_assert(r);
+    if (!config_get("placement.remember", Config_Bool, &remember))
+        g_assert_not_reached();
 
     if (!remember.bool || !place_history(e->data.c.client))
         place_random(e->data.c.client);

@@ -118,14 +118,14 @@ static void focus_desktop()
 static void event(ObEvent *e, void *foo)
 {
     ConfigValue follow_mouse, focus_new;
-    gboolean r;
     
-    r = config_get("focus.followMouse", Config_Bool, &follow_mouse);
-    g_assert(r);
+    if (!config_get("focus.followMouse", Config_Bool, &follow_mouse))
+        g_assert_not_reached();
 
     switch (e->type) {
     case Event_Client_Mapped:
-        r = config_get("focus.focusNew", Config_Bool, &focus_new);
+        if (!config_get("focus.focusNew", Config_Bool, &focus_new))
+            g_assert_not_reached();
         if (focus_new.bool && client_normal(e->data.c.client))
             client_focus(e->data.c.client);
         break;

@@ -412,6 +412,12 @@ void BScreen::saveWindowToWindowSnap(bool s) {
 }
 
 
+void BScreen::saveResizeZones(unsigned int z) {
+  resource.resize_zones = z;
+  config->setValue(screenstr + "resizeZones", resource.resize_zones);
+}
+
+
 void BScreen::saveWindowCornerSnap(bool s) {
   resource.window_corner_snap = s;
   config->setValue(screenstr + "windowCornerSnap",
@@ -505,6 +511,7 @@ void BScreen::save_rc(void) {
   saveAutoRaise(resource.auto_raise);
   saveImageDither(doImageDither());
   saveAAFonts(resource.aa_fonts);
+  saveResizeZones(resource.resize_zones);
   saveOpaqueMove(resource.opaque_move);
   saveFullMax(resource.full_max);
   saveFocusNew(resource.focus_new);
@@ -550,6 +557,11 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;
+
+  if (! config->getValue(screenstr + "resizeZones", resource.resize_zones) ||
+      (resource.resize_zones != 1 && resource.resize_zones != 2 &&
+       resource.resize_zones != 4))
+      resource.resize_zones = 4;
 
   if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
     resource.hide_toolbar = false;

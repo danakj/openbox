@@ -252,8 +252,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
       client.normal_hint_flags & (PPosition|USPosition)) {
     applyGravity(frame.rect);
 
-    if (blackbox->isStartup() ||
-        client.rect.intersects(screen->availableArea()))
+    if (blackbox->isStartup() || client.rect.intersects(screen->getRect()))
       place_window = False;
   }
 
@@ -816,7 +815,9 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
 
 
 void BlackboxWindow::reconfigure(void) {
+  restoreGravity(client.rect);
   upsize();
+  applyGravity(frame.rect);
   positionWindows();
   decorate();
   redrawWindowFrame();
@@ -845,8 +846,7 @@ void BlackboxWindow::grabButtons(void) {
   if (functions & Func_Resize)
     blackbox->grabButton(Button3, Mod1Mask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-                         GrabModeAsync, frame.window,
-                         blackbox->getLowerRightAngleCursor());
+                         GrabModeAsync, frame.window, None);
   // alt+middle lowers the window
   blackbox->grabButton(Button2, Mod1Mask, frame.window, True,
                        ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
@@ -2759,7 +2759,7 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
       if (frame.title == be->window || frame.label == be->window) {
         if (((be->time - lastButtonPressTime) <=
              blackbox->getDoubleClickInterval()) ||
-            (be->state & ControlMask)) {
+            (be->state == ControlMask)) {
           lastButtonPressTime = 0;
           shade();
         } else {
@@ -3270,19 +3270,36 @@ void BlackboxWindow::motionNotifyEvent(const XMotionEvent *me) {
   } else if (flags.resizing) {
     doResize(me->x_root, me->y_root);
   } else {
-    if (! flags.resizing && (me->state & Button1Mask) &&
-        (functions & Func_Move) &&
+    if (!flags.resizing && me->state & Button1Mask && (functions & Func_Move) &&
         (frame.title == me->window || frame.label == me->window ||
          frame.handle == me->window || frame.window == me->window)) {
       beginMove(me->x_root, me->y_root);
     } else if ((functions & Func_Resize) &&
-               (((me->state & Button1Mask) &&
-                 (me->window == frame.right_grip ||
-                  me->window == frame.left_grip)) ||
-                (me->state & (Mod1Mask | Button3Mask) &&
-                 me->window == frame.window))) {
-      beginResize(me->x_root, me->y_root,
-                  (me->window == frame.left_grip) ? BottomLeft : BottomRight);
+               (me->state & Button1Mask && (me->window == frame.right_grip ||
+                                            me->window == frame.left_grip)) ||
+               (me->state & Button3Mask && me->state & Mod1Mask &&
+                me->window == frame.window)) {
+      unsigned int zones = screen->getResizeZones();
+      Corner corner;
+      
+      if (me->window == frame.left_grip) {
+        corner = BottomLeft;
+      } else if (me->window == frame.right_grip || zones == 1) {
+        corner = BottomRight;
+      } else {
+        bool top;
+        bool left = (me->x_root - frame.rect.x() <=
+                     static_cast<signed>(frame.rect.width() / 2));
+        if (zones == 2)
+          top = False;
+        else // (zones == 4)
+          top = (me->y_root - frame.rect.y() <=
+                 static_cast<signed>(frame.rect.height() / 2));
+        corner = (top ? (left ? TopLeft : TopRight) :
+                        (left ? BottomLeft : BottomRight));
+      }
+
+      beginResize(me->x_root, me->y_root, corner);
     }
   }
 }

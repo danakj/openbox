@@ -156,7 +156,8 @@ private:
     int toolbar_placement, toolbar_width_percent, placement_policy,
       edge_snap_threshold, row_direction, col_direction;
 
-    unsigned int handle_width, bevel_width, frame_width, border_width;
+    unsigned int handle_width, bevel_width, frame_width, border_width,
+      resize_zones;
 
 #ifdef    HAVE_STRFTIME
     std::string strftime_format;
@@ -241,6 +242,8 @@ public:
   { return resource.frame_width; }
   inline unsigned int getBorderWidth(void) const
   { return resource.border_width; }
+  inline unsigned int getResizeZones(void) const
+  { return resource.resize_zones; }
 
   inline unsigned int getCurrentWorkspaceID(void)
   { return current_workspace->getID(); }
@@ -276,6 +279,7 @@ public:
   void saveHideToolbar(bool h);
   void saveWindowToWindowSnap(bool s);
   void saveWindowCornerSnap(bool s);
+  void saveResizeZones(unsigned int z);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

@@ -383,15 +383,16 @@ void Openbox::process_event(XEvent *e) {
 	      screen->getRootmenu()->show();
 	    }
           } else if (e->xbutton.button == 4) {
-            if ((screen->getCurrentWorkspaceID()-1)<0)
-              screen->changeWorkspaceID(screen->getWorkspaceCount()-1);
-            else
-              screen->changeWorkspaceID(screen->getCurrentWorkspaceID()-1);
-          } else if (e->xbutton.button == 5) {
-            if ((screen->getCurrentWorkspaceID()+1)>screen->getWorkspaceCount()-1)
+            if ((screen->getCurrentWorkspaceID() + 1) >
+                screen->getWorkspaceCount() - 1)
               screen->changeWorkspaceID(0);
             else
-              screen->changeWorkspaceID(screen->getCurrentWorkspaceID()+1);
+              screen->changeWorkspaceID(screen->getCurrentWorkspaceID() + 1);
+          } else if (e->xbutton.button == 5) {
+            if ((screen->getCurrentWorkspaceID() - 1) < 0)
+              screen->changeWorkspaceID(screen->getWorkspaceCount() - 1);
+            else
+              screen->changeWorkspaceID(screen->getCurrentWorkspaceID() - 1);
           }
         }
       }

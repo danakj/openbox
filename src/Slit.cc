@@ -800,6 +800,7 @@ void Slitmenu::Directionmenu::setValues() {
 
 void Slitmenu::Directionmenu::reconfigure() {
   setValues();
+  Basemenu::reconfigure();
 }
 
 

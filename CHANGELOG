@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 1.2.0:
+ * fix for slit menu not using the correct style when
+   the style changed.                                   (Ben Jansens)
+
  * changed the menu from an rcfile option to a command-
    line option. use 'openbox -menu <file>' to select an
    alternate menu. The default menu used is

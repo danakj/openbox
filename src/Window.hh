@@ -331,6 +331,7 @@ public:
   void remaximize(void);
   void shade(void);
   void stick(void);
+  void unstick(void);
   void reconfigure(void);
   void updateFocusModel(void);
   void installColormap(bool install);

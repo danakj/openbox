@@ -254,11 +254,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
               frame.rect.width(), frame.rect.height());
   }
 
-  // get sticky state from our parent window if we've got one
-  if (isTransient() && client.transient_for != (BlackboxWindow *) ~0ul &&
-      client.transient_for->isStuck() != flags.stuck)
-    stick();
-
   if (flags.shaded) {
     flags.shaded = False;
     shade();
@@ -1614,9 +1609,6 @@ void BlackboxWindow::shade(void) {
 }
 
 
-/*
- * (Un)Sticks a window and its relatives.
- */
 void BlackboxWindow::stick(void) {
   if (flags.stuck) {
     blackbox_attrib.flags ^= AttribOmnipresent;
@@ -1636,16 +1628,6 @@ void BlackboxWindow::stick(void) {
 
     setState(current_state);
   }
-  // go up the chain
-  if (isTransient() && client.transient_for != (BlackboxWindow *) ~0ul &&
-      client.transient_for->isStuck() != flags.stuck)
-    client.transient_for->stick();
-  // go down the chain
-  BlackboxWindowList::iterator it;
-  const BlackboxWindowList::iterator end = client.transientList.end();
-  for (it = client.transientList.begin(); it != end; ++it)
-    if ((*it)->isStuck() != flags.stuck)
-      (*it)->stick();
 }
 
 

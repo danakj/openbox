@@ -31,7 +31,7 @@ void python_init(char *argv0)
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
 //  PyRun_SimpleString("from _otk import *; from _openbox import *;");
-  PyRun_SimpleString("from openbox import *;");
+  PyRun_SimpleString("from otk import *; from openbox import *;");
   PyRun_SimpleString("openbox = Openbox_instance()");
   PyRun_SimpleString("display = OBDisplay_display()");
 

@@ -7,33 +7,7 @@
 #  include "../config.h"
 #endif
 
-#include "application.hh"
-#include "appwidget.hh"
-#include "assassin.hh"
-#include "button.hh"
-#include "color.hh"
-#include "configuration.hh"
-#include "display.hh"
-#include "eventdispatcher.hh"
-#include "eventhandler.hh"
-#include "focuslabel.hh"
-#include "focuswidget.hh"
-#include "font.hh"
-#include "gccache.hh"
-#include "image.hh"
-#include "label.hh"
-#include "point.hh"
-#include "property.hh"
-#include "rect.hh"
-#include "screeninfo.hh"
-#include "strut.hh"
-#include "style.hh"
-#include "texture.hh"
-#include "timer.hh"
-#include "timerqueue.hh"
-#include "timerqueuemanager.hh"
-#include "util.hh"
-#include "widget.hh"
+#include "otk.hh"
 %}
 
 %include "stl.i"
@@ -104,6 +78,7 @@ namespace otk {
 %include "timerqueue.hh"
 %include "timerqueuemanager.hh"
 %include "util.hh"
+%include "widget.hh"
 
 // for Mod1Mask etc
 %include "X11/X.h"

@@ -20,7 +20,7 @@ def state_shaded(data, add=2):
     """Toggles, adds or removes the 'shaded' state on a window."""
     if not data.client: return
     send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
-                    OBProperty.net_wm_state, data.client,window(), add,
+                    OBProperty.net_wm_state, data.client.window(), add,
                     openbox.property().atom(OBProperty.net_wm_state_shaded))
     
 def close(data):

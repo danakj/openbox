@@ -13,7 +13,7 @@
 #include "bindings.hh"
 #include "actions.hh"
 #include "python.hh"
-#include "otk/display.hh"
+#include "otk/otk.hh"
 %}
 
 %include "stl.i"
@@ -107,7 +107,7 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
-%include "../otk/otk.i"
+%import "../otk/otk.i"
 
 %import "widgetbase.hh"
 %import "actions.hh"

@@ -1442,9 +1442,11 @@ void BlackboxWindow::maximize(unsigned int button) {
     blackbox_attrib.flags &= ! (AttribMaxHoriz | AttribMaxVert);
     blackbox_attrib.attrib &= ! (AttribMaxHoriz | AttribMaxVert);
 
-    // when a resize is begun, maximize(0) is called to clear any maximization
-    // flags currently set.  Otherwise it still thinks it is maximized.
-    // so we do not need to call configure() because resizing will handle it
+    /*
+      when a resize is begun, maximize(0) is called to clear any maximization
+      flags currently set.  Otherwise it still thinks it is maximized.
+      so we do not need to call configure() because resizing will handle it
+    */
     if (!flags.resizing)
       configure(blackbox_attrib.premax_x, blackbox_attrib.premax_y,
                 blackbox_attrib.premax_w, blackbox_attrib.premax_h);
@@ -1499,7 +1501,8 @@ void BlackboxWindow::maximize(unsigned int button) {
 
   configure(frame.changing.x(), frame.changing.y(),
             frame.changing.width(), frame.changing.height());
-  screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
+  if (flags.focused)
+    screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
   redrawAllButtons();
   setState(current_state);
 }
@@ -2640,8 +2643,10 @@ void BlackboxWindow::restore(bool remap) {
   XSetWindowBorderWidth(blackbox->getXDisplay(), client.window, client.old_bw);
 
   XEvent ev;
-  if (! XCheckTypedWindowEvent(blackbox->getXDisplay(), client.window,
-                               ReparentNotify, &ev)) {
+  if (XCheckTypedWindowEvent(blackbox->getXDisplay(), client.window,
+                             ReparentNotify, &ev)) {
+    remap = True;
+  } else {
     // according to the ICCCM - if the client doesn't reparent to
     // root, then we have to do it for them
     XReparentWindow(blackbox->getXDisplay(), client.window,

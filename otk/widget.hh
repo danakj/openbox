@@ -52,7 +52,7 @@ public:
   inline bool visible() const { return _visible; }
 
   virtual void update();
-  virtual void refresh() { _dirty = true; render(); }
+  virtual void refresh() { if (_visible) { _dirty = true; render(); } }
   
   virtual void setBevel(int b);
   inline int bevel() const { return _bevel; }

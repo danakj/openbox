@@ -86,11 +86,9 @@ void Widget::show(bool children)
     }
   }
   if (!_visible) {
-    _visible = true;
     if (_parent) _parent->calcDefaultSizes();
-    else {
-      resize(_area.size());
-    }
+    else resize(_area.size()); // constrain sizes
+    _visible = true;
     XMapWindow(**display, _window);
     update();
   }
@@ -133,14 +131,15 @@ void Widget::moveresize(const Rect &r)
   w = std::max(std::min(r.width(), maxSize().width()), minSize().width());
   h = std::max(std::min(r.height(), maxSize().height()), minSize().height());
 
-  if (r.x() == area().x() && r.y() == area().y() &&
-      w == area().width() && h == area().height()) {
+  bool sizechange = !(w == area().width() && h == area().height());
+
+  if (r.x() == area().x() && r.y() == area().y() && !sizechange)
     return; // no change, don't cause a big layout chain to occur!
-  }
   
   internal_moveresize(r.x(), r.y(), w, h);
 
-  update();
+  if (sizechange)
+    update();
 }
 
 void Widget::internal_moveresize(int x, int y, int w, int h)
@@ -297,13 +296,10 @@ void Widget::layoutHorz()
   std::list<Widget*>::iterator it, end;
 
   // work with just the visible children
-  std::list<Widget*> visible = _children;
-  for (it = visible.begin(), end = visible.end(); it != end;) {
-    std::list<Widget*>::iterator next = it; ++next;
-    if (!(*it)->visible())
-      visible.erase(it);
-    it = next;
-  }
+  std::list<Widget*> visible;
+  for (it = _children.begin(), end = _children.end(); it != end; ++it)
+    if ((*it)->visible())
+      visible.push_back(*it);
 
   if (visible.empty()) return;
 
@@ -317,16 +313,14 @@ void Widget::layoutHorz()
   if (free < 0) free = 0;
   int each;
   
-  std::list<Widget*> adjustable = visible;
+  std::list<Widget*> adjustable;
 
   // find the 'free' space, and how many children will be using it
-  for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
-    std::list<Widget*>::iterator next = it; ++next;
+  for (it = visible.begin(), end = visible.end(); it != end; ++it) {
     free -= (*it)->minSize().width();
     if (free < 0) free = 0;
-    if ((*it)->maxSize().width() - (*it)->minSize().width() <= 0)
-      adjustable.erase(it);
-    it = next;
+    if ((*it)->maxSize().width() - (*it)->minSize().width() > 0)
+      adjustable.push_back(*it);
   }
   // some widgets may have max widths that restrict them, find the 'true'
   // amount of free space after these widgets are not included
@@ -393,13 +387,10 @@ void Widget::layoutVert()
   std::list<Widget*>::iterator it, end;
 
   // work with just the visible children
-  std::list<Widget*> visible = _children;
-  for (it = visible.begin(), end = visible.end(); it != end;) {
-    std::list<Widget*>::iterator next = it; ++next;
-    if (!(*it)->visible())
-      visible.erase(it);
-    it = next;
-  }
+  std::list<Widget*> visible;
+  for (it = _children.begin(), end = _children.end(); it != end; ++it)
+    if ((*it)->visible())
+      visible.push_back(*it);
 
   if (visible.empty()) return;
 
@@ -413,16 +404,14 @@ void Widget::layoutVert()
   if (free < 0) free = 0;
   int each;
 
-  std::list<Widget*> adjustable = visible;
+  std::list<Widget*> adjustable;
 
   // find the 'free' space, and how many children will be using it
-  for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
-    std::list<Widget*>::iterator next = it; ++next;
+  for (it = visible.begin(), end = visible.end(); it != end; ++it) {
     free -= (*it)->minSize().height();
     if (free < 0) free = 0;
-    if ((*it)->maxSize().height() - (*it)->minSize().height() <= 0)
-      adjustable.erase(it);
-    it = next;
+    if ((*it)->maxSize().height() - (*it)->minSize().height() > 0)
+      adjustable.push_back(*it);
   }
   // some widgets may have max heights that restrict them, find the 'true'
   // amount of free space after these widgets are not included
@@ -446,7 +435,7 @@ void Widget::layoutVert()
 
   // place/size the widgets
   if (!adjustable.empty())
-  each = free / adjustable.size();
+    each = free / adjustable.size();
   else
     each = 0;
   for (it = visible.begin(), end = visible.end(); it != end; ++it) {
@@ -541,7 +530,7 @@ void Widget::configureHandler(const XConfigureEvent &e)
   } else {
     // only interested in these for top level windows
     if (_parent) return;
-    
+
     XEvent ev;
     ev.xconfigure.width = e.width;
     ev.xconfigure.height = e.height;

@@ -153,7 +153,7 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   windowmenu = 0;
 
   /*
-    get the initial size and location of client window (relative to the
+    set the initial size and location of client window (relative to the
     _root window_). This position is the reference point used with the
     window's gravity to find the window's initial position.
   */
@@ -2719,12 +2719,13 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
     // determine if this is a transient window
     getTransientInfo();
 
+    if (flags.stuck != s) stick();
+
     // adjust the window decorations based on transience
     if (isTransient()) {
       functions &= ~Func_Maximize;
       setAllowedActions();
       setupDecor();
-//      if (flags.stuck != s) stick();
     }
 
     reconfigure();

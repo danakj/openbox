@@ -74,7 +74,7 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   // run the PRESS python hook
   WidgetBase *w = dynamic_cast<WidgetBase*>
     (openbox->findHandler(e.window));
-  assert(w); // everything should be a widget
+  if (!w) return;
 
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
@@ -113,7 +113,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   
   WidgetBase *w = dynamic_cast<WidgetBase*>
     (openbox->findHandler(e.window));
-  assert(w); // everything should be a widget
+  if (!w) return;
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -236,7 +236,7 @@ void Actions::motionHandler(const XMotionEvent &e)
 
   WidgetBase *w = dynamic_cast<WidgetBase*>
     (openbox->findHandler(e.window));
-  assert(w); // everything should be a widget
+  if (!w) return;
 
   // run the MOTION python hook
   // kill off the Button1Mask etc, only want the modifiers

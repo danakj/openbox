@@ -1,5 +1,72 @@
 ChangeLog from Blackbox (this code's previous project):
 
+Changes from 0.62.1 to 0.65.0:
+  - bsetroot now sets _XROOTPMAP_ID, so pseudo transparent apps will be happy
+  - beginnings of a strut implementation.  toolbar and slit are removed from
+    the available screen area if 'full maximize' is not set
+  - handle the odd edge case where a reparent event occurs while the window
+    is unmapped.  XReparentWindow sends an UnmapNotify to the window manager
+    however the window is already unmapped so the window manager never gets
+    the event and the unmapNotify event is where reparentNotify was handled.
+    Added a reparentNotifyEvent handler in the BlackboxWindow class and a new
+    case in the Blackbox class's process_event function.
+  - no more blackbox->grab/ungrab calls everywhere
+  - compression of motion and expose
+  - added a Util.cc file which contains useful functions with no obvious home.
+  - Now we have one function which turns ~/ into /home/user/.  This is now
+    called everywhere this expansion should be done.  Even added this to the
+    resource.menu_file so now the menu file may be specified as
+    ~/blackbox_menu.
+  - added a TimerQueue which is a priority_queue with the ability to release
+    items it contains before they reach the top of the queue.  Also added a
+    TimerQueueManager protocol class which BaseDisplay now inherits from.
+  - BTimer now defaults to NOT recurring.  Most of the timers in blackbox were
+    one shots so I saw little benefit in defaulting to repeating timers.
+  - added emacs local variables that prevent the addition of tabs to each file
+  - update transient handling, should solve issues with apps like acroread.
+    added a getTransientInfo() method of the BlackboxWindow class which
+    handles checking the transient state in X and setting the appropriate
+    variables on the window.  To further attack the infinite loops this
+    function ensures that client.transient != this.
+    The new transient code also allows for one window to have multiple
+    transients so applications like xmms and web browsers are better behaved.
+  - added Taiwan Chinese (zh_TW), Hungarian (hu_HU), Korean (ko_KR),
+    Norwegian (no_NO), Romanian (ro_RO) and Ukrainian (uk_UA) nls files and
+    updated the most of the others.
+  - added French man pages
+  - remove slit and netwm as compile time options
+  - strip much of BaseDisplay's original functionality and move it to the
+    blackbox class.
+  - move code over to the STL
+  - new placeWindow algorithm.  Blows the old one out of the water.  Not only
+    is it faster but it is also cleaner code too (-:  Went from number 5 in
+    the profiling to results to under 30.  Managing of new windows is slowed
+    down by image rendering above all else now.
+    Because of the new code layout, the support is now there for new and
+    different layout options, but this will wait for after 0.65.0.
+  - better window group handling
+  - huge amounts of internal cleanups
+  - even better ICCCM support and focus handling
+  - wmswallow works
+  - fix for clock clipping in the toolbar
+  - better support for non decorated windows and toggling decor
+  - the geometry window shown when moving or resizing a window now handles the
+    parentrelative setting better
+  - improved edge snap support (still no window to window snapping)
+  - changing preferences no longer leads to windows being raised
+  - the window's send to menu disables the current workspace, which is a
+    better UI approach
+  - removed several unused variables and otherwise reduced the memory usage
+    of the objects in Blackbox.  For the record we are about 100k larger than
+    0.62.0 and that is mostly due to the STL.  However for the most part
+    blackbox runs faster and is still one of the leanest window managers out
+    there today.
+  - smart window placement ignores shaded windows now
+  - new option in the Config menu which allows Scroll Lock to disable
+    Blackbox's keybindings.
+  - first the resurrection of the code and now the return of Brad!  Blackbox
+    is only getting better with age.
+
 Changes from 0.62.0 to 0.62.1:
   - the lock modifier code handles user redefined modifiers better
   - check if the locale actually needs multibyte support before using multibyte

@@ -511,7 +511,7 @@ void ob_main_loop_timeout_add(ObMainLoop *loop,
     t->data = data;
     t->destroy = notify;
     t->del_me = FALSE;
-    g_get_current_time(&now);
+    g_get_current_time(&loop->now);
     t->last = t->timeout = loop->now;
     g_time_val_add(&t->timeout, t->delay);
 

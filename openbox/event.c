@@ -226,7 +226,7 @@ void event_process(XEvent *e)
 	if (e->xfocus.detail == NotifyInferior ||
             e->xfocus.detail == NotifyAncestor ||
             e->xfocus.detail > NotifyNonlinearVirtual) return;
-            g_message("FocusIn on %lx", window);*/
+            g_message("FocusIn on %lx", window);
         break;
     case FocusOut:
         g_message("FocusOut on %lx mode %d detail %d", window,

@@ -303,7 +303,7 @@ gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
     guint num;
      
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
-	*ret = g_strdup(raw); /* grab the first string from the list */
+	*ret = g_strndup(raw, num); /* grab the first string from the list */
 	g_free(raw);
 	return TRUE;
     }

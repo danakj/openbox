@@ -967,11 +967,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xclient.data.l[0] & 1 << 10)
                 w = e->xclient.data.l[3];
             else
-                w = client->area.y;
+                w = client->area.width;
             if (e->xclient.data.l[0] & 1 << 11)
                 h = e->xclient.data.l[4];
             else
-                h = client->area.y;
+                h = client->area.height;
             client->gravity = tmpg;
 
             {

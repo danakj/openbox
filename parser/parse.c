@@ -262,20 +262,14 @@ gboolean parse_attr_contains(const char *val, xmlNodePtr node,
 static GSList* split_paths(const gchar *paths)
 {
     GSList *list = NULL;
-    gchar *c, *e, *s;
+    gchar **spl, **it;
 
-    c = g_strdup(paths);
-    s = c;
-    e = c - 1;
-    while ((e = strchr(e + 1, ':'))) {
-        *e = '\0';
-        if (s[0] != '\0')
-            list = g_slist_append(list, g_strdup(s));
-        s = e + 1;
-    }
-    if (s[0] != '\0')
-        list = g_slist_append(list, g_strdup(s));
-    g_free(c);
+    if (!paths)
+        return NULL;
+    spl = g_strsplit(paths, ":", -1);
+    for (it = spl; *it; ++it)
+        list = g_slist_append(list, *it);
+    g_free(spl);
     return list;
 }
 

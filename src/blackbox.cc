@@ -1161,17 +1161,17 @@ void Blackbox::setFocusedWindow(BlackboxWindow *win) {
       if (active_screen) {
         // set input focus to the toolbar of the screen with mouse
         XSetInputFocus(getXDisplay(),
-                       active_screen->getToolbar()->getWindowID(),
+                       active_screen->getRootWindow(),
                        RevertToPointerRoot, CurrentTime);
       } else {
         // set input focus to the toolbar of the first managed screen
         XSetInputFocus(getXDisplay(),
-                       screenList.front()->getToolbar()->getWindowID(),
+                       screenList.front()->getRootWindow(),
                        RevertToPointerRoot, CurrentTime);
       }
     } else {
       // set input focus to the toolbar of the last screen
-      XSetInputFocus(getXDisplay(), old_screen->getToolbar()->getWindowID(),
+      XSetInputFocus(getXDisplay(), old_screen->getRootWindow(),
                      RevertToPointerRoot, CurrentTime);
     }
   }

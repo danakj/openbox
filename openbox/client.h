@@ -263,6 +263,9 @@ gboolean client_normal(ObClient *self);
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
 
+#define client_configure(self, anchor, x, y, w, h, user, final) \
+  client_configure_full(self, anchor, x, y, w, h, user, final, FALSE)
+
 /*! Move and/or resize the window.
   This also maintains things like the client's minsize, and size increments.
   @param anchor The corner to keep in the same position when resizing.
@@ -277,10 +280,13 @@ gboolean client_focused(ObClient *self);
                configuration. e.g. Final should be FALSE if doing an
 	       interactive move/resize, and then be TRUE for the last call
 	       only.
+  @param force_reply Send a ConfigureNotify to the client regardless of if
+                     the position changed.
 */
-void client_configure(ObClient *self, ObCorner anchor,
-                      int x, int y, int w, int h,
-		      gboolean user, gboolean final);
+void client_configure_full(ObClient *self, ObCorner anchor,
+                           int x, int y, int w, int h,
+                           gboolean user, gboolean final,
+                           gboolean force_reply);
 
 void client_reconfigure(ObClient *self);
 

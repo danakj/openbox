@@ -758,14 +758,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	/* if we are iconic (or shaded (fvwm does this)) ignore the event */
 	if (client->iconic || client->shaded) return;
 
-	if (e->xconfigurerequest.value_mask & CWBorderWidth)
-	    client->border_width = e->xconfigurerequest.border_width;
-
 	/* resize, then move, as specified in the EWMH section 7.7 */
 	if (e->xconfigurerequest.value_mask & (CWWidth | CWHeight |
-					       CWX | CWY)) {
+					       CWX | CWY |
+                                               CWBorderWidth)) {
 	    int x, y, w, h;
 	    ObCorner corner;
+
+            if (e->xconfigurerequest.value_mask & CWBorderWidth)
+                client->border_width = e->xconfigurerequest.border_width;
 
 	    x = (e->xconfigurerequest.value_mask & CWX) ?
 		e->xconfigurerequest.x : client->area.x;
@@ -802,7 +803,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
 		corner = OB_CORNER_TOPLEFT;
 	    }
 
-	    client_configure(client, corner, x, y, w, h, FALSE, TRUE);
+	    client_configure_full(client, corner, x, y, w, h, FALSE, TRUE,
+                                  TRUE);
 	}
 
 	if (e->xconfigurerequest.value_mask & CWStackMode) {
@@ -1032,7 +1034,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    client_setup_decor_and_functions(client);
 	}
 	else if (msgtype == prop_atoms.net_wm_strut) {
-            g_message("strut change");
 	    client_update_strut(client);
         }
 	else if (msgtype == prop_atoms.net_wm_icon ||

@@ -249,10 +249,6 @@ void client_manage(Window window)
 
     grab_server(FALSE);
 
-    /* add to client list/map */
-    client_list = g_list_append(client_list, self);
-    g_hash_table_insert(window_map, &self->window, self);
-
     /* update the focus lists */
     focus_order_add_new(self);
 
@@ -322,6 +318,10 @@ void client_manage(Window window)
     client_set_list();
 
     dispatch_client(Event_Client_Mapped, self, 0, 0);
+
+    /* add to client list/map */
+    client_list = g_list_append(client_list, self);
+    g_hash_table_insert(window_map, &self->window, self);
 
     ob_debug("Managed window 0x%lx (%s)\n", window, self->class);
 }
@@ -427,6 +427,7 @@ void client_unmanage(ObClient *self)
 	   unmapping/mapping */
 	PROP_ERASE(self->window, net_wm_desktop);
 	PROP_ERASE(self->window, net_wm_state);
+	PROP_ERASE(self->window, wm_state);
     } else {
 	/* if we're left in an iconic state, the client wont be mapped. this is
 	   bad, since we will no longer be managing the window on restart */
@@ -1346,11 +1347,8 @@ void client_update_strut(ObClient *self)
     if (!PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
 	STRUT_SET(self->strut, 0, 0, 0, 0);
     } else {
-        if (num == 4) {
-            g_message("new strut: %d %d %d %d",
-                      data[0], data[2], data[1], data[3]);
+        if (num == 4)
             STRUT_SET(self->strut, data[0], data[2], data[1], data[3]);
-        }
         else
             STRUT_SET(self->strut, 0, 0, 0, 0);
 	g_free(data);
@@ -1656,9 +1654,10 @@ static void client_apply_startup_state(ObClient *self)
     */
 }
 
-void client_configure(ObClient *self, ObCorner anchor,
-                      int x, int y, int w, int h,
-		      gboolean user, gboolean final)
+void client_configure_full(ObClient *self, ObCorner anchor,
+                           int x, int y, int w, int h,
+                           gboolean user, gboolean final,
+                           gboolean force_reply)
 {
     gboolean moved = FALSE, resized = FALSE;
 
@@ -1850,20 +1849,19 @@ void client_configure(ObClient *self, ObCorner anchor,
         if (moved || resized)
             frame_adjust_area(self->frame, moved, resized);
 
-        /* If you send this and the client hasn't changed you end up with buggy
-           clients (emacs) freaking out, cuz they send back a configure every
-           time they receive this event, which resends them this event... etc.
-        */
-        if ((!user && moved) || (user && final)) {
+        if (force_reply || (!resized && ((!user && moved) || (user && final))))
+        {
             XEvent event;
             event.type = ConfigureNotify;
             event.xconfigure.display = ob_display;
             event.xconfigure.event = self->window;
             event.xconfigure.window = self->window;
-    
+
             /* root window real coords */
-            event.xconfigure.x = self->frame->area.x + self->frame->size.left;
-            event.xconfigure.y = self->frame->area.y + self->frame->size.top;
+            event.xconfigure.x = self->frame->area.x + self->frame->size.left -
+                self->border_width;
+            event.xconfigure.y = self->frame->area.y + self->frame->size.top -
+                self->border_width;
     
             event.xconfigure.width = w;
             event.xconfigure.height = h;

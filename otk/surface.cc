@@ -26,14 +26,23 @@ Surface::Surface(int screen, const Size &size)
 Surface::~Surface()
 {
   destroyObjects();
-  delete [] _pixel_data;
+  freePixelData();
+}
+
+void Surface::freePixelData()
+{
+  if (_pixel_data) {
+    delete [] _pixel_data;
+    _pixel_data = 0;
+  }
 }
 
 void Surface::setPixmap(const RenderColor &color)
 {
+  assert(_pixel_data);
   if (_pixmap == None)
     createObjects();
-
+  
   XFillRectangle(**display, _pixmap, color.gc(), 0, 0,
                  _size.width(), _size.height());
 
@@ -49,6 +58,7 @@ void Surface::setPixmap(const RenderColor &color)
 
 void Surface::setPixmap(XImage *image)
 {
+  assert(_pixel_data);
   assert(image->width == _size.width());
   assert(image->height == _size.height());
   

@@ -227,6 +227,7 @@ static void render(int screen, const otk::Size &size, Window win,
   XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
   XClearWindow(**otk::display, win);
   if (*surface) delete *surface;
+  s->freePixelData();
   *surface = s;
 }
 
@@ -382,6 +383,7 @@ void Frame::renderLabel()
   XSetWindowBackgroundPixmap(**otk::display, _label, s->pixmap());
   XClearWindow(**otk::display, _label);
   if (_label_sur) delete _label_sur;
+  s->freePixelData();
   _label_sur = s;
 }
 

@@ -508,6 +508,7 @@ void Widget::render()
   // delete the old surface *after* its pixmap isn't in use anymore
   if (_surface) delete _surface;
 
+  s->freePixelData(); // done rendering with this surface
   _surface = s;
 
   _dirty = false;

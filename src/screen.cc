@@ -44,8 +44,6 @@ Screen::Screen(int screen)
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
 
-  _showing_desktop = false;
-
   ::running = false;
   XErrorHandler old = XSetErrorHandler(::anotherWMRunning);
   XSelectInput(**otk::display, _info->rootWindow(),
@@ -112,6 +110,12 @@ Screen::Screen(int screen)
   changeNumDesktops(_num_desktops); // set the hint
 
   changeDesktop(0); // set the hint
+
+  // don't start in showing-desktop mode
+  _showing_desktop = false;
+  otk::Property::set(_info->rootWindow(),
+                     otk::Property::atoms.net_showing_desktop,
+                     otk::Property::atoms.cardinal, 0);
 
   // create the window which gets focus when no clients get it
   XSetWindowAttributes attr;

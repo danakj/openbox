@@ -117,7 +117,7 @@ Screen::Screen(int screen)
   // we have a list of desktop names
 
   if (!python_get_long("number_of_desktops", &_num_desktops))
-    _num_desktops = 4;
+    _num_desktops = 1;
   changeNumDesktops(_num_desktops); // set the hint
 
   _desktop = 0;

@@ -179,10 +179,6 @@ void focus_fallback(ObFocusFallbackType type)
     */
     focus_set_client(NULL);
 
-    if (!config_focus_last && config_focus_follow)
-        if (focus_under_pointer())
-            return;
-
     if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
         /* try for transient relations */
         if (old->transient_for) {
@@ -200,6 +196,10 @@ void focus_fallback(ObFocusFallbackType type)
                     return;
             }
         }
+
+    if (!config_focus_last && config_focus_follow)
+        if (focus_under_pointer())
+            return;
 
 #if 0
         /* try for group relations */
@@ -276,7 +276,7 @@ static gboolean valid_focus_target(ObClient *ft)
        focus an iconic window, but we want to be able to, so we just check
        if the focus flags on the window allow it, and its on the current
        desktop */
-    return (ft->transients == NULL && client_normal(ft) &&
+    return (ft == client_focus_target(ft) && client_normal(ft) &&
             ((ft->can_focus || ft->focus_notify) &&
              !ft->skip_taskbar &&
              (ft->desktop == screen_desktop || ft->desktop == DESKTOP_ALL)));
@@ -324,7 +324,6 @@ void focus_cycle(gboolean forward, gboolean linear,
             it = it->prev;
             if (it == NULL) it = g_list_last(list);
         }
-        /*ft = client_focus_target(it->data);*/
         ft = it->data;
         if (valid_focus_target(ft)) {
             if (ft != focus_cycle_target) { /* prevents flicker */

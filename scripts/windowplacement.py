@@ -1,6 +1,10 @@
 ############################################################################
 ### Window placement algorithms, choose one of these and ebind it to the ###
 ### ob.EventAction.PlaceWindow event.                                    ###
+###                                                                      ###
+### Also see historyplacement.py for the history placement module which  ###
+### provides an algorithm that can be used in place of, or alongside     ###
+### these.                                                               ###
 ############################################################################
 
 import otk

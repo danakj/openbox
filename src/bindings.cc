@@ -481,8 +481,6 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
 
 void OBBindings::fireButton(ButtonData *data)
 {
-  printf("but.mods %d.%d\n", data->button, data->state);
-  
   if (data->context == MC_Window) {
     // these are grabbed in Sync mode to allow the press to be normal to the
     // client

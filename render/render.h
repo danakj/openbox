@@ -6,7 +6,6 @@
 #include <X11/Xft/Xft.h>
 #include <glib.h>
 #include "color.h"
-#include "font.h"
 
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
@@ -98,13 +97,18 @@ typedef struct Surface {
     SurfaceData data;
 } Surface;
 
+typedef struct {
+    XftFont *xftfont;
+} ObFont;
+
 typedef struct TextureText {
     ObFont *font;
-    int shadow;
-    int offset;
+    int shadow;  
+    unsigned char tint;
+    unsigned char offset;
     color_rgb *color;
     char *string;
-} TextureText;
+} TextureText;   
 
 typedef struct TextureMask {
     color_rgb *color;

@@ -152,17 +152,26 @@ void dock_configure()
 
     dock->w = dock->h = spot = 0;
 
+    /* get the size */
     for (it = dock->dock_apps; it; it = it->next) {
         struct DockApp *app = it->data;
         if (config_dock_horz) {
             dock->w += app->w;
             dock->h = MAX(dock->h, app->h);
+        } else {
+            dock->w = MAX(dock->w, app->w);
+            dock->h += app->h;
+        }
+    }
+
+    /* position the apps */
+    for (it = dock->dock_apps; it; it = it->next) {
+        struct DockApp *app = it->data;
+        if (config_dock_horz) {
             app->x = spot;
             app->y = (dock->h - app->h) / 2;
             spot += app->w;
         } else {
-            dock->w = MAX(dock->w, app->w);
-            dock->h += app->h;
             app->x = (dock->w - app->w) / 2;
             app->y = spot;
             spot += app->h;

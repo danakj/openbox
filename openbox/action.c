@@ -1,4 +1,5 @@
 #include "client.h"
+#include "focus.h"
 #include "stacking.h"
 #include "frame.h"
 #include "screen.h"
@@ -666,9 +667,16 @@ void action_showmenu(union ActionData *data)
 void action_cycle_windows(union ActionData *data)
 {
     if (data->cycle.linear) {
-        if (!data->cycle.final) {
+        static Client *first = NULL;
+        static Client *t = NULL;
+
+        if (data->cycle.cancel) {
+            if (first) client_focus(first);
+        } else if (!data->cycle.final) {
             GList *it, *start;
 
+            t = NULL;
+            first = focus_client;
             start = it = g_list_find(client_list, data->cycle.c);
             do {
                 if (data->cycle.forward) {
@@ -678,9 +686,13 @@ void action_cycle_windows(union ActionData *data)
                     it = it->prev;
                     if (it == NULL) it = g_list_last(client_list);
                 }
-                if (client_focus(it->data))
+                if (client_focus(it->data)) {
+                    t = it->data;
                     break;
+                }
             } while (it != start);
+        } else {
+            if (t) stacking_raise(t);
         }
     } else {
     }

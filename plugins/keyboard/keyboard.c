@@ -19,7 +19,7 @@ void plugin_setup_config()
 KeyBindingTree *firstnode = NULL;
 
 static KeyBindingTree *curpos;
-static guint reset_key, reset_state;
+static guint reset_key, reset_state, button_return, button_escape;
 static gboolean grabbed;
 
 static void grab_keys(gboolean grab)
@@ -90,17 +90,31 @@ static void event(ObEvent *e, void *foo)
 {
     static KeyBindingTree *grabbed_key = NULL;
 
-    if (e->type == Event_X_KeyRelease) {
-        if (grabbed_key) {
-            if (!(grabbed_key->state & e->data.x.e->xkey.state)) {
-                grabbed_key->action->data.cycle.final = TRUE;
-                grabbed_key->action->func(&grabbed_key->action->data);
-                grab_keyboard(FALSE);
-                grabbed_key = FALSE;
+    if (grabbed_key) {
+        gboolean done = FALSE;
+
+        if ((e->type == Event_X_KeyRelease && 
+             !(grabbed_key->state & e->data.x.e->xkey.state)))
+            done = TRUE;
+        else if (e->type == Event_X_KeyPress) {
+            if (e->data.x.e->xkey.keycode == button_return)
+                done = TRUE;
+            else if (e->data.x.e->xkey.keycode == button_escape) {
+                grabbed_key->action->data.cycle.cancel = TRUE;
+                done = TRUE;
             }
         }
-        return;
+        if (done) {
+            grabbed_key->action->data.cycle.final = TRUE;
+            grabbed_key->action->func(&grabbed_key->action->data);
+            grab_keyboard(FALSE);
+            grabbed_key = NULL;
+            reset_chains();
+            return; 
+        }
     }
+    if (e->type == Event_X_KeyRelease)
+        return;
 
     if (e->data.x.e->xkey.keycode == reset_key &&
         e->data.x.e->xkey.state == reset_state) {
@@ -130,12 +144,15 @@ static void event(ObEvent *e, void *foo)
                         g_assert(!(p->action->func == action_move ||
                                    p->action->func == action_resize));
 
-                        if (p->action->func == action_cycle_windows)
+                        if (p->action->func == action_cycle_windows) {
                             p->action->data.cycle.final = FALSE;
+                            p->action->data.cycle.cancel = FALSE;
+                        }
 
                         p->action->func(&p->action->data);
 
-                        if (p->action->func == action_cycle_windows) {
+                        if (p->action->func == action_cycle_windows &&
+                            !grabbed_key) {
                             grab_keyboard(TRUE);
                             grabbed_key = p;
                         }
@@ -152,12 +169,16 @@ static void event(ObEvent *e, void *foo)
 
 void plugin_startup()
 {
+    guint i;
+
     curpos = NULL;
     grabbed = FALSE;
 
     dispatch_register(Event_X_KeyPress | Event_X_KeyRelease, (EventHandler)event, NULL);
 
     translate_key("C-g", &reset_state, &reset_key);
+    translate_key("Escape", &i, &button_escape);
+    translate_key("Return", &i, &button_return);
 }
 
 void plugin_shutdown()

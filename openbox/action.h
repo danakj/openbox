@@ -73,6 +73,7 @@ struct CycleWindows {
     gboolean linear;
     gboolean forward;
     gboolean final;
+    gboolean cancel;
 };
 
 union ActionData {

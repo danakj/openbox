@@ -572,21 +572,23 @@ void Workspace::placeWindow(OpenboxWindow *win) {
           slit->placement() == Slit::TopRight)) ||
         slit->placement() == Slit::TopCenter) {
       // exclude top
-      if (tbartop)
-        space.setH(space.h() - slit_y);
-      else
+      if (tbartop && slit_y + slit->area().h() < tbarh) {
+        space.setY(space.y() + tbarh);
         space.setH(space.h() - tbarh);
-      space.setY(space.y() + slit_y + slit->area().h() +
-                 screen.getBorderWidth() * 2);
-      space.setH(space.h() - (slit_y + slit->area().h() +
-                              screen.getBorderWidth() * 2));
+      } else {
+        space.setY(space.y() + (slit_y + slit->area().h() +
+                                screen.getBorderWidth() * 2));
+        space.setH(space.h() - (slit_y + slit->area().h() +
+                                screen.getBorderWidth() * 2));
+        if (!tbartop)
+          space.setH(space.h() - tbarh);
+      }
     } else if ((slit->direction() == Slit::Vertical &&
               (slit->placement() == Slit::TopRight ||
                slit->placement() == Slit::BottomRight)) ||
              slit->placement() == Slit::CenterRight) {
       // exclude right
-      space.setW(space.w() - (screen.size().w() - slit_x +
-                              screen.getBorderWidth() * 2));
+      space.setW(space.w() - (screen.size().w() - slit_x));
       if (tbartop)
         space.setY(space.y() + tbarh);
       space.setH(space.h() - tbarh);
@@ -595,8 +597,15 @@ void Workspace::placeWindow(OpenboxWindow *win) {
                slit->placement() == Slit::BottomRight)) ||
              slit->placement() == Slit::BottomCenter) {
       // exclude bottom
-      space.setH(space.h() - ((screen.size().h() - slit_y) > tbarh ?
-                              screen.size().h() - slit_y : tbarh));
+      if (!tbartop && (screen.size().h() - slit_y) < tbarh) {
+        space.setH(space.h() - tbarh);
+      } else {
+        space.setH(space.h() - (screen.size().h() - slit_y));
+        if (tbartop) {
+          space.setY(space.y() + tbarh);
+          space.setH(space.h() - tbarh);
+        }
+      }
     } else {// if ((slit->direction() == Slit::Vertical &&
       //      (slit->placement() == Slit::TopLeft ||
       //       slit->placement() == Slit::BottomLeft)) ||

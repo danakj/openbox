@@ -459,6 +459,29 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
                     }
                 break;
 
+                case Decor_BottomLeft:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > le) le = temp;
+                    temp = dec->position.y + dec->position.height;
+                    if (temp > be) be = temp;
+                break;
+
+                case Decor_Bottom:
+                    temp = dec->position.y + dec->position.height;
+                    if (temp > be) be = temp;
+                    if (dec->position.width > cr->width) {
+                        temp = (dec->position.width - cr->width)/2;
+                        if (temp > re) re = temp;
+                        if (temp > le) le = temp;
+                    }
+                break;
+
+                case Decor_BottomRight:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > re) re = temp;
+                    temp = dec->position.y + dec->position.height;
+                    if (temp > be) te = temp;
+                break;
             }
         }
 printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);

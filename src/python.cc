@@ -34,7 +34,7 @@ void python_init(char *argv0)
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
   // import the otk and openbox modules into the main namespace
-  PyRun_SimpleString("from otk import *; from openbox import *;");
+  PyRun_SimpleString("from openbox import *;");
   // set up convenience global variables
   PyRun_SimpleString("openbox = Openbox_instance()");
   PyRun_SimpleString("display = OBDisplay_display()");

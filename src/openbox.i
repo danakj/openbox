@@ -107,7 +107,20 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
-%import "../otk/otk.i"
+%include "../otk/display.hh"
+%include "../otk/point.hh"
+%include "../otk/property.hh"
+%include "../otk/rect.hh"
+%include "../otk/screeninfo.hh"
+%include "../otk/strut.hh"
+
+%rename(itostring_unsigned) itostring(unsigned int);
+%rename(itostring_long) itostring(long);
+%rename(itostring_unsigned_long) itostring(unsigned long);
+%include "../otk/util.hh"
+
+%include "../otk/eventhandler.hh"
+%include "../otk/eventdispatcher.hh"
 
 %import "widgetbase.hh"
 %import "actions.hh"

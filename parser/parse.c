@@ -329,8 +329,8 @@ void parse_paths_startup()
                                             g_build_filename
                                             (G_DIR_SEPARATOR_S,
                                              "usr", "share", NULL));
-        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
-                                              g_strdup(DATADIR));
+        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
+                                            g_strdup(DATADIR));
     }
     xdg_data_dir_paths = g_slist_prepend(xdg_data_dir_paths,
                                          xdg_data_home_path);

@@ -505,6 +505,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	client_unmanage(client);
 	break;
     case MapRequest:
+        g_message("MapRequest for 0x%lx", client->window);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it! */
         if (screen_showing_desktop)

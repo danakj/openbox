@@ -1309,6 +1309,34 @@ static PyObject *_wrap_Openbox_shutdown(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Openbox_execute(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
+    int arg2 ;
+    std::string *arg3 = 0 ;
+    std::string temp3 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OiO:Openbox_execute",&obj0,&arg2,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    {
+        if (PyString_Check(obj2)) {
+            temp3 = std::string(PyString_AsString(obj2));
+            arg3 = &temp3;
+        }else {
+            SWIG_exception(SWIG_TypeError, "string expected");
+        }
+    }
+    (arg1)->execute(arg2,(std::string const &)*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * Openbox_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -2604,6 +2632,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_setFocusedClient", _wrap_Openbox_setFocusedClient, METH_VARARGS },
 	 { (char *)"Openbox_focusedScreen", _wrap_Openbox_focusedScreen, METH_VARARGS },
 	 { (char *)"Openbox_shutdown", _wrap_Openbox_shutdown, METH_VARARGS },
+	 { (char *)"Openbox_execute", _wrap_Openbox_execute, METH_VARARGS },
 	 { (char *)"Openbox_swigregister", Openbox_swigregister, METH_VARARGS },
 	 { (char *)"OBScreen_client", _wrap_OBScreen_client, METH_VARARGS },
 	 { (char *)"OBScreen_clientCount", _wrap_OBScreen_clientCount, METH_VARARGS },

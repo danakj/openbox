@@ -326,5 +326,26 @@ void Openbox::setFocusedClient(OBClient *c)
   }
 }
 
+void Openbox::execute(int screen, const std::string &bin)
+{
+#ifdef    __EMX__
+  // XXX: whats this for? windows?
+  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", bin.c_str(), NULL);
+#else //  __EMX__
+  if (screen >= ScreenCount(otk::OBDisplay::display))
+    screen = 0;
+  const std::string &dstr =
+    otk::OBDisplay::screenInfo(screen)->displayString();
+  
+  if (! fork()) {
+      setsid();
+      int ret = putenv(const_cast<char *>(dstr.c_str()));
+      assert(ret != -1);
+      ret = execl("/bin/sh", "/bin/sh", "-c", bin.c_str(), NULL);
+      exit(ret);
+    }
+#endif // __EMX__
+}
+
 }
 

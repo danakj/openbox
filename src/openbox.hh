@@ -240,6 +240,9 @@ public:
     manager can be destroyed.
   */
   inline void shutdown() { _doshutdown = true; }
+
+  //! Executes a command on a screen
+  void execute(int screen, const std::string &bin);
 };
 
 }

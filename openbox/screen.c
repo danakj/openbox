@@ -153,7 +153,9 @@ void screen_startup()
     /* get the initial size */
     screen_resize();
 
+    screen_num_desktops = 0;
     screen_set_num_desktops(4);
+    screen_desktop = 0;
     screen_set_desktop(0);
 
     /* don't start in showing-desktop mode */
@@ -206,27 +208,9 @@ void screen_set_num_desktops(guint num)
 {
     guint i, old;
     gulong *viewport;
-     
+    GSList *it;
+
     g_assert(num > 0);
-  
-    /* move windows on desktops that will no longer exist! */
-    /* XXX
-       std::list<Client*>::iterator it, end = clients.end();
-       for (it = clients.begin(); it != end; ++it) {
-       unsigned int d = (*it)->desktop();
-       if (d >= num && d != 0xffffffff) {
-       XEvent ce;
-       ce.xclient.type = ClientMessage;
-       ce.xclient.message_type = otk::Property::atoms.net_wm_desktop;
-       ce.xclient.display = **otk::display;
-       ce.xclient.window = (*it)->window();
-       ce.xclient.format = 32;
-       ce.xclient.data.l[0] = num - 1;
-       XSendEvent(**otk::display, _info->rootWindow(), false,
-       SubstructureNotifyMask | SubstructureRedirectMask, &ce);
-       }
-       }
-    */
 
     old = screen_num_desktops;
     screen_num_desktops = num;
@@ -255,6 +239,13 @@ void screen_set_num_desktops(guint num)
     /* set the new lists to be empty */
     for (i = old; i < num; ++i)
         focus_order[i] = NULL;
+
+    /* move windows on desktops that will no longer exist! */
+    for (it = client_list; it != NULL; it = it->next) {
+        Client *c = it->data;
+        if (c->desktop >= num)
+            client_set_desktop(num - 1);
+    }
 
     dispatch_ob(Event_Ob_NumDesktops, num, old);
 

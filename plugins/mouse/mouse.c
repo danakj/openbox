@@ -254,7 +254,7 @@ static void event(ObEvent *e, void *foo)
                     e->data.x.e->xbutton.y >= (signed)-b &&
                     e->data.x.e->xbutton.x < (signed)(w+b) &&
                     e->data.x.e->xbutton.y < (signed)(h+b)) {
-                    click =TRUE;
+                    click = TRUE;
                     /* double clicks happen if there were 2 in a row! */
                     if (lbutton == button &&
                         e->data.x.e->xbutton.time - 300 <= ltime) {

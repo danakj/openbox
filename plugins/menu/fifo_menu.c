@@ -79,15 +79,18 @@ void fifo_menu_handler(int fd, void *d) {
                         num_realloc);
 
         if (num_read == 0) { /* eof */
+            xmlDocPtr doc;
+            xmlNodePtr node;
+
             menu->invalid = TRUE;
             menu_clear(menu);
 
             FIFO_MENU_DATA(menu)->buf[FIFO_MENU_DATA(menu)->buflen] = '\0';
 
-            xmlDocPtr doc = xmlParseMemory(FIFO_MENU_DATA(menu)->buf,
-                                           FIFO_MENU_DATA(menu)->buflen);
+            doc = xmlParseMemory(FIFO_MENU_DATA(menu)->buf,
+                                 FIFO_MENU_DATA(menu)->buflen);
 
-            xmlNodePtr node = xmlDocGetRootElement(doc);
+            node = xmlDocGetRootElement(doc);
             
             if (node &&
                 !xmlStrcasecmp(node->name, (const xmlChar*) "fifo_menu")) {

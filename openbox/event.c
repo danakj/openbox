@@ -862,14 +862,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	    switch (e->xconfigurerequest.detail) {
 	    case Below:
 	    case BottomIf:
-		stacking_lower(CLIENT_AS_WINDOW(client));
-		break;
+            action_run_string("Lower", client);
+            break;
 
 	    case Above:
 	    case TopIf:
 	    default:
-		stacking_raise(CLIENT_AS_WINDOW(client));
-		break;
+            action_run_string("Raise", client);
+            break;
 	    }
 	}
 	break;

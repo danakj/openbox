@@ -8,6 +8,7 @@
 #include "focus.h"
 #include "extensions.h"
 #include "gettext.h"
+#include "config.h"
 #include "grab.h"
 #include "engine.h"
 #include "themerc.h"
@@ -143,6 +144,7 @@ int main(int argc, char **argv)
      
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
+        config_startup();
 	render_startup();
 	font_startup();
 	themerc_startup();
@@ -153,6 +155,8 @@ int main(int argc, char **argv)
 	client_startup();
         grab_startup();
         plugin_startup();
+
+        config_parse();
 
         /* XXX load all plugins!! */
         plugin_open("focus");
@@ -180,6 +184,7 @@ int main(int argc, char **argv)
 	engine_shutdown();
 	themerc_shutdown();
 	render_shutdown();
+        config_shutdown();
 	timer_shutdown();
     }
 

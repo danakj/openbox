@@ -93,7 +93,6 @@ void OBDisplay::initialize(char *name)
   (void)junk;
 
   // Open the X display
-  printf("getenv(DISPLAY)=%s\n", getenv("DISPLAY"));
   if (!(display = XOpenDisplay(name))) {
     printf(_("Unable to open connection to the X server. Please set the \n\
 DISPLAY environment variable approriately, or use the '-display' command \n\

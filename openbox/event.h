@@ -32,4 +32,8 @@ extern guint ScrollLockMask;
 void event_startup(gboolean reconfig);
 void event_shutdown(gboolean reconfig);
 
+/*! Request that a number of EnterNotify events not be used for distributing
+  focus */
+void event_ignore_enter_focus(guint num);
+
 #endif

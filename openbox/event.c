@@ -95,6 +95,7 @@ static const int mask_table[] = {
 };
 static int mask_table_size;
 
+static guint ignore_enter_focus = 0;
 static ObClient *focus_delay_client;
 
 static gboolean menu_can_hide;
@@ -420,34 +421,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                 focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             }
         }
-	break;
-    case EnterNotify:
-    case LeaveNotify:
-        /* NotifyUngrab occurs when a mouse button is released and the event is
-           caused, like when lowering a window */
-        /* NotifyVirtual and NotifyAncestor occurs when ungrabbing the
-           pointer (Ancestor happens when the pointer is on a window border) */
-        if (e->xcrossing.mode == NotifyGrab ||
-            e->xcrossing.detail == NotifyInferior ||
-            (e->xcrossing.mode == NotifyUngrab &&
-             (e->xcrossing.detail == NotifyAncestor ||
-              e->xcrossing.detail == NotifyNonlinearVirtual ||
-              e->xcrossing.detail == NotifyVirtual))) {
-#ifdef DEBUG_FOCUS
-            ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
-                     (e->type == EnterNotify ? "Enter" : "Leave"),
-                     e->xcrossing.mode,
-                     e->xcrossing.detail, client?client->window:0);
-#endif
-            return TRUE;
-        }
-#ifdef DEBUG_FOCUS
-        ob_debug("%sNotify mode %d detail %d on %lx\n",
-                 (e->type == EnterNotify ? "Enter" : "Leave"),
-                 e->xcrossing.mode,
-                 e->xcrossing.detail, client?client->window:0);
-#endif
-	break;
+        break;
     }
     return FALSE;
 }
@@ -732,6 +706,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case EnterNotify:
+    {
+        gboolean nofocus = FALSE;
+
+        if (ignore_enter_focus) {
+            ignore_enter_focus--;
+            nofocus = TRUE;
+        }
+
         con = frame_context(client, e->xcrossing.window);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
@@ -755,11 +737,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (client_normal(client)) {
-                if (config_focus_follow) {
+            if (!nofocus && client_normal(client) && config_focus_follow) {
+                if (e->xcrossing.mode == NotifyGrab ||
+                    e->xcrossing.detail == NotifyInferior)
+                {
 #ifdef DEBUG_FOCUS
-                    ob_debug("EnterNotify on %lx, focusing window\n",
-                             client->window);
+                    ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
+                             (e->type == EnterNotify ? "Enter" : "Leave"),
+                             e->xcrossing.mode,
+                             e->xcrossing.detail, client?client->window:0);
+#endif
+                } else {
+#ifdef DEBUG_FOCUS
+                    ob_debug("%sNotify mode %d detail %d on %lx, "
+                             "focusing window\n",
+                             (e->type == EnterNotify ? "Enter" : "Leave"),
+                             e->xcrossing.mode,
+                             e->xcrossing.detail, client?client->window:0);
 #endif
                     if (config_focus_delay) {
                         ob_main_loop_timeout_add(ob_main_loop,
@@ -776,6 +770,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         }
         break;
+    }
     case ConfigureRequest:
 	/* compress these */
 	while (XCheckTypedWindowEvent(ob_display, client->window,
@@ -1264,4 +1259,9 @@ static void focus_delay_client_dest(gpointer data)
                                          focus_delay_client);
         focus_delay_client = NULL;
     }
+}
+
+void event_ignore_enter_focus(guint num)
+{
+    ignore_enter_focus += num;
 }

@@ -21,100 +21,146 @@ def getkeyval(line):
         key = value = None
     return key, value
 
-def simple_replace(data):
-    for i in range(len(data)):
+def find_key(data, keysubstr):
+    i = 0
+    n = len(data)
+    while i < n:
         l = data[i]
         key, value = getkeyval(l)
         if key and value:
-            pairs = {}
-            pairs['window.focus.font'] = 'window.label.focus.font'
-            pairs['window.unfocus.font'] = 'window.label.unfocus.font'
-            pairs['window.justify'] = 'window.label.justify'
-            pairs['menu.frame.disableColor'] = 'menu.disabled.textColor'
-            pairs['style.']  = 'info.'
-            pairs['menu.frame'] = 'menu.items'
-            pairs['menu.hilite'] = 'menu.selected'
-            pairs['.picColor'] = '.imageColor'
+            if key.find(keysubstr) != -1:
+                return i, key, value
+        i += 1
+    return -1, None, None
 
-            for k in pairs.keys():
-                if key.find(k) != -1:
-                    newl = l.replace(k, pairs[k])
-                    out('Updating "' + key +
-                        '" to "' + key.replace(k, pairs[k]) + '"\n')
-                    data[i] = newl
-                    break
+def simple_replace(data):
+    pairs = {}
+    pairs['window.focus.font'] = 'window.label.focus.font'
+    pairs['window.unfocus.font'] = 'window.label.unfocus.font'
+    pairs['window.justify'] = 'window.label.justify'
+    pairs['menu.frame.disableColor'] = 'menu.disabled.textColor'
+    pairs['style.']  = 'info.'
+    pairs['menu.frame'] = 'menu.items'
+    pairs['menu.hilite'] = 'menu.selected'
+    pairs['.picColor'] = '.imageColor'
+
+    for k in pairs.keys():
+        while 1:
+            i, key, nul = find_key(data, k);
+            if i >= 0:
+                newl = data[i].replace(k, pairs[k])
+                out('Updating "' + key +
+                    '" to "' + key.replace(k, pairs[k]) + '"\n')
+                data[i] = newl
+            else:
+                break
 
 def remove(data):
-    i = 0
-    n = len(data)
-    while i < n:
-        l = data[i]
-        key, value = getkeyval(l)
-        if key and value:
-            invalid = []
-            invalid.append('toolbar')
-            invalid.append('rootCommand')
-            invalid.append('menu.frame.justify')
-            for inv in invalid:
-                if key.find(inv) != -1:
-                    out(key + ' is no longer supported.\nRemove (Y/n)? ')
-                    if read_bool():
-                        out('Removing "' + key + '"\n')
-                        data.pop(i)
-                        i -= 1
-                        n -= 1
-                    break
-        i += 1
+    invalid = []
+    invalid.append('toolbar')
+    invalid.append('rootCommand')
+    invalid.append('menu.frame.justify')
+    for inv in invalid:
+        while 1:
+            i, key, nul = find_key(data, inv)
+            if i >= 0:
+                out(key + ' is no longer supported.\nRemove (Y/n)? ')
+                if read_bool():
+                    out('Removing "' + key + '"\n')
+                    data.pop(i)
+            else:
+                break
 
 def pressed(data):
-    i = 0
-    n = len(data)
-    while i < n:
-        l = data[i]
-        key, value = getkeyval(l)
-        if key and value:
-            if key == 'window.button.pressed':
-                out('The window.button.pressed option has been replaced by ' +
-                    'window.button.pressed.focus and ' +
-                    'window.button.pressed.unfocus.\nUpdate (Y/n)? ')
-                if read_bool():
-                    out('Removing "window.button.pressed"\n')
-                    data.pop(i)
-                    out('Adding "window.button.pressed.unfocus"\n')
-                    data.insert(i, l.replace('window.button.pressed',
+    i, nul, nul = find_key(data, 'window.button.pressed')
+    if i >= 0:
+        out('The window.button.pressed option has been replaced by ' +
+            'window.button.pressed.focus and ' +
+            'window.button.pressed.unfocus.\nUpdate (Y/n)? ')
+        if read_bool():
+            out('Removing "window.button.pressed"\n')
+            data.pop(i)
+            out('Adding "window.button.pressed.unfocus"\n')
+            data.insert(i, l.replace('window.button.pressed',
                                              'window.button.pressed.unfocus'))
-                    out('Adding "window.button.pressed.focus"\n')
-                    data.insert(i, l.replace('window.button.pressed',
-                                             'window.button.pressed.focus'))
-                    i += 1
-                    n += 1
-                break
-        i += 1
+            out('Adding "window.button.pressed.focus"\n')
+            data.insert(i, l.replace('window.button.pressed',
+                                     'window.button.pressed.focus'))
 
-def fonts(data):
-    for l in data:
-        key, value = getkeyval(l)
-        if key and value:
-            if key == 'window.font':
-                out('You appear to specify fonts using the old X fonts ' +
-                    'syntax.\nShall I remove all fonts from the theme (Y/n)? ')
-                if not read_bool():
-                    return
-    i = 0
-    n = len(data)
-    while i < n:
-        l = data[i]
-        key, value = getkeyval(l)
-        if key and value:
-            if key.find('font') != -1:
-                out('Removing "' + key + '"\n')
-                data.pop(i)
-                i -= 1
-                n -= 1
-        i += 1
+def x_fonts(data):
+    i, nul, nul = find_key(data, 'window.font')
+    if i >= 0:
+        out('You appear to specify fonts using the old X fonts ' +
+            'syntax.\nShall I remove all fonts from the theme (Y/n)? ')
+        if not read_bool():
+            return
+    else: return
+    while 1:
+        i, key = key_find(data, '.font')
+        if i < 0:
+            break
+        out('Removing "' + key + '"\n')
+        data.pop(i)
 
+def xft_fonts(data):
+    i, nul, nul = find_key(data, '.xft.')
+    if i >= 0:
+        out('You appear to specify fonts using the old Xft fonts ' +
+            'syntax.\nShall I update these to the new syntax (Y/n)? ')
+        if not read_bool():
+            return
+    else: return
+    fonts = {}
+    fonts['window'] = 'window.label.focus.font'
+    fonts['menu.items'] = 'menu.items.font'
+    fonts['menu.title'] = 'menu.title.font'
+    for f in fonts.keys():
+        li, nul, flags = find_key(data, f + '.xft.flags')
+        if li < 0:
+            li, nul, flags = find_key(data, '*.xft.flags')
+        else:
+            out('Removing ' + f + '.xft.flags\n')
+            data.pop(li)
+        oi, nul, offset = find_key(data, f + '.xft.shadow.offset')
+        if oi < 0:
+            oi, nul, offset = find_key(data, '*.xft.shadow.offset')
+        else:
+            out('Removing ' + f + '.xft.shadow.offset\n')
+            data.pop(oi)
+        ti, nul, tint = find_key(data, f + '.xft.shadow.tint')
+        if ti < 0:
+            ti, nul, tint = find_key(data, '*.xft.shadow.tint')
+        else:
+            out('Removing ' + f + '.xft.shadow.tint\n')
+            data.pop(ti)
+        fi, nul, face = find_key(data, f + '.xft.font')
+        if fi < 0:
+            fi, nul, face = find_key(data, '*.xft.font')
+            if fi >= 0: fi = len(data) - 1
+        else:
+            out('Removing ' + f + '.xft.font\n')
+            data.pop(fi)
 
+        if fi >= 0:
+            s = face
+            if li >= 0:
+                if flags.find('bold'):
+                    s = s + ':bold'
+                if flags.find('shadow'):
+                    s = s + ':shadow=y'
+            if oi >= 0:
+                s = s + ':shadowoffset=' + offset
+            if ti >= 0:
+                s = s + ':shadowtint=' + tint
+        out('Adding ' + fonts[f] + '\n')
+        data.insert(fi, fonts[f] + ': ' + s)
 
+    for stars in ('*.xft.flags', '*.xft.shadow.offset' ,
+                  '*.xft.shadow.tint', '*.xft.font'):
+        i, key, nul = find_key(data, stars)
+        if i >= 0:
+            out('Removing ' + key + '\n')
+            data.pop(i)
 
 
 
@@ -148,9 +194,10 @@ for i in range(len(data)):
     data[i] = data[i].strip()
 
 simple_replace(data)
-remove(data)
-pressed(data)
-fonts(data)
+#remove(data)
+#pressed(data)
+#x_fonts(data)
+xft_fonts(data)
 
 for l in data:
     print l

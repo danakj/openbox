@@ -648,6 +648,8 @@ void OBScreen::changeDesktop(long desktop)
                                      otk::OBProperty::Atom_Cardinal,
                                      _desktop);
 
+  if (old == _desktop) return;
+  
   OBClient::List::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->desktop() == old) {

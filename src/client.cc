@@ -655,6 +655,8 @@ void OBClient::setWMState(long state)
 
 void OBClient::setDesktop(long target)
 {
+  if (target == _desktop) return;
+  
   printf("Setting desktop %ld\n", target);
   assert(target >= 0 || target == (signed)0xffffffff);
   //assert(target == 0xffffffff || target < MAX);

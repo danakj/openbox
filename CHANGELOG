@@ -1,3 +1,11 @@
+:
+	* Closed bug #885 (raiseOnFocus is flawed)
+	* Closed bug #887 (Mouse-wheel scrolling only changes 1 desktop when
+	using "dialog" option)
+	* Closed bug #888 (some random coredump)
+	* Closed bug #889 (focus follow mouse not following)
+	* Closed bug #892 (client_under_pointer() doesn't check DESKTOP_ALL)
+
 3.0-rc1:
 	* Closed bug #875 (RaiseLower fails to funtion on windows with dialogs)
 	* Added the <moveButton> option for moving dock apps around inside the

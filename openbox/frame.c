@@ -462,7 +462,7 @@ static void layout_title(Frame *self)
     if (!c) RrSurfaceHide(self->s_close);
 
 
-    x = ob_theme->bevel + 1;
+    x = ob_theme->bevel + ob_theme->bwidth + 1;
     y = ob_theme->bevel + ob_theme->bwidth + 1;
     for (lc = ob_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {

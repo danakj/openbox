@@ -26,52 +26,6 @@ ScreenInfo::ScreenInfo(int num) {
                                              _screen)),
                HeightOfScreen(ScreenOfDisplay(**display,
                                               _screen)));
-  /*
-    If the default depth is at least 8 we will use that,
-    otherwise we try to find the largest TrueColor visual.
-    Preference is given to 24 bit over larger depths if 24 bit is an option.
-  */
-
-  _depth = DefaultDepth(**display, _screen);
-  _visual = DefaultVisual(**display, _screen);
-  _colormap = DefaultColormap(**display, _screen);
-  
-  if (_depth < 8) {
-    // search for a TrueColor Visual... if we can't find one...
-    // we will use the default visual for the screen
-    XVisualInfo vinfo_template, *vinfo_return;
-    int vinfo_nitems;
-    int best = -1;
-
-    vinfo_template.screen = _screen;
-    vinfo_template.c_class = TrueColor;
-
-    vinfo_return = XGetVisualInfo(**display,
-                                  VisualScreenMask | VisualClassMask,
-                                  &vinfo_template, &vinfo_nitems);
-    if (vinfo_return) {
-      int max_depth = 1;
-      for (int i = 0; i < vinfo_nitems; ++i) {
-        if (vinfo_return[i].depth > max_depth) {
-          if (max_depth == 24 && vinfo_return[i].depth > 24)
-            break;          // prefer 24 bit over 32
-          max_depth = vinfo_return[i].depth;
-          best = i;
-        }
-      }
-      if (max_depth < _depth) best = -1;
-    }
-
-    if (best != -1) {
-      _depth = vinfo_return[best].depth;
-      _visual = vinfo_return[best].visual;
-      _colormap = XCreateColormap(**display, _root_window, _visual,
-                                  AllocNone);
-    }
-
-    XFree(vinfo_return);
-  }
-
   // get the default display string and strip the screen number
   string default_string = DisplayString(**display);
   const string::size_type pos = default_string.rfind(".");

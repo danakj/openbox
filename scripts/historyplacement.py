@@ -48,17 +48,6 @@ config.add('historyplacement',
            'enum',
            windowplacement.random,
            options = windowplacement.export_functions)
-config.add('historyplacement',
-           'confirm_callback',
-           'Confirm Placement Callback',
-           "A function which will be called before attempting to place a " + \
-           "window via history. If the function returns true, then an " + \
-           "attempt will be made to place the window. If it returns false, " +\
-           "the 'Fallback Algorithm' will be directly applied instead. The " +\
-           "function must take 1 argument, which will be the callback data " +\
-           "which was passed to invoke the window placement.",
-           'function',
-           None)
 
 ###########################################################################
 
@@ -152,25 +141,23 @@ def _place(data):
             if data.client.positionRequested(): return
         state = _create_state(data)
         try:
-            confirm = config.get('historyplacement', 'confirm_callback')
-            if not confirm or confirm(data):
-                print "looking for : " + state.appname +  " : " + \
-                      state.appclass + " : " + state.role
+            print "looking for : " + state.appname +  " : " + \
+                  state.appclass + " : " + state.role
 
-                i = _find(data.screen, state)
-                if i >= 0:
-                    coords = _data[data.screen][i]
-                    print "Found in history ("+str(coords.x)+","+\
-                          str(coords.y)+")"
-                    if not (config.get('historyplacement', 'dont_duplicate') \
-                            and coords.placed):
-                        data.client.move(coords.x, coords.y)
-                        coords.placed = 1
-                        return
-                    else:
-                        print "Already placed another window there"
+            i = _find(data.screen, state)
+            if i >= 0:
+                coords = _data[data.screen][i]
+                print "Found in history ("+str(coords.x)+","+\
+                      str(coords.y)+")"
+                if not (config.get('historyplacement', 'dont_duplicate') \
+                        and coords.placed):
+                    data.client.move(coords.x, coords.y)
+                    coords.placed = 1
+                    return
                 else:
-                    print "No match in history"
+                    print "Already placed another window there"
+            else:
+                print "No match in history"
         except TypeError:
             pass
     fallback = config.get('historyplacement', 'fallback')

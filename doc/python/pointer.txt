@@ -1,0 +1,130 @@
+input.Pointer
+
+----
+
+This document describes the 'Pointer' class, exposed by Openbox's 'input'
+module to its python scripts.
+
+All pointer events which will be generated because of the Pointer class can
+be caught from the hooks.pointer hook.
+
+----
+
+Terminology
+
+----
+
+Context -- A context is a string describing a part of a window or screen in
+	   which an event can occur. Contexts are used for grabbing and
+	   tracking pointer events. A list of possible contexts are exposed by
+	   the engine through the contexts() method. The standard list of
+	   contexts are:
+	   * "none" - no context associated.
+	   * "root" - the root window.
+	   * "frame" - the client's entire frame. Note: when a button is
+		       grabbed in the "frame" context, it will not get passed
+		       through to the client.
+	   * "client" - client's window.
+	   * "titlebar" - a client's titlebar.
+	   * "handle" - a client's handle.
+	   * "tlcorner" - the top-left corner of a client's decorations.
+	   * "trcorner" - the top-right corner of a client's decorations.
+	   * "blcorner" - the bottom-left corner of a client's decorations.
+	   * "brcorner" - the bottom-right corner of a client's decorations.
+	   * "maximize" - the maximize button in the titlebar.
+	   * "close" - the close button in the titlebar.
+	   * "iconify" - the iconify button in the titlebar.
+	   * "alldesktops" - the all-desktops button in the titlebar.
+	   * "icon" - the window icon in the titlebar.
+
+	   An engine may add to this list as it sees fit (most engines will
+	   include "close", "maximize", etc. contexts for titlebar buttons).
+
+----
+
+Methods
+
+----
+
+bind(button, context, action, func)
+
+Binds a pointer button for a context and action to a function. See the
+Terminology section for a decription and list of common contexts. The button is
+a string which defines a modifier and button combination with the format
+[Modifier-]...[Button]. Modifiers can be 'mod1', 'mod2', 'mod3', 'mod4',
+'mod5', 'control', and 'shift'. The keys on your keyboard that are bound to
+each of these modifiers can be found by running 'xmodmap'. The button is the
+number of the button. Button numbers can be found by running 'xev', pressing
+the button with the pointer over its window, and watching its output. Here
+are some examples of valid buttons: 'control-1', '2', 'mod1-shift-5'. The 
+action is one of the Action_* constants. The func must have a definition
+similar to 'def func(ptrdata, client)'. The arguments passed to the function
+are a PointerData object and a Client object (or None). A button and context
+may be bound to more than one function.
+
+	button: A string defining the modifiers and button to for which events
+		should be generated.
+
+	context: The context in which the button events should be generated.
+
+	action: One of the Action_* constants specifying the action to bind
+		the function to.
+
+	func: A function to bind to the button/context.
+
+----
+
+clearBinds()
+
+Removes all bindings that were previously made by bind().
+
+----
+
+grab(func)
+
+Grabs the pointer device, causing all possible pointer events to be sent to
+the given function. CAUTION: Be sure when you grab() that you also have an
+ungrab() that will execute, or you will not be able to use the pointer device
+until you restart Openbox. The func must have a definition similar to
+'def func(data)'. The argument passed to the function is a PointerData object.
+The pointer cannot be grabbed if it is already grabbed. When a grab is active,
+no pointer bindings will fire, everything is sent only to the specified func.
+
+	func: A function to receive all the grabbed pointer events.
+
+----
+
+ungrab()
+
+Ungrabs the pointer. The pointer cannot be ungrabbed if it is not grabbed.
+
+----
+
+Constants
+
+----
+
+Action_Press		a pointer button press
+Action_Release		a pointer button release
+Action_Click		a pointer button click (press-release)
+Action_DoubleClick	a pointer button double-click
+Action_Motion		a pointer drag
+
+----
+
+Configuration options (through the config module)
+
+----
+
+double_click_rate
+
+An integer containing the number of milliseconds in which 2 clicks must be
+received to cause a double-click event.
+
+----
+
+drag_threshold
+
+An integer containing the number of pixels a drag must go before motion events
+start getting generated. Once a drag has begun, the button release will not
+count as a click event.

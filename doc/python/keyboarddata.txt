@@ -1,0 +1,35 @@
+KeyboardData
+
+----
+
+This document describes the 'KeyboardData' class, passed to functions bound to
+keyboard events.
+
+----
+
+Attributes
+
+----
+
+keychain
+
+The keychain (in the format that input.Keyboard.bind() expects them) that
+was pressed.
+
+----
+
+state
+
+An integer bitmask of the modifiers pressed down when the key was pressed.
+
+----
+
+keycode
+
+An integer containing the keycode for the key that was pressed.
+
+----
+
+press
+
+True or False for if the event was a key press or a key release

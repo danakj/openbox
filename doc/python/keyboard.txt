@@ -1,0 +1,59 @@
+input.Keyboard
+
+----
+
+This document describes the 'Keyboard' class, exposed by Openbox's 'input'
+module to its python scripts.
+
+All keyboard events which will be generated because of the Keyboard class can
+be caught from the hooks.keyboard hook.
+
+----
+
+Methods
+
+----
+
+bind(keychain, func)
+
+Binds a key-chain to a function. The keychain is a tuple of strings which
+define a chain of key presses. Each member of the tuple has the format
+[Modifier-]...[Key]. Modifiers can be 'mod1', 'mod2', 'mod3', 'mod4', 'mod5',
+'control', and 'shift'. The keys on your keyboard that are bound to each of
+these modifiers can be found by running 'xmodmap'. The Key can be any valid
+key definition. Key definitions can be found by running 'xev', pressing the
+key while its window is focused, and watching its output. Here are some
+examples of valid keychains: ('a'), ('F7'), ('control-a', 'd'),
+('control-mod1-x', 'control-mod4-g'), ('F1', 'space').
+The func must have a definition similar to 'def func(keydata, client)'. The
+arguments passed to the function are a KeyboardData object and a Client object.
+A keychain cannot be bound to more than one function.
+
+	keychain: A tuple containing strings defining a chain of key presses.
+
+	func: A function to bind to the keychain.
+
+----
+
+clearBinds()
+
+Removes all bindings that were previously made by bind().
+
+----
+
+grab(func)
+
+Grabs the entire keyboard, causing all possible keyboard events to be passed
+to the given function. CAUTION: Be sure when you grab() that you also have an
+ungrab() that will execute, or you will not be able to type until you restart
+Openbox. The func must have a definition similar to 'def func(keydata)'. The
+argument passed to the function is a KeyboardData object. The keyboard cannot
+be grabbed if it is already grabbed.
+
+	func: A function to receive all the grabbed keyboard events.
+
+----
+
+ungrab()
+
+Ungrabs the keyboard. The keyboard cannot be ungrabbed if it is not grabbed.

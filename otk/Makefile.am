@@ -8,7 +8,7 @@ lib_LTLIBRARIES=libotk.la
 
 libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc util.cc \
                   renderstyle.cc rendercolor.cc pseudorendercontrol.cc \
-                  display.cc font.cc screeninfo.cc property.cc timer.cc \
+                  display.cc font.cc property.cc timer.cc \
                   eventdispatcher.cc eventhandler.cc ustring.cc \
                   widget.cc application.cc label.cc appwidget.cc button.cc \
                   otk.cc messagedialog.cc
@@ -19,7 +19,7 @@ includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
                    display.hh eventdispatcher.hh eventhandler.hh font.hh \
                    label.hh otk.hh point.hh property.hh pseudorendercontrol.hh\
                    rect.hh rendercolor.hh rendercontrol.hh renderstyle.hh \
-                   rendertexture.hh screeninfo.hh size.hh strut.hh surface.hh \
+                   rendertexture.hh size.hh strut.hh surface.hh \
                    timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
                    messagedialog.hh ../config.h
 

@@ -1,0 +1,54 @@
+The themerc file dictates which engine and theme openbox will use, as well as
+parameters for the engine.
+
+----
+
+Options for the themerc file are specified as:
+option = value
+
+Lines that begin with # are considered comments.
+
+----
+
+These are the valid options:
+
+engine
+	String value, containing the name of the engine to load.
+	example: 'openbox'
+	default: 'openbox'
+
+theme
+	String value containing	the theme to load in the engine. This can be
+	an absolute path to the theme, or simply the theme's name in which case
+	the appropriate paths will be searched for the theme.
+	example: 'mytheme'
+	default: engine-dependant
+
+font
+	String value containing the font to use in the window titlebars. The
+	format of this string is described in:
+	http://keithp.com/~keithp/render/Xft.tutorial
+	example: 'times-12:bold:slant=italic,oblique'
+	default: 'sans-8'
+
+titlebarlayout
+	The layout of the titlebar of windows. This is a string that can
+	consist of only valid characters. The characters are:
+		I - iconify button
+		M - maximize button
+		C - close button
+		D - all-desktops button
+		N - window icon
+		L - text label (window title)
+	example: 'ILMC'
+	default: 'NDLIMC'
+
+----
+
+example themerc:
+
+# My themerc file!
+engine='openbox'
+theme='nyz'
+titlebarlayout='ILMC'
+font='arial,sans-9:bold'

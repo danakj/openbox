@@ -290,8 +290,8 @@ void Actions::motionHandler(const XMotionEvent &e)
   // compress changes to a window into a single change
   XEvent ce;
   while (XCheckTypedWindowEvent(**otk::display, e.window, e.type, &ce)) {
-    x_root = e.x_root;
-    y_root = e.y_root;
+    x_root = ce.x_root;
+    y_root = ce.y_root;
   }
 
   int screen;

@@ -3,8 +3,6 @@
 #include "config.h"
 
 #include "display.hh"
-#include "screeninfo.hh"
-#include "rendercontrol.hh"
 #include "util.hh"
 
 extern "C" {
@@ -68,8 +66,8 @@ static int xerrorHandler(::Display *d, XErrorEvent *e)
 }
 
 
-Display::Display()
-  : _display(0),
+Display::Display(::Display *d)
+  : _display(d),
     _xkb(false),
     _xkb_event_basep(0),
     _shape(false),
@@ -79,21 +77,15 @@ Display::Display()
     _mask_list(),
     _num_lock_mask(0),
     _scroll_lock_mask(0),
-    _grab_count(0),
-    _screeninfo_list(0),
-    _rendercontrol_list(0)
+    _grab_count(0)
 {
   int junk;
   (void)junk;
 
+  assert(_display);
+  
   display = this;
   
-  // Open the X display
-  if (!(_display = XOpenDisplay(NULL))) {
-    printf(_("Unable to open connection to the X server. Please set the \n\
-DISPLAY environment variable approriately.\n\n"));
-    ::exit(1);
-  }
   if (fcntl(ConnectionNumber(_display), F_SETFD, 1) == -1) {
     printf(_("Couldn't mark display connection as close-on-exec.\n\n"));
     ::exit(1);
@@ -159,13 +151,51 @@ DISPLAY environment variable approriately.\n\n"));
   _mask_list[6] = _scroll_lock_mask | _num_lock_mask;
   _mask_list[7] = _scroll_lock_mask | LockMask | _num_lock_mask;
 
-  // Get information on all the screens which are available, and create their
-  // RenderControl
-  _screeninfo_list = new ScreenInfo*[ScreenCount(_display)];
-  _rendercontrol_list = new RenderControl*[ScreenCount(_display)];
-  for (int i = 0; i < ScreenCount(_display); ++i) {
-    _screeninfo_list[i] = new ScreenInfo(i);
-    _rendercontrol_list[i] = RenderControl::createRenderControl(i);
+  /*
+    If the default depth is at least 8 we will use that,
+    otherwise we try to find the largest TrueColor visual.
+    Preference is given to 24 bit over larger depths if 24 bit is an option.
+  */
+
+  int screen = DefaultScreen(_display);
+  _depth = DefaultDepth(_display, screen);
+  _visual = DefaultVisual(_display, screen);
+  _colormap = DefaultColormap(_display, screen);
+  
+  if (_depth < 8) {
+    // search for a TrueColor Visual... if we can't find one...
+    // we will use the default visual for the screen
+    XVisualInfo vinfo_template, *vinfo_return;
+    int vinfo_nitems;
+    int best = -1;
+
+    vinfo_template.screen = screen;
+    vinfo_template.c_class = TrueColor;
+
+    vinfo_return = XGetVisualInfo(_display,
+                                  VisualScreenMask | VisualClassMask,
+                                  &vinfo_template, &vinfo_nitems);
+    if (vinfo_return) {
+      int max_depth = 1;
+      for (int i = 0; i < vinfo_nitems; ++i) {
+        if (vinfo_return[i].depth > max_depth) {
+          if (max_depth == 24 && vinfo_return[i].depth > 24)
+            break;          // prefer 24 bit over 32
+          max_depth = vinfo_return[i].depth;
+          best = i;
+        }
+      }
+      if (max_depth < _depth) best = -1;
+    }
+
+    if (best != -1) {
+      _depth = vinfo_return[best].depth;
+      _visual = vinfo_return[best].visual;
+      _colormap = XCreateColormap(_display, RootWindow(_display, screen),
+                                  _visual, AllocNone);
+    }
+
+    XFree(vinfo_return);
   }
 }
 
@@ -177,39 +207,7 @@ Display::~Display()
 
   XFreeModifiermap(_modmap);
   
-  for (int i = 0; i < ScreenCount(_display); ++i) {
-    delete _rendercontrol_list[i];
-    delete _screeninfo_list[i];
-  }
-  delete [] _rendercontrol_list;
-  delete [] _screeninfo_list;
-  
   XCloseDisplay(_display);
-}
-
-
-const ScreenInfo* Display::screenInfo(int snum) const
-{
-  assert(snum >= 0);
-  assert(snum < (signed) ScreenCount(_display));
-  return _screeninfo_list[snum];
-}
-
-
-const ScreenInfo* Display::findScreen(Window root) const
-{
-  for (int i = 0; i < ScreenCount(_display); ++i)
-    if (_screeninfo_list[i]->rootWindow() == root)
-      return _screeninfo_list[i];
-  return 0;
-}
-
-
-const RenderControl *Display::renderControl(int snum) const
-{
-  assert(snum >= 0);
-  assert(snum < (signed) ScreenCount(_display));
-  return _rendercontrol_list[snum];
 }
 
 

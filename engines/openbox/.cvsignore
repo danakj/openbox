@@ -1,0 +1,7 @@
+Makefile
+Makefile.in
+.deps
+.libs
+openbox.la
+openbox.lo
+theme.lo

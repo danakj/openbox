@@ -1,0 +1,208 @@
+ob.Openbox
+
+----
+
+This document describes the 'Openbox' class, exposed by Openbox's 'ob' module
+to its python scripts.
+
+----
+
+Methods
+
+----
+
+shutdown()
+
+Causes Openbox to shutdown and exit.
+
+
+----
+
+restart([path])
+
+Causes Openbox to shutdown and restart. If path is specified, Openbox will
+shutdown and attempt to run the specified executable instead of restarting
+itself. If that fails, however, it will restart itself.
+
+	path: Optional path to replacement executable.
+
+----
+
+state()
+
+Returns Openbox's current state, this will be one of the State constants.
+
+	Returns: One of the State values representing the internal state
+		 of Openbox.
+
+----
+
+desktop()
+
+Returns the number of the currently visible desktop. This will be in the range
+of [0, numDesktops()).
+
+	Returns: The currently visible desktop.
+
+----
+
+setDesktop(desktop)
+
+Sets the specified desktop as the visible desktop.
+
+	desktop: The desktop to make visible. Must be in the range of
+		 [0, numDesktops()) or a ValueError exception will be raised.
+
+----
+
+setNextDesktop([wrap])
+
+Sets the visible desktop to the next desktop, optionally wrapping around when
+reaching the last.
+
+	wrap: An optional argument which, when True will cause the function to
+	      wrap to the first desktop when going past the last. If it is not
+	      specified, it defaults to true.
+
+----
+
+setPreviousDesktop([wrap])
+
+Sets the visible desktop to the previous desktop, optionally wrapping around
+when reaching the first.
+
+	wrap: An optional argument which, when True will cause the function to
+	      wrap to the last desktop when going past the first. If it is not
+	      specified, it defaults to true.
+
+----
+
+numDesktops()
+
+Returns the number of desktops available.
+
+	Returns: The number of available desktops.
+
+----
+
+setNumDesktops(num)
+
+Sets the number of desktops available.
+
+	num: The new number of available desktops. This must be greater than 0.
+
+----
+
+desktopNames()
+
+Returns a tuple of names, containing a name for each desktop. The tuple may
+have a length greater than numDesktops() if more names have been specified.
+
+	Returns: A tuple of names.
+
+----
+
+setDesktopNames(names)
+
+Sets the names for the desktops.
+
+	names: An iterable list of names to apply to the desktops. Can contain
+	       more or less names than numDesktops(). If it contains fewer
+	       names, then Openbox will give the remaining desktops a
+	       placeholder name.
+
+----
+
+showingDesktop()
+
+Returns True or False, depicting if Openbox is in 'showing the desktop' mode.
+In 'showing the desktop' mode, all normal clients are hidden and the desktop
+is given focus if possible.
+
+	Returns: True or False describing if Openbox is in 'showing the
+		 desktop' mode.
+
+----
+
+setShowingDesktop(show)
+
+Enters or leaves 'showing the desktop' mode. See showingDesktop() for a
+description of this mode.
+
+	show: True or False to enter or leave 'showing the desktop' mode
+	      respectively.
+
+----
+
+screenArea(desktop)
+
+Returns the on-screen available area. This is the area not reserved by
+applications' struts. Windows should be placed within this area, not within
+the physicalSize().
+
+	desktop: The desktop for which to get the available area. 0xffffffff to
+		 get the combined area for all desktops (combined
+		 subtractively).
+
+	Returns: A tuple of form (x, y, width, height) containing the
+		 dimensions of the available on-screen area for the desktop.
+
+
+----
+
+screenStrut(desktop)
+
+Returns the combined strut which has been reserved by all applications on the
+desktops.
+
+	desktop: The desktop for which to get the strut. 0xffffffff to get the
+		 combined strut for all desktops (combined additively).
+
+	Returns: A tuple of form (left, top, right, bottom) containing the
+		 size of the reserved strut space for the desktop.
+
+----
+
+physicalSize()
+
+Returns the physical size of the display device (in pixels).
+
+	Returns: A tuple of the form (width, height) containing the size of
+		 the display device's area.
+
+----
+
+screenNumber()
+
+Returns the number of the screen on which Openbox is running.
+
+	Returns: An integer specifying the screen on which this instance of
+		 Openbox is running.
+
+----
+
+rootWindow()
+
+Return the window id of the root window.
+
+	Returns: An integer containing the window id of the root window.
+
+----
+
+clientList()
+
+Returns a all clients currently being managed by Openbox. This list is updated
+as clients are managed and closed/destroyed/released.
+
+	Returns: A list of Clients containing all the clients managed by
+		 Openbox.
+
+----
+
+ob.State
+
+State.Starting: Openbox is starting up and has not yet reached its
+		main event loop.
+State.Running:  Openbox is running normally.
+State.Exiting:  Openbox has left its main event loop and is shutting
+		down.

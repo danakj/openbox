@@ -1,0 +1,67 @@
+PointerData
+
+----
+
+This document describes the 'PointerData' class, passed to functions bound to
+pointer events.
+
+----
+
+Attributes
+
+----
+
+action
+
+The type of event. One of the input.Pointer.Action_* constants.
+
+----
+
+button
+
+The button (in the format that input.Pointer.bind() expects them) that caused
+the event. This will be 'None' if there was no button associated with the
+event. (This can only happen during a pointer grab.)
+
+----
+
+context
+
+A string containing the context of the event. See the Terminology section in
+the Pointer documentation for a decription and list of common contexts.
+
+----
+
+state
+
+An integer bitmask of the modifiers pressed down when the event occured.
+
+----
+
+buttonnum
+
+An integer containing the number of the pointer button associated with the
+event.
+
+----
+
+pos
+
+A tuple containing the current position of the cursor. The tuple has the format
+(x, y). This is only valid when 'action' is 'Action_Motion'.
+
+-----
+
+presspos
+
+A tuple containing the position of the cursor when the drag started. The tuple
+has the format (x, y). This is only valid when 'action' is 'Action_Motion'.
+
+----
+
+pressclientarea
+
+A tuple containing the area of the client when the drag started. The tuple has
+the format (x, y, width, height). This will be None if there is no client
+associated with the event (during a pointer grab, or a drag on the root
+window). This is only valid when 'action' is 'Action_Motion'.

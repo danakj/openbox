@@ -16,11 +16,6 @@ namespace otk {
 
 class ScreenInfo {
 private:
-  Visual *_visual;
-  Window _root_window;
-  Colormap _colormap;
-
-  int _depth;
   int _screen;
   std::string _display_string;
   Size _size;

@@ -1,0 +1,553 @@
+ob.Client
+
+----
+
+This document describes the 'ob.Client' class, exposed by Openbox to its python
+scripts. The 'Client' class cannot be instantiated, and can only be
+retrieved by catching events from Openbox, or from the ob.Openbox.clientList()
+method.
+
+A Client instance is associated with a single client window which Openbox is
+managing. When the client window is closed/destroyed/released, the Client
+instance will be marked as invalid (see valid()). Any methods of Client, with
+the exception of valid(), will raise a ReferenceError exception if they are
+called on a non-valid Client instance. For this reason, it is not encouraged to
+keep references to Client instances between events, unless you are tracking the
+hooks.closed hook or check valid() before attempting to reuse a Client
+instance.
+
+----
+
+Methods
+
+----
+
+valid()
+
+Returns if the Client instance is still valid. Client instances are marked as
+invalid when the Client they are associated is closed/destroyed/released.
+
+	Returns: True or False for if the Client instance is valid.
+
+----
+
+title()
+
+Returns the client's title.
+
+	Returns: A string containing the client's title.
+
+----
+
+setTitle(title)
+
+Change the client's title to the given string. This change will be overwritten
+if/when the client changes its title.
+
+	title: A string containing the new title for the client.
+
+----
+
+iconTitle()
+
+Returns's the client's icon title. The icon title is the title to be displayed
+when the client is iconified.
+
+	Returns: A string containing the client's icon title.
+
+----
+
+setIconTitle(title)
+
+Change the client's icon title to the given string. This change will be
+overwritten if/when the client changes its icon title.
+
+	title: A string containing the new icon title for the client.
+
+----
+
+desktop()
+
+Returns the desktop on which the client is visible. This value will always be
+in the range [0, ob.Openbox.numDesktops()), unless it is 0xffffffff. A value of
+0xffffffff indicates the client is visible on all desktops.
+
+	Returns: An integer containing the client's desktop,
+
+----
+
+setDesktop(desktop)
+
+Moves the client to the specified desktop. The desktop must be in the range
+[0, ob.Openbox.numDesktops()), unless it is 0xffffffff. A value of 0xffffffff
+indicates the client is visible on all desktops.
+
+	desktop: The desktop on which to place the client.
+
+----
+
+resName()
+
+Returns the resouce name of the client. The resource name is meant to provide
+an instance name for the client.
+
+	Returns: A string containing the client's resource name.
+
+----
+resClass()
+
+Returns the resouce class of the client. The resource class is meant to provide
+the genereal class of the application. e.g. 'Emacs', 'Xterm', 'XClock',
+'XLoad', and so on.
+
+	Returns: A string containing the client's resource class.
+
+----
+
+role()
+
+Returns the client's role. The role is meant to distinguish between different
+windows of an application. Each window should have a unique role.
+
+	Returns: A string containing the client window's role.
+
+----
+
+transient()
+
+Returns True or False describing if the client is a transient window. Transient
+windows are 'temporary' windows, such as preference dialogs, and usually have
+a parent window, which can be found from transientFor().
+
+	Returns: True or False for if the client is a transient window.
+
+----
+
+transientFor()
+
+Returns the client for which this client is a transient. See transient() for
+a description of transience.
+
+	Returns: A Client containing the client which this client is transient
+		 for. None if such a client does not exist.
+
+----
+
+transients()
+
+Returns a tuple containing all the Clients which are transients of this window.
+See transient() for a description of transience.
+
+	Returns: A tuple containing Clients which are transients for this
+		 client. The tuple may be empty.
+
+----
+
+type()
+
+Returns the logical type of the window. This is one of the ClientType
+constants. See also normal().
+
+	Returns: The type of the window.
+
+----
+
+normal()
+
+Returns True or False for if the client is a 'normal' window. Normal windows
+make up most applications. Non-normal windows have special rules applied to
+them at times such as for focus handling. An example of a non-normal window
+is 'gnome-panel'. This value is determined from the client's type(), but does
+not imply that the window is ClientType.Normal. Rather this is a more generic
+definition of 'normal' windows, and includes dialogs and others.
+
+	Returns: True or False declaring the client as 'normal' or not.
+
+----
+
+area()
+
+Returns the area of the screen which the client occupies. It may be important
+to note that this is the position and size of the client *with* its
+decorations. If you want the underlying position and size of the client
+itself, you should use clientArea(). See also logicalSize().
+
+	Returns: A tuple containing the area of the client and decorations on
+		 the screen. The tuple is in the format (x, y, width, height).
+
+----
+
+setArea(area, [final])
+
+Sets the client's area, moving and resizing it as specified (or as close as can
+be accomidated).
+
+	area: The new area for the client, in a tuple. The tuple should be of
+	      the format (x, y, width, height).
+
+	final: Optional True or False for if this is a final change. This
+	       should be set to False if the change is only part of a
+	       move/resize. Otherwise, it should be set to True. If it is not
+	       specified, it will default to True.
+
+----
+
+clientArea()
+
+Returns the area of the screen which the client considers itself to be
+occupying. This value is not what you see and should not be used for most
+things (it should, for example, be used for persisting a client's dimentions
+across sessions). See also area().
+
+	Returns: A tuple containing the area the client considers itself to be
+		 occupying. The tuple is in the format (x, y, width, height).
+
+----
+
+setClientArea(area)
+
+Sets the area of the screen which the client considers itself to be occupying.
+This is not the on-screen visible position and size, and should be used with
+care. You probably want to use setArea() to adjust the client. This should be
+used if you want the client window (inside the decorations) to be a specific
+size. Adjusting the client's position with this function is probably always a
+bad idea, because of window gravity.
+
+	area: The new area for the client. in a tuple. The tuple should be of
+	      the format (x, y, width, height).
+
+----
+
+frameSize()
+
+Returns the size of the decorations around the client window.
+
+	Returns: A tuple containing the size of the decorations on each side
+		 of the client window. The tuple has the format
+		 (left, top, right, bottom).
+
+----
+
+strut()
+
+Returns the application's specified strut. The strut is the amount of space
+that should be reserved for the application on each side of the screen.
+
+
+	Returns: A tuple containing the application's strut. The tuple has the
+		 format (left, top, right, bottom).
+
+----
+
+logicalSize()
+
+Returns the client's logical size. The logical size is the client's size in
+more user friendly terms. For many apps this is simply the size of the client
+in pixels, however for some apps this will differ (e.g. terminal emulators).
+This value should be used when displaying an applications size to the user.
+
+	Returns: A tuple containing the client's logical size. The tuple has
+		 the format (width, height).
+
+----
+
+canFocus()
+
+Returns True or False for if the client can be focused.
+
+	Returns: True or False for if the client can recieve input focus.
+
+----
+
+focus([focus])
+
+Focuses (or unfocuses) the client window. Windows which return False for
+canFocus() or visible() cannot be focused. When this function returns, the
+client's focused() state will not be changed yet. This only sends the request
+through the X server. You should wait for the hooks.focused hook to fire, and
+not assume the client has been focused.
+
+	focus: Optional. If True, the window will be focused. If False, and
+	       focused() is True, it will lose its focus. If the argument is
+	       not passed, it will default to True.
+
+	Returns: True if the client could be focused, and focus has been sent
+		 to the window. False if the client could not be focused.
+
+----
+
+focused()
+
+Returns True or False for if the client has the input focus.
+
+	Returns: True or False for if the client has the input focus.
+
+----
+
+visible()
+
+Returns True or False for if the client is visible. A client is not visible if
+it is iconic() or if its desktop() is not visible.
+
+	Returns: True or False for if the client is visible.
+
+----
+
+setVisible(show)
+
+Shows or hides the client. This has no effect if its current visible() state
+is requested.
+
+	show: True or False specifying if the client should be hidden or shown.
+
+----
+
+modal()
+
+Returns True or False for if the client is a modal window. Modal windows
+indicate that they must be dealt with before the program can continue. When
+a modal window is a transient(), its transientFor() client cannot be focused or
+raised above it.
+
+	Returns: True or False for if the client is a modal window.
+
+----
+
+setModal(modal)
+
+Make the client window modal or non-modal.
+
+	mdal: True or False to make the client modal or not respectively.
+
+----
+
+shaded()
+
+Returns True or False for if the client is shaded. Shaded windows have only
+their titlebar decorations showing.
+
+----
+
+setShaded(shade)
+
+Shade or unshade the client. Shaded windows have only their titlebar
+decorations showing. Windows which do not have a titlebar cannot be shaded.
+
+	shade: True or False to make the client shaded or not respectively.
+
+----
+
+iconic()
+
+Returns True or False for if the window is iconified. Iconified windows are not
+visible on any desktops.
+
+	Returns: True or False for if the client is iconified.
+
+----
+
+setIconic(iconify, [current])
+
+Iconifies or restores the client window. Iconified windows are not visible on
+any desktops. Iconified windows can be restored to the currently visible
+desktop or to their original (native) desktop.
+
+	iconify: True or False to iconify or deiconify the client repectively.
+
+	current: Optional True or False to specify if the client should be
+		 restored to the currently visible desktop or to the desktop
+		 from which it was iconified. This does not apply to windows
+		 who's desktop() is 0xffffffff. If this is not specified, it
+		 defaults to True (the current desktop).
+
+----
+
+maximizedHorz()
+
+Returns whether the client is maximized in the horizontal direction.
+
+	Returns: True if the client is maximized horizontally; False if it is
+		 not.
+
+----
+
+setMaximizedHorz(max)
+
+Maximizes or restores a client horizontally.
+
+	max: True or False for if the client should be maximized or
+	     unmaximized in the horizontal direction.
+
+----
+
+maximizedVert()
+
+Returns whether the client is maximized in the vertical direction.
+
+	Returns: True if the client is maximized vertically; False if it is
+		 not.
+
+----
+
+setMaximizedVert(max)
+
+Maximizes or restores a client vertically.
+
+	max: True or False for if the client should be maximized or
+	     unmaximized in the vertical direction.
+
+----
+
+maximized()
+
+Returns whether the client is maximized in the horizontal or vertical
+direction.
+
+	Returns: True if the client is maximized horizontally or vertically;
+		 False if it is not.
+
+----
+
+setMaximized(max)
+
+Maximizes or restores a client vertically and horzontally.
+
+	max: True or False for if the client should be maximized or
+	     unmaximized in the vertical and horizontal direction.
+-
+---
+
+fullscreen()
+
+Returns if the client is in fullscreen mode. Fullscreen windows are kept above
+all other windows and are stretched to fill the entire physical display.
+
+	Returns: True or False for if the client is fullscreen.
+
+----
+
+setFullscreen(full)
+
+Set a client into or out of fullscreen mode. Fullscreen windows are kept above
+all other windows and are stretched to fill the entire physical display.
+
+	full: True or False to set the client into or out of fullscreen mode
+	      respectively.
+
+----
+
+stacking()
+
+Returns if the client will be stacked above/below other clients in the same
+layer.
+
+	Returns: An integer > 0 if the client will be stacked above other
+		 clients in its layer. An integer < 0 if it will be stacked
+		 below other clients. 0 will be returned if the client is
+		 stacked as normal amongst other clients in its layer.
+
+----
+
+setStacking(stack)
+
+Set how the client will be stacked according to other clients in its layer.
+
+	stack: An integer > 0 if the client should be stacked above other
+	       clients in its layer. An integer < 0 if it should be stacked
+	       below other clients. Exactly 0 if the client should be stacked
+	       as normal amongst other clients in its layer.
+
+----
+
+raiseWindow()
+
+Raises the window to the top of its stacking layer.
+
+----
+
+lowerWindow()
+
+Lowers the window to the bottom of its stacking layer.
+
+----
+
+skipPager()
+
+Returns if the client has requested to be skipped (not displayed) by pagers.
+
+	Returns: True or False for if the client has requested to be skiped by
+		 pagers.
+
+----
+
+setSkipPager(skip)
+
+Set whether the client should be skipped (not displayed) by pagers.
+
+	skip: True or False to make the client be skipped or not skipped by
+	      pagers.
+
+----
+
+skipTaskbar()
+
+Returns if the client has requested to be skipped (not displayed) by taskbars.
+
+	Returns: True or False for if the client has requested to be skiped by
+		 taskbars.
+
+----
+
+setSkipTaskbar(skip)
+
+Set whether the client should be skipped (not displayed) by taskbars.
+
+	skip: True or False to make the client be skipped or not skipped by
+	      taskbars.
+
+----
+
+disableDecorations(titlebar, handle, border)
+
+Choose which decorations to disable on the client. Note that decorations can
+only be disabled, and decorations that would normally not be shown cannot be
+added. These values may have slightly different meanings in different theme
+engines.
+
+	titlebar: True to disable, or False to enable (if possible) the
+		  client's titlebar.
+
+	handle: True to disable, or False to enable (if possible) the
+		client's handle.
+
+	border: True to disable, or False to enable (if possible) the
+		client's border.
+
+----
+
+close()
+
+Requests the client to close its window.
+
+----
+
+window()
+
+Returns the client's window id. This is the id by which the X server knows the
+client.
+
+	Returns: An integer containing the client's window id.
+
+----
+
+ob.ClientType
+
+ClientType.Normal: a normal application window.
+ClientType.Dialog: a dialog window (usually a transient()).
+ClientType.Desktop: a desktop (bottom-most) window.
+ClientType.Dock: a dock or panel window.
+ClientType.Toolbar: a toolbar "torn off" from an application.
+ClientType.Menu: a pinnable menu "torn off" from an application.
+ClientType.Utility: a small persistent utility window such as a
+		    palette or toolbox.
+ClientType.Splash: a splash screen window.

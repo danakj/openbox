@@ -1,0 +1,13 @@
+config.Config
+
+----
+
+This document describes the 'Config' class, exposed by Openbox's 'config'
+module to its python scripts.
+
+----
+
+Methods
+
+----
+

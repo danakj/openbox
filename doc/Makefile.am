@@ -1,9 +1,9 @@
-CLEANFILES = openbox.1
+#CLEANFILES = openbox.1
 MAINTAINERCLEANFILES = Makefile.in
-man_MANS = openbox.1
+#man_MANS = openbox.1
 SUBDIRS = doxygen
 
-EXTRA_DIST = openbox.1.in
+#EXTRA_DIST = openbox.1.in
 
 DEFAULT_MENU=$(pkgdatadir)/menu
 

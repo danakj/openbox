@@ -8,7 +8,6 @@ extern "C" {
 
 namespace otk {
 
-class ScreenInfo;
 class RenderControl;
 
 class Display;
@@ -56,37 +55,23 @@ private:
   //! When true, X errors will be ignored. Use with care.
   bool _ignore_errors;
 
-  //! A list of information for all screens on the display
-  ScreenInfo** _screeninfo_list;
+  //! The optimal visual for the display
+  Visual *_visual;
 
-  //! A list of RenderControl objects, which are used for all graphics on a
-  //! screen
-  RenderControl** _rendercontrol_list;
+  //! Our colormap built for the optimal visual
+  Colormap _colormap;
 
+  //! The depth of our optimal visual
+  int _depth;
+  
 public:
-  //! Initializes the class, opens the X display
+  //! Wraps an open Display connection
   /*!
-    The DISPLAY environment variable is used to choose the display.
-    @see Display::display
+    @param d An open Display connection.
   */
-  Display();
+  Display(::Display *d);
   //! Destroys the class, closes the X display
   ~Display();
-
-  //! Gets information on a specific screen
-  /*!
-    Returns a ScreenInfo class, which contains information for a screen on the
-    display.
-    @param snum The screen number of the screen to retrieve info on
-    @return Info on the requested screen, in a ScreenInfo class
-  */
-  const ScreenInfo* screenInfo(int snum) const;
-
-  //! Find a ScreenInfo based on a root window
-  const ScreenInfo* findScreen(Window root) const;
-
-  //! Gets the RenderControl for a screen
-  const RenderControl *renderControl(int snum) const;
 
   //! Returns if the display has the xkb extension available
   inline bool xkb() const { return _xkb; }

@@ -461,6 +461,7 @@ void client_unmanage(ObClient *self)
     g_free(self->name);
     g_free(self->class);
     g_free(self->role);
+    g_free(self->sm_client_id);
     g_free(self);
      
     /* update the list hints */
@@ -677,6 +678,7 @@ static void client_get_all(ObClient *self)
   
     client_update_title(self);
     client_update_class(self);
+    client_update_sm_client_id(self);
     client_update_strut(self);
     client_update_icons(self);
 }
@@ -2795,13 +2797,15 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
     return NULL;
 }
 
-gchar* client_get_sm_client_id(ObClient *self)
+void client_update_sm_client_id(ObClient *self)
 {
-    gchar *id = NULL;
+    g_free(self->sm_client_id);
+    self->sm_client_id = NULL;
 
-    if (!PROP_GETS(self->window, sm_client_id, locale, &id) && self->group)
-        PROP_GETS(self->group->leader, sm_client_id, locale, &id);
-    return id;
+    if (!PROP_GETS(self->window, sm_client_id, locale, &self->sm_client_id) &&
+        self->group)
+        PROP_GETS(self->group->leader, sm_client_id, locale,
+                  &self->sm_client_id);
 }
 
 /* finds the nearest edge in the given direction from the current client

@@ -106,6 +106,8 @@ struct _ObClient
     gchar *class;
     /*! The specified role of the window, used for identification */
     gchar *role;
+    /*! The session client id for the window. *This can be NULL!* */
+    gchar *sm_client_id;
 
     /*! The type of window (what its function is) */
     ObClientType type;
@@ -497,6 +499,6 @@ void client_set_layer(ObClient *self, int layer);
 
 guint client_monitor(ObClient *self);
 
-gchar* client_get_sm_client_id(ObClient *self);
+void client_update_sm_client_id(ObClient *self);
 
 #endif

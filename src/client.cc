@@ -89,7 +89,7 @@ void OBClient::getDesktop()
   const otk::OBProperty *property = Openbox::instance->property();
 
   // defaults to the current desktop
-  _desktop = 0; // XXX: change this to the current desktop!
+  _desktop = Openbox::instance->screen(_screen)->desktop();
 
   property->get(_window, otk::OBProperty::net_wm_desktop,
                 otk::OBProperty::Atom_Cardinal,
@@ -877,15 +877,23 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
       setDesktop(e.data.l[0]); // use the original event
   } else if (e.message_type == property->atom(otk::OBProperty::net_wm_state)) {
     // can't compress these
+#ifdef DEBUG
+    printf("net_wm_state for 0x%lx\n", _window);
+#endif
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
   } else if (e.message_type ==
              property->atom(otk::OBProperty::net_close_window)) {
+#ifdef DEBUG
+    printf("net_close_window for 0x%lx\n", _window);
+#endif
     close();
   } else if (e.message_type ==
              property->atom(otk::OBProperty::net_active_window)) {
+#ifdef DEBUG
+    printf("net_active_window for 0x%lx\n", _window);
+#endif
     focus();
     Openbox::instance->screen(_screen)->restack(true, this); // raise
-  } else {
   }
 }
 
@@ -1130,10 +1138,8 @@ void OBClient::unfocusHandler(const XFocusChangeEvent &e)
   frame->unfocus();
   _focused = false;
 
-  if (Openbox::instance->focusedClient() == this) {
-    printf("UNFOCUSED!\n");
-    Openbox::instance->setFocusedClient(this);
-  }
+  if (Openbox::instance->focusedClient() == this)
+    Openbox::instance->setFocusedClient(0);
 }
 
 

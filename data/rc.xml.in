@@ -17,7 +17,9 @@
 <focus>
   <focusNew>yes</focusNew>
   <followMouse>no</followMouse>
+  <focusLast>yes</focusLast>
   <focusDelay>0</focusDelay>
+  <raiseOnFocus>no</raiseOnFocus>
 </focus>
 
 <theme>

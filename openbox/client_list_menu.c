@@ -31,7 +31,8 @@
 
 static GSList *desktop_menus;
 
-typedef struct {
+typedef struct
+{
     guint desktop;
 } DesktopData;
 
@@ -92,12 +93,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
    when we make the actions! */
 static void desk_menu_execute(ObMenuEntry *self, guint state, gpointer data)
 {
-    GSList *it;
+    ObAction *a;
 
-    for (it = self->data.normal.actions; it; it = g_slist_next(it))
-    {
-        ObAction *act = it->data;
-        action_run(it->data, act->data.any.c, state);
+    if (self->data.normal.actions) {
+        a = self->data.normal.actions->data;
+        action_run(self->data.normal.actions, a->data.any.c, state);
     }
 }
 

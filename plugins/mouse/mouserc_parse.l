@@ -25,7 +25,7 @@ white [ \t]*
 
 %%
 
-^{white}\#.+\n lineno++;
+^{white}\#.*\n lineno++;
 {field} gotfield();
 \n endofline();
 [ \t]

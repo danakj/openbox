@@ -41,7 +41,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
   AC_MSG_CHECKING([for GNU C++])
   if test "$GXX" = "yes"; then
     AC_MSG_RESULT([yes])
-    FLAGS="-Wall -W"
+    FLAGS="-Wall -W -fno-check-new -fno-execptions"
     # -pedantic
     test "$DEBUG" = "yes" && FLAGS="$FLAGS -g -fno-inline"
   else

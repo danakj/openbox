@@ -85,6 +85,15 @@ typedef struct {
 } Action;
 
 Action *action_new(void (*func)(union ActionData *data));
+
+/* Creates a new Action from the name of the action
+   A few action types need data set after making this call still. Check if
+   the returned action's "func" is one of these.
+   action_execute - the path needs to be set
+   action_restart - the path can optionally be set
+   action_desktop - the destination desktop needs to be set
+*/
+Action *action_from_string(char *name);
 void action_free(Action *a);
 
 /* Execute */

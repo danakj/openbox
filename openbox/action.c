@@ -98,6 +98,8 @@ Action *action_from_string(char *name)
         a = action_new(action_send_to_previous_desktop);
         a->data.sendtonextprev.wrap = TRUE;
         a->data.sendtonextprev.follow = TRUE;
+    } else if (!g_ascii_strcasecmp(name, "desktop")) {
+        a = action_new(action_desktop);
     } else if (!g_ascii_strcasecmp(name, "nextdesktop")) {
         a = action_new(action_next_desktop);
         a->data.nextprevdesktop.wrap = FALSE;

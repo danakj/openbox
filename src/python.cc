@@ -189,6 +189,7 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func)
   Py_INCREF(Py_None); return Py_None;
 }
 
+/*
 PyObject *kunbind(PyObject *keylist, PyObject *func)
 {
   if (!PyList_Check(keylist)) {
@@ -217,6 +218,7 @@ PyObject *kunbind(PyObject *keylist, PyObject *func)
   }
   Py_INCREF(Py_None); return Py_None;
 }
+*/
 
 void kunbind_all()
 {

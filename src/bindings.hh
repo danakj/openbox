@@ -103,12 +103,12 @@ public:
   */
   bool addKey(const StringVect &keylist, PyObject *callback);
 
-  //! Removes a key binding
-  /*!
-    @return The callbackid of the binding, or '< 0' if there was no binding to
-            be removed.
-  */
-  bool removeKey(const StringVect &keylist, PyObject *callback);
+  ////! Removes a key binding
+  ///*!
+  //  @return The callbackid of the binding, or '< 0' if there was no binding to
+  //          be removed.
+  //*/
+  //bool removeKey(const StringVect &keylist, PyObject *callback);
 
   //! Removes all key bindings
   void removeAllKeys();

@@ -241,7 +241,6 @@ bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
 
   if (t) {
     // already bound to something
-    // XXX: look if callback is already bound to this key?
     t->callbacks.push_back(callback);
     destroytree(tree);
   } else {
@@ -261,7 +260,7 @@ bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
   return true;
 }
 
-
+/*
 bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
 {
   assert(false); // XXX: function not implemented yet
@@ -295,7 +294,7 @@ bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
   }
   return false;
 }
-
+*/
 
 void Bindings::setResetKey(const std::string &key)
 {

@@ -78,7 +78,8 @@ static void foreach_clear(GQuark key, gpointer data, gpointer user_data)
 
         MouseBinding *b = it->data;
 	for (i = 0; i < NUM_MOUSEACTION; ++i)
-            action_free(b->action[i]);
+            if (b->action[i] != NULL)
+                action_free(b->action[i]);
         g_free(b);
     }
     g_slist_free(data);
@@ -328,8 +329,7 @@ static gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
     b->state = state;
     b->button = button;
     for (i = 0; i < NUM_MOUSEACTION; ++i)
-        if (i != mact)
-            b->action[i] = NULL;
+        b->action[i] = NULL;
     b->action[mact] = action;
     g_datalist_id_set_data(&bound_contexts, context, 
         g_slist_append(g_datalist_id_get_data(&bound_contexts, context), b));

@@ -43,9 +43,9 @@ extern "C" {
 #endif // HAVE_CTYPE_H
 }
 
-#include "../src/gccache.hh"
-#include "../src/texture.hh"
-#include "../src/util.hh"
+#include "gccache.hh"
+#include "texture.hh"
+#include "util.hh"
 #include "bsetroot.hh"
 
 bsetroot::bsetroot(int argc, char **argv, char *dpy_name)

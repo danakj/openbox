@@ -24,8 +24,8 @@
 #ifndef   __bsetroot2_hh
 #define   __bsetroot2_hh
 
-#include "../src/basedisplay.hh"
-#include "../src/image.hh"
+#include "basedisplay.hh"
+#include "image.hh"
 
 #include <string>
 

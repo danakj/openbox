@@ -7,11 +7,13 @@ bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot xftlsfonts
 
 bsetroot_SOURCES =	bsetroot.cc
-bsetroot_LDADD =	../src/basedisplay.o ../src/color.o ../src/gccache.o \
-			../src/texture.o ../src/timer.o ../src/image.o \
-			../src/imagecontrol.o ../src/util.o
+bsetroot_LDADD =	../src/basedisplay.o ../otk/color.o ../otk/gccache.o \
+			../otk/texture.o ../src/timer.o ../otk/image.o \
+			../otk/imagecontrol.o ../src/util.o
 
 xftlsfonts_SOURCES = xftlsfonts.cc
+
+INCLUDES= -I../src -I../otk
 
 MAINTAINERCLEANFILES =	Makefile.in
 

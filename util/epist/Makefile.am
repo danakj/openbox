@@ -15,8 +15,7 @@ epist_SOURCES =		epist.cc window.cc screen.cc main.cc actions.cc \
 			yacc_parser.cc parser.cc keytree.cc lex.yy.c config.cc
 
 epist_LDADD =		../../src/xatom.o ../../src/basedisplay.o \
-			../../src/util.o ../../src/timer.o \
-			../../src/gccache.o ../../src/color.o
+			../../src/util.o ../../src/timer.o
 
 MAINTAINERCLEANFILES =	Makefile.in
 

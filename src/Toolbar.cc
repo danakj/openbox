@@ -528,15 +528,20 @@ void Toolbar::updateStrut(void) {
   // left and right are always 0
   strut.top = strut.bottom = 0;
 
+  // when hidden only one border is visible
+  unsigned int border_width = screen->getBorderWidth();
+  if (! do_auto_hide)
+    border_width *= 2;
+
   if (! screen->doHideToolbar()) {
     switch(placement) {
     case TopLeft:
     case TopCenter:
     case TopRight:
-      strut.top = getExposedHeight() + (screen->getBorderWidth() * 2);
+      strut.top = getExposedHeight() + border_width;
       break;
     default:
-      strut.bottom = getExposedHeight() + (screen->getBorderWidth() * 2);
+      strut.bottom = getExposedHeight() + border_width;
     }
   }
 

@@ -163,8 +163,6 @@ public:
                                                      f(0), enabled(1),
                                                      selected(0) {}
 
-  ~BasemenuItem(void);
-
   inline const char *exec(void) const { return e.c_str(); }
   inline const char *label(void) const { return l.c_str(); }
   inline int function(void) const { return f; }

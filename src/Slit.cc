@@ -433,25 +433,29 @@ void Slit::updateStrut(void) {
   strut.top = strut.bottom = strut.left = strut.right = 0;
 
   if (! clientList.empty()) {
+    // when not hidden both borders are in use, when hidden only one is
+    unsigned int border_width = screen->getBorderWidth();
+    if (! do_auto_hide)
+      border_width *= 2;
+
     switch (direction) {
     case Vertical:
       switch (placement) {
       case TopCenter:
-        strut.top = getY() + getExposedHeight() +
-                    (screen->getBorderWidth() * 2);
+        strut.top = getExposedHeight() + border_width;
         break;
       case BottomCenter:
-        strut.bottom = screen->getHeight() - getY();
+        strut.bottom = getExposedHeight() + border_width;
         break;
       case TopLeft:
       case CenterLeft:
       case BottomLeft:
-        strut.left = getExposedWidth() + (screen->getBorderWidth() * 2);
+        strut.left = getExposedWidth() + border_width;
         break;
       case TopRight:
       case CenterRight:
       case BottomRight:
-        strut.right = getExposedWidth() + (screen->getBorderWidth() * 2);
+        strut.right = getExposedWidth() + border_width;
         break;
       }
       break;
@@ -460,19 +464,18 @@ void Slit::updateStrut(void) {
       case TopCenter:
       case TopLeft:
       case TopRight:
-        strut.top = getY() + getExposedHeight() +
-                    (screen->getBorderWidth() * 2);
+        strut.top = getExposedHeight() + border_width;
         break;
       case BottomCenter:
       case BottomLeft:
       case BottomRight:
-        strut.bottom = screen->getHeight() - getY();
+        strut.bottom = getExposedHeight() + border_width;
         break;
       case CenterLeft:
-        strut.left = getExposedWidth() + (screen->getBorderWidth() * 2);
+        strut.left = getExposedWidth() + border_width;
         break;
       case CenterRight:
-        strut.right = getExposedWidth() + (screen->getBorderWidth() * 2);
+        strut.right = getExposedWidth() + border_width;
         break;
       }
       break;

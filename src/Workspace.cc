@@ -97,18 +97,39 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
 
   stackingList.remove(w);
 
-  if (w->isFocused() && ! screen->getBlackbox()->doShutdown()) {
+  // pass focus to the next appropriate window
+  if ((w->isFocused() || w == lastfocus) &&
+      ! screen->getBlackbox()->doShutdown()) {
     BlackboxWindow *newfocus = 0;
     if (w->isTransient())
       newfocus = w->getTransientFor();
     if (! newfocus && ! stackingList.empty())
       newfocus = stackingList.front();
-    if (! newfocus || ! newfocus->setInputFocus())
-      screen->getBlackbox()->setFocusedWindow(0);
-  }
 
-  if (lastfocus == w)
-    lastfocus = (BlackboxWindow *) 0;
+    assert(newfocus != w);  // this would be very wrong.
+
+    if (id == screen->getCurrentWorkspaceID()) {
+      /*
+        if the window is on the visible workspace, then try focus it, and fall
+        back to the default focus target if the window won't focus.
+      */
+      if (! newfocus || ! newfocus->setInputFocus())
+        screen->getBlackbox()->setFocusedWindow(0);
+    } else if (lastfocus == w) {
+      /*
+        If this workspace is not the current one do not assume that
+        w == lastfocus. If a sticky window is removed on a workspace other
+        than where it originated, it will fire the removeWindow on a
+        non-visible workspace.
+      */
+      
+      /*
+        If the window isn't on the visible workspace, don't focus the new one,
+        just mark it to be focused when the workspace comes into view.
+      */
+      setLastFocusedWindow(newfocus);
+    }
+  }
 
   windowList.remove(w);
   clientmenu->remove(w->getWindowNumber());

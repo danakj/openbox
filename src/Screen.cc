@@ -245,6 +245,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   workspacemenu->setItemSelected(2, True);
 
+  removeWorkspaceNames(); // do not need them any longer
+
   toolbar = new Toolbar(this);
 
   slit = new Slit(this);
@@ -593,7 +595,6 @@ void BScreen::load_rc(void) {
   else
     resource.col_direction = TopBottom;
 
-  removeWorkspaceNames();
   if (config->getValue(screenstr + "workspaceNames", s)) {
     string::const_iterator it = s.begin(), end = s.end();
     while(1) {
@@ -1060,10 +1061,6 @@ void BScreen::changeWorkspaceID(unsigned int id) {
   if (! current_workspace) return;
 
   if (id != current_workspace->getID()) {
-    current_workspace->hideAll();
-
-    workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
-
     BlackboxWindow *focused = blackbox->getFocusedWindow();
     if (focused && focused->getScreen() == this && ! focused->isStuck()) {
       if (focused->getWorkspaceNumber() != current_workspace->getID()) {
@@ -1072,8 +1069,15 @@ void BScreen::changeWorkspaceID(unsigned int id) {
         abort();
       }
       current_workspace->setLastFocusedWindow(focused);
-      blackbox->setFocusedWindow((BlackboxWindow *) 0);
+    } else {
+      // if no window had focus, no need to store a last focus
+      current_workspace->setLastFocusedWindow((BlackboxWindow *) 0);
     }
+    // when we switch workspaces, unfocus whatever was focused
+    blackbox->setFocusedWindow((BlackboxWindow *) 0);
+    
+    current_workspace->hideAll();
+    workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
 
     current_workspace = getWorkspace(id);
 
@@ -1229,7 +1233,7 @@ void BScreen::updateNetizenConfigNotify(XEvent *e) {
 
 
 void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
-  // XXX: why 13??
+  // the 13 represents the number of blackbox windows such as menus
   Window *session_stack = new
     Window[(num + workspacesList.size() + rootmenuList.size() + 13)];
   unsigned int i = 0, k = num;

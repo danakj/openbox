@@ -411,43 +411,55 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
   screen_number = num;
 
   root_window = RootWindow(basedisplay->getXDisplay(), screen_number);
-  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
 
   rect.setSize(WidthOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(),
                                              screen_number)),
                HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(),
                                               screen_number)));
+  /*
+    If the default depth is at least 15 we will use that,
+    otherwise we try to find the largest TrueColor visual.
+    Preference is given to 24 bit over larger depths if 24 bit is an option.
+  */
 
-  // search for a TrueColor Visual... if we can't find one... we will use the
-  // default visual for the screen
-  XVisualInfo vinfo_template, *vinfo_return;
-  int vinfo_nitems;
+  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
+  visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
+  colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
+  
+  if (depth < 15) {
+    // search for a TrueColor Visual... if we can't find one...
+    // we will use the default visual for the screen
+    XVisualInfo vinfo_template, *vinfo_return;
+    int vinfo_nitems;
+    int best = -1;
 
-  vinfo_template.screen = screen_number;
-  vinfo_template.c_class = TrueColor;
+    vinfo_template.screen = screen_number;
+    vinfo_template.c_class = TrueColor;
 
-  visual = (Visual *) 0;
-
-  vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
-                                VisualScreenMask | VisualClassMask,
-                                &vinfo_template, &vinfo_nitems);
-  if (vinfo_return && vinfo_nitems > 0) {
-    for (int i = 0; i < vinfo_nitems; i++) {
-      if (depth < (vinfo_return + i)->depth) {
-        depth = (vinfo_return + i)->depth;
-        visual = (vinfo_return + i)->visual;
+    vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
+                                  VisualScreenMask | VisualClassMask,
+                                  &vinfo_template, &vinfo_nitems);
+    if (vinfo_return) {
+      int max_depth = 1;
+      for (int i = 0; i < vinfo_nitems; ++i) {
+        if (vinfo_return[i].depth > max_depth) {
+          if (max_depth == 24 && vinfo_return[i].depth > 24)
+            break;          // prefer 24 bit over 32
+          max_depth = vinfo_return[i].depth;
+          best = i;
+        }
       }
+      if (max_depth < depth) best = -1;
+    }
+
+    if (best != -1) {
+      depth = vinfo_return[best].depth;
+      visual = vinfo_return[best].visual;
+      colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
+                                 visual, AllocNone);
     }
 
     XFree(vinfo_return);
-  }
-
-  if (visual) {
-    colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
-                               visual, AllocNone);
-  } else {
-    visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
-    colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
   }
 
   // get the default display string and strip the screen number

@@ -201,14 +201,11 @@ Basemenu::~Basemenu(void) {
 }
 
 
-BasemenuItem::~BasemenuItem(void) {}
-
-
 BasemenuItem *Basemenu::find(int index) {
-  if (index < 0 || index > static_cast<signed>(menuitems.size()))
+  if (index < 0 || index >= static_cast<signed>(menuitems.size()))
     return (BasemenuItem*) 0;
 
-  return *(menuitems.begin() + index);
+  return menuitems[index];
 }
 
 
@@ -593,8 +590,7 @@ bool Basemenu::hasSubmenu(int index) {
 
 
 void Basemenu::drawItem(int index, bool highlight, bool clear,
-                        int x, int y, unsigned int w, unsigned int h)
-{
+                        int x, int y, unsigned int w, unsigned int h) {
   BasemenuItem *item = find(index);
   if (! item) return;
 

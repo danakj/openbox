@@ -149,3 +149,46 @@ void RrIncreaseDepth(struct RrInstance *i, RrData32 *data, XImage *im)
         g_message("this image bit depth is currently unhandled\n");
     }
 }
+
+
+gboolean RrPixmapToRGBA(struct RrInstance *inst, Pixmap pmap, 
+                               Pixmap mask, int *w, int *h, RrData32 **data)
+{
+    Window xr;
+    int xx, xy;
+    guint pw, ph, mw, mh, xb, xd, i, x, y, di;
+    XImage *xi, *xm = NULL;
+    if (!XGetGeometry(inst->display, pmap, &xr, &xx, &xy, &pw, &ph, &xb, &xd))
+        return FALSE;
+    if (mask) {
+        if (!XGetGeometry(inst->display, mask,
+                          &xr, &xx, &xy, &mw, &mh, &xb, &xd))
+            return FALSE;
+        if (pw != mw || ph != mh || xd != 1)
+            return FALSE;
+    }
+    xi = XGetImage(inst->display, pmap, 0, 0, pw, ph, 0xffffffff, ZPixmap);
+    if (!xi)
+        return FALSE;
+    if (mask) {
+        xm = XGetImage(inst->display, mask, 0, 0, mw, mh, 0xffffffff, ZPixmap);
+        if (!xm)
+            return FALSE;
+    }
+    *data = g_new(RrData32, pw * ph);
+    RrIncreaseDepth(inst, *data, xi);
+    if (mask) {
+        /* apply transparency from the mask */
+        di = 0;
+        for (i = 0, y = 0; y < ph; ++y) {
+            for (x = 0; x < pw; ++x, ++i) {
+                if (!((((unsigned)xm->data[di + x / 8]) >> (x % 8)) & 0x1))
+                    (*data)[i] &= ~(0xff << default_alpha_offset);
+            }
+            di += xm->bytes_per_line;
+        }
+    }
+    *w = pw;
+    *h = ph;
+    return TRUE;
+}

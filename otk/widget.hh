@@ -4,6 +4,7 @@
 #include "rect.hh"
 #include "point.hh"
 #include "texture.hh"
+#include "style.hh"
 
 namespace otk {
 
@@ -11,10 +12,13 @@ class OtkWidget {
 
 public:
 
+  enum Direction { Horizontal, Vertical };
+
   typedef std::list<OtkWidget *> OtkWidgetList;
 
-  OtkWidget(OtkWidget *parent);
-  OtkWidget(unsigned int screen, Cursor);
+  OtkWidget(OtkWidget *parent, Direction = Horizontal);
+  OtkWidget(Style *style, Direction direction = Horizontal,
+            Cursor cursor = 0, int bevel_width = 1);
 
   virtual ~OtkWidget();
 
@@ -40,7 +44,6 @@ public:
 
   inline bool isFocused(void) const { return _focused; };
   virtual void focus(void);
-  virtual void blur(void);
 
   inline bool hasGrabbedMouse(void) const { return _grabbed_mouse; }
   bool grabMouse(void);
@@ -51,9 +54,9 @@ public:
   void ungrabKeyboard(void);
 
   inline const BTexture *getTexture(void) const { return _texture; }
-  virtual void setTexture(BTexture *texture);
+  virtual void setTexture(BTexture *texture = 0);
 
-  virtual void addChild(OtkWidget *child);
+  virtual void addChild(OtkWidget *child, bool front = false);
   virtual void removeChild(OtkWidget *child);
 
   inline bool getStretchableHorz(void) const { return _stretchable_horz; }
@@ -64,6 +67,16 @@ public:
 
   inline Cursor getCursor(void) const { return _cursor; }
 
+  inline int getBevelWidth(void) const { return _bevel_width; }
+  void setBevelWidth(int bevel_width)
+  { assert(bevel_width > 0); _bevel_width = bevel_width; }
+
+  inline Direction getDirection(void) const { return _direction; }
+  void setDirection(Direction dir) { _direction = dir; }
+
+  inline Style *getStyle(void) const { return _style; }
+  void setStyle(Style *style) { _style = style; }
+
 private:
 
   void create(void);
@@ -73,6 +86,11 @@ private:
   OtkWidget *_parent;
   OtkWidgetList _children;
  
+  Style *_style;
+  Direction _direction;
+  Cursor _cursor;
+  int _bevel_width;
+
   bool _visible;
   bool _focused;
 
@@ -83,11 +101,10 @@ private:
   bool _stretchable_horz;
 
   BTexture *_texture;
+  Pixmap _bg_pixmap;
 
   Rect _rect;
   unsigned int _screen;
-
-  Cursor _cursor;
 };
 
 }

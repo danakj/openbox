@@ -113,7 +113,6 @@ RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
 void RrFontClose(RrFont *f)
 {
     if (f) {
-        g_message("freeing %p", f);
         XftFontClose(RrDisplay(f->inst), f->xftfont);
         g_free(f);
     }

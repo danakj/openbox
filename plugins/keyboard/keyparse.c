@@ -17,7 +17,7 @@ void keyparse(ParseToken *token)
         /* just fall through and free the token */
     } else if (top == NULL) {
         if (token->type == TOKEN_IDENTIFIER &&
-            !g_ascii_strcasecmp("key", token->data.identifier)) {
+            !g_ascii_strcasecmp("kbind", token->data.identifier)) {
             top = token->data.identifier;
             return;
         } else {

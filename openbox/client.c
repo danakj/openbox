@@ -123,7 +123,10 @@ void client_manage_all()
     }
     XFree(children);
 
-    /* stack them as they were on startup! */
+    /* stack them as they were on startup!
+       why with stacking_lower? Why, because then windows who aren't in the
+       stacking list are on the top where you can see them instead of buried
+       at the bottom! */
     for (i = client_startup_stack_size; i > 0; --i) {
         Client *c;
 

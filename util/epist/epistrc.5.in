@@ -22,7 +22,7 @@ options {
 .br
 }
 .PP
-The option name is a string of characters, and the option value can be either a string in double quotes or a number.
+The option name is a string of characters, and the option value can be either a string in double quotes, a number, or a boolen value (the words True or False without quotes around them).
 .SS Bindings
 Bindings are specified in this format:
 .PP
@@ -62,11 +62,18 @@ Control-Mod1-x {
 .br
 }
 .SH OPTIONS
-.SS chainTimeout
+.SS stackedCycling (boolean)
+When this option is set to True, any window cycling actions, such as nextWindow,
+prevWindow, nextWindowOfClass, etc., will cause the windows to focus, but they will
+not be raised until the modifiers are released. When the modifier is released,
+the focused (and now raised) window will be moved to the top of the stacking order,
+so if you execute nextWindow and release the modifiers multiple times, focus will
+cycle between two windows.
+.SS chainTimeout (number)
 Specifies the period of time after which a started key chain will
 be timed out. It takes a number argument specifying the number of
 milliseconds to wait. It defaults to 4000.
-.SS workspaceColumns
+.SS workspaceColumns (number)
 Specifies the number of columns of your workspace layout if you are using
 your workspaces in a 2-dimensional manner. This option must exist if one of
 the prevWorkspaceColumn, prevWorkspaceRow, nextWorkspaceColumn,

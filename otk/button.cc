@@ -38,6 +38,8 @@ void Button::release(unsigned int mouse_button)
 
   styleChanged(*RenderStyle::style(screen()));
   refresh();
+
+  clickHandler(_mouse_button);
 }
 
 void Button::buttonPressHandler(const XButtonEvent &e)

@@ -20,6 +20,8 @@ public:
   virtual void buttonPressHandler(const XButtonEvent &e);
   virtual void buttonReleaseHandler(const XButtonEvent &e);
 
+  virtual void clickHandler(unsigned int button) {(void)button;}
+
   virtual void styleChanged(const RenderStyle &style);
  
 private:

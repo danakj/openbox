@@ -100,6 +100,8 @@ protected:
   void createWindow(bool overrideredir);
 
   RenderTexture *_texture;
+
+  EventDispatcher *dispatcher() const { return _dispatcher; }
   
 private:
   void internal_moveresize(int x, int y, int w, int h);

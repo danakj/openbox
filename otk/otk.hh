@@ -15,6 +15,7 @@
 #include "rendercolor.hh"
 #include "display.hh"
 #include "font.hh"
+#include "messagedialog.hh"
 #include "rendercontrol.hh"
 #include "size.hh"
 #include "point.hh"

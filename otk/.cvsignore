@@ -37,6 +37,7 @@ surface.lo
 rendertexture.lo
 rendertest
 renderstyle.lo
+messagedialog.lo
 rendercontrol.lo
 rendercolor.lo
 otk.py

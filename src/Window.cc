@@ -55,6 +55,7 @@ extern "C" {
 #include "Workspace.hh"
 #include "Slit.hh"
 
+using std::string;
 
 /*
  * Initializes the class with default values/the window's set initial values.
@@ -649,54 +650,86 @@ void BlackboxWindow::destroyMaximizeButton(void) {
 
 
 void BlackboxWindow::positionButtons(bool redecorate_label) {
-  unsigned int bw = frame.button_w + frame.bevel_w + 1,
-    by = frame.bevel_w + 1, lx = by, lw = frame.inside_w - by;
+  string layout = blackbox->getTitlebarLayout();
+  string parsed;
 
-  if (decorations & Decor_Iconify) {
-    if (frame.iconify_button == None) createIconifyButton();
+  bool hasclose, hasiconify, hasmaximize, haslabel;
+  hasclose = hasiconify = hasmaximize = haslabel = false;
 
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.iconify_button, by, by,
-                      frame.button_w, frame.button_w);
-    XMapWindow(blackbox->getXDisplay(), frame.iconify_button);
-    XClearWindow(blackbox->getXDisplay(), frame.iconify_button);
-
-    lx += bw;
-    lw -= bw;
-  } else if (frame.iconify_button) {
-    destroyIconifyButton();
+  string::const_iterator it, end;
+  for (it = layout.begin(), end = layout.end(); it != end; ++it) {
+    switch(*it) {
+    case 'C':
+      if (! hasclose && (decorations & Decor_Close)) {
+        hasclose = true;
+        parsed += *it;
+      }
+      break;
+    case 'I':
+      if (! hasiconify && (decorations & Decor_Iconify)) {
+        hasiconify = true;
+        parsed += *it;
+      }
+      break;
+    case 'M':
+      if (! hasmaximize && (decorations & Decor_Maximize)) {
+        hasmaximize = true;
+        parsed += *it;
+      }
+      break;
+    case 'L':
+      if (! haslabel) {
+        haslabel = true;
+        parsed += *it;
+      }
+    }
   }
-  int bx = frame.inside_w - bw;
-
-  if (decorations & Decor_Close) {
-    if (frame.close_button == None) createCloseButton();
-
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.close_button, bx, by,
-                      frame.button_w, frame.button_w);
-    XMapWindow(blackbox->getXDisplay(), frame.close_button);
-    XClearWindow(blackbox->getXDisplay(), frame.close_button);
-
-    bx -= bw;
-    lw -= bw;
-  } else if (frame.close_button) {
+  if (! hasclose)
     destroyCloseButton();
-  }
-  if (decorations & Decor_Maximize) {
-    if (frame.maximize_button == None) createMaximizeButton();
+  if (! hasiconify)
+    destroyCloseButton();
+  if (! hasmaximize)
+    destroyCloseButton();
+  if (! haslabel)
+    parsed += 'L';      // require that the label be in the layout
 
-    XMoveResizeWindow(blackbox->getXDisplay(), frame.maximize_button, bx, by,
-                      frame.button_w, frame.button_w);
-    XMapWindow(blackbox->getXDisplay(), frame.maximize_button);
-    XClearWindow(blackbox->getXDisplay(), frame.maximize_button);
+  const unsigned int bsep = frame.bevel_w + 1;  // separation between elements
+  const unsigned int by = frame.bevel_w + 1;
+  const unsigned int ty = frame.bevel_w;
 
-    lw -= bw;
-  } else if (frame.maximize_button) {
-    destroyMaximizeButton();
+  frame.label_w = frame.inside_w - bsep * 2 -
+    (frame.button_w + bsep) * (parsed.size() - 1);
+
+  unsigned int x = bsep;
+  for (it = parsed.begin(), end = parsed.end(); it != end; ++it) {
+    switch(*it) {
+    case 'C':
+      if (!frame.close_button) createCloseButton();
+      XMoveResizeWindow(blackbox->getXDisplay(), frame.close_button, x, by,
+                        frame.button_w, frame.button_w);
+      x += frame.button_w + bsep;
+      break;
+    case 'I':
+      if (!frame.iconify_button) createIconifyButton();
+      XMoveResizeWindow(blackbox->getXDisplay(), frame.iconify_button, x, by,
+                        frame.button_w, frame.button_w);
+      x += frame.button_w + bsep;
+      break;
+    case 'M':
+      if (!frame.maximize_button) createMaximizeButton();
+      XMoveResizeWindow(blackbox->getXDisplay(), frame.maximize_button, x, by,
+                        frame.button_w, frame.button_w);
+      x += frame.button_w + bsep;
+      break;
+    case 'L':
+      XMoveResizeWindow(blackbox->getXDisplay(), frame.label, x, ty,
+                        frame.label_w, frame.label_h);
+      x += frame.label_w + bsep;
+      break;
+    }
   }
-  frame.label_w = lw - by;
-  XMoveResizeWindow(blackbox->getXDisplay(), frame.label, lx, frame.bevel_w,
-                    frame.label_w, frame.label_h);
+
   if (redecorate_label) decorateLabel();
-
   redrawLabel();
   redrawAllButtons();
 }
@@ -2369,6 +2402,18 @@ void BlackboxWindow::buttonPressEvent(XButtonEvent *be) {
         windowmenu->hide();
       }
     }
+  // mouse wheel up
+  } else if (be->button == 4) {
+    if ((be->window == frame.label ||
+         be->window == frame.title) &&
+        ! flags.shaded)
+      shade();
+  // mouse wheel down
+  } else if (be->button == 5) {
+    if ((be->window == frame.label ||
+         be->window == frame.title) &&
+        flags.shaded)
+      shade();
   }
 }
 

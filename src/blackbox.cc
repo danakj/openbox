@@ -988,6 +988,7 @@ void Blackbox::save_rc(void) {
   config.setValue("session.cacheLife", resource.cache_life / 60000);
   config.setValue("session.cacheMax", resource.cache_max);
   config.setValue("session.styleFile", resource.style_file);
+  config.setValue("session.titlebarLayout", resource.titlebar_layout);
   
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::save_rc));
@@ -1032,6 +1033,9 @@ void Blackbox::load_rc(void) {
 
   if (! config.getValue("session.cacheMax", resource.cache_max))
     resource.cache_max = 200;
+  
+  if (! config.getValue("session.titlebarLayout", resource.titlebar_layout))
+    resource.titlebar_layout = "ILMC";
 }
 
 

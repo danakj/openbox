@@ -1927,6 +1927,18 @@ void BScreen::buttonPressEvent(XButtonEvent *xbutton) {
       blackbox->checkMenu();
       rootmenu->show();
     }
+  // mouse wheel up
+  } else if (xbutton->button == 4) {
+    if (getCurrentWorkspaceID() >= getWorkspaceCount() - 1)
+      changeWorkspaceID(0);
+    else
+      changeWorkspaceID(getCurrentWorkspaceID() + 1);
+  // mouse wheel down
+  } else if (xbutton->button == 5) {
+    if (getCurrentWorkspaceID() == 0)
+      changeWorkspaceID(getWorkspaceCount() - 1);
+    else
+      changeWorkspaceID(getCurrentWorkspaceID() - 1);
   }
 }
 

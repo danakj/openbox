@@ -113,6 +113,7 @@ private:
     int colors_per_channel;
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
+    std::string titlebar_layout;
   } resource;
 
   typedef std::map<Window, BlackboxWindow*> WindowLookup;
@@ -240,6 +241,9 @@ public:
 
   inline int getColorsPerChannel(void) const
     { return resource.colors_per_channel; }
+
+  inline std::string getTitlebarLayout(void) const
+    { return resource.titlebar_layout; }
 
   inline const timeval &getAutoRaiseDelay(void) const
     { return resource.auto_raise_delay; }

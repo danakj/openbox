@@ -13,6 +13,8 @@ private:
   XColor *_colors; // the valid allocated colors
   
   virtual void reduceDepth(Surface &sf, XImage *im) const;
+
+  const XColor *pickColor(int r, int g, int b) const;
   
 public:
   PseudoRenderControl(int screen);

@@ -54,6 +54,7 @@ void RenderColor::create()
 
   if (item) {
     _gc = item->gc;
+    _pixel = item->pixel;
     ++item->count;
   } else {
     XGCValues gcv;
@@ -81,7 +82,7 @@ void RenderColor::create()
     assert(_gc);
 
     // insert into the cache
-    item = new CacheItem(_gc);
+    item = new CacheItem(_gc, _pixel);
     _cache[_screen][color] = item;
     ++item->count;
   }

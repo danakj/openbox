@@ -58,7 +58,7 @@ TrueRenderControl::~TrueRenderControl()
 static inline void renderPixel(XImage *im, unsigned char *dp,
 			       unsigned long pixel)
 {
-  unsigned int bpp = im->bits_per_pixel + (im->byte_order == MSBFirst) ? 1 : 0;
+  unsigned int bpp = im->bits_per_pixel + (im->byte_order == MSBFirst ? 1 : 0);
 
   switch (bpp) {
   case  8: //  8bpp

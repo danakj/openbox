@@ -165,9 +165,13 @@ void EventDispatcher::dispatch(Window win, const XEvent &e)
     xwc.border_width = e.xconfigurerequest.border_width;
     xwc.sibling = e.xconfigurerequest.above;
     xwc.stack_mode = e.xconfigurerequest.detail;
-      
+
+    // we are not to be held responsible if someone sends us an invalid
+    // request!
+    display->setIgnoreErrors(true); 
     XConfigureWindow(**display, e.xconfigurerequest.window,
                      e.xconfigurerequest.value_mask, &xwc);
+    display->setIgnoreErrors(false);
   } else {
     // grab a falback if it exists
     handler = _fallback;

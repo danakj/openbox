@@ -49,6 +49,7 @@ namespace otk {
 %include "eventhandler.hh"
 %include "eventdispatcher.hh"
 %include "point.hh"
+%include "size.hh"
 %include "rect.hh"
 %include "rendercolor.hh"
 %include "rendertexture.hh"
@@ -56,8 +57,6 @@ namespace otk {
 %include "renderstyle.hh"
 %include "widget.hh"
 %include "label.hh"
-%include "focuswidget.hh"
-%include "focuslabel.hh"
 %include "appwidget.hh"
 %include "application.hh"
 %include "assassin.hh"
@@ -67,8 +66,6 @@ namespace otk {
 %include "property.hh"
 %include "screeninfo.hh"
 %include "strut.hh"
-%include "timer.hh"
-%include "util.hh"
 
 // for Window etc
 %import "X11/X.h"
@@ -77,4 +74,8 @@ namespace otk {
 %pythoncode %{
 display = cvar.display;
 atoms = cvar.Property_atoms;
+
+def style(screen):
+    return RenderStyle_style(screen)
+
 %}

@@ -49,7 +49,6 @@
 
 %import "otk.i"
 
-%import "widgetbase.hh"
 %import "actions.hh"
 
 %include "openbox.hh"

@@ -1,5 +1,17 @@
-all install uninstall clean distclean:
+include build/Makefile.incl
+
+all clean distclean:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+
+install:
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(plugindir)
+
+uninstall:
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.resistance $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins.placement $@
+	-rmdir $(DESTDIR)$(plugindir)
 
 .PHONY: all clean distclean install uninstall

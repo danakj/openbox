@@ -32,7 +32,6 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(plugindir)/
 	$(LIBTOOL) --mode=install $(INSTALL) $(target) \
 		$(DESTDIR)$(plugindir)/$(notdir $(target))
-	$(LIBTOOL) --mode=finish $(DESTDIR)$(plugindir)
 
 uninstall:
 	$(LTRM) $(DESTDIR)$(plugindir)/$(notdir $(target))

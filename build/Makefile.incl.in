@@ -40,7 +40,7 @@ localedir = $(datadir)/locale
 enginedir = $(libdir)/openbox/engines
 plugindir = $(libdir)/openbox/plugins
 rcdir = $(datadir)/openbox
-themesdir = $(datadir)/openbox/themes
+themedir = $(datadir)/openbox/themes
 
 depdir = .deps
 

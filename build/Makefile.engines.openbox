@@ -1,12 +1,14 @@
 include build/Makefile.incl
 
-dir = plugins/placement
+dir = engines/openbox
+theme = operation
 
-CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Plugin-Placement\"
+CPPFLAGS += $(GLIB_CFLAGS) $(XFT_CFLAGS) -DG_LOG_DOMAIN=\"Engine-Openbox\" \
+            -DDEFAULT_THEME=\"$(theme)\" -DTHEMEDIR=\"$(themedir)/openbox\"
 LDFLAGS = -module -avoid-version
 
-target = placement.la
-sources = history.c placement.c
+target = openbox.la
+sources = obengine.c obtheme.c obrender.c
 
 srcdir := $(srcdir)/$(dir)
 target := $(addprefix $(dir)/,$(target))
@@ -18,7 +20,7 @@ depdir := $(depdir)/$(dir)
 all: $(target)
 
 $(target): $(objects)
-	$(LINK) -rpath $(plugindir) -o $@ $^ $(LDFLAGS)
+	$(LINK) -rpath $(enginedir) -o $@ $^ $(LDFLAGS)
 
 $(dir)/%.lo: $(srcdir)/%.c $(depdir)/%.d
 	$(LTCOMPILE) -c -o $@ $<
@@ -29,12 +31,12 @@ $(depdir)/%.d: $(srcdir)/%.c
 	@$(DEPCOMPILE) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 
 install:
-	$(INSTALL) -d $(DESTDIR)$(plugindir)/
+	$(INSTALL) -d $(DESTDIR)$(enginedir)/
 	$(LIBTOOL) --mode=install $(INSTALL) $(target) \
-		$(DESTDIR)$(plugindir)/$(notdir $(target))
+		$(DESTDIR)$(enginedir)/$(notdir $(target))
 
 uninstall:
-	$(LTRM) $(DESTDIR)$(plugindir)/$(notdir $(target))
+	$(LTRM) $(DESTDIR)$(enginedir)/$(notdir $(target))
 
 clean:
 	$(RM) $(target) $(objects)

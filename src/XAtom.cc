@@ -364,14 +364,8 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   int ret_size;
   unsigned long ret_bytes;
   int result;
-  const unsigned long maxread = nelements;
+  unsigned long maxread = nelements;
   bool ret = False;
-
-  /*
-    Grab the server because this takes 2 reads and if it changes between, it
-    totally screws everything up.
-  */
-  XGrabServer(_display);
 
   // try get the first element
   result = XGetWindowProperty(_display, win, atom, 0l, 1l, False,
@@ -395,13 +389,20 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
       result = XGetWindowProperty(_display, win, atom, 0l, remain, False, type,
                                   &ret_type, &ret_size, &nelements, &ret_bytes,
                                   &c_val);
-      assert(result == Success);
-      assert(ret_bytes == 0);
+      ret = (result == Success && ret_type == type && ret_size == size &&
+             ret_bytes == 0);
+      /*
+        If the property has changed type/size, or has grown since our first
+        read of it, then stop here and try again. If it shrank, then this will
+        still work.
+      */
+      if (! ret)
+        return getValue(win, atom, type, maxread, value, size);
+  
       *value = new unsigned char[nelements * size/8 + 1];
       memcpy(*value, c_val, nelements * size/8 + 1);
     }    
   }
-  XUngrabServer(_display);
   if (c_val) XFree(c_val);
   return ret;
 }

@@ -455,7 +455,7 @@ void screen_set_desktop(guint num)
     }
 
     event_ignore_queued_enters();
-    
+
     focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
 }
 

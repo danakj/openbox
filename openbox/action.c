@@ -6,6 +6,8 @@
 #include "action.h"
 #include "dispatch.h"
 #include "openbox.h"
+#include "engine.h"
+#include "render/render.h"
 
 #include <glib.h>
 
@@ -624,6 +626,38 @@ void action_toggle_decorations(union ActionData *data)
     client_setup_decor_and_functions(c);
 }
 
+static void popup_coords(char *format, int a, int b, gboolean hide)
+{
+    XSetWindowAttributes attrib;
+    static Window coords = None;
+
+    if (coords == None) {
+        attrib.override_redirect = TRUE;
+        coords = XCreateWindow(ob_display, ob_root,
+                               0, 0, 1, 1, 0, render_depth, InputOutput,
+                               render_visual, CWOverrideRedirect, &attrib);
+        g_assert(coords != None);
+    }
+
+    if (hide)
+        XUnmapWindow(ob_display, coords);
+    else {
+        Rect area = { 10, 10, 1, 1 };
+        Size s;
+        char *text;
+
+        text = g_strdup_printf(format, a, b);
+        engine_size_label(text, TRUE, TRUE, &s);
+        area.width = s.width; area.height = s.height;
+        XMoveResizeWindow(ob_display, coords,
+                          area.x, area.y, area.width, area.height);
+        engine_render_label(coords, &area, text, TRUE, TRUE);
+        g_free(text);
+
+        XMapWindow(ob_display, coords);
+    }
+}
+
 void action_move(union ActionData *data)
 {
     Client *c = data->move.c;
@@ -633,6 +667,8 @@ void action_move(union ActionData *data)
     if (!c || !client_normal(c)) return;
 
     dispatch_move(c, &x, &y);
+
+    popup_coords("X:  %d  Y:  %d", x, y, data->move.final);
 
     frame_frame_gravity(c->frame, &x, &y); /* get where the client should be */
     client_configure(c, Corner_TopLeft, x, y, c->area.width, c->area.height,
@@ -648,12 +684,15 @@ void action_resize(union ActionData *data)
     if (!c || c->shaded || !client_normal(c)) return;
 
     dispatch_resize(c, &w, &h, data->resize.corner);
-    
+
     w -= c->frame->size.left + c->frame->size.right;
     h -= c->frame->size.top + c->frame->size.bottom;
     
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);
+
+    popup_coords("W:  %d  H:  %d", c->logical_size.width,
+                 c->logical_size.height, data->move.final);
 }
 
 void action_restart(union ActionData *data)

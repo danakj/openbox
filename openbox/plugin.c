@@ -44,6 +44,7 @@ static Plugin *plugin_new(char *name)
     }
 
     if (p->module == NULL) {
+        g_warning(g_module_error());
         g_free(p);
         return NULL;
     }

@@ -32,11 +32,6 @@ extern Window   ob_root;
 /* The state of execution of the window manager */
 extern ObState ob_state;
 
-/*! Runtime option to specify running on a remote display */
-extern gboolean ob_remote;
-/*! Runtime option to run in synchronous mode */
-extern gboolean ob_sync;
-
 void ob_restart_other(const gchar *path);
 void ob_restart();
 void ob_exit();

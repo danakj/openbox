@@ -4,6 +4,7 @@
 #include "mask.h"
 #include "theme.h"
 #include "icon.h"
+#include "parser/parse.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
@@ -1059,21 +1060,29 @@ void RrThemeFree(RrTheme *theme)
 
 static XrmDatabase loaddb(RrTheme *theme, char *name)
 {
-    XrmDatabase db;
+    GSList *it;
+    XrmDatabase db = NULL;
+    gchar *s;
 
-    char *s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-                               name, "themerc", NULL);
-    if ((db = XrmGetFileDatabase(s)))
-        theme->path = g_path_get_dirname(s);
-    g_free(s);
-    if (db == NULL) {
-	char *s = g_build_filename(THEMEDIR, name, "themerc", NULL);
+    if (name[0] == '/') {
+        s = g_build_filename(name, "openbox-3", "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
-	g_free(s);
+        g_free(s);
+    } else {
+        for (it = parse_xdg_data_dir_paths(); !db && it;
+             it = g_slist_next(it))
+        {
+            s = g_build_filename(it->data, "themes", name,
+                                 "openbox-3", "themerc", NULL);
+            if ((db = XrmGetFileDatabase(s)))
+                theme->path = g_path_get_dirname(s);
+            g_free(s);
+        }
     }
+
     if (db == NULL) {
-        char *s = g_build_filename(name, "themerc", NULL);
+        s = g_build_filename(name, "themerc", NULL);
 	if ((db = XrmGetFileDatabase(s)))
             theme->path = g_path_get_dirname(s);
         g_free(s);

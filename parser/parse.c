@@ -1,5 +1,14 @@
 #include "parse.h"
 #include <glib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+static gboolean xdg_start;
+static gchar   *xdg_config_home_path;
+static gchar   *xdg_data_home_path;
+static GSList  *xdg_config_dir_paths;
+static GSList  *xdg_data_dir_paths;
 
 struct Callback {
     char *tag;
@@ -52,22 +61,37 @@ void parse_register(ObParseInst *i, const char *tag,
 
 gboolean parse_load_rc(xmlDocPtr *doc, xmlNodePtr *root)
 {
-    char *path;
+    GSList *it;
+    gchar *path;
     gboolean r = FALSE;
 
-    path = g_build_filename(g_get_home_dir(), ".openbox", "rc.xml", NULL);
-    if (parse_load(path, "openbox_config", doc, root)) {
-        r = TRUE;
-    } else {
+    for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
+        path = g_build_filename(it->data, "openbox", "rc.xml", NULL);
+        r = parse_load(path, "openbox_config", doc, root);
         g_free(path);
-        path = g_build_filename(RCDIR, "rc.xml", NULL);
-        if (parse_load(path, "openbox_config", doc, root)) {
-            r = TRUE;
-        }
     }
-    g_free(path);
     if (!r)
         g_warning("unable to find a valid config file, using defaults");
+    return r;
+}
+
+gboolean parse_load_menu(const gchar *file, xmlDocPtr *doc, xmlNodePtr *root)
+{
+    GSList *it;
+    gchar *path;
+    gboolean r = FALSE;
+
+    if (file[0] == '/') {
+        r = parse_load(file, "openbox_menu", doc, root);
+    } else {
+        for (it = xdg_config_dir_paths; !r && it; it = g_slist_next(it)) {
+            path = g_build_filename(it->data, "openbox", file, NULL);
+            r = parse_load(path, "openbox_menu", doc, root);
+            g_free(path);
+        }
+    }
+    if (!r)
+        g_warning("unable to find a valid menu file '%s'", file);
     return r;
 }
 
@@ -215,4 +239,145 @@ gboolean parse_attr_contains(const char *val, xmlNodePtr node,
     r = !xmlStrcasecmp(c, (const xmlChar*) val);
     xmlFree(c);
     return r;
+}
+
+static GSList* split_paths(const gchar *paths)
+{
+    GSList *list = NULL;
+    gchar *c, *e, *s;
+
+    c = g_strdup(paths);
+    s = c;
+    e = c - 1;
+    g_message("paths %s", paths);
+    while ((e = strchr(e + 1, ':'))) {
+        *e = '\0';
+        g_message("s %s", s);
+        if (s[0] != '\0')
+            list = g_slist_append(list, g_strdup(s));
+        s = e + 1;
+    }
+    if (s[0] != '\0')
+        list = g_slist_append(list, g_strdup(s));
+    g_free(c);
+    return list;
+}
+
+void parse_paths_startup()
+{
+    gchar *path;
+
+    if (xdg_start)
+        return;
+    xdg_start = TRUE;
+
+    path = getenv("XDG_CONFIG_HOME");
+    if (path && path[0] != '\0') /* not unset or empty */
+        xdg_config_home_path = g_build_filename(path, NULL);
+    else
+        xdg_config_home_path = g_build_filename(g_get_home_dir(), ".config",
+                                                NULL);
+
+    path = getenv("XDG_DATA_HOME");
+    if (path && path[0] != '\0') /* not unset or empty */
+        xdg_data_home_path = g_build_filename(path, NULL);
+    else
+        xdg_data_home_path = g_build_filename(g_get_home_dir(), ".local",
+                                              "share", NULL);
+
+    path = getenv("XDG_CONFIG_DIRS");
+    if (path && path[0] != '\0') /* not unset or empty */
+        xdg_config_dir_paths = split_paths(path);
+    else {
+        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
+                                              g_build_filename
+                                              (G_DIR_SEPARATOR_S,
+                                               "etc", "xdg", NULL));
+        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
+                                              g_strdup(CONFIGDIR));
+    }
+    xdg_config_dir_paths = g_slist_prepend(xdg_config_dir_paths,
+                                           xdg_config_home_path);
+    
+    path = getenv("XDG_DATA_DIRS");
+    if (path && path[0] != '\0') /* not unset or empty */
+        xdg_data_dir_paths = split_paths(path);
+    else {
+        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
+                                            g_build_filename
+                                            (G_DIR_SEPARATOR_S,
+                                             "usr", "local", "share", NULL));
+        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
+                                            g_build_filename
+                                            (G_DIR_SEPARATOR_S,
+                                             "usr", "share", NULL));
+        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
+                                              g_strdup(DATADIR));
+    }
+    xdg_data_dir_paths = g_slist_prepend(xdg_data_dir_paths,
+                                         xdg_data_home_path);
+}
+
+void parse_paths_shutdown()
+{
+    GSList *it;
+
+    if (!xdg_start)
+        return;
+    xdg_start = FALSE;
+
+    for (it = xdg_config_dir_paths; it; it = g_slist_next(it))
+        g_free(it->data);
+    g_slist_free(xdg_config_dir_paths);
+    xdg_config_dir_paths = NULL;
+}
+
+gchar *parse_expand_tilde(const gchar *f)
+{
+    gchar **spl;
+    gchar *ret;
+
+    if (!f)
+        return NULL;
+    spl = g_strsplit(f, "~", 0);
+    ret = g_strjoinv(g_get_home_dir(), spl);
+    g_strfreev(spl);
+    return ret;
+}
+
+void parse_mkdir_path(const gchar *path, gint mode)
+{
+    gchar *c, *e;
+
+    g_assert(path[0] == '/');
+
+    c = g_strdup(path);
+    e = c;
+    while ((e = strchr(e + 1, '/'))) {
+        *e = '\0';
+        mkdir(c, mode);
+        *e = '/';
+    }
+    mkdir(c, mode);
+    g_free(c);
+}
+
+const gchar* parse_xdg_config_home_path()
+{
+    return xdg_config_home_path;
+}
+
+const gchar* parse_xdg_data_home_path()
+{
+    return xdg_data_home_path;
+}
+
+GSList* parse_xdg_config_dir_paths()
+{
+    return xdg_config_dir_paths;
+}
+
+GSList* parse_xdg_data_dir_paths()
+{
+    return xdg_data_dir_paths;
 }

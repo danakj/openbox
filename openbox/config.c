@@ -189,7 +189,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
         g_free(config_theme);
         c = parse_string(doc, n);
-        config_theme = ob_expand_tilde(c);
+        config_theme = parse_expand_tilde(c);
         g_free(c);
     }
     if ((n = parse_find_node("titleLayout", node))) {
@@ -304,7 +304,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 
             c = parse_string(doc, node);
             config_menu_files = g_slist_append(config_menu_files,
-                                               ob_expand_tilde(c));
+                                               parse_expand_tilde(c));
             g_free(c);
         }
     }

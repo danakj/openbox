@@ -1,14 +1,15 @@
 SUBDIRS = m4 po
 
-themedir        = $(datadir)/openbox/themes
+themedir        = $(datadir)/themes
 localedir       = $(datadir)/locale
-rcdir           = $(datadir)/openbox
+configdir       = $(sysconfdir)/xdg
+rcdir           = $(configdir)/openbox
 desktopfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
 
-theme = thebear
+theme = TheBear
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -39,13 +40,14 @@ render_libobrender_la_CPPFLAGS = \
 	$(X_CFLAGS) \
 	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
-	-DDEFAULT_THEME=\"$(theme)\" \
-	-DTHEMEDIR=\"$(themedir)\"
+	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LIBADD = \
 	$(X_LIBS) \
 	$(XFT_LIBS) \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	parser/libobparser.la
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \
@@ -74,7 +76,8 @@ parser_libobparser_la_CPPFLAGS = \
 	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObParser\" \
 	-DLOCALEDIR=\"$(localedir)\" \
-	-DRCDIR=\"$(rcdir)\"
+	-DDATADIR=\"$(datadir)\" \
+	-DCONFIGDIR=\"$(configdir)\"
 parser_libobparser_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
@@ -92,7 +95,8 @@ openbox_openbox_CPPFLAGS = \
 	$(LIBSN_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
-	-DRCDIR=\"$(rcdir)\" \
+	-DDATADIR=\"$(datadir)\" \
+	-DCONFIGDIR=\"$(configdir)\" \
 	-DG_LOG_DOMAIN=\"Openbox\"
 openbox_openbox_LDADD = \
 	$(SM_LIBS) \
@@ -194,43 +198,43 @@ tools_kdetrayproxy_kdetrayproxy_SOURCES = \
 
 ## themes ##
 
-allegro_themedir = $(themedir)/allegro
+allegro_themedir = $(themedir)/Allegro/openbox-3
 dist_allegro_theme_DATA = \
-	themes/allegro/themerc \
-	themes/allegro/bullet.xbm
+	themes/Allegro/openbox-3/themerc \
+	themes/Allegro/openbox-3/bullet.xbm
 
-artwiz_themedir = $(themedir)/artwiz
+artwiz_themedir = $(themedir)/Artwiz/openbox-3
 dist_artwiz_theme_DATA = \
-	themes/artwiz/themerc
+	themes/Artwiz/openbox-3/themerc
 
-blah41_themedir = $(themedir)/blah41
+blah41_themedir = $(themedir)/Blah41/openbox-3
 dist_blah41_theme_DATA = \
-	themes/blah41/themerc
+	themes/Blah41/openbox-3/themerc
 
-om4ob_themedir = $(themedir)/om4ob
+om4ob_themedir = $(themedir)/Om4Ob/openbox-3
 dist_om4ob_theme_DATA = \
-	themes/om4ob/themerc \
-	themes/om4ob/close_hover.xbm \
-	themes/om4ob/close.xbm \
-	themes/om4ob/desk_hover.xbm \
-	themes/om4ob/desk_toggled.xbm \
-	themes/om4ob/desk.xbm \
-	themes/om4ob/iconify_hover.xbm \
-	themes/om4ob/iconify_pressed.xbm \
-	themes/om4ob/iconify.xbm \
-	themes/om4ob/max_disabled.xbm \
-	themes/om4ob/max_hover.xbm \
-	themes/om4ob/max_pressed.xbm \
-	themes/om4ob/max_toggled.xbm \
-	themes/om4ob/max.xbm \
-	themes/om4ob/shade_disabled.xbm \
-	themes/om4ob/shade_hover.xbm \
-	themes/om4ob/shade_toggled.xbm \
-	themes/om4ob/shade.xbm
+	themes/Om4Ob/openbox-3/themerc \
+	themes/Om4Ob/openbox-3/close_hover.xbm \
+	themes/Om4Ob/openbox-3/close.xbm \
+	themes/Om4Ob/openbox-3/desk_hover.xbm \
+	themes/Om4Ob/openbox-3/desk_toggled.xbm \
+	themes/Om4Ob/openbox-3/desk.xbm \
+	themes/Om4Ob/openbox-3/iconify_hover.xbm \
+	themes/Om4Ob/openbox-3/iconify_pressed.xbm \
+	themes/Om4Ob/openbox-3/iconify.xbm \
+	themes/Om4Ob/openbox-3/max_disabled.xbm \
+	themes/Om4Ob/openbox-3/max_hover.xbm \
+	themes/Om4Ob/openbox-3/max_pressed.xbm \
+	themes/Om4Ob/openbox-3/max_toggled.xbm \
+	themes/Om4Ob/openbox-3/max.xbm \
+	themes/Om4Ob/openbox-3/shade_disabled.xbm \
+	themes/Om4Ob/openbox-3/shade_hover.xbm \
+	themes/Om4Ob/openbox-3/shade_toggled.xbm \
+	themes/Om4Ob/openbox-3/shade.xbm
 
-thebear_themedir = $(themedir)/thebear
+thebear_themedir = $(themedir)/TheBear
 dist_thebear_theme_DATA = \
-	themes/thebear/themerc
+	themes/TheBear/openbox-3/themerc
 
 
 ## public headers ##

@@ -723,7 +723,7 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             if (act->func == action_execute || act->func == action_restart) {
                 if ((n = parse_find_node("execute", node->xmlChildrenNode))) {
                     gchar *s = parse_string(doc, n);
-                    act->data.execute.path = ob_expand_tilde(s);
+                    act->data.execute.path = parse_expand_tilde(s);
                     g_free(s);
                 }
             } else if (act->func == action_showmenu) {

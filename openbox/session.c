@@ -42,6 +42,7 @@ static gchar      *save_file;
 static gchar      *sm_id;
 static gint        sm_argc;
 static gchar     **sm_argv;
+static gchar      *sm_sessions_path;
 
 static void session_load(char *path);
 static gboolean session_save();
@@ -141,6 +142,10 @@ void session_startup(int *argc, char ***argv)
     if (sm_disable)
         return;
 
+    sm_sessions_path = g_build_filename(parse_xdg_data_home_path(),
+                                        "openbox", "sessions", NULL);
+    parse_mkdir_path(sm_sessions_path, 0700);
+
     if (save_file)
         session_load(save_file);
 
@@ -224,6 +229,7 @@ void session_startup(int *argc, char ***argv)
 
 void session_shutdown()
 {
+    g_free(sm_sessions_path);
     g_free(save_file);
     g_free(sm_id);
 
@@ -298,8 +304,7 @@ static gboolean session_save()
                                (int) time(NULL),
                                (int) getpid(),
                                g_random_int());
-    save_file = g_build_filename(g_get_home_dir(), ".openbox", "sessions",
-                                 filename, NULL);
+    save_file = g_build_filename(sm_sessions_path, filename, NULL);
     g_free(filename);
 
     f = fopen(save_file, "w");

@@ -34,35 +34,6 @@ static void parse_menu_separator(ObParseInst *i,
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data);
 
-static gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
-{
-    gboolean loaded = TRUE;
-    gchar *p;
-
-    if (file[0] == '/') {
-        if (!parse_load(file, "openbox_menu", doc, node)) {
-            g_warning("Failed to load menu from '%s'", file);
-            loaded = FALSE;
-        }
-    } else {
-        p = g_build_filename(g_get_home_dir(), ".openbox", file, NULL);
-        if (!parse_load(p, "openbox_menu", doc, node)) {
-            g_free(p);
-            p = g_build_filename(RCDIR, file, NULL);
-            if (!parse_load(p, "openbox_menu", doc, node)) {
-                g_free(p);
-                p = g_strdup(file);
-                if (!parse_load(p, "openbox_menu", doc, node)) {
-                    g_warning("Failed to load menu from '%s'", file);
-                    loaded = FALSE;
-                }
-            }
-        }
-        g_free(p);
-    }
-    return loaded;
-}
-
 static void client_dest(gpointer client)
 {
     /* menus can be associated with a client, so close any that are since
@@ -94,14 +65,14 @@ void menu_startup(gboolean reconfig)
                    parse_menu_separator, &menu_parse_state);
 
     for (it = config_menu_files; it; it = g_slist_next(it)) {
-        if (menu_open(it->data, &doc, &node)) {
+        if (parse_load_menu(it->data, &doc, &node)) {
             loaded = TRUE;
             parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
         }
     }
     if (!loaded) {
-        if (menu_open("menu.xml", &doc, &node)) {
+        if (parse_load_menu("menu.xml", &doc, &node)) {
             parse_tree(menu_parse_inst, doc, node->children);
             xmlFreeDoc(doc);
         }
@@ -225,7 +196,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if ((menu = menu_new(name, title, NULL))) {
             menu->pipe_creator = state->pipe_creator;
             if (parse_attr_string("execute", node, &script)) {
-                menu->execute = ob_expand_tilde(script);
+                menu->execute = parse_expand_tilde(script);
             } else {
                 ObMenu *old;
 

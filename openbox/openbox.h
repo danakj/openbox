@@ -41,6 +41,4 @@ Cursor ob_cursor(ObCursor cursor);
 
 KeyCode ob_keycode(ObKey key);
 
-gchar *ob_expand_tilde(const gchar *f);
-
 #endif

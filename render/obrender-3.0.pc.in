@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: ObRender
 Description: Openbox Render Library
 Version: @VERSION@
-Requires: 
+Requires: obparser-3.0
 Libs: -L${libdir} -lobrender
 Cflags: -I${includedir}/openbox/@OB_VERSION@

@@ -29,7 +29,6 @@
 #  include <fcntl.h>
 #endif
 #ifdef HAVE_SIGNAL_H
-#define __USE_UNIX98
 #  include <signal.h>
 #endif
 #ifdef HAVE_STDLIB_H
@@ -68,8 +67,6 @@ static void parse_args(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-    char *path;
-
 #ifdef DEBUG
     ob_debug_show_output(TRUE);
 #endif
@@ -83,24 +80,10 @@ int main(int argc, char **argv)
     bind_textdomain_codeset(PACKAGE_NAME, "UTF-8");
     textdomain(PACKAGE_NAME);
 
-    /* create the ~/.openbox dir */
-    path = g_build_filename(g_get_home_dir(), ".openbox", NULL);
-    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
-                 S_IROTH | S_IWOTH | S_IXOTH));
-    g_free(path);
-    /* create the ~/.openbox/themes dir */
-    path = g_build_filename(g_get_home_dir(), ".openbox", "themes", NULL);
-    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
-                 S_IROTH | S_IWOTH | S_IXOTH));
-    g_free(path);
-    /* create the ~/.openbox/sessions dir */
-    path = g_build_filename(g_get_home_dir(), ".openbox", "sessions", NULL);
-    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
-                 S_IROTH | S_IWOTH | S_IXOTH));
-    g_free(path);
-
     g_set_prgname(argv[0]);
      
+    parse_paths_startup();
+
     session_startup(&argc, &argv);
 
     /* parse out command line args */
@@ -291,6 +274,8 @@ int main(int argc, char **argv)
 
     XCloseDisplay(ob_display);
 
+    parse_paths_shutdown();
+
     if (restart) {
         if (restart_path != NULL) {
             int argcp;
@@ -404,6 +389,12 @@ void ob_restart()
     ob_exit();
 }
 
+void ob_reconfigure()
+{
+    reconfigure = TRUE;
+    ob_exit();
+}
+
 void ob_exit()
 {
     ob_main_loop_exit(ob_main_loop);
@@ -424,23 +415,4 @@ KeyCode ob_keycode(ObKey key)
 ObState ob_state()
 {
     return state;
-}
-
-gchar *ob_expand_tilde(const gchar *f)
-{
-    gchar **spl;
-    gchar *ret;
-
-    if (!f)
-        return NULL;
-    spl = g_strsplit(f, "~", 0);
-    ret = g_strjoinv(g_get_home_dir(), spl);
-    g_strfreev(spl);
-    return ret;
-}
-
-void ob_reconfigure()
-{
-    reconfigure = TRUE;
-    ob_exit();
 }

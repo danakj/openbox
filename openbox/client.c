@@ -1221,20 +1221,20 @@ static void client_change_allowed_actions(ObClient *self)
         actions[num++] = prop_atoms.net_wm_action_change_desktop;
 
     if (self->functions & OB_CLIENT_FUNC_SHADE)
-	actions[num++] = prop_atoms.net_wm_action_shade;
+        actions[num++] = prop_atoms.net_wm_action_shade;
     if (self->functions & OB_CLIENT_FUNC_CLOSE)
-	actions[num++] = prop_atoms.net_wm_action_close;
+        actions[num++] = prop_atoms.net_wm_action_close;
     if (self->functions & OB_CLIENT_FUNC_MOVE)
-	actions[num++] = prop_atoms.net_wm_action_move;
+        actions[num++] = prop_atoms.net_wm_action_move;
     if (self->functions & OB_CLIENT_FUNC_ICONIFY)
-	actions[num++] = prop_atoms.net_wm_action_minimize;
+        actions[num++] = prop_atoms.net_wm_action_minimize;
     if (self->functions & OB_CLIENT_FUNC_RESIZE)
-	actions[num++] = prop_atoms.net_wm_action_resize;
+        actions[num++] = prop_atoms.net_wm_action_resize;
     if (self->functions & OB_CLIENT_FUNC_FULLSCREEN)
-	actions[num++] = prop_atoms.net_wm_action_fullscreen;
+        actions[num++] = prop_atoms.net_wm_action_fullscreen;
     if (self->functions & OB_CLIENT_FUNC_MAXIMIZE) {
-	actions[num++] = prop_atoms.net_wm_action_maximize_horz;
-	actions[num++] = prop_atoms.net_wm_action_maximize_vert;
+        actions[num++] = prop_atoms.net_wm_action_maximize_horz;
+        actions[num++] = prop_atoms.net_wm_action_maximize_vert;
     }
 
     PROP_SETA32(self->window, net_wm_allowed_actions, atom, actions, num);
@@ -1242,21 +1242,21 @@ static void client_change_allowed_actions(ObClient *self)
     /* make sure the window isn't breaking any rules now */
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
-	if (self->frame) client_shade(self, FALSE);
-	else self->shaded = FALSE;
+        if (self->frame) client_shade(self, FALSE);
+        else self->shaded = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
-	if (self->frame) client_iconify(self, FALSE, TRUE);
-	else self->iconic = FALSE;
+        if (self->frame) client_iconify(self, FALSE, TRUE);
+        else self->iconic = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
-	if (self->frame) client_fullscreen(self, FALSE, TRUE);
-	else self->fullscreen = FALSE;
+        if (self->frame) client_fullscreen(self, FALSE, TRUE);
+        else self->fullscreen = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
                                                          self->max_vert)) {
-	if (self->frame) client_maximize(self, FALSE, 0, TRUE);
-	else self->max_vert = self->max_horz = FALSE;
+        if (self->frame) client_maximize(self, FALSE, 0, TRUE);
+        else self->max_vert = self->max_horz = FALSE;
     }
 }
 
@@ -1767,7 +1767,7 @@ static void client_showhide(ObClient *self)
 gboolean client_normal(ObClient *self) {
     return ! (self->type == OB_CLIENT_TYPE_DESKTOP ||
               self->type == OB_CLIENT_TYPE_DOCK ||
-	      self->type == OB_CLIENT_TYPE_SPLASH);
+              self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
 static void client_apply_startup_state(ObClient *self)

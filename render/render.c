@@ -210,6 +210,7 @@ void appearance_free(Appearance *a)
         if (p->primary != NULL) color_free(p->primary);
         if (p->secondary != NULL) color_free(p->secondary);
         if (p->border_color != NULL) color_free(p->border_color);
+        if (p->pixel_data != NULL) g_free(l->surface.data.planar.pixel_data);
     }
     g_free(a);
 }

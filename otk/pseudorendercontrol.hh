@@ -8,6 +8,7 @@ namespace otk {
 
 class PseudoRenderControl : public RenderControl {
 private:
+  int _bpc;        // number of bits per color
   int _ncolors;    // number of allocated colors, size of the XColor array
   XColor *_colors; // the valid allocated colors
   

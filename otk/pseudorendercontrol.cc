@@ -27,28 +27,31 @@ PseudoRenderControl::PseudoRenderControl(int screen)
   int depth = info->depth();
 
   // determine the number of colors and the bits-per-color
-  int bpc = 2; // XXX THIS SHOULD BE A USER OPTION
-  assert(bpc >= 1);
-  _ncolors = 1 << (bpc * 3);
+  _bpc = 2; // XXX THIS SHOULD BE A USER OPTION
+  assert(_bpc >= 1);
+  _ncolors = 1 << (_bpc * 3);
 
   if (_ncolors > 1 << depth) {
     fprintf(stderr,
             _("PseudoRenderControl: Invalid colormap size. Resizing.\n"));
-    bpc = 1 << (depth/3) >> 3;
-    _ncolors = 1 << (bpc * 3);
+    _bpc = 1 << (depth/3) >> 3;
+    _ncolors = 1 << (_bpc * 3);
   }
 
   // build a color cube
   _colors = new XColor[_ncolors];
-
-  int cpc = 1 << bpc; // colors per channel
-  for (int n = _ncolors - 1,
-         r = (1 << (bpc + 1)) -1, i = 0; i < cpc; r >>= 1, ++i)
-    for (int g = (1 << (bpc + 1)) -1, j = 0; j < cpc; g >>= 1, ++j)
-      for (int b = (1 << (bpc + 1)) -1, k = 0; k < cpc; b >>= 1, ++k, --n) {
-        _colors[n].red = r | r << 8;
-        _colors[n].green = g | g << 8;
-        _colors[n].blue = b | b << 8;
+int tr, tg, tb;
+  int cpc = 1 << _bpc; // colors per channel
+  for (int n = 0,
+         r = 0; r < cpc; r++)
+    for (int g = 0; g < cpc; g++)
+      for (int b = 0; b < cpc; b++, n++) {
+        tr = (int)(((float)(r)/(float)(cpc-1)) * 0xFF);
+        tg = (int)(((float)(g)/(float)(cpc-1)) * 0xFF);
+        tb = (int)(((float)(b)/(float)(cpc-1)) * 0xFF);
+        _colors[n].red = tr | tr << 8;
+        _colors[n].green = tg | tg << 8;
+        _colors[n].blue = tb | tb << 8;
         _colors[n].flags = DoRed|DoGreen|DoBlue; // used to track allocation
       }
 
@@ -87,10 +90,12 @@ PseudoRenderControl::PseudoRenderControl(int screen)
       _colors[i].red = icolors[close].red;
       _colors[i].green = icolors[close].green;
       _colors[i].blue = icolors[close].blue;
+      _colors[i].pixel = icolors[close].pixel;
 
       // try alloc this closest color, it had better succeed!
-      if (XAllocColor(**display, info->colormap(), &_colors[i]))
+      if (XAllocColor(**display, info->colormap(), &_colors[i])) {
         _colors[i].flags = DoRed|DoGreen|DoBlue; // mark as alloced
+      }
       else
         assert(false); // wtf has gone wrong, its already alloced for chissake!
     }
@@ -111,6 +116,23 @@ PseudoRenderControl::~PseudoRenderControl()
 
 void PseudoRenderControl::reduceDepth(Surface &sf, XImage *im) const
 {
+  pixel32 *data = sf.pixelData();
+  char *p = (char *)data;
+  int x, y, r, g, b;
+    for (y = 0; y < im->height; y++) {
+      for (x = 0; x < im->width; x++) {
+        r = (data[x] >> default_red_shift) & 0xFF;
+        r = r >> (8-_bpc);
+        g = (data[x] >> default_green_shift) & 0xFF;
+        g = g >> (8-_bpc);
+        b = (data[x] >> default_blue_shift) & 0xFF;
+        b = b >> (8-_bpc);
+        p[x] = _colors[(r << (2*_bpc)) + (g << (1*_bpc)) + b].pixel;
+      }
+      data += im->width;
+      p += im->bytes_per_line;
+    }
+
 }
 
 }

@@ -45,7 +45,6 @@ void OBActions::insertPress(const XButtonEvent &e)
 
   OBClient *c = Openbox::instance->findClient(e.window);
   if (c) a->clientarea = c->area();
-  printf("press %d x:%d y:%d winx:%d winy:%d\n", e.button, e.x_root, e.y_root, c->area().x(), c->area().y());
 }
 
 void OBActions::removePress(const XButtonEvent &e)
@@ -202,8 +201,6 @@ void OBActions::motionHandler(const XMotionEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;
-  printf("motion %d x:%d y:%d winx:%d winy:%d\n", button, x_root, y_root,
-         _posqueue[0]->clientarea.x(), _posqueue[0]->clientarea.y());
   MotionData *data = new_motion_data(e.window, e.time, state, button,
                                      w->mcontext(), MouseMotion,
                                      x_root, y_root, _posqueue[0]->pos,

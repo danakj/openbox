@@ -414,46 +414,30 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
 void OBBindings::grabButtons(bool grab, OBClient *client)
 {
   for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
-    Window win[3] = {0, 0, 0}; // at most 2 windows
+    Window win;
+    int mode = GrabModeAsync;
     switch (i) {
     case MC_Frame:
-      win[0] = client->frame->window();
-      break;
-    case MC_Titlebar:
-      win[0] = client->frame->titlebar();
-      win[1] = client->frame->label();
+      win = client->frame->window();
       break;
     case MC_Window:
-      win[0] = client->frame->plate();
-      break;
-    case MC_Handle:
-      win[0] = client->frame->handle();
-      break;
-    case MC_MaximizeButton:
-    case MC_CloseButton:
-    case MC_IconifyButton:
-    case MC_StickyButton: 
-    case MC_Grip:
-    case MC_Root:
-    case MC_MenuItem:
+      win = client->frame->plate();
+      mode = GrabModeSync; // this is handled in the plate's buttonPressHandler
       break;
     default:
-      assert(false); // invalid mouse context
+      continue;
     }
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it)
-      for (Window *w = win; *w; ++w) {
-        if (grab) {
-          otk::OBDisplay::grabButton((*it)->binding.key,
-                                     (*it)->binding.modifiers, *w, false,
-                                     ButtonPressMask | ButtonMotionMask |
-                                     ButtonReleaseMask, GrabModeAsync,
-                                     GrabModeAsync, None, None, false);
-        }
-        else
-          otk::OBDisplay::ungrabButton((*it)->binding.key,
-                                       (*it)->binding.modifiers, *w);
-    }
+      if (grab)
+        otk::OBDisplay::grabButton((*it)->binding.key,
+                                   (*it)->binding.modifiers, win, false,
+                                   ButtonPressMask | ButtonMotionMask |
+                                   ButtonReleaseMask, mode, GrabModeAsync,
+                                   None, None, false);
+      else
+        otk::OBDisplay::ungrabButton((*it)->binding.key,
+                                     (*it)->binding.modifiers, win);
   }
 }
 

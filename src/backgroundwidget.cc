@@ -114,7 +114,8 @@ void OBBackgroundWidget::grabButtons(bool grab)
 
 void OBBackgroundWidget::buttonPressHandler(const XButtonEvent &e)
 {
-  XAllowEvents(otk::OBDisplay::display, ReplayPointer, e.time);
+  if (type() == OBWidget::Type_Plate)
+    XAllowEvents(otk::OBDisplay::display, ReplayPointer, e.time);
 }
 
 }

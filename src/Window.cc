@@ -2990,7 +2990,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       /*
          If the XWarpPointer is done after the configure, we can end up
          grabbing another window, so made sure you do it first.
-         */
+      */
       int dest_x;
       if (x_root <= 0) {
         dest_x = screen->getRect().right() - 1;

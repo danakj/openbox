@@ -66,12 +66,14 @@ Client::Client(int screen, Window window)
 
   updateProtocols();
 
-  // got the type, the mwmhints, and the protocols, so we're ready to set up
+  getGravity();        // get the attribute gravity
+  updateNormalHints(); // this may override the attribute gravity
+
+  // got the type, the mwmhints, the protocols, and the normal hints (min/max
+  // sizes), so we're ready to set up
   // the decorations/functions
   setupDecorAndFunctions();
   
-  getGravity();        // get the attribute gravity
-  updateNormalHints(); // this may override the attribute gravity
   // also get the initial_state and set _iconic if we aren't "starting"
   // when we're "starting" that means we should use whatever state was already
   // on the window over the initial map state, because it was already mapped

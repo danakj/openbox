@@ -3058,10 +3058,6 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
   dx -= frame.border_w;
   dy -= frame.border_w;
 
-  if (screen->doWorkspaceWarping())
-    if (doWorkspaceWarping(x_root, y_root, dx, dy))
-      return;
-
   doWindowSnapping(dx, dy);
 
   if (screen->doOpaqueMove()) {
@@ -3084,12 +3080,15 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
                    frame.changing.height() - 1);
   }
 
+  if (screen->doWorkspaceWarping())
+    doWorkspaceWarping(x_root, y_root, dx, dy);
+
   screen->showPosition(dx, dy);
 }
 
 
-bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
-                                        int dx, int dy) {
+void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
+                                        int &dx, int dy) {
   // workspace warping
   bool warp = False;
   unsigned int dest = screen->getCurrentWorkspaceID();
@@ -3106,7 +3105,7 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
     else dest = 0;
   }
   if (! warp)
-    return false;
+    return;
 
   endMove();
   bool focus = flags.focused; // had focus while moving?
@@ -3116,6 +3115,15 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
   if (focus)
     setInputFocus();
 
+  int dest_x;
+  if (x_root <= 0) {
+    dest_x = screen->getRect().right() - 1;
+    dx += screen->getRect().width() - 1;
+  } else {
+    dest_x = 0;
+    dx -= screen->getRect().width() - 1;
+  }
+
   /*
      We grab the X server here because we are moving the window and then the
      mouse cursor. When one moves, it could end up putting the mouse cursor
@@ -3123,23 +3131,15 @@ bool BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
      move on another window.
   */
   XGrabServer(blackbox->getXDisplay());
-  int dest_x;
-  if (x_root <= 0) {
-    dest_x = screen->getRect().right() - 1;
-    configure(dx + (screen->getRect().width() - 1), dy,
-              frame.rect.width(), frame.rect.height());
-  } else {
-    dest_x = 0;
-    configure(dx - (screen->getRect().width() - 1), dy,
-              frame.rect.width(), frame.rect.height());
-  }
+
+  configure(dx, dy, frame.rect.width(), frame.rect.height());
   XWarpPointer(blackbox->getXDisplay(), None, 
                screen->getRootWindow(), 0, 0, 0, 0,
                dest_x, y_root);
+
   XUngrabServer(blackbox->getXDisplay());
 
   beginMove(dest_x, y_root);
-  return true;
 }
 
 

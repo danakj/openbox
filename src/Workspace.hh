@@ -104,8 +104,8 @@ public:
   unsigned int getCount(void) const;
   void appendStackOrder(BlackboxWindowList &stack_order) const;
 
-  void show(void);
-  void hide(void);
+  void showAll(void);
+  void hideAll(void);
   void removeAll(void);
   void raiseWindow(BlackboxWindow *w);
   void lowerWindow(BlackboxWindow *w);

@@ -182,9 +182,8 @@ void Windowmenu::SendtoWorkspacemenu::itemSelected(int button,
 void Windowmenu::SendtoWorkspacemenu::update(void) {
   unsigned int i, r = getCount(),
     workspace_count = getScreen()->getWorkspaceCount();
-  if (r > workspace_count) {
-    for (i = r; i < workspace_count; ++i)
-      remove(0);
+  while (r > workspace_count) {
+    remove(0);
     r = getCount();
   }
 

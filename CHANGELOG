@@ -1,5 +1,16 @@
 Changelog for Openbox:
 
+2.0.1:
+ * Fix SendTo menus. They would keep workspaces that
+   had been deleted.                                    (Ben Jansens)
+
+ * Fixes for workspace switching. Putting old code      (Ben Jansens)
+   back.
+
+ * Fixes for workspace warping. Window and mouse would  (Ben Jansens)
+   move slightly out of sync, as one motion event would
+   get dropped.
+
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)
    which modifier combo Openbox uses for mouse

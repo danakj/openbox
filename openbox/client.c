@@ -3017,3 +3017,24 @@ int client_directional_edge_search(ObClient *c, ObDirection dir)
     }
     return dest;
 }
+
+ObClient* client_under_pointer()
+{
+    int x, y;
+    GList *it;
+    ObClient *ret = NULL;
+
+    if (screen_pointer_pos(&x, &y)) {
+        for (it = stacking_list; it != NULL; it = it->next) {
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = WINDOW_AS_CLIENT(it->data);
+                if (c->desktop == screen_desktop &&
+                    RECT_CONTAINS(c->frame->area, x, y)) {
+                    ret = c;
+                    break;
+                }
+            }
+        }
+    }
+    return ret;
+}

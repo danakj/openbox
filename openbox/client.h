@@ -519,4 +519,6 @@ guint client_monitor(ObClient *self);
 
 void client_update_sm_client_id(ObClient *self);
 
+ObClient* client_under_pointer();
+
 #endif

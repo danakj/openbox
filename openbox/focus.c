@@ -119,23 +119,10 @@ void focus_set_client(ObClient *client)
 
 static gboolean focus_under_pointer()
 {
-    int x, y;
-    GList *it;
+    ObClient *c;
 
-    if (screen_pointer_pos(&x, &y)) {
-        for (it = stacking_list; it != NULL; it = it->next) {
-            if (WINDOW_IS_CLIENT(it->data)) {
-                ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (c->desktop == screen_desktop &&
-                    RECT_CONTAINS(c->frame->area, x, y))
-                    break;
-            }
-        }
-        if (it != NULL) {
-            g_assert(WINDOW_IS_CLIENT(it->data));
-            return client_normal(it->data) && client_focus(it->data);
-        }
-    }
+    if ((c = client_under_pointer()))
+        return client_normal(c) && client_focus(c);
     return FALSE;
 }
 

@@ -348,6 +348,9 @@ private:
   //! The number of icons in _icons
   int _nicons;
 
+  Pixmap _kwm_icon;
+  Pixmap _kwm_icon_mask;
+
   //! Retrieves the window's initial gravity
   void getGravity();
   //! Retrieves the desktop hint's value and sets Client::_desktop
@@ -414,6 +417,8 @@ private:
   void updateTransientFor();
   //! Updates the window's icons
   void updateIcons();
+  //! Updates the window's kwm icon
+  void updateKwmIcon();
 
   //! Change the client's state hints to match the class' data
   void changeState();
@@ -659,6 +664,17 @@ BB    @param window The window id that the Client class should handle
     smaller than the specified size will be returned.
   */
   const Icon *icon(const otk::Size &s) const;
+
+  //! Returns the pixmap for the KWM_WIN_ICON specified on the window (or None)
+  /*!
+    The icon given by Client::icon should take precedence over this icon/mask.
+  */
+  Pixmap kwmIcon() const { return _kwm_icon; }
+  //! Returns the mask for the KWM_WIN_ICON specified on the window (or None)
+  /*!
+    The icon given by Client::icon should take precedence over this icon/mask.
+  */
+  Pixmap kwmIconMask() const { return _kwm_icon_mask; }
   
   //! Move the window (actually, its frame) to a position.
   /*!

@@ -77,6 +77,7 @@ Client::Client(int screen, Window window)
   updateClass();
   updateStrut();
   updateIcons();
+  updateKwmIcon();
   
   // this makes sure that these windows appear on all desktops
   if (/*_type == Type_Dock ||*/ _type == Type_Desktop)
@@ -755,6 +756,22 @@ void Client::updateIcons()
   if (frame) frame->adjustIcon();
 }
 
+void Client::updateKwmIcon()
+{
+  _kwm_icon = _kwm_icon_mask = None;
+
+  unsigned long num = 2;
+  Pixmap *data;
+  if (otk::Property::get(_window, otk::Property::atoms.kwm_win_icon,
+                         otk::Property::atoms.kwm_win_icon, &num, &data)) {
+    if (num >= 2) {
+      _kwm_icon = data[0];
+      _kwm_icon_mask = data[1];
+    }
+    delete [] data;
+  }
+}
+
 void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
@@ -800,6 +817,8 @@ void Client::propertyHandler(const XPropertyEvent &e)
     updateStrut();
   else if (e.atom == otk::Property::atoms.net_wm_icon)
     updateIcons();
+  else if (e.atom == otk::Property::atoms.kwm_win_icon)
+    updateKwmIcon();
 }
 
 void Client::setWMState(long state)

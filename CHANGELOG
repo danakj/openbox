@@ -11,6 +11,8 @@
 	* Reversed the default directions for the mouse wheel desktop
 	switching actions
 	* Don't wrap around in the default keyboard desktop switching bindings
+	* Place parentless dialogs so they avoid always-on-top windows
+	* Ignore fullscreen windows in placing new ones
 
 3.0-rc3:
 	* Closed bug #904 (ToggleMaximizeHorz & Vert dont always toggle)

@@ -1668,6 +1668,7 @@ void BlackboxWindow::iconify(void) {
       if (! (*it)->flags.iconic) (*it)->iconify();
     }
   }
+  screen->updateStackingList();
 }
 
 

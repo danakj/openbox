@@ -240,7 +240,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   raiseWindows(0, 0);     // this also initializes the empty stacking list
   rootmenu->update();
 
-  updateClientList();     // initialize the client list, which will be empty
+  updateClientList();     // initialize the client lists, which will be empty
   updateAvailableArea();
 
   changeWorkspaceID(0);
@@ -921,7 +921,10 @@ void BScreen::LoadStyle(void) {
 void BScreen::addIcon(BlackboxWindow *w) {
   if (! w) return;
 
-  w->setWorkspace(BSENTINEL);
+  // we set the workspace to 'all workspaces' so that taskbars will show the
+  // window. otherwise, it made uniconifying a window impoosible without the
+  // blackbox workspace menu
+  w->setWorkspace(0xffffffff);
   w->setWindowNumber(iconList.size());
 
   iconList.push_back(w);
@@ -1061,6 +1064,8 @@ void BScreen::updateClientList(void) {
   } else
     xatom->setValue(getRootWindow(), XAtom::net_client_list, XAtom::window,
                     0, 0);
+
+  updateStackingList();
 }
 
 
@@ -1072,7 +1077,7 @@ void BScreen::updateStackingList(void) {
   BlackboxWindowList stack_order;
 
   /*
-   * Get the atacking order from all of the workspaces.
+   * Get the stacking order from all of the workspaces.
    * We start with the current workspace so that the sticky windows will be
    * in the right order on the current workspace.
    * XXX: Do we need to have sticky windows in the list once for each workspace?
@@ -1081,13 +1086,13 @@ void BScreen::updateStackingList(void) {
   for (unsigned int i = 0; i < getWorkspaceCount(); ++i)
     if (i != getCurrentWorkspaceID())
       getWorkspace(i)->appendStackOrder(stack_order);
- 
+
   if (stack_order.size() > 0) {
     // set the client list atoms
     Window *windows = new Window[stack_order.size()];
     Window *win_it = windows;
-    BlackboxWindowList::iterator it = stack_order.begin();
-    const BlackboxWindowList::iterator end = stack_order.end();
+    BlackboxWindowList::iterator it = stack_order.begin(),
+                                 end = stack_order.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->getClientWindow();
     xatom->setValue(getRootWindow(), XAtom::net_client_list_stacking,
@@ -1390,6 +1395,7 @@ void BScreen::reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
     getWorkspace(w->getWorkspaceNumber())->removeWindow(w);
     getWorkspace(wkspc_id)->addWindow(w);
   }
+  updateStackingList();
 }
 
 

@@ -44,6 +44,9 @@ void moveresize_startup(gboolean reconfig)
 
 void moveresize_shutdown(gboolean reconfig)
 {
+    if (moveresize_in_progress)
+        moveresize_end(FALSE);
+
     if (!reconfig)
         client_remove_destructor(client_dest);
 

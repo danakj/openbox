@@ -49,6 +49,6 @@ $ #TopBottom
 $ #BottomTop
 # Bottom to Top
 $ #IgnoreShaded
-# Ignore shaded windows
+# Ignore Shaded Windows
 $ #IgnoreMax
-# Ignore full-maximized windows
+# Ignore Full-Maximized Windows

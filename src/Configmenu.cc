@@ -231,10 +231,10 @@ Configmenu::Placementmenu::Placementmenu(Configmenu *cm):
          BScreen::TopBottom);
   insert(i18n(ConfigmenuSet, ConfigmenuBottomTop, "Bottom to Top"),
          BScreen::BottomTop);
-  insert(i18n(ConfigmenuSet, ConfigmenuIgnoreShaded, "Ignore shaded windows"),
+  insert(i18n(ConfigmenuSet, ConfigmenuIgnoreShaded, "Ignore Shaded Windows"),
          BScreen::IgnoreShaded);
   insert(i18n(ConfigmenuSet, ConfigmenuIgnoreMax,
-              "Ignore full-maximized windows"),
+              "Ignore Full-Maximized Windows"),
          BScreen::IgnoreMaximized);
   update();
   setValues();

@@ -48,6 +48,9 @@ private:
   //! The base color for the texture, the only color when the texture is solid.
   //! This must always be defined
   const RenderColor *_color;
+  //! The secondary color for a gradient texture.
+  //! This is only defined for gradients
+  const RenderColor *_secondary_color;
   //! The shadow color for the bevel. This must be defined if
   //! RenderTexture::_relief is not RenderTexture::ReliefType::Flat
   const RenderColor *_bevel_dark_color;
@@ -64,7 +67,8 @@ private:
 public:
   RenderTexture(bool parent_relative, ReliefType relief, BevelType bevel,
                 bool border, GradientType gradient, bool interlaced,
-                const RenderColor *color, const RenderColor *bevel_dark_color,
+                const RenderColor *color, const RenderColor *secondary_color,
+                const RenderColor *bevel_dark_color,
                 const RenderColor *bevel_light_color,
                 const RenderColor *border_color,
                 const RenderColor *interlace_color)
@@ -75,6 +79,7 @@ public:
       _gradient(gradient),
       _interlaced(interlaced),
       _color(color),
+      _secondary_color(secondary_color),
       _bevel_dark_color(bevel_dark_color),
       _bevel_light_color(bevel_light_color),
       _border_color(border_color),
@@ -103,6 +108,10 @@ public:
   //! The base color for the texture, the only color when the texture is solid.
   //! This must always be defined
   inline const RenderColor& color() const { return *_color; }
+  //! The secondary color for gradient textures.
+  //! This is only defined for gradients
+  inline const RenderColor& secondary_color() const
+    { return *_secondary_color; }
   //! The shadow color for the bevel. This must be defined if
   //! RenderTexture::_relief is not RenderTexture::ReliefType::Flat
   inline const RenderColor& bevelDarkColor() const

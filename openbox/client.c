@@ -603,7 +603,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* XXX watch for xinerama dead areas */
     /* This makes sure windows aren't entirely outside of the screen so you
      * can't see them at all */
-    a = screen_area(self->desktop);
+    //a = screen_area(self->desktop);
+    a = screen_physical_area_monitor(client_monitor(self));
     if (client_normal(self)) {
         if (!self->strut.right && *x >= a->x + a->width - 1)
             *x = a->x + a->width - self->frame->area.width;
@@ -619,10 +620,6 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
      * not applied to all windows. Not sure if it's going to stay at all.
      * I wonder if disabling this will break struts somehow? Let's find out. */
     if (rude) {
-        /* avoid the xinerama monitor divide while we're at it,
-         * remember to fix the placement stuff to avoid it also and
-         * then remove this XXX */
-        a = screen_physical_area_monitor(client_monitor(self));
         /* this is ben's MOZILLA BITCHSLAP. "oh ya it fucking feels good.
            Java can suck it too." */
 

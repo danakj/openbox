@@ -324,9 +324,9 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     b = area->y + area->height - client->frame->area.height;
 
     *x = px - client->area.width / 2 - client->frame->size.left;
-//    *x = MIN(MAX(*x, l), r);
+    *x = MIN(MAX(*x, l), r);
     *y = py - client->area.height / 2 - client->frame->size.top;
-//    *y = MIN(MAX(*y, t), b);
+    *y = MIN(MAX(*y, t), b);
 
     return TRUE;
 }

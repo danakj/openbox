@@ -111,6 +111,13 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, RrScreenWidth(inst), 0, RrScreenHeight(inst), 0, 10);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
         return inst;
     }
 

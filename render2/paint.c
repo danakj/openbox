@@ -65,16 +65,20 @@ void RrPaint(struct RrSurface *sur)
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    glViewport(0, 0, RrScreenWidth(inst), RrScreenHeight(inst));
+/*
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    glOrtho(0, RrScreenWidth(inst), RrScreenHeight(inst), 0, 0, 10);
-    glViewport(0, 0, RrScreenWidth(inst), RrScreenHeight(inst));
+    glOrtho(RrSurfaceX(sur), RrSurfaceX(sur) + RrSurfaceWidth(sur),
+            RrSurfaceY(sur), RrSurfaceY(sur) + RrSurfaceHeight(sur),
+            0, 10);
     glMatrixMode(GL_MODELVIEW);
+    glViewport(0, 0, RrSurfaceWidth(sur), RrSurfaceHeight(sur));
+*/
+
+    glPushMatrix();
     glTranslatef(-RrSurfaceX(sur),
-                 RrScreenHeight(inst)-RrSurfaceHeight(sur)-RrSurfaceY(sur), 0);
+                 -RrSurfaceY(sur), 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     p = sur;
@@ -95,6 +99,8 @@ void RrPaint(struct RrSurface *sur)
     case RR_SURFACE_NONE:
         break;
     }
+
+    glPopMatrix();
 
     for (i = 0; i < sur->ntextures; ++i)
         RrTexturePaint(sur, &sur->texture[i]);

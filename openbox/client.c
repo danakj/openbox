@@ -1114,12 +1114,13 @@ void client_setup_decor_and_functions(ObClient *self)
     client_change_allowed_actions(self);
 
     if (self->frame) {
-        /* this makes sure that these windows appear on all desktops */
-        if (self->type == OB_CLIENT_TYPE_DESKTOP &&
-            self->desktop != DESKTOP_ALL)
-            client_set_desktop(self, DESKTOP_ALL, FALSE);
-
-	/* adjust the client's decorations, etc. */
+        if (self->decorations != self->frame->decorations)
+            /* adjust the client's decorations, etc. */
+            client_reconfigure(self);
+        /* we actually have to do this twice :P
+           the first time it removes the decorations, but now it may need to
+           be reconstrained for being maximized etc, so calling this again
+           will work with the new setup of decorations on the window */
 	client_reconfigure(self);
     } else {
         /* this makes sure that these windows appear on all desktops */

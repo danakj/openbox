@@ -13,6 +13,8 @@ extern "C" {
 #include "openbox.hh"
 #include "frame.hh"
 #include "client.hh"
+#include "python.hh"
+#include "bindings.hh"
 #include "otk/display.hh"
 
 #include <string>
@@ -70,33 +72,26 @@ OBFrame::~OBFrame()
 
 void OBFrame::grabButtons(bool grab)
 {
-  if (grab) {
-    // grab simple button clicks on the client, but pass them through too
-    otk::OBDisplay::grabButton(Button1, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-    otk::OBDisplay::grabButton(Button2, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-    otk::OBDisplay::grabButton(Button3, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-    otk::OBDisplay::grabButton(Button4, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-    otk::OBDisplay::grabButton(Button5, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-  } else {
-  }
+  _plate.grabButtons(grab);
 
   // grab any requested buttons on the entire frame
-  if (grab) {
-  
-    otk::OBDisplay::grabButton(Button1, 0, _plate.window(), true,
-                               ButtonPressMask, GrabModeSync, GrabModeSync,
-                               _plate.window(), None, false);
-  } else {
+  std::vector<std::string> grabs;
+  if (python_get_stringlist("client_buttons", &grabs)) {
+    std::vector<std::string>::iterator grab_it, grab_end = grabs.end();
+    for (grab_it = grabs.begin(); grab_it != grab_end; ++grab_it) {
+      Binding b(0,0);
+      if (!Openbox::instance->bindings()->translate(*grab_it, b, false))
+        continue;
+      printf("grabbing %d %d\n", b.key, b.modifiers);
+      if (grab) {
+        otk::OBDisplay::grabButton(b.key, b.modifiers, _window, true,
+                                   ButtonPressMask | ButtonMotionMask |
+                                   ButtonReleaseMask, GrabModeAsync,
+                                   GrabModeAsync, _window, None, false);
+      } else {
+        otk::OBDisplay::ungrabButton(b.key, b.modifiers, _window);
+      }
+    }
   }
 }
 

@@ -68,7 +68,7 @@ static bool modvalue(const std::string &mod, unsigned int *val)
   return true;
 }
 
-bool OBBindings::translate(const std::string &str, Binding &b) const
+bool OBBindings::translate(const std::string &str, Binding &b,bool askey) const
 {
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -92,14 +92,18 @@ bool OBBindings::translate(const std::string &str, Binding &b) const
 
   // set the binding
   b.modifiers = modval;
-  KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
-  if (sym == NoSymbol) {
-    printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
-    return false;
+  if (askey) {
+    KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
+    if (sym == NoSymbol) {
+      printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
+      return false;
+    }
+    if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
+      printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
+    return b.key != 0;
+  } else {
+    return buttonvalue(key, &b.key);
   }
-  if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
-    printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
-  return b.key != 0;
 }
 
 static void destroytree(BindingTree *tree)

@@ -63,7 +63,6 @@ private:
   otk::OBTimer _timer;
   
   PyObject *find(BindingTree *search, bool *conflict) const;
-  bool translate(const std::string &str, Binding &b) const;
   BindingTree *buildtree(const StringVect &keylist, PyObject *callback) const;
   void assimilate(BindingTree *node);
 
@@ -75,6 +74,9 @@ public:
   //! Destroys the OBBinding object
   virtual ~OBBindings();
 
+  //! Translates a binding string into the actual Binding
+  bool translate(const std::string &str, Binding &b, bool askey = true) const;
+  
   //! Adds a new key binding
   /*!
     A binding will fail to be added if the binding already exists (as part of

@@ -780,7 +780,6 @@ static std::string SwigString_AsString(PyObject* o) {
 
   enum ActionType {
     Action_ButtonPress,
-    Action_ButtonRelease,
     Action_Click,
     Action_DoubleClick,
     Action_EnterWindow,
@@ -850,6 +849,10 @@ PyObject * unregister_all(int action)
 
 PyObject * bind(PyObject *keylist, PyObject *func)
 {
+  if (!PyCallable_Check(func)) {
+    PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
+    return NULL;
+  }
   if (!PyList_Check(keylist)) {
     PyErr_SetString(PyExc_TypeError, "Invalid keylist. Not a list.");
     return NULL;
@@ -2913,7 +2916,6 @@ _swigt__p_XUnmapEvent,
 
 static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Action_ButtonPress", (long) Action_ButtonPress, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Action_ButtonRelease", (long) Action_ButtonRelease, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_Click", (long) Action_Click, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_DoubleClick", (long) Action_DoubleClick, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Action_EnterWindow", (long) Action_EnterWindow, 0, 0, 0},

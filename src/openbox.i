@@ -28,7 +28,6 @@
 %inline %{
   enum ActionType {
     Action_ButtonPress,
-    Action_ButtonRelease,
     Action_Click,
     Action_DoubleClick,
     Action_EnterWindow,

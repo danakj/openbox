@@ -134,8 +134,8 @@ Openbox::Openbox(int argc, char **argv)
   // load config values
   python_exec(SCRIPTDIR"/config.py"); // load openbox config values
   // run all of the python scripts
-  python_exec(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
-  python_exec(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
+//  python_exec(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+//  python_exec(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
   // run the user's script
   python_exec(_scriptfilepath.c_str());
 

@@ -56,11 +56,6 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
 
-  // run the RELEASE python hook
-  doCallback(Action_ButtonRelease, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, e.button, e.x_root, e.y_root, e.time);
-
   // not for the button we're watching?
   if (_button != e.button) return;
 
@@ -163,7 +158,7 @@ void OBActions::motionHandler(const XMotionEvent &e)
   // run the simple MOTION python hook for now...
   doCallback(Action_MouseMotion, e.window,
              (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, (unsigned)-1, e.x_root, e.y_root, e.time);
+             e.state, (unsigned)-1, x_root, y_root, e.time);
 }
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)

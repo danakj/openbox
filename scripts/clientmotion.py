@@ -20,24 +20,37 @@ def def_motion_release(data):
 			posqueue.remove(i)
 			break
 
+def def_do_move(xroot, yroot, client):
+	global posqueue
+	dx = xroot - posqueue[0][1]
+	dy = yroot - posqueue[0][2]
+	area = posqueue[0][3] # A Rect
+	OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
+
+def def_do_resize(xroot, yroot, client, anchor_corner):
+	global posqueue
+	dx = xroot - posqueue[0][1]
+	dy = yroot - posqueue[0][2]
+	OBClient_resize(client, anchor_corner,
+			Rect_width(area) - dx, Rect_height(area) + dy)
+
 def def_motion(data):
 	client = Openbox_findClient(openbox, data.window())
 	if not client: return
 
 	global posqueue
-	dx = data.xroot() - posqueue[0][1]
-	dy = data.yroot() - posqueue[0][2]
-
-	area = posqueue[0][3] # A Rect
+	if not posqueue[0][0] == 1: return
+	
 	type = data.target()
-	if (type == Type_Titlebar) or (type == Type_Label):
-		OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
+	if (type == Type_Titlebar) or (type == Type_Label) or \
+	   (type == Type_Plate) or (type == Type_Handle):
+		def_do_move(data.xroot(), data.yroot(), client)
 	elif type == Type_LeftGrip:
-		OBClient_resize(client, OBClient_TopRight,
-				Rect_width(area) - dx, Rect_height(area) + dy)
+		def_do_resize(data.xroot(), data.yroot(), client,
+			      OBClient_TopRight)
 	elif type == Type_RightGrip:
-		OBClient_resize(client, OBClient_TopLeft,
-				Rect_width(area) + dx, Rect_height(area) + dy)
+		def_do_resize(data.xroot(), data.yroot(), client,
+			      OBClient_TopLeft)
 
 def def_enter(data):
 	client = Openbox_findClient(openbox, data.window())

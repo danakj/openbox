@@ -30,7 +30,6 @@ public:
   // update the same enum in openbox.i when making changes to this
   enum ActionType {
     Action_ButtonPress,
-    Action_ButtonRelease,
     Action_Click,
     Action_DoubleClick,
     Action_EnterWindow,

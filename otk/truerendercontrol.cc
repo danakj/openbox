@@ -338,6 +338,7 @@ void TrueRenderControl::drawImage(Surface &sf, int w, int h,
   startx = x;
   
   for (i = 0, c = 0, e = w*h; i < e; ++i) {
+    printf("%d, %d\n", x, y);
     unsigned char alpha = data[i] >> 24;
     unsigned char r = data[i];
     unsigned char g = data[i] >> 8;
@@ -359,7 +360,8 @@ void TrueRenderControl::drawImage(Surface &sf, int w, int h,
       ++y;
       x = startx;
       c = 0;
-    }
+    } else
+      ++x;
   }
 
   const ScreenInfo *info = display->screenInfo(_screen);

@@ -1,6 +1,7 @@
 To build Openbox from CVS you need:
 
-A C++ Compiler (GNU GCC/G++ 3.2+ suggested)
+A C++ Compiler (GNU GCC/G++ 3.2+ suggested, 2.9x is not supported as it is not
+                very compliant with the ISO C++ standards)
 GNU Gettext 0.11.5
 GNU Autoconf 2.50+
 GNU Automake 1.7.1+ (1.7.1 has a bug fix for py-compile)

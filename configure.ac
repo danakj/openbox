@@ -258,6 +258,38 @@ CXXFLAGS=$OLDCXXFLAGS
 AC_SUBST([XFT_CFLAGS])
 AC_SUBST([XFT_LIBS])
 
+# Check for XKB extension support
+AC_CHECK_LIB([X11], [XkbBell],
+  AC_MSG_CHECKING([for X11/XKBlib.h])
+  AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/XKBlib.h>
+    ],
+    [
+      Display *d;
+      Window w;
+      XkbBell(d, w, 0, 0);
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      XKB="yes"
+      AC_DEFINE([XKB], [1], [Found the XKB extension])
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      XKB="no"
+    ]
+  )
+)
+AC_MSG_CHECKING([for the XKB extension])
+if test "$XKB" = "yes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+fi
+
 # Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])

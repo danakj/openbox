@@ -2059,26 +2059,28 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         w -= self->base_size.width;
         h -= self->base_size.height;
 
-        if (self->min_ratio)
-            if (h * self->min_ratio > w) {
-                h = (gint)(w / self->min_ratio);
+        if (!self->fullscreen) {
+            if (self->min_ratio)
+                if (h * self->min_ratio > w) {
+                    h = (gint)(w / self->min_ratio);
 
-                /* you cannot resize to nothing */
-                if (h < 1) {
-                    h = 1;
-                    w = (gint)(h * self->min_ratio);
+                    /* you cannot resize to nothing */
+                    if (h < 1) {
+                        h = 1;
+                        w = (gint)(h * self->min_ratio);
+                    }
                 }
-            }
-        if (self->max_ratio)
-            if (h * self->max_ratio < w) {
-                h = (gint)(w / self->max_ratio);
+            if (self->max_ratio)
+                if (h * self->max_ratio < w) {
+                    h = (gint)(w / self->max_ratio);
 
-                /* you cannot resize to nothing */
-                if (h < 1) {
-                    h = 1;
-                    w = (gint)(h * self->min_ratio);
+                    /* you cannot resize to nothing */
+                    if (h < 1) {
+                        h = 1;
+                        w = (gint)(h * self->min_ratio);
+                    }
                 }
-            }
+        }
 
         w += self->base_size.width;
         h += self->base_size.height;

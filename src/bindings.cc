@@ -41,15 +41,13 @@ void OBBindings::display()
 
 bool OBBindings::translate(const std::string &str, Binding &b)
 {
-  unsigned int mods = 0;
-  
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
   keybegin = (keybegin == std::string::npos) ? 0 : keybegin + 1;
   std::string key(str, keybegin);
 
-  // XXX: get some modifiers up in the hizzie
   // parse out the requested modifier keys
+  unsigned int mods = 0;
   std::string::size_type begin = 0, end;
   while (begin != keybegin) {
     end = str.find_first_of('-', begin);
@@ -124,9 +122,6 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id)
     p->chain = false;
   }
 
-//  printf("BUILDING:\n");
-//  print_branch(ret, "");
-  
   // successfully built a tree
   return ret;
 }

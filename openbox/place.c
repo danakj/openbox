@@ -211,19 +211,34 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
         spaces = area_add(spaces, screen_area_monitor(client->desktop, i));
 
     if (type == SMART_FULL || type == SMART_FOCUSED) {
+        gboolean found_foc = FALSE, stop = FALSE;
+        ObClient *foc;
         GList *list;
 
         list = focus_order[client->desktop == DESKTOP_ALL ?
                            screen_desktop : client->desktop];
+        foc = list ? list->data : NULL;
 
-        for (it = list; it; it = g_list_next(it)) {
-            ObClient *c = it->data;
+        for (it = stacking_list; it && !stop; it = g_list_next(it))
+        {
+            ObClient *c;
+
+            if (WINDOW_IS_CLIENT(it->data))
+                c = it->data;
+            else
+                continue;
 
             if (!SMART_IGNORE(client, c)) {
-                spaces = area_remove(spaces, &c->frame->area);
-                if (type == SMART_FOCUSED)
-                    break;
+                if (type == SMART_FOCUSED) {
+                    if (c->layer <= client->layer && found_foc)
+                        stop = TRUE;
+                }
+                if (!stop)
+                    spaces = area_remove(spaces, &c->frame->area);
             }
+
+            if (c == foc)
+                found_foc = TRUE;
         }
     } else if (type == SMART_GROUP) {
         /* has to be more than me in the group */

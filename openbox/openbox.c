@@ -147,22 +147,24 @@ int main(int argc, char **argv)
     extensions_query_all(); /* find which extensions are present */
 
     if (screen_annex()) { /* it will be ours! */
+        /* startup the parsing so everything can register sections of the rc */
+        parse_startup();
+
+        /* anything that is going to read data from the rc file needs to be 
+           in this group */
 	timer_startup();
 	render_startup();
 	font_startup();
 	event_startup();
         grab_startup();
         engine_startup();
+	focus_startup();
         plugin_startup();
-
-        /* startup the parsing so plugins can register sections of the rc */
-        parse_startup();
-
         /* load the plugins specified in the pluginrc */
         plugin_loadall();
+
         /* parse/load user options */
         parse_rc();
-
         /* we're done with parsing now, kill it */
         parse_shutdown();
 
@@ -170,7 +172,6 @@ int main(int argc, char **argv)
 	engine_load();
 
 	screen_startup();
-	focus_startup();
 	client_startup();
 
         /* call startup for all the plugins */
@@ -188,8 +189,8 @@ int main(int argc, char **argv)
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
 	client_shutdown();
-	focus_shutdown();
 	screen_shutdown();
+	focus_shutdown();
 	engine_shutdown();
         grab_shutdown();
 	event_shutdown();

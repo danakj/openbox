@@ -6,6 +6,7 @@
 #include "prop.h"
 #include "dispatch.h"
 #include "focus.h"
+#include "parse.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -17,6 +18,25 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 Window focus_backup = None;
 gboolean focus_new = TRUE;
 gboolean focus_follow = TRUE;
+
+static void parse_assign(char *name, ParseToken *value)
+{
+    if (!g_ascii_strcasecmp(name, "focusnew")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            focus_new = value->data.bool;
+        }
+    } else if (!g_ascii_strcasecmp(name, "followmouse")) {
+        if (value->type != TOKEN_BOOL)
+            yyerror("invalid value");
+        else {
+            focus_follow = value->data.bool;
+        }
+    } else
+        yyerror("invalid option");
+    parse_free_token(value);
+}
 
 void focus_startup()
 {
@@ -38,6 +58,8 @@ void focus_startup()
 
     /* start with nothing focused */
     focus_set_client(NULL);
+
+    parse_reg_section("focus", NULL, parse_assign);
 }
 
 void focus_shutdown()

@@ -1,4 +1,12 @@
-all install uninstall:
+all uninstall:
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.render $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.kernel $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.engines $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.data $@
+#	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes $@
+
+install: all
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.render $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.kernel $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins $@

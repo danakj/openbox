@@ -3,11 +3,11 @@
 static GHashTable     *reg = NULL;
 
 struct Functions {
-    ParseFunc       func;
-    AssignParseFunc afunc;
+    ParseFunc       f;
+    AssignParseFunc af;
 } *funcs;
 
-void destshit(gpointer key) { g_free(key); }
+void destshit(gpointer shit) { g_free(shit); }
 
 void parse_startup()
 {
@@ -22,15 +22,10 @@ void parse_shutdown()
 
 void parse_reg_section(char *section, ParseFunc func, AssignParseFunc afunc)
 {
-    if (g_hash_table_lookup(reg, section) != NULL)
-        g_warning("duplicate request for section '%s' in the rc file",
-                  section);
-    else {
-        struct Functions *f = g_new(struct Functions, 1);
-        f->func = func;
-        f->afunc = afunc;
-        g_hash_table_insert(reg, g_ascii_strdown(section, -1), f);
-    }
+    struct Functions *f = g_new(struct Functions, 1);
+    f->f = func;
+    f->af = afunc;
+    g_hash_table_insert(reg, g_ascii_strdown(section, -1), f);
 }
 
 void parse_free_token(ParseToken *token)
@@ -64,14 +59,17 @@ void parse_free_token(ParseToken *token)
 
 void parse_set_section(char *section)
 {
-    funcs = g_hash_table_lookup(reg, section);
+    char *sec;
+    sec = g_ascii_strdown(section, -1);
+    funcs = g_hash_table_lookup(reg, sec);
+    g_free(sec);
 }
 
 void parse_token(ParseToken *token)
 {
     if (funcs) {
-        if (funcs->func != NULL)
-            funcs->func(token);
+        if (funcs->f)
+            funcs->f(token);
         else if (token->type != TOKEN_NEWLINE)
             yyerror("syntax error");
     }
@@ -80,8 +78,8 @@ void parse_token(ParseToken *token)
 void parse_assign(char *name, ParseToken *value)
 {
     if (funcs) {
-        if (funcs->afunc != NULL)
-            funcs->afunc(name, value);
+        if (funcs->af)
+            funcs->af(name, value);
         else
             yyerror("syntax error");
     }

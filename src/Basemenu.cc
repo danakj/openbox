@@ -442,7 +442,7 @@ void Basemenu::move(int x, int y) {
 void Basemenu::redrawTitle(void) {
   const char *text = (! menu.label.empty()) ? getLabel() :
     i18n(BasemenuSet, BasemenuBlackboxMenu, "Blackbox Menu");
-  int dx = menu.bevel_w, len = strlen(text);
+  int dx = menu.bevel_w;
   unsigned int l;
   MenuStyle *style = screen->getMenuStyle();
 
@@ -544,7 +544,7 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   int sbl = index / menu.persub, i = index - (sbl * menu.persub);
   int item_x = (sbl * menu.item_w), item_y = (i * menu.item_h);
   int hilite_x = item_x, hilite_y = item_y, hoff_x = 0, hoff_y = 0;
-  int text_x = 0, text_y = 0, len = strlen(text), sel_x = 0, sel_y = 0;
+  int text_x = 0, text_y = 0, sel_x = 0, sel_y = 0;
   unsigned int hilite_w = menu.item_w, hilite_h = menu.item_h, text_w = 0,
     text_h = 0;
   unsigned int half_w = menu.item_h / 2, quarter_w = menu.item_h / 4;

@@ -1172,9 +1172,9 @@ void Toolbarmenu::Placementmenu::itemSelected(int button, unsigned int index) {
 }
 
 
-int ToolbarStyle::doJustify(const std::string &text, int &start_pos,
-                            unsigned int max_length,
-                            unsigned int modifier) const {
+void ToolbarStyle::doJustify(const std::string &text, int &start_pos,
+                             unsigned int max_length,
+                             unsigned int modifier) const {
   size_t text_len = text.size();
   unsigned int length;
 
@@ -1195,6 +1195,4 @@ int ToolbarStyle::doJustify(const std::string &text, int &start_pos,
   default:
     break;
   }
-
-  return text_len;
 }

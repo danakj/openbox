@@ -3542,9 +3542,9 @@ void BlackboxWindow::constrain(Corner anchor, int *pw, int *ph) {
 }
 
 
-int WindowStyle::doJustify(const std::string &text, int &start_pos,
-                           unsigned int max_length,
-                           unsigned int modifier) const {
+void WindowStyle::doJustify(const std::string &text, int &start_pos,
+                            unsigned int max_length,
+                            unsigned int modifier) const {
   size_t text_len = text.size();
   unsigned int length;
 
@@ -3565,8 +3565,6 @@ int WindowStyle::doJustify(const std::string &text, int &start_pos,
   default:
     break;
   }
-
-  return text_len;
 }
 
 

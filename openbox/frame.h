@@ -37,6 +37,7 @@ typedef struct Frame {
     Strut  size;
     Rect   area;
     gboolean visible;
+    int    decorations;
 
     Window title;
     Window label;

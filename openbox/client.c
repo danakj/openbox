@@ -1027,10 +1027,7 @@ void client_setup_decor_and_functions(Client *self)
         if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
             client_set_desktop(self, DESKTOP_ALL, FALSE);
 
-	/* change the decors on the frame, and with more/less decorations,
-           we may also need to be repositioned */
-	frame_adjust_area(self->frame, TRUE, TRUE);
-	/* with new decor, the window's maximized size may change */
+	/* adjust the client's decorations, etc. */
 	client_reconfigure(self);
     } else {
         /* this makes sure that these windows appear on all desktops */
@@ -1775,6 +1772,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     /* move/resize the frame to match the request */
     if (self->frame) {
+        if (self->decorations != self->frame->decorations)
+            moved = resized = TRUE;
+
         if (moved || resized)
             frame_adjust_area(self->frame, moved, resized);
 

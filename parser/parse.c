@@ -161,7 +161,7 @@ gboolean parse_load_mem(gpointer data, guint len, const char *rootname,
 
 void parse_close(xmlDocPtr doc)
 {
-    xmlFree(doc);
+    xmlFreeDoc(doc);
 }
 
 void parse_tree(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)

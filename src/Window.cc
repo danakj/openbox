@@ -2681,7 +2681,7 @@ void BlackboxWindow::redrawCloseButton(bool pressed) const {
   XClearWindow(blackbox->getXDisplay(), frame.close_button);
 
   BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
-           screen->getWindowStyle()->b_pic_unfocus, 0, 2);
+           screen->getWindowStyle()->b_pic_unfocus);
   XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),
             2, 2, (frame.button_w - 3), (frame.button_w - 3));
   XDrawLine(blackbox->getXDisplay(), frame.close_button, pen.gc(),

@@ -12,11 +12,12 @@
 
 static char *PLUGIN_NAME = "fifo_menu";
 
-typedef struct Fifo_Menu_Data{
+typedef struct Fifo_Menu_Data {
     char *fifo;
     char *buf; /* buffer to hold partially read menu */
     unsigned long buflen; /* how many bytes are in the buffer */
     int fd; /* file descriptor to read menu from */
+    gboolean use_pid;
     event_fd_handler *handler;
 } Fifo_Menu_Data;
 
@@ -78,9 +79,6 @@ void fifo_menu_handler(int fd, void *d) {
                         num_realloc);
 
         if (num_read == 0) { /* eof */
-            unsigned long count = 0;
-            char *found = NULL;
-
             menu->invalid = TRUE;
             menu_clear(menu);
 
@@ -90,8 +88,9 @@ void fifo_menu_handler(int fd, void *d) {
                                            FIFO_MENU_DATA(menu)->buflen);
 
             xmlNodePtr node = xmlDocGetRootElement(doc);
-
-            if (!xmlStrcasecmp(node->name, (const xmlChar*) "fifo")) {
+            
+            if (node &&
+                !xmlStrcasecmp(node->name, (const xmlChar*) "fifo_menu")) {
                 if ((node = parse_find_node("item", node->xmlChildrenNode)))
                     parse_menu_full(doc, node, menu, FALSE);
             }
@@ -137,8 +136,6 @@ void plugin_destroy (ObMenu *m)
 }
 
 void *plugin_create(PluginMenuCreateData *data)
-
-
 {
     char *fifo;
     char *dir;
@@ -146,15 +143,22 @@ void *plugin_create(PluginMenuCreateData *data)
     Fifo_Menu_Data *d;
     ObMenu *m;
     char *label = NULL, *id = NULL;
+    char *attr_pid = NULL;
         
     d = g_new(Fifo_Menu_Data, 1);
 
     parse_attr_string("id", data->node, &id);
     parse_attr_string("label", data->node, &label);
-
+    
+    if (parse_attr_string("pid", data->node, &attr_pid) &&
+        g_strcasecmp(attr_pid, "true") == 0) {
+        d->use_pid = TRUE;
+    } else
+        d->use_pid = FALSE;
+    
     m = menu_new( (label != NULL ? label : ""),
-                 (id != NULL ? id : PLUGIN_NAME),
-                 data->parent);
+                  (id != NULL ? id : PLUGIN_NAME),
+                  data->parent);
     menu_add_entry(data->parent, menu_entry_new_submenu(
                        (label != NULL ? label : ""),
                        m));
@@ -172,6 +176,7 @@ void *plugin_create(PluginMenuCreateData *data)
     
     m->plugin_data = (void *)d;
 
+        
     dir = g_build_filename(g_get_home_dir(), ".openbox",
                           PLUGIN_NAME, NULL);
 
@@ -185,9 +190,19 @@ void *plugin_create(PluginMenuCreateData *data)
         return NULL;
     }
 
-    fifo = g_build_filename(g_get_home_dir(), ".openbox",
-                            PLUGIN_NAME,
-                            m->name, NULL);
+    if (d->use_pid)
+    {
+        char *pid = g_strdup_printf("%s.%d", m->name, getpid());
+        fifo = g_build_filename(g_get_home_dir(), ".openbox",
+                                PLUGIN_NAME,
+                                pid, NULL);
+        g_free(pid);
+    } else {
+        fifo = g_build_filename(g_get_home_dir(), ".openbox",
+                                PLUGIN_NAME,
+                                m->name, NULL);
+    }
+    
     if (mkfifo(fifo, S_IRUSR | S_IWUSR |
                S_IRGRP | S_IWGRP | /* let umask do its thing */
                S_IROTH | S_IWOTH) == -1 && errno != EEXIST) {

@@ -138,6 +138,7 @@ void client_menu_startup()
 {
     GSList *acts;
     ObMenu *menu;
+    ObMenuEntry *e;
 
     menu = menu_new(LAYER_MENU_NAME, _("Layer"), NULL);
     menu_set_update_func(menu, layer_update);
@@ -159,15 +160,21 @@ void client_menu_startup()
     menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), NULL);
     menu_set_update_func(menu, client_update);
 
-    menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
+    e = menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
+    e->data.normal.mask = ob_rr_theme->desk_mask;
+    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
 
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     acts = g_slist_prepend(NULL, action_from_string("Iconify"));
-    menu_add_normal(menu, CLIENT_ICONIFY, _("Iconify"), acts);
+    e = menu_add_normal(menu, CLIENT_ICONIFY, _("Iconify"), acts);
+    e->data.normal.mask = ob_rr_theme->iconify_mask;
+    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleMaximizeFull"));
-    menu_add_normal(menu, CLIENT_MAXIMIZE, _("Maximize"), acts);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Maximize"), acts);
+    e->data.normal.mask = ob_rr_theme->max_mask;
+    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
 
     acts = g_slist_prepend(NULL, action_from_string("Raise"));
     menu_add_normal(menu, CLIENT_RAISE, _("Raise to top"), acts);
@@ -176,7 +183,9 @@ void client_menu_startup()
     menu_add_normal(menu, CLIENT_LOWER, _("Lower to bottom"),acts);
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleShade"));
-    menu_add_normal(menu, CLIENT_SHADE, _("Roll up/down"), acts);
+    e = menu_add_normal(menu, CLIENT_SHADE, _("Roll up/down"), acts);
+    e->data.normal.mask = ob_rr_theme->shade_mask;
+    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleDecorations"));
     menu_add_normal(menu, CLIENT_DECORATE, _("Decorate"), acts);
@@ -192,5 +201,7 @@ void client_menu_startup()
     menu_add_separator(menu, -1);
 
     acts = g_slist_prepend(NULL, action_from_string("Close"));
-    menu_add_normal(menu, CLIENT_CLOSE, _("Close"), acts);
+    e = menu_add_normal(menu, CLIENT_CLOSE, _("Close"), acts);
+    e->data.normal.mask = ob_rr_theme->close_mask;
+    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
 }

@@ -287,10 +287,12 @@ void Frame::adjustSize()
                  _innersize.top + _innersize.bottom +
                  _client->area().height()));
 
-  XMoveResizeWindow(**otk::display, _plate,
-                    _innersize.left - geom.cbwidth,
-                    _innersize.top - geom.cbwidth,
-                    _client->area().width(), _client->area().height());
+  // do this in two steps because clients whose gravity is set to
+  // 'Static' don't end up getting moved at all with an XMoveResizeWindow
+  XMoveWindow(**otk::display, _plate, _innersize.left - geom.cbwidth,
+              _innersize.top - geom.cbwidth);
+  XResizeWindow(**otk::display, _plate, _client->area().width(),
+                _client->area().height());
 
   _size.left   = _innersize.left + geom.bwidth;
   _size.right  = _innersize.right + geom.bwidth;

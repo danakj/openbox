@@ -324,11 +324,6 @@
     </item>
   </menu>
   <item label="--" /> <!-- separator -->
-  <menu id="switch" label="Switch To">
-    <item label="Openbox 2">
-      <action name="restart"><execute>openbox</execute></action>
-    </item>
-  </menu>
   <item label="Restart">
     <action name="restart" />
   </item>

@@ -14,8 +14,7 @@ gchar *config_title_layout;
 int     config_desktops_num;
 GSList *config_desktops_names;
 
-gboolean config_opaque_move;
-gboolean config_opaque_resize;
+gboolean config_redraw_resize;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
@@ -86,16 +85,14 @@ static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
 
-static void parse_moveresize(xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_resize(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
     node = node->xmlChildrenNode;
     
-    if ((n = parse_find_node("opaqueMove", node)))
-        config_opaque_move = parse_bool(doc, n);
-    if ((n = parse_find_node("opaqueResize", node)))
-        config_opaque_resize = parse_bool(doc, n);
+    if ((n = parse_find_node("drawContents", node)))
+        config_redraw_resize = parse_bool(doc, n);
 }
 
 static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
@@ -179,10 +176,9 @@ void config_startup()
 
     parse_register("desktops", parse_desktops, NULL);
 
-    config_opaque_move = TRUE;
-    config_opaque_resize = TRUE;
+    config_redraw_resize = TRUE;
 
-    parse_register("moveresize", parse_moveresize, NULL);
+    parse_register("resize", parse_resize, NULL);
 
     config_dock_layer = OB_STACKING_LAYER_TOP;
     config_dock_pos = OB_DIRECTION_NORTHEAST;

@@ -18,12 +18,9 @@ extern gboolean config_focus_last_on_desktop;
 extern gboolean config_focus_popup;
 /*! The number of slits to create 
   extern int config_slit_number;*/
-/*! When true windows are moved opaquely, when false just an outline is shown
-  while they are moved */
-extern gboolean config_opaque_move;
-/*! When true windows are resize opaquely, when false just an outline is shown
-  while they are resize */
-extern gboolean config_opaque_resize;
+/*! When true windows' contents are refreshed while they are resized; otherwise
+  they are not updated until the resize is complete */
+extern gboolean config_redraw_resize;
 
 /*! The stacking layer the dock will reside in */
 extern ObStackingLayer config_dock_layer;

@@ -1888,9 +1888,9 @@ void client_configure_full(ObClient *self, ObCorner anchor,
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
-       resizing in opaque mode */
+       resizing in redraw mode */
     if ((!user && resized) ||
-        (user && (final || (resized && config_opaque_resize))))
+        (user && (final || (resized && config_redraw_resize))))
 	XResizeWindow(ob_display, self->window, w, h);
 
     /* move/resize the frame to match the request */

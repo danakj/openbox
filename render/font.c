@@ -115,7 +115,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     m = font_measure_string(t->font, text, t->shadow, t->offset);
     while (l && m > position->width) {
         text[--l] = '\0';
-    m = font_measure_string(t->font, text, t->shadow, t->offset);
+        m = font_measure_string(t->font, text, t->shadow, t->offset);
     }
     if (!l) return;
 

@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
     struct GlftFont *font;
 
-    if (argc < 2) {
+    if (argc < 3) {
         printf("Usage: %s fontname text\n", argv[0]);
         return 1;
     }

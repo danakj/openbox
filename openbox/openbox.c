@@ -419,14 +419,12 @@ ObState ob_state()
 gchar *ob_expand_tilde(const gchar *f)
 {
     gchar **spl;
-    gchar *ret, *mid;
+    gchar *ret;
 
     if (!f)
         return NULL;
     spl = g_strsplit(f, "~", 0);
-    mid = g_strconcat(g_get_home_dir(), G_DIR_SEPARATOR_S, NULL);
-    ret = g_strjoinv(mid, spl);
-    g_free(mid);
+    ret = g_strjoinv(g_get_home_dir(), spl);
     g_strfreev(spl);
     return ret;
 }

@@ -7,7 +7,9 @@ bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot xftlsfonts
 
 bsetroot_SOURCES =	bsetroot.cc
-bsetroot_LDADD =	../src/BaseDisplay.o ../src/Color.o ../src/GCCache.o ../src/Texture.o ../src/Timer.o ../src/Image.o ../src/ImageControl.o ../src/i18n.o ../src/Util.o
+bsetroot_LDADD =	../src/basedisplay.o ../src/color.o ../src/gccache.o \
+			../src/texture.o ../src/timer.o ../src/image.o \
+			../src/imagecontrol.o ../src/util.o
 
 xftlsfonts_SOURCES = xftlsfonts.cc
 
@@ -17,9 +19,3 @@ distclean-local:
 	rm -f *\~ .\#*
 
 # local dependencies
-
-bsetroot.o: bsetroot.cc ../config.h ../src/i18n.hh \
- ../src/../nls/blackbox-nls.hh ../src/GCCache.hh ../src/BaseDisplay.hh \
- ../src/Timer.hh ../src/Color.hh ../src/Texture.hh ../src/Util.hh \
- bsetroot.hh ../src/Image.hh
-xftlsfonts.o: xftlsfonts.cc

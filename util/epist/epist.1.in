@@ -20,6 +20,7 @@ rather than the mouse.
 a default configuration, installed in \fI@pkgdatadir@/epistrc\fR
 will be used.
 .SH AUTHOR
-The author of epist is openbox-devel <openbox-devel@sunsite.dk>.
+The authors of epist are Scott Moynes <smoynes@nexus.carleton.ca>,
+Marius Nita <marius@cs.pdx.edu>, and Ben Jansens <ben@orodu.net>.
 .SH SEE ALSO
 \fIopenbox\fR(1)

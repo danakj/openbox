@@ -34,7 +34,7 @@ Changelog for Openbox:
    a normal window, except appearing on all
    workspaces.
 
- * Xft font support for style.                          (Ben Jansens)
+ * Xft font support for styles.                         (Ben Jansens)
 
  * Xinerama support for window placement, maximization, (Ben Jansens)
    and snapping.
@@ -78,17 +78,17 @@ Changelog for Openbox:
    shade/unshade the window. rolling the mouse wheel on
    the root window will change workspaces. 
 
- * better handling of the rc file and its configuration (Ben Jansens)
+ * Better handling of the rc file and its configuration (Ben Jansens)
    options. The file is written each time an option in
    the file is changed, instead of being written at
    shutdown. This means that you can edit the file by
    hand while in Openbox, and then choose reconfig or
    restart to have it use the new rc file. 
 
- * changed the default configuration file from          (Ben Jansens)
+ * Changed the default configuration file from          (Ben Jansens)
    ~/.blackboxrc to ~/.openbox/rc. 
 
- * changed the menu from an rcfile option to a          (Ben Jansens)
+ * Changed the menu from an rcfile option to a          (Ben Jansens)
    command-line option. use 'openbox -menu ' to select
    an alternate menu. The default menu used is
    ~/.openbox/menu. If the default, or the file you

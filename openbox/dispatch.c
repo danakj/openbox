@@ -3,6 +3,11 @@
 
 #include <glib.h>
 
+typedef struct {
+    EventHandler h;
+    void *data;
+} Func;
+
 static GSList **funcs;
 
 void dispatch_startup()
@@ -26,8 +31,11 @@ void dispatch_shutdown()
 {
     guint i;
     EventType j;
+    GSList *it;
 
     for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1) {
+        for (it = funcs[i]; it != NULL; it = it->next)
+            g_free(it->data);
         g_slist_free(funcs[i]);
         funcs[i] = NULL;
     }
@@ -35,18 +43,46 @@ void dispatch_shutdown()
     g_free(funcs);
 }
 
-void dispatch_register(EventHandler h, EventMask mask)
+void dispatch_register(EventMask mask, EventHandler h, void *data)
 {
     guint i;
     EventType j;
+    GSList *it, *next;
+    EventMask m;
+    Func *f;
 
-    while (mask) {
+    /* add to masks it needs to be registered for */
+    m = mask;
+    while (m) {
         for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1)
-            if (mask & j) {
-                funcs[i] = g_slist_append(funcs[i], h);
-                mask ^= j; /* remove from the mask */
+            if (m & j) {
+                for (it = funcs[i]; it != NULL; it = it->next) {
+                    f = it->data;
+                    if (f->h == h && f->data == data)
+                        break;
+                }
+                if (it == NULL) { /* wasn't already regged */
+                    f = g_new(Func, 1);
+                    f->h = h;
+                    f->data = data;
+                    funcs[i] = g_slist_append(funcs[i], f);
+                }
+                m ^= j; /* remove from the mask */
             }
         g_assert(j >= EVENT_RANGE); /* an invalid event is in the mask */
+    }
+
+    /* remove from masks its not registered for anymore */
+    for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1) {
+        if (!(j & mask))
+            for (it = funcs[i]; it != NULL; it = next) {
+                next = it->next;
+                f = it->data;
+                if (f->h == h && f->data == data) {
+                    g_free(f);
+                    funcs[i] = g_slist_delete_link(funcs[i], it);
+                }
+            }
     }
 }
 
@@ -101,8 +137,10 @@ void dispatch_x(XEvent *xe, Client *c)
         ++i;
     }
 
-    for (it = funcs[i]; it != NULL; it = it->next)
-        ((EventHandler)it->data)(&obe);
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
 }
 
 void dispatch_client(EventType e, Client *c)
@@ -122,8 +160,10 @@ void dispatch_client(EventType e, Client *c)
         ++i;
     }
 
-    for (it = funcs[i]; it != NULL; it = it->next)
-        ((EventHandler)it->data)(&obe);
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
 }
 
 void dispatch_ob(EventType e)
@@ -140,8 +180,10 @@ void dispatch_ob(EventType e)
         ++i;
     }
 
-    for (it = funcs[i]; it != NULL; it = it->next)
-        ((EventHandler)it->data)(&obe);
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
 }
 
 void dispatch_signal(int signal)
@@ -160,6 +202,8 @@ void dispatch_signal(int signal)
         ++i;
     }
 
-    for (it = funcs[i]; it != NULL; it = it->next)
-        ((EventHandler)it->data)(&obe);
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
 }

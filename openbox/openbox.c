@@ -10,6 +10,7 @@
 #include "gettext.h"
 #include "engine.h"
 #include "themerc.h"
+#include "plugin.h"
 #include "timer.h"
 #include "../render/render.h"
 #include "../render/font.h"
@@ -47,7 +48,7 @@ gboolean ob_remote   = FALSE;
 gboolean ob_sync     = TRUE;
 Cursors  ob_cursors;
 
-void signal_handler(const ObEvent *e);
+void signal_handler(const ObEvent *e, void *data);
 
 int main(int argc, char **argv)
 {
@@ -65,7 +66,7 @@ int main(int argc, char **argv)
 
     /* start our event dispatcher and register for signals */
     dispatch_startup();
-    dispatch_register(signal_handler, Event_Signal);
+    dispatch_register(Event_Signal, signal_handler, NULL);
 
     /* set up signal handler */
     sigemptyset(&sigset);
@@ -136,8 +137,10 @@ int main(int argc, char **argv)
 	screen_startup();
 	focus_startup();
 	client_startup();
+        plugin_startup();
 
-        dispatch_ob(Event_Ob_Startup);
+        /* XXX load all plugins!! */
+        plugin_open("foo");
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -150,8 +153,7 @@ int main(int argc, char **argv)
 
 	client_unmanage_all();
 
-        dispatch_ob(Event_Ob_Shutdown);
-
+        plugin_shutdown();
 	client_shutdown();
 	screen_shutdown();
 	event_shutdown();
@@ -170,7 +172,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void signal_handler(const ObEvent *e)
+void signal_handler(const ObEvent *e, void *data)
 {
     switch (e->data.signal) {
     case SIGUSR1:

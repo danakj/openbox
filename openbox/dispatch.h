@@ -29,12 +29,10 @@ typedef enum {
     Event_Ob_Desktop      = 1 << 15, /* changed desktops */
     Event_Ob_NumDesktops  = 1 << 16, /* changed the number of desktops */
     Event_Ob_ShowDesktop  = 1 << 17, /* entered/left show-the-desktop mode */
-    Event_Ob_Startup      = 1 << 18, /* startup under way */
-    Event_Ob_Shutdown     = 1 << 19, /* shutdown under way */
 
-    Event_Signal          = 1 << 20, /* a signal from the OS */
+    Event_Signal          = 1 << 18, /* a signal from the OS */
 
-    EVENT_RANGE           = 1 << 21
+    EVENT_RANGE           = 1 << 19
 } EventType;
 
 typedef struct {
@@ -53,11 +51,11 @@ typedef struct {
     EventData data;
 } ObEvent;
 
-typedef void (*EventHandler)(const ObEvent *e);
+typedef void (*EventHandler)(const ObEvent *e, void *data);
 
 typedef unsigned int EventMask;
 
-void dispatch_register(EventHandler h, EventMask mask);
+void dispatch_register(EventMask mask, EventHandler h, void *data);
 
 void dispatch_x(XEvent *e, Client *c);
 void dispatch_client(EventType e, Client *c);

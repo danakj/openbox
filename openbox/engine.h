@@ -24,9 +24,4 @@ EngineFrameHide *engine_frame_hide;
 
 EngineGetContext *engine_get_context;
 
-EngineMouseEnter *engine_mouse_enter;
-EngineMouseLeave *engine_mouse_leave;
-EngineMousePress *engine_mouse_press;
-EngineMouseRelease *engine_mouse_release;
-
 #endif

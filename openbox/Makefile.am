@@ -20,11 +20,11 @@ ob3_LDADD=@LIBINTL@ ../render/librender.a
 ob3_LDFLAGS=-export-dynamic
 ob3_SOURCES=client.c event.c extensions.c focus.c frame.c openbox.c prop.c \
 	screen.c stacking.c xerror.c themerc.c timer.c dispatch.c \
-	engine.c
+	engine.c plugin.c
 
 noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \
 	openbox.h prop.h screen.h stacking.h xerror.h themerc.h dispatch.h \
-	timer.h engine.h
+	timer.h engine.h plugin.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

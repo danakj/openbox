@@ -4,10 +4,10 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\" \
 -DG_LOG_DOMAIN=\"Openbox-Plugin\"
 
-#engine_LTLIBRARIES=openbox.la
+plugin_LTLIBRARIES=focus.la
 
-#openbox_la_LDFLAGS=-module -avoid-version
-#openbox_la_SOURCES=openbox.c theme.c
+focus_la_LDFLAGS=-module -avoid-version
+focus_la_SOURCES=focus.c
 
 noinst_HEADERS=
 

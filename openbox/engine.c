@@ -52,10 +52,6 @@ static gboolean load(char *name)
     LOADSYM(frame_show, engine_frame_show);
     LOADSYM(frame_hide, engine_frame_hide);
     LOADSYM(get_context, engine_get_context);
-    LOADSYM(frame_mouse_enter, engine_mouse_enter);
-    LOADSYM(frame_mouse_leave, engine_mouse_leave);
-    LOADSYM(frame_mouse_press, engine_mouse_press);
-    LOADSYM(frame_mouse_release, engine_mouse_release);
 
     if (!estartup())
 	return FALSE;

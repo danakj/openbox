@@ -39,7 +39,15 @@ void dock_startup(gboolean reconfig)
     XSetWindowAttributes attrib;
 
     if (reconfig) {
+        XSetWindowBorder(ob_display, dock->frame,
+                         RrColorPixel(ob_rr_theme->b_color));
+        XSetWindowBorderWidth(ob_display, dock->frame, ob_rr_theme->bwidth);
+
+        RrAppearanceFree(dock->a_frame);
+        dock->a_frame = RrAppearanceCopy(ob_rr_theme->a_unfocused_title);
+
         stacking_add(DOCK_AS_WINDOW(dock));
+
         dock_configure();
         return;
     }

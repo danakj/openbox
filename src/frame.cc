@@ -130,7 +130,7 @@ void OBFrame::adjust()
   _decorations = _client->decorations();
   _decorations = 0xffffffff;
   
-  int width;   // the width of the whole frame
+  int width;   // the width of the client and its border
   int bwidth;  // width to make borders
   int cbwidth; // width of the inner client border
   
@@ -139,6 +139,8 @@ void OBFrame::adjust()
     cbwidth = _style->getFrameWidth();
   } else
     bwidth = cbwidth = 0;
+  // inside this function _size is the size EXCLUDING the outer border
+  // at the end of this function it becomes the size INCLUDING the outer border
   _size.left = _size.top = _size.bottom = _size.right = cbwidth;
   width = _client->area().width() + cbwidth * 2;
 
@@ -286,6 +288,13 @@ void OBFrame::adjust()
   else
     _handle.hide(true);
   
+  // inside this function _size is the size EXCLUDING the outer border
+  // at the end of this function it becomes the size INCLUDING the outer border
+  _size.left += bwidth;
+  _size.right += bwidth;
+  _size.top += bwidth;
+  _size.bottom += bwidth;
+
   // XXX: more is gunna have to happen here
 
   adjustShape();
@@ -353,8 +362,9 @@ void OBFrame::grabClient()
   //XRaiseWindow(otk::OBDisplay::display, _client->window());
   // map the client so it maps when the frame does
   XMapWindow(otk::OBDisplay::display, _client->window());
-  
+
   adjust();
+  applyGravity();
 }
 
 
@@ -380,47 +390,64 @@ void OBFrame::releaseClient(bool remap)
 }
 
 
-Window OBFrame::createChild(Window parent, Cursor cursor)
+void OBFrame::applyGravity()
 {
-  XSetWindowAttributes attrib_create;
-  unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask;
+  int x, y;
+  // apply horizontal window gravity
+  switch (_client->gravity()) {
+  default:
+  case NorthWestGravity:
+  case SouthWestGravity:
+  case WestGravity:
+    x = _client->area().x();
+    break;
 
-  attrib_create.background_pixmap = None;
-  attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
-                             ButtonMotionMask | ExposureMask;
+  case NorthGravity:
+  case SouthGravity:
+  case CenterGravity:
+    x = _client->area().x() - (_size.left + _size.right) / 2;
+    break;
 
-  if (cursor) {
-    create_mask |= CWCursor;
-    attrib_create.cursor = cursor;
+  case NorthEastGravity:
+  case SouthEastGravity:
+  case EastGravity:
+    x = _client->area().x() - _size.left - _size.right + 2;
+    break;
+
+  case ForgetGravity:
+  case StaticGravity:
+    x = _client->area().x() - _size.left;
+    break;
   }
 
-  Window w = XCreateWindow(otk::OBDisplay::display, parent, 0, 0, 1, 1, 0,
-                           _screen->getDepth(), InputOutput,
-                           _screen->getVisual(), create_mask, &attrib_create);
-  return w;
+  // apply vertical window gravity
+  switch (_client->gravity()) {
+  default:
+  case NorthWestGravity:
+  case NorthEastGravity:
+  case NorthGravity:
+    y = _client->area().y();
+    break;
+
+  case CenterGravity:
+  case EastGravity:
+  case WestGravity:
+    y = _client->area().y() - (_size.top + _size.bottom) / 2;
+    break;
+
+  case SouthWestGravity:
+  case SouthEastGravity:
+  case SouthGravity:
+    y = _client->area().y() - _size.top - _size.bottom + 2;
+    break;
+
+  case ForgetGravity:
+  case StaticGravity:
+    y = _client->area().y() - _size.top;
+    break;
+  }
+  move(x, y);
 }
 
-
-Window OBFrame::createFrame()
-{
-  XSetWindowAttributes attrib_create;
-  unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWColormap |
-                              CWOverrideRedirect | CWEventMask;
-
-  attrib_create.background_pixmap = None;
-  attrib_create.colormap = _screen->getColormap();
-  attrib_create.override_redirect = True;
-  attrib_create.event_mask = EnterWindowMask | LeaveWindowMask | ButtonPress;
-  /*
-    We catch button presses because other wise they get passed down to the
-    root window, which will then cause root menus to show when you click the
-    window's frame.
-  */
-
-  return XCreateWindow(otk::OBDisplay::display, _screen->getRootWindow(),
-                       0, 0, 1, 1, 0,
-                       _screen->getDepth(), InputOutput, _screen->getVisual(),
-                       create_mask, &attrib_create);
-}
 
 }

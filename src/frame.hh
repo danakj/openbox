@@ -56,11 +56,6 @@ private:
   */
   OBClient::DecorationFlags _decorations;
 
-  //! Creates the base frame window
-  Window createFrame();
-  //! Creates a child frame decoration element window
-  Window createChild(Window parent, Cursor cursor);
-
   //! Reparents the client window from the root window onto the frame
   void grabClient();
   //! Reparents the client window back to the root window
@@ -85,7 +80,11 @@ public:
   //! Update the frame to match the client
   void adjust();
   //! Shape the frame window to the client window
-  void adjustShape(); 
+  void adjustShape();
+
+  //! Applies gravity for the client's gravity, moving the frame to the
+  //! appropriate place
+  void applyGravity();
 };
 
 }

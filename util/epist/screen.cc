@@ -499,8 +499,7 @@ void screen::cycleWindow(const bool forward, const int increment,
       } else {
         if (target == begin)
           target = end;
-        for (int x = 0; x < increment; ++x)
-          --target;
+        --target;
       }
 
       // must be no window to focus

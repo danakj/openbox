@@ -134,6 +134,10 @@ void event_loop()
 	}
 	XNextEvent(ob_display, &e);
 
+        /* we don't use exposes but the render lib wants them all! */
+        if (ob_state != State_Exiting && e.type == Expose)
+            RrExpose(ob_render_inst, &e);
+
 #ifdef USE_LIBSN
         sn_display_process_event(ob_sn_display, &e);
 #endif
@@ -426,13 +430,6 @@ static void event_process(XEvent *e)
     DockApp *dockapp = NULL;
     Menu *menu = NULL;
     ObWindow *obwin = NULL;
-
-    /* expose events aren't related to any internal stuff */
-    if (e->type == Expose) {
-        if (ob_state != State_Exiting)
-            RrExpose(ob_render_inst, &e->xexpose);
-        return;
-    }
 
     window = event_get_window(e);
     if ((obwin = g_hash_table_lookup(window_map, &window))) {

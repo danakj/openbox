@@ -123,8 +123,8 @@ void OtkEventDispatcher::dispatch(const XEvent &e) {
   if (handler)
     handler->handle(e);
 
-  if (master)
-    master->handle(e);
+  if (_master)
+    _master->handle(e);
 }
 
 OtkEventHandler *OtkEventDispatcher::findHandler(Window win)

@@ -1,5 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-// i18n.cc for Openbox
+// i18n.cc for Blackbox - an X11 Window manager
 // Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
@@ -46,11 +46,17 @@ extern "C" {
 }
 
 #include <string>
+using std::string;
 
-#include "i18n.h"
+#include "i18n.hh"
 
-I18n::I18n(const char *catalog) {
-  mb = false;
+
+// the rest of bb source uses True and False from X, so we continue that
+#define True true
+#define False false
+
+I18n::I18n(void) {
+  mb = False;
 #ifdef    HAVE_SETLOCALE
   locale = setlocale(LC_ALL, "");
   if (! locale) {
@@ -61,7 +67,7 @@ I18n::I18n(const char *catalog) {
   } else {
     // MB_CUR_MAX returns the size of a char in the current locale
     if (MB_CUR_MAX > 1)
-      mb = true;
+      mb = True;
     // truncate any encoding off the end of the locale
     char *l = strchr(locale, '@');
     if (l) *l = '\0';
@@ -73,12 +79,10 @@ I18n::I18n(const char *catalog) {
   catalog_fd = (nl_catd) -1;
 #endif
 #endif // HAVE_SETLOCALE
-  if (catalog)
-    openCatalog(catalog);
 }
 
 
-I18n::~I18n() {
+I18n::~I18n(void) {
 #if defined(NLS) && defined(HAVE_CATCLOSE)
   if (catalog_fd != (nl_catd) -1)
     catclose(catalog_fd);
@@ -86,9 +90,9 @@ I18n::~I18n() {
 }
 
 
-#if defined(NLS) && defined(HAVE_CATOPEN)
 void I18n::openCatalog(const char *catalog) {
-  std::string catalog_filename = LOCALEPATH;
+#if defined(NLS) && defined(HAVE_CATOPEN)
+  string catalog_filename = LOCALEPATH;
   catalog_filename += '/';
   catalog_filename += locale;
   catalog_filename += '/';
@@ -102,21 +106,14 @@ void I18n::openCatalog(const char *catalog) {
 
   if (catalog_fd == (nl_catd) -1)
     fprintf(stderr, "failed to open catalog, using default messages\n");
-}
-#else
-void I18n::openCatalog(const char *) {
-}
 #endif // HAVE_CATOPEN
+}
 
-#if   defined(NLS) && defined(HAVE_CATGETS)
 const char* I18n::operator()(int set, int msg, const char *msgString) const {
+#if   defined(NLS) && defined(HAVE_CATGETS)
   if (catalog_fd != (nl_catd) -1)
     return catgets(catalog_fd, set, msg, msgString);
   else
+#endif
     return msgString;
 }
-#else
-const char* I18n::operator()(int, int, const char *msgString) const {
-  return msgString;
-}
-#endif

@@ -1,4 +1,5 @@
-// Rootmenu.h for Openbox
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// Netizen.hh for Blackbox - An X11 Window Manager
 // Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
@@ -20,32 +21,41 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __Rootmenu_hh
-#define   __Rootmenu_hh
+#ifndef   __Netizen_hh
+#define   __Netizen_hh
 
-// forward declarations
-class Rootmenu;
+extern "C" {
+#include <X11/Xlib.h>
+}
 
-class Openbox;
+// forward declaration
+class Blackbox;
 class BScreen;
+class Netizen;
 
-#include "Basemenu.h"
-
-
-class Rootmenu : public Basemenu {
+class Netizen {
 private:
-  Openbox &openbox;
-  BScreen &screen;
-
-
-protected:
-  virtual void itemSelected(int, int);
-
+  Blackbox *blackbox;
+  BScreen *screen;
+  Window window;
+  XEvent event;
 
 public:
-  Rootmenu(BScreen &);
+  Netizen(BScreen *, Window);
+
+  inline Window getWindowID(void) const { return window; }
+
+  void sendWorkspaceCount(void);
+  void sendCurrentWorkspace(void);
+
+  void sendWindowFocus(Window);
+  void sendWindowAdd(Window, unsigned long);
+  void sendWindowDel(Window);
+  void sendWindowRaise(Window);
+  void sendWindowLower(Window);
+
+  void sendConfigNotify(XEvent *);
 };
 
 
-#endif // __Rootmenu_hh
-
+#endif // __Netizen_hh

@@ -1,6 +1,6 @@
-// Workspace.cc for Openbox
-// Copyright (c) 2002 - 2002 Ben Jansens (ben@orodu.net)
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+// Workspace.cc for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,594 +21,580 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
-
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
+
+extern "C" {
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
-
-#ifdef    HAVE_STRING_H
+#ifdef HAVE_STRING_H
 #  include <string.h>
 #endif // HAVE_STRING_H
+}
 
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
+#include <functional>
+#include <string>
 
-#include "i18n.h"
-#include "openbox.h"
-#include "Clientmenu.h"
-#include "Screen.h"
-#include "Toolbar.h"
-#include "Window.h"
-#include "Workspace.h"
-#include "Windowmenu.h"
-#include "Geometry.h"
-#include "Util.h"
+using std::string;
 
-#include <algorithm>
-#include <vector>
-typedef std::vector<Rect> rectList;
+#include "i18n.hh"
+#include "blackbox.hh"
+#include "Clientmenu.hh"
+#include "Netizen.hh"
+#include "Screen.hh"
+#include "Toolbar.hh"
+#include "Util.hh"
+#include "Window.hh"
+#include "Workspace.hh"
+#include "Windowmenu.hh"
 
-Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
-  cascade_x = cascade_y = 0;
-  _focused = _last = (OpenboxWindow *) 0;
+
+Workspace::Workspace(BScreen *scrn, unsigned int i) {
+  screen = scrn;
+
+  cascade_x = cascade_y = 32;
+
   id = i;
 
-  clientmenu = new Clientmenu(*this);
+  clientmenu = new Clientmenu(this);
 
-  name = (char *) 0;
-  setName(screen.getNameOfWorkspace(id));
+  lastfocus = (BlackboxWindow *) 0;
+
+  setName(screen->getNameOfWorkspace(id));
 }
 
 
-Workspace::~Workspace(void) {
-  delete clientmenu;
+void Workspace::addWindow(BlackboxWindow *w, bool place) {
+  assert(w != 0);
 
-  if (name)
-    delete [] name;
-}
-
-
-int Workspace::addWindow(OpenboxWindow *w, bool place) {
-  if (! w) return -1;
-
-  if (place) placeWindow(*w);
+  if (place) placeWindow(w);
 
   w->setWorkspace(id);
-  w->setWindowNumber(_windows.size());
+  w->setWindowNumber(windowList.size());
 
-  _zorder.push_front(w);
-  _windows.push_back(w);
+  stackingList.push_front(w);
+  windowList.push_back(w);
 
-  clientmenu->insert((const char **) w->getTitle());
+  clientmenu->insert(w->getTitle());
   clientmenu->update();
 
-  screen.updateNetizenWindowAdd(w->getClientWindow(), id);
+  screen->updateNetizenWindowAdd(w->getClientWindow(), id);
 
   raiseWindow(w);
-
-  return w->getWindowNumber();
 }
 
 
-int Workspace::removeWindow(OpenboxWindow *w) {
-  if (! w) return -1;
+unsigned int Workspace::removeWindow(BlackboxWindow *w) {
+  assert(w != 0);
 
-  winVect::iterator winit = std::find(_windows.begin(), _windows.end(), w);
+  stackingList.remove(w);
 
-  if (winit == _windows.end()) {
-    if (w == _last)
-      _last = (OpenboxWindow *) 0;
-    if (w == _focused)
-      _focused = (OpenboxWindow *) 0;
-    return _windows.size();
+  if (w->isFocused() && ! screen->getBlackbox()->doShutdown()) {
+    BlackboxWindow *newfocus = 0;
+    if (w->isTransient())
+      newfocus = w->getTransientFor();
+    if (! newfocus && ! stackingList.empty())
+      newfocus = stackingList.front();
+    if (! newfocus || ! newfocus->setInputFocus())
+      screen->getBlackbox()->setFocusedWindow(0);
   }
-  
-  _zorder.remove(w);
 
-  if (w == _last)
-    _last = (OpenboxWindow *) 0;
-  if (w == _focused) {
-    OpenboxWindow *fw = (OpenboxWindow *) 0;
-    if (w->isTransient() && w->getTransientFor() &&
-        w->getTransientFor()->isVisible())
-      fw = w->getTransientFor();
-    else if (screen.sloppyFocus())             // sloppy focus
-      fw = (OpenboxWindow *) 0;
-    else if (!_zorder.empty())                 // click focus
-      fw = _zorder.front();
+  if (lastfocus == w)
+    lastfocus = (BlackboxWindow *) 0;
 
-    if (!(fw != (OpenboxWindow *) 0 && fw->setInputFocus()))
-      screen.getOpenbox().focusWindow(0);
-  }
-  
-  _windows.erase(winit);
+  windowList.remove(w);
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
 
-  screen.updateNetizenWindowDel(w->getClientWindow());
+  screen->updateNetizenWindowDel(w->getClientWindow());
 
-  winVect::iterator it = _windows.begin();
-  for (int i=0; it != _windows.end(); ++it, ++i)
+  BlackboxWindowList::iterator it = windowList.begin();
+  const BlackboxWindowList::iterator end = windowList.end();
+  unsigned int i = 0;
+  for (; it != end; ++it, ++i)
     (*it)->setWindowNumber(i);
 
-  return _windows.size();
-}
+  if (i == 0)
+    cascade_x = cascade_y = 32;
 
-
-void Workspace::focusWindow(OpenboxWindow *win) {
-  if (_focused != (OpenboxWindow *) 0)
-    clientmenu->setItemSelected(_focused->getWindowNumber(), false);
-  _focused = win;
-  // make sure the focused window belongs to this workspace before highlighting
-  // it in the menu (sticky windows arent in this workspace's menu).
-  if (_focused != (OpenboxWindow *) 0 && _focused->getWorkspaceNumber() == id)
-    clientmenu->setItemSelected(_focused->getWindowNumber(), true);
-  if (win != (OpenboxWindow *) 0)
-    _last = win;
+  return i;
 }
 
 
 void Workspace::showAll(void) {
-  winList::iterator it;
-  for (it = _zorder.begin(); it != _zorder.end(); ++it)
-    (*it)->deiconify(false, false);
+  std::for_each(stackingList.begin(), stackingList.end(),
+                std::mem_fun(&BlackboxWindow::show));
 }
 
 
 void Workspace::hideAll(void) {
-  winList::reverse_iterator it;
-  for (it = _zorder.rbegin(); it != _zorder.rend(); ++it)
-    if (!(*it)->isStuck())
-      (*it)->withdraw();
+  // withdraw in reverse order to minimize the number of Expose events
+
+  BlackboxWindowList lst(stackingList.rbegin(), stackingList.rend());
+
+  BlackboxWindowList::iterator it = lst.begin();
+  const BlackboxWindowList::iterator end = lst.end();
+  for (; it != end; ++it) {
+    BlackboxWindow *bw = *it;
+    if (! bw->isStuck())
+      bw->withdraw();
+  }
 }
 
 
 void Workspace::removeAll(void) {
-  winVect::iterator it;
-  for (it = _windows.begin(); it != _windows.end(); ++it)
-    (*it)->iconify();
+  while (! windowList.empty())
+    windowList.front()->iconify();
 }
 
 
-void Workspace::raiseWindow(OpenboxWindow *w) {
-  OpenboxWindow *win = (OpenboxWindow *) 0, *bottom = w;
-
-  while (bottom->isTransient() && bottom->getTransientFor())
-    bottom = bottom->getTransientFor();
-
-  int i = 1;
-  win = bottom;
-  while (win->hasTransient() && win->getTransient()) {
-    win = win->getTransient();
-
-    i++;
-  }
-
-  Window *nstack = new Window[i], *curr = nstack;
-  Workspace *wkspc;
-
-  win = bottom;
-  while (true) {
-    *(curr++) = win->getFrameWindow();
-    screen.updateNetizenWindowRaise(win->getClientWindow());
-
-    if (! win->isIconic()) {
-      wkspc = screen.getWorkspace(win->getWorkspaceNumber());
-      wkspc->_zorder.remove(win);
-      wkspc->_zorder.push_front(win);
+/*
+ * returns the number of transients for win, plus the number of transients
+ * associated with each transient of win
+ */
+static int countTransients(const BlackboxWindow * const win) {
+  int ret = win->getTransients().size();
+  if (ret > 0) {
+    BlackboxWindowList::const_iterator it, end = win->getTransients().end();
+    for (it = win->getTransients().begin(); it != end; ++it) {
+      ret += countTransients(*it);
     }
-
-    if (! win->hasTransient() || ! win->getTransient())
-      break;
-
-    win = win->getTransient();
   }
-
-  screen.raiseWindows(nstack, i);
-
-  delete [] nstack;
+  return ret;
 }
 
 
-void Workspace::lowerWindow(OpenboxWindow *w) {
-  OpenboxWindow *win = (OpenboxWindow *) 0, *bottom = w;
+/*
+ * puts the transients of win into the stack. windows are stacked above
+ * the window before it in the stackvector being iterated, meaning
+ * stack[0] is on bottom, stack[1] is above stack[0], stack[2] is above
+ * stack[1], etc...
+ */
+void Workspace::raiseTransients(const BlackboxWindow * const win,
+                                StackVector::iterator &stack) {
+  if (win->getTransients().size() == 0) return; // nothing to do
 
-  while (bottom->isTransient() && bottom->getTransientFor())
-    bottom = bottom->getTransientFor();
+  // put win's transients in the stack
+  BlackboxWindowList::const_iterator it, end = win->getTransients().end();
+  for (it = win->getTransients().begin(); it != end; ++it) {
+    *stack++ = (*it)->getFrameWindow();
+    screen->updateNetizenWindowRaise((*it)->getClientWindow());
 
-  int i = 1;
-  win = bottom;
-  while (win->hasTransient() && win->getTransient()) {
-    win = win->getTransient();
-
-    i++;
+    if (! (*it)->isIconic()) {
+      Workspace *wkspc = screen->getWorkspace((*it)->getWorkspaceNumber());
+      wkspc->stackingList.remove((*it));
+      wkspc->stackingList.push_front((*it));
+    }
   }
 
-  Window *nstack = new Window[i], *curr = nstack;
-  Workspace *wkspc;
+  // put transients of win's transients in the stack
+  for (it = win->getTransients().begin(); it != end; ++it) {
+    raiseTransients(*it, stack);
+  }
+}
 
-  while (true) {
-    *(curr++) = win->getFrameWindow();
-    screen.updateNetizenWindowLower(win->getClientWindow());
 
-    if (! win->isIconic()) {
-      wkspc = screen.getWorkspace(win->getWorkspaceNumber());
-      wkspc->_zorder.remove(win);
-      wkspc->_zorder.push_back(win);
+void Workspace::lowerTransients(const BlackboxWindow * const win,
+                                StackVector::iterator &stack) {
+  if (win->getTransients().size() == 0) return; // nothing to do
+
+  // put transients of win's transients in the stack
+  BlackboxWindowList::const_reverse_iterator it,
+    end = win->getTransients().rend();
+  for (it = win->getTransients().rbegin(); it != end; ++it) {
+    lowerTransients(*it, stack);
+  }
+
+  // put win's transients in the stack
+  for (it = win->getTransients().rbegin(); it != end; ++it) {
+    *stack++ = (*it)->getFrameWindow();
+    screen->updateNetizenWindowLower((*it)->getClientWindow());
+
+    if (! (*it)->isIconic()) {
+      Workspace *wkspc = screen->getWorkspace((*it)->getWorkspaceNumber());
+      wkspc->stackingList.remove((*it));
+      wkspc->stackingList.push_back((*it));
     }
+  }
 
-    if (! win->getTransientFor())
-      break;
+}
 
+
+void Workspace::raiseWindow(BlackboxWindow *w) {
+  BlackboxWindow *win = w;
+
+  // walk up the transient_for's to the window that is not a transient
+  while (win->isTransient()) {
+    if (! win->getTransientFor()) break;
     win = win->getTransientFor();
   }
 
-  screen.getOpenbox().grab();
+  // get the total window count (win and all transients)
+  unsigned int i = 1 + countTransients(win);
 
-  XLowerWindow(screen.getBaseDisplay().getXDisplay(), *nstack);
-  XRestackWindows(screen.getBaseDisplay().getXDisplay(), nstack, i);
+  // stack the window with all transients above
+  StackVector stack_vector(i);
+  StackVector::iterator stack = stack_vector.begin();
 
-  screen.getOpenbox().ungrab();
+  *(stack++) = win->getFrameWindow();
+  screen->updateNetizenWindowRaise(win->getClientWindow());
+  if (! win->isIconic()) {
+    Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
+    wkspc->stackingList.remove(win);
+    wkspc->stackingList.push_front(win);
+  }
 
-  delete [] nstack;
+  raiseTransients(win, stack);
+
+  screen->raiseWindows(&stack_vector[0], stack_vector.size());
+}
+
+
+void Workspace::lowerWindow(BlackboxWindow *w) {
+  BlackboxWindow *win = w;
+
+  // walk up the transient_for's to the window that is not a transient
+  while (win->isTransient()) {
+    if (! win->getTransientFor()) break;
+    win = win->getTransientFor();
+  }
+
+  // get the total window count (win and all transients)
+  unsigned int i = 1 + countTransients(win);
+
+  // stack the window with all transients above
+  StackVector stack_vector(i);
+  StackVector::iterator stack = stack_vector.begin();
+
+  lowerTransients(win, stack);
+
+  *(stack++) = win->getFrameWindow();
+  screen->updateNetizenWindowLower(win->getClientWindow());
+  if (! win->isIconic()) {
+    Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
+    wkspc->stackingList.remove(win);
+    wkspc->stackingList.push_back(win);
+  }
+
+  XLowerWindow(screen->getBaseDisplay()->getXDisplay(), stack_vector.front());
+  XRestackWindows(screen->getBaseDisplay()->getXDisplay(),
+                  &stack_vector[0], stack_vector.size());
 }
 
 
 void Workspace::reconfigure(void) {
   clientmenu->reconfigure();
-
-  winVect::iterator it;
-  for (it = _windows.begin(); it != _windows.end(); ++it)
-    if ((*it)->validateClient())
-      (*it)->reconfigure();
+  std::for_each(windowList.begin(), windowList.end(),
+                std::mem_fun(&BlackboxWindow::reconfigure));
 }
 
 
-OpenboxWindow *Workspace::getWindow(int index) {
-  if ((index >= 0) && (index < (signed)_windows.size()))
-    return _windows[index];
-  else
-    return (OpenboxWindow *) 0;
+void Workspace::updateFocusModel(void) {
+  std::for_each(windowList.begin(), windowList.end(),
+                std::mem_fun(&BlackboxWindow::updateFocusModel));
 }
 
 
-int Workspace::getCount(void) {
-  return (signed)_windows.size();
+BlackboxWindow *Workspace::getWindow(unsigned int index) {
+  if (index < windowList.size()) {
+    BlackboxWindowList::iterator it = windowList.begin();
+    for(; index > 0; --index, ++it); /* increment to index */
+    return *it;
+  }
+  return 0;
 }
 
 
-void Workspace::update(void) {
-  clientmenu->update();
-  screen.getToolbar()->redrawWindowLabel(true);
+BlackboxWindow*
+Workspace::getNextWindowInList(BlackboxWindow *w) {
+  BlackboxWindowList::iterator it = std::find(windowList.begin(),
+                                              windowList.end(),
+                                              w);
+  assert(it != windowList.end());   // window must be in list
+  ++it;                             // next window
+  if (it == windowList.end())
+    return windowList.front();      // if we walked off the end, wrap around
+
+  return *it;
 }
 
 
-bool Workspace::isCurrent(void) {
-  return (id == screen.getCurrentWorkspaceID());
+BlackboxWindow* Workspace::getPrevWindowInList(BlackboxWindow *w) {
+  BlackboxWindowList::iterator it = std::find(windowList.begin(),
+                                              windowList.end(),
+                                              w);
+  assert(it != windowList.end()); // window must be in list
+  if (it == windowList.begin())
+    return windowList.back();     // if we walked of the front, wrap around
+
+  return *(--it);
 }
 
+
+BlackboxWindow* Workspace::getTopWindowOnStack(void) const {
+  return stackingList.front();
+}
+
+
+void Workspace::sendWindowList(Netizen &n) {
+  BlackboxWindowList::iterator it = windowList.begin(),
+    end = windowList.end();
+  for(; it != end; ++it)
+    n.sendWindowAdd((*it)->getClientWindow(), getID());
+}
+
+
+unsigned int Workspace::getCount(void) const {
+  return windowList.size();
+}
+
+
+bool Workspace::isCurrent(void) const {
+  return (id == screen->getCurrentWorkspaceID());
+}
+
+
+bool Workspace::isLastWindow(const BlackboxWindow* const w) const {
+  return (w == windowList.back());
+}
 
 void Workspace::setCurrent(void) {
-  screen.changeWorkspaceID(id);
+  screen->changeWorkspaceID(id);
 }
 
 
-void Workspace::setName(const char *new_name) {
-  if (name)
-    delete [] name;
-
-  if (new_name) {
-    name = bstrdup(new_name);
+void Workspace::setName(const string& new_name) {
+  if (! new_name.empty()) {
+    name = new_name;
   } else {
-    name = new char[128];
-    sprintf(name, i18n(WorkspaceSet, WorkspaceDefaultNameFormat,
-                       "Workspace %d"), id + 1);
+    string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat, "Workspace %d");
+    assert(tmp.length() < 32);
+    char default_name[32];
+    sprintf(default_name, tmp.c_str(), id + 1);
+    name = default_name;
   }
 
   clientmenu->setLabel(name);
   clientmenu->update();
-  screen.saveWorkspaceNames();
 }
 
 
-void Workspace::shutdown(void) {
-  while (!_windows.empty())
-    _windows[0]->restore();
-}
+/*
+ * Calculate free space available for window placement.
+ */
+typedef std::vector<Rect> rectList;
 
 static rectList calcSpace(const Rect &win, const rectList &spaces) {
+  Rect isect, extra;
   rectList result;
-  rectList::const_iterator siter;
-  for(siter=spaces.begin(); siter!=spaces.end(); ++siter) {
-    if(win.Intersect(*siter)) {
-      //Check for space to the left of the window
-      if(win.x() > siter->x())
-        result.push_back(Rect(siter->x(), siter->y(),
-                              win.x() - siter->x() - 1,
-                              siter->h()));
-      //Check for space above the window
-      if(win.y() > siter->y())
-        result.push_back(Rect(siter->x(), siter->y(),
-                              siter->w(),
-                              win.y() - siter->y() - 1));
-      //Check for space to the right of the window
-      if((win.x()+win.w()) <
-         (siter->x()+siter->w()))
-        result.push_back(Rect(win.x() + win.w() + 1,
-                              siter->y(),
-                              siter->x() + siter->w() -
-                              win.x() - win.w() - 1,
-                              siter->h()));
-      //Check for space below the window
-      if((win.y()+win.h()) <
-         (siter->y()+siter->h()))
-        result.push_back(Rect(siter->x(),
-                              win.y() + win.h() + 1,
-                              siter->w(),
-                              siter->y() + siter->h()-
-                              win.y() - win.h() - 1));
+  rectList::const_iterator siter, end = spaces.end();
+  for (siter = spaces.begin(); siter != end; ++siter) {
+    const Rect &curr = *siter;
 
+    if(! win.intersects(curr)) {
+      result.push_back(curr);
+      continue;
     }
-    else
-      result.push_back(*siter);
+
+    /* Use an intersection of win and curr to determine the space around
+     * curr that we can use.
+     *
+     * NOTE: the spaces calculated can overlap.
+     */
+    isect = curr & win;
+
+    // left
+    extra.setCoords(curr.left(), curr.top(),
+                    isect.left() - 1, curr.bottom());
+    if (extra.valid()) result.push_back(extra);
+
+    // top
+    extra.setCoords(curr.left(), curr.top(),
+                    curr.right(), isect.top() - 1);
+    if (extra.valid()) result.push_back(extra);
+
+    // right
+    extra.setCoords(isect.right() + 1, curr.top(),
+                    curr.right(), curr.bottom());
+    if (extra.valid()) result.push_back(extra);
+
+    // bottom
+    extra.setCoords(curr.left(), isect.bottom() + 1,
+                    curr.right(), curr.bottom());
+    if (extra.valid()) result.push_back(extra);
   }
   return result;
 }
 
-bool rowRLBT(const Rect &first, const Rect &second){
-  if (first.y()+first.h()==second.y()+second.h())
-    return first.x()+first.w()>second.x()+second.w();
-  return first.y()+first.h()>second.y()+second.h();
+
+static bool rowRLBT(const Rect &first, const Rect &second) {
+  if (first.bottom() == second.bottom())
+    return first.right() > second.right();
+  return first.bottom() > second.bottom();
 }
 
-bool rowRLTB(const Rect &first, const Rect &second){
-  if (first.y()==second.y())
-    return first.x()+first.w()>second.x()+second.w();
-  return first.y()<second.y();
+static bool rowRLTB(const Rect &first, const Rect &second) {
+  if (first.y() == second.y())
+    return first.right() > second.right();
+  return first.y() < second.y();
 }
 
-bool rowLRBT(const Rect &first, const Rect &second){
-  if (first.y()+first.h()==second.y()+second.h())
-    return first.x()<second.x();
-  return first.y()+first.h()>second.y()+second.h();
+static bool rowLRBT(const Rect &first, const Rect &second) {
+  if (first.bottom() == second.bottom())
+    return first.x() < second.x();
+  return first.bottom() > second.bottom();
 }
 
-bool rowLRTB(const Rect &first, const Rect &second){
-  if (first.y()==second.y())
-    return first.x()<second.x();
-  return first.y()<second.y();
+static bool rowLRTB(const Rect &first, const Rect &second) {
+  if (first.y() == second.y())
+    return first.x() < second.x();
+  return first.y() < second.y();
 }
 
-bool colLRTB(const Rect &first, const Rect &second){
-  if (first.x()==second.x())
-    return first.y()<second.y();
-  return first.x()<second.x();
+static bool colLRTB(const Rect &first, const Rect &second) {
+  if (first.x() == second.x())
+    return first.y() < second.y();
+  return first.x() < second.x();
 }
 
-bool colLRBT(const Rect &first, const Rect &second){
-  if (first.x()==second.x())
-    return first.y()+first.h()>second.y()+second.h();
-  return first.x()<second.x();
+static bool colLRBT(const Rect &first, const Rect &second) {
+  if (first.x() == second.x())
+    return first.bottom() > second.bottom();
+  return first.x() < second.x();
 }
 
-bool colRLTB(const Rect &first, const Rect &second){
-  if (first.x()+first.w()==second.x()+second.w())
-    return first.y()<second.y();
-  return first.x()+first.w()>second.x()+second.w();
+static bool colRLTB(const Rect &first, const Rect &second) {
+  if (first.right() == second.right())
+    return first.y() < second.y();
+  return first.right() > second.right();
 }
 
-bool colRLBT(const Rect &first, const Rect &second){
-  if (first.x()+first.w()==second.x()+second.w())
-    return first.y()+first.h()>second.y()+second.h();
-  return first.x()+first.w()>second.x()+second.w();
+static bool colRLBT(const Rect &first, const Rect &second) {
+  if (first.right() == second.right())
+    return first.bottom() > second.bottom();
+  return first.right() > second.right();
 }
 
 
-//BestFitPlacement finds the smallest free space that fits the window
-//to be placed. It currentl ignores whether placement is right to left or top
-//to bottom.
-Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
-  const Rect *best;
+bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
   rectList spaces;
-  rectList::const_iterator siter;
-  spaces.push_back(space); //initially the entire screen is free
+  spaces.push_back(availableArea); //initially the entire screen is free
 
   //Find Free Spaces
-  winVect::iterator it;
-  for (it = _windows.begin(); it != _windows.end(); ++it)
-    spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
-                       spaces);
+  BlackboxWindowList::iterator wit = windowList.begin(),
+                               end = windowList.end();
+  Rect tmp;
+  for (; wit != end; ++wit) {
+    const BlackboxWindow* const curr = *wit;
+    tmp.setRect(curr->frameRect().x(), curr->frameRect().y(),
+                curr->frameRect().width() + screen->getBorderWidth(),
+                curr->frameRect().height() + screen->getBorderWidth());
 
-  //Find first space that fits the window
-  best = NULL;
-  for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
-    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
-      if (best==NULL)
-        best = &*siter;
-      else if(siter->w()*siter->h()<best->h()*best->w())
-        best = &*siter;
-    }
-  }
-  if (best != NULL) {
-    Point *pt = new Point(best->origin());
-    if (screen.colPlacementDirection() != BScreen::TopBottom)
-      pt->setY(pt->y() + (best->h() - win_size.h()));
-    if (screen.rowPlacementDirection() != BScreen::LeftRight)
-      pt->setX(pt->x() + (best->w() - win_size.w()));
-    return pt;
-  } else
-    return NULL; //fall back to cascade
-}
-
-Point *Workspace::underMousePlacement(const Size &win_size, const Rect &space) {
-  Point *pt;
-
-  int x, y, rx, ry;
-  Window c, r;
-  unsigned int m;
-  XQueryPointer(screen.getOpenbox().getXDisplay(), screen.getRootWindow(),
-                &r, &c, &rx, &ry, &x, &y, &m);
-  pt = new Point(rx - win_size.w() / 2, ry - win_size.h() / 2);
-
-  if (pt->x() < space.x())
-    pt->setX(space.x());
-  if (pt->y() < space.y())
-    pt->setY(space.y());
-  if (pt->x() + win_size.w() > space.x() + space.w())
-    pt->setX(space.x() + space.w() - win_size.w());
-  if (pt->y() + win_size.h() > space.y() + space.h())
-    pt->setY(space.y() + space.h() - win_size.h());
-  return pt;
-}
-
-Point *Workspace::rowSmartPlacement(const Size &win_size, const Rect &space) {
-  const Rect *best;
-  rectList spaces;
-
-  rectList::const_iterator siter;
-  spaces.push_back(space); //initially the entire screen is free
-
-  //Find Free Spaces
-  winVect::iterator it;
-  for (it = _windows.begin(); it != _windows.end(); ++it)
-    spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
-                       spaces);
-  //Sort spaces by preference
-  if(screen.rowPlacementDirection() == BScreen::RightLeft)
-    if(screen.colPlacementDirection() == BScreen::TopBottom)
-      sort(spaces.begin(),spaces.end(),rowRLTB);
-    else
-      sort(spaces.begin(),spaces.end(),rowRLBT);
-  else
-    if(screen.colPlacementDirection() == BScreen::TopBottom)
-      sort(spaces.begin(),spaces.end(),rowLRTB);
-    else
-      sort(spaces.begin(),spaces.end(),rowLRBT);
-  best = NULL;
-  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
-    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
-      best = &*siter;
-      break;
-    }
-
-  if (best != NULL) {
-    Point *pt = new Point(best->origin());
-    if (screen.colPlacementDirection() != BScreen::TopBottom)
-      pt->setY(best->y() + best->h() - win_size.h());
-    if (screen.rowPlacementDirection() != BScreen::LeftRight)
-      pt->setX(best->x()+best->w()-win_size.w());
-    return pt;
-  } else
-    return NULL; //fall back to cascade
-}
-
-Point *Workspace::colSmartPlacement(const Size &win_size, const Rect &space) {
-  const Rect *best;
-  rectList spaces;
-
-  rectList::const_iterator siter;
-  spaces.push_back(space); //initially the entire screen is free
-
-  //Find Free Spaces
-  winVect::iterator it;
-  for (it = _windows.begin(); it != _windows.end(); ++it)
-    spaces = calcSpace((*it)->area().Inflate(screen.getBorderWidth() * 4),
-                       spaces);
-  //Sort spaces by user preference
-  if(screen.colPlacementDirection() == BScreen::TopBottom)
-    if(screen.rowPlacementDirection() == BScreen::LeftRight)
-      sort(spaces.begin(),spaces.end(),colLRTB);
-    else
-      sort(spaces.begin(),spaces.end(),colRLTB);
-  else
-    if(screen.rowPlacementDirection() == BScreen::LeftRight)
-      sort(spaces.begin(),spaces.end(),colLRBT);
-    else
-      sort(spaces.begin(),spaces.end(),colRLBT);
-
-  //Find first space that fits the window
-  best = NULL;
-  for (siter=spaces.begin(); siter!=spaces.end(); ++siter)
-    if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
-      best = &*siter;
-      break;
-    }
-
-  if (best != NULL) {
-    Point *pt = new Point(best->origin());
-    if (screen.colPlacementDirection() != BScreen::TopBottom)
-      pt->setY(pt->y() + (best->h() - win_size.h()));
-    if (screen.rowPlacementDirection() != BScreen::LeftRight)
-      pt->setX(pt->x() + (best->w() - win_size.w()));
-    return pt;
-  } else
-    return NULL; //fall back to cascade
-}
-
-
-Point *const Workspace::cascadePlacement(const OpenboxWindow &win,
-                                         const Rect &space) {
-  if ((cascade_x + win.area().w() + screen.getBorderWidth() * 2 >
-       (space.x() + space.w())) ||
-      (cascade_y + win.area().h() + screen.getBorderWidth() * 2 >
-       (space.y() + space.h())))
-    cascade_x = cascade_y = 0;
-  if (cascade_x < space.x() || cascade_y < space.y()) {
-    cascade_x = space.x();
-    cascade_y = space.y();
+    spaces = calcSpace(tmp, spaces);
   }
 
-  Point *p = new Point(cascade_x, cascade_y);
-  cascade_x += win.getTitleHeight();
-  cascade_y += win.getTitleHeight();
-  return p;
+  if (screen->getPlacementPolicy() == BScreen::RowSmartPlacement) {
+    if(screen->getRowPlacementDirection() == BScreen::LeftRight) {
+      if(screen->getColPlacementDirection() == BScreen::TopBottom)
+        sort(spaces.begin(), spaces.end(), rowLRTB);
+      else
+        sort(spaces.begin(), spaces.end(), rowLRBT);
+    } else {
+      if(screen->getColPlacementDirection() == BScreen::TopBottom)
+        sort(spaces.begin(), spaces.end(), rowRLTB);
+      else
+        sort(spaces.begin(), spaces.end(), rowRLBT);
+    }
+  } else {
+    if(screen->getColPlacementDirection() == BScreen::TopBottom) {
+      if(screen->getRowPlacementDirection() == BScreen::LeftRight)
+        sort(spaces.begin(), spaces.end(), colLRTB);
+      else
+        sort(spaces.begin(), spaces.end(), colRLTB);
+    } else {
+      if(screen->getRowPlacementDirection() == BScreen::LeftRight)
+        sort(spaces.begin(), spaces.end(), colLRBT);
+      else
+        sort(spaces.begin(), spaces.end(), colRLBT);
+    }
+  }
+
+  rectList::const_iterator sit = spaces.begin(), spaces_end = spaces.end();
+  for(; sit != spaces_end; ++sit) {
+    if (sit->width() >= win.width() && sit->height() >= win.height())
+      break;
+  }
+
+  if (sit == spaces_end)
+    return False;
+
+  //set new position based on the empty space found
+  const Rect& where = *sit;
+  win.setX(where.x());
+  win.setY(where.y());
+
+  // adjust the location() based on left/right and top/bottom placement
+  if (screen->getPlacementPolicy() == BScreen::RowSmartPlacement) {
+    if (screen->getRowPlacementDirection() == BScreen::RightLeft)
+      win.setX(where.right() - win.width());
+    if (screen->getColPlacementDirection() == BScreen::BottomTop)
+      win.setY(where.bottom() - win.height());
+  } else {
+    if (screen->getColPlacementDirection() == BScreen::BottomTop)
+      win.setY(win.y() + where.height() - win.height());
+    if (screen->getRowPlacementDirection() == BScreen::RightLeft)
+      win.setX(win.x() + where.width() - win.width());
+  }
+  return True;
 }
 
 
-void Workspace::placeWindow(OpenboxWindow &win) {
-  Rect space = screen.availableArea();
-  const Size window_size(win.area().w()+screen.getBorderWidth() * 2,
-                         win.area().h()+screen.getBorderWidth() * 2);
-  Point *place = NULL;
+bool Workspace::cascadePlacement(Rect &win, const Rect &availableArea) {
+  if ((cascade_x > static_cast<signed>(availableArea.width() / 2)) ||
+      (cascade_y > static_cast<signed>(availableArea.height() / 2)))
+    cascade_x = cascade_y = 32;
 
-  switch (screen.placementPolicy()) {
-  case BScreen::BestFitPlacement:
-    place = bestFitPlacement(window_size, space);
-    break;
+  if (cascade_x == 32) {
+    cascade_x += availableArea.x();
+    cascade_y += availableArea.y();
+  }
+
+  win.setPos(cascade_x, cascade_y);
+
+  return True;
+}
+
+
+void Workspace::placeWindow(BlackboxWindow *win) {
+  Rect availableArea(screen->availableArea()),
+    new_win(availableArea.x(), availableArea.y(),
+            win->frameRect().width(), win->frameRect().height());
+  bool placed = False;
+
+  switch (screen->getPlacementPolicy()) {
   case BScreen::RowSmartPlacement:
-    place = rowSmartPlacement(window_size, space);
-    break;
   case BScreen::ColSmartPlacement:
-    place = colSmartPlacement(window_size, space);
+    placed = smartPlacement(new_win, availableArea);
     break;
-  case BScreen::UnderMousePlacement:
-  case BScreen::ClickMousePlacement:
-    place = underMousePlacement(window_size, space);
-    break;
+  default:
+    break; // handled below
   } // switch
 
-  if (place == NULL)
-    place = cascadePlacement(win, space);
+  if (placed == False) {
+    cascadePlacement(new_win, availableArea);
+    cascade_x += win->getTitleHeight() + (screen->getBorderWidth() * 2);
+    cascade_y += win->getTitleHeight() + (screen->getBorderWidth() * 2);
+  }
 
-  ASSERT(place != NULL);  
-  if (place->x() + window_size.w() > (signed) space.x() + space.w())
-    place->setX(((signed) space.x() + space.w() - window_size.w()) / 2);
-  if (place->y() + window_size.h() > (signed) space.y() + space.h())
-    place->setY(((signed) space.y() + space.h() - window_size.h()) / 2);
-
-  win.configure(place->x(), place->y(), win.area().w(), win.area().h());
-  delete place;
+  if (new_win.right() > availableArea.right())
+    new_win.setX(availableArea.left());
+  if (new_win.bottom() > availableArea.bottom())
+    new_win.setY(availableArea.top());
+  win->configure(new_win.x(), new_win.y(), new_win.width(), new_win.height());
 }

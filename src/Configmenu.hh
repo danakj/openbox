@@ -1,5 +1,6 @@
-// Configmenu.h for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// Configmenu.hh for Blackbox - An X11 Window Manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,10 +24,10 @@
 #ifndef   __Configmenu_hh
 #define   __Configmenu_hh
 
-#include "Basemenu.h"
+#include "Basemenu.hh"
 
 // forward declaration
-class Openbox;
+class Blackbox;
 class BScreen;
 class Configmenu;
 
@@ -34,51 +35,48 @@ class Configmenu : public Basemenu {
 private:
   class Focusmenu : public Basemenu {
   private:
-    Configmenu *configmenu;
+    Focusmenu(const Focusmenu&);
+    Focusmenu& operator=(const Focusmenu&);
 
   protected:
-    virtual void itemSelected(int, int);
-    virtual void setValues();
+    virtual void itemSelected(int button, unsigned int index);
 
   public:
-    Focusmenu(Configmenu *);
-    void reconfigure();
+    Focusmenu(Configmenu *cm);
   };
 
   class Placementmenu : public Basemenu {
   private:
-    Configmenu *configmenu;
+    Placementmenu(const Placementmenu&);
+    Placementmenu& operator=(const Placementmenu&);
 
   protected:
-    virtual void itemSelected(int, int);
-    virtual void setValues();
-
+    virtual void itemSelected(int button, unsigned int index);
 
   public:
-    Placementmenu(Configmenu *);
-    void reconfigure();
+    Placementmenu(Configmenu *cm);
   };
 
-  BScreen &screen;
   Focusmenu *focusmenu;
   Placementmenu *placementmenu;
 
   friend class Focusmenu;
   friend class Placementmenu;
 
-protected:
-  virtual void itemSelected(int, int);
-  virtual void setValues();
+  Configmenu(const Configmenu&);
+  Configmenu& operator=(const Configmenu&);
 
+protected:
+  virtual void itemSelected(int button, unsigned int index);
 
 public:
-  Configmenu(BScreen &);
-  virtual ~Configmenu();
+  Configmenu(BScreen *scr);
+  virtual ~Configmenu(void);
 
-  inline Basemenu *getFocusmenu() { return focusmenu; }
-  inline Basemenu *getPlacementmenu() { return placementmenu; }
+  inline Basemenu *getFocusmenu(void) { return focusmenu; }
+  inline Basemenu *getPlacementmenu(void) { return placementmenu; }
 
-  void reconfigure();
+  void reconfigure(void);
 };
 
 #endif // __Configmenu_hh

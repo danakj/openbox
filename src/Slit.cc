@@ -1,5 +1,6 @@
-// Slit.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+// Slit.cc for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,170 +21,154 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
-
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#ifdef    SLIT
-
+extern "C" {
 #include <X11/keysym.h>
+}
 
-#include "i18n.h"
-#include "openbox.h"
-#include "Image.h"
-#include "Screen.h"
-#include "Slit.h"
-#include "Toolbar.h"
+#include "i18n.hh"
+#include "blackbox.hh"
+#include "Image.hh"
+#include "Screen.hh"
+#include "Slit.hh"
+#include "Toolbar.hh"
 
-#include <strstream>
-#include <string>
-using std::ends;
 
-Slit::Slit(BScreen &scr, Resource &conf) : openbox(scr.getOpenbox()),
-screen(scr), config(conf)
-{
-  load();
+Slit::Slit(BScreen *scr) {
+  screen = scr;
+  blackbox = screen->getBlackbox();
 
-  display = screen.getBaseDisplay().getXDisplay();
+  on_top = screen->isSlitOnTop();
+  hidden = do_auto_hide = screen->doSlitAutoHide();
+
+  display = screen->getBaseDisplay()->getXDisplay();
   frame.window = frame.pixmap = None;
 
-  timer = new BTimer(openbox, *this);
-  // the time out is set in ::reconfigure()
-  timer->fireOnce(True);
+  timer = new BTimer(blackbox, this);
+  timer->setTimeout(blackbox->getAutoRaiseDelay());
 
-  slitmenu = new Slitmenu(*this);
+  slitmenu = new Slitmenu(this);
 
   XSetWindowAttributes attrib;
   unsigned long create_mask = CWBackPixmap | CWBackPixel | CWBorderPixel |
-    CWColormap | CWOverrideRedirect | CWEventMask;
+                              CWColormap | CWOverrideRedirect | CWEventMask;
   attrib.background_pixmap = None;
   attrib.background_pixel = attrib.border_pixel =
-    screen.getBorderColor()->getPixel();
-  attrib.colormap = screen.getColormap();
+    screen->getBorderColor()->pixel();
+  attrib.colormap = screen->getColormap();
   attrib.override_redirect = True;
   attrib.event_mask = SubstructureRedirectMask | ButtonPressMask |
-    EnterWindowMask | LeaveWindowMask;
+                      EnterWindowMask | LeaveWindowMask;
 
-  frame.area = Rect(0, 0, 1, 1);
+  frame.rect.setSize(1, 1);
 
   frame.window =
-    XCreateWindow(display, screen.getRootWindow(),
-                  frame.area.x(), frame.area.y(),
-                  frame.area.w(), frame.area.h(), screen.getBorderWidth(),
-                  screen.getDepth(), InputOutput, screen.getVisual(),
-                  create_mask, &attrib);
-  openbox.saveSlitSearch(frame.window, this);
+    XCreateWindow(display, screen->getRootWindow(),
+                  frame.rect.x(), frame.rect.y(),
+                  frame.rect.width(), frame.rect.height(),
+                  screen->getBorderWidth(), screen->getDepth(), InputOutput,
+                  screen->getVisual(), create_mask, &attrib);
+  blackbox->saveSlitSearch(frame.window, this);
+
+  screen->addStrut(&strut);
 
   reconfigure();
 }
 
 
-Slit::~Slit() {
-  openbox.grab();
-
-  if (timer->isTiming()) timer->stop();
+Slit::~Slit(void) {
   delete timer;
-
-  clientList.clear();
 
   delete slitmenu;
 
-  screen.getImageControl()->removeImage(frame.pixmap);
+  screen->getImageControl()->removeImage(frame.pixmap);
 
-  openbox.removeSlitSearch(frame.window);
+  blackbox->removeSlitSearch(frame.window);
 
   XDestroyWindow(display, frame.window);
-
-  openbox.ungrab();
 }
 
 
 void Slit::addClient(Window w) {
-  openbox.grab();
+  if (! blackbox->validateWindow(w))
+    return;
 
-  if (openbox.validateWindow(w)) {
-    SlitClient *client = new SlitClient;
-    client->client_window = w;
+  SlitClient *client = new SlitClient;
+  client->client_window = w;
 
-    XWMHints *wmhints = XGetWMHints(display, w);
+  XWMHints *wmhints = XGetWMHints(display, w);
 
-    if (wmhints) {
-      if ((wmhints->flags & IconWindowHint) &&
-          (wmhints->icon_window != None)) {
-        XMoveWindow(display, client->client_window, screen.size().w() + 10,
-                    screen.size().h() + 10);
-        XMapWindow(display, client->client_window);
+  if (wmhints) {
+    if ((wmhints->flags & IconWindowHint) &&
+        (wmhints->icon_window != None)) {
+      // some dock apps use separate windows, we need to hide these
+      XMoveWindow(display, client->client_window, screen->getWidth() + 10,
+                  screen->getHeight() + 10);
+      XMapWindow(display, client->client_window);
 
-        client->icon_window = wmhints->icon_window;
-        client->window = client->icon_window;
-      } else {
-        client->icon_window = None;
-        client->window = client->client_window;
-      }
-
-      XFree(wmhints);
+      client->icon_window = wmhints->icon_window;
+      client->window = client->icon_window;
     } else {
       client->icon_window = None;
       client->window = client->client_window;
     }
 
-    XWindowAttributes attrib;
-    if (XGetWindowAttributes(display, client->window, &attrib)) {
-      client->width = attrib.width;
-      client->height = attrib.height;
-    } else {
-      client->width = client->height = 64;
-    }
-
-    XSetWindowBorderWidth(display, client->window, 0);
-
-    XSelectInput(display, frame.window, NoEventMask);
-    XSelectInput(display, client->window, NoEventMask);
-
-    XReparentWindow(display, client->window, frame.window, 0, 0);
-    XMapRaised(display, client->window);
-    XChangeSaveSet(display, client->window, SetModeInsert);
-
-    XSelectInput(display, frame.window, SubstructureRedirectMask |
-                 ButtonPressMask | EnterWindowMask | LeaveWindowMask);
-    XSelectInput(display, client->window, StructureNotifyMask |
-                 SubstructureNotifyMask | EnterWindowMask);
-    XFlush(display);
-
-    clientList.push_back(client);
-
-    openbox.saveSlitSearch(client->client_window, this);
-    openbox.saveSlitSearch(client->icon_window, this);
-    reconfigure();
+    XFree(wmhints);
+  } else {
+    client->icon_window = None;
+    client->window = client->client_window;
   }
 
-  openbox.ungrab();
+  XWindowAttributes attrib;
+  if (XGetWindowAttributes(display, client->window, &attrib)) {
+    client->rect.setSize(attrib.width, attrib.height);
+  } else {
+    client->rect.setSize(64, 64);
+  }
+
+  XSetWindowBorderWidth(display, client->window, 0);
+
+  XGrabServer(display);
+  XSelectInput(display, frame.window, NoEventMask);
+  XSelectInput(display, client->window, NoEventMask);
+  XReparentWindow(display, client->window, frame.window, 0, 0);
+  XMapRaised(display, client->window);
+  XChangeSaveSet(display, client->window, SetModeInsert);
+  XSelectInput(display, frame.window, SubstructureRedirectMask |
+               ButtonPressMask | EnterWindowMask | LeaveWindowMask);
+  XSelectInput(display, client->window, StructureNotifyMask |
+               SubstructureNotifyMask | EnterWindowMask);
+
+  XUngrabServer(display);
+
+  clientList.push_back(client);
+
+  blackbox->saveSlitSearch(client->client_window, this);
+  blackbox->saveSlitSearch(client->icon_window, this);
+  reconfigure();
 }
 
 
-void Slit::removeClient(SlitClient *client, Bool remap) {
-  openbox.removeSlitSearch(client->client_window);
-  openbox.removeSlitSearch(client->icon_window);
-
+void Slit::removeClient(SlitClient *client, bool remap) {
+  blackbox->removeSlitSearch(client->client_window);
+  blackbox->removeSlitSearch(client->icon_window);
   clientList.remove(client);
 
-  screen.removeNetizen(client->window);
+  screen->removeNetizen(client->window);
 
-  if (remap && openbox.validateWindow(client->window)) {
+  if (remap && blackbox->validateWindow(client->window)) {
+    XGrabServer(display);
     XSelectInput(display, frame.window, NoEventMask);
     XSelectInput(display, client->window, NoEventMask);
-    XReparentWindow(display, client->window, screen.getRootWindow(),
-                    client->x, client->y);
+    XReparentWindow(display, client->window, screen->getRootWindow(),
+                    client->rect.x(), client->rect.y());
     XChangeSaveSet(display, client->window, SetModeDelete);
     XSelectInput(display, frame.window, SubstructureRedirectMask |
                  ButtonPressMask | EnterWindowMask | LeaveWindowMask);
-    XFlush(display);
+    XUngrabServer(display);
   }
 
   delete client;
@@ -191,287 +176,174 @@ void Slit::removeClient(SlitClient *client, Bool remap) {
 }
 
 
-void Slit::removeClient(Window w, Bool remap) {
-  openbox.grab();
-
-  Bool reconf = False;
-
-  slitClientList::iterator it;
-  for (it = clientList.begin(); it != clientList.end(); it++)
-    if ((*it)->window == w) {
-      removeClient(*it, remap);
-      reconf = True;
-      break;
-    }
-
-  if (reconf)
-    reconfigure();
-
-  openbox.ungrab();
-}
-
-void Slit::setOnTop(bool b) {
-  m_ontop = b;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.onTop" << ends;
-  config.setValue(s.str(), m_ontop ? "True" : "False");
-  s.rdbuf()->freeze(0);
-}
-
-void Slit::setAutoHide(bool b) {
-  m_autohide = b;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.autoHide" << ends;
-  config.setValue(s.str(), m_autohide ? "True" : "False");
-  s.rdbuf()->freeze(0);
-}
-
-void Slit::setPlacement(int p) {
-  m_placement = p;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.placement"
-    << ends;
-  const char *placement;
-  switch (m_placement) {
-  case TopLeft: placement = "TopLeft"; break;
-  case CenterLeft: placement = "CenterLeft"; break;
-  case BottomLeft: placement = "BottomLeft"; break;
-  case TopCenter: placement = "TopCenter"; break;
-  case BottomCenter: placement = "BottomCenter"; break;
-  case TopRight: placement = "TopRight"; break;
-  case BottomRight: placement = "BottomRight"; break;
-  case CenterRight: default: placement = "CenterRight"; break;
+struct SlitClientMatch {
+  Window window;
+  SlitClientMatch(Window w): window(w) {}
+  inline bool operator()(const Slit::SlitClient* client) const {
+    return (client->window == window);
   }
-  config.setValue(s.str(), placement);
-  s.rdbuf()->freeze(0);
+};
+
+
+void Slit::removeClient(Window w, bool remap) {
+  SlitClientList::iterator it = clientList.begin();
+  const SlitClientList::iterator end = clientList.end();
+
+  it = std::find_if(it, end, SlitClientMatch(w));
+  if (it != end) {
+    removeClient(*it, remap);
+    reconfigure();
+  }
 }
 
-void Slit::setDirection(int d) {
-  m_direction = d;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".slit.direction"
-    << ends;
-  config.setValue(s.str(),
-                  m_direction == Horizontal ? "Horizontal" : "Vertical");
-  s.rdbuf()->freeze(0);
-}
-
-void Slit::save() {
-  setOnTop(m_ontop);
-  setAutoHide(m_autohide);
-  setPlacement(m_placement);
-  setDirection(m_direction);
-}
-
-void Slit::load() {
-  std::ostrstream rscreen, rname, rclass;
-  std::string s;
-  bool b;
-  rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
-
-  rname << rscreen.str() << "slit.placement" << ends;
-  rclass << rscreen.str() << "Slit.Placement" << ends;
-  if (config.getValue(rname.str(), rclass.str(), s)) {
-    if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
-      m_placement = TopLeft;
-    else if (0 == strncasecmp(s.c_str(), "CenterLeft", s.length()))
-      m_placement = CenterLeft;
-    else if (0 == strncasecmp(s.c_str(), "BottomLeft", s.length()))
-      m_placement = BottomLeft;
-    else if (0 == strncasecmp(s.c_str(), "TopCenter", s.length()))
-      m_placement = TopCenter;
-    else if (0 == strncasecmp(s.c_str(), "BottomCenter", s.length()))
-      m_placement = BottomCenter;
-    else if (0 == strncasecmp(s.c_str(), "TopRight", s.length()))
-      m_placement = TopRight;
-    else if (0 == strncasecmp(s.c_str(), "BottomRight", s.length()))
-      m_placement = BottomRight;
-    else if (0 == strncasecmp(s.c_str(), "CenterRight", s.length()))
-      m_placement = CenterRight;
-  } else
-    m_placement = CenterRight;
-
-  rname.seekp(0); rclass.seekp(0);
-  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
-  rname << rscreen.str() << "slit.direction" << ends;
-  rclass << rscreen.str() << "Slit.Direction" << ends;
-  if (config.getValue(rname.str(), rclass.str(), s)) {
-    if (0 == strncasecmp(s.c_str(), "Horizontal", s.length()))
-      m_direction = Horizontal;
-    else if (0 == strncasecmp(s.c_str(), "Vertical", s.length()))
-      m_direction = Vertical;
-  } else
-    m_direction = Vertical;
-
-  rname.seekp(0); rclass.seekp(0);
-  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
-  rname << rscreen.str() << "slit.onTop" << ends;
-  rclass << rscreen.str() << "Slit.OnTop" << ends;
-  if (config.getValue(rname.str(), rclass.str(), b))
-    m_ontop = b;
-  else
-    m_ontop = false;
-
-  rname.seekp(0); rclass.seekp(0);
-  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
-  rname << rscreen.str() << "slit.autoHide" << ends;
-  rclass << rscreen.str() << "Slit.AutoHide" << ends;
-  if (config.getValue(rname.str(), rclass.str(), b))
-    m_hidden = m_autohide = b;
-  else
-    m_hidden = m_autohide = false;
-
-  rscreen.rdbuf()->freeze(0);
-  rname.rdbuf()->freeze(0); rclass.rdbuf()->freeze(0);
-}
 
 void Slit::reconfigure(void) {
-  timer->setTimeout(openbox.getAutoRaiseDelay());
+  SlitClientList::iterator it = clientList.begin();
+  const SlitClientList::iterator end = clientList.end();
+  SlitClient *client;
 
-  frame.area.setSize(0, 0);
-  slitClientList::const_iterator it;
+  unsigned int width = 0, height = 0;
 
-  switch (m_direction) {
+  switch (screen->getSlitDirection()) {
   case Vertical:
-    for (it = clientList.begin(); it != clientList.end(); it++) {
-      frame.area.setH(frame.area.h() + (*it)->height + screen.getBevelWidth());
+    for (; it != end; ++it) {
+      client = *it;
+      height += client->rect.height() + screen->getBevelWidth();
 
-      if (frame.area.w() < (*it)->width)
-        frame.area.setW((*it)->width);
+      if (width < client->rect.width())
+        width = client->rect.width();
     }
 
-    if (frame.area.w() < 1)
-      frame.area.setW(1);
+    if (width < 1)
+      width = 1;
     else
-      frame.area.setW(frame.area.w() + (screen.getBevelWidth() * 2));
+      width += (screen->getBevelWidth() * 2);
 
-    if (frame.area.h() < 1)
-      frame.area.setH(1);
+    if (height < 1)
+      height = 1;
     else
-      frame.area.setH(frame.area.h() + screen.getBevelWidth());
+      height += screen->getBevelWidth();
 
     break;
 
   case Horizontal:
-    for (it = clientList.begin(); it != clientList.end(); it++) {
-      frame.area.setW(frame.area.w() + (*it)->width + screen.getBevelWidth());
+    for (; it != end; ++it) {
+      client = *it;
+      width += client->rect.width() + screen->getBevelWidth();
 
-      if (frame.area.h() < (*it)->height)
-        frame.area.setH((*it)->height);
+      if (height < client->rect.height())
+        height = client->rect.height();
     }
 
-    if (frame.area.w() < 1)
-      frame.area.setW(1);
+    if (width < 1)
+      width = 1;
     else
-      frame.area.setW(frame.area.w() + screen.getBevelWidth());
+      width += screen->getBevelWidth();
 
-    if (frame.area.h() < 1)
-      frame.area.setH(1);
+    if (height < 1)
+      height = 1;
     else
-      frame.area.setH(frame.area.h() + (screen.getBevelWidth() * 2));
+      height += (screen->getBevelWidth() * 2);
 
     break;
   }
+  frame.rect.setSize(width, height);
 
   reposition();
 
-  XSetWindowBorderWidth(display ,frame.window, screen.getBorderWidth());
+  XSetWindowBorderWidth(display ,frame.window, screen->getBorderWidth());
   XSetWindowBorder(display, frame.window,
-                   screen.getBorderColor()->getPixel());
+                   screen->getBorderColor()->pixel());
 
-  if (! clientList.size())
+  if (clientList.empty())
     XUnmapWindow(display, frame.window);
   else
     XMapWindow(display, frame.window);
 
-  Pixmap tmp = frame.pixmap;
-  BImageControl *image_ctrl = screen.getImageControl();
-  BTexture *texture = &(screen.getToolbarStyle()->toolbar);
-  if (texture->getTexture() == (BImage_Flat | BImage_Solid)) {
-    frame.pixmap = None;
-    XSetWindowBackground(display, frame.window,
-                         texture->getColor()->getPixel());
-  } else {
-    frame.pixmap = image_ctrl->renderImage(frame.area.w(), frame.area.h(),
-                                           texture);
+  BTexture *texture = &(screen->getToolbarStyle()->toolbar);
+  frame.pixmap = texture->render(frame.rect.width(), frame.rect.height(),
+                                 frame.pixmap);
+  if (! frame.pixmap)
+    XSetWindowBackground(display, frame.window, texture->color().pixel());
+  else
     XSetWindowBackgroundPixmap(display, frame.window, frame.pixmap);
-  }
-  if (tmp) image_ctrl->removeImage(tmp);
+
   XClearWindow(display, frame.window);
+
+  it = clientList.begin();
 
   int x, y;
 
-  switch (m_direction) {
+  switch (screen->getSlitDirection()) {
   case Vertical:
     x = 0;
-    y = screen.getBevelWidth();
+    y = screen->getBevelWidth();
 
-    for (it = clientList.begin(); it != clientList.end(); it++) {
-      x = (frame.area.w() - (*it)->width) / 2;
+    for (; it != end; ++it) {
+      client = *it;
+      x = (frame.rect.width() - client->rect.width()) / 2;
 
-      XMoveResizeWindow(display, (*it)->window, x, y,
-                        (*it)->width, (*it)->height);
-      XMapWindow(display, (*it)->window);
+      XMoveResizeWindow(display, client->window, x, y,
+                        client->rect.width(), client->rect.height());
+      XMapWindow(display, client->window);
 
       // for ICCCM compliance
-      (*it)->x = x;
-      (*it)->y = y;
+      client->rect.setPos(x, y);
 
       XEvent event;
       event.type = ConfigureNotify;
 
       event.xconfigure.display = display;
-      event.xconfigure.event = (*it)->window;
-      event.xconfigure.window = (*it)->window;
+      event.xconfigure.event = client->window;
+      event.xconfigure.window = client->window;
       event.xconfigure.x = x;
       event.xconfigure.y = y;
-      event.xconfigure.width = (*it)->width;
-      event.xconfigure.height = (*it)->height;
+      event.xconfigure.width = client->rect.width();
+      event.xconfigure.height = client->rect.height();
       event.xconfigure.border_width = 0;
       event.xconfigure.above = frame.window;
       event.xconfigure.override_redirect = False;
 
-      XSendEvent(display, (*it)->window, False, StructureNotifyMask, &event);
+      XSendEvent(display, client->window, False, StructureNotifyMask, &event);
 
-      y += (*it)->height + screen.getBevelWidth();
+      y += client->rect.height() + screen->getBevelWidth();
     }
 
     break;
 
   case Horizontal:
-    x = screen.getBevelWidth();
+    x = screen->getBevelWidth();
     y = 0;
 
-    for (it = clientList.begin(); it != clientList.end(); it++) {
-      y = (frame.area.h() - (*it)->height) / 2;
+    for (; it != end; ++it) {
+      client = *it;
+      y = (frame.rect.height() - client->rect.height()) / 2;
 
-      XMoveResizeWindow(display, (*it)->window, x, y,
-                        (*it)->width, (*it)->height);
-      XMapWindow(display, (*it)->window);
+      XMoveResizeWindow(display, client->window, x, y,
+                        client->rect.width(), client->rect.height());
+      XMapWindow(display, client->window);
 
       // for ICCCM compliance
-      (*it)->x = x;
-      (*it)->y = y;
+      client->rect.setPos(x, y);
 
       XEvent event;
       event.type = ConfigureNotify;
 
       event.xconfigure.display = display;
-      event.xconfigure.event = (*it)->window;
-      event.xconfigure.window = (*it)->window;
+      event.xconfigure.event = client->window;
+      event.xconfigure.window = client->window;
       event.xconfigure.x = x;
       event.xconfigure.y = y;
-      event.xconfigure.width = (*it)->width;
-      event.xconfigure.height = (*it)->height;
+      event.xconfigure.width = client->rect.width();
+      event.xconfigure.height = client->rect.height();
       event.xconfigure.border_width = 0;
       event.xconfigure.above = frame.window;
       event.xconfigure.override_redirect = False;
 
-      XSendEvent(display, (*it)->window, False, StructureNotifyMask, &event);
+      XSendEvent(display, client->window, False, StructureNotifyMask, &event);
 
-      x += (*it)->width + screen.getBevelWidth();
+      x += client->rect.width() + screen->getBevelWidth();
     }
-
     break;
   }
 
@@ -479,121 +351,195 @@ void Slit::reconfigure(void) {
 }
 
 
+void Slit::updateStrut(void) {
+  strut.top = strut.bottom = strut.left = strut.right = 0;
+
+  if (! clientList.empty()) {
+    switch (screen->getSlitDirection()) {
+    case Vertical:
+      switch (screen->getSlitPlacement()) {
+      case TopCenter:
+        strut.top = getY() + getExposedHeight() +
+                    (screen->getBorderWidth() * 2);
+        break;
+      case BottomCenter:
+        strut.bottom = screen->getHeight() - getY();
+        break;
+      case TopLeft:
+      case CenterLeft:
+      case BottomLeft:
+        strut.left = getExposedWidth() + (screen->getBorderWidth() * 2);
+        break;
+      case TopRight:
+      case CenterRight:
+      case BottomRight:
+        strut.right = getExposedWidth() + (screen->getBorderWidth() * 2);
+        break;
+      }
+      break;
+    case Horizontal:
+      switch (screen->getSlitPlacement()) {
+      case TopCenter:
+      case TopLeft:
+      case TopRight:
+        strut.top = getY() + getExposedHeight() +
+                    (screen->getBorderWidth() * 2);
+        break;
+      case BottomCenter:
+      case BottomLeft:
+      case BottomRight:
+        strut.bottom = screen->getHeight() - getY();
+        break;
+      case CenterLeft:
+        strut.left = getExposedWidth() + (screen->getBorderWidth() * 2);
+        break;
+      case CenterRight:
+        strut.right = getExposedWidth() + (screen->getBorderWidth() * 2);
+        break;
+      }
+      break;
+    }
+  }
+
+  // update area with new Strut info
+  screen->updateAvailableArea();
+}
+
+
 void Slit::reposition(void) {
   // place the slit in the appropriate place
-  switch (m_placement) {
+  switch (screen->getSlitPlacement()) {
   case TopLeft:
-    frame.area.setOrigin(0, 0);
-    if (m_direction == Vertical) {
-      frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
-                           - frame.area.w(), 0);
+    frame.rect.setPos(0, 0);
+
+    if (screen->getSlitDirection() == Vertical) {
+      frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                       - frame.rect.width();
+      frame.y_hidden = 0;
     } else {
-      frame.hidden = Point(0, screen.getBevelWidth() - screen.getBorderWidth()
-                           - frame.area.h());
+      frame.x_hidden = 0;
+      frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                       - frame.rect.height();
     }
     break;
 
   case CenterLeft:
-    frame.area.setOrigin(0, (screen.size().h() - frame.area.h()) / 2);
-    frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
-                         - frame.area.w(), frame.area.y());
+    frame.rect.setPos(0, (screen->getHeight() - frame.rect.height()) / 2);
+
+    frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                     - frame.rect.width();
+    frame.y_hidden = frame.rect.y();
     break;
 
   case BottomLeft:
-    frame.area.setOrigin(0, screen.size().h() - frame.area.h()
-                         - (screen.getBorderWidth() * 2));
-    if (m_direction == Vertical)
-      frame.hidden = Point(screen.getBevelWidth() - screen.getBorderWidth()
-                           - frame.area.w(), frame.area.y());
-    else
-      frame.hidden = Point(0, screen.size().h() - screen.getBevelWidth()
-                           - screen.getBorderWidth());
+    frame.rect.setPos(0, (screen->getHeight() - frame.rect.height()
+                          - (screen->getBorderWidth() * 2)));
+
+    if (screen->getSlitDirection() == Vertical) {
+      frame.x_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                       - frame.rect.width();
+      frame.y_hidden = frame.rect.y();
+    } else {
+      frame.x_hidden = 0;
+      frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
+                       - screen->getBorderWidth();
+    }
     break;
 
   case TopCenter:
-    frame.area.setOrigin((screen.size().w() - frame.area.w()) / 2, 0);
-    frame.hidden = Point(frame.area.x(), screen.getBevelWidth()
-                         - screen.getBorderWidth() - frame.area.h());
+    frame.rect.setPos((screen->getWidth() - frame.rect.width()) / 2, 0);
+
+    frame.x_hidden = frame.rect.x();
+    frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                     - frame.rect.height();
     break;
 
   case BottomCenter:
-    frame.area.setOrigin((screen.size().w() - frame.area.w()) / 2,
-                         screen.size().h() - frame.area.h()
-                         - (screen.getBorderWidth() * 2));
-    frame.hidden = Point(frame.area.x(), screen.size().h()
-                         - screen.getBevelWidth() - screen.getBorderWidth());
+    frame.rect.setPos((screen->getWidth() - frame.rect.width()) / 2,
+                      (screen->getHeight() - frame.rect.height()
+                       - (screen->getBorderWidth() * 2)));
+    frame.x_hidden = frame.rect.x();
+    frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
+                     - screen->getBorderWidth();
     break;
 
   case TopRight:
-    frame.area.setOrigin(screen.size().w() - frame.area.w()
-                         - (screen.getBorderWidth() * 2), 0);
-    if (m_direction == Vertical)
-      frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
-                           - screen.getBorderWidth(), 0);
-    else
-      frame.hidden = Point(frame.area.x(), screen.getBevelWidth()
-                           - screen.getBorderWidth() - frame.area.h());
+    frame.rect.setPos((screen->getWidth() - frame.rect.width()
+                       - (screen->getBorderWidth() * 2)), 0);
+
+    if (screen->getSlitDirection() == Vertical) {
+      frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
+                       - screen->getBorderWidth();
+      frame.y_hidden = 0;
+    } else {
+      frame.x_hidden = frame.rect.x();
+      frame.y_hidden = screen->getBevelWidth() - screen->getBorderWidth()
+                       - frame.rect.height();
+    }
     break;
 
   case CenterRight:
   default:
-    frame.area.setOrigin(screen.size().w() - frame.area.w()
-                         - (screen.getBorderWidth() * 2),
-                         (screen.size().h() - frame.area.h()) / 2);
-    frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
-                         - screen.getBorderWidth(), frame.area.y());
+    frame.rect.setPos((screen->getWidth() - frame.rect.width()
+                       - (screen->getBorderWidth() * 2)),
+                      (screen->getHeight() - frame.rect.height()) / 2);
+
+    frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
+                     - screen->getBorderWidth();
+    frame.y_hidden = frame.rect.y();
     break;
 
   case BottomRight:
-    frame.area.setOrigin(screen.size().w() - frame.area.w()
-                         - (screen.getBorderWidth() * 2),
-                         screen.size().h() - frame.area.h()
-                         - (screen.getBorderWidth() * 2));
-    if (m_direction == Vertical)
-      frame.hidden = Point(screen.size().w() - screen.getBevelWidth()
-                           - screen.getBorderWidth(), frame.area.y());
-    else
-      frame.hidden = Point(frame.area.x(), screen.size().h() -
-                           screen.getBevelWidth() - screen.getBorderWidth());
+    frame.rect.setPos((screen->getWidth() - frame.rect.width()
+                       - (screen->getBorderWidth() * 2)),
+                      (screen->getHeight() - frame.rect.height()
+                       - (screen->getBorderWidth() * 2)));
+
+    if (screen->getSlitDirection() == Vertical) {
+      frame.x_hidden = screen->getWidth() - screen->getBevelWidth()
+                       - screen->getBorderWidth();
+      frame.y_hidden = frame.rect.y();
+    } else {
+      frame.x_hidden = frame.rect.x();
+      frame.y_hidden = screen->getHeight() - screen->getBevelWidth()
+                       - screen->getBorderWidth();
+    }
     break;
   }
 
-  Toolbar *tbar = screen.getToolbar();
-  int sw = frame.area.w() + (screen.getBorderWidth() * 2),
-  sh = frame.area.h() + (screen.getBorderWidth() * 2),
-  tw = tbar->area().w() + screen.getBorderWidth(),
-  th = tbar->area().h() + screen.getBorderWidth();
+  Rect tbar_rect = screen->getToolbar()->getRect();
+  tbar_rect.setSize(tbar_rect.width() + (screen->getBorderWidth() * 2),
+                    tbar_rect.height() + (screen->getBorderWidth() * 2));
+  Rect slit_rect = frame.rect;
+  slit_rect.setSize(slit_rect.width() + (screen->getBorderWidth() * 2),
+                    slit_rect.height() + (screen->getBorderWidth() * 2));
 
-  if (tbar->area().x() < frame.area.x() + sw &&
-      tbar->area().x() + tw > frame.area.x() &&
-      tbar->area().y() < frame.area.y() + sh &&
-      tbar->area().y() + th > frame.area.y()) {
-    if (frame.area.y() < th) {
-      frame.area.setY(frame.area.y() + tbar->getExposedHeight());
-      if (m_direction == Vertical)
-        frame.hidden.setY(frame.hidden.y() + tbar->getExposedHeight());
-      else
-        frame.hidden.setY(frame.area.y());
-    } else {
-      frame.area.setY(frame.area.y() - tbar->getExposedHeight());
-      if (m_direction == Vertical)
-        frame.hidden.setY(frame.area.y() - tbar->getExposedHeight());
-      else
-        frame.hidden.setY(frame.area.y());
+  if (slit_rect.intersects(tbar_rect)) {
+    Toolbar *tbar = screen->getToolbar();
+    frame.y_hidden = frame.rect.y();
+
+    int delta = tbar->getExposedHeight() + (screen->getBorderWidth() * 2);
+    if (frame.rect.bottom() <= tbar_rect.bottom()) {
+      delta = -delta;
     }
+    frame.rect.setY(frame.rect.y() + delta);
+    if (screen->getSlitDirection() == Vertical)
+      frame.y_hidden += delta;
   }
 
-  if (m_hidden)
-    XMoveResizeWindow(display, frame.window, frame.hidden.x(),
-                      frame.hidden.y(), frame.area.w(), frame.area.h());
+  updateStrut();
+
+  if (hidden)
+    XMoveResizeWindow(display, frame.window, frame.x_hidden,
+                      frame.y_hidden, frame.rect.width(), frame.rect.height());
   else
-    XMoveResizeWindow(display, frame.window, frame.area.x(),
-                      frame.area.y(), frame.area.w(), frame.area.h());
+    XMoveResizeWindow(display, frame.window, frame.rect.x(), frame.rect.y(),
+                      frame.rect.width(), frame.rect.height());
 }
 
 
 void Slit::shutdown(void) {
-  while (clientList.size())
+  while (! clientList.empty())
     removeClient(clientList.front());
 }
 
@@ -601,10 +547,10 @@ void Slit::shutdown(void) {
 void Slit::buttonPressEvent(XButtonEvent *e) {
   if (e->window != frame.window) return;
 
-  if (e->button == Button1 && !m_ontop) {
+  if (e->button == Button1 && (! on_top)) {
     Window w[1] = { frame.window };
-    screen.raiseWindows(w, 1);
-  } else if (e->button == Button2 && !m_ontop) {
+    screen->raiseWindows(w, 1);
+  } else if (e->button == Button2 && (! on_top)) {
     XLowerWindow(display, frame.window);
   } else if (e->button == Button3) {
     if (! slitmenu->isVisible()) {
@@ -615,13 +561,13 @@ void Slit::buttonPressEvent(XButtonEvent *e) {
 
       if (x < 0)
         x = 0;
-      else if (x + slitmenu->getWidth() > screen.size().w())
-        x = screen.size().w() - slitmenu->getWidth();
+      else if (x + slitmenu->getWidth() > screen->getWidth())
+        x = screen->getWidth() - slitmenu->getWidth();
 
       if (y < 0)
         y = 0;
-      else if (y + slitmenu->getHeight() > screen.size().h())
-        y = screen.size().h() - slitmenu->getHeight();
+      else if (y + slitmenu->getHeight() > screen->getHeight())
+        y = screen->getHeight() - slitmenu->getHeight();
 
       slitmenu->move(x, y);
       slitmenu->show();
@@ -633,10 +579,10 @@ void Slit::buttonPressEvent(XButtonEvent *e) {
 
 
 void Slit::enterNotifyEvent(XCrossingEvent *) {
-  if (!m_autohide)
+  if (! do_auto_hide)
     return;
 
-  if (m_hidden) {
+  if (hidden) {
     if (! timer->isTiming()) timer->start();
   } else {
     if (timer->isTiming()) timer->stop();
@@ -645,69 +591,84 @@ void Slit::enterNotifyEvent(XCrossingEvent *) {
 
 
 void Slit::leaveNotifyEvent(XCrossingEvent *) {
-  if (!m_autohide)
+  if (! do_auto_hide)
     return;
 
-  if (m_hidden) {
+  if (hidden) {
     if (timer->isTiming()) timer->stop();
   } else if (! slitmenu->isVisible()) {
-    if (!timer->isTiming()) timer->start();
+    if (! timer->isTiming()) timer->start();
   }
 }
 
 
 void Slit::configureRequestEvent(XConfigureRequestEvent *e) {
-  openbox.grab();
+  if (! blackbox->validateWindow(e->window))
+    return;
 
-  if (openbox.validateWindow(e->window)) {
-    Bool reconf = False;
-    XWindowChanges xwc;
+  XWindowChanges xwc;
 
-    xwc.x = e->x;
-    xwc.y = e->y;
-    xwc.width = e->width;
-    xwc.height = e->height;
-    xwc.border_width = 0;
-    xwc.sibling = e->above;
-    xwc.stack_mode = e->detail;
+  xwc.x = e->x;
+  xwc.y = e->y;
+  xwc.width = e->width;
+  xwc.height = e->height;
+  xwc.border_width = 0;
+  xwc.sibling = e->above;
+  xwc.stack_mode = e->detail;
 
-    XConfigureWindow(display, e->window, e->value_mask, &xwc);
+  XConfigureWindow(display, e->window, e->value_mask, &xwc);
 
-    slitClientList::iterator it = clientList.begin();
-    for (; it != clientList.end(); it++) {
-      SlitClient *client = *it;
-      if (client->window == e->window)
-        if (client->width != ((unsigned) e->width) ||
-            client->height != ((unsigned) e->height)) {
-          client->width = (unsigned) e->width;
-          client->height = (unsigned) e->height;
-          reconf = True;
-          break;
-        }
-    }
+  SlitClientList::iterator it = clientList.begin();
+  const SlitClientList::iterator end = clientList.end();
+  for (; it != end; ++it) {
+    SlitClient *client = *it;
+    if (client->window == e->window &&
+        (static_cast<signed>(client->rect.width()) != e->width ||
+         static_cast<signed>(client->rect.height()) != e->height)) {
+      client->rect.setSize(e->width, e->height);
 
-    if (reconf)
       reconfigure();
+      return;
+    }
   }
-  openbox.ungrab();
 }
 
 
 void Slit::timeout(void) {
-  m_hidden = !m_hidden;
-  if (m_hidden)
-    XMoveWindow(display, frame.window, frame.hidden.x(), frame.hidden.y());
+  hidden = ! hidden;
+  if (hidden)
+    XMoveWindow(display, frame.window, frame.x_hidden, frame.y_hidden);
   else
-    XMoveWindow(display, frame.window, frame.area.x(), frame.area.y());
+    XMoveWindow(display, frame.window, frame.rect.x(), frame.rect.y());
 }
 
 
-Slitmenu::Slitmenu(Slit &sl) : Basemenu(sl.screen), slit(sl) {
+void Slit::toggleAutoHide(void) {
+  do_auto_hide = (do_auto_hide) ?  False : True;
+
+  updateStrut();
+
+  if (do_auto_hide == False && hidden) {
+    // force the slit to be visible
+    if (timer->isTiming()) timer->stop();
+    timeout();
+  }
+}
+
+
+void Slit::unmapNotifyEvent(XUnmapEvent *e) {
+  removeClient(e->window);
+}
+
+
+Slitmenu::Slitmenu(Slit *sl) : Basemenu(sl->screen) {
+  slit = sl;
+
   setLabel(i18n(SlitSet, SlitSlitTitle, "Slit"));
   setInternalMenu();
 
-  directionmenu = new Directionmenu(*this);
-  placementmenu = new Placementmenu(*this);
+  directionmenu = new Directionmenu(this);
+  placementmenu = new Placementmenu(this);
 
   insert(i18n(CommonSet, CommonDirectionTitle, "Direction"),
          directionmenu);
@@ -718,12 +679,8 @@ Slitmenu::Slitmenu(Slit &sl) : Basemenu(sl.screen), slit(sl) {
 
   update();
 
-  setValues();
-}
-
-void Slitmenu::setValues() {
-  setItemSelected(2, slit.onTop());
-  setItemSelected(3, slit.autoHide());
+  if (slit->isOnTop()) setItemSelected(2, True);
+  if (slit->doAutoHide()) setItemSelected(3, True);
 }
 
 
@@ -733,7 +690,7 @@ Slitmenu::~Slitmenu(void) {
 }
 
 
-void Slitmenu::itemSelected(int button, int index) {
+void Slitmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
     return;
 
@@ -742,18 +699,16 @@ void Slitmenu::itemSelected(int button, int index) {
 
   switch (item->function()) {
   case 1: { // always on top
-    bool change = ((slit.onTop()) ?  false : true);
-    slit.setOnTop(change);
-    setItemSelected(2, change);
+    slit->on_top = ((slit->isOnTop()) ?  False : True);
+    setItemSelected(2, slit->on_top);
 
-    if (slit.onTop()) slit.screen.raiseWindows((Window *) 0, 0);
+    if (slit->isOnTop()) slit->screen->raiseWindows((Window *) 0, 0);
     break;
   }
 
   case 2: { // auto hide
-    Bool change = ((slit.autoHide()) ?  false : true);
-    slit.setAutoHide(change);
-    setItemSelected(3, change);
+    slit->toggleAutoHide();
+    setItemSelected(3, slit->do_auto_hide);
 
     break;
   }
@@ -763,13 +718,12 @@ void Slitmenu::itemSelected(int button, int index) {
 
 void Slitmenu::internal_hide(void) {
   Basemenu::internal_hide();
-  if (slit.autoHide())
-    slit.timeout();
+  if (slit->doAutoHide())
+    slit->timeout();
 }
 
 
 void Slitmenu::reconfigure(void) {
-  setValues();
   directionmenu->reconfigure();
   placementmenu->reconfigure();
 
@@ -777,43 +731,34 @@ void Slitmenu::reconfigure(void) {
 }
 
 
-Slitmenu::Directionmenu::Directionmenu(Slitmenu &sm)
-  : Basemenu(sm.slit.screen), slitmenu(sm) {
-    setLabel(i18n(SlitSet, SlitSlitDirection, "Slit Direction"));
-    setInternalMenu();
+Slitmenu::Directionmenu::Directionmenu(Slitmenu *sm)
+  : Basemenu(sm->slit->screen) {
 
-    insert(i18n(CommonSet, CommonDirectionHoriz, "Horizontal"),
-           Slit::Horizontal);
-    insert(i18n(CommonSet, CommonDirectionVert, "Vertical"),
-           Slit::Vertical);
+  setLabel(i18n(SlitSet, SlitSlitDirection, "Slit Direction"));
+  setInternalMenu();
 
-    update();
+  insert(i18n(CommonSet, CommonDirectionHoriz, "Horizontal"),
+         Slit::Horizontal);
+  insert(i18n(CommonSet, CommonDirectionVert, "Vertical"),
+         Slit::Vertical);
 
-    setValues();
-  }
+  update();
 
-
-void Slitmenu::Directionmenu::setValues() {
-  if (slitmenu.slit.direction() == Slit::Horizontal)
+  if (getScreen()->getSlitDirection() == Slit::Horizontal)
     setItemSelected(0, True);
   else
     setItemSelected(1, True);
 }
 
-void Slitmenu::Directionmenu::reconfigure() {
-  setValues();
-  Basemenu::reconfigure();
-}
 
-
-void Slitmenu::Directionmenu::itemSelected(int button, int index) {
+void Slitmenu::Directionmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
     return;
 
   BasemenuItem *item = find(index);
   if (! item) return;
 
-  slitmenu.slit.setDirection(item->function());
+  getScreen()->saveSlitDirection(item->function());
 
   if (item->function() == Slit::Horizontal) {
     setItemSelected(0, True);
@@ -824,52 +769,48 @@ void Slitmenu::Directionmenu::itemSelected(int button, int index) {
   }
 
   hide();
-  slitmenu.slit.reconfigure();
+  getScreen()->getSlit()->reconfigure();
 }
 
 
-Slitmenu::Placementmenu::Placementmenu(Slitmenu &sm)
-  : Basemenu(sm.slit.screen), slitmenu(sm) {
+Slitmenu::Placementmenu::Placementmenu(Slitmenu *sm)
+  : Basemenu(sm->slit->screen) {
 
-    setLabel(i18n(SlitSet, SlitSlitPlacement, "Slit Placement"));
-    setMinimumSublevels(3);
-    setInternalMenu();
+  setLabel(i18n(SlitSet, SlitSlitPlacement, "Slit Placement"));
+  setMinimumSublevels(3);
+  setInternalMenu();
 
-    insert(i18n(CommonSet, CommonPlacementTopLeft, "Top Left"),
-           Slit::TopLeft);
-    insert(i18n(CommonSet, CommonPlacementCenterLeft, "Center Left"),
-           Slit::CenterLeft);
-    insert(i18n(CommonSet, CommonPlacementBottomLeft, "Bottom Left"),
-           Slit::BottomLeft);
-    insert(i18n(CommonSet, CommonPlacementTopCenter, "Top Center"),
-           Slit::TopCenter);
-    insert("");
-    insert(i18n(CommonSet, CommonPlacementBottomCenter, 
-                "Bottom Center"),
-           Slit::BottomCenter);
-    insert(i18n(CommonSet, CommonPlacementTopRight, "Top Right"),
-           Slit::TopRight);
-    insert(i18n(CommonSet, CommonPlacementCenterRight,
-                "Center Right"),
-           Slit::CenterRight);
-    insert(i18n(CommonSet, CommonPlacementBottomRight,
-                "Bottom Right"),
-           Slit::BottomRight);
+  insert(i18n(CommonSet, CommonPlacementTopLeft, "Top Left"),
+         Slit::TopLeft);
+  insert(i18n(CommonSet, CommonPlacementCenterLeft, "Center Left"),
+         Slit::CenterLeft);
+  insert(i18n(CommonSet, CommonPlacementBottomLeft, "Bottom Left"),
+         Slit::BottomLeft);
+  insert(i18n(CommonSet, CommonPlacementTopCenter, "Top Center"),
+         Slit::TopCenter);
+  insert("");
+  insert(i18n(CommonSet, CommonPlacementBottomCenter, "Bottom Center"),
+         Slit::BottomCenter);
+  insert(i18n(CommonSet, CommonPlacementTopRight, "Top Right"),
+         Slit::TopRight);
+  insert(i18n(CommonSet, CommonPlacementCenterRight, "Center Right"),
+         Slit::CenterRight);
+  insert(i18n(CommonSet, CommonPlacementBottomRight, "Bottom Right"),
+         Slit::BottomRight);
 
-    update();
-  }
+  update();
+}
 
 
-void Slitmenu::Placementmenu::itemSelected(int button, int index) {
+void Slitmenu::Placementmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
     return;
 
   BasemenuItem *item = find(index);
   if (! (item && item->function())) return;
 
-  slitmenu.slit.setPlacement(item->function());
+  getScreen()->saveSlitPlacement(item->function());
   hide();
-  slitmenu.slit.reconfigure();
+  getScreen()->getSlit()->reconfigure();
 }
 
-#endif // SLIT

@@ -1,5 +1,6 @@
-// Iconmenu.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// Icon.cc for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,23 +21,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
-
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "i18n.h"
-#include "Iconmenu.h"
-#include "Screen.h"
-#include "Window.h"
+#include "i18n.hh"
+#include "Iconmenu.hh"
+#include "Screen.hh"
+#include "Window.hh"
 
 
-Iconmenu::Iconmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
+Iconmenu::Iconmenu(BScreen *scrn) : Basemenu(scrn) {
   setInternalMenu();
 
   setLabel(i18n(IconSet, IconIcons, "Icons"));
@@ -44,12 +39,12 @@ Iconmenu::Iconmenu(BScreen &scrn) : Basemenu(scrn), screen(scrn) {
 }
 
 
-void Iconmenu::itemSelected(int button, int index) {
+void Iconmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
     return;
 
-  if (index >= 0 && index < screen.getIconCount()) {
-    OpenboxWindow *win = screen.getIcon(index);
+  if (index < getScreen()->getIconCount()) {
+    BlackboxWindow *win = getScreen()->getIcon(index);
 
     if (win) {
       win->deiconify();
@@ -57,6 +52,6 @@ void Iconmenu::itemSelected(int button, int index) {
     }
   }
 
-  if (! (screen.getWorkspacemenu()->isTorn() || isTorn()))
+  if (! (getScreen()->getWorkspacemenu()->isTorn() || isTorn()))
     hide();
 }

@@ -1,5 +1,6 @@
-// BaseDisplay.cc for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// BaseDisplay.cc for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,20 +21,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// stupid macros needed to access some functions in version 2 of the GNU C
-// library
-#ifndef   _GNU_SOURCE
-#define   _GNU_SOURCE
-#endif // _GNU_SOURCE
-
 #ifdef    HAVE_CONFIG_H
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
+extern "C" {
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 
 #ifdef    SHAPE
@@ -48,11 +43,11 @@
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
 
-#ifdef    HAVE_STDLIB_H
+#ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
 
-#ifdef    HAVE_STRING_H
+#ifdef HAVE_STRING_H
 #  include <string.h>
 #endif // HAVE_STRING_H
 
@@ -81,34 +76,37 @@
 #  include <sys/types.h>
 #  include <sys/wait.h>
 #endif // HAVE_SYS_WAIT_H
+}
 
-#if defined(HAVE_PROCESS_H) && defined(__EMX__)
-#  include <process.h>
-#endif //   HAVE_PROCESS_H             __EMX__
+#include <sstream>
+using std::string;
 
-#include "i18n.h"
-#include "BaseDisplay.h"
-#include "Timer.h"
+#include "i18n.hh"
+#include "BaseDisplay.hh"
+#include "GCCache.hh"
+#include "Timer.hh"
+#include "Util.hh"
 
-#include <algorithm>
 
 // X error handler to handle any and all X errors while the application is
 // running
-static Bool internal_error = False;
+static bool internal_error = False;
 static Window last_bad_window = None;
 
 BaseDisplay *base_display;
 
-static int handleXErrors(Display *d, XErrorEvent *e) {
 #ifdef    DEBUG
+static int handleXErrors(Display *d, XErrorEvent *e) {
   char errtxt[128];
 
   XGetErrorText(d, e->error_code, errtxt, 128);
-  fprintf(stderr, i18n(BaseDisplaySet, BaseDisplayXError,
-                       "%s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n"
-                       ),
+  fprintf(stderr,
+          i18n(BaseDisplaySet, BaseDisplayXError,
+               "%s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n"),
           base_display->getApplicationName(), errtxt, e->error_code,
           e->request_code, e->minor_code, e->resourceid);
+#else
+static int handleXErrors(Display *, XErrorEvent *e) {
 #endif // DEBUG
 
   if (e->error_code == BadWindow) last_bad_window = e->resourceid;
@@ -121,11 +119,11 @@ static int handleXErrors(Display *d, XErrorEvent *e) {
 // signal handler to allow for proper and gentle shutdown
 
 #ifndef   HAVE_SIGACTION
-static RETSIGTYPE signalhandler(int sig)
+static RETSIGTYPE signalhandler(int sig) {
 #else //  HAVE_SIGACTION
-static void signalhandler(int sig)
+static void signalhandler(int sig) {
 #endif // HAVE_SIGACTION
-{
+
   static int re_enter = 0;
 
   switch (sig) {
@@ -177,31 +175,10 @@ static void signalhandler(int sig)
 }
 
 
-// convenience functions
-#ifndef    __EMX__
-void bexec(const char *command, char* displaystring) {
-  if (! fork()) {
-    setsid();
-    putenv(displaystring);
-    execl("/bin/sh", "/bin/sh", "-c", command, NULL);
-    exit(0);
-  }
-}
-#endif // !__EMX__
+BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
+  application_name = app_name;
 
-char *bstrdup(const char *s) {
-  const int l = strlen(s) + 1;
-  char *n = new char[l];
-  strncpy(n, s, l);
-  return n;
-}
-
-BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
-  application_name = bstrdup(app_name);
-
-  _startup = True;
-  _shutdown = False;
-  server_grabs = 0;
+  run_state = STARTUP;
   last_bad_window = None;
 
   ::base_display = this;
@@ -235,8 +212,9 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
 #endif // HAVE_SIGACTION
 
   if (! (display = XOpenDisplay(dpy_name))) {
-    fprintf(stderr, i18n(BaseDisplaySet, BaseDisplayXConnectFail,
-                         "BaseDisplay::BaseDisplay: connection to X server failed.\n"));
+    fprintf(stderr,
+            i18n(BaseDisplaySet, BaseDisplayXConnectFail,
+               "BaseDisplay::BaseDisplay: connection to X server failed.\n"));
     ::exit(2);
   } else if (fcntl(ConnectionNumber(display), F_SETFD, 1) == -1) {
     fprintf(stderr,
@@ -255,93 +233,12 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
   shape.extensions = False;
 #endif // SHAPE
 
-  xa_wm_colormap_windows =
-    XInternAtom(display, "WM_COLORMAP_WINDOWS", False);
-  xa_wm_protocols = XInternAtom(display, "WM_PROTOCOLS", False);
-  xa_wm_state = XInternAtom(display, "WM_STATE", False);
-  xa_wm_change_state = XInternAtom(display, "WM_CHANGE_STATE", False);
-  xa_wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
-  xa_wm_take_focus = XInternAtom(display, "WM_TAKE_FOCUS", False);
-  motif_wm_hints = XInternAtom(display, "_MOTIF_WM_HINTS", False);
-
-  openbox_hints = XInternAtom(display, "_BLACKBOX_HINTS", False);
-  openbox_attributes = XInternAtom(display, "_BLACKBOX_ATTRIBUTES", False);
-  openbox_change_attributes =
-    XInternAtom(display, "_BLACKBOX_CHANGE_ATTRIBUTES", False);
-
-  openbox_structure_messages =
-    XInternAtom(display, "_BLACKBOX_STRUCTURE_MESSAGES", False);
-  openbox_notify_startup =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_STARTUP", False);
-  openbox_notify_window_add =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WINDOW_ADD", False);
-  openbox_notify_window_del =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WINDOW_DEL", False);
-  openbox_notify_current_workspace =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_CURRENT_WORKSPACE", False);
-  openbox_notify_workspace_count =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WORKSPACE_COUNT", False);
-  openbox_notify_window_focus =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WINDOW_FOCUS", False);
-  openbox_notify_window_raise =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WINDOW_RAISE", False);
-  openbox_notify_window_lower =
-    XInternAtom(display, "_BLACKBOX_NOTIFY_WINDOW_LOWER", False);
-
-  openbox_change_workspace =
-    XInternAtom(display, "_BLACKBOX_CHANGE_WORKSPACE", False);
-  openbox_change_window_focus =
-    XInternAtom(display, "_BLACKBOX_CHANGE_WINDOW_FOCUS", False);
-  openbox_cycle_window_focus =
-    XInternAtom(display, "_BLACKBOX_CYCLE_WINDOW_FOCUS", False);
-
-#ifdef    NEWWMSPEC
-
-  net_supported = XInternAtom(display, "_NET_SUPPORTED", False);
-  net_client_list = XInternAtom(display, "_NET_CLIENT_LIST", False);
-  net_client_list_stacking = XInternAtom(display, "_NET_CLIENT_LIST_STACKING", False);
-  net_number_of_desktops = XInternAtom(display, "_NET_NUMBER_OF_DESKTOPS", False);
-  net_desktop_geometry = XInternAtom(display, "_NET_DESKTOP_GEOMETRY", False);
-  net_desktop_viewport = XInternAtom(display, "_NET_DESKTOP_VIEWPORT", False);
-  net_current_desktop = XInternAtom(display, "_NET_CURRENT_DESKTOP", False);
-  net_desktop_names = XInternAtom(display, "_NET_DESKTOP_NAMES", False);
-  net_active_window = XInternAtom(display, "_NET_ACTIVE_WINDOW", False);
-  net_workarea = XInternAtom(display, "_NET_WORKAREA", False);
-  net_supporting_wm_check = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", False);
-  net_virtual_roots = XInternAtom(display, "_NET_VIRTUAL_ROOTS", False);
-
-  net_close_window = XInternAtom(display, "_NET_CLOSE_WINDOW", False);
-  net_wm_moveresize = XInternAtom(display, "_NET_WM_MOVERESIZE", False);
-
-  net_properties = XInternAtom(display, "_NET_PROPERTIES", False);
-  net_wm_name = XInternAtom(display, "_NET_WM_NAME", False);
-  net_wm_desktop = XInternAtom(display, "_NET_WM_DESKTOP", False);
-  net_wm_window_type = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
-  net_wm_state = XInternAtom(display, "_NET_WM_STATE", False);
-  net_wm_strut = XInternAtom(display, "_NET_WM_STRUT", False);
-  net_wm_icon_geometry = XInternAtom(display, "_NET_WM_ICON_GEOMETRY", False);
-  net_wm_icon = XInternAtom(display, "_NET_WM_ICON", False);
-  net_wm_pid = XInternAtom(display, "_NET_WM_PID", False);
-  net_wm_handled_icons = XInternAtom(display, "_NET_WM_HANDLED_ICONS", False);
-
-  net_wm_ping = XInternAtom(display, "_NET_WM_PING", False);
-
-#endif // NEWWMSPEC
-
-  cursor.session = XCreateFontCursor(display, XC_left_ptr);
-  cursor.move = XCreateFontCursor(display, XC_fleur);
-  cursor.ll_angle = XCreateFontCursor(display, XC_ll_angle);
-  cursor.lr_angle = XCreateFontCursor(display, XC_lr_angle);
-  cursor.ul_angle = XCreateFontCursor(display, XC_ul_angle);
-  cursor.ur_angle = XCreateFontCursor(display, XC_ur_angle);
-
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
-  screenInfoList.reserve(numberOfScreens());
-  for (unsigned int s = 0; s < numberOfScreens(); s++)
-    screenInfoList.push_back(new ScreenInfo(*this, s));
+  screenInfoList.reserve(ScreenCount(display));
+  for (int i = 0; i < ScreenCount(display); ++i)
+    screenInfoList.push_back(ScreenInfo(this, i));
 
-#ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
 
   const XModifierKeymap* const modmap = XGetModifierMapping(display);
@@ -355,15 +252,15 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
     // get the values of the keyboard lock modifiers
     // Note: Caps lock is not retrieved the same way as Scroll and Num lock
     // since it doesn't need to be.
-    const KeyCode num_lock_code = XKeysymToKeycode(display, XK_Num_Lock);
-    const KeyCode scroll_lock_code = XKeysymToKeycode(display, XK_Scroll_Lock);
+    const KeyCode num_lock = XKeysymToKeycode(display, XK_Num_Lock);
+    const KeyCode scroll_lock = XKeysymToKeycode(display, XK_Scroll_Lock);
 
     for (size_t cnt = 0; cnt < size; ++cnt) {
       if (! modmap->modifiermap[cnt]) continue;
 
-      if (num_lock_code == modmap->modifiermap[cnt])
+      if (num_lock == modmap->modifiermap[cnt])
         NumLockMask = mask_table[cnt / modmap->max_keypermod];
-      if (scroll_lock_code == modmap->modifiermap[cnt])
+      if (scroll_lock == modmap->modifiermap[cnt])
         ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
     }
   }
@@ -379,20 +276,13 @@ BaseDisplay::BaseDisplay(const char *app_name, char *dpy_name) {
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
 
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
-#else
-  NumLockMask = Mod2Mask;
-  ScrollLockMask = Mod5Mask;
-#endif // NOCLOBBER
+
+  gccache = 0;
 }
 
 
 BaseDisplay::~BaseDisplay(void) {
-  std::for_each(screenInfoList.begin(), screenInfoList.end(),
-                PointerAssassin());
-  // we don't create the BTimers, we don't delete them
-
-  if (application_name != NULL)
-    delete [] application_name;
+  delete gccache;
 
   XCloseDisplay(display);
 }
@@ -401,24 +291,18 @@ BaseDisplay::~BaseDisplay(void) {
 void BaseDisplay::eventLoop(void) {
   run();
 
-  int xfd = ConnectionNumber(display);
+  const int xfd = ConnectionNumber(display);
 
-  while ((! _shutdown) && (! internal_error)) {
+  while (run_state == RUNNING && ! internal_error) {
     if (XPending(display)) {
       XEvent e;
       XNextEvent(display, &e);
 
-      if (last_bad_window != None && e.xany.window == last_bad_window) {
-#ifdef    DEBUG
-        fprintf(stderr, i18n(BaseDisplaySet,
-                             BaseDisplayBadWindowRemove,
-                             "BaseDisplay::eventLoop(): removing bad window "
-                             "from event queue\n"));
-#endif // DEBUG
-      } else {
-        last_bad_window = None;
-        process_event(&e);
-      }
+      if (last_bad_window != None && e.xany.window == last_bad_window)
+        continue;
+
+      last_bad_window = None;
+      process_event(&e);
     } else {
       fd_set rfds;
       timeval now, tm, *timeout = (timeval *) 0;
@@ -426,33 +310,11 @@ void BaseDisplay::eventLoop(void) {
       FD_ZERO(&rfds);
       FD_SET(xfd, &rfds);
 
-      if (!timerList.empty()) {
+      if (! timerList.empty()) {
+        const BTimer* const timer = timerList.top();
+
         gettimeofday(&now, 0);
-
-        tm.tv_sec = tm.tv_usec = 0l;
-
-        BTimer *timer = timerList.front();
-        ASSERT(timer != NULL);
-
-        tm.tv_sec = timer->getStartTime().tv_sec +
-          timer->getTimeout().tv_sec - now.tv_sec;
-        tm.tv_usec = timer->getStartTime().tv_usec +
-          timer->getTimeout().tv_usec - now.tv_usec;
-
-        while (tm.tv_usec >= 1000000) {
-          tm.tv_sec++;
-          tm.tv_usec -= 1000000;
-        }
-
-        while (tm.tv_usec < 0) {
-          if (tm.tv_sec > 0) {
-            tm.tv_sec--;
-            tm.tv_usec += 1000000;
-          } else {
-            tm.tv_usec = 0;
-            break;
-          }
-        }
+        tm = timer->timeRemaining(now);
 
         timeout = &tm;
       }
@@ -462,105 +324,53 @@ void BaseDisplay::eventLoop(void) {
       // check for timer timeout
       gettimeofday(&now, 0);
 
-      TimerList::iterator it;
-      for (it = timerList.begin(); it != timerList.end(); ++it) {
-        BTimer *timer = *it;
-        ASSERT(timer != NULL);
-
-        tm.tv_sec = timer->getStartTime().tv_sec +
-          timer->getTimeout().tv_sec;
-        tm.tv_usec = timer->getStartTime().tv_usec +
-          timer->getTimeout().tv_usec;
-
-        if ((now.tv_sec < tm.tv_sec) ||
-            (now.tv_sec == tm.tv_sec && now.tv_usec < tm.tv_usec))
+      // there is a small chance for deadlock here:
+      // *IF* the timer list keeps getting refreshed *AND* the time between
+      // timer->start() and timer->shouldFire() is within the timer's period
+      // then the timer will keep firing.  This should be VERY near impossible.
+      while (! timerList.empty()) {
+        BTimer *timer = timerList.top();
+        if (! timer->shouldFire(now))
           break;
 
-        timer->fireTimeout();
+        timerList.pop();
 
-        // restart the current timer so that the start time is updated
-        if (! timer->doOnce()) {
-          // reorder
-          removeTimer(timer);
-          addTimer(timer);
+        timer->fireTimeout();
+        timer->halt();
+        if (timer->isRecurring())
           timer->start();
-        } else
-          timer->stop();
-        it = timerList.begin(); // we no longer have any idea if the iterator is
-        // valid, but what was at the front() is no
-        // longer.
       }
     }
   }
 }
 
 
-const Bool BaseDisplay::validateWindow(Window window) {
-  XEvent event;
-  if (XCheckTypedWindowEvent(display, window, DestroyNotify, &event)) {
-    XPutBackEvent(display, &event);
-
-    return False;
-  }
-
-  return True;
-}
-
-
-void BaseDisplay::grab(void) {
-  if (! server_grabs++)
-    XGrabServer(display);
-}
-
-
-void BaseDisplay::ungrab(void) {
-  if (! --server_grabs)
-    XUngrabServer(display);
-}
-
-
 void BaseDisplay::addTimer(BTimer *timer) {
-  ASSERT(timer != (BTimer *) 0);
+  if (! timer) return;
 
-  TimerList::iterator it;
-  for (it = timerList.begin(); it != timerList.end(); ++it) {
-    BTimer *tmp = *it;
-    if ((tmp->getTimeout().tv_sec > timer->getTimeout().tv_sec) ||
-        ((tmp->getTimeout().tv_sec == timer->getTimeout().tv_sec) &&
-         (tmp->getTimeout().tv_usec >= timer->getTimeout().tv_usec)))
-      break;
-  }
-
-  timerList.insert(it, timer);
+  timerList.push(timer);
 }
 
 
 void BaseDisplay::removeTimer(BTimer *timer) {
-  ASSERT(timer != (BTimer *) 0);
-  timerList.remove(timer);
+  timerList.release(timer);
 }
 
 
 /*
- * Grabs a button, but also grabs the button in every possible combination with
- * the keyboard lock keys, so that they do not cancel out the event.
+ * Grabs a button, but also grabs the button in every possible combination
+ * with the keyboard lock keys, so that they do not cancel out the event.
  */
 void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
-                             Window grab_window, Bool owner_events,
+                             Window grab_window, bool owner_events,
                              unsigned int event_mask, int pointer_mode,
-                             int keybaord_mode, Window confine_to,
-                             Cursor cursor) const
-{
-#ifndef   NOCLOBBER
-  for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
+                             int keyboard_mode, Window confine_to,
+                             Cursor cursor) const {
+  for (size_t cnt = 0; cnt < MaskListLength; ++cnt) {
     XGrabButton(display, button, modifiers | MaskList[cnt], grab_window,
-                owner_events, event_mask, pointer_mode, keybaord_mode,
+                owner_events, event_mask, pointer_mode, keyboard_mode,
                 confine_to, cursor);
-#else  // NOCLOBBER
-  XGrabButton(display, button, modifiers, grab_window,
-              owner_events, event_mask, pointer_mode, keybaord_mode,
-              confine_to, cursor);
-#endif // NOCLOBBER
+  }
 }
 
 /*
@@ -569,26 +379,37 @@ void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
  */
 void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
                                Window grab_window) const {
-#ifndef   NOCLOBBER
-  for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
+  for (size_t cnt = 0; cnt < MaskListLength; ++cnt) {
     XUngrabButton(display, button, modifiers | MaskList[cnt], grab_window);
-#else  // NOCLOBBER
-  XUngrabButton(display, button, modifiers, grab_window);
-#endif // NOCLOBBER
+  }
 }
 
 
-ScreenInfo::ScreenInfo(BaseDisplay &d, int num) : basedisplay(d),
-screen_number(num)
+const ScreenInfo* BaseDisplay::getScreenInfo(unsigned int s) const {
+  if (s < screenInfoList.size())
+    return &screenInfoList[s];
+  return (const ScreenInfo*) 0;
+}
+
+
+BGCCache *BaseDisplay::gcCache(void) const
 {
+    if (! gccache) gccache = new BGCCache(this);
+    return gccache;
+}
 
-  root_window = RootWindow(basedisplay.getXDisplay(), screen_number);
-  depth = DefaultDepth(basedisplay.getXDisplay(), screen_number);
 
-  m_size = Size(WidthOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
-                                              screen_number)),
-                HeightOfScreen(ScreenOfDisplay(basedisplay.getXDisplay(),
-                                               screen_number)));
+ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
+  basedisplay = d;
+  screen_number = num;
+
+  root_window = RootWindow(basedisplay->getXDisplay(), screen_number);
+  depth = DefaultDepth(basedisplay->getXDisplay(), screen_number);
+
+  rect.setSize(WidthOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(),
+                                             screen_number)),
+               HeightOfScreen(ScreenOfDisplay(basedisplay->getXDisplay(),
+                                              screen_number)));
 
   // search for a TrueColor Visual... if we can't find one... we will use the
   // default visual for the screen
@@ -600,10 +421,10 @@ screen_number(num)
 
   visual = (Visual *) 0;
 
-  if ((vinfo_return = XGetVisualInfo(basedisplay.getXDisplay(),
-                                     VisualScreenMask | VisualClassMask,
-                                     &vinfo_template, &vinfo_nitems)) &&
-      vinfo_nitems > 0) {
+  vinfo_return = XGetVisualInfo(basedisplay->getXDisplay(),
+                                VisualScreenMask | VisualClassMask,
+                                &vinfo_template, &vinfo_nitems);
+  if (vinfo_return && vinfo_nitems > 0) {
     for (int i = 0; i < vinfo_nitems; i++) {
       if (depth < (vinfo_return + i)->depth) {
         depth = (vinfo_return + i)->depth;
@@ -615,10 +436,20 @@ screen_number(num)
   }
 
   if (visual) {
-    colormap = XCreateColormap(basedisplay.getXDisplay(), root_window,
+    colormap = XCreateColormap(basedisplay->getXDisplay(), root_window,
                                visual, AllocNone);
   } else {
-    visual = DefaultVisual(basedisplay.getXDisplay(), screen_number);
-    colormap = DefaultColormap(basedisplay.getXDisplay(), screen_number);
+    visual = DefaultVisual(basedisplay->getXDisplay(), screen_number);
+    colormap = DefaultColormap(basedisplay->getXDisplay(), screen_number);
   }
+
+  // get the default display string and strip the screen number
+  string default_string = DisplayString(basedisplay->getXDisplay());
+  const string::size_type pos = default_string.rfind(".");
+  if (pos != string::npos)
+    default_string.resize(pos);
+
+  std::ostringstream formatter;
+  formatter << "DISPLAY=" << default_string << '.' << screen_number;
+  display_string = formatter.str();
 }

@@ -1,5 +1,6 @@
-// Iconmenu.h for Openbox
-// Copyright (c) 2001 Sean 'Shaleh' Perry <shaleh@debian.org>
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// WorkspaceMenu.hh for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
 // Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20,25 +21,27 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __Icon_hh
-#define   __Icon_hh
+#ifndef   __Workspacemenu_hh
+#define   __Workspacemenu_hh
 
-#include "Basemenu.h"
+#include "Basemenu.hh"
 
 // forward declaration
-class Iconmenu;
-class BScreen;
+class Workspacemenu;
+class Toolbar;
 
-class Iconmenu : public Basemenu {
+class Workspacemenu : public Basemenu {
 private:
-  BScreen &screen;
+  Workspacemenu(const Workspacemenu&);
+  Workspacemenu& operator=(const Workspacemenu&);
 
 protected:
-  virtual void itemSelected(int, int);
+  virtual void itemSelected(int button, unsigned int index);
 
 public:
-  Iconmenu(BScreen &);
+  Workspacemenu(BScreen *scrn);
 };
 
 
-#endif // __Icon_hh
+#endif // __Workspacemenu_hh
+

@@ -1,5 +1,7 @@
-// Util.h for Openbox
-// Copyright (c) 2002 - 2002 Ben Jansens (ben@orodu.net)
+// -*- mode: C++; indent-tabs-mode: nil; -*-
+// Rootmenu.hh for Blackbox - an X11 Window manager
+// Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh@debian.org>
+// Copyright (c) 1997 - 2000 Brad Hughes (bhughes@tcac.net)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -19,21 +21,27 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#ifndef   __Util_hh
-#define   __Util_hh
+#ifndef   __Rootmenu_hh
+#define   __Rootmenu_hh
 
-#ifdef     DEBUG
-# include <assert.h>
-# define ASSERT(x) assert(x)
-#else  // !DEBUG
-# define ASSERT(x)
-#endif //  DEBUG
+// forward declarations
+class BScreen;
 
-struct PointerAssassin {
-  template<typename T>
-  inline void operator()(const T ptr) const {
-    delete ptr;
-  }
+#include "Basemenu.hh"
+
+
+class Rootmenu : public Basemenu {
+private:
+  Rootmenu(const Rootmenu&);
+  Rootmenu& operator=(const Rootmenu&);
+
+protected:
+  virtual void itemSelected(int button, unsigned int index);
+
+public:
+  Rootmenu(BScreen *scrn);
 };
 
-#endif // __Util_hh
+
+#endif // __Rootmenu_hh
+

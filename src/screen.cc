@@ -783,7 +783,7 @@ void Screen::changeNumDesktops(unsigned int num)
       ce.xclient.window = (*it)->window();
       ce.xclient.format = 32;
       ce.xclient.data.l[0] = num - 1;
-      XSendEvent(**otk::display, _info->rootWindow(), False,
+      XSendEvent(**otk::display, _info->rootWindow(), false,
                  SubstructureNotifyMask | SubstructureRedirectMask, &ce);
     }
   }
@@ -828,17 +828,6 @@ void Screen::updateDesktopNames()
     _desktop_names.push_back("Unnamed");
 }
 
-
-void Screen::setDesktopName(unsigned int i, const otk::ustring &name)
-{
-  if (i >= _num_desktops) return;
-
-  otk::Property::StringVect newnames = _desktop_names;
-  newnames[i] = name;
-  otk::Property::set(_info->rootWindow(),
-                     otk::Property::atoms.net_desktop_names,
-                     otk::Property::utf8, newnames);
-}
 
 otk::ustring Screen::desktopName(unsigned int i) const
 {

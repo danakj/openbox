@@ -27,7 +27,7 @@ void gradient_render(Surface *sf, int w, int h)
     gradient_crossdiagonal(sf, w, h);
     break;
   default:
-    g_message("unhandled gradient\n");
+    g_message("unhandled gradient");
   }
   
   if (sf->data.planar.relief == Flat && sf->data.planar.border) {

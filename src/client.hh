@@ -602,6 +602,14 @@ BB    @param window The window id that the Client class should handle
   //! Remove focus from the client window
   void unfocus() const;
 
+  //! Validate client, by making sure no Destroy or Unmap events exist in
+  //! the event queue for the window.
+  /*!
+    @return true if the client is valid; false if the client has already
+            been unmapped/destroyed, and so is invalid.
+  */
+  bool validate() const;
+  
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);

@@ -49,6 +49,8 @@ Client::Client(int screen, Window window)
   _layer = Layer_Normal;
   // default to not urgent
   _urgent = false;
+  // not positioned unless specified
+  _positioned = false;
   
   getArea();
   getDesktop();
@@ -112,6 +114,21 @@ Client::~Client()
     if (_iconic)
       XMapWindow(**otk::display, _window);
   }
+}
+
+
+bool Client::validate() const
+{
+  XSync(**otk::display, false); // get all events on the server
+
+  XEvent e;
+  if (XCheckTypedWindowEvent(**otk::display, _window, DestroyNotify, &e) ||
+      XCheckTypedWindowEvent(**otk::display, _window, UnmapNotify, &e)) {
+    XPutBackEvent(**otk::display, &e);
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -636,6 +653,9 @@ void Client::updateTransientFor()
 void Client::propertyHandler(const XPropertyEvent &e)
 {
   otk::EventHandler::propertyHandler(e);
+
+  // validate cuz we query stuff off the client here
+  if (!validate()) return;
   
   // compress changes to a single property into a single change
   XEvent ce;
@@ -909,6 +929,9 @@ void Client::toggleClientBorder(bool addborder)
 void Client::clientMessageHandler(const XClientMessageEvent &e)
 {
   otk::EventHandler::clientMessageHandler(e);
+  
+  // validate cuz we query stuff off the client here
+  if (!validate()) return;
   
   if (e.format != 32) return;
 

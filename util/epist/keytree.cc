@@ -132,11 +132,6 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
 void keytree::addAction(Action::ActionType action, unsigned int mask,
                         string key, string arg)
 {
-  // can't grab non-modifier as topmost key
-  // XXX: do we allow Esc to be grabbed at the top?
-  if (_current == _head && (mask == 0 || mask == ShiftMask))
-    return;
-
   keynode *tmp = new keynode;
   tmp->action = new Action(action,
                            XKeysymToKeycode(_display,

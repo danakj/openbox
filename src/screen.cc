@@ -520,8 +520,8 @@ void Screen::manageWindow(Window window)
     openbox->bindings()->fireEvent(&data);
   }
 
-  EventData data(_number, client, EventAction::DisplayingWindow, 0);
-  openbox->bindings()->fireEvent(&data);
+  EventData ddata(_number, client, EventAction::DisplayingWindow, 0);
+  openbox->bindings()->fireEvent(&ddata);
 
   // if on the current desktop.. (or all desktops)
   if (client->desktop() == _desktop ||
@@ -546,8 +546,8 @@ void Screen::manageWindow(Window window)
 
   openbox->bindings()->grabButtons(true, client);
 
-  EventData data(_number, client, EventAction::NewWindow, 0);
-  openbox->bindings()->fireEvent(&data);
+  EventData ndata(_number, client, EventAction::NewWindow, 0);
+  openbox->bindings()->fireEvent(&ndata);
 
 #ifdef DEBUG
   printf("Managed window 0x%lx frame 0x%lx\n",

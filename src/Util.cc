@@ -169,13 +169,11 @@ void bexec(const string& command, const string& displaystring) {
     setsid();
     int ret = putenv(const_cast<char *>(displaystring.c_str()));
     assert(ret != -1);
-    string cmd = "exec ";
-    cmd += command;
-    ret = execl("/bin/sh", "/bin/sh", "-c", cmd.c_str(), NULL);
+    ret = execl("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
     exit(ret);
   }
 #else //   __EMX__
-  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", command, NULL);
+  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", command.c_str(), NULL);
 #endif // !__EMX__
 }
 

@@ -1,3 +1,116 @@
+2003-08-14  xor@zed.orodu.net  <xor@zed>
+
+	* kernel/menu.c: fix the offsets used to keep the menus on screen
+
+	* kernel/menu_render.c:
+	dont show titles on submenus. kill the extra 1px at the top of titleless menus
+
+	* kernel/menu.c:
+	make putting plugin menus in a menu closer to working..
+
+	* data/menu: rename root to root-menu
+
+	* data/rc3: add the client-list-menu
+
+	* Makefile.am, kernel/plugin.c, plugins/menu/.cvsignore, plugins/menu/client_list_menu.c:
+	add the client_list_menu plugin
+
+	* plugins/menu/client_menu.c: add the destructor for menus
+
+	* kernel/menu.c, kernel/menu.h: add a menu destructor callback.
+	fix a possible crasher where a callback was called with a different menu.
+
+	* kernel/stacking.c: 80 cols
+
+	* kernel/openbox.c: shutdown the menus before the plugins are unloaded
+
+	* kernel/focus.c, kernel/event.c, kernel/client.c, kernel/client.h:
+	make activate take a here parameter
+
+	* kernel/action.c: parse <here>true</here> for the activate action
+
+	* kernel/action.c, kernel/action.h:
+	make the activate action have a 'here' parameter
+
+	* kernel/action.c, kernel/action.h: add an 'activate' action
+
+2003-08-12  xor@zed.orodu.net  <xor@zed>
+
+	* Makefile.am, kernel/config.c, kernel/config.h, kernel/moveresize.c, kernel/plugin.c, kernel/resist.c, kernel/resist.h:
+	move the resistance plugin into the kernel. dont resist when move/resizing with the keyboard, only when doing it with the mouse.
+
+	* kernel/client.c: oops i fucked up tore's patch. better.
+
+	* kernel/action.c, kernel/client.c:
+	bug fixes for growtoedge from tore. props to tore for all the growtoedge and movetoedge code, and directional focus code also since i dont think i mentioned his name before in the changelogs woot.
+
+	* Makefile.am, data/menu, data/rc3, kernel/config.c, kernel/config.h, kernel/menu.c, kernel/menu.h, kernel/mouse.c, kernel/openbox.c, kernel/plugin.c, kernel/plugin.h, plugins/interface.h, plugins/menu/fifo_menu.c, plugins/menu/include_menu.c, plugins/menu/timed_menu.c, plugins/placement/placement.c:
+	adjust for changes to the parsing api.
+	split the menu into its own file.
+
+	* parser/parse.c, parser/parse.h:
+	create ObParseInst structuer which can be then used to parse more than one file/memory thing at a time.
+	add function to parse memory block.
+
+	* kernel/config.c, kernel/mouse.c, kernel/mouse.h:
+	prefix/capitalize the mouse actions enum
+
+	* kernel/config.c: oops read the mouse cnofig vars into the right place
+
+	* data/rc3, kernel/config.c, kernel/config.h, kernel/keyboard.c:
+	add the chainQuitKey option to teh <keyboard> section of the rc3
+
+	* render/font.h, render/render.h, render/test.c:
+	add Xutil includes for these badboys on older X versions/solaris
+
+	* render/theme.c:
+	make all the masks unsigned chars for consistancy woot
+
+	* render/theme.c: kill some warnings
+
+	* kernel/extensions.h: include Xutil for shape.h on old X versions
+
+	* kernel/menu_render.c, render/theme.c:
+	rendering fixups for submenu bullets
+
+	* data/rc3: add the cyclingDialog option
+
+	* data/rc3:
+	remove the scrolling on root without alt since that fucks up with the dialog since there are no modifiers
+
+	* kernel/config.c, kernel/config.h, kernel/mouse.c, kernel/screen.c:
+	add an option for if the popup is used for desktop cycling. defaults on.
+
+	* kernel/client.c: dont move windows when starting
+
+	* ChangeLog: recent changes
+
+	* configure.ac: alpha5
+
+	* kernel/screen.c: when cancelling return the first desktop
+
+	* kernel/action.c, kernel/action.h:
+	use the new client_directional_edge_search for the movetoedge actions.
+	add new growtoedge actions.
+
+	* kernel/client.c, kernel/client.h:
+	small bugfix to the directional focus code.
+	add the client_directional_edge_search function.
+
+	* kernel/keyboard.c:
+	only do shit with the grabbed_* when a grab is in place
+
+	* kernel/action.c, kernel/mouse.c, kernel/screen.c:
+	remove debug printings
+
+	* ChangeLog, Makefile.am, kernel/.cvsignore, kernel/action.c, kernel/action.h, kernel/client.c, kernel/config.c, kernel/config.h, kernel/event.c, kernel/focus.c, kernel/keyboard.c, kernel/keyboard.h, kernel/keytree.c, kernel/keytree.h, kernel/menu.c, kernel/menu.h, kernel/mouse.c, kernel/mouse.h, kernel/openbox.c, kernel/plugin.c, kernel/screen.c, kernel/screen.h, kernel/translate.c, kernel/translate.h, plugins/menu/client_menu.c:
+	move the keyboard and mouse plugins into the kernel for mucho sexiness.
+	make workspace changing a grabbed/interactive process like focus cycling is, with the popup and all.
+	this is some hot shit.
+
+	* kernel/event.c:
+	keep event_lasttime at the last time an event has come in so far, don't regress when events come out of order. props to shrimpx for this patch.
+
 2003-08-12  xor@zed.orodu.net  <xor@zed>
 
 	* configure.ac: alpha5

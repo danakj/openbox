@@ -29,6 +29,11 @@ extern "C" {
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
+#ifdef    XINERAMA
+#  include <X11/Xlib.h>
+#  include <X11/extensions/Xinerama.h>
+#endif // XINERAMA
+
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
@@ -154,8 +159,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   XDefineCursor(blackbox->getXDisplay(), getRootWindow(),
                 blackbox->getSessionCursor());
 
-  // start off full screen, top left.
-  usableArea.setSize(getWidth(), getHeight());
+  updateAvailableArea();
 
   image_control =
     new BImageControl(blackbox, this, True, blackbox->getColorsPerChannel(),
@@ -2070,9 +2074,27 @@ const Rect& BScreen::availableArea(void) const {
 }
 
 
+RectList BScreen::allAvailableAreas(void) const {
+#ifdef    XINERAMA
+  if (isXineramaActive())
+    return xineramaUsableArea;
+#endif // XINERAMA
+
+  RectList list;
+  list.push_back(availableArea());
+  return list;
+}
+
+
 void BScreen::updateAvailableArea(void) {
   Rect old_area = usableArea;
   usableArea = getRect(); // reset to full screen
+
+#ifdef    XINERAMA
+  // reset to the full areas
+  if (isXineramaActive())
+    xineramaUsableArea = allAvailableAreas();
+#endif // XINERAMA
 
   /* these values represent offsets from the screen edge
    * we look for the biggest offset on each edge and then apply them
@@ -2099,6 +2121,27 @@ void BScreen::updateAvailableArea(void) {
   usableArea.setPos(current_left, current_top);
   usableArea.setSize(usableArea.width() - (current_left + current_right),
                      usableArea.height() - (current_top + current_bottom));
+
+#ifdef    XINERAMA
+  if (isXineramaActive()) {
+    // keep each of the ximerama-defined areas inside the strut
+    RectList::iterator xit, xend = xineramaUsableArea.end();
+    for (xit = xineramaUsableArea.begin(); xit != xend; ++xit) {
+      if (xit->x() < usableArea.x()) {
+        xit->setX(usableArea.x());
+        xit->setWidth(xit->width() - usableArea.x());
+      }
+      if (xit->y() < usableArea.y()) {
+        xit->setY(usableArea.y());
+        xit->setHeight(xit->height() - usableArea.y());
+      }
+      if (xit->x() + xit->width() > usableArea.width())
+        xit->setWidth(usableArea.width() - xit->x());
+      if (xit->y() + xit->height() > usableArea.height())
+        xit->setHeight(usableArea.height() - xit->y());
+    }
+  }
+#endif // XINERAMA
 
   if (old_area != usableArea) {
     BlackboxWindowList::iterator it = windowList.begin(),

@@ -131,6 +131,9 @@ private:
   unsigned long event_mask;
 
   Rect usableArea;
+#ifdef    XINERAMA
+  RectList xineramaUsableArea;
+#endif // XINERAMA
 
   typedef std::list<Strut*> StrutList;
   StrutList strutList;
@@ -306,7 +309,10 @@ public:
 
   BlackboxWindow *getIcon(unsigned int index);
 
+  // allAvailableAreas should be used whenever possible instead of this function
+  // as then Xinerama will work correctly.
   const Rect& availableArea(void) const;
+  RectList allAvailableAreas(void) const;
   void updateAvailableArea(void);
   void addStrut(Strut *strut);
   void removeStrut(Strut *strut);

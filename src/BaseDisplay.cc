@@ -35,6 +35,10 @@ extern "C" {
 #  include <X11/extensions/shape.h>
 #endif // SHAPE
 
+#ifdef    XINERAMA
+#  include <X11/extensions/Xinerama.h>
+#endif // XINERAMA
+
 #ifdef    HAVE_FCNTL_H
 #  include <fcntl.h>
 #endif // HAVE_FCNTL_H
@@ -231,6 +235,22 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
 #else // !SHAPE
   shape.extensions = False;
 #endif // SHAPE
+
+  xinerama.extensions = False;
+#ifdef    XINERAMA
+  if (XineramaQueryExtension(display, &xinerama.event_basep,
+                             &xinerama.error_basep)) {
+    if (XineramaQueryVersion(display, &xinerama.major,
+                             &xinerama.minor)) {
+#ifdef    DEBUG
+      fprintf(stderr,
+              "BaseDisplay::BaseDisplay: Found Xinerama version %d.%d\n",
+              xinerama.major, xinerama.minor);
+#endif // DEBUG
+      xinerama.extensions = True;
+    }
+  }
+#endif // XINERAMA
 
   XSetErrorHandler((XErrorHandler) handleXErrors);
 
@@ -462,4 +482,34 @@ ScreenInfo::ScreenInfo(BaseDisplay *d, unsigned int num) {
 
   display_string = string("DISPLAY=") + default_string + '.' +
     itostring(static_cast<unsigned long>(screen_number));
+  
+#ifdef    XINERAMA
+  if (d->hasXineramaExtensions()) {
+    if (d->getXineramaMajorVersion() == 1) {
+      // we know the version 1(.1?) protocol
+
+      /*
+         in this version of Xinerama, we can't query on a per-screen basis, but
+         in future versions we should be able, so the 'activeness' is checked
+         on a pre-screen basis anyways.
+      */
+      xinerama_active = XineramaIsActive(d->getXDisplay());
+      /*
+         If Xinerama is being used, there there is only going to be one screen
+         present. We still, of course, want to use the screen class, but that is
+         why no screen number is used in this function call. There should never
+         be more than one screen present with Xinerama active.
+      */
+      int num;
+      XineramaScreenInfo *info = XineramaQueryScreens(d->getXDisplay(), &num);
+      if (num > 0 && info) {
+        for (int i = 0; i < num; ++i) {
+          xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
+                                        info[i].width, info[i].height));
+        }
+        XFree(info);
+      }
+    }
+  }
+#endif // XINERAMA
 }

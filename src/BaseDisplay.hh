@@ -50,6 +50,10 @@ private:
   unsigned int screen_number;
   std::string display_string;
   Rect rect;
+#ifdef XINERAMA
+  RectList xinerama_areas;
+  bool xinerama_active;
+#endif
 
 public:
   ScreenInfo(BaseDisplay *d, unsigned int num);
@@ -66,6 +70,10 @@ public:
   inline unsigned int getHeight(void) const { return rect.height(); }
   inline const std::string& displayString(void) const
   { return display_string; }
+#ifdef XINERAMA
+  inline const RectList &getXineramaAreas(void) const { return xinerama_areas; }
+  inline bool isXineramaActive(void) const { return xinerama_active; }
+#endif
 };
 
 
@@ -76,6 +84,15 @@ private:
     int event_basep, error_basep;
   };
   BShape shape;
+
+#ifdef    XINERAMA
+  struct BXinerama {
+    bool extensions;
+    int event_basep, error_basep;
+    int major, minor; // version
+  };
+  BXinerama xinerama;
+#endif // XINERAMA
 
   unsigned int MaskList[8];
   size_t MaskListLength;
@@ -114,6 +131,10 @@ public:
 
   inline bool hasShapeExtensions(void) const
     { return shape.extensions; }
+#ifdef    XINERAMA
+  inline bool hasXineramaExtensions(void) const
+    { return xinerama.extensions; }
+#endif // XINERAMA
   inline bool doShutdown(void) const
     { return run_state == SHUTDOWN; }
   inline bool isStartup(void) const
@@ -130,6 +151,10 @@ public:
     { return screenInfoList.size(); }
   inline int getShapeEventBase(void) const
     { return shape.event_basep; }
+#ifdef    XINERAMA
+  inline int getXineramaMajorVersion(void) const
+    { return xinerama.major; }
+#endif // XINERAMA
 
   inline void shutdown(void) { run_state = SHUTDOWN; }
   inline void run(void) { run_state = RUNNING; }

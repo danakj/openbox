@@ -32,7 +32,15 @@ typedef struct _ObAction ObAction;
    available (possibly NULL though) if it wants it.
 */
 
+typedef enum
+{
+    OB_CLIENT_ACTION_NO,
+    OB_CLIENT_ACTION_OPTIONAL,
+    OB_CLIENT_ACTION_ALWAYS
+} ObClientActionReq;
+
 struct AnyAction {
+    ObClientActionReq client_action;
     struct _ObClient *c;
     ObFrameContext context;
     gboolean interactive;

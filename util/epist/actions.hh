@@ -80,9 +80,9 @@ public:
   inline const KeyCode keycode() const { return _keycode; }
   inline const int modifierMask() const { return _modifierMask; }
 
-  Action::Action(enum ActionType type, KeyCode keycode, int modifierMask);
+  Action(enum ActionType type, KeyCode keycode, int modifierMask);
 };
   
-typedef list<Action> ActionList;
+typedef std::list<Action> ActionList;
 
 #endif

@@ -97,7 +97,7 @@ void popup_size_to_string(Popup *self, gchar *text)
     gint iconw;
 
     if (!self->a_text)
-        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_selected_label);
 
     self->a_text->texture[0].data.text.string = text;
     RrMinsize(self->a_text, &textw, &texth);
@@ -112,7 +112,7 @@ void popup_size_to_string(Popup *self, gchar *text)
 void popup_set_text_align(Popup *self, RrJustify align)
 {
     if (!self->a_text)
-        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_selected_label);
 
     self->a_text->texture[0].data.text.justify = align;
 }
@@ -125,11 +125,11 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 
     /* create the shit if needed */
     if (!self->a_bg)
-        self->a_bg = RrAppearanceCopy(ob_rr_theme->app_hilite_bg);
+        self->a_bg = RrAppearanceCopy(ob_rr_theme->app_selected_bg);
     if (self->hasicon && !self->a_icon)
         self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     if (!self->a_text)
-        self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+        self->a_text = RrAppearanceCopy(ob_rr_theme->app_selected_label);
 
     XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
     XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);

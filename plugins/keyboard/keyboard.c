@@ -238,9 +238,8 @@ static void event(ObEvent *e, void *foo)
                             }
 
                             if (act->func == action_cycle_windows &&
-                                !grabbed_key) {
+                                !grabbed_key && grab_keyboard(TRUE)) {
                                 grabbed_key = p;
-                                grab_keyboard(TRUE);
                             }
 
                             act->data.any.c = focus_client;

@@ -304,8 +304,11 @@
     <mousebind button="A-Down" action="click">
       <action name="desktopleft"/>
     </mousebind>
+    <mousebind button="Middle" action="press">
+      <action name="showmenu"><menu>client-list-menu</menu></action>
+    </mousebind> 
     <mousebind button="Right" action="press">
-      <action name="showmenu"><menu>root</menu></action>
+      <action name="showmenu"><menu>root-menu</menu></action>
     </mousebind>
   </context>
 </mouse>

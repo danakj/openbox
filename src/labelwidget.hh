@@ -31,8 +31,6 @@ public:
   virtual void focus();
   virtual void unfocus();
 
-  virtual void update();
-
   virtual void renderForeground();
 
   inline const otk::ustring &text() const { return _text; }

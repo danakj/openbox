@@ -259,15 +259,12 @@ void Widget::ungrabKeyboard(void)
 void Widget::render(void)
 {
   if (!_texture) return;
-  printf("RENDER\n");
 
   Surface *s = _surface; // save the current surface
   
   _surface = new Surface(_screen, _rect.size());
   display->renderControl(_screen)->drawBackground(*_surface, *_texture);
 
-  if (dynamic_cast<FocusLabel*>(this))
-    printf("IM A FOCUSLABEL RENDERING\n");
   renderForeground(); // for inherited types to render onto the _surface
 
   XSetWindowBackgroundPixmap(**display, _window, _surface->pixmap());

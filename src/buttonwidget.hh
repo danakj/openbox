@@ -22,7 +22,6 @@ public:
 
   virtual void adjust();
 
-  virtual void update();
   virtual void renderForeground();
   
   virtual void focus();

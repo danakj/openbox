@@ -77,19 +77,12 @@ void ButtonWidget::setStyle(otk::RenderStyle *style)
 }
 
 
-void ButtonWidget::update()
-{
-  printf("ButtonWidget::update()\n");
-  otk::Widget::update();
-}
-
 void ButtonWidget::renderForeground()
 {
   otk::PixmapMask *pm;
   int width;
   bool draw = _dirty;
 
-  printf("ButtonWidget::renderForeground()\n");
   otk::Widget::renderForeground();
 
   if (draw) {

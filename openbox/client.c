@@ -1356,7 +1356,8 @@ static Client *search_focus_tree(Client *node, Client *skip)
     return NULL;
 }
 
-static void calc_recursive(Client *self, StackLayer l, gboolean raised)
+static void calc_recursive(Client *self, Client *orig, StackLayer l,
+                           gboolean raised)
 {
     StackLayer old;
     GSList *it;
@@ -1365,10 +1366,10 @@ static void calc_recursive(Client *self, StackLayer l, gboolean raised)
     self->layer = l;
 
     for (it = self->transients; it; it = it->next)
-        calc_recursive(it->data, l, raised ? raised : l != old);
+        calc_recursive(it->data, orig, l, raised ? raised : l != old);
 
     if (!raised && l != old)
-	if (self->frame)
+	if (orig->frame) /* only restack if the original window is managed */
 	    stacking_raise(self);
 }
 
@@ -1376,6 +1377,9 @@ void client_calc_layer(Client *self)
 {
     StackLayer l;
     gboolean f;
+    Client *orig;
+
+    orig = self;
 
     /* transients take on the layer of their parents */
     if (self->transient_for) {
@@ -1413,7 +1417,7 @@ void client_calc_layer(Client *self)
     else if (self->below) l = Layer_Below;
     else l = Layer_Normal;
 
-    calc_recursive(self, l, FALSE);
+    calc_recursive(self, orig, l, FALSE);
 }
 
 gboolean client_should_show(Client *self)

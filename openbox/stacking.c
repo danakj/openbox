@@ -81,8 +81,7 @@ static void raise_recursive(Client *client)
 
     /* raise transients first */
     for (sit = client->transients; sit; sit = sit->next)
-        if (((Client*)sit->data)->frame)
-            raise_recursive(sit->data);
+        raise_recursive(sit->data);
 
     /* find 'it' where it is the positiion in the stacking order where
        'client' will be inserted *before* */

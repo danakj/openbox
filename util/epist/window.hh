@@ -76,8 +76,6 @@ private:
   void updateTitle();
   void updateClass();
 
-  void findFramePosition(int &x, int &y) const;
-
 public:
   XWindow(epist *epist, screen *screen, Window window);
   virtual ~XWindow();

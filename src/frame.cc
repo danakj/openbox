@@ -816,7 +816,9 @@ void Frame::grabClient()
     _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config/map req's)
-  XSelectInput(**otk::display, _plate, SubstructureRedirectMask);
+  // the ButtonPress is to catch clicks on the client border
+  XSelectInput(**otk::display, _plate, (SubstructureRedirectMask |
+                                        ButtonPressMask));
 
   // map the client so it maps when the frame does
   XMapWindow(**otk::display, _client->window());

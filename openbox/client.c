@@ -1905,8 +1905,6 @@ gboolean client_focus(Client *self)
 	}
     }
 
-    g_message("** focusing %lx", self->window);
-
     if (self->can_focus)
 	XSetInputFocus(ob_display, self->window, RevertToNone,
                        CurrentTime);

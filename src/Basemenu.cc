@@ -536,7 +536,6 @@ bool Basemenu::hasSubmenu(int index) {
 
 void Basemenu::drawItem(int index, bool highlight, bool clear,
                         int x, int y, unsigned int w, unsigned int h) {
-  fprintf(stderr, "DRAW ITEM\n");
   BasemenuItem *item = find(index);
   if (! item) return;
 
@@ -629,7 +628,6 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   if (dotext && text) {
-    fprintf(stderr, "FONT: %s\nTEXT: %s\n", style->f_font->name().c_str(), text);
     style->f_font->drawString(menu.frame, text_x, text_y,
                               (highlight ? style->h_text :
                                (item->isEnabled() ? style->f_text :

@@ -9,6 +9,7 @@ if XFT
 if XFT2
 else
 TMP_PROGS =	xftlsfonts
+xftlsfonts_SOURCES =	xftlsfonts.cc
 endif
 endif
 

@@ -34,6 +34,8 @@ noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \
 	openbox.h prop.h screen.h stacking.h xerror.h dispatch.h \
 	timer.h engine.h plugin.h action.h grab.h config.h menu.h parse.h
 
+lex.yy.h: lex.yy.c
+
 lex.yy.c: parse.l
 	$(FLEX) $^
 

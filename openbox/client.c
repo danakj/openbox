@@ -1697,7 +1697,8 @@ static ObStackingLayer calc_layer(ObClient *self)
     else if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
-        if (!self->below) l = OB_STACKING_LAYER_TOP;
+        if (self->above) l = OB_STACKING_LAYER_DOCK_ABOVE;
+        else if (self->below) l = OB_STACKING_LAYER_DOCK_BELOW;
         else l = OB_STACKING_LAYER_NORMAL;
     }
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;

@@ -66,9 +66,8 @@ ObFrame *frame_new()
     self->obscured = TRUE;
 
     /* create all of the decor windows */
-    mask = CWOverrideRedirect | CWEventMask;
+    mask = CWEventMask;
     attrib.event_mask = FRAME_EVENTMASK;
-    attrib.override_redirect = TRUE;
     self->window = createWindow(RootWindow(ob_display, ob_screen),
                                 mask, &attrib);
 

@@ -352,6 +352,11 @@ void python_init(char *argv0)
   PyRun_SimpleString("from _otk import *; from _openbox import *;");
   PyRun_SimpleString("openbox = Openbox_instance()");
 
+  /* XXX
+     sys.path.append('stuff')
+     install the .py wrappers, and include their path with this, then import em
+  */
+  
   // set up access to the python global variables
   PyObject *obmodule = PyImport_AddModule("__main__");
   obdict = PyModule_GetDict(obmodule);

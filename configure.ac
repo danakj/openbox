@@ -72,9 +72,7 @@ AC_CONFIG_FILES([Makefile
 		 plugins/placement/Makefile
 		 plugins/mouse/Makefile
 		 plugins/keyboard/Makefile
-		 plugins/menu/Makefile
-		 tools/Makefile
-		 tools/slit/Makefile])
+		 plugins/menu/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT

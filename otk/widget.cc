@@ -72,6 +72,7 @@ void OtkWidget::create(void)
                           _rect.y(), _rect.width(), _rect.height(), 0,
                           scr_info->getDepth(), InputOutput,
                           scr_info->getVisual(), create_mask, &attrib_create);
+  _ignore_config++;
 }
 
 void OtkWidget::setWidth(int w)
@@ -97,6 +98,7 @@ void OtkWidget::move(int x, int y)
 {
   _rect.setPos(x, y);
   XMoveWindow(otk::OBDisplay::display, _window, x, y);
+  _ignore_config++;
 }
 
 void OtkWidget::resize(const Point &to)
@@ -125,9 +127,9 @@ void OtkWidget::setGeometry(int x, int y, int width, int height)
 {
   _rect = Rect(x, y, width, height);
   _dirty = true;
-  _ignore_config++;
 
   XMoveResizeWindow(otk::OBDisplay::display, _window, x, y, width, height);
+  _ignore_config++;
 }
 
 void OtkWidget::show(void)
@@ -411,6 +413,7 @@ bool OtkWidget::configure(const XConfigureEvent &e)
     if (_ignore_config) {
       _ignore_config--;
     } else {
+      std::cout << "configure\n";
       _dirty = true;
       _rect.setRect(e.x, e.y, e.width, e.height);
       update();

@@ -63,8 +63,8 @@ int main(void) {
       if (e.type == Expose) {
         foo.expose(e.xexpose);
       } else if (e.type == ConfigureNotify) {
-        std::cout << "configure\n";
         foo.configure(e.xconfigure);
+        label.hide();
       }
     } 
   }

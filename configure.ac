@@ -21,6 +21,8 @@ AM_MAINTAINER_MODE
 OB_DEBUG
 # Pick compiler specific/build target flags, and set $CVS
 OB_COMPILER_FLAGS
+AC_C_CONST
+AC_C_INLINE
 
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)

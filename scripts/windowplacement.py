@@ -3,7 +3,7 @@
 ### ob.EventAction.PlaceWindow event.                                    ###
 ###                                                                      ###
 ### Also see historyplacement.py for the history placement module which  ###
-### provides an algorithm that can be used in place of, or alongside     ###
+### provides an algorithm that can be used in place of, or alongside,    ###
 ### these.                                                               ###
 ############################################################################
 
@@ -15,6 +15,7 @@ _rand = random.Random()
 
 def random(data):
     if not data.client: return
+    if data.client.positionRequested(): return
     client_area = data.client.area()
     frame_size = data.client.frame.size()
     screen_area = ob.openbox.screen(data.screen).area()

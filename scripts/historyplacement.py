@@ -11,6 +11,10 @@ import windowplacement # fallback routines
 # fallback - The window placement algorithm that will be used when history ###
 ###          placement does not have a place for the window.               ###
 fallback = windowplacement.random                                          ###
+# ignore_requested_positions - When true, the history algorithm will       ###
+###                            attempt to place windows even when they     ###
+###                            request a position (like XMMS).             ###
+ignore_requested_positions = 0                                             ###
 ###                                                                        ###
 # filename - The name of the file where history data will be stored. The   ###
 ###          number of the screen is appended onto this filename.          ###
@@ -40,16 +44,14 @@ class _state:
         return 0
 
 def _load(data):
+    global _data
     file = open(os.environ['HOME']+'/.openbox/'+filename+"."+str(data.screen),
                 'r')
     if file:
-        print "loading: "
         # read data
         for line in file.readlines():
             line = line[:-1] # drop the '\n'
             try:
-                print string.split(line, '\0')
-                print line.count('\0')
                 s = string.split(line, '\0')
                 state = _state(s[0], s[1], s[2],
                                string.atoi(s[3]), string.atoi(s[4]))
@@ -58,22 +60,17 @@ def _load(data):
                     _data.append([])
                 _data[data.screen].append(state)
                 
-                print "  "+s[0]+" "+s[1]+" "+s[2]
-                print "     " + str(s[3]) + "," + str(s[4])
             except ValueError:
-                print "ValueError"
                 pass
             except IndexError:
-                print "IndexError"
                 pass
-        print "DONE loading."
         file.close()
 
 def _save(data):
+    global _data
     file = open(os.environ['HOME']+'/.openbox/'+filename+"."+str(data.screen),
                 'w')
     if file:
-        print "saving: "
         while len(_data)-1 < data.screen:
             _data.append([])
         for i in _data[data.screen]:
@@ -82,49 +79,55 @@ def _save(data):
                        i.role + '\0' +
                        str(i.x) + '\0' +
                        str(i.y) + '\n')
-            print "  "+i.appname+" "+i.appclass+" "+i.role
-            print "     " + str(i.x) + "," + str(i.y)
-        print "DONE saving."
         file.close()
 
-def place(data):
-    print "placing"
-    if data.client:
-        state = _state(data.client.appName(), data.client.appClass(),
-                       data.client.role(), 0, 0)
-        while len(_data)-1 < data.screen:
+def _create_state(data):
+    global _data
+    area = data.client.area()
+    return _state(data.client.appName(), data.client.appClass(),
+                  data.client.role(), area.x(), area.y())
+
+def _find(screen, state):
+    global _data
+    try:
+        return _data[screen].index(state)
+    except ValueError:
+        return -1
+    except IndexError:
+        while len(_data)-1 < screen:
             _data.append([])
-        print "looking for :"
-        print "  " + state.appname
-        print "  " + state.appclass
-        print "  " + state.role
-        try:
-            i = _data[data.screen].index(state)
-            print "got it"
+        return _find(screen, state) # try again
+
+def place(data):
+    global _data
+    if data.client:
+        if not ignore_requested_positions:
+            if data.client.positionRequested(): return
+        state = _create_state(data)
+        print "looking for : " + state.appname +  " : " + state.appclass + \
+              " : " + state.role
+
+        i = _find(data.screen, state)
+        if i >= 0:
             coords = _data[data.screen][i]
             print "Found in history ("+str(coords.x)+","+str(coords.y)+")"
             data.client.move(coords.x, coords.y)
-        except ValueError:
+        else:
             print "No match in history"
-            fallback(data)
+            if fallback: fallback(data)
 
 def _save_window(data):
-    print "saving"
+    global _data
     if data.client:
-        area = data.client.area()
-        state = _state(data.client.appName(), data.client.appClass(),
-                       data.client.role(), area.x(), area.y())
-        while len(_data)-1 < data.screen:
-            _data.append([])
-        print "looking for :"
-        print "  " + state.appname
-        print "  " + state.appclass
-        print "  " + state.role
-        try:
-            i = _data[data.screen].index(state)
+        state = _create_state(data)
+        print "looking for : " + state.appname +  " : " + state.appclass + \
+              " : " + state.role
+
+        i = _find(data.screen, state)
+        if i >= 0:
             print "replacing"
             _data[data.screen][i] = state # replace it
-        except ValueError:
+        else:
             print "appending"
             _data[data.screen].append(state)
 

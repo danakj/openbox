@@ -20,6 +20,8 @@ void OtkFocusWidget::focus(void)
   if (_focused)
     return;
 
+  // XXX: what about OtkWidget::focus()
+
   assert(_focus_texture);
   OtkWidget::setTexture(_focus_texture);
   OtkWidget::update();

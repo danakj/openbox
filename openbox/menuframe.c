@@ -591,18 +591,22 @@ void menu_frame_show(ObMenuFrame *self, ObMenuFrame *parent)
     if (g_list_find(menu_frame_visible, self))
         return;
 
+    if (menu_frame_visible == NULL) {
+        /* no menus shown yet */
+        if (!grab_pointer(TRUE, OB_CURSOR_NONE))
+            return;
+        if (!grab_keyboard(TRUE)) {
+            grab_pointer(FALSE, OB_CURSOR_NONE);
+            return;
+        }
+    }
+
     if (parent) {
         if (parent->child)
             menu_frame_hide(parent->child);
         parent->child = self;
     }
     self->parent = parent;
-
-    if (menu_frame_visible == NULL) {
-        /* no menus shown yet */
-        grab_pointer(TRUE, OB_CURSOR_NONE);
-        grab_keyboard(TRUE);
-    }
 
     /* determine if the underlying menu is already visible */
     for (it = menu_frame_visible; it; it = g_list_next(it)) {

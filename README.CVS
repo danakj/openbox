@@ -35,3 +35,8 @@ Here's the packages from Debian (sid):
   libxft2-dev
   python-dev
   swig1.3
+
+
+----
+Check out the Wiki for how to configure Openbox 3:
+http://icculus.org/openbox/phpwiki/index.php/PythonScripting

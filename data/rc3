@@ -295,12 +295,6 @@
     </mousebind>
   </context>
   <context name="root">
-    <mousebind button="Up" action="click">
-      <action name="desktopright"/>
-    </mousebind>
-    <mousebind button="Down" action="click">
-      <action name="desktopleft"/>
-    </mousebind>
     <mousebind button="A-Up" action="click">
       <action name="desktopright"/>
     </mousebind>

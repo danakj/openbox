@@ -54,7 +54,8 @@ void client_startup()
 
     /* save the stacking order on startup! */
     PROP_GETA32(ob_root, net_client_list_stacking, window,
-                &client_startup_stack_order, &client_startup_stack_size);
+                (guint32**)&client_startup_stack_order,
+                &client_startup_stack_size);
 
     client_set_list();
 }
@@ -79,7 +80,7 @@ void client_set_list()
     } else
 	windows = NULL;
 
-    PROP_SETA32(ob_root, net_client_list, window, windows, size);
+    PROP_SETA32(ob_root, net_client_list, window, (guint32*)windows, size);
 
     if (windows)
 	g_free(windows);
@@ -542,9 +543,9 @@ static void client_get_area(Client *self)
 
 static void client_get_desktop(Client *self)
 {
-    unsigned int d;
+    guint32 d;
 
-    if (PROP_GET32(self->window, net_wm_desktop, cardinal, d)) {
+    if (PROP_GET32(self->window, net_wm_desktop, cardinal, &d)) {
 	if (d >= screen_num_desktops && d != DESKTOP_ALL)
 	    d = screen_num_desktops - 1;
 	self->desktop = d;
@@ -556,7 +557,7 @@ static void client_get_desktop(Client *self)
 
 static void client_get_state(Client *self)
 {
-    Atom *state;
+    guint32 *state;
     guint num;
   
     self->modal = self->shaded = self->max_horz = self->max_vert =
@@ -688,7 +689,7 @@ static void client_get_mwm_hints(Client *self)
 void client_get_type(Client *self)
 {
     guint num, i;
-    Atom *val;
+    guint32 *val;
 
     self->type = -1;
   
@@ -738,7 +739,7 @@ void client_get_type(Client *self)
 
 void client_update_protocols(Client *self)
 {
-    Atom *proto;
+    guint32 *proto;
     guint num_return, i;
 
     self->focus_notify = FALSE;
@@ -949,7 +950,7 @@ void client_setup_decor_and_functions(Client *self)
 
 static void client_change_allowed_actions(Client *self)
 {
-    Atom actions[9];
+    guint32 actions[9];
     int num = 0;
 
     actions[num++] = prop_atoms.net_wm_action_change_desktop;
@@ -1213,7 +1214,7 @@ void client_update_icons(Client *self)
 void client_update_kwm_icon(Client *self)
 {
     guint num;
-    Pixmap *data;
+    guint32 *data;
 
     if (!PROP_GETA32(self->window, kwm_win_icon, kwm_win_icon, &data, &num)) {
 	self->pixmap_icon = self->pixmap_icon_mask = None;
@@ -1231,9 +1232,9 @@ void client_update_kwm_icon(Client *self)
 
 static void client_change_state(Client *self)
 {
-    unsigned long state[2];
-    Atom netstate[10];
-    int num;
+    guint32 state[2];
+    guint32 netstate[10];
+    guint num;
 
     state[0] = self->wmstate;
     state[1] = None;
@@ -1597,7 +1598,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
         h = screen_area(self->desktop)->height / 2;
 
 	if (PROP_GETA32(self->window, openbox_premax, cardinal,
-                        dimensions, &num)) {
+                        &dimensions, &num)) {
             if (num == 4) {
                 x = dimensions[0];
                 y = dimensions[1];
@@ -1715,7 +1716,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 	    /* get the property off the window and use it for the dimensions
 	       we are already maxed on */
 	    if (PROP_GETA32(self->window, openbox_premax, cardinal,
-			    &readdim, &num)) {
+			    (guint32**)&readdim, &num)) {
                 if (num == 4) {
                     if (self->max_horz) {
                         dimensions[0] = readdim[0];
@@ -1730,7 +1731,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 	    }
 
 	    PROP_SETA32(self->window, openbox_premax, cardinal,
-			dimensions, 4);
+			(guint32*)dimensions, 4);
 	}
     } else {
         guint num;
@@ -1749,7 +1750,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
         }
 
 	if (PROP_GETA32(self->window, openbox_premax, cardinal,
-			&dimensions, &num)) {
+			(guint32**)&dimensions, &num)) {
             if (num == 4) {
                 if (dir == 0 || dir == 1) { /* horz */
                     x = dimensions[0];

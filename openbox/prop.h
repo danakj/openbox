@@ -153,9 +153,9 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
 		  long data2, long data3);
 
 #define PROP_GET32(win, prop, type, ret) \
-    (prop_get32(win, prop_atoms.prop, prop_atoms.type, (guint32*)ret))
+    (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))
 #define PROP_GETA32(win, prop, type, ret, nret) \
-    (prop_get_array32(win, prop_atoms.prop, prop_atoms.type, (guint32**)ret, \
+    (prop_get_array32(win, prop_atoms.prop, prop_atoms.type, ret, \
                       nret))
 #define PROP_GETS(win, prop, type, ret) \
     (prop_get_string_##type(win, prop_atoms.prop, ret))
@@ -165,7 +165,7 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
 #define PROP_SET32(win, prop, type, val) \
     prop_set32(win, prop_atoms.prop, prop_atoms.type, val)
 #define PROP_SETA32(win, prop, type, val, num) \
-    prop_set_array32(win, prop_atoms.prop, prop_atoms.type, (guint32*)val, num)
+    prop_set_array32(win, prop_atoms.prop, prop_atoms.type, val, num)
 #define PROP_SETS(win, prop, val) \
     prop_set_string_utf8(win, prop_atoms.prop, val)
 #define PROP_SETSS(win, prop, strs) \

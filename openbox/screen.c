@@ -312,7 +312,7 @@ void screen_update_layout()
     screen_desktop_layout.rows = 1;
     screen_desktop_layout.columns = screen_num_desktops;
 
-    if (PROP_GETA32(ob_root, net_desktop_layout, cardinal, data, &num)) {
+    if (PROP_GETA32(ob_root, net_desktop_layout, cardinal, &data, &num)) {
         if (num == 3 || num == 4) {
             if (data[0] == prop_atoms.net_wm_orientation_vert)
                 screen_desktop_layout.orientation = data[0];

@@ -231,7 +231,7 @@ void epist::addAction(Action::ActionType act, unsigned int modifiers,
 
 
 void epist::addAction(Action::ActionType act, unsigned int modifiers,
-                      string key, std::string str) {
+                      string key, string str) {
   _actions.push_back(Action(act, XKeysymToKeycode(getXDisplay(),
                                                   XStringToKeysym(key.c_str())),
                             modifiers, str));

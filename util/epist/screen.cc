@@ -453,7 +453,7 @@ void screen::updateActiveWindow() {
 }
 
 
-void screen::execCommand(const std::string &cmd) const {
+void screen::execCommand(const string &cmd) const {
   pid_t pid;
   if ((pid = fork()) == 0) {
     extern char **environ;

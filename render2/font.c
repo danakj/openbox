@@ -58,7 +58,7 @@ void RrFontRenderString(struct RrSurface *sur, struct RrFont *font,
 {
     struct GlftColor col;
     int fh = RrFontHeight(font);
-    int l, m;
+    int l, mw, mh;
     GString *text;
     int shortened = 0;
 
@@ -81,16 +81,18 @@ void RrFontRenderString(struct RrSurface *sur, struct RrFont *font,
 
     text = g_string_new(string);
     l = g_utf8_strlen(text->str, -1);
-    m = RrFontMeasureString(font, text->str);
+    GlftMeasureString(font->font, text->str, strlen(text->str), &mw, &mh);
     if (font->elipses > w)
         l = 0; /* nothing fits.. */
     else {
-        while (l && m > w) {
+        while (l && mw > w) {
             shortened = 1;
             /* remove a character from the middle */
             text = g_string_erase(text, l-- / 2, 1);
             /* if the elipses are too large, don't show them at all */
-            m = RrFontMeasureString(font, text->str) + font->elipses;
+            GlftMeasureString(font->font, text->str, strlen(text->str),
+                              &mw, &mh);
+            mw += font->elipses;
         }
         if (shortened) {
             text = g_string_insert(text, (l + 1) / 2, ELIPSES);
@@ -98,6 +100,10 @@ void RrFontRenderString(struct RrSurface *sur, struct RrFont *font,
         }
     }
     if (!l) return;
+
+    /* center in the font's height's area based on the measured height of the
+       specific string */
+    y += (fh - mh) / 2;
 
     switch (layout) {
     case RR_TOP_LEFT:
@@ -107,12 +113,12 @@ void RrFontRenderString(struct RrSurface *sur, struct RrFont *font,
     case RR_TOP:
     case RR_CENTER:
     case RR_BOTTOM:
-        x += (w - m) / 2;
+        x += (w - mw) / 2;
         break;
     case RR_TOP_RIGHT:
     case RR_RIGHT:
     case RR_BOTTOM_RIGHT:
-        x += w - m;
+        x += w - mw;
         break;
     }
 

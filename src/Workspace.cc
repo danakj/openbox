@@ -71,6 +71,7 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
   lastfocus = (BlackboxWindow *) 0;
 
   setName("");
+  fprintf(stderr, "WORKSPACE NAME: %s\n", name.c_str());
 }
 
 
@@ -435,12 +436,12 @@ void Workspace::setName(const string& new_name) {
   XAtom::StringVect namesList;
   unsigned long numnames = (unsigned) -1;
   if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
-                      XAtom::utf8, numnames, namesList)) {
-    if (namesList.size() > id)
-      namesList[id] = name;
-    else
-      namesList.push_back(name);
-  }
+                      XAtom::utf8, numnames, namesList) &&
+      namesList.size() > id)
+    namesList[id] = name;
+  else
+    namesList.push_back(name);
+
   xatom->setValue(screen->getRootWindow(), XAtom::net_desktop_names,
                   XAtom::utf8, namesList);
 

@@ -31,6 +31,8 @@ def _new_win(data):
 
     if _doing_stacked:
         _clients.insert(_clients.index(_cyc_w), data.client.window())
+        _create_popup_list(data)
+        _hilite_popup_list()
     else:
         if not len(_clients):
             _clients.append(data.client.window())
@@ -49,8 +51,9 @@ def _close_win(data):
         # have to fix the cycling if we remove anything
         win = data.client.window()
         if _cyc_w == win:
-            _do_stacked_cycle(data) # cycle off the window first
+            _do_stacked_cycle(data, 1) # cycle off the window first, forward
         _clients.remove(win)
+        _create_popup_list(data)
 
 def _focused(data):
     global _clients
@@ -65,13 +68,7 @@ def _focused(data):
             _clients.insert(0, win)
         else: # if we are cycling, then update our pointer
             _cyc_w = data.client.window()
-            global _list_widget, _list_labels, _list_windows
-            if _list_widget:
-                i = 0
-                for w in _list_windows:
-                    if w == _cyc_w: _list_labels[i].focus()
-                    else: _list_labels[i].unfocus()
-                    i += 1
+            _hilite_popup_list()
     elif fallback: 
         # pass around focus
         desktop = ob.openbox.screen(_cyc_screen).desktop()
@@ -125,15 +122,75 @@ def _focus_stacked_ungrab(data):
                 client = ob.openbox.findClient(_cyc_w)
                 if client:
                     ob.openbox.screen(data.screen).raiseWindow(client)
-            global _list_widget, _list_labels, _list_windows
-            if _list_widget:
-                _list_windows = []
-                _list_labels = []
-                _list_widget = 0
+            _destroy_popup_list()
 
 _list_widget = 0
 _list_labels = []
 _list_windows = []
+
+def _hilite_popup_list():
+    global _cyc_w
+    global _list_widget, _list_labels, _list_windows
+    if _list_widget:
+        i = 0
+        for w in _list_windows:
+            if w == _cyc_w: _list_labels[i].focus()
+            else: _list_labels[i].unfocus()
+            i += 1
+
+def _destroy_popup_list():
+    global _list_widget, _list_labels, _list_windows
+    if _list_widget:
+        _list_windows = []
+        _list_labels = []
+        _list_widget = 0
+    
+def _create_popup_list(data):
+    global _list_widget, _list_labels, _list_windows, _clients
+
+    if _list_widget:
+        _destroy_popup_list()
+    
+    style = ob.openbox.screen(data.screen).style()
+    _list_widget = otk.Widget(ob.openbox, style,
+                              otk.Widget.Vertical, 0,
+                              style.bevelWidth(), 1)
+    t = style.titlebarFocusBackground()
+    _list_widget.setTexture(t)
+
+    titles = []
+    font = style.labelFont()
+    height = font.height()
+    longest = 0
+    for c in _clients:
+        client = ob.openbox.findClient(c)
+        desktop = ob.openbox.screen(data.screen).desktop()
+        if client and (client.desktop() == desktop and \
+                       client.normal()):
+            t = client.title()
+            if len(t) > 50: # limit the length of titles
+                t = t[:24] + "..." + t[-24:]
+            titles.append(t)
+            _list_windows.append(c)
+            l = font.measureString(t) + 10 # add margin
+            if l > longest: longest = l
+    if len(titles):
+        for t in titles:
+            w = otk.FocusLabel(_list_widget)
+            w.resize(longest, height)
+            w.setText(t)
+            w.unfocus()
+            _list_labels.append(w)
+        _list_labels[0].focus()
+        _list_widget.update()
+        area = otk.display.screenInfo(data.screen).rect()
+        _list_widget.move(area.x() + (area.width() -
+                                      _list_widget.width()) / 2,
+                          area.y() + (area.height() -
+                                      _list_widget.height()) / 2)
+        _list_widget.show(1)
+    else:
+        _list_widget = 0 #nothing to list
 
 def focus_next_stacked(data, forward=1):
     """Focus the next (or previous, with forward=0) window in a stacked
@@ -156,49 +213,7 @@ def focus_next_stacked(data, forward=1):
 
         global cycle_popup_list
         if cycle_popup_list:
-            global _list_widget, _list_labels
-            if not _list_widget: # make the widget list
-                style = ob.openbox.screen(data.screen).style()
-                _list_widget = otk.Widget(ob.openbox, style,
-                                          otk.Widget.Vertical, 0,
-                                          style.bevelWidth(), 1)
-                t = style.titlebarFocusBackground()
-                _list_widget.setTexture(t)
-
-                titles = []
-                font = style.labelFont()
-                height = font.height()
-                longest = 0
-                for c in _clients:
-                    client = ob.openbox.findClient(c)
-                    screen = ob.openbox.screen(data.screen)
-                    desktop = screen.desktop()
-                    if client and (client.desktop() == desktop and \
-                                   client.normal()):
-                        t = client.title()
-                        if len(t) > 50: # limit the length of titles
-                            t = t[:24] + "..." + t[-24:]
-                        titles.append(t)
-                        _list_windows.append(c)
-                        l = font.measureString(t) + 10 # add margin
-                        if l > longest: longest = l
-                if len(titles):
-                    for t in titles:
-                        w = otk.FocusLabel(_list_widget)
-                        w.resize(longest, height)
-                        w.setText(t)
-                        w.unfocus()
-                        _list_labels.append(w)
-                    _list_labels[0].focus()
-                    _list_widget.update()
-                    area = screen.area()
-                    _list_widget.move(area.x() + (area.width() -
-                                                  _list_widget.width()) / 2,
-                                      area.y() + (area.height() -
-                                                  _list_widget.height()) / 2)
-                    _list_widget.show(1)
-                else:
-                    _list_widget = 0 #nothing to list
+            _create_popup_list(data)
 
         ob.kgrab(data.screen, _focus_stacked_ungrab)
         focus_next_stacked(data, forward) # start with the first press

@@ -42,13 +42,17 @@
 #  include <sys/types.h>
 #endif
 
+#ifdef USE_SM
 #include <X11/SM/SMlib.h>
+#endif
+
 #include <X11/cursorfont.h>
 
-#define SM_ERR_LEN 1024
-
+#ifdef USE_SM
 SmcConn     ob_sm_conn;
 gchar      *ob_sm_id = NULL;
+#endif
+
 RrInstance *ob_rr_inst = NULL;
 RrTheme    *ob_rr_theme = NULL;
 Display    *ob_display = NULL;
@@ -65,11 +69,17 @@ char       *ob_rc_path  = NULL;
 
 static void signal_handler(const ObEvent *e, void *data);
 static void parse_args(int argc, char **argv);
+
+static void sm_startup(int argc, char **argv);
+static void sm_shutdown();
+
+#ifdef USE_SM
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast);
 static void sm_die(SmcConn conn, SmPointer data);
 static void sm_save_complete(SmcConn conn, SmPointer data);
 static void sm_shutdown_cancelled(SmcConn conn, SmPointer data);
+#endif
 static void exit_with_error(gchar *msg);
 
 int main(int argc, char **argv)
@@ -79,8 +89,6 @@ int main(int argc, char **argv)
     char *path;
     xmlDocPtr doc;
     xmlNodePtr node;
-    SmcCallbacks cb;
-    char sm_err[SM_ERR_LEN];
 
     ob_state = State_Starting;
 
@@ -128,67 +136,7 @@ int main(int argc, char **argv)
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         exit_with_error("Failed to set display as close-on-exec.");
 
-    cb.save_yourself.callback = sm_save_yourself;
-    cb.save_yourself.client_data = NULL;
-
-    cb.die.callback = sm_die;
-    cb.die.client_data = NULL;
-
-    cb.save_complete.callback = sm_save_complete;
-    cb.save_complete.client_data = NULL;
-
-    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
-    cb.shutdown_cancelled.client_data = NULL;
-
-    ob_sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
-                                   SmcSaveYourselfProcMask |
-                                   SmcDieProcMask |
-                                   SmcSaveCompleteProcMask |
-                                   SmcShutdownCancelledProcMask,
-                                   &cb, ob_sm_id, &ob_sm_id,
-                                   SM_ERR_LEN, sm_err);
-    if (ob_sm_conn == NULL)
-        g_warning("Failed to connect to session manager: %s", sm_err);
-    else {
-        SmPropValue val_cmd;
-        SmPropValue val_res;
-        SmPropValue val_prog;
-        SmPropValue val_uid;
-        SmProp prop_cmd = { SmCloneCommand, "SmLISTofARRAY8", 1, };
-        SmProp prop_res = { SmRestartCommand, "SmLISTofARRAY8", 1, };
-        SmProp prop_prog = { SmProgram, "SmARRAY8", 1, };
-        SmProp prop_uid = { SmUserID, "SmARRAY8", 1, };
-        SmProp *props[4];
-        gchar *user;
-
-        val_cmd.value = argv[0];
-        val_cmd.length = strlen(argv[0]);
-        val_res.value = argv[0];
-        val_res.length = strlen(argv[0]); /* XXX -id foo */
-        val_prog.value = argv[0];
-        val_prog.length = strlen(argv[0]);
-
-        user = g_strdup_printf("%ld", (long)getuid());
-        val_uid.value = user;
-        val_uid.length = strlen(user);
-
-        prop_cmd.vals = &val_cmd;
-        prop_res.vals = &val_res;
-        prop_prog.vals = &val_prog;
-        prop_uid.vals = &val_uid;
-
-        props[0] = &prop_cmd;
-        props[1] = &prop_res;
-        props[2] = &prop_prog;
-        props[3] = &prop_uid;
-
-        SmcSetProperties(ob_sm_conn, 3, props);
-
-        g_free(user);
-
-        g_message("Connected to session manager with id %s", ob_sm_id);
-    }
-    g_free (ob_sm_id);
+    sm_startup(argc, argv);
 
 #ifdef USE_LIBSN
     ob_sn_display = sn_display_new(ob_display, NULL, NULL);
@@ -307,8 +255,8 @@ int main(int argc, char **argv)
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
-    if (ob_sm_conn)
-        SmcCloseConnection(ob_sm_conn, 0, NULL);
+    sm_shutdown();
+
     XCloseDisplay(ob_display);
 
     if (ob_restart) {
@@ -333,6 +281,85 @@ int main(int argc, char **argv)
     }
      
     return 0;
+}
+
+static void sm_startup(int argc, char **argv)
+{
+#ifdef USE_SM
+
+#define SM_ERR_LEN 1024
+
+    SmcCallbacks cb;
+    char sm_err[SM_ERR_LEN];
+
+    cb.save_yourself.callback = sm_save_yourself;
+    cb.save_yourself.client_data = NULL;
+
+    cb.die.callback = sm_die;
+    cb.die.client_data = NULL;
+
+    cb.save_complete.callback = sm_save_complete;
+    cb.save_complete.client_data = NULL;
+
+    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
+    cb.shutdown_cancelled.client_data = NULL;
+
+    ob_sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
+                                   SmcSaveYourselfProcMask |
+                                   SmcDieProcMask |
+                                   SmcSaveCompleteProcMask |
+                                   SmcShutdownCancelledProcMask,
+                                   &cb, ob_sm_id, &ob_sm_id,
+                                   SM_ERR_LEN, sm_err);
+    if (ob_sm_conn == NULL)
+        g_warning("Failed to connect to session manager: %s", sm_err);
+    else {
+        SmPropValue val_cmd;
+        SmPropValue val_res;
+        SmPropValue val_prog;
+        SmPropValue val_uid;
+        SmProp prop_cmd = { SmCloneCommand, "SmLISTofARRAY8", 1, };
+        SmProp prop_res = { SmRestartCommand, "SmLISTofARRAY8", 1, };
+        SmProp prop_prog = { SmProgram, "SmARRAY8", 1, };
+        SmProp prop_uid = { SmUserID, "SmARRAY8", 1, };
+        SmProp *props[4];
+
+        val_cmd.value = argv[0];
+        val_cmd.length = strlen(argv[0]);
+        val_res.value = argv[0];
+        val_res.length = strlen(argv[0]); /* XXX -id foo */
+        val_prog.value = argv[0];
+        val_prog.length = strlen(argv[0]);
+
+        val_uid.value = g_strdup_printf("%ld", (long)getuid());
+        val_uid.length = strlen(val_uid.value);
+
+        prop_cmd.vals = &val_cmd;
+        prop_res.vals = &val_res;
+        prop_prog.vals = &val_prog;
+        prop_uid.vals = &val_uid;
+
+        props[0] = &prop_cmd;
+        props[1] = &prop_res;
+        props[2] = &prop_prog;
+        props[3] = &prop_uid;
+
+        SmcSetProperties(ob_sm_conn, 3, props);
+
+        g_free(val_uid.value);
+
+        g_message("Connected to session manager with id %s", ob_sm_id);
+    }
+    g_free (ob_sm_id);
+#endif
+}
+
+static void sm_shutdown()
+{
+#ifdef USE_SM
+    if (ob_sm_conn)
+        SmcCloseConnection(ob_sm_conn, 0, NULL);
+#endif
 }
 
 static void signal_handler(const ObEvent *e, void *data)
@@ -417,6 +444,7 @@ gboolean ob_pointer_pos(int *x, int *y)
     return !!XQueryPointer(ob_display, ob_root, &w, &w, x, y, &i, &i, &u);
 }
 
+#ifdef USE_SM
 static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
                              Bool shutdown, int interact_style, Bool fast)
 {
@@ -439,11 +467,11 @@ static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
 {
     g_message("got SHUTDOWN CANCELLED from session manager");
 }
+#endif
 
 static void exit_with_error(gchar *msg)
 {
     g_critical(msg);
-    if (ob_sm_conn)
-        SmcCloseConnection(ob_sm_conn, 1, &msg);
+    sm_shutdown();
     exit(EXIT_FAILURE);
 }

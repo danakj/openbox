@@ -32,7 +32,9 @@
 #  include <signal.h>
 #endif
 
+#ifdef USE_SM
 #include <X11/ICE/ICElib.h>
+#endif
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
@@ -41,8 +43,10 @@ static void event_handle_dockapp(DockApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, Client *c, XEvent *e);
 static void fd_event_handle();
+#ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
                       IcePointer *watch_data);
+#endif
 static void find_max_fd();
 
 #define INVALID_FOCUSIN(e) ((e)->xfocus.detail == NotifyInferior || \
@@ -69,11 +73,15 @@ static const int mask_table[] = {
 static int mask_table_size;
 
 static fd_set selset, allset;
+#ifdef USE_SM
 static IceConn ice_conn;
-static int max_fd, x_fd, ice_fd;
+static int ice_fd;
+#endif
+static int max_fd, x_fd;
 static GData *fd_handler_list;
 
 
+#ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
                       IcePointer *watch_data)
 {
@@ -88,6 +96,7 @@ static void ice_watch(IceConn conn, IcePointer data, Bool opening,
     }
     find_max_fd();
 }
+#endif
 
 void event_startup()
 {
@@ -120,8 +129,10 @@ void event_startup()
     max_fd = x_fd = ConnectionNumber(ob_display);
     FD_SET(x_fd, &allset);
 
+#ifdef USE_SM
     ice_fd = -1;
     IceAddConnectionWatch(ice_watch, NULL);
+#endif
 
     g_datalist_init(&fd_handler_list);
 }
@@ -179,10 +190,12 @@ void event_loop()
         if (FD_ISSET(x_fd, &selset))
             return;
 
+#ifdef USE_SM
         if (ice_fd >= 0 && FD_ISSET(ice_fd, &selset)) {
             Bool b;
             IceProcessMessages(ice_conn, NULL, &b);
         }
+#endif
 
         fd_event_handle();
     }
@@ -1036,7 +1049,9 @@ static void find_max_fd()
   int tmpmax = -1;
   g_datalist_foreach(&fd_handler_list, find_max_fd_foreach, (gpointer)&tmpmax);
   max_fd = MAX(x_fd, tmpmax);
+#ifdef USE_SM
   max_fd = MAX(ice_fd, tmpmax);
+#endif
 }
 
 void event_remove_fd(int n)

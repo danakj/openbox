@@ -5,8 +5,9 @@ plugindir=$(libdir)/openbox/plugins
 binary=openbox3
 url=http://openbox.org/
 
-CPPFLAGS=$(X_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
-         $(LIBSN_CFLAGS) $(GL_CFLAGS) $(XML_CFLAGS) @CPPFLAGS@ \
+CPPFLAGS=$(X_CFLAGS) $(SM_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) \
+         $(GMODULE_CFLAGS) $(LIBSN_CFLAGS) $(GL_CFLAGS) $(XML_CFLAGS) \
+         @CPPFLAGS@ \
          -DLOCALEDIR=\"$(localedir)\" \
          -DPLUGINDIR=\"$(plugindir)\" \
          -DRCDIR=\"$(rcdir)\" \
@@ -14,9 +15,9 @@ CPPFLAGS=$(X_CFLAGS) $(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
          -DBINARY=\"$(binary)\"
 
 INCLUDES=-I..
-LIBS=$(X_LIBS) $(XFT_LIBS) $(XINERAMA_LIBS) $(XKB_LIBS) $(XRANDR_LIBS) \
-	$(VIDMODE_LIBS) $(XSHAPE_LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) \
-	$(LIBSN_LIBS) $(XML_LIBS) @LIBS@ @LIBINTL@
+LIBS=$(X_LIBS) $(SM_LIBS) $(XFT_LIBS) $(XINERAMA_LIBS) $(XKB_LIBS) \
+	$(XRANDR_LIBS) $(VIDMODE_LIBS) $(XSHAPE_LIBS) $(GLIB_LIBS) \
+	$(GMODULE_LIBS) $(LIBSN_LIBS) $(XML_LIBS) @LIBS@ @LIBINTL@
 
 bin_PROGRAMS=$(binary)
 

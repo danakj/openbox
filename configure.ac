@@ -93,6 +93,9 @@ PKG_CHECK_MODULES(GTK, [gtk+-2.0],
 )
 AM_CONDITIONAL(OBCONF, [test "$use_gtk" = "yes" && test "$use_glade" = "yes"])
 
+# Check for session management
+X11_SM
+
 # Check for X11 extensions
 X11_EXT_XKB
 X11_EXT_XRANDR

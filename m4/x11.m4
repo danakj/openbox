@@ -13,8 +13,8 @@ AC_DEFUN([X11_DEVEL],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  X_LIBS="$X_LIBS -lX11"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
+  X_LIBS="$X_PRE_LIBS $X_LIBS -lX11"
+  LIBS="$LIBS $X_LIBS"
 
   # Check for required functions in -lX11
   AC_CHECK_LIB(
@@ -23,7 +23,7 @@ AC_DEFUN([X11_DEVEL],
     AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
   )
 
-  # Restore the old values. Use X_CFLAGS and X_PRE_LIBS X_LIBS X_EXTRA_LIBS in
+  # Restore the old values. Use X_CFLAGS and X_LIBS in
   # the Makefiles
   LIBS=$OLDLIBS
   CPPFLAGS=$OLDCPPFLAGS
@@ -192,7 +192,7 @@ AC_DEFUN([X11_EXT_XKB],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
+  LIBS="$LIBS $X_LIBS"
 
   AC_CHECK_LIB([X11], [XkbBell],
     AC_MSG_CHECKING([for X11/XKBlib.h])
@@ -248,7 +248,7 @@ AC_DEFUN([X11_EXT_XRANDR],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext -lXrender -lXrandr"
+  LIBS="$LIBS $X_LIBS -lXext -lXrender -lXrandr"
 
   AC_CHECK_LIB([Xrandr], [XRRSelectInput],
     AC_MSG_CHECKING([for X11/extensions/Xrandr.h])
@@ -305,7 +305,7 @@ AC_DEFUN([X11_EXT_SHAPE],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
+  LIBS="$LIBS $X_LIBS"
 
   AC_CHECK_LIB([Xext], [XShapeCombineShape],
     AC_MSG_CHECKING([for X11/extensions/shape.h])
@@ -360,7 +360,7 @@ AC_DEFUN([X11_EXT_XINERAMA],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext"
+  LIBS="$LIBS $X_LIBS -lXext"
 
   AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
   [
@@ -411,7 +411,7 @@ AC_DEFUN([X11_EXT_VIDMODE],
   OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext -lXxf86vm"
+  LIBS="$LIBS $X_LIBS -lXext -lXxf86vm"
 
   AC_CHECK_LIB([Xxf86vm], [XF86VidModeGetViewPort],
     AC_MSG_CHECKING([for X11/extensions/xf86vmode.h])
@@ -447,6 +447,51 @@ AC_DEFUN([X11_EXT_VIDMODE],
 
   AC_MSG_CHECKING([for the VidMode extension])
   if test "$VIDMODE" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+# X11_SM()
+#
+# Check for the presence of SMlib for session management.
+# Defines "USE_SM" if SMlib is present.
+AC_DEFUN([X11_SM],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  AC_ARG_ENABLE([session-management],
+  [  --disable-session-management  build without support for session managers],
+  [SM=$enableval], [SM="yes"])
+  
+  if test "$SM" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
+     
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS"
+
+    SM="no"
+
+    AC_CHECK_LIB([SM], [SmcSaveYourselfDone], [
+      AC_CHECK_HEADERS([X11/SM/SMlib.h], [
+        SM_CFLAGS="$X_CFLAGS"
+        SM_LIBS="-lSM -lICE"
+        AC_DEFINE(USE_SM)
+        AC_SUBST(SM_CFLAGS)
+        AC_SUBST(SM_LIBS)
+        SM="yes"
+      ])
+    ])
+  fi
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
+  AC_MSG_CHECKING([for session management support])
+  if test "$SM" = "yes"; then
     AC_MSG_RESULT([yes])
   else
     AC_MSG_RESULT([no])

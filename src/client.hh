@@ -617,14 +617,14 @@ BB    @param window The window id that the Client class should handle
   //! Returns the client's strut definition
   inline const otk::Strut &strut() const { return _strut; }
 
-  //! Move the client window
+  //! Move the window (actually, its frame) to a position.
   /*!
+    This moves the window so that the top-left corner of its frame will be at
+    the position specified.
     @param x The X coordinate to move to.
     @param y The Y coordinate to move to.
-    @param bool framepos True if the frame should be moved to the position
-                instead of the client. This makes it ignore the gravity.
   */
-  void move(int x, int y, bool framepos = false);
+  void move(int x, int y);
   
   //! Resizes the client window, anchoring it in a given corner
   /*!

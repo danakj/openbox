@@ -1146,11 +1146,11 @@ void Client::internal_resize(Corner anchor, int w, int h, bool user,
 }
 
 
-void Client::move(int x, int y, bool framepos)
+void Client::move(int x, int y)
 {
   if (!(_functions & Func_Move)) return;
-  if (framepos)
-    frame->frameGravity(x, y);
+  frame->frameGravity(x, y); // get the client's position based on x,y for the
+                             // frame
   internal_move(x, y);
 }
 

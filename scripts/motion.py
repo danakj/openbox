@@ -134,7 +134,7 @@ def _do_move():
         # draw the outline ...
         f=0
     else:
-        _client.move(x, y, 1) # move the *frame*
+        _client.move(x, y)
 
     global move_popup
     if move_popup:

@@ -1,13 +1,12 @@
 extern "C" {
 #include <stdio.h>
+#include <string.h>
 }
 
 #include "parser.hh"
-
 #include <string>
 
 using std::string;
-
 
 parser::parser(keytree *kt)
     : _kt(kt), _mask(0), _action(Action::noaction), _key(""), _arg("") 
@@ -35,7 +34,7 @@ void parser::parse(string rc_file)
 void parser::setAction(string act)
 {
     struct {
-        string str;
+        const char* str;
         Action::ActionType act;
     }
     actions[] = {
@@ -47,36 +46,36 @@ void parser::setAction(string act)
         { "close", Action::close },
         { "toggleshade", Action::toggleshade },
         { "toggleomnipresent", Action::toggleomnipresent },
-        { "moveWindowUp", Action::moveWindowUp },
-        { "moveWindowDown", Action::moveWindowDown },
-        { "moveWindowLeft", Action::moveWindowLeft },
-        { "moveWindowRight", Action::moveWindowRight },
-        { "resizeWindowWidth", Action::resizeWindowWidth },
-        { "resizeWindowHeight", Action::resizeWindowHeight },
-        { "toggleMaximizeFull", Action::toggleMaximizeFull },
-        { "toggleMaximizeVertical", Action::toggleMaximizeVertical },
-        { "toggleMaximizeHorizontal", Action::toggleMaximizeHorizontal },
-        { "sendToWorkspace", Action::sendToWorkspace },
-        { "nextWindow", Action::nextWindow },
-        { "prevWindow", Action::prevWindow },
-        { "nextWindowOnAllWorkspaces", Action::nextWindowOnAllWorkspaces },
-        { "prevWindowOnAllWorkspaces", Action::prevWindowOnAllWorkspaces },
-        { "nextWindowOnAllScreens", Action::nextWindowOnAllScreens },
-        { "prevWindowOnAllScreens", Action::prevWindowOnAllScreens },
-        { "nextWindowOfClass", Action::nextWindowOfClass },
-        { "prevWindowOfClass", Action::prevWindowOfClass },
-        { "nextWindowOfClassOnAllWorkspaces", Action::nextWindowOfClassOnAllWorkspaces },
-        { "prevWindowOfClassOnAllWorkspaces", Action::prevWindowOfClassOnAllWorkspaces },
-        { "changeWorkspace", Action::changeWorkspace },
-        { "nextWorkspace", Action::nextWorkspace },
-        { "prevWorkspace", Action::prevWorkspace },
-        { "nextScreen", Action::nextScreen },
-        { "prevScreen", Action::prevScreen },
-        { "showRootMenu", Action::showRootMenu },
-        { "showWorkspaceMenu", Action::showWorkspaceMenu },
-        { "stringChain", Action::stringChain },
-        { "keyChain", Action::keyChain },
-        { "numberChain", Action::numberChain },
+        { "movewindowup", Action::moveWindowUp },
+        { "movewindowdown", Action::moveWindowDown },
+        { "movewindowleft", Action::moveWindowLeft },
+        { "movewindowright", Action::moveWindowRight },
+        { "resizewindowwidth", Action::resizeWindowWidth },
+        { "resizewindowheight", Action::resizeWindowHeight },
+        { "togglemaximizefull", Action::toggleMaximizeFull },
+        { "togglemaximizevertical", Action::toggleMaximizeVertical },
+        { "togglemaximizehorizontal", Action::toggleMaximizeHorizontal },
+        { "sendtoworkspace", Action::sendToWorkspace },
+        { "nextwindow", Action::nextWindow },
+        { "prevwindow", Action::prevWindow },
+        { "nextwindowonallworkspaces", Action::nextWindowOnAllWorkspaces },
+        { "prevwindowonallworkspaces", Action::prevWindowOnAllWorkspaces },
+        { "nextwindowonallscreens", Action::nextWindowOnAllScreens },
+        { "prevwindowonallscreens", Action::prevWindowOnAllScreens },
+        { "nextwindowofclass", Action::nextWindowOfClass },
+        { "prevwindowofclass", Action::prevWindowOfClass },
+        { "nextwindowofclassonallworkspaces", Action::nextWindowOfClassOnAllWorkspaces },
+        { "prevwindowofclassonallworkspaces", Action::prevWindowOfClassOnAllWorkspaces },
+        { "changeworkspace", Action::changeWorkspace },
+        { "nextworkspace", Action::nextWorkspace },
+        { "prevworkspace", Action::prevWorkspace },
+        { "nextscreen", Action::nextScreen },
+        { "prevscreen", Action::prevScreen },
+        { "showrootmenu", Action::showRootMenu },
+        { "showworkspacemenu", Action::showWorkspaceMenu },
+        { "stringchain", Action::stringChain },
+        { "keychain", Action::keyChain },
+        { "numberchain", Action::numberChain },
         { "cancel", Action::cancel },
         { "", Action::noaction }
     };
@@ -84,7 +83,7 @@ void parser::setAction(string act)
     bool found = false;
 
     for (int i = 0; actions[i].str != ""; ++i) {
-        if (actions[i].str == act) {
+        if ( strcasecmp(actions[i].str, act.c_str()) == 0 ) {
             _action = actions[i].act;
             found = true;
         }
@@ -104,6 +103,7 @@ void parser::addModifier(string mod)
         { "Mod1", Mod1Mask },
         { "Mod2", Mod2Mask },
         { "Mod3", Mod3Mask },
+        { "Mod4", Mod4Mask },
         { "Control", ControlMask },
         { "Shift", ShiftMask },
         { "", 0 }

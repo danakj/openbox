@@ -69,10 +69,31 @@ void keytree::grabChildren(keynode *node, screen *scr)
 
 void keytree::ungrabChildren(keynode *node, screen *scr)
 {
+  ChildList::const_iterator head_it, head_end = _head->children.end();
   ChildList::const_iterator it, end = node->children.end();
-  for (it = node->children.begin(); it != end; ++it)
-    if ( (*it)->action )
-      scr->ungrabKey( (*it)->action->keycode(), (*it)->action->modifierMask());
+  bool ungrab = true;
+ 
+  // when ungrabbing children, make sure that we don't ungrab any topmost keys
+  // (children of the head node) This would render those topmost keys useless.
+  // Topmost keys are _never_ ungrabbed, since they are only grabbed at startup
+  
+  for (it = node->children.begin(); it != end; ++it) {
+    if ( (*it)->action ) {
+      for (head_it = _head->children.begin(); head_it != head_end; ++head_it) {
+        if ( (*it)->action->modifierMask() == (*head_it)->action->modifierMask() &&
+             (*it)->action->keycode() == (*head_it)->action->keycode())
+        {
+          ungrab = false;
+          break;
+        }
+      }
+      
+      if (ungrab) 
+        scr->ungrabKey( (*it)->action->keycode(), (*it)->action->modifierMask());
+      
+      ungrab = true;
+    }
+  }
 }
 
 const Action * keytree::getAction(const XEvent &e, unsigned int state,
@@ -80,6 +101,7 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
 {
   Action *act;
 
+  // we're done with the children. ungrab them
   if (_current != _head)
     ungrabChildren(_current, scr);
   
@@ -88,17 +110,20 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
     act = (*it)->action;
     if (e.xkey.keycode == act->keycode() && state == act->modifierMask()) {
       if ( isLeaf(*it) ) {
-	_current = _head;
-	return act;
+        // node is a leaf, so an action will be executed
+        _current = _head;
+        return act;
       }
       else {
-	_current = *it;
-	grabChildren(_current, scr);
-	return (const Action *)NULL;
+        // node is not a leaf, so we advance down the tree, and grab the
+        // children of the new current node. no action is executed
+        _current = *it;
+        grabChildren(_current, scr);
+        return (const Action *)NULL;
       }
     }
   }
-
+  
   // action not found. back to the head
   _current = _head;
   return (const Action *)NULL;
@@ -108,14 +133,15 @@ void keytree::addAction(Action::ActionType action, unsigned int mask,
                         string key, string arg)
 {
   // can't grab non-modifier as topmost key
+  // XXX: do we allow Esc to be grabbed at the top?
   if (_current == _head && (mask == 0 || mask == ShiftMask))
     return;
 
   keynode *tmp = new keynode;
   tmp->action = new Action(action,
-			   XKeysymToKeycode(_display,
-					    XStringToKeysym(key.c_str())),
-			   mask, arg);
+                           XKeysymToKeycode(_display,
+                                            XStringToKeysym(key.c_str())),
+                           mask, arg);
   tmp->parent = _current;
   _current->children.push_back(tmp);
 }
@@ -140,8 +166,9 @@ void keytree::setCurrentNodeProps(Action::ActionType action, unsigned int mask,
 {
   if (_current->action)
     delete _current->action;
+  
   _current->action = new Action(action,
-				XKeysymToKeycode(_display,
-						 XStringToKeysym(key.c_str())),
-				mask, arg);
+                                XKeysymToKeycode(_display,
+                                                 XStringToKeysym(key.c_str())),
+                                mask, arg);
 }

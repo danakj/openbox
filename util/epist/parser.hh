@@ -13,8 +13,14 @@ public:
     void setKey(std::string key)
     {  _key = key; }
 
-    void setArgument(std::string arg)
+    void setArgumentNum(std::string arg)
     { _arg = arg; }
+
+    void setArgumentNegNum(std::string arg)
+    { _arg = "-" + arg; }
+
+    void setArgumentStr(std::string arg)
+    { _arg = arg.substr(1, arg.size() - 2); }
 
     void setAction(std::string);
     void addModifier(std::string);

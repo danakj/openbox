@@ -20,7 +20,7 @@ void yyerror(const char *c) {
 
 %}
 
-%token OBRACE EBRACE SEMICOLON DASH ACTION BINDING NUMBER QUOTES WORD  
+%token OBRACE EBRACE SEMICOLON DASH NUMBER QUOTES WORD BINDING 
 
 %%
 
@@ -33,7 +33,7 @@ command:
     ;
 
 action_command:
-    binding ACTION parameter SEMICOLON
+    binding WORD parameter SEMICOLON
     {
         ((parser*)parser_obj)->setAction($2);
         ((parser*)parser_obj)->endAction();
@@ -59,7 +59,7 @@ obrace:
 ebrace:
     EBRACE { /* ((parser*)parser_obj)->endChain(); */ }
     ;
-    
+
 binding_w_modifier:
     | BINDING DASH binding_w_modifier { ((parser*)parser_obj)->addModifier($1); }
     ;
@@ -72,11 +72,11 @@ bind_key:
     | NUMBER     { ((parser*)parser_obj)->setKey($1); }
     | WORD       { ((parser*)parser_obj)->setKey($1); }
     ;
-    
+
 parameter:
-    | NUMBER      { ((parser*)parser_obj)->setArgument($1); }
-    | DASH NUMBER { ((parser*)parser_obj)->setArgument($1); }
-    | QUOTES      { ((parser*)parser_obj)->setArgument($1); }
+    | NUMBER      { ((parser*)parser_obj)->setArgumentNum($1); }
+    | DASH NUMBER { ((parser*)parser_obj)->setArgumentNegNum($2); }
+    | QUOTES      { ((parser*)parser_obj)->setArgumentStr($1); }
     ;
 
 %%

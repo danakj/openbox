@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "yacc_parser.hh"
+
+extern YYSTYPE yylval;
+    
 %}
 
 %%
@@ -10,45 +13,6 @@
 \}                  return EBRACE;
 ;                   return SEMICOLON;
 -                   return DASH;
-noaction |
-execute |
-iconify |
-raise |
-lower |
-close |
-toggleshade |
-toggleomnipresent |
-moveWindowUp |
-moveWindowDown |
-moveWindowLeft |
-moveWindowRight |
-resizeWindowWidth |
-resizeWindowHeight |
-toggleMaximizeFull |
-toggleMaximizeVertical |
-toggleMaximizeHorizontal |
-sendToWorkspace |
-nextWindow |
-prevWindow |
-nextWindowOnAllWorkspaces |
-prevWindowOnAllWorkspaces |
-nextWindowOnAllScreens |
-prevWindowOnAllScreens |
-nextWindowOfClass |
-prevWindowOfClass |
-nextWindowOfClassOnAllWorkspaces |
-prevWindowOfClassOnAllWorkspaces |
-changeWorkspace |
-nextWorkspace |
-prevWorkspace |
-nextScreen |
-prevScreen |
-showRootMenu |
-showWorkspaceMenu |
-stringChain |
-keyChain |
-numberChain |
-cancel              yylval = (int) strdup(yytext); return ACTION;
 Mod1 |
 Mod2 |
 Mod3 |

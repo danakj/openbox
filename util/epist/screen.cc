@@ -121,11 +121,11 @@ void screen::processEvent(const XEvent &e) {
     // root window
     if (e.xproperty.atom == _xatom->getAtom(XAtom::net_number_of_desktops))
       updateNumDesktops();
-    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_current_desktop))
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_current_desktop))
       updateActiveDesktop();
-    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_active_window))
       updateActiveWindow();
-    if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list)) {
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_client_list)) {
       // catch any window unmaps first
       XEvent ev;
       if (XCheckTypedWindowEvent(_epist->getXDisplay(), e.xany.window,

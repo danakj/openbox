@@ -47,10 +47,10 @@ public:
 
 private:
   // defined by black/openbox
-  static const unsigned int PropBlackboxAttributesElements = 9;
-  static const unsigned int AttribDecoration = 1 << 6;
-  static const unsigned int DecorNone = 0;
-  static const unsigned int DecorNormal = 2;
+  static const unsigned long PropBlackboxAttributesElements = 9;
+  static const unsigned long AttribDecoration = 1 << 6;
+  static const unsigned long DecorNone = 0;
+  static const unsigned long DecorNormal = 2;
 
   epist  *_epist;
   screen *_screen;

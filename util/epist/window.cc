@@ -36,6 +36,13 @@ using std::dec;
 #include "window.hh"
 #include "../../src/XAtom.hh"
 
+  // defined by black/openbox
+const unsigned long XWindow::PropBlackboxAttributesElements;
+const unsigned long XWindow::AttribDecoration;
+const unsigned long XWindow::DecorNone;
+const unsigned long XWindow::DecorNormal;
+
+
 XWindow::XWindow(epist *epist, screen *screen, Window window)
   : _epist(epist), _screen(screen), _xatom(epist->xatom()), _window(window) {
 
@@ -203,8 +210,10 @@ void XWindow::processEvent(const XEvent &e) {
   case PropertyNotify:
     if (e.xproperty.atom == XA_WM_NORMAL_HINTS)
       updateNormalHints();
-    if (e.xproperty.atom == XA_WM_HINTS)
+    else if (e.xproperty.atom == XA_WM_HINTS)
       updateWMHints();
+    else if (e.xproperty.atom == _xatom->getAtom(XAtom::blackbox_attributes))
+      updateBlackboxAttributes();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_state))
       updateState();
     else if (e.xproperty.atom == _xatom->getAtom(XAtom::net_wm_desktop))

@@ -251,14 +251,12 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     XftColor c;
     GString *text;
     gint mw, mh;
+#ifndef USE_PANGO
     size_t l;
     gboolean shortened = FALSE;
-
-#ifdef USE_PANGO
+#else
     PangoLayout *pl;
-    PangoLayoutLine *pll;
     PangoContext *context;
-    GSList *p;
 
     context = pango_xft_get_context (RrDisplay(t->font->inst), RrScreen(t->font->inst));
     pl = pango_layout_new (context);
@@ -273,6 +271,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     h = area->height;
 
     text = g_string_new(t->string);
+#ifndef USE_PANGO
     l = g_utf8_strlen(text->str, -1);
     font_measure_full(t->font, text->str, &mw, &mh);
     while (l && mw > area->width) {
@@ -304,17 +303,16 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
 
     l = strlen(text->str); /* number of bytes */
 
-#ifdef USE_PANGO
-    pango_layout_set_text(pl, text->str, l);
+#else
+    pango_layout_set_text(pl, text->str, -1);
     pango_layout_set_font_description(pl, t->font->pango_font_description);
     pango_layout_set_single_paragraph_mode(pl, TRUE);
-    pll = pango_layout_get_line(pl, 0);
+    pango_layout_set_width(pl, w * PANGO_SCALE);
+    pango_layout_set_ellipsize(pl, PANGO_ELLIPSIZE_MIDDLE);
+    pango_layout_set_alignment(pl, (PangoAlignment)(t->justify));
 #endif /* USE_PANGO */
 
     if (t->font->shadow) {
-#ifdef USE_PANGO
-        int x2 = x;
-#endif /* USE_PANGO */
         if (t->font->tint >= 0) {
             c.color.red = 0;
             c.color.green = 0;
@@ -330,26 +328,15 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
             c.pixel = WhitePixel(RrDisplay(t->font->inst),
                                  RrScreen(t->font->inst));
 #ifndef USE_PANGO
-        }  
+        }
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->font->offset,
                           t->font->xftfont->ascent + y + t->font->offset,
                           (FcChar8*)text->str, l);
-    }  
+    }
 #else /* USE_PANGO */
         }
-
-    for (p = pll->runs; p != NULL; p = p->next)
-        {
-            PangoLayoutRun *run = p->data;
-            PangoFont *font = run->item->analysis.font;
-            PangoGlyphString *glyphs = run->glyphs;
-            PangoRectangle rect;
-
-            pango_glyph_string_extents (glyphs, font, NULL, &rect);
-            pango_xft_render (d, &c, font, glyphs, x2 + t->font->offset,
-                              t->font->xftfont->ascent + y + t->font->offset);
-            x2 += rect.width / PANGO_SCALE;
-        }
+    pango_xft_render_layout(d, &c, pl, (x + t->font->offset) * PANGO_SCALE,
+                            (y + t->font->offset) * PANGO_SCALE);
     }
 #endif /* USE_PANGO */
     c.color.red = t->color->r | t->color->r << 8;
@@ -363,22 +350,10 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                       t->font->xftfont->ascent + y,
                       (FcChar8*)text->str, l);
 #else /* USE_PANGO */
-    for (p = pll->runs; p != NULL; p = p->next)
-        {
-            PangoLayoutRun *run = p->data;
-            PangoFont *font = run->item->analysis.font;
-            PangoGlyphString *glyphs = run->glyphs;
-            PangoRectangle rect;
-
-            pango_glyph_string_extents (glyphs, font, NULL, &rect);
-            pango_xft_render (d, &c, font, glyphs, x, t->font->xftfont->ascent + y);
-            x += rect.width / PANGO_SCALE;
-        }
-
-    //    pango_layout_line_unref(pll);
-        g_object_unref(pl);
-        g_object_unref(context);
-#endif /* USE_PANGO */
+    pango_xft_render_layout(d, &c, pl, x * PANGO_SCALE, y * PANGO_SCALE);
+    g_object_unref(pl);
+    g_object_unref(context);
+#endif
 
     g_string_free(text, TRUE);
     return;

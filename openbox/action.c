@@ -994,6 +994,10 @@ void action_activate(union ActionData *data)
 
 void action_focus(union ActionData *data)
 {
+    /* if using focus_delay, stop the timer now so that focus doesn't go moving
+       on us */
+    event_halt_focus_delay();
+
     client_focus(data->client.any.c);
 }
 
@@ -1380,6 +1384,10 @@ void action_showmenu(union ActionData *data)
 
 void action_cycle_windows(union ActionData *data)
 {
+    /* if using focus_delay, stop the timer now so that focus doesn't go moving
+       on us */
+    event_halt_focus_delay();
+
     focus_cycle(data->cycle.forward, data->cycle.linear,
                 data->cycle.dialog,
                 data->cycle.inter.final, data->cycle.inter.cancel);
@@ -1387,6 +1395,10 @@ void action_cycle_windows(union ActionData *data)
 
 void action_directional_focus(union ActionData *data)
 {
+    /* if using focus_delay, stop the timer now so that focus doesn't go moving
+       on us */
+    event_halt_focus_delay();
+
     focus_directional_cycle(data->interdiraction.direction,
                             data->interdiraction.dialog,
                             data->interdiraction.inter.final,

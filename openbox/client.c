@@ -359,7 +359,13 @@ void client_manage(Window window)
        a window maps since its not based on an action from the user like
        clicking a window to activate is. so keep the new window out of the way
        but do focus it. */
-    if (activate) client_focus(self);
+    if (activate) {
+        /* if using focus_delay, stop the timer now so that focus doesn't go
+           moving on us */
+        event_halt_focus_delay();
+
+        client_focus(self);
+    }
 
     /* client_activate does this but we aret using it so we have to do it
        here as well */

@@ -19,6 +19,8 @@ enum ActionType {
   keyChain,
   numberChain,
 
-  cancel
+  cancel,
+
+  NUM_ACTIONS
 };
 

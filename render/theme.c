@@ -244,7 +244,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "menu.frame.textColor", &theme->menu_color))
         theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
-                    "menu.bullet.picColor", &theme->menu_color))
+                    "menu.bullet.picColor", &theme->menu_bullet_color))
         theme->menu_bullet_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "menu.frame.disableColor", &theme->menu_disabled_color))

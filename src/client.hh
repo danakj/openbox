@@ -103,6 +103,10 @@ private:
   //! NormalState
   long _wmstate;
 
+  //! Was the window's position requested by the application? if not, we should
+  //! place the window ourselves when it first appears
+  bool _positioned;
+  
   //! Can the window receive input focus?
   bool _can_focus;
   //! Urgency flag

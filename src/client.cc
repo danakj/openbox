@@ -54,7 +54,8 @@ OBClient::OBClient(Window window)
          "  shaped:        \t%s\t\t  modal:         \t%s\n"
          "  shaded:        \t%s\t\t  iconic:        \t%s\n"
          "  vert maximized:\t%s\t\t  horz maximized:\t%s\n"
-         "  fullscreen:    \t%s\t\t  floating:      \t%s\n",
+         "  fullscreen:    \t%s\t\t  floating:      \t%s\n"
+         "  requested pos: \t%s\n",
          _window,
          _title.c_str(),
          _icon_title.c_str(),
@@ -81,7 +82,8 @@ OBClient::OBClient(Window window)
          _max_vert ? "yes" : "no",
          _max_horz ? "yes" : "no",
          _fullscreen ? "yes" : "no",
-         _floating ? "yes" : "no");
+         _floating ? "yes" : "no",
+         _positioned ? "yes" : "no");
 #endif
 }
 
@@ -239,20 +241,26 @@ void OBClient::updateNormalHints()
 
   // get the hints from the window
   if (XGetWMNormalHints(otk::OBDisplay::display, _window, &size, &ret)) {
+    _positioned = (size.flags & (PPosition|USPosition));
+
     if (size.flags & PWinGravity)
       _gravity = size.win_gravity;
+    
     if (size.flags & PMinSize) {
       _min_x = size.min_width;
       _min_y = size.min_height;
     }
+    
     if (size.flags & PMaxSize) {
       _max_x = size.max_width;
       _max_y = size.max_height;
     }
+    
     if (size.flags & PBaseSize) {
       _base_x = size.base_width;
       _base_y = size.base_height;
     }
+    
     if (size.flags & PResizeInc) {
       _inc_x = size.width_inc;
       _inc_y = size.height_inc;

@@ -1169,7 +1169,7 @@ static Client *search_focus_tree(Client *node, Client *skip)
     GSList *it;
     Client *ret;
 
-    for (it = node->transients; it != NULL; it = g_slist_next(it)) {
+    for (it = node->transients; it != NULL; it = it->next) {
 	Client *c = it->data;
 	if (c == skip) continue; /* circular? */
 	if ((ret = search_focus_tree(c, skip))) return ret;
@@ -1685,14 +1685,12 @@ void client_set_desktop(Client *self, guint target)
     if (old == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
             focus_order[i] = g_list_remove(focus_order[i], self);
+        focus_order[target] = g_list_prepend(focus_order[target], self);
     } else {
         focus_order[old] = g_list_remove(focus_order[old], self);
-    }
-    if (target == DESKTOP_ALL) {
-        for (i = 0; i < screen_num_desktops; ++i)
-            focus_order[i] = g_list_prepend(focus_order[i], self);
-    } else {
-        focus_order[target] = g_list_prepend(focus_order[target], self);
+        if (target == DESKTOP_ALL)
+            for (i = 0; i < screen_num_desktops; ++i)
+                focus_order[i] = g_list_prepend(focus_order[i], self);
     }
 
     dispatch_client(Event_Client_Desktop, self, target, old);

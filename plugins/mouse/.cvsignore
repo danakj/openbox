@@ -1,4 +1,5 @@
 mouse.lo
 mouse.la
 translate.lo
-mouserc_parse.lo
+mouseparse.lo
+.libs

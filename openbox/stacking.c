@@ -79,7 +79,7 @@ static void do_restack(GList *wins, GList *before)
     stacking_set_list();
 }
 
-static void raise(GList *wins)
+static void do_raise(GList *wins)
 {
     GList *it;
     GList *layer[NUM_STACKLAYER] = {NULL};
@@ -106,7 +106,7 @@ static void raise(GList *wins)
     }
 }
 
-static void lower(GList *wins)
+static void do_lower(GList *wins)
 {
     GList *it;
     GList *layer[NUM_STACKLAYER] = {NULL};
@@ -237,7 +237,7 @@ void stacking_raise(ObWindow *window)
     window = top_transient(window);
     wins = pick_windows(window);
     wins = g_list_concat(wins, pick_group_windows(window));
-    raise(wins);
+    do_raise(wins);
     g_list_free(wins);
 }
 
@@ -248,7 +248,7 @@ void stacking_lower(ObWindow *window)
     window = top_transient(window);
     wins = pick_windows(window);
     wins = g_list_concat(pick_group_windows(window), wins);
-    lower(wins);
+    do_lower(wins);
     g_list_free(wins);
 }
 

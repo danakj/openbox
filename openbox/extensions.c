@@ -83,8 +83,8 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
     for (i = 1; i < *nxin; ++i) {
         l = MIN(l, (*xin_areas)[i].x);
         t = MIN(l, (*xin_areas)[i].y);
-        r = MIN(r, (*xin_areas)[0].x + (*xin_areas)[0].width - 1);
-        b = MIN(b, (*xin_areas)[0].y + (*xin_areas)[0].height - 1);
+        r = MAX(r, (*xin_areas)[0].x + (*xin_areas)[0].width - 1);
+        b = MAX(b, (*xin_areas)[0].y + (*xin_areas)[0].height - 1);
     }
     RECT_SET((*xin_areas)[*nxin], l, t, r - l + 1, b - t + 1);
 }

@@ -853,7 +853,7 @@ void screen_update_desktop_names()
                                        screen_num_desktops + 1);
         screen_desktop_names[screen_num_desktops] = NULL;
         for (; i < screen_num_desktops; ++i)
-            screen_desktop_names[i] = g_strdup("Unnamed Desktop");
+            screen_desktop_names[i] = g_strdup("Desktop %i", i + 1);
     }
 }
 

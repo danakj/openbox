@@ -234,7 +234,7 @@ void Client::setupDecorAndFunctions()
     }
   }
 
-  // XXX: changeAllowedActions();
+  changeAllowedActions();
 }
 
 
@@ -901,7 +901,14 @@ void Client::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void Client::resize(Corner anchor, int w, int h, int x, int y)
+void Client::resize(Corner anchor, int w, int h)
+{
+  if (!(_functions & Func_Resize)) return;
+  internal_resize(anchor, w, h);
+}
+
+
+void Client::internal_resize(Corner anchor, int w, int h, int x, int y)
 {
   w -= _base_size.x(); 
   h -= _base_size.y();
@@ -963,11 +970,18 @@ void Client::resize(Corner anchor, int w, int h, int x, int y)
 
   // resize the frame to match the request
   frame->adjustSize();
-  move(x, y);
+  internal_move(x, y);
 }
 
 
 void Client::move(int x, int y)
+{
+  if (!(_functions & Func_Move)) return;
+  internal_move(x, y);
+}
+
+
+void Client::internal_move(int x, int y)
 {
   _area.setPos(x, y);
 
@@ -1055,6 +1069,30 @@ void Client::changeState()
                      otk::Property::atoms.atom, netstate, num);
 
   calcLayer();
+}
+
+
+void Client::changeAllowedActions(void)
+{
+  Atom actions[7];
+  int num = 0;
+
+  actions[num++] = otk::Property::atoms.net_wm_action_shade;
+  actions[num++] = otk::Property::atoms.net_wm_action_change_desktop;
+
+  if (_functions & Func_Close)
+    actions[num++] = otk::Property::atoms.net_wm_action_close;
+  if (_functions & Func_Move)
+        actions[num++] = otk::Property::atoms.net_wm_action_move;
+  if (_functions & Func_Resize)
+        actions[num++] = otk::Property::atoms.net_wm_action_resize;
+  if (_functions & Func_Maximize) {
+    actions[num++] = otk::Property::atoms.net_wm_action_maximize_horz;
+    actions[num++] = otk::Property::atoms.net_wm_action_maximize_vert;
+  }
+
+  otk::Property::set(_window, otk::Property::atoms.net_wm_allowed_actions,
+                     otk::Property::atoms.atom, actions, num);
 }
 
 
@@ -1179,13 +1217,13 @@ void Client::configureRequestHandler(const XConfigureRequestEvent &e)
     if (e.value_mask & (CWX | CWY)) {
       int x = (e.value_mask & CWX) ? e.x : _area.x();
       int y = (e.value_mask & CWY) ? e.y : _area.y();
-      resize(corner, w, h, x, y);
+      internal_resize(corner, w, h, x, y);
     } else // if JUST resizing...
-      resize(corner, w, h);
+      internal_resize(corner, w, h);
   } else if (e.value_mask & (CWX | CWY)) { // if JUST moving...
     int x = (e.value_mask & CWX) ? e.x : _area.x();
     int y = (e.value_mask & CWY) ? e.y : _area.y();
-    move(x, y);
+    internal_move(x, y);
   }
 
   if (e.value_mask & CWStackMode) {

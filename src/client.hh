@@ -367,6 +367,8 @@ private:
 
   //! Change the client's state hints to match the class' data
   void changeState();
+  //! Change the allowed actions set on the client
+  void changeAllowedActions();
 
   //! Request the client to close its window.
   void close();
@@ -377,7 +379,29 @@ private:
                  unshaded.
   */
   void shade(bool shade);
-  
+
+  //! Internal version of the Client::move function
+  /*!
+    @param x The X coordinate to move to.
+    @param y The Y coordinate to move to.
+  */
+  void internal_move(int x, int y);
+  //! Internal version of the Client::resize function
+  /*!
+    This also maintains things like the client's minsize, and size increments.
+    @param anchor The corner to keep in the same position when resizing.
+    @param w The width component of the new size for the client.
+    @param h The height component of the new size for the client.
+    @param x An optional X coordinate to which the window will be moved
+             after resizing.
+    @param y An optional Y coordinate to which the window will be moved
+             after resizing.
+    The x and y coordinates must both be sepcified together, or they will have
+    no effect. When they are specified, the anchor is ignored.
+  */
+  void internal_resize(Corner anchor, int w, int h,
+                       int x = INT_MIN, int y = INT_MIN);
+
 public:
 #ifndef SWIG
   //! Constructs a new Client object around a specified window id
@@ -510,14 +534,8 @@ BB    @param window The window id that the Client class should handle
     @param anchor The corner to keep in the same position when resizing.
     @param w The width component of the new size for the client.
     @param h The height component of the new size for the client.
-    @param x An optional X coordinate to which the window will be moved
-             after resizing.
-    @param y An optional Y coordinate to which the window will be moved
-             after resizing.
-    The x and y coordinates must both be sepcified together, or they will have
-    no effect. When they are specified, the anchor is ignored.
   */
-  void resize(Corner anchor, int w, int h, int x = INT_MIN, int y = INT_MIN);
+  void resize(Corner anchor, int w, int h);
 
   //! Attempt to focus the client window
   bool focus() const;

@@ -5,7 +5,7 @@ AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 AC_PREREQ([2.50])
 
 AC_PATH_PROG([regex_cmd], [sed])
-test -z $regex_cmd && AC_MSG_ERROR([sed not found])
+test "$regex_cmd" || AC_MSG_ERROR([sed not found])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -16,13 +16,13 @@ AC_PROG_INSTALL
 ALL_LINGUAS=""
 AM_GNU_GETTEXT
 
-AC_LANG(C++)
+dnl AC_LANG(C++)
 	
 dnl Check what compiler we are using
 AC_MSG_CHECKING([for GCC])
 if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
-  CPPFLAGS="$CPPFLAGS -Wall -W -pedantic"
+  CFLAGS="$CFLAGS -Wall -W -pedantic"
 else
   AC_MSG_RESULT([no, trying other compilers])
   AC_MSG_CHECKING(for MIPSpro)
@@ -31,11 +31,11 @@ else
     AC_MSG_RESULT([no])
   else
     AC_MSG_RESULT([yes, version $mips_pro_ver.])
-    AC_MSG_CHECKING(for -LANG:std in CPPFLAGS)
-    lang_std_not_set=`echo $CPPFLAGS | grep "\-LANG:std"`
+    AC_MSG_CHECKING(for -LANG:std in CFLAGS)
+    lang_std_not_set=`echo $CFLAGS | grep "\-LANG:std"`
     if test "x$lang_std_not_set" = "x"; then
       AC_MSG_RESULT([not set, setting.])
-      CPPFLAGS="${CPPFLAGS} -LANG:std"
+      CFLAGS="${CFLAGS} -LANG:std"
     else
       AC_MSG_RESULT([already set.])
     fi
@@ -71,7 +71,21 @@ AC_ARG_ENABLE([debug],
   AC_MSG_RESULT([no])
   DEBUG="-DNDEBUG"
 )
-CPPFLAGS="$CPPFLAGS $DEBUG"
+CFLAGS="$CFLAGS $DEBUG"
+
+dnl Check for Python
+AC_CHECK_HEADER([python2.2/Python.h],
+  PYTHON_CFLAGS="-Ipython2.2",
+  AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
+See http://www.python.org
+]))
+AC_CHECK_LIB([python2.2], [Py_Initialize],
+  PYTHON_LDFLAGS="-lpython2.2 -Xlinker -export-dynamic",
+  AC_MSG_ERROR([Openbox requires the use of Python 2.2. This is its secret special formula for extreme sexiness.
+See http://www.python.org
+]))
+AC_SUBST([PYTHON_CFLAGS])
+AC_SUBST([PYTHON_LDFLAGS])
 
 dnl Check for X headers and libraries
 AC_PATH_X
@@ -80,7 +94,7 @@ test "$no_x" = "yes" && AC_MSG_ERROR([No Xlibs found.])
 test -z "$x_includes" && x_includes="/usr/include"
 test -z "$x_libraries" && x_libraries="/usr/lib"
      
-CPPFLAGS="$CPPFLAGS $X_CPPFLAGS"
+CFLAGS="$CFLAGS $X_CFLAGS"
 LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS"
 LDFLAGS="$LDFLAGS $X_PRE_LIBS $LIBS $X_EXTRA_LIBS"
 
@@ -108,14 +122,14 @@ AC_MSG_RESULT([yes])
 
 dnl Store these
 OLDLIBS=$LIBS
-OLDCPPFLAGS=$CPPFLAGS
+OLDCFLAGS=$CFLAGS
 
 XFT_CFLAGS="`pkg-config --cflags xft`"
 XFT_LIBS="`pkg-config --libs xft`"
 
 dnl Set these for checking with the tests below. They'll be restored after
 LIBS="$LIBS $XFT_LIBS"
-CPPFLAGS="$XFT_CFLAGS $CPPFLAGS"
+CFLAGS="$XFT_CFLAGS $CFLAGS"
 
 AC_CHECK_LIB([Xft], [XftFontOpenName],
   AC_MSG_CHECKING([for X11/Xft/Xft.h for Xft >= $XFT_MIN])
@@ -180,19 +194,11 @@ See http://www.fontconfig.org/
 )
 dnl Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
 LIBS=$OLDLIBS
-CPPFLAGS=$OLDCPPFLAGS
+CFLAGS=$OLDCFLAGS
 
 AC_SUBST([XFT_CFLAGS])
 AC_SUBST([XFT_LIBS])
 
-dnl Check for Guile
-GUILE_FLAGS
-if ! test "$GUILE_CFLAGS" && ! test "$GUILE_LDFLAGS"; then
-  AC_MSG_ERROR([Openbox requires the Guile language to be installed.
-See http://www.gnu.org/software/guile/ .
-])
-fi
-		
 dnl Check for XShape extension support
 AC_CHECK_LIB([Xext], [XShapeCombineShape],
   AC_MSG_CHECKING([for X11/extensions/shape.h])
@@ -293,7 +299,7 @@ AC_MSG_RESULT([$PACKAGE version $VERSION configured successfully.])
 AC_MSG_RESULT
 AC_MSG_RESULT([Using '$prefix' for installation.])
 AC_MSG_RESULT([Using '$CXX' for C++ compiler.])
-AC_MSG_RESULT([Building with '$CPPFLAGS' for C++ compiler flags.])
+AC_MSG_RESULT([Building with '$CFLAGS' for C++ compiler flags.])
 AC_MSG_RESULT([Building with '$LIBS' for linker flags.])
 AC_MSG_RESULT
 AC_MSG_RESULT([configure complete, now type \"make\"])

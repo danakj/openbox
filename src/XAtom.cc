@@ -52,6 +52,7 @@ XAtom::XAtom(Display *d) {
   _atoms[wm_take_focus] = create("WM_TAKE_FOCUS");
   _atoms[wm_name] = create("WM_NAME");
   _atoms[wm_icon_name] = create("WM_ICON_NAME");
+  _atoms[wm_class] = create("WM_CLASS");
   _atoms[motif_wm_hints] = create("_MOTIF_WM_HINTS");
   _atoms[blackbox_hints] = create("_BLACKBOX_HINTS");
   _atoms[blackbox_attributes] = create("_BLACKBOX_ATTRIBUTES");
@@ -471,10 +472,10 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
     std::string::const_iterator tmp = it; // current string.begin()
     it = std::find(tmp, end, '\0');       // look for null between tmp and end
     strings.push_back(std::string(tmp, it));   // s[tmp:it)
+    ++num;
     if (it == end) break;
     ++it;
     if (it == end) break;
-    ++num;
   }
 
   nelements = num;

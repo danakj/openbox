@@ -1319,63 +1319,61 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         }
     }
 
-    if (x == self->area.x && y == self->area.y && w == self->area.width &&
-        h == self->area.height)
-        return; /* no change */
+    if (!(w == self->area.width && h == self->area.height)) {
+        w -= self->base_size.width;
+        h -= self->base_size.height;
 
-    w -= self->base_size.width;
-    h -= self->base_size.height;
+        if (user) {
+            /* for interactive resizing. have to move half an increment in each
+               direction. */
 
-    if (user) {
-	/* for interactive resizing. have to move half an increment in each
-	   direction. */
-
-	/* how far we are towards the next size inc */
-	int mw = w % self->size_inc.width; 
-	int mh = h % self->size_inc.height;
-	/* amount to add */
-	int aw = self->size_inc.width / 2;
-	int ah = self->size_inc.height / 2;
-	/* don't let us move into a new size increment */
-	if (mw + aw >= self->size_inc.width)
-	    aw = self->size_inc.width - mw - 1;
-	if (mh + ah >= self->size_inc.height)
-	    ah = self->size_inc.height - mh - 1;
-	w += aw;
-	h += ah;
+            /* how far we are towards the next size inc */
+            int mw = w % self->size_inc.width; 
+            int mh = h % self->size_inc.height;
+            /* amount to add */
+            int aw = self->size_inc.width / 2;
+            int ah = self->size_inc.height / 2;
+            /* don't let us move into a new size increment */
+            if (mw + aw >= self->size_inc.width)
+                aw = self->size_inc.width - mw - 1;
+            if (mh + ah >= self->size_inc.height)
+                ah = self->size_inc.height - mh - 1;
+            w += aw;
+            h += ah;
     
-	/* if this is a user-requested resize, then check against min/max
-	   sizes and aspect ratios */
+            /* if this is a user-requested resize, then check against min/max
+               sizes and aspect ratios */
 
-	/* smaller than min size or bigger than max size? */
-	if (w > self->max_size.width) w = self->max_size.width;
-	if (w < self->min_size.width) w = self->min_size.width;
-	if (h > self->max_size.height) h = self->max_size.height;
-	if (h < self->min_size.height) h = self->min_size.height;
+            /* smaller than min size or bigger than max size? */
+            if (w > self->max_size.width) w = self->max_size.width;
+            if (w < self->min_size.width) w = self->min_size.width;
+            if (h > self->max_size.height) h = self->max_size.height;
+            if (h < self->min_size.height) h = self->min_size.height;
 
-	/* adjust the height ot match the width for the aspect ratios */
-	if (self->min_ratio)
-	    if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
-	if (self->max_ratio)
-	    if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
-    }
+            /* adjust the height ot match the width for the aspect ratios */
+            if (self->min_ratio)
+                if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
+            if (self->max_ratio)
+                if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
+        }
 
-    /* keep to the increments */
-    w /= self->size_inc.width;
-    h /= self->size_inc.height;
+        /* keep to the increments */
+        w /= self->size_inc.width;
+        h /= self->size_inc.height;
 
-    /* you cannot resize to nothing */
-    if (w < 1) w = 1;
-    if (h < 1) h = 1;
+        /* you cannot resize to nothing */
+        if (w < 1) w = 1;
+        if (h < 1) h = 1;
   
-    /* store the logical size */
-    SIZE_SET(self->logical_size, w, h);
+        /* store the logical size */
+        SIZE_SET(self->logical_size, w, h);
 
-    w *= self->size_inc.width;
-    h *= self->size_inc.height;
+        w *= self->size_inc.width;
+        h *= self->size_inc.height;
 
-    w += self->base_size.width;
-    h += self->base_size.height;
+        w += self->base_size.width;
+        h += self->base_size.height;
+    }
 
     switch (anchor) {
     case Corner_TopLeft:

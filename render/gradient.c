@@ -13,7 +13,7 @@ static void gradient_pyramid(RrSurface *sf, int inw, int inh);
 
 void RrRender(RrAppearance *a, int w, int h)
 {
-    RrPixel32 *data = a->surface.RrPixel_data;
+    RrPixel32 *data = a->surface.pixel_data;
     RrPixel32 current;
     unsigned int r,g,b;
     int off, x;
@@ -163,7 +163,7 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 
     for (a = 0; a < w; a++)
         for (b = 0; b < h; b++)
-            sp->RrPixel_data[a + b * w] = pix;
+            sp->pixel_data[a + b * w] = pix;
 
     XFillRectangle(RrDisplay(l->inst), l->pixmap, sp->primary->gc,
                    0, 0, w, h);
@@ -334,7 +334,7 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 static void gradient_horizontal(RrSurface *sf, int w, int h)
 {
     int x, y;
-    RrPixel32 *data = sf->RrPixel_data, *datav;
+    RrPixel32 *data = sf->pixel_data, *datav;
     RrPixel32 current;
 
     VARS(x);
@@ -359,7 +359,7 @@ static void gradient_horizontal(RrSurface *sf, int w, int h)
 static void gradient_vertical(RrSurface *sf, int w, int h)
 {
     int x, y;
-    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *data = sf->pixel_data;
     RrPixel32 current;
 
     VARS(y);
@@ -381,7 +381,7 @@ static void gradient_vertical(RrSurface *sf, int w, int h)
 static void gradient_diagonal(RrSurface *sf, int w, int h)
 {
     int x, y;
-    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *data = sf->pixel_data;
     RrColor left, right;
     RrColor extracorner;
 
@@ -428,7 +428,7 @@ static void gradient_diagonal(RrSurface *sf, int w, int h)
 static void gradient_crossdiagonal(RrSurface *sf, int w, int h)
 {
     int x, y;
-    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *data = sf->pixel_data;
     RrColor left, right;
     RrColor extracorner;
 
@@ -475,7 +475,7 @@ static void gradient_crossdiagonal(RrSurface *sf, int w, int h)
 static void gradient_pyramid(RrSurface *sf, int inw, int inh)
 {
     int x, y, w = (inw >> 1) + 1, h = (inh >> 1) + 1;
-    RrPixel32 *data = sf->RrPixel_data;
+    RrPixel32 *data = sf->pixel_data;
     RrPixel32 *end = data + inw*inh - 1;
     RrPixel32 current;
     RrColor left, right;

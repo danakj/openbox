@@ -70,7 +70,7 @@ struct _RrSurface {
     RrAppearance *parent;
     gint parentx;
     gint parenty;
-    RrPixel32 *RrPixel_data;
+    RrPixel32 *pixel_data;
 };
 
 struct _RrTextureText {

@@ -45,17 +45,17 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                                RrVisual(l->inst), RrColormap(l->inst));
     g_assert(l->xftdraw != NULL);
 
-    g_free(l->surface.RrPixel_data);
-    l->surface.RrPixel_data = g_new(RrPixel32, w * h);
+    g_free(l->surface.pixel_data);
+    l->surface.pixel_data = g_new(RrPixel32, w * h);
 
     if (l->surface.grad == RR_SURFACE_PARENTREL) {
         g_assert (l->surface.parent);
         g_assert (l->surface.parent->w);
 
         sw = l->surface.parent->w;
-        source = (l->surface.parent->surface.RrPixel_data +
+        source = (l->surface.parent->surface.pixel_data +
                   l->surface.parentx + sw * l->surface.parenty);
-        dest = l->surface.RrPixel_data;
+        dest = l->surface.pixel_data;
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(RrPixel32));
         }
@@ -109,7 +109,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
         break;
         case RR_TEXTURE_RGBA:
-            RrImageDraw(l->surface.RrPixel_data,
+            RrImageDraw(l->surface.pixel_data,
                         &l->texture[i].data.rgba, &tarea);
         break;
         }
@@ -190,7 +190,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     spc->border = spo->border;
     spc->parent = NULL;
     spc->parentx = spc->parenty = 0;
-    spc->RrPixel_data = NULL;
+    spc->pixel_data = NULL;
 
     copy->textures = orig->textures;
     copy->texture = g_memdup(orig->texture,
@@ -215,7 +215,7 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->border_color);
         RrColorFree(p->bevel_dark);
         RrColorFree(p->bevel_light);
-        g_free(p->RrPixel_data);
+        g_free(p->pixel_data);
 
         g_free(a);
     }
@@ -231,7 +231,7 @@ static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
                       ZPixmap, 0, NULL, w, h, 32, 0);
     g_assert(im != NULL);
 
-    in = l->surface.RrPixel_data;
+    in = l->surface.pixel_data;
     out = l->pixmap;
 
     im->byte_order = LSBFirst;

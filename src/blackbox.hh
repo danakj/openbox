@@ -81,7 +81,7 @@ private:
 
     std::string style_file;
     int colors_per_channel;
-    ::timeval auto_raise_delay;
+    timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
     std::string titlebar_layout;
     unsigned int mod_mask;  // modifier mask used for window-mouse interaction
@@ -176,7 +176,7 @@ public:
   inline std::string getTitlebarLayout(void) const
     { return resource.titlebar_layout; }
 
-  inline const ::timeval &getAutoRaiseDelay(void) const
+  inline const timeval &getAutoRaiseDelay(void) const
     { return resource.auto_raise_delay; }
 
   inline unsigned long getCacheLife(void) const

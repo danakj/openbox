@@ -222,15 +222,8 @@ public:
   //! Lowers a client window below all others in its stacking layer
   void lowerWindow(Client *client);
 
-  //! Sets the name of a desktop by changing the root window property
-  /*!
-    @param i The index of the desktop to set the name for (starts at 0)
-    @param name The name to set for the desktop
-    If the index is too large, it is simply ignored.
-  */
-  void setDesktopName(unsigned int i, const otk::ustring &name);
-
-  otk::ustring desktopName(unsigned int i) const;
+  const otk::Property::StringVect& desktopNames() const
+    { return _desktop_names; }
 
   void installColormap(bool install) const;
 

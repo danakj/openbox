@@ -198,7 +198,7 @@ void Screen::updateDesktopLayout()
                          otk::Property::atoms.net_desktop_layout,
                          otk::Property::atoms.cardinal,
                          &num, &data)) {
-    if (num >= 4) {
+    if (num == 4) {
       if (data[0] == _NET_WM_ORIENTATION_VERT)
         _layout.orientation = DesktopLayout::Vertical;
       if (data[3] == _NET_WM_TOPRIGHT)
@@ -810,6 +810,9 @@ void Screen::changeNumDesktops(unsigned int num)
   // the number of rows/columns will differ
   updateDesktopLayout();
 
+  // may be some unnamed desktops that we need to fill in with names
+  updateDesktopNames();
+
   // change our desktop if we're on one that no longer exists!
   if (_desktop >= _num_desktops)
     changeDesktop(_num_desktops - 1);
@@ -818,7 +821,7 @@ void Screen::changeNumDesktops(unsigned int num)
 
 void Screen::updateDesktopNames()
 {
-  unsigned long num = (unsigned) -1;
+  unsigned long num;
   
   if (!otk::Property::get(_info->rootWindow(),
                           otk::Property::atoms.net_desktop_names,
@@ -828,12 +831,6 @@ void Screen::updateDesktopNames()
     _desktop_names.push_back("Unnamed");
 }
 
-
-otk::ustring Screen::desktopName(unsigned int i) const
-{
-  if (i >= _num_desktops) return "";
-  return _desktop_names[i];
-}
 
 const otk::Rect& Screen::area(unsigned int desktop) const {
   assert(desktop < _num_desktops || desktop == 0xffffffff);

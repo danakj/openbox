@@ -110,6 +110,11 @@ void Workspace::addWindow(BlackboxWindow *w, bool place, bool sticky) {
         lastfocus = w;
       }
     }
+  } else {
+    w->setWorkspace(id);
+    // just give it some number, else bad things happen as it is assumed to not
+    // be on a workspace
+    w->setWindowNumber(0);
   }
 
   if (! w->isDesktop())

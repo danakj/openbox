@@ -429,13 +429,18 @@ void OBFrame::grabClient()
 
 void OBFrame::releaseClient()
 {
-  // XXX: check for a reparent before reparenting?
-  
-  // according to the ICCCM - if the client doesn't reparent to
-  // root, then we have to do it for them
-  XReparentWindow(otk::OBDisplay::display, _client->window(),
-                  _screen->rootWindow(),
-                  _client->area().x(), _client->area().y());
+  // check if the app has already reparented its window away
+  XEvent ev;
+  if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
+                             ReparentNotify, &ev)) {
+    XPutBack(otk::OBDisplay::display, &ev);
+  } else {
+    // according to the ICCCM - if the client doesn't reparent itself, then we
+    // will reparent the window to root for them
+    XReparentWindow(otk::OBDisplay::display, _client->window(),
+                    _screen->rootWindow(),
+                    _client->area().x(), _client->area().y());
+  }
 }
 
 

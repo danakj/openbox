@@ -6,3 +6,6 @@ autom4te.cache
 aclocal.m4
 .deps
 Makefile
+config.guess
+config.sub
+ltmain.sh

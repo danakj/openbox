@@ -1,7 +1,6 @@
 AC_PREREQ([2.50])
 AC_INIT([openbox], [2.90.0cvs], [http://bugzilla.icculus.org])
 AC_CONFIG_SRCDIR([kernel/openbox.c])
-AC_CONFIG_AUX_DIR([build])
 
 AC_PREFIX_DEFAULT([/usr/local])
 test "$prefix" = "NONE" && prefix=$ac_default_prefix

@@ -5,46 +5,50 @@
 import ob
 import otk
 
-def state_above(data, add=2):
+StateRemove = 0
+StateAdd = 1
+StateToggle = 2
+
+def state_above(data, add=StateAdd):
     """Toggles, adds or removes the 'above' state on a window.
-       The second paramater should one of: 0 - removes the state, 1 - adds the
-       state, 2 - toggles the state."""
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_above)
     
-def state_below(data, add=2):
+def state_below(data, add=StateAdd):
     """Toggles, adds or removes the 'below' state on a window.
-       The second paramater should one of: 0 - removes the state, 1 - adds the
-       state, 2 - toggles the state."""
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_below)
     
-def state_shaded(data, add=2):
+def state_shaded(data, add=StateAdd):
     """Toggles, adds or removes the 'shaded' state on a window.
-       The second paramater should one of: 0 - removes the state, 1 - adds the
-       state, 2 - toggles the state."""
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_shaded)
 
-def state_skip_taskbar(data, add=2):
+def state_skip_taskbar(data, add=StateAdd):
     """Toggles, adds or removes the 'skip_taskbar' state on a window.
-       The second paramater should one of: 0 - removes the state, 1 - adds the
-       state, 2 - toggles the state."""
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
                        add, otk.Property_atoms().net_wm_state_skip_taskbar)
     
-def state_skip_pager(data, add=2):
+def state_skip_pager(data, add=StateAdd):
     """Toggles, adds or removes the 'skip_pager' state on a window.
-       The second paramater should one of: 0 - removes the state, 1 - adds the
-       state, 2 - toggles the state."""
+       The second paramater should one of: StateRemove, StateAdd, or
+       StateToggle."""
     if not data.client: return
     ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
                        otk.Property_atoms().net_wm_state, data.client.window(),
@@ -97,15 +101,15 @@ def lower_win(data):
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""
-    state_shaded(data)
+    state_shaded(data, StateToggle)
 
 def shade(data):
     """Shades the window on which the event occured"""
-    state_shaded(data, 1)
+    state_shaded(data, StateAdd)
 
 def unshade(data):
     """Unshades the window on which the event occured"""
-    state_shaded(data, 0)
+    state_shaded(data, StateRemove)
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
@@ -151,7 +155,7 @@ def toggle_all_desktops(data):
     if not data.client.desktop() == 0xffffffff:
         send_to_desktop(data, 0xffffffff)
     else:
-        send_to_desktop(data, openbox.screen(data.screen).desktop())
+        send_to_desktop(data, ob.openbox.screen(data.screen).desktop())
     
 def send_to_all_desktops(data):
     """Sends a client to all desktops"""

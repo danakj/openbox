@@ -1541,9 +1541,6 @@ void BlackboxWindow::setWorkspace(unsigned int n) {
 
 
 void BlackboxWindow::shade(void) {
-  if (! (decorations & Decor_Titlebar))
-    return;
-
   if (flags.shaded) {
     XResizeWindow(blackbox->getXDisplay(), frame.window,
                   frame.inside_w, frame.inside_h);
@@ -1557,6 +1554,9 @@ void BlackboxWindow::shade(void) {
     frame.rect.setHeight(client.rect.height() + frame.margin.top +
                          frame.margin.bottom);
   } else {
+    if (! (decorations & Decor_Titlebar))
+      return;
+
     XResizeWindow(blackbox->getXDisplay(), frame.window,
                   frame.inside_w, frame.title_h);
     flags.shaded = True;
@@ -2741,6 +2741,11 @@ void BlackboxWindow::changeBlackboxHints(BlackboxHints *net) {
 
       break;
     }
+
+    // we can not be shaded if we lack a titlebar
+    if (flags.shaded && ! (decorations & Decor_Titlebar))
+      shade();
+
     if (frame.window) {
       XMapSubwindows(blackbox->getXDisplay(), frame.window);
       XMapWindow(blackbox->getXDisplay(), frame.window);

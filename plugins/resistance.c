@@ -253,7 +253,7 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
         dlt = lt - *h + c->frame->area.height;
         drb = rb;
         if (lt >= at && dlt < at && dlt >= at - resist.integer)
-            *h = rb - al + 1;
+            *h = rb - at + 1;
         break;
     }
 

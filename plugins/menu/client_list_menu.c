@@ -60,11 +60,11 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 
 /* executes it without changing the client in the actions, since we set that
    when we make the actions! */
-static void desk_menu_execute(ObMenuEntryFrame *self, gpointer data)
+static void desk_menu_execute(ObMenuEntry *self, gpointer data)
 {
     GSList *it;
 
-    for (it = self->entry->data.normal.actions; it; it = g_slist_next(it))
+    for (it = self->data.normal.actions; it; it = g_slist_next(it))
     {
         ObAction *act = it->data;
         act->func(&act->data);

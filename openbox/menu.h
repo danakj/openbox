@@ -20,11 +20,10 @@ typedef struct _ObSubmenuMenuEntry ObSubmenuMenuEntry;
 typedef struct _ObSeparatorMenuEntry ObSeparatorMenuEntry;
 
 typedef void (*ObMenuUpdateFunc)(struct _ObMenuFrame *frame, gpointer data);
-typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntryFrame *frame,
-                                  gpointer data);
+typedef void (*ObMenuExecuteFunc)(struct _ObMenuEntry *entry, gpointer data);
 typedef void (*ObMenuDestroyFunc)(struct _ObMenu *menu, gpointer data);
 
-extern GList *menu_visible;
+extern ObParseInst *menu_parse_inst;
 
 struct _ObMenu
 {

@@ -572,16 +572,22 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
 void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
 {
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+        /* grab all this shizzle, cuz when the menu gets hidden, 'self'
+           gets freed */
+        ObMenuEntry *entry = self->entry;
+        ObMenuExecuteFunc func = self->frame->menu->execute_func;
+        gpointer data = self->frame->menu->data;
+        GSList *acts = self->entry->data.normal.actions;
+
         /* release grabs before executing the shit */
         menu_frame_hide_all();
 
-        if (self->frame->menu->execute_func)
-            self->frame->menu->execute_func(self, self->frame->menu->data);
+        if (func)
+            func(entry, data);
         else {
             GSList *it;
 
-            for (it = self->entry->data.normal.actions; it;
-                 it = g_slist_next(it))
+            for (it = acts; it; it = g_slist_next(it))
             {
                 ObAction *act = it->data;
                 act->data.any.c = self->frame->client;

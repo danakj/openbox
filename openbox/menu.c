@@ -12,7 +12,9 @@
 #include "misc.h"
 #include "parser/parse.h"
 
-GHashTable *menu_hash = NULL;
+static GHashTable *menu_hash = NULL;
+
+ObParseInst *menu_parse_inst;
 
 typedef struct _ObMenuParseState ObMenuParseState;
 
@@ -129,69 +131,80 @@ void menu_startup(ObParseInst *i)
 {
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                       (GDestroyNotify)menu_destroy_hash_value);
+    menu_parse_inst = parse_startup();
 }
 
 void menu_shutdown()
 {
+    parse_shutdown(menu_parse_inst);
+    menu_parse_inst = NULL;
+
     menu_frame_hide_all();
     g_hash_table_destroy(menu_hash);
     menu_hash = NULL;
 }
 
+gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
+{
+    gboolean loaded = TRUE;
+    gchar *p;
+
+    p = g_build_filename(g_get_home_dir(), ".openbox", file, NULL);
+    if (!parse_load(p, "openbox_menu", doc, node)) {
+        g_free(p);
+        p = g_build_filename(RCDIR, file, NULL);
+        if (!parse_load(p, "openbox_menu", doc, node)) {
+            g_free(p);
+            p = g_strdup(file);
+            if (!parse_load(p, "openbox_menu", doc, node)) {
+                g_warning("Failed to load menu from '%s'", file);
+                loaded = FALSE;
+            }
+        }
+    }
+    g_free(p);
+    return loaded;
+}
+
 void menu_parse()
 {
-    ObParseInst *i;
     ObMenuParseState parse_state;
     xmlDocPtr doc;
     xmlNodePtr node;
-    gchar *p;
     gboolean loaded = FALSE;
+    GSList *it;
 
-    i = parse_startup();
+    for (it = config_menu_files; it; it = g_slist_next(it)) {
+        if (menu_open(it->data, &doc, &node))
+            loaded = TRUE;
 
-    if (config_menu_path)
-        if (!(loaded =
-              parse_load(config_menu_path, "openbox_menu", &doc, &node)))
-            g_warning("Failed to load menu from '%s'", config_menu_path);
-    if (!loaded) {
-        p = g_build_filename(g_get_home_dir(), ".openbox", "menu", NULL);
-        if (!(loaded =
-              parse_load(p, "openbox_menu", &doc, &node)))
-            g_warning("Failed to load menu from '%s'", p);
-        g_free(p);
     }
-    if (!loaded) {
-        p = g_build_filename(RCDIR, "menu", NULL);
-        if (!(loaded =
-              parse_load(p, "openbox_menu", &doc, &node)))
-            g_warning("Failed to load menu from '%s'", p);
-        g_free(p);
-    }
+    if (!loaded)
+        loaded = menu_open("menu", &doc, &node);
 
     if (loaded) {
         parse_state.menus = NULL;
 
-        parse_register(i, "menu", parse_menu, &parse_state);
-        parse_register(i, "item", parse_menu_item, &parse_state);
-        parse_register(i, "separator", parse_menu_separator, &parse_state);
-        parse_tree(i, doc, node->xmlChildrenNode);
+        parse_register(menu_parse_inst, "menu", parse_menu, &parse_state);
+        parse_register(menu_parse_inst, "item", parse_menu_item, &parse_state);
+        parse_register(menu_parse_inst, "separator",
+                       parse_menu_separator, &parse_state);
+        parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
     }
-
-    parse_shutdown(i);
 }
 
 gboolean menu_new(gchar *name, gchar *title, gpointer data)
 {
     ObMenu *self;
 
-    if (g_hash_table_lookup(menu_hash, name)) return FALSE;
+    /*if (g_hash_table_lookup(menu_hash, name)) return FALSE;*/
 
     self = g_new0(ObMenu, 1);
     self->name = g_strdup(name);
     self->title = g_strdup(title);
     self->data = data;
 
-    g_hash_table_insert(menu_hash, self->name, self);
+    g_hash_table_replace(menu_hash, self->name, self);
 
     return TRUE;
 }

@@ -109,7 +109,7 @@ window.button.disabled.unfocus.borderColor: #7b7d7b
 !! Global width settings
 borderWidth: 1
 bevelWidth: 1
-handleWidth: 4
+handleWidth: 3
 frameWidth: 0
 !borderColor: #091d2e
 borderColor: #091d2e

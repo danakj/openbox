@@ -420,7 +420,6 @@ void Screen::changeStackingList()
 void Screen::changeWorkArea() {
   unsigned long *dims = new unsigned long[4 * _num_desktops];
   for (long i = 0; i < _num_desktops; ++i) {
-    // XXX: this could be different for each workspace
     dims[(i * 4) + 0] = _area.x();
     dims[(i * 4) + 1] = _area.y();
     dims[(i * 4) + 2] = _area.width();

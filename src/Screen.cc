@@ -1217,8 +1217,8 @@ void BScreen::manageWindow(Window w) {
     // desktop windows cant do anything, so we remove all the normal window
     // stuff from them, they are only kept around so that we can keep them on
     // the bottom of the z-order
-    addDesktopWindow(win->getClientWindow());
     win->restore(True);
+    addDesktopWindow(win->getClientWindow());
     delete win;
     return;
   }

@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <string.h>
 #include "yacc_parser.hh"
 %}
 
@@ -47,16 +48,16 @@ showWorkspaceMenu |
 stringChain |
 keyChain |
 numberChain |
-cancel              yylval = strdup(yytext); return ACTION;
+cancel              yylval = (int) strdup(yytext); return ACTION;
 Mod1 |
 Mod2 |
 Mod3 |
 Mod4 |
 Control |
-Shift               yylval = strdup(yytext); return BINDING;
-[0-9]+              yylval = strdup(yytext); return NUMBER;
-\".+\"              yylval = strdup(yytext); return QUOTES;
-[a-zA-Z_0-9]+       yylval = strdup(yytext); return WORD;
+Shift               yylval = (int) strdup(yytext); return BINDING;
+[0-9]+              yylval = (int) strdup(yytext); return NUMBER;
+\".+\"              yylval = (int) strdup(yytext); return QUOTES;
+[a-zA-Z_0-9]+       yylval = (int) strdup(yytext); return WORD;
 #.+\n               /* ignore */
 \n                  /* ignore */
 [ \t]+              /* */

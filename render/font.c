@@ -108,7 +108,6 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
 
     x += 3; /* XXX figure out X with justification */
 
-    g_message("SHADOW %d %d %d", t->shadow, t->offset, t->tint);
     if (t->shadow) {
 
         if (t->tint >= 0) {

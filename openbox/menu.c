@@ -408,7 +408,7 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* TODO: I don't understand why these bevels should be here.
 	       Something must be wrong in the width calculation */
 	    x = self->parent->location.x + self->parent->size.width + 
-		ob_rr_theme->bevel;
+		ob_rr_theme->bwidth;
 
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);

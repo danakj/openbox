@@ -449,8 +449,8 @@ void Frame::renderLabel()
     src = _title_sur->pixelData() + w * (geom.bevel + 1) + geom.title_x;
     
     // get the background under the label
-    int xd = s->width();
-    int yd = s->height();
+    int xd = s->size().width();
+    int yd = s->size().height();
     for (int y = 0; y < yd; ++y, src += w - xd)
       for (int x = 0; x < xd; ++x, ++dest, ++src)
         *dest = *src;

@@ -31,7 +31,7 @@ void place_random(Client *c)
                      TRUE, TRUE);
 }
 
-void event(ObEvent *e, void *foo)
+void place_event(ObEvent *e, void *foo)
 {
     g_assert(e->type == Event_Client_New);
 
@@ -43,7 +43,7 @@ void event(ObEvent *e, void *foo)
 
 void plugin_startup()
 {
-    dispatch_register(Event_Client_New, (EventHandler)event, NULL);
+    dispatch_register(Event_Client_New, (EventHandler)place_event, NULL);
 
     history_startup();
 }

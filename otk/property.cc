@@ -139,6 +139,7 @@ OBProperty::OBProperty()
   _atoms[net_wm_state_skip_pager] = create("_NET_WM_STATE_SKIP_PAGER");
   _atoms[net_wm_state_hidden] = create("_NET_WM_STATE_HIDDEN");
   _atoms[net_wm_state_fullscreen] = create("_NET_WM_STATE_FULLSCREEN");
+  _atoms[net_wm_state_floating] = create("_NET_WM_STATE_FLOATING");
   
   _atoms[kde_net_system_tray_windows] = create("_KDE_NET_SYSTEM_TRAY_WINDOWS");
   _atoms[kde_net_wm_system_tray_window_for] =

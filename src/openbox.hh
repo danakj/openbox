@@ -118,6 +118,8 @@ public:
   */
   inline otk::OBTimerQueueManager *timerManager() { return &_timermanager; }
 
+  inline const otk::OBProperty *property() const { return _property; }
+
   //! The main function of the Openbox class
   /*!
     This function should be called after instantiating the Openbox class.

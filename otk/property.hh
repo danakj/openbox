@@ -136,6 +136,7 @@ public:
     net_wm_state_skip_pager,
     net_wm_state_hidden,
     net_wm_state_fullscreen,
+    net_wm_state_floating,
 
     kde_net_system_tray_windows,
     kde_net_wm_system_tray_window_for,
@@ -317,7 +318,7 @@ public:
              value to return
     @return The value of the specified Atom
   */
-  inline Atom atom(Atoms a) {
+  inline Atom atom(Atoms a) const {
     assert(a >= 0 && a < NUM_ATOMS); Atom ret = _atoms[a]; assert(ret != 0);
     return ret;
   }

@@ -79,10 +79,6 @@ public:
 
   virtual void motionHandler(const XMotionEvent &e);
 
-  virtual void mapRequestHandler(const XMapRequestEvent &e);
-  virtual void unmapHandler(const XUnmapEvent &e);
-  virtual void destroyHandler(const XDestroyWindowEvent &e);
-
 #ifdef    XKB
   virtual void xkbHandler(const XkbEvent &e);
 #endif // XKB

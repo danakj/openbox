@@ -271,24 +271,6 @@ void Actions::motionHandler(const XMotionEvent &e)
   openbox->bindings()->fireButton(&data);
 }
 
-void Actions::mapRequestHandler(const XMapRequestEvent &e)
-{
-  otk::EventHandler::mapRequestHandler(e);
-  // do this in Screen::manageWindow
-}
-
-void Actions::unmapHandler(const XUnmapEvent &e)
-{
-  otk::EventHandler::unmapHandler(e);
-  // do this in Screen::unmanageWindow
-}
-
-void Actions::destroyHandler(const XDestroyWindowEvent &e)
-{
-  otk::EventHandler::destroyHandler(e);
-  // do this in Screen::unmanageWindow
-}
-
 #ifdef    XKB
 void Actions::xkbHandler(const XkbEvent &e)
 {

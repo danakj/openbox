@@ -191,10 +191,10 @@ void action_run_list(GSList *acts, struct _ObClient *c,
     action_run_list(a, c, s, 0, -1, -1, n, d)
 
 #define action_run_key(a, c, s, x, y) \
-    action_run_list(a, c, s, 0, x, y, FALSE,FALSE)
+    action_run_list(a, c, s, 0, x, y, FALSE, FALSE)
 
 #define action_run(a, c, s) \
-    action_run_list(a, c, s, 0, -1, -1, FALSE,FALSE)
+    action_run_list(a, c, s, 0, -1, -1, FALSE, FALSE)
 
 /* Execute */
 void action_execute(union ActionData *data);

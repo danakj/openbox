@@ -10,7 +10,7 @@ RrPixmapMask *RrPixmapMaskNew(const RrInstance *inst,
     m->width = w;
     m->height = h;
     /* round up to nearest byte */
-    m->data = g_memdup(data, (w * h + 7) / 8);
+    m->data = g_memdup(data, (w + 7) / 8 * h);
     m->mask = XCreateBitmapFromData(RrDisplay(inst), RrRootWindow(inst),
                                     data, w, h);
     return m;
@@ -56,7 +56,7 @@ RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src)
     m->width = src->width;
     m->height = src->height;
     /* round up to nearest byte */
-    m->data = g_memdup(src->data, (src->width * src->height + 7) / 8);
+    m->data = g_memdup(src->data, (src->width + 7) / 8 * src->height);
     m->mask = XCreateBitmapFromData(RrDisplay(m->inst), RrRootWindow(m->inst),
                                     m->data, m->width, m->height);
     return m;

@@ -1001,6 +1001,7 @@ static void event_handle_menu(Client *client, XEvent *e)
             else
                 menu_control_mouseover(over, FALSE);
             menu_entry_render(over);
+            over = NULL;
         }
 /*
         if (top->hide)
@@ -1032,6 +1033,15 @@ static void event_handle_menu(Client *client, XEvent *e)
                                                     m->location.x,
                                                     e->xbutton.y_root -
                                                     m->location.y))) {
+                    if (over) {
+                        if (over->parent->mouseover)
+                            over->parent->mouseover(over, FALSE);
+                        else
+                            menu_control_mouseover(over, FALSE); 
+                        menu_entry_render(over);
+                        over = NULL;
+                    }
+                    /* this hides the menu */
                     menu_entry_fire(entry);
                 }
                 break;
@@ -1044,6 +1054,7 @@ static void event_handle_menu(Client *client, XEvent *e)
                 else
                     menu_control_mouseover(over, FALSE); 
                 menu_entry_render(over);
+                over = NULL;
             }
 /*
             if (top->hide)

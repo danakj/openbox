@@ -33,8 +33,7 @@ typedef enum {
 /*! Call this when you need to focus something! */
 void focus_fallback(ObFocusFallbackType type);
 
-/*! Cycle focus amongst windows
-  Returns the _ObClient to which focus has been cycled, or NULL if none. */
+/*! Cycle focus amongst windows. */
 void focus_cycle(gboolean forward, gboolean linear,
                  gboolean dialog, gboolean done, gboolean cancel);
 void focus_directional_cycle(ObDirection dir,

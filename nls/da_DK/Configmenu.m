@@ -16,6 +16,8 @@ $ #FocusNew
 # Fokus nyt vindue
 $ #FocusLast
 # Fokus vindue ved skrivebords ændring
+$ #DisableBindings
+# Deaktiver tastebindinger med Scroll Lock
 $ #ClickToFocus
 # Klik for fokus
 $ #SloppyFocus

@@ -77,8 +77,6 @@ static void showHelp(int exitval) {
               "Compile time options:\n"
               "  Debugging:\t\t\t%s\n"
               "  Shape:\t\t\t%s\n"
-              "  Slit:\t\t\t\t%s\n"
-              "  Event Clobbering:\t\t%s\n"
               "  8bpp Ordered Dithering:\t%s\n\n"),
 #ifdef    DEBUG
          i18n(CommonSet, CommonYes, "yes"),
@@ -91,18 +89,6 @@ static void showHelp(int exitval) {
 #else // !SHAPE
          i18n(CommonSet, CommonNo, "no"),
 #endif // SHAPE
-
-#ifdef    SLIT
-         i18n(CommonSet, CommonYes, "yes"),
-#else // !SLIT
-         i18n(CommonSet, CommonNo, "no"),
-#endif // SLIT
-
-#ifndef   NOCLOBBER
-         i18n(CommonSet, CommonYes, "yes"),
-#else // !NOCLOBBER
-         i18n(CommonSet, CommonNo, "no"),
-#endif // NOCLOBBER
 
 #ifdef    ORDEREDPSEUDO
          i18n(CommonSet, CommonYes, "yes")

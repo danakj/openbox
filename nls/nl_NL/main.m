@@ -21,6 +21,4 @@ $ #CompileOptions
 # Gecompileerd met instellingen:\n\
   Debugging:               %s\n\
   Shape:                   %s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp Ordered Dithering:  %s\n\n

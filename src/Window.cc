@@ -819,24 +819,27 @@ void BlackboxWindow::reconfigure(void) {
 
 
 void BlackboxWindow::grabButtons(void) {
-  if ((! screen->isSloppyFocus()) || screen->doClickRaise())
+  if (! screen->isSloppyFocus() || screen->doClickRaise())
     // grab button 1 for changing focus/raising
     blackbox->grabButton(Button1, 0, frame.plate, True, ButtonPressMask,
-                         GrabModeSync, GrabModeSync, frame.plate, None);
-
+                         GrabModeSync, GrabModeSync, frame.plate, None,
+                         screen->allowScrollLock());
+  
   if (functions & Func_Move)
     blackbox->grabButton(Button1, Mod1Mask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-                         GrabModeAsync, frame.window,
-                         blackbox->getMoveCursor());
+                         GrabModeAsync, frame.window, None,
+                         screen->allowScrollLock());
   if (functions & Func_Resize)
     blackbox->grabButton(Button3, Mod1Mask, frame.window, True,
                          ButtonReleaseMask | ButtonMotionMask, GrabModeAsync,
-                         GrabModeAsync, frame.window, None);
+                         GrabModeAsync, frame.window, None,
+                         screen->allowScrollLock());
   // alt+middle lowers the window
   blackbox->grabButton(Button2, Mod1Mask, frame.window, True,
                        ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
-                       frame.window, None);
+                       frame.window, None,
+                       screen->allowScrollLock());
 }
 
 

@@ -20,6 +20,8 @@ $ #WindowToWindowSnap
 # Window-To-Window Snapping
 $ #WindowCornerSnap
 # Window Corner Snapping
+$ #DisableBindings
+# Disable Mouse with Scroll Lock
 $ #HideToolbar
 # Hide Toolbar
 $ #ClickToFocus

@@ -144,8 +144,8 @@ private:
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
-      hide_toolbar, window_to_window_snap, window_corner_snap, aa_fonts,
-      ignore_shaded, ignore_maximized;
+      allow_scroll_lock, hide_toolbar, window_to_window_snap,
+      window_corner_snap, aa_fonts, ignore_shaded, ignore_maximized;
     BColor border_color;
 
     unsigned int workspaces;
@@ -214,6 +214,7 @@ public:
     { return resource.window_to_window_snap; }
   inline bool getWindowCornerSnap(void) const
     { return resource.window_corner_snap; }
+  inline bool allowScrollLock(void) const { return resource.allow_scroll_lock; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
@@ -285,6 +286,7 @@ public:
   void saveResizeZones(unsigned int z);
   void savePlaceIgnoreShaded(bool i);
   void savePlaceIgnoreMaximized(bool i);
+  void saveAllowScrollLock(bool a);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

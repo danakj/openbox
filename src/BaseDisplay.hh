@@ -77,10 +77,8 @@ private:
   };
   BShape shape;
 
-#ifndef   NOCLOBBER
   unsigned int MaskList[8];
   size_t MaskListLength;
-#endif // NOCLOBBER
 
   enum RunState { STARTUP, RUNNING, SHUTDOWN };
   RunState run_state;
@@ -139,7 +137,8 @@ public:
   void grabButton(unsigned int button, unsigned int modifiers,
                   Window grab_window, bool owner_events,
                   unsigned int event_mask, int pointer_mode,
-                  int keyboard_mode, Window confine_to, Cursor cursor) const;
+                  int keyboard_mode, Window confine_to, Cursor cursor,
+                  bool allow_scroll_lock) const;
   void ungrabButton(unsigned int button, unsigned int modifiers,
                     Window grab_window) const;
 

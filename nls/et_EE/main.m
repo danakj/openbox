@@ -21,6 +21,4 @@ $ #CompileOptions
 # Kompileerimisoptsioonid:\n\
   Debuggimine\t\t\t%s\n\
   Kuju:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp m‰‰ratud teravustamine:\t%s\n\n

@@ -21,6 +21,4 @@ $ #CompileOptions
 # Opções em tempo de compilação:\n\
   Informações extras para problemas:\t\t\t%s\n\
   Forma:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp Simulação ordenada de cores em imagens:\t%s\n\n

@@ -238,7 +238,6 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   for (int i = 0; i < ScreenCount(display); ++i)
     screenInfoList.push_back(ScreenInfo(this, i));
 
-#ifndef   NOCLOBBER
   NumLockMask = ScrollLockMask = 0;
 
   const XModifierKeymap* const modmap = XGetModifierMapping(display);
@@ -268,20 +267,16 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   MaskList[0] = 0;
   MaskList[1] = LockMask;
   MaskList[2] = NumLockMask;
-  MaskList[3] = ScrollLockMask;
-  MaskList[4] = LockMask | NumLockMask;
-  MaskList[5] = NumLockMask  | ScrollLockMask;
-  MaskList[6] = LockMask | ScrollLockMask;
-  MaskList[7] = LockMask | NumLockMask | ScrollLockMask;
+  MaskList[3] = LockMask | NumLockMask;
+  MaskList[4] = ScrollLockMask;
+  MaskList[5] = ScrollLockMask | LockMask;
+  MaskList[6] = ScrollLockMask | NumLockMask;
+  MaskList[7] = ScrollLockMask | LockMask | NumLockMask;
   MaskListLength = sizeof(MaskList) / sizeof(MaskList[0]);
 
   if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
-#else  // NOCLOBBER
-  NumLockMask = 0;
-  ScrollLockMask = 0;
-#endif // NOCLOBBER
 
-  gccache = 0;
+  gccache = (BGCCache *) 0;
 }
 
 
@@ -359,23 +354,23 @@ void BaseDisplay::removeTimer(BTimer *timer) {
 /*
  * Grabs a button, but also grabs the button in every possible combination
  * with the keyboard lock keys, so that they do not cancel out the event.
+
+ * if allow_scroll_lock is true then only the top half of the lock mask
+ * table is used and scroll lock is ignored.  This value defaults to false.
  */
 void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
                              Window grab_window, bool owner_events,
                              unsigned int event_mask, int pointer_mode,
                              int keyboard_mode, Window confine_to,
-                             Cursor cursor) const {
-#ifndef   NOCLOBBER
-  for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
+                             Cursor cursor, bool allow_scroll_lock) const {
+  unsigned int length = (allow_scroll_lock) ? MaskListLength / 2:
+                                              MaskListLength;
+  for (size_t cnt = 0; cnt < length; ++cnt)
     XGrabButton(display, button, modifiers | MaskList[cnt], grab_window,
                 owner_events, event_mask, pointer_mode, keyboard_mode,
                 confine_to, cursor);
-#else  // NOCLOBBER
-  XGrabButton(display, button, modifiers, grab_window,
-              owner_events, event_mask, pointer_mode, keyboard_mode,
-              confine_to, cursor);
-#endif // NOCLOBBER
 }
+
 
 /*
  * Releases the grab on a button, and ungrabs all possible combinations of the
@@ -383,12 +378,8 @@ void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
  */
 void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
                                Window grab_window) const {
-#ifndef   NOCLOBBER
   for (size_t cnt = 0; cnt < MaskListLength; ++cnt)
     XUngrabButton(display, button, modifiers | MaskList[cnt], grab_window);
-#else  // NOCLOBBER
-  XUngrabButton(display, button, modifiers, grab_window);
-#endif // NOCLOBBER
 }
 
 
@@ -399,10 +390,11 @@ const ScreenInfo* BaseDisplay::getScreenInfo(unsigned int s) const {
 }
 
 
-BGCCache *BaseDisplay::gcCache(void) const
-{
-    if (! gccache) gccache = new BGCCache(this);
-    return gccache;
+BGCCache* BaseDisplay::gcCache(void) const {
+  if (! gccache)
+    gccache = new BGCCache(this);
+  
+  return gccache;
 }
 
 

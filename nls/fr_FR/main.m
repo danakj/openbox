@@ -21,6 +21,4 @@ $ #CompileOptions
 # Options de compilation:\n\
   Debugage\t\t\t%s\n\
   Shape:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp Lissage ordonné:\t%s\n\n

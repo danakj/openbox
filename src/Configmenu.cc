@@ -57,8 +57,10 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Window-To-Window Snapping"), 6);
   insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
               "Window Corner Snapping"), 7);
+  insert(i18n(ConfigmenuSet, ConfigmenuDisableBindings,
+              "Disable Mouse with Scroll Lock"), 8);
   insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
-              "Hide Toolbar"), 8);
+              "Hide Toolbar"), 9);
   update();
   setValues();
 }
@@ -75,7 +77,8 @@ void Configmenu::setValues(void) {
   setItemSelected(8, getScreen()->getWindowCornerSnap());
   setItemEnabled(8, getScreen()->getWindowToWindowSnap());
   
-  setItemSelected(9, getScreen()->doHideToolbar());
+  setItemSelected(9, getScreen()->allowScrollLock());
+  setItemSelected(10, getScreen()->doHideToolbar());
 }
 
 
@@ -83,6 +86,7 @@ Configmenu::~Configmenu(void) {
   delete focusmenu;
   delete placementmenu;
 }
+
 
 void Configmenu::itemSelected(int button, unsigned int index) {
   if (button != 1)
@@ -130,7 +134,13 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(index, getScreen()->getWindowCornerSnap());
     break;
 
-  case 8: // hide toolbar
+  case 8: // disable mouse bindings with Scroll Lock
+    getScreen()->saveAllowScrollLock(! getScreen()->allowScrollLock());
+    setItemSelected(index, getScreen()->allowScrollLock());
+    getScreen()->reconfigure();
+    break;
+
+  case 9: // hide toolbar
     getScreen()->saveHideToolbar(! getScreen()->doHideToolbar());
     setItemSelected(index, getScreen()->doHideToolbar());
     break;

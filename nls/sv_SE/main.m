@@ -21,6 +21,4 @@ $ #CompileOptions
 # Kompilerad med:\n\
   Avlusning\t\t\t%s\n\
   Form:\t\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   8bpp ordnad dithering:\t%s\n\n

@@ -112,24 +112,6 @@ if test x$XFT = "xyes"; then
   AC_DEFINE(XFT,1,Enable support of the Xft extension)
 fi
 
-dnl Check for the Slit
-SLIT=""
-AC_MSG_CHECKING([whether to include the Slit])
-AC_ARG_ENABLE(
-  slit, [  --enable-slit           include code for the Slit [default=yes]],
-  if test x$enableval = "xyes"; then
-    AC_MSG_RESULT([yes])
-    SLIT="yes"
-  else
-    AC_MSG_RESULT([no])
-  fi,
-  AC_MSG_RESULT([yes])
-  SLIT="yes"
-)
-if test x$SLIT = "xyes"; then
-  AC_DEFINE(SLIT,1,Enable the Slit)
-fi
-
 dnl Check for ordered 8bpp dithering
 ORDEREDPSEUDO=""
 AC_MSG_CHECKING([whether to include Pseudocolor ordered dithering code])
@@ -146,24 +128,6 @@ AC_ARG_ENABLE(ordered-pseudo,
 )
 if test x$ORDEREDPSEUDO = "xyes"; then
   AC_DEFINE(ORDEREDPSEUDO,1,Enable pseudocolor ordered dithering)
-fi
-
-dnl Check for event clobbering
-CLOBBER=""
-AC_MSG_CHECKING([whether to intercept mouse events to clients])
-AC_ARG_ENABLE(clobber,
-[  --enable-clobber        intercept mouse events to clients when num lock 
-			  or scroll lock are on [default=yes]],
-  if test x$enableval = "xno"; then
-    AC_MSG_RESULT([no])
-    CLOBBER="no"
-  else
-    AC_MSG_RESULT([yes]) 
-  fi,
-  AC_MSG_RESULT([yes])
-)
-if test x$CLOBBER = "xno"; then
-  AC_DEFINE(NOCLOBBER,1,Disable grabbing of mouse events when num/scoll lock is pressed)
 fi
 
 dnl Check whether to include debugging code

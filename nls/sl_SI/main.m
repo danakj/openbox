@@ -21,6 +21,4 @@ $ #CompileOptions
 # Izbire pri prevajanju:\n\
   Razhro¹èevanje\t\t\t%s\n\
   Oblika:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
   Osembitno stresanje barv:\t%s\n\n

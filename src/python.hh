@@ -81,7 +81,7 @@ struct EventAction {
     EnterWindow,        //!< Occurs when the mouse enters a window
     LeaveWindow,        //!< Occurs when the mouse leaves a window
     //! Occurs while a window is being managed. The handler should call
-    //! Client::move to the window
+    //! Client::move on the window
     PlaceWindow,
     //! Occurs while a window is being managed, just before the window is
     //! displayed

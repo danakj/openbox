@@ -679,8 +679,6 @@ void Client::updateTransientFor()
     _transient_for = c;
     if (_transient_for)
       _transient_for->_transients.push_back(this); // add to new parent
-
-    // XXX: change decor status?
   }
 }
 
@@ -841,7 +839,6 @@ void Client::setState(StateAction action, long data1, long data2)
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
         if (_max_horz) continue;
         maxh = true;
-        // XXX: resize the window etc
       } else if (state == otk::Property::atoms.net_wm_state_shaded) {
         shadestate = true;
       } else if (state == otk::Property::atoms.net_wm_state_skip_taskbar) {
@@ -1551,6 +1548,13 @@ void Client::disableDecorations(DecorationFlags flags)
 }
 
 
+bool Client::focusModalChild()
+{
+  // XXX: find a modal child recursively and try focus it
+  return false;
+}
+
+
 bool Client::focus()
 {
   // won't try focus if the client doesn't want it, or if the window isn't
@@ -1558,6 +1562,10 @@ bool Client::focus()
   if (!(frame->isVisible() && (_can_focus || _focus_notify))) return false;
 
   if (_focused) return true;
+
+  if (_modal)
+    if (focusModalChild())
+      return true;
 
   // do a check to see if the window has already been unmapped or destroyed
   // do this intelligently while watching out for unmaps we've generated

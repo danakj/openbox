@@ -472,6 +472,12 @@ private:
   void internal_resize(Corner anchor, int w, int h, bool user = true,
                        int x = INT_MIN, int y = INT_MIN);
 
+  //! Attempts to focus a modal child of this window, recursively.
+  /*!
+    @return true if a modal child has been found and focused; otherwise, false.
+  */
+  bool focusModalChild();
+
 public:
 #ifndef SWIG
   //! Constructs a new Client object around a specified window id

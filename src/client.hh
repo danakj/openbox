@@ -622,6 +622,11 @@ BB    @param window The window id that the Client class should handle
   const otk::Size &logicalSize() const { return _logical_size; }
 
   //! Returns the position and size of the client relative to the root window
+  /*!
+    Note that this value is *not* the size and position of the window's
+    frame, though the position will often line up.<br>
+    If you want the frame's area, use Frame::area() instead.
+  */
   inline const otk::Rect &area() const { return _area; }
 
   //! Returns the client's strut definition

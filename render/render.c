@@ -110,7 +110,11 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
     g_free(l->surface.data.planar.pixel_data);
     l->surface.data.planar.pixel_data = g_new(pixel32, w * h);
 
-    if (l->surface.data.planar.grad == Background_Solid)
+
+    if (l->surface.data.planar.grad == Background_ParentRelative) {
+        memset(l->surface.data.planar.pixel_data, 0xFF, w*h*4);
+    }
+    else if (l->surface.data.planar.grad == Background_Solid)
         gradient_solid(l, x, y, w, h);
     else gradient_render(&l->surface, w, h);
 

@@ -1585,15 +1585,9 @@ Client *Client::searchModalTree(Client *node, Client *skip)
   
   for (it = node->_transients.begin(); it != end; ++it) {
     if (*it == skip) continue; // circular?
-    printf("recursing\n");
     if ((ret = searchModalTree(*it, skip))) return ret; // got one
-    printf("trying this window\n");
-    if ((*it)->_modal) {
-          printf("found it\n");
-          return *it; // got one
-    }
+    if ((*it)->_modal) return *it; // got one
   }
-  printf("found none\n");
   return 0;
 }
 

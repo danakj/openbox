@@ -562,10 +562,10 @@ void RenderStyle::defaultStyle(RenderStyle *s, int screen)
                                                false,
                                                RenderTexture::Flat,
                                                RenderTexture::Bevel1,
-                                               false,
+                                               true,
                                                RenderTexture::Solid,
                                                false,
-                                               0, 0, 0, 0);
+                                               0, 0, 0xffffff, 0);
   s->_button_unpress_unfocus = new RenderTexture(screen,
                                                  false,
                                                  RenderTexture::Flat,
@@ -579,10 +579,10 @@ void RenderStyle::defaultStyle(RenderStyle *s, int screen)
                                              false,
                                              RenderTexture::Flat,
                                              RenderTexture::Bevel1,
-                                             false,
+                                             true,
                                              RenderTexture::Solid,
                                              false,
-                                             0, 0, 0, 0);
+                                             0, 0, 0xffffff, 0);
   s->_button_press_unfocus = new RenderTexture(screen,
                                                false,
                                                RenderTexture::Flat,

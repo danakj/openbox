@@ -5,6 +5,7 @@ Changelog for Openbox:
    iconified windows causing some client apps to 'lock'.
 
  * Added sendToWorkspace epistrophy action.		(Scott Moynes)
+
 2.2.3:
  * Fix compile errors when the strftime funtion is not  (Ben Jansens)
    found on the system.

@@ -164,10 +164,6 @@ public:
   static const long no_propagate_mask = ButtonPressMask | ButtonReleaseMask |
                                         ButtonMotionMask;
 
-  //! The desktop value which indicated the window is iconified and not on any
-  //! desktop
-  static const long ICONIC_DESKTOP = 0xfffffffe;
-
   //! The number of unmap events to ignore on the window
   int ignore_unmaps;
   
@@ -188,11 +184,7 @@ private:
   Client::List _transients;
 
   //! The desktop on which the window resides (0xffffffff for all desktops)
-  long _desktop;
-
-  //! The last desktop to which the window belonged, mostly useful when the
-  //! window is iconified, to see where it used to be.
-  long _old_desktop;
+  unsigned int _desktop;
 
   //! Normal window title
   otk::ustring  _title;
@@ -380,11 +372,7 @@ private:
   void setState(StateAction action, long data1, long data2);
 
   //! Sends the window to the specified desktop
-  /*!
-    A window is iconified by sending it to the ICONIC_DESKTOP, and restored
-    by sending it to any other valid desktop.
-  */
-  void setDesktop(long desktop);
+  void setDesktop(unsigned int desktop);
   
   //! Calculates the stacking layer for the client window
   void calcLayer();
@@ -445,6 +433,16 @@ private:
                     when restoring a window from fullscreen.
   */
   void fullscreen(bool fs, bool savearea = true);
+
+  //! Iconifies or uniconifies the client window
+  /*!
+    @param iconic true if the window should be iconified; false if it should be
+                  restored.
+    @param curdesk If iconic is false, then this determines if the window will
+                   be uniconified to the current viewable desktop (true) or to
+                   its previous desktop (false)
+  */
+  void iconify(bool iconic, bool curdesk = true);
 
   //! Maximize or unmaximize the client window
   /*!
@@ -532,7 +530,7 @@ BB    @param window The window id that the Client class should handle
     This value is a 0-based index.<br>
     A value of 0xffffffff indicates that the window exists on all desktops.
   */
-  inline long desktop() const { return _desktop; }
+  inline unsigned int desktop() const { return _desktop; }
   //! Returns the window's title
   inline const otk::ustring &title() const { return _title; }
   //! Returns the window's title when it is iconified
@@ -653,6 +651,12 @@ BB    @param window The window id that the Client class should handle
     surroundings (struts, etc).
   */
   void remaximize();
+
+  //! Shows the window if it should be shown, or hides it
+  /*!
+    Used when changing desktops, the window's state, etc.
+  */
+  void showhide();
   
   //! Choose a mask of decorations to not display on the client
   /*!

@@ -105,7 +105,7 @@ Screen::Screen(int screen)
 
   _desktop = 0;
   
-  if (!python_get_long("NUMBER_OF_DESKTOPS", &_num_desktops))
+  if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&_num_desktops))
     _num_desktops = 1;
   changeNumDesktops(_num_desktops); // set the hint
 
@@ -217,16 +217,16 @@ void Screen::updateStruts()
 
   ClientList::const_iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
-    long desk = (*it)->desktop();
+    if ((*it)->iconic()) continue; // these dont count in the strut
+    
+    unsigned int desk = (*it)->desktop();
     const otk::Strut &s = (*it)->strut();
 
-    if (desk == (signed) 0xffffffff)
+    if (desk == 0xffffffff)
       for (unsigned int i = 0, e = _struts.size(); i < e; ++i)
         apply(_struts[i], s);
-    else if ((unsigned)desk < _struts.size())
+    else if (desk < _struts.size())
       apply(_struts[desk], s);
-    else if (desk == Client::ICONIC_DESKTOP)
-      continue; // skip for the 'all desktops' strut
     else
       assert(false); // invalid desktop otherwise..
     // apply to the 'all desktops' strut
@@ -239,7 +239,7 @@ void Screen::updateStruts()
 void Screen::changeWorkArea()
 {
   unsigned long *dims = new unsigned long[4 * _num_desktops];
-  for (long i = 0; i < _num_desktops + 1; ++i) {
+  for (unsigned int i = 0; i < _num_desktops + 1; ++i) {
     otk::Rect old_area = _area[i];
 /*
 #ifdef    XINERAMA
@@ -286,7 +286,7 @@ void Screen::changeWorkArea()
             (*it)->remaximize();
         } else {
           // the 'all desktops' size
-          if ((*it)->desktop() == (signed) 0xffffffff)
+          if ((*it)->desktop() == 0xffffffff)
             (*it)->remaximize();
         }
     }
@@ -537,11 +537,7 @@ void Screen::manageWindow(Window window)
   EventData ddata(_number, client, EventAction::DisplayingWindow, 0);
   openbox->bindings()->fireEvent(&ddata);
 
-  // if on the current desktop.. (or all desktops)
-  if (client->desktop() == _desktop ||
-      client->desktop() == (signed)0xffffffff) {
-    client->frame->show();
-  }
+  client->showhide();
 
   client->applyStartupState();
 
@@ -708,13 +704,13 @@ void Screen::raiseWindow(Client *client)
   changeStackingList(); 
 }
 
-void Screen::changeDesktop(long desktop)
+void Screen::changeDesktop(unsigned int desktop)
 {
-  if (!(desktop >= 0 && desktop < _num_desktops)) return;
+  if (desktop >= _num_desktops) return;
 
-  printf("Moving to desktop %ld\n", desktop);
+  printf("Moving to desktop %u\n", desktop);
   
-  long old = _desktop;
+  unsigned int old = _desktop;
   
   _desktop = desktop;
   otk::Property::set(_info->rootWindow(),
@@ -724,20 +720,15 @@ void Screen::changeDesktop(long desktop)
   if (old == _desktop) return;
 
   ClientList::iterator it, end = clients.end();
-  for (it = clients.begin(); it != end; ++it) {
-    if ((*it)->desktop() == old) {
-      (*it)->frame->hide();
-    } else if ((*it)->desktop() == _desktop) {
-      (*it)->frame->show();
-    }
-  }
+  for (it = clients.begin(); it != end; ++it)
+    (*it)->showhide();
 
   // force the callbacks to fire
   if (!openbox->focusedClient())
     openbox->setFocusedClient(0);
 }
 
-void Screen::changeNumDesktops(long num)
+void Screen::changeNumDesktops(unsigned int num)
 {
   assert(num > 0);
   
@@ -746,9 +737,8 @@ void Screen::changeNumDesktops(long num)
   // move windows on desktops that will no longer exist!
   ClientList::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
-    int d = (*it)->desktop();
-    if (d >= num && !(d == (signed) 0xffffffff ||
-                      d == Client::ICONIC_DESKTOP)) {
+    unsigned int d = (*it)->desktop();
+    if (d >= num && d != 0xffffffff) {
       XEvent ce;
       ce.xclient.type = ClientMessage;
       ce.xclient.message_type = otk::Property::atoms.net_wm_desktop;
@@ -794,15 +784,13 @@ void Screen::updateDesktopNames()
                           otk::Property::atoms.net_desktop_names,
                           otk::Property::utf8, &num, &_desktop_names))
     _desktop_names.clear();
-  while ((long)_desktop_names.size() < _num_desktops)
+  while (_desktop_names.size() < _num_desktops)
     _desktop_names.push_back("Unnamed");
 }
 
 
-void Screen::setDesktopName(long i, const otk::ustring &name)
+void Screen::setDesktopName(unsigned int i, const otk::ustring &name)
 {
-  assert(i >= 0);
-
   if (i >= _num_desktops) return;
 
   otk::Property::StringVect newnames = _desktop_names;
@@ -813,10 +801,9 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
 }
 
 
-const otk::Rect& Screen::area(long desktop) const {
-  assert(desktop >= 0 || desktop == (signed) 0xffffffff);
-  assert(desktop < _num_desktops || desktop == (signed) 0xffffffff);
-  if (desktop >= 0 && desktop < _num_desktops)
+const otk::Rect& Screen::area(unsigned int desktop) const {
+  assert(desktop < _num_desktops || desktop == 0xffffffff);
+  if (desktop < _num_desktops)
     return _area[desktop];
   else
     return _area[_num_desktops];

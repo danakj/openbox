@@ -80,10 +80,10 @@ private:
   ClientList _stacking;
 
   //! The desktop currently being displayed
-  long _desktop;
+  unsigned int _desktop;
 
   //! The number of desktops
-  long _num_desktops;
+  unsigned int _num_desktops;
 
   //! The names of all desktops
   otk::Property::StringVect _desktop_names;
@@ -118,14 +118,14 @@ private:
     @param desktop The number of the desktop to switch to (starts from 0).
     If the desktop is out of valid range, it is ignored.
   */
-  void changeDesktop(long desktop);
+  void changeDesktop(unsigned int desktop);
 
   //! Changes the number of desktops.
   /*!
     @param num The number of desktops that should exist. This value must be
                greater than 0 or it will be ignored.
   */
-  void changeNumDesktops(long num);
+  void changeNumDesktops(unsigned int num);
 
 public:
 #ifndef SWIG
@@ -146,9 +146,9 @@ public:
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
   //! Returns the desktop being displayed
-  inline long desktop() const { return _desktop; }
+  inline unsigned int desktop() const { return _desktop; }
   //! Returns the number of desktops
-  inline long numDesktops() const { return _num_desktops; }
+  inline unsigned int numDesktops() const { return _num_desktops; }
 
   //! Returns the area of the screen not reserved by applications' Struts
   /*!
@@ -156,7 +156,7 @@ public:
                    0xffffffff will return an area that combines all struts
                    on all desktops.
   */
-  const otk::Rect& area(long desktop) const;
+  const otk::Rect& area(unsigned int desktop) const;
 
   //! Update's the screen's combined strut of all the clients.
   /*!
@@ -198,7 +198,7 @@ public:
     @param name The name to set for the desktop
     If the index is too large, it is simply ignored.
   */
-  void setDesktopName(long i, const otk::ustring &name);
+  void setDesktopName(unsigned int i, const otk::ustring &name);
 
   void installColormap(bool install) const;
 

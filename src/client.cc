@@ -45,7 +45,7 @@ Client::Client(int screen, Window window)
   _positioned = false;
   _disabled_decorations = 0;
   _group = None;
-  _desktop = _old_desktop = 0;
+  _desktop = 0;
   
   getArea();
   getDesktop();
@@ -730,62 +730,46 @@ void Client::setWMState(long state)
   
   switch (state) {
   case IconicState:
-    setDesktop(ICONIC_DESKTOP);
+    iconify(true);
     break;
   case NormalState:
-    setDesktop(openbox->screen(_screen)->desktop());
+    iconify(false);
     break;
   }
 }
 
 
-void Client::setDesktop(long target)
+void Client::setDesktop(unsigned int target)
 {
   if (target == _desktop) return;
   
-  printf("Setting desktop %ld\n", target);
+  printf("Setting desktop %u\n", target);
 
-  if (!(target >= 0 || target == (signed)0xffffffff ||
-        target == ICONIC_DESKTOP))
+  if (!(target < openbox->screen(_screen)->numDesktops() ||
+        target == 0xffffffff))
     return;
 
-  _old_desktop = _desktop;
   _desktop = target;
 
-  // set the desktop hint, but not if we're iconifying
-  if (_desktop != ICONIC_DESKTOP)
-    otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
-                       otk::Property::atoms.cardinal, (unsigned)_desktop);
+  // set the desktop hint
+  otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
+                     otk::Property::atoms.cardinal, _desktop);
   
   // 'move' the window to the new desktop
-  if (_desktop == openbox->screen(_screen)->desktop() ||
-      _desktop == (signed)0xffffffff)
+  showhide();
+
+  openbox->screen(_screen)->updateStruts();
+}
+
+
+void Client::showhide()
+{
+  if (!_iconic &&
+      (_desktop == openbox->screen(_screen)->desktop() ||
+       _desktop == 0xffffffff))
     frame->show();
   else
     frame->hide();
-
-  // Handle Iconic state. Iconic state is maintained by the client being a
-  // member of the ICONIC_DESKTOP, so this is where we make iconifying and
-  // uniconifying happen.
-  bool i = _desktop == ICONIC_DESKTOP;
-  if (i != _iconic) { // has the state changed?
-    _iconic = i;
-    if (_iconic) {
-      _wmstate = IconicState;
-      ignore_unmaps++;
-      // we unmap the client itself so that we can get MapRequest events, and
-      // because the ICCCM tells us to!
-      XUnmapWindow(**otk::display, _window);
-    } else {
-      _wmstate = NormalState;
-      XMapWindow(**otk::display, _window);
-    }
-    changeState();
-  }
-
-  changeAllowedActions();
-  frame->adjustState();
-  openbox->screen(_screen)->updateStruts();
 }
 
 
@@ -1029,14 +1013,14 @@ void Client::clientMessageHandler(const XClientMessageEvent &e)
     printf("net_active_window for 0x%lx\n", _window);
 #endif
     if (_iconic)
-      setDesktop(openbox->screen(_screen)->desktop());
+      iconify(false);
     if (_shaded)
       shade(false);
     focus();
     openbox->screen(_screen)->raiseWindow(this);
   } else if (e.message_type == otk::Property::atoms.openbox_active_window) {
     if (_iconic)
-      setDesktop(openbox->screen(_screen)->desktop());
+      iconify(false);
     if (e.data.l[0] && _shaded)
       shade(false);
     focus();
@@ -1325,7 +1309,7 @@ void Client::applyStartupState()
 
   if (_iconic) {
     _iconic = false;
-    setDesktop(ICONIC_DESKTOP);
+    iconify(true);
   }
   if (_fullscreen) {
     _fullscreen = false;
@@ -1395,8 +1379,7 @@ void Client::maximize(bool max, int dir, bool savearea)
     if (dir == 2 && !_max_vert) return;
   }
 
-  const otk::Rect &a = openbox->screen(_screen)->area(_iconic ?
-                                                      _old_desktop : _desktop);
+  const otk::Rect &a = openbox->screen(_screen)->area(_desktop);
   int x = frame->area().x(), y = frame->area().y(),
     w = _area.width(), h = _area.height();
   
@@ -1541,9 +1524,7 @@ void Client::fullscreen(bool fs, bool savearea)
       delete dimensions;
     } else {
       // pick some fallbacks...
-      const otk::Rect &a = openbox->screen(_screen)->area(_iconic ?
-                                                          _old_desktop :
-                                                          _desktop);
+      const otk::Rect &a = openbox->screen(_screen)->area(_desktop);
       x = a.x() + a.width() / 4;
       y = a.y() + a.height() / 4;
       w = a.width() / 2;
@@ -1561,6 +1542,32 @@ void Client::fullscreen(bool fs, bool savearea)
 
   // try focus us when we go into fullscreen mode
   if (fs) focus();
+}
+
+
+void Client::iconify(bool iconic, bool curdesk)
+{
+  if (_iconic == iconic) return; // nothing to do
+
+  _iconic = iconic;
+
+  if (_iconic) {
+    _wmstate = IconicState;
+    ignore_unmaps++;
+    // we unmap the client itself so that we can get MapRequest events, and
+    // because the ICCCM tells us to!
+    XUnmapWindow(**otk::display, _window);
+  } else {
+    if (curdesk)
+      setDesktop(openbox->screen(_screen)->desktop());
+    _wmstate = NormalState;
+    XMapWindow(**otk::display, _window);
+  }
+  changeState();
+
+  showhide();
+  
+  openbox->screen(_screen)->updateStruts();
 }
 
 
@@ -1856,7 +1863,7 @@ void Client::mapRequestHandler(const XMapRequestEvent &e)
   assert(_iconic); // we shouldn't be able to get this unless we're iconic
 
   // move to the current desktop (uniconify)
-  setDesktop(openbox->screen(_screen)->desktop());
+  iconify(false);
   // XXX: should we focus/raise the window? (basically a net_wm_active_window)
 }
 

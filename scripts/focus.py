@@ -29,6 +29,7 @@ _disable = 0
 def _focusable(client, desktop):
     if not client.normal(): return 0
     if not (client.canFocus() or client.focusNotify()): return 0
+    if client.iconic(): return 0
     if AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
 
     desk = client.desktop()

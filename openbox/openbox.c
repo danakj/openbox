@@ -17,6 +17,7 @@
 #include "extensions.h"
 #include "menuframe.h"
 #include "grab.h"
+#include "popup.h"
 #include "group.h"
 #include "config.h"
 #include "mainloop.h"
@@ -194,6 +195,28 @@ int main(int argc, char **argv)
 
     if (screen_annex()) { /* it will be ours! */
         do {
+            Window reconfig_window;
+            Popup *reconfig_popup;
+
+            if (reconfigure) {
+                gint w, h;
+
+                w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+                h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+
+                reconfig_popup = popup_new(FALSE);
+                popup_position(reconfig_popup, CenterGravity, w / 2, h / 2);
+                popup_show(reconfig_popup, _("Reloading . . ."), NULL);
+
+                reconfig_window = XCreateWindow
+                    (ob_display, RootWindow(ob_display, ob_screen),
+                     0, 0, w, h,
+                     0, CopyFromParent, InputOnly, CopyFromParent, 0, NULL);
+                XMapWindow(ob_display, reconfig_window);
+
+                XFlush(ob_display);
+            }
+
             event_startup(reconfigure);
             grab_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
@@ -245,6 +268,12 @@ int main(int argc, char **argv)
                     ObClient *c = it->data;
                     frame_adjust_theme(c->frame);
                 }
+
+                XFlush(ob_display);
+
+                /* destroy the hiding window */
+                XDestroyWindow(ob_display, reconfig_window);
+                popup_free(reconfig_popup);
             }
 
             reconfigure = FALSE;

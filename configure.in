@@ -72,16 +72,17 @@ if test x$enableval = "xyes"; then
 #include <X11/extensions/shape.h>
 , long foo = ShapeSet,
       AC_MSG_RESULT([yes])
-      SHAPE="-DSHAPE"; Xext_lib="-lXext",
+      SHAPE="yes",
       AC_MSG_RESULT([no])
     )
   )
 else
   AC_MSG_RESULT([no])
 fi
-AC_SUBST(SHAPE)
-
-LIBS="$LIBS $Xext_lib"
+if test x$SHAPE = "xyes"; then
+  LIBS="$LIBS -lXext"
+  AC_DEFINE(SHAPE,1,Enable support of the XShape extension)
+fi
 
 dnl Check for the Slit
 SLIT=""
@@ -90,14 +91,16 @@ AC_ARG_ENABLE(
   slit, [  --enable-slit           include code for the Slit [default=yes]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    SLIT="-DSLIT"
+    SLIT="yes"
   else
     AC_MSG_RESULT([no])
   fi,
   AC_MSG_RESULT([yes])
-  SLIT="-DSLIT"
+  SLIT="yes"
 )
-AC_SUBST(SLIT)
+if test x$SLIT = "xyes"; then
+  AC_DEFINE(SLIT,1,Enable the Slit)
+fi
 
 dnl Check for ordered 8bpp dithering
 ORDEREDPSEUDO=""
@@ -107,13 +110,15 @@ AC_ARG_ENABLE(ordered-pseudo,
                           dithering [default=no]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    ORDEREDPSEUDO="-DORDEREDPSEUDO" 
+    ORDEREDPSEUDO="yes" 
   else
     AC_MSG_RESULT([no]) 
   fi,
   AC_MSG_RESULT([no])
 )
-AC_SUBST(ORDEREDPSEUDO)
+if test x$ORDEREDPSEUDO = "xyes"; then
+  AC_DEFINE(ORDEREDPSEUDO,1,Enable pseudocolor ordered dithering)
+fi
 
 dnl Check for event clobbering
 CLOBBER=""
@@ -123,13 +128,15 @@ AC_ARG_ENABLE(clobber,
 			  or scroll lock are on [default=yes]],
   if test x$enableval = "xno"; then
     AC_MSG_RESULT([no])
-    CLOBBER="-DNOCLOBBER" 
+    CLOBBER="no"
   else
     AC_MSG_RESULT([yes]) 
   fi,
-  AC_MSG_RESULT([no])
+  AC_MSG_RESULT([yes])
 )
-AC_SUBST(CLOBBER)
+if test x$CLOBBER = "xno"; then
+  AC_DEFINE(NOCLOBBER,1,Disable grabbing of mouse events when num/scoll lock is pressed)
+fi
 
 dnl Check whether to include debugging code
 DEBUG=""
@@ -141,8 +148,10 @@ AC_ARG_ENABLE(debug,
     DEBUG="-DDEBUG -Wall -W"
   else
     AC_MSG_RESULT([no])
+    DEBUG="-DNDEBUG"
   fi,
   AC_MSG_RESULT([no])
+  DEBUG="-DNDEBUG"
 )
 AC_SUBST(DEBUG)
 
@@ -153,14 +162,13 @@ AC_ARG_ENABLE(nls,
   [  --enable-nls            include natural language support [default=yes]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    NLS="-DNLS"
+    NLS="yes"
   else
     AC_MSG_RESULT([no])
   fi,
   AC_MSG_RESULT([yes])
-  NLS="-DNLS"
+  NLS="yes"
 )
-AC_SUBST(NLS)
 
 AC_CHECK_LIB(xpg4, setlocale, LIBS="$LIBS -lxpg4")
 
@@ -169,23 +177,28 @@ if test x$gencat_cmd = "x"; then
   NLS=""
 fi
 
+if test x$NLS = "xyes"; then
+  AC_DEFINE(NLS,1,Include natural language support)
+fi
 
 dnl Check for new timed pixmap cache
 TIMEDCACHE=""
-AC_MSG_CHECKING([whether to use the new timed pixmap cache])
+AC_MSG_CHECKING([whether to use the timed pixmap cache])
 AC_ARG_ENABLE(
   timed-cache,
-[  --enable-timed-cache    use new timed pixmap cache [default=yes]],
+[  --enable-timed-cache    use timed pixmap cache [default=yes]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    TIMEDCACHE="-DTIMEDCACHE"
+    TIMEDCACHE="yes"
   else
     AC_MSG_RESULT([no])
   fi,
   AC_MSG_RESULT([yes])
-  TIMEDCACHE="-DTIMEDCACHE"
+  TIMEDCACHE="yes"
 )
-AC_SUBST(TIMEDCACHE)
+if test x$TIMEDCACHE = "xyes"; then
+  AC_DEFINE(TIMEDCACHE,1,Use timed pixmap cache)
+fi
 
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL

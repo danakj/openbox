@@ -412,11 +412,9 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client->ignore_unmaps--;
 	    break;
 	}
-	g_message("UnmapNotify for %lx", client->window);
 	client_unmanage(client);
 	break;
     case DestroyNotify:
-	g_message("DestroyNotify for %lx", client->window);
 	client_unmanage(client);
 	break;
     case ReparentNotify:

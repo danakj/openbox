@@ -1,3 +1,214 @@
+2003-09-15  Ben Jansens  <xor@zed.orodu.net>
+
+	* configure.ac: beta3
+
+	* openbox/session.c: use the sm_client_id in the client struct
+
+	* openbox/client.c, openbox/client.h:
+	save the sm_client_id just like saving other properties, dont query each time its needed
+
+	* openbox/event.c:
+	propogate property changes on the group leader to the whole group
+
+	* openbox/popup.c: remove debug prints
+
+	* openbox/startupnotify.c: remove debug print
+
+	* openbox/event.c: sloppy focus fixes, ignore a few more enter events
+
+	* openbox/focus.c:
+	fix crashing when doing a directional focus with no windows on the desktop
+
+	* openbox/place.c: best fit only one direction
+
+	* openbox/place.c: no center in the first smart-place
+
+	* openbox/place.c: sort smallest to largest area
+
+	* openbox/place.c: 2 passes at smart placement
+
+	* openbox/place.c:
+	smart placement only avoids the focused window, and centers in its area
+
+	* openbox/stacking.h: whitespace
+
+	* openbox/place.c: fallback to random when focus follows mouse is off
+
+	* openbox/place.c: fix comment
+
+	* openbox/place.c: oops backwarsd
+
+	* openbox/place.c: dont use continue
+
+	* openbox/place.c: remove blank line
+
+	* openbox/mainloop.c: allow more than one timer to work at a time
+
+	* openbox/mainloop.c: allow more than one timer to process at a time
+
+	* openbox/place.c:
+	apply gravity to the chosen coords, bound the undermouse placement
+
+	* openbox/place.c:
+	always use smart placement, add under-mouse placement for the fallback
+
+	* openbox/place.c: dont count !normal clients for placement
+
+	* openbox/place.c: added smart placement
+
+	* openbox/resist.c: use the new RECT_LEFT/RIGHT/TOP/BOTTOM for clarity
+
+	* openbox/geom.h:
+	add some interesection shit, and RECT_LEFT/RIGHT/TOP/BOTTOM
+
+2003-09-14  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/menuframe.c: kill the padding in the menu title
+
+	* openbox/stacking.c:
+	dont raise parents of transients when the transient is raised
+
+	* render/theme.c: fix 2 mem leaks
+
+	* Makefile.am: install the openbox.png pixmap icon
+
+	* openbox/openbox.c:
+	adjust the themes for the frames before everything else happens, cuz they store pointers to the freed theme, then redraw them at the end
+
+	* openbox/frame.c: dont redraw the frames when changing their theme
+
+	* openbox/startupnotify.c: remove the x event handler
+
+	* openbox/screen.c:
+	dont bother fucking everythign up when the desktops number hasnt changed
+
+	* openbox/popup.c: fix mem leak
+
+	* openbox/menuframe.c:
+	update the menus before putting them in the visible list
+
+	* openbox/menu.c:
+	fix a mem leak, and make suer the menus arent visible when they are modified
+
+	* openbox/event.c: fix mem leak, remove teh ice watch handler
+
+	* openbox/config.c, openbox/action.c: fix mem leak
+
+	* data/openbox.png: add the .png version of the icon.h
+
+	* openbox/client.c:
+	dont impose staying on-screen for non-normal windows like kicker
+
+	* render/icon.h: add a default icon made by merry.
+
+	* openbox/openbox.c:
+	move moveresize_startup/shutdown so its between its deps
+
+	* openbox/moveresize.c: only sopt moveresize when shutting down
+
+	* render/font.c: remove debug print
+
+	* openbox/moveresize.c: stop any moveresizes on shutdown
+
+	* configure.ac: dont need libtool doing dlopen capable libs
+
+	* render/theme.c: use the values passed to the function
+
+	* render/theme.h: code style
+
+	* render/render.c: free XImages
+
+	* render/font.c: destroy 'pat' always
+
+	* render/mask.c:
+	X allocs more bytes than i thought, new algo to pick the amount of memory for the bitmap data
+
+	* openbox/client.c: dont waste a strdup which is never freed
+
+	* openbox/mainloop.c:
+	fix a memory leak in the mainloop timers correctly
+
+	* openbox/mainloop.c: fix a memory leak in the mainloop timers
+
+2003-09-12  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/focus.c, openbox/moveresize.c, openbox/openbox.c, openbox/popup.c, openbox/popup.h, openbox/screen.c:
+	new popups with subclasses, added an ObIconPopup for popups with icons, and ObPagerPopup, for a popup with a pager on it.
+
+	better logic also for the desktop layout code figuring out how many rows and columns there are.
+
+	* render/theme.c, render/theme.h:
+	add app_(un)hilite_fg, which is never parentrelative
+
+	* render/font.c: wasted variable
+
+	* render/theme.c:
+	handle parentrel app labels, by using the title's texture instead
+
+	* render/theme.c: better more valid C
+
+	* openbox/popup.c: 80 cols
+
+	* openbox/openbox.c:
+	start the session shit, and grab the params before grabbing the rest of the parameters (and erroring on invalid ones)
+
+	* Makefile.am, openbox/client.c, render/theme.c, render/theme.h:
+	add support for a default icon, but no icon has been made yet.
+
+	* configure.ac: allow building of static libs
+
+2003-09-10  Ben Jansens  <xor@zed.orodu.net>
+
+	* openbox/event.c, openbox/mouse.c, openbox/mouse.h:
+	frame context fallbacks when there is no binding on the context
+
+	* themes/allegro/themerc: requested update from safarial
+
+	* openbox/event.c:
+	make menu hiding-on-release based on a timer rather than on where it is released (on the frame border)
+
+	* openbox/config.h: s/milli/micro/
+
+	* openbox/menu.c: hide menus before showing a new menu root
+
+	* openbox/menuframe.c:
+	keep menus taller than the screen from jittering. also keep the half of the menu you're in visible. more precision would be nicer but meh for now (ever) i guess.
+
+	* Makefile.am: distribute the .pc.in files
+
+	* openbox/focus.c: save the new glist!
+
+	* openbox/keyboard.c:
+	when the client for an interactive action is closed, kill the action
+
+	* openbox/moveresize.c:
+	use the current size not the start size for moving
+
+	* openbox/event.c:
+	use the focus client when the client is null for keyboard events
+
+	* openbox/action.c: oops, copypaste
+
+	* openbox/action.c: dont deref the client before checking for null
+
+	* openbox/frame.c: use theme.show_handle
+
+2003-09-09  Ben Jansens  <xor@zed.orodu.net>
+
+	* ChangeLog: more changes
+
+	* openbox/event.c, openbox/keyboard.c, openbox/keyboard.h:
+	save teh client for interactive actions cuz after teh keyboard is grabbed there is no client
+
+	* configure.ac: beta2
+
+	* ChangeLog: recent changes
+
+	* openbox/action.c, openbox/action.h, openbox/event.c, openbox/keyboard.c, openbox/keyboard.h, openbox/mouse.c, openbox/mouse.h, openbox/screen.c:
+	no more interactive mouse actions, they are evil etc. actions now "feel" much more solid. if move/resizing a window while changing workspaces, it will follow.
+
+	* openbox/action.c: no mouse interactive actions. no bugs.
+
 2003-09-09  Ben Jansens  <xor@zed.orodu.net>
 
 	* openbox/event.c, openbox/keyboard.c, openbox/keyboard.h:

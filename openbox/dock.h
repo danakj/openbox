@@ -11,50 +11,44 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-typedef enum {
-    DockPos_Floating,
-    DockPos_TopLeft,
-    DockPos_Top,
-    DockPos_TopRight,
-    DockPos_Right,
-    DockPos_BottomRight,
-    DockPos_Bottom,
-    DockPos_BottomLeft,
-    DockPos_Left
-} DockPosition;
+typedef struct _ObDock    ObDock;
+typedef struct _ObDockApp ObDockApp;
 
-typedef struct Dock {
+struct _ObDock
+{
     ObWindow obwin;
 
     Window frame;
     RrAppearance *a_frame;
 
     /* actual position (when not auto-hidden) */
-    int x, y;
-    int w, h;
+    gint x;
+    gint y;
+    gint w;
+    gint h;
 
     gboolean hidden;
     Timer *hide_timer;
 
     GList *dock_apps;
-} Dock;
+};
 
-typedef struct DockApp {
+struct _ObDockApp {
     ObWindow obwin;
 
-    int ignore_unmaps;
+    gint ignore_unmaps;
 
     Window icon_win;
     Window win;
 
-    char *name;
-    char *class;
+    gchar *name;
+    gchar *class;
 
-    int x;
-    int y;
-    int w;
-    int h;
-} DockApp;
+    gint x;
+    gint y;
+    gint w;
+    gint h;
+};
 
 extern Strut dock_strut;
 
@@ -67,9 +61,9 @@ void dock_hide(gboolean hide);
 void dock_add(Window win, XWMHints *wmhints);
 
 void dock_remove_all();
-void dock_remove(DockApp *app, gboolean reparent);
+void dock_remove(ObDockApp *app, gboolean reparent);
 
-void dock_app_drag(DockApp *app, XMotionEvent *e);
-void dock_app_configure(DockApp *app, int w, int h);
+void dock_app_drag(ObDockApp *app, XMotionEvent *e);
+void dock_app_configure(ObDockApp *app, gint w, gint h);
 
 #endif

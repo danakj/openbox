@@ -38,8 +38,8 @@
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
-static void event_handle_dock(Dock *s, XEvent *e);
-static void event_handle_dockapp(DockApp *app, XEvent *e);
+static void event_handle_dock(ObDock *s, XEvent *e);
+static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static void event_handle_menu(ObClient *c, XEvent *e);
 static void fd_event_handle();
@@ -468,8 +468,8 @@ static void event_process(XEvent *e)
 {
     Window window;
     ObClient *client = NULL;
-    Dock *dock = NULL;
-    DockApp *dockapp = NULL;
+    ObDock *dock = NULL;
+    ObDockApp *dockapp = NULL;
     Menu *menu = NULL;
     ObWindow *obwin = NULL;
 
@@ -1145,7 +1145,7 @@ static void fd_event_handle()
     g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
 }
 
-static void event_handle_dock(Dock *s, XEvent *e)
+static void event_handle_dock(ObDock *s, XEvent *e)
 {
     switch (e->type) {
     case ButtonPress:
@@ -1160,7 +1160,7 @@ static void event_handle_dock(Dock *s, XEvent *e)
     }
 }
 
-static void event_handle_dockapp(DockApp *app, XEvent *e)
+static void event_handle_dockapp(ObDockApp *app, XEvent *e)
 {
     switch (e->type) {
     case MotionNotify:

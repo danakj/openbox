@@ -23,7 +23,7 @@ Window window_top(ObWindow *self)
     case Window_Menu:
         return ((Menu*)self)->frame;
     case Window_Dock:
-        return ((Dock*)self)->frame;
+        return ((ObDock*)self)->frame;
     case Window_DockApp:
         /* not to be used for stacking */
         g_assert_not_reached();

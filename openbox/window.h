@@ -30,13 +30,13 @@ typedef struct InternalWindow {
 #define WINDOW_IS_INTERNAL(win) (((ObWindow*)win)->type == Window_Internal)
 
 struct Menu;
-struct Dock;
-struct DockApp;
+struct _ObDock;
+struct _ObDockApp;
 struct _ObClient;
 
 #define WINDOW_AS_MENU(win) ((struct Menu*)win)
-#define WINDOW_AS_DOCK(win) ((struct Dock*)win)
-#define WINDOW_AS_DOCKAPP(win) ((struct DockApp*)win)
+#define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
+#define WINDOW_AS_DOCKAPP(win) ((struct _ObDockApp*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
 #define WINDOW_AS_INTERNAL(win) ((struct InternalWindow*)win)
 

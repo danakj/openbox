@@ -16,7 +16,8 @@ gboolean config_opaque_move;
 gboolean config_opaque_resize;
 
 StackLayer   config_dock_layer;
-DockPosition config_dock_pos;
+gboolean     config_dock_floating;
+ObDirection  config_dock_pos;
 int          config_dock_x;
 int          config_dock_y;
 gboolean     config_dock_horz;
@@ -89,25 +90,33 @@ static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
 
     if ((n = parse_find_node("position", node))) {
         if (parse_contains("TopLeft", doc, n))
-            config_dock_pos = DockPos_TopLeft;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_NORTHWEST;
         else if (parse_contains("Top", doc, n))
-            config_dock_pos = DockPos_Top;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_NORTH;
         else if (parse_contains("TopRight", doc, n))
-            config_dock_pos = DockPos_TopRight;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_NORTHEAST;
         else if (parse_contains("Right", doc, n))
-            config_dock_pos = DockPos_Right;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_EAST;
         else if (parse_contains("BottomRight", doc, n))
-            config_dock_pos = DockPos_BottomRight;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_SOUTHEAST;
         else if (parse_contains("Bottom", doc, n))
-            config_dock_pos = DockPos_Bottom;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_SOUTH;
         else if (parse_contains("BottomLeft", doc, n))
-            config_dock_pos = DockPos_BottomLeft;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_SOUTHWEST;
         else if (parse_contains("Left", doc, n))
-            config_dock_pos = DockPos_Left;
+            config_dock_floating = FALSE,
+            config_dock_pos = OB_DIRECTION_WEST;
         else if (parse_contains("Floating", doc, n))
-            config_dock_pos = DockPos_Floating;
+            config_dock_floating = TRUE;
     }
-    if (config_dock_pos == DockPos_Floating) {
+    if (config_dock_floating) {
         if ((n = parse_find_node("floatingX", node)))
             config_dock_x = parse_int(doc, n);
         if ((n = parse_find_node("floatingY", node)))
@@ -158,7 +167,8 @@ void config_startup()
     parse_register("moveresize", parse_moveresize, NULL);
 
     config_dock_layer = Layer_Top;
-    config_dock_pos = DockPos_TopRight;
+    config_dock_pos = OB_DIRECTION_NORTHEAST;
+    config_dock_floating = FALSE;
     config_dock_x = 0;
     config_dock_y = 0;
     config_dock_horz = FALSE;

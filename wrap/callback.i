@@ -6,18 +6,14 @@
  */
 static void PythonMouseCallback(ob::MouseData *data, void *pyfunc)
 {
-  PyObject *func, *arglist, *pdata;
-  PyObject *result;
-  double    dres = 0;
-
-  func = (PyObject*) pyfunc;
+  PyObject *arglist, *pdata, *result;
 
   pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__MouseData, 0);
   arglist = Py_BuildValue("(O)", pdata);
   Py_DECREF(pdata);
 
   // call the callback
-  result = PyEval_CallObject(func, arglist);
+  result = PyEval_CallObject((PyObject*)pyfunc, arglist);
   if (!result || PyErr_Occurred()) {
     // an exception occured in the script, display it
     PyErr_Print();
@@ -32,18 +28,14 @@ static void PythonMouseCallback(ob::MouseData *data, void *pyfunc)
  */
 static void PythonKeyCallback(ob::KeyData *data, void *pyfunc)
 {
-  PyObject *func, *arglist, *pdata;
-  PyObject *result;
-  double    dres = 0;
-
-  func = (PyObject*) pyfunc;
+  PyObject *arglist, *pdata, *result;
 
   pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__KeyData, 0);
   arglist = Py_BuildValue("(O)", pdata);
   Py_DECREF(pdata);
 
   // call the callback
-  result = PyEval_CallObject(func, arglist);
+  result = PyEval_CallObject((PyObject*)pyfunc, arglist);
   if (!result || PyErr_Occurred()) {
     // an exception occured in the script, display it
     PyErr_Print();
@@ -58,18 +50,14 @@ static void PythonKeyCallback(ob::KeyData *data, void *pyfunc)
  */
 static void PythonEventCallback(ob::EventData *data, void *pyfunc)
 {
-  PyObject *func, *arglist, *pdata;
-  PyObject *result;
-  double    dres = 0;
-
-  func = (PyObject*) pyfunc;
+  PyObject *arglist, *pdata, *result;
 
   pdata = SWIG_NewPointerObj((void *) data, SWIGTYPE_p_ob__EventData, 0);
   arglist = Py_BuildValue("(O)", pdata);
   Py_DECREF(pdata);
 
   // call the callback
-  result = PyEval_CallObject(func, arglist);
+  result = PyEval_CallObject((PyObject*)pyfunc, arglist);
   if (!result || PyErr_Occurred()) {
     // an exception occured in the script, display it
     PyErr_Print();
@@ -129,6 +117,7 @@ bool mbind(const std::string &button, ob::MouseContext::MC context,
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
+  Py_INCREF(func);
   return true;
 }
 
@@ -143,6 +132,7 @@ bool ebind(ob::EventAction::EA action, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
+  Py_INCREF(func);
   return true;
 }
 
@@ -153,6 +143,7 @@ bool kgrab(int screen, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to grab keybaord.");
     return false;
   }
+  Py_INCREF(func);
   return true;
 }
 
@@ -202,6 +193,7 @@ bool kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func)
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return false;
   }
+  Py_INCREF(func);
   return true;
 }
 

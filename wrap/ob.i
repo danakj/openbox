@@ -68,8 +68,8 @@ void set_reset_key(const std::string &key)
 }
 
 void send_client_msg(Window target, Atom type, Window about,
-                     long data, long data1, long data2,
-                     long data3, long data4)
+                     long data=0, long data1=0, long data2=0,
+                     long data3=0, long data4=0)
 {
   XEvent e;
   e.xclient.type = ClientMessage;
@@ -87,7 +87,7 @@ void send_client_msg(Window target, Atom type, Window about,
              &e);
 }
 
-void execute(const std::string &bin, int screen)
+void execute(const std::string &bin, int screen=0)
 {
   if (screen >= ScreenCount(**otk::display))
     screen = 0;

@@ -265,9 +265,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
             */
         } else
             XUnmapWindow(ob_display, self->handle);
-    }
 
-    if (resized) {
         /* move and resize the plate */
         XMoveResizeWindow(ob_display, self->plate,
                           self->innersize.left - self->cbwidth,
@@ -276,9 +274,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
                           self->client->area.height);
         /* when the client has StaticGravity, it likes to move around. */
         XMoveWindow(ob_display, self->client->window, 0, 0);
-    }
 
-    if (resized) {
         STRUT_SET(self->size,
                   self->innersize.left + self->bwidth,
                   self->innersize.top + self->bwidth,
@@ -290,7 +286,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
     RECT_SET_SIZE(self->area,
 		  self->client->area.width +
 		  self->size.left + self->size.right,
-		  (self->client->shaded ? ob_rr_theme->title_height + self->bwidth*2:
+		  (self->client->shaded ?
+                   ob_rr_theme->title_height + self->bwidth*2:
                    self->client->area.height +
                    self->size.top + self->size.bottom));
 
@@ -299,8 +296,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
            frame_client_gravity. */
         self->area.x = self->client->area.x;
         self->area.y = self->client->area.y;
-        frame_client_gravity((ObFrame*)self,
-                             &self->area.x, &self->area.y);
+        frame_client_gravity(self, &self->area.x, &self->area.y);
     }
 
     /* move and resize the top level frame.

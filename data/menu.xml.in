@@ -44,9 +44,7 @@
   <item label="Reconfigure">
     <action name="Reconfigure" />
   </item>
-  <item label="Restart">
-    <action name="Restart" />
-  </item>
+  <separator />
   <item label="Exit">
     <action name="Exit" />
   </item>

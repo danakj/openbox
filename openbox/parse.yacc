@@ -1,8 +1,5 @@
 %{
-#define NO_Y_H
 #include "parse.h"
-#undef NO_Y_H
-
 #ifdef HAVE_STDIO_H
 #  include <stdio.h>
 #endif

@@ -57,6 +57,7 @@ extern "C" {
 class Slit; // forward reference
 class BFont;
 class XAtom;
+struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
@@ -94,12 +95,6 @@ struct MenuStyle {
 
   TextJustify t_justify, f_justify;
   int bullet, bullet_pos;
-};
-
-struct Strut {
-  unsigned int top, bottom, left, right;
-
-  Strut(void): top(0), bottom(0), left(0), right(0) {}
 };
 
 class BScreen : public ScreenInfo {

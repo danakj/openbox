@@ -85,6 +85,7 @@ using std::string;
 #include "Window.hh"
 #include "Workspace.hh"
 #include "Workspacemenu.hh"
+#include "Util.hh"
 #include "XAtom.hh"
 
 #ifndef   FONT_ELEMENT_SIZE

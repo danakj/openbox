@@ -76,6 +76,12 @@ private:
   int _x1, _y1, _x2, _y2;
 };
 
+struct Strut {
+  unsigned int top, bottom, left, right;
+
+  Strut(void): top(0), bottom(0), left(0), right(0) {}
+};
+
 /* XXX: this needs autoconf help */
 const unsigned int BSENTINEL = 65535;
 

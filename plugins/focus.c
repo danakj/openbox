@@ -83,6 +83,10 @@ static void events(ObEvent *e, void *foo)
         g_slist_prepend(focus_order[e->data.c.num[1]], e->data.c.client);
         break;
 
+    case Event_X_EnterNotify:
+        if (e->data.x.client && client_normal(e->data.x.client))
+            client_focus(e->data.x.client);
+
     default:
         g_assert_not_reached();
     }
@@ -95,6 +99,7 @@ void plugin_startup()
     dispatch_register(Event_Client_Mapped | Event_Client_Destroy |
                       Event_Ob_Desktop | Event_Ob_NumDesktops |
                       Event_Client_Focus | Event_Client_Unfocus |
+                      Event_X_EnterNotify |
                       Event_Client_Desktop,
                       (EventHandler)events, NULL);
 

@@ -303,6 +303,11 @@ static void event_hack_mods(XEvent *e)
 static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
+    case EnterNotify:
+    case LeaveNotify:
+        if (e->xcrossing.detail == NotifyInferior)
+            return TRUE;
+        break;
     case FocusIn:
         /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
            because of RevertToPointerRoot. If the focus ends up reverting to
@@ -753,7 +758,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         case OB_FRAME_CONTEXT_FRAME:
             if (e->xcrossing.mode == NotifyGrab ||
-                e->xcrossing.detail == NotifyInferior ||
                 e->xcrossing.mode == NotifyUngrab)
             {
 #ifdef DEBUG_FOCUS

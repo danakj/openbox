@@ -1,4 +1,4 @@
-#include "../../kernel/openbox.h"
+#include "kernel/openbox.h"
 #include "mouse.h"
 #include <glib.h>
 #include <string.h>

@@ -259,6 +259,26 @@ gboolean parse_attr_contains(const gchar *val, xmlNodePtr node,
     return r;
 }
 
+static gint slist_path_cmp(const gchar *a, const gchar *b)
+{
+    return strcmp(a, b);
+}
+
+typedef GSList* (*GSListFunc) (gpointer list, gconstpointer data);
+
+static GSList* slist_path_add(GSList *list, gpointer data, GSListFunc func)
+{
+    g_assert(func);
+
+    if (!data)
+        return list;
+
+    if (!g_slist_find_custom(list, data, (GCompareFunc) slist_path_cmp))
+        list = func(list, data);
+
+    return list;
+}
+
 static GSList* split_paths(const gchar *paths)
 {
     GSList *list = NULL;
@@ -268,7 +288,7 @@ static GSList* split_paths(const gchar *paths)
         return NULL;
     spl = g_strsplit(paths, ":", -1);
     for (it = spl; *it; ++it)
-        list = g_slist_append(list, *it);
+        list = slist_path_add(list, *it, (GSListFunc) g_slist_append);
     g_free(spl);
     return list;
 }
@@ -299,33 +319,40 @@ void parse_paths_startup()
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_config_dir_paths = split_paths(path);
     else {
-        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
+        xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
                                               g_build_filename
                                               (G_DIR_SEPARATOR_S,
-                                               "etc", "xdg", NULL));
-        xdg_config_dir_paths = g_slist_append(xdg_config_dir_paths,
-                                              g_strdup(CONFIGDIR));
+                                               "etc", "xdg", NULL),
+                                              (GSListFunc) g_slist_append);
+        xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
+                                              g_strdup(CONFIGDIR),
+                                              (GSListFunc) g_slist_append);
     }
-    xdg_config_dir_paths = g_slist_prepend(xdg_config_dir_paths,
-                                           xdg_config_home_path);
+    xdg_config_dir_paths = slist_path_add(xdg_config_dir_paths,
+                                          xdg_config_home_path,
+                                          (GSListFunc) g_slist_prepend);
     
     path = getenv("XDG_DATA_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
         xdg_data_dir_paths = split_paths(path);
     else {
-        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
+        xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
                                             g_build_filename
                                             (G_DIR_SEPARATOR_S,
-                                             "usr", "local", "share", NULL));
-        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
+                                             "usr", "local", "share", NULL),
+                                            (GSListFunc) g_slist_append);
+        xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
                                             g_build_filename
                                             (G_DIR_SEPARATOR_S,
-                                             "usr", "share", NULL));
-        xdg_data_dir_paths = g_slist_append(xdg_data_dir_paths,
-                                            g_strdup(DATADIR));
+                                             "usr", "share", NULL),
+                                            (GSListFunc) g_slist_append);
+        xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
+                                            g_strdup(DATADIR),
+                                            (GSListFunc) g_slist_append);
     }
-    xdg_data_dir_paths = g_slist_prepend(xdg_data_dir_paths,
-                                         xdg_data_home_path);
+    xdg_data_dir_paths = slist_path_add(xdg_data_dir_paths,
+                                        xdg_data_home_path,
+                                        (GSListFunc) g_slist_prepend);
 }
 
 void parse_paths_shutdown()

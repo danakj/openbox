@@ -78,7 +78,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     false,
                                     RenderTexture::Flat,
                                     RenderTexture::Bevel1,
-                                    true,
+                                    false,
                                     RenderTexture::Vertical,
                                     false,
                                     0x858687,

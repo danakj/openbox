@@ -22,7 +22,7 @@ static char *path;
     GList *list;
 }
 
-%token <integer> INTEGER;
+%token <integer> INTEGER
 %token <string> STRING
 %token <string> FIELD
 %token <string> DESKTOP

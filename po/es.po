@@ -1,0 +1,109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Ben Jansens
+# This file is distributed under the same license as the PACKAGE package.
+# Miguel Calleja Gomez <mcg79@lycos.es>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Openbox 3.1\n"
+"POT-Creation-Date: 2003-12-22 12:48-0500\n"
+"PO-Revision-Date: 2004-01-25 20:41+0100\n"
+"Last-Translator: Miguel Calleja Gomez <mcg79@lycos.es>\n"
+"Language-Team: None\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: ben@openbox.org\n"
+
+#: openbox/client_list_menu.c:94
+msgid "Go there..."
+msgstr "Ir ahí..."
+
+#: openbox/client_list_menu.c:160
+msgid "Desktops"
+msgstr "Escritorios"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Restaurar"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Maximizar"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Desenrollar"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Enrollar"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Todos los escritorios"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Capa"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Siempre encima"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Normal"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Siempre debajo"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Enviar a escritorio"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Menú del cliente"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Minimizar"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Poner en primer plano"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Poner en último plano"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Decorar"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Mover"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Redimensionar"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Cerrar"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id necesita un argumento\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file necesita un argumento\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "No se puede crear el directorio '%s': %s"

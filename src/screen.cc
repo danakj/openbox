@@ -890,8 +890,11 @@ void Screen::showDesktop(bool show)
     Client *c = openbox->focusedClient();
     if (c) saved_focus = c->window();
   } else {
-    Client *c = openbox->findClient(saved_focus);
-    if (c) c->focus();
+    Client *f = openbox->focusedClient();
+    if (!f || f->type() == Client::Type_Desktop) {
+      Client *c = openbox->findClient(saved_focus);
+      if (c) c->focus();
+    }
   }
   
   _showing_desktop = show;

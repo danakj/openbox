@@ -110,7 +110,6 @@ line argument.\n\n"));
 
   // set the DISPLAY environment variable for any lauched children, to the
   // display we're using, so they open in the right place.
-  // XXX rm -> std::string dtmp = "DISPLAY=" + DisplayString(display);
   putenv(std::string("DISPLAY=") + DisplayString(display));
   
   // find the availability of X extensions we like to use

@@ -1049,15 +1049,16 @@ void client_update_wmhints(Client *self)
                 group_remove(self->group, self);
                 self->group = NULL;
             }
-            if (hints->window_group != None)
+            if (hints->window_group != None) {
                 self->group = group_add(hints->window_group, self);
 
-            /* add other transients of the group that are already set up */
-            for (it = self->group->members; it; it = it->next)
-                if (it->data != self &&
-                    ((Client*)it->data)->transient_for == TRAN_GROUP)
-                    self->transients = g_slist_append(self->transients,
-                                                      it->data);
+                /* add other transients of the group that are already set up */
+                for (it = self->group->members; it; it = it->next)
+                    if (it->data != self &&
+                        ((Client*)it->data)->transient_for == TRAN_GROUP)
+                        self->transients = g_slist_append(self->transients,
+                                                          it->data);
+            }
 
             /* because the self->transient flag wont change from this call,
                we don't need to update the window's type and such, only its

@@ -45,6 +45,7 @@ Frame *frame_new()
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
+    XMapWindow(ob_display, self->plate);
 
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
@@ -56,7 +57,6 @@ Frame *frame_new()
 
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = self->shade_press = FALSE;
-
     return (Frame*)self;
 }
 
@@ -73,6 +73,7 @@ void frame_show(Frame *self)
     if (!self->visible) {
 	self->visible = TRUE;
 	XMapWindow(ob_display, self->window);
+        XSync(ob_display, FALSE);
     }
 }
 
@@ -268,6 +269,12 @@ Context frame_context(Client *client, Window win)
 
     obwin = g_hash_table_lookup(window_map, &win);
     g_assert(obwin);
+
+    if (client->frame->window == win)
+        return Context_Frame;
+    if (client->frame->plate == win)
+        return Context_Client;
+
     g_assert(WINDOW_IS_DECORATION(obwin));
     return WINDOW_AS_DECORATION(obwin)->context;
 }
@@ -384,29 +391,31 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
         } else {
             self->bwidth = self->cbwidth = 0;
         }
+        STRUT_SET(self->size, self->cbwidth, 
+                  self->cbwidth,self->cbwidth, self->cbwidth);
 
         self->width = self->client->area.width + self->cbwidth * 2;
         g_assert(self->width > 0);
     }
     if (resized) {
         /* move and resize the plate */
-/*        XMoveResizeWindow(ob_display, self->plate,
-                          self->innersize.left - self->cbwidth,
-                          self->innersize.top - self->cbwidth,
+        XMoveResizeWindow(ob_display, self->plate,
+                          self->size.left - self->cbwidth,
+                          self->size.top - self->cbwidth,
                           self->client->area.width,
                           self->client->area.height);
-*/
+
         /* when the client has StaticGravity, it likes to move around. */
         XMoveWindow(ob_display, self->client->window, 0, 0);
     }
 
     if (resized) {
-/*        STRUT_SET(self->size,
-                  self->innersize.left + self->bwidth,
-                  self->innersize.top + self->bwidth,
-                  self->innersize.right + self->bwidth,
-                  self->innersize.bottom + self->bwidth);
-*/
+        STRUT_SET(self->size,
+                  self->cbwidth,
+                  self->cbwidth,
+                  self->cbwidth,
+                  self->cbwidth);
+
     }
 
     /* shading can change without being moved or resized */

@@ -106,13 +106,13 @@ struct _ObClient
       is, rather, the position requested by the client, to which the window's
       gravity is applied.
     */
-    Rect    area;
+    Rect area;
 
     /*! The window's strut
       The strut defines areas of the screen that are marked off-bounds for
       window placement. In theory, where this window exists.
     */
-    Strut   strut;
+    StrutPartial strut;
      
     /*! The logical size of the window
       The "logical" size of the window is refers to the user's perception of
@@ -120,7 +120,7 @@ struct _ObClient
       user. For example, with xterms, this value it the number of characters
       being displayed in the terminal, instead of the number of pixels.
     */
-    Size   logical_size;
+    Size logical_size;
 
     /*! Width of the border on the window.
       The window manager will set this to 0 while the window is being managed,

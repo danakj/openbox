@@ -50,7 +50,7 @@ struct _ObDockApp {
     gint h;
 };
 
-extern Strut dock_strut;
+extern StrutPartial dock_strut;
 
 void dock_startup();
 void dock_shutdown();

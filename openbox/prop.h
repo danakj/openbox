@@ -65,6 +65,7 @@ typedef struct Atoms {
     Atom net_wm_window_type;
     Atom net_wm_state;
     Atom net_wm_strut;
+    Atom net_wm_strut_partial;
     Atom net_wm_icon;
 /*  Atom net_wm_pid; */
     Atom net_wm_allowed_actions;

@@ -13,13 +13,14 @@
 
 static ObDock *dock;
 
-Strut dock_strut;
+StrutPartial dock_strut;
 
 void dock_startup()
 {
     XSetWindowAttributes attrib;
 
-    STRUT_SET(dock_strut, 0, 0, 0, 0);
+    STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
+                      0, 0, 0, 0, 0, 0, 0, 0);
 
     dock = g_new0(ObDock, 1);
     dock->obwin.type = Window_Dock;
@@ -338,7 +339,8 @@ void dock_configure()
     }
 
     if (!config_dock_floating && config_dock_hide) {
-        strw = strh = ob_rr_theme->bwidth;
+        strw = ob_rr_theme->bwidth;
+        strh = ob_rr_theme->bwidth;
     } else {
         strw = dock->w;
         strh =  dock->h;
@@ -346,58 +348,83 @@ void dock_configure()
 
     /* set the strut */
     if (config_dock_floating) {
-        STRUT_SET(dock_strut, 0, 0, 0, 0);
+        STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0);
     } else {
         switch (config_dock_pos) {
         case OB_DIRECTION_NORTHWEST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
-                STRUT_SET(dock_strut, 0, strh, 0, 0);
+                STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
+                                  0, 0, dock->x, dock->x + dock->w - 1,
+                                  0, 0, 0, 0);
                 break;
             case OB_ORIENTATION_VERT:
-                STRUT_SET(dock_strut, strw, 0, 0, 0);
+                STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
+                                  dock->y, dock->y + dock->h - 1,
+                                  0, 0, 0, 0, 0, 0);
                 break;
             }
             break;
         case OB_DIRECTION_NORTH:
-            STRUT_SET(dock_strut, 0, strh, 0, 0);
+            STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
+                              dock->x, dock->x + dock->w - 1,
+                              0, 0, 0, 0, 0, 0);
             break;
         case OB_DIRECTION_NORTHEAST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
-                STRUT_SET(dock_strut, 0, strh, 0, 0);
+                STRUT_PARTIAL_SET(dock_strut, 0, strh, 0, 0,
+                                  0, 0, dock->x, dock->x + dock->w -1,
+                                  0, 0, 0, 0);
                 break;
             case OB_ORIENTATION_VERT:
-                STRUT_SET(dock_strut, 0, 0, strw, 0);
+                STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
+                                  0, 0, 0, 0,
+                                  dock->y, dock->y + dock->h - 1, 0, 0);
                 break;
             }
             break;
         case OB_DIRECTION_WEST:
-            STRUT_SET(dock_strut, strw, 0, 0, 0);
+            STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
+                              dock->y, dock->y + dock->h - 1,
+                              0, 0, 0, 0, 0, 0);
             break;
         case OB_DIRECTION_EAST:
-            STRUT_SET(dock_strut, 0, 0, strw, 0);
+            STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
+                              0, 0, 0, 0,
+                              dock->y, dock->y + dock->h - 1, 0, 0);
             break;
         case OB_DIRECTION_SOUTHWEST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
-                STRUT_SET(dock_strut, 0, 0, 0, strh);
+                STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
+                                  0, 0, 0, 0, 0, 0,
+                                  dock->x, dock->x + dock->w - 1);
                 break;
             case OB_ORIENTATION_VERT:
-                STRUT_SET(dock_strut, strw, 0, 0, 0);
+                STRUT_PARTIAL_SET(dock_strut, strw, 0, 0, 0,
+                                  dock->y, dock->y + dock->h - 1,
+                                  0, 0, 0, 0, 0, 0);
                 break;
             }
             break;
         case OB_DIRECTION_SOUTH:
-            STRUT_SET(dock_strut, 0, 0, 0, strh);
+            STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
+                              0, 0, 0, 0, 0, 0,
+                              dock->x, dock->x + dock->w - 1);
             break;
         case OB_DIRECTION_SOUTHEAST:
             switch (config_dock_orient) {
             case OB_ORIENTATION_HORZ:
-                STRUT_SET(dock_strut, 0, 0, 0, strh);
+                STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, strh,
+                                  0, 0, 0, 0, 0, 0,
+                                  dock->x, dock->x + dock->w - 1);
                 break;
             case OB_ORIENTATION_VERT:
-                STRUT_SET(dock_strut, 0, 0, strw, 0);
+                STRUT_PARTIAL_SET(dock_strut, 0, 0, strw, 0,
+                                  0, 0, 0, 0,
+                                  dock->y, dock->y + dock->h - 1, 0, 0);
                 break;
             }
             break;

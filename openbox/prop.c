@@ -59,6 +59,7 @@ void prop_startup()
     CREATE(net_wm_window_type, "_NET_WM_WINDOW_TYPE");
     CREATE(net_wm_state, "_NET_WM_STATE");
     CREATE(net_wm_strut, "_NET_WM_STRUT");
+    CREATE(net_wm_strut_partial, "_NET_WM_STRUT_PARTIAL");
     CREATE(net_wm_icon, "_NET_WM_ICON");
 /*   CREATE(net_wm_pid, "_NET_WM_PID"); */
     CREATE(net_wm_allowed_actions, "_NET_WM_ALLOWED_ACTIONS");

@@ -1,21 +1,21 @@
 #ifndef __geom_h
 #define __geom_h
 
-typedef struct Point {
+typedef struct _Point {
     int x;
     int y;
 } Point;
 
 #define POINT_SET(pt, nx, ny) (pt).x = (nx), (pt).y = (ny)
 
-typedef struct Size {
+typedef struct _Size {
     int width;
     int height;
 } Size;
 
 #define SIZE_SET(sz, w, h) (sz).width = (w), (sz).height = (h)
 
-typedef struct Rect {
+typedef struct _Rect {
     int x;
     int y;
     int width;
@@ -43,15 +43,34 @@ typedef struct Rect {
     ((o).x < (r).x + (r).width && (o).x + (o).width > (r).x && \
      (o).y < (r).y + (r).height && (o).y + (o).height > (r).y)
 
-typedef struct Strut {
+typedef struct _Strut {
     int left;
     int top;
     int right;
     int bottom;
 } Strut;
 
+typedef struct _StrutPartial {
+    int left;
+    int top;
+    int right;
+    int bottom;
+
+    int left_start,   left_end;
+    int top_start,    top_end;
+    int right_start,  right_end;
+    int bottom_start, bottom_end;
+} StrutPartial;
+
 #define STRUT_SET(s, l, t, r, b) \
     (s).left = (l), (s).top = (t), (s).right = (r), (s).bottom = (b)
+
+#define STRUT_PARTIAL_SET(s, l, t, r, b, ls, le, ts, te, rs, re, bs, be) \
+    (s).left = (l), (s).top = (t), (s).right = (r), (s).bottom = (b), \
+    (s).left_start = (ls), (s).left_end = (le), \
+    (s).top_start = (ts), (s).top_end = (te), \
+    (s).right_start = (rs), (s).right_end = (re), \
+    (s).bottom_start = (bs), (s).bottom_end = (be)
 
 #define STRUT_ADD(s1, s2) \
     (s1).left = MAX((s1).left, (s2).left), \

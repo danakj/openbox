@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  X Fehler: %s(%d) opcodes %d/%d\n  resource 0x%lx\n
+# %s:  Un error de X: %s(%d) clave de operación %d/%d\n  recurso 0x%lx\n
 $ #SignalCaught
-# %s: Signal %d erhalten\n
+# %s: señal %d capturada\n
 $ #ShuttingDown
-# Shutdown\n
+# cerrando\n
 $ #Aborting
-# Abbruch... dumping core\n
+# cancelando... generando 'core'\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: Verbindung mit X Server versagt.\n
+# BaseDisplay::BaseDisplay: la conexión al servidor de X falló.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: kann die Display Verbindung nicht als 'close-on-exec' markieren\n
+# BaseDisplay::BaseDisplay: no se pude marcar la conexión de despliegue como close-on-exec\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): Entfernung des inkorrekten Fensters aus der 'Event Queue'\n
+# BaseDisplay::eventLoop(): quitando la ventana errónea de la cola de eventos\n

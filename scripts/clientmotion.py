@@ -27,7 +27,7 @@ def def_do_motion(client, xroot, yroot):
 	area = posqueue[0][3] # A Rect
 	OBClient_move(client, Rect_x(area) + dx, Rect_y(area) + dy)
 
-def def_do_resize(client, xroot, yroot, archor_corner):
+def def_do_resize(client, xroot, yroot, anchor_corner):
 	global posqueue
 	dx = xroot - posqueue[0][1]
 	dy = yroot - posqueue[0][2]

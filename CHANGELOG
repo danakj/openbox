@@ -1,6 +1,10 @@
 Changelog for Openbox:
 
-2.0.1:
+2.1.0:
+ * Add an optional Sticky button for window titlebars.
+   It can be added by putting an 'S' in your
+   titlebarLayout.                                      (Scott Moynes)
+
  * Fix SendTo menus. They would keep workspaces that
    had been deleted.                                    (Ben Jansens)
 

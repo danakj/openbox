@@ -38,6 +38,35 @@ void OBBindings::display()
 }
 
 
+static bool modvalue(const std::string &mod, unsigned int *val)
+{
+  if (mod == "C") {           // control
+    *val |= ControlMask;
+  } else if (mod == "S") {    // shift
+    *val |= ShiftMask;
+  } else if (mod == "A" ||    // alt/mod1
+             mod == "M" ||
+             mod == "M1" ||
+             mod == "Mod1") {
+    *val |= Mod1Mask;
+  } else if (mod == "M2" ||   // mod2
+             mod == "Mod2") {
+    *val |= Mod2Mask;
+  } else if (mod == "M3" ||   // mod3
+             mod == "Mod3") {
+    *val |= Mod3Mask;
+  } else if (mod == "W" ||    // windows/mod4
+             mod == "M4" ||
+             mod == "Mod4") {
+    *val |= Mod4Mask;
+  } else if (mod == "M5" ||   // mod5
+             mod == "Mod5") {
+    *val |= Mod5Mask;
+  } else {                    // invalid
+    return false;
+  }
+  return true;
+}
 
 bool OBBindings::translate(const std::string &str, Binding &b)
 {
@@ -47,45 +76,24 @@ bool OBBindings::translate(const std::string &str, Binding &b)
   std::string key(str, keybegin);
 
   // parse out the requested modifier keys
-  unsigned int mods = 0;
+  unsigned int modval = 0;
   std::string::size_type begin = 0, end;
   while (begin != keybegin) {
     end = str.find_first_of('-', begin);
 
     std::string mod(str, begin, end-begin);
-
-    if (mod == "C") {           // control
-      mods |= ControlMask;
-    } else if (mod == "S") {    // shift
-      mods |= ShiftMask;
-    } else if (mod == "A" ||    // alt/mod1
-               mod == "M" ||
-               mod == "M1" ||
-               mod == "Mod1") {
-      mods |= Mod1Mask;
-    } else if (mod == "M2" ||   // mod2
-               mod == "Mod2") {
-      mods |= Mod2Mask;
-    } else if (mod == "M3" ||   // mod3
-               mod == "Mod3") {
-      mods |= Mod3Mask;
-    } else if (mod == "W" ||    // windows/mod4
-               mod == "M4" ||
-               mod == "Mod4") {
-      mods |= Mod4Mask;
-    } else if (mod == "M5" ||   // mod5
-               mod == "Mod5") {
-      mods |= Mod5Mask;
-    } else {                    // invalid
+    if (!modvalue(mod, &modval)) {
       printf(_("Invalid modifier element in key binding: %s\n"), mod.c_str());
       return false;
     }
+    
     begin = end + 1;
   }
-  
+
+  // set the binding
   KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
   if (sym == NoSymbol) return false;
-  b.modifiers = mods;
+  b.modifiers = modval;
   b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
   return b.key != 0;
 }

@@ -351,11 +351,14 @@ void dock_configure()
         strh = ob_rr_theme->bwidth;
     } else {
         strw = dock->w;
-        strh =  dock->h;
+        strh = dock->h;
     }
 
     /* set the strut */
-    if (config_dock_floating) {
+    if (!dock->dock_apps) {
+        STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0);
+    } else if (config_dock_floating) {
         STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
     } else {
@@ -446,7 +449,10 @@ void dock_configure()
     dock->w -= ob_rr_theme->bwidth * 2;
     dock->h -= ob_rr_theme->bwidth * 2;
 
-    if (dock->w > 0 && dock->h > 0) {
+    if (dock->dock_apps) {
+        g_assert(dock->w > 0);
+        g_assert(dock->h > 0);
+
         XMoveResizeWindow(ob_display, dock->frame,
                           dock->x, dock->y, dock->w, dock->h);
 

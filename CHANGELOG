@@ -13,7 +13,7 @@ Changelog for Openbox:
    for moving during the warp. Now everything works as
    expected.
 
- * Better workspace changing for sticky windows, don't  (Ben Jansens)
+ * Better workspace changing for sticky windows, don't  (Jason Kasper)
    unmap/remap them, causing them to flicker. But keep
    sloppy focus working right still.
 
@@ -28,6 +28,8 @@ Changelog for Openbox:
 
  * Fix window gravity handling for an application
    resizing (ConfigureRequest event for resize only).   (Ben Jansens)
+
+ * Fix support for the Shape extension.                 (Ben Jansens)
 
 2.0.0:
  * Add an rc option (modiferMask) to allow changing     (Ben Jansens)

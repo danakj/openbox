@@ -398,8 +398,10 @@ static void menu_frame_render(ObMenuFrame *self)
 
         self->a_title->texture[0].data.text.string = self->menu->title;
         RrMinsize(self->a_title, &tw, &th);
-        tw = MIN(tw, MAX_MENU_WIDTH);
+        tw = MIN(tw, MAX_MENU_WIDTH) + ob_rr_theme->padding * 2;
         w = MAX(w, tw);
+
+        th = ob_rr_theme->mtitlefont_height + ob_rr_theme->padding * 2;
         h += (self->title_h = th + ob_rr_theme->bwidth);
 
         XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);

@@ -172,7 +172,12 @@ int main(int argc, char **argv)
 
     XCloseDisplay(ob_display);
 
-    /* XXX if (ob_restart) */
+    if (ob_restart) {
+        if (ob_restart_path != NULL) {
+            /* run other shit */
+        }
+        /* re-run me */
+    }
      
     return 0;
 }

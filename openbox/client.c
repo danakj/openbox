@@ -1505,6 +1505,12 @@ void client_update_title(ObClient *self)
         data = vdata;
     }
 
+    // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+    if (self->transient)
+        data = '\0';
+    else
+        data = g_strdup("Unnamed Window");
+
     PROP_SETS(self->window, net_wm_visible_icon_name, data);
 
     self->icon_title = data;

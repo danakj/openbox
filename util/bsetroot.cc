@@ -220,8 +220,8 @@ void bsetroot::gradient(void) {
       texture.getColorTo()->setPixel(BlackPixel(getXDisplay(), screen));
 
     pixmaps[screen] =
-      img_ctrl[screen]->renderImage(getScreenInfo(screen)->getWidth(),
-                                    getScreenInfo(screen)->getHeight(),
+      img_ctrl[screen]->renderImage(getScreenInfo(screen)->size().w(),
+                                    getScreenInfo(screen)->size().h(),
                                     &texture);
 
     XSetWindowBackgroundPixmap(getXDisplay(),

@@ -1067,9 +1067,10 @@ void BlackboxWindow::getWMProtocols(void) {
       if (proto[i] == xatom->getAtom(XAtom::wm_delete_window)) {
         decorations |= Decor_Close;
         functions |= Func_Close;
-      } else if (proto[i] == xatom->getAtom(XAtom::wm_take_focus)) {
+      } else if (proto[i] == xatom->getAtom(XAtom::wm_take_focus))
         flags.send_focus_message = True;
-      }
+      else if (proto[i] == xatom->getAtom(XAtom::blackbox_structure_messages))
+        screen->addNetizen(new Netizen(screen, client.window));
     }
 
     XFree(proto);

@@ -72,9 +72,13 @@ static void client_update(ObMenuFrame *frame, gpointer data)
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_ICONIFY;
 
     e = menu_find_entry_id(menu, CLIENT_MAXIMIZE);
+    e->data.normal.label = frame->client->max_vert || frame->client->max_horz ?
+        _("Restore") : _("Maximize");
     e->data.normal.enabled =frame->client->functions & OB_CLIENT_FUNC_MAXIMIZE;
 
     e = menu_find_entry_id(menu, CLIENT_SHADE);
+    e->data.normal.label = frame->client->shaded ?
+        _("Roll down") : _("Roll up");
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_SHADE;
 
     e = menu_find_entry_id(menu, CLIENT_MOVE);
@@ -203,7 +207,7 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleMaximizeFull",
                             OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Maximize"), acts);
+    e = menu_add_normal(menu, CLIENT_MAXIMIZE, "MAXIMIZE", acts);
     e->data.normal.mask = ob_rr_theme->max_mask; 
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
@@ -219,7 +223,7 @@ void client_menu_startup()
 
     acts = g_slist_prepend(NULL, action_from_string
                            ("ToggleShade", OB_USER_ACTION_MENU_SELECTION));
-    e = menu_add_normal(menu, CLIENT_SHADE, _("Roll up/down"), acts);
+    e = menu_add_normal(menu, CLIENT_SHADE, "SHADE", acts);
     e->data.normal.mask = ob_rr_theme->shade_mask;
     e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
     e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;

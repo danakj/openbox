@@ -27,6 +27,10 @@ double_click_delay = 300
 desktop_names = ["one", "two", "three", "four", "five", "six", "seven", \
                  "eight", "nine", "ten", "eleven", "twelve"]
 
+# number_of_desktops - the number of desktops/workspaces which can be scrolled
+#                      between
+number_of_desktops = 4
+
 #############################################################################
 ### Options that can be modified by the user to change the default hooks' ###
 ### behaviors.                                                            ###

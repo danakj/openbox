@@ -147,6 +147,8 @@ void moveresize_end(gboolean cancel)
 
 static void do_move()
 {
+    Rect *a;
+
     dispatch_move(moveresize_client, &cur_x, &cur_y);
 
     /* get where the client should be */
@@ -156,8 +158,10 @@ static void do_move()
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
-    popup_coords("X:  %4d  Y:  %4d", moveresize_client->frame->area.x,
-                 moveresize_client->frame->area.y);
+    a = screen_area(screen_desktop);
+    popup_coords("X:  %4d  Y:  %4d",
+                 moveresize_client->frame->area.x - a->x,
+                 moveresize_client->frame->area.y - a->y);
 }
 
 static void do_resize()

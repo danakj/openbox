@@ -77,27 +77,28 @@ void menu_startup()
 
     menu_parse_inst = parse_startup();
 
+    menu_parse_state.menus = NULL;
+    parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
+    parse_register(menu_parse_inst, "item", parse_menu_item,
+                   &menu_parse_state);
+    parse_register(menu_parse_inst, "separator",
+                   parse_menu_separator, &menu_parse_state);
+
     for (it = config_menu_files; it; it = g_slist_next(it)) {
-        if (menu_open(it->data, &doc, &node))
+        if (menu_open(it->data, &doc, &node)) {
             loaded = TRUE;
-
+            parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+            xmlFreeDoc(doc);
+        }
     }
-    if (!loaded)
-        loaded = menu_open("menu", &doc, &node);
-
-    if (loaded) {
-        menu_parse_state.menus = NULL;
-
-        parse_register(menu_parse_inst, "menu", parse_menu, &menu_parse_state);
-        parse_register(menu_parse_inst, "item", parse_menu_item,
-                       &menu_parse_state);
-        parse_register(menu_parse_inst, "separator",
-                       parse_menu_separator, &menu_parse_state);
-        parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
-        xmlFreeDoc(doc);
-
-        g_assert(menu_parse_state.menus == NULL);
+    if (!loaded) {
+        if (menu_open("menu", &doc, &node)) {
+            parse_tree(menu_parse_inst, doc, node->xmlChildrenNode);
+            xmlFreeDoc(doc);
+        }
     }
+    
+    g_assert(menu_parse_state.menus == NULL);
 
     client_add_destructor(client_dest);
 }

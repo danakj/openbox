@@ -398,8 +398,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     if (!read_mask(inst, "bullet.xbm", theme, &theme->menu_bullet_mask)) {
-        char data[] = { 0x18, 0x30, 0x60, 0xfe, 0xfe, 0x60, 0x30, 0x18 };
-        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 8, 8, data);
+        guchar data[] = { 0x18, 0x30, 0x60, 0xfe, 0xfe, 0x60, 0x30, 0x18 };
+        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 8, 8, (char*)data);
     }
 
     /* read the decoration textures */

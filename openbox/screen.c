@@ -20,7 +20,7 @@
 			SubstructureNotifyMask | SubstructureRedirectMask | \
 			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
-guint    screen_num_desktops    = 1;
+guint    screen_num_desktops    = 0;
 guint    screen_desktop         = 0;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;

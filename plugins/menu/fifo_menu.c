@@ -73,7 +73,8 @@ void fifo_menu_handler(int fd, void *d) {
         FIFO_MENU_DATA(menu)->buf = tmpbuf;
     
         num_read = read(fd,
-                        FIFO_MENU_DATA(menu)->buf + FIFO_MENU_DATA(menu)->buflen,
+                        FIFO_MENU_DATA(menu)->buf +
+                        FIFO_MENU_DATA(menu)->buflen,
                         num_realloc);
 
         if (num_read == 0) { /* eof */
@@ -83,24 +84,25 @@ void fifo_menu_handler(int fd, void *d) {
             menu->invalid = TRUE;
             menu_clear(menu);
 
-            /* TEMP: list them */
-            while (NULL !=
-                   (found = strchr(&FIFO_MENU_DATA(menu)->buf[count], '\n'))) {
-                FIFO_MENU_DATA(menu)->buf
-                    [found - FIFO_MENU_DATA(menu)->buf] = '\0';
-                menu_add_entry(menu,
-                               menu_entry_new_separator
-                               (&FIFO_MENU_DATA(menu)->buf[count]));
-                count = found - FIFO_MENU_DATA(menu)->buf + 1;
-            }
-
             FIFO_MENU_DATA(menu)->buf[FIFO_MENU_DATA(menu)->buflen] = '\0';
-            fifo_menu_clean_up(menu);
 
+            xmlDocPtr doc = xmlParseMemory(FIFO_MENU_DATA(menu)->buf,
+                                           FIFO_MENU_DATA(menu)->buflen);
+
+            xmlNodePtr node = xmlDocGetRootElement(doc);
+
+            if (!xmlStrcasecmp(node->name, (const xmlChar*) "fifo")) {
+                if ((node = parse_find_node("item", node->xmlChildrenNode)))
+                    parse_menu_full(doc, node, menu, FALSE);
+            }
+            
+            fifo_menu_clean_up(menu);
+            
             event_remove_fd(FIFO_MENU_DATA(menu)->handler->fd);
         
             if ((FIFO_MENU_DATA(menu)->fd =
-                 open(FIFO_MENU_DATA(menu)->fifo, O_NONBLOCK | O_RDONLY)) == -1) {
+                 open(FIFO_MENU_DATA(menu)->fifo,
+                      O_NONBLOCK | O_RDONLY)) == -1) {
                 g_warning("Can't reopen FIFO");
                 fifo_menu_clean_up(menu);
                 return;
@@ -134,15 +136,31 @@ void plugin_destroy (ObMenu *m)
     menu_free(m->name);
 }
 
-void *plugin_create() /* TODO: need config */
+void *plugin_create(PluginMenuCreateData *data)
+
+
 {
     char *fifo;
     char *dir;
     event_fd_handler *h;
-    
-    Fifo_Menu_Data *d = g_new(Fifo_Menu_Data, 1);
-    ObMenu *m = menu_new("", PLUGIN_NAME, NULL);
+    Fifo_Menu_Data *d;
+    ObMenu *m;
+    char *label = NULL, *id = NULL;
+        
+    d = g_new(Fifo_Menu_Data, 1);
 
+    parse_attr_string("id", data->node, &id);
+    parse_attr_string("label", data->node, &label);
+
+    m = menu_new( (label != NULL ? label : ""),
+                 (id != NULL ? id : PLUGIN_NAME),
+                 data->parent);
+    menu_add_entry(data->parent, menu_entry_new_submenu(
+                       (label != NULL ? label : ""),
+                       m));
+
+    g_free(label);
+    g_free(id);
     d->fd = -1;
     d->buf = NULL;
     d->buflen = 0;
@@ -154,7 +172,8 @@ void *plugin_create() /* TODO: need config */
     
     m->plugin_data = (void *)d;
 
-    dir = g_build_filename(g_get_home_dir(), ".openbox", PLUGIN_NAME, NULL);
+    dir = g_build_filename(g_get_home_dir(), ".openbox",
+                          PLUGIN_NAME, NULL);
 
     if (mkdir(dir, S_IRWXU | S_IRWXG | S_IRWXO) == -1 && errno != EEXIST) {
 /* technically, if ~/.openbox/fifo_menu exists and isn't a directory
@@ -166,7 +185,8 @@ void *plugin_create() /* TODO: need config */
         return NULL;
     }
 
-    fifo = g_build_filename(g_get_home_dir(), ".openbox", PLUGIN_NAME,
+    fifo = g_build_filename(g_get_home_dir(), ".openbox",
+                            PLUGIN_NAME,
                             m->name, NULL);
     if (mkfifo(fifo, S_IRUSR | S_IWUSR |
                S_IRGRP | S_IWGRP | /* let umask do its thing */

@@ -176,7 +176,7 @@ void plugin_loadall()
     }
 }
 
-void *plugin_create(char *name /* TODO */)
+void *plugin_create(char *name, void *data)
 {
     Plugin *p = (Plugin *)g_datalist_get_data(&plugins, name);
 
@@ -190,7 +190,7 @@ void *plugin_create(char *name /* TODO */)
 	return NULL;
     }
 
-    return p->create();
+    return p->create(data);
 }
 
 void plugin_destroy(char *name, void *data)

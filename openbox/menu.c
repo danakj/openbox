@@ -18,28 +18,51 @@ GSList *menu_visible = NULL;
 
 static void parse_menu(xmlDocPtr doc, xmlNodePtr node, void *data)
 {
+    parse_menu_full(doc, node, data, TRUE);
+}
+
+
+void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
+                       gboolean newmenu)
+{
     Action *act;
     xmlNodePtr nact;
-    gchar *id = NULL, *title = NULL, *label = NULL;
-    ObMenu *menu, *parent;
 
-    if (!parse_attr_string("id", node->parent, &id))
-        goto parse_menu_fail;
-    if (!parse_attr_string("label", node->parent, &title))
-        goto parse_menu_fail;
+    gchar *id = NULL, *title = NULL, *label = NULL, *plugin;
+    ObMenu *menu = NULL, *parent;
 
-    g_message("menu label %s", title);
+    if (newmenu == TRUE) {
+        if (!parse_attr_string("id", node->parent, &id))
+            goto parse_menu_fail;
+        if (!parse_attr_string("label", node->parent, &title))
+            goto parse_menu_fail;
 
-    menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
-    if (data)
-        *((ObMenu**)data) = menu;
+        g_message("menu label %s", title);
 
+        menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
+
+        if (data)
+            *((ObMenu**)data) = menu;
+    } else {
+        menu = (ObMenu *)data;
+    }
+    
     while (node) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
-            parent = menu;
-            parse_menu(doc, node->xmlChildrenNode, &parent);
-            menu_add_entry(menu, menu_entry_new_submenu(parent->label,
-                                                        parent));
+            if (parse_attr_string("plugin", node, &plugin)) {
+                PluginMenuCreateData data = {
+                    .doc = doc,
+                    .node = node,
+                    .parent = menu
+                };
+                parent = plugin_create(plugin, &data);
+            } else {
+                parent = menu;
+                parse_menu(doc, node->xmlChildrenNode, &parent);
+                menu_add_entry(menu, menu_entry_new_submenu(parent->label,
+                                                            parent));
+            }
+
         }
         else if (!xmlStrcasecmp(node->name, (const xmlChar*) "item")) {
             if (parse_attr_string("label", node, &label)) {

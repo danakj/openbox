@@ -96,7 +96,14 @@ struct _ObMenuEntry
     RrAppearance *a_hilite;
     gint y;
     gint min_w;
-};
+} MenuEntry;
+
+typedef struct PluginMenuCreateData{
+    xmlDocPtr doc;
+    xmlNodePtr node;
+    ObMenu *parent;
+} PluginMenuCreateData;
+
 
 void menu_startup();
 void menu_shutdown();
@@ -147,5 +154,7 @@ void menu_entry_fire(ObMenuEntry *self);
 void menu_render(ObMenu *self);
 void menu_render_full(ObMenu *self);
 
+//so plugins can call it?
+void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data, gboolean new);
 void menu_control_mouseover(ObMenuEntry *entry, gboolean enter);
 #endif

@@ -184,7 +184,6 @@ void increase_depth(pixel32 *data, XImage *im)
 
     switch (im->bits_per_pixel) {
     case 32:
-        g_message("increase 32");
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (p32[x] >> render_red_offset) & 0xff;
@@ -200,7 +199,6 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     case 16:
-        g_message("increase 16");
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (p16[x] & render_red_mask) >> render_red_offset <<
@@ -219,7 +217,7 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     case 8:
-        g_message("this bit depth is currently unhandled\n");
+        g_message("this image bit depth is currently unhandled\n");
         break;
     case 1:
         for (y = 0; y < im->height; y++) {
@@ -234,6 +232,6 @@ void increase_depth(pixel32 *data, XImage *im)
         }
         break;
     default:
-        g_message("your bit depth is currently unhandled\n");
+        g_message("this image bit depth is currently unhandled\n");
     }
 }

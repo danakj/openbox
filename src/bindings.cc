@@ -214,7 +214,6 @@ void OBBindings::assimilate(BindingTree *node)
   if (!_keytree.first_child) {
     // there are no nodes at this level yet
     _keytree.first_child = node;
-    return;
   } else {
     a = _keytree.first_child;
     last = a;
@@ -225,9 +224,6 @@ void OBBindings::assimilate(BindingTree *node)
       if (a->binding != b->binding) {
         a = a->next_sibling;
       } else {
-        printf("a: %s %d %d\n", a->text.c_str(), a->binding.key, a->binding.modifiers);
-        printf("b: %s %d %d\n", b->text.c_str(), b->binding.key, b->binding.modifiers);
-        printf("moving up one in b\n");
         tmp = b;
         b = b->first_child;
         delete tmp;
@@ -271,6 +267,8 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
   if (!(tree = buildtree(keylist, id)))
     return false; // invalid binding requested
 
+  print_branch(tree, " Adding: ");
+  
   if (find_key(tree) != -1) {
     // conflicts with another binding
     destroytree(tree);
@@ -279,6 +277,11 @@ bool OBBindings::add_key(const StringVect &keylist, int id)
 
   // assimilate this built tree into the main tree
   assimilate(tree); // assimilation destroys/uses the tree
+
+  printf("Added!\n");
+  print_branch(&_keytree, "");
+  printf("\n");
+  
   return true;
 }
 

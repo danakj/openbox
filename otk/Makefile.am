@@ -9,7 +9,7 @@ INCLUDES= -I../src
 noinst_LTLIBRARIES=libotk.la
 
 libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
-                  rendertexture.cc renderstyle.cc rendercolor.cc  \
+                  renderstyle.cc rendercolor.cc  \
                   color.cc display.cc font.cc gccache.cc image.cc \
                   property.cc imagecontrol.cc rect.cc screeninfo.cc \
                   texture.cc timer.cc style.cc \

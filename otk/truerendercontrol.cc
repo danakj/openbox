@@ -8,8 +8,7 @@
 #include "display.hh"
 #include "screeninfo.hh"
 #include "surface.hh"
-
-#include "rendercolor.hh"
+#include "rendertexture.hh"
 
 extern "C" {
 #ifdef    HAVE_STDLIB_H
@@ -103,8 +102,6 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
 void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const
 {
-  (void)texture;
-
   assert(sf._screen == _screen);
   
   int w = sf.width(), h = sf.height();
@@ -130,7 +127,8 @@ void TrueRenderControl::drawBackground(Surface& sf,
   im->data = (char*) data;
 
 //  sf.setPixmap(im);
-  sf.setPixmap(RenderColor(_screen, 0xff, 0xff, 0));
+  sf.setPixmap(texture.color());
+//  sf.setPixmap(RenderColor(_screen, 0xff, 0xff, 0));
 
   delete [] im->data;
   im->data = NULL;

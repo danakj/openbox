@@ -2,9 +2,9 @@
 #ifndef __renderstyle_hh
 #define __renderstyle_hh
 
-namespace otk {
-
 #include "rendertexture.hh"
+
+namespace otk {
 
 class RenderStyle {
 };

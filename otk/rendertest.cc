@@ -12,8 +12,17 @@ int main(int argc, char **argv)
   otk::Application app(argc, argv);
   otk::AppWidget foo(&app);
   foo.resize(600, 500);
-  
-  otk::RenderTexture tex;
+
+  otk::RenderColor color(0, 0xff, 0x20, 0x20);
+  otk::RenderTexture tex(false,
+			 otk::RenderTexture::Flat,
+			 false,
+			 otk::RenderTexture::Solid,
+			 false,
+			 &color,
+			 0,
+			 0,
+			 0);
   foo.setTexture(&tex);
 
   foo.show();

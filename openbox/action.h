@@ -150,6 +150,8 @@ void action_unfocus(union ActionData *data);
 /* ClientAction */
 void action_iconify(union ActionData *data);
 /* ClientAction */
+void action_raiselower(union ActionData *data);
+/* ClientAction */
 void action_raise(union ActionData *data);
 /* ClientAction */
 void action_lower(union ActionData *data);

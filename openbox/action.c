@@ -335,6 +335,11 @@ ActionString actionstrings[] =
         NULL
     },
     {
+        "raiselower",
+        action_raiselower,
+        NULL
+    },
+    {
         "raise",
         action_raise,
         NULL
@@ -765,6 +770,16 @@ void action_iconify(union ActionData *data)
 {
     if (data->client.c)
         client_iconify(data->client.c, TRUE, TRUE);
+}
+
+void action_raiselower(union ActionData *data)
+{
+    if (data->client.c) {
+        if (data->client.c->frame->obscured)
+            stacking_raise(CLIENT_AS_WINDOW(data->client.c));
+        else
+            stacking_lower(CLIENT_AS_WINDOW(data->client.c));
+    }
 }
 
 void action_raise(union ActionData *data)

@@ -475,7 +475,13 @@ Window BlackboxWindow::createToplevelWindow(void) {
   attrib_create.background_pixmap = None;
   attrib_create.colormap = screen->getColormap();
   attrib_create.override_redirect = True;
-  attrib_create.event_mask = EnterWindowMask | LeaveWindowMask;
+  attrib_create.event_mask = EnterWindowMask | LeaveWindowMask |
+                             ButtonPress;
+  /*
+    We catch button presses because other wise they get passed down to the
+    root window, which will then cause root menus to show when you click the
+    window's frame.
+  */
 
   return XCreateWindow(blackbox->getXDisplay(), screen->getRootWindow(),
                        0, 0, 1, 1, frame.border_w, screen->getDepth(),

@@ -46,6 +46,8 @@ public:
   virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
   virtual void drawGradientBackground(Surface &sf,
                                       const RenderTexture &texture) const;
+
+  inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
 };
 
 }

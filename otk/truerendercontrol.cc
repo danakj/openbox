@@ -143,12 +143,36 @@ void TrueRenderControl::drawGradientBackground(
             + (g << 8)
             + b;
     for (off = 0, x = 0; x < w; ++x, off++) {
-	*(data + off) = current;
-	*(data + off + ((h-1) * w)) = current;
+      *(data + off) = current;
+      *(data + off + ((h-1) * w)) = current;
     }
     for (off = 0, x = 0; x < h; ++x, off++) {
-	*(data + (off * w)) = current;
-	*(data + (off * w) + w - 1) = current;
+      *(data + (off * w)) = current;
+      *(data + (off * w) + w - 1) = current;
+    }
+  }
+
+  if (texture.relief() != RenderTexture::Flat) {
+    if (texture.bevel() == RenderTexture::Bevel1) {
+      for (off = 0, x = 0; x < w; ++x, off++)
+        highlight(data + off,
+                data + off + (h-1) * w,
+                texture.relief()==RenderTexture::Raised);
+      for (off = 0, x = 0; x < h; ++x, off++)
+        highlight(data + off * w,
+                data + off * w + w - 1,
+                texture.relief()==RenderTexture::Raised);
+    }
+
+    if (texture.bevel() == RenderTexture::Bevel2) {
+      for (off = 1, x = 1; x < w - 1; ++x, off++)
+        highlight(data + off + w,
+                data + off + (h-2) * w,
+                texture.relief()==RenderTexture::Raised);
+      for (off = 1, x = 1; x < h-1; ++x, off++)
+        highlight(data + off * w + 1,
+                  data + off * w + w - 2,
+                  texture.relief()==RenderTexture::Raised);
     }
   }
 
@@ -162,6 +186,37 @@ void TrueRenderControl::drawGradientBackground(
   XDestroyImage(im);
 }
 
+void TrueRenderControl::highlight(pixel32 *x, pixel32 *y, bool raised) const
+{
+  int r, g, b;
+
+  pixel32 *up, *down;
+  if (raised) {
+    up = x;
+    down = y;
+  } else {
+    up = y;
+    down = x;
+  }
+  r = (*up >> 16) & 0xFF;
+  r += r >> 1;
+  g = (*up >> 8) & 0xFF;
+  g += g >> 1;
+  b = *up & 0xFF;
+  b += b >> 1;
+  if (r > 255) r = 255;
+  if (g > 255) r = 255;
+  if (b > 255) r = 255;
+  *up = (r << 16) + (g << 8) + b;
+  
+  r = (*down >> 16) & 0xFF;
+  r = (r >> 1) + (r >> 2);
+  g = (*down >> 8) & 0xFF;
+  g = (g >> 1) + (g >> 2);
+  b = *down & 0xFF;
+  b = (b >> 1) + (b >> 2);
+  *down = (r << 16) + (g << 8) + b;
+}
 void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const
 {

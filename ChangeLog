@@ -1,7 +1,11 @@
 Changelog for Openbox:
 
 1.0.0:
- * added BestFit window placement algorithm/type        (Ruhi Bloodworth)
+ * made shaded windows edge-snap correctly to the
+   bottom for their size instead for their unshaded
+   size.                                                (Ben Jansens)
+
+ * added BestFit window placement algorithm/type.       (Ruhi Bloodworth)
 
 0.99.1:
  * forced a redraw of the close button after pressing

@@ -2804,15 +2804,18 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
       dy -= frame.border_w;
 
       int snap_distance = screen->getEdgeSnapThreshold();
+      // width/height of the snapping window
+      unsigned int snap_w = frame.width + (frame.border_w * 2);
+      unsigned int snap_h = getHeight() + (frame.border_w * 2);
       if (snap_distance) {
-        int drx = screen->getWidth() - (dx + frame.snap_w);
+        int drx = screen->getWidth() - (dx + snap_w);
 
         if (dx < drx && (dx > 0 && dx < snap_distance) ||
                         (dx < 0 && dx > -snap_distance) )
           dx = 0;
         else if ( (drx > 0 && drx < snap_distance) ||
                   (drx < 0 && drx > -snap_distance) )
-          dx = screen->getWidth() - frame.snap_w;
+          dx = screen->getWidth() - snap_w;
 
         int dtty, dbby, dty, dby;
         switch (screen->getToolbarPlacement()) {
@@ -2831,14 +2834,14 @@ void OpenboxWindow::motionNotifyEvent(XMotionEvent *me) {
         }
 
         dty = dy - dtty;
-        dby = dbby - (dy + frame.snap_h);
+        dby = dbby - (dy + snap_h);
 
         if ( (dy > 0 && dty < snap_distance) ||
             (dy < 0 && dty > -snap_distance) )
           dy = dtty;
         else if ( (dby > 0 && dby < snap_distance) ||
                  (dby < 0 && dby > -snap_distance) )
-          dy = dbby - frame.snap_h;
+          dy = dbby - snap_h;
       }
 
       if (screen->doOpaqueMove()) {
@@ -3148,9 +3151,6 @@ void OpenboxWindow::upsize(void) {
   
   frame.width = client.width + (frame.mwm_border_w * 2);
   frame.height = frame.y_handle + frame.handle_h;
-
-  frame.snap_w = frame.width + (frame.border_w * 2);
-  frame.snap_h = frame.height + (frame.border_w * 2);
 }
 
 
@@ -3172,9 +3172,6 @@ void OpenboxWindow::downsize(void) {
     - frame.handle_h - (decorations.handle ? frame.border_w : 0);
 
   frame.y_handle = frame.border_h + frame.y_border + frame.border_w;
-
-  frame.snap_w = frame.width + (frame.border_w * 2);
-  frame.snap_h = frame.height + (frame.border_w * 2);
 }
 
 

@@ -105,6 +105,14 @@ mbind	Titlebar	Press		Left	Focus
 mbind	Handle		Press		Left	Focus
 mbind	BLCorner	Press		Left	Focus
 mbind	BRCorner	Press		Left	Focus
+mbind	Maximize	Press		Left	Focus
+mbind	Maximize	Press		Middle	Focus
+mbind	Maximize	Press		Right	Focus
+mbind	Iconify		Press		Left	Focus
+mbind	Icon		Press		Left	Focus
+mbind	Close		Press		Left	Focus
+mbind	AllDesktops	Press		Left	Focus
+mbind	Shade		Press		Left	Focus
 mbind	Client		Press		Left	FocusRaise
 mbind	Client		Press		Middle	Focus
 mbind	Client		Press		Right	Focus

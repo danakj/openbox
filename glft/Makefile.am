@@ -3,12 +3,14 @@ themedir=$(datadir)/openbox/themes
 theme=operation
 
 CPPFLAGS=$(FC_CFLAGS) $(GLIB_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
+         $(shell freetype-config --cflags) \
          -DG_LOG_DOMAIN=\"GlFt\" \
          -DDEFAULT_THEME=\"$(theme)\" \
          -DTHEMEDIR=\"$(themedir)\"
 
 INCLUDES=-I..
-LIBS=$(FC_LIBS) $(GLIB_LIBS) $(X_LIBS) $(GL_LIBS) @LIBS@
+LIBS=$(FC_LIBS) $(GLIB_LIBS) $(X_LIBS) $(GL_LIBS) \
+     $(shell freetype-config --libs) @LIBS@
 
 noinst_PROGRAMS=glfttest
 glfttest_LDFLAGS=-lglft -L.
@@ -18,13 +20,15 @@ lib_LTLIBRARIES=libglft.la
 libglft_la_SOURCES=\
 	init.c \
 	font.c \
-	debug.c
+	debug.c \
+	render.c
 
 noinst_HEADERS=\
 	glft.h \
 	font.h \
 	init.h \
-	debug.h
+	debug.h \
+	render.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

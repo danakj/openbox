@@ -7,3 +7,4 @@ init.lo
 glfttest
 debug.lo
 font.lo
+render.lo

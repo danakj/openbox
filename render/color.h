@@ -21,7 +21,7 @@ typedef u_int32_t pixel32;
 typedef u_int16_t pixel16;   
 #endif /* HAVE_STDINT_H */  
 
-#if (G_ENDIAN == G_BIG_ENDIAN)
+#if (G_BYTE_ORDER == G_BIG_ENDIAN)
 #define default_red_shift 0
 #define default_green_shift 8
 #define default_blue_shift 16
@@ -31,7 +31,7 @@ typedef u_int16_t pixel16;
 #define default_green_shift 8
 #define default_blue_shift 0
 #define endian LSBFirst
-#endif /* G_ENDIAN == G_BIG_ENDIAN */
+#endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 
 
 typedef struct color_rgb {

@@ -7,3 +7,4 @@ keyaction.lo
 keyparse.lo
 Makefile.in
 .deps
+Makefile

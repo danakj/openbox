@@ -12,3 +12,4 @@ libobrender.la
 theme.lo
 Makefile.in
 .deps
+Makefile

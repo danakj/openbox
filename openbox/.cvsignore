@@ -28,3 +28,4 @@ timer.lo
 xerror.lo
 Makefile.in
 .deps
+Makefile

@@ -16,3 +16,4 @@ config.rpath
 depcomp
 missing
 mkinstalldirs
+Makefile.in

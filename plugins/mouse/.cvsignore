@@ -5,3 +5,4 @@ mouseparse.lo
 .libs
 Makefile.in
 .deps
+Makefile

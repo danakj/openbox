@@ -260,7 +260,9 @@ dist_thebear_theme_DATA = \
 pubinclude_HEADERS = \
 	render/render.h \
 	render/theme.h \
-	parser/parse.h \
+	parser/parse.h
+
+nodist_pubinclude_HEADERS = \
 	version.h
 
 nodist_pkgconfig_DATA = \
@@ -306,6 +308,7 @@ dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
+	version.h.in \
 	data/rc.xml.in \
 	data/menu.xml.in \
 	render/obrender-3.0.pc.in \

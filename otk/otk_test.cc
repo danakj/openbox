@@ -23,25 +23,43 @@ int main(void) {
   my_style->load(style_conf);
 
   otk::OtkFocusWidget foo(my_style);
-  otk::OtkButton iconb(&foo);
-  otk::OtkFocusWidget label(&foo);
-  otk::OtkButton maxb(&foo);
-  otk::OtkButton closeb(&foo);
 
-  foo.setBevelWidth(2);
-  foo.setDirection(otk::OtkWidget::Vertical);
-  
-  foo.setHeight(400);
+  foo.resize(600, 500);
   foo.setTexture(my_style->getTitleFocus());
   foo.setUnfocusTexture(my_style->getTitleUnfocus());
 
+  foo.setBevelWidth(2);
+  foo.setDirection(otk::OtkWidget::Horizontal);
+
+  otk::OtkFocusWidget left(&foo);
+  otk::OtkFocusWidget right(&foo);
+
+  left.setDirection(otk::OtkWidget::Horizontal);
+  left.setStretchableVert(true);
+  left.setStretchableHorz(true);
+  left.setTexture(my_style->getTitleFocus());
+  left.setUnfocusTexture(my_style->getTitleUnfocus());
+ 
+  right.setDirection(otk::OtkWidget::Vertical);
+  right.setBevelWidth(10);
+  right.setStretchableVert(true);
+  right.setWidth(300);
+  right.setTexture(my_style->getTitleFocus());
+  right.setUnfocusTexture(my_style->getTitleUnfocus());
+
+  otk::OtkButton iconb(&left);
+  otk::OtkFocusWidget label(&left);
+  otk::OtkButton maxb(&left);
+  otk::OtkButton closeb(&left);
+  
   // fixed size
   iconb.setText("foo");
   iconb.press();
 
   // fix width to 60 and let the height be calculated by its parent
-  label.setWidth(60);
+  //label.setHeight(20);
   label.setStretchableVert(true);
+  label.setStretchableHorz(true);
   label.setTexture(my_style->getLabelFocus());
   label.setUnfocusTexture(my_style->getLabelUnfocus());
 
@@ -50,6 +68,18 @@ int main(void) {
 
   // fixed size
   closeb.setText("fuubar");
+
+  otk::OtkFocusWidget rblef(&right);
+  otk::OtkButton rbutt1(&right);
+  otk::OtkButton rbutt2(&right);
+
+  rblef.setStretchableHorz(true);
+  rblef.setHeight(50);
+  rblef.setTexture(my_style->getHandleFocus());
+  rblef.setUnfocusTexture(my_style->getHandleUnfocus());
+  
+  rbutt1.setText("this is fucking tight");
+  rbutt2.setText("heh, WOOP");
 
   // will recursively unfocus its children
   //foo.unfocus();

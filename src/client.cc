@@ -914,6 +914,9 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 #ifdef DEBUG
     printf("net_active_window for 0x%lx\n", _window);
 #endif
+    if (_shaded)
+      shade(false);
+    // XXX: deiconify
     focus();
     Openbox::instance->screen(_screen)->restack(true, this); // raise
   }

@@ -789,10 +789,22 @@ void OBScreen::mapRequestHandler(const XMapRequestEvent &e)
   OBClient *c = Openbox::instance->findClient(e.window);
 
   if (c) {
-    if (c->shaded())
-      c->shade(false);
-    // XXX: uniconify the window
-    c->focus();
+    // send a net_active_window message
+    XEvent ce;
+    ce.xclient.type = ClientMessage;
+    ce.xclient.message_type =
+      Openbox::instance->property()->atom(otk::OBProperty::net_active_window);
+    ce.xclient.display = otk::OBDisplay::display;
+    ce.xclient.window = c->window();
+    ce.xclient.format = 32;
+    ce.xclient.data.l[0] = 0l;
+    ce.xclient.data.l[1] = 0l;
+    ce.xclient.data.l[2] = 0l;
+    ce.xclient.data.l[3] = 0l;
+    ce.xclient.data.l[4] = 0l;
+    XSendEvent(otk::OBDisplay::display, _info->rootWindow(), false,
+               SubstructureRedirectMask | SubstructureNotifyMask,
+               &ce);
   } else
     manageWindow(e.window);
 }

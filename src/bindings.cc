@@ -243,12 +243,15 @@ bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
     t->callbacks.push_back(callback);
     destroytree(tree);
   } else {
+    // grab the server here to make sure no key pressed go missed
+    otk::OBDisplay::grab();
     grabKeys(false);
 
     // assimilate this built tree into the main tree
     assimilate(tree); // assimilation destroys/uses the tree
 
     grabKeys(true); 
+    otk::OBDisplay::ungrab();
   }
  
   Py_INCREF(callback);
@@ -273,6 +276,8 @@ bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
                                           t->callbacks.end(),
                                           callback);
     if (it != t->callbacks.end()) {
+      // grab the server here to make sure no key pressed go missed
+      otk::OBDisplay::grab();
       grabKeys(false);
       
       _curpos = &_keytree;
@@ -281,6 +286,8 @@ bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
       Py_XDECREF(*it);
       
       grabKeys(true);
+      otk::OBDisplay::ungrab();
+      
       return true;
     }
   }
@@ -292,10 +299,13 @@ void OBBindings::setResetKey(const std::string &key)
 {
   Binding b(0, 0);
   if (translate(key, b)) {
+    // grab the server here to make sure no key pressed go missed
+    otk::OBDisplay::grab();
     grabKeys(false);
     _resetkey.key = b.key;
     _resetkey.modifiers = b.modifiers;
     grabKeys(true);
+    otk::OBDisplay::ungrab();
   }
 }
 
@@ -370,9 +380,12 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
       if (p->binding.key == key && p->binding.modifiers == modifiers) {
         if (p->chain) {
           _timer.start(); // start/restart the timer
+          // grab the server here to make sure no key pressed go missed
+          otk::OBDisplay::grab();
           grabKeys(false);
           _curpos = p;
           grabKeys(true);
+          otk::OBDisplay::ungrab();
         } else {
           Window win = None;
           OBClient *c = Openbox::instance->focusedClient();
@@ -394,9 +407,12 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
 void OBBindings::resetChains(OBBindings *self)
 {
   self->_timer.stop();
+  // grab the server here to make sure no key pressed go missed
+  otk::OBDisplay::grab();
   self->grabKeys(false);
   self->_curpos = &self->_keytree;
   self->grabKeys(true);
+  otk::OBDisplay::ungrab();
 }
 
 

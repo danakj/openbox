@@ -83,7 +83,6 @@ Client::Client(int screen, Window window)
   // any changes we've made here
   otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
                      otk::Property::atoms.cardinal, (unsigned)_desktop);
-  
   changeState();
 }
 
@@ -750,14 +749,12 @@ void Client::setDesktop(unsigned int target)
     return;
 
   _desktop = target;
-
   // set the desktop hint
   otk::Property::set(_window, otk::Property::atoms.net_wm_desktop,
                      otk::Property::atoms.cardinal, _desktop);
-  
+  frame->adjustState(); // the frame can display the current desktop state
   // 'move' the window to the new desktop
   showhide();
-
   openbox->screen(_screen)->updateStruts();
 }
 
@@ -1580,9 +1577,7 @@ void Client::iconify(bool iconic, bool curdesk)
     XMapWindow(**otk::display, _window);
   }
   changeState();
-
   showhide();
-  
   openbox->screen(_screen)->updateStruts();
 }
 

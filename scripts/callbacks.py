@@ -113,7 +113,7 @@ def focus(data):
         return
     data.client.focus()
 
-def restart(data, other = ""):
+def restart(data=0, other = ""):
     """Restarts Openbox, optionally starting another window manager."""
     ob.openbox.restart(other)
 

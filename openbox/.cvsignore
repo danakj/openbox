@@ -3,3 +3,4 @@ lex.yy.c
 parse.tab.c
 parse.tab.h
 .libs
+parse.lex.c

@@ -24,6 +24,7 @@ INSTALL = @INSTALL@
 LIBTOOL = @LIBTOOL@
 
 srcdir = @srcdir@
+
 # non-recursive!
 top_builddir = .
 
@@ -41,4 +42,9 @@ plugindir = $(libdir)/openbox/plugins
 rcdir = $(datadir)/openbox
 themesdir = $(datadir)/openbox/themes
 
-binary = openbox3
+depdir = .deps
+
+COMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
+DEPCOMPILE = $(CC) $(DEFS) $(CPPFLAGS) $(CFLAGS) 
+LINK = $(LIBTOOL) --mode=link $(CC)
+LTCLEAN = $(LIBTOOL) --mode=clean $(RM)

@@ -19,8 +19,8 @@
 #include "parse.h"
 
 extern int yylex();
-/*extern int yyparse();*/
-/*void yyerror(char *err);*/
+extern int yyparse();
+void yyerror(char *err);
 
 extern int yylineno;
 extern FILE *yyin;

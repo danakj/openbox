@@ -12,11 +12,9 @@ def focus(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     type = OBClient_type(client)
-    # these types of windows dont get focus from window enter events
-    if data.action() == EventEnterWindow:
-        if (type == OBClient_Type_Dock or \
-            type == OBClient_Type_Desktop):
-            return
+    # !normal windows dont get focus from window enter events
+    if data.action() == EventEnterWindow and not OBClient_normal(client):
+        return
     OBClient_focus(client)
 
 def move(data):
@@ -25,11 +23,8 @@ def move(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
 
-    type = OBClient_type(client)
-    # these types of windows dont get moved
-    if type == OBClient_Type_Dock or \
-       type == OBClient_Type_Desktop:
-        return
+    # !normal windows dont get moved
+    if not OBClient_normal(client): return
 
     dx = data.xroot() - data.pressx()
     dy = data.yroot() - data.pressy()
@@ -41,11 +36,8 @@ def resize(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
 
-    type = OBClient_type(client)
-    # these types of windows dont get resized
-    if type == OBClient_Type_Dock or \
-       type == OBClient_Type_Desktop:
-        return
+    # !normal windows dont get moved
+    if not OBClient_normal(client): return
 
     px = data.pressx()
     py = data.pressy()

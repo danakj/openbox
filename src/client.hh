@@ -352,6 +352,16 @@ public:
 
   //! Returns the type of the window, one of the OBClient::WindowType values
   inline WindowType type() const { return _type; }
+  //! Returns if the window should be treated as a normal window.
+  /*!
+    Some windows (desktops, docks, splash screens) have special rules applied
+    to them in a number of places regarding focus or user interaction.
+  */
+  inline bool normal() const {
+    return ! (_type == Type_Desktop || _type == Type_Dock ||
+              _type == Type_Splash);
+  }
+  
   //! Returns the desktop on which the window resides
   /*!
     This value is a 0-based index.<br>
@@ -458,6 +468,15 @@ public:
   //! Request the client to close its window.
   void close();
 
+  //! Sets the window's stacking layer
+  /*!
+    @param l An integer specifying the layer.<br>
+    '0' - the normal layer<br>
+    '> 0' - the 'above' layer<br>
+    '< 0' - the 'below' layer
+  */
+  void setStackLayer(int l);
+  
   //! Shades or unshades the client window
   /*!
     @param shade true if the window should be shaded; false if it should be

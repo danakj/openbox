@@ -518,6 +518,9 @@ void OBScreen::manageWindow(Window window)
   setClientList();
 
   Openbox::instance->bindings()->grabButtons(true, client);
+
+  // XXX: make this optional or more intelligent
+  client->focus();
 }
 
 
@@ -533,9 +536,13 @@ void OBScreen::unmanageWindow(OBClient *client)
   // pass around focus if this window was focused XXX do this better!
   if (Openbox::instance->focusedClient() == client) {
     OBClient *newfocus = 0;
-    if (!_stacking.empty())
-      newfocus = _stacking.front();
-    if (! (newfocus && newfocus->focus()))
+    ClientList::iterator it, end = _stacking.end();
+    for (it = _stacking.begin(); it != end; ++it)
+      if ((*it)->normal() && (*it)->focus()) {
+        newfocus = *it;
+        break;
+      }
+    if (!newfocus)
       client->unfocus();
   }
 

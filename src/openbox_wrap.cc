@@ -1853,6 +1853,23 @@ static PyObject *_wrap_OBClient_type(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_normal(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_normal",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((ob::OBClient const *)arg1)->normal();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_desktop(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2311,6 +2328,23 @@ static PyObject *_wrap_OBClient_close(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_setStackLayer(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:OBClient_setStackLayer",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setStackLayer(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_shade(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2701,6 +2735,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_screen", _wrap_OBClient_screen, METH_VARARGS },
 	 { (char *)"OBClient_window", _wrap_OBClient_window, METH_VARARGS },
 	 { (char *)"OBClient_type", _wrap_OBClient_type, METH_VARARGS },
+	 { (char *)"OBClient_normal", _wrap_OBClient_normal, METH_VARARGS },
 	 { (char *)"OBClient_desktop", _wrap_OBClient_desktop, METH_VARARGS },
 	 { (char *)"OBClient_title", _wrap_OBClient_title, METH_VARARGS },
 	 { (char *)"OBClient_iconTitle", _wrap_OBClient_iconTitle, METH_VARARGS },
@@ -2726,6 +2761,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
 	 { (char *)"OBClient_resize", _wrap_OBClient_resize, METH_VARARGS },
 	 { (char *)"OBClient_close", _wrap_OBClient_close, METH_VARARGS },
+	 { (char *)"OBClient_setStackLayer", _wrap_OBClient_setStackLayer, METH_VARARGS },
 	 { (char *)"OBClient_shade", _wrap_OBClient_shade, METH_VARARGS },
 	 { (char *)"OBClient_focus", _wrap_OBClient_focus, METH_VARARGS },
 	 { (char *)"OBClient_unfocus", _wrap_OBClient_unfocus, METH_VARARGS },

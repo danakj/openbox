@@ -966,6 +966,22 @@ void OBClient::changeState()
   
 }
 
+
+void OBClient::setStackLayer(int l)
+{
+  if (l == 0)
+    _above = _below = false;  // normal
+  else if (l > 0) {
+    _above = true;
+    _below = false; // above
+  } else {
+    _above = false;
+    _below = true;  // below
+  }
+  changeState();
+}
+
+
 void OBClient::shade(bool shade)
 {
   if (shade == _shaded) return; // already done

@@ -93,72 +93,49 @@ Sends the currently focused window to another workspace. This takes a single
 numberical parameter, which is the workspace to send the window to. Workspace
 numbers begin at 1.
 .SS nextWindow
-Cycles focus to the next window on the workspace. This can take a single
-numerical parameter specifying how many windows to cycle through. If none is
-specified, a value of 1 is assumed.
 .SS prevWindow
-Cycles focus to the previous window on the workspace. This can take a single
-numerical parameter specifying how many windows to cycle through. If none is
-specified, a value of 1 is assumed.
+Cycles focus to the next/previous window on the workspace. This can take a
+single numerical parameter specifying how many windows to cycle through. If
+none is specified, a value of 1 is assumed.
 .SS nextWindowOnAllWorkspaces
-Cycles focus to the next window on all workspaces, switching between workspaces
-as neccessary. This can take a single numerical parameter specifying how many
-windows to cycle through. If none is specified, a value of 1 is assumed.
 .SS prevWindowOnAllWorkspaces
-Cycles focus to the previous window on all workspaces, switching between
+Cycles focus to the next/previous window on all workspaces, switching between
 workspaces as neccessary. This can take a single numerical parameter specifying
 how many windows to cycle through. If none is specified, a value of 1 is
 assumed.
 .SS nextWindowOnAllScreens
-Cycles focus to the next window on all screens (in a multi-head setup). This
-can take a single numerical parameter specifying how many windows to cycle
-through. If none is specified, a value of 1 is assumed.
 .SS prevWindowOnAllScreens
-Cycles focus to the previous window on all screens (in a multi-head setup). This
-can take a single numerical parameter specifying how many windows to cycle
+Cycles focus to the next/previous window on all screens (in a multi-head setup).
+This can take a single numerical parameter specifying how many windows to cycle
 through. If none is specified, a value of 1 is assumed.
 .SS nextWindowOfClass
-Cycles focus to the next window of a certain class on the current workspace.
-This can take a single string parameter, in ""s, specifying the class of the
-window to cycle to. If the parameter is omitted, the class of the currently
-focused window is used. This can take a single numerical parameter specifying
-how many windows to cycle through. If none is specified, a value of 1 is
-assumed.
 .SS prevWindowOfClass
-Cycles focus to the previous window of a certain class on the current workspace.
+Cycles focus to the next/previous window of a certain class on the current
+workspace. This can take a single string parameter, in ""s, specifying the
+class of the window to cycle to. If the parameter is omitted, the class of the
+currently focused window is used. This can take a single numerical parameter
+specifying how many windows to cycle through. If none is specified, a value of
+1 is assumed.
+.SS nextWindowOfClassOnAllWorkspaces
+.SS prevWindowOfClassOnAllWorkspaces
+Cycles focus to the next/previous window of a certain class on all workspaces.
 This can take a single string parameter, in ""s, specifying the class of the
 window to cycle to. If the parameter is omitted, the class of the currently
 focused window is used. This can take a single numerical parameter specifying
 how many windows to cycle through. If none is specified, a value of 1 is
 assumed.
-.SS nextWindowOfClassOnAllWorkspaces
-Cycles focus to the next window of a certain class on all workspaces. This can
-take a single string parameter, in ""s, specifying the class of the window to
-cycle to. If the parameter is omitted, the class of the currently focused
-window is used. This can take a single numerical parameter specifying how many
-windows to cycle through. If none is specified, a value of 1 is assumed.
-.SS prevWindowOfClassOnAllWorkspaces
-Cycles focus to the previous window of a certain class on all workspaces. This
-can take a single string parameter, in ""s, specifying the class of the window
-to cycle to. If the parameter is omitted, the class of the currently focused
-window is used. This can take a single numerical parameter specifying how many
-windows to cycle through. If none is specified, a value of 1 is assumed.
 .SS changeWorkspace
 Changes to a specific workspace. This takes a single numerical paramter,
 specifying the number of the workspace to switch to. Workspace numbers begin at
 1.
 .SS nextWorkspace
-Switches to the next workspace. This can take a single numerical parameter
-specifying how many workspaces to cycle through. If none is specified, a value
-of 1 is assumed.
 .SS prevWorkspace
-Switches to the previous workspace. This can take a single numerical parameter
-specifying how many workspaces to cycle through. If none is specified, a value
-of 1 is assumed.
+Switches to the next/previous workspace. This can take a single numerical
+parameter specifying how many workspaces to cycle through. If none is specified,
+a value of 1 is assumed.
 .SS nextScreen
-Cycles focus to the next screen (in a multi-head setup).
 .SS prevScreen
-Cycles focus to the previous screen (in a multi-head setup).
+Cycles focus to the next/previous screen (in a multi-head setup).
 
 .SH SEE ALSO
 \fIepist\fR(1) \fIopenbox\fR(1)

@@ -1291,11 +1291,9 @@ static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
     RrPixel32 *im, *p;
     gint i;
 
-    p = im = g_memdup(OB_DEFAULT_ICON_pixel_data,
-                      OB_DEFAULT_ICON_WIDTH * OB_DEFAULT_ICON_HEIGHT *
-                      sizeof(RrPixel32));
+    p = im = g_memdup(data, width * height * sizeof(RrPixel32));
 
-    for (i = 0; i < OB_DEFAULT_ICON_WIDTH*OB_DEFAULT_ICON_HEIGHT; ++i) {
+    for (i = 0; i < width * height; ++i) {
         guchar a = ((*p >> 24) & 0xff);
         guchar b = ((*p >> 16) & 0xff);
         guchar g = ((*p >>  8) & 0xff);

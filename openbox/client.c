@@ -38,8 +38,8 @@ static Client *search_focus_tree(Client *node, Client *skip);
 static void client_apply_startup_state(Client *self);
 static Client *search_modal_tree(Client *node, Client *skip);
 
-static guint map_hash(Window w) { return w; }
-static gboolean map_key_comp(Window w1, Window w2) { return w1 == w2; }
+static guint map_hash(Window *w) { return *w; }
+static gboolean map_key_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 
 void client_startup()
 {
@@ -186,8 +186,8 @@ void client_manage(Window window)
      
     client_list = g_slist_append(client_list, client);
     stacking_list = g_list_append(stacking_list, client);
-    g_assert(!g_hash_table_lookup(client_map, (gpointer)client->window));
-    g_hash_table_insert(client_map, (gpointer)window, client);
+    g_assert(!g_hash_table_lookup(client_map, &client->window));
+    g_hash_table_insert(client_map, &client->window, client);
 
     /* update the focus lists */
     if (client->desktop == DESKTOP_ALL) {
@@ -241,7 +241,7 @@ void client_unmanage(Client *client)
 
     client_list = g_slist_remove(client_list, client);
     stacking_list = g_list_remove(stacking_list, client);
-    g_hash_table_remove(client_map, (gpointer)client->window);
+    g_hash_table_remove(client_map, &client->window);
 
     /* update the focus lists */
     if (client->desktop == DESKTOP_ALL) {
@@ -528,7 +528,7 @@ void client_update_transient_for(Client *self)
     if (XGetTransientForHint(ob_display, self->window, &t) &&
 	t != self->window) { /* cant be transient to itself! */
 	self->transient = TRUE;
-	c = g_hash_table_lookup(client_map, (gpointer)t);
+	c = g_hash_table_lookup(client_map, &t);
 	g_assert(c != self);/* if this happens then we need to check for it*/
 
 	if (!c /*XXX: && _group*/) {

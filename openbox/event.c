@@ -253,7 +253,7 @@ void event_process(XEvent *e)
 	break;
     }
 
-    client = g_hash_table_lookup(client_map, (gpointer)window);
+    client = g_hash_table_lookup(client_map, &window);
 
     /* deal with it in the kernel */
     if (client)

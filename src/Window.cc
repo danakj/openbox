@@ -1582,8 +1582,6 @@ bool BlackboxWindow::setInputFocus(void) {
   if (focus_mode == F_LocallyActive || focus_mode == F_Passive) {
     XSetInputFocus(blackbox->getXDisplay(), client.window,
                    RevertToPointerRoot, CurrentTime);
-
-    blackbox->setFocusedWindow(this);
   } else {
     /* we could set the focus to none, since the window doesn't accept focus,
      * but we shouldn't set focus to nothing since this would surely make
@@ -2060,9 +2058,13 @@ void BlackboxWindow::setFocusFlag(bool focus) {
 
   if (isFocused())
     blackbox->setFocusedWindow(this);
-  
-  Clientmenu *menu = screen->getWorkspace(blackbox_attrib.workspace)->getMenu();
-  menu->setItemSelected(window_number, isFocused());
+ 
+  if (! flags.iconic) {
+    // iconic windows arent in a workspace menu!
+    Clientmenu *menu =
+      screen->getWorkspace(blackbox_attrib.workspace)->getMenu();
+    menu->setItemSelected(window_number, isFocused());
+  }
 }
 
 

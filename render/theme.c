@@ -35,6 +35,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     theme->inst = inst;
 
+    theme->show_handle = TRUE;
+
     theme->a_disabled_focused_max = RrAppearanceNew(inst, 1);
     theme->a_disabled_unfocused_max = RrAppearanceNew(inst, 1);
     theme->a_hover_focused_max = RrAppearanceNew(inst, 1);
@@ -147,9 +149,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
 	theme->menu_overlap < 0 || theme->menu_overlap > 20)
         theme->menu_overlap = 0;
-    if (!read_int(db, "handleWidth", &theme->handle_height) ||
-	theme->handle_height < 0 || theme->handle_height > 100)
-        theme->handle_height = 3;
+    if (!read_int(db, "handleWidth", &theme->handle_height))
+        theme->handle_height = 6;
+    if (!theme->handle_height)
+        theme->show_handle = FALSE;
+    if (theme->handle_height <= 0 || theme->handle_height > 100)
+        theme->handle_height = 6;
     if (!read_int(db, "bevelWidth", &theme->bevel) ||
 	theme->bevel <= 0 || theme->bevel > 100)
         theme->bevel = 3;

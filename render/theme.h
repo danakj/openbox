@@ -11,6 +11,9 @@ struct _RrTheme {
 
     const RrInstance *inst;
 
+    /* style settings - optional decor */
+    gboolean show_handle;
+
     /* style settings - geometry */
     gint bevel;
     gint handle_height;

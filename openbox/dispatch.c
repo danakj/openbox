@@ -111,6 +111,8 @@ void dispatch_client(EventType e, Client *c)
     GSList *it;
     ObEvent obe;
 
+    g_assert(c != NULL);
+
     obe.type = e;
     obe.data.client = c;
 

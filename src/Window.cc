@@ -2724,7 +2724,7 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
       functions &= ~Func_Maximize;
       setAllowedActions();
       setupDecor();
-      if (flags.stuck != s) stick();
+//      if (flags.stuck != s) stick();
     }
 
     reconfigure();

@@ -781,6 +781,7 @@ static void render_label(ObFrame *self)
 
     /* set the texture's text! */
     a->texture[0].data.text.string = self->frame.client->title;
+    RECT_SET(a->texture[0].position, 0, 0, self->label_width, LABEL_HEIGHT);
 
     paint(self->label, a, 0, 0, self->label_width, LABEL_HEIGHT);
 }
@@ -790,69 +791,70 @@ static void render_icon(ObFrame *self)
     if (self->icon_x < 0) return;
 
     /* XXX set the texture's icon picture! */
+    RECT_SET(self->a_icon->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
     paint(self->icon, self->a_icon, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_max(ObFrame *self)
 {
+    Appearance *a;
+
     gboolean press = self->max_press ||
 	self->frame.client->max_vert || self->frame.client->max_horz;
     
     if (self->max_x < 0) return;
 
-    paint(self->max, (client_focused(self->frame.client) ?
-		      (press ?
-		       a_focused_pressed_max :
-		       a_focused_unpressed_max) :
-		      (press ?
-		       a_unfocused_pressed_max :
-		       a_unfocused_unpressed_max)),
-	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    a = (client_focused(self->frame.client) ?
+         (press ? a_focused_pressed_max : a_focused_unpressed_max) :
+         (press ? a_unfocused_pressed_max : a_unfocused_unpressed_max));
+    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    paint(self->max, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_iconify(ObFrame *self)
 {
+    Appearance *a;
+
     if (self->iconify_x < 0) return;
 
-    paint(self->iconify, (client_focused(self->frame.client) ?
-			  (self->iconify_press ?
-			   a_focused_pressed_iconify :
-			   a_focused_unpressed_iconify) :
-			  (self->iconify_press ?
-			   a_unfocused_pressed_iconify :
-			   a_unfocused_unpressed_iconify)),
-	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    a = (client_focused(self->frame.client) ?
+         (self->iconify_press ?
+          a_focused_pressed_iconify : a_focused_unpressed_iconify) :
+         (self->iconify_press ?
+          a_unfocused_pressed_iconify : a_unfocused_unpressed_iconify));
+    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    paint(self->iconify, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_desk(ObFrame *self)
 {
+    Appearance *a;
+
     gboolean press = self->desk_press ||
 	self->frame.client->desktop == DESKTOP_ALL;
     
     if (self->desk_x < 0) return;
 
-    paint(self->desk, (client_focused(self->frame.client) ?
-		       (press ?
-			a_focused_pressed_desk :
-			a_focused_unpressed_desk) :
-		       (press ?
-			a_unfocused_pressed_desk :
-			a_unfocused_unpressed_desk)),
-	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    a = (client_focused(self->frame.client) ?
+         (press ? a_focused_pressed_desk : a_focused_unpressed_desk) :
+         (press ? a_unfocused_pressed_desk : a_unfocused_unpressed_desk));
+    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    paint(self->desk, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_close(ObFrame *self)
 {
+    Appearance *a;
+
     if (self->close_x < 0) return;
 
-    paint(self->close, (client_focused(self->frame.client) ?
-			  (self->close_press ?
-			   a_focused_pressed_close :
-			   a_focused_unpressed_close) :
-			  (self->close_press ?
-			   a_unfocused_pressed_close :
-			   a_unfocused_unpressed_close)),
-	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
+    a = (client_focused(self->frame.client) ?
+         (self->close_press ?
+          a_focused_pressed_close : a_focused_unpressed_close) :
+         (self->close_press ?
+          a_unfocused_pressed_close : a_unfocused_unpressed_close));
+    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    paint(self->close, a, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 GQuark get_context(Client *client, Window win)

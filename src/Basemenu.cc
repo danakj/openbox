@@ -447,6 +447,7 @@ void Basemenu::redrawTitle(void) {
     break;
   }
 
+  XClearWindow(display, menu.title);
   style->t_font->drawString(menu.title, dx, menu.bevel_w,
                             style->t_text, text);
 }
@@ -609,6 +610,10 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
            max(sel_y, y) <= min<signed>(sel_y + half_w, y + h)))
       dooppsel = False;
   }
+
+  if (dotext)
+    XClearArea(display, menu.frame, text_x, text_y, text_w, text_h,
+               False);
 
   if (dohilite && highlight && (menu.hilite_pixmap != ParentRelative)) {
     if (menu.hilite_pixmap)

@@ -85,8 +85,8 @@ static GSList* area_remove(GSList *list, Rect *a)
         } else {
             Rect isect, extra;
 
-            /* Use an intersection of win and curr to determine the space
-               around curr that we can use.
+            /* Use an intersection of a and r to determine the space
+               around r that we can use.
 
                NOTE: the spaces calculated can overlap.
             */

@@ -2241,37 +2241,13 @@ Client *client_focus_target(Client *self)
 
 gboolean client_can_focus(Client *self)
 {
-    /* same code as in client_focus */
+    XEvent ev;
 
     /* choose the correct target */
     self = client_focus_target(self);
 
     if (!self->frame->visible)
         return FALSE;
-
-    if (!((self->can_focus || self->focus_notify) &&
-          (self->desktop == screen_desktop ||
-           self->desktop == DESKTOP_ALL) &&
-          !self->iconic))
-	return FALSE;
-
-    return TRUE;
-}
-
-gboolean client_focus(Client *self)
-{
-    XEvent ev;
-
-    /* same code as in client_can_focus */
-
-    /* choose the correct target */
-    self = client_focus_target(self);
-
-    if (!self->frame->visible) {
-        /* update the focus lists */
-        focus_order_to_top(self);
-        return FALSE;
-    }
 
     if (!((self->can_focus || self->focus_notify) &&
           (self->desktop == screen_desktop ||
@@ -2295,6 +2271,22 @@ gboolean client_focus(Client *self)
 	    XPutBackEvent(ob_display, &ev);
 	    return FALSE;
 	}
+    }
+
+    return TRUE;
+}
+
+gboolean client_focus(Client *self)
+{
+    /* choose the correct target */
+    self = client_focus_target(self);
+
+    if (!client_can_focus(self)) {
+        if (!self->frame->visible) {
+            /* update the focus lists */
+            focus_order_to_top(self);
+        }
+        return FALSE;
     }
 
     if (self->can_focus)

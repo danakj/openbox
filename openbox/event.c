@@ -1147,9 +1147,9 @@ static void event_handle_dock(ObDock *s, XEvent *e)
     switch (e->type) {
     case ButtonPress:
         if (e->xbutton.button == 1)
-            stacking_raise(DOCK_AS_WINDOW(s));
+            stacking_raise(DOCK_AS_WINDOW(s), FALSE);
         else if (e->xbutton.button == 2)
-            stacking_lower(DOCK_AS_WINDOW(s));
+            stacking_lower(DOCK_AS_WINDOW(s), FALSE);
         break;
     case EnterNotify:
         dock_hide(FALSE);

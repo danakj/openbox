@@ -134,6 +134,11 @@ struct CycleWindows {
     gboolean dialog;
 };
 
+struct Stacking {
+    struct AnyAction any;
+    gboolean group;
+};
+
 union ActionData {
     struct AnyAction any;
     struct InteractiveAction inter;
@@ -151,6 +156,7 @@ union ActionData {
     struct ShowMenu showmenu;
     struct CycleWindows cycle;
     struct Layer layer;
+    struct Stacking stacking;
 };
 
 struct _ObAction {

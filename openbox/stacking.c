@@ -229,7 +229,7 @@ static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
 }
 
 static GList *pick_group_windows(ObClient *top, ObClient *selected,
-                                 gboolean raise)
+                                 gboolean raise, gboolean normal)
 {
     GList *ret = NULL;
     GList *it, *next, *prev;
@@ -256,7 +256,8 @@ static GList *pick_group_windows(ObClient *top, ObClient *selected,
                      c->desktop == DESKTOP_ALL) &&
                     (t == OB_CLIENT_TYPE_TOOLBAR ||
                      t == OB_CLIENT_TYPE_MENU ||
-                     t == OB_CLIENT_TYPE_UTILITY))
+                     t == OB_CLIENT_TYPE_UTILITY ||
+                     (normal && t == OB_CLIENT_TYPE_NORMAL)))
                 {
                     ret = g_list_concat(ret,
                                         pick_windows(sit->data,
@@ -271,7 +272,7 @@ static GList *pick_group_windows(ObClient *top, ObClient *selected,
     return ret;
 }
 
-void stacking_raise(ObWindow *window)
+void stacking_raise(ObWindow *window, gboolean group)
 {
     GList *wins;
 
@@ -281,7 +282,7 @@ void stacking_raise(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, TRUE);
-        wins = g_list_concat(wins, pick_group_windows(c, selected, TRUE));
+        wins = g_list_concat(wins, pick_group_windows(c, selected, TRUE, group));
     } else {
         wins = g_list_append(NULL, window);
         stacking_list = g_list_remove(stacking_list, window);
@@ -290,7 +291,7 @@ void stacking_raise(ObWindow *window)
     g_list_free(wins);
 }
 
-void stacking_lower(ObWindow *window)
+void stacking_lower(ObWindow *window, gboolean group)
 {
     GList *wins;
 
@@ -300,7 +301,7 @@ void stacking_lower(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, FALSE);
-        wins = g_list_concat(pick_group_windows(c, selected, FALSE), wins);
+        wins = g_list_concat(pick_group_windows(c, selected, FALSE, group), wins);
     } else {
         wins = g_list_append(NULL, window);
         stacking_list = g_list_remove(stacking_list, window);
@@ -329,13 +330,13 @@ void stacking_add(ObWindow *win)
     GList *wins;
 
     g_assert(screen_support_win != None); /* make sure I dont break this in the
-                                       future */
+                                             future */
 
     l = window_layer(win);
     wins = g_list_append(NULL, win); /* list of 1 element */
 
     stacking_list = g_list_append(stacking_list, win);
-    stacking_raise(win);
+    stacking_raise(win, FALSE);
 }
 
 void stacking_add_nonintrusive(ObWindow *win)

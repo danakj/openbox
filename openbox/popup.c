@@ -204,7 +204,7 @@ void popup_show(ObPopup *self, gchar *text)
 
     if (!self->mapped) {
         XMapWindow(ob_display, self->bg);
-        stacking_raise(INTERNAL_AS_WINDOW(self));
+        stacking_raise(INTERNAL_AS_WINDOW(self), FALSE);
         self->mapped = TRUE;
     }
 }

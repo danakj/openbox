@@ -59,10 +59,11 @@ def focus_next(data, num=1, forward=1):
         for i in r:
             if found:
                 target = i
+                found = 2
                 break
             elif screen.client(i).window() == client_win:
                 found = 1
-        if not found: # wraparound
+        if found == 1: # wraparound
             if forward: target = 0
             else: target = count - 1
 
@@ -80,7 +81,7 @@ def focus_next(data, num=1, forward=1):
             t += num
             if t >= count: t -= count
         else:
-            t -= 1
+            t -= num
             if t < 0: t += count
         if t == target: return # nothing to focus
 

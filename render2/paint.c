@@ -6,33 +6,41 @@
 #include <stdlib.h>
 #include <GL/glx.h>
 
-struct ExposeArea {
-    struct RrSurface *sur;
-    int x;
-    int y;
-    int w;
-    int h;
-};
+void steal_children_exposes(struct RrInstance *inst, struct RrSurface *sur)
+{
+    GSList *it;
+    XEvent e2;
 
-#define MERGE_AREA(a, x, y, w, h) \
-            a->w = MAX(a->x + a->w - 1, x + w - 1) - MIN(a->x, x), \
-            a->h = MAX(a->y + a->h - 1, y + h - 1) - MIN(a->y, y), \
-            a->x = MIN(a->x, x), \
-            a->y = MIN(a->y, y)
-
+    for (it = sur->children; it; it = g_slist_next(it)) {
+        switch (RrSurfaceType(((struct RrSurface*)it->data))) {
+        case RR_SURFACE_NONE:
+            break;
+        case RR_SURFACE_PLANAR:
+            if (RrPlanarHasAlpha(((struct RrSurface*)it->data))) {
+                while (XCheckTypedWindowEvent
+                       (RrDisplay(inst), Expose,
+                        ((struct RrSurface*)it->data)->win, &e2));
+                steal_children_exposes(inst, it->data);
+            }
+            break;
+        case RR_SURFACE_NONPLANAR:
+            assert(0);
+        }
+    }
+}
 
 void RrExpose(struct RrInstance *inst, XExposeEvent *e)
 {
     XEvent e2;
     struct RrSurface *sur;
-    Window win;
 
-    win = e->window;
+    g_message("Expose on %lx", e->window);
 
-    if ((sur = RrInstaceLookupSurface(inst, win))) {
+    if ((sur = RrInstaceLookupSurface(inst, e->window))) {
         while (1) {
             struct RrSurface *p = NULL;
 
+            /* steal events along the way */
             while (XCheckTypedWindowEvent(RrDisplay(inst), Expose,
                                           sur->win, &e2));
 
@@ -50,9 +58,11 @@ void RrExpose(struct RrInstance *inst, XExposeEvent *e)
             if (p) sur = p;
             else break;
         }
+        /* also do this for transparent children */
+        steal_children_exposes(inst, sur);
         RrPaint(sur, 0);
     } else
-        RrDebug("Unable to find surface for window 0x%lx\n", win);
+        RrDebug("Unable to find surface for window 0x%lx\n", e->window);
 }
 
 /*! Paints the surface, and all its children */
@@ -71,6 +81,8 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     if (!inst) return;
 
     if (!RrSurfaceVisible(sur)) return;
+
+    g_message("PAINTING SURFACE %p", sur);
 
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);

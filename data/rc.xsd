@@ -42,6 +42,7 @@
             <xs:sequence>
                 <xs:element name="resistance" type="ob:resistance"/>
                 <xs:element name="focus" type="ob:focus"/>
+                <xs:element name="placement" type="ob:placement"/>
                 <xs:element name="theme" type="ob:theme"/>
                 <xs:element name="desktops" type="ob:desktops"/>
                 <xs:element name="resize" type="ob:resize"/>
@@ -73,6 +74,14 @@
             <xs:element name="followMouse" type="ob:yesorno"/>
             <xs:element name="focusDelay" type="xs:integer"/>
             <xs:element name="raiseOnFocus" type="ob:yesorno"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="placement">
+        <xs:annotation>
+            <xs:documentation>defines how new windows are placed</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="policy" type="ob:placementpolicy"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="theme">
@@ -164,6 +173,12 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="yes"/>
             <xs:enumeration value="no"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="placementpolicy">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Smart"/>
+            <xs:enumeration value="UnderMouse"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="position">

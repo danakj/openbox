@@ -25,6 +25,10 @@
   <titlelayout>NLIMC</titlelayout>
 </theme>
 
+<placement>
+  <policy>Smart</policy>
+</placement>
+
 <desktops>
   <number>4</number>
   <names>

@@ -182,6 +182,8 @@ if test "$enableval" = "yes"; then
       ]
       )
     )
+    CXXFLAGS=${S_CXXFLAGS}
+    LIBS=${S_LIBS}
   else 
     AC_MSG_RESULT([version 1])
     AC_CHECK_LIB(Xft, XftFontOpenXlfd,

@@ -186,12 +186,15 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
 
             s->action->func(&s->action->data);
 
-            grab_keyboard(FALSE);
-            grab_pointer(FALSE, OB_CURSOR_NONE);
-            keyboard_reset_chains();
-
             g_free(s);
+
             interactive_states = g_slist_delete_link(interactive_states, it);
+            if (!interactive_states) {
+                grab_keyboard(FALSE);
+                grab_pointer(FALSE, OB_CURSOR_NONE);
+                keyboard_reset_chains();
+            }
+
             handled = TRUE;
         }
     }

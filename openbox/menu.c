@@ -39,20 +39,27 @@ static gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
     gboolean loaded = TRUE;
     gchar *p;
 
-    p = g_build_filename(g_get_home_dir(), ".openbox", file, NULL);
-    if (!parse_load(p, "openbox_menu", doc, node)) {
-        g_free(p);
-        p = g_build_filename(RCDIR, file, NULL);
+    if (file[0] == '/') {
+        if (!parse_load(file, "openbox_menu", doc, node)) {
+            g_warning("Failed to load menu from '%s'", file);
+            loaded = FALSE;
+        }
+    } else {
+        p = g_build_filename(g_get_home_dir(), ".openbox", file, NULL);
         if (!parse_load(p, "openbox_menu", doc, node)) {
             g_free(p);
-            p = g_strdup(file);
+            p = g_build_filename(RCDIR, file, NULL);
             if (!parse_load(p, "openbox_menu", doc, node)) {
-                g_warning("Failed to load menu from '%s'", file);
-                loaded = FALSE;
+                g_free(p);
+                p = g_strdup(file);
+                if (!parse_load(p, "openbox_menu", doc, node)) {
+                    g_warning("Failed to load menu from '%s'", file);
+                    loaded = FALSE;
+                }
             }
         }
+        g_free(p);
     }
-    g_free(p);
     return loaded;
 }
 

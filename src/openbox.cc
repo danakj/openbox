@@ -51,7 +51,6 @@ extern "C" {
 namespace ob {
 
 Openbox *Openbox::instance  = (Openbox *) 0;
-OBActions *Openbox::actions = (OBActions *) 0;
 
 
 void Openbox::signalHandler(int signal)
@@ -124,9 +123,9 @@ Openbox::Openbox(int argc, char **argv)
 
   _property = new otk::OBProperty();
 
-  Openbox::actions = new OBActions();
+  _actions = new OBActions();
 
-  setMasterHandler(Openbox::actions); // set as the master event handler
+  setMasterHandler(_actions); // set as the master event handler
 
   // create the mouse cursors we'll use
   _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);

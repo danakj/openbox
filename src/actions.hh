@@ -56,7 +56,9 @@ private:
   void removePress(const XButtonEvent &e);
   
 public:
+  //! Constructs an OBActions object
   OBActions();
+  //! Destroys the OBActions object
   virtual ~OBActions();
 
   virtual void buttonPressHandler(const XButtonEvent &e);

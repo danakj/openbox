@@ -147,6 +147,8 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 
 void OBActions::motionHandler(const XMotionEvent &e)
 {
+  if (!e.same_screen) return; // this just gets stupid
+
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   printf("GUILE: MOTION: win %lx modifiers %u x %d y %d\n",
          (long)e.window, e.state,

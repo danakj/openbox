@@ -51,9 +51,6 @@ public:
   */
   static Openbox *instance;
 
-  //! The action interface through which all user-available actions occur
-  static OBActions *actions;
-
   //! The posible running states of the window manager
   enum RunState {
     State_Starting, //!< The window manager is starting up (being created)
@@ -114,6 +111,9 @@ private:
     is initialized in this class' constructor.
   */
   otk::OBProperty *_property;
+
+  //! The action interface through which all user-available actions occur
+  OBActions *_actions;
 
   //! The running state of the window manager
   RunState _state;

@@ -276,7 +276,7 @@ void client_unmanage(Client *client)
 
     /* unfocus the client (dispatchs the focus event) (we're out of the
      transient lists already, so being modal doesn't matter) */
-    if (client->focused)
+    if (client_focused(client))
 	client_unfocus(client);
 
     if (ob_state != State_Exiting) {
@@ -385,7 +385,6 @@ static void client_get_all(Client *self)
     self->title = self->icon_title = NULL;
     self->res_name = self->res_class = self->role = NULL;
     self->wmstate = NormalState;
-    self->focused = FALSE;
     self->transient = FALSE;
     self->transients = NULL;
     self->transient_for = NULL;
@@ -1171,7 +1170,7 @@ static Client *search_focus_tree(Client *node, Client *skip)
 	Client *c = it->data;
 	if (c == skip) continue; /* circular? */
 	if ((ret = search_focus_tree(c, skip))) return ret;
-	if (c->focused) return c;
+	if (client_focused(c)) return c;
     }
     return NULL;
 }
@@ -1898,6 +1897,11 @@ gboolean client_focus(Client *self)
 	    return FALSE;
 	}
     }
+
+    if (client_focused(self))
+        return TRUE;
+
+    g_print("Focusing: %lx\n", self->window);
      
     if (self->can_focus)
 	XSetInputFocus(ob_display, self->window, RevertToNone, CurrentTime);
@@ -1917,12 +1921,18 @@ gboolean client_focus(Client *self)
 	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    /*XSync(ob_display, FALSE); XXX Why sync? */
+    /* XSync(ob_display, FALSE); XXX Why sync? */
     return TRUE;
 }
 
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
+    g_print("UNFocusing: %lx\n", self->window);
     focus_set_client(NULL);
+}
+
+gboolean client_focused(Client *self)
+{
+    return self == focus_client;
 }

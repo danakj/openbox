@@ -76,6 +76,7 @@ static void focus_fallback(gboolean switching_desks)
 
 static void events(ObEvent *e, void *foo)
 {
+    g_message("event %d", e->type);
     switch (e->type) {
     case Event_Client_Mapped:
         if (focus_new && client_normal(e->data.c.client))
@@ -85,7 +86,7 @@ static void events(ObEvent *e, void *foo)
     case Event_Client_Unmapped:
         if (ob_state == State_Exiting) break;
 
-        if (e->data.c.client->focused)
+        if (client_focused(e->data.c.client))
             if (!follow_mouse || !focus_under_pointer())
                 focus_fallback(FALSE);
         break;
@@ -110,8 +111,10 @@ static void events(ObEvent *e, void *foo)
             --skip_enter;
         }
         else*/
-        if (e->data.x.client != NULL && client_normal(e->data.x.client))
+        if (e->data.x.client != NULL && client_normal(e->data.x.client)) {
             client_focus(e->data.x.client);
+            g_message("enter %lx", e->data.x.client->window);
+        }
         break;
 
     default:

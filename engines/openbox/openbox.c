@@ -23,6 +23,9 @@
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
+#define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
+                           ButtonMotionMask | ExposureMask | \
+                           EnterWindowMask | LeaveWindowMask)
 
 /* style settings - geometry */
 int s_bevel;
@@ -268,8 +271,7 @@ Frame *frame_new()
     self->frame.plate = createWindow(self->frame.window, mask, &attrib);
 
     mask = CWEventMask;
-    attrib.event_mask = (ButtonPressMask | ButtonReleaseMask |
-			 ButtonMotionMask | ExposureMask);
+    attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->frame.window, mask, &attrib);
     self->label = createWindow(self->title, mask, &attrib);
     self->max = createWindow(self->title, mask, &attrib);
@@ -729,7 +731,7 @@ static void layout_title(ObFrame *self)
 
 static void render(ObFrame *self)
 {
-    if (self->frame.client->focused) {
+    if (client_focused(self->frame.client)) {
         XSetWindowBorder(ob_display, self->frame.plate,
                          s_cb_focused_color->pixel);
     } else {
@@ -738,7 +740,7 @@ static void render(ObFrame *self)
     }
 
     if (self->frame.client->decorations & Decor_Titlebar) {
-        paint(self->title, (self->frame.client->focused ?
+        paint(self->title, (client_focused(self->frame.client) ?
                             self->a_focused_title :
                             self->a_unfocused_title),
               0, 0, self->width, TITLE_HEIGHT);
@@ -751,16 +753,16 @@ static void render(ObFrame *self)
     }
 
     if (self->frame.client->decorations & Decor_Handle) {
-        paint(self->handle, (self->frame.client->focused ?
+        paint(self->handle, (client_focused(self->frame.client) ?
                              self->a_focused_handle :
                              self->a_unfocused_handle),
               GRIP_WIDTH + self->bwidth, 0,
               HANDLE_WIDTH(self), s_handle_height);
-        paint(self->lgrip, (self->frame.client->focused ?
+        paint(self->lgrip, (client_focused(self->frame.client) ?
                             a_focused_grip :
                             a_unfocused_grip),
               0, 0, GRIP_WIDTH, s_handle_height);
-        paint(self->rgrip, (self->frame.client->focused ?
+        paint(self->rgrip, (client_focused(self->frame.client) ?
                             a_focused_grip :
                             a_unfocused_grip),
               0, 0, GRIP_WIDTH, s_handle_height);
@@ -773,7 +775,7 @@ static void render_label(ObFrame *self)
 
     if (self->label_x < 0) return;
 
-    a = (self->frame.client->focused ?
+    a = (client_focused(self->frame.client) ?
          self->a_focused_label : self->a_unfocused_label);
 
     /* set the texture's text! */
@@ -797,7 +799,7 @@ static void render_max(ObFrame *self)
     
     if (self->max_x < 0) return;
 
-    paint(self->max, (self->frame.client->focused ?
+    paint(self->max, (client_focused(self->frame.client) ?
 		      (press ?
 		       a_focused_pressed_max :
 		       a_focused_unpressed_max) :
@@ -811,7 +813,7 @@ static void render_iconify(ObFrame *self)
 {
     if (self->iconify_x < 0) return;
 
-    paint(self->iconify, (self->frame.client->focused ?
+    paint(self->iconify, (client_focused(self->frame.client) ?
 			  (self->iconify_press ?
 			   a_focused_pressed_iconify :
 			   a_focused_unpressed_iconify) :
@@ -828,7 +830,7 @@ static void render_desk(ObFrame *self)
     
     if (self->desk_x < 0) return;
 
-    paint(self->desk, (self->frame.client->focused ?
+    paint(self->desk, (client_focused(self->frame.client) ?
 		       (press ?
 			a_focused_pressed_desk :
 			a_focused_unpressed_desk) :
@@ -842,7 +844,7 @@ static void render_close(ObFrame *self)
 {
     if (self->close_x < 0) return;
 
-    paint(self->close, (self->frame.client->focused ?
+    paint(self->close, (client_focused(self->frame.client) ?
 			  (self->close_press ?
 			   a_focused_pressed_close :
 			   a_focused_unpressed_close) :

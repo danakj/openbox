@@ -217,8 +217,6 @@ typedef struct Client {
     gboolean urgent;
     /*! Notify the window when it receives focus? */
     gboolean focus_notify;
-    /*! Does the client window have the input focus? */
-    gboolean focused;
 
     /*! The window uses shape extension to be non-rectangular? */
     gboolean shaped;
@@ -318,6 +316,9 @@ gboolean client_should_show(Client *self);
   Some windows (desktops, docks, splash screens) have special rules applied
   to them in a number of places regarding focus or user interaction. */
 gboolean client_normal(Client *self);
+
+/* Returns if the window is focused */
+gboolean client_focused(Client *self);
 
 /*! Move and/or resize the window.
   This also maintains things like the client's minsize, and size increments.

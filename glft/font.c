@@ -14,6 +14,10 @@ struct GHashTable *glyph_map = NULL;
 #define TRUNC(x)    ((x) >> 6)
 #define ROUND(x)    (((x)+32) & -64)
 
+#define GLFT_SHADOW "shadow"
+#define GLFT_SHADOW_OFFSET "shadowoffset"
+#define GLFT_SHADOW_ALPHA "shadowalpha"
+
 void dest_glyph_map_value(gpointer key, gpointer val, gpointer data)
 {
     struct GlftGlyph *g = val;
@@ -21,7 +25,40 @@ void dest_glyph_map_value(gpointer key, gpointer val, gpointer data)
     free(g);
 }
 
-struct GlftFont *GlftFontOpen(const char *name)
+static void GlftDefaultSubstitute(Display *d, int s, FcPattern *pat)
+{
+    FcValue v;
+    double dpi;
+
+    if (FcPatternGet(pat, FC_DPI, 0, &v) == FcResultNoMatch) {
+        dpi = DisplayHeight(d, s) * 25.4 / (double)DisplayHeightMM(d, s);
+        FcPatternAddDouble(pat, FC_DPI, dpi);
+    }
+    if (FcPatternGet(pat, FC_ANTIALIAS, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, FC_ANTIALIAS, FcTrue);
+    if (FcPatternGet(pat, FC_HINTING, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, FC_HINTING, FcTrue);
+    if (FcPatternGet(pat, FC_AUTOHINT, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, FC_AUTOHINT, FcFalse);
+    if (FcPatternGet(pat, FC_GLOBAL_ADVANCE, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, FC_GLOBAL_ADVANCE, FcTrue);
+    if (FcPatternGet(pat, FC_SPACING, 0, &v) == FcResultNoMatch)
+        FcPatternAddInteger(pat, FC_SPACING, FC_PROPORTIONAL);
+    if (FcPatternGet(pat, FC_MINSPACE, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, FC_MINSPACE, FcTrue);
+    if (FcPatternGet(pat, FC_CHAR_WIDTH, 0, &v) == FcResultNoMatch)
+        FcPatternAddInteger(pat, FC_CHAR_WIDTH, 0);
+    if (FcPatternGet(pat, GLFT_SHADOW, 0, &v) == FcResultNoMatch)
+        FcPatternAddBool(pat, GLFT_SHADOW, FcFalse);
+    if (FcPatternGet(pat, GLFT_SHADOW_OFFSET, 0, &v) == FcResultNoMatch)
+        FcPatternAddInteger(pat, GLFT_SHADOW_OFFSET, 2);
+    if (FcPatternGet(pat, GLFT_SHADOW_ALPHA, 0, &v) == FcResultNoMatch)
+        FcPatternAddDouble(pat, GLFT_SHADOW_ALPHA, 0.5);
+
+    FcDefaultSubstitute(pat);
+}
+
+struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name)
 {
     struct GlftFont *font;
     FcPattern *pat, *match;
@@ -37,7 +74,7 @@ struct GlftFont *GlftFontOpen(const char *name)
     /* XXX read our extended attributes here? (if failing below..) */
 
     FcConfigSubstitute(NULL, pat, FcMatchPattern);
-    FcDefaultSubstitute(pat);
+    GlftDefaultSubstitute(d, screen, pat);
 
     match = FcFontMatch(NULL, pat, &res);
     printf("Pattern ");
@@ -51,6 +88,8 @@ struct GlftFont *GlftFontOpen(const char *name)
     }
     
     font = malloc(sizeof(struct GlftFont));
+    font->display = d;
+    font->screen = screen;
     font->pat = match;
     font->ftflags = FT_LOAD_DEFAULT | FT_LOAD_NO_BITMAP;
 
@@ -131,7 +170,7 @@ struct GlftFont *GlftFontOpen(const char *name)
 
     switch (FcPatternGetBool(match, FC_MINSPACE, 0, &font->minspace)) {
     case FcResultNoMatch:
-        font->minspace = FcFalse;
+        font->minspace = FcTrue;
         break;
     case FcResultMatch:
         break;
@@ -157,14 +196,14 @@ struct GlftFont *GlftFontOpen(const char *name)
         goto openfail0;
     font->ftcharsize = (FT_F26Dot6) psize * 64;
 
-    if (FcPatternGetBool(match, "shadow", 0, &font->shadow) != FcResultMatch)
+    if (FcPatternGetBool(match, GLFT_SHADOW, 0, &font->shadow) != FcResultMatch)
         font->shadow = FcFalse;
 
-    if (FcPatternGetInteger(match, "shadowoffset", 0, &font->shadow_offset) !=
+    if (FcPatternGetInteger(match,GLFT_SHADOW_OFFSET,0,&font->shadow_offset) !=
         FcResultMatch)
         font->shadow_offset = 2;
 
-    if (FcPatternGetDouble(match, "shadowalpha", 0, &alpha) != FcResultMatch)
+    if (FcPatternGetDouble(match, GLFT_SHADOW_ALPHA,0,&alpha) != FcResultMatch)
         alpha = 0.5;
     font->shadow_alpha = (float)alpha;
 

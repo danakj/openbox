@@ -2,6 +2,7 @@
 #define __glft_h__
 
 #include <fontconfig/fontconfig.h>
+#include <X11/Xlib.h>
 
 /* initialization */
 
@@ -11,7 +12,7 @@ FcBool GlftInit();
 
 struct GlftFont;
 
-struct GlftFont *GlftFontOpen(const char *name);
+struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name);
 
 void GlftFontClose(struct GlftFont *font);
 

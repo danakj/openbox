@@ -7,9 +7,13 @@
 #include FT_FREETYPE_H
 #include <fontconfig/fcfreetype.h>
 
+#include <X11/Xlib.h>
 #include <glib.h>
 
 struct GlftFont {
+    Display *display;
+    int screen;
+
     FcPattern *pat;
     FcCharSet *chars;
 

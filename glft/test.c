@@ -11,6 +11,7 @@
 #include "render.h"
 #include <glib.h>
 #include <GL/glx.h>
+#include <assert.h>
 
 static int x_error_handler(Display * disp, XErrorEvent * error)
 {
@@ -47,12 +48,14 @@ int main(int argc, char **argv)
 
     if (!GlftInit()) return 1;
 
-    font = GlftFontOpen(argv[1]);
-
     if (!(display = XOpenDisplay(NULL))) {
         fprintf(stderr, "couldn't connect to X server in DISPLAY\n");
         return EXIT_FAILURE;
     }
+
+    font = GlftFontOpen(display, DefaultScreen(display), argv[1]);
+    assert(font);
+
     XSetErrorHandler(x_error_handler);
     win = XCreateWindow(display, RootWindow(display, DefaultScreen(display)),
                         X, Y, W, H, 0, 
@@ -74,8 +77,8 @@ int main(int argc, char **argv)
 
 
 
-    chint.res_name = "rendertest";
-    chint.res_class = "Rendertest";
+    chint.res_name = "glfttest";
+    chint.res_class = "Glfttest";
     XSetClassHint(display, win, &chint);
 
     delete_win = XInternAtom(display, "WM_DELETE_WINDOW", False);
@@ -87,6 +90,7 @@ int main(int argc, char **argv)
     glOrtho(0, W, -100, H+100, 0, 10);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_LINE_SMOOTH);
+    glLineWidth(0.5);
 
     quit = 0;
     while (!quit) {

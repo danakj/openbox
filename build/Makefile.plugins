@@ -1,5 +1,6 @@
 plugins_dir:=plugins
 plugins_srcdir:=$(srcdir)/$(plugins_dir)
+plugins_depdir:=$(depdir)/$(plugins_dir)
 
 plugins_resistance_dir:=$(plugins_dir)
 plugins_resistance_srcdir:=$(plugins_srcdir)
@@ -65,6 +66,7 @@ $(plugins_placement_dir)/%.lo: $(plugins_placement_srcdir)/%.c $(plugins_placeme
 
 $(plugins_placement_depdir)/%.d: $(plugins_placement_srcdir)/%.c $(depdir)
 	@echo Building dependancies for $<
+	@mkdir $(plugins_depdir) 2> /dev/null || true
 	@mkdir $(dir $@) 2> /dev/null || true
 	@$(CC) $(plugins_placement_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 

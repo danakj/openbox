@@ -1,12 +1,11 @@
 #ifndef __button_hh
 #define __button_hh
 
-#include "focuswidget.hh"
-//#include "pixmap.hh"
+#include "focuslabel.hh"
 
 namespace otk {
 
-class OtkButton : public OtkFocusWidget {
+class OtkButton : public OtkFocusLabel {
 
 public:
 
@@ -26,28 +25,17 @@ public:
   void setTexture(BTexture *texture);
   void setUnfocusTexture(BTexture *texture);
 
-  inline const std::string &getText(void) const { return _text; }
-  void setText(const std::string &text) { _text = text; _dirty = true; }
-
-  //inline const OtkPixmap &getPixmap(void) const { return _pixmap; }
-  //void setPixmap(const OtkPixmap &pixmap);
-
   inline bool isPressed(void) const { return _pressed; }
-  void press(void);
-  void release(void);
+  void press(unsigned int mouse_button);
+  void release(unsigned int mouse_button);
 
-  void update(void);
-  int exposeHandler(const XExposeEvent &e);
-  int configureHandler(const XConfigureEvent &e);
   int buttonPressHandler(const XButtonEvent &e);
   int buttonReleaseHandler(const XButtonEvent &e);
 
 private:
 
-  std::string _text;
-  //OtkPixmap _pixmap;
   bool _pressed;
-  bool _dirty;
+  unsigned int _mouse_button;
 
   BTexture *_pressed_focus_tx;
   BTexture *_pressed_unfocus_tx;

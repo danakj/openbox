@@ -31,13 +31,14 @@ int main(int argc, char **argv) {
   right.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
 
   otk::OtkButton iconb(&left);
+  iconb.resize(40,20);
   otk::OtkFocusWidget label(&left);
   otk::OtkButton maxb(&left);
   otk::OtkButton closeb(&left);
   
   // fixed size
   iconb.setText("foo");
-  iconb.press();
+  iconb.press(Button1);
 
   // fix width to 60 and let the height be calculated by its parent
   //label.setHeight(20);

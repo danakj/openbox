@@ -1,12 +1,10 @@
-#include <iostream>
 #include "button.hh"
 
 namespace otk {
 
 OtkButton::OtkButton(OtkWidget *parent)
-  : OtkFocusWidget(parent), _text(""), _pressed(false), _dirty(false),
-    _pressed_focus_tx(0), _pressed_unfocus_tx(0), _unpr_focus_tx(0),
-    _unpr_unfocus_tx(0)
+  : OtkFocusLabel(parent), _pressed(false), _pressed_focus_tx(0),
+    _pressed_unfocus_tx(0), _unpr_focus_tx(0), _unpr_unfocus_tx(0)
 {
   setTexture(getStyle()->getButtonFocus());
   setUnfocusTexture(getStyle()->getButtonUnfocus());
@@ -20,17 +18,22 @@ OtkButton::~OtkButton()
   if (_pressed_unfocus_tx) delete _pressed_unfocus_tx;
 }
 
-void OtkButton::press(void)
+void OtkButton::press(unsigned int mouse_button)
 {
+  if (_pressed) return;
+
   if (_pressed_focus_tx)
     OtkFocusWidget::setTexture(_pressed_focus_tx);
   if (_pressed_unfocus_tx)
     OtkFocusWidget::setUnfocusTexture(_pressed_unfocus_tx);
   _pressed = true;
+  _mouse_button = mouse_button;
 }
 
-void OtkButton::release(void)
+void OtkButton::release(unsigned int mouse_button)
 {
+  if (_mouse_button != mouse_button) return; // wrong button
+
   OtkFocusWidget::setTexture(_unpr_focus_tx);
   OtkFocusWidget::setUnfocusTexture(_unpr_unfocus_tx);
   _pressed = false;
@@ -48,52 +51,18 @@ void OtkButton::setUnfocusTexture(BTexture *texture)
   _unpr_unfocus_tx = texture;
 }
 
-void OtkButton::update(void)
-{
-  if (_dirty) {
-    const BFont ft = getStyle()->getFont();
-    BColor *text_color = (isFocused() ? getStyle()->getTextFocus()
-                          : getStyle()->getTextUnfocus());
-    unsigned int bevel = getStyle()->getBevelWidth();
-
-    OtkFocusWidget::resize(ft.measureString(_text) + bevel * 2,
-                           ft.height() + bevel * 2);
-    OtkFocusWidget::update();
-
-    ft.drawString(getWindow(), bevel, bevel, *text_color, _text);
-  } else
-    OtkFocusWidget::update();
-
-  _dirty = false;
-}
-
 int OtkButton::buttonPressHandler(const XButtonEvent &e)
 {
-  press();
-  _dirty = true;
+  press(e.button);
   update();
   return OtkFocusWidget::buttonPressHandler(e);
 }
 
 int OtkButton::buttonReleaseHandler(const XButtonEvent &e)
 {
-  release();
-  _dirty = true;
+  release(e.button);
   update();
   return OtkFocusWidget::buttonReleaseHandler(e);
-}
-
-int OtkButton::exposeHandler(const XExposeEvent &e)
-{
-  _dirty = true;
-  return OtkFocusWidget::exposeHandler(e);
-}
-
-int OtkButton::configureHandler(const XConfigureEvent &e)
-{
-  if (!(e.width == width() && e.height == height()))
-    _dirty = true;
-  return OtkFocusWidget::configureHandler(e);
 }
 
 }

@@ -1,3 +1,92 @@
+2003-08-03  xor@zed.orodu.net  <xor@zed>
+
+	* data/rc3, kernel/client.c, kernel/config.c, kernel/config.h, kernel/moveresize.c:
+	kill non-opaque move/resize
+	add an option for redrawing/resizing the client window while resizing, when disabled the client is not touched until the resize is complete.
+
+	* kernel/framerender.c:
+	give the plate the same background color as its border
+
+2003-08-02  xor@zed.orodu.net  <xor@zed>
+
+	* tools/obconf/main.c: has a pane and list and workarea
+
+	* tools/obconf/main.c: has a menu and a treeview
+
+	* kernel/client.c, kernel/event.c:
+	use the frame size not the client size when figuring out if stuff fits on the screen
+
+	* plugins/placement/placement.c:
+	let transients go where they requested :( fuck xmms
+
+	* themes/om4ob/themerc: add disabled button styles (from miklos)
+
+	* tools/kdetrayproxy/kdetrayproxy.c: missing sys/time.h
+
+	* configure.ac: alpha4
+
+	* ChangeLog: recent changes
+
+	* Makefile.am, themes/om4ob/close.xbm, themes/om4ob/close_hover.xbm, themes/om4ob/desk.xbm, themes/om4ob/desk_hover.xbm, themes/om4ob/desk_toggled.xbm, themes/om4ob/iconify.xbm, themes/om4ob/iconify_hover.xbm, themes/om4ob/iconify_pressed.xbm, themes/om4ob/max.xbm, themes/om4ob/max_disabled.xbm, themes/om4ob/max_hover.xbm, themes/om4ob/max_pressed.xbm, themes/om4ob/max_toggled.xbm, themes/om4ob/shade.xbm, themes/om4ob/shade_disabled.xbm, themes/om4ob/shade_hover.xbm, themes/om4ob/shade_toggled.xbm, themes/om4ob/themerc:
+	add the om4ob theme
+
+	* ChangeLog: recent changes
+
+	* render/theme.c: oops indenting
+
+	* render/theme.c:
+	look in theme dirs first, use the theme as the path as a last attempt only!
+
+	* kernel/frame.c: the grips go below the titlebar buttons
+
+	* plugins/placement/placement.c: place transients better
+
+	* kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/geom.h, kernel/prop.c, kernel/prop.h:
+	add partial struts tho they arent useful eyt
+
+	* data/rc3, kernel/frame.c, kernel/frame.h, kernel/framerender.c, render/theme.h:
+	invisible resizing areas/grips in the top corners of the window
+
+	* plugins/mouse/mouse.c:
+	omg i found the bug that would make the mouse cursor end up way far from where you started the drag.
+
+	* render/theme.c: use the toggled mask for shade and desk buttons
+
+	* kernel/client.c: that line ended up in teh if somehow...
+
+2003-08-02  xor@zed.orodu.net  <xor@zed>
+
+	* configure.ac: alpha4
+
+	* ChangeLog: recent changes
+
+	* Makefile.am, themes/om4ob/close.xbm, themes/om4ob/close_hover.xbm, themes/om4ob/desk.xbm, themes/om4ob/desk_hover.xbm, themes/om4ob/desk_toggled.xbm, themes/om4ob/iconify.xbm, themes/om4ob/iconify_hover.xbm, themes/om4ob/iconify_pressed.xbm, themes/om4ob/max.xbm, themes/om4ob/max_disabled.xbm, themes/om4ob/max_hover.xbm, themes/om4ob/max_pressed.xbm, themes/om4ob/max_toggled.xbm, themes/om4ob/shade.xbm, themes/om4ob/shade_disabled.xbm, themes/om4ob/shade_hover.xbm, themes/om4ob/shade_toggled.xbm, themes/om4ob/themerc:
+	add the om4ob theme
+
+	* ChangeLog: recent changes
+
+	* render/theme.c: oops indenting
+
+	* render/theme.c:
+	look in theme dirs first, use the theme as the path as a last attempt only!
+
+	* kernel/frame.c: the grips go below the titlebar buttons
+
+	* plugins/placement/placement.c: place transients better
+
+	* kernel/client.h, kernel/dock.c, kernel/dock.h, kernel/geom.h, kernel/prop.c, kernel/prop.h:
+	add partial struts tho they arent useful eyt
+
+	* data/rc3, kernel/frame.c, kernel/frame.h, kernel/framerender.c, render/theme.h:
+	invisible resizing areas/grips in the top corners of the window
+
+	* plugins/mouse/mouse.c:
+	omg i found the bug that would make the mouse cursor end up way far from where you started the drag.
+
+	* render/theme.c: use the toggled mask for shade and desk buttons
+
+	* kernel/client.c: that line ended up in teh if somehow...
+
 2003-08-02  xor@zed.orodu.net  <xor@zed>
 
 	* Makefile.am, themes/om4ob/close.xbm, themes/om4ob/close_hover.xbm, themes/om4ob/desk.xbm, themes/om4ob/desk_hover.xbm, themes/om4ob/desk_toggled.xbm, themes/om4ob/iconify.xbm, themes/om4ob/iconify_hover.xbm, themes/om4ob/iconify_pressed.xbm, themes/om4ob/max.xbm, themes/om4ob/max_disabled.xbm, themes/om4ob/max_hover.xbm, themes/om4ob/max_pressed.xbm, themes/om4ob/max_toggled.xbm, themes/om4ob/shade.xbm, themes/om4ob/shade_disabled.xbm, themes/om4ob/shade_hover.xbm, themes/om4ob/shade_toggled.xbm, themes/om4ob/themerc:

@@ -208,8 +208,15 @@ static void event(ObEvent *e, void *foo)
             if (e->data.x.client != NULL) {
                 cx = e->data.x.client->frame->area.x;
                 cy = e->data.x.client->frame->area.y;
-                cw = e->data.x.client->frame->area.width;
-                ch = e->data.x.client->frame->area.height;
+                /* use the client size because the frame can be differently
+                   sized (shaded windows) and we want this based on the clients
+                   size */
+                cw = e->data.x.client->area.width + 
+                    e->data.x.client->frame->size.left +
+                    e->data.x.client->frame->size.right;
+                ch = e->data.x.client->area.height +
+                    e->data.x.client->frame->size.top +
+                    e->data.x.client->frame->size.bottom;
                 px = e->data.x.e->xbutton.x_root;
                 py = e->data.x.e->xbutton.y_root;
                 corner = pick_corner(px, py, cx, cy, cw, ch);

@@ -7,6 +7,8 @@ SUBDIRS = C da_DK de_DE es_AR es_ES et_EE fr_FR hu_HU it_IT ja_JP ko_KR lv_LV \
 MAINTAINERCLEANFILES = Makefile.in blackbox-nls.hh
 DISTCLEANFILES = blackbox-nls.hh
 
+EXTRA_DIST = convert.awk
+
 uninstall-local:
 	@if test x$(NLSTEST) = "xyes"; then \
 		rmdir $(DESTDIR)$(pkgdatadir)/nls; \

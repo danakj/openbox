@@ -13,7 +13,7 @@ fi
 
 AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
-AC_CHECK_PROG([SED], [sed])
+AC_PATH_PROG([SED], [sed])
 test "$SED" || AC_MSG_ERROR([sed not found])
 
 AM_MAINTAINER_MODE
@@ -22,11 +22,11 @@ OB_DEBUG
 # Pick compiler specific/build target flags, and set $CVS
 OB_COMPILER_FLAGS
 
-PKG_CHECK_MODULES(GLIB, glib-2.0)
+PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 	
-PKG_CHECK_MODULES(GMODULE, gmodule-2.0)
+PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
 AC_SUBST(GMODULE_CFLAGS)
 AC_SUBST(GMODULE_LIBS)
 	

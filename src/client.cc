@@ -300,6 +300,10 @@ void Client::setupDecorAndFunctions()
     }
   }
 
+  // can't maximize without moving/resizing
+  if (!((_functions & Func_Move) && (_functions & Func_Resize)))
+    _functions &= ~Func_Maximize;
+
   // finally, user specified disabled decorations are applied to subtract
   // decorations
   if (_disabled_decorations & Decor_Titlebar)

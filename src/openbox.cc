@@ -76,6 +76,7 @@ Openbox::Openbox(int argc, char **argv)
 
   _displayreq = (char*) 0;
   _argv0 = argv[0];
+  _doshutdown = false;
 
   parseCommandLine(argc, argv);
 

@@ -8,7 +8,7 @@
 #include "display.hh"
 #include "assassin.hh"
 #include "screeninfo.hh"
-
+#include "focuslabel.hh"
 #include <algorithm>
 #include <iostream>
 
@@ -175,7 +175,7 @@ void Widget::show(bool recursive)
   if (recursive) {
     WidgetList::iterator it = _children.begin(), end = _children.end();
     for (; it != end; ++it)
-      (*it)->show();
+      (*it)->show(recursive);
   }
 
   XMapWindow(**display, _window);
@@ -266,7 +266,9 @@ void Widget::render(void)
   _surface = new Surface(_screen, _rect.size());
   display->renderControl(_screen)->drawBackground(*_surface, *_texture);
 
-  renderForeground();
+  if (dynamic_cast<FocusLabel*>(this))
+    printf("IM A FOCUSLABEL RENDERING\n");
+  renderForeground(); // for inherited types to render onto the _surface
 
   XSetWindowBackgroundPixmap(**display, _window, _surface->pixmap());
 

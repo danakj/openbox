@@ -146,12 +146,10 @@ private:
   void changeNumDesktops(unsigned int num);
 
 public:
-#ifndef SWIG
   //! Constructs a new Screen object
   Screen(int screen);
   //! Destroys the Screen object
   virtual ~Screen();
-#endif
 
   inline int number() const { return _number; }
   

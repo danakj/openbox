@@ -148,7 +148,6 @@ private:
   static void signalHandler(int signal);
 
 public:
-#ifndef SWIG
   //! Openbox constructor.
   /*!
     \param argc Number of command line arguments, as received in main()
@@ -157,7 +156,6 @@ public:
   Openbox(int argc, char **argv);
   //! Openbox destructor.
   virtual ~Openbox();
-#endif
 
   //! Returns the state of the window manager (starting, exiting, etc)
   inline RunState state() const { return _state; }
@@ -182,7 +180,6 @@ public:
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }
 
-#ifndef SWIG
   //! The main function of the Openbox class
   /*!
     This function should be called after instantiating the Openbox class.
@@ -190,7 +187,6 @@ public:
     The Openbox::shutdown method will cause this function to exit.
   */
   void eventLoop();
-#endif
 
   //! Adds an Client to the client list for lookups
   void addClient(Window window, Client *client);

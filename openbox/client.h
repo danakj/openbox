@@ -320,6 +320,11 @@ gboolean client_normal(Client *self);
 /* Returns if the window is focused */
 gboolean client_focused(Client *self);
 
+/*! Sets the client to a focused or unfocused state. This does not actually
+  change the input focus, but rather is used once focus has been moved to tell
+  the client that it is so. */
+void client_set_focused(Client *self, gboolean focused);
+
 /*! Move and/or resize the window.
   This also maintains things like the client's minsize, and size increments.
   @param anchor The corner to keep in the same position when resizing.

@@ -219,36 +219,31 @@ void event_process(XEvent *e)
 	event_lasttime = e->xproperty.time;
 	break;
     case FocusIn:
-	if (e->xfocus.mode == NotifyGrab) return;
-/* 	if (e->type == FocusIn && window == focus_backup && focus_client != NULL) {
-*/
-            /* Something's focused but we got a focus event for the backup
-               window. this means that something unfocused before we received
-               the new FocusIn. Just ignore it, and refocus what should be
-               focused! */
-/*            client_focus(focus_client);
+	if (e->xfocus.mode == NotifyGrab ||
+            !(e->xfocus.detail == NotifyNonlinearVirtual ||
+              e->xfocus.detail == NotifyNonlinear))
             return;
-        }
-*/
+        g_message("FOCUS IN %lx", window);
         break;
     case FocusOut:
-	if (e->xfocus.mode == NotifyGrab) return;
-	    /*|| e.xfocus.mode == NotifyUngrab ||*/
-	    /* From Metacity, from WindowMaker, ignore all funky pointer
-	       root events. Its commented out cuz I don't think we need this
-	       at all. If problems arise we can look into it */
-	    /*e.xfocus.detail > NotifyNonlinearVirtual) */
+	if (e->xfocus.mode == NotifyGrab ||
+            !(e->xfocus.detail == NotifyNonlinearVirtual ||
+              e->xfocus.detail == NotifyNonlinear))
+            return;
 
         /* FocusOut events just make us look for FocusIn events. They
            are mostly ignored otherwise. */
         {
             XEvent fi;
             if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
+                g_message("FOCUS OUT %lx IN %lx", e->xfocus.window, fi.xfocus.window);
 		event_process(&fi);
-		/* dont unfocus the window we just focused! */
-		if (fi.xfocus.window == e->xfocus.window)
-		    return;
-	    }
+
+                if (fi.xfocus.window == e->xfocus.window)
+                    return;
+	    } else {
+                g_message("FOCUS OUT %lx IN 0x0", e->xfocus.window);
+            }
         }
 	break;
     case EnterNotify:
@@ -334,22 +329,8 @@ static void event_handle_client(Client *client, XEvent *e)
      
     switch (e->type) {
     case FocusIn:
-        if (focus_client != client)
-            focus_set_client(client);
-
-        /* focus state can affect the stacking layer */
-        client_calc_layer(client);
-
-        engine_frame_adjust_focus(client->frame);
-	break;
     case FocusOut:
-	if (focus_client == client)
-	    focus_set_client(NULL);
-
-        /* focus state can affect the stacking layer */
-        client_calc_layer(client);
-
-        engine_frame_adjust_focus(client->frame);
+        client_set_focused(client, e->type == FocusIn);
 	break;
     case ConfigureRequest:
 	g_message("ConfigureRequest for window %lx", client->window);
@@ -508,7 +489,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client_set_desktop(client, e->xclient.data.l[0]);
 	} else if (msgtype == prop_atoms.net_wm_state) {
 	    /* can't compress these */
-	    g_message("net_wm_state %s %ld %ld for 0x%lx\n",
+	    g_message("net_wm_state %s %ld %ld for 0x%lx",
 		      (e->xclient.data.l[0] == 0 ? "Remove" :
 		       e->xclient.data.l[0] == 1 ? "Add" :
 		       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
@@ -517,10 +498,10 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client_set_state(client, e->xclient.data.l[0],
 			     e->xclient.data.l[1], e->xclient.data.l[2]);
 	} else if (msgtype == prop_atoms.net_close_window) {
-	    g_message("net_close_window for 0x%lx\n", client->window);
+	    g_message("net_close_window for 0x%lx", client->window);
 	    client_close(client);
 	} else if (msgtype == prop_atoms.net_active_window) {
-	    g_message("net_active_window for 0x%lx\n", client->window);
+	    g_message("net_active_window for 0x%lx", client->window);
 	    if (screen_showing_desktop)
 		screen_show_desktop(FALSE);
 	    if (client->iconic)

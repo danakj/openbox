@@ -1,8 +1,10 @@
+#include "event.h"
 #include "openbox.h"
 #include "client.h"
 #include "screen.h"
 #include "prop.h"
 #include "dispatch.h"
+#include "focus.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -12,8 +14,6 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
 Window focus_backup = None;
-
-void focus_set_client(Client *client);
 
 void focus_startup()
 {
@@ -62,7 +62,7 @@ void focus_set_client(Client *client)
 
     if (client == NULL) {
 	/* when nothing will be focused, send focus to the backup target */
-	XSetInputFocus(ob_display, focus_backup, RevertToNone, CurrentTime);
+	XSetInputFocus(ob_display, focus_backup, RevertToNone, event_lasttime);
     }
 
     old = focus_client;

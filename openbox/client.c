@@ -239,17 +239,6 @@ void client_unmanage(Client *client)
 
     engine_frame_hide(client->frame);
 
-    /* dispatch the unmapped event */
-    dispatch_client(Event_Client_Unmapped, client, 0, 0);
-    g_assert(client != NULL);
-
-    /* give the client its border back */
-    client_toggle_border(client, TRUE);
-
-    /* reparent the window out of the frame, and free the frame */
-    engine_frame_release_client(client->frame, client);
-    client->frame = NULL;
-     
     client_list = g_slist_remove(client_list, client);
     stacking_list = g_list_remove(stacking_list, client);
     g_hash_table_remove(client_map, (gpointer)client->window);
@@ -278,11 +267,22 @@ void client_unmanage(Client *client)
 	client_calc_layer(it->data);
     }
 
+    /* dispatch the unmapped event */
+    dispatch_client(Event_Client_Unmapped, client, 0, 0);
+    g_assert(client != NULL);
+
     /* unfocus the client (dispatchs the focus event) (we're out of the
      transient lists already, so being modal doesn't matter) */
     if (client_focused(client))
 	client_unfocus(client);
 
+    /* give the client its border back */
+    client_toggle_border(client, TRUE);
+
+    /* reparent the window out of the frame, and free the frame */
+    engine_frame_release_client(client->frame, client);
+    client->frame = NULL;
+     
     if (ob_state != State_Exiting) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
@@ -1511,6 +1511,9 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
     client_change_state(self);
     client_showhide(self);
     screen_update_struts();
+
+    dispatch_client(iconic ? Event_Client_Unmapped : Event_Client_Mapped,
+                    self, 0, 0);
 }
 
 void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
@@ -1650,7 +1653,7 @@ void client_close(Client *self)
     ce.xclient.window = self->window;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = prop_atoms.wm_delete_window;
-    ce.xclient.data.l[1] = CurrentTime;
+    ce.xclient.data.l[1] = event_lasttime;
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
@@ -1902,11 +1905,11 @@ gboolean client_focus(Client *self)
 	}
     }
 
-    if (client_focused(self))
-        return TRUE;
+    g_message("** focusing %lx", self->window);
 
     if (self->can_focus)
-	XSetInputFocus(ob_display, self->window, RevertToNone, CurrentTime);
+	XSetInputFocus(ob_display, self->window, RevertToNone,
+                       CurrentTime);
 
     if (self->focus_notify) {
 	XEvent ce;
@@ -1916,7 +1919,7 @@ gboolean client_focus(Client *self)
 	ce.xclient.window = self->window;
 	ce.xclient.format = 32;
 	ce.xclient.data.l[0] = prop_atoms.wm_take_focus;
-	ce.xclient.data.l[1] = event_lasttime;
+	ce.xclient.data.l[1] = CurrentTime;
 	ce.xclient.data.l[2] = 0l;
 	ce.xclient.data.l[3] = 0l;
 	ce.xclient.data.l[4] = 0l;
@@ -1930,10 +1933,26 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
-    focus_set_client(NULL);
+    client_set_focused(self, FALSE);
 }
 
 gboolean client_focused(Client *self)
 {
     return self == focus_client;
+}
+
+void client_set_focused(Client *self, gboolean focused)
+{
+    if (focused) {
+        if (focus_client != self)
+            focus_set_client(self);
+    } else {
+	if (focus_client == self)
+	    focus_set_client(NULL);
+    }
+
+    /* focus state can affect the stacking layer */
+    client_calc_layer(self);
+
+    engine_frame_adjust_focus(self->frame);
 }

@@ -91,6 +91,10 @@ Action *action_new(void (*func)(union ActionData *data));
    action_execute - the path needs to be set
    action_restart - the path can optionally be set
    action_desktop - the destination desktop needs to be set
+   action_move_relative_horz - the delta
+   action_move_relative_vert - the delta
+   action_resize_relative_horz - the delta
+   action_resize_relative_vert - the delta
 */
 Action *action_from_string(char *name);
 void action_free(Action *a);

@@ -37,9 +37,11 @@ extern "C" {
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
-}
 
-#include <cctype>
+#ifdef    HAVE_CTYPE_H
+# include <ctype.h>
+#endif // HAVE_CTYPE_H
+}
 
 #include "../src/i18n.hh"
 #include "../src/GCCache.hh"
@@ -303,7 +305,7 @@ void bsetroot::gradient(void) {
 
   std::string::const_iterator it = grad.begin(), end = grad.end();
   for (; it != end; ++it)
-    descr += std::tolower(*it);
+    descr += tolower(*it);
 
   std::string::size_type pos;
   while ((pos = descr.find("raised")) != std::string::npos)

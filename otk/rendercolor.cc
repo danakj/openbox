@@ -66,7 +66,7 @@ void RenderColor::create() const
     xcol.blue = (_blue << 8) | _blue;
     xcol.pixel = 0;
 
-    if (! XAllocColor(**display, info->colormap(), &xcol)) {
+    if (!XAllocColor(**display, info->colormap(), &xcol)) {
       fprintf(stderr, "RenderColor: color alloc error: rgb:%x/%x/%x\n",
 	      _red, _green, _blue);
       xcol.pixel = 0;

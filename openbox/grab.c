@@ -120,9 +120,14 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
 {
     guint i;
 
+    xerror_set_ignore(TRUE); /* can get BadAccess' from these */
+    xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
                     pointer_mode, GrabModeSync, None, ob_cursor(cur));
+    xerror_set_ignore(FALSE);
+    if (xerror_occured)
+        g_warning("failed to grab keycode %d modifiers %d", keycode, state);
 }
 
 void grab_button(guint button, guint state, Window win, guint mask)

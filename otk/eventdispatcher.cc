@@ -165,7 +165,11 @@ void EventDispatcher::dispatch(Window win, const XEvent &e)
     xwc.border_width = e.xconfigurerequest.border_width;
     xwc.sibling = e.xconfigurerequest.above;
     xwc.stack_mode = e.xconfigurerequest.detail;
-
+    
+#ifdef DEBUG
+    printf("Proxying configure event for 0x%lx\n", e.xconfigurerequest.window);
+#endif
+    
     // we are not to be held responsible if someone sends us an invalid
     // request!
     display->setIgnoreErrors(true); 

@@ -60,9 +60,9 @@ bool python_exec(const std::string &path)
 bool python_get_long(const char *name, long *value)
 {
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
-  if (!(val && PyLong_Check(val))) return false;
+  if (!(val && PyInt_Check(val))) return false;
   
-  *value = PyLong_AsLong(val);
+  *value = PyInt_AsLong(val);
   return true;
 }
 

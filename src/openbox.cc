@@ -43,6 +43,10 @@ extern "C" {
 #  include <sys/select.h>
 #endif // HAVE_SYS_SELECT_H
 
+#ifdef    HAVE_SYS_WAIT_H
+#  include <sys/wait.h>
+#endif // HAVE_SYS_WAIT_H
+
 #include "gettext.h"
 #define _(str) gettext(str)
 }
@@ -60,6 +64,10 @@ void Openbox::signalHandler(int signal)
   case SIGUSR1:
     printf("Caught SIGUSR1 signal. Restarting.\n");
     openbox->restart();
+    break;
+
+  case SIGCLD:
+    wait(NULL);
     break;
 
   case SIGHUP:
@@ -113,6 +121,10 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGTERM, &action, (struct sigaction *) 0);
   sigaction(SIGINT, &action, (struct sigaction *) 0);
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
+  sigaction(SIGCLD, &action, (struct sigaction *) 0);
+
+  // anything that died while we were restarting won't give us a SIGCLD
+  while (waitpid(-1, NULL, WNOHANG) > 0);
 
   otk::Timer::initialize();
   otk::Property::initialize();

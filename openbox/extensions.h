@@ -4,6 +4,7 @@
 #include "geom.h"
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h> /* shape.h uses Region which is in here */
 #ifdef    XKB
 #include <X11/XKBlib.h>
 #endif

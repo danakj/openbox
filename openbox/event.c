@@ -612,11 +612,8 @@ void event_enter_client(ObClient *client)
                                      config_focus_delay,
                                      focus_delay_func,
                                      client, NULL);
-        } else {
-            client_focus(client);
-            if (config_focus_raise)
-                stacking_raise(CLIENT_AS_WINDOW(client));
-        }
+        } else
+            focus_delay_func(client);
     }
 }
 
@@ -712,6 +709,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
+            /*
+            if (config_focus_follow && config_focus_delay)
+                ob_main_loop_timeout_remove_data(ob_main_loop,
+                                                 focus_delay_func,
+                                                 client);
+            */
             break;
         default:
             break;
@@ -1267,7 +1270,28 @@ static void focus_delay_client_dest(gpointer data)
     ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, c);
 }
 
-void event_ignore_enter_focus(guint num)
+void event_ignore_queued_enters()
 {
-    ignore_enter_focus += num;
+    GSList *saved = NULL, *it;
+    XEvent *e;
+                
+    XSync(ob_display, FALSE);
+
+    /* count the events */
+    while (TRUE) {
+        e = g_new(XEvent, 1);
+        if (XCheckTypedEvent(ob_display, EnterNotify, e)) {
+            saved = g_slist_append(saved, e);
+            ++ignore_enter_focus;
+        } else {
+            g_free(e);
+            break;
+        }
+    }
+    /* put the events back */
+    for (it = saved; it; it = g_slist_next(it)) {
+        XPutBackEvent(ob_display, it->data);
+        g_free(it->data);
+    }
+    g_slist_free(saved);
 }

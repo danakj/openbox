@@ -35,12 +35,12 @@ extern guint ScrollLockMask;
 void event_startup(gboolean reconfig);
 void event_shutdown(gboolean reconfig);
 
-/*! Request that a number of EnterNotify events not be used for distributing
-  focus */
-void event_ignore_enter_focus(guint num);
-
 /*! Make as if the mouse just entered the client, use only when using focus
   follows mouse */
 void event_enter_client(struct _ObClient *client);
+
+/*! Request that any queued EnterNotify events not be used for distributing
+  focus */
+void event_ignore_queued_enters();
 
 #endif

@@ -58,6 +58,9 @@ window.button.pressed.focus.colorTo: #7c8c93
 window.button.pressed.focus.picColor: #ffffff
 
 window.button.disabled.focus: parentrelative
+window.button.disabled.focus.picColor: #7c8c93
+window.button.disabled.unfocus: parentrelative
+window.button.disabled.unfocus.picColor: #7c8c93
 
 window.button.unfocus: parentrelative
 window.button.unfocus.picColor: #677b91

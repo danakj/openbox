@@ -55,6 +55,13 @@ static gboolean menu_open(gchar *file, xmlDocPtr *doc, xmlNodePtr *node)
     return loaded;
 }
 
+static void client_dest(ObClient *c)
+{
+    /* menus can be associated with a client, so close any that are since
+       we are disappearing now */
+    menu_frame_hide_all_client(c);
+}
+
 void menu_startup()
 {
     xmlDocPtr doc;
@@ -91,10 +98,14 @@ void menu_startup()
 
         g_assert(menu_parse_state.menus == NULL);
     }
+
+    client_add_destructor(client_dest);
 }
 
 void menu_shutdown()
 {
+    client_remove_destructor(client_dest);
+
     parse_shutdown(menu_parse_inst);
     menu_parse_inst = NULL;
 

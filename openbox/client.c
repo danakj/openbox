@@ -32,7 +32,8 @@
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
 				ButtonMotionMask)
 
-GList      *client_list      = NULL;
+GList      *client_list        = NULL;
+GSList     *client_destructors = NULL;
 
 static void client_get_all(ObClient *self);
 static void client_toggle_border(ObClient *self, gboolean show);
@@ -56,6 +57,16 @@ void client_startup()
 
 void client_shutdown()
 {
+}
+
+void client_add_destructor(ObClientDestructorFunc func)
+{
+    client_destructors = g_slist_prepend(client_destructors, (gpointer)func);
+}
+
+void client_remove_destructor(ObClientDestructorFunc func)
+{
+    client_destructors = g_slist_remove(client_destructors, (gpointer)func);
 }
 
 void client_set_list()
@@ -414,13 +425,11 @@ void client_unmanage(ObClient *self)
         }
     }
 
-    if (moveresize_client == self)
-        moveresize_end(TRUE);
-
-    /* menus can be associated with a client, so close any that are since
-       we are disappearing now */
-    menu_frame_hide_all_client(self);
-    
+    for (it = client_destructors; it; it = g_slist_next(it)) {
+        ObClientDestructorFunc func = (ObClientDestructorFunc) it->data;
+        func(self);
+    }
+        
     if (focus_client == self) {
         XEvent e;
 

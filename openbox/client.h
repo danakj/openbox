@@ -243,6 +243,11 @@ extern GList *client_list;
 void client_startup();
 void client_shutdown();
 
+typedef void (*ObClientDestructorFunc)(ObClient *c);
+
+void client_add_destructor(ObClientDestructorFunc func);
+void client_remove_destructor(ObClientDestructorFunc func);
+
 /*! Manages all existing windows */
 void client_manage_all();
 /*! Manages a given window */

@@ -30,6 +30,12 @@ static Popup *popup = NULL;
 #define POPUP_X (10)
 #define POPUP_Y (10)
 
+static void client_dest(ObClient *c)
+{
+    if (moveresize_client == c)
+        moveresize_end(TRUE);    
+}
+
 void moveresize_startup()
 {
     XSetWindowAttributes attrib;
@@ -38,10 +44,14 @@ void moveresize_startup()
     popup_size_to_string(popup, "W:  0000  W:  0000");
 
     attrib.save_under = True;
+
+    client_add_destructor(client_dest);
 }
 
 void moveresize_shutdown()
 {
+    client_remove_destructor(client_dest);
+
     popup_free(popup);
     popup = NULL;
 }

@@ -52,12 +52,22 @@ struct _RrTheme {
     /* style settings - masks */
     RrPixmapMask *max_set_mask;
     RrPixmapMask *max_unset_mask;
+    RrPixmapMask *max_hover_mask;
+    RrPixmapMask *max_disabled_mask;
     RrPixmapMask *iconify_mask;
+    RrPixmapMask *iconify_hover_mask;
+    RrPixmapMask *iconify_disabled_mask;
     RrPixmapMask *desk_set_mask;
     RrPixmapMask *desk_unset_mask;
+    RrPixmapMask *desk_hover_mask;
+    RrPixmapMask *desk_disabled_mask;
     RrPixmapMask *shade_set_mask;
     RrPixmapMask *shade_unset_mask;
+    RrPixmapMask *shade_hover_mask;
+    RrPixmapMask *shade_disabled_mask;
     RrPixmapMask *close_mask;
+    RrPixmapMask *close_hover_mask;
+    RrPixmapMask *close_disabled_mask;
 
     /* global appearances */
     RrAppearance *a_disabled_focused_max;

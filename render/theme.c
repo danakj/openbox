@@ -232,11 +232,18 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "menu.hilite.textColor", &theme->menu_hilite_color))
         theme->menu_hilite_color = RrColorNew(inst, 0, 0, 0);
 
-    if (read_mask(inst, "max.xbm", theme, &theme->max_unset_mask)){
-        if (!read_mask(inst, "max_t.xbm", theme, &theme->max_set_mask)) {
+    if (read_mask(inst, "max.xbm", theme, &theme->max_unset_mask)) {
+        if (!read_mask(inst, "max_toggled.xbm", theme, &theme->max_set_mask)) {
             theme->max_set_mask = RrPixmapMaskCopy(theme->max_unset_mask);
         }
-    } else {
+        if (!read_mask(inst, "max_disabled.xbm", theme,
+                       &theme->max_disabled_mask)) {
+            theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_unset_mask);
+        } 
+        if (!read_mask(inst, "max_hover.xbm", theme, &theme->max_hover_mask)) {
+            theme->max_hover_mask = RrPixmapMaskCopy(theme->max_unset_mask);
+        }
+   } else {
         {
             char data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
             theme->max_unset_mask = RrPixmapMaskNew(inst, 7, 7, data);
@@ -245,15 +252,33 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
             theme->max_set_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
+        theme->max_disabled_mask = RrPixmapMaskCopy(theme->max_unset_mask);
+        theme->max_hover_mask = RrPixmapMaskCopy(theme->max_unset_mask);
     }
 
-    if (!read_mask(inst, "iconify.xbm", theme, &theme->iconify_mask)) {
-        char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
-        theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, data);
+    if (read_mask(inst, "iconify.xbm", theme, &theme->iconify_mask)) {
+        if (!read_mask(inst, "iconify_disabled.xbm", theme,
+                       &theme->iconify_disabled_mask)) {
+            theme->iconify_disabled_mask =
+                RrPixmapMaskCopy(theme->iconify_mask);
+        } 
+        if (!read_mask(inst, "iconify_hover.xbm", theme,
+                       &theme->iconify_hover_mask)) {
+            theme->iconify_hover_mask =
+                RrPixmapMaskCopy(theme->iconify_mask);
+        }
+    } else {
+        {
+            char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
+            theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, data);
+        }
+        theme->iconify_disabled_mask = RrPixmapMaskCopy(theme->iconify_mask);
+        theme->iconify_hover_mask = RrPixmapMaskCopy(theme->iconify_mask);
     }
 
     if (read_mask(inst, "stick.xbm", theme, &theme->desk_unset_mask)) {
-        if (!read_mask(inst, "stick_t.xbm", theme, &theme->desk_set_mask)) {
+        if (!read_mask(inst, "stick_toggled.xbm", theme,
+                       &theme->desk_set_mask)) {
             theme->desk_set_mask =
                 RrPixmapMaskCopy(theme->desk_unset_mask);
         }
@@ -269,8 +294,19 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     }
 
     if (read_mask(inst, "shade.xbm", theme, &theme->shade_unset_mask)) {
-        if (!read_mask(inst, "shade_t.xbm", theme, &theme->shade_set_mask)) {
+        if (!read_mask(inst, "shade_toggled.xbm", theme,
+                       &theme->shade_set_mask)) {
             theme->shade_set_mask =
+                RrPixmapMaskCopy(theme->shade_unset_mask);
+        }
+        if (!read_mask(inst, "shade_disabled.xbm", theme,
+                       &theme->shade_disabled_mask)) {
+            theme->shade_disabled_mask =
+                RrPixmapMaskCopy(theme->shade_unset_mask);
+        } 
+        if (!read_mask(inst, "shade_hover.xbm", theme, 
+                       &theme->shade_hover_mask)) {
+            theme->shade_hover_mask =
                 RrPixmapMaskCopy(theme->shade_unset_mask);
         }
     } else {
@@ -282,11 +318,26 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
             char data[] = { 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x7f };
             theme->shade_set_mask = RrPixmapMaskNew(inst, 7, 7, data);
         }
+        theme->shade_disabled_mask = RrPixmapMaskCopy(theme->shade_unset_mask);
+        theme->shade_hover_mask = RrPixmapMaskCopy(theme->shade_unset_mask);
     }
 
-    if (!read_mask(inst, "close.xbm", theme, &theme->close_mask)) {
-        char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
-        theme->close_mask = RrPixmapMaskNew(inst, 7, 7, data);
+    if (read_mask(inst, "close.xbm", theme, &theme->close_mask)) {
+        if (!read_mask(inst, "close_disabled.xbm", theme,
+                       &theme->close_disabled_mask)) {
+            theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
+        } 
+        if (!read_mask(inst, "close_hover.xbm", theme,
+                       &theme->close_hover_mask)) {
+            theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
+        }
+    } else {
+        {
+            char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
+            theme->close_mask = RrPixmapMaskNew(inst, 7, 7, data);
+        }
+        theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
+        theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
     }        
 
     /* read the decoration textures */
@@ -577,9 +628,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_unfocused_pressed_iconify->texture[0].type = RR_TEXTURE_MASK;
     theme->a_disabled_focused_max->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_max->texture[0].data.mask.mask = 
-        theme->a_hover_focused_max->texture[0].data.mask.mask = 
+        theme->max_disabled_mask;
+    theme->a_hover_focused_max->texture[0].data.mask.mask = 
         theme->a_hover_unfocused_max->texture[0].data.mask.mask = 
-        theme->a_focused_unpressed_max->texture[0].data.mask.mask = 
+        theme->max_hover_mask;
+    theme->a_focused_unpressed_max->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_max->texture[0].data.mask.mask = 
         theme->a_focused_pressed_max->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_max->texture[0].data.mask.mask =
@@ -589,18 +642,22 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->max_set_mask;
     theme->a_disabled_focused_close->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_close->texture[0].data.mask.mask = 
-        theme->a_hover_focused_close->texture[0].data.mask.mask = 
+        theme->close_disabled_mask;
+    theme->a_hover_focused_close->texture[0].data.mask.mask = 
         theme->a_hover_unfocused_close->texture[0].data.mask.mask = 
-        theme->a_focused_pressed_close->texture[0].data.mask.mask = 
+        theme->close_hover_mask;
+    theme->a_focused_pressed_close->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_close->texture[0].data.mask.mask =
         theme->a_focused_unpressed_close->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_close->texture[0].data.mask.mask =
         theme->close_mask;
     theme->a_disabled_focused_desk->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_desk->texture[0].data.mask.mask = 
-        theme->a_hover_focused_desk->texture[0].data.mask.mask = 
+        theme->desk_disabled_mask;
+    theme->a_hover_focused_desk->texture[0].data.mask.mask = 
         theme->a_hover_unfocused_desk->texture[0].data.mask.mask = 
-        theme->a_focused_unpressed_desk->texture[0].data.mask.mask = 
+        theme->desk_hover_mask;
+    theme->a_focused_unpressed_desk->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_desk->texture[0].data.mask.mask = 
         theme->a_focused_pressed_desk->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_desk->texture[0].data.mask.mask =
@@ -610,9 +667,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->desk_set_mask;
     theme->a_disabled_focused_shade->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_shade->texture[0].data.mask.mask = 
-        theme->a_hover_focused_shade->texture[0].data.mask.mask = 
+        theme->shade_disabled_mask;
+    theme->a_hover_focused_shade->texture[0].data.mask.mask = 
         theme->a_hover_unfocused_shade->texture[0].data.mask.mask = 
-        theme->a_focused_unpressed_shade->texture[0].data.mask.mask = 
+        theme->shade_hover_mask;
+    theme->a_focused_unpressed_shade->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_shade->texture[0].data.mask.mask = 
         theme->a_focused_pressed_shade->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_shade->texture[0].data.mask.mask =
@@ -622,9 +681,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->shade_set_mask;
     theme->a_disabled_focused_iconify->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_iconify->texture[0].data.mask.mask = 
-        theme->a_hover_focused_iconify->texture[0].data.mask.mask = 
+        theme->iconify_disabled_mask;
+    theme->a_hover_focused_iconify->texture[0].data.mask.mask = 
         theme->a_hover_unfocused_iconify->texture[0].data.mask.mask = 
-        theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
+        theme->iconify_hover_mask;
+    theme->a_focused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_unpressed_iconify->texture[0].data.mask.mask = 
         theme->a_focused_pressed_iconify->texture[0].data.mask.mask = 
         theme->a_unfocused_pressed_iconify->texture[0].data.mask.mask =
@@ -719,12 +780,22 @@ void RrThemeFree(RrTheme *theme)
 
         RrPixmapMaskFree(theme->max_set_mask);
         RrPixmapMaskFree(theme->max_unset_mask);
+        RrPixmapMaskFree(theme->max_disabled_mask);
+        RrPixmapMaskFree(theme->max_hover_mask);
         RrPixmapMaskFree(theme->desk_set_mask);
         RrPixmapMaskFree(theme->desk_unset_mask);
+        RrPixmapMaskFree(theme->desk_disabled_mask);
+        RrPixmapMaskFree(theme->desk_hover_mask);
         RrPixmapMaskFree(theme->shade_set_mask);
         RrPixmapMaskFree(theme->shade_unset_mask);
+        RrPixmapMaskFree(theme->shade_disabled_mask);
+        RrPixmapMaskFree(theme->shade_hover_mask);
         RrPixmapMaskFree(theme->iconify_mask);
+        RrPixmapMaskFree(theme->iconify_disabled_mask);
+        RrPixmapMaskFree(theme->iconify_hover_mask);
         RrPixmapMaskFree(theme->close_mask);
+        RrPixmapMaskFree(theme->close_disabled_mask);
+        RrPixmapMaskFree(theme->close_hover_mask);
 
         RrFontClose(theme->winfont);
         RrFontClose(theme->mtitlefont);

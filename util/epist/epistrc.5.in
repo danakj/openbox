@@ -10,10 +10,12 @@ epistrc \- Configuration file for Epist
 .SH SYNTAX
 The epistrc file contains 2 sections:
 .SS options
-All of the options for epist are contained inside an options {} clause, such as
-this:
+All of the options for epist are contained inside a clause such as this:
+.br
 options {
-blef 5;
+.br
+	blef 5;
+.br
 }
 .SS bindings
 Bindings are specified in this format:

@@ -802,7 +802,7 @@ void OBClient::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void OBClient::resize(Corner anchor, int w, int h)
+void OBClient::resize(Corner anchor, int w, int h, int x, int y)
 {
   w -= _base_size.x(); 
   h -= _base_size.y();
@@ -835,23 +835,27 @@ void OBClient::resize(Corner anchor, int w, int h)
   w += _base_size.x();
   h += _base_size.y();
 
-  int x = _area.x(), y = _area.y();  
-  switch (anchor) {
-  case TopLeft:
-    break;
-  case TopRight:
-    x -= w - _area.width();
-    break;
-  case BottomLeft:
-    y -= h - _area.height();
-    break;
-  case BottomRight:
-    x -= w - _area.width();
-    y -= h - _area.height();
-    break;
+  if (x == INT_MIN || y == INT_MIN) {
+    x = _area.x();
+    y = _area.y();
+    switch (anchor) {
+    case TopLeft:
+      break;
+    case TopRight:
+      x -= w - _area.width();
+      break;
+    case BottomLeft:
+      y -= h - _area.height();
+      break;
+    case BottomRight:
+      x -= w - _area.width();
+      y -= h - _area.height();
+      break;
+    }
   }
 
   _area.setSize(w, h);
+
   XResizeWindow(otk::OBDisplay::display, _window, w, h);
 
   // resize the frame to match the request
@@ -863,6 +867,7 @@ void OBClient::resize(Corner anchor, int w, int h)
 void OBClient::move(int x, int y)
 {
   _area.setPos(x, y);
+
   // move the frame to be in the requested position
   frame->adjustPosition();
 }
@@ -1048,10 +1053,14 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
       corner = TopLeft;
     }
 
-    resize(corner, w, h);
-  }
-
-  if (e.value_mask & (CWX | CWY)) {
+    // if moving AND resizing ...
+    if (e.value_mask & (CWX | CWY)) {
+      int x = (e.value_mask & CWX) ? e.x : _area.x();
+      int y = (e.value_mask & CWY) ? e.y : _area.y();
+      resize(corner, w, h, x, y);
+    } else // if JUST resizing...
+      resize(corner, w, h);
+  } else if (e.value_mask & (CWX | CWY)) { // if JUST moving...
     int x = (e.value_mask & CWX) ? e.x : _area.x();
     int y = (e.value_mask & CWY) ? e.y : _area.y();
     move(x, y);

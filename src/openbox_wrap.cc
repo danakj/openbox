@@ -2282,11 +2282,13 @@ static PyObject *_wrap_OBClient_resize(PyObject *self, PyObject *args) {
     int arg2 ;
     int arg3 ;
     int arg4 ;
+    int arg5 = (int) INT_MIN ;
+    int arg6 = (int) INT_MIN ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oiii:OBClient_resize",&obj0,&arg2,&arg3,&arg4)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oiii|ii:OBClient_resize",&obj0,&arg2,&arg3,&arg4,&arg5,&arg6)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->resize((ob::OBClient::Corner )arg2,arg3,arg4);
+    (arg1)->resize((ob::OBClient::Corner )arg2,arg3,arg4,arg5,arg6);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;

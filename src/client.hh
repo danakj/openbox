@@ -431,11 +431,17 @@ public:
   //! Resizes the client window, anchoring it in a given corner
   /*!
     This also maintains things like the client's minsize, and size increments.
-    @param anchor The corner to keep in the same position when resizing
-    @param x The X component of the new size for the client
-    @param y The Y component of the new size for the client
+    @param anchor The corner to keep in the same position when resizing.
+    @param w The width component of the new size for the client.
+    @param h The height component of the new size for the client.
+    @param x An optional X coordinate to which the window will be moved
+             after resizing.
+    @param y An optional Y coordinate to which the window will be moved
+             after resizing.
+    The x and y coordinates must both be sepcified together, or they will have
+    no effect. When they are specified, the anchor is ignored.
   */
-  void resize(Corner anchor, int x, int y);
+  void resize(Corner anchor, int w, int h, int x = INT_MIN, int y = INT_MIN);
 
   //! Request the client to close its window.
   void close();

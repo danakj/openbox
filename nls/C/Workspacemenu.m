@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Werkbladen
+# Areas de Trabalho
 $ #NewWorkspace
-# Nieuw werkblad
+# Nova Area de Trabalho
 $ #RemoveLast
-# Verwijder laatste werkblad
+# Remover Ultima

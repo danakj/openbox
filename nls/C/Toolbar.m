@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Werkbalk
+# Toolbar
 $ #EditWkspcName
-# Wijzig naam van huidig werkblad
+# Renomear Area de Trabalho
 $ #ToolbarPlacement
-# Plaats van werkbalk
+# Posicionamento

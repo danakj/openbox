@@ -1,23 +1,23 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# エラー: '-rc' オプションは引数を必要とします\n
+# fout: '-rc' heeft een argument nodig (bestandsnaam)\n
 $ #DISPLAYRequiresArg
-# エラー: '-display' オプションは引数を必要とします\n
+# fout: '-display' heeft een argument nodig (displaynaam)\n
 $ #WarnDisplaySet
-# 警告: 環境変数 'DISPLAY' を設定できませんでした\n
+# waarschuwing: kan omgevingsvariabele 'DISPLAY' niet instellen\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
   \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\t指定ディスプレイに接続\n\
-  -rc <string>\t\t\t代りのリソースファイルを使用\n\
-  -version\t\t\tバージョン情報を表示し、終了\n\
-  -help\t\t\t\tこのヘルプを表示し、終了\n\n
+  -display <displaynaam>   gebruik aangegeven display.\n\
+  -rc <bestandsnaam>       gebruik alternatief resource bestand.\n\
+  -version                 toon versie en stop.\n\
+  -help                    toon deze hulp tekst en stop.\n\n
 $ #CompileOptions
-# コンパイル時オプション:\n\
-  Debugging\t\t\t%s\n\
-  Shape:\t\t\t%s\n\
-  Slit:\t\t\t\t%s\n\
-  Event Clobbering:\t\t%s\n\
-  8bpp Ordered Dithering:\t%s\n\n
+# Gecompileerd met instellingen:\n\
+  Debugging:               %s\n\
+  Shape:                   %s\n\
+  Slit:                    %s\n\
+  Event Clobbering:        %s\n\
+  8bpp Ordered Dithering:  %s\n\n

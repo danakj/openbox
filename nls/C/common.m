@@ -1,38 +1,35 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# Sim
 $ #No
-# Nee
+# Não
 
 $ #DirectionTitle
-# Richting
+# Direção
 $ #DirectionHoriz
-# Horizontaal
+# Horizontal
 $ #DirectionVert
-# Vertikaal
+# Vertical
 
 $ #AlwaysOnTop
-# Altijd op voorgrond
+# Sempre Visivel
 
 $ #PlacementTitle
-# Plaatsing
+# Posicionamento
 $ #PlacementTopLeft
-# Linksboven
+# No Alto a Esquerda
 $ #PlacementCenterLeft
-# Links
+# No Centro a Esquerda
 $ #PlacementBottomLeft
-# Linksonder
+# Em Baixo a Esquerda
 $ #PlacementTopCenter
-# Middenboven
+# No Alto e no Centro
 $ #PlacementBottomCenter
-# Middenonder
+# Em Baixo e no Centro
 $ #PlacementTopRight
-# Rechtsboven
+# No Alto a Direita
 $ #PlacementCenterRight
-# Rechts
+# No Meio a Direita
 $ #PlacementBottomRight
-# Rechtsonder
-
-$ #AutoHide
-# Automatisch verbergen
+# Em Baixo a Direita

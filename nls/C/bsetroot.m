@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s: fout: een van -solid, -mod, -gradient moet aangegeven worden\n
+# %s: erro: necessario especificar um dos seguintes argumentos: -solid, -mod, -gradient\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
-  -display <displaynaam>   display verbinding\n\
-  -mod <x> <y>             modula patroon\n\
-  -foreground, -fg <kleur> modula voorgrondkleur\n\
-  -background, -bg <kleur> modula achtergrondkleur\n\n\
-  -gradient <textuur>      gradiënt textuur\n\
-  -from <kleur>            gradiënt beginkleur\n\
-  -to <kleur>              gradiënt eindkleur\n\n\
-  -solid <kleur>           effen kleur\n\n\
-  -help                    toon deze hulp tekst en stop\n
+  -display <string>        conexão com display\n\
+  -mod <x> <y>             modula pattern\n\
+  -foreground, -fg <color> modula foreground color\n\
+  -background, -bg <color> modula background color\n\n\
+  -gradient <texture>      textura gradiente\n\
+  -from <color>            cor de inicio do gradiente\n\
+  -to <color>              com do fim do gradiente\n\n\
+  -solid <color>           cor solida\n\n\
+  -help                    mostra essa ajuda e sai\n
 

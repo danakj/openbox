@@ -161,6 +161,8 @@ void menu_pipe_execute(ObMenu *self)
     } else {
         g_warning("Invalid output from pipe-menu: %s", self->execute);
     }
+
+    g_free(output);
 }
 
 static ObMenu* menu_from_name(gchar *name)
@@ -260,7 +262,17 @@ ObMenu* menu_new(gchar *name, gchar *title, gpointer data)
 
 static void menu_destroy_hash_value(ObMenu *self)
 {
-    /* XXX make sure its not visible */
+    /* make sure its not visible */
+    {
+        GList *it;
+        ObMenuFrame *f;
+
+        for (it = menu_frame_visible; it; it = g_list_next(it)) {
+            f = it->data;
+            if (f->menu == self)
+                menu_frame_hide_all();
+        }
+    }
 
     if (self->destroy_func)
         self->destroy_func(self, self->data);
@@ -269,6 +281,8 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self->name);
     g_free(self->title);
     g_free(self->execute);
+
+    g_free(self);
 }
 
 void menu_free(ObMenu *menu)
@@ -341,7 +355,18 @@ void menu_entry_free(ObMenuEntry *self)
 
 void menu_clear_entries(ObMenu *self)
 {
-    /* XXX assert that the menu isn't visible */
+#ifdef DEBUG
+    /* assert that the menu isn't visible */
+    {
+        GList *it;
+        ObMenuFrame *f;
+
+        for (it = menu_frame_visible; it; it = g_list_next(it)) {
+            f = it->data;
+            g_assert(f->menu != self);
+        }
+    }
+#endif
 
     while (self->entries) {
 	menu_entry_free(self->entries->data);

@@ -1,4 +1,5 @@
 #include "../../kernel/openbox.h"
+#include "mouse.h"
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -45,9 +46,9 @@ gboolean translate_button(char *str, guint *state, guint *button)
     }
 
     /* figure out the button */
-    if (!g_ascii_strcasecmp("Left", l)) *button = 1;
+    if (!g_ascii_strcasecmp("Left", l)) *button = mouse_lefthand ? 3 : 1;
     else if (!g_ascii_strcasecmp("Middle", l)) *button = 2;
-    else if (!g_ascii_strcasecmp("Right", l)) *button = 3;
+    else if (!g_ascii_strcasecmp("Right", l)) *button = mouse_lefthand ? 1 : 3;
     else if (!g_ascii_strcasecmp("Up", l)) *button = 4;
     else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
     else if (!g_ascii_strncasecmp("Button", l, 6)) *button = atoi(l+6);

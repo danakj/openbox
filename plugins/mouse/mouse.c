@@ -13,7 +13,7 @@
 
 static int threshold;
 static int dclicktime;
-
+gboolean mouse_lefthand;
 /*
 
 <context name="Titlebar"> 
@@ -36,6 +36,8 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
         threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))
         dclicktime = parse_int(doc, n);
+    if ((n = parse_find_node("leftHanded", node)))
+        mouse_lefthand = parse_bool(doc, n);
 
     n = parse_find_node("context", node);
     while (n) {
@@ -99,6 +101,7 @@ void plugin_setup_config()
 {
     threshold = 3;
     dclicktime = 200;
+    mouse_lefthand = FALSE;
     parse_register("mouse", parse_xml, NULL);
 }
 

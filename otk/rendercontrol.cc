@@ -7,10 +7,10 @@
 #include "rendercontrol.hh"
 #include "truerendercontrol.hh"
 #include "rendertexture.hh"
+#include "rendercolor.hh"
 #include "display.hh"
 #include "screeninfo.hh"
 #include "surface.hh"
-#include "color.hh"
 #include "font.hh"
 #include "ustring.hh"
 
@@ -61,7 +61,8 @@ RenderControl::~RenderControl()
 }
 
 void RenderControl::drawString(Surface& sf, const Font &font, int x, int y,
-			       const Color &color, const ustring &string) const
+			       const RenderColor &color,
+                               const ustring &string) const
 {
   assert(sf._screen == _screen);
   XftDraw *d = sf._xftdraw;

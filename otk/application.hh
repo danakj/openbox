@@ -4,9 +4,7 @@
 
 #include "eventdispatcher.hh"
 #include "display.hh"
-#include "configuration.hh"
-#include "image.hh"
-#include "style.hh"
+#include "renderstyle.hh"
 
 namespace otk {
 
@@ -25,16 +23,14 @@ public:
   void setDockable(bool dockable) { _dockable = dockable; }
   inline bool isDockable(void) const { return _dockable; }
 
-  inline Style *getStyle(void) const { return _style; }
+  inline RenderStyle *getStyle(void) const { return _style; }
   // more accessors
 
 private:
   void loadStyle(void);
 
   Display _display;
-  ImageControl *_img_ctrl;
-  Configuration *_style_conf;
-  Style *_style;
+  RenderStyle *_style;
   bool _dockable;
 
   int _appwidget_count;

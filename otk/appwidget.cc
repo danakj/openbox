@@ -15,7 +15,7 @@ extern "C" {
 namespace otk {
 
 AppWidget::AppWidget(Application *app, Direction direction,
-                           Cursor cursor, int bevel_width)
+                     Cursor cursor, int bevel_width)
   : Widget(app, app->getStyle(), direction, cursor, bevel_width),
     _application(app)
 {

@@ -15,8 +15,8 @@ int main(int argc, char **argv) {
   otk::AppWidget foo(&app);
 
   foo.resize(600, 500);
-  foo.setTexture(app.getStyle()->getTitleFocus());
-//  foo.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
+  foo.setTexture(app.getStyle()->titlebarFocusBackground());
+//  foo.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
 
   foo.setBevelWidth(2);
   foo.setDirection(otk::Widget::Horizontal);
@@ -27,15 +27,15 @@ int main(int argc, char **argv) {
   left.setDirection(otk::Widget::Horizontal);
   left.setStretchableVert(true);
   left.setStretchableHorz(true);
-  left.setTexture(app.getStyle()->getTitleFocus());
-  left.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
+  left.setTexture(app.getStyle()->titlebarFocusBackground());
+  left.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
  
   right.setDirection(otk::Widget::Vertical);
   right.setBevelWidth(10);
   right.setStretchableVert(true);
   right.setWidth(300);
-  right.setTexture(app.getStyle()->getTitleFocus());
-  right.setUnfocusTexture(app.getStyle()->getTitleUnfocus());
+  right.setTexture(app.getStyle()->titlebarFocusBackground());
+  right.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
 
   otk::Button iconb(&left);
   iconb.resize(40,20);
@@ -51,8 +51,8 @@ int main(int argc, char **argv) {
   //label.setHeight(20);
   label.setStretchableVert(true);
   label.setStretchableHorz(true);
-  label.setTexture(app.getStyle()->getLabelFocus());
-  label.setUnfocusTexture(app.getStyle()->getLabelUnfocus());
+  label.setTexture(app.getStyle()->labelFocusBackground());
+  label.setUnfocusTexture(app.getStyle()->labelUnfocusBackground());
 
   // fixed size
   maxb.setText("bar");
@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
 
   rblef.setStretchableHorz(true);
   rblef.setHeight(50);
-  rblef.setTexture(app.getStyle()->getHandleFocus());
-  rblef.setUnfocusTexture(app.getStyle()->getHandleUnfocus());
+  rblef.setTexture(app.getStyle()->handleFocusBackground());
+  rblef.setUnfocusTexture(app.getStyle()->handleUnfocusBackground());
   
   rbutt1.setText("this is fucking tight");
   rbutt2.setText("heh, WOOP");
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
   foo.show();
 
-  app.exec();
+  app.run();
 
   return 0;
 }

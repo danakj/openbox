@@ -71,7 +71,8 @@ void RenderColor::create()
       xcol.pixel = 0;
     }
 
-    gcv.foreground = xcol.pixel;
+    _pixel = xcol.pixel;
+    gcv.foreground = _pixel;
     gcv.cap_style = CapProjecting;
     _gc = XCreateGC(**display, info->rootWindow(),
 		    GCForeground | GCCapStyle, &gcv);

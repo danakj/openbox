@@ -17,19 +17,18 @@ Label::~Label()
 {
 }
 
-void Label::setStyle(Style *style)
+void Label::setStyle(RenderStyle *style)
 {
   Widget::setStyle(style);
 
-  // XXX: do this again
-  //setTexture(style->getLabelUnfocus());
+  setTexture(style->labelUnfocusBackground());
 }
 
 
 void Label::renderForeground(void)
 {
-  const Font *ft = style()->getFont();
-  unsigned int sidemargin = style()->getBevelWidth() * 2;
+  const Font *ft = style()->labelFont();
+  unsigned int sidemargin = style()->bevelWidth() * 2;
 
   ustring t = _text; // the actual text to draw
   int x = sidemargin;    // x coord for the text
@@ -48,20 +47,20 @@ void Label::renderForeground(void)
     } while (length > max_length && text_len-- > 0);
 
     // justify the text
-    switch (style()->textJustify()) {
-    case Style::RightJustify:
+    switch (style()->labelTextJustify()) {
+    case RenderStyle::RightJustify:
       x += max_length - length;
       break;
-    case Style::CenterJustify:
+    case RenderStyle::CenterJustify:
       x += (max_length - length) / 2;
       break;
-    case Style::LeftJustify:
+    case RenderStyle::LeftJustify:
       break;
     }
   }
 
   display->renderControl(_screen)->
-    drawString(*_surface, *ft, x, 0, *style()->getTextUnfocus(), t);
+    drawString(*_surface, *ft, x, 0, *style()->textUnfocusColor(), t);
 }
 
 }

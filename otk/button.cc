@@ -19,15 +19,14 @@ Button::~Button()
 }
 
 
-void Button::setStyle(Style *style)
+void Button::setStyle(RenderStyle *style)
 {
   FocusLabel::setStyle(style);
 
-  // XXX: do this again
-  //setTexture(style->getButtonFocus());
-  //setUnfocusTexture(style->getButtonUnfocus());
-  //_pressed_focus_tx = style->getButtonPressedFocus();
-  //_pressed_unfocus_tx = style->getButtonPressedUnfocus();
+  setTexture(style->buttonUnpressFocusBackground());
+  setUnfocusTexture(style->buttonUnpressUnfocusBackground());
+  _pressed_focus_tx = style->buttonPressFocusBackground();
+  _pressed_unfocus_tx = style->buttonPressUnfocusBackground();
 }
 
 

@@ -30,22 +30,16 @@ Application::Application(int argc, char **argv)
   (void)argc;
   (void)argv;
 
-  const ScreenInfo *s_info = _display.screenInfo(DefaultScreen(*_display));
-
   Timer::initialize();
   RenderColor::initialize();
   Property::initialize();
-  _img_ctrl = new ImageControl(s_info, True, 4, 5, 200);
-  _style_conf = new Configuration(False);
-  _style = new Style(_img_ctrl);
+  _style = new RenderStyle(DefaultScreen(*_display), ""); // XXX: get a path!
 
   loadStyle();
 }
 
 Application::~Application()
 {
-  delete _style_conf;
-  delete _img_ctrl;
   delete _style;
   RenderColor::destroy();
   Timer::destroy();
@@ -53,14 +47,9 @@ Application::~Application()
 
 void Application::loadStyle(void)
 {
-  // find the style name as a property
+  // XXX: find the style name as a property
   std::string style = "/usr/local/share/openbox/styles/artwiz";
-  _style_conf->setFile(style);
-  if (!_style_conf->load()) {
-    std::cerr << "ERROR: Unable to load style \"" << style << "\".\n";
-    ::exit(1);
-  }
-  _style->load(*_style_conf);
+  //_style->load(style);
 }
 
 void Application::run(void)

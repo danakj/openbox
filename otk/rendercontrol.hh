@@ -13,7 +13,7 @@ class ScreenInfo;
 class Surface;
 class RenderTexture;
 class Font;
-class Color;
+class RenderColor;
 class ustring;
 
 class RenderControl {
@@ -73,7 +73,8 @@ public:
 
   //! Draws a string onto a Surface
   virtual void drawString(Surface& sf, const Font& font, int x, int y,
-			  const Color& color, const ustring& string) const;
+			  const RenderColor& color,
+                          const ustring& string) const;
 
   //! Draws a background onto a Surface, as specified by a RenderTexture
   virtual void drawBackground(Surface& sf,

@@ -35,9 +35,9 @@ Widget::Widget(Widget *parent, Direction direction)
   setStyle(_style); // let the widget initialize stuff
 }
 
-Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
-                     Direction direction, Cursor cursor, int bevel_width,
-                     bool override_redirect)
+Widget::Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
+               Direction direction, Cursor cursor, int bevel_width,
+               bool override_redirect)
   : EventHandler(),
     _dirty(false),_focused(false),
     _parent(0), _style(style), _direction(direction), _cursor(cursor),
@@ -45,7 +45,7 @@ Widget::Widget(EventDispatcher *event_dispatcher, Style *style,
     _grabbed_mouse(false), _grabbed_keyboard(false),
     _stretchable_vert(false), _stretchable_horz(false), _texture(0),
     _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1),
-    _screen(style->getScreen()), _fixed_width(false), _fixed_height(false),
+    _screen(style->screen()), _fixed_width(false), _fixed_height(false),
     _surface(0),
     _event_dispatcher(event_dispatcher)
 {
@@ -444,7 +444,7 @@ void Widget::removeChild(Widget *child)
     _children.erase(it);
 }
 
-void Widget::setStyle(Style *style)
+void Widget::setStyle(RenderStyle *style)
 {
   assert(style);
   _style = style;
@@ -473,12 +473,22 @@ void Widget::exposeHandler(const XExposeEvent &e)
 void Widget::configureHandler(const XConfigureEvent &e)
 {
   EventHandler::configureHandler(e);
+
   if (_ignore_config) {
     _ignore_config--;
   } else {
-    if (!(e.width == _rect.width() && e.height == _rect.height())) {
+    int width = e.width;
+    int height = e.height;
+
+    XEvent ev;
+    while (XCheckTypedWindowEvent(**display, _window, ConfigureNotify, &ev)) {
+      width = ev.xconfigure.width;
+      height = ev.xconfigure.height;
+    }
+
+    if (!(width == _rect.width() && height == _rect.height())) {
       _dirty = true;
-      _rect.setSize(e.width, e.height);
+      _rect.setSize(width, height);
     }
     update();
   }

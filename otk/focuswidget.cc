@@ -55,7 +55,7 @@ void FocusWidget::setTexture(RenderTexture *texture)
   _focus_texture = texture;
 }
 
-void FocusWidget::setBorderColor(const Color *color)
+void FocusWidget::setBorderColor(const RenderColor *color)
 {
   Widget::setBorderColor(color);
   _focus_bcolor = color;

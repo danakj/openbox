@@ -18,16 +18,16 @@ public:
   virtual void unfocus(void);
 
   virtual void setTexture(RenderTexture *texture);
-  virtual void setBorderColor(const Color *color);
+  virtual void setBorderColor(const RenderColor *color);
 
   inline void setUnfocusTexture(RenderTexture *texture)
   { _unfocus_texture = texture; }
   inline RenderTexture *getUnfocusTexture(void) const
   { return _unfocus_texture; }
 
-  inline void setUnfocusBorderColor(const Color *color)
+  inline void setUnfocusBorderColor(const RenderColor *color)
   { _unfocus_bcolor = color; }
-  inline const Color *getUnfocusBorderColor(void) const
+  inline const RenderColor *getUnfocusBorderColor(void) const
   { return _unfocus_bcolor; }
 
   inline bool isFocused(void) const { return _focused; }
@@ -38,8 +38,8 @@ private:
   RenderTexture *_unfocus_texture;
   RenderTexture *_focus_texture;
 
-  const Color *_unfocus_bcolor;
-  const Color *_focus_bcolor;
+  const RenderColor *_unfocus_bcolor;
+  const RenderColor *_focus_bcolor;
 };
 
 }

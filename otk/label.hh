@@ -18,7 +18,7 @@ public:
 
   virtual void renderForeground(void);
 
-  virtual void setStyle(Style *style);
+  virtual void setStyle(RenderStyle *style);
 
 private:
   //! Text to be displayed in the label

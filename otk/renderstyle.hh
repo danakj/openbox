@@ -62,6 +62,8 @@ public:
   RenderStyle(int screen, const std::string &stylefile);
   virtual ~RenderStyle();
 
+  inline int screen() const { return _screen; }
+  
   inline RenderColor *textFocusColor() const { return _text_color_focus; }
   inline RenderColor *textUnfocusColor() const { return _text_color_unfocus; }
 
@@ -96,7 +98,7 @@ public:
     { return _button_unpress_unfocus; }
   inline RenderTexture *buttonPressFocusBackground() const
     { return _button_press_focus; }
-  inline RenderTexture *buttonPressUnfocusBackgrounf() const
+  inline RenderTexture *buttonPressUnfocusBackground() const
     { return _button_press_unfocus; }
 
   inline RenderTexture *gripdFocusBackground() const { return _grip_focus; }

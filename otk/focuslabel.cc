@@ -20,22 +20,21 @@ FocusLabel::~FocusLabel()
 }
 
 
-void FocusLabel::setStyle(Style *style)
+void FocusLabel::setStyle(RenderStyle *style)
 {
   FocusWidget::setStyle(style);
 
-  // XXX: do this again
-  //setTexture(style->getLabelFocus());
-  //setUnfocusTexture(style->getLabelUnfocus());
+  setTexture(style->labelFocusBackground());
+  setUnfocusTexture(style->labelUnfocusBackground());
 }
 
 
 void FocusLabel::renderForeground(void)
 {
-  const Font *ft = style()->getFont();
-  Color *text_color = (isFocused() ? style()->getTextFocus()
-                       : style()->getTextUnfocus());
-  unsigned int sidemargin = style()->getBevelWidth() * 2;
+  const Font *ft = style()->labelFont();
+  RenderColor *text_color = (isFocused() ? style()->textFocusColor()
+                             : style()->textUnfocusColor());
+  unsigned int sidemargin = style()->bevelWidth() * 2;
 
   ustring t = _text; // the actual text to draw
   int x = sidemargin;    // x coord for the text
@@ -54,14 +53,14 @@ void FocusLabel::renderForeground(void)
     } while (length > max_length && text_len-- > 0);
 
     // justify the text
-    switch (style()->textJustify()) {
-    case Style::RightJustify:
+    switch (style()->labelTextJustify()) {
+    case RenderStyle::RightJustify:
       x += max_length - length;
       break;
-    case Style::CenterJustify:
+    case RenderStyle::CenterJustify:
       x += (max_length - length) / 2;
       break;
-    case Style::LeftJustify:
+    case RenderStyle::LeftJustify:
       break;
     }
   }

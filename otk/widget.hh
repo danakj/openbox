@@ -5,7 +5,7 @@
 #include "rect.hh"
 #include "point.hh"
 #include "rendertexture.hh"
-#include "style.hh"
+#include "renderstyle.hh"
 #include "eventdispatcher.hh"
 #include "display.hh"
 #include "surface.hh"
@@ -28,7 +28,7 @@ public:
   typedef std::list<Widget *> WidgetList;
 
   Widget(Widget *parent, Direction = Horizontal);
-  Widget(EventDispatcher *event_dispatcher, Style *style,
+  Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
          Direction direction = Horizontal, Cursor cursor = 0,
          int bevel_width = 1, bool override_redirect = false);
 
@@ -81,8 +81,8 @@ public:
   virtual void setTexture(RenderTexture *texture)
     { _texture = texture; _dirty = true; }
 
-  inline const Color *borderColor(void) const { return _bcolor; }
-  virtual void setBorderColor(const Color *color) {
+  inline const RenderColor *borderColor(void) const { return _bcolor; }
+  virtual void setBorderColor(const RenderColor *color) {
     assert(color); _bcolor = color;
     XSetWindowBorder(**display, _window, color->pixel());
   }
@@ -115,8 +115,8 @@ public:
   inline Direction direction(void) const { return _direction; }
   void setDirection(Direction dir) { _direction = dir; }
 
-  inline Style *style(void) const { return _style; }
-  virtual void setStyle(Style *style);
+  inline RenderStyle *style(void) const { return _style; }
+  virtual void setStyle(RenderStyle *style);
 
   inline EventDispatcher *eventDispatcher(void)
     { return _event_dispatcher; }
@@ -140,7 +140,7 @@ protected:
   Widget *_parent;
   WidgetList _children;
 
-  Style *_style;
+  RenderStyle *_style;
   Direction _direction;
   Cursor _cursor;
   int _bevel_width;
@@ -158,7 +158,7 @@ protected:
   Pixmap _bg_pixmap;
   unsigned int _bg_pixel;
 
-  const Color *_bcolor;
+  const RenderColor *_bcolor;
   unsigned int _bwidth;
 
   Rect _rect;

@@ -346,7 +346,11 @@ void client_manage(Window window)
         client_find_onscreen(self, &x, &y,
                              self->frame->area.width,
                              self->frame->area.height,
-                             client_normal(self));
+                             /* non-normal clients has less rules, and
+                                windows that are being restored from a session
+                                do also. we can assume you want it back where
+                                you saved it */
+                             client_normal(self) && !self->session);
 
         if (x != ox || y != oy)
             client_move(self, x, y);

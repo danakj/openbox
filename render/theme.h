@@ -21,6 +21,7 @@ struct _RrTheme {
     gint cbwidth;
     gint label_height;
     gint title_height;
+    gint menu_title_height;
     gint button_size;
     gint grip_width;
     gint menu_overlap;
@@ -47,13 +48,13 @@ struct _RrTheme {
     RrColor *menu_selected_color;
 
     /* style settings - fonts */
-    gint winfont_height;
-    RrFont *winfont_focused;
-    RrFont *winfont_unfocused;
-    gint mtitlefont_height;
-    RrFont *mtitlefont;
-    gint mfont_height;
-    RrFont *mfont;
+    gint win_font_height;
+    RrFont *win_font_focused;
+    RrFont *win_font_unfocused;
+    gint menu_title_font_height;
+    RrFont *menu_title_font;
+    gint menu_font_height;
+    RrFont *menu_font;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* 48x48 RGBA */

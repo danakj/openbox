@@ -401,7 +401,7 @@ static void menu_frame_render(ObMenuFrame *self)
         tw = MIN(tw, MAX_MENU_WIDTH) + ob_rr_theme->padding * 2;
         w = MAX(w, tw);
 
-        th = ob_rr_theme->mtitlefont_height + ob_rr_theme->padding * 2;
+        th = ob_rr_theme->menu_title_height;
         h += (self->title_h = th + ob_rr_theme->bwidth);
 
         XSetWindowBorderWidth(ob_display, self->title, ob_rr_theme->bwidth);

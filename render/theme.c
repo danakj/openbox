@@ -101,21 +101,21 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_string(db, "window.active.label.text.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
 
-    if (!(theme->winfont_focused = RrFontOpen(inst, font_str))) {
+    if (!(theme->win_font_focused = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->winfont_height = RrFontHeight(theme->winfont_focused);
+    theme->win_font_height = RrFontHeight(theme->win_font_focused);
 
     if (!read_string(db, "window.inactive.label.text.font", &font_str))
         /* font_str will already be set to the last one */;
 
-    if (!(theme->winfont_unfocused = RrFontOpen(inst, font_str))) {
+    if (!(theme->win_font_unfocused = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->winfont_height = MAX(theme->winfont_height,
-                                RrFontHeight(theme->winfont_unfocused));
+    theme->win_font_height = MAX(theme->win_font_height,
+                                RrFontHeight(theme->win_font_unfocused));
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.label.text.justify", &str)) {
@@ -128,11 +128,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_string(db, "menu.title.text.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=12:shadow=y";
 
-    if (!(theme->mtitlefont = RrFontOpen(inst, font_str))) {
+    if (!(theme->menu_title_font = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->mtitlefont_height = RrFontHeight(theme->mtitlefont);
+    theme->menu_title_font_height = RrFontHeight(theme->menu_title_font);
 
     mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.text.justify", &str)) {
@@ -145,11 +145,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     if (!read_string(db, "menu.items.font", &font_str))
         font_str = "arial,sans:bold:pixelsize=11:shadow=y";
 
-    if (!(theme->mfont = RrFontOpen(inst, font_str))) {
+    if (!(theme->menu_font = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);
         return NULL;
     }
-    theme->mfont_height = RrFontHeight(theme->mfont);
+    theme->menu_font_height = RrFontHeight(theme->menu_font);
 
     /* load direct dimensions */
     if (!read_int(db, "menu.overlap", &theme->menu_overlap) ||
@@ -672,7 +672,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->app_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
     theme->a_focused_label->texture[0].data.text.font =
         theme->app_hilite_label->texture[0].data.text.font =
-        theme->winfont_focused;
+        theme->win_font_focused;
     theme->a_focused_label->texture[0].data.text.color =
         theme->app_hilite_label->texture[0].data.text.color =
         theme->title_focused_color;
@@ -684,14 +684,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RR_JUSTIFY_LEFT;
     theme->a_unfocused_label->texture[0].data.text.font =
         theme->app_unhilite_label->texture[0].data.text.font =
-        theme->winfont_unfocused;
+        theme->win_font_unfocused;
     theme->a_unfocused_label->texture[0].data.text.color =
         theme->app_unhilite_label->texture[0].data.text.color =
         theme->title_unfocused_color;
 
     theme->a_menu_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_title->texture[0].data.text.justify = mtitlejust;
-    theme->a_menu_title->texture[0].data.text.font = theme->mtitlefont;
+    theme->a_menu_title->texture[0].data.text.font = theme->menu_title_font;
     theme->a_menu_title->texture[0].data.text.color = theme->menu_title_color;
 
     theme->a_menu_text_normal->texture[0].type =
@@ -703,7 +703,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         RR_JUSTIFY_LEFT;
     theme->a_menu_text_normal->texture[0].data.text.font =
         theme->a_menu_text_disabled->texture[0].data.text.font =
-        theme->a_menu_text_selected->texture[0].data.text.font = theme->mfont;
+        theme->a_menu_text_selected->texture[0].data.text.font =
+        theme->menu_font;
     theme->a_menu_text_normal->texture[0].data.text.color = theme->menu_color;
     theme->a_menu_text_disabled->texture[0].data.text.color =
         theme->menu_disabled_color;
@@ -895,13 +896,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     XrmDestroyDatabase(db);
 
     {
-        gint fl, ft, fr, fb;
-        gint ul, ut, ur, ub;
+        gint ft, fb, fl, fr, ut, ub, ul, ur;
 
         RrMargins(theme->a_focused_label, &fl, &ft, &fr, &fb);
         RrMargins(theme->a_unfocused_label, &ul, &ut, &ur, &ub);
-        theme->label_height = theme->winfont_height
-            + MAX(ft + fb, ut + ub);
+        theme->label_height = theme->win_font_height + MAX(ft + fb, ut + ub);
 
         /* this would be nice I think, since padding.width can now be 0,
            but it breaks frame.c horribly and I don't feel like fixing that
@@ -915,6 +914,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                 MAX(theme->padding * 2, ut + ub));
         */
         theme->title_height = theme->label_height + theme->padding * 2;
+        /* this should match the above title_height given the same font size
+           for both. */
+        theme->menu_title_height = theme->menu_title_font_height +
+            theme->padding * 2;
     }
     theme->button_size = theme->label_height - 2;
     theme->grip_width = theme->title_height * 1.5;
@@ -975,10 +978,10 @@ void RrThemeFree(RrTheme *theme)
         RrPixmapMaskFree(theme->close_pressed_mask);
         RrPixmapMaskFree(theme->menu_bullet_mask);
 
-        RrFontClose(theme->winfont_focused); 
-        RrFontClose(theme->winfont_unfocused);
-        RrFontClose(theme->mtitlefont);
-        RrFontClose(theme->mfont);
+        RrFontClose(theme->win_font_focused); 
+        RrFontClose(theme->win_font_unfocused);
+        RrFontClose(theme->menu_title_font);
+        RrFontClose(theme->menu_font);
 
         RrAppearanceFree(theme->a_disabled_focused_max);
         RrAppearanceFree(theme->a_disabled_unfocused_max);

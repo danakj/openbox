@@ -18,7 +18,6 @@ class ScreenInfo;
 class Surface {
   int _screen;
   Point _size;
-  XImage *_im;
   Pixmap _pm;
   XftDraw *_xftdraw;
 

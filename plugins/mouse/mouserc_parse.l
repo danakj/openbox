@@ -37,16 +37,18 @@ white [ \t]*
 
 static void gotfield()
 {
-    if (context == NULL)
-        context = g_strdup(mparsetext);
-    else if (event == NULL)
-        event = g_strdup(mparsetext);
-    else if (button == NULL)
-        button = g_strdup(mparsetext);
-    else if (action == NULL)
-        action = g_strdup(mparsetext);
-    else
-        error = TRUE;
+    if (!comment) {
+        if (context == NULL)
+            context = g_strdup(mparsetext);
+        else if (event == NULL)
+            event = g_strdup(mparsetext);
+        else if (button == NULL)
+            button = g_strdup(mparsetext);
+        else if (action == NULL)
+            action = g_strdup(mparsetext);
+        else
+            error = TRUE;
+    }
 }
 
 static void endofline()

@@ -86,10 +86,14 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 
         GSList *acts = NULL;
         ObAction* act;
+        ObMenuEntry *e;
+
         act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
         act->data.desktop.desk = d->desktop;
         acts = g_slist_append(acts, act);
-        menu_add_normal(menu, 0, _("Go there..."), acts);
+        e = menu_add_normal(menu, 0, _("Go there..."), acts);
+        if (d->desktop == screen_desktop)
+            e->data.normal.enabled = FALSE;
     }
 }
 

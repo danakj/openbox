@@ -17,4 +17,7 @@ distclean: clean
 	$(RM) configure Makefile.incl
 	$(RM) -r .deps/
 
-.PHONY: all clean distclean install uninstall
+love:
+	@echo "<moan>"
+
+.PHONY: all clean distclean install uninstall love

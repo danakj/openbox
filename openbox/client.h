@@ -273,6 +273,16 @@ gboolean client_normal(ObClient *self);
 /* Returns if the window is focused */
 gboolean client_focused(ObClient *self);
 
+#define client_move(self, x, y) \
+  client_configure(self, OB_CORNER_TOPLEFT, x, y, \
+                   self->area.width, self->area.height, \
+                   TRUE, TRUE)
+#define client_resize(self, w, h) \
+  client_configure(self, OB_CORNER_TOPLEFT, self->area.x, self->area.y, \
+                   w, h, TRUE, TRUE)
+#define client_move_resize(self, x, y, w, h) \
+  client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE)
+
 #define client_configure(self, anchor, x, y, w, h, user, final) \
   client_configure_full(self, anchor, x, y, w, h, user, final, FALSE)
 

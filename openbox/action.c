@@ -700,6 +700,11 @@ ActionString actionstrings[] =
         setup_action_growtoedge_east
     },
     {
+        "vibrate",
+        action_vibrate,
+        NULL
+    },
+    {
         NULL,
         NULL,
         NULL
@@ -917,38 +922,31 @@ void action_move_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     if (c)
-        client_configure(c, OB_CORNER_TOPLEFT,
-                         c->area.x + data->relative.delta, c->area.y,
-                         c->area.width, c->area.height, TRUE, TRUE);
+        client_move(c, c->area.x + data->relative.delta, c->area.y);
 }
 
 void action_move_relative_vert(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     if (c)
-        client_configure(c, OB_CORNER_TOPLEFT,
-                         c->area.x, c->area.y + data->relative.delta,
-                         c->area.width, c->area.height, TRUE, TRUE);
+        client_move(c, c->area.x, c->area.y + data->relative.delta);
 }
 
 void action_resize_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     if (c)
-        client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
-                         c->area.width +
-                         data->relative.delta * c->size_inc.width,
-                         c->area.height, TRUE, TRUE);
+        client_resize(c,
+                      c->area.width + data->relative.delta * c->size_inc.width,
+                      c->area.height);
 }
 
 void action_resize_relative_vert(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
     if (c && !c->shaded)
-        client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
-                         c->area.width, c->area.height +
-                         data->relative.delta * c->size_inc.height,
-                         TRUE, TRUE);
+        client_resize(c, c->area.width, c->area.height +
+                      data->relative.delta * c->size_inc.height);
 }
 
 void action_maximize_full(union ActionData *data)
@@ -1147,8 +1145,7 @@ void action_movetoedge(union ActionData *data)
         g_assert_not_reached();
     }
     frame_frame_gravity(c->frame, &x, &y);
-    client_configure(c, OB_CORNER_TOPLEFT,
-                     x, y, c->area.width, c->area.height, TRUE, TRUE);
+    client_move(c, x, y);
 
 }
 
@@ -1211,7 +1208,7 @@ void action_growtoedge(union ActionData *data)
     frame_frame_gravity(c->frame, &x, &y);
     width -= c->frame->size.left + c->frame->size.right;
     height -= c->frame->size.top + c->frame->size.bottom;
-    client_configure(c, OB_CORNER_TOPLEFT, x, y, width, height, TRUE, TRUE);
+    client_move(c, x, y);
 }
 
 void action_send_to_layer(union ActionData *data)
@@ -1245,4 +1242,29 @@ void action_show_desktop(union ActionData *data)
 void action_unshow_desktop(union ActionData *data)
 {
     screen_show_desktop(FALSE);
+}
+
+void action_vibrate(union ActionData *data)
+{
+    ObClient *c = data->client.any.c;
+    gint x, y, thr, length, i;
+
+    if (!c) return;
+
+    x = c->frame->area.x;
+    y = c->frame->area.y;
+    thr = 120;
+    length = y + thr;
+    for (i = 0; i < 5; ++i) {
+        while (y < length) {
+            client_move(c, x, y);
+            y += 4;
+            x -= 1;
+        }
+        while (y >= length - thr) {
+            client_move(c, x, y);
+            y -= 4;
+            x += 1;
+        }
+    }
 }

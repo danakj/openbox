@@ -244,5 +244,7 @@ void action_toggle_show_desktop(union ActionData *data);
 void action_show_desktop(union ActionData *data);
 /* Any */
 void action_unshow_desktop(union ActionData *data);
+/* Client */
+void action_vibrate(union ActionData *data);
 
 #endif

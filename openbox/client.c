@@ -49,6 +49,7 @@ static void client_change_state(ObClient *self);
 static void client_apply_startup_state(ObClient *self);
 static void client_restore_session_state(ObClient *self);
 static void client_restore_session_stacking(ObClient *self);
+static void client_act_urgent(ObClient *self);
 
 void client_startup()
 {
@@ -330,9 +331,7 @@ void client_manage(Window window)
                              client_normal(self));
 
         if (x != ox || y != oy)
-            client_configure(self, OB_CORNER_TOPLEFT, x, y,
-                             self->area.width, self->area.height,
-                             TRUE, TRUE);
+            client_move(self, x, y);
     }
 
     client_showhide(self);
@@ -483,6 +482,18 @@ void client_unmanage(ObClient *self)
     client_set_list();
 }
 
+static void client_act_urgent(ObClient *self)
+{
+    GSList *it;
+
+    for (it = config_urgent_actions; it; it = g_slist_next(it)) {
+        ObAction *a = it->data;
+
+        a->data.any.c = self;
+        a->func(&a->data);
+    }
+}
+
 static void client_restore_session_state(ObClient *self)
 {
     GList *it;
@@ -543,9 +554,7 @@ void client_move_onscreen(ObClient *self, gboolean rude)
     if (client_find_onscreen(self, &x, &y,
                              self->frame->area.width,
                              self->frame->area.height, rude)) {
-        client_configure(self, OB_CORNER_TOPLEFT, x, y,
-                         self->area.width, self->area.height,
-                         TRUE, TRUE);
+        client_move(self, x, y);
     }
 }
 
@@ -1296,9 +1305,8 @@ void client_update_wmhints(ObClient *self)
                  ur ? "ON" : "OFF");
 	/* fire the urgent callback if we're mapped, otherwise, wait until
 	   after we're mapped */
-	if (self->frame) {
-            /* XXX do shit */
-        }
+	if (self->frame && self->urgent)
+            client_act_urgent(self);
     }
 }
 
@@ -1722,7 +1730,7 @@ static void client_apply_startup_state(ObClient *self)
 	client_shade(self, TRUE);
     }
     if (self->urgent)
-        /* XXX do shit */;
+        client_act_urgent(self);
   
     if (self->max_vert && self->max_horz) {
 	self->max_vert = self->max_horz = FALSE;
@@ -2021,7 +2029,7 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
 
     client_setup_decor_and_functions(self);
 
-    client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE);
+    client_move_resize(self, x, y, w, h);
 
     /* try focus us when we go into fullscreen mode */
     client_focus(self);
@@ -2197,7 +2205,7 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
 
     /* figure out where the client should be going */
     frame_frame_gravity(self->frame, &x, &y);
-    client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE);
+    client_move_resize(self, x, y, w, h);
 }
 
 void client_shade(ObClient *self, gboolean shade)

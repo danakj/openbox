@@ -7,6 +7,7 @@
 #include "openbox.h"
 #include "resist.h"
 #include "popup.h"
+#include "moveresize.h"
 #include "config.h"
 #include "render/render.h"
 #include "render/theme.h"
@@ -143,10 +144,9 @@ void moveresize_end(gboolean cancel)
     popup_hide(popup);
 
     if (moving) {
-        client_configure(moveresize_client, OB_CORNER_TOPLEFT,
-                         (cancel ? start_cx : cur_x),
-                         (cancel ? start_cy : cur_y),
-                         start_cw, start_ch, TRUE, TRUE);
+        client_move(moveresize_client,
+                    (cancel ? start_cx : cur_x),
+                    (cancel ? start_cy : cur_y));
     } else {
         client_configure(moveresize_client, lockcorner,
                          moveresize_client->area.x,
@@ -168,8 +168,7 @@ static void do_move(gboolean resist)
 
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
-    client_configure(moveresize_client, OB_CORNER_TOPLEFT, cur_x, cur_y,
-                     start_cw, start_ch, TRUE, FALSE);
+    client_move(moveresize_client, cur_x, cur_y);
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

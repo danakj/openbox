@@ -7,13 +7,13 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 
-static XrmDatabase loaddb(char *theme);
+static XrmDatabase loaddb(RrTheme *theme, char *name);
 static gboolean read_int(XrmDatabase db, char *rname, int *value);
 static gboolean read_string(XrmDatabase db, char *rname, char **value);
 static gboolean read_color(XrmDatabase db, const RrInstance *inst,
                            gchar *rname, RrColor **value);
-static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
-                          gchar *rname, gchar *theme,
+static gboolean read_mask(const RrInstance *inst,
+                          gchar *maskname, RrTheme *theme,
                           RrPixmapMask **value);
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 gchar *rname, RrAppearance *value);
@@ -91,20 +91,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->app_icon = RrAppearanceNew(inst, 1);
 
     if (name) {
-	db = loaddb(name);
+	db = loaddb(theme, name);
         if (db == NULL) {
 	    g_warning("Failed to load the theme '%s'", name);
 	    g_message("Falling back to the default: '%s'", DEFAULT_THEME);
 	} else
-            theme->name = g_strdup(name);
+            theme->name = g_path_get_basename(name);
     }
     if (db == NULL) {
-	db = loaddb(DEFAULT_THEME);
+	db = loaddb(theme, DEFAULT_THEME);
 	if (db == NULL) {
 	    g_warning("Failed to load the theme '%s'.", DEFAULT_THEME);
 	    return NULL;
 	} else
-            theme->name = g_strdup(DEFAULT_THEME);
+            theme->name = g_path_get_basename(DEFAULT_THEME);
     }
 
     /* load the font stuff */
@@ -215,11 +215,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "menu.hilite.textColor", &theme->menu_hilite_color))
         theme->menu_hilite_color = RrColorNew(inst, 0, 0, 0);
 
-    if (read_mask(db, inst,
-                  "window.button.max.mask", name, &theme->max_unset_mask)){
-        if (!read_mask(db, inst,
-                       "window.button.max.toggled.mask", name,
-                       &theme->max_set_mask)) {
+    if (read_mask(inst, "max.xbm", theme, &theme->max_unset_mask)){
+        if (!read_mask(inst, "max_t.xbm", theme, &theme->max_set_mask)) {
             theme->max_set_mask = RrPixmapMaskCopy(theme->max_unset_mask);
         }
     } else {
@@ -233,18 +230,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     }
 
-    if (!read_mask(db, inst,
-                   "window.button.icon.mask", name,
-                   &theme->iconify_mask)) {
+    if (!read_mask(inst, "iconify.xbm", theme, &theme->iconify_mask)) {
         char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
         theme->iconify_mask = RrPixmapMaskNew(inst, 7, 7, data);
     }
 
-    if (read_mask(db, inst,
-                  "window.button.stick.mask", name,
-                   &theme->desk_unset_mask)) {
-        if (!read_mask(db, inst, "window.button.stick.toggled.mask", name,
-                       &theme->desk_set_mask)) {
+    if (read_mask(inst, "stick.xbm", theme, &theme->desk_unset_mask)) {
+        if (!read_mask(inst, "stick_t.xbm", theme, &theme->desk_set_mask)) {
             theme->desk_set_mask =
                 RrPixmapMaskCopy(theme->desk_unset_mask);
         }
@@ -259,10 +251,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     }
 
-    if (read_mask(db, inst, "window.button.shade.mask", name,
-                   &theme->shade_unset_mask)) {
-        if (!read_mask(db, inst, "window.button.shade.toggled.mask", name,
-                       &theme->shade_set_mask)) {
+    if (read_mask(inst, "shade.xbm", theme, &theme->shade_unset_mask)) {
+        if (!read_mask(inst, "shade_t.xbm", theme, &theme->shade_set_mask)) {
             theme->shade_set_mask =
                 RrPixmapMaskCopy(theme->shade_unset_mask);
         }
@@ -277,8 +267,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         }
     }
 
-    if (!read_mask(db, inst, "window.button.close.mask", name,
-                   &theme->close_mask)) {
+    if (!read_mask(inst, "close.xbm", theme, &theme->close_mask)) {
         char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
         theme->close_mask = RrPixmapMaskNew(inst, 7, 7, data);
     }        
@@ -623,22 +612,26 @@ void RrThemeFree(RrTheme *theme)
     }
 }
 
-static XrmDatabase loaddb(char *theme)
+static XrmDatabase loaddb(RrTheme *theme, char *name)
 {
     XrmDatabase db;
 
-    db = XrmGetFileDatabase(theme);
+    if ((db = XrmGetFileDatabase(name)))
+        theme->path = g_path_get_dirname(name);
     if (db == NULL) {
 	char *s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-				   theme, NULL);
-	db = XrmGetFileDatabase(s);
+				   name, NULL);
+	if ((db = XrmGetFileDatabase(s)))
+            theme->path = g_path_get_dirname(s);
 	g_free(s);
     }
     if (db == NULL) {
-	char *s = g_build_filename(THEMEDIR, theme, NULL);
-	db = XrmGetFileDatabase(s);
-	g_free(s);
+	char *s = g_build_filename(THEMEDIR, name, NULL);
+	if ((db = XrmGetFileDatabase(s)))
+            theme->path = g_path_get_dirname(s);
+        g_free(s);
     }
+
     return db;
 }
 
@@ -713,62 +706,44 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
     return ret;
 }
 
-static gboolean read_mask(XrmDatabase db, const RrInstance *inst,
-                          gchar *rname, gchar *theme,
+static gboolean read_mask(const RrInstance *inst,
+                          gchar *maskname, RrTheme *theme,
                           RrPixmapMask **value)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname);
-    char *rettype;
     char *s;
     char *data_dir;
-    XrmValue retvalue;
     int hx, hy; /* ignored */
     unsigned int w, h;
     unsigned char *b;
-  
-    if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
-        retvalue.addr != NULL) {
 
-	data_dir = g_strdup_printf("%s_data", theme);
+    data_dir = g_strdup_printf("%s_data", theme->name);
 
-        s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
-                             data_dir, retvalue.addr, NULL);
-
-        if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
+    s = g_build_filename(g_get_home_dir(), ".openbox", "themes",
+                         data_dir, maskname, NULL);
+    if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess)
+        ret = TRUE;
+    else {
+        g_free(s);
+        s = g_build_filename(THEMEDIR, data_dir, maskname, NULL);
+        if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
             ret = TRUE;
         else {
             g_free(s);
-            s = g_build_filename(THEMEDIR, data_dir, retvalue.addr, NULL);
-	
+            s = g_build_filename(theme->path, data_dir, maskname, NULL);
             if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) == BitmapSuccess) 
                 ret = TRUE;
-            else {
-                char *themename;
-
-                g_free(s);
-                themename = g_path_get_basename(theme);
-                s = g_strdup_printf("%s/%s_data/%s", theme,
-                                    themename, retvalue.addr);
-                g_free(themename);
-                if (XReadBitmapFileData(s, &w, &h, &b, &hx, &hy) ==
-                    BitmapSuccess) 
-                    ret = TRUE;
-                else
-                    g_message("Unable to find bitmap '%s'", retvalue.addr);
-            }
         }
-
-        if (ret) {
-            *value = RrPixmapMaskNew(inst, w, h, (char*)b);
-            XFree(b);
-        }
-      
-        g_free(s);
-        g_free(data_dir);
     }
 
-    g_free(rclass);
+    if (ret) {
+        *value = RrPixmapMaskNew(inst, w, h, (char*)b);
+        XFree(b);
+    }
+      
+    g_free(s);
+    g_free(data_dir);
+
     return ret;
 }
 

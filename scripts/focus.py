@@ -121,8 +121,9 @@ def _do_stacked_cycle(data, forward):
     desktop = ob.openbox.screen(data.screen).desktop()
     for w in clients:
         client = ob.openbox.findClient(w)
-        if client and (client.desktop() == desktop and \
-                       client.normal() and client.focus()):
+        if client and (client.desktop() == desktop or
+                       client.desktop() == 0xffffffff) \
+                       and client.normal() and client.focus():
             if stacked_cycle_raise:
                 ob.openbox.screen(data.screen).raiseWindow(client)
             return

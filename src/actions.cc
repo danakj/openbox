@@ -13,7 +13,7 @@ namespace ob {
 const unsigned int OBActions::DOUBLECLICKDELAY = 300;
 
 OBActions::OBActions()
-  : _button(0), _enter_win(0)
+  : _button(0)
 {
 
   // XXX: load a configuration out of somewhere
@@ -28,6 +28,8 @@ OBActions::~OBActions()
 
 void OBActions::buttonPressHandler(const XButtonEvent &e)
 {
+  OtkEventHandler::buttonPressHandler(e);
+  
   // XXX: run the PRESS guile hook
   printf("GUILE: PRESS: win %lx modifiers %u button %u time %lx\n",
          (long)e.window, e.state, e.button, e.time);
@@ -40,6 +42,8 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 
 void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 {
+  OtkEventHandler::buttonReleaseHandler(e);
+  
   // XXX: run the RELEASE guile hook
   printf("GUILE: RELEASE: win %lx modifiers %u button %u time %lx\n",
          (long)e.window, e.state, e.button, e.time);
@@ -82,24 +86,21 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 }
 
 
-void OBActions::enter(Window win, unsigned int modifiers)
+void OBActions::enterHandler(const XCrossingEvent &e)
 {
-  _enter_win = win;
-
-  (void)modifiers;
+  OtkEventHandler::enterHandler(e);
+  
   // XXX: run the ENTER guile hook
-  printf("GUILE: ENTER: win %lx modifiers %u\n", (long)win, modifiers);
-
+  printf("GUILE: ENTER: win %lx modifiers %u\n", (long)e.window, e.state);
 }
 
 
-void OBActions::leave(unsigned int modifiers)
+void OBActions::leaveHandler(const XCrossingEvent &e)
 {
-  (void)modifiers;
-  // XXX: run the LEAVE guile hook
-  printf("GUILE: LEAVE: win %lx modifiers %u\n", (long)_enter_win, modifiers);
+  OtkEventHandler::leaveHandler(e);
 
-  _enter_win = 0;
+  // XXX: run the LEAVE guile hook
+  printf("GUILE: LEAVE: win %lx modifiers %u\n", (long)e.window, e.state);
 }
 
 

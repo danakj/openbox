@@ -35,8 +35,6 @@ private:
   MouseButtonAction _release;
   //! The mouse button currently being watched from a press for a CLICK
   unsigned int _button;
-  //! The window the last enter action occured on (where the mouse is located)
-  Window _enter_win;
 
   void insertPress(Window win, unsigned int button, Time time);
   
@@ -47,21 +45,8 @@ public:
   virtual void buttonPressHandler(const XButtonEvent &e);
   virtual void buttonReleaseHandler(const XButtonEvent &e);
   
-
-
-
-  //! Notify that a mouse enter action has occured on a window.
-  /*!
-    @param win The window on which the action was performed.
-    @param modifiers The modifier state for the action.
-  */
-  void enter(Window win, unsigned int modifiers);
-
-  //! Notify that a mouse leave action has occured on a window.
-  /*!
-    @param modifiers The modifier state for the action.
-  */
-  void leave(unsigned int modifiers);
+  virtual void enterHandler(const XCrossingEvent &e);
+  virtual void leaveHandler(const XCrossingEvent &e);
 
   //! Notify that a mouse drag is taking place.
   /*!

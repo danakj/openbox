@@ -19,6 +19,7 @@ static PyObject *shit(PyObject *self, PyObject *args)
 
   printf("SHIT CALLED!@!\n");
 
+  Py_INCREF(Py_None);
   return Py_None;
 }
   
@@ -36,7 +37,7 @@ static PyMethodDef OBMethods[] = {
 
 void initopenbox()
 {
-  PyClient_Type.ob_type = &PyType_Type;
+  OBClient_Type.ob_type = &PyType_Type;
   
   Py_InitModule("openbox", OBMethods);
 }

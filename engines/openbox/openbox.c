@@ -430,6 +430,14 @@ void frame_adjust_area(ObFrame *self)
   
     /* position/size and map/unmap all the windows */
 
+    /* they all default off, they're turned on in layout_title */
+    self->icon_x = -1;
+    self->desk_x = -1;
+    self->icon_x = -1;
+    self->label_x = -1;
+    self->max_x = -1;
+    self->close_x = -1;
+    
     if (self->frame.client->decorations & Decor_Titlebar) {
 	XMoveResizeWindow(ob_display, self->title,
 			  -self->bwidth, -self->bwidth,
@@ -584,18 +592,18 @@ void frame_release_client(ObFrame *self, Client *client)
     }
 
     /* remove all the windows for the frame from the client_map */
-    g_hash_table_remove(client_map, (gpointer)self->frame.window);
-    g_hash_table_remove(client_map, (gpointer)self->frame.plate);
-    g_hash_table_remove(client_map, (gpointer)self->title);
-    g_hash_table_remove(client_map, (gpointer)self->label);
-    g_hash_table_remove(client_map, (gpointer)self->max);
-    g_hash_table_remove(client_map, (gpointer)self->close);
-    g_hash_table_remove(client_map, (gpointer)self->desk);
-    g_hash_table_remove(client_map, (gpointer)self->icon);
-    g_hash_table_remove(client_map, (gpointer)self->iconify);
-    g_hash_table_remove(client_map, (gpointer)self->handle);
-    g_hash_table_remove(client_map, (gpointer)self->lgrip);
-    g_hash_table_remove(client_map, (gpointer)self->rgrip);
+    g_hash_table_remove(client_map, &self->frame.window);
+    g_hash_table_remove(client_map, &self->frame.plate);
+    g_hash_table_remove(client_map, &self->title);
+    g_hash_table_remove(client_map, &self->label);
+    g_hash_table_remove(client_map, &self->max);
+    g_hash_table_remove(client_map, &self->close);
+    g_hash_table_remove(client_map, &self->desk);
+    g_hash_table_remove(client_map, &self->icon);
+    g_hash_table_remove(client_map, &self->iconify);
+    g_hash_table_remove(client_map, &self->handle);
+    g_hash_table_remove(client_map, &self->lgrip);
+    g_hash_table_remove(client_map, &self->rgrip);
 
     frame_free(self);
 }
@@ -653,35 +661,12 @@ static void layout_title(ObFrame *self)
     XResizeWindow(ob_display, self->label, self->label_width,
                   LABEL_HEIGHT);
   
-    if (!n) {
-	self->frame.client->decorations &= ~Decor_Icon;
-	XUnmapWindow(ob_display, self->icon);
-	self->icon_x = -1;
-    }
-    if (!d) {
-	self->frame.client->decorations &= ~Decor_AllDesktops;
-	XUnmapWindow(ob_display, self->desk);
-	self->desk_x = -1;
-    }
-    if (!i) {
-	self->frame.client->decorations &= ~Decor_Iconify;
-	XUnmapWindow(ob_display, self->iconify);
-	self->icon_x = -1;
-    }
-    if (!l) {
-	XUnmapWindow(ob_display, self->label);
-	self->label_x = -1;
-    }
-    if (!m) {
-	self->frame.client->decorations &= ~Decor_Maximize;
-	XUnmapWindow(ob_display, self->max);
-	self->max_x = -1;
-    }
-    if (!c) {
-	self->frame.client->decorations &= ~Decor_Close;
-	XUnmapWindow(ob_display, self->close);
-	self->close_x = -1;
-    }
+    if (!n) XUnmapWindow(ob_display, self->icon);
+    if (!d) XUnmapWindow(ob_display, self->desk);
+    if (!i) XUnmapWindow(ob_display, self->iconify);
+    if (!l) XUnmapWindow(ob_display, self->label);
+    if (!m) XUnmapWindow(ob_display, self->max);
+    if (!c) XUnmapWindow(ob_display, self->close);
 
     x = s_bevel + 1;
     for (lc = layout.string; *lc != '\0'; ++lc) {

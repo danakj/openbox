@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   otk::AppWidget foo(&app);
 
   foo.resize(600, 500);
-  foo.setTexture(app.getStyle()->titlebarFocusBackground());
+//  foo.setTexture(app.getStyle()->titlebarFocusBackground());
 //  foo.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
 
   foo.setBevelWidth(2);
@@ -36,10 +36,10 @@ int main(int argc, char **argv) {
   right.setWidth(300);
   right.setTexture(app.getStyle()->titlebarFocusBackground());
   right.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
-
   otk::Button iconb(&left);
   iconb.resize(40,20);
-  otk::FocusWidget label(&left);
+
+/*  otk::FocusWidget label(&left);
   otk::Button maxb(&left);
   otk::Button closeb(&left);
   
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
   // fixed size
   closeb.setText("fuubar");
-
+*/
   otk::FocusWidget rblef(&right);
   otk::Button rbutt1(&right);
   otk::Button rbutt2(&right);

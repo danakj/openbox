@@ -29,7 +29,7 @@ void FocusLabel::setStyle(RenderStyle *style)
 }
 
 
-void FocusLabel::renderForeground(void)
+void FocusLabel::renderForeground()
 {
   const Font *ft = style()->labelFont();
   RenderColor *text_color = (isFocused() ? style()->textFocusColor()

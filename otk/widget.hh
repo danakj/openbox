@@ -133,7 +133,7 @@ protected:
   virtual void adjustVert(void);
   virtual void internalResize(int width, int height);
   virtual void render(void);
-  virtual void renderForeground(void) {} // for overriding
+  virtual void renderForeground() {} // for overriding
 
   Window _window;
 

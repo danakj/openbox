@@ -713,8 +713,23 @@ void Screen::changeNumDesktops(long num)
   
   if (!(num > 0)) return;
 
-  // XXX: move windows on desktops that will no longer exist!
-  
+  // move windows on desktops that will no longer exist!
+  Client::List::iterator it, end = clients.end();
+  for (it = clients.begin(); it != end; ++it) {
+    int d = (*it)->desktop();
+    if (d >= num && !(d == 0xffffffff || d == Client::ICONIC_DESKTOP)) {
+      XEvent ce;
+      ce.xclient.type = ClientMessage;
+      ce.xclient.message_type = otk::Property::atoms.net_wm_desktop;
+      ce.xclient.display = **otk::display;
+      ce.xclient.window = (*it)->window();
+      ce.xclient.format = 32;
+      ce.xclient.data.l[0] = num - 1;
+      XSendEvent(**otk::display, _info->rootWindow(), False,
+                 SubstructureNotifyMask | SubstructureRedirectMask, &ce);
+    }
+  }
+
   _num_desktops = num;
   otk::Property::set(_info->rootWindow(),
                      otk::Property::atoms.net_number_of_desktops,
@@ -731,6 +746,10 @@ void Screen::changeNumDesktops(long num)
 
   // update the work area hint
   changeWorkArea();
+
+  // change our desktop if we're on one that no longer exists!
+  if (_desktop >= num)
+    changeDesktop(num - 1);
 }
 
 

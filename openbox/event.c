@@ -15,6 +15,7 @@
 #include "framerender.h"
 #include "focus.h"
 #include "moveresize.h"
+#include "group.h"
 #include "stacking.h"
 #include "extensions.h"
 #include "event.h"
@@ -41,6 +42,7 @@ static void event_handle_menu(XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
+static void event_handle_group(ObGroup *g, XEvent *e);
 
 static gboolean focus_delay_func(gpointer data);
 static void focus_delay_client_dest(gpointer data);
@@ -424,6 +426,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 static void event_process(const XEvent *ec, gpointer data)
 {
     Window window;
+    ObGroup *group = NULL;
     ObClient *client = NULL;
     ObDock *dock = NULL;
     ObDockApp *dockapp = NULL;
@@ -435,24 +438,26 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
-    if ((obwin = g_hash_table_lookup(window_map, &window))) {
-        switch (obwin->type) {
-        case Window_Dock:
-            dock = WINDOW_AS_DOCK(obwin);
-            break;
-        case Window_DockApp:
-            dockapp = WINDOW_AS_DOCKAPP(obwin);
-            break;
-        case Window_Client:
-            client = WINDOW_AS_CLIENT(obwin);
-            break;
-        case Window_Menu:
-        case Window_Internal:
-            /* not to be used for events */
-            g_assert_not_reached();
-            break;
+    if (!(e->type == PropertyNotify &&
+          (group = g_hash_table_lookup(group_map, &window))))
+        if ((obwin = g_hash_table_lookup(window_map, &window))) {
+            switch (obwin->type) {
+            case Window_Dock:
+                dock = WINDOW_AS_DOCK(obwin);
+                break;
+            case Window_DockApp:
+                dockapp = WINDOW_AS_DOCKAPP(obwin);
+                break;
+            case Window_Client:
+                client = WINDOW_AS_CLIENT(obwin);
+                break;
+            case Window_Menu:
+            case Window_Internal:
+                /* not to be used for events */
+                g_assert_not_reached();
+                break;
+            }
         }
-    }
 
     event_set_lasttime(e);
     event_hack_mods(e);
@@ -460,7 +465,9 @@ static void event_process(const XEvent *ec, gpointer data)
         return;
 
     /* deal with it in the kernel */
-    if (client)
+    if (group)
+	event_handle_group(group, e);
+    else if (client)
 	event_handle_client(client, e);
     else if (dockapp)
 	event_handle_dockapp(dockapp, e);
@@ -570,6 +577,16 @@ static void event_handle_root(XEvent *e)
         }
 #endif
     }
+}
+
+static void event_handle_group(ObGroup *group, XEvent *e)
+{
+    GSList *it;
+
+    g_assert(e->type == PropertyNotify);
+
+    for (it = group->members; it; it = g_slist_next(it))
+        event_handle_client(it->data, e);
 }
 
 static void event_handle_client(ObClient *client, XEvent *e)
@@ -1061,6 +1078,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	else if (msgtype == prop_atoms.net_wm_icon ||
                  msgtype == prop_atoms.kwm_win_icon) {
 	    client_update_icons(client);
+        }
+        else if (msgtype == prop_atoms.sm_client_id) {
+            client_update_sm_client_id(client);
         }
     default:
         ;

@@ -220,6 +220,7 @@ void Slit::setOnTop(bool b) {
   ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setAutoHide(bool b) {
@@ -227,6 +228,7 @@ void Slit::setAutoHide(bool b) {
   ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".slit.autoHide" << ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setPlacement(int p) {
@@ -246,6 +248,7 @@ void Slit::setPlacement(int p) {
   case CenterRight: default: placement = "CenterRight"; break;
   }
   config.setValue(s.str(), placement);
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::setDirection(int d) {
@@ -255,6 +258,7 @@ void Slit::setDirection(int d) {
     ends;
   config.setValue(s.str(),
                   m_direction == Horizontal ? "Horizontal" : "Vertical");
+  s.rdbuf()->freeze(0);
 }
 
 void Slit::save() {
@@ -312,6 +316,9 @@ void Slit::load() {
   rclass << rscreen.str() << "Slit.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
+  rscreen.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0);
+  rclass.rdbuf()->freeze(0);
 }
 
 void Slit::reconfigure(void) {

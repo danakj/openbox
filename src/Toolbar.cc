@@ -223,6 +223,7 @@ void Toolbar::setOnTop(bool b) {
   ostrstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop" << ends;
   config.setValue(s.str(), m_ontop ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setAutoHide(bool b) {
@@ -231,6 +232,7 @@ void Toolbar::setAutoHide(bool b) {
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide" <<
     ends;
   config.setValue(s.str(), m_autohide ? "True" : "False");
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setWidthPercent(int w) {
@@ -239,6 +241,7 @@ void Toolbar::setWidthPercent(int w) {
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.widthPercent"
     << ends;
   config.setValue(s.str(), m_width_percent);
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setPlacement(int p) {
@@ -256,6 +259,7 @@ void Toolbar::setPlacement(int p) {
   case BottomCenter: default: placement = "BottomCenter"; break;
   }
   config.setValue(s.str(), placement);
+  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::save() {
@@ -306,6 +310,9 @@ void Toolbar::load() {
   rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
+  rscreen.rdbuf()->freeze(0);
+  rname.rdbuf()->freeze(0);
+  rclass.rdbuf()->freeze(0);
 }
 
 void Toolbar::reconfigure() {

@@ -71,6 +71,9 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
 
     g_assert(!moveresize_in_progress);
 
+    if (!c->frame->visible)
+        return;
+
     moveresize_client = c;
     start_cx = c->frame->area.x;
     start_cy = c->frame->area.y;

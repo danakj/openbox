@@ -106,12 +106,21 @@ int Workspace::addWindow(OpenboxWindow *w, bool place) {
 int Workspace::removeWindow(OpenboxWindow *w) {
   if (! w) return -1;
 
-  _zorder.remove(w);
+  winVect::iterator winit = std::find(_windows.begin(), _windows.end(), w);
 
-  if (w->isFocused()) {
+  if (winit == _windows.end()) {
     if (w == _last)
       _last = (OpenboxWindow *) 0;
+    if (w == _focused)
+      _focused = (OpenboxWindow *) 0;
+    return _windows.size();
+  }
+  
+  _zorder.remove(w);
 
+  if (w == _last)
+    _last = (OpenboxWindow *) 0;
+  if (w == _focused) {
     OpenboxWindow *fw = (OpenboxWindow *) 0;
     if (w->isTransient() && w->getTransientFor() &&
         w->getTransientFor()->isVisible())
@@ -124,8 +133,8 @@ int Workspace::removeWindow(OpenboxWindow *w) {
     if (!(fw != (OpenboxWindow *) 0 && fw->setInputFocus()))
       screen.getOpenbox().focusWindow(0);
   }
-
-  _windows.erase(_windows.begin() + w->getWindowNumber());
+  
+  _windows.erase(winit);
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
 
@@ -140,11 +149,13 @@ int Workspace::removeWindow(OpenboxWindow *w) {
 
 
 void Workspace::focusWindow(OpenboxWindow *win) {
-  if (win != (OpenboxWindow *) 0)
-    clientmenu->setItemSelected(win->getWindowNumber(), true);
   if (_focused != (OpenboxWindow *) 0)
     clientmenu->setItemSelected(_focused->getWindowNumber(), false);
   _focused = win;
+  // make sure the focused window belongs to this workspace before highlighting
+  // it in the menu (sticky windows arent in this workspace's menu).
+  if (_focused != (OpenboxWindow *) 0 && _focused->getWorkspaceNumber() == id)
+    clientmenu->setItemSelected(_focused->getWindowNumber(), true);
   if (win != (OpenboxWindow *) 0)
     _last = win;
 }

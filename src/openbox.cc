@@ -1088,7 +1088,10 @@ void Openbox::focusWindow(OpenboxWindow *win) {
   if (win && !win->isIconic()) {
     current_screen = win->getScreen();
     tbar = current_screen->getToolbar();
-    wkspc = current_screen->getWorkspace(win->getWorkspaceNumber());
+    if (win->isStuck())
+      wkspc = current_screen->getCurrentWorkspace();
+    else
+      wkspc = current_screen->getWorkspace(win->getWorkspaceNumber());
     win->setFocusFlag(true);
     wkspc->focusWindow(win);
 

@@ -462,34 +462,33 @@ static RETSIGTYPE signalhandler(int sig) {
         // check for timer timeout
         gettimeofday(&now, 0);
 
-        TimerList::iterator it;
-        for (it = timerList.begin(); it != timerList.end(); ++it) {
-          BTimer *timer = *it;
-          ASSERT(timer != NULL);
+      TimerList::iterator it;
+      for (it = timerList.begin(); it != timerList.end(); ++it) {
+        BTimer *timer = *it;
+        ASSERT(timer != NULL);
 
-          tm.tv_sec = timer->getStartTime().tv_sec +
-            timer->getTimeout().tv_sec;
-          tm.tv_usec = timer->getStartTime().tv_usec +
-            timer->getTimeout().tv_usec;
+        tm.tv_sec = timer->getStartTime().tv_sec +
+          timer->getTimeout().tv_sec;
+        tm.tv_usec = timer->getStartTime().tv_usec +
+          timer->getTimeout().tv_usec;
 
-          if ((now.tv_sec < tm.tv_sec) ||
-              (now.tv_sec == tm.tv_sec && now.tv_usec < tm.tv_usec))
-            break;
+        if ((now.tv_sec < tm.tv_sec) ||
+            (now.tv_sec == tm.tv_sec && now.tv_usec < tm.tv_usec))
+          break;
 
-          timer->fireTimeout();
+        timer->fireTimeout();
 
-          // restart the current timer so that the start time is updated
-          if (! timer->doOnce()) {
-            // reorder
-            removeTimer(timer);
-            addTimer(timer);
-            timer->start();
-          } else
-            timer->stop();
-          it = timerList.begin(); // we no longer have any idea if the iterator is
-          // valid, but what was at the front() is no
-          // longer.
-        }
+        // restart the current timer so that the start time is updated
+        if (! timer->doOnce()) {
+          // reorder
+          removeTimer(timer);
+          addTimer(timer);
+          timer->start();
+        } else
+          timer->stop();
+        it = timerList.begin(); // we no longer have any idea if the iterator is
+                                // valid, but what was at the front() is no
+                                // longer.
       }
     }
   }
@@ -540,6 +539,13 @@ static RETSIGTYPE signalhandler(int sig) {
     timerList.remove(timer);
   }
 
+<<<<<<< BaseDisplay.cc
+=======
+void BaseDisplay::removeTimer(BTimer *timer) {
+  ASSERT(timer != (BTimer *) 0);
+  timerList.remove(timer);
+}
+>>>>>>> 1.13.4.1
 
   /*
    * Grabs a button, but also grabs the button in every possible combination with

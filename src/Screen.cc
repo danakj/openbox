@@ -1976,11 +1976,9 @@ void BScreen::load() {
       workspacemenu->setItemSelected(current_workspace->getWorkspaceID() + 2,
                                      False);
 
-      if (openbox.focusedWindow() &&
-          openbox.focusedWindow()->getScreen() == this &&
-          (! openbox.focusedWindow()->isStuck())) {
-        openbox.focusWindow(0);
-      }
+    OpenboxWindow *fw = openbox.focusedWindow();
+    if (fw && fw->getScreen() == this)
+      openbox.focusWindow(0);
 
       current_workspace = getWorkspace(id);
 

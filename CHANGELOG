@@ -1,6 +1,8 @@
 Changelog for Openbox:
 
 2.0.0:
+ * fixed sticky windows behavior.                       (Ben Jansens)
+
  * make reconfigure reset the timeout values for
    windows, the slit, and the toolbar, so that a new
    autoRaiseDelay value will take effect without having

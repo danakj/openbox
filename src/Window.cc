@@ -314,9 +314,14 @@ OpenboxWindow::~OpenboxWindow(void) {
     XUngrabPointer(display, CurrentTime);
   }
 
-  if (workspace_number != -1 && window_number != -1)
-    screen->getWorkspace(workspace_number)->removeWindow(this);
-  else if (flags.iconic)
+  if (workspace_number != -1 && window_number != -1) {
+    if (flags.stuck) {
+      // make sure no other workspaces think that we're focused
+      for (int i=0; i < screen->getWorkspaceCount(); i++)
+        screen->getWorkspace(i)->removeWindow(this);
+    } else
+      screen->getWorkspace(workspace_number)->removeWindow(this);
+  } else if (flags.iconic)
     screen->removeIcon(this);
 
   if (timer) {

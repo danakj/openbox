@@ -421,7 +421,6 @@ static void event_handle_client(Client *client, XEvent *e)
 	    if (ce.xconfigurerequest.value_mask & CWStackMode)
 		e->xconfigurerequest.detail = ce.xconfigurerequest.detail;
 	}
-        if (i) g_message("Compressed %d Configures", i);
 
 	/* if we are iconic (or shaded (fvwm does this)) ignore the event */
 	if (client->iconic || client->shaded) return;

@@ -7,10 +7,21 @@
 ###              Also see the options in the focus module.              ###
 ###########################################################################
 include_all_desktops = 0
+"""If this is non-zero then windows from all desktops will be included in
+   the stacking list."""
 include_icons = 1
+"""If this is non-zero then windows which are iconified will be included
+   in the stacking list."""
 include_omnipresent = 1
+"""If this is non-zero then windows which are on all-desktops at once will
+   be included."""
 title_size_limit = 80
+"""This specifies a rough limit of characters for the cycling list titles.
+   Titles which are larger will be chopped with an elipsis in their
+   center."""
 activate_while_cycling = 1
+"""If this is non-zero then windows will be activated as they are
+   highlighted in the cycling list (except iconified windows)."""
 ###########################################################################
 
 def next(data):

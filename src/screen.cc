@@ -526,7 +526,7 @@ void OBScreen::manageWindow(Window window)
   // XXX: if on the current desktop..
   client->frame->show();
  
-  // XXX: handle any requested states such as shaded/maximized
+  // XXX: handle any requested states such as maximized
 
   otk::OBDisplay::ungrab();
 

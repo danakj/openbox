@@ -49,7 +49,7 @@ RrColor *RrColorParse(const RrInstance *inst, gchar *colorname)
     xcol.pixel = 0;
     if (!XParseColor(RrDisplay(inst), RrColormap(inst), colorname, &xcol)) {
         g_warning("unable to parse color '%s'", colorname);
-	return NULL;
+        return NULL;
     }
     return RrColorNew(inst, xcol.red >> 8, xcol.green >> 8, xcol.blue >> 8);
 }

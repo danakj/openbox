@@ -29,7 +29,7 @@ gint xerror_handler(Display *d, XErrorEvent *e)
 #ifdef DEBUG
     if (!xerror_ignore) {
         gchar errtxt[128];
-	  
+
         /*if (e->error_code != BadWindow) */
         {
             XGetErrorText(d, e->error_code, errtxt, 127);

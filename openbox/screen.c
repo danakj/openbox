@@ -182,7 +182,7 @@ gboolean screen_annex()
                   ob_screen);
 
         XDestroyWindow(ob_display, screen_support_win);
-	return FALSE;
+        return FALSE;
     }
 
 
@@ -355,7 +355,7 @@ void screen_resize()
                 net_desktop_geometry, cardinal, geometry, 2);
 
     if (ob_state() == OB_STATE_STARTING)
-	return;
+        return;
 
     screen_update_areas();
     dock_configure();
@@ -403,7 +403,7 @@ void screen_set_num_desktops(guint num)
 
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
-	screen_set_desktop(num - 1);
+        screen_set_desktop(num - 1);
 
    /* update the focus lists */
     /* free our lists for the desktops which have disappeared */
@@ -1159,9 +1159,9 @@ Rect *screen_area_monitor(guint desktop, guint head)
     if (head > screen_num_monitors)
         return NULL;
     if (desktop >= screen_num_desktops) {
-	if (desktop == DESKTOP_ALL)
-	    return &area[screen_num_desktops][head];
-	return NULL;
+        if (desktop == DESKTOP_ALL)
+            return &area[screen_num_desktops][head];
+        return NULL;
     }
     return &area[desktop][head];
 }

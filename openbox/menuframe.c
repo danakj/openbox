@@ -29,7 +29,7 @@
 #define MAX_MENU_WIDTH 400
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
-			 LeaveWindowMask)
+                         LeaveWindowMask)
 #define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
@@ -43,10 +43,10 @@ static void menu_frame_render(ObMenuFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
 
 static Window createWindow(Window parent, gulong mask,
-			   XSetWindowAttributes *attrib)
+                           XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 RrDepth(ob_rr_inst), InputOutput,
+                         RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 

@@ -41,7 +41,7 @@ void stacking_set_list()
     /* create an array of the window ids (from bottom to top,
        reverse order!) */
     if (stacking_list) {
-	windows = g_new(Window, g_list_length(stacking_list));
+        windows = g_new(Window, g_list_length(stacking_list));
         for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data))
                 windows[i++] = WINDOW_AS_CLIENT(it->data)->window;

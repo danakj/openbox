@@ -63,7 +63,7 @@ void extensions_query_all()
 
 #ifdef VIDMODE
     extensions_vidmode =
-	XF86VidModeQueryExtension(ob_display, &extensions_vidmode_event_basep,
+        XF86VidModeQueryExtension(ob_display, &extensions_vidmode_event_basep,
                                   &junk);
 #endif
 }

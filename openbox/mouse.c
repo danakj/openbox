@@ -125,7 +125,7 @@ static void grab_all_clients(gboolean grab)
     GList *it;
 
     for (it = client_list; it; it = g_list_next(it))
-	mouse_grab_for_client(it->data, grab);
+        mouse_grab_for_client(it->data, grab);
 }
 
 void mouse_unbind_all()
@@ -315,11 +315,11 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
     }
 
     for (it = bound_contexts[context]; it; it = g_slist_next(it)) {
-	b = it->data;
-	if (b->state == state && b->button == button) {
+        b = it->data;
+        if (b->state == state && b->button == button) {
             b->actions[mact] = g_slist_append(b->actions[mact], action);
             return TRUE;
-	}
+        }
     }
 
     /* when there are no modifiers in the binding, then the action cannot

@@ -53,7 +53,7 @@ typedef struct _Rect {
     (r).x = (nx), (r).y = (ny), (r).width = (w), (r).height = (h)
 
 #define RECT_EQUAL(r1, r2) ((r1).x == (r2).x && (r1).y == (r2).y && \
-			    (r1).width == (r2).width && \
+                            (r1).width == (r2).width && \
                             (r1).height == (r2).height)
 
 #define RECT_CONTAINS(r, px, py) \

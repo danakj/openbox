@@ -223,9 +223,9 @@ Window findclient(Window win)
 
   /* try me */
   XGetWindowProperty(display, win, state, 0, 1,
-		     False, state, &ret_type, &ret_format,
-		     &ret_items, &ret_bytesleft,
-		     (unsigned char**) &prop_return); 
+                     False, state, &ret_type, &ret_format,
+                     &ret_items, &ret_bytesleft,
+                     (unsigned char**) &prop_return); 
   if (ret_type == None || ret_items < 1)
     return None;
   return win; /* found it! */

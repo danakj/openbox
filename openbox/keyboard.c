@@ -119,7 +119,7 @@ gboolean keyboard_bind(GList *keylist, ObAction *action)
         return FALSE;
 
     if ((t = tree_find(tree, &conflict)) != NULL) {
-	/* already bound to something, use the existing tree */
+        /* already bound to something, use the existing tree */
         tree_destroy(tree);
         tree = NULL;
     } else

@@ -37,7 +37,7 @@
                            EnterWindowMask | LeaveWindowMask)
 
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
-		           f->cbwidth_y)
+                           f->cbwidth_y)
 
 static void layout_title(ObFrame *self);
 static void flash_done(gpointer data);
@@ -47,10 +47,10 @@ static void set_theme_statics(ObFrame *self);
 static void free_theme_statics(ObFrame *self);
 
 static Window createWindow(Window parent, gulong mask,
-			   XSetWindowAttributes *attrib)
+                           XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 RrDepth(ob_rr_inst), InputOutput,
+                         RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
                        
 }
@@ -109,9 +109,9 @@ ObFrame *frame_new()
     XMapWindow(ob_display, self->label);
 
     self->max_press = self->close_press = self->desk_press = 
-	self->iconify_press = self->shade_press = FALSE;
+        self->iconify_press = self->shade_press = FALSE;
     self->max_hover = self->close_hover = self->desk_hover = 
-	self->iconify_hover = self->shade_hover = FALSE;
+        self->iconify_hover = self->shade_hover = FALSE;
 
     set_theme_statics(self);
 
@@ -218,41 +218,41 @@ void frame_adjust_shape(ObFrame *self)
     XRectangle xrect[2];
 
     if (!self->client->shaped) {
-	/* clear the shape on the frame window */
-	XShapeCombineMask(ob_display, self->window, ShapeBounding,
-			  self->innersize.left,
-			  self->innersize.top,
-			  None, ShapeSet);
+        /* clear the shape on the frame window */
+        XShapeCombineMask(ob_display, self->window, ShapeBounding,
+                          self->innersize.left,
+                          self->innersize.top,
+                          None, ShapeSet);
     } else {
-	/* make the frame's shape match the clients */
-	XShapeCombineShape(ob_display, self->window, ShapeBounding,
-			   self->innersize.left,
-			   self->innersize.top,
-			   self->client->window,
-			   ShapeBounding, ShapeSet);
+        /* make the frame's shape match the clients */
+        XShapeCombineShape(ob_display, self->window, ShapeBounding,
+                           self->innersize.left,
+                           self->innersize.top,
+                           self->client->window,
+                           ShapeBounding, ShapeSet);
 
-	num = 0;
-	if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-	    xrect[0].x = -ob_rr_theme->bwidth;
-	    xrect[0].y = -ob_rr_theme->bwidth;
-	    xrect[0].width = self->width + self->rbwidth * 2;
-	    xrect[0].height = ob_rr_theme->title_height +
-		self->bwidth * 2;
-	    ++num;
-	}
+        num = 0;
+        if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
+            xrect[0].x = -ob_rr_theme->bwidth;
+            xrect[0].y = -ob_rr_theme->bwidth;
+            xrect[0].width = self->width + self->rbwidth * 2;
+            xrect[0].height = ob_rr_theme->title_height +
+                self->bwidth * 2;
+            ++num;
+        }
 
-	if (self->decorations & OB_FRAME_DECOR_HANDLE) {
-	    xrect[1].x = -ob_rr_theme->bwidth;
-	    xrect[1].y = FRAME_HANDLE_Y(self);
-	    xrect[1].width = self->width + self->rbwidth * 2;
-	    xrect[1].height = ob_rr_theme->handle_height +
-		self->bwidth * 2;
-	    ++num;
-	}
+        if (self->decorations & OB_FRAME_DECOR_HANDLE) {
+            xrect[1].x = -ob_rr_theme->bwidth;
+            xrect[1].y = FRAME_HANDLE_Y(self);
+            xrect[1].width = self->width + self->rbwidth * 2;
+            xrect[1].height = ob_rr_theme->handle_height +
+                self->bwidth * 2;
+            ++num;
+        }
 
-	XShapeCombineRectangles(ob_display, self->window,
-				ShapeBounding, 0, 0, xrect, num,
-				ShapeUnion, Unsorted);
+        XShapeCombineRectangles(ob_display, self->window,
+                                ShapeBounding, 0, 0, xrect, num,
+                                ShapeUnion, Unsorted);
     }
 #endif
 }
@@ -391,9 +391,9 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
     /* shading can change without being moved or resized */
     RECT_SET_SIZE(self->area,
-		  self->client->area.width +
-		  self->size.left + self->size.right,
-		  (self->client->shaded ?
+                  self->client->area.width +
+                  self->size.left + self->size.right,
+                  (self->client->shaded ?
                    ob_rr_theme->title_height + self->rbwidth * 2:
                    self->client->area.height +
                    self->size.top + self->size.bottom));
@@ -473,7 +473,7 @@ void frame_grab_client(ObFrame *self, ObClient *client)
       handled and need to be ignored.
     */
     if (ob_state() == OB_STATE_STARTING)
-	client->ignore_unmaps += 2;
+        client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map
        req's) the ButtonPress is to catch clicks on the client border */
@@ -569,48 +569,48 @@ static void layout_title(ObFrame *self)
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_rr_theme->padding + 1) * 2;
     for (lc = config_title_layout; *lc != '\0'; ++lc) {
-	switch (*lc) {
-	case 'N':
+        switch (*lc) {
+        case 'N':
             if (n) { *lc = ' '; break; } /* rm duplicates */
-	    n = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size + 2 +
+            n = TRUE;
+            self->label_width -= (ob_rr_theme->button_size + 2 +
                                   ob_rr_theme->padding + 1);
-	    break;
-	case 'D':
+            break;
+        case 'D':
             if (d) { *lc = ' '; break; } /* rm duplicates */
-	    d = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size +
+            d = TRUE;
+            self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
-	    break;
-	case 'S':
+            break;
+        case 'S':
             if (s) { *lc = ' '; break; } /* rm duplicates */
-	    s = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size +
+            s = TRUE;
+            self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
-	    break;
-	case 'I':
+            break;
+        case 'I':
             if (i) { *lc = ' '; break; } /* rm duplicates */
-	    i = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size +
+            i = TRUE;
+            self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
-	    break;
-	case 'L':
+            break;
+        case 'L':
             if (l) { *lc = ' '; break; } /* rm duplicates */
-	    l = TRUE;
-	    break;
-	case 'M':
+            l = TRUE;
+            break;
+        case 'M':
             if (m) { *lc = ' '; break; } /* rm duplicates */
-	    m = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size +
+            m = TRUE;
+            self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
-	    break;
-	case 'C':
+            break;
+        case 'C':
             if (c) { *lc = ' '; break; } /* rm duplicates */
-	    c = TRUE;
-	    self->label_width -= (ob_rr_theme->button_size +
+            c = TRUE;
+            self->label_width -= (ob_rr_theme->button_size +
                                   ob_rr_theme->padding + 1);
-	    break;
-	}
+            break;
+        }
     }
     if (self->label_width < 1) self->label_width = 1;
 
@@ -627,57 +627,57 @@ static void layout_title(ObFrame *self)
 
     x = ob_rr_theme->padding + 1;
     for (lc = config_title_layout; *lc != '\0'; ++lc) {
-	switch (*lc) {
-	case 'N':
-	    if (!n) break;
-	    self->icon_x = x;
-	    XMapWindow(ob_display, self->icon);
-	    XMoveWindow(ob_display, self->icon, x, ob_rr_theme->padding);
-	    x += ob_rr_theme->button_size + 2 + ob_rr_theme->padding + 1;
-	    break;
-	case 'D':
-	    if (!d) break;
-	    self->desk_x = x;
-	    XMapWindow(ob_display, self->desk);
-	    XMoveWindow(ob_display, self->desk, x, ob_rr_theme->padding + 1);
-	    x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
-	    break;
-	case 'S':
-	    if (!s) break;
-	    self->shade_x = x;
-	    XMapWindow(ob_display, self->shade);
-	    XMoveWindow(ob_display, self->shade, x, ob_rr_theme->padding + 1);
-	    x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
-	    break;
-	case 'I':
-	    if (!i) break;
-	    self->iconify_x = x;
-	    XMapWindow(ob_display, self->iconify);
-	    XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->padding + 1);
-	    x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
-	    break;
-	case 'L':
-	    if (!l) break;
-	    self->label_x = x;
-	    XMapWindow(ob_display, self->label);
-	    XMoveWindow(ob_display, self->label, x, ob_rr_theme->padding);
-	    x += self->label_width + ob_rr_theme->padding + 1;
-	    break;
-	case 'M':
-	    if (!m) break;
-	    self->max_x = x;
-	    XMapWindow(ob_display, self->max);
-	    XMoveWindow(ob_display, self->max, x, ob_rr_theme->padding + 1);
-	    x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
-	    break;
-	case 'C':
-	    if (!c) break;
-	    self->close_x = x;
-	    XMapWindow(ob_display, self->close);
-	    XMoveWindow(ob_display, self->close, x, ob_rr_theme->padding + 1);
-	    x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
-	    break;
-	}
+        switch (*lc) {
+        case 'N':
+            if (!n) break;
+            self->icon_x = x;
+            XMapWindow(ob_display, self->icon);
+            XMoveWindow(ob_display, self->icon, x, ob_rr_theme->padding);
+            x += ob_rr_theme->button_size + 2 + ob_rr_theme->padding + 1;
+            break;
+        case 'D':
+            if (!d) break;
+            self->desk_x = x;
+            XMapWindow(ob_display, self->desk);
+            XMoveWindow(ob_display, self->desk, x, ob_rr_theme->padding + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            break;
+        case 'S':
+            if (!s) break;
+            self->shade_x = x;
+            XMapWindow(ob_display, self->shade);
+            XMoveWindow(ob_display, self->shade, x, ob_rr_theme->padding + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            break;
+        case 'I':
+            if (!i) break;
+            self->iconify_x = x;
+            XMapWindow(ob_display, self->iconify);
+            XMoveWindow(ob_display,self->iconify, x, ob_rr_theme->padding + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            break;
+        case 'L':
+            if (!l) break;
+            self->label_x = x;
+            XMapWindow(ob_display, self->label);
+            XMoveWindow(ob_display, self->label, x, ob_rr_theme->padding);
+            x += self->label_width + ob_rr_theme->padding + 1;
+            break;
+        case 'M':
+            if (!m) break;
+            self->max_x = x;
+            XMapWindow(ob_display, self->max);
+            XMoveWindow(ob_display, self->max, x, ob_rr_theme->padding + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            break;
+        case 'C':
+            if (!c) break;
+            self->close_x = x;
+            XMapWindow(ob_display, self->close);
+            XMoveWindow(ob_display, self->close, x, ob_rr_theme->padding + 1);
+            x += ob_rr_theme->button_size + ob_rr_theme->padding + 1;
+            break;
+        }
     }
 }
 
@@ -771,24 +771,24 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y)
     case NorthWestGravity:
     case SouthWestGravity:
     case WestGravity:
-	break;
+        break;
 
     case NorthGravity:
     case SouthGravity:
     case CenterGravity:
-	*x -= (self->size.left + self->size.right) / 2;
-	break;
+        *x -= (self->size.left + self->size.right) / 2;
+        break;
 
     case NorthEastGravity:
     case SouthEastGravity:
     case EastGravity:
-	*x -= self->size.left + self->size.right;
-	break;
+        *x -= self->size.left + self->size.right;
+        break;
 
     case ForgetGravity:
     case StaticGravity:
-	*x -= self->size.left;
-	break;
+        *x -= self->size.left;
+        break;
     }
 
     /* vertical */
@@ -797,24 +797,24 @@ void frame_client_gravity(ObFrame *self, gint *x, gint *y)
     case NorthWestGravity:
     case NorthEastGravity:
     case NorthGravity:
-	break;
+        break;
 
     case CenterGravity:
     case EastGravity:
     case WestGravity:
-	*y -= (self->size.top + self->size.bottom) / 2;
-	break;
+        *y -= (self->size.top + self->size.bottom) / 2;
+        break;
 
     case SouthWestGravity:
     case SouthEastGravity:
     case SouthGravity:
-	*y -= self->size.top + self->size.bottom;
-	break;
+        *y -= self->size.top + self->size.bottom;
+        break;
 
     case ForgetGravity:
     case StaticGravity:
-	*y -= self->size.top;
-	break;
+        *y -= self->size.top;
+        break;
     }
 }
 
@@ -826,21 +826,21 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
     case NorthWestGravity:
     case WestGravity:
     case SouthWestGravity:
-	break;
+        break;
     case NorthGravity:
     case CenterGravity:
     case SouthGravity:
-	*x += (self->size.left + self->size.right) / 2;
-	break;
+        *x += (self->size.left + self->size.right) / 2;
+        break;
     case NorthEastGravity:
     case EastGravity:
     case SouthEastGravity:
-	*x += self->size.left + self->size.right;
-	break;
+        *x += self->size.left + self->size.right;
+        break;
     case StaticGravity:
     case ForgetGravity:
-	*x += self->size.left;
-	break;
+        *x += self->size.left;
+        break;
     }
 
     /* vertical */
@@ -849,21 +849,21 @@ void frame_frame_gravity(ObFrame *self, gint *x, gint *y)
     case NorthWestGravity:
     case NorthGravity:
     case NorthEastGravity:
-	break;
+        break;
     case WestGravity:
     case CenterGravity:
     case EastGravity:
-	*y += (self->size.top + self->size.bottom) / 2;
-	break;
+        *y += (self->size.top + self->size.bottom) / 2;
+        break;
     case SouthWestGravity:
     case SouthGravity:
     case SouthEastGravity:
-	*y += self->size.top + self->size.bottom;
-	break;
+        *y += self->size.top + self->size.bottom;
+        break;
     case StaticGravity:
     case ForgetGravity:
-	*y += self->size.top;
-	break;
+        *y += self->size.top;
+        break;
     }
 }
 

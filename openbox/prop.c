@@ -170,14 +170,14 @@ static gboolean get(Window win, Atom prop, Atom type, gint size,
     glong num32 = 32 / size * num; /\* num in 32-bit elements *\/
 
     res = XGetWindowProperty(display, win, prop, 0l, num32,
-			     FALSE, type, &ret_type, &ret_size,
-			     &ret_items, &bytes_left, &xdata);
+                             FALSE, type, &ret_type, &ret_size,
+                             &ret_items, &bytes_left, &xdata);
     if (res == Success && ret_items && xdata) {
-	if (ret_size == size && ret_items >= num) {
-	    *data = g_memdup(xdata, num * (size / 8));
-	    ret = TRUE;
-	}
-	XFree(xdata);
+        if (ret_size == size && ret_items >= num) {
+            *data = g_memdup(xdata, num * (size / 8));
+            ret = TRUE;
+        }
+        XFree(xdata);
     }
     return ret;
 }
@@ -195,28 +195,28 @@ static gboolean get_prealloc(Window win, Atom prop, Atom type, gint size,
     glong num32 = 32 / size * num; /* num in 32-bit elements */
 
     res = XGetWindowProperty(ob_display, win, prop, 0l, num32,
-			     FALSE, type, &ret_type, &ret_size,
-			     &ret_items, &bytes_left, &xdata);
+                             FALSE, type, &ret_type, &ret_size,
+                             &ret_items, &bytes_left, &xdata);
     if (res == Success && ret_items && xdata) {
-	if (ret_size == size && ret_items >= num) {
-	    guint i;
-	    for (i = 0; i < num; ++i)
-		switch (size) {
-		case 8:
-		    data[i] = xdata[i];
-		    break;
-		case 16:
-		    ((guint16*)data)[i] = ((guint16*)xdata)[i];
-		    break;
-		case 32:
-		    ((guint32*)data)[i] = ((gulong*)xdata)[i];
-		    break;
-		default:
-		    g_assert_not_reached(); /* unhandled size */
-		}
-	    ret = TRUE;
-	}
-	XFree(xdata);
+        if (ret_size == size && ret_items >= num) {
+            guint i;
+            for (i = 0; i < num; ++i)
+                switch (size) {
+                case 8:
+                    data[i] = xdata[i];
+                    break;
+                case 16:
+                    ((guint16*)data)[i] = ((guint16*)xdata)[i];
+                    break;
+                case 32:
+                    ((guint32*)data)[i] = ((gulong*)xdata)[i];
+                    break;
+                default:
+                    g_assert_not_reached(); /* unhandled size */
+                }
+            ret = TRUE;
+        }
+        XFree(xdata);
     }
     return ret;
 }
@@ -232,31 +232,31 @@ static gboolean get_all(Window win, Atom prop, Atom type, gint size,
     gulong ret_items, bytes_left;
 
     res = XGetWindowProperty(ob_display, win, prop, 0l, G_MAXLONG,
-			     FALSE, type, &ret_type, &ret_size,
-			     &ret_items, &bytes_left, &xdata);
+                             FALSE, type, &ret_type, &ret_size,
+                             &ret_items, &bytes_left, &xdata);
     if (res == Success) {
-	if (ret_size == size && ret_items > 0) {
-	    guint i;
+        if (ret_size == size && ret_items > 0) {
+            guint i;
 
-	    *data = g_malloc(ret_items * (size / 8));
-	    for (i = 0; i < ret_items; ++i)
-		switch (size) {
-		case 8:
-		    (*data)[i] = xdata[i];
-		    break;
-		case 16:
-		    ((guint16*)*data)[i] = ((guint16*)xdata)[i];
-		    break;
-		case 32:
-		    ((guint32*)*data)[i] = ((gulong*)xdata)[i];
-		    break;
-		default:
-		    g_assert_not_reached(); /* unhandled size */
-		}
-	    *num = ret_items;
-	    ret = TRUE;
-	}
-	XFree(xdata);
+            *data = g_malloc(ret_items * (size / 8));
+            for (i = 0; i < ret_items; ++i)
+                switch (size) {
+                case 8:
+                    (*data)[i] = xdata[i];
+                    break;
+                case 16:
+                    ((guint16*)*data)[i] = ((guint16*)xdata)[i];
+                    break;
+                case 32:
+                    ((guint32*)*data)[i] = ((gulong*)xdata)[i];
+                    break;
+                default:
+                    g_assert_not_reached(); /* unhandled size */
+                }
+            *num = ret_items;
+            ret = TRUE;
+        }
+        XFree(xdata);
     }
     return ret;
 }
@@ -328,9 +328,9 @@ gboolean prop_get_strings_locale(Window win, Atom prop, gchar ***ret)
             if (!(*ret)[i])
                 (*ret)[i] = g_strdup("");
         }
-	g_free(raw);
+        g_free(raw);
         g_slist_free(strs);
-	return TRUE;
+        return TRUE;
     }
     return FALSE;
 }
@@ -342,8 +342,8 @@ gboolean prop_get_string_utf8(Window win, Atom prop, gchar **ret)
     guint num;
      
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
-	str = g_strndup(raw, num); /* grab the first string from the list */
-	g_free(raw);
+        str = g_strndup(raw, num); /* grab the first string from the list */
+        g_free(raw);
         if (g_utf8_validate(str, -1, NULL)) {
             *ret = str;
             return TRUE;
@@ -376,9 +376,9 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
             else
                 (*ret)[i] = g_strdup("");
         }
-	g_free(raw);
+        g_free(raw);
         g_slist_free(strs);
-	return TRUE;
+        return TRUE;
     }
     return FALSE;
 }
@@ -423,7 +423,7 @@ void prop_erase(Window win, Atom prop)
 }
 
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
-		  glong data2, glong data3, glong mask)
+                  glong data2, glong data3, glong mask)
 {
     XEvent ce;
     ce.xclient.type = ClientMessage;
@@ -436,5 +436,5 @@ void prop_message(Window about, Atom messagetype, glong data0, glong data1,
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
     XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
-	       mask, &ce);
+               mask, &ce);
 }

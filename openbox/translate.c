@@ -51,16 +51,16 @@ gboolean translate_button(const gchar *str, guint *state, guint *button)
     /* first, find the button (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)
-	l = parsed[i];
+        l = parsed[i];
     if (l == NULL)
-	goto translation_fail;
+        goto translation_fail;
 
     /* figure out the mod mask */
     *state = 0;
     for (i = 0; parsed[i] != l; ++i) {
-	guint m = translate_modifier(parsed[i]);
-	if (!m) goto translation_fail;
-	*state |= m;
+        guint m = translate_modifier(parsed[i]);
+        if (!m) goto translation_fail;
+        *state |= m;
     }
 
     /* figure out the button */
@@ -71,8 +71,8 @@ gboolean translate_button(const gchar *str, guint *state, guint *button)
     else if (!g_ascii_strcasecmp("Down", l)) *button = 5;
     else if (!g_ascii_strncasecmp("Button", l, 6)) *button = atoi(l+6);
     if (!*button) {
-	g_warning("Invalid button '%s' in pointer binding.", l);
-	goto translation_fail;
+        g_warning("Invalid button '%s' in pointer binding.", l);
+        goto translation_fail;
     }
 
     ret = TRUE;
@@ -95,16 +95,16 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
     /* first, find the key (last token) */
     l = NULL;
     for (i = 0; parsed[i] != NULL; ++i)
-	l = parsed[i];
+        l = parsed[i];
     if (l == NULL)
-	goto translation_fail;
+        goto translation_fail;
 
     /* figure out the mod mask */
     *state = 0;
     for (i = 0; parsed[i] != l; ++i) {
-	guint m = translate_modifier(parsed[i]);
-	if (!m) goto translation_fail;
-	*state |= m;
+        guint m = translate_modifier(parsed[i]);
+        if (!m) goto translation_fail;
+        *state |= m;
     }
 
     if (!g_ascii_strncasecmp("0x", l, 2)) {
@@ -126,8 +126,8 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
         *keycode = XKeysymToKeycode(ob_display, sym);
     }
     if (!*keycode) {
-	g_warning("Key '%s' does not exist on the display.", l); 
-	goto translation_fail;
+        g_warning("Key '%s' does not exist on the display.", l); 
+        goto translation_fail;
     }
 
     ret = TRUE;

@@ -186,7 +186,7 @@ void prop_set_strings_utf8(Window win, Atom prop, gchar **strs);
 void prop_erase(Window win, Atom prop);
 
 void prop_message(Window about, Atom messagetype, glong data0, glong data1,
-		  glong data2, glong data3, glong mask);
+                  glong data2, glong data3, glong mask);
 
 #define PROP_GET32(win, prop, type, ret) \
     (prop_get32(win, prop_atoms.prop, prop_atoms.type, ret))

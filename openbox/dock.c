@@ -129,7 +129,7 @@ void dock_add(Window win, XWMHints *wmhints)
 
     if (PROP_GETSS(app->win, wm_class, locale, &data)) {
         if (data[0]) {
-	    app->name = g_strdup(data[0]);
+            app->name = g_strdup(data[0]);
             if (data[1])
                 app->class = g_strdup(data[1]);
         }
@@ -158,7 +158,7 @@ void dock_add(Window win, XWMHints *wmhints)
       handled and need to be ignored.
     */
     if (ob_state() == OB_STATE_STARTING)
-	app->ignore_unmaps += 2;
+        app->ignore_unmaps += 2;
 
     if (app->win != app->icon_win) {
         /* have to map it so that it can be re-managed on a restart */
@@ -197,7 +197,7 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     g_hash_table_remove(window_map, &app->icon_win);
 
     if (reparent)
-	XReparentWindow(ob_display, app->icon_win,
+        XReparentWindow(ob_display, app->icon_win,
                         RootWindow(ob_display, ob_screen), app->x, app->y);
 
     dock->dock_apps = g_list_remove(dock->dock_apps, app);

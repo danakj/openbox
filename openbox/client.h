@@ -324,11 +324,11 @@ gboolean client_focused(ObClient *self);
   @param h The height component of the new size for the client.
   @param user Specifies whether this is a user-requested change or a
               program requested change. For program requested changes, the
-	      constraints are not checked.
+              constraints are not checked.
   @param final If user is true, then this should specify if this is a final
                configuration. e.g. Final should be FALSE if doing an
-	       interactive move/resize, and then be TRUE for the last call
-	       only.
+               interactive move/resize, and then be TRUE for the last call
+               only.
   @param force_reply Send a ConfigureNotify to the client regardless of if
                      the position changed.
 */
@@ -484,7 +484,7 @@ void client_update_normal_hints(ObClient *self);
 /*! Updates the WMHints and adjusts things if they change
   @param initstate Whether to read the initial_state property from the
                    WMHints. This should only be used during the mapping
-		   process.
+                   process.
 */
 void client_update_wmhints(ObClient *self);
 /*! Updates the window's title and icon title */

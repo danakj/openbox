@@ -45,10 +45,10 @@ See the COPYING file for a copy of the GNU General Public License.
 
 /*! The event mask to grab on client windows */
 #define CLIENT_EVENTMASK (PropertyChangeMask | FocusChangeMask | \
-			  StructureNotifyMask)
+                          StructureNotifyMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
-				ButtonMotionMask)
+                                ButtonMotionMask)
 
 typedef struct
 {
@@ -1232,7 +1232,7 @@ void client_setup_decor_and_functions(ObClient *self)
             /* dont let mwm hints kill the close button
                if (! (self->mwmhints.functions & MwmFunc_Close))
                self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
-	    }
+        }
     }
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE))

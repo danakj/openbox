@@ -500,17 +500,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     /* read buttons textures */
     if (!read_appearance(db, inst,
                          "window.active.button.disabled.bg",
-			 theme->a_disabled_focused_max,
+                         theme->a_disabled_focused_max,
                          TRUE))
         set_default_appearance(theme->a_disabled_focused_max);
     if (!read_appearance(db, inst,
                          "window.inactive.button.disabled.bg",
-			 theme->a_disabled_unfocused_max,
+                         theme->a_disabled_unfocused_max,
                          TRUE))
         set_default_appearance(theme->a_disabled_unfocused_max);
     if (!read_appearance(db, inst,
                          "window.active.button.pressed.bg",
-			 theme->a_focused_pressed_max,
+                         theme->a_focused_pressed_max,
                          TRUE))
         set_default_appearance(theme->a_focused_pressed_max);
     if (!read_appearance(db, inst,
@@ -1212,7 +1212,7 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
             *relief = RR_RELIEF_FLAT;
         else
             *relief = RR_RELIEF_RAISED;
-	
+
         *border = FALSE;
         if (*relief == RR_RELIEF_FLAT) {
             if (strstr(tex, "border") != NULL)

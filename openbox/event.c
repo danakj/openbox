@@ -251,9 +251,9 @@ static void event_set_lasttime(XEvent *e)
 }
 
 #define STRIP_MODS(s) \
-	s &= ~(LockMask | NumLockMask | ScrollLockMask), \
-	/* kill off the Button1Mask etc, only want the modifiers */ \
-	s &= (ControlMask | ShiftMask | Mod1Mask | \
+        s &= ~(LockMask | NumLockMask | ScrollLockMask), \
+        /* kill off the Button1Mask etc, only want the modifiers */ \
+        s &= (ControlMask | ShiftMask | Mod1Mask | \
               Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask) \
 
 static void event_hack_mods(XEvent *e)
@@ -317,7 +317,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
            want will be of type NotifyAncestor. This situation does not occur
            for FocusOut, so it is safely ignored there.
         */
-	if (INVALID_FOCUSIN(e) ||
+        if (INVALID_FOCUSIN(e) ||
             client == NULL) {
 #ifdef DEBUG_FOCUS
             ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
@@ -336,7 +336,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 #endif
         break;
     case FocusOut:
-	if (INVALID_FOCUSOUT(e)) {
+        if (INVALID_FOCUSOUT(e)) {
 #ifdef DEBUG_FOCUS
         ob_debug("FocusOut on %lx mode %d detail %d IGNORED\n",
                  e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
@@ -840,7 +840,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 if (e->xconfigurerequest.value_mask & CWY)
                     y = newy;
             }
-	       
+
             switch (client->gravity) {
             case NorthEastGravity:
             case EastGravity:
@@ -1038,7 +1038,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 if (e->xclient.data.l[0] & 1 << 9)
                     y = newy;
             }
-	       
+
             client_configure(client, OB_CORNER_TOPLEFT,
                              x, y, w, h, FALSE, TRUE);
 

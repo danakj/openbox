@@ -17,7 +17,7 @@ openbox_LDADD=../otk/libotk.a @LIBINTL@
 
 openbox_SOURCES= configuration.cc screen.cc openbox.cc \
                  util.cc window.cc workspace.cc xatom.cc blackbox.cc \
-                 main.cc
+                 main.cc xeventhandler.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

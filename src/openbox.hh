@@ -11,6 +11,7 @@ extern "C" {
 
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
+#include "xeventhandler.hh"
 
 namespace ob {
 
@@ -67,6 +68,9 @@ private:
     that all timers fire when their times elapse.
   */
   otk::OBTimerQueueManager _timermanager;
+
+  //! The class which will handle raw XEvents
+  OBXEventHandler _xeventhandler;
 
   //! The running state of the window manager
   RunState _state;

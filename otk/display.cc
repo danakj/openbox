@@ -41,9 +41,9 @@ namespace otk {
 
 Display *OBDisplay::display = (Display*) 0;
 bool OBDisplay::_shape = false;
-int  OBDisplay::_shape_event_basep;
+int  OBDisplay::_shape_event_basep = 0;
 bool OBDisplay::_xinerama = false;
-int  OBDisplay::_xinerama_event_basep;
+int  OBDisplay::_xinerama_event_basep = 0;
 unsigned int OBDisplay::_mask_list[8];
 OBDisplay::ScreenInfoList OBDisplay::_screenInfoList;
 BGCCache *OBDisplay::_gccache = (BGCCache*) 0;

@@ -199,7 +199,8 @@ void Openbox::eventLoop()
     if (XPending(otk::OBDisplay::display)) {
       XEvent e;
       XNextEvent(otk::OBDisplay::display, &e);
-      process_event(&e);
+      //process_event(&e);
+      _xeventhandler.handle(e);
     } else {
       _timermanager.fire();
     }

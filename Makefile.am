@@ -310,8 +310,7 @@ plugins_menu_client_menu_la_LDFLAGS = \
 	-module \
 	-avoid-version
 plugins_menu_client_menu_la_SOURCES = \
-	plugins/menu/client_menu.c \
-	plugins/menu/client_menu.h
+	plugins/menu/client_menu.c
 
 plugins_menu_include_menu_la_CPPFLAGS = \
 	$(XFT_CFLAGS) \
@@ -324,8 +323,7 @@ plugins_menu_include_menu_la_LDFLAGS = \
 	-module \
 	-avoid-version
 plugins_menu_include_menu_la_SOURCES = \
-	plugins/menu/include_menu.c \
-	plugins/menu/include_menu.h
+	plugins/menu/include_menu.c
 
 
 ## themes ##
@@ -389,7 +387,7 @@ EXTRA_DIST = \
 	mkinstalldirs \
 	README \
 	COPYING \
-	AUTHOR
+	AUTHORS
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

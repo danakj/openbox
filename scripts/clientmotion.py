@@ -72,6 +72,18 @@ def def_motion(action, win, type, modifiers, xroot, yroot, time):
 		#        _posqueue[0]->clientarea.width() + _dx,
 		#        _posqueue[0]->clientarea.height() + _dy);
 
+def def_enter(action, win, type, modifiers):
+	client = Openbox_findClient(openbox, win)
+	if not client: return
+        OBClient_focus(client)
+
+def def_leave(action, win, type, modifiers):
+	client = Openbox_findClient(openbox, win)
+	if not client: return
+
+
+register(Action_EnterWindow, def_enter)
+#register(Action_LeaveWindow, def_leave)
 
 register(Action_ButtonPress, def_motion_press)
 register(Action_ButtonRelease, def_motion_release)

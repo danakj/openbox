@@ -11,8 +11,6 @@
 extern "C" {
 // The initializer in openbox_wrap.cc
 extern void init_openbox(void);
-// The initializer in otk_wrap.cc
-extern void init_otk(void);
 }
 
 namespace ob {
@@ -24,8 +22,7 @@ void python_init(char *argv0)
   // start the python engine
   Py_SetProgramName(argv0);
   Py_Initialize();
-  // initialize the C python modules
-  init_otk();
+  // initialize the C python module
   init_openbox();
   // include the openbox directories for python scripts in the sys path
   PyRun_SimpleString("import sys");

@@ -8,7 +8,7 @@ CPPFLAGS=$(FC_CFLAGS) $(GLIB_CFLAGS) $(GL_CFLAGS) @CPPFLAGS@ \
          -DTHEMEDIR=\"$(themedir)\"
 
 INCLUDES=-I..
-LIBS=$(FC_LIBS) $(GLIB_LIBS) $(GL_LIBS) @LIBS@
+LIBS=$(FC_LIBS) $(GLIB_LIBS) $(X_LIBS) $(GL_LIBS) @LIBS@
 
 noinst_PROGRAMS=glfttest
 glfttest_LDFLAGS=-lglft -L.

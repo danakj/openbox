@@ -109,6 +109,8 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                            void *d)
 {
+    keyboard_unbind_all();
+
     parse_key(i, doc, node->children, NULL);
 }
 
@@ -131,6 +133,8 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     ObUserAction uact;
     ObMouseAction mact;
     ObAction *action;
+
+    mouse_unbind_all();
 
     node = node->children;
     
@@ -340,6 +344,131 @@ static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_resist_edge = parse_int(doc, n);
 }
 
+typedef struct
+{
+    const gchar *key;
+    const gchar *actname;
+} ObDefKeyBind;
+
+static void bind_default_keyboard()
+{
+    ObDefKeyBind *it;
+    ObDefKeyBind binds[] = {
+        { "A-Tab", "NextWindow" },
+        { "S-A-Tab", "PreviousWindow" },
+        { "C-A-Right", "DesktopRight" },
+        { "C-A-Left", "DesktopLeft" },
+        { "C-A-Up", "DesktopUp" },
+        { "C-A-Down", "DesktopDown" },
+        { "S-A-Right", "SendToDesktopRight" },
+        { "S-A-Left", "SendToDesktopLeft" },
+        { "S-A-Up", "SendToDesktopUp" },
+        { "S-A-Down", "SendToDesktopDown" },
+        { "A-F10", "MaximizeFull" },
+        { "A-F5", "UnmaximizeFull" },
+        { "A-F12", "ToggleShade" },
+        { "A-F4", "Close" },
+        { "A-F7", "Move" },
+        { "A-F8", "Resize" },
+        { "A-F9", "Iconify" },
+        { NULL, NULL }
+    };
+
+    for (it = binds; it->key; ++it) {
+        GList *l = g_list_append(NULL, g_strdup(it->key));
+        keyboard_bind(l, action_from_string(it->actname,
+                                            OB_USER_ACTION_KEYBOARD_KEY));
+    }
+}
+
+typedef struct
+{
+    const gchar *button;
+    const gchar *context;
+    ObMouseAction mact;
+    const gchar *actname;
+} ObDefMouseBind;
+
+static void bind_default_mouse()
+{
+    ObDefMouseBind *it;
+    ObDefMouseBind binds[] = {
+        { "Up", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
+        { "Down", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
+        { "A-Up", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
+        { "A-Down", "Desktop", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
+        { "A-Up", "Frame", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
+        { "A-Down", "Frame", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
+        { "A-Up", "MoveResize", OB_MOUSE_ACTION_PRESS, "DesktopNext" },
+        { "Down", "MoveResize", OB_MOUSE_ACTION_PRESS, "DesktopPrevious" },
+        { "Left", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Middle", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Right", "Client", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Desktop", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Middle", "Desktop", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Right", "Desktop", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Titlebar", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Handle", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "BLCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "BRCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "TLCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "TRCorner", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Close", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Maximize", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Iconify", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Icon", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "AllDesktops", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Shade", OB_MOUSE_ACTION_PRESS, "Focus" },
+        { "Left", "Client", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Titlebar", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Middle", "Titlebar", OB_MOUSE_ACTION_CLICK, "Lower" },
+        { "Left", "Handle", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "BLCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "BRCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "TLCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "TRCorner", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Close", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Maximize", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Iconify", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Icon", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "AllDesktops", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Shade", OB_MOUSE_ACTION_CLICK, "Raise" },
+        { "Left", "Close", OB_MOUSE_ACTION_CLICK, "Close" },
+        { "Left", "Maximize", OB_MOUSE_ACTION_CLICK, "ToggleMaximizeFull" },
+        { "Left", "Iconify", OB_MOUSE_ACTION_CLICK, "Iconify" },
+        { "Left", "AllDesktops", OB_MOUSE_ACTION_CLICK, "ToggleOmnipresent" },
+        { "Left", "Shade", OB_MOUSE_ACTION_CLICK, "ToggleShade" },
+        { "Left", "TLCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "TRCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "BLCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "BRCorner", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { "Left", "Titlebar", OB_MOUSE_ACTION_MOTION, "Move" },
+        { "A-Left", "Frame", OB_MOUSE_ACTION_MOTION, "Move" },
+        { "A-Middle", "Frame", OB_MOUSE_ACTION_MOTION, "Resize" },
+        { NULL, NULL, 0, NULL }
+    };
+
+    for (it = binds; it->button; ++it) {
+        ObUserAction uact;
+        switch (it->mact) {
+        case OB_MOUSE_ACTION_PRESS:
+            uact = OB_USER_ACTION_MOUSE_PRESS; break;
+        case OB_MOUSE_ACTION_RELEASE:
+            uact = OB_USER_ACTION_MOUSE_RELEASE; break;
+        case OB_MOUSE_ACTION_CLICK:
+            uact = OB_USER_ACTION_MOUSE_CLICK; break;
+        case OB_MOUSE_ACTION_DOUBLE_CLICK:
+            uact = OB_USER_ACTION_MOUSE_DOUBLE_CLICK; break;
+        case OB_MOUSE_ACTION_MOTION:
+            uact = OB_USER_ACTION_MOUSE_MOTION; break;
+        case OB_NUM_MOUSE_ACTIONS:
+            g_assert_not_reached();
+        }
+        mouse_bind(it->button, it->context, it->mact,
+                   action_from_string(it->actname, uact));
+    }
+}
+
 void config_startup(ObParseInst *i)
 {
     config_focus_new = TRUE;
@@ -377,10 +506,14 @@ void config_startup(ObParseInst *i)
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
+    bind_default_keyboard();
+
     parse_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 3;
     config_mouse_dclicktime = 200;
+
+    bind_default_mouse();
 
     parse_register(i, "mouse", parse_mouse, NULL);
 

@@ -132,6 +132,7 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *sur,
                                      struct RrSurface *parent);
 void RrSurfaceFree(struct RrSurface *sur);
 
+Window RrSurfaceWindow(struct RrSurface *sur);
 struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
 
 #endif

@@ -62,7 +62,7 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
 {
     struct RrSurface *sur;
 
-    /* cant be a child of a prototype! */
+    /* can't be a child of a prototype! */
     assert(parent->inst);
     if (!parent->inst) return NULL;
 
@@ -115,7 +115,7 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
 {
     struct RrSurface *sur;
 
-    /* cant be a child of a prototype! */
+    /* can't be a child of a prototype! */
     assert(parent->inst);
     if (!parent->inst) return NULL;
 
@@ -135,6 +135,15 @@ void RrSurfaceFree(struct RrSurface *sur)
             XDestroyWindow(RrDisplay(sur->inst), sur->win);
         free(sur);
     }
+}
+
+Window RrSurfaceWindow(struct RrSurface *sur)
+{
+    /* can't get a window for a prototype */
+    assert(sur->inst);
+    if (!sur->inst) return None;
+
+    return sur->win;
 }
 
 struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum)

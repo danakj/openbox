@@ -113,37 +113,30 @@ OBBindings::~OBBindings()
 
 static void assimilate(BindingTree *parent, BindingTree *node)
 {
-  BindingTree *p, *lastsib, *nextparent, *nextnode = node->first_child;
+  BindingTree *a, *b, *tmp, *last;
 
   if (!parent->first_child) {
     // there are no nodes at this level yet
     parent->first_child = node;
-    nextparent = node;
+    return;
   } else {
-    p = lastsib = parent->first_child;
-
-    while (p->next_sibling) {
-      p = p->next_sibling;
-      lastsib = p; // finds the last sibling
-      if (p->binding == node->binding) {
-	// found an identical binding..
-	assert(node->chain && p->chain);
-	delete node; // kill the one we aren't using
-        printf("using existing node\n");
-	break;
+    a = parent->first_child;
+    last = a;
+    b = node;
+    while (a->first_child) {
+      last = a;
+      if (a->binding != b->binding) {
+        a = a->next_sibling;
+      } else {
+	tmp = b;
+        b = b->first_child;
+	delete tmp;
+        a = a->first_child;
       }
     }
-    if (!p) {
-      // couldn't find an existing binding, use this new one, and insert it
-      // into the list
-      p = lastsib->next_sibling = node;
-      printf("inserting %s\n", p->text.c_str());
-    }
-    nextparent = p;
+    last->first_child = b->first_child;
+    delete b;
   }
-
-  if (nextnode)
-    assimilate(nextparent, nextnode);
 }
 
 

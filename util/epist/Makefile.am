@@ -2,7 +2,7 @@
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
-bin_PROGRAMS =		epist
+EXTRA_PROGRAMS =		epist
 
 epist_SOURCES =		epist.cc window.cc screen.cc main.cc
 epist_LDADD =		../../src/XAtom.o ../../src/BaseDisplay.o \

@@ -1504,8 +1504,11 @@ static void calc_recursive(Client *self, Client *orig, StackLayer l,
         calc_recursive(it->data, orig, l, raised ? raised : l != old);
 
     if (!raised && l != old)
-	if (orig->frame) /* only restack if the original window is managed */
-	    stacking_raise(CLIENT_AS_WINDOW(self));
+	if (orig->frame) { /* only restack if the original window is managed */
+            /* XXX add_non_intrusive ever? */
+            stacking_remove(CLIENT_AS_WINDOW(self));
+            stacking_add(CLIENT_AS_WINDOW(self));
+        }
 }
 
 void client_calc_layer(Client *self)

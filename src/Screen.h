@@ -219,7 +219,7 @@ public:
   void setAutoRaise(bool a);
   
   inline bool imageDither() const { return resource.image_dither; }
-  void setImageDither(bool d);
+  void setImageDither(bool d, bool reconfig = true);
   
   inline bool orderedDither() const { return resource.ordered_dither; }
   

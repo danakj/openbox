@@ -850,13 +850,14 @@ void BScreen::setAutoRaise(bool a) {
 }
 
 
-void BScreen::setImageDither(bool d) {
+void BScreen::setImageDither(bool d, bool reconfig) {
   resource.image_dither = d;
   std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
   config.setValue(s.str(), resource.image_dither);
   s.rdbuf()->freeze(0);
-  openbox.reconfigure();
+  if (reconfig)
+    openbox.reconfigure();
 }
 
 
@@ -1042,7 +1043,7 @@ void BScreen::saveWorkspaceNames() {
 void BScreen::save() {
   setSloppyFocus(resource.sloppy_focus);
   setAutoRaise(resource.auto_raise);
-  setImageDither(resource.image_dither);
+  setImageDither(resource.image_dither, false);
   setOpaqueMove(resource.opaque_move);
   setFullMax(resource.full_max);
   setFocusNew(resource.focus_new);

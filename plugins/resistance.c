@@ -39,7 +39,7 @@ static void resist(Client *c, int *x, int *y)
 
             target = it->data;
             /* don't snap to self or non-visibles */
-            if (target == c || !target->frame->visible) continue; 
+            if (!target->frame->visible || target == c) continue; 
 
             tl = target->frame->area.x - 1;
             tt = target->frame->area.y - 1;

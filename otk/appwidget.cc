@@ -21,13 +21,10 @@ AppWidget::AppWidget(Application *app, Direction direction,
 {
   assert(app);
 
-  _wm_protocols = Property::atoms.wm_protocols;
-  _wm_delete = Property::atoms.wm_protocols;
-
   // set WM Protocols on the window
   Atom protocols[2];
-  protocols[0] = _wm_protocols;
-  protocols[1] = _wm_delete;
+  protocols[0] = Property::atoms.wm_protocols;
+  protocols[1] = Property::atoms.wm_delete_window;
   XSetWMProtocols(**display, window(), protocols, 2);
 }
 
@@ -52,8 +49,8 @@ void AppWidget::hide(void)
 void AppWidget::clientMessageHandler(const XClientMessageEvent &e)
 {
   EventHandler::clientMessageHandler(e);
-  if (e.message_type == _wm_protocols &&
-      static_cast<Atom>(e.data.l[0]) == _wm_delete)
+  if (e.message_type == Property::atoms.wm_protocols &&
+      static_cast<Atom>(e.data.l[0]) == Property::atoms.wm_delete_window)
     hide();
 }
 

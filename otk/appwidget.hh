@@ -23,8 +23,6 @@ public:
 private:
 
   Application *_application;
-  Atom _wm_protocols;
-  Atom _wm_delete;
 };
 
 }

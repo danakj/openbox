@@ -3,6 +3,7 @@
 epistrc \- Configuration file for Epist
 .SH SYNOPSIS
 .B $HOME/.openbox/epistrc
+.br
 .B @pkgdatadir@/epistrc
 .SH DESCRIPTION
 \fIepist\fR(1) grabs its configuration and bindings from the epistrc file.

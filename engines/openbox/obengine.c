@@ -37,10 +37,14 @@ int ob_s_winfont_shadow;
 int ob_s_winfont_shadow_offset;
 ObFont *ob_s_winfont;
 /* style settings - masks */
-pixmap_mask *ob_s_max_mask;
-pixmap_mask *ob_s_icon_mask;
-pixmap_mask *ob_s_desk_mask;
-pixmap_mask *ob_s_close_mask;
+pixmap_mask *ob_s_max_pressed_mask;
+pixmap_mask *ob_s_max_unpressed_mask;
+pixmap_mask *ob_s_iconify_pressed_mask;
+pixmap_mask *ob_s_iconify_unpressed_mask;
+pixmap_mask *ob_s_desk_pressed_mask;
+pixmap_mask *ob_s_desk_unpressed_mask;
+pixmap_mask *ob_s_close_pressed_mask;
+pixmap_mask *ob_s_close_unpressed_mask;
 
 /* global appearances */
 Appearance *ob_a_focused_unpressed_max;
@@ -101,7 +105,10 @@ gboolean startup()
         ob_s_title_unfocused_color = ob_s_title_focused_color = 
         ob_s_titlebut_unfocused_color = ob_s_titlebut_focused_color = NULL;
     ob_s_winfont = NULL;
-    ob_s_max_mask = ob_s_icon_mask = ob_s_desk_mask = ob_s_close_mask = NULL;
+    ob_s_max_pressed_mask = ob_s_max_unpressed_mask = NULL;
+    ob_s_iconify_pressed_mask = ob_s_iconify_unpressed_mask = NULL;
+    ob_s_desk_pressed_mask = ob_s_desk_unpressed_mask = NULL;
+    ob_s_close_pressed_mask = ob_s_close_unpressed_mask = NULL;
 
     ob_a_focused_unpressed_max = appearance_new(Surface_Planar, 1);
     ob_a_focused_pressed_max = appearance_new(Surface_Planar, 1);
@@ -186,10 +193,22 @@ void shutdown()
     if (ob_s_titlebut_focused_color != NULL)
         color_free(ob_s_titlebut_focused_color);
 
-    if (ob_s_max_mask != NULL) pixmap_mask_free(ob_s_max_mask);
-    if (ob_s_desk_mask != NULL) pixmap_mask_free(ob_s_desk_mask);
-    if (ob_s_icon_mask != NULL) pixmap_mask_free(ob_s_icon_mask);
-    if (ob_s_close_mask != NULL) pixmap_mask_free(ob_s_close_mask);
+    if (ob_s_max_pressed_mask != NULL)
+        pixmap_mask_free(ob_s_max_pressed_mask);
+    if (ob_s_max_unpressed_mask != NULL)
+        pixmap_mask_free(ob_s_max_unpressed_mask);
+    if (ob_s_desk_pressed_mask != NULL)
+        pixmap_mask_free(ob_s_desk_pressed_mask);
+    if (ob_s_desk_unpressed_mask != NULL)
+        pixmap_mask_free(ob_s_desk_unpressed_mask);
+    if (ob_s_iconify_pressed_mask != NULL)
+        pixmap_mask_free(ob_s_iconify_pressed_mask);
+    if (ob_s_iconify_unpressed_mask != NULL)
+        pixmap_mask_free(ob_s_iconify_unpressed_mask);
+    if (ob_s_close_pressed_mask != NULL)
+        pixmap_mask_free(ob_s_close_pressed_mask);
+    if (ob_s_close_unpressed_mask != NULL)
+        pixmap_mask_free(ob_s_close_unpressed_mask);
 
     if (ob_s_winfont != NULL) font_close(ob_s_winfont);
 

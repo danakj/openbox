@@ -32,10 +32,14 @@ extern int ob_s_winfont_shadow;
 extern int ob_s_winfont_shadow_offset;
 extern ObFont *ob_s_winfont;
 
-extern pixmap_mask *ob_s_max_mask;
-extern pixmap_mask *ob_s_icon_mask;
-extern pixmap_mask *ob_s_desk_mask;
-extern pixmap_mask *ob_s_close_mask;
+extern pixmap_mask *ob_s_max_pressed_mask;
+extern pixmap_mask *ob_s_max_unpressed_mask;
+extern pixmap_mask *ob_s_iconify_pressed_mask;
+extern pixmap_mask *ob_s_iconify_unpressed_mask;
+extern pixmap_mask *ob_s_desk_pressed_mask;
+extern pixmap_mask *ob_s_desk_unpressed_mask;
+extern pixmap_mask *ob_s_close_pressed_mask;
+extern pixmap_mask *ob_s_close_unpressed_mask;
 
 extern Appearance *ob_a_focused_unpressed_max;
 extern Appearance *ob_a_focused_pressed_max;

@@ -720,39 +720,40 @@ static void layout_title(ObFrame *self)
 static void render(ObFrame *self)
 {
     if (self->frame.client->focused) {
-	XSetWindowBorder(ob_display, self->frame.plate,
-			 s_cb_focused_color->pixel);
+        XSetWindowBorder(ob_display, self->frame.plate,
+                         s_cb_focused_color->pixel);
     } else {
-	XSetWindowBorder(ob_display, self->frame.plate,
-			 s_cb_unfocused_color->pixel);
+        XSetWindowBorder(ob_display, self->frame.plate,
+                         s_cb_unfocused_color->pixel);
     }
 
     if (self->frame.client->decorations & Decor_Titlebar) {
-	paint(self->title, (self->frame.client->focused ?
-			    self->a_focused_title :
-			    self->a_unfocused_title),
-	      self->width, TITLE_HEIGHT);
-	render_label(self);
-	render_max(self);
-	render_icon(self);
-	render_iconify(self);
-	render_desk(self);
-	render_close(self);
+        paint(self->title, (self->frame.client->focused ?
+                            self->a_focused_title :
+                            self->a_unfocused_title),
+              0, 0, self->width, TITLE_HEIGHT);
+        render_label(self);
+        render_max(self);
+        render_icon(self);
+        render_iconify(self);
+        render_desk(self);
+        render_close(self);
     }
 
     if (self->frame.client->decorations & Decor_Handle) {
-	paint(self->handle, (self->frame.client->focused ?
-			     self->a_focused_handle :
-			     self->a_unfocused_handle),
-	      HANDLE_WIDTH(self), s_handle_height);
-	paint(self->lgrip, (self->frame.client->focused ?
-			    a_focused_grip :
-			    a_unfocused_grip),
-	      GRIP_WIDTH, s_handle_height);
-	paint(self->rgrip, (self->frame.client->focused ?
-			    a_focused_grip :
-			    a_unfocused_grip),
-	      GRIP_WIDTH, s_handle_height);
+        paint(self->handle, (self->frame.client->focused ?
+                             self->a_focused_handle :
+                             self->a_unfocused_handle),
+              GRIP_WIDTH + self->bwidth, 0,
+              HANDLE_WIDTH(self), s_handle_height);
+        paint(self->lgrip, (self->frame.client->focused ?
+                            a_focused_grip :
+                            a_unfocused_grip),
+              0, 0, GRIP_WIDTH, s_handle_height);
+        paint(self->rgrip, (self->frame.client->focused ?
+                            a_focused_grip :
+                            a_unfocused_grip),
+              0, 0, GRIP_WIDTH, s_handle_height);
     }
 }
 
@@ -768,7 +769,7 @@ static void render_label(ObFrame *self)
     /* set the texture's text! */
     a->texture[0].data.text.string = self->frame.client->title;
 
-    paint(self->label, a, self->label_width, LABEL_HEIGHT);
+    paint(self->label, a, 0, 0, self->label_width, LABEL_HEIGHT);
 }
 
 static void render_icon(ObFrame *self)
@@ -776,7 +777,7 @@ static void render_icon(ObFrame *self)
     if (self->icon_x < 0) return;
 
     /* XXX set the texture's icon picture! */
-    paint(self->icon, self->a_icon, BUTTON_SIZE, BUTTON_SIZE);
+    paint(self->icon, self->a_icon, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_max(ObFrame *self)
@@ -793,7 +794,7 @@ static void render_max(ObFrame *self)
 		      (press ?
 		       a_unfocused_pressed_max :
 		       a_unfocused_unpressed_max)),
-	  BUTTON_SIZE, BUTTON_SIZE);
+	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_iconify(ObFrame *self)
@@ -807,7 +808,7 @@ static void render_iconify(ObFrame *self)
 			  (self->iconify_press ?
 			   a_unfocused_pressed_iconify :
 			   a_unfocused_unpressed_iconify)),
-	  BUTTON_SIZE, BUTTON_SIZE);
+	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_desk(ObFrame *self)
@@ -824,7 +825,7 @@ static void render_desk(ObFrame *self)
 		       (press ?
 			a_unfocused_pressed_desk :
 			a_unfocused_unpressed_desk)),
-	  BUTTON_SIZE, BUTTON_SIZE);
+	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 static void render_close(ObFrame *self)
@@ -838,7 +839,7 @@ static void render_close(ObFrame *self)
 			  (self->close_press ?
 			   a_unfocused_pressed_close :
 			   a_unfocused_unpressed_close)),
-	  BUTTON_SIZE, BUTTON_SIZE);
+	  0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 
 GQuark get_context(Client *client, Window win)

@@ -58,9 +58,9 @@
 #  include <string.h>
 #endif // HAVE_STRING_H
 
-#include <vector>
 #include <algorithm>
-typedef vector<Rect> rectList;
+#include <vector>
+typedef std::vector<Rect> rectList;
 
 Workspace::Workspace(BScreen &scrn, int i) : screen(scrn) {
 
@@ -442,9 +442,9 @@ Point *Workspace::bestFitPlacement(const Size &win_size, const Rect &space) {
   for (siter=spaces.begin(); siter!=spaces.end(); ++siter) {
     if ((siter->w() >= win_size.w()) && (siter->h() >= win_size.h())) {
       if (best==NULL)
-        best = siter;
+        best = &*siter;
       else if(siter->w()*siter->h()<best->h()*best->w())
-        best = siter;
+        best = &*siter;
     }
   }
   if (best != NULL) {

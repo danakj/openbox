@@ -15,13 +15,15 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 
+AC_LANG_CPLUSPLUS
+
 AC_CHECK_PROGS(regex_cmd, sed)
 if test x$regex_cmd = "x"; then
   AC_MSG_ERROR([error. sed is required to build the default menu file.])
 fi
 
 dnl Check for system header files
-AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdio.h string.h stdlib.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
+AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdio.h string.h stdlib.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h sstream)
 AC_HEADER_TIME
 
 dnl Check for existance of basename(), setlocale() and strftime()

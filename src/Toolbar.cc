@@ -62,7 +62,10 @@
 # endif // HAVE_SYS_TIME_H
 #endif // TIME_WITH_SYS_TIME
 
-#include <strstream>
+#ifdef    HAVE_SSTREAM
+#  include <sstream>
+#endif // HAVE_SSTREAM
+
 #include <string>
 
 Toolbar::Toolbar(BScreen &scrn, Resource &conf) : screen(scrn),
@@ -214,35 +217,30 @@ Toolbar::~Toolbar() {
 
 void Toolbar::setOnTop(bool b) {
   m_ontop = b;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop" << ends;
+  std::ostringstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.onTop";
   config.setValue(s.str(), m_ontop ? "True" : "False");
-  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setAutoHide(bool b) {
   m_autohide = b;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide" <<
-    ends;
+  std::ostringstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.autoHide";
   config.setValue(s.str(), m_autohide ? "True" : "False");
-  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setWidthPercent(int w) {
   m_width_percent = w;
-  std::ostrstream s;
+  std::ostringstream s;
   s << "session.screen" << screen.getScreenNumber() << ".toolbar.widthPercent"
-    << ends;
+   ;
   config.setValue(s.str(), m_width_percent);
-  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::setPlacement(int p) {
   m_placement = p;
-  std::ostrstream s;
-  s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement" <<
-    ends;
+  std::ostringstream s;
+  s << "session.screen" << screen.getScreenNumber() << ".toolbar.placement";
   const char *placement;
   switch (m_placement) {
   case TopLeft: placement = "TopLeft"; break;
@@ -253,7 +251,6 @@ void Toolbar::setPlacement(int p) {
   case BottomCenter: default: placement = "BottomCenter"; break;
   }
   config.setValue(s.str(), placement);
-  s.rdbuf()->freeze(0);
 }
 
 void Toolbar::save() {
@@ -264,22 +261,22 @@ void Toolbar::save() {
 }
 
 void Toolbar::load() {
-  std::ostrstream rscreen, rname, rclass;
+  std::ostringstream rscreen, rname, rclass;
   std::string s;
   bool b;
   long l;
-  rscreen << "session.screen" << screen.getScreenNumber() << '.' << ends;
+  rscreen << "session.screen" << screen.getScreenNumber() << '.';
 
-  rname << rscreen.str() << "toolbar.widthPercent" << ends;
-  rclass << rscreen.str() << "Toolbar.WidthPercent" << ends;
+  rname << rscreen.str() << "toolbar.widthPercent";
+  rclass << rscreen.str() << "Toolbar.WidthPercent";
   if (config.getValue(rname.str(), rclass.str(), l) && (l > 0 && l <= 100))
     m_width_percent = l;
   else
     m_width_percent =66;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.placement" << ends;
-  rclass << rscreen.str() << "Toolbar.Placement" << ends;
+  rname << rscreen.str() << "toolbar.placement";
+  rclass << rscreen.str() << "Toolbar.Placement";
   if (config.getValue(rname.str(), rclass.str(), s)) {
     if (0 == strncasecmp(s.c_str(), "TopLeft", s.length()))
       m_placement = TopLeft;
@@ -297,24 +294,20 @@ void Toolbar::load() {
     m_placement = BottomCenter;
   
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.onTop" << ends;
-  rclass << rscreen.str() << "Toolbar.OnTop" << ends;
+  rname << rscreen.str() << "toolbar.onTop";
+  rclass << rscreen.str() << "Toolbar.OnTop";
   if (config.getValue(rname.str(), rclass.str(), b))
     m_ontop = b;
   else
     m_ontop = false;
 
   rname.seekp(0); rclass.seekp(0);
-  rname << rscreen.str() << "toolbar.autoHide" << ends;
-  rclass << rscreen.str() << "Toolbar.AutoHide" << ends;
+  rname << rscreen.str() << "toolbar.autoHide";
+  rclass << rscreen.str() << "Toolbar.AutoHide";
   if (config.getValue(rname.str(), rclass.str(), b))
     m_hidden = m_autohide = b;
   else
     m_hidden = m_autohide = false;
-
-  rscreen.rdbuf()->freeze(0);
-  rname.rdbuf()->freeze(0);
-  rclass.rdbuf()->freeze(0);
 }
 
 void Toolbar::reconfigure() {

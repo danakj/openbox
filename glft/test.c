@@ -28,6 +28,7 @@ static int x_error_handler(Display * disp, XErrorEvent * error)
 
 int main(int argc, char **argv)
 {
+    struct GlftColor col;
     Display *display;
     Window win;
     XVisualInfo *vi;
@@ -99,10 +100,10 @@ int main(int argc, char **argv)
                     quit = 1;
         case Expose:
             glClear(GL_COLOR_BUFFER_BIT);
-            glColor3f(0.0, 0.0, 0.0);
-            GlftRenderString(font, argv[2], strlen(argv[2]), 2, -2);
-            glColor3f(1.0, 1.0, 0.0);
-            GlftRenderString(font, argv[2], strlen(argv[2]), 0, 0);
+            col.r = 0.0; col.g = 0.0; col.b = 0.0; col.a = 1.0;
+            GlftRenderString(font, argv[2], strlen(argv[2]), &col, 9, -9);
+            col.r = 1.0; col.g = 1.0; col.b = 0.0; col.a = 0.25;
+            GlftRenderString(font, argv[2], strlen(argv[2]), &col, 0, 0);
             glXSwapBuffers(display, win);
         case ConfigureNotify:
             break;

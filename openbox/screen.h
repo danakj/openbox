@@ -75,6 +75,10 @@ Rect *screen_area(guint desktop);
 
 Rect *screen_area_monitor(guint desktop, guint head);
 
+/*! Sets the root cursor. This function decides which cursor to use, but you
+  gotta call it to let it know it should change. */
+void screen_set_root_cursor();
+
 gboolean screen_pointer_pos(int *x, int *y);
 
 #endif

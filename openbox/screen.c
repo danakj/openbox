@@ -1,11 +1,10 @@
 #include "debug.h"
 #include "openbox.h"
-#include "mainloop.h"
 #include "dock.h"
 #include "xerror.h"
 #include "prop.h"
-#include "startup.h"
 #include "grab.h"
+#include "startupnotify.h"
 #include "config.h"
 #include "screen.h"
 #include "client.h"
@@ -14,11 +13,6 @@
 #include "popup.h"
 #include "extensions.h"
 #include "render/render.h"
-
-#ifdef USE_LIBSN
-#  define SN_API_NOT_YET_FROZEN
-#  include <libsn/sn.h>
-#endif
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -47,15 +41,6 @@ static Rect  **area; /* array of desktop holding array of xinerama areas */
 static Rect  *monitor_area;
 
 static Popup *desktop_cycle_popup;
-
-#ifdef USE_LIBSN
-static SnMonitorContext *sn_context;
-static int sn_busy_cnt;
-
-static void sn_event_func(SnMonitorEvent *event, void *data);
-#endif
-
-static void set_root_cursor();
 
 static gboolean replace_wm()
 {
@@ -179,7 +164,7 @@ gboolean screen_annex()
     }
 
 
-    set_root_cursor();
+    screen_set_root_cursor();
 
     /* set the OPENBOX_PID hint */
     pid = getpid();
@@ -287,10 +272,7 @@ void screen_startup(gboolean reconfig)
         screen_num_desktops = 0;
     screen_set_num_desktops(config_desktops_num);
     if (!reconfig) {
-        if (startup_desktop >= screen_num_desktops)
-            startup_desktop = 0;
-        screen_desktop = startup_desktop;
-        screen_set_desktop(startup_desktop);
+        screen_set_desktop(0);
 
         /* don't start in showing-desktop mode */
         screen_showing_desktop = FALSE;
@@ -298,12 +280,6 @@ void screen_startup(gboolean reconfig)
                    net_showing_desktop, cardinal, screen_showing_desktop);
 
         screen_update_layout();
-
-#ifdef USE_LIBSN
-        sn_context = sn_monitor_context_new(ob_sn_display, ob_screen,
-                                            sn_event_func, NULL, NULL);
-        sn_busy_cnt = 0;
-#endif
     }
 }
 
@@ -314,10 +290,6 @@ void screen_shutdown(gboolean reconfig)
     popup_free(desktop_cycle_popup);
 
     if (!reconfig) {
-#ifdef USE_LIBSN
-        sn_monitor_context_unref(sn_context);
-#endif
-
         XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
                      NoEventMask);
 
@@ -1078,66 +1050,15 @@ Rect *screen_physical_area_monitor(guint head)
     return &monitor_area[head];
 }
 
-static void set_root_cursor()
+void screen_set_root_cursor()
 {
-#ifdef USE_LIBSN
-        if (sn_busy_cnt)
-            XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
-                          ob_cursor(OB_CURSOR_BUSY));
-        else
-#endif
-            XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
-                          ob_cursor(OB_CURSOR_POINTER));
+    if (sn_app_starting())
+        XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
+                      ob_cursor(OB_CURSOR_BUSY));
+    else
+        XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
+                      ob_cursor(OB_CURSOR_POINTER));
 }
-
-#ifdef USE_LIBSN
-static gboolean sn_timeout(gpointer data)
-{
-    sn_busy_cnt = 0;
-
-    set_root_cursor();
-
-    return FALSE; /* don't repeat */
-}
-
-static void sn_event_func(SnMonitorEvent *ev, void *data)
-{
-    SnStartupSequence *seq;
-    const char *seq_id, *bin_name;
-    int cnt = sn_busy_cnt;
-
-    if (!(seq = sn_monitor_event_get_startup_sequence(ev)))
-        return;
-
-    seq_id = sn_startup_sequence_get_id(seq);
-    bin_name = sn_startup_sequence_get_binary_name(seq);
-    
-    if (!(seq_id && bin_name))
-        return;
-
-    switch (sn_monitor_event_get_type(ev)) {
-    case SN_MONITOR_EVENT_INITIATED:
-        ++sn_busy_cnt;
-        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
-        /* 30 second timeout for apps to start */
-        ob_main_loop_timeout_add(ob_main_loop, 30 * G_USEC_PER_SEC,
-                                 sn_timeout, NULL, NULL);
-        break;
-    case SN_MONITOR_EVENT_CHANGED:
-        break;
-    case SN_MONITOR_EVENT_COMPLETED:
-        if (sn_busy_cnt) --sn_busy_cnt;
-        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
-        break;
-    case SN_MONITOR_EVENT_CANCELED:
-        if (sn_busy_cnt) --sn_busy_cnt;
-        ob_main_loop_timeout_remove(ob_main_loop, sn_timeout);
-    };
-
-    if (sn_busy_cnt != cnt)
-        set_root_cursor();
-}
-#endif
 
 gboolean screen_pointer_pos(int *x, int *y)
 {

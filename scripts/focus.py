@@ -135,13 +135,13 @@ def _focus_stacked_ungrab(data):
     if data.action == ob.KeyAction.Release:
         # have all the modifiers this started with been released?
         if not _cyc_mask & data.state:
+            _destroy_popup_list()
             ob.kungrab() # ungrab ourself
             _doing_stacked = 0;
             if cycle_raise:
                 client = ob.openbox.findClient(_cyc_w)
                 if client:
                     ob.openbox.screen(data.screen).raiseWindow(client)
-            _destroy_popup_list()
 
 _list_widget = 0
 _list_labels = []

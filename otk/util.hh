@@ -40,6 +40,7 @@ inline std::string itostring(unsigned int i)
 inline std::string itostring(int i)
   { return itostring((long) i); }
 
+void putenv(const std::string &data);
 
 std::string basename(const std::string& path);
 

@@ -19,28 +19,17 @@ static PyObject *obdict = NULL;
 
 void python_init(char *argv0)
 {
-  std::string path;
-  
   // start the python engine
-  //Py_SetProgramName(argv0);
-  //Py_Initialize();
+  Py_SetProgramName(argv0);
+  Py_Initialize();
   // initialize the C python module
-  //init_openbox();
+  init_openbox();
   // include the openbox directories for python scripts in the sys path
-//  PyRun_SimpleString("import sys");
-printf("SCRIPTDIR=%s\n", SCRIPTDIR);
-printf("1 getenv(DISPLAY)=%s\n", getenv("DISPLAY"));
-  path = "sys.path";
-printf("2 getenv(DISPLAY)=%s\n", getenv("DISPLAY"));
-  path = "sys.path.append('";
-printf("3 getenv(DISPLAY)=%s\n", getenv("DISPLAY"));
-  path += SCRIPTDIR;
-  path += "')";
-  PyRun_SimpleString(const_cast<char*>(path.c_str()));
-  path = "sys.path.append('";
-  path += otk::expandTilde("~/.openbox/python");
-  path += "')";
-  PyRun_SimpleString(const_cast<char*>(path.c_str()));
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
+  PyRun_SimpleString(const_cast<char*>(("sys.path.append('" +
+                                        otk::expandTilde("~/.openbox/python") +
+                                        "')").c_str()));
   // import the otk and openbox modules into the main namespace
   PyRun_SimpleString("from openbox import *;");
   // set up convenience global variables

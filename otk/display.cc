@@ -7,6 +7,7 @@
 #include "display.hh"
 #include "screeninfo.hh"
 #include "gccache.hh"
+#include "util.hh"
 
 extern "C" {
 #include <X11/keysym.h>
@@ -26,10 +27,6 @@ extern "C" {
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
-
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
 
 #ifdef    HAVE_SIGNAL_H
 #  include <signal.h>
@@ -110,11 +107,7 @@ line argument.\n\n"));
   // set the DISPLAY environment variable for any lauched children, to the
   // display we're using, so they open in the right place.
   // XXX rm -> std::string dtmp = "DISPLAY=" + DisplayString(display);
-  if (putenv(const_cast<char*>((std::string("DISPLAY=") +
-                                DisplayString(display)).c_str()))) {
-    printf(_("warning: couldn't set environment variable 'DISPLAY'\n"));
-    perror("putenv()");
-  }
+  putenv(std::string("DISPLAY=") + DisplayString(display));
   
   // find the availability of X extensions we like to use
 #ifdef XKB

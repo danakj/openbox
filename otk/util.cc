@@ -23,6 +23,9 @@ extern "C" {
 #  include <process.h>
 #endif //   HAVE_PROCESS_H             __EMX__
 
+#include "gettext.h"
+#define _(str) gettext(str)
+
 #include <assert.h>
 }
 
@@ -48,9 +51,8 @@ void bexec(const string& command, const string& displaystring) {
 #ifndef    __EMX__
   if (! fork()) {
     setsid();
-    int ret = putenv(const_cast<char *>(displaystring.c_str()));
-    assert(ret != -1);
-    ret = execl("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
+    putenv(displaystring);
+    int ret = execl("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
     exit(ret);
   }
 #else //   __EMX__
@@ -99,6 +101,19 @@ string itostring(long i) {
   if (i < 0)
     tmp.insert(tmp.begin(), '-');
   return tmp;
+}
+
+void putenv(const std::string &data)
+{
+  char *c = new char[data.size() + 1];
+  std::string::size_type i, max;
+  for (i = 0, max = data.size(); i < max; ++i)
+    c[i] = data[i];
+  c[i] = 0;
+  if (::putenv(c)) {
+    printf(_("warning: couldn't set environment variable\n"));
+    perror("putenv()");
+  }
 }
 
 string basename (const string& path) {

@@ -37,8 +37,10 @@ OBActions::~OBActions()
 void OBActions::insertPress(const XButtonEvent &e)
 {
   ButtonPressAction *a = _posqueue[BUTTONS - 1];
-  for (int i=BUTTONS-1; i>0;)
-    _posqueue[i] = _posqueue[--i];
+  // rm'd the last one, shift them all down one
+  for (int i = BUTTONS-1; i > 0; --i) {
+    _posqueue[i] = _posqueue[i-1];
+  }
   _posqueue[0] = a;
   a->button = e.button;
   a->pos.setPoint(e.x_root, e.y_root);
@@ -49,17 +51,19 @@ void OBActions::insertPress(const XButtonEvent &e)
 
 void OBActions::removePress(const XButtonEvent &e)
 {
+  int i;
   ButtonPressAction *a = 0;
-  for (int i=0; i<BUTTONS; ++i) {
-    if (_posqueue[i]->button == e.button)
+  for (i=0; i<BUTTONS-1; ++i)
+    if (_posqueue[i]->button == e.button) {
       a = _posqueue[i];
-    if (a) // found one and removed it
+      break;
+    }
+  if (a) { // found one, remove it and shift the rest up one
+    for (; i < BUTTONS-1; ++i)
       _posqueue[i] = _posqueue[i+1];
-  }
-  if (a) { // found one
     _posqueue[BUTTONS-1] = a;
-    a->button = 0;
   }
+  _posqueue[BUTTONS-1]->button = 0;
 }
 
 void OBActions::buttonPressHandler(const XButtonEvent &e)

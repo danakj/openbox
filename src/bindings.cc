@@ -158,7 +158,7 @@ OBBindings::~OBBindings()
 {
   grabKeys(false);
   removeAllKeys();
-  removeAllButtons();
+//  removeAllButtons(); XXX
   removeAllEvents();
 }
 
@@ -456,7 +456,7 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
 
 void OBBindings::removeAllButtons()
 {
-  for (int i = i; i < NUM_MOUSE_CONTEXT; ++i) {
+  for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it) {
       for (int a = 0; a < NUM_MOUSE_ACTION; ++a) {

@@ -13,7 +13,7 @@
 #include "otk/property.hh"
 #include "otk/display.hh"
 #include "otk/assassin.hh"
-#include "otk/util.hh" // TEMPORARY
+#include "otk/util.hh"
 
 extern "C" {
 #include <X11/cursorfont.h>
@@ -202,7 +202,7 @@ Openbox::~Openbox()
     if (!_restart_prog.empty()) {
       const std::string &dstr =
         otk::OBDisplay::screenInfo(first_screen)->displayString();
-      putenv(const_cast<char *>(dstr.c_str()));
+      otk::putenv(const_cast<char *>(dstr.c_str()));
       execlp(_restart_prog.c_str(), _restart_prog.c_str(), NULL);
       perror(_restart_prog.c_str());
     }
@@ -381,23 +381,9 @@ void Openbox::setFocusedClient(OBClient *c)
 
 void Openbox::execute(int screen, const std::string &bin)
 {
-#ifdef    __EMX__
-  // XXX: whats this for? windows?
-  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", bin.c_str(), NULL);
-#else //  __EMX__
   if (screen >= ScreenCount(otk::OBDisplay::display))
     screen = 0;
-  const std::string &dstr =
-    otk::OBDisplay::screenInfo(screen)->displayString();
-  
-  if (! fork()) {
-      setsid();
-      int ret = putenv(const_cast<char *>(dstr.c_str()));
-      assert(ret != -1);
-      ret = execl("/bin/sh", "/bin/sh", "-c", bin.c_str(), NULL);
-      exit(ret);
-    }
-#endif // __EMX__
+  otk::bexec(bin, otk::OBDisplay::screenInfo(screen)->displayString());
 }
 
 }

@@ -43,6 +43,8 @@ OBClient::OBClient(int screen, Window window)
   _focused = false;
   // not a transient by default of course
   _transient_for = 0;
+  // pick a layer to start from
+  _layer = Layer_Normal;
   
   getArea();
   getDesktop();

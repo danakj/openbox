@@ -24,6 +24,7 @@
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
+#include "focus.h"
 #include "moveresize.h"
 #include "render/theme.h"
 
@@ -420,6 +421,11 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             PROP_SETA32(self->client->window, kde_net_wm_frame_strut,
                         cardinal, vals, 4);
         }
+
+        /* if this occurs while we are focus cycling, the indicator needs to
+           match the changes */
+        if (focus_cycle_target == self->client)
+            focus_cycle_draw_indicator();
     }
 }
 

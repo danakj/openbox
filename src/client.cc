@@ -541,8 +541,8 @@ void OBClient::setDesktop(long target)
 {
   assert(target >= 0);
   //assert(target == 0xffffffff || target < MAX);
-  
-  // XXX: move the window to the new desktop
+
+  // XXX: move the window to the new desktop (and set root property)
   _desktop = target;
 }
 
@@ -768,10 +768,16 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
       setDesktop(e.data.l[0]); // use the found event
     else
       setDesktop(e.data.l[0]); // use the original event
-  }
-  else if (e.message_type == property->atom(otk::OBProperty::net_wm_state))
+  } else if (e.message_type == property->atom(otk::OBProperty::net_wm_state)) {
     // can't compress these
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
+  } else if (e.message_type ==
+             property->atom(otk::OBProperty::net_close_window)) {
+    close();
+  } else if (e.message_type ==
+             property->atom(otk::OBProperty::net_active_window)) {
+    focus();
+  }
 }
 
 

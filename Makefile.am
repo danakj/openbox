@@ -91,7 +91,6 @@ openbox_openbox_CPPFLAGS = \
 	$(SM_CFLAGS) \
 	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(GMODULE_CFLAGS) \
 	$(LIBSN_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
@@ -105,7 +104,6 @@ openbox_openbox_LDADD = \
 	$(VIDMODE_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(GLIB_LIBS) \
-	$(GMODULE_LIBS) \
 	$(LIBSN_LIBS) \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \

@@ -5,9 +5,6 @@
 
 /*! Time at which the last event with a timestamp occured. */
 extern Time event_lasttime;
-/*! Time at which the last event with a timestamp occured before we tried to
-  unfocus a window. */
-extern Time event_unfocustime;
 
 /*! The value of the mask for the NumLock modifier */
 extern unsigned int NumLockMask;

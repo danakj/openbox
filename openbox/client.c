@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "prop.h"
 #include "extensions.h"
+#include "config.h"
 #include "frame.h"
 #include "engine.h"
 #include "event.h"
@@ -86,6 +87,7 @@ void client_set_list()
 
 void client_manage_all()
 {
+    ConfigValue focus_new;
     unsigned int i, j, nchild;
     Window w, *children;
     XWMHints *wmhints;
@@ -136,6 +138,11 @@ void client_manage_all()
     g_free(client_startup_stack_order);
     client_startup_stack_order = NULL;
     client_startup_stack_size = 0;
+
+    if (!config_get("focusNew", Config_Bool, &focus_new))
+        g_assert_not_reached();
+    if (focus_new.bool)
+        focus_fallback(FALSE);
 }
 
 void client_manage(Window window)
@@ -146,6 +153,7 @@ void client_manage(Window window)
     XSetWindowAttributes attrib_set;
 /*    XWMHints *wmhint; */
     guint i;
+    ConfigValue focus_new;
 
     grab_server(TRUE);
 
@@ -231,6 +239,11 @@ void client_manage(Window window)
     client_showhide(client);
 
     dispatch_client(Event_Client_Mapped, client, 0, 0);
+
+    if (!config_get("focusNew", Config_Bool, &focus_new))
+        g_assert_not_reached();
+    if (ob_state != State_Starting && focus_new.bool)
+        client_focus(client);
 
     /* update the list hints */
     client_set_list();
@@ -1934,7 +1947,7 @@ gboolean client_focus(Client *self)
     }
 
     if (self->can_focus)
-	XSetInputFocus(ob_display, self->window, RevertToNone,
+	XSetInputFocus(ob_display, self->window, RevertToPointerRoot,
                        event_lasttime);
 
     if (self->focus_notify) {
@@ -1952,36 +1965,24 @@ gboolean client_focus(Client *self)
 	XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
     }
 
-    /* XSync(ob_display, FALSE); XXX Why sync? */
+    g_message("focusing %lx", self->window);
+
+    /* Cause the FocusIn to come back to us. Important for desktop switches,
+       since otherwise we'll have no FocusIn on the queue and send it off to
+       the focus_backup. */
+    XSync(ob_display, FALSE);
     return TRUE;
 }
 
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
-    client_set_focused(self, FALSE);
+    focus_fallback(FALSE);
 }
 
 gboolean client_focused(Client *self)
 {
     return self == focus_client;
-}
-
-void client_set_focused(Client *self, gboolean focused)
-{
-    if (focused) {
-        if (focus_client != self)
-            focus_set_client(self);
-    } else {
-        event_unfocustime = event_lasttime;
-	if (focus_client == self)
-	    focus_set_client(NULL);
-    }
-
-    /* focus state can affect the stacking layer */
-    client_calc_layer(self);
-
-    engine_frame_adjust_focus(self->frame);
 }
 
 Icon *client_icon(Client *self, int w, int h)

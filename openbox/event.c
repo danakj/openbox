@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "client.h"
+#include "config.h"
 #include "xerror.h"
 #include "prop.h"
 #include "screen.h"
@@ -24,7 +25,6 @@ static void event_handle_root(XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 
 Time event_lasttime = 0;
-Time event_unfocustime = 0;
 
 /*! The value of the mask for the NumLock modifier */
 unsigned int NumLockMask;
@@ -221,17 +221,21 @@ void event_process(XEvent *e)
 	event_lasttime = e->xproperty.time;
 	break;
     case FocusIn:
-	if (e->xfocus.mode == NotifyGrab ||
-            !(e->xfocus.detail == NotifyNonlinearVirtual ||
-              e->xfocus.detail == NotifyNonlinear))
-            return;
+        g_message("FocusIn on %lx mode %d detail %d", window,
+                  e->xfocus.mode, e->xfocus.detail);
+	if (e->xfocus.detail == NotifyInferior ||
+            e->xfocus.detail == NotifyAncestor ||
+            e->xfocus.detail > NotifyNonlinearVirtual) return;
+            g_message("FocusIn on %lx", window);*/
         break;
     case FocusOut:
-	if (e->xfocus.mode == NotifyGrab ||
-            !(e->xfocus.detail == NotifyNonlinearVirtual ||
-              e->xfocus.detail == NotifyNonlinear))
-            return;
+        g_message("FocusOut on %lx mode %d detail %d", window,
+                  e->xfocus.mode, e->xfocus.detail);
+	if (e->xfocus.detail == NotifyInferior ||
+            e->xfocus.detail == NotifyAncestor ||
+            e->xfocus.detail > NotifyNonlinearVirtual) return;
 
+        g_message("FocusOut on %lx", window);
         /* FocusOut events just make us look for FocusIn events. They
            are mostly ignored otherwise. */
         {
@@ -241,7 +245,8 @@ void event_process(XEvent *e)
 
                 if (fi.xfocus.window == e->xfocus.window)
                     return;
-            }
+            } else
+                focus_set_client(NULL);
         }
 	break;
     case EnterNotify:
@@ -324,13 +329,33 @@ static void event_handle_client(Client *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
-        int i=0;
+    int i=0;
+    ConfigValue focus_follow;
      
     switch (e->type) {
     case FocusIn:
+        focus_set_client(client);
     case FocusOut:
-        client_set_focused(client, e->type == FocusIn);
+        g_message("Focus%s on client for %lx", (e->type==FocusIn?"In":"Out"),
+                  client->window);
+        /* focus state can affect the stacking layer */
+        client_calc_layer(client);
+        engine_frame_adjust_focus(client->frame);
 	break;
+    case EnterNotify:
+        if (ob_state == State_Starting) {
+            /* move it to the top of the focus order */
+            guint desktop = client->desktop;
+            if (desktop == DESKTOP_ALL) desktop = screen_desktop;
+            focus_order[desktop] = g_list_remove(focus_order[desktop], client);
+            focus_order[desktop] = g_list_prepend(focus_order[desktop],client);
+        } else {
+            if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
+                g_assert_not_reached();
+            if (focus_follow.bool)
+                client_focus(client);
+        }
+        break;
     case ConfigureRequest:
 	/* compress these */
 	while (XCheckTypedWindowEvent(ob_display, client->window,

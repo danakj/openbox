@@ -1,7 +1,7 @@
 Changelog for Openbox:
 2.2.0
  * Allow changing the appearance of buttons with xbm	(Scott Moynes)
-   bitmap files. Can be disable with 
+   bitmap files. Can be disabled with 
    --disable-bitmap-buttons.
  
  * Added style textures for				(Scott Moynes)

@@ -196,7 +196,8 @@ def _create_popup_list(data):
         desktop = ob.openbox.screen(data.screen).desktop()
         if client and ((client.desktop() == desktop or
                         client.desktop() == 0xffffffff) and \
-                       client.normal()):
+                       client.normal() and (client.canFocus() or
+                                            client.focusNotify()):
             t = client.title()
             if len(t) > 50: # limit the length of titles
                 t = t[:24] + "..." + t[-24:]

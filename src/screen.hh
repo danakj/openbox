@@ -24,13 +24,13 @@ extern "C" {
 #include "otk/font.hh"
 #include "otk/texture.hh"
 #include "otk/image.hh"
+#include "otk/property.hh"
 #include "timer.hh"
 #include "workspace.hh"
 #include "blackbox.hh"
 
 namespace ob {
 
-class OBAtom;
 struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
@@ -66,7 +66,7 @@ private:
   Blackbox *blackbox;
   otk::BImageControl *image_control;
   Configuration *config;
-  OBAtom *xatom;
+  otk::OBProperty *xatom;
 
   BlackboxWindowList iconList, windowList;
 

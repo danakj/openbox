@@ -64,7 +64,6 @@ using std::string;
 #include "bbwindow.hh"
 #include "workspace.hh"
 #include "util.hh"
-#include "atom.hh"
 
 #ifndef   FONT_ELEMENT_SIZE
 #define   FONT_ELEMENT_SIZE 50
@@ -112,18 +111,18 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
 
   geom_pixmap = None;
 
-  xatom->setSupported(this);    // set-up netwm support
+//  xatom->setSupported(this);    // set-up netwm support
 #ifdef    HAVE_GETPID
-  xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::cardinal,
+  xatom->setValue(getRootWindow(), otk::OBProperty::blackbox_pid, otk::OBProperty::cardinal,
                   (unsigned long) getpid());
 #endif // HAVE_GETPID
   unsigned long geometry[] = { getWidth(),
                                getHeight()};
-  xatom->setValue(getRootWindow(), OBAtom::net_desktop_geometry,
-                  OBAtom::cardinal, geometry, 2);
+  xatom->set(getRootWindow(), otk::OBProperty::net_desktop_geometry,
+             otk::OBProperty::Atom_Cardinal, geometry, 2);
   unsigned long viewport[] = {0,0};
-  xatom->setValue(getRootWindow(), OBAtom::net_desktop_viewport,
-                  OBAtom::cardinal, viewport, 2);
+  xatom->set(getRootWindow(), otk::OBProperty::net_desktop_viewport,
+             otk::OBProperty::Atom_Cardinal, viewport, 2);
                   
 
   XDefineCursor(otk::OBDisplay::display, getRootWindow(),
@@ -194,8 +193,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
 
   current_workspace = workspacesList.front();
   
-  xatom->setValue(getRootWindow(), OBAtom::net_current_desktop,
-                  OBAtom::cardinal, 0); //first workspace
+  xatom->set(getRootWindow(), otk::OBProperty::net_current_desktop,
+             otk::OBProperty::Atom_Cardinal, 0); //first workspace
 
   raiseWindows(0, 0);     // this also initializes the empty stacking list
 
@@ -630,7 +629,7 @@ void BScreen::load_rc(void) {
     resource.col_direction = TopBottom;
 
   if (config->getValue(screenstr + "workspaceNames", s)) {
-    OBAtom::StringVect workspaceNames;
+    otk::OBProperty::StringVect workspaceNames;
 
     string::const_iterator it = s.begin(), end = s.end();
     while(1) {
@@ -642,8 +641,8 @@ void BScreen::load_rc(void) {
       ++it;
     }
 
-    xatom->setValue(getRootWindow(), OBAtom::net_desktop_names, OBAtom::utf8,
-                    workspaceNames);
+    xatom->set(getRootWindow(), otk::OBProperty::net_desktop_names,
+               otk::OBProperty::utf8, workspaceNames);
   }
 
   resource.sloppy_focus = true;
@@ -1014,8 +1013,8 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
   current_workspace = getWorkspace(id);
 
-  xatom->setValue(getRootWindow(), OBAtom::net_current_desktop,
-                  OBAtom::cardinal, id);
+  xatom->set(getRootWindow(), otk::OBProperty::net_current_desktop,
+             otk::OBProperty::Atom_Cardinal, id);
 
   current_workspace->showAll();
 
@@ -1069,12 +1068,12 @@ void BScreen::updateClientList(void) {
     const BlackboxWindowList::iterator end = windowList.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->getClientWindow();
-    xatom->setValue(getRootWindow(), OBAtom::net_client_list, OBAtom::window,
-                    windows, windowList.size());
+    xatom->set(getRootWindow(), otk::OBProperty::net_client_list,
+               otk::OBProperty::Atom_Window, windows, windowList.size());
     delete [] windows;
   } else
-    xatom->setValue(getRootWindow(), OBAtom::net_client_list, OBAtom::window,
-                    0, 0);
+    xatom->set(getRootWindow(), otk::OBProperty::net_client_list,
+               otk::OBProperty::Atom_Window, 0, 0);
 
   updateStackingList();
 }
@@ -1106,12 +1105,12 @@ void BScreen::updateStackingList(void) {
                                  end = stack_order.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->getClientWindow();
-    xatom->setValue(getRootWindow(), OBAtom::net_client_list_stacking,
-                    OBAtom::window, windows, stack_order.size());
+    xatom->set(getRootWindow(), otk::OBProperty::net_client_list_stacking,
+               otk::OBProperty::Atom_Window, windows, stack_order.size());
     delete [] windows;
   } else
-    xatom->setValue(getRootWindow(), OBAtom::net_client_list_stacking,
-                    OBAtom::window, 0, 0);
+    xatom->set(getRootWindow(), otk::OBProperty::net_client_list_stacking,
+               otk::OBProperty::Atom_Window, 0, 0);
 }
 
 
@@ -1120,9 +1119,9 @@ void BScreen::addSystrayWindow(Window window) {
   
   XSelectInput(otk::OBDisplay::display, window, StructureNotifyMask);
   systrayWindowList.push_back(window);
-  xatom->setValue(getRootWindow(), OBAtom::kde_net_system_tray_windows,
-                  OBAtom::window,
-                  &systrayWindowList[0], systrayWindowList.size());
+  xatom->set(getRootWindow(), otk::OBProperty::kde_net_system_tray_windows,
+             otk::OBProperty::Atom_Window,
+             &systrayWindowList[0], systrayWindowList.size());
   blackbox->saveSystrayWindowSearch(window, this);
 
   XUngrabServer(otk::OBDisplay::display);
@@ -1137,9 +1136,10 @@ void BScreen::removeSystrayWindow(Window window) {
   for (; it != end; ++it)
     if (*it == window) {
       systrayWindowList.erase(it);
-      xatom->setValue(getRootWindow(), OBAtom::kde_net_system_tray_windows,
-                      OBAtom::window,
-                      &systrayWindowList[0], systrayWindowList.size());
+      xatom->set(getRootWindow(),
+                 otk::OBProperty::kde_net_system_tray_windows,
+                 otk::OBProperty::Atom_Window,
+                 &systrayWindowList[0], systrayWindowList.size());
       blackbox->removeSystrayWindowSearch(window);
       XSelectInput(otk::OBDisplay::display, window, NoEventMask);
       break;
@@ -1154,8 +1154,10 @@ void BScreen::removeSystrayWindow(Window window) {
 void BScreen::manageWindow(Window w) {
   // is the window a KDE systray window?
   Window systray;
-  if (xatom->getValue(w, OBAtom::kde_net_wm_system_tray_window_for,
-                      OBAtom::window, systray) && systray != None) {
+  if (xatom->get(w, otk::OBProperty::kde_net_wm_system_tray_window_for,
+                 otk::OBProperty::Atom_Window, &systray) &&
+      systray != None)
+  {
     addSystrayWindow(w);
     return;
   }
@@ -1197,9 +1199,11 @@ void BScreen::manageWindow(Window w) {
 void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   // is the window a KDE systray window?
   Window systray;
-  if (xatom->getValue(w->getClientWindow(),
-                      OBAtom::kde_net_wm_system_tray_window_for,
-                      OBAtom::window, systray) && systray != None) {
+  if (xatom->get(w->getClientWindow(),
+                 otk::OBProperty::kde_net_wm_system_tray_window_for,
+                 otk::OBProperty::Atom_Window, &systray) &&
+      systray != None)
+  {
     removeSystrayWindow(w->getClientWindow());
     return;
   }
@@ -1271,18 +1275,19 @@ void BScreen::updateWorkArea(void) {
       dims[(i * 4) + 2] = area.width();
       dims[(i * 4) + 3] = area.height();
     }
-    xatom->setValue(getRootWindow(), OBAtom::net_workarea, OBAtom::cardinal,
-                    dims, 4 * workspacesList.size());
+    xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
+               otk::OBProperty::Atom_Cardinal,
+               dims, 4 * workspacesList.size());
     delete [] dims;
   } else
-    xatom->setValue(getRootWindow(), OBAtom::net_workarea, OBAtom::cardinal,
-                    0, 0);
+    xatom->set(getRootWindow(), otk::OBProperty::net_workarea,
+               otk::OBProperty::Atom_Cardinal, 0, 0);
 }
 
 
 void BScreen::updateNetizenWorkspaceCount(void) {
-  xatom->setValue(getRootWindow(), OBAtom::net_number_of_desktops,
-                  OBAtom::cardinal, workspacesList.size());
+  xatom->set(getRootWindow(), otk::OBProperty::net_number_of_desktops,
+             otk::OBProperty::Atom_Cardinal, workspacesList.size());
 
   updateWorkArea();
 }
@@ -1292,8 +1297,8 @@ void BScreen::updateNetizenWindowFocus(void) {
   Window f = ((blackbox->getFocusedWindow()) ?
               blackbox->getFocusedWindow()->getClientWindow() : None);
 
-  xatom->setValue(getRootWindow(), OBAtom::net_active_window,
-                  OBAtom::window, f);
+  xatom->set(getRootWindow(), otk::OBProperty::net_active_window,
+             otk::OBProperty::Atom_Window, f);
 }
 
 
@@ -1641,7 +1646,7 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
 
 
 void BScreen::propertyNotifyEvent(const XPropertyEvent *pe) {
-  if (pe->atom == xatom->getAtom(OBAtom::net_desktop_names)) {
+  if (pe->atom == xatom->atom(otk::OBProperty::net_desktop_names)) {
     // _NET_WM_DESKTOP_NAMES
     WorkspaceList::iterator it = workspacesList.begin();
     const WorkspaceList::iterator end = workspacesList.end();

@@ -6,6 +6,7 @@
 
 #include "../version.h"
 #include "openbox.hh"
+#include "otk/property.hh"
 #include "otk/display.hh"
 
 extern "C" {
@@ -39,7 +40,6 @@ extern "C" {
 }
 
 namespace ob {
-
 
 Openbox *Openbox::instance = (Openbox *) 0;
 
@@ -95,7 +95,8 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGINT, &action, (struct sigaction *) 0);
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
-
+  _property = new otk::OBProperty();
+  
   
   _state = State_Normal; // done starting
 }

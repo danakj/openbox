@@ -10,7 +10,7 @@ extern "C" {
 #include <string>
 #include <vector>
 
-#include "atom.hh"
+#include "otk/property.hh"
 
 namespace ob {
 
@@ -25,7 +25,7 @@ class Workspace {
 private:
   BScreen *screen;
   BlackboxWindow *lastfocus;
-  OBAtom *xatom;
+  otk::OBProperty *xatom;
 
   BlackboxWindowList stackingList, windowList;
 

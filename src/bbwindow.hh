@@ -13,6 +13,7 @@ extern "C" {
 #include <string>
 
 #include "otk/timer.hh"
+#include "otk/property.hh"
 #include "blackbox.hh"
 #include "util.hh"
 
@@ -104,7 +105,7 @@ public:
 private:
   Blackbox *blackbox;
   BScreen *screen;
-  OBAtom *xatom;
+  otk::OBProperty *xatom;
   otk::OBTimer *timer;
   BlackboxAttributes blackbox_attrib;
 

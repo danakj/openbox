@@ -15,8 +15,8 @@ extern "C" {
 
 #include "otk/screeninfo.hh"
 #include "otk/timerqueuemanager.hh"
+#include "otk/property.hh"
 #include "xeventhandler.hh"
-#include "atom.hh"
 
 namespace ob {
 
@@ -73,6 +73,14 @@ private:
 
   //! The class which will handle raw XEvents
   OBXEventHandler _xeventhandler;
+
+  //! Cached atoms on the display
+  /*!
+    This is a pointer because the OBProperty class uses otk::OBDisplay::display
+    in its constructor, so, it needs to be initialized <b>after</b> the display
+    is initialized in this class' constructor.
+  */
+  otk::OBProperty *_property;
 
   //! The running state of the window manager
   RunState _state;

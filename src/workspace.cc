@@ -31,7 +31,6 @@ using std::string;
 #include "util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
-#include "atom.hh"
 
 namespace ob {
 
@@ -424,12 +423,12 @@ void Workspace::setCurrent(void) {
 
 
 void Workspace::readName(void) {
-  OBAtom::StringVect namesList;
+  otk::OBProperty::StringVect namesList;
   unsigned long numnames = id + 1;
     
   // attempt to get from the _NET_WM_DESKTOP_NAMES property
-  if (xatom->getValue(screen->getRootWindow(), OBAtom::net_desktop_names,
-                      OBAtom::utf8, numnames, namesList) &&
+  if (xatom->get(screen->getRootWindow(), otk::OBProperty::net_desktop_names,
+                 otk::OBProperty::utf8, &numnames, &namesList) &&
       namesList.size() > id) {
     name = namesList[id];
   
@@ -451,17 +450,18 @@ void Workspace::readName(void) {
 
 void Workspace::setName(const string& new_name) {
   // set the _NET_WM_DESKTOP_NAMES property with the new name
-  OBAtom::StringVect namesList;
+  otk::OBProperty::StringVect namesList;
   unsigned long numnames = (unsigned) -1;
-  if (xatom->getValue(screen->getRootWindow(), OBAtom::net_desktop_names,
-                      OBAtom::utf8, numnames, namesList) &&
+  if (xatom->get(screen->getRootWindow(),
+                 otk::OBProperty::net_desktop_names,
+                 otk::OBProperty::utf8, &numnames, &namesList) &&
       namesList.size() > id)
     namesList[id] = new_name;
   else
     namesList.push_back(new_name);
 
-  xatom->setValue(screen->getRootWindow(), OBAtom::net_desktop_names,
-                  OBAtom::utf8, namesList);
+  xatom->set(screen->getRootWindow(), otk::OBProperty::net_desktop_names,
+             otk::OBProperty::utf8, namesList);
 }
 
 

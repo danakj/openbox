@@ -141,15 +141,19 @@ public:
     kde_net_wm_system_tray_window_for,
     kde_net_wm_window_type_override,
  
+#ifndef DOXYGEN_IGNORE
     // constant for how many atoms exist in the enumerator
     NUM_ATOMS
+#endif
   };
 
   //! The possible types/encodings of strings
   enum StringType {
     ascii, //!< Standard 8-bit ascii string
     utf8,  //!< Utf8-encoded string
+#ifndef DOXYGEN_IGNORE
     NUM_STRING_TYPE
+#endif
   };
 
 private:

@@ -159,24 +159,11 @@ Openbox::Openbox(int argc, char **argv)
   _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
   _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
 
-  // start up python and run the user's startup script
-  Py_SetProgramName(argv[0]);
-  Py_Initialize();
-  init_otk();
-  init_openbox();
-  PyRun_SimpleString("from _otk import *; from _openbox import *;");
-  PyRun_SimpleString("openbox = Openbox_instance()");
-
-  runPython(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
-  runPython(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
-  runPython(_scriptfilepath.c_str());
- 
   // initialize all the screens
   OBScreen *screen;
   screen = new OBScreen(0, _config);
   if (screen->managed()) {
     _screens.push_back(screen);
-    _screens[0]->manageExisting();
     // XXX: "change to" the first workspace on the screen to initialize stuff
   } else
     delete screen;
@@ -186,6 +173,22 @@ Openbox::Openbox(int argc, char **argv)
     ::exit(1);
   }
 
+  // start up python and run the user's startup script
+  Py_SetProgramName(argv[0]);
+  Py_Initialize();
+  init_otk();
+  init_openbox();
+  PyRun_SimpleString("from _otk import *; from _openbox import *;");
+
+  runPython(SCRIPTDIR"/globals.py"); // create/set global vars
+  runPython(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+  runPython(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
+  runPython(_scriptfilepath.c_str());
+
+  ScreenList::iterator it, end = _screens.end();
+  for (it = _screens.begin(); it != end; ++it)
+    (*it)->manageExisting();
+ 
   // grab any keys set up before the screens existed
   _bindings->grabKeys(true);
 

@@ -57,9 +57,6 @@ guint config_keyboard_reset_state;
 gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 
-gboolean config_dialog_focus;
-gboolean config_dialog_desktop;
-
 GSList *config_menu_files;
 
 gint config_resist_win;

@@ -62,6 +62,10 @@ void RrFontRenderString(struct RrSurface *sur, struct RrFont *font,
     GString *text;
     int shortened = 0;
 
+#define EDGESPACE 2
+    x += EDGESPACE;
+    w -= EDGESPACE * 2;
+
     switch (layout) {
     case RR_TOP_LEFT:
     case RR_TOP:

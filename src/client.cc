@@ -708,7 +708,6 @@ void Client::updateIcons()
   unsigned long num = (unsigned) -1;
   unsigned long *data;
   unsigned long w, h, i = 0;
-  bool freeit = false;
 
   for (int j = 0; j < _nicons; ++j)
     delete [] _icons[j].data;
@@ -716,38 +715,32 @@ void Client::updateIcons()
     delete [] _icons;
   _nicons = 0;
 
-  if (!otk::Property::get(_window, otk::Property::atoms.net_wm_icon,
+  if (otk::Property::get(_window, otk::Property::atoms.net_wm_icon,
                           otk::Property::atoms.cardinal, &num, &data)) {
-    // use default icon(s)
-    num = openbox->screen(_screen)->config().icon_length;
-    data = openbox->screen(_screen)->config().default_icon;
-  } else
-    freeit = true;
-  
-  // figure out how man valid icons are in here
-  while (num - i > 2) {
-    w = data[i++];
-    h = data[i++];
-    i += w * h;
-    if (i > num) break;
-    ++_nicons;
-  }
+    // figure out how man valid icons are in here
+    while (num - i > 2) {
+      w = data[i++];
+      h = data[i++];
+      i += w * h;
+      if (i > num) break;
+      ++_nicons;
+    }
 
-  _icons = new Icon[_nicons];
-
-  // store the icons
-  i = 0;
-  for (int j = 0; j < _nicons; ++j) {
-    w = _icons[j].w = data[i++];
+    _icons = new Icon[_nicons];
+    
+    // store the icons
+    i = 0;
+    for (int j = 0; j < _nicons; ++j) {
+      w = _icons[j].w = data[i++];
       h = _icons[j].h = data[i++];
       _icons[j].data = new unsigned long[w * h];
       ::memcpy(_icons[j].data, &data[i], w * h * sizeof(unsigned long));
       i += w * h;
       assert(i <= num);
-  }
+    }
 
-  if (freeit)
     delete [] data;
+  }
 
   if (_nicons <= 0) {
     _nicons = 1;

@@ -69,27 +69,10 @@ Config::Config()
     drag_threshold = 3;
   if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&num_desktops))
     num_desktops = 1;
-
-  otk::ustring s;
-  long w, h;
-  if (python_get_string("DEFAULT_ICON", &s) && s.bytes() > 2 &&
-      python_get_long("DEFAULT_ICON_WIDTH", &w) &&
-      python_get_long("DEFAULT_ICON_HEIGHT", &h) &&
-      (unsigned)(w * h) == s.bytes() / sizeof(unsigned long)) {
-    default_icon = new unsigned long[s.bytes() / sizeof(unsigned long) + 2];
-    default_icon[0] = w;
-    default_icon[1] = h;
-    memcpy(default_icon + 2, s.data(), s.bytes());
-  } else {
-    default_icon = 0;
-  }
-      
-  icon_length = s.bytes();
 }
 
 Config::~Config()
 {
-  if (default_icon) delete [] default_icon;
 }
 
 }

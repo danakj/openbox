@@ -30,10 +30,6 @@
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif
-#ifdef HAVE_SYS_WAIT_H
-#  include <sys/types.h>
-#  include <sys/wait.h>
-#endif
 #ifdef HAVE_LOCALE_H
 #  include <locale.h>
 #endif
@@ -94,10 +90,6 @@ int main(int argc, char **argv)
     sigaction(SIGTERM, &action, (struct sigaction *) NULL);
     sigaction(SIGINT, &action, (struct sigaction *) NULL);
     sigaction(SIGHUP, &action, (struct sigaction *) NULL);
-    sigaction(SIGCHLD, &action, (struct sigaction *) NULL);
-
-    /* anything that died while we were restarting won't give us a SIGCHLD */
-    while (waitpid(-1, NULL, WNOHANG) > 0);
 
     /* create the ~/.openbox dir */
     path = g_build_filename(g_get_home_dir(), ".openbox", NULL);
@@ -262,10 +254,6 @@ void signal_handler(const ObEvent *e, void *data)
     case SIGUSR1:
 	g_message("Caught SIGUSR1 signal. Restarting.");
 	ob_shutdown = ob_restart = TRUE;
-	break;
-
-    case SIGCHLD:
-	wait(NULL);
 	break;
 
     case SIGHUP:

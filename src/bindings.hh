@@ -2,7 +2,7 @@
 #ifndef __binding_hh
 #define __binding_hh
 
-/*! @file binding.hh
+/*! @file bindings.hh
   @brief I dunno.. some binding stuff?
 */
 

@@ -53,30 +53,22 @@ static void sn_event_func(SnMonitorEvent *event, void *data);
 
 static void set_root_cursor();
 
-static gboolean running;
-static int another_running(Display *d, XErrorEvent *e)
-{
-    (void)d;(void)e;
-    g_message("A window manager is already running on screen %d",
-	      ob_screen);
-    running = TRUE;
-    return -1;
-}
-
 gboolean screen_annex()
 {
-    XErrorHandler old;
     pid_t pid;
     int i, num_support;
     guint32 *supported;
 
-    running = FALSE;
-    old = XSetErrorHandler(another_running);
+    xerror_set_ignore(TRUE);
+    xerror_occured = FALSE;
     XSelectInput(ob_display, ob_root, ROOT_EVENTMASK);
-    XSync(ob_display, FALSE);
-    XSetErrorHandler(old);
-    if (running)
+    xerror_set_ignore(FALSE);
+    if (xerror_occured) {
+        g_message("A window manager is already running on screen %d",
+                  ob_screen);
 	return FALSE;
+    }
+
 
     g_message("Managing screen %d", ob_screen);
 

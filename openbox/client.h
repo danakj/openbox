@@ -307,10 +307,6 @@ void client_set_list();
   surroundings (struts, etc). */
 void client_remaximize(Client *self);
 
-/*! Shows the window if it should be shown, or hides it
-  Used when changing desktops, the window's state, etc. */
-void client_showhide(Client *self);
-
 /*! Determines if the client should be shown or hidden currently.
   @return TRUE if it should be visible; otherwise, FALSE.
 */

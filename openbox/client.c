@@ -32,6 +32,7 @@ static void client_get_state(Client *self);
 static void client_get_shaped(Client *self);
 static void client_get_mwm_hints(Client *self);
 static void client_get_gravity(Client *self);
+static void client_showhide(Client *self);
 static void client_change_allowed_actions(Client *self);
 static void client_change_state(Client *self);
 static Client *search_focus_tree(Client *node, Client *skip);
@@ -1233,7 +1234,7 @@ gboolean client_should_show(Client *self)
     return TRUE;
 }
 
-void client_showhide(Client *self)
+static void client_showhide(Client *self)
 {
 
     if (client_should_show(self))

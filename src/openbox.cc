@@ -63,7 +63,7 @@ void Openbox::signalHandler(int signal)
     instance->restart();
     break;
 
-  case SUGHUP:
+  case SIGHUP:
   case SIGINT:
   case SIGTERM:
   case SIGPIPE:

@@ -92,13 +92,11 @@ void menu_startup()
 
     menu_add_entry(m, menu_entry_new_submenu("subz", s));
 
-    /*
     t = (Menu *)plugin_create("timed_menu");
     a = action_from_string("execute");
     a->data.execute.path = g_strdup("xeyes");
     menu_add_entry(t, menu_entry_new("xeyes", a));
     menu_add_entry(m, menu_entry_new_submenu("timed", t));
-    */
     
     s = menu_new("empty", "chub", m);
     menu_add_entry(m, menu_entry_new_submenu("empty", s));
@@ -121,7 +119,7 @@ void menu_startup()
     menu_add_entry(s, menu_entry_new("exit", a));
 
     menu_add_entry(m, menu_entry_new_submenu("long", s));
-
+    
     m = menu_new(NULL, "client", NULL);
     a = action_from_string("iconify");
     menu_add_entry(m, menu_entry_new("iconify", a));
@@ -312,6 +310,7 @@ void menu_clear(Menu *self) {
 	menu_entry_free(entry);
     }
     self->entries = NULL;
+    self->invalid = TRUE;
 }
 
 

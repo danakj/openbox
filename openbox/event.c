@@ -14,10 +14,13 @@
 #include "extensions.h"
 #include "timer.h"
 #include "dispatch.h"
+#include "event.h"
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
+#include <glib.h>
+
 #ifdef HAVE_SYS_SELECT_H
 #  include <sys/select.h>
 #endif
@@ -51,6 +54,12 @@ static const int mask_table[] = {
 };
 static int mask_table_size;
 
+static fd_set selset, allset;
+static int max_fd, x_fd;
+static GData *fd_handler_list;
+
+void fd_event_handle();
+
 void event_startup()
 {
     mask_table_size = sizeof(mask_table) / sizeof(mask_table[0]);
@@ -77,18 +86,22 @@ void event_startup()
 		ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
 	}
     }
+
+    FD_ZERO(&allset);
+    max_fd = x_fd = ConnectionNumber(ob_display);
+    FD_SET(x_fd, &allset);
+    g_datalist_init(&fd_handler_list);
 }
 
 void event_shutdown()
 {
     XFreeModifiermap(modmap);
+    g_datalist_clear(&fd_handler_list);
 }
 
 void event_loop()
 {
-    fd_set selset;
     XEvent e;
-    int x_fd;
     struct timeval *wait;
     gboolean had_event = FALSE;
 
@@ -117,15 +130,19 @@ void event_loop()
 	XNextEvent(ob_display, &e);
 
 	event_process(&e);
-       had_event = TRUE;
+        had_event = TRUE;
     }
 
     if (!had_event) {
         timer_dispatch((GTimeVal**)&wait);
-        x_fd = ConnectionNumber(ob_display);
-        FD_ZERO(&selset);
-        FD_SET(x_fd, &selset);
-        select(x_fd + 1, &selset, NULL, NULL, wait);
+        selset = allset;
+        select(max_fd + 1, &selset, NULL, NULL, wait);
+
+        /* handle the X events as soon as possible? */
+        if (FD_ISSET(x_fd, &selset))
+            return;
+
+        fd_event_handle();
     }
 }
 
@@ -930,6 +947,40 @@ static void event_handle_slit(Slit *s, XEvent *e)
         slit_hide(s, TRUE);
         break;
     }
+}
+
+void event_add_fd_handler(event_fd_handler *h) {
+  g_datalist_id_set_data(&fd_handler_list, h->fd, h);
+  FD_SET(h->fd, &allset);
+  max_fd = MAX(max_fd, h->fd);
+}
+
+void find_max_fd_foreach(GQuark n, gpointer data, gpointer max)
+{
+  *((unsigned int *)max) = MAX(*((unsigned int *)max), n);
+}
+
+void event_remove_fd(int n)
+{
+  int tmpmax = 0;
+  FD_CLR(n, &allset);
+  g_datalist_id_remove_data(&fd_handler_list, (GQuark)n);
+  g_datalist_foreach(&fd_handler_list, find_max_fd_foreach, (gpointer)&tmpmax);
+  max_fd = MAX(x_fd, tmpmax);
+}
+
+void fd_event_handle_foreach(GQuark n, gpointer data, gpointer user_data)
+{
+    if (FD_ISSET( (int)n, &selset)) {
+        event_fd_handler *h = (event_fd_handler *)data;
+        g_assert(h->fd == (int)n);
+        h->handler(h->fd, h->data);
+    }
+}
+
+void fd_event_handle()
+{
+    g_datalist_foreach(&fd_handler_list, fd_event_handle_foreach, NULL);
 }
 
 static void event_handle_slitapp(SlitApp *app, XEvent *e)

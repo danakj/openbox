@@ -14,6 +14,15 @@ extern unsigned int ScrollLockMask;
 void event_startup();
 void event_shutdown();
 
+typedef struct event_fd_handler {
+    int fd;
+    void *data;
+    void (*handler)(int fd, void *data);
+} event_fd_handler;
+
+void event_add_fd_handler(event_fd_handler *handler);
+void event_remove_fd(int n);
+
 void event_loop();
 
 #endif

@@ -92,7 +92,7 @@ def _motion_grab(data):
 _last_x = 0
 _last_y = 0
 
-def _do_move():
+def _do_move(final):
     global _screen, _client, _cx, _cy, _dx, _dy
 
     # get destination x/y for the *frame*
@@ -135,7 +135,7 @@ def _do_move():
         # draw the outline ...
         f=0
     else:
-        _client.move(x, y)
+        _client.move(x, y, final)
 
     if MOVE_POPUP:
         global _popwidget, _poplabel
@@ -146,7 +146,7 @@ def _do_move():
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
-        scsize = otk.display.screenInfo(_screen).size()
+        scsize = ob.openbox.screen(_screen).size()
         size = _poplabel.minSize()
         _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
                                        (scsize.height() - size.height()) / 2,
@@ -167,7 +167,7 @@ def _move(data):
     _dx = data.xroot - data.pressx
     _dy = data.yroot - data.pressy
     _motion_mask = data.state
-    _do_move()
+    _do_move(0)
     global _inmove
     if not _inmove:
         ob.kgrab(_screen, _motion_grab)
@@ -179,7 +179,7 @@ def _end_move(data):
     if _inmove:
         r = MOVE_RUBBERBAND
         MOVE_RUBBERBAND = 0
-        _do_move()
+        _do_move(1)
         MOVE_RUBBERBAND = r
         _inmove = 0
     _poplabel = 0
@@ -231,7 +231,7 @@ def _do_resize():
             _poplabel = otk.Label(_popwidget)
             _poplabel.setHighlighted(1)
         _poplabel.setText(text)
-        scsize = otk.display.screenInfo(_screen).size()
+        scsize = ob.openbox.screen(_screen).size()
         size = _poplabel.minSize()
         _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
                                        (scsize.height() - size.height()) / 2,

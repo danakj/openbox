@@ -237,6 +237,9 @@ void client_unmanage(Client *client)
 
     engine_frame_hide(client->frame);
 
+    /* dispatch the unmapped event */
+    dispatch_client(Event_Client_Unmapped, client, 0, 0);
+
     /* give the client its border back */
     client_toggle_border(client, TRUE);
 
@@ -275,7 +278,7 @@ void client_unmanage(Client *client)
      transient lists already, so being modal doesn't matter) */
     if (client->focused)
 	client_unfocus(client);
-    
+
     if (ob_state != State_Exiting) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
@@ -1281,15 +1284,30 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 {
     gboolean moved = FALSE, resized = FALSE;
 
-    /* lock if maximized */
-    if (self->max_horz) {
-        x = self->area.x;
-        w = self->area.width;
+    /* set the size and position if fullscreen */
+    if (self->fullscreen) {
+	x = 0;
+	y = 0;
+	w = screen_physical_size.width;
+	h = screen_physical_size.height;
+    } else {
+        /* set the size and position if maximized */
+        if (self->max_horz) {
+            x = screen_area(self->desktop)->x - self->frame->size.left;
+            w = screen_area(self->desktop)->x +
+                screen_area(self->desktop)->width;
+        }
+        if (self->max_vert) {
+            y = screen_area(self->desktop)->y;
+            h = screen_area(self->desktop)->y +
+                screen_area(self->desktop)->height -
+                self->frame->size.top - self->frame->size.bottom;
+        }
     }
-    if (self->max_vert) {
-        y = self->area.y;
-        h = self->area.height;
-    }
+
+    if (x == self->area.x && y == self->area.y && w == self->area.width &&
+        h == self->area.height)
+        return; /* no change */
 
     w -= self->base_size.width;
     h -= self->base_size.height;
@@ -1430,10 +1448,10 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
 	    PROP_SET32A(self->window, openbox_premax, cardinal,
 			dimensions, 4);
 	}
-	x = 0;
-	y = 0;
-	w = screen_physical_size.width;
-	h = screen_physical_size.height;
+
+        /* these are not actually used cuz client_configure will set them
+           as appropriate when the window is fullscreened */
+        x = y = w = h = 0;
     } else {
 	long *dimensions;
 
@@ -1549,17 +1567,13 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 	    PROP_SET32A(self->window, openbox_premax, cardinal,
 			dimensions, 4);
 	}
-	if (dir == 0 || dir == 1) { /* horz */
-	    x = screen_area(self->desktop)->x - self->frame->size.left;
-	    w = screen_area(self->desktop)->x +
-		screen_area(self->desktop)->width;
-	}
-	if (dir == 0 || dir == 2) { /* vert */
-	    y = screen_area(self->desktop)->y;
-	    h = screen_area(self->desktop)->y +
-		screen_area(self->desktop)->height -
-		self->frame->size.top - self->frame->size.bottom;
-	}
+
+        /* pass the client's current position info. the client_configure
+           will move/size stuff as appropriate for a maximized window */
+        x = self->area.x;
+        y = self->area.y;
+        w = self->area.width;
+        h = self->area.height;
     } else {
 	long *dimensions;
 

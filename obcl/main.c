@@ -25,6 +25,7 @@ int main()
     CLProc *p = cl_proc_new();
     cl_proc_add_handler_func(p, "foo", process_foo);
     cl_proc_add_handler_func(p, "bah", process_bah);
+    cl_proc_add_handler_proc(p,"meh",p);
 
     cl_process(lst, p);
 

@@ -61,6 +61,16 @@ void cl_proc_add_handler_func(CLProc *proc, gchar *str,
     cl_proc_add_handler(proc, str, ph);
 }
 
+void cl_proc_add_handler_proc(CLProc *proc, gchar *str,
+                              CLProc *hproc)
+{
+    CLProcHandler *ph;
+
+    g_assert(proc != NULL);
+    ph = cl_proc_handler_new_proc(hproc);
+    cl_proc_add_handler(proc, str, ph);
+}
+
 void cl_proc_set_default(CLProc *proc, CLProcHandler *ph)
 {
     g_assert(proc != NULL);

@@ -90,6 +90,8 @@ void cl_proc_add_handler(CLProc *proc, gchar *str,
                          CLProcHandler *handler);
 void cl_proc_add_handler_func(CLProc *proc, gchar *str,
                               CLProcFunc func);
+void cl_proc_add_handler_proc(CLProc *proc, gchar *str,
+                              CLProc *hproc);
 void cl_proc_set_default(CLProc *proc, CLProcHandler *pf);
 void cl_proc_register_keywords(CLProc *proc, ...);
 void cl_process(GList *tree, CLProc *proc);

@@ -41,7 +41,6 @@
 #include "Workspace.h"
 #include "Workspacemenu.h"
 
-#include <X11/Xutil.h>
 #include <X11/keysym.h>
 
 #ifdef    HAVE_STRING_H

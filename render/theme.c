@@ -90,11 +90,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_clear = RrAppearanceNew(inst, 0);
     theme->a_clear_tex = RrAppearanceNew(inst, 1);
 
-    theme->app_hilite_bg = RrAppearanceNew(inst, 0);
-    theme->app_unhilite_bg = RrAppearanceNew(inst, 0);
-    theme->app_hilite_label = RrAppearanceNew(inst, 1);
-    theme->app_unhilite_label = RrAppearanceNew(inst, 1);
-
     if (name) {
         db = loaddb(theme, name);
         if (db == NULL) {
@@ -489,26 +484,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         set_default_appearance(theme->a_menu_selected);
 
     /* read the appearances for rendering non-decorations */
-    if (!read_appearance(db, inst,
-                         "window.active.title.bg", theme->app_hilite_bg,
-                         FALSE))
-        set_default_appearance(theme->app_hilite_bg);
-    if (!read_appearance(db, inst,
-                         "window.active.label.bg", theme->app_hilite_label,
-                         TRUE))
-        set_default_appearance(theme->app_hilite_label);
+    theme->app_hilite_bg = RrAppearanceCopy(theme->a_focused_title);
+    theme->app_hilite_label = RrAppearanceCopy(theme->a_focused_label);
     if (theme->a_focused_label->surface.grad != RR_SURFACE_PARENTREL)
         theme->app_hilite_fg = RrAppearanceCopy(theme->a_focused_label);
     else
         theme->app_hilite_fg = RrAppearanceCopy(theme->a_focused_title);
-    if (!read_appearance(db, inst,
-                         "window.inactive.title.bg", theme->app_unhilite_bg,
-                         FALSE))
-        set_default_appearance(theme->app_unhilite_bg);
-    if (!read_appearance(db, inst,
-                         "window.inactive.label.bg", theme->app_unhilite_label,
-                         TRUE))
-        set_default_appearance(theme->app_unhilite_label);
+    theme->app_unhilite_bg = RrAppearanceCopy(theme->a_unfocused_title);
+    theme->app_unhilite_label = RrAppearanceCopy(theme->a_unfocused_label);
     if (theme->a_unfocused_label->surface.grad != RR_SURFACE_PARENTREL)
         theme->app_unhilite_fg = RrAppearanceCopy(theme->a_unfocused_label);
     else

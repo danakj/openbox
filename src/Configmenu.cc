@@ -54,18 +54,18 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Image Dithering"), 1);
   insert(i18n(ConfigmenuSet, ConfigmenuOpaqueMove,
               "Opaque Window Moving"), 2);
-  insert(i18n(ConfigmenuSet, ConfigmenuFullMax,
-              "Full Maximization"), 3);
-  insert(i18n(ConfigmenuSet, ConfigmenuFocusNew,
-              "Focus New Windows"), 4);
-  insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
-              "Focus Last Window on Workspace"), 5);
-  insert(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
-              "Window-To-Window Snapping"), 6);
-  insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
-              "Window Corner Snapping"), 7);
   insert(i18n(ConfigmenuSet, ConfigmenuWorkspaceWarping,
-              "Workspace Warping"), 8);
+              "Workspace Warping"), 3);
+  insert(i18n(ConfigmenuSet, ConfigmenuFullMax,
+              "Full Maximization"), 4);
+  insert(i18n(ConfigmenuSet, ConfigmenuFocusNew,
+              "Focus New Windows"), 5);
+  insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
+              "Focus Last Window on Workspace"), 6);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
+              "Window-To-Window Snapping"), 7);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
+              "Window Corner Snapping"), 8);
   insert(i18n(ConfigmenuSet, ConfigmenuDisableBindings,
               "Disable Mouse with Scroll Lock"), 9);
   insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
@@ -82,6 +82,7 @@ void Configmenu::setValues(void) {
 #endif // XINERAMA
   setItemSelected(index++, getScreen()->doImageDither());
   setItemSelected(index++, getScreen()->doOpaqueMove());
+  setItemSelected(index++, getScreen()->doWorkspaceWarping());
   setItemSelected(index++, getScreen()->doFullMax());
   setItemSelected(index++, getScreen()->doFocusNew());
   setItemSelected(index++, getScreen()->doFocusLast());
@@ -90,7 +91,6 @@ void Configmenu::setValues(void) {
   setItemSelected(index, getScreen()->getWindowCornerSnap());
   setItemEnabled(index++, getScreen()->getWindowToWindowSnap());
   
-  setItemSelected(index++, getScreen()->doWorkspaceWarping());
   setItemSelected(index++, getScreen()->allowScrollLock());
   setItemSelected(index++, getScreen()->doHideToolbar());
 }
@@ -125,35 +125,35 @@ void Configmenu::itemSelected(int button, unsigned int index) {
     setItemSelected(index, getScreen()->doOpaqueMove());
     break;
 
-  case 3: // full maximization
+  case 3: // workspace wrapping
+    getScreen()->saveWorkspaceWarping(! getScreen()->doWorkspaceWarping());
+    setItemSelected(index, getScreen()->doWorkspaceWarping());
+    break;
+
+  case 4: // full maximization
     getScreen()->saveFullMax(! getScreen()->doFullMax());
     setItemSelected(index, getScreen()->doFullMax());
     break;
 
-  case 4: // focus new windows
+  case 5: // focus new windows
     getScreen()->saveFocusNew(! getScreen()->doFocusNew());
     setItemSelected(index, getScreen()->doFocusNew());
     break;
 
-  case 5: // focus last window on workspace
+  case 6: // focus last window on workspace
     getScreen()->saveFocusLast(! getScreen()->doFocusLast());
     setItemSelected(index, getScreen()->doFocusLast());
     break;
 
-  case 6: // window-to-window snapping
+  case 7: // window-to-window snapping
     getScreen()->saveWindowToWindowSnap(! getScreen()->getWindowToWindowSnap());
     setItemSelected(index, getScreen()->getWindowToWindowSnap());
     setItemEnabled(index + 1, getScreen()->getWindowToWindowSnap());
     break;
 
-  case 7: // window corner snapping
+  case 8: // window corner snapping
     getScreen()->saveWindowCornerSnap(! getScreen()->getWindowCornerSnap());
     setItemSelected(index, getScreen()->getWindowCornerSnap());
-    break;
-
-  case 8: // workspace wrapping
-    getScreen()->saveWorkspaceWarping(! getScreen()->doWorkspaceWarping());
-    setItemSelected(index, getScreen()->doWorkspaceWarping());
     break;
 
   case 9: // disable mouse bindings with Scroll Lock

@@ -1164,6 +1164,32 @@ void Blackbox::shutdown(void) {
 }
 
 
+#ifdef    XINERAMA
+void Blackbox::saveXineramaPlacement(bool x) {
+  resource.xinerama_placement = x;
+  config.setValue("session.xineramaSupport.windowPlacement",
+                  resource.xinerama_placement);
+  reconfigure();  // make sure all screens get this change
+}
+
+
+void Blackbox::saveXineramaMaximizing(bool x) {
+  resource.xinerama_maximize = x;
+  config.setValue("session.xineramaSupport.windowMaximizing",
+                  resource.xinerama_maximize);
+  reconfigure();  // make sure all screens get this change
+}
+
+
+void Blackbox::saveXineramaSnapping(bool x) {
+  resource.xinerama_snap = x;
+  config.setValue("session.xineramaSupport.windowSnapping",
+                  resource.xinerama_snap);
+  reconfigure();  // make sure all screens get this change
+}
+#endif // XINERAMA
+
+  
 /*
  * Save all values as they are so that the defaults will be written to the rc
  * file
@@ -1182,6 +1208,12 @@ void Blackbox::save_rc(void) {
   config.setValue("session.styleFile", resource.style_file);
   config.setValue("session.titlebarLayout", resource.titlebar_layout);
   
+#ifdef    XINERAMA
+  saveXineramaPlacement(resource.xinerama_placement);
+  saveXineramaMaximizing(resource.xinerama_maximize);
+  saveXineramaSnapping(resource.xinerama_snap);
+#endif // XINERAMA
+
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::save_rc));
  
@@ -1228,10 +1260,28 @@ void Blackbox::load_rc(void) {
   
   if (! config.getValue("session.titlebarLayout", resource.titlebar_layout))
     resource.titlebar_layout = "ILMC";
+
+#ifdef    XINERAMA
+  if (! config.getValue("session.xineramaSupport.windowPlacement",
+                        resource.xinerama_placement))
+    resource.xinerama_placement = true;
+
+  if (! config.getValue("session.xineramaSupport.windowMaximizing",
+                        resource.xinerama_maximize))
+    resource.xinerama_maximize = true;
+
+  if (! config.getValue("session.xineramaSupport.windowSnapping",
+                        resource.xinerama_snap))
+    resource.xinerama_snap = true;
+#endif // XINERAMA
 }
 
 
 void Blackbox::reconfigure(void) {
+  // don't reconfigure while saving the initial rc file, it's a waste and it
+  // breaks somethings (workspace names)
+  if (isStartup()) return;
+
   reconfigure_wait = True;
 
   if (! timer->isTiming()) timer->start();

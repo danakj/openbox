@@ -584,9 +584,22 @@ static bool colRLBT(const Rect &first, const Rect &second) {
 }
 
 
-bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
+bool Workspace::smartPlacement(Rect& win) {
   rectList spaces;
-  spaces.push_back(availableArea); //initially the entire screen is free
+ 
+  //initially the entire screen is free
+#ifdef    XINERAMA
+  if (screen->isXineramaActive() &&
+      screen->getBlackbox()->doXineramaPlacement()) {
+    RectList availableAreas = screen->allAvailableAreas();
+    assert(availableAreas.size() > 0);
+    RectList::iterator it, end = availableAreas.end();
+
+    for (it = availableAreas.begin(); it != end; ++it)
+      spaces.push_back(*it);
+  } else
+#endif // XINERAMA
+    spaces.push_back(screen->availableArea());
 
   //Find Free Spaces
   BlackboxWindowList::const_iterator wit = windowList.begin(),
@@ -661,23 +674,40 @@ bool Workspace::smartPlacement(Rect& win, const Rect& availableArea) {
 }
 
 
-bool Workspace::underMousePlacement(Rect &win, const Rect &availableArea) {
+bool Workspace::underMousePlacement(Rect &win) {
   int x, y, rx, ry;
   Window c, r;
   unsigned int m;
   XQueryPointer(screen->getBlackbox()->getXDisplay(), screen->getRootWindow(),
                 &r, &c, &rx, &ry, &x, &y, &m);
+
+  Rect area;
+#ifdef    XINERAMA
+  if (screen->isXineramaActive() &&
+      screen->getBlackbox()->doXineramaPlacement()) {
+    RectList availableAreas = screen->allAvailableAreas();
+    assert(availableAreas.size() > 0);
+    RectList::iterator it, end = availableAreas.end();
+
+    for (it = availableAreas.begin(); it != end; ++it)
+      if (it->contains(rx, ry)) break;
+    assert(it != end);  // the mouse isn't inside an area?
+    area = *it;
+  } else
+#endif // XINERAMA
+    area = screen->availableArea();
+  
   x = rx - win.width() / 2;
   y = ry - win.height() / 2;
 
-  if (x < availableArea.x())
-    x = availableArea.x();
-  if (y < availableArea.y())
-    y = availableArea.y();
-  if (x + win.width() > availableArea.x() + availableArea.width())
-    x = availableArea.x() + availableArea.width() - win.width();
-  if (y + win.height() > availableArea.y() + availableArea.height())
-    y = availableArea.y() + availableArea.height() - win.height();
+  if (x < area.x())
+    x = area.x();
+  if (y < area.y())
+    y = area.y();
+  if (x + win.width() > area.x() + area.width())
+    x = area.x() + area.width() - win.width();
+  if (y + win.height() > area.y() + area.height())
+    y = area.y() + area.height() - win.height();
 
   win.setX(x);
   win.setY(y);
@@ -686,7 +716,9 @@ bool Workspace::underMousePlacement(Rect &win, const Rect &availableArea) {
 }
 
 
-bool Workspace::cascadePlacement(Rect &win, const Rect &availableArea) {
+bool Workspace::cascadePlacement(Rect &win) {
+  const Rect &availableArea = screen->availableArea();
+
   if ((cascade_x > static_cast<signed>(availableArea.width() / 2)) ||
       (cascade_y > static_cast<signed>(availableArea.height() / 2)))
     cascade_x = cascade_y = 32;
@@ -703,32 +735,29 @@ bool Workspace::cascadePlacement(Rect &win, const Rect &availableArea) {
 
 
 void Workspace::placeWindow(BlackboxWindow *win) {
-  Rect availableArea(screen->availableArea()),
-    new_win(availableArea.x(), availableArea.y(),
-            win->frameRect().width(), win->frameRect().height());
+  Rect new_win(0, 0, win->frameRect().width(), win->frameRect().height());
   bool placed = False;
 
   switch (screen->getPlacementPolicy()) {
   case BScreen::RowSmartPlacement:
   case BScreen::ColSmartPlacement:
-    placed = smartPlacement(new_win, availableArea);
+    placed = smartPlacement(new_win);
     break;
   case BScreen::UnderMousePlacement:
   case BScreen::ClickMousePlacement:
-    placed = underMousePlacement(new_win, availableArea);
+    placed = underMousePlacement(new_win);
   default:
     break; // handled below
   } // switch
 
   if (placed == False) {
-    cascadePlacement(new_win, availableArea);
+    cascadePlacement(new_win);
     cascade_x += win->getTitleHeight() + (screen->getBorderWidth() * 2);
     cascade_y += win->getTitleHeight() + (screen->getBorderWidth() * 2);
   }
 
-  if (new_win.right() > availableArea.right())
-    new_win.setX(availableArea.left());
-  if (new_win.bottom() > availableArea.bottom())
-    new_win.setY(availableArea.top());
+  // make sure the placement was valid
+  assert(screen->availableArea().contains(new_win));
+
   win->configure(new_win.x(), new_win.y(), new_win.width(), new_win.height());
 }

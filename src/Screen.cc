@@ -2074,16 +2074,12 @@ const Rect& BScreen::availableArea(void) const {
 }
 
 
-RectList BScreen::allAvailableAreas(void) const {
 #ifdef    XINERAMA
-  if (isXineramaActive())
-    return xineramaUsableArea;
-#endif // XINERAMA
-
-  RectList list;
-  list.push_back(availableArea());
-  return list;
+RectList BScreen::allAvailableAreas(void) const {
+  assert(isXineramaActive());
+  return xineramaUsableArea;
 }
+#endif // XINERAMA
 
 
 void BScreen::updateAvailableArea(void) {

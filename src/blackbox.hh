@@ -115,6 +115,10 @@ private:
     timeval auto_raise_delay;
     unsigned long cache_life, cache_max;
     std::string titlebar_layout;
+
+#ifdef    XINERAMA
+    bool xinerama_placement, xinerama_maximize, xinerama_snap;
+#endif // XINERAMA
   } resource;
 
   typedef std::map<Window, BlackboxWindow*> WindowLookup;
@@ -181,6 +185,19 @@ public:
   Toolbar *searchToolbar(Window);
   Slit *searchSlit(Window);
 
+#ifdef    XINERAMA
+  inline bool doXineramaPlacement(void) const
+    { return resource.xinerama_placement; }
+  inline bool doXineramaMaximizing(void) const
+    { return resource.xinerama_maximize; }
+  inline bool doXineramaSnapping(void) const
+    { return resource.xinerama_snap; }
+
+  void saveXineramaPlacement(bool x);
+  void saveXineramaMaximizing(bool x);
+  void saveXineramaSnapping(bool x);
+#endif // XINERAMA
+  
   void saveMenuSearch(Window window, Basemenu *data);
   void saveSystrayWindowSearch(Window window, BScreen *screen);
   void saveWindowSearch(Window window, BlackboxWindow *data);

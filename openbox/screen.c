@@ -61,7 +61,7 @@ gboolean screen_annex()
     g_message("Managing screen %d", ob_screen);
 
     /* set the mouse cursor for the root window (the default cursor) */
-    XDefineCursor(ob_display, ob_root, ob_cursors.left_ptr);
+    XDefineCursor(ob_display, ob_root, ob_cursors.ptr);
 
     /* set the OPENBOX_PID hint */
     pid = getpid();

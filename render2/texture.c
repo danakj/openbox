@@ -115,11 +115,14 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
     case RR_TEXTURE_NONE:
         break;
     case RR_TEXTURE_TEXT:
+glEnable(GL_BLEND);
         RrFontRenderString(sur, tex->data.text.font, &tex->data.text.color,
                            tex->data.text.layout, tex->data.text.string,
                            x, y, w, h);
+glDisable(GL_BLEND);
         break;
     case RR_TEXTURE_RGBA:
+glDisable(GL_BLEND);
         glColor3f(1.0, 1.0, 1.0);
         glBindTexture(GL_TEXTURE_2D, tex->data.rgba.texid);
         glBegin(GL_TRIANGLES);

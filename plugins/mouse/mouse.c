@@ -31,6 +31,8 @@ static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
     MouseAction mact;
     Action *action;
 
+    node = node->xmlChildrenNode;
+    
     if ((n = parse_find_node("dragThreshold", node)))
         threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))

@@ -100,7 +100,7 @@ void parse_tree(xmlDocPtr doc, xmlNodePtr node, void *nothing)
         struct Callback *c = g_hash_table_lookup(callbacks, node->name);
 
         if (c)
-            c->func(doc, node->xmlChildrenNode, c->data);
+            c->func(doc, node, c->data);
 
         node = node->next;
     }

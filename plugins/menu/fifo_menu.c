@@ -133,6 +133,11 @@ void plugin_destroy (ObMenu *m)
         FIFO_MENU_DATA(m)->fifo = NULL;
     }
 
+    if (FIFO_MENU_DATA(m)->buf != NULL) {
+        g_free(FIFO_MENU_DATA(m)->buf);
+        FIFO_MENU_DATA(m)->buf = NULL;
+    }
+ 
     g_free(m->plugin_data);
 
     menu_free(m->name);
@@ -162,9 +167,11 @@ void *plugin_create(PluginMenuCreateData *data)
     m = menu_new( (label != NULL ? label : ""),
                   (id != NULL ? id : PLUGIN_NAME),
                   data->parent);
-    menu_add_entry(data->parent, menu_entry_new_submenu(
-                       (label != NULL ? label : ""),
-                       m));
+
+    if (data->parent)
+        menu_add_entry(data->parent, menu_entry_new_submenu(
+                           (label != NULL ? label : ""),
+                           m));
 
     g_free(label);
     g_free(id);

@@ -69,7 +69,7 @@ static void parse_key(xmlDocPtr doc, xmlNodePtr node, GList *keylist)
 
 static void parse_xml(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
-    parse_key(doc, node, NULL);
+    parse_key(doc, node->xmlChildrenNode, NULL);
 }
 
 void plugin_setup_config()
@@ -247,6 +247,11 @@ static void event(ObEvent *e, void *foo)
                             if (act->func == action_cycle_windows &&
                                 !grabbed_key && grab_keyboard(TRUE)) {
                                 grabbed_key = p;
+                            }
+
+                            if (act->func == action_showmenu) {
+                                act->data.showmenu.x = e->data.x.e->xkey.x_root;
+                                act->data.showmenu.y = e->data.x.e->xkey.y_root;
                             }
 
                             act->data.any.c = focus_client;

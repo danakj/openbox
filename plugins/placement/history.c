@@ -181,7 +181,7 @@ static void save_history()
     xmlIndentTreeOutput = 1;
     xmlSaveFormatFile(history_path, doc, 1);
 
-    xmlFree(doc);
+    xmlFreeDoc(doc);
 }
 
 static void load_history()
@@ -236,7 +236,7 @@ static void load_history()
         g_free(name); g_free(class); g_free(role);
         node = parse_find_node("entry", node->next);
     }
-    xmlFree(doc);
+    xmlFreeDoc(doc);
 }
 
 void history_startup()

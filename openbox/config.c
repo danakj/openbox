@@ -28,6 +28,8 @@ static void parse_focus(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
+    
     if ((n = parse_find_node("focusNew", node)))
         config_focus_new = parse_bool(doc, n);
     if ((n = parse_find_node("followMouse", node)))
@@ -44,6 +46,8 @@ static void parse_theme(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
+
     if ((n = parse_find_node("theme", node))) {
         g_free(config_theme);
         config_theme = parse_string(doc, n);
@@ -54,6 +58,8 @@ static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
+    
     if ((n = parse_find_node("number", node)))
         config_desktops_num = parse_int(doc, n);
     if ((n = parse_find_node("names", node))) {
@@ -78,6 +84,8 @@ static void parse_moveresize(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
 
+    node = node->xmlChildrenNode;
+    
     if ((n = parse_find_node("opaqueMove", node)))
         config_opaque_move = parse_bool(doc, n);
     if ((n = parse_find_node("opaqueResize", node)))
@@ -87,6 +95,8 @@ static void parse_moveresize(xmlDocPtr doc, xmlNodePtr node, void *d)
 static void parse_dock(xmlDocPtr doc, xmlNodePtr node, void *d)
 {
     xmlNodePtr n;
+
+    node = node->xmlChildrenNode;
 
     if ((n = parse_find_node("position", node))) {
         if (parse_contains("TopLeft", doc, n))

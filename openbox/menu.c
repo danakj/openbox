@@ -33,20 +33,30 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
     ObMenu *menu = NULL, *parent;
 
     if (newmenu == TRUE) {
-        if (!parse_attr_string("id", node->parent, &id))
+        if (!parse_attr_string("id", node, &id))
             goto parse_menu_fail;
-        if (!parse_attr_string("label", node->parent, &title))
+        if (!parse_attr_string("label", node, &title))
             goto parse_menu_fail;
-
         g_message("menu label %s", title);
 
-        menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
-
+        if (parse_attr_string("plugin", node, &plugin)) {
+            PluginMenuCreateData data = {
+                .doc = doc,
+                .node = node,
+                .parent = menu
+            };
+            parent = plugin_create(plugin, &data);
+            g_free(plugin);
+        } else
+            menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
+            
         if (data)
             *((ObMenu**)data) = menu;
     } else {
         menu = (ObMenu *)data;
     }
+
+    node = node->xmlChildrenNode;
     
     while (node) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
@@ -59,7 +69,7 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
                 g_free(plugin);
             } else {
                 parent = menu;
-                parse_menu(doc, node->xmlChildrenNode, &parent);
+                parse_menu(doc, node, &parent);
                 menu_add_entry(menu, menu_entry_new_submenu(parent->label,
                                                             parent));
             }

@@ -357,12 +357,14 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;
+  int result;
   const unsigned long maxread = nelements;
   // try get the first element
-  XGetWindowProperty(_display, win, atom, 0l, 1l, False, AnyPropertyType,
-                     &ret_type, &ret_size, &nelements, &ret_bytes, &c_val);
-  if (ret_type == None || nelements < 1)
-    // the property does not exist on the window or is empty
+  result = XGetWindowProperty(_display, win, atom, 0l, 1l, False,
+                              AnyPropertyType, &ret_type, &ret_size,
+                              &nelements, &ret_bytes, &c_val);
+  if (result != Success || ret_type == None || nelements < 1)
+    // an error occured, the property does not exist on the window, or is empty
     return false;
   if (ret_type != type || ret_size != size) {
     // wrong data in property
@@ -384,8 +386,10 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
   int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
   if (remain > size/8 * (signed)maxread) // dont get more than the max
     remain = size/8 * (signed)maxread;
-  XGetWindowProperty(_display, win, atom, 0l, remain, False, type, &ret_type,
-                     &ret_size, &nelements, &ret_bytes, &c_val);
+  result = XGetWindowProperty(_display, win, atom, 0l, remain, False, type,
+                              &ret_type, &ret_size, &nelements, &ret_bytes,
+                              &c_val);
+  assert(result == Success);
   assert(ret_bytes == 0);
   *value = new unsigned char[nelements * size/8 + 1];
   memcpy(*value, c_val, nelements * size/8 + 1);

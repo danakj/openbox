@@ -259,7 +259,6 @@ static void event_hack_mods(XEvent *e)
 	break;
     case MotionNotify:
         STRIP_MODS(e->xmotion.state);
-#if 0
 	/* compress events */
         {
             XEvent ce;
@@ -269,7 +268,6 @@ static void event_hack_mods(XEvent *e)
                 e->xmotion.y_root = ce.xmotion.y_root;
             }
 	}
-#endif
 	break;
     }
 }

@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 2.2.1:
+ * Fix for clients changing from a non-resizable window (Ben Jansens)
+   to a resizable window.
+
  * Fix bug with mutltibyte fonts being really tiny.     (Ben Jansens)
 
  * Stop using Utf8 drawing routines for Xft. These      (Ben Jansens)

@@ -2957,23 +2957,22 @@ void BlackboxWindow::propertyNotifyEvent(const XPropertyEvent *pe) {
   case XA_WM_NORMAL_HINTS: {
     getWMNormalHints();
 
-    if ((client.normal_hint_flags & PMinSize) &&
-        (client.normal_hint_flags & PMaxSize)) {
-      // the window now can/can't resize itself, so the buttons need to be
-      // regrabbed.
-      ungrabButtons();
-      if (client.max_width <= client.min_width &&
-          client.max_height <= client.min_height) {
-        functions &= ~(Func_Resize | Func_Maximize);
-      } else {
-        if (! isTransient())
-          functions |= Func_Maximize;
-        functions |= Func_Resize;
-      }
-      grabButtons();
-      setAllowedActions();
-      setupDecor();
+    // the window now can/can't resize itself, so the buttons need to be
+    // regrabbed.
+    ungrabButtons();
+    if (((client.normal_hint_flags & PMinSize) &&
+         (client.normal_hint_flags & PMaxSize)) &&
+        (client.max_width <= client.min_width &&
+         client.max_height <= client.min_height)) {
+      functions &= ~(Func_Resize | Func_Maximize);
+    } else {
+      if (! isTransient())
+        functions |= Func_Maximize;
+      functions |= Func_Resize;
     }
+    grabButtons();
+    setAllowedActions();
+    setupDecor();
 
     Rect old_rect = frame.rect;
 

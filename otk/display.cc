@@ -165,7 +165,7 @@ DISPLAY environment variable approriately.\n\n"));
   _rendercontrol_list = new RenderControl*[ScreenCount(_display)];
   for (int i = 0; i < ScreenCount(_display); ++i) {
     _screeninfo_list[i] = new ScreenInfo(i);
-    _rendercontrol_list[i] = RenderControl::getRenderControl(i);
+    _rendercontrol_list[i] = RenderControl::createRenderControl(i);
   }
 }
 

@@ -32,7 +32,7 @@ extern "C" {
 
 namespace otk {
 
-RenderControl *RenderControl::getRenderControl(int screen)
+RenderControl *RenderControl::createRenderControl(int screen)
 {
   // get the visual on the screen and return the correct type of RenderControl
   int vclass = display->screenInfo(screen)->visual()->c_class;

@@ -46,7 +46,7 @@ protected:
 public:
   virtual ~RenderControl();
 
-  static RenderControl *getRenderControl(int screen);
+  static RenderControl *createRenderControl(int screen);
 
   //! Draws a background onto a Surface, as specified by a RenderTexture
   /*!

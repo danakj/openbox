@@ -60,9 +60,6 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     if (b > t) *y = g_random_int_range(t, b + 1);
     else       *y = 0;
 
-    /* get where the client should be */
-    frame_frame_gravity(client->frame, x, y);
-
     return TRUE;
 }
 #endif
@@ -183,12 +180,30 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
 
 static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 {
-    int px, py;
+    guint i;
+    gint l, r, t, b;
+    gint px, py;
+    Rect *area;
 
     screen_pointer_pos(&px, &py);
 
+    for (i = 0; i < screen_num_monitors; ++i) {
+        area = screen_area_monitor(client->desktop, i);
+        if (RECT_CONTAINS(*area, px, py))
+            break;
+    }
+    if (i == screen_num_monitors)
+        area = screen_area_monitor(client->desktop, 0);
+
+    l = area->x;
+    t = area->y;
+    r = area->x + area->width - client->frame->area.width;
+    b = area->y + area->height - client->frame->area.height;
+
     *x = px - client->area.width / 2 - client->frame->size.left;
+    *x = MIN(MAX(*x, l), r);
     *y = py - client->area.height / 2 - client->frame->size.top;
+    *y = MIN(MAX(*y, t), b);
 
     return TRUE;
 }
@@ -256,13 +271,13 @@ void place_client(ObClient *client, gint *x, gint *y)
 {
     if (client->positioned)
         return;
-    if (place_transient(client, x, y))
-        return;
-    if (place_dialog(client, x, y))
-        return;
-    if (place_smart(client, x, y))
-        return;
-    if (place_under_mouse(client, x, y))
-        return;
-    g_assert_not_reached(); /* the last one better succeed */
+    if (place_transient(client, x, y) ||
+        place_dialog(client, x, y)    ||
+        place_smart(client, x, y)     ||
+        place_under_mouse(client, x, y))
+    {
+        /* get where the client should be */
+        frame_frame_gravity(client->frame, x, y);
+    } else
+        g_assert_not_reached(); /* the last one better succeed */
 }

@@ -104,11 +104,6 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                 if (l->surface.grad != RR_SURFACE_SOLID)
                     pixel_data_to_pixmap(l, 0, 0, w, h);
             }
-            g_message("%d %d -> %d %d",
-                      l->texture[i].data.lineart.x1,
-                      l->texture[i].data.lineart.y1,
-                      l->texture[i].data.lineart.x2,
-                      l->texture[i].data.lineart.y2);
             XDrawLine(RrDisplay(l->inst), l->pixmap,
                       RrColorGC(l->texture[i].data.lineart.color),
                       l->texture[i].data.lineart.x1,

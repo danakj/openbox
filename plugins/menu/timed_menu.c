@@ -4,6 +4,10 @@
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include "kernel/menu.h"
 #include "kernel/timer.h"
@@ -16,22 +20,19 @@
 static char *PLUGIN_NAME = "timed_menu";
 
 typedef enum {
-    TIMED_MENU_PIPE
+    TIMED_MENU_PIPE, /* read entries from a child process' output */
+    TIMED_MENU_STAT  /* reread entries from file when timestamp changes */
 } Timed_Menu_Type;
 
-/* we can use various GIO channels to support reading menus (can we add them to
-   the event loop? )
-   stat() based update
-   exec() based read
-*/
 typedef struct {
     Timed_Menu_Type type;
-    Timer *timer; /* timer code handles free */
+    Timer *timer;
     char *command; /* for the PIPE */
-    char *buf;
-    unsigned long buflen;
-    int fd;
-    pid_t pid;
+    char *buf; /* buffer to hold partially read menu */
+    unsigned long buflen; /* how many bytes are in the buffer */
+    int fd; /* file descriptor to read menu from */
+    pid_t pid; /* pid of child process in PIPE */
+    time_t mtime; /* time of last modification */
 } Timed_Menu_Data;
 
 
@@ -59,6 +60,8 @@ void timed_menu_clean_up(Menu *m) {
         waitpid(TIMED_MENU_DATA(m)->pid, NULL, 0);
         TIMED_MENU_DATA(m)->pid = -1;
     }
+
+    TIMED_MENU_DATA(m)->mtime = 0;
 }
 
 void timed_menu_read_pipe(int fd, Menu *menu)
@@ -66,6 +69,7 @@ void timed_menu_read_pipe(int fd, Menu *menu)
     char *tmpbuf = NULL;
     unsigned long num_read;
 #ifdef DEBUG
+    /* because gdb is dumb */
     Timed_Menu_Data *d = TIMED_MENU_DATA(menu);
 #endif
 
@@ -104,7 +108,6 @@ void timed_menu_read_pipe(int fd, Menu *menu)
                 (&TIMED_MENU_DATA(menu)->buf[count]));
             count = found - TIMED_MENU_DATA(menu)->buf + 1;
         }
-            
 
         TIMED_MENU_DATA(menu)->buf[TIMED_MENU_DATA(menu)->buflen] = '\0';
         timed_menu_clean_up(menu);
@@ -123,8 +126,7 @@ void timed_menu_timeout_handler(Menu *data)
 
     if (!data->shown && TIMED_MENU_DATA(data)->fd == -1) {
         switch (TIMED_MENU_DATA(data)->type) {
-            case (TIMED_MENU_PIPE):
-            {
+            case (TIMED_MENU_PIPE): {
                 /* if the menu is not shown, run a process and use its output
                    as menu */
 
@@ -132,28 +134,46 @@ void timed_menu_timeout_handler(Menu *data)
                 char *args[] = {"/bin/sh", "-c", TIMED_MENU_DATA(data)->command,
                                 NULL};
                 int child_stdout;
+                int child_pid;
                 if (g_spawn_async_with_pipes(
                         NULL,
                         args,
                         NULL,
                         G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                         NULL,
-                        &TIMED_MENU_DATA(data)->pid,                        
                         NULL,
+                        &child_pid,
                         NULL,
                         &child_stdout,
                         NULL,
                         NULL)) {
                     event_fd_handler *h = g_new(event_fd_handler, 1);
                     TIMED_MENU_DATA(data)->fd = h->fd = child_stdout;
+                    TIMED_MENU_DATA(data)->pid = child_pid;
                     h->handler = timed_menu_read_pipe;
                     h->data = data;
                     event_add_fd_handler(h);
                 } else {
                     g_warning("unable to spawn child");
                 }
-                    
                 break;
+            }
+
+            case (TIMED_MENU_STAT): {
+                struct stat stat_buf;
+
+                if (stat(TIMED_MENU_DATA(data)->command, &stat_buf) == -1) {
+                    g_warning("Unable to stat %s: %s",
+                              TIMED_MENU_DATA(data)->command,
+                              strerror(errno));
+                    break;
+                }
+
+                if (stat_buf.st_mtime > TIMED_MENU_DATA(data)->mtime) {
+                    g_warning("file changed");
+                    TIMED_MENU_DATA(data)->mtime = stat_buf.st_mtime;
+                    /* TODO: parse */
+                }
             }
         }
     }
@@ -166,13 +186,14 @@ void *plugin_create()
     
     m->plugin = PLUGIN_NAME;
 
-    d->type = TIMED_MENU_PIPE;
-    d->timer = timer_start(60000000, &timed_menu_timeout_handler, m);
-    d->command = "find /media -name *.m3u";
+    d->type = TIMED_MENU_STAT;
+    d->timer = timer_start(6000000, &timed_menu_timeout_handler, m);
+    d->command = "/home/woodblock/timed_menu_stat";
     d->buf = NULL;
     d->buflen = 0;
     d->fd = -1;
     d->pid = -1;
+    d->mtime = 0;
     
     m->plugin_data = (void *)d;
 

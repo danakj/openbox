@@ -429,15 +429,15 @@ void BScreen::saveFocusLast(bool f) {
 
 void BScreen::saveAAFonts(bool f) {
   resource.aa_fonts = f;
-  reconfigure();
   config->setValue(screenstr + "antialiasFonts", resource.aa_fonts);
+  reconfigure();
 }
 
 
 void BScreen::saveShadowFonts(bool f) {
   resource.shadow_fonts = f;
-  reconfigure();
   config->setValue(screenstr + "dropShadowFonts", resource.shadow_fonts);
+  reconfigure();
 }
 
 
@@ -709,11 +709,12 @@ void BScreen::load_rc(void) {
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
 
-  if (! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
-    resource.shadow_fonts = false;
-
   if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
     resource.aa_fonts = true;
+
+  if (! resource.aa_fonts ||
+      ! config->getValue(screenstr + "dropShadowFonts", resource.shadow_fonts))
+    resource.shadow_fonts = false;
 
   if (! config->getValue(screenstr + "resizeZones", resource.resize_zones) ||
       (resource.resize_zones != 1 && resource.resize_zones != 2 &&
@@ -1753,6 +1754,9 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #ifdef    XINERAMA
   ++bbwins;
 #endif // XINERAMA
+#ifdef    XFT
+  ++bbwins;
+#endif // XFT
 
   Window *session_stack = new
     Window[(num + workspacesList.size() + rootmenuList.size() +
@@ -1776,6 +1780,9 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 #ifdef    XINERAMA
   *(session_stack + i++) = configmenu->getXineramamenu()->getWindowID();
 #endif // XINERAMA
+#ifdef    XFT
+  *(session_stack + i++) = configmenu->getXftmenu()->getWindowID();
+#endif // XFT
   *(session_stack + i++) = configmenu->getWindowID();
 
   *(session_stack + i++) = slit->getMenu()->getDirectionmenu()->getWindowID();
@@ -1867,8 +1874,7 @@ void BScreen::propagateWindowName(const BlackboxWindow *bw) {
   if (bw->isIconic()) {
     iconmenu->changeItemLabel(bw->getWindowNumber(), bw->getIconTitle());
     iconmenu->update();
-  }
-  else {
+  } else {
     Clientmenu *clientmenu = getWorkspace(bw->getWorkspaceNumber())->getMenu();
     clientmenu->changeItemLabel(bw->getWindowNumber(), bw->getTitle());
     clientmenu->update();
@@ -1879,7 +1885,28 @@ void BScreen::propagateWindowName(const BlackboxWindow *bw) {
 }
 
 
-void BScreen::nextFocus(void) {
+void BScreen::nextFocus(void) const {
+  BlackboxWindow *focused = blackbox->getFocusedWindow(),
+    *next = focused;
+
+  if (focused &&
+      focused->getScreen()->getScreenNumber() == getScreenNumber() &&
+      current_workspace->getCount() > 1) {
+    do {
+      next = current_workspace->getNextWindowInList(next);
+    } while (next != focused && ! next->setInputFocus());
+
+    if (next != focused)
+      current_workspace->raiseWindow(next);
+  } else if (current_workspace->getCount() > 0) {
+    next = current_workspace->getTopWindowOnStack();
+    next->setInputFocus();
+    current_workspace->raiseWindow(next);
+  }
+}
+
+
+void BScreen::prevFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow(),
     *next = focused;
 
@@ -1888,56 +1915,26 @@ void BScreen::nextFocus(void) {
     if (focused->getScreen()->getScreenNumber() != getScreenNumber())
       focused = (BlackboxWindow*) 0;
   }
-
-  if (focused && current_workspace->getCount() > 1) {
-    // next is the next window to recieve focus, current is a place holder
-    BlackboxWindow *current;
+  
+  if (focused &&
+      focused->getScreen()->getScreenNumber() == getScreenNumber() &&
+      current_workspace->getCount() > 1) {
+    // next is the next window to receive focus, current is a place holder
     do {
-      current = next;
-      next = current_workspace->getNextWindowInList(current);
-    } while(! next->setInputFocus() && next != focused);
+      next = current_workspace->getPrevWindowInList(next);
+    } while (next != focused && ! next->setInputFocus());
 
     if (next != focused)
       current_workspace->raiseWindow(next);
-  } else if (current_workspace->getCount() >= 1) {
+  } else if (current_workspace->getCount() > 0) {
     next = current_workspace->getTopWindowOnStack();
-
-    current_workspace->raiseWindow(next);
     next->setInputFocus();
+    current_workspace->raiseWindow(next);
   }
 }
 
 
-void BScreen::prevFocus(void) {
-  BlackboxWindow *focused = blackbox->getFocusedWindow(),
-    *next = focused;
-
-  if (focused) {
-    // if window is not on this screen, ignore it
-    if (focused->getScreen()->getScreenNumber() != getScreenNumber())
-      focused = (BlackboxWindow*) 0;
-  }
-
-  if (focused && current_workspace->getCount() > 1) {
-    // next is the next window to recieve focus, current is a place holder
-    BlackboxWindow *current;
-    do {
-      current = next;
-      next = current_workspace->getPrevWindowInList(current);
-    } while(! next->setInputFocus() && next != focused);
-
-    if (next != focused)
-      current_workspace->raiseWindow(next);
-  } else if (current_workspace->getCount() >= 1) {
-    next = current_workspace->getTopWindowOnStack();
-
-    current_workspace->raiseWindow(next);
-    next->setInputFocus();
-  }
-}
-
-
-void BScreen::raiseFocus(void) {
+void BScreen::raiseFocus(void) const {
   BlackboxWindow *focused = blackbox->getFocusedWindow();
   if (! focused)
     return;
@@ -2525,7 +2522,7 @@ void BScreen::updateAvailableArea(void) {
 }
 
 
-Workspace* BScreen::getWorkspace(unsigned int index) {
+Workspace* BScreen::getWorkspace(unsigned int index) const {
   assert(index < workspacesList.size());
   return workspacesList[index];
 }

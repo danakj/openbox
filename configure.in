@@ -35,7 +35,7 @@ dnl Check for X headers and libraries
 AC_PATH_X
 AC_PATH_XTRA
 
-test x$no_x = "xyes" && AC_MSG_ERROR([Openbox requires the X Window System libraries and headers.])
+test "$no_x" = "yes" && AC_MSG_ERROR([Openbox requires the X Window System libraries and headers.])
 
 test x$x_includes = "x" && x_includes="/usr/include"
 test x$x_libraries = "x" && x_libraries="/usr/lib"
@@ -46,7 +46,7 @@ LIBS="$LIBS $X_LIBS"
 LDFLAGS="$LDFLAGS $LIBS $X_PRE_LIBS"
 
 AC_MSG_CHECKING(for GCC)
-if test x$GCC = "xyes"; then
+if test "$GCC" = "yes"; then
   AC_MSG_RESULT([yes])
   CXXFLAGS="${CXXFLAGS} -Wall -W"
 else
@@ -83,7 +83,7 @@ AC_ARG_ENABLE(
   shape, [  --enable-shape          enable support of the XShape extension [default=yes]])
 
 : ${enableval="yes"}
-if test x$enableval = "xyes"; then
+if test "$enableval" = "yes"; then
   AC_MSG_RESULT([yes])
   AC_CHECK_LIB(Xext, XShapeCombineShape,
 	AC_MSG_CHECKING([for X11/extensions/shape.h])
@@ -100,7 +100,7 @@ if test x$enableval = "xyes"; then
 else
   AC_MSG_RESULT([no])
 fi
-if test x$SHAPE = "xyes"; then
+if test "$SHAPE" = "yes"; then
   LIBS="$LIBS -lXext"
   AC_DEFINE(SHAPE,1,Enable support of the XShape extension)
 fi
@@ -110,7 +110,7 @@ XINERAMA=""
 AC_MSG_CHECKING([whether to build support for the Xinerama extension])
 AC_ARG_ENABLE(
   xinerama, [  --enable-xinerama       enable support of the Xinerama extension [default=no]],
-  if test x$enableval = "xyes"; then
+  if test "$enableval" = "yes"; then
 	AC_MSG_RESULT([yes])
 
 	AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
@@ -131,17 +131,18 @@ AC_ARG_ENABLE(
   fi,
   AC_MSG_RESULT([no])
 )
-if test x$XINERAMA = "xyes"; then
+if test "$XINERAMA" = "yes"; then
   AC_DEFINE(XINERAMA,1,Enable support of the Xinerama extension)
 fi
 
 dnl Check for Xft extension support and proper library files.
 XFT=""
+XFT_UTF8=""
 AC_MSG_CHECKING([whether to build support for the Xft extension])
 AC_ARG_ENABLE(
   xft, [  --enable-xft            enable support of the Xft extension [default=yes]])
 : ${enableval="yes"}
-if test x$enableval = "xyes"; then
+if test "$enableval" = "yes"; then
   AC_MSG_RESULT([yes])
 
   AC_CHECK_LIB(Xft, XftFontOpenXlfd,
@@ -152,7 +153,13 @@ if test x$enableval = "xyes"; then
 , XftFont foo,
       AC_MSG_RESULT([yes])
       XFT="yes"
-      LIBS="$LIBS -lXft",
+      LIBS="$LIBS -lXft"
+
+      dnl Check for utf8 support in the Xft library
+      AC_CHECK_LIB(Xft, XftDrawStringUtf8,
+        XFT_UTF8="yes",
+      ),
+
       AC_MSG_RESULT([no])
     )
   )
@@ -160,8 +167,11 @@ if test x$enableval = "xyes"; then
 else
   AC_MSG_RESULT([no])
 fi
-if test x$XFT = "xyes"; then
-  AC_DEFINE(XFT,1,Enable support of the Xft extension)
+if test "$XFT" = "yes"; then
+  AC_DEFINE(XFT,1,[Enable support of the Xft extension])
+  if test "$XFT_UTF8" = "yes"; then
+    AC_DEFINE(XFT_UTF8,1,[Support for Utf8 text in the Xft extension])
+  fi
 fi
 
 dnl Check for ordered 8bpp dithering
@@ -170,7 +180,7 @@ AC_MSG_CHECKING([whether to include Pseudocolor ordered dithering code])
 AC_ARG_ENABLE(ordered-pseudo,
 [  --enable-ordered-pseudo include code for ordered pseudocolor (8bpp)
                           dithering [default=no]],
-  if test x$enableval = "xyes"; then
+  if test "$enableval" = "yes"; then
     AC_MSG_RESULT([yes])
     ORDEREDPSEUDO="yes" 
   else
@@ -178,7 +188,7 @@ AC_ARG_ENABLE(ordered-pseudo,
   fi,
   AC_MSG_RESULT([no])
 )
-if test x$ORDEREDPSEUDO = "xyes"; then
+if test "$ORDEREDPSEUDO" = "yes"; then
   AC_DEFINE(ORDEREDPSEUDO,1,Enable pseudocolor ordered dithering)
 fi
 
@@ -187,9 +197,9 @@ DEBUG=""
 AC_MSG_CHECKING([whether to include verbose debugging code])
 AC_ARG_ENABLE(debug,
   [  --enable-debug          include verbose debugging code [default=no]],
-  if test x$enableval = "xyes"; then
+  if test "$enableval" = "yes"; then
     AC_MSG_RESULT([yes])
-    if test x$GCC = "xyes"; then
+    if test "$GCC" = "yes"; then
        DEBUG="-DDEBUG -fno-inline -g"
     else
        DEBUG="-DDEBUG"
@@ -208,7 +218,7 @@ NLS=""
 AC_MSG_CHECKING([whether to include NLS support])
 AC_ARG_ENABLE(nls,
   [  --enable-nls            include natural language support [default=yes]],
-  if test x$enableval = "xyes"; then
+  if test "$enableval" = "yes"; then
     AC_MSG_RESULT([yes])
     NLS="yes"
   else
@@ -225,7 +235,7 @@ if test x$gencat_cmd = "x"; then
   NLS=""
 fi
 
-if test x$NLS = "xyes"; then
+if test "$NLS" = "yes"; then
   AC_DEFINE(NLS,1,Include natural language support)
   AC_SUBST(NLS)
 fi
@@ -236,7 +246,7 @@ AC_MSG_CHECKING([whether to use the timed pixmap cache])
 AC_ARG_ENABLE(
   timed-cache,
 [  --enable-timed-cache    use timed pixmap cache [default=yes]],
-  if test x$enableval = "xyes"; then
+  if test "$enableval" = "yes"; then
     AC_MSG_RESULT([yes])
     TIMEDCACHE="yes"
   else
@@ -245,7 +255,7 @@ AC_ARG_ENABLE(
   AC_MSG_RESULT([yes])
   TIMEDCACHE="yes"
 )
-if test x$TIMEDCACHE = "xyes"; then
+if test "$TIMEDCACHE" = "yes"; then
   AC_DEFINE(TIMEDCACHE,1,Use timed pixmap cache)
 fi
 
@@ -305,6 +315,7 @@ nls/hu_HU/Makefile
 nls/it_IT/Makefile
 nls/ja_JP/Makefile
 nls/ko_KR/Makefile
+nls/lv_LV/Makefile
 nls/no_NO/Makefile
 nls/pl_PL/Makefile
 nls/nl_NL/Makefile

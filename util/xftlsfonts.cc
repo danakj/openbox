@@ -128,12 +128,14 @@ int main(int argc, char **argv) {
           cout << val.u.b;
           break;
 
+#ifdef XFT_UTF8
         case XftTypeMatrix:
           cout << "xx(" << val.u.m->xx << ") ";
           cout << "xy(" << val.u.m->xy << ") ";
           cout << "yx(" << val.u.m->yx << ") ";
           cout << "yy(" << val.u.m->yy << ")";
           break;
+#endif
         }
       } while ((vallist = vallist->next));
       cout << endl;

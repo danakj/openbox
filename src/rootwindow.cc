@@ -48,7 +48,18 @@ void OBRootWindow::propertyHandler(const XPropertyEvent &e)
 
   const otk::OBProperty *property = Openbox::instance->property();
 
-  if (e.atom == property->atom(otk::OBProperty::net_desktop_names))
+  // compress changes to a single property into a single change
+  XEvent ce;
+  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+    // XXX: it would be nice to compress ALL changes to a property, not just
+    //      changes in a row without other props between.
+    if (ce.xproperty.atom != e.atom) {
+      XPutBackEvent(otk::OBDisplay::display, &ce);
+      break;
+    }
+  }
+
+  if (e.atom == property->atom(otk::OBProperty::net_desktop_names)) 
     updateDesktopNames();
 }
 

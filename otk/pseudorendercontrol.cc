@@ -30,19 +30,7 @@ PseudoRenderControl::~PseudoRenderControl()
   printf("Destroying PseudoColor RenderControl\n");
 }
 
-void PseudoRenderControl::drawBackground(Surface& sf,
-				       const RenderTexture &texture) const
-{
-  assert(_screen == sf._screen);
-  assert(_screen == texture.color().screen());
-
-  // in psuedo color, gradients aren't even worth while! just draw a solid!
-  //if (texture.gradient() == RenderTexture::Solid) {
-  drawSolidBackground(sf, texture);
-}
-
-void PseudoRenderControl::drawImage(Surface &sf, int w, int h,
-                                    unsigned long *data) const
+void PseudoRenderControl::reduceDepth(Surface &sf, XImage *im) const
 {
 }
 

@@ -65,9 +65,17 @@ protected:
 
   RenderControl(int screen);
 
+  virtual void reduceDepth(Surface &sf, XImage *im) const = 0;
+  
+  inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
+  void verticalGradient(Surface &sf, const RenderTexture &texture) const;
+  void diagonalGradient(Surface &sf, const RenderTexture &texture) const;
+  void crossDiagonalGradient(Surface &sf, const RenderTexture &texture) const;
+  virtual void drawGradientBackground(Surface &sf,
+                                      const RenderTexture &texture) const;
   virtual void drawSolidBackground(Surface& sf,
                                    const RenderTexture& texture) const;
-  
+
 public:
   virtual ~RenderControl();
 
@@ -80,7 +88,7 @@ public:
     This function will overwrite the entire surface.
   */
   virtual void drawBackground(Surface &sf,
-			      const RenderTexture &texture) const = 0;
+			      const RenderTexture &texture) const;
 
   //! Draws an image onto the surface
   /*!
@@ -89,7 +97,7 @@ public:
     background will be used for applying the alpha.
   */
   virtual void drawImage(Surface &sf, int w, int h,
-                         unsigned long *data) const = 0;
+                         unsigned long *data) const;
   
   //! Draws a string onto a Surface
   virtual void drawString(Surface &sf, const Font &font, int x, int y,

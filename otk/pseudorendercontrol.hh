@@ -4,32 +4,18 @@
 
 #include "rendercontrol.hh"
 
-extern "C" {
-
-#ifdef HAVE_STDINT_H
-#  include <stdint.h>
-#else
-#  ifdef HAVE_SYS_TYPES_H
-#    include <sys/types.h>
-#  endif
-#endif
-
-}
-
-#include <vector>
-
 namespace otk {
 
 class PseudoRenderControl : public RenderControl {
 private:
-
+  // add some vars!!!
+  
+  virtual void reduceDepth(Surface &sf, XImage *im) const;
+  
 public:
   PseudoRenderControl(int screen);
   virtual ~PseudoRenderControl();
 
-  virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
-  virtual void drawImage(Surface &sf, int w, int h,
-                         unsigned long *data) const;
 };
 
 }

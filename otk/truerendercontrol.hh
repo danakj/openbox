@@ -21,22 +21,11 @@ private:
   int _green_offset;
   int _blue_offset;
 
-  inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
-  void reduceDepth(Surface &sf, XImage *im) const;
-  void verticalGradient(Surface &sf, const RenderTexture &texture) const;
-  void diagonalGradient(Surface &sf, const RenderTexture &texture) const;
-  void crossDiagonalGradient(Surface &sf, const RenderTexture &texture) const;
-  virtual void drawGradientBackground(Surface &sf,
-                                      const RenderTexture &texture) const;
-  
+  virtual void reduceDepth(Surface &sf, XImage *im) const;
+
 public:
   TrueRenderControl(int screen);
   virtual ~TrueRenderControl();
-
-  virtual void drawBackground(Surface& sf, const RenderTexture &texture) const;
-
-  virtual void drawImage(Surface &sf, int w, int h,
-                         unsigned long *data) const;
 };
 
 }

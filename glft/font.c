@@ -331,3 +331,8 @@ int GlftFontHeight(struct GlftFont *font)
 {
     return font->height;
 }
+
+int GlftFontMaxCharWidth(struct GlftFont *font)
+{
+    return font->max_advance_width;
+}

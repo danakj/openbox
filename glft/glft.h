@@ -16,8 +16,6 @@ struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name);
 
 void GlftFontClose(struct GlftFont *font);
 
-int GlftFontHeight(struct GlftFont *font);
-
 /* rendering */
 
 struct GlftColor {
@@ -43,5 +41,8 @@ void GlftMeasureString(struct GlftFont *font,
                        int bytes,
                        int *w,
                        int *h);
+
+int GlftFontHeight(struct GlftFont *font);
+int GlftFontMaxCharWidth(struct GlftFont *font);
 
 #endif

@@ -153,12 +153,12 @@ void OBBindings::assimilate(BindingTree *node)
 {
   BindingTree *a, *b, *tmp, *last;
 
-  if (!parent->first_child) {
+  if (!_tree.first_child) {
     // there are no nodes at this level yet
-    parent->first_child = node;
+    _tree.first_child = node;
     return;
   } else {
-    a = parent->first_child;
+    a = _tree.first_child;
     last = a;
     b = node;
     while (a->first_child) {

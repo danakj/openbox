@@ -308,7 +308,8 @@ static gboolean event_ignore(XEvent *e, Client *client)
         /* NotifyVirtual occurs when ungrabbing the pointer */
         if (e->xcrossing.mode == NotifyGrab ||
             e->xcrossing.detail == NotifyInferior ||
-            e->xcrossing.detail == NotifyVirtual)
+            (e->xcrossing.mode == NotifyUngrab &&
+             e->xcrossing.detail == NotifyVirtual))
             return TRUE;
 	break;
     }

@@ -29,6 +29,7 @@ GPtrArray *screen_desktop_names;
 
 static Rect  *area = NULL;
 static Strut *strut = NULL;
+static Window support_window = None;
 
 static void screen_update_area();
 
@@ -45,7 +46,6 @@ static int another_running(Display *d, XErrorEvent *e)
 gboolean screen_annex()
 {
     XErrorHandler old;
-    Window support;
     pid_t pid;
     int i, num_support;
     Atom *supported;
@@ -68,14 +68,14 @@ gboolean screen_annex()
     PROP_SET32(ob_root, openbox_pid, cardinal, pid);
 
     /* create the netwm support window */
-    support = XCreateSimpleWindow(ob_display, ob_root, 0, 0, 1, 1, 0, 0, 0);
+    support_window = XCreateSimpleWindow(ob_display, ob_root, 0,0,1,1,0,0,0);
 
     /* set supporting window */
-    PROP_SET32(ob_root, net_supporting_wm_check, window, support);
+    PROP_SET32(ob_root, net_supporting_wm_check, window, support_window);
 
     /* set properties on the supporting window */
-    PROP_SETS(support, net_wm_name, utf8, "Openbox");
-    PROP_SET32(support, net_supporting_wm_check, window, support);
+    PROP_SETS(support_window, net_wm_name, utf8, "Openbox");
+    PROP_SET32(support_window, net_supporting_wm_check, window,support_window);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 48;
@@ -167,7 +167,13 @@ void screen_shutdown()
 {
     guint i;
 
+    XSelectInput(ob_display, ob_root, NoEventMask);
+
     PROP_ERASE(ob_root, openbox_pid); /* we're not running here no more! */
+    PROP_ERASE(ob_root, net_supported); /* not without us */
+    PROP_ERASE(ob_root, net_showing_desktop); /* don't keep this mode */
+
+    XDestroyWindow(ob_display, support_window);
 
     for (i = 0; i < screen_desktop_names->len; ++i)
 	g_free(g_ptr_array_index(screen_desktop_names, i));

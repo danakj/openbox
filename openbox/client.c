@@ -493,10 +493,9 @@ void client_unmanage(ObClient *self)
         PROP_ERASE(self->window, net_wm_state);
         PROP_ERASE(self->window, wm_state);
     } else {
-        /* if we're left in an iconic state, the client wont be mapped. this is
-           bad, since we will no longer be managing the window on restart */
-        if (self->iconic)
-            XMapWindow(ob_display, self->window);
+        /* if we're left in an unmapped state, the client wont be mapped. this
+           is bad, since we will no longer be managing the window on restart */
+        XMapWindow(ob_display, self->window);
     }
 
 
@@ -2203,11 +2202,6 @@ static void client_iconify_recursive(ObClient *self,
                     PROP_MSG(self->window, kde_wm_change_state,
                              self->wmstate, 1, 0, 0);
 
-                self->ignore_unmaps++;
-                /* we unmap the client itself so that we can get MapRequest
-                   events, and because the ICCCM tells us to! */
-                XUnmapWindow(ob_display, self->window);
-
                 /* update the focus lists.. iconic windows go to the bottom of
                    the list, put the new iconic window at the 'top of the
                    bottom'. */
@@ -2226,8 +2220,6 @@ static void client_iconify_recursive(ObClient *self,
             if (old != self->wmstate)
                 PROP_MSG(self->window, kde_wm_change_state,
                          self->wmstate, 1, 0, 0);
-
-            XMapWindow(ob_display, self->window);
 
             /* this puts it after the current focused window */
             focus_order_remove(self);

@@ -23,6 +23,11 @@ struct Strut {
   Strut(void): top(0), bottom(0), left(0), right(0) {}
   //! Constructs a new Strut with margins
   Strut(int l, int t, int r, int b): top(t), bottom(b), left(l), right(r) {}
+
+  bool operator==(const Strut &o) const {
+    return top == o.top && bottom == o.bottom && left == o.left &&
+      right == o.right;
+  }
 };
 
 }

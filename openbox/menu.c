@@ -356,9 +356,6 @@ void menu_control_show(Menu *self, int x, int y, Client *client) {
 	      MIN(y, screen_physical_size.height - self->size.height));
 
     if (!self->shown) {
-        /* XXX gotta add to the stacking list first!
-           stacking_raise(MENU_AS_WINDOW(self));
-        */
 	XMapWindow(ob_display, self->frame);
         stacking_raise(MENU_AS_WINDOW(self));
 	self->shown = TRUE;

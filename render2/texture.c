@@ -47,7 +47,7 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
@@ -103,13 +103,13 @@ void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
         glTexCoord2f(0, 0);
         glVertex2i(x, y);
         glTexCoord2f(1, 0);
-        glVertex2i(x+w - 1, y); 
+        glVertex2i(x+w, y); 
         glTexCoord2f(1, 1);
-        glVertex2i(x+w - 1, y+h - 1);
+        glVertex2i(x+w, y+h);
 
-        glVertex2i(x+w - 1, y+h - 1);
+        glVertex2i(x+w, y+h);
         glTexCoord2f(0, 1);
-        glVertex2i(x, y+h - 1);
+        glVertex2i(x, y+h);
         glTexCoord2f(0, 0);
         glVertex2i(x, y);
         glEnd();

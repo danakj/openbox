@@ -378,7 +378,9 @@ void focus_cycle_draw_indicator()
         int x, y, w, h;
         int wt, wl, wr, wb;
 
-        wt = wl = wr = wb = MAX(5, ob_rr_theme->handle_height);
+        wt = wl = wr = wb = MAX(3,
+                                ob_rr_theme->handle_height +
+                                ob_rr_theme->bwidth * 2);
 
         x = focus_cycle_target->frame->area.x;
         y = focus_cycle_target->frame->area.y;

@@ -3,6 +3,7 @@
 #define __surface_hh
 
 #include "point.hh"
+#include "truerendercontrol.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -26,6 +27,8 @@ public:
   virtual const Point& size() const { return _size; }
   virtual int width() const { return _size.x(); }
   virtual int height() const { return _size.y(); }
+
+  friend class TrueRenderControl;
 };
 
 }

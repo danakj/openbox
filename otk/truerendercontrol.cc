@@ -7,7 +7,7 @@
 #include "truerendercontrol.hh"
 #include "display.hh"
 #include "screeninfo.hh"
-#include "widget.hh"
+#include "surface.hh"
 
 extern "C" {
 #ifdef    HAVE_STDLIB_H
@@ -21,7 +21,10 @@ extern "C" {
 namespace otk {
 
 TrueRenderControl::TrueRenderControl(const ScreenInfo *screen)
-  : RenderControl(screen)
+  : RenderControl(screen),
+    _red_offset(0),
+    _green_offset(0),
+    _blue_offset(0)
 {
   printf("Initializing TrueColor RenderControl\n");
 
@@ -99,12 +102,12 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
   }
 }
 
-void TrueRenderControl::render(Widget *wi)
+void TrueRenderControl::render(Surface *sf)
 {
-  assert(wi);
+  assert(sf);
   
-  int w = wi->width(), h = wi->height();
-  Pixmap p = XCreatePixmap(**display, wi->window(), w, h, _screen->depth());
+  int w = sf->width(), h = sf->height();
+
   XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
 			    ZPixmap, 0, NULL, w, h, 32, 0);
 
@@ -125,17 +128,15 @@ void TrueRenderControl::render(Widget *wi)
 
   im->data = (char*) data;
   
-  XPutImage(**display, p, DefaultGC(**display, _screen->screen()),
+  if (!sf->_pm)
+    sf->_pm = XCreatePixmap(**display, _screen->rootWindow(), w, h,
+			    _screen->depth());
+  XPutImage(**display, sf->_pm, DefaultGC(**display, _screen->screen()),
             im, 0, 0, 0, 0, w, h);
 
   //delete [] image->data;
   //image->data = NULL;
   XDestroyImage(im);
-
-  XSetWindowBackgroundPixmap(**display, wi->window(), p);
-  XClearWindow(**display, wi->window());
-
-  XFreePixmap(**display, p);
 }
 
 }

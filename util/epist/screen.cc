@@ -433,8 +433,6 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
                          const bool sameclass, const string &cn) const {
   assert(_managed);
 
-  if (_clients.empty()) return;
-    
   WindowList::const_iterator target = _active;
 
   string classname = cn;
@@ -443,6 +441,8 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
 
   if (target == _clients.end())
     target = _clients.begin();
+
+  WindowList::const_iterator begin = target;
  
   do {
     if (forward) {
@@ -454,6 +454,10 @@ void screen::cycleWindow(const bool forward, const bool alldesktops,
         target = _clients.end();
       --target;
     }
+
+    // no window to focus
+    if (target == begin)
+      return;
   } while (target == _clients.end() ||
            (*target)->iconic() ||
            (! alldesktops && (*target)->desktop() != _active_desktop) ||

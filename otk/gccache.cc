@@ -8,6 +8,8 @@ extern "C" {
 #include <stdio.h>
 }
 
+#include <algorithm>
+
 #include "gccache.hh"
 #include "color.hh"
 #include "assassin.hh"

@@ -716,6 +716,9 @@ ObAction *action_parse(xmlDocPtr doc, xmlNodePtr node)
             } else if (act->func == action_send_to_desktop_dir) {
                 if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.sendtodir.wrap = parse_bool(doc, n);
+            } else if (act->func == action_activate) {
+                if ((n = parse_find_node("here", node->xmlChildrenNode)))
+                    act->data.activate.here = parse_bool(doc, n);
             }
         }
         g_free(actname);

@@ -3113,6 +3113,7 @@ void BlackboxWindow::beginResize(int x_root, int y_root, Corner dir) {
 
   default:
     assert(false); // unhandled Corner
+    return;        // unreachable, for the compiler
   }
   
   XGrabServer(blackbox->getXDisplay());
@@ -3151,29 +3152,30 @@ void BlackboxWindow::doResize(int x_root, int y_root) {
   Corner anchor;
 
   switch (resize_dir) {
-    case BottomLeft:
-      anchor = TopRight;
-      frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
-                             frame.rect.height() + (y_root - frame.grab_y));
-      break;
-    case BottomRight:
-      anchor = TopLeft;
-      frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
-                             frame.rect.height() + (y_root - frame.grab_y));
-      break;
-    case TopLeft:
-      anchor = BottomRight;
-      frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
-                             frame.rect.height() - (y_root - frame.grab_y));
-      break;
-    case TopRight:
-      anchor = BottomLeft;
-      frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
-                             frame.rect.height() - (y_root - frame.grab_y));
-      break;
+  case BottomLeft:
+    anchor = TopRight;
+    frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
+                           frame.rect.height() + (y_root - frame.grab_y));
+    break;
+  case BottomRight:
+    anchor = TopLeft;
+    frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
+                           frame.rect.height() + (y_root - frame.grab_y));
+    break;
+  case TopLeft:
+    anchor = BottomRight;
+    frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
+                           frame.rect.height() - (y_root - frame.grab_y));
+    break;
+  case TopRight:
+    anchor = BottomLeft;
+    frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
+                           frame.rect.height() - (y_root - frame.grab_y));
+    break;
 
-    default:
-      assert(false); // unhandled Corner
+  default:
+    assert(false); // unhandled Corner
+    return;        // unreachable, for the compiler
   }
   
   constrain(anchor, &gw, &gh);

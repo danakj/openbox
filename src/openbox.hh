@@ -24,11 +24,11 @@ extern "C" {
 #include "otk/configuration.hh"
 #include "otk/eventdispatcher.hh"
 #include "otk/eventhandler.hh"
-#include "client.hh"
 
 namespace ob {
 
 class OBScreen;
+class OBClient;
 
 //! The main class for the Openbox window manager.
 /*!

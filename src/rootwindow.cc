@@ -100,10 +100,7 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
 
   OBClient *client = Openbox::instance->findClient(e.window);
 
-  printf("Client: %lx\n", client);
-  
   if (client) {
-    printf("found client\n");
     // XXX: uniconify and/or unshade the window
   } else {
     Openbox::instance->screen(_info->getScreenNumber())->
@@ -112,7 +109,6 @@ void OBRootWindow::mapRequestHandler(const XMapRequestEvent &e)
 }
 
 
-#include <stdio.h>
 void OBRootWindow::configureRequestHandler(const XConfigureRequestEvent &e)
 {
   OtkEventHandler::configureRequestHandler(e);

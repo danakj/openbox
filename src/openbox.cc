@@ -6,6 +6,7 @@
 
 #include "../version.h"
 #include "openbox.hh"
+#include "client.hh"
 #include "screen.hh"
 #include "otk/property.hh"
 #include "otk/display.hh"

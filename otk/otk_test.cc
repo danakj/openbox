@@ -11,7 +11,8 @@ int main(void) {
   otk::OBDisplay::initialize(NULL);
   otk::Configuration style_conf(False);
   otk::OBTimerQueueManager *tm = new otk::OBTimerQueueManager();
-  const otk::ScreenInfo *s_info = otk::OBDisplay::screenInfo(0);
+  const otk::ScreenInfo *s_info =
+    otk::OBDisplay::screenInfo(DefaultScreen(otk::OBDisplay::display));
   otk::BImageControl *ctrl = new otk::BImageControl(tm, s_info, True, 4, 5, 200);
 
   otk::Style *my_style = new otk::Style(0ul, ctrl);
@@ -52,6 +53,8 @@ int main(void) {
   delete my_style;
   delete tm;
   delete ctrl;
+
+  otk::OBDisplay::destroy();
 
   return 0;
 }

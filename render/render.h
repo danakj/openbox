@@ -102,7 +102,13 @@ typedef struct TextureMask {
 } TextureMask;
 
 typedef struct TextureRGBA {
-    int poo;
+    int width;
+    int height;
+    unsigned long *data;
+/* cached scaled so we don't have to scale often */
+    int cwidth;
+    int cheight;
+    unsigned long *cache;
 } TextureRGBA;
 
 typedef union {

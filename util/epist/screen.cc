@@ -294,7 +294,7 @@ void screen::handleKeypress(const XEvent &e) {
       window->sendTo(it->number());
       return;
 
-    case Action::toggleomnipresent:
+    case Action::toggleOmnipresent:
       if (window->desktop() == 0xffffffff)
         window->sendTo(_active_desktop);
       else
@@ -329,7 +329,7 @@ void screen::handleKeypress(const XEvent &e) {
       window->resizeRel(0, it->number());
       return;
       
-    case Action::toggleshade:
+    case Action::toggleShade:
       window->shade(! window->shaded());
       return;
       

@@ -29,8 +29,8 @@ Control-Mod1-Shift-x {
     r raise;
     l lower;
     k close;
-    s toggleshade;
-    o toggleomnipresent;
+    s toggleShade;
+    o toggleOmnipresent;
 
     1 sendToWorkspace 1;
     2 sendToWorkspace 2;

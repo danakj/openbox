@@ -39,8 +39,8 @@ public:
     raise, //done
     lower, //done
     close, //done
-    toggleshade, //done
-    toggleomnipresent, //done
+    toggleShade, //done
+    toggleOmnipresent, //done
     moveWindowUp, //done
     moveWindowDown, //done
     moveWindowLeft, //done

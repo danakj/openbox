@@ -507,14 +507,14 @@ static void insert_timer(ObMainLoop *loop, ObMainLoopTimer *ins)
 {
     GSList *it;
     for (it = loop->timers; it; it = g_slist_next(it)) {
-	ObMainLoopTimer *t = it->data;
-        if (timecompare(&ins->timeout, &t->timeout) <= 0) {
-	    loop->timers = g_slist_insert_before(loop->timers, it, ins);
-	    break;
-	}
+        ObMainLoopTimer *t = it->data;
+        if (timecompare(&ins->timeout, &t->timeout) >= 0) {
+            loop->timers = g_slist_insert_before(loop->timers, it, ins);
+            break;
+        }
     }
     if (it == NULL) /* didnt fit anywhere in the list */
-	loop->timers = g_slist_append(loop->timers, ins);
+        loop->timers = g_slist_append(loop->timers, ins);
 }
 
 void ob_main_loop_timeout_add(ObMainLoop *loop,
@@ -609,7 +609,7 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
 	
         /* the queue is sorted, so if this timer shouldn't fire, none are 
            ready */
-        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) <= 0)
+        if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) < 0)
             break;
 
         /* we set the last fired time to delay msec after the previous firing,

@@ -59,7 +59,7 @@
     <action name="UnmaximizeFull"></action>
   </keybind>
   <keybind key="A-F12">
-    <action name="ToggleShaded"></action>
+    <action name="ToggleShade"></action>
   </keybind>
   <keybind key="C-A-Left">
     <action name="DesktopLeft"></action>

@@ -116,8 +116,8 @@ borderColor: #091d2e
 
 !! font me!
 !window.title.font: Borzoi:pixelsize=11
-window.focus.font: Bitstream Vera Sans:bold:pixelsize=10:shadow=y:shadowoffset=1:shadowtint=75
-window.unfocus.font: Bitstream Vera Sans:bold:pixelsize=10
+window.focus.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowoffset=1:shadowtint=75
+window.unfocus.font: Bitstream Vera Sans:bold:pixelsize=9
 menu.frame.font: National First Font:pixelsize=15
 !menu.title.font: Bitstream Vera Sans:bold:pixelsize=9:shadow=y:shadowtint=75
 menu.title.font: Bitstream Vera Sans:bold:pixelsize=10

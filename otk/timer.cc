@@ -77,15 +77,11 @@ void OBTimer::start(void)
 
 void OBTimer::stop(void)
 {
-  timing = false;
+  if (timing) {
+    timing = false;
 
-  manager->removeTimer(this);
-}
-
-
-void OBTimer::halt(void)
-{
-  timing = false;
+    manager->removeTimer(this);
+  }
 }
 
 

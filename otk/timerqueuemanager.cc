@@ -45,7 +45,6 @@ void OBTimerQueueManager::fire()
     timerList.pop();
 
     timer->fireTimeout();
-    timer->halt();
     if (timer->isRecurring())
       timer->start();
   }

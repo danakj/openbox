@@ -637,14 +637,28 @@ void Screen::lowerWindow(Client *client)
   Client::List::iterator it = --_stacking.end();
   const Client::List::iterator end = _stacking.begin();
 
-  for (; it != end && (*it)->layer() < client->layer(); --it);
-  if (*it == client) return;          // already the bottom, return
+  if (client->modal() && client->transientFor()) {
+    // don't let a modal window lower below its transient_for
+    it = std::find(_stacking.begin(), _stacking.end(), client->transientFor());
+    assert(it != _stacking.end());
 
-  wins[0] = (*it)->frame->window();
-  wins[1] = client->frame->window();
+    wins[0] = (it == _stacking.begin() ? _focuswindow :
+               ((*(--Client::List::const_iterator(it)))->frame->window()));
+    wins[1] = client->frame->window();
+    if (wins[0] == wins[1]) return; // already right above the window
 
-  _stacking.remove(client);
-  _stacking.insert(++it, client);
+    _stacking.remove(client);
+    _stacking.insert(it, client);
+  } else {
+    for (; it != end && (*it)->layer() < client->layer(); --it);
+    if (*it == client) return;          // already the bottom, return
+
+    wins[0] = (*it)->frame->window();
+    wins[1] = client->frame->window();
+
+    _stacking.remove(client);
+    _stacking.insert(++it, client);
+  }
 
   XRestackWindows(**otk::display, wins, 2);
   changeStackingList();
@@ -676,7 +690,12 @@ void Screen::raiseWindow(Client *client)
   _stacking.insert(it, client);
 
   XRestackWindows(**otk::display, wins, 2);
-  changeStackingList();
+
+  // if the window has a modal child, then raise it after us to put it on top
+  if (client->modalChild())
+    raiseWindow(client->modalChild());
+  else
+    changeStackingList(); // no need to do this twice!
 }
 
 void Screen::changeDesktop(long desktop)

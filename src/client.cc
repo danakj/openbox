@@ -53,6 +53,8 @@ Client::Client(int screen, Window window)
   _positioned = false;
   // nothing is disabled unless specified
   _disabled_decorations = 0;
+  // no modal children until they set themselves
+  _modal_child = 0;
   
   getArea();
   getDesktop();
@@ -105,6 +107,8 @@ Client::~Client()
   }
   
   // clean up parents reference to this
+  if (_modal)
+    setModal(false);
   if (_transient_for)
     _transient_for->_transients.remove(this); // remove from old parent
   
@@ -674,11 +678,18 @@ void Client::updateTransientFor()
 
   // if anything has changed...
   if (c != _transient_for) {
+    bool m = _modal;
+    if (_modal)
+      setModal(false);
+    
     if (_transient_for)
       _transient_for->_transients.remove(this); // remove from old parent
     _transient_for = c;
     if (_transient_for)
       _transient_for->_transients.push_back(this); // add to new parent
+
+    if (m)
+      setModal(true);
   }
 }
 
@@ -791,12 +802,59 @@ void Client::setDesktop(long target)
 }
 
 
+Client *Client::findModalChild(Client *skip) const
+{
+  Client *ret = 0;
+  
+  // find a modal child recursively and try focus it
+  List::const_iterator it, end = _transients.end();
+  for (it = _transients.begin(); it != end; ++it)
+    if ((*it)->_modal && *it != skip)
+      return *it; // got one
+  // none of our direct children are modal, let them try check
+  for (it = _transients.begin(); it != end; ++it)
+    if ((ret = (*it)->findModalChild()))
+      return ret; // got one
+  return ret;
+}
+
+
+void Client::setModal(bool modal)
+{
+  if (modal) {
+    Client *c = this;
+    while (c->_transient_for) {
+      c = c->_transient_for;
+      if (c->_modal_child) break; // already has a modal child
+      c->_modal_child = this;
+    }
+  } else {
+    // try find a replacement modal dialog
+    Client *replacement = 0;
+    
+    Client *c = this;
+    while (c->_transient_for) // go up the tree
+      c = c->_transient_for;
+    replacement = c->findModalChild(this); // find a modal child, skipping this
+
+    c = this;
+    while (c->_transient_for) {
+      c = c->_transient_for;
+      if (c->_modal_child != this) break; // has a different modal child
+      c->_modal_child = replacement;
+    }
+  }
+  _modal = modal;
+}
+
+
 void Client::setState(StateAction action, long data1, long data2)
 {
   bool shadestate = _shaded;
   bool fsstate = _fullscreen;
   bool maxh = _max_horz;
   bool maxv = _max_vert;
+  bool modal = _modal;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -832,8 +890,7 @@ void Client::setState(StateAction action, long data1, long data2)
     if (action == State_Add) {
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (_modal) continue;
-        _modal = true;
-        // XXX: give it focus if another window has focus that shouldnt now
+        modal = true;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         maxv = true;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
@@ -858,7 +915,7 @@ void Client::setState(StateAction action, long data1, long data2)
     } else { // action == State_Remove
       if (state == otk::Property::atoms.net_wm_state_modal) {
         if (!_modal) continue;
-        _modal = false;
+        modal = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_vert) {
         maxv = false;
       } else if (state == otk::Property::atoms.net_wm_state_maximized_horz) {
@@ -895,6 +952,8 @@ void Client::setState(StateAction action, long data1, long data2)
         maximize(maxv, 2, true);
     }
   }
+  if (modal != _modal)
+    setModal(modal);
   // change fullscreen state before shading, as it will affect if the window
   // can shade or not
   if (fsstate != _fullscreen)
@@ -1303,6 +1362,11 @@ void Client::applyStartupState()
 {
   // these are in a carefully crafted order..
 
+  if (_modal) {
+    _modal = false;
+    setModal(true);
+  }
+  
   if (_iconic) {
     _iconic = false;
     setDesktop(ICONIC_DESKTOP);
@@ -1548,32 +1612,17 @@ void Client::disableDecorations(DecorationFlags flags)
 }
 
 
-bool Client::focusModalChild()
-{
-  // find a modal child recursively and try focus it
-  List::iterator it, end = _transients.end();
-  for (it = _transients.begin(); it != end; ++it)
-    if ((*it)->focusModalChild())
-      return true; // got one
-  // none of our grand-children are modal, try our direct children
-  for (it = _transients.begin(); it != end; ++it)
-    if ((*it)->modal() && (*it)->focus())
-      return true; // got one
-  return false;
-}
-
-
 bool Client::focus()
 {
+  // if we have a modal child, then focus it, not us
+  if (_modal_child)
+    return _modal_child->focus();
+
   // won't try focus if the client doesn't want it, or if the window isn't
   // visible on the screen
   if (!(frame->isVisible() && (_can_focus || _focus_notify))) return false;
 
   if (_focused) return true;
-
-  if (!_modal)
-    if (focusModalChild())
-      return true;
 
   // do a check to see if the window has already been unmapped or destroyed
   // do this intelligently while watching out for unmaps we've generated

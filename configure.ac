@@ -10,6 +10,7 @@ test "$prefix" = "NONE" && prefix="$ac_default_prefix"
 dnl We're in the C++ world
 AC_LANG(C++)
 
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
 dnl AC_PROG_LIBTOOL  dont need this until we're doing plugins/engines

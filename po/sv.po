@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.1\n"
-"Report-Msgid-Bugs-To: ben@openbox.org\n"
-"POT-Creation-Date: 2004-03-29 11:29+0200\n"
+"Report-Msgid-Bugs-To: mikachu@comhem.se\n"
+"POT-Creation-Date: 2004-03-29 18:54+0200\n"
 "PO-Revision-Date: 2004-03-29 18:33:39+0200\n"
 "Last-Translator: Mikael Magnusson <mikachu@comhem.se>\n"
 "Language-Team: None\n"
@@ -107,3 +107,17 @@ msgstr "--sm-save-file kräver ett argument\n"
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Kunde inte skapa katalogen '%s': %s"
+
+#: render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "Kunde inte initialisera Xft."
+
+#: render/font.c:122 render/font.c:127
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Kunde inte ladda fonten \"%s\"\n"
+
+#: render/font.c:123
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Försöker med reservfonten \"%s\"\n"

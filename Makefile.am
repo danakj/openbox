@@ -275,7 +275,7 @@ nodist_rc_DATA = \
 	data/menu.xml
 
 dist_xsd_DATA = \
-	data/rc.xsd
+	data/rc.xsd \
 	data/menu.xsd
 
 %.xml: %.xml.in

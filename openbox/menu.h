@@ -101,4 +101,6 @@ void menu_entry_render(MenuEntry *self);
 
 void menu_entry_fire(MenuEntry *self);
 
+void menu_render(Menu *self);
+
 #endif

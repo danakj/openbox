@@ -21,9 +21,10 @@ bin_PROGRAMS=$(binary)
 openbox3_LDADD=@LIBINTL@ -lobrender -L../render
 openbox3_LDFLAGS=-export-dynamic
 openbox3_SOURCES=parse.tab.c parse.lex.c action.c client.c config.c \
-                 extensions.c focus.c frame.c grab.c menu.c openbox.c \
-                 framerender.c parse.c plugin.c prop.c screen.c stacking.c \
-                 dispatch.c event.c group.c timer.c xerror.c moveresize.c
+                 extensions.c focus.c frame.c grab.c menu.c menu_render.c \
+                 openbox.c framerender.c parse.c plugin.c prop.c screen.c \
+                 stacking.c dispatch.c event.c group.c timer.c xerror.c \
+                 moveresize.c
 
 noinst_HEADERS=action.h client.h config.h dispatch.h event.h extensions.h \
                focus.h frame.h framerender.h geom.h gettext.h grab.h group.h \

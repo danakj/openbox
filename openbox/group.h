@@ -4,7 +4,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-struct Client;
+struct _ObClient;
 
 typedef struct Group {
     Window leader;
@@ -18,8 +18,8 @@ extern GHashTable *group_map;
 void group_startup();
 void group_shutdown();
 
-Group *group_add(Window leader, struct Client *client);
+Group *group_add(Window leader, struct _ObClient *client);
 
-void group_remove(Group *self, struct Client *client);
+void group_remove(Group *self, struct _ObClient *client);
 
 #endif

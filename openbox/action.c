@@ -700,7 +700,7 @@ void action_toggle_omnipresent(union ActionData *data)
 
 void action_move_relative_horz(union ActionData *data)
 {
-    Client *c = data->relative.c;
+    ObClient *c = data->relative.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x + data->relative.delta, c->area.y,
@@ -709,7 +709,7 @@ void action_move_relative_horz(union ActionData *data)
 
 void action_move_relative_vert(union ActionData *data)
 {
-    Client *c = data->relative.c;
+    ObClient *c = data->relative.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x, c->area.y + data->relative.delta,
@@ -718,7 +718,7 @@ void action_move_relative_vert(union ActionData *data)
 
 void action_resize_relative_horz(union ActionData *data)
 {
-    Client *c = data->relative.c;
+    ObClient *c = data->relative.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width +
@@ -728,7 +728,7 @@ void action_resize_relative_horz(union ActionData *data)
 
 void action_resize_relative_vert(union ActionData *data)
 {
-    Client *c = data->relative.c;
+    ObClient *c = data->relative.c;
     if (c && !c->shaded)
         client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width, c->area.height +
@@ -1098,7 +1098,7 @@ void action_send_to_desktop_up(union ActionData *data)
 
 void action_toggle_decorations(union ActionData *data)
 {
-    Client *c = data->client.c;;
+    ObClient *c = data->client.c;;
 
     if (!c) return;
 
@@ -1108,7 +1108,7 @@ void action_toggle_decorations(union ActionData *data)
 
 void action_moveresize(union ActionData *data)
 {
-    Client *c = data->moveresize.c;
+    ObClient *c = data->moveresize.c;
 
     if (!c || !client_normal(c)) return;
 
@@ -1137,7 +1137,7 @@ void action_showmenu(union ActionData *data)
 
 void action_cycle_windows(union ActionData *data)
 {
-    Client *c;
+    ObClient *c;
     
     c = focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
                     data->cycle.cancel);
@@ -1145,7 +1145,7 @@ void action_cycle_windows(union ActionData *data)
 
 void action_directional_focus(union ActionData *data)
 {
-    Client *nf;
+    ObClient *nf;
 
     if (!data->diraction.c)
         return;
@@ -1157,7 +1157,7 @@ void action_directional_focus(union ActionData *data)
 void action_movetoedge(union ActionData *data)
 {
     int x, y, h, w;
-    Client *c = data->diraction.c;
+    ObClient *c = data->diraction.c;
 
     if (!c)
         return;
@@ -1196,7 +1196,7 @@ void action_send_to_layer(union ActionData *data)
 
 void action_toggle_layer(union ActionData *data)
 {
-    Client *c = data->layer.c;
+    ObClient *c = data->layer.c;
 
     if (c) {
         if (data->layer.layer < 0)

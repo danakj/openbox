@@ -105,7 +105,7 @@ void popup_size_to_string(Popup *self, char *text)
     self->w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
 }
 
-void popup_show(Popup *self, char *text, Icon *icon)
+void popup_show(Popup *self, char *text, ObClientIcon *icon)
 {
     int x, y, w, h;
     int textw, texth;

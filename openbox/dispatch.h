@@ -41,23 +41,23 @@ typedef enum {
 
 typedef struct {
     XEvent *e;
-    Client *client;
+    ObClient *client;
 } EventData_X;
 
 typedef struct {
-    Client *client;
+    ObClient *client;
     int num[3];
-    /* Event_Client_Desktop: num[0] = new number, num[1] = old number
-       Event_Client_Urgent: num[0] = urgent state
-       Event_Client_Moving: num[0] = dest x coord, num[1] = dest y coord --
+    /* Event_ObClient_Desktop: num[0] = new number, num[1] = old number
+       Event_ObClient_Urgent: num[0] = urgent state
+       Event_ObClient_Moving: num[0] = dest x coord, num[1] = dest y coord --
                             change these in the handler to adjust where the
                             window will be placed
-       Event_Client_Resizing: num[0] = dest width, num[1] = dest height --
+       Event_ObClient_Resizing: num[0] = dest width, num[1] = dest height --
                               change these in the handler to adjust where the
                               window will be placed
                               num[2] = the anchored corner
      */
-} EventData_Client;
+} EventData_ObClient;
 
 typedef struct {
     int num[2];
@@ -73,7 +73,7 @@ typedef struct {
 
 typedef struct {
     EventData_X x;      /* for Event_X_* event types */
-    EventData_Client c; /* for Event_Client_* event types */
+    EventData_ObClient c; /* for Event_ObClient_* event types */
     EventData_Ob o;     /* for Event_Ob_* event types */
     EventData_Signal s; /* for Event_Signal */
 } EventData;
@@ -89,15 +89,15 @@ typedef unsigned int EventMask;
 
 void dispatch_register(EventMask mask, EventHandler h, void *data);
 
-void dispatch_x(XEvent *e, Client *c);
-void dispatch_client(EventType e, Client *c, int num0, int num1);
+void dispatch_x(XEvent *e, ObClient *c);
+void dispatch_client(EventType e, ObClient *c, int num0, int num1);
 void dispatch_ob(EventType e, int num0, int num1);
 void dispatch_signal(int signal);
 /* *x and *y should be set with the destination of the window, they may be
    changed by the event handlers */
-void dispatch_move(Client *c, int *x, int *y);
+void dispatch_move(ObClient *c, int *x, int *y);
 /* *w and *h should be set with the destination of the window, they may be
    changed by the event handlers */
-void dispatch_resize(Client *c, int *w, int *h, ObCorner corner);
+void dispatch_resize(ObClient *c, int *w, int *h, ObCorner corner);
 
 #endif

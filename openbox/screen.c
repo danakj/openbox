@@ -292,7 +292,7 @@ void screen_set_num_desktops(guint num)
 
     /* move windows on desktops that will no longer exist! */
     for (it = client_list; it != NULL; it = it->next) {
-        Client *c = it->data;
+        ObClient *c = it->data;
         if (c->desktop >= num && c->desktop != DESKTOP_ALL)
             client_set_desktop(c, num - 1, FALSE);
     }
@@ -328,7 +328,7 @@ void screen_set_desktop(guint num)
     /* show windows from top to bottom */
     for (it = stacking_list; it != NULL; it = it->next) {
         if (WINDOW_IS_CLIENT(it->data)) {
-            Client *c = it->data;
+            ObClient *c = it->data;
             if (!c->frame->visible && client_should_show(c))
                 frame_show(c->frame);
         }
@@ -337,7 +337,7 @@ void screen_set_desktop(guint num)
     /* hide windows from bottom to top */
     for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
         if (WINDOW_IS_CLIENT(it->data)) {
-            Client *c = it->data;
+            ObClient *c = it->data;
             if (c->frame->visible && !client_should_show(c))
                 frame_hide(c->frame);
         }
@@ -466,7 +466,7 @@ void screen_show_desktop(gboolean show)
 	/* bottom to top */
 	for (it = g_list_last(stacking_list); it != NULL; it = it->prev) {
             if (WINDOW_IS_CLIENT(it->data)) {
-                Client *client = it->data;
+                ObClient *client = it->data;
                 if (client->frame->visible && !client_should_show(client))
                     frame_hide(client->frame);
             }
@@ -475,7 +475,7 @@ void screen_show_desktop(gboolean show)
         /* top to bottom */
 	for (it = stacking_list; it != NULL; it = it->next) {
             if (WINDOW_IS_CLIENT(it->data)) {
-                Client *client = it->data;
+                ObClient *client = it->data;
                 if (!client->frame->visible && client_should_show(client))
                     frame_show(client->frame);
             }
@@ -485,7 +485,7 @@ void screen_show_desktop(gboolean show)
     if (show) {
         /* focus desktop */
         for (it = focus_order[screen_desktop]; it; it = it->next)
-            if (((Client*)it->data)->type == Type_Desktop &&
+            if (((ObClient*)it->data)->type == Type_Desktop &&
                 client_focus(it->data))
                 break;
     } else {
@@ -498,7 +498,7 @@ void screen_show_desktop(gboolean show)
     dispatch_ob(Event_Ob_ShowDesktop, show, 0);
 }
 
-void screen_install_colormap(Client *client, gboolean install)
+void screen_install_colormap(ObClient *client, gboolean install)
 {
     XWindowAttributes wa;
 
@@ -569,7 +569,7 @@ void screen_update_areas()
         /* apply struts */
         STRUT_SET(s, 0, 0, 0, 0);
         for (it = client_list; it; it = it->next)
-            STRUT_ADD(s, ((Client*)it->data)->strut);
+            STRUT_ADD(s, ((ObClient*)it->data)->strut);
         STRUT_ADD(s, dock_strut);
 
         if (s.left) {
@@ -658,7 +658,7 @@ void screen_update_areas()
                 XXX if gunna test this shit, then gotta worry about when
                 the client moves between xinerama heads..
 
-                if (RECT_CONTAINS_RECT(((Client*)it->data)->frame->area,
+                if (RECT_CONTAINS_RECT(((ObClient*)it->data)->frame->area,
                                        area[i][x])) {
 
                 }            
@@ -671,7 +671,7 @@ void screen_update_areas()
         /* the area has changed, adjust all the maximized 
            windows */
         for (it = client_list; it; it = it->next) {
-            Client *c = it->data; 
+            ObClient *c = it->data; 
             if (i < screen_num_desktops) {
                 if (c->desktop == i)
                     client_reconfigure(c);

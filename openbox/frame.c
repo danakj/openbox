@@ -330,7 +330,7 @@ void frame_adjust_icon(Frame *self)
     framerender_frame(self);
 }
 
-void frame_grab_client(Frame *self, Client *client)
+void frame_grab_client(Frame *self, ObClient *client)
 {
     self->client = client;
 
@@ -372,7 +372,7 @@ void frame_grab_client(Frame *self, Client *client)
     g_hash_table_insert(window_map, &self->rgrip, client);
 }
 
-void frame_release_client(Frame *self, Client *client)
+void frame_release_client(Frame *self, ObClient *client)
 {
     XEvent ev;
 
@@ -578,7 +578,7 @@ Context frame_context_from_string(char *name)
     return Context_None;
 }
 
-Context frame_context(Client *client, Window win)
+Context frame_context(ObClient *client, Window win)
 {
     Frame *self;
 

@@ -84,7 +84,7 @@ void dispatch_register(EventMask mask, EventHandler h, void *data)
     }
 }
 
-void dispatch_x(XEvent *xe, Client *c)
+void dispatch_x(XEvent *xe, ObClient *c)
 {
     EventType e;
     guint i;
@@ -141,7 +141,7 @@ void dispatch_x(XEvent *xe, Client *c)
     }
 }
 
-void dispatch_client(EventType e, Client *c, int num0, int num1)
+void dispatch_client(EventType e, ObClient *c, int num0, int num1)
 {
     guint i;
     GSList *it;
@@ -211,7 +211,7 @@ void dispatch_signal(int signal)
     }
 }
 
-void dispatch_move(Client *c, int *x, int *y)
+void dispatch_move(ObClient *c, int *x, int *y)
 {
     guint i;
     GSList *it;
@@ -238,7 +238,7 @@ void dispatch_move(Client *c, int *x, int *y)
     *y = obe.data.c.num[1];
 }
 
-void dispatch_resize(Client *c, int *w, int *h, ObCorner corner)
+void dispatch_resize(ObClient *c, int *w, int *h, ObCorner corner)
 {
     guint i;
     GSList *it;

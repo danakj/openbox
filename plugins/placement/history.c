@@ -49,7 +49,7 @@ static struct HistoryItem *history_find(const char *name, const char *class,
     return NULL;
 }
 
-gboolean place_history(Client *c)
+gboolean place_history(ObClient *c)
 {
     struct HistoryItem *hi;
     int x, y, w, h;
@@ -90,7 +90,7 @@ gboolean place_history(Client *c)
     return FALSE;
 }
 
-static void set_history(Client *c)
+static void set_history(ObClient *c)
 {
     struct HistoryItem *hi;
 

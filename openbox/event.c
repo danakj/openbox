@@ -40,8 +40,8 @@ static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
 static void event_handle_dock(Dock *s, XEvent *e);
 static void event_handle_dockapp(DockApp *app, XEvent *e);
-static void event_handle_client(Client *c, XEvent *e);
-static void event_handle_menu(Client *c, XEvent *e);
+static void event_handle_client(ObClient *c, XEvent *e);
+static void event_handle_menu(ObClient *c, XEvent *e);
 static void fd_event_handle();
 #ifdef USE_SM
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
@@ -320,7 +320,7 @@ static void event_hack_mods(XEvent *e)
     }
 }
 
-static gboolean event_ignore(XEvent *e, Client *client)
+static gboolean event_ignore(XEvent *e, ObClient *client)
 {
     switch(e->type) {
     case FocusIn:
@@ -467,7 +467,7 @@ static gboolean event_ignore(XEvent *e, Client *client)
 static void event_process(XEvent *e)
 {
     Window window;
-    Client *client = NULL;
+    ObClient *client = NULL;
     Dock *dock = NULL;
     DockApp *dockapp = NULL;
     Menu *menu = NULL;
@@ -607,7 +607,7 @@ static void event_handle_root(XEvent *e)
     }
 }
 
-static void event_handle_client(Client *client, XEvent *e)
+static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
@@ -982,7 +982,7 @@ static void event_handle_client(Client *client, XEvent *e)
     }
 }
 
-static void event_handle_menu(Client *client, XEvent *e)
+static void event_handle_menu(ObClient *client, XEvent *e)
 {
     static MenuEntry *over = NULL;
     MenuEntry *entry;

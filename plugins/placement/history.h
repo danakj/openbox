@@ -7,6 +7,6 @@
 void history_startup();
 void history_shutdown();
 
-gboolean place_history(Client *c);
+gboolean place_history(ObClient *c);
 
 #endif

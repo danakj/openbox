@@ -29,7 +29,7 @@ typedef enum {
 		           f->cbwidth)
 
 typedef struct Frame {
-    Client *client;
+    ObClient *client;
 
     Window window;
     Window plate;
@@ -96,12 +96,12 @@ void frame_adjust_state(Frame *self);
 void frame_adjust_focus(Frame *self, gboolean hilite);
 void frame_adjust_title(Frame *self);
 void frame_adjust_icon(Frame *self);
-void frame_grab_client(Frame *self, Client *client);
-void frame_release_client(Frame *self, Client *client);
+void frame_grab_client(Frame *self, ObClient *client);
+void frame_release_client(Frame *self, ObClient *client);
 
 Context frame_context_from_string(char *name);
 
-Context frame_context(Client *self, Window win);
+Context frame_context(ObClient *self, Window win);
 
 /*! Applies gravity to the client's position to find where the frame should
   be positioned.

@@ -104,7 +104,7 @@ static void grab_keys(gboolean grab)
 
     grab_for_window(focus_backup, grab);
     for (it = client_list; it; it = g_list_next(it))
-        grab_for_window(((Client*)it->data)->frame->window, grab);
+        grab_for_window(((ObClient*)it->data)->frame->window, grab);
 }
 
 static void reset_chains()

@@ -24,7 +24,7 @@ void plugin_setup_config()
     parse_register("placement", parse_xml, NULL);
 }
 
-static void place_random(Client *c)
+static void place_random(ObClient *c)
 {
     int l, r, t, b;
     int x, y;

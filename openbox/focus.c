@@ -17,13 +17,13 @@
 #include <glib.h>
 #include <assert.h>
 
-Client *focus_client = NULL;
+ObClient *focus_client = NULL;
 GList **focus_order = NULL; /* these lists are created when screen_startup
                                sets the number of desktops */
 
 Window focus_backup = None;
 
-static Client *focus_cycle_target = NULL;
+static ObClient *focus_cycle_target = NULL;
 static Popup *focus_cycle_popup = NULL;
 
 void focus_startup()
@@ -69,7 +69,7 @@ void focus_shutdown()
                    event_lasttime);
 }
 
-static void push_to_top(Client *client)
+static void push_to_top(ObClient *client)
 {
     guint desktop;
 
@@ -79,10 +79,10 @@ static void push_to_top(Client *client)
     focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
 }
 
-void focus_set_client(Client *client)
+void focus_set_client(ObClient *client)
 {
     Window active;
-    Client *old;
+    ObClient *old;
 
 #ifdef DEBUG_FOCUS
     g_message("focus_set_client 0x%lx", client ? client->window : 0);
@@ -130,7 +130,7 @@ static gboolean focus_under_pointer()
     if (ob_pointer_pos(&x, &y)) {
         for (it = stacking_list; it != NULL; it = it->next) {
             if (WINDOW_IS_CLIENT(it->data)) {
-                Client *c = WINDOW_AS_CLIENT(it->data);
+                ObClient *c = WINDOW_AS_CLIENT(it->data);
                 if (c->desktop == screen_desktop &&
                     RECT_CONTAINS(c->frame->area, x, y))
                     break;
@@ -146,10 +146,10 @@ static gboolean focus_under_pointer()
 
 /* finds the first transient that isn't 'skip' and ensure's that client_normal
  is true for it */
-static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
+static ObClient *find_transient_recursive(ObClient *c, ObClient *top, ObClient *skip)
 {
     GSList *it;
-    Client *ret;
+    ObClient *ret;
 
     for (it = c->transients; it; it = it->next) {
         if (it->data == top) return NULL;
@@ -160,9 +160,9 @@ static Client *find_transient_recursive(Client *c, Client *top, Client *skip)
     return NULL;
 }
 
-static gboolean focus_fallback_transient(Client *top, Client *old)
+static gboolean focus_fallback_transient(ObClient *top, ObClient *old)
 {
-    Client *target = find_transient_recursive(top, top, old);
+    ObClient *target = find_transient_recursive(top, top, old);
     if (!target) {
         /* make sure client_normal is true always */
         if (!client_normal(top))
@@ -175,7 +175,7 @@ static gboolean focus_fallback_transient(Client *top, Client *old)
 void focus_fallback(FallbackType type)
 {
     GList *it;
-    Client *old = NULL;
+    ObClient *old = NULL;
 
     old = focus_client;
 
@@ -231,7 +231,7 @@ void focus_fallback(FallbackType type)
                 /* dont fall back to 'anonymous' fullscreen windows. theres no
                    checks for this is in transient/group fallbacks, so they can
                    be fallback targets there. */
-                !((Client*)it->data)->fullscreen &&
+                !((ObClient*)it->data)->fullscreen &&
                 client_can_focus(it->data)) {
                 gboolean r = client_focus(it->data);
                 assert(r);
@@ -241,13 +241,13 @@ void focus_fallback(FallbackType type)
     /* nothing to focus, and already set it to none above */
 }
 
-static void popup_cycle(Client *c, gboolean show)
+static void popup_cycle(ObClient *c, gboolean show)
 {
     if (!show) {
         popup_hide(focus_cycle_popup);
     } else {
         Rect *a;
-        Client *p = c;
+        ObClient *p = c;
         char *title;
 
         a = screen_physical_area_monitor(0);
@@ -280,14 +280,14 @@ static void popup_cycle(Client *c, gboolean show)
     }
 }
 
-Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
+ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
                     gboolean cancel)
 {
-    static Client *first = NULL;
-    static Client *t = NULL;
+    static ObClient *first = NULL;
+    static ObClient *t = NULL;
     static GList *order = NULL;
     GList *it, *start, *list;
-    Client *ft;
+    ObClient *ft;
 
     if (cancel) {
         if (focus_cycle_target)
@@ -355,7 +355,7 @@ done_cycle:
     return NULL;
 }
 
-void focus_order_add_new(Client *c)
+void focus_order_add_new(ObClient *c)
 {
     guint d, i;
 
@@ -365,20 +365,20 @@ void focus_order_add_new(Client *c)
         d = c->desktop;
         if (d == DESKTOP_ALL) {
             for (i = 0; i < screen_num_desktops; ++i) {
-                if (focus_order[i] && ((Client*)focus_order[i]->data)->iconic)
+                if (focus_order[i] && ((ObClient*)focus_order[i]->data)->iconic)
                     focus_order[i] = g_list_insert(focus_order[i], c, 0);
                 else
                     focus_order[i] = g_list_insert(focus_order[i], c, 1);
             }
         } else
-             if (focus_order[d] && ((Client*)focus_order[d]->data)->iconic)
+             if (focus_order[d] && ((ObClient*)focus_order[d]->data)->iconic)
                 focus_order[d] = g_list_insert(focus_order[d], c, 0);
             else
                 focus_order[d] = g_list_insert(focus_order[d], c, 1);
     }
 }
 
-void focus_order_remove(Client *c)
+void focus_order_remove(ObClient *c)
 {
     guint d, i;
 
@@ -390,7 +390,7 @@ void focus_order_remove(Client *c)
         focus_order[d] = g_list_remove(focus_order[d], c);
 }
 
-static void to_top(Client *c, guint d)
+static void to_top(ObClient *c, guint d)
 {
     focus_order[d] = g_list_remove(focus_order[d], c);
     if (!c->iconic) {
@@ -400,12 +400,12 @@ static void to_top(Client *c, guint d)
 
         /* insert before first iconic window */
         for (it = focus_order[d];
-             it && !((Client*)it->data)->iconic; it = it->next);
+             it && !((ObClient*)it->data)->iconic; it = it->next);
         g_list_insert_before(focus_order[d], it, c);
     }
 }
 
-void focus_order_to_top(Client *c)
+void focus_order_to_top(ObClient *c)
 {
     guint d, i;
 
@@ -417,7 +417,7 @@ void focus_order_to_top(Client *c)
         to_top(c, d);
 }
 
-static void to_bottom(Client *c, guint d)
+static void to_bottom(ObClient *c, guint d)
 {
     focus_order[d] = g_list_remove(focus_order[d], c);
     if (c->iconic) {
@@ -427,12 +427,12 @@ static void to_bottom(Client *c, guint d)
 
         /* insert before first iconic window */
         for (it = focus_order[d];
-             it && !((Client*)it->data)->iconic; it = it->next);
+             it && !((ObClient*)it->data)->iconic; it = it->next);
         g_list_insert_before(focus_order[d], it, c);
     }
 }
 
-void focus_order_to_bottom(Client *c)
+void focus_order_to_bottom(ObClient *c)
 {
     guint d, i;
 

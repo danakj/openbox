@@ -104,7 +104,7 @@ void plugin_setup_config()
 /* Array of GSList*s of PointerBinding*s. */
 static GSList *bound_contexts[NUM_CONTEXTS];
 
-static void grab_for_client(Client *client, gboolean grab)
+static void grab_for_client(ObClient *client, gboolean grab)
 {
     int i;
     GSList *it;
@@ -167,7 +167,7 @@ static void clearall()
     }
 }
 
-static void fire_button(MouseAction a, Context context, Client *c, guint state,
+static void fire_button(MouseAction a, Context context, ObClient *c, guint state,
                         guint button, int x, int y)
 {
     GSList *it;
@@ -198,7 +198,7 @@ static void fire_button(MouseAction a, Context context, Client *c, guint state,
     }
 }
 
-static void fire_motion(MouseAction a, Context context, Client *c,
+static void fire_motion(MouseAction a, Context context, ObClient *c,
                         guint state, guint button, int x_root, int y_root,
                         guint32 corner)
 {

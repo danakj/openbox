@@ -32,12 +32,12 @@ typedef struct InternalWindow {
 struct Menu;
 struct Dock;
 struct DockApp;
-struct Client;
+struct _ObClient;
 
 #define WINDOW_AS_MENU(win) ((struct Menu*)win)
 #define WINDOW_AS_DOCK(win) ((struct Dock*)win)
 #define WINDOW_AS_DOCKAPP(win) ((struct DockApp*)win)
-#define WINDOW_AS_CLIENT(win) ((struct Client*)win)
+#define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
 #define WINDOW_AS_INTERNAL(win) ((struct InternalWindow*)win)
 
 #define MENU_AS_WINDOW(menu) ((ObWindow*)menu)

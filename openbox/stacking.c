@@ -133,7 +133,7 @@ static void do_lower(GList *wins)
     }
 }
 
-static GList *pick_windows(Client *top, Client *selected, gboolean raise)
+static GList *pick_windows(ObClient *top, ObClient *selected, gboolean raise)
 {
     GList *ret = NULL;
     GList *it, *next, *prev;
@@ -154,7 +154,7 @@ static GList *pick_windows(Client *top, Client *selected, gboolean raise)
         next = g_list_next(it);
 
         if ((sit = g_slist_find(top->transients, it->data))) {
-            Client *c = sit->data;
+            ObClient *c = sit->data;
 
             ++i;
 
@@ -196,7 +196,7 @@ static GList *pick_windows(Client *top, Client *selected, gboolean raise)
     return ret;
 }
 
-static GList *pick_group_windows(Client *top, Client *selected, gboolean raise)
+static GList *pick_group_windows(ObClient *top, ObClient *selected, gboolean raise)
 {
     GList *ret = NULL;
     GList *it, *next, *prev;
@@ -229,8 +229,8 @@ void stacking_raise(ObWindow *window)
     GList *wins;
 
     if (WINDOW_IS_CLIENT(window)) {
-        Client *c;
-        Client *selected;
+        ObClient *c;
+        ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, TRUE);
@@ -248,8 +248,8 @@ void stacking_lower(ObWindow *window)
     GList *wins;
 
     if (WINDOW_IS_CLIENT(window)) {
-        Client *c;
-        Client *selected;
+        ObClient *c;
+        ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, FALSE);
@@ -279,8 +279,8 @@ void stacking_add(ObWindow *win)
 
 void stacking_add_nonintrusive(ObWindow *win)
 {
-    Client *client;
-    Client *parent = NULL;
+    ObClient *client;
+    ObClient *parent = NULL;
     GList *it_before = NULL;
 
     if (!WINDOW_IS_CLIENT(win)) {
@@ -303,7 +303,7 @@ void stacking_add_nonintrusive(ObWindow *win)
                     if ((sit = g_slist_find(client->group->members, it->data)))
                 for (sit = client->group->members; !parent && sit;
                      sit = sit->next) {
-                    Client *c = sit->data;
+                    ObClient *c = sit->data;
                     /* checking transient_for prevents infinate loops! */
                     if (sit->data == it->data && !c->transient_for)
                         parent = it->data;

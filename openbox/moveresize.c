@@ -14,7 +14,7 @@
 #include <glib.h>
 
 gboolean moveresize_in_progress = FALSE;
-Client *moveresize_client = NULL;
+ObClient *moveresize_client = NULL;
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
@@ -79,7 +79,7 @@ static void popup_coords(char *format, int a, int b)
     g_free(text);
 }
 
-void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
+void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
 {
     ObCursor cur;
     Rect *a;

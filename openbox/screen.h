@@ -5,7 +5,7 @@
 #include "geom.h"
 #include "client.h"
 
-struct Client;
+struct _ObClient;
 
 #define DESKTOP_ALL (0xffffffff)
 
@@ -57,7 +57,7 @@ void screen_update_desktop_names();
 
 /*! Installs or uninstalls a colormap for a client. If client is NULL, then
   it handles the root colormap. */
-void screen_install_colormap(struct Client *client, gboolean install);
+void screen_install_colormap(struct _ObClient *client, gboolean install);
 
 void screen_update_areas();
 

@@ -28,7 +28,7 @@ void plugin_setup_config()
     parse_register("resistance", parse_xml, NULL);
 }
 
-static void resist_move(Client *c, int *x, int *y)
+static void resist_move(ObClient *c, int *x, int *y)
 {
     GList *it;
     Rect *area;
@@ -37,7 +37,7 @@ static void resist_move(Client *c, int *x, int *y)
     int al, at, ar, ab; /* screen area edges */
     int cl, ct, cr, cb; /* current edges */
     int w, h; /* current size */
-    Client *snapx = NULL, *snapy = NULL;
+    ObClient *snapx = NULL, *snapy = NULL;
 
     w = c->frame->area.width;
     h = c->frame->area.height;
@@ -55,7 +55,7 @@ static void resist_move(Client *c, int *x, int *y)
     /* snap to other clients */
     if (resist_windows)
         for (it = stacking_list; it != NULL; it = it->next) {
-            Client *target;
+            ObClient *target;
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
 
             if (!WINDOW_IS_CLIENT(it->data))
@@ -131,16 +131,16 @@ static void resist_move(Client *c, int *x, int *y)
     }
 }
 
-static void resist_size(Client *c, int *w, int *h, ObCorner corn)
+static void resist_size(ObClient *c, int *w, int *h, ObCorner corn)
 {
     GList *it;
-    Client *target; /* target */
+    ObClient *target; /* target */
     int l, t, r, b; /* my left, top, right and bottom sides */
     int dlt, drb; /* my destination left/top and right/bottom sides */
     int tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides */
     Rect *area;
     int al, at, ar, ab; /* screen boundaries */
-    Client *snapx = NULL, *snapy = NULL;
+    ObClient *snapx = NULL, *snapy = NULL;
 
     /* don't snap windows with size increments */
     if (c->size_inc.width > 1 || c->size_inc.height > 1)

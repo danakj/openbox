@@ -61,7 +61,7 @@ parse_menu_fail:
     g_free(title);
 }
 
-void menu_control_show(Menu *self, int x, int y, Client *client);
+void menu_control_show(Menu *self, int x, int y, ObClient *client);
 
 void menu_destroy_hash_key(Menu *menu)
 {
@@ -288,7 +288,7 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
     g_hash_table_insert(window_map, &entry->item, menu);
 }
 
-void menu_show(char *name, int x, int y, Client *client)
+void menu_show(char *name, int x, int y, ObClient *client)
 {
     Menu *self;
   
@@ -302,7 +302,7 @@ void menu_show(char *name, int x, int y, Client *client)
     menu_show_full(self, x, y, client);
 }  
 
-void menu_show_full(Menu *self, int x, int y, Client *client)
+void menu_show_full(Menu *self, int x, int y, ObClient *client)
 {
     g_assert(self != NULL);
        
@@ -397,7 +397,7 @@ void menu_entry_fire(MenuEntry *self)
    Default menu controller action for showing.
 */
 
-void menu_control_show(Menu *self, int x, int y, Client *client) {
+void menu_control_show(Menu *self, int x, int y, ObClient *client) {
     guint i;
     Rect *a = NULL;
 

@@ -29,7 +29,7 @@ Window window_top(ObWindow *self)
         g_assert_not_reached();
         break;
     case Window_Client:
-        return ((Client*)self)->frame->window;
+        return ((ObClient*)self)->frame->window;
     case Window_Internal:
         return ((InternalWindow*)self)->win;
     }
@@ -49,7 +49,7 @@ Window window_layer(ObWindow *self)
         g_assert_not_reached();
         break;
     case Window_Client:
-        return ((Client*)self)->layer;
+        return ((ObClient*)self)->layer;
     case Window_Internal:
         return Layer_Internal;
     }

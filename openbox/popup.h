@@ -19,7 +19,7 @@ void popup_position(Popup *self, int gravity, int x, int y);
 void popup_size(Popup *self, int w, int h);
 void popup_size_to_string(Popup *self, char *text);
 
-void popup_show(Popup *self, char *text, Icon *icon);
+void popup_show(Popup *self, char *text, ObClientIcon *icon);
 void popup_hide(Popup *self);
 
 #endif

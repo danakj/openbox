@@ -10,57 +10,57 @@
 */
 
 struct AnyAction {
-    Client *c;
+    ObClient *c;
 };
 
 struct DirectionalAction{
-    Client *c;
+    ObClient *c;
     ObDirection direction;
 };
 
 struct Execute {
-    Client *c;
+    ObClient *c;
     char *path;
 };
 
 struct ClientAction {
-    Client *c;
+    ObClient *c;
 };
 
 struct MoveResizeRelative {
-    Client *c;
+    ObClient *c;
     int delta;
 };
 
 struct SendToDesktop {
-    Client *c;
+    ObClient *c;
     guint desk;
     gboolean follow;
 };
 
 struct SendToDesktopDirection {
-    Client *c;
+    ObClient *c;
     gboolean wrap;
     gboolean follow;
 };
 
 struct Desktop {
-    Client *c;
+    ObClient *c;
     guint desk;
 };
 
 struct Layer {
-    Client *c;
+    ObClient *c;
     int layer; /* < 0 = below, 0 = normal, > 0 = above */
 };
 
 struct DesktopDirection {
-    Client *c;
+    ObClient *c;
     gboolean wrap;
 };
 
 struct MoveResize {
-    Client *c;
+    ObClient *c;
     int x;
     int y;
     guint32 corner; /* prop_atoms.net_wm_moveresize_* */
@@ -68,14 +68,14 @@ struct MoveResize {
 };
 
 struct ShowMenu {
-    Client *c;
+    ObClient *c;
     char *name;
     int x;
     int y;
 };
 
 struct CycleWindows {
-    Client *c;
+    ObClient *c;
     gboolean linear;
     gboolean forward;
     gboolean final;

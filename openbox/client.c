@@ -30,18 +30,18 @@
 
 GList      *client_list      = NULL;
 
-static void client_get_all(Client *self);
-static void client_toggle_border(Client *self, gboolean show);
-static void client_get_area(Client *self);
-static void client_get_desktop(Client *self);
-static void client_get_state(Client *self);
-static void client_get_shaped(Client *self);
-static void client_get_mwm_hints(Client *self);
-static void client_get_gravity(Client *self);
-static void client_showhide(Client *self);
-static void client_change_allowed_actions(Client *self);
-static void client_change_state(Client *self);
-static void client_apply_startup_state(Client *self);
+static void client_get_all(ObClient *self);
+static void client_toggle_border(ObClient *self, gboolean show);
+static void client_get_area(ObClient *self);
+static void client_get_desktop(ObClient *self);
+static void client_get_state(ObClient *self);
+static void client_get_shaped(ObClient *self);
+static void client_get_mwm_hints(ObClient *self);
+static void client_get_gravity(ObClient *self);
+static void client_showhide(ObClient *self);
+static void client_change_allowed_actions(ObClient *self);
+static void client_change_state(ObClient *self);
+static void client_apply_startup_state(ObClient *self);
 
 void client_startup()
 {
@@ -63,7 +63,7 @@ void client_set_list()
 	windows = g_new(Window, size);
 	win_it = windows;
 	for (it = client_list; it != NULL; it = it->next, ++win_it)
-	    *win_it = ((Client*)it->data)->window;
+	    *win_it = ((ObClient*)it->data)->window;
     } else
 	windows = NULL;
 
@@ -76,7 +76,7 @@ void client_set_list()
 }
 
 /*
-void client_foreach_transient(Client *self, ClientForeachFunc func, void *data)
+void client_foreach_transient(ObClient *self, ObClientForeachFunc func, void *data)
 {
     GSList *it;
 
@@ -86,7 +86,7 @@ void client_foreach_transient(Client *self, ClientForeachFunc func, void *data)
     }
 }
 
-void client_foreach_ancestor(Client *self, ClientForeachFunc func, void *data)
+void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, void *data)
 {
     if (self->transient_for) {
         if (self->transient_for != TRAN_GROUP) {
@@ -97,7 +97,7 @@ void client_foreach_ancestor(Client *self, ClientForeachFunc func, void *data)
 
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    !((Client*)it->data)->transient_for) {
+                    !((ObClient*)it->data)->transient_for) {
                     if (!func(it->data, data)) return;
                     client_foreach_ancestor(it->data, func, data);
                 }
@@ -176,7 +176,7 @@ void client_manage_all()
 
 void client_manage(Window window)
 {
-    Client *self;
+    ObClient *self;
     XEvent e;
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
@@ -223,9 +223,9 @@ void client_manage(Window window)
 			    CWEventMask|CWDontPropagate, &attrib_set);
 
 
-    /* create the Client struct, and populate it from the hints on the
+    /* create the ObClient struct, and populate it from the hints on the
        window */
-    self = g_new(Client, 1);
+    self = g_new(ObClient, 1);
     self->obwin.type = Window_Client;
     self->window = window;
     client_get_all(self);
@@ -316,11 +316,11 @@ void client_unmanage_all()
 /* called by client_unmanage() to close any menus referencing this client */
 void client_close_menus(gpointer key, gpointer value, gpointer self)
 {
-    if (((Menu *)value)->client == (Client *)self)
+    if (((Menu *)value)->client == (ObClient *)self)
         menu_hide((Menu *)value);
 }
 
-void client_unmanage(Client *self)
+void client_unmanage(ObClient *self)
 {
     int j;
     GSList *it;
@@ -355,8 +355,8 @@ void client_unmanage(Client *self)
 
         for (it = self->group->members; it; it = it->next)
             if (it->data != self)
-                ((Client*)it->data)->transients =
-                    g_slist_remove(((Client*)it->data)->transients, self);
+                ((ObClient*)it->data)->transients =
+                    g_slist_remove(((ObClient*)it->data)->transients, self);
     } else if (self->transient_for) {        /* transient of window */
 	self->transient_for->transients =
 	    g_slist_remove(self->transient_for->transients, self);
@@ -364,8 +364,8 @@ void client_unmanage(Client *self)
 
     /* tell our transients that we're gone */
     for (it = self->transients; it != NULL; it = it->next) {
-        if (((Client*)it->data)->transient_for != TRAN_GROUP) {
-            ((Client*)it->data)->transient_for = NULL;
+        if (((ObClient*)it->data)->transient_for != TRAN_GROUP) {
+            ((ObClient*)it->data)->transient_for = NULL;
             client_calc_layer(it->data);
         }
     }
@@ -435,7 +435,7 @@ void client_unmanage(Client *self)
     client_set_list();
 }
 
-void client_move_onscreen(Client *self)
+void client_move_onscreen(ObClient *self)
 {
     Rect *a;
     int x = self->frame->area.x, y = self->frame->area.y;
@@ -458,7 +458,7 @@ void client_move_onscreen(Client *self)
                      TRUE, TRUE);
 }
 
-static void client_toggle_border(Client *self, gboolean show)
+static void client_toggle_border(ObClient *self, gboolean show)
 {
     /* adjust our idea of where the client is, based on its border. When the
        border is removed, the client should now be considered to be in a
@@ -524,7 +524,7 @@ static void client_toggle_border(Client *self, gboolean show)
 }
 
 
-static void client_get_all(Client *self)
+static void client_get_all(ObClient *self)
 {
     /* update EVERYTHING!! */
 
@@ -574,7 +574,7 @@ static void client_get_all(Client *self)
     client_change_state(self);
 }
 
-static void client_get_area(Client *self)
+static void client_get_area(ObClient *self)
 {
     XWindowAttributes wattrib;
     Status ret;
@@ -586,7 +586,7 @@ static void client_get_area(Client *self)
     self->border_width = wattrib.border_width;
 }
 
-static void client_get_desktop(Client *self)
+static void client_get_desktop(ObClient *self)
 {
     guint32 d = screen_num_desktops; /* an always-invalid value */
 
@@ -607,8 +607,8 @@ static void client_get_desktop(Client *self)
 
                 for (it = self->group->members; it; it = it->next)
                     if (it->data != self &&
-                        !((Client*)it->data)->transient_for) {
-                        self->desktop = ((Client*)it->data)->desktop;
+                        !((ObClient*)it->data)->transient_for) {
+                        self->desktop = ((ObClient*)it->data)->desktop;
                         trdesk = TRUE;
                         break;
                     }
@@ -625,7 +625,7 @@ static void client_get_desktop(Client *self)
     }
 }
 
-static void client_get_state(Client *self)
+static void client_get_state(ObClient *self)
 {
     guint32 *state;
     guint num;
@@ -663,7 +663,7 @@ static void client_get_state(Client *self)
     }
 }
 
-static void client_get_shaped(Client *self)
+static void client_get_shaped(ObClient *self)
 {
     self->shaped = FALSE;
 #ifdef   SHAPE
@@ -682,10 +682,10 @@ static void client_get_shaped(Client *self)
 #endif
 }
 
-void client_update_transient_for(Client *self)
+void client_update_transient_for(ObClient *self)
 {
     Window t = None;
-    Client *c = NULL;
+    ObClient *c = NULL;
 
     if (XGetTransientForHint(ob_display, self->window, &t)) {
 	self->transient = TRUE;
@@ -717,9 +717,9 @@ void client_update_transient_for(Client *self)
 	    /* remove from old parents */
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    !((Client*)it->data)->transient_for)
-                    ((Client*)it->data)->transients =
-                        g_slist_remove(((Client*)it->data)->transients, self);
+                    !((ObClient*)it->data)->transient_for)
+                    ((ObClient*)it->data)->transients =
+                        g_slist_remove(((ObClient*)it->data)->transients, self);
         } else if (self->transient_for != NULL) { /* transient of window */
 	    /* remove from old parent */
 	    self->transient_for->transients =
@@ -732,9 +732,9 @@ void client_update_transient_for(Client *self)
 	    /* add to new parents */
             for (it = self->group->members; it; it = it->next)
                 if (it->data != self &&
-                    !((Client*)it->data)->transient_for)
-                    ((Client*)it->data)->transients =
-                        g_slist_append(((Client*)it->data)->transients, self);
+                    !((ObClient*)it->data)->transient_for)
+                    ((ObClient*)it->data)->transients =
+                        g_slist_append(((ObClient*)it->data)->transients, self);
 
             /* remove all transients which are in the group, that causes
                circlular pointer hell of doom */
@@ -755,7 +755,7 @@ void client_update_transient_for(Client *self)
     }
 }
 
-static void client_get_mwm_hints(Client *self)
+static void client_get_mwm_hints(ObClient *self)
 {
     guint num;
     guint32 *hints;
@@ -773,7 +773,7 @@ static void client_get_mwm_hints(Client *self)
     }
 }
 
-void client_get_type(Client *self)
+void client_get_type(ObClient *self)
 {
     guint num, i;
     guint32 *val;
@@ -824,7 +824,7 @@ void client_get_type(Client *self)
     }
 }
 
-void client_update_protocols(Client *self)
+void client_update_protocols(ObClient *self)
 {
     guint32 *proto;
     guint num_return, i;
@@ -846,7 +846,7 @@ void client_update_protocols(Client *self)
     }
 }
 
-static void client_get_gravity(Client *self)
+static void client_get_gravity(ObClient *self)
 {
     XWindowAttributes wattrib;
     Status ret;
@@ -856,7 +856,7 @@ static void client_get_gravity(Client *self)
     self->gravity = wattrib.win_gravity;
 }
 
-void client_update_normal_hints(Client *self)
+void client_update_normal_hints(ObClient *self)
 {
     XSizeHints size;
     long ret;
@@ -909,7 +909,7 @@ void client_update_normal_hints(Client *self)
     }
 }
 
-void client_setup_decor_and_functions(Client *self)
+void client_setup_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
     self->decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
@@ -1040,7 +1040,7 @@ void client_setup_decor_and_functions(Client *self)
     }
 }
 
-static void client_change_allowed_actions(Client *self)
+static void client_change_allowed_actions(ObClient *self)
 {
     guint32 actions[9];
     int num = 0;
@@ -1090,7 +1090,7 @@ static void client_change_allowed_actions(Client *self)
     }
 }
 
-void client_reconfigure(Client *self)
+void client_reconfigure(ObClient *self)
 {
     /* by making this pass FALSE for user, we avoid the emacs event storm where
        every configurenotify causes an update in its normal hints, i think this
@@ -1099,7 +1099,7 @@ void client_reconfigure(Client *self)
                      self->area.width, self->area.height, FALSE, TRUE);
 }
 
-void client_update_wmhints(Client *self)
+void client_update_wmhints(ObClient *self)
 {
     XWMHints *hints;
     gboolean ur = FALSE;
@@ -1146,7 +1146,7 @@ void client_update_wmhints(Client *self)
                        set up */
                     for (it = self->group->members; it; it = it->next)
                         if (it->data != self &&
-                            ((Client*)it->data)->transient_for == TRAN_GROUP)
+                            ((ObClient*)it->data)->transient_for == TRAN_GROUP)
                             self->transients = g_slist_append(self->transients,
                                                               it->data);
                 }
@@ -1176,7 +1176,7 @@ void client_update_wmhints(Client *self)
     }
 }
 
-void client_update_title(Client *self)
+void client_update_title(ObClient *self)
 {
     GList *it;
     guint32 nums;
@@ -1196,7 +1196,7 @@ void client_update_title(Client *self)
     nums = 0;
     for (it = client_list; it; it = it->next)
         if (it->data != self) {
-            Client *c = it->data;
+            ObClient *c = it->data;
             if (0 == strncmp(c->title, data, strlen(data)))
                 nums |= 1 << c->title_count;
         }
@@ -1252,7 +1252,7 @@ void client_update_title(Client *self)
     self->icon_title = data;
 }
 
-void client_update_class(Client *self)
+void client_update_class(ObClient *self)
 {
     char **data;
     char *s;
@@ -1280,7 +1280,7 @@ void client_update_class(Client *self)
     if (self->role == NULL) self->role = g_strdup("");
 }
 
-void client_update_strut(Client *self)
+void client_update_strut(ObClient *self)
 {
     guint num;
     guint32 *data;
@@ -1301,7 +1301,7 @@ void client_update_strut(Client *self)
 	screen_update_areas();
 }
 
-void client_update_icons(Client *self)
+void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
@@ -1325,7 +1325,7 @@ void client_update_icons(Client *self)
 	    ++self->nicons;
 	}
 
-	self->icons = g_new(Icon, self->nicons);
+	self->icons = g_new(ObClientIcon, self->nicons);
     
 	/* store the icons */
 	i = 0;
@@ -1357,7 +1357,7 @@ void client_update_icons(Client *self)
                            kwm_win_icon, &data, &num)) {
         if (num == 2) {
             self->nicons++;
-            self->icons = g_new(Icon, self->nicons);
+            self->icons = g_new(ObClientIcon, self->nicons);
             xerror_set_ignore(TRUE);
             if (!RrPixmapToRGBA(ob_rr_inst,
                                 data[0], data[1],
@@ -1376,7 +1376,7 @@ void client_update_icons(Client *self)
         if ((hints = XGetWMHints(ob_display, self->window))) {
             if (hints->flags & IconPixmapHint) {
                 self->nicons++;
-                self->icons = g_new(Icon, self->nicons);
+                self->icons = g_new(ObClientIcon, self->nicons);
                 xerror_set_ignore(TRUE);
                 if (!RrPixmapToRGBA(ob_rr_inst,
                                     hints->icon_pixmap,
@@ -1398,7 +1398,7 @@ void client_update_icons(Client *self)
 	frame_adjust_icon(self->frame);
 }
 
-static void client_change_state(Client *self)
+static void client_change_state(ObClient *self)
 {
     guint32 state[2];
     guint32 netstate[10];
@@ -1437,10 +1437,10 @@ static void client_change_state(Client *self)
 	frame_adjust_state(self->frame);
 }
 
-Client *client_search_focus_tree(Client *self)
+ObClient *client_search_focus_tree(ObClient *self)
 {
     GSList *it;
-    Client *ret;
+    ObClient *ret;
 
     for (it = self->transients; it != NULL; it = it->next) {
 	if (client_focused(it->data)) return it->data;
@@ -1449,7 +1449,7 @@ Client *client_search_focus_tree(Client *self)
     return NULL;
 }
 
-Client *client_search_focus_tree_full(Client *self)
+ObClient *client_search_focus_tree_full(ObClient *self)
 {
     if (self->transient_for) {
         if (self->transient_for != TRAN_GROUP) {
@@ -1459,8 +1459,8 @@ Client *client_search_focus_tree_full(Client *self)
             gboolean recursed = FALSE;
         
             for (it = self->group->members; it; it = it->next)
-                if (!((Client*)it->data)->transient_for) {
-                    Client *c;
+                if (!((ObClient*)it->data)->transient_for) {
+                    ObClient *c;
                     if ((c = client_search_focus_tree_full(it->data)))
                         return c;
                     recursed = TRUE;
@@ -1477,7 +1477,7 @@ Client *client_search_focus_tree_full(Client *self)
     return client_search_focus_tree(self);
 }
 
-static StackLayer calc_layer(Client *self)
+static StackLayer calc_layer(ObClient *self)
 {
     StackLayer l;
 
@@ -1494,7 +1494,7 @@ static StackLayer calc_layer(Client *self)
     return l;
 }
 
-static void client_calc_layer_recursive(Client *self, Client *orig,
+static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
                                         StackLayer l, gboolean raised)
 {
     StackLayer old, own;
@@ -1516,10 +1516,10 @@ static void client_calc_layer_recursive(Client *self, Client *orig,
         }
 }
 
-void client_calc_layer(Client *self)
+void client_calc_layer(ObClient *self)
 {
     StackLayer l;
-    Client *orig;
+    ObClient *orig;
 
     orig = self;
 
@@ -1531,7 +1531,7 @@ void client_calc_layer(Client *self)
     client_calc_layer_recursive(self, orig, l, FALSE);
 }
 
-gboolean client_should_show(Client *self)
+gboolean client_should_show(ObClient *self)
 {
     if (self->iconic) return FALSE;
     else if (!(self->desktop == screen_desktop ||
@@ -1541,7 +1541,7 @@ gboolean client_should_show(Client *self)
     return TRUE;
 }
 
-static void client_showhide(Client *self)
+static void client_showhide(ObClient *self)
 {
 
     if (client_should_show(self))
@@ -1550,12 +1550,12 @@ static void client_showhide(Client *self)
         frame_hide(self->frame);
 }
 
-gboolean client_normal(Client *self) {
+gboolean client_normal(ObClient *self) {
     return ! (self->type == Type_Desktop || self->type == Type_Dock ||
 	      self->type == Type_Splash);
 }
 
-static void client_apply_startup_state(Client *self)
+static void client_apply_startup_state(ObClient *self)
 {
     /* these are in a carefully crafted order.. */
 
@@ -1594,7 +1594,7 @@ static void client_apply_startup_state(Client *self)
     */
 }
 
-void client_configure(Client *self, ObCorner anchor,
+void client_configure(ObClient *self, ObCorner anchor,
                       int x, int y, int w, int h,
 		      gboolean user, gboolean final)
 {
@@ -1814,7 +1814,7 @@ void client_configure(Client *self, ObCorner anchor,
     }
 }
 
-void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
+void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
 {
     int x, y, w, h;
 
@@ -1872,7 +1872,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
     client_focus(self);
 }
 
-static void client_iconify_recursive(Client *self,
+static void client_iconify_recursive(ObClient *self,
                                      gboolean iconic, gboolean curdesk)
 {
     GSList *it;
@@ -1935,7 +1935,7 @@ static void client_iconify_recursive(Client *self,
                                                        iconic, curdesk);
 }
 
-void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
+void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk)
 {
     /* move up the transient chain as far as possible first */
     self = client_search_top_transient(self);
@@ -1944,7 +1944,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
                              iconic, curdesk);
 }
 
-void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
+void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
 {
     int x, y, w, h;
      
@@ -2046,7 +2046,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
     client_configure(self, OB_CORNER_TOPLEFT, x, y, w, h, TRUE, TRUE);
 }
 
-void client_shade(Client *self, gboolean shade)
+void client_shade(ObClient *self, gboolean shade)
 {
     if ((!(self->functions & Func_Shade) && shade) || /* can't shade */
 	self->shaded == shade) return;     /* already done */
@@ -2060,7 +2060,7 @@ void client_shade(Client *self, gboolean shade)
     frame_adjust_area(self->frame, FALSE, FALSE);
 }
 
-void client_close(Client *self)
+void client_close(ObClient *self)
 {
     XEvent ce;
 
@@ -2087,12 +2087,12 @@ void client_close(Client *self)
     XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
 }
 
-void client_kill(Client *self)
+void client_kill(ObClient *self)
 {
     XKillClient(ob_display, self->window);
 }
 
-void client_set_desktop_recursive(Client *self,
+void client_set_desktop_recursive(ObClient *self,
                                   guint target, gboolean donthide)
 {
     guint old;
@@ -2135,26 +2135,26 @@ void client_set_desktop_recursive(Client *self,
                                                            target, donthide);
 }
 
-void client_set_desktop(Client *self, guint target, gboolean donthide)
+void client_set_desktop(ObClient *self, guint target, gboolean donthide)
 {
     client_set_desktop_recursive(client_search_top_transient(self),
                                  target, donthide);
 }
 
-Client *client_search_modal_child(Client *self)
+ObClient *client_search_modal_child(ObClient *self)
 {
     GSList *it;
-    Client *ret;
+    ObClient *ret;
   
     for (it = self->transients; it != NULL; it = it->next) {
-	Client *c = it->data;
+	ObClient *c = it->data;
 	if ((ret = client_search_modal_child(c))) return ret;
 	if (c->modal) return c;
     }
     return NULL;
 }
 
-gboolean client_validate(Client *self)
+gboolean client_validate(ObClient *self)
 {
     XEvent e; 
 
@@ -2169,7 +2169,7 @@ gboolean client_validate(Client *self)
     return TRUE;
 }
 
-void client_set_wm_state(Client *self, long state)
+void client_set_wm_state(ObClient *self, long state)
 {
     if (state == self->wmstate) return; /* no change */
   
@@ -2183,7 +2183,7 @@ void client_set_wm_state(Client *self, long state)
     }
 }
 
-void client_set_state(Client *self, Atom action, long data1, long data2)
+void client_set_state(ObClient *self, Atom action, long data1, long data2)
 {
     gboolean shaded = self->shaded;
     gboolean fullscreen = self->fullscreen;
@@ -2307,9 +2307,9 @@ void client_set_state(Client *self, Atom action, long data1, long data2)
     client_change_state(self); /* change the hint to reflect these changes */
 }
 
-Client *client_focus_target(Client *self)
+ObClient *client_focus_target(ObClient *self)
 {
-    Client *child;
+    ObClient *child;
      
     /* if we have a modal child, then focus it, not us */
     child = client_search_modal_child(self);
@@ -2317,7 +2317,7 @@ Client *client_focus_target(Client *self)
     return self;
 }
 
-gboolean client_can_focus(Client *self)
+gboolean client_can_focus(ObClient *self)
 {
     XEvent ev;
 
@@ -2354,7 +2354,7 @@ gboolean client_can_focus(Client *self)
     return TRUE;
 }
 
-gboolean client_focus(Client *self)
+gboolean client_focus(ObClient *self)
 {
     /* choose the correct target */
     self = client_focus_target(self);
@@ -2402,7 +2402,7 @@ gboolean client_focus(Client *self)
     return TRUE;
 }
 
-void client_unfocus(Client *self)
+void client_unfocus(ObClient *self)
 {
     g_assert(focus_client == self);
 #ifdef DEBUG_FOCUS
@@ -2411,7 +2411,7 @@ void client_unfocus(Client *self)
     focus_fallback(Fallback_Unfocusing);
 }
 
-void client_activate(Client *self)
+void client_activate(ObClient *self)
 {
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE);
@@ -2427,12 +2427,12 @@ void client_activate(Client *self)
     stacking_raise(CLIENT_AS_WINDOW(self));
 }
 
-gboolean client_focused(Client *self)
+gboolean client_focused(ObClient *self)
 {
     return self == focus_client;
 }
 
-Icon *client_icon(Client *self, int w, int h)
+ObClientIcon *client_icon(ObClient *self, int w, int h)
 {
     int i;
     /* si is the smallest image >= req */
@@ -2458,13 +2458,13 @@ Icon *client_icon(Client *self, int w, int h)
 }
 
 /* this be mostly ripped from fvwm */
-Client *client_find_directional(Client *c, ObDirection dir) 
+ObClient *client_find_directional(ObClient *c, ObDirection dir) 
 {
     int my_cx, my_cy, his_cx, his_cy;
     int offset = 0;
     int distance = 0;
     int score, best_score;
-    Client *best_client, *cur;
+    ObClient *best_client, *cur;
     GList *it;
 
     if(!client_list)
@@ -2554,7 +2554,7 @@ Client *client_find_directional(Client *c, ObDirection dir)
     return best_client;
 }
 
-void client_set_layer(Client *self, int layer)
+void client_set_layer(ObClient *self, int layer)
 {
     if (layer < 0) {
         self->below = TRUE;
@@ -2569,7 +2569,7 @@ void client_set_layer(Client *self, int layer)
     client_change_state(self); /* reflect this in the state hints */
 }
 
-guint client_monitor(Client *self)
+guint client_monitor(ObClient *self)
 {
     guint i;
 
@@ -2583,7 +2583,7 @@ guint client_monitor(Client *self)
     return i;
 }
 
-Client *client_search_top_transient(Client *self)
+ObClient *client_search_top_transient(ObClient *self)
 {
     /* move up the transient chain as far as possible */
     if (self->transient_for) {
@@ -2593,7 +2593,7 @@ Client *client_search_top_transient(Client *self)
             GSList *it;
 
             for (it = self->group->members; it; it = it->next) {
-                Client *c = it->data;
+                ObClient *c = it->data;
 
                 /* checking transient_for prevents infinate loops! */
                 if (c != self && !c->transient_for)

@@ -1,5 +1,5 @@
-// bsetroot.cc for Openbox
-// Copyright (c) 2002 - 2002 Ben Janens (ben@orodu.net)
+// -*- mode++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+// Window.cc for Blackbox - an X11 Window manager
 // Copyright (c) 2001 - 2002 Sean 'Shaleh' Perry <shaleh at debian.org>
 // Copyright (c) 1997 - 2000, 2002 Brad Hughes <bhughes at trolltech.com>
 //
@@ -25,33 +25,35 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#ifdef    HAVE_STRING_H
-#  include <string.h>
-#endif // HAVE_STRING_H
-
-#ifdef    HAVE_STDLIB_H
+extern "C" {
+#ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
 #endif // HAVE_STDLIB_H
+
+#ifdef HAVE_STRING_H
+#  include <string.h>
+#endif // HAVE_STRING_H
 
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H
+}
 
-#include "../src/i18n.h"
-#include "../src/BaseDisplay.h"
-#include "../src/Image.h"
-#include "bsetroot.h"
+#include "../src/i18n.hh"
+#include "../src/GCCache.hh"
+#include "../src/Texture.hh"
+#include "../src/Util.hh"
+#include "bsetroot.hh"
 
-#include <algorithm>
 
-I18n i18n("openbox.cat");
+I18n i18n;
 
 bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
   : BaseDisplay(argv[0], dpy_name)
 {
   grad = fore = back = (char *) 0;
 
-  Bool mod = False, sol = False, grd = False;
+  bool mod = False, sol = False, grd = False;
   int mod_x = 0, mod_y = 0;
 
   for (int i = 1; i < argc; i++) {
@@ -101,16 +103,16 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
 
   if ((mod + sol + grd) != True) {
     fprintf(stderr,
-      i18n(bsetrootSet, bsetrootMustSpecify,
-           "%s: error: must specify one of: -solid, -mod, -gradient\n"),
-      getApplicationName());
+	    i18n(bsetrootSet, bsetrootMustSpecify,
+	         "%s: error: must specify one of: -solid, -mod, -gradient\n"),
+	    getApplicationName());
 
     usage(2);
   }
 
-  img_ctrl = new BImageControl*[numberOfScreens()];
-  for (unsigned int s = 0, n = numberOfScreens(); s < n; ++s)
-    img_ctrl[s] = new BImageControl(*this, *getScreenInfo(s), true);
+  img_ctrl = new BImageControl*[getNumberOfScreens()];
+  for (unsigned int s = 0; s < getNumberOfScreens(); ++s)
+    img_ctrl[s] = new BImageControl(this, getScreenInfo(s), True);
 
   if (sol && fore) solid();
   else if (mod && mod_x && mod_y && fore && back) modula(mod_x, mod_y);
@@ -124,7 +126,7 @@ bsetroot::~bsetroot(void) {
 
   XKillClient(getXDisplay(), AllTemporary);
 
-  std::for_each(img_ctrl, img_ctrl + numberOfScreens(), PointerAssassin());
+  std::for_each(img_ctrl, img_ctrl + getNumberOfScreens(), PointerAssassin());
 
   delete [] img_ctrl;
 }
@@ -146,7 +148,7 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
 
   XGrabServer(getXDisplay());
 
-  // Clear out the old pixmap
+  /* Clear out the old pixmap */
   XGetWindowProperty(getXDisplay(), screen_info->getRootWindow(),
                      rootpmap_id, 0L, 1L, False, XA_PIXMAP,
                      &type, &format, &length, &after, &data);
@@ -158,16 +160,16 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
 
   if (pixmap) {
     XChangeProperty(getXDisplay(), screen_info->getRootWindow(),
-        rootpmap_id, XA_PIXMAP, 32, PropModeReplace,
-        (unsigned char *) &pixmap, 1);
+		    rootpmap_id, XA_PIXMAP, 32, PropModeReplace,
+		    (unsigned char *) &pixmap, 1);
     XChangeProperty(getXDisplay(), screen_info->getRootWindow(),
-        esetroot_id, XA_PIXMAP, 32, PropModeReplace,
-        (unsigned char *) &pixmap, 1);
+		    esetroot_id, XA_PIXMAP, 32, PropModeReplace,
+		    (unsigned char *) &pixmap, 1);
   } else {
     XDeleteProperty(getXDisplay(), screen_info->getRootWindow(),
-        rootpmap_id);
+		    rootpmap_id);
     XDeleteProperty(getXDisplay(), screen_info->getRootWindow(),
-        esetroot_id);
+		    esetroot_id);
   }
 
   XUngrabServer(getXDisplay());
@@ -177,15 +179,15 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
 
 // adapted from wmsetbg
 Pixmap bsetroot::duplicatePixmap(int screen, Pixmap pixmap,
-         int width, int height) {
+				 int width, int height) {
   XSync(getXDisplay(), False);
 
   Pixmap copyP = XCreatePixmap(getXDisplay(),
-             getScreenInfo(screen)->getRootWindow(),
-             width, height,
-             DefaultDepth(getXDisplay(), screen));
+			       getScreenInfo(screen)->getRootWindow(),
+			       width, height,
+			       DefaultDepth(getXDisplay(), screen));
   XCopyArea(getXDisplay(), pixmap, copyP, DefaultGC(getXDisplay(), screen),
-      0, 0, width, height, 0, 0);
+	    0, 0, width, height, 0, 0);
   XSync(getXDisplay(), False);
 
   return copyP;
@@ -193,26 +195,19 @@ Pixmap bsetroot::duplicatePixmap(int screen, Pixmap pixmap,
 
 
 void bsetroot::solid(void) {
-  for (unsigned int screen = 0, n = numberOfScreens(); screen < n; screen++) {
-    BColor c;
-
-    img_ctrl[screen]->parseColor(&c, fore);
-    if (! c.isAllocated()) c.setPixel(BlackPixel(getXDisplay(), screen));
-
+  for (unsigned int screen = 0; screen < getNumberOfScreens(); screen++) {
+    BColor c(fore, this, screen);
     const ScreenInfo *screen_info = getScreenInfo(screen);
 
     XSetWindowBackground(getXDisplay(), screen_info->getRootWindow(),
-                         c.getPixel());
+                         c.pixel());
     XClearWindow(getXDisplay(), screen_info->getRootWindow());
 
     Pixmap pixmap = XCreatePixmap(getXDisplay(),
-          screen_info->getRootWindow(),
-          8, 8, DefaultDepth(getXDisplay(), screen));
-    
-    XSetForeground(getXDisplay(), DefaultGC(getXDisplay(), screen),
-                   c.getPixel());
-    XFillRectangle(getXDisplay(), pixmap, DefaultGC(getXDisplay(), screen),
-                   0, 0, 8, 8);
+				  screen_info->getRootWindow(),
+				  8, 8, DefaultDepth(getXDisplay(), screen));
+    BPen pen(c);
+    XFillRectangle(getXDisplay(), pixmap, pen.gc(), 0, 0, 8, 8);
 
     setPixmapProperty(screen, duplicatePixmap(screen, pixmap, 8, 8));
 
@@ -226,9 +221,8 @@ void bsetroot::modula(int x, int y) {
   long pattern;
 
   unsigned int screen, i;
-  unsigned int n = numberOfScreens();
 
-  for (pattern = 0, screen = 0; screen < n; screen++) {
+  for (pattern = 0, screen = 0; screen < getNumberOfScreens(); screen++) {
     for (i = 0; i < 16; i++) {
       pattern <<= 1;
       if ((i % x) == 0)
@@ -237,41 +231,34 @@ void bsetroot::modula(int x, int y) {
 
     for (i = 0; i < 16; i++) {
       if ((i %  y) == 0) {
-        data[(i * 2)] = (char) 0xff;
-        data[(i * 2) + 1] = (char) 0xff;
+        data[(i * 2)] = static_cast<char>(0xff);
+        data[(i * 2) + 1] = static_cast<char>(0xff);
       } else {
         data[(i * 2)] = pattern & 0xff;
         data[(i * 2) + 1] = (pattern >> 8) & 0xff;
       }
     }
 
-    BColor f, b;
+    BColor f(fore, this, screen), b(back, this, screen);
     GC gc;
     Pixmap bitmap;
-    
     const ScreenInfo *screen_info = getScreenInfo(screen);
 
     bitmap =
       XCreateBitmapFromData(getXDisplay(),
                             screen_info->getRootWindow(), data,
                             16, 16);
-    
-    img_ctrl[screen]->parseColor(&f, fore);
-    img_ctrl[screen]->parseColor(&b, back);
-
-    if (! f.isAllocated()) f.setPixel(WhitePixel(getXDisplay(), screen));
-    if (! b.isAllocated()) b.setPixel(BlackPixel(getXDisplay(), screen));
 
     XGCValues gcv;
-    gcv.foreground = f.getPixel();
-    gcv.background = b.getPixel();
+    gcv.foreground = f.pixel();
+    gcv.background = b.pixel();
 
     gc = XCreateGC(getXDisplay(), screen_info->getRootWindow(),
                    GCForeground | GCBackground, &gcv);
 
     Pixmap pixmap = XCreatePixmap(getXDisplay(),
-          screen_info->getRootWindow(),
-          16, 16, screen_info->getDepth());
+				  screen_info->getRootWindow(),
+				  16, 16, screen_info->getDepth());
 
     XCopyPlane(getXDisplay(), bitmap, pixmap, gc,
                0, 0, 16, 16, 0, 0, 1l);
@@ -281,7 +268,7 @@ void bsetroot::modula(int x, int y) {
     XClearWindow(getXDisplay(), screen_info->getRootWindow());
 
     setPixmapProperty(screen,
-          duplicatePixmap(screen, pixmap, 16, 16));
+		      duplicatePixmap(screen, pixmap, 16, 16));
 
     XFreeGC(getXDisplay(), gc);
     XFreePixmap(getXDisplay(), bitmap);
@@ -293,22 +280,17 @@ void bsetroot::modula(int x, int y) {
 
 
 void bsetroot::gradient(void) {
-  for (unsigned int screen = 0, n = numberOfScreens(); screen < n; screen++) {
-    BTexture texture;
-    img_ctrl[screen]->parseTexture(&texture, grad);
-    img_ctrl[screen]->parseColor(texture.getColor(), fore);
-    img_ctrl[screen]->parseColor(texture.getColorTo(), back);
+  for (unsigned int screen = 0; screen < getNumberOfScreens(); screen++) {
+    BTexture texture(grad, this, screen, img_ctrl[screen]);
     const ScreenInfo *screen_info = getScreenInfo(screen);
 
-    if (! texture.getColor()->isAllocated())
-      texture.getColor()->setPixel(WhitePixel(getXDisplay(), screen));
-    if (! texture.getColorTo()->isAllocated())
-      texture.getColorTo()->setPixel(BlackPixel(getXDisplay(), screen));
+    texture.setColor(BColor(fore, this, screen));
+    texture.setColorTo(BColor(back, this, screen));
 
     Pixmap pixmap =
-      img_ctrl[screen]->renderImage(screen_info->size().w(),
-                                    screen_info->size().h(),
-                                    &texture);
+      img_ctrl[screen]->renderImage(screen_info->getWidth(),
+                                    screen_info->getHeight(),
+                                    texture);
 
     XSetWindowBackgroundPixmap(getXDisplay(),
                                screen_info->getRootWindow(),
@@ -316,9 +298,9 @@ void bsetroot::gradient(void) {
     XClearWindow(getXDisplay(), screen_info->getRootWindow());
 
     setPixmapProperty(screen,
-          duplicatePixmap(screen, pixmap,
-              screen_info->size().w(),
-              screen_info->size().h()));
+		      duplicatePixmap(screen, pixmap,
+				      screen_info->getWidth(),
+				      screen_info->getHeight()));
 
     if (! (screen_info->getVisual()->c_class & 1)) {
       img_ctrl[screen]->removeImage(pixmap);
@@ -329,20 +311,20 @@ void bsetroot::gradient(void) {
 
 void bsetroot::usage(int exit_code) {
     fprintf(stderr,
-      i18n(bsetrootSet, bsetrootUsage,
-     "%s 2.0\n\n"
-     "Copyright (c) 1997-2000, 2002 Bradley T Hughes\n"
-     "Copyright (c) 2001-2002 Sean 'Shaleh' Perry\n\n"
-     "  -display <string>        display connection\n"
-     "  -mod <x> <y>             modula pattern\n"
-     "  -foreground, -fg <color> modula foreground color\n"
-     "  -background, -bg <color> modula background color\n\n"
-     "  -gradient <texture>      gradient texture\n"
-     "  -from <color>            gradient start color\n"
-     "  -to <color>              gradient end color\n\n"
-     "  -solid <color>           solid color\n\n"
-     "  -help                    print this help text and exit\n"),
-      getApplicationName());
+	    i18n(bsetrootSet, bsetrootUsage,
+		 "%s 2.0\n\n"
+		 "Copyright (c) 1997-2000, 2002 Bradley T Hughes\n"
+		 "Copyright (c) 2001-2002 Sean 'Shaleh' Perry\n\n"
+		 "  -display <string>        display connection\n"
+		 "  -mod <x> <y>             modula pattern\n"
+		 "  -foreground, -fg <color> modula foreground color\n"
+		 "  -background, -bg <color> modula background color\n\n"
+		 "  -gradient <texture>      gradient texture\n"
+		 "  -from <color>            gradient start color\n"
+		 "  -to <color>              gradient end color\n\n"
+		 "  -solid <color>           solid color\n\n"
+		 "  -help                    print this help text and exit\n"),
+	    getApplicationName());
 
     exit(exit_code);
 }
@@ -350,13 +332,15 @@ void bsetroot::usage(int exit_code) {
 int main(int argc, char **argv) {
   char *display_name = (char *) 0;
 
+  i18n.openCatalog("blackbox.cat");
+
   for (int i = 1; i < argc; i++) {
     if (! strcmp(argv[i], "-display")) {
       // check for -display option
 
       if ((++i) >= argc) {
         fprintf(stderr, i18n(mainSet, mainDISPLAYRequiresArg,
-                             "error: '-display' requires an argument\n"));
+		             "error: '-display' requires an argument\n"));
 
         ::exit(1);
       }
@@ -369,4 +353,3 @@ int main(int argc, char **argv) {
 
   return 0;
 }
-

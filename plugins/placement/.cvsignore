@@ -4,3 +4,4 @@ placement.la
 placement.lo
 .deps
 .libs
+history.lo

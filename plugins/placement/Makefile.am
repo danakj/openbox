@@ -7,9 +7,9 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 plugin_LTLIBRARIES=placement.la
 
 placement_la_LDFLAGS=-module -avoid-version
-placement_la_SOURCES=placement.c
+placement_la_SOURCES=placement.c history.c
 
-noinst_HEADERS=
+noinst_HEADERS=history.h
 
 MAINTAINERCLEANFILES=Makefile.in
 

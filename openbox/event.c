@@ -443,7 +443,7 @@ static void event_process(XEvent *e)
             client = WINDOW_AS_CLIENT(obwin);
             break;
         case Window_Decoration:
-            client = WINDOW_AS_DECORATION(obwin)->client;
+            client = WINDOW_AS_DECORATION(obwin)->frame->client;
             break;
         case Window_Internal:
             /* not to be used for events */

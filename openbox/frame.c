@@ -406,32 +406,62 @@ void frame_frame_gravity(Frame *self, int *x, int *y)
 void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
 {
     FrameDecor *dec;
-    int i, le = 0, re = 0, te = 0, be = 0, temp, center;
+    Rect *cr;
+    int i, le = 0, re = 0, te = 0, be = 0, temp;
 
-    for (i = 0; i < self->framedecors; i++) {
-        dec = &self->framedecor[i];
-        if (dec->type & self->client->decorations)
-            switch (dec->anchor) {
-                case Decor_Top:
-                    center = self->client->area.width/2;
+    if (resized)
+        for (i = 0; i < self->framedecors; i++) {
+            dec = &self->framedecor[i];
+            cr = &self->client->area;
+            if (dec->type & self->client->decorations)
+                switch (dec->anchor) {
+                case Decor_TopLeft:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > le) le = temp;
                     temp = dec->position.y + dec->position.height;
-                    printf("extends by %d\n", temp);
                     if (temp > te) te = temp;
+                break;
 
-                    printf("putting crap at %d, %d, %d, %d\n",
-                                      dec->position.x,
-                                      dec->position.y,
-                                      dec->position.width,
-                                      dec->position.height);
-                    XMoveResizeWindow(ob_display, dec->window,
-                                      dec->position.x,
-                                      dec->position.y,
-                                      dec->position.width,
-                                      dec->position.height);
-                    break;
+                case Decor_Top:
+                    temp = dec->position.y + dec->position.height;
+                    if (temp > te) te = temp;
+                    if (dec->position.width > cr->width) {
+                        temp = (dec->position.width - cr->width)/2;
+                        if (temp > re) re = temp;
+                        if (temp > le) le = temp;
+                    }
+                break;
+
+                case Decor_TopRight:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > re) re = temp;
+                    temp = dec->position.y + dec->position.height;
+                    if (temp > te) te = temp;
+                break;
+
+                case Decor_Left:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > le) le = temp;
+                    if (dec->position.height > cr->height) {
+                        temp = (dec->position.height - cr->height)/2;
+                        if (temp > be) be = temp;
+                        if (temp > te) te = temp;
+                    }
+                break;
+
+                case Decor_Right:
+                    temp = dec->position.x + dec->position.width;
+                    if (temp > re) re = temp;
+                    if (dec->position.height > cr->height) {
+                        temp = (dec->position.height - cr->height)/2;
+                        if (temp > be) be = temp;
+                        if (temp > te) te = temp;
+                    }
+                break;
+
             }
-    }
-
+        }
+printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
     if (resized) {
         if (self->client->decorations & Decor_Border) {
             self->bwidth = theme_bwidth;
@@ -442,7 +472,7 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
         STRUT_SET(self->size, self->cbwidth + le, 
                   self->cbwidth + te, self->cbwidth + re, self->cbwidth + be);
 
-        self->width = self->client->area.width + self->cbwidth * 2;
+        self->width = self->client->area.width + self->cbwidth * 2 + re + le;
         g_assert(self->width > 0);
     }
     if (resized) {

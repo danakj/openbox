@@ -11,7 +11,7 @@
 namespace otk {
 
 OtkEventDispatcher::OtkEventDispatcher()
-  : _fallback(0), _master(0), _focus(None)
+  : _fallback(0), _master(0)
 {
 }
 

@@ -113,8 +113,8 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
             RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
         break;
         case RR_TEXTURE_RGBA:
-            image_draw(l->surface.RrPixel_data,
-                       &l->texture[i].data.rgba, &tarea);
+            RrImageDraw(l->surface.RrPixel_data,
+                        &l->texture[i].data.rgba, &tarea);
         break;
         }
     }

@@ -7,7 +7,7 @@
 XColor *pseudo_colors;
 int pseudo_bpc;
 
-void color_allocate_gc(RrColor *in)
+void RrColorAllocateGC(RrColor *in)
 {
     XGCValues gcv;
 
@@ -66,7 +66,7 @@ void RrColorFree(RrColor *c)
     }
 }
 
-void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
+void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;
@@ -113,10 +113,10 @@ void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         g_assert(RrVisual(inst)->class != TrueColor);
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
-                p8[x] = pickColor(inst,
-                                  data[x] >> RrDefaultRedOffset,
-                                  data[x] >> RrDefaultGreenOffset,
-                                  data[x] >> RrDefaultBlueOffset)->pixel;
+                p8[x] = RrPickColor(inst,
+                                    data[x] >> RrDefaultRedOffset,
+                                    data[x] >> RrDefaultGreenOffset,
+                                    data[x] >> RrDefaultBlueOffset)->pixel;
         }
         data += im->width;
         p8 += im->bytes_per_line;
@@ -128,7 +128,7 @@ void reduce_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     }
 }
 
-XColor *pickColor(const RrInstance *inst, gint r, gint g, gint b) 
+XColor *RrPickColor(const RrInstance *inst, gint r, gint g, gint b) 
 {
   r = (r & 0xff) >> (8-pseudo_bpc);
   g = (g & 0xff) >> (8-pseudo_bpc);
@@ -174,7 +174,7 @@ static void swap_byte_order(XImage *im)
         im->byte_order = LSBFirst;
 }
 
-void increase_depth(const RrInstance *inst, RrPixel32 *data, XImage *im)
+void RrIncreaseDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
     int r, g, b;
     int x,y;

@@ -4,7 +4,7 @@
 
 #include <glib.h>
 
-void image_draw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
+void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, Rect *area)
 {
     RrPixel32 *draw = rgba->data;
     gint c, i, e, t, sfw, sfh;

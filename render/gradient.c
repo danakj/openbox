@@ -267,7 +267,7 @@ static void create_bevel_colors(RrAppearance *l)
     if (b > 0xFF) b = 0xFF;
     g_assert(!l->surface.bevel_light);
     l->surface.bevel_light = RrColorNew(l->inst, r, g, b);
-    color_allocate_gc(l->surface.bevel_light);
+    RrColorAllocateGC(l->surface.bevel_light);
 
     /* dark color */
     r = l->surface.primary->r;
@@ -278,7 +278,7 @@ static void create_bevel_colors(RrAppearance *l)
     b = (b >> 1) + (b >> 2);
     g_assert(!l->surface.bevel_dark);
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
-    color_allocate_gc(l->surface.bevel_dark);
+    RrColorAllocateGC(l->surface.bevel_dark);
 }
 
 void gradient_solid(RrAppearance *l, int x, int y, int w, int h) 
@@ -289,7 +289,7 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
     int left = x, top = y, right = x + w - 1, bottom = y + h - 1;
 
     if (sp->primary->gc == None)
-        color_allocate_gc(sp->primary);
+        RrColorAllocateGC(sp->primary);
     pix = (sp->primary->r << RrDefaultRedOffset)
         + (sp->primary->g << RrDefaultGreenOffset)
         + (sp->primary->b << RrDefaultBlueOffset);
@@ -303,7 +303,7 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
 
     if (sp->interlaced) {
         if (sp->secondary->gc == None)
-            color_allocate_gc(sp->secondary);
+            RrColorAllocateGC(sp->secondary);
         for (i = y; i < h; i += 2)
             XDrawLine(RrDisplay(l->inst), l->pixmap, sp->secondary->gc,
                       x, i, w, i);
@@ -380,7 +380,7 @@ void gradient_solid(RrAppearance *l, int x, int y, int w, int h)
     case RR_RELIEF_FLAT:
         if (sp->border) {
             if (sp->border_color->gc == None)
-                color_allocate_gc(sp->border_color);
+                RrColorAllocateGC(sp->border_color);
             XDrawRectangle(RrDisplay(l->inst), l->pixmap, sp->border_color->gc,
                            left, top, right, bottom);
         }

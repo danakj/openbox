@@ -128,7 +128,8 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   frame.border_w = 1;
   frame.window = frame.plate = frame.title = frame.handle = None;
-  frame.close_button = frame.iconify_button = frame.maximize_button = None;
+  frame.close_button = frame.iconify_button = frame.maximize_button =
+    frame.stick_button = None;
   frame.right_grip = frame.left_grip = None;
 
   frame.ulabel_pixel = frame.flabel_pixel = frame.utitle_pixel =
@@ -719,6 +720,9 @@ void BlackboxWindow::destroyTitlebar(void) {
   if (frame.maximize_button)
     destroyMaximizeButton();
 
+  if (frame.stick_button)
+    destroyStickyButton();
+  
   if (frame.ftitle)
     screen->getImageControl()->removeImage(frame.ftitle);
 
@@ -802,13 +806,28 @@ void BlackboxWindow::destroyMaximizeButton(void) {
   frame.maximize_button = None;
 }
 
+void BlackboxWindow::createStickyButton(void) {
+  if (frame.title != None) {
+    frame.stick_button = createChildWindow(frame.title,
+                                           ButtonPressMask |
+                                           ButtonReleaseMask |
+                                           ButtonMotionMask | ExposureMask);
+    blackbox->saveWindowSearch(frame.stick_button, this);
+  }
+}
+
+void BlackboxWindow::destroyStickyButton(void) {
+  blackbox->removeWindowSearch(frame.stick_button);
+  XDestroyWindow(blackbox->getXDisplay(), frame.stick_button);
+  frame.stick_button = None;
+}
 
 void BlackboxWindow::positionButtons(bool redecorate_label) {
   string layout = blackbox->getTitlebarLayout();
   string parsed;
 
-  bool hasclose, hasiconify, hasmaximize, haslabel;
-  hasclose = hasiconify = hasmaximize = haslabel = false;
+  bool hasclose, hasiconify, hasmaximize, haslabel, hasstick;
+  hasclose = hasiconify = hasmaximize = haslabel = hasstick = false;
 
   string::const_iterator it, end;
   for (it = layout.begin(), end = layout.end(); it != end; ++it) {
@@ -825,6 +844,12 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
         parsed += *it;
       }
       break;
+    case 'S':
+      if (!hasstick) {
+        hasstick = true;
+        parsed += *it;
+      }
+      break;
     case 'M':
       if (! hasmaximize && (decorations & Decor_Maximize)) {
         hasmaximize = true;
@@ -836,14 +861,18 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
         haslabel = true;
         parsed += *it;
       }
+      break;
     }
   }
+  
   if (! hasclose && frame.close_button)
     destroyCloseButton();
   if (! hasiconify && frame.iconify_button)
     destroyIconifyButton();
   if (! hasmaximize && frame.maximize_button)
     destroyMaximizeButton();
+  if (! hasstick && frame.stick_button)
+    destroyStickyButton();
   if (! haslabel)
     parsed += 'L';      // require that the label be in the layout
 
@@ -866,6 +895,12 @@ void BlackboxWindow::positionButtons(bool redecorate_label) {
     case 'I':
       if (! frame.iconify_button) createIconifyButton();
       XMoveResizeWindow(blackbox->getXDisplay(), frame.iconify_button, x, by,
+                        frame.button_w, frame.button_w);
+      x += frame.button_w + bsep;
+      break;
+    case 'S':
+      if (! frame.stick_button) createStickyButton();
+      XMoveResizeWindow(blackbox->getXDisplay(), frame.stick_button, x, by,
                         frame.button_w, frame.button_w);
       x += frame.button_w + bsep;
       break;
@@ -2077,6 +2112,9 @@ void BlackboxWindow::stick(void) {
 
     setState(current_state);
   }
+
+  redrawAllButtons();
+  
   // go up the chain
   if (isTransient() && client.transient_for != (BlackboxWindow *) ~0ul &&
       client.transient_for->isStuck() != flags.stuck)
@@ -2542,6 +2580,7 @@ void BlackboxWindow::redrawAllButtons(void) const {
   if (frame.iconify_button) redrawIconifyButton(False);
   if (frame.maximize_button) redrawMaximizeButton(flags.maximized);
   if (frame.close_button) redrawCloseButton(False);
+  if (frame.stick_button) redrawStickyButton(flags.stuck);
 }
 
 
@@ -2650,6 +2689,40 @@ void BlackboxWindow::redrawCloseButton(bool pressed) const {
             2, (frame.button_w - 3), (frame.button_w - 3), 2);
 }
 
+
+void BlackboxWindow::redrawStickyButton(bool pressed) const {
+  if (! pressed) {
+    if (flags.focused) {
+      if (frame.fbutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.stick_button, frame.fbutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                             frame.fbutton_pixel);
+    } else {
+      if (frame.ubutton)
+        XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                   frame.stick_button, frame.ubutton);
+      else
+        XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                             frame.ubutton_pixel);
+    }
+  } else {
+    if (frame.pbutton)
+      XSetWindowBackgroundPixmap(blackbox->getXDisplay(),
+                                 frame.stick_button, frame.pbutton);
+    else
+      XSetWindowBackground(blackbox->getXDisplay(), frame.stick_button,
+                           frame.pbutton_pixel);
+  }
+  XClearWindow(blackbox->getXDisplay(), frame.stick_button);
+
+  BPen pen((flags.focused) ? screen->getWindowStyle()->b_pic_focus :
+           screen->getWindowStyle()->b_pic_unfocus);
+  
+  XFillRectangle(blackbox->getXDisplay(), frame.stick_button, pen.gc(),
+                 frame.button_w/2 - 1, frame.button_w/2 -1, 2, 2 );
+}
 
 void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
   if (re->window != client.window)
@@ -2865,6 +2938,8 @@ void BlackboxWindow::exposeEvent(const XExposeEvent *ee) {
     redrawMaximizeButton(flags.maximized);
   else if (frame.iconify_button == ee->window)
     redrawIconifyButton(False);
+  else if (frame.stick_button == ee->window)
+    redrawStickyButton(flags.stuck);
 }
 
 
@@ -2958,6 +3033,8 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
       redrawIconifyButton(True);
     } else if (frame.close_button == be->window) {
       redrawCloseButton(True);
+    } else if (frame.stick_button == be->window) {
+      redrawStickyButton(True);
     } else if (frame.plate == be->window) {
       if (windowmenu && windowmenu->isVisible()) windowmenu->hide();
 
@@ -2981,7 +3058,8 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
       screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
     }
   } else if (be->button == 2 && (be->window != frame.iconify_button) &&
-             (be->window != frame.close_button)) {
+             (be->window != frame.close_button) &&
+             (be->window != frame.stick_button)) {
     screen->getWorkspace(blackbox_attrib.workspace)->lowerWindow(this);
   } else if (windowmenu && be->button == 3 &&
              (frame.title == be->window || frame.label == be->window ||
@@ -3029,7 +3107,8 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
          be->window == frame.title ||
          be->window == frame.maximize_button ||
          be->window == frame.iconify_button ||
-         be->window == frame.close_button) &&
+         be->window == frame.close_button ||
+         be->window == frame.stick_button) &&
         ! flags.shaded)
       shade();
   // mouse wheel down
@@ -3038,7 +3117,8 @@ void BlackboxWindow::buttonPressEvent(const XButtonEvent *be) {
          be->window == frame.title ||
          be->window == frame.maximize_button ||
          be->window == frame.iconify_button ||
-         be->window == frame.close_button) &&
+         be->window == frame.close_button ||
+         be->window == frame.stick_button) &&
         flags.shaded)
       shade();
   }
@@ -3065,6 +3145,13 @@ void BlackboxWindow::buttonReleaseEvent(const XButtonEvent *re) {
       iconify();
     } else {
       redrawIconifyButton(False);
+    }
+  } else if (re->window == frame.stick_button && re->button == 1) {
+    if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&
+        (re->y >= 0 && re->y <= static_cast<signed>(frame.button_w))) {
+      stick();
+    } else {
+      redrawStickyButton(False);
     }
   } else if (re->window == frame.close_button & re->button == 1) {
     if ((re->x >= 0 && re->x <= static_cast<signed>(frame.button_w)) &&

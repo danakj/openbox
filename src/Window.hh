@@ -230,7 +230,7 @@ private:
       title,
       label,
       handle,
-      close_button, iconify_button, maximize_button,
+      close_button, iconify_button, maximize_button, stick_button,
       right_grip, left_grip;
 
     /*
@@ -285,12 +285,15 @@ private:
   void destroyIconifyButton(void);
   void createMaximizeButton(void);
   void destroyMaximizeButton(void);
+  void createStickyButton(void);
+  void destroyStickyButton(void);
   void redrawWindowFrame(void) const;
   void redrawLabel(void) const;
   void redrawAllButtons(void) const;
   void redrawCloseButton(bool pressed) const;
   void redrawIconifyButton(bool pressed) const;
   void redrawMaximizeButton(bool pressed) const;
+  void redrawStickyButton(bool pressed) const;
   void applyGravity(Rect &r);
   void restoreGravity(Rect &r);
   void setAllowedActions(void);

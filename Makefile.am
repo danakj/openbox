@@ -404,9 +404,9 @@ dist_imerry_theme_DATA = \
 	themes/I-merry/iconify.xbm \
 	themes/I-merry/close.xbm
 
-greenz_themedir = $(themedir)/I-merry
+greenz_themedir = $(themedir)/greenz
 dist_greenz_theme_DATA = \
-	themes/I-merry/themerc
+	themes/greenz/themerc
 
 bbstyle_themedir = $(themedir)/BBstylE
 dist_bbstyle_theme_DATA = \

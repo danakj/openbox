@@ -4225,8 +4225,6 @@ void BlackboxWindow::constrain(Corner anchor,
     if (dh > client.max_height) dh = client.max_height;
   }
 
-  assert(dw >= base_width && dh >= base_height);
-
   if (client.width_inc > 1) {
     dw -= base_width;
     dw /= client.width_inc;

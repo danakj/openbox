@@ -33,6 +33,9 @@
   <separator />
   <menu id="client-list-menu" />
   <separator />
+  <item label="ObConf">
+    <action name="execute"><execute>obconf</execute></action>
+  </item>
   <item label="Reconfigure">
     <action name="reconfigure" />
   </item>

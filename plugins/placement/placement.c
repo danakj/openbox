@@ -30,7 +30,7 @@ static void place_random(ObClient *c)
     int x, y;
     Rect *area;
 
-    if (ob_state == OB_STATE_STARTING) return;
+    if (ob_state() == OB_STATE_STARTING) return;
 
     area = screen_area_monitor(c->desktop,
                                g_random_int_range(0, screen_num_monitors));

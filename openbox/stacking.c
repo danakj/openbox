@@ -18,7 +18,7 @@ void stacking_set_list()
     /* on shutdown, don't update the properties, so that we can read it back
        in on startup and re-stack the windows as they were before we shut down
     */
-    if (ob_state == OB_STATE_EXITING) return;
+    if (ob_state() == OB_STATE_EXITING) return;
 
     /* create an array of the window ids (from bottom to top,
        reverse order!) */

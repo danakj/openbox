@@ -58,7 +58,7 @@ gboolean place_history(ObClient *c)
 
     if (hi && !(hi->flags & PLACED)) {
         hi->flags |= PLACED;
-        if (ob_state != OB_STATE_STARTING) {
+        if (ob_state() != OB_STATE_STARTING) {
             if (hi->flags & HAVE_POSITION ||
                 hi->flags & HAVE_SIZE) {
                 if (hi->flags & HAVE_POSITION) {

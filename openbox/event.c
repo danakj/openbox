@@ -650,7 +650,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 	break;
     case EnterNotify:
         if (client_normal(client)) {
-            if (ob_state == OB_STATE_STARTING) {
+            if (ob_state() == OB_STATE_STARTING) {
                 /* move it to the top of the focus order */
                 guint desktop = client->desktop;
                 if (desktop == DESKTOP_ALL) desktop = screen_desktop;

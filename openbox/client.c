@@ -256,7 +256,7 @@ void client_manage(Window window)
     focus_order_add_new(self);
 
     /* focus the new window? */
-    if (ob_state != OB_STATE_STARTING && config_focus_new &&
+    if (ob_state() != OB_STATE_STARTING && config_focus_new &&
         (self->type == OB_CLIENT_TYPE_NORMAL || self->type == OB_CLIENT_TYPE_DIALOG)) {
         gboolean group_foc = FALSE;
         
@@ -405,7 +405,7 @@ void client_unmanage(ObClient *self)
     frame_release_client(self->frame, self);
     self->frame = NULL;
      
-    if (ob_state != OB_STATE_EXITING) {
+    if (ob_state() != OB_STATE_EXITING) {
 	/* these values should not be persisted across a window
 	   unmapping/mapping */
 	prop_erase(self->window, prop_atoms.net_wm_desktop);
@@ -1125,7 +1125,7 @@ void client_update_wmhints(ObClient *self)
 
 	/* only do this when first managing the window *AND* when we aren't
            starting up! */
-	if (ob_state != OB_STATE_STARTING && self->frame == NULL)
+	if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
 

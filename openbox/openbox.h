@@ -28,7 +28,7 @@ SnDisplay *ob_sn_display;
 extern gint     ob_screen;
 
 /* The state of execution of the window manager */
-extern ObState ob_state;
+ObState ob_state();
 
 void ob_restart_other(const gchar *path);
 void ob_restart();

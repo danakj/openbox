@@ -349,7 +349,7 @@ void frame_grab_client(ObFrame *self, ObClient *client)
       member set the root window, and one set to the client, but both get
       handled and need to be ignored.
     */
-    if (ob_state == OB_STATE_STARTING)
+    if (ob_state() == OB_STATE_STARTING)
 	client->ignore_unmaps += 2;
 
     /* select the event mask on the client's parent (to receive config/map

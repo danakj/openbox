@@ -59,10 +59,10 @@ RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 Display    *ob_display;
 gint        ob_screen;
-ObState     ob_state;
 Cursor      ob_cursors[OB_NUM_CURSORS];
 KeyCode     ob_keys[OB_NUM_KEYS];
 
+static ObState   state;
 static gboolean  sync;
 static gboolean  shutdown;
 static gboolean  restart;
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     xmlDocPtr doc;
     xmlNodePtr node;
 
-    ob_state = OB_STATE_STARTING;
+    state = OB_STATE_STARTING;
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
@@ -256,10 +256,10 @@ int main(int argc, char **argv)
 	/* get all the existing windows */
 	client_manage_all();
 
-	ob_state = OB_STATE_RUNNING;
+	state = OB_STATE_RUNNING;
 	while (!shutdown)
 	    event_loop();
-	ob_state = OB_STATE_EXITING;
+	state = OB_STATE_EXITING;
 
         dock_remove_all();
 	client_unmanage_all();
@@ -611,4 +611,9 @@ KeyCode ob_keycode(ObKey key)
 {
     g_assert(key < OB_NUM_KEYS);
     return ob_keys[key];
+}
+
+ObState ob_state()
+{
+    return state;
 }

@@ -93,7 +93,7 @@ void dock_add(Window win, XWMHints *wmhints)
       member set the root window, and one set to the client, but both get
       handled and need to be ignored.
     */
-    if (ob_state == OB_STATE_STARTING)
+    if (ob_state() == OB_STATE_STARTING)
 	app->ignore_unmaps += 2;
 
     if (app->win != app->icon_win) {

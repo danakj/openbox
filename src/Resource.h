@@ -29,7 +29,7 @@
 
 class Resource {
 public:
-  Resource(const std::string &file);
+  explicit Resource(const std::string &file);
   Resource();
   virtual ~Resource();
 

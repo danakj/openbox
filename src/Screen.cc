@@ -243,8 +243,6 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   image_control->installRootColormap();
   root_colormap_installed = True;
 
-  image_control->setDither(resource.image_dither);
-
   load();       // load config options from Resources
   LoadStyle();
 
@@ -852,12 +850,13 @@ void BScreen::setAutoRaise(bool a) {
 
 void BScreen::setImageDither(bool d, bool reconfig) {
   resource.image_dither = d;
+  image_control->setDither(d);
   std::ostrstream s;
   s << "session.screen" << getScreenNumber() << ".imageDither" << ends;
   config.setValue(s.str(), resource.image_dither);
   s.rdbuf()->freeze(0);
   if (reconfig)
-    openbox.reconfigure();
+    reconfigure();
 }
 
 

@@ -91,8 +91,7 @@ void Configmenu::itemSelected(int button, int index) {
 
   switch(item->function()) {
   case 1: { // dither
-    screen.getImageControl()->
-      setDither((! screen.getImageControl()->doDither()));
+    screen.setImageDither(!screen.getImageControl()->doDither());
 
     setItemSelected(index, screen.getImageControl()->doDither());
 

@@ -46,21 +46,21 @@ static bool modvalue(const std::string &mod, unsigned int *val)
     *val |= ShiftMask;
   } else if (mod == "A" ||    // alt/mod1
              mod == "M" ||
-             mod == "M1" ||
-             mod == "Mod1") {
+             mod == "Mod1" ||
+             mod == "M1") {
     *val |= Mod1Mask;
-  } else if (mod == "M2" ||   // mod2
-             mod == "Mod2") {
+  } else if (mod == "Mod2" ||   // mod2
+             mod == "M2") {
     *val |= Mod2Mask;
-  } else if (mod == "M3" ||   // mod3
-             mod == "Mod3") {
+  } else if (mod == "Mod3" ||   // mod3
+             mod == "M3") {
     *val |= Mod3Mask;
   } else if (mod == "W" ||    // windows/mod4
-             mod == "M4" ||
-             mod == "Mod4") {
+             mod == "Mod4" ||
+             mod == "M4") {
     *val |= Mod4Mask;
-  } else if (mod == "M5" ||   // mod5
-             mod == "Mod5") {
+  } else if (mod == "Mod5" ||   // mod5
+             mod == "M5") {
     *val |= Mod5Mask;
   } else {                    // invalid
     return false;

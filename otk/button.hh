@@ -32,6 +32,8 @@ public:
   void buttonPressHandler(const XButtonEvent &e);
   void buttonReleaseHandler(const XButtonEvent &e);
 
+  void setStyle(Style *style);
+  
 private:
 
   bool _pressed;

@@ -2,14 +2,20 @@
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
-SUBDIRS = 			epist
+SUBDIRS = 		epist
 bin_SCRIPTS = 		bsetbg
-bin_PROGRAMS =		bsetroot xftlsfonts
+
+if XFT
+if XFT2
+else
+TMP_PROGS =	xftlsfonts
+endif
+endif
+
+bin_PROGRAMS =		bsetroot $(TMP_PROGS)
 
 bsetroot_SOURCES =	bsetroot.cc
 bsetroot_LDADD =	../src/BaseDisplay.o ../src/Color.o ../src/GCCache.o ../src/Texture.o ../src/Timer.o ../src/Image.o ../src/ImageControl.o ../src/i18n.o ../src/Util.o
-
-xftlsfonts_SOURCES = xftlsfonts.cc
 
 MAINTAINERCLEANFILES =	Makefile.in
 

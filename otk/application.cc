@@ -43,6 +43,7 @@ void Application::loadStyle(void)
   // XXX: find the style name as a property
   std::string style = "/usr/local/share/openbox/styles/artwiz";
   //_style->load(style);
+  otk::RenderStyle::setStyle(_screen, style);
 }
 
 void Application::run(void)

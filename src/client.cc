@@ -1149,10 +1149,10 @@ void Client::internal_resize(Corner anchor, int w, int h,
     // and aspect ratios
 
     // smaller than min size or bigger than max size?
+    if (w > _max_size.width()) w = _max_size.width();
     if (w < _min_size.width()) w = _min_size.width();
-    else if (w > _max_size.width()) w = _max_size.width();
+    if (h > _max_size.height()) h = _max_size.height();
     if (h < _min_size.height()) h = _min_size.height();
-    else if (h > _max_size.height()) h = _max_size.height();
 
     // adjust the height ot match the width for the aspect ratios
     if (_min_ratio)

@@ -268,9 +268,9 @@ static void popup_cycle(Client *c, gboolean show)
         if (p == c)
             title = NULL;
         else
-            title = g_strconcat((p->iconic ? p->icon_title : p->title),
+            title = g_strconcat((c->iconic ? c->icon_title : c->title),
                                 " - ",
-                                (c->iconic ? c->icon_title : c->title),
+                                (p->iconic ? p->icon_title : p->title),
                                 NULL);
 
         popup_show(focus_cycle_popup,

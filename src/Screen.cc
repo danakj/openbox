@@ -613,8 +613,9 @@ void BScreen::load_rc(void) {
   else
     resource.col_direction = TopBottom;
 
-  XAtom::StringVect workspaceNames;
   if (config->getValue(screenstr + "workspaceNames", s)) {
+    XAtom::StringVect workspaceNames;
+
     string::const_iterator it = s.begin(), end = s.end();
     while(1) {
       string::const_iterator tmp = it;     // current string.begin()
@@ -624,9 +625,10 @@ void BScreen::load_rc(void) {
         break;
       ++it;
     }
+
+    xatom->setValue(getRootWindow(), XAtom::net_desktop_names, XAtom::utf8,
+                    workspaceNames);
   }
-  xatom->setValue(getRootWindow(), XAtom::net_desktop_names, XAtom::utf8,
-                  workspaceNames);
 
   resource.sloppy_focus = true;
   resource.auto_raise = false;
@@ -685,6 +687,10 @@ void BScreen::load_rc(void) {
 
 
 void BScreen::reconfigure(void) {
+  // don't reconfigure while saving the initial rc file, it's a waste and it
+  // breaks somethings (workspace names)
+  if (blackbox->isStartup()) return;
+
   load_rc();
   toolbar->load_rc();
   slit->load_rc();

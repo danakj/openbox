@@ -5,6 +5,9 @@
 #include "render/render.h"
 
 #include <X11/Xutil.h>
+#ifdef HAVE_STRING_H
+#  include <string.h>
+#endif
 
 void cwmcc_client_get_protocols(Window win, Atom **protocols)
 {
@@ -52,6 +55,13 @@ void cwmcc_client_get_name(Window win, char **name)
         }
 }
 
+void cwmcc_client_set_name(Window win, char *name)
+{
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, net_wm_name),
+                    CWMCC_ATOM(type, utf8), 32, PropModeReplace,
+                    (guchar*)name, strlen(name));
+}
+
 void cwmcc_client_get_icon_name(Window win, char **name)
 {
     if (!prop_get_string_utf8(win, CWMCC_ATOM(client, net_wm_icon_name), name))
@@ -60,6 +70,13 @@ void cwmcc_client_get_icon_name(Window win, char **name)
             g_warning("Failed to read an icon name from 0x%lx", win);
             *name = g_strdup("Unnamed Window");
         }
+}
+
+void cwmcc_client_icon_set_name(Window win, char *name)
+{
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, net_wm_icon_name),
+                    CWMCC_ATOM(type, utf8), 32, PropModeReplace,
+                    (guchar*)name, strlen(name));
 }
 
 void cwmcc_client_get_class(Window win, char **class, char **name)

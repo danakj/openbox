@@ -7,8 +7,10 @@ void cwmcc_client_get_wm_state(Window win, gulong *state);
 void cwmcc_client_set_wm_state(Window win, gulong state);
 
 void cwmcc_client_get_name(Window win, char **name);
+void cwmcc_client_set_name(Window win, char *name);
 
 void cwmcc_client_get_icon_name(Window win, char **name);
+void cwmcc_client_set_icon_name(Window win, char *name);
 
 void cwmcc_client_get_class(Window win, char **class, char **name);
 

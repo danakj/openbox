@@ -264,6 +264,9 @@ dist_rc_DATA = \
 dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
+dist_noinst_DATA = \
+	tools/themeupdate/themeupdate.py
+
 EXTRA_DIST = \
 	config.rpath \
 	mkinstalldirs \

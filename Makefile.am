@@ -57,6 +57,11 @@ render_libobrender_la_CPPFLAGS = \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+render_libobrender_la_LIBADD = \
+	$(X_LIBS) \
+	$(XFT_LIBS) \
+	$(GLIB_LIBS) \
+	$(XML_LIBS) 
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \
@@ -89,6 +94,9 @@ parser_libobparser_la_CPPFLAGS = \
 	-DCONFIGDIR=\"$(configdir)\"
 parser_libobparser_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+render_libobparser_la_LIBADD = \
+	$(GLIB_LIBS) \
+	$(XML_LIBS) 
 parser_libobparser_la_SOURCES = \
 	parser/parse.h \
 	parser/parse.c

@@ -34,7 +34,7 @@ public:
 
   //! The event mask to grab on frame windows
   static const long event_mask = EnterWindowMask | LeaveWindowMask;
-
+   
 private:
   OBClient *_client;
   const otk::ScreenInfo *_screen;

@@ -24,8 +24,7 @@ namespace ob {
 const long OBFrame::event_mask;
 
 OBFrame::OBFrame(OBClient *client, otk::Style *style)
-  : otk::OtkWidget(Openbox::instance, style, Horizontal, 0, 1,
-                   CWOverrideRedirect),
+  : otk::OtkWidget(Openbox::instance, style, Horizontal, 0, 1, true),
     OBWidget(Type_Frame),
     _client(client),
     _screen(otk::OBDisplay::screenInfo(client->screen())),
@@ -106,7 +105,6 @@ void OBFrame::focus()
 {
   otk::OtkWidget::focus();
   update();
-  _handle.update();
 }
 
 

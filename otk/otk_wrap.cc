@@ -1862,7 +1862,7 @@ static PyObject *_wrap_new_OtkWidget__SWIG_1(PyObject *self, PyObject *args) {
     int arg3 = (int) otk::OtkWidget::Horizontal ;
     Cursor arg4 = (Cursor) 0 ;
     int arg5 = (int) 1 ;
-    unsigned long arg6 = (unsigned long) 0 ;
+    bool arg6 = (bool) false ;
     otk::OtkWidget *result;
     Cursor *argp4 ;
     PyObject * obj0  = 0 ;
@@ -1878,7 +1878,7 @@ static PyObject *_wrap_new_OtkWidget__SWIG_1(PyObject *self, PyObject *args) {
         arg4 = *argp4; 
     }
     if (obj5) {
-        arg6 = (unsigned long) PyInt_AsLong(obj5);
+        arg6 = (bool) PyInt_AsLong(obj5);
         if (PyErr_Occurred()) SWIG_fail;
     }
     result = (otk::OtkWidget *)new otk::OtkWidget(arg1,arg2,(otk::OtkWidget::Direction )arg3,arg4,arg5,arg6);

@@ -93,11 +93,15 @@ class cycledata:
         oldpos = self.menupos
         self.menupos = -1
 
-        # get the list of clients
+        # get the list of clients, keeping iconic windows at the bottom
         self.clients = []
+        iconic_clients = []
         for i in focus._clients:
             c = ob.openbox.findClient(i)
-            if c: self.clients.append(c)
+            if c:
+                if c.iconic(): iconic_clients.append(c)
+                else: self.clients.append(c)
+        self.clients.extend(iconic_clients)
 
         font = self.style.labelFont()
         longest = 0

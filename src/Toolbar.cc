@@ -314,7 +314,7 @@ void Toolbar::reconfigure(void) {
   unsigned int w = 0;
   frame.workspace_label_w = 0;
 
-  for (i = 0; i < screen->getCount(); i++) {
+  for (i = 0; i < screen->getWorkspaceCount(); i++) {
     if (i18n->multibyte()) {
       XRectangle ink, logical;
       XmbTextExtents(screen->getToolbarStyle()->fontset,
@@ -926,14 +926,14 @@ void Toolbar::buttonReleaseEvent(XButtonEvent *re) {
           screen->changeWorkspaceID(screen->getCurrentWorkspace()->
                                     getWorkspaceID() - 1);
         else
-          screen->changeWorkspaceID(screen->getCount() - 1);
+          screen->changeWorkspaceID(screen->getWorkspaceCount() - 1);
     } else if (re->window == frame.nsbutton) {
       redrawNextWorkspaceButton(False, True);
 
       if (re->x >= 0 && re->x < (signed) frame.button_w &&
           re->y >= 0 && re->y < (signed) frame.button_w)
         if (screen->getCurrentWorkspace()->getWorkspaceID() <
-            screen->getCount() - 1)
+            screen->getWorkspaceCount() - 1)
           screen->changeWorkspaceID(screen->getCurrentWorkspace()->
                                     getWorkspaceID() + 1);
         else

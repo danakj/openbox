@@ -88,6 +88,10 @@ void obResource::setValue(const std::string &rname, bool value) {
     save();
 }
 
+void obResource::setValue(const std::string &rname, int value) {
+  setValue(rname, (long)value);
+}
+
 void obResource::setValue(const std::string &rname, long value) {
   assert(m_database != NULL);
   

@@ -381,11 +381,11 @@ void Openbox::process_event(XEvent *e) {
 	    }
           } else if (e->xbutton.button == 4) {
             if ((screen->getCurrentWorkspaceID()-1)<0)
-              screen->changeWorkspaceID(screen->getCount()-1);
+              screen->changeWorkspaceID(screen->getWorkspaceCount()-1);
             else
               screen->changeWorkspaceID(screen->getCurrentWorkspaceID()-1);
           } else if (e->xbutton.button == 5) {
-            if ((screen->getCurrentWorkspaceID()+1)>screen->getCount()-1)
+            if ((screen->getCurrentWorkspaceID()+1)>screen->getWorkspaceCount()-1)
               screen->changeWorkspaceID(0);
             else
               screen->changeWorkspaceID(screen->getCurrentWorkspaceID()+1);
@@ -688,7 +688,7 @@ void Openbox::process_event(XEvent *e) {
 	BScreen *screen = searchScreen(e->xclient.window);
 
 	if (screen && e->xclient.data.l[0] >= 0 &&
-	    e->xclient.data.l[0] < screen->getCount())
+	    e->xclient.data.l[0] < screen->getWorkspaceCount())
 	  screen->changeWorkspaceID(e->xclient.data.l[0]);
       } else if (e->xclient.message_type == getOpenboxChangeWindowFocusAtom()) {
 	OpenboxWindow *win = searchWindow(e->xclient.window);
@@ -969,239 +969,181 @@ void Openbox::shutdown(void) {
 
 
 void Openbox::save_rc(void) {
-  XrmDatabase new_openboxrc = (XrmDatabase) 0;
-  char rc_string[1024];
-
-  load_rc();
-
-  sprintf(rc_string, "session.menuFile:  %s", resource.menu_file);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.colorsPerChannel:  %d",
-          resource.colors_per_channel);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.titlebarLayout:  %s",
-          resource.titlebar_layout);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.doubleClickInterval:  %lu",
-          resource.double_click_interval);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.autoRaiseDelay:  %lu",
+  config.setAutoSave(false);
+  
+  config.setValue("session.menuFile", getMenuFilename());
+  config.setValue("session.colorsPerChannel",
+                  resource.colors_per_channel);
+  config.setValue("session.doubleClickInterval",
+                  (long)resource.double_click_interval);
+  config.setValue("session.autoRaiseDelay",
           ((resource.auto_raise_delay.tv_sec * 1000) +
            (resource.auto_raise_delay.tv_usec / 1000)));
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.cacheLife: %lu", resource.cache_life / 60000);
-  XrmPutLineResource(&new_openboxrc, rc_string);
-
-  sprintf(rc_string, "session.cacheMax: %lu", resource.cache_max);
-  XrmPutLineResource(&new_openboxrc, rc_string);
+  config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
+  config.setValue("session.cacheMax", (long)resource.cache_max);
 
   LinkedListIterator<BScreen> it(screenList);
   for (BScreen *screen = it.current(); screen; it++, screen = it.current()) {
-    int screen_number = screen->getScreenNumber();
-
-#ifdef    SLIT
-    char *slit_placement = (char *) 0;
-
-    switch (screen->getSlitPlacement()) {
-    case Slit::TopLeft: slit_placement = "TopLeft"; break;
-    case Slit::CenterLeft: slit_placement = "CenterLeft"; break;
-    case Slit::BottomLeft: slit_placement = "BottomLeft"; break;
-    case Slit::TopCenter: slit_placement = "TopCenter"; break;
-    case Slit::BottomCenter: slit_placement = "BottomCenter"; break;
-    case Slit::TopRight: slit_placement = "TopRight"; break;
-    case Slit::BottomRight: slit_placement = "BottomRight"; break;
-    case Slit::CenterRight: default: slit_placement = "CenterRight"; break;
-    }
-
-    sprintf(rc_string, "session.screen%d.slit.placement: %s", screen_number,
-	    slit_placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.slit.direction: %s", screen_number,
-            ((screen->getSlitDirection() == Slit::Horizontal) ? "Horizontal" :
-                                                                "Vertical"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    const char *rootcmd;
-    if ((rootcmd = screen->getRootCommand()) != NULL) {
-      sprintf(rc_string, "session.screen%d.rootCommand: %s", screen_number,
-              rootcmd);
-      XrmPutLineResource(&new_openboxrc, rc_string);
-    }
-
-    sprintf(rc_string, "session.screen%d.slit.onTop: %s", screen_number,
-            ((screen->getSlit()->isOnTop()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.slit.autoHide: %s", screen_number,
-            ((screen->getSlit()->doAutoHide()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-#endif // SLIT
-
-    sprintf(rc_string, "session.opaqueMove: %s",
-	    ((screen->doOpaqueMove()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.imageDither: %s",
-	    ((screen->getImageControl()->doDither()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.fullMaximization: %s", screen_number,
-	    ((screen->doFullMax()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.focusNewWindows: %s", screen_number,
-            ((screen->doFocusNew()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.focusLastWindow: %s", screen_number,
-	    ((screen->doFocusLast()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.rowPlacementDirection: %s",
-	    screen_number,
-	    ((screen->getRowPlacementDirection() == BScreen::LeftRight) ?
-	     "LeftToRight" : "RightToLeft"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    sprintf(rc_string, "session.screen%d.colPlacementDirection: %s",
-	    screen_number,
-	    ((screen->getColPlacementDirection() == BScreen::TopBottom) ?
-	     "TopToBottom" : "BottomToTop"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+//  ScreenList::iterator it = screenList.begin();
+//  for (; it != screenList.end(); ++it) {
+//    BScreen *screen = *it;
+    char rc_string[1024];
+    const int screen_number = screen->getScreenNumber();
 
     char *placement = (char *) 0;
-    switch (screen->getPlacementPolicy()) {
-    case BScreen::CascadePlacement:
-      placement = "CascadePlacement";
-      break;
 
-    case BScreen::ColSmartPlacement:
-      placement = "ColSmartPlacement";
-      break;
-
-    case BScreen::RowSmartPlacement:
-    default:
-      placement = "RowSmartPlacement";
-      break;
+    switch (screen->getSlitPlacement()) {
+    case Slit::TopLeft: placement = "TopLeft"; break;
+    case Slit::CenterLeft: placement = "CenterLeft"; break;
+    case Slit::BottomLeft: placement = "BottomLeft"; break;
+    case Slit::TopCenter: placement = "TopCenter"; break;
+    case Slit::BottomCenter: placement = "BottomCenter"; break;
+    case Slit::TopRight: placement = "TopRight"; break;
+    case Slit::BottomRight: placement = "BottomRight"; break;
+    case Slit::CenterRight: default: placement = "CenterRight"; break;
     }
-    sprintf(rc_string, "session.screen%d.windowPlacement:  %s", screen_number,
-	    placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.slit.placement", screen_number);
+    config.setValue(rc_string, placement);
 
-    sprintf(rc_string, "session.screen%d.windowZones:  %i", screen_number,
-	    screen->getWindowZones());
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.slit.direction", screen_number);
+    config.setValue(rc_string,
+                    screen->getSlitDirection() == Slit::Horizontal ?
+                    "Horizontal" : "Vertical");
 
-    sprintf(rc_string, "session.screen%d.focusModel:  %s", screen_number,
-	    ((screen->isSloppyFocus()) ?
-	     ((screen->doAutoRaise()) ? "AutoRaiseSloppyFocus" :
-	      "SloppyFocus") :
-	     "ClickToFocus"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.slit.onTop", screen_number);
+    config.setValue(rc_string, screen->getSlit()->isOnTop() ? "True" : "False");
 
-    sprintf(rc_string, "session.screen%d.workspaces:  %d", screen_number,
-	    screen->getCount());
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.slit.autoHide", screen_number);
+    config.setValue(rc_string, screen->getSlit()->doAutoHide() ?
+                    "True" : "False");
 
-    sprintf(rc_string, "session.screen%d.toolbar.onTop:  %s", screen_number,
-	    ((screen->getToolbar()->isOnTop()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    config.setValue("session.opaqueMove",
+                    (screen->doOpaqueMove()) ? "True" : "False");
+    config.setValue("session.imageDither",
+                    (screen->getImageControl()->doDither()) ? "True" : "False");
 
-    sprintf(rc_string, "session.screen%d.toolbar.autoHide:  %s", screen_number,
-	    ((screen->getToolbar()->doAutoHide()) ? "True" : "False"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.fullMaximization", screen_number);
+    config.setValue(rc_string, screen->doFullMax() ? "True" : "False");
 
-    char *toolbar_placement = (char *) 0;
+    sprintf(rc_string, "session.screen%d.focusNewWindows", screen_number);
+    config.setValue(rc_string, screen->doFocusNew() ? "True" : "False");
+
+    sprintf(rc_string, "session.screen%d.focusLastWindow", screen_number);
+    config.setValue(rc_string, screen->doFocusLast() ? "True" : "False");
+
+    sprintf(rc_string, "session.screen%d.rowPlacementDirection", screen_number);
+    config.setValue(rc_string,
+                    screen->getRowPlacementDirection() == BScreen::LeftRight ?
+                    "LeftToRight" : "RightToLeft");
+
+    sprintf(rc_string, "session.screen%d.colPlacementDirection", screen_number);
+    config.setValue(rc_string,
+                    screen->getColPlacementDirection() == BScreen::TopBottom ?
+                    "TopToBottom" : "BottomToTop");
+
+    switch (screen->getPlacementPolicy()) {
+    case BScreen::CascadePlacement: placement = "CascadePlacement"; break;
+    case BScreen::ColSmartPlacement: placement = "ColSmartPlacement"; break;
+    default:
+    case BScreen::RowSmartPlacement: placement = "RowSmartPlacement"; break;
+    }
+    sprintf(rc_string, "session.screen%d.windowPlacement", screen_number);
+    config.setValue(rc_string, placement);
+
+    sprintf(rc_string, "session.screen%d.focusModel", screen_number);
+    config.setValue(rc_string,
+                    (screen->isSloppyFocus() ?
+                     (screen->doAutoRaise() ? "AutoRaiseSloppyFocus" :
+                      "SloppyFocus") : "ClickToFocus"));
+
+    sprintf(rc_string, "session.screen%d.workspaces", screen_number);
+    config.setValue(rc_string, screen->getWorkspaceCount());
+
+    sprintf(rc_string, "session.screen%d.toolbar.onTop", screen_number);
+    config.setValue(rc_string, screen->getToolbar()->isOnTop() ?
+                    "True" : "False");
+
+    sprintf(rc_string, "session.screen%d.toolbar.autoHide", screen_number);
+    config.setValue(rc_string, screen->getToolbar()->doAutoHide() ?
+                    "True" : "False");
 
     switch (screen->getToolbarPlacement()) {
-    case Toolbar::TopLeft: toolbar_placement = "TopLeft"; break;
-    case Toolbar::BottomLeft: toolbar_placement = "BottomLeft"; break;
-    case Toolbar::TopCenter: toolbar_placement = "TopCenter"; break;
-    case Toolbar::TopRight: toolbar_placement = "TopRight"; break;
-    case Toolbar::BottomRight: toolbar_placement = "BottomRight"; break;
-    case Toolbar::BottomCenter: default:
-      toolbar_placement = "BottomCenter"; break;
+    case Toolbar::TopLeft: placement = "TopLeft"; break;
+    case Toolbar::BottomLeft: placement = "BottomLeft"; break;
+    case Toolbar::TopCenter: placement = "TopCenter"; break;
+    case Toolbar::TopRight: placement = "TopRight"; break;
+    case Toolbar::BottomRight: placement = "BottomRight"; break;
+    default:
+    case Toolbar::BottomCenter: placement = "BottomCenter"; break;
     }
 
-    sprintf(rc_string, "session.screen%d.toolbar.placement: %s", screen_number,
-            toolbar_placement);
-    XrmPutLineResource(&new_openboxrc, rc_string);
-
-    load_rc(screen);
-
-    // these are static, but may not be saved in the users .openbox/rc,
-    // writing these resources will allow the user to edit them at a later
-    // time... but loading the defaults before saving allows us to rewrite the
-    // users changes...
+    sprintf(rc_string, "session.screen%d.toolbar.placement", screen_number);
+    config.setValue(rc_string, placement);
 
 #ifdef    HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.strftimeFormat: %s", screen_number,
-	    screen->getStrftimeFormat());
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.strftimeFormat", screen_number);
+    config.setValue(rc_string, screen->getStrftimeFormat());
 #else // !HAVE_STRFTIME
-    sprintf(rc_string, "session.screen%d.dateFormat:  %s", screen_number,
-	    ((screen->getDateFormat() == B_EuropeanDate) ?
-	     "European" : "American"));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.dateFormat", screen_number);
+    config.setValue(rc_string, screen->getDateFormat() == B_EuropeanDate ?
+                    "European" : "American");
 
-    sprintf(rc_string, "session.screen%d.clockFormat:  %d", screen_number,
-	    ((screen->isClock24Hour()) ? 24 : 12));
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.clockFormat", screen_number);
+    config.setValue(rc_string, screen->isClock24Hour() ? 24 : 12);
 #endif // HAVE_STRFTIME
 
-    sprintf(rc_string, "session.screen%d.edgeSnapThreshold: %d", screen_number,
-	    screen->getEdgeSnapThreshold());
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.edgeSnapThreshold", screen_number);
+    config.setValue(rc_string, screen->getEdgeSnapThreshold());
 
-    sprintf(rc_string, "session.screen%d.toolbar.widthPercent:  %d",
-            screen_number, screen->getToolbarWidthPercent());
-    XrmPutLineResource(&new_openboxrc, rc_string);
+    sprintf(rc_string, "session.screen%d.toolbar.widthPercent", screen_number);
+    config.setValue(rc_string, screen->getToolbarWidthPercent());
 
-    // write out the users workspace names
+    // write out the user's workspace names
     int i, len = 0;
-    for (i = 0; i < screen->getCount(); i++)
+    for (i = 0; i < screen->getWorkspaceCount(); i++)
       len += strlen((screen->getWorkspace(i)->getName()) ?
-		    screen->getWorkspace(i)->getName() : "Null") + 1;
+        screen->getWorkspace(i)->getName() : "Null") + 1;
 
     char *resource_string = new char[len + 1024],
       *save_string = new char[len], *save_string_pos = save_string,
       *name_string_pos;
     if (save_string) {
-      for (i = 0; i < screen->getCount(); i++) {
-	len = strlen((screen->getWorkspace(i)->getName()) ?
-		     screen->getWorkspace(i)->getName() : "Null") + 1;
-	name_string_pos =
-	  (char *) ((screen->getWorkspace(i)->getName()) ?
-		    screen->getWorkspace(i)->getName() : "Null");
-
-	while (--len) *(save_string_pos++) = *(name_string_pos++);
-	*(save_string_pos++) = ',';
+      for (i = 0; i < screen->getWorkspaceCount(); i++) {
+        len = strlen((screen->getWorkspace(i)->getName()) ?
+         screen->getWorkspace(i)->getName() : "Null") + 1;
+        name_string_pos =
+          (char *) ((screen->getWorkspace(i)->getName()) ?
+                    screen->getWorkspace(i)->getName() : "Null");
+        
+        while (--len) *(save_string_pos++) = *(name_string_pos++);
+        *(save_string_pos++) = ',';
       }
     }
 
     *(--save_string_pos) = '\0';
 
-    sprintf(resource_string, "session.screen%d.workspaceNames:  %s",
-	    screen_number, save_string);
-    XrmPutLineResource(&new_openboxrc, resource_string);
+    sprintf(resource_string, "session.screen%d.workspaceNames", screen_number);
+    config.setValue(resource_string, save_string);
 
     delete [] resource_string;
     delete [] save_string;
+/*
+    std::string save_string = screen->getWorkspace(0)->getName();
+    for (unsigned int i = 1; i < screen->getWorkspaceCount(); ++i) {
+      save_string += ',';
+      save_string += screen->getWorkspace(i)->getName();
+    }
+
+    char *resource_string = new char[save_string.length() + 48];
+    sprintf(resource_string, "session.screen%d.workspaceNames", screen_number);
+    config.setValue(rc_string, save_string);
+
+    delete [] resource_string;*/
   }
 
-  XrmDatabase old_openboxrc = XrmGetFileDatabase(rc_file);
-
-  XrmMergeDatabases(new_openboxrc, &old_openboxrc);
-  XrmPutFileDatabase(old_openboxrc, rc_file);
-  XrmDestroyDatabase(old_openboxrc);
+  config.setAutoSave(true);
+  config.save();
 }
-
 
 void Openbox::load_rc(void) {
   if (!config.load())
@@ -1391,6 +1333,7 @@ void Openbox::load_rc(BScreen *screen) {
   sprintf(name_lookup,  "session.screen%d.focusModel", screen_number);
   sprintf(class_lookup, "Session.Screen%d.FocusModel", screen_number);
   if (config.getValue(name_lookup, class_lookup, s)) {
+    cout << s << endl;
     if (0 == strncasecmp(s.c_str(), "clicktofocus", s.length())) {
       screen->saveAutoRaise(False);
       screen->saveSloppyFocus(False);

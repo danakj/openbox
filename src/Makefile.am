@@ -45,65 +45,65 @@ BaseDisplay.o: BaseDisplay.cc i18n.h BaseDisplay.h LinkedList.h \
 Basemenu.o: Basemenu.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h
+ Workspace.h Workspacemenu.h Resource.h
 Clientmenu.o: Clientmenu.cc openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Clientmenu.h Workspace.h Screen.h Configmenu.h Netizen.h \
- Rootmenu.h Workspacemenu.h
+ Rootmenu.h Workspacemenu.h Resource.h
 Configmenu.o: Configmenu.cc i18n.h Configmenu.h Basemenu.h \
  LinkedList.h Screen.h BaseDisplay.h Timer.h Iconmenu.h Netizen.h \
  Rootmenu.h Workspace.h Workspacemenu.h openbox.h Image.h \
- Window.h Windowmenu.h Slit.h Toolbar.h
+ Window.h Windowmenu.h Slit.h Toolbar.h Resource.h
 Icon.o: Iconmenu.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
+ Workspacemenu.h Toolbar.h Resource.h
 Image.o: Image.cc i18n.h BaseDisplay.h LinkedList.h Timer.h \
  Image.h
 LinkedList.o: LinkedList.cc LinkedList.h
 Netizen.o: Netizen.cc Netizen.h BaseDisplay.h LinkedList.h Timer.h \
  Screen.h Configmenu.h Basemenu.h openbox.h Image.h Window.h \
  Iconmenu.h Windowmenu.h Slit.h Rootmenu.h Workspace.h \
- Workspacemenu.h
+ Workspacemenu.h Resource.h
 Rootmenu.o: Rootmenu.cc openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Rootmenu.h Screen.h Configmenu.h Netizen.h Workspace.h \
- Workspacemenu.h
+ Workspacemenu.h Resource.h
 Screen.o: Screen.cc i18n.h bsd-snprintf.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Screen.h Configmenu.h \
- Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h
+ Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h Resource.h
 Slit.o: Slit.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
+ Workspacemenu.h Toolbar.h Resource.h
 Timer.o: Timer.cc BaseDisplay.h LinkedList.h Timer.h
 Toolbar.o: Toolbar.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Clientmenu.h Workspace.h Rootmenu.h Screen.h Configmenu.h \
- Netizen.h Workspacemenu.h Toolbar.h
+ Netizen.h Workspacemenu.h Toolbar.h Resource.h
 Window.o: Window.cc i18n.h openbox.h BaseDisplay.h LinkedList.h \
  Timer.h Image.h Window.h Iconmenu.h Basemenu.h Windowmenu.h Slit.h \
  Screen.h Configmenu.h Netizen.h Rootmenu.h Workspace.h \
- Workspacemenu.h Toolbar.h
+ Workspacemenu.h Toolbar.h Resource.h
 Windowmenu.o: Windowmenu.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h
+ Workspace.h Workspacemenu.h Resource.h
 Workspace.o: Workspace.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Screen.h \
- Configmenu.h Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h
+ Configmenu.h Netizen.h Rootmenu.h Workspacemenu.h Toolbar.h Resource.h
 Workspacemenu.o: Workspacemenu.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Screen.h Configmenu.h Netizen.h Rootmenu.h \
- Workspace.h Workspacemenu.h Toolbar.h
+ Workspace.h Workspacemenu.h Toolbar.h Resource.h
 openbox.o: openbox.cc i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
  Windowmenu.h Slit.h Clientmenu.h Workspace.h Rootmenu.h \
- Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h
+ Screen.h Configmenu.h Netizen.h Workspacemenu.h Toolbar.h Resource.h
 bsd-snprintf.o: bsd-snprintf.c bsd-snprintf.h
 i18n.o: i18n.cc i18n.h
 main.o: main.cc ../version.h i18n.h openbox.h BaseDisplay.h \
  LinkedList.h Timer.h Image.h Window.h Iconmenu.h Basemenu.h \
- Windowmenu.h Slit.h
+ Windowmenu.h Slit.h Resource.h

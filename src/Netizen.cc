@@ -53,7 +53,7 @@ Netizen::Netizen(BScreen *scr, Window win) {
 
 void Netizen::sendWorkspaceCount(void) {
   event.xclient.data.l[0] = basedisplay->getOpenboxNotifyWorkspaceCountAtom();
-  event.xclient.data.l[1] = screen->getCount();
+  event.xclient.data.l[1] = screen->getWorkspaceCount();
 
   XSendEvent(basedisplay->getXDisplay(), window, False, NoEventMask, &event);
 }

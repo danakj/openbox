@@ -52,6 +52,8 @@
 #endif // SLIT
 #include "Image.h"
 
+#include <strstream>
+
 // forward declaration
 class BScreen;
 
@@ -239,7 +241,7 @@ public:
 
   inline const int getCurrentWorkspaceID()
   { return current_workspace->getWorkspaceID(); }
-  inline const int getCount(void) { return workspacesList->count(); }
+  inline const int getWorkspaceCount(void) { return workspacesList->count(); }
   inline const int getIconCount(void) { return iconList->count(); }
   inline const int &getNumberOfWorkspaces(void) const
   { return resource.workspaces; }

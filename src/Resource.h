@@ -52,6 +52,7 @@ public:
   bool load();
 
   void setValue(const std::string &rname, bool value);
+  void setValue(const std::string &rname, int value);
   void setValue(const std::string &rname, long value);
   void setValue(const std::string &rname, const std::string &value);
   void setValue(const std::string &rname, const char *value);

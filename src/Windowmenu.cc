@@ -171,7 +171,7 @@ Windowmenu::SendtoWorkspacemenu::SendtoWorkspacemenu(Windowmenu *w)
 void Windowmenu::SendtoWorkspacemenu::itemSelected(int button, int index) {
   if (button > 2) return;
 
-  if (index <= windowmenu->screen->getCount()) {
+  if (index <= windowmenu->screen->getWorkspaceCount()) {
     if (index == windowmenu->screen->getCurrentWorkspaceID()) return;
     if (windowmenu->window->isStuck()) windowmenu->window->stick();
 
@@ -190,7 +190,7 @@ void Windowmenu::SendtoWorkspacemenu::update(void) {
     for (i = 0; i < r; ++i)
       remove(0);
 
-  for (i = 0; i < windowmenu->screen->getCount(); ++i)
+  for (i = 0; i < windowmenu->screen->getWorkspaceCount(); ++i)
     insert(windowmenu->screen->getWorkspace(i)->getName());
 
   Basemenu::update();

@@ -284,7 +284,7 @@ OpenboxWindow::OpenboxWindow(Openbox *b, Window w, BScreen *s) {
 
   decorate();
 
-  if (workspace_number < 0 || workspace_number >= screen->getCount())
+  if (workspace_number < 0 || workspace_number >= screen->getWorkspaceCount())
     screen->getCurrentWorkspace()->addWindow(this, place_window);
   else
     screen->getWorkspace(workspace_number)->addWindow(this, place_window);
@@ -1927,7 +1927,7 @@ void OpenboxWindow::restoreAttributes(void) {
   }
 
   if (((int) openbox_attrib.workspace != screen->getCurrentWorkspaceID()) &&
-      ((int) openbox_attrib.workspace < screen->getCount())) {
+      ((int) openbox_attrib.workspace < screen->getWorkspaceCount())) {
     screen->reassociateWindow(this, openbox_attrib.workspace, True);
 
     if (current_state == NormalState) current_state = WithdrawnState;
@@ -2688,9 +2688,10 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
           (re->x >= 0) && ((unsigned) re->x <= frame.button_w) &&
           (re->y >= 0) && ((unsigned) re->y <= frame.button_h)) {
           close();
-      } else {
-        redrawCloseButton(False);
       }
+      //we should always redraw the close button. some applications
+      //eg. acroread don't honour the close.
+      redrawCloseButton(False);
     }
   // middle button released
   } else if (re->button == 2) {

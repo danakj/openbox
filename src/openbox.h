@@ -145,6 +145,9 @@ public:
   BScreen *getScreen(int);
   BScreen *searchScreen(Window);
 
+  inline obResource &getConfig() {
+    return config;
+  }
   inline const Time &getDoubleClickInterval(void) const
     { return resource.double_click_interval; }
   inline const Time &getLastTime(void) const { return last_time; }

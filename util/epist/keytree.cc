@@ -195,13 +195,8 @@ void keytree::addAction(Action::ActionType action, unsigned int mask,
   }
 
   KeySym sym = XStringToKeysym(key.c_str());
-
-  if (sym == 0) {
-    std::cerr << "Key " << key << " is invalid! (Action ignored)\n";
-    return;
-  }
-
   keynode *tmp = new keynode;
+
   tmp->action = new Action(action,
                            XKeysymToKeycode(_display, sym),
                            mask, arg);
@@ -229,10 +224,10 @@ void keytree::setCurrentNodeProps(Action::ActionType action, unsigned int mask,
 {
   if (_current->action)
     delete _current->action;
-  
+
+  KeySym sym = XStringToKeysym(key.c_str());
   _current->action = new Action(action,
-                                XKeysymToKeycode(_display,
-                                                 XStringToKeysym(key.c_str())),
+                                XKeysymToKeycode(_display, sym),
                                 mask, arg);
 }
 

@@ -36,9 +36,6 @@ public:
 
   void parse(std::string);
 
-  void setKey(std::string key)
-  {  _key = key; }
-
   void setArgumentNum(std::string arg)
   { _arg = arg; }
 
@@ -57,6 +54,7 @@ public:
   void setOption(std::string opt)
   { _config->addOption(opt, _arg); }
 
+  void setKey(std::string);
   void setAction(std::string);
   void addModifier(std::string);
   void endAction();

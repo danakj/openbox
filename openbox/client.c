@@ -665,22 +665,24 @@ void client_update_transient_for(Client *self)
     Window t = None;
     Client *c = NULL;
 
-    if (XGetTransientForHint(ob_display, self->window, &t) &&
-	t != self->window) { /* cant be transient to itself! */
+    if (XGetTransientForHint(ob_display, self->window, &t)) {
 	self->transient = TRUE;
-	c = g_hash_table_lookup(client_map, &t);
-	g_assert(c != self);/* if this happens then we need to check for it*/
-
-	if (!c && self->group) {
-	    /* not transient to a client, see if it is transient for a
-	       group */
-	    if (t == self->group->leader ||
-		t == None ||
-		t == ob_root) {
-		/* window is a transient for its group! */
-                c = TRAN_GROUP;
-	    }
-	}
+        if (t != self->window) { /* cant be transient to itself! */
+            c = g_hash_table_lookup(client_map, &t);
+            /* if this happens then we need to check for it*/
+            g_assert(c != self);
+            
+            if (!c && self->group) {
+                /* not transient to a client, see if it is transient for a
+                   group */
+                if (t == self->group->leader ||
+                    t == None ||
+                    t == ob_root) {
+                    /* window is a transient for its group! */
+                    c = TRAN_GROUP;
+                }
+            }
+        }
     } else
 	self->transient = FALSE;
 
@@ -691,7 +693,8 @@ void client_update_transient_for(Client *self)
 
 	    /* remove from old parents */
             for (it = self->group->members; it; it = it->next)
-                if (it->data != self)
+                if (it->data != self &&
+                    (((Client*)it->data)->transient_for != TRAN_GROUP))
                     ((Client*)it->data)->transients =
                         g_slist_remove(((Client*)it->data)->transients, self);
         } else if (self->transient_for != NULL) { /* transient of window */
@@ -705,9 +708,22 @@ void client_update_transient_for(Client *self)
 
 	    /* add to new parents */
             for (it = self->group->members; it; it = it->next)
-                if (it->data != self)
+                if (it->data != self &&
+                    (((Client*)it->data)->transient_for != TRAN_GROUP))
                     ((Client*)it->data)->transients =
                         g_slist_append(((Client*)it->data)->transients, self);
+
+            /* remove all transients which are in the group, that causes
+               circlular pointer hell of doom */
+            for (it = self->group->members; it; it = it->next) {
+                GSList *sit, *next;
+                for (sit = self->transients; sit; sit = next) {
+                    next = sit->next;
+                    if (sit->data == it->data)
+                        self->transients = g_slist_remove(self->transients,
+                                                          sit->data);
+                }
+            }
         } else if (self->transient_for != NULL) { /* transient of window */
 	    /* add to new parent */
 	    self->transient_for->transients =

@@ -320,7 +320,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
 
 void focus_fallback(ObFocusFallbackType type)
 {
-    ObClient *new;
+    ObClient *new = focus_fallback_target(type);
 
     /* unfocus any focused clients.. they can be focused by Pointer events
        and such, and then when I try focus them, I won't get a FocusIn event
@@ -328,7 +328,7 @@ void focus_fallback(ObFocusFallbackType type)
     */
     focus_set_client(NULL);
 
-    if ((new = focus_fallback_target(type)))
+    if (new)
         client_focus(new);
 }
 

@@ -101,6 +101,14 @@ PyObject *mbind(const std::string &button, ob::MouseContext::MC context,
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
     return NULL;
   }
+  if(context < 0 || context >= MouseContext::NUM_MOUSE_CONTEXT) {
+    PyErr_SetString(PyExc_ValueError, "Invalid MouseContext");
+    return NULL;
+  }
+  if(action < 0 || action >= MouseAction::NUM_MOUSE_ACTION) {
+    PyErr_SetString(PyExc_ValueError, "Invalid MouseAction");
+    return NULL;
+  }
   
   if (!ob::openbox->bindings()->addButton(button, context,
                                           action, func)) {

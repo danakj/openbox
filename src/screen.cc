@@ -512,8 +512,7 @@ void Screen::manageWindow(Window window)
   // reparent the client to the frame
   client->frame->grabClient();
 
-  if (!(openbox->state() == Openbox::State_Starting ||
-        client->positionRequested())) {
+  if (openbox->state() != Openbox::State_Starting) {
     // position the window intelligenty .. hopefully :)
     // call the python PLACEWINDOW binding
     EventData data(_number, client, EventAction::PlaceWindow, 0);

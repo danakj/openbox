@@ -398,10 +398,13 @@ void focus_directional_cycle(ObDirection dir,
             focus_cycle_target = ft;
             frame_adjust_focus(focus_cycle_target->frame, TRUE);
         }
-        popup_cycle(ft, dialog);
+    }
+    if (focus_cycle_target) {
+        popup_cycle(focus_cycle_target, dialog);
         if (dialog)
             return;
     }
+
 
 done_cycle:
     if (done && focus_cycle_target)

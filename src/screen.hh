@@ -74,8 +74,6 @@ private:
   StrutList _struts;
 
 
-  //! Manage any pre-existing windows on the screen
-  void manageExisting();
   //! Calculate the OBScreen::_area member
   void calcArea();
   //! Set the client list on the root window
@@ -119,6 +117,8 @@ public:
   //! Loads a new style on the screen
   void loadStyle(const otk::Configuration &config);
 
+  //! Manage any pre-existing windows on the screen
+  void manageExisting();
   //! Manage a client window
   /*!
     This gives the window a frame, reparents it, selects events on it, etc.

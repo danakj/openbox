@@ -92,10 +92,6 @@ OBScreen::OBScreen(int screen, const otk::Configuration &config)
   // the manageExising() function
   setClientList();     // initialize the client lists, which will be empty
   calcArea();          // initialize the available working area
-
-  manageExisting();
-
-  // XXX: "change to" the first workspace to initialize stuff
 }
 
 
@@ -331,7 +327,7 @@ void OBScreen::manageWindow(Window window)
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
 
-  // XXX: manage the window, i.e. grab events n shit
+  printf("Managing Window: %lx\n", window);
 
   // is the window a docking app
   if ((wmhint = XGetWMHints(otk::OBDisplay::display, window))) {

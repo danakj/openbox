@@ -405,7 +405,7 @@ void OBFrame::grabClient()
                OBClient::event_mask);
 
   // raise the client above the frame
-  XRaiseWindow(otk::OBDisplay::display, _client->window());
+  //XRaiseWindow(otk::OBDisplay::display, _client->window());
   // map the client so it maps when the frame does
   XMapWindow(otk::OBDisplay::display, _client->window());
   
@@ -454,7 +454,6 @@ Window OBFrame::createChild(Window parent, Cursor cursor)
   Window w = XCreateWindow(otk::OBDisplay::display, parent, 0, 0, 1, 1, 0,
                            _screen->getDepth(), InputOutput,
                            _screen->getVisual(), create_mask, &attrib_create);
-  XRaiseWindow(otk::OBDisplay::display, w); // raise above the parent
   return w;
 }
 

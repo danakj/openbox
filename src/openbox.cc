@@ -129,6 +129,8 @@ Openbox::Openbox(int argc, char **argv)
 
   // initialize all the screens
   _screens.push_back(new OBScreen(0, _config));
+  _screens[0]->manageExisting();
+  // XXX: "change to" the first workspace on the screen to initialize stuff
   
   _state = State_Normal; // done starting
 }

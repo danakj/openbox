@@ -1,6 +1,7 @@
 #ifndef __menu_h
 #define __menu_h
 
+#include "action.h"
 #include <glib.h>
 
 typedef struct Menu {

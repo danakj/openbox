@@ -538,22 +538,76 @@ Point *const Workspace::cascadePlacement(const OpenboxWindow *const win){
 void Workspace::placeWindow(OpenboxWindow *win) {
   ASSERT(win != NULL);
 
+  // the following code is temporary and will be taken care of by Screen in the
+  // future (with the NETWM 'strut')
+  Rect space(0, 0, screen.size().w(), screen.size().h());
+
+  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
+#ifdef    SLIT
+  Slit *slit = screen.getSlit();
+  int remove;   // 0 - top/2 - right/2 - bottom/3 - left
+  if ((slit->direction() == Slit::Horizontal &&
+       (slit->placement() == Slit::TopLeft ||
+        slit->placement() == Slit::TopRight)) ||
+      slit->placement() == Slit::TopCenter)
+    remove = 0;
+  else if ((slit->direction() == Slit::Vertical &&
+            (slit->placement() == Slit::TopRight ||
+             slit->placement() == Slit::BottomRight)) ||
+           slit->placement() == Slit::CenterRight)
+    remove = 1;
+  else if ((slit->direction() == Slit::Horizontal &&
+            (slit->placement() == Slit::BottomLeft ||
+             slit->placement() == Slit::BottomRight)) ||
+           slit->placement() == Slit::TopCenter)
+    remove = 2;
+  else// if ((slit->direction() == Slit::Vertical &&
+      //      (slit->placement() == Slit::TopLeft ||
+      //       slit->placement() == Slit::BottomLeft)) ||
+      //     slit->placement() == Slit::CenterLeft)
+    remove = 3;
+  switch (remove) {
+  case 0: // top
+    space.setY(slit->area().h() + screen.getBorderWidth() * 2);
+    break;
+  case 1: // right
+    space.setW(screen.size().w() -
+               (slit->area().w() + screen.getBorderWidth() * 2));
+    break;
+  case 2: // bottom
+    space.setH(screen.size().h() -
+               (slit->area().h() + screen.getBorderWidth() * 2));
+    break;
+  case 3: // left
+    space.setX(slit->area().w() + screen.getBorderWidth() * 2);
+    break;
+  }
+#endif
+
+  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
+  Toolbar *toolbar = screen.getToolbar();
+  int tbarh = screen.hideToolbar() ? 0 :
+    toolbar->getExposedHeight() + screen.getBorderWidth() * 2;
+  switch (toolbar->placement()) {
+  case Toolbar::TopLeft:
+  case Toolbar::TopCenter:
+  case Toolbar::TopRight:
+    if (tbarh > space.y())
+      space.setY(toolbar->getExposedHeight());
+    break;
+  case Toolbar::BottomLeft:
+  case Toolbar::BottomCenter:
+  case Toolbar::BottomRight:
+    if (screen.size().h() - tbarh < space.h())
+      space.setH(screen.size().h() - tbarh);
+    break;
+  default:
+    ASSERT(false);      // unhandled placement
+  }
+  cout << "space: x: " << space.x() << " y: " << space.y() << " w: " << space.w() << " h: " << space.h() << endl;
+
   const int win_w = win->size().w() + (screen.getBorderWidth() * 4),
     win_h = win->size().h() + (screen.getBorderWidth() * 4),
-#ifdef    SLIT
-    slit_x = screen.getSlit()->area().x() - screen.getBorderWidth(),
-    slit_y = screen.getSlit()->area().y() - screen.getBorderWidth(),
-    slit_w = screen.getSlit()->area().w() +
-      (screen.getBorderWidth() * 4),
-    slit_h = screen.getSlit()->area().h() +
-      (screen.getBorderWidth() * 4),
-#endif // SLIT
-    toolbar_x = screen.getToolbar()->getX() - screen.getBorderWidth(),
-    toolbar_y = screen.getToolbar()->getY() - screen.getBorderWidth(),
-    toolbar_w = screen.getToolbar()->getWidth() +
-      (screen.getBorderWidth() * 4),
-    toolbar_h = screen.getToolbar()->getHeight() + 
-      (screen.getBorderWidth() * 4),
     start_pos = 0,
     change_y =
       ((screen.colPlacementDirection() == BScreen::TopBottom) ? 1 : -1),
@@ -563,10 +617,6 @@ void Workspace::placeWindow(OpenboxWindow *win) {
 
   LinkedListIterator<OpenboxWindow> it(windowList);
 
-  Rect space(0, 0,
-             screen.size().w(),
-             screen.size().h()
-            );
   Size window_size(win->size().w()+screen.getBorderWidth() * 4,
                    win->size().h()+screen.getBorderWidth() * 4);
   Point *place = NULL;

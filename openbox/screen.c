@@ -487,10 +487,12 @@ void screen_install_colormap(Client *client, gboolean install)
     } else {
 	if (XGetWindowAttributes(ob_display, client->window, &wa) &&
             wa.colormap != None) {
+            xerror_set_ignore(TRUE);
 	    if (install)
 		XInstallColormap(ob_display, wa.colormap);
 	    else
 		XUninstallColormap(ob_display, wa.colormap);
+            xerror_set_ignore(FALSE);
 	}
     }
 }

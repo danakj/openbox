@@ -32,16 +32,6 @@ void font_startup(void)
 static void measure_height(ObFont *f)
 {
     XGlyphInfo info;
-    char *str;
-
-    /* XXX add some extended UTF8 characters in here? */
-    str = "12345678900-qwertyuiopasdfghjklzxcvbnm"
-        "!@#$%^&*()_+QWERTYUIOPASDFGHJKLZXCVBNM"
-        "`~[]\\;',./{}|:\"<>?";
-
-    XftTextExtentsUtf8(ob_display, f->xftfont,
-                       (FcChar8*)str, strlen(str), &info);
-    f->height = (signed) info.height;
 
     /* measure an elipses */
     XftTextExtentsUtf8(ob_display, f->xftfont,
@@ -83,19 +73,28 @@ void font_close(ObFont *f)
     }
 }
 
-int font_measure_string(ObFont *f, char *str, int shadow, int offset)
+void font_measure_full(ObFont *f, char *str, int shadow, int offset,
+                       int *x, int *y)
 {
     XGlyphInfo info;
 
     XftTextExtentsUtf8(ob_display, f->xftfont,
                        (FcChar8*)str, strlen(str), &info);
 
-    return (signed) info.xOff + (shadow ? offset : 0);
+    *x = (signed) info.xOff + (shadow ? ABS(offset) : 0);
+    *y = info.height + (shadow ? ABS(offset) : 0);
+}
+
+int font_measure_string(ObFont *f, char *str, int shadow, int offset)
+{
+    int x, y;
+    font_measure_full (f, str, shadow, offset, &x, &y);
+    return x;
 }
 
 int font_height(ObFont *f, int shadow, int offset)
 {
-    return f->height + (shadow ? offset : 0);
+    return f->xftfont->ascent + f->xftfont->descent + (shadow ? offset : 0);
 }
 
 int font_max_char_width(ObFont *f)
@@ -108,7 +107,7 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     int x,y,w,h;
     XftColor c;
     GString *text;
-    int m, em;
+    int mw, em, mh;
     size_t l;
     gboolean shortened = FALSE;
 
@@ -116,14 +115,10 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     w = position->width;
     h = position->height;
 
-    /* accomidate for areas bigger/smaller than Xft thinks the font is tall */
-    y -= (2 * (t->font->xftfont->ascent + t->font->xftfont->descent) -
-          (t->font->height + h) - 1) / 2;
-
     text = g_string_new(t->string);
     l = g_utf8_strlen(text->str, -1);
-    m = font_measure_string(t->font, text->str, t->shadow, t->offset);
-    while (l && m > position->width) {
+    font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
+    while (l && mw > position->width) {
         shortened = TRUE;
         /* remove a character from the middle */
         text = g_string_erase(text, l-- / 2, 1);
@@ -131,7 +126,8 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
         /* if the elipses are too large, don't show them at all */
         if (em > position->width)
             shortened = FALSE;
-        m = font_measure_string(t->font, text->str, t->shadow, t->offset) + em;
+        font_measure_full(t->font, text->str, t->shadow, t->offset, &mw, &mh);
+        mw += em;
     }
     if (shortened) {
         text = g_string_insert(text, (l + 1) / 2, ELIPSES);
@@ -139,15 +135,18 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
     }
     if (!l) return;
 
+    /* center vertically */
+    y -= ((t->font->xftfont->ascent + t->font->xftfont->descent) - mh) / 2;
+
     switch (t->justify) {
     case Justify_Left:
         x = position->x;
         break;
     case Justify_Right:
-        x = position->x + (w - m);
+        x = position->x + (w - mw);
         break;
     case Justify_Center:
-        x = position->x + (w - m) / 2;
+        x = position->x + (w - mw) / 2;
         break;
     }
 

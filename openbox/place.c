@@ -71,7 +71,6 @@ static GSList* area_add(GSList *list, Rect *a)
     return g_slist_prepend(list, r);
 }
 
-
 static GSList* area_remove(GSList *list, Rect *a)
 {
     GSList *sit;

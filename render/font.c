@@ -108,13 +108,22 @@ void font_draw(XftDraw *d, TextureText *t, Rect *position)
 
     x += 3; /* XXX figure out X with justification */
 
+    g_message("SHADOW %d %d %d", t->shadow, t->offset, t->tint);
     if (t->shadow) {
-        c.color.red = 0;
-        c.color.green = 0;
-        c.color.blue = 0;
-        c.color.alpha = t->tint | t->tint << 8; /* transparent shadow */
-        c.pixel = BlackPixel(ob_display, ob_screen);
-  
+
+        if (t->tint >= 0) {
+            c.color.red = 0;
+            c.color.green = 0;
+            c.color.blue = 0;
+            c.color.alpha = 0xffff * t->tint / 100; /* transparent shadow */
+            c.pixel = BlackPixel(ob_display, ob_screen);
+        } else {
+            c.color.red = 0xffff * -t->tint / 100;
+            c.color.green = 0xffff * -t->tint / 100;
+            c.color.blue = 0xffff * -t->tint / 100;
+            c.color.alpha = 0xffff * -t->tint / 100; /* transparent shadow */
+            c.pixel = WhitePixel(ob_display, ob_screen);
+        }  
         XftDrawStringUtf8(d, &c, t->font->xftfont, x + t->offset,
                           t->font->xftfont->ascent + y + t->offset,
                           (FcChar8*)t->string, strlen(t->string));

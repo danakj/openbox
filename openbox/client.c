@@ -1916,20 +1916,32 @@ void client_set_state(Client *self, Atom action, long data1, long data2)
     client_change_state(self); /* change the hint to relect these changes */
 }
 
-gboolean client_focus(Client *self)
+Client *client_focus_target(Client *self)
 {
-    XEvent ev;
     Client *child;
      
     /* if we have a modal child, then focus it, not us */
     child = client_find_modal_child(self);
-    if (child)
-	return client_focus(child);
+    if (child) return child;
+    return self;
+}
 
+gboolean client_focusable(Client *self)
+{
     /* won't try focus if the client doesn't want it, or if the window isn't
        visible on the screen */
-    if (!(self->frame->visible &&
-	  (self->can_focus || self->focus_notify)))
+    return self->frame->visible &&
+        (self->can_focus || self->focus_notify);
+}
+
+gboolean client_focus(Client *self)
+{
+    XEvent ev;
+
+    /* choose the correct target */
+    self = client_focus_target(self);
+
+    if (!client_focusable(self))
 	return FALSE;
 
     /* do a check to see if the window has already been unmapped or destroyed
@@ -1984,6 +1996,7 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
+    g_message("client_unfocus");
     focus_fallback(FALSE);
 }
 

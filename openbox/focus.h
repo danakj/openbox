@@ -12,10 +12,6 @@ extern Window focus_backup;
 /*! The client which is currently focused */
 extern struct Client *focus_client;
 
-/* The number of FocusIn events which should be ignored for tracking the focus
-   order */
-extern int focus_ignore_in;
-
 /*! The recent focus order on each desktop */
 extern GList **focus_order;
 
@@ -33,5 +29,9 @@ void focus_set_client(struct Client *client);
 
 /*! Call this when you need to focus something! */
 void focus_fallback(gboolean switching_desks);
+
+/*! Cycle focus amongst windows */
+void focus_cycle(gboolean forward, gboolean linear, gboolean done,
+                 gboolean cancel);
 
 #endif

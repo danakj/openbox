@@ -7,6 +7,7 @@
 #include "dispatch.h"
 #include "focus.h"
 #include "parse.h"
+#include "engine.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -18,7 +19,8 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 Window focus_backup = None;
 gboolean focus_new = TRUE;
 gboolean focus_follow = TRUE;
-int focus_ignore_in = 0;
+
+static gboolean noreorder = 0;
 
 static void parse_assign(char *name, ParseToken *value)
 {
@@ -79,11 +81,21 @@ void focus_shutdown()
                    event_lasttime);
 }
 
+static void push_to_top(Client *client)
+{
+    guint desktop;
+
+    desktop = client->desktop;
+    if (desktop == DESKTOP_ALL) desktop = screen_desktop;
+    focus_order[desktop] = g_list_remove(focus_order[desktop], client);
+    focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
+    g_message("REORDERING");
+}
+
 void focus_set_client(Client *client)
 {
     Window active;
     Client *old;
-    guint desktop;
 
     /* uninstall the old colormap, and install the new one */
     screen_install_colormap(focus_client, FALSE);
@@ -100,15 +112,10 @@ void focus_set_client(Client *client)
     focus_client = client;
 
     /* move to the top of the list */
-    if (focus_ignore_in) {
-        g_assert(focus_ignore_in > 0);
-        --focus_ignore_in;
-    } else if (client != NULL) {
-        desktop = client->desktop;
-        if (desktop == DESKTOP_ALL) desktop = screen_desktop;
-        focus_order[desktop] = g_list_remove(focus_order[desktop], client);
-        focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
-    }
+    if (noreorder)
+        --noreorder;
+    else if (client != NULL)
+        push_to_top(client);
 
     /* set the NET_ACTIVE_WINDOW hint */
     active = client ? client->window : None;
@@ -170,4 +177,56 @@ void focus_fallback(gboolean switching_desks)
         if (it == NULL) /* nothing to focus */
             focus_set_client(NULL);
     }
+}
+
+void focus_cycle(gboolean forward, gboolean linear, gboolean done,
+                 gboolean cancel)
+{
+    static Client *first = NULL;
+    static Client *t = NULL;
+    static GList *order = NULL;
+    GList *it, *start, *list;
+    Client *ft;
+
+    if (cancel) {
+        if (first) client_focus(first);
+        goto done_cycle;
+    } else if (done) {
+        if (focus_client) {
+            push_to_top(focus_client); /* move to top of focus_order */
+            stacking_raise(focus_client);
+        }
+        goto done_cycle;
+    }
+    if (!first) first = focus_client;
+
+    if (linear) list = client_list;
+    else        list = focus_order[screen_desktop];
+
+    start = it = g_list_find(list, focus_client);
+    if (!start) goto done_cycle; /* switched desktops or something? */
+
+    do {
+        if (forward) {
+            it = it->next;
+            if (it == NULL) it = list;
+        } else {
+            it = it->prev;
+            if (it == NULL) it = g_list_last(list);
+        }
+        ft = client_focus_target(it->data);
+        if (ft == it->data && focus_client != ft && client_focusable(ft)) {
+            if (client_focus(ft)) {
+                noreorder++; /* avoid reordering the focus_order */
+                break;
+            }
+        }
+    } while (it != start);
+    return;
+
+done_cycle:
+    t = NULL;
+    first = NULL;
+    g_list_free(order);
+    order = NULL;
 }

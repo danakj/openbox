@@ -410,6 +410,14 @@ void client_set_wm_state(Client *self, long state);
 */
 void client_set_state(Client *self, Atom action, long data1, long data2);
 
+/* Given a Client, find the client that focus would actually be sent to if
+   you wanted to give focus to the specified Client. Will return the same
+   Client passed to it or another Client if appropriate. */
+Client *client_focus_target(Client *self);
+
+/* Returns if a client can be focused or not */
+gboolean client_focusable(Client *self);
+
 /*! Attempt to focus the client window */
 gboolean client_focus(Client *self);
 

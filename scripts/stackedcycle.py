@@ -212,6 +212,7 @@ class cycledata:
 
     def grabfunc(self, data):
         done = 0
+        notreverting = 1
         # have all the modifiers this started with been released?
         if (data.action == ob.KeyAction.Release and
             not self.state & data.state):
@@ -219,13 +220,15 @@ class cycledata:
         # has Escape been pressed?
         elif data.action == ob.KeyAction.Press and data.key == "Escape":
             done = 1
+            notreverting = 0
             # revert
             self.menupos = 0
 
         if done:
             self.cycling = 0
             focus._disable = 0
-            self.activatetarget(1) # activate, and deiconify/unshade/raise
+            # activate, and deiconify/unshade/raise
+            self.activatetarget(notreverting)
             self.destroypopup()
             ob.kungrab()
             ob.mungrab()

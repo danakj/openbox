@@ -30,14 +30,14 @@ Frame::Frame(Client *client, otk::RenderStyle *style)
     _screen(otk::display->screenInfo(client->screen())),
     _plate(this, WidgetBase::Type_Plate),
     _titlebar(this, WidgetBase::Type_Titlebar),
-    _button_close(&_titlebar, WidgetBase::Type_CloseButton),
-    _button_iconify(&_titlebar, WidgetBase::Type_IconifyButton),
-    _button_max(&_titlebar, WidgetBase::Type_MaximizeButton),
-    _button_stick(&_titlebar, WidgetBase::Type_StickyButton),
+    _button_close(&_titlebar, WidgetBase::Type_CloseButton, client),
+    _button_iconify(&_titlebar, WidgetBase::Type_IconifyButton, client),
+    _button_max(&_titlebar, WidgetBase::Type_MaximizeButton, client),
+    _button_stick(&_titlebar, WidgetBase::Type_StickyButton, client),
     _label(&_titlebar, WidgetBase::Type_Label),
     _handle(this, WidgetBase::Type_Handle),
-    _grip_left(&_handle, WidgetBase::Type_LeftGrip),
-    _grip_right(&_handle, WidgetBase::Type_RightGrip),
+    _grip_left(&_handle, WidgetBase::Type_LeftGrip, client),
+    _grip_right(&_handle, WidgetBase::Type_RightGrip, client),
     _decorations(client->decorations())
 {
   assert(client);
@@ -396,6 +396,13 @@ void Frame::adjustShape()
                             ShapeUnion, Unsorted);
   }
 #endif // SHAPE
+}
+
+
+void Frame::adjustState()
+{
+  _button_stick.update();
+  _button_max.update();
 }
 
 

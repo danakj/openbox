@@ -9801,6 +9801,22 @@ static PyObject *_wrap_Frame_adjustShape(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Frame_adjustState(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Frame *arg1 = (ob::Frame *) 0 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_adjustState",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->adjustState();
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Frame_clientGravity(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Frame *arg1 = (ob::Frame *) 0 ;
@@ -11699,6 +11715,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Frame_adjustSize", _wrap_Frame_adjustSize, METH_VARARGS },
 	 { (char *)"Frame_adjustPosition", _wrap_Frame_adjustPosition, METH_VARARGS },
 	 { (char *)"Frame_adjustShape", _wrap_Frame_adjustShape, METH_VARARGS },
+	 { (char *)"Frame_adjustState", _wrap_Frame_adjustState, METH_VARARGS },
 	 { (char *)"Frame_clientGravity", _wrap_Frame_clientGravity, METH_VARARGS },
 	 { (char *)"Frame_frameGravity", _wrap_Frame_frameGravity, METH_VARARGS },
 	 { (char *)"Frame_plate", _wrap_Frame_plate, METH_VARARGS },

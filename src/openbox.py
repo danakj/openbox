@@ -860,6 +860,7 @@ class Frame(_object):
     def adjustSize(*args): return apply(_openbox.Frame_adjustSize,args)
     def adjustPosition(*args): return apply(_openbox.Frame_adjustPosition,args)
     def adjustShape(*args): return apply(_openbox.Frame_adjustShape,args)
+    def adjustState(*args): return apply(_openbox.Frame_adjustState,args)
     def clientGravity(*args): return apply(_openbox.Frame_clientGravity,args)
     def frameGravity(*args): return apply(_openbox.Frame_frameGravity,args)
     def plate(*args): return apply(_openbox.Frame_plate,args)

@@ -102,6 +102,9 @@ public:
   void adjustPosition();
   //! Shape the frame window to the client window
   void adjustShape();
+  //! Update the frame to match the client's new state (for things like toggle
+  //! buttons)
+  void adjustState();
 
   //! Applies gravity to the client's position to find where the frame should
   //! be positioned.

@@ -141,19 +141,26 @@ def prev_desktop(data, no_wrap=0):
         d = n - 1
     change_desktop(data, d)
 
-def send_to_all_desktops(data):
-    """Sends a client to all desktops"""
-    if not data.client: return
-    send_client_msg(display.screenInfo(data.screen).rootWindow(),
-                    Property_atoms().net_wm_desktop, data.client.window(),
-                    0xffffffff)
-    
 def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
     if not data.client: return
     send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property_atoms().net_wm_desktop, data.client.window(), num)
 
+def toggle_all_desktops(data):
+    """Toggles between sending a client to all desktops and to the current
+       desktop."""
+    if not data.client: return
+    if not data.client.desktop() == 0xffffffff:
+        send_to_desktop(data, 0xffffffff)
+    else:
+        send_to_desktop(data, openbox.screen(data.screen).desktop())
+    
+def send_to_all_desktops(data):
+    """Sends a client to all desktops"""
+    if not data.client: return
+    send_to_desktop(data, 0xffffffff)
+    
 def send_to_next_desktop(data, no_wrap=0, follow=1):
     """Sends a window to the next desktop, optionally (by default) cycling
        around to the first when going past the last. Also optionally moving to
@@ -255,6 +262,7 @@ def setup_window_clicks():
 
 def setup_window_buttons():
     """Sets up the default behaviors for the buttons in the window titlebar."""
+    mbind("Left", MC_StickyButton, MouseClick, toggle_all_desktops)
     mbind("Left", MC_CloseButton, MouseClick, close)
 
 def setup_scroll():

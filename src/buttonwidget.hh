@@ -7,21 +7,28 @@
 
 namespace ob {
 
+class Client;
+
 class ButtonWidget : public otk::Widget, public WidgetBase
 {
 private:
   void setTextures();
+  Client *_client;
   bool _pressed;
   unsigned int _button;
+  bool _state;
   
 public:
-  ButtonWidget(otk::Widget *parent, WidgetBase::WidgetType type);
+  ButtonWidget(otk::Widget *parent, WidgetBase::WidgetType type,
+               Client *client);
   virtual ~ButtonWidget();
 
   virtual void setStyle(otk::RenderStyle *style);
 
   virtual void adjust();
 
+  virtual void update();
+  
   virtual void renderForeground();
   
   virtual void focus();

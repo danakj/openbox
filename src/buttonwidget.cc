@@ -5,16 +5,19 @@
 #endif
 
 #include "buttonwidget.hh"
-#include "otk/gccache.hh" // otk::BPen
+#include "client.hh"
 
 namespace ob {
 
 ButtonWidget::ButtonWidget(otk::Widget *parent,
-                           WidgetBase::WidgetType type)
+                           WidgetBase::WidgetType type,
+                           Client *client)
   : otk::Widget(parent),
     WidgetBase(type),
+    _client(client),
     _pressed(false),
-    _button(0)
+    _button(0),
+    _state(false)
 {
 }
 
@@ -26,6 +29,21 @@ ButtonWidget::~ButtonWidget()
 
 void ButtonWidget::setTextures()
 {
+  bool p = _pressed;
+
+  switch (type()) {
+  case Type_StickyButton:
+    if (_client->desktop() == (signed)0xffffffff)
+      p = true;
+    break;
+  case Type_MaximizeButton:
+    if (_client->maxHorz() || _client->maxVert())
+      p = true;
+    break;
+  default:
+    break;
+  }
+  
   switch (type()) {
   case Type_LeftGrip:
   case Type_RightGrip:
@@ -35,10 +53,10 @@ void ButtonWidget::setTextures()
       setTexture(_style->gripUnfocusBackground());
     break;
   case Type_StickyButton:
-  case Type_CloseButton:
   case Type_MaximizeButton:
+  case Type_CloseButton:
   case Type_IconifyButton:
-    if (_pressed) {
+    if (p) {
       if (_focused)
         setTexture(_style->buttonPressFocusBackground());
       else
@@ -74,6 +92,29 @@ void ButtonWidget::setStyle(otk::RenderStyle *style)
   default:
     assert(false); // there's no other button widgets!
   }
+}
+
+
+void ButtonWidget::update()
+{
+  switch (type()) {
+  case Type_StickyButton:
+    if ((_client->desktop() == (signed)0xffffffff) != _state) {
+      _state = !_state;
+      setTextures();
+    }
+    break;
+  case Type_MaximizeButton:
+    if ((_client->maxHorz() || _client->maxVert()) != _state) {
+      _state = !_state;
+      setTextures();
+    }
+    break;
+  default:
+    break;
+  }
+  
+  otk::Widget::update();
 }
 
 

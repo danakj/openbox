@@ -655,6 +655,8 @@ void Client::setDesktop(long target)
     frame->show();
   else
     frame->hide();
+
+  frame->adjustState();
 }
 
 
@@ -1072,6 +1074,9 @@ void Client::changeState()
                      otk::Property::atoms.atom, netstate, num);
 
   calcLayer();
+
+  if (frame)
+    frame->adjustState();
 }
 
 

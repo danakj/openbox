@@ -17,7 +17,7 @@ theme = "/usr/local/share/openbox/styles/fieron2"
 #                   S - sticky button, C - close button
 #                   If no 'L' is included in the string, one will be added to
 #                   the end by Openbox.
-titlebar_layout = "ILC"
+titlebar_layout = "ILMC"
 
 # double_click_delay - the number of milliseconds in which 2 clicks are
 #                      perceived as a double-click.

@@ -1,6 +1,8 @@
 Changelog for Openbox:
 
 2.0.0:
+ * fix compliling with --disable-slit.                  (Ben Jansens)
+
  * fixed sticky windows behavior.                       (Ben Jansens)
 
  * make reconfigure reset the timeout values for

@@ -653,7 +653,7 @@ Rect BScreen::availableArea() const {
       space.setH(space.h() - tbarh);
     }
 #else // !SLIT
-    int tbarh = resource.hide_toolbar() ? 0 :
+    int tbarh = resource.hide_toolbar ? 0 :
       toolbar->getExposedHeight() + resource.border_width * 2;
     switch (toolbar->placement()) {
     case Toolbar::TopLeft:

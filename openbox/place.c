@@ -122,11 +122,13 @@ static GSList* area_remove(GSList *list, Rect *a)
     return result;
 }
 
-static gint area_cmp(gconstpointer p1, gconstpointer p2)
+static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
 {
+    Rect *carea = data;
     const Rect *a1 = p1, *a2 = p2;
 
-    return a1->width * a1->height - a2->width * a2->height;
+    return MIN((a1->width - carea->width), (a1->height - carea->height)) -
+        MIN((a2->width - carea->width), (a2->height - carea->height));
 }
 
 static gboolean place_smart(ObClient *client, gint *x, gint *y,
@@ -153,7 +155,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
         }
     }
 
-    spaces = g_slist_sort(spaces, area_cmp);
+    spaces = g_slist_sort_with_data(spaces, area_cmp, &client->frame->area);
 
     for (sit = spaces; sit; sit = g_slist_next(sit)) {
         Rect *r = sit->data;

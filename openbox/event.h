@@ -43,4 +43,8 @@ void event_enter_client(struct _ObClient *client);
   focus */
 void event_ignore_queued_enters();
 
+/* Halts any focus delay in progress, use this when the user is selecting a
+   window for focus */
+void event_halt_focus_delay();
+
 #endif

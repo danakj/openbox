@@ -1199,6 +1199,11 @@ static void focus_delay_client_dest(ObClient *client, gpointer data)
     ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, client);
 }
 
+void event_halt_focus_delay()
+{
+    ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+}
+
 void event_ignore_queued_enters()
 {
     GSList *saved = NULL, *it;

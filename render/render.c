@@ -188,6 +188,8 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 
     spc->interlaced = spo->interlaced;
     spc->border = spo->border;
+    spc->parent = NULL;
+    spc->parentx = spc->parenty = 0;
     spc->RrPixel_data = NULL;
 
     copy->textures = orig->textures;

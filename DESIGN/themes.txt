@@ -99,7 +99,6 @@
 
   <menutitle foreground="vroom" background="fancy" />
   <menu      set="coolmenu" />
-</menu>
 </style>
 
 </openbox_theme>

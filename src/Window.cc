@@ -3129,22 +3129,33 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
         bool snapped = False;
         
         const Rect &winrect = *it;
+        
+        // if the window is already over top of this snap target, then
+        // resistance is futile, so just ignore it
+        if (screen->doOpaqueMove()) {
+          if (winrect.intersects(frame.rect))
+            continue;
+        } else {
+          if (winrect.intersects(frame.changing))
+            continue;
+        }
+        
         int dleft = wright - winrect.left(),
-           dright = wleft - winrect.right(),
+           dright = winrect.right() - wleft,
              dtop = wbottom - winrect.top(),
-          dbottom = wtop - winrect.bottom();
+          dbottom = winrect.bottom() - wtop;
 
         // if the windows are in the same plane vertically
         if (wtop >= (signed)(winrect.y() - frame.rect.height() + 1) &&
             wtop < (signed)(winrect.y() + winrect.height() - 1)) {
 
           // snap left of other window?
-          if (dleft > 0 && dleft < resistance_size && dleft < dright) {
+          if (dleft >= 0 && dleft < resistance_size) {
             dx = winrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
-          else if (dright > 0 && dright < resistance_size) {
+          else if (dright >= 0 && dright < resistance_size) {
             dx = winrect.right() + 1;
             snapped = True;
           }
@@ -3169,7 +3180,7 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
             wleft < (signed)(winrect.x() + winrect.width() - 1)) {
 
           // snap top of other window?
-          if (dtop > 0 && dtop < resistance_size && dtop < dbottom) {
+          if (dtop >= 0 && dtop < resistance_size) {
             dy = winrect.top() - frame.rect.height();
             snapped = True;
           }
@@ -3223,14 +3234,14 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
         dbottom = wbottom - srect.bottom();
 
         // snap left?
-        if (dleft > 0 && dleft < resistance_size && dleft > dright)
+        if (dleft > 0 && dleft < resistance_size)
           dx = srect.left();
         // snap right?
         else if (dright > 0 && dright < resistance_size)
           dx = srect.right() - frame.rect.width() + 1;
 
         // snap top?
-        if (dtop > 0 && dtop < resistance_size && dtop > dbottom)
+        if (dtop > 0 && dtop < resistance_size)
           dy = srect.top();
         // snap bottom?
         else if (dbottom > 0 && dbottom < resistance_size)

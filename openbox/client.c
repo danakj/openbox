@@ -1761,6 +1761,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
     RECT_SET(self->area, x, y, w, h);
 
+    /* for app-requested resizes, always resize if 'resized' is true.
+       for user-requested ones, only resize if final is true, or when
+       resizing in opaque mode */
     if ((!user && resized) ||
         (user && (final || (resized && config_opaque_resize))))
 	XResizeWindow(ob_display, self->window, w, h);

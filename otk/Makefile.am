@@ -14,12 +14,11 @@ libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc util.cc \
 
 #focuswidget.cc focuslabel.cc
 
-includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh size.hh \
-                   display.hh eventdispatcher.hh eventhandler.hh \
-                   focuslabel.hh focuswidget.hh font.hh label.hh otk.hh \
-                   point.hh property.hh pseudorendercontrol.hh rect.hh \
-                   rendercolor.hh rendercontrol.hh renderstyle.hh \
-                   rendertexture.hh screeninfo.hh strut.hh surface.hh \
+includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
+                   display.hh eventdispatcher.hh eventhandler.hh font.hh \
+                   label.hh otk.hh point.hh property.hh pseudorendercontrol.hh\
+                   rect.hh rendercolor.hh rendercontrol.hh renderstyle.hh \
+                   rendertexture.hh screeninfo.hh size.hh strut.hh surface.hh \
                    timer.hh truerendercontrol.hh ustring.hh util.hh widget.hh \
                    ../config.h
 

@@ -67,7 +67,7 @@ typedef struct MwmHints {
 class OpenboxWindow : public TimeoutHandler {
 private:
   BImageControl *image_ctrl;
-  Openbox *openbox;
+  Openbox &openbox;
   BScreen *screen;
   Display *display;
   BTimer *timer;
@@ -239,7 +239,7 @@ protected:
 
 
 public:
-  OpenboxWindow(Openbox *b, Window w, BScreen *s = (BScreen *) 0);
+  OpenboxWindow(Openbox &b, Window w, BScreen *s = (BScreen *) 0);
   virtual ~OpenboxWindow(void);
 
   inline Bool isTransient(void) const { return flags.transient; }

@@ -467,7 +467,7 @@ void Openbox::process_event(XEvent *e) {
     OpenboxWindow *win = searchWindow(e->xmaprequest.window);
 
     if (! win)
-      win = new OpenboxWindow(this, e->xmaprequest.window);
+      win = new OpenboxWindow(*this, e->xmaprequest.window);
 
     if ((win = searchWindow(e->xmaprequest.window)))
       win->mapRequestEvent(&e->xmaprequest);

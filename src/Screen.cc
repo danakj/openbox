@@ -462,7 +462,7 @@ BScreen::BScreen(Openbox &ob, int scrn) : ScreenInfo(ob, scrn), openbox(ob) {
       if (attrib.override_redirect) continue;
 
       if (attrib.map_state != IsUnmapped) {
-        new OpenboxWindow(&openbox, children[i], this);
+        new OpenboxWindow(openbox, children[i], this);
 
         OpenboxWindow *win = openbox.searchWindow(children[i]);
         if (win) {

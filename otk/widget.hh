@@ -77,7 +77,7 @@ public:
 
   virtual void exposeHandler(const XExposeEvent &e);
   virtual void configureHandler(const XConfigureEvent &e);
-  virtual void styleChanged(const RenderStyle &) {calcDefaultSizes();update();}
+  virtual void styleChanged(const RenderStyle &) {}
 
 protected:
   virtual void addChild(Widget *w) { assert(w); _children.push_back(w); }

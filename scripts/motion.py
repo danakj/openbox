@@ -149,9 +149,9 @@ def _do_move():
         _poplabel.setText(text)
         scsize = otk.display.screenInfo(_screen).size()
         size = _poplabel.minSize()
-        _popwidget.resize(_poplabel.minSize())
-        _popwidget.move(otk.Point((scsize.width() - size.width()) / 2,
-                                  (scsize.height() - size.height()) / 2))
+        _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
+                                       (scsize.height() - size.height()) / 2,
+                                       size.width(), size.height()))
         _popwidget.show(1)
 
 def _move(data):
@@ -235,9 +235,9 @@ def _do_resize():
         _poplabel.setText(text)
         scsize = otk.display.screenInfo(_screen).size()
         size = _poplabel.minSize()
-        _popwidget.resize(_poplabel.minSize())
-        _popwidget.move(otk.Point((scsize.width() - size.width()) / 2,
-                                  (scsize.height() - size.height()) / 2))
+        _popwidget.moveresize(otk.Rect((scsize.width() - size.width()) / 2,
+                                       (scsize.height() - size.height()) / 2,
+                                       size.width(), size.height()))
         _popwidget.show(1)
 
 def _resize(data):

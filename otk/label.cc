@@ -17,7 +17,7 @@ Label::Label(Widget *parent)
     _text(""),
     _justify_horz(RenderStyle::LeftTopJustify),
     _justify_vert(RenderStyle::LeftTopJustify),
-    _highlight(true)
+    _highlight(false)
 {
   styleChanged(*RenderStyle::style(screen()));
 }
@@ -92,9 +92,10 @@ void Label::styleChanged(const RenderStyle &style)
     _texture = style.labelUnfocusBackground();
     _forecolor = style.textUnfocusColor();
   }
-  _font = style.labelFont();
-  Widget::styleChanged(style);
-  calcDefaultSizes();
+  if (_font != style.labelFont()) {
+    _font = style.labelFont();
+    calcDefaultSizes();
+  }
 }
 
 void Label::renderForeground(Surface &surface)

@@ -61,7 +61,7 @@ Widget::Widget(Widget *parent, Direction direction, int bevel)
   assert(parent);
   createWindow(false);
   parent->addChild(this);
-  parent->layout();
+  if (parent->visible()) parent->layout();
   _dispatcher->registerHandler(_window, this);
 }
 
@@ -80,8 +80,9 @@ void Widget::show(bool children)
 {
   if (children) {
     std::list<Widget*>::iterator it , end = _children.end();
-    for (it = _children.begin(); it != end; ++it)
+    for (it = _children.begin(); it != end; ++it) {
       (*it)->show(true);
+    }
   }
   if (!_visible) {
     _visible = true;
@@ -107,6 +108,7 @@ void Widget::setEventMask(long e)
 
 void Widget::update()
 {
+  if (!_visible) return;
   _dirty = true;
   if (parent())
     parent()->layout(); // relay-out us and our siblings
@@ -224,6 +226,7 @@ void Widget::setBevel(int b)
 
 void Widget::layout()
 {
+  if (_children.empty() || !_visible) return;
   if (_direction == Horizontal)
     layoutHorz();
   else
@@ -470,6 +473,9 @@ void Widget::configureHandler(const XConfigureEvent &e)
   if (_ignore_config) {
     _ignore_config--;
   } else {
+    // only interested in these for top level windows
+    if (_parent) return;
+    
     XEvent ev;
     ev.xconfigure.width = e.width;
     ev.xconfigure.height = e.height;

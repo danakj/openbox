@@ -12,7 +12,6 @@ Button::Button(Widget *parent)
   : Label(parent),
     _pressed(false)
 {
-  setHighlighted(false);
   setHorizontalJustify(RenderStyle::CenterJustify);
   setVerticalJustify(RenderStyle::CenterJustify);
   styleChanged(*RenderStyle::style(screen()));
@@ -70,7 +69,7 @@ void Button::styleChanged(const RenderStyle &style)
       _texture = style.buttonUnpressUnfocusBackground();
     _forecolor = style.buttonUnfocusColor();
   }
-  Widget::styleChanged(style);
+  refresh();
 }
 
 }

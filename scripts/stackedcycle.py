@@ -113,10 +113,6 @@ class _cycledata:
             if current and c.window() == current.window():
                 self.menupos = i
                 w.setHighlighted(1)
-                pass
-            else:
-                w.setHighlighted(0)
-                pass
             self.menuwidgets.append(w)
 
             if c.iconic(): t = c.iconTitle()
@@ -147,9 +143,9 @@ class _cycledata:
         # show or hide the list and its child widgets
         if len(self.clients) > 1:
             size = self.screeninfo.size()
-            self.widget.resize(otk.Size(width, height))
-            self.widget.move(otk.Point((size.width() - width) / 2,
-                                       (size.height() - height) / 2))
+            self.widget.moveresize(otk.Rect((size.width() - width) / 2,
+                                            (size.height() - height) / 2,
+                                            width, height))
             self.widget.show(1)
 
     def activatetarget(self, final):

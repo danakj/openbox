@@ -51,6 +51,14 @@ ObFrame *frame_new()
     mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
     self->title = createWindow(self->window, mask, &attrib);
+
+    mask |= CWCursor;
+    attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
+    self->tlresize = createWindow(self->title, mask, &attrib);
+    attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
+    self->trresize = createWindow(self->title, mask, &attrib);
+
+    mask &= ~CWCursor;
     self->label = createWindow(self->title, mask, &attrib);
     self->max = createWindow(self->title, mask, &attrib);
     self->close = createWindow(self->title, mask, &attrib);
@@ -59,15 +67,12 @@ ObFrame *frame_new()
     self->icon = createWindow(self->title, mask, &attrib);
     self->iconify = createWindow(self->title, mask, &attrib);
     self->handle = createWindow(self->window, mask, &attrib);
+
     mask |= CWCursor;
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHWEST);
     self->lgrip = createWindow(self->handle, mask, &attrib);
     attrib.cursor = ob_cursor(OB_CURSOR_SOUTHEAST);
     self->rgrip = createWindow(self->handle, mask, &attrib); 
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHWEST);
-    self->tlresize = createWindow(self->title, mask, &attrib);
-    attrib.cursor = ob_cursor(OB_CURSOR_NORTHEAST);
-    self->trresize = createWindow(self->title, mask, &attrib);
 
     self->focused = FALSE;
 

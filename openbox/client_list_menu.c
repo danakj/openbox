@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "client.h"
 #include "focus.h"
+#include "config.h"
 #include "gettext.h"
 
 #include <glib.h>

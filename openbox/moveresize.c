@@ -70,6 +70,8 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
     start_cy = c->frame->area.y;
     start_cw = c->area.width;
     start_ch = c->area.height;
+    start_x = x;
+    start_y = y;
     if (corner == prop_atoms.net_wm_moveresize_move_keyboard ||
         corner == prop_atoms.net_wm_moveresize_size_keyboard)
         button = 0; /* mouse can't end it without being pressed first */
@@ -188,7 +190,6 @@ void moveresize_event(XEvent *e)
         if (moving) {
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
-
             do_move();
         } else {
             if (corner == prop_atoms.net_wm_moveresize_size_topleft) {

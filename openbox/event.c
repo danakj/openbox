@@ -341,14 +341,33 @@ static gboolean event_ignore(XEvent *e, Client *client)
                     g_message("found pending FocusIn");
 #endif
                     /* is the focused window getting a FocusOut/In back to
-                       itself? */
+                       itself?
+                    */
                     if (fe.xfocus.window == e->xfocus.window &&
                         !event_ignore(&fe, client)) {
+                        /*
+                          if focus_client is not set, then we can't do
+                          this. we need the FocusIn. This happens in the
+                          case when the set_focus_client(NULL) in the
+                          focus_fallback function fires and then
+                          focus_fallback picks the currently focused
+                          window (such as on a SendToDesktop-esque action.
+                        */
+                        if (focus_client) {
 #ifdef DEBUG_FOCUS
-                        g_message("focused window got an Out/In back to "
-                                  "itself IGNORED both");
+                            g_message("focused window got an Out/In back to "
+                                      "itself IGNORED both");
 #endif
-                        return TRUE;
+                            return TRUE;
+                        } else {
+                            event_process(&fe);
+#ifdef DEBUG_FOCUS
+                            g_message("focused window got an Out/In back to "
+                                      "itself but focus_client was null "
+                                      "IGNORED just the Out");
+#endif
+                            return TRUE;
+                        }
                     }
 
                     /* once all the FocusOut's have been dealt with, if there

@@ -49,6 +49,7 @@
 #include <X11/cursorfont.h>
 
 #ifdef USE_SM
+gboolean    ob_sm_use = TRUE;
 SmcConn     ob_sm_conn;
 gchar      *ob_sm_id = NULL;
 #endif
@@ -471,7 +472,8 @@ static void print_help()
     g_print("Options:\n\n");
     g_print("  -rc PATH          Specify the path to the rc file to use\n");
 #ifdef USE_SM
-    g_print("  -sm-client-id ID  Specify the session manager ID\n");
+    g_print("  -sm-client-id ID  Specify session management ID\n");
+    g_print("  -sm-disable       Disable connection to session manager\n");
 #endif
     g_print("  -help             Display this help and exit\n");
     g_print("  -version          Display the version and exit\n");
@@ -504,6 +506,8 @@ static void parse_args(int argc, char **argv)
                 g_printerr(_("-sm-client-id requires an argument\n"));
             else
                 ob_sm_id = argv[++i];
+        } else if (!strcmp(argv[i], "-sm-disable")) {
+            ob_sm_use = FALSE;
 #endif
         } else {
             g_printerr("Invalid option: '%s'\n\n", argv[i]);

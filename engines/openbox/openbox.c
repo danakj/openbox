@@ -594,30 +594,29 @@ void frame_release_client(ObFrame *self, Client *client)
 static void layout_title(ObFrame *self)
 {
     const char *lc;
-    int x, sep;
+    int x;
     gboolean n, d, i, l, m ,c;
 
     n = d = i = l = m = c = FALSE;
-    sep = s_bevel + 1;
 
     /* figure out whats being shown, and the width of the label */
-    self->label_width = self->width - sep * 2;
+    self->label_width = self->width - (s_bevel + 1) * 2;
     for (lc = themerc_titlebar_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
 	    if (!(self->frame.client->decorations & Decor_Icon)) break;
 	    n = TRUE;
-	    self->label_width -= BUTTON_SIZE + sep;
+	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'D':
 	    if (!(self->frame.client->decorations & Decor_AllDesktops)) break;
 	    d = TRUE;
-	    self->label_width -= BUTTON_SIZE + sep;
+	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'I':
 	    if (!(self->frame.client->decorations & Decor_Iconify)) break;
 	    i = TRUE;
-	    self->label_width -= BUTTON_SIZE + sep;
+	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'L':
 	    l = TRUE;
@@ -625,12 +624,12 @@ static void layout_title(ObFrame *self)
 	case 'M':
 	    if (!(self->frame.client->decorations & Decor_Maximize)) break;
 	    m = TRUE;
-	    self->label_width -= BUTTON_SIZE + sep;
+	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'C':
 	    if (!(self->frame.client->decorations & Decor_Close)) break;
 	    c = TRUE;
-	    self->label_width -= BUTTON_SIZE + sep;
+	    self->label_width -= BUTTON_SIZE + s_bevel + 1;
 	    break;
 	}
     }
@@ -669,7 +668,7 @@ static void layout_title(ObFrame *self)
 	self->close_x = -1;
     }
 
-    x = sep;
+    x = s_bevel + 1;
     for (lc = themerc_titlebar_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':
@@ -677,42 +676,42 @@ static void layout_title(ObFrame *self)
 	    self->icon_x = x;
 	    XMapWindow(ob_display, self->icon);
 	    XMoveWindow(ob_display, self->icon, x, s_bevel + 1);
-	    x += BUTTON_SIZE + sep;
+	    x += BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'D':
 	    if (!d) break;
 	    self->desk_x = x;
 	    XMapWindow(ob_display, self->desk);
 	    XMoveWindow(ob_display, self->desk, x, s_bevel + 1);
-	    x += BUTTON_SIZE + sep;
+	    x += BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'I':
 	    if (!i) break;
 	    self->iconify_x = x;
 	    XMapWindow(ob_display, self->iconify);
 	    XMoveWindow(ob_display, self->iconify, x, s_bevel + 1);
-	    x += BUTTON_SIZE + sep;
+	    x += BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'L':
 	    if (!l) break;
 	    self->label_x = x;
 	    XMapWindow(ob_display, self->label);
 	    XMoveWindow(ob_display, self->label, x, s_bevel);
-	    x += self->label_width + sep;
+	    x += self->label_width + s_bevel + 1;
 	    break;
 	case 'M':
 	    if (!m) break;
 	    self->max_x = x;
 	    XMapWindow(ob_display, self->max);
 	    XMoveWindow(ob_display, self->max, x, s_bevel + 1);
-	    x += BUTTON_SIZE + sep;
+	    x += BUTTON_SIZE + s_bevel + 1;
 	    break;
 	case 'C':
 	    if (!c) break;
 	    self->close_x = x;
 	    XMapWindow(ob_display, self->close);
 	    XMoveWindow(ob_display, self->close, x, s_bevel + 1);
-	    x += BUTTON_SIZE + sep;
+	    x += BUTTON_SIZE + s_bevel + 1;
 	    break;
 	}
     }

@@ -86,13 +86,16 @@ def _motion_grab(data):
             else:
                 raise RuntimeError
 
+_last_x = 0
+_last_y = 0
+
 def _do_move():
     global _screen, _client, _cx, _cy, _dx, _dy
 
     x = _cx + _dx
     y = _cy + _dy
 
-    global edge_resistance
+    global edge_resistance, _last_x, _last_y
     if edge_resistance:
         fs = _client.frame.size()
         w = _client.area().width() + fs.left + fs.right
@@ -104,17 +107,20 @@ def _do_move():
         t = area.top()
         b = area.bottom() - h + 1
         # left screen edge
-        if x < l and x >= l - edge_resistance:
+        if _last_x > x and x < l and x >= l - edge_resistance:
             x = l
         # right screen edge
-        if x > r and x <= r + edge_resistance:
+        if _last_x < x and x > r and x <= r + edge_resistance:
             x = r
         # top screen edge
-        if y < t and y >= t - edge_resistance:
+        if _last_y > y and y < t and y >= t - edge_resistance:
             y = t
         # right screen edge
-        if y > b and y <= b + edge_resistance:
+        if _last_y < y and y > b and y <= b + edge_resistance:
             y = b
+
+    _last_x = x
+    _last_y = y
 
     global move_rubberband
     if move_rubberband:

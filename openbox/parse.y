@@ -17,7 +17,9 @@
 }
 
 %{
+#define NO_TAB_H
 #include "parse.h"
+#undef NO_TAB_H
 
 extern int yylex();
 extern int yyparse();

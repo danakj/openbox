@@ -2,7 +2,9 @@
 #define __parse_h
 
 #include <glib.h>
+#ifndef NO_TAB_H
 #include "parse.tab.h"
+#endif
 
 typedef enum {
     TOKEN_REAL       = REAL,

@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "event.h"
+#include "xerror.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -102,9 +103,14 @@ void grab_key(guint keycode, guint state, int keyboard_mode)
 {
     guint i;
 
+    xerror_set_ignore(TRUE); /* can get BadAccess' from these */
+    xerror_occured = FALSE;
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabKey(ob_display, keycode, state | mask_list[i], ob_root, FALSE,
                  GrabModeAsync, keyboard_mode);
+    xerror_set_ignore(FALSE);
+    if (xerror_occured)
+        g_warning("failed to grab keycode %d modifiers %d", keycode, state);
 }
 
 void ungrab_all_keys()

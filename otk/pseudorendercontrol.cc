@@ -101,12 +101,12 @@ PseudoRenderControl::~PseudoRenderControl()
 {
   printf("Destroying PseudoColor RenderControl\n");
 
-  unsigned long *pixels = new unsigned long [ncolors], *p = pixels;
+  unsigned long *pixels = new unsigned long [_ncolors], *p = pixels;
   for (int i = 0; i < _ncolors; ++i, ++p)
     *p = _colors[i].pixel;
   XFreeColors(**display, display->screenInfo(_screen)->colormap(), pixels,
               _ncolors, 0);
-  delete [] colors;
+  delete [] _colors;
 }
 
 void PseudoRenderControl::reduceDepth(Surface &sf, XImage *im) const

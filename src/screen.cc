@@ -343,8 +343,7 @@ void OBScreen::manageWindow(Window window)
 
   // choose the events we want to receive on the CLIENT window
   attrib_set.event_mask = OBClient::event_mask;
-  attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
-                                     ButtonMotionMask;
+  attrib_set.do_not_propagate_mask = OBClient::no_propagate_mask;
   XChangeWindowAttributes(otk::OBDisplay::display, window,
                           CWEventMask|CWDontPropagate, &attrib_set);
 

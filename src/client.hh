@@ -134,6 +134,14 @@ public:
   static const long event_mask = PropertyChangeMask | FocusChangeMask |
                                  StructureNotifyMask;
 
+  //! The mask of events to not let propogate past the client
+  /*!
+    This makes things like xprop work on the client window, but means we have
+    to explicitly grab clicks that we want.
+  */
+  static const long no_propagate_mask = ButtonPressMask | ButtonReleaseMask |
+                                        ButtonMotionMask;
+
   //! The number of unmap events to ignore on the window
   int ignore_unmaps;
   

@@ -55,10 +55,6 @@
 
 #include <list>
 #include <vector>
-typedef std::list<Rootmenu *> menuList;
-typedef std::list<Netizen *> netList;
-typedef std::vector<Workspace *> wkspList;
-typedef std::vector<std::string> wkspNameList;
 
 // forward declaration
 class BScreen;
@@ -116,8 +112,11 @@ private:
   Iconmenu *iconmenu;
   Rootmenu *rootmenu;
 
+  typedef std::list<Rootmenu *> menuList;
   menuList rootmenuList;
+  typedef std::list<Netizen *> netList;
   netList netizenList;
+  typedef std::list<OpenboxWindow *> winList;
   winList iconList;     // winList is declared in Workspace.h
 
 #ifdef    SLIT
@@ -131,7 +130,9 @@ private:
   unsigned int geom_w, geom_h;
   unsigned long event_mask;
 
+  typedef std::vector<std::string> wkspNameList;
   wkspNameList workspaceNames;
+  typedef std::vector<Workspace *> wkspList;
   wkspList workspacesList;
 
   struct resource {

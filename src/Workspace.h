@@ -35,16 +35,15 @@ class OpenboxWindow;
 class Size;
 class Rect;
 
-typedef std::vector<OpenboxWindow *> winVect;
-typedef std::list<OpenboxWindow *> winList;
-
 class Workspace {
 private:
   BScreen &screen;
   OpenboxWindow *lastfocus;
   Clientmenu *clientmenu;
 
+  typedef std::vector<OpenboxWindow *> winVect;
   winVect _windows;
+  typedef std::list<OpenboxWindow *> winList;
   winList _zorder;
 
   char *name;

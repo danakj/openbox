@@ -6,6 +6,7 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
+#include "point.hh"
 #include <vector>
 
 namespace otk {

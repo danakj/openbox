@@ -223,7 +223,7 @@ void Frame::adjustSize()
       layout.erase(i--, 1);
     }
     if (!tit_l)
-      layout.append(1, 'L');
+      layout += "L";
     
     // the size of the label. this ASSUMES the layout has only buttons other
     // that the ONE LABEL!!

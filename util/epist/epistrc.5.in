@@ -1,0 +1,198 @@
+.TH epistrc 5 "August 24, 2002"
+.SH NAME
+epistrc \- Configuration file for Epist
+.SH SYNOPSIS
+.B $HOME/.openbox/epistrc
+.br
+.B @pkgdatadir@/epistrc
+.SH DESCRIPTION
+\fIepist\fR(1) grabs its configuration and bindings from the epistrc file. All
+options shown will work with any window manager that supports the NetWM/EWMH
+specification, with the exception of those marked with the
+.B [Openbox specific]
+tag.
+.SH SYNTAX
+The epistrc file contains 2 sections:
+.SS Options
+All of the options for epist are contained inside a clause such as this:
+.PP
+options {
+.br
+	<option name> <option value>;
+.br
+}
+.PP
+The option name is a string of characters, and the option value can be either a string in double quotes, a number, or a boolen value (the words True or False without quotes around them).
+.SS Bindings
+Bindings are specified in this format:
+.PP
+<key> <action> <optional parameter>;
+.PP
+Bindings with chains are specified in this format:
+.PP
+<root key> {
+.br
+	<key> <action> <optional parameter>;
+.br
+}
+.PP
+The <key> is made up of a list of modifiers and a single key. The possible modifiers are: \fIControl\fR, \fIShift\fR, \fIMod1\fR (usually the Alt key), \fIMod2\fR, \fIMod3\fR, \fIMod4\fR (usually the "windows" key), and \fIMod5\fR. You may also specify a <key> without any modifiers.
+.PP
+Comments can be added by prefixing the commented line with a "#".
+.PP
+You may nest as many chains as you want. Some examples of bindings are:
+.PP
+Mod1-Tab nextWindow;
+.br
+Mod1-Shift-Tab prevWindow;
+.br
+Mod1-F1 changeWorkspace 1;
+.br
+Mod1-F2 changeWorkspace 2;
+.br
+Control-F1 execute "xterm";
+.br
+Control-Mod1-x {
+.br
+	i iconify;
+.br
+	r raise;
+.br
+	Mod1-x { l lower; }
+.br
+}
+.SH OPTIONS
+.SS stackedCycling (boolean, default=off)
+When this option is set to True, any window cycling actions, such as nextWindow,
+prevWindow, nextWindowOfClass, etc., will cause the windows to focus, but they will
+not be raised until the modifiers are released. When the modifier is released,
+the focused (and now raised) window will be moved to the top of the stacking order,
+so if you execute nextWindow and release the modifiers multiple times, focus will
+cycle between two windows.
+.SS stackedCyclingRaise (boolean, default=off)
+This option modifies the window raise behavior when stackedCycling is turned on.
+When true, windows will be raised immediatly on focus, rather than when the
+keys are released. This may be desirable if you frequently have windows that are
+obscured by other windows.
+.SS chainTimeout (number, default=3500)
+Specifies the period of time after which a started key chain will
+be timed out. It takes a number argument specifying the number of
+milliseconds to wait. It defaults to 4000.
+.SS workspaceColumns (number, default=0, disabled)
+Specifies the number of columns of your workspace layout if you are using
+your workspaces in a 2-dimensional manner. This option must exist if one of
+the prevWorkspaceColumn, prevWorkspaceRow, nextWorkspaceColumn,
+nextWorkspaceRow commands are used.
+.SH COMMANDS
+.SS execute
+Runs a shell command. Takes a single string argument, in ""s.
+.SS iconify
+Iconifies the currently focused window.
+.SS raise
+Raises the currently focused window to the top of the stacking order.
+.SS lower
+Lowers the currently focused window to the bottom of the stacking order.
+.SS close
+Closes the currently focused window.
+.SS toggleShade
+Shades and Unshades the currently focused window.
+.SS toggleOmnipresent
+Sends the window to all workspaces, or moves it from all workspaces to the
+current one.
+.SS moveWindowUp
+.SS moveWindowDown
+.SS moveWindowLeft
+.SS moveWindowRight
+Move the window in the specified direction. Takes a single numerical parameter,
+which is the amount to move the window.
+.SS resizeWindowWidth
+.SS resizeWindowHeight
+Resizes the window. Takes a single numerical parameter, which is the
+amount to resize the window by. A positive number enlarges the window, a
+negative value shrinks the window.
+.SS toggleMaximizeFull
+Maximizes and Unmaxizes the currently focused window.
+.SS toggleMaximizeVertical
+Maximizes and Unmaxizes the currently focused window vertically.
+.SS toggleMaximizeHorizontal
+Maximizes and Unmaxizes the currently focused window horizontally.
+.SS sendToWorkspace
+Sends the currently focused window to another workspace. This takes a single
+numerical parameter, which is the workspace to send the window to. Workspace
+numbers begin at 1.
+.SS sendToNextWorkspace
+.SS sendToPrevWorkspace
+Sends the currently focused window to the next/previous workspace. Takes 
+boolean parameter that when true switches to that workspace as well. If none is
+specified a value of false is assumed.
+.SS nextWindow
+.SS prevWindow
+Cycles focus to the next/previous window on the workspace. This can take a
+single numerical parameter specifying how many windows to cycle through. If
+none is specified, a value of 1 is assumed.
+.SS nextWindowOnAllWorkspaces
+.SS prevWindowOnAllWorkspaces
+Cycles focus to the next/previous window on all workspaces, switching between
+workspaces as neccessary. This can take a single numerical parameter specifying
+how many windows to cycle through. If none is specified, a value of 1 is
+assumed.
+.SS nextWindowOnAllScreens
+.SS prevWindowOnAllScreens
+Cycles focus to the next/previous window on all screens (in a multi-head setup).
+This can take a single numerical parameter specifying how many windows to cycle
+through. If none is specified, a value of 1 is assumed.
+.SS nextWindowOfClass
+.SS prevWindowOfClass
+Cycles focus to the next/previous window of a certain class on the current
+workspace. This can take a single string parameter, in ""s, specifying the
+class of the window to cycle to. If the parameter is omitted, the class of the
+currently focused window is used. This can take a single numerical parameter
+specifying how many windows to cycle through. If none is specified, a value of
+1 is assumed.
+.SS nextWindowOfClassOnAllWorkspaces
+.SS prevWindowOfClassOnAllWorkspaces
+Cycles focus to the next/previous window of a certain class on all workspaces.
+This can take a single string parameter, in ""s, specifying the class of the
+window to cycle to. If the parameter is omitted, the class of the currently
+focused window is used. This can take a single numerical parameter specifying
+how many windows to cycle through. If none is specified, a value of 1 is
+assumed.
+.SS changeWorkspace
+Changes to a specific workspace. This takes a single numerical paramter,
+specifying the number of the workspace to switch to. Workspace numbers begin at
+1.
+.SS nextWorkspace
+.SS prevWorkspace
+Switches to the next/previous workspace. This can take a single numerical
+parameter specifying how many workspaces to cycle through. If none is specified,
+a value of 1 is assumed.
+.SS nextScreen
+.SS prevScreen
+Cycles focus to the next/previous screen (in a multi-head setup).
+.SS prevWorkspaceColumn
+.SS nextWorkspaceColumn
+.SS prevWorkspaceRow
+.SS nextWorkspaceRow
+Used to navigate the workspaces in a 2-dimensional manner. If these commands are
+used, the workspaceColumns action must be specified. See OPTIONS.
+.SS toggleGrabs
+Disables all keybindings except for the binding which runs this action, for
+the current screen. Enables keybindings when run again. This command cannot be
+part of a chain.
+
+.SS toggleDecorations
+.B [Openbox specific]
+.br
+Toggles whether or not the window decorations are shown on the currently
+focused window. (Decorations include the titlebar, borders, and bottom handle.)
+.SS showRootMenu
+.B [Openbox specific]
+.br
+Opens the root menu under the mouse pointer.
+.SS showWorkspaceMenu
+.B [Openbox specific]
+.br
+Opens the workspace menu under the mouse pointer.
+
+.SH SEE ALSO
+\fIepist\fR(1) \fIopenbox\fR(1)

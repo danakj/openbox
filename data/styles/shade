@@ -91,3 +91,8 @@ handleWidth:			3
 *xft.size:			10
 
 rootCommand:			bsetroot -solid rgb:4/4/4
+
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

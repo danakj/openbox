@@ -1,0 +1,54 @@
+2.2.2
+
+  * Fixed bug which caused an infinate loop when       (Ben)
+    cycling backwards through windows on an empty
+    workspace.
+
+
+2.2.0
+
+  * Fixed (hopefully) the ugly bugly that would cause  (Marius)
+    epist to hog the keyboard on invalid keys.
+
+  * Added stackedCyclingRaise option, to allow windows (Marius)
+    to raise on focus when stacked is on.
+
+  * Small fixes, better sanity checks, much better     (Marius)
+    error reporting on bad keys and modifiers.
+
+2.1.0
+
+  * Improved parser: much better error reporting for
+    malformed files, most tokens are now case
+    insensitive.                       	                (Marius)
+
+  * Added configuration code and options {} block in
+    the config file                                     (Marius)
+
+  * Added chain timeout; (time after which a started
+    chain is automatically cancelled) enabled with the
+    chainTimeout option.                                (Marius)
+     
+  * 2d matrix workspace navigation code. Enabled with
+    the workspaceRows option, uses the
+    {prev,next}Workspace{Row,Column} actions.           (Scott, Marius)
+
+  * Added stacked window cycling. Enable with the
+    stackedCycling option.                              (Marius, Ben)
+
+  * New actions: showRootMenu, showWorkspaceMenu,
+    toggleDecorations                                   (Ben)
+
+  * Fixed some internal inconsistencies in action names (Marius)
+
+  * Added cancelChain action - users can cancel chains
+    explicitly                                          (Marius)
+     
+  * Added toggleGrabs action - can be bound to a key    (Marius)
+    to temporarily disable epist bindings.
+
+  * Added/improved command line parameter handling      (Ben)
+
+  * Added code to handle windows which don't specify
+    the input focus.                                    (Ben)
+

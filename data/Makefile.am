@@ -1,8 +1,10 @@
+# data/Makefile.am for Openbox
+
 SUBDIRS = styles buttons
 CLEANFILES = menu
 MAINTAINERCLEANFILES = Makefile.in
 
-EXTRA_DIST = README.menu menu.in
+EXTRA_DIST = README.menu README.style menu.in
 
 all-local: menu
 

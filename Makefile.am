@@ -1,19 +1,14 @@
-SUBDIRS = po data doc otk src scripts
+# Makefile.am for Openbox
+
+SUBDIRS = data doc nls src util
 MAINTAINERCLEANFILES = aclocal.m4 config.h.in configure Makefile.in stamp-h.in
 
-.PHONY: doc
-
-doc:
-	$(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
+EXTRA_DIST=CHANGELOG CHANGELOG.Blackbox CHANGELOG.bsetbg INSTALL LICENSE \
+           README.bbtools README.bsetbg stamp-h.in version.h.in depcomp \
+           bootstrap
 
 uninstall-local:
 	-rmdir $(pkgdatadir)
 
 distclean-local:
 	rm -f *\~ gmon.out .\#*
-
-ACLOCAL_AMFLAGS = -I m4
-
-EXTRA_DIST = config.rpath mkinstalldirs ABOUT-NLS INSTALL README \
-             COPYING AUTHORS CHANGELOG CHANGELOG.Blackbox CHANGELOG.bsetbg \
-             README.bbtools README.bsetbg

@@ -141,3 +141,8 @@ bbpager.inactive.window.borderColor:	black
 ! ***** rootCommand *****
 #rootCommand:	bsetbg -solid "#484848"
 rootCommand: bsetbg -gradient flatinterlaced -bg "#485561" -fg "#"484848
+
+window.button.max.mask: max.xbm
+window.button.icon.mask: icon.xbm
+window.button.stick.mask: stick.xbm
+window.button.close.mask: close.xbm

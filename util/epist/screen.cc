@@ -588,30 +588,26 @@ void screen::changeWorkspaceVert(const int num) const {
   if (width > _num_desktops || width <= 0)
     return;
 
+  int wnum;
+  
   // a cookie to the person that makes this pretty
   if (num < 0) {
-    int wnum = _active_desktop - width;
-    if (wnum >= 0)
-      changeWorkspace(wnum);
-    else {
+    wnum = _active_desktop - width;
+    if (wnum < 0) {
       wnum = _num_desktops/width * width + _active_desktop;
       if (wnum >= _num_desktops)
         wnum = _num_desktops - 1;
-      changeWorkspace(wnum);
     }
   }
   else {
-    int wnum = _active_desktop + width;
-    if (wnum < _num_desktops)
-      changeWorkspace(wnum);
-    else {
+    wnum = _active_desktop + width;
+    if (wnum >= _num_desktops) {
       wnum = (_active_desktop + width) % _num_desktops - 1;
       if (wnum < 0)
         wnum = 0;
-      changeWorkspace(wnum);
     }
-     
   }
+  changeWorkspace(wnum);
 }
 
 void screen::changeWorkspaceHorz(const int num) const {

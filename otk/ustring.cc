@@ -132,13 +132,13 @@ ustring& ustring::operator=(const ustring& other)
   return *this;
 }
 
-ustring::ustring(const std::string& src)
-  : _string(src), _utf8(true)
+ustring::ustring(const std::string& src, bool utf8)
+  : _string(src), _utf8(utf8)
 {
 }
 
-ustring::ustring(const char* src)
-  : _string(src), _utf8(true)
+ustring::ustring(const char* src, bool utf8)
+  : _string(src), _utf8(utf8)
 {
 }
 

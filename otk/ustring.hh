@@ -124,8 +124,8 @@ public:
   
   ustring(const ustring& other);
   ustring& operator=(const ustring& other);
-  ustring(const std::string& src);
-  ustring(const char* src);
+  ustring(const std::string& src, bool utf8 = true);
+  ustring(const char* src, bool utf8 = true);
 
   // append to the string
 

@@ -82,6 +82,10 @@
   $result = s;
 }
 
+%typemap(python,in,numinputs=0) unsigned long *nelements (unsigned long temp) {
+  $1 = &temp;
+}
+
 %typemap(python,in) unsigned long *nelements (unsigned long temp) {
   temp = (unsigned)PyLong_AsLong($input);
   $1 = &temp;

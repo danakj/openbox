@@ -2552,23 +2552,23 @@ void BlackboxWindow::motionNotifyEvent(XMotionEvent *me) {
           // snap left?
           if (dleft < snap_distance && dleft <= dright) {
             dx = winrect.left() - frame.rect.width();
-            break;
+            continue;
           }
           // snap right?
           else if (dright < snap_distance) {
             dx = winrect.right() + 1;
-            break;
+            continue;
           }
 
           // snap top?
           if (dtop < snap_distance && dtop <= dbottom) {
             dy = winrect.top() - frame.rect.height();
-            break;
+            continue;
           }
           // snap bottom?
           else if (dbottom < snap_distance) {
             dy = winrect.bottom() + 1;
-            break;
+            continue;
           }
         }
                 

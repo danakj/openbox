@@ -96,23 +96,21 @@ void timed_menu_read_pipe(int fd, void *d)
                     TIMED_MENU_DATA(menu)->buf + TIMED_MENU_DATA(menu)->buflen,
                     num_realloc);
     if (num_read == 0) {
-        unsigned long count = 0;
-        char *found = NULL;
-        menu->invalid = TRUE;
+         menu->invalid = TRUE;
         menu_clear(menu);
 
-        /* TEMP: list them */
-        while (NULL !=
-               (found = strchr(&TIMED_MENU_DATA(menu)->buf[count], '\n'))) {
-            TIMED_MENU_DATA(menu)->buf
-                [found - TIMED_MENU_DATA(menu)->buf] = '\0';
-            menu_add_entry(menu,
-                menu_entry_new_separator
-                (&TIMED_MENU_DATA(menu)->buf[count]));
-            count = found - TIMED_MENU_DATA(menu)->buf + 1;
+        TIMED_MENU_DATA(menu)->buf[TIMED_MENU_DATA(menu)->buflen] = '\0';
+
+        xmlDocPtr doc = xmlParseMemory(TIMED_MENU_DATA(menu)->buf,
+                                       TIMED_MENU_DATA(menu)->buflen);
+
+        xmlNodePtr node = xmlDocGetRootElement(doc);
+
+        if (!xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
+            if ((node = parse_find_node("item", node->xmlChildrenNode)))
+                parse_menu_full(doc, node, menu, FALSE);
         }
 
-        TIMED_MENU_DATA(menu)->buf[TIMED_MENU_DATA(menu)->buflen] = '\0';
         timed_menu_clean_up(menu);
     } else if (num_read > 0) {
         TIMED_MENU_DATA(menu)->buflen += num_read;
@@ -184,16 +182,44 @@ void timed_menu_timeout_handler(void *d)
     }
 }
 
-void *plugin_create()
+void *plugin_create(PluginMenuCreateData *data)
 {
-    Timed_Menu_Data *d = g_new(Timed_Menu_Data, 1);
-    ObMenu *m = menu_new("", PLUGIN_NAME, NULL);
+    char *id;
+    char *label;
+    char *timeout;
+    Timed_Menu_Data *d;
+    ObMenu *m;
     
+    parse_attr_string("id", data->node, &id);
+    parse_attr_string("label", data->node, &label);
+    
+    d = g_new(Timed_Menu_Data, 1);
+        
+    m = menu_new( (label != NULL ? label : ""),
+                  (id != NULL ? id : PLUGIN_NAME),
+                  data->parent);
+
     m->plugin = PLUGIN_NAME;
 
-    d->type = TIMED_MENU_STAT;
-    d->timer = timer_start(6000000, &timed_menu_timeout_handler, m);
-    d->command = "/home/woodblock/timed_menu_stat";
+    if (data->parent)
+        menu_add_entry(data->parent, menu_entry_new_submenu(
+                           (label != NULL ? label : ""),
+                           m));
+
+    if (!parse_attr_string("command", data->node, &d->command)) {
+        d->command = g_strdup("");
+    }
+
+    if (parse_attr_string("timeout", data->node, &timeout)) {
+        char *endptr;
+        gdouble timeout_val = g_strtod(timeout, &endptr);
+        g_free(timeout);
+        d->timer = timer_start(timeout_val * 1000000,
+                               &timed_menu_timeout_handler, m);
+    } else
+        d->timer = timer_start(600 * 1000000, &timed_menu_timeout_handler, m);
+
+    d->type = TIMED_MENU_PIPE;
     d->buf = NULL;
     d->buflen = 0;
     d->fd = -1;

@@ -48,7 +48,7 @@
   <floatingX>0</floatingX>
   <floatingY>0</floatingY>
   <autoHide>no</autoHide>
-  <hideTimeout>300</hideTimeout>
+  <hideDelay>300</hideDelay>
 </dock>
 
 <keyboard>

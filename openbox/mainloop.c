@@ -674,6 +674,8 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
         if (curr->del_me) {
             /* delete the top */
             loop->timers = g_slist_delete_link(loop->timers, it); 
+            if (curr->destroy)
+                curr->destroy(curr->data);
             g_free(curr);
             continue;
         }

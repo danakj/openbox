@@ -272,6 +272,8 @@ void client_manage(Window window)
         (self->type == OB_CLIENT_TYPE_NORMAL ||
          self->type == OB_CLIENT_TYPE_DIALOG))
     {        
+        activate = TRUE;
+#if 0
         if (self->desktop != screen_desktop) {
             /* activate the window */
             activate = TRUE;
@@ -301,6 +303,7 @@ void client_manage(Window window)
                 activate = TRUE;
             }
         }
+#endif
     }
 
     dispatch_client(Event_Client_New, self, 0, 0);

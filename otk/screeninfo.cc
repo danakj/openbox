@@ -18,32 +18,32 @@ using std::string;
 namespace otk {
 
 ScreenInfo::ScreenInfo(unsigned int num) {
-  screen_number = num;
+  _screen = num;
 
-  root_window = RootWindow(OBDisplay::display, screen_number);
+  _root_window = RootWindow(OBDisplay::display, _screen);
 
-  rect.setSize(WidthOfScreen(ScreenOfDisplay(OBDisplay::display,
-                                             screen_number)),
+  _rect.setSize(WidthOfScreen(ScreenOfDisplay(OBDisplay::display,
+                                              _screen)),
                HeightOfScreen(ScreenOfDisplay(OBDisplay::display,
-                                              screen_number)));
+                                              _screen)));
   /*
     If the default depth is at least 8 we will use that,
     otherwise we try to find the largest TrueColor visual.
     Preference is given to 24 bit over larger depths if 24 bit is an option.
   */
 
-  depth = DefaultDepth(OBDisplay::display, screen_number);
-  visual = DefaultVisual(OBDisplay::display, screen_number);
-  colormap = DefaultColormap(OBDisplay::display, screen_number);
+  _depth = DefaultDepth(OBDisplay::display, _screen);
+  _visual = DefaultVisual(OBDisplay::display, _screen);
+  _colormap = DefaultColormap(OBDisplay::display, _screen);
   
-  if (depth < 8) {
+  if (_depth < 8) {
     // search for a TrueColor Visual... if we can't find one...
     // we will use the default visual for the screen
     XVisualInfo vinfo_template, *vinfo_return;
     int vinfo_nitems;
     int best = -1;
 
-    vinfo_template.screen = screen_number;
+    vinfo_template.screen = _screen;
     vinfo_template.c_class = TrueColor;
 
     vinfo_return = XGetVisualInfo(OBDisplay::display,
@@ -59,14 +59,14 @@ ScreenInfo::ScreenInfo(unsigned int num) {
           best = i;
         }
       }
-      if (max_depth < depth) best = -1;
+      if (max_depth < _depth) best = -1;
     }
 
     if (best != -1) {
-      depth = vinfo_return[best].depth;
-      visual = vinfo_return[best].visual;
-      colormap = XCreateColormap(OBDisplay::display, root_window, visual,
-                                 AllocNone);
+      _depth = vinfo_return[best].depth;
+      _visual = vinfo_return[best].visual;
+      _colormap = XCreateColormap(OBDisplay::display, _root_window, _visual,
+                                  AllocNone);
     }
 
     XFree(vinfo_return);
@@ -78,11 +78,11 @@ ScreenInfo::ScreenInfo(unsigned int num) {
   if (pos != string::npos)
     default_string.resize(pos);
 
-  display_string = string("DISPLAY=") + default_string + '.' +
-    otk::itostring(static_cast<unsigned long>(screen_number));
+  _display_string = string("DISPLAY=") + default_string + '.' +
+    otk::itostring(static_cast<unsigned long>(_screen));
   
 #ifdef    XINERAMA
-  xinerama_active = False;
+  _xinerama_active = False;
 
   if (d->hasXineramaExtensions()) {
     if (d->getXineramaMajorVersion() == 1) {
@@ -104,16 +104,16 @@ ScreenInfo::ScreenInfo(unsigned int num) {
         XineramaScreenInfo *info = XineramaQueryScreens(OBDisplay::display,
                                                         &num);
         if (num > 0 && info) {
-          xinerama_areas.reserve(num);
+          _xinerama_areas.reserve(num);
           for (int i = 0; i < num; ++i) {
-            xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
-                                          info[i].width, info[i].height));
+            _xinerama_areas.push_back(Rect(info[i].x_org, info[i].y_org,
+                                           info[i].width, info[i].height));
           }
           XFree(info);
 
           // if we can't find any xinerama regions, then we act as if it is not
           // active, even though it said it was
-          xinerama_active = True;
+          _xinerama_active = True;
         }
       }
     }

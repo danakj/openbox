@@ -137,7 +137,7 @@ public:
 
   inline void setImageControl(BImageControl *c) {
     image_control = c;
-    screen_number = c->getScreenInfo()->getScreenNumber();
+    screen_number = c->getScreenInfo()->screen();
   }
   inline unsigned int getScreen(void) { return screen_number; }
 

@@ -14,36 +14,34 @@ namespace otk {
 
 class ScreenInfo {
 private:
-  Visual *visual;
-  Window root_window;
-  Colormap colormap;
+  Visual *_visual;
+  Window _root_window;
+  Colormap _colormap;
 
-  int depth;
-  unsigned int screen_number;
-  std::string display_string;
-  Rect rect;
+  int _depth;
+  unsigned int _screen;
+  std::string _display_string;
+  Rect _rect;
 #ifdef XINERAMA
-  RectList xinerama_areas;
-  bool xinerama_active;
+  RectList _xinerama_areas;
+  bool _xinerama_active;
 #endif
 
 public:
   ScreenInfo(unsigned int num);
 
-  inline Visual *getVisual(void) const { return visual; }
-  inline Window getRootWindow(void) const { return root_window; }
-  inline Colormap getColormap(void) const { return colormap; }
-  inline int getDepth(void) const { return depth; }
-  inline unsigned int getScreenNumber(void) const
-    { return screen_number; }
-  inline const Rect& getRect(void) const { return rect; }
-  inline unsigned int getWidth(void) const { return rect.width(); }
-  inline unsigned int getHeight(void) const { return rect.height(); }
-  inline const std::string& displayString(void) const
-  { return display_string; }
+  inline Visual *visual() const { return _visual; }
+  inline Window rootWindow() const { return _root_window; }
+  inline Colormap colormap() const { return _colormap; }
+  inline int depth() const { return _depth; }
+  inline unsigned int screen() const { return _screen; }
+  inline const Rect& rect() const { return _rect; }
+  inline unsigned int width() const { return _rect.width(); }
+  inline unsigned int height() const { return _rect.height(); }
+  inline const std::string& displayString() const { return _display_string; }
 #ifdef XINERAMA
-  inline const RectList &getXineramaAreas(void) const { return xinerama_areas; }
-  inline bool isXineramaActive(void) const { return xinerama_active; }
+  inline const RectList &xineramaAreas() const { return _xinerama_areas; }
+  inline bool isXineramaActive() const { return _xinerama_active; }
 #endif
 };
 

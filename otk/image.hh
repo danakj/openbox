@@ -88,7 +88,7 @@ public:
 
   inline Window getDrawable(void) const { return window; }
 
-  inline Visual *getVisual(void) { return screeninfo->getVisual(); }
+  inline Visual *getVisual(void) { return screeninfo->visual(); }
 
   inline int getBitsPerPixel(void) const { return bits_per_pixel; }
   inline int getDepth(void) const { return screen_depth; }

@@ -75,7 +75,7 @@ void BColor::parseColorName(void) {
 
   if (scrn == ~(0u))
     scrn = DefaultScreen(OBDisplay::display);
-  Colormap colormap = OBDisplay::screenInfo(scrn)->getColormap();
+  Colormap colormap = OBDisplay::screenInfo(scrn)->colormap();
 
   // get rgb values from colorname
   XColor xcol;
@@ -98,7 +98,7 @@ void BColor::parseColorName(void) {
 
 void BColor::allocate(void) {
   if (scrn == ~(0u)) scrn = DefaultScreen(OBDisplay::display);
-  Colormap colormap = OBDisplay::screenInfo(scrn)->getColormap();
+  Colormap colormap = OBDisplay::screenInfo(scrn)->colormap();
 
   if (! isValid()) {
     if (colorname.empty()) {
@@ -205,7 +205,7 @@ void BColor::doCacheCleanup(void) {
 
     if (count > 0)
       XFreeColors(OBDisplay::display,
-                  OBDisplay::screenInfo(i)->getColormap(),
+                  OBDisplay::screenInfo(i)->colormap(),
                   pixels, count, 0);
   }
 

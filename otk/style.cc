@@ -19,7 +19,7 @@ Style::Style() : font(NULL)
 
 Style::Style(BImageControl *ctrl)
   : image_control(ctrl), font(0),
-    screen_number(ctrl->getScreenInfo()->getScreenNumber())
+    screen_number(ctrl->getScreenInfo()->screen())
 {
 }
 
@@ -136,7 +136,7 @@ void Style::load(const Configuration &style) {
   // load bevel, border and handle widths
 
   const ScreenInfo *s_info = OBDisplay::screenInfo(screen_number);
-  unsigned int width = s_info->getRect().width();
+  unsigned int width = s_info->rect().width();
 
   if (! style.getValue("handleWidth", handle_width) ||
       handle_width > width/2 || handle_width == 0)
@@ -160,7 +160,7 @@ void Style::load(const Configuration &style) {
 
 void Style::readDatabaseMask(const std::string &rname, PixmapMask &pixmapMask,
                              const Configuration &style) {
-  Window root_window = OBDisplay::screenInfo(screen_number)->getRootWindow();
+  Window root_window = OBDisplay::screenInfo(screen_number)->rootWindow();
   std::string s;
   int hx, hy; //ignored
   int ret = BitmapOpenFailed; //default to failure.

@@ -86,7 +86,7 @@ BGCCache::~BGCCache(void) {
 
 
 BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
-  Window hd = OBDisplay::screenInfo(scr)->getRootWindow();
+  Window hd = OBDisplay::screenInfo(scr)->rootWindow();
 
   BGCCacheContext *c;
 

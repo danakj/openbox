@@ -12,8 +12,8 @@ OtkLabel::OtkLabel(OtkWidget *parent)
   : OtkWidget(parent), _text("")
 {
   const ScreenInfo *info = OBDisplay::screenInfo(screen());
-  _xftdraw = XftDrawCreate(OBDisplay::display, window(), info->getVisual(),
-                           info->getColormap());
+  _xftdraw = XftDrawCreate(OBDisplay::display, window(), info->visual(),
+                           info->colormap());
 }
 
 OtkLabel::~OtkLabel()

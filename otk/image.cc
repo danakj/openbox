@@ -562,7 +562,7 @@ Pixmap BImage::renderPixmap(void) {
 
   XPutImage(OBDisplay::display, pixmap,
 	    DefaultGC(OBDisplay::display,
-		      control->getScreenInfo()->getScreenNumber()),
+		      control->getScreenInfo()->screen()),
             image, 0, 0, 0, 0, width, height);
 
   if (image->data) {

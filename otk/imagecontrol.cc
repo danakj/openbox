@@ -69,10 +69,10 @@ BImageControl::BImageControl(OBTimerQueueManager *timermanager,
 
   sqrt_table = (unsigned long *) 0;
 
-  screen_depth = screeninfo->getDepth();
-  window = screeninfo->getRootWindow();
-  screen_number = screeninfo->getScreenNumber();
-  colormap = screeninfo->getColormap();
+  screen_depth = screeninfo->depth();
+  window = screeninfo->rootWindow();
+  screen_number = screeninfo->screen();
+  colormap = screeninfo->colormap();
 
   int count;
   XPixmapFormatValues *pmv = XListPixmapFormats(OBDisplay::display,

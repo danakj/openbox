@@ -70,7 +70,7 @@ OtkWidget::~OtkWidget()
 void OtkWidget::create(void)
 {
   const ScreenInfo *scr_info = otk::OBDisplay::screenInfo(_screen);
-  Window p_window = _parent ? _parent->window() : scr_info->getRootWindow();
+  Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
 
   _rect.setRect(0, 0, 1, 1); // just some initial values
 
@@ -78,7 +78,7 @@ void OtkWidget::create(void)
   unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask;
 
   attrib_create.background_pixmap = None;
-  attrib_create.colormap = scr_info->getColormap();
+  attrib_create.colormap = scr_info->colormap();
   attrib_create.event_mask = ButtonPressMask | ButtonReleaseMask |
     ButtonMotionMask | ExposureMask | StructureNotifyMask;
 
@@ -89,8 +89,8 @@ void OtkWidget::create(void)
 
   _window = XCreateWindow(otk::OBDisplay::display, p_window, _rect.x(),
                           _rect.y(), _rect.width(), _rect.height(), 0,
-                          scr_info->getDepth(), InputOutput,
-                          scr_info->getVisual(), create_mask, &attrib_create);
+                          scr_info->depth(), InputOutput,
+                          scr_info->visual(), create_mask, &attrib_create);
   _ignore_config++;
 }
 

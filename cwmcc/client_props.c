@@ -16,16 +16,31 @@ void cwmcc_client_get_protocols(Window win, Atom **protocols)
     }
 }
 
-int cwmcc_client_get_wm_state(Window win)
+void cwmcc_client_set_protocols(Window win, Atom *protocols)
 {
-    gulong s;
+    gulong n;
+    Atom *a;
 
+    for (a = protocols, n = 0; *a; ++a, ++n);
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, wm_state),
+                    CWMCC_ATOM(type, atom), 32, PropModeReplace,
+                    (guchar*)protocols, n);
+}
+
+void cwmcc_client_get_wm_state(Window win, gulong *state)
+{
     if (!prop_get32(win, CWMCC_ATOM(client, wm_state),
-                    CWMCC_ATOM(client, wm_state), &s)) {
+                    CWMCC_ATOM(client, wm_state), state)) {
         g_warning("Failed to read WM_STATE from 0x%lx", win);
-        s = NormalState;
+        *state = NormalState;
     }
-    return s;
+}
+
+void cwmcc_client_set_wm_state(Window win, gulong state)
+{
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, wm_state),
+                    CWMCC_ATOM(client, wm_state), 32, PropModeReplace,
+                    (guchar*)&state, 1);
 }
 
 void cwmcc_client_get_name(Window win, char **name)
@@ -109,6 +124,13 @@ void cwmcc_client_get_desktop(Window win, gulong *desk)
     }
 }
 
+void cwmcc_client_set_desktop(Window win, gulong desk)
+{
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, net_wm_desktop),
+                    CWMCC_ATOM(type, cardinal), 32, PropModeReplace,
+                    (guchar*)&desk, 1);
+}
+
 void cwmcc_client_get_type(Window win, gulong **types)
 {
     gulong num;
@@ -122,6 +144,17 @@ void cwmcc_client_get_type(Window win, gulong **types)
     }
 }
 
+void cwmcc_client_set_type(Window win, gulong *types)
+{
+    gulong n;
+    gulong *t;
+
+    for (t = types, n = 0; *t; ++t, ++n);
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, wm_state),
+                    CWMCC_ATOM(type, atom), 32, PropModeReplace,
+                    (guchar*)types, n);
+}
+
 void cwmcc_client_get_state(Window win, gulong **states)
 {
     gulong num;
@@ -132,6 +165,17 @@ void cwmcc_client_get_state(Window win, gulong **states)
         *states = g_new(Atom, 1);
         (*states)[0] = 0;
     }
+}
+
+void cwmcc_client_set_state(Window win, gulong *states)
+{
+    gulong n;
+    gulong *s;
+
+    for (s = states, n = 0; *s; ++s, ++n);
+    XChangeProperty(cwmcc_display, win, CWMCC_ATOM(client, wm_state),
+                    CWMCC_ATOM(type, atom), 32, PropModeReplace,
+                    (guchar*)states, n);
 }
 
 void cwmcc_client_get_strut(Window win, int *l, int *t, int *r, int *b)

@@ -3,7 +3,8 @@
 
 void cwmcc_client_get_protocols(Window win, Atom **protocols);
 
-int cwmcc_client_get_wm_state(Window win);
+void cwmcc_client_get_wm_state(Window win, gulong *state);
+void cwmcc_client_set_wm_state(Window win, gulong state);
 
 void cwmcc_client_get_name(Window win, char **name);
 
@@ -55,10 +56,13 @@ struct Cwmcc_MwmHints {
 void cwmcc_client_get_mwmhints(Window win, struct Cwmcc_MwmHints *hints);
 
 void cwmcc_client_get_desktop(Window win, gulong *desk);
+void cwmcc_client_set_desktop(Window win, gulong desk);
 
 void cwmcc_client_get_type(Window win, gulong **types);
+void cwmcc_client_set_type(Window win, gulong *types);
 
 void cwmcc_client_get_state(Window win, gulong **states);
+void cwmcc_client_set_state(Window win, gulong *states);
 
 void cwmcc_client_get_strut(Window win, int *l, int *t, int *r, int *b);
 

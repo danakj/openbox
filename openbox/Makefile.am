@@ -32,7 +32,8 @@ openbox3_SOURCES=client.c event.c extensions.c focus.c frame.c openbox.c \
 
 noinst_HEADERS=client.h event.h extensions.h focus.h frame.h geom.h gettext.h \
 	openbox.h prop.h screen.h stacking.h xerror.h dispatch.h \
-	timer.h engine.h plugin.h action.h grab.h config.h menu.h parse.h
+	timer.h engine.h plugin.h action.h grab.h config.h menu.h parse.h \
+	y.tab.h
 
 lex.yy.c: parse.l
 	$(FLEX) $^

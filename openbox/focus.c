@@ -257,8 +257,8 @@ static void popup_cycle(ObClient *c, gboolean show)
     }
 }
 
-ObClient *focus_cycle(gboolean forward, gboolean linear,
-                      gboolean dialog, gboolean done, gboolean cancel)
+void focus_cycle(gboolean forward, gboolean linear,
+                 gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     static ObClient *t = NULL;
@@ -271,10 +271,9 @@ ObClient *focus_cycle(gboolean forward, gboolean linear,
             frame_adjust_focus(focus_cycle_target->frame, FALSE);
         if (focus_client)
             frame_adjust_focus(focus_client->frame, TRUE);
+        focus_cycle_target = NULL;
         goto done_cycle;
-    } else if (done) {
-        if (focus_cycle_target)
-            client_activate(focus_cycle_target, FALSE);
+    } else if (done && dialog) {
         goto done_cycle;
     }
 
@@ -314,11 +313,14 @@ ObClient *focus_cycle(gboolean forward, gboolean linear,
                 frame_adjust_focus(focus_cycle_target->frame, TRUE);
             }
             popup_cycle(ft, dialog);
-            return ft;
+            return;
         }
     } while (it != start);
 
 done_cycle:
+    if (done && focus_cycle_target)
+        client_activate(focus_cycle_target, FALSE);
+
     t = NULL;
     first = NULL;
     focus_cycle_target = NULL;
@@ -327,7 +329,51 @@ done_cycle:
 
     popup_cycle(ft, FALSE);
 
-    return NULL;
+    return;
+}
+
+void focus_directional_cycle(ObDirection dir,
+                             gboolean dialog, gboolean done, gboolean cancel)
+{
+    static ObClient *first = NULL;
+    ObClient *ft;
+
+    if (cancel) {
+        if (focus_cycle_target)
+            frame_adjust_focus(focus_cycle_target->frame, FALSE);
+        if (focus_client)
+            frame_adjust_focus(focus_client->frame, TRUE);
+        focus_cycle_target = NULL;
+        goto done_cycle;
+    } else if (done && dialog) {
+        goto done_cycle;
+    }
+
+    if (!first) first = focus_client;
+    if (!focus_cycle_target) focus_cycle_target = focus_client;
+
+    if ((ft = client_find_directional(focus_cycle_target, dir))) {
+        if (ft != focus_cycle_target) {/* prevents flicker */
+            if (focus_cycle_target)
+                frame_adjust_focus(focus_cycle_target->frame, FALSE);
+            focus_cycle_target = ft;
+            frame_adjust_focus(focus_cycle_target->frame, TRUE);
+        }
+        popup_cycle(ft, dialog);
+    }
+    if (dialog)
+        return;
+
+done_cycle:
+    if (done && focus_cycle_target)
+        client_activate(focus_cycle_target, FALSE);
+
+    first = NULL;
+    focus_cycle_target = NULL;
+
+    popup_cycle(ft, FALSE);
+
+    return;
 }
 
 void focus_order_add_new(ObClient *c)

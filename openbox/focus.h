@@ -1,6 +1,8 @@
 #ifndef __focus_h
 #define __focus_h
 
+#include "misc.h"
+
 #include <X11/Xlib.h>
 #include <glib.h>
 
@@ -31,8 +33,10 @@ void focus_fallback(ObFocusFallbackType type);
 
 /*! Cycle focus amongst windows
   Returns the _ObClient to which focus has been cycled, or NULL if none. */
-struct _ObClient *focus_cycle(gboolean forward, gboolean linear,
-                              gboolean dialog, gboolean done, gboolean cancel);
+void focus_cycle(gboolean forward, gboolean linear,
+                 gboolean dialog, gboolean done, gboolean cancel);
+void focus_directional_cycle(ObDirection dir,
+                             gboolean dialog, gboolean done, gboolean cancel);
 
 /*! Add a new client into the focus order */
 void focus_order_add_new(struct _ObClient *c);

@@ -59,9 +59,41 @@ TrueRenderControl::~TrueRenderControl()
 
 void TrueRenderControl::render(::Drawable d)
 {
-  Pixmap p = XCreatePixmap(**display, d, 255, 30, _screen->depth());
+  XGCValues gcv;
+  gcv.cap_style = CapProjecting;
 
+  int w = 255, h = 32;
+  Pixmap p = XCreatePixmap(**display, d, w, h, _screen->depth());
+  XImage *im = XCreateImage(**display, _screen->visual(), _screen->depth(),
+			    ZPixmap, 0, NULL, w, h, 32, 0);
+  //GC gc = XCreateGC(**display, _screen->rootWindow(), GCCapStyle, &gcv);
 
+  im->data = new char[im->bytes_per_line * (h + 1)]; // XXX  + 1?
+  char *dp = im->data;
+
+  for (int x = 0; x < w; ++x, ++dp)
+    *dp = 0;
+  for (int y = 0; y < 10; ++h)
+    for (int x = 0; x < w; ++x, ++dp)
+      *dp = _red_color_table[x] << _red_offset;
+  for (int y = 0; y < 10; ++h)
+    for (int x = 0; x < w; ++x, ++dp)
+      *dp = _green_color_table[x] << _green_offset;
+  for (int y = 0; y < 10; ++h)
+    for (int x = 0; x < w; ++x, ++dp)
+      *dp = _blue_color_table[x] << _blue_offset;
+  for (int x = 0; x < w; ++x, ++dp)
+    *dp = 0;
+
+  XPutImage(**display, p, DefaultGC(**display, _screen->screen()),
+            im, 0, 0, 0, 0, w, h);
+
+  //delete [] image->data;
+  //image->data = NULL;
+  XDestroyImage(im);
+
+  XCopyArea(**display, p, d, DefaultGC(**display, _screen->screen()),
+	    0, 0, w, h,  0, 0);
 
   XFreePixmap(**display, p);
 }

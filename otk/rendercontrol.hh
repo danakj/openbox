@@ -4,6 +4,7 @@
 
 extern "C" {
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 }
 
 namespace otk {
@@ -66,7 +67,7 @@ public:
 
   static RenderControl *getRenderControl(int screen);
 
-  virtual void render(::Drawable d);
+  virtual void render(::Drawable d) = 0;
 };
 
 }

@@ -17,7 +17,7 @@ public:
   TrueRenderControl(const ScreenInfo *screen);
   virtual ~TrueRenderControl();
 
-  virtual void render(::Drawable d) = 0;
+  virtual void render(::Drawable d);
 };
 
 }

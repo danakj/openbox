@@ -1,5 +1,0 @@
-/* Created with The GIMP */
-#define bulletbc_width 8
-#define bulletbc_height 8
-static unsigned char bulletbc_bits[] = {
-   0x00, 0x04, 0x0e, 0x1c, 0x3c, 0x1c, 0x0e, 0x04 };

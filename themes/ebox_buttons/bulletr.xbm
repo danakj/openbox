@@ -1,5 +1,0 @@
-/* Created with The GIMP */
-#define bulletr_width 8
-#define bulletr_height 8
-static unsigned char bulletr_bits[] = {
-   0x00, 0x04, 0x0e, 0x1c, 0x3c, 0x1c, 0x0e, 0x04 };

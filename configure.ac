@@ -106,6 +106,9 @@ X11_EXT_XINERAMA
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in
                  themes/Makefile
+                 themes/ebox_data/Makefile
+                 themes/fieron_data/Makefile
+                 themes/fieron2_data/Makefile
 		 data/Makefile
                  render/Makefile
 		 parser/Makefile

@@ -1541,10 +1541,19 @@ void client_update_strut(ObClient *self)
     if (!got &&
         PROP_GETA32(self->window, net_wm_strut, cardinal, &data, &num)) {
         if (num == 4) {
+            const Rect *a;
+
             got = TRUE;
+
+            /* use the screen's width/height */
+            a = screen_physical_area();
+
             STRUT_PARTIAL_SET(strut,
                               data[0], data[2], data[1], data[3],
-                              0, 0, 0, 0, 0, 0, 0, 0);
+                              a->y, a->y + a->height - 1,
+                              a->x, a->x + a->width - 1,
+                              a->y, a->y + a->height - 1,
+                              a->x, a->x + a->width - 1);
         }
         g_free(data);
     }

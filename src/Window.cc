@@ -1094,9 +1094,12 @@ void BlackboxWindow::getWMHints(void) {
 
     // add window to the appropriate group
     BWindowGroup *group = blackbox->searchGroup(client.window_group);
-    if (! group) // no group found, create it!
-      group = new BWindowGroup(blackbox, client.window_group);
-    group->addWindow(this);
+    if (! group) { // no group found, create it!
+      new BWindowGroup(blackbox, client.window_group);
+      group = blackbox->searchGroup(client.window_group);
+    }
+    if (group)
+      group->addWindow(this);
   }
 
   client.wm_hint_flags = wmhint->flags;

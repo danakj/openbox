@@ -420,6 +420,17 @@ void OtkWidget::removeChild(OtkWidget *child)
     _children.erase(it);
 }
 
+void OtkWidget::setStyle(Style *style)
+{
+  assert(style);
+  _style = style;
+  _dirty = true;
+  OtkWidgetList::iterator it, end = _children.end();
+  for (it = _children.begin(); it != end; ++it)
+    (*it)->setStyle(style);
+}
+
+
 void OtkWidget::setEventDispatcher(OtkEventDispatcher *disp)
 {
   if (_event_dispatcher)

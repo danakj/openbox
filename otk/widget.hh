@@ -101,7 +101,7 @@ public:
   void setDirection(Direction dir) { _direction = dir; }
 
   inline Style *getStyle(void) const { return _style; }
-  virtual void setStyle(Style *style) { assert(style); _style = style; }
+  virtual void setStyle(Style *style);
 
   inline OtkEventDispatcher *getEventDispatcher(void)
   { return _event_dispatcher; }

@@ -62,18 +62,23 @@ Control-Mod1-x {
 .br
 }
 .SH OPTIONS
-.SS stackedCycling (boolean)
+.SS stackedCycling (boolean, default=off)
 When this option is set to True, any window cycling actions, such as nextWindow,
 prevWindow, nextWindowOfClass, etc., will cause the windows to focus, but they will
 not be raised until the modifiers are released. When the modifier is released,
 the focused (and now raised) window will be moved to the top of the stacking order,
 so if you execute nextWindow and release the modifiers multiple times, focus will
 cycle between two windows.
-.SS chainTimeout (number)
+.SS stackedCyclingRaise (boolean, default=off)
+This option modifies the window raise behavior when stackedCycling is turned on.
+When true, windows will be raised immediatly on focus, rather than when the
+keys are released. This may be desirable if you frequently have windows that are
+obscured by other windows.
+.SS chainTimeout (number, default=3500)
 Specifies the period of time after which a started key chain will
 be timed out. It takes a number argument specifying the number of
 milliseconds to wait. It defaults to 4000.
-.SS workspaceColumns (number)
+.SS workspaceColumns (number, default=0, disabled)
 Specifies the number of columns of your workspace layout if you are using
 your workspaces in a 2-dimensional manner. This option must exist if one of
 the prevWorkspaceColumn, prevWorkspaceRow, nextWorkspaceColumn,

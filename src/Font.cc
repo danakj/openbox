@@ -48,7 +48,8 @@ string      BFont::_fallback_font   = "fixed";
 
 #ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
-             bool bold, bool italic, bool shadow, bool antialias) :
+             bool bold, bool italic, bool shadow, unsigned char offset, 
+             int tint, bool antialias) :
                                           _display(d),
                                           _screen(screen),
                                           _family(family),
@@ -58,6 +59,8 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
                                           _italic(italic),
                                           _antialias(antialias),
                                           _shadow(shadow),
+                                          _offset(offset),
+                                          _tint(tint),
                                           _xftfont(0),
                                           _font(0),
                                           _fontset(0),
@@ -264,19 +267,29 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
 
     if (_shadow) {
       XftColor c;
-      c.color.red = 0;
-      c.color.green = 0;
-      c.color.blue = 0;
-      c.color.alpha = 0x40 | 0x40 << 8; // transparent shadow
-      c.pixel = BlackPixel(_display, _screen->getScreenNumber());
+      if (_tint >= 0) {
+        c.color.red = 0;
+        c.color.green = 0;
+        c.color.blue = 0;
+        c.color.alpha = 0xffff * _tint/100; // transparent shadow
+        c.pixel = BlackPixel(_display, _screen->getScreenNumber());
+      } else {
+        c.color.red = 0xffff * -_tint/100;
+        c.color.green = 0xffff * -_tint/100;
+        c.color.blue = 0xffff * -_tint/100;
+        c.color.alpha = 0xffff * -_tint/100;
+        c.pixel = WhitePixel(_display, _screen->getScreenNumber());
+      }
 
 #ifdef XFT_UTF8
       XftDrawStringUtf8(
 #else
       XftDrawString8(
 #endif
-                     draw, &c, _xftfont, x + 1, _xftfont->ascent + y + 1,
-                     (XftChar8 *) string.c_str(), string.size());
+                     draw, &c, _xftfont, x + _offset, 
+                     _xftfont->ascent + y + _offset,
+                     (XftChar8 *) string.c_str(), 
+                     string.size());
     }
     
     XftColor c;
@@ -327,7 +340,7 @@ unsigned int BFont::measureString(const string &string) const {
                     _display, _xftfont, (XftChar8 *) string.c_str(),
                     string.size(), &info);
 
-    return info.xOff + (_shadow ? 1 : 0);
+    return info.xOff + (_shadow ? std::abs(_offset) : 0);
   }
 #endif // XFT
 
@@ -346,7 +359,7 @@ unsigned int BFont::height(void) const {
 
 #ifdef    XFT
   if (_xftfont)
-    return _xftfont->height + (_shadow ? 1 : 0);
+    return _xftfont->height + (_shadow ? std::abs(_offset) : 0);
 #endif // XFT
 
   if (i18n.multibyte())

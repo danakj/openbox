@@ -54,11 +54,27 @@ void parser::parse(string rc_file)
 
   yyin = fopen(rc_file.c_str(), "r");
 
-  yyparse(this);
+  if (yyin) {
+    yyparse(this);
+    fclose(yyin);
+  } else {
+    std::cerr << "ERROR: Configuration file could not be opened/found.\n";
+  }
 
-  fclose(yyin);
   _kt->reset();
   _kt->initialize();
+}
+
+void parser::setKey(string key)
+{ 
+  KeySym sym = XStringToKeysym(key.c_str());
+
+  if (sym == 0) {
+    std::cerr << "ERROR: Invalid key (" << key << ")! This may cause odd behavior.\n";
+    _add = false;
+  } else {
+    _key = key;
+  }
 }
 
 void parser::setAction(string act)
@@ -189,14 +205,11 @@ void parser::endChain()
 
 void parser::setChainBinding()
 {
-  if (_mask != 0 && _key != "") {
-    if (!_add) {
-      cout << "Error: Bad modifier detected on chain's root key.\n";
-      _add = true;
-    }
+  if (_add)
     _kt->setCurrentNodeProps(Action::noaction, _mask, _key, "");
-    reset();
-  }
+  
+  _add = true;
+  reset();
 }
 
 void parser::reset()

@@ -2725,15 +2725,33 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
     string family = s;
     bool bold = False;
     bool italic = False;
+    bool dropShadow = False;
+
     if (style.getValue(rbasename + "xft.flags", s)) {
       if (s.find("bold") != string::npos)
         bold = True;
       if (s.find("italic") != string::npos)
         italic = True;
+      if (s.find("shadow") != string::npos)
+        dropShadow = True;
     }
     
+    unsigned char offset = 1;
+    if (style.getValue(rbasename + "xft.shadow.offset", s)) {
+      offset = atoi(s.c_str()); //doesn't detect errors
+      if (offset > CHAR_MAX)
+        offset = 1;
+    }
+
+    unsigned char tint = 0x40;
+    if (style.getValue(rbasename + "xft.shadow.tint", s)) {
+      tint = atoi(s.c_str());
+    }
+
+    
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic, resource.shadow_fonts, resource.aa_fonts);
+                         italic, dropShadow && resource.shadow_fonts, offset, 
+                         tint, resource.aa_fonts);
     if (b->valid())
       return b;
     else

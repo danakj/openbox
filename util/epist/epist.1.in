@@ -5,7 +5,7 @@ epist - NetWM keybindings grabber
 \fBepist\fR [options]
 .SH DESCRIPTION
 \fBepist\fR is intended to provide keygrabbing for the OpenBox window manager
-for the X Windows System. This allows you to control things with keypresses
+for the X Window System. This allows you to control things with keypresses
 rather than the mouse.
 .SH OPTIONS
 .TP

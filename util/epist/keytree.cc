@@ -29,6 +29,7 @@
 #include "config.hh"
 
 #include <string>
+#include <iostream>
 
 using std::string;
 
@@ -84,18 +85,26 @@ void keytree::grabDefaults(screen *scr)
 
 void keytree::ungrabDefaults(screen *scr)
 {
+  Action *act;
+
   ChildList::const_iterator it, end = _head->children.end();
-  for (it = _head->children.begin(); it != end; ++it)
-    if ( (*it)->action && (*it)->action->type() != Action::toggleGrabs)
-      scr->ungrabKey( (*it)->action->keycode(), (*it)->action->modifierMask() );
+  for (it = _head->children.begin(); it != end; ++it) {
+    act = (*it)->action;
+    if (act && act->type() != Action::toggleGrabs)
+      scr->ungrabKey(act->keycode(), act->modifierMask());
+  }
 }
 
 void keytree::grabChildren(keynode *node, screen *scr)
 {
+  Action *act;
+
   ChildList::const_iterator it, end = node->children.end();
-  for (it = node->children.begin(); it != end; ++it)
-    if ( (*it)->action )
-      scr->grabKey( (*it)->action->keycode(), (*it)->action->modifierMask() );
+  for (it = node->children.begin(); it != end; ++it) {
+    act = (*it)->action;
+    if (act)
+      scr->grabKey(act->keycode(), act->modifierMask());
+  }
 }
 
 void keytree::ungrabChildren(keynode *node, screen *scr)
@@ -178,8 +187,6 @@ const Action * keytree::getAction(const XEvent &e, unsigned int state,
 void keytree::addAction(Action::ActionType action, unsigned int mask,
                         string key, string arg)
 {
-  keynode *tmp = new keynode;
-
   if (action == Action::toggleGrabs && _current != _head) {
     // the toggleGrabs key can only be set up as a root key, since if
     // it was a chain key, we'd have to not ungrab the whole chain up
@@ -187,9 +194,11 @@ void keytree::addAction(Action::ActionType action, unsigned int mask,
     return;
   }
 
+  KeySym sym = XStringToKeysym(key.c_str());
+  keynode *tmp = new keynode;
+
   tmp->action = new Action(action,
-                           XKeysymToKeycode(_display,
-                                            XStringToKeysym(key.c_str())),
+                           XKeysymToKeycode(_display, sym),
                            mask, arg);
   tmp->parent = _current;
   _current->children.push_back(tmp);
@@ -215,10 +224,10 @@ void keytree::setCurrentNodeProps(Action::ActionType action, unsigned int mask,
 {
   if (_current->action)
     delete _current->action;
-  
+
+  KeySym sym = XStringToKeysym(key.c_str());
   _current->action = new Action(action,
-                                XKeysymToKeycode(_display,
-                                                 XStringToKeysym(key.c_str())),
+                                XKeysymToKeycode(_display, sym),
                                 mask, arg);
 }
 

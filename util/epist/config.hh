@@ -36,6 +36,7 @@ public:
   enum BoolType {
     NO_BOOL_TYPE,
     stackedCycling,
+    stackedCyclingRaise,
     NUM_BOOL_TYPES
   };
 

@@ -42,7 +42,7 @@ Frame *frame_new()
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
-XSetWindowBorderWidth(ob_display, self->window, 3);
+XSetWindowBorderWidth(ob_display, self->window, 1);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -60,7 +60,7 @@ XSetWindowBorderWidth(ob_display, self->window, 3);
     self->framedecor[0].type = Decor_Titlebar;
     self->framedecor[0].context = Context_Titlebar;
     self->framedecor[0].frame = self;
-XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 3);
+XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 1);
     XMapWindow(ob_display, self->framedecor[0].window);
 
     self->framedecor[1].obwin.type = Window_Decoration;
@@ -70,7 +70,7 @@ XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 3);
     self->framedecor[1].type = Decor_Titlebar;
     self->framedecor[1].context = Context_Titlebar;
     self->framedecor[1].frame = self;
-XSetWindowBorderWidth(ob_display, self->framedecor[1].window, 3);
+XSetWindowBorderWidth(ob_display, self->framedecor[1].window, 1);
     XMapWindow(ob_display, self->framedecor[1].window);
 
     self->focused = FALSE;
@@ -563,7 +563,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
 
                     case Decor_TopRight:
                     x = self->size.left + cr->width
-                      - dec->position.x - dec->position.width;
+                      + dec->position.x + dec->position.width;
                     y = self->size.top - dec->position.y - dec->position.height;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
                                       dec->position.width,
@@ -581,8 +581,8 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
                     break;
 
                     case Decor_Right:
-                    x = self->size.left + cr->width - dec->position.x
-                      - dec->position.width;
+                    x = self->size.left + cr->width + dec->position.x
+                      + dec->position.width;
                     y = cr->height/2 + self->size.top - dec->position.y
                       - dec->position.height/2;
                     XMoveResizeWindow(ob_display, dec->window, x, y,
@@ -611,7 +611,7 @@ printf("frame extends by %d, %d, %d, %d\n", le, te, le, be);
 
                     case Decor_BottomRight:
                     x = self->size.left + cr->width
-                      - dec->position.x - dec->position.width;
+                      + dec->position.x + dec->position.width;
                     y = self->size.top + cr->height
                       - dec->position.y - dec->position.height;
                     XMoveResizeWindow(ob_display, dec->window, x, y,

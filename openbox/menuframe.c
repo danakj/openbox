@@ -667,7 +667,8 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
         ObClient *client = self->frame->client;
 
         /* release grabs before executing the shit */
-        menu_frame_hide_all();
+        if (hide)
+            menu_frame_hide_all();
 
         if (func)
             func(entry, data);

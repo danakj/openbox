@@ -1322,7 +1322,7 @@ void client_update_icons(Client *self)
 	    w = data[i++];
 	    h = data[i++];
 	    i += w * h;
-	    if (i > num) break;
+	    if (i > num || w*h == 0) break;
 	    ++self->nicons;
 	}
 

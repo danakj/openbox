@@ -454,8 +454,7 @@ BB    @param window The window id that the OBClient class should handle
   inline bool modal() const { return _modal; }
   //! Returns if the window is shaded
   /*!
-    When the window is shaded, only its titlebar is visible, the client itself
-    is not mapped
+    When the window is shaded, only its titlebar is visible.
   */
   inline bool shaded() const { return _shaded; }
   //! Returns if the window is iconified
@@ -514,10 +513,10 @@ BB    @param window The window id that the OBClient class should handle
   void shade(bool shade);
   
   //! Attempt to focus the client window
-  bool focus();
+  bool focus() const;
 
   //! Remove focus from the client window
-  void unfocus();
+  void unfocus() const;
 
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);

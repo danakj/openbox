@@ -23,6 +23,9 @@
 GSList     *client_list      = NULL;
 GHashTable *client_map       = NULL;
 
+static Window *client_startup_stack_order = NULL;
+static gulong  client_startup_stack_size = 0;
+
 static void client_get_all(Client *self);
 static void client_toggle_border(Client *self, gboolean show);
 static void client_get_area(Client *self);
@@ -45,6 +48,13 @@ void client_startup()
 {
     client_map = g_hash_table_new((GHashFunc)map_hash,
 				  (GEqualFunc)map_key_comp);
+
+    /* save the stacking order on startup! */
+    if (!PROP_GET32U(ob_root, net_client_list_stacking, window,
+                     client_startup_stack_order, client_startup_stack_size))
+        g_message("failed");
+    g_message("%ld", client_startup_stack_size);
+
     client_set_list();
 }
 
@@ -112,6 +122,15 @@ void client_manage_all()
 	}
     }
     XFree(children);
+
+    /* stack them as they were on startup! */
+    for (i = client_startup_stack_size; i > 0; --i) {
+        Client *c;
+
+        w = client_startup_stack_order[i-1];
+        c = g_hash_table_lookup(client_map, &w);
+        if (c) stacking_lower(c);
+    }
 }
 
 void client_manage(Window window)

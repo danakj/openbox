@@ -26,6 +26,9 @@ void gradient_render(Surface *sf, int w, int h)
   case Background_CrossDiagonal:
     gradient_crossdiagonal(sf, w, h);
     break;
+  case Background_Pyramid:
+    gradient_pyramid(sf, w, h);
+    break;
   default:
     g_message("unhandled gradient");
     return;
@@ -327,3 +330,42 @@ void gradient_solid(Appearance *l, int x, int y, int w, int h)
   }
 */
 }
+
+void gradient_pyramid(Surface *sf, int inw, int inh)
+{
+  pixel32 *data = sf->data.planar.pixel_data;
+  pixel32 *end = data + inw*inh;
+  pixel32 current;
+  float drx, dgx, dbx, dry, dgy, dby;
+  unsigned int r,g,b;
+  int x, y, h=inh/2, w=inw/2;
+memset(data, 0, inw*inh*sizeof(pixel32));
+  for (y = 0; y < h; ++y) {
+    drx = (float)(sf->data.planar.secondary->r - sf->data.planar.primary->r);
+    dry = drx/(float)h;
+    drx/= (float)w;
+
+    dgx = (float)(sf->data.planar.secondary->g - sf->data.planar.primary->g);
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
+
+    dbx = (float)(sf->data.planar.secondary->b - sf->data.planar.primary->b);
+    dby = dbx/(float)h;
+    dbx/= (float)w;
+    for (x = 0; x < w; ++x, data) {
+      r = sf->data.planar.primary->r + ((int)(drx * x) + (int)(dry * y))/2;
+      g = sf->data.planar.primary->g + ((int)(dgx * x) + (int)(dgy * y))/2;
+      b = sf->data.planar.primary->b + ((int)(dbx * x) + (int)(dby * y))/2;
+      current = (r << default_red_shift)
+              + (g << default_green_shift)
+              + (b << default_blue_shift);
+      *(data+x) = current;
+      *(data+inw-x) = current;
+      *(end-x) = current;
+      *(end-(inw-x)) = current;
+    }
+    data+=inw;
+    end-=inw;
+  }
+}
+

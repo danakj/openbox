@@ -253,6 +253,8 @@ static void menu_entry_free(ObMenuEntry *self)
             }
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
+            g_free(self->data.submenu.name);
+            break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             break;
         }
@@ -296,14 +298,13 @@ void menu_add_normal(gchar *name, gint id, gchar *label, GSList *actions)
 
 void menu_add_submenu(gchar *name, gint id, gchar *submenu)
 {
-    ObMenu *self, *sub;
+    ObMenu *self;
     ObMenuEntry *e;
 
     if (!(self = menu_from_name(name))) return;
-    if (!(sub = menu_from_name(submenu))) return;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_SUBMENU, id);
-    e->data.submenu.submenu = sub;
+    e->data.submenu.name = g_strdup(submenu);
 
     self->entries = g_list_append(self->entries, e);
 }
@@ -358,4 +359,16 @@ ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)
         }
     }
     return ret;
+}
+
+void menu_find_submenus(ObMenu *self)
+{
+    GList *it;
+
+    for (it = self->entries; it; it = g_list_next(it)) {
+        ObMenuEntry *e = it->data;
+
+        if (e->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+            e->data.submenu.submenu = menu_from_name(e->data.submenu.name);
+    }
 }

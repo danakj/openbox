@@ -170,6 +170,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
 {
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
+    ObMenu *sub;
 
     item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                !self->entry->data.normal.enabled) ?
@@ -205,8 +206,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         text_a->texture[0].data.text.string = self->entry->data.normal.label;
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
-        text_a->texture[0].data.text.string =
-            self->entry->data.submenu.submenu->title;
+        sub = self->entry->data.submenu.submenu;
+        text_a->texture[0].data.text.string = sub ? sub->title : "";
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
         break;
@@ -265,6 +266,7 @@ static void menu_frame_render(ObMenuFrame *self)
     gint tw, th; /* temps */
     GList *it;
     gboolean has_icon = FALSE, has_bullet = FALSE;
+    ObMenu *sub;
 
     XSetWindowBorderWidth(ob_display, self->window, ob_rr_theme->bwidth);
     XSetWindowBorder(ob_display, self->window,
@@ -315,8 +317,8 @@ static void menu_frame_render(ObMenuFrame *self)
             /* XXX has_icon = TRUE; */
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
-            text_a->texture[0].data.text.string =
-                e->entry->data.submenu.submenu->title;
+            sub = e->entry->data.submenu.submenu;
+            text_a->texture[0].data.text.string = sub ? sub->title : "";
             RrMinsize(text_a, &tw, &th);
 
             has_bullet = TRUE;
@@ -377,6 +379,8 @@ static void menu_frame_render(ObMenuFrame *self)
 static void menu_frame_update(ObMenuFrame *self)
 {
     GList *mit, *fit;
+
+    menu_find_submenus(self->menu);
 
     self->selected = NULL;
 
@@ -537,6 +541,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry)
 void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
 {
     ObMenuFrame *f;
+
+    if (!self->entry->data.submenu.submenu) return;
 
     f = menu_frame_new(self->entry->data.submenu.submenu,
                        self->frame->client);

@@ -62,6 +62,7 @@ struct _ObNormalMenuEntry {
 };
 
 struct _ObSubmenuMenuEntry {
+    gchar *name;
     ObMenu *submenu;
 };
 
@@ -106,5 +107,7 @@ void menu_add_submenu(gchar *name, gint id, gchar *submenu);
 void menu_add_separator(gchar *name, gint id);
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
+
+void menu_find_submenus(ObMenu *self);
 
 #endif

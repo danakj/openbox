@@ -83,6 +83,9 @@ static void layer_update(ObMenuFrame *frame, gpointer data)
             e->data.normal.enabled = !!frame->client;
     }
 
+    if (!frame->client)
+        return;
+
     e = menu_find_entry_id(menu, LAYER_TOP);
     e->data.normal.enabled = !frame->client->above;
 

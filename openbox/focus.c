@@ -118,10 +118,17 @@ void focus_fallback(gboolean switching_desks)
     gboolean under = FALSE;
     Client *old = NULL;
 
+    old = focus_client;
+
+    /* unfocus any focused clients.. they can be focused by Pointer events
+       and such, and then when I try focus them, I won't get a FocusIn event
+       at all for them.
+    */
+    focus_set_client(NULL);
+
     if (switching_desks) {
         /* don't skip any windows when switching desktops */
-        old = focus_client;
-        focus_client = NULL;
+        old = NULL;
     } else {
         if (!config_get("focusFollowsMouse", Config_Bool, &focus_follow))
             g_assert_not_reached();
@@ -131,14 +138,11 @@ void focus_fallback(gboolean switching_desks)
 
     if (!under) {
         for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
-            if (it->data != focus_client && client_normal(it->data)) {
+            if (it->data != old && client_normal(it->data)) {
                 /* if we're switching desktops, and we get the already focused
                    window, then we wont get a FocusIn for it, so just restore
                    the focus_client so that we know it is focused */
-                if (it->data == old) {
-                    focus_client = old;
-                    break;
-                } else if (client_focus(it->data))
+                if (client_focus(it->data))
                     break;
             }
         }

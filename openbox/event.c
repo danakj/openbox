@@ -225,16 +225,6 @@ void event_process(XEvent *e)
     case FocusIn:
         g_message("FocusIn on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
-        if (client == NULL) {
-            /* says a client was not found for the event!
-               this is important whether the event is a valid type for us or
-               not! this makes the evil known as mozilla not DESTROY my
-               precious wm!! YES ITS FIVE AM AND I AM NOT SANE RIGHT NOW. FOCUS
-               EVENTS WILL DRIVE YOU MAD.
-             */
-            e->xfocus.window = None;
-        }
-
         /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
            because of RevertToPointerRoot. If the focus ends up reverting to
            pointer root on a workspace change, then the FocusIn event that we
@@ -242,8 +232,15 @@ void event_process(XEvent *e)
            for FocusOut, so it is safely ignored there.
         */
 	if (e->xfocus.detail == NotifyInferior ||
-            e->xfocus.detail > NotifyNonlinearVirtual) return;
-            g_message("FocusIn on %lx", window);
+            e->xfocus.detail > NotifyNonlinearVirtual || client == NULL) {
+            /* says a client was not found for the event (or a valid FocusIn
+               event was not found.
+            */
+            e->xfocus.window = None;
+            return;
+        }
+
+        g_message("FocusIn on %lx", window);
         break;
     case FocusOut:
         g_message("FocusOut on %lx mode %d detail %d", window,

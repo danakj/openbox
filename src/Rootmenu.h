@@ -34,8 +34,8 @@ class BScreen;
 
 class Rootmenu : public Basemenu {
 private:
-  Openbox *openbox;
-  BScreen *screen;
+  Openbox &openbox;
+  BScreen &screen;
 
 
 protected:
@@ -43,7 +43,7 @@ protected:
 
 
 public:
-  Rootmenu(BScreen *);
+  Rootmenu(BScreen &);
 };
 
 

@@ -3,13 +3,13 @@ README for Openbox:
 The source tree for Openbox is comprised of five subdirectories:
 
 	data/		- this holds the default data files that Openbox
-                          requires for proper operation
+                          requires for proper operation.
 
 	doc/		- this holds the documentation files that explain
-	                  the various aspects of Openbox
+	                  the various aspects of Openbox.
 
 	nls/		- this holds the message files used to generate
-			  message catalogs for different languages
+			  message catalogs for different languages.
 
 	src/		- this holds the actual C++ source code for the window
 			  manager.
@@ -23,10 +23,10 @@ Quick Start:
 The quickest and easiest way to get Openbox up and running is to run the
 following commands:
 
-# cd openbox-x.x.x
-# ./configure
-# make
-# su -c 'make install'
+% cd openbox-x.x.x
+% ./configure
+% make
+% su -c 'make install'
 
 This will configure, compile and install Openbox the quickest.  For those
 who like to spend the extra 15 seconds reading ./configure --help, some

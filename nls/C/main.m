@@ -2,6 +2,8 @@ $set 14 #main
 
 $ #RCRequiresArg
 # error: '-rc' requires an argument\n
+$ #MENURequiresArg
+# error: '-menu' requires an argument\n
 $ #DISPLAYRequiresArg
 # error: '-display' requires an argument\n
 $ #WarnDisplaySet
@@ -12,6 +14,7 @@ $ #Usage
   \t\t\t  1997 - 2000 Brad Hughes\n\n\
   -display <string>\t\tuse display connection.\n\
   -rc <string>\t\t\tuse alternate resource file.\n\
+  -menu <string>\t\t\tuse alternate menu file.\n\
   -version\t\t\tdisplay version and exit.\n\
   -help\t\t\t\tdisplay this help text and exit.\n\n
 $ #CompileOptions

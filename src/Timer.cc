@@ -33,10 +33,7 @@
 #include "BaseDisplay.h"
 #include "Timer.h"
 
-BTimer::BTimer(BaseDisplay *d, TimeoutHandler *h) {
-  display = d;
-  handler = h;
-
+BTimer::BTimer(BaseDisplay &d, TimeoutHandler &h) : display(d), handler(h) {
   once = timing = False;
 }
 
@@ -49,6 +46,10 @@ void BTimer::setTimeout(long t) {
   _timeout.tv_usec = t;
   _timeout.tv_usec -= (_timeout.tv_sec * 1000);
   _timeout.tv_usec *= 1000;
+  if (timing) {
+    display.removeTimer(this);
+    display.addTimer(this);     // reorder the display
+  }
 }
 
 void BTimer::setTimeout(timeval t) {
@@ -61,16 +62,18 @@ void BTimer::start(void) {
 
   if (! timing) {
     timing = True;
-    display->addTimer(this);
+    display.addTimer(this);
   }
 }
 
 void BTimer::stop(void) {
-  timing = False;
+  if (timing) {
+    timing = False;
 
-  display->removeTimer(this);
+    display.removeTimer(this);
+  }
 }
 
 void BTimer::fireTimeout(void) {
-  if (handler) handler->timeout();
+  handler.timeout();
 }

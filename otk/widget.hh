@@ -60,8 +60,8 @@ public:
   virtual void setGeometry(int x, int y, int width, int height);
 
   inline bool isVisible(void) const { return _visible; };
-  virtual void show(void);
-  virtual void hide(void);
+  virtual void show(bool recursive = false);
+  virtual void hide(bool recursive = false);
 
   inline bool isFocused(void) const { return _focused; };
   virtual void focus(void);

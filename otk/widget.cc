@@ -147,7 +147,7 @@ void OtkWidget::setGeometry(int x, int y, int width, int height)
   _ignore_config++;
 }
 
-void OtkWidget::show(void)
+void OtkWidget::show(bool recursive)
 {
   if (_visible)
     return;
@@ -156,23 +156,27 @@ void OtkWidget::show(void)
   if (_dirty)
     update();
 
-  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
-  for (; it != end; ++it)
-    (*it)->show();
+  if (recursive) {
+    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    for (; it != end; ++it)
+      (*it)->show();
+  }
 
   XMapWindow(otk::OBDisplay::display, _window);
   _visible = true;
 }
 
-void OtkWidget::hide(void)
+void OtkWidget::hide(bool recursive)
 {
   if (! _visible)
     return;
 
-  OtkWidgetList::iterator it = _children.begin(), end = _children.end();
-  for (; it != end; ++it)
-    (*it)->hide();
-
+  if (recursive) {
+    OtkWidgetList::iterator it = _children.begin(), end = _children.end();
+    for (; it != end; ++it)
+      (*it)->hide();
+  }
+  
   XUnmapWindow(otk::OBDisplay::display, _window);
   _visible = false;
 }
@@ -227,6 +231,8 @@ void OtkWidget::ungrabKeyboard(void)
 
 void OtkWidget::render(void)
 {
+  if (!_texture) return;
+  
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
   if (_bg_pixmap)

@@ -20,8 +20,6 @@ OtkButton::OtkButton(OtkWidget *parent)
 
 OtkButton::~OtkButton()
 {
-  if (_pressed_focus_tx) delete _pressed_focus_tx;
-  if (_pressed_unfocus_tx) delete _pressed_unfocus_tx;
 }
 
 void OtkButton::press(unsigned int mouse_button)

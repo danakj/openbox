@@ -235,8 +235,7 @@ void focus_fallback(FallbackType type)
                 return;
             }
 
-    /* nothing to focus */
-    focus_set_client(NULL);
+    /* nothing to focus, and already set it to none above */
 }
 
 static void popup_cycle(Client *c, gboolean show)

@@ -50,7 +50,7 @@ AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h
 AC_HEADER_TIME
 
 # Determine the return type of signal handlers
-AC_TYPE_SIGNAL
+# AC_TYPE_SIGNAL
 
 # Check whether to include debugging code
 DEBUG=""

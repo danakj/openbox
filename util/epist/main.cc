@@ -25,6 +25,8 @@
 #endif // HAVE_CONFIG_H
 
 extern "C" {
+#include <X11/Xlib.h>
+
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -50,6 +52,8 @@ using std::endl;
 
 bool _shutdown = false;
 char **_argv;
+char *_display_name = 0;
+Display *_display = 0;
 
 #ifdef   HAVE_SIGACTION
 static void signalhandler(int sig)
@@ -73,6 +77,7 @@ static RETSIGTYPE signalhandler(int sig)
   signal(sig, (RETSIGTYPE (*)(int)) signalhandler);
 #endif // HAVE_SIGACTION
 }
+
 
 int main(int, char **argv) {
   _argv = argv;
@@ -98,9 +103,17 @@ int main(int, char **argv) {
   signal(SIGINT, (RETSIGTYPE (*)(int)) signalhandler);
   signal(SIGHUP, (RETSIGTYPE (*)(int)) signalhandler);
 #endif // HAVE_SIGACTION
-  
+
+  _display = XOpenDisplay(_display_name);
+  if (! _display) {
+    cout << "Connection to X server '" << _display_name << "' failed.\n";
+    return 1;
+  }
+
   while (! _shutdown) {
     usleep(500);
   }
+
+  XCloseDisplay(_display);
   return 0;
 }

@@ -42,6 +42,7 @@ render_rendertest_LDADD = \
 	render/libobrender.la \
 	$(XFT_LIBS) \
 	$(GLIB_LIBS) \
+	$(PANGO_LIBS) \
 	$(XML_LIBS) \
 	$(X_LIBS)
 render_rendertest_SOURCES = render/test.c
@@ -51,6 +52,7 @@ render_libobrender_la_CPPFLAGS = \
 	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
+	$(PANGO_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
@@ -113,6 +115,7 @@ openbox_openbox_LDADD = \
 	$(VIDMODE_LIBS) \
 	$(XSHAPE_LIBS) \
 	$(GLIB_LIBS) \
+	$(PANGO_LIBS) \
 	$(X_LIBS) \
 	$(LIBSN_LIBS) \
 	$(XML_LIBS) \

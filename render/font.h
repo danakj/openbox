@@ -21,9 +21,15 @@
 #define __font_h
 #include "render.h"
 #include "geom.h"
+#ifdef USE_PANGO
+#include <pango/pango.h>
+#endif /* USE_PANGO */
 
 struct _RrFont {
     const RrInstance *inst;
+#ifdef USE_PANGO
+    PangoFontDescription *pango_font_description;
+#endif /* USE_PANGO */
     XftFont *xftfont;
     gint elipses_length;
     gint shadow;

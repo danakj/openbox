@@ -73,6 +73,18 @@ fi
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
+
+AC_ARG_ENABLE(pango,
+              AC_HELP_STRING([--enable-pango],
+                             [enable the pango library for better display of international fonts. (default=no)]),
+              [enable_pango=yes], [enable_pango=no])
+
+if test "$enable_pango" = yes; then
+PKG_CHECK_MODULES([PANGO], [pango pangoxft])
+AC_SUBST(PANGO_CFLAGS)
+AC_SUBST(PANGO_LIBS)
+DEFS="$DEFS -DUSE_PANGO"
+fi
 	
 PKG_CHECK_MODULES(XFT, [xft])
 AC_SUBST(XFT_CFLAGS)

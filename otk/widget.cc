@@ -154,6 +154,13 @@ void Widget::setGeometry(int x, int y, int width, int height)
   _rect = Rect(x, y, width, height);
   _dirty = true;
 
+  // make all parents dirty too
+  Widget *p = _parent;
+  while (p) {
+    p->_dirty = true;
+    p = p->_parent;
+  }
+
   // don't use an XMoveResizeWindow here, because it doesn't seem to move
   // windows with StaticGravity? This works, that didn't.
   XResizeWindow(**display, _window, width, height);
@@ -331,7 +338,6 @@ void Widget::adjustHorz(void)
 
     prev_widget = tmp;
   }
-
   internalResize(width, tallest + _bevel_width * 2);
 }
 
@@ -392,7 +398,7 @@ void Widget::adjustVert(void)
   internalResize(widest + _bevel_width * 2, height);
 }
 
-void Widget::update(void)
+void Widget::update()
 {
   if (_dirty) {
     adjust();
@@ -411,12 +417,17 @@ void Widget::internalResize(int w, int h)
 {
   assert(w > 0 && h > 0);
 
-  if (! _fixed_width && ! _fixed_height)
+  bool fw = _fixed_width, fh = _fixed_height;
+  
+  if (! fw && ! fh)
     resize(w, h);
-  else if (! _fixed_width)
+  else if (! fw)
     resize(w, _rect.height());
-  else if (! _fixed_height)
+  else if (! fh)
     resize(_rect.width(), h);
+
+  _fixed_width = fw;
+  _fixed_height = fh;
 }
 
 void Widget::addChild(Widget *child, bool front)

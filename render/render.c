@@ -59,7 +59,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
         for (i = 0; i < h; i++, source += sw, dest += w) {
             memcpy(dest, source, w * sizeof(RrPixel32));
         }
-    }else
+    } else
         RrRender(l, w, h);
 
     RECT_SET(tarea, 0, 0, w, h);

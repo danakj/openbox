@@ -1,3 +1,52 @@
+# Mouserc - Mouse bindings for Openbox
+
+# Context : The place where the mouse click takes place
+#  * Titlebar - A client's titlebar (the top of the frame)
+#  * Handle - A client's handle (the bottom of the frame)
+#  * Client - A client (the actual window inside the frame, clicks in this
+#	    	        context also get passed through to the client)
+#  * Frame - A client's entire frame (clicks in this context do not get passed
+#				      through to the client)
+#  * Icon - A client's icon (in the titlebar)
+#  * AllDesktops - A client's omnipresent button (in the titlebar)
+#  * Iconify - A client's iconify button (in the titlebar)
+#  * Maximize - A client's maximize button (in the titlebar)
+#  * Close - A client's close button (in the titlebar)
+#  * Root - The root window (the desktop background, these are often blocked
+#                            by programs with desktop windows, and are not
+#                            available on rootless X servers (like OSX))
+#  * TLCorner - The top-left corner of the frame (if supported by the
+#						  engine)
+#  * TRCorner - The top-right corner of the frame (if supported by the
+#						   engine)
+#  * BLCorner - The bottom-left corner of the frame (if supported by the
+#						     engine)
+#  * BRCorner - The bottom-right corner of the frame (if supported by the
+#						      engine)
+#  Other contexts may be created by engines.
+
+# Event : The type of mouse action to bind
+#  * Press - A button is pressed
+#  * Release - A button is released
+#  * Click - A button is pressed and released
+#  * DoubleClick - A button is pressed and released twice quickly
+#  * Drag - A button is held and the mouse is moved
+
+# Button : The mouse button which is performing the Event
+#  A string composed of [<modifier>-]<button>. A button can have 0 or more
+#  modifiers.
+#  Valid modifiers are Mod1 ('A' is an alias for this), Mod2, Mod3, Mod4 ('W'
+#  is an alias for this), and Mod5.
+#  Valid buttons are Left, Right, Middle, Up, Down, or any number > 0
+
+# Action: The action to be performed then the Event occurs with the Button in
+#         the context.
+#  Value actions are:
+#  * Focus  - Focus the client
+#  
+
+# All options are case insensitive.
+
 #Context	Event		Button	Action
 
 Titlebar	Drag		Left	Move

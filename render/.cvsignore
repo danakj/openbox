@@ -1,2 +1,10 @@
 rendertest
 librender.a
+.libs
+color.lo
+font.lo
+gradient.lo
+image.lo
+mask.lo
+render.lo
+test.lo

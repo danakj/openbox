@@ -17,10 +17,10 @@ depdir := $(depdir)/$(dir)
 all: $(target)
 
 $(target): $(objects)
-	$(AR) r $@ $^
+	$(LINK) -static -o $@ $^
 
 $(dir)/%.o: $(srcdir)/%.c $(depdir)/%.d
-	$(COMPILE) -c -o $@ $<
+	$(LTCOMPILE) -c -o $@ $<
 
 $(depdir)/%.d: $(srcdir)/%.c
 	@echo Building dependancies for $<

@@ -1,1 +1,5 @@
 Makefile.incl
+Makefile.themes.openbox
+config.guess
+config.sub
+ltmain.sh

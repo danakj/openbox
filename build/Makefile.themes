@@ -1,60 +1,21 @@
-themes_srcdir:=$(srcdir)/themes
+include build/Makefile.incl
 
-themes_ob_dir:=$(DESTDIR)$(themesdir)/openbox
-themes_ob_srcdir:=$(themes_srcdir)/openbox
-themes_ob:=artwiz bbs bluebox cthulhain deep ebox fieron fieron2 flux \
-           frobozz frobust mbdtex miklos nyz nyzclone ob20 operation \
-           outcomes paper purplehaaze shade steelblue steelblue2 \
-           the_orange trisb twice warp-xp
+targets = openbox
 
-themes_ob_fieron_buttons_dir:=$(themes_ob_dir)/fieron_buttons
-themes_ob_fieron_buttons_srcdir:=$(themes_ob_srcdir)/fieron_buttons
-themes_ob_fieron_buttons:=close.xbm icon.xbm max.xbm stick.xbm
-
-themes_ob_fieron2_buttons_dir:=$(themes_ob_dir)/fieron2_buttons
-themes_ob_fieron2_buttons_srcdir:=$(themes_ob_srcdir)/fieron2_buttons
-themes_ob_fieron2_buttons:=close.xbm icon.xbm max.xbm stick.xbm
-
-themes_ob_ebox_buttons_dir:=$(themes_ob_dir)/ebox_buttons
-themes_ob_ebox_buttons_srcdir:=$(themes_ob_srcdir)/ebox_buttons
-themes_ob_ebox_buttons:=close.xbm icon.xbm max.xbm
-
-themes-install:
-	$(INSTALL) -d $(DESTDIR)$(themesdir)
-
-	$(INSTALL) -d $(themes_ob_dir)
-	for i in $(addprefix $(themes_ob_srcdir)/,$(themes_ob)); do \
-		$(INSTALL) $$i $(themes_ob_dir); \
-	done
-	$(INSTALL) -d $(themes_ob_fieron_buttons_dir)
-	for i in $(addprefix $(themes_ob_fieron_buttons_srcdir)/,$(themes_ob_fieron_buttons)); do \
-		$(INSTALL) $$i $(themes_ob_fieron_buttons_dir); \
-	done
-	$(INSTALL) -d $(themes_ob_fieron2_buttons_dir)
-	for i in $(addprefix $(themes_ob_fieron2_buttons_srcdir)/,$(themes_ob_fieron2_buttons)); do \
-		$(INSTALL) $$i $(themes_ob_fieron2_buttons_dir); \
-	done
-	$(INSTALL) -d $(themes_ob_ebox_buttons_dir)
-	for i in $(addprefix $(themes_ob_ebox_buttons_srcdir)/,$(themes_ob_ebox_buttons)); do \
-		$(INSTALL) $$i $(themes_ob_ebox_buttons_dir); \
+all clean distclean:
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes.$$i $@; \
 	done
 
-themes-uninstall:
-	-for i in $(themes_ob_ebox_buttons); do \
-		$(RM) $(themes_ob_ebox_buttons_dir)/$$i; \
+install:
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes.$$i $@; \
 	done
-	-rmdir $(themes_ob_ebox_buttons_dir)
-	-for i in $(themes_ob_fieron2_buttons); do \
-		$(RM) $(themes_ob_fieron2_buttons_dir)/$$i; \
-	done
-	-rmdir $(themes_ob_fieron2_buttons_dir)
-	-for i in $(themes_ob_fieron_buttons); do \
-		$(RM) $(themes_ob_fieron_buttons_dir)/$$i; \
-	done
-	-rmdir $(themes_ob_fieron_buttons_dir)
-	-for i in $(themes_ob); do \
-		$(RM) $(themes_ob_dir)/$$i; \
-	done
-	-rmdir $(themes_ob_dir)
 
-	-rmdir $(DESTDIR)$(themesdir)
+uninstall:
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes.$$i $@; \
+	done
+	-rmdir $(DESTDIR)$(themedir)
+
+.PHONY: all clean distclean install uninstall

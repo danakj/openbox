@@ -1,0 +1,34 @@
+include build/Makefile.incl
+
+targets = render kernel plugins engines themes data
+
+all: libtool
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+	done
+
+uninstall:
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+	done
+
+install: all
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+	done
+
+clean:
+	@for i in $(targets); do \
+		$(MAKE) -$(MAKEFLAGS) -f build/Makefile.$$i $@; \
+	done
+	$(RM) *\~
+
+distclean: clean
+	$(RM) configure Makefile.incl
+	$(RM) -r .deps/
+
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
+
+.PHONY: all clean distclean install uninstall

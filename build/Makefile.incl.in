@@ -1,3 +1,6 @@
+CC = @CC@
+MAKE += --no-print-directory
+
 CFLAGS = @CFLAGS@
 CPPFLAGS = -I. -I$(srcdir) @CPPFLAGS@ \
   -DLOCALEDIR=\"$(localedir)\" \

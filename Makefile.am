@@ -14,6 +14,5 @@ distclean-local:
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = config.rpath mkinstalldirs ABOUT-NLS INSTALL README \
-             COPYING AUTHORS CHANGELOG CHANGELOG.Blackbox CHANGELOG.bsetbg \
-             README.bbtools README.bsetbg
+EXTRA_DIST = config.rpath mkinstalldirs INSTALL README \
+             COPYING AUTHORS CHANGELOG

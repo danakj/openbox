@@ -314,39 +314,90 @@ static void sm_startup(int argc, char **argv)
     if (ob_sm_conn == NULL)
         g_warning("Failed to connect to session manager: %s", sm_err);
     else {
-        SmPropValue val_cmd;
-        SmPropValue val_res;
         SmPropValue val_prog;
         SmPropValue val_uid;
-        SmProp prop_cmd = { SmCloneCommand, "SmLISTofARRAY8", 1, };
-        SmProp prop_res = { SmRestartCommand, "SmLISTofARRAY8", 1, };
-        SmProp prop_prog = { SmProgram, "SmARRAY8", 1, };
-        SmProp prop_uid = { SmUserID, "SmARRAY8", 1, };
-        SmProp *props[4];
+        SmPropValue val_hint; 
+        SmPropValue val_pri;
+        SmPropValue val_pid;
+        SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
+        SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8, };
+        SmProp prop_prog = { SmProgram, SmARRAY8, 1, };
+        SmProp prop_uid = { SmUserID, SmARRAY8, 1, };
+        SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
+        SmProp prop_pid = { SmProcessID, SmARRAY8, 1, };
+        SmProp prop_pri = { "_GSM_Priority", SmCARD8, 1, };
+        SmProp *props[7];
+        gulong hint, pri;
+        gchar pid[32];
+        gint i;
+        gboolean has_id;
 
-        val_cmd.value = argv[0];
-        val_cmd.length = strlen(argv[0]);
-        val_res.value = argv[0];
-        val_res.length = strlen(argv[0]); /* XXX -id foo */
+        for (i = 1; i < argc - 1; ++i)
+            if (strcmp(argv[i], "-sm-client-id") == 0)
+                break;
+        has_id = (i < argc - 1);
+
+        prop_cmd.vals = g_new(SmPropValue, (has_id ? argc-2 : argc));
+        prop_cmd.num_vals = (has_id ? argc-2 : argc);
+        for (i = 0; i < argc; ++i) {
+            if (strcmp (argv[i], "-sm-client-id") == 0) {
+                ++i; /* skip the next as well */
+            } else {
+                prop_cmd.vals[i].value = argv[i];
+                prop_cmd.vals[i].length = strlen(argv[i]);
+            }
+        }
+
+        prop_res.vals = g_new(SmPropValue, (has_id ? argc : argc+2));
+        prop_res.num_vals = (has_id ? argc : argc+2);
+        for (i = 0; i < argc; ++i) {
+            prop_res.vals[i].value = argv[i];
+            prop_res.vals[i].length = strlen(argv[i]);
+        }
+        if (!has_id) {
+            prop_res.vals[i].value = "-sm-client-id";
+            prop_res.vals[i++].length = strlen("-sm-client-id");
+            prop_res.vals[i].value = ob_sm_id;
+            prop_res.vals[i++].length = strlen(ob_sm_id);
+        }
+
         val_prog.value = argv[0];
         val_prog.length = strlen(argv[0]);
 
-        val_uid.value = g_strdup_printf("%ld", (long)getuid());
+        val_uid.value = g_get_user_name();
         val_uid.length = strlen(val_uid.value);
 
-        prop_cmd.vals = &val_cmd;
-        prop_res.vals = &val_res;
+        hint = SmRestartImmediately;
+        val_hint.value = &hint;
+        val_hint.length = 1;
+
+        sprintf(pid, "%ld", (long)getpid());
+        val_pid.value = pid;
+        val_pid.length = strlen(pid);
+
+        /* priority with gnome-session-manager, low to run before other apps */
+        pri = 20;
+        val_pri.value = &pri;
+        val_pri.length = 1;
+
         prop_prog.vals = &val_prog;
         prop_uid.vals = &val_uid;
+        prop_hint.vals = &val_hint;
+        prop_pid.vals = &val_pid;
+        prop_pri.vals = &val_pri;
 
-        props[0] = &prop_cmd;
-        props[1] = &prop_res;
-        props[2] = &prop_prog;
+        props[0] = &prop_prog;
+        props[1] = &prop_cmd;
+        props[2] = &prop_res;
         props[3] = &prop_uid;
+        props[4] = &prop_hint;
+        props[5] = &prop_pid;
+        props[6] = &prop_pri;
 
-        SmcSetProperties(ob_sm_conn, 3, props);
+        SmcSetProperties(ob_sm_conn, 7, props);
 
-        g_free(val_uid.value);
+        g_free(prop_cmd.vals);
+        g_free(prop_res.vals);
 
         g_message("Connected to session manager with id %s", ob_sm_id);
     }
@@ -357,8 +408,25 @@ static void sm_startup(int argc, char **argv)
 static void sm_shutdown()
 {
 #ifdef USE_SM
-    if (ob_sm_conn)
+    if (ob_sm_conn) {
+        SmPropValue val_hint;
+        SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
+        SmProp *props[1];
+        gulong hint;
+
+        /* when we exit, we want to reset this to a more friendly state */
+        hint = SmRestartIfRunning;
+        val_hint.value = &hint;
+        val_hint.length = 1;
+
+        prop_hint.vals = &val_hint;
+
+        props[0] = &prop_hint;
+
+        SmcSetProperties(ob_sm_conn, 1, props);
+
         SmcCloseConnection(ob_sm_conn, 0, NULL);
+    }
 #endif
 }
 
@@ -401,11 +469,12 @@ static void print_help()
     print_version();
     g_print("Syntax: %s [options]\n\n", BINARY);
     g_print("Options:\n\n");
-    g_print("  -rc PATH     Specify the path to the rc file to use\n");
-    g_print("  -help        Display this help and exit\n");
-    g_print("  -version     Display the version and exit\n");
-    g_print("  -sync        Run in synchronous mode (this is slow and meant\n"
-            "               for debugging X routines)\n");
+    g_print("  -rc PATH          Specify the path to the rc file to use\n");
+    g_print("  -sm-client-id ID  Specify the session manager ID\n");
+    g_print("  -help             Display this help and exit\n");
+    g_print("  -version          Display the version and exit\n");
+    g_print("  -sync             Run in synchronous mode (this is slow and\n"
+            "                    meant for debugging X routines)\n");
     g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
@@ -424,9 +493,16 @@ static void parse_args(int argc, char **argv)
             ob_sync = TRUE;
         } else if (!strcmp(argv[i], "-rc")) {
             if (i == argc - 1) /* no args left */
-                g_printerr("-rc requires an argument\n");
+                g_printerr(_("-rc requires an argument\n"));
             else
                 ob_rc_path = argv[++i];
+#ifdef USE_SM
+        } else if (!strcmp(argv[i], "-sm-client-id")) {
+            if (i == argc - 1) /* no args left */
+                g_printerr(_("-sm-client-id requires an argument\n"));
+            else
+                ob_sm_id = argv[++i];
+#endif
         } else {
             g_printerr("Invalid option: '%s'\n\n", argv[i]);
             print_help();

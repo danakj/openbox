@@ -424,7 +424,7 @@ static void to_top(ObClient *c, guint d)
         /* insert before first iconic window */
         for (it = focus_order[d];
              it && !((ObClient*)it->data)->iconic; it = it->next);
-        g_list_insert_before(focus_order[d], it, c);
+        focus_order[d] = g_list_insert_before(focus_order[d], it, c);
     }
 }
 

@@ -795,13 +795,14 @@ void action_toggle_maximize_vert(union ActionData *data)
 
 void action_send_to_desktop(union ActionData *data)
 {
-    if (data->sendto.c) {
-        if (data->sendto.desk < screen_num_desktops ||
-            data->sendto.desk == DESKTOP_ALL) {
-            client_set_desktop(data->desktop.c,
-                               data->sendto.desk, data->sendto.follow);
-            if (data->sendto.follow) screen_set_desktop(data->sendto.desk);
-        }
+    ObClient *c = data->sendto.c;
+
+    if (!c || !client_normal(c)) return;
+
+    if (data->sendto.desk < screen_num_desktops ||
+        data->sendto.desk == DESKTOP_ALL) {
+        client_set_desktop(c, data->sendto.desk, data->sendto.follow);
+        if (data->sendto.follow) screen_set_desktop(data->sendto.desk);
     }
 }
 
@@ -942,25 +943,26 @@ void action_desktop_right(union ActionData *data)
 
 void action_send_to_desktop_right(union ActionData *data)
 {
+    ObClient *cl = data->sendto.c;
     guint r, c, d;
 
-    if (data->sendtodir.c) {
-        cur_row_col(&r, &c);
+    if (!cl || !client_normal(cl)) return;
+
+    cur_row_col(&r, &c);
+    ++c;
+    if (c >= screen_desktop_layout.columns) {
+        if (!data->sendtodir.wrap) return;
+        c = 0;
+    }
+    d = translate_row_col(r, c);
+    if (d >= screen_num_desktops) {
+        if (!data->sendtodir.wrap) return;
         ++c;
-        if (c >= screen_desktop_layout.columns) {
-            if (!data->sendtodir.wrap) return;
-            c = 0;
-        }
-        d = translate_row_col(r, c);
-        if (d >= screen_num_desktops) {
-            if (!data->sendtodir.wrap) return;
-            ++c;
-        }
-        d = translate_row_col(r, c);
-        if (d < screen_num_desktops) {
-            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow) screen_set_desktop(d);
-        }
+    }
+    d = translate_row_col(r, c);
+    if (d < screen_num_desktops) {
+        client_set_desktop(cl, d, data->sendtodir.follow);
+        if (data->sendtodir.follow) screen_set_desktop(d);
     }
 }
 
@@ -986,25 +988,26 @@ void action_desktop_left(union ActionData *data)
 
 void action_send_to_desktop_left(union ActionData *data)
 {
+    ObClient *cl = data->sendto.c;
     guint r, c, d;
 
-    if (data->sendtodir.c) {
-        cur_row_col(&r, &c);
+    if (!cl || !client_normal(cl)) return;
+
+    cur_row_col(&r, &c);
+    --c;
+    if (c >= screen_desktop_layout.columns) {
+        if (!data->sendtodir.wrap) return;
+        c = screen_desktop_layout.columns - 1;
+    }
+    d = translate_row_col(r, c);
+    if (d >= screen_num_desktops) {
+        if (!data->sendtodir.wrap) return;
         --c;
-        if (c >= screen_desktop_layout.columns) {
-            if (!data->sendtodir.wrap) return;
-            c = screen_desktop_layout.columns - 1;
-        }
-        d = translate_row_col(r, c);
-        if (d >= screen_num_desktops) {
-            if (!data->sendtodir.wrap) return;
-            --c;
-        }
-        d = translate_row_col(r, c);
-        if (d < screen_num_desktops) {
-            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow) screen_set_desktop(d);
-        }
+    }
+    d = translate_row_col(r, c);
+    if (d < screen_num_desktops) {
+        client_set_desktop(cl, d, data->sendtodir.follow);
+        if (data->sendtodir.follow) screen_set_desktop(d);
     }
 }
 

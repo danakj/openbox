@@ -31,25 +31,25 @@ typedef enum {
 typedef struct Frame {
     ObClient *client;
 
-    Window window;
-    Window plate;
+    Window    window;
+    Window    plate;
 
-    Strut  size;
-    Rect   area;
-    gboolean visible;
-    int    decorations;
+    Strut     size;
+    Rect      area;
+    gboolean  visible;
+    guint     decorations;
 
-    Window title;
-    Window label;
-    Window max;
-    Window close;
-    Window desk;
-    Window shade;
-    Window icon;
-    Window iconify;
-    Window handle;
-    Window lgrip;
-    Window rgrip;
+    Window    title;
+    Window    label;
+    Window    max;
+    Window    close;
+    Window    desk;
+    Window    shade;
+    Window    icon;
+    Window    iconify;
+    Window    handle;
+    Window    lgrip;
+    Window    rgrip;
 
     RrAppearance *a_unfocused_title;
     RrAppearance *a_focused_title;
@@ -59,29 +59,29 @@ typedef struct Frame {
     RrAppearance *a_unfocused_handle;
     RrAppearance *a_focused_handle;
 
-    Strut  innersize;
+    Strut     innersize;
 
-    GSList *clients;
+    GSList   *clients;
 
-    int width;         /* title and handle */
-    int label_width;
-    int icon_x;        /* x-position of the window icon button */
-    int label_x;       /* x-position of the window title */
-    int iconify_x;     /* x-position of the window iconify button */
-    int desk_x;        /* x-position of the window all-desktops button */
-    int shade_x;       /* x-position of the window shade button */
-    int max_x;         /* x-position of the window maximize button */
-    int close_x;       /* x-position of the window close button */
-    int bwidth;        /* border width */
-    int cbwidth;       /* client border width */
+    gint      width;         /* title and handle */
+    gint      label_width;
+    gint      icon_x;        /* x-position of the window icon button */
+    gint      label_x;       /* x-position of the window title */
+    gint      iconify_x;     /* x-position of the window iconify button */
+    gint      desk_x;        /* x-position of the window all-desktops button */
+    gint      shade_x;       /* x-position of the window shade button */
+    gint      max_x;         /* x-position of the window maximize button */
+    gint      close_x;       /* x-position of the window close button */
+    gint      bwidth;        /* border width */
+    gint      cbwidth;       /* client border width */
 
-    gboolean max_press;
-    gboolean close_press;
-    gboolean desk_press;
-    gboolean shade_press;
-    gboolean iconify_press;
+    gboolean  max_press;
+    gboolean  close_press;
+    gboolean  desk_press;
+    gboolean  shade_press;
+    gboolean  iconify_press;
 
-    gboolean focused;
+    gboolean  focused;
 } Frame;
 
 void frame_startup();

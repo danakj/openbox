@@ -29,27 +29,29 @@ struct _ObClientIcon
 };
      
 /*! Possible window types */
-typedef enum {
-    Type_Desktop, /*!< A desktop (bottom-most window) */
-    Type_Dock,    /*!< A dock bar/panel window */
-    Type_Toolbar, /*!< A toolbar window, pulled off an app */
-    Type_Menu,    /*!< An unpinned menu from an app */
-    Type_Utility, /*!< A small utility window such as a palette */
-    Type_Splash,  /*!< A splash screen window */
-    Type_Dialog,  /*!< A dialog window */
-    Type_Normal   /*!< A normal application window */
-} WindowType;
+typedef enum
+{
+    OB_CLIENT_TYPE_DESKTOP, /*!< A desktop (bottom-most window) */
+    OB_CLIENT_TYPE_DOCK,    /*!< A dock bar/panel window */
+    OB_CLIENT_TYPE_TOOLBAR, /*!< A toolbar window, pulled off an app */
+    OB_CLIENT_TYPE_MENU,    /*!< An unpinned menu from an app */
+    OB_CLIENT_TYPE_UTILITY, /*!< A small utility window such as a palette */
+    OB_CLIENT_TYPE_SPLASH,  /*!< A splash screen window */
+    OB_CLIENT_TYPE_DIALOG,  /*!< A dialog window */
+    OB_CLIENT_TYPE_NORMAL   /*!< A normal application window */
+} ObClientType;
 
 /*! The things the user can do to the client window */
-typedef enum {
-    Func_Resize     = 1 << 0, /*!< Allow resizing */
-    Func_Move       = 1 << 1, /*!< Allow moving */
-    Func_Iconify    = 1 << 2, /*!< Allow to be iconified */
-    Func_Maximize   = 1 << 3, /*!< Allow to be maximized */
-    Func_Shade      = 1 << 4, /*!< Allow to be shaded */
-    Func_Fullscreen = 1 << 5, /*!< Allow to be made fullscreen */
-    Func_Close      = 1 << 6  /*!< Allow to be closed */
-} Function;
+typedef enum
+{
+    OB_CLIENT_FUNC_RESIZE     = 1 << 0, /*!< Allow user resizing */
+    OB_CLIENT_FUNC_MOVE       = 1 << 1, /*!< Allow user moving */
+    OB_CLIENT_FUNC_ICONIFY    = 1 << 2, /*!< Allow to be iconified */
+    OB_CLIENT_FUNC_MAXIMIZE   = 1 << 3, /*!< Allow to be maximized */
+    OB_CLIENT_FUNC_SHADE      = 1 << 4, /*!< Allow to be shaded */
+    OB_CLIENT_FUNC_FULLSCREEN = 1 << 5, /*!< Allow to be made fullscreen */
+    OB_CLIENT_FUNC_CLOSE      = 1 << 6  /*!< Allow to be closed */
+} ObFunctions;
 
 /*! The decorations the client window wants to be displayed on it */
 typedef enum {
@@ -112,7 +114,7 @@ struct _ObClient
     gchar *role;
 
     /*! The type of window (what its function is) */
-    WindowType type;
+    ObClientType type;
 
     /*! Position and size of the window
       This will not always be the actual position of the window on screen, it
@@ -227,23 +229,23 @@ struct _ObClient
       The values in the variable are the decorations that the client wants to
       be displayed around it.
     */
-    int decorations;
+    guint decorations;
 
     /*! A bitmask of values in the Decoration enum.
       Specifies the decorations that should NOT be displayed on the client.
     */
-    int disabled_decorations;
+    guint disabled_decorations;
 
-    /*! A bitmask of values in the Function enum
+    /*! A bitmask of values in the ObFunctions enum
       The values in the variable specify the ways in which the user is allowed
       to modify this window.
     */
-    int functions;
+    guint functions;
 
     /*! Icons for the client as specified on the client window */
     ObClientIcon *icons;
     /*! The number of icons in icons */
-    int nicons;
+    guint nicons;
 };
 
 extern GList *client_list;

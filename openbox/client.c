@@ -255,7 +255,7 @@ void client_manage(Window window)
 
     /* focus the new window? */
     if (ob_state != OB_STATE_STARTING && config_focus_new &&
-        (self->type == Type_Normal || self->type == Type_Dialog)) {
+        (self->type == OB_CLIENT_TYPE_NORMAL || self->type == OB_CLIENT_TYPE_DIALOG)) {
         gboolean group_foc = FALSE;
         
         if (self->group) {
@@ -322,7 +322,7 @@ void client_close_menus(gpointer key, gpointer value, gpointer self)
 
 void client_unmanage(ObClient *self)
 {
-    int j;
+    guint j;
     GSList *it;
 
     g_message("Unmanaging window: %lx (%s)", self->window, self->class);
@@ -784,21 +784,21 @@ void client_get_type(ObClient *self)
 	/* use the first value that we know about in the array */
 	for (i = 0; i < num; ++i) {
 	    if (val[i] == prop_atoms.net_wm_window_type_desktop)
-		self->type = Type_Desktop;
+		self->type = OB_CLIENT_TYPE_DESKTOP;
 	    else if (val[i] == prop_atoms.net_wm_window_type_dock)
-		self->type = Type_Dock;
+		self->type = OB_CLIENT_TYPE_DOCK;
 	    else if (val[i] == prop_atoms.net_wm_window_type_toolbar)
-		self->type = Type_Toolbar;
+		self->type = OB_CLIENT_TYPE_TOOLBAR;
 	    else if (val[i] == prop_atoms.net_wm_window_type_menu)
-		self->type = Type_Menu;
+		self->type = OB_CLIENT_TYPE_MENU;
 	    else if (val[i] == prop_atoms.net_wm_window_type_utility)
-		self->type = Type_Utility;
+		self->type = OB_CLIENT_TYPE_UTILITY;
 	    else if (val[i] == prop_atoms.net_wm_window_type_splash)
-		self->type = Type_Splash;
+		self->type = OB_CLIENT_TYPE_SPLASH;
 	    else if (val[i] == prop_atoms.net_wm_window_type_dialog)
-		self->type = Type_Dialog;
+		self->type = OB_CLIENT_TYPE_DIALOG;
 	    else if (val[i] == prop_atoms.net_wm_window_type_normal)
-		self->type = Type_Normal;
+		self->type = OB_CLIENT_TYPE_NORMAL;
 	    else if (val[i] == prop_atoms.kde_net_wm_window_type_override) {
 		/* prevent this window from getting any decor or
 		   functionality */
@@ -807,20 +807,20 @@ void client_get_type(ObClient *self)
 		self->mwmhints.decorations = 0;
 		self->mwmhints.functions = 0;
 	    }
-	    if (self->type != (WindowType) -1)
+	    if (self->type != (ObClientType) -1)
 		break; /* grab the first legit type */
 	}
 	g_free(val);
     }
     
-    if (self->type == (WindowType) -1) {
+    if (self->type == (ObClientType) -1) {
 	/*the window type hint was not set, which means we either classify
 	  ourself as a normal window or a dialog, depending on if we are a
 	  transient. */
 	if (self->transient)
-	    self->type = Type_Dialog;
+	    self->type = OB_CLIENT_TYPE_DIALOG;
 	else
-	    self->type = Type_Normal;
+	    self->type = OB_CLIENT_TYPE_NORMAL;
     }
 }
 
@@ -915,43 +915,44 @@ void client_setup_decor_and_functions(ObClient *self)
     self->decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
 	Decor_Icon | Decor_AllDesktops | Decor_Iconify | Decor_Maximize |
         Decor_Shade;
-    self->functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
-	Func_Shade;
+    self->functions = OB_CLIENT_FUNC_RESIZE | OB_CLIENT_FUNC_MOVE |
+        OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_MAXIMIZE |
+        OB_CLIENT_FUNC_SHADE;
     if (self->delete_window) {
 	self->decorations |= Decor_Close;
-	self->functions |= Func_Close;
+	self->functions |= OB_CLIENT_FUNC_CLOSE;
     }
 
     if (!(self->min_size.width < self->max_size.width ||
 	  self->min_size.height < self->max_size.height)) {
 	self->decorations &= ~(Decor_Maximize | Decor_Handle);
-	self->functions &= ~(Func_Resize | Func_Maximize);
+	self->functions &= ~OB_CLIENT_FUNC_RESIZE;
     }
 
     switch (self->type) {
-    case Type_Normal:
+    case OB_CLIENT_TYPE_NORMAL:
 	/* normal windows retain all of the possible decorations and
 	   functionality, and are the only windows that you can fullscreen */
-	self->functions |= Func_Fullscreen;
+	self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
 	break;
 
-    case Type_Dialog:
-    case Type_Utility:
+    case OB_CLIENT_TYPE_DIALOG:
+    case OB_CLIENT_TYPE_UTILITY:
 	/* these windows cannot be maximized */
 	self->decorations &= ~Decor_Maximize;
-	self->functions &= ~Func_Maximize;
+	self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
 	break;
 
-    case Type_Menu:
-    case Type_Toolbar:
+    case OB_CLIENT_TYPE_MENU:
+    case OB_CLIENT_TYPE_TOOLBAR:
 	/* these windows get less functionality */
 	self->decorations &= ~(Decor_Iconify | Decor_Handle);
-	self->functions &= ~(Func_Iconify | Func_Resize);
+	self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_RESIZE);
 	break;
 
-    case Type_Desktop:
-    case Type_Dock:
-    case Type_Splash:
+    case OB_CLIENT_TYPE_DESKTOP:
+    case OB_CLIENT_TYPE_DOCK:
+    case OB_CLIENT_TYPE_SPLASH:
 	/* none of these windows are manipulated by the window manager */
 	self->decorations = 0;
 	self->functions = 0;
@@ -978,13 +979,13 @@ void client_setup_decor_and_functions(ObClient *self)
     if (self->mwmhints.flags & OB_MWM_FLAG_FUNCTIONS) {
 	if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
-		self->functions &= ~Func_Resize;
+		self->functions &= ~OB_CLIENT_FUNC_RESIZE;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
-		self->functions &= ~Func_Move;
+		self->functions &= ~OB_CLIENT_FUNC_MOVE;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
-		self->functions &= ~Func_Iconify;
+		self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
 	    if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
-		self->functions &= ~Func_Maximize;
+		self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
 	    /* dont let mwm hints kill the close button
 	       if (! (self->mwmhints.functions & MwmFunc_Close))
 	       self->functions &= ~Func_Close; */
@@ -992,8 +993,10 @@ void client_setup_decor_and_functions(ObClient *self)
     }
 
     /* can't maximize without moving/resizing */
-    if (!((self->functions & Func_Move) && (self->functions & Func_Resize)))
-	self->functions &= ~(Func_Maximize | Func_Fullscreen);
+    if (!((self->functions & OB_CLIENT_FUNC_MOVE) &&
+          (self->functions & OB_CLIENT_FUNC_RESIZE)))
+	self->functions &= ~(OB_CLIENT_FUNC_MAXIMIZE |
+                             OB_CLIENT_FUNC_FULLSCREEN);
 
     /* finally, user specified disabled decorations are applied to subtract
        decorations */
@@ -1016,11 +1019,13 @@ void client_setup_decor_and_functions(ObClient *self)
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & Decor_Titlebar))
-	self->functions &= ~Func_Shade;
+	self->functions &= ~OB_CLIENT_FUNC_SHADE;
 
     /* now we need to check against rules for the client's current state */
     if (self->fullscreen) {
-	self->functions &= (Func_Close | Func_Fullscreen | Func_Iconify);
+	self->functions &= (OB_CLIENT_FUNC_CLOSE |
+                            OB_CLIENT_FUNC_FULLSCREEN |
+                            OB_CLIENT_FUNC_ICONIFY);
 	self->decorations = 0;
     }
 
@@ -1028,15 +1033,19 @@ void client_setup_decor_and_functions(ObClient *self)
 
     if (self->frame) {
         /* this makes sure that these windows appear on all desktops */
-        if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
+        if (self->type == OB_CLIENT_TYPE_DESKTOP &&
+            self->desktop != DESKTOP_ALL)
             client_set_desktop(self, DESKTOP_ALL, FALSE);
 
 	/* adjust the client's decorations, etc. */
 	client_reconfigure(self);
     } else {
         /* this makes sure that these windows appear on all desktops */
-        if (self->type == Type_Desktop && self->desktop != DESKTOP_ALL)
+        if (self->type == OB_CLIENT_TYPE_DESKTOP &&
+            self->desktop != DESKTOP_ALL)
+        {
             self->desktop = DESKTOP_ALL;
+        }
     }
 }
 
@@ -1046,22 +1055,22 @@ static void client_change_allowed_actions(ObClient *self)
     int num = 0;
 
     /* desktop windows are kept on all desktops */
-    if (self->type != Type_Desktop)
+    if (self->type != OB_CLIENT_TYPE_DESKTOP)
         actions[num++] = prop_atoms.net_wm_action_change_desktop;
 
-    if (self->functions & Func_Shade)
+    if (self->functions & OB_CLIENT_FUNC_SHADE)
 	actions[num++] = prop_atoms.net_wm_action_shade;
-    if (self->functions & Func_Close)
+    if (self->functions & OB_CLIENT_FUNC_CLOSE)
 	actions[num++] = prop_atoms.net_wm_action_close;
-    if (self->functions & Func_Move)
+    if (self->functions & OB_CLIENT_FUNC_MOVE)
 	actions[num++] = prop_atoms.net_wm_action_move;
-    if (self->functions & Func_Iconify)
+    if (self->functions & OB_CLIENT_FUNC_ICONIFY)
 	actions[num++] = prop_atoms.net_wm_action_minimize;
-    if (self->functions & Func_Resize)
+    if (self->functions & OB_CLIENT_FUNC_RESIZE)
 	actions[num++] = prop_atoms.net_wm_action_resize;
-    if (self->functions & Func_Fullscreen)
+    if (self->functions & OB_CLIENT_FUNC_FULLSCREEN)
 	actions[num++] = prop_atoms.net_wm_action_fullscreen;
-    if (self->functions & Func_Maximize) {
+    if (self->functions & OB_CLIENT_FUNC_MAXIMIZE) {
 	actions[num++] = prop_atoms.net_wm_action_maximize_horz;
 	actions[num++] = prop_atoms.net_wm_action_maximize_vert;
     }
@@ -1070,21 +1079,21 @@ static void client_change_allowed_actions(ObClient *self)
 
     /* make sure the window isn't breaking any rules now */
 
-    if (!(self->functions & Func_Shade) && self->shaded) {
+    if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
 	if (self->frame) client_shade(self, FALSE);
 	else self->shaded = FALSE;
     }
-    if (!(self->functions & Func_Iconify) && self->iconic) {
+    if (!(self->functions & OB_CLIENT_FUNC_ICONIFY) && self->iconic) {
         g_message("UNSETTING ICONIC");
 	if (self->frame) client_iconify(self, FALSE, TRUE);
 	else self->iconic = FALSE;
     }
-    if (!(self->functions & Func_Fullscreen) && self->fullscreen) {
+    if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
 	if (self->frame) client_fullscreen(self, FALSE, TRUE);
 	else self->fullscreen = FALSE;
     }
-    if (!(self->functions & Func_Maximize) && (self->max_horz ||
-					       self->max_vert)) {
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
+                                                         self->max_vert)) {
 	if (self->frame) client_maximize(self, FALSE, 0, TRUE);
 	else self->max_vert = self->max_horz = FALSE;
     }
@@ -1305,11 +1314,10 @@ void client_update_icons(ObClient *self)
 {
     guint num;
     guint32 *data;
-    guint w, h, i;
-    int j;
+    guint w, h, i, j;
 
-    for (j = 0; j < self->nicons; ++j)
-	g_free(self->icons[j].data);
+    for (i = 0; i < self->nicons; ++i)
+	g_free(self->icons[i].data);
     if (self->nicons > 0)
 	g_free(self->icons);
     self->nicons = 0;
@@ -1482,8 +1490,8 @@ static StackLayer calc_layer(ObClient *self)
     StackLayer l;
 
     if (self->fullscreen) l = Layer_Fullscreen;
-    else if (self->type == Type_Desktop) l = Layer_Desktop;
-    else if (self->type == Type_Dock) {
+    else if (self->type == OB_CLIENT_TYPE_DESKTOP) l = Layer_Desktop;
+    else if (self->type == OB_CLIENT_TYPE_DOCK) {
         if (!self->below) l = Layer_Top;
         else l = Layer_Normal;
     }
@@ -1551,8 +1559,9 @@ static void client_showhide(ObClient *self)
 }
 
 gboolean client_normal(ObClient *self) {
-    return ! (self->type == Type_Desktop || self->type == Type_Dock ||
-	      self->type == Type_Splash);
+    return ! (self->type == OB_CLIENT_TYPE_DESKTOP ||
+              self->type == OB_CLIENT_TYPE_DOCK ||
+	      self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
 static void client_apply_startup_state(ObClient *self)
@@ -1659,11 +1668,11 @@ void client_configure(ObClient *self, ObCorner anchor,
 
     /* these override the above states! if you cant move you can't move! */
     if (user) {
-        if (!(self->functions & Func_Move)) {
+        if (!(self->functions & OB_CLIENT_FUNC_MOVE)) {
             x = self->area.x;
             y = self->area.y;
         }
-        if (!(self->functions & Func_Resize)) {
+        if (!(self->functions & OB_CLIENT_FUNC_RESIZE)) {
             w = self->area.width;
             h = self->area.height;
         }
@@ -1818,8 +1827,8 @@ void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)
 {
     int x, y, w, h;
 
-    if (!(self->functions & Func_Fullscreen) || /* can't */
-	self->fullscreen == fs) return;         /* already done */
+    if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) || /* can't */
+	self->fullscreen == fs) return;                   /* already done */
 
     self->fullscreen = fs;
     client_change_state(self); /* change the state hints on the client,
@@ -1886,7 +1895,7 @@ static void client_iconify_recursive(ObClient *self,
         self->iconic = iconic;
 
         if (iconic) {
-            if (self->functions & Func_Iconify) {
+            if (self->functions & OB_CLIENT_FUNC_ICONIFY) {
                 self->wmstate = IconicState;
                 self->ignore_unmaps++;
                 /* we unmap the client itself so that we can get MapRequest
@@ -1949,7 +1958,7 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
     int x, y, w, h;
      
     g_assert(dir == 0 || dir == 1 || dir == 2);
-    if (!(self->functions & Func_Maximize)) return; /* can't */
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
 
     /* check if already done */
     if (max) {
@@ -2048,7 +2057,8 @@ void client_maximize(ObClient *self, gboolean max, int dir, gboolean savearea)
 
 void client_shade(ObClient *self, gboolean shade)
 {
-    if ((!(self->functions & Func_Shade) && shade) || /* can't shade */
+    if ((!(self->functions & OB_CLIENT_FUNC_SHADE) &&
+         shade) ||                         /* can't shade */
 	self->shaded == shade) return;     /* already done */
 
     /* when we're iconic, don't change the wmstate */
@@ -2064,7 +2074,7 @@ void client_close(ObClient *self)
 {
     XEvent ce;
 
-    if (!(self->functions & Func_Close)) return;
+    if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
 
     /*
       XXX: itd be cool to do timeouts and shit here for killing the client's
@@ -2434,7 +2444,7 @@ gboolean client_focused(ObClient *self)
 
 ObClientIcon *client_icon(ObClient *self, int w, int h)
 {
-    int i;
+    guint i;
     /* si is the smallest image >= req */
     /* li is the largest image < req */
     unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;

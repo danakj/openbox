@@ -59,7 +59,6 @@ RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 Display    *ob_display;
 gint        ob_screen;
-Window      ob_root;
 ObState     ob_state;
 Cursor      ob_cursors[OB_NUM_CURSORS];
 KeyCode     ob_keys[OB_NUM_KEYS];
@@ -147,7 +146,6 @@ int main(int argc, char **argv)
 #endif
 
     ob_screen = DefaultScreen(ob_display);
-    ob_root = RootWindow(ob_display, ob_screen);
 
     ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
     if (ob_rr_inst == NULL)
@@ -550,7 +548,8 @@ gboolean ob_pointer_pos(int *x, int *y)
     int i;
     guint u;
 
-    return !!XQueryPointer(ob_display, ob_root, &w, &w, x, y, &i, &i, &u);
+    return !!XQueryPointer(ob_display, RootWindow(ob_display, ob_screen),
+                           &w, &w, x, y, &i, &i, &u);
 }
 
 #ifdef USE_SM

@@ -212,7 +212,7 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
 
     attrib.override_redirect = TRUE;
     attrib.event_mask = FRAME_EVENTMASK;
-    self->frame = createWindow(ob_root,
+    self->frame = createWindow(RootWindow(ob_display, ob_screen),
                                CWOverrideRedirect|CWEventMask, &attrib);
     attrib.event_mask = TITLE_EVENTMASK;
     self->title = createWindow(self->frame, CWEventMask, &attrib);

@@ -407,6 +407,6 @@ void prop_message(Window about, Atom messagetype, long data0, long data1,
     ce.xclient.data.l[1] = data1;
     ce.xclient.data.l[2] = data2;
     ce.xclient.data.l[3] = data3;
-    XSendEvent(ob_display, ob_root, FALSE,
+    XSendEvent(ob_display, RootWindow(ob_display, ob_screen), FALSE,
 	       SubstructureNotifyMask | SubstructureRedirectMask, &ce);
 }

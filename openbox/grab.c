@@ -20,8 +20,9 @@ gboolean grab_keyboard(gboolean grab)
 
     if (grab) {
         if (kgrabs++ == 0)
-            ret = XGrabKeyboard(ob_display, ob_root, FALSE, GrabModeAsync,
-                                GrabModeAsync, event_lasttime) == Success;
+            ret = XGrabKeyboard(ob_display, RootWindow(ob_display, ob_screen),
+                                FALSE, GrabModeAsync, GrabModeAsync,
+                                event_lasttime) == Success;
         else
             ret = TRUE;
     } else if (kgrabs > 0) {
@@ -39,10 +40,10 @@ gboolean grab_pointer(gboolean grab, ObCursor cur)
 
     if (grab) {
         if (pgrabs++ == 0)
-            ret = XGrabPointer(ob_display, ob_root, False, GRAB_PTR_MASK,
-                               GrabModeAsync, GrabModeAsync, FALSE,
-                               ob_cursor(cur),
-                               event_lasttime) == Success;
+            ret = XGrabPointer(ob_display, RootWindow(ob_display, ob_screen),
+                               False, GRAB_PTR_MASK, GrabModeAsync,
+                               GrabModeAsync, FALSE,
+                               ob_cursor(cur), event_lasttime) == Success;
         else
             ret = TRUE;
     } else if (pgrabs > 0) {

@@ -42,7 +42,9 @@ void moveresize_startup()
     popup_size_to_string(popup, "W:  0000  W:  0000");
 
     attrib.save_under = True;
-    opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
+    opaque_window.win = XCreateWindow(ob_display,
+                                      RootWindow(ob_display, ob_screen),
+                                      0, 0, 1, 1, 0,
                                       RrDepth(ob_rr_inst), InputOutput,
                                       RrVisual(ob_rr_inst),
                                       CWSaveUnder, &attrib);

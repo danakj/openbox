@@ -486,7 +486,7 @@ static void event_process(XEvent *e)
 	event_handle_dockapp(dockapp, e);
     else if (dock)
 	event_handle_dock(dock, e);
-    else if (window == ob_root)
+    else if (window == RootWindow(ob_display, ob_screen))
 	event_handle_root(e);
     else if (e->type == MapRequest)
 	client_manage(window);

@@ -48,7 +48,8 @@ ObFrame *frame_new()
     mask = CWOverrideRedirect | CWEventMask;
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
-    self->window = createWindow(ob_root, mask, &attrib);
+    self->window = createWindow(RootWindow(ob_display, ob_screen),
+                                mask, &attrib);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -395,7 +396,8 @@ void frame_release_client(ObFrame *self, ObClient *client)
     } else {
 	/* according to the ICCCM - if the client doesn't reparent itself,
 	   then we will reparent the window to root for them */
-	XReparentWindow(ob_display, client->window, ob_root,
+	XReparentWindow(ob_display, client->window,
+                        RootWindow(ob_display, ob_screen),
 			client->area.x,
 			client->area.y);
     }
@@ -582,7 +584,7 @@ ObFrameContext frame_context(ObClient *client, Window win)
 {
     ObFrame *self;
 
-    if (win == ob_root) return OB_FRAME_CONTEXT_ROOT;
+    if (win == RootWindow(ob_display, ob_screen)) return OB_FRAME_CONTEXT_ROOT;
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
     if (win == client->window) return OB_FRAME_CONTEXT_CLIENT;
 

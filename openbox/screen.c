@@ -61,7 +61,8 @@ gboolean screen_annex()
 
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;
-    XSelectInput(ob_display, ob_root, ROOT_EVENTMASK);
+    XSelectInput(ob_display, RootWindow(ob_display, ob_screen),
+                 ROOT_EVENTMASK);
     xerror_set_ignore(FALSE);
     if (xerror_occured) {
         g_message("A window manager is already running on screen %d",
@@ -76,11 +77,13 @@ gboolean screen_annex()
 
     /* set the OPENBOX_PID hint */
     pid = getpid();
-    PROP_SET32(ob_root, openbox_pid, cardinal, pid);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               openbox_pid, cardinal, pid);
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
-    screen_support_win = XCreateWindow(ob_display, ob_root,
+    screen_support_win = XCreateWindow(ob_display,
+                                       RootWindow(ob_display, ob_screen),
                                        -100, -100, 1, 1, 0,
                                        CopyFromParent, InputOutput,
                                        CopyFromParent,
@@ -88,7 +91,8 @@ gboolean screen_annex()
     XMapRaised(ob_display, screen_support_win);
 
     /* set supporting window */
-    PROP_SET32(ob_root, net_supporting_wm_check, window, screen_support_win);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_supporting_wm_check, window, screen_support_win);
 
     /* set properties on the supporting window */
     PROP_SETS(screen_support_win, net_wm_name, "Openbox");
@@ -165,7 +169,8 @@ gboolean screen_annex()
   supported[] = prop_atoms.net_wm_action_stick;
 */
 
-    PROP_SETA32(ob_root, net_supported, atom, supported, num_support);
+    PROP_SETA32(RootWindow(ob_display, ob_screen),
+                net_supported, atom, supported, num_support);
     g_free(supported);
 
     return TRUE;
@@ -185,7 +190,8 @@ void screen_startup()
     for (i = 0, it = config_desktops_names; it; ++i, it = it->next)
         screen_desktop_names[i] = it->data; /* dont strdup */
     screen_desktop_names[i] = NULL;
-    PROP_SETSS(ob_root, net_desktop_names, screen_desktop_names);
+    PROP_SETSS(RootWindow(ob_display, ob_screen),
+               net_desktop_names, screen_desktop_names);
     g_free(screen_desktop_names); /* dont free the individual strings */
     screen_desktop_names = NULL;
 
@@ -198,7 +204,8 @@ void screen_startup()
 
     /* don't start in showing-desktop mode */
     screen_showing_desktop = FALSE;
-    PROP_SET32(ob_root, net_showing_desktop, cardinal, screen_showing_desktop);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_showing_desktop, cardinal, screen_showing_desktop);
 
     screen_update_layout();
 
@@ -213,11 +220,14 @@ void screen_shutdown()
 {
     Rect **r;
 
-    XSelectInput(ob_display, ob_root, NoEventMask);
+    XSelectInput(ob_display, RootWindow(ob_display, ob_screen), NoEventMask);
 
-    PROP_ERASE(ob_root, openbox_pid); /* we're not running here no more! */
-    PROP_ERASE(ob_root, net_supported); /* not without us */
-    PROP_ERASE(ob_root, net_showing_desktop); /* don't keep this mode */
+    /* we're not running here no more! */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), openbox_pid);
+    /* not without us */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), net_supported);
+    /* don't keep this mode */
+    PROP_ERASE(RootWindow(ob_display, ob_screen), net_showing_desktop);
 
     XDestroyWindow(ob_display, screen_support_win);
 
@@ -244,7 +254,8 @@ void screen_resize()
     /* Set the _NET_DESKTOP_GEOMETRY hint */
     screen_physical_size.width = geometry[0] = w;
     screen_physical_size.height = geometry[1] = h;
-    PROP_SETA32(ob_root, net_desktop_geometry, cardinal, geometry, 2);
+    PROP_SETA32(RootWindow(ob_display, ob_screen),
+                net_desktop_geometry, cardinal, geometry, 2);
 
     if (ob_state == OB_STATE_STARTING)
 	return;
@@ -266,11 +277,13 @@ void screen_set_num_desktops(guint num)
 
     old = screen_num_desktops;
     screen_num_desktops = num;
-    PROP_SET32(ob_root, net_number_of_desktops, cardinal, num);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_number_of_desktops, cardinal, num);
 
     /* set the viewport hint */
     viewport = g_new0(guint32, num * 2);
-    PROP_SETA32(ob_root, net_desktop_viewport, cardinal, viewport, num * 2);
+    PROP_SETA32(RootWindow(ob_display, ob_screen),
+                net_desktop_viewport, cardinal, viewport, num * 2);
     g_free(viewport);
 
     /* the number of rows/columns will differ */
@@ -316,7 +329,8 @@ void screen_set_desktop(guint num)
 
     old = screen_desktop;
     screen_desktop = num;
-    PROP_SET32(ob_root, net_current_desktop, cardinal, num);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_current_desktop, cardinal, num);
 
     if (old == num) return;
 
@@ -366,7 +380,8 @@ void screen_update_layout()
     guint num;
     gboolean valid = FALSE;
 
-    if (PROP_GETA32(ob_root, net_desktop_layout, cardinal, &data, &num)) {
+    if (PROP_GETA32(RootWindow(ob_display, ob_screen),
+                    net_desktop_layout, cardinal, &data, &num)) {
         if (num == 3 || num == 4) {
 
             if (data[0] == prop_atoms.net_wm_orientation_vert)
@@ -444,7 +459,8 @@ void screen_update_desktop_names()
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
 
-    if (PROP_GETSS(ob_root, net_desktop_names, utf8, &screen_desktop_names))
+    if (PROP_GETSS(RootWindow(ob_display, ob_screen),
+                   net_desktop_names, utf8, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i <= screen_num_desktops; ++i);
     else
         i = 0;
@@ -496,7 +512,8 @@ void screen_show_desktop(gboolean show)
     }
 
     show = !!show; /* make it boolean */
-    PROP_SET32(ob_root, net_showing_desktop, cardinal, show);
+    PROP_SET32(RootWindow(ob_display, ob_screen),
+               net_showing_desktop, cardinal, show);
 
     dispatch_ob(Event_Ob_ShowDesktop, show, 0);
 }
@@ -689,7 +706,7 @@ void screen_update_areas()
             dims[(i * 4) + 3] = area[i][screen_num_monitors].height;
         }
     }
-    PROP_SETA32(ob_root, net_workarea, cardinal,
+    PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
 		dims, 4 * screen_num_desktops);
 
     g_free(dims);
@@ -728,10 +745,12 @@ static void set_root_cursor()
 {
 #ifdef USE_LIBSN
         if (sn_busy_cnt)
-            XDefineCursor(ob_display, ob_root, ob_cursor(OB_CURSOR_BUSY));
+            XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
+                          ob_cursor(OB_CURSOR_BUSY));
         else
 #endif
-            XDefineCursor(ob_display, ob_root, ob_cursor(OB_CURSOR_POINTER));
+            XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
+                          ob_cursor(OB_CURSOR_POINTER));
 }
 
 #ifdef USE_LIBSN

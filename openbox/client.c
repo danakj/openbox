@@ -67,7 +67,8 @@ void client_set_list()
     } else
 	windows = NULL;
 
-    PROP_SETA32(ob_root, net_client_list, window, (guint32*)windows, size);
+    PROP_SETA32(RootWindow(ob_display, ob_screen),
+                net_client_list, window, (guint32*)windows, size);
 
     if (windows)
 	g_free(windows);
@@ -113,7 +114,8 @@ void client_manage_all()
     XWMHints *wmhints;
     XWindowAttributes attrib;
 
-    XQueryTree(ob_display, ob_root, &w, &w, &children, &nchild);
+    XQueryTree(ob_display, RootWindow(ob_display, ob_screen),
+               &w, &w, &children, &nchild);
 
     /* remove all icon windows from the list */
     for (i = 0; i < nchild; i++) {
@@ -700,7 +702,7 @@ void client_update_transient_for(ObClient *self)
                    group */
                 if (t == self->group->leader ||
                     t == None ||
-                    t == ob_root) {
+                    t == RootWindow(ob_display, ob_screen)) {
                     /* window is a transient for its group! */
                     c = OB_TRAN_GROUP;
                 }

@@ -26,8 +26,6 @@ SnDisplay *ob_sn_display;
 
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;
-/*! The root window */
-extern Window   ob_root;
 
 /* The state of execution of the window manager */
 extern ObState ob_state;

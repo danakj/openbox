@@ -27,7 +27,8 @@ void dock_startup()
 
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
-    dock->frame = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
+    dock->frame = XCreateWindow(ob_display, RootWindow(ob_display, ob_screen),
+                                0, 0, 1, 1, 0,
                                 RrDepth(ob_rr_inst), InputOutput,
                                 RrVisual(ob_rr_inst),
                                 CWOverrideRedirect | CWEventMask,
@@ -134,7 +135,8 @@ void dock_remove(ObDockApp *app, gboolean reparent)
     g_hash_table_remove(window_map, &app->icon_win);
 
     if (reparent)
-	XReparentWindow(ob_display, app->icon_win, ob_root, app->x, app->y);
+	XReparentWindow(ob_display, app->icon_win,
+                        RootWindow(ob_display, ob_screen), app->x, app->y);
 
     dock->dock_apps = g_list_remove(dock->dock_apps, app);
     dock_configure();

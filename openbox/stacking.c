@@ -30,8 +30,8 @@ void stacking_set_list()
         }
     }
 
-    PROP_SETA32(ob_root, net_client_list_stacking, window,
-                (guint32*)windows, i);
+    PROP_SETA32(RootWindow(ob_display, ob_screen),
+                net_client_list_stacking, window, (guint32*)windows, i);
 
     g_free(windows);
 }

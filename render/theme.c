@@ -88,7 +88,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     /* load the font stuff */
     if (!read_string(db, "window.focus.font", &font_str))
-        font_str = "arial,sans:bold:pixelsize=9:shadow=y:shadowtint=50";
+        font_str = "arial,sans:bold:pixelsize=10:shadow=y:shadowtint=50";
 
     if (!(theme->winfont_focused = RrFontOpen(inst, font_str))) {
         RrThemeFree(theme);

@@ -6,6 +6,7 @@
 #include "openbox.h"
 #include "render/theme.h"
 
+#define PADDING 2
 #define SEPARATOR_HEIGHT 5
 
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
@@ -226,24 +227,26 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     switch (self->entry->type) {
     case OB_MENU_ENTRY_TYPE_NORMAL:
         XMoveResizeWindow(ob_display, self->text,
-                          self->frame->text_x, 0,
-                          self->frame->text_w, self->frame->item_h);
+                          self->frame->text_x, PADDING,
+                          self->frame->text_w,
+                          self->frame->item_h - 2*PADDING);
         text_a->surface.parent = item_a;
         text_a->surface.parentx = self->frame->text_x;
-        text_a->surface.parenty = 0;
-        RrPaint(text_a, self->text, self->frame->text_w, self->frame->item_h);
+        text_a->surface.parenty = PADDING;
+        RrPaint(text_a, self->text, self->frame->text_w,
+                self->frame->item_h - 2*PADDING);
         XMapWindow(ob_display, self->text);
         break;
     case OB_MENU_ENTRY_TYPE_SUBMENU:
         XMoveResizeWindow(ob_display, self->text,
-                          self->frame->text_x, 0,
+                          self->frame->text_x, PADDING,
                           self->frame->text_w - self->frame->item_h,
-                          self->frame->item_h);
+                          self->frame->item_h - 2*PADDING);
         text_a->surface.parent = item_a;
         text_a->surface.parentx = self->frame->text_x;
-        text_a->surface.parenty = 0;
+        text_a->surface.parenty = PADDING;
         RrPaint(text_a, self->text, self->frame->text_w - self->frame->item_h,
-                self->frame->item_h);
+                self->frame->item_h - 2*PADDING);
         XMapWindow(ob_display, self->text);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
@@ -254,8 +257,9 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
         self->entry->data.normal.icon_data)
     {
-        XMoveResizeWindow(ob_display, self->icon, 0, 0,
-                          self->frame->item_h, self->frame->item_h);
+        XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
+                          self->frame->item_h,
+                          self->frame->item_h);
         self->a_icon->texture[0].data.rgba.width =
             self->entry->data.normal.icon_width;
         self->a_icon->texture[0].data.rgba.height =
@@ -263,7 +267,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         self->a_icon->texture[0].data.rgba.data =
             self->entry->data.normal.icon_data;
         self->a_icon->surface.parent = item_a;
-        self->a_icon->surface.parentx = 0;
+        self->a_icon->surface.parentx = PADDING;
         self->a_icon->surface.parenty = 0;
         RrPaint(self->a_icon, self->icon,
                 self->frame->item_h, self->frame->item_h);
@@ -274,14 +278,17 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
         XMoveResizeWindow(ob_display, self->bullet,
                           self->frame->text_x + self->frame->text_w
-                          - self->frame->item_h, 0,
-                          self->frame->item_h, self->frame->item_h);
+                          - self->frame->item_h + PADDING, PADDING,
+                          self->frame->item_h - 2*PADDING,
+                          self->frame->item_h - 2*PADDING);
         self->a_bullet->surface.parent = item_a;
         self->a_bullet->surface.parentx =
-            self->frame->text_x + self->frame->text_w - self->frame->item_h;
-        self->a_bullet->surface.parenty = 0;
+            self->frame->text_x + self->frame->text_w - self->frame->item_h
+            - PADDING;
+        self->a_bullet->surface.parenty = PADDING;
         RrPaint(self->a_bullet, self->bullet,
-                self->frame->item_h, self->frame->item_h);
+                self->frame->item_h - 2*PADDING,
+                self->frame->item_h - 2*PADDING);
         XMapWindow(ob_display, self->bullet);
     } else
         XUnmapWindow(ob_display, self->bullet);
@@ -306,6 +313,8 @@ static void menu_frame_render(ObMenuFrame *self)
 
         self->a_title->texture[0].data.text.string = self->menu->title;
         RrMinsize(self->a_title, &tw, &th);
+        tw += 2*PADDING;
+        th += 2*PADDING;
         w = MAX(w, tw);
         h += (self->title_h = th + ob_rr_theme->bwidth);
 
@@ -320,6 +329,8 @@ static void menu_frame_render(ObMenuFrame *self)
         ObMenuEntryFrame *e = self->entries->data;
         e->a_text_normal->texture[0].data.text.string = "";
         RrMinsize(e->a_text_normal, &tw, &th);
+        tw += 2*PADDING;
+        th += 2*PADDING;
         self->item_h = th;
     } else
         self->item_h = 0;
@@ -350,25 +361,27 @@ static void menu_frame_render(ObMenuFrame *self)
             text_a->texture[0].data.text.string = sub ? sub->title : "";
             RrMinsize(text_a, &tw, &th);
 
-            tw += self->item_h;
+            tw += self->item_h - PADDING;
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:
             tw = 0;
             th = SEPARATOR_HEIGHT;
             break;
         }
+        tw += 2*PADDING;
+        th += 2*PADDING;
         w = MAX(w, tw);
         h += th;
         allitems_h += th;
     }
 
-    self->text_x = 0;
+    self->text_x = PADDING;
     self->text_w = w;
 
     if (self->entries) {
         if (has_icon) {
-            w += self->item_h;
-            self->text_x += self->item_h;
+            w += self->item_h + PADDING;
+            self->text_x += self->item_h + PADDING;
         }
     }
 

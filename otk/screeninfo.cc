@@ -81,7 +81,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
   _display_string = string("DISPLAY=") + default_string + '.' +
     otk::itostring(static_cast<unsigned long>(_screen));
   
-#ifdef    XINERAMA
+#if 0 //def    XINERAMA
   _xinerama_active = False;
 
   if (d->hasXineramaExtensions()) {

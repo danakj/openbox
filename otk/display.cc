@@ -19,6 +19,10 @@ extern "C" {
 #include <X11/extensions/shape.h>
 #endif // SHAPE
 
+#ifdef    XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif // XINERAMA
+
 #ifdef    HAVE_STDIO_H
 #  include <stdio.h>
 #endif // HAVE_STDIO_H

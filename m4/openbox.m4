@@ -19,7 +19,8 @@ AC_DEFUN([OB_DEBUG],
     AC_DEFINE([DEBUG], [1], [Creating a debug build])
   else
     AC_MSG_RESULT([RELEASE])
-    AC_DEFINE([NDEBUG], [1], [Creating a release build])
+# keep the asserts in
+#    AC_DEFINE([NDEBUG], [1], [Creating a release build])
   fi
 ])
 

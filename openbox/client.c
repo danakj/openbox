@@ -207,9 +207,6 @@ void client_manage(Window window)
 
     dispatch_client(Event_Client_Mapped, client, 0, 0);
 
-    /* grab all mouse bindings */
-    /*pointer_grab_all(client, TRUE);XXX*/
-
     /* update the list hints */
     client_set_list();
 
@@ -238,9 +235,6 @@ void client_unmanage(Client *client)
     /* we dont want events no more */
     XSelectInput(ob_display, client->window, NoEventMask);
 
-    /* ungrab any mouse bindings */
-    /*pointer_grab_all(client, FALSE);XXX*/
-     
     engine_frame_hide(client->frame);
 
     /* give the client its border back */

@@ -70,7 +70,8 @@ struct _ObMenuEntryFrame
 
     RrAppearance *a_icon;
     RrAppearance *a_mask;
-    RrAppearance *a_bullet;
+    RrAppearance *a_bullet_normal;
+    RrAppearance *a_bullet_selected;
     RrAppearance *a_separator;
     RrAppearance *a_text_normal;
     RrAppearance *a_text_disabled;

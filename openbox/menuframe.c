@@ -103,7 +103,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     XMapWindow(ob_display, self->window);
     XMapWindow(ob_display, self->text);
 
-    self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_item);
+    self->a_normal = RrAppearanceCopy(ob_rr_theme->a_menu_normal);
     self->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
     self->a_selected = RrAppearanceCopy(ob_rr_theme->a_menu_selected);
 
@@ -115,11 +115,14 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
         self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
         self->a_mask = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
         self->a_mask->texture[0].type = RR_TEXTURE_MASK;
-        self->a_bullet = RrAppearanceCopy(ob_rr_theme->a_menu_bullet);
+        self->a_bullet_normal =
+            RrAppearanceCopy(ob_rr_theme->a_menu_bullet_normal);
+        self->a_bullet_selected =
+            RrAppearanceCopy(ob_rr_theme->a_menu_bullet_selected);
     }
 
     self->a_text_normal =
-        RrAppearanceCopy(ob_rr_theme->a_menu_text_item);
+        RrAppearanceCopy(ob_rr_theme->a_menu_text_normal);
     self->a_text_disabled =
         RrAppearanceCopy(ob_rr_theme->a_menu_text_disabled);
     self->a_text_selected =
@@ -148,7 +151,8 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         RrAppearanceFree(self->a_text_normal);
         RrAppearanceFree(self->a_text_disabled);
         RrAppearanceFree(self->a_text_selected);
-        RrAppearanceFree(self->a_bullet);
+        RrAppearanceFree(self->a_bullet_normal);
+        RrAppearanceFree(self->a_bullet_selected);
 
         g_free(self);
     }
@@ -298,13 +302,22 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     } else if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR &&
                self->entry->data.normal.mask)
     {
+        RrColor *c;
+
         XMoveResizeWindow(ob_display, self->icon, PADDING, 0,
                           self->frame->item_h,
                           self->frame->item_h);
         self->a_mask->texture[0].data.mask.mask =
             self->entry->data.normal.mask;
-        self->a_mask->texture[0].data.mask.color =
-            self->entry->data.normal.mask_color;
+
+        c = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+              !self->entry->data.normal.enabled) ?
+             self->entry->data.normal.mask_disabled_color :
+             (self == self->frame->selected ?
+              self->entry->data.normal.mask_selected_color :
+              self->entry->data.normal.mask_normal_color));
+        self->a_mask->texture[0].data.mask.color = c;
+
         self->a_mask->surface.parent = item_a;
         self->a_mask->surface.parentx = PADDING;
         self->a_mask->surface.parenty = 0;
@@ -315,17 +328,21 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         XUnmapWindow(ob_display, self->icon);
 
     if (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+        RrAppearance *bullet_a;
         XMoveResizeWindow(ob_display, self->bullet,
                           self->frame->text_x + self->frame->text_w
                           - self->frame->item_h + PADDING, PADDING,
                           self->frame->item_h - 2*PADDING,
                           self->frame->item_h - 2*PADDING);
-        self->a_bullet->surface.parent = item_a;
-        self->a_bullet->surface.parentx =
+        bullet_a = (self == self->frame->selected ?
+                    self->a_bullet_selected :
+                    self->a_bullet_normal);
+        bullet_a->surface.parent = item_a;
+        bullet_a->surface.parentx =
             self->frame->text_x + self->frame->text_w - self->frame->item_h
             + PADDING;
-        self->a_bullet->surface.parenty = PADDING;
-        RrPaint(self->a_bullet, self->bullet,
+        bullet_a->surface.parenty = PADDING;
+        RrPaint(bullet_a, self->bullet,
                 self->frame->item_h - 2*PADDING,
                 self->frame->item_h - 2*PADDING);
         XMapWindow(ob_display, self->bullet);

@@ -162,19 +162,25 @@ void client_menu_startup()
 
     e = menu_add_submenu(menu, CLIENT_SEND_TO, SEND_TO_MENU_NAME);
     e->data.normal.mask = ob_rr_theme->desk_mask;
-    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
 
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     acts = g_slist_prepend(NULL, action_from_string("Iconify"));
     e = menu_add_normal(menu, CLIENT_ICONIFY, _("Iconify"), acts);
     e->data.normal.mask = ob_rr_theme->iconify_mask;
-    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleMaximizeFull"));
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Maximize"), acts);
-    e->data.normal.mask = ob_rr_theme->max_mask;
-    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
+    e->data.normal.mask = ob_rr_theme->max_mask; 
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
 
     acts = g_slist_prepend(NULL, action_from_string("Raise"));
     menu_add_normal(menu, CLIENT_RAISE, _("Raise to top"), acts);
@@ -185,7 +191,9 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string("ToggleShade"));
     e = menu_add_normal(menu, CLIENT_SHADE, _("Roll up/down"), acts);
     e->data.normal.mask = ob_rr_theme->shade_mask;
-    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
 
     acts = g_slist_prepend(NULL, action_from_string("ToggleDecorations"));
     menu_add_normal(menu, CLIENT_DECORATE, _("Decorate"), acts);
@@ -203,5 +211,7 @@ void client_menu_startup()
     acts = g_slist_prepend(NULL, action_from_string("Close"));
     e = menu_add_normal(menu, CLIENT_CLOSE, _("Close"), acts);
     e->data.normal.mask = ob_rr_theme->close_mask;
-    e->data.normal.mask_color = ob_rr_theme->menu_bullet_color;
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
 }

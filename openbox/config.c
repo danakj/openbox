@@ -44,7 +44,7 @@ gint            config_dock_x;
 gint            config_dock_y;
 ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
-guint           config_dock_hide_timeout;
+guint           config_dock_hide_delay;
 
 guint config_keyboard_reset_keycode;
 guint config_keyboard_reset_state;
@@ -317,8 +317,8 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
     }
     if ((n = parse_find_node("autoHide", node)))
         config_dock_hide = parse_bool(doc, n);
-    if ((n = parse_find_node("hideTimeout", node)))
-        config_dock_hide_timeout = parse_int(doc, n) * 1000;
+    if ((n = parse_find_node("hideDelay", node)))
+        config_dock_hide_delay = parse_int(doc, n) * 1000;
 }
 
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
@@ -502,7 +502,7 @@ void config_startup(ObParseInst *i)
     config_dock_y = 0;
     config_dock_orient = OB_ORIENTATION_VERT;
     config_dock_hide = FALSE;
-    config_dock_hide_timeout = 300;
+    config_dock_hide_delay = 300;
 
     parse_register(i, "dock", parse_dock, NULL);
 

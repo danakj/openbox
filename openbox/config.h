@@ -54,7 +54,7 @@ extern ObOrientation config_dock_orient;
 /*! Whether to auto-hide the dock when the pointer is not over it */
 extern gboolean config_dock_hide;
 /*! The number of microseconds to wait before hiding the dock */
-extern guint config_dock_hide_timeout;
+extern guint config_dock_hide_delay;
 
 /* The name of the theme */
 extern char *config_theme;

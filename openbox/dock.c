@@ -584,7 +584,7 @@ void dock_hide(gboolean hide)
         /* if was hiding, stop it */
         ob_main_loop_timeout_remove(ob_main_loop, hide_timeout);
     } else if (!dock->hidden && config_dock_hide) {
-        ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_timeout,
+        ob_main_loop_timeout_add(ob_main_loop, config_dock_hide_delay,
                                  hide_timeout, NULL, NULL);
     }
 }

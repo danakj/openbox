@@ -1467,6 +1467,10 @@ void action_growtoedge(union ActionData *data)
     ObClient *c = data->diraction.any.c;
     Rect *a;
 
+    //FIXME growtoedge resizes shaded windows to 0 height
+    if (c->shaded)
+        return;
+
     a = screen_area(c->desktop);
     x = c->frame->area.x;
     y = c->frame->area.y;

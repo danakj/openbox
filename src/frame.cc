@@ -645,45 +645,44 @@ void Frame::layoutTitle()
       geom.icon_x = x;
       XMapWindow(**otk::display, _icon);
       XMoveWindow(**otk::display, _icon, x, geom.bevel + 1);
-      x += geom.button_size;
+      x += geom.button_size + geom.bevel;
       break;
     case 'd':
     case 'D':
       if (!d) break;
       XMapWindow(**otk::display, _desk);
       XMoveWindow(**otk::display, _desk, x, geom.bevel + 1);
-      x += geom.button_size;
+      x += geom.button_size + geom.bevel;
       break;
     case 'i':
     case 'I':
       if (!i) break;
       XMapWindow(**otk::display, _iconify);
       XMoveWindow(**otk::display, _iconify, x, geom.bevel + 1);
-      x += geom.button_size;
+      x += geom.button_size + geom.bevel;
       break;
     case 't':
     case 'T':
       if (!t) break;
       XMapWindow(**otk::display, _label);
       XMoveWindow(**otk::display, _label, x, geom.bevel);
-      x += geom.label_width;
+      x += geom.label_width + geom.bevel;
       break;
     case 'm':
     case 'M':
       if (!m) break;
       XMapWindow(**otk::display, _max);
       XMoveWindow(**otk::display, _max, x, geom.bevel + 1);
-      x += geom.button_size;
+      x += geom.button_size + geom.bevel;
       break;
     case 'c':
     case 'C':
       if (!c) break;
       XMapWindow(**otk::display, _close);
       XMoveWindow(**otk::display, _close, x, geom.bevel + 1);
-      x += geom.button_size;
+      x += geom.button_size + geom.bevel;
       break;
     }
-    x += geom.bevel;
   }
 }
 

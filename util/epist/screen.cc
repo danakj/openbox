@@ -342,16 +342,11 @@ void screen::updateClientList() {
   Window *rootclients = 0;
   unsigned long num = (unsigned) -1;
   if (! _xatom->getValue(_root, XAtom::net_client_list, XAtom::window, num,
-                         &rootclients)) {
-    while (! _clients.empty()) {
-      delete _clients.front();
-      _clients.erase(_clients.begin());
-    }
-    if (rootclients) delete [] rootclients;
-    return;
-  }
-  
-  WindowList::iterator it, end = _clients.end();
+                         &rootclients))
+    num = 0;
+
+  WindowList::iterator it;
+  const WindowList::iterator end = _clients.end();
   unsigned long i;
   
   // insert new clients after the active window
@@ -370,12 +365,17 @@ void screen::updateClientList() {
 
   // remove clients that no longer exist
   for (it = _clients.begin(); it != end;) {
-    WindowList::iterator it2 = it++;
+    WindowList::iterator it2 = it;
+    ++it;
+
     for (i = 0; i < num; ++i)
       if (**it2 == rootclients[i])
         break;
     if (i == num)  { // no longer exists
       //cout << "Removed window: 0x" << hex << (*it2)->window() << dec << endl;
+      // watch for the active window
+      if (it2 == _active)
+        _active = _clients.end();
       delete *it2;
       _clients.erase(it2);
     }

@@ -432,7 +432,7 @@ void screen_update_struts()
     g_free(strut);
     strut = g_new0(Strut, screen_num_desktops + 1);
 
-    for (it = client_list; it; it = it->next) {
+    for (it = client_list; it != NULL; it = it->next) {
 	Client *c = it->data;
 	if (c->iconic) continue; /* these dont count in the strut */
     

@@ -268,7 +268,6 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
 
 BlackboxWindow::~BlackboxWindow(void) {
-
 #ifdef    DEBUG
   fprintf(stderr, "BlackboxWindow::~BlackboxWindow: destroying 0x%lx\n",
           client.window);

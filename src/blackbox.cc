@@ -666,10 +666,9 @@ void Blackbox::process_event(XEvent *e) {
       } else if(e->xclient.message_type == getBlackboxChangeWorkspaceAtom()) {
         BScreen *screen = searchScreen(e->xclient.window);
 
-        if (screen && e->xclient.data.l[0] >= 0 &&
-            e->xclient.data.l[0] <
-            static_cast<signed>(screen->getWorkspaceCount()))
-          screen->changeWorkspaceID(e->xclient.data.l[0]);
+        unsigned int workspace = e->xclient.data.l[0];
+        if (screen && workspace < screen->getWorkspaceCount())
+          screen->changeWorkspaceID(workspace);
       } else if (e->xclient.message_type == getBlackboxChangeWindowFocusAtom()) {
         BlackboxWindow *win = searchWindow(e->xclient.window);
 

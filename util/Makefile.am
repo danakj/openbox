@@ -11,7 +11,7 @@ bsetroot_LDADD =	../src/BaseDisplay.o ../src/Color.o ../src/GCCache.o ../src/Tex
 MAINTAINERCLEANFILES =	Makefile.in
 
 distclean-local:
-	rm -f *\~
+	rm -f *\~ .\#*
 
 # local dependencies
 

@@ -1040,10 +1040,14 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
     workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
 
-    if (blackbox->getFocusedWindow() &&
-        blackbox->getFocusedWindow()->getScreen() == this &&
-        ! blackbox->getFocusedWindow()->isStuck()) {
-      current_workspace->setLastFocusedWindow(blackbox->getFocusedWindow());
+    BlackboxWindow *focused = blackbox->getFocusedWindow();
+    if (focused && focused->getScreen() == this && ! focused->isStuck()) {
+      if (focused->getWorkspaceNumber() != current_workspace->getID()) {
+        fprintf(stderr, "%s is on the wrong workspace, aborting\n",
+                focused->getTitle());
+        abort();
+      }
+      current_workspace->setLastFocusedWindow(focused);
       blackbox->setFocusedWindow((BlackboxWindow *) 0);
     }
 
@@ -1079,7 +1083,8 @@ void BScreen::manageWindow(Window w) {
 
   XMapRequestEvent mre;
   mre.window = w;
-  win->restoreAttributes();
+  if (blackbox->isStartup())
+    win->restoreAttributes();
   win->mapRequestEvent(&mre);
 }
 

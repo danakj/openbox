@@ -224,7 +224,6 @@ void Workspace::lowerTransients(const BlackboxWindow * const win,
       wkspc->stackingList.push_back((*it));
     }
   }
-
 }
 
 

@@ -50,7 +50,6 @@ static void resist(Client *c, int *x, int *y)
                window edge available, without going all the way from
                bottom-to-top in the stacking list
             */
-            g_print("r %d tl %d\n", r, tl);
             if (!snapx && cl >= tr && l < tr && l >= tr - resistance)
                 *x = tr, snapx = TRUE;
             else if (!snapx && cr <= tl && r > tl && r <= tl + resistance)

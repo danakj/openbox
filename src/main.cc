@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
   // initialize the locale
   setlocale(LC_ALL, "");
   bindtextdomain(PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
   textdomain(PACKAGE);
 
   ob::Openbox openbox(argc, argv);

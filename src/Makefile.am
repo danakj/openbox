@@ -17,8 +17,7 @@ openbox3_LDADD=-L../otk -lotk @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   main.cc rootwindow.cc backgroundwidget.cc labelwidget.cc \
-                  buttonwidget.cc openbox_wrap.cc
-# guile.cc
+                  buttonwidget.cc python.cc openbox_wrap.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -29,6 +28,6 @@ openbox.i: openbox.hh screen.hh client.hh
 	touch $@
 
 openbox_wrap.cc: openbox.i
-	swig -python -c++ -nodefault -o $@ $<
+	swig $(filter -I%,$(CFLAGS)) -python -c++ -nodefault -o $@ $<
 
 # local dependencies

@@ -578,13 +578,13 @@ void action_next_desktop_column(union ActionData *data)
 
     cur_row_col(&r, &c);
     ++c;
+    if (c >= screen_desktop_layout.columns)
+        c = 0;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
         if (!data->nextprevdesktop.wrap) return;
-        c = 0;
-    }
-    if (d >= screen_num_desktops)
         ++c;
+    }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
         screen_set_desktop(d);
@@ -596,13 +596,13 @@ void action_previous_desktop_column(union ActionData *data)
 
     cur_row_col(&r, &c);
     --c;
+    if (c >= screen_desktop_layout.columns)
+        c = screen_desktop_layout.columns - 1;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
         if (!data->nextprevdesktop.wrap) return;
-        c = screen_desktop_layout.columns - 1;
-    }
-    if (d >= screen_num_desktops)
         --c;
+    }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
         screen_set_desktop(d);
@@ -614,13 +614,13 @@ void action_next_desktop_row(union ActionData *data)
 
     cur_row_col(&r, &c);
     ++r;
+    if (r >= screen_desktop_layout.rows)
+        r = 0;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
         if (!data->nextprevdesktop.wrap) return;
-        r = 0;
-    }
-    if (d >= screen_num_desktops)
         ++r;
+    }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
         screen_set_desktop(d);
@@ -632,13 +632,13 @@ void action_previous_desktop_row(union ActionData *data)
 
     cur_row_col(&r, &c);
     --r;
+    if (r >= screen_desktop_layout.rows)
+        r = screen_desktop_layout.rows - 1;
     d = translate_row_col(r, c);
     if (d >= screen_num_desktops) {
         if (!data->nextprevdesktop.wrap) return;
-        c = screen_desktop_layout.rows - 1;
-    }
-    if (d >= screen_num_desktops)
         --r;
+    }
     d = translate_row_col(r, c);
     if (d < screen_num_desktops)
         screen_set_desktop(d);

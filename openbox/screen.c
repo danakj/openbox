@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "dock.h"
+#include "xerror.h"
 #include "prop.h"
 #include "startup.h"
 #include "timer.h"

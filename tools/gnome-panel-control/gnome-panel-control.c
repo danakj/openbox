@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     }
 
     if (!a) {
-        printf("Usage: gnomepanelproxy ACTION\n\n");
+        printf("Usage: gnome-panel-control ACTION\n\n");
         printf("Actions:\n");
         printf("    --help       Display this help and exit\n");
         printf("    --main-menu  Show the main menu\n");

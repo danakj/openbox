@@ -51,11 +51,10 @@ void parse_menu_full(xmlDocPtr doc, xmlNodePtr node, void *data,
     while (node) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "menu")) {
             if (parse_attr_string("plugin", node, &plugin)) {
-                PluginMenuCreateData data = {
-                    .doc = doc,
-                    .node = node,
-                    .parent = menu
-                };
+                PluginMenuCreateData data;
+                data.doc = doc;
+                data.node = node;
+                data.parent = menu;
                 parent = plugin_create(plugin, &data);
                 g_free(plugin);
             } else {
@@ -393,6 +392,18 @@ ObMenuEntry *menu_find_entry(ObMenu *menu, Window win)
     return NULL;
 }
 
+ObMenuEntry *menu_find_entry_by_submenu(ObMenu *menu, ObMenu *submenu)
+{
+    GList *it;
+
+    for (it = menu->entries; it; it = it->next) {
+        ObMenuEntry *entry = it->data;
+        if (entry->submenu == submenu)
+            return entry;
+    }
+    return NULL;
+}
+
 ObMenuEntry *menu_find_entry_by_pos(ObMenu *menu, int x, int y)
 {
     if (x < 0 || x >= menu->size.width || y < 0 || y >= menu->size.height)
@@ -457,13 +468,18 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 {
     int x;
     Rect *a;
+    ObMenuEntry *e;
 
-    self->hilite = enter;
-  
     if (enter) {
 	if (self->parent->open_submenu && self->submenu 
 	    != self->parent->open_submenu)
+        {
+            e = menu_find_entry_by_submenu(self->parent,
+                                           self->parent->open_submenu);
+            e->hilite = FALSE;
+            menu_entry_render(e);
 	    menu_hide(self->parent->open_submenu);
+        }
 	
 	if (self->submenu && self->parent->open_submenu != self->submenu) {
 	    self->parent->open_submenu = self->submenu;
@@ -489,6 +505,11 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
                            self->parent->client);
 	} 
     }
+
+    if (enter || !self->submenu ||
+        menu_find_entry_by_submenu(self->parent,
+                                   self->parent->open_submenu) != self)
+        self->hilite = enter;
 }
 
 ObMenuEntry *menu_control_keyboard_nav(ObMenuEntry *over, ObKey key)

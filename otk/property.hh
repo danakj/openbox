@@ -291,8 +291,8 @@ public:
                      retrieve all possible strings, use "(unsigned) -1".<br>
                      When the function returns, if it returns true, this will
                      contain the actual number of strings retrieved.<br>
-    @param value If the function returns true, then this contains all of the
-                 strings retrieved from the property's value.
+    @param strings If the function returns true, then this contains all of the
+                   strings retrieved from the property's value.
     @return true if retrieval of the specified property with the specified
             type was successful; otherwise, false
   */
@@ -301,9 +301,9 @@ public:
 
   //! Removes a property from a window
   /*!
-    @param The window id of the window to remove the property from
-    @param A member of the OBProperty::Atoms enum that specifies which property
-           to remove from the window
+    @param win The window id of the window to remove the property from
+    @param atom A member of the OBProperty::Atoms enum that specifies which
+                property to remove from the window
   */
   void erase(Window win, Atoms atom) const;
 

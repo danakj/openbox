@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "action.h"
 #include "dispatch.h"
+#include "openbox.h"
 
 #include <glib.h>
 
@@ -424,4 +425,15 @@ void action_resize(union ActionData *data)
 
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);
+}
+
+void action_restart(union ActionData *data)
+{
+    ob_restart_path = data->execute.path;
+    ob_shutdown = ob_restart = TRUE;
+}
+
+void action_exit(union ActionData *data)
+{
+    ob_shutdown = TRUE;
 }

@@ -161,5 +161,9 @@ void action_toggle_decorations(union ActionData *data);
 void action_move(union ActionData *data);
 /* Resize */
 void action_resize(union ActionData *data);
+/* Execute */
+void action_restart(union ActionData *data);
+/* Any */
+void action_exit(union ActionData *data);
 
 #endif

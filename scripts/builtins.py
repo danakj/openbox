@@ -317,11 +317,11 @@ ob_rand = None
 import random
 def placewindows_random(data):
     if not data.client: return
-    client_area = data.client.area()
+    frame_area = data.client.frame.area()
     screen = display.screenInfo(data.screen)
     # XXX - USE THE FRAME'S SIZE!!
-    width = screen.width() - client_area.width()
-    height = screen.height() - client_area.height()
+    width = screen.width() - frame_area.width()
+    height = screen.height() - frame_area.height()
     global ob_rand
     if not ob_rand: ob_rand = random.Random()
     x = ob_rand.randrange(0, width-1)

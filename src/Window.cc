@@ -1701,7 +1701,7 @@ void BlackboxWindow::show(void) {
   XMapSubwindows(blackbox->getXDisplay(), frame.window);
   XMapWindow(blackbox->getXDisplay(), frame.window);
 
-#ifdef DEBUG
+#if 0
   int real_x, real_y;
   Window child;
   XTranslateCoordinates(blackbox->getXDisplay(), client.window,

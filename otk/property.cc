@@ -4,12 +4,14 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
+#include "property.hh"
+#include "display.hh"
+
 extern "C" {
 #include <assert.h>
 }
 
-#include "property.hh"
-#include "display.hh"
+#include <algorithm>
 
 namespace otk {
 

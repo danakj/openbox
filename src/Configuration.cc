@@ -20,151 +20,155 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#ifdef    HAVE_CONFIG_H
 #include "../config.h"
+#endif // HAVE_CONFIG_H
+
+extern "C" {
+#ifdef    HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif // HAVE_STDLIB_H
+}
 
 #include "Configuration.hh"
 #include "Util.hh"
 
 #include <algorithm>
 
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
-
 using std::string;
 
-bool Configuration::m_initialized = False;
+bool Configuration::_initialized = False;
 
 Configuration::Configuration(const string &file, bool autosave) {
   setFile(file);
-  m_modified = False;
-  m_database = NULL;
-  m_autosave = autosave;
-  if (! m_initialized) {
+  _modified = False;
+  _database = NULL;
+  _autosave = autosave;
+  if (! _initialized) {
     XrmInitialize();
-    m_initialized = True;
+    _initialized = True;
   }
 }
 
 Configuration::Configuration(bool autosave) {
-  m_modified = False;
-  m_database = NULL;
-  m_autosave = autosave;
-  if (! m_initialized) {
+  _modified = False;
+  _database = NULL;
+  _autosave = autosave;
+  if (! _initialized) {
     XrmInitialize();
-    m_initialized = True;
+    _initialized = True;
   }
 }
 
 Configuration::~Configuration() {
-  if (m_database != NULL)
-    XrmDestroyDatabase(m_database);
+  if (_database != NULL)
+    XrmDestroyDatabase(_database);
 }
 
 void Configuration::setFile(const string &file) {
-  m_file = file;
+  _file = file;
 }
 
 void Configuration::setAutoSave(bool autosave) {
-  m_autosave = autosave;
+  _autosave = autosave;
 }
 
 void Configuration::save() {
-  assert(m_database != NULL);
-  XrmPutFileDatabase(m_database, m_file.c_str());
-  m_modified = False;
+  assert(_database != NULL);
+  XrmPutFileDatabase(_database, _file.c_str());
+  _modified = False;
 }
 
 bool Configuration::load() {
-  if (m_database != NULL)
-    XrmDestroyDatabase(m_database);
-  m_modified = False;
-  if (NULL == (m_database = XrmGetFileDatabase(m_file.c_str())))
+  if (_database != NULL)
+    XrmDestroyDatabase(_database);
+  _modified = False;
+  if (NULL == (_database = XrmGetFileDatabase(_file.c_str())))
     return False;
   return True;
 }
 
 bool Configuration::merge(const string &file, bool overwrite) {
-  if (XrmCombineFileDatabase(file.c_str(), &m_database, overwrite) == 0)
+  if (XrmCombineFileDatabase(file.c_str(), &_database, overwrite) == 0)
     return False;
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
   return True;
 }
 
 void Configuration::create() {
-  if (m_database != NULL)
-    XrmDestroyDatabase(m_database);
-  m_modified = False;
-  assert(NULL != (m_database = XrmGetStringDatabase("")));
+  if (_database != NULL)
+    XrmDestroyDatabase(_database);
+  _modified = False;
+  assert(NULL != (_database = XrmGetStringDatabase("")));
 }
 
 void Configuration::setValue(const string &rname, bool value) {
-  assert(m_database != NULL);
+  assert(_database != NULL);
 
   const char *val = (value ? "True" : "False");
   string rc_string = rname + ": " + val;
-  XrmPutLineResource(&m_database, rc_string.c_str());
+  XrmPutLineResource(&_database, rc_string.c_str());
 
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
 }
 
 void Configuration::setValue(const string &rname, unsigned long value) {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rc_string = rname + ": " + itostring(value);
-  XrmPutLineResource(&m_database, rc_string.c_str());
+  XrmPutLineResource(&_database, rc_string.c_str());
 
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
 }
 
 void Configuration::setValue(const string &rname, long value) {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rc_string = rname + ": " + itostring(value);
-  XrmPutLineResource(&m_database, rc_string.c_str());
+  XrmPutLineResource(&_database, rc_string.c_str());
 
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
 }
 
 void Configuration::setValue(const string &rname, const char *value) {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   assert(value != NULL);
   
   string rc_string = rname + ": " + value;
-  XrmPutLineResource(&m_database, rc_string.c_str());
+  XrmPutLineResource(&_database, rc_string.c_str());
 
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
 }
 
 void Configuration::setValue(const string &rname, const string &value) {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rc_string = rname + ": " + value;
-  XrmPutLineResource(&m_database, rc_string.c_str());
+  XrmPutLineResource(&_database, rc_string.c_str());
 
-  m_modified = True;
-  if (m_autosave)
+  _modified = True;
+  if (_autosave)
     save();
 }
 
 bool Configuration::getValue(const string &rname, bool &value) const {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rclass = createClassName(rname);
   
   char *rettype;
   XrmValue retvalue;
-  if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
+  if (0 == XrmGetResource(_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
     return False;
   string val = retvalue.addr;
@@ -176,13 +180,13 @@ bool Configuration::getValue(const string &rname, bool &value) const {
 }
 
 bool Configuration::getValue(const string &rname, long &value) const {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rclass = createClassName(rname);
   
   char *rettype;
   XrmValue retvalue;
-  if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
+  if (0 == XrmGetResource(_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
     return False;
   char *end;
@@ -193,13 +197,13 @@ bool Configuration::getValue(const string &rname, long &value) const {
 }
 
 bool Configuration::getValue(const string &rname, unsigned long &value) const {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rclass = createClassName(rname);
   
   char *rettype;
   XrmValue retvalue;
-  if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
+  if (0 == XrmGetResource(_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
     return False;
   char *end;
@@ -211,13 +215,13 @@ bool Configuration::getValue(const string &rname, unsigned long &value) const {
 
 bool Configuration::getValue(const string &rname,
                              string &value) const {
-  assert(m_database != NULL);
+  assert(_database != NULL);
   
   string rclass = createClassName(rname);
   
   char *rettype;
   XrmValue retvalue;
-  if (0 == XrmGetResource(m_database, rname.c_str(), rclass.c_str(), 
+  if (0 == XrmGetResource(_database, rname.c_str(), rclass.c_str(), 
                           &rettype, &retvalue) || retvalue.addr == NULL)
     return False;
   value = retvalue.addr;

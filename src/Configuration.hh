@@ -42,18 +42,18 @@ public:
   virtual ~Configuration();
 
   inline const std::string &file() const {
-    return static_cast<const std::string &>(m_file);
+    return static_cast<const std::string &>(_file);
   }
   void setFile(const std::string &file);
 
   // defaults to true!
   inline bool autoSave() const {
-    return m_autosave;
+    return _autosave;
   }
   void setAutoSave(bool);
 
   inline bool isModified() const {
-    return m_modified;
+    return _modified;
   }
 
   void save();
@@ -88,11 +88,11 @@ private:
   std::string createClassName(const std::string &rname) const;
   char toUpper(char) const;
   
-  static bool m_initialized;
-  std::string m_file;
-  bool m_modified;
-  bool m_autosave;
-  XrmDatabase m_database;
+  static bool _initialized;
+  std::string _file;
+  bool _modified;
+  bool _autosave;
+  XrmDatabase _database;
 };
 
 #endif // __Configuration_hh

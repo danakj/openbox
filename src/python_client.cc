@@ -15,7 +15,7 @@ PyObject *get_client_dict(PyObject* self, PyObject* args)
 {
   if (!PyArg_ParseTuple(args, ":get_client_dict"))
     return NULL;
-  return PyDictProxy_New(Openbox::instance->pyclients());
+  return PyDictProxy_New((PyObject*)Openbox::instance->pyclients());
 }
 
 

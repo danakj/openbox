@@ -171,7 +171,7 @@ public:
   //! Returns the mouse cursors used throughout Openbox
   inline const Cursors &cursors() const { return _cursors; }
 
-  inline PyObject *pyclients() const { return _pyclients; }
+  inline PyDictObject *pyclients() const { return _pyclients; }
 
   //! The main function of the Openbox class
   /*!

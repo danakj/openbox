@@ -1002,6 +1002,7 @@ static void event_handle_dock(Dock *s, XEvent *e)
     switch (e->type) {
     case ButtonPress:
         stacking_raise(DOCK_AS_WINDOW(s));
+        break;
     case EnterNotify:
         dock_hide(FALSE);
         break;

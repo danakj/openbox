@@ -56,20 +56,25 @@ struct _RrTheme {
     RrPixmapMask *max_toggled_mask;
     RrPixmapMask *max_hover_mask;
     RrPixmapMask *max_disabled_mask;
+    RrPixmapMask *max_pressed_mask;
     RrPixmapMask *iconify_mask;
     RrPixmapMask *iconify_hover_mask;
     RrPixmapMask *iconify_disabled_mask;
+    RrPixmapMask *iconify_pressed_mask;
     RrPixmapMask *desk_mask;
     RrPixmapMask *desk_toggled_mask;
     RrPixmapMask *desk_hover_mask;
     RrPixmapMask *desk_disabled_mask;
+    RrPixmapMask *desk_pressed_mask;
     RrPixmapMask *shade_mask;
     RrPixmapMask *shade_toggled_mask;
     RrPixmapMask *shade_hover_mask;
     RrPixmapMask *shade_disabled_mask;
+    RrPixmapMask *shade_pressed_mask;
     RrPixmapMask *close_mask;
     RrPixmapMask *close_hover_mask;
     RrPixmapMask *close_disabled_mask;
+    RrPixmapMask *close_pressed_mask;
 
     /* global appearances */
     RrAppearance *a_disabled_focused_max;

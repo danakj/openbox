@@ -134,7 +134,7 @@ void client_set_list()
 }
 
 /*
-  void client_foreach_transient(ObClient *self, ObClientForeachFunc func, void *data)
+  void client_foreach_transient(ObClient *self, ObClientForeachFunc func, gpointer data)
   {
   GSList *it;
 
@@ -144,7 +144,7 @@ void client_set_list()
   }
   }
 
-  void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, void *data)
+  void client_foreach_ancestor(ObClient *self, ObClientForeachFunc func, gpointer data)
   {
   if (self->transient_for) {
   if (self->transient_for != OB_TRAN_GROUP) {

@@ -112,7 +112,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           void *d)
+                           gpointer d)
 {
     keyboard_unbind_all();
 
@@ -130,7 +130,7 @@ static void parse_keyboard(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 */
 
 static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        void *d)
+                        gpointer d)
 {
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
@@ -190,7 +190,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        void *d)
+                        gpointer d)
 {
     xmlNodePtr n;
 
@@ -207,7 +207,7 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                            void *d)
+                            gpointer d)
 {
     xmlNodePtr n;
 
@@ -219,7 +219,7 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                        void *d)
+                        gpointer d)
 {
     xmlNodePtr n;
 
@@ -240,7 +240,7 @@ static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                           void *d)
+                           gpointer d)
 {
     xmlNodePtr n;
 
@@ -270,7 +270,7 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 }
 
 static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
-                         void *d)
+                         gpointer d)
 {
     xmlNodePtr n;
 
@@ -280,7 +280,8 @@ static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_redraw_resize = parse_bool(doc, n);
 }
 
-static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                       gpointer d)
 {
     xmlNodePtr n;
 
@@ -351,7 +352,8 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
     }
 }
 
-static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
+static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
+                       gpointer d)
 {
     for (node = node->children; node; node = node->next) {
         if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
@@ -366,7 +368,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, void *d)
 }
    
 static void parse_resistance(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node, 
-                             void *d)
+                             gpointer d)
 {
     xmlNodePtr n;
 

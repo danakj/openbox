@@ -28,14 +28,15 @@ typedef enum {
     Event_Client_Urgent   = 1 << 14, /* entered/left urgent state */
     Event_Client_Desktop  = 1 << 15, /* moved to a new desktop */
     Event_Client_Moving   = 1 << 16, /* being interactively moved */
+    Event_Client_Resizing = 1 << 17, /* being interactively resized */
 
-    Event_Ob_Desktop      = 1 << 17, /* changed desktops */
-    Event_Ob_NumDesktops  = 1 << 18, /* changed the number of desktops */
-    Event_Ob_ShowDesktop  = 1 << 19, /* entered/left show-the-desktop mode */
+    Event_Ob_Desktop      = 1 << 18, /* changed desktops */
+    Event_Ob_NumDesktops  = 1 << 19, /* changed the number of desktops */
+    Event_Ob_ShowDesktop  = 1 << 20, /* entered/left show-the-desktop mode */
 
-    Event_Signal          = 1 << 20, /* a signal from the OS */
+    Event_Signal          = 1 << 21, /* a signal from the OS */
 
-    EVENT_RANGE           = 1 << 21
+    EVENT_RANGE           = 1 << 22
 } EventType;
 
 typedef struct {
@@ -45,12 +46,16 @@ typedef struct {
 
 typedef struct {
     Client *client;
-    int num[2];
+    int num[3];
     /* Event_Client_Desktop: num[0] = new number, num[1] = old number
        Event_Client_Urgent: num[0] = urgent state
        Event_Client_Moving: num[0] = dest x coord, num[1] = dest y coord --
                             change these in the handler to adjust where the
                             window will be placed
+       Event_Client_Resizing: num[0] = dest width, num[1] = dest height --
+                              change these in the handler to adjust where the
+                              window will be placed
+                              num[2] = the anchored corner
      */
 } EventData_Client;
 
@@ -91,5 +96,8 @@ void dispatch_signal(int signal);
 /* *x and *y should be set with the destination of the window, they may be
    changed by the event handlers */
 void dispatch_move(Client *c, int *x, int *y);
+/* *w and *h should be set with the destination of the window, they may be
+   changed by the event handlers */
+void dispatch_resize(Client *c, int *w, int *h, Corner corner);
 
 #endif

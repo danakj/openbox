@@ -153,6 +153,7 @@ void dispatch_client(EventType e, Client *c, int num0, int num1)
     obe.data.c.client = c;
     obe.data.c.num[0] = num0;
     obe.data.c.num[1] = num1;
+    obe.data.c.num[2] = 0;
 
     i = 0;
     while (e > 1) {
@@ -213,8 +214,8 @@ void dispatch_signal(int signal)
 void dispatch_move(Client *c, int *x, int *y)
 {
     guint i;
-    EventType e = Event_Client_Moving;
     GSList *it;
+    EventType e = Event_Client_Moving;
     ObEvent obe;
 
     obe.type = e;
@@ -235,4 +236,32 @@ void dispatch_move(Client *c, int *x, int *y)
 
     *x = obe.data.c.num[0];
     *y = obe.data.c.num[1];
+}
+
+void dispatch_resize(Client *c, int *w, int *h, Corner corner)
+{
+    guint i;
+    GSList *it;
+    EventType e = Event_Client_Resizing;
+    ObEvent obe;
+
+    obe.type = e;
+    obe.data.c.client = c;
+    obe.data.c.num[0] = *w;
+    obe.data.c.num[1] = *h;
+    obe.data.c.num[2] = corner;
+
+    i = 0;
+    while (e > 1) {
+        e >>= 1;
+        ++i;
+    }
+
+    for (it = funcs[i]; it != NULL; it = it->next) {
+        Func *f = it->data;
+        f->h(&obe, f->data);
+    }
+
+    *w = obe.data.c.num[0];
+    *h = obe.data.c.num[1];
 }

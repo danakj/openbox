@@ -592,13 +592,15 @@ void action_move(union ActionData *data)
 void action_resize(union ActionData *data)
 {
     Client *c = data->resize.c;
-    int w = data->resize.x - c->frame->size.left - c->frame->size.right;
-    int h = data->resize.y - c->frame->size.top - c->frame->size.bottom;
+    int w = data->resize.x;
+    int h = data->resize.y;
  
     if (!c || !client_normal(c)) return;
 
-    /* XXX window snapping/struts */
-
+    dispatch_resize(c, &w, &h, data->resize.corner);
+    
+    w -= c->frame->size.left + c->frame->size.right;
+    h -= c->frame->size.top + c->frame->size.bottom;
     client_configure(c, data->resize.corner, c->area.x, c->area.y, w, h,
                      TRUE, data->resize.final);
 }

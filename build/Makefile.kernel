@@ -12,12 +12,8 @@ sources = action.c client.c config.c dispatch.c engine.c event.c \
           extensions.c focus.c frame.c grab.c menu.c openbox.c \
           parse.c plugin.c prop.c screen.c stacking.c timer.c xerror.c \
           parse.lex.c parse.tab.c
-lex = parse.l
-yacc = parse.y
 
 srcdir := $(srcdir)/$(dir)
-lex := $(addprefix $(srcdir)/,$(lex))
-yacc := $(addprefix $(srcdir)/,$(yacc))
 target := $(addprefix $(dir)/,$(target))
 objects := $(addprefix $(dir)/,$(sources:.c=.o))
 sources := $(addprefix $(srcdir)/,$(sources))

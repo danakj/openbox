@@ -339,14 +339,14 @@ static void sm_startup(int argc, char **argv)
         gboolean has_id;
 
         for (i = 1; i < argc - 1; ++i)
-            if (strcmp(argv[i], "-sm-client-id") == 0)
+            if (strcmp(argv[i], "--sm-client-id") == 0)
                 break;
         has_id = (i < argc - 1);
 
         prop_cmd.vals = g_new(SmPropValue, (has_id ? argc-2 : argc));
         prop_cmd.num_vals = (has_id ? argc-2 : argc);
         for (i = 0, j = 0; i < argc; ++i, ++j) {
-            if (strcmp (argv[i], "-sm-client-id") == 0) {
+            if (strcmp (argv[i], "--sm-client-id") == 0) {
                 ++i, --j; /* skip the next as well, keep j where it is */
             } else {
                 prop_cmd.vals[j].value = argv[i];
@@ -357,15 +357,15 @@ static void sm_startup(int argc, char **argv)
         prop_res.vals = g_new(SmPropValue, (has_id ? argc : argc+2));
         prop_res.num_vals = (has_id ? argc : argc+2);
         for (i = 0, j = 0; i < argc; ++i, ++j) { 
-            if (strcmp (argv[i], "-sm-client-id") == 0) {
+            if (strcmp (argv[i], "--sm-client-id") == 0) {
                 ++i, --j; /* skip the next as well, keep j where it is */
             } else {
                 prop_res.vals[j].value = argv[i];
                 prop_res.vals[j].length = strlen(argv[i]);
             }
         }
-        prop_res.vals[j].value = "-sm-client-id";
-        prop_res.vals[j++].length = strlen("-sm-client-id");
+        prop_res.vals[j].value = "--sm-client-id";
+        prop_res.vals[j++].length = strlen("--sm-client-id");
         prop_res.vals[j].value = ob_sm_id;
         prop_res.vals[j++].length = strlen(ob_sm_id);
 
@@ -477,15 +477,15 @@ static void print_help()
     print_version();
     g_print("Syntax: %s [options]\n\n", BINARY);
     g_print("Options:\n\n");
-    g_print("  -rc PATH          Specify the path to the rc file to use\n");
+    g_print("  --rc PATH          Specify the path to the rc file to use\n");
 #ifdef USE_SM
-    g_print("  -sm-client-id ID  Specify session management ID\n");
-    g_print("  -sm-disable       Disable connection to session manager\n");
+    g_print("  --sm-client-id ID  Specify session management ID\n");
+    g_print("  --sm-disable       Disable connection to session manager\n");
 #endif
-    g_print("  -help             Display this help and exit\n");
-    g_print("  -version          Display the version and exit\n");
-    g_print("  -sync             Run in synchronous mode (this is slow and\n"
-            "                    meant for debugging X routines)\n");
+    g_print("  --help             Display this help and exit\n");
+    g_print("  --version          Display the version and exit\n");
+    g_print("  --sync             Run in synchronous mode (this is slow and\n"
+            "                     meant for debugging X routines)\n");
     g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
@@ -494,26 +494,26 @@ static void parse_args(int argc, char **argv)
     int i;
 
     for (i = 1; i < argc; ++i) {
-        if (!strcmp(argv[i], "-version")) {
+        if (!strcmp(argv[i], "--version")) {
             print_version();
             exit(0);
-        } else if (!strcmp(argv[i], "-help")) {
+        } else if (!strcmp(argv[i], "--help")) {
             print_help();
             exit(0);
-        } else if (!strcmp(argv[i], "-sync")) {
+        } else if (!strcmp(argv[i], "--sync")) {
             ob_sync = TRUE;
-        } else if (!strcmp(argv[i], "-rc")) {
+        } else if (!strcmp(argv[i], "--rc")) {
             if (i == argc - 1) /* no args left */
-                g_printerr(_("-rc requires an argument\n"));
+                g_printerr(_("--rc requires an argument\n"));
             else
                 ob_rc_path = argv[++i];
 #ifdef USE_SM
-        } else if (!strcmp(argv[i], "-sm-client-id")) {
+        } else if (!strcmp(argv[i], "--sm-client-id")) {
             if (i == argc - 1) /* no args left */
-                g_printerr(_("-sm-client-id requires an argument\n"));
+                g_printerr(_("--sm-client-id requires an argument\n"));
             else
                 ob_sm_id = argv[++i];
-        } else if (!strcmp(argv[i], "-sm-disable")) {
+        } else if (!strcmp(argv[i], "--sm-disable")) {
             ob_sm_use = FALSE;
 #endif
         } else {

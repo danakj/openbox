@@ -639,7 +639,7 @@ g_assert(err != 0);
     if (l->surface.data.planar.grad == Background_ParentRelative) {
         printf("crap\n");
     } else
-        render_gl_gradient(&l->surface, absx+x, absy+y, absw, absh);
+        render_gradient(&l->surface, absx+x, absy+y, absw, absh);
 
     glXSwapBuffers(ob_display, win);
 }

@@ -65,8 +65,7 @@ enum EventAction {
   NUM_EVENTS
 };
 
-// *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
-class MotionData {
+class MouseData {
 public:
   int screen;
   OBClient *client;
@@ -84,10 +83,10 @@ public:
   int press_clientwidth;
   int press_clientheight;
 
-  MotionData(int screen, OBClient *client, Time time, unsigned int state,
-             unsigned int button, MouseContext context, MouseAction action,
-             int xroot, int yroot, const otk::Point &initpos,
-             const otk::Rect &initarea) {
+  MouseData(int screen, OBClient *client, Time time, unsigned int state,
+            unsigned int button, MouseContext context, MouseAction action,
+            int xroot, int yroot, const otk::Point &initpos,
+            const otk::Rect &initarea) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
@@ -104,21 +103,8 @@ public:
     this->press_clientwidth  = initarea.width();
     this->press_clientheight = initarea.height();
   }
-};
-
-// *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
-class ButtonData {
-public:
-  int screen;
-  OBClient *client;
-  Time time;
-  unsigned int state;
-  unsigned int button;
-  MouseContext context;
-  MouseAction action;
-
-  ButtonData(int screen, OBClient *client, Time time, unsigned int state,
-             unsigned int button, MouseContext context, MouseAction action) {
+  MouseData(int screen, OBClient *client, Time time, unsigned int state,
+            unsigned int button, MouseContext context, MouseAction action) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
@@ -126,6 +112,14 @@ public:
     this->button = button;
     this->context= context;
     this->action = action;
+    this->xroot  = xroot;
+    this->yroot  = yroot;
+    this->pressx = 0;
+    this->pressy = 0;
+    this->press_clientx      = 0;
+    this->press_clienty      = 0;
+    this->press_clientwidth  = 0;
+    this->press_clientheight = 0;
   }
 };
 
@@ -177,8 +171,7 @@ bool python_get_stringlist(const char *name, std::vector<std::string> *value);
 /***********************************************
  * These are found in openbox.i, not python.cc *
  ***********************************************/
-void python_callback(PyObject *func, MotionData *data);
-void python_callback(PyObject *func, ButtonData *data);
+void python_callback(PyObject *func, MouseData *data);
 void python_callback(PyObject *func, EventData *data);
 void python_callback(PyObject *func, KeyData *data);
 

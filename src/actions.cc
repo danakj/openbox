@@ -81,8 +81,8 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
     screen = c->screen();
   else
     screen = otk::OBDisplay::findScreen(e.root)->screen();
-  ButtonData data(screen, c, e.time, state, e.button, w->mcontext(),
-                  MousePress);
+  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
+                 MousePress);
   Openbox::instance->bindings()->fireButton(&data);
     
   if (_button) return; // won't count toward CLICK events
@@ -124,8 +124,8 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     screen = c->screen();
   else
     screen = otk::OBDisplay::findScreen(e.root)->screen();
-  ButtonData data(screen, c, e.time, state, e.button, w->mcontext(),
-                  MouseClick);
+  MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
+                 MouseClick);
   Openbox::instance->bindings()->fireButton(&data);
     
 
@@ -234,9 +234,9 @@ void OBActions::motionHandler(const XMotionEvent &e)
     screen = c->screen();
   else
     screen = otk::OBDisplay::findScreen(e.root)->screen();
-  MotionData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
-                  x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
-  Openbox::instance->bindings()->fireButton((ButtonData*)&data);
+  MouseData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
+                 x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
+  Openbox::instance->bindings()->fireButton(&data);
 }
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)

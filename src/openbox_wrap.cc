@@ -652,31 +652,31 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__Style swig_types[4] 
 #define  SWIGTYPE_p_ob__OBFrame swig_types[5] 
 #define  SWIGTYPE_p_XReparentEvent swig_types[6] 
-#define  SWIGTYPE_p_ob__MotionData swig_types[7] 
+#define  SWIGTYPE_p_ob__MouseData swig_types[7] 
 #define  SWIGTYPE_p_ob__OBClient swig_types[8] 
 #define  SWIGTYPE_p_ob__Openbox swig_types[9] 
 #define  SWIGTYPE_p_otk__Strut swig_types[10] 
-#define  SWIGTYPE_p_ob__KeyData swig_types[11] 
-#define  SWIGTYPE_p_XMapRequestEvent swig_types[12] 
-#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[13] 
-#define  SWIGTYPE_p_otk__Point swig_types[14] 
-#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[15] 
-#define  SWIGTYPE_p_std__string swig_types[16] 
-#define  SWIGTYPE_p_otk__Rect swig_types[17] 
-#define  SWIGTYPE_p_ob__OBWidget swig_types[18] 
-#define  SWIGTYPE_p_XClientMessageEvent swig_types[19] 
-#define  SWIGTYPE_p_XFocusChangeEvent swig_types[20] 
-#define  SWIGTYPE_p_otk__OBProperty swig_types[21] 
-#define  SWIGTYPE_p_ob__EventData swig_types[22] 
-#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[23] 
-#define  SWIGTYPE_p_XPropertyEvent swig_types[24] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[25] 
-#define  SWIGTYPE_p_otk__BImageControl swig_types[26] 
-#define  SWIGTYPE_p_PyObject swig_types[27] 
-#define  SWIGTYPE_p_ob__OBBindings swig_types[28] 
-#define  SWIGTYPE_p_ob__MwmHints swig_types[29] 
-#define  SWIGTYPE_p_XUnmapEvent swig_types[30] 
-#define  SWIGTYPE_p_ob__ButtonData swig_types[31] 
+#define  SWIGTYPE_p_XRectangle swig_types[11] 
+#define  SWIGTYPE_p_ob__KeyData swig_types[12] 
+#define  SWIGTYPE_p_XMapRequestEvent swig_types[13] 
+#define  SWIGTYPE_p_XConfigureRequestEvent swig_types[14] 
+#define  SWIGTYPE_p_otk__Point swig_types[15] 
+#define  SWIGTYPE_p_otk__OtkEventHandler swig_types[16] 
+#define  SWIGTYPE_p_std__string swig_types[17] 
+#define  SWIGTYPE_p_otk__Rect swig_types[18] 
+#define  SWIGTYPE_p_ob__OBWidget swig_types[19] 
+#define  SWIGTYPE_p_XClientMessageEvent swig_types[20] 
+#define  SWIGTYPE_p_XFocusChangeEvent swig_types[21] 
+#define  SWIGTYPE_p_otk__OBProperty swig_types[22] 
+#define  SWIGTYPE_p_ob__EventData swig_types[23] 
+#define  SWIGTYPE_p_otk__OtkEventDispatcher swig_types[24] 
+#define  SWIGTYPE_p_XPropertyEvent swig_types[25] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[26] 
+#define  SWIGTYPE_p_otk__BImageControl swig_types[27] 
+#define  SWIGTYPE_p_PyObject swig_types[28] 
+#define  SWIGTYPE_p_ob__OBBindings swig_types[29] 
+#define  SWIGTYPE_p_ob__MwmHints swig_types[30] 
+#define  SWIGTYPE_p_XUnmapEvent swig_types[31] 
 static swig_type_info *swig_types[33];
 
 /* -------- TYPES TABLE (END) -------- */
@@ -787,33 +787,13 @@ static std::string SwigString_AsString(PyObject* o) {
 
 
 namespace ob {
-void python_callback(PyObject *func, MotionData *data)
+void python_callback(PyObject *func, MouseData *data)
 {
   PyObject *arglist;
   PyObject *result;
 
   arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__MotionData,
-                                                    0));
-  
-  // call the callback
-  result = PyEval_CallObject(func, arglist);
-  if (!result || PyErr_Occurred()) {
-    // an exception occured in the script, display it
-    PyErr_Print();
-  }
-
-  Py_XDECREF(result);
-  Py_DECREF(arglist);
-}
-
-void python_callback(PyObject *func, ButtonData *data)
-{
-  PyObject *arglist;
-  PyObject *result;
-
-  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__ButtonData,
+                                                    SWIGTYPE_p_ob__MouseData,
                                                     0));
   
   // call the callback
@@ -899,6 +879,1441 @@ static PyObject *_wrap_Openbox_instance(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_new_Point__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":new_Point")) goto fail;
+    result = (otk::Point *)new otk::Point();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Point, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Point__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    int arg2 ;
+    otk::Point *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)"ii:new_Point",&arg1,&arg2)) goto fail;
+    result = (otk::Point *)new otk::Point(arg1,arg2);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Point, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Point(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[3];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 0) {
+        return _wrap_new_Point__SWIG_0(self,args);
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                return _wrap_new_Point__SWIG_1(self,args);
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'new_Point'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Point_setX(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Point_setX",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setX(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Point_x(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Point_x",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Point const *)arg1)->x();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Point_setY(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Point_setY",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setY(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Point_y(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Point_y",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Point const *)arg1)->y();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Point_setPoint(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = (otk::Point *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oii:Point_setPoint",&obj0,&arg2,&arg3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setPoint(arg2,arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject * Point_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_otk__Point, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
+static PyObject *_wrap_new_Rect__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)":new_Rect")) goto fail;
+    result = (otk::Rect *)new otk::Rect();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    int arg1 ;
+    int arg2 ;
+    int arg3 ;
+    int arg4 ;
+    otk::Rect *result;
+    
+    if(!PyArg_ParseTuple(args,(char *)"iiii:new_Rect",&arg1,&arg2,&arg3,&arg4)) goto fail;
+    result = (otk::Rect *)new otk::Rect(arg1,arg2,arg3,arg4);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect__SWIG_2(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Point *arg1 = 0 ;
+    otk::Point *arg2 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:new_Rect",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (otk::Rect *)new otk::Rect((otk::Point const &)*arg1,(otk::Point const &)*arg2);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect__SWIG_3(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:new_Rect",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (otk::Rect *)new otk::Rect((otk::Rect const &)*arg1);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect__SWIG_4(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    XRectangle *arg1 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:new_Rect",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_XRectangle,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg1 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (otk::Rect *)new otk::Rect((XRectangle const &)*arg1);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 1);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_new_Rect(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[5];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 0) {
+        return _wrap_new_Rect__SWIG_0(self,args);
+    }
+    if (argc == 1) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            return _wrap_new_Rect__SWIG_3(self,args);
+        }
+    }
+    if (argc == 1) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_XRectangle, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            return _wrap_new_Rect__SWIG_4(self,args);
+        }
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                return _wrap_new_Rect__SWIG_2(self,args);
+            }
+        }
+    }
+    if (argc == 4) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        return _wrap_new_Rect__SWIG_1(self,args);
+                    }
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'new_Rect'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_left(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_left",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->left();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_top(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_top",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->top();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_right(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_right",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->right();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_bottom(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_bottom",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->bottom();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_x(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_x",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->x();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_y(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_y",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->y();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_location(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_location",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = ((otk::Rect const *)arg1)->location();
+    
+    {
+        otk::Point * resultptr;
+        resultptr = new otk::Point((otk::Point &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Point, 1);
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setX(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Rect_setX",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setX(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setY(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Rect_setY",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setY(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setPos__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oii:Rect_setPos",&obj0,&arg2,&arg3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setPos(arg2,arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setPos__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect_setPos",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->setPos((otk::Point const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setPos(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[4];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                return _wrap_Rect_setPos__SWIG_1(self,args);
+            }
+        }
+    }
+    if (argc == 3) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    return _wrap_Rect_setPos__SWIG_0(self,args);
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'Rect_setPos'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_width(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_width",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->width();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_height(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_height",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((otk::Rect const *)arg1)->height();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_size(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_size",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = ((otk::Rect const *)arg1)->size();
+    
+    {
+        otk::Point * resultptr;
+        resultptr = new otk::Point((otk::Point &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Point, 1);
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setWidth(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Rect_setWidth",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setWidth(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setHeight(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oi:Rect_setHeight",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setHeight(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setSize__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oii:Rect_setSize",&obj0,&arg2,&arg3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setSize(arg2,arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setSize__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point *arg2 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect_setSize",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->setSize((otk::Point const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setSize(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[4];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                return _wrap_Rect_setSize__SWIG_1(self,args);
+            }
+        }
+    }
+    if (argc == 3) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    return _wrap_Rect_setSize__SWIG_0(self,args);
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'Rect_setSize'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setRect__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    int arg4 ;
+    int arg5 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oiiii:Rect_setRect",&obj0,&arg2,&arg3,&arg4,&arg5)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setRect(arg2,arg3,arg4,arg5);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setRect__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point *arg2 = 0 ;
+    otk::Point *arg3 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOO:Rect_setRect",&obj0,&obj1,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg3 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->setRect((otk::Point const &)*arg2,(otk::Point const &)*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setRect(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[6];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 3) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                {
+                    void *ptr;
+                    if (SWIG_ConvertPtr(argv[2], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                        _v = 0;
+                        PyErr_Clear();
+                    }else {
+                        _v = 1;
+                    }
+                }
+                if (_v) {
+                    return _wrap_Rect_setRect__SWIG_1(self,args);
+                }
+            }
+        }
+    }
+    if (argc == 5) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
+                        }
+                        if (_v) {
+                            return _wrap_Rect_setRect__SWIG_0(self,args);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'Rect_setRect'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setCoords__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    int arg4 ;
+    int arg5 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oiiii:Rect_setCoords",&obj0,&arg2,&arg3,&arg4,&arg5)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->setCoords(arg2,arg3,arg4,arg5);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setCoords__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point *arg2 = 0 ;
+    otk::Point *arg3 = 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OOO:Rect_setCoords",&obj0,&obj1,&obj2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    if ((SWIG_ConvertPtr(obj2,(void **) &arg3, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg3 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    (arg1)->setCoords((otk::Point const &)*arg2,(otk::Point const &)*arg3);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_setCoords(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[6];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 3) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                {
+                    void *ptr;
+                    if (SWIG_ConvertPtr(argv[2], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                        _v = 0;
+                        PyErr_Clear();
+                    }else {
+                        _v = 1;
+                    }
+                }
+                if (_v) {
+                    return _wrap_Rect_setCoords__SWIG_1(self,args);
+                }
+            }
+        }
+    }
+    if (argc == 5) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
+                        }
+                        if (_v) {
+                            return _wrap_Rect_setCoords__SWIG_0(self,args);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'Rect_setCoords'");
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___eq__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___eq__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (bool)(arg1)->operator ==((otk::Rect const &)*arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___ne__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___ne__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (bool)(arg1)->operator !=((otk::Rect const &)*arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___or__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    otk::Rect result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___or__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = ((otk::Rect const *)arg1)->operator |((otk::Rect const &)*arg2);
+    
+    {
+        otk::Rect * resultptr;
+        resultptr = new otk::Rect((otk::Rect &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Rect, 1);
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___and__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    otk::Rect result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___and__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = ((otk::Rect const *)arg1)->operator &((otk::Rect const &)*arg2);
+    
+    {
+        otk::Rect * resultptr;
+        resultptr = new otk::Rect((otk::Rect &) result);
+        resultobj = SWIG_NewPointerObj((void *) resultptr, SWIGTYPE_p_otk__Rect, 1);
+    }
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___ior__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___ior__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    {
+        otk::Rect &_result_ref = (arg1)->operator |=((otk::Rect const &)*arg2);
+        result = (otk::Rect *) &_result_ref;
+    }
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect___iand__(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    otk::Rect *result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect___iand__",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    {
+        otk::Rect &_result_ref = (arg1)->operator &=((otk::Rect const &)*arg2);
+        result = (otk::Rect *) &_result_ref;
+    }
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__Rect, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_valid(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Rect_valid",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((otk::Rect const *)arg1)->valid();
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_intersects(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect_intersects",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (bool)((otk::Rect const *)arg1)->intersects((otk::Rect const &)*arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_contains__SWIG_0(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    int arg2 ;
+    int arg3 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"Oii:Rect_contains",&obj0,&arg2,&arg3)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (bool)((otk::Rect const *)arg1)->contains(arg2,arg3);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_contains__SWIG_1(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Point *arg2 = 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect_contains",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Point,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (bool)((otk::Rect const *)arg1)->contains((otk::Point const &)*arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_contains__SWIG_2(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Rect *arg1 = (otk::Rect *) 0 ;
+    otk::Rect *arg2 = 0 ;
+    bool result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:Rect_contains",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_otk__Rect,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (arg2 == NULL) {
+        PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
+    }
+    result = (bool)((otk::Rect const *)arg1)->contains((otk::Rect const &)*arg2);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Rect_contains(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[4];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                return _wrap_Rect_contains__SWIG_1(self,args);
+            }
+        }
+    }
+    if (argc == 2) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                return _wrap_Rect_contains__SWIG_2(self,args);
+            }
+        }
+    }
+    if (argc == 3) {
+        int _v;
+        {
+            void *ptr;
+            if (SWIG_ConvertPtr(argv[0], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                _v = 0;
+                PyErr_Clear();
+            }else {
+                _v = 1;
+            }
+        }
+        if (_v) {
+            {
+                _v = (PyInt_Check(argv[1]) || PyLong_Check(argv[1])) ? 1 : 0;
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    return _wrap_Rect_contains__SWIG_0(self,args);
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'Rect_contains'");
+    return NULL;
+}
+
+
+static PyObject * Rect_swigregister(PyObject *self, PyObject *args) {
+    PyObject *obj;
+    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
+    SWIG_TypeClientData(SWIGTYPE_p_otk__Rect, obj);
+    Py_INCREF(obj);
+    return Py_BuildValue((char *)"");
+}
 static PyObject *_wrap_Cursors_session_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Cursors *arg1 = (ob::Cursors *) 0 ;
@@ -2788,14 +4203,14 @@ static PyObject * OBClient_swigregister(PyObject *self, PyObject *args) {
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
-static PyObject *_wrap_MotionData_screen_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_screen_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_screen_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_screen_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->screen = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -2805,14 +4220,14 @@ static PyObject *_wrap_MotionData_screen_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_screen_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_screen_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_screen_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_screen_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->screen);
     
     resultobj = PyInt_FromLong((long)result);
@@ -2822,15 +4237,15 @@ static PyObject *_wrap_MotionData_screen_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_client_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_client_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     ob::OBClient *arg2 = (ob::OBClient *) 0 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_client_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:MouseData_client_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
     if (arg1) (arg1)->client = arg2;
     
@@ -2841,14 +4256,14 @@ static PyObject *_wrap_MotionData_client_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_client_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_client_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     ob::OBClient *result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_client_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_client_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (ob::OBClient *) ((arg1)->client);
     
     resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
@@ -2858,15 +4273,15 @@ static PyObject *_wrap_MotionData_client_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_time_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_time_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     Time arg2 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_time_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:MouseData_time_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (Time) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
     if (arg1) (arg1)->time = arg2;
@@ -2878,14 +4293,14 @@ static PyObject *_wrap_MotionData_time_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_time_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_time_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     Time result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_time_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_time_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (Time) ((arg1)->time);
     
     resultobj = PyInt_FromLong((long)result);
@@ -2895,15 +4310,15 @@ static PyObject *_wrap_MotionData_time_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_state_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_state_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     unsigned int arg2 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_state_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:MouseData_state_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
     if (arg1) (arg1)->state = arg2;
@@ -2915,14 +4330,14 @@ static PyObject *_wrap_MotionData_state_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_state_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_state_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     unsigned int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_state_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_state_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (unsigned int) ((arg1)->state);
     
     resultobj = PyInt_FromLong((long)result);
@@ -2932,15 +4347,15 @@ static PyObject *_wrap_MotionData_state_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_button_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_button_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     unsigned int arg2 ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:MotionData_button_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO:MouseData_button_set",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg2 = (unsigned int) PyInt_AsLong(obj1);
     if (PyErr_Occurred()) SWIG_fail;
     if (arg1) (arg1)->button = arg2;
@@ -2952,14 +4367,14 @@ static PyObject *_wrap_MotionData_button_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_button_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_button_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     unsigned int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_button_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_button_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (unsigned int) ((arg1)->button);
     
     resultobj = PyInt_FromLong((long)result);
@@ -2969,14 +4384,14 @@ static PyObject *_wrap_MotionData_button_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_context_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_context_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_context_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_context_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->context = (ob::MouseContext )arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -2986,14 +4401,14 @@ static PyObject *_wrap_MotionData_context_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_context_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_context_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_context_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_context_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->context);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3003,14 +4418,14 @@ static PyObject *_wrap_MotionData_context_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_action_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_action_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_action_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_action_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->action = (ob::MouseAction )arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3020,14 +4435,14 @@ static PyObject *_wrap_MotionData_action_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_action_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_action_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_action_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_action_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->action);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3037,14 +4452,14 @@ static PyObject *_wrap_MotionData_action_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_xroot_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_xroot_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_xroot_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_xroot_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->xroot = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3054,14 +4469,14 @@ static PyObject *_wrap_MotionData_xroot_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_xroot_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_xroot_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_xroot_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_xroot_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->xroot);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3071,14 +4486,14 @@ static PyObject *_wrap_MotionData_xroot_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_yroot_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_yroot_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_yroot_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_yroot_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->yroot = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3088,14 +4503,14 @@ static PyObject *_wrap_MotionData_yroot_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_yroot_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_yroot_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_yroot_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_yroot_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->yroot);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3105,14 +4520,14 @@ static PyObject *_wrap_MotionData_yroot_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_pressx_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_pressx_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_pressx_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_pressx_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->pressx = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3122,14 +4537,14 @@ static PyObject *_wrap_MotionData_pressx_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_pressx_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_pressx_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_pressx_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_pressx_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->pressx);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3139,14 +4554,14 @@ static PyObject *_wrap_MotionData_pressx_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_pressy_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_pressy_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_pressy_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_pressy_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->pressy = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3156,14 +4571,14 @@ static PyObject *_wrap_MotionData_pressy_set(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_pressy_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_pressy_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_pressy_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_pressy_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->pressy);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3173,14 +4588,14 @@ static PyObject *_wrap_MotionData_pressy_get(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_MotionData_press_clientx_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientx_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientx_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_press_clientx_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->press_clientx = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3190,14 +4605,14 @@ static PyObject *_wrap_MotionData_press_clientx_set(PyObject *self, PyObject *ar
 }
 
 
-static PyObject *_wrap_MotionData_press_clientx_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientx_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientx_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_press_clientx_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->press_clientx);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3207,14 +4622,14 @@ static PyObject *_wrap_MotionData_press_clientx_get(PyObject *self, PyObject *ar
 }
 
 
-static PyObject *_wrap_MotionData_press_clienty_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clienty_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clienty_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_press_clienty_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->press_clienty = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3224,14 +4639,14 @@ static PyObject *_wrap_MotionData_press_clienty_set(PyObject *self, PyObject *ar
 }
 
 
-static PyObject *_wrap_MotionData_press_clienty_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clienty_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clienty_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_press_clienty_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->press_clienty);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3241,14 +4656,14 @@ static PyObject *_wrap_MotionData_press_clienty_get(PyObject *self, PyObject *ar
 }
 
 
-static PyObject *_wrap_MotionData_press_clientwidth_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientwidth_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientwidth_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_press_clientwidth_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->press_clientwidth = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3258,14 +4673,14 @@ static PyObject *_wrap_MotionData_press_clientwidth_set(PyObject *self, PyObject
 }
 
 
-static PyObject *_wrap_MotionData_press_clientwidth_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientwidth_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientwidth_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_press_clientwidth_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->press_clientwidth);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3275,14 +4690,14 @@ static PyObject *_wrap_MotionData_press_clientwidth_get(PyObject *self, PyObject
 }
 
 
-static PyObject *_wrap_MotionData_press_clientheight_set(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientheight_set(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int arg2 ;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"Oi:MotionData_press_clientheight_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"Oi:MouseData_press_clientheight_set",&obj0,&arg2)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if (arg1) (arg1)->press_clientheight = arg2;
     
     Py_INCREF(Py_None); resultobj = Py_None;
@@ -3292,14 +4707,14 @@ static PyObject *_wrap_MotionData_press_clientheight_set(PyObject *self, PyObjec
 }
 
 
-static PyObject *_wrap_MotionData_press_clientheight_get(PyObject *self, PyObject *args) {
+static PyObject *_wrap_MouseData_press_clientheight_get(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    ob::MotionData *arg1 = (ob::MotionData *) 0 ;
+    ob::MouseData *arg1 = (ob::MouseData *) 0 ;
     int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:MotionData_press_clientheight_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MotionData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:MouseData_press_clientheight_get",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__MouseData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int) ((arg1)->press_clientheight);
     
     resultobj = PyInt_FromLong((long)result);
@@ -3309,7 +4724,7 @@ static PyObject *_wrap_MotionData_press_clientheight_get(PyObject *self, PyObjec
 }
 
 
-static PyObject *_wrap_new_MotionData(PyObject *self, PyObject *args) {
+static PyObject *_wrap_new_MouseData__SWIG_0(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     int arg1 ;
     ob::OBClient *arg2 = (ob::OBClient *) 0 ;
@@ -3322,7 +4737,7 @@ static PyObject *_wrap_new_MotionData(PyObject *self, PyObject *args) {
     int arg9 ;
     otk::Point *arg10 = 0 ;
     otk::Rect *arg11 = 0 ;
-    ob::MotionData *result;
+    ob::MouseData *result;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     PyObject * obj3  = 0 ;
@@ -3330,7 +4745,7 @@ static PyObject *_wrap_new_MotionData(PyObject *self, PyObject *args) {
     PyObject * obj9  = 0 ;
     PyObject * obj10  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"iOOOOiiiiOO:new_MotionData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7,&arg8,&arg9,&obj9,&obj10)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOiiiiOO:new_MouseData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7,&arg8,&arg9,&obj9,&obj10)) goto fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg3 = (Time) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
@@ -3346,272 +4761,16 @@ static PyObject *_wrap_new_MotionData(PyObject *self, PyObject *args) {
     if (arg11 == NULL) {
         PyErr_SetString(PyExc_TypeError,"null reference"); SWIG_fail; 
     }
-    result = (ob::MotionData *)new ob::MotionData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7,arg8,arg9,(otk::Point const &)*arg10,(otk::Rect const &)*arg11);
+    result = (ob::MouseData *)new ob::MouseData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7,arg8,arg9,(otk::Point const &)*arg10,(otk::Rect const &)*arg11);
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__MotionData, 1);
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__MouseData, 1);
     return resultobj;
     fail:
     return NULL;
 }
 
 
-static PyObject * MotionData_swigregister(PyObject *self, PyObject *args) {
-    PyObject *obj;
-    if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
-    SWIG_TypeClientData(SWIGTYPE_p_ob__MotionData, obj);
-    Py_INCREF(obj);
-    return Py_BuildValue((char *)"");
-}
-static PyObject *_wrap_ButtonData_screen_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_screen_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->screen = arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_screen_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_screen_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (int) ((arg1)->screen);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_client_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_client_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | SWIG_POINTER_DISOWN )) == -1) SWIG_fail;
-    if (arg1) (arg1)->client = arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_client_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    ob::OBClient *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_client_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (ob::OBClient *) ((arg1)->client);
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__OBClient, 0);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_time_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    Time arg2 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_time_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (Time) PyInt_AsLong(obj1);
-    if (PyErr_Occurred()) SWIG_fail;
-    if (arg1) (arg1)->time = arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_time_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    Time result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_time_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (Time) ((arg1)->time);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_state_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    unsigned int arg2 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_state_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (unsigned int) PyInt_AsLong(obj1);
-    if (PyErr_Occurred()) SWIG_fail;
-    if (arg1) (arg1)->state = arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_state_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    unsigned int result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_state_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (unsigned int) ((arg1)->state);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_button_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    unsigned int arg2 ;
-    PyObject * obj0  = 0 ;
-    PyObject * obj1  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"OO:ButtonData_button_set",&obj0,&obj1)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    arg2 = (unsigned int) PyInt_AsLong(obj1);
-    if (PyErr_Occurred()) SWIG_fail;
-    if (arg1) (arg1)->button = arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_button_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    unsigned int result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_button_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (unsigned int) ((arg1)->button);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_context_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_context_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->context = (ob::MouseContext )arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_context_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_context_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (int) ((arg1)->context);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_action_set(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Oi:ButtonData_action_set",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    if (arg1) (arg1)->action = (ob::MouseAction )arg2;
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_ButtonData_action_get(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::ButtonData *arg1 = (ob::ButtonData *) 0 ;
-    int result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:ButtonData_action_get",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__ButtonData,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (int) ((arg1)->action);
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_new_ButtonData(PyObject *self, PyObject *args) {
+static PyObject *_wrap_new_MouseData__SWIG_1(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     int arg1 ;
     ob::OBClient *arg2 = (ob::OBClient *) 0 ;
@@ -3620,13 +4779,13 @@ static PyObject *_wrap_new_ButtonData(PyObject *self, PyObject *args) {
     unsigned int arg5 ;
     int arg6 ;
     int arg7 ;
-    ob::ButtonData *result;
+    ob::MouseData *result;
     PyObject * obj1  = 0 ;
     PyObject * obj2  = 0 ;
     PyObject * obj3  = 0 ;
     PyObject * obj4  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"iOOOOii:new_ButtonData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"iOOOOii:new_MouseData",&arg1,&obj1,&obj2,&obj3,&obj4,&arg6,&arg7)) goto fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     arg3 = (Time) PyInt_AsLong(obj2);
     if (PyErr_Occurred()) SWIG_fail;
@@ -3634,19 +4793,156 @@ static PyObject *_wrap_new_ButtonData(PyObject *self, PyObject *args) {
     if (PyErr_Occurred()) SWIG_fail;
     arg5 = (unsigned int) PyInt_AsLong(obj4);
     if (PyErr_Occurred()) SWIG_fail;
-    result = (ob::ButtonData *)new ob::ButtonData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7);
+    result = (ob::MouseData *)new ob::MouseData(arg1,arg2,arg3,arg4,arg5,(ob::MouseContext )arg6,(ob::MouseAction )arg7);
     
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__ButtonData, 1);
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_ob__MouseData, 1);
     return resultobj;
     fail:
     return NULL;
 }
 
 
-static PyObject * ButtonData_swigregister(PyObject *self, PyObject *args) {
+static PyObject *_wrap_new_MouseData(PyObject *self, PyObject *args) {
+    int argc;
+    PyObject *argv[12];
+    int ii;
+    
+    argc = PyObject_Length(args);
+    for (ii = 0; (ii < argc) && (ii < 11); ii++) {
+        argv[ii] = PyTuple_GetItem(args,ii);
+    }
+    if (argc == 7) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_ob__OBClient, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
+                        }
+                        if (_v) {
+                            {
+                                _v = (PyInt_Check(argv[5]) || PyLong_Check(argv[5])) ? 1 : 0;
+                            }
+                            if (_v) {
+                                {
+                                    _v = (PyInt_Check(argv[6]) || PyLong_Check(argv[6])) ? 1 : 0;
+                                }
+                                if (_v) {
+                                    return _wrap_new_MouseData__SWIG_1(self,args);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (argc == 11) {
+        int _v;
+        {
+            _v = (PyInt_Check(argv[0]) || PyLong_Check(argv[0])) ? 1 : 0;
+        }
+        if (_v) {
+            {
+                void *ptr;
+                if (SWIG_ConvertPtr(argv[1], (void **) &ptr, SWIGTYPE_p_ob__OBClient, 0) == -1) {
+                    _v = 0;
+                    PyErr_Clear();
+                }else {
+                    _v = 1;
+                }
+            }
+            if (_v) {
+                {
+                    _v = (PyInt_Check(argv[2]) || PyLong_Check(argv[2])) ? 1 : 0;
+                }
+                if (_v) {
+                    {
+                        _v = (PyInt_Check(argv[3]) || PyLong_Check(argv[3])) ? 1 : 0;
+                    }
+                    if (_v) {
+                        {
+                            _v = (PyInt_Check(argv[4]) || PyLong_Check(argv[4])) ? 1 : 0;
+                        }
+                        if (_v) {
+                            {
+                                _v = (PyInt_Check(argv[5]) || PyLong_Check(argv[5])) ? 1 : 0;
+                            }
+                            if (_v) {
+                                {
+                                    _v = (PyInt_Check(argv[6]) || PyLong_Check(argv[6])) ? 1 : 0;
+                                }
+                                if (_v) {
+                                    {
+                                        _v = (PyInt_Check(argv[7]) || PyLong_Check(argv[7])) ? 1 : 0;
+                                    }
+                                    if (_v) {
+                                        {
+                                            _v = (PyInt_Check(argv[8]) || PyLong_Check(argv[8])) ? 1 : 0;
+                                        }
+                                        if (_v) {
+                                            {
+                                                void *ptr;
+                                                if (SWIG_ConvertPtr(argv[9], (void **) &ptr, SWIGTYPE_p_otk__Point, 0) == -1) {
+                                                    _v = 0;
+                                                    PyErr_Clear();
+                                                }else {
+                                                    _v = 1;
+                                                }
+                                            }
+                                            if (_v) {
+                                                {
+                                                    void *ptr;
+                                                    if (SWIG_ConvertPtr(argv[10], (void **) &ptr, SWIGTYPE_p_otk__Rect, 0) == -1) {
+                                                        _v = 0;
+                                                        PyErr_Clear();
+                                                    }else {
+                                                        _v = 1;
+                                                    }
+                                                }
+                                                if (_v) {
+                                                    return _wrap_new_MouseData__SWIG_0(self,args);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    PyErr_SetString(PyExc_TypeError,"No matching function for overloaded 'new_MouseData'");
+    return NULL;
+}
+
+
+static PyObject * MouseData_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
-    SWIG_TypeClientData(SWIGTYPE_p_ob__ButtonData, obj);
+    SWIG_TypeClientData(SWIGTYPE_p_ob__MouseData, obj);
     Py_INCREF(obj);
     return Py_BuildValue((char *)"");
 }
@@ -4161,6 +5457,42 @@ static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
 
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
+	 { (char *)"new_Point", _wrap_new_Point, METH_VARARGS },
+	 { (char *)"Point_setX", _wrap_Point_setX, METH_VARARGS },
+	 { (char *)"Point_x", _wrap_Point_x, METH_VARARGS },
+	 { (char *)"Point_setY", _wrap_Point_setY, METH_VARARGS },
+	 { (char *)"Point_y", _wrap_Point_y, METH_VARARGS },
+	 { (char *)"Point_setPoint", _wrap_Point_setPoint, METH_VARARGS },
+	 { (char *)"Point_swigregister", Point_swigregister, METH_VARARGS },
+	 { (char *)"new_Rect", _wrap_new_Rect, METH_VARARGS },
+	 { (char *)"Rect_left", _wrap_Rect_left, METH_VARARGS },
+	 { (char *)"Rect_top", _wrap_Rect_top, METH_VARARGS },
+	 { (char *)"Rect_right", _wrap_Rect_right, METH_VARARGS },
+	 { (char *)"Rect_bottom", _wrap_Rect_bottom, METH_VARARGS },
+	 { (char *)"Rect_x", _wrap_Rect_x, METH_VARARGS },
+	 { (char *)"Rect_y", _wrap_Rect_y, METH_VARARGS },
+	 { (char *)"Rect_location", _wrap_Rect_location, METH_VARARGS },
+	 { (char *)"Rect_setX", _wrap_Rect_setX, METH_VARARGS },
+	 { (char *)"Rect_setY", _wrap_Rect_setY, METH_VARARGS },
+	 { (char *)"Rect_setPos", _wrap_Rect_setPos, METH_VARARGS },
+	 { (char *)"Rect_width", _wrap_Rect_width, METH_VARARGS },
+	 { (char *)"Rect_height", _wrap_Rect_height, METH_VARARGS },
+	 { (char *)"Rect_size", _wrap_Rect_size, METH_VARARGS },
+	 { (char *)"Rect_setWidth", _wrap_Rect_setWidth, METH_VARARGS },
+	 { (char *)"Rect_setHeight", _wrap_Rect_setHeight, METH_VARARGS },
+	 { (char *)"Rect_setSize", _wrap_Rect_setSize, METH_VARARGS },
+	 { (char *)"Rect_setRect", _wrap_Rect_setRect, METH_VARARGS },
+	 { (char *)"Rect_setCoords", _wrap_Rect_setCoords, METH_VARARGS },
+	 { (char *)"Rect___eq__", _wrap_Rect___eq__, METH_VARARGS },
+	 { (char *)"Rect___ne__", _wrap_Rect___ne__, METH_VARARGS },
+	 { (char *)"Rect___or__", _wrap_Rect___or__, METH_VARARGS },
+	 { (char *)"Rect___and__", _wrap_Rect___and__, METH_VARARGS },
+	 { (char *)"Rect___ior__", _wrap_Rect___ior__, METH_VARARGS },
+	 { (char *)"Rect___iand__", _wrap_Rect___iand__, METH_VARARGS },
+	 { (char *)"Rect_valid", _wrap_Rect_valid, METH_VARARGS },
+	 { (char *)"Rect_intersects", _wrap_Rect_intersects, METH_VARARGS },
+	 { (char *)"Rect_contains", _wrap_Rect_contains, METH_VARARGS },
+	 { (char *)"Rect_swigregister", Rect_swigregister, METH_VARARGS },
 	 { (char *)"Cursors_session_set", _wrap_Cursors_session_set, METH_VARARGS },
 	 { (char *)"Cursors_session_get", _wrap_Cursors_session_get, METH_VARARGS },
 	 { (char *)"Cursors_move_set", _wrap_Cursors_move_set, METH_VARARGS },
@@ -4264,54 +5596,38 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_destroyHandler", _wrap_OBClient_destroyHandler, METH_VARARGS },
 	 { (char *)"OBClient_reparentHandler", _wrap_OBClient_reparentHandler, METH_VARARGS },
 	 { (char *)"OBClient_swigregister", OBClient_swigregister, METH_VARARGS },
-	 { (char *)"MotionData_screen_set", _wrap_MotionData_screen_set, METH_VARARGS },
-	 { (char *)"MotionData_screen_get", _wrap_MotionData_screen_get, METH_VARARGS },
-	 { (char *)"MotionData_client_set", _wrap_MotionData_client_set, METH_VARARGS },
-	 { (char *)"MotionData_client_get", _wrap_MotionData_client_get, METH_VARARGS },
-	 { (char *)"MotionData_time_set", _wrap_MotionData_time_set, METH_VARARGS },
-	 { (char *)"MotionData_time_get", _wrap_MotionData_time_get, METH_VARARGS },
-	 { (char *)"MotionData_state_set", _wrap_MotionData_state_set, METH_VARARGS },
-	 { (char *)"MotionData_state_get", _wrap_MotionData_state_get, METH_VARARGS },
-	 { (char *)"MotionData_button_set", _wrap_MotionData_button_set, METH_VARARGS },
-	 { (char *)"MotionData_button_get", _wrap_MotionData_button_get, METH_VARARGS },
-	 { (char *)"MotionData_context_set", _wrap_MotionData_context_set, METH_VARARGS },
-	 { (char *)"MotionData_context_get", _wrap_MotionData_context_get, METH_VARARGS },
-	 { (char *)"MotionData_action_set", _wrap_MotionData_action_set, METH_VARARGS },
-	 { (char *)"MotionData_action_get", _wrap_MotionData_action_get, METH_VARARGS },
-	 { (char *)"MotionData_xroot_set", _wrap_MotionData_xroot_set, METH_VARARGS },
-	 { (char *)"MotionData_xroot_get", _wrap_MotionData_xroot_get, METH_VARARGS },
-	 { (char *)"MotionData_yroot_set", _wrap_MotionData_yroot_set, METH_VARARGS },
-	 { (char *)"MotionData_yroot_get", _wrap_MotionData_yroot_get, METH_VARARGS },
-	 { (char *)"MotionData_pressx_set", _wrap_MotionData_pressx_set, METH_VARARGS },
-	 { (char *)"MotionData_pressx_get", _wrap_MotionData_pressx_get, METH_VARARGS },
-	 { (char *)"MotionData_pressy_set", _wrap_MotionData_pressy_set, METH_VARARGS },
-	 { (char *)"MotionData_pressy_get", _wrap_MotionData_pressy_get, METH_VARARGS },
-	 { (char *)"MotionData_press_clientx_set", _wrap_MotionData_press_clientx_set, METH_VARARGS },
-	 { (char *)"MotionData_press_clientx_get", _wrap_MotionData_press_clientx_get, METH_VARARGS },
-	 { (char *)"MotionData_press_clienty_set", _wrap_MotionData_press_clienty_set, METH_VARARGS },
-	 { (char *)"MotionData_press_clienty_get", _wrap_MotionData_press_clienty_get, METH_VARARGS },
-	 { (char *)"MotionData_press_clientwidth_set", _wrap_MotionData_press_clientwidth_set, METH_VARARGS },
-	 { (char *)"MotionData_press_clientwidth_get", _wrap_MotionData_press_clientwidth_get, METH_VARARGS },
-	 { (char *)"MotionData_press_clientheight_set", _wrap_MotionData_press_clientheight_set, METH_VARARGS },
-	 { (char *)"MotionData_press_clientheight_get", _wrap_MotionData_press_clientheight_get, METH_VARARGS },
-	 { (char *)"new_MotionData", _wrap_new_MotionData, METH_VARARGS },
-	 { (char *)"MotionData_swigregister", MotionData_swigregister, METH_VARARGS },
-	 { (char *)"ButtonData_screen_set", _wrap_ButtonData_screen_set, METH_VARARGS },
-	 { (char *)"ButtonData_screen_get", _wrap_ButtonData_screen_get, METH_VARARGS },
-	 { (char *)"ButtonData_client_set", _wrap_ButtonData_client_set, METH_VARARGS },
-	 { (char *)"ButtonData_client_get", _wrap_ButtonData_client_get, METH_VARARGS },
-	 { (char *)"ButtonData_time_set", _wrap_ButtonData_time_set, METH_VARARGS },
-	 { (char *)"ButtonData_time_get", _wrap_ButtonData_time_get, METH_VARARGS },
-	 { (char *)"ButtonData_state_set", _wrap_ButtonData_state_set, METH_VARARGS },
-	 { (char *)"ButtonData_state_get", _wrap_ButtonData_state_get, METH_VARARGS },
-	 { (char *)"ButtonData_button_set", _wrap_ButtonData_button_set, METH_VARARGS },
-	 { (char *)"ButtonData_button_get", _wrap_ButtonData_button_get, METH_VARARGS },
-	 { (char *)"ButtonData_context_set", _wrap_ButtonData_context_set, METH_VARARGS },
-	 { (char *)"ButtonData_context_get", _wrap_ButtonData_context_get, METH_VARARGS },
-	 { (char *)"ButtonData_action_set", _wrap_ButtonData_action_set, METH_VARARGS },
-	 { (char *)"ButtonData_action_get", _wrap_ButtonData_action_get, METH_VARARGS },
-	 { (char *)"new_ButtonData", _wrap_new_ButtonData, METH_VARARGS },
-	 { (char *)"ButtonData_swigregister", ButtonData_swigregister, METH_VARARGS },
+	 { (char *)"MouseData_screen_set", _wrap_MouseData_screen_set, METH_VARARGS },
+	 { (char *)"MouseData_screen_get", _wrap_MouseData_screen_get, METH_VARARGS },
+	 { (char *)"MouseData_client_set", _wrap_MouseData_client_set, METH_VARARGS },
+	 { (char *)"MouseData_client_get", _wrap_MouseData_client_get, METH_VARARGS },
+	 { (char *)"MouseData_time_set", _wrap_MouseData_time_set, METH_VARARGS },
+	 { (char *)"MouseData_time_get", _wrap_MouseData_time_get, METH_VARARGS },
+	 { (char *)"MouseData_state_set", _wrap_MouseData_state_set, METH_VARARGS },
+	 { (char *)"MouseData_state_get", _wrap_MouseData_state_get, METH_VARARGS },
+	 { (char *)"MouseData_button_set", _wrap_MouseData_button_set, METH_VARARGS },
+	 { (char *)"MouseData_button_get", _wrap_MouseData_button_get, METH_VARARGS },
+	 { (char *)"MouseData_context_set", _wrap_MouseData_context_set, METH_VARARGS },
+	 { (char *)"MouseData_context_get", _wrap_MouseData_context_get, METH_VARARGS },
+	 { (char *)"MouseData_action_set", _wrap_MouseData_action_set, METH_VARARGS },
+	 { (char *)"MouseData_action_get", _wrap_MouseData_action_get, METH_VARARGS },
+	 { (char *)"MouseData_xroot_set", _wrap_MouseData_xroot_set, METH_VARARGS },
+	 { (char *)"MouseData_xroot_get", _wrap_MouseData_xroot_get, METH_VARARGS },
+	 { (char *)"MouseData_yroot_set", _wrap_MouseData_yroot_set, METH_VARARGS },
+	 { (char *)"MouseData_yroot_get", _wrap_MouseData_yroot_get, METH_VARARGS },
+	 { (char *)"MouseData_pressx_set", _wrap_MouseData_pressx_set, METH_VARARGS },
+	 { (char *)"MouseData_pressx_get", _wrap_MouseData_pressx_get, METH_VARARGS },
+	 { (char *)"MouseData_pressy_set", _wrap_MouseData_pressy_set, METH_VARARGS },
+	 { (char *)"MouseData_pressy_get", _wrap_MouseData_pressy_get, METH_VARARGS },
+	 { (char *)"MouseData_press_clientx_set", _wrap_MouseData_press_clientx_set, METH_VARARGS },
+	 { (char *)"MouseData_press_clientx_get", _wrap_MouseData_press_clientx_get, METH_VARARGS },
+	 { (char *)"MouseData_press_clienty_set", _wrap_MouseData_press_clienty_set, METH_VARARGS },
+	 { (char *)"MouseData_press_clienty_get", _wrap_MouseData_press_clienty_get, METH_VARARGS },
+	 { (char *)"MouseData_press_clientwidth_set", _wrap_MouseData_press_clientwidth_set, METH_VARARGS },
+	 { (char *)"MouseData_press_clientwidth_get", _wrap_MouseData_press_clientwidth_get, METH_VARARGS },
+	 { (char *)"MouseData_press_clientheight_set", _wrap_MouseData_press_clientheight_set, METH_VARARGS },
+	 { (char *)"MouseData_press_clientheight_get", _wrap_MouseData_press_clientheight_get, METH_VARARGS },
+	 { (char *)"new_MouseData", _wrap_new_MouseData, METH_VARARGS },
+	 { (char *)"MouseData_swigregister", MouseData_swigregister, METH_VARARGS },
 	 { (char *)"EventData_screen_set", _wrap_EventData_screen_set, METH_VARARGS },
 	 { (char *)"EventData_screen_get", _wrap_EventData_screen_get, METH_VARARGS },
 	 { (char *)"EventData_client_set", _wrap_EventData_client_set, METH_VARARGS },
@@ -4345,6 +5661,12 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_ob__OBScreenTo_p_ob__OBWidget(void *x) {
+    return (void *)((ob::OBWidget *)  ((ob::OBScreen *) x));
+}
+static void *_p_ob__OBClientTo_p_ob__OBWidget(void *x) {
+    return (void *)((ob::OBWidget *)  ((ob::OBClient *) x));
+}
 static void *_p_ob__OBActionsTo_p_otk__OtkEventHandler(void *x) {
     return (void *)((otk::OtkEventHandler *)  ((ob::OBActions *) x));
 }
@@ -4357,12 +5679,6 @@ static void *_p_ob__OBScreenTo_p_otk__OtkEventHandler(void *x) {
 static void *_p_ob__OBClientTo_p_otk__OtkEventHandler(void *x) {
     return (void *)((otk::OtkEventHandler *)  ((ob::OBClient *) x));
 }
-static void *_p_ob__OBScreenTo_p_ob__OBWidget(void *x) {
-    return (void *)((ob::OBWidget *)  ((ob::OBScreen *) x));
-}
-static void *_p_ob__OBClientTo_p_ob__OBWidget(void *x) {
-    return (void *)((ob::OBWidget *)  ((ob::OBClient *) x));
-}
 static void *_p_ob__OpenboxTo_p_otk__OtkEventDispatcher(void *x) {
     return (void *)((otk::OtkEventDispatcher *)  ((ob::Openbox *) x));
 }
@@ -4373,10 +5689,11 @@ static swig_type_info _swigt__p_ob__OBScreen[] = {{"_p_ob__OBScreen", 0, "ob::OB
 static swig_type_info _swigt__p_otk__Style[] = {{"_p_otk__Style", 0, "otk::Style *", 0},{"_p_otk__Style"},{0}};
 static swig_type_info _swigt__p_ob__OBFrame[] = {{"_p_ob__OBFrame", 0, "ob::OBFrame *", 0},{"_p_ob__OBFrame"},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
-static swig_type_info _swigt__p_ob__MotionData[] = {{"_p_ob__MotionData", 0, "ob::MotionData *", 0},{"_p_ob__MotionData"},{0}};
+static swig_type_info _swigt__p_ob__MouseData[] = {{"_p_ob__MouseData", 0, "ob::MouseData *", 0},{"_p_ob__MouseData"},{0}};
 static swig_type_info _swigt__p_ob__OBClient[] = {{"_p_ob__OBClient", 0, "ob::OBClient *", 0},{"_p_ob__OBClient"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
+static swig_type_info _swigt__p_XRectangle[] = {{"_p_XRectangle", 0, "XRectangle *", 0},{"_p_XRectangle"},{0}};
 static swig_type_info _swigt__p_ob__KeyData[] = {{"_p_ob__KeyData", 0, "ob::KeyData *", 0},{"_p_ob__KeyData"},{0}};
 static swig_type_info _swigt__p_XMapRequestEvent[] = {{"_p_XMapRequestEvent", 0, "XMapRequestEvent *", 0},{"_p_XMapRequestEvent"},{0}};
 static swig_type_info _swigt__p_XConfigureRequestEvent[] = {{"_p_XConfigureRequestEvent", 0, "XConfigureRequestEvent *", 0},{"_p_XConfigureRequestEvent"},{0}};
@@ -4397,7 +5714,6 @@ static swig_type_info _swigt__p_PyObject[] = {{"_p_PyObject", 0, "PyObject *", 0
 static swig_type_info _swigt__p_ob__OBBindings[] = {{"_p_ob__OBBindings", 0, "ob::OBBindings *", 0},{"_p_ob__OBBindings"},{0}};
 static swig_type_info _swigt__p_ob__MwmHints[] = {{"_p_ob__MwmHints", 0, "ob::MwmHints *", 0},{"_p_ob__MwmHints"},{0}};
 static swig_type_info _swigt__p_XUnmapEvent[] = {{"_p_XUnmapEvent", 0, "XUnmapEvent *", 0},{"_p_XUnmapEvent"},{0}};
-static swig_type_info _swigt__p_ob__ButtonData[] = {{"_p_ob__ButtonData", 0, "ob::ButtonData *", 0},{"_p_ob__ButtonData"},{0}};
 
 static swig_type_info *swig_types_initial[] = {
 _swigt__p_otk__OBTimerQueueManager, 
@@ -4407,10 +5723,11 @@ _swigt__p_ob__OBScreen,
 _swigt__p_otk__Style, 
 _swigt__p_ob__OBFrame, 
 _swigt__p_XReparentEvent, 
-_swigt__p_ob__MotionData, 
+_swigt__p_ob__MouseData, 
 _swigt__p_ob__OBClient, 
 _swigt__p_ob__Openbox, 
 _swigt__p_otk__Strut, 
+_swigt__p_XRectangle, 
 _swigt__p_ob__KeyData, 
 _swigt__p_XMapRequestEvent, 
 _swigt__p_XConfigureRequestEvent, 
@@ -4431,7 +5748,6 @@ _swigt__p_PyObject,
 _swigt__p_ob__OBBindings, 
 _swigt__p_ob__MwmHints, 
 _swigt__p_XUnmapEvent, 
-_swigt__p_ob__ButtonData, 
 0
 };
 

@@ -125,7 +125,7 @@ public:
   //! Removes all button bindings
   void removeAllButtons();
 
-  void fireButton(ButtonData *data);
+  void fireButton(MouseData *data);
 
   //! Bind a callback for an event
   bool addEvent(EventAction action, PyObject *callback);

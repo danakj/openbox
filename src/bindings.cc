@@ -390,6 +390,7 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           OBClient *c = Openbox::instance->focusedClient();
           KeyData data(screen, c, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
+          printf("Firing key!\n");
           for (it = p->callbacks.begin(); it != end; ++it)
             python_callback(*it, &data);
           resetChains(this);
@@ -512,7 +513,7 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
   }
 }
 
-void OBBindings::fireButton(ButtonData *data)
+void OBBindings::fireButton(MouseData *data)
 {
   if (data->context == MC_Window) {
     // these are grabbed in Sync mode to allow the press to be normal to the
@@ -527,7 +528,7 @@ void OBBindings::fireButton(ButtonData *data)
       CallbackList::iterator c_it,c_end = (*it)->callbacks[data->action].end();
       for (c_it = (*it)->callbacks[data->action].begin();
            c_it != c_end; ++c_it)
-        python_callback(*c_it, (PyObject*)data);
+        python_callback(*c_it, data);
     }
 }
 

@@ -6,6 +6,7 @@
 #include "python.hh"
 #include "bindings.hh"
 #include "otk/display.hh"
+#include "otk/util.hh"
 
 extern "C" {
 // The initializer in openbox_wrap.cc
@@ -24,7 +25,13 @@ void python_init(char *argv0)
   Py_Initialize();
   init_otk();
   init_openbox();
-  PyRun_SimpleString("from _otk import *; from _openbox import *;");
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
+  PyRun_SimpleString(const_cast<char*>(((std::string)"sys.path.append('" +
+                                        otk::expandTilde("~/.openbox/python") +
+                                        "')").c_str()));
+//  PyRun_SimpleString("from _otk import *; from _openbox import *;");
+  PyRun_SimpleString("from otk import *; from openbox import *;");
   PyRun_SimpleString("openbox = Openbox_instance()");
   PyRun_SimpleString("display = OBDisplay_display()");
 
@@ -143,6 +150,7 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
     vectkeylist.push_back(PyString_AsString(str));
   }
 
+  (void)context; // XXX use this sometime!
   if (!ob::Openbox::instance->bindings()->addKey(vectkeylist, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;

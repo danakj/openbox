@@ -4,123 +4,101 @@
 
 def state_above(data, add=2):
     """Toggles, adds or removes the 'above' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    above = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_above)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    above)
+    if not data.client: return
+    send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
+                    OBProperty.net_wm_state, data.client.window(), add,
+                    openbox.property().atom(OBProperty.net_wm_state_above))
     
 def state_below(data, add=2):
     """Toggles, adds or removes the 'below' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    below = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_below)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    below)
+    if not data.client: return
+    send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
+                    OBProperty.net_wm_state, data.client.window(), add,
+                    openbox.property().atom(OBProperty.net_wm_state_below))
     
 def state_shaded(data, add=2):
     """Toggles, adds or removes the 'shaded' state on a window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    shaded = OBProperty_atom(Openbox_property(openbox),
-                            OBProperty_net_wm_state_shaded)
-    send_client_msg(root, OBProperty_net_wm_state, window, add,
-                    shaded)
+    if not data.client: return
+    send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
+                    OBProperty.net_wm_state, data.client,window(), add,
+                    openbox.property().atom(OBProperty.net_wm_state_shaded))
     
 def close(data):
     """Closes the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    window = OBClient_window(client)
-    send_client_msg(root, OBProperty_net_close_window, window, 0)
+    if not data.client: return
+    send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
+                    OBProperty.net_close_window, data.client.window(), 0)
 
 def focus(data):
     """Focuses the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    type = OBClient_type(client)
+    if not data.client: return
     # !normal windows dont get focus from window enter events
-    if data.action() == EventEnterWindow and not OBClient_normal(client):
+    if data.action == EventEnterWindow and not data.client.normal():
         return
-    OBClient_focus(client)
+    data.client.focus()
 
 def move(data):
     """Moves the window interactively. This should only be used with
        MouseMotion events"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
+    if not data.client: return
 
     # !normal windows dont get moved
-    if not OBClient_normal(client): return
+    if not data.client.normal(): return
 
-    dx = data.xroot() - data.pressx()
-    dy = data.yroot() - data.pressy()
-    OBClient_move(client, data.press_clientx() + dx, data.press_clienty() + dy)
+    dx = data.xroot - data.pressx
+    dy = data.yroot - data.pressy
+    data.client.move(data.press_clientx + dx, data.press_clienty + dy)
 
 def resize(data):
     """Resizes the window interactively. This should only be used with
        MouseMotion events"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
+    if not data.client: return
 
     # !normal windows dont get moved
-    if not OBClient_normal(client): return
+    if not data.client.normal(): return
 
-    px = data.pressx()
-    py = data.pressy()
-    dx = data.xroot() - px
-    dy = data.yroot() - py
+    px = data.pressx
+    py = data.pressy
+    dx = data.xroot - px
+    dy = data.yroot - py
 
     # pick a corner to anchor
-    if not (resize_nearest or data.context() == MC_Grip):
-        corner = OBClient_TopLeft
+    if not (resize_nearest or data.context == MC_Grip):
+        corner = OBClient.TopLeft
     else:
-        x = px - data.press_clientx()
-        y = py - data.press_clienty()
-        if y < data.press_clientheight() / 2:
-            if x < data.press_clientwidth() / 2:
-                corner = OBClient_BottomRight
+        x = px - data.press_clientx
+        y = py - data.press_clienty
+        if y < data.press_clientheight / 2:
+            if x < data.press_clientwidth / 2:
+                corner = OBClient.BottomRight
                 dx *= -1
             else:
-                corner = OBClient_BottomLeft
+                corner = OBClient.BottomLeft
             dy *= -1
         else:
-            if x < data.press_clientwidth() / 2:
-                corner = OBClient_TopRight
+            if x < data.press_clientwidth / 2:
+                corner = OBClient.TopRight
                 dx *= -1
             else:
-                corner = OBClient_TopLeft
+                corner = OBClient.TopLeft
 
-    OBClient_resize(client, corner,
-                    data.press_clientwidth() + dx,
-                    data.press_clientheight() + dy);
+    data.client.resize(corner,
+                       data.press_clientwidth + dx,
+                       data.press_clientheight + dy);
 
 def restart(data):
     """Restarts openbox"""
-    Openbox_restart(openbox, "")
+    openbox.restart("")
 
 def raise_win(data):
     """Raises the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    screen = Openbox_screen(openbox, OBClient_screen(client))
-    OBScreen_restack(screen, 1, client)
+    if not data.client: return
+    openbox.screen(data.screen).restack(1, data.client)
 
 def lower_win(data):
     """Lowers the window on which the event occured"""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    screen = Openbox_screen(openbox, OBClient_screen(client))
-    OBScreen_restack(screen, 0, client)
+    if not data.client: return
+    openbox.screen(data.screen).restack(0, data.client)
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""
@@ -136,15 +114,15 @@ def unshade(data):
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    send_client_msg(root, OBProperty_net_current_desktop, root, num)
+    root = OBDisplay_screenInfo(data.screen).rootWindow()
+    send_client_msg(root, OBProperty.net_current_desktop, root, num)
 
 def next_desktop(data, no_wrap=0):
     """Switches to the next desktop, optionally (by default) cycling around to
        the first when going past the last."""
-    screen = Openbox_screen(openbox, data.screen())
-    d = OBScreen_desktop(screen)
-    n = OBScreen_numDesktops(screen)
+    screen = openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
     if (d < (n-1)):
         d = d + 1
     elif not no_wrap:
@@ -154,9 +132,9 @@ def next_desktop(data, no_wrap=0):
 def prev_desktop(data, no_wrap=0):
     """Switches to the previous desktop, optionally (by default) cycling around
        to the last when going past the first."""
-    screen = Openbox_screen(openbox, data.screen())
-    d = OBScreen_desktop(screen)
-    n = OBScreen_numDesktops(screen)
+    screen = openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
     if (d > 0):
         d = d - 1
     elif not no_wrap:
@@ -165,21 +143,18 @@ def prev_desktop(data, no_wrap=0):
 
 def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
-    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
-    client = Openbox_findClient(openbox, data.window())
-    if client:
-        window = OBClient_window(client)
-        send_client_msg(root, OBProperty_net_wm_desktop, window, num)
+    if not data.client: return
+    send_client_msg(OBDisplay_screenInfo(data.screen).rootWindow(),
+                    OBProperty.net_wm_desktop, data.client.window(), num)
 
 def send_to_next_desktop(data, no_wrap=0, follow=1):
     """Sends a window to the next desktop, optionally (by default) cycling
        around to the first when going past the last. Also optionally moving to
        the new desktop after sending the window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    screen = Openbox_screen(openbox, data.screen())
-    d = OBScreen_desktop(screen)
-    n = OBScreen_numDesktops(screen)
+    if not data.client: return
+    screen = openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
     if (d < (n-1)):
         d = d + 1
     elif not no_wrap:
@@ -192,11 +167,10 @@ def send_to_prev_desktop(data, no_wrap=0, follow=1):
     """Sends a window to the previous desktop, optionally (by default) cycling
        around to the last when going past the first. Also optionally moving to
        the new desktop after sending the window."""
-    client = Openbox_findClient(openbox, data.window())
-    if not client: return
-    screen = Openbox_screen(openbox, data.screen())
-    d = OBScreen_desktop(screen)
-    n = OBScreen_numDesktops(screen)
+    if not data.client: return
+    screen = openbox.screen(data.screen)
+    d = screen.desktop()
+    n = screen.numDesktops()
     if (d > 0):
         d = d - 1
     elif not no_wrap:
@@ -213,6 +187,6 @@ def execute(bin, screen = 0):
     """Executes a command on the specified screen. It is recommended that you
        use this call instead of a python system call. If the specified screen
        is beyond your range of screens, the default is used instead."""
-    Openbox_execute(openbox, screen, bin)
+    openbox.execute(screen, bin)
 
 print "Loaded builtins.py"

@@ -2314,7 +2314,8 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
       for (; it != end; ++it) {
         const string& fname = *it;
 
-        if (fname[fname.size()-1] == '~')
+        //ignore backups and dot files
+        if (fname[fname.size()-1] == '~' || fname[0] == '.')
           continue;
 
         string style = stylesdir;

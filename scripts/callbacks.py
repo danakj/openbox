@@ -5,111 +5,22 @@
 import ob
 import otk
 
-StateRemove = 0
-"""For the state_* callbacks. Indicates the state should be removed from the
-   window."""
-StateAdd = 1
-"""For the state_* callbacks. Indicates the state should be add to the
-   window."""
-StateToggle = 2
-"""For the state_* callbacks. Indicates the state should be toggled on the
-   window."""
-
-def state_above(data, add=StateAdd):
-    """Toggles, adds or removes the 'above' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_above)
-    
-def state_below(data, add=StateAdd):
-    """Toggles, adds or removes the 'below' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_below)
-    
-def state_shaded(data, add=StateAdd):
-    """Toggles, adds or removes the 'shaded' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_shaded)
-
-def state_maximize(data, add=StateAdd):
-    """Toggles, adds or removes the horizontal and vertical 'maximized' state
-       on a window. The second paramater should one of: StateRemove, StateAdd,
-       or StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_maximized_horz,
-                       otk.atoms.net_wm_state_maximized_vert)
-
-def state_maximize_horz(data, add=StateAdd):
-    """Toggles, adds or removes the horizontal 'maximized' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_maximized_horz)
-
-def state_maximize_vert(data, add=StateAdd):
-    """Toggles, adds or removes the vertical 'maximized' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_maximized_vert)
-
-def state_skip_taskbar(data, add=StateAdd):
-    """Toggles, adds or removes the 'skip_taskbar' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_skip_taskbar)
-    
-def state_skip_pager(data, add=StateAdd):
-    """Toggles, adds or removes the 'skip_pager' state on a window.
-       The second paramater should one of: StateRemove, StateAdd, or
-       StateToggle."""
-    if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_state, data.client.window(),
-                       add, otk.atoms.net_wm_state_skip_pager)
-    
 def iconify(data):
     """Iconifies the window on which the event occured"""
     if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.wm_change_state,
-                       data.client.window(), 3) # IconicState
+    data.client.iconify(1)
     
 def restore(data):
     """Un-iconifies the window on which the event occured, but does not focus
        if. If you want to focus the window too, it is recommended that you
        use the activate() function."""
     if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.wm_change_state,
-                       data.client.window(), 1) # NormalState
+    data.client.iconify(0)
     
 def close(data):
     """Closes the window on which the event occured"""
     if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_close_window,
-                       data.client.window(), 0)
+    data.client.close()
 
 def focus(data):
     """Focuses the window on which the event occured"""
@@ -122,75 +33,84 @@ def focus(data):
 def raise_win(data):
     """Raises the window on which the event occured"""
     if not data.client: return
-    ob.openbox.screen(data.screen).raiseWindow(data.client)
+    data.client.raiseWindow()
 
 def lower_win(data):
     """Lowers the window on which the event occured"""
     if not data.client: return
-    ob.openbox.screen(data.screen).lowerWindow(data.client)
+    data.client.lowerWindow()
 
 def toggle_maximize(data):
     """Toggles the maximized status of the window on which the event occured"""
-    state_maximize(data, StateToggle)
+    if not data.client: return
+    data.client.maximize(not (data.client.maxHorz() or data.client.maxVert()))
 
 def toggle_maximize_horz(data):
     """Toggles the horizontal maximized status of the window on which the event
        occured"""
-    state_maximize_horz(data, StateToggle)
+    if not data.client: return
+    data.client.maximizeHorizontal(not data.client.maxHorz())
 
 def toggle_maximize_vert(data):
     """Toggles the vertical maximized status of the window on which the event
        occured"""
-    state_maximize_vert(data, StateToggle)
+    if not data.client: return
+    data.client.maximizeVertical(not data.client.maxVert())
 
 def maximize(data):
     """Maximizes the window on which the event occured"""
-    state_maximize(data, StateAdd)
+    if not data.client: return
+    data.client.maximize(1)
 
 def maximize_horz(data):
     """Horizontally maximizes the window on which the event occured"""
-    state_maximize_horz(data, StateAdd)
+    if not data.client: return
+    data.client.maximizeHorizontal(1)
 
 def maximize_vert(data):
     """Vertically maximizes the window on which the event occured"""
-    state_maximize_vert(data, StateAdd)
+    if not data.client: return
+    data.client.maximizeVertical(1)
 
 def unmaximize(data):
     """Unmaximizes the window on which the event occured"""
-    state_maximize(data, StateRemove)
+    if not data.client: return
+    data.client.maximize(0)
 
 def unmaximize_horz(data):
     """Horizontally unmaximizes the window on which the event occured"""
-    state_maximize_horz(data, StateRemove)
+    if not data.client: return
+    data.client.maximizeHorizontal(0)
 
 def unmaximize_vert(data):
     """Vertically unmaximizes the window on which the event occured"""
-    state_maximize_vert(data, StateRemove)
+    if not data.client: return
+    data.client.maximizeVertical(0)
 
 def toggle_shade(data):
     """Toggles the shade status of the window on which the event occured"""
-    state_shaded(data, StateToggle)
+    if not data.client: return
+    data.client.shade(not data.client.shaded())
 
 def shade(data):
     """Shades the window on which the event occured"""
-    state_shaded(data, StateAdd)
+    if not data.client: return
+    data.client.shade(1)
 
 def unshade(data):
     """Unshades the window on which the event occured"""
-    state_shaded(data, StateRemove)
+    if not data.client: return
+    data.client.shade(0)
 
 def change_desktop(data, num):
     """Switches to a specified desktop"""
-    root = otk.display.screenInfo(data.screen).rootWindow()
-    ob.send_client_msg(root, otk.atoms.net_current_desktop,
-                       root, num)
+    ob.openbox.screen(data.screen).changeDesktop(num)
 
 def show_desktop(data, show=1):
     """Shows and focuses the desktop, hiding any client windows. Optionally,
        if show is zero, this will hide the desktop, leaving show-desktop
        mode."""
-    root = otk.display.screenInfo(data.screen).rootWindow()
-    ob.send_client_msg(root, otk.atoms.net_showing_desktop, root, show)
+    ob.openbox.screen(data.screen).showDesktop(show)
 
 def hide_desktop(data):
     """Hides the desktop, re-showing the client windows. Leaves show-desktop
@@ -200,13 +120,8 @@ def hide_desktop(data):
 def toggle_show_desktop(data):
     """Requests the Openbox to show the desktop, hiding the client windows, or
        redisplay the clients."""
-    # get the current desktop state
-    root = otk.display.screenInfo(data.screen).rootWindow()
-    result, value = otk.Property_get(root, otk.atoms.net_showing_desktop,
-                                     otk.atoms.cardinal)
-    if not result: return
-    show = not value
-    ob.send_client_msg(root, otk.atoms.net_showing_desktop, root, show)
+    screen = ob.openbox.screen(data.screen)
+    screen.showDesktop(not screen.showingDesktop())
 
 def next_desktop(data, no_wrap=0):
     """Switches to the next desktop, optionally (by default) cycling around to
@@ -296,12 +211,10 @@ def right_desktop(data, num=1):
         target -= l.columns
     change_desktop(data, target)
 
-def send_to_desktop(data, num=1):
+def send_to_desktop(data, num):
     """Sends a client to a specified desktop"""
     if not data.client: return
-    ob.send_client_msg(otk.display.screenInfo(data.screen).rootWindow(),
-                       otk.atoms.net_wm_desktop,
-                       data.client.window(),num)
+    data.client.setDesktop(num)
 
 def toggle_all_desktops(data):
     """Toggles between sending a client to all desktops and to the current

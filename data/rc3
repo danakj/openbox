@@ -132,9 +132,7 @@
       <action name="lower"/>
     </mousebind>
     <mousebind button="A-Right" action="press">
-      <action name="showmenu">
-        <menu plugin="client_menu">client-menu</menu>
-      </action>
+      <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="A-Up" action="click">
       <action name="desktopright"/>
@@ -172,9 +170,7 @@
       <action name="unshade"/>
     </mousebind>
     <mousebind button="Right" action="press">
-      <action name="showmenu">
-        <menu plugin="client_menu">client-menu</menu>
-      </action>
+      <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
   <context name="handle">
@@ -240,14 +236,10 @@
       <action name="focus"/>
     </mousebind>
     <mousebind button="Right" action="press">
-      <action name="showmenu">
-        <menu plugin="client_menu">client-menu</menu>
-      </action>
+      <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="Left" action="click">
-      <action name="showmenu">
-        <menu plugin="client_menu">client-menu</menu>
-      </action>
+      <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="Left" action="doubleclick">
       <action name="close"/>
@@ -313,9 +305,7 @@
       <action name="desktopleft"/>
     </mousebind>
     <mousebind button="Middle" action="press">
-      <action name="showmenu">
-        <menu plugin="client_list_menu">client-list-menu</menu>
-      </action>
+      <action name="showmenu"><menu>client-list-menu</menu></action>
     </mousebind> 
     <mousebind button="Right" action="press">
       <action name="showmenu">

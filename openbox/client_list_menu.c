@@ -7,16 +7,11 @@
 #include "kernel/focus.h"
 #include "gettext.h"
 
-#include "render/theme.h"
-
 #include <glib.h>
 
 #define MENU_NAME "client-list-menu"
 
-typedef struct {
-    /* how many desktop menus we've made */
-    guint desktops;
-} MenuData;
+static GSList *desktop_menus;
 
 typedef struct {
     guint desktop;
@@ -31,7 +26,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     GList *it;
     gint i;
 
-    menu_clear_entries(menu->name);
+    menu_clear_entries(menu);
 
     for (it = focus_order[d->desktop], i = 0; it; it = g_list_next(it), ++i) {
         ObClient *c = it->data;
@@ -44,7 +39,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             act = action_from_string("activate");
             act->data.activate.c = c;
             acts = g_slist_prepend(NULL, act);
-            e = menu_add_normal(menu->name, i,
+            e = menu_add_normal(menu, i,
                                 (c->iconic ? c->icon_title : c->title), acts);
 
             if ((icon = client_icon(c, 32, 32))) {
@@ -79,54 +74,43 @@ static void desk_menu_destroy(ObMenu *menu, gpointer data)
 
 static void self_update(ObMenuFrame *frame, gpointer data)
 {
+    ObMenu *menu = frame->menu;
     guint i;
-    MenuData *d = data;
+    GSList *it, *next;
     
-    menu_clear_entries(MENU_NAME);
-
+    it = desktop_menus;
     for (i = 0; i < screen_num_desktops; ++i) {
-        gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
-        DesktopData *data = g_new(DesktopData, 1);
+        if (!it) {
+            ObMenu *submenu;
+            gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
+            DesktopData *data = g_new(DesktopData, 1);
 
-        data->desktop = i;
-        menu_new(name, screen_desktop_names[i], data);
-        menu_set_update_func(name, desk_menu_update);
-        menu_set_execute_func(name, desk_menu_execute);
-        menu_set_destroy_func(name, desk_menu_destroy);
+            data->desktop = i;
+            submenu = menu_new(name, screen_desktop_names[i], data);
+            menu_set_update_func(submenu, desk_menu_update);
+            menu_set_execute_func(submenu, desk_menu_execute);
+            menu_set_destroy_func(submenu, desk_menu_destroy);
 
-        menu_add_submenu(MENU_NAME, 0, name);
+            menu_add_submenu(menu, i, name);
 
-        g_free(name);
+            g_free(name);
+
+            desktop_menus = g_slist_append(desktop_menus, submenu);
+        } else
+            it = g_slist_next(it);
     }
-
-    d->desktops = MAX(d->desktops, screen_num_desktops);
-}
-
-static void self_destroy(ObMenu *menu, gpointer data)
-{
-    MenuData *d = data;
-    guint i;
-
-    for (i = 0; i < d->desktops; ++i) {
-        gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
-        menu_free(name);
-        g_free(name);
+    for (; it; it = next, ++i) {
+        next = g_slist_next(it);
+        menu_free(it->data);
+        desktop_menus = g_slist_delete_link(desktop_menus, it);
+        menu_entry_remove(menu_find_entry_id(menu, i));
     }
-    g_free(d);
 }
 
-void plugin_startup()
+void client_list_menu_startup()
 {
-    MenuData *data;
+    ObMenu *menu;
 
-    data = g_new(MenuData, 1);
-    data->desktops = 0;
-    menu_new(MENU_NAME, _("Desktops"), data);
-    menu_set_update_func(MENU_NAME, self_update);
-    menu_set_destroy_func(MENU_NAME, self_destroy);
-}
-
-void plugin_shutdown()
-{
-    menu_free(MENU_NAME);
+    menu = menu_new(MENU_NAME, _("Desktops"), NULL);
+    menu_set_update_func(menu, self_update);
 }

@@ -3,7 +3,6 @@ SUBDIRS = m4 po
 themedir        = $(datadir)/openbox/themes
 localedir       = $(datadir)/locale
 rcdir           = $(datadir)/openbox
-plugindir       = $(libdir)/openbox/plugins
 desktopfilesdir = $(datadir)/gnome/wm-properties
 pixmapdir       = $(datadir)/pixmaps
 
@@ -24,13 +23,6 @@ lib_LTLIBRARIES = \
 bin_PROGRAMS = \
 	kernel/openbox \
 	tools/kdetrayproxy/kdetrayproxy
-
-plugin_LTLIBRARIES = \
-	plugins/menu/client_menu.la \
-	plugins/menu/client_list_menu.la
-#	plugins/menu/timed_menu.la \
-#	plugins/menu/fifo_menu.la \
-#	plugins/menu/include_menu.la \
 
 if OBCONF
 bin_PROGRAMS += \
@@ -103,7 +95,6 @@ kernel_openbox_CPPFLAGS = \
 	$(LIBSN_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
-	-DPLUGINDIR=\"$(plugindir)\" \
 	-DRCDIR=\"$(rcdir)\" \
 	-DG_LOG_DOMAIN=\"Openbox\"
 kernel_openbox_LDADD = \
@@ -128,6 +119,10 @@ kernel_openbox_SOURCES = \
 	kernel/action.h \
 	kernel/client.c \
 	kernel/client.h \
+	kernel/client_list_menu.c \
+	kernel/client_list_menu.h \
+	kernel/client_menu.c \
+	kernel/client_menu.h \
 	kernel/config.c \
 	kernel/config.h \
 	kernel/debug.c \
@@ -167,8 +162,6 @@ kernel_openbox_SOURCES = \
 	kernel/openbox.h \
 	kernel/place.c \
 	kernel/place.h \
-	kernel/plugin.c \
-	kernel/plugin.h \
 	kernel/popup.c \
 	kernel/popup.h \
 	kernel/prop.c \
@@ -190,78 +183,7 @@ kernel_openbox_SOURCES = \
 	kernel/window.c \
 	kernel/window.h \
 	kernel/xerror.c \
-	kernel/xerror.h \
-	plugins/interface.h
-
-## plugins/menu ##
-
-plugins_menu_timed_menu_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Timed-Menu\"
-plugins_menu_timed_menu_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_menu_timed_menu_la_SOURCES = \
-	plugins/menu/timed_menu.c \
-	plugins/menu/timed_menu.h
-
-plugins_menu_fifo_menu_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Fifo-Menu\"
-plugins_menu_fifo_menu_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_menu_fifo_menu_la_SOURCES = \
-	plugins/menu/fifo_menu.c \
-	plugins/menu/fifo_menu.h
-
-plugins_menu_client_menu_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Client-Menu\"
-plugins_menu_client_menu_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_menu_client_menu_la_SOURCES = \
-	plugins/menu/client_menu.c
-
-plugins_menu_include_menu_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Include-Menu\"
-plugins_menu_include_menu_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_menu_include_menu_la_SOURCES = \
-	plugins/menu/include_menu.c
-
-plugins_menu_client_list_menu_la_CPPFLAGS = \
-	$(XFT_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(LIBSN_CFLAGS) \
-	$(XML_CFLAGS) \
-	-DPLUGINDIR=\"$(plugindir)\" \
-	-DG_LOG_DOMAIN=\"Plugin-Client-List-Menu\"
-plugins_menu_client_list_menu_la_LDFLAGS = \
-	-module \
-	-avoid-version
-plugins_menu_client_list_menu_la_SOURCES = \
-o	plugins/menu/client_list_menu.c
-
+	kernel/xerror.h
 
 ## obconf ##
 

@@ -31,7 +31,7 @@
   <menu id="apps-menu" />
   <menu id="games-menu" />
   <separator />
-  <menu id="client-list-menu" plugin="client_list_menu" />
+  <menu id="client-list-menu" />
   <separator />
   <item label="Restart">
     <action name="restart" />

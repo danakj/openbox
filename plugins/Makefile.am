@@ -4,7 +4,7 @@ SUBDIRS = keyboard
 
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\" \
--DG_LOG_DOMAIN=\"Openbox-Plugin\"
+-DG_LOG_DOMAIN=\"Plugin\"
 
 plugin_LTLIBRARIES=focus.la
 

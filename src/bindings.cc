@@ -68,8 +68,7 @@ static bool modvalue(const std::string &mod, unsigned int *val)
   return true;
 }
 
-bool OBBindings::translate(const std::string &str, Binding &b,
-                           bool askey) const
+bool OBBindings::translate(const std::string &str, Binding &b) const
 {
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -93,22 +92,14 @@ bool OBBindings::translate(const std::string &str, Binding &b,
 
   // set the binding
   b.modifiers = modval;
-  if (askey) {
-    KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
-    if (sym == NoSymbol) {
-      printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
-      return false;
-    }
-    if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
-      printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
-    return b.key != 0;
-  } else {
-    if (!buttonvalue(key, &b.key)) {
-      printf(_("Invalid Button name in mouse binding: %s\n"), key.c_str());
-      return false;
-    } else
-      return true;
+  KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
+  if (sym == NoSymbol) {
+    printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
+    return false;
   }
+  if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
+    printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
+  return b.key != 0;
 }
 
 static void destroytree(BindingTree *tree)
@@ -143,7 +134,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
 
 
 OBBindings::OBBindings()
-  : _curpos(&_keytree), _mousetree(0), _resetkey(0,0)
+  : _curpos(&_keytree), _resetkey(0,0)
 {
   setResetKey("C-g"); // set the default reset key
 }
@@ -151,50 +142,8 @@ OBBindings::OBBindings()
 
 OBBindings::~OBBindings()
 {
-  grabMouseOnAll(false); // ungrab everything
   grabKeys(false);
   remove_all();
-}
-
-
-bool OBBindings::add_mouse(const std::string &button, int id)
-{
-  BindingTree n;
-
-  if (!translate(button, n.binding, false))
-    return false;
-
-  BindingTree *p = _mousetree, **newp = &_mousetree;
-  while (p) {
-    if (p->binding == n.binding)
-      return false; // conflict
-    p = p->next_sibling;
-    newp = &p->next_sibling;
-  }
-
-  grabMouseOnAll(false); // ungrab everything
-  
-  *newp = new BindingTree(id);
-  (*newp)->chain = false;
-  (*newp)->binding.key = n.binding.key;
-  (*newp)->binding.modifiers = n.binding.modifiers;
-
-  grabMouseOnAll(true);
-  
-  return true;
-}
-
-
-int OBBindings::remove_mouse(const std::string &button)
-{
-  (void)button;
-  assert(false); // XXX: function not implemented yet
-
-  grabMouseOnAll(false); // ungrab everything
-
-  // do shit...
-  
-  grabMouseOnAll(true);
 }
 
 
@@ -340,43 +289,6 @@ void OBBindings::remove_all()
     remove_branch(_keytree.first_child);
     _keytree.first_child = 0;
   }
-  BindingTree *p = _mousetree;
-  while (p) {
-    BindingTree *n = p->next_sibling;
-    delete p;
-    p = n;
-  }
-  _mousetree = 0;
-}
-
-
-void OBBindings::grabMouse(bool grab, const OBClient *client)
-{
-  BindingTree *p = _mousetree;
-  while (p) {
-    if (grab)
-      otk::OBDisplay::grabButton(p->binding.key, p->binding.modifiers,
-                                 client->frame->window(), false,
-                                 ButtonMotionMask | ButtonPressMask |
-                                 ButtonReleaseMask, GrabModeAsync,
-                                 GrabModeAsync, None, None, false);
-    else
-      otk::OBDisplay::ungrabButton(p->binding.key, p->binding.modifiers,
-                                   client->frame->window());
-    p = p->next_sibling;
-  }
-}
-
-
-void OBBindings::grabMouseOnAll(bool grab)
-{
-  for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
-    OBScreen *s = Openbox::instance->screen(i);
-    assert(s);
-    OBScreen::ClientList::iterator it, end = s->clients.end();
-    for (it = s->clients.begin(); it != end; ++it)
-      grabMouse(grab, *it);
-  }
 }
 
 
@@ -408,44 +320,32 @@ void OBBindings::grabKeys(bool grab)
 }
 
 
-void OBBindings::fire(OBActions::ActionType type, Window window,
-                      unsigned int modifiers, unsigned int key, Time time)
+void OBBindings::fire(Window window, unsigned int modifiers, unsigned int key,
+                      Time time)
 {
-  if (type == OBActions::Action_KeyPress) {
-    if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
-      grabKeys(false);
-      _curpos = &_keytree;
-      grabKeys(true);
-    } else {
-      BindingTree *p = _curpos->first_child;
-      while (p) {
-        if (p->binding.key == key && p->binding.modifiers == modifiers) {
-          if (p->chain) {
-            grabKeys(false);
-            _curpos = p;
-            grabKeys(true);
-          } else {
-            python_callback_binding(p->id, type, window, modifiers, key, time);
-            grabKeys(false);
-            _curpos = &_keytree;
-            grabKeys(true);
-          }
-          break;
-        }
-        p = p->next_sibling;
-      }
-    }
+  if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
+    grabKeys(false);
+    _curpos = &_keytree;
+    grabKeys(true);
   } else {
-    BindingTree *p = _mousetree;
+    BindingTree *p = _curpos->first_child;
     while (p) {
       if (p->binding.key == key && p->binding.modifiers == modifiers) {
-        python_callback_binding(p->id, type, window, modifiers, key, time);
+        if (p->chain) {
+          grabKeys(false);
+          _curpos = p;
+          grabKeys(true);
+        } else {
+          python_callback_binding(p->id, type, window, modifiers, key, time);
+          grabKeys(false);
+          _curpos = &_keytree;
+          grabKeys(true);
+        }
         break;
       }
       p = p->next_sibling;
     }
   }
 }
-
 
 }

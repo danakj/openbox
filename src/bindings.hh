@@ -49,40 +49,21 @@ public:
   typedef std::vector<std::string> StringVect;
 
 private:
-  BindingTree _keytree; // root node of the tree (this doesn't have siblings!)
+  BindingTree _tree; // root node of the tree (this doesn't have siblings!)
   BindingTree *_curpos; // position in the keytree
-
-  BindingTree *_mousetree; // this tree is a list. it has only siblings
 
   Binding _resetkey; // the key which resets the key chain status
   
-  int find_key(BindingTree *search) const;
-  bool translate(const std::string &str, Binding &b, bool askey) const;
+  int find(BindingTree *search) const;
+  bool translate(const std::string &str, Binding &b) const;
   BindingTree *buildtree(const StringVect &keylist, int id) const;
   void assimilate(BindingTree *node);
 
-  void grabMouseOnAll(bool grab);
-  
 public:
   //! Initializes an OBBinding object
   OBBindings();
   //! Destroys the OBBinding object
   virtual ~OBBindings();
-
-  //! Adds a new mouse binding
-  /*!
-    A binding will fail to be added if the binding already exists, or if the
-    string is invalid.    
-    @return true if the binding could be added; false if it could not.
-  */
-  bool add_mouse(const std::string &button, int id);
-
-  //! Removes a mouse binding
-  /*!
-    @return The id of the binding that was removed, or '< 0' if none were
-            removed.
-  */
-  int remove_mouse(const std::string &button);
 
   //! Adds a new key binding
   /*!
@@ -90,14 +71,14 @@ public:
     a chain or not), or if any of the strings in the keylist are invalid.    
     @return true if the binding could be added; false if it could not.
   */
-  bool add_key(const StringVect &keylist, int id);
+  bool add(const StringVect &keylist, int id);
 
   //! Removes a key binding
   /*!
     @return The id of the binding that was removed, or '< 0' if none were
             removed.
   */
-  int remove_key(const StringVect &keylist);
+  int remove(const StringVect &keylist);
 
   //! Removes all key bindings
   void remove_all();
@@ -107,14 +88,12 @@ public:
     @return -1 if the keybinding was not found but does not conflict with
     any others; -2 if the keybinding conflicts with another.
   */
-  int find_key(const StringVect &keylist);
+  int find(const StringVect &keylist);
 
-  void fire(OBActions::ActionType type, Window window, unsigned int modifiers,
-            unsigned int key, Time time);
+  void fire(Window window, unsigned int modifiers,unsigned int key, Time time);
 
   void setResetKey(const std::string &key);
 
-  void grabMouse(bool grab, const OBClient *client);
   void grabKeys(bool grab);
 };
 

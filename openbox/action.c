@@ -41,42 +41,42 @@ void action_free(Action *a)
 
 void setup_action_directional_focus_north(Action *a)
 {
-    a->data.dfocus.direction = Direction_North;
+    a->data.diraction.direction = Direction_North;
 }
 
 void setup_action_directional_focus_east(Action *a)
 {
-    a->data.dfocus.direction = Direction_East;
+    a->data.diraction.direction = Direction_East;
 }
 
 void setup_action_directional_focus_south(Action *a)
 {
-    a->data.dfocus.direction = Direction_South;
+    a->data.diraction.direction = Direction_South;
 }
 
 void setup_action_directional_focus_west(Action *a)
 {
-    a->data.dfocus.direction = Direction_West;
+    a->data.diraction.direction = Direction_West;
 }
 
 void setup_action_directional_focus_northeast(Action *a)
 {
-    a->data.dfocus.direction = Direction_NorthEast;
+    a->data.diraction.direction = Direction_NorthEast;
 }
 
 void setup_action_directional_focus_southeast(Action *a)
 {
-    a->data.dfocus.direction = Direction_SouthEast;
+    a->data.diraction.direction = Direction_SouthEast;
 }
 
 void setup_action_directional_focus_southwest(Action *a)
 {
-    a->data.dfocus.direction = Direction_SouthWest;
+    a->data.diraction.direction = Direction_SouthWest;
 }
 
 void setup_action_directional_focus_northwest(Action *a)
 {
-    a->data.dfocus.direction = Direction_NorthWest;
+    a->data.diraction.direction = Direction_NorthWest;
 }
 
 void setup_action_send_to_desktop(Action *a)
@@ -149,7 +149,27 @@ void setup_action_cycle_windows_previous(Action *a)
     a->data.cycle.linear = FALSE;
     a->data.cycle.forward = FALSE;
 }
-    
+
+void setup_action_movetoedge_north(Action *a)
+{
+    a->data.diraction.direction = Direction_North;
+}
+
+void setup_action_movetoedge_south(Action *a)
+{
+    a->data.diraction.direction = Direction_South;
+}
+
+void setup_action_movetoedge_east(Action *a)
+{
+    a->data.diraction.direction = Direction_East;
+}
+
+void setup_action_movetoedge_west(Action *a)
+{
+    a->data.diraction.direction = Direction_West;
+}
+
 ActionString actionstrings[] =
 {
     {
@@ -481,6 +501,26 @@ ActionString actionstrings[] =
         "previouswindow",
         action_cycle_windows,
         setup_action_cycle_windows_previous
+    },
+    {
+        "movetoedgenorth",
+        action_movetoedge,
+        setup_action_movetoedge_north
+    },
+    {
+        "movetoedgesouth",
+        action_movetoedge,
+        setup_action_movetoedge_south
+    },
+    {
+        "movetoedgewest",
+        action_movetoedge,
+        setup_action_movetoedge_west
+    },
+    {
+        "movetoedgeeast",
+        action_movetoedge,
+        setup_action_movetoedge_east
     },
     {
         NULL,
@@ -1009,8 +1049,41 @@ void action_directional_focus(union ActionData *data)
 {
     Client *nf;
 
-    if (!data->dfocus.c)
+    if (!data->diraction.c)
         return;
-    if ((nf = client_find_directional(data->dfocus.c, data->dfocus.direction)))
+    if ((nf = client_find_directional(data->diraction.c,
+                                      data->diraction.direction)))
         client_activate(nf);
+}
+
+void action_movetoedge(union ActionData *data)
+{
+    int x, y, h, w;
+    Client *c = data->diraction.c;
+
+    if (!c)
+        return;
+    x = c->frame->area.x;
+    y = c->frame->area.y;
+    
+    h = screen_area(c->desktop)->height;
+    w = screen_area(c->desktop)->width;
+    switch(data->diraction.direction) {
+    case Direction_North:
+        y = 0;
+        break;
+    case Direction_West:
+        x = 0;
+        break;
+    case Direction_South:
+        y = h - c->frame->area.height;
+        break;
+    case Direction_East:
+        x = w - c->frame->area.width;
+        break;
+    }
+    frame_frame_gravity(c->frame, &x, &y);
+    client_configure(c, Corner_TopLeft,
+                     x, y, c->area.width, c->area.height, TRUE, TRUE);
+
 }

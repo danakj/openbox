@@ -12,7 +12,7 @@ struct AnyAction {
     Client *c;
 };
 
-struct DirectionalFocus {
+struct DirectionalAction{
     Client *c;
     int direction;
 };
@@ -78,7 +78,7 @@ struct CycleWindows {
 
 union ActionData {
     struct AnyAction any;
-    struct DirectionalFocus dfocus;
+    struct DirectionalAction diraction;
     struct Execute execute;
     struct ClientAction client;
     struct MoveResizeRelative relative;
@@ -206,4 +206,5 @@ void action_showmenu(union ActionData *data);
 void action_cycle_windows(union ActionData *data);
 
 void action_directional_focus(union ActionData *data);
+void action_movetoedge(union ActionData *data);
 #endif

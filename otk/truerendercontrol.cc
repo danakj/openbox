@@ -156,19 +156,19 @@ void TrueRenderControl::drawGradientBackground(
     if (texture.bevel() == RenderTexture::Bevel1) {
       for (off = 1, x = 1; x < w - 1; ++x, off++)
         highlight(data + off,
-                data + off + (h-1) * w,
-                texture.relief()==RenderTexture::Raised);
+                  data + off + (h-1) * w,
+                  texture.relief()==RenderTexture::Raised);
       for (off = 0, x = 0; x < h; ++x, off++)
         highlight(data + off * w,
-                data + off * w + w - 1,
-                texture.relief()==RenderTexture::Raised);
+                  data + off * w + w - 1,
+                  texture.relief()==RenderTexture::Raised);
     }
 
     if (texture.bevel() == RenderTexture::Bevel2) {
       for (off = 2, x = 2; x < w - 2; ++x, off++)
         highlight(data + off + w,
-                data + off + (h-2) * w,
-                texture.relief()==RenderTexture::Raised);
+                  data + off + (h-2) * w,
+                  texture.relief()==RenderTexture::Raised);
       for (off = 1, x = 1; x < h-1; ++x, off++)
         highlight(data + off * w + 1,
                   data + off * w + w - 2,
@@ -176,7 +176,8 @@ void TrueRenderControl::drawGradientBackground(
     }
   }
 
-//XXX: any dithering should be done now
+  reduceDepth(im, data);
+
   im->data = (char*) data;
 
   sf.setPixmap(im);
@@ -184,6 +185,34 @@ void TrueRenderControl::drawGradientBackground(
   delete [] im->data;
   im->data = NULL;
   XDestroyImage(im);
+}
+
+void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
+{
+  int r, g, b;
+  int x,y;
+  pixel16 *p = (pixel16 *)data;
+  switch (im->bits_per_pixel) {
+  case 32:
+    return;
+  case 16:
+    for (y = 0; y < im->height; y++) {
+      for (x = 0; x < im->width; x++) {
+        r = (data[x] >> 16) & 0xFF;
+        r = r >> _red_shift;
+        g = (data[x] >> 8) & 0xFF;
+        g = g >> _green_shift;
+        b = data[x] & 0xFF;
+        b = b >> _blue_shift;
+        p[x] = (r << _red_offset) + (g << _green_offset) + (b << _blue_offset);
+      }
+      data += im->width;
+      p += im->bytes_per_line/2;
+    }
+    break;
+  default:
+    printf("your bit depth is currently unhandled\n");
+  }
 }
 
 void TrueRenderControl::highlight(pixel32 *x, pixel32 *y, bool raised) const

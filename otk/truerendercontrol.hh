@@ -22,8 +22,10 @@ namespace otk {
 
 #ifdef HAVE_STDINT_H
 typedef uint32_t pixel32;
+typedef uint16_t pixel16;
 #else
 typedef u_int32_t pixel32;
+typedef u_int16_t pixel16;
 #endif
 
 class TrueRenderControl : public RenderControl {
@@ -48,6 +50,7 @@ public:
                                       const RenderTexture &texture) const;
 
   inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
+  void reduceDepth(XImage *im, pixel32 *data) const;
 };
 
 }

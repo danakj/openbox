@@ -40,140 +40,169 @@ void action_execute(union ActionData *data)
 
 void action_focus(union ActionData *data)
 {
-    client_focus(data->client.c);
+    if (data->client.c)
+        client_focus(data->client.c);
 }
 
 void action_unfocus (union ActionData *data)
 {
-    client_unfocus(data->client.c);
+    if (data->client.c)
+        client_unfocus(data->client.c);
 }
 
 void action_iconify(union ActionData *data)
 {
-    client_iconify(data->client.c, TRUE, TRUE);
+    if (data->client.c)
+        client_iconify(data->client.c, TRUE, TRUE);
 }
 
 void action_focusraise(union ActionData *data)
 {
-    client_focus(data->client.c);
-    stacking_raise(data->client.c);
+    if (data->client.c) {
+        client_focus(data->client.c);
+        stacking_raise(data->client.c);
+    }
 }
 
 void action_raise(union ActionData *data)
 {
-    stacking_raise(data->client.c);
+    if (data->client.c)
+        stacking_raise(data->client.c);
 }
 
 void action_lower(union ActionData *data)
 {
-    stacking_lower(data->client.c);
+    if (data->client.c)
+        stacking_lower(data->client.c);
 }
 
 void action_close(union ActionData *data)
 {
-    client_close(data->client.c);
+    if (data->client.c)
+        client_close(data->client.c);
 }
 
 void action_kill(union ActionData *data)
 {
-    client_kill(data->client.c);
+    if (data->client.c)
+        client_kill(data->client.c);
 }
 
 void action_shade(union ActionData *data)
 {
-    client_shade(data->client.c, TRUE);
+    if (data->client.c)
+        client_shade(data->client.c, TRUE);
 }
 
 void action_unshade(union ActionData *data)
 {
-    client_shade(data->client.c, FALSE);
+    if (data->client.c)
+        client_shade(data->client.c, FALSE);
 }
 
 void action_toggle_shade(union ActionData *data)
 {
-    client_shade(data->client.c, !data->client.c->shaded);
+    if (data->client.c)
+        client_shade(data->client.c, !data->client.c->shaded);
 }
 
 void action_toggle_omnipresent(union ActionData *data)
-{
-    client_set_desktop(data->client.c, data->client.c->desktop == DESKTOP_ALL ?
-                       screen_desktop : DESKTOP_ALL);
+{ 
+    if (data->client.c)
+        client_set_desktop(data->client.c,
+                           data->client.c->desktop == DESKTOP_ALL ?
+                           screen_desktop : DESKTOP_ALL);
 }
 
 void action_move_relative(union ActionData *data)
 {
     Client *c = data->relative.c;
-    client_configure(c, Corner_TopLeft,
-                     c->area.x + data->relative.dx,
-                     c->area.y + data->relative.dy,
-                     c->area.width, c->area.height, TRUE, TRUE);
+    if (c)
+        client_configure(c, Corner_TopLeft,
+                         c->area.x + data->relative.dx,
+                         c->area.y + data->relative.dy,
+                         c->area.width, c->area.height, TRUE, TRUE);
 }
 
 void action_resize_relative(union ActionData *data)
 {
     Client *c = data->relative.c;
-    client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
-                     c->area.width + data->relative.dx,
-                     c->area.height + data->relative.dy, TRUE, TRUE);
+    if (c)
+        client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
+                         c->area.width + data->relative.dx,
+                         c->area.height + data->relative.dy, TRUE, TRUE);
 }
 
 void action_maximize_full(union ActionData *data)
 {
-    client_maximize(data->client.c, TRUE, 0, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, TRUE, 0, TRUE);
 }
 
 void action_unmaximize_full(union ActionData *data)
 {
-    client_maximize(data->client.c, FALSE, 0, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, FALSE, 0, TRUE);
 }
 
 void action_toggle_maximize_full(union ActionData *data)
 {
-    client_maximize(data->client.c,
-                    !(data->client.c->max_horz || data->client.c->max_vert),
-                    0, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c,
+                        !(data->client.c->max_horz ||
+                          data->client.c->max_vert),
+                        0, TRUE);
 }
 
 void action_maximize_horz(union ActionData *data)
 {
-    client_maximize(data->client.c, TRUE, 1, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, TRUE, 1, TRUE);
 }
 
 void action_unmaximize_horz(union ActionData *data)
 {
-    client_maximize(data->client.c, FALSE, 1, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, FALSE, 1, TRUE);
 }
 
 void action_toggle_maximize_horz(union ActionData *data)
 {
-    client_maximize(data->client.c, !data->client.c->max_horz, 1, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, !data->client.c->max_horz, 1, TRUE);
 }
 
 void action_maximize_vert(union ActionData *data)
 {
-    client_maximize(data->client.c, TRUE, 2, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, TRUE, 2, TRUE);
 }
 
 void action_unmaximize_vert(union ActionData *data)
 {
-    client_maximize(data->client.c, FALSE, 2, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, FALSE, 2, TRUE);
 }
 
 void action_toggle_maximize_vert(union ActionData *data)
 {
-    client_maximize(data->client.c, !data->client.c->max_vert, 2, TRUE);
+    if (data->client.c)
+        client_maximize(data->client.c, !data->client.c->max_vert, 2, TRUE);
 }
 
 void action_send_to_desktop(union ActionData *data)
 {
-    if (data->sendto.desktop < screen_num_desktops ||
-        data->sendto.desktop == DESKTOP_ALL)
-        client_set_desktop(data->sendto.c, data->sendto.desktop);
+    if (data->sendto.c)
+        if (data->sendto.desktop < screen_num_desktops ||
+            data->sendto.desktop == DESKTOP_ALL)
+            client_set_desktop(data->sendto.c, data->sendto.desktop);
 }
 
 void action_send_to_next_desktop(union ActionData *data)
 {
     guint d;
+
+    if (!data->sendto.c) return;
 
     d = screen_desktop + 1;
     if (d >= screen_num_desktops) {
@@ -187,6 +216,8 @@ void action_send_to_next_desktop(union ActionData *data)
 void action_send_to_previous_desktop(union ActionData *data)
 {
     guint d;
+
+    if (!data->sendto.c) return;
 
     d = screen_desktop - 1;
     if (d >= screen_num_desktops) {
@@ -408,7 +439,7 @@ void action_move(union ActionData *data)
     int x = data->move.x;
     int y = data->move.y;
 
-    if (!client_normal(c)) return;
+    if (!c || !client_normal(c)) return;
 
     dispatch_move(c, &x, &y);
 
@@ -423,7 +454,7 @@ void action_resize(union ActionData *data)
     int w = data->resize.x - c->frame->size.left - c->frame->size.right;
     int h = data->resize.y - c->frame->size.top - c->frame->size.bottom;
  
-    if (!client_normal(c)) return;
+    if (!c || !client_normal(c)) return;
 
     /* XXX window snapping/struts */
 

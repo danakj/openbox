@@ -136,7 +136,7 @@ void event_loop()
 
         /* we don't use exposes but the render lib wants them all! */
         if (ob_state != State_Exiting && e.type == Expose)
-            RrExpose(ob_render_inst, &e);
+            RrExpose(ob_render_inst, &e.xexpose);
 
 #ifdef USE_LIBSN
         sn_display_process_event(ob_sn_display, &e);

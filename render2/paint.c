@@ -21,35 +21,25 @@ struct ExposeArea {
             a->y = MIN(a->y, y)
 
 
-void RrExpose(struct RrInstance *inst, XEvent *e)
+void RrExpose(struct RrInstance *inst, XExposeEvent *e)
 {
     XEvent e2;
-    GSList *tops = NULL, *it, *n;
     struct RrSurface *sur;
+    Window win;
 
-    e2 = *e;
-    if ((sur = RrInstaceLookupSurface(inst, e2.xexpose.window))) {
-        while (XCheckTypedWindowEvent(RrDisplay(inst), Expose,
-                                      e->xexpose.window, &e2));
-        while (sur->parent &&
-               RrSurfaceType(sur->parent) != RR_SURFACE_NONE) {
+    win = e->window;
+
+    if ((sur = RrInstaceLookupSurface(inst, win))) {
+        while (XCheckTypedWindowEvent(RrDisplay(inst), Expose, win, &e2));
+        while (sur->parent && RrSurfaceType(sur->parent) != RR_SURFACE_NONE)
             sur = sur->parent;
-        }
         RrPaint(sur);
-    } else {
-        RrDebug("Unable to find surface for window 0x%lx\n",
-                e2.xexpose.window);
-    }
+    } else
+        RrDebug("Unable to find surface for window 0x%lx\n", win);
 }
 
 /*! Paints the surface, and all its children */
 void RrPaint(struct RrSurface *sur)
-{
-    RrPaintArea(sur, 0, 0, RrSurfaceWidth(sur), RrSurfaceHeight(sur));
-}
-
-/*! Paints the surface, and all its children, but only in the given area. */
-void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
 {
     struct RrInstance *inst;
     struct RrSurface *p;
@@ -97,7 +87,7 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
 
     switch (RrSurfaceType(sur)) {
     case RR_SURFACE_PLANAR:
-        RrPlanarPaint(sur, surx + x, sury + y, w, h);
+        RrPlanarPaint(sur, surx, sury);
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);

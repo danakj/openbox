@@ -170,6 +170,20 @@ void RrSurfaceFree(struct RrSurface *sur)
     }
 }
 
+void RrSurfaceSetPos(struct RrSurface *sur,
+                     int x,
+                     int y)
+{
+    RrSurfaceSetArea(sur, x, y, sur->w, sur->h);
+}
+
+void RrSurfaceSetSize(struct RrSurface *sur,
+                      int w,
+                      int h)
+{
+    RrSurfaceSetArea(sur, sur->x, sur->y, w, h);
+}
+
 void RrSurfaceSetArea(struct RrSurface *sur,
                       int x,
                       int y,

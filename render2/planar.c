@@ -63,7 +63,7 @@ static void copy_parent(struct RrSurface *sur)
     }
 }
 
-void RrPlanarPaint(struct RrSurface *sur, int x, int y, int w, int h)
+void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
 {   
     struct RrColor *pri, *sec, avg;
     int x, y, w, h;

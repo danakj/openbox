@@ -112,6 +112,12 @@ void RrSurfaceSetArea(struct RrSurface *sur,
                       int y,
                       int w,
                       int h);
+void RrSurfaceSetPos(struct RrSurface *sur,
+                     int x,
+                     int y);
+void RrSurfaceSetSize(struct RrSurface *sur,
+                      int w,
+                      int h);
 
 Window RrSurfaceWindow(struct RrSurface *sur);
 
@@ -190,12 +196,7 @@ void RrTextureSetNone(struct RrSurface *sur,
 
 /*! Paints the surface, and all its children */
 void RrPaint(struct RrSurface *sur);
-/*! Paints the surface, and all its children, but only in the given area. */
-void RrPaintArea(struct RrSurface *sur,
-                 int x,
-                 int y,
-                 int w,
-                 int h);
-void RrExpose(struct RrInstance *inst, XEvent *e);
+
+void RrExpose(struct RrInstance *inst, XExposeEvent *e);
 
 #endif

@@ -85,16 +85,13 @@ int main()
                 /* fall through ... */
             } else {
                 while (XCheckTypedWindowEvent(display, win, Expose, &report));
-                RrPaintArea(sur, report.xexpose.x, report.xexpose.y,
-                            report.xexpose.width, report.xexpose.height);
+                RrPaint(sur);
                 break;
             }
         case ConfigureNotify:
             while (XCheckTypedWindowEvent(display, win, ConfigureNotify,
                                           &report));
-            RrSurfaceSetArea(sur,
-                             report.xconfigure.x,
-                             report.xconfigure.y,
+            RrSurfaceSetSize(sur,
                              report.xconfigure.width,
                              report.xconfigure.height);
             break;

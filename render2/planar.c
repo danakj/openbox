@@ -6,18 +6,25 @@
 #include "debug.h"
 #include "font.h"
 #include <string.h>
+#include <assert.h>
 #include <GL/glx.h>
 
 void RrPlanarSet(struct RrSurface *sur,
                  enum RrSurfaceColorType type,
                  enum RrBevelType bevel,
                  struct RrColor *primary,
-                 struct RrColor *secondary)
+                 struct RrColor *secondary,
+                 int borderwidth,
+                 struct RrColor *border)
 {
     sur->data.planar.colortype = type;
     sur->data.planar.bevel = bevel;
     sur->data.planar.primary = *primary;
     sur->data.planar.secondary = *secondary;
+    assert(borderwidth >= 0);
+    sur->data.planar.borderwidth = borderwidth >= 0 ? borderwidth : 0;
+    if (borderwidth)
+        sur->data.planar.border = *border;
 }
 
 static void copy_parent(struct RrSurface *sur)

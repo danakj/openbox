@@ -184,7 +184,9 @@ void RrPlanarSet(struct RrSurface *sur,
                  enum RrSurfaceColorType type,
                  enum RrBevelType bevel,
                  struct RrColor *primary,
-                 struct RrColor *secondary);
+                 struct RrColor *secondary,
+                 int borderwidth,
+                 struct RrColor *border);
 
 /* textures */
 

@@ -67,7 +67,8 @@ int main()
     RrSurfaceSetArea(sur, X, Y, W, H);
     RrColorSet(&pri, 0, 0, 0, 0);
     RrColorSet(&sec, 1, 1, 1, 0);
-    RrPlanarSet(sur, RR_PLANAR_PIPECROSS, RR_RAISED_INNER, &pri, &sec);
+    RrPlanarSet(sur, RR_PLANAR_PIPECROSS, RR_RAISED_INNER, &pri, &sec,
+                0, NULL);
 
     quit = 0;
     while (!quit) {

@@ -9,6 +9,9 @@ struct RrPlanarSurface {
 
     struct RrColor primary;
     struct RrColor secondary;
+
+    int borderwidth;
+    struct RrColor border;
 };
 
 #define RrPlanarColorType(sur) ((sur)->data.planar.colortype)

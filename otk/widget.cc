@@ -248,13 +248,12 @@ void OtkWidget::render(void)
 {
   if (!_texture) return;
 
-  printf("rendering %lx\n", _texture);
-
   _bg_pixmap = _texture->render(_rect.width(), _rect.height(), _bg_pixmap);
 
-  if (_bg_pixmap)
+  if (_bg_pixmap) {
     XSetWindowBackgroundPixmap(otk::OBDisplay::display, _window, _bg_pixmap);
-  else {
+    _bg_pixel = None;
+  } else {
     unsigned int pix = _texture->color().pixel();
     if (pix != _bg_pixel) {
       _bg_pixel = pix;
@@ -388,7 +387,6 @@ void OtkWidget::adjustVert(void)
 void OtkWidget::update(void)
 {
   if (_dirty) {
-    printf("widget dirty, redrawing\n");
     adjust();
     render();
     XClearWindow(OBDisplay::display, _window);

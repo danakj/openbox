@@ -151,6 +151,7 @@ void dock_configure()
     int spot;
     int gravity;
     int minw, minh;
+    int strw, strh;
     Rect *a;
 
     RrMinsize(dock->a_frame, &minw, &minh);
@@ -310,6 +311,13 @@ void dock_configure()
         }    
     }
 
+    if (config_dock_pos != DockPos_Floating && config_dock_hide) {
+        strw = strh = ob_rr_theme->bwidth;
+    } else {
+        strw = dock->w;
+        strh =  dock->h;
+    }
+
     /* set the strut */
     switch (config_dock_pos) {
     case DockPos_Floating:
@@ -317,39 +325,39 @@ void dock_configure()
         break;
     case DockPos_TopLeft:
         if (config_dock_horz)
-            STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+            STRUT_SET(dock_strut, 0, strh, 0, 0);
         else
-            STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+            STRUT_SET(dock_strut, strw, 0, 0, 0);
         break;
     case DockPos_Top:
-        STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+        STRUT_SET(dock_strut, 0, strh, 0, 0);
         break;
     case DockPos_TopRight:
         if (config_dock_horz)
-            STRUT_SET(dock_strut, 0, dock->h, 0, 0);
+            STRUT_SET(dock_strut, 0, strh, 0, 0);
         else
-            STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+            STRUT_SET(dock_strut, 0, 0, strw, 0);
         break;
     case DockPos_Left:
-        STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+        STRUT_SET(dock_strut, strw, 0, 0, 0);
         break;
     case DockPos_Right:
-        STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+        STRUT_SET(dock_strut, 0, 0, strw, 0);
         break;
     case DockPos_BottomLeft:
         if (config_dock_horz)
-            STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+            STRUT_SET(dock_strut, 0, 0, 0, strh);
         else
-            STRUT_SET(dock_strut, dock->w, 0, 0, 0);
+            STRUT_SET(dock_strut, strw, 0, 0, 0);
         break;
     case DockPos_Bottom:
-        STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+        STRUT_SET(dock_strut, 0, 0, 0, strh);
         break;
     case DockPos_BottomRight:
         if (config_dock_horz)
-            STRUT_SET(dock_strut, 0, 0, 0, dock->h);
+            STRUT_SET(dock_strut, 0, 0, 0, strh);
         else
-            STRUT_SET(dock_strut, 0, 0, dock->w, 0);
+            STRUT_SET(dock_strut, 0, 0, strw, 0);
         break;
     }
 

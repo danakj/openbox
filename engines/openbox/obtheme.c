@@ -363,19 +363,19 @@ gboolean obtheme_load()
         }
     } else {
         {
-            char data[] = { 0x3f, 0x3f, 0x21, 0x21, 0x21, 0x3f };
-            ob_s_max_unset_mask = pixmap_mask_new(6, 6, data);
+            char data[] = { 0x7f, 0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f };
+            ob_s_max_unset_mask = pixmap_mask_new(7, 7, data);
         }
         {
-            char data[] = { 0x3c, 0x24, 0x27, 0x3f, 0x0f, 0x0f };
-            ob_s_max_set_mask = pixmap_mask_new(6, 6, data);
+            char data[] = { 0x7c, 0x44, 0x47, 0x47, 0x7f, 0x1f, 0x1f };
+            ob_s_max_set_mask = pixmap_mask_new(7, 7, data);
         }
     }
 
     if (!read_mask(db, "window.button.icon.mask",
                    &ob_s_iconify_mask)) {
-        char data[] = { 0x00, 0x00, 0x00, 0x3f, 0x3f, 0x3f };
-        ob_s_iconify_mask = pixmap_mask_new(6, 6, data);
+        char data[] = { 0x00, 0x00, 0x00, 0x00, 0x7f, 0x7f, 0x7f };
+        ob_s_iconify_mask = pixmap_mask_new(7, 7, data);
     }
 
     if (read_mask(db, "window.button.stick.mask",
@@ -387,19 +387,19 @@ gboolean obtheme_load()
         }
     } else {
         {
-            char data[] = { 0x33, 0x33, 0x00, 0x00, 0x33, 0x33 };
-            ob_s_desk_unset_mask = pixmap_mask_new(6, 6, data);
+            char data[] = { 0x63, 0x63, 0x00, 0x00, 0x00, 0x63, 0x63 };
+            ob_s_desk_unset_mask = pixmap_mask_new(7, 7, data);
         }
         {
-            char data[] = { 0x0c, 0x0c, 0x3f, 0x3f, 0x0c, 0x0c };
-            ob_s_desk_set_mask = pixmap_mask_new(6, 6, data);
+            char data[] = { 0x00, 0x36, 0x36, 0x08, 0x36, 0x36, 0x00 };
+            ob_s_desk_set_mask = pixmap_mask_new(7, 7, data);
         }
     }
 
     if (!read_mask(db, "window.button.close.mask",
                    &ob_s_close_mask)) {
-        char data[] = { 0x33, 0x3f, 0x1e, 0x1e, 0x3f, 0x33 };
-        ob_s_close_mask = pixmap_mask_new(6, 6, data);
+        char data[] = { 0x63, 0x77, 0x3e, 0x1c, 0x3e, 0x77, 0x63 };
+        ob_s_close_mask = pixmap_mask_new(7, 7, data);
     }        
 
     if (!read_appearance(db, "window.title.focus", ob_a_focused_title))

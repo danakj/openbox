@@ -14,4 +14,6 @@ void gradient_rectangle(Surface *sf, int w, int h);
 void gradient_solid(Appearance *l, int x, int y, int w, int h);
 void highlight(pixel32 *x, pixel32 *y, gboolean raised);
 
+void render_gl_gradient(Surface *sf, int x, int y, int w, int h);
+
 #endif /* __gradient_h */

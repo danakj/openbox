@@ -1,5 +1,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+
+#ifdef USE_GL
+# include <GL/glx.h>
+#endif
+
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
@@ -19,17 +24,112 @@ XVisualInfo render_visual_info;
 
 Visual *render_visual;
 Colormap render_colormap;
+
 int render_red_offset = 0, render_green_offset = 0, render_blue_offset = 0;
 int render_red_shift, render_green_shift, render_blue_shift;
 int render_red_mask, render_green_mask, render_blue_mask;
 
+
+#ifdef USE_GL
+
+GLXContext render_glx_context;
+
+int render_glx_rating(XVisualInfo *v)
+{
+    int er;
+    int rating = 0;
+    int val;
+    printf("evaluating visual %d\n", v->visualid);
+    glXGetConfig(ob_display, v, GLX_BUFFER_SIZE, &val);
+    printf("buffer size %d\n", val);
+
+    switch (val) {
+    case 32:
+        rating += 300;
+    break;
+    case 24:
+        rating += 200;
+    break;
+    case 16:
+        rating += 100;
+    break;
+    }
+
+    glXGetConfig(ob_display, v, GLX_LEVEL, &val);
+    printf("level %d\n", val);
+    if (val != 0)
+        rating = -10000;
+
+    glXGetConfig(ob_display, v, GLX_DEPTH_SIZE, &val);
+    printf("depth size %d\n", val);
+    switch (val) {
+    case 32:
+        rating += 30;
+    break;
+    case 24:
+        rating += 20;
+    break;
+    case 16:
+        rating += 10;
+    break;
+    case 0:
+        rating -= 10000;
+    }
+
+    glXGetConfig(ob_display, v, GLX_DOUBLEBUFFER, &val);
+    printf("double buffer %d\n", val);
+    if (val)
+        rating++;
+    return rating;
+}
+#endif /* USE_GL */
+
 void render_startup(void)
 {
+    int count, i = 0, val, best = 0, rate = 0, temp;
+    XVisualInfo vimatch, *vilist;
     paint = x_paint;
 
     render_depth = DefaultDepth(ob_display, ob_screen);
     render_visual = DefaultVisual(ob_display, ob_screen);
     render_colormap = DefaultColormap(ob_display, ob_screen);
+
+#ifdef USE_GL
+    vimatch.screen = ob_screen;
+    vimatch.class = TrueColor;
+    vilist = XGetVisualInfo(ob_display, VisualScreenMask | VisualClassMask,
+                            &vimatch, &count);
+
+    if (vilist) {
+        printf("looking for a GL visualin %d visuals\n", count);
+        for (i = 0; i < count; i++) {
+            glXGetConfig(ob_display, &vilist[i], GLX_USE_GL, &val);
+            if (val) {
+                temp = render_glx_rating(&vilist[i]);
+                if (temp > rate) {
+                    best = i;
+                    rate = temp;
+                }
+            }
+        }
+    }
+    if (rate > 0) {
+        printf("picked visual %d with rating %d\n", best, rate);
+        render_depth = vilist[best].depth;
+        render_visual = vilist[best].visual;
+        render_colormap = XCreateColormap(ob_display, ob_root, 
+                                          render_visual, AllocNone);
+        render_visual_info = vilist[best];
+        render_glx_context = glXCreateContext(ob_display, &render_visual_info,
+                                              NULL, True);
+        if (render_glx_context == NULL)
+            printf("sadness\n");
+        else {
+            paint = gl_paint;
+        }
+    }
+#endif /*USE_GL*/
+
 
   switch (render_visual->class) {
   case TrueColor:
@@ -270,13 +370,6 @@ void x_paint(Window win, Appearance *l)
     if (oldp != None) XFreePixmap(ob_display, oldp);
 }
 
-/*
-void gl_paint(Window win, Appearance *l)
-{
-    glXMakeCurrent(ob_display, win, gl_context);
-}
-*/
-
 void render_shutdown(void)
 {
 }
@@ -501,3 +594,54 @@ gboolean render_pixmap_to_rgba(Pixmap pmap, Pixmap mask,
 
     return TRUE;
 }
+
+#ifdef USE_GL
+void gl_paint(Window win, Appearance *l)
+{
+    int err;
+    Window root, child;
+    int i, transferred = 0, sw, b, d;
+    pixel32 *source, *dest;
+    Pixmap oldp;
+    int tempx, tempy, absx, absy, absw, absh;
+    int x = l->area.x;
+    int y = l->area.y;
+    int w = l->area.width;
+    int h = l->area.height;
+    Rect tarea; /* area in which to draw textures */
+    if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
+
+    g_assert(l->surface.type == Surface_Planar);
+
+printf("making %p, %p, %p current\n", ob_display, win, render_glx_context);
+    err = glXMakeCurrent(ob_display, win, render_glx_context);
+g_assert(err != 0);
+
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glOrtho(0, 1376, 1032, 0, 0, 10);
+    if (XGetGeometry(ob_display, win, &root, &tempx, &tempy,
+                     &absw, &absh,  &b, &d) &&
+        XTranslateCoordinates(ob_display, win, root, tempx, tempy, 
+        &absx, &absy, &child))
+        printf("window at %d, %d (%d,%d)\n", absx, absy, absw, absh);
+    else
+        return;
+
+    glViewport(0, 0, 1376, 1032);
+    glMatrixMode(GL_MODELVIEW);
+    glTranslatef(-absx, 1032-absh-absy, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    if (l->surface.data.planar.grad == Background_ParentRelative) {
+        printf("crap\n");
+    } else
+        render_gl_gradient(&l->surface, absx+x, absy+y, absw, absh);
+
+    glXSwapBuffers(ob_display, win);
+}
+
+#endif /* USE_GL */

@@ -1,3 +1,4 @@
+#include <GL/gl.h>
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
@@ -523,4 +524,79 @@ void gradient_pipecross(Surface *sf, int inw, int inh)
         end-=inw;
     }
 }
+#ifdef USE_GL
+void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
+{
+    float pr,pg,pb;
+    float sr, sg, sb;
 
+    pr = (float)sf->data.planar.primary->r/255.0;
+    pg = (float)sf->data.planar.primary->g/255.0;
+    pb = (float)sf->data.planar.primary->b/255.0;
+    if (sf->data.planar.secondary) {
+        sr = (float)sf->data.planar.secondary->r/255.0;
+        sg = (float)sf->data.planar.secondary->g/255.0;
+        sb = (float)sf->data.planar.secondary->b/255.0;
+    }
+    switch (sf->data.planar.grad) {
+    case Background_Solid: /* already handled */
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glVertex3i(x+w, y, 0);
+        glVertex3i(x+w, y+h, 0);
+
+        glVertex3i(x+w, y+h, 0);
+        glVertex3i(x, y+h, 0);
+        glVertex3i(x, y, 0);
+        glEnd();
+        return;
+    case Background_Vertical:
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w, y, 0);
+        glVertex3i(x+w, y+h, 0);
+
+        glVertex3i(x+w, y+h, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y+h, 0);
+        glVertex3i(x, y, 0);
+        glEnd();
+        break;
+    case Background_Horizontal:
+        glBegin(GL_TRIANGLES);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glVertex3i(x+w, y, 0);
+        glColor3f(sr, sg, sb);
+        glVertex3i(x+w, y+h, 0);
+
+        glVertex3i(x+w, y+h, 0);
+        glVertex3i(x, y+h, 0);
+        glColor3f(pr, pg, pb);
+        glVertex3i(x, y, 0);
+        glEnd();
+        break;
+    case Background_Diagonal:
+printf("diagonal\n");
+        break;
+    case Background_CrossDiagonal:
+printf("crossdiagonal\n");
+        break;
+    case Background_Pyramid:
+printf("pyramid\n");
+        break;
+    case Background_PipeCross:
+printf("pipecross\n");
+        break;
+    case Background_Rectangle:
+printf("rect\n");
+        break;
+    default:
+        g_message("unhandled gradient");
+        return;
+    }
+}
+#endif /* USE_GL */

@@ -151,6 +151,7 @@ void (*paint)(Window win, Appearance *l);
 void render_startup(void);
 void init_appearance(Appearance *l);
 void x_paint(Window win, Appearance *l);
+void gl_paint(Window win, Appearance *l);
 void render_shutdown(void);
 Appearance *appearance_new(SurfaceType type, int numtex);
 Appearance *appearance_copy(Appearance *a);

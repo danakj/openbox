@@ -320,7 +320,15 @@ void screen::handleKeypress(const XEvent &e) {
     case Action::sendToWorkspace:
       window->sendTo(it->number());
       return;
+      
+    case Action::sendToNextWorkspace:
+      sendToNextWorkspace(*window, true, (it->number() != 0));
+      return;
 
+    case Action::sendToPrevWorkspace:
+      sendToNextWorkspace(*window, false, (it->number() != 0));
+      return;
+      
     case Action::toggleOmnipresent:
       if (window->desktop() == 0xffffffff)
         window->sendTo(_active_desktop);
@@ -694,7 +702,6 @@ void screen::cycleWorkspace(const bool forward, const int increment,
     changeWorkspace(destination);
 }
 
-
 void screen::changeWorkspace(const int num) const {
   assert(_managed);
 
@@ -765,6 +772,21 @@ void screen::changeWorkspaceHorz(const int num) const {
   }
   changeWorkspace(wnum);
 }
+
+ void screen::sendToNextWorkspace(const XWindow &window, bool forward,
+                                  bool follow) const {
+   assert(_managed);
+   int dest = (signed) _active_desktop + (forward ? 1 : -1 );
+   
+   if (dest >= (signed)_num_desktops)
+       dest = 0;
+   else if ( dest < 0)
+       dest = _num_desktops - 1;
+         
+   window.sendTo(dest);
+   if (follow)
+     changeWorkspace(dest);
+ }
 
 void screen::grabKey(const KeyCode keyCode, const int modifierMask) const {
 

@@ -102,6 +102,8 @@ void parser::setAction(string act)
     { "togglemaximizevertical", Action::toggleMaximizeVertical },
     { "togglemaximizehorizontal", Action::toggleMaximizeHorizontal },
     { "sendtoworkspace", Action::sendToWorkspace },
+    { "sendtonextworkspace", Action::sendToNextWorkspace },
+    { "sendtoprevworkspace", Action::sendToPrevWorkspace },
     { "nextwindow", Action::nextWindow },
     { "prevwindow", Action::prevWindow },
     { "nextwindowonallworkspaces", Action::nextWindowOnAllWorkspaces },

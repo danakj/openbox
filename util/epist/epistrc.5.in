@@ -120,6 +120,10 @@ Maximizes and Unmaxizes the currently focused window horizontally.
 Sends the currently focused window to another workspace. This takes a single
 numberical parameter, which is the workspace to send the window to. Workspace
 numbers begin at 1.
+.SS sendToNextWorkspace
+.SS sendToPrevWorkspace
+Sends the currently focused window to the next/previous workspace. Takes 
+boolean parameter that when true switches to that workspace as well.
 .SS nextWindow
 .SS prevWindow
 Cycles focus to the next/previous window on the workspace. This can take a

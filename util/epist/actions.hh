@@ -53,6 +53,8 @@ public:
     toggleMaximizeHorizontal, //done
 
     sendToWorkspace, //done
+    sendToNextWorkspace,
+    sendToPrevWorkspace,
 
     nextWindow, //done for now
     prevWindow, //done for now

@@ -97,6 +97,8 @@ public:
   void changeWorkspaceVert(const int num) const;
   void changeWorkspaceHorz(const int num) const;
 
+  void sendToNextWorkspace(const XWindow& win, bool forward, 
+                           bool follow) const;
   void toggleShaded(const Window win) const;
   void execCommand(const std::string &cmd) const;
 

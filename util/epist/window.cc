@@ -279,7 +279,6 @@ void XWindow::sendTo(unsigned int dest) const {
                             _window, dest);
 }
 
-
 void XWindow::move(int x, int y) const {
   // get the window's decoration sizes (margins)
   Strut margins;

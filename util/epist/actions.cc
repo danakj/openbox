@@ -37,9 +37,29 @@ Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
     noaction
   };
 
+  ActionType bool_types[] = {
+    sendToNextWorkspace,
+    sendToPrevWorkspace,
+    noaction
+  };
+
   for (int i = 0; str_types[i] != noaction; ++i) {
     if (type == str_types[i]) {
       _stringParam = str;
+      return;
+    }
+  }
+
+  for (int i = 0; bool_types[i] != noaction; ++i) {
+    if (type == bool_types[i]) {
+      const char *tmp = str.c_str();
+
+      
+      if (strcasecmp(tmp, "true") == 0 || strcasecmp(tmp, "1") == 0 ||
+          strcasecmp(tmp, "on") == 0)
+        _numberParam = 1;
+      else
+        _numberParam = 0;
       return;
     }
   }

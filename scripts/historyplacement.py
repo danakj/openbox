@@ -15,6 +15,12 @@ fallback = windowplacement.random                                          ###
 ###                            attempt to place windows even when they     ###
 ###                            request a position (like XMMS).             ###
 ignore_requested_positions = 0                                             ###
+# confirm_callback - set this to a function to have the function called    ###
+###                  before attempting to place a window via history. If   ###
+###                  the function returns 'true' then an attempt will be   ###
+###                  made to place the window. If it returns 'false', the  ###
+###                  fallback method will be directly applied instead.     ###
+confirm_callback = 0                                                       ###
 ###                                                                        ###
 # filename - The name of the file where history data will be stored. The   ###
 ###          number of the screen is appended onto this filename.          ###
@@ -104,17 +110,23 @@ def place(data):
         if not ignore_requested_positions:
             if data.client.positionRequested(): return
         state = _create_state(data)
-        print "looking for : " + state.appname +  " : " + state.appclass + \
-              " : " + state.role
+        try:
+            if not confirm_callback or confirm_callback(data):
+                print "looking for : " + state.appname +  " : " + \
+                      state.appclass + " : " + state.role
 
-        i = _find(data.screen, state)
-        if i >= 0:
-            coords = _data[data.screen][i]
-            print "Found in history ("+str(coords.x)+","+str(coords.y)+")"
-            data.client.move(coords.x, coords.y)
-        else:
-            print "No match in history"
-            if fallback: fallback(data)
+                i = _find(data.screen, state)
+                if i >= 0:
+                    coords = _data[data.screen][i]
+                    print "Found in history ("+str(coords.x)+","+\
+                          str(coords.y)+")"
+                    data.client.move(coords.x, coords.y)
+                    return
+                else:
+                    print "No match in history"
+        except TypeError:
+            pass
+    if fallback: fallback(data)
 
 def _save_window(data):
     global _data

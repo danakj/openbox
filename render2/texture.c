@@ -22,6 +22,16 @@ void RrTextureFreeContents(struct RrTexture *tex)
     tex->type = RR_TEXTURE_NONE;
 }
 
+static RrData32 frob(RrData32 in)
+{
+    unsigned char r,g,b,a;
+    b = 0xFF & (in >> 0); 
+    g = 0xFF & (in >> 8);
+    r = 0xFF & (in >> 16);
+    a = 0xFF & (in >> 24);
+    return (a << 24) | (b << 16) | (g << 8) | r;
+}
+
 void RrTextureSetRGBA(struct RrSurface *sur,
                       int texnum,
                       RrData32 *data,
@@ -30,8 +40,8 @@ void RrTextureSetRGBA(struct RrSurface *sur,
                       int w,
                       int h)
 {
-    int i;
-    unsigned char *padbuf;
+    int px, py;
+    RrData32 *padbuf;
     unsigned int num;
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
     if (!tex) return;
@@ -55,16 +65,14 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     memset(padbuf, 0xFF, sizeof(RrData32) * tex->data.rgba.padh * 
            tex->data.rgba.padw);
 
-    for (i = 0; i < h; i++)
-        memcpy(padbuf + i*tex->data.rgba.padw * sizeof(RrData32),
-               data + i*w,
-               w * sizeof(RrData32));
+    for (py = 0; py < h; py++)
+        for (px = 0; px < w; px++)
+            *(padbuf + py*tex->data.rgba.padw + px) = frob(*(data + py*w + px));
 
     glGenTextures(1, &num);
     tex->data.rgba.texid = num;
     glBindTexture(GL_TEXTURE_2D, num);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_PACK_SWAP_BYTES, 1);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -72,7 +80,7 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                  tex->data.rgba.padw, tex->data.rgba.padh,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, padbuf);
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char *)padbuf);
     free(padbuf);
 }
 

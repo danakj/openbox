@@ -53,8 +53,12 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
               "Focus New Windows"), 4);
   insert(i18n(ConfigmenuSet, ConfigmenuFocusLast,
               "Focus Last Window on Workspace"), 5);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowToWindowSnap,
+              "Window-To-Window Snapping"), 6);
+  insert(i18n(ConfigmenuSet, ConfigmenuWindowCornerSnap,
+              "Window Corner Snapping"), 7);
   insert(i18n(ConfigmenuSet, ConfigmenuHideToolbar,
-              "Hide Toolbar"), 6);
+              "Hide Toolbar"), 8);
   update();
   setValues();
 }
@@ -66,7 +70,12 @@ void Configmenu::setValues(void) {
   setItemSelected(4, getScreen()->doFullMax());
   setItemSelected(5, getScreen()->doFocusNew());
   setItemSelected(6, getScreen()->doFocusLast());
-  setItemSelected(7, getScreen()->doHideToolbar());
+  setItemSelected(7, getScreen()->getBlackbox()->getWindowToWindowSnap());
+
+  setItemSelected(8, getScreen()->getBlackbox()->getWindowCornerSnap());
+  setItemEnabled(8, getScreen()->getBlackbox()->getWindowToWindowSnap());
+  
+  setItemSelected(9, getScreen()->doHideToolbar());
 }
 
 
@@ -92,30 +101,47 @@ void Configmenu::itemSelected(int button, unsigned int index) {
   }
 
   case 2: { // opaque move
-    getScreen()->saveOpaqueMove((! getScreen()->doOpaqueMove()));
+    getScreen()->saveOpaqueMove(! getScreen()->doOpaqueMove());
     setItemSelected(index, getScreen()->doOpaqueMove());
     break;
   }
 
   case 3: { // full maximization
-    getScreen()->saveFullMax((! getScreen()->doFullMax()));
+    getScreen()->saveFullMax(! getScreen()->doFullMax());
     setItemSelected(index, getScreen()->doFullMax());
     break;
   }
   case 4: { // focus new windows
-    getScreen()->saveFocusNew((! getScreen()->doFocusNew()));
+    getScreen()->saveFocusNew(! getScreen()->doFocusNew());
     setItemSelected(index, getScreen()->doFocusNew());
     break;
   }
 
   case 5: { // focus last window on workspace
-    getScreen()->saveFocusLast((! getScreen()->doFocusLast()));
+    getScreen()->saveFocusLast(! getScreen()->doFocusLast());
     setItemSelected(index, getScreen()->doFocusLast());
     break;
   }
 
-  case 6: { // hide toolbar
-    getScreen()->saveHideToolbar((! getScreen()->doHideToolbar()));
+  case 6: { // window-to-window snapping
+    getScreen()->getBlackbox()->
+      saveWindowToWindowSnap(! getScreen()->getBlackbox()->
+                             getWindowToWindowSnap());
+    setItemSelected(index, getScreen()->getBlackbox()->getWindowToWindowSnap());
+    setItemEnabled(index + 1,
+                   getScreen()->getBlackbox()->getWindowToWindowSnap());
+    break;
+  }
+
+  case 7: { // window corner snapping
+    getScreen()->getBlackbox()->
+      saveWindowCornerSnap(! getScreen()->getBlackbox()->getWindowCornerSnap());
+    setItemSelected(index, getScreen()->getBlackbox()->getWindowCornerSnap());
+    break;
+  }
+
+  case 8: { // hide toolbar
+    getScreen()->saveHideToolbar(! getScreen()->doHideToolbar());
     setItemSelected(index, getScreen()->doHideToolbar());
     break;
   }

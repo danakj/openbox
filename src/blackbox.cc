@@ -896,6 +896,18 @@ void Blackbox::shutdown(void) {
 }
 
 
+void Blackbox::saveWindowToWindowSnap(bool s) {
+  resource.window_to_window_snap = s;
+  config.setValue("session.windowToWindowSnap", resource.window_to_window_snap);
+}
+
+
+void Blackbox::saveWindowCornerSnap(bool s) {
+  resource.window_corner_snap = s;
+  config.setValue("session.windowCornerSnap", resource.window_corner_snap);
+}
+
+
 /*
  * Save all values as they are so that the defaults will be written to the rc
  * file
@@ -913,6 +925,8 @@ void Blackbox::save_rc(void) {
   config.setValue("session.cacheMax", resource.cache_max);
   config.setValue("session.styleFile", resource.style_file);
   config.setValue("session.titlebarLayout", resource.titlebar_layout);
+  saveWindowToWindowSnap(resource.window_to_window_snap);
+  saveWindowCornerSnap(resource.window_corner_snap);
   
   std::for_each(screenList.begin(), screenList.end(),
                 std::mem_fun(&BScreen::save_rc));
@@ -960,6 +974,14 @@ void Blackbox::load_rc(void) {
   
   if (! config.getValue("session.titlebarLayout", resource.titlebar_layout))
     resource.titlebar_layout = "ILMC";
+
+  if (! config.getValue("session.windowToWindowSnap",
+                        resource.window_to_window_snap))
+    resource.window_to_window_snap = true;
+
+  if (! config.getValue("session.windowCornerSnap",
+                        resource.window_corner_snap))
+    resource.window_corner_snap = true;
 }
 
 

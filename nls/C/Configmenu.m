@@ -16,6 +16,10 @@ $ #FocusNew
 # Focus New Windows
 $ #FocusLast
 # Focus Window on Workspace Change
+$ #WindowToWindowSnap
+# Window-To-Window Snapping
+$ #WindowCornerSnap
+# Window Corner Snapping
 $ #HideToolbar
 # Hide Toolbar
 $ #ClickToFocus

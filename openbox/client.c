@@ -1048,6 +1048,7 @@ void client_update_wmhints(Client *self)
                         self->transients = g_slist_remove(self->transients,
                                                           it->data);
                     }
+                self->group = NULL;
             }
             if (hints->window_group != None)
                 self->group = group_add(hints->window_group, self);

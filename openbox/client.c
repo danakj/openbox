@@ -1786,8 +1786,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         h /= self->size_inc.height;
 
         /* you cannot resize to nothing */
-        if (w < 1) w = 1;
-        if (h < 1) h = 1;
+        if (basew + w < 1) w = 1 - basew;
+        if (baseh + h < 1) h = 1 - baseh;
   
         /* store the logical size */
         SIZE_SET(self->logical_size, w, h);
@@ -1849,7 +1849,7 @@ void client_configure_full(ObClient *self, ObCorner anchor,
         if (moved || resized)
             frame_adjust_area(self->frame, moved, resized);
 
-        if (force_reply || (!resized && ((!user && moved) || (user && final))))
+        if (!resized && (force_reply || ((!user && moved) || (user && final))))
         {
             XEvent event;
             event.type = ConfigureNotify;
@@ -1862,7 +1862,11 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                 self->border_width;
             event.xconfigure.y = self->frame->area.y + self->frame->size.top -
                 self->border_width;
-    
+            g_message("x %d cx %d y %d cy %d",
+                      self->area.x, 
+                      event.xconfigure.x,
+                      self->area.y,
+                      event.xconfigure.y);
             event.xconfigure.width = w;
             event.xconfigure.height = h;
             event.xconfigure.border_width = 0;

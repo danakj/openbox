@@ -1,4 +1,7 @@
-CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@
+buttonsdir = $(pkgdatadir)/buttons
+
+CXXFLAGS=$(XFT_CFLAGS) $(PYTHON_CFLAGS) @CXXFLAGS@ \
+-DBUTTONSDIR=\"$(buttonsdir)\"
 
 INCLUDES= -I../src
 

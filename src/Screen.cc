@@ -596,6 +596,32 @@ void BScreen::saveRootScrollDirection(int d) {
 }
 
 
+void BScreen::saveRootMenuButton(unsigned int b) {
+  resource.root_menu_button = b;
+  const char *but;
+  switch (resource.root_menu_button) {
+  case 0: but = "None"; break;
+  case 1: but = "Left"; break;
+  case 2: but = "Middle"; break;
+  case 3: default: but = "Right"; break;
+  }
+  config->setValue(screenstr + "rootMenuButton", but);
+}
+
+
+void BScreen::saveWorkspaceMenuButton(unsigned int b) {
+  resource.workspace_menu_button = b;
+  const char *but;
+  switch (resource.workspace_menu_button) {
+  case 0: but = "None"; break;
+  case 1: but = "Left"; break;
+  case 2: default: but = "Middle"; break;
+  case 3: but = "Right"; break;
+  }
+  config->setValue(screenstr + "workspaceMenuButton", but);
+}
+
+
 void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
@@ -629,6 +655,8 @@ void BScreen::save_rc(void) {
   saveAllowScrollLock(resource.allow_scroll_lock);
   saveWorkspaceWarping(resource.workspace_warping);
   saveRootScrollDirection(resource.root_scroll);
+  saveRootMenuButton(resource.root_menu_button);
+  saveWorkspaceMenuButton(resource.workspace_menu_button);
 
   toolbar->save_rc();
   slit->save_rc();
@@ -804,6 +832,29 @@ void BScreen::load_rc(void) {
     else if (s == "Reverse")
       resource.root_scroll = ReverseScroll;
   }
+
+  resource.root_menu_button = 3;
+  if (config->getValue(screenstr + "rootMenuButton", s)) {
+    if (s == "None")
+      resource.root_menu_button = 0;
+    else if (s == "Left")
+      resource.root_menu_button = 1;
+    else if (s == "Middle")
+      resource.root_menu_button = 2;
+  }
+
+  resource.workspace_menu_button = 2;
+  if (config->getValue(screenstr + "workspaceMenuButton", s)) {
+    if (s == "None")
+      resource.workspace_menu_button = 0;
+    else if (s == "Left")
+      resource.workspace_menu_button = 1;
+    else if (s == "Right")
+      resource.workspace_menu_button = 3;
+  }
+  // cant both be the same
+  if (resource.workspace_menu_button == resource.root_menu_button)
+    resource.workspace_menu_button = 0;
 }
 
 
@@ -2413,10 +2464,6 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
 
     if (rootmenu->isVisible())
       rootmenu->hide();
-  } else if (xbutton->button == 2) {
-    showWorkspaceMenu(xbutton->x_root, xbutton->y_root);
-  } else if (xbutton->button == 3) {
-    showRootMenu(xbutton->x_root, xbutton->y_root);
   // mouse wheel up
   } else if ((xbutton->button == 4 && resource.root_scroll == NormalScroll) ||
              (xbutton->button == 5 && resource.root_scroll == ReverseScroll)) {
@@ -2432,6 +2479,13 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
     else
       changeWorkspaceID(getCurrentWorkspaceID() - 1);
   }
+
+  if (resource.root_menu_button > 0 &&
+      xbutton->button == resource.root_menu_button)
+    showRootMenu(xbutton->x_root, xbutton->y_root);
+  else if (resource.workspace_menu_button > 0 &&
+           xbutton->button == resource.workspace_menu_button)
+    showWorkspaceMenu(xbutton->x_root, xbutton->y_root);
 }
 
 

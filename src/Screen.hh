@@ -163,6 +163,8 @@ private:
     unsigned int handle_width, bevel_width, frame_width, border_width,
       resize_zones;
 
+    unsigned int root_menu_button, workspace_menu_button;
+
 #ifdef    HAVE_STRFTIME
     std::string strftime_format;
 #else // !HAVE_STRFTIME
@@ -231,6 +233,10 @@ public:
   inline bool doWorkspaceWarping(void) const
     { return resource.workspace_warping; }
   inline int rootScrollDirection(void) const { return resource.root_scroll; }
+  inline unsigned int rootMenuButton(void) const
+    { return resource.root_menu_button; }
+  inline unsigned int workspaceMenuButton(void) const
+    { return resource.workspace_menu_button; }
 
   inline const GC &getOpGC(void) const { return opGC; }
 
@@ -313,6 +319,8 @@ public:
   void saveAllowScrollLock(bool a);
   void saveWorkspaceWarping(bool w);
   void saveRootScrollDirection(int d);
+  void saveRootMenuButton(unsigned int b);
+  void saveWorkspaceMenuButton(unsigned int b);
   inline void iconUpdate(void) { iconmenu->update(); }
 
 #ifdef    HAVE_STRFTIME

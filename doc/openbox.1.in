@@ -243,6 +243,10 @@ required [begin] tag.
 Inserts a command item into the menu.
 When you select the menu item from the menu, Openbox runs `shell command.'
 .TP
+.B [pipe] (label for submenu) {shell command}
+Executes a command, parses the output as a menu, and includes it as a sub
+menu.
+.TP
 .B [exit] (label for exit)
 Inserts an item that shuts down and exits Openbox.
 Any running programs are not closed.

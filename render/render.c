@@ -5,11 +5,14 @@
 #include "gradient.h"
 #include "font.h"
 #include "mask.h"
+#include "color.h"
 #include "../kernel/openbox.h"
 
 int render_depth;
 Visual *render_visual;
 Colormap render_colormap;
+int render_red_offset = 0, render_green_offset = 0, render_blue_offset = 0;
+int render_red_shift, render_green_shift, render_blue_shift;
 
 void render_startup(void)
 {
@@ -52,18 +55,46 @@ void render_startup(void)
       }
       XFree(vinfo_return);
     }  
+  truecolor_startup();
+}
+
+void truecolor_startup(void)
+{
+  unsigned long red_mask, green_mask, blue_mask;
+  XImage *timage = NULL;
+
+  timage = XCreateImage(ob_display, render_visual, render_depth,
+                        ZPixmap, 0, NULL, 1, 1, 32, 0);
+  g_assert(timage != NULL);
+  // find the offsets for each color in the visual's masks
+  red_mask = timage->red_mask;
+  green_mask = timage->green_mask;
+  blue_mask = timage->blue_mask;
+
+  render_red_offset = 0;
+  render_green_offset = 0;
+  render_blue_offset = 0;
+
+  while (! (red_mask & 1))   { render_red_offset++;   red_mask   >>= 1; }
+  while (! (green_mask & 1)) { render_green_offset++; green_mask >>= 1; }
+  while (! (blue_mask & 1))  { render_blue_offset++;  blue_mask  >>= 1; }
+
+  render_red_shift = render_green_shift = render_blue_shift = 8;
+  while (red_mask)   { red_mask   >>= 1; render_red_shift--;   }
+  while (green_mask) { green_mask >>= 1; render_green_shift--; }
+  while (blue_mask)  { blue_mask  >>= 1; render_blue_shift--;  }
+  XFree(timage);
 }
 
 void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
 {
     int i;
-    XImage *im;
+    XImage *im = NULL;
     Pixmap oldp;
 
     if (w <= 0 || h <= 0) return;
 
     g_assert(l->surface.type == Surface_Planar);
-//    printf("painting window %ld\n", win);
 
     oldp = l->pixmap; /* save to free after changing the visible pixmap */
     l->pixmap = XCreatePixmap(ob_display, ob_root, x+w, y+h, render_depth);
@@ -83,16 +114,16 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
         gradient_solid(l, x, y, w, h);
     else gradient_render(&l->surface, w, h);
 
-/*reduce depth here...
-  also, this is not the right place for this code, it's only here so
+/*this is not the right place for this code, it's only here so
   text rendering shows up for now.
 */
     if (l->surface.data.planar.grad != Background_Solid) {
         im = XCreateImage(ob_display, render_visual, render_depth,
                           ZPixmap, 0, NULL, w, h, 32, 0);
-        g_assert(im != None);
+        g_assert(im != NULL);
         im->byte_order = endian;
-        im->data = l->surface.data.planar.pixel_data;
+        im->data = (unsigned char *)l->surface.data.planar.pixel_data;
+        reduce_depth(im->data, im);
         XPutImage(ob_display, l->pixmap, DefaultGC(ob_display, ob_screen),
                   im, 0, 0, x, y, w, h);
         im->data = NULL;

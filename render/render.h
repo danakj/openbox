@@ -7,34 +7,6 @@
 #include <glib.h>
 #include "color.h"
 
-#ifdef HAVE_STDINT_H
-#  include <stdint.h>
-#else
-#  ifdef HAVE_SYS_TYPES_H
-#    include <sys/types.h>
-#  endif
-#endif
-
-#ifdef HAVE_STDINT_H
-typedef uint32_t pixel32;
-typedef uint16_t pixel16;
-#else
-typedef u_int32_t pixel32;
-typedef u_int16_t pixel16;
-#endif /* HAVE_STDINT_H */
-
-#if (G_ENDIAN == G_BIG_ENDIAN)
-#define default_red_shift 0
-#define default_green_shift 8
-#define default_blue_shift 16
-#define endian MSBFirst
-#else
-#define default_red_shift 16
-#define default_green_shift 8
-#define default_blue_shift 0
-#define endian LSBFirst
-#endif /* G_ENDIAN == G_BIG_ENDIAN */
-
 typedef enum {
     Surface_Planar,
     Surface_Nonplanar
@@ -164,4 +136,5 @@ void render_shutdown(void);
 Appearance *appearance_new(SurfaceType type, int numtex);
 Appearance *appearance_copy(Appearance *a);
 void appearance_free(Appearance *a);
+void truecolor_startup(void);
 #endif /*__render_h*/

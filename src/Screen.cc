@@ -84,6 +84,7 @@ using std::string;
 #include "Image.hh"
 #include "Screen.hh"
 #include "Slit.hh"
+#include "Pipemenu.hh"
 #include "Rootmenu.hh"
 #include "Toolbar.hh"
 #include "Util.hh"
@@ -2082,7 +2083,7 @@ size_t string_within(char begin, char end,
 
 bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
   char line[1024], keyword[1024], label[1024], command[1024];
-  bool done = False;
+  bool done = False, readData = False;
 
   while (! (done || feof(file))) {
     memset(line, 0, 1024);
@@ -2092,6 +2093,11 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     if (! fgets(line, 1024, file))
       continue;
 
+    if (! readData) {
+      menu->clearMenu();
+      readData = True;
+    }
+    
     if (line[0] == '#') // comment, skip it
       continue;
 
@@ -2118,19 +2124,19 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     pos = string_within('{', '}', line, pos, line_length, command);
 
     switch (key) {
-    case 311: // end
+    case 'e'+'n'+'d': // end
       done = True;
 
       break;
 
-    case 333: // nop
+    case 'n'+'o'+'p': // nop
       if (! *label)
         label[0] = '\0';
       menu->insert(label);
 
       break;
 
-    case 421: // exec
+    case 'e'+'x'+'e'+'c': // exec
       if (! (*label && *command)) {
         fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
                              "BScreen::parseMenuFile: [exec] error, "
@@ -2142,7 +2148,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 442: // exit
+    case 'e'+'x'+'i'+'t': // exit
       if (! *label) {
         fprintf(stderr, i18n(ScreenSet, ScreenEXITError,
                              "BScreen::parseMenuFile: [exit] error, "
@@ -2154,7 +2160,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 561: { // style
+    case 's'+'t'+'y'+'l'+'e': { // style
       if (! (*label && *command)) {
         fprintf(stderr,
                 i18n(ScreenSet, ScreenSTYLEError,
@@ -2169,7 +2175,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     }
       break;
 
-    case 630: // config
+    case 'c'+'o'+'n'+'f'+'i'+'g': // config
       if (! *label) {
         fprintf(stderr, i18n(ScreenSet, ScreenCONFIGError,
                              "BScreen::parseMenufile: [config] error, "
@@ -2181,7 +2187,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 740: { // include
+    case 'i'+'n'+'c'+'l'+'u'+'d'+'e': { // include
       if (! *label) {
         fprintf(stderr, i18n(ScreenSet, ScreenINCLUDEError,
                              "BScreen::parseMenuFile: [include] error, "
@@ -2217,7 +2223,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 767: { // submenu
+    case 's'+'u'+'b'+'m'+'e'+'n'+'u': { // submenu
       if (! *label) {
         fprintf(stderr, i18n(ScreenSet, ScreenSUBMENUError,
                              "BScreen::parseMenuFile: [submenu] error, "
@@ -2240,7 +2246,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 773: { // restart
+    case 'r'+'e'+'s'+'t'+'a'+'r'+'t': { // restart
       if (! *label) {
         fprintf(stderr, i18n(ScreenSet, ScreenRESTARTError,
                              "BScreen::parseMenuFile: [restart] error, "
@@ -2256,7 +2262,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 845: { // reconfig
+    case 'r'+'e'+'c'+'o'+'n'+'f'+'i'+'g': { // reconfig
       if (! *label) {
         fprintf(stderr,
                 i18n(ScreenSet, ScreenRECONFIGError,
@@ -2270,8 +2276,8 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
 
       break;
 
-    case 995:    // stylesdir
-    case 1113: { // stylesmenu
+    case 's'+'t'+'y'+'l'+'e'+'s'+'d'+'i'+'r':    // stylesdir
+    case 's'+'t'+'y'+'l'+'e'+'s'+'m'+'e'+'n'+'u': { // stylesmenu
       bool newmenu = ((key == 1113) ? True : False);
 
       if (! *label || (! *command && newmenu)) {
@@ -2351,7 +2357,7 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
     }
       break;
 
-    case 1090: { // workspaces
+    case 'w'+'o'+'r'+'k'+'s'+'p'+'a'+'c'+'e'+'s': { // workspaces
       if (! *label) {
         fprintf(stderr,
                 i18n(ScreenSet, ScreenWORKSPACESError,
@@ -2363,12 +2369,31 @@ bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
       menu->insert(label, workspacemenu);
     }
       break;
+
+    case 'p'+'i'+'p'+'e': {
+      
+      if (! (*label && *command)) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenPIPEError,
+                     "BScreen::parseMenuFile: [pipe]"
+                     " error, no command defined\n"));
+        continue;
+      }
+      Pipemenu *submenu = new Pipemenu(this, command);
+      
+      submenu->setLabel(label);
+        
+      submenu->update();
+      menu->insert(label, submenu);
+      rootmenuList.push_back(submenu);
+      break;
+    }
+   
     }
   }
-
+  
   return ((menu->getCount() == 0) ? True : False);
 }
-
 
 void BScreen::shutdown(void) {
   XSelectInput(blackbox->getXDisplay(), getRootWindow(), NoEventMask);

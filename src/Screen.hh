@@ -197,8 +197,6 @@ private:
   BScreen(const BScreen&);
   BScreen& operator=(const BScreen&);
 
-  bool parseMenuFile(FILE *file, Rootmenu *menu);
-
 #ifdef    BITMAPBUTTONS
   void readDatabaseMask(const std::string &rname,
                         PixmapMask &pixmapMask,
@@ -415,6 +413,7 @@ public:
   void showPosition(int x, int y);
   void showGeometry(unsigned int gx, unsigned int gy);
   void hideGeometry(void);
+  bool parseMenuFile(FILE *file, Rootmenu *menu);
 
   void showWorkspaceMenu(int x, int y);
   void showRootMenu(int x, int y);

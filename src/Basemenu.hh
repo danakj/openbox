@@ -46,7 +46,7 @@ private:
   BImageControl *image_ctrl;
   BScreen *screen;
 
-  bool moving, visible, movable, torn, internal_menu, title_vis, shifted,
+  bool moving, movable, torn, internal_menu, title_vis, shifted,
     hide_tree;
   Display *display;
   int which_sub, which_press, which_sbl, alignment;
@@ -65,6 +65,8 @@ private:
   Basemenu& operator=(const Basemenu&);
 
 protected:
+  bool visible;
+
   inline void setTitleVisibility(bool b) { title_vis = b; }
   inline void setMovable(bool b) { movable = b; }
   inline void setHideTree(bool h) { hide_tree = h; }
@@ -76,11 +78,12 @@ protected:
                         unsigned int w = 0, unsigned int h = 0);
   virtual void redrawTitle(void);
   virtual void internal_hide(void);
-
+  inline Basemenu* getParent(void) const { return parent; }
 
 public:
   Basemenu(BScreen *scrn);
   virtual ~Basemenu(void);
+  void clearMenu(void);
 
   inline bool isTorn(void) const { return torn; }
   inline bool isVisible(void) const { return visible; }

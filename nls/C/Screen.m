@@ -43,6 +43,8 @@ $ #STYLESDIRErrorNotDir
 directory\n
 $ #STYLESDIRErrorNoExist
 # BScreen::parseMenuFile: [stylesdir/stylesmenu] error, '%s' does not exist\n
+$ #PIPEError
+# BScreen::parseMenuFile: [pipe] error, no command defined\n
 $ #WORKSPACESError
 # BScreen::parseMenuFile: [workspaces] error, no menu label defined\n
 $ #PositionLength

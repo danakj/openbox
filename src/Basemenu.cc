@@ -144,7 +144,29 @@ Basemenu::Basemenu(BScreen *scrn) {
 
 
 Basemenu::~Basemenu(void) {
-  XUnmapWindow(display, menu.window);
+  clearMenu();
+
+  blackbox->removeMenuSearch(menu.title);
+  XDestroyWindow(display, menu.title);
+
+  blackbox->removeMenuSearch(menu.frame);
+  XDestroyWindow(display, menu.frame);
+
+  blackbox->removeMenuSearch(menu.window);
+  XDestroyWindow(display, menu.window);
+
+  if (menu.title_pixmap)
+    image_ctrl->removeImage(menu.title_pixmap);
+
+  if (menu.frame_pixmap)
+    image_ctrl->removeImage(menu.frame_pixmap);
+
+  if (menu.hilite_pixmap)
+    image_ctrl->removeImage(menu.hilite_pixmap);
+}
+ 
+void Basemenu::clearMenu(void) {
+ XUnmapWindow(display, menu.window);
 
   if (shown && shown->getWindowID() == getWindowID())
     shown = (Basemenu *) 0;
@@ -164,24 +186,7 @@ Basemenu::~Basemenu(void) {
   }
 
   std::for_each(menuitems.begin(), menuitems.end(), PointerAssassin());
-
-  if (menu.title_pixmap)
-    image_ctrl->removeImage(menu.title_pixmap);
-
-  if (menu.frame_pixmap)
-    image_ctrl->removeImage(menu.frame_pixmap);
-
-  if (menu.hilite_pixmap)
-    image_ctrl->removeImage(menu.hilite_pixmap);
-
-  blackbox->removeMenuSearch(menu.title);
-  XDestroyWindow(display, menu.title);
-
-  blackbox->removeMenuSearch(menu.frame);
-  XDestroyWindow(display, menu.frame);
-
-  blackbox->removeMenuSearch(menu.window);
-  XDestroyWindow(display, menu.window);
+  menuitems.clear();
 }
 
 
@@ -244,7 +249,6 @@ int Basemenu::remove(int index) {
 
   return menuitems.size();
 }
-
 
 void Basemenu::update(void) {
   const MenuStyle* const style = screen->getMenuStyle();
@@ -366,6 +370,8 @@ void Basemenu::update(void) {
     parent->drawSubmenu(parent->which_sub);
 
   XMapSubwindows(display, menu.window);
+  if (visible)
+    XMapWindow(display, menu.window);
 }
 
 
@@ -381,7 +387,6 @@ void Basemenu::show(void) {
     shown = this;
   }
 }
-
 
 void Basemenu::hide(void) {
   if (! torn && hide_tree && parent && parent->isVisible()) {
@@ -452,7 +457,6 @@ void Basemenu::redrawTitle(void) {
                             style->t_text, text);
 }
 
-
 void Basemenu::drawSubmenu(int index) {
   BasemenuItem *item = find(which_sub);
   if (item && item->submenu() && ! item->submenu()->isTorn() &&
@@ -485,7 +489,7 @@ void Basemenu::drawSubmenu(int index) {
 
     if (alignment == AlignBottom &&
         (y + submenu->menu.height) > ((shifted) ? menu.y_shift :
-                                              menu.y) + menu.height)
+                                      menu.y) + menu.height)
       y = (((shifted) ? menu.y_shift : menu.y) +
            menu.height - submenu->menu.height);
 
@@ -502,11 +506,11 @@ void Basemenu::drawSubmenu(int index) {
 
     submenu->move(x, y);
     if (! moving) drawItem(index, True);
-
+    
+    which_sub = index;
     if (! submenu->isVisible())
       submenu->show();
     submenu->moving = moving;
-    which_sub = index;
   } else {
     which_sub = -1;
   }

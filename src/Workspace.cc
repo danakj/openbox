@@ -408,7 +408,7 @@ void Workspace::appendStackOrder(BlackboxWindowList &stack_order) const {
   BlackboxWindowList::const_reverse_iterator it = stackingList.rbegin();
   const BlackboxWindowList::const_reverse_iterator end = stackingList.rend();
   for (; it != end; ++it)
-    if (! (*it)->isNormal())
+    if ((*it)->isNormal())
       stack_order.push_back(*it);
 }
   

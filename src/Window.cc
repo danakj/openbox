@@ -1225,9 +1225,12 @@ void BlackboxWindow::getMWMHints(void) {
   num = PropMwmHintsElements;
   if (! xatom->getValue(client.window, XAtom::motif_wm_hints,
                         XAtom::motif_wm_hints, num,
-                        (unsigned long **)&mwm_hint) ||
-      num < PropMwmHintsElements)
+                        (unsigned long **)&mwm_hint))
     return;
+  if (num < PropMwmHintsElements) {
+    delete [] mwm_hint;
+    return;
+  }
 
   if (mwm_hint->flags & MwmHintsDecorations) {
     if (mwm_hint->decorations & MwmDecorAll) {
@@ -1268,7 +1271,7 @@ void BlackboxWindow::getMWMHints(void) {
         functions |= Func_Close;
     }
   }
-  delete mwm_hint;
+  delete [] mwm_hint;
 }
 
 
@@ -1286,9 +1289,12 @@ bool BlackboxWindow::getBlackboxHints(void) {
   num = PropBlackboxHintsElements;
   if (! xatom->getValue(client.window, XAtom::blackbox_hints,
                         XAtom::blackbox_hints, num,
-                        (unsigned long **)&blackbox_hint) ||
-      num < PropBlackboxHintsElements)
+                        (unsigned long **)&blackbox_hint))
     return False;
+  if (num < PropBlackboxHintsElements) {
+    delete [] blackbox_hint;
+    return False;
+  }
 
   if (blackbox_hint->flags & AttribShaded)
     flags.shaded = (blackbox_hint->attrib & AttribShaded);
@@ -1350,7 +1356,7 @@ bool BlackboxWindow::getBlackboxHints(void) {
     reconfigure();
   }
   
-  delete blackbox_hint;
+  delete [] blackbox_hint;
 
   return True;
 }
@@ -2103,7 +2109,7 @@ void BlackboxWindow::restoreAttributes(void) {
                         (unsigned long **)&net))
     return;
   if (num < PropBlackboxAttributesElements) {
-    delete net;
+    delete [] net;
     return;
   }
 
@@ -2169,7 +2175,7 @@ void BlackboxWindow::restoreAttributes(void) {
   // with the state set it will then be the map event's job to read the
   // window's state and behave accordingly
 
-  delete net;
+  delete [] net;
 }
 
 

@@ -1303,6 +1303,7 @@ void BScreen::updateWorkArea(void) {
     }
     xatom->setValue(getRootWindow(), XAtom::net_workarea, XAtom::cardinal,
                     dims, 4 * workspacesList.size());
+    delete [] dims;
   } else
     xatom->setValue(getRootWindow(), XAtom::net_workarea, XAtom::cardinal,
                     0, 0);

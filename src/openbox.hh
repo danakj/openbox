@@ -116,9 +116,6 @@ public:
   */
   void eventLoop();
 
-  // XXX: TEMPORARY!#!@%*!^#*!#!#!
-  virtual void process_event(XEvent *) = 0;
-
   //! Requests that the window manager exit
   /*!
     Causes the Openbox::eventLoop function to stop looping, so that the window

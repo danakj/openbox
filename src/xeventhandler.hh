@@ -120,7 +120,13 @@ private:
     @param e The XEvent to handle
   */
   void shapeEvent(const XShapeEvent &e);
-#endif // SHAPE
+#endif // SHAPE 
+  //! Handles client message events
+  /*!
+    @param e The XEvent to handle
+  */
+  void clientMessage(const XClientMessageEvent &e);
+ 
   
 public:
   //! Constructs an OBXEventHandler object

@@ -94,9 +94,11 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 
     attr.event_mask = ENTRY_EVENTMASK;
     self->window = createWindow(self->frame->items, CWEventMask, &attr);
-    self->icon = createWindow(self->window, 0, NULL);
     self->text = createWindow(self->window, 0, NULL);
-    self->bullet = createWindow(self->window, 0, NULL);
+    if (entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR) {
+        self->icon = createWindow(self->window, 0, NULL);
+        self->bullet = createWindow(self->window, 0, NULL);
+    }
 
     XMapWindow(ob_display, self->window);
     XMapWindow(ob_display, self->text);
@@ -129,10 +131,12 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 static void menu_entry_frame_free(ObMenuEntryFrame *self)
 {
     if (self) {
-        XDestroyWindow(ob_display, self->icon);
         XDestroyWindow(ob_display, self->text);
-        XDestroyWindow(ob_display, self->bullet);
         XDestroyWindow(ob_display, self->window);
+        if (self->entry->type != OB_MENU_ENTRY_TYPE_SEPARATOR) {
+            XDestroyWindow(ob_display, self->icon);
+            XDestroyWindow(ob_display, self->bullet);
+        }
 
         RrAppearanceFree(self->a_normal);
         RrAppearanceFree(self->a_disabled);
@@ -256,22 +260,20 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                 self->frame->item_h - 2*PADDING);
         break;
     case OB_MENU_ENTRY_TYPE_SEPARATOR:
-        XMoveResizeWindow(ob_display, self->text,
-                          self->frame->text_x, PADDING,
-                          self->frame->text_w - 2*PADDING,
-                          SEPARATOR_HEIGHT);
+        XMoveResizeWindow(ob_display, self->text, PADDING, PADDING,
+                          self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
         self->a_separator->surface.parent = item_a;
-        self->a_separator->surface.parentx = self->frame->text_x;
+        self->a_separator->surface.parentx = PADDING;
         self->a_separator->surface.parenty = PADDING;
         self->a_separator->texture[0].data.lineart.color =
             text_a->texture[0].data.text.color;
         self->a_separator->texture[0].data.lineart.x1 = 2*PADDING;
         self->a_separator->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT / 2;
         self->a_separator->texture[0].data.lineart.x2 =
-            self->frame->text_w - 6*PADDING;
+            self->area.width - 4*PADDING;
         self->a_separator->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT / 2;
         RrPaint(self->a_separator, self->text,
-                self->frame->text_w - 2*PADDING, SEPARATOR_HEIGHT);
+                self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
         break;
     }
 

@@ -1,6 +1,7 @@
 #include "instance.h"
 #include "render.h"
 #include "debug.h"
+#include "glft/glft.h"
 
 static int glXRating(Display *display, XVisualInfo *v)
 {
@@ -78,7 +79,10 @@ struct RrInstance *RrInit(Display *display,
     if (rate > 0) {
         RrDebug("picked visual %d with rating %d\n", best, rate);
         ret = RrInstanceNew(display, screen, vilist[best]);
+    
+        GlftInit();
     }
+
     return ret;
 }
 

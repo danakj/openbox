@@ -1,0 +1,24 @@
+To build Openbox from CVS you need:
+
+A C++ Compiler (GNU GCC/G++ 3.2+ suggested)
+GNU Gettext 0.11.5
+GNU Autoconf 2.50+
+GNU Automake
+GNU Libtool
+Xft2 library/headers (devel package) (http://www.fontconfig.org)
+Xlib library/headers (devel package)
+Python library/headers (devel package) (http://www.python.org)
+
+Optional:
+SWIG 1.3.17+ (http://www.swig.org)
+  *** If you don't want to get swig, thats fine, unless you're going to be
+  *** editing stuff.
+  *** Without SWIG, before you build CVS _every time you update_ you need to:
+  ***
+  *** % touch src/openbox.i
+  *** % touch src/openbox_wrap.cc
+  ***
+  *** This is because of how CVS deals with timestamps.
+
+
+I recommend the latest version of all these packages.

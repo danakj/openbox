@@ -42,6 +42,7 @@ Frame *frame_new()
     attrib.event_mask = FRAME_EVENTMASK;
     attrib.override_redirect = TRUE;
     self->window = createWindow(ob_root, mask, &attrib);
+XSetWindowBorderWidth(ob_display, self->window, 3);
 
     mask = 0;
     self->plate = createWindow(self->window, mask, &attrib);
@@ -55,16 +56,19 @@ Frame *frame_new()
     self->framedecor[0].obwin.type = Window_Decoration;
     self->framedecor[0].window = createWindow(self->window, mask, &attrib);
     self->framedecor[0].anchor = Decor_Top;
-    RECT_SET(self->framedecor[0].position, 0, 0, 10, 10);
+    RECT_SET(self->framedecor[0].position, 0, 0, 150, 10);
     self->framedecor[0].type = Decor_Titlebar;
+    self->framedecor[0].context = Context_Titlebar;
+XSetWindowBorderWidth(ob_display, self->framedecor[0].window, 3);
     XMapWindow(ob_display, self->framedecor[0].window);
 
     self->framedecor[1].obwin.type = Window_Decoration;
     self->framedecor[1].window = createWindow(self->window, mask, &attrib);
-    self->framedecor[1].anchor = Decor_Top;
+    self->framedecor[1].anchor = Decor_Right;
     RECT_SET(self->framedecor[1].position, 0, 0, 10, 30);
     self->framedecor[1].type = Decor_Titlebar;
-
+    self->framedecor[1].context = Context_Titlebar;
+XSetWindowBorderWidth(ob_display, self->framedecor[1].window, 3);
     XMapWindow(ob_display, self->framedecor[1].window);
 
     self->focused = FALSE;
@@ -276,7 +280,6 @@ Context frame_context_from_string(char *name)
 Context frame_context(Client *client, Window win)
 {
     ObWindow *obwin;
-
     if (win == ob_root) return Context_Root;
     if (client == NULL) return Context_None;
     if (win == client->window) return Context_Client;
@@ -284,11 +287,13 @@ Context frame_context(Client *client, Window win)
     obwin = g_hash_table_lookup(window_map, &win);
     g_assert(obwin);
 
-    if (client->frame->window == win)
+    if (client->frame->window == win) {
+printf("frame context\n");
         return Context_Frame;
+    }
     if (client->frame->plate == win)
         return Context_Client;
-
+printf("decoration clicked\n");
     g_assert(WINDOW_IS_DECORATION(obwin));
     return WINDOW_AS_DECORATION(obwin)->context;
 }
@@ -406,10 +411,22 @@ void frame_adjust_area(Frame *self, gboolean moved, gboolean resized)
         if (dec->type & self->client->decorations)
             switch (dec->anchor) {
                 case Decor_Top:
+                    center = self->client->area.width/2;
                     temp = dec->position.y + dec->position.height;
                     printf("extends by %d\n", temp);
                     if (temp > te) te = temp;
-                break;
+
+                    printf("putting crap at %d, %d, %d, %d\n",
+                                      dec->position.x,
+                                      dec->position.y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    XMoveResizeWindow(ob_display, dec->window,
+                                      dec->position.x,
+                                      dec->position.y,
+                                      dec->position.width,
+                                      dec->position.height);
+                    break;
             }
     }
 

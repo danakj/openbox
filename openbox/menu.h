@@ -59,6 +59,11 @@ struct _ObNormalMenuEntry {
 
     /* List of ObActions */
     GSList *actions;
+
+    /* Icon shit */
+    gint icon_width;
+    gint icon_height;
+    RrPixel32 *icon_data;
 };
 
 struct _ObSubmenuMenuEntry {

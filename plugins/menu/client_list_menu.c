@@ -29,20 +29,30 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     ObMenu *menu = frame->menu;
     DesktopData *d = data;
     GList *it;
+    gint i;
 
     menu_clear_entries(menu->name);
 
-    for (it = focus_order[d->desktop]; it; it = g_list_next(it)) {
+    for (it = focus_order[d->desktop], i = 0; it; it = g_list_next(it), ++i) {
         ObClient *c = it->data;
         if (client_normal(c)) {
             GSList *acts;
             ObAction* act;
+            ObMenuEntry *e;
+            ObClientIcon *icon;
 
             act = action_from_string("activate");
             act->data.activate.c = c;
             acts = g_slist_prepend(NULL, act);
-            menu_add_normal(menu->name, 0,
+            menu_add_normal(menu->name, i,
                             (c->iconic ? c->icon_title : c->title), acts);
+
+            if ((icon = client_icon(c, 32, 32))) {
+                e = menu_find_entry_id(menu, i);
+                e->data.normal.icon_width = icon->width;
+                e->data.normal.icon_height = icon->height;
+                e->data.normal.icon_data = icon->data;
+            }
         }
     }
     

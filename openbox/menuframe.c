@@ -134,7 +134,6 @@ void menu_entry_frame_free(ObMenuEntryFrame *self)
 
 void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 {
-    /* XXX screen constraints */
     RECT_SET_POINT(self->area, x, y);
     XMoveWindow(ob_display, self->window, self->area.x, self->area.y);
 }
@@ -171,6 +170,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
     RrAppearance *item_a, *text_a;
     gint th; /* temp */
     ObMenu *sub;
+    ObClientIcon *icon;
 
     item_a = ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                !self->entry->data.normal.enabled) ?
@@ -230,11 +230,17 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         break;
     }
 
-    /* XXX draw icons */
-    if (0) {
+    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+        self->entry->data.normal.icon_data)
+    {
         XMoveResizeWindow(ob_display, self->icon, 0, 0,
                           self->frame->item_h, self->frame->item_h);
-        /* XXX set the RGBA surface stuff */
+        self->a_icon->texture[0].data.rgba.width =
+            self->entry->data.normal.icon_width;
+        self->a_icon->texture[0].data.rgba.height =
+            self->entry->data.normal.icon_height;
+        self->a_icon->texture[0].data.rgba.data =
+            self->entry->data.normal.icon_data;
         self->a_icon->surface.parent = item_a;
         self->a_icon->surface.parentx = 0;
         self->a_icon->surface.parenty = 0;
@@ -314,7 +320,8 @@ static void menu_frame_render(ObMenuFrame *self)
             text_a->texture[0].data.text.string = e->entry->data.normal.label;
             RrMinsize(text_a, &tw, &th);
 
-            /* XXX has_icon = TRUE; */
+            if (e->entry->data.normal.icon_data)
+                has_icon = TRUE;
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             sub = e->entry->data.submenu.submenu;

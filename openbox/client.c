@@ -812,7 +812,11 @@ void client_update_transient_for(ObClient *self)
             target = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
             g_assert(target != self);
-            g_assert(!target || WINDOW_IS_CLIENT(target));
+            if (target && !WINDOW_IS_CLIENT(target)) {
+                /* this can happen when a dialog is a child of
+                   a dockapp, for example */
+                target = NULL;
+            }
             
             if (!target && self->group) {
                 /* not transient to a client, see if it is transient for a

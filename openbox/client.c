@@ -1450,9 +1450,10 @@ void client_update_title(ObClient *self)
         /* try old x stuff */
         if (!PROP_GETS(self->window, wm_name, locale, &data))
             // http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-            if (self->transient)
-                data = g_strdup(""), goto no_number;
-            else
+            if (self->transient) {
+                data = g_strdup("");
+                goto no_number;
+            } else
                 data = g_strdup("Unnamed Window");
 
     /* did the title change? then reset the title_count */

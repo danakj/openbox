@@ -1170,13 +1170,15 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 gboolean allow_trans)
 {
     gboolean ret = FALSE;
-    char *rclass = create_class_name(rname), *cname, *ctoname, *bcname;
+    char *rclass = create_class_name(rname);
+    char *cname, *ctoname, *bcname, *icname;
     char *rettype;
     XrmValue retvalue;
 
     cname = g_strconcat(rname, ".color", NULL);
     ctoname = g_strconcat(rname, ".colorTo", NULL);
     bcname = g_strconcat(rname, ".borderColor", NULL);
+    icname = g_strconcat(rname, ".interlaceColor", NULL);
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
 	retvalue.addr != NULL) {
@@ -1195,9 +1197,14 @@ static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
 	    if (!read_color(db, inst, bcname,
 			    &value->surface.border_color))
 		value->surface.border_color = RrColorNew(inst, 0, 0, 0);
+        if (value->surface.interlaced)
+	    if (!read_color(db, inst, icname,
+			    &value->surface.interlace_color))
+		value->surface.interlace_color = RrColorNew(inst, 0, 0, 0);
 	ret = TRUE;
     }
 
+    g_free(icname);
     g_free(bcname);
     g_free(ctoname);
     g_free(cname);

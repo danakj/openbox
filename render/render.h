@@ -67,6 +67,7 @@ struct _RrSurface {
     RrColor *border_color;
     RrColor *bevel_dark; 
     RrColor *bevel_light;
+    RrColor *interlace_color;
     gboolean interlaced;
     gboolean border;
     RrAppearance *parent;

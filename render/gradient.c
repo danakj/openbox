@@ -82,6 +82,23 @@ void RrRender(RrAppearance *a, int w, int h)
                           a->surface.relief==RR_RELIEF_RAISED);
         }
     }
+
+    if (a->surface.interlaced) {
+        int i;
+        RrPixel32 *p;
+
+        r = a->surface.interlace_color->r;
+        g = a->surface.interlace_color->g;
+        b = a->surface.interlace_color->b;
+        current = (r << RrDefaultRedOffset)
+            + (g << RrDefaultGreenOffset)
+            + (b << RrDefaultBlueOffset);
+        p = data;
+        for (i = 0; i < h; i += 2, p += w)
+            for (x = 0; x < w; ++x, ++p)
+                *p = current;
+    }
+
 }
 
 static void highlight(RrPixel32 *x, RrPixel32 *y, gboolean raised)
@@ -166,7 +183,8 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 
     if (sp->interlaced) {
         for (i = 0; i < h; i += 2)
-            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->secondary),
+            XDrawLine(RrDisplay(l->inst), l->pixmap,
+                      RrColorGC(sp->interlace_color),
                       0, i, w, i);
     }
 

@@ -118,7 +118,7 @@ Maximizes and Unmaxizes the currently focused window vertically.
 Maximizes and Unmaxizes the currently focused window horizontally.
 .SS sendToWorkspace
 Sends the currently focused window to another workspace. This takes a single
-numberical parameter, which is the workspace to send the window to. Workspace
+numerical parameter, which is the workspace to send the window to. Workspace
 numbers begin at 1.
 .SS sendToNextWorkspace
 .SS sendToPrevWorkspace

@@ -39,9 +39,9 @@ $(kernel_dir)/%.tab.c: $(kernel_srcdir)/%.y
 	cd kernel && \
 	$(BISON) -d $(notdir $<)
 
-$(kernel_depdir)/%.d: $(kernel_srcdir)/%.c $(depdir)
+$(kernel_depdir)/%.d: $(kernel_srcdir)/%.c
 	@echo Building dependancies for $<
-	@mkdir $(dir $@) 2> /dev/null || true
+	$(INSTALL) -d $(dir $@)
 	@$(CC) $(kernel_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.o) $<
 
 kernel-install:

@@ -32,10 +32,9 @@ $(engines_ob_dir)/%.lo: $(engines_ob_srcdir)/%.c $(engines_ob_depdir)/%.d
 	$(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 		$(engines_ob_CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
-$(engines_ob_depdir)/%.d: $(engines_ob_srcdir)/%.c $(depdir)
+$(engines_ob_depdir)/%.d: $(engines_ob_srcdir)/%.c
 	@echo Building dependancies for $<
-	@mkdir $(engines_depdir) 2> /dev/null || true
-	@mkdir $(dir $@) 2> /dev/null || true
+	$(INSTALL) -d $(dir $@)
 	@$(CC) $(engines_ob_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 
 ## end engines_ob

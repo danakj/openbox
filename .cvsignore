@@ -7,3 +7,4 @@ config.log
 config.guess
 autom4te.cache
 aclocal.m4
+.deps

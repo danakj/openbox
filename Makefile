@@ -23,7 +23,4 @@ distclean: clean
 	$(RM) configure Makefile.incl
 	$(RM) -r .deps/
 
-$(depdir):
-	@mkdir $@
-
 .PHONY: all clean distclean

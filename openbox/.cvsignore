@@ -2,3 +2,4 @@ openbox3
 lex.yy.c
 parse.tab.c
 parse.tab.h
+.libs

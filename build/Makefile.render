@@ -20,9 +20,9 @@ $(render_dir):
 $(render_dir)/%.o: $(render_srcdir)/%.c $(depdir)/%.d
 	$(CC) $(DEFS) $(render_CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
-$(render_depdir)/%.d: $(render_srcdir)/%.c $(render_depdir)
+$(render_depdir)/%.d: $(render_srcdir)/%.c
 	@echo Building dependancies for $<
-	@mkdir $(dir $@) 2> /dev/null || true
+	$(INSTALL) -d $(dir $@)
 	@$(CC) $(render_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.o) $<
 
 render-install:

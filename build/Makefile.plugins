@@ -46,7 +46,7 @@ $(plugins_resistance_dir)/%.lo: $(plugins_resistance_srcdir)/%.c $(plugins_resis
 
 $(plugins_resistance_depdir)/%.d: $(plugins_resistance_srcdir)/%.c $(depdir)
 	@echo Building dependancies for $<
-	@mkdir $(dir $@) 2> /dev/null || true
+	$(INSTALL) -d $(dir $@)
 	@$(CC) $(plugins_resistance_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 
 ## end plugins_resistance
@@ -64,10 +64,10 @@ $(plugins_placement_dir)/%.lo: $(plugins_placement_srcdir)/%.c $(plugins_placeme
 	$(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 		$(plugins_placement_CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
-$(plugins_placement_depdir)/%.d: $(plugins_placement_srcdir)/%.c $(depdir)
+$(plugins_placement_depdir)/%.d: $(plugins_placement_srcdir)/%.c
 	@echo Building dependancies for $<
-	@mkdir $(plugins_depdir) 2> /dev/null || true
-	@mkdir $(dir $@) 2> /dev/null || true
+	echo $(plugins_depdir)
+	$(INSTALL) -d $(dir $@)
 	@$(CC) $(plugins_placement_CPPFLAGS) $(CFLAGS) -w -MM -MF $@ -MQ $(<:.c=.lo) $<
 
 ## end plugins_placement

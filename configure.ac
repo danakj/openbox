@@ -113,6 +113,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   render/obrender-3.0.pc
   parser/obparser-3.0.pc
+  version.h
 ])
 AC_OUTPUT
 

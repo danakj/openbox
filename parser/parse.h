@@ -19,6 +19,8 @@
 #ifndef __parse_h
 #define __parse_h
 
+#include "version.h"
+
 #include <libxml/parser.h>
 #include <glib.h>
 

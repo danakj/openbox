@@ -3,6 +3,10 @@ themercdir=$(datadir)/openbox
 enginedir=$(libdir)/openbox/engines
 plugindir=$(libdir)/openbox/plugins
 
+binary=ob3
+url=http://icculus.org/openbox
+bugurl=http://bugzilla.icculus.org
+
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
 @CPPFLAGS@ \
 -DLOCALEDIR=\"$(localedir)\" \
@@ -10,11 +14,14 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
 -DPLUGINDIR=\"$(plugindir)\" \
 -DENGINEDIR=\"$(enginedir)\" \
 -DDEFAULT_ENGINE=\"openbox\" \
--DG_LOG_DOMAIN=\"Openbox\"
+-DG_LOG_DOMAIN=\"Openbox\" \
+-DBINARY=\"$(binary)\" \
+-DURL=\"$(url)\" \
+-DBUGURL=\"$(bugurl)\"
 
 LIBS=$(XFT_LIBS) $(GLIB_LIBS) $(GMODULE_LIBS) @LIBS@
 
-bin_PROGRAMS= ob3
+bin_PROGRAMS=$(binary)
 
 ob3_LDADD=@LIBINTL@ ../render/librender.a
 ob3_LDFLAGS=-export-dynamic

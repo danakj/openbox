@@ -34,6 +34,7 @@ automake1.7
 autoconf
 libtool
 libxft2-dev
+libxrender-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev

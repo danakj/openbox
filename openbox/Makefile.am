@@ -2,6 +2,7 @@ localedir=$(datadir)/locale
 themercdir=$(datadir)/openbox
 enginedir=$(libdir)/openbox/engines
 plugindir=$(libdir)/openbox/plugins
+rcdir=$(datadir)/openbox
 
 binary=openbox3
 url=http://icculus.org/openbox
@@ -11,6 +12,7 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) $(GMODULE_CFLAGS) \
 @CPPFLAGS@ \
 -DLOCALEDIR=\"$(localedir)\" \
 -DTHEMERCDIR=\"$(themercdir)\" \
+-DRCDIR=\"$(rcdir)\" \
 -DPLUGINDIR=\"$(plugindir)\" \
 -DENGINEDIR=\"$(enginedir)\" \
 -DDEFAULT_ENGINE=\"openbox\" \

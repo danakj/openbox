@@ -34,7 +34,7 @@ void Label::fitString(const std::string &str)
 void Label::fitSize(int w, int h)
 {
   unsigned int sidemargin = _bevel_width * 2;
-  resize(w + sidemargin * 2, h);
+  resize(w + sidemargin * 2, h + _bevel_width * 2);
 }
 
 void Label::update()
@@ -98,7 +98,7 @@ void Label::renderForeground(void)
   }
 
   display->renderControl(_screen)->
-    drawString(*_surface, *ft, x, 0, *style()->textUnfocusColor(), t);
+    drawString(*_surface, *ft, x, _bevel_width, *style()->textUnfocusColor(), t);
 }
 
 }

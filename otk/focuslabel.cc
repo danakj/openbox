@@ -38,7 +38,7 @@ void FocusLabel::fitString(const std::string &str)
 void FocusLabel::fitSize(int w, int h)
 {
   unsigned int sidemargin = _bevel_width * 2;
-  resize(w + sidemargin * 2, h);
+  resize(w + sidemargin * 2, h + _bevel_width * 2);
 }
 
 void FocusLabel::update()
@@ -104,7 +104,7 @@ void FocusLabel::renderForeground()
   }
 
   display->renderControl(_screen)->
-    drawString(*_surface, *ft, x, 0, *text_color, t);
+    drawString(*_surface, *ft, x, _bevel_width, *text_color, t);
 }
 
 }

@@ -1613,17 +1613,21 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         int dot;
         XF86VidModeModeLine mode;
 
-        XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y);
-        XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode);
-        w = mode.hdisplay;
-        h = mode.vdisplay;
-        if (mode.privsize) XFree(mode.private);
+        if (XF86VidModeGetModeLine(ob_display, ob_screen, &dot, &mode)) {
+            w = mode.hdisplay;
+            h = mode.vdisplay;
+            if (mode.privsize) XFree(mode.private);
+        } else {
 #else
-	x = 0;
-	y = 0;
-	w = screen_physical_size.width;
-	h = screen_physical_size.height;
+            w = screen_physical_size.width;
+            h = screen_physical_size.height;
 #endif
+#ifdef VIDMODE
+        }
+        if (!XF86VidModeGetViewPort(ob_display, ob_screen, &x, &y)) {
+            x = y = 0;
+#endif
+        }
         user = FALSE; /* ignore that increment etc shit when in fullscreen */
     } else {
         /* set the size and position if maximized */

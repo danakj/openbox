@@ -230,6 +230,26 @@ void Actions::keyPressHandler(const XKeyEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+
+  // add to the state the mask of the modifier being pressed, if it is
+  // a modifier key being pressed (this is a little ugly..)
+  const XModifierKeymap *map = otk::display->modifierMap();
+  const int mask_table[] = {
+    ShiftMask, LockMask, ControlMask, Mod1Mask,
+    Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
+  };
+  KeyCode *kp = map->modifiermap;
+  for (int i = 0, n = sizeof(mask_table)/sizeof(mask_table[0]); i < n; ++i) {
+    for (int k = 0; k < map->max_keypermod; ++k) {
+      if (*kp == e.keycode) { // found the keycode
+        state |= mask_table[i]; // add the mask for it
+        i = n; // cause the first loop to break;
+        break; // get outta here!
+      }
+      ++kp;
+    }
+  }
+  
   openbox->bindings()->
     fireKey(otk::display->findScreen(e.root)->screen(),
             state, e.keycode, e.time, KeyAction::Press);

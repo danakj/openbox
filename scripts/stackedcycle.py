@@ -218,15 +218,18 @@ class _cycledata:
         done = 0
         notreverting = 1
         # have all the modifiers this started with been released?
-        if (data.action == ob.KeyAction.Release and
-            not self.state & data.state):
+        if not self.state == data.state:
             done = 1
-        # has Escape been pressed?
-        elif data.action == ob.KeyAction.Press and data.key == "Escape":
-            done = 1
-            notreverting = 0
-            # revert
-            self.menupos = 0
+        elif data.action == ob.KeyAction.Press:
+            # has Escape been pressed?
+            if data.key == "Escape":
+                done = 1
+                notreverting = 0
+                # revert
+                self.menupos = 0
+            # has Enter been pressed?
+            elif data.key == "Return":
+                done = 1
 
         if done:
             # activate, and deiconify/unshade/raise

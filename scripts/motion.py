@@ -80,15 +80,15 @@ _motion_mask = 0
 def _motion_grab(data):
     global _motion_mask, _inmove, _inresize;
 
-    if data.action == ob.KeyAction.Release:
-        # have all the modifiers this started with been released?
-        if not _motion_mask & data.state:
-            if _inmove:
-                _end_move(data)
-            elif _inresize:
-                _end_resize(data)
-            else:
-                raise RuntimeError
+    # are all the modifiers this started with still pressed?
+    print _motion_mask, data.state
+    if not _motion_mask == data.state:
+        if _inmove:
+            _end_move(data)
+        elif _inresize:
+            _end_resize(data)
+        else:
+            raise RuntimeError
 
 _last_x = 0
 _last_y = 0
@@ -160,13 +160,14 @@ def _move(data):
     # not-normal windows dont get moved
     if not data.client.normal(): return
 
-    global _screen, _client, _cx, _cy, _dx, _dy
+    global _screen, _client, _cx, _cy, _dx, _dy, _motion_mask
     _screen = data.screen
     _client = data.client
     _cx = data.press_clientx
     _cy = data.press_clienty
     _dx = data.xroot - data.pressx
     _dy = data.yroot - data.pressy
+    _motion_mask = data.state
     _do_move()
     global _inmove
     if not _inmove:
@@ -245,6 +246,7 @@ def _resize(data):
     if not data.client.normal(): return
 
     global _screen, _client, _cx, _cy, _cw, _ch, _px, _py, _dx, _dy
+    global _motion_mask
     _screen = data.screen
     _client = data.client
     _cx = data.press_clientx
@@ -255,6 +257,7 @@ def _resize(data):
     _py = data.pressy
     _dx = data.xroot - _px
     _dy = data.yroot - _py
+    _motion_mask = data.state
     _do_resize()
     global _inresize
     if not _inresize:

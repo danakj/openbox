@@ -91,6 +91,16 @@ void Workspace::addWindow(BlackboxWindow *w, bool place) {
     clientmenu->update();
 
     screen->updateNetizenWindowAdd(w->getClientWindow(), id);
+
+    if (id != screen->getCurrentWorkspaceID() &&
+        screen->doFocusNew()) {
+      /*
+         not on the focused workspace, so the window is not going to get focus
+         but if the user wants new windows focused, then it should get focus
+         when this workspace does become focused.
+      */
+      lastfocus = w;
+    }
   }
 
   if (! w->isDesktop())

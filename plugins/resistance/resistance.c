@@ -108,8 +108,8 @@ static void resist_move(Client *c, int *x, int *y)
         }
 
     /* get the screen boundaries */
-    for (i = 0; i < screen_num_xin_areas; ++i) {
-        area = screen_area_xinerama(c->desktop, i);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        area = screen_area_monitor(c->desktop, i);
 
         if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
             continue;

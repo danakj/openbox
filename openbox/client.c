@@ -1613,8 +1613,8 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         Rect *a;
         guint i;
 
-        i = client_xinerama_area(self);
-        a = screen_physical_area_xinerama(i);
+        i = client_monitor(self);
+        a = screen_physical_area_monitor(i);
 
 #ifdef VIDMODE
         if (i == 0 && /* primary head */
@@ -1640,7 +1640,7 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
     } else {
         Rect *a;
 
-        a = screen_area_xinerama(self->desktop, client_xinerama_area(self));
+        a = screen_area_monitor(self->desktop, client_monitor(self));
 
         /* set the size and position if maximized */
         if (self->max_horz) {
@@ -1845,7 +1845,7 @@ void client_fullscreen(Client *self, gboolean fs, gboolean savearea)
         Rect *a;
 
         /* pick some fallbacks... */
-        a = screen_area_xinerama(self->desktop, 0);
+        a = screen_area_monitor(self->desktop, 0);
         x = a->x + a->width / 4;
         y = a->y + a->height / 4;
         w = a->width / 2;
@@ -2004,7 +2004,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
         Rect *a;
 
         /* pick some fallbacks... */
-        a = screen_area_xinerama(self->desktop, 0);
+        a = screen_area_monitor(self->desktop, 0);
         if (dir == 0 || dir == 1) { /* horz */
             x = a->x + a->width / 4;
             w = a->width / 2;
@@ -2566,17 +2566,17 @@ void client_set_layer(Client *self, int layer)
     client_change_state(self); /* reflect this in the state hints */
 }
 
-guint client_xinerama_area(Client *self)
+guint client_monitor(Client *self)
 {
     guint i;
 
-    for (i = 0; i < screen_num_xin_areas; ++i) {
-        Rect *area = screen_physical_area_xinerama(i);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *area = screen_physical_area_monitor(i);
         if (RECT_INTERSECTS_RECT(*area, self->frame->area))
             break;
     }
-    if (i == screen_num_xin_areas) i = 0;
-    g_assert(i < screen_num_xin_areas);
+    if (i == screen_num_monitors) i = 0;
+    g_assert(i < screen_num_monitors);
     return i;
 }
 

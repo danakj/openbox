@@ -32,8 +32,8 @@ static void place_random(Client *c)
 
     if (ob_state == State_Starting) return;
 
-    area = screen_area_xinerama(c->desktop,
-                                g_random_int_range(0, screen_num_xin_areas));
+    area = screen_area_monitor(c->desktop,
+                               g_random_int_range(0, screen_num_monitors));
 
     l = area->x;
     t = area->y;

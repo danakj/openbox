@@ -31,7 +31,7 @@
 			ButtonPressMask | ButtonReleaseMask | ButtonMotionMask)
 
 guint    screen_num_desktops    = 0;
-guint    screen_num_xin_areas   = 0;
+guint    screen_num_monitors    = 0;
 guint    screen_desktop         = 0;
 Size     screen_physical_size;
 gboolean screen_showing_desktop;
@@ -40,7 +40,7 @@ char   **screen_desktop_names = NULL;
 
 static Rect  **area = NULL; /* array of desktop holding array of
                                xinerama areas */
-static Rect  *xin_areas = NULL;
+static Rect  *monitor_area = NULL;
 static Window support_window = None;
 
 #ifdef USE_LIBSN
@@ -178,8 +178,7 @@ void screen_startup()
     guint i;
 
     /* get the initial size */
-    screen_resize(WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen)),
-                  HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen)));
+    screen_resize();
 
     /* set the names */
     screen_desktop_names = g_new(char*,
@@ -229,10 +228,19 @@ void screen_shutdown()
     g_free(area);
 }
 
-void screen_resize(int w, int h)
+void screen_resize()
 {
+    static int oldw = 0, oldh = 0;
+    int w, h;
     GList *it;
     guint32 geometry[2];
+
+    w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+    h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
+
+    if (w == oldw && h == oldh) return;
+
+    oldw = w; oldh = h;
 
     /* Set the _NET_DESKTOP_GEOMETRY hint */
     screen_physical_size.width = geometry[0] = w;
@@ -510,8 +518,8 @@ void screen_update_areas()
     Rect **rit;
     GList *it;
 
-    g_free(xin_areas);
-    extensions_xinerama_screens(&xin_areas, &screen_num_xin_areas);
+    g_free(monitor_area);
+    extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
 
     if (area) {
         for (i = 0; area[i]; ++i)
@@ -521,7 +529,7 @@ void screen_update_areas()
 
     area = g_new(Rect*, screen_num_desktops + 2);
     for (i = 0; i < screen_num_desktops + 1; ++i)
-        area[i] = g_new(Rect, screen_num_xin_areas + 1);
+        area[i] = g_new(Rect, screen_num_monitors + 1);
     area[i] = NULL;
      
     dims = g_new(guint32, 4 * screen_num_desktops);
@@ -532,18 +540,18 @@ void screen_update_areas()
         int l, r, t, b;
 
         /* calc the xinerama areas */
-        for (x = 0; x < screen_num_xin_areas; ++x) {
-            area[i][x] = xin_areas[x];
+        for (x = 0; x < screen_num_monitors; ++x) {
+            area[i][x] = monitor_area[x];
             if (x == 0) {
-                l = xin_areas[x].x;
-                t = xin_areas[x].y;
-                r = xin_areas[x].x + xin_areas[x].width - 1;
-                b = xin_areas[x].y + xin_areas[x].height - 1;
+                l = monitor_area[x].x;
+                t = monitor_area[x].y;
+                r = monitor_area[x].x + monitor_area[x].width - 1;
+                b = monitor_area[x].y + monitor_area[x].height - 1;
             } else {
-                l = MIN(l, xin_areas[x].x);
-                t = MIN(t, xin_areas[x].y);
-                r = MAX(r, xin_areas[x].x + xin_areas[x].width - 1);
-                b = MAX(b, xin_areas[x].y + xin_areas[x].height - 1);
+                l = MIN(l, monitor_area[x].x);
+                t = MIN(t, monitor_area[x].y);
+                r = MAX(r, monitor_area[x].x + monitor_area[x].width - 1);
+                b = MAX(b, monitor_area[x].y + monitor_area[x].height - 1);
             }
         }
         RECT_SET(area[i][x], l, t, r - l + 1, b - t + 1);
@@ -559,10 +567,10 @@ void screen_update_areas()
 
             /* find the left-most xin heads, i do this in 2 loops :| */
             o = area[i][0].x;
-            for (x = 1; x < screen_num_xin_areas; ++x)
+            for (x = 1; x < screen_num_monitors; ++x)
                 o = MIN(o, area[i][x].x);
 
-            for (x = 0; x < screen_num_xin_areas; ++x) {
+            for (x = 0; x < screen_num_monitors; ++x) {
                 int edge = o + s.left - area[i][x].x;
                 if (edge > 0) {
                     area[i][x].x += edge;
@@ -570,18 +578,18 @@ void screen_update_areas()
                 }
             }
 
-            area[i][screen_num_xin_areas].x += s.left;
-            area[i][screen_num_xin_areas].width -= s.left;
+            area[i][screen_num_monitors].x += s.left;
+            area[i][screen_num_monitors].width -= s.left;
         }
         if (s.top) {
             int o;
 
             /* find the left-most xin heads, i do this in 2 loops :| */
             o = area[i][0].y;
-            for (x = 1; x < screen_num_xin_areas; ++x)
+            for (x = 1; x < screen_num_monitors; ++x)
                 o = MIN(o, area[i][x].y);
 
-            for (x = 0; x < screen_num_xin_areas; ++x) {
+            for (x = 0; x < screen_num_monitors; ++x) {
                 int edge = o + s.top - area[i][x].y;
                 if (edge > 0) {
                     area[i][x].y += edge;
@@ -589,47 +597,47 @@ void screen_update_areas()
                 }
             }
 
-            area[i][screen_num_xin_areas].y += s.top;
-            area[i][screen_num_xin_areas].height -= s.top;
+            area[i][screen_num_monitors].y += s.top;
+            area[i][screen_num_monitors].height -= s.top;
         }
         if (s.right) {
             int o;
 
             /* find the bottom-most xin heads, i do this in 2 loops :| */
             o = area[i][0].x + area[i][0].width - 1;
-            for (x = 1; x < screen_num_xin_areas; ++x)
+            for (x = 1; x < screen_num_monitors; ++x)
                 o = MAX(o, area[i][x].x + area[i][x].width - 1);
 
-            for (x = 0; x < screen_num_xin_areas; ++x) {
+            for (x = 0; x < screen_num_monitors; ++x) {
                 int edge = (area[i][x].x + area[i][x].width - 1) -
                     (o - s.right);
                 if (edge > 0)
                     area[i][x].width -= edge;
             }
 
-            area[i][screen_num_xin_areas].width -= s.right;
+            area[i][screen_num_monitors].width -= s.right;
         }
         if (s.bottom) {
             int o;
 
             /* find the bottom-most xin heads, i do this in 2 loops :| */
             o = area[i][0].y + area[i][0].height - 1;
-            for (x = 1; x < screen_num_xin_areas; ++x)
+            for (x = 1; x < screen_num_monitors; ++x)
                 o = MAX(o, area[i][x].y + area[i][x].height - 1);
 
-            for (x = 0; x < screen_num_xin_areas; ++x) {
+            for (x = 0; x < screen_num_monitors; ++x) {
                 int edge = (area[i][x].y + area[i][x].height - 1) -
                     (o - s.bottom);
                 if (edge > 0)
                     area[i][x].height -= edge;
             }
 
-            area[i][screen_num_xin_areas].height -= s.bottom;
+            area[i][screen_num_monitors].height -= s.bottom;
         }
 
         /* XXX when dealing with partial struts, if its in a single
            xinerama area, then only subtract it from that area's space
-        for (x = 0; x < screen_num_xin_areas; ++x) {
+        for (x = 0; x < screen_num_monitors; ++x) {
 	    GList *it;
 
 
@@ -662,10 +670,10 @@ void screen_update_areas()
         }
         if (i < screen_num_desktops) {
             /* don't set these for the 'all desktops' area */
-            dims[(i * 4) + 0] = area[i][screen_num_xin_areas].x;
-            dims[(i * 4) + 1] = area[i][screen_num_xin_areas].y;
-            dims[(i * 4) + 2] = area[i][screen_num_xin_areas].width;
-            dims[(i * 4) + 3] = area[i][screen_num_xin_areas].height;
+            dims[(i * 4) + 0] = area[i][screen_num_monitors].x;
+            dims[(i * 4) + 1] = area[i][screen_num_monitors].y;
+            dims[(i * 4) + 2] = area[i][screen_num_monitors].width;
+            dims[(i * 4) + 3] = area[i][screen_num_monitors].height;
         }
     }
     PROP_SETA32(ob_root, net_workarea, cardinal,
@@ -676,12 +684,12 @@ void screen_update_areas()
 
 Rect *screen_area(guint desktop)
 {
-    return screen_area_xinerama(desktop, screen_num_xin_areas);
+    return screen_area_monitor(desktop, screen_num_monitors);
 }
 
-Rect *screen_area_xinerama(guint desktop, guint head)
+Rect *screen_area_monitor(guint desktop, guint head)
 {
-    if (head > screen_num_xin_areas)
+    if (head > screen_num_monitors)
         return NULL;
     if (desktop >= screen_num_desktops) {
 	if (desktop == DESKTOP_ALL)
@@ -693,14 +701,14 @@ Rect *screen_area_xinerama(guint desktop, guint head)
 
 Rect *screen_physical_area()
 {
-    return screen_physical_area_xinerama(screen_num_xin_areas);
+    return screen_physical_area_monitor(screen_num_monitors);
 }
 
-Rect *screen_physical_area_xinerama(guint head)
+Rect *screen_physical_area_monitor(guint head)
 {
-    if (head > screen_num_xin_areas)
+    if (head > screen_num_monitors)
         return NULL;
-    return &xin_areas[head];
+    return &monitor_area[head];
 }
 
 static void set_root_cursor()

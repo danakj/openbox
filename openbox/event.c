@@ -595,9 +595,7 @@ static void event_handle_root(XEvent *e)
 #ifdef XRANDR
         XRRUpdateConfiguration(e);
 #endif
-        if (e->xconfigure.width != screen_physical_size.width ||
-            e->xconfigure.height != screen_physical_size.height)
-            screen_resize(e->xconfigure.width, e->xconfigure.height);
+        screen_resize();
         break;
     default:
         ;

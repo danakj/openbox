@@ -403,8 +403,8 @@ void menu_control_show(Menu *self, int x, int y, Client *client) {
 
     g_assert(!self->invalid);
     
-    for (i = 0; i < screen_num_xin_areas; ++i) {
-        a = screen_physical_area_xinerama(i);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        a = screen_physical_area_monitor(i);
         if (RECT_CONTAINS(*a, x, y))
             break;
     }
@@ -449,7 +449,7 @@ void menu_control_mouseover(MenuEntry *self, gboolean enter) {
 	    /* need to get the width. is this bad?*/
 	    menu_render(self->submenu);
 
-            a = screen_physical_area_xinerama(self->parent->xin_area);
+            a = screen_physical_area_monitor(self->parent->xin_area);
 
 	    if (self->submenu->size.width + x >= a->x + a->width)
 		x = self->parent->location.x - self->submenu->size.width - 

@@ -11,11 +11,9 @@ struct Client;
 /*! The number of available desktops */
 extern guint screen_num_desktops;
 /*! The number of virtual "xinerama" screens/heads */
-extern guint screen_num_xin_areas;
+extern guint screen_num_monitors;
 /*! The current desktop */
 extern guint screen_desktop;
-/*! The size of the screen */
-extern Size  screen_physical_size;
 /*! Are we in showing-desktop mode? */
 extern gboolean screen_showing_desktop;
 
@@ -45,7 +43,7 @@ void screen_startup();
 void screen_shutdown();
 
 /*! Figure out the new size of the screen and adjust stuff for it */
-void screen_resize(int w, int h);
+void screen_resize();
 
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);
@@ -70,10 +68,10 @@ void screen_update_areas();
 
 Rect *screen_physical_area();
 
-Rect *screen_physical_area_xinerama(guint head);
+Rect *screen_physical_area_monitor(guint head);
 
 Rect *screen_area(guint desktop);
 
-Rect *screen_area_xinerama(guint desktop, guint head);
+Rect *screen_area_monitor(guint desktop, guint head);
 
 #endif

@@ -56,6 +56,7 @@ void client_send_to_update(Menu *self)
     }
 }
 
+#if 0
 void client_menu_show(Menu *self, int x, int y, Client *client)
 {
     int newy;
@@ -82,6 +83,7 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
 	menu_hide(self->open_submenu);
     }
 }
+#endif
 
 void plugin_setup_config() { }
 

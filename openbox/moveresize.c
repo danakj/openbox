@@ -82,7 +82,7 @@ static void popup_coords(char *format, int a, int b)
     Rect *area;
 
     text = g_strdup_printf(format, a, b);
-    area = screen_physical_area_xinerama(0);
+    area = screen_physical_area_monitor(0);
     popup_position(popup, NorthWestGravity,
                    POPUP_X + area->x, POPUP_Y + area->y);
     popup_show(popup, text, NULL);

@@ -70,7 +70,8 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
         *nxin = 1;
         *xin_areas = g_new(Rect, *nxin + 1);
         RECT_SET((*xin_areas)[0], 0, 0,
-                 screen_physical_size.width, screen_physical_size.height);
+                 WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen)),
+                 HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen)));
     }
 
     /* returns one extra with the total area in it */

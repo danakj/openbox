@@ -135,16 +135,17 @@ void event_process(XEvent *e)
 	window = e->xconfigurerequest.window;
 	break;
     default:
-	/* XKB events */
-	if (e->type == extensions_xkb_event_basep) {
+#ifdef XKB
+	if (extensions_xkb && e->type == extensions_xkb_event_basep) {
 	    switch (((XkbAnyEvent*)&e)->xkb_type) {
 	    case XkbBellNotify:
 		window = ((XkbBellNotifyEvent*)&e)->window;
 	    default:
 		window = None;
 	    }
-	} else
-	    window = e->xany.window;
+        } else
+#endif
+            window = e->xany.window;
     }
      
     /* grab the lasttime and hack up the state */
@@ -560,5 +561,13 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client_update_icons(client);
 	else if (msgtype == prop_atoms.kwm_win_icon)
 	    client_update_kwm_icon(client);
+    default:
+        ;
+#ifdef SHAPE
+        if (extensions_shape && e->type == extensions_shape_event_basep) {
+            client->shaped = ((XShapeEvent*)&e)->shaped;
+            engine_frame_adjust_shape(client->frame);
+        }
+#endif
     }
 }

@@ -3139,12 +3139,12 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
             wtop < (signed)(winrect.y() + winrect.height() - 1)) {
 
           // snap left of other window?
-          if (dleft < resistance_size && dleft > dright) {
+          if (dleft > 0 && dleft < resistance_size && dleft < dright) {
             dx = winrect.left() - frame.rect.width();
             snapped = True;
           }
           // snap right of other window?
-          else if (dright < resistance_size) {
+          else if (dright > 0 && dright < resistance_size) {
             dx = winrect.right() + 1;
             snapped = True;
           }
@@ -3169,12 +3169,12 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
             wleft < (signed)(winrect.x() + winrect.width() - 1)) {
 
           // snap top of other window?
-          if (dtop < resistance_size && dtop > dbottom) {
+          if (dtop > 0 && dtop < resistance_size && dtop < dbottom) {
             dy = winrect.top() - frame.rect.height();
             snapped = True;
           }
           // snap bottom of other window?
-          else if (dbottom < resistance_size) {
+          else if (dbottom > 0 && dbottom < resistance_size) {
             dy = winrect.bottom() + 1;
             snapped = True;
           }
@@ -3223,17 +3223,17 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
         dbottom = wbottom - srect.bottom();
 
         // snap left?
-        if (dleft < resistance_size && dleft > dright)
+        if (dleft > 0 && dleft < resistance_size && dleft > dright)
           dx = srect.left();
         // snap right?
-        else if (dright < resistance_size)
+        else if (dright > 0 && dright < resistance_size)
           dx = srect.right() - frame.rect.width() + 1;
 
         // snap top?
-        if (dtop < resistance_size && dtop > dbottom)
+        if (dtop > 0 && dtop < resistance_size && dtop > dbottom)
           dy = srect.top();
         // snap bottom?
-        else if (dbottom < resistance_size)
+        else if (dbottom > 0 && dbottom < resistance_size)
           dy = srect.bottom() - frame.rect.height() + 1;
     }
   }

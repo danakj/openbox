@@ -10,11 +10,14 @@ extern "C" {
 #include <list>
 
 #include "timer.hh"
-#include "basedisplay.hh"
 #include "color.hh"
+#include "screeninfo.hh"
+
+namespace otk {
 
 class BImageControl;
 class BTexture;
+class ScreenInfo;
 
 class BImage {
 private:
@@ -72,17 +75,15 @@ public:
     unsigned long pixel1, pixel2, texture;
   };
 
-  BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
+  BImageControl(const ScreenInfo *scrn,
                 bool _dither= False, int _cpc = 4,
                 unsigned long cache_timeout = 300000l,
                 unsigned long cmax = 200l);
   virtual ~BImageControl(void);
 
-  inline BaseDisplay *getBaseDisplay(void) const { return basedisplay; }
-
   inline bool doDither(void) { return dither; }
 
-  inline const ScreenInfo *getScreenInfo(void) { return screeninfo; }
+  inline const ScreenInfo* getScreenInfo() const { return screeninfo; }
 
   inline Window getDrawable(void) const { return window; }
 
@@ -114,7 +115,6 @@ public:
 
 private:
   bool dither;
-  BaseDisplay *basedisplay;
   const ScreenInfo *screeninfo;
   BTimer *timer;
 
@@ -139,6 +139,7 @@ private:
                      const BColor &c1, const BColor &c2);
 };
 
+}
 
 #endif // __Image_hh
 

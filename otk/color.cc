@@ -11,25 +11,25 @@ extern "C" {
 #include <assert.h>
 
 #include "color.hh"
-#include "basedisplay.hh"
+#include "display.hh"
+#include "screeninfo.hh"
 
+namespace otk {
 
 BColor::ColorCache BColor::colorcache;
 bool BColor::cleancache = false;
 
-BColor::BColor(const BaseDisplay * const _display, unsigned int _screen)
-  : allocated(false), r(-1), g(-1), b(-1), p(0), dpy(_display), scrn(_screen)
+BColor::BColor(unsigned int _screen)
+  : allocated(false), r(-1), g(-1), b(-1), p(0), scrn(_screen)
 {}
 
-BColor::BColor(int _r, int _g, int _b,
-               const BaseDisplay * const _display, unsigned int _screen)
-  : allocated(false), r(_r), g(_g), b(_b), p(0), dpy(_display), scrn(_screen)
+BColor::BColor(int _r, int _g, int _b, unsigned int _screen)
+  : allocated(false), r(_r), g(_g), b(_b), p(0), scrn(_screen)
 {}
 
 
-BColor::BColor(const std::string &_name,
-               const BaseDisplay * const _display, unsigned int _screen)
-  : allocated(false), r(-1), g(-1), b(-1), p(0), dpy(_display), scrn(_screen),
+BColor::BColor(const std::string &_name, unsigned int _screen)
+  : allocated(false), r(-1), g(-1), b(-1), p(0), scrn(_screen),
     colorname(_name) {
   parseColorName();
 }
@@ -40,16 +40,14 @@ BColor::~BColor(void) {
 }
 
 
-void BColor::setDisplay(const BaseDisplay * const _display,
-                        unsigned int _screen) {
-  if (_display == display() && _screen == screen()) {
+void BColor::setScreen(unsigned int _screen) {
+  if (_screen == screen()) {
     // nothing to do
     return;
   }
 
   deallocate();
 
-  dpy = _display;
   scrn = _screen;
 
   if (! colorname.empty()) {
@@ -70,16 +68,14 @@ unsigned long BColor::pixel(void) const {
 
 
 void BColor::parseColorName(void) {
-  assert(dpy != 0);
-
   if (colorname.empty()) {
     fprintf(stderr, "BColor: empty colorname, cannot parse (using black)\n");
     setRGB(0, 0, 0);
   }
 
   if (scrn == ~(0u))
-    scrn = DefaultScreen(display()->getXDisplay());
-  Colormap colormap = display()->getScreenInfo(scrn)->getColormap();
+    scrn = DefaultScreen(OBDisplay::display);
+  Colormap colormap = OBDisplay::screenInfo(scrn)->getColormap();
 
   // get rgb values from colorname
   XColor xcol;
@@ -88,7 +84,7 @@ void BColor::parseColorName(void) {
   xcol.blue = 0;
   xcol.pixel = 0;
 
-  if (! XParseColor(display()->getXDisplay(), colormap,
+  if (! XParseColor(OBDisplay::display, colormap,
                     colorname.c_str(), &xcol)) {
     fprintf(stderr, "BColor::allocate: color parse error: \"%s\"\n",
             colorname.c_str());
@@ -101,10 +97,8 @@ void BColor::parseColorName(void) {
 
 
 void BColor::allocate(void) {
-  assert(dpy != 0);
-
-  if (scrn == ~(0u)) scrn = DefaultScreen(display()->getXDisplay());
-  Colormap colormap = display()->getScreenInfo(scrn)->getColormap();
+  if (scrn == ~(0u)) scrn = DefaultScreen(OBDisplay::display);
+  Colormap colormap = OBDisplay::screenInfo(scrn)->getColormap();
 
   if (! isValid()) {
     if (colorname.empty()) {
@@ -116,7 +110,7 @@ void BColor::allocate(void) {
   }
 
   // see if we have allocated this color before
-  RGB rgb(display(), scrn, r, g, b);
+  RGB rgb(scrn, r, g, b);
   ColorCache::iterator it = colorcache.find(rgb);
   if (it != colorcache.end()) {
     // found
@@ -133,7 +127,7 @@ void BColor::allocate(void) {
   xcol.blue =  b | b << 8;
   xcol.pixel = 0;
 
-  if (! XAllocColor(display()->getXDisplay(), colormap, &xcol)) {
+  if (! XAllocColor(OBDisplay::display, colormap, &xcol)) {
     fprintf(stderr, "BColor::allocate: color alloc error: rgb:%x/%x/%x\n",
             r, g, b);
     xcol.pixel = 0;
@@ -153,9 +147,7 @@ void BColor::deallocate(void) {
   if (! allocated)
     return;
 
-  assert(dpy != 0);
-
-  ColorCache::iterator it = colorcache.find(RGB(display(), scrn, r, g, b));
+  ColorCache::iterator it = colorcache.find(RGB(scrn, r, g, b));
   if (it != colorcache.end()) {
     if ((*it).second.count >= 1)
       (*it).second.count--;
@@ -173,7 +165,6 @@ BColor &BColor::operator=(const BColor &c) {
 
   setRGB(c.r, c.g, c.b);
   colorname = c.colorname;
-  dpy = c.dpy;
   scrn = c.scrn;
   return *this;
 }
@@ -192,11 +183,11 @@ void BColor::doCacheCleanup(void) {
     return;
   }
 
-  const BaseDisplay* const display = (*it).first.display;
   unsigned long *pixels = new unsigned long[ colorcache.size() ];
-  unsigned int i, count;
+  int i;
+  unsigned count;
 
-  for (i = 0; i < display->getNumberOfScreens(); i++) {
+  for (i = 0; i < ScreenCount(OBDisplay::display); i++) {
     count = 0;
     it = colorcache.begin();
 
@@ -213,11 +204,13 @@ void BColor::doCacheCleanup(void) {
     }
 
     if (count > 0)
-      XFreeColors(display->getXDisplay(),
-                  display->getScreenInfo(i)->getColormap(),
+      XFreeColors(OBDisplay::display,
+                  OBDisplay::screenInfo(i)->getColormap(),
                   pixels, count, 0);
   }
 
   delete [] pixels;
   cleancache = false;
+}
+
 }

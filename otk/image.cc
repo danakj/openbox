@@ -12,12 +12,12 @@
 using std::max;
 using std::min;
 
-#include "blackbox.hh"
-#include "basedisplay.hh"
+#include "display.hh"
 #include "gccache.hh"
 #include "image.hh"
 #include "texture.hh"
 
+namespace otk {
 
 BImage::BImage(BImageControl *c, int w, int h) {
   control = c;
@@ -62,7 +62,7 @@ Pixmap BImage::render(const BTexture &texture) {
 
 
 Pixmap BImage::render_solid(const BTexture &texture) {
-  Pixmap pixmap = XCreatePixmap(control->getBaseDisplay()->getXDisplay(),
+  Pixmap pixmap = XCreatePixmap(OBDisplay::display,
 				control->getDrawable(), width,
 				height, control->getDepth());
   if (pixmap == None) {
@@ -70,70 +70,68 @@ Pixmap BImage::render_solid(const BTexture &texture) {
     return None;
   }
 
-  Display *display = control->getBaseDisplay()->getXDisplay();
-
   BPen pen(texture.color());
   BPen penlight(texture.lightColor());
   BPen penshadow(texture.shadowColor());
 
-  XFillRectangle(display, pixmap, pen.gc(), 0, 0, width, height);
+  XFillRectangle(OBDisplay::display, pixmap, pen.gc(), 0, 0, width, height);
 
   if (texture.texture() & BTexture::Interlaced) {
     BPen peninterlace(texture.colorTo());
     for (unsigned int i = 0; i < height; i += 2)
-      XDrawLine(display, pixmap, peninterlace.gc(), 0, i, width, i);
+      XDrawLine(OBDisplay::display, pixmap, peninterlace.gc(), 0, i, width, i);
   }
 
   int left = 0, top = 0, right = width - 1, bottom = height - 1;
 
   if (texture.texture() & BTexture::Border) {
     BPen penborder(texture.borderColor());
-    XDrawRectangle(display, pixmap, penborder.gc(),
+    XDrawRectangle(OBDisplay::display, pixmap, penborder.gc(),
                    left, top, right, bottom);
   }
 
   if (texture.texture() & BTexture::Bevel1) {
     if (texture.texture() & BTexture::Raised) {
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left, top, right, top);
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left, bottom, left, top);
     } else if (texture.texture() & BTexture::Sunken) {
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left, bottom, right, bottom);
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 right, bottom, right, top);
 
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left, top, right, top);
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left, bottom, left, top);
     }
   } else if (texture.texture() & BTexture::Bevel2) {
     if (texture.texture() & BTexture::Raised) {
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
     } else if (texture.texture() & BTexture::Sunken) {
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 left + 1, bottom - 2, right - 2, bottom - 2);
-      XDrawLine(display, pixmap, penlight.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penlight.gc(),
                 right - 2, bottom - 2, right - 2, top + 1);
 
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left + 1, top + 1, right - 2, top + 1);
-      XDrawLine(display, pixmap, penshadow.gc(),
+      XDrawLine(OBDisplay::display, pixmap, penshadow.gc(),
                 left + 1, bottom - 2, left + 1, top + 1);
     }
   }
@@ -427,7 +425,7 @@ void BImage::PseudoColorDither(int bytes_per_line, unsigned char *pixel_data) {
 
 XImage *BImage::renderXImage(void) {
   XImage *image =
-    XCreateImage(control->getBaseDisplay()->getXDisplay(),
+    XCreateImage(OBDisplay::display,
                  control->getVisual(), control->getDepth(), ZPixmap, 0, 0,
                  width, height, 32, 0);
 
@@ -541,7 +539,7 @@ XImage *BImage::renderXImage(void) {
 
 Pixmap BImage::renderPixmap(void) {
   Pixmap pixmap =
-    XCreatePixmap(control->getBaseDisplay()->getXDisplay(),
+    XCreatePixmap(OBDisplay::display,
                   control->getDrawable(), width, height, control->getDepth());
 
   if (pixmap == None) {
@@ -552,18 +550,18 @@ Pixmap BImage::renderPixmap(void) {
   XImage *image = renderXImage();
 
   if (! image) {
-    XFreePixmap(control->getBaseDisplay()->getXDisplay(), pixmap);
+    XFreePixmap(OBDisplay::display, pixmap);
     return None;
   }
 
   if (! image->data) {
     XDestroyImage(image);
-    XFreePixmap(control->getBaseDisplay()->getXDisplay(), pixmap);
+    XFreePixmap(OBDisplay::display, pixmap);
     return None;
   }
 
-  XPutImage(control->getBaseDisplay()->getXDisplay(), pixmap,
-	    DefaultGC(control->getBaseDisplay()->getXDisplay(),
+  XPutImage(OBDisplay::display, pixmap,
+	    DefaultGC(OBDisplay::display,
 		      control->getScreenInfo()->getScreenNumber()),
             image, 0, 0, 0, 0, width, height);
 
@@ -1674,4 +1672,6 @@ void BImage::cdgradient(void) {
       }
     }
   }
+}
+
 }

@@ -9,14 +9,15 @@ extern "C" {
 }
 
 #include "gccache.hh"
-#include "basedisplay.hh"
 #include "color.hh"
 #include "util.hh"
+#include "screeninfo.hh"
 
+namespace otk {
 
 BGCCacheContext::~BGCCacheContext(void) {
   if (gc)
-    XFreeGC(display->getXDisplay(), gc);
+    XFreeGC(OBDisplay::display, gc);
 }
 
 
@@ -41,7 +42,7 @@ void BGCCacheContext::set(const BColor &_color,
     fontid = 0;
   }
 
-  XChangeGC(display->getXDisplay(), gc, mask, &gcv);
+  XChangeGC(OBDisplay::display, gc, mask, &gcv);
 }
 
 
@@ -53,20 +54,18 @@ void BGCCacheContext::set(const XFontStruct * const _font) {
 
   XGCValues gcv;
   fontid = gcv.font = _font->fid;
-  XChangeGC(display->getXDisplay(), gc, GCFont, &gcv);
+  XChangeGC(OBDisplay::display, gc, GCFont, &gcv);
 }
 
 
-BGCCache::BGCCache(const BaseDisplay * const _display,
-                   unsigned int screen_count)
-  : display(_display),  context_count(128u),
-    cache_size(16u), cache_buckets(8u * screen_count),
+BGCCache::BGCCache(unsigned int screen_count)
+  : context_count(128u), cache_size(16u), cache_buckets(8u * screen_count),
     cache_total_size(cache_size * cache_buckets) {
 
   contexts = new BGCCacheContext*[context_count];
   unsigned int i;
   for (i = 0; i < context_count; i++) {
-    contexts[i] = new BGCCacheContext(display);
+    contexts[i] = new BGCCacheContext();
   }
 
   cache = new BGCCacheItem*[cache_total_size];
@@ -85,7 +84,7 @@ BGCCache::~BGCCache(void) {
 
 
 BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
-  Window hd = display->getScreenInfo(scr)->getRootWindow();
+  Window hd = OBDisplay::screenInfo(scr)->getRootWindow();
 
   BGCCacheContext *c;
 
@@ -93,7 +92,7 @@ BGCCacheContext *BGCCache::nextContext(unsigned int scr) {
     c = contexts[i];
 
     if (! c->gc) {
-      c->gc = XCreateGC(display->getXDisplay(), hd, 0, 0);
+      c->gc = XCreateGC(OBDisplay::display, hd, 0, 0);
       c->used = false;
       c->screen = scr;
     }
@@ -185,4 +184,6 @@ void BGCCache::purge(void) {
       d->ctx = 0;
     }
   }
+}
+
 }

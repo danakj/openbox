@@ -4,19 +4,18 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-
 #include <X11/Xft/Xft.h>
 }
 
 #include <assert.h>
-
 #include <string>
+
+namespace otk {
 
 class BGCCache;
 class BGCCacheItem;
 class BColor;
-
-#include "screen.hh"
+class ScreenInfo;
 
 class BFont {
   /*
@@ -36,8 +35,7 @@ public:
    * instance members
    */
 private:
-  Display          *_display;
-  BScreen          *_screen;
+  int               _screen_num;
 
   std::string       _family;
   bool              _simplename;  // true if not spec'd as a -*-* string
@@ -58,7 +56,7 @@ private:
 
 public:
   // loads an Xft font
-  BFont(Display *d, BScreen *screen, const std::string &family, int size,
+  BFont(int screen_num, const std::string &family, int size,
         bool bold, bool italic, bool shadow, unsigned char offset, 
         unsigned char tint, bool antialias = True);
   virtual ~BFont(void);
@@ -78,5 +76,7 @@ public:
   void drawString(Drawable d, int x, int y, const BColor &color,
                   const std::string &string) const;
 };
+
+}
 
 #endif // __Font_hh

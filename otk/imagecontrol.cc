@@ -18,11 +18,12 @@ extern "C" {
 
 #include <algorithm>
 
-#include "blackbox.hh"
-#include "basedisplay.hh"
+#include "display.hh"
 #include "color.hh"
 #include "image.hh"
 #include "texture.hh"
+
+namespace otk {
 
 static unsigned long bsqrt(unsigned long x) {
   if (x <= 0) return 0;
@@ -40,22 +41,22 @@ static unsigned long bsqrt(unsigned long x) {
 
 BImageControl *ctrl = 0;
 
-BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
+BImageControl::BImageControl(const ScreenInfo *scrn,
                              bool _dither, int _cpc,
                              unsigned long cache_timeout,
                              unsigned long cmax) {
   if (! ctrl) ctrl = this;
 
-  basedisplay = dpy;
   screeninfo = scrn;
   setDither(_dither);
   setColorsPerChannel(_cpc);
 
   cache_max = cmax;
   if (cache_timeout) {
-    timer = new BTimer(basedisplay, this);
+    // XXX: FIX THIS
+    timer = 0;/*new BTimer(this);
     timer->setTimeout(cache_timeout);
-    timer->start();
+    timer->start();*/
   } else {
     timer = (BTimer *) 0;
   }
@@ -74,7 +75,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
   colormap = screeninfo->getColormap();
 
   int count;
-  XPixmapFormatValues *pmv = XListPixmapFormats(basedisplay->getXDisplay(),
+  XPixmapFormatValues *pmv = XListPixmapFormats(OBDisplay::display,
                                                 &count);
   if (pmv) {
     bits_per_pixel = 0;
@@ -167,7 +168,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
 	}
 
     for (i = 0; i < ncolors; i++) {
-      if (! XAllocColor(basedisplay->getXDisplay(), colormap, &colors[i])) {
+      if (! XAllocColor(OBDisplay::display, colormap, &colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
 	colors[i].flags = 0;
@@ -182,7 +183,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(basedisplay->getXDisplay(), colormap, icolors, incolors);
+    XQueryColors(OBDisplay::display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -204,7 +205,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(basedisplay->getXDisplay(), colormap,
+	    if (XAllocColor(OBDisplay::display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -261,7 +262,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
       colors[i].blue = (i * 0xffff) / (colors_per_channel - 1);;
       colors[i].flags = DoRed|DoGreen|DoBlue;
 
-      if (! XAllocColor(basedisplay->getXDisplay(), colormap,
+      if (! XAllocColor(OBDisplay::display, colormap,
 			&colors[i])) {
 	fprintf(stderr, "couldn't alloc color %i %i %i\n",
 		colors[i].red, colors[i].green, colors[i].blue);
@@ -278,7 +279,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
     for (i = 0; i < incolors; i++)
       icolors[i].pixel = i;
 
-    XQueryColors(basedisplay->getXDisplay(), colormap, icolors, incolors);
+    XQueryColors(OBDisplay::display, colormap, icolors, incolors);
     for (i = 0; i < ncolors; i++) {
       if (! colors[i].flags) {
 	unsigned long chk = 0xffffffff, pixel, close = 0;
@@ -300,7 +301,7 @@ BImageControl::BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
 	    colors[i].green = icolors[close].green;
 	    colors[i].blue = icolors[close].blue;
 
-	    if (XAllocColor(basedisplay->getXDisplay(), colormap,
+	    if (XAllocColor(OBDisplay::display, colormap,
 			    &colors[i])) {
 	      colors[i].flags = DoRed|DoGreen|DoBlue;
 	      break;
@@ -334,7 +335,7 @@ BImageControl::~BImageControl(void) {
     for (int i = 0; i < ncolors; i++)
       *(pixels + i) = (*(colors + i)).pixel;
 
-    XFreeColors(basedisplay->getXDisplay(), colormap, pixels, ncolors, 0);
+    XFreeColors(OBDisplay::display, colormap, pixels, ncolors, 0);
 
     delete [] colors;
   }
@@ -347,7 +348,7 @@ BImageControl::~BImageControl(void) {
     CacheContainer::iterator it = cache.begin();
     const CacheContainer::iterator end = cache.end();
     for (; it != end; ++it)
-      XFreePixmap(basedisplay->getXDisplay(), it->pixmap);
+      XFreePixmap(OBDisplay::display, it->pixmap);
   }
   if (timer) {
     timer->stop();
@@ -498,7 +499,7 @@ void BImageControl::getGradientBuffers(unsigned int w,
 void BImageControl::installRootColormap(void) {
   int ncmap = 0;
   Colormap *cmaps =
-    XListInstalledColormaps(basedisplay->getXDisplay(), window, &ncmap);
+    XListInstalledColormaps(OBDisplay::display, window, &ncmap);
 
   if (cmaps) {
     bool install = True;
@@ -507,7 +508,7 @@ void BImageControl::installRootColormap(void) {
 	install = False;
 
     if (install)
-      XInstallColormap(basedisplay->getXDisplay(), colormap);
+      XInstallColormap(OBDisplay::display, colormap);
 
     XFree(cmaps);
   }
@@ -543,19 +544,19 @@ struct ZeroRefCheck {
 };
 
 struct CacheCleaner {
-  Display *display;
   ZeroRefCheck ref_check;
-  CacheCleaner(Display *d): display(d) {}
+  CacheCleaner() {}
   inline void operator()(const BImageControl::CachedImage& image) const {
     if (ref_check(image))
-      XFreePixmap(display, image.pixmap);
+      XFreePixmap(OBDisplay::display, image.pixmap);
   }
 };
 
 
 void BImageControl::timeout(void) {
-  CacheCleaner cleaner(basedisplay->getXDisplay());
+  CacheCleaner cleaner;
   std::for_each(cache.begin(), cache.end(), cleaner);
   cache.remove_if(cleaner.ref_check);
 }
 
+}

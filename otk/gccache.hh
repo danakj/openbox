@@ -6,8 +6,10 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "basedisplay.hh"
+#include "display.hh"
 #include "color.hh"
+
+namespace otk {
 
 class BGCCacheItem;
 
@@ -20,11 +22,10 @@ public:
   ~BGCCacheContext(void);
 
 private:
-  BGCCacheContext(const BaseDisplay * const _display)
-    : display(_display), gc(0), pixel(0ul), fontid(0ul),
+  BGCCacheContext()
+    : gc(0), pixel(0ul), fontid(0ul),
       function(0), subwindow(0), used(false), screen(~(0u)), linewidth(0) {}
 
-  const BaseDisplay *display;
   GC gc;
   unsigned long pixel;
   unsigned long fontid;
@@ -61,7 +62,7 @@ private:
 
 class BGCCache {
 public:
-  BGCCache(const BaseDisplay * const _display, unsigned int screen_count);
+  BGCCache(unsigned int screen_count);
   ~BGCCache(void);
 
   // cleans up the cache
@@ -78,8 +79,6 @@ private:
 
   // this is closely modelled after the Qt GC cache, but with some of the
   // complexity stripped out
-  const BaseDisplay *display;
-
   const unsigned int context_count;
   const unsigned int cache_size;
   const unsigned int cache_buckets;
@@ -94,7 +93,7 @@ public:
               int _linewidth = 0, int _function = GXcopy,
               int _subwindow = ClipByChildren)
     : color(_color), font(_font), linewidth(_linewidth), function(_function),
-      subwindow(_subwindow), cache(_color.display()->gcCache()), item(0) { }
+      subwindow(_subwindow), cache(OBDisplay::gcCache()), item(0) { }
 
   inline ~BPen(void) { if (item) cache->release(item); }
 
@@ -115,5 +114,6 @@ private:
   mutable BGCCacheItem *item;
 };
 
+}
 
 #endif // GCCACHE_HH

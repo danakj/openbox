@@ -4,9 +4,12 @@
 
 #include "color.hh"
 #include "util.hh"
-class BImageControl;
 
 #include <string>
+
+namespace otk {
+
+class BImageControl;
 
 class BTexture {
 public:
@@ -42,10 +45,8 @@ public:
     Interlaced          = (1l<<18)
   };
 
-  BTexture(const BaseDisplay * const _display = 0,
-           unsigned int _screen = ~(0u), BImageControl* _ctrl = 0);
+  BTexture(unsigned int _screen = ~(0u), BImageControl* _ctrl = 0);
   BTexture(const std::string &_description,
-           const BaseDisplay * const _display = 0,
            unsigned int _screen = ~(0u), BImageControl* _ctrl = 0);
 
   void setColor(const BColor &_color);
@@ -69,10 +70,8 @@ public:
   inline bool operator!=(const BTexture &tt)
   { return (! operator==(tt)); }
 
-  const BaseDisplay *display(void) const { return dpy; }
   unsigned int screen(void) const { return scrn; }
-  void setDisplay(const BaseDisplay * const _display,
-                  const unsigned int _screen);
+  void setScreen(const unsigned int _screen);
   void setImageControl(BImageControl* _ctrl) { ctrl = _ctrl; }
   const std::string &description(void) const { return descr; }
   void setDescription(const std::string &d);
@@ -84,9 +83,10 @@ private:
   BColor c, ct, lc, sc, bc;
   std::string descr;
   unsigned long t;
-  const BaseDisplay *dpy;
   BImageControl *ctrl;
   unsigned int scrn;
 };
+
+}
 
 #endif // TEXTURE_HH

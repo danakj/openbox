@@ -21,14 +21,16 @@ using std::endl;
 #include "util.hh"
 #include "gccache.hh"
 #include "color.hh"
+#include "screeninfo.hh"
+
+namespace otk {
 
 string      BFont::_fallback_font   = "fixed";
 
-BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
+BFont::BFont(int screen_num, const string &family, int size,
              bool bold, bool italic, bool shadow, unsigned char offset, 
              unsigned char tint, bool antialias) :
-                                          _display(d),
-                                          _screen(screen),
+                                          _screen_num(screen_num),
                                           _family(family),
                                           _simplename(False),
                                           _size(size),
@@ -41,7 +43,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
                                           _xftfont(0) {
   _valid = False;
 
-  _xftfont = XftFontOpen(_display, _screen->getScreenNumber(),
+  _xftfont = XftFontOpen(OBDisplay::display, _screen_num,
                          XFT_FAMILY, XftTypeString,  _family.c_str(),
                          XFT_SIZE,   XftTypeInteger, _size,
                          XFT_WEIGHT, XftTypeInteger, (_bold ?
@@ -61,7 +63,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
 
 BFont::~BFont(void) {
   if (_xftfont)
-    XftFontClose(_display, _xftfont);
+    XftFontClose(OBDisplay::display, _xftfont);
 }
 
 
@@ -69,8 +71,9 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
                        const string &string) const {
   assert(_valid);
 
-  XftDraw *draw = XftDrawCreate(_display, d, _screen->getVisual(),
-                                _screen->getColormap());
+  const ScreenInfo *info = OBDisplay::screenInfo(_screen_num);
+  XftDraw *draw = XftDrawCreate(OBDisplay::display, d,
+                                info->getVisual(), info->getColormap());
   assert(draw);
 
   if (_shadow) {
@@ -79,7 +82,7 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     c.color.green = 0;
     c.color.blue = 0;
     c.color.alpha = _tint | _tint << 8; // transparent shadow
-    c.pixel = BlackPixel(_display, _screen->getScreenNumber());
+    c.pixel = BlackPixel(OBDisplay::display, _screen_num);
 
     XftDrawStringUtf8(draw, &c, _xftfont, x + _offset,
                       _xftfont->ascent + y + _offset,
@@ -107,8 +110,8 @@ unsigned int BFont::measureString(const string &string) const {
 
   XGlyphInfo info;
 
-  XftTextExtentsUtf8(_display, _xftfont, (XftChar8 *) string.c_str(),
-                     string.size(), &info);
+  XftTextExtentsUtf8(OBDisplay::display, _xftfont,
+                     (XftChar8 *) string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }
@@ -125,4 +128,6 @@ unsigned int BFont::maxCharWidth(void) const {
   assert(_valid);
 
   return _xftfont->max_advance_width;
+}
+
 }

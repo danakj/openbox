@@ -14,33 +14,30 @@ extern "C" {
 #include <assert.h>
 
 #include "texture.hh"
-#include "basedisplay.hh"
+#include "display.hh"
 #include "image.hh"
-#include "screen.hh"
-#include "blackbox.hh"
 
 using std::string;
 
+namespace otk {
 
-BTexture::BTexture(const BaseDisplay * const _display,
-                   unsigned int _screen, BImageControl* _ctrl)
-  : c(_display, _screen), ct(_display, _screen),
-    lc(_display, _screen), sc(_display, _screen), bc(_display, _screen), t(0),
-    dpy(_display), ctrl(_ctrl), scrn(_screen) { }
+BTexture::BTexture(unsigned int _screen, BImageControl* _ctrl)
+  : c(_screen), ct(_screen),
+    lc(_screen), sc(_screen), bc(_screen), t(0),
+    ctrl(_ctrl), scrn(_screen) { }
 
 
-BTexture::BTexture(const string &d, const BaseDisplay * const _display,
-                   unsigned int _screen, BImageControl* _ctrl)
-  : c(_display, _screen), ct(_display, _screen),
-    lc(_display, _screen), sc(_display, _screen), bc(_display, _screen), t(0),
-    dpy(_display), ctrl(_ctrl), scrn(_screen) {
+BTexture::BTexture(const string &d,unsigned int _screen, BImageControl* _ctrl)
+  : c(_screen), ct(_screen),
+    lc(_screen), sc(_screen), bc(_screen), t(0),
+    ctrl(_ctrl), scrn(_screen) {
   setDescription(d);
 }
 
 
 void BTexture::setColor(const BColor &cc) {
   c = cc;
-  c.setDisplay(display(), screen());
+  c.setScreen(screen());
 
   unsigned char r, g, b, rr, gg, bb;
 
@@ -54,7 +51,7 @@ void BTexture::setColor(const BColor &cc) {
   if (rr < r) rr = ~0;
   if (gg < g) gg = ~0;
   if (bb < b) bb = ~0;
-  lc = BColor(rr, gg, bb, display(), screen());
+  lc = BColor(rr, gg, bb, screen());
 
   // calculate the shadow color
   r = c.red();
@@ -66,7 +63,7 @@ void BTexture::setColor(const BColor &cc) {
   if (rr > r) rr = 0;
   if (gg > g) gg = 0;
   if (bb > b) bb = 0;
-  sc = BColor(rr, gg, bb, display(), screen());
+  sc = BColor(rr, gg, bb, screen());
 }
 
 
@@ -127,20 +124,18 @@ void BTexture::setDescription(const string &d) {
   }
 }
 
-void BTexture::setDisplay(const BaseDisplay * const _display,
-                          const unsigned int _screen) {
-  if (_display == display() && _screen == screen()) {
+void BTexture::setScreen(const unsigned int _screen) {
+  if (_screen == screen()) {
     // nothing to do
     return;
   }
 
-  dpy = _display;
   scrn = _screen;
-  c.setDisplay(_display, _screen);
-  ct.setDisplay(_display, _screen);
-  lc.setDisplay(_display, _screen);
-  sc.setDisplay(_display, _screen);
-  bc.setDisplay(_display, _screen);
+  c.setScreen(_screen);
+  ct.setScreen(_screen);
+  lc.setScreen(_screen);
+  sc.setScreen(_screen);
+  bc.setScreen(_screen);
 }
 
 
@@ -152,7 +147,6 @@ BTexture& BTexture::operator=(const BTexture &tt) {
   bc = tt.bc;
   descr = tt.descr;
   t  = tt.t;
-  dpy = tt.dpy;
   scrn = tt.scrn;
   ctrl = tt.ctrl;
 
@@ -162,7 +156,6 @@ BTexture& BTexture::operator=(const BTexture &tt) {
 
 Pixmap BTexture::render(const unsigned int width, const unsigned int height,
                         const Pixmap old) {
-  assert(display() != 0);
   assert(texture() != BTexture::NoTexture);
 
   if (texture() == (BTexture::Flat | BTexture::Solid))
@@ -171,7 +164,7 @@ Pixmap BTexture::render(const unsigned int width, const unsigned int height,
     return ParentRelative;
 
   if (screen() == ~(0u))
-    scrn = DefaultScreen(display()->getXDisplay());
+    scrn = DefaultScreen(OBDisplay::display);
 
   assert(ctrl != 0);
   Pixmap ret = ctrl->renderImage(width, height, *this);
@@ -180,4 +173,6 @@ Pixmap BTexture::render(const unsigned int width, const unsigned int height,
     ctrl->removeImage(old);
 
   return ret;
+}
+
 }

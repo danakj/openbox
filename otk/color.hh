@@ -9,15 +9,13 @@ extern "C" {
 #include <map>
 #include <string>
 
-class BaseDisplay;
+namespace otk {
 
 class BColor {
 public:
-  BColor(const BaseDisplay * const _display = 0, unsigned int _screen = ~(0u));
-  BColor(int _r, int _g, int _b,
-         const BaseDisplay * const _display, unsigned int _screen = ~(0u));
-  BColor(const std::string &_name,
-         const BaseDisplay * const _display, unsigned int _screen = ~(0u));
+  BColor(unsigned int _screen = ~(0u));
+  BColor(int _r, int _g, int _b, unsigned int _screen = ~(0u));
+  BColor(const std::string &_name, unsigned int _screen = ~(0u));
   ~BColor(void);
 
   inline const std::string &name(void) const { return colorname; }
@@ -32,10 +30,8 @@ public:
     b = _b;
   }
 
-  inline const BaseDisplay *display(void) const { return dpy; }
   inline unsigned int screen(void) const { return scrn; }
-  void setDisplay(const BaseDisplay * const _display,
-                  unsigned int _screen = ~(0u));
+  void setScreen(unsigned int _screen = ~(0u));
 
   inline bool isAllocated(void) const { return allocated; }
 
@@ -60,27 +56,23 @@ private:
   bool allocated;
   int r, g, b;
   unsigned long p;
-  const BaseDisplay *dpy;
   unsigned int scrn;
   std::string colorname;
 
   // global color allocator/deallocator
   struct RGB {
-    const BaseDisplay* const display;
-    const unsigned int screen;
+    const int screen;
     const int r, g, b;
 
-    RGB(void) : display(0), screen(~(0u)), r(-1), g(-1), b(-1) { }
-    RGB(const BaseDisplay * const a, const unsigned int b,
-        const int x, const int y, const int z)
-      : display(a), screen(b), r(x), g(y), b(z) {}
+    RGB(void) : screen(~(0u)), r(-1), g(-1), b(-1) { }
+    RGB(const int b, const int x, const int y, const int z)
+      : screen(b), r(x), g(y), b(z) {}
     RGB(const RGB &x)
-      : display(x.display), screen(x.screen), r(x.r), g(x.g), b(x.b) {}
+      : screen(x.screen), r(x.r), g(x.g), b(x.b) {}
 
     inline bool operator==(const RGB &x) const {
-      return display == x.display &&
-              screen == x.screen &&
-                   r == x.r && g == x.g && b == x.b;
+      return screen == x.screen &&
+             r == x.r && g == x.g && b == x.b;
     }
 
     inline bool operator<(const RGB &x) const {
@@ -102,5 +94,7 @@ private:
   static bool cleancache;
   static void doCacheCleanup(void);
 };
+
+}
 
 #endif // COLOR_HH

@@ -16,9 +16,9 @@ class DialogButton {
   ustring _label;
   bool _default;
 public:
-  DialogButton(char *label) : _label(label), _default(false)
+  DialogButton(ustring label) : _label(label), _default(false)
     {}
-  DialogButton(char *label, bool def) : _label(label), _default(def)
+  DialogButton(ustring label, bool def) : _label(label), _default(def)
     {}
   inline const ustring& label() const { return _label; }
   inline const bool& isDefault() const { return _default; }
@@ -35,7 +35,7 @@ public:
   MessageDialog(Widget *parent, ustring title, ustring caption);
   virtual ~MessageDialog();
 
-  virtual void addButton(const DialogButton &b) { _buttons.push_back(b); }
+  virtual void addButton(const DialogButton &b);
 
   virtual const DialogButton& run();
 
@@ -43,24 +43,22 @@ public:
   virtual void hide();
   virtual void focus();
 
-  virtual const DialogButton& result() const { return *_result; }
-  virtual void setResult(const DialogButton &result) { _result = &result; }
+  virtual const DialogButton& result() const { return _result; }
+  virtual void setResult(const DialogButton &result) { _result = result; }
   
   virtual void keyPressHandler(const XKeyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);
 
 private:
-  static DialogButton _default_result;
-
   void init(const ustring &title, const ustring &caption);
 
-  std::vector<DialogButton> _buttons;
+protected:
   std::vector<Button *> _button_widgets;
   Label *_label;
   Widget *_button_holder;
   KeyCode _return;
   KeyCode _escape;
-  const DialogButton *_result;
+  DialogButton _result;
 };
 
 }

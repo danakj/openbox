@@ -15,17 +15,13 @@
 
 namespace otk {
 
-DialogButton MessageDialog::_default_result("", false);
-
 class DialogButtonWidget : public Button {
   MessageDialog *_dia;
-  const DialogButton &_res;
 public:
   DialogButtonWidget(Widget *parent, MessageDialog *dia,
 		     const DialogButton &b)
     : Button(parent),
-      _dia(dia),
-      _res(b)
+      _dia(dia)
   {
     assert(dia);
     setBevel(1);
@@ -41,27 +37,30 @@ public:
       Button::buttonPressHandler(e);
   }
   virtual void clickHandler(unsigned int) {
-    _dia->setResult(_res);
+    _dia->setResult(DialogButton(text(), isHighlighted()));
     _dia->hide();
   }
 };
 
 MessageDialog::MessageDialog(int screen, EventDispatcher *ed, ustring title,
 			     ustring caption)
-  : Widget(screen, ed, Widget::Vertical)
+  : Widget(screen, ed, Widget::Vertical),
+    _result("", false)
 {
   init(title, caption);
 }
 
 MessageDialog::MessageDialog(EventDispatcher *ed, ustring title,
 			     ustring caption)
-  : Widget(DefaultScreen(**display), ed, Widget::Vertical)
+  : Widget(DefaultScreen(**display), ed, Widget::Vertical),
+    _result("", false)
 {
   init(title, caption);
 }
 
 MessageDialog::MessageDialog(Widget *parent, ustring title, ustring caption)
-  : Widget(parent, Widget::Vertical)
+  : Widget(parent, Widget::Vertical),
+    _result("", false)
 {
   init(title, caption);
 }
@@ -75,7 +74,6 @@ void MessageDialog::init(const ustring &title, const ustring &caption)
   _button_holder->show();
   _return = XKeysymToKeycode(**display, XStringToKeysym("Return"));
   _escape = XKeysymToKeycode(**display, XStringToKeysym("Escape"));
-  _result = &_default_result;
 
   setEventMask(eventMask() | KeyPressMask);
   _label->setText(caption);
@@ -109,7 +107,13 @@ const DialogButton& MessageDialog::run()
     if (visible())
       Timer::dispatchTimers(); // fire pending events
   }
-  return *_result;
+  return _result;
+}
+
+void MessageDialog::addButton(const DialogButton &b)
+{
+  _button_widgets.push_back(new DialogButtonWidget(_button_holder,
+						   this, b));
 }
 
 void MessageDialog::focus()
@@ -120,11 +124,6 @@ void MessageDialog::focus()
 
 void MessageDialog::show()
 {
-  std::vector<DialogButton>::const_iterator it, end = _buttons.end();
-  for (it = _buttons.begin(); it != end; ++it)
-    _button_widgets.push_back(new DialogButtonWidget(_button_holder,
-						     this, *it));
-
   Rect r;
 
   if (parent())
@@ -165,10 +164,10 @@ void MessageDialog::hide()
 void MessageDialog::keyPressHandler(const XKeyEvent &e)
 {
   if (e.keycode == _return) {
-    std::vector<DialogButton>::const_iterator it, end = _buttons.end();
-    for (it = _buttons.begin(); it != end; ++it)
-      if (it->isDefault()) {
-	_result = &(*it);
+    std::vector<Button *>::const_iterator it, end = _button_widgets.end();
+    for (it = _button_widgets.begin(); it != end; ++it)
+      if ((*it)->isHighlighted()) {
+	_result = DialogButton((*it)->text(), true);
 	hide();
 	break;
       }

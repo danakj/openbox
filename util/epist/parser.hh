@@ -48,6 +48,12 @@ public:
   void setArgumentStr(std::string arg)
   { _arg = arg.substr(1, arg.size() - 2); }
 
+  void setArgumentTrue(std::string)
+  { _arg = "true"; }
+
+  void setArgumentFalse(std::string)
+  { _arg = "false"; }
+
   void setOption(std::string opt)
   { _config->addOption(opt, _arg); }
 

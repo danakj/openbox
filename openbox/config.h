@@ -16,6 +16,8 @@ extern gboolean config_focus_last;
 extern gboolean config_focus_last_on_desktop;
 /*! Show a popup dialog while cycling focus */
 extern gboolean config_focus_popup;
+/*! Show a popup dialog while cycling desktops */
+extern gboolean config_desktop_popup;
 /*! The number of slits to create 
   extern int config_slit_number;*/
 /*! When true windows' contents are refreshed while they are resized; otherwise

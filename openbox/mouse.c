@@ -121,8 +121,10 @@ static void fire_button(ObMouseAction a, ObFrameContext context,
                 act->data.sendtodir.cancel = FALSE;
             }
 
-            if ((act->func == action_desktop_dir ||
-                 act->func == action_send_to_desktop_dir)) {
+            if (config_desktop_popup &&
+                (act->func == action_desktop_dir ||
+                 act->func == action_send_to_desktop_dir))
+            {
                 keyboard_interactive_grab(state, c, context, act);
             }
 

@@ -9,6 +9,7 @@ gboolean config_focus_follow;
 gboolean config_focus_last;
 gboolean config_focus_last_on_desktop;
 gboolean config_focus_popup;
+gboolean config_desktop_popup;
 
 char *config_theme;
 
@@ -231,6 +232,8 @@ static void parse_desktops(xmlDocPtr doc, xmlNodePtr node, void *d)
             nname = parse_find_node("name", nname->next);
         }
     }
+    if ((n = parse_find_node("cyclingDialog", node)))
+        config_desktop_popup = parse_bool(doc, n);
 }
 
 static void parse_resize(xmlDocPtr doc, xmlNodePtr node, void *d)
@@ -321,6 +324,7 @@ void config_startup()
 
     config_desktops_num = 4;
     config_desktops_names = NULL;
+    config_desktop_popup = TRUE;
 
     parse_register("desktops", parse_desktops, NULL);
 

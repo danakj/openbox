@@ -700,7 +700,8 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
         d = translate_row_col(r, c);
     }
 
-    popup_cycle(d, TRUE);
+    if (config_desktop_popup)
+        popup_cycle(d, TRUE);
     return d;
 
 done_cycle:

@@ -45,13 +45,14 @@ void python_init(char *argv0)
 void python_destroy()
 {
   Py_DECREF(obdict);
+  Py_Finalize();
 }
 
 bool python_exec(const std::string &path)
 {
   FILE *rcpyfd = fopen(path.c_str(), "r");
   if (!rcpyfd) {
-    printf("failed to load python file %s\n", path.c_str());
+    printf("Failed to load python file %s\n", path.c_str());
     return false;
   }
   PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));

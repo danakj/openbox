@@ -209,10 +209,6 @@ void action_run_list(GSList *acts, struct _ObClient *c, ObFrameContext context,
 #define action_run(a, c, s) \
     action_run_list(a, c, OB_FRAME_CONTEXT_NONE, s, 0, -1, -1, FALSE, FALSE)
 
-/*! This is only for internal usage, i.e. not meant for user bindings and
-  such! */
-void action_run_string(const gchar *name, struct _ObClient *c);
-
 /* Execute */
 void action_execute(union ActionData *data);
 /* ActivateAction */

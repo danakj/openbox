@@ -926,20 +926,6 @@ void action_run_list(GSList *acts, ObClient *c, ObFrameContext context,
     }
 }
 
-void action_run_string(const gchar *name, struct _ObClient *c)
-{
-    ObAction *a;
-    GSList *l;
-
-    a = action_from_string(name, OB_USER_ACTION_NONE);
-    g_assert(a);
-
-    l = g_slist_append(NULL, a);
-
-    action_run(l, c, 0);
-}
-
-void action_execute(union ActionData *data)
 {
     GError *e = NULL;
     char *cmd;

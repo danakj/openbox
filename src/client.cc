@@ -921,9 +921,11 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 void OBClient::shapeHandler(const XShapeEvent &e)
 {
   otk::OtkEventHandler::shapeHandler(e);
-  
-  _shaped = e.shaped;
-  frame->adjustShape();
+
+  if (e.kind == ShapeBounding) {
+    _shaped = e.shaped;
+    frame->adjustShape();
+  }
 }
 #endif
 

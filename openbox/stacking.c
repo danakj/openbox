@@ -6,7 +6,6 @@
 #include "group.h"
 #include "frame.h"
 #include "window.h"
-#include <glib.h>
 
 GList  *stacking_list = NULL;
 

@@ -378,6 +378,7 @@ static void event_process(XEvent *e)
     window = event_get_window(e);
     if (!(client = g_hash_table_lookup(client_map, &window)))
         menu = g_hash_table_lookup(menu_map, &window);
+
     event_set_lasttime(e);
     event_hack_mods(e);
     if (event_ignore(e, client))
@@ -858,10 +859,12 @@ static void event_handle_menu(Menu *menu, XEvent *e)
     g_message("EVENT %d", e->type);
     switch (e->type) {
     case ButtonPress:
+	g_message("BUTTON PRESS");
         if (e->xbutton.button == 3)
             menu_hide(menu);
         break;
     case ButtonRelease:
+	g_message("BUTTON RELEASED");
         if (!menu->shown) break;
 
 /*        grab_pointer_window(FALSE, None, menu->frame);*/
@@ -879,16 +882,21 @@ static void event_handle_menu(Menu *menu, XEvent *e)
                 e->xbutton.y < (signed)(h+b)) {
                 menu_entry_fire(entry);
             }
-        }
+	
         break;
     case EnterNotify:
     case LeaveNotify:
         g_message("enter/leave");
         entry = menu_find_entry(menu, e->xcrossing.window);
         if (entry) {
-            entry->hilite = e->type == EnterNotify;
+            if (menu->mouseover)
+                menu->mouseover(entry, e->type == EnterNotify);
+            else
+                menu_control_mouseover(entry, e->type == EnterNotify);
+	    
             menu_entry_render(entry);
         }
         break;
+	}
     }
 }

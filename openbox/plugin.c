@@ -4,6 +4,8 @@
 typedef void (*PluginSetupConfig)();
 typedef void (*PluginStartup)();
 typedef void (*PluginShutdown)();
+typedef void *(*PluginCreate)(/* TODO */);
+typedef void (*PluginDestroy)(void *);
 
 typedef struct {
     GModule *module;
@@ -12,14 +14,18 @@ typedef struct {
     PluginSetupConfig config;
     PluginStartup startup;
     PluginShutdown shutdown;
+    PluginCreate create;
+    PluginDestroy destroy;
 } Plugin;
 
-static gpointer load_sym(GModule *module, char *name, char *symbol)
+static gpointer load_sym(GModule *module, char *name, char *symbol,
+			 gboolean allow_fail)
 {
     gpointer var;
     if (!g_module_symbol(module, symbol, &var)) {
-        g_warning("Failed to load symbol '%s' from plugin '%s'",
-                  symbol, name);
+        if (!allow_fail)
+	    g_warning("Failed to load symbol '%s' from plugin '%s'",
+		      symbol, name);
         var = NULL;
     }
     return var;
@@ -50,9 +56,14 @@ static Plugin *plugin_new(char *name)
     }
 
     p->config = (PluginSetupConfig)load_sym(p->module, name,
-                                            "plugin_setup_config");
-    p->startup = (PluginStartup)load_sym(p->module, name, "plugin_startup");
-    p->shutdown = (PluginShutdown)load_sym(p->module, name, "plugin_shutdown");
+                                            "plugin_setup_config", FALSE);
+    p->startup = (PluginStartup)load_sym(p->module, name, "plugin_startup",
+					 FALSE);
+    p->shutdown = (PluginShutdown)load_sym(p->module, name, "plugin_shutdown",
+					   FALSE);
+    p->create = (PluginCreate)load_sym(p->module, name, "plugin_create", TRUE);
+    p->destroy = (PluginDestroy)load_sym(p->module, name, "plugin_destroy",
+					 TRUE);
 
     if (p->config == NULL || p->startup == NULL || p->shutdown == NULL) {
         g_module_close(p->module);
@@ -85,12 +96,13 @@ void plugin_shutdown()
     g_datalist_clear(&plugins);
 }
 
-gboolean plugin_open(char *name)
+gboolean plugin_open_full(char *name, gboolean reopen)
 {
     Plugin *p;
 
     if (g_datalist_get_data(&plugins, name) != NULL) {
-        g_warning("plugin '%s' already loaded, can't load again", name);
+	if (!reopen) 
+	    g_warning("plugin '%s' already loaded, can't load again", name);
         return TRUE;
     }
 
@@ -103,6 +115,14 @@ gboolean plugin_open(char *name)
 
     g_datalist_set_data_full(&plugins, name, p, (GDestroyNotify) plugin_free);
     return TRUE;
+}
+
+gboolean plugin_open(char *name) {
+    return plugin_open_full(name, FALSE);
+}
+
+gboolean plugin_open_reopen(char *name) {
+    return plugin_open_full(name, TRUE);
 }
 
 void plugin_close(char *name)
@@ -155,4 +175,42 @@ void plugin_loadall()
         }
         g_io_channel_unref(io);
     }
+}
+
+void *plugin_create(char *name /* TODO */)
+{
+    Plugin *p = (Plugin *)g_datalist_get_data(&plugins, name);
+
+    if (p == NULL) {
+	g_warning("Unable to find plugin for create: %s", name);
+	return NULL;
+    }
+
+    if (p->create == NULL || p->destroy == NULL) {
+	g_critical("Unsupported create/destroy: %s", name);
+	return NULL;
+    }
+
+    return p->create();
+}
+
+void plugin_destroy(char *name, void *data)
+{
+    Plugin *p = (Plugin *)g_datalist_get_data(&plugins, name);
+
+    if (p == NULL) {
+	g_critical("Unable to find plugin for destroy: %s", name);
+	/* really shouldn't happen, but attempt to free something anyway? */
+	g_free(data);
+	return;
+    }
+
+    if (p->destroy == NULL || p->create == NULL) {
+	g_critical("Unsupported create/destroy: %s", name);
+	/* really, really shouldn't happen, but attempt to free anyway? */
+	g_free(data);
+	return;
+    }
+
+    p->destroy(data);
 }

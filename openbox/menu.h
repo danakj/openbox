@@ -3,15 +3,19 @@
 
 #include "action.h"
 #include "render/render.h"
+#include "geom.h"
 
 #include <glib.h>
 
 extern GHashTable *menu_map;
 
 struct Menu;
+struct MenuEntry;
 
 typedef void(*menu_controller_show)(struct Menu *self, int x, int y, Client *);
 typedef void(*menu_controller_update)(struct Menu *self);
+typedef void(*menu_controller_mouseover)(struct MenuEntry *self, 
+                                         gboolean enter);
 
 typedef struct Menu {
     char *label;
@@ -23,6 +27,8 @@ typedef struct Menu {
     gboolean invalid;
 
     struct Menu *parent;
+    
+    struct Menu *open_submenu;
 
     /* place a menu on screen */
     menu_controller_show show;
@@ -30,7 +36,7 @@ typedef struct Menu {
 
     /* render a menu */
     menu_controller_update update;
-    void (*mouseover)( /* some bummu */);
+    menu_controller_mouseover mouseover;
     void (*selected)( /* some bummu */);
 
 
@@ -44,7 +50,12 @@ typedef struct Menu {
     Appearance *a_items;
     int bullet_w;
     int item_h;
-    int width;
+    Point location;
+    Size size;
+
+    /* plugin stuff */
+    char *plugin;
+    void *plugin_data;
 } Menu;
 
 typedef enum MenuEntryRenderType {
@@ -89,6 +100,8 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
 void menu_free(char *name);
 
 void menu_show(char *name, int x, int y, Client *client);
+void menu_show_full(Menu *menu, int x, int y, Client *client);
+
 void menu_hide(Menu *self);
 
 MenuEntry *menu_entry_new_full(char *label, Action *action,
@@ -96,7 +109,16 @@ MenuEntry *menu_entry_new_full(char *label, Action *action,
                                gpointer submenu);
 
 #define menu_entry_new(label, action) \
-  menu_entry_new_full(label, action, MenuEntryRenderType_None, NULL)
+menu_entry_new_full(label, action, MenuEntryRenderType_None, NULL)
+
+#define menu_entry_new_separator(label) \
+menu_entry_new_full(label, NULL, MenuEntryRenderType_Separator, NULL)
+
+#define menu_entry_new_submenu(label, submenu) \
+menu_entry_new_full(label, NULL, MenuEntryRenderType_Submenu, submenu)
+
+#define menu_entry_new_boolean(label, action) \
+menu_entry_new_full(label, action, MenuEntryRenderType_Boolean, NULL)
 
 void menu_entry_free(MenuEntry *entry);
 
@@ -112,4 +134,5 @@ void menu_entry_fire(MenuEntry *self);
 
 void menu_render(Menu *self);
 
+void menu_control_mouseover(MenuEntry *entry, gboolean enter);
 #endif

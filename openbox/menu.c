@@ -3,11 +3,15 @@
 #include "stacking.h"
 #include "grab.h"
 #include "render/theme.h"
+#include "screen.h"
+#include "geom.h"
+#include "plugin.h"
 
 static GHashTable *menu_hash = NULL;
 GHashTable *menu_map = NULL;
 
-#define FRAME_EVENTMASK (ButtonMotionMask | EnterWindowMask | LeaveWindowMask)
+#define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask | \
+			 LeaveWindowMask)
 #define TITLE_EVENTMASK (ButtonPressMask | ButtonMotionMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
                          ButtonPressMask | ButtonReleaseMask)
@@ -60,6 +64,8 @@ void menu_entry_free(MenuEntry *self)
 void menu_startup()
 {
     Menu *m;
+    Menu *s;
+    Menu *t;
     Action *a;
 
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
@@ -67,15 +73,50 @@ void menu_startup()
                                       (GDestroyNotify)menu_destroy_hash_value);
     menu_map = g_hash_table_new(g_int_hash, g_int_equal);
 
-    m = menu_new("sex menu", "root", NULL);
+    m = menu_new(NULL, "root", NULL);
+ 
     a = action_from_string("execute");
     a->data.execute.path = g_strdup("xterm");
     menu_add_entry(m, menu_entry_new("xterm", a));
     a = action_from_string("restart");
     menu_add_entry(m, menu_entry_new("restart", a));
-    menu_add_entry(m, menu_entry_new("--", NULL));
+    menu_add_entry(m, menu_entry_new_separator("--"));
     a = action_from_string("exit");
     menu_add_entry(m, menu_entry_new("exit", a));
+    s = menu_new("subsex menu", "submenu", m);
+    a = action_from_string("execute");
+    a->data.execute.path = g_strdup("xclock");
+    menu_add_entry(s, menu_entry_new("xclock", a));
+
+    menu_add_entry(m, menu_entry_new_submenu("subz", s));
+
+    /*
+    t = (Menu *)plugin_create("timed_menu");
+    a = action_from_string("execute");
+    a->data.execute.path = g_strdup("xeyes");
+    menu_add_entry(t, menu_entry_new("xeyes", a));*/
+
+    s = menu_new("empty", "chub", m);
+    menu_add_entry(m, menu_entry_new_submenu("empty", s));
+
+    s = menu_new("", "s-club", m);
+    menu_add_entry(m, menu_entry_new_submenu("empty", s));
+
+    s = menu_new(NULL, "h-club", m);
+    menu_add_entry(m, menu_entry_new_submenu("empty", s));
+
+    s = menu_new(NULL, "g-club", m);
+
+    a = action_from_string("execute");
+    a->data.execute.path = g_strdup("xterm");
+    menu_add_entry(s, menu_entry_new("xterm", a));
+    a = action_from_string("restart");
+    menu_add_entry(s, menu_entry_new("restart", a));
+    menu_add_entry(s, menu_entry_new_separator("--"));
+    a = action_from_string("exit");
+    menu_add_entry(s, menu_entry_new("exit", a));
+
+    menu_add_entry(m, menu_entry_new_submenu("long", s));
 
     m = menu_new("client menu", "client", NULL);
     a = action_from_string("iconify");
@@ -86,6 +127,7 @@ void menu_startup()
     menu_add_entry(m, menu_entry_new("(un)maximize", a));
     a = action_from_string("close");
     menu_add_entry(m, menu_entry_new("close", a));
+
 }
 
 void menu_shutdown()
@@ -113,17 +155,21 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     self->label = g_strdup(label);
     self->name = g_strdup(name);
     self->parent = parent;
+    self->open_submenu = NULL;
 
     self->entries = NULL;
     self->shown = FALSE;
-    self->invalid = FALSE;
-    /* default controllers? */
-    
+    self->invalid = TRUE;
+
+    /* default controllers */
     self->show = show;
     self->hide = NULL;
     self->update = update;
     self->mouseover = NULL;
     self->selected = NULL;
+
+    self->plugin = NULL;
+    self->plugin_data = NULL;
 
     attrib.override_redirect = TRUE;
     attrib.event_mask = FRAME_EVENTMASK;
@@ -133,6 +179,7 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     self->items = createWindow(self->frame, 0, &attrib);
 
     XSetWindowBorderWidth(ob_display, self->frame, theme_bwidth);
+    XSetWindowBackground(ob_display, self->frame, theme_b_color->pixel);
     XSetWindowBorderWidth(ob_display, self->title, theme_bwidth);
     XSetWindowBorder(ob_display, self->frame, theme_b_color->pixel);
     XSetWindowBorder(ob_display, self->title, theme_b_color->pixel);
@@ -207,35 +254,42 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
 void menu_show(char *name, int x, int y, Client *client)
 {
     Menu *self;
-
+  
     self = g_hash_table_lookup(menu_hash, name);
     if (!self) {
         g_warning("Attempted to show menu '%s' but it does not exist.",
                   name);
         return;
     }
+    
+    menu_show_full(self, x, y, client);
+}  
 
-    if (self->invalid) {
-      if (self->update) {
-        self->update(self);
-      } else {
-        menu_render(self);
-      }
-    }
+void menu_show_full(Menu *self, int x, int y, Client *client)
+{
+    g_assert(self != NULL);
+       
+    menu_render(self);
     
     self->client = client;
 
     if (self->show) {
-      self->show(self, x, y, client);
+	self->show(self, x, y, client);
     } else {
       menu_control_show(self, x, y, client);
     }
 }
 
+
 void menu_hide(Menu *self) {
     if (self->shown) {
         XUnmapWindow(ob_display, self->frame);
         self->shown = FALSE;
+	if (self->open_submenu)
+	    menu_hide(self->open_submenu);
+	if (self->parent && self->parent->open_submenu == self)
+	    self->parent->open_submenu = NULL;
+
     }
 }
 
@@ -249,29 +303,6 @@ MenuEntry *menu_find_entry(Menu *menu, Window win)
             return entry;
     }
     return NULL;
-}
-
-void menu_entry_render(MenuEntry *self)
-{
-    Menu *menu = self->parent;
-    Appearance *a;
-
-    a = !self->enabled ? self->a_disabled :
-        (self->hilite && self->action ? self->a_hilite : self->a_item);
-
-    RECT_SET(a->area, 0, 0, menu->width,
-             menu->item_h);
-    RECT_SET(a->texture[0].position, menu->bullet_w,
-             0, menu->width - 2 * menu->bullet_w,
-             menu->item_h);
-
-    XMoveResizeWindow(ob_display, self->item, 0, self->y,
-                      menu->width, menu->item_h);
-    a->surface.data.planar.parent = menu->a_items;
-    a->surface.data.planar.parentx = 0;
-    a->surface.data.planar.parenty = self->y;
-
-    paint(self->item, a);
 }
 
 void menu_entry_fire(MenuEntry *self)
@@ -294,11 +325,52 @@ void menu_entry_fire(MenuEntry *self)
 */
 
 void menu_control_show(Menu *self, int x, int y, Client *client) {
-  XMoveWindow(ob_display, self->frame, x, y);
+    g_assert(!self->invalid);
+    
+    XMoveWindow(ob_display, self->frame, 
+		MIN(x, screen_physical_size.width - self->size.width), 
+		MIN(y, screen_physical_size.height - self->size.height));
+    POINT_SET(self->location, 
+	      MIN(x, screen_physical_size.width - self->size.width), 
+	      MIN(y, screen_physical_size.height - self->size.height));
 
-  if (!self->shown) {
-    stacking_raise_internal(self->frame);
-    XMapWindow(ob_display, self->frame);
-    self->shown = TRUE;
-  }
+    if (!self->shown) {
+	stacking_raise_internal(self->frame);
+	XMapWindow(ob_display, self->frame);
+	self->shown = TRUE;
+    } else if (self->shown && self->open_submenu) {
+	menu_hide(self->open_submenu);
+    }
+}
+
+void menu_control_mouseover(MenuEntry *self, gboolean enter) {
+    int x;
+    self->hilite = enter;
+  
+    if (enter) {
+	if (self->parent->open_submenu && self->submenu 
+	    != self->parent->open_submenu)
+	    menu_hide(self->parent->open_submenu);
+	
+	if (self->submenu) {
+	    self->parent->open_submenu = self->submenu;
+
+	    /* shouldn't be invalid since it must be displayed */
+	    g_assert(!self->parent->invalid);
+	    /* TODO: I don't understand why these bevels should be here.
+	       Something must be wrong in the width calculation */
+	    x = self->parent->location.x + self->parent->size.width + 
+		theme_bevel;
+
+	    /* need to get the width. is this bad?*/
+	    menu_render(self->submenu);
+
+	    if (self->submenu->size.width + x > screen_physical_size.width)
+		x = self->parent->location.x - self->submenu->size.width - 
+		    theme_bevel;
+	    
+	    menu_show_full(self->submenu, x,
+			   self->parent->location.y + self->y, NULL);
+	} 
+    }
 }

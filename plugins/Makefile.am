@@ -1,6 +1,6 @@
-plugindir=$(libdir)/openbox/plugins
+XFplugindir=$(libdir)/openbox/plugins
 
-SUBDIRS = keyboard mouse placement
+SUBDIRS = keyboard mouse placement menu
 
 CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DPLUGINDIR=\"$(plugindir)\"

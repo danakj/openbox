@@ -15,7 +15,7 @@ static long timecompare(GTimeVal *a, GTimeVal *b)
     long r;
 
     if ((r = b->tv_sec - a->tv_sec)) return r;
-    return b->tv_usec - a->tv_sec;
+    return b->tv_usec - a->tv_usec;
     
 }
 
@@ -108,7 +108,7 @@ void timer_dispatch(GTimeVal **wait)
 	
 	/* the queue is sorted, so if this timer shouldn't fire, none are 
 	   ready */
-        if (timecompare(&now, &NEAREST_TIMEOUT) <= 0)
+        if (timecompare(&NEAREST_TIMEOUT, &now) <= 0)
 	    break;
 
 	/* we set the last fired time to delay msec after the previous firing,

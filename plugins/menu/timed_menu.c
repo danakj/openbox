@@ -31,6 +31,7 @@ typedef struct {
     char *buf;
     unsigned long buflen;
     int fd;
+    pid_t pid;
 } Timed_Menu_Data;
 
 
@@ -54,7 +55,10 @@ void timed_menu_clean_up(Menu *m) {
         TIMED_MENU_DATA(m)->fd = -1;
     }
 
-    /* child is reaped by glib ? */
+    if (TIMED_MENU_DATA(m)->pid != -1) {
+        waitpid(TIMED_MENU_DATA(m)->pid, NULL, 0);
+        TIMED_MENU_DATA(m)->pid = -1;
+    }
 }
 
 void timed_menu_read_pipe(int fd, Menu *menu)
@@ -134,7 +138,7 @@ void timed_menu_timeout_handler(Menu *data)
                         NULL,
                         G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                         NULL,
-                        NULL,
+                        &TIMED_MENU_DATA(data)->pid,                        
                         NULL,
                         NULL,
                         &child_stdout,
@@ -168,6 +172,7 @@ void *plugin_create()
     d->buf = NULL;
     d->buflen = 0;
     d->fd = -1;
+    d->pid = -1;
     
     m->plugin_data = (void *)d;
 

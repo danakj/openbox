@@ -105,7 +105,7 @@ void epist::activateGrabs() {
 
     for(ait = _actions.begin(); ait != end; ++ait) {
       XGrabKey(getXDisplay(), ait->keycode(), ait->modifierMask(),
-               (*scrit)->rootWindow(), True, GrabModeAsync, GrabModeAsync);
+               (*scrit)->rootWindow(), False, GrabModeAsync, GrabModeAsync);
     }
   }
 }

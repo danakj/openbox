@@ -344,14 +344,18 @@ void client_manage(Window window)
 
         place_client(self, &x, &y);
 
-        /* make sure the window is visible.
            
-           this is about the rude parameter:
-           non-normal clients has less rules, and
-           windows that are being restored from a session
-           do also. we can assume you want it back where
-           you saved it */
-        client_move_onscreen(self, client_normal(self) && !self->session);
+        /* make sure the window is visible. */
+        client_find_onscreen(self, &x, &y,
+                             self->frame->area.width,
+                             self->frame->area.height,
+                             /* non-normal clients has less rules, and
+                                windows that are being restored from a session
+                                do also. we can assume you want it back where
+                                you saved it */
+                             client_normal(self) && !self->session);
+        if (x != ox || y != oy) 	 
+            client_move(self, x, y);
     }
 
     keyboard_grab_for_client(self, TRUE);

@@ -35,7 +35,7 @@ void parse_menu_full(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     xmlNodePtr nact;
 
     gchar *id = NULL, *title = NULL, *label = NULL, *plugin;
-    ObMenu *menu = NULL, *parent;
+    ObMenu *menu = NULL, *parent = NULL;
 
     if (newmenu == TRUE) {
         if (!parse_attr_string("id", node, &id))
@@ -52,12 +52,12 @@ void parse_menu_full(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             data.parent = menu;
 
             if (plugin_open_reopen(plugin, i))
-                parent = plugin_create(plugin, &data);
+                menu = plugin_create(plugin, &data);
             g_free(plugin);
         } else
             menu = menu_new(title, id, data ? *((ObMenu**)data) : NULL);
             
-        if (data)
+        if (data && menu)
             *((ObMenu**)data) = menu;
     } else {
         menu = (ObMenu *)data;
@@ -78,9 +78,11 @@ void parse_menu_full(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             } else {
                 parent = menu;
                 parse_menu(i, doc, node, &parent);
+            }
+
+            if (parent)
                 menu_add_entry(menu, menu_entry_new_submenu(parent->label,
                                                             parent));
-            }
 
         }
         else if (!xmlStrcasecmp(node->name, (const xmlChar*) "item")) {

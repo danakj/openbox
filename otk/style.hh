@@ -110,7 +110,7 @@ public:
   inline BTexture *getButtonUnfocus(void) { return &b_unfocus; }
 
   inline BTexture *getButtonPressedFocus(void)
-  { return &b_pressed_focus; }
+  { return &b_pressed; }
   inline BTexture *getButtonPressedUnfocus(void)
   { return &b_pressed_unfocus; }
 

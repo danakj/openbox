@@ -1756,6 +1756,8 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                            gboolean user, gboolean final,
                            gboolean force_reply)
 {
+    gint oldw, oldh;
+    gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE;
     guint fdecor = self->frame->decorations;
     gboolean fhorz = self->frame->max_horz;
@@ -1917,13 +1919,19 @@ void client_configure_full(ObClient *self, ObCorner anchor,
     moved = x != self->area.x || y != self->area.y;
     resized = w != self->area.width || h != self->area.height;
 
+    oldw = self->area.width;
+    oldh = self->area.height;
     RECT_SET(self->area, x, y, w, h);
 
     /* for app-requested resizes, always resize if 'resized' is true.
        for user-requested ones, only resize if final is true, or when
        resizing in redraw mode */
-    if ((!user && resized) ||
-        (user && (final || (resized && config_redraw_resize))))
+    send_resize_client = ((!user && resized) ||
+                          (user && (final ||
+                                    (resized && config_redraw_resize))));
+
+    /* if the client is enlarging, the resize the client before the frame */
+    if (send_resize_client && (w > oldw || h > oldh))
 	XResizeWindow(ob_display, self->window, w, h);
 
     /* move/resize the frame to match the request */
@@ -1956,6 +1964,10 @@ void client_configure_full(ObClient *self, ObCorner anchor,
                        FALSE, StructureNotifyMask, &event);
 	}
     }
+
+    /* if the client is shrinking, then resize the frame before the client */
+    if (send_resize_client && (w <= oldw && h <= oldh))
+	XResizeWindow(ob_display, self->window, w, h);
 }
 
 void client_fullscreen(ObClient *self, gboolean fs, gboolean savearea)

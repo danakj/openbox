@@ -3115,12 +3115,12 @@ void BlackboxWindow::doWorkspaceWarping(int x_root, int y_root,
   if (focus)
     setInputFocus();
 
-  int dest_x;
+  int dest_x = x_root;
   if (x_root <= 0) {
-    dest_x = screen->getRect().right() - 1;
+    dest_x += screen->getRect().width() - 1;
     dx += screen->getRect().width() - 1;
   } else {
-    dest_x = 0;
+    dest_x -= screen->getRect().width() - 1;
     dx -= screen->getRect().width() - 1;
   }
 

@@ -1,5 +1,5 @@
-#include "obconf.h"
-#include "plugins.h"
+/*#include "obconf.h"
+  #include "plugins.h"*/
 #include "parser/parse.h"
 #include "gettext.h"
 

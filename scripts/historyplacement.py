@@ -60,9 +60,9 @@ class _state:
 
 def _load(data):
     global _data
-    file = open(os.environ['HOME']+'/.openbox/'+FILENAME+"."+str(data.screen),
-                'r')
-    if file:
+    try:
+        file = open(os.environ['HOME'] + '/.openbox/' + FILENAME+"." +
+                    str(data.screen), 'r')
         # read data
         for line in file.readlines():
             line = line[:-1] # drop the '\n'
@@ -78,6 +78,7 @@ def _load(data):
             except ValueError: pass
             except IndexError: pass
         file.close()
+    except IOError: pass
 
 def _save(data):
     global _data

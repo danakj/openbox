@@ -86,6 +86,22 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   else
     return; // not a valid mouse context
 
+  if (_button) {
+    unsigned int mask;
+    switch(_button) {
+    case Button1: mask = Button1Mask; break;
+    case Button2: mask = Button2Mask; break;
+    case Button3: mask = Button3Mask; break;
+    case Button4: mask = Button4Mask; break;
+    case Button5: mask = Button5Mask; break;
+    default: assert(false); return; // unhandled button
+    }
+    // was the button released but we didnt get the event? (pointergrabs cause
+    // this)
+    if (!(e.state & mask))
+      _button = 0;
+  }
+  
   // run the PRESS python hook
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
@@ -120,7 +136,7 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
 void Actions::buttonReleaseHandler(const XButtonEvent &e)
 {
   otk::EventHandler::buttonReleaseHandler(e);
-  removePress(e);
+  //removePress(e);
   
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);

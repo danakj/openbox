@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: ピックスマップ生成エラー\n
+# BImage::render_solid: kan pixmap niet aanmaken\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: XImage 生成エラー\n
+# BImage::renderXImage: kan XImage niet aanmaken\n
 $ #UnsupVisual
-# BImage::renderXImage: 未サポートの視覚効果\n
+# BImage::renderXImage: niet ondersteunde visual\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: ピックスマップ生成エラー\n
+# BImage::renderPixmap: kan pixmap niet aanmaken\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: 不正なカラーマップサイズ %d (%d/%d/%d) - 減色中\n
+# BImageControl::BImageControl: ongeldige grootte kleurenmap %d (%d/%d/%d) - verkleind\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: カラーマップ確保エラー\n
+# BImageControl::BImageControl: kan geen kleurenmap aanmaken\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: カラー %d/%d/%d の確保に失敗\n
+# BImageControl::BImageControl: kan kleur %d/%d/%d niet aanmaken\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: ピックスマップキャッシュ -  %d ピックスマップを解放\n
+# BImageControl::~BImageControl: pixmap cache - %d pixmaps verwijderd\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: キャッシュが大きすぎるので強制的に掃除\n
+# BImageControl::renderImage: cache is te groot, leeggemaakt\n
 $ #ColorParseError
-# BImageControl::getColor: カラー解析エラー: '%s'\n
+# BImageControl::getColor: fout bij lezen kleur: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: カラー確保エラー: '%s'\n
+# BImageControl::getColor: fout bij aanmaken kleur: '%s'\n

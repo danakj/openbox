@@ -1,16 +1,16 @@
 $set 16 #bsetroot
 
 $ #MustSpecify
-# %s: ¥¨¥é¡¼: ¼¡¤ÎÃæ¤«¤é°ì¤Ä¤òÁªÂò¤·¤Ê¤±¤ì¤Ð¤Ê¤ê¤Þ¤»¤ó: -solid, -mod, -gradient\n
+# %s: fout: een van -solid, -mod, -gradient moet aangegeven worden\n
 $ #Usage
 # %s 2.0: (c) 1997-2000 Brad Hughes\n\n\
-  -display <string>        »ØÄê¥Ç¥£¥¹¥×¥ì¥¤¤ËÀÜÂ³\n\
-  -mod <x> <y>             ¥â¥¸¥å¡¼¥é¥Ñ¥¿¡¼¥ó\n\
-  -foreground, -fg <color> ¥â¥¸¥å¡¼¥éÁ°·Ê¿§\n\
-  -background, -bg <color> ¥â¥¸¥å¡¼¥éÇØ·Ê¿§\n\n\
-  -gradient <texture>      ¥°¥é¥Ç¥£¥¨¥ó¥È¥Æ¥¯¥¹¥Á¥ã\n\
-  -from <color>            ¥°¥é¥Ç¥£¥¨¥ó¥È³«»Ï¿§\n\
-  -to <color>              ¥°¥é¥Ç¥£¥¨¥ó¥È½ªÃ¼¿§\n\n\
-  -solid <color>           Ã±¿§\n\n\
-  -help                    ¤³¤Î¥Ø¥ë¥×¤òÉ½¼¨¤·¡¢½ªÎ»\n
+  -display <displaynaam>   display verbinding\n\
+  -mod <x> <y>             modula patroon\n\
+  -foreground, -fg <kleur> modula voorgrondkleur\n\
+  -background, -bg <kleur> modula achtergrondkleur\n\n\
+  -gradient <textuur>      gradiënt textuur\n\
+  -from <kleur>            gradiënt beginkleur\n\
+  -to <kleur>              gradiënt eindkleur\n\n\
+  -solid <kleur>           effen kleur\n\n\
+  -help                    toon deze hulp tekst en stop\n
 

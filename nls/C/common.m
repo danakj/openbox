@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# はい
+# Ja
 $ #No
-# いいえ
+# Nee
 
 $ #DirectionTitle
-# 方向
+# Richting
 $ #DirectionHoriz
-# 水平
+# Horizontaal
 $ #DirectionVert
-# 垂直
+# Vertikaal
 
 $ #AlwaysOnTop
-# 常に最前面に
+# Altijd op voorgrond
 
 $ #PlacementTitle
-# 配置
+# Plaatsing
 $ #PlacementTopLeft
-# 左上
+# Linksboven
 $ #PlacementCenterLeft
-# 左中央
+# Links
 $ #PlacementBottomLeft
-# 左下
+# Linksonder
 $ #PlacementTopCenter
-# 中央上
+# Middenboven
 $ #PlacementBottomCenter
-# 中央下
+# Middenonder
 $ #PlacementTopRight
-# 右上
+# Rechtsboven
 $ #PlacementCenterRight
-# 右中央
+# Rechts
 $ #PlacementBottomRight
-# 右下
+# Rechtsonder
 
 $ #AutoHide
-# 自動的に隠す
+# Automatisch verbergen

@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# 設定オプション
+# Instellingen
 $ #FocusModel
-# フォーカスモデル
+# Toetsenbord focusmodel
 $ #WindowPlacement
-# ウィンドウ配置
+# Plaatsing van vensters
 $ #ImageDithering
-# 画像ディザ
+# Kleurbenadering
 $ #OpaqueMove
-# ウィンドウ不透明移動
+# Inhoud vensters zichtbaar tijdens slepen
 $ #FullMax
-# 完全最大化
+# Volledig maximaliseren
 $ #FocusNew
-# 新規ウィンドウにフォーカス
+# Geef nieuwe vensters direct focus
 $ #FocusLast
-# ワークスペース変更時にウィンドウにフォーカス
+# Focus laatste venster bij wisselen van werkblad
 $ #ClickToFocus
-# Click to Focus
+# Geef focus na muisklik in venster
 $ #SloppyFocus
-# Sloppy Focus
+# Geef focus zodra muis in venster komt
 $ #AutoRaise
-# 自動的に前面に出す
+# Vensters automatisch naar voorgrond
 $ #SmartRows
-# 賢く配置 (行)
+# Optimale plaatsing (rijen)
 $ #SmartCols
-# 賢く配置 (列)
+# Optimale plaatsing (kolommen)
 $ #Cascade
-# ずらして配置
+# Trapsgewijs
 $ #LeftRight
-# 左から右へ
+# Van links naar rechts
 $ #RightLeft
-# 右から左へ
+# Van rechts naar links
 $ #TopBottom
-# 上から下へ
+# Van boven naar beneden
 $ #BottomTop
-# 下から上へ
+# Van beneden naar boven

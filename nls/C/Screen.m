@@ -1,53 +1,52 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: X サーバ問合せ中にエラー発生\n  \
-another window manager is already running on display %s.\n
+# BScreen::BScreen: er is een fout opgetreden bij het verbinden met de X server.\n  \
+er werkt al een andere window manager op display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: スクリーン %d を視覚効果 0x%lx, 深さ %d で制御\n
+# BScreen::BScreen: manager op scherm %d met visual 0x%lx, kleurdiepte %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): フォント '%s' を読み込めませんでした\n
+# BScreen::LoadStyle(): kan lettertype '%s' niet laden\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): デフォルトフォントを読み込めませんでした\n
+# BScreen::LoadStyle(): kan standaardlettertype niet laden\n
 $ #EmptyMenuFile
-# %s: 空のメニューファイル\n
+# %s: leeg menu bestand\n
 $ #xterm
 # xterm
 $ #Restart
-# 再起動
+# Herstarten
 $ #Exit
-# 終了
+# Afsluiten
 $ #EXECError
-# BScreen::parseMenuFile: [exec] エラー、メニューラベルと(あるいは)コマンド未定義\n
+# BScreen::parseMenuFile: [exec] fout, geen label en/of commando aangegeven\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [exit] fout, geen label aangegeven\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] エラー、メニューラベルと(あるいは)ファイル名未定義\n
+# BScreen::parseMenuFile: [style] fout, geen label en/of bestandsnaam aangegeven\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [config] fout, geen label aangegeven\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] エラー、ファイル名未定義\n
+# BScreen::parseMenuFile: [include] fout, geen bestandsnaam aangegeven\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] エラー、'%s' はレギュラーファイルではありません\n
+# BScreen::parseMenuFile: [include] fout, '%s' is geen leesbaar bestand\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [submenu] fout, geen label aangegeven\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [restart] fout, geen label aangegeven\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [reconfig] fout, geen label aangegeven\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] エラー、ディレクトリ名未定義\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, geen directory aangegeven\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] エラー、'%s' はディレクトリでは\
-ありません\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, '%s' is geen directory\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] エラー、'%s' は存在しません\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] fout, '%s' bestaat niet\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] エラー、メニューラベル未定義\n
+# BScreen::parseMenuFile: [workspaces] fout, geen label aangegeven\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# 幅: %4d x 高さ: %4d
+# B: %4d x H: %4d
 

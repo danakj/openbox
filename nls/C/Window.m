@@ -2,17 +2,16 @@ $set 9 #Window
 
 
 $ #Creating
-# BlackboxWindow::BlackboxWindow: 0x%lx を生成中\n
+# BlackboxWindow::BlackboxWindow: maak window aan 0x%lx\n
 $ #XGetWindowAttributesFail
-# BlackboxWindow::BlackboxWindow: XGetWindowAttributres 失敗\n
+# BlackboxWindow::BlackboxWindow: XGetWindowAttributres mislukt\n
 $ #CannotFindScreen
-# BlackboxWindow::BlackboxWindow: ルートウィンドウ 0x%lx に対するスクリーンが\
-みつかりません\n
+# BlackboxWindow::BlackboxWindow: kan scherm voor root window 0x%lx niet vinden\n
 $ #Unnamed
-# 名前なし
+# Zonder titel
 $ #MapRequest
-# BlackboxWindow::mapRequestEvent() (0x%lx に対して)\n
+# BlackboxWindow::mapRequestEvent() voor 0x%lx\n
 $ #UnmapNotify
-# BlackboxWindow::unmapNotifyEvent() (0x%lx に対して)\n
+# BlackboxWindow::unmapNotifyEvent() voor 0x%lx\n
 $ #ReparentNotify
-# BlackboxWindow::unmapnotifyEvent: reparent 0x%lx to 0x%lx\n
+# BlackboxWindow::reparentNotifyEvent: reparent 0x%lx naar 0x%lx\n

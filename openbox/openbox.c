@@ -45,17 +45,18 @@
 
 #include <X11/cursorfont.h>
 
-Display *ob_display  = NULL;
-int      ob_screen;
-Window   ob_root;
-State    ob_state;
-gboolean ob_shutdown = FALSE;
-gboolean ob_restart  = FALSE;
-char    *ob_restart_path = NULL;
-gboolean ob_remote   = TRUE;
-gboolean ob_sync     = FALSE;
-Cursors  ob_cursors;
-char    *ob_rc_path  = NULL;
+RrInstance *ob_rr_inst = NULL;
+Display    *ob_display = NULL;
+int         ob_screen;
+Window      ob_root;
+State       ob_state;
+gboolean    ob_shutdown = FALSE;
+gboolean    ob_restart  = FALSE;
+char       *ob_restart_path = NULL;
+gboolean    ob_remote   = TRUE;
+gboolean    ob_sync     = FALSE;
+Cursors     ob_cursors;
+char       *ob_rc_path  = NULL;
 
 void signal_handler(const ObEvent *e, void *data);
 void parse_args(int argc, char **argv);
@@ -128,6 +129,12 @@ int main(int argc, char **argv)
     ob_screen = DefaultScreen(ob_display);
     ob_root = RootWindow(ob_display, ob_screen);
 
+    ob_rr_inst = RrInstanceNew(ob_display, ob_screen);
+    if (ob_rr_inst == NULL) {
+        g_critical("Failed to initialize the render library.");
+        exit(1);
+    }
+
     /* XXX fork self onto other screens */
      
     XSynchronize(ob_display, ob_sync);
@@ -170,9 +177,8 @@ int main(int argc, char **argv)
         /* anything that is going to read data from the rc file needs to be 
            in this group */
 	timer_startup();
-	render_startup();
 	font_startup();
-        theme_startup();
+        theme_startup(ob_rr_inst);
 	event_startup();
         grab_startup();
         plugin_startup();
@@ -229,13 +235,13 @@ int main(int argc, char **argv)
         grab_shutdown();
 	event_shutdown();
         theme_shutdown();
-	render_shutdown();
 	timer_shutdown();
         config_shutdown();
     }
 
     dispatch_shutdown();
 
+    RrInstanceFree(ob_rr_inst);
     XCloseDisplay(ob_display);
 
     if (ob_restart) {

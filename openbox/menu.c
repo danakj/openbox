@@ -39,7 +39,7 @@ void menu_destroy_hash_value(Menu *self)
 
     stacking_remove(self);
 
-    appearance_free(self->a_title);
+    RrAppearanceFree(self->a_title);
     XDestroyWindow(ob_display, self->title);
     XDestroyWindow(ob_display, self->frame);
     XDestroyWindow(ob_display, self->items);
@@ -54,9 +54,9 @@ void menu_entry_free(MenuEntry *self)
 
     g_hash_table_remove(window_map, &self->item);
 
-    appearance_free(self->a_item);
-    appearance_free(self->a_disabled);
-    appearance_free(self->a_hilite);
+    RrAppearanceFree(self->a_item);
+    RrAppearanceFree(self->a_disabled);
+    RrAppearanceFree(self->a_hilite);
     XDestroyWindow(ob_display, self->item);
 
     g_free(self);
@@ -125,8 +125,8 @@ static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 render_depth, InputOutput, render_visual,
-			 mask, attrib);
+			 RrDepth(ob_rr_inst), InputOutput,
+                         RrVisual(ob_rr_inst), mask, attrib);
                        
 }
 
@@ -173,8 +173,8 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     XMapWindow(ob_display, self->title);
     XMapWindow(ob_display, self->items);
 
-    self->a_title = appearance_copy(theme_a_menu_title);
-    self->a_items = appearance_copy(theme_a_menu);
+    self->a_title = RrAppearanceCopy(theme_a_menu_title);
+    self->a_items = RrAppearanceCopy(theme_a_menu);
 
     g_hash_table_insert(window_map, &self->frame, self);
     g_hash_table_insert(window_map, &self->title, self);
@@ -234,9 +234,9 @@ void menu_add_entry(Menu *menu, MenuEntry *entry)
     attrib.event_mask = ENTRY_EVENTMASK;
     entry->item = createWindow(menu->items, CWEventMask, &attrib);
     XMapWindow(ob_display, entry->item);
-    entry->a_item = appearance_copy(theme_a_menu_item);
-    entry->a_disabled = appearance_copy(theme_a_menu_disabled);
-    entry->a_hilite = appearance_copy(theme_a_menu_hilite);
+    entry->a_item = RrAppearanceCopy(theme_a_menu_item);
+    entry->a_disabled = RrAppearanceCopy(theme_a_menu_disabled);
+    entry->a_hilite = RrAppearanceCopy(theme_a_menu_hilite);
 
     menu->invalid = TRUE;
 

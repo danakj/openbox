@@ -27,7 +27,7 @@ typedef struct Dock {
     ObWindow obwin;
 
     Window frame;
-    Appearance *a_frame;
+    RrAppearance *a_frame;
 
     /* actual position (when not auto-hidden) */
     int x, y;

@@ -29,7 +29,7 @@ void menu_render_full(Menu *self) {
     /* set texture data and size them mofos out */
     if (self->label) {
 	self->a_title->texture[0].data.text.string = self->label;
-	appearance_minsize(self->a_title, &self->title_min_w, &self->title_h);
+	RrMinsize(self->a_title, &self->title_min_w, &self->title_h);
 	self->title_min_w += theme_bevel * 2;
 	self->title_h += theme_bevel * 2;
 	self->size.width = MAX(self->size.width, self->title_min_w);
@@ -40,16 +40,16 @@ void menu_render_full(Menu *self) {
         int h;
 
         e->a_item->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_item, &e->min_w, &self->item_h);
+        RrMinsize(e->a_item, &e->min_w, &self->item_h);
         self->size.width = MAX(self->size.width, e->min_w);
 
         e->a_disabled->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_disabled, &e->min_w, &h);
+        RrMinsize(e->a_disabled, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 	
         e->a_hilite->texture[0].data.text.string = e->label;
-        appearance_minsize(e->a_hilite, &e->min_w, &h);
+        RrMinsize(e->a_hilite, &e->min_w, &h);
         self->item_h = MAX(self->item_h, h);
         self->size.width = MAX(self->size.width, e->min_w);
 
@@ -72,8 +72,8 @@ void menu_render_full(Menu *self) {
 		      items_h);
 
     if (self->label)
-	paint(self->title, self->a_title, self->size.width, self->title_h);
-    paint(self->items, self->a_items, self->size.width, items_h);
+	RrPaint(self->a_title, self->title, self->size.width, self->title_h);
+    RrPaint(self->a_items, self->items, self->size.width, items_h);
 
     item_y = 0;
     for (it = self->entries; it; it = it->next) {
@@ -89,7 +89,7 @@ void menu_render_full(Menu *self) {
 void menu_entry_render(MenuEntry *self)
 {
     Menu *menu = self->parent;
-    Appearance *a;
+    RrAppearance *a;
     
     switch (self->render_type) {
     case MenuEntryRenderType_Submenu:
@@ -123,5 +123,5 @@ void menu_entry_render(MenuEntry *self)
     a->surface.parentx = 0;
     a->surface.parenty = self->y;
 
-    paint(self->item, a, menu->size.width, menu->item_h);
+    RrPaint(a, self->item, menu->size.width, menu->item_h);
 }

@@ -50,13 +50,13 @@ typedef struct Frame {
     Window lgrip;
     Window rgrip;
 
-    Appearance *a_unfocused_title;
-    Appearance *a_focused_title;
-    Appearance *a_unfocused_label;
-    Appearance *a_focused_label;
-    Appearance *a_icon;
-    Appearance *a_unfocused_handle;
-    Appearance *a_focused_handle;
+    RrAppearance *a_unfocused_title;
+    RrAppearance *a_focused_title;
+    RrAppearance *a_unfocused_label;
+    RrAppearance *a_focused_label;
+    RrAppearance *a_icon;
+    RrAppearance *a_unfocused_handle;
+    RrAppearance *a_focused_handle;
 
     Strut  innersize;
 

@@ -53,7 +53,8 @@ void moveresize_startup()
 
     attrib.save_under = True;
     opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
-                                      render_depth, InputOutput, render_visual,
+                                      RrDepth(ob_rr_inst), InputOutput,
+                                      RrVisual(ob_rr_inst),
                                       CWSaveUnder, &attrib);
     stacking_add(INTERNAL_AS_WINDOW(&opaque_window));
     stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));

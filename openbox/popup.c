@@ -13,9 +13,9 @@ typedef struct Popup {
     Window text;
 
     gboolean hasicon;
-    Appearance *a_bg;
-    Appearance *a_icon;
-    Appearance *a_text;
+    RrAppearance *a_bg;
+    RrAppearance *a_icon;
+    RrAppearance *a_text;
     int gravity;
     int x;
     int y;
@@ -45,12 +45,12 @@ void popup_free(Popup *self)
         XDestroyWindow(ob_display, self->bg);
         XDestroyWindow(ob_display, self->text);
         XDestroyWindow(ob_display, self->icon);
-        appearance_free(self->a_bg);
+        RrAppearanceFree(self->a_bg);
         if (self->hasicon)
-            appearance_free(self->a_icon);
+            RrAppearanceFree(self->a_icon);
     }
     if (self->a_text)
-        appearance_free(self->a_text);
+        RrAppearanceFree(self->a_text);
     stacking_remove(self);
     g_free(self);
 }
@@ -74,10 +74,10 @@ void popup_size_to_string(Popup *self, char *text)
     int iconw;
 
     if (!self->a_text)
-        self->a_text = appearance_copy(theme_app_hilite_label);
+        self->a_text = RrAppearanceCopy(theme_app_hilite_label);
 
     self->a_text->texture[0].data.text.string = text;
-    appearance_minsize(self->a_text, &textw, &texth);
+    RrMinsize(self->a_text, &textw, &texth);
     textw += theme_bevel * 2;
     texth += theme_bevel * 2;
 
@@ -97,45 +97,46 @@ void popup_show(Popup *self, char *text, Icon *icon)
     if (!self->bg) {
         attrib.override_redirect = True;
         self->bg = XCreateWindow(ob_display, ob_root,
-                                 0, 0, 1, 1, 0, render_depth, InputOutput,
-                                 render_visual, CWOverrideRedirect, &attrib);
+                                 0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
+                                 InputOutput, RrVisual(ob_rr_inst),
+                                 CWOverrideRedirect, &attrib);
 
         XSetWindowBorderWidth(ob_display, self->bg, theme_bwidth);
         XSetWindowBorder(ob_display, self->bg, theme_b_color->pixel);
 
         self->text = XCreateWindow(ob_display, self->bg,
-                                   0, 0, 1, 1, 0, render_depth, InputOutput,
-                                   render_visual, 0, NULL);
+                                   0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
+                                   InputOutput, RrVisual(ob_rr_inst), 0, NULL);
         if (self->hasicon)
             self->icon = XCreateWindow(ob_display, self->bg,
                                        0, 0, 1, 1, 0,
-                                       render_depth, InputOutput,
-                                       render_visual, 0, NULL);
+                                       RrDepth(ob_rr_inst), InputOutput,
+                                       RrVisual(ob_rr_inst), 0, NULL);
 
         XMapWindow(ob_display, self->text);
         XMapWindow(ob_display, self->icon);
 
-        self->a_bg = appearance_copy(theme_app_hilite_bg);
+        self->a_bg = RrAppearanceCopy(theme_app_hilite_bg);
         if (self->hasicon)
-            self->a_icon = appearance_copy(theme_app_icon);
+            self->a_icon = RrAppearanceCopy(theme_app_icon);
     }
     if (!self->a_text)
-        self->a_text = appearance_copy(theme_app_hilite_label);
+        self->a_text = RrAppearanceCopy(theme_app_hilite_label);
 
     /* set up the textures */
     self->a_text->texture[0].data.text.string = text;
     if (self->hasicon) {
         if (icon) {
-            self->a_icon->texture[0].type = RGBA;
+            self->a_icon->texture[0].type = RR_TEXTURE_RGBA;
             self->a_icon->texture[0].data.rgba.width = icon->width;
             self->a_icon->texture[0].data.rgba.height = icon->height;
             self->a_icon->texture[0].data.rgba.data = icon->data;
         } else
-            self->a_icon->texture[0].type = NoTexture;
+            self->a_icon->texture[0].type = RR_TEXTURE_NONE;
     }
 
     /* measure the shit out */
-    appearance_minsize(self->a_text, &textw, &texth);
+    RrMinsize(self->a_text, &textw, &texth);
     textw += theme_bevel * 2;
     texth += theme_bevel * 2;
 
@@ -208,10 +209,10 @@ void popup_show(Popup *self, char *text, Icon *icon)
                           theme_bevel, theme_bevel, iconw, texth);
     }
 
-    paint(self->bg, self->a_bg, w, h);
-    paint(self->text, self->a_text, textw, texth);
+    RrPaint(self->a_bg, self->bg, w, h);
+    RrPaint(self->a_text, self->text, textw, texth);
     if (self->hasicon)
-        paint(self->icon, self->a_icon, iconw, texth);
+        RrPaint(self->a_icon, self->icon, iconw, texth);
 
     if (!self->mapped) {
         XMapWindow(ob_display, self->bg);

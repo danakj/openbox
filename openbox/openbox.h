@@ -1,6 +1,8 @@
 #ifndef __openbox_h
 #define __openbox_h
 
+#include "render/render.h"
+
 #ifdef USE_LIBSN
 #  define SN_API_NOT_YET_FROZEN
 #  include <libsn/sn.h>
@@ -8,6 +10,8 @@
 
 #include <glib.h>
 #include <X11/Xlib.h>
+
+extern RrInstance *ob_rr_inst;
 
 /*! The X display */
 extern Display *ob_display; 

@@ -28,10 +28,11 @@ void dock_startup()
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
     dock->frame = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
-                                render_depth, InputOutput, render_visual,
+                                RrDepth(ob_rr_inst), InputOutput,
+                                RrVisual(ob_rr_inst),
                                 CWOverrideRedirect | CWEventMask,
                                 &attrib);
-    dock->a_frame = appearance_copy(theme_a_unfocused_title);
+    dock->a_frame = RrAppearanceCopy(theme_a_unfocused_title);
     XSetWindowBorder(ob_display, dock->frame, theme_b_color->pixel);
     XSetWindowBorderWidth(ob_display, dock->frame, theme_bwidth);
 
@@ -43,7 +44,7 @@ void dock_startup()
 void dock_shutdown()
 {
     XDestroyWindow(ob_display, dock->frame);
-    appearance_free(dock->a_frame);
+    RrAppearanceFree(dock->a_frame);
     g_hash_table_remove(window_map, &dock->frame);
     stacking_remove(dock);
 }
@@ -352,7 +353,7 @@ void dock_configure()
         XMoveResizeWindow(ob_display, dock->frame,
                           dock->x, dock->y, dock->w, dock->h);
 
-        paint(dock->frame, dock->a_frame, dock->w, dock->h);
+        RrPaint(dock->a_frame, dock->frame, dock->w, dock->h);
         XMapWindow(ob_display, dock->frame);
     } else
         XUnmapWindow(ob_display, dock->frame);

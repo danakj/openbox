@@ -46,10 +46,10 @@ typedef struct Menu {
     Client *client;
     Window frame;
     Window title;
-    Appearance *a_title;
+    RrAppearance *a_title;
     int title_min_w, title_h;
     Window items;
-    Appearance *a_items;
+    RrAppearance *a_items;
     int bullet_w;
     int item_h;
     Point location;
@@ -84,9 +84,9 @@ typedef struct {
 
     /* render stuff */
     Window item;
-    Appearance *a_item;
-    Appearance *a_disabled;
-    Appearance *a_hilite;
+    RrAppearance *a_item;
+    RrAppearance *a_disabled;
+    RrAppearance *a_hilite;
     int y;
     int min_w;
 } MenuEntry;

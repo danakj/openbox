@@ -24,8 +24,8 @@ static Window createWindow(Window parent, unsigned long mask,
 			   XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 render_depth, InputOutput, render_visual,
-			 mask, attrib);
+			 RrDepth(ob_rr_inst), InputOutput,
+                         RrVisual(ob_rr_inst), mask, attrib);
                        
 }
 
@@ -96,13 +96,13 @@ Frame *frame_new()
                   theme_grip_width, theme_handle_height);
 
     /* set up the dynamic appearances */
-    self->a_unfocused_title = appearance_copy(theme_a_unfocused_title);
-    self->a_focused_title = appearance_copy(theme_a_focused_title);
-    self->a_unfocused_label = appearance_copy(theme_a_unfocused_label);
-    self->a_focused_label = appearance_copy(theme_a_focused_label);
-    self->a_unfocused_handle = appearance_copy(theme_a_unfocused_handle);
-    self->a_focused_handle = appearance_copy(theme_a_focused_handle);
-    self->a_icon = appearance_copy(theme_a_icon);
+    self->a_unfocused_title = RrAppearanceCopy(theme_a_unfocused_title);
+    self->a_focused_title = RrAppearanceCopy(theme_a_focused_title);
+    self->a_unfocused_label = RrAppearanceCopy(theme_a_unfocused_label);
+    self->a_focused_label = RrAppearanceCopy(theme_a_focused_label);
+    self->a_unfocused_handle = RrAppearanceCopy(theme_a_unfocused_handle);
+    self->a_focused_handle = RrAppearanceCopy(theme_a_focused_handle);
+    self->a_icon = RrAppearanceCopy(theme_a_icon);
 
     self->max_press = self->close_press = self->desk_press = 
 	self->iconify_press = self->shade_press = FALSE;
@@ -112,13 +112,13 @@ Frame *frame_new()
 
 static void frame_free(Frame *self)
 {
-    appearance_free(self->a_unfocused_title); 
-    appearance_free(self->a_focused_title);
-    appearance_free(self->a_unfocused_label);
-    appearance_free(self->a_focused_label);
-    appearance_free(self->a_unfocused_handle);
-    appearance_free(self->a_focused_handle);
-    appearance_free(self->a_icon);
+    RrAppearanceFree(self->a_unfocused_title); 
+    RrAppearanceFree(self->a_focused_title);
+    RrAppearanceFree(self->a_unfocused_label);
+    RrAppearanceFree(self->a_focused_label);
+    RrAppearanceFree(self->a_unfocused_handle);
+    RrAppearanceFree(self->a_focused_handle);
+    RrAppearanceFree(self->a_icon);
 
     XDestroyWindow(ob_display, self->window);
 

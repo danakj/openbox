@@ -7,7 +7,7 @@
 */
 
 extern "C" {
-/*
+
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #else
@@ -15,25 +15,25 @@ extern "C" {
 #    include <sys/types.h>
 #  endif
 #endif
-*/
+
 }
 
 #include <string>
 
 namespace otk {
 
-/*
+
 #ifdef HAVE_STDINT_H
 typedef uint32_t unichar;
 #else
 typedef u_int32_t unichar;
 #endif
-*/
+
 
 #ifndef DOXYGEN_IGNORE
 
 //! The number of bytes to skip to find the next character in the string
-const char g_utf8_skip[256] = {
+const char utf8_skip[256] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -43,6 +43,8 @@ const char g_utf8_skip[256] = {
   2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
   3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
 };
+
+unichar utf8_get_char(const char *p);
 
 #endif // DOXYGEN_IGNORE
 
@@ -57,43 +59,26 @@ const char g_utf8_skip[256] = {
   write operation would invalidate all other iterators pointing into the same
   string.
 */
-/*
+
 template <class T>
 class ustring_Iterator
 {
 public:
   typedef std::bidirectional_iterator_tag   iterator_category;
-  //typedef unichar                           value_type;
+  typedef unichar                           value_type;
   typedef std::string::difference_type      difference_type;
   //typedef value_type                        reference;
   typedef void                              pointer;
-
+  
   inline ustring_Iterator() {}
   inline ustring_Iterator(const ustring_Iterator<std::string::iterator>&
 			  other) : _pos(other.base()) {}
 
 
   inline value_type operator*() const {
-    // get a unicode character from the iterator's position
-
     // get an iterator to the internal string
     std::string::const_iterator pos = _pos;
-    
-    unichar result = static_cast<unsigned char>(*pos);
-
-    // if its not a 7-bit ascii character
-    if((result & 0x80) != 0) {
-      // len is the number of bytes this character takes up in the string
-      unsigned char len = g_utf8_skip[result];
-      result &= 0x7F >> len;
-      
-      while(--len != 0) {
-	result <<= 6;
-	result |= static_cast<unsigned char>(*++pos) & 0x3F;
-      }
-    }
-    
-    return result;
+    return utf8_get_char(&(*pos));
   }
 
   
@@ -112,7 +97,7 @@ public:
 private:
   T _pos;
 };
-*/
+
 
 //! This class provides a simple wrapper to a std::string that can be encoded
 //! as UTF-8. The ustring::utf() member specifies if the given string is UTF-8
@@ -135,7 +120,7 @@ public:
   typedef std::string::size_type                        size_type;
   typedef std::string::difference_type                  difference_type;
 
-  //typedef unichar                                       value_type;
+  typedef unichar                                       value_type;
   //typedef unichar &                                     reference;
   //typedef const unichar &                               const_reference;
 
@@ -176,7 +161,12 @@ public:
   // change the string's size
 
   void resize(size_type n, char c='\0');
+
+  // extract characters
   
+  // No reference return; use replace() to write characters.
+  value_type operator[](size_type i) const;
+
   // internal data
 
   const char* data()  const;

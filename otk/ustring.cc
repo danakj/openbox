@@ -14,16 +14,46 @@ namespace otk {
 
 // helper functions
 
-static ustring::size_type utf8_find_offset(const char *str, const char *pos)
+// takes a pointer into a utf8 string and returns a unicode character for the
+// first character at the pointer
+unichar utf8_get_char (const char *p)
+{
+  unichar result = static_cast<unsigned char>(*p);
+
+  // if its not a 7-bit ascii character
+  if((result & 0x80) != 0) {
+    // len is the number of bytes this character takes up in the string
+    unsigned char len = utf8_skip[result];
+    result &= 0x7F >> len;
+
+    while(--len != 0) {
+      result <<= 6;
+      result |= static_cast<unsigned char>(*++p) & 0x3F;
+    }
+  }
+    
+  return result;
+}
+  
+// takes a pointer into a string and finds its offset
+static ustring::size_type utf8_ptr_to_offset(const char *str, const char *pos)
 {
   ustring::size_type offset = 0;
 
   while (str < pos) {
-    str += g_utf8_skip[*str];
-    offset += g_utf8_skip[*str];
+    str += utf8_skip[*str];
+    offset++;
   }
 
   return offset;
+}
+
+// takes an offset into a string and returns a pointer to it
+const char *utf8_offset_to_ptr(const char *str, ustring::size_type offset)
+{
+  while (offset--)
+    str += utf8_skip[*str];
+  return str;
 }
 
 // First overload: stop on '\0' character.
@@ -39,7 +69,7 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset)
     if(*p == '\0')
       return ustring::npos;
 
-    p += g_utf8_skip[*p];
+    p += utf8_skip[*p];
   }
 
   return (p - str);
@@ -60,7 +90,7 @@ ustring::size_type utf8_byte_offset(const char* str, ustring::size_type offset,
     if(p >= pend)
       return ustring::npos;
 
-    p += g_utf8_skip[*p];
+    p += utf8_skip[*p];
   }
 
   return (p - str);
@@ -122,7 +152,7 @@ ustring::size_type ustring::size() const
 {
   if (_utf8) {
     const char *const pdata = _string.data();
-    return utf8_find_offset(pdata, pdata + _string.size());
+    return utf8_ptr_to_offset(pdata, pdata + _string.size());
   } else
     return _string.size();
 }
@@ -179,6 +209,11 @@ void ustring::resize(ustring::size_type n, char c)
       _string.append(n - size_now, c);
   } else
     _string.resize(n, c);
+}
+
+ustring::value_type ustring::operator[](ustring::size_type i) const
+{
+  return utf8_get_char(utf8_offset_to_ptr(_string.data(), i));
 }
 
 const char* ustring::data() const

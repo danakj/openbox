@@ -149,3 +149,5 @@ Root		Click		A-Up	NextDesktopWrap
 Root		Click		A-Down	PreviousDesktopWrap
 Frame		Click		A-Up	NextDesktopWrap
 Frame		Click		A-Down	PreviousDesktopWrap
+Frame		Click		C-A-Up	SendToNextDesktopWrap
+Frame		Click		C-A-Down SendToPreviousDesktopWrap

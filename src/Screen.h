@@ -51,8 +51,7 @@
 #  include "Slit.h"
 #endif // SLIT
 #include "Image.h"
-
-#include <strstream>
+#include "Resource.h"
 
 // forward declaration
 class BScreen;
@@ -136,7 +135,7 @@ private:
       auto_edge_balance, image_dither, ordered_dither, opaque_move, full_max,
       focus_new, focus_last;
     BColor border_color;
-    XrmDatabase stylerc;
+    obResource styleconfig;
 
     int workspaces, toolbar_placement, toolbar_width_percent, placement_policy,
       edge_snap_threshold, row_direction, col_direction;
@@ -163,12 +162,13 @@ private:
 protected:
   Bool parseMenuFile(FILE *, Rootmenu *);
 
-  void readDatabaseTexture(char *, char *, BTexture *, unsigned long);
-  void readDatabaseColor(char *, char *, BColor *, unsigned long);
+  void readDatabaseTexture(const char *, const char *, BTexture *,
+                           unsigned long);
+  void readDatabaseColor(const char *, const char *, BColor *, unsigned long);
 
-  void readDatabaseFontSet(char *, char *, XFontSet *);
-  XFontSet createFontSet(char *);
-  void readDatabaseFont(char *, char *, XFontStruct **);
+  void readDatabaseFontSet(const char *, const char *, XFontSet *);
+  XFontSet createFontSet(const char *);
+  void readDatabaseFont(const char *, const char *, XFontStruct **);
 
   void InitMenu(void);
   void LoadStyle(void);

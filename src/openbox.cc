@@ -1333,7 +1333,6 @@ void Openbox::load_rc(BScreen *screen) {
   sprintf(name_lookup,  "session.screen%d.focusModel", screen_number);
   sprintf(class_lookup, "Session.Screen%d.FocusModel", screen_number);
   if (config.getValue(name_lookup, class_lookup, s)) {
-    cout << s << endl;
     if (0 == strncasecmp(s.c_str(), "clicktofocus", s.length())) {
       screen->saveAutoRaise(False);
       screen->saveSloppyFocus(False);

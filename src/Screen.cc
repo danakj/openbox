@@ -94,6 +94,7 @@
 #define   FONT_ELEMENT_SIZE 50
 #endif // FONT_ELEMENT_SIZE
 
+#include <string>
 #include <algorithm>
 
 static Bool running = True;
@@ -201,7 +202,6 @@ BScreen::BScreen(Openbox *bb, int scrn) : ScreenInfo(bb, scrn) {
           getDepth());
 
   rootmenu = 0;
-  resource.stylerc = 0;
 
   resource.mstyle.t_fontset = resource.mstyle.f_fontset =
     resource.tstyle.fontset = resource.wstyle.fontset = (XFontSet) 0;
@@ -584,16 +584,14 @@ BScreen::~BScreen(void) {
 	  resource.tstyle.b_pic_gc);
 }
 
-void BScreen::readDatabaseTexture(char *rname, char *rclass,
+void BScreen::readDatabaseTexture(const char *rname, const char *rclass,
 				  BTexture *texture,
 				  unsigned long default_pixel)
 {
-  XrmValue value;
-  char *value_type;
-
-  if (XrmGetResource(resource.stylerc, rname, rclass, &value_type,
-		     &value))
-    image_control->parseTexture(texture, value.addr);
+  std::string s;
+  
+  if (resource.styleconfig.getValue(rname, rclass, s))
+    image_control->parseTexture(texture, s.c_str());
   else
     texture->setTexture(BImage_Solid | BImage_Flat);
 
@@ -684,16 +682,14 @@ void BScreen::readDatabaseTexture(char *rname, char *rclass,
 }
 
 
-void BScreen::readDatabaseColor(char *rname, char *rclass, BColor *color,
-				unsigned long default_pixel)
+void BScreen::readDatabaseColor(const char *rname, const  char *rclass,
+                                BColor *color, unsigned long default_pixel)
 {
-  XrmValue value;
-  char *value_type;
-
-  if (XrmGetResource(resource.stylerc, rname, rclass, &value_type,
-		     &value)) {
-    image_control->parseColor(color, value.addr);
-  } else {
+  std::string s;
+  
+  if (resource.styleconfig.getValue(rname, rclass, s))
+    image_control->parseColor(color, s.c_str());
+  else {
     // parsing with no color string just deallocates the color, if it has
     // been previously allocated
     image_control->parseColor(color);
@@ -702,26 +698,22 @@ void BScreen::readDatabaseColor(char *rname, char *rclass, BColor *color,
 }
 
 
-void BScreen::readDatabaseFontSet(char *rname, char *rclass,
+void BScreen::readDatabaseFontSet(const char *rname, const char *rclass,
 				  XFontSet *fontset) {
   if (! fontset) return;
 
   static char *defaultFont = "fixed";
-
-  Bool load_default = False;
-  XrmValue value;
-  char *value_type;
+  bool load_default = false;
+  std::string s;
 
   if (*fontset)
     XFreeFontSet(getBaseDisplay()->getXDisplay(), *fontset);
 
-  if (XrmGetResource(resource.stylerc, rname, rclass, &value_type, &value)) {
-    char *fontname = value.addr;
-    if (! (*fontset = createFontSet(fontname)))
-      load_default = True;
-  } else {
-    load_default = True;
-  }
+  if (resource.styleconfig.getValue(rname, rclass, s)) {
+    if (! (*fontset = createFontSet(s.c_str())))
+      load_default = true;
+  } else
+    load_default = true;
 
   if (load_default) {
     *fontset = createFontSet(defaultFont);
@@ -735,30 +727,27 @@ void BScreen::readDatabaseFontSet(char *rname, char *rclass,
 }
 
 
-void BScreen::readDatabaseFont(char *rname, char *rclass, XFontStruct **font) {
+void BScreen::readDatabaseFont(const char *rname, const char *rclass,
+                               XFontStruct **font) {
   if (! font) return;
 
   static char *defaultFont = "fixed";
-
-  Bool load_default = False;
-  XrmValue value;
-  char *value_type;
+  bool load_default = false;
+  std::string s;
 
   if (*font)
     XFreeFont(getBaseDisplay()->getXDisplay(), *font);
 
-  if (XrmGetResource(resource.stylerc, rname, rclass, &value_type, &value)) {
+  if (resource.styleconfig.getValue(rname, rclass, s)) {
     if ((*font = XLoadQueryFont(getBaseDisplay()->getXDisplay(),
-				value.addr)) == NULL) {
+				s.c_str())) == NULL) {
       fprintf(stderr, i18n->getMessage(ScreenSet, ScreenFontLoadFail,
 			 "BScreen::LoadStyle(): couldn't load font '%s'\n"),
-	      value.addr);
-
-      load_default = True;
+	      s.c_str());
+      load_default = true;
     }
-  } else {
-    load_default = True;
-  }
+  } else
+    load_default = true;
 
   if (load_default) {
     if ((*font = XLoadQueryFont(getBaseDisplay()->getXDisplay(),
@@ -771,7 +760,7 @@ void BScreen::readDatabaseFont(char *rname, char *rclass, XFontStruct **font) {
 }
 
 
-XFontSet BScreen::createFontSet(char *fontname) {
+XFontSet BScreen::createFontSet(const char *fontname) {
   XFontSet fs;
   char **missing, *def = "-";
   int nmissing, pixel_size = 0, buf_size = 0;
@@ -1004,14 +993,22 @@ void BScreen::removeWorkspaceNames(void) {
 
 
 void BScreen::LoadStyle(void) {
-  resource.stylerc = XrmGetFileDatabase(openbox->getStyleFilename());
-  if (resource.stylerc == NULL)
-    resource.stylerc = XrmGetFileDatabase(DEFAULTSTYLE);
-  assert(resource.stylerc != NULL);
+  obResource &conf = resource.styleconfig;
+  
+  conf.setFile(openbox->getStyleFilename());
+  if (!conf.load()) {
+    conf.setFile(DEFAULTSTYLE);
+    if (!conf.load()) {
+      fprintf(stderr, i18n->getMessage(ScreenSet, ScreenDefaultStyleLoadFail,
+                                       "BScreen::LoadStyle(): couldn't load "
+                                       "default style.\n"));
+      exit(2);
+    }
+  }
 
-  XrmValue value;
-  char *value_type;
-
+  std::string s;
+  long l;
+  
   // load fonts/fontsets
 
   if (i18n->multibyte()) {
@@ -1119,17 +1116,16 @@ void BScreen::LoadStyle(void) {
 		    WhitePixel(getBaseDisplay()->getXDisplay(),
 			       getScreenNumber()));
 
-  if (XrmGetResource(resource.stylerc, "window.justify", "Window.Justify",
-		     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (conf.getValue("window.justify", "Window.Justify", s)) {
+    if (0 == strncasecmp(s.c_str(), "right", s.length()))
       resource.wstyle.justify = BScreen::RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (0 == strncasecmp(s.c_str(), "center", s.length()))
       resource.wstyle.justify = BScreen::CenterJustify;
     else
       resource.wstyle.justify = BScreen::LeftJustify;
-  } else {
+  } else
     resource.wstyle.justify = BScreen::LeftJustify;
-  }
+
   // load toolbar config
   readDatabaseTexture("toolbar", "Toolbar",
 		      &resource.tstyle.toolbar,
@@ -1173,17 +1169,16 @@ void BScreen::LoadStyle(void) {
 		    BlackPixel(getBaseDisplay()->getXDisplay(),
 			       getScreenNumber()));
 
-  if (XrmGetResource(resource.stylerc, "toolbar.justify",
-		     "Toolbar.Justify", &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (conf.getValue("toolbar.justify", "Toolbar.Justify", s)) {
+    if (0 == strncasecmp(s.c_str(), "right", s.length()))
       resource.tstyle.justify = BScreen::RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (0 == strncasecmp(s.c_str(), "center", s.length()))
       resource.tstyle.justify = BScreen::CenterJustify;
     else
       resource.tstyle.justify = BScreen::LeftJustify;
-  } else {
+  } else
     resource.tstyle.justify = BScreen::LeftJustify;
-  }
+
   // load menu config
   readDatabaseTexture("menu.title", "Menu.Title",
 		      &resource.mstyle.title,
@@ -1214,96 +1209,85 @@ void BScreen::LoadStyle(void) {
 		    BlackPixel(getBaseDisplay()->getXDisplay(),
 			       getScreenNumber()));
 
-  if (XrmGetResource(resource.stylerc, "menu.title.justify",
-		     "Menu.Title.Justify",
-		     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+  if (conf.getValue("menu.title.justify", "Menu.Title.Justify", s)) {
+    if (0 == strncasecmp(s.c_str(), "right", s.length()))
       resource.mstyle.t_justify = BScreen::RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (0 == strncasecmp(s.c_str(), "center", s.length()))
       resource.mstyle.t_justify = BScreen::CenterJustify;
     else
       resource.mstyle.t_justify = BScreen::LeftJustify;
-  } else {
+  } else
     resource.mstyle.t_justify = BScreen::LeftJustify;
-  }
-  if (XrmGetResource(resource.stylerc, "menu.frame.justify",
-		     "Menu.Frame.Justify",
-		     &value_type, &value)) {
-    if (strstr(value.addr, "right") || strstr(value.addr, "Right"))
+
+  if (conf.getValue("menu.frame.justify", "Menu.Frame.Justify", s)) {
+    if (0 == strncasecmp(s.c_str(), "right", s.length()))
       resource.mstyle.f_justify = BScreen::RightJustify;
-    else if (strstr(value.addr, "center") || strstr(value.addr, "Center"))
+    else if (0 == strncasecmp(s.c_str(), "center", s.length()))
       resource.mstyle.f_justify = BScreen::CenterJustify;
     else
       resource.mstyle.f_justify = BScreen::LeftJustify;
-  } else {
+  } else
     resource.mstyle.f_justify = BScreen::LeftJustify;
-  }
-  if (XrmGetResource(resource.stylerc, "menu.bullet", "Menu.Bullet",
-                     &value_type, &value)) {
-    if (! strncasecmp(value.addr, "empty", value.size))
+
+  if (conf.getValue("menu.bullet", "Menu.Bullet", s)) {
+    if (0 == strncasecmp(s.c_str(), "empty", s.length()))
       resource.mstyle.bullet = Basemenu::Empty;
-    else if (! strncasecmp(value.addr, "square", value.size))
+    else if (0 == strncasecmp(s.c_str(), "square", s.length()))
       resource.mstyle.bullet = Basemenu::Square;
-    else if (! strncasecmp(value.addr, "diamond", value.size))
+    else if (0 == strncasecmp(s.c_str(), "diamond", s.length()))
       resource.mstyle.bullet = Basemenu::Diamond;
     else
       resource.mstyle.bullet = Basemenu::Triangle;
-  } else {
+  } else
     resource.mstyle.bullet = Basemenu::Triangle;
-  }
-  if (XrmGetResource(resource.stylerc, "menu.bullet.position",
-                     "Menu.Bullet.Position", &value_type, &value)) {
-    if (! strncasecmp(value.addr, "right", value.size))
+
+  if (conf.getValue("menu.bullet.position", "Menu.Bullet.Position", s)) {
+    if (0 == strncasecmp(s.c_str(), "right", s.length()))
       resource.mstyle.bullet_pos = Basemenu::Right;
     else
       resource.mstyle.bullet_pos = Basemenu::Left;
-  } else {
+  } else
     resource.mstyle.bullet_pos = Basemenu::Left;
-  }
+
   readDatabaseColor("borderColor", "BorderColor", &resource.border_color,
 		    BlackPixel(getBaseDisplay()->getXDisplay(),
 			       getScreenNumber()));
 
   // load bevel, border and handle widths
-  if (XrmGetResource(resource.stylerc, "handleWidth", "HandleWidth",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%u", &resource.handle_width) != 1 ||
-	resource.handle_width > getWidth() / 2 || resource.handle_width == 0)
+  if (conf.getValue("handleWidth", "HandleWidth", l)) {
+    if (l <= getWidth() / 2 && l != 0)
+      resource.handle_width = l;
+    else
       resource.handle_width = 6;
-  } else {
+  } else
     resource.handle_width = 6;
-  }
-  if (XrmGetResource(resource.stylerc, "borderWidth", "BorderWidth",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%u", &resource.border_width) != 1)
-      resource.border_width = 1;
-  } else {
-    resource.border_width = 1;
-  }
 
-  if (XrmGetResource(resource.stylerc, "bevelWidth", "BevelWidth",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%u", &resource.bevel_width) != 1 ||
-	resource.bevel_width > getWidth() / 2 || resource.bevel_width == 0)
+  if (conf.getValue("borderWidth", "BorderWidth", l))
+    resource.border_width = l;
+  else
+    resource.border_width = 1;
+
+  if (conf.getValue("bevelWidth", "BevelWidth", l)) {
+    if (l <= getWidth() / 2 && l != 0)
+      resource.bevel_width = l;
+    else
       resource.bevel_width = 3;
-  } else {
+  } else
     resource.bevel_width = 3;
-  }
-  if (XrmGetResource(resource.stylerc, "frameWidth", "FrameWidth",
-                     &value_type, &value)) {
-    if (sscanf(value.addr, "%u", &resource.frame_width) != 1 ||
-	resource.frame_width > getWidth() / 2)
+
+  if (conf.getValue("frameWidth", "FrameWidth", l)) {
+    if (l <= getWidth() / 2)
+      resource.frame_width = l;
+    else
       resource.frame_width = resource.bevel_width;
-  } else {
+  } else
     resource.frame_width = resource.bevel_width;
-  }
+
   const char *cmd = resource.root_command;
-  if (cmd != NULL || XrmGetResource(resource.stylerc,
-                     "rootCommand",
-                     "RootCommand", &value_type, &value)) {
+  if (cmd != NULL || conf.getValue("rootCommand", "RootCommand", s)) {
     if (cmd == NULL)
-      cmd = value.addr; // not specified by the screen, so use the one from the
-                        // style file
+      cmd = s.c_str(); // not specified by the screen, so use the one from the
+                       // style file
 #ifndef    __EMX__
     char displaystring[MAXPATHLEN];
     sprintf(displaystring, "DISPLAY=%s",
@@ -1316,8 +1300,6 @@ void BScreen::LoadStyle(void) {
     spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", cmd, NULL);
 #endif // !__EMX__
   }
-
-  XrmDestroyDatabase(resource.stylerc);
 }
 
 

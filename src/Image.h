@@ -230,8 +230,8 @@ public:
                           unsigned int **, unsigned int **);
   void setDither(Bool d) { dither = d; }
   void setColorsPerChannel(int);
-  void parseTexture(BTexture *, char *);
-  void parseColor(BColor *, char * = 0);
+  void parseTexture(BTexture *, const char *);
+  void parseColor(BColor *, const char * = 0);
 
   virtual void timeout(void);
 };

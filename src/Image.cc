@@ -2343,7 +2343,7 @@ unsigned long BImageControl::getSqrt(unsigned int x) {
 }
 
 
-void BImageControl::parseTexture(BTexture *texture, char *t) {
+void BImageControl::parseTexture(BTexture *texture, const char *t) {
   if ((! texture) || (! t)) return;
 
   int t_len = strlen(t) + 1, i;
@@ -2409,7 +2409,7 @@ void BImageControl::parseTexture(BTexture *texture, char *t) {
 }
 
 
-void BImageControl::parseColor(BColor *color, char *c) {
+void BImageControl::parseColor(BColor *color, const char *c) {
   if (! color) return;
 
   if (color->isAllocated()) {

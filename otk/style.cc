@@ -10,17 +10,17 @@
 
 namespace otk {
 
-Style::Style()
+Style::Style() : font(NULL)
 {
-  fprintf(stderr, "new font class used");
 }
 
-Style::Style(unsigned int screen) : screen_number(screen)
+Style::Style(unsigned int screen)
+  : font(NULL), screen_number(screen)
 {
 }
 
 Style::Style(unsigned int screen, otk::BImageControl *ctrl)
-  : image_control(ctrl), screen_number(screen)
+  : image_control(ctrl), font(NULL), screen_number(screen)
 {
 }
 

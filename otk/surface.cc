@@ -57,9 +57,11 @@ void Surface::createObjects()
   
   _pixmap = XCreatePixmap(**display, info->rootWindow(),
                           _size.x(), _size.y(), info->depth());
+  assert(_pixmap != None);
     
   _xftdraw = XftDrawCreate(**display, _pixmap,
                            info->visual(), info->colormap());
+  assert(_xftdraw);
 }
 
 void Surface::destroyObjects()

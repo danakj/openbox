@@ -53,53 +53,6 @@ TrueRenderControl::TrueRenderControl(int screen)
 TrueRenderControl::~TrueRenderControl()
 {
   printf("Destroying TrueColor RenderControl\n");
-
-
-}
-
-
-static inline void renderPixel(XImage *im, unsigned char *dp,
-			       unsigned long pixel)
-{
-  unsigned int bpp = im->bits_per_pixel + (im->byte_order == MSBFirst ? 1 : 0);
-
-  switch (bpp) {
-  case  8: //  8bpp
-    *dp++ = pixel;
-    break;
-  case 16: // 16bpp LSB
-    *dp++ = pixel;
-    *dp++ = pixel >> 8;
-    break;
-  case 17: // 16bpp MSB
-    *dp++ = pixel >> 8;
-    *dp++ = pixel;
-    break;
-  case 24: // 24bpp LSB
-    *dp++ = pixel;
-    *dp++ = pixel >> 8;
-    *dp++ = pixel >> 16;
-    break;
-  case 25: // 24bpp MSB
-    *dp++ = pixel >> 16;
-    *dp++ = pixel >> 8;
-    *dp++ = pixel;
-    break;
-  case 32: // 32bpp LSB
-    *dp++ = pixel;
-    *dp++ = pixel >> 8;
-    *dp++ = pixel >> 16;
-    *dp++ = pixel >> 24;
-    break;
-  case 33: // 32bpp MSB
-    *dp++ = pixel >> 24;
-    *dp++ = pixel >> 16;
-    *dp++ = pixel >> 8;
-    *dp++ = pixel;
-    break;
-  default:
-    assert(false); // wtf?
-  }
 }
 
 void TrueRenderControl::drawGradientBackground(
@@ -244,8 +197,8 @@ void TrueRenderControl::diagonalGradient(Surface &sf,
 }
 
 void TrueRenderControl::crossDiagonalGradient(Surface &sf,
-                                         const RenderTexture &texture,
-                                         pixel32 *data) const
+                                              const RenderTexture &texture,
+                                              pixel32 *data) const
 {
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
@@ -274,12 +227,13 @@ void TrueRenderControl::crossDiagonalGradient(Surface &sf,
     }
   }
 }
+
 void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
 {
 // since pixel32 is the largest possible pixel size, we can share the array
   int r, g, b;
   int x,y;
-  pixel16 *p = (pixel16 *)data;
+  pixel16 *p = (pixel16*) data;
   switch (im->bits_per_pixel) {
   case 32:
     if ((_red_offset != default_red_shift) ||
@@ -291,7 +245,8 @@ void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
           r = (data[x] >> default_red_shift) & 0xFF;
           g = (data[x] >> default_green_shift) & 0xFF;
           b = (data[x] >> default_blue_shift) & 0xFF;
-          data[x] = (r << _red_offset) + (g << _green_offset) + (b << _blue_offset);
+          data[x] = (r << _red_offset) + (g << _green_offset) +
+            (b << _blue_offset);
         }
         data += im->width;
       } 
@@ -350,17 +305,17 @@ void TrueRenderControl::highlight(pixel32 *x, pixel32 *y, bool raised) const
   *down = (r << default_red_shift) + (g << default_green_shift)
         + (b << default_blue_shift);
 }
+
 void TrueRenderControl::drawBackground(Surface& sf,
 				       const RenderTexture &texture) const
 {
   assert(_screen == sf._screen);
   assert(_screen == texture.color().screen());
 
-  if (texture.gradient() == RenderTexture::Solid) {
+  if (texture.gradient() == RenderTexture::Solid)
     drawSolidBackground(sf, texture);
-  } else {
+  else
     drawGradientBackground(sf, texture);
-  }
 }
 
 }

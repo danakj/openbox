@@ -38,7 +38,7 @@ RenderControl *RenderControl::getRenderControl(int screen)
     return new PseudoRenderControl(screen);
   case GrayScale:
   case StaticGray:
-//    return new GrayRenderControl(screen);
+    return new PseudoRenderControl(screen);
   default:
     printf(_("RenderControl: Unsupported visual %d specified. Aborting.\n"),
 	   vclass);

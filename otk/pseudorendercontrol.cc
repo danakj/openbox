@@ -24,22 +24,12 @@ namespace otk {
 PseudoRenderControl::PseudoRenderControl(int screen)
   : RenderControl(screen)
 {
-  const ScreenInfo *info = display->screenInfo(_screen);
-
   printf("Initializing PseudoColor RenderControl\n");
-
 }
 
 PseudoRenderControl::~PseudoRenderControl()
 {
   printf("Destroying PseudoColor RenderControl\n");
-
-
-}
-
-void PseudoRenderControl::drawGradientBackground(
-     Surface &sf, const RenderTexture &texture) const
-{
 }
 
 void PseudoRenderControl::drawBackground(Surface& sf,
@@ -48,11 +38,9 @@ void PseudoRenderControl::drawBackground(Surface& sf,
   assert(_screen == sf._screen);
   assert(_screen == texture.color().screen());
 
-  if (texture.gradient() == RenderTexture::Solid) {
-    drawSolidBackground(sf, texture);
-  } else {
-    drawGradientBackground(sf, texture);
-  }
+  // in psuedo color, gradients aren't even worth while! just draw a solid!
+  //if (texture.gradient() == RenderTexture::Solid) {
+  drawSolidBackground(sf, texture);
 }
 
 }

@@ -23,9 +23,6 @@ namespace otk {
 class PseudoRenderControl : public RenderControl {
 private:
 
-  virtual void drawGradientBackground(Surface &sf,
-                                      const RenderTexture &texture) const;
- 
 public:
   PseudoRenderControl(int screen);
   virtual ~PseudoRenderControl();

@@ -71,3 +71,16 @@ void XScreen::setColorData() {
     _colormap = DefaultColormap(_display, _number);
   }
 }
+
+
+/*
+ * Creates a window on screen.
+ */
+Window createWindow(Window parent, const Rect &area, int borderw,
+                    unsigned int winclass, unsigned long attrib_mask,
+                    XSetWindowAttributes *attrib) const {
+  return XCreateWindow(_display, parent,
+                       area.x(), area.y(), area.w(), area.h(),
+                       borderw, depth(), winclass, visual(),
+                       attrib_mask, attrib);
+}

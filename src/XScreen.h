@@ -53,6 +53,11 @@ public:
   inline unsigned int depth() const { return _depth; }
   inline unsigned int number() const { return _number; }
   inline const Size &size() const { return _size; }
+
+  Window createWindow(Window parent, const Rect &area, int borderw,
+                      unsigned int winclass,
+                      unsigned long attrib_mask,
+                      XSetWindowAttributes *attrib) const;
 };
 
 #endif // __XScreen_h

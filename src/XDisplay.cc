@@ -36,7 +36,6 @@
 #endif
 
 #include "XDisplay.h"
-#include "XScreen.h"
 #include "Util.h"
 #include <iostream>
 #include <algorithm>
@@ -51,7 +50,7 @@ Window      XDisplay::_last_bad_window = None;
  * X error handler to handle all X errors while the application is
  * running.
  */
-int XDisplay::XErrorHandler(Display *d, XErrorEvent *e) {
+int XDisplay::errorHandler(Display *d, XErrorEvent *e) {
 #ifdef DEBUG
   char errtxt[128];
   XGetErrorText(d, e->error_code, errtxt, sizeof(errtxt)/sizeof(char));
@@ -86,32 +85,22 @@ XDisplay::XDisplay(const std::string &application_name, const char *dpyname) {
   }
   _name = XDisplayName(dpyname);
 
-  XSetErrorHandler(XErrorHandler);
+  XSetErrorHandler(errorHandler);
 
 #ifdef    SHAPE
   int waste;
   _hasshape = XShapeQueryExtension(_display, &_shape_event_base, &waste);
 #endif // SHAPE
 
-  const unsigned int scount = ScreenCount(_display);
-  _screens.reserve(scount);
-  for (unsigned int s = 0; s < scount; s++)
-    _screens.push_back(new XScreen(this, s));
+#ifndef NOCLOBBER
+  getLockModifiers();
+#endif
 }
 
 
 XDisplay::~XDisplay() {
   std::for_each(_screens.begin(), _screens.end(), PointerAssassin());
   XCloseDisplay(_display);
-}
-
-
-/*
- * Return information about a screen.
- */
-XScreen *XDisplay::screen(unsigned int s) const {
-  ASSERT(s < _screens.size());
-  return _screens[s];
 }
 
 
@@ -152,4 +141,120 @@ bool XDisplay::nextEvent(XEvent &e) {
       _last_bad_window = None;
   }
   return true;
+}
+
+
+int XDisplay::connectionNumber() const {
+  return ConnectionNumber(_display);
+}
+
+
+/*
+ * Creates a font cursor in the X server and returns it.
+ */
+Cursor createCursor(unsigned int shape) const {
+  return XCreateFontCursor(_display, shape);
+}
+
+
+#ifndef   NOCLOBBER
+void XDisplay::getLockModifers() {
+  NumLockMask = ScrollLockMask = 0;
+
+  const XModifierKeymap* const modmap = XGetModifierMapping(display);
+  if (modmap && modmap->max_keypermod > 0) {
+    const int mask_table[] = {
+      ShiftMask, LockMask, ControlMask, Mod1Mask,
+      Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
+    };
+    const size_t size = (sizeof(mask_table) / sizeof(mask_table[0])) *
+      modmap->max_keypermod;
+    // get the values of the keyboard lock modifiers
+    // Note: Caps lock is not retrieved the same way as Scroll and Num lock
+    // since it doesn't need to be.
+    const KeyCode num_lock_code = XKeysymToKeycode(display, XK_Num_Lock);
+    const KeyCode scroll_lock_code = XKeysymToKeycode(display, XK_Scroll_Lock);
+
+    for (size_t cnt = 0; cnt < size; ++cnt) {
+      if (! modmap->modifiermap[cnt]) continue;
+
+      if (num_lock_code == modmap->modifiermap[cnt])
+        NumLockMask = mask_table[cnt / modmap->max_keypermod];
+      if (scroll_lock_code == modmap->modifiermap[cnt])
+        ScrollLockMask = mask_table[cnt / modmap->max_keypermod];
+    }
+  }
+
+  MaskList[0] = 0;
+  MaskList[1] = LockMask;
+  MaskList[2] = NumLockMask;
+  MaskList[3] = ScrollLockMask;
+  MaskList[4] = LockMask | NumLockMask;
+  MaskList[5] = NumLockMask  | ScrollLockMask;
+  MaskList[6] = LockMask | ScrollLockMask;
+  MaskList[7] = LockMask | NumLockMask | ScrollLockMask;
+
+  if (modmap) XFreeModifiermap(const_cast<XModifierKeymap*>(modmap));
+}
+#endif // NOCLOBBER
+  
+unsigned int XDisplay::stripModifiers(const unsigned int state) const {
+#ifndef NOCLOBBER
+  return state &= ~(NumLockMask() | ScrollLockMask | LockMask);
+#else
+  return state &= ~LockMask;
+#endif
+}
+
+
+/*
+ * Verifies that a window has not requested to be destroyed/unmapped, so
+ * if it is a valid window or not.
+ * Returns: true if the window is valid; false if it is no longer valid.
+ */
+bool XDisplay::validateWindow(Window window) {
+  XEvent event;
+  if (XCheckTypedWindowEvent(_display, window, DestroyNotify, &event)) {
+    XPutBackEvent(display, &event);
+    return false;
+  }
+  return true;
+}
+
+
+/*
+ * Grabs a button, but also grabs the button in every possible combination with
+ * the keyboard lock keys, so that they do not cancel out the event.
+ */
+void BaseDisplay::grabButton(unsigned int button, unsigned int modifiers,
+                             Window grab_window, Bool owner_events,
+                             unsigned int event_mask, int pointer_mode,
+                             int keybaord_mode, Window confine_to,
+                             Cursor cursor) const
+{
+#ifndef   NOCLOBBER
+  for (size_t cnt = 0; cnt < 8; ++cnt)
+    XGrabButton(_display, button, modifiers | MaskList[cnt], grab_window,
+                owner_events, event_mask, pointer_mode, keybaord_mode,
+                confine_to, cursor);
+#else  // NOCLOBBER
+  XGrabButton(_display, button, modifiers, grab_window,
+              owner_events, event_mask, pointer_mode, keybaord_mode,
+              confine_to, cursor);
+#endif // NOCLOBBER
+}
+
+
+/*
+ * Releases the grab on a button, and ungrabs all possible combinations of the
+ * keyboard lock keys.
+ */
+void BaseDisplay::ungrabButton(unsigned int button, unsigned int modifiers,
+                               Window grab_window) const {
+#ifndef   NOCLOBBER
+  for (size_t cnt = 0; cnt < 8; ++cnt)
+    XUngrabButton(display, button, modifiers | MaskList[cnt], grab_window);
+#else  // NOCLOBBER
+  XUngrabButton(display, button, modifiers, grab_window);
+#endif // NOCLOBBER
 }

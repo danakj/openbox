@@ -22,6 +22,8 @@
 #ifndef   __XAtom_h
 #define   __XAtom_h
 
+#include "../config.h"
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <vector>
@@ -37,6 +39,10 @@ class XAtom {
   SupportWindows        _support_windows; 
 
   Atom 
+#ifdef    HAVE_GETPID
+    openbox_pid,
+#endif // HAVE_GETPID
+
     // window hints
     wm_colormap_windows,
     wm_protocols,
@@ -140,6 +146,10 @@ public:
   
   void eraseValue(Window win, Atom atom) const;
   
+#ifdef    HAVE_GETPID
+  inline Atom openboxPid() const { return openbox_pid; }
+#endif // HAVE_GETPID
+
   inline Atom wmChangeState() const { return wm_change_state; }
   inline Atom wmState() const { return wm_state; }
   inline Atom wmDelete() const { return wm_delete_window; }

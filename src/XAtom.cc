@@ -27,6 +27,10 @@
 XAtom::XAtom(const XDisplay *display) {
   _display = display->_display;
 
+#ifdef    HAVE_GETPID
+  openbox_pid = getAtom("_BLACKBOX_PID");
+#endif // HAVE_GETPID
+
   wm_colormap_windows = getAtom("WM_COLORMAP_WINDOWS");
   wm_protocols = getAtom("WM_PROTOCOLS");
   wm_state = getAtom("WM_STATE");

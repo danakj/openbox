@@ -39,11 +39,17 @@ private:
   bool           _hasshape;
   int            _shape_event_base;
 
-  typedef std::vector<XScreen*> XScreenList;
-  XScreenList    _screens;
+#ifndef   NOCLOBBER
+  // the server's values for the lock key modifiers
+  void getLockModifiers();
+  unsigned int MaskList[8];
+  // the masks of the modifiers which are ignored in button events.
+  int NumLockMask, ScrollLockMask;
+#endif // NOCLOBBER
 
+  
   // X error handling
-  static int XErrorHandler(Display *d, XErrorEvent *e);
+  static int errorHandler(Display *d, XErrorEvent *e);
   static std::string _app_name;
   static Window _last_bad_window;
 
@@ -58,27 +64,34 @@ public:
   XDisplay(const std::string &application_name, const char *dpyname = 0);
   virtual ~XDisplay();
 
-  XScreen *screen(unsigned int s) const;
-  inline unsigned int screenCount() const { return _screens.size(); }
+  inline virtual unsigned int screenCount() const
+  { return ScreenCount(_display); }
   
   inline bool hasShape() const { return _hasshape; }
   inline int shapeEventBase() const { return _shape_event_base; }
 
   //inline Display *display() const { return _display; }
 
+  inline std::string applicationName() const { return _app_name; }
   inline std::string name() const { return _name; }
-
-  // these belong in Xwindow
-  //const bool validateWindow(Window);
-  //void grabButton(unsigned int, unsigned int, Window, Bool, unsigned int, int,
-  //    int, Window, Cursor) const;
-  //void ungrabButton(unsigned int button, unsigned int modifiers,
-  //    Window grab_window) const;
   
   void grab();
   void ungrab();
 
   bool nextEvent(XEvent &e);
+
+  int connectionNumber() const;
+
+  Cursor createCursor(unsigned int shape) const;
+
+  unsigned int stripModifiers(const unsigned int state) const;
+
+  // these belong in Xwindow
+  const bool validateWindow(Window);
+  void grabButton(unsigned int, unsigned int, Window, Bool, unsigned int, int,
+      int, Window, Cursor) const;
+  void ungrabButton(unsigned int button, unsigned int modifiers,
+      Window grab_window) const;
 };
 
 #endif // _XDisplay_h

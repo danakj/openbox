@@ -184,7 +184,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     w = area->width - 4;
     h = area->height;
 
-    text = g_string_new(strfry(t->string));
+    text = g_string_new(t->string);
     l = g_utf8_strlen(text->str, -1);
     font_measure_full(t->font, text->str, &mw, &mh);
     while (l && mw > area->width) {
@@ -236,9 +236,9 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
                           t->font->xftfont->ascent + y + t->font->offset,
                           (FcChar8*)text->str, l);
     }  
-    c.color.red = t->color->r | g_random_int_range(0,255) << 8; //t->color->r << 8;
-    c.color.green = t->color->g | g_random_int_range(0,255) << 8; //t->color->g << 8;
-    c.color.blue = t->color->b | g_random_int_range(0,255) << 8; //t->color->b << 8;
+    c.color.red = t->color->r | t->color->r << 8;
+    c.color.green = t->color->g | t->color->g << 8;
+    c.color.blue = t->color->b | t->color->b << 8;
     c.color.alpha = 0xff | 0xff << 8; /* fully opaque text */
     c.pixel = t->color->pixel;
 

@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
       // print current version string
       printf("Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n",
              "\t\t\t   1997 - 2000 Brad Hughes\n"
-             __blackbox_version);
+             __openbox_version);
 
       ::exit(0);
     } else if (! strcmp(argv[i], "-help")) {

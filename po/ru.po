@@ -1,0 +1,124 @@
+# Russian translation of Openbox
+# # Copyright (C) 2004 Mikael Magnusson
+# This file is distributed under the same license as the openbox package.
+# Alexey Remizov <alexey@remizov.pp.ru>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openbox 3.2\n"
+"POT-Creation-Date: 2004-04-17 13:45+0200\n"
+"PO-Revision-Date: 2004-04-23 13:00+0300\n"
+"Last-Translator: Alexey Remizov <alexey@remizov.pp.ru>\n"
+"Language-Team: Russian <gnome-cyr@gnome.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: openbox/client_list_menu.c:94
+msgid "Go there..."
+msgstr "Перейти..."
+
+#: openbox/client_list_menu.c:160
+msgid "Desktops"
+msgstr "Рабочие места"
+
+#: openbox/client_menu.c:78
+msgid "Restore"
+msgstr "Восстановить"
+
+#: openbox/client_menu.c:78
+msgid "Maximize"
+msgstr "Развернуть на весь экран"
+
+#: openbox/client_menu.c:84
+msgid "Roll down"
+msgstr "Раскрутить"
+
+#: openbox/client_menu.c:84
+msgid "Roll up"
+msgstr "Скрутить"
+
+#: openbox/client_menu.c:146
+msgid "All desktops"
+msgstr "Все рабочие места"
+
+#: openbox/client_menu.c:170
+msgid "Layer"
+msgstr "Расположить"
+
+#: openbox/client_menu.c:175
+msgid "Always on top"
+msgstr "Всегда на переднем плане"
+
+#: openbox/client_menu.c:180
+msgid "Normal"
+msgstr "Обычно"
+
+#: openbox/client_menu.c:185
+msgid "Always on bottom"
+msgstr "Всегда на заднем плане"
+
+#: openbox/client_menu.c:188
+msgid "Send to desktop"
+msgstr "Переместить на рабочее место"
+
+#: openbox/client_menu.c:192
+msgid "Client menu"
+msgstr "Меню клиента"
+
+#: openbox/client_menu.c:205
+msgid "Iconify"
+msgstr "Свернуть"
+
+#: openbox/client_menu.c:222
+msgid "Raise to top"
+msgstr "Поднять на передний план"
+
+#: openbox/client_menu.c:226
+msgid "Lower to bottom"
+msgstr "Опустить на задний план"
+
+#: openbox/client_menu.c:239
+msgid "Decorate"
+msgstr "Убрать оформление"
+
+#: openbox/client_menu.c:245
+msgid "Move"
+msgstr "Переместить"
+
+#: openbox/client_menu.c:249
+msgid "Resize"
+msgstr "Изменить размер"
+
+#: openbox/client_menu.c:255
+msgid "Close"
+msgstr "Закрыть"
+
+#: openbox/session.c:124
+msgid "--sm-client-id requires an argument\n"
+msgstr "--sm-client-id требует параметр\n"
+
+#: openbox/session.c:132
+msgid "--sm-save-file requires an argument\n"
+msgstr "--sm-save-file требует параметр\n"
+
+#: openbox/session.c:160
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Невозможно создать каталог '%s': %s"
+
+#: render/font.c:50
+msgid "Couldn't initialize Xft."
+msgstr "Не удалось инициализировать Xft."
+
+#: render/font.c:122
+#: render/font.c:127
+#, c-format
+msgid "Unable to load font: %s\n"
+msgstr "Невозможно загрузить шрифт: %s\n"
+
+#: render/font.c:123
+#, c-format
+msgid "Trying fallback font: %s\n"
+msgstr "Попытка вернуть шрифт: %s\n"
+

@@ -1677,16 +1677,13 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             minh = self->base_size.height;
         }
 
-        w -= basew;
-        h -= baseh;
-
         if (user) {
             /* for interactive resizing. have to move half an increment in each
                direction. */
 
             /* how far we are towards the next size inc */
-            int mw = w % self->size_inc.width; 
-            int mh = h % self->size_inc.height;
+            int mw = (w - basew) % self->size_inc.width; 
+            int mh = (h - baseh) % self->size_inc.height;
             /* amount to add */
             int aw = self->size_inc.width / 2;
             int ah = self->size_inc.height / 2;
@@ -1707,6 +1704,9 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             if (h > self->max_size.height) h = self->max_size.height;
             if (h < minh) h = minh;
         }
+
+        w -= basew;
+        h -= baseh;
 
         /* keep to the increments */
         w /= self->size_inc.width;

@@ -11,6 +11,8 @@ void framerender_frame(Frame *self)
     if (self->client->decorations & Decor_Titlebar) {
         struct RrSurface *t, *l, *p, *m, *n, *i, *d, *s, *c;
 
+        RrSurfaceCopy(self->s_frame, ob_theme->frame);
+
         t = (self->focused ?
              ob_theme->title_f : ob_theme->title);
         l = (self->focused ?

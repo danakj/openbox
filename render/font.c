@@ -28,7 +28,7 @@ static gboolean started = FALSE;
 static void font_startup(void)
 {
     if (!XftInit(0)) {
-        g_warning(_("Couldn't initialize Xft.\n"));
+        g_warning(_("Couldn't initialize Xft."));
         exit(EXIT_FAILURE);
     }
     FcNameRegisterObjectTypes(objs, (sizeof(objs) / sizeof(objs[0])));
@@ -56,6 +56,7 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
         return NULL;
 
     match = XftFontMatch(RrDisplay(inst), RrScreen(inst), pat, &res);
+    FcPatternDestroy(pat);
     if (!match)
         return NULL;
 
@@ -112,6 +113,7 @@ RrFont *RrFontOpen(const RrInstance *inst, char *fontstring)
 void RrFontClose(RrFont *f)
 {
     if (f) {
+        g_message("freeing %p", f);
         XftFontClose(RrDisplay(f->inst), f->xftfont);
         g_free(f);
     }

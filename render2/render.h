@@ -73,4 +73,61 @@ int RrFontMeasureString(struct RrFont *font, const char *string);
 int RrFontHeight(struct RrFont *font);
 int RrFontMaxCharWidth(struct RrFont *font);
 
+/* surfaces */
+
+struct RrSurface;
+struct RrTexture;
+
+enum RrSurfaceType {
+    RR_SURFACE_PLANAR,
+    RR_SURFACE_NONPLANAR
+};
+
+enum RrTextureType {
+    RR_TEXTURE_FOO
+};
+
+/*! The options available for the background of an RrSurface */
+enum RrSurfaceColorType {
+    /*! No rendering on the surface background, its contents will be
+      undefined. */
+    RR_SURFACE_NONE,
+    /*! Solid color fill. */
+    RR_SURFACE_SOLID,
+    /*! Horizontal gradient. */
+    RR_SURFACE_HORIZONTAL,
+    /*! Vertical gradient. */
+    RR_SURFACE_VERTICAL,
+    /*! Diagonal (TL->BR) gradient. */
+    RR_SURFACE_DIAGONAL,
+    /*! Cross-Diagonal (TR->BL) gradient. */
+    RR_SURFACE_CROSSDIAGONAL,
+    /*! Pipecross gradient. */
+    RR_SURFACE_PIPECROSS,
+    /*! Rectangle gradient. */
+    RR_SURFACE_RECTANGLE,
+    /*! Pyramid gradient. */
+    RR_SURFACE_PYRAMID
+};
+
+/*! Create a new top-level RrSurface for a Window. */
+struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
+                               enum RrSurfaceType type,
+                               Window win,
+                               int numtex);
+/*! Create a new RrSurface which is a child of another. */
+struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
+                                    struct RrSurface *parent,
+                                    int numtex);
+/*! Copy an RrSurface, creating a new top-level RrSurface for a Window. */
+struct RrSurface *RrSurfaceCopy(struct RrInstance *inst,
+                                struct RrSurface *sur,
+                                Window win);
+/*! Copy an RrSurface, creating a nwe RrSurface which is a child of another. */
+struct RrSurface *RrSurfaceCopyChild(struct RrSurface *sur,
+                                     struct RrSurface *parent);
+void RrSurfaceFree(struct RrSurface *sur);
+
+struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);
+
 #endif

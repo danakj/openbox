@@ -10,3 +10,4 @@ init.lo
 debug.lo
 color.lo
 font.lo
+surface.lo

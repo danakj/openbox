@@ -22,3 +22,4 @@ install-sh
 depcomp
 config.rpath
 py-compile
+ABOUT-NLS

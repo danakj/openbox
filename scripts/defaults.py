@@ -38,16 +38,20 @@ ob.kbind(["A-F4"], ob.KeyContext.All, callbacks.close)
 ob.kbind(["W-d"], ob.KeyContext.All, callbacks.toggle_show_desktop)
 
 # focus bindings
-import stackedcycle # functions for doing stacked 'kde-style' cycling
-ob.kbind(["A-Tab"], ob.KeyContext.All, stackedcycle.next)
-ob.kbind(["A-S-Tab"], ob.KeyContext.All, stackedcycle.previous)
 
-# if you want linear cycling instead of stacked cycling, comment out the focus
+from cycle import CycleWindows
+ob.kbind(["A-Tab"], ob.KeyContext.All, CycleWindows.next)
+ob.kbind(["A-S-Tab"], ob.KeyContext.All, CycleWindows.previous)
+
+# if you want linear cycling instead of stacked cycling, comment out the two
 # bindings above, and use these instead.
-#import focuscycle # functions for doing linear cycling
-#focuscycle.RAISE_WINDOW = 0 # don't raise windows when they're activated
-#ob.kbind(["A-Tab"], ob.KeyContext.All, focuscycle.next)
-#ob.kbind(["A-S-Tab"], ob.KeyContext.All, focuscycle.previous)
+#from cycle import CycleWindowsLinear
+#ob.kbind(["A-Tab"], ob.KeyContext.All, CycleWindows.next)
+#ob.kbind(["A-S-Tab"], ob.KeyContext.All, CycleWindows.previous)
+
+from cycle import CycleDesktops
+ob.kbind(["C-Tab"], ob.KeyContext.All, CycleDesktops.next)
+ob.kbind(["C-S-Tab"], ob.KeyContext.All, CycleDesktops.previous)
 
 # desktop changing bindings
 ob.kbind(["C-1"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 0))

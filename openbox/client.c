@@ -829,7 +829,7 @@ void client_update_transient_for(ObClient *self)
     ObClient *target = NULL;
 
     if (XGetTransientForHint(ob_display, self->window, &t)) {
-	self->transient = TRUE;
+        self->transient = TRUE;
         if (t != self->window) { /* cant be transient to itself! */
             target = g_hash_table_lookup(window_map, &t);
             /* if this happens then we need to check for it*/
@@ -845,14 +845,15 @@ void client_update_transient_for(ObClient *self)
                    group */
                 if (t == self->group->leader ||
                     t == None ||
-                    t == RootWindow(ob_display, ob_screen)) {
+                    t == RootWindow(ob_display, ob_screen))
+                {
                     /* window is a transient for its group! */
                     target = OB_TRAN_GROUP;
                 }
             }
         }
     } else
-	self->transient = FALSE;
+        self->transient = FALSE;
 
     /* if anything has changed... */
     if (target != self->transient_for) {
@@ -2813,6 +2814,8 @@ ObClient *client_search_top_transient(ObClient *self)
             return client_search_top_transient(self->transient_for);
         } else {
             GSList *it;
+
+            g_assert(self->group);
 
             for (it = self->group->members; it; it = it->next) {
                 ObClient *c = it->data;

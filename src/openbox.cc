@@ -982,6 +982,8 @@ void Openbox::save() {
   config.setValue("session.menuFile", getMenuFilename());
   config.setValue("session.colorsPerChannel",
                   resource.colors_per_channel);
+  config.setValue("session.styleFile", resource.style_file);
+  config.setValue("session.titlebarLayout", resource.titlebar_layout);
   config.setValue("session.doubleClickInterval",
                   (long)resource.double_click_interval);
   config.setValue("session.autoRaiseDelay",
@@ -989,7 +991,6 @@ void Openbox::save() {
            (resource.auto_raise_delay.tv_usec / 1000)));
   config.setValue("session.cacheLife", (long)resource.cache_life / 60000);
   config.setValue("session.cacheMax", (long)resource.cache_max);
-  config.setValue("session.styleFile", resource.style_file);
 
   LinkedListIterator<BScreen> it(screenList);
   for (BScreen *s = it.current(); s != NULL; it++, s = it.current()) {

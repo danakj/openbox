@@ -14,6 +14,8 @@ Changelog for Openbox:
 
  * fix positioning of the window menu                   (Ben Jansens)
 
+ * save the titlebarLayout in the default config file.  (Ben Jansens)
+
 1.0.0:
  * maximizing windows takes the slit into account as
    well as the toolbar when 'Full Maximization' is off  (Ben Jansens)

@@ -1539,6 +1539,8 @@ void OpenboxWindow::maximize(unsigned int button) {
   if (! screen->fullMax()) {
 #ifdef    SLIT
     Slit *slit = screen->getSlit();
+    int slit_x = slit->autoHide() ? slit->hiddenOrigin().x() : slit->area().x(),
+        slit_y = slit->autoHide() ? slit->hiddenOrigin().y() : slit->area().y();
     Toolbar *toolbar = screen->getToolbar();
     int tbarh = screen->hideToolbar() ? 0 :
       toolbar->getExposedHeight() + screen->getBorderWidth() * 2;
@@ -1562,19 +1564,21 @@ void OpenboxWindow::maximize(unsigned int button) {
           slit->placement() == Slit::TopRight)) ||
         slit->placement() == Slit::TopCenter) {
       // exclude top
-      if (tbartop) {
-        space.setY(slit->area().y());
-        space.setH(space.h() - space.y());
-      } else
+      if (tbartop)
+        space.setH(space.h() - slit_y);
+      else
         space.setH(space.h() - tbarh);
-      space.setY(space.y() + slit->area().h() + screen->getBorderWidth() * 2);
-      space.setH(space.h() - (slit->area().h() + screen->getBorderWidth() * 2));
+      space.setY(space.y() + slit_y + slit->area().h() +
+                 screen->getBorderWidth() * 2);
+      space.setH(space.h() - (slit_y + slit->area().h() +
+                              screen->getBorderWidth() * 2));
     } else if ((slit->direction() == Slit::Vertical &&
               (slit->placement() == Slit::TopRight ||
                slit->placement() == Slit::BottomRight)) ||
              slit->placement() == Slit::CenterRight) {
       // exclude right
-      space.setW(space.w() - (slit->area().w() + screen->getBorderWidth() * 2));
+      space.setW(space.w() - (screen->size().w() - slit_x +
+                              screen->getBorderWidth() * 2));
       if (tbartop)
         space.setY(space.y() + tbarh);
       space.setH(space.h() - tbarh);
@@ -1583,14 +1587,16 @@ void OpenboxWindow::maximize(unsigned int button) {
                slit->placement() == Slit::BottomRight)) ||
              slit->placement() == Slit::BottomCenter) {
       // exclude bottom
-      space.setH(space.h() - (screen->size().h() - slit->area().y()));
+      space.setH(space.h() - (screen->size().h() - slit_y));
     } else {// if ((slit->direction() == Slit::Vertical &&
       //      (slit->placement() == Slit::TopLeft ||
       //       slit->placement() == Slit::BottomLeft)) ||
       //     slit->placement() == Slit::CenterLeft)
       // exclude left
-      space.setX(slit->area().w() + screen->getBorderWidth() * 2);
-      space.setW(space.w() - (slit->area().w() + screen->getBorderWidth() * 2));
+      space.setX(slit_x + slit->area().w() +
+                 screen->getBorderWidth() * 2);
+      space.setW(space.w() - (slit_x + slit->area().w() +
+                              screen->getBorderWidth() * 2));
       if (tbartop)
         space.setY(space.y() + tbarh);
       space.setH(space.h() - tbarh);

@@ -133,6 +133,7 @@ public:
   inline const Point &origin() const { return frame.area.origin(); }
   inline const Size &size() const { return frame.area.size(); }
   inline const Rect &area() const { return frame.area; }
+  inline const Point &hiddenOrigin() const { return frame.hidden; }
 
   void addClient(Window);
   void removeClient(SlitClient *, Bool = True);

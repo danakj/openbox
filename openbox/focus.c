@@ -268,14 +268,8 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             frame_adjust_focus(focus_client->frame, TRUE);
         goto done_cycle;
     } else if (done) {
-        if (focus_cycle_target) {
-            if (focus_cycle_target->iconic)
-                client_iconify(focus_cycle_target, FALSE, FALSE);
-            if (focus_cycle_target->shaded)
-                client_shade(focus_cycle_target, FALSE);
-            client_focus(focus_cycle_target);
-            stacking_raise(focus_cycle_target);
-        }
+        if (focus_cycle_target)
+            client_activate(focus_cycle_target);
         goto done_cycle;
     }
     if (!first) first = focus_client;

@@ -731,18 +731,7 @@ static void event_handle_client(Client *client, XEvent *e)
 	    client_close(client);
 	} else if (msgtype == prop_atoms.net_active_window) {
 	    g_message("net_active_window for 0x%lx", client->window);
-	    if (screen_showing_desktop)
-		screen_show_desktop(FALSE);
-	    if (client->iconic)
-		client_iconify(client, FALSE, TRUE);
-	    else if (!client->frame->visible)
-		/* if its not visible for other reasons, then don't mess
-		   with it */
-		break;
-            if (client->shaded)
-                client_shade(client, FALSE);
-            client_focus(client);
-            stacking_raise(client);
+            client_activate(client);
 	} else if (msgtype == prop_atoms.net_wm_moveresize) {
 	    g_message("net_wm_moveresize for 0x%lx", client->window);
             if ((Atom)e->xclient.data.l[2] ==

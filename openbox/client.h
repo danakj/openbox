@@ -427,6 +427,10 @@ gboolean client_focus(Client *self);
 /*! Remove focus from the client window */
 void client_unfocus(Client *self);
 
+/*! Activates the client for use, focusing, uniconifying it, etc. To be used
+  when the user deliberately selects a window for use. */
+void client_activate(Client *self);
+
 /*! Calculates the stacking layer for the client window */
 void client_calc_layer(Client *self);
 

@@ -1192,6 +1192,7 @@ void client_update_title(Client *self)
     guint32 nums;
     guint i;
     char *data = NULL;
+    gboolean read_title;
 
     g_free(self->title);
      
@@ -1236,15 +1237,18 @@ void client_update_title(Client *self)
     /* update the icon title */
     data = NULL;
     g_free(self->icon_title);
-     
+
+    read_title = TRUE;
     /* try netwm */
     if (!PROP_GETS(self->window, net_wm_icon_name, utf8, &data))
 	/* try old x stuff */
-	if (!PROP_GETS(self->window, wm_icon_name, locale, &data))
-            data = g_strdup("Unnamed Window");
+	if (!PROP_GETS(self->window, wm_icon_name, locale, &data)) {
+            data = g_strdup(self->title);
+            read_title = FALSE;
+        }
 
     /* append the title count, dont display the number for the first window */
-    if (self->title_count > 1) {
+    if (read_title && self->title_count > 1) {
         char *vdata, *ndata;
         ndata = g_strdup_printf(" - [%u]", self->title_count);
         vdata = g_strconcat(data, ndata, NULL);
@@ -2290,6 +2294,22 @@ void client_unfocus(Client *self)
     g_message("client_unfocus for %lx", self->window);
 #endif
     focus_fallback(Fallback_Unfocusing);
+}
+
+void client_activate(Client *self)
+{
+    if (client_normal(self) && screen_showing_desktop)
+        screen_show_desktop(FALSE);
+    if (self->iconic)
+        client_iconify(self, FALSE, TRUE);
+    else if (!self->frame->visible)
+        /* if its not visible for other reasons, then don't mess
+           with it */
+        return;
+    if (self->shaded)
+        client_shade(self, FALSE);
+    client_focus(self);
+    stacking_raise(self);
 }
 
 gboolean client_focused(Client *self)

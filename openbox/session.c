@@ -190,7 +190,7 @@ void session_startup(int *argc, char ***argv)
                                 &cb, sm_id, &sm_id,
                                 SM_ERR_LEN, sm_err);
     if (sm_conn == NULL)
-        g_warning("Failed to connect to session manager: %s", sm_err);
+        ob_debug("Failed to connect to session manager: %s", sm_err);
     else {
         SmPropValue val_prog;
         SmPropValue val_uid;

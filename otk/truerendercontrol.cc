@@ -59,13 +59,14 @@ void TrueRenderControl::drawGradientBackground(
      Surface &sf, const RenderTexture &texture) const
 {
   unsigned int r,g,b;
-  int w = sf.width(), h = sf.height(), off, x;
+  unsigned int w = sf.size().width(), h = sf.size().height();
+  unsigned int off, x;
 
   const ScreenInfo *info = display->screenInfo(_screen);
   XImage *im = XCreateImage(**display, info->visual(), info->depth(),
                             ZPixmap, 0, NULL, w, h, 32, 0);
   im->byte_order = endian;
-  pixel32 *data = new pixel32[sf.height()*sf.width()];
+  pixel32 *data = new pixel32[h*w];
   pixel32 current;
 
   switch (texture.gradient()) {
@@ -101,25 +102,29 @@ void TrueRenderControl::drawGradientBackground(
 
   if (texture.relief() != RenderTexture::Flat) {
     if (texture.bevel() == RenderTexture::Bevel1) {
-      for (off = 1, x = 1; x < w - 1; ++x, off++)
-        highlight(data + off,
-                  data + off + (h-1) * w,
-                  texture.relief()==RenderTexture::Raised);
-      for (off = 0, x = 0; x < h; ++x, off++)
-        highlight(data + off * w,
-                  data + off * w + w - 1,
-                  texture.relief()==RenderTexture::Raised);
+      if (w >= 1 && h >= 1) {
+        for (off = 1, x = 1; x < w - 1; ++x, off++)
+          highlight(data + off,
+                    data + off + (h-1) * w,
+                    texture.relief()==RenderTexture::Raised);
+        for (off = 0, x = 0; x < h; ++x, off++)
+          highlight(data + off * w,
+                    data + off * w + w - 1,
+                    texture.relief()==RenderTexture::Raised);
+      }
     }
 
     if (texture.bevel() == RenderTexture::Bevel2) {
-      for (off = 2, x = 2; x < w - 2; ++x, off++)
-        highlight(data + off + w,
-                  data + off + (h-2) * w,
-                  texture.relief()==RenderTexture::Raised);
-      for (off = 1, x = 1; x < h-1; ++x, off++)
-        highlight(data + off * w + 1,
-                  data + off * w + w - 2,
-                  texture.relief()==RenderTexture::Raised);
+      if (w >= 2 && h >= 2) {
+        for (off = 2, x = 2; x < w - 2; ++x, off++)
+          highlight(data + off + w,
+                    data + off + (h-2) * w,
+                    texture.relief()==RenderTexture::Raised);
+        for (off = 1, x = 1; x < h-1; ++x, off++)
+          highlight(data + off * w + 1,
+                    data + off * w + w - 2,
+                    texture.relief()==RenderTexture::Raised);
+      }
     }
   }
 
@@ -141,24 +146,25 @@ void TrueRenderControl::verticalGradient(Surface &sf,
   pixel32 current;
   float dr, dg, db;
   unsigned int r,g,b;
+  unsigned int w = sf.size().width(), h = sf.size().height();
 
   dr = (float)(texture.secondary_color().red() - texture.color().red());
-  dr/= (float)sf.height();
+  dr/= (float)h;
 
   dg = (float)(texture.secondary_color().green() - texture.color().green());
-  dg/= (float)sf.height();
+  dg/= (float)h;
 
   db = (float)(texture.secondary_color().blue() - texture.color().blue());
-  db/= (float)sf.height();
+  db/= (float)h;
 
-  for (int y = 0; y < sf.height(); ++y) {
+  for (unsigned int y = 0; y < h; ++y) {
     r = texture.color().red() + (int)(dr * y);
     g = texture.color().green() + (int)(dg * y);
     b = texture.color().blue() + (int)(db * y);
     current = (r << default_red_shift)
             + (g << default_green_shift)
             + (b << default_blue_shift);
-    for (int x = 0; x < sf.width(); ++x, ++data)
+    for (unsigned int x = 0; x < w; ++x, ++data)
       *data = current;
   }
 }
@@ -170,21 +176,21 @@ void TrueRenderControl::diagonalGradient(Surface &sf,
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
   unsigned int r,g,b;
+  unsigned int w = sf.size().width(), h = sf.size().height();
 
-
-  for (int y = 0; y < sf.height(); ++y) {
+  for (unsigned int y = 0; y < h; ++y) {
     drx = (float)(texture.secondary_color().red() - texture.color().red());
-    dry = drx/(float)sf.height();
-    drx/= (float)sf.width();
+    dry = drx/(float)h;
+    drx/= (float)w;
 
     dgx = (float)(texture.secondary_color().green() - texture.color().green());
-    dgy = dgx/(float)sf.height();
-    dgx/= (float)sf.width();
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
 
     dbx = (float)(texture.secondary_color().blue() - texture.color().blue());
-    dby = dbx/(float)sf.height();
-    dbx/= (float)sf.width();
-    for (int x = 0; x < sf.width(); ++x, ++data) {
+    dby = dbx/(float)h;
+    dbx/= (float)w;
+    for (unsigned int x = 0; x < w; ++x, ++data) {
       r = texture.color().red() + ((int)(drx * x) + (int)(dry * y))/2;
       g = texture.color().green() + ((int)(dgx * x) + (int)(dgy * y))/2;
       b = texture.color().blue() + ((int)(dbx * x) + (int)(dby * y))/2;
@@ -203,20 +209,21 @@ void TrueRenderControl::crossDiagonalGradient(Surface &sf,
   pixel32 current;
   float drx, dgx, dbx, dry, dgy, dby;
   unsigned int r,g,b;
+  unsigned int w = sf.size().width(), h = sf.size().height();
 
-  for (int y = 0; y < sf.height(); ++y) {
+  for (unsigned int y = 0; y < h; ++y) {
     drx = (float)(texture.secondary_color().red() - texture.color().red());
-    dry = drx/(float)sf.height();
-    drx/= (float)sf.width();
+    dry = drx/(float)h;
+    drx/= (float)w;
 
     dgx = (float)(texture.secondary_color().green() - texture.color().green());
-    dgy = dgx/(float)sf.height();
-    dgx/= (float)sf.width();
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
 
     dbx = (float)(texture.secondary_color().blue() - texture.color().blue());
-    dby = dbx/(float)sf.height();
-    dbx/= (float)sf.width();
-    for (int x = sf.width(); x > 0; --x, ++data) {
+    dby = dbx/(float)h;
+    dbx/= (float)w;
+    for (int x = w; x > 0; --x, ++data) {
       r = texture.color().red() + ((int)(drx * (x-1)) + (int)(dry * y))/2;
       g = texture.color().green() + ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
       b = texture.color().blue() + ((int)(dbx * (x-1)) + (int)(dby * y))/2;

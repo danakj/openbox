@@ -11,14 +11,13 @@ class Application;
 class AppWidget : public Widget {
 
 public:
-  AppWidget(Application *app, Direction direction = Horizontal,
-            Cursor cursor = 0, int bevel_width = 1);
+  AppWidget(Application *app, Direction direction = Horizontal, int bevel = 0);
   virtual ~AppWidget();
 
-  virtual void setStyle(RenderStyle *style);
-  
-  virtual void show(void);
-  virtual void hide(void);
+  virtual void render();
+
+  virtual void show();
+  virtual void hide();
 
   virtual void clientMessageHandler(const XClientMessageEvent &e);
   

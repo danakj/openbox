@@ -2,49 +2,33 @@
 #ifndef __button_hh
 #define __button_hh
 
-#include "focuslabel.hh"
+#include "label.hh"
 
 namespace otk {
 
-class Button : public FocusLabel {
+class Button : public Label {
 
 public:
-
   Button(Widget *parent);
-  ~Button();
+  virtual ~Button();
 
-  inline const RenderTexture *getPressedFocusTexture(void) const
-  { return _pressed_focus_tx; }
-  void setPressedFocusTexture(RenderTexture *texture)
-  { _pressed_focus_tx = texture; }
-
-  inline const RenderTexture *getPressedUnfocusTexture(void) const
-  { return _pressed_unfocus_tx; }
-  void setPressedUnfocusTexture(RenderTexture *texture)
-  { _pressed_unfocus_tx = texture; }
-
-  void setTexture(RenderTexture *texture);
-  void setUnfocusTexture(RenderTexture *texture);
-
-  inline bool isPressed(void) const { return _pressed; }
-  void press(unsigned int mouse_button);
-  void release(unsigned int mouse_button);
-
-  void buttonPressHandler(const XButtonEvent &e);
-  void buttonReleaseHandler(const XButtonEvent &e);
-
-  virtual void setStyle(RenderStyle *style);
+  virtual inline bool isDefault() const { return _default; }
+  virtual void setDefault(bool d);
   
-private:
+  virtual inline bool isPressed() const { return _pressed; }
 
+  virtual void press(unsigned int mouse_button);
+  virtual void release(unsigned int mouse_button);
+
+  virtual void buttonPressHandler(const XButtonEvent &e);
+  virtual void buttonReleaseHandler(const XButtonEvent &e);
+
+  virtual void styleChanged(const RenderStyle &style);
+ 
+private:
+  bool _default;
   bool _pressed;
   unsigned int _mouse_button;
-
-  RenderTexture *_pressed_focus_tx;
-  RenderTexture *_pressed_unfocus_tx;
-
-  RenderTexture *_unpr_focus_tx;
-  RenderTexture *_unpr_unfocus_tx;
 };
 
 }

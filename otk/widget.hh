@@ -2,179 +2,136 @@
 #ifndef __widget_hh
 #define __widget_hh
 
+#include "eventhandler.hh"
 #include "rect.hh"
-#include "point.hh"
-#include "rendertexture.hh"
 #include "renderstyle.hh"
-#include "eventdispatcher.hh"
-#include "display.hh"
-#include "surface.hh"
 
-extern "C" {
-#include <assert.h>
-}
-
-#include <string>
 #include <list>
+#include <algorithm>
+#include <cassert>
 
 namespace otk {
 
-class Widget : public EventHandler {
+class Surface;
+class RenderTexture;
+class RenderColor;
+class EventDispatcher;
 
+class Widget : public EventHandler, public StyleNotify {
 public:
-
   enum Direction { Horizontal, Vertical };
 
-  typedef std::list<Widget *> WidgetList;
-
-  Widget(Widget *parent, Direction = Horizontal);
-  Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
-         Direction direction = Horizontal, Cursor cursor = 0,
-         int bevel_width = 1, bool override_redirect = false);
-
+  Widget(int screen, EventDispatcher *ed, Direction direction = Horizontal,
+         int bevel = 3, bool overrideredir = false);
+  Widget(Widget *parent, Direction direction = Horizontal, int bevel = 3);
   virtual ~Widget();
 
+  inline int screen() const { return _screen; }
+  inline Window window() const { return _window; }
+  inline Widget *parent() const { return _parent; }
+  inline Direction direction() const { return _direction; }
+
+  inline RenderStyle::Justify alignment() const { return _alignment; }
+  void setAlignment(RenderStyle::Justify a);
+
+  inline long eventMask() const { return _event_mask; }
+  virtual void setEventMask(long e);
+  
+  inline const Rect& area() const { return _area; }
+  inline Rect usableArea() const { return Rect(_area.position(),
+                                               Size(_area.width() -
+                                                    _borderwidth * 2,
+                                                    _area.height() -
+                                                    _borderwidth * 2));}
+  inline const Size& minSize() const { return _min_size; }
+  inline const Size& maxSize() const { return _max_size; }
+  virtual void setMaxSize(const Size &s);
+
+  virtual void show(bool children = false);
+  virtual void hide();
+  inline bool visible() const { return _visible; }
+
   virtual void update();
+  virtual void refresh() { _dirty = true; render(); }
+  
+  virtual void setBevel(int b);
+  inline int bevel() const { return _bevel; }
 
-  void exposeHandler(const XExposeEvent &e);
-  void configureHandler(const XConfigureEvent &e);
+  void move(const Point &p)
+    { moveresize(Rect(p, _area.size())); }
+  void resize(const Size &s)
+    { moveresize(Rect(_area.position(), s)); }
+  /*!
+    When a widget has a parent, this won't change the widget directly, but will
+    just cause the parent to re-layout all its children.
+  */
+  virtual void moveresize(const Rect &r);
 
-  inline Window window(void) const { return _window; }
-  inline const Widget *parent(void) const { return _parent; }
-  inline const WidgetList &children(void) const { return _children; }
-  inline unsigned int screen(void) const { return _screen; }
-  inline const Rect &rect(void) const { return _rect; }
+  inline const RenderColor *borderColor() const { return _bordercolor; }
+  virtual void setBorderColor(const RenderColor *c);
 
-  void move(const Point &to);
-  void move(int x, int y);
+  inline int borderWidth() const { return _borderwidth; }
+  virtual void setBorderWidth(int w);
 
-  virtual void setWidth(int);
-  virtual void setHeight(int);
+  const std::list<Widget*>& children() const { return _children; }
 
-  virtual int width() const { return _rect.width(); }
-  virtual int height() const { return _rect.height(); }
-
-  virtual void resize(const Point &to);
-  virtual void resize(int x, int y);
-
-  virtual void setGeometry(const Rect &new_geom);
-  virtual void setGeometry(const Point &topleft, int width, int height);
-  virtual void setGeometry(int x, int y, int width, int height);
-
-  inline bool isVisible(void) const { return _visible; };
-  virtual void show(bool recursive = false);
-  virtual void hide(bool recursive = false);
-
-  inline bool isFocused(void) const { return _focused; };
-  virtual void focus(void);
-  virtual void unfocus(void);
-
-  inline bool hasGrabbedMouse(void) const { return _grabbed_mouse; }
-  bool grabMouse(void);
-  void ungrabMouse(void);
-
-  inline bool hasGrabbedKeyboard(void) const { return _grabbed_keyboard; }
-  bool grabKeyboard(void);
-  void ungrabKeyboard(void);
-
-  inline RenderTexture *texture(void) const { return _texture; }
-  virtual void setTexture(RenderTexture *texture)
-    { _texture = texture; _dirty = true; }
-
-  inline const RenderColor *borderColor(void) const { return _bcolor; }
-  virtual void setBorderColor(const RenderColor *color) {
-    assert(color); _bcolor = color;
-    XSetWindowBorder(**display, _window, color->pixel());
-  }
-
-  inline int borderWidth(void) const { return _bwidth; }
-  void setBorderWidth(int width) {
-    _bwidth = width;
-    XSetWindowBorderWidth(**display, _window, width);
-  }
-
-  virtual void addChild(Widget *child, bool front = false);
-  virtual void removeChild(Widget *child);
-
-  inline bool isStretchableHorz(void) const { return _stretchable_horz; }
-  void setStretchableHorz(bool s_horz = true) { _stretchable_horz = s_horz; }
-
-  inline bool isStretchableVert(void) const { return _stretchable_vert; }
-  void setStretchableVert(bool s_vert = true)  { _stretchable_vert = s_vert; }
-
-  inline Cursor cursor(void) const { return _cursor; }
-  void setCursor(Cursor cursor) {
-    _cursor = cursor;
-    XDefineCursor(**display, _window, _cursor);
-  }
-
-  inline int bevelWidth(void) const { return _bevel_width; }
-  void setBevelWidth(int bevel_width)
-    { assert(bevel_width > 0); _bevel_width = bevel_width; }
-
-  inline Direction direction(void) const { return _direction; }
-  void setDirection(Direction dir) { _direction = dir; }
-
-  inline RenderStyle *style(void) const { return _style; }
-  virtual void setStyle(RenderStyle *style);
-
-  inline long eventMask(void) const { return _event_mask; }
-  void setEventMask(long e);
-
-  inline EventDispatcher *eventDispatcher(void)
-    { return _event_dispatcher; }
-  void setEventDispatcher(EventDispatcher *disp);
+  virtual void exposeHandler(const XExposeEvent &e);
+  virtual void configureHandler(const XConfigureEvent &e);
+  virtual void styleChanged(const RenderStyle &) {calcDefaultSizes();update();}
 
 protected:
-  
-  bool _dirty;
-  bool _focused;
+  virtual void addChild(Widget *w) { assert(w); _children.push_back(w); }
+  virtual void removeChild(Widget *w) { assert(w); _children.remove(w); }
 
-  virtual void adjust(void);
-  virtual void create(bool override_redirect = false);
-  virtual void adjustHorz(void);
-  virtual void adjustVert(void);
-  virtual void internalResize(int width, int height);
-  virtual void render(void);
-  virtual void renderForeground() {} // for overriding
+  //! Find the default min/max sizes for the widget. Useful after the in-use
+  //! style has changed.
+  virtual void calcDefaultSizes() {};
 
-  Window _window;
+  virtual void setMinSize(const Size &s);
 
-  Widget *_parent;
-  WidgetList _children;
+  //! Arrange the widget's children
+  virtual void layout();
+  virtual void layoutHorz();
+  virtual void layoutVert();
+  virtual void render();
+  virtual void renderForeground(Surface&) {};
+  virtual void renderChildren();
 
-  RenderStyle *_style;
-  Direction _direction;
-  Cursor _cursor;
-  int _bevel_width;
-  int _ignore_config;
-
-  bool _visible;
-
-  bool _grabbed_mouse;
-  bool _grabbed_keyboard;
-
-  bool _stretchable_vert;
-  bool _stretchable_horz;
+  void createWindow(bool overrideredir);
 
   RenderTexture *_texture;
-  Pixmap _bg_pixmap;
-  unsigned int _bg_pixel;
+  
+private:
+  void internal_moveresize(int x, int y, unsigned w, unsigned int h);
 
-  const RenderColor *_bcolor;
-  unsigned int _bwidth;
-
-  Rect _rect;
-  unsigned int _screen;
-
-  bool _fixed_width;
-  bool _fixed_height;
-
-  long _event_mask;
-
+  int _screen;
+  Widget *_parent;
+  Window _window;
   Surface *_surface;
+  long _event_mask;
+  
+  RenderStyle::Justify _alignment;
+  Direction _direction;
+  Rect _area;
+  //! This size is the size *inside* the border, so they won't match the
+  //! actual size of the widget
+  Size _min_size;
+  //! This size is the size *inside* the border, so they won't match the
+  //! actual size of the widget 
+  Size _max_size;
 
-  EventDispatcher *_event_dispatcher;
+  bool _visible;
+  
+  const RenderColor *_bordercolor;
+  int _borderwidth;
+  int _bevel;
+  bool _dirty;
+
+  std::list<Widget*> _children;
+
+  EventDispatcher *_dispatcher;
+
+  int _ignore_config;
 };
 
 }

@@ -3,33 +3,54 @@
 #define __label_hh
 
 #include "widget.hh"
+#include "ustring.hh"
+#include "renderstyle.hh"
+#include "font.hh"
+
+#include <vector>
 
 namespace otk {
 
 class Label : public Widget {
 
 public:
-
   Label(Widget *parent);
-  ~Label();
+  virtual ~Label();
 
-  inline const ustring &getText(void) const { return _text; }
-  void setText(const ustring &text) { _text = text; _dirty = true; }
+  inline const ustring& getText(void) const { return _text; }
+  void setText(const ustring &text);
 
-  virtual void renderForeground(void);
+  RenderStyle::Justify horizontalJustify() const { return _justify_horz; }
+  virtual void setHorizontalJustify(RenderStyle::Justify j);
+  RenderStyle::Justify verticalJustify() const { return _justify_vert; }
+  virtual void setVerticalJustify(RenderStyle::Justify j);
 
-  virtual void update();
+  const Font *font() const { return _font; }
+  virtual void setFont(const Font *f);
 
-  void fitString(const std::string &str);
-  void fitSize(int w, int h);
+  virtual void calcDefaultSizes();
 
-  virtual void setStyle(RenderStyle *style);
+  virtual void styleChanged(const RenderStyle &style);
+  
+  virtual void renderForeground(Surface &surface);
 
+protected:
+  //! The color the label will use for rendering its text
+  RenderColor *_forecolor;
+  
 private:
   //! Text to be displayed in the label
   ustring _text;
+  //! Text to be displayed, parsed into its separate lines
+  std::vector<ustring> _parsedtext;
   //! The actual text being shown, may be a subset of _text
   ustring _drawtext;
+  //! The font the text will be rendered with
+  const Font *_font;
+  //! The horizontal justification used for drawing text
+  RenderStyle::Justify _justify_horz;
+  //! The vertical justification used for drawing text
+  RenderStyle::Justify _justify_vert;
   //! The drawing offset for the text
   int _drawx;
 };

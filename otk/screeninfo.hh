@@ -2,6 +2,7 @@
 #ifndef   __screeninfo_hh
 #define   __screeninfo_hh
 
+#include "size.hh"
 #include "rect.hh"
 
 extern "C" {
@@ -9,6 +10,7 @@ extern "C" {
 }
 
 #include <string>
+#include <vector>
 
 namespace otk {
 
@@ -21,9 +23,9 @@ private:
   int _depth;
   unsigned int _screen;
   std::string _display_string;
-  Rect _rect;
+  Size _size;
 #ifdef XINERAMA
-  RectList _xinerama_areas;
+  std::vector<Rect> _xinerama_areas;
   bool _xinerama_active;
 #endif
 
@@ -35,12 +37,11 @@ public:
   inline Colormap colormap() const { return _colormap; }
   inline int depth() const { return _depth; }
   inline unsigned int screen() const { return _screen; }
-  inline const Rect& rect() const { return _rect; }
-  inline unsigned int width() const { return _rect.width(); }
-  inline unsigned int height() const { return _rect.height(); }
+  inline const Size& size() const { return _size; }
   inline const std::string& displayString() const { return _display_string; }
 #ifdef XINERAMA
-  inline const RectList &xineramaAreas() const { return _xinerama_areas; }
+  inline const std::vector<Rect> &xineramaAreas() const
+    { return _xinerama_areas; }
   inline bool isXineramaActive() const { return _xinerama_active; }
 #endif
 };

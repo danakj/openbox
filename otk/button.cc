@@ -9,73 +9,73 @@
 namespace otk {
 
 Button::Button(Widget *parent)
-  : FocusLabel(parent), _pressed(false), _pressed_focus_tx(0),
-    _pressed_unfocus_tx(0), _unpr_focus_tx(0), _unpr_unfocus_tx(0)
+  : Label(parent), _default(false), _pressed(false)
 {
-  setStyle(_style);
+  setHorizontalJustify(RenderStyle::CenterJustify);
+  setVerticalJustify(RenderStyle::CenterJustify);
+  styleChanged(*RenderStyle::style(screen()));
 }
 
 Button::~Button()
 {
 }
 
-
-void Button::setStyle(RenderStyle *style)
-{
-  FocusLabel::setStyle(style);
-
-  setTexture(style->buttonUnpressFocusBackground());
-  setUnfocusTexture(style->buttonUnpressUnfocusBackground());
-  _pressed_focus_tx = style->buttonPressFocusBackground();
-  _pressed_unfocus_tx = style->buttonPressUnfocusBackground();
-}
-
-
 void Button::press(unsigned int mouse_button)
 {
   if (_pressed) return;
 
-  if (_pressed_unfocus_tx)
-    FocusWidget::setUnfocusTexture(_pressed_unfocus_tx);
-  if (_pressed_focus_tx)
-    FocusWidget::setTexture(_pressed_focus_tx);
   _pressed = true;
   _mouse_button = mouse_button;
+
+  styleChanged(*RenderStyle::style(screen()));
+  refresh();
 }
 
 void Button::release(unsigned int mouse_button)
 {
-  if (_mouse_button != mouse_button) return; // wrong button
+  if (!_pressed || _mouse_button != mouse_button) return; // wrong button
 
-  FocusWidget::setUnfocusTexture(_unpr_unfocus_tx);
-  FocusWidget::setTexture(_unpr_focus_tx);
   _pressed = false;
-}
 
-void Button::setTexture(RenderTexture *texture)
-{
-  FocusWidget::setTexture(texture);
-  _unpr_focus_tx = texture;
-}
-
-void Button::setUnfocusTexture(RenderTexture *texture)
-{
-  FocusWidget::setUnfocusTexture(texture);
-  _unpr_unfocus_tx = texture;
+  styleChanged(*RenderStyle::style(screen()));
+  refresh();
 }
 
 void Button::buttonPressHandler(const XButtonEvent &e)
 {
+  Widget::buttonPressHandler(e);
   press(e.button);
-  update();
-  FocusWidget::buttonPressHandler(e);
 }
 
 void Button::buttonReleaseHandler(const XButtonEvent &e)
 {
+  Widget::buttonReleaseHandler(e);
   release(e.button);
-  update();
-  FocusWidget::buttonReleaseHandler(e);
+}
+
+void Button::setDefault(bool d)
+{
+  _default = d;
+  styleChanged(*RenderStyle::style(screen()));
+  refresh();
+}
+
+void Button::styleChanged(const RenderStyle &style)
+{
+  if (_default) {
+    if (_pressed)
+      _texture = style.buttonPressFocusBackground();
+    else
+      _texture = style.buttonUnpressFocusBackground();
+    _forecolor = style.buttonFocusColor();
+  } else {
+    if (_pressed)
+      _texture = style.buttonPressUnfocusBackground();
+    else
+      _texture = style.buttonUnpressUnfocusBackground();
+    _forecolor = style.buttonUnfocusColor();
+  }
+  Widget::styleChanged(style);
 }
 
 }

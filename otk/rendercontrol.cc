@@ -9,6 +9,7 @@
 #include "pseudorendercontrol.hh"
 #include "rendertexture.hh"
 #include "rendercolor.hh"
+#include "renderstyle.hh"
 #include "display.hh"
 #include "screeninfo.hh"
 #include "surface.hh"
@@ -50,15 +51,11 @@ RenderControl::RenderControl(int screen)
   : _screen(screen)
 {
   printf("Initializing RenderControl\n");
-
-  
 }
 
 RenderControl::~RenderControl()
 {
   printf("Destroying RenderControl\n");
-
-
 }
 
 void RenderControl::drawRoot(const RenderColor &color) const
@@ -120,7 +117,7 @@ void RenderControl::drawSolidBackground(Surface& sf,
   
   sf.setPixmap(texture.color());
 
-  int width = sf.width(), height = sf.height();
+  int width = sf.size().width(), height = sf.size().height();
   int left = 0, top = 0, right = width - 1, bottom = height - 1;
 
   if (texture.interlaced())

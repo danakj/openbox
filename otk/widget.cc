@@ -1,111 +1,103 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
-
+#include "config.h"
 #include "widget.hh"
 #include "display.hh"
-#include "assassin.hh"
+#include "surface.hh"
+#include "rendertexture.hh"
+#include "rendercolor.hh"
+#include "eventdispatcher.hh"
 #include "screeninfo.hh"
-#include "focuslabel.hh"
+
+#include <climits>
+#include <cassert>
 #include <algorithm>
-#include <iostream>
 
 namespace otk {
 
-Widget::Widget(Widget *parent, Direction direction)
-  : EventHandler(),
-    _dirty(false), _focused(false),
-    _parent(parent), _style(parent->style()), _direction(direction),
-    _cursor(parent->cursor()), _bevel_width(parent->bevelWidth()),
-    _ignore_config(0),
-    _visible(false), _grabbed_mouse(false),
-    _grabbed_keyboard(false), _stretchable_vert(false),
-    _stretchable_horz(false), _texture(0), _bg_pixmap(0), _bg_pixel(0),
-    _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1), _screen(parent->screen()),
-    _fixed_width(false), _fixed_height(false),
+Widget::Widget(int screen, EventDispatcher *ed, Direction direction, int bevel,
+               bool overrideredir)
+  : _texture(0),
+    _screen(screen),
+    _parent(0),
+    _window(0),
+    _surface(0),
     _event_mask(ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
                 ExposureMask | StructureNotifyMask),
-    _surface(0),
-    _event_dispatcher(parent->eventDispatcher())
+    _alignment(RenderStyle::CenterJustify),
+    _direction(direction),
+    _max_size(UINT_MAX, UINT_MAX),
+    _visible(false),
+    _bordercolor(0),
+    _borderwidth(0),
+    _bevel(bevel),
+    _dirty(true),
+    _dispatcher(ed),
+    _ignore_config(0)
 {
-  assert(parent);
-  parent->addChild(this);
-  create();
-  _event_dispatcher->registerHandler(_window, this);
+  createWindow(overrideredir);
+  _dispatcher->registerHandler(_window, this);
 }
 
-Widget::Widget(EventDispatcher *event_dispatcher, RenderStyle *style,
-               Direction direction, Cursor cursor, int bevel_width,
-               bool override_redirect)
-  : EventHandler(),
-    _dirty(false),_focused(false),
-    _parent(0), _style(style), _direction(direction), _cursor(cursor),
-    _bevel_width(bevel_width), _ignore_config(0), _visible(false),
-    _grabbed_mouse(false), _grabbed_keyboard(false),
-    _stretchable_vert(false), _stretchable_horz(false), _texture(0),
-    _bg_pixmap(0), _bg_pixel(0), _bcolor(0), _bwidth(0), _rect(0, 0, 1, 1),
-    _screen(style->screen()), _fixed_width(false), _fixed_height(false),
+Widget::Widget(Widget *parent, Direction direction, int bevel)
+  : _texture(0),
+    _screen(parent->_screen),
+    _parent(parent),
+    _window(0),
+    _surface(0),
     _event_mask(ButtonPressMask | ButtonReleaseMask | ButtonMotionMask |
                 ExposureMask | StructureNotifyMask),
-    _surface(0),
-    _event_dispatcher(event_dispatcher)
+    _alignment(RenderStyle::CenterJustify),
+    _direction(direction),
+    _max_size(UINT_MAX, UINT_MAX),
+    _visible(false),
+    _bordercolor(0),
+    _borderwidth(0),
+    _bevel(bevel),
+    _dirty(true),
+    _dispatcher(parent->_dispatcher),
+    _ignore_config(0)
 {
-  assert(event_dispatcher);
-  assert(style);
-  create(override_redirect);
-  _event_dispatcher->registerHandler(_window, this);
+  assert(parent);
+  createWindow(false);
+  parent->addChild(this);
+  parent->layout();
+  _dispatcher->registerHandler(_window, this);
 }
 
 Widget::~Widget()
 {
-  if (_visible)
-    hide();
-
-  if (_surface)
-    delete _surface;
+  assert(_children.empty()); // this would be bad. theyd have a hanging _parent
   
-  _event_dispatcher->clearHandler(_window);
+  if (_surface) delete _surface;
+  if (_parent) _parent->removeChild(this);
 
-  std::for_each(_children.begin(), _children.end(), PointerAssassin());
-
-  if (_parent)
-    _parent->removeChild(this);
-
+  _dispatcher->clearHandler(_window);
   XDestroyWindow(**display, _window);
 }
 
-void Widget::create(bool override_redirect)
+void Widget::show(bool children)
 {
-  const ScreenInfo *scr_info = display->screenInfo(_screen);
-  Window p_window = _parent ? _parent->window() : scr_info->rootWindow();
-
-  _rect.setRect(0, 0, 1, 1); // just some initial values
-
-  XSetWindowAttributes attrib_create;
-  unsigned long create_mask = CWBackPixmap | CWBorderPixel | CWEventMask;
-
-  attrib_create.background_pixmap = None;
-  attrib_create.colormap = scr_info->colormap();
-  attrib_create.event_mask = _event_mask;
-
-  if (override_redirect) {
-    create_mask |= CWOverrideRedirect;
-    attrib_create.override_redirect = true;
+  if (children) {
+    std::list<Widget*>::iterator it , end = _children.end();
+    for (it = _children.begin(); it != end; ++it)
+      (*it)->show(true);
   }
-
-  if (_cursor) {
-    create_mask |= CWCursor;
-    attrib_create.cursor = _cursor;
+  if (!_visible) {
+    _visible = true;
+    XMapWindow(**display, _window);
+    update();
   }
-
-  _window = XCreateWindow(**display, p_window, _rect.x(),
-                          _rect.y(), _rect.width(), _rect.height(), 0,
-                          scr_info->depth(), InputOutput,
-                          scr_info->visual(), create_mask, &attrib_create);
-  _ignore_config++;
 }
+
+void Widget::hide()
+{
+  if (_visible) {
+    _visible = false;
+    XUnmapWindow(**display, _window);
+    if (_parent) _parent->layout();
+  }
+} 
 
 void Widget::setEventMask(long e)
 {
@@ -113,410 +105,381 @@ void Widget::setEventMask(long e)
   _event_mask = e;
 }
 
-void Widget::setWidth(int w)
-{
-  assert(w > 0);
-  _fixed_width = true;  
-  setGeometry(_rect.x(), _rect.y(), w, _rect.height());
-}
-
-void Widget::setHeight(int h)
-{
-  assert(h > 0);
-  _fixed_height = true;
-  setGeometry(_rect.x(), _rect.y(), _rect.width(), h);
-}
-
-void Widget::move(const Point &to)
-{
-  move(to.x(), to.y());
-}
-
-void Widget::move(int x, int y)
-{
-  _rect.setPos(x, y);
-  XMoveWindow(**display, _window, x, y);
-  _ignore_config++;
-}
-
-void Widget::resize(const Point &to)
-{
-  resize(to.x(), to.y());
-}
-
-void Widget::resize(int w, int h)
-{
-  assert(w > 0 && h > 0);
-  _fixed_width = _fixed_height = true;
-  setGeometry(_rect.x(), _rect.y(), w, h);
-}
-
-void Widget::setGeometry(const Rect &new_geom)
-{
-  setGeometry(new_geom.x(), new_geom.y(), new_geom.width(), new_geom.height());
-}
- 
-void Widget::setGeometry(const Point &topleft, int width, int height)
-{
-  setGeometry(topleft.x(), topleft.y(), width, height);
-}
-
-void Widget::setGeometry(int x, int y, int width, int height)
-{
-  _rect = Rect(x, y, width, height);
-  _dirty = true;
-
-  // make all parents dirty too
-  Widget *p = _parent;
-  while (p) {
-    p->_dirty = true;
-    p = p->_parent;
-  }
-
-  // don't use an XMoveResizeWindow here, because it doesn't seem to move
-  // windows with StaticGravity? This works, that didn't.
-  XResizeWindow(**display, _window, width, height);
-  XMoveWindow(**display, _window, x, y);
-  _ignore_config+=2;
-}
-
-void Widget::show(bool recursive)
-{
-  if (_visible)
-    return;
-
-  // make sure the internal state isn't mangled
-  if (_dirty)
-    update();
-
-  if (recursive) {
-    WidgetList::iterator it = _children.begin(), end = _children.end();
-    for (; it != end; ++it)
-      (*it)->show(recursive);
-  }
-
-  XMapWindow(**display, _window);
-  _visible = true;
-}
-
-void Widget::hide(bool recursive)
-{
-  if (! _visible)
-    return;
-
-  if (recursive) {
-    WidgetList::iterator it = _children.begin(), end = _children.end();
-    for (; it != end; ++it)
-      (*it)->hide();
-  }
-  
-  XUnmapWindow(**display, _window);
-  _visible = false;
-}
-
-void Widget::focus(void)
-{
-  _focused = true;
-  
-  Widget::WidgetList::iterator it = _children.begin(),
-    end = _children.end();
-  for (; it != end; ++it)
-    (*it)->focus();
-}
-
-void Widget::unfocus(void)
-{
-  _focused = false;
-  
-  Widget::WidgetList::iterator it = _children.begin(),
-    end = _children.end();
-  for (; it != end; ++it)
-    (*it)->unfocus();
-}
-
-bool Widget::grabMouse(void)
-{
-  Status ret = XGrabPointer(**display, _window, True,
-                            (ButtonPressMask | ButtonReleaseMask |
-                             ButtonMotionMask | EnterWindowMask |
-                             LeaveWindowMask | PointerMotionMask),
-                            GrabModeSync, GrabModeAsync, None, None,
-                            CurrentTime);
-  _grabbed_mouse = (ret == GrabSuccess);
-  return _grabbed_mouse;
-}
-
-void Widget::ungrabMouse(void)
-{
-  if (! _grabbed_mouse)
-    return;
-
-  XUngrabPointer(**display, CurrentTime);
-  _grabbed_mouse = false;
-}
-
-bool Widget::grabKeyboard(void)
-{
-  Status ret = XGrabKeyboard(**display, _window, True,
-                             GrabModeSync, GrabModeAsync, CurrentTime);
-  _grabbed_keyboard = (ret == GrabSuccess);
-  return _grabbed_keyboard;
-
-}
-
-void Widget::ungrabKeyboard(void)
-{
-  if (! _grabbed_keyboard)
-    return;
-
-  XUngrabKeyboard(**display, CurrentTime);
-  _grabbed_keyboard = false;
-}
-
-void Widget::render(void)
-{
-  if (!_texture) {
-    XSetWindowBackgroundPixmap(**display, _window, ParentRelative);
-    return;
-  }
-
-  Surface *s = _surface; // save the current surface
-  
-  _surface = new Surface(_screen, _rect.size());
-  display->renderControl(_screen)->drawBackground(*_surface, *_texture);
-
-  renderForeground(); // for inherited types to render onto the _surface
-
-  XSetWindowBackgroundPixmap(**display, _window, _surface->pixmap());
-
-  if (s)
-    delete s; // delete the old surface *after* its pixmap isn't in use anymore
-}
-
-void Widget::adjust(void)
-{
-  if (_direction == Horizontal)
-    adjustHorz();
-  else
-    adjustVert();
-}
-
-void Widget::adjustHorz(void)
-{
-  if (_children.size() == 0)
-    return;
-
-  Widget *tmp;
-  WidgetList::iterator it, end = _children.end();
-
-  int tallest = 0;
-  int width = _bevel_width;
-  WidgetList stretchable;
-
-  for (it = _children.begin(); it != end; ++it) {
-    tmp = *it;
-    if (tmp->isStretchableVert())
-      tmp->setHeight(_rect.height() > _bevel_width * 2 ?
-                     _rect.height() - _bevel_width * 2 : _bevel_width);
-    if (tmp->isStretchableHorz())
-      stretchable.push_back(tmp);
-    else
-      width += tmp->_rect.width() + _bevel_width;
-
-    if (tmp->_rect.height() > tallest)
-      tallest = tmp->_rect.height();
-  }
-
-  if (stretchable.size() > 0) {
-    WidgetList::iterator str_it = stretchable.begin(),
-      str_end = stretchable.end();
-
-    int str_width = _rect.width() - width / stretchable.size();
-
-    for (; str_it != str_end; ++str_it)
-      (*str_it)->setWidth(str_width > _bevel_width ? str_width - _bevel_width
-                          : _bevel_width);
-  }
-
-  Widget *prev_widget = 0;
-
-  for (it = _children.begin(); it != end; ++it) {
-    tmp = *it;
-    int x, y;
-
-    if (prev_widget)
-      x = prev_widget->_rect.x() + prev_widget->_rect.width() + _bevel_width;
-    else
-      x = _bevel_width;
-    y = (tallest - tmp->_rect.height()) / 2 + _bevel_width;
-
-    tmp->move(x, y);
-
-    prev_widget = tmp;
-  }
-  internalResize(width, tallest + _bevel_width * 2);
-}
-
-void Widget::adjustVert(void)
-{
-  if (_children.size() == 0)
-    return;
-
-  Widget *tmp;
-  WidgetList::iterator it, end = _children.end();
-
-  int widest = 0;
-  int height = _bevel_width;
-  WidgetList stretchable;
-
-  for (it = _children.begin(); it != end; ++it) {
-    tmp = *it;
-    if (tmp->isStretchableHorz())
-      tmp->setWidth(_rect.width() > _bevel_width * 2 ?
-                    _rect.width() - _bevel_width * 2 : _bevel_width);
-    if (tmp->isStretchableVert())
-      stretchable.push_back(tmp);
-    else
-      height += tmp->_rect.height() + _bevel_width;
-
-    if (tmp->_rect.width() > widest)
-      widest = tmp->_rect.width();
-  }
-
-  if (stretchable.size() > 0) {
-    WidgetList::iterator str_it = stretchable.begin(),
-      str_end = stretchable.end();
-
-    int str_height = _rect.height() - height / stretchable.size();
-
-    for (; str_it != str_end; ++str_it)
-      (*str_it)->setHeight(str_height > _bevel_width ?
-                           str_height - _bevel_width : _bevel_width);
-  }
-  if (stretchable.size() > 0)
-    height = _rect.height();
-
-  Widget *prev_widget = 0;
-
-  for (it = _children.begin(); it != end; ++it) {
-    tmp = *it;
-    int x, y;
-
-    if (prev_widget)
-      y = prev_widget->_rect.y() + prev_widget->_rect.height() + _bevel_width;
-    else
-      y = _bevel_width;
-    x = (widest - tmp->_rect.width()) / 2 + _bevel_width;
-
-    tmp->move(x, y);
-
-    prev_widget = tmp;
-  }
-
-  internalResize(widest + _bevel_width * 2, height);
-}
-
 void Widget::update()
 {
-  WidgetList::iterator it = _children.begin(), end = _children.end();
-  for (; it != end; ++it)
-    (*it)->update();
-
-  if (_dirty) {
-    adjust();
+  _dirty = true;
+  if (parent())
+    parent()->layout(); // relay-out us and our siblings
+  else {
     render();
-    XClearWindow(**display, _window);
+    layout();
   }
+}
+
+void Widget::moveresize(const Rect &r)
+{
+  unsigned int w, h;
+  w = std::min(std::max(r.width(), minSize().width()), maxSize().width());
+  h = std::min(std::max(r.height(), minSize().height()), maxSize().height());
+
+  if (r.x() == area().x() && r.y() == area().y() &&
+      w == area().width() && h == area().height()) {
+    return; // no change, don't cause a big layout chain to occur!
+  }
+  
+  internal_moveresize(r.x(), r.y(), w, h);
+
+  update();
+}
+
+void Widget::internal_moveresize(int x, int y, unsigned w, unsigned int h)
+{
+  assert(w > 0);
+  assert(h > 0);
+  assert(_borderwidth >= 0);
+  _dirty = true;
+  XMoveResizeWindow(**display, _window, x, y,
+                    w - _borderwidth * 2,
+                    h - _borderwidth * 2);
+  _ignore_config++;
+
+  _area = Rect(x, y, w, h);
+}
+
+void Widget::setAlignment(RenderStyle::Justify a)
+{
+  _alignment = a;  
+  layout();
+}
+  
+void Widget::createWindow(bool overrideredir)
+{
+  const ScreenInfo *info = display->screenInfo(_screen);
+  XSetWindowAttributes attrib;
+  unsigned long mask = CWEventMask | CWBorderPixel;
+
+  attrib.event_mask = _event_mask;
+  attrib.border_pixel = (_bordercolor ?
+                         _bordercolor->pixel():
+                         BlackPixel(**display, _screen));
+
+  if (overrideredir) {
+    mask |= CWOverrideRedirect;
+    attrib.override_redirect = true;
+  }
+  
+  _window = XCreateWindow(**display, (_parent ?
+                                      _parent->_window :
+                                      RootWindow(**display, _screen)),
+                          _area.x(), _area.y(),
+                          _area.width(), _area.height(),
+                          _borderwidth,
+                          info->depth(),
+                          InputOutput,
+                          info->visual(),
+                          mask,
+                          &attrib);
+  assert(_window != None);
+  ++_ignore_config;
+}
+
+void Widget::setBorderWidth(int w)
+{
+  assert(w >= 0);
+  if (!parent()) return; // top-level windows cannot have borders
+  if (w == borderWidth()) return; // no change
+  
+  _borderwidth = w;
+  XSetWindowBorderWidth(**display, _window, _borderwidth);
+
+  calcDefaultSizes();
+  update();
+}
+
+void Widget::setMinSize(const Size &s)
+{
+  _min_size = s;
+  update();
+}
+
+void Widget::setMaxSize(const Size &s)
+{
+  _max_size = s;
+  update();
+}
+
+void Widget::setBorderColor(const RenderColor *c)
+{
+  _bordercolor = c;
+  XSetWindowBorder(**otk::display, _window,
+                   c ? c->pixel() : BlackPixel(**otk::display, _screen));
+}
+
+void Widget::setBevel(int b)
+{
+  _bevel = b;
+  calcDefaultSizes();
+  layout();
+}
+
+void Widget::layout()
+{
+  if (_direction == Horizontal)
+    layoutHorz();
+  else
+    layoutVert();
+}
+
+void Widget::layoutHorz()
+{
+  std::list<Widget*>::iterator it, end;
+
+  // work with just the visible children
+  std::list<Widget*> visible = _children;
+  for (it = visible.begin(), end = visible.end(); it != end;) {
+    std::list<Widget*>::iterator next = it; ++next;
+    if (!(*it)->visible())
+      visible.erase(it);
+    it = next;
+  }
+
+  if (visible.empty()) return;
+
+  if ((unsigned)(_borderwidth * 2 + _bevel * 2) > _area.width() ||
+      (unsigned)(_borderwidth * 2 + _bevel * 2) > _area.height())
+    return; // not worth laying anything out!
+  
+  int x, y; unsigned int w, h; // working area
+  x = y = _bevel;
+  w = _area.width() - _borderwidth * 2 - _bevel * 2;
+  h = _area.height() - _borderwidth * 2 - _bevel * 2;
+
+  int free = w - (visible.size() - 1) * _bevel;
+  if (free < 0) free = 0;
+  unsigned int each;
+  
+  std::list<Widget*> adjustable = visible;
+
+  // find the 'free' space, and how many children will be using it
+  for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
+    std::list<Widget*>::iterator next = it; ++next;
+    free -= (*it)->minSize().width();
+    if (free < 0) free = 0;
+    if ((*it)->maxSize().width() - (*it)->minSize().width() <= 0)
+      adjustable.erase(it);
+    it = next;
+  }
+  // some widgets may have max widths that restrict them, find the 'true'
+  // amount of free space after these widgets are not included
+  if (!adjustable.empty()) {
+    do {
+      each = free / adjustable.size();
+      for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
+        std::list<Widget*>::iterator next = it; ++next;
+        unsigned int m = (*it)->maxSize().width() - (*it)->minSize().width();
+        if (m > 0 && m < each) {
+          free -= m;
+          if (free < 0) free = 0;
+          adjustable.erase(it);
+          break; // if one is found to be fixed, then the free space needs to
+                 // change, and the rest need to be reexamined
+        }
+        it = next;
+      }
+    } while (it != end && !adjustable.empty());
+  }
+
+  // place/size the widgets
+  if (!adjustable.empty())
+    each = free / adjustable.size();
+  else
+    each = 0;
+  for (it = visible.begin(), end = visible.end(); it != end; ++it) {
+    unsigned int w;
+    // is the widget adjustable?
+    std::list<Widget*>::const_iterator
+      found = std::find(adjustable.begin(), adjustable.end(), *it);
+    if (found != adjustable.end()) {
+      // adjustable
+      w = (*it)->minSize().width() + each;
+    } else {
+      // fixed
+      w = (*it)->minSize().width();
+    }
+    // align it vertically
+    int yy = y;
+    unsigned int hh = std::max(std::min(h, (*it)->_max_size.height()),
+                               (*it)->_min_size.height());
+    if (hh < h) {
+      switch(_alignment) {
+      case RenderStyle::RightBottomJustify:
+        yy += h - hh;
+        break;
+      case RenderStyle::CenterJustify:
+        yy += (h - hh) / 2;
+        break;
+      case RenderStyle::LeftTopJustify:
+        break;
+      }
+    }
+    (*it)->internal_moveresize(x, yy, w, hh);
+    (*it)->render();
+    (*it)->layout();
+    x += w + _bevel;
+  }
+}
+
+void Widget::layoutVert()
+{
+  std::list<Widget*>::iterator it, end;
+
+  // work with just the visible children
+  std::list<Widget*> visible = _children;
+  for (it = visible.begin(), end = visible.end(); it != end;) {
+    std::list<Widget*>::iterator next = it; ++next;
+    if (!(*it)->visible())
+      visible.erase(it);
+    it = next;
+  }
+
+  if (visible.empty()) return;
+
+  if ((unsigned)(_borderwidth * 2 + _bevel * 2) > _area.width() ||
+      (unsigned)(_borderwidth * 2 + _bevel * 2) > _area.height())
+    return; // not worth laying anything out!
+  
+  int x, y; unsigned int w, h; // working area
+  x = y = _bevel;
+  w = _area.width() - _borderwidth * 2 - _bevel * 2;
+  h = _area.height() - _borderwidth * 2 - _bevel * 2;
+
+  int free = h - (visible.size() - 1) * _bevel;
+  if (free < 0) free = 0;
+  unsigned int each;
+
+  std::list<Widget*> adjustable = visible;
+
+  // find the 'free' space, and how many children will be using it
+  for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
+    std::list<Widget*>::iterator next = it; ++next;
+    free -= (*it)->minSize().height();
+    if (free < 0) free = 0;
+    if ((*it)->maxSize().height() - (*it)->minSize().height() <= 0)
+      adjustable.erase(it);
+    it = next;
+  }
+  // some widgets may have max heights that restrict them, find the 'true'
+  // amount of free space after these widgets are not included
+  if (!adjustable.empty()) {
+    do {
+      each = free / adjustable.size();
+      for (it = adjustable.begin(), end = adjustable.end(); it != end;) {
+        std::list<Widget*>::iterator next = it; ++next;
+        unsigned int m = (*it)->maxSize().height() - (*it)->minSize().height();
+        if (m > 0 && m < each) {
+          free -= m;
+          if (free < 0) free = 0;
+          adjustable.erase(it);
+          break; // if one is found to be fixed, then the free space needs to
+                 // change, and the rest need to be reexamined
+        }
+        it = next;
+      }
+    } while (it != end && !adjustable.empty());
+  }
+
+  // place/size the widgets
+  if (!adjustable.empty())
+  each = free / adjustable.size();
+  else
+    each = 0;
+  for (it = visible.begin(), end = visible.end(); it != end; ++it) {
+    unsigned int h;
+    // is the widget adjustable?
+    std::list<Widget*>::const_iterator
+      found = std::find(adjustable.begin(), adjustable.end(), *it);
+    if (found != adjustable.end()) {
+      // adjustable
+      h = (*it)->minSize().height() + each;
+    } else {
+      // fixed
+      h = (*it)->minSize().height();
+    }
+    // align it horizontally
+    int xx = x;
+    unsigned int ww = std::max(std::min(w, (*it)->_max_size.width()),
+                               (*it)->_min_size.width());
+    if (ww < w) {
+      switch(_alignment) {
+      case RenderStyle::RightBottomJustify:
+        xx += w - ww;
+        break;
+      case RenderStyle::CenterJustify:
+        xx += (w - ww) / 2;
+        break;
+      case RenderStyle::LeftTopJustify:
+        break;
+      }
+    }
+    (*it)->internal_moveresize(xx, y, ww, h);
+    (*it)->render();
+    (*it)->layout();
+    y += h + _bevel; 
+  }
+}
+
+void Widget::render()
+{
+  if (!_texture || !_dirty) return;
+  if ((unsigned)_borderwidth * 2 > _area.width() ||
+      (unsigned)_borderwidth * 2 > _area.height())
+    return; // no surface to draw on
+  
+  Surface *s = new Surface(_screen, Size(_area.width() - _borderwidth * 2,
+                                         _area.height() - _borderwidth * 2));
+  display->renderControl(_screen)->drawBackground(*s, *_texture);
+
+  renderForeground(*s); // for inherited types to render onto the _surface
+
+  XSetWindowBackgroundPixmap(**display, _window, s->pixmap());
+  XClearWindow(**display, _window);
+
+  // delete the old surface *after* its pixmap isn't in use anymore
+  if (_surface) delete _surface;
+
+  _surface = s;
 
   _dirty = false;
 }
 
-void Widget::internalResize(int w, int h)
+void Widget::renderChildren()
 {
-  assert(w > 0 && h > 0);
-
-  bool fw = _fixed_width, fh = _fixed_height;
-  
-  if (! fw && ! fh)
-    resize(w, h);
-  else if (! fw)
-    resize(w, _rect.height());
-  else if (! fh)
-    resize(_rect.width(), h);
-
-  _fixed_width = fw;
-  _fixed_height = fh;
-}
-
-void Widget::addChild(Widget *child, bool front)
-{
-  assert(child);
-  if (front)
-    _children.push_front(child);
-  else
-    _children.push_back(child);
-}
-
-void Widget::removeChild(Widget *child)
-{
-  assert(child);
-  WidgetList::iterator it, end = _children.end();
-  for (it = _children.begin(); it != end; ++it) {
-    if ((*it) == child)
-      break;
-  }
-
-  if (it != _children.end())
-    _children.erase(it);
-}
-
-void Widget::setStyle(RenderStyle *style)
-{
-  assert(style);
-  _style = style;
-  _dirty = true;
-
-  WidgetList::iterator it, end = _children.end();
+  std::list<Widget*>::iterator it, end = _children.end();
   for (it = _children.begin(); it != end; ++it)
-    (*it)->setStyle(style);
-}
-
-
-void Widget::setEventDispatcher(EventDispatcher *disp)
-{
-  if (_event_dispatcher)
-    _event_dispatcher->clearHandler(_window);
-  _event_dispatcher = disp;
-  _event_dispatcher->registerHandler(_window, this);
+    (*it)->render();
 }
 
 void Widget::exposeHandler(const XExposeEvent &e)
 {
   EventHandler::exposeHandler(e);
-//  XClearArea(**display, _window, e.x, e.y, e.width, e.height, false);
+  XClearArea(**display, _window, e.x, e.y, e.width, e.height, false);
 }
 
 void Widget::configureHandler(const XConfigureEvent &e)
 {
-  EventHandler::configureHandler(e);
-
   if (_ignore_config) {
     _ignore_config--;
   } else {
-    int width = e.width;
-    int height = e.height;
-
     XEvent ev;
-    while (XCheckTypedWindowEvent(**display, _window, ConfigureNotify, &ev)) {
-      width = ev.xconfigure.width;
-      height = ev.xconfigure.height;
-    }
+    ev.xconfigure.width = e.width;
+    ev.xconfigure.height = e.height;
+    while (XCheckTypedWindowEvent(**display, window(), ConfigureNotify, &ev));
 
-    if (!(width == _rect.width() && height == _rect.height())) {
-      _dirty = true;
-      _rect.setSize(width, height);
+    if (!((unsigned)ev.xconfigure.width == area().width() &&
+          (unsigned)ev.xconfigure.height == area().height())) {
+      _area = Rect(_area.position(), Size(e.width, e.height));
+      update();
     }
-    update();
   }
 }
 

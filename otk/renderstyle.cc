@@ -8,7 +8,48 @@
 #include "display.hh"
 #include "screeninfo.hh"
 
+#include <cassert>
+
 namespace otk {
+
+RenderStyle **RenderStyle::_styles = 0;
+std::list<StyleNotify*> *RenderStyle::_notifies = 0;
+
+void RenderStyle::initialize()
+{
+  int screens = ScreenCount(**display);
+  _styles = new RenderStyle*[screens];
+  for (int i = 0; i < screens; ++i)
+    _styles[i] = new RenderStyle(i, ""); // XXX get a path
+  _notifies = new std::list<StyleNotify*>[screens];
+}
+
+void RenderStyle::destroy()
+{
+  int screens = ScreenCount(**display);
+  for (int i = 0; i < screens; ++i)
+    delete _styles[i];
+  delete [] _styles;
+  delete [] _notifies;
+}
+
+void RenderStyle::registerNotify(int screen, StyleNotify *n)
+{
+  assert(screen >= 0 && screen < ScreenCount(**display));
+  _notifies[screen].push_back(n);
+}
+
+void RenderStyle::unregisterNotify(int screen, StyleNotify *n)
+{
+  assert(screen >= 0 && screen < ScreenCount(**display));
+  _notifies[screen].remove(n);
+}
+
+RenderStyle *RenderStyle::style(int screen)
+{
+  assert(screen >= 0 && screen < ScreenCount(**display));
+  return _styles[screen];
+}
 
 RenderStyle::RenderStyle(int screen, const std::string &stylefile)
   : _screen(screen),
@@ -175,7 +216,7 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                                     0x0);
 
   _label_font = new Font(_screen, "Arial,Sans-9:bold", true, 1, 0x40);
-  _label_justify = RightJustify;
+  _label_justify = RightBottomJustify;
 
   _max_mask = new PixmapMask();
   _max_mask->w = _max_mask->h = 8;

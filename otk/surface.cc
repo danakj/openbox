@@ -15,7 +15,7 @@ extern "C" {
 
 namespace otk {
 
-Surface::Surface(int screen, const Point &size)
+Surface::Surface(int screen, const Size &size)
   : _screen(screen),
     _size(size),
     _pixmap(None),
@@ -34,19 +34,19 @@ void Surface::setPixmap(const RenderColor &color)
     createObjects();
 
   XFillRectangle(**display, _pixmap, color.gc(), 0, 0,
-                 _size.x(), _size.y());
+                 _size.width(), _size.height());
 }
 
 void Surface::setPixmap(XImage *image)
 {
-  assert(image->width == _size.x());
-  assert(image->height == _size.y());
+  assert((unsigned)image->width == _size.width());
+  assert((unsigned)image->height == _size.height());
   
   if (_pixmap == None)
     createObjects();
 
   XPutImage(**display, _pixmap, DefaultGC(**display, _screen),
-            image, 0, 0, 0, 0, _size.x(), _size.y());
+            image, 0, 0, 0, 0, _size.width(), _size.height());
 }
 
 void Surface::createObjects()
@@ -56,7 +56,7 @@ void Surface::createObjects()
   const ScreenInfo *info = display->screenInfo(_screen);
   
   _pixmap = XCreatePixmap(**display, info->rootWindow(),
-                          _size.x(), _size.y(), info->depth());
+                          _size.width(), _size.height(), info->depth());
   assert(_pixmap != None);
     
   _xftdraw = XftDrawCreate(**display, _pixmap,

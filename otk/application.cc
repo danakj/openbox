@@ -6,10 +6,10 @@
 
 #include "application.hh"
 #include "eventhandler.hh"
-#include "widget.hh"
 #include "timer.hh"
 #include "property.hh"
 #include "rendercolor.hh"
+#include "renderstyle.hh"
 
 extern "C" {
 #ifdef HAVE_STDLIB_H
@@ -30,17 +30,19 @@ Application::Application(int argc, char **argv)
   (void)argc;
   (void)argv;
 
+  _screen = DefaultScreen(*_display);
+  
   Timer::initialize();
   RenderColor::initialize();
+  RenderStyle::initialize();
   Property::initialize();
-  _style = new RenderStyle(DefaultScreen(*_display), ""); // XXX: get a path!
 
   loadStyle();
 }
 
 Application::~Application()
 {
-  delete _style;
+  RenderStyle::destroy();
   RenderColor::destroy();
   Timer::destroy();
 }

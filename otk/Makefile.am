@@ -4,18 +4,17 @@ pkgconfigdir = $(libdir)/pkgconfig
 
 CPPFLAGS=$(XFT_CFLAGS) @CPPFLAGS@ -DBUTTONSDIR=\"$(buttonsdir)\"
 
-#noinst_LIBRARIES=libotk.a
 lib_LTLIBRARIES=libotk.la
 
-libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc \
+libotk_la_SOURCES=rendercontrol.cc truerendercontrol.cc surface.cc util.cc \
                   renderstyle.cc rendercolor.cc pseudorendercontrol.cc \
-                  display.cc font.cc \
-                  property.cc rect.cc screeninfo.cc \
-                  timer.cc \
-                  util.cc widget.cc focuswidget.cc \
-                  button.cc eventhandler.cc eventdispatcher.cc ustring.cc \
-                  label.cc focuslabel.cc application.cc appwidget.cc
-includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh \
+                  display.cc font.cc screeninfo.cc property.cc timer.cc \
+                  eventdispatcher.cc eventhandler.cc ustring.cc \
+                  widget.cc application.cc label.cc appwidget.cc button.cc
+
+#focuswidget.cc focuslabel.cc
+
+includeotk_HEADERS=application.hh appwidget.hh assassin.hh button.hh size.hh \
                    display.hh eventdispatcher.hh eventhandler.hh \
                    focuslabel.hh focuswidget.hh font.hh label.hh otk.hh \
                    point.hh property.hh pseudorendercontrol.hh rect.hh \

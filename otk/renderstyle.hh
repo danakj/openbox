@@ -7,6 +7,7 @@
 #include "font.hh"
 
 #include <string>
+#include <list>
 
 namespace otk {
 
@@ -16,11 +17,27 @@ struct PixmapMask {
   PixmapMask() { mask = None; w = h = 0; }
 };
 
-class RenderStyle {
+class RenderStyle;
+
+class StyleNotify {
 public:
-  enum TextJustify {
-    LeftJustify,
-    RightJustify,
+  //! Called when the style is changed on the same screen as the handler.
+  virtual void styleChanged(const RenderStyle &) {}
+};
+
+class RenderStyle {
+  static RenderStyle **_styles;
+  static std::list<StyleNotify*> *_notifies;
+public:
+  static void initialize();
+  static void destroy();
+  static void registerNotify(int screen, StyleNotify *n);
+  static void unregisterNotify(int screen, StyleNotify *n);
+  static RenderStyle *style(int screen);
+  
+  enum Justify {
+    LeftTopJustify,
+    RightBottomJustify,
     CenterJustify
   };
 
@@ -61,7 +78,7 @@ private:
   RenderTexture *_grip_unfocus;
 
   Font *_label_font;
-  TextJustify _label_justify;
+  Justify _label_justify;
 
   PixmapMask *_max_mask;
   PixmapMask *_icon_mask;
@@ -120,7 +137,7 @@ public:
   inline RenderTexture *gripUnfocusBackground() const { return _grip_unfocus; }
 
   inline Font *labelFont() const { return _label_font; }
-  inline TextJustify labelTextJustify() const { return _label_justify; }
+  inline Justify labelTextJustify() const { return _label_justify; }
 
   inline PixmapMask *maximizeMask() const { return _max_mask; }
   inline PixmapMask *iconifyMask() const { return _icon_mask; }

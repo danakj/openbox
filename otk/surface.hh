@@ -2,7 +2,7 @@
 #ifndef __surface_hh
 #define __surface_hh
 
-#include "point.hh"
+#include "size.hh"
 #include "truerendercontrol.hh"
 #include "pseudorendercontrol.hh"
 
@@ -19,7 +19,7 @@ class RenderColor;
 
 class Surface {
   int _screen;
-  Point _size;
+  Size _size;
   Pixmap _pixmap;
   XftDraw *_xftdraw;
 
@@ -31,14 +31,12 @@ protected:
   void setPixmap(const RenderColor &color);
   
 public:
-  Surface(int screen, const Point &size);
+  Surface(int screen, const Size &size);
   virtual ~Surface();
 
   inline int screen(void) const { return _screen; }
 
-  virtual const Point& size() const { return _size; }
-  virtual int width() const { return _size.x(); }
-  virtual int height() const { return _size.y(); }
+  virtual const Size& size() const { return _size; }
 
   virtual Pixmap pixmap() const { return _pixmap; }
 

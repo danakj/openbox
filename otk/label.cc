@@ -5,100 +5,138 @@
 #endif
 
 #include "label.hh"
+#include "display.hh"
+#include "rendercontrol.hh"
+
+#include <string>
 
 namespace otk {
 
 Label::Label(Widget *parent)
-  : Widget(parent), _text("")
+  : Widget(parent),
+    _text(""),
+    _justify_horz(RenderStyle::LeftTopJustify),
+    _justify_vert(RenderStyle::LeftTopJustify)
 {
-  setStyle(_style);
+  styleChanged(*RenderStyle::style(screen()));
 }
 
 Label::~Label()
 {
 }
 
-void Label::setStyle(RenderStyle *style)
+void Label::setHorizontalJustify(RenderStyle::Justify j)
 {
-  Widget::setStyle(style);
-
-  setTexture(style->labelUnfocusBackground());
+  _justify_horz = j;
+  refresh();
 }
 
-void Label::fitString(const std::string &str)
+void Label::setVerticalJustify(RenderStyle::Justify j)
 {
-  const Font *ft = style()->labelFont();
-  fitSize(ft->measureString(str), ft->height());
+  _justify_vert = j;
+  refresh();
 }
 
-void Label::fitSize(int w, int h)
+void Label::setText(const ustring &text)
 {
-  unsigned int sidemargin = _bevel_width * 2;
-  resize(w + sidemargin * 2, h + _bevel_width * 2);
-}
+  bool utf = text.utf8();
+  std::string s = text.c_str(); // use a normal string, for its functionality
 
-void Label::update()
-{
-  if (_dirty) {
-    int w = _rect.width(), h = _rect.height();
-    const Font *ft = style()->labelFont();
-    unsigned int sidemargin = _bevel_width * 2;
-    if (!_fixed_width)
-      w = ft->measureString(_text) + sidemargin * 2;
-    if (!_fixed_height)
-      h = ft->height();
-
-    // enforce a minimum size
-    if (w > _rect.width()) {
-      if (h > _rect.height())
-        internalResize(w, h);
-      else
-        internalResize(w, _rect.height());
-    } else if (h > _rect.height())
-      internalResize(_rect.width(), h);
+  _parsedtext.clear();
+  
+  // parse it into multiple lines
+  std::string::size_type p = 0;
+  while (p != std::string::npos) {
+    std::string::size_type p2 = s.find('\n', p);
+    _parsedtext.push_back(s.substr(p, (p2==std::string::npos?p2:p2-p)));
+    _parsedtext.back().setUtf8(utf);
+    p = (p2==std::string::npos?p2:p2+1);
   }
-  Widget::update();
+  calcDefaultSizes();
 }
 
-
-void Label::renderForeground(void)
+void Label::setFont(const Font *f)
 {
-  Widget::renderForeground();
+  _font = f;
+  calcDefaultSizes();
+}
 
-  const Font *ft = style()->labelFont();
-  unsigned int sidemargin = _bevel_width * 2;
+void Label::calcDefaultSizes()
+{
+  unsigned int longest = 0;
+  // find the longest line
+  std::vector<ustring>::iterator it, end = _parsedtext.end();
+  for (it = _parsedtext.begin(); it != end; ++it) {
+    unsigned int length = _font->measureString(*it);
+    if (length > longest) longest = length;
+  }
+  setMinSize(Size(longest + borderWidth() * 2 + bevel() * 4,
+                  _parsedtext.size() * _font->height() + borderWidth() * 2 +
+                  bevel() * 2));
+}
+  
+void Label::styleChanged(const RenderStyle &style)
+{
+  _texture = style.labelFocusBackground();
+  _forecolor = style.textFocusColor();
+  _font = style.labelFont();
+  Widget::styleChanged(style);
+  calcDefaultSizes();
+}
 
-  ustring t = _text; // the actual text to draw
-  int x = sidemargin;    // x coord for the text
+void Label::renderForeground(Surface &surface)
+{
+  const RenderControl *control = display->renderControl(screen());
+  unsigned int sidemargin = bevel() * 2;
+  int y = bevel();
+  unsigned int w = area().width() - borderWidth() * 2 - sidemargin * 2;
+  unsigned int h = area().height() - borderWidth() * 2 - bevel() * 2;
 
-  // find a string that will fit inside the area for text
-  int max_length = width() - sidemargin * 2;
-  if (max_length <= 0) {
-    t = ""; // can't fit anything
-  } else {
-    size_t text_len = t.size();
-    int length;
+  switch (_justify_vert) {
+  case RenderStyle::RightBottomJustify:
+    y += h - (_parsedtext.size() * _font->height());
+    if (y < bevel()) y = bevel();
+    break;
+  case RenderStyle::CenterJustify:
+    y += (h - (_parsedtext.size() * _font->height())) / 2;
+    if (y < bevel()) y = bevel();
+    break;
+  case RenderStyle::LeftTopJustify:
+    break;
+  }
+  
+  if (w <= 0) return; // can't fit anything
+  
+  std::vector<ustring>::iterator it, end = _parsedtext.end();
+  for (it = _parsedtext.begin(); it != end; ++it, y += _font->height()) {
+    ustring t = *it; // the actual text to draw
+    int x = sidemargin;    // x coord for the text
+
+    // find a string that will fit inside the area for text
+    ustring::size_type text_len = t.size();
+    unsigned int length;
       
     do {
       t.resize(text_len);
-      length = ft->measureString(t);
-    } while (length > max_length && text_len-- > 0);
+      length = _font->measureString(t);
+    } while (length > w && text_len-- > 0);
+
+    if (text_len <= 0) continue; // won't fit anything
 
     // justify the text
-    switch (style()->labelTextJustify()) {
-    case RenderStyle::RightJustify:
-      x += max_length - length;
+    switch (_justify_horz) {
+    case RenderStyle::RightBottomJustify:
+      x += w - length;
       break;
     case RenderStyle::CenterJustify:
-      x += (max_length - length) / 2;
+      x += (w - length) / 2;
       break;
-    case RenderStyle::LeftJustify:
+    case RenderStyle::LeftTopJustify:
       break;
     }
-  }
-
-  display->renderControl(_screen)->
-    drawString(*_surface, *ft, x, _bevel_width, *style()->textUnfocusColor(), t);
+ 
+    control->drawString(surface, *_font, x, y, *_forecolor, t);
+ }
 }
 
 }

@@ -22,8 +22,8 @@ ScreenInfo::ScreenInfo(unsigned int num) {
 
   _root_window = RootWindow(**display, _screen);
 
-  _rect.setSize(WidthOfScreen(ScreenOfDisplay(**display,
-                                              _screen)),
+  _size = Size(WidthOfScreen(ScreenOfDisplay(**display,
+                                             _screen)),
                HeightOfScreen(ScreenOfDisplay(**display,
                                               _screen)));
   /*

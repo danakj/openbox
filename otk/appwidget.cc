@@ -7,6 +7,7 @@
 #include "appwidget.hh"
 #include "application.hh"
 #include "property.hh"
+#include "renderstyle.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -14,9 +15,8 @@ extern "C" {
 
 namespace otk {
 
-AppWidget::AppWidget(Application *app, Direction direction,
-                     Cursor cursor, int bevel_width)
-  : Widget(app, app->getStyle(), direction, cursor, bevel_width),
+AppWidget::AppWidget(Application *app, Direction direction, int bevel)
+  : Widget(app->screen(), app, direction, bevel),
     _application(app)
 {
   assert(app);
@@ -26,29 +26,28 @@ AppWidget::AppWidget(Application *app, Direction direction,
   protocols[0] = Property::atoms.wm_protocols;
   protocols[1] = Property::atoms.wm_delete_window;
   XSetWMProtocols(**display, window(), protocols, 2);
-
-  setStyle(_style);
 }
 
 AppWidget::~AppWidget()
 {
 }
 
-void AppWidget::setStyle(RenderStyle *style)
+void AppWidget::render()
 {
-  Widget::setStyle(style);
-
-  setTexture(style->titlebarUnfocusBackground());
+  XSetWindowBackground(**display, window(),
+                       RenderStyle::style(screen())->
+                       titlebarUnfocusBackground()->color().pixel());
+  Widget::render();
 }
 
-void AppWidget::show(void)
+void AppWidget::show()
 {
   Widget::show(true);
 
   _application->_appwidget_count++;
 }
 
-void AppWidget::hide(void)
+void AppWidget::hide()
 {
   Widget::hide();
 

@@ -82,6 +82,8 @@ public:
 
   void shade(const bool sh) const;
   void close() const;
+  void raise() const;
+  void lower() const;
 
   bool operator == (const XWindow &w) const { return w._window == _window; }
   bool operator == (const Window &w) const { return w == _window; }

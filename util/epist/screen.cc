@@ -179,6 +179,14 @@ void screen::handleKeypress(const XEvent &e) {
           window->close();
           return;
 
+        case Action::raise:
+          window->raise();
+          return;
+
+        case Action::lower:
+          window->lower();
+          return;
+
         case Action::toggleshade:
           window->shade(! window->shaded());
           return;

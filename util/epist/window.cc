@@ -154,3 +154,13 @@ void XWindow::close() const {
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_close_window,
                             _window);
 }
+
+
+void XWindow::raise() const {
+  XRaiseWindow(_epist->getXDisplay(), _window);
+}
+
+
+void XWindow::lower() const {
+  XLowerWindow(_epist->getXDisplay(), _window);
+}

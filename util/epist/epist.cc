@@ -100,6 +100,14 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("Tab")),
                            Mod1Mask | ShiftMask));
+  _actions.push_back(Action(Action::raise,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Up")),
+                           Mod1Mask));
+  _actions.push_back(Action(Action::lower,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("Down")),
+                           Mod1Mask));
   activateGrabs();
 }
 

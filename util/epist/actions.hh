@@ -36,8 +36,8 @@ public:
     noaction = 0,
     execute,
     iconify,
-    raise,
-    lower,
+    raise, //done
+    lower, //done
     close, //done
     toggleshade, //done
     moveWindowUp,

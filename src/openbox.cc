@@ -360,13 +360,27 @@ Client *Openbox::findClient(Window window)
 
 void Openbox::setFocusedClient(Client *c)
 {
+  if (c == _focused_client) return;
+  assert(_focused_screen);
+
+  // uninstall the old colormap
+  if (_focused_client)
+    _focused_client->installColormap(false);
+  else
+    _focused_screen->installColormap(false);
+  
   _focused_client = c;
   if (c) {
     _focused_screen = _screens[c->screen()];
+
+    // install the client's colormap
+    c->installColormap(true);
   } else {
-    assert(_focused_screen);
     XSetInputFocus(**otk::display, _focused_screen->focuswindow(),
                    RevertToNone, CurrentTime);
+
+    // install the root window colormap
+    _focused_screen->installColormap(true);
   }
   // set the NET_ACTIVE_WINDOW hint for all screens
   ScreenList::iterator it, end = _screens.end();

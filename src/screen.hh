@@ -10,7 +10,6 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include "client.hh"
 #include "widgetbase.hh"
 #include "otk/renderstyle.hh"
 #include "otk/strut.hh"
@@ -44,8 +43,10 @@ public:
                                           ButtonPressMask |
                                           ButtonReleaseMask;
 
+  //! Holds a list of Clients
+  typedef std::list<Client*> ClientList;
   //! All managed clients on the screen (in order of being mapped)
-  Client::List clients;
+  ClientList clients;
   
 private:
   //! Was %Openbox able to manage the screen?
@@ -77,7 +78,7 @@ private:
   Window _supportwindow;
 
   //! A list of all managed clients on the screen, in their stacking order
-  Client::List _stacking;
+  ClientList _stacking;
 
   //! The desktop currently being displayed
   long _desktop;
@@ -195,6 +196,8 @@ public:
     If the index is too large, it is simply ignored.
   */
   void setDesktopName(long i, const otk::ustring &name);
+
+  void installColormap(bool install) const;
 
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);

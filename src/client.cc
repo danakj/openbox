@@ -105,10 +105,8 @@ Client::~Client()
     _transients.front()->_transient_for = 0;
     _transients.pop_front();
   }
-  
+
   // clean up parents reference to this
-  if (_modal)
-    setModal(false);
   if (_transient_for)
     _transient_for->_transients.remove(this); // remove from old parent
   
@@ -825,6 +823,8 @@ Client *Client::findModalChild(Client *skip) const
 
 void Client::setModal(bool modal)
 {
+  if (modal == _modal) return;
+  
   if (modal) {
     Client *c = this;
     while (c->_transient_for) {
@@ -1613,6 +1613,19 @@ void Client::disableDecorations(DecorationFlags flags)
 {
   _disabled_decorations = flags;
   setupDecorAndFunctions();
+}
+
+
+void Client::installColormap(bool install) const
+{
+  XWindowAttributes wa;
+  if (XGetWindowAttributes(**otk::display, _window, &wa)) {
+    printf("%snstalling Window Colormap 0x%lx!\n", install ? "I" : "Uni", _window);
+    if (install)
+      XInstallColormap(**otk::display, wa.colormap);
+    else
+      XUninstallColormap(**otk::display, wa.colormap);
+  }
 }
 
 

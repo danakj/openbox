@@ -7,6 +7,7 @@
   property changes on the window and some client messages
 */
 
+#include "screen.hh"
 #include "widgetbase.hh"
 #include "otk/point.hh"
 #include "otk/strut.hh"
@@ -28,6 +29,7 @@ extern "C" {
 namespace ob {
 
 class Frame;
+class Screen;
 
 //! The MWM Hints as retrieved from the window property
 /*!
@@ -483,6 +485,21 @@ private:
   //! Attempts to find and return a modal child of this window, recursively.
   Client *findModalChild(Client *skip = 0) const;
 
+  //! Removes or reapplies the client's border to its window
+  /*!
+    Used when managing and unmanaging a window.
+    @param addborder true if adding the border to the client; false if removing
+                     from the client
+  */
+  void toggleClientBorder(bool addborder);
+
+  //! Applies the states requested when the window mapped
+  /*!
+    This should be called only once, during the window mapping process. It
+    applies things like maximized, and fullscreen.
+  */
+  void applyStartupState();
+  
 public:
 #ifndef SWIG
   //! Constructs a new Client object around a specified window id
@@ -612,21 +629,6 @@ BB    @param window The window id that the Client class should handle
   */
   const otk::Point &logicalSize() const { return _logical_size; }
 
-  //! Applies the states requested when the window mapped
-  /*!
-    This should be called only once, during the window mapping process. It
-    applies things like maximized, and fullscreen.
-  */
-  void applyStartupState();
-  
-  //! Removes or reapplies the client's border to its window
-  /*!
-    Used when managing and unmanaging a window.
-    @param addborder true if adding the border to the client; false if removing
-                     from the client
-  */
-  void toggleClientBorder(bool addborder);
-
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
 
@@ -695,7 +697,10 @@ BB    @param window The window id that the Client class should handle
   virtual void mapRequestHandler(const XMapRequestEvent &e);
 #if defined(SHAPE)
   virtual void shapeHandler(const XShapeEvent &e);
-#endif // SHAPE 
+#endif // SHAPE
+
+  friend void Screen::manageWindow(Window);
+  friend void Screen::unmanageWindow(Client *);
 };
 
 }

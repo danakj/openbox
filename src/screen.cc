@@ -211,7 +211,7 @@ void Screen::updateStrut()
 {
   _strut.left = _strut.right = _strut.top = _strut.bottom = 0;
 
-  Client::List::iterator it, end = clients.end();
+  ClientList::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     const otk::Strut &s = (*it)->strut();
     _strut.left = std::max(_strut.left, s.left);
@@ -264,7 +264,7 @@ void Screen::calcArea()
  
   if (old_area != _area) {
     // the area has changed, adjust all the maximized windows
-    Client::List::iterator it, end = clients.end();
+    ClientList::iterator it, end = clients.end();
     for (it = clients.begin(); it != end; ++it)
       (*it)->remaximize();
   }
@@ -371,8 +371,8 @@ void Screen::changeClientList()
     
     windows = new Window[size];
     win_it = windows;
-    Client::List::const_iterator it = clients.begin();
-    const Client::List::const_iterator end = clients.end();
+    ClientList::const_iterator it = clients.begin();
+    const ClientList::const_iterator end = clients.end();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -402,8 +402,8 @@ void Screen::changeStackingList()
     
     windows = new Window[size];
     win_it = windows;
-    Client::List::const_reverse_iterator it = _stacking.rbegin();
-    const Client::List::const_reverse_iterator end = _stacking.rend();
+    ClientList::const_reverse_iterator it = _stacking.rbegin();
+    const ClientList::const_reverse_iterator end = _stacking.rend();
     for (; it != end; ++it, ++win_it)
       *win_it = (*it)->window();
   } else
@@ -615,6 +615,9 @@ void Screen::unmanageWindow(Client *client)
   // influence
   updateStrut();
 
+  // unset modal before dropping our focus
+  client->setModal(false);
+  
   // unfocus the client (calls the focus callbacks)
   client->unfocus();
 
@@ -634,8 +637,8 @@ void Screen::lowerWindow(Client *client)
 
   assert(!_stacking.empty()); // this would be bad
 
-  Client::List::iterator it = --_stacking.end();
-  const Client::List::iterator end = _stacking.begin();
+  ClientList::iterator it = --_stacking.end();
+  const ClientList::iterator end = _stacking.begin();
 
   if (client->modal() && client->transientFor()) {
     // don't let a modal window lower below its transient_for
@@ -643,7 +646,7 @@ void Screen::lowerWindow(Client *client)
     assert(it != _stacking.end());
 
     wins[0] = (it == _stacking.begin() ? _focuswindow :
-               ((*(--Client::List::const_iterator(it)))->frame->window()));
+               ((*(--ClientList::const_iterator(it)))->frame->window()));
     wins[1] = client->frame->window();
     if (wins[0] == wins[1]) return; // already right above the window
 
@@ -673,8 +676,8 @@ void Screen::raiseWindow(Client *client)
   // remove the client before looking so we can't run into ourselves
   _stacking.remove(client);
   
-  Client::List::iterator it = _stacking.begin();
-  const Client::List::iterator end = _stacking.end();
+  ClientList::iterator it = _stacking.begin();
+  const ClientList::iterator end = _stacking.end();
 
   // the stacking list is from highest to lowest
   for (; it != end && (*it)->layer() > client->layer(); ++it);
@@ -684,7 +687,7 @@ void Screen::raiseWindow(Client *client)
     otherwise, we want to stack under the previous window in the stack.
   */
   wins[0] = (it == _stacking.begin() ? _focuswindow :
-             ((*(--Client::List::const_iterator(it)))->frame->window()));
+             ((*(--ClientList::const_iterator(it)))->frame->window()));
   wins[1] = client->frame->window();
 
   _stacking.insert(it, client);
@@ -713,7 +716,7 @@ void Screen::changeDesktop(long desktop)
 
   if (old == _desktop) return;
 
-  Client::List::iterator it, end = clients.end();
+  ClientList::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     if ((*it)->desktop() == old) {
       (*it)->frame->hide();
@@ -734,7 +737,7 @@ void Screen::changeNumDesktops(long num)
   if (!(num > 0)) return;
 
   // move windows on desktops that will no longer exist!
-  Client::List::iterator it, end = clients.end();
+  ClientList::iterator it, end = clients.end();
   for (it = clients.begin(); it != end; ++it) {
     int d = (*it)->desktop();
     if (d >= num && !(d == (signed) 0xffffffff ||
@@ -798,6 +801,16 @@ void Screen::setDesktopName(long i, const otk::ustring &name)
   otk::Property::set(_info->rootWindow(),
                      otk::Property::atoms.net_desktop_names,
                      otk::Property::utf8, newnames);
+}
+
+
+void Screen::installColormap(bool install) const
+{
+  printf("%snstalling Root Colormap!\n", install ? "I" : "Uni");
+  if (install)
+    XInstallColormap(**otk::display, _info->colormap());
+  else
+    XUninstallColormap(**otk::display, _info->colormap());
 }
 
 

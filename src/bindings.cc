@@ -442,7 +442,7 @@ void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
           _timer = new otk::Timer(5000, // 5 second timeout
                                   (otk::Timer::TimeoutHandler)resetChains,
                                   this);
-          // grab the server here to make sure no key pressed go missed
+          // grab the server here to make sure no key presses get missed
           otk::display->grab();
           grabKeys(false);
           _curpos = p;

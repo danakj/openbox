@@ -1,3 +1,4 @@
+#include "widget.hh"
 #include "focuswidget.hh"
 #include "display.hh"
 #include "configuration.hh"
@@ -15,9 +16,7 @@ int main(void) {
 
   otk::Style *my_style = new otk::Style(ctrl);
 
-  const char *sfile = "/usr/local/share/openbox/styles/artwiz";
-  
-  style_conf.setFile(sfile);
+  style_conf.setFile("/usr/local/share/openbox/styles/artwiz");
   style_conf.load();
 
   my_style->load(style_conf);
@@ -29,10 +28,9 @@ int main(void) {
   otk::OtkFocusWidget closeb(&foo);
 
   foo.setBevelWidth(2);
-
-  // fix the width to 400. the height will be determined by the height of
-  // its children
-  foo.setWidth(400);
+  foo.setDirection(otk::OtkWidget::Vertical);
+  
+  foo.setHeight(400);
   foo.setTexture(my_style->getTitleFocus());
   foo.setUnfocusTexture(my_style->getTitleUnfocus());
 
@@ -41,9 +39,9 @@ int main(void) {
   iconb.setTexture(my_style->getButtonFocus());
   iconb.setUnfocusTexture(my_style->getButtonUnfocus());
 
-  // fix height to 15 and let the width be calculated by its parent
-  label.setHeight(15);
-  label.setStretchableHorz(true);
+  // fix width to 60 and let the height be calculated by its parent
+  label.setWidth(60);
+  label.setStretchableVert(true);
   label.setTexture(my_style->getLabelFocus());
   label.setUnfocusTexture(my_style->getLabelUnfocus());
 
@@ -58,7 +56,7 @@ int main(void) {
   closeb.setUnfocusTexture(my_style->getButtonUnfocus());
 
   // will recursively unfocus its children
-  foo.unfocus();
+  //foo.unfocus();
   foo.show();
 
   while (1) {

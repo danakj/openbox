@@ -250,6 +250,7 @@ AM_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile
 src/Makefile
 util/Makefile
+util/epist/Makefile
 data/Makefile
 data/styles/Makefile
 doc/Makefile

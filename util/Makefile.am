@@ -2,6 +2,7 @@
 
 CPPFLAGS= @CPPFLAGS@ @DEBUG@
 
+SUBDIRS = 			epist
 bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot
 

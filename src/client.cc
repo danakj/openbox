@@ -1563,7 +1563,7 @@ bool Client::focus()
 
   if (_focused) return true;
 
-  if (_modal)
+  if (!_modal)
     if (focusModalChild())
       return true;
 

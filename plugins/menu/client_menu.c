@@ -46,11 +46,11 @@ void client_menu_show(Menu *self, int x, int y, Client *client)
     int newy;
     g_assert(!self->invalid);
     g_assert(client);
-    
+/*    XXX Sorry wooby!
     newy = MAX(client->frame->area.y +
                client->frame->a_focused_title->area.height + theme_bwidth,
                y - theme_bwidth);
-    
+*/  
     POINT_SET(self->location, 
 	      MIN(x, screen_physical_size.width - self->size.width -
                   theme_bwidth * 2), 

@@ -4,6 +4,7 @@
 #include "geom.h"
 #include "client.h"
 #include "render/render.h"
+#include "window.h"
 
 typedef enum {
     Context_None,
@@ -28,6 +29,13 @@ typedef enum {
 #define FRAME_HANDLE_Y(f) (f->innersize.top + f->client->area.height + \
 		           f->cbwidth)
 
+typedef struct FrameDecor {
+    ObWindow obwin;
+
+    Window window;
+    Context context;
+} FrameDecor;
+
 typedef struct Frame {
     Client *client;
 
@@ -38,39 +46,11 @@ typedef struct Frame {
     Rect   area;
     gboolean visible;
 
-    Window title;
-    Window label;
-    Window max;
-    Window close;
-    Window desk;
-    Window shade;
-    Window icon;
-    Window iconify;
-    Window handle;
-    Window lgrip;
-    Window rgrip;
+    int framedecors;
+    FrameDecor *framedecor;
 
-    Appearance *a_unfocused_title;
-    Appearance *a_focused_title;
-    Appearance *a_unfocused_label;
-    Appearance *a_focused_label;
-    Appearance *a_icon;
-    Appearance *a_unfocused_handle;
-    Appearance *a_focused_handle;
-
-    Strut  innersize;
-
-    GSList *clients;
-
-    int width;         /* title and handle */
-    int label_width;
-    int icon_x;        /* x-position of the window icon button */
-    int label_x;       /* x-position of the window title */
-    int iconify_x;     /* x-position of the window iconify button */
-    int desk_x;        /* x-position of the window all-desktops button */
-    int shade_x;       /* x-position of the window shade button */
-    int max_x;         /* x-position of the window maximize button */
-    int close_x;       /* x-position of the window close button */
+    int width;         /* width of client + borders */
+    int height;         /* height of client + borders */
     int bwidth;        /* border width */
     int cbwidth;       /* client border width */
 

@@ -108,7 +108,7 @@ bsetroot::bsetroot(int argc, char **argv, char *dpy_name)
   }
 
   img_ctrl = new BImageControl*[numberOfScreens()];
-  for (unsigned int s = 0; s < numberOfScreens(); ++s)
+  for (unsigned int s = 0, n = numberOfScreens(); s < n; ++s)
     img_ctrl[s] = new BImageControl(*this, *getScreenInfo(s), true);
 
   if (sol && fore) solid();
@@ -141,8 +141,8 @@ void bsetroot::setPixmapProperty(int screen, Pixmap pixmap) {
   const ScreenInfo *screen_info = getScreenInfo(screen);
 
   if (rootpmap_id == None) {
-    rootpmap_id = XInternAtom(getXDisplay(), "_XROOTPMAP_ID", True);
-    esetroot_id = XInternAtom(getXDisplay(), "ESETROOT_PMAP_ID", True);
+    rootpmap_id = XInternAtom(getXDisplay(), "_XROOTPMAP_ID", False);
+    esetroot_id = XInternAtom(getXDisplay(), "ESETROOT_PMAP_ID", False);
   }
 
   XGrabServer(getXDisplay());
@@ -201,7 +201,7 @@ Pixmap bsetroot::duplicatePixmap(int screen, Pixmap pixmap,
 
 
 void bsetroot::solid(void) {
-  for (unsigned int screen = 0; screen < numberOfScreens(); screen++) {
+  for (unsigned int screen = 0, n = numberOfScreens(); screen < n; screen++) {
     BColor c;
 
     img_ctrl[screen]->parseColor(&c, fore);
@@ -234,8 +234,9 @@ void bsetroot::modula(int x, int y) {
   long pattern;
 
   unsigned int screen, i;
+  unsigned int n = numberOfScreens();
 
-  for (pattern = 0, screen = 0; screen < numberOfScreens(); screen++) {
+  for (pattern = 0, screen = 0; screen < n; screen++) {
     for (i = 0; i < 16; i++) {
       pattern <<= 1;
       if ((i % x) == 0)
@@ -300,7 +301,7 @@ void bsetroot::modula(int x, int y) {
 
 
 void bsetroot::gradient(void) {
-  for (unsigned int screen = 0; screen < numberOfScreens(); screen++) {
+  for (unsigned int screen = 0, n = numberOfScreens(); screen < n; screen++) {
     BTexture texture;
     img_ctrl[screen]->parseTexture(&texture, grad);
     img_ctrl[screen]->parseColor(texture.getColor(), fore);

@@ -60,3 +60,18 @@ def resize(data):
 
 def execute(bin, screen = 0):
     Openbox_execute(openbox, screen, bin)
+
+def toggle_shade(data):
+    print "toggle_shade"
+
+def raise_win(data):
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    screen = Openbox_screen(openbox, OBClient_screen(client))
+    OBScreen_raise(screen, client)
+
+def lower_win(data):
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    screen = Openbox_screen(openbox, OBClient_screen(client))
+    OBScreen_lower(screen, client)

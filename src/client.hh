@@ -17,11 +17,12 @@ extern "C" {
 
 #include <string>
 
+#include "screen.hh"
+#include "widget.hh"
 #include "otk/point.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"
-#include "widget.hh"
 
 namespace ob {
 
@@ -254,7 +255,11 @@ private:
   //! The window is a 'fullscreen' window, and should be on top of all others
   bool _fullscreen;
   //! The window should be on top of other windows of the same type
-  bool _floating;
+  bool _above;
+  //! The window should be underneath other windows of the same type
+  bool _below;
+
+  OBScreen::StackLayer _layer;
 
   //! A bitmask of values in the OBClient::Decoration enum
   /*!
@@ -292,6 +297,9 @@ private:
   void setDesktop(long desktop);
   //! Adjusts the window's net_state
   void setState(StateAction action, long data1, long data2);
+
+  //! Calculates the stacking layer for the client window
+  void calcLayer();
 
   //! Update the protocols that the window supports and adjusts things if they
   //! change
@@ -396,17 +404,8 @@ public:
   inline bool maxVert() const { return _max_vert; }
   //! Returns if the window is maximized horizontally
   inline bool maxHorz() const { return _max_horz; }
-  //! Returns if the window is fullscreen
-  /*!
-    When the window is fullscreen, it is kept above all others
-  */
-  inline bool fullscreen() const { return _fullscreen; }
-  //! Returns if the window is floating
-  /*!
-    When the window is floating, it is kept above all others in the same
-    stacking layer as it
-  */
-  inline bool floating() const { return _floating; }
+  //! Returns the window's stacking layer
+  inline OBScreen::StackLayer layer() const { return _layer; }
 
   //! Removes or reapplies the client's border to its window
   /*!

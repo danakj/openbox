@@ -1560,6 +1560,44 @@ static PyObject *_wrap_OBScreen_unmanageWindow(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBScreen_raise(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_raise",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->raise(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_lower(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_lower",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    (arg1)->lower(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject * OBScreen_swigregister(PyObject *self, PyObject *args) {
     PyObject *obj;
     if (!PyArg_ParseTuple(args,(char*)"O", &obj)) return NULL;
@@ -2132,32 +2170,15 @@ static PyObject *_wrap_OBClient_maxHorz(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_OBClient_fullscreen(PyObject *self, PyObject *args) {
+static PyObject *_wrap_OBClient_layer(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
-    bool result;
+    int result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_fullscreen",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_layer",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((ob::OBClient const *)arg1)->fullscreen();
-    
-    resultobj = PyInt_FromLong((long)result);
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_OBClient_floating(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
-    bool result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:OBClient_floating",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (bool)((ob::OBClient const *)arg1)->floating();
+    result = (int)((ob::OBClient const *)arg1)->layer();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2646,6 +2667,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_manageExisting", _wrap_OBScreen_manageExisting, METH_VARARGS },
 	 { (char *)"OBScreen_manageWindow", _wrap_OBScreen_manageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_unmanageWindow", _wrap_OBScreen_unmanageWindow, METH_VARARGS },
+	 { (char *)"OBScreen_raise", _wrap_OBScreen_raise, METH_VARARGS },
+	 { (char *)"OBScreen_lower", _wrap_OBScreen_lower, METH_VARARGS },
 	 { (char *)"OBScreen_swigregister", OBScreen_swigregister, METH_VARARGS },
 	 { (char *)"MwmHints_flags_set", _wrap_MwmHints_flags_set, METH_VARARGS },
 	 { (char *)"MwmHints_flags_get", _wrap_MwmHints_flags_get, METH_VARARGS },
@@ -2679,8 +2702,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_iconic", _wrap_OBClient_iconic, METH_VARARGS },
 	 { (char *)"OBClient_maxVert", _wrap_OBClient_maxVert, METH_VARARGS },
 	 { (char *)"OBClient_maxHorz", _wrap_OBClient_maxHorz, METH_VARARGS },
-	 { (char *)"OBClient_fullscreen", _wrap_OBClient_fullscreen, METH_VARARGS },
-	 { (char *)"OBClient_floating", _wrap_OBClient_floating, METH_VARARGS },
+	 { (char *)"OBClient_layer", _wrap_OBClient_layer, METH_VARARGS },
 	 { (char *)"OBClient_toggleClientBorder", _wrap_OBClient_toggleClientBorder, METH_VARARGS },
 	 { (char *)"OBClient_area", _wrap_OBClient_area, METH_VARARGS },
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
@@ -2789,6 +2811,15 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Openbox_State_Normal", (long) ob::Openbox::State_Normal, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Openbox_State_Exiting", (long) ob::Openbox::State_Exiting, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBScreen_event_mask", (long) ob::OBScreen::event_mask, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Icon", (long) ob::OBScreen::Layer_Icon, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Desktop", (long) ob::OBScreen::Layer_Desktop, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Below", (long) ob::OBScreen::Layer_Below, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Normal", (long) ob::OBScreen::Layer_Normal, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Above", (long) ob::OBScreen::Layer_Above, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Top", (long) ob::OBScreen::Layer_Top, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Fullscreen", (long) ob::OBScreen::Layer_Fullscreen, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_Layer_Internal", (long) ob::OBScreen::Layer_Internal, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"OBScreen_NUM_LAYERS", (long) ob::OBScreen::NUM_LAYERS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MwmHints_elements", (long) ob::MwmHints::elements, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBClient_TopLeft", (long) ob::OBClient::TopLeft, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"OBClient_TopRight", (long) ob::OBClient::TopRight, 0, 0, 0},

@@ -26,6 +26,8 @@ extern "C" {
 #include "python.hh"
 #include "otk/display.hh"
 
+#include <vector>
+
 static bool running;
 static int anotherWMRunning(Display *display, XErrorEvent *) {
   printf(_("Another window manager already running on display %s.\n"),
@@ -87,7 +89,7 @@ OBScreen::OBScreen(int screen)
     }
   }
   _style.load(sconfig);
-  
+
   // Set the netwm atoms for geomtery and viewport
   unsigned long geometry[] = { _info->width(),
                                _info->height() };
@@ -402,6 +404,9 @@ void OBScreen::manageWindow(Window window)
 
   // add to the screen's list
   clients.push_back(client);
+  // this puts into the stacking order, then raises it
+  _stacking.push_back(client);
+  raise(client);
   // update the root properties
   setClientList();
 
@@ -447,12 +452,65 @@ void OBScreen::unmanageWindow(OBClient *client)
   delete client->frame;
   client->frame = 0;
 
-  // remove from the screen's list
+  // remove from the screen's lists
+  _stacking.remove(client);
   clients.remove(client);
   delete client;
 
   // update the root properties
   setClientList();
+}
+
+void OBScreen::raise(OBClient *client)
+{
+  const int layer = client->layer();
+  std::vector<Window> wins;
+
+  _stacking.remove(client);
+
+  // the stacking list is from highest to lowest
+  
+  ClientList::iterator it = _stacking.begin(), end = _stacking.end();
+  // insert the windows above this window
+  for (; it != end; ++it) {
+    if ((*it)->layer() <= layer)
+      break;
+    wins.push_back((*it)->frame->window());
+  }
+  // insert our client
+  wins.push_back(client->frame->window());
+  _stacking.insert(it, client);
+  // insert the remaining below this window
+  for (; it != end; ++it)
+    wins.push_back((*it)->frame->window());
+
+  XRestackWindows(otk::OBDisplay::display, &wins[0], wins.size());
+}
+
+void OBScreen::lower(OBClient *client)
+{
+  const int layer = client->layer();
+  std::vector<Window> wins;
+
+  _stacking.remove(client);
+
+  // the stacking list is from highest to lowest
+  
+  ClientList::iterator it = _stacking.begin(), end = _stacking.end();
+  // insert the windows above this window
+  for (; it != end; ++it) {
+    if ((*it)->layer() < layer)
+      break;
+    wins.push_back((*it)->frame->window());
+  }
+  // insert our client
+  wins.push_back(client->frame->window());
+  _stacking.insert(it, client);
+  // insert the remaining below this window
+  for (; it != end; ++it)
+    wins.push_back((*it)->frame->window());
+
+  XRestackWindows(otk::OBDisplay::display, &wins[0], wins.size());
 }
 
 }

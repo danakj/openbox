@@ -37,7 +37,7 @@ OBClient::OBClient(int screen, Window window)
   // update EVERYTHING the first time!!
 
   // the state is kinda assumed to be normal. is this right? XXX
-  _wmstate = NormalState;
+  _wmstate = NormalState; _iconic = false;
   // no default decors or functions, each has to be enabled
   _decorations = _functions = 0;
   // start unfocused
@@ -91,53 +91,7 @@ OBClient::OBClient(int screen, Window window)
   updateIconTitle();
   updateClass();
 
-/*
-#ifdef DEBUG
-  printf("Mapped window: 0x%lx\n"
-         "  title:         \t%s\t  icon title:    \t%s\n"
-         "  app name:      \t%s\t\t  class:         \t%s\n"
-         "  position:      \t%d, %d\t\t  size:          \t%d, %d\n"
-         "  desktop:       \t%lu\t\t  group:         \t0x%lx\n"
-         "  type:          \t%d\t\t  min size       \t%d, %d\n"
-         "  base size      \t%d, %d\t\t  max size       \t%d, %d\n"
-         "  size incr      \t%d, %d\t\t  gravity        \t%d\n"
-         "  wm state       \t%ld\t\t  can be focused:\t%s\n"
-         "  notify focus:  \t%s\t\t  urgent:        \t%s\n"
-         "  shaped:        \t%s\t\t  modal:         \t%s\n"
-         "  shaded:        \t%s\t\t  iconic:        \t%s\n"
-         "  vert maximized:\t%s\t\t  horz maximized:\t%s\n"
-         "  fullscreen:    \t%s\t\t  floating:      \t%s\n"
-         "  requested pos: \t%s\n",
-         _window,
-         _title.c_str(),
-         _icon_title.c_str(),
-         _app_name.c_str(),
-         _app_class.c_str(),
-         _area.x(), _area.y(),
-         _area.width(), _area.height(),
-         _desktop,
-         _group,
-         _type,
-         _min_x, _min_y,
-         _base_x, _base_y,
-         _max_x, _max_y,
-         _inc_x, _inc_y,
-         _gravity,
-         _wmstate,
-         _can_focus ? "yes" : "no",
-         _focus_notify ? "yes" : "no",
-         _urgent ? "yes" : "no",
-         _shaped ? "yes" : "no",
-         _modal ? "yes" : "no",
-         _shaded ? "yes" : "no",
-         _iconic ? "yes" : "no",
-         _max_vert ? "yes" : "no",
-         _max_horz ? "yes" : "no",
-         _fullscreen ? "yes" : "no",
-         _floating ? "yes" : "no",
-         _positioned ? "yes" : "no");
-#endif
-*/
+  calcLayer();
 }
 
 
@@ -295,7 +249,8 @@ void OBClient::getState()
 {
   const otk::OBProperty *property = Openbox::instance->property();
 
-  _modal = _shaded = _max_horz = _max_vert = _fullscreen = _floating = false;
+  _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
+    false;
   
   unsigned long *state;
   unsigned long num = (unsigned) -1;
@@ -317,6 +272,12 @@ void OBClient::getState()
       else if (state[i] ==
                property->atom(otk::OBProperty::net_wm_state_maximized_horz))
         _max_horz = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_above))
+        _above = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_below))
+        _below = true;
     }
 
     delete [] state;
@@ -340,6 +301,17 @@ void OBClient::getShaped()
     _shaped = (s != 0);
   }
 #endif // SHAPE
+}
+
+
+void OBClient::calcLayer() {
+  if (_iconic) _layer = OBScreen::Layer_Icon;
+  else if (_type == Type_Desktop) _layer = OBScreen::Layer_Desktop;
+  else if (_type == Type_Dock) _layer = OBScreen::Layer_Top;
+  else if (_fullscreen) _layer = OBScreen::Layer_Fullscreen;
+  else if (_above) _layer = OBScreen::Layer_Above;
+  else if (_below) _layer = OBScreen::Layer_Below;
+  else _layer = OBScreen::Layer_Normal;
 }
 
 
@@ -596,8 +568,10 @@ void OBClient::setState(StateAction action, long data1, long data2)
       else if (state ==
                property->atom(otk::OBProperty::net_wm_state_fullscreen))
         action = _fullscreen ? State_Remove : State_Add;
-      else if (state == property->atom(otk::OBProperty::net_wm_state_floating))
-        action = _floating ? State_Remove : State_Add;
+      else if (state == property->atom(otk::OBProperty::net_wm_state_above))
+        action = _above ? State_Remove : State_Add;
+      else if (state == property->atom(otk::OBProperty::net_wm_state_below))
+        action = _below ? State_Remove : State_Add;
     }
     
     if (action == State_Add) {
@@ -626,10 +600,15 @@ void OBClient::setState(StateAction action, long data1, long data2)
         _fullscreen = true;
         // XXX: raise the window n shit
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_floating)) {
-        if (_floating) continue;
-        _floating = true;
+                 property->atom(otk::OBProperty::net_wm_state_above)) {
+        if (_above) continue;
+        _above = true;
         // XXX: raise the window n shit
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_below)) {
+        if (_below) continue;
+        _below = true;
+        // XXX: lower the window n shit
       }
 
     } else { // action == State_Remove
@@ -657,13 +636,20 @@ void OBClient::setState(StateAction action, long data1, long data2)
         _fullscreen = false;
         // XXX: lower the window to its proper layer
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_floating)) {
-        if (!_floating) continue;
-        _floating = false;
+                 property->atom(otk::OBProperty::net_wm_state_above)) {
+        if (!_above) continue;
+        _above = false;
         // XXX: lower the window to its proper layer
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_below)) {
+        if (!_below) continue;
+        _below = false;
+        // XXX: raise the window to its proper layer
       }
     }
   }
+  calcLayer();
+  Openbox::instance->screen(_screen)->raise(this);
 }
 
 
@@ -928,7 +914,7 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
   if (e.value_mask & CWBorderWidth)
     _border_width = e.border_width;
 
-    // resize, then move, as specified in the EWMH section 7.7
+  // resize, then move, as specified in the EWMH section 7.7
   if (e.value_mask & (CWWidth | CWHeight)) {
     int w = (e.value_mask & CWWidth) ? e.width : _area.width();
     int h = (e.value_mask & CWHeight) ? e.height : _area.height();

@@ -127,6 +127,7 @@ public:
     net_wm_action_close,
 
     net_wm_state_modal,
+    net_wm_state_sticky,
     net_wm_state_maximized_vert,
     net_wm_state_maximized_horz,
     net_wm_state_shaded,
@@ -134,7 +135,8 @@ public:
     net_wm_state_skip_pager,
     net_wm_state_hidden,
     net_wm_state_fullscreen,
-    net_wm_state_floating,
+    net_wm_state_above,
+    net_wm_state_below,
 
     kde_net_system_tray_windows,
     kde_net_wm_system_tray_window_for,

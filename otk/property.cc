@@ -130,6 +130,7 @@ OBProperty::OBProperty()
   _atoms[net_wm_action_close] = create("_NET_WM_ACTION_CLOSE");
     
   _atoms[net_wm_state_modal] = create("_NET_WM_STATE_MODAL");
+  _atoms[net_wm_state_sticky] = create("_NET_WM_STATE_STICKY");
   _atoms[net_wm_state_maximized_vert] = create("_NET_WM_STATE_MAXIMIZED_VERT");
   _atoms[net_wm_state_maximized_horz] = create("_NET_WM_STATE_MAXIMIZED_HORZ");
   _atoms[net_wm_state_shaded] = create("_NET_WM_STATE_SHADED");
@@ -137,7 +138,8 @@ OBProperty::OBProperty()
   _atoms[net_wm_state_skip_pager] = create("_NET_WM_STATE_SKIP_PAGER");
   _atoms[net_wm_state_hidden] = create("_NET_WM_STATE_HIDDEN");
   _atoms[net_wm_state_fullscreen] = create("_NET_WM_STATE_FULLSCREEN");
-  _atoms[net_wm_state_floating] = create("_NET_WM_STATE_FLOATING");
+  _atoms[net_wm_state_above] = create("_NET_WM_STATE_ABOVE");
+  _atoms[net_wm_state_below] = create("_NET_WM_STATE_BELOW");
   
   _atoms[kde_net_system_tray_windows] = create("_KDE_NET_SYSTEM_TRAY_WINDOWS");
   _atoms[kde_net_wm_system_tray_window_for] =

@@ -30,6 +30,7 @@
 #include "focus.h"
 #include "stacking.h"
 #include "popup.h"
+#include "render/render.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -40,6 +41,17 @@ GList **focus_order; /* these lists are created when screen_startup
                         sets the number of desktops */
 ObClient *focus_cycle_target;
 
+struct {
+    InternalWindow top;
+    InternalWindow left;
+    InternalWindow right;
+    InternalWindow bottom;
+} focus_indicator;
+
+RrAppearance *a_focus_indicator;
+RrColor *color_black;
+RrColor *color_white;
+
 static ObIconPopup *focus_cycle_popup;
 
 static void focus_cycle_destructor(ObClient *client, gpointer data)
@@ -49,15 +61,67 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
 }
 
+static Window createWindow(Window parent, unsigned long mask,
+			   XSetWindowAttributes *attrib)
+{
+    return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
+			 RrDepth(ob_rr_inst), InputOutput,
+                         RrVisual(ob_rr_inst), mask, attrib);
+                       
+}
+
 void focus_startup(gboolean reconfig)
 {
     focus_cycle_popup = icon_popup_new(TRUE);
 
     if (!reconfig) {
+        XSetWindowAttributes attr;
+
         client_add_destructor(focus_cycle_destructor, NULL);
 
         /* start with nothing focused */
         focus_set_client(NULL);
+
+        focus_indicator.top.obwin.type = Window_Internal;
+        focus_indicator.left.obwin.type = Window_Internal;
+        focus_indicator.right.obwin.type = Window_Internal;
+        focus_indicator.bottom.obwin.type = Window_Internal;
+
+        attr.override_redirect = True;
+        attr.background_pixel = BlackPixel(ob_display, ob_screen);
+        focus_indicator.top.win =
+            createWindow(RootWindow(ob_display, ob_screen),
+                         CWOverrideRedirect | CWBackPixel, &attr);
+        focus_indicator.left.win =
+            createWindow(RootWindow(ob_display, ob_screen),
+                         CWOverrideRedirect | CWBackPixel, &attr);
+        focus_indicator.right.win =
+            createWindow(RootWindow(ob_display, ob_screen),
+                         CWOverrideRedirect | CWBackPixel, &attr);
+        focus_indicator.bottom.win =
+            createWindow(RootWindow(ob_display, ob_screen),
+                         CWOverrideRedirect | CWBackPixel, &attr);
+
+        stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.top));
+        stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));
+        stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
+        stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+
+        color_black = RrColorNew(ob_rr_inst, 0, 0, 0);
+        color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
+
+        a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
+        a_focus_indicator->surface.grad = RR_SURFACE_SOLID;
+        a_focus_indicator->surface.relief = RR_RELIEF_FLAT;
+        a_focus_indicator->surface.primary = color_black;
+        a_focus_indicator->texture[0].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[0].data.lineart.color = color_white;
+        a_focus_indicator->texture[1].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[1].data.lineart.color = color_white;
+        a_focus_indicator->texture[2].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[2].data.lineart.color = color_white;
+        a_focus_indicator->texture[3].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[3].data.lineart.color = color_white;
     }
 }
 
@@ -76,6 +140,16 @@ void focus_shutdown(gboolean reconfig)
 
         /* reset focus to root */
         XSetInputFocus(ob_display, PointerRoot, RevertToNone, event_lasttime);
+
+        RrColorFree(color_black);
+        RrColorFree(color_white);
+
+        RrAppearanceFree(a_focus_indicator);
+
+        XDestroyWindow(ob_display, focus_indicator.top.win);
+        XDestroyWindow(ob_display, focus_indicator.left.win);
+        XDestroyWindow(ob_display, focus_indicator.right.win);
+        XDestroyWindow(ob_display, focus_indicator.bottom.win);
     }
 }
 
@@ -310,10 +384,12 @@ void focus_cycle(gboolean forward, gboolean linear,
     ObClient *ft = NULL;
 
     if (cancel) {
+        /*
         if (focus_cycle_target)
             frame_adjust_focus(focus_cycle_target->frame, FALSE);
         if (focus_client)
             frame_adjust_focus(focus_client->frame, TRUE);
+        */
         focus_cycle_target = NULL;
         goto done_cycle;
     } else if (done && dialog) {
@@ -345,12 +421,132 @@ void focus_cycle(gboolean forward, gboolean linear,
         ft = it->data;
         if (valid_focus_target(ft)) {
             if (ft != focus_cycle_target) { /* prevents flicker */
+                /*
                 if (focus_cycle_target)
                     frame_adjust_focus(focus_cycle_target->frame, FALSE);
+                */
                 focus_cycle_target = ft;
+                /*
                 frame_adjust_focus(focus_cycle_target->frame, TRUE);
+                */
+                {
+                    int x, y, w, h;
+                    int wt, wl, wr, wb;
+
+                    wt = wl = wr = wb = MAX(5, ob_rr_theme->handle_height);
+
+                    x = focus_cycle_target->frame->area.x;
+                    y = focus_cycle_target->frame->area.y;
+                    w = focus_cycle_target->frame->area.width;
+                    h = wt;
+
+                    XMoveResizeWindow(ob_display, focus_indicator.top.win,
+                                      x, y, w, h);
+                    a_focus_indicator->texture[0].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[0].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y2 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[1].data.lineart.y2 = 0;
+                    a_focus_indicator->texture[2].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[2].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[3].data.lineart.x1 = (wl-1);
+                    a_focus_indicator->texture[3].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
+                    a_focus_indicator->texture[3].data.lineart.y2 = h-1;
+                    RrPaint(a_focus_indicator, focus_indicator.top.win,
+                            w, h);
+
+                    x = focus_cycle_target->frame->area.x;
+                    y = focus_cycle_target->frame->area.y;
+                    w = wl;
+                    h = focus_cycle_target->frame->area.height;
+
+                    XMoveResizeWindow(ob_display, focus_indicator.left.win,
+                                      x, y, w, h);
+                    a_focus_indicator->texture[0].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[0].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y2 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[1].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[2].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[3].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
+                    a_focus_indicator->texture[3].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
+                    RrPaint(a_focus_indicator, focus_indicator.left.win,
+                            w, h);
+
+                    x = focus_cycle_target->frame->area.x +
+                        focus_cycle_target->frame->area.width - wr;
+                    y = focus_cycle_target->frame->area.y;
+                    w = wr;
+                    h = focus_cycle_target->frame->area.height ;
+
+                    XMoveResizeWindow(ob_display, focus_indicator.right.win,
+                                      x, y, w, h);
+                    a_focus_indicator->texture[0].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[0].data.lineart.y2 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[1].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[1].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[2].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[3].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
+                    a_focus_indicator->texture[3].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
+                    RrPaint(a_focus_indicator, focus_indicator.right.win,
+                            w, h);
+
+                    x = focus_cycle_target->frame->area.x;
+                    y = focus_cycle_target->frame->area.y +
+                        focus_cycle_target->frame->area.height - wb;
+                    w = focus_cycle_target->frame->area.width;
+                    h = wb;
+
+                    XMoveResizeWindow(ob_display, focus_indicator.bottom.win,
+                                      x, y, w, h);
+                    a_focus_indicator->texture[0].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[0].data.lineart.x2 = 0;
+                    a_focus_indicator->texture[0].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[1].data.lineart.x1 = 0;
+                    a_focus_indicator->texture[1].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[1].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[1].data.lineart.y2 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x1 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y1 = h-1;
+                    a_focus_indicator->texture[2].data.lineart.x2 = w-1;
+                    a_focus_indicator->texture[2].data.lineart.y2 = 0;
+                    a_focus_indicator->texture[3].data.lineart.x1 = wl-1;
+                    a_focus_indicator->texture[3].data.lineart.y1 = 0;
+                    a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
+                    a_focus_indicator->texture[3].data.lineart.y2 = 0;
+                    RrPaint(a_focus_indicator, focus_indicator.bottom.win,
+                            w, h);
+                }
             }
             popup_cycle(ft, dialog);
+            XMapWindow(ob_display, focus_indicator.top.win);
+            XMapWindow(ob_display, focus_indicator.left.win);
+            XMapWindow(ob_display, focus_indicator.right.win);
+            XMapWindow(ob_display, focus_indicator.bottom.win);
             return;
         }
     } while (it != start);
@@ -358,6 +554,11 @@ void focus_cycle(gboolean forward, gboolean linear,
 done_cycle:
     if (done && focus_cycle_target)
         client_activate(focus_cycle_target, FALSE);
+
+    XUnmapWindow(ob_display, focus_indicator.top.win);
+    XUnmapWindow(ob_display, focus_indicator.left.win);
+    XUnmapWindow(ob_display, focus_indicator.right.win);
+    XUnmapWindow(ob_display, focus_indicator.bottom.win);
 
     t = NULL;
     first = NULL;

@@ -59,6 +59,7 @@ def simple_replace(data):
 def remove(data):
     invalid = []
     invalid.append('toolbar')
+    invalid.append('menu.bullet')
     invalid.append('rootCommand')
     invalid.append('menu.frame.justify')
     for inv in invalid:

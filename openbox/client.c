@@ -2124,7 +2124,9 @@ gboolean client_focus(Client *self)
 void client_unfocus(Client *self)
 {
     g_assert(focus_client == self);
+#ifndef DEBUG_FOCUS
     g_message("client_unfocus");
+#endif
     focus_fallback(Fallback_Unfocusing);
 }
 

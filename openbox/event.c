@@ -251,7 +251,6 @@ void event_process(XEvent *e)
     }
 
     client = g_hash_table_lookup(client_map, (gpointer)window);
-    g_message("EVENT: 0x%lx -> 0x%lx", window, client);
 
     /* deal with it in the kernel */
     if (client)

@@ -14,6 +14,8 @@ struct RrInstance {
     Colormap cmap;
     GLXContext glx_context;
 
+    Window shape_window;
+
     GHashTable *surface_map;
 };
 
@@ -27,6 +29,8 @@ struct RrInstance {
 #define RrVisual(i)   ((i)->visinfo.visual)
 #define RrColormap(i) ((i)->cmap)
 #define RrContext(i)  ((i)->glx_context)
+
+#define RrShapeWindow(i) ((i)->shape_window)
 
 struct RrSurface;
 

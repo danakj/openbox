@@ -125,7 +125,19 @@ void RrSurfaceShow(struct RrSurface *sur);
 void RrSurfaceHide(struct RrSurface *sur);
 int RrSurfaceVisible(struct RrSurface *sur);
 
-void RrSurfaceMinSize(struct RrSurface *sur, int *w, int *h);
+void RrSurfaceMinSize(struct RrSurface *sur,
+                      int *w,
+                      int *h);
+
+void RrSurfaceShape(struct RrSurface *sur);
+
+/*! Set the base shape for a surface. To clear the base, pass 0 for all
+  of the arguments (except for the surface of course!)
+*/
+void RrSurfaceShapeSetBase(struct RrSurface *sur,
+                           Window base,
+                           int x,
+                           int y);
 
 /* planar surfaces */
 

@@ -3,6 +3,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef    SHAPE
+#include <X11/extensions/shape.h>
+#endif
 
 /* doesn't set win or parent */
 static struct RrSurface *surface_new(enum RrSurfaceType type,
@@ -12,6 +15,9 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
 
     sur = malloc(sizeof(struct RrSurface));
     sur->type = type;
+    sur->shape_base = None;
+    sur->shape_base_x = 0;
+    sur->shape_base_y = 0;
     sur->ntextures = numtex;
     if (numtex) {
         sur->texture = malloc(sizeof(struct RrTexture) * numtex);
@@ -277,5 +283,54 @@ void RrSurfaceHide(struct RrSurface *sur)
 
 int RrSurfaceVisible(struct RrSurface *sur)
 {
+    assert(sur->inst);
     return sur->visible;
+}
+
+void RrSurfaceShapeSetBase(struct RrSurface *sur, Window base, int x, int y)
+{
+    assert(sur->inst);
+    sur->shape_base = base;
+    sur->shape_base_x = x;
+    sur->shape_base_y = y;
+}
+
+void RrSurfaceShape(struct RrSurface *sur)
+{
+    GSList *it;
+
+    assert(sur->inst);
+
+#ifdef SHAPE
+    XResizeWindow(RrDisplay(sur->inst), RrShapeWindow(sur->inst),
+                  sur->w, sur->h);
+    XShapeCombineShape(RrDisplay(sur->inst), RrShapeWindow(sur->inst),
+                       ShapeBounding,
+                       sur->shape_base_x, sur->shape_base_y,
+                       sur->shape_base, ShapeBounding, ShapeSet);
+    /* include the shape of the children */
+    for (it = sur->children; it; it = g_slist_next(it)) {
+        struct RrSurface *ch = it->data;
+        if (ch->win)
+            XShapeCombineShape(RrDisplay(sur->inst),
+                               RrShapeWindow(sur->inst),
+                               ShapeBounding, ch->x, ch->y, ch->win,
+                               ShapeBounding, ShapeUnion);
+    }
+    switch (sur->type) {
+    case RR_SURFACE_NONE:
+        break;
+    case RR_SURFACE_PLANAR:
+        /* XXX shape me based on something! an alpha mask? */
+        break;
+    case RR_SURFACE_NONPLANAR:
+        /* XXX shape me based on my GL form! */
+        assert(0);
+        break;
+    }
+
+    /* apply the final shape */
+    XShapeCombineShape(RrDisplay(sur->inst), sur->win, ShapeBounding, 0, 0,
+                       RrShapeWindow(sur->inst), ShapeBounding, ShapeSet);
+#endif
 }

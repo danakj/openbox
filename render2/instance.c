@@ -97,6 +97,9 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
                                      RrVisual(inst), AllocNone);
         inst->glx_context = glXCreateContext(display, &vilist[best],
                                              NULL, True);
+        inst->shape_window = XCreateSimpleWindow(display,
+                                                 RootWindow(display, screen),
+                                                 0, 0, 1, 1, 0, 0, 0);
         inst->surface_map = g_hash_table_new(g_int_hash, g_int_equal);
 
         assert(inst->glx_context);

@@ -29,6 +29,10 @@ struct RrSurface {
     */
     Window win; /* XXX this can optionally be None if parent != NULL ... */
 
+    Window shape_base;
+    int shape_base_x;
+    int shape_base_y;
+
     int ntextures;
     struct RrTexture *texture;
 

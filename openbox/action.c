@@ -9,6 +9,7 @@
 #include "screen.h"
 #include "action.h"
 #include "openbox.h"
+#include "grab.h"
 
 #include <glib.h>
 
@@ -718,6 +719,9 @@ ObAction *action_from_string(char *name)
                 actionstrings[i].setup(a);
             break;
         }
+    if (!a)
+        g_warning("Invalid action '%s' requested. No such action exists.",
+                  name);
     return a;
 }
 
@@ -916,32 +920,44 @@ void action_toggle_omnipresent(union ActionData *data)
 void action_move_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    if (c)
+    if (c) {
+        grab_pointer(TRUE, None);
         client_move(c, c->area.x + data->relative.delta, c->area.y);
+        grab_pointer(FALSE, None);
+    }
 }
 
 void action_move_relative_vert(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    if (c)
+    if (c) {
+        grab_pointer(TRUE, None);
         client_move(c, c->area.x, c->area.y + data->relative.delta);
+        grab_pointer(FALSE, None);
+    }
 }
 
 void action_resize_relative_horz(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    if (c)
+    if (c) {
+        grab_pointer(TRUE, None);
         client_resize(c,
                       c->area.width + data->relative.delta * c->size_inc.width,
                       c->area.height);
+        grab_pointer(FALSE, None);
+    }
 }
 
 void action_resize_relative_vert(union ActionData *data)
 {
     ObClient *c = data->relative.any.c;
-    if (c && !c->shaded)
+    if (c && !c->shaded) {
+        grab_pointer(TRUE, None);
         client_resize(c, c->area.width, c->area.height +
                       data->relative.delta * c->size_inc.height);
+        grab_pointer(FALSE, None);
+    }
 }
 
 void action_maximize_full(union ActionData *data)
@@ -1140,7 +1156,9 @@ void action_movetoedge(union ActionData *data)
         g_assert_not_reached();
     }
     frame_frame_gravity(c->frame, &x, &y);
+    grab_pointer(TRUE, None);
     client_move(c, x, y);
+    grab_pointer(FALSE, None);
 
 }
 
@@ -1203,7 +1221,9 @@ void action_growtoedge(union ActionData *data)
     frame_frame_gravity(c->frame, &x, &y);
     width -= c->frame->size.left + c->frame->size.right;
     height -= c->frame->size.top + c->frame->size.bottom;
+    grab_pointer(TRUE, None);
     client_move_resize(c, x, y, width, height);
+    grab_pointer(FALSE, None);
 }
 
 void action_send_to_layer(union ActionData *data)

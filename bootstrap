@@ -4,10 +4,11 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
+sh libtoolize --copy --force --automake
 sh aclocal
 sh autoheader
-sh automake --foreign --include-deps --add-missing
 sh autoconf
+sh automake --foreign --include-deps --add-missing
 
 echo
 echo You are now ready to run ./configure

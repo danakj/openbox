@@ -1,7 +1,7 @@
 // SWIG typemaps for otk::ustring
 
 %{
-#include "ustring.hh"
+#include "otk/ustring.hh"
 %}
 
 namespace otk {

@@ -155,7 +155,7 @@ Openbox::Openbox(int argc, char **argv)
   if (!rcpyfd) {
     printf("failed to load python file %s\n", _scriptfilepath.c_str());
   } else {
-    PyRun_SimpleFile(rcpyfd, _scriptfilepath.c_str());
+    PyRun_SimpleFile(rcpyfd, const_cast<char*>(_scriptfilepath.c_str()));
     fclose(rcpyfd);
   }
  

@@ -20,8 +20,10 @@ static void obconf_error(GError *e)
                                GTK_MESSAGE_ERROR,
                                GTK_BUTTONS_CLOSE,
                                "%s", e->message);
-    gtk_dialog_run(GTK_DIALOG(d));
-    gtk_widget_destroy(d);
+    g_signal_connect_swapped(GTK_OBJECT(d), "response",
+                             G_CALLBACK(gtk_widget_destroy),
+                             GTK_OBJECT(d));
+    gtk_widget_show(d);
 }
 
 static void load_stock ()
@@ -55,15 +57,15 @@ int main(int argc, char **argv)
     gtk_set_locale();
     gtk_init(&argc, &argv);
 
-    load_stock();
-
     mainwin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(mainwin), "Obconf");
     gtk_window_set_wmclass(GTK_WINDOW(mainwin), "obconf", "Obconf");
     gtk_window_set_role(GTK_WINDOW(mainwin), "main window");
-    if (ob_icon) gtk_window_set_icon(GTK_WINDOW(mainwin), ob_icon);
 
     gtk_widget_show_all(mainwin);
+
+    load_stock();
+    if (ob_icon) gtk_window_set_icon(GTK_WINDOW(mainwin), ob_icon);
 
     gtk_main();
     return 0;

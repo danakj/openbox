@@ -61,7 +61,7 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
     }
 
     glPushMatrix();
-
+    glTranslatef(x, y, 0.0);
     c = str;
     while (c - str < bytes) {
         g = GlftFontGlyph(font, c);
@@ -70,7 +70,6 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
             glBindTexture(GL_TEXTURE_2D, g->tnum);
 
             glBegin(GL_QUADS);
-            glColor3f(1.0, 1.0, 0.0);
 
             glTexCoord2f(0, g->texh/(float)g->pady);
             glVertex2i(g->left, 0 - g->yoff);

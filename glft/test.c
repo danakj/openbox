@@ -99,6 +99,9 @@ int main(int argc, char **argv)
                     quit = 1;
         case Expose:
             glClear(GL_COLOR_BUFFER_BIT);
+            glColor3f(0.0, 0.0, 0.0);
+            GlftRenderString(font, argv[2], strlen(argv[2]), 2, -2);
+            glColor3f(1.0, 1.0, 0.0);
             GlftRenderString(font, argv[2], strlen(argv[2]), 0, 0);
             glXSwapBuffers(display, win);
         case ConfigureNotify:

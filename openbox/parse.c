@@ -5,7 +5,7 @@ static GHashTable *reg = NULL;
 static ParseFunc func = NULL;
 
 /* parse tokens from the [openbox] section of the rc file */
-static void parse_rc_token(ParseTokenType type, union ParseToken token);
+static void parse_rc_token(ParseToken *token);
 
 void destkey(gpointer key) { g_free(key); }
 
@@ -31,20 +31,27 @@ void parse_reg_section(char *section, ParseFunc func)
         g_hash_table_insert(reg, g_ascii_strdown(section, -1), (void*)func);
 }
 
-void parse_free_token(ParseTokenType type, union ParseToken token)
+void parse_free_token(ParseToken *token)
 {
-    switch (type) {
+    GSList *it;
+
+    switch (token->type) {
     case TOKEN_STRING:
-        g_free(token.string);
+        g_free(token-data.string);
         break;
     case TOKEN_IDENTIFIER:
-        g_free(token.identifier);
+        g_free(token->data.identifier);
+        break;
+    case TOKEN_LIST:
+        for (it = token->data.list; it; it = it->next) {
+            parse_free_token(it->data);
+            g_free(it->data);
+        }
+        g_slist_free(token->data.list);
         break;
     case TOKEN_REAL:
     case TOKEN_INTEGER:
     case TOKEN_BOOL:
-    case TOKEN_LBRACKET:
-    case TOKEN_RBRACKET:
     case TOKEN_LBRACE:
     case TOKEN_RBRACE:
     case TOKEN_EQUALS:
@@ -59,10 +66,10 @@ void parse_set_section(char *section)
     func = (ParseFunc)g_hash_table_lookup(reg, section);
 }
 
-void parse_token(ParseTokenType type, union ParseToken token)
+void parse_token(ParseToken *token)
 {
     if (func != NULL)
-        func(type, token);
+        func(token);
 }
 
 static void parse_rc_token(ParseToken *token)

@@ -1,4 +1,4 @@
-// -*- mode: C++; indent-tabs-mode: nil; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 /*! @file main.cc
   @brief Main entry point for the application
@@ -15,9 +15,6 @@ extern "C" {
 
 #include "gettext.h"
 }
-
-#include <string>
-using std::string;
 
 #include "openbox.hh"
 

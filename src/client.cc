@@ -23,9 +23,9 @@ extern "C" {
 
 namespace ob {
 
-OBClient::OBClient(int screen, Window window)
-  : otk::OtkEventHandler(),
-    OBWidget(OBWidget::Type_Client),
+Client::Client(int screen, Window window)
+  : otk::EventHandler(),
+    WidgetBase(WidgetBase::Type_Client),
     frame(0), _screen(screen), _window(window)
 {
   assert(screen >= 0);
@@ -70,9 +70,9 @@ OBClient::OBClient(int screen, Window window)
 }
 
 
-OBClient::~OBClient()
+Client::~Client()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   // clean up parents reference to this
   if (_transient_for)
@@ -80,70 +80,70 @@ OBClient::~OBClient()
   
   if (Openbox::instance->state() != Openbox::State_Exiting) {
     // these values should not be persisted across a window unmapping/mapping
-    property->erase(_window, otk::OBProperty::net_wm_desktop);
-    property->erase(_window, otk::OBProperty::net_wm_state);
+    property->erase(_window, otk::Property::net_wm_desktop);
+    property->erase(_window, otk::Property::net_wm_state);
   }
 }
 
 
-void OBClient::getDesktop()
+void Client::getDesktop()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   // defaults to the current desktop
   _desktop = Openbox::instance->screen(_screen)->desktop();
 
-  if (!property->get(_window, otk::OBProperty::net_wm_desktop,
-                     otk::OBProperty::Atom_Cardinal,
+  if (!property->get(_window, otk::Property::net_wm_desktop,
+                     otk::Property::Atom_Cardinal,
                      (long unsigned*)&_desktop)) {
     // make sure the hint exists
     Openbox::instance->property()->set(_window,
-                                       otk::OBProperty::net_wm_desktop,
-                                       otk::OBProperty::Atom_Cardinal,
+                                       otk::Property::net_wm_desktop,
+                                       otk::Property::Atom_Cardinal,
                                        (unsigned)_desktop);
   }
 }
 
 
-void OBClient::getType()
+void Client::getType()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   _type = (WindowType) -1;
   
   unsigned long *val;
   unsigned long num = (unsigned) -1;
-  if (property->get(_window, otk::OBProperty::net_wm_window_type,
-                    otk::OBProperty::Atom_Atom,
+  if (property->get(_window, otk::Property::net_wm_window_type,
+                    otk::Property::Atom_Atom,
                     &num, &val)) {
     // use the first value that we know about in the array
     for (unsigned long i = 0; i < num; ++i) {
       if (val[i] ==
-          property->atom(otk::OBProperty::net_wm_window_type_desktop))
+          property->atom(otk::Property::net_wm_window_type_desktop))
         _type = Type_Desktop;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_dock))
+               property->atom(otk::Property::net_wm_window_type_dock))
         _type = Type_Dock;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_toolbar))
+               property->atom(otk::Property::net_wm_window_type_toolbar))
         _type = Type_Toolbar;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_menu))
+               property->atom(otk::Property::net_wm_window_type_menu))
         _type = Type_Menu;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_utility))
+               property->atom(otk::Property::net_wm_window_type_utility))
         _type = Type_Utility;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_splash))
+               property->atom(otk::Property::net_wm_window_type_splash))
         _type = Type_Splash;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_dialog))
+               property->atom(otk::Property::net_wm_window_type_dialog))
         _type = Type_Dialog;
       else if (val[i] ==
-               property->atom(otk::OBProperty::net_wm_window_type_normal))
+               property->atom(otk::Property::net_wm_window_type_normal))
         _type = Type_Normal;
 //      else if (val[i] ==
-//               property->atom(otk::OBProperty::kde_net_wm_window_type_override))
+//               property->atom(otk::Property::kde_net_wm_window_type_override))
 //        mwm_decorations = 0; // prevent this window from getting any decor
       // XXX: make this work again
       if (_type != (WindowType) -1)
@@ -165,7 +165,7 @@ void OBClient::getType()
 }
 
 
-void OBClient::setupDecorAndFunctions()
+void Client::setupDecorAndFunctions()
 {
   // start with everything
   _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
@@ -237,17 +237,17 @@ void OBClient::setupDecorAndFunctions()
 }
 
 
-void OBClient::getMwmHints()
+void Client::getMwmHints()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   unsigned long num = MwmHints::elements;
   unsigned long *hints;
 
   _mwmhints.flags = 0; // default to none
   
-  if (!property->get(_window, otk::OBProperty::motif_wm_hints,
-                     otk::OBProperty::motif_wm_hints, &num,
+  if (!property->get(_window, otk::Property::motif_wm_hints,
+                     otk::Property::motif_wm_hints, &num,
                      (unsigned long **)&hints))
     return;
   
@@ -262,12 +262,12 @@ void OBClient::getMwmHints()
 }
 
 
-void OBClient::getArea()
+void Client::getArea()
 {
   XWindowAttributes wattrib;
   Status ret;
   
-  ret = XGetWindowAttributes(otk::OBDisplay::display, _window, &wattrib);
+  ret = XGetWindowAttributes(otk::Display::display, _window, &wattrib);
   assert(ret != BadWindow);
 
   _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
@@ -275,9 +275,9 @@ void OBClient::getArea()
 }
 
 
-void OBClient::getState()
+void Client::getState()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
     _skip_taskbar = _skip_pager = false;
@@ -285,35 +285,35 @@ void OBClient::getState()
   unsigned long *state;
   unsigned long num = (unsigned) -1;
   
-  if (property->get(_window, otk::OBProperty::net_wm_state,
-                    otk::OBProperty::Atom_Atom, &num, &state)) {
+  if (property->get(_window, otk::Property::net_wm_state,
+                    otk::Property::Atom_Atom, &num, &state)) {
     for (unsigned long i = 0; i < num; ++i) {
-      if (state[i] == property->atom(otk::OBProperty::net_wm_state_modal))
+      if (state[i] == property->atom(otk::Property::net_wm_state_modal))
         _modal = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_shaded)) {
+               property->atom(otk::Property::net_wm_state_shaded)) {
         _shaded = true;
         _wmstate = IconicState;
       } else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_skip_taskbar))
+               property->atom(otk::Property::net_wm_state_skip_taskbar))
         _skip_taskbar = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_skip_pager))
+               property->atom(otk::Property::net_wm_state_skip_pager))
         _skip_pager = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_fullscreen))
+               property->atom(otk::Property::net_wm_state_fullscreen))
         _fullscreen = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_maximized_vert))
+               property->atom(otk::Property::net_wm_state_maximized_vert))
         _max_vert = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_maximized_horz))
+               property->atom(otk::Property::net_wm_state_maximized_horz))
         _max_horz = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_above))
+               property->atom(otk::Property::net_wm_state_above))
         _above = true;
       else if (state[i] ==
-               property->atom(otk::OBProperty::net_wm_state_below))
+               property->atom(otk::Property::net_wm_state_below))
         _below = true;
     }
 
@@ -322,18 +322,18 @@ void OBClient::getState()
 }
 
 
-void OBClient::getShaped()
+void Client::getShaped()
 {
   _shaped = false;
 #ifdef   SHAPE
-  if (otk::OBDisplay::shape()) {
+  if (otk::Display::shape()) {
     int foo;
     unsigned int ufoo;
     int s;
 
-    XShapeSelectInput(otk::OBDisplay::display, _window, ShapeNotifyMask);
+    XShapeSelectInput(otk::Display::display, _window, ShapeNotifyMask);
 
-    XShapeQueryExtents(otk::OBDisplay::display, _window, &s, &foo,
+    XShapeQueryExtents(otk::Display::display, _window, &s, &foo,
                        &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo, &ufoo);
     _shaped = (s != 0);
   }
@@ -341,7 +341,7 @@ void OBClient::getShaped()
 }
 
 
-void OBClient::calcLayer() {
+void Client::calcLayer() {
   StackLayer l;
 
   if (_iconic) l = Layer_Icon;
@@ -368,9 +368,9 @@ void OBClient::calcLayer() {
 }
 
 
-void OBClient::updateProtocols()
+void Client::updateProtocols()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   Atom *proto;
   int num_return = 0;
@@ -379,14 +379,14 @@ void OBClient::updateProtocols()
   _decorations &= ~Decor_Close;
   _functions &= ~Func_Close;
 
-  if (XGetWMProtocols(otk::OBDisplay::display, _window, &proto, &num_return)) {
+  if (XGetWMProtocols(otk::Display::display, _window, &proto, &num_return)) {
     for (int i = 0; i < num_return; ++i) {
-      if (proto[i] == property->atom(otk::OBProperty::wm_delete_window)) {
+      if (proto[i] == property->atom(otk::Property::wm_delete_window)) {
         _decorations |= Decor_Close;
         _functions |= Func_Close;
         if (frame)
           frame->adjustSize(); // update the decorations
-      } else if (proto[i] == property->atom(otk::OBProperty::wm_take_focus))
+      } else if (proto[i] == property->atom(otk::Property::wm_take_focus))
         // if this protocol is requested, then the window will be notified
         // by the window manager whenever it receives focus
         _focus_notify = true;
@@ -396,7 +396,7 @@ void OBClient::updateProtocols()
 }
 
 
-void OBClient::updateNormalHints()
+void Client::updateNormalHints()
 {
   XSizeHints size;
   long ret;
@@ -413,7 +413,7 @@ void OBClient::updateNormalHints()
   // point..
 
   // get the hints from the window
-  if (XGetWMNormalHints(otk::OBDisplay::display, _window, &size, &ret)) {
+  if (XGetWMNormalHints(otk::Display::display, _window, &size, &ret)) {
     _positioned = (size.flags & (PPosition|USPosition));
 
     if (size.flags & PWinGravity)
@@ -443,7 +443,7 @@ void OBClient::updateNormalHints()
 }
 
 
-void OBClient::updateWMHints()
+void Client::updateWMHints()
 {
   XWMHints *hints;
 
@@ -451,7 +451,7 @@ void OBClient::updateWMHints()
   _can_focus = true;
   _urgent = false;
   
-  if ((hints = XGetWMHints(otk::OBDisplay::display, _window)) != NULL) {
+  if ((hints = XGetWMHints(otk::Display::display, _window)) != NULL) {
     if (hints->flags & InputHint)
       _can_focus = hints->input;
 
@@ -472,18 +472,18 @@ void OBClient::updateWMHints()
 }
 
 
-void OBClient::updateTitle()
+void Client::updateTitle()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   _title = "";
   
   // try netwm
-  if (! property->get(_window, otk::OBProperty::net_wm_name,
-                      otk::OBProperty::utf8, &_title)) {
+  if (! property->get(_window, otk::Property::net_wm_name,
+                      otk::Property::utf8, &_title)) {
     // try old x stuff
-    property->get(_window, otk::OBProperty::wm_name,
-                  otk::OBProperty::ascii, &_title);
+    property->get(_window, otk::Property::wm_name,
+                  otk::Property::ascii, &_title);
   }
 
   if (_title.empty())
@@ -494,18 +494,18 @@ void OBClient::updateTitle()
 }
 
 
-void OBClient::updateIconTitle()
+void Client::updateIconTitle()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   _icon_title = "";
   
   // try netwm
-  if (! property->get(_window, otk::OBProperty::net_wm_icon_name,
-                      otk::OBProperty::utf8, &_icon_title)) {
+  if (! property->get(_window, otk::Property::net_wm_icon_name,
+                      otk::Property::utf8, &_icon_title)) {
     // try old x stuff
-    property->get(_window, otk::OBProperty::wm_icon_name,
-                  otk::OBProperty::ascii, &_icon_title);
+    property->get(_window, otk::Property::wm_icon_name,
+                  otk::Property::ascii, &_icon_title);
   }
 
   if (_title.empty())
@@ -513,38 +513,38 @@ void OBClient::updateIconTitle()
 }
 
 
-void OBClient::updateClass()
+void Client::updateClass()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   // set the defaults
   _app_name = _app_class = _role = "";
 
-  otk::OBProperty::StringVect v;
+  otk::Property::StringVect v;
   unsigned long num = 2;
 
-  if (property->get(_window, otk::OBProperty::wm_class,
-                    otk::OBProperty::ascii, &num, &v)) {
+  if (property->get(_window, otk::Property::wm_class,
+                    otk::Property::ascii, &num, &v)) {
     if (num > 0) _app_name = v[0];
     if (num > 1) _app_class = v[1];
   }
 
   v.clear();
   num = 1;
-  if (property->get(_window, otk::OBProperty::wm_window_role,
-                    otk::OBProperty::ascii, &num, &v)) {
+  if (property->get(_window, otk::Property::wm_window_role,
+                    otk::Property::ascii, &num, &v)) {
     if (num > 0) _role = v[0];
   }
 }
 
 
-void OBClient::updateStrut()
+void Client::updateStrut()
 {
   unsigned long num = 4;
   unsigned long *data;
   if (!Openbox::instance->property()->get(_window,
-                                          otk::OBProperty::net_wm_strut,
-                                          otk::OBProperty::Atom_Cardinal,
+                                          otk::Property::net_wm_strut,
+                                          otk::Property::Atom_Cardinal,
                                           &num, &data))
     return;
 
@@ -561,12 +561,12 @@ void OBClient::updateStrut()
 }
 
 
-void OBClient::updateTransientFor()
+void Client::updateTransientFor()
 {
   Window t = 0;
-  OBClient *c = 0;
+  Client *c = 0;
 
-  if (XGetTransientForHint(otk::OBDisplay::display, _window, &t) &&
+  if (XGetTransientForHint(otk::Display::display, _window, &t) &&
       t != _window) { // cant be transient to itself!
     c = Openbox::instance->findClient(t);
     assert(c != this); // if this happens then we need to check for it
@@ -575,7 +575,7 @@ void OBClient::updateTransientFor()
       // not transient to a client, see if it is transient for a group
       if (//t == _group->leader() ||
         t == None ||
-        t == otk::OBDisplay::screenInfo(_screen)->rootWindow()) {
+        t == otk::Display::screenInfo(_screen)->rootWindow()) {
         // window is a transient for its group!
         // XXX: for now this is treated as non-transient.
         //      this needs to be fixed!
@@ -596,19 +596,19 @@ void OBClient::updateTransientFor()
 }
 
 
-void OBClient::propertyHandler(const XPropertyEvent &e)
+void Client::propertyHandler(const XPropertyEvent &e)
 {
-  otk::OtkEventHandler::propertyHandler(e);
+  otk::EventHandler::propertyHandler(e);
   
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   // compress changes to a single property into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+  while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
     // XXX: it would be nice to compress ALL changes to a property, not just
     //      changes in a row without other props between.
     if (ce.xproperty.atom != e.atom) {
-      XPutBackEvent(otk::OBDisplay::display, &ce);
+      XPutBackEvent(otk::Display::display, &ce);
       break;
     }
   }
@@ -624,22 +624,22 @@ void OBClient::propertyHandler(const XPropertyEvent &e)
     setupDecorAndFunctions();
     frame->adjustSize(); // this updates the frame for any new decor settings
   }
-  else if (e.atom == property->atom(otk::OBProperty::net_wm_name) ||
-           e.atom == property->atom(otk::OBProperty::wm_name))
+  else if (e.atom == property->atom(otk::Property::net_wm_name) ||
+           e.atom == property->atom(otk::Property::wm_name))
     updateTitle();
-  else if (e.atom == property->atom(otk::OBProperty::net_wm_icon_name) ||
-           e.atom == property->atom(otk::OBProperty::wm_icon_name))
+  else if (e.atom == property->atom(otk::Property::net_wm_icon_name) ||
+           e.atom == property->atom(otk::Property::wm_icon_name))
     updateIconTitle();
-  else if (e.atom == property->atom(otk::OBProperty::wm_class))
+  else if (e.atom == property->atom(otk::Property::wm_class))
     updateClass();
-  else if (e.atom == property->atom(otk::OBProperty::wm_protocols))
+  else if (e.atom == property->atom(otk::Property::wm_protocols))
     updateProtocols();
-  else if (e.atom == property->atom(otk::OBProperty::net_wm_strut))
+  else if (e.atom == property->atom(otk::Property::net_wm_strut))
     updateStrut();
 }
 
 
-void OBClient::setWMState(long state)
+void Client::setWMState(long state)
 {
   if (state == _wmstate) return; // no change
   
@@ -655,7 +655,7 @@ void OBClient::setWMState(long state)
 }
 
 
-void OBClient::setDesktop(long target)
+void Client::setDesktop(long target)
 {
   if (target == _desktop) return;
   
@@ -666,8 +666,8 @@ void OBClient::setDesktop(long target)
   _desktop = target;
 
   Openbox::instance->property()->set(_window,
-                                     otk::OBProperty::net_wm_desktop,
-                                     otk::OBProperty::Atom_Cardinal,
+                                     otk::Property::net_wm_desktop,
+                                     otk::Property::Atom_Cardinal,
                                      (unsigned)_desktop);
   
   // 'move' the window to the new desktop
@@ -679,9 +679,9 @@ void OBClient::setDesktop(long target)
 }
 
 
-void OBClient::setState(StateAction action, long data1, long data2)
+void Client::setState(StateAction action, long data1, long data2)
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
   bool shadestate = _shaded;
 
   if (!(action == State_Add || action == State_Remove ||
@@ -695,106 +695,106 @@ void OBClient::setState(StateAction action, long data1, long data2)
 
     // if toggling, then pick whether we're adding or removing
     if (action == State_Toggle) {
-      if (state == property->atom(otk::OBProperty::net_wm_state_modal))
+      if (state == property->atom(otk::Property::net_wm_state_modal))
         action = _modal ? State_Remove : State_Add;
       else if (state ==
-               property->atom(otk::OBProperty::net_wm_state_maximized_vert))
+               property->atom(otk::Property::net_wm_state_maximized_vert))
         action = _max_vert ? State_Remove : State_Add;
       else if (state ==
-               property->atom(otk::OBProperty::net_wm_state_maximized_horz))
+               property->atom(otk::Property::net_wm_state_maximized_horz))
         action = _max_horz ? State_Remove : State_Add;
-      else if (state == property->atom(otk::OBProperty::net_wm_state_shaded))
+      else if (state == property->atom(otk::Property::net_wm_state_shaded))
         action = _shaded ? State_Remove : State_Add;
       else if (state ==
-               property->atom(otk::OBProperty::net_wm_state_skip_taskbar))
+               property->atom(otk::Property::net_wm_state_skip_taskbar))
         action = _skip_taskbar ? State_Remove : State_Add;
       else if (state ==
-               property->atom(otk::OBProperty::net_wm_state_skip_pager))
+               property->atom(otk::Property::net_wm_state_skip_pager))
         action = _skip_pager ? State_Remove : State_Add;
       else if (state ==
-               property->atom(otk::OBProperty::net_wm_state_fullscreen))
+               property->atom(otk::Property::net_wm_state_fullscreen))
         action = _fullscreen ? State_Remove : State_Add;
-      else if (state == property->atom(otk::OBProperty::net_wm_state_above))
+      else if (state == property->atom(otk::Property::net_wm_state_above))
         action = _above ? State_Remove : State_Add;
-      else if (state == property->atom(otk::OBProperty::net_wm_state_below))
+      else if (state == property->atom(otk::Property::net_wm_state_below))
         action = _below ? State_Remove : State_Add;
     }
     
     if (action == State_Add) {
-      if (state == property->atom(otk::OBProperty::net_wm_state_modal)) {
+      if (state == property->atom(otk::Property::net_wm_state_modal)) {
         if (_modal) continue;
         _modal = true;
         // XXX: give it focus if another window has focus that shouldnt now
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_maximized_vert)){
+                 property->atom(otk::Property::net_wm_state_maximized_vert)){
         if (_max_vert) continue;
         _max_vert = true;
         // XXX: resize the window etc
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_maximized_horz)){
+                 property->atom(otk::Property::net_wm_state_maximized_horz)){
         if (_max_horz) continue;
         _max_horz = true;
         // XXX: resize the window etc
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_shaded)) {
+                 property->atom(otk::Property::net_wm_state_shaded)) {
         if (_shaded) continue;
         // shade when we're all thru here
         shadestate = true;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
+                 property->atom(otk::Property::net_wm_state_skip_taskbar)) {
         _skip_taskbar = true;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_skip_pager)) {
+                 property->atom(otk::Property::net_wm_state_skip_pager)) {
         _skip_pager = true;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
+                 property->atom(otk::Property::net_wm_state_fullscreen)) {
         if (_fullscreen) continue;
         _fullscreen = true;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_above)) {
+                 property->atom(otk::Property::net_wm_state_above)) {
         if (_above) continue;
         _above = true;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_below)) {
+                 property->atom(otk::Property::net_wm_state_below)) {
         if (_below) continue;
         _below = true;
       }
 
     } else { // action == State_Remove
-      if (state == property->atom(otk::OBProperty::net_wm_state_modal)) {
+      if (state == property->atom(otk::Property::net_wm_state_modal)) {
         if (!_modal) continue;
         _modal = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_maximized_vert)){
+                 property->atom(otk::Property::net_wm_state_maximized_vert)){
         if (!_max_vert) continue;
         _max_vert = false;
         // XXX: resize the window etc
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_maximized_horz)){
+                 property->atom(otk::Property::net_wm_state_maximized_horz)){
         if (!_max_horz) continue;
         _max_horz = false;
         // XXX: resize the window etc
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_shaded)) {
+                 property->atom(otk::Property::net_wm_state_shaded)) {
         if (!_shaded) continue;
         // unshade when we're all thru here
         shadestate = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
+                 property->atom(otk::Property::net_wm_state_skip_taskbar)) {
         _skip_taskbar = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_skip_pager)) {
+                 property->atom(otk::Property::net_wm_state_skip_pager)) {
         _skip_pager = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
+                 property->atom(otk::Property::net_wm_state_fullscreen)) {
         if (!_fullscreen) continue;
         _fullscreen = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_above)) {
+                 property->atom(otk::Property::net_wm_state_above)) {
         if (!_above) continue;
         _above = false;
       } else if (state ==
-                 property->atom(otk::OBProperty::net_wm_state_below)) {
+                 property->atom(otk::Property::net_wm_state_below)) {
         if (!_below) continue;
         _below = false;
       }
@@ -806,7 +806,7 @@ void OBClient::setState(StateAction action, long data1, long data2)
 }
 
 
-void OBClient::toggleClientBorder(bool addborder)
+void Client::toggleClientBorder(bool addborder)
 {
   // adjust our idea of where the client is, based on its border. When the
   // border is removed, the client should now be considered to be in a
@@ -844,32 +844,32 @@ void OBClient::toggleClientBorder(bool addborder)
   _area.setPos(x, y);
 
   if (addborder) {
-    XSetWindowBorderWidth(otk::OBDisplay::display, _window, _border_width);
+    XSetWindowBorderWidth(otk::Display::display, _window, _border_width);
 
     // move the client so it is back it the right spot _with_ its border!
-    XMoveWindow(otk::OBDisplay::display, _window, x, y);
+    XMoveWindow(otk::Display::display, _window, x, y);
   } else
-    XSetWindowBorderWidth(otk::OBDisplay::display, _window, 0);
+    XSetWindowBorderWidth(otk::Display::display, _window, 0);
 }
 
 
-void OBClient::clientMessageHandler(const XClientMessageEvent &e)
+void Client::clientMessageHandler(const XClientMessageEvent &e)
 {
-  otk::OtkEventHandler::clientMessageHandler(e);
+  otk::EventHandler::clientMessageHandler(e);
   
   if (e.format != 32) return;
 
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
   
-  if (e.message_type == property->atom(otk::OBProperty::wm_change_state)) {
+  if (e.message_type == property->atom(otk::Property::wm_change_state)) {
     // compress changes into a single change
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+    while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
       // XXX: it would be nice to compress ALL messages of a type, not just
       //      messages in a row without other message types between.
       if (ce.xclient.message_type != e.message_type) {
-        XPutBackEvent(otk::OBDisplay::display, &ce);
+        XPutBackEvent(otk::Display::display, &ce);
         break;
       }
       compress = true;
@@ -879,15 +879,15 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
     else
       setWMState(e.data.l[0]); // use the original event
   } else if (e.message_type ==
-             property->atom(otk::OBProperty::net_wm_desktop)) {
+             property->atom(otk::Property::net_wm_desktop)) {
     // compress changes into a single change 
     bool compress = false;
     XEvent ce;
-    while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+    while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
       // XXX: it would be nice to compress ALL messages of a type, not just
       //      messages in a row without other message types between.
       if (ce.xclient.message_type != e.message_type) {
-        XPutBackEvent(otk::OBDisplay::display, &ce);
+        XPutBackEvent(otk::Display::display, &ce);
         break;
       }
       compress = true;
@@ -896,7 +896,7 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
       setDesktop(e.data.l[0]); // use the found event
     else
       setDesktop(e.data.l[0]); // use the original event
-  } else if (e.message_type == property->atom(otk::OBProperty::net_wm_state)) {
+  } else if (e.message_type == property->atom(otk::Property::net_wm_state)) {
     // can't compress these
 #ifdef DEBUG
     printf("net_wm_state %s %ld %ld for 0x%lx\n",
@@ -906,13 +906,13 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 #endif
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
   } else if (e.message_type ==
-             property->atom(otk::OBProperty::net_close_window)) {
+             property->atom(otk::Property::net_close_window)) {
 #ifdef DEBUG
     printf("net_close_window for 0x%lx\n", _window);
 #endif
     close();
   } else if (e.message_type ==
-             property->atom(otk::OBProperty::net_active_window)) {
+             property->atom(otk::Property::net_active_window)) {
 #ifdef DEBUG
     printf("net_active_window for 0x%lx\n", _window);
 #endif
@@ -926,9 +926,9 @@ void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 
 
 #if defined(SHAPE)
-void OBClient::shapeHandler(const XShapeEvent &e)
+void Client::shapeHandler(const XShapeEvent &e)
 {
-  otk::OtkEventHandler::shapeHandler(e);
+  otk::EventHandler::shapeHandler(e);
 
   if (e.kind == ShapeBounding) {
     _shaped = e.shaped;
@@ -938,7 +938,7 @@ void OBClient::shapeHandler(const XShapeEvent &e)
 #endif
 
 
-void OBClient::resize(Corner anchor, int w, int h, int x, int y)
+void Client::resize(Corner anchor, int w, int h, int x, int y)
 {
   w -= _base_size.x(); 
   h -= _base_size.y();
@@ -992,7 +992,7 @@ void OBClient::resize(Corner anchor, int w, int h, int x, int y)
 
   _area.setSize(w, h);
 
-  XResizeWindow(otk::OBDisplay::display, _window, w, h);
+  XResizeWindow(otk::Display::display, _window, w, h);
 
   // resize the frame to match the request
   frame->adjustSize();
@@ -1000,7 +1000,7 @@ void OBClient::resize(Corner anchor, int w, int h, int x, int y)
 }
 
 
-void OBClient::move(int x, int y)
+void Client::move(int x, int y)
 {
   _area.setPos(x, y);
 
@@ -1012,7 +1012,7 @@ void OBClient::move(int x, int y)
     // yet)
     XEvent event;
     event.type = ConfigureNotify;
-    event.xconfigure.display = otk::OBDisplay::display;
+    event.xconfigure.display = otk::Display::display;
     event.xconfigure.event = _window;
     event.xconfigure.window = _window;
     event.xconfigure.x = x;
@@ -1028,10 +1028,10 @@ void OBClient::move(int x, int y)
 }
 
 
-void OBClient::close()
+void Client::close()
 {
   XEvent ce;
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   if (!(_functions & Func_Close)) return;
 
@@ -1042,62 +1042,62 @@ void OBClient::close()
   // explicitly killed.
 
   ce.xclient.type = ClientMessage;
-  ce.xclient.message_type =  property->atom(otk::OBProperty::wm_protocols);
-  ce.xclient.display = otk::OBDisplay::display;
+  ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
+  ce.xclient.display = otk::Display::display;
   ce.xclient.window = _window;
   ce.xclient.format = 32;
-  ce.xclient.data.l[0] = property->atom(otk::OBProperty::wm_delete_window);
+  ce.xclient.data.l[0] = property->atom(otk::Property::wm_delete_window);
   ce.xclient.data.l[1] = CurrentTime;
   ce.xclient.data.l[2] = 0l;
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
-  XSendEvent(otk::OBDisplay::display, _window, false, NoEventMask, &ce);
+  XSendEvent(otk::Display::display, _window, false, NoEventMask, &ce);
 }
 
 
-void OBClient::changeState()
+void Client::changeState()
 {
-  const otk::OBProperty *property = Openbox::instance->property();
+  const otk::Property *property = Openbox::instance->property();
 
   unsigned long state[2];
   state[0] = _wmstate;
   state[1] = None;
-  property->set(_window, otk::OBProperty::wm_state, otk::OBProperty::wm_state,
+  property->set(_window, otk::Property::wm_state, otk::Property::wm_state,
                 state, 2);
   
   Atom netstate[10];
   int num = 0;
   if (_modal)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_modal);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_modal);
   if (_shaded)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_shaded);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_shaded);
   if (_iconic)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_hidden);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_hidden);
   if (_skip_taskbar)
     netstate[num++] =
-      property->atom(otk::OBProperty::net_wm_state_skip_taskbar);
+      property->atom(otk::Property::net_wm_state_skip_taskbar);
   if (_skip_pager)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_skip_pager);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_skip_pager);
   if (_fullscreen)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_fullscreen);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_fullscreen);
   if (_max_vert)
     netstate[num++] =
-      property->atom(otk::OBProperty::net_wm_state_maximized_vert);
+      property->atom(otk::Property::net_wm_state_maximized_vert);
   if (_max_horz)
     netstate[num++] =
-      property->atom(otk::OBProperty::net_wm_state_maximized_horz);
+      property->atom(otk::Property::net_wm_state_maximized_horz);
   if (_above)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_above);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_above);
   if (_below)
-    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_below);
-  property->set(_window, otk::OBProperty::net_wm_state,
-                otk::OBProperty::Atom_Atom, netstate, num);
+    netstate[num++] = property->atom(otk::Property::net_wm_state_below);
+  property->set(_window, otk::Property::net_wm_state,
+                otk::Property::Atom_Atom, netstate, num);
 
   calcLayer();
 }
 
 
-void OBClient::shade(bool shade)
+void Client::shade(bool shade)
 {
   if (shade == _shaded) return; // already done
 
@@ -1108,7 +1108,7 @@ void OBClient::shade(bool shade)
 }
 
 
-bool OBClient::focus() const
+bool Client::focus() const
 {
   // won't try focus if the client doesn't want it, or if the window isn't
   // visible on the screen
@@ -1117,31 +1117,31 @@ bool OBClient::focus() const
   if (_focused) return true;
 
   if (_can_focus)
-    XSetInputFocus(otk::OBDisplay::display, _window,
+    XSetInputFocus(otk::Display::display, _window,
                    RevertToNone, CurrentTime);
 
   if (_focus_notify) {
     XEvent ce;
-    const otk::OBProperty *property = Openbox::instance->property();
+    const otk::Property *property = Openbox::instance->property();
     
     ce.xclient.type = ClientMessage;
-    ce.xclient.message_type =  property->atom(otk::OBProperty::wm_protocols);
-    ce.xclient.display = otk::OBDisplay::display;
+    ce.xclient.message_type =  property->atom(otk::Property::wm_protocols);
+    ce.xclient.display = otk::Display::display;
     ce.xclient.window = _window;
     ce.xclient.format = 32;
-    ce.xclient.data.l[0] = property->atom(otk::OBProperty::wm_take_focus);
+    ce.xclient.data.l[0] = property->atom(otk::Property::wm_take_focus);
     ce.xclient.data.l[1] = Openbox::instance->lastTime();
     ce.xclient.data.l[2] = 0l;
     ce.xclient.data.l[3] = 0l;
     ce.xclient.data.l[4] = 0l;
-    XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+    XSendEvent(otk::Display::display, _window, False, NoEventMask, &ce);
   }
 
   return true;
 }
 
 
-void OBClient::unfocus() const
+void Client::unfocus() const
 {
   if (!_focused) return;
 
@@ -1150,13 +1150,13 @@ void OBClient::unfocus() const
 }
 
 
-void OBClient::focusHandler(const XFocusChangeEvent &e)
+void Client::focusHandler(const XFocusChangeEvent &e)
 {
 #ifdef    DEBUG
 //  printf("FocusIn for 0x%lx\n", e.window);
 #endif // DEBUG
   
-  OtkEventHandler::focusHandler(e);
+  otk::EventHandler::focusHandler(e);
 
   frame->focus();
   _focused = true;
@@ -1165,13 +1165,13 @@ void OBClient::focusHandler(const XFocusChangeEvent &e)
 }
 
 
-void OBClient::unfocusHandler(const XFocusChangeEvent &e)
+void Client::unfocusHandler(const XFocusChangeEvent &e)
 {
 #ifdef    DEBUG
 //  printf("FocusOut for 0x%lx\n", e.window);
 #endif // DEBUG
   
-  OtkEventHandler::unfocusHandler(e);
+  otk::EventHandler::unfocusHandler(e);
 
   frame->unfocus();
   _focused = false;
@@ -1181,13 +1181,13 @@ void OBClient::unfocusHandler(const XFocusChangeEvent &e)
 }
 
 
-void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
+void Client::configureRequestHandler(const XConfigureRequestEvent &e)
 {
 #ifdef    DEBUG
   printf("ConfigureRequest for 0x%lx\n", e.window);
 #endif // DEBUG
   
-  OtkEventHandler::configureRequestHandler(e);
+  otk::EventHandler::configureRequestHandler(e);
 
   // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event
 
@@ -1246,7 +1246,7 @@ void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 }
 
 
-void OBClient::unmapHandler(const XUnmapEvent &e)
+void Client::unmapHandler(const XUnmapEvent &e)
 {
   if (ignore_unmaps) {
 #ifdef    DEBUG
@@ -1260,27 +1260,27 @@ void OBClient::unmapHandler(const XUnmapEvent &e)
   printf("UnmapNotify for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  OtkEventHandler::unmapHandler(e);
+  otk::EventHandler::unmapHandler(e);
 
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);
 }
 
 
-void OBClient::destroyHandler(const XDestroyWindowEvent &e)
+void Client::destroyHandler(const XDestroyWindowEvent &e)
 {
 #ifdef    DEBUG
   printf("DestroyNotify for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  OtkEventHandler::destroyHandler(e);
+  otk::EventHandler::destroyHandler(e);
 
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);
 }
 
 
-void OBClient::reparentHandler(const XReparentEvent &e)
+void Client::reparentHandler(const XReparentEvent &e)
 {
   // this is when the client is first taken captive in the frame
   if (e.parent == frame->plate()) return;
@@ -1289,7 +1289,7 @@ void OBClient::reparentHandler(const XReparentEvent &e)
   printf("ReparentNotify for 0x%lx\n", e.window);
 #endif // DEBUG
 
-  OtkEventHandler::reparentHandler(e);
+  otk::EventHandler::reparentHandler(e);
 
   /*
     This event is quite rare and is usually handled in unmapHandler.
@@ -1302,7 +1302,7 @@ void OBClient::reparentHandler(const XReparentEvent &e)
   // server to deal with after we unmanage the window
   XEvent ev;
   ev.xreparent = e;
-  XPutBackEvent(otk::OBDisplay::display, &ev);
+  XPutBackEvent(otk::Display::display, &ev);
   
   // this deletes us etc
   Openbox::instance->screen(_screen)->unmanageWindow(this);

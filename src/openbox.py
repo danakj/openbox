@@ -29,94 +29,94 @@ except AttributeError:
 
 Openbox_instance = _openbox.Openbox_instance
 
-OBDisplay_display = _openbox.OBDisplay_display
+Display_display = _openbox.Display_display
 
-class OBDisplay(_object):
+class Display(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OBDisplay, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Display, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, OBDisplay, name)
-    __swig_getmethods__["initialize"] = lambda x: _openbox.OBDisplay_initialize
-    if _newclass:initialize = staticmethod(_openbox.OBDisplay_initialize)
-    __swig_getmethods__["destroy"] = lambda x: _openbox.OBDisplay_destroy
-    if _newclass:destroy = staticmethod(_openbox.OBDisplay_destroy)
-    __swig_getmethods__["gcCache"] = lambda x: _openbox.OBDisplay_gcCache
-    if _newclass:gcCache = staticmethod(_openbox.OBDisplay_gcCache)
-    __swig_getmethods__["screenInfo"] = lambda x: _openbox.OBDisplay_screenInfo
-    if _newclass:screenInfo = staticmethod(_openbox.OBDisplay_screenInfo)
-    __swig_getmethods__["findScreen"] = lambda x: _openbox.OBDisplay_findScreen
-    if _newclass:findScreen = staticmethod(_openbox.OBDisplay_findScreen)
-    __swig_getmethods__["xkb"] = lambda x: _openbox.OBDisplay_xkb
-    if _newclass:xkb = staticmethod(_openbox.OBDisplay_xkb)
-    __swig_getmethods__["xkbEventBase"] = lambda x: _openbox.OBDisplay_xkbEventBase
-    if _newclass:xkbEventBase = staticmethod(_openbox.OBDisplay_xkbEventBase)
-    __swig_getmethods__["shape"] = lambda x: _openbox.OBDisplay_shape
-    if _newclass:shape = staticmethod(_openbox.OBDisplay_shape)
-    __swig_getmethods__["shapeEventBase"] = lambda x: _openbox.OBDisplay_shapeEventBase
-    if _newclass:shapeEventBase = staticmethod(_openbox.OBDisplay_shapeEventBase)
-    __swig_getmethods__["xinerama"] = lambda x: _openbox.OBDisplay_xinerama
-    if _newclass:xinerama = staticmethod(_openbox.OBDisplay_xinerama)
-    __swig_getmethods__["numLockMask"] = lambda x: _openbox.OBDisplay_numLockMask
-    if _newclass:numLockMask = staticmethod(_openbox.OBDisplay_numLockMask)
-    __swig_getmethods__["scrollLockMask"] = lambda x: _openbox.OBDisplay_scrollLockMask
-    if _newclass:scrollLockMask = staticmethod(_openbox.OBDisplay_scrollLockMask)
-    __swig_getmethods__["grab"] = lambda x: _openbox.OBDisplay_grab
-    if _newclass:grab = staticmethod(_openbox.OBDisplay_grab)
-    __swig_getmethods__["ungrab"] = lambda x: _openbox.OBDisplay_ungrab
-    if _newclass:ungrab = staticmethod(_openbox.OBDisplay_ungrab)
-    __swig_getmethods__["grabButton"] = lambda x: _openbox.OBDisplay_grabButton
-    if _newclass:grabButton = staticmethod(_openbox.OBDisplay_grabButton)
-    __swig_getmethods__["ungrabButton"] = lambda x: _openbox.OBDisplay_ungrabButton
-    if _newclass:ungrabButton = staticmethod(_openbox.OBDisplay_ungrabButton)
-    __swig_getmethods__["grabKey"] = lambda x: _openbox.OBDisplay_grabKey
-    if _newclass:grabKey = staticmethod(_openbox.OBDisplay_grabKey)
-    __swig_getmethods__["ungrabKey"] = lambda x: _openbox.OBDisplay_ungrabKey
-    if _newclass:ungrabKey = staticmethod(_openbox.OBDisplay_ungrabKey)
+    __getattr__ = lambda self, name: _swig_getattr(self, Display, name)
+    __swig_getmethods__["initialize"] = lambda x: _openbox.Display_initialize
+    if _newclass:initialize = staticmethod(_openbox.Display_initialize)
+    __swig_getmethods__["destroy"] = lambda x: _openbox.Display_destroy
+    if _newclass:destroy = staticmethod(_openbox.Display_destroy)
+    __swig_getmethods__["gcCache"] = lambda x: _openbox.Display_gcCache
+    if _newclass:gcCache = staticmethod(_openbox.Display_gcCache)
+    __swig_getmethods__["screenInfo"] = lambda x: _openbox.Display_screenInfo
+    if _newclass:screenInfo = staticmethod(_openbox.Display_screenInfo)
+    __swig_getmethods__["findScreen"] = lambda x: _openbox.Display_findScreen
+    if _newclass:findScreen = staticmethod(_openbox.Display_findScreen)
+    __swig_getmethods__["xkb"] = lambda x: _openbox.Display_xkb
+    if _newclass:xkb = staticmethod(_openbox.Display_xkb)
+    __swig_getmethods__["xkbEventBase"] = lambda x: _openbox.Display_xkbEventBase
+    if _newclass:xkbEventBase = staticmethod(_openbox.Display_xkbEventBase)
+    __swig_getmethods__["shape"] = lambda x: _openbox.Display_shape
+    if _newclass:shape = staticmethod(_openbox.Display_shape)
+    __swig_getmethods__["shapeEventBase"] = lambda x: _openbox.Display_shapeEventBase
+    if _newclass:shapeEventBase = staticmethod(_openbox.Display_shapeEventBase)
+    __swig_getmethods__["xinerama"] = lambda x: _openbox.Display_xinerama
+    if _newclass:xinerama = staticmethod(_openbox.Display_xinerama)
+    __swig_getmethods__["numLockMask"] = lambda x: _openbox.Display_numLockMask
+    if _newclass:numLockMask = staticmethod(_openbox.Display_numLockMask)
+    __swig_getmethods__["scrollLockMask"] = lambda x: _openbox.Display_scrollLockMask
+    if _newclass:scrollLockMask = staticmethod(_openbox.Display_scrollLockMask)
+    __swig_getmethods__["grab"] = lambda x: _openbox.Display_grab
+    if _newclass:grab = staticmethod(_openbox.Display_grab)
+    __swig_getmethods__["ungrab"] = lambda x: _openbox.Display_ungrab
+    if _newclass:ungrab = staticmethod(_openbox.Display_ungrab)
+    __swig_getmethods__["grabButton"] = lambda x: _openbox.Display_grabButton
+    if _newclass:grabButton = staticmethod(_openbox.Display_grabButton)
+    __swig_getmethods__["ungrabButton"] = lambda x: _openbox.Display_ungrabButton
+    if _newclass:ungrabButton = staticmethod(_openbox.Display_ungrabButton)
+    __swig_getmethods__["grabKey"] = lambda x: _openbox.Display_grabKey
+    if _newclass:grabKey = staticmethod(_openbox.Display_grabKey)
+    __swig_getmethods__["ungrabKey"] = lambda x: _openbox.Display_ungrabKey
+    if _newclass:ungrabKey = staticmethod(_openbox.Display_ungrabKey)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
-        return "<C OBDisplay instance at %s>" % (self.this,)
+        return "<C Display instance at %s>" % (self.this,)
 
-class OBDisplayPtr(OBDisplay):
+class DisplayPtr(Display):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OBDisplay
-_openbox.OBDisplay_swigregister(OBDisplayPtr)
-OBDisplay_initialize = _openbox.OBDisplay_initialize
+        self.__class__ = Display
+_openbox.Display_swigregister(DisplayPtr)
+Display_initialize = _openbox.Display_initialize
 
-OBDisplay_destroy = _openbox.OBDisplay_destroy
+Display_destroy = _openbox.Display_destroy
 
-OBDisplay_gcCache = _openbox.OBDisplay_gcCache
+Display_gcCache = _openbox.Display_gcCache
 
-OBDisplay_screenInfo = _openbox.OBDisplay_screenInfo
+Display_screenInfo = _openbox.Display_screenInfo
 
-OBDisplay_findScreen = _openbox.OBDisplay_findScreen
+Display_findScreen = _openbox.Display_findScreen
 
-OBDisplay_xkb = _openbox.OBDisplay_xkb
+Display_xkb = _openbox.Display_xkb
 
-OBDisplay_xkbEventBase = _openbox.OBDisplay_xkbEventBase
+Display_xkbEventBase = _openbox.Display_xkbEventBase
 
-OBDisplay_shape = _openbox.OBDisplay_shape
+Display_shape = _openbox.Display_shape
 
-OBDisplay_shapeEventBase = _openbox.OBDisplay_shapeEventBase
+Display_shapeEventBase = _openbox.Display_shapeEventBase
 
-OBDisplay_xinerama = _openbox.OBDisplay_xinerama
+Display_xinerama = _openbox.Display_xinerama
 
-OBDisplay_numLockMask = _openbox.OBDisplay_numLockMask
+Display_numLockMask = _openbox.Display_numLockMask
 
-OBDisplay_scrollLockMask = _openbox.OBDisplay_scrollLockMask
+Display_scrollLockMask = _openbox.Display_scrollLockMask
 
-OBDisplay_grab = _openbox.OBDisplay_grab
+Display_grab = _openbox.Display_grab
 
-OBDisplay_ungrab = _openbox.OBDisplay_ungrab
+Display_ungrab = _openbox.Display_ungrab
 
-OBDisplay_grabButton = _openbox.OBDisplay_grabButton
+Display_grabButton = _openbox.Display_grabButton
 
-OBDisplay_ungrabButton = _openbox.OBDisplay_ungrabButton
+Display_ungrabButton = _openbox.Display_ungrabButton
 
-OBDisplay_grabKey = _openbox.OBDisplay_grabKey
+Display_grabKey = _openbox.Display_grabKey
 
-OBDisplay_ungrabKey = _openbox.OBDisplay_ungrabKey
+Display_ungrabKey = _openbox.Display_ungrabKey
 
 
 class Point(_object):
@@ -142,126 +142,126 @@ class PointPtr(Point):
         self.__class__ = Point
 _openbox.Point_swigregister(PointPtr)
 
-class OBProperty(_object):
+class Property(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OBProperty, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Property, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, OBProperty, name)
-    Atom_Cardinal = _openbox.OBProperty_Atom_Cardinal
-    Atom_Window = _openbox.OBProperty_Atom_Window
-    Atom_Pixmap = _openbox.OBProperty_Atom_Pixmap
-    Atom_Atom = _openbox.OBProperty_Atom_Atom
-    Atom_String = _openbox.OBProperty_Atom_String
-    Atom_Utf8 = _openbox.OBProperty_Atom_Utf8
-    openbox_pid = _openbox.OBProperty_openbox_pid
-    wm_colormap_windows = _openbox.OBProperty_wm_colormap_windows
-    wm_protocols = _openbox.OBProperty_wm_protocols
-    wm_state = _openbox.OBProperty_wm_state
-    wm_delete_window = _openbox.OBProperty_wm_delete_window
-    wm_take_focus = _openbox.OBProperty_wm_take_focus
-    wm_change_state = _openbox.OBProperty_wm_change_state
-    wm_name = _openbox.OBProperty_wm_name
-    wm_icon_name = _openbox.OBProperty_wm_icon_name
-    wm_class = _openbox.OBProperty_wm_class
-    wm_window_role = _openbox.OBProperty_wm_window_role
-    motif_wm_hints = _openbox.OBProperty_motif_wm_hints
-    blackbox_attributes = _openbox.OBProperty_blackbox_attributes
-    blackbox_change_attributes = _openbox.OBProperty_blackbox_change_attributes
-    blackbox_hints = _openbox.OBProperty_blackbox_hints
-    blackbox_structure_messages = _openbox.OBProperty_blackbox_structure_messages
-    blackbox_notify_startup = _openbox.OBProperty_blackbox_notify_startup
-    blackbox_notify_window_add = _openbox.OBProperty_blackbox_notify_window_add
-    blackbox_notify_window_del = _openbox.OBProperty_blackbox_notify_window_del
-    blackbox_notify_window_focus = _openbox.OBProperty_blackbox_notify_window_focus
-    blackbox_notify_current_workspace = _openbox.OBProperty_blackbox_notify_current_workspace
-    blackbox_notify_workspace_count = _openbox.OBProperty_blackbox_notify_workspace_count
-    blackbox_notify_window_raise = _openbox.OBProperty_blackbox_notify_window_raise
-    blackbox_notify_window_lower = _openbox.OBProperty_blackbox_notify_window_lower
-    blackbox_change_workspace = _openbox.OBProperty_blackbox_change_workspace
-    blackbox_change_window_focus = _openbox.OBProperty_blackbox_change_window_focus
-    blackbox_cycle_window_focus = _openbox.OBProperty_blackbox_cycle_window_focus
-    openbox_show_root_menu = _openbox.OBProperty_openbox_show_root_menu
-    openbox_show_workspace_menu = _openbox.OBProperty_openbox_show_workspace_menu
-    net_supported = _openbox.OBProperty_net_supported
-    net_client_list = _openbox.OBProperty_net_client_list
-    net_client_list_stacking = _openbox.OBProperty_net_client_list_stacking
-    net_number_of_desktops = _openbox.OBProperty_net_number_of_desktops
-    net_desktop_geometry = _openbox.OBProperty_net_desktop_geometry
-    net_desktop_viewport = _openbox.OBProperty_net_desktop_viewport
-    net_current_desktop = _openbox.OBProperty_net_current_desktop
-    net_desktop_names = _openbox.OBProperty_net_desktop_names
-    net_active_window = _openbox.OBProperty_net_active_window
-    net_workarea = _openbox.OBProperty_net_workarea
-    net_supporting_wm_check = _openbox.OBProperty_net_supporting_wm_check
-    net_close_window = _openbox.OBProperty_net_close_window
-    net_wm_moveresize = _openbox.OBProperty_net_wm_moveresize
-    net_wm_name = _openbox.OBProperty_net_wm_name
-    net_wm_visible_name = _openbox.OBProperty_net_wm_visible_name
-    net_wm_icon_name = _openbox.OBProperty_net_wm_icon_name
-    net_wm_visible_icon_name = _openbox.OBProperty_net_wm_visible_icon_name
-    net_wm_desktop = _openbox.OBProperty_net_wm_desktop
-    net_wm_window_type = _openbox.OBProperty_net_wm_window_type
-    net_wm_state = _openbox.OBProperty_net_wm_state
-    net_wm_strut = _openbox.OBProperty_net_wm_strut
-    net_wm_allowed_actions = _openbox.OBProperty_net_wm_allowed_actions
-    net_wm_window_type_desktop = _openbox.OBProperty_net_wm_window_type_desktop
-    net_wm_window_type_dock = _openbox.OBProperty_net_wm_window_type_dock
-    net_wm_window_type_toolbar = _openbox.OBProperty_net_wm_window_type_toolbar
-    net_wm_window_type_menu = _openbox.OBProperty_net_wm_window_type_menu
-    net_wm_window_type_utility = _openbox.OBProperty_net_wm_window_type_utility
-    net_wm_window_type_splash = _openbox.OBProperty_net_wm_window_type_splash
-    net_wm_window_type_dialog = _openbox.OBProperty_net_wm_window_type_dialog
-    net_wm_window_type_normal = _openbox.OBProperty_net_wm_window_type_normal
-    net_wm_moveresize_size_topleft = _openbox.OBProperty_net_wm_moveresize_size_topleft
-    net_wm_moveresize_size_topright = _openbox.OBProperty_net_wm_moveresize_size_topright
-    net_wm_moveresize_size_bottomleft = _openbox.OBProperty_net_wm_moveresize_size_bottomleft
-    net_wm_moveresize_size_bottomright = _openbox.OBProperty_net_wm_moveresize_size_bottomright
-    net_wm_moveresize_move = _openbox.OBProperty_net_wm_moveresize_move
-    net_wm_action_move = _openbox.OBProperty_net_wm_action_move
-    net_wm_action_resize = _openbox.OBProperty_net_wm_action_resize
-    net_wm_action_shade = _openbox.OBProperty_net_wm_action_shade
-    net_wm_action_maximize_horz = _openbox.OBProperty_net_wm_action_maximize_horz
-    net_wm_action_maximize_vert = _openbox.OBProperty_net_wm_action_maximize_vert
-    net_wm_action_change_desktop = _openbox.OBProperty_net_wm_action_change_desktop
-    net_wm_action_close = _openbox.OBProperty_net_wm_action_close
-    net_wm_state_modal = _openbox.OBProperty_net_wm_state_modal
-    net_wm_state_sticky = _openbox.OBProperty_net_wm_state_sticky
-    net_wm_state_maximized_vert = _openbox.OBProperty_net_wm_state_maximized_vert
-    net_wm_state_maximized_horz = _openbox.OBProperty_net_wm_state_maximized_horz
-    net_wm_state_shaded = _openbox.OBProperty_net_wm_state_shaded
-    net_wm_state_skip_taskbar = _openbox.OBProperty_net_wm_state_skip_taskbar
-    net_wm_state_skip_pager = _openbox.OBProperty_net_wm_state_skip_pager
-    net_wm_state_hidden = _openbox.OBProperty_net_wm_state_hidden
-    net_wm_state_fullscreen = _openbox.OBProperty_net_wm_state_fullscreen
-    net_wm_state_above = _openbox.OBProperty_net_wm_state_above
-    net_wm_state_below = _openbox.OBProperty_net_wm_state_below
-    kde_net_system_tray_windows = _openbox.OBProperty_kde_net_system_tray_windows
-    kde_net_wm_system_tray_window_for = _openbox.OBProperty_kde_net_wm_system_tray_window_for
-    kde_net_wm_window_type_override = _openbox.OBProperty_kde_net_wm_window_type_override
-    NUM_ATOMS = _openbox.OBProperty_NUM_ATOMS
-    ascii = _openbox.OBProperty_ascii
-    utf8 = _openbox.OBProperty_utf8
-    NUM_STRING_TYPE = _openbox.OBProperty_NUM_STRING_TYPE
+    __getattr__ = lambda self, name: _swig_getattr(self, Property, name)
+    Atom_Cardinal = _openbox.Property_Atom_Cardinal
+    Atom_Window = _openbox.Property_Atom_Window
+    Atom_Pixmap = _openbox.Property_Atom_Pixmap
+    Atom_Atom = _openbox.Property_Atom_Atom
+    Atom_String = _openbox.Property_Atom_String
+    Atom_Utf8 = _openbox.Property_Atom_Utf8
+    openbox_pid = _openbox.Property_openbox_pid
+    wm_colormap_windows = _openbox.Property_wm_colormap_windows
+    wm_protocols = _openbox.Property_wm_protocols
+    wm_state = _openbox.Property_wm_state
+    wm_delete_window = _openbox.Property_wm_delete_window
+    wm_take_focus = _openbox.Property_wm_take_focus
+    wm_change_state = _openbox.Property_wm_change_state
+    wm_name = _openbox.Property_wm_name
+    wm_icon_name = _openbox.Property_wm_icon_name
+    wm_class = _openbox.Property_wm_class
+    wm_window_role = _openbox.Property_wm_window_role
+    motif_wm_hints = _openbox.Property_motif_wm_hints
+    blackbox_attributes = _openbox.Property_blackbox_attributes
+    blackbox_change_attributes = _openbox.Property_blackbox_change_attributes
+    blackbox_hints = _openbox.Property_blackbox_hints
+    blackbox_structure_messages = _openbox.Property_blackbox_structure_messages
+    blackbox_notify_startup = _openbox.Property_blackbox_notify_startup
+    blackbox_notify_window_add = _openbox.Property_blackbox_notify_window_add
+    blackbox_notify_window_del = _openbox.Property_blackbox_notify_window_del
+    blackbox_notify_window_focus = _openbox.Property_blackbox_notify_window_focus
+    blackbox_notify_current_workspace = _openbox.Property_blackbox_notify_current_workspace
+    blackbox_notify_workspace_count = _openbox.Property_blackbox_notify_workspace_count
+    blackbox_notify_window_raise = _openbox.Property_blackbox_notify_window_raise
+    blackbox_notify_window_lower = _openbox.Property_blackbox_notify_window_lower
+    blackbox_change_workspace = _openbox.Property_blackbox_change_workspace
+    blackbox_change_window_focus = _openbox.Property_blackbox_change_window_focus
+    blackbox_cycle_window_focus = _openbox.Property_blackbox_cycle_window_focus
+    openbox_show_root_menu = _openbox.Property_openbox_show_root_menu
+    openbox_show_workspace_menu = _openbox.Property_openbox_show_workspace_menu
+    net_supported = _openbox.Property_net_supported
+    net_client_list = _openbox.Property_net_client_list
+    net_client_list_stacking = _openbox.Property_net_client_list_stacking
+    net_number_of_desktops = _openbox.Property_net_number_of_desktops
+    net_desktop_geometry = _openbox.Property_net_desktop_geometry
+    net_desktop_viewport = _openbox.Property_net_desktop_viewport
+    net_current_desktop = _openbox.Property_net_current_desktop
+    net_desktop_names = _openbox.Property_net_desktop_names
+    net_active_window = _openbox.Property_net_active_window
+    net_workarea = _openbox.Property_net_workarea
+    net_supporting_wm_check = _openbox.Property_net_supporting_wm_check
+    net_close_window = _openbox.Property_net_close_window
+    net_wm_moveresize = _openbox.Property_net_wm_moveresize
+    net_wm_name = _openbox.Property_net_wm_name
+    net_wm_visible_name = _openbox.Property_net_wm_visible_name
+    net_wm_icon_name = _openbox.Property_net_wm_icon_name
+    net_wm_visible_icon_name = _openbox.Property_net_wm_visible_icon_name
+    net_wm_desktop = _openbox.Property_net_wm_desktop
+    net_wm_window_type = _openbox.Property_net_wm_window_type
+    net_wm_state = _openbox.Property_net_wm_state
+    net_wm_strut = _openbox.Property_net_wm_strut
+    net_wm_allowed_actions = _openbox.Property_net_wm_allowed_actions
+    net_wm_window_type_desktop = _openbox.Property_net_wm_window_type_desktop
+    net_wm_window_type_dock = _openbox.Property_net_wm_window_type_dock
+    net_wm_window_type_toolbar = _openbox.Property_net_wm_window_type_toolbar
+    net_wm_window_type_menu = _openbox.Property_net_wm_window_type_menu
+    net_wm_window_type_utility = _openbox.Property_net_wm_window_type_utility
+    net_wm_window_type_splash = _openbox.Property_net_wm_window_type_splash
+    net_wm_window_type_dialog = _openbox.Property_net_wm_window_type_dialog
+    net_wm_window_type_normal = _openbox.Property_net_wm_window_type_normal
+    net_wm_moveresize_size_topleft = _openbox.Property_net_wm_moveresize_size_topleft
+    net_wm_moveresize_size_topright = _openbox.Property_net_wm_moveresize_size_topright
+    net_wm_moveresize_size_bottomleft = _openbox.Property_net_wm_moveresize_size_bottomleft
+    net_wm_moveresize_size_bottomright = _openbox.Property_net_wm_moveresize_size_bottomright
+    net_wm_moveresize_move = _openbox.Property_net_wm_moveresize_move
+    net_wm_action_move = _openbox.Property_net_wm_action_move
+    net_wm_action_resize = _openbox.Property_net_wm_action_resize
+    net_wm_action_shade = _openbox.Property_net_wm_action_shade
+    net_wm_action_maximize_horz = _openbox.Property_net_wm_action_maximize_horz
+    net_wm_action_maximize_vert = _openbox.Property_net_wm_action_maximize_vert
+    net_wm_action_change_desktop = _openbox.Property_net_wm_action_change_desktop
+    net_wm_action_close = _openbox.Property_net_wm_action_close
+    net_wm_state_modal = _openbox.Property_net_wm_state_modal
+    net_wm_state_sticky = _openbox.Property_net_wm_state_sticky
+    net_wm_state_maximized_vert = _openbox.Property_net_wm_state_maximized_vert
+    net_wm_state_maximized_horz = _openbox.Property_net_wm_state_maximized_horz
+    net_wm_state_shaded = _openbox.Property_net_wm_state_shaded
+    net_wm_state_skip_taskbar = _openbox.Property_net_wm_state_skip_taskbar
+    net_wm_state_skip_pager = _openbox.Property_net_wm_state_skip_pager
+    net_wm_state_hidden = _openbox.Property_net_wm_state_hidden
+    net_wm_state_fullscreen = _openbox.Property_net_wm_state_fullscreen
+    net_wm_state_above = _openbox.Property_net_wm_state_above
+    net_wm_state_below = _openbox.Property_net_wm_state_below
+    kde_net_system_tray_windows = _openbox.Property_kde_net_system_tray_windows
+    kde_net_wm_system_tray_window_for = _openbox.Property_kde_net_wm_system_tray_window_for
+    kde_net_wm_window_type_override = _openbox.Property_kde_net_wm_window_type_override
+    NUM_ATOMS = _openbox.Property_NUM_ATOMS
+    ascii = _openbox.Property_ascii
+    utf8 = _openbox.Property_utf8
+    NUM_STRING_TYPE = _openbox.Property_NUM_STRING_TYPE
     def __init__(self,*args):
-        self.this = apply(_openbox.new_OBProperty,args)
+        self.this = apply(_openbox.new_Property,args)
         self.thisown = 1
-    def __del__(self, destroy= _openbox.delete_OBProperty):
+    def __del__(self, destroy= _openbox.delete_Property):
         try:
             if self.thisown: destroy(self)
         except: pass
-    def set(*args): return apply(_openbox.OBProperty_set,args)
-    def get(*args): return apply(_openbox.OBProperty_get,args)
-    def erase(*args): return apply(_openbox.OBProperty_erase,args)
-    def atom(*args): return apply(_openbox.OBProperty_atom,args)
+    def set(*args): return apply(_openbox.Property_set,args)
+    def get(*args): return apply(_openbox.Property_get,args)
+    def erase(*args): return apply(_openbox.Property_erase,args)
+    def atom(*args): return apply(_openbox.Property_atom,args)
     def __repr__(self):
-        return "<C OBProperty instance at %s>" % (self.this,)
+        return "<C Property instance at %s>" % (self.this,)
 
-class OBPropertyPtr(OBProperty):
+class PropertyPtr(Property):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OBProperty
-_openbox.OBProperty_swigregister(OBPropertyPtr)
+        self.__class__ = Property
+_openbox.Property_swigregister(PropertyPtr)
 
 class Rect(_object):
     __swig_setmethods__ = {}
@@ -365,110 +365,90 @@ class StrutPtr(Strut):
         self.__class__ = Strut
 _openbox.Strut_swigregister(StrutPtr)
 
-expandTilde = _openbox.expandTilde
-
-bexec = _openbox.bexec
-
-textPropertyToString = _openbox.textPropertyToString
-
-itostring_unsigned_long = _openbox.itostring_unsigned_long
-
-itostring_long = _openbox.itostring_long
-
-itostring_unsigned = _openbox.itostring_unsigned
-
-itostring = _openbox.itostring
-
-putenv = _openbox.putenv
-
-basename = _openbox.basename
-
-class OtkEventHandler(_object):
+class EventHandler(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OtkEventHandler, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, EventHandler, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, OtkEventHandler, name)
-    def handle(*args): return apply(_openbox.OtkEventHandler_handle,args)
-    def keyPressHandler(*args): return apply(_openbox.OtkEventHandler_keyPressHandler,args)
-    def keyReleaseHandler(*args): return apply(_openbox.OtkEventHandler_keyReleaseHandler,args)
-    def buttonPressHandler(*args): return apply(_openbox.OtkEventHandler_buttonPressHandler,args)
-    def buttonReleaseHandler(*args): return apply(_openbox.OtkEventHandler_buttonReleaseHandler,args)
-    def motionHandler(*args): return apply(_openbox.OtkEventHandler_motionHandler,args)
-    def enterHandler(*args): return apply(_openbox.OtkEventHandler_enterHandler,args)
-    def leaveHandler(*args): return apply(_openbox.OtkEventHandler_leaveHandler,args)
-    def focusHandler(*args): return apply(_openbox.OtkEventHandler_focusHandler,args)
-    def unfocusHandler(*args): return apply(_openbox.OtkEventHandler_unfocusHandler,args)
-    def exposeHandler(*args): return apply(_openbox.OtkEventHandler_exposeHandler,args)
-    def graphicsExposeHandler(*args): return apply(_openbox.OtkEventHandler_graphicsExposeHandler,args)
-    def noExposeEventHandler(*args): return apply(_openbox.OtkEventHandler_noExposeEventHandler,args)
-    def circulateRequestHandler(*args): return apply(_openbox.OtkEventHandler_circulateRequestHandler,args)
-    def configureRequestHandler(*args): return apply(_openbox.OtkEventHandler_configureRequestHandler,args)
-    def mapRequestHandler(*args): return apply(_openbox.OtkEventHandler_mapRequestHandler,args)
-    def resizeRequestHandler(*args): return apply(_openbox.OtkEventHandler_resizeRequestHandler,args)
-    def circulateHandler(*args): return apply(_openbox.OtkEventHandler_circulateHandler,args)
-    def configureHandler(*args): return apply(_openbox.OtkEventHandler_configureHandler,args)
-    def createHandler(*args): return apply(_openbox.OtkEventHandler_createHandler,args)
-    def destroyHandler(*args): return apply(_openbox.OtkEventHandler_destroyHandler,args)
-    def gravityHandler(*args): return apply(_openbox.OtkEventHandler_gravityHandler,args)
-    def mapHandler(*args): return apply(_openbox.OtkEventHandler_mapHandler,args)
-    def mappingHandler(*args): return apply(_openbox.OtkEventHandler_mappingHandler,args)
-    def reparentHandler(*args): return apply(_openbox.OtkEventHandler_reparentHandler,args)
-    def unmapHandler(*args): return apply(_openbox.OtkEventHandler_unmapHandler,args)
-    def visibilityHandler(*args): return apply(_openbox.OtkEventHandler_visibilityHandler,args)
-    def colorMapHandler(*args): return apply(_openbox.OtkEventHandler_colorMapHandler,args)
-    def propertyHandler(*args): return apply(_openbox.OtkEventHandler_propertyHandler,args)
-    def selectionClearHandler(*args): return apply(_openbox.OtkEventHandler_selectionClearHandler,args)
-    def selectionHandler(*args): return apply(_openbox.OtkEventHandler_selectionHandler,args)
-    def selectionRequestHandler(*args): return apply(_openbox.OtkEventHandler_selectionRequestHandler,args)
-    def clientMessageHandler(*args): return apply(_openbox.OtkEventHandler_clientMessageHandler,args)
-    def __del__(self, destroy= _openbox.delete_OtkEventHandler):
+    __getattr__ = lambda self, name: _swig_getattr(self, EventHandler, name)
+    def handle(*args): return apply(_openbox.EventHandler_handle,args)
+    def keyPressHandler(*args): return apply(_openbox.EventHandler_keyPressHandler,args)
+    def keyReleaseHandler(*args): return apply(_openbox.EventHandler_keyReleaseHandler,args)
+    def buttonPressHandler(*args): return apply(_openbox.EventHandler_buttonPressHandler,args)
+    def buttonReleaseHandler(*args): return apply(_openbox.EventHandler_buttonReleaseHandler,args)
+    def motionHandler(*args): return apply(_openbox.EventHandler_motionHandler,args)
+    def enterHandler(*args): return apply(_openbox.EventHandler_enterHandler,args)
+    def leaveHandler(*args): return apply(_openbox.EventHandler_leaveHandler,args)
+    def focusHandler(*args): return apply(_openbox.EventHandler_focusHandler,args)
+    def unfocusHandler(*args): return apply(_openbox.EventHandler_unfocusHandler,args)
+    def exposeHandler(*args): return apply(_openbox.EventHandler_exposeHandler,args)
+    def graphicsExposeHandler(*args): return apply(_openbox.EventHandler_graphicsExposeHandler,args)
+    def noExposeEventHandler(*args): return apply(_openbox.EventHandler_noExposeEventHandler,args)
+    def circulateRequestHandler(*args): return apply(_openbox.EventHandler_circulateRequestHandler,args)
+    def configureRequestHandler(*args): return apply(_openbox.EventHandler_configureRequestHandler,args)
+    def mapRequestHandler(*args): return apply(_openbox.EventHandler_mapRequestHandler,args)
+    def resizeRequestHandler(*args): return apply(_openbox.EventHandler_resizeRequestHandler,args)
+    def circulateHandler(*args): return apply(_openbox.EventHandler_circulateHandler,args)
+    def configureHandler(*args): return apply(_openbox.EventHandler_configureHandler,args)
+    def createHandler(*args): return apply(_openbox.EventHandler_createHandler,args)
+    def destroyHandler(*args): return apply(_openbox.EventHandler_destroyHandler,args)
+    def gravityHandler(*args): return apply(_openbox.EventHandler_gravityHandler,args)
+    def mapHandler(*args): return apply(_openbox.EventHandler_mapHandler,args)
+    def mappingHandler(*args): return apply(_openbox.EventHandler_mappingHandler,args)
+    def reparentHandler(*args): return apply(_openbox.EventHandler_reparentHandler,args)
+    def unmapHandler(*args): return apply(_openbox.EventHandler_unmapHandler,args)
+    def visibilityHandler(*args): return apply(_openbox.EventHandler_visibilityHandler,args)
+    def colorMapHandler(*args): return apply(_openbox.EventHandler_colorMapHandler,args)
+    def propertyHandler(*args): return apply(_openbox.EventHandler_propertyHandler,args)
+    def selectionClearHandler(*args): return apply(_openbox.EventHandler_selectionClearHandler,args)
+    def selectionHandler(*args): return apply(_openbox.EventHandler_selectionHandler,args)
+    def selectionRequestHandler(*args): return apply(_openbox.EventHandler_selectionRequestHandler,args)
+    def clientMessageHandler(*args): return apply(_openbox.EventHandler_clientMessageHandler,args)
+    def __del__(self, destroy= _openbox.delete_EventHandler):
         try:
             if self.thisown: destroy(self)
         except: pass
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
-        return "<C OtkEventHandler instance at %s>" % (self.this,)
+        return "<C EventHandler instance at %s>" % (self.this,)
 
-class OtkEventHandlerPtr(OtkEventHandler):
+class EventHandlerPtr(EventHandler):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OtkEventHandler
-_openbox.OtkEventHandler_swigregister(OtkEventHandlerPtr)
-cvar = _openbox.cvar
-BSENTINEL = cvar.BSENTINEL
+        self.__class__ = EventHandler
+_openbox.EventHandler_swigregister(EventHandlerPtr)
 
-class OtkEventDispatcher(_object):
+class EventDispatcher(_object):
     __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OtkEventDispatcher, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, EventDispatcher, name, value)
     __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, OtkEventDispatcher, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, EventDispatcher, name)
     def __init__(self,*args):
-        self.this = apply(_openbox.new_OtkEventDispatcher,args)
+        self.this = apply(_openbox.new_EventDispatcher,args)
         self.thisown = 1
-    def __del__(self, destroy= _openbox.delete_OtkEventDispatcher):
+    def __del__(self, destroy= _openbox.delete_EventDispatcher):
         try:
             if self.thisown: destroy(self)
         except: pass
-    def clearAllHandlers(*args): return apply(_openbox.OtkEventDispatcher_clearAllHandlers,args)
-    def registerHandler(*args): return apply(_openbox.OtkEventDispatcher_registerHandler,args)
-    def clearHandler(*args): return apply(_openbox.OtkEventDispatcher_clearHandler,args)
-    def dispatchEvents(*args): return apply(_openbox.OtkEventDispatcher_dispatchEvents,args)
-    def setFallbackHandler(*args): return apply(_openbox.OtkEventDispatcher_setFallbackHandler,args)
-    def getFallbackHandler(*args): return apply(_openbox.OtkEventDispatcher_getFallbackHandler,args)
-    def setMasterHandler(*args): return apply(_openbox.OtkEventDispatcher_setMasterHandler,args)
-    def getMasterHandler(*args): return apply(_openbox.OtkEventDispatcher_getMasterHandler,args)
-    def findHandler(*args): return apply(_openbox.OtkEventDispatcher_findHandler,args)
-    def lastTime(*args): return apply(_openbox.OtkEventDispatcher_lastTime,args)
+    def clearAllHandlers(*args): return apply(_openbox.EventDispatcher_clearAllHandlers,args)
+    def registerHandler(*args): return apply(_openbox.EventDispatcher_registerHandler,args)
+    def clearHandler(*args): return apply(_openbox.EventDispatcher_clearHandler,args)
+    def dispatchEvents(*args): return apply(_openbox.EventDispatcher_dispatchEvents,args)
+    def setFallbackHandler(*args): return apply(_openbox.EventDispatcher_setFallbackHandler,args)
+    def getFallbackHandler(*args): return apply(_openbox.EventDispatcher_getFallbackHandler,args)
+    def setMasterHandler(*args): return apply(_openbox.EventDispatcher_setMasterHandler,args)
+    def getMasterHandler(*args): return apply(_openbox.EventDispatcher_getMasterHandler,args)
+    def findHandler(*args): return apply(_openbox.EventDispatcher_findHandler,args)
+    def lastTime(*args): return apply(_openbox.EventDispatcher_lastTime,args)
     def __repr__(self):
-        return "<C OtkEventDispatcher instance at %s>" % (self.this,)
+        return "<C EventDispatcher instance at %s>" % (self.this,)
 
-class OtkEventDispatcherPtr(OtkEventDispatcher):
+class EventDispatcherPtr(EventDispatcher):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OtkEventDispatcher
-_openbox.OtkEventDispatcher_swigregister(OtkEventDispatcherPtr)
+        self.__class__ = EventDispatcher
+_openbox.EventDispatcher_swigregister(EventDispatcherPtr)
 
 class Cursors(_object):
     __swig_setmethods__ = {}
@@ -504,12 +484,12 @@ class CursorsPtr(Cursors):
         self.__class__ = Cursors
 _openbox.Cursors_swigregister(CursorsPtr)
 
-class Openbox(OtkEventDispatcher,OtkEventHandler):
+class Openbox(EventDispatcher,EventHandler):
     __swig_setmethods__ = {}
-    for _s in [OtkEventDispatcher,OtkEventHandler]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    for _s in [EventDispatcher,EventHandler]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, Openbox, name, value)
     __swig_getmethods__ = {}
-    for _s in [OtkEventDispatcher,OtkEventHandler]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    for _s in [EventDispatcher,EventHandler]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, Openbox, name)
     State_Starting = _openbox.Openbox_State_Starting
     State_Normal = _openbox.Openbox_State_Normal
@@ -542,43 +522,43 @@ class OpenboxPtr(Openbox):
         self.__class__ = Openbox
 _openbox.Openbox_swigregister(OpenboxPtr)
 
-class OBScreen(OtkEventHandler,):
+class Screen(EventHandler,):
     __swig_setmethods__ = {}
-    for _s in [OtkEventHandler,]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OBScreen, name, value)
+    for _s in [EventHandler,]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Screen, name, value)
     __swig_getmethods__ = {}
-    for _s in [OtkEventHandler,]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, OBScreen, name)
-    def client(*args): return apply(_openbox.OBScreen_client,args)
-    def clientCount(*args): return apply(_openbox.OBScreen_clientCount,args)
-    event_mask = _openbox.OBScreen_event_mask
-    def number(*args): return apply(_openbox.OBScreen_number,args)
-    def managed(*args): return apply(_openbox.OBScreen_managed,args)
-    def imageControl(*args): return apply(_openbox.OBScreen_imageControl,args)
-    def area(*args): return apply(_openbox.OBScreen_area,args)
-    def style(*args): return apply(_openbox.OBScreen_style,args)
-    def focuswindow(*args): return apply(_openbox.OBScreen_focuswindow,args)
-    def desktop(*args): return apply(_openbox.OBScreen_desktop,args)
-    def numDesktops(*args): return apply(_openbox.OBScreen_numDesktops,args)
-    def updateStrut(*args): return apply(_openbox.OBScreen_updateStrut,args)
-    def manageExisting(*args): return apply(_openbox.OBScreen_manageExisting,args)
-    def manageWindow(*args): return apply(_openbox.OBScreen_manageWindow,args)
-    def unmanageWindow(*args): return apply(_openbox.OBScreen_unmanageWindow,args)
-    def restack(*args): return apply(_openbox.OBScreen_restack,args)
-    def setDesktopName(*args): return apply(_openbox.OBScreen_setDesktopName,args)
-    def propertyHandler(*args): return apply(_openbox.OBScreen_propertyHandler,args)
-    def clientMessageHandler(*args): return apply(_openbox.OBScreen_clientMessageHandler,args)
-    def mapRequestHandler(*args): return apply(_openbox.OBScreen_mapRequestHandler,args)
+    for _s in [EventHandler,]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, Screen, name)
+    def client(*args): return apply(_openbox.Screen_client,args)
+    def clientCount(*args): return apply(_openbox.Screen_clientCount,args)
+    event_mask = _openbox.Screen_event_mask
+    def number(*args): return apply(_openbox.Screen_number,args)
+    def managed(*args): return apply(_openbox.Screen_managed,args)
+    def imageControl(*args): return apply(_openbox.Screen_imageControl,args)
+    def area(*args): return apply(_openbox.Screen_area,args)
+    def style(*args): return apply(_openbox.Screen_style,args)
+    def focuswindow(*args): return apply(_openbox.Screen_focuswindow,args)
+    def desktop(*args): return apply(_openbox.Screen_desktop,args)
+    def numDesktops(*args): return apply(_openbox.Screen_numDesktops,args)
+    def updateStrut(*args): return apply(_openbox.Screen_updateStrut,args)
+    def manageExisting(*args): return apply(_openbox.Screen_manageExisting,args)
+    def manageWindow(*args): return apply(_openbox.Screen_manageWindow,args)
+    def unmanageWindow(*args): return apply(_openbox.Screen_unmanageWindow,args)
+    def restack(*args): return apply(_openbox.Screen_restack,args)
+    def setDesktopName(*args): return apply(_openbox.Screen_setDesktopName,args)
+    def propertyHandler(*args): return apply(_openbox.Screen_propertyHandler,args)
+    def clientMessageHandler(*args): return apply(_openbox.Screen_clientMessageHandler,args)
+    def mapRequestHandler(*args): return apply(_openbox.Screen_mapRequestHandler,args)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
-        return "<C OBScreen instance at %s>" % (self.this,)
+        return "<C Screen instance at %s>" % (self.this,)
 
-class OBScreenPtr(OBScreen):
+class ScreenPtr(Screen):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OBScreen
-_openbox.OBScreen_swigregister(OBScreenPtr)
+        self.__class__ = Screen
+_openbox.Screen_swigregister(ScreenPtr)
 
 class MwmHints(_object):
     __swig_setmethods__ = {}
@@ -606,120 +586,120 @@ class MwmHintsPtr(MwmHints):
         self.__class__ = MwmHints
 _openbox.MwmHints_swigregister(MwmHintsPtr)
 
-class OBClient(OtkEventHandler,):
+class Client(EventHandler,):
     __swig_setmethods__ = {}
-    for _s in [OtkEventHandler,]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, OBClient, name, value)
+    for _s in [EventHandler,]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Client, name, value)
     __swig_getmethods__ = {}
-    for _s in [OtkEventHandler,]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, OBClient, name)
-    __swig_setmethods__["frame"] = _openbox.OBClient_frame_set
-    __swig_getmethods__["frame"] = _openbox.OBClient_frame_get
-    if _newclass:frame = property(_openbox.OBClient_frame_get,_openbox.OBClient_frame_set)
-    Layer_Icon = _openbox.OBClient_Layer_Icon
-    Layer_Desktop = _openbox.OBClient_Layer_Desktop
-    Layer_Below = _openbox.OBClient_Layer_Below
-    Layer_Normal = _openbox.OBClient_Layer_Normal
-    Layer_Above = _openbox.OBClient_Layer_Above
-    Layer_Top = _openbox.OBClient_Layer_Top
-    Layer_Fullscreen = _openbox.OBClient_Layer_Fullscreen
-    Layer_Internal = _openbox.OBClient_Layer_Internal
-    NUM_LAYERS = _openbox.OBClient_NUM_LAYERS
-    TopLeft = _openbox.OBClient_TopLeft
-    TopRight = _openbox.OBClient_TopRight
-    BottomLeft = _openbox.OBClient_BottomLeft
-    BottomRight = _openbox.OBClient_BottomRight
-    Type_Desktop = _openbox.OBClient_Type_Desktop
-    Type_Dock = _openbox.OBClient_Type_Dock
-    Type_Toolbar = _openbox.OBClient_Type_Toolbar
-    Type_Menu = _openbox.OBClient_Type_Menu
-    Type_Utility = _openbox.OBClient_Type_Utility
-    Type_Splash = _openbox.OBClient_Type_Splash
-    Type_Dialog = _openbox.OBClient_Type_Dialog
-    Type_Normal = _openbox.OBClient_Type_Normal
-    MwmFlag_Functions = _openbox.OBClient_MwmFlag_Functions
-    MwmFlag_Decorations = _openbox.OBClient_MwmFlag_Decorations
-    MwmFunc_All = _openbox.OBClient_MwmFunc_All
-    MwmFunc_Resize = _openbox.OBClient_MwmFunc_Resize
-    MwmFunc_Move = _openbox.OBClient_MwmFunc_Move
-    MwmFunc_Iconify = _openbox.OBClient_MwmFunc_Iconify
-    MwmFunc_Maximize = _openbox.OBClient_MwmFunc_Maximize
-    MwmDecor_All = _openbox.OBClient_MwmDecor_All
-    MwmDecor_Border = _openbox.OBClient_MwmDecor_Border
-    MwmDecor_Handle = _openbox.OBClient_MwmDecor_Handle
-    MwmDecor_Title = _openbox.OBClient_MwmDecor_Title
-    MwmDecor_Iconify = _openbox.OBClient_MwmDecor_Iconify
-    MwmDecor_Maximize = _openbox.OBClient_MwmDecor_Maximize
-    Func_Resize = _openbox.OBClient_Func_Resize
-    Func_Move = _openbox.OBClient_Func_Move
-    Func_Iconify = _openbox.OBClient_Func_Iconify
-    Func_Maximize = _openbox.OBClient_Func_Maximize
-    Func_Close = _openbox.OBClient_Func_Close
-    Decor_Titlebar = _openbox.OBClient_Decor_Titlebar
-    Decor_Handle = _openbox.OBClient_Decor_Handle
-    Decor_Border = _openbox.OBClient_Decor_Border
-    Decor_Iconify = _openbox.OBClient_Decor_Iconify
-    Decor_Maximize = _openbox.OBClient_Decor_Maximize
-    Decor_Sticky = _openbox.OBClient_Decor_Sticky
-    Decor_Close = _openbox.OBClient_Decor_Close
-    State_Remove = _openbox.OBClient_State_Remove
-    State_Add = _openbox.OBClient_State_Add
-    State_Toggle = _openbox.OBClient_State_Toggle
-    event_mask = _openbox.OBClient_event_mask
-    no_propagate_mask = _openbox.OBClient_no_propagate_mask
-    __swig_setmethods__["ignore_unmaps"] = _openbox.OBClient_ignore_unmaps_set
-    __swig_getmethods__["ignore_unmaps"] = _openbox.OBClient_ignore_unmaps_get
-    if _newclass:ignore_unmaps = property(_openbox.OBClient_ignore_unmaps_get,_openbox.OBClient_ignore_unmaps_set)
-    def screen(*args): return apply(_openbox.OBClient_screen,args)
-    def window(*args): return apply(_openbox.OBClient_window,args)
-    def type(*args): return apply(_openbox.OBClient_type,args)
-    def normal(*args): return apply(_openbox.OBClient_normal,args)
-    def desktop(*args): return apply(_openbox.OBClient_desktop,args)
-    def title(*args): return apply(_openbox.OBClient_title,args)
-    def iconTitle(*args): return apply(_openbox.OBClient_iconTitle,args)
-    def appName(*args): return apply(_openbox.OBClient_appName,args)
-    def appClass(*args): return apply(_openbox.OBClient_appClass,args)
-    def role(*args): return apply(_openbox.OBClient_role,args)
-    def canFocus(*args): return apply(_openbox.OBClient_canFocus,args)
-    def urgent(*args): return apply(_openbox.OBClient_urgent,args)
-    def focusNotify(*args): return apply(_openbox.OBClient_focusNotify,args)
-    def shaped(*args): return apply(_openbox.OBClient_shaped,args)
-    def gravity(*args): return apply(_openbox.OBClient_gravity,args)
-    def positionRequested(*args): return apply(_openbox.OBClient_positionRequested,args)
-    def decorations(*args): return apply(_openbox.OBClient_decorations,args)
-    def funtions(*args): return apply(_openbox.OBClient_funtions,args)
-    def transientFor(*args): return apply(_openbox.OBClient_transientFor,args)
-    def modal(*args): return apply(_openbox.OBClient_modal,args)
-    def shaded(*args): return apply(_openbox.OBClient_shaded,args)
-    def iconic(*args): return apply(_openbox.OBClient_iconic,args)
-    def maxVert(*args): return apply(_openbox.OBClient_maxVert,args)
-    def maxHorz(*args): return apply(_openbox.OBClient_maxHorz,args)
-    def layer(*args): return apply(_openbox.OBClient_layer,args)
-    def toggleClientBorder(*args): return apply(_openbox.OBClient_toggleClientBorder,args)
-    def area(*args): return apply(_openbox.OBClient_area,args)
-    def strut(*args): return apply(_openbox.OBClient_strut,args)
-    def move(*args): return apply(_openbox.OBClient_move,args)
-    def resize(*args): return apply(_openbox.OBClient_resize,args)
-    def focus(*args): return apply(_openbox.OBClient_focus,args)
-    def unfocus(*args): return apply(_openbox.OBClient_unfocus,args)
-    def focusHandler(*args): return apply(_openbox.OBClient_focusHandler,args)
-    def unfocusHandler(*args): return apply(_openbox.OBClient_unfocusHandler,args)
-    def propertyHandler(*args): return apply(_openbox.OBClient_propertyHandler,args)
-    def clientMessageHandler(*args): return apply(_openbox.OBClient_clientMessageHandler,args)
-    def configureRequestHandler(*args): return apply(_openbox.OBClient_configureRequestHandler,args)
-    def unmapHandler(*args): return apply(_openbox.OBClient_unmapHandler,args)
-    def destroyHandler(*args): return apply(_openbox.OBClient_destroyHandler,args)
-    def reparentHandler(*args): return apply(_openbox.OBClient_reparentHandler,args)
+    for _s in [EventHandler,]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, Client, name)
+    __swig_setmethods__["frame"] = _openbox.Client_frame_set
+    __swig_getmethods__["frame"] = _openbox.Client_frame_get
+    if _newclass:frame = property(_openbox.Client_frame_get,_openbox.Client_frame_set)
+    Layer_Icon = _openbox.Client_Layer_Icon
+    Layer_Desktop = _openbox.Client_Layer_Desktop
+    Layer_Below = _openbox.Client_Layer_Below
+    Layer_Normal = _openbox.Client_Layer_Normal
+    Layer_Above = _openbox.Client_Layer_Above
+    Layer_Top = _openbox.Client_Layer_Top
+    Layer_Fullscreen = _openbox.Client_Layer_Fullscreen
+    Layer_Internal = _openbox.Client_Layer_Internal
+    NUM_LAYERS = _openbox.Client_NUM_LAYERS
+    TopLeft = _openbox.Client_TopLeft
+    TopRight = _openbox.Client_TopRight
+    BottomLeft = _openbox.Client_BottomLeft
+    BottomRight = _openbox.Client_BottomRight
+    Type_Desktop = _openbox.Client_Type_Desktop
+    Type_Dock = _openbox.Client_Type_Dock
+    Type_Toolbar = _openbox.Client_Type_Toolbar
+    Type_Menu = _openbox.Client_Type_Menu
+    Type_Utility = _openbox.Client_Type_Utility
+    Type_Splash = _openbox.Client_Type_Splash
+    Type_Dialog = _openbox.Client_Type_Dialog
+    Type_Normal = _openbox.Client_Type_Normal
+    MwmFlag_Functions = _openbox.Client_MwmFlag_Functions
+    MwmFlag_Decorations = _openbox.Client_MwmFlag_Decorations
+    MwmFunc_All = _openbox.Client_MwmFunc_All
+    MwmFunc_Resize = _openbox.Client_MwmFunc_Resize
+    MwmFunc_Move = _openbox.Client_MwmFunc_Move
+    MwmFunc_Iconify = _openbox.Client_MwmFunc_Iconify
+    MwmFunc_Maximize = _openbox.Client_MwmFunc_Maximize
+    MwmDecor_All = _openbox.Client_MwmDecor_All
+    MwmDecor_Border = _openbox.Client_MwmDecor_Border
+    MwmDecor_Handle = _openbox.Client_MwmDecor_Handle
+    MwmDecor_Title = _openbox.Client_MwmDecor_Title
+    MwmDecor_Iconify = _openbox.Client_MwmDecor_Iconify
+    MwmDecor_Maximize = _openbox.Client_MwmDecor_Maximize
+    Func_Resize = _openbox.Client_Func_Resize
+    Func_Move = _openbox.Client_Func_Move
+    Func_Iconify = _openbox.Client_Func_Iconify
+    Func_Maximize = _openbox.Client_Func_Maximize
+    Func_Close = _openbox.Client_Func_Close
+    Decor_Titlebar = _openbox.Client_Decor_Titlebar
+    Decor_Handle = _openbox.Client_Decor_Handle
+    Decor_Border = _openbox.Client_Decor_Border
+    Decor_Iconify = _openbox.Client_Decor_Iconify
+    Decor_Maximize = _openbox.Client_Decor_Maximize
+    Decor_Sticky = _openbox.Client_Decor_Sticky
+    Decor_Close = _openbox.Client_Decor_Close
+    State_Remove = _openbox.Client_State_Remove
+    State_Add = _openbox.Client_State_Add
+    State_Toggle = _openbox.Client_State_Toggle
+    event_mask = _openbox.Client_event_mask
+    no_propagate_mask = _openbox.Client_no_propagate_mask
+    __swig_setmethods__["ignore_unmaps"] = _openbox.Client_ignore_unmaps_set
+    __swig_getmethods__["ignore_unmaps"] = _openbox.Client_ignore_unmaps_get
+    if _newclass:ignore_unmaps = property(_openbox.Client_ignore_unmaps_get,_openbox.Client_ignore_unmaps_set)
+    def screen(*args): return apply(_openbox.Client_screen,args)
+    def window(*args): return apply(_openbox.Client_window,args)
+    def type(*args): return apply(_openbox.Client_type,args)
+    def normal(*args): return apply(_openbox.Client_normal,args)
+    def desktop(*args): return apply(_openbox.Client_desktop,args)
+    def title(*args): return apply(_openbox.Client_title,args)
+    def iconTitle(*args): return apply(_openbox.Client_iconTitle,args)
+    def appName(*args): return apply(_openbox.Client_appName,args)
+    def appClass(*args): return apply(_openbox.Client_appClass,args)
+    def role(*args): return apply(_openbox.Client_role,args)
+    def canFocus(*args): return apply(_openbox.Client_canFocus,args)
+    def urgent(*args): return apply(_openbox.Client_urgent,args)
+    def focusNotify(*args): return apply(_openbox.Client_focusNotify,args)
+    def shaped(*args): return apply(_openbox.Client_shaped,args)
+    def gravity(*args): return apply(_openbox.Client_gravity,args)
+    def positionRequested(*args): return apply(_openbox.Client_positionRequested,args)
+    def decorations(*args): return apply(_openbox.Client_decorations,args)
+    def funtions(*args): return apply(_openbox.Client_funtions,args)
+    def transientFor(*args): return apply(_openbox.Client_transientFor,args)
+    def modal(*args): return apply(_openbox.Client_modal,args)
+    def shaded(*args): return apply(_openbox.Client_shaded,args)
+    def iconic(*args): return apply(_openbox.Client_iconic,args)
+    def maxVert(*args): return apply(_openbox.Client_maxVert,args)
+    def maxHorz(*args): return apply(_openbox.Client_maxHorz,args)
+    def layer(*args): return apply(_openbox.Client_layer,args)
+    def toggleClientBorder(*args): return apply(_openbox.Client_toggleClientBorder,args)
+    def area(*args): return apply(_openbox.Client_area,args)
+    def strut(*args): return apply(_openbox.Client_strut,args)
+    def move(*args): return apply(_openbox.Client_move,args)
+    def resize(*args): return apply(_openbox.Client_resize,args)
+    def focus(*args): return apply(_openbox.Client_focus,args)
+    def unfocus(*args): return apply(_openbox.Client_unfocus,args)
+    def focusHandler(*args): return apply(_openbox.Client_focusHandler,args)
+    def unfocusHandler(*args): return apply(_openbox.Client_unfocusHandler,args)
+    def propertyHandler(*args): return apply(_openbox.Client_propertyHandler,args)
+    def clientMessageHandler(*args): return apply(_openbox.Client_clientMessageHandler,args)
+    def configureRequestHandler(*args): return apply(_openbox.Client_configureRequestHandler,args)
+    def unmapHandler(*args): return apply(_openbox.Client_unmapHandler,args)
+    def destroyHandler(*args): return apply(_openbox.Client_destroyHandler,args)
+    def reparentHandler(*args): return apply(_openbox.Client_reparentHandler,args)
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
-        return "<C OBClient instance at %s>" % (self.this,)
+        return "<C Client instance at %s>" % (self.this,)
 
-class OBClientPtr(OBClient):
+class ClientPtr(Client):
     def __init__(self,this):
         self.this = this
         if not hasattr(self,"thisown"): self.thisown = 0
-        self.__class__ = OBClient
-_openbox.OBClient_swigregister(OBClientPtr)
+        self.__class__ = Client
+_openbox.Client_swigregister(ClientPtr)
 
 MC_Frame = _openbox.MC_Frame
 MC_Titlebar = _openbox.MC_Titlebar

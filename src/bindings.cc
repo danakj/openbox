@@ -68,7 +68,7 @@ static bool modvalue(const std::string &mod, unsigned int *val)
   return true;
 }
 
-bool OBBindings::translate(const std::string &str, Binding &b,bool askey) const
+bool Bindings::translate(const std::string &str, Binding &b,bool askey) const
 {
   // parse out the base key name
   std::string::size_type keybegin = str.find_last_of('-');
@@ -98,7 +98,7 @@ bool OBBindings::translate(const std::string &str, Binding &b,bool askey) const
       printf(_("Invalid Key name in key binding: %s\n"), key.c_str());
       return false;
     }
-    if (!(b.key = XKeysymToKeycode(otk::OBDisplay::display, sym)))
+    if (!(b.key = XKeysymToKeycode(otk::Display::display, sym)))
       printf(_("No valid keycode for Key in key binding: %s\n"), key.c_str());
     return b.key != 0;
   } else {
@@ -115,7 +115,7 @@ static void destroytree(KeyBindingTree *tree)
   }
 }
 
-KeyBindingTree *OBBindings::buildtree(const StringVect &keylist,
+KeyBindingTree *Bindings::buildtree(const StringVect &keylist,
                                       PyObject *callback) const
 {
   if (keylist.empty()) return 0; // nothing in the list.. return 0
@@ -142,11 +142,11 @@ KeyBindingTree *OBBindings::buildtree(const StringVect &keylist,
 }
 
 
-OBBindings::OBBindings()
+Bindings::Bindings()
   : _curpos(&_keytree),
     _resetkey(0,0),
     _timer(Openbox::instance->timerManager(),
-           (otk::OBTimeoutHandler)resetChains, this)
+           (otk::TimeoutHandler)resetChains, this)
 {
   _timer.setTimeout(5000); // chains reset after 5 seconds
   
@@ -154,7 +154,7 @@ OBBindings::OBBindings()
 }
 
 
-OBBindings::~OBBindings()
+Bindings::~Bindings()
 {
   grabKeys(false);
   removeAllKeys();
@@ -163,7 +163,7 @@ OBBindings::~OBBindings()
 }
 
 
-void OBBindings::assimilate(KeyBindingTree *node)
+void Bindings::assimilate(KeyBindingTree *node)
 {
   KeyBindingTree *a, *b, *tmp, *last;
 
@@ -195,7 +195,7 @@ void OBBindings::assimilate(KeyBindingTree *node)
 }
 
 
-KeyBindingTree *OBBindings::find(KeyBindingTree *search,
+KeyBindingTree *Bindings::find(KeyBindingTree *search,
                                  bool *conflict) const {
   *conflict = false;
   KeyBindingTree *a, *b;
@@ -222,7 +222,7 @@ KeyBindingTree *OBBindings::find(KeyBindingTree *search,
 }
 
 
-bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
+bool Bindings::addKey(const StringVect &keylist, PyObject *callback)
 {
   KeyBindingTree *tree, *t;
   bool conflict;
@@ -244,14 +244,14 @@ bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
     destroytree(tree);
   } else {
     // grab the server here to make sure no key pressed go missed
-    otk::OBDisplay::grab();
+    otk::Display::grab();
     grabKeys(false);
 
     // assimilate this built tree into the main tree
     assimilate(tree); // assimilation destroys/uses the tree
 
     grabKeys(true); 
-    otk::OBDisplay::ungrab();
+    otk::Display::ungrab();
   }
  
   Py_INCREF(callback);
@@ -260,7 +260,7 @@ bool OBBindings::addKey(const StringVect &keylist, PyObject *callback)
 }
 
 
-bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
+bool Bindings::removeKey(const StringVect &keylist, PyObject *callback)
 {
   assert(false); // XXX: function not implemented yet
 
@@ -277,7 +277,7 @@ bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
                                           callback);
     if (it != t->callbacks.end()) {
       // grab the server here to make sure no key pressed go missed
-      otk::OBDisplay::grab();
+      otk::Display::grab();
       grabKeys(false);
       
       _curpos = &_keytree;
@@ -286,7 +286,7 @@ bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
       Py_XDECREF(*it);
       
       grabKeys(true);
-      otk::OBDisplay::ungrab();
+      otk::Display::ungrab();
       
       return true;
     }
@@ -295,17 +295,17 @@ bool OBBindings::removeKey(const StringVect &keylist, PyObject *callback)
 }
 
 
-void OBBindings::setResetKey(const std::string &key)
+void Bindings::setResetKey(const std::string &key)
 {
   Binding b(0, 0);
   if (translate(key, b)) {
     // grab the server here to make sure no key pressed go missed
-    otk::OBDisplay::grab();
+    otk::Display::grab();
     grabKeys(false);
     _resetkey.key = b.key;
     _resetkey.modifiers = b.modifiers;
     grabKeys(true);
-    otk::OBDisplay::ungrab();
+    otk::Display::ungrab();
   }
 }
 
@@ -328,7 +328,7 @@ static void remove_branch(KeyBindingTree *first)
 }
 
 
-void OBBindings::removeAllKeys()
+void Bindings::removeAllKeys()
 {
   grabKeys(false);
   if (_keytree.first_child) {
@@ -339,37 +339,37 @@ void OBBindings::removeAllKeys()
 }
 
 
-void OBBindings::grabKeys(bool grab)
+void Bindings::grabKeys(bool grab)
 {
   for (int i = 0; i < Openbox::instance->screenCount(); ++i) {
-    Window root = otk::OBDisplay::screenInfo(i)->rootWindow();
+    Window root = otk::Display::screenInfo(i)->rootWindow();
 
     KeyBindingTree *p = _curpos->first_child;
     while (p) {
       if (grab) {
-        otk::OBDisplay::grabKey(p->binding.key, p->binding.modifiers,
+        otk::Display::grabKey(p->binding.key, p->binding.modifiers,
                                 root, false, GrabModeAsync, GrabModeAsync,
                                 false);
       }
       else
-        otk::OBDisplay::ungrabKey(p->binding.key, p->binding.modifiers,
+        otk::Display::ungrabKey(p->binding.key, p->binding.modifiers,
                                   root);
       p = p->next_sibling;
     }
 
     if (_resetkey.key)
       if (grab)
-        otk::OBDisplay::grabKey(_resetkey.key, _resetkey.modifiers,
+        otk::Display::grabKey(_resetkey.key, _resetkey.modifiers,
                                 root, false, GrabModeAsync, GrabModeAsync,
                                 false);
       else
-        otk::OBDisplay::ungrabKey(_resetkey.key, _resetkey.modifiers,
+        otk::Display::ungrabKey(_resetkey.key, _resetkey.modifiers,
                                   root);
   }
 }
 
 
-void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
+void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
                          Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
@@ -381,13 +381,13 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
         if (p->chain) {
           _timer.start(); // start/restart the timer
           // grab the server here to make sure no key pressed go missed
-          otk::OBDisplay::grab();
+          otk::Display::grab();
           grabKeys(false);
           _curpos = p;
           grabKeys(true);
-          otk::OBDisplay::ungrab();
+          otk::Display::ungrab();
         } else {
-          OBClient *c = Openbox::instance->focusedClient();
+          Client *c = Openbox::instance->focusedClient();
           KeyData data(screen, c, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
@@ -401,19 +401,19 @@ void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
   }
 }
 
-void OBBindings::resetChains(OBBindings *self)
+void Bindings::resetChains(Bindings *self)
 {
   self->_timer.stop();
   // grab the server here to make sure no key pressed go missed
-  otk::OBDisplay::grab();
+  otk::Display::grab();
   self->grabKeys(false);
   self->_curpos = &self->_keytree;
   self->grabKeys(true);
-  otk::OBDisplay::ungrab();
+  otk::Display::ungrab();
 }
 
 
-bool OBBindings::addButton(const std::string &but, MouseContext context,
+bool Bindings::addButton(const std::string &but, MouseContext context,
                            MouseAction action, PyObject *callback)
 {
   assert(context >= 0 && context < NUM_MOUSE_CONTEXT);
@@ -441,8 +441,8 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
     _buttons[context].push_back(bind);
     // grab the button on all clients
     for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
-      OBScreen *s = Openbox::instance->screen(sn);
-      OBClient::List::iterator c_it, c_end = s->clients.end();
+      Screen *s = Openbox::instance->screen(sn);
+      Client::List::iterator c_it, c_end = s->clients.end();
       for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
         grabButton(true, bind->binding, context, *c_it);
       }
@@ -454,7 +454,7 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
   return true;
 }
 
-void OBBindings::removeAllButtons()
+void Bindings::removeAllButtons()
 {
   for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
@@ -467,8 +467,8 @@ void OBBindings::removeAllButtons()
       }
       // ungrab the button on all clients
       for (int sn = 0; sn < Openbox::instance->screenCount(); ++sn) {
-        OBScreen *s = Openbox::instance->screen(sn);
-        OBClient::List::iterator c_it, c_end = s->clients.end();
+        Screen *s = Openbox::instance->screen(sn);
+        Client::List::iterator c_it, c_end = s->clients.end();
         for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
           grabButton(false, (*it)->binding, (MouseContext)i, *c_it);
         }
@@ -477,8 +477,8 @@ void OBBindings::removeAllButtons()
   }
 }
 
-void OBBindings::grabButton(bool grab, const Binding &b, MouseContext context,
-                            OBClient *client)
+void Bindings::grabButton(bool grab, const Binding &b, MouseContext context,
+                            Client *client)
 {
   Window win;
   int mode = GrabModeAsync;
@@ -500,13 +500,13 @@ void OBBindings::grabButton(bool grab, const Binding &b, MouseContext context,
     return;
   }
   if (grab)
-    otk::OBDisplay::grabButton(b.key, b.modifiers, win, false, mask, mode,
+    otk::Display::grabButton(b.key, b.modifiers, win, false, mask, mode,
                                GrabModeAsync, None, None, false);
   else
-    otk::OBDisplay::ungrabButton(b.key, b.modifiers, win);
+    otk::Display::ungrabButton(b.key, b.modifiers, win);
 }
 
-void OBBindings::grabButtons(bool grab, OBClient *client)
+void Bindings::grabButtons(bool grab, Client *client)
 {
   for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
@@ -515,11 +515,11 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
   }
 }
 
-void OBBindings::fireButton(MouseData *data)
+void Bindings::fireButton(MouseData *data)
 {
   if (data->context == MC_Window) {
     // Replay the event, so it goes to the client, and ungrab the device.
-    XAllowEvents(otk::OBDisplay::display, ReplayPointer, data->time);
+    XAllowEvents(otk::Display::display, ReplayPointer, data->time);
   }
   
   ButtonBindingList::iterator it, end = _buttons[data->context].end();
@@ -534,14 +534,14 @@ void OBBindings::fireButton(MouseData *data)
 }
 
 
-bool OBBindings::addEvent(EventAction action, PyObject *callback)
+bool Bindings::addEvent(EventAction action, PyObject *callback)
 {
   if (action < 0 || action >= NUM_EVENTS) {
     return false;
   }
 #ifdef    XKB
   if (action == EventBell && _eventlist[action].empty())
-    XkbSelectEvents(otk::OBDisplay::display, XkbUseCoreKbd,
+    XkbSelectEvents(otk::Display::display, XkbUseCoreKbd,
                     XkbBellNotifyMask, XkbBellNotifyMask);
 #endif // XKB
   _eventlist[action].push_back(callback);
@@ -549,7 +549,7 @@ bool OBBindings::addEvent(EventAction action, PyObject *callback)
   return true;
 }
 
-bool OBBindings::removeEvent(EventAction action, PyObject *callback)
+bool Bindings::removeEvent(EventAction action, PyObject *callback)
 {
   if (action < 0 || action >= NUM_EVENTS) {
     return false;
@@ -563,7 +563,7 @@ bool OBBindings::removeEvent(EventAction action, PyObject *callback)
     _eventlist[action].erase(it);
 #ifdef    XKB
     if (action == EventBell && _eventlist[action].empty())
-      XkbSelectEvents(otk::OBDisplay::display, XkbUseCoreKbd,
+      XkbSelectEvents(otk::Display::display, XkbUseCoreKbd,
                       XkbBellNotifyMask, 0);
 #endif // XKB
     return true;
@@ -571,7 +571,7 @@ bool OBBindings::removeEvent(EventAction action, PyObject *callback)
   return false;
 }
 
-void OBBindings::removeAllEvents()
+void Bindings::removeAllEvents()
 {
   for (int i = 0; i < NUM_EVENTS; ++i) {
     while (!_eventlist[i].empty()) {
@@ -581,7 +581,7 @@ void OBBindings::removeAllEvents()
   }
 }
 
-void OBBindings::fireEvent(EventData *data)
+void Bindings::fireEvent(EventData *data)
 {
   CallbackList::iterator c_it, c_end = _eventlist[data->action].end();
   for (c_it = _eventlist[data->action].begin(); c_it != c_end; ++c_it)

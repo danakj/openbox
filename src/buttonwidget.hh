@@ -1,13 +1,13 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __obbuttonwidget_hh
-#define   __obbuttonwidget_hh
+#ifndef   __buttonwidget_hh
+#define   __buttonwidget_hh
 
 #include "widgetbase.hh"
 #include "otk/widget.hh"
 
 namespace ob {
 
-class OBButtonWidget : public otk::OtkWidget, public OBWidget
+class ButtonWidget : public otk::Widget, public WidgetBase
 {
 private:
   void setTextures();
@@ -15,8 +15,8 @@ private:
   unsigned int _button;
   
 public:
-  OBButtonWidget(otk::OtkWidget *parent, OBWidget::WidgetType type);
-  virtual ~OBButtonWidget();
+  ButtonWidget(otk::Widget *parent, WidgetBase::WidgetType type);
+  virtual ~ButtonWidget();
 
   virtual void setStyle(otk::Style *style);
 
@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif // __obbuttonwidget_hh
+#endif // __buttonwidget_hh

@@ -1,12 +1,12 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __obwidgetbase_hh
-#define   __obwidgetbase_hh
+#ifndef   __widgetbase_hh
+#define   __widgetbase_hh
 
 #include "python.hh"
 
 namespace ob {
 
-class OBWidget {
+class WidgetBase {
 public:
   enum WidgetType {
     Type_Frame,
@@ -28,7 +28,7 @@ private:
   WidgetType _type;
 
 public:
-  OBWidget(WidgetType type) : _type(type) {}
+  WidgetBase(WidgetType type) : _type(type) {}
   
   inline WidgetType type() const { return _type; }
 
@@ -68,4 +68,4 @@ public:
 
 }
 
-#endif // __obwidgetbase_hh
+#endif // __widgetbase_hh

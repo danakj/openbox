@@ -21,7 +21,7 @@ extern "C" {
 
 namespace ob {
 
-class OBClient;
+class Client;
 
 enum MouseContext {
   MC_Frame,
@@ -68,7 +68,7 @@ enum EventAction {
 class MouseData {
 public:
   int screen;
-  OBClient *client;
+  Client *client;
   Time time;
   unsigned int state;
   unsigned int button;
@@ -83,7 +83,7 @@ public:
   int press_clientwidth;
   int press_clientheight;
 
-  MouseData(int screen, OBClient *client, Time time, unsigned int state,
+  MouseData(int screen, Client *client, Time time, unsigned int state,
             unsigned int button, MouseContext context, MouseAction action,
             int xroot, int yroot, const otk::Point &initpos,
             const otk::Rect &initarea) {
@@ -103,7 +103,7 @@ public:
     this->press_clientwidth  = initarea.width();
     this->press_clientheight = initarea.height();
   }
-  MouseData(int screen, OBClient *client, Time time, unsigned int state,
+  MouseData(int screen, Client *client, Time time, unsigned int state,
             unsigned int button, MouseContext context, MouseAction action) {
     this->screen = screen;
     this->client = client;
@@ -126,11 +126,11 @@ public:
 class EventData {
 public:
   int screen;
-  OBClient *client;
+  Client *client;
   unsigned int state;
   EventAction action;
 
-  EventData(int screen, OBClient *client, EventAction action,
+  EventData(int screen, Client *client, EventAction action,
             unsigned int state) {
     this->screen = screen;
     this->client = client;
@@ -142,18 +142,18 @@ public:
 class KeyData {
 public:
   int screen;
-  OBClient *client;
+  Client *client;
   Time time;
   unsigned int state;
   std::string key;
 
-  KeyData(int screen, OBClient *client, Time time, unsigned int state,
+  KeyData(int screen, Client *client, Time time, unsigned int state,
           unsigned int key) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
     this->state  = state;
-    this->key    = XKeysymToString(XKeycodeToKeysym(otk::OBDisplay::display,
+    this->key    = XKeysymToString(XKeycodeToKeysym(otk::Display::display,
                                                     key, 0));
   }
 };

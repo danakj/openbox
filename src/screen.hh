@@ -3,7 +3,7 @@
 #define   __screen_hh
 
 /*! @file screen.hh
-  @brief OBScreen manages a single screen
+  @brief Screen manages a single screen
 */
 
 extern "C" {
@@ -25,13 +25,13 @@ extern "C" {
 
 namespace ob {
 
-class OBClient;
-class OBRootWindow;
+class Client;
+class RootWindow;
 
 //! Manages a single screen
 /*!
 */
-class OBScreen : public otk::OtkEventHandler, public OBWidget {
+class Screen : public otk::EventHandler, public WidgetBase {
 public:
   //! Holds a list of otk::Strut objects
   typedef std::list<otk::Strut*> StrutList;
@@ -46,7 +46,7 @@ public:
                                           ButtonReleaseMask;
 
   //! All managed clients on the screen (in order of being mapped)
-  OBClient::List clients;
+  Client::List clients;
   
 private:
   //! Was %Openbox able to manage the screen?
@@ -59,7 +59,7 @@ private:
   const otk::ScreenInfo *_info;
   
   //! The Image Control used for rendering on the screen
-  otk::BImageControl *_image_control;
+  otk::ImageControl *_image_control;
 
   //! The style with which to render on the screen
   otk::Style _style;
@@ -81,7 +81,7 @@ private:
   Window _supportwindow;
 
   //! A list of all managed clients on the screen, in their stacking order
-  OBClient::List _stacking;
+  Client::List _stacking;
 
   //! The desktop currently being displayed
   long _desktop;
@@ -90,16 +90,16 @@ private:
   long _num_desktops;
 
   //! The names of all desktops
-  otk::OBProperty::StringVect _desktop_names;
+  otk::Property::StringVect _desktop_names;
 
-  //! Calculate the OBScreen::_area member
+  //! Calculate the Screen::_area member
   void calcArea();
   //! Set the list of supported NETWM atoms on the root window
   void changeSupportedAtoms();
   //! Set the client list on the root window
   /*!
     Sets the _NET_CLIENT_LIST root window property.<br>
-    Also calls OBScreen::updateStackingList.
+    Also calls Screen::updateStackingList.
   */
   void changeClientList();
   //! Set the client stacking list on the root window
@@ -133,10 +133,10 @@ private:
 
 public:
 #ifndef SWIG
-  //! Constructs a new OBScreen object
-  OBScreen(int screen);
-  //! Destroys the OBScreen object
-  virtual ~OBScreen();
+  //! Constructs a new Screen object
+  Screen(int screen);
+  //! Destroys the Screen object
+  virtual ~Screen();
 #endif
 
   inline int number() const { return _number; }
@@ -148,7 +148,7 @@ public:
   */
   inline bool managed() const { return _managed; }
   //! Returns the Image Control used for rendering on the screen
-  inline otk::BImageControl *imageControl() { return _image_control; }
+  inline otk::ImageControl *imageControl() { return _image_control; }
   //! Returns the area of the screen not reserved by applications' Struts
   inline const otk::Rect &area() const { return _area; }
   //! Returns the style in use on the screen
@@ -179,11 +179,11 @@ public:
     it, etc.
     @param client The client to unmanage
   */
-  void unmanageWindow(OBClient *client);
+  void unmanageWindow(Client *client);
 
   //! Raises/Lowers a client window above/below all others in its stacking
   //! layer
-  void restack(bool raise, OBClient *client);
+  void restack(bool raise, Client *client);
 
   //! Sets the name of a desktop by changing the root window property
   /*!

@@ -18,7 +18,7 @@
 
 %include "stl.i"
 //%include std_list.i
-//%template(ClientList) std::list<OBClient*>;
+//%template(ClientList) std::list<Client*>;
 
 %ignore ob::Openbox::instance;
 %inline %{
@@ -90,15 +90,15 @@ void python_callback(PyObject *func, KeyData *data)
 }
 %}
 
-%ignore ob::OBScreen::clients;
+%ignore ob::Screen::clients;
 %{
   #include <iterator>
 %}
-%extend ob::OBScreen {
-  OBClient *client(int i) {
+%extend ob::Screen {
+  Client *client(int i) {
     if (i >= (int)self->clients.size())
       return NULL;
-    ob::OBClient::List::iterator it = self->clients.begin();
+    ob::Client::List::iterator it = self->clients.begin();
     std::advance(it,i);
     return *it;
   }
@@ -107,9 +107,9 @@ void python_callback(PyObject *func, KeyData *data)
   }
 };
 
-%ignore otk::OBDisplay::display;
+%ignore otk::Display::display;
 %inline %{
-  Display *OBDisplay_display() { return otk::OBDisplay::display; }
+  Display *Display_display() { return otk::Display::display; }
 %};
 
 %include "../otk/display.hh"
@@ -118,11 +118,6 @@ void python_callback(PyObject *func, KeyData *data)
 %include "../otk/rect.hh"
 %include "../otk/screeninfo.hh"
 %include "../otk/strut.hh"
-
-%rename(itostring_unsigned) itostring(unsigned int);
-%rename(itostring_long) itostring(long);
-%rename(itostring_unsigned_long) itostring(unsigned long);
-%include "../otk/util.hh"
 
 %include "../otk/eventhandler.hh"
 %include "../otk/eventdispatcher.hh"

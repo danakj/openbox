@@ -23,10 +23,10 @@ extern "C" {
 
 namespace ob {
 
-class OBScreen;
-class OBClient;
-class OBActions;
-class OBBindings;
+class Screen;
+class Client;
+class Actions;
+class Bindings;
 
 //! Mouse cursors used throughout Openbox
 struct Cursors {
@@ -49,7 +49,7 @@ struct Cursors {
   not exit until the window manager is ready to be destroyed. Destruction of
   the Openbox class instance will shutdown the window manager.
 */
-class Openbox : public otk::OtkEventDispatcher, public otk::OtkEventHandler
+class Openbox : public otk::EventDispatcher, public otk::EventHandler
 {
 public:
   //! The single instance of the Openbox class for the application
@@ -67,10 +67,10 @@ public:
   };
 
   //! A map for looking up a specific client class from the window id
-  typedef std::map<Window, OBClient *> ClientMap;
+  typedef std::map<Window, Client *> ClientMap;
 
-  //! A list of OBScreen classes
-  typedef std::vector<OBScreen *> ScreenList;
+  //! A list of Screen classes
+  typedef std::vector<Screen *> ScreenList;
   
 private:
   // stuff that can be passed on the command line
@@ -106,24 +106,24 @@ private:
   
   //! Manages all timers for the application
   /*!
-    Use of the otk::OBTimerQueueManager::fire funtion in this object ensures
+    Use of the otk::TimerQueueManager::fire funtion in this object ensures
     that all timers fire when their times elapse.
   */
-  otk::OBTimerQueueManager _timermanager;
+  otk::TimerQueueManager _timermanager;
 
   //! Cached atoms on the display
   /*!
-    This is a pointer because the OBProperty class uses otk::OBDisplay::display
+    This is a pointer because the Property class uses otk::Display::display
     in its constructor, so, it needs to be initialized <b>after</b> the display
     is initialized in this class' constructor.
   */
-  otk::OBProperty *_property;
+  otk::Property *_property;
 
   //! The action interface through which all user-available actions occur
-  OBActions *_actions;
+  Actions *_actions;
 
   //! The interface through which keys/buttons are grabbed and handled
-  OBBindings *_bindings;
+  Bindings *_bindings;
 
   //! The running state of the window manager
   RunState _state;
@@ -146,14 +146,14 @@ private:
   /*!
     Updated by the clients themselves.
   */
-  OBClient *_focused_client;
+  Client *_focused_client;
 
   //! The screen with input focus
   /*!
     Updated by the clients when they update the Openbox::focused_client
     property.
   */
-  OBScreen *_focused_screen;
+  Screen *_focused_screen;
   
   //! Parses the command line used when executing this application
   void parseCommandLine(int argv, char **argv);
@@ -180,24 +180,24 @@ public:
   //! Returns the state of the window manager (starting, exiting, etc)
   inline RunState state() const { return _state; }
 
-  //! Returns the otk::OBTimerQueueManager for the application
+  //! Returns the otk::TimerQueueManager for the application
   /*!
-    All otk::OBTimer objects used in the application should be made to use this
-    otk::OBTimerQueueManager.
+    All otk::Timer objects used in the application should be made to use this
+    otk::TimerQueueManager.
   */
-  inline otk::OBTimerQueueManager *timerManager() { return &_timermanager; }
+  inline otk::TimerQueueManager *timerManager() { return &_timermanager; }
 
-  //! Returns the otk::OBProperty instance for the window manager
-  inline const otk::OBProperty *property() const { return _property; }
+  //! Returns the otk::Property instance for the window manager
+  inline const otk::Property *property() const { return _property; }
 
-  //! Returns the OBActions instance for the window manager
-  inline OBActions *actions() const { return _actions; }
+  //! Returns the Actions instance for the window manager
+  inline Actions *actions() const { return _actions; }
 
-  //! Returns the OBBindings instance for the window manager
-  inline OBBindings *bindings() const { return _bindings; }
+  //! Returns the Bindings instance for the window manager
+  inline Bindings *bindings() const { return _bindings; }
 
   //! Returns a managed screen
-  inline OBScreen *screen(int num) {
+  inline Screen *screen(int num) {
     assert(num >= 0); assert(num < (signed)_screens.size());
     if (num >= screenCount())
       return NULL;
@@ -222,26 +222,26 @@ public:
   void eventLoop();
 #endif
 
-  //! Adds an OBClient to the client list for lookups
-  void addClient(Window window, OBClient *client);
+  //! Adds an Client to the client list for lookups
+  void addClient(Window window, Client *client);
 
-  //! Removes an OBClient from the client list for lookups
+  //! Removes an Client from the client list for lookups
   void removeClient(Window window);
 
-  //! Finds an OBClient based on its window id
-  OBClient *findClient(Window window);
+  //! Finds an Client based on its window id
+  Client *findClient(Window window);
 
   //! The client with input focus
-  inline OBClient *focusedClient() { return _focused_client; }
+  inline Client *focusedClient() { return _focused_client; }
 
   //! Change the client which has focus.
   /*!
     This is called by the clients themselves when their focus state changes.
   */
-  void setFocusedClient(OBClient *c);
+  void setFocusedClient(Client *c);
 
   //! The screen with input focus
-  inline OBScreen *focusedScreen() { return _focused_screen; }
+  inline Screen *focusedScreen() { return _focused_screen; }
   
   //! Requests that the window manager exit
   /*!

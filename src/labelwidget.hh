@@ -9,12 +9,12 @@
 
 namespace ob {
 
-class OBLabelWidget : public otk::OtkWidget, public OBWidget
+class LabelWidget : public otk::Widget, public WidgetBase
 {
 private:
   void setTextures();
-  const otk::BFont *_font;
-  otk::BColor *_text_color;
+  const otk::Font *_font;
+  otk::Color *_text_color;
   int _sidemargin;
   otk::Style::TextJustify _justify;
   std::string _text;
@@ -22,8 +22,8 @@ private:
   XftDraw *_xftdraw;
   
 public:
-  OBLabelWidget(otk::OtkWidget *parent, OBWidget::WidgetType type);
-  virtual ~OBLabelWidget();
+  LabelWidget(otk::Widget *parent, WidgetBase::WidgetType type);
+  virtual ~LabelWidget();
 
   virtual void setStyle(otk::Style *style);
 

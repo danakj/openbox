@@ -20,7 +20,7 @@ extern "C" {
 
 namespace ob {
 
-class OBClient;
+class Client;
 
 typedef std::list<PyObject *> CallbackList;
 
@@ -55,7 +55,7 @@ typedef struct ButtonBinding {
   ButtonBinding() : binding(0, 0) {}
 };
 
-class OBBindings {
+class Bindings {
 public:
   //! A list of strings
   typedef std::vector<std::string> StringVect;
@@ -67,28 +67,28 @@ private:
 
   Binding _resetkey; // the key which resets the key chain status
 
-  otk::OBTimer _timer;
+  otk::Timer _timer;
   
   KeyBindingTree *find(KeyBindingTree *search, bool *conflict) const;
   KeyBindingTree *buildtree(const StringVect &keylist,
                             PyObject *callback) const;
   void assimilate(KeyBindingTree *node);
 
-  static void resetChains(OBBindings *self); // the timer's timeout function
+  static void resetChains(Bindings *self); // the timer's timeout function
 
   typedef std::list <ButtonBinding*> ButtonBindingList;
   ButtonBindingList _buttons[NUM_MOUSE_CONTEXT];
 
   void grabButton(bool grab, const Binding &b, MouseContext context,
-                  OBClient *client);
+                  Client *client);
 
   CallbackList _eventlist[NUM_EVENTS];
   
 public:
-  //! Initializes an OBBindings object
-  OBBindings();
-  //! Destroys the OBBindings object
-  virtual ~OBBindings();
+  //! Initializes an Bindings object
+  Bindings();
+  //! Destroys the Bindings object
+  virtual ~Bindings();
 
   //! Translates a binding string into the actual Binding
   bool translate(const std::string &str, Binding &b, bool askey = true) const;
@@ -120,7 +120,7 @@ public:
   bool addButton(const std::string &but, MouseContext context,
                  MouseAction action, PyObject *callback);
 
-  void grabButtons(bool grab, OBClient *client);
+  void grabButtons(bool grab, Client *client);
 
   //! Removes all button bindings
   void removeAllButtons();

@@ -3,7 +3,7 @@
 #define   __client_hh
 
 /*! @file client.hh
-  @brief The OBClient class maintains the state of a client window by handling
+  @brief The Client class maintains the state of a client window by handling
   property changes on the window and some client messages
 */
 
@@ -26,7 +26,7 @@ extern "C" {
 
 namespace ob {
 
-class OBFrame;
+class Frame;
 
 //! The MWM Hints as retrieved from the window property
 /*!
@@ -34,36 +34,36 @@ class OBFrame;
   structure contains 5. We only use the first 3, so that is all gets defined.
 */
 struct MwmHints {
-  unsigned long flags;      //!< A bitmask of OBClient::MwmFlags values
-  unsigned long functions;  //!< A bitmask of OBClient::MwmFunctions values
-  unsigned long decorations;//!< A bitmask of OBClient::MwmDecorations values
-  //! The number of elements in the OBClient::MwmHints struct
+  unsigned long flags;      //!< A bitmask of Client::MwmFlags values
+  unsigned long functions;  //!< A bitmask of Client::MwmFunctions values
+  unsigned long decorations;//!< A bitmask of Client::MwmDecorations values
+  //! The number of elements in the Client::MwmHints struct
   static const unsigned int elements = 3;
 };
 
 //! Maintains the state of a client window.
 /*!
-  OBClient maintains the state of a client window. The state consists of the
+  Client maintains the state of a client window. The state consists of the
   hints that the application sets on the window, such as the title, or window
   gravity.
   <p>
-  OBClient also manages client messages for the client window. When the
+  Client also manages client messages for the client window. When the
   application (or any application) requests something to be changed for the
   client, it will call the ActionHandler (for client messages) or update the
   class' member variables and call whatever is nessary to complete the
   change (such as causing a redraw of the titlebar after the title is changed).
 */
-class OBClient : public otk::OtkEventHandler, public OBWidget {
+class Client : public otk::EventHandler, public WidgetBase {
 public:
 
   //! The frame window which decorates around the client window
   /*!
     NOTE: This should NEVER be used inside the client class's constructor!
   */
-  OBFrame *frame;
+  Frame *frame;
 
-  //! Holds a list of OBClients
-  typedef std::list<OBClient*> List;
+  //! Holds a list of Clients
+  typedef std::list<Client*> List;
 
   //! The possible stacking layers a client window can be a part of
   enum StackLayer {
@@ -126,7 +126,7 @@ public:
                   Func_Maximize = 1 << 3, //!< Allow to be maximized
                   Func_Close    = 1 << 4  //!< Allow to be closed
   };
-  //! Holds a bitmask of OBClient::Function values
+  //! Holds a bitmask of Client::Function values
   typedef unsigned char FunctionFlags;
 
   //! The decorations the client window wants to be displayed on it
@@ -138,7 +138,7 @@ public:
                     Decor_Sticky   = 1 << 5, //!< Display a sticky button
                     Decor_Close    = 1 << 6  //!< Display a close button
   };
-  //! Holds a bitmask of OBClient::Decoration values
+  //! Holds a bitmask of Client::Decoration values
   typedef unsigned char DecorationFlags;
 
   //! Possible actions that can be made with the _NET_WM_STATE client message
@@ -173,10 +173,10 @@ private:
   Window   _group;
 
   //! The client which this client is a transient (child) for
-  OBClient *_transient_for;
+  Client *_transient_for;
 
   //! The clients which are transients (children) of this client
-  OBClient::List _transients;
+  Client::List _transients;
 
   //! The desktop on which the window resides (0xffffffff for all desktops)
   long _desktop;
@@ -296,38 +296,38 @@ private:
 
   StackLayer _layer;
 
-  //! A bitmask of values in the OBClient::Decoration enum
+  //! A bitmask of values in the Client::Decoration enum
   /*!
     The values in the variable are the decorations that the client wants to be
     displayed around it.
   */
   DecorationFlags _decorations;
 
-  //! A bitmask of values in the OBClient::Function enum
+  //! A bitmask of values in the Client::Function enum
   /*!
     The values in the variable specify the ways in which the user is allowed to
     modify this window.
   */
   FunctionFlags _functions;
 
-  //! Retrieves the desktop hint's value and sets OBClient::_desktop
+  //! Retrieves the desktop hint's value and sets Client::_desktop
   void getDesktop();
-  //! Retrieves the window's type and sets OBClient::_type
+  //! Retrieves the window's type and sets Client::_type
   void getType();
-  //! Gets the MWM Hints and adjusts OBClient::_functions and
-  //! OBClient::_decorations
+  //! Gets the MWM Hints and adjusts Client::_functions and
+  //! Client::_decorations
   void getMwmHints();
-  //! Gets the position and size of the window and sets OBClient::_area
+  //! Gets the position and size of the window and sets Client::_area
   void getArea();
   //! Gets the net_state hint and sets the boolean flags for any states set in
   //! the hint
   void getState();
   //! Determines if the window uses the Shape extension and sets
-  //! OBClient::_shaped
+  //! Client::_shaped
   void getShaped();
 
   //! Set up what decor should be shown on the window and what functions should
-  //! be allowed (OBClient::_decorations and OBClient::_functions).
+  //! be allowed (Client::_decorations and Client::_functions).
   /*!
     This also updates the NET_WM_ALLOWED_ACTIONS hint.
   */
@@ -377,23 +377,23 @@ private:
   
 public:
 #ifndef SWIG
-  //! Constructs a new OBClient object around a specified window id
+  //! Constructs a new Client object around a specified window id
   /*!
-BB    @param window The window id that the OBClient class should handle
+BB    @param window The window id that the Client class should handle
     @param screen The screen on which the window resides
   */
-  OBClient(int screen, Window window);
-  //! Destroys the OBClient object
-  virtual ~OBClient();
+  Client(int screen, Window window);
+  //! Destroys the Client object
+  virtual ~Client();
 #endif
 
   //! Returns the screen on which the clien resides
   inline int screen() const { return _screen; }
   
-  //! Returns the window id that the OBClient object is handling
+  //! Returns the window id that the Client object is handling
   inline Window window() const { return _window; }
 
-  //! Returns the type of the window, one of the OBClient::WindowType values
+  //! Returns the type of the window, one of the Client::WindowType values
   inline WindowType type() const { return _type; }
   //! Returns if the window should be treated as a normal window.
   /*!
@@ -454,7 +454,7 @@ BB    @param window The window id that the OBClient class should handle
   inline FunctionFlags funtions() const { return _functions; }
 
   //! Return the client this window is transient for
-  inline OBClient *transientFor() const { return _transient_for; }
+  inline Client *transientFor() const { return _transient_for; }
 
   //! Returns if the window is modal
   /*!

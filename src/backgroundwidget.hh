@@ -1,20 +1,20 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
-#ifndef   __obbackgroundwidget_hh
-#define   __obbackgroundwidget_hh
+#ifndef   __backgroundwidget_hh
+#define   __backgroundwidget_hh
 
 #include "otk/widget.hh"
 #include "widgetbase.hh"
 
 namespace ob {
 
-class OBBackgroundWidget : public otk::OtkWidget, public OBWidget
+class BackgroundWidget : public otk::Widget, public WidgetBase
 {
 private:
   void setTextures();
   
 public:
-  OBBackgroundWidget(otk::OtkWidget *parent, OBWidget::WidgetType type);
-  virtual ~OBBackgroundWidget();
+  BackgroundWidget(otk::Widget *parent, WidgetBase::WidgetType type);
+  virtual ~BackgroundWidget();
 
   virtual void setStyle(otk::Style *style);
 
@@ -26,4 +26,4 @@ public:
 
 }
 
-#endif // __obbackgroundwidget_hh
+#endif // __backgroundwidget_hh

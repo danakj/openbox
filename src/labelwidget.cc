@@ -1,4 +1,5 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
+// -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
 #ifdef HAVE_CONFIG_H
 # include "../config.h"
@@ -10,30 +11,30 @@
 
 namespace ob {
 
-OBLabelWidget::OBLabelWidget(otk::OtkWidget *parent, OBWidget::WidgetType type)
-  : otk::OtkWidget(parent),
-    OBWidget(type)
+LabelWidget::LabelWidget(otk::Widget *parent, WidgetBase::WidgetType type)
+  : otk::Widget(parent),
+    WidgetBase(type)
 {
-  const otk::ScreenInfo *info = otk::OBDisplay::screenInfo(_screen);
-  _xftdraw = XftDrawCreate(otk::OBDisplay::display, _window, info->visual(),
+  const otk::ScreenInfo *info = otk::Display::screenInfo(_screen);
+  _xftdraw = XftDrawCreate(otk::Display::display, _window, info->visual(),
                            info->colormap());
 }
 
 
-OBLabelWidget::~OBLabelWidget()
+LabelWidget::~LabelWidget()
 {
   XftDrawDestroy(_xftdraw);
 }
 
 
-void OBLabelWidget::setText(const std::string &text)
+void LabelWidget::setText(const std::string &text)
 {
   _text = text;
   _dirty = true;
 }
 
 
-void OBLabelWidget::setTextures()
+void LabelWidget::setTextures()
 {
   if (_focused) {
     setTexture(_style->getLabelFocus());
@@ -45,9 +46,9 @@ void OBLabelWidget::setTextures()
 }
 
 
-void OBLabelWidget::setStyle(otk::Style *style)
+void LabelWidget::setStyle(otk::Style *style)
 {
-  OtkWidget::setStyle(style);
+  otk::Widget::setStyle(style);
   setTextures();
   _font = style->getFont();
   assert(_font);
@@ -56,25 +57,25 @@ void OBLabelWidget::setStyle(otk::Style *style)
 }
 
 
-void OBLabelWidget::focus()
+void LabelWidget::focus()
 {
-  otk::OtkWidget::focus();
+  otk::Widget::focus();
   setTextures();
 }
 
 
-void OBLabelWidget::unfocus()
+void LabelWidget::unfocus()
 {
-  otk::OtkWidget::unfocus();
+  otk::Widget::unfocus();
   setTextures();
 }
 
 
-void OBLabelWidget::update()
+void LabelWidget::update()
 {
   bool draw = _dirty;
 
-  OtkWidget::update();
+  otk::Widget::update();
 
   if (draw) {
     std::string t = _text;
@@ -111,7 +112,7 @@ void OBLabelWidget::update()
 }
 
 
-void OBLabelWidget::adjust()
+void LabelWidget::adjust()
 {
   // nothing to adjust. no children.
 }

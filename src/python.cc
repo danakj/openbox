@@ -133,7 +133,7 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
     return NULL;
   }
 
-  ob::OBBindings::StringVect vectkeylist;
+  ob::Bindings::StringVect vectkeylist;
   for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
     PyObject *str = PyList_GetItem(keylist, i);
     if (!PyString_Check(str)) {
@@ -163,7 +163,7 @@ PyObject *kunbind(PyObject *keylist, PyObject *func)
     return NULL;
   }
   
-  ob::OBBindings::StringVect vectkeylist;
+  ob::Bindings::StringVect vectkeylist;
   for (int i = 0, end = PyList_Size(keylist); i < end; ++i) {
     PyObject *str = PyList_GetItem(keylist, i);
     if (!PyString_Check(str)) {
@@ -195,9 +195,9 @@ PyObject *send_client_msg(Window target, int type, Window about,
                           long data, long data1, long data2,
                           long data3, long data4)
 {
-  if (type < 0 || type >= otk::OBProperty::NUM_ATOMS) {
+  if (type < 0 || type >= otk::Property::NUM_ATOMS) {
       PyErr_SetString(PyExc_TypeError,
-                     "Invalid atom type. Must be from otk::OBProperty::Atoms");
+                     "Invalid atom type. Must be from otk::Property::Atoms");
       return NULL;
   }
   
@@ -205,7 +205,7 @@ PyObject *send_client_msg(Window target, int type, Window about,
   e.xclient.type = ClientMessage;
   e.xclient.format = 32;
   e.xclient.message_type =
-    Openbox::instance->property()->atom((otk::OBProperty::Atoms)type);
+    Openbox::instance->property()->atom((otk::Property::Atoms)type);
   e.xclient.window = about;
   e.xclient.data.l[0] = data;
   e.xclient.data.l[1] = data1;
@@ -213,7 +213,7 @@ PyObject *send_client_msg(Window target, int type, Window about,
   e.xclient.data.l[3] = data3;
   e.xclient.data.l[4] = data4;
 
-  XSendEvent(otk::OBDisplay::display, target, false,
+  XSendEvent(otk::Display::display, target, false,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
   Py_INCREF(Py_None); return Py_None;

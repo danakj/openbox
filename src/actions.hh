@@ -25,7 +25,7 @@ namespace ob {
   When these actions are fired, hooks to the guile engine are fired so that
   guile code is run.
 */
-class OBActions : public otk::OtkEventHandler {
+class Actions : public otk::EventHandler {
 public:
 #ifndef   SWIG // get rid of a swig warning
   struct ButtonReleaseAction {
@@ -61,10 +61,10 @@ private:
   void removePress(const XButtonEvent &e);
 
 public:
-  //! Constructs an OBActions object
-  OBActions();
-  //! Destroys the OBActions object
-  virtual ~OBActions();
+  //! Constructs an Actions object
+  Actions();
+  //! Destroys the Actions object
+  virtual ~Actions();
 
   virtual void buttonPressHandler(const XButtonEvent &e);
   virtual void buttonReleaseHandler(const XButtonEvent &e);

@@ -17,9 +17,9 @@
 
 namespace ob {
 
-const int OBActions::BUTTONS;
+const int Actions::BUTTONS;
 
-OBActions::OBActions()
+Actions::Actions()
   : _button(0)
 {
   for (int i=0; i<BUTTONS; ++i)
@@ -27,14 +27,14 @@ OBActions::OBActions()
 }
 
 
-OBActions::~OBActions()
+Actions::~Actions()
 {
   for (int i=0; i<BUTTONS; ++i)
     delete _posqueue[i];
 }
 
 
-void OBActions::insertPress(const XButtonEvent &e)
+void Actions::insertPress(const XButtonEvent &e)
 {
   ButtonPressAction *a = _posqueue[BUTTONS - 1];
   // rm'd the last one, shift them all down one
@@ -45,11 +45,11 @@ void OBActions::insertPress(const XButtonEvent &e)
   a->button = e.button;
   a->pos.setPoint(e.x_root, e.y_root);
 
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c) a->clientarea = c->area();
 }
 
-void OBActions::removePress(const XButtonEvent &e)
+void Actions::removePress(const XButtonEvent &e)
 {
   int i;
   ButtonPressAction *a = 0;
@@ -66,13 +66,13 @@ void OBActions::removePress(const XButtonEvent &e)
   _posqueue[BUTTONS-1]->button = 0;
 }
 
-void OBActions::buttonPressHandler(const XButtonEvent &e)
+void Actions::buttonPressHandler(const XButtonEvent &e)
 {
-  OtkEventHandler::buttonPressHandler(e);
+  otk::EventHandler::buttonPressHandler(e);
   insertPress(e);
   
   // run the PRESS python hook
-  OBWidget *w = dynamic_cast<OBWidget*>
+  WidgetBase *w = dynamic_cast<WidgetBase*>
     (Openbox::instance->findHandler(e.window));
   assert(w); // everything should be a widget
 
@@ -80,11 +80,11 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   int screen;
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c)
     screen = c->screen();
   else
-    screen = otk::OBDisplay::findScreen(e.root)->screen();
+    screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MousePress);
   Openbox::instance->bindings()->fireButton(&data);
@@ -106,12 +106,12 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
 }
   
 
-void OBActions::buttonReleaseHandler(const XButtonEvent &e)
+void Actions::buttonReleaseHandler(const XButtonEvent &e)
 {
-  OtkEventHandler::buttonReleaseHandler(e);
+  otk::EventHandler::buttonReleaseHandler(e);
   removePress(e);
   
-  OBWidget *w = dynamic_cast<OBWidget*>
+  WidgetBase *w = dynamic_cast<WidgetBase*>
     (Openbox::instance->findHandler(e.window));
   assert(w); // everything should be a widget
 
@@ -122,7 +122,7 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 
   // find the area of the window
   XWindowAttributes attr;
-  if (!XGetWindowAttributes(otk::OBDisplay::display, e.window, &attr)) return;
+  if (!XGetWindowAttributes(otk::Display::display, e.window, &attr)) return;
 
   // if not on the window any more, it isnt a CLICK
   if (!(e.same_screen && e.x >= 0 && e.y >= 0 &&
@@ -134,11 +134,11 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   int screen;
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c)
     screen = c->screen();
   else
-    screen = otk::OBDisplay::findScreen(e.root)->screen();
+    screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
                  MouseClick);
   Openbox::instance->bindings()->fireButton(&data);
@@ -169,54 +169,54 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
 }
 
 
-void OBActions::enterHandler(const XCrossingEvent &e)
+void Actions::enterHandler(const XCrossingEvent &e)
 {
-  OtkEventHandler::enterHandler(e);
+  otk::EventHandler::enterHandler(e);
   
   // run the ENTER python hook
   int screen;
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c)
     screen = c->screen();
   else
-    screen = otk::OBDisplay::findScreen(e.root)->screen();
+    screen = otk::Display::findScreen(e.root)->screen();
   EventData data(screen, c, EventEnterWindow, e.state);
   Openbox::instance->bindings()->fireEvent(&data);
 }
 
 
-void OBActions::leaveHandler(const XCrossingEvent &e)
+void Actions::leaveHandler(const XCrossingEvent &e)
 {
-  OtkEventHandler::leaveHandler(e);
+  otk::EventHandler::leaveHandler(e);
 
   // run the LEAVE python hook
   int screen;
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c)
     screen = c->screen();
   else
-    screen = otk::OBDisplay::findScreen(e.root)->screen();
+    screen = otk::Display::findScreen(e.root)->screen();
   EventData data(screen, c, EventLeaveWindow, e.state);
   Openbox::instance->bindings()->fireEvent(&data);
 }
 
 
-void OBActions::keyPressHandler(const XKeyEvent &e)
+void Actions::keyPressHandler(const XKeyEvent &e)
 {
-  OtkEventHandler::keyPressHandler(e);
+  otk::EventHandler::keyPressHandler(e);
 
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   Openbox::instance->bindings()->
-    fireKey(otk::OBDisplay::findScreen(e.root)->screen(),
+    fireKey(otk::Display::findScreen(e.root)->screen(),
             state, e.keycode, e.time);
 }
 
 
-void OBActions::motionHandler(const XMotionEvent &e)
+void Actions::motionHandler(const XMotionEvent &e)
 {
-  OtkEventHandler::motionHandler(e);
+  otk::EventHandler::motionHandler(e);
 
   if (!e.same_screen) return; // this just gets stupid
 
@@ -224,9 +224,9 @@ void OBActions::motionHandler(const XMotionEvent &e)
   
   // compress changes to a window into a single change
   XEvent ce;
-  while (XCheckTypedEvent(otk::OBDisplay::display, e.type, &ce)) {
+  while (XCheckTypedEvent(otk::Display::display, e.type, &ce)) {
     if (ce.xmotion.window != e.window) {
-      XPutBackEvent(otk::OBDisplay::display, &ce);
+      XPutBackEvent(otk::Display::display, &ce);
       break;
     } else {
       x_root = e.x_root;
@@ -234,7 +234,7 @@ void OBActions::motionHandler(const XMotionEvent &e)
     }
   }
 
-  OBWidget *w = dynamic_cast<OBWidget*>
+  WidgetBase *w = dynamic_cast<WidgetBase*>
     (Openbox::instance->findHandler(e.window));
   assert(w); // everything should be a widget
 
@@ -244,46 +244,46 @@ void OBActions::motionHandler(const XMotionEvent &e)
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;
   int screen;
-  OBClient *c = Openbox::instance->findClient(e.window);
+  Client *c = Openbox::instance->findClient(e.window);
   if (c)
     screen = c->screen();
   else
-    screen = otk::OBDisplay::findScreen(e.root)->screen();
+    screen = otk::Display::findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
                  x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
   Openbox::instance->bindings()->fireButton(&data);
 }
 
-void OBActions::mapRequestHandler(const XMapRequestEvent &e)
+void Actions::mapRequestHandler(const XMapRequestEvent &e)
 {
-  OtkEventHandler::mapRequestHandler(e);
-  // do this in OBScreen::manageWindow
+  otk::EventHandler::mapRequestHandler(e);
+  // do this in Screen::manageWindow
 }
 
-void OBActions::unmapHandler(const XUnmapEvent &e)
+void Actions::unmapHandler(const XUnmapEvent &e)
 {
-  OtkEventHandler::unmapHandler(e);
-  // do this in OBScreen::unmanageWindow
+  otk::EventHandler::unmapHandler(e);
+  // do this in Screen::unmanageWindow
 }
 
-void OBActions::destroyHandler(const XDestroyWindowEvent &e)
+void Actions::destroyHandler(const XDestroyWindowEvent &e)
 {
-  OtkEventHandler::destroyHandler(e);
-  // do this in OBScreen::unmanageWindow
+  otk::EventHandler::destroyHandler(e);
+  // do this in Screen::unmanageWindow
 }
 
 #ifdef    XKB
-void OBActions::xkbHandler(const XkbEvent &e)
+void Actions::xkbHandler(const XkbEvent &e)
 {
   Window w;
   int screen;
   
-  OtkEventHandler::xkbHandler(e);
+  otk::EventHandler::xkbHandler(e);
 
   switch (((XkbAnyEvent*)&e)->xkb_type) {
   case XkbBellNotify:
     w = ((XkbBellNotifyEvent*)&e)->window;
-    OBClient *c = Openbox::instance->findClient(w);
+    Client *c = Openbox::instance->findClient(w);
     if (c)
       screen = c->screen();
     else

@@ -79,8 +79,8 @@ void Openbox::signalHandler(int signal)
 
 
 Openbox::Openbox(int argc, char **argv)
-  : otk::OtkEventDispatcher(),
-    otk::OtkEventHandler()
+  : otk::EventDispatcher(),
+    otk::EventHandler()
 {
   struct sigaction action;
 
@@ -100,10 +100,10 @@ Openbox::Openbox(int argc, char **argv)
   parseCommandLine(argc, argv);
 
   // open the X display (and gets some info about it, and its screens)
-  otk::OBDisplay::initialize(_displayreq);
-  assert(otk::OBDisplay::display);
+  otk::Display::initialize(_displayreq);
+  assert(otk::Display::display);
 
-  XSynchronize(otk::OBDisplay::display, _sync);
+  XSynchronize(otk::Display::display, _sync);
   
   // set up the signal handler
   action.sa_handler = Openbox::signalHandler;
@@ -117,19 +117,19 @@ Openbox::Openbox(int argc, char **argv)
   sigaction(SIGINT, &action, (struct sigaction *) 0);
   sigaction(SIGHUP, &action, (struct sigaction *) 0);
 
-  _property = new otk::OBProperty();
-  _actions = new OBActions();
-  _bindings = new OBBindings();
+  _property = new otk::Property();
+  _actions = new Actions();
+  _bindings = new Bindings();
 
   setMasterHandler(_actions); // set as the master event handler
 
   // create the mouse cursors we'll use
-  _cursors.session = XCreateFontCursor(otk::OBDisplay::display, XC_left_ptr);
-  _cursors.move = XCreateFontCursor(otk::OBDisplay::display, XC_fleur);
-  _cursors.ll_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ll_angle);
-  _cursors.lr_angle = XCreateFontCursor(otk::OBDisplay::display, XC_lr_angle);
-  _cursors.ul_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ul_angle);
-  _cursors.ur_angle = XCreateFontCursor(otk::OBDisplay::display, XC_ur_angle);
+  _cursors.session = XCreateFontCursor(otk::Display::display, XC_left_ptr);
+  _cursors.move = XCreateFontCursor(otk::Display::display, XC_fleur);
+  _cursors.ll_angle = XCreateFontCursor(otk::Display::display, XC_ll_angle);
+  _cursors.lr_angle = XCreateFontCursor(otk::Display::display, XC_lr_angle);
+  _cursors.ul_angle = XCreateFontCursor(otk::Display::display, XC_ul_angle);
+  _cursors.ur_angle = XCreateFontCursor(otk::Display::display, XC_ur_angle);
 
   // initialize scripting
   python_init(argv[0]);
@@ -143,11 +143,11 @@ Openbox::Openbox(int argc, char **argv)
     python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors
 
   // initialize all the screens
-  OBScreen *screen;
-  int i = _single ? DefaultScreen(otk::OBDisplay::display) : 0;
-  int max = _single ? i + 1 : ScreenCount(otk::OBDisplay::display);
+  Screen *screen;
+  int i = _single ? DefaultScreen(otk::Display::display) : 0;
+  int max = _single ? i + 1 : ScreenCount(otk::Display::display);
   for (; i < max; ++i) {
-    screen = new OBScreen(i);
+    screen = new Screen(i);
     if (screen->managed())
       _screens.push_back(screen);
     else
@@ -189,19 +189,19 @@ Openbox::~Openbox()
 
   python_destroy();
 
-  XSetInputFocus(otk::OBDisplay::display, PointerRoot, RevertToNone,
+  XSetInputFocus(otk::Display::display, PointerRoot, RevertToNone,
                  CurrentTime);
-  XSync(otk::OBDisplay::display, false);
+  XSync(otk::Display::display, false);
 
   // this tends to block.. i honestly am not sure why. causing an x error in
   // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
   // all im gunna do is the same.
-  //otk::OBDisplay::destroy();
+  //otk::Display::destroy();
 
   if (_restart) {
     if (!_restart_prog.empty()) {
       const std::string &dstr =
-        otk::OBDisplay::screenInfo(first_screen)->displayString();
+        otk::Display::screenInfo(first_screen)->displayString();
       otk::putenv(const_cast<char *>(dstr.c_str()));
       execlp(_restart_prog.c_str(), _restart_prog.c_str(), NULL);
       perror(_restart_prog.c_str());
@@ -321,13 +321,13 @@ void Openbox::eventLoop()
 {
   while (!_shutdown) {
     _timermanager.fire(!_sync); // wait if not in sync mode
-    dispatchEvents(); // from OtkEventDispatcher
-    XFlush(otk::OBDisplay::display); // flush here before we go wait for timers
+    dispatchEvents(); // from otk::EventDispatcher
+    XFlush(otk::Display::display); // flush here before we go wait for timers
   }
 }
 
 
-void Openbox::addClient(Window window, OBClient *client)
+void Openbox::addClient(Window window, Client *client)
 {
   _clients[window] = client;
 }
@@ -339,7 +339,7 @@ void Openbox::removeClient(Window window)
 }
 
 
-OBClient *Openbox::findClient(Window window)
+Client *Openbox::findClient(Window window)
 {
   /*
     NOTE: we dont use _clients[] to find the value because that will insert
@@ -350,27 +350,27 @@ OBClient *Openbox::findClient(Window window)
   if (it != _clients.end())
     return it->second;
   else
-    return (OBClient*) 0;
+    return (Client*) 0;
 }
 
 
-void Openbox::setFocusedClient(OBClient *c)
+void Openbox::setFocusedClient(Client *c)
 {
   _focused_client = c;
   if (c) {
     _focused_screen = _screens[c->screen()];
   } else {
     assert(_focused_screen);
-    XSetInputFocus(otk::OBDisplay::display, _focused_screen->focuswindow(),
+    XSetInputFocus(otk::Display::display, _focused_screen->focuswindow(),
                    RevertToNone, CurrentTime);
   }
   // set the NET_ACTIVE_WINDOW hint for all screens
   ScreenList::iterator it, end = _screens.end();
   for (it = _screens.begin(); it != end; ++it) {
     int num = (*it)->number();
-    Window root = otk::OBDisplay::screenInfo(num)->rootWindow();
-    _property->set(root, otk::OBProperty::net_active_window,
-                   otk::OBProperty::Atom_Window,
+    Window root = otk::Display::screenInfo(num)->rootWindow();
+    _property->set(root, otk::Property::net_active_window,
+                   otk::Property::Atom_Window,
                    (c && _focused_screen == *it) ? c->window() : None);
   }
 
@@ -381,9 +381,9 @@ void Openbox::setFocusedClient(OBClient *c)
 
 void Openbox::execute(int screen, const std::string &bin)
 {
-  if (screen >= ScreenCount(otk::OBDisplay::display))
+  if (screen >= ScreenCount(otk::Display::display))
     screen = 0;
-  otk::bexec(bin, otk::OBDisplay::screenInfo(screen)->displayString());
+  otk::bexec(bin, otk::Display::screenInfo(screen)->displayString());
 }
 
 }

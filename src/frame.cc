@@ -21,29 +21,29 @@ extern "C" {
 
 namespace ob {
 
-const long OBFrame::event_mask;
+const long Frame::event_mask;
 
-OBFrame::OBFrame(OBClient *client, otk::Style *style)
-  : otk::OtkWidget(Openbox::instance, style, Horizontal, 0, 1, true),
-    OBWidget(Type_Frame),
+Frame::Frame(Client *client, otk::Style *style)
+  : otk::Widget(Openbox::instance, style, Horizontal, 0, 1, true),
+    WidgetBase(WidgetBase::Type_Frame),
     _client(client),
-    _screen(otk::OBDisplay::screenInfo(client->screen())),
-    _plate(this, OBWidget::Type_Plate),
-    _titlebar(this, OBWidget::Type_Titlebar),
-    _button_close(&_titlebar, OBWidget::Type_CloseButton),
-    _button_iconify(&_titlebar, OBWidget::Type_IconifyButton),
-    _button_max(&_titlebar, OBWidget::Type_MaximizeButton),
-    _button_stick(&_titlebar, OBWidget::Type_StickyButton),
-    _label(&_titlebar, OBWidget::Type_Label),
-    _handle(this, OBWidget::Type_Handle),
-    _grip_left(&_handle, OBWidget::Type_LeftGrip),
-    _grip_right(&_handle, OBWidget::Type_RightGrip),
+    _screen(otk::Display::screenInfo(client->screen())),
+    _plate(this, WidgetBase::Type_Plate),
+    _titlebar(this, WidgetBase::Type_Titlebar),
+    _button_close(&_titlebar, WidgetBase::Type_CloseButton),
+    _button_iconify(&_titlebar, WidgetBase::Type_IconifyButton),
+    _button_max(&_titlebar, WidgetBase::Type_MaximizeButton),
+    _button_stick(&_titlebar, WidgetBase::Type_StickyButton),
+    _label(&_titlebar, WidgetBase::Type_Label),
+    _handle(this, WidgetBase::Type_Handle),
+    _grip_left(&_handle, WidgetBase::Type_LeftGrip),
+    _grip_right(&_handle, WidgetBase::Type_RightGrip),
     _decorations(client->decorations())
 {
   assert(client);
   assert(style);
 
-  XSelectInput(otk::OBDisplay::display, _window, OBFrame::event_mask);
+  XSelectInput(otk::Display::display, _window, Frame::event_mask);
 
   _grip_left.setCursor(Openbox::instance->cursors().ll_angle);
   _grip_right.setCursor(Openbox::instance->cursors().lr_angle);
@@ -53,29 +53,29 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   _style = 0;
   setStyle(style);
 
-  otk::OtkWidget::unfocus(); // stuff starts out appearing focused in otk
+  otk::Widget::unfocus(); // stuff starts out appearing focused in otk
   
   _plate.show(); // the other stuff is shown based on decor settings
 }
 
 
-OBFrame::~OBFrame()
+Frame::~Frame()
 {
 }
 
 
-void OBFrame::setTitle(const std::string &text)
+void Frame::setTitle(const std::string &text)
 {
   _label.setText(text);
   _label.update();
 }
 
 
-void OBFrame::setStyle(otk::Style *style)
+void Frame::setStyle(otk::Style *style)
 {
   assert(style);
 
-  otk::OtkWidget::setStyle(style);
+  otk::Widget::setStyle(style);
 
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
@@ -98,27 +98,27 @@ void OBFrame::setStyle(otk::Style *style)
 }
 
 
-void OBFrame::focus()
+void Frame::focus()
 {
-  otk::OtkWidget::focus();
+  otk::Widget::focus();
   update();
 }
 
 
-void OBFrame::unfocus()
+void Frame::unfocus()
 {
-  otk::OtkWidget::unfocus();
+  otk::Widget::unfocus();
   update();
 }
 
 
-void OBFrame::adjust()
+void Frame::adjust()
 {
   // the party all happens in adjustSize
 }
 
 
-void OBFrame::adjustSize()
+void Frame::adjustSize()
 {
   // XXX: only if not overridden or something!!! MORE LOGIC HERE!!
   _decorations = _client->decorations();
@@ -131,7 +131,7 @@ void OBFrame::adjustSize()
   int butsize=0; // width and height of the titlebar buttons
   const int bevel = _style->getBevelWidth();
   
-  if (_decorations & OBClient::Decor_Border) {
+  if (_decorations & Client::Decor_Border) {
     bwidth = _style->getBorderWidth();
     cbwidth = _style->getFrameWidth();
   } else
@@ -148,7 +148,7 @@ void OBFrame::adjustSize()
   _grip_right.setBorderWidth(bwidth);
   _handle.setBorderWidth(bwidth);
   
-  if (_decorations & OBClient::Decor_Titlebar) {
+  if (_decorations & Client::Decor_Titlebar) {
     // set the titlebar size
     _titlebar.setGeometry(-bwidth,
                           -bwidth,
@@ -160,13 +160,13 @@ void OBFrame::adjustSize()
     _label.setGeometry(0, bevel, width, _style->getFont()->height());
     // set the buttons sizes
     butsize = _label.height() - 2;
-    if (_decorations & OBClient::Decor_Iconify)
+    if (_decorations & Client::Decor_Iconify)
       _button_iconify.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & OBClient::Decor_Maximize)
+    if (_decorations & Client::Decor_Maximize)
       _button_max.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & OBClient::Decor_Sticky)
+    if (_decorations & Client::Decor_Sticky)
       _button_stick.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & OBClient::Decor_Close)
+    if (_decorations & Client::Decor_Close)
       _button_close.setGeometry(0, bevel + 1, butsize, butsize);
 
     // separation between titlebar elements
@@ -185,7 +185,7 @@ void OBFrame::adjustSize()
       switch (layout[i]) {
       case 'i':
       case 'I':
-        if (!tit_i && (_decorations & OBClient::Decor_Iconify)) {
+        if (!tit_i && (_decorations & Client::Decor_Iconify)) {
           tit_i = true;
           continue;
         }
@@ -199,21 +199,21 @@ void OBFrame::adjustSize()
         break;
       case 'm':
       case 'M':
-        if (!tit_m && (_decorations & OBClient::Decor_Maximize)) {
+        if (!tit_m && (_decorations & Client::Decor_Maximize)) {
           tit_m = true;
           continue;
         }
         break;
       case 's':
       case 'S':
-        if (!tit_s && (_decorations & OBClient::Decor_Sticky)) {
+        if (!tit_s && (_decorations & Client::Decor_Sticky)) {
           tit_s = true;
           continue;
         }
         break;
       case 'c':
       case 'C':
-        if (!tit_c && (_decorations & OBClient::Decor_Close)) {
+        if (!tit_c && (_decorations & Client::Decor_Close)) {
           tit_c = true;
           continue;
         }
@@ -272,7 +272,7 @@ void OBFrame::adjustSize()
     }
   }
 
-  if (_decorations & OBClient::Decor_Handle) {
+  if (_decorations & Client::Decor_Handle) {
     _handle.setGeometry(-bwidth,
                         _innersize.top + _client->area().height() + cbwidth,
                         width, _style->getHandleWidth());
@@ -306,7 +306,7 @@ void OBFrame::adjustSize()
                      _client->area().width(), _client->area().height());
 
   // map/unmap all the windows
-  if (_decorations & OBClient::Decor_Titlebar) {
+  if (_decorations & Client::Decor_Titlebar) {
     _label.show();
     if (tit_i)
       _button_iconify.show();
@@ -329,7 +329,7 @@ void OBFrame::adjustSize()
     _titlebar.hide(true);
   }
 
-  if (_decorations & OBClient::Decor_Handle)
+  if (_decorations & Client::Decor_Handle)
     _handle.show(true);
   else
     _handle.hide(true);
@@ -345,7 +345,7 @@ void OBFrame::adjustSize()
 }
 
 
-void OBFrame::adjustPosition()
+void Frame::adjustPosition()
 {
   int x, y;
   clientGravity(x, y);
@@ -353,21 +353,21 @@ void OBFrame::adjustPosition()
 }
 
 
-void OBFrame::adjustShape()
+void Frame::adjustShape()
 {
 #ifdef SHAPE
-  int bwidth = (_decorations & OBClient::Decor_Border) ?
+  int bwidth = (_decorations & Client::Decor_Border) ?
     _style->getBorderWidth() : 0;
   
   if (!_client->shaped()) {
     // clear the shape on the frame window
-    XShapeCombineMask(otk::OBDisplay::display, _window, ShapeBounding,
+    XShapeCombineMask(otk::Display::display, _window, ShapeBounding,
                       _innersize.left,
                       _innersize.top,
                       None, ShapeSet);
   } else {
     // make the frame's shape match the clients
-    XShapeCombineShape(otk::OBDisplay::display, _window, ShapeBounding,
+    XShapeCombineShape(otk::Display::display, _window, ShapeBounding,
                        _innersize.left,
                        _innersize.top,
                        _client->window(), ShapeBounding, ShapeSet);
@@ -375,7 +375,7 @@ void OBFrame::adjustShape()
     int num = 0;
     XRectangle xrect[2];
 
-    if (_decorations & OBClient::Decor_Titlebar) {
+    if (_decorations & Client::Decor_Titlebar) {
       xrect[0].x = _titlebar.rect().x();
       xrect[0].y = _titlebar.rect().y();
       xrect[0].width = _titlebar.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
@@ -383,7 +383,7 @@ void OBFrame::adjustShape()
       ++num;
     }
 
-    if (_decorations & OBClient::Decor_Handle) {
+    if (_decorations & Client::Decor_Handle) {
       xrect[1].x = _handle.rect().x();
       xrect[1].y = _handle.rect().y();
       xrect[1].width = _handle.width() + bwidth * 2; // XXX: this is useless once the widget handles borders!
@@ -391,7 +391,7 @@ void OBFrame::adjustShape()
       ++num;
     }
 
-    XShapeCombineRectangles(otk::OBDisplay::display, window(),
+    XShapeCombineRectangles(otk::Display::display, window(),
                             ShapeBounding, 0, 0, xrect, num,
                             ShapeUnion, Unsorted);
   }
@@ -399,10 +399,10 @@ void OBFrame::adjustShape()
 }
 
 
-void OBFrame::grabClient()
+void Frame::grabClient()
 {
   // reparent the client to the frame
-  XReparentWindow(otk::OBDisplay::display, _client->window(),
+  XReparentWindow(otk::Display::display, _client->window(),
                   _plate.window(), 0, 0);
   /*
     When reparenting the client window, it is usually not mapped yet, since
@@ -416,38 +416,38 @@ void OBFrame::grabClient()
     _client->ignore_unmaps += 2;
 
   // select the event mask on the client's parent (to receive config req's)
-  XSelectInput(otk::OBDisplay::display, _plate.window(),
+  XSelectInput(otk::Display::display, _plate.window(),
                SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
-  XMapWindow(otk::OBDisplay::display, _client->window());
+  XMapWindow(otk::Display::display, _client->window());
 
   adjustSize();
   adjustPosition();
 }
 
 
-void OBFrame::releaseClient()
+void Frame::releaseClient()
 {
   XEvent ev;
 
   // check if the app has already reparented its window away
-  if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
+  if (XCheckTypedWindowEvent(otk::Display::display, _client->window(),
                              ReparentNotify, &ev)) {
-    XPutBackEvent(otk::OBDisplay::display, &ev);
+    XPutBackEvent(otk::Display::display, &ev);
     // re-map the window since the unmanaging process unmaps it
-    XMapWindow(otk::OBDisplay::display, _client->window());  
+    XMapWindow(otk::Display::display, _client->window());  
   } else {
     // according to the ICCCM - if the client doesn't reparent itself, then we
     // will reparent the window to root for them
-    XReparentWindow(otk::OBDisplay::display, _client->window(),
+    XReparentWindow(otk::Display::display, _client->window(),
                     _screen->rootWindow(),
                     _client->area().x(), _client->area().y());
   }
 }
 
 
-void OBFrame::clientGravity(int &x, int &y)
+void Frame::clientGravity(int &x, int &y)
 {
   x = _client->area().x();
   y = _client->area().y();
@@ -506,7 +506,7 @@ void OBFrame::clientGravity(int &x, int &y)
 }
 
 
-void OBFrame::frameGravity(int &x, int &y)
+void Frame::frameGravity(int &x, int &y)
 {
   x = rect().x();
   y = rect().y();

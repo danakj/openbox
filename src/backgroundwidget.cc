@@ -8,20 +8,20 @@
 
 namespace ob {
 
-OBBackgroundWidget::OBBackgroundWidget(otk::OtkWidget *parent,
-                                       OBWidget::WidgetType type)
-  : otk::OtkWidget(parent),
-    OBWidget(type)
+BackgroundWidget::BackgroundWidget(otk::Widget *parent,
+                                   WidgetBase::WidgetType type)
+  : otk::Widget(parent),
+    WidgetBase(type)
 {
 }
 
 
-OBBackgroundWidget::~OBBackgroundWidget()
+BackgroundWidget::~BackgroundWidget()
 {
 }
 
 
-void OBBackgroundWidget::setTextures()
+void BackgroundWidget::setTextures()
 {
   switch (type()) {
   case Type_Titlebar:
@@ -48,9 +48,9 @@ void OBBackgroundWidget::setTextures()
 }
 
 
-void OBBackgroundWidget::setStyle(otk::Style *style)
+void BackgroundWidget::setStyle(otk::Style *style)
 {
-  OtkWidget::setStyle(style);
+  Widget::setStyle(style);
   setTextures();
   switch (type()) {
   case Type_Titlebar:
@@ -65,23 +65,23 @@ void OBBackgroundWidget::setStyle(otk::Style *style)
 }
 
 
-void OBBackgroundWidget::focus()
+void BackgroundWidget::focus()
 {
-  otk::OtkWidget::focus();
+  otk::Widget::focus();
   setTextures();
 }
 
 
-void OBBackgroundWidget::unfocus()
+void BackgroundWidget::unfocus()
 {
-  otk::OtkWidget::unfocus();
+  otk::Widget::unfocus();
   setTextures();
 }
 
 
-void OBBackgroundWidget::adjust()
+void BackgroundWidget::adjust()
 {
-  // nothing to adjust here. its done in OBFrame::adjustSize
+  // nothing to adjust here. its done in Frame::adjustSize
 }
 
 }

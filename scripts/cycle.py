@@ -242,9 +242,9 @@ class _CycleWindows(_Cycle):
     """
     This is a basic cycling class for Windows.
 
-    An example of inheriting from and modifying this class is _ClassCycleWindows,
-    which allows users to cycle around windows of a certain application
-    name/class only.
+    An example of inheriting from and modifying this class is
+    _ClassCycleWindows, which allows users to cycle around windows of a certain
+    application name/class only.
 
     This class has an underscored name because I use the singleton pattern 
     (so CycleWindows is an actual instance of this class).  This doesn't have 

@@ -101,6 +101,8 @@ int main(int argc, char **argv)
 
     g_set_prgname(argv[0]);
      
+    session_startup(&argc, &argv);
+
     /* parse out command line args */
     parse_args(argc, argv);
 
@@ -119,8 +121,6 @@ int main(int argc, char **argv)
     ob_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler, NULL, NULL);
     ob_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL, NULL);
-
-    session_startup(&argc, &argv);
 
     ob_screen = DefaultScreen(ob_display);
 

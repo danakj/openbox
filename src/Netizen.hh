@@ -32,11 +32,13 @@ extern "C" {
 class Blackbox;
 class BScreen;
 class Netizen;
+class XAtom;
 
 class Netizen {
 private:
   Blackbox *blackbox;
   BScreen *screen;
+  XAtom *xatom;
   Window window;
   XEvent event;
 

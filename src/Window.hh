@@ -108,6 +108,20 @@ public:
                     Decor_Close    = (1l << 5) };
   typedef unsigned char DecorationFlags;
 
+  enum WindowType { Type_Desktop,
+                    Type_Dock,
+                    Type_Toolbar,
+                    Type_Menu,
+                    Type_Utility,
+                    Type_Splash,
+                    Type_Dialog,
+                    Type_Normal };
+
+  enum Corner { TopLeft,
+                TopRight,
+                BottomLeft,
+                BottomRight };
+
 private:
   Blackbox *blackbox;
   BScreen *screen;
@@ -132,8 +146,11 @@ private:
       visible,               // is visible?
       iconic,                // is iconified?
       focused,               // has focus?
-      stuck,                 // is omnipresent
+      stuck,                 // is omnipresent?
       modal,                 // is modal? (must be dismissed to continue)
+      skip_taskbar,          // skipped by taskbars?
+      skip_pager,            // skipped by pagers?
+      fullscreen,            // a fullscreen window?
       send_focus_message,    // should we send focus messages to our client?
       shaped;                // does the frame use the shape extension?
     unsigned int maximized;  // maximize is special, the number corresponds
@@ -151,6 +168,7 @@ private:
     std::string title, icon_title;
 
     Rect rect;
+    Strut strut;
 
     int old_bw;                       // client's borderwidth
 
@@ -173,6 +191,8 @@ private:
    * the menu is not really decor, but it goes hand in hand with the decor
    */
   DecorationFlags decorations;
+  Corner resize_dir;
+  WindowType window_type;
 
   /*
    * client window = the application's window
@@ -234,14 +254,18 @@ private:
   Window createToplevelWindow();
   Window createChildWindow(Window parent, Cursor = None);
 
+  void getWindowType(void);
+  void updateStrut(void);
   void getWMName(void);
   void getWMIconName(void);
   void getWMNormalHints(void);
   void getWMProtocols(void);
   void getWMHints(void);
+  void getNetWMHints(void);
   void getMWMHints(void);
   bool getBlackboxHints(void);
   void getTransientInfo(void);
+  bool isKDESystrayWindow(void);
   void setNetWMAttributes(void);
   void associateClientWindow(void);
   void decorate(void);
@@ -265,10 +289,14 @@ private:
   void redrawMaximizeButton(bool pressed);
   void restoreGravity(void);
   void setGravityOffsets(void);
+  void setAllowedActions(void);
   void setState(unsigned long new_state);
   void upsize(void);
+  void doMove(int x_root, int y_root);
+  void endMove(void);
+  void doResize(int x_root, int y_root);
+  void endResize(void);
 
-  enum Corner { TopLeft, TopRight };
   void constrain(Corner anchor, int *pw = 0, int *ph = 0);
 
 public:
@@ -281,11 +309,16 @@ public:
   inline bool isIconic(void) const { return flags.iconic; }
   inline bool isShaded(void) const { return flags.shaded; }
   inline bool isMaximized(void) const { return flags.maximized; }
+  inline bool isMaximizedHoriz(void) const { return flags.maximized == 3; }
+  inline bool isMaximizedVert(void) const { return flags.maximized == 2; }
+  inline bool isMaximizedFull(void) const { return flags.maximized == 1; }
   inline bool isStuck(void) const { return flags.stuck; }
+  inline bool isModal(void) const { return flags.modal; }
   inline bool isIconifiable(void) const { return functions & Func_Iconify; }
   inline bool isMaximizable(void) const { return functions & Func_Maximize; }
   inline bool isResizable(void) const { return functions & Func_Resize; }
   inline bool isClosable(void) const { return functions & Func_Close; }
+  inline bool isDesktop(void) const { return window_type == Type_Desktop; }
 
   inline bool hasTitlebar(void) const { return decorations & Decor_Titlebar; }
 
@@ -321,6 +354,19 @@ public:
   bool validateClient(void) const;
   bool setInputFocus(void);
 
+  // none of these are used by the window manager, they are here to persist
+  // them properly in the window's netwm state property.
+  inline bool skipTaskbar(void) const { return flags.skip_taskbar; }
+  inline void setSkipTaskbar(const bool s) { flags.skip_taskbar = s; }
+  inline bool skipPager(void) const { return flags.skip_pager; }
+  inline void setSkipPager(const bool s) { flags.skip_pager = s; }
+  inline bool isFullscreen(void) const { return flags.fullscreen; }
+  inline void setFullscreen(const bool f) { flags.fullscreen = f; }
+
+  inline void setModal(const bool m) { flags.modal = m; }
+
+  void beginMove(int x_root, int y_root);
+  void beginResize(int x_root, int y_root, Corner dir);
   void setFocusFlag(bool focus);
   void iconify(void);
   void deiconify(bool reassoc = True, bool raise = True);
@@ -331,7 +377,6 @@ public:
   void remaximize(void);
   void shade(void);
   void stick(void);
-  void unstick(void);
   void reconfigure(void);
   void updateFocusModel(void);
   void installColormap(bool install);

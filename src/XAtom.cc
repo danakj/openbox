@@ -21,16 +21,17 @@
 
 #include "../config.h"
 
+#include <assert.h>
+
 #include "XAtom.hh"
-#include "blackbox.hh"
 #include "Screen.hh"
 #include "Util.hh"
 
-XAtom::XAtom(Blackbox *bb) {
-  _display = bb->getXDisplay();
+XAtom::XAtom(Display *d) {
+  _display = d;
 
   // make sure asserts fire if there is a problem
-  memset(_atoms, sizeof(_atoms), 0);
+  memset(_atoms, 0, sizeof(_atoms));
 
   _atoms[cardinal] = XA_CARDINAL;
   _atoms[window] = XA_WINDOW;
@@ -49,6 +50,8 @@ XAtom::XAtom(Blackbox *bb) {
   _atoms[wm_change_state] = create("WM_CHANGE_STATE");
   _atoms[wm_delete_window] = create("WM_DELETE_WINDOW");
   _atoms[wm_take_focus] = create("WM_TAKE_FOCUS");
+  _atoms[wm_name] = create("WM_NAME");
+  _atoms[wm_icon_name] = create("WM_ICON_NAME");
   _atoms[motif_wm_hints] = create("_MOTIF_WM_HINTS");
   _atoms[blackbox_hints] = create("_BLACKBOX_HINTS");
   _atoms[blackbox_attributes] = create("_BLACKBOX_ATTRIBUTES");
@@ -84,23 +87,69 @@ XAtom::XAtom(Blackbox *bb) {
   _atoms[net_active_window] = create("_NET_ACTIVE_WINDOW");
   _atoms[net_workarea] = create("_NET_WORKAREA");
   _atoms[net_supporting_wm_check] = create("_NET_SUPPORTING_WM_CHECK");
-  _atoms[net_virtual_roots] = create("_NET_VIRTUAL_ROOTS");
+//  _atoms[net_virtual_roots] = create("_NET_VIRTUAL_ROOTS");
 
   _atoms[net_close_window] = create("_NET_CLOSE_WINDOW");
   _atoms[net_wm_moveresize] = create("_NET_WM_MOVERESIZE");
 
-  _atoms[net_properties] = create("_NET_PROPERTIES");
+//  _atoms[net_properties] = create("_NET_PROPERTIES");
   _atoms[net_wm_name] = create("_NET_WM_NAME");
+  _atoms[net_wm_visible_name] = create("_NET_WM_VISIBLE_NAME");
+  _atoms[net_wm_icon_name] = create("_NET_WM_ICON_NAME");
+  _atoms[net_wm_visible_icon_name] = create("_NET_WM_VISIBLE_ICON_NAME");
   _atoms[net_wm_desktop] = create("_NET_WM_DESKTOP");
   _atoms[net_wm_window_type] = create("_NET_WM_WINDOW_TYPE");
   _atoms[net_wm_state] = create("_NET_WM_STATE");
   _atoms[net_wm_strut] = create("_NET_WM_STRUT");
-  _atoms[net_wm_icon_geometry] = create("_NET_WM_ICON_GEOMETRY");
-  _atoms[net_wm_icon] = create("_NET_WM_ICON");
-  _atoms[net_wm_pid] = create("_NET_WM_PID");
-  _atoms[net_wm_handled_icons] = create("_NET_WM_HANDLED_ICONS");
+//  _atoms[net_wm_icon_geometry] = create("_NET_WM_ICON_GEOMETRY");
+//  _atoms[net_wm_icon] = create("_NET_WM_ICON");
+//  _atoms[net_wm_pid] = create("_NET_WM_PID");
+//  _atoms[net_wm_handled_icons] = create("_NET_WM_HANDLED_ICONS");
+  _atoms[net_wm_allowed_actions] = create("_NET_WM_ALLOWED_ACTIONS");
 
-  _atoms[net_wm_ping] = create("_NET_WM_PING");
+//  _atoms[net_wm_ping] = create("_NET_WM_PING");
+  
+  _atoms[net_wm_window_type_desktop] = create("_NET_WM_WINDOW_TYPE_DESKTOP");
+  _atoms[net_wm_window_type_dock] = create("_NET_WM_WINDOW_TYPE_DOCK");
+  _atoms[net_wm_window_type_toolbar] = create("_NET_WM_WINDOW_TYPE_TOOLBAR");
+  _atoms[net_wm_window_type_menu] = create("_NET_WM_WINDOW_TYPE_MENU");
+  _atoms[net_wm_window_type_utility] = create("_NET_WM_WINDOW_TYPE_UTILITY");
+  _atoms[net_wm_window_type_splash] = create("_NET_WM_WINDOW_TYPE_SPLASH");
+  _atoms[net_wm_window_type_dialog] = create("_NET_WM_WINDOW_TYPE_DIALOG");
+  _atoms[net_wm_window_type_normal] = create("_NET_WM_WINDOW_TYPE_NORMAL");
+
+  _atoms[net_wm_moveresize_size_topleft] =
+    create("_NET_WM_MOVERESIZE_SIZE_TOPLEFT");
+  _atoms[net_wm_moveresize_size_topright] =
+    create("_NET_WM_MOVERESIZE_SIZE_TOPRIGHT");
+  _atoms[net_wm_moveresize_size_bottomleft] =
+    create("_NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT");
+  _atoms[net_wm_moveresize_size_bottomright] =
+    create("_NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT");
+  _atoms[net_wm_moveresize_move] =
+    create("_NET_WM_MOVERESIZE_MOVE");
+ 
+  _atoms[net_wm_action_move] = create("_NET_WM_ACTION_MOVE");
+  _atoms[net_wm_action_resize] = create("_NET_WM_ACTION_RESIZE");
+  _atoms[net_wm_action_shade] = create("_NET_WM_ACTION_SHADE");
+  _atoms[net_wm_action_maximize_horz] = create("_NET_WM_ACTION_MAXIMIZE_HORZ");
+  _atoms[net_wm_action_maximize_vert] = create("_NET_WM_ACTION_MAXIMIZE_VERT");
+  _atoms[net_wm_action_change_desktop] =
+    create("_NET_WM_ACTION_CHANGE_DESKTOP");
+  _atoms[net_wm_action_close] = create("_NET_WM_ACTION_CLOSE");
+    
+  _atoms[net_wm_state_modal] = create("_NET_WM_STATE_MODAL");
+  _atoms[net_wm_state_maximized_vert] = create("_NET_WM_STATE_MAXIMIZED_VERT");
+  _atoms[net_wm_state_maximized_horz] = create("_NET_WM_STATE_MAXIMIZED_HORZ");
+  _atoms[net_wm_state_shaded] = create("_NET_WM_STATE_SHADED");
+  _atoms[net_wm_state_skip_taskbar] = create("_NET_WM_STATE_SKIP_TASKBAR");
+  _atoms[net_wm_state_skip_pager] = create("_NET_WM_STATE_SKIP_PAGER");
+  _atoms[net_wm_state_hidden] = create("_NET_WM_STATE_HIDDEN");
+  _atoms[net_wm_state_fullscreen] = create("_NET_WM_STATE_FULLSCREEN");
+  
+  _atoms[kde_net_system_tray_windows] = create("_KDE_NET_SYSTEM_TRAY_WINDOWS");
+  _atoms[kde_net_wm_system_tray_window_for] =
+    create("_KDE_NET_WM_SYSTEM_TRAY_WINDOW_FOR");
 }
 
 
@@ -148,7 +197,53 @@ void XAtom::setSupported(const ScreenInfo *screen) {
 
   Atom supported[] = {
     _atoms[net_current_desktop],
-    _atoms[net_number_of_desktops]
+    _atoms[net_number_of_desktops],
+    _atoms[net_desktop_geometry],
+    _atoms[net_desktop_viewport],
+    _atoms[net_active_window],
+    _atoms[net_workarea],
+    _atoms[net_client_list],
+    _atoms[net_client_list_stacking],
+    _atoms[net_desktop_names],
+    _atoms[net_close_window],
+    _atoms[net_wm_name],
+    _atoms[net_wm_visible_name],
+    _atoms[net_wm_icon_name],
+    _atoms[net_wm_visible_icon_name],
+    _atoms[net_wm_desktop],
+    _atoms[net_wm_strut],
+    _atoms[net_wm_window_type],
+    _atoms[net_wm_window_type_desktop],
+    _atoms[net_wm_window_type_dock],
+    _atoms[net_wm_window_type_toolbar],
+    _atoms[net_wm_window_type_menu],
+    _atoms[net_wm_window_type_utility],
+    _atoms[net_wm_window_type_splash],
+    _atoms[net_wm_window_type_dialog],
+    _atoms[net_wm_window_type_normal],
+    _atoms[net_wm_moveresize],
+    _atoms[net_wm_moveresize_size_topleft],
+    _atoms[net_wm_moveresize_size_topright],
+    _atoms[net_wm_moveresize_size_bottomleft],
+    _atoms[net_wm_moveresize_size_bottomright],
+    _atoms[net_wm_moveresize_move],
+    _atoms[net_wm_allowed_actions],
+    _atoms[net_wm_action_move],
+    _atoms[net_wm_action_resize],
+    _atoms[net_wm_action_shade],
+    _atoms[net_wm_action_maximize_horz],
+    _atoms[net_wm_action_maximize_vert],
+    _atoms[net_wm_action_change_desktop],
+    _atoms[net_wm_action_close],
+    _atoms[net_wm_state],
+    _atoms[net_wm_state_modal],
+    _atoms[net_wm_state_maximized_vert],
+    _atoms[net_wm_state_maximized_horz],
+    _atoms[net_wm_state_shaded],
+    _atoms[net_wm_state_skip_taskbar],
+    _atoms[net_wm_state_skip_pager],
+    _atoms[net_wm_state_hidden],
+    _atoms[net_wm_state_fullscreen],
   };
   const int num_supported = sizeof(supported)/sizeof(Atom);
 
@@ -165,12 +260,11 @@ void XAtom::setValue(Window win, Atom atom, Atom type,
                      unsigned char* data, int size, int nelements,
                      bool append) const {
   assert(win != None); assert(atom != None); assert(type != None);
-  assert(data != (unsigned char *) 0);
+  assert(nelements == 0 || (nelements > 0 && data != (unsigned char *) 0));
   assert(size == 8 || size == 16 || size == 32);
-  assert(nelements > 0);
   XChangeProperty(_display, win, atom, type, size,
                   (append ? PropModeAppend : PropModeReplace),
-                  data, nelements);                  
+                  data, nelements);
 }
 
 
@@ -205,24 +299,44 @@ void XAtom::setValue(Window win, Atoms atom, StringType type,
                      const std::string &value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
-  assert(win != None); assert(_atoms[atom] != None);
-
-  const char *c = value.c_str();
-  XTextProperty textprop;
-  if (Success != XmbTextListToTextProperty(_display, const_cast<char**>(&c), 1,
-                                           type == ansi ? XStringStyle :
-#ifdef X_HAVE_UTF8_STRING
-                                           XUTF8StringStyle,
-#else
-                                           XCompoundTextStyle,
-#endif
-                                           &textprop)) {
-    return;
-  }
   
-  XSetTextProperty(_display, win, &textprop, _atoms[atom]);
+  Atom t;
+  switch (type) {
+  case ansi: t = _atoms[string]; break;
+  case utf8: t = _atoms[utf8_string]; break;
+  default: assert(false); // unhandled StringType
+  }
+  setValue(win, _atoms[atom], t,
+           reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
+           8, value.size() + 1, false); // add 1 to the size to include the null
+}
 
-  XFree(textprop.value);
+
+/*
+ * Set an array of string property values on a window.
+ */
+void XAtom::setValue(Window win, Atoms atom, StringType type,
+                     const StringVect &strings) const {
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_STRING_TYPE);
+
+  Atom t;
+  switch (type) {
+  case ansi: t = _atoms[string]; break;
+  case utf8: t = _atoms[utf8_string]; break;
+  default: assert(false); // unhandled StringType
+  }
+
+  std::string value;
+
+  StringVect::const_iterator it = strings.begin();
+  const StringVect::const_iterator end = strings.end();
+  for (; it != end; ++it)
+      value += *it + '\0';
+
+  setValue(win, _atoms[atom], t,
+           reinterpret_cast<unsigned char *>(const_cast<char *>(value.c_str())),
+           8, value.size(), false);
 }
 
 
@@ -238,23 +352,25 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
                      int size) const {
   assert(win != None); assert(atom != None); assert(type != None);
   assert(size == 8 || size == 16 || size == 32);
+  assert(nelements > 0);
   unsigned char *c_val;        // value alloc'd with c malloc
   Atom ret_type;
   int ret_size;
   unsigned long ret_bytes;
+  const unsigned long maxread = nelements;
   // try get the first element
   XGetWindowProperty(_display, win, atom, 0l, 1l, False, AnyPropertyType,
                      &ret_type, &ret_size, &nelements, &ret_bytes, &c_val);
-  if (ret_type == None)
-    // the property does not exist on the window
+  if (ret_type == None || nelements < 1)
+    // the property does not exist on the window or is empty
     return false;
   if (ret_type != type || ret_size != size) {
     // wrong data in property
     XFree(c_val);
     return false;
   }
-  // the data is correct, now, is there more than 1 element?
-  if (ret_bytes == 0) {
+  // the data is correct, now, is there more elements left?
+  if (ret_bytes == 0 || maxread <= nelements) {
     // we got the whole property's value
     *value = new unsigned char[nelements * size/8 + 1];
     memcpy(*value, c_val, nelements * size/8 + 1);
@@ -262,10 +378,12 @@ bool XAtom::getValue(Window win, Atom atom, Atom type,
     return true;    
   }
   // get the entire property since it is larger than one long
-  free(c_val);
+  XFree(c_val);
   // the number of longs that need to be retreived to get the property's entire
   // value. The last + 1 is the first long that we retrieved above.
-  const int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
+  int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
+  if (remain > size/8 * (signed)maxread) // dont get more than the max
+    remain = size/8 * (signed)maxread;
   XGetWindowProperty(_display, win, atom, 0l, remain, False, type, &ret_type,
                      &ret_size, &nelements, &ret_bytes, &c_val);
   assert(ret_bytes == 0);
@@ -290,44 +408,76 @@ bool XAtom::getValue(Window win, Atoms atom, Atoms type,
 
 
 /*
- * Gets an string property's value from a window.
+ * Gets a single 32-bit property's value from a window.
  */
-bool XAtom::getValue(Window win, Atoms atom, StringType type,
-                     std::string &value) const {
+bool XAtom::getValue(Window win, Atoms atom, Atoms type,
+                     unsigned long &value) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
-  assert(type >= 0 && type < NUM_STRING_TYPE);
-  assert(win != None); assert(_atoms[atom] != None);
-
-  XTextProperty textprop;
-  if (0 == XGetTextProperty(_display, win, &textprop, _atoms[atom]))
+  assert(type >= 0 && type < NUM_ATOMS);
+  unsigned long *temp;
+  unsigned long num = 1;
+  if (! getValue(win, _atoms[atom], _atoms[type], num,
+                 reinterpret_cast<unsigned char **>(&temp), 32))
     return false;
-
-  int ret;
-  int count;
-  char **list;
-  if (type == ansi) {
-      ret = XmbTextPropertyToTextList(_display, &textprop, &list, &count);
-  } else {
-#ifdef X_HAVE_UTF8_STRING
-    ret = Xutf8TextPropertyToTextList(_display, &textprop, &list, &count);
-#else
-    ret = XmbTextPropertyToTextList(_display, &textprop, &list, &count);
-#endif
-  }
- 
-  if (ret != Success || count < 1) {
-    XFree(textprop.value);
-    return false;
-  }
-
-  value = list[0];
-
-  XFreeStringList(list);
-  XFree(textprop.value);
+  value = temp[0];
+  delete [] temp;
   return true;
 }
 
 
+/*
+ * Gets an string property's value from a window.
+ */
+bool XAtom::getValue(Window win, Atoms atom, StringType type,
+                     std::string &value) const {
+  int n = 1;
+  StringVect s;
+  if (getValue(win, atom, type, n, s)) {
+    value = s[0];
+    return true;
+  }
+  return false;
+}
+
+
+bool XAtom::getValue(Window win, Atoms atom, StringType type, int &nelements,
+                     StringVect &strings) const {
+  assert(atom >= 0 && atom < NUM_ATOMS);
+  assert(type >= 0 && type < NUM_STRING_TYPE);
+  assert(win != None); assert(_atoms[atom] != None);
+  assert(nelements > 0);
+
+  Atom t;
+  switch (type) {
+  case ansi: t = _atoms[string]; break;
+  case utf8: t = _atoms[utf8_string]; break;
+  default: assert(false); // unhandled StringType
+  }
+  
+  unsigned char *value;
+  unsigned long elements = (unsigned) -1;
+  if (!getValue(win, _atoms[atom], t, elements, &value, 8) || elements < 1)
+    return false;
+
+  std::string s(reinterpret_cast<char *>(value));
+  delete [] value;
+
+  std::string::const_iterator it = s.begin(), end = s.end();
+  int num = 0;
+  while(num < nelements) {
+    std::string::const_iterator tmp = it; // current string.begin()
+    it = std::find(tmp, end, '\0');       // look for null between tmp and end
+    strings.push_back(std::string(tmp, it));   // s[tmp:it)
+    if (it == end)
+      break;
+    ++it;
+    ++num;
+  }
+
+  nelements = elements;
+
+  return true;
+}
 
 
 /*

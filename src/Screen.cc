@@ -143,6 +143,14 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   xatom->setValue(getRootWindow(), XAtom::blackbox_pid, XAtom::cardinal,
                   (unsigned long) getpid());
 #endif // HAVE_GETPID
+  unsigned long geometry[] = { getWidth(),
+                               getHeight()};
+  xatom->setValue(getRootWindow(), XAtom::net_desktop_geometry,
+                  XAtom::cardinal, geometry, 2);
+  unsigned long viewport[] = {0,0};
+  xatom->setValue(getRootWindow(), XAtom::net_desktop_viewport,
+                  XAtom::cardinal, viewport, 2);
+                  
 
   XDefineCursor(blackbox->getXDisplay(), getRootWindow(),
                 blackbox->getSessionCursor());
@@ -233,6 +241,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   }
   saveWorkspaceNames();
 
+  updateDesktopNames();
   updateNetizenWorkspaceCount();
 
   workspacemenu->insert(i18n(IconSet, IconIcons, "Icons"), iconmenu);
@@ -253,9 +262,10 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
 
   InitMenu();
 
-  raiseWindows(0, 0);
+  raiseWindows(0, 0);     // this also initializes the empty stacking list
   rootmenu->update();
 
+  updateClientList();     // initialize the client list, which will be empty
   updateAvailableArea();
 
   changeWorkspaceID(0);
@@ -506,9 +516,10 @@ void BScreen::saveClock24Hour(Bool c) {
 
 void BScreen::saveWorkspaceNames() {
   string names;
-  WorkspaceList::iterator it;
-  WorkspaceList::iterator last = workspacesList.end() - 1;
-  for (it = workspacesList.begin(); it != workspacesList.end(); ++it) {
+  WorkspaceList::iterator it = workspacesList.begin();
+  const WorkspaceList::iterator last = workspacesList.end() - 1;
+  const WorkspaceList::iterator end = workspacesList.end();
+  for (; it != end; ++it) {
     names += (*it)->getName();
     if (it != last)
       names += ',';
@@ -1023,6 +1034,7 @@ unsigned int BScreen::addWorkspace(void) {
 
   toolbar->reconfigure();
 
+  updateDesktopNames();
   updateNetizenWorkspaceCount();
 
   return workspacesList.size();
@@ -1048,6 +1060,7 @@ unsigned int BScreen::removeLastWorkspace(void) {
 
   saveWorkspaces(getWorkspaceCount());
   saveWorkspaceNames();
+  updateDesktopNames();
 
   toolbar->reconfigure();
 
@@ -1083,7 +1096,6 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 
     xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                     XAtom::cardinal, id);
-    printf("%d\n", id);
 
     workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
     toolbar->redrawWorkspaceLabel(True);
@@ -1100,14 +1112,124 @@ void BScreen::changeWorkspaceID(unsigned int id) {
 }
 
 
+/*
+ * Set the _NET_CLIENT_LIST root window property.
+ */
+void BScreen::updateClientList(void) {
+  if (windowList.size() > 0) {
+    Window *windows = new Window[windowList.size()];
+    Window *win_it = windows;
+    BlackboxWindowList::iterator it = windowList.begin();
+    const BlackboxWindowList::iterator end = windowList.end();
+    for (; it != end; ++it, ++win_it)
+      *win_it = (*it)->getClientWindow();
+    xatom->setValue(getRootWindow(), XAtom::net_client_list, XAtom::window,
+                    windows, windowList.size());
+    delete [] windows;
+  } else
+    xatom->setValue(getRootWindow(), XAtom::net_client_list, XAtom::window,
+                    0, 0);
+}
+
+
+/*
+ * Set the _NET_CLIENT_LIST_STACKING root window property.
+ */
+void BScreen::updateStackingList(void) {
+
+  BlackboxWindowList stack_order;
+
+  /*
+   * Get the atacking order from all of the workspaces.
+   * We start with the current workspace so that the sticky windows will be
+   * in the right order on the current workspace.
+   * XXX: Do we need to have sticky windows in the list once for each workspace?
+   */
+  getCurrentWorkspace()->appendStackOrder(stack_order);
+  for (unsigned int i = 0; i < getWorkspaceCount(); ++i)
+    if (i != getCurrentWorkspaceID())
+      getWorkspace(i)->appendStackOrder(stack_order);
+ 
+  if (stack_order.size() > 0) {
+    // set the client list atoms
+    Window *windows = new Window[stack_order.size()];
+    Window *win_it = windows;
+    BlackboxWindowList::iterator it = stack_order.begin();
+    const BlackboxWindowList::iterator end = stack_order.end();
+    for (; it != end; ++it, ++win_it)
+      *win_it = (*it)->getClientWindow();
+    xatom->setValue(getRootWindow(), XAtom::net_client_list_stacking,
+                    XAtom::window, windows, stack_order.size());
+    delete [] windows;
+  } else
+    xatom->setValue(getRootWindow(), XAtom::net_client_list_stacking,
+                    XAtom::window, 0, 0);
+}
+
+
+void BScreen::addSystrayWindow(Window window) {
+  systrayWindowList.push_back(window);
+  xatom->setValue(getRootWindow(), XAtom::kde_net_system_tray_windows,
+                  XAtom::window,
+                  &systrayWindowList[0], systrayWindowList.size());
+  blackbox->saveSystrayWindowSearch(window, this);
+}
+
+
+void BScreen::removeSystrayWindow(Window window) {
+  WindowList::iterator it = systrayWindowList.begin();
+  const WindowList::iterator end = systrayWindowList.end();
+  for (; it != end; ++it)
+    if (*it == window) {
+      systrayWindowList.erase(it);
+      xatom->setValue(getRootWindow(), XAtom::kde_net_system_tray_windows,
+                      XAtom::window,
+                      &systrayWindowList[0], systrayWindowList.size());
+      blackbox->removeSystrayWindowSearch(window);
+      break;
+    }
+}
+
+
+void BScreen::addDesktopWindow(Window window) {
+  desktopWindowList.push_back(window);
+  XLowerWindow(blackbox->getXDisplay(), window);
+  XSelectInput(blackbox->getXDisplay(), window, StructureNotifyMask);
+  blackbox->saveDesktopWindowSearch(window, this);
+}
+
+
+void BScreen::removeDesktopWindow(Window window) {
+  WindowList::iterator it = desktopWindowList.begin();
+  const WindowList::iterator end = desktopWindowList.end();
+  for (; it != end; ++it)
+    if (*it == window) {
+      desktopWindowList.erase(it);
+      XSelectInput(blackbox->getXDisplay(), window, None);
+      blackbox->removeDesktopWindowSearch(window);
+      break;
+    }
+}
+
+
 void BScreen::manageWindow(Window w) {
   new BlackboxWindow(blackbox, w, this);
 
   BlackboxWindow *win = blackbox->searchWindow(w);
   if (! win)
     return;
+  if (win->isDesktop()) {
+    // desktop windows cant do anything, so we remove all the normal window
+    // stuff from them, they are only kept around so that we can keep them on
+    // the bottom of the z-order
+    addDesktopWindow(win->getClientWindow());
+    win->restore(True);
+    delete win;
+    return;
+  }
 
   windowList.push_back(win);
+  updateClientList();
 
   XMapRequestEvent mre;
   mre.window = w;
@@ -1126,6 +1248,7 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
     removeIcon(w);
 
   windowList.remove(w);
+  updateClientList();
 
   if (blackbox->getFocusedWindow() == w)
     blackbox->setFocusedWindow((BlackboxWindow *) 0);
@@ -1172,6 +1295,25 @@ void BScreen::removeNetizen(Window w) {
 }
 
 
+void BScreen::updateWorkArea(void) {
+  if (workspacesList.size() > 0) {
+    unsigned long *dims = new unsigned long[4 * workspacesList.size()];
+    for (unsigned int i = 0, m = workspacesList.size(); i < m; ++i) {
+      // XXX: this could be different for each workspace
+      const Rect &area = availableArea();
+      dims[(i * 4) + 0] = area.x();
+      dims[(i * 4) + 1] = area.y();
+      dims[(i * 4) + 2] = area.width();
+      dims[(i * 4) + 3] = area.height();
+    }
+    xatom->setValue(getRootWindow(), XAtom::net_workarea, XAtom::cardinal,
+                    dims, 4 * workspacesList.size());
+  } else
+    xatom->setValue(getRootWindow(), XAtom::net_workarea, XAtom::cardinal,
+                    0, 0);
+}
+
+
 void BScreen::updateNetizenCurrentWorkspace(void) {
   std::for_each(netizenList.begin(), netizenList.end(),
                 std::mem_fun(&Netizen::sendCurrentWorkspace));
@@ -1182,6 +1324,8 @@ void BScreen::updateNetizenWorkspaceCount(void) {
   xatom->setValue(getRootWindow(), XAtom::net_number_of_desktops,
                   XAtom::cardinal, workspacesList.size());
 
+  updateWorkArea();
+  
   std::for_each(netizenList.begin(), netizenList.end(),
                 std::mem_fun(&Netizen::sendWorkspaceCount));
 }
@@ -1190,6 +1334,10 @@ void BScreen::updateNetizenWorkspaceCount(void) {
 void BScreen::updateNetizenWindowFocus(void) {
   Window f = ((blackbox->getFocusedWindow()) ?
               blackbox->getFocusedWindow()->getClientWindow() : None);
+
+  xatom->setValue(getRootWindow(), XAtom::net_active_window,
+                  XAtom::window, f);
+
   NetizenList::iterator it = netizenList.begin();
   for (; it != netizenList.end(); ++it)
     (*it)->sendWindowFocus(f);
@@ -1277,11 +1425,35 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
   XRestackWindows(blackbox->getXDisplay(), session_stack, i);
 
   delete [] session_stack;
+
+  updateStackingList();
+}
+
+
+void BScreen::lowerDesktops(void) {
+  XLowerWindow(blackbox->getXDisplay(), desktopWindowList[0]);
+  if (desktopWindowList.size() > 1)
+    XRestackWindows(blackbox->getXDisplay(), &desktopWindowList[0],
+                    desktopWindowList.size());
 }
 
 
 void BScreen::addWorkspaceName(const string& name) {
   workspaceNames.push_back(name);
+  updateDesktopNames();
+}
+
+
+void BScreen::updateDesktopNames(){
+  XAtom::StringVect names;
+
+  WorkspaceList::iterator it = workspacesList.begin();
+  const WorkspaceList::iterator end = workspacesList.end();
+  for (; it != end; ++it)
+    names.push_back((*it)->getName());
+
+  xatom->setValue(getRootWindow(), XAtom::net_desktop_names,
+                  XAtom::utf8, names);
 }
 
 
@@ -1956,6 +2128,8 @@ void BScreen::updateAvailableArea(void) {
     for (; it != end; ++it)
       if ((*it)->isMaximized()) (*it)->remaximize();
   }
+
+  updateWorkArea();  
 }
 
 

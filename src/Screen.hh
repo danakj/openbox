@@ -129,6 +129,9 @@ private:
   NetizenList netizenList;
   BlackboxWindowList iconList, windowList;
 
+  typedef std::vector<Window> WindowList;
+  WindowList desktopWindowList, systrayWindowList;
+
   Slit *slit;
   Toolbar *toolbar;
   Workspace *current_workspace;
@@ -190,7 +193,7 @@ private:
   void InitMenu(void);
   void LoadStyle(void);
 
-
+  void updateWorkArea(void);
 public:
   enum { RowSmartPlacement = 1, ColSmartPlacement, CascadePlacement,
          UnderMousePlacement, LeftRight, RightLeft, TopBottom, BottomTop };
@@ -310,16 +313,26 @@ public:
   const std::string getNameOfWorkspace(unsigned int id);
   void changeWorkspaceID(unsigned int id);
   void saveWorkspaceNames(void);
+  void updateDesktopNames(void);
 
   void addNetizen(Netizen *n);
   void removeNetizen(Window w);
 
+  void addDesktopWindow(Window window);
+  void removeDesktopWindow(Window window);
+
+  void addSystrayWindow(Window window);
+  void removeSystrayWindow(Window window);
+
   void addIcon(BlackboxWindow *w);
   void removeIcon(BlackboxWindow *w);
 
+  void updateClientList(void);
+  void updateStackingList(void);
   void manageWindow(Window w);
   void unmanageWindow(BlackboxWindow *w, bool remap);
   void raiseWindows(Window *workspace_stack, unsigned int num);
+  void lowerDesktops(void);
   void reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
                          bool ignore_sticky);
   void propagateWindowName(const BlackboxWindow *bw);

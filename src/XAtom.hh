@@ -24,6 +24,9 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+
+#include <assert.h>
+
 #include <vector>
 #include <string>
 
@@ -52,6 +55,8 @@ public:
     wm_delete_window,
     wm_take_focus,
     wm_change_state,
+    wm_name,
+    wm_icon_name,
     motif_wm_hints,
     blackbox_attributes,
     blackbox_change_attributes,
@@ -85,24 +90,63 @@ public:
     net_active_window,
     net_workarea,
     net_supporting_wm_check,
-    net_virtual_roots,
+//    net_virtual_roots,
     // root window messages
     net_close_window,
     net_wm_moveresize,
     // application window properties
-    net_properties,
+//    net_properties,
     net_wm_name,
+    net_wm_visible_name,
+    net_wm_icon_name,
+    net_wm_visible_icon_name,
     net_wm_desktop,
     net_wm_window_type,
     net_wm_state,
     net_wm_strut,
-    net_wm_icon_geometry,
-    net_wm_icon,
-    net_wm_pid,
-    net_wm_handled_icons,
+//  net_wm_icon_geometry,
+//  net_wm_icon,
+//  net_wm_pid,
+//  net_wm_handled_icons,
+    net_wm_allowed_actions,
     // application protocols
-    net_wm_ping,
+//    net_wm_ping,
 
+    net_wm_window_type_desktop,
+    net_wm_window_type_dock,
+    net_wm_window_type_toolbar,
+    net_wm_window_type_menu,
+    net_wm_window_type_utility,
+    net_wm_window_type_splash,
+    net_wm_window_type_dialog,
+    net_wm_window_type_normal,
+
+    net_wm_moveresize_size_topleft,
+    net_wm_moveresize_size_topright,
+    net_wm_moveresize_size_bottomleft,
+    net_wm_moveresize_size_bottomright,
+    net_wm_moveresize_move,
+
+    net_wm_action_move,
+    net_wm_action_resize,
+    net_wm_action_shade,
+    net_wm_action_maximize_horz,
+    net_wm_action_maximize_vert,
+    net_wm_action_change_desktop,
+    net_wm_action_close,
+
+    net_wm_state_modal,
+    net_wm_state_maximized_vert,
+    net_wm_state_maximized_horz,
+    net_wm_state_shaded,
+    net_wm_state_skip_taskbar,
+    net_wm_state_skip_pager,
+    net_wm_state_hidden,
+    net_wm_state_fullscreen,
+
+    kde_net_system_tray_windows,
+    kde_net_wm_system_tray_window_for,
+ 
     // constant for how many atoms exist in the enumerator
     NUM_ATOMS
   };
@@ -134,7 +178,9 @@ private:
   XAtom& operator=(const XAtom&);
 
 public:
-  XAtom(Blackbox *bb);
+  typedef std::vector<std::string> StringVect;
+  
+  XAtom(Display *d);
   virtual ~XAtom();
 
   // setup support on a screen, each screen should call this once in its
@@ -146,21 +192,29 @@ public:
                 unsigned long value[], int elements) const;
   void setValue(Window win, Atoms atom, StringType type,
                 const std::string &value) const;
+  void setValue(Window win, Atoms atom, StringType type,
+                const StringVect &strings) const;
 
   // the 'value' is allocated inside the function and
   // delete [] value needs to be called when you are done with it.
   // the 'value' array returned is null terminated, and has 'nelements'
   // elements in it plus the null.
+  // nelements must be set to the maximum number of elements to read from
+  // the property.
   bool getValue(Window win, Atoms atom, Atoms type,
                 unsigned long &nelements, unsigned long **value) const;
+  bool getValue(Window win, Atoms atom, Atoms type, unsigned long &value) const;
   bool getValue(Window win, Atoms atom, StringType type,
                 std::string &value) const;
+  bool getValue(Window win, Atoms atom, StringType type,
+                int &nelements, StringVect &strings) const;
   
   void eraseValue(Window win, Atoms atom) const;
 
   // temporary function!! remove when not used in blackbox.hh anymore!!
   inline Atom getAtom(Atoms a)
-  { Atom ret = _atoms[a]; assert(ret != 0); return ret; }
+  { assert(a >= 0 && a < NUM_ATOMS); Atom ret = _atoms[a];
+    assert(ret != 0); return ret; }
 };
 
 #endif // __XAtom_h

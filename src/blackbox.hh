@@ -98,7 +98,7 @@ extern I18n i18n;
 class Blackbox : public BaseDisplay, public TimeoutHandler {
 private:
   struct BCursor {
-    Cursor session, move, ll_angle, lr_angle;
+    Cursor session, move, ll_angle, lr_angle, ul_angle, ur_angle;
   };
   BCursor cursor;
 
@@ -120,6 +120,10 @@ private:
   typedef std::map<Window, BlackboxWindow*> WindowLookup;
   typedef WindowLookup::value_type WindowLookupPair;
   WindowLookup windowSearchList;
+
+  typedef std::map<Window, BScreen*> WindowScreenLookup;
+  typedef WindowScreenLookup::value_type WindowScreenLookupPair;
+  WindowScreenLookup systraySearchList, desktopSearchList;
 
   typedef std::map<Window, BWindowGroup*> GroupLookup;
   typedef GroupLookup::value_type GroupLookupPair;
@@ -144,7 +148,7 @@ private:
   ScreenList screenList;
 
   BScreen *active_screen;
-  BlackboxWindow *focused_window;
+  BlackboxWindow *focused_window, *changing_window;
   BTimer *timer;
   Configuration config;
   XAtom *xatom;
@@ -171,17 +175,23 @@ public:
 
   Basemenu *searchMenu(Window window);
   BWindowGroup *searchGroup(Window window);
+  BScreen *searchDesktopWindow(Window window);
+  BScreen *searchSystrayWindow(Window window);
   BlackboxWindow *searchWindow(Window window);
   BScreen *searchScreen(Window window);
   Toolbar *searchToolbar(Window);
   Slit *searchSlit(Window);
 
   void saveMenuSearch(Window window, Basemenu *data);
+  void saveDesktopWindowSearch(Window window, BScreen *screen);
+  void saveSystrayWindowSearch(Window window, BScreen *screen);
   void saveWindowSearch(Window window, BlackboxWindow *data);
   void saveGroupSearch(Window window, BWindowGroup *data);
   void saveToolbarSearch(Window window, Toolbar *data);
   void saveSlitSearch(Window window, Slit *data);
   void removeMenuSearch(Window window);
+  void removeDesktopWindowSearch(Window window);
+  void removeSystrayWindowSearch(Window window);
   void removeWindowSearch(Window window);
   void removeGroupSearch(Window window);
   void removeToolbarSearch(Window window);
@@ -190,6 +200,7 @@ public:
   inline XAtom *getXAtom(void) { return xatom; }
   
   inline BlackboxWindow *getFocusedWindow(void) { return focused_window; }
+  inline BlackboxWindow *getChangingWindow(void) { return changing_window; }
 
   inline Configuration *getConfig() { return &config; }
   inline const Time &getDoubleClickInterval(void) const
@@ -225,8 +236,13 @@ public:
     { return cursor.ll_angle; }
   inline Cursor getLowerRightAngleCursor(void) const
     { return cursor.lr_angle; }
+  inline Cursor getUpperLeftAngleCursor(void) const
+    { return cursor.ul_angle; }
+  inline Cursor getUpperRightAngleCursor(void) const
+    { return cursor.ur_angle; }
 
-  void setFocusedWindow(BlackboxWindow *w);
+  void setFocusedWindow(BlackboxWindow *win);
+  void setChangingWindow(BlackboxWindow *win);
   void shutdown(void);
   void saveStyleFilename(const std::string& filename);
   void addMenuTimestamp(const std::string& filename);
@@ -244,64 +260,6 @@ public:
 #ifndef   HAVE_STRFTIME
   enum { B_AmericanDate = 1, B_EuropeanDate };
 #endif // HAVE_STRFTIME
-
-  inline Atom getWMDeleteAtom(void) const
-    { return xatom->getAtom(XAtom::wm_delete_window); }
-  inline Atom getWMProtocolsAtom(void) const
-    { return xatom->getAtom(XAtom::wm_protocols); }
-  inline Atom getWMTakeFocusAtom(void) const
-    { return xatom->getAtom(XAtom::wm_take_focus); }
-  inline Atom getWMColormapAtom(void) const
-    { return xatom->getAtom(XAtom::wm_colormap_windows); }
-  inline Atom getMotifWMHintsAtom(void) const
-    { return xatom->getAtom(XAtom::motif_wm_hints); }
-
-  // this atom is for normal app->WM hints about decorations, stacking,
-  // starting workspace etc...
-  inline Atom getBlackboxHintsAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_hints); }
-
-  // these atoms are for normal app->WM interaction beyond the scope of the
-  // ICCCM...
-  inline Atom getBlackboxAttributesAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_attributes); }
-  inline Atom getBlackboxChangeAttributesAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_change_attributes); }
-
-  // these atoms are for window->WM interaction, with more control and
-  // information on window "structure"... common examples are
-  // notifying apps when windows are raised/lowered... when the user changes
-  // workspaces... i.e. "pager talk"
-  inline Atom getBlackboxStructureMessagesAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_structure_messages); }
-
-  // *Notify* portions of the NETStructureMessages protocol
-  inline Atom getBlackboxNotifyStartupAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_startup); }
-  inline Atom getBlackboxNotifyWindowAddAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_window_add); }
-  inline Atom getBlackboxNotifyWindowDelAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_window_del); }
-  inline Atom getBlackboxNotifyWindowFocusAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_window_focus); }
-  inline Atom getBlackboxNotifyCurrentWorkspaceAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_current_workspace); }
-  inline Atom getBlackboxNotifyWorkspaceCountAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_workspace_count); }
-  inline Atom getBlackboxNotifyWindowRaiseAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_window_raise); }
-  inline Atom getBlackboxNotifyWindowLowerAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_notify_window_lower); }
-
-  // atoms to change that request changes to the desktop environment during
-  // runtime... these messages can be sent by any client... as the sending
-  // client window id is not included in the ClientMessage event...
-  inline Atom getBlackboxChangeWorkspaceAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_change_workspace); }
-  inline Atom getBlackboxChangeWindowFocusAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_change_window_focus); }
-  inline Atom getBlackboxCycleWindowFocusAtom(void) const
-    { return xatom->getAtom(XAtom::blackbox_cycle_window_focus); }
 };
 
 

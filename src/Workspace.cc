@@ -307,6 +307,7 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
   XLowerWindow(screen->getBaseDisplay()->getXDisplay(), stack_vector.front());
   XRestackWindows(screen->getBaseDisplay()->getXDisplay(),
                   &stack_vector[0], stack_vector.size());
+  screen->lowerDesktops();
 }
 
 
@@ -376,6 +377,14 @@ unsigned int Workspace::getCount(void) const {
   return windowList.size();
 }
 
+
+void Workspace::appendStackOrder(BlackboxWindowList &stack_order) const {
+  BlackboxWindowList::const_iterator it = stackingList.begin();
+  const BlackboxWindowList::const_iterator end = stackingList.end();
+  for (; it != end; ++it)
+    stack_order.push_back(*it);
+}
+  
 
 bool Workspace::isCurrent(void) const {
   return (id == screen->getCurrentWorkspaceID());

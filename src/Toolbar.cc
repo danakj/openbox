@@ -979,6 +979,7 @@ void Toolbar::keyPressEvent(XKeyEvent *ke) {
 
       Workspace *wkspc = screen->getCurrentWorkspace();
       wkspc->setName(new_workspace_name);
+      screen->updateDesktopNames();
       wkspc->getMenu()->hide();
 
       screen->getWorkspacemenu()->changeItemLabel(wkspc->getID() + 2,

@@ -27,19 +27,21 @@
 
 #include "Netizen.hh"
 #include "Screen.hh"
+#include "XAtom.hh"
 
 Netizen::Netizen(BScreen *scr, Window win) {
   screen = scr;
   blackbox = scr->getBlackbox();
+  xatom = blackbox->getXAtom();
   window = win;
 
   event.type = ClientMessage;
   event.xclient.message_type =
-    blackbox->getBlackboxStructureMessagesAtom();
+    xatom->getAtom(XAtom::blackbox_structure_messages);
   event.xclient.display = blackbox->getXDisplay();
   event.xclient.window = window;
   event.xclient.format = 32;
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyStartupAtom();
+  event.xclient.data.l[0] = xatom->getAtom(XAtom::blackbox_notify_startup);
   event.xclient.data.l[1] = event.xclient.data.l[2] =
     event.xclient.data.l[3] = event.xclient.data.l[4] = 0l;
 
@@ -49,7 +51,7 @@ Netizen::Netizen(BScreen *scr, Window win) {
 
 void Netizen::sendWorkspaceCount(void) {
   event.xclient.data.l[0] =
-    blackbox->getBlackboxNotifyWorkspaceCountAtom();
+    xatom->getAtom(XAtom::blackbox_notify_workspace_count);
   event.xclient.data.l[1] = screen->getWorkspaceCount();
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);
@@ -58,7 +60,7 @@ void Netizen::sendWorkspaceCount(void) {
 
 void Netizen::sendCurrentWorkspace(void) {
   event.xclient.data.l[0] =
-    blackbox->getBlackboxNotifyCurrentWorkspaceAtom();
+    xatom->getAtom(XAtom::blackbox_notify_current_workspace);
   event.xclient.data.l[1] = screen->getCurrentWorkspaceID();
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);
@@ -66,7 +68,7 @@ void Netizen::sendCurrentWorkspace(void) {
 
 
 void Netizen::sendWindowFocus(Window w) {
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyWindowFocusAtom();
+  event.xclient.data.l[0] = xatom->getAtom(XAtom::blackbox_notify_window_focus);
   event.xclient.data.l[1] = w;
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);
@@ -74,7 +76,7 @@ void Netizen::sendWindowFocus(Window w) {
 
 
 void Netizen::sendWindowAdd(Window w, unsigned long p) {
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyWindowAddAtom();
+  event.xclient.data.l[0] = xatom->getAtom(XAtom::blackbox_notify_window_add);
   event.xclient.data.l[1] = w;
   event.xclient.data.l[2] = p;
 
@@ -85,7 +87,7 @@ void Netizen::sendWindowAdd(Window w, unsigned long p) {
 
 
 void Netizen::sendWindowDel(Window w) {
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyWindowDelAtom();
+  event.xclient.data.l[0] = xatom->getAtom(XAtom::blackbox_notify_window_del);
   event.xclient.data.l[1] = w;
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);
@@ -93,7 +95,7 @@ void Netizen::sendWindowDel(Window w) {
 
 
 void Netizen::sendWindowRaise(Window w) {
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyWindowRaiseAtom();
+  event.xclient.data.l[0] = xatom->getAtom(XAtom::blackbox_notify_window_raise);
   event.xclient.data.l[1] = w;
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);
@@ -101,7 +103,8 @@ void Netizen::sendWindowRaise(Window w) {
 
 
 void Netizen::sendWindowLower(Window w) {
-  event.xclient.data.l[0] = blackbox->getBlackboxNotifyWindowLowerAtom();
+  event.xclient.data.l[0] =
+    xatom->getAtom(XAtom::blackbox_notify_window_lower);
   event.xclient.data.l[1] = w;
 
   XSendEvent(blackbox->getXDisplay(), window, False, NoEventMask, &event);

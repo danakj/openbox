@@ -240,7 +240,7 @@ static void event(ObEvent *e, void *foo)
             button = e->data.x.e->xbutton.button;
             state = e->data.x.e->xbutton.state;
         }
-        context = frame_context(e->data.x.client->frame,
+        context = frame_context(e->data.x.client,
                                 e->data.x.e->xbutton.window);
 
         fire_button(MouseAction_Press, context,
@@ -255,7 +255,7 @@ static void event(ObEvent *e, void *foo)
             break;
 
     case Event_X_ButtonRelease:
-        context = frame_context(e->data.x.client->frame,
+        context = frame_context(e->data.x.client,
                                 e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
@@ -314,7 +314,7 @@ static void event(ObEvent *e, void *foo)
                 (ABS(dx) >= threshold || ABS(dy) >= threshold))
                 drag = TRUE;
             if (drag) {
-                context = frame_context(e->data.x.client->frame,
+                context = frame_context(e->data.x.client,
                                         e->data.x.e->xbutton.window);
                 drag_used = fire_motion(MouseAction_Motion, context,
                                         e->data.x.client,

@@ -646,12 +646,15 @@ Context frame_context_from_string(char *name)
     return Context_None;
 }
 
-Context frame_context(Frame *self, Window win)
+Context frame_context(Client *client, Window win)
 {
-    if (win == ob_root) return Context_Root;
-    if (self == NULL) return Context_None;
-    if (win == self->client->window) return Context_Client;
+    Frame *self;
 
+    if (win == ob_root) return Context_Root;
+    if (client == NULL) return Context_None;
+    if (win == client->window) return Context_Client;
+
+    self = client->frame;
     if (win == self->window) return Context_Frame;
     if (win == self->plate)  return Context_Client;
     if (win == self->title)  return Context_Titlebar;

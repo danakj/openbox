@@ -369,7 +369,7 @@ static void event_handle_client(Client *client, XEvent *e)
     switch (e->type) {
     case ButtonPress:
     case ButtonRelease:
-        switch (frame_context(client->frame, e->xbutton.window)) {
+        switch (frame_context(client, e->xbutton.window)) {
         case Context_Maximize:
             client->frame->max_press = (e->type == ButtonPress);
             framerender_frame(client->frame);

@@ -98,7 +98,7 @@ void frame_release_client(Frame *self, Client *client);
 
 Context frame_context_from_string(char *name);
 
-Context frame_context(Frame *self, Window win);
+Context frame_context(Client *self, Window win);
 
 /*! Applies gravity to the client's position to find where the frame should
   be positioned.

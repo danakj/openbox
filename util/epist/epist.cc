@@ -102,10 +102,9 @@ void epist::activateGrabs() {
   ScreenList::const_iterator scrit, scrend = _screens.end();
   
   for (scrit = _screens.begin(); scrit != scrend; ++scrit) {
-    ActionList::const_iterator end = _actions.end();
+    ActionList::const_iterator ait, end = _actions.end();
 
-    for(ActionList::const_iterator ait = _actions.begin();
-        ait != end; ++ait) {
+    for(ait = _actions.begin(); ait != end; ++ait) {
       XGrabKey(getXDisplay(), ait->keycode(), ait->modifierMask(),
                (*scrit)->rootWindow(), True, GrabModeAsync, GrabModeAsync);
     }

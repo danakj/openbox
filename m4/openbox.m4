@@ -7,9 +7,16 @@ AC_DEFUN([OB_DEBUG],
 [
     AC_MSG_CHECKING([build type])
 
+    DEFAULTDEBUG="no"
+
+  # cvs builds are always debug
+    CVS=""
+    test "${PACKAGE_VERSION%*cvs}" != "$PACKAGE_VERSION" && CVS="yes"
+    test "$CVS" = "yes" && DEFAULTDEBUG="yes"
+
     AC_ARG_ENABLE([debug],
-    [  --enable-debug          build a debug version default=yes],
-    [DEBUG=$enableval], [DEBUG="no"])
+    [  --enable-debug          build a debug version default=$DEFAULTDEBUG],
+    [DEBUG=$enableval], [DEBUG=$DEFAULTDEBUG])
 
     AC_ARG_ENABLE([strict-ansi],
     [  --enable-strict-ansi    Enable strict ANSI compliance build default=no],
@@ -17,11 +24,6 @@ AC_DEFUN([OB_DEBUG],
     if test "$GCC" = "yes" && test "$STRICT" = "yes"; then
 	CFLAGS="$CFLAGS -ansi -pedantic -D_XOPEN_SOURCE"
     fi
-
-  # cvs builds are always debug
-    CVS=""
-    test "${PACKAGE_VERSION%*cvs}" != "$PACKAGE_VERSION" && CVS="yes"
-    test "$CVS" = "yes" && DEBUG="yes"
 
     if test "$DEBUG" = "yes"; then
 	MSG="DEBUG"

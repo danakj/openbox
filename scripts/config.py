@@ -9,7 +9,7 @@
 client_buttons = ["A-1", "A-2", "A-3"]
 
 # theme - the theme used to decorate everything.
-theme = "/usr/local/share/openbox/styles/nyz"
+theme = "/usr/local/share/openbox/styles/fieron2"
 
 # titlebar_layout - the layout of the buttons/label on client titlebars, can be
 #                   made up of the following:

@@ -232,9 +232,14 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   rootmenu = 0;
 
   resource.mstyle.t_fontset = resource.mstyle.f_fontset =
-    resource.tstyle.fontset = resource.wstyle.fontset = (XFontSet) 0;
+    resource.tstyle.fontset = resource.wstyle.fontset = NULL;
   resource.mstyle.t_font = resource.mstyle.f_font = resource.tstyle.font =
-    resource.wstyle.font = (XFontStruct *) 0;
+    resource.wstyle.font = NULL;
+
+#ifdef   SLIT
+  slit = NULL;
+#endif // SLIT
+  toolbar = NULL;
 
 #ifdef    HAVE_GETPID
   pid_t bpid = getpid();
@@ -415,7 +420,7 @@ BScreen::BScreen(Openbox &ob, int scrn, Resource &conf) : ScreenInfo(ob, scrn),
   iconmenu = new Iconmenu(*this);
   configmenu = new Configmenu(*this);
 
-  Workspace *wkspc = (Workspace *) 0;
+  Workspace *wkspc = NULL;
   if (resource.workspaces != 0) {
     for (int i = 0; i < resource.workspaces; ++i) {
       wkspc = new Workspace(*this, workspacesList->count());
@@ -1058,6 +1063,13 @@ void BScreen::load() {
   rclass << rscreen.str() << "HideToolbar" << ends;
   if (config.getValue(rname.str(), rclass.str(), b))
     resource.hide_toolbar = b;
+  Toolbar *t = getToolbar();
+  if (t != NULL) {
+    if (resource.hide_toolbar)
+      t->unMapToolbar();
+    else
+      t->mapToolbar();
+  }
 
   rname.seekp(0); rclass.seekp(0);
   rname << rscreen.str() << "fullMaximization" << ends;
@@ -1730,7 +1742,7 @@ OpenboxWindow *BScreen::getIcon(int index) {
   if (index >= 0 && index < iconList->count())
     return iconList->find(index);
 
-  return (OpenboxWindow *) 0;
+  return NULL;
 }
 
 
@@ -1789,7 +1801,7 @@ void BScreen::changeWorkspaceID(int id) {
 	openbox.getFocusedWindow()->getScreen() == this &&
         (! openbox.getFocusedWindow()->isStuck())) {
       current_workspace->setLastFocusedWindow(openbox.getFocusedWindow());
-      openbox.setFocusedWindow((OpenboxWindow *) 0);
+      openbox.setFocusedWindow(NULL);
     }
 
     current_workspace = getWorkspace(id);
@@ -1956,7 +1968,7 @@ void BScreen::addWorkspaceName(const char *name) {
 }
 
 char* BScreen::getNameOfWorkspace(int id) {
-  char *name = (char *) 0;
+  char *name = NULL;
 
   if (id >= 0 && id < workspaceNames->count()) {
     char *wkspc_name = workspaceNames->find(id);

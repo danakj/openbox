@@ -1472,12 +1472,6 @@ void OpenboxWindow::deiconify(bool reassoc, bool raise, bool initial) {
   // after the window is mapped, we need to start interactively moving it
   if (initial && place_window &&
       screen->placementPolicy() == BScreen::ClickMousePlacement) {
-    // if the last window wasn't placed yet, or we're just moving a window
-    // already, finish off that move cleanly
-    OpenboxWindow *w = openbox.getFocusedWindow();
-    if (w != (OpenboxWindow *) 0 && w->flags.moving)
-      w->endMove();
-
     int x, y, rx, ry;
     Window c, r;
     unsigned int m;
@@ -2759,6 +2753,12 @@ void OpenboxWindow::buttonReleaseEvent(XButtonEvent *re) {
 void OpenboxWindow::startMove(int x, int y) {
   ASSERT(!flags.moving);
 
+  // make sure only one window is moving at a time
+  OpenboxWindow *w;
+  if ((w = openbox.getMaskedWindow()) != (OpenboxWindow *) 0 &&
+      w->flags.moving)
+    w->endMove();
+  
   XGrabPointer(display, frame.window, False, PointerMotionMask |
                ButtonReleaseMask, GrabModeAsync, GrabModeAsync,
                None, openbox.getMoveCursor(), CurrentTime);

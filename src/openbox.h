@@ -172,6 +172,8 @@ public:
   inline const unsigned long &getCacheMax() const
     { return resource.cache_max; }
 
+  inline OpenboxWindow *getMaskedWindow() const
+    { return masked_window; }
   inline void maskWindowEvents(Window w, OpenboxWindow *bw)
     { masked = w; masked_window = bw; }
   inline void setNoFocus(Bool f) { no_focus = f; }

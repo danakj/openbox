@@ -79,4 +79,20 @@ def lower_win(data):
     screen = Openbox_screen(openbox, OBClient_screen(client))
     OBScreen_restack(screen, 0, client)
 
+def toggle_shade(data):
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    print "toggle_shade"
+    OBClient_shade(client, not OBClient_shaded(client))
+
+def shade(data):
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    OBClient_shade(client, 1)
+
+def unshade(data):
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    OBClient_shade(client, 0)
+
 print "Loaded builtins.py"

@@ -296,8 +296,12 @@ void OBFrame::adjustSize()
 
   // position/size all the windows
 
-  resize(_innersize.left + _innersize.right + _client->area().width(),
-         _innersize.top + _innersize.bottom + _client->area().height());
+  if (_client->shaded())
+    resize(_innersize.left + _innersize.right + _client->area().width(),
+           _titlebar.height());
+  else
+    resize(_innersize.left + _innersize.right + _client->area().width(),
+           _innersize.top + _innersize.bottom + _client->area().height());
 
   _plate.setGeometry(_innersize.left - cbwidth, _innersize.top - cbwidth,
                      _client->area().width(), _client->area().height());

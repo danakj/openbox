@@ -2312,6 +2312,26 @@ static PyObject *_wrap_OBClient_close(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBClient_shade(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
+    bool arg2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OO:OBClient_shade",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    arg2 = (bool) PyInt_AsLong(obj1);
+    if (PyErr_Occurred()) SWIG_fail;
+    (arg1)->shade(arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBClient_focus(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2729,6 +2749,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
 	 { (char *)"OBClient_resize", _wrap_OBClient_resize, METH_VARARGS },
 	 { (char *)"OBClient_close", _wrap_OBClient_close, METH_VARARGS },
+	 { (char *)"OBClient_shade", _wrap_OBClient_shade, METH_VARARGS },
 	 { (char *)"OBClient_focus", _wrap_OBClient_focus, METH_VARARGS },
 	 { (char *)"OBClient_unfocus", _wrap_OBClient_unfocus, METH_VARARGS },
 	 { (char *)"OBClient_focusHandler", _wrap_OBClient_focusHandler, METH_VARARGS },

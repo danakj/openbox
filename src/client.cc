@@ -249,7 +249,7 @@ void OBClient::getState()
   const otk::OBProperty *property = Openbox::instance->property();
 
   _modal = _shaded = _max_horz = _max_vert = _fullscreen = _above = _below =
-    false;
+    _skip_taskbar = _skip_pager = false;
   
   unsigned long *state;
   unsigned long num = (unsigned) -1;
@@ -262,6 +262,12 @@ void OBClient::getState()
       else if (state[i] ==
                property->atom(otk::OBProperty::net_wm_state_shaded))
         _shaded = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_skip_taskbar))
+        _skip_taskbar = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_skip_pager))
+        _skip_pager = true;
       else if (state[i] ==
                property->atom(otk::OBProperty::net_wm_state_fullscreen))
         _fullscreen = true;
@@ -565,6 +571,12 @@ void OBClient::setState(StateAction action, long data1, long data2)
       else if (state == property->atom(otk::OBProperty::net_wm_state_shaded))
         action = _shaded ? State_Remove : State_Add;
       else if (state ==
+               property->atom(otk::OBProperty::net_wm_state_skip_taskbar))
+        action = _skip_taskbar ? State_Remove : State_Add;
+      else if (state ==
+               property->atom(otk::OBProperty::net_wm_state_skip_pager))
+        action = _skip_pager ? State_Remove : State_Add;
+      else if (state ==
                property->atom(otk::OBProperty::net_wm_state_fullscreen))
         action = _fullscreen ? State_Remove : State_Add;
       else if (state == property->atom(otk::OBProperty::net_wm_state_above))
@@ -593,6 +605,12 @@ void OBClient::setState(StateAction action, long data1, long data2)
         if (_shaded) continue;
         _shaded = true;
         // XXX: hide the client window
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
+        _skip_taskbar = true;
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_skip_pager)) {
+        _skip_pager = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (_fullscreen) continue;
@@ -629,6 +647,12 @@ void OBClient::setState(StateAction action, long data1, long data2)
         if (!_shaded) continue;
         _shaded = false;
         // XXX: show the client window
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
+        _skip_taskbar = false;
+      } else if (state ==
+                 property->atom(otk::OBProperty::net_wm_state_skip_pager)) {
+        _skip_pager = false;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (!_fullscreen) continue;
@@ -846,6 +870,57 @@ void OBClient::close()
   ce.xclient.data.l[3] = 0l;
   ce.xclient.data.l[4] = 0l;
   XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+}
+
+
+void OBClient::changeState()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  unsigned long state[2];
+  state[0] = _wmstate;
+  state[1] = None;
+  property->set(_window, otk::OBProperty::wm_state, otk::OBProperty::wm_state,
+                state, 2);
+  
+  Atom netstate[10];
+  int num = 0;
+  if (_modal)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_modal);
+  if (_shaded)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_shaded);
+  if (_iconic)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_hidden);
+  if (_skip_taskbar)
+    netstate[num++] =
+      property->atom(otk::OBProperty::net_wm_state_skip_taskbar);
+  if (_skip_pager)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_skip_pager);
+  if (_fullscreen)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_fullscreen);
+  if (_max_vert)
+    netstate[num++] =
+      property->atom(otk::OBProperty::net_wm_state_maximized_vert);
+  if (_max_horz)
+    netstate[num++] =
+      property->atom(otk::OBProperty::net_wm_state_maximized_horz);
+  if (_above)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_above);
+  if (_below)
+    netstate[num++] = property->atom(otk::OBProperty::net_wm_state_below);
+  property->set(_window, otk::OBProperty::net_wm_state,
+                otk::OBProperty::Atom_Atom, netstate, num);
+  
+}
+
+void OBClient::shade(bool shade)
+{
+  if (shade == _shaded) return; // already done
+
+  _wmstate = shade ? IconicState : NormalState;
+  _shaded = shade;
+  changeState();
+  frame->adjustSize();
 }
 
 

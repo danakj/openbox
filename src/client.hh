@@ -252,6 +252,10 @@ private:
   bool _max_vert;
   //! The window is maximized to fill the screen horizontally
   bool _max_horz;
+  //! The window should not be displayed by pagers
+  bool _skip_pager;
+  //! The window should not be displayed by taskbars
+  bool _skip_taskbar;
   //! The window is a 'fullscreen' window, and should be on top of all others
   bool _fullscreen;
   //! The window should be on top of other windows of the same type
@@ -316,6 +320,9 @@ private:
   void updateClass();
   // XXX: updateTransientFor();
 
+  //! Change the client's state hints to match the class' data
+  void changeState();
+  
 public:
 #ifndef SWIG
   //! Constructs a new OBClient object around a specified window id
@@ -433,12 +440,19 @@ public:
   //! Request the client to close its window.
   void close();
 
+  //! Shades or unshades the client window
+  /*!
+    @param shade true if the window should be shaded; false if it should be
+                 unshaded.
+  */
+  void shade(bool shade);
+  
   //! Attempt to focus the client window
   bool focus();
 
   //! Remove focus from the client window
   void unfocus();
-  
+
   virtual void focusHandler(const XFocusChangeEvent &e);
   virtual void unfocusHandler(const XFocusChangeEvent &e);
   virtual void propertyHandler(const XPropertyEvent &e);

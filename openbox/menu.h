@@ -3,7 +3,7 @@
 
 #include <glib.h>
 
-typedef struct {
+typedef struct Menu {
     char *label;
     
     GList *entries;
@@ -13,7 +13,7 @@ typedef struct {
     gboolean shown;
     gboolean invalid;
 
-    Menu *parent;
+    struct Menu *parent;
 
     /* waste o' pointers */
     void (*show)( /* some bummu */);

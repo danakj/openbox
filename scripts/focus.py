@@ -7,10 +7,10 @@
 ###                                                                     ###
 # cycle_raise - raise the window also when it is focused                ###
 cycle_raise = 1                                                         ###
-# avoid_skip_taskbar - don't focus windows which have requested to not  ###
-###                    be displayed in taskbars. you will still be able ###
+# avoid_skip_taskbar - Don't focus windows which have requested to not  ###
+###                    be displayed in taskbars. You will still be able ###
 ###                    to focus the windows, but not through cycling,   ###
-###                    they won't be focused as a fallback if           ###
+###                    and they won't be focused as a fallback if       ###
 ###                    'fallback' is enabled.                           ###
 avoid_skip_taskbar = 1                                                  ###
 # stacked_cycle_raise - raise as you cycle in stacked mode              ###

@@ -26,7 +26,9 @@ def def_motion_release(action, win, type, modifiers, button, xroot, yroot,
 	global posqueue
 	for i in posqueue:
 		if i[0] == button:
-			delete_Rect(i[3])
+			client = Openbox_findClient(openbox, win)
+			if client:
+				delete_Rect(i[3])
 			posqueue.remove(i)
 			break
 	

@@ -127,17 +127,18 @@ void OtkEventDispatcher::dispatchEvents(void)
   } else if (focus != None) {
     // the last focus event was a FocusIn, so unfocus what used to be focus and
     // focus this new target
+//    printf("FOCUSING: %lx\n", focus);
+    _focus_e.xfocus.type = FocusIn;
+    _focus_e.xfocus.window = focus;
+    dispatch(_focus_e);
+
     if (_focus != None) {
 //      printf("UNFOCUSING: %lx\n", _focus);
       _focus_e.xfocus.type = FocusOut;
       _focus_e.xfocus.window = _focus;
       dispatch(_focus_e);
     }
-//    printf("FOCUSING: %lx\n", focus);
-    _focus_e.xfocus.type = FocusIn;
-    _focus_e.xfocus.window = focus;
-    dispatch(_focus_e);
-
+    
     _focus = focus;
   }
   

@@ -907,6 +907,11 @@ void OBClient::unfocusHandler(const XFocusChangeEvent &e)
 
   frame->unfocus();
   _focused = false;
+
+  if (Openbox::instance->focusedClient() == this) {
+    printf("UNFOCUSED!\n");
+    Openbox::instance->setFocusedClient(this);
+  }
 }
 
 

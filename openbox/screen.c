@@ -78,7 +78,7 @@ gboolean screen_annex()
     PROP_SET32(support_window, net_supporting_wm_check, window,support_window);
 
     /* set the _NET_SUPPORTED_ATOMS hint */
-    num_support = 48;
+    num_support = 61;
     i = 0;
     supported = g_new(guint32, num_support);
     supported[i++] = prop_atoms.net_current_desktop;
@@ -129,14 +129,21 @@ gboolean screen_annex()
     supported[i++] = prop_atoms.net_wm_state_fullscreen;
     supported[i++] = prop_atoms.net_wm_state_above;
     supported[i++] = prop_atoms.net_wm_state_below;
+    supported[i++] = prop_atoms.net_moveresize_window;
+    supported[i++] = prop_atoms.net_wm_moveresize;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_topleft;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_top;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_topright;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_right;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_bottomright;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_bottom;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_bottomleft;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_left;
+    supported[i++] = prop_atoms.net_wm_moveresize_move;
+    supported[i++] = prop_atoms.net_wm_moveresize_size_keyboard;
+    supported[i++] = prop_atoms.net_wm_moveresize_move_keyboard;
     g_assert(i == num_support);
 /*
-  supported[] = prop_atoms.net_wm_moveresize;
-  supported[] = prop_atoms.net_wm_moveresize_size_topleft;
-  supported[] = prop_atoms.net_wm_moveresize_size_topright;
-  supported[] = prop_atoms.net_wm_moveresize_size_bottomleft;
-  supported[] = prop_atoms.net_wm_moveresize_size_bottomright;
-  supported[] = prop_atoms.net_wm_moveresize_move;
   supported[] = prop_atoms.net_wm_action_stick;
 */
 

@@ -662,7 +662,66 @@ static void event_handle_client(Client *client, XEvent *e)
                 client_shade(client, FALSE);
             client_focus(client);
             stacking_raise(client);
-	}
+	} else if (msgtype == prop_atoms.net_wm_moveresize) {
+	    g_message("net_wm_moveresize for 0x%lx", client->window);
+            if ((Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_topleft ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_top ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_topright ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_right ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_right ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_bottomright ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_bottom ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_bottomleft ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_left ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_move ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_size_keyboard ||
+                (Atom)e->xclient.data.l[2] ==
+                prop_atoms.net_wm_moveresize_move_keyboard) {
+
+                moveresize_start(client, e->xclient.data.l[0],
+                                 e->xclient.data.l[1], e->xclient.data.l[2],
+                                 e->xclient.data.l[3]);
+            }
+        } else if (msgtype == prop_atoms.net_moveresize_window) {
+            int oldg = client->gravity;
+            int tmpg, x, y, w, h;
+
+            if (e->xclient.data.l[0] & 0xff)
+                tmpg = e->xclient.data.l[0] & 0xff;
+            else
+                tmpg = oldg;
+
+            if (e->xclient.data.l[0] & 1 << 8)
+                x = e->xclient.data.l[1];
+            else
+                x = client->area.x;
+            if (e->xclient.data.l[0] & 1 << 9)
+                y = e->xclient.data.l[2];
+            else
+                y = client->area.y;
+            if (e->xclient.data.l[0] & 1 << 10)
+                w = e->xclient.data.l[3];
+            else
+                w = client->area.y;
+            if (e->xclient.data.l[0] & 1 << 11)
+                h = e->xclient.data.l[4];
+            else
+                h = client->area.y;
+            client->gravity = tmpg;
+            client_configure(client, Corner_TopLeft, x, y, w, h, TRUE, TRUE);
+            client->gravity = oldg;
+        }
 	break;
     case PropertyNotify:
 	/* validate cuz we query stuff off the client here */

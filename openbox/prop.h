@@ -49,6 +49,7 @@ typedef struct Atoms {
     /* root window messages */
     Atom net_close_window;
     Atom net_wm_moveresize;
+    Atom net_moveresize_window;
     /* application window properties */
     Atom net_wm_name;
     Atom net_wm_visible_name;

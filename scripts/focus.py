@@ -89,9 +89,12 @@ def _focused(data):
     global _clients
     global _doing_stacked
     global _cyc_w
+
+    print "FOCUSED " + str(data.client)
     
     if data.client:
         if not _doing_stacked: # only move the window when we're not cycling
+            print "HI"
             win = data.client.window()
             # move it to the top
             _clients.remove(win)
@@ -152,9 +155,11 @@ def _focus_stacked_ungrab(data):
             ob.kungrab()
             ob.mungrab()
             _doing_stacked = 0;
-            if cycle_raise:
-                client = ob.openbox.findClient(_cyc_w)
-                if client:
+            client = ob.openbox.findClient(_cyc_w)
+            if client:
+                data.client = client
+                _focused(data) # resort the list as appropriate
+                if cycle_raise:
                     ob.openbox.screen(data.screen).raiseWindow(client)
 
 _list_widget = 0

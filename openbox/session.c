@@ -31,11 +31,12 @@ void session_state_free(ObSessionState *state) {}
 
 #include <X11/SM/SMlib.h>
 
+GList *session_saved_state;
+
 static SmcConn     sm_conn;
 static gchar      *save_file;
 static gint        sm_argc;
 static gchar     **sm_argv;
-static GSList     *sm_saved_state;
 
 static gboolean session_save();
 
@@ -217,6 +218,12 @@ void session_shutdown()
         SmcSetProperties(sm_conn, 1, props);
 
         SmcCloseConnection(sm_conn, 0, NULL);
+
+        while (session_saved_state) {
+            session_state_free(session_saved_state->data);
+            session_saved_state = g_list_delete_link(session_saved_state,
+                                                     session_saved_state);
+        }
     }
 }
 
@@ -281,15 +288,22 @@ static gboolean session_save()
         g_warning("unable to save the session to %s: %s",
                   save_file, strerror(errno));
     } else {
+        guint stack_pos = 0;
+
         fprintf(f, "<?xml version=\"1.0\"?>\n\n");
         fprintf(f, "<openbox_session id=\"%s\">\n\n", ob_sm_id);
 
-        for (it = client_list; it; it = g_list_next(it)) {
+        for (it = stacking_list; it; it = g_list_next(it)) {
             guint num;
             gint32 *dimensions;
             gint prex, prey, prew, preh;
-            ObClient *c = it->data;
+            ObClient *c;
             gchar *client_id, *t;
+
+            if (WINDOW_IS_CLIENT(it->data))
+                c = WINDOW_AS_CLIENT(it->data);
+            else
+                continue;
 
             if (!client_normal(c))
                 continue;
@@ -327,6 +341,7 @@ static gboolean session_save()
             g_free(t);
 
             fprintf(f, "\t<desktop>%d</desktop>\n", c->desktop);
+            fprintf(f, "\t<stacking>%d</stacking>\n", stack_pos);
             fprintf(f, "\t<x>%d</x>\n", prex);
             fprintf(f, "\t<y>%d</y>\n", prey);
             fprintf(f, "\t<width>%d</width>\n", prew);
@@ -350,6 +365,8 @@ static gboolean session_save()
             if (c->max_vert)
                 fprintf(f, "\t<max_vert />\n");
             fprintf(f, "</window>\n\n");
+
+            ++stack_pos;
 
             g_free(client_id);
         }
@@ -379,41 +396,43 @@ void session_state_free(ObSessionState *state)
     }
 }
 
-static gboolean session_state_cmp(ObSessionState *s, ObClient *c)
+gboolean session_state_cmp(ObSessionState *s, ObClient *c)
 {
     gchar *client_id;
 
     if (!(client_id = client_get_sm_client_id(c)))
         return FALSE;
-    g_print("\nsaved %s\nnow %s\n", s->id, client_id);
     if (strcmp(s->id, client_id)) {
         g_free(client_id);
         return FALSE;
     }
     g_free(client_id);
-    g_print("saved %s\nnow %s\n", s->name, c->name);
     if (strcmp(s->name, c->name))
         return FALSE;
-    g_print("saved %s\nnow %s\n", s->class, c->class);
     if (strcmp(s->class, c->class))
         return FALSE;
-    g_print("saved %s\nnow %s\n\n", s->role, c->role);
     if (strcmp(s->role, c->role))
         return FALSE;
     return TRUE;
 }
 
-ObSessionState* session_state_find(ObClient *c)
+GList* session_state_find(ObClient *c)
 {
-    GSList *it;
+    GList *it;
 
-    for (it = sm_saved_state; it; it = g_slist_next(it))
-        if (session_state_cmp(it->data, c)) {
-            ObSessionState *s = it->data;
-            sm_saved_state = g_slist_remove(sm_saved_state, s);
-            return s;
+    for (it = session_saved_state; it; it = g_list_next(it)) {
+        ObSessionState *s = it->data;
+        if (!s->matched && session_state_cmp(s, c)) {
+            s->matched = TRUE;
+            break;
         }
-    return NULL;
+    }
+    return it;
+}
+
+static gint stack_sort(const ObSessionState *s1, const ObSessionState *s2)
+{
+    return s1->stacking - s2->stacking;
 }
 
 void session_load(char *path)
@@ -446,6 +465,9 @@ void session_load(char *path)
         if (!(n = parse_find_node("role", node->xmlChildrenNode)))
             goto session_load_bail;
         state->role = parse_string(doc, n);
+        if (!(n = parse_find_node("stacking", node->xmlChildrenNode)))
+            goto session_load_bail;
+        state->stacking = parse_int(doc, n);
         if (!(n = parse_find_node("desktop", node->xmlChildrenNode)))
             goto session_load_bail;
         state->desktop = parse_int(doc, n);
@@ -482,7 +504,7 @@ void session_load(char *path)
             parse_find_node("max_vert", node->xmlChildrenNode) != NULL;
         
         /* save this */
-        sm_saved_state = g_slist_prepend(sm_saved_state, state);
+        session_saved_state = g_list_prepend(session_saved_state, state);
         goto session_load_ok;
 
     session_load_bail:
@@ -492,6 +514,10 @@ void session_load(char *path)
 
         node = parse_find_node("window", node->next);
     }
+
+    /* sort them by their stacking order */
+    session_saved_state = g_list_sort(session_saved_state,
+                                      (GCompareFunc)stack_sort);
 
     xmlFreeDoc(doc);
 }

@@ -35,7 +35,7 @@ extern gboolean config_focus_follow;
 extern guint    config_focus_delay;
 /*! If windows should automatically be raised when they are focused in
  focus follows mouse */
-extern guint    config_focus_raise;
+extern gboolean config_focus_raise;
 
 extern ObPlacePolicy config_place_policy;
 

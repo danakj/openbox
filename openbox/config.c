@@ -27,7 +27,7 @@
 gboolean config_focus_new;
 gboolean config_focus_follow;
 guint    config_focus_delay;
-guint    config_focus_raise;
+gboolean config_focus_raise;
 
 ObPlacePolicy config_place_policy;
 

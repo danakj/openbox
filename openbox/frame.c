@@ -124,6 +124,8 @@ Frame *frame_new()
     attrib.cursor = ob_cursors.br;
     self->rgrip = createWindow(self->handle, mask, &attrib);
 
+    self->focused = FALSE;
+
     /* the other stuff is shown based on decor settings */
     XMapWindow(ob_display, self->plate);
     XMapWindow(ob_display, self->lgrip);
@@ -386,8 +388,9 @@ void frame_adjust_state(Frame *self)
     framerender_frame(self);
 }
 
-void frame_adjust_focus(Frame *self)
+void frame_adjust_focus(Frame *self, gboolean hilite)
 {
+    self->focused = hilite;
     framerender_frame(self);
 }
 

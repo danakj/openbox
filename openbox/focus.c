@@ -20,7 +20,7 @@ GList **focus_order = NULL; /* these lists are created when screen_startup
 
 Window focus_backup = None;
 
-static gboolean noreorder = 0;
+static Client *focus_cycle_target = NULL;
 
 void focus_startup()
 {
@@ -85,13 +85,15 @@ void focus_set_client(Client *client)
         XSync(ob_display, FALSE);
     }
 
+    /* in the middle of cycling..? kill it. */
+    if (focus_cycle_target)
+        focus_cycle(TRUE, TRUE, TRUE, TRUE);
+
     old = focus_client;
     focus_client = client;
 
     /* move to the top of the list */
-    if (noreorder)
-        --noreorder;
-    else if (client != NULL)
+    if (client != NULL)
         push_to_top(client);
 
     /* set the NET_ACTIVE_WINDOW hint */
@@ -212,7 +214,7 @@ void focus_fallback(FallbackType type)
 }
 
 Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
-                 gboolean cancel)
+                    gboolean cancel)
 {
     static Client *first = NULL;
     static Client *t = NULL;
@@ -221,21 +223,26 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
     Client *ft;
 
     if (cancel) {
-        if (first) client_focus(first);
+        /*if (first) client_focus(first); XXX*/
+        if (focus_cycle_target)
+            frame_adjust_focus(focus_cycle_target->frame, FALSE);
+        if (focus_client)
+            frame_adjust_focus(focus_client->frame, TRUE);
         goto done_cycle;
     } else if (done) {
-        if (focus_client) {
-            push_to_top(focus_client); /* move to top of focus_order */
-            stacking_raise(focus_client);
+        if (focus_cycle_target) {
+            client_focus(focus_cycle_target);
+            stacking_raise(focus_cycle_target);
         }
         goto done_cycle;
     }
     if (!first) first = focus_client;
+    if (!focus_cycle_target) focus_cycle_target = focus_client;
 
     if (linear) list = client_list;
     else        list = focus_order[screen_desktop];
 
-    start = it = g_list_find(list, focus_client);
+    start = it = g_list_find(list, focus_cycle_target);
     if (!start) /* switched desktops or something? */
         start = it = forward ? g_list_last(list) : g_list_first(list);
     if (!start) goto done_cycle;
@@ -249,9 +256,13 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
             if (it == NULL) it = g_list_last(list);
         }
         ft = client_focus_target(it->data);
-        if (ft == it->data && focus_client != ft && client_normal(ft) &&
-            client_focus(ft)) {
-            noreorder++; /* avoid reordering the focus_order */
+        if (ft == it->data && client_normal(ft) && client_focusable(ft)) {
+            if (focus_cycle_target)
+                frame_adjust_focus(focus_cycle_target->frame, FALSE);
+            else if (focus_client)
+                frame_adjust_focus(focus_client->frame, FALSE);
+            focus_cycle_target = ft;
+            frame_adjust_focus(focus_cycle_target->frame, TRUE);
             return ft;
         }
     } while (it != start);
@@ -260,6 +271,7 @@ Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
 done_cycle:
     t = NULL;
     first = NULL;
+    focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;
     return NULL;

@@ -79,6 +79,8 @@ typedef struct Frame {
     gboolean desk_press;
     gboolean shade_press;
     gboolean iconify_press;
+
+    gboolean focused;
 } Frame;
 
 void frame_startup();
@@ -90,7 +92,7 @@ void frame_hide(Frame *self);
 void frame_adjust_shape(Frame *self);
 void frame_adjust_area(Frame *self, gboolean moved, gboolean resized);
 void frame_adjust_state(Frame *self);
-void frame_adjust_focus(Frame *self);
+void frame_adjust_focus(Frame *self, gboolean hilite);
 void frame_adjust_title(Frame *self);
 void frame_adjust_icon(Frame *self);
 void frame_grab_client(Frame *self, Client *client);

@@ -498,7 +498,7 @@ static void event_handle_client(Client *client, XEvent *e)
 #endif
         /* focus state can affect the stacking layer */
         client_calc_layer(client);
-        frame_adjust_focus(client->frame);
+        frame_adjust_focus(client->frame, e->type == FocusIn);
 	break;
     case EnterNotify:
         if (client_normal(client)) {

@@ -14,22 +14,21 @@ static void framerender_close(Frame *self, Appearance *a);
 
 void framerender_frame(Frame *self)
 {
-    if (client_focused(self->client)) {
+    if (self->focused)
         XSetWindowBorder(ob_display, self->plate,
                          theme_cb_focused_color->pixel);
-    } else {
+    else
         XSetWindowBorder(ob_display, self->plate,
                          theme_cb_unfocused_color->pixel);
-    }
 
     if (self->client->decorations & Decor_Titlebar) {
         Appearance *t, *l, *m, *n, *i, *d, *s, *c;
 
-        t = (client_focused(self->client) ?
+        t = (self->focused ?
              self->a_focused_title : self->a_unfocused_title);
-        l = (client_focused(self->client) ?
+        l = (self->focused ?
              self->a_focused_label : self->a_unfocused_label);
-        m = (client_focused(self->client) ?
+        m = (self->focused ?
              (self->client->max_vert || self->client->max_horz ?
               theme_a_focused_pressed_set_max :
               (self->max_press ?
@@ -40,14 +39,14 @@ void framerender_frame(Frame *self)
                theme_a_unfocused_pressed_max :
                theme_a_unfocused_unpressed_max)));
         n = self->a_icon;
-        i = (client_focused(self->client) ?
+        i = (self->focused ?
              (self->iconify_press ?
               theme_a_focused_pressed_iconify :
               theme_a_focused_unpressed_iconify) :
              (self->iconify_press ?
               theme_a_unfocused_pressed_iconify :
               theme_a_unfocused_unpressed_iconify));
-        d = (client_focused(self->client) ?
+        d = (self->focused ?
              (self->client->desktop == DESKTOP_ALL ?
               theme_a_focused_pressed_set_desk :
               (self->desk_press ?
@@ -58,7 +57,7 @@ void framerender_frame(Frame *self)
               (self->desk_press ?
                theme_a_unfocused_pressed_desk :
                theme_a_unfocused_unpressed_desk)));
-        s = (client_focused(self->client) ?
+        s = (self->focused ?
              (self->client->shaded ?
               theme_a_focused_pressed_set_shade :
               (self->shade_press ?
@@ -69,7 +68,7 @@ void framerender_frame(Frame *self)
               (self->shade_press ?
                theme_a_unfocused_pressed_shade :
                theme_a_unfocused_unpressed_shade)));
-        c = (client_focused(self->client) ?
+        c = (self->focused ?
              (self->close_press ?
               theme_a_focused_pressed_close :
               theme_a_focused_unpressed_close) :
@@ -120,9 +119,9 @@ void framerender_frame(Frame *self)
     if (self->client->decorations & Decor_Handle) {
         Appearance *h, *g;
 
-        h = (client_focused(self->client) ?
+        h = (self->focused ?
              self->a_focused_handle : self->a_unfocused_handle);
-        g = (client_focused(self->client) ?
+        g = (self->focused ?
              theme_a_focused_grip : theme_a_unfocused_grip);
 
         if (g->surface.data.planar.grad == Background_ParentRelative) {

@@ -152,6 +152,8 @@ int main(int argc, char **argv)
         config_startup();
 	render_startup();
 	font_startup();
+	event_startup();
+        grab_startup();
         plugin_startup();
 
         /* startup the parsing so plugins can register sections of the rc */
@@ -166,11 +168,9 @@ int main(int argc, char **argv)
         parse_shutdown();
 
 	engine_startup();
-	event_startup();
 	screen_startup();
 	focus_startup();
 	client_startup();
-        grab_startup();
 
         /* call startup for all the plugins */
         plugin_startall();
@@ -186,12 +186,12 @@ int main(int argc, char **argv)
 	client_unmanage_all();
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
-        grab_shutdown();
 	client_shutdown();
 	focus_shutdown();
 	screen_shutdown();
-	event_shutdown();
 	engine_shutdown();
+        grab_shutdown();
+	event_shutdown();
 	render_shutdown();
         config_shutdown();
 	timer_shutdown();

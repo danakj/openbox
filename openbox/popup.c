@@ -167,7 +167,8 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
         textw = w - (l+r + iconw + ob_rr_theme->padding *
                      (self->hasicon ? 3 : 2));
     } else
-        w = l+r + textw + iconw + ob_rr_theme->padding * (self->hasicon ? 3 : 2);
+        w = l+r + textw + iconw + ob_rr_theme->padding *
+            (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;

@@ -53,7 +53,8 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             } else continue;
 
             if (grab)
-                grab_button_full(b->button, b->state, win, mask, mode, None);
+                grab_button_full(b->button, b->state, win, mask, mode,
+                                 OB_CURSOR_NONE);
             else
                 ungrab_button(b->button, b->state, win);
         }

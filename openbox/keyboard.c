@@ -136,7 +136,7 @@ void keyboard_interactive_grab(guint state, ObClient *client,
     if (!interactive_states) {
         if (!grab_keyboard(TRUE))
             return;
-        if (!grab_pointer(TRUE, None)) {
+        if (!grab_pointer(TRUE, OB_CURSOR_NONE)) {
             grab_keyboard(FALSE);
             return;
         }
@@ -187,7 +187,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
             s->action->func(&s->action->data);
 
             grab_keyboard(FALSE);
-            grab_pointer(FALSE, None);
+            grab_pointer(FALSE, OB_CURSOR_NONE);
             keyboard_reset_chains();
 
             g_free(s);

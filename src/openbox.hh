@@ -177,7 +177,7 @@ public:
   //! Returns a managed screen
   inline Screen *screen(int num) {
     assert(num >= 0); assert(num < (signed)_screens.size());
-    if (num >= screenCount())
+    if (num < 0 || num >= screenCount())
       return NULL;
     return _screens[num];
   }

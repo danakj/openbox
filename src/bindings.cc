@@ -372,15 +372,21 @@ void Bindings::grabKeys(bool grab)
 }
 
 
-bool Bindings::grabKeyboard(PyObject *callback)
+bool Bindings::grabKeyboard(int screen, PyObject *callback)
 {
   assert(callback);
   if (_keybgrab_callback) return false; // already grabbed
+
+  int i;
+  for (i = 0; i < openbox->screenCount(); ++i)
+    if (openbox->screen(screen)->number() == screen)
+      break;
+  if (i >= openbox->screenCount())
+    return false; // couldn't find the screen.. it's not managed
   
-  int screen = openbox->screen(0)->number();
-  Window root = otk::display->screenInfo(screen)->rootWindow();
+  Window root = otk::display->screenInfo(i)->rootWindow();
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
-                    GrabModeAsync, CurrentTime))
+                    GrabModeSync, CurrentTime))
     return false;
   printf("****GRABBED****\n");
   _keybgrab_callback = callback;
@@ -563,7 +569,7 @@ void Bindings::grabButtons(bool grab, Client *client)
 void Bindings::fireButton(MouseData *data)
 {
   if (data->context == MC_Window) {
-    // Replay the event, so it goes to the client, and ungrab the device.
+    // Replay the event, so it goes to the client
     XAllowEvents(**otk::display, ReplayPointer, data->time);
   }
   

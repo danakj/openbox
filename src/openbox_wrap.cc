@@ -694,20 +694,21 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__ScreenInfo swig_types[46] 
 #define  SWIGTYPE_p_otk__RenderStyle swig_types[47] 
 #define  SWIGTYPE_p_ob__EventData swig_types[48] 
-#define  SWIGTYPE_p_XCreateWindowEvent swig_types[49] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[50] 
-#define  SWIGTYPE_p_otk__Property__StringVect swig_types[51] 
-#define  SWIGTYPE_p_ob__WidgetBase swig_types[52] 
-#define  SWIGTYPE_p_otk__Atoms swig_types[53] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[54] 
-#define  SWIGTYPE_p_int swig_types[55] 
-#define  SWIGTYPE_p_otk__Strut swig_types[56] 
-#define  SWIGTYPE_p_unsigned_long swig_types[57] 
+#define  SWIGTYPE_p_XModifierKeymap swig_types[49] 
+#define  SWIGTYPE_p_XCreateWindowEvent swig_types[50] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
+#define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
+#define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
+#define  SWIGTYPE_p_otk__Atoms swig_types[54] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[55] 
+#define  SWIGTYPE_p_int swig_types[56] 
+#define  SWIGTYPE_p_otk__Strut swig_types[57] 
 #define  SWIGTYPE_p_p_unsigned_long swig_types[58] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[59] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[60] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[61] 
-static swig_type_info *swig_types[63];
+#define  SWIGTYPE_p_unsigned_long swig_types[59] 
+#define  SWIGTYPE_p_XMotionEvent swig_types[60] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[61] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[62] 
+static swig_type_info *swig_types[64];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -1150,6 +1151,23 @@ static PyObject *_wrap_Display_scrollLockMask(PyObject *self, PyObject *args) {
     result = (unsigned int)((otk::Display const *)arg1)->scrollLockMask();
     
     resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_Display_modifierMap(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    otk::Display *arg1 = (otk::Display *) 0 ;
+    XModifierKeymap *result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:Display_modifierMap",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (XModifierKeymap *)((otk::Display const *)arg1)->modifierMap();
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_XModifierKeymap, 0);
     return resultobj;
     fail:
     return NULL;
@@ -11273,13 +11291,14 @@ static PyObject *_wrap_kbind(PyObject *self, PyObject *args) {
 
 static PyObject *_wrap_kgrab(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    PyObject *arg1 = (PyObject *) 0 ;
+    int arg1 ;
+    PyObject *arg2 = (PyObject *) 0 ;
     PyObject *result;
-    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:kgrab",&obj0)) goto fail;
-    arg1 = obj0;
-    result = (PyObject *)ob::kgrab(arg1);
+    if(!PyArg_ParseTuple(args,(char *)"iO:kgrab",&arg1,&obj1)) goto fail;
+    arg2 = obj1;
+    result = (PyObject *)ob::kgrab(arg1,arg2);
     
     resultobj = result;
     return resultobj;
@@ -11391,6 +11410,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Display_xinerama", _wrap_Display_xinerama, METH_VARARGS },
 	 { (char *)"Display_numLockMask", _wrap_Display_numLockMask, METH_VARARGS },
 	 { (char *)"Display_scrollLockMask", _wrap_Display_scrollLockMask, METH_VARARGS },
+	 { (char *)"Display_modifierMap", _wrap_Display_modifierMap, METH_VARARGS },
 	 { (char *)"Display___mul__", _wrap_Display___mul__, METH_VARARGS },
 	 { (char *)"Display_grab", _wrap_Display_grab, METH_VARARGS },
 	 { (char *)"Display_ungrab", _wrap_Display_ungrab, METH_VARARGS },
@@ -11950,6 +11970,7 @@ static swig_type_info _swigt__p_PyObject[] = {{"_p_PyObject", 0, "PyObject *", 0
 static swig_type_info _swigt__p_otk__ScreenInfo[] = {{"_p_otk__ScreenInfo", 0, "otk::ScreenInfo *", 0},{"_p_otk__ScreenInfo"},{0}};
 static swig_type_info _swigt__p_otk__RenderStyle[] = {{"_p_otk__RenderStyle", 0, "otk::RenderStyle *", 0},{"_p_otk__RenderStyle"},{0}};
 static swig_type_info _swigt__p_ob__EventData[] = {{"_p_ob__EventData", 0, "ob::EventData *", 0},{"_p_ob__EventData"},{0}};
+static swig_type_info _swigt__p_XModifierKeymap[] = {{"_p_XModifierKeymap", 0, "XModifierKeymap *", 0},{"_p_XModifierKeymap"},{0}};
 static swig_type_info _swigt__p_XCreateWindowEvent[] = {{"_p_XCreateWindowEvent", 0, "XCreateWindowEvent *", 0},{"_p_XCreateWindowEvent"},{0}};
 static swig_type_info _swigt__p_XDestroyWindowEvent[] = {{"_p_XDestroyWindowEvent", 0, "XDestroyWindowEvent *", 0},{"_p_XDestroyWindowEvent"},{0}};
 static swig_type_info _swigt__p_otk__Property__StringVect[] = {{"_p_otk__Property__StringVect", 0, "otk::Property::StringVect *", 0},{"_p_otk__Property__StringVect"},{0}};
@@ -11958,8 +11979,8 @@ static swig_type_info _swigt__p_otk__Atoms[] = {{"_p_otk__Atoms", 0, "otk::Atoms
 static swig_type_info _swigt__p_XKeyEvent[] = {{"_p_XKeyEvent", 0, "XKeyEvent *", 0},{"_p_XKeyEvent"},{0}};
 static swig_type_info _swigt__p_int[] = {{"_p_int", 0, "int *", 0},{"_p_int"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
-static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "unsigned long **", 0},{"_p_p_unsigned_long"},{0}};
+static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_XMotionEvent[] = {{"_p_XMotionEvent", 0, "XMotionEvent *", 0},{"_p_XMotionEvent"},{0}};
 static swig_type_info _swigt__p_XButtonEvent[] = {{"_p_XButtonEvent", 0, "XButtonEvent *", 0},{"_p_XButtonEvent"},{0}};
 static swig_type_info _swigt__p_XSelectionEvent[] = {{"_p_XSelectionEvent", 0, "XSelectionEvent *", 0},{"_p_XSelectionEvent"},{0}};
@@ -12014,6 +12035,7 @@ _swigt__p_PyObject,
 _swigt__p_otk__ScreenInfo, 
 _swigt__p_otk__RenderStyle, 
 _swigt__p_ob__EventData, 
+_swigt__p_XModifierKeymap, 
 _swigt__p_XCreateWindowEvent, 
 _swigt__p_XDestroyWindowEvent, 
 _swigt__p_otk__Property__StringVect, 
@@ -12022,8 +12044,8 @@ _swigt__p_otk__Atoms,
 _swigt__p_XKeyEvent, 
 _swigt__p_int, 
 _swigt__p_otk__Strut, 
-_swigt__p_unsigned_long, 
 _swigt__p_p_unsigned_long, 
+_swigt__p_unsigned_long, 
 _swigt__p_XMotionEvent, 
 _swigt__p_XButtonEvent, 
 _swigt__p_XSelectionEvent, 

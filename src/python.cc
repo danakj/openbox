@@ -123,14 +123,14 @@ PyObject *ebind(ob::EventAction action, PyObject *func)
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject *kgrab(PyObject *func)
+PyObject *kgrab(int screen, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
     return NULL;
   }
 
-  if (!ob::openbox->bindings()->grabKeyboard(func)) {
+  if (!ob::openbox->bindings()->grabKeyboard(screen, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to grab keybaord.");
     return NULL;
   }

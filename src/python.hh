@@ -192,7 +192,7 @@ PyObject *mbind(const std::string &button, ob::MouseContext context,
 
 PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
 
-PyObject *kgrab(PyObject *func);
+PyObject *kgrab(int screen, PyObject *func);
 PyObject *kungrab();
 
 PyObject *ebind(ob::EventAction action, PyObject *func);

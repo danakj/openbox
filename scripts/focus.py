@@ -2,38 +2,60 @@
 ###          Functions for helping out with your window focus.          ###
 ###########################################################################
 
+# raise the window also when it is focused
 ob_focus_raise = 1
+# send focus somewhere when nothing is left with the focus if possible
 ob_focus_fallback = 0
 
 # maintain a list of clients, stacked in focus order
 ob_clients = []
 # maintaint he current focused window
-ob_focused = 0
-ob_hold_client_list = 0
+ob_doing_stacked = 0
 
 def ob_new_win(data):
     global ob_clients
-    if not len(ob_clients): ob_clients.append(data.client.window())
-    else: ob_clients.insert(1, data.client.window()) # insert in 2nd slot
+    global ob_doing_stacked
+    global ob_cyc_w;
+
+    if ob_doing_stacked:
+        ob_clients.insert(ob_clients.index(ob_cyc_w), data.client.window())
+    else:
+        if not len(ob_clients):
+            ob_clients.append(data.client.window())
+        else:
+            ob_clients.insert(1, data.client.window()) # insert in 2nd slot
 
 def ob_close_win(data):
     global ob_clients
-    ob_clients.remove(data.client.window())
+    global ob_cyc_w;
+    global ob_doing_stacked
+
+    if not ob_doing_stacked:
+        # not in the middle of stacked cycling, so who cares
+        ob_clients.remove(data.client.window())
+    else:
+        # have to fix the cycling if we remove anything
+        win = data.client.window()
+        if ob_cyc_w == win:
+            do_stacked_cycle(data) # cycle off the window first
+        ob_clients.remove(win)
 
 def ob_focused(data):
     global ob_clients
+    global ob_doing_stacked
+    global ob_cyc_w
+    
     if data.client:
-        if not ob_hold_client_list:
+        if not ob_doing_stacked: # only move the window when we're not cycling
             win = data.client.window()
-            ob_focused = win
             # move it to the top
             ob_clients.remove(win)
             ob_clients.insert(0, win)
-    elif ob_focus_fallback:
-        ob_old_client_list = 0 # something is wrong.. stop holding
+        else: # if we are cycling, then update our pointer
+            ob_cyc_w = data.client.window()
+    elif ob_focus_fallback: 
         # pass around focus
-        ob_focused = 0
-        desktop = openbox.screen(data.screen).desktop()
+        desktop = openbox.screen(ob_cyc_screen).desktop()
         for w in ob_clients:
             client = openbox.findClient(w)
             if client and (client.desktop() == desktop and \
@@ -45,31 +67,56 @@ ebind(EventCloseWindow, ob_close_win)
 ebind(EventFocus, ob_focused)
 
 ob_cyc_mask = 0
-ob_cyc_key = 0;
+ob_cyc_key = 0
+ob_cyc_w = 0 # last window cycled to
+ob_cyc_screen = 0
+
+def do_stacked_cycle(data):
+    global ob_cyc_w
+
+    try:
+        i = ob_clients.index(ob_cyc_w) + 1
+    except ValueError:
+        i = 0
+        
+    clients = ob_clients[i:] + ob_clients[:i]
+    for w in clients:
+        client = openbox.findClient(w)
+        if client and (client.desktop() == desktop and \
+                       client.normal() and client.focus()):
+            return
 
 def focus_next_stacked_grab(data):
     global ob_cyc_mask;
     global ob_cyc_key;
+    global ob_cyc_w;
+    global ob_doing_stacked;
 
     if data.action == EventKeyRelease:
-        print "release: " + str(ob_cyc_mask) + "..." + str(data.state)
         # have all the modifiers this started with been released?
         if not ob_cyc_mask & data.state:
             kungrab() # ungrab ourself
+            ob_doing_stacked = 0;
             print "UNGRABBED!"
     else:
-        print "press: " + str(ob_cyc_mask) + "..." + str(data.state) + \
-              "..." + data.key
         if ob_cyc_key == data.key:
+            # the next window to try focusing in ob_clients[ob_cyc_i]
             print "CYCLING!!"
+            do_stacked_cycle(data)
 
 def focus_next_stacked(data, forward=1):
-    global ob_cyc_mask;
-    global ob_cyc_key;
+    global ob_cyc_mask
+    global ob_cyc_key
+    global ob_cyc_w
+    global ob_cyc_screen
+    global ob_doing_stacked
     ob_cyc_mask = data.state
     ob_cyc_key = data.key
+    ob_cyc_w = 0
+    ob_cyc_screen = data.screen
+    ob_doing_stacked = 1
 
-    kgrab(focus_next_stacked_grab)
+    kgrab(data.screen, focus_next_stacked_grab)
     print "GRABBED!"
     focus_next_stacked_grab(data) # start with the first press
 

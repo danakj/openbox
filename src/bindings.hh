@@ -120,7 +120,7 @@ public:
 
   void grabKeys(bool grab);
 
-  bool grabKeyboard(PyObject *callback);
+  bool grabKeyboard(int screen, PyObject *callback);
   void ungrabKeyboard();
 
   bool addButton(const std::string &but, MouseContext context,

@@ -55,6 +55,7 @@ class Display(_object):
     def xinerama(*args): return apply(_openbox.Display_xinerama,args)
     def numLockMask(*args): return apply(_openbox.Display_numLockMask,args)
     def scrollLockMask(*args): return apply(_openbox.Display_scrollLockMask,args)
+    def modifierMap(*args): return apply(_openbox.Display_modifierMap,args)
     def __mul__(*args): return apply(_openbox.Display___mul__,args)
     def grab(*args): return apply(_openbox.Display_grab,args)
     def ungrab(*args): return apply(_openbox.Display_ungrab,args)

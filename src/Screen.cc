@@ -1399,8 +1399,13 @@ void BScreen::updateNetizenConfigNotify(XEvent *e) {
 
 void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
   // the 13 represents the number of blackbox windows such as menus
+  int bbwins = 13;
+#ifdef    XINERAMA
+  ++bbwins;
+#endif // XINERAMA
+
   Window *session_stack = new
-    Window[(num + workspacesList.size() + rootmenuList.size() + 13)];
+    Window[(num + workspacesList.size() + rootmenuList.size() + bbwins)];
   unsigned int i = 0, k = num;
 
   XRaiseWindow(blackbox->getXDisplay(), iconmenu->getWindowID());
@@ -1415,6 +1420,9 @@ void BScreen::raiseWindows(Window *workspace_stack, unsigned int num) {
 
   *(session_stack + i++) = configmenu->getFocusmenu()->getWindowID();
   *(session_stack + i++) = configmenu->getPlacementmenu()->getWindowID();
+#ifdef    XINERAMA
+  *(session_stack + i++) = configmenu->getXineramamenu()->getWindowID();
+#endif // XINERAMA
   *(session_stack + i++) = configmenu->getWindowID();
 
   *(session_stack + i++) = slit->getMenu()->getDirectionmenu()->getWindowID();

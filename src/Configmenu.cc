@@ -38,11 +38,18 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 
   focusmenu = new Focusmenu(this);
   placementmenu = new Placementmenu(this);
+#ifdef    XINERAMA
+  xineramamenu = new Xineramamenu(this);
+#endif // XINERAMA
 
   insert(i18n(ConfigmenuSet, ConfigmenuFocusModel,
               "Focus Model"), focusmenu);
   insert(i18n(ConfigmenuSet, ConfigmenuWindowPlacement,
               "Window Placement"), placementmenu);
+#ifdef    XINERAMA
+  insert(i18n(ConfigmenuSet, ConfigmenuXineramaSupport,
+              "XineramaSupport"), xineramamenu);
+#endif // XINERAMA
   insert(i18n(ConfigmenuSet, ConfigmenuImageDithering,
               "Image Dithering"), 1);
   insert(i18n(ConfigmenuSet, ConfigmenuOpaqueMove,
@@ -67,24 +74,27 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 
 
 void Configmenu::setValues(void) {
-  setItemSelected(2, getScreen()->doImageDither());
-  setItemSelected(3, getScreen()->doOpaqueMove());
-  setItemSelected(4, getScreen()->doFullMax());
-  setItemSelected(5, getScreen()->doFocusNew());
-  setItemSelected(6, getScreen()->doFocusLast());
-  setItemSelected(7, getScreen()->getWindowToWindowSnap());
+  setItemSelected(3, getScreen()->doImageDither());
+  setItemSelected(4, getScreen()->doOpaqueMove());
+  setItemSelected(5, getScreen()->doFullMax());
+  setItemSelected(6, getScreen()->doFocusNew());
+  setItemSelected(7, getScreen()->doFocusLast());
+  setItemSelected(8, getScreen()->getWindowToWindowSnap());
 
-  setItemSelected(8, getScreen()->getWindowCornerSnap());
-  setItemEnabled(8, getScreen()->getWindowToWindowSnap());
+  setItemSelected(9, getScreen()->getWindowCornerSnap());
+  setItemEnabled(9, getScreen()->getWindowToWindowSnap());
   
-  setItemSelected(9, getScreen()->allowScrollLock());
-  setItemSelected(10, getScreen()->doHideToolbar());
+  setItemSelected(10, getScreen()->allowScrollLock());
+  setItemSelected(11, getScreen()->doHideToolbar());
 }
 
 
 Configmenu::~Configmenu(void) {
   delete focusmenu;
   delete placementmenu;
+#ifdef    XINERAMA
+  delete xineramamenu;
+#endif // XINERAMA
 }
 
 
@@ -152,6 +162,7 @@ void Configmenu::reconfigure(void) {
   setValues();
   focusmenu->reconfigure();
   placementmenu->reconfigure();
+  xineramamenu->reconfigure();
 
   Basemenu::reconfigure();
 }
@@ -418,3 +429,65 @@ void Configmenu::Placementmenu::itemSelected(int button, unsigned int index) {
     break;
   }
 }
+
+
+#ifdef    XINERAMA
+Configmenu::Xineramamenu::Xineramamenu(Configmenu *cm):
+  Basemenu(cm->getScreen()) {
+  setLabel(i18n(ConfigmenuSet, ConfigmenuXineramaSupport, "Xinerama Support"));
+  setInternalMenu();
+
+  insert(i18n(ConfigmenuSet, ConfigmenuXineramaPlacement, "Window Placement"),
+         1);
+  insert(i18n(ConfigmenuSet, ConfigmenuXineramaMaximizing, "Window Maximizing"),
+         2);
+  insert(i18n(ConfigmenuSet, ConfigmenuXineramaSnapping, "Window Snapping"),
+         3);
+
+  update();
+  setValues();
+}
+
+
+void Configmenu::Xineramamenu::setValues(void) {
+  setItemSelected(0, getScreen()->getBlackbox()->doXineramaPlacement());
+  setItemSelected(1, getScreen()->getBlackbox()->doXineramaMaximizing());
+  setItemSelected(2, getScreen()->getBlackbox()->doXineramaSnapping());
+}
+
+
+void Configmenu::Xineramamenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}
+
+
+void Configmenu::Xineramamenu::itemSelected(int button, unsigned int index) {
+  if (button != 1)
+    return;
+
+  BasemenuItem *item = find(index);
+
+  if (! item->function())
+    return;
+
+  Blackbox *bb = getScreen()->getBlackbox();
+
+  switch (item->function()) {
+  case 1: // window placement
+    bb->saveXineramaPlacement(! bb->doXineramaPlacement());
+    setItemSelected(0, bb->doXineramaPlacement());
+    break;
+
+  case 2: // window maximizing
+    bb->saveXineramaMaximizing(! bb->doXineramaMaximizing());
+    setItemSelected(1, bb->doXineramaMaximizing());
+    break;
+
+  case 3: // window snapping
+    bb->saveXineramaSnapping(! bb->doXineramaSnapping());
+    setItemSelected(2, bb->doXineramaSnapping());
+    break;
+  }
+}
+#endif // XINERAMA

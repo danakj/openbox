@@ -61,8 +61,27 @@ private:
     virtual void reconfigure(void);
   };
 
+#ifdef    XINERAMA
+  class Xineramamenu : public Basemenu {
+  private:
+    Xineramamenu(const Xineramamenu&);
+    Xineramamenu& operator=(const Xineramamenu&);
+
+  protected:
+    virtual void itemSelected(int button, unsigned int index);
+    virtual void setValues(void);
+
+  public:
+    Xineramamenu(Configmenu *cm);
+    virtual void reconfigure(void);
+  };
+#endif // XINERAMA
+
   Focusmenu *focusmenu;
   Placementmenu *placementmenu;
+#ifdef    XINERAMA
+  Xineramamenu *xineramamenu;
+#endif // XINERAMA
 
   friend class Focusmenu;
   friend class Placementmenu;
@@ -80,6 +99,9 @@ public:
 
   inline Basemenu *getFocusmenu(void) { return focusmenu; }
   inline Basemenu *getPlacementmenu(void) { return placementmenu; }
+#ifdef    XINERAMA
+  inline Basemenu *getXineramamenu(void) { return xineramamenu; }
+#endif // XINERAMA
 
   virtual void reconfigure(void);
 };

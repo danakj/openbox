@@ -587,12 +587,13 @@ static void client_get_area(Client *self)
 
 static void client_get_desktop(Client *self)
 {
-    guint32 d;
+    guint32 d = screen_num_desktops; /* an always-invalid value */
 
     if (PROP_GET32(self->window, net_wm_desktop, cardinal, &d)) {
 	if (d >= screen_num_desktops && d != DESKTOP_ALL)
-	    d = screen_num_desktops - 1;
-	self->desktop = d;
+	    self->desktop = screen_num_desktops - 1;
+        else
+            self->desktop = d;
     } else { 
         gboolean trdesk = FALSE;
 
@@ -616,6 +617,8 @@ static void client_get_desktop(Client *self)
            /* defaults to the current desktop */
            self->desktop = screen_desktop;
 
+    }
+    if (self->desktop != d) {
         /* set the desktop hint, to make sure that it always exists */
         PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
     }

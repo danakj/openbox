@@ -120,6 +120,18 @@ void keyboard_interactive_grab(guint state, ObClient *client,
             return;
         }
         interactive_grab = TRUE;
+    } else if (action != grabbed_action) {
+        /* finish it */
+        if (grabbed_action->func == action_cycle_windows) {
+            grabbed_action->data.cycle.final = TRUE;
+        }
+        if (grabbed_action->func == action_desktop_dir) {
+            grabbed_action->data.desktopdir.final = TRUE;
+        }
+        if (grabbed_action->func == action_send_to_desktop_dir) {
+            grabbed_action->data.sendtodir.final = TRUE;
+        }
+        grabbed_action->func(&grabbed_action->data);
     }
 
     grabbed_state = state;

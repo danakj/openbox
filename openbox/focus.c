@@ -89,7 +89,6 @@ static void push_to_top(Client *client)
     if (desktop == DESKTOP_ALL) desktop = screen_desktop;
     focus_order[desktop] = g_list_remove(focus_order[desktop], client);
     focus_order[desktop] = g_list_prepend(focus_order[desktop], client);
-    g_message("REORDERING");
 }
 
 void focus_set_client(Client *client)

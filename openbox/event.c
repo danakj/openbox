@@ -1166,14 +1166,26 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
 ObMenuFrame* find_active_menu()
 {
     GList *it;
-    ObMenuFrame *f;
+    ObMenuFrame *ret = NULL;
 
     for (it = menu_frame_visible; it; it = g_list_next(it)) {
-        f = it->data;
-        if (f->selected)
+        ret = it->data;
+        if (ret->selected)
             break;
+        ret = NULL;
     }
-    return it ? it->data : NULL;
+    return ret;
+}
+
+ObMenuFrame* find_active_or_last_menu()
+{
+    GList *it;
+    ObMenuFrame *ret = NULL;
+
+    ret = find_active_menu();
+    if (!ret && menu_frame_visible)
+        ret = menu_frame_visible->data;
+    return ret;
 }
 
 static void event_handle_menu(XEvent *ev)
@@ -1219,19 +1231,19 @@ static void event_handle_menu(XEvent *ev)
                 menu_entry_frame_execute(f->selected, ev->xkey.state);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_LEFT)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()) && f->parent)
+            if ((f = find_active_or_last_menu()) && f->parent)
                 menu_frame_select(f, NULL);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_RIGHT)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()) && f->child)
+            if ((f = find_active_or_last_menu()) && f->child)
                 menu_frame_select_next(f->child);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_UP)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()))
+            if ((f = find_active_or_last_menu()))
                 menu_frame_select_previous(f);
         } else if (ev->xkey.keycode == ob_keycode(OB_KEY_DOWN)) {
             ObMenuFrame *f;
-            if ((f = find_active_menu()))
+            if ((f = find_active_or_last_menu()))
                 menu_frame_select_next(f);
         }
         break;

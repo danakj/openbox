@@ -4,12 +4,16 @@
 # Sets the CPPFLAGS and LIBS variables as appropriate.
 AC_DEFUN([X11_DEVEL],
 [
-  AC_PATH_X
   AC_PATH_XTRA
   test "$no_x" = "yes" && \
     AC_MSG_ERROR([The X Window System could not be found.])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
      
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  X_LIBS="$X_LIBS -lX11"
   LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
 
   # Check for required functions in -lX11
@@ -18,6 +22,11 @@ AC_DEFUN([X11_DEVEL],
     ,
     AC_MSG_ERROR([Could not find XOpenDisplay in -lX11.])
   )
+
+  # Restore the old values. Use X_CFLAGS and X_PRE_LIBS X_LIBS X_EXTRA_LIBS in
+  # the Makefiles
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
 ])
 
 
@@ -160,7 +169,7 @@ AC_DEFUN([XFT_DEVEL],
     ])
   )
 
-# Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefile.am's
+  # Restore the old values. Use XFT_CFLAGS and XFT_LIBS in the Makefiles
   LIBS=$OLDLIBS
   CPPFLAGS=$OLDCPPFLAGS
 
@@ -177,6 +186,13 @@ AC_DEFUN([XFT_DEVEL],
 AC_DEFUN([X11_EXT_XKB],
 [
   AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
 
   AC_CHECK_LIB([X11], [XkbBell],
     AC_MSG_CHECKING([for X11/XKBlib.h])
@@ -201,6 +217,10 @@ AC_DEFUN([X11_EXT_XKB],
       XKB="no"
     ])
   )
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
   AC_MSG_CHECKING([for the Xkb extension])
   if test "$XKB" = "yes"; then
     AC_MSG_RESULT([yes])
@@ -217,6 +237,13 @@ AC_DEFUN([X11_EXT_XKB],
 AC_DEFUN([X11_EXT_SHAPE],
 [
   AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS"
 
   AC_CHECK_LIB([Xext], [XShapeCombineShape],
     AC_MSG_CHECKING([for X11/extensions/shape.h])
@@ -240,7 +267,11 @@ AC_DEFUN([X11_EXT_SHAPE],
       SHAPE="no"
     ])
   )
-  AC_MSG_CHECKING([for the Shape extension])
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+ 
+ AC_MSG_CHECKING([for the Shape extension])
   if test "$SHAPE" = "yes"; then
     AC_MSG_RESULT([yes])
   else
@@ -258,6 +289,13 @@ AC_DEFUN([X11_EXT_XINERAMA],
 [
   AC_REQUIRE([X11_DEVEL])
 
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+     
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXext"
+
   AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
   [
     AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
@@ -273,13 +311,18 @@ AC_DEFUN([X11_EXT_XINERAMA],
       AC_MSG_RESULT([yes])
       XINERAMA="yes"
       AC_DEFINE([XINERAMA], [1], [Enable support of the Xinerama extension])
-      LIBS="$LIBS -lXinerama"
+      XINERAMA_LIBS="-lXext -lXinerama"
+      AC_SUBST(XINERAMA_LIBS)
     ],
     [
       AC_MSG_RESULT([no])
       XINERAMA="no"
     ])
   ])
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
   AC_MSG_CHECKING([for the Xinerama extension])
   if test "$XINERAMA" = "yes"; then
     AC_MSG_RESULT([yes])

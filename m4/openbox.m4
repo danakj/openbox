@@ -38,8 +38,6 @@ AC_DEFUN([OB_DEBUG],
     
     test "$DEBUG" = "yes" && \
 	AC_DEFINE([DEBUG], [1], [Creating a debug build])
-
-    AM_CONDITIONAL(CVS, test "$CVS" = "yes")
 ])
 
 
@@ -82,7 +80,7 @@ AC_DEFUN([OB_NLS],
     [NLS=$enableval], [NLS="yes"])
 
     if test "$NLS" = yes; then
-	CPPFLAGS="$CPPFLAGS -DENABLE_NLS"
+	DEFS="$DEFS -DENABLE_NLS"
     fi
 ])
 

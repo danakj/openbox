@@ -2,9 +2,9 @@ include build/Makefile.incl
 
 dir = kernel
 
-CPPFLAGS += $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(XFT_CFLAGS) \
+CPPFLAGS += $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(XFT_CFLAGS) $(X_CFLAGS) \
             -DG_LOG_DOMAIN=\"Openbox\"
-LIBS += $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS)
+LIBS += $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS) $(X_LIBS) $(XINERAMA_LIBS)
 LDFLAGS += -export-dynamic
 
 target = openbox3

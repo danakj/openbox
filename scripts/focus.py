@@ -5,11 +5,11 @@
 ###########################################################################
 ###         Options that affect the behavior of the focus module.       ###
 ###########################################################################
-avoid_skip_taskbar = 1
+AVOID_SKIP_TASKBAR = 1
 """Don't focus windows which have requested to not be displayed in taskbars.
    You will still be able to focus the windows, but not through cycling, and
    they won't be focused as a fallback if 'fallback' is enabled."""
-fallback = 0
+FALLBACK = 0
 """Send focus somewhere when nothing is left with the focus, if possible."""
 ###########################################################################
 
@@ -29,7 +29,7 @@ _disable = 0
 def _focusable(client, desktop):
     if not client.normal(): return 0
     if not (client.canFocus() or client.focusNotify()): return 0
-    if avoid_skip_taskbar and client.skipTaskbar(): return 0
+    if AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
 
     desk = client.desktop()
     if not (desk == 0xffffffff or desk == desktop): return 0
@@ -46,7 +46,7 @@ def _focused(data):
         # move it to the top
         _clients.remove(win)
         _clients.insert(0, win)
-    elif fallback:
+    elif FALLBACK:
         # pass around focus
         desktop = ob.openbox.screen(data.screen).desktop()
         for w in _clients:

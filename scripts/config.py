@@ -1,34 +1,36 @@
 #############################################################################
-### Options that can be defined on startup that affect the behavior of    ###
-### openbox.                                                              ###
+### Options that can be changed to adjust the behavior of Openbox.        ###
 #############################################################################
 
-# theme - the theme used to decorate everything.
-theme = "/usr/local/share/openbox/styles/fieron2"
+THEME = "/usr/local/share/openbox/styles/fieron2"
+"""The theme used to decorate everything."""
 
-# titlebar_layout - the layout of the buttons/label on client titlebars, can be
-#                   made up of the following:
-#                   I - iconify button, L - text label, M - maximize button,
-#                   D - all-desktops button, C - close button
-#                   If no 'L' is included in the string, one will be added to
-#                   the end by Openbox.
-titlebar_layout = "DILMC"
+TITLEBAR_LAYOUT = "DILMC"
+"""The layout of the buttons/label on client titlebars, can be made up of the
+following:
+    I - iconify button
+    L - text label
+    M - maximize button,
+    D - all-desktops button
+    C - close button
+If no 'L' is included in the string, one will be added to the end by
+Openbox."""
 
-# double_click_delay - the number of milliseconds in which 2 clicks are
-#                      perceived as a double-click.
-double_click_delay = 300
+DOUBLE_CLICK_DELAY = 300
+"""The number of milliseconds in which 2 clicks are perceived as a
+double-click."""
 
-# drag_threshold - the amount of pixels that you have to drag the mouse before
-#                  motion events will start occuring.
-drag_threshold = 3
+DRAG_THRESHOLD = 3
+"""The amount of pixels that you have to drag the mouse before motion events
+will start occuring."""
 
-# desktop_names - the name of each desktop
-desktop_names = ["one", "two", "three", "four", "five", "six", "seven", \
+DESKTOP_NAMES = ["one", "two", "three", "four", "five", "six", "seven", \
                  "eight", "nine", "ten", "eleven", "twelve"]
+"""The name of each desktop."""
 
-# number_of_desktops - the number of desktops/workspaces which can be scrolled
-#                      between.
-number_of_desktops = 4
+NUMBER_OF_DESKTOPS = 4
+"""The number of desktops/workspaces which can be scrolled between."""
 
+#############################################################################
 
 print "Loaded config.py"

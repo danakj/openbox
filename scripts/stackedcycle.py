@@ -5,24 +5,24 @@
 ###########################################################################
 ###    Options that affect the behavior of the stackedcycle module.     ###
 ###########################################################################
-include_all_desktops = 0
+INCLUDE_ALL_DESKTOPS = 0
 """If this is non-zero then windows from all desktops will be included in
    the stacking list."""
-include_icons = 1
+INCLUDE_ICONS = 1
 """If this is non-zero then windows which are iconified will be included
    in the stacking list."""
-include_omnipresent = 1
+INCLUDE_OMNIPRESENT = 1
 """If this is non-zero then windows which are on all-desktops at once will
    be included."""
-title_size_limit = 80
+TITLE_SIZE_LIMIT = 80
 """This specifies a rough limit of characters for the cycling list titles.
    Titles which are larger will be chopped with an elipsis in their
    center."""
-activate_while_cycling = 1
+ACTIVATE_WHILE_CYCLING = 1
 """If this is non-zero then windows will be activated as they are
    highlighted in the cycling list (except iconified windows)."""
-# See focus.avoid_skip_taskbar
-# See focuscycle.raise_window
+# See focus.AVOID_SKIP_TASKBAR
+# See focuscycle.RAISE_WINDOW
 ###########################################################################
 
 def next(data):
@@ -51,7 +51,7 @@ import ob
 import focus
 import focuscycle
 
-class cycledata:
+class _cycledata:
     def __init__(self):
         self.cycling = 0
 
@@ -72,11 +72,11 @@ class cycledata:
 
         if not client.normal(): return 0
         if not (client.canFocus() or client.focusNotify()): return 0
-        if focus.avoid_skip_taskbar and client.skipTaskbar(): return 0
+        if focus.AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
 
-        if include_icons and client.iconic(): return 1
-        if include_omnipresent and desk == 0xffffffff: return 1
-        if include_all_desktops: return 1
+        if INCLUDE_ICONS and client.iconic(): return 1
+        if INCLUDE_OMNIPRESENT and desk == 0xffffffff: return 1
+        if INCLUDE_ALL_DESKTOPS: return 1
         if desk == curdesk: return 1
 
         return 0
@@ -127,9 +127,9 @@ class cycledata:
 
             if c.iconic(): t = c.iconTitle()
             else: t = c.title()
-            if len(t) > title_size_limit: # limit the length of titles
-                t = t[:title_size_limit / 2 - 2] + "..." + \
-                    t[0 - title_size_limit / 2 - 2:]
+            if len(t) > TITLE_SIZE_LIMIT: # limit the length of titles
+                t = t[:TITLE_SIZE_LIMIT / 2 - 2] + "..." + \
+                    t[0 - TITLE_SIZE_LIMIT / 2 - 2:]
             length = font.measureString(t)
             if length > longest: longest = length
             w.setText(t)
@@ -172,7 +172,7 @@ class cycledata:
         
         # send a net_active_window message for the target
         if final or not client.iconic():
-            if final: r = focuscycle.raise_window
+            if final: r = focuscycle.RAISE_WINDOW
             else: r = 0
             ob.send_client_msg(self.screeninfo.rootWindow(),
                                otk.Property_atoms().openbox_active_window,
@@ -207,7 +207,7 @@ class cycledata:
         if self.menupos < 0: self.menupos = len(self.clients) - 1
         elif self.menupos >= len(self.clients): self.menupos = 0
         self.menuwidgets[self.menupos].focus()
-        if activate_while_cycling:
+        if ACTIVATE_WHILE_CYCLING:
             self.activatetarget(0) # activate, but dont deiconify/unshade/raise
 
     def grabfunc(self, data):
@@ -245,6 +245,6 @@ def _grabfunc(data):
 ob.ebind(ob.EventAction.NewWindow, _newwindow)
 ob.ebind(ob.EventAction.CloseWindow, _closewindow)
 
-_o = cycledata()
+_o = _cycledata()
 
 print "Loaded stackedcycle.py"

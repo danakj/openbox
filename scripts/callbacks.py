@@ -6,8 +6,14 @@ import ob
 import otk
 
 StateRemove = 0
+"""For the state_* callbacks. Indicates the state should be removed from the
+   window."""
 StateAdd = 1
+"""For the state_* callbacks. Indicates the state should be add to the
+   window."""
 StateToggle = 2
+"""For the state_* callbacks. Indicates the state should be toggled on the
+   window."""
 
 def state_above(data, add=StateAdd):
     """Toggles, adds or removes the 'above' state on a window.

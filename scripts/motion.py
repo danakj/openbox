@@ -4,50 +4,54 @@
 ############################################################################
 
 #############################################################################
-### Options that can be modified to change the functions' behaviors.      ###
-###                                                                       ###
-# edge_resistance - the amount of resistance to provide to moving a       ###
-###                 window past a screen boundary. Specify a value of 0   ###
-###                 to disable edge resistance.                           ###
-edge_resistance = 10                                                      ###
-###                                                                       ###
-# move_popup - display a coordinates popup when moving windows.           ###
-move_popup = 1                                                            ###
-###                                                                       ###
-# NOT IMPLEMENTED (yet?)                                                  ###
-# move_rubberband - display an outline while moving instead of moving the ###
-###                 actual window, until the move is completed. Good for  ###
-###                 slower systems.                                       ###
-move_rubberband = 0                                                       ###
-###                                                                       ###
-# resize_popup - display a size popup when resizing windows.              ###
-resize_popup = 1                                                          ###
-###                                                                       ###
-# NOT IMPLEMENTED (yet?)                                                  ###
-# resize_rubberband - display an outline while resizing instead of        ###
-###                   resizing the actual window, until the resize is     ###
-###                   completed. Good for slower systems.                 ###
-resize_rubberband = 0                                                     ###
-###                                                                       ###
-# resize_nearest - 1 to resize from the corner nearest where the mouse    ###
-###                is, 0 to resize always from the bottom right corner.   ###
-resize_nearest = 1                                                        ###
-###                                                                       ###
-###                                                                       ###
-# Provides:                                                               ###
-# def move(data):                                                         ###
-#     """Moves the window interactively. This should only be used with    ###
-#        MouseMotion events. If move_popup or move_rubberband is enabled, ###
-#        then the end_move function needs to be bound as well."""         ###
-# def end_move(data):                                                     ###
-#     """Complete the interactive move of a window."""                    ###
-# def resize(data):                                                       ###
-#     """Resizes the window interactively. This should only be used with  ###
-#        MouseMotion events"""                                            ###
-# def end_resize(data):                                                   ###
-#     """Complete the interactive resize of a window."""                  ###
-###                                                                       ###
+###   Options that can be modified to change the functions' behaviors.    ###
 #############################################################################
+EDGE_RESISTANCE = 10
+"""The amount of resistance to provide to moving a window past a screen
+   boundary. Specify a value of 0 to disable edge resistance."""
+MOVE_POPUP = 1
+"""Display a coordinates popup when moving windows."
+MOVE_RUBBERBAND = 0
+"""NOT IMPLEMENTED (yet?)
+   Display an outline while moving instead of moving the actual window,
+   until the move is completed. Good for slower systems."""
+RESIZE_POPUP = 1
+"""Display a size popup when resizing windows."""
+RESIZE_RUBBERBAND = 0
+"""NOT IMPLEMENTED (yet?)
+   Display an outline while resizing instead of resizing the actual
+   window, until the resize is completed. Good for slower systems."""
+RESIZE_NEAREST = 1
+"""Non-zero to resize from the corner nearest where the mouse is, 0 to
+   resize always from the bottom right corner."""
+#############################################################################
+
+def move(data):
+    """Moves the window interactively. This should only be used with
+       MouseAction.Motion events. If MOVE_POPUP or MOVE_RUBBERBAND is enabled,
+       then the end_move function needs to be bound as well."""
+    _move(data)
+
+def end_move(data):
+    """Complete the interactive move of a window."""
+    _end_move(data)
+
+def resize(data):
+    """Resizes the window interactively. This should only be used with
+       MouseMotion events. If RESIZE_POPUP or RESIZE_RUBBERBAND is enabled,
+       then the end_resize function needs to be bound as well."""
+    _resize(data)
+
+def end_resize(data):
+    """Complete the interactive resize of a window."""
+    _end_resize(data)
+
+###########################################################################
+###########################################################################
+
+###########################################################################
+###      Internal stuff, should not be accessed outside the module.     ###
+###########################################################################
 
 import ob
 import otk
@@ -80,9 +84,9 @@ def _motion_grab(data):
         # have all the modifiers this started with been released?
         if not _motion_mask & data.state:
             if _inmove:
-                end_move(data)
+                _end_move(data)
             elif _inresize:
-                end_resize(data)
+                _end_resize(data)
             else:
                 raise RuntimeError
 
@@ -96,9 +100,8 @@ def _do_move():
     x = _cx + _dx + _client.frame.rect().x() - _client.area().x()
     y = _cy + _dy + _client.frame.rect().y() - _client.area().y()
 
-    global edge_resistance
     global _last_x, _last_y
-    if edge_resistance:
+    if EDGE_RESISTANCE:
         fs = _client.frame.size()
         w = _client.area().width() + fs.left + fs.right
         h = _client.area().height() + fs.top + fs.bottom
@@ -109,16 +112,16 @@ def _do_move():
         t = area.top()
         b = area.bottom() - h + 1
         # left screen edge
-        if _last_x > x and x < l and x >= l - edge_resistance:
+        if _last_x > x and x < l and x >= l - EDGE_RESISTANCE:
             x = l
         # right screen edge
-        if _last_x < x and x > r and x <= r + edge_resistance:
+        if _last_x < x and x > r and x <= r + EDGE_RESISTANCE:
             x = r
         # top screen edge
-        if _last_y > y and y < t and y >= t - edge_resistance:
+        if _last_y > y and y < t and y >= t - EDGE_RESISTANCE:
             y = t
         # right screen edge
-        if _last_y < y and y > b and y <= b + edge_resistance:
+        if _last_y < y and y > b and y <= b + EDGE_RESISTANCE:
             y = b
 
     global _inmove
@@ -129,15 +132,13 @@ def _do_move():
         _last_x = x
         _last_y = y
 
-    global move_rubberband
-    if move_rubberband:
+    if MOVE_RUBBERBAND:
         # draw the outline ...
         f=0
     else:
         _client.move(x, y)
 
-    global move_popup
-    if move_popup:
+    if MOVE_POPUP:
         global _popwidget, _poplabel
         style = ob.openbox.screen(_screen).style()
         font = style.labelFont()
@@ -160,10 +161,7 @@ def _do_move():
                                     _popwidget.height()) / 2)
         _popwidget.show(1)
 
-def move(data):
-    """Moves the window interactively. This should only be used with
-       MouseMotion events. If move_popup or move_rubberband is enabled, then
-       the end_move function needs to be bound as well."""
+def _move(data):
     if not data.client: return
 
     # not-normal windows dont get moved
@@ -182,15 +180,14 @@ def move(data):
         ob.kgrab(_screen, _motion_grab)
         _inmove = 1
 
-def end_move(data):
-    """Complete the interactive move of a window."""
-    global move_rubberband, _inmove
-    global _popwidget, _poplabel
+def _end_move(data):
+    global MOVE_RUBBERBAND
+    global _inmove, _popwidget, _poplabel
     if _inmove:
-        r = move_rubberband
-        move_rubberband = 0
+        r = MOVE_RUBBERBAND
+        MOVE_RUBBERBAND = 0
         _do_move()
-        move_rubberband = r
+        MOVE_RUBBERBAND = r
         _inmove = 0
     _poplabel = 0
     _popwidget = 0
@@ -203,7 +200,7 @@ def _do_resize():
     dy = _dy
     
     # pick a corner to anchor
-    if not (resize_nearest or _context == ob.MouseContext.Grip):
+    if not (RESIZE_NEAREST or _context == ob.MouseContext.Grip):
         corner = ob.Client.TopLeft
     else:
         x = _px - _cx
@@ -225,15 +222,13 @@ def _do_resize():
     w = _cw + dx
     h = _ch + dy
 
-    global resize_popup
-    if resize_rubberband:
+    if RESIZE_RUBBERBAND:
         # draw the outline ...
         f=0
     else:
         _client.resize(corner, w, h)
 
-    global resize_popup
-    if resize_popup:
+    if RESIZE_POPUP:
         global _popwidget, _poplabel
         style = ob.openbox.screen(_screen).style()
         ls = _client.logicalSize()
@@ -255,9 +250,7 @@ def _do_resize():
                                     _popwidget.height()) / 2)
         _popwidget.show(1)
 
-def resize(data):
-    """Resizes the window interactively. This should only be used with
-       MouseMotion events"""
+def _resize(data):
     if not data.client: return
 
     # not-normal windows dont get resized
@@ -280,15 +273,14 @@ def resize(data):
         ob.kgrab(_screen, _motion_grab)
         _inresize = 1
 
-def end_resize(data):
-    """Complete the interactive resize of a window."""
-    global resize_rubberband, _inresize
+def _end_resize(data):
+    global RESIZE_RUBBERBAND, _inresize
     global _popwidget, _poplabel
     if _inresize:
-        r = resize_rubberband
-        resize_rubberband = 0
+        r = RESIZE_RUBBERBAND
+        RESIZE_RUBBERBAND = 0
         _do_resize()
-        resize_rubberband = r
+        RESIZE_RUBBERBAND = r
         _inresize = 0
     _poplabel = 0
     _popwidget = 0

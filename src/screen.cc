@@ -77,7 +77,7 @@ Screen::Screen(int screen)
   // XXX: initialize the screen's style
   /*
   otk::ustring stylepath;
-  python_get_string("theme", &stylepath);
+  python_get_string("THEME", &stylepath);
   otk::Configuration sconfig(false);
   sconfig.setFile(otk::expandTilde(stylepath.c_str()));
   if (!sconfig.load()) {
@@ -103,7 +103,7 @@ Screen::Screen(int screen)
 
   // Set the net_desktop_names property
   std::vector<otk::ustring> names;
-  python_get_stringlist("desktop_names", &names);
+  python_get_stringlist("DESKTOP_NAMES", &names);
   otk::Property::set(_info->rootWindow(),
                      otk::Property::atoms.net_desktop_names,
                      otk::Property::utf8, names);
@@ -112,7 +112,7 @@ Screen::Screen(int screen)
 
   _desktop = 0;
   
-  if (!python_get_long("number_of_desktops", &_num_desktops))
+  if (!python_get_long("NUMBER_OF_DESKTOPS", &_num_desktops))
     _num_desktops = 1;
   changeNumDesktops(_num_desktops); // set the hint
 

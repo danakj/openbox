@@ -173,7 +173,7 @@ void Frame::adjustSize()
     const int sep = bevel + 1;
 
     otk::ustring layout;
-    if (!python_get_string("titlebar_layout", &layout))
+    if (!python_get_string("TITLEBAR_LAYOUT", &layout))
       layout = "ILMC";
 
     // this code ensures that the string only has one of each possible

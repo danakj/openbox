@@ -6,33 +6,36 @@
 import windowplacement # fallback routines
 
 ##############################################################################
-### Options for the historyplacement module (Options in the                ###
-### windowplacement module also apply!):                                   ###
-###                                                                        ###
-# ignore_requested_positions - When true, the placement algorithm will     ###
-###                            attempt to place windows even when they     ###
-###                            request a position (like XMMS).             ###
-###                            Note this only applies to normal windows,   ###
-###                            not to special cases like desktops and      ###
-###                            docks.                                      ###
-ignore_requested_positions = 0                                             ###
-###                                                                        ###
-# fallback - The window placement algorithm that will be used when history ###
-###          placement does not have a place for the window.               ###
-fallback = windowplacement.random                                          ###
-###                                                                        ###
-# confirm_callback - set this to a function to have the function called    ###
-###                  before attempting to place a window via history. If   ###
-###                  the function returns 'true' then an attempt will be   ###
-###                  made to place the window. If it returns 'false', the  ###
-###                  fallback method will be directly applied instead.     ###
-confirm_callback = 0                                                       ###
-###                                                                        ###
-# filename - The name of the file where history data will be stored. The   ###
-###          number of the screen is appended onto this filename.          ###
-filename = 'historydb'                                                     ###
-###                                                                        ###
+###       Options for the historyplacement module (Options in the          ###
+###                windowplacement module also apply!)                     ###
 ##############################################################################
+IGNORE_REQUESTED_POSITIONS = 0
+"""When true, the placement algorithm will attempt to place windows even
+   when they request a position (like XMMS). Note this only applies to
+   normal windows, not to special cases like desktops and docks."""
+FALLBACK = windowplacement.random
+"""The window placement algorithm that will be used when history placement
+   does not have a place for the window."""
+CONFIRM_CALLBACK = 0
+"""Set this to a function to have the function called before attempting to
+   place a window via history. If the function returns a non-zero, then an
+   attempt will be made to place the window. If it returns zero, the
+   fallback method will be directly applied instead."""
+FILENAME = 'historydb'
+"""The name of the file where history data will be stored. The number of
+   the screen is appended onto this filename."""
+##############################################################################
+
+def place(data):
+    """Place a window usingthe history placement algorithm."""
+    _place(data)
+
+###########################################################################
+###########################################################################
+
+###########################################################################
+###      Internal stuff, should not be accessed outside the module.     ###
+###########################################################################
 
 import otk
 import ob
@@ -57,7 +60,7 @@ class _state:
 
 def _load(data):
     global _data
-    file = open(os.environ['HOME']+'/.openbox/'+filename+"."+str(data.screen),
+    file = open(os.environ['HOME']+'/.openbox/'+FILENAME+"."+str(data.screen),
                 'r')
     if file:
         # read data
@@ -80,7 +83,7 @@ def _load(data):
 
 def _save(data):
     global _data
-    file = open(os.environ['HOME']+'/.openbox/'+filename+"."+str(data.screen),
+    file = open(os.environ['HOME']+'/.openbox/'+FILENAME+"."+str(data.screen),
                 'w')
     if file:
         while len(_data)-1 < data.screen:
@@ -110,14 +113,14 @@ def _find(screen, state):
             _data.append([])
         return _find(screen, state) # try again
 
-def place(data):
+def _place(data):
     global _data
     if data.client:
-        if not (ignore_requested_positions and data.client.normal()):
+        if not (IGNORE_REQUESTED_POSITIONS and data.client.normal()):
             if data.client.positionRequested(): return
         state = _create_state(data)
         try:
-            if not confirm_callback or confirm_callback(data):
+            if not CONFIRM_CALLBACK or CONFIRM_CALLBACK(data):
                 print "looking for : " + state.appname +  " : " + \
                       state.appclass + " : " + state.role
 
@@ -132,7 +135,7 @@ def place(data):
                     print "No match in history"
         except TypeError:
             pass
-    if fallback: fallback(data)
+    if FALLBACK: FALLBACK(data)
 
 def _save_window(data):
     global _data

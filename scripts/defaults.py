@@ -6,7 +6,7 @@ import windowplacement # use a routine in here to place windows
 import historyplacement # history window placement
 
 # try focus something when nothing is focused
-focus.fallback = 1
+focus.FALLBACK = 1
 
 # choose a default focus model
 focusmodel.setup_click_focus() # use focusmodel.setup_sloppy_focus() instead to
@@ -23,7 +23,7 @@ ob.ebind(ob.EventAction.PlaceWindow, historyplacement.place)
 def histplace(data):
     if data.client.appClass() == "XTerm": return 0
     return 1
-historyplacement.confirm_callback = histplace
+historyplacement.CONFIRM_CALLBACK = histplace
 
 
 # run xterm from root clicks
@@ -40,7 +40,7 @@ ob.kbind(["A-S-Tab"], ob.KeyContext.All, stackedcycle.previous
 # if you want linear cycling instead of stacked cycling, comment out the focus
 # bindings above, and use these instead.
 #import focuscycle
-#focuscycle.raise_window = 0 # don't raise windows when they're activated
+#focuscycle.RAISE_WINDOW = 0 # don't raise windows when they're activated
 #ob.kbind(["A-Tab"], ob.KeyContext.All, focuscycle.next)
 #ob.kbind(["A-S-Tab"], ob.KeyContext.All, focuscycle.previous)
 

@@ -5,7 +5,7 @@
 ###########################################################################
 ###     Options that affect the behavior of the focuscycle module.      ###
 ###########################################################################
-raise_window = 1
+RAISE_WINDOW = 1
 """When cycling focus, raise the window chosen as well as focusing it. This
    does not affect fallback focusing behavior."""
 # See focus.avoid_skip_taskbar
@@ -58,7 +58,7 @@ def _cycle(data, num, forward):
         while 1:
             client = screen.client(t)
             if client and focus._focusable(client, desktop) and client.focus():
-                if raise_window:
+                if RAISE_WINDOW:
                     screen.raiseWindow(client)
                 return
             if forward:

@@ -153,7 +153,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
 
   // XXX: dont load this every time!!@*
   long dblclick;
-  if (!python_get_long("double_click_delay", &dblclick))
+  if (!python_get_long("DOUBLE_CLICK_DELAY", &dblclick))
     dblclick = 300;
 
   if (e.time - _release.time < (unsigned)dblclick &&
@@ -283,7 +283,7 @@ void Actions::motionHandler(const XMotionEvent &e)
     int dx = x_root - _posqueue[0]->pos.x();
     int dy = y_root - _posqueue[0]->pos.y();
     // XXX: dont get this from python every time!
-    if (!python_get_long("drag_threshold", &threshold))
+    if (!python_get_long("DRAG_THRESHOLD", &threshold))
       threshold = 0;
     if (!(std::abs(dx) >= threshold || std::abs(dy) >= threshold))
       return; // not at the threshold yet

@@ -29,7 +29,7 @@
 .if n .sp 1
 .if t .sp .5
 ..
-.TH openbox 1 "April 8th, 2002" "@VERSION@"
+.TH openbox 1 "April 8th, 2002" "@version@"
 .SH NAME
 openbox \- a window manager for X11
 .SH SYNOPSIS

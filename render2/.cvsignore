@@ -14,3 +14,4 @@ surface.lo
 paint.lo
 texture.lo
 planar.lo
+theme.lo

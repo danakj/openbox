@@ -217,11 +217,15 @@ void menu_frame_move_on_screen(ObMenuFrame *self)
     if (dx || dy) {
         ObMenuFrame *f;
 
-        for (f = self; f; f = f->parent)
+        menu_frame_move(self, self->area.x + dx, self->area.y + dy);
+        if (!config_menu_xorstyle)
+            dy = 0;
+        for (f = self->parent; f; f = f->parent)
             menu_frame_move(f, f->area.x + dx, f->area.y + dy);
         for (f = self->child; f; f = f->child)
             menu_frame_move(f, f->area.x + dx, f->area.y + dy);
-        XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+        if (config_menu_warppointer)
+            XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
     }
 }
 

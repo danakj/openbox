@@ -97,6 +97,14 @@ extern gint config_resist_win;
 /*! Number of pixels to resist while crossing a screen's edge */
 extern gint config_resist_edge;
 
+/*! Warp near edge on menu? */
+extern gboolean config_menu_warppointer;
+/*! make menus jump around a lot */
+extern gboolean config_menu_xorstyle;
+/*! hilight first entry in menu */
+extern gboolean config_menu_hilightfirst;
+/*! delay for hiding menu when opening */
+extern guint    config_menu_hide_delay;
 /*! User-specified menu files */
 extern GSList *config_menu_files;
 

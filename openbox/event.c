@@ -531,7 +531,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
                 menu_can_hide = FALSE;
                 ob_main_loop_timeout_add(ob_main_loop,
-                                         G_USEC_PER_SEC / 4,
+                                         config_menu_hide_delay * 1000,
                                          menu_hide_delay_func,
                                          NULL, NULL);
 

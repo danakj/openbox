@@ -27,15 +27,7 @@ namespace ob {
 */
 class OBActions : public otk::OtkEventHandler {
 public:
-  // update the same enum in openbox.i when making changes to this
-  enum ActionType {
-    Action_EnterWindow,
-    Action_LeaveWindow,
-    Action_NewWindow,
-    Action_CloseWindow,
-    NUM_ACTIONS
-  };
-  
+#ifndef   SWIG // get rid of a swig warning
   struct ButtonReleaseAction {
     Window win;
     unsigned int button;
@@ -49,10 +41,9 @@ public:
     otk::Rect clientarea;
     ButtonPressAction() { button = 0; }
   };
-
+#endif // SWIG
 private:
   // milliseconds XXX: config option
-  static const unsigned int DOUBLECLICKDELAY;
   static const int BUTTONS = 5;
   
   //! The mouse button currently being watched from a press for a CLICK
@@ -68,15 +59,9 @@ private:
   
   void insertPress(const XButtonEvent &e);
   void removePress(const XButtonEvent &e);
-  
-  typedef std::multimap<ActionType, PyObject*> CallbackMap;
-  typedef std::pair<ActionType, PyObject*> CallbackMapPair;
-  CallbackMap _callbacks;
 
-  void doCallback(ActionType action, Window window, OBWidget::WidgetType type,
-                  unsigned int state, unsigned int button,
-                  int xroot, int yroot, Time time);
-  
+  PyObject *_callback[NUM_EVENTS];
+
 public:
   //! Constructs an OBActions object
   OBActions();
@@ -97,18 +82,14 @@ public:
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
 
-  //! Add a callback funtion to the back of the hook list
-  /*!
-    Registering functions for KeyPress events is pointless. Use
-    OBSCript::bindKey instead to do this.
-  */
-  bool registerCallback(ActionType action, PyObject *func, bool atfront);
+  //! Bind a callback for an action
+  bool bind(EventAction action, PyObject *func);
 
-  //! Remove a callback function from the hook list
-  bool unregisterCallback(ActionType action, PyObject *func);
+  //! Unbind the callback function from an action
+  bool unbind(EventAction action);
 
-  //! Remove all callback functions from the hook list
-  bool unregisterAllCallbacks(ActionType action);
+  //! Remove all callback functions
+  void unbindAll();
 };
 
 }

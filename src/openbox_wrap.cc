@@ -2554,30 +2554,18 @@ static PyObject *_wrap_kbind(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_kunbind(PyObject *self, PyObject *args) {
+static PyObject *_wrap_ebind(PyObject *self, PyObject *args) {
     PyObject *resultobj;
-    PyObject *arg1 = (PyObject *) 0 ;
+    int arg1 ;
+    PyObject *arg2 = (PyObject *) 0 ;
     PyObject *result;
-    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:kunbind",&obj0)) goto fail;
-    arg1 = obj0;
-    result = (PyObject *)ob::kunbind(arg1);
+    if(!PyArg_ParseTuple(args,(char *)"iO:ebind",&arg1,&obj1)) goto fail;
+    arg2 = obj1;
+    result = (PyObject *)ob::ebind((ob::EventAction )arg1,arg2);
     
     resultobj = result;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_kunbind_all(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    
-    if(!PyArg_ParseTuple(args,(char *)":kunbind_all")) goto fail;
-    ob::kunbind_all();
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;
     fail:
     return NULL;
@@ -2706,8 +2694,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_swigregister", OBClient_swigregister, METH_VARARGS },
 	 { (char *)"mbind", _wrap_mbind, METH_VARARGS },
 	 { (char *)"kbind", _wrap_kbind, METH_VARARGS },
-	 { (char *)"kunbind", _wrap_kunbind, METH_VARARGS },
-	 { (char *)"kunbind_all", _wrap_kunbind_all, METH_VARARGS },
+	 { (char *)"ebind", _wrap_ebind, METH_VARARGS },
 	 { (char *)"set_reset_key", _wrap_set_reset_key, METH_VARARGS },
 	 { NULL, NULL }
 };
@@ -2867,6 +2854,11 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"KC_Menu", (long) ob::KC_Menu, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"KC_All", (long) ob::KC_All, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_KEY_CONTEXT", (long) ob::NUM_KEY_CONTEXT, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventEnterWindow", (long) ob::EventEnterWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventLeaveWindow", (long) ob::EventLeaveWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventNewWindow", (long) ob::EventNewWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventCloseWindow", (long) ob::EventCloseWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL", (long) 11, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL_REVISION", (long) 0, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"None", (long) 0L, 0, 0, 0},

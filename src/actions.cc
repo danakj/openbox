@@ -16,7 +16,6 @@
 
 namespace ob {
 
-const unsigned int OBActions::DOUBLECLICKDELAY = 300;
 const int OBActions::BUTTONS;
 
 OBActions::OBActions()
@@ -24,6 +23,9 @@ OBActions::OBActions()
 {
   for (int i=0; i<BUTTONS; ++i)
     _posqueue[i] = new ButtonPressAction();
+
+  for (int i = 0; i < NUM_EVENTS; ++i)
+    _callback[i] = 0;
 }
 
 
@@ -116,7 +118,12 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   Openbox::instance->bindings()->fireButton(data);
     
 
-  if (e.time - _release.time < DOUBLECLICKDELAY &&
+  // XXX: dont load this every time!!@*
+  long dblclick;
+  if (!python_get_long("double_click_delay", &dblclick))
+    dblclick = 300;
+
+  if (e.time - _release.time < (unsigned)dblclick &&
       _release.win == e.window && _release.button == e.button) {
 
     // run the DOUBLECLICK python hook
@@ -142,12 +149,12 @@ void OBActions::enterHandler(const XCrossingEvent &e)
 {
   OtkEventHandler::enterHandler(e);
   
-  OBWidget *w = dynamic_cast<OBWidget*>
-    (Openbox::instance->findHandler(e.window));
-
   // run the ENTER python hook
-  doCallback(Action_EnterWindow, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1), e.state, 0, 0, 0, 0);
+  if (_callback[EventEnterWindow]) {
+    EventData *data = new_event_data(e.window, EventEnterWindow, e.state);
+    python_callback(_callback[EventEnterWindow], (PyObject*)data);
+    Py_DECREF((PyObject*)data);
+  }
 }
 
 
@@ -155,19 +162,18 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
 {
   OtkEventHandler::leaveHandler(e);
 
-  OBWidget *w = dynamic_cast<OBWidget*>
-    (Openbox::instance->findHandler(e.window));
-
   // run the LEAVE python hook
-  doCallback(Action_LeaveWindow, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1), e.state, 0, 0, 0, 0);
+  if (_callback[EventLeaveWindow]) {
+    EventData *data = new_event_data(e.window, EventLeaveWindow, e.state);
+    python_callback(_callback[EventLeaveWindow], (PyObject*)data);
+    Py_DECREF((PyObject*)data);
+  }
 }
 
 
 void OBActions::keyPressHandler(const XKeyEvent &e)
 {
-//  OBWidget *w = dynamic_cast<OBWidget*>
-//    (Openbox::instance->findHandler(e.window));
+  OtkEventHandler::keyPressHandler(e);
 
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
@@ -177,6 +183,8 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 
 void OBActions::motionHandler(const XMotionEvent &e)
 {
+  OtkEventHandler::motionHandler(e);
+
   if (!e.same_screen) return; // this just gets stupid
 
   int x_root = e.x_root, y_root = e.y_root;
@@ -211,97 +219,66 @@ void OBActions::motionHandler(const XMotionEvent &e)
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)
 {
-  doCallback(Action_NewWindow, e.window, (OBWidget::WidgetType)-1,
-             0, 0, 0, 0, 0);
+  OtkEventHandler::mapRequestHandler(e);
+
+  if (_callback[EventNewWindow]) {
+    EventData *data = new_event_data(e.window, EventNewWindow, 0);
+    python_callback(_callback[EventNewWindow], (PyObject*)data);
+    Py_DECREF((PyObject*)data);
+  }
 }
 
 void OBActions::unmapHandler(const XUnmapEvent &e)
 {
-  (void)e;
-  doCallback(Action_CloseWindow, e.window, (OBWidget::WidgetType)-1,
-             0, 0, 0, 0, 0);
+  OtkEventHandler::unmapHandler(e);
+
+  if (_callback[EventCloseWindow]) {
+    EventData *data = new_event_data(e.window, EventCloseWindow, 0);
+    python_callback(_callback[EventCloseWindow], (PyObject*)data);
+    Py_DECREF((PyObject*)data);
+  }
 }
 
 void OBActions::destroyHandler(const XDestroyWindowEvent &e)
 {
-  (void)e;
-  doCallback(Action_CloseWindow, e.window, (OBWidget::WidgetType)-1,
-             0, 0, 0, 0, 0);
+  OtkEventHandler::destroyHandler(e);
+
+  if (_callback[EventCloseWindow]) {
+    EventData *data = new_event_data(e.window, EventCloseWindow, 0);
+    python_callback(_callback[EventCloseWindow], (PyObject*)data);
+    Py_DECREF((PyObject*)data);
+  }
 }
 
-void OBActions::doCallback(ActionType action, Window window,
-                           OBWidget::WidgetType type, unsigned int state,
-                           unsigned int button, int xroot, int yroot,
-                           Time time)
+bool OBActions::bind(EventAction action, PyObject *func)
 {
-  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
-    _callbacks.equal_range(action);
-
-  CallbackMap::iterator it;
-//  for (it = it_pair.first; it != it_pair.second; ++it)
-//    python_callback(it->second, action, window, type, state,
-//                    button, xroot, yroot, time);
-  // XXX do a callback
-}
-
-bool OBActions::registerCallback(ActionType action, PyObject *func,
-                                 bool atfront)
-{
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+  if (action < 0 || action >= NUM_EVENTS) {
     return false;
   }
-  if (!func)
-    return false;
 
-  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
-    _callbacks.equal_range(action);
-
-  CallbackMap::iterator it;
-  for (it = it_pair.first; it != it_pair.second; ++it)
-    if (it->second == func)
-      return true; // already in there
-  if (atfront)
-    _callbacks.insert(_callbacks.begin(), CallbackMapPair(action, func));
-  else
-    _callbacks.insert(CallbackMapPair(action, func));
+  Py_XDECREF(_callback[action]);
+  _callback[action] = func;
   Py_INCREF(func);
   return true;
 }
 
-bool OBActions::unregisterCallback(ActionType action, PyObject *func)
+bool OBActions::unbind(EventAction action)
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
+  if (action < 0 || action >= NUM_EVENTS) {
     return false;
   }
-  if (!func)
-    return false;
   
-  std::pair<CallbackMap::iterator, CallbackMap::iterator> it_pair =
-    _callbacks.equal_range(action);
-  
-  CallbackMap::iterator it;
-  for (it = it_pair.first; it != it_pair.second; ++it)
-    if (it->second == func)
-      break;
-  if (it != it_pair.second) { // its been registered before
-    Py_DECREF(func);
-    _callbacks.erase(it);
-  }
+  Py_XDECREF(_callback[action]);
+  _callback[action] = 0;
   return true;
 }
 
-bool OBActions::unregisterAllCallbacks(ActionType action)
+void OBActions::unbindAll()
 {
-  if (action < 0 || action >= OBActions::NUM_ACTIONS) {
-    return false;
+  for (int i = 0; i < NUM_EVENTS; ++i) {
+    Py_XDECREF(_callback[i]);
+    _callback[i] = 0;
   }
-
-  while (!_callbacks.empty()) {
-    CallbackMap::iterator it = _callbacks.begin();
-    Py_DECREF(it->second);
-    _callbacks.erase(it);
-  }
-  return true;
 }
 
 }

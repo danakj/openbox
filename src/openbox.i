@@ -24,8 +24,6 @@
   ob::Openbox *Openbox_instance() { return ob::Openbox::instance; }
 %};
 
-%rename(register) python_register;
-
 %ignore ob::OBScreen::clients;
 %{
   #include <iterator>

@@ -19,6 +19,10 @@ theme = "/usr/local/share/openbox/styles/nyz"
 #                   the end by Openbox.
 titlebar_layout = "ILC"
 
+# double_click_delay - the number of milliseconds in which 2 clicks are
+#                      perceived as a double-click
+double_click_delay = 300
+
 #############################################################################
 ### Options that can be modified by the user to change the default hooks' ###
 ### behaviors.                                                            ###

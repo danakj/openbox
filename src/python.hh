@@ -48,6 +48,14 @@ enum KeyContext {
   NUM_KEY_CONTEXT
 };
 
+enum EventAction {
+  EventEnterWindow,
+  EventLeaveWindow,
+  EventNewWindow,
+  EventCloseWindow,
+  NUM_EVENTS
+};
+
 #ifndef SWIG
 
 // *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
@@ -83,6 +91,13 @@ typedef struct {
 typedef struct {
   PyObject_HEAD;
   Window window;
+  unsigned int state;
+  EventAction action;
+} EventData;
+
+typedef struct {
+  PyObject_HEAD;
+  Window window;
   Time time;
   unsigned int state;
   unsigned int key;
@@ -100,21 +115,25 @@ MotionData *new_motion_data(Window window, Time time, unsigned int state,
 ButtonData *new_button_data(Window window, Time time, unsigned int state,
                             unsigned int button, MouseContext context,
                             MouseAction action);
+EventData *new_event_data(Window window, EventAction action,
+                           unsigned int state);
 KeyData *new_key_data(Window window, Time time, unsigned int state,
                       unsigned int key);
 
 void python_callback(PyObject *func, PyObject *data);
 
+bool python_get_long(const char *name, long *value);
 bool python_get_string(const char *name, std::string *value);
 bool python_get_stringlist(const char *name, std::vector<std::string> *value);
 #endif
 
-PyObject * mbind(const std::string &button, ob::MouseContext context,
-                 ob::MouseAction action, PyObject *func);
+PyObject *mbind(const std::string &button, ob::MouseContext context,
+                ob::MouseAction action, PyObject *func);
 
-PyObject * kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
-PyObject * kunbind(PyObject *keylist);
-void kunbind_all();
+PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
+
+PyObject *ebind(ob::EventAction action, PyObject *func);
+
 void set_reset_key(const std::string &key);
 
 }

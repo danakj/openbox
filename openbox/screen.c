@@ -353,8 +353,8 @@ void screen_resize()
     if (ob_state() == OB_STATE_STARTING)
 	return;
 
-    dock_configure();
     screen_update_areas();
+    dock_configure();
 
     for (it = client_list; it; it = it->next)
         client_move_onscreen(it->data, FALSE);

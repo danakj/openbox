@@ -1,7 +1,7 @@
 Changelog for Openbox:
 
 2.2.1:
- * Fix bug with mutltibyte fonts being realy tiny.      (Ben Jansens)
+ * Fix bug with mutltibyte fonts being really tiny.      (Ben Jansens)
 
  * Fix menu redraw bug when dragging them off-screen or (Scott Moynes)
    under other menus, with Xft fonts.

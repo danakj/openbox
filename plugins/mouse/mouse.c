@@ -211,6 +211,8 @@ static void event(ObEvent *e, void *foo)
     static guint button = 0, state = 0, lbutton = 0;
     static gboolean drag = FALSE, drag_used = FALSE;
     static Corner corner = Corner_TopLeft;
+    static Client *drag_client = NULL;
+    static Context drag_context = Context_None;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
     Context context;
@@ -225,6 +227,9 @@ static void event(ObEvent *e, void *foo)
         break;
 
     case Event_X_ButtonPress:
+        context = frame_context(e->data.x.client,
+                                e->data.x.e->xbutton.window);
+
         if (!button) {
             if (e->data.x.client != NULL) {
                 cx = e->data.x.client->frame->area.x;
@@ -244,9 +249,9 @@ static void event(ObEvent *e, void *foo)
             }
             button = e->data.x.e->xbutton.button;
             state = e->data.x.e->xbutton.state;
+            drag_context = context;
+            drag_client = e->data.x.client;
         }
-        context = frame_context(e->data.x.client,
-                                e->data.x.e->xbutton.window);
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
@@ -266,10 +271,12 @@ static void event(ObEvent *e, void *foo)
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
             if (drag_used) {
-                fire_motion(MouseAction_Motion, context,
-                            e->data.x.client, state, button,
+                fire_motion(MouseAction_Motion, drag_context,
+                            drag_client, state, button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
                 drag = drag_used = FALSE;
+                drag_context = Context_None;
+                drag_client = NULL;
                 
                 lbutton = 0;
             } else {
@@ -322,13 +329,12 @@ static void event(ObEvent *e, void *foo)
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
             if (!drag &&
-                (ABS(dx) >= threshold || ABS(dy) >= threshold))
+                (ABS(dx) >= threshold || ABS(dy) >= threshold)) {
                 drag = TRUE;
+            }
             if (drag) {
-                context = frame_context(e->data.x.client,
-                                        e->data.x.e->xbutton.window);
-                drag_used = fire_motion(MouseAction_Motion, context,
-                                        e->data.x.client,
+                drag_used = fire_motion(MouseAction_Motion, drag_context,
+                                        drag_client,
                                         state, button, cx, cy, cw, ch, dx, dy,
                                         FALSE, corner);
             }

@@ -4,9 +4,18 @@
 #include "color.h"
 #include "debug.h"
 #include "font.h"
+#include "instance.h"
 #include <string.h>
 #include <assert.h>
 #include <GL/glx.h>
+
+static void RrLineWidth(struct RrInstance *i, int w)
+{
+    if (i->gl_linewidth != w) {
+        glLineWidth(w);
+        i->gl_linewidth = w;
+    }
+}
 
 void RrPlanarSet(struct RrSurface *sur,
                  enum RrSurfaceColorType type,
@@ -49,11 +58,16 @@ static void copy_parent(struct RrSurface *sur)
     }
 }
 
-static void RrBevelPaint(int x, int y, int w, int h, int bwidth,
-                         int inset, int raise)
+static void RrBevelPaint(struct RrSurface *s, int inset, int raise)
 {
-    int offset = bwidth + inset;
-    h--; w--;
+    int offset = RrPlanarBorderWidth(s) + inset;
+    int x, y, w, h;
+    x = RrSurfaceX(s);
+    y = RrSurfaceY(s);
+    w = RrSurfaceWidth(s) - 1;
+    h = RrSurfaceHeight(s) - 1;
+
+    RrLineWidth(RrSurfaceInstance(s), 1);
 
     if (raise)
         glColor4f(1.0, 1.0, 1.0, 0.25);
@@ -80,21 +94,26 @@ static void RrBevelPaint(int x, int y, int w, int h, int bwidth,
     glEnd();
 }
 
-static void RrBorderPaint(int x, int y, int w, int h, int bwidth,
-                          struct RrColor *color)
+static void RrBorderPaint(struct RrSurface *s)
 {
-    int offset = bwidth / 2;
-    h--; w--;
+    int x, y, w, h, offset, bwidth;
 
-    RrColor4f(color);
+    offset = RrPlanarBorderWidth(s) / 2;
+    bwidth = RrPlanarBorderWidth(s);
+    x = RrSurfaceX(s);
+    y = RrSurfaceY(s);
+    w = RrSurfaceWidth(s) - 1;
+    h = RrSurfaceHeight(s) - 1;
+
+    RrColor4f(&RrPlanarBorderColor(s));
+
+    RrLineWidth(RrSurfaceInstance(s), bwidth);
 
     glBegin(GL_LINE_LOOP);
-    glLineWidth(bwidth);
     glVertex2i(x + offset, y + offset);
     glVertex2i(x + offset, y + h - offset);
     glVertex2i(x + w - offset, y + h - offset);
     glVertex2i(x + w - offset, y + offset);
-    glLineWidth(1.0); /* XXX is this needed? */
     glEnd();
 }
 
@@ -322,33 +341,23 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
 
     switch (RrPlanarBevelType(sur)) {
     case RR_SUNKEN_OUTER:
-        RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
-                     RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     RrPlanarBorderWidth(sur), 0, 0);
+        RrBevelPaint(sur, 0, 0);
         break;
     case RR_SUNKEN_INNER:
-        RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
-                     RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     RrPlanarBorderWidth(sur), 1, 0);
+        RrBevelPaint(sur, 1, 0);
         break;
     case RR_RAISED_OUTER:
-        RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
-                     RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     RrPlanarBorderWidth(sur), 0, 1);
+        RrBevelPaint(sur, 0, 1);
         break;
     case RR_RAISED_INNER:
-        RrBevelPaint(RrSurfaceX(sur), RrSurfaceY(sur),
-                     RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                     RrPlanarBorderWidth(sur), 1, 1);
+        RrBevelPaint(sur, 1, 1);
         break;
     case RR_BEVEL_NONE:
         break;
     }
 
     if (RrPlanarBorderWidth(sur))
-        RrBorderPaint(RrSurfaceX(sur), RrSurfaceY(sur),
-                      RrSurfaceWidth(sur), RrSurfaceHeight(sur),
-                      RrPlanarBorderWidth(sur), &RrPlanarBorderColor(sur));
+        RrBorderPaint(sur);
 }
 
 int RrPlanarEdgeWidth(struct RrSurface *sur)

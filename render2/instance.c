@@ -119,6 +119,8 @@ struct RrInstance *RrInstanceNew(Display *display, int screen)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
+        inst->gl_linewidth = 1.0;
+
         return inst;
     }
 

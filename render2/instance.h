@@ -13,7 +13,7 @@ struct RrInstance {
     XVisualInfo visinfo;
     Colormap cmap;
     GLXContext glx_context;
-
+    int gl_linewidth;
     Window shape_window;
 
     GHashTable *surface_map;

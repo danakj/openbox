@@ -681,7 +681,7 @@ bool Workspace::smartPlacement(Rect& win) {
 }
 
 
-bool Workspace::underMousePlacement(Rect &win) const {
+bool Workspace::underMousePlacement(Rect &win) {
   int x, y, rx, ry;
   Window c, r;
   unsigned int m;

@@ -1747,7 +1747,7 @@ gboolean client_should_show(ObClient *self)
 {
     if (self->iconic) return FALSE;
     else if (!(self->desktop == screen_desktop ||
-	       self->desktop == DESKTOP_ALL)) return FALSE;
+               self->desktop == DESKTOP_ALL)) return FALSE;
     else if (client_normal(self) && screen_showing_desktop) return FALSE;
     
     return TRUE;
@@ -2552,10 +2552,7 @@ gboolean client_can_focus(ObClient *self)
     if (!self->frame->visible)
         return FALSE;
 
-    if (!((self->can_focus || self->focus_notify) &&
-          (self->desktop == screen_desktop ||
-           self->desktop == DESKTOP_ALL) &&
-          !self->iconic))
+    if (!(self->can_focus || self->focus_notify))
         return FALSE;
 
     /* do a check to see if the window has already been unmapped or destroyed

@@ -34,6 +34,7 @@ OBClient::OBClient(Window window)
   getState();
   getShaped();
 
+  updateProtocols();
   updateNormalHints();
   updateWMHints();
   // XXX: updateTransientFor();
@@ -176,6 +177,7 @@ void OBClient::getArea()
   assert(XGetWindowAttributes(otk::OBDisplay::display, _window, &wattrib));
 
   _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
+  _border_width = wattrib.border_width;
 }
 
 
@@ -224,6 +226,29 @@ void OBClient::getShaped()
                        &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo, &ufoo);
   }
 #endif // SHAPE
+}
+
+
+void OBClient::updateProtocols() {
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  Atom *proto;
+  int num_return = 0;
+
+  _focus_notify = false;
+
+  if (XGetWMProtocols(otk::OBDisplay::display, _window, &proto, &num_return)) {
+    for (int i = 0; i < num_return; ++i) {
+      if (proto[i] == property->atom(otk::OBProperty::wm_delete_window)) {
+        // XXX: do shit with this! let the window close, and show a close
+        // button
+      } else if (proto[i] == property->atom(otk::OBProperty::wm_take_focus))
+        // if this protocol is requested, then the window will be notified
+        // by the window manager whenever it receives focus
+        _focus_notify = true;
+    }
+    XFree(proto);
+  }
 }
 
 
@@ -351,7 +376,10 @@ void OBClient::update(const XPropertyEvent &e)
     updateTitle();
   else if (e.atom == property->atom(otk::OBProperty::wm_class))
     updateClass();
+  else if (e.atom == property->atom(otk::OBProperty::wm_protocols))
+    updateProtocols();
   // XXX: transient for hint
+  // XXX: strut hint
 }
 
 

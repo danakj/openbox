@@ -89,6 +89,13 @@ private:
   //! Position and size of the window (relative to the root window)
   otk::Rect    _area;
 
+  //! Width of the border on the window.
+  /*!
+    The window manager will set this to 0 while the window is being managed,
+    but needs to restore it afterwards, so it is saved here.
+  */
+  int _border_width;
+
   // size bounds
   // if min > max, then the window is not resizable
   int _min_x, _min_y; // minumum size
@@ -144,7 +151,8 @@ private:
   void setWMState(long state);
   void setDesktop(long desktop);
   void setState(StateAction action, long data1, long data2);
-  
+
+  void updateProtocols();
   void updateNormalHints();
   void updateWMHints();
   // XXX: updateTransientFor();

@@ -6,6 +6,11 @@
 #include "otk/display.hh"
 #include "otk/rect.hh"
 
+extern "C" {
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+}
+
 namespace ob {
 
 
@@ -113,6 +118,37 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 }
 
 
+// XXX: put this into the OBScreen class!
+static void manageWindow(Window window)
+{
+  XWMHints *wmhint;
+  XSetWindowAttributes attrib_set;
+
+  // XXX: manage the window, i.e. grab events n shit
+
+  // is the window a docking app
+  if ((wmhint = XGetWMHints(otk::OBDisplay::display, window))) {
+    if ((wmhint->flags & StateHint) &&
+        wmhint->initial_state == WithdrawnState) {
+      //slit->addClient(w); // XXX: make dock apps work!
+      XFree(wmhint);
+      return;
+    }
+    XFree(wmhint);
+  }
+
+  // choose the events we want to receive on the CLIENT window
+  attrib_set.event_mask = PropertyChangeMask | FocusChangeMask |
+                          StructureNotifyMask;
+  attrib_set.do_not_propagate_mask = ButtonPressMask | ButtonReleaseMask |
+                                     ButtonMotionMask;
+  XChangeWindowAttributes(otk::OBDisplay::display, window,
+                          CWEventMask|CWDontPropagate, &attrib_set);
+
+  // create the OBClient class, which gets all of the hints on the window
+  Openbox::instance->addClient(window, new OBClient(window));
+}
+
 void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
 {
 #ifdef    DEBUG
@@ -124,8 +160,7 @@ void OBXEventHandler::mapRequest(const XMapRequestEvent &e)
   if (client) {
     // XXX: uniconify and/or unshade the window
   } else {
-    // XXX: manage the window, i.e. grab events n shit
-    Openbox::instance->addClient(e.window, new OBClient(e.window));
+    manageWindow(e.window);
   }
   
 /*

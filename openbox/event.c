@@ -638,13 +638,13 @@ static void event_handle_client(Client *client, XEvent *e)
 	    switch (e->xconfigurerequest.detail) {
 	    case Below:
 	    case BottomIf:
-		stacking_lower(client);
+		stacking_lower(CLIENT_AS_WINDOW(client));
 		break;
 
 	    case Above:
 	    case TopIf:
 	    default:
-		stacking_raise(client);
+		stacking_raise(CLIENT_AS_WINDOW(client));
 		break;
 	    }
 	}
@@ -689,7 +689,7 @@ static void event_handle_client(Client *client, XEvent *e)
         if (client->shaded)
             client_shade(client, FALSE);
         client_focus(client);
-        stacking_raise(client);
+        stacking_raise(CLIENT_AS_WINDOW(client));
 	break;
     case ClientMessage:
 	/* validate cuz we query stuff off the client here */

@@ -26,14 +26,26 @@ void stacking_set_list()
 	windows = g_new(Window, size);
 	win_it = windows;
 	for (it = g_list_last(stacking_list); it != NULL;
-             it = it->prev, ++win_it)
-            if (WINDOW_IS_CLIENT(it->data))
+             it = it->prev)
+            if (WINDOW_IS_CLIENT(it->data)) {
                 *win_it = window_top(it->data);
+                ++win_it;
+            }
     } else
-	windows = NULL;
+	windows = win_it = NULL;
 
     PROP_SETA32(ob_root, net_client_list_stacking, window,
-                (guint32*)windows, size);
+                (guint32*)windows, win_it - windows);
+
+    g_print("Client list:");
+    for (it = client_list; it; it = it->next)
+            g_print("0x%lx ", ((Client*)it->data)->window);
+    g_print("\n");
+    g_print("Stacking order: ");
+    for (it = stacking_list; it; it = it->next)
+        if (WINDOW_IS_CLIENT(it->data))
+            g_print("0x%lx ", ((Client*)it->data)->window);
+    g_print("\n");
 
     if (windows)
 	g_free(windows);

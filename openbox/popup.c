@@ -1,13 +1,18 @@
 #include "openbox.h"
 #include "frame.h"
+#include "window.h"
+#include "stacking.h"
 #include "render/render.h"
 #include "render/theme.h"
 
 typedef struct Popup {
-    gboolean hasicon;
+    ObWindow obwin;
     Window bg;
+
     Window icon;
     Window text;
+
+    gboolean hasicon;
     Appearance *a_bg;
     Appearance *a_icon;
     Appearance *a_text;
@@ -16,16 +21,21 @@ typedef struct Popup {
     int y;
     int w;
     int h;
+    gboolean mapped;
 } Popup;
 
 Popup *popup_new(gboolean hasicon)
 {
     Popup *self = g_new(Popup, 1);
+    self->obwin.type = Window_Internal;
     self->hasicon = hasicon;
     self->bg = None;
     self->a_text = NULL;
     self->gravity = NorthWestGravity;
     self->x = self->y = self->w = self->h = 0;
+    self->mapped = FALSE;
+    stacking_add(self);
+    stacking_raise(INTERNAL_AS_WINDOW(self));
     return self;
 }
 
@@ -41,6 +51,7 @@ void popup_free(Popup *self)
     }
     if (self->a_text)
         appearance_free(self->a_text);
+    stacking_remove(self);
     g_free(self);
 }
 
@@ -206,10 +217,17 @@ void popup_show(Popup *self, char *text, Icon *icon)
     if (self->hasicon)
         paint(self->icon, self->a_icon);
 
-    XMapWindow(ob_display, self->bg);
+    if (!self->mapped) {
+        XMapWindow(ob_display, self->bg);
+        stacking_raise(INTERNAL_AS_WINDOW(self));
+        self->mapped = TRUE;
+    }
 }
 
 void popup_hide(Popup *self)
 {
-    XUnmapWindow(ob_display, self->bg);
+    if (self->mapped) {
+        XUnmapWindow(ob_display, self->bg);
+        self->mapped = FALSE;
+    }
 }

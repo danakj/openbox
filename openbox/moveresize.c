@@ -1,10 +1,13 @@
 #include "grab.h"
 #include "framerender.h"
+#include "screen.h"
 #include "prop.h"
 #include "client.h"
 #include "dispatch.h"
 #include "openbox.h"
 #include "popup.h"
+#include "render/render.h"
+#include "render/theme.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -24,12 +27,21 @@ static guint button_return, button_escape, button_left, button_right,
     button_up, button_down;
 
 static Popup *popup = NULL;
+static InternalWindow opaque_window = { { Window_Internal }, None };
+static GC opaque_gc = None;
+static gboolean first_draw = FALSE;
 
 #define POPUP_X (10)
 #define POPUP_Y (10)
 
+gboolean config_opaque_move = FALSE;
+gboolean config_opaque_resize = FALSE;
+
 void moveresize_startup()
 {
+    XSetWindowAttributes attrib;
+    XGCValues gcv;
+
     button_return = XKeysymToKeycode(ob_display, XStringToKeysym("Return"));
     button_escape = XKeysymToKeycode(ob_display, XStringToKeysym("Escape"));
     button_left = XKeysymToKeycode(ob_display, XStringToKeysym("Left"));
@@ -40,12 +52,30 @@ void moveresize_startup()
     popup = popup_new(FALSE);
     popup_size_to_string(popup, "W:  0000  W:  0000");
     popup_position(popup, NorthWestGravity, POPUP_X, POPUP_Y);
+
+    attrib.save_under = True;
+    opaque_window.win = XCreateWindow(ob_display, ob_root, 0, 0, 1, 1, 0,
+                                      render_depth, InputOutput, render_visual,
+                                      CWSaveUnder, &attrib);
+    stacking_add(&opaque_window);
+    stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));
+
+    /* a GC to invert stuff */
+    gcv.function = GXxor;
+    gcv.line_width = theme_bwidth;
+    gcv.foreground = (WhitePixel(ob_display, ob_screen) ^
+                      BlackPixel(ob_display, ob_screen));
+    opaque_gc = XCreateGC(ob_display, opaque_window.win,
+                          GCFunction | GCForeground | GCLineWidth, &gcv);
 }
 
 void moveresize_shutdown()
 {
     popup_free(popup);
     popup = NULL;
+    stacking_remove(&opaque_window);
+    XFreeGC(ob_display, opaque_gc);
+    XDestroyWindow(ob_display, opaque_window.win);
 }
 
 static void popup_coords(char *format, int a, int b)
@@ -117,10 +147,25 @@ void moveresize_start(Client *c, int x, int y, guint b, guint32 cnr)
 
     grab_pointer(TRUE, cur);
     grab_keyboard(TRUE);
+
+    XResizeWindow(ob_display, opaque_window.win, screen_physical_size.width,
+                  screen_physical_size.height);
+    stacking_raise(INTERNAL_AS_WINDOW(&opaque_window));
+    if (corner == prop_atoms.net_wm_moveresize_move ||
+        corner == prop_atoms.net_wm_moveresize_move_keyboard) {
+        if (!config_opaque_move)
+            XMapWindow(ob_display, opaque_window.win);
+    } else {
+        if (!config_opaque_resize)
+            XMapWindow(ob_display, opaque_window.win);
+    }
+    first_draw = TRUE;
 }
 
 void moveresize_end(gboolean cancel)
 {
+    XUnmapWindow(ob_display, opaque_window.win);
+
     grab_keyboard(FALSE);
     grab_pointer(FALSE, None);
 
@@ -145,12 +190,30 @@ void moveresize_end(gboolean cancel)
 
 static void do_move()
 {
+    int oldx, oldy, oldw, oldh;
+
     dispatch_move(moveresize_client, &cur_x, &cur_y);
 
+    oldx = moveresize_client->frame->area.x;
+    oldy = moveresize_client->frame->area.y;
+    oldw = moveresize_client->frame->area.width;
+    oldh = moveresize_client->frame->area.height;
     /* get where the client should be */
     frame_frame_gravity(moveresize_client->frame, &cur_x, &cur_y);
     client_configure(moveresize_client, Corner_TopLeft, cur_x, cur_y,
                      start_cw, start_ch, TRUE, FALSE);
+    /* draw the new one */
+    if (!config_opaque_move)
+        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                       moveresize_client->frame->area.x,
+                       moveresize_client->frame->area.y,
+                       moveresize_client->frame->area.width - 1,
+                       moveresize_client->frame->area.height - 1);
+    /* erase the old one */
+    if (!config_opaque_move && !first_draw)
+        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                       oldx, oldy, oldw - 1, oldh - 1);
+    first_draw = FALSE;
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
@@ -160,6 +223,8 @@ static void do_move()
 
 static void do_resize()
 {
+    int oldx, oldy, oldw, oldh;
+
     /* dispatch_resize needs the frame size */
     cur_x += moveresize_client->frame->size.left +
         moveresize_client->frame->size.right;
@@ -173,8 +238,25 @@ static void do_resize()
     cur_y -= moveresize_client->frame->size.top +
         moveresize_client->frame->size.bottom;
     
-    client_configure(moveresize_client, lockcorner, moveresize_client->area.x,
-                     moveresize_client->area.y, cur_x, cur_y, TRUE, FALSE);
+    oldx = moveresize_client->frame->area.x;
+    oldy = moveresize_client->frame->area.y;
+    oldw = moveresize_client->frame->area.width;
+    oldh = moveresize_client->frame->area.height;
+    client_configure(moveresize_client, lockcorner, 
+                     moveresize_client->area.x, moveresize_client->area.y,
+                     cur_x, cur_y, TRUE, FALSE);
+    /* draw the new one */
+    if (!config_opaque_resize)
+        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                       moveresize_client->frame->area.x,
+                       moveresize_client->frame->area.y,
+                       moveresize_client->frame->area.width - 1,
+                       moveresize_client->frame->area.height - 1);
+    /* erase the old one */
+    if (!config_opaque_resize && !first_draw)
+        XDrawRectangle(ob_display, opaque_window.win, opaque_gc,
+                       oldx, oldy, oldw - 1, oldh - 1);
+    first_draw = FALSE;
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */

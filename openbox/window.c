@@ -13,6 +13,8 @@ Window window_top(ObWindow *self)
         return ((Slit*)self)->frame;
     case Window_Client:
         return ((Client*)self)->frame->window;
+    case Window_Internal:
+        return ((InternalWindow*)self)->win;
     }
     g_assert_not_reached();
     return None;
@@ -27,6 +29,8 @@ Window window_layer(ObWindow *self)
         return ((Slit*)self)->layer;
     case Window_Client:
         return ((Client*)self)->layer;
+    case Window_Internal:
+        return Layer_Internal;
     }
     g_assert_not_reached();
     return None;

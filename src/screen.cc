@@ -261,10 +261,12 @@ void Screen::calcArea()
 #endif // XINERAMA
 */
  
-  if (old_area != _area)
+  if (old_area != _area) {
     // the area has changed, adjust all the maximized windows
+    Client::List::iterator it, end = clients.end();
     for (it = clients.begin(); it != end; ++it)
       (*it)->remaximize();
+  }
 
   changeWorkArea();
 }

@@ -267,8 +267,11 @@ void Toolbar::reconfigure(void) {
   if (ttmp != -1) {
     tt = localtime(&ttmp);
     if (tt) {
-      char t[1024], *time_string = (char *) 0;
+      char t[1025], *time_string = (char *) 0;
       int len = strftime(t, 1024, screen->getStrftimeFormat(), tt);
+      t[len++-1] = ' ';   // add a space to the string for padding
+      t[len++-1] = ' ';   // add a space to the string for padding
+      t[len] = '\0';
 
       if (i18n->multibyte()) {
         XRectangle ink, logical;
@@ -277,9 +280,9 @@ void Toolbar::reconfigure(void) {
         frame.clock_w = logical.width;
 
         // ben's additional solution to pad some space beside the numbers
-        frame.clock_w +=
-          screen->getToolbarStyle()->fontset_extents->max_logical_extent.width *
-          4;
+        //frame.clock_w +=
+        //  screen->getToolbarStyle()->fontset_extents->max_logical_extent.width *
+        //  4;
 
         // brad's solution, which is currently buggy, too big
         //frame.clock_w =
@@ -288,7 +291,7 @@ void Toolbar::reconfigure(void) {
       } else {
         frame.clock_w = XTextWidth(screen->getToolbarStyle()->font, t, len);
         // ben's additional solution to pad some space beside the numbers
-        frame.clock_w += screen->getToolbarStyle()->font->max_bounds.width * 4;
+        //frame.clock_w += screen->getToolbarStyle()->font->max_bounds.width * 4;
         // brad's solution again, too big
         //frame.clock_w = screen->getToolbarStyle()->font->max_bounds.width * len;
       }

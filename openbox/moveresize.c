@@ -76,6 +76,14 @@ void moveresize_start(ObClient *c, int x, int y, guint b, guint32 cnr)
     corner = cnr;
     button = b;
 
+    /*
+      have to change start_cx and start_cy if going to do this..
+    if (corner == prop_atoms.net_wm_moveresize_move_keyboard ||
+        corner == prop_atoms.net_wm_moveresize_size_keyboard)
+        XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
+                     c->area.width / 2, c->area.height / 2);
+    */
+
     if (corner == prop_atoms.net_wm_moveresize_move ||
         corner == prop_atoms.net_wm_moveresize_move_keyboard) {
         cur_x = start_cx;
@@ -262,28 +270,42 @@ void moveresize_event(XEvent *e)
             moveresize_end(FALSE);
         else {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
+                int dx = 0, dy = 0;
+
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    cur_x += MAX(4, moveresize_client->size_inc.width);
+                    dx = MAX(4, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    cur_x -= MAX(4, moveresize_client->size_inc.width);
+                    dx = -MAX(4, moveresize_client->size_inc.width);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    cur_y += MAX(4, moveresize_client->size_inc.height);
+                    dy = MAX(4, moveresize_client->size_inc.height);
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
-                    cur_y -= MAX(4, moveresize_client->size_inc.height);
+                    dy = -MAX(4, moveresize_client->size_inc.height);
                 else
                     return;
+
+                cur_x += dx;
+                cur_y += dy;
+                XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+
                 do_resize(FALSE);
             } else if (corner == prop_atoms.net_wm_moveresize_move_keyboard) {
+                int dx = 0, dy = 0;
+
                 if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
-                    cur_x += 4;
+                    dx = 4;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_LEFT))
-                    cur_x -= 4;
+                    dx = -4;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_DOWN))
-                    cur_y += 4;
+                    dy = 4;
                 else if (e->xkey.keycode == ob_keycode(OB_KEY_UP))
-                    cur_y -= 4;
+                    dy = -4;
                 else
                     return;
+
+                cur_x += dx;
+                cur_y += dy;
+                XWarpPointer(ob_display, None, None, 0, 0, 0, 0, dx, dy);
+
                 do_move(FALSE);
             }
         }

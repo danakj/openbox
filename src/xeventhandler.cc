@@ -121,6 +121,7 @@ void OBXEventHandler::configureRequest(const XConfigureRequestEvent &e)
 // XXX: put this into the OBScreen class!
 static void manageWindow(Window window)
 {
+  OBClient *client = 0;
   XWMHints *wmhint;
   XSetWindowAttributes attrib_set;
 
@@ -146,7 +147,40 @@ static void manageWindow(Window window)
                           CWEventMask|CWDontPropagate, &attrib_set);
 
   // create the OBClient class, which gets all of the hints on the window
-  Openbox::instance->addClient(window, new OBClient(window));
+  Openbox::instance->addClient(window, client = new OBClient(window));
+
+  // we dont want a border on the client
+  XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
+  
+  // specify that if we exit, the window should not be destroyed and should be
+  // reparented back to root automatically
+  XChangeSaveSet(otk::OBDisplay::display, window, SetModeInsert);
+
+  if (!client->positionRequested()) {
+    // XXX: position the window intelligenty
+  }
+  
+  // XXX: grab server, reparent client to the frame, ungrab server
+
+  // XXX: if shaped, shape the frame..
+
+  // XXX: if on the current desktop..
+  /// XMapSubwindows(otk::OBDisplay::display, FRAMEWINDOW);
+  XMapWindow(otk::OBDisplay::display, window);
+ 
+  // handle any requested states such as shaded/maximized
+}
+
+static void unmanageWindow(OBClient *client)
+{
+  Window window = client->window();
+  
+  // we dont want a border on the client
+  XSetWindowBorderWidth(otk::OBDisplay::display, window,client->borderWidth());
+
+  // remove the window from our save set
+  XChangeSaveSet(otk::OBDisplay::display, window, SetModeDelete);
+  
 }
 
 void OBXEventHandler::mapRequest(const XMapRequestEvent &e)

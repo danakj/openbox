@@ -176,6 +176,7 @@ public:
   inline bool focusNotify() const { return _focus_notify; }
   inline bool shaped() const { return _shaped; }
   inline int gravity() const { return _gravity; }
+  inline bool positionRequested() const { return _positioned; }
 
   // states
   inline bool modal() const { return _modal; }
@@ -186,6 +187,7 @@ public:
   inline bool fullscreen() const { return _fullscreen; }
   inline bool floating() const { return _floating; }
 
+  inline int borderWidth() const { return _border_width; }
   inline int minX() const { return _min_x; }
   inline int minY() const { return _min_y; }
   inline int maxX() const { return _max_x; }

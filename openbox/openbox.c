@@ -1,5 +1,6 @@
 #include "openbox.h"
 #include "event.h"
+#include "menu.h"
 #include "client.h"
 #include "dispatch.h"
 #include "xerror.h"
@@ -178,6 +179,7 @@ int main(int argc, char **argv)
         g_free(theme);
         if (!theme) return 1;
 
+        menu_startup();
         frame_startup();
 	focus_startup();
 	screen_startup();
@@ -203,6 +205,7 @@ int main(int argc, char **argv)
 	screen_shutdown();
 	focus_shutdown();
         frame_shutdown();
+        menu_shutdown();
         grab_shutdown();
 	event_shutdown();
         theme_shutdown();

@@ -82,6 +82,8 @@ void keyparse(ParseToken *token)
         /* these use the argument */
         if (action->func == action_execute || action->func == action_restart)
             action->data.execute.path = g_strdup(arg_str);
+        else if (action->func == action_showmenu)
+            action->data.showmenu.name = g_strdup(arg_str);
         if ((action->func == action_desktop ||
              action->func == action_send_to_desktop) &&
             arg_int)

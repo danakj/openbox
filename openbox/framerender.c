@@ -242,7 +242,7 @@ void framerender_size_popup_label(char *text, Size *sz)
     a = theme_app_hilite_label;
     a->texture[0].data.text.string = text;
 
-    appearance_minsize(a, sz);
+    appearance_minsize(a, &sz->width, &sz->height);
     sz->width += theme_bevel * 2;
     sz->height += theme_bevel * 2;
 }

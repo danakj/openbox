@@ -65,7 +65,9 @@ struct Resize {
 
 struct ShowMenu {
     Client *c;
-    char *menuName;
+    char *name;
+    int x;
+    int y;
 };
 
 struct CycleWindows {
@@ -87,7 +89,7 @@ union ActionData {
     struct NextPreviousDesktop nextprevdesktop;
     struct Move move;
     struct Resize resize;
-    struct ShowMenu showMenu;
+    struct ShowMenu showmenu;
     struct CycleWindows cycle;
 };
 

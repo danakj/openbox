@@ -105,7 +105,7 @@ static void clearall()
 }
 
 static void fire_button(MouseAction a, Context context, Client *c, guint state,
-                        guint button)
+                        guint button, int x, int y)
 {
     GSList *it;
     MouseBinding *b;
@@ -123,6 +123,11 @@ static void fire_button(MouseAction a, Context context, Client *c, guint state,
 
         g_assert(!(b->action[a]->func == action_move ||
                    b->action[a]->func == action_resize));
+
+        if (b->action[a]->func == action_showmenu) {
+            b->action[a]->data.showmenu.x = x;
+            b->action[a]->data.showmenu.y = y;
+        }
 
         b->action[a]->func(&b->action[a]->data);
     }
@@ -245,7 +250,8 @@ static void event(ObEvent *e, void *foo)
 
         fire_button(MouseAction_Press, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
-                    e->data.x.e->xbutton.button);
+                    e->data.x.e->xbutton.button,
+                    e->data.x.e->xbutton.x_root, e->data.x.e->xbutton.y_root);
 
         if (context == Context_Client) {
             /* Replay the event, so it goes to the client*/
@@ -295,15 +301,20 @@ static void event(ObEvent *e, void *foo)
         }
         fire_button(MouseAction_Release, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
-                    e->data.x.e->xbutton.button);
+                    e->data.x.e->xbutton.button,
+                    e->data.x.e->xbutton.x_root, e->data.x.e->xbutton.y_root);
         if (click)
             fire_button(MouseAction_Click, context,
                         e->data.x.client, e->data.x.e->xbutton.state,
-                        e->data.x.e->xbutton.button);
+                        e->data.x.e->xbutton.button,
+                        e->data.x.e->xbutton.x_root,
+                        e->data.x.e->xbutton.y_root);
         if (dclick)
             fire_button(MouseAction_DClick, context,
                         e->data.x.client, e->data.x.e->xbutton.state,
-                        e->data.x.e->xbutton.button);
+                        e->data.x.e->xbutton.button,
+                        e->data.x.e->xbutton.x_root,
+                        e->data.x.e->xbutton.y_root);
         break;
 
     case Event_X_MotionNotify:

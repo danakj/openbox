@@ -1,5 +1,6 @@
 #include "client.h"
 #include "focus.h"
+#include "menu.h"
 #include "stacking.h"
 #include "frame.h"
 #include "framerender.h"
@@ -15,10 +16,6 @@ Action *action_new(void (*func)(union ActionData *data))
     Action *a = g_new0(Action, 1);
     a->func = func;
 
-    /* deal with pointers */
-    if (func == action_execute)
-        a->data.execute.path = NULL;
-
     return a;
 }
 
@@ -29,6 +26,8 @@ void action_free(Action *a)
     /* deal with pointers */
     if (a->func == action_execute || a->func == action_restart)
         g_free(a->data.execute.path);
+    else if (a->func == action_showmenu)
+        g_free(a->data.showmenu.name);
 
     g_free(a);
 }
@@ -708,7 +707,8 @@ void action_exit(union ActionData *data)
 
 void action_showmenu(union ActionData *data)
 {
-    g_message(__FUNCTION__);
+    menu_show(data->showmenu.name, data->showmenu.x, data->showmenu.y,
+              data->showmenu.c);
 }
 
 static void popup_cycle(Client *c, gboolean hide)

@@ -11,6 +11,7 @@ extern "C" {
 namespace otk {
 
 class RenderColor {
+public:
   struct RGB {
     int r;
     int g;
@@ -22,7 +23,8 @@ class RenderColor {
         g((color >> 8) & 0xff),
         b((color) & 0xff) {}
   };
-  
+
+private:
   struct CacheItem {
     GC gc;
     int count;

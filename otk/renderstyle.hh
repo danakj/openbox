@@ -3,6 +3,8 @@
 #define __renderstyle_hh
 
 #include "rendertexture.hh"
+#include "rendercolor.hh"
+#include "font.hh"
 
 #include <string>
 
@@ -20,11 +22,15 @@ private:
   int _screen;
   std::string _file;
   
-  RenderColor *_text_focus_color;
-  RenderColor *_text_unfocus_color;
+  RenderColor *_text_color_focus;
+  RenderColor *_text_color_unfocus;
+
+  RenderColor *_button_color_focus;
+  RenderColor *_button_color_unfocus;
 
   RenderColor *_frame_border_color;
-  int _frame_border_wirth;
+  int _frame_border_width;
+
   RenderColor *_client_border_color_focus; 
   RenderColor *_client_border_color_unfocus;
   int _client_border_width;
@@ -59,8 +65,13 @@ public:
   inline RenderColor *textFocusColor() const { return _text_color_focus; }
   inline RenderColor *textUnfocusColor() const { return _text_color_unfocus; }
 
+  inline RenderColor *buttonFocusColor() const { return _button_color_focus; }
+  inline RenderColor *buttonUnfocusColor() const
+    { return _button_color_unfocus; }
+
   inline RenderColor *frameBorderColor() const { return _frame_border_color; }
-  inline int frameBorderWidth() const { return _frame_border_wirth; }
+  inline int frameBorderWidth() const { return _frame_border_width; }
+
   inline RenderColor *clientBorderFocusColor() const
     { return _client_border_color_focus; }
   inline RenderColor *clientBorderUnfocusColor() const
@@ -75,8 +86,9 @@ public:
   inline RenderTexture *labelFocusBackground() const { return _label_focus; }
   inline RenderTexture *labelUnfocusBackground() const { return _label_unfocus;}
 
-  inline RenderTexture *handleFocusBackground() const { _handle_focus; }
-  inline RenderTexture *handleUnfocusBackground() const { _handle_unfocus; }
+  inline RenderTexture *handleFocusBackground() const { return _handle_focus; }
+  inline RenderTexture *handleUnfocusBackground() const
+    { return _handle_unfocus; }
 
   inline RenderTexture *buttonUnpressFocusBackground() const
     { return _button_unpress_focus; }

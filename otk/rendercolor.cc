@@ -33,17 +33,6 @@ RenderColor::RenderColor(int screen, unsigned char red,
   create();
 }
 
-RenderColor::RenderColor(int screen, unsigned char red,
-			 unsigned char green, unsigned char blue)
-  : _screen(screen),
-    _red(red),
-    _green(green),
-    _blue(blue),
-    _gc(0)
-{
-  create();
-}
-
 RenderColor::RenderColor(int screen, RGB rgb)
   : _screen(screen),
     _red(rgb.r),

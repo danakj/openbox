@@ -31,6 +31,8 @@ public:
   };
 
 private:
+  int _screen;
+  
   //! If true, the texture is not rendered at all, so all options are ignored
   bool _parent_relative;
   //! The relief type of the texture
@@ -65,27 +67,47 @@ private:
   const RenderColor *_interlace_color;
 
 public:
-  RenderTexture(bool parent_relative, ReliefType relief, BevelType bevel,
+  RenderTexture(int screen,
+                bool parent_relative, ReliefType relief, BevelType bevel,
                 bool border, GradientType gradient, bool interlaced,
                 const RenderColor::RGB &color,
                 const RenderColor::RGB &secondary_color,
-                const RenderColor::RGB &bevel_dark_color,
-                const RenderColor::RGB &bevel_light_color,
                 const RenderColor::RGB &border_color,
                 const RenderColor::RGB &interlace_color)
-    : _parent_relative(parent_relative),
+    : _screen(screen),
+      _parent_relative(parent_relative),
       _relief(relief),
       _bevel(bevel),
       _border(border),
       _gradient(gradient),
       _interlaced(interlaced),
-      _color(new RenderColor(color)),
-      _secondary_color(new RenderColor(secondary_color)),
-      _bevel_dark_color(new RenderColor(bevel_dark_color)),
-      _bevel_light_color(new RenderColor(bevel_light_color)),
-      _border_color(new RenderColor(border_color)),
-      _interlace_color(new RenderColor(interlace_color))
+      _color(new RenderColor(screen, color)),
+      _secondary_color(new RenderColor(screen, secondary_color)),
+      _bevel_dark_color(0),
+      _bevel_light_color(0),
+      _border_color(new RenderColor(screen, border_color)),
+      _interlace_color(new RenderColor(screen, interlace_color))
   {
+    if (_relief != Flat) {
+      unsigned char r, g, b;
+
+      // calculate the light bevel color
+      r = _color->red() + _color->red() / 2;
+      g = _color->green() + _color->green() / 2;
+      b = _color->blue() + _color->blue() / 2;
+      // watch for wraparound
+      if (r < _color->red()) r = 0xff;
+      if (g < _color->green()) g = 0xff;
+      if (b < _color->blue()) b = 0xff;
+      _bevel_dark_color = new RenderColor(screen, r, g, b);
+      
+      // calculate the dark bevel color
+      r = _color->red() / 4 + _color->red() / 2;
+      g = _color->green() / 4 + _color->green() / 2;
+      b = _color->blue() / 4 + _color->blue() / 2;
+      _bevel_light_color = new RenderColor(screen, r, g, b);
+    }
+    
     assert(_relief == Flat || (_bevel_dark_color && _bevel_light_color));
     assert(!_border || _border_color);
     assert(!_interlaced || _interlace_color);
@@ -95,8 +117,8 @@ public:
   virtual ~RenderTexture() {
     delete _color;
     delete _secondary_color;
-    delete _bevel_dark_color;
-    delete _bevel_light_color;
+    if (_bevel_dark_color) delete _bevel_dark_color;
+     if (_bevel_dark_color) delete _bevel_light_color;
     delete _border_color;
     delete _interlace_color;
   }

@@ -89,6 +89,9 @@ static void client_update(ObMenuFrame *frame, gpointer data)
 
     e = menu_find_entry_id(menu, CLIENT_CLOSE);
     e->data.normal.enabled = frame->client->functions & OB_CLIENT_FUNC_CLOSE;
+
+    e = menu_find_entry_id(menu, CLIENT_DECORATE);
+    e->data.normal.enabled = client_normal(frame->client);
 }
 
 static void layer_update(ObMenuFrame *frame, gpointer data)

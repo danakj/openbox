@@ -283,6 +283,8 @@ void menu_show(gchar *name, gint x, gint y, ObClient *client)
 
     if (!(self = menu_from_name(name))) return;
 
+    menu_frame_hide_all();
+
     frame = menu_frame_new(self, client);
     menu_frame_move(frame, x, y);
     menu_frame_show(frame, NULL);

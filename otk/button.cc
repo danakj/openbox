@@ -74,7 +74,8 @@ bool OtkButton::expose(const XExposeEvent &e)
 
 bool OtkButton::configure(const XConfigureEvent &e)
 {
-  _dirty = true;
+  if (!(e.width == width() && e.height == height()))
+    _dirty = true;
   return OtkFocusWidget::configure(e);
 }
 

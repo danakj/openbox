@@ -173,8 +173,11 @@ void popup_show(Popup *self, char *text, Icon *icon)
                      textw, texth);
 
     if (self->hasicon) {
-        RrTextureSetRGBA(self->s_icon, 0, icon->data, 0, 0, icon->width,
-                         icon->height);
+        if (icon)
+            RrTextureSetRGBA(self->s_icon, 0, icon->data, 0, 0, icon->width,
+                             icon->height);
+        else
+            RrTextureSetNone(self->s_icon, 0);
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         RrSurfaceSetArea(self->s_icon,
                          theme_bwidth + theme_bevel,

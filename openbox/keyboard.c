@@ -244,10 +244,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
 
                         if (act->func == action_showmenu)
                         {
-                            act->data.showmenu.x =
-                                e->xkey.x_root;
-                            act->data.showmenu.y =
-                                e->xkey.y_root;
+                            act->data.showmenu.x = e->xkey.x_root;
+                            act->data.showmenu.y = e->xkey.y_root;
                         }
 
                         act->data.any.c = client;

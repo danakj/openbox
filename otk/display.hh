@@ -96,6 +96,8 @@ public:
   */
   static const ScreenInfo* screenInfo(int snum);
 
+  static const ScreenInfo* findScreen(Window root);
+
   //! Returns if the display has the shape extention available
   inline static bool shape() { return _shape; }
   //! Returns the shape extension's event base

@@ -532,7 +532,7 @@ void OBScreen::manageWindow(Window window)
   }
 
   // call the python NEWWINDOW binding
-  EventData *data = new_event_data(window, EventNewWindow, 0);
+  EventData *data = new_event_data(_number, window, EventNewWindow, 0);
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
 
@@ -545,7 +545,8 @@ void OBScreen::unmanageWindow(OBClient *client)
   OBFrame *frame = client->frame;
 
   // call the python CLOSEWINDOW binding 
-  EventData *data = new_event_data(client->window(), EventCloseWindow, 0);
+  EventData *data = new_event_data(_number, client->window(),
+                                   EventCloseWindow, 0);
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
 

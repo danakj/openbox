@@ -359,7 +359,8 @@ void OBBindings::grabKeys(bool grab)
 }
 
 
-void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
+void OBBindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
+                         Time time)
 {
   if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
     resetChains(this);
@@ -376,7 +377,7 @@ void OBBindings::fireKey(unsigned int modifiers, unsigned int key, Time time)
           Window win = None;
           OBClient *c = Openbox::instance->focusedClient();
           if (c) win = c->window();
-          KeyData *data = new_key_data(win, time, modifiers, key);
+          KeyData *data = new_key_data(screen, win, time, modifiers, key);
           CallbackList::iterator it, end = p->callbacks.end();
           for (it = p->callbacks.begin(); it != end; ++it)
             python_callback(*it, (PyObject*)data);

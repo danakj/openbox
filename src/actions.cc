@@ -74,8 +74,10 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  ButtonData *data = new_button_data(e.window, e.time, state, e.button,
-                                     w->mcontext(), MousePress);
+  ButtonData *data =
+    new_button_data(otk::OBDisplay::findScreen(e.root)->screen(),
+                    e.window, e.time, state, e.button, w->mcontext(),
+                    MousePress);
   Openbox::instance->bindings()->fireButton(data);
   Py_DECREF((PyObject*)data);
     
@@ -112,8 +114,10 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  ButtonData *data = new_button_data(e.window, e.time, state, e.button,
-                                     w->mcontext(), MouseClick);
+  ButtonData *data =
+    new_button_data(otk::OBDisplay::findScreen(e.root)->screen(),
+                    e.window, e.time, state, e.button, w->mcontext(),
+                    MouseClick);
   Openbox::instance->bindings()->fireButton(data);
     
 
@@ -149,7 +153,9 @@ void OBActions::enterHandler(const XCrossingEvent &e)
   OtkEventHandler::enterHandler(e);
   
   // run the ENTER python hook
-  EventData *data = new_event_data(e.window, EventEnterWindow, e.state);
+  EventData *data =
+    new_event_data(otk::OBDisplay::findScreen(e.root)->screen(),
+                   e.window, EventEnterWindow, e.state);
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
 }
@@ -160,7 +166,9 @@ void OBActions::leaveHandler(const XCrossingEvent &e)
   OtkEventHandler::leaveHandler(e);
 
   // run the LEAVE python hook
-  EventData *data = new_event_data(e.window, EventLeaveWindow, e.state);
+  EventData *data =
+    new_event_data(otk::OBDisplay::findScreen(e.root)->screen(),
+                   e.window, EventLeaveWindow, e.state);
   Openbox::instance->bindings()->fireEvent(data);
   Py_DECREF((PyObject*)data);
 }
@@ -173,7 +181,9 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  Openbox::instance->bindings()->fireKey(state, e.keycode, e.time);
+  Openbox::instance->bindings()->
+    fireKey(otk::OBDisplay::findScreen(e.root)->screen(),
+            state, e.keycode, e.time);
 }
 
 
@@ -206,10 +216,11 @@ void OBActions::motionHandler(const XMotionEvent &e)
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;
-  MotionData *data = new_motion_data(e.window, e.time, state, button,
-                                     w->mcontext(), MouseMotion,
-                                     x_root, y_root, _posqueue[0]->pos,
-                                     _posqueue[0]->clientarea);
+  MotionData *data =
+    new_motion_data(otk::OBDisplay::findScreen(e.root)->screen(),
+                    e.window, e.time, state, button, w->mcontext(),
+                    MouseMotion, x_root, y_root, _posqueue[0]->pos,
+                    _posqueue[0]->clientarea);
   Openbox::instance->bindings()->fireButton((ButtonData*)data);
   Py_DECREF((PyObject*)data);
 }

@@ -176,6 +176,16 @@ const ScreenInfo* OBDisplay::screenInfo(int snum) {
 }
 
 
+const ScreenInfo* OBDisplay::findScreen(Window root)
+{
+  ScreenInfoList::iterator it, end = _screenInfoList.end();
+  for (it = _screenInfoList.begin(); it != end; ++it)
+    if (it->rootWindow() == root)
+      return &(*it);
+  return 0;
+}
+
+
 void OBDisplay::grab()
 {
   if (_grab_count == 0)

@@ -5497,6 +5497,25 @@ static PyObject *_wrap_OBDisplay_screenInfo(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_OBDisplay_findScreen(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    Window arg1 ;
+    otk::ScreenInfo *result;
+    Window *argp1 ;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBDisplay_findScreen",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &argp1, SWIGTYPE_p_Window,SWIG_POINTER_EXCEPTION) == -1)) SWIG_fail;
+    arg1 = *argp1; 
+    result = (otk::ScreenInfo *)otk::OBDisplay::findScreen(arg1);
+    
+    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__ScreenInfo, 0);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_OBDisplay_shape(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     bool result;
@@ -13066,6 +13085,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBDisplay_destroy", _wrap_OBDisplay_destroy, METH_VARARGS },
 	 { (char *)"OBDisplay_gcCache", _wrap_OBDisplay_gcCache, METH_VARARGS },
 	 { (char *)"OBDisplay_screenInfo", _wrap_OBDisplay_screenInfo, METH_VARARGS },
+	 { (char *)"OBDisplay_findScreen", _wrap_OBDisplay_findScreen, METH_VARARGS },
 	 { (char *)"OBDisplay_shape", _wrap_OBDisplay_shape, METH_VARARGS },
 	 { (char *)"OBDisplay_shapeEventBase", _wrap_OBDisplay_shapeEventBase, METH_VARARGS },
 	 { (char *)"OBDisplay_xinerama", _wrap_OBDisplay_xinerama, METH_VARARGS },

@@ -61,6 +61,7 @@ enum EventAction {
 // *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
 typedef struct {
   PyObject_HEAD;
+  int screen;
   Window window;
   Time time;
   unsigned int state;
@@ -80,6 +81,7 @@ typedef struct {
 // *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
 typedef struct {
   PyObject_HEAD;
+  int screen;
   Window window;
   Time time;
   unsigned int state;
@@ -90,6 +92,7 @@ typedef struct {
 
 typedef struct {
   PyObject_HEAD;
+  int screen;
   Window window;
   unsigned int state;
   EventAction action;
@@ -97,6 +100,7 @@ typedef struct {
 
 typedef struct {
   PyObject_HEAD;
+  int screen;
   Window window;
   Time time;
   unsigned int state;
@@ -107,17 +111,17 @@ void python_init(char *argv0);
 void python_destroy();
 bool python_exec(const std::string &path);
                  
-MotionData *new_motion_data(Window window, Time time, unsigned int state,
-                            unsigned int button, MouseContext context,
-                            MouseAction action, int xroot, int yroot,
-                            const otk::Point &initpos,
+MotionData *new_motion_data(int screen, Window window, Time time,
+                            unsigned int state, unsigned int button,
+                            MouseContext context, MouseAction action,
+                            int xroot, int yroot, const otk::Point &initpos,
                             const otk::Rect &initarea);
-ButtonData *new_button_data(Window window, Time time, unsigned int state,
-                            unsigned int button, MouseContext context,
-                            MouseAction action);
-EventData *new_event_data(Window window, EventAction action,
-                           unsigned int state);
-KeyData *new_key_data(Window window, Time time, unsigned int state,
+ButtonData *new_button_data(int screen, Window window, Time time,
+                            unsigned int state, unsigned int button,
+                            MouseContext context, MouseAction action);
+EventData *new_event_data(int screen, Window window, EventAction action,
+                          unsigned int state);
+KeyData *new_key_data(int screen, Window window, Time time, unsigned int state,
                       unsigned int key);
 
 void python_callback(PyObject *func, PyObject *data);

@@ -104,6 +104,26 @@ def unshade(data):
     client = Openbox_findClient(openbox, data.window())
     if not client: return
     OBClient_shade(client, 0)
+
+def next_desktop(data):
+    screen = Openbox_screen(openbox, data.screen())
+    d = OBScreen_desktop(screen)
+    n = OBScreen_numDesktops(screen)
+    if (d == (n-1)):
+        d = 0
+    else:
+        d = d + 1
+    OBScreen_changeDesktop(screen, d)
+    
+def prev_desktop(data):
+    screen = Openbox_screen(openbox, data.screen())
+    d = OBScreen_desktop(screen)
+    n = OBScreen_numDesktops(screen)
+    if (d > 0):
+        d = d - 1
+    else:
+        d = n - 1
+    OBScreen_changeDesktop(screen, d)
     
 #########################################
 ### Convenience functions for scripts ###

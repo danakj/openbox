@@ -27,6 +27,12 @@ static void dealloc(PyObject *self)
   PyObject_Del(self);
 }
 
+PyObject *MotionData_screen(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":screen")) return NULL;
+  return PyLong_FromLong(self->screen);
+}
+
 PyObject *MotionData_window(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":window")) return NULL;
@@ -124,6 +130,8 @@ PyObject *MotionData_time(MotionData *self, PyObject *args)
 static PyMethodDef MotionData_methods[] = {
   {"action", (PyCFunction)MotionData_action, METH_VARARGS,
    "Return the action being executed."},
+  {"screen", (PyCFunction)MotionData_screen, METH_VARARGS,
+   "Return the number of the screen the event is on."},
   {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
   {"context", (PyCFunction)MotionData_context, METH_VARARGS,
@@ -160,6 +168,8 @@ static PyMethodDef ButtonData_methods[] = {
    "Return the action being executed."},
   {"context", (PyCFunction)MotionData_context, METH_VARARGS,
    "Return the context that the action is occuring in."},
+  {"screen", (PyCFunction)MotionData_screen, METH_VARARGS,
+   "Return the number of the screen the event is on."},
   {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
   {"modifiers", (PyCFunction)MotionData_modifiers, METH_VARARGS,
@@ -184,6 +194,8 @@ PyObject *EventData_modifiers(EventData *self, PyObject *args)
 }
 
 static PyMethodDef EventData_methods[] = {
+  {"screen", (PyCFunction)MotionData_screen, METH_VARARGS,
+   "Return the number of the screen the event is on."},
   {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
   {"action", (PyCFunction)EventData_action, METH_VARARGS,
@@ -202,6 +214,8 @@ PyObject *KeyData_key(KeyData *self, PyObject *args)
 }
 
 static PyMethodDef KeyData_methods[] = {
+  {"screen", (PyCFunction)MotionData_screen, METH_VARARGS,
+   "Return the number of the screen the event is on."},
   {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
   {"modifiers", (PyCFunction)MotionData_modifiers, METH_VARARGS,
@@ -281,12 +295,14 @@ static PyTypeObject KeyData_Type = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-MotionData *new_motion_data(Window window, Time time, unsigned int state,
-                          unsigned int button, MouseContext context,
-                          MouseAction action, int xroot, int yroot,
-                          const otk::Point &initpos, const otk::Rect &initarea)
+MotionData *new_motion_data(int screen, Window window, Time time,
+                            unsigned int state, unsigned int button,
+                            MouseContext context, MouseAction action,
+                            int xroot, int yroot, const otk::Point &initpos,
+                            const otk::Rect &initarea)
 {
   MotionData *data = PyObject_New(MotionData, &MotionData_Type);
+  data->screen = screen;
   data->window = window;
   data->time   = time;
   data->state  = state;
@@ -304,11 +320,12 @@ MotionData *new_motion_data(Window window, Time time, unsigned int state,
   return data;
 }
 
-ButtonData *new_button_data(Window window, Time time, unsigned int state,
-                          unsigned int button, MouseContext context,
-                          MouseAction action)
+ButtonData *new_button_data(int screen, Window window, Time time,
+                            unsigned int state, unsigned int button,
+                            MouseContext context, MouseAction action)
 {
   ButtonData *data = PyObject_New(ButtonData, &ButtonData_Type);
+  data->screen = screen;
   data->window = window;
   data->time   = time;
   data->state  = state;
@@ -318,20 +335,22 @@ ButtonData *new_button_data(Window window, Time time, unsigned int state,
   return data;
 }
 
-EventData *new_event_data(Window window, EventAction action,
+EventData *new_event_data(int screen, Window window, EventAction action,
                           unsigned int state)
 {
   EventData *data = PyObject_New(EventData, &EventData_Type);
+  data->screen = screen;
   data->window = window;
   data->action = action;
   data->state  = state;
   return data;
 }
 
-KeyData *new_key_data(Window window, Time time, unsigned int state,
-                       unsigned int key)
+KeyData *new_key_data(int screen, Window window, Time time, unsigned int state,
+                      unsigned int key)
 {
   KeyData *data = PyObject_New(KeyData, &KeyData_Type);
+  data->screen = screen;
   data->window = window;
   data->time   = time;
   data->state  = state;

@@ -111,7 +111,7 @@ public:
   //! Removes all key bindings
   void removeAllKeys();
 
-  void fireKey(unsigned int modifiers,unsigned int key, Time time);
+  void fireKey(int screen, unsigned int modifiers,unsigned int key, Time time);
 
   void setResetKey(const std::string &key);
 

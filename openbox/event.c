@@ -931,18 +931,20 @@ static void event_handle_menu(Menu *menu, Client *client, XEvent *e)
 
 /*        grab_pointer_window(FALSE, None, menu->frame);*/
 
-        entry = menu_find_entry(menu, e->xbutton.window);
-        if (entry) {
-            int junk;
-            Window wjunk;
-            guint ujunk, b, w, h;
-            XGetGeometry(ob_display, e->xbutton.window,
-                         &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
-            if (e->xbutton.x >= (signed)-b &&
-                e->xbutton.y >= (signed)-b &&
-                e->xbutton.x < (signed)(w+b) &&
-                e->xbutton.y < (signed)(h+b)) {
-                menu_entry_fire(entry);
+        if (e->xbutton.button == 1) {
+            entry = menu_find_entry(menu, e->xbutton.window);
+            if (entry) {
+                int junk;
+                Window wjunk;
+                guint ujunk, b, w, h;
+                XGetGeometry(ob_display, e->xbutton.window,
+                             &wjunk, &junk, &junk, &w, &h, &b, &ujunk);
+                if (e->xbutton.x >= (signed)-b &&
+                    e->xbutton.y >= (signed)-b &&
+                    e->xbutton.x < (signed)(w+b) &&
+                    e->xbutton.y < (signed)(h+b)) {
+                    menu_entry_fire(entry);
+                }
             }
         }
 	

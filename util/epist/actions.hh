@@ -28,6 +28,7 @@ extern "C" {
 }
 
 #include <list>
+#include <string>
 
 class Action {
 public:
@@ -81,14 +82,18 @@ private:
   const unsigned int _modifierMask;
 
   const int _numberParam;
+  const std::string _stringParam;
 public:
   inline enum ActionType type() const { return _type;}
   inline const KeyCode keycode() const { return _keycode; }
   inline const unsigned int modifierMask() const { return _modifierMask; }
   inline const int number() const { return _numberParam; }
+  inline const std::string &string() const { return _stringParam; }
 
   Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
          int number = 0);
+  Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
+         const std::string &str);
 };
   
 typedef std::list<Action> ActionList;

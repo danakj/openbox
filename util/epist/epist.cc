@@ -159,7 +159,7 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
   _actions.push_back(Action(Action::execute,
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("F6")),
-                           Mod1Mask));
+                           Mod1Mask, "aterm"));
   activateGrabs();
 }
 

@@ -202,7 +202,7 @@ void screen::handleKeypress(const XEvent &e) {
         return;
 
       case Action::execute:
-        execCommand("aterm");
+        execCommand(it->string());
         return;
       }
 

@@ -23,6 +23,13 @@
 #include "actions.hh"
 
 Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
-               int num): _type(type), _keycode(keycode),
-                         _modifierMask(modifierMask), _numberParam(num)
+               int num)
+  : _type(type), _keycode(keycode),
+    _modifierMask(modifierMask), _numberParam(num)
+{ }
+
+Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
+               const std::string &str)
+  : _type(type), _keycode(keycode),
+    _modifierMask(modifierMask), _stringParam(str)
 { }

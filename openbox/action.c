@@ -60,10 +60,14 @@ Action *action_from_string(char *name)
         a = action_new(action_toggle_shade);
     } else if (!g_ascii_strcasecmp(name, "toggleomnipresent")) {
         a = action_new(action_toggle_omnipresent);
-    } else if (!g_ascii_strcasecmp(name, "moverelative")) {
-        a = action_new(action_move_relative);
-    } else if (!g_ascii_strcasecmp(name, "resizerelative")) {
-        a = action_new(action_resize_relative);
+    } else if (!g_ascii_strcasecmp(name, "moverelativehorz")) {
+        a = action_new(action_move_relative_horz);
+    } else if (!g_ascii_strcasecmp(name, "moverelativevert")) {
+        a = action_new(action_move_relative_vert);
+    } else if (!g_ascii_strcasecmp(name, "resizerelativehorz")) {
+        a = action_new(action_resize_relative_horz);
+    } else if (!g_ascii_strcasecmp(name, "resizerelativevert")) {
+        a = action_new(action_resize_relative_vert);
     } else if (!g_ascii_strcasecmp(name, "maximizefull")) {
         a = action_new(action_maximize_full);
     } else if (!g_ascii_strcasecmp(name, "unmaximizefull")) {
@@ -234,23 +238,40 @@ void action_toggle_omnipresent(union ActionData *data)
                            screen_desktop : DESKTOP_ALL);
 }
 
-void action_move_relative(union ActionData *data)
+void action_move_relative_horz(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c)
         client_configure(c, Corner_TopLeft,
-                         c->area.x + data->relative.dx,
-                         c->area.y + data->relative.dy,
+                         c->area.x + data->relative.delta, c->area.y,
                          c->area.width, c->area.height, TRUE, TRUE);
 }
 
-void action_resize_relative(union ActionData *data)
+void action_move_relative_vert(union ActionData *data)
+{
+    Client *c = data->relative.c;
+    if (c)
+        client_configure(c, Corner_TopLeft,
+                         c->area.x, c->area.y + data->relative.delta,
+                         c->area.width, c->area.height, TRUE, TRUE);
+}
+
+void action_resize_relative_horz(union ActionData *data)
 {
     Client *c = data->relative.c;
     if (c)
         client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
-                         c->area.width + data->relative.dx,
-                         c->area.height + data->relative.dy, TRUE, TRUE);
+                         c->area.width + data->relative.delta,
+                         c->area.height, TRUE, TRUE);
+}
+
+void action_resize_relative_vert(union ActionData *data)
+{
+    Client *c = data->relative.c;
+    if (c)
+        client_configure(c, Corner_TopLeft, c->area.x, c->area.y,
+                         c->area.width, c->area.height + data->relative.delta,
+                         TRUE, TRUE);
 }
 
 void action_maximize_full(union ActionData *data)

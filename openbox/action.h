@@ -23,8 +23,7 @@ struct ClientAction {
 
 struct MoveResizeRelative {
     Client *c;
-    int dx;
-    int dy;
+    int delta;
 };
 
 struct SendToDesktop {
@@ -123,9 +122,13 @@ void action_toggle_shade(union ActionData *data);
 /* ClientAction */
 void action_toggle_omnipresent(union ActionData *data);
 /* MoveResizeRelative */
-void action_move_relative(union ActionData *data);
+void action_move_relative_horz(union ActionData *data);
 /* MoveResizeRelative */
-void action_resize_relative(union ActionData *data);
+void action_move_relative_vert(union ActionData *data);
+/* MoveResizeRelative */
+void action_resize_relative_horz(union ActionData *data);
+/* MoveResizeRelative */
+void action_resize_relative_vert(union ActionData *data);
 /* ClientAction */
 void action_maximize_full(union ActionData *data);
 /* ClientAction */

@@ -48,10 +48,9 @@ def _remove(client):
     raise ValueError("_remove(x): x not in _clients list.")
 
 def _focused(data):
-    global _clients
+    global _clients, _skip
 
     if _skip:
-        global _skip
         _skip -= 1
         return
 

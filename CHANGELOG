@@ -17,8 +17,8 @@
       move/resize-popup is shown, these go in the resize section of the config
       popupPosition can be Top or Center, popupShow can be Always, Never or
       Nonpixel (this is the default).
-    * Changed the default behaviour for the menus when opened along the bottom
-      edge of the screen, the xorStyle option can be used to turn it on again
+    * Added the xorStyle option to change the behaviour of menus along the bottom
+      edge, note that the default is true
     * warpPointer option in the menu section to control if the mouse cursor is
       to be warped by openbox when the menu moves to keep on screen to keep the
       cursor in the same place relative to the menu. (I think i got that right)

@@ -134,7 +134,8 @@ gboolean startup()
     g_quark_from_string("icon");
     g_quark_from_string("close");
 
-    s_b_color = s_cb_unfocused_color = s_cb_focused_color = NULL;
+    s_b_color = s_cb_unfocused_color = s_cb_focused_color = 
+        s_title_unfocused_color = s_title_focused_color = NULL;
     s_winfont = NULL;
 
     a_focused_unpressed_max = appearance_new(Surface_Planar, 0);//1);
@@ -163,18 +164,6 @@ gboolean startup()
     a_focused_handle = appearance_new(Surface_Planar, 0);
     a_unfocused_handle = appearance_new(Surface_Planar, 0);
 
-    a_focused_label->texture[0].type = Text;
-    a_focused_label->texture[0].data.text.font = s_winfont;
-    a_focused_label->texture[0].data.text.shadow = s_winfont_shadow;
-    a_focused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
-    a_focused_label->texture[0].data.text.color = s_title_focused_color;
-
-    a_unfocused_label->texture[0].type = Text;
-    a_unfocused_label->texture[0].data.text.font = s_winfont;
-    a_unfocused_label->texture[0].data.text.shadow = s_winfont_shadow;
-    a_unfocused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
-    a_unfocused_label->texture[0].data.text.color = s_title_unfocused_color;
-
     return load();
 }
 
@@ -183,6 +172,8 @@ void shutdown()
     if (s_b_color != NULL) color_free(s_b_color);
     if (s_cb_unfocused_color != NULL) color_free(s_cb_unfocused_color);
     if (s_cb_focused_color != NULL) color_free(s_cb_focused_color);
+    if (s_title_unfocused_color != NULL) color_free(s_title_unfocused_color);
+    if (s_title_focused_color != NULL) color_free(s_title_focused_color);
 
     if (s_winfont != NULL) font_close(s_winfont);
 
@@ -747,16 +738,17 @@ static void render(ObFrame *self)
 
 static void render_label(ObFrame *self)
 {
+    Appearance *a;
+
     if (self->label_x < 0) return;
 
-    /* set the texture's text! */
-    self->a_focused_label->texture[0].data.text.string =
-        self->frame.client->title;
+    a = (self->frame.client->focused ?
+         self->a_focused_label : self->a_focused_label);
 
-    paint(self->label, (self->frame.client->focused ?
-			self->a_focused_label :
-			self->a_unfocused_label),
-	  self->label_width, LABEL_HEIGHT);
+    /* set the texture's text! */
+    a->texture[0].data.text.string = self->frame.client->title;
+
+    paint(self->label, a, self->label_width, LABEL_HEIGHT);
 }
 
 static void render_icon(ObFrame *self)

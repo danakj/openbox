@@ -328,8 +328,20 @@ gboolean load()
 
     a_icon->surface.data.planar.grad = Background_ParentRelative;
 
-
     /* XXX load the button masks */
+
+    /* set up the textures */
+    a_focused_label->texture[0].type = Text;
+    a_focused_label->texture[0].data.text.font = s_winfont;
+    a_focused_label->texture[0].data.text.shadow = s_winfont_shadow;
+    a_focused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
+    a_focused_label->texture[0].data.text.color = s_title_focused_color;
+
+    a_unfocused_label->texture[0].type = Text;
+    a_unfocused_label->texture[0].data.text.font = s_winfont;
+    a_unfocused_label->texture[0].data.text.shadow = s_winfont_shadow;
+    a_unfocused_label->texture[0].data.text.offset = s_winfont_shadow_offset;
+    a_unfocused_label->texture[0].data.text.color = s_title_unfocused_color;
 
     XrmDestroyDatabase(db);
     return TRUE;

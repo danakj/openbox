@@ -57,6 +57,7 @@ bool Pipemenu::readPipe() {
   if (file != NULL)
   {
     printf("popen %s\n", _command.c_str());
+    clearMenu();
     getScreen()->parseMenuFile(file, this);
     pclose(file);
     return true;

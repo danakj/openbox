@@ -232,6 +232,7 @@ void Client::setupDecorAndFunctions()
     // normal windows retain all of the possible decorations and
     // functionality, and are the only windows that you can fullscreen
     _functions |= Func_Fullscreen;
+    break;
 
   case Type_Dialog:
     // dialogs cannot be maximized

@@ -33,6 +33,9 @@
   <separator />
   <menu id="client-list-menu" />
   <separator />
+  <item label="Reconfigure">
+    <action name="reconfigure" />
+  </item>
   <item label="Restart">
     <action name="restart" />
   </item>

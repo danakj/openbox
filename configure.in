@@ -137,14 +137,24 @@ fi
 
 dnl Check for Xft extension support and proper library files.
 XFT=""
+XFT2=""
+OLDLIBS=${LIBS}
 dnl XFT_UTF8=""
 AC_MSG_CHECKING([whether to build support for the Xft extension])
 AC_ARG_ENABLE(
   xft, [  --enable-xft            enable support of the Xft extension [default=yes]])
 : ${enableval="yes"}
 if test "$enableval" = "yes"; then
-  AC_MSG_RESULT([yes])
 
+  if pkg-config xft; then
+    XFT2="yes"
+    AC_MSG_RESULT([version 2])
+    CXXFLAGS="`pkg-config --cflags xft` ${CXXFLAGS}"
+    LIBS="${LIBS} `pkg-config --libs xft`"
+  else 
+    AC_MSG_RESULT([version 1])
+  fi
+  
   AC_CHECK_LIB(Xft, XftFontOpenXlfd,
     AC_MSG_CHECKING([for X11/Xft/Xft.h])
     AC_TRY_LINK(
@@ -153,7 +163,7 @@ if test "$enableval" = "yes"; then
 , XftFont foo,
       AC_MSG_RESULT([yes])
       XFT="yes"
-      LIBS="$LIBS -lXft"
+      test "${XFT2}" = "yes" || LIBS="${LIBS} -lXft"
 
       dnl Check for utf8 support in the Xft library
       dnl AC_CHECK_LIB(Xft, XftDrawStringUtf8,
@@ -173,6 +183,8 @@ if test "$XFT" = "yes"; then
   dnl if test "$XFT_UTF8" = "yes"; then
     dnl AC_DEFINE(XFT_UTF8,1,[Support for Utf8 text in the Xft extension])
   dnl fi
+else
+  LIBS=${OLDLIBS}
 fi
 
 dnl Check for ordered 8bpp dithering

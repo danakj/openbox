@@ -84,10 +84,10 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
     c.color.alpha = _tint | _tint << 8; // transparent shadow
     c.pixel = BlackPixel(OBDisplay::display, _screen_num);
 
-    XftDrawStringUtf8(draw, &c, _xftfont, x + _offset,
-                      _xftfont->ascent + y + _offset,
-                      (XftChar8 *) string.c_str(),
-                      string.size());
+    XftDrawString8(draw, &c, _xftfont, x + _offset,
+                   _xftfont->ascent + y + _offset,
+                   (XftChar8 *) string.c_str(),
+                   string.size());
   }
     
   XftColor c;
@@ -97,8 +97,8 @@ void BFont::drawString(Drawable d, int x, int y, const BColor &color,
   c.pixel = color.pixel();
   c.color.alpha = 0xff | 0xff << 8; // no transparency in BColor yet
 
-  XftDrawStringUtf8(draw, &c, _xftfont, x, _xftfont->ascent + y,
-                    (XftChar8 *) string.c_str(), string.size());
+  XftDrawString8(draw, &c, _xftfont, x, _xftfont->ascent + y,
+                 (XftChar8 *) string.c_str(), string.size());
 
   XftDrawDestroy(draw);
   return;
@@ -110,8 +110,8 @@ unsigned int BFont::measureString(const string &string) const {
 
   XGlyphInfo info;
 
-  XftTextExtentsUtf8(OBDisplay::display, _xftfont,
-                     (XftChar8 *) string.c_str(), string.size(), &info);
+  XftTextExtents8(OBDisplay::display, _xftfont,
+                  (XftChar8 *) string.c_str(), string.size(), &info);
 
   return info.xOff + (_shadow ? _offset : 0);
 }

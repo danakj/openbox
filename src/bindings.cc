@@ -149,7 +149,7 @@ BindingTree *OBBindings::buildtree(const StringVect &keylist, int id) const
   for (it = keylist.rbegin(); it != end; ++it) {
     p = ret;
     ret = new BindingTree(id);
-    if (!p) ret->chain = false;
+    if (!p) ret->chain = false; // only the first built node
     ret->first_child = p;
     if (!translate(*it, ret->binding, true)) {
       destroytree(ret);

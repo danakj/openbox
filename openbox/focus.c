@@ -73,7 +73,7 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
-    if (!client) {
+    if (client == NULL) {
 	/* when nothing will be focused, send focus to the backup target */
 	XSetInputFocus(ob_display, screen_support_win, RevertToPointerRoot,
                        event_lasttime);
@@ -87,22 +87,16 @@ void focus_set_client(ObClient *client)
     old = focus_client;
     focus_client = client;
 
-    if (old) {
-        /* focus state can affect the stacking layer */
-        client_calc_layer(old);
-    }
-    if (client) {
-        /* focus state can affect the stacking layer */
-        client_calc_layer(client);
-
-        /* move to the top of the list */
+    /* move to the top of the list */
+    if (client != NULL)
         push_to_top(client);
-    }
 
-    /* set the NET_ACTIVE_WINDOW hint */
-    active = client ? client->window : None;
-    PROP_SET32(RootWindow(ob_display, ob_screen),
-               net_active_window, window, active);
+    /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
+    if (ob_state() != OB_STATE_EXITING) {
+        active = client ? client->window : None;
+        PROP_SET32(RootWindow(ob_display, ob_screen),
+                   net_active_window, window, active);
+    }
 }
 
 static gboolean focus_under_pointer()

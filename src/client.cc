@@ -47,7 +47,6 @@ Client::Client(int screen, Window window)
   // pick a layer to start from
   _layer = Layer_Normal;
   
-  getGravity();
   getArea();
   getDesktop();
 
@@ -61,6 +60,8 @@ Client::Client(int screen, Window window)
   getShaped();
 
   updateProtocols();
+  getGravity(); // get the attribute gravity
+  updateNormalHints(); // this may override the attribute gravity
   updateWMHints();
   updateTitle();
   updateIconTitle();
@@ -93,21 +94,12 @@ Client::~Client()
 
 void Client::getGravity()
 {
-  XSizeHints size;
   XWindowAttributes wattrib;
   Status ret;
-  long junk;
 
-  if (XGetWMNormalHints(**otk::display, _window, &size, &junk) &&
-      size.flags & PWinGravity) {
-    // first try the normal hints
-    _gravity = size.win_gravity;
-  } else {
-    // then fall back to the attribute
-    ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
-    assert(ret != BadWindow);
-    _gravity = wattrib.win_gravity;
-  }
+  ret = XGetWindowAttributes(**otk::display, _window, &wattrib);
+  assert(ret != BadWindow);
+  _gravity = wattrib.win_gravity;
 }
 
 
@@ -415,7 +407,7 @@ void Client::updateNormalHints()
       
       // if the client has a frame, i.e. has already been mapped and is
       // changing its gravity
-      if (_gravity != oldgravity) {
+      if (frame && _gravity != oldgravity) {
         // move our idea of the client's position based on its new gravity
         int x, y;
         frame->frameGravity(x, y);

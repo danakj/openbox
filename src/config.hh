@@ -21,7 +21,13 @@ struct Config {
   long drag_threshold;
   long num_desktops;
 
+  unsigned long *default_icon;
+  long icon_w;
+  long icon_h;
+  long icon_length;
+  
   Config();
+  ~Config();
 };
 
 }

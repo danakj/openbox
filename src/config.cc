@@ -8,6 +8,8 @@ extern "C" {
 #include <Python.h>
 }
 
+#include <cstring>
+
 namespace ob {
 
 static PyObject *obdict = NULL;
@@ -25,8 +27,10 @@ bool python_get_string(const char *name, otk::ustring *value)
 {
   PyObject *val = PyDict_GetItemString(obdict, const_cast<char*>(name));
   if (!(val && PyString_Check(val))) return false;
-  
-  *value = PyString_AsString(val);
+
+  printf("PYLENGTH %d\n", PyString_Size(val));
+  std::string temp(PyString_AsString(val), PyString_Size(val));
+  *value = temp;
   return true;
 }
 
@@ -66,6 +70,29 @@ Config::Config()
     drag_threshold = 3;
   if (!python_get_long("NUMBER_OF_DESKTOPS", (long*)&num_desktops))
     num_desktops = 1;
+
+  otk::ustring s;
+  long w, h;
+  if (python_get_string("DEFAULT_ICON", &s) && s.bytes() > 2 &&
+      python_get_long("DEFAULT_ICON_WIDTH", &w) &&
+      python_get_long("DEFAULT_ICON_HEIGHT", &h) &&
+      (unsigned)(w * h) == s.bytes() / sizeof(unsigned long)) {
+    default_icon = new unsigned long[s.bytes() / sizeof(unsigned long) + 2];
+    default_icon[0] = w;
+    default_icon[1] = h;
+    memcpy(default_icon + 2, s.data(), s.bytes());
+    printf("%d %d\n", default_icon[0], default_icon[1]);
+  } else {
+    default_icon = 0;
+  }
+      
+  icon_length = s.bytes();
+  printf("LENGTH %d\n", icon_length);
+}
+
+Config::~Config()
+{
+  if (default_icon) delete [] default_icon;
 }
 
 }

@@ -348,8 +348,8 @@ private:
   //! The number of icons in _icons
   int _nicons;
 
-  Pixmap _kwm_icon;
-  Pixmap _kwm_icon_mask;
+  Pixmap _pixmap_icon;
+  Pixmap _pixmap_icon_mask;
 
   //! Retrieves the window's initial gravity
   void getGravity();
@@ -665,16 +665,16 @@ BB    @param window The window id that the Client class should handle
   */
   const Icon *icon(const otk::Size &s) const;
 
-  //! Returns the pixmap for the KWM_WIN_ICON specified on the window (or None)
+  //! Returns the pixmap for the pixmap icon specified on the window (or None)
   /*!
     The icon given by Client::icon should take precedence over this icon/mask.
   */
-  Pixmap kwmIcon() const { return _kwm_icon; }
-  //! Returns the mask for the KWM_WIN_ICON specified on the window (or None)
+  Pixmap pixmapIcon() const { return _pixmap_icon; }
+  //! Returns the mask for the pixmap icon specified on the window (or None)
   /*!
     The icon given by Client::icon should take precedence over this icon/mask.
   */
-  Pixmap kwmIconMask() const { return _kwm_icon_mask; }
+  Pixmap pixmapIconMask() const { return _pixmap_icon_mask; }
   
   //! Move the window (actually, its frame) to a position.
   /*!

@@ -438,62 +438,50 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
                                   unsigned long *data) const
 {
   pixel32 *bg = sf.pixelData();
-  int x, y, c, sfw, sfh;
+  int c, sfw, sfh;
   unsigned int i, e, bgi;
   sfw = sf.size().width();
   sfh = sf.size().height();
-  x = (sfw - w) / 2;
-  y = (sfh - h) / 2;
 
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
-
-  // Reduce the image size if its too big to make it fit on the surface
-  int oldw = w, oldh = h;
-  unsigned long *olddata = data;
-  if (w > sfw) w = sfw;
-  if (h > sfh) h = sfh;
-  unsigned long newdata[w*h];
-  if (w < oldw || h < oldh) {
-    double dx = oldw / (double)w;
-    double dy = oldh / (double)h;
+  if (w && h) {
+    // scale it
+    unsigned long *olddata = data;
+    unsigned long newdata[sfw*sfh];
+    double dx = w / (double)sfw;
+    double dy = h / (double)sfh;
     double px = 0.0;
     double py = 0.0;
     int iy = 0;
-    for (i = 0, c = 0, e = w*h; i < e; ++i) {
+    for (i = 0, c = 0, e = sfw*sfh; i < e; ++i) {
       newdata[i] = olddata[(int)px + iy];
-      if (++c >= w) {
+      if (++c >= sfw) {
         c = 0;
         px = 0;
         py += dy;
-        iy = (int)py * oldw;
+        iy = (int)py * w;
       } else
         px += dx;
     }
     data = newdata;
-  }
 
-  for (i = 0, c = 0, bgi = y * sfw + x, e = w*h; i < e; ++i, ++bgi) {
-    unsigned char alpha = data[i] >> 24;
-    unsigned char r = data[i] >> 16;
-    unsigned char g = data[i] >> 8;
-    unsigned char b = data[i];
+    // apply the alpha channel
+    for (i = 0, c = 0, e = sfw*sfh; i < e; ++i, ++bgi) {
+      unsigned char alpha = data[i] >> 24;
+      unsigned char r = data[i] >> 16;
+      unsigned char g = data[i] >> 8;
+      unsigned char b = data[i];
 
-    // background color
-    unsigned char bgr = bg[bgi] >> default_red_shift;
-    unsigned char bgg = bg[bgi] >> default_green_shift;
-    unsigned char bgb = bg[bgi] >> default_blue_shift;
+      // background color
+      unsigned char bgr = bg[i] >> default_red_shift;
+      unsigned char bgg = bg[i] >> default_green_shift;
+      unsigned char bgb = bg[i] >> default_blue_shift;
       
-    r = bgr + (((r - bgr) * alpha) >> 8);
-    g = bgg + (((g - bgg) * alpha) >> 8);
-    b = bgb + (((b - bgb) * alpha) >> 8);
+      r = bgr + (((r - bgr) * alpha) >> 8);
+      g = bgg + (((g - bgg) * alpha) >> 8);
+      b = bgb + (((b - bgb) * alpha) >> 8);
 
-    bg[bgi] = (r << default_red_shift) | (g << default_green_shift) |
-      (b << default_blue_shift);
-
-    if (++c >= w) {
-      c = 0;
-      bgi += sfw - w;
+      bg[i] = (r << default_red_shift) | (g << default_green_shift) |
+        (b << default_blue_shift);
     }
   }
 
@@ -506,6 +494,70 @@ void RenderControl::drawImage(Surface &sf, int w, int h,
   reduceDepth(sf, im);
   sf.setPixmap(im);
   XDestroyImage(im);
+}
+
+void RenderControl::drawImage(Surface &sf, Pixmap pixmap, Pixmap mask) const
+{
+  int junk, sfw, sfh, w, h, depth, mw, mh, mdepth;
+  Window wjunk;
+  const ScreenInfo *info = display->screenInfo(_screen);
+  GC mgc = 0;
+
+  assert(pixmap != None);
+
+  sfw = sf.size().width();
+  sfh = sf.size().height();
+
+  XGetGeometry(**display, pixmap, &wjunk, &junk, &junk,
+               (unsigned int*)&w, (unsigned int*)&h,
+               (unsigned int*)&junk, (unsigned int*)&depth);
+  if (mask != None) {
+    XGetGeometry(**display, mask, &wjunk, &junk, &junk,
+                 (unsigned int*)&mw, (unsigned int*)&mh,
+                 (unsigned int*)&junk, (unsigned int*)&mdepth);
+    if (mw != w || mh != h || mdepth != 1)
+      return;
+  }
+
+  Pixmap p = XCreatePixmap(**display, info->rootWindow(), sfw, sfh,
+                           info->depth());
+  Pixmap m;
+  if (mask == None)
+    m = None;
+  else {
+    m = XCreatePixmap(**display, info->rootWindow(), sfw, sfh, 1);
+    XGCValues gcv;
+    gcv.subwindow_mode = IncludeInferiors;
+    gcv.graphics_exposures = false;
+    mgc = XCreateGC(**display, m, GCGraphicsExposures |
+                    GCSubwindowMode, &gcv);
+  }
+
+  // scale it
+  for (int y = sfh - 1; y >= 0; --y) {
+    int yy = y * h / sfh;
+    for (int x = sfw - 1; x >= 0; --x) {
+      int xx = x * w / sfw;
+      if (depth != info->depth()) {
+        XCopyPlane(**display, pixmap, p, DefaultGC(**display, _screen),
+                   xx, yy, 1, 1, x, y, 1);
+      } else {
+        XCopyArea(**display, pixmap, p, DefaultGC(**display, _screen),
+                  xx, yy, 1, 1, x, y);
+      }
+      if (mask != None)
+        XCopyArea(**display, mask, m, mgc, xx, yy, 1, 1, x, y);
+    }
+  }
+
+  XSetClipMask(**display, DefaultGC(**display, _screen), m);
+  XSetClipOrigin(**display, DefaultGC(**display, _screen), 0, 0);
+  XCopyArea(**display, p, sf.pixmap(), DefaultGC(**display, _screen), 0, 0,
+            sfw, sfh, 0, 0);
+  XSetClipMask(**display, DefaultGC(**display, _screen), None);
+
+  XFreePixmap(**display, p);
+  if (m != None) XFreePixmap(**display, m);
 }
 
 }

@@ -64,6 +64,9 @@ public:
   virtual void drawImage(Surface &sf, int w, int h,
                          unsigned long *data) const;
   
+  //! Draws an image onto the surface
+  virtual void drawImage(Surface &sf, Pixmap pixmap, Pixmap mask) const;
+
   //! Draws a string onto a Surface
   virtual void drawString(Surface &sf, const Font &font, int x, int y,
 			  const RenderColor &color,

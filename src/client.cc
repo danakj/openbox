@@ -576,6 +576,17 @@ void Client::updateWMHints(bool initstate)
     } else // no group!
       _group = None;
 
+    if (hints->flags & IconPixmapHint) {
+      updateKwmIcon(); // try get the kwm icon first, this is a fallback only
+      if (_pixmap_icon == None) {
+        _pixmap_icon = hints->icon_pixmap;
+        if (hints->flags & IconMaskHint)
+          _pixmap_icon_mask = hints->icon_mask;
+        else
+          _pixmap_icon_mask = None;
+      }
+    }
+
     XFree(hints);
   }
 
@@ -758,15 +769,15 @@ void Client::updateIcons()
 
 void Client::updateKwmIcon()
 {
-  _kwm_icon = _kwm_icon_mask = None;
+  _pixmap_icon = _pixmap_icon_mask = None;
 
   unsigned long num = 2;
   Pixmap *data;
   if (otk::Property::get(_window, otk::Property::atoms.kwm_win_icon,
                          otk::Property::atoms.kwm_win_icon, &num, &data)) {
     if (num >= 2) {
-      _kwm_icon = data[0];
-      _kwm_icon_mask = data[1];
+      _pixmap_icon = data[0];
+      _pixmap_icon_mask = data[1];
     }
     delete [] data;
   }

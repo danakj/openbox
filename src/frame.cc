@@ -557,6 +557,11 @@ void Frame::renderIcon()
   const Icon *icon = _client->icon(otk::Size(geom.button_size,
                                              geom.button_size));
   control->drawImage(*s, icon->w, icon->h, icon->data);
+  if (!icon->data) {
+    Pixmap p = _client->pixmapIcon(), m = _client->pixmapIconMask();
+    if (p != None)
+      control->drawImage(*s, p, m);
+  }
 
   XSetWindowBackgroundPixmap(**otk::display, _icon, s->pixmap());
   XClearWindow(**otk::display, _icon);

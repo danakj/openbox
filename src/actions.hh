@@ -6,7 +6,7 @@
   @brief The action interface for user-available actions
 */
 
-#include "widget.hh"
+#include "widgetbase.hh"
 #include "otk/point.hh"
 #include "otk/rect.hh"
 #include "otk/eventhandler.hh"

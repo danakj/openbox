@@ -26,7 +26,6 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-#include <X11/Xresource.h>
 
 #ifdef    TIME_WITH_SYS_TIME
 #  include <sys/time.h>
@@ -150,7 +149,7 @@ private:
 
     bool sloppy_focus, auto_raise, auto_edge_balance, ordered_dither,
       opaque_move, full_max, focus_new, focus_last, click_raise,
-      hide_toolbar, window_to_window_snap, window_corner_snap;
+      hide_toolbar, window_to_window_snap, window_corner_snap, aa_fonts;
     BColor border_color;
 
     unsigned int workspaces;
@@ -205,6 +204,7 @@ public:
   inline bool doAutoRaise(void) const { return resource.auto_raise; }
   inline bool doClickRaise(void) const { return resource.click_raise; }
   inline bool isScreenManaged(void) const { return managed; }
+  inline bool doAAFonts(void) const { return resource.aa_fonts; }
   inline bool doImageDither(void) const { return image_control->doDither(); }
   inline bool doOrderedDither(void) const { return resource.ordered_dither; }
   inline bool doOpaqueMove(void) const { return resource.opaque_move; }
@@ -268,6 +268,7 @@ public:
   void saveColPlacementDirection(int d);
   void saveEdgeSnapThreshold(int t);
   void saveImageDither(bool d);
+  void saveAAFonts(bool f);
   void saveOpaqueMove(bool o);
   void saveFullMax(bool f);
   void saveFocusNew(bool f);

@@ -44,23 +44,23 @@ using std::endl;
 #include "GCCache.hh"
 #include "Color.hh"
 
-bool        BFont::_antialias       = True;
 string      BFont::_fallback_font   = "fixed";
-
 
 #ifdef XFT
 BFont::BFont(Display *d, BScreen *screen, const string &family, int size,
-             bool bold, bool italic) : _display(d),
-                                       _screen(screen),
-                                       _family(family),
-                                       _simplename(False),
-                                       _size(size),
-                                       _bold(bold),
-                                       _italic(italic),
-                                       _xftfont(0),
-                                       _font(0),
-                                       _fontset(0),
-                                       _fontset_extents(0) {
+             bool bold, bool italic, bool antialias) :
+                                          _display(d),
+                                          _screen(screen),
+                                          _family(family),
+                                          _simplename(False),
+                                          _size(size),
+                                          _bold(bold),
+                                          _italic(italic),
+                                          _antialias(antialias),
+                                          _xftfont(0),
+                                          _font(0),
+                                          _fontset(0),
+                                          _fontset_extents(0) {
   _valid = False;
 
   _xftfont = XftFontOpen(_display, _screen->getScreenNumber(),
@@ -90,6 +90,7 @@ BFont::BFont(Display *d, BScreen *screen, const string &xlfd) :
                                        _display(d),
                                        _screen(screen),
 #ifdef    XFT
+                                       _antialias(False),
                                        _xftfont(0),
 #endif // XFT
                                        _font(0),

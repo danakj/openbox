@@ -388,6 +388,13 @@ void BScreen::saveFocusLast(bool f) {
 }
 
 
+void BScreen::saveAAFonts(bool f) {
+  resource.aa_fonts = f;
+  reconfigure();
+  config->setValue(screenstr + "antialiasFonts", resource.aa_fonts);
+}
+
+
 void BScreen::saveHideToolbar(bool h) {
   resource.hide_toolbar = h;
   if (resource.hide_toolbar)
@@ -497,6 +504,7 @@ void BScreen::save_rc(void) {
   saveSloppyFocus(resource.sloppy_focus);
   saveAutoRaise(resource.auto_raise);
   saveImageDither(doImageDither());
+  saveAAFonts(resource.aa_fonts);
   saveOpaqueMove(resource.opaque_move);
   saveFullMax(resource.full_max);
   saveFocusNew(resource.focus_new);
@@ -539,6 +547,9 @@ void BScreen::load_rc(void) {
 
   if (! config->getValue(screenstr + "opaqueMove", resource.opaque_move))
     resource.opaque_move = false;
+
+  if (! config->getValue(screenstr + "antialiasFonts", resource.aa_fonts))
+    resource.aa_fonts = true;
 
   if (! config->getValue(screenstr + "hideToolbar", resource.hide_toolbar))
     resource.hide_toolbar = false;
@@ -2158,7 +2169,7 @@ BFont *BScreen::readDatabaseFont(const string &rbasename,
     }
     
     BFont *b = new BFont(blackbox->getXDisplay(), this, family, i, bold,
-                         italic);
+                         italic, resource.aa_fonts);
     if (b->valid())
       return b;
     else

@@ -47,13 +47,9 @@ class BFont {
    * static members
    */
 private:
-  static bool         _antialias;
   static std::string  _fallback_font;
 
 public:
-  inline static bool antialias(void) { return _antialias; }
-  inline static void setAntialias(bool a) { _antialias = a; }
-
   // the fallback is only used for X fonts, not for Xft fonts, since it is
   // assumed that X fonts will be the fallback from Xft.
   inline static std::string fallbackFont(void) { return _fallback_font; }
@@ -74,6 +70,8 @@ private:
   bool              _italic;
 
 #ifdef XFT
+  bool              _antialias;
+
   XftFont          *_xftfont;
 
   bool createXftFont(void);
@@ -97,7 +95,7 @@ public:
 #ifdef XFT
   // loads an Xft font
   BFont(Display *d, BScreen *screen, const std::string &family, int size,
-        bool bold, bool italic);
+        bool bold, bool italic, bool antialias = True);
 #endif
   // loads a standard X font
   BFont(Display *d, BScreen *screen, const std::string &xlfd);

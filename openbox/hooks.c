@@ -111,6 +111,7 @@ static PyObject *hook_remove(HookObject *self, PyObject *args)
 
 static PyObject *hook_call(HookObject *self, PyObject *args)
 {
+    PyObject *ret;
     GSList *it, *next;
     gboolean stop = FALSE;
 
@@ -121,9 +122,9 @@ static PyObject *hook_call(HookObject *self, PyObject *args)
     }
 
     for (it = self->funcs; !stop && it != NULL;) {
-	next = it->next; /* incase the hook removes itself */
+        next = it->next; /* incase the hook removes itself */
 
-	PyObject *ret = PyObject_CallObject(it->data, args);
+	ret = PyObject_CallObject(it->data, args);
 	if (ret == NULL)
 	    return NULL;
 	if (ret != Py_None)

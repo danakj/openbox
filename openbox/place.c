@@ -151,9 +151,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y)
     for (it = list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
 
-        if (c == client || c->shaded || !client_normal(c))
-            continue;
-        spaces = area_remove(spaces, &c->frame->area);
+        if (c != client && !c->shaded && !client_normal(c))
+            spaces = area_remove(spaces, &c->frame->area);
     }
 
     spaces = g_slist_sort(spaces, area_cmp);

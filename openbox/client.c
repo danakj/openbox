@@ -1659,7 +1659,7 @@ void client_maximize(Client *self, gboolean max, int dir, gboolean savearea)
 
 void client_shade(Client *self, gboolean shade)
 {
-    if (!(self->functions & Func_Shade) || /* can't */
+    if ((!(self->functions & Func_Shade) && shade) || /* can't shade */
 	self->shaded == shade) return;     /* already done */
 
     /* when we're iconic, don't change the wmstate */

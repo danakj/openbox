@@ -56,10 +56,14 @@ AC_SUBST(XFT_CFLAGS)
 AC_SUBST(XFT_LIBS)
 
 PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0],
-  AC_DEFINE(USE_LIBSN)
-  AC_SUBST(LIBSN_CFLAGS)
-  AC_SUBST(LIBSN_LIBS)
-  ,
+  [
+    AC_DEFINE(USE_LIBSN)
+    AC_SUBST(LIBSN_CFLAGS)
+    AC_SUBST(LIBSN_LIBS)
+  ],
+  [
+    no_such_luck=yes
+  ]
 )
 
 # Check for X11 extensions

@@ -163,18 +163,10 @@ gboolean keyboard_process_interactive_grab(const XEvent *e,
                 cancel = done = TRUE;
         }
         if (done) {
-            if (s->action->func == action_cycle_windows) {
-                s->action->data.cycle.cancel = cancel;
-                s->action->data.cycle.final = TRUE;
-            }
-            if (s->action->func == action_desktop_dir) {
-                s->action->data.desktopdir.cancel = cancel;
-                s->action->data.desktopdir.final = TRUE;
-            }
-            if (s->action->func == action_send_to_desktop_dir) {
-                s->action->data.sendtodir.cancel = cancel;
-                s->action->data.sendtodir.final = TRUE;
-            }
+            g_assert(s->action->data.any.interactive);
+
+            s->action->data.inter.cancel = cancel;
+            s->action->data.inter.final = TRUE;
 
             s->action->func(&s->action->data);
 
@@ -225,38 +217,19 @@ void keyboard_event(ObClient *client, const XEvent *e)
                     if (act->func != NULL) {
                         act->data.any.c = client;
 
-                        if (act->func == action_cycle_windows)
-                        {
-                            act->data.cycle.final = FALSE;
-                            act->data.cycle.cancel = FALSE;
-                        }
-                        if (act->func == action_desktop_dir)
-                        {
-                            act->data.desktopdir.final = FALSE;
-                            act->data.desktopdir.cancel = FALSE;
-                        }
-                        if (act->func == action_send_to_desktop_dir)
-                        {
-                            act->data.sendtodir.final = FALSE;
-                            act->data.sendtodir.cancel = FALSE;
-                        }
-
-                        if (act->func == action_moveresize)
-                        {
+                        if (act->func == action_moveresize) {
                             screen_pointer_pos(&act->data.moveresize.x,
                                                &act->data.moveresize.y);
                         }
 
-                        if ((act->func == action_cycle_windows ||
-                             act->func == action_desktop_dir ||
-                             act->func == action_send_to_desktop_dir))
-                        {
+                        if (act->data.any.interactive) {
+                            act->data.inter.cancel = FALSE;
+                            act->data.inter.final = FALSE;
                             keyboard_interactive_grab(e->xkey.state, client,
                                                       0, act);
                         }
 
-                        if (act->func == action_showmenu)
-                        {
+                        if (act->func == action_showmenu) {
                             act->data.showmenu.x = e->xkey.x_root;
                             act->data.showmenu.y = e->xkey.y_root;
                         }

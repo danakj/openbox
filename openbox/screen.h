@@ -47,7 +47,7 @@ void screen_set_num_desktops(guint num);
 void screen_set_desktop(guint num);
 /*! Interactively change desktops */
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean done, gboolean cancel);
+                           gboolean dialog, gboolean done, gboolean cancel);
 
 /*! Shows and focuses the desktop and hides all the client windows, or
   returns to the normal state, showing client windows. */

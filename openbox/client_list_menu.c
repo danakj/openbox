@@ -37,7 +37,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             ObClientIcon *icon;
 
             act = action_from_string("activate");
-            act->data.activate.c = c;
+            act->data.activate.any.c = c;
             acts = g_slist_prepend(NULL, act);
             e = menu_add_normal(menu, i,
                                 (c->iconic ? c->icon_title : c->title), acts);

@@ -584,7 +584,7 @@ static void popup_cycle(guint d, gboolean show)
 }
 
 guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
-                           gboolean done, gboolean cancel)
+                           gboolean dialog, gboolean done, gboolean cancel)
 {
     static gboolean first = TRUE;
     static gboolean lin;
@@ -682,7 +682,7 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
         d = translate_row_col(r, c);
     }
 
-    if (config_desktop_popup) {
+    if (dialog) {
         popup_cycle(d, TRUE);
         return d;
     }

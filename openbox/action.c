@@ -86,6 +86,7 @@ void setup_action_send_to_desktop(ObAction *a)
 
 void setup_action_send_to_desktop_prev(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_WEST;
     a->data.sendtodir.linear = TRUE;
     a->data.sendtodir.wrap = TRUE;
@@ -94,6 +95,7 @@ void setup_action_send_to_desktop_prev(ObAction *a)
 
 void setup_action_send_to_desktop_next(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_EAST;
     a->data.sendtodir.linear = TRUE;
     a->data.sendtodir.wrap = TRUE;
@@ -102,6 +104,7 @@ void setup_action_send_to_desktop_next(ObAction *a)
 
 void setup_action_send_to_desktop_left(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_WEST;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
@@ -110,6 +113,7 @@ void setup_action_send_to_desktop_left(ObAction *a)
 
 void setup_action_send_to_desktop_right(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_EAST;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
@@ -118,6 +122,7 @@ void setup_action_send_to_desktop_right(ObAction *a)
 
 void setup_action_send_to_desktop_up(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_NORTH;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
@@ -126,6 +131,7 @@ void setup_action_send_to_desktop_up(ObAction *a)
 
 void setup_action_send_to_desktop_down(ObAction *a)
 {
+    a->data.sendtodir.inter.any.interactive = TRUE;
     a->data.sendtodir.dir = OB_DIRECTION_SOUTH;
     a->data.sendtodir.linear = FALSE;
     a->data.sendtodir.wrap = TRUE;
@@ -134,6 +140,7 @@ void setup_action_send_to_desktop_down(ObAction *a)
 
 void setup_action_desktop_prev(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_WEST;
     a->data.desktopdir.linear = TRUE;
     a->data.desktopdir.wrap = TRUE;
@@ -141,6 +148,7 @@ void setup_action_desktop_prev(ObAction *a)
 
 void setup_action_desktop_next(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_EAST;
     a->data.desktopdir.linear = TRUE;
     a->data.desktopdir.wrap = TRUE;
@@ -148,6 +156,7 @@ void setup_action_desktop_next(ObAction *a)
 
 void setup_action_desktop_left(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_WEST;
     a->data.desktopdir.linear = FALSE;
     a->data.desktopdir.wrap = TRUE;
@@ -155,6 +164,7 @@ void setup_action_desktop_left(ObAction *a)
 
 void setup_action_desktop_right(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_EAST;
     a->data.desktopdir.linear = FALSE;
     a->data.desktopdir.wrap = TRUE;
@@ -162,6 +172,7 @@ void setup_action_desktop_right(ObAction *a)
 
 void setup_action_desktop_up(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_NORTH;
     a->data.desktopdir.linear = FALSE;
     a->data.desktopdir.wrap = TRUE;
@@ -169,6 +180,7 @@ void setup_action_desktop_up(ObAction *a)
 
 void setup_action_desktop_down(ObAction *a)
 {
+    a->data.desktopdir.inter.any.interactive = TRUE;
     a->data.desktopdir.dir = OB_DIRECTION_SOUTH;
     a->data.desktopdir.linear = FALSE;
     a->data.desktopdir.wrap = TRUE;
@@ -196,24 +208,28 @@ void setup_action_resize_keyboard(ObAction *a)
 
 void setup_action_cycle_windows_linear_next(ObAction *a)
 {
+    a->data.cycle.inter.any.interactive = TRUE;
     a->data.cycle.linear = TRUE;
     a->data.cycle.forward = TRUE;
 }
 
 void setup_action_cycle_windows_linear_previous(ObAction *a)
 {
+    a->data.cycle.inter.any.interactive = TRUE;
     a->data.cycle.linear = TRUE;
     a->data.cycle.forward = FALSE;
 }
 
 void setup_action_cycle_windows_next(ObAction *a)
 {
+    a->data.cycle.inter.any.interactive = TRUE;
     a->data.cycle.linear = FALSE;
     a->data.cycle.forward = TRUE;
 }
 
 void setup_action_cycle_windows_previous(ObAction *a)
 {
+    a->data.cycle.inter.any.interactive = TRUE;
     a->data.cycle.linear = FALSE;
     a->data.cycle.forward = FALSE;
 }
@@ -721,9 +737,8 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
                 if ((n = parse_find_node("delta", node->xmlChildrenNode)))
                     act->data.relative.delta = parse_int(doc, n);
             } else if (act->func == action_desktop_dir) {
-                if ((n = parse_find_node("wrap", node->xmlChildrenNode))) {
+                if ((n = parse_find_node("wrap", node->xmlChildrenNode)))
                     act->data.desktopdir.wrap = parse_bool(doc, n);
-                }
             } else if (act->func == action_send_to_desktop) {
                 if ((n = parse_find_node("follow", node->xmlChildrenNode)))
                     act->data.sendto.follow = parse_bool(doc, n);
@@ -735,6 +750,11 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
             } else if (act->func == action_activate) {
                 if ((n = parse_find_node("here", node->xmlChildrenNode)))
                     act->data.activate.here = parse_bool(doc, n);
+            }
+
+            if (act->data.any.interactive) {
+                if ((n = parse_find_node("interactive",node->xmlChildrenNode)))
+                    act->data.any.interactive = parse_bool(doc, n);
             }
         }
         g_free(actname);
@@ -761,31 +781,31 @@ void action_execute(union ActionData *data)
 
 void action_activate(union ActionData *data)
 {
-    if (data->activate.c)
-        client_activate(data->activate.c, data->activate.here);
+    if (data->activate.any.c)
+        client_activate(data->activate.any.c, data->activate.here);
 }
 
 void action_focus(union ActionData *data)
 {
-    if (data->client.c)
-        client_focus(data->client.c);
+    if (data->client.any.c)
+        client_focus(data->client.any.c);
 }
 
 void action_unfocus (union ActionData *data)
 {
-    if (data->client.c)
-        client_unfocus(data->client.c);
+    if (data->client.any.c)
+        client_unfocus(data->client.any.c);
 }
 
 void action_iconify(union ActionData *data)
 {
-    if (data->client.c)
-        client_iconify(data->client.c, TRUE, TRUE);
+    if (data->client.any.c)
+        client_iconify(data->client.any.c, TRUE, TRUE);
 }
 
 void action_raiselower(union ActionData *data)
 {
-    ObClient *c = data->client.c;
+    ObClient *c = data->client.any.c;
     GList *it;
     gboolean raise = FALSE;
 
@@ -814,77 +834,77 @@ void action_raiselower(union ActionData *data)
 
 void action_raise(union ActionData *data)
 {
-    if (data->client.c)
-        stacking_raise(CLIENT_AS_WINDOW(data->client.c));
+    if (data->client.any.c)
+        stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
 }
 
 void action_unshaderaise(union ActionData *data)
 {
-    if (data->client.c) {
-        if (data->client.c->shaded)
-            client_shade(data->client.c, FALSE);
+    if (data->client.any.c) {
+        if (data->client.any.c->shaded)
+            client_shade(data->client.any.c, FALSE);
         else
-            stacking_raise(CLIENT_AS_WINDOW(data->client.c));
+            stacking_raise(CLIENT_AS_WINDOW(data->client.any.c));
     }
 }
 
 void action_shadelower(union ActionData *data)
 {
-    if (data->client.c) {
-        if (data->client.c->shaded)
-            stacking_lower(CLIENT_AS_WINDOW(data->client.c));
+    if (data->client.any.c) {
+        if (data->client.any.c->shaded)
+            stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
         else
-            client_shade(data->client.c, TRUE);
+            client_shade(data->client.any.c, TRUE);
     }
 }
 
 void action_lower(union ActionData *data)
 {
-    if (data->client.c)
-        stacking_lower(CLIENT_AS_WINDOW(data->client.c));
+    if (data->client.any.c)
+        stacking_lower(CLIENT_AS_WINDOW(data->client.any.c));
 }
 
 void action_close(union ActionData *data)
 {
-    if (data->client.c)
-        client_close(data->client.c);
+    if (data->client.any.c)
+        client_close(data->client.any.c);
 }
 
 void action_kill(union ActionData *data)
 {
-    if (data->client.c)
-        client_kill(data->client.c);
+    if (data->client.any.c)
+        client_kill(data->client.any.c);
 }
 
 void action_shade(union ActionData *data)
 {
-    if (data->client.c)
-        client_shade(data->client.c, TRUE);
+    if (data->client.any.c)
+        client_shade(data->client.any.c, TRUE);
 }
 
 void action_unshade(union ActionData *data)
 {
-    if (data->client.c)
-        client_shade(data->client.c, FALSE);
+    if (data->client.any.c)
+        client_shade(data->client.any.c, FALSE);
 }
 
 void action_toggle_shade(union ActionData *data)
 {
-    if (data->client.c)
-        client_shade(data->client.c, !data->client.c->shaded);
+    if (data->client.any.c)
+        client_shade(data->client.any.c, !data->client.any.c->shaded);
 }
 
 void action_toggle_omnipresent(union ActionData *data)
 { 
-    if (data->client.c)
-        client_set_desktop(data->client.c,
-                           data->client.c->desktop == DESKTOP_ALL ?
+    if (data->client.any.c)
+        client_set_desktop(data->client.any.c,
+                           data->client.any.c->desktop == DESKTOP_ALL ?
                            screen_desktop : DESKTOP_ALL, FALSE);
 }
 
 void action_move_relative_horz(union ActionData *data)
 {
-    ObClient *c = data->relative.c;
+    ObClient *c = data->relative.any.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x + data->relative.delta, c->area.y,
@@ -893,7 +913,7 @@ void action_move_relative_horz(union ActionData *data)
 
 void action_move_relative_vert(union ActionData *data)
 {
-    ObClient *c = data->relative.c;
+    ObClient *c = data->relative.any.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT,
                          c->area.x, c->area.y + data->relative.delta,
@@ -902,7 +922,7 @@ void action_move_relative_vert(union ActionData *data)
 
 void action_resize_relative_horz(union ActionData *data)
 {
-    ObClient *c = data->relative.c;
+    ObClient *c = data->relative.any.c;
     if (c)
         client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width +
@@ -912,7 +932,7 @@ void action_resize_relative_horz(union ActionData *data)
 
 void action_resize_relative_vert(union ActionData *data)
 {
-    ObClient *c = data->relative.c;
+    ObClient *c = data->relative.any.c;
     if (c && !c->shaded)
         client_configure(c, OB_CORNER_TOPLEFT, c->area.x, c->area.y,
                          c->area.width, c->area.height +
@@ -922,64 +942,65 @@ void action_resize_relative_vert(union ActionData *data)
 
 void action_maximize_full(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, TRUE, 0, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, TRUE, 0, TRUE);
 }
 
 void action_unmaximize_full(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, FALSE, 0, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, FALSE, 0, TRUE);
 }
 
 void action_toggle_maximize_full(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c,
-                        !(data->client.c->max_horz ||
-                          data->client.c->max_vert),
+    if (data->client.any.c)
+        client_maximize(data->client.any.c,
+                        !(data->client.any.c->max_horz ||
+                          data->client.any.c->max_vert),
                         0, TRUE);
 }
 
 void action_maximize_horz(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, TRUE, 1, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, TRUE, 1, TRUE);
 }
 
 void action_unmaximize_horz(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, FALSE, 1, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, FALSE, 1, TRUE);
 }
 
 void action_toggle_maximize_horz(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, !data->client.c->max_horz, 1, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c,
+                        !data->client.any.c->max_horz, 1, TRUE);
 }
 
 void action_maximize_vert(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, TRUE, 2, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, TRUE, 2, TRUE);
 }
 
 void action_unmaximize_vert(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, FALSE, 2, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, FALSE, 2, TRUE);
 }
 
 void action_toggle_maximize_vert(union ActionData *data)
 {
-    if (data->client.c)
-        client_maximize(data->client.c, !data->client.c->max_vert, 2, TRUE);
+    if (data->client.any.c)
+        client_maximize(data->client.any.c, !data->client.any.c->max_vert, 2, TRUE);
 }
 
 void action_send_to_desktop(union ActionData *data)
 {
-    ObClient *c = data->sendto.c;
+    ObClient *c = data->sendto.any.c;
 
     if (!c || !client_normal(c)) return;
 
@@ -1002,222 +1023,35 @@ void action_desktop_dir(union ActionData *data)
 {
     guint d;
 
-    d = screen_cycle_desktop(data->desktopdir.dir, data->desktopdir.wrap,
+    d = screen_cycle_desktop(data->desktopdir.dir,
+                             data->desktopdir.wrap,
                              data->sendtodir.linear,
-                             data->desktopdir.final, data->desktopdir.cancel);
+                             data->desktopdir.inter.any.interactive,
+                             data->desktopdir.inter.final,
+                             data->desktopdir.inter.cancel);
     screen_set_desktop(d);
 }
 
 void action_send_to_desktop_dir(union ActionData *data)
 {
-    ObClient *c = data->sendtodir.c;
+    ObClient *c = data->sendtodir.inter.any.c;
     guint d;
 
     if (!c || !client_normal(c)) return;
 
     d = screen_cycle_desktop(data->sendtodir.dir, data->sendtodir.wrap,
                              data->sendtodir.linear,
-                             data->sendtodir.final, data->sendtodir.cancel);
+                             data->sendtodir.inter.any.interactive,
+                             data->sendtodir.inter.final,
+                             data->sendtodir.inter.cancel);
     client_set_desktop(c, d, data->sendtodir.follow);
     if (data->sendtodir.follow)
         screen_set_desktop(d);
 }
 
-#if 0
-void action_desktop_right(union ActionData *data)
-{
-    guint r, c, d;
-
-    cur_row_col(&r, &c);
-    ++c;
-    if (c >= screen_desktop_layout.columns) {
-        if (!data->desktopdir.wrap) return;
-        c = 0;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->desktopdir.wrap) return;
-        ++c;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops)
-        screen_cycle_desktop(d, data->desktopdir.final,
-                             data->desktopdir.cancel);
-}
-
-void action_send_to_desktop_right(union ActionData *data)
-{
-    ObClient *cl = data->sendto.c;
-    guint r, c, d;
-
-    if (!cl || !client_normal(cl)) return;
-
-    cur_row_col(&r, &c);
-    ++c;
-    if (c >= screen_desktop_layout.columns) {
-        if (!data->sendtodir.wrap) return;
-        c = 0;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->sendtodir.wrap) return;
-        ++c;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops) {
-        client_set_desktop(cl, d, data->sendtodir.follow);
-        if (data->sendtodir.follow)
-            screen_cycle_desktop(d, data->desktopdir.final,
-                                 data->desktopdir.cancel);
-    }
-}
-
-void action_desktop_left(union ActionData *data)
-{
-    guint r, c, d;
-
-    cur_row_col(&r, &c);
-    --c;
-    if (c >= screen_desktop_layout.columns) {
-        if (!data->desktopdir.wrap) return;
-        c = screen_desktop_layout.columns - 1;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->desktopdir.wrap) return;
-        --c;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops)
-        screen_cycle_desktop(d, data->desktopdir.final,
-                             data->desktopdir.cancel);
-}
-
-void action_send_to_desktop_left(union ActionData *data)
-{
-    ObClient *cl = data->sendto.c;
-    guint r, c, d;
-
-    if (!cl || !client_normal(cl)) return;
-
-    cur_row_col(&r, &c);
-    --c;
-    if (c >= screen_desktop_layout.columns) {
-        if (!data->sendtodir.wrap) return;
-        c = screen_desktop_layout.columns - 1;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->sendtodir.wrap) return;
-        --c;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops) {
-        client_set_desktop(cl, d, data->sendtodir.follow);
-        if (data->sendtodir.follow)
-            screen_cycle_desktop(d, data->desktopdir.final,
-                                 data->desktopdir.cancel);
-    }
-}
-
-void action_desktop_down(union ActionData *data)
-{
-    guint r, c, d;
-
-    cur_row_col(&r, &c);
-    ++r;
-    if (r >= screen_desktop_layout.rows) {
-        if (!data->desktopdir.wrap) return;
-        r = 0;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->desktopdir.wrap) return;
-        ++r;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops)
-        screen_cycle_desktop(d, data->desktopdir.final,
-                             data->desktopdir.cancel);
-}
-
-void action_send_to_desktop_down(union ActionData *data)
-{
-    guint r, c, d;
-
-    if (data->sendtodir.c) {
-        cur_row_col(&r, &c);
-        ++r;
-        if (r >= screen_desktop_layout.rows) {
-            if (!data->sendtodir.wrap) return;
-            r = 0;
-        }
-        d = translate_row_col(r, c);
-        if (d >= screen_num_desktops) {
-            if (!data->sendtodir.wrap) return;
-            ++r;
-        }
-        d = translate_row_col(r, c);
-        if (d < screen_num_desktops) {
-            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow)
-                screen_cycle_desktop(d, data->desktopdir.final,
-                                     data->desktopdir.cancel);
-        }
-    }
-}
-
-void action_desktop_up(union ActionData *data)
-{
-    guint r, c, d;
-
-    cur_row_col(&r, &c);
-    --r;
-    if (r >= screen_desktop_layout.rows) {
-        if (!data->desktopdir.wrap) return;
-        r = screen_desktop_layout.rows - 1;
-    }
-    d = translate_row_col(r, c);
-    if (d >= screen_num_desktops) {
-        if (!data->desktopdir.wrap) return;
-        --r;
-    }
-    d = translate_row_col(r, c);
-    if (d < screen_num_desktops)
-        screen_cycle_desktop(d, data->desktopdir.final,
-                             data->desktopdir.cancel);
-}
-
-void action_send_to_desktop_up(union ActionData *data)
-{
-    guint r, c, d;
-
-    if (data->sendtodir.c) {
-        cur_row_col(&r, &c);
-        --r;
-        if (r >= screen_desktop_layout.rows) {
-            if (!data->sendtodir.wrap) return;
-            r = screen_desktop_layout.rows - 1;
-        }
-        d = translate_row_col(r, c);
-        if (d >= screen_num_desktops) {
-            if (!data->sendtodir.wrap) return;
-            --r;
-        }
-        d = translate_row_col(r, c);
-        if (d < screen_num_desktops) {
-            client_set_desktop(data->sendtodir.c, d, data->sendtodir.follow);
-            if (data->sendtodir.follow)
-                screen_cycle_desktop(d, data->desktopdir.final,
-                                     data->desktopdir.cancel);
-        }
-    }
-}
-#endif
-
 void action_toggle_decorations(union ActionData *data)
 {
-    ObClient *c = data->client.c;
+    ObClient *c = data->client.any.c;
 
     if (!c) return;
 
@@ -1227,7 +1061,7 @@ void action_toggle_decorations(union ActionData *data)
 
 void action_moveresize(union ActionData *data)
 {
-    ObClient *c = data->moveresize.c;
+    ObClient *c = data->moveresize.any.c;
 
     if (!c || !client_normal(c)) return;
 
@@ -1249,7 +1083,7 @@ void action_showmenu(union ActionData *data)
 {
     if (data->showmenu.name) {
         menu_show(data->showmenu.name, data->showmenu.x, data->showmenu.y,
-                  data->showmenu.c);
+                  data->showmenu.any.c);
     }
 }
 
@@ -1257,17 +1091,18 @@ void action_cycle_windows(union ActionData *data)
 {
     ObClient *c;
     
-    c = focus_cycle(data->cycle.forward, data->cycle.linear, data->cycle.final,
-                    data->cycle.cancel);
+    c = focus_cycle(data->cycle.forward, data->cycle.linear,
+                    data->cycle.inter.any.interactive,
+                    data->cycle.inter.final, data->cycle.inter.cancel);
 }
 
 void action_directional_focus(union ActionData *data)
 {
     ObClient *nf;
 
-    if (!data->diraction.c)
+    if (!data->diraction.any.c)
         return;
-    if ((nf = client_find_directional(data->diraction.c,
+    if ((nf = client_find_directional(data->diraction.any.c,
                                       data->diraction.direction)))
         client_activate(nf, FALSE);
 }
@@ -1275,7 +1110,7 @@ void action_directional_focus(union ActionData *data)
 void action_movetoedge(union ActionData *data)
 {
     int x, y;
-    ObClient *c = data->diraction.c;
+    ObClient *c = data->diraction.any.c;
 
     if (!c)
         return;
@@ -1309,7 +1144,7 @@ void action_movetoedge(union ActionData *data)
 void action_growtoedge(union ActionData *data)
 {
     int x, y, width, height, dest;
-    ObClient *c = data->diraction.c;
+    ObClient *c = data->diraction.any.c;
     Rect *a = screen_area(c->desktop);
 
     if (!c)
@@ -1370,13 +1205,13 @@ void action_growtoedge(union ActionData *data)
 
 void action_send_to_layer(union ActionData *data)
 {
-    if (data->layer.c)
-        client_set_layer(data->layer.c, data->layer.layer);
+    if (data->layer.any.c)
+        client_set_layer(data->layer.any.c, data->layer.layer);
 }
 
 void action_toggle_layer(union ActionData *data)
 {
-    ObClient *c = data->layer.c;
+    ObClient *c = data->layer.any.c;
 
     if (c) {
         if (data->layer.layer < 0)

@@ -115,21 +115,9 @@ static gboolean fire_button(ObMouseAction a, ObFrameContext context,
                 act->data.showmenu.y = y;
             }
 
-            if (act->func == action_desktop_dir)
-            {
-                act->data.desktopdir.final = FALSE;
-                act->data.desktopdir.cancel = FALSE;
-            }
-            if (act->func == action_send_to_desktop_dir)
-            {
-                act->data.sendtodir.final = FALSE;
-                act->data.sendtodir.cancel = FALSE;
-            }
-
-            if (config_desktop_popup &&
-                (act->func == action_desktop_dir ||
-                 act->func == action_send_to_desktop_dir))
-            {
+            if (act->data.any.interactive) {
+                act->data.inter.cancel = FALSE;
+                act->data.inter.final = FALSE;
                 keyboard_interactive_grab(state, c, context, act);
             }
 

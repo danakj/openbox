@@ -13,69 +13,72 @@ typedef struct _ObAction ObAction;
 
 struct AnyAction {
     struct _ObClient *c;
+    gboolean interactive;
+};
+
+struct InteractiveAction {
+    struct AnyAction any;
+    gboolean final;
+    gboolean cancel;
 };
 
 struct DirectionalAction{
-    struct _ObClient *c;
+    struct AnyAction any;
     ObDirection direction;
 };
 
 struct Execute {
-    struct _ObClient *c;
+    struct AnyAction any;
     char *path;
 };
 
 struct ClientAction {
-    struct _ObClient *c;
+    struct AnyAction any;
 };
 
 struct Activate {
-    struct _ObClient *c;
+    struct AnyAction any;
     gboolean here; /* bring it to the current desktop */
 };
 
 struct MoveResizeRelative {
-    struct _ObClient *c;
+    struct AnyAction any;
     int delta;
 };
 
 struct SendToDesktop {
-    struct _ObClient *c;
+    struct AnyAction any;
     guint desk;
     gboolean follow;
 };
 
 struct SendToDesktopDirection {
-    struct _ObClient *c;
+    struct InteractiveAction inter;
     ObDirection dir;
     gboolean wrap;
     gboolean linear;
-    gboolean final;
-    gboolean cancel;
     gboolean follow;
 };
 
 struct Desktop {
-    struct _ObClient *c;
+    struct AnyAction any;
     guint desk;
 };
 
 struct Layer {
-    struct _ObClient *c;
+    struct AnyAction any;
     int layer; /* < 0 = below, 0 = normal, > 0 = above */
 };
 
 struct DesktopDirection {
-    struct _ObClient *c;
+    struct InteractiveAction inter;
     ObDirection dir;
     gboolean wrap;
     gboolean linear;
-    gboolean final;
-    gboolean cancel;
 };
 
 struct MoveResize {
-    struct _ObClient *c;
+    struct AnyAction any;
     int x;
     int y;
     guint32 corner; /* prop_atoms.net_wm_moveresize_* */
@@ -83,22 +86,21 @@ struct MoveResize {
 };
 
 struct ShowMenu {
-    struct _ObClient *c;
+    struct AnyAction any;
     char *name;
     int x;
     int y;
 };
 
 struct CycleWindows {
-    struct _ObClient *c;
+    struct InteractiveAction inter;
     gboolean linear;
     gboolean forward;
-    gboolean final;
-    gboolean cancel;
 };
 
 union ActionData {
     struct AnyAction any;
+    struct InteractiveAction inter;
     struct DirectionalAction diraction;
     struct Execute execute;
     struct ClientAction client;

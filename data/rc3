@@ -19,7 +19,6 @@
   <followMouse>no</followMouse>
   <focusLast>yes</focusLast>
   <focusLastOnDesktop>yes</focusLastOnDesktop>
-  <cyclingDialog>yes</cyclingDialog>
 </focus>
 
 <theme>
@@ -35,7 +34,6 @@
     <name>three</name>
     <name>four</name>
   </names>
-  <cyclingDialog>yes</cyclingDialog>
 </desktops>
 
 <resize>
@@ -135,16 +133,16 @@
       <action name="showmenu"><menu>client-menu</menu></action>
     </mousebind>
     <mousebind button="A-Up" action="click">
-      <action name="desktopright"/>
+      <action name="desktopnext"/>
     </mousebind>
     <mousebind button="A-Down" action="click">
-      <action name="desktopleft"/>
+      <action name="desktopprevious"/>
     </mousebind>
     <mousebind button="C-A-Up" action="click">
-      <action name="sendtodesktopright"/>
+      <action name="sendtodesktopnext"/>
     </mousebind>
     <mousebind button="C-A-Down" action="click">
-      <action name="sendtodesktopleft"/>
+      <action name="sendtodesktopprevious"/>
     </mousebind>
   </context>
   <context name="titlebar">
@@ -298,11 +296,17 @@
     </mousebind>
   </context>
   <context name="desktop">
+    <mousebind button="Up" action="click">
+      <action name="desktopnext"><interactive>no</interactive></action>
+    </mousebind>
+    <mousebind button="Down" action="click">
+      <action name="desktopprevious"><interactive>no</interactive></action>
+    </mousebind>
     <mousebind button="A-Up" action="click">
-      <action name="desktopright"/>
+      <action name="desktopnext"/>
     </mousebind>
     <mousebind button="A-Down" action="click">
-      <action name="desktopleft"/>
+      <action name="desktopprevious"/>
     </mousebind>
     <mousebind button="Middle" action="press">
       <action name="showmenu"><menu>client-list-menu</menu></action>

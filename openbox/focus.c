@@ -80,7 +80,7 @@ void focus_set_client(ObClient *client)
 
     /* in the middle of cycling..? kill it. */
     if (focus_cycle_target)
-        focus_cycle(TRUE, TRUE, TRUE, TRUE);
+        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE);
 
     old = focus_client;
     focus_client = client;
@@ -257,8 +257,8 @@ static void popup_cycle(ObClient *c, gboolean show)
     }
 }
 
-ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
-                      gboolean cancel)
+ObClient *focus_cycle(gboolean forward, gboolean linear,
+                      gboolean dialog, gboolean done, gboolean cancel)
 {
     static ObClient *first = NULL;
     static ObClient *t = NULL;
@@ -313,7 +313,7 @@ ObClient *focus_cycle(gboolean forward, gboolean linear, gboolean done,
                 focus_cycle_target = ft;
                 frame_adjust_focus(focus_cycle_target->frame, TRUE);
             }
-            popup_cycle(ft, config_focus_popup);
+            popup_cycle(ft, dialog);
             return ft;
         }
     } while (it != start);

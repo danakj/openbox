@@ -9,8 +9,6 @@ gboolean config_focus_new;
 gboolean config_focus_follow;
 gboolean config_focus_last;
 gboolean config_focus_last_on_desktop;
-gboolean config_focus_popup;
-gboolean config_desktop_popup;
 
 char *config_theme;
 
@@ -216,8 +214,6 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_focus_last = parse_bool(doc, n);
     if ((n = parse_find_node("focusLastOnDesktop", node)))
         config_focus_last_on_desktop = parse_bool(doc, n);
-    if ((n = parse_find_node("cyclingDialog", node)))
-        config_focus_popup = parse_bool(doc, n);
 }
 
 static void parse_theme(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -266,8 +262,6 @@ static void parse_desktops(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             nname = parse_find_node("name", nname->next);
         }
     }
-    if ((n = parse_find_node("cyclingDialog", node)))
-        config_desktop_popup = parse_bool(doc, n);
 }
 
 static void parse_resize(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -373,7 +367,6 @@ void config_startup(ObParseInst *i)
     config_focus_follow = FALSE;
     config_focus_last = TRUE;
     config_focus_last_on_desktop = TRUE;
-    config_focus_popup = TRUE;
 
     parse_register(i, "focus", parse_focus, NULL);
 
@@ -385,7 +378,6 @@ void config_startup(ObParseInst *i)
 
     config_desktops_num = 4;
     config_desktops_names = NULL;
-    config_desktop_popup = TRUE;
 
     parse_register(i, "desktops", parse_desktops, NULL);
 

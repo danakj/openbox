@@ -92,7 +92,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
     XImage *im = NULL;
     Pixmap oldp;
 
-    if (w <= 0 || h <= 0) return;
+    if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
 
     g_assert(l->surface.type == Surface_Planar);
 
@@ -106,8 +106,7 @@ void x_paint(Window win, Appearance *l, int x, int y, int w, int h)
                                render_colormap);
     g_assert(l->xftdraw != NULL);
 
-    if (l->surface.data.planar.pixel_data != NULL)
-        g_free(l->surface.data.planar.pixel_data);
+    g_free(l->surface.data.planar.pixel_data);
     l->surface.data.planar.pixel_data = g_new(pixel32, w * h);
 
     if (l->surface.data.planar.grad == Background_Solid)

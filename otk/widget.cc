@@ -153,6 +153,8 @@ void Widget::setGeometry(int x, int y, int width, int height)
   _rect = Rect(x, y, width, height);
   _dirty = true;
 
+  // don't use an XMoveResizeWindow here, because it doesn't seem to move
+  // windows with StaticGravity? This works, that didn't.
   XResizeWindow(**display, _window, width, height);
   XMoveWindow(**display, _window, x, y);
   _ignore_config+=2;

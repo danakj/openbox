@@ -130,7 +130,7 @@ void client_manage(Window window)
     if (XCheckTypedWindowEvent(ob_display, window, DestroyNotify, &e) ||
 	XCheckTypedWindowEvent(ob_display, window, UnmapNotify, &e)) {
 	XPutBackEvent(ob_display, &e);
-    
+
         grab_server(FALSE);
 	return; /* don't manage it */
     }

@@ -311,6 +311,7 @@ gint main(gint argc, gchar **argv)
             } else {
                 g_warning("failed to execute '%s': %s", restart_path,
                           err->message);
+                g_error_free(err);
             }
         }
 

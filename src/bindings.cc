@@ -39,9 +39,14 @@ void OBBindings::display()
 
 static bool translate(const std::string str, Binding &b)
 {
-  KeySym sym = XStringToKeysym(const_cast<char *>(str.c_str()));
+  std::string::size_type keybegin = str.find_last_of('-');
+  std::string key(str, keybegin != std::string::npos ? keybegin + 1 : 0);
+
+  // XXX: get some modifiers up in the hizzie
+  
+  KeySym sym = XStringToKeysym(const_cast<char *>(key.c_str()));
   if (sym == NoSymbol) return false;
-  b.modifiers = Mod1Mask;
+  b.modifiers = Mod1Mask; // XXX: no way
   b.key = XKeysymToKeycode(otk::OBDisplay::display, sym);
   return b.key != 0;
 }

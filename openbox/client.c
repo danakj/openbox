@@ -1652,6 +1652,11 @@ void client_close(Client *self)
     XSendEvent(ob_display, self->window, FALSE, NoEventMask, &ce);
 }
 
+void client_kill(Client *self)
+{
+    XKillClient(ob_display, self->window);
+}
+
 void client_set_desktop(Client *self, guint target)
 {
     guint old, i;

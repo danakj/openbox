@@ -73,6 +73,11 @@ void action_close(union ActionData *data)
     client_close(data->client.c);
 }
 
+void action_kill(union ActionData *data)
+{
+    client_kill(data->client.c);
+}
+
 void action_shade(union ActionData *data)
 {
     client_shade(data->client.c, TRUE);

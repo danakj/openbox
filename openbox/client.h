@@ -380,8 +380,11 @@ void client_maximize(Client *self, gboolean max, int dir,
 */
 void client_shade(Client *self, gboolean shade);
 
-/*! Request the client to close its window. */
+/*! Request the client to close its window */
 void client_close(Client *self);
+
+/*! Kill the client off violently */
+void client_kill(Client *self);
 
 /*! Sends the window to the specified desktop */
 void client_set_desktop(Client *self, guint target);

@@ -407,6 +407,8 @@ static void binddef()
     mbind("1", "icon", MouseAction_DClick, a);
     a = action_new(action_close);
     mbind("1", "close", MouseAction_Click, a);
+    a = action_new(action_kill);
+    mbind("2", "close", MouseAction_Click, a);
     a = action_new(action_toggle_omnipresent);
     mbind("1", "alldesktops", MouseAction_Click, a);
 

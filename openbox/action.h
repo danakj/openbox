@@ -104,6 +104,8 @@ void action_focusraise(union ActionData *data);
 /* ClientAction */
 void action_close(union ActionData *data);
 /* ClientAction */
+void action_kill(union ActionData *data);
+/* ClientAction */
 void action_shade(union ActionData *data);
 /* ClientAction */
 void action_unshade(union ActionData *data);

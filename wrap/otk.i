@@ -60,7 +60,6 @@ namespace otk {
 %include "label.hh"
 %include "appwidget.hh"
 %include "application.hh"
-%include "assassin.hh"
 %include "button.hh"
 %include "display.hh"
 %include "rendercontrol.hh"

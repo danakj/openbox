@@ -8,14 +8,14 @@ void dispatch_startup();
 void dispatch_shutdown();
 
 typedef enum {
-    Event_X_EnterNotify   = 1 << 0,
-    Event_X_LeaveNotify   = 1 << 1,
-    Event_X_KeyPress      = 1 << 2,
-    Event_X_KeyRelease    = 1 << 3,
-    Event_X_ButtonPress   = 1 << 4,
-    Event_X_ButtonRelease = 1 << 5,
-    Event_X_MotionNotify  = 1 << 6,
-    Event_X_Bell          = 1 << 7,
+    Event_X_EnterNotify   = 1 << 0, /* pointer entered a window */
+    Event_X_LeaveNotify   = 1 << 1, /* pointer left a window */
+    Event_X_KeyPress      = 1 << 2, /* key pressed */
+    Event_X_KeyRelease    = 1 << 3, /* key released */
+    Event_X_ButtonPress   = 1 << 4, /* mouse button pressed */
+    Event_X_ButtonRelease = 1 << 5, /* mouse button released */
+    Event_X_MotionNotify  = 1 << 6, /* mouse motion */
+    Event_X_Bell          = 1 << 7, /* an XKB bell event
 
     Event_Client_New      = 1 << 8, /* new window, before mapping */
     Event_Client_Mapped   = 1 << 9, /* new window, after mapping */
@@ -29,10 +29,10 @@ typedef enum {
     Event_Ob_Desktop      = 1 << 15, /* changed desktops */
     Event_Ob_NumDesktops  = 1 << 16, /* changed the number of desktops */
     Event_Ob_ShowDesktop  = 1 << 17, /* entered/left show-the-desktop mode */
-    Event_Ob_Startup      = 1 << 18, /* startup complete */
-    Event_Ob_Shutdown     = 1 << 19, /* shutdown about to start */
+    Event_Ob_Startup      = 1 << 18, /* startup under way */
+    Event_Ob_Shutdown     = 1 << 19, /* shutdown under way */
 
-    Event_Signal          = 1 << 20,
+    Event_Signal          = 1 << 20, /* a signal from the OS */
 
     EVENT_RANGE           = 1 << 21
 } EventType;

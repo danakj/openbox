@@ -61,7 +61,15 @@ hooks.visible.append(myfocus)
 mykmap=((("C-a", "d"), printshit),
         (("C-Tab",), stackedcycle.next),
         (("C-S-Tab",), stackedcycle.previous),
-        (("C-space",), lambda k, c: myexec("xterm")))
+        (("Mod1-1",), lambda k,c: ob.Openbox.setDesktop(1)),
+        (("Mod1-2",), lambda k,c: ob.Openbox.setDesktop(2)),
+        (("Mod1-3",), lambda k,c: ob.Openbox.setDesktop(3)),
+        (("Mod1-4",), lambda k,c: ob.Openbox.setDesktop(4)),
+        (("Mod1-C-Left",), lambda k,c: ob.Openbox.setPreviousDesktop() or c.setDesktop(ob.Openbox.desktop())),
+        (("Mod1-C-Right",), lambda k,c: ob.Openbox.setNextDesktop() or c.setDesktop(ob.Openbox.desktop())),
+        (("Mod1-Left",), lambda k,c: ob.Openbox.setPreviousDesktop()),
+        (("Mod1-Right",), lambda k,c: ob.Openbox.setNextDesktop()),
+        (("C-space",), lambda k,c: myexec("xterm")))
 keymap.set(mykmap)
 
 def mytogglesticky(client):

@@ -48,7 +48,7 @@ gboolean screen_annex()
     XErrorHandler old;
     pid_t pid;
     int i, num_support;
-    Atom *supported;
+    guint32 *supported;
 
     running = FALSE;
     old = XSetErrorHandler(another_running);
@@ -80,7 +80,7 @@ gboolean screen_annex()
     /* set the _NET_SUPPORTED_ATOMS hint */
     num_support = 48;
     i = 0;
-    supported = g_new(Atom, num_support);
+    supported = g_new(guint32, num_support);
     supported[i++] = prop_atoms.net_current_desktop;
     supported[i++] = prop_atoms.net_number_of_desktops;
     supported[i++] = prop_atoms.net_desktop_geometry;
@@ -155,8 +155,8 @@ void screen_startup()
     screen_resize();
 
     /* set the names */
-    screen_desktop_names = g_new(char*,
-                                 g_slist_length(config_desktops_names) + 1);
+    screen_desktop_names = g_new0(char*,
+                                  g_slist_length(config_desktops_names) + 1);
     for (i = 0, it = config_desktops_names; it; ++i, it = it->next)
         screen_desktop_names[i] = it->data; /* dont strdup */
     PROP_SETSS(ob_root, net_desktop_names, screen_desktop_names);
@@ -384,6 +384,7 @@ void screen_update_desktop_names()
     if (i < screen_num_desktops) {
         screen_desktop_names = g_renew(char*, screen_desktop_names,
                                        screen_num_desktops + 1);
+        screen_desktop_names[screen_num_desktops] = NULL;
         for (; i < screen_num_desktops; ++i)
             screen_desktop_names[i] = g_strdup("Unnamed Desktop");
     }

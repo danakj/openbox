@@ -74,7 +74,7 @@ static void focus_fallback(gboolean switching_desks)
         }
 }
 
-static void events(ObEvent *e, void *foo)
+static void event(ObEvent *e, void *foo)
 {
     switch (e->type) {
     case Event_Client_Mapped:
@@ -125,10 +125,10 @@ void plugin_startup()
                       Event_Ob_Desktop | 
                       Event_Client_Unmapped |
                       Event_X_EnterNotify,
-                      (EventHandler)events, NULL);
+                      (EventHandler)event, NULL);
 }
 
 void plugin_shutdown()
 {
-    dispatch_register(0, (EventHandler)events, NULL);
+    dispatch_register(0, (EventHandler)event, NULL);
 }

@@ -386,6 +386,8 @@ bool Bindings::grabKeyboard(int screen, PyObject *callback)
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
                     GrabModeAsync, CurrentTime))
     return false;
+  XGrabPointer(**otk::display, root, false, 0, GrabModeAsync,
+               GrabModeAsync, None, None, CurrentTime);
   _keybgrab_callback = callback;
   return true;
 }
@@ -397,6 +399,7 @@ void Bindings::ungrabKeyboard()
 
   _keybgrab_callback = 0;
   XUngrabKeyboard(**otk::display, CurrentTime);
+  XUngrabPointer(**otk::display, CurrentTime);
 }
 
 

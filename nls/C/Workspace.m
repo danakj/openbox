@@ -1,4 +1,4 @@
 $set 11 #Workspace
 
 $ #DefaultNameFormat
-# Werkblad %d
+# Area de Trabalho %d

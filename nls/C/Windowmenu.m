@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Verplaatsen naar ...
+# Enviar Para ...
 $ #Shade
-# Alleen titel
+# Encolher
 $ #Iconify
-# Minimaliseren
+# Minimizar
 $ #Maximize
-# Maximaliseren
+# Maximizar
 $ #Raise
-# Voorgrond
+# Focalizar
 $ #Lower
-# Achtergrond
+# Desfocalizar
 $ #Stick
-# Altijd zichtbaar
+# Sempre Visivel
 $ #KillClient
-# Afbreken
+# Kill Cliente
 $ #Close
-# Sluiten
+# Fechar

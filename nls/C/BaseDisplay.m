@@ -1,16 +1,16 @@
 $set 1 #BaseDisplay
 
 $ #XError
-# %s:  X fout: %s(%d) opcodes %d/%d\n  resource 0x%lx\n
+# %s:  X erro: %s(%d) opcodes %d/%d\n  recurso 0x%lx\n
 $ #SignalCaught
-# %s: signaal %d gekregen\n
+# %s: recebeido sinal %d\n
 $ #ShuttingDown
-# bezig af te sluiten\n
+# desligando\n
 $ #Aborting
-# afgebroken... core bestand gedumpt\n
+# abortando... gerando arquivo core\n
 $ #XConnectFail
-# BaseDisplay::BaseDisplay: verbinding met X server mislukt\n
+# BaseDisplay::BaseDisplay: conecção ao servidor X falhou.\n
 $ #CloseOnExecFail
-# BaseDisplay::BaseDisplay: kan display verbinding niet markeren als 'close-on-exec'\n
+# BaseDisplay::BaseDisplay: impossivel marcar a conexão ao display como close-on-exec\n
 $ #BadWindowRemove
-# BaseDisplay::eventLoop(): verwijder 'bad window' van gebeurtenis wachtrij\n
+# BaseDisplay::eventLoop(): removendo má janela da trilha de eventos\n

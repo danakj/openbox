@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: kan pixmap niet aanmaken\n
+# BImage::render_solid: erro criando pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: kan XImage niet aanmaken\n
+# BImage::renderXImage: erro criando XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: niet ondersteunde visual\n
+# BImage::renderXImage: visual não suportado\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: kan pixmap niet aanmaken\n
+# BImage::renderPixmap: erro criando pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: ongeldige grootte kleurenmap %d (%d/%d/%d) - verkleind\n
+# BImageControl::BImageControl: mapa de cores de tamanho invalido %d (%d/%d/%d) - reduzindo\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: kan geen kleurenmap aanmaken\n
+# BImageControl::BImageControl: erro localizando mapa de cores\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: kan kleur %d/%d/%d niet aanmaken\n
+# BImageControl::BImageControl: falha localizando cor %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: pixmap cache - %d pixmaps verwijderd\n
+# BImageControl::~BImageControl: reserva de pixmap cheia - liberando %d pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: cache is te groot, leeggemaakt\n
+# BImageControl::renderImage: reserva cheia, forçando limpeza\n
 $ #ColorParseError
-# BImageControl::getColor: fout bij lezen kleur: '%s'\n
+# BImageControl::getColor: color parse error: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: fout bij aanmaken kleur: '%s'\n
+# BImageControl::getColor: erro localizando cor: '%s'\n

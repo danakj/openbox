@@ -699,7 +699,7 @@ static void event_handle_client(Client *client, XEvent *e)
 		corner = Corner_TopLeft;
 	    }
 
-	    client_configure(client, corner, x, y, w, h, FALSE, FALSE);
+	    client_configure(client, corner, x, y, w, h, FALSE, TRUE);
 	}
 
 	if (e->xconfigurerequest.value_mask & CWStackMode) {

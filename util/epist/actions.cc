@@ -39,7 +39,13 @@ Action::Action(enum ActionType type, KeyCode keycode, unsigned int modifierMask,
 
   for (int i = 0; str_types[i] != noaction; ++i) {
     if (type == str_types[i]) {
-      _stringParam = str;
+      // the first and last characters of the string are quotes, and we need to
+      // get rid of them
+      assert(str.size() >= 2);
+      assert(str[0] == '"');
+      assert(str[str.size() - 1] == '"');
+
+      _stringParam = str.substr(1, str.size() - 2);
       return;
     }
   }

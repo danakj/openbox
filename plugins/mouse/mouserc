@@ -54,6 +54,10 @@
 #  * Shade - Shade (roll up) the client
 #  * Unshade - Unshade (roll down) the client
 #  * ToggleShade - Shade and unshade the client
+#  * ShadeLower - Shades the window if it's not shaded, and lower it
+#                 if it was already shaded
+#  * UnshadeRaise - Unshades the window if it's shaded, and raise it
+#                   if it was already unshaded
 #  * ToggleOmnipresent - Place the client on all desktops or the current one
 #  * MaximizeFull - Maximize the window horizontally and vertically
 #  * UnmaximizeFull - Restore the window horizontally and vertically

@@ -24,6 +24,10 @@
 #  * Shade - Shade (roll up) the focused client
 #  * Unshade - Unshade (roll down) the focused client
 #  * ToggleShade - Shade and unshade the focused client
+#  * ShadeLower - Shades the window if it's not shaded, and lower it
+#                 if it was already shaded
+#  * UnshadeRaise - Unshades the window if it's shaded, and raise it
+#                   if it was already unshaded
 #  * ToggleOmnipresent - Place the focused client on all desktops or the
 #                        current one
 #  * MaximizeFull - Maximize the focused window horizontally and vertically

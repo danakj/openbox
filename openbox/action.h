@@ -120,6 +120,10 @@ void action_kill(union ActionData *data);
 /* ClientAction */
 void action_shade(union ActionData *data);
 /* ClientAction */
+void action_shadelower(union ActionData *data);
+/* ClientAction */
+void action_unshaderaise(union ActionData *data);
+/* ClientAction */
 void action_unshade(union ActionData *data);
 /* ClientAction */
 void action_toggle_shade(union ActionData *data);

@@ -52,6 +52,10 @@ Action *action_from_string(char *name)
         a = action_new(action_close);
     } else if (!g_ascii_strcasecmp(name, "kill")) {
         a = action_new(action_kill);
+    } else if (!g_ascii_strcasecmp(name, "shadelower")) {
+        a = action_new(action_shadelower);
+    } else if (!g_ascii_strcasecmp(name, "unshaderaise")) {
+        a = action_new(action_unshaderaise);
     } else if (!g_ascii_strcasecmp(name, "shade")) {
         a = action_new(action_shade);
     } else if (!g_ascii_strcasecmp(name, "unshade")) {
@@ -194,6 +198,26 @@ void action_raise(union ActionData *data)
 {
     if (data->client.c)
         stacking_raise(data->client.c);
+}
+
+void action_unshaderaise(union ActionData *data)
+{
+    if (data->client.c) {
+        if (data->client.c->shaded)
+            client_shade(data->client.c, FALSE);
+        else
+            stacking_raise(data->client.c);
+    }
+}
+
+void action_shadelower(union ActionData *data)
+{
+    if (data->client.c) {
+        if (data->client.c->shaded)
+            stacking_lower(data->client.c);
+        else
+            client_shade(data->client.c, TRUE);
+    }
 }
 
 void action_lower(union ActionData *data)

@@ -37,8 +37,8 @@
  */
 class Configuration {
 public:
-  explicit Configuration(const std::string &file);
-  Configuration();
+  explicit Configuration(const std::string &file, bool autosave = True);
+  Configuration(bool autosave = True);
   virtual ~Configuration();
 
   inline const std::string &file() const {
@@ -58,6 +58,7 @@ public:
 
   void save();
   bool load();
+  bool merge(const std::string &file, bool overwrite = False);
   void create();
 
   void setValue(const std::string &rname, bool value);

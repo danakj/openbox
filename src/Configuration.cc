@@ -35,21 +35,21 @@ using std::string;
 
 bool Configuration::m_initialized = False;
 
-Configuration::Configuration(const string &file) {
+Configuration::Configuration(const string &file, bool autosave) {
   setFile(file);
   m_modified = False;
   m_database = NULL;
-  m_autosave = True;
+  m_autosave = autosave;
   if (! m_initialized) {
     XrmInitialize();
     m_initialized = True;
   }
 }
 
-Configuration::Configuration() {
+Configuration::Configuration(bool autosave) {
   m_modified = False;
   m_database = NULL;
-  m_autosave = True;
+  m_autosave = autosave;
   if (! m_initialized) {
     XrmInitialize();
     m_initialized = True;
@@ -81,6 +81,15 @@ bool Configuration::load() {
   m_modified = False;
   if (NULL == (m_database = XrmGetFileDatabase(m_file.c_str())))
     return False;
+  return True;
+}
+
+bool Configuration::merge(const string &file, bool overwrite) {
+  if (XrmCombineFileDatabase(file.c_str(), &m_database, overwrite) == 0)
+    return False;
+  m_modified = True;
+  if (m_autosave)
+    save();
   return True;
 }
 

@@ -19,6 +19,7 @@ static PyMethodDef otk_methods[] = {
 
 void initotk(char *display)
 {
+  OtkRect_Type.ob_type = &PyType_Type;
   OtkDisplay_Type.ob_type = &PyType_Type;
   OtkScreenInfo_Type.ob_type = &PyType_Type;
   OtkColor_Type.ob_type = &PyType_Type;

@@ -1,5 +1,6 @@
 #include "debug.h"
 #include "openbox.h"
+#include "session.h"
 #include "dock.h"
 #include "event.h"
 #include "menu.h"
@@ -36,30 +37,22 @@
 #ifdef HAVE_LOCALE_H
 #  include <locale.h>
 #endif
-#ifdef HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #  include <sys/types.h>
 #endif
-
-#ifdef USE_SM
-#include <X11/SM/SMlib.h>
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
 #endif
 
 #include <X11/cursorfont.h>
-
-#ifdef USE_SM
-gboolean    ob_sm_use = TRUE;
-SmcConn     ob_sm_conn;
-gchar      *ob_sm_id;
-#endif
 
 RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 Display    *ob_display;
 gint        ob_screen;
+gboolean    ob_sm_use = TRUE;
+gchar      *ob_sm_id;
 gboolean    ob_replace_wm;
 
 static ObState   state;
@@ -69,20 +62,11 @@ static gboolean  restart;
 static char     *restart_path;
 static Cursor    cursors[OB_NUM_CURSORS];
 static KeyCode   keys[OB_NUM_KEYS];
+static gchar    *sm_save_file;
 
 static void signal_handler(const ObEvent *e, void *data);
 static void parse_args(int argc, char **argv);
 
-static void sm_startup(int argc, char **argv);
-static void sm_shutdown();
-
-#ifdef USE_SM
-static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
-                             Bool shutdown, int interact_style, Bool fast);
-static void sm_die(SmcConn conn, SmPointer data);
-static void sm_save_complete(SmcConn conn, SmPointer data);
-static void sm_shutdown_cancelled(SmcConn conn, SmPointer data);
-#endif
 static void exit_with_error(gchar *msg);
 
 int main(int argc, char **argv)
@@ -133,6 +117,11 @@ int main(int argc, char **argv)
     mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
                  S_IROTH | S_IWOTH | S_IXOTH));
     g_free(path);
+    /* create the ~/.openbox/sessions dir */
+    path = g_build_filename(g_get_home_dir(), ".openbox", "sessions", NULL);
+    mkdir(path, (S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP |
+                 S_IROTH | S_IWOTH | S_IXOTH));
+    g_free(path);
 
     g_set_prgname(argv[0]);
      
@@ -145,7 +134,8 @@ int main(int argc, char **argv)
     if (fcntl(ConnectionNumber(ob_display), F_SETFD, 1) == -1)
         exit_with_error("Failed to set display as close-on-exec.");
 
-    sm_startup(argc, argv);
+    session_load(sm_save_file);
+    session_startup(argc, argv);
 
 #ifdef USE_LIBSN
     ob_sn_display = sn_display_new(ob_display, NULL, NULL);
@@ -289,7 +279,8 @@ int main(int argc, char **argv)
     RrThemeFree(ob_rr_theme);
     RrInstanceFree(ob_rr_inst);
 
-    sm_shutdown();
+    session_shutdown();
+    g_free(ob_sm_id);
 
     XCloseDisplay(ob_display);
 
@@ -314,156 +305,6 @@ int main(int argc, char **argv)
     }
      
     return 0;
-}
-
-static void sm_startup(int argc, char **argv)
-{
-#ifdef USE_SM
-
-#define SM_ERR_LEN 1024
-
-    SmcCallbacks cb;
-    char sm_err[SM_ERR_LEN];
-
-    cb.save_yourself.callback = sm_save_yourself;
-    cb.save_yourself.client_data = NULL;
-
-    cb.die.callback = sm_die;
-    cb.die.client_data = NULL;
-
-    cb.save_complete.callback = sm_save_complete;
-    cb.save_complete.client_data = NULL;
-
-    cb.shutdown_cancelled.callback = sm_shutdown_cancelled;
-    cb.shutdown_cancelled.client_data = NULL;
-
-    ob_sm_conn = SmcOpenConnection(NULL, NULL, 1, 0,
-                                   SmcSaveYourselfProcMask |
-                                   SmcDieProcMask |
-                                   SmcSaveCompleteProcMask |
-                                   SmcShutdownCancelledProcMask,
-                                   &cb, ob_sm_id, &ob_sm_id,
-                                   SM_ERR_LEN, sm_err);
-    if (ob_sm_conn == NULL)
-        g_warning("Failed to connect to session manager: %s", sm_err);
-    else {
-        SmPropValue val_prog;
-        SmPropValue val_uid;
-        SmPropValue val_hint; 
-        SmPropValue val_pri;
-        SmPropValue val_pid;
-        SmProp prop_cmd = { SmCloneCommand, SmLISTofARRAY8, 1, };
-        SmProp prop_res = { SmRestartCommand, SmLISTofARRAY8, };
-        SmProp prop_prog = { SmProgram, SmARRAY8, 1, };
-        SmProp prop_uid = { SmUserID, SmARRAY8, 1, };
-        SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
-        SmProp prop_pid = { SmProcessID, SmARRAY8, 1, };
-        SmProp prop_pri = { "_GSM_Priority", SmCARD8, 1, };
-        SmProp *props[7];
-        gulong hint, pri;
-        gchar pid[32];
-        gint i, j;
-        gboolean has_id;
-
-        for (i = 1; i < argc - 1; ++i)
-            if (strcmp(argv[i], "--sm-client-id") == 0)
-                break;
-        has_id = (i < argc - 1);
-
-        prop_cmd.vals = g_new(SmPropValue, (has_id ? argc-2 : argc));
-        prop_cmd.num_vals = (has_id ? argc-2 : argc);
-        for (i = 0, j = 0; i < argc; ++i, ++j) {
-            if (strcmp (argv[i], "--sm-client-id") == 0) {
-                ++i, --j; /* skip the next as well, keep j where it is */
-            } else {
-                prop_cmd.vals[j].value = argv[i];
-                prop_cmd.vals[j].length = strlen(argv[i]);
-            }
-        }
-
-        prop_res.vals = g_new(SmPropValue, (has_id ? argc : argc+2));
-        prop_res.num_vals = (has_id ? argc : argc+2);
-        for (i = 0, j = 0; i < argc; ++i, ++j) { 
-            if (strcmp (argv[i], "--sm-client-id") == 0) {
-                ++i, --j; /* skip the next as well, keep j where it is */
-            } else {
-                prop_res.vals[j].value = argv[i];
-                prop_res.vals[j].length = strlen(argv[i]);
-            }
-        }
-        prop_res.vals[j].value = "--sm-client-id";
-        prop_res.vals[j++].length = strlen("--sm-client-id");
-        prop_res.vals[j].value = ob_sm_id;
-        prop_res.vals[j++].length = strlen(ob_sm_id);
-
-        val_prog.value = argv[0];
-        val_prog.length = strlen(argv[0]);
-
-        val_uid.value = g_strdup(g_get_user_name());
-        val_uid.length = strlen(val_uid.value);
-
-        hint = SmRestartImmediately;
-        val_hint.value = &hint;
-        val_hint.length = 1;
-
-        sprintf(pid, "%ld", (long)getpid());
-        val_pid.value = pid;
-        val_pid.length = strlen(pid);
-
-        /* priority with gnome-session-manager, low to run before other apps */
-        pri = 20;
-        val_pri.value = &pri;
-        val_pri.length = 1;
-
-        prop_prog.vals = &val_prog;
-        prop_uid.vals = &val_uid;
-        prop_hint.vals = &val_hint;
-        prop_pid.vals = &val_pid;
-        prop_pri.vals = &val_pri;
-
-        props[0] = &prop_prog;
-        props[1] = &prop_cmd;
-        props[2] = &prop_res;
-        props[3] = &prop_uid;
-        props[4] = &prop_hint;
-        props[5] = &prop_pid;
-        props[6] = &prop_pri;
-
-        SmcSetProperties(ob_sm_conn, 7, props);
-
-        g_free(val_uid.value);
-        g_free(prop_cmd.vals);
-        g_free(prop_res.vals);
-
-        ob_debug("Connected to session manager with id %s\n", ob_sm_id);
-    }
-    g_free (ob_sm_id);
-#endif
-}
-
-static void sm_shutdown()
-{
-#ifdef USE_SM
-    if (ob_sm_conn) {
-        SmPropValue val_hint;
-        SmProp prop_hint = { SmRestartStyleHint, SmCARD8, 1, };
-        SmProp *props[1];
-        gulong hint;
-
-        /* when we exit, we want to reset this to a more friendly state */
-        hint = SmRestartIfRunning;
-        val_hint.value = &hint;
-        val_hint.length = 1;
-
-        prop_hint.vals = &val_hint;
-
-        props[0] = &prop_hint;
-
-        SmcSetProperties(ob_sm_conn, 1, props);
-
-        SmcCloseConnection(ob_sm_conn, 0, NULL);
-    }
-#endif
 }
 
 static void signal_handler(const ObEvent *e, void *data)
@@ -506,16 +347,18 @@ static void print_help()
     g_print("Syntax: openbox [options]\n\n");
     g_print("Options:\n\n");
 #ifdef USE_SM
-    g_print("  --sm-client-id ID  Specify session management ID\n");
-    g_print("  --sm-disable       Disable connection to session manager\n");
+    g_print("  --sm-disable        Disable connection to session manager\n");
+    g_print("  --sm-client-id ID   Specify session management ID\n");
+    g_print("  --sm-save-file FILE Specify file to load a saved session\n"
+            "                      from\n");
 #endif
-    g_print("  --replace          Replace the currently running window "
+    g_print("  --replace           Replace the currently running window "
             "manager\n");
-    g_print("  --help             Display this help and exit\n");
-    g_print("  --version          Display the version and exit\n");
-    g_print("  --sync             Run in synchronous mode (this is slow and\n"
-            "                     meant for debugging X routines)\n");
-    g_print("  --debug            Display debugging output\n");
+    g_print("  --help              Display this help and exit\n");
+    g_print("  --version           Display the version and exit\n");
+    g_print("  --sync              Run in synchronous mode (this is slow and\n"
+            "                      meant for debugging X routines)\n");
+    g_print("  --debug             Display debugging output\n");
     g_print("\nPlease report bugs at %s\n", PACKAGE_BUGREPORT);
 }
 
@@ -543,7 +386,12 @@ static void parse_args(int argc, char **argv)
             if (i == argc - 1) /* no args left */
                 g_printerr(_("--sm-client-id requires an argument\n"));
             else
-                ob_sm_id = argv[++i];
+                ob_sm_id = g_strdup(argv[++i]);
+        } else if (!strcmp(argv[i], "--sm-save-file")) {
+            if (i == argc - 1) /* no args left */
+                g_printerr(_("--sm-save-file requires an argument\n"));
+            else
+                sm_save_file = argv[++i];
         } else if (!strcmp(argv[i], "--sm-disable")) {
             ob_sm_use = FALSE;
 #endif
@@ -555,35 +403,10 @@ static void parse_args(int argc, char **argv)
     }
 }
 
-#ifdef USE_SM
-static void sm_save_yourself(SmcConn conn, SmPointer data, int save_type,
-                             Bool shutdown, int interact_style, Bool fast)
-{
-    ob_debug("got SAVE YOURSELF from session manager\n");
-    SmcSaveYourselfDone(conn, TRUE);
-}
-
-static void sm_die(SmcConn conn, SmPointer data)
-{
-    ob_exit();
-    ob_debug("got DIE from session manager\n");
-}
-
-static void sm_save_complete(SmcConn conn, SmPointer data)
-{
-    ob_debug("got SAVE COMPLETE from session manager\n");
-}
-
-static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
-{
-    ob_debug("got SHUTDOWN CANCELLED from session manager\n");
-}
-#endif
-
 static void exit_with_error(gchar *msg)
 {
     g_critical(msg);
-    sm_shutdown();
+    session_shutdown();
     exit(EXIT_FAILURE);
 }
 

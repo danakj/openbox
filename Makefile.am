@@ -169,6 +169,8 @@ kernel_openbox_SOURCES = \
 	kernel/prop.h \
 	kernel/screen.c \
 	kernel/screen.h \
+	kernel/session.c \
+	kernel/session.h \
 	kernel/stacking.c \
 	kernel/stacking.h \
 	kernel/startup.c \

@@ -708,7 +708,7 @@ done_cycle:
 
     popup_cycle(0, FALSE);
 
-    return d = screen_desktop;
+    return d;
 }
 
 void screen_update_layout()

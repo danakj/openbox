@@ -27,6 +27,7 @@
 
 #include "Basemenu.h"
 #include "Timer.h"
+#include "Screen.h"
 
 // forward declaration
 class Toolbar;
@@ -125,8 +126,13 @@ public:
   
   inline const int &getX(void) const
   { return ((hidden) ? frame.x_hidden : frame.x); }
-  inline const int getY(void) const 
-    { return ((hidden || do_hide) ? frame.y_hidden : frame.y); }
+  //  const int getY(void) const;
+  inline const int getY(void) const { 
+    if (do_hide) return screen.size().h();
+    else if (hidden) return frame.y_hidden;
+    else return frame.y;
+  }
+
   
   void buttonPressEvent(XButtonEvent *);
   void buttonReleaseEvent(XButtonEvent *);

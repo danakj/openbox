@@ -1,3 +1,6 @@
+#ifndef __focus_hh
+#define __focus_hh
+
 #include <string>
 #include <list>
 
@@ -22,6 +25,8 @@ public:
 
   virtual ~OtkWidget();
 
+  void update(void);
+
   inline Window getWindow(void) const { return _window; }
   inline const OtkWidget *getParent(void) const { return _parent; }
   inline const OtkWidgetList &getChildren(void) const { return _children; }
@@ -30,6 +35,9 @@ public:
 
   void move(const Point &to);
   void move(int x, int y);
+
+  virtual void setWidth(int);
+  virtual void setHeight(int);
 
   virtual void resize(const Point &to);
   virtual void resize(int x, int y);
@@ -53,16 +61,17 @@ public:
   bool grabKeyboard(void);
   void ungrabKeyboard(void);
 
-  inline const BTexture *getTexture(void) const { return _texture; }
-  virtual void setTexture(BTexture *texture = 0);
+  inline BTexture *getTexture(void) const { return _texture; }
+  virtual void setTexture(BTexture *texture)
+  { _texture = texture; _dirty = true; }
 
   virtual void addChild(OtkWidget *child, bool front = false);
   virtual void removeChild(OtkWidget *child);
 
-  inline bool getStretchableHorz(void) const { return _stretchable_horz; }
+  inline bool isStretchableHorz(void) const { return _stretchable_horz; }
   void setStretchableHorz(bool s_horz) { _stretchable_horz = s_horz; }
 
-  inline bool getStretchableVert(void) const { return _stretchable_vert; }
+  inline bool isStretchableVert(void) const { return _stretchable_vert; }
   void setStretchableVert(bool s_vert)  { _stretchable_vert = s_vert; }
 
   inline Cursor getCursor(void) const { return _cursor; }
@@ -80,12 +89,17 @@ public:
 private:
 
   void create(void);
+  void adjust(void);
+  void adjustHorz(void);
+  void adjustVert(void);
+  void internalResize(int width, int height);
+  void render(void);
 
   Window _window;
 
   OtkWidget *_parent;
   OtkWidgetList _children;
- 
+
   Style *_style;
   Direction _direction;
   Cursor _cursor;
@@ -102,9 +116,17 @@ private:
 
   BTexture *_texture;
   Pixmap _bg_pixmap;
+  unsigned int _bg_pixel;
 
   Rect _rect;
   unsigned int _screen;
+
+  bool _fixed_width;
+  bool _fixed_height;
+
+  bool _dirty;
 };
 
 }
+
+#endif // __widget_hh

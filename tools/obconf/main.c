@@ -23,7 +23,6 @@ gboolean on_mainwindow_delete_event(GtkWidget *w, GdkEvent *e, gpointer d);
 void on_quit_activate(GtkMenuItem *item, gpointer d);
 void on_applybutton_clicked(GtkButton *but, gpointer d);
 void on_revertbutton_clicked(GtkButton *but, gpointer d);
-void on_helpbutton_clicked(GtkButton *but, gpointer d);
 void on_selection_changed(GtkTreeSelection *selection, gpointer data);
 
 static void obconf_error(GError *e)
@@ -141,6 +140,10 @@ int main(int argc, char **argv)
     GtkWidget *vbox;
     GtkWidget *hpane;
     GtkAccelGroup *accel;
+    GtkWidget *sep;
+    GtkWidget *bbox;
+    GtkWidget *but;
+    GtkWidget *bar;
 
     gtk_set_locale();
     gtk_init(&argc, &argv);
@@ -156,7 +159,7 @@ int main(int argc, char **argv)
     accel = gtk_accel_group_new();
     gtk_window_add_accel_group(GTK_WINDOW(mainwin), accel);
 
-    vbox = gtk_vbox_new(FALSE, 3);
+    vbox = gtk_vbox_new(FALSE, 5);
     gtk_container_add(GTK_CONTAINER(mainwin), vbox);
 
     /* Menu */
@@ -174,8 +177,35 @@ int main(int argc, char **argv)
 
     /* Main work area */
 
-    mainworkarea = gtk_vbox_new(FALSE, 1);
+    mainworkarea = gtk_layout_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(hpane), mainworkarea);
+
+    /* Separator */
+
+    sep = gtk_hseparator_new();
+    gtk_box_pack_start(GTK_BOX(vbox), sep, FALSE, FALSE, 0);
+
+    /* Button box */
+
+    bbox = gtk_hbutton_box_new();
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
+    gtk_button_box_set_spacing(GTK_BUTTON_BOX(bbox), 6);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
+
+    /* Revert Button */
+
+    but = gtk_button_new_with_mnemonic("_Revert");
+    gtk_box_pack_start(GTK_BOX(bbox), but, FALSE, FALSE, 0);
+
+    /* Apply Button */
+
+    but = gtk_button_new_with_mnemonic("_Apply");
+    gtk_box_pack_start(GTK_BOX(bbox), but, FALSE, FALSE, 0);
+
+    /* Status bar */
+
+    bar = gtk_statusbar_new();
+    gtk_box_pack_start(GTK_BOX(vbox), bar, FALSE, FALSE, 0);
 
     gtk_widget_show_all(mainwin);
 
@@ -205,11 +235,6 @@ void on_applybutton_clicked(GtkButton *but, gpointer d)
 void on_revertbutton_clicked(GtkButton *but, gpointer d)
 {
     g_message("revert");
-}
-
-void on_helpbutton_clicked(GtkButton *but, gpointer d)
-{
-    g_message("help");
 }
 
 void on_selection_changed(GtkTreeSelection *sel, gpointer data)

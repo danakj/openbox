@@ -3,7 +3,7 @@ themercdir=$(datadir)/openbox
 enginedir=$(libdir)/openbox/engines
 plugindir=$(libdir)/openbox/plugins
 
-binary=ob3
+binary=openbox3
 url=http://icculus.org/openbox
 bugurl=http://bugzilla.icculus.org
 

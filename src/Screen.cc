@@ -312,9 +312,6 @@ BScreen::~BScreen(void) {
 
   std::for_each(netizenList.begin(), netizenList.end(), PointerAssassin());
 
-  while (! desktopWindowList.empty())
-    removeDesktopWindow(desktopWindowList[0]);
-
   while (! systrayWindowList.empty())
     removeSystrayWindow(systrayWindowList[0]);
 
@@ -652,7 +649,7 @@ void BScreen::load_rc(void) {
     else if (s == "UnderMousePlacement")
       resource.placement_policy = UnderMousePlacement;
     else if (s == "ClickMousePlacement")
-      resource.placement_policy = UnderMousePlacement;
+      resource.placement_policy = ClickMousePlacement;
     else if (s == "ColSmartPlacement")
       resource.placement_policy = ColSmartPlacement;
     else //if (s == "RowSmartPlacement")
@@ -1168,49 +1165,33 @@ void BScreen::removeSystrayWindow(Window window) {
 }
 
 
-void BScreen::addDesktopWindow(Window window) {
-  desktopWindowList.push_back(window);
-  XLowerWindow(blackbox->getXDisplay(), window);
-  XSelectInput(blackbox->getXDisplay(), window, StructureNotifyMask);
-  blackbox->saveDesktopWindowSearch(window, this);
-}
-
-
-void BScreen::removeDesktopWindow(Window window) {
-  WindowList::iterator it = desktopWindowList.begin();
-  const WindowList::iterator end = desktopWindowList.end();
-  for (; it != end; ++it)
-    if (*it == window) {
-      desktopWindowList.erase(it);
-      XSelectInput(blackbox->getXDisplay(), window, None);
-      blackbox->removeDesktopWindowSearch(window);
-      break;
-    }
-}
-
-
 void BScreen::manageWindow(Window w) {
+  // is the window a KDE systray window?
+  Window systray;
+  if (xatom->getValue(w, XAtom::kde_net_wm_system_tray_window_for,
+                      XAtom::window, systray) && systray) {
+    addSystrayWindow(w);
+    return;
+  }
+
   new BlackboxWindow(blackbox, w, this);
 
   BlackboxWindow *win = blackbox->searchWindow(w);
   if (! win)
     return;
-  if (win->windowType() == BlackboxWindow::Type_Desktop) {
-    // desktop windows cant do anything, so we remove all the normal window
-    // stuff from them, they are only kept around so that we can keep them on
-    // the bottom of the z-order
-    win->restore(True);
-    addDesktopWindow(win->getClientWindow());
-    delete win;
-    return;
-  }
 
-  windowList.push_back(win);
-  updateClientList();
+
+  if (win->isNormal()) {
+    // don't list non-normal windows as managed windows
+    windowList.push_back(win);
+    updateClientList();
+  } else if (win->isDesktop()) {
+    desktopWindowList.push_back(win->getFrameWindow());
+  }
 
   XMapRequestEvent mre;
   mre.window = w;
-  if (blackbox->isStartup()) win->restoreAttributes();
+  if (blackbox->isStartup() && win->isNormal()) win->restoreAttributes();
   win->mapRequestEvent(&mre);
 }
 
@@ -1224,8 +1205,20 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
   else if (w->isIconic())
     removeIcon(w);
 
-  windowList.remove(w);
-  updateClientList();
+  if (w->isNormal()) {
+    // we don't list non-normal windows as managed windows
+    windowList.remove(w);
+    updateClientList();
+  } else if (w->isDesktop()) {
+    WindowList::iterator it = desktopWindowList.begin();
+    const WindowList::iterator end = desktopWindowList.end();
+    for (; it != end; ++it)
+      if (*it == w->getFrameWindow()) {
+        desktopWindowList.erase(it);
+        break;
+      }
+    assert(it != end);  // the window wasnt a desktop window?
+  }
 
   if (blackbox->getFocusedWindow() == w)
     blackbox->setFocusedWindow((BlackboxWindow *) 0);
@@ -2149,7 +2142,6 @@ void BScreen::buttonPressEvent(const XButtonEvent *xbutton) {
 void BScreen::propertyNotifyEvent(const XPropertyEvent *pe) {
   if (pe->atom == xatom->getAtom(XAtom::net_desktop_names)) {
     // _NET_WM_DESKTOP_NAMES
-    fprintf(stderr, "UPDATING WORKSPACE NAMES\n");
     WorkspaceList::iterator it = workspacesList.begin();
     const WorkspaceList::iterator end = workspacesList.end();
     for (; it != end; ++it) {

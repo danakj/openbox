@@ -79,22 +79,28 @@ void Workspace::addWindow(BlackboxWindow *w, bool place) {
 
   if (place) placeWindow(w);
 
-  w->setWorkspace(id);
-  w->setWindowNumber(windowList.size());
-
   stackingList.push_front(w);
-  windowList.push_back(w);
+    
+  if (w->isNormal()) {
+    w->setWorkspace(id);
+    w->setWindowNumber(windowList.size());
 
-  clientmenu->insert(w->getTitle());
-  clientmenu->update();
+    windowList.push_back(w);
 
-  screen->updateNetizenWindowAdd(w->getClientWindow(), id);
+    clientmenu->insert(w->getTitle());
+    clientmenu->update();
 
-  raiseWindow(w);
+    screen->updateNetizenWindowAdd(w->getClientWindow(), id);
+  }
+
+  if (! w->isDesktop())
+    raiseWindow(w);
+  else
+    lowerWindow(w);
 }
 
 
-unsigned int Workspace::removeWindow(BlackboxWindow *w) {
+void Workspace::removeWindow(BlackboxWindow *w) {
   assert(w != 0);
 
   stackingList.remove(w);
@@ -113,6 +119,8 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
     }
   }
 
+  if (! w->isNormal()) return;
+
   windowList.remove(w);
   clientmenu->remove(w->getWindowNumber());
   clientmenu->update();
@@ -127,8 +135,6 @@ unsigned int Workspace::removeWindow(BlackboxWindow *w) {
 
   if (i == 0)
     cascade_x = cascade_y = 32;
-
-  return i;
 }
 
 
@@ -154,10 +160,7 @@ void Workspace::focusFallback(const BlackboxWindow *old_window) {
                                   end = stackingList.end();
       for (; it != end; ++it) {
         BlackboxWindow *tmp = *it;
-        if (! (tmp->windowType() == BlackboxWindow::Type_Dialog ||
-               tmp->windowType() == BlackboxWindow::Type_Normal))
-          continue; // don't fallback to special windows
-        if (tmp && tmp->setInputFocus()) {
+        if (tmp && tmp->isNormal() && tmp->setInputFocus()) {
           // we found our new focus target
           newfocus = tmp;
           break;
@@ -281,8 +284,10 @@ void Workspace::lowerTransients(const BlackboxWindow * const win,
 void Workspace::raiseWindow(BlackboxWindow *w) {
   BlackboxWindow *win = w;
 
+  if (win->isDesktop()) return;
+
   // walk up the transient_for's to the window that is not a transient
-  while (win->isTransient()) {
+  while (win->isTransient() && ! win->isDesktop()) {
     if (! win->getTransientFor()) break;
     win = win->getTransientFor();
   }
@@ -296,7 +301,7 @@ void Workspace::raiseWindow(BlackboxWindow *w) {
 
   *(stack++) = win->getFrameWindow();
   screen->updateNetizenWindowRaise(win->getClientWindow());
-  if (! win->isIconic()) {
+  if (! (win->isIconic() || win->isDesktop())) {
     Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
     wkspc->stackingList.remove(win);
     wkspc->stackingList.push_front(win);
@@ -312,7 +317,7 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
   BlackboxWindow *win = w;
 
   // walk up the transient_for's to the window that is not a transient
-  while (win->isTransient()) {
+  while (win->isTransient() && ! win->isDesktop()) {
     if (! win->getTransientFor()) break;
     win = win->getTransientFor();
   }
@@ -328,7 +333,7 @@ void Workspace::lowerWindow(BlackboxWindow *w) {
 
   *(stack++) = win->getFrameWindow();
   screen->updateNetizenWindowLower(win->getClientWindow());
-  if (! win->isIconic()) {
+  if (! (win->isIconic() || win->isDesktop())) {
     Workspace *wkspc = screen->getWorkspace(win->getWorkspaceNumber());
     wkspc->stackingList.remove(win);
     wkspc->stackingList.push_back(win);

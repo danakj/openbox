@@ -267,7 +267,6 @@ private:
   void getMWMHints(void);
   bool getBlackboxHints(void);
   void getTransientInfo(void);
-  bool isKDESystrayWindow(void);
   void setNetWMAttributes(void);
   void associateClientWindow(void);
   void decorate(void);
@@ -321,8 +320,12 @@ public:
   inline bool isMaximizable(void) const { return functions & Func_Maximize; }
   inline bool isResizable(void) const { return functions & Func_Resize; }
   inline bool isClosable(void) const { return functions & Func_Close; }
-  inline WindowType windowType(void) const { return window_type; }
 
+  // is a 'normal' window? meaning, a standard client application
+  inline bool isNormal(void) const
+  { return window_type == Type_Dialog || window_type == Type_Normal; }
+  inline bool isDesktop(void) const { return window_type == Type_Desktop; }
+  
   inline bool hasTitlebar(void) const { return decorations & Decor_Titlebar; }
 
   inline const BlackboxWindowList &getTransients(void) const

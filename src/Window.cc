@@ -152,16 +152,9 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   client.rect.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
   client.old_bw = wattrib.border_width;
 
+  timer = 0;
   windowmenu = 0;
   lastButtonPressTime = 0;
-
-  timer = new BTimer(blackbox, this);
-  timer->setTimeout(blackbox->getAutoRaiseDelay());
-
-  if (! getBlackboxHints()) {
-    getMWMHints();
-    getNetWMHints();
-  }
 
   // get size, aspect, minimum/maximum size and other hints set by the
   // client
@@ -175,10 +168,12 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
     return;
   }
 
-  if (isKDESystrayWindow()) {
-    screen->addSystrayWindow(client.window);
-    delete this;
-    return;
+  timer = new BTimer(blackbox, this);
+  timer->setTimeout(blackbox->getAutoRaiseDelay());
+
+  if (! getBlackboxHints()) {
+    getMWMHints();
+    getNetWMHints();
   }
 
   frame.window = createToplevelWindow();
@@ -199,32 +194,16 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
   // adjust the window decorations/behavior based on the window type
   switch (window_type) {
   case Type_Desktop:
-    // desktop windows are not managed by us, we just make sure they stay on the
-    // bottom.
-    return;
-
   case Type_Dock:
   case Type_Menu:
-    // docks (such as kicker) and menus (as used by kde for the 'desktop menu'
-    // which mimics apple, cannot be moved, and appear on all workspaces
-    // also, these have no decorations
-    functions &= ~(Func_Move);
-    decorations &= ~Decor_Titlebar;
-    flags.stuck = True;
   case Type_Toolbar:
   case Type_Utility:
-    // these windows have minimal decorations, only a titlebar, and cannot
-    // be resized or iconified
-    decorations &= ~(Decor_Maximize | Decor_Handle | Decor_Border |
-                     Decor_Iconify);
-    functions &= ~(Func_Resize | Func_Maximize | Func_Iconify);
-    break;
-
   case Type_Splash:
-    // splash screens have no functionality or decorations, they are left up
-    // to the application which created them
+    // none of these windows are decorated or manipulated by the window manager
     decorations = 0;
     functions = 0;
+    blackbox_attrib.workspace = 0;  // we do need to belong to a workspace
+    flags.stuck = True;             // we show up on all workspaces
     break;
 
   case Type_Dialog:
@@ -1441,15 +1420,6 @@ void BlackboxWindow::getTransientInfo(void) {
 }
 
 
-bool BlackboxWindow::isKDESystrayWindow(void) {
-  Window systray;
-  if (xatom->getValue(client.window, XAtom::kde_net_wm_system_tray_window_for,
-                      XAtom::window, systray) && systray)
-    return True;
-  return False;
-}
-
-
 BlackboxWindow *BlackboxWindow::getTransientFor(void) const {
   if (client.transient_for &&
       client.transient_for != (BlackboxWindow*) ~0ul)
@@ -1942,11 +1912,10 @@ void BlackboxWindow::stick(void) {
 
     if (! flags.iconic)
       screen->reassociateWindow(this, BSENTINEL, True);
-    else
-      // temporary fix since sticky windows suck. set the hint to what we
-      // actually hold in our data.
-      xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
-                      blackbox_attrib.workspace);
+    // temporary fix since sticky windows suck. set the hint to what we
+    // actually hold in our data.
+    xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
+                    blackbox_attrib.workspace);
 
     setState(current_state);
   } else {
@@ -2538,16 +2507,22 @@ void BlackboxWindow::mapRequestEvent(const XMapRequestEvent *re) {
   default:
     show();
     screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
-    if (! blackbox->isStartup() && (isTransient() || screen->doFocusNew())) {
-      XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped..
-      setInputFocus();
+    if (isNormal()) {
+      if (! blackbox->isStartup()) {
+        XSync(blackbox->getXDisplay(), False); // make sure the frame is mapped
+        if (isTransient() || screen->doFocusNew()) {
+          setInputFocus();
+        }
+        if (screen->getPlacementPolicy() == BScreen::ClickMousePlacement) {
+          int x, y, rx, ry;
+          Window c, r;
+          unsigned int m;
+          XQueryPointer(blackbox->getXDisplay(), screen->getRootWindow(),
+                        &r, &c, &rx, &ry, &x, &y, &m);
+          beginMove(rx, ry);
+        }
+      }
     }
-    int x, y, rx, ry;
-    Window c, r;
-    unsigned int m;
-    XQueryPointer(screen->getBlackbox()->getXDisplay(), screen->getRootWindow(),
-                  &r, &c, &rx, &ry, &x, &y, &m);
-    beginMove(rx, ry);
     break;
   }
 }
@@ -2742,7 +2717,7 @@ void BlackboxWindow::configureRequestEvent(const XConfigureRequestEvent *cr) {
     configure(req.x(), req.y(), req.width(), req.height());
   }
 
-  if (cr->value_mask & CWStackMode) {
+  if (cr->value_mask & CWStackMode && !isDesktop()) {
     switch (cr->detail) {
     case Below:
     case BottomIf:

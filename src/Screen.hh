@@ -320,9 +320,6 @@ public:
   void addNetizen(Netizen *n);
   void removeNetizen(Window w);
 
-  void addDesktopWindow(Window window);
-  void removeDesktopWindow(Window window);
-
   void addSystrayWindow(Window window);
   void removeSystrayWindow(Window window);
 

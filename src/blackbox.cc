@@ -384,8 +384,6 @@ void Blackbox::process_event(XEvent *e) {
       slit->unmapNotifyEvent(&e->xunmap);
     } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
       screen->removeSystrayWindow(e->xunmap.window);
-    } else if ((screen = searchDesktopWindow(e->xunmap.window))) {
-      screen->removeDesktopWindow(e->xunmap.window);
     }
 
     break;
@@ -405,8 +403,6 @@ void Blackbox::process_event(XEvent *e) {
       delete group;
     } else if ((screen = searchSystrayWindow(e->xunmap.window))) {
       screen->removeSystrayWindow(e->xunmap.window);
-    } else if ((screen = searchDesktopWindow(e->xunmap.window))) {
-      screen->removeDesktopWindow(e->xunmap.window);
     }
 
     break;
@@ -494,7 +490,8 @@ void Blackbox::process_event(XEvent *e) {
       screen->getImageControl()->installRootColormap();
     } else if ((win = searchWindow(e->xcrossing.window))) {
       if (win->getScreen()->isSloppyFocus() &&
-          (! win->isFocused()) && (! no_focus)) {
+          (! win->isFocused()) && (! no_focus) &&
+          win->isNormal()) {  // don't focus non-normal windows with mouseover
         if (((! sa.leave) || sa.inferior) && win->isVisible()) {
           if (win->setInputFocus())
             win->installColormap(True); // XXX: shouldnt we honour no install?
@@ -1038,15 +1035,6 @@ BScreen *Blackbox::searchScreen(Window window) {
 }
 
 
-BScreen *Blackbox::searchDesktopWindow(Window window) {
-  WindowScreenLookup::iterator it = desktopSearchList.find(window);
-  if (it != desktopSearchList.end())
-    return it->second;
-
-  return (BScreen*) 0;
-}
-
-
 BScreen *Blackbox::searchSystrayWindow(Window window) {
   WindowScreenLookup::iterator it = systraySearchList.find(window);
   if (it != systraySearchList.end())
@@ -1101,11 +1089,6 @@ Slit *Blackbox::searchSlit(Window window) {
 }
 
 
-void Blackbox::saveDesktopWindowSearch(Window window, BScreen *screen) {
-  desktopSearchList.insert(WindowScreenLookupPair(window, screen));
-}
-
-
 void Blackbox::saveSystrayWindowSearch(Window window, BScreen *screen) {
   systraySearchList.insert(WindowScreenLookupPair(window, screen));
 }
@@ -1133,11 +1116,6 @@ void Blackbox::saveToolbarSearch(Window window, Toolbar *data) {
 
 void Blackbox::saveSlitSearch(Window window, Slit *data) {
   slitSearchList.insert(SlitLookupPair(window, data));
-}
-
-
-void Blackbox::removeDesktopWindowSearch(Window window) {
-  desktopSearchList.erase(window);
 }
 
 

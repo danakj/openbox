@@ -123,7 +123,7 @@ private:
 
   typedef std::map<Window, BScreen*> WindowScreenLookup;
   typedef WindowScreenLookup::value_type WindowScreenLookupPair;
-  WindowScreenLookup systraySearchList, desktopSearchList;
+  WindowScreenLookup systraySearchList;
 
   typedef std::map<Window, BWindowGroup*> GroupLookup;
   typedef GroupLookup::value_type GroupLookupPair;
@@ -175,7 +175,6 @@ public:
 
   Basemenu *searchMenu(Window window);
   BWindowGroup *searchGroup(Window window);
-  BScreen *searchDesktopWindow(Window window);
   BScreen *searchSystrayWindow(Window window);
   BlackboxWindow *searchWindow(Window window);
   BScreen *searchScreen(Window window);
@@ -183,14 +182,12 @@ public:
   Slit *searchSlit(Window);
 
   void saveMenuSearch(Window window, Basemenu *data);
-  void saveDesktopWindowSearch(Window window, BScreen *screen);
   void saveSystrayWindowSearch(Window window, BScreen *screen);
   void saveWindowSearch(Window window, BlackboxWindow *data);
   void saveGroupSearch(Window window, BWindowGroup *data);
   void saveToolbarSearch(Window window, Toolbar *data);
   void saveSlitSearch(Window window, Slit *data);
   void removeMenuSearch(Window window);
-  void removeDesktopWindowSearch(Window window);
   void removeSystrayWindowSearch(Window window);
   void removeWindowSearch(Window window);
   void removeGroupSearch(Window window);

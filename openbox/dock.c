@@ -456,7 +456,7 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
 
     /* which dock app are we on top of? */
     stop = FALSE;
-    for (it = dock->dock_apps; it && !stop; it = it->next) {
+    for (it = dock->dock_apps; it; it = it->next) {
         over = it->data;
         switch (config_dock_orient) {
         case OB_ORIENTATION_HORZ:
@@ -468,6 +468,8 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
                 stop = TRUE;
             break;
         }
+        /* dont go to it->next! */
+        if (stop) break;
     }
     if (!it || app == over) return;
 

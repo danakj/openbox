@@ -270,7 +270,7 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **ret)
     if (get_stringlist(win, prop, &list, &nstr) && nstr) {
         *ret = g_locale_to_utf8(list[0], -1, NULL, NULL, NULL);
         XFreeStringList(list);
-        if (ret) return TRUE;
+        if (*ret) return TRUE;
     }
     return FALSE;
 }

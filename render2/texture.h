@@ -2,6 +2,7 @@
 #define __render_texture_h
 
 #include "render.h"
+#include <GL/gl.h>
 
 enum RrTextureType {
     RR_TEXTURE_NONE,
@@ -16,7 +17,7 @@ struct RrTextureText {
 };
 
 struct RrTextureRGBA {
-    RrData32 *data;
+    GLuint texid;
     int x;
     int y;
     int w;

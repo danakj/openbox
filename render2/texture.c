@@ -1,3 +1,4 @@
+#include "instance.h"
 #include "texture.h"
 #include "surface.h"
 #include <stdlib.h>
@@ -12,6 +13,7 @@ void RrTextureFreeContents(struct RrTexture *tex)
         free(tex->data.text.string);
         break;
     case RR_TEXTURE_RGBA:
+        glDeleteTextures(1, &tex->data.rgba.texid);
         break;
     }
     tex->type = RR_TEXTURE_NONE;
@@ -25,16 +27,27 @@ void RrTextureSetRGBA(struct RrSurface *sur,
                       int w,
                       int h)
 {
+    unsigned int num;
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
 
     if (!tex) return;
     RrTextureFreeContents(tex);
     tex->type = RR_TEXTURE_RGBA;
-    tex->data.rgba.data = data;
     tex->data.rgba.x = x;
     tex->data.rgba.y = y;
     tex->data.rgba.w = w;
     tex->data.rgba.h = h;
+    glGenTextures(1, &num);
+    tex->data.rgba.texid = num;
+    glBindTexture(GL_TEXTURE_2D, num);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
 void RrTextureSetText(struct RrSurface *sur,

@@ -3,14 +3,28 @@
 #include "../kernel/frame.h"
 #include "../kernel/stacking.h"
 #include "../kernel/screen.h"
+#include "../kernel/config.h"
 #include <glib.h>
+
+#define DEFAULT_RESISTANCE 10
 
 void plugin_setup_config()
 {
-}
+    ConfigValue val;
 
-static int resistance = 10;
-static gboolean window_resistance = TRUE; /* window-to-window */
+    config_def_set(config_def_new("resistance", Config_Integer,
+                                  "Edge Resistance",
+                                  "The amount of resistance to provide when "
+                                  "moving windows past edges."
+                                  "positioned."));
+    config_def_set(config_def_new("resistance.windows", Config_Bool,
+                                  "Edge Resistance On Windows",
+                                  "Whether to provide edge resistance when "
+                                  "moving windows past the edge of another "
+                                  "window."));
+    val.bool = TRUE;
+    config_set("resistance.windows", Config_Bool, val);
+}
 
 static void resist(Client *c, int *x, int *y)
 {
@@ -21,6 +35,15 @@ static void resist(Client *c, int *x, int *y)
     int cl, ct, cr, cb; /* current edges */
     int w, h; /* current size */
     gboolean snapx = FALSE, snapy = FALSE;
+    ConfigValue resist, window_resist;
+
+    if (!config_get("resistance", Config_Integer, &resist) ||
+        resist.integer < 0) {
+        resist.integer = DEFAULT_RESISTANCE;
+        config_set("resistance", Config_Integer, resist);
+    }
+    if (!config_get("resistance.windows", Config_Bool, &window_resist))
+        g_assert_not_reached();
 
     w = c->frame->area.width;
     h = c->frame->area.height;
@@ -36,7 +59,7 @@ static void resist(Client *c, int *x, int *y)
     cb = ct + c->frame->area.height - 1;
     
     /* snap to other clients */
-    if (window_resistance)
+    if (window_resist.bool)
         for (it = stacking_list; it != NULL; it = it->next) {
             Client *target;
             int tl, tt, tr, tb; /* 1 past the target's edges on each side */
@@ -54,13 +77,13 @@ static void resist(Client *c, int *x, int *y)
                window edge available, without going all the way from
                bottom-to-top in the stacking list
             */
-            if (!snapx && cl >= tr && l < tr && l >= tr - resistance)
+            if (!snapx && cl >= tr && l < tr && l >= tr - resist.integer)
                 *x = tr, snapx = TRUE;
-            else if (!snapx && cr <= tl && r > tl && r <= tl + resistance)
+            else if (!snapx && cr <= tl && r > tl && r <= tl + resist.integer)
                 *x = tl - w + 1, snapx = TRUE;
-            else if (!snapy && ct >= tb && t < tb && t >= tb - resistance)
+            else if (!snapy && ct >= tb && t < tb && t >= tb - resist.integer)
                 *y = tb, snapy = TRUE;
-            else if (!snapy && cb <= tt && b > tt && b <= tt + resistance)
+            else if (!snapy && cb <= tt && b > tt && b <= tt + resist.integer)
                 *y = tt - h + 1, snapy = TRUE;
 
             if (snapx && snapy) break;
@@ -74,13 +97,13 @@ static void resist(Client *c, int *x, int *y)
     ab = at + area->height - 1;
 
     /* snap to screen edges */
-    if (cl >= al && l < al && l >= al - resistance)
+    if (cl >= al && l < al && l >= al - resist.integer)
         *x = al;
-    else if (cr <= ar && r > ar && r <= ar + resistance)
+    else if (cr <= ar && r > ar && r <= ar + resist.integer)
             *x = ar - w + 1;
-    if (ct >= at && t < at && t >= at - resistance)
+    if (ct >= at && t < at && t >= at - resist.integer)
         *y = at;
-    else if (cb <= ab && b > ab && b < ab + resistance)
+    else if (cb <= ab && b > ab && b < ab + resist.integer)
         *y = ab - h + 1;
 }
 

@@ -23,10 +23,10 @@ Quick Start:
 The quickest and easiest way to get Openbox up and running is to run the
 following commands:
 
-# cd openbox-x.x.x
-# ./configure
-# make
-# su -c 'make install'
+% cd openbox-x.x.x
+% ./configure
+% make
+% su -c 'make install'
 
 This will configure, compile and install Openbox the quickest.  For those
 who like to spend the extra 15 seconds reading ./configure --help, some

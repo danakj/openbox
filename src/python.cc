@@ -413,7 +413,7 @@ void python_callback(PyObject *func, PyObject *data)
   
   // call the callback
   result = PyEval_CallObject(func, arglist);
-  if (!result) {
+  if (!result || PyErr_Occurred()) {
     // an exception occured in the script, display it
     PyErr_Print();
   }

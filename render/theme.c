@@ -1070,6 +1070,13 @@ static XrmDatabase loaddb(RrTheme *theme, char *name)
             theme->path = g_path_get_dirname(s);
         g_free(s);
     } else {
+        /* XXX backwards compatibility, remove me sometime later */
+        s = g_build_filename(g_get_home_dir(), ".themes", name,
+                             "openbox-3", "themerc", NULL);
+        if ((db = XrmGetFileDatabase(s)))
+            theme->path = g_path_get_dirname(s);
+        g_free(s);
+
         for (it = parse_xdg_data_dir_paths(); !db && it;
              it = g_slist_next(it))
         {

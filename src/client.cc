@@ -58,8 +58,8 @@ Client::Client(int screen, Window window)
   getDesktop();
 
   updateTransientFor();
-  getType();
   getMwmHints();
+  getType(); // this can change the mwmhints for special cases
 
   getState();
   getShaped();
@@ -188,9 +188,11 @@ void Client::getType()
         _type = Type_Dialog;
       else if (val[i] == otk::Property::atoms.net_wm_window_type_normal)
         _type = Type_Normal;
-//    XXX: make this work again
-//    else if (val[i] == otk::Property::atoms.kde_net_wm_window_type_override)
-//      mwm_decorations = 0; // prevent this window from getting any decor
+      else if (val[i] == otk::Property::atoms.kde_net_wm_window_type_override){
+        // prevent this window from getting any decor
+        _mwmhints.flags &= MwmFlag_Decorations;
+        _mwmhints.decorations = 0;
+      }
       if (_type != (WindowType) -1)
         break; // grab the first known type
     }

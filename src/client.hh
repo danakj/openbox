@@ -364,6 +364,16 @@ private:
 
   //! Change the client's state hints to match the class' data
   void changeState();
+
+  //! Request the client to close its window.
+  void close();
+
+  //! Shades or unshades the client window
+  /*!
+    @param shade true if the window should be shaded; false if it should be
+                 unshaded.
+  */
+  void shade(bool shade);
   
 public:
 #ifndef SWIG
@@ -502,16 +512,6 @@ BB    @param window The window id that the OBClient class should handle
   */
   void resize(Corner anchor, int w, int h, int x = INT_MIN, int y = INT_MIN);
 
-  //! Request the client to close its window.
-  void close();
-
-  //! Shades or unshades the client window
-  /*!
-    @param shade true if the window should be shaded; false if it should be
-                 unshaded.
-  */
-  void shade(bool shade);
-  
   //! Attempt to focus the client window
   bool focus() const;
 

@@ -614,7 +614,14 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
 
       XPoint pts[6];
 
-      pts[0].x = sel_x + 0;
+      // put the check mark on the opposite side of the menu
+      int x = sel_x;
+      if (screen->getMenuStyle()->bullet_pos == Right)
+        x -= (menu.item_w - menu.item_h - menu.bevel_w);
+      else
+        x += (menu.item_w - menu.item_h - menu.bevel_w);
+
+      pts[0].x = x + 0;
       pts[0].y = sel_y + 2;
       
       pts[1].x = 0;

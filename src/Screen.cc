@@ -1646,37 +1646,38 @@ void BScreen::InitMenu(void) {
       memset(label, 0, 1024);
 
       while (fgets(line, 1024, menu_file) && ! feof(menu_file)) {
-        if (line[0] != '#') {
-          int i, key = 0, index = -1, len = strlen(line);
+        if (line[0] == '#')
+          continue;
 
-          for (i = 0; i < len; i++) {
-            if (line[i] == '[') index = 0;
-            else if (line[i] == ']') break;
-            else if (line[i] != ' ')
-              if (index++ >= 0)
-                key += tolower(line[i]);
-          }
+        int i, key = 0, index = -1, len = strlen(line);
 
-          if (key == 517) { // [begin]
-            index = -1;
-            for (i = index; i < len; i++) {
-              if (line[i] == '(') index = 0;
-              else if (line[i] == ')') break;
-              else if (index++ >= 0) {
-                if (line[i] == '\\' && i < len - 1) i++;
-                label[index - 1] = line[i];
-              }
+        for (i = 0; i < len; i++) {
+          if (line[i] == '[') index = 0;
+          else if (line[i] == ']') break;
+          else if (line[i] != ' ')
+            if (index++ >= 0)
+              key += tolower(line[i]);
+        }
+
+        if (key == 517) { // [begin]
+          index = -1;
+          for (i = index; i < len; i++) {
+            if (line[i] == '(') index = 0;
+            else if (line[i] == ')') break;
+            else if (index++ >= 0) {
+              if (line[i] == '\\' && i < len - 1) i++;
+              label[index - 1] = line[i];
             }
-
-            if (index == -1) index = 0;
-            label[index] = '\0';
-
-            rootmenu->setLabel(label);
-            defaultMenu = parseMenuFile(menu_file, rootmenu);
-            if (! defaultMenu)
-              blackbox->addMenuTimestamp(menu_filename);
-            break;
           }
+
+          if (index == -1) index = 0;
+          label[index] = '\0';
+
+          rootmenu->setLabel(label);
+          defaultMenu = parseMenuFile(menu_file, rootmenu);
+          if (! defaultMenu)
+            blackbox->addMenuTimestamp(menu_filename);
+          break;
         }
       }
     }
@@ -1698,320 +1699,312 @@ void BScreen::InitMenu(void) {
 }
 
 
-bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
-  char line[1024], label[1024], command[1024];
+static
+void string_within(char begin, char end, const char *input, size_t length,
+                   char *output) {
+  bool parse = False;
+  size_t index = 0;
 
-  while (! feof(file)) {
+  for (size_t i = 0; i < length; ++i) {
+    if (input[i] == begin) {
+      parse = True;
+    } else if (input[i] == end) {
+      break;
+    } else if (parse) {
+      if (input[i] == '\\' && i < length - 1) i++;
+      output[index++] = input[i];
+    } 
+  }
+
+  if (parse)
+    output[index] = '\0';
+  else
+    output[0] = '\0';
+}
+
+
+bool BScreen::parseMenuFile(FILE *file, Rootmenu *menu) {
+  char line[1024], keyword[1024], label[1024], command[1024];
+  bool done = False;
+
+  while (! (done || feof(file))) {
     memset(line, 0, 1024);
     memset(label, 0, 1024);
     memset(command, 0, 1024);
 
-    if (fgets(line, 1024, file)) {
-      if (line[0] != '#') {
-        int i, key = 0, parse = 0, index = -1, line_length = strlen(line);
+    if (! fgets(line, 1024, file))
+      continue;
 
-        // determine the keyword
-        for (i = 0; i < line_length; i++) {
-          if (line[i] == '[') parse = 1;
-          else if (line[i] == ']') break;
-          else if (line[i] != ' ')
-            if (parse)
-              key += tolower(line[i]);
-        }
+    if (line[0] == '#') // comment, skip it
+      continue;
 
-        // get the label enclosed in ()'s
-        parse = 0;
+    size_t line_length = strlen(line);
+    unsigned int key = 0;
 
-        for (i = 0; i < line_length; i++) {
-          if (line[i] == '(') {
-            index = 0;
-            parse = 1;
-          } else if (line[i] == ')') break;
-          else if (index++ >= 0) {
-            if (line[i] == '\\' && i < line_length - 1) i++;
-            label[index - 1] = line[i];
-          }
-        }
+    // get the keyword enclosed in []'s
+    string_within('[', ']', line, line_length, keyword);
 
-        if (parse) {
-          label[index] = '\0';
-        } else {
-          label[0] = '\0';
-        }
-
-        // get the command enclosed in {}'s
-        parse = 0;
-        index = -1;
-        for (i = 0; i < line_length; i++) {
-          if (line[i] == '{') {
-            index = 0;
-            parse = 1;
-          } else if (line[i] == '}') break;
-          else if (index++ >= 0) {
-            if (line[i] == '\\' && i < line_length - 1) i++;
-            command[index - 1] = line[i];
-          }
-        }
-
-        if (parse) {
-          command[index] = '\0';
-        } else {
-          command[0] = '\0';
-        }
-
-        switch (key) {
-        case 311: // end
-          return ((menu->getCount() == 0) ? True : False);
-
-          break;
-
-        case 333: // nop
-          if (! *label)
-            label[0] = '\0';
-          menu->insert(label);
-
-          break;
-
-        case 421: // exec
-          if (! (*label && *command)) {
-            fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
-                                 "BScreen::parseMenuFile: [exec] error, "
-                                 "no menu label and/or command defined\n"));
-            continue;
-          }
-
-          menu->insert(label, BScreen::Execute, command);
-
-          break;
-
-        case 442: // exit
-          if (! *label) {
-            fprintf(stderr, i18n(ScreenSet, ScreenEXITError,
-                                 "BScreen::parseMenuFile: [exit] error, "
-                                 "no menu label defined\n"));
-            continue;
-          }
-
-          menu->insert(label, BScreen::Exit);
-
-          break;
-
-        case 561: { // style
-          if (! (*label && *command)) {
-            fprintf(stderr,
-                    i18n(ScreenSet, ScreenSTYLEError,
-                         "BScreen::parseMenuFile: [style] error, "
-                         "no menu label and/or filename defined\n"));
-            continue;
-          }
-
-          string style = expandTilde(command);
-
-          menu->insert(label, BScreen::SetStyle, style.c_str());
-        }
-          break;
-
-        case 630: // config
-          if (! *label) {
-            fprintf(stderr, i18n(ScreenSet, ScreenCONFIGError,
-                                 "BScreen::parseMenufile: [config] error, "
-                                 "no label defined"));
-            continue;
-          }
-
-          menu->insert(label, configmenu);
-
-          break;
-
-        case 740: // include
-          {
-            if (! *label) {
-              fprintf(stderr, i18n(ScreenSet, ScreenINCLUDEError,
-                                   "BScreen::parseMenuFile: [include] error, "
-                                   "no filename defined\n"));
-              continue;
-            }
-
-            string newfile = expandTilde(label);
-            FILE *submenufile = fopen(newfile.c_str(), "r");
-
-            if (submenufile) {
-              struct stat buf;
-              if (fstat(fileno(submenufile), &buf) ||
-                  ! S_ISREG(buf.st_mode)) {
-                fprintf(stderr,
-                        i18n(ScreenSet, ScreenINCLUDEErrorReg,
-                             "BScreen::parseMenuFile: [include] error: "
-                             "'%s' is not a regular file\n"), newfile.c_str());
-                break;
-              }
-
-              if (! feof(submenufile)) {
-                if (! parseMenuFile(submenufile, menu))
-                  blackbox->addMenuTimestamp(newfile);
-
-                fclose(submenufile);
-              }
-            } else {
-              perror(newfile.c_str());
-            }
-          }
-
-          break;
-
-        case 767: // submenu
-          {
-            if (! *label) {
-              fprintf(stderr, i18n(ScreenSet, ScreenSUBMENUError,
-                                   "BScreen::parseMenuFile: [submenu] error, "
-                                   "no menu label defined\n"));
-              continue;
-            }
-
-            Rootmenu *submenu = new Rootmenu(this);
-
-            if (*command)
-              submenu->setLabel(command);
-            else
-              submenu->setLabel(label);
-
-            parseMenuFile(file, submenu);
-            submenu->update();
-            menu->insert(label, submenu);
-            rootmenuList.push_back(submenu);
-          }
-
-          break;
-
-        case 773: // restart
-          {
-            if (! *label) {
-              fprintf(stderr, i18n(ScreenSet, ScreenRESTARTError,
-                                   "BScreen::parseMenuFile: [restart] error, "
-                                   "no menu label defined\n"));
-              continue;
-            }
-
-            if (*command)
-              menu->insert(label, BScreen::RestartOther, command);
-            else
-              menu->insert(label, BScreen::Restart);
-          }
-
-          break;
-
-        case 845: // reconfig
-          {
-            if (! *label) {
-              fprintf(stderr,
-                      i18n(ScreenSet, ScreenRECONFIGError,
-                           "BScreen::parseMenuFile: [reconfig] error, "
-                           "no menu label defined\n"));
-              continue;
-            }
-
-            menu->insert(label, BScreen::Reconfigure);
-          }
-
-          break;
-
-        case 995: // stylesdir
-        case 1113: // stylesmenu
-          {
-            bool newmenu = ((key == 1113) ? True : False);
-
-            if (! *label || (! *command && newmenu)) {
-              fprintf(stderr,
-                      i18n(ScreenSet, ScreenSTYLESDIRError,
-                           "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
-                           " error, no directory defined\n"));
-              continue;
-            }
-
-            char *directory = ((newmenu) ? command : label);
-
-            string stylesdir = expandTilde(directory);
-
-            struct stat statbuf;
-
-            if (! stat(stylesdir.c_str(), &statbuf)) {
-              if (S_ISDIR(statbuf.st_mode)) {
-                Rootmenu *stylesmenu;
-
-                if (newmenu)
-                  stylesmenu = new Rootmenu(this);
-                else
-                  stylesmenu = menu;
-
-                DIR *d = opendir(stylesdir.c_str());
-                struct dirent *p;
-                std::vector<string> ls;
-
-                while((p = readdir(d)))
-                  ls.push_back(p->d_name);
-
-                closedir(d);
-
-                std::sort(ls.begin(), ls.end());
-
-                std::vector<string>::iterator it = ls.begin(),
-                  end = ls.end();
-                for (; it != end; ++it) {
-                  const string& fname = *it;
-
-                  if (fname[fname.size()-1] == '~')
-                    continue;
-
-                  string style = stylesdir;
-                  style += '/';
-                  style += fname;
-
-                  if (! stat(style.c_str(), &statbuf) &&
-                      S_ISREG(statbuf.st_mode))
-                    stylesmenu->insert(fname, BScreen::SetStyle, style);
-                }
-
-                stylesmenu->update();
-
-                if (newmenu) {
-                  stylesmenu->setLabel(label);
-                  menu->insert(label, stylesmenu);
-                  rootmenuList.push_back(stylesmenu);
-                }
-
-                blackbox->addMenuTimestamp(stylesdir);
-              } else {
-                fprintf(stderr,
-                        i18n(ScreenSet, ScreenSTYLESDIRErrorNotDir,
-                             "BScreen::parseMenuFile:"
-                             " [stylesdir/stylesmenu] error, %s is not a"
-                             " directory\n"), stylesdir.c_str());
-              }
-            } else {
-              fprintf(stderr,
-                      i18n(ScreenSet, ScreenSTYLESDIRErrorNoExist,
-                           "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
-                           " error, %s does not exist\n"), stylesdir.c_str());
-            }
-            break;
-          }
-
-        case 1090: // workspaces
-          {
-            if (! *label) {
-              fprintf(stderr,
-                      i18n(ScreenSet, ScreenWORKSPACESError,
-                           "BScreen:parseMenuFile: [workspaces] error, "
-                           "no menu label defined\n"));
-              continue;
-            }
-
-            menu->insert(label, workspacemenu);
-
-            break;
-          }
-        }
+    if (keyword[0] == '\0') {  // no keyword, no menu entry
+      continue;
+    } else {
+      size_t len = strlen(keyword);
+      for (size_t i = 0; i < len; ++i) {
+        if (keyword[i] != ' ')
+          key += tolower(keyword[i]);
       }
+    }
+
+    // get the label enclosed in ()'s
+    string_within('(', ')', line, line_length, label);
+
+    // get the command enclosed in {}'s
+    string_within('{', '}', line, line_length, command);
+
+    switch (key) {
+    case 311: // end
+      done = True;
+
+      break;
+
+    case 333: // nop
+      if (! *label)
+        label[0] = '\0';
+      menu->insert(label);
+
+      break;
+
+    case 421: // exec
+      if (! (*label && *command)) {
+        fprintf(stderr, i18n(ScreenSet, ScreenEXECError,
+                             "BScreen::parseMenuFile: [exec] error, "
+                             "no menu label and/or command defined\n"));
+        continue;
+      }
+
+      menu->insert(label, BScreen::Execute, command);
+
+      break;
+
+    case 442: // exit
+      if (! *label) {
+        fprintf(stderr, i18n(ScreenSet, ScreenEXITError,
+                             "BScreen::parseMenuFile: [exit] error, "
+                             "no menu label defined\n"));
+        continue;
+      }
+
+      menu->insert(label, BScreen::Exit);
+
+      break;
+
+    case 561: { // style
+      if (! (*label && *command)) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenSTYLEError,
+                     "BScreen::parseMenuFile: [style] error, "
+                     "no menu label and/or filename defined\n"));
+        continue;
+      }
+
+      string style = expandTilde(command);
+
+      menu->insert(label, BScreen::SetStyle, style.c_str());
+    }
+      break;
+
+    case 630: // config
+      if (! *label) {
+        fprintf(stderr, i18n(ScreenSet, ScreenCONFIGError,
+                             "BScreen::parseMenufile: [config] error, "
+                             "no label defined"));
+        continue;
+      }
+
+      menu->insert(label, configmenu);
+
+      break;
+
+    case 740: { // include
+      if (! *label) {
+        fprintf(stderr, i18n(ScreenSet, ScreenINCLUDEError,
+                             "BScreen::parseMenuFile: [include] error, "
+                             "no filename defined\n"));
+        continue;
+      }
+
+      string newfile = expandTilde(label);
+      FILE *submenufile = fopen(newfile.c_str(), "r");
+
+      if (! submenufile) {
+        perror(newfile.c_str());
+        continue;
+      }
+
+      struct stat buf;
+      if (fstat(fileno(submenufile), &buf) ||
+          ! S_ISREG(buf.st_mode)) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenINCLUDEErrorReg,
+                     "BScreen::parseMenuFile: [include] error: "
+                     "'%s' is not a regular file\n"), newfile.c_str());
+        break;
+      }
+
+      if (! feof(submenufile)) {
+        if (! parseMenuFile(submenufile, menu))
+          blackbox->addMenuTimestamp(newfile);
+
+        fclose(submenufile);
+      }
+    }
+
+      break;
+
+    case 767: { // submenu
+      if (! *label) {
+        fprintf(stderr, i18n(ScreenSet, ScreenSUBMENUError,
+                             "BScreen::parseMenuFile: [submenu] error, "
+                             "no menu label defined\n"));
+        continue;
+      }
+
+      Rootmenu *submenu = new Rootmenu(this);
+
+      if (*command)
+        submenu->setLabel(command);
+      else
+        submenu->setLabel(label);
+
+      parseMenuFile(file, submenu);
+      submenu->update();
+      menu->insert(label, submenu);
+      rootmenuList.push_back(submenu);
+    }
+
+      break;
+
+    case 773: { // restart
+      if (! *label) {
+        fprintf(stderr, i18n(ScreenSet, ScreenRESTARTError,
+                             "BScreen::parseMenuFile: [restart] error, "
+                             "no menu label defined\n"));
+        continue;
+      }
+
+      if (*command)
+        menu->insert(label, BScreen::RestartOther, command);
+      else
+        menu->insert(label, BScreen::Restart);
+    }
+
+      break;
+
+    case 845: { // reconfig
+      if (! *label) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenRECONFIGError,
+                     "BScreen::parseMenuFile: [reconfig] error, "
+                     "no menu label defined\n"));
+        continue;
+      }
+
+      menu->insert(label, BScreen::Reconfigure);
+    }
+
+      break;
+
+    case 995:    // stylesdir
+    case 1113: { // stylesmenu
+      bool newmenu = ((key == 1113) ? True : False);
+
+      if (! *label || (! *command && newmenu)) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenSTYLESDIRError,
+                     "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
+                     " error, no directory defined\n"));
+        continue;
+      }
+
+      char *directory = ((newmenu) ? command : label);
+
+      string stylesdir = expandTilde(directory);
+
+      struct stat statbuf;
+
+      if (stat(stylesdir.c_str(), &statbuf) == -1) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenSTYLESDIRErrorNoExist,
+                     "BScreen::parseMenuFile: [stylesdir/stylesmenu]"
+                     " error, %s does not exist\n"), stylesdir.c_str());
+        continue;
+      }
+      if (! S_ISDIR(statbuf.st_mode)) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenSTYLESDIRErrorNotDir,
+                     "BScreen::parseMenuFile:"
+                     " [stylesdir/stylesmenu] error, %s is not a"
+                     " directory\n"), stylesdir.c_str());
+        continue;
+      }
+
+      Rootmenu *stylesmenu;
+
+      if (newmenu)
+        stylesmenu = new Rootmenu(this);
+      else
+        stylesmenu = menu;
+
+      DIR *d = opendir(stylesdir.c_str());
+      struct dirent *p;
+      std::vector<string> ls;
+
+      while((p = readdir(d)))
+        ls.push_back(p->d_name);
+
+      closedir(d);
+
+      std::sort(ls.begin(), ls.end());
+
+      std::vector<string>::iterator it = ls.begin(),
+        end = ls.end();
+      for (; it != end; ++it) {
+        const string& fname = *it;
+
+        if (fname[fname.size()-1] == '~')
+          continue;
+
+        string style = stylesdir;
+        style += '/';
+        style += fname;
+
+        if (! stat(style.c_str(), &statbuf) && S_ISREG(statbuf.st_mode))
+          stylesmenu->insert(fname, BScreen::SetStyle, style);
+      }
+
+      stylesmenu->update();
+
+      if (newmenu) {
+        stylesmenu->setLabel(label);
+        menu->insert(label, stylesmenu);
+        rootmenuList.push_back(stylesmenu);
+      }
+
+      blackbox->addMenuTimestamp(stylesdir);
+    }
+      break;
+
+    case 1090: { // workspaces
+      if (! *label) {
+        fprintf(stderr,
+                i18n(ScreenSet, ScreenWORKSPACESError,
+                     "BScreen:parseMenuFile: [workspaces] error, "
+                     "no menu label defined\n"));
+        continue;
+      }
+
+      menu->insert(label, workspacemenu);
+    }
+      break;
     }
   }
 

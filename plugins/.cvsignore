@@ -1,0 +1,6 @@
+focus.lo
+focus.la
+Makefile
+Makefile.in
+.libs
+.deps

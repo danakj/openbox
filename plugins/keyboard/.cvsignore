@@ -1,0 +1,6 @@
+keyboard.lo
+keyboard.la
+Makefile
+Makefile.in
+.libs
+.deps

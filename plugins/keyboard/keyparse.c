@@ -75,11 +75,9 @@ void keyparse(ParseToken *token)
         GList *strchain = NULL;
 
         /* build a list of just char*'s */
-        for (it = chain; it; it = it->next) {
+        for (it = chain; it; it = it->next)
             strchain = g_list_append(strchain,
                                      ((ParseToken*)it->data)->data.identifier);
-            g_print("Chain %s\n", ((ParseToken*)it->data)->data.identifier);
-        }
 
         /* these use the argument */
         if (action->func == action_execute || action->func == action_restart)

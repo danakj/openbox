@@ -13,7 +13,10 @@
 
 namespace ob {
 
-struct Config {
+class Config {
+  int _screen;
+
+public:
   std::vector<otk::ustring> desktop_names;
   otk::ustring theme;
   otk::ustring titlebar_layout;
@@ -21,8 +24,10 @@ struct Config {
   long drag_threshold;
   long num_desktops;
 
-  Config();
+  Config(int screen);
   ~Config();
+
+  void load();
 };
 
 }

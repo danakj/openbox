@@ -3,6 +3,11 @@
 #include "config.h"
 
 #include "config.hh"
+#include "otk/screeninfo.hh"
+#include "otk/renderstyle.hh"
+#include "otk/util.hh"
+#include "otk/property.hh"
+#include "otk/display.hh"
 
 extern "C" {
 #include <Python.h>
@@ -51,8 +56,11 @@ bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
   return true;
 }
 
-Config::Config()
+void Config::load()
 {
+  const otk::ScreenInfo *info = otk::display->screenInfo(_screen);
+  Window root = info->rootWindow();
+
   // set up access to the python global variables
   PyObject *obmodule = PyImport_ImportModule("config");
   obdict = PyModule_GetDict(obmodule);
@@ -61,6 +69,12 @@ Config::Config()
   python_get_stringlist("DESKTOP_NAMES", &desktop_names);
 
   python_get_string("THEME", &theme);
+  // initialize the screen's style
+  otk::RenderStyle::setStyle(_screen, theme);
+  // draw the root window
+  otk::bexec("obsetroot " + otk::RenderStyle::style(_screen)->rootArgs(),
+             info->displayString());
+
 
   if (!python_get_string("TITLEBAR_LAYOUT", &titlebar_layout)) {
     fprintf(stderr, _("Unable to load config.%s\n"), "TITLEBAR_LAYOUT");
@@ -79,6 +93,28 @@ Config::Config()
     fprintf(stderr, _("Unable to load config.%s\n"), "NUMBER_OF_DESKTOPS");
     ::exit(1);
   }
+
+  // Set the net_desktop_names property
+  otk::Property::set(root,
+                     otk::Property::atoms.net_desktop_names,
+                     otk::Property::utf8, desktop_names);
+  // the above set() will cause screen::updateDesktopNames to fire right away
+  // so we have a list of desktop names
+
+  XEvent ce;
+  ce.xclient.type = ClientMessage;
+  ce.xclient.message_type = otk::Property::atoms.net_number_of_desktops;
+  ce.xclient.display = **otk::display;
+  ce.xclient.window = root;
+  ce.xclient.format = 32;
+  ce.xclient.data.l[0] = num_desktops;
+  XSendEvent(**otk::display, root, False,
+	     SubstructureNotifyMask | SubstructureRedirectMask, &ce);
+}
+
+Config::Config(int screen)
+  : _screen(screen)
+{
 }
 
 Config::~Config()

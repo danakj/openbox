@@ -165,7 +165,7 @@ public:
   inline bool managed() const { return _managed; }
 
   //! Returns the config options set by the user scripts
-  const Config& config() const { return _config; }
+  Config& config() { return _config; }
 
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }

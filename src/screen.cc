@@ -40,7 +40,8 @@ namespace ob {
 
 
 Screen::Screen(int screen)
-  : _number(screen)
+  : _number(screen),
+    _config(screen)
 {
   assert(screen >= 0); assert(screen < ScreenCount(**otk::display));
   _info = otk::display->screenInfo(screen);
@@ -67,12 +68,6 @@ Screen::Screen(int screen)
   XDefineCursor(**otk::display, _info->rootWindow(),
                 openbox->cursors().session);
 
-  // initialize the screen's style
-  otk::RenderStyle::setStyle(_number, _config.theme);
-  // draw the root window
-  otk::bexec("obsetroot " + otk::RenderStyle::style(_number)->rootArgs(),
-             _info->displayString());
-
   // set up notification of netwm support
   changeSupportedAtoms();
 
@@ -83,17 +78,9 @@ Screen::Screen(int screen)
                      otk::Property::atoms.net_desktop_geometry,
                      otk::Property::atoms.cardinal, geometry, 2);
 
-  // Set the net_desktop_names property
-  otk::Property::set(_info->rootWindow(),
-                     otk::Property::atoms.net_desktop_names,
-                     otk::Property::utf8, _config.desktop_names);
-  // the above set() will cause the updateDesktopNames to fire right away so
-  // we have a list of desktop names
-
   _desktop = 0;
 
-  changeNumDesktops(_config.num_desktops); // set the hint
-
+  changeNumDesktops(1); // set the hint
   changeDesktop(0); // set the hint
 
   // don't start in showing-desktop mode

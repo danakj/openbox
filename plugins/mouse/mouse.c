@@ -3,6 +3,7 @@
 #include "../../kernel/action.h"
 #include "../../kernel/client.h"
 #include "../../kernel/frame.h"
+#include "../../kernel/grab.h"
 #include "../../kernel/engine.h"
 #include "translate.h"
 #include "mouse.h"
@@ -16,40 +17,33 @@ struct foreach_grab_temp {
     gboolean grab;
 };
 
-static void grab_button(Client *client, guint state, guint button,
-			GQuark context, gboolean grab)
-{
-    Window win;
-    int mode = GrabModeAsync;
-    unsigned int mask;
-
-    if (context == g_quark_try_string("frame")) {
-	win = client->frame->window;
-	mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
-    } else if (context == g_quark_try_string("client")) {
-	win = client->frame->plate;
-	mode = GrabModeSync; /* this is handled in pointer_event */
-	mask = ButtonPressMask; /* can't catch more than this with Sync mode
-				   the release event is manufactured in
-				   pointer_fire */
-    } else return;
-
-    if (grab)
-        /* XXX grab all lock keys */
-	XGrabButton(ob_display, button, state, win, FALSE, mask, mode,
-		    GrabModeAsync, None, None);
-    else
-        /* XXX ungrab all lock keys */
-	XUngrabButton(ob_display, button, state, win);
-}
-
 static void foreach_grab(GQuark key, gpointer data, gpointer user_data)
 {
     struct foreach_grab_temp *d = user_data;
     GSList *it;
     for (it = data; it != NULL; it = it->next) {
+        /* grab/ungrab the button */
 	MouseBinding *b = it->data;
- 	grab_button(d->client, b->state, b->button, key, d->grab);
+        Window win;
+        int mode;
+        unsigned int mask;
+
+        if (key == g_quark_try_string("frame")) {
+            win = d->client->frame->window;
+            mode = GrabModeAsync;
+            mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
+        } else if (key == g_quark_try_string("client")) {
+            win = d->client->frame->plate;
+            mode = GrabModeSync; /* this is handled in event */
+            mask = ButtonPressMask; /* can't catch more than this with Sync
+                                       mode the release event is manufactured
+                                       in event */
+        } else return;
+
+        if (d->grab)
+            grab_button(b->button, b->state, win, mask, mode);
+        else
+            ungrab_button(b->button, b->state, win);
     }
 }
   

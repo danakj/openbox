@@ -16,13 +16,11 @@ static gboolean grabbed;
 static void grab_keys(gboolean grab)
 {
     if (!grab) {
-	XUngrabKey(ob_display, AnyKey, AnyModifier, ob_root);
+        ungrab_all_keys();
     } else {
 	KeyBindingTree *p = firstnode;
 	while (p) {
-            /* XXX grab all lock keys too */
-	    XGrabKey(ob_display, p->key, p->state, ob_root, FALSE,
-		     GrabModeAsync, GrabModeSync);
+            grab_key(p->key, p->state, GrabModeSync);
 	    p = p->next_sibling;
 	}
     }

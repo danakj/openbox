@@ -8,6 +8,7 @@ desktopfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
+userscriptdir   = $(datadir)/openbox
 
 theme = TheBear
 
@@ -261,13 +262,15 @@ dist_rc_DATA = \
 	data/rc.xml \
 	data/menu.xml
 
+dist_userscript_DATA = \
+	tools/themeupdate/themeupdate.py
+
 dist_desktopfiles_DATA = \
 	data/openbox.desktop
 
 dist_noinst_DATA = \
 	render/obrender-3.0.pc.in \
-	parser/obparser-3.0.pc.in \
-	tools/themeupdate/themeupdate.py
+	parser/obparser-3.0.pc.in
 
 EXTRA_DIST = \
 	config.rpath \

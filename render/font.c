@@ -79,7 +79,7 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     FcResult res;
     gint tint;
 #ifdef USE_PANGO
-    gchar *tmp_string = NULL;
+    guchar *tmp_string = NULL;
     gint tmp_int;
 #endif /* USE_PANGO */
 
@@ -100,16 +100,16 @@ static RrFont *openfont(const RrInstance *inst, gchar *fontstring)
     out->pango_font_description = pango_font_description_new();
 
     if (FcPatternGetString(match, "family", 0, &tmp_string) != FcResultTypeMismatch) {
-        pango_font_description_set_family(out->pango_font_description, tmp_string);
+        pango_font_description_set_family(out->pango_font_description, (gchar *)tmp_string);
         tmp_string = NULL;
     }
     if (FcPatternGetString(match, "style", 0, &tmp_string) != FcResultTypeMismatch) {
         /* Bold ? */
-        if (!strcasecmp("bold", tmp_string)) {
+        if (!strcasecmp("bold", (gchar *)tmp_string)) {
             pango_font_description_set_weight(out->pango_font_description, PANGO_WEIGHT_BOLD);
         }
         /* Italic ? */
-        else if (!strcasecmp("italic", tmp_string)) {
+        else if (!strcasecmp("italic", (gchar *)tmp_string)) {
             pango_font_description_set_style(out->pango_font_description, PANGO_STYLE_ITALIC);
         }
         tmp_string = NULL;

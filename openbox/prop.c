@@ -278,27 +278,32 @@ gboolean prop_get_string_locale(Window win, Atom prop, char **ret)
 
 gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
 {
+    GSList *strs = NULL, *it;
     char *raw, *p;
-    guint num, i;
+    guint num, i, count = 0;
 
-    if (get_all(win, prop, prop_atoms.string, 8, (guchar**)&raw, &num)){
-        *ret = g_new(char*, num + 1);
-        (*ret)[num] = NULL; /* null terminated list */
+    if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
 
         p = raw;
-        for (i = 0; i < num; ++i) {
-            (*ret)[i] = g_convert(p, strlen(p), "UTF-8", "ISO-8859-1",
+        while (p < raw + num - 1) {
+            ++count;
+            strs = g_slist_append(strs, p);
+            p += strlen(p) + 1; /* next string */
+        }
+
+        *ret = g_new0(char*, count + 1);
+        (*ret)[count] = NULL; /* null terminated list */
+
+        for (it = strs; it; it = g_slist_next(it)) {
+            (*ret)[i] = g_convert(it->data, -1, "UTF-8", "ISO-8859-1",
                                   NULL, NULL, NULL);
             /* make sure translation did not fail */
-            if (!(*ret)[i]) {
-                g_strfreev(*ret); /* free what we did so far */
-                break; /* the force is not strong with us */
-            }
-            p += strlen(p) + 1;
+            if (!(*ret)[i])
+                (*ret)[i] = g_strdup("");
         }
 	g_free(raw);
-        if (i == num)
-            return TRUE;
+        g_slist_free(strs);
+	return TRUE;
     }
     return FALSE;
 }
@@ -323,22 +328,29 @@ gboolean prop_get_string_utf8(Window win, Atom prop, char **ret)
 
 gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 {
+    GSList *strs = NULL, *it;
     char *raw, *p;
-    guint num, i;
+    guint num, i, count = 0;
 
     if (get_all(win, prop, prop_atoms.utf8, 8, (guchar**)&raw, &num)) {
-        *ret = g_new(char*, num + 1);
-        (*ret)[num] = NULL; /* null terminated list */
 
         p = raw;
-        for (i = 0; i < num; ++i) {
-            if (g_utf8_validate(p, -1, NULL))
-                (*ret)[i] = g_strdup(p);
+        while (p < raw + num - 1) {
+            ++count;
+            strs = g_slist_append(strs, p);
+            p += strlen(p) + 1; /* next string */
+        }
+
+        *ret = g_new0(char*, count + 1);
+
+        for (it = strs; it; it = g_slist_next(it)) {
+            if (g_utf8_validate(it->data, -1, NULL))
+                (*ret)[i] = g_strdup(it->data);
             else
                 (*ret)[i] = g_strdup("");
-            p += strlen(p) + 1;
         }
 	g_free(raw);
+        g_slist_free(strs);
 	return TRUE;
     }
     return FALSE;

@@ -639,7 +639,7 @@ void screen::cycleWindow(unsigned int state, const bool forward,
 
     // if the window is on another desktop, we can't use XSetInputFocus, since
     // it doesn't imply a workspace change.
-    if (t->desktop() == _active_desktop)
+    if (t->desktop() == _active_desktop || t->desktop() == 0xffffffff)
       t->focus(false); // focus, but don't raise
     else
       t->focus(); // change workspace and focus

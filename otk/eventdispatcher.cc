@@ -99,10 +99,6 @@ void OtkEventDispatcher::dispatchEvents(void)
 
 void OtkEventDispatcher::dispatchFocus(const XEvent &e)
 {
-  // ignore all focus changes from grabs
-  if (e.xfocus.mode != NotifyNormal)
-    return;
-  
   if (e.type == FocusIn) {
     //printf("Got FocusIn!\n");
 
@@ -113,6 +109,10 @@ void OtkEventDispatcher::dispatchFocus(const XEvent &e)
   } else if (e.type == FocusOut) {
     //printf("Got FocusOut!\n");
 
+    // ignore FocusOut changes from grabs
+    if (e.xfocus.mode == NotifyGrab)
+      return;
+  
     // FocusOut events just make us look for FocusIn events. They are ignored
     // otherwise.
     XEvent fi;

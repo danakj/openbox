@@ -407,6 +407,7 @@ static void menu_frame_update(ObMenuFrame *self)
 {
     GList *mit, *fit;
 
+    menu_pipe_execute(self->menu);
     menu_find_submenus(self->menu);
 
     self->selected = NULL;
@@ -480,8 +481,6 @@ void menu_frame_hide(ObMenuFrame *self)
     if (!it)
         return;
 
-    menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
-
     if (self->child)
         menu_frame_hide(self->child);
 
@@ -494,6 +493,8 @@ void menu_frame_hide(ObMenuFrame *self)
         grab_pointer(FALSE, None);
         grab_keyboard(FALSE);
     }
+
+    menu_frame_visible = g_list_delete_link(menu_frame_visible, it);
 
     XUnmapWindow(ob_display, self->window);
 

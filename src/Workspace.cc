@@ -592,7 +592,6 @@ bool Workspace::smartPlacement(Rect& win) {
   if (screen->isXineramaActive() &&
       screen->getBlackbox()->doXineramaPlacement()) {
     RectList availableAreas = screen->allAvailableAreas();
-    assert(availableAreas.size() > 0);
     RectList::iterator it, end = availableAreas.end();
 
     for (it = availableAreas.begin(); it != end; ++it)
@@ -686,7 +685,6 @@ bool Workspace::underMousePlacement(Rect &win) {
   if (screen->isXineramaActive() &&
       screen->getBlackbox()->doXineramaPlacement()) {
     RectList availableAreas = screen->allAvailableAreas();
-    assert(availableAreas.size() > 0);
     RectList::iterator it, end = availableAreas.end();
 
     for (it = availableAreas.begin(); it != end; ++it)

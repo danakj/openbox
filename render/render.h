@@ -127,19 +127,12 @@ struct _RrAppearance {
     gint w, h;
 };
 
-#if (G_BYTE_ORDER == G_BIG_ENDIAN)
-#define RrDefaultAlphaOffset 0
-#define RrDefaultRedOffset 8
-#define RrDefaultGreenOffset 16
-#define RrDefaultBlueOffset 24
-#define RrEndian MSBFirst  
-#else
+/* these are the same on all endian machines because it seems to be dependant
+   on the endianness of the gfx card, not the cpu. */
 #define RrDefaultAlphaOffset 24
 #define RrDefaultRedOffset 16
 #define RrDefaultGreenOffset 8
 #define RrDefaultBlueOffset 0
-#define RrEndian LSBFirst
-#endif /* G_BYTE_ORDER == G_BIG_ENDIAN */
 
 RrInstance* RrInstanceNew (Display *display, gint screen);
 void        RrInstanceFree (RrInstance *inst);

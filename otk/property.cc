@@ -134,6 +134,8 @@ void Property::initialize()
   atoms.kde_net_wm_window_type_override =
     create("_KDE_NET_WM_WINDOW_TYPE_OVERRIDE");
 
+  atoms.kwm_win_icon = create("KWM_WIN_ICON");
+  
   atoms.rootpmapid = create("_XROOTPMAP_ID");
   atoms.esetrootid = create("ESETROOT_PMAP_ID");
 

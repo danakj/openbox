@@ -28,11 +28,12 @@
 #include "openbox.h"
 #include "grab.h"
 #include "keyboard.h"
+#include "event.h"
 
 #include <glib.h>
 
 typedef struct ActionString {
-    char *name;
+    const gchar *name;
     void (*func)(union ActionData *);
     void (*setup)(ObAction **, ObUserAction uact);
 } ActionString;
@@ -784,27 +785,51 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     return act;
 }
 
-void action_run_full(ObAction *a, struct _ObClient *c,
+void action_run_list(GSList *acts, struct _ObClient *c,
                      guint state, guint button, gint x, gint y,
                      gboolean cancel, gboolean done)
 {
+    GSList *it;
+    ObAction *a;
+    gboolean inter = FALSE;
+
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
 
-    a->data.any.c = c;
-    a->data.any.x = x;
-    a->data.any.y = y;
-
-    a->data.any.button = button;
-
-    if (a->data.any.interactive) {
-        a->data.inter.cancel = cancel;
-        a->data.inter.final = done;
-        if (!(cancel || done))
-            keyboard_interactive_grab(state, c, a);
+    for (it = acts; it; it = g_slist_next(it)) {
+        a = it->data;
+        if (a->data.any.interactive) {
+            inter = TRUE;
+            break;
+        }
     }
 
-    a->func(&a->data);
+    if (!inter) {
+        /* sometimes when we execute another app as an action,
+           it won't work right unless we XUngrabKeyboard first,
+           even though we grabbed the key/button Asychronously.
+           e.g. "gnome-panel-control --main-menu" */
+        XUngrabKeyboard(ob_display, event_lasttime);
+    }
+
+    for (it = acts; it; it = g_slist_next(it)) {
+        a = it->data;
+
+        a->data.any.c = c;
+        a->data.any.x = x;
+        a->data.any.y = y;
+
+        a->data.any.button = button;
+
+        if (a->data.any.interactive) {
+            a->data.inter.cancel = cancel;
+            a->data.inter.final = done;
+            if (!(cancel || done))
+                keyboard_interactive_grab(state, c, a);
+        }
+
+        a->func(&a->data);
+    }
 }
 
 void action_execute(union ActionData *data)

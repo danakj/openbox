@@ -47,20 +47,18 @@ Client::Client(int screen, Window window)
   _urgent = false;
   _positioned = false;
   _disabled_decorations = 0;
-  _modal = false;
   _modal_child = 0;
   _group = None;
   _desktop = 0;
   
   getArea();
   getDesktop();
+  getState();  // do this before updateTransientFor! (for _modal)
+  getShaped();
 
   updateTransientFor();
   getMwmHints();
   getType(); // this can change the mwmhints for special cases
-
-  getState();
-  getShaped();
 
   updateProtocols();
 

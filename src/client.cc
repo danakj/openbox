@@ -1209,8 +1209,8 @@ void Client::applyStartupState()
 
 void Client::fireUrgent()
 {
-  // call the python UrgentNotify callbacks
-  EventData data(_screen, this, EventUrgentNotify, 0);
+  // call the python UrgentWindow callbacks
+  EventData data(_screen, this, EventUrgentWindow, 0);
   openbox->bindings()->fireEvent(&data);
 }
 

@@ -309,7 +309,9 @@ static gboolean mbind(char *buttonstr, char *contextstr, MouseAction mact,
         return FALSE;
     }
 
+    contextstr = g_ascii_strdown(contextstr, -1);
     context = g_quark_try_string(contextstr);
+    g_free(contextstr);
     if (!context) {
         g_warning("invalid context");
         return FALSE;

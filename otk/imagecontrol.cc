@@ -41,7 +41,8 @@ static unsigned long bsqrt(unsigned long x) {
 
 BImageControl *ctrl = 0;
 
-BImageControl::BImageControl(const ScreenInfo *scrn,
+BImageControl::BImageControl(OBTimerQueueManager *timermanager,
+                             const ScreenInfo *scrn,
                              bool _dither, int _cpc,
                              unsigned long cache_timeout,
                              unsigned long cmax) {
@@ -53,12 +54,11 @@ BImageControl::BImageControl(const ScreenInfo *scrn,
 
   cache_max = cmax;
   if (cache_timeout) {
-    // XXX: FIX THIS
-    timer = 0;/*new BTimer(this);
+    timer = new OBTimer(timermanager, (OBTimeoutHandler)timeout, this);
     timer->setTimeout(cache_timeout);
-    timer->start();*/
+    timer->start();
   } else {
-    timer = (ob::OBTimer *) 0;
+    timer = (OBTimer *) 0;
   }
 
   colors = (XColor *) 0;
@@ -420,7 +420,7 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
       "forcing cleanout\n");
 #endif // DEBUG
 
-    timeout();
+    timeout(this);
   }
 
   return pixmap;
@@ -440,7 +440,7 @@ void BImageControl::removeImage(Pixmap pixmap) {
   }
 
   if (! timer)
-    timeout();
+    timeout(this);
 }
 
 
@@ -553,10 +553,10 @@ struct CacheCleaner {
 };
 
 
-void BImageControl::timeout(void) {
+void BImageControl::timeout(BImageControl *t) {
   CacheCleaner cleaner;
-  std::for_each(cache.begin(), cache.end(), cleaner);
-  cache.remove_if(cleaner.ref_check);
+  std::for_each(t->cache.begin(), t->cache.end(), cleaner);
+  t->cache.remove_if(cleaner.ref_check);
 }
 
 }

@@ -135,7 +135,9 @@ BlackboxWindow::BlackboxWindow(Blackbox *b, Window w, BScreen *s) {
 
   lastButtonPressTime = 0;
 
-  timer = new OBTimer(this);
+  timer = new otk::OBTimer(Openbox::instance->timerManager(),
+                           (otk::OBTimeoutHandler)timeout,
+                           this);
   timer->setTimeout(blackbox->getAutoRaiseDelay());
 
   // get size, aspect, minimum/maximum size and other hints set by the
@@ -3902,8 +3904,9 @@ void BlackboxWindow::restore(bool remap) {
 
 
 // timer for autoraise
-void BlackboxWindow::timeout(void) {
-  screen->getWorkspace(blackbox_attrib.workspace)->raiseWindow(this);
+void BlackboxWindow::timeout(BlackboxWindow *t) {
+  t->screen->getWorkspace(t->blackbox_attrib.workspace)->raiseWindow(t);
+  printf("TIMED OUT YA YAY\n");
 }
 
 

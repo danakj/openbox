@@ -132,7 +132,8 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(scrn) {
   updateAvailableArea();
 
   image_control =
-    new otk::BImageControl(this, True, blackbox->getColorsPerChannel(),
+    new otk::BImageControl(Openbox::instance->timerManager(),
+                           this, True, blackbox->getColorsPerChannel(),
                            blackbox->getCacheLife(), blackbox->getCacheMax());
   image_control->installRootColormap();
   root_colormap_installed = True;
@@ -779,7 +780,7 @@ void BScreen::reconfigure(void) {
       bw->reconfigure();
   }
 
-  image_control->timeout();
+  otk::BImageControl::timeout(image_control);
 }
 
 

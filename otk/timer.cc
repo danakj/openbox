@@ -4,67 +4,101 @@
 #  include "../config.h"
 #endif // HAVE_CONFIG_H
 
-#include "otk/display.hh"
-#include "openbox.hh"
 #include "timer.hh"
+#include "display.hh"
 #include "util.hh"
 
-namespace ob {
+namespace otk {
 
-OBTimer::OBTimer(TimeoutHandler *h) {
+static timeval normalizeTimeval(const timeval &tm)
+{
+  timeval ret = tm;
+
+  while (ret.tv_usec < 0) {
+    if (ret.tv_sec > 0) {
+      --ret.tv_sec;
+      ret.tv_usec += 1000000;
+    } else {
+      ret.tv_usec = 0;
+    }
+  }
+
+  if (ret.tv_usec >= 1000000) {
+    ret.tv_sec += ret.tv_usec / 1000000;
+    ret.tv_usec %= 1000000;
+  }
+
+  if (ret.tv_sec < 0) ret.tv_sec = 0;
+
+  return ret;
+}
+
+
+OBTimer::OBTimer(OBTimerQueueManager *m, OBTimeoutHandler h, OBTimeoutData d)
+{
+  manager = m;
   handler = h;
+  data = d;
 
   recur = timing = False;
 }
 
 
-OBTimer::~OBTimer(void) {
+OBTimer::~OBTimer(void)
+{
   if (timing) stop();
 }
 
 
-void OBTimer::setTimeout(long t) {
+void OBTimer::setTimeout(long t)
+{
   _timeout.tv_sec = t / 1000;
   _timeout.tv_usec = t % 1000;
   _timeout.tv_usec *= 1000;
 }
 
 
-void OBTimer::setTimeout(const timeval &t) {
+void OBTimer::setTimeout(const timeval &t)
+{
   _timeout.tv_sec = t.tv_sec;
   _timeout.tv_usec = t.tv_usec;
 }
 
 
-void OBTimer::start(void) {
+void OBTimer::start(void)
+{
   gettimeofday(&_start, 0);
 
   if (! timing) {
     timing = True;
-    Openbox::instance->timerManager()->addTimer(this);
+    manager->addTimer(this);
   }
 }
 
 
-void OBTimer::stop(void) {
+void OBTimer::stop(void)
+{
   timing = False;
 
-  Openbox::instance->timerManager()->removeTimer(this);
+  manager->removeTimer(this);
 }
 
 
-void OBTimer::halt(void) {
+void OBTimer::halt(void)
+{
   timing = False;
 }
 
 
-void OBTimer::fireTimeout(void) {
+void OBTimer::fireTimeout(void)
+{
   if (handler)
-    handler->timeout();
+    handler(data);
 }
 
 
-timeval OBTimer::timeRemaining(const timeval &tm) const {
+timeval OBTimer::timeRemaining(const timeval &tm) const
+{
   timeval ret = endpoint();
 
   ret.tv_sec  -= tm.tv_sec;
@@ -74,7 +108,8 @@ timeval OBTimer::timeRemaining(const timeval &tm) const {
 }
 
 
-timeval OBTimer::endpoint(void) const {
+timeval OBTimer::endpoint(void) const
+{
   timeval ret;
 
   ret.tv_sec = _start.tv_sec + _timeout.tv_sec;
@@ -84,7 +119,8 @@ timeval OBTimer::endpoint(void) const {
 }
 
 
-bool OBTimer::shouldFire(const timeval &tm) const {
+bool OBTimer::shouldFire(const timeval &tm) const
+{
   timeval end = endpoint();
 
   return ! ((tm.tv_sec < end.tv_sec) ||

@@ -25,6 +25,7 @@ extern "C" {
 #include <map>
 #include <string>
 
+#include "otk/timer.hh"
 #include "openbox.hh"
 #include "configuration.hh"
 #include "timer.hh"
@@ -69,7 +70,7 @@ class Blackbox;
 class BlackboxWindow;
 class BWindowGroup;
 
-class Blackbox : public Openbox, public TimeoutHandler {
+class Blackbox : public Openbox {
 private:
   struct BCursor {
     Cursor session, move, ll_angle, lr_angle, ul_angle, ur_angle;
@@ -109,7 +110,7 @@ private:
 
   BScreen *active_screen;
   BlackboxWindow *focused_window, *changing_window;
-  OBTimer *timer;
+  otk::OBTimer *timer;
   Configuration config;
   XAtom *xatom;
 
@@ -213,7 +214,7 @@ public:
 
   virtual bool handleSignal(int sig);
 
-  virtual void timeout(void);
+  static void timeout(Blackbox *t);
 
   enum { B_AmericanDate = 1, B_EuropeanDate };
 };

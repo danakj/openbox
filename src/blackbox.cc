@@ -158,7 +158,9 @@ Blackbox::Blackbox(int argc, char **m_argv, char *rc)
 
   reconfigure_wait = False;
 
-  timer = new OBTimer(this);
+  timer = new otk::OBTimer(Openbox::instance->timerManager(),
+                           (otk::OBTimeoutHandler)timeout,
+                           this);
   timer->setTimeout(0l);
 }
 
@@ -1151,11 +1153,11 @@ void Blackbox::saveStyleFilename(const string& filename) {
 }
 
 
-void Blackbox::timeout(void) {
-  if (reconfigure_wait)
-    real_reconfigure();
+void Blackbox::timeout(Blackbox *t) {
+  if (t->reconfigure_wait)
+    t->real_reconfigure();
 
-  reconfigure_wait = False;
+  t->reconfigure_wait = False;
 }
 
 

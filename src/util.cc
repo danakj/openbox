@@ -83,29 +83,6 @@ string textPropertyToString(Display *display, XTextProperty& text_prop) {
 }
 
 
-timeval normalizeTimeval(const timeval &tm) {
-  timeval ret = tm;
-
-  while (ret.tv_usec < 0) {
-    if (ret.tv_sec > 0) {
-      --ret.tv_sec;
-      ret.tv_usec += 1000000;
-    } else {
-      ret.tv_usec = 0;
-    }
-  }
-
-  if (ret.tv_usec >= 1000000) {
-    ret.tv_sec += ret.tv_usec / 1000000;
-    ret.tv_usec %= 1000000;
-  }
-
-  if (ret.tv_sec < 0) ret.tv_sec = 0;
-
-  return ret;
-}
-
-
 string itostring(unsigned long i) {
   if (i == 0)
     return string("0");

@@ -11,7 +11,7 @@ extern "C" {
 
 #include "color.hh"
 #include "screeninfo.hh"
-#include "src/timer.hh"
+#include "timer.hh"
 
 namespace otk {
 
@@ -66,7 +66,7 @@ public:
 };
 
 
-class BImageControl : public ob::TimeoutHandler {
+class BImageControl {
 public:
   struct CachedImage {
     Pixmap pixmap;
@@ -75,7 +75,8 @@ public:
     unsigned long pixel1, pixel2, texture;
   };
 
-  BImageControl(const ScreenInfo *scrn,
+  BImageControl(OBTimerQueueManager *timermanager,
+                const ScreenInfo *scrn,
                 bool _dither= False, int _cpc = 4,
                 unsigned long cache_timeout = 300000l,
                 unsigned long cmax = 200l);
@@ -111,12 +112,12 @@ public:
   void setDither(bool d) { dither = d; }
   void setColorsPerChannel(int cpc);
 
-  virtual void timeout(void);
+  static void timeout(BImageControl *t);
 
 private:
   bool dither;
   const ScreenInfo *screeninfo;
-  ob::OBTimer *timer;
+  OBTimer *timer;
 
   Colormap colormap;
 

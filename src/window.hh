@@ -12,8 +12,8 @@ extern "C" {
 
 #include <string>
 
+#include "otk/timer.hh"
 #include "blackbox.hh"
-#include "timer.hh"
 #include "util.hh"
 
 #define MwmHintsFunctions     (1l << 0)
@@ -70,7 +70,7 @@ public:
 };
 
 
-class BlackboxWindow : public TimeoutHandler {
+class BlackboxWindow {
 public:
   enum Function { Func_Resize   = (1l << 0),
                   Func_Move     = (1l << 1),
@@ -105,7 +105,7 @@ private:
   Blackbox *blackbox;
   BScreen *screen;
   XAtom *xatom;
-  OBTimer *timer;
+  otk::OBTimer *timer;
   BlackboxAttributes blackbox_attrib;
 
   Time lastButtonPressTime;  // used for double clicks, when were we clicked
@@ -405,7 +405,7 @@ public:
   void shapeEvent(XShapeEvent * /*unused*/);
 #endif // SHAPE
 
-  virtual void timeout(void);
+  static void timeout(BlackboxWindow *t);
 };
 
 }

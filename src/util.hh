@@ -39,8 +39,6 @@ void bexec(const std::string& command, const std::string& displaystring);
 
 std::string textPropertyToString(Display *display, XTextProperty& text_prop);
 
-timeval normalizeTimeval(const timeval &tm);
-
 std::string itostring(unsigned long i);
 std::string itostring(long i);
 inline std::string itostring(unsigned int i)

@@ -16,7 +16,7 @@ bin_PROGRAMS= openbox
 openbox_LDADD=../otk/libotk.a @LIBINTL@
 
 openbox_SOURCES= configuration.cc screen.cc openbox.cc \
-                 timer.cc util.cc window.cc workspace.cc xatom.cc blackbox.cc \
+                 util.cc window.cc workspace.cc xatom.cc blackbox.cc \
                  main.cc
 
 MAINTAINERCLEANFILES= Makefile.in

@@ -1972,6 +1972,11 @@ void BlackboxWindow::stick(void) {
     xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal,
                     blackbox_attrib.workspace);
 
+    for (unsigned int i = 0; i < screen->getNumberOfWorkspaces(); ++i)
+      if (i != blackbox_attrib.workspace)
+        if (screen->getWorkspace(i)->getLastFocusedWindow() == this)
+          screen->getWorkspace(i)->focusFallback(this);
+
     setState(current_state);
   } else {
     flags.stuck = True;

@@ -551,11 +551,18 @@ Action *action_from_string(char *name)
 void action_execute(union ActionData *data)
 {
     GError *e = NULL;
-    if (data->execute.path)
-        if (!g_spawn_command_line_async(data->execute.path, &e)) {
-            g_warning("failed to execute '%s': %s",
-                      data->execute.path, e->message);
+    char *cmd;
+    if (data->execute.path) {
+        cmd = g_filename_from_utf8(data->execute.path, -1, NULL, NULL, NULL);
+        if (cmd) {
+            if (!g_spawn_command_line_async(cmd, &e)) {
+                g_warning("failed to execute '%s': %s",
+                          cmd, e->message);
+            }
+        } else {
+            g_warning("failed to convert '%s' from utf8", data->execute.path);
         }
+    }
 }
 
 void action_focus(union ActionData *data)

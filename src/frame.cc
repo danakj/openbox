@@ -56,14 +56,11 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
   otk::OtkWidget::unfocus(); // stuff starts out appearing focused in otk
   
   _plate.show(); // the other stuff is shown based on decor settings
-  
-  grabClient();
 }
 
 
 OBFrame::~OBFrame()
 {
-  releaseClient();
 }
 
 
@@ -432,24 +429,13 @@ void OBFrame::grabClient()
 
 void OBFrame::releaseClient()
 {
-  // check if the app has already reparented its window to the root window
-  XEvent ev;
-  if (XCheckTypedWindowEvent(otk::OBDisplay::display, _client->window(),
-                             ReparentNotify, &ev)) {
-    /*
-      If the app reparented itself, then we unmanage the window. This causes
-      the window to be unmapped, so to be nice to it, we remap the window
-      here. We don't put the event back onto the stack because we put it there
-      in the first place.
-    */
-    XMapWindow(otk::OBDisplay::display, _client->window());
-  } else {
-    // according to the ICCCM - if the client doesn't reparent to
-    // root, then we have to do it for them
-    XReparentWindow(otk::OBDisplay::display, _client->window(),
-                    _screen->rootWindow(),
-                    _client->area().x(), _client->area().y());
-  }
+  // XXX: check for a reparent before reparenting?
+  
+  // according to the ICCCM - if the client doesn't reparent to
+  // root, then we have to do it for them
+  XReparentWindow(otk::OBDisplay::display, _client->window(),
+                  _screen->rootWindow(),
+                  _client->area().x(), _client->area().y());
 }
 
 

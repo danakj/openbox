@@ -519,6 +519,9 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->addClient(client->frame->grip_left(), client);
   Openbox::instance->addClient(client->frame->grip_right(), client);
 
+  // reparent the client to the frame
+  client->frame->grabClient();
+
   // if on the current desktop.. (or all desktops)
   if (client->desktop() == _desktop ||
       client->desktop() == (signed)0xffffffff) {
@@ -548,7 +551,7 @@ void OBScreen::manageWindow(Window window)
 }
 
 
-void OBScreen::unmanageWindow(OBClient *client)
+void OBScreen::unmanageWindow(OBClient *client, bool reparented)
 {
   OBFrame *frame = client->frame;
 
@@ -587,6 +590,14 @@ void OBScreen::unmanageWindow(OBClient *client)
   // give the client its border back
   client->toggleClientBorder(true);
 
+  if (!reparented)
+    // reparent the window out of the frame
+    frame->releaseClient();
+  else
+    // the client is already reparented, so, since we unmapped the window
+    // above, we remap it here. aren't we nice? :)
+    XMapWindow(otk::OBDisplay::display, client->window());
+  
   delete client->frame;
   client->frame = 0;
 

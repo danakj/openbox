@@ -67,11 +67,6 @@ private:
   */
   OBClient::DecorationFlags _decorations;
 
-  //! Reparents the client window from the root window onto the frame
-  void grabClient();
-  //! Reparents the client window back to the root window
-  void releaseClient();
-
 public:
   //! Constructs an OBFrame object, and reparents the client to itself
   /*!
@@ -95,6 +90,14 @@ public:
 
   void setTitle(const std::string &text);
  
+  //! Reparents the client window from the root window onto the frame
+  void grabClient();
+  //! Reparents the client window back to the root window
+  /*!
+    This is not to be called if the client has already reparented itself.
+  */
+  void releaseClient();
+
   //! Update the frame's size to match the client
   void adjustSize();
   //! Update the frame's position to match the client

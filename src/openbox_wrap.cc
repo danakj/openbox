@@ -1604,13 +1604,19 @@ static PyObject *_wrap_OBScreen_unmanageWindow(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
     ob::OBClient *arg2 = (ob::OBClient *) 0 ;
+    bool arg3 = (bool) false ;
     PyObject * obj0  = 0 ;
     PyObject * obj1  = 0 ;
+    PyObject * obj2  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"OO:OBScreen_unmanageWindow",&obj0,&obj1)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"OO|O:OBScreen_unmanageWindow",&obj0,&obj1,&obj2)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     if ((SWIG_ConvertPtr(obj1,(void **) &arg2, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->unmanageWindow(arg2);
+    if (obj2) {
+        arg3 = (bool) PyInt_AsLong(obj2);
+        if (PyErr_Occurred()) SWIG_fail;
+    }
+    (arg1)->unmanageWindow(arg2,arg3);
     
     Py_INCREF(Py_None); resultobj = Py_None;
     return resultobj;

@@ -233,8 +233,13 @@ void client_manage(Window window)
     self = g_new(ObClient, 1);
     self->obwin.type = Window_Client;
     self->window = window;
+
     client_get_all(self);
     client_restore_session_state(self);
+
+    /* set the desktop hint, to make sure that it always exists */
+    PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
+
     client_change_state(self);
 
     /* remove the client's border (and adjust re gravity) */
@@ -698,11 +703,6 @@ static void client_get_desktop(ObClient *self)
        if (!trdesk)
            /* defaults to the current desktop */
            self->desktop = screen_desktop;
-
-    }
-    if (self->desktop != d) {
-        /* set the desktop hint, to make sure that it always exists */
-        PROP_SET32(self->window, net_wm_desktop, cardinal, self->desktop);
     }
 }
 

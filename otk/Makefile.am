@@ -9,8 +9,7 @@ libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc \
                   texture.cc timer.cc timerqueuemanager.cc style.cc \
                   configuration.cc util.cc widget.cc focuswidget.cc \
                   button.cc eventhandler.cc eventdispatcher.cc \
-                  label.cc focuslabel.cc application.cc appwidget.cc \
-                  basewidget.cc
+                  label.cc focuslabel.cc application.cc appwidget.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

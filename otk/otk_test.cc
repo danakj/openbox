@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   otk::AppWidget foo(&app);
 
   foo.resize(600, 500);
-//  foo.setTexture(app.getStyle()->titlebarFocusBackground());
+  foo.setTexture(app.getStyle()->titlebarFocusBackground());
 //  foo.setUnfocusTexture(app.getStyle()->titlebarUnfocusBackground());
 
   foo.setBevelWidth(2);

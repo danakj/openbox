@@ -3,14 +3,14 @@ pythondir = $(libdir)/openbox/python
 
 CXXFLAGS = $(XFT_CFLAGS) $(filter-out -W -Wall,@CXXFLAGS@)
 
-INCLUDES = -I.. -I../..
+INCLUDES = -I.. -I../swig
 
 python_LTLIBRARIES = otkpy.la
 
 otkpy_la_CXXFLAGS = $(PYTHON_CFLAGS)
 otkpy_la_LDFLAGS  = -module
 otkpy_la_SOURCES  = wrap_otk.cc
-otkpy_la_LIBADD   = ../libotk.la
+otkpy_la_LIBADD   = ../otk/libotk.la
 
 CLEANFILES = wrap_* otk.py
 MAINTAINERCLEANFILES = Makefile.in
@@ -27,6 +27,9 @@ uninstall-local:
 
 %.py: wrap_%.cc
 
-wrap_%.cc: %.i $(wildcard ../*.hh)
+otk.i: $(wildcard ../otk/*.hh)
+	@touch $@
+
+wrap_%.cc: %.i
 	swig $(INCLUDES) $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 

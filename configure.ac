@@ -48,8 +48,8 @@ X11_EXT_XINERAMA
 
 AC_CONFIG_FILES([Makefile po/Makefile.in
 		otk/Makefile
-		otk/wrap/Makefile
 		src/Makefile
+		wrap/Makefile
 		scripts/Makefile
 		doc/Makefile
 		doc/doxygen/Makefile

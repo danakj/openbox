@@ -1,5 +1,3 @@
-SUBDIRS = wrap
-
 buttonsdir = $(pkgdatadir)/buttons
 includeotkdir = $(includedir)/otk
 pkgconfigdir = $(libdir)/pkgconfig

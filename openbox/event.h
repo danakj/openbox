@@ -22,6 +22,8 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+struct _ObClient;
+
 /*! Time at which the last event with a timestamp occured. */
 extern Time event_lasttime;
 
@@ -36,5 +38,9 @@ void event_shutdown(gboolean reconfig);
 /*! Request that a number of EnterNotify events not be used for distributing
   focus */
 void event_ignore_enter_focus(guint num);
+
+/*! Make as if the mouse just entered the client, use only when using focus
+  follows mouse */
+void event_enter_client(struct _ObClient *client);
 
 #endif

@@ -97,7 +97,6 @@ static const int mask_table[] = {
 static int mask_table_size;
 
 static guint ignore_enter_focus = 0;
-static ObClient *focus_delay_client;
 
 static gboolean menu_can_hide;
 
@@ -602,6 +601,25 @@ static void event_handle_group(ObGroup *group, XEvent *e)
         event_handle_client(it->data, e);
 }
 
+void event_enter_client(ObClient *client)
+{
+    g_assert(config_focus_follow);
+
+    if (client_normal(client) && client_can_focus(client)) {
+        if (config_focus_delay) {
+            ob_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+            ob_main_loop_timeout_add(ob_main_loop,
+                                     config_focus_delay,
+                                     focus_delay_func,
+                                     client, NULL);
+        } else {
+            client_focus(client);
+            if (config_focus_raise)
+                stacking_raise(CLIENT_AS_WINDOW(client));
+        }
+    }
+}
+
 static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
@@ -694,12 +712,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (client == focus_delay_client) {
-                ob_main_loop_timeout_remove_data(ob_main_loop,
-                                                 focus_delay_func,
-                                                 focus_delay_client);
-                focus_delay_client = NULL;
-            }
+            break;
         default:
             break;
         }
@@ -736,39 +749,26 @@ static void event_handle_client(ObClient *client, XEvent *e)
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            if (!nofocus && config_focus_follow &&
-                client_normal(client) && client_can_focus(client)) {
-                if (e->xcrossing.mode == NotifyGrab ||
-                    e->xcrossing.detail == NotifyInferior ||
-                    e->xcrossing.mode == NotifyUngrab)
-                {
+            if (e->xcrossing.mode == NotifyGrab ||
+                e->xcrossing.detail == NotifyInferior ||
+                e->xcrossing.mode == NotifyUngrab)
+            {
 #ifdef DEBUG_FOCUS
-                    ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
-                             (e->type == EnterNotify ? "Enter" : "Leave"),
-                             e->xcrossing.mode,
-                             e->xcrossing.detail, client?client->window:0);
+                ob_debug("%sNotify mode %d detail %d on %lx IGNORED\n",
+                         (e->type == EnterNotify ? "Enter" : "Leave"),
+                         e->xcrossing.mode,
+                         e->xcrossing.detail, client?client->window:0);
 #endif
-                } else {
+            } else {
 #ifdef DEBUG_FOCUS
-                    ob_debug("%sNotify mode %d detail %d on %lx, "
-                             "focusing window\n",
-                             (e->type == EnterNotify ? "Enter" : "Leave"),
-                             e->xcrossing.mode,
-                             e->xcrossing.detail, client?client->window:0);
+                ob_debug("%sNotify mode %d detail %d on %lx, "
+                         "focusing window\n",
+                         (e->type == EnterNotify ? "Enter" : "Leave"),
+                         e->xcrossing.mode,
+                         e->xcrossing.detail, client?client->window:0);
 #endif
-                    if (config_focus_delay) {
-                        ob_main_loop_timeout_add(ob_main_loop,
-                                                 config_focus_delay,
-                                                 focus_delay_func,
-                                                 client, NULL);
-                        focus_delay_client = client;
-                    } else {
-                        client_focus(client);
-                        if (config_focus_raise)
-                            stacking_raise
-                                (CLIENT_AS_WINDOW(focus_delay_client));
-                    }
-                }
+                if (!nofocus && config_focus_follow)
+                    event_enter_client(client);
             }
             break;
         default:
@@ -1252,22 +1252,19 @@ static gboolean menu_hide_delay_func(gpointer data)
 
 static gboolean focus_delay_func(gpointer data)
 {
-    if (data == focus_delay_client) {
-        client_focus(focus_delay_client);
-        if (config_focus_raise)
-            stacking_raise(CLIENT_AS_WINDOW(focus_delay_client));
-    }
+    ObClient *c = data;
+
+    client_focus(c);
+    if (config_focus_raise)
+        stacking_raise(CLIENT_AS_WINDOW(c));
     return FALSE; /* no repeat */
 }
 
 static void focus_delay_client_dest(gpointer data)
 {
     ObClient *c = data;
-    if (c == focus_delay_client) {
-        ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
-                                         focus_delay_client);
-        focus_delay_client = NULL;
-    }
+
+    ob_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func, c);
 }
 
 void event_ignore_enter_focus(guint num)

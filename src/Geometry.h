@@ -99,6 +99,18 @@ public:
   }
 
   bool Intersect(const Rect &r) const;
+  // returns a rect that is this rect increased in size by the passed in amount
+  Rect Inflate(const unsigned int i) const;
+  Rect Inflate(const unsigned int iw, const unsigned int ih) const;
+  Rect Inflate(const Size &i) const;
+  // returns a rect that is this rect decreased in size by the passed in amount
+  Rect Deflate(const unsigned int d) const;
+  Rect Deflate(const unsigned int dw, const unsigned int dh) const;
+  Rect Deflate(const Size &d) const;
+  // returns a rect that is moved the amount specified
+  Rect Translate(const int t) const;
+  Rect Translate(const int tx, const int ty) const;
+  Rect Translate(const Point &t) const;
 };  
 
 #endif // __geometry_h

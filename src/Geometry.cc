@@ -107,3 +107,39 @@ bool Rect::Intersect(const Rect &r) const {
     (y() < (r.y()+r.h()) ) &&
     ( (y()+h()) > r.y());
 }
+
+Rect Rect::Inflate(const unsigned int i) const {
+  return Rect(x(), y(), w()+i, h()+i);
+}
+
+Rect Rect::Inflate(const unsigned int iw, const unsigned int ih) const {
+  return Rect(x(), y(), w()+iw, h()+ih);
+}
+
+Rect Rect::Inflate(const Size &i) const {
+  return Rect(x(), y(), w()+i.w(), h()+i.h());
+}
+
+Rect Rect::Deflate(const unsigned int d) const {
+  return Rect(x(), y(), w()-d, h()-d);
+}
+
+Rect Rect::Deflate(const unsigned int dw, const unsigned int dh) const {
+  return Rect(x(), y(), w()-dw, h()-dh);
+}
+
+Rect Rect::Deflate(const Size &d) const {
+  return Rect(x(), y(), w()-d.w(), h()-d.h());
+}
+
+Rect Rect::Translate(const int t) const {
+  return Rect(x()+t, y()+t, w(), h());
+}
+
+Rect Rect::Translate(const int tx, const int ty) const {
+  return Rect(x()+tx, y()+ty, w(), h());
+}
+
+Rect Rect::Translate(const Point &t) const {
+  return Rect(x()+t.x(), y()+t.y(), w(), h());
+}

@@ -9,7 +9,9 @@ $ #DISPLAYRequiresArg
 $ #WarnDisplaySet
 # попередження: не вдалося встановити зм╕нну середовища "DISPLAY"\n
 $ #Usage
-# Blackbox %s: (c) 1997 - 2000 Brad Hughes\n\n\
+# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
+                    2001 - 2002 Sean 'Shaleh' Perry\n\
+                    1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tобслуговувати вказаний дисплей.\n\
   -rc <string>\t\t\tвикористовувати альтернативний файл ресурс╕в.\n\
   -menu <string>\t\tuse alternate menu file.\n\

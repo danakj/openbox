@@ -9,8 +9,9 @@ $ #DISPLAYRequiresArg
 $ #WarnDisplaySet
 # ikaz : 'DISPLAY' verisini oturtamadým\n
 $ #Usage
-# Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n\
-  \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
+# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
+                    2001 - 2002 Sean 'Shaleh' Perry\n\
+                    1997 - 2000, 2002 Brad Hughes\n\n\
   -display <metin>\t\tekraný kullan.\n\
   -rc <metin>\t\t\tbaþka bir ayarlama dosyasýný kullan.\n\
   -menu <metin>\t\tuse alternate menu file.\n\

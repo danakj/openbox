@@ -9,8 +9,9 @@ $ #DISPLAYRequiresArg
 $ #WarnDisplaySet
 # 警告: 環境変数 'DISPLAY' を設定できませんでした\n
 $ #Usage
-# Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n\
-  \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
+# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
+                    2001 - 2002 Sean 'Shaleh' Perry\n\
+                    1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\t指定ディスプレイに接続\n\
   -rc <string>\t\t\t代りのリソースファイルを使用\n\
   -menu <string>\t\tuse alternate menu file.\n\

@@ -9,8 +9,9 @@ $ #DISPLAYRequiresArg
 $ #WarnDisplaySet
 # advarsel: kunne ikke sætte variablen 'DISPLAY'\n
 $ #Usage
-# Blackbox %s : (c) 2001 - 2002 Sean 'Shaleh' Perry\n\
-  \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
+# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
+                    2001 - 2002 Sean 'Shaleh' Perry\n\
+                    1997 - 2000, 2002 Brad Hughes\n\n\
   -display <string>\t\tbrug skærm tilslutning.\n\
   -rc <string>\t\t\tbrug alternativ resource fil.\n\
   -menu <string>\t\tbrug alternativ menu fil.\n\

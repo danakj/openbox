@@ -241,7 +241,6 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   }
   saveWorkspaceNames();
 
-  updateDesktopNames();
   updateNetizenWorkspaceCount();
 
   workspacemenu->insert(i18n(IconSet, IconIcons, "Icons"), iconmenu);
@@ -253,8 +252,6 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
                   XAtom::cardinal, 0); //first workspace
 
   workspacemenu->setItemSelected(2, True);
-
-  removeWorkspaceNames(); // do not need them any longer
 
   toolbar = new Toolbar(this);
 
@@ -365,10 +362,6 @@ BScreen::~BScreen(void) {
 }
 
 
-void BScreen::removeWorkspaceNames(void) {
-  workspaceNames.clear();
-}
-  
 void BScreen::saveSloppyFocus(bool s) {
   resource.sloppy_focus = s;
 
@@ -515,14 +508,17 @@ void BScreen::saveClock24Hour(Bool c) {
 
 
 void BScreen::saveWorkspaceNames() {
+  XAtom::StringVect nameList;
+  unsigned long numnames = (unsigned) -1;
   string names;
-  WorkspaceList::iterator it = workspacesList.begin();
-  const WorkspaceList::iterator last = workspacesList.end() - 1;
-  const WorkspaceList::iterator end = workspacesList.end();
-  for (; it != end; ++it) {
-    names += (*it)->getName();
-    if (it != last)
-      names += ',';
+ 
+  if (numnames > 0 &&
+      xatom->getValue(getRootWindow(), XAtom::net_desktop_names, XAtom::utf8,
+                      numnames, nameList)) {
+    for (unsigned int i = 0; i < nameList.size(); ++i) {
+      if (i > 0) names += ",";
+      names += nameList[i];
+    }
   }
   config->setValue(screenstr + "workspaceNames", names);
 }
@@ -606,17 +602,20 @@ void BScreen::load_rc(void) {
   else
     resource.col_direction = TopBottom;
 
+  XAtom::StringVect workspaceNames;
   if (config->getValue(screenstr + "workspaceNames", s)) {
     string::const_iterator it = s.begin(), end = s.end();
     while(1) {
       string::const_iterator tmp = it;     // current string.begin()
       it = std::find(tmp, end, ',');       // look for comma between tmp and end
-      addWorkspaceName(string(tmp, it));   // s[tmp:it]
+      workspaceNames.push_back(string(tmp, it)); // s[tmp:it]
       if (it == end)
         break;
       ++it;
     }
   }
+  xatom->setValue(getRootWindow(), XAtom::net_desktop_names, XAtom::utf8,
+                  workspaceNames);
 
   resource.sloppy_focus = true;
   resource.auto_raise = false;
@@ -1026,7 +1025,6 @@ unsigned int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(this, workspacesList.size());
   workspacesList.push_back(wkspc);
   saveWorkspaces(getWorkspaceCount());
-  saveWorkspaceNames();
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
                         wkspc->getID() + 2);
@@ -1034,7 +1032,6 @@ unsigned int BScreen::addWorkspace(void) {
 
   toolbar->reconfigure();
 
-  updateDesktopNames();
   updateNetizenWorkspaceCount();
 
   return workspacesList.size();
@@ -1059,8 +1056,6 @@ unsigned int BScreen::removeLastWorkspace(void) {
   delete wkspc;
 
   saveWorkspaces(getWorkspaceCount());
-  saveWorkspaceNames();
-  updateDesktopNames();
 
   toolbar->reconfigure();
 
@@ -1437,40 +1432,6 @@ void BScreen::lowerDesktops(void) {
   if (desktopWindowList.size() > 1)
     XRestackWindows(blackbox->getXDisplay(), &desktopWindowList[0],
                     desktopWindowList.size());
-}
-
-
-void BScreen::addWorkspaceName(const string& name) {
-  workspaceNames.push_back(name);
-  updateDesktopNames();
-}
-
-
-void BScreen::updateDesktopNames(){
-  XAtom::StringVect names;
-
-  WorkspaceList::iterator it = workspacesList.begin();
-  const WorkspaceList::iterator end = workspacesList.end();
-  for (; it != end; ++it)
-    names.push_back((*it)->getName());
-
-  xatom->setValue(getRootWindow(), XAtom::net_desktop_names,
-                  XAtom::utf8, names);
-}
-
-
-/*
- * I would love to kill this function and the accompanying workspaceNames
- * list.  However, we have a chicken and egg situation.  The names are read
- * in during load_rc() which happens before the workspaces are created.
- * The current solution is to read the names into a list, then use the list
- * later for constructing the workspaces.  It is only used during initial
- * BScreen creation.
- */
-const string BScreen::getNameOfWorkspace(unsigned int id) {
-  if (id < workspaceNames.size())
-    return workspaceNames[id];
-  return string("");
 }
 
 

@@ -46,6 +46,7 @@ private:
   BScreen *screen;
   BlackboxWindow *lastfocus;
   Clientmenu *clientmenu;
+  XAtom *xatom;
 
   BlackboxWindowList stackingList, windowList;
 

@@ -55,10 +55,12 @@ using std::string;
 #include "Window.hh"
 #include "Workspace.hh"
 #include "Windowmenu.hh"
+#include "XAtom.hh"
 
 
 Workspace::Workspace(BScreen *scrn, unsigned int i) {
   screen = scrn;
+  xatom = screen->getBlackbox()->getXAtom();
 
   cascade_x = cascade_y = 32;
 
@@ -68,7 +70,7 @@ Workspace::Workspace(BScreen *scrn, unsigned int i) {
 
   lastfocus = (BlackboxWindow *) 0;
 
-  setName(screen->getNameOfWorkspace(id));
+  setName("");
 }
 
 
@@ -395,6 +397,7 @@ bool Workspace::isLastWindow(const BlackboxWindow* const w) const {
   return (w == windowList.back());
 }
 
+
 void Workspace::setCurrent(void) {
   screen->changeWorkspaceID(id);
 }
@@ -404,12 +407,35 @@ void Workspace::setName(const string& new_name) {
   if (! new_name.empty()) {
     name = new_name;
   } else {
-    string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat, "Workspace %d");
-    assert(tmp.length() < 32);
-    char default_name[32];
-    sprintf(default_name, tmp.c_str(), id + 1);
-    name = default_name;
+    // attempt to get from the _NET_WM_DESKTOP_NAMES property
+    XAtom::StringVect namesList;
+    unsigned long numnames = id + 1;
+    if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
+                        XAtom::utf8, numnames, namesList) &&
+        namesList.size() > id) {
+      name = namesList[id];
+    } else {
+      string tmp =i18n(WorkspaceSet, WorkspaceDefaultNameFormat,
+                       "Workspace %d");
+      assert(tmp.length() < 32);
+      char default_name[32];
+      sprintf(default_name, tmp.c_str(), id + 1);
+      name = default_name;
+    }
   }
+  
+  // reset the property with the new name
+  XAtom::StringVect namesList;
+  unsigned long numnames = (unsigned) -1;
+  if (xatom->getValue(screen->getRootWindow(), XAtom::net_desktop_names,
+                      XAtom::utf8, numnames, namesList)) {
+    if (namesList.size() > id)
+      namesList[id] = name;
+    else
+      namesList.push_back(name);
+  }
+  xatom->setValue(screen->getRootWindow(), XAtom::net_desktop_names,
+                  XAtom::utf8, namesList);
 
   clientmenu->setLabel(name);
   clientmenu->update();

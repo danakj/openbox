@@ -3,8 +3,6 @@ CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
 
 INCLUDES= -I../src
 
-LDFLAGS=`pkg-config --libs xft`
-
 noinst_LIBRARIES=libotk.a
 
 libotk_a_SOURCES= color.cc font.cc gccache.cc image.cc imagecontrol.cc \

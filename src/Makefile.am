@@ -1,9 +1,11 @@
 DEFAULT_MENU=$(pkgdatadir)/menu
 DEFAULT_STYLE=$(pkgdatadir)/styles/mbdtex
 
-CXXFLAGS=@CXXFLAGS@ \
+CXXFLAGS=`pkg-config --cflags xft` @CXXFLAGS@ \
 -DDEFAULTMENU=\"$(DEFAULT_MENU)\" \
 -DDEFAULTSTYLE=\"$(DEFAULT_STYLE)\"
+
+LDFLAGS=`pkg-config --libs xft`
 
 INCLUDES= -I../otk
 

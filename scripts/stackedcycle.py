@@ -174,6 +174,12 @@ class _cycledata:
 
     def cycle(self, data, forward):
         if not self.cycling:
+            ob.kgrab(data.screen, _grabfunc)
+            # the pointer grab causes pointer events during the keyboard grab
+            # to go away, which means we don't get enter notifies when the
+            # popup disappears, screwing up the focus
+            ob.mgrab(data.screen)
+
             self.cycling = 1
             focus._disable = 1
             self.state = data.state
@@ -184,12 +190,6 @@ class _cycledata:
             self.clients = [] # so it doesnt try start partway through the list
             self.populatelist()
         
-            ob.kgrab(self.screen.number(), _grabfunc)
-            # the pointer grab causes pointer events during the keyboard grab
-            # to go away, which means we don't get enter notifies when the
-            # popup disappears, screwing up the focus
-            ob.mgrab(self.screen.number())
-
         if not len(self.clients): return # don't both doing anything
         
         self.menuwidgets[self.menupos].setHighlighted(0)

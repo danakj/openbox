@@ -1248,7 +1248,7 @@ void Client::fullscreen(bool fs)
 }
 
 
-bool Client::focus() const
+bool Client::focus()
 {
   // won't try focus if the client doesn't want it, or if the window isn't
   // visible on the screen
@@ -1257,11 +1257,20 @@ bool Client::focus() const
   if (_focused) return true;
 
   // do a check to see if the window has already been unmapped or destroyed
+  // do this intelligently while watching out for unmaps we've generated
+  // (ignore_unmaps > 0)
   XEvent ev;
-  if (XCheckTypedWindowEvent(**otk::display, _window, UnmapNotify, &ev) ||
-      XCheckTypedWindowEvent(**otk::display, _window, DestroyNotify, &ev)) {
+  if (XCheckTypedWindowEvent(**otk::display, _window, DestroyNotify, &ev)) {
     XPutBackEvent(**otk::display, &ev);
     return false;
+  }
+  while (XCheckTypedWindowEvent(**otk::display, _window, UnmapNotify, &ev)) {
+    if (ignore_unmaps) {
+      --ignore_unmaps;
+    } else {
+      XPutBackEvent(**otk::display, &ev);
+      return false;
+    }
   }
 
   if (_can_focus)
@@ -1397,7 +1406,7 @@ void Client::unmapHandler(const XUnmapEvent &e)
 {
   if (ignore_unmaps) {
 #ifdef    DEBUG
-    printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
+//  printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
 #endif // DEBUG
     ignore_unmaps--;
     return;

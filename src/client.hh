@@ -580,7 +580,7 @@ BB    @param window The window id that the Client class should handle
   void resize(Corner anchor, int w, int h);
 
   //! Attempt to focus the client window
-  bool focus() const;
+  bool focus();
 
   //! Remove focus from the client window
   void unfocus() const;

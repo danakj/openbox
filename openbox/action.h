@@ -137,7 +137,7 @@ ObAction *action_new(void (*func)(union ActionData *data));
 */
 
 ObAction *action_from_string(char *name);
-ObAction *action_parse(xmlDocPtr doc, xmlNodePtr node);
+ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 void action_free(ObAction *a);
 
 /* Execute */

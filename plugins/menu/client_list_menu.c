@@ -1,142 +1,123 @@
 #include "kernel/openbox.h"
 #include "kernel/menu.h"
+#include "kernel/menuframe.h"
 #include "kernel/action.h"
 #include "kernel/screen.h"
 #include "kernel/client.h"
 #include "kernel/focus.h"
+#include "gettext.h"
 
 #include "render/theme.h"
 
 #include <glib.h>
 
-static char *PLUGIN_NAME = "client_list_menu";
+#define MENU_NAME "client-list-menu"
 
 typedef struct {
-    GSList *submenus;
-} Client_List_Menu_Data;
+    /* how many desktop menus we've made */
+    guint desktops;
+} MenuData;
 
 typedef struct {
     guint desktop;
-} Client_List_Desktop_Menu_Data;
-
-#define CLIENT_LIST_MENU(m) ((ObMenu *)m)
-#define CLIENT_LIST_MENU_DATA(m) ((Client_List_Menu_Data *)((ObMenu *)m)->plugin_data)
-
-#define CLIENT_LIST_DESKTOP_MENU(m) ((ObMenu *)m)
-#define CLIENT_LIST_DESKTOP_MENU_DATA(m) ((Client_List_Desktop_Menu_Data *)((ObMenu *)m)->plugin_data)
-
-static void self_update(ObMenu *self);
-static void self_destroy(ObMenu *self);
+} DesktopData;
 
 void plugin_setup_config() { }
-void plugin_shutdown() { }
-void plugin_destroy (ObMenu *m) { }
 
-void *plugin_create()
+static void desk_menu_update(ObMenuFrame *frame, gpointer data)
 {
-    ObMenu *menu = menu_new_full("Desktops", "client-list-menu", NULL,
-                                 NULL, self_update, NULL,
-                                 NULL, NULL, self_destroy);
+    ObMenu *menu = frame->menu;
+    DesktopData *d = data;
+    GList *it;
 
-    menu->plugin = PLUGIN_NAME;
-    menu->plugin_data = g_new(Client_List_Menu_Data, 1);
-    CLIENT_LIST_MENU_DATA(menu)->submenus = NULL;
+    menu_clear_entries(menu->name);
 
-    return (void *)menu;
+    for (it = focus_order[d->desktop]; it; it = g_list_next(it)) {
+        ObClient *c = it->data;
+        if (client_normal(c)) {
+            GSList *acts;
+            ObAction* act;
+
+            act = action_from_string("activate");
+            act->data.activate.c = c;
+            acts = g_slist_prepend(NULL, act);
+            menu_add_normal(menu->name, 0,
+                            (c->iconic ? c->icon_title : c->title), acts);
+        }
+    }
+    
+}
+
+/* executes it without changing the client in the actions, since we set that
+   when we make the actions! */
+static void desk_menu_execute(ObMenuEntryFrame *self, gpointer data)
+{
+    GSList *it;
+
+    for (it = self->entry->data.normal.actions; it; it = g_slist_next(it))
+    {
+        ObAction *act = it->data;
+        act->func(&act->data);
+    }
+}
+
+static void desk_menu_destroy(ObMenu *menu, gpointer data)
+{
+    DesktopData *d = data;
+
+    g_free(d);
+}
+
+static void self_update(ObMenuFrame *frame, gpointer data)
+{
+    guint i;
+    MenuData *d = data;
+    
+    menu_clear_entries(MENU_NAME);
+
+    for (i = 0; i < screen_num_desktops; ++i) {
+        gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
+        DesktopData *data = g_new(DesktopData, 1);
+
+        data->desktop = i;
+        menu_new(name, screen_desktop_names[i], data);
+        menu_set_update_func(name, desk_menu_update);
+        menu_set_execute_func(name, desk_menu_execute);
+        menu_set_destroy_func(name, desk_menu_destroy);
+
+        menu_add_submenu(MENU_NAME, 0, name);
+
+        g_free(name);
+    }
+
+    d->desktops = MAX(d->desktops, screen_num_desktops);
+}
+
+static void self_destroy(ObMenu *menu, gpointer data)
+{
+    MenuData *d = data;
+    guint i;
+
+    for (i = 0; i < d->desktops; ++i) {
+        gchar *name = g_strdup_printf("%s-%u", MENU_NAME, i);
+        menu_free(name);
+        g_free(name);
+    }
+    g_free(d);
 }
 
 void plugin_startup()
 {
-    plugin_create("client_list_menu");
+    MenuData *data;
+
+    data = g_new(MenuData, 1);
+    data->desktops = 0;
+    menu_new(MENU_NAME, _("Desktops"), data);
+    menu_set_update_func(MENU_NAME, self_update);
+    menu_set_destroy_func(MENU_NAME, self_destroy);
 }
 
-
-static void desk_update(ObMenu *self)
+void plugin_shutdown()
 {
-    GList *it;
-    guint desk;
-
-    menu_clear(self);
-
-    desk = CLIENT_LIST_DESKTOP_MENU_DATA(self)->desktop;
-
-    for (it = focus_order[desk]; it; it = g_list_next(it)) {
-        ObClient *c = (ObClient *)it->data;
-        if (client_normal(c)) {
-            ObAction* a = action_from_string("activate");
-            a->data.activate.c = c;
-            menu_add_entry(self, menu_entry_new((c->iconic ?
-                                                 c->icon_title :
-                                                 c->title), a));
-        }
-    }
-
-    menu_render(self);
-}
-
-static void desk_selected(ObMenuEntry *entry,
-                          unsigned int button, unsigned int x, unsigned int y)
-{
-    entry->action->data.activate.here = (button == 2);
-    entry->parent->client = entry->action->data.activate.c;
-    menu_entry_fire(entry, button, x, y);
-}
-
-static void desk_destroy(ObMenu *self)
-{
-    g_free(self->plugin_data);
-}
-
-static void self_update(ObMenu *self)
-{
-    guint i, n;
-    ObMenu *deskmenu;
-    gchar *s;
-    GList *eit, *enext;
-    GSList *sit, *snext;
-
-    n = g_slist_length(CLIENT_LIST_MENU_DATA(self)->submenus);
-
-    for (i = 0; i < screen_num_desktops; ++i) {
-        if (i >= n) {
-            s = g_strdup_printf("client-list-menu-desktop-%d", i);
-            deskmenu = menu_new_full(screen_desktop_names[i], s, self,
-                                     NULL,
-                                     desk_update, desk_selected, NULL, NULL,
-                                     desk_destroy);
-            g_free(s);
-
-            deskmenu->plugin = PLUGIN_NAME;
-            deskmenu->plugin_data = g_new(Client_List_Desktop_Menu_Data, 1);
-            CLIENT_LIST_DESKTOP_MENU_DATA(deskmenu)->desktop = i;
-
-            CLIENT_LIST_MENU_DATA(self)->submenus =
-                g_slist_append(CLIENT_LIST_MENU_DATA(self)->submenus,
-                               deskmenu);
-        }
-
-        menu_add_entry(self, menu_entry_new_submenu(screen_desktop_names[i],
-                                                    deskmenu));
-    }
-
-    for (eit = g_list_nth(self->entries, i); eit; eit = enext) {
-        enext = g_list_next(eit);
-	menu_entry_free(eit->data);
-        self->entries = g_list_delete_link(self->entries, eit);
-    }
-
-    for (sit = g_slist_nth(CLIENT_LIST_MENU_DATA(self)->submenus, i);
-         sit; sit = snext) {
-        snext = g_slist_next(sit);
-        menu_free(sit->data);
-        CLIENT_LIST_MENU_DATA(self)->submenus = 
-            g_slist_delete_link(CLIENT_LIST_MENU_DATA(self)->submenus, sit);
-    }
-
-    menu_render(self);
-}
-
-static void self_destroy(ObMenu *self)
-{
-    g_free(self->plugin_data);
+    menu_free(MENU_NAME);
 }

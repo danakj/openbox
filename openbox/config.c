@@ -92,7 +92,7 @@ static void parse_key(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     if (keylist) {
         nact = parse_find_node("action", node);
         while (nact) {
-            if ((action = action_parse(doc, nact))) {
+            if ((action = action_parse(i, doc, nact))) {
                 /* validate that its okay for a key binding */
                 if (action->func == action_moveresize &&
                     action->data.moveresize.corner !=
@@ -165,7 +165,7 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                 goto next_nbut;
             nact = parse_find_node("action", nbut->xmlChildrenNode);
             while (nact) {
-                if ((action = action_parse(doc, nact))) {
+                if ((action = action_parse(i, doc, nact))) {
                     /* validate that its okay for a mouse binding*/
                     if (mact == OB_MOUSE_ACTION_MOTION) {
                         if (action->func != action_moveresize ||

@@ -344,8 +344,10 @@ static void menu_frame_render(ObMenuFrame *self)
     }
 
     if (!w) w = 10;
-    if (!allitems_h) allitems_h = 3;
-    if (!h) h = 3;
+    if (!allitems_h) {
+        allitems_h = 3;
+        h += 3;
+    }
 
     XResizeWindow(ob_display, self->window, w, h);
     XResizeWindow(ob_display, self->items, w, allitems_h);
@@ -546,20 +548,24 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     menu_frame_show(f, self->frame);
 }
 
-void menu_entry_frame_execute(ObMenuEntryFrame *self)
+void menu_entry_frame_execute(ObMenuEntryFrame *self, gboolean hide)
 {
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
-        GSList *it;
-
         /* release grabs before executing the shit */
         menu_frame_hide_all();
 
-        for (it = self->entry->data.normal.actions; it;
-             it = g_slist_next(it))
-        {
-            ObAction *act = it->data;
-            act->data.any.c = self->frame->client;
-            act->func(&act->data);
+        if (self->frame->menu->execute_func)
+            self->frame->menu->execute_func(self, self->frame->menu->data);
+        else {
+            GSList *it;
+
+            for (it = self->entry->data.normal.actions; it;
+                 it = g_slist_next(it))
+            {
+                ObAction *act = it->data;
+                act->data.any.c = self->frame->client;
+                act->func(&act->data);
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ static void parse_menu_item(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
             for (node = node->xmlChildrenNode; node; node = node->next)
                 if (!xmlStrcasecmp(node->name, (const xmlChar*) "action"))
-                    acts = g_slist_append(acts, action_parse(doc, node));
+                    acts = g_slist_append(acts, action_parse(i, doc, node));
             menu_add_normal(state->menus->data, 0, label, acts);
             g_free(label);
         }
@@ -64,6 +64,21 @@ static void parse_menu_separator(ObParseInst *i,
         menu_add_separator(state->menus->data, 0);
 }
 
+gboolean menu_open_plugin(ObParseInst *i, gchar *name, gchar *plugin)
+{
+    gboolean ret = FALSE;
+
+    if (plugin_open(plugin, i)) {
+        plugin_start(plugin);
+        if (g_hash_table_lookup(menu_hash, name))
+            ret = TRUE;
+        else
+            g_warning("Specified plugin '%s' did not provide the "
+                      "menu '%s'", plugin, name);
+    }
+    return ret;
+}
+
 static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
                        gpointer data)
 {
@@ -75,13 +90,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
 
     if (!g_hash_table_lookup(menu_hash, name)) {
         if (parse_attr_string("plugin", node, &plugin)) {
-            if (!plugin_open(plugin, i))
-                goto parse_menu_fail;
-            plugin_start(plugin);
-            if (!g_hash_table_lookup(menu_hash, name))
-                g_warning("Specified plugin '%s' did not provide the "
-                          "menu '%s'", plugin, name);
-                goto parse_menu_fail;
+            menu_open_plugin(i, name, plugin);
         } else {
             if (!parse_attr_string("label", node, &title))
                 goto parse_menu_fail;
@@ -107,6 +116,10 @@ parse_menu_fail:
 void menu_destroy_hash_value(ObMenu *self)
 {
     /* XXX make sure its not visible */
+
+    if (self->destroy_func)
+        self->destroy_func(self, self->data);
+
     menu_clear_entries_internal(self);
     g_free(self->name);
     g_free(self->title);
@@ -313,6 +326,22 @@ void menu_set_update_func(gchar *name, ObMenuUpdateFunc func)
 
     if (!(self = menu_from_name(name))) return;
     self->update_func = func;
+}
+
+void menu_set_execute_func(gchar *name, ObMenuExecuteFunc func)
+{
+    ObMenu *self;
+
+    if (!(self = menu_from_name(name))) return;
+    self->execute_func = func;
+}
+
+void menu_set_destroy_func(gchar *name, ObMenuDestroyFunc func)
+{
+    ObMenu *self;
+
+    if (!(self = menu_from_name(name))) return;
+    self->destroy_func = func;
 }
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id)

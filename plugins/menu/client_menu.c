@@ -82,6 +82,15 @@ static void layer_update(ObMenuFrame *frame, gpointer data)
         if (e->type == OB_MENU_ENTRY_TYPE_NORMAL)
             e->data.normal.enabled = !!frame->client;
     }
+
+    e = menu_find_entry_id(menu, LAYER_TOP);
+    e->data.normal.enabled = !frame->client->above;
+
+    e = menu_find_entry_id(menu, LAYER_NORMAL);
+    e->data.normal.enabled = !(frame->client->above || frame->client->below);
+
+    e = menu_find_entry_id(menu, LAYER_BOTTOM);
+    e->data.normal.enabled = !frame->client->below;
 }
 
 static void send_to_update(ObMenuFrame *frame, gpointer data)

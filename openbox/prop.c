@@ -294,7 +294,7 @@ gboolean prop_get_strings_locale(Window win, Atom prop, char ***ret)
         *ret = g_new0(char*, count + 1);
         (*ret)[count] = NULL; /* null terminated list */
 
-        for (it = strs; it; it = g_slist_next(it)) {
+        for (i = 0, it = strs; it; ++i, it = g_slist_next(it)) {
             (*ret)[i] = g_convert(it->data, -1, "UTF-8", "ISO-8859-1",
                                   NULL, NULL, NULL);
             /* make sure translation did not fail */
@@ -343,7 +343,7 @@ gboolean prop_get_strings_utf8(Window win, Atom prop, char ***ret)
 
         *ret = g_new0(char*, count + 1);
 
-        for (it = strs; it; it = g_slist_next(it)) {
+        for (i = 0, it = strs; it; ++i, it = g_slist_next(it)) {
             if (g_utf8_validate(it->data, -1, NULL))
                 (*ret)[i] = g_strdup(it->data);
             else

@@ -79,7 +79,6 @@ static RrFont *openfont(const RrInstance *inst, char *fontstring)
     out->tint = tint;
 
     font = XftFontOpenPattern(RrDisplay(inst), match);
-    FcPatternDestroy(match);
     if (!font) {
         g_free(out);
         return NULL;

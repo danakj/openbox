@@ -179,7 +179,6 @@ int main(int argc, char **argv)
     XCloseDisplay(ob_display);
 
     if (ob_restart) {
-        ob_restart_path = "";
         if (ob_restart_path != NULL) {
             int argcp;
             char **argvp;

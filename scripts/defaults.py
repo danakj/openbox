@@ -1,5 +1,4 @@
 import focus      # add some default focus handling and cycling functions
-import stackedcycle # functions for doing stacked 'kde-style' cycling
 import focusmodel # default focus models
 import behavior   # defines default behaviors for interaction with windows
 import callbacks  # a lib of functions that can be used as binding callbacks
@@ -34,8 +33,15 @@ ob.mbind("Left", ob.MouseContext.Root, ob.MouseAction.Click,
 ob.kbind(["A-F4"], ob.KeyContext.All, callbacks.close)
 
 # focus bindings
+import stackedcycle # functions for doing stacked 'kde-style' cycling
 ob.kbind(["A-Tab"], ob.KeyContext.All, stackedcycle.next)
-ob.kbind(["A-S-Tab"], ob.KeyContext.All, stackedcycle.previous)
+ob.kbind(["A-S-Tab"], ob.KeyContext.All, stackedcycle.previous
+
+# if you want linear cycling instead of stacked cycling ...
+#import focuscycle
+#focuscycle.raise_window = 0 # don't raise windows when they're activated
+#ob.kbind(["A-Tab"], ob.KeyContext.All, focuscycle.next)
+#ob.kbind(["A-S-Tab"], ob.KeyContext.All, focuscycle.previous)
 
 # desktop changing bindings
 ob.kbind(["C-1"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 0))

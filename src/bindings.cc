@@ -79,7 +79,7 @@ static BindingTree *buildtree(const OBBindings::StringVect &keylist, int id)
   }
 
   printf("<BUILDING>\n");
-  print_branch(ret);
+  print_branch(ret, "");
   printf("</BUILDING>\n");
   
   // successfully built a tree

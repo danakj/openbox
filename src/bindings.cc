@@ -344,7 +344,9 @@ void Bindings::removeAllKeys()
 
 void Bindings::grabKeys(bool grab)
 {
-  for (int i = 0; i < openbox->screenCount(); ++i) {
+  for (int i = 0; i < ScreenCount(**otk::display); ++i) {
+    Screen *sc = openbox->screen(i);
+    if (!sc) continue; // not a managed screen
     Window root = otk::display->screenInfo(i)->rootWindow();
 
     KeyBindingTree *p = _curpos->first_child;
@@ -377,18 +379,13 @@ bool Bindings::grabKeyboard(int screen, PyObject *callback)
   assert(callback);
   if (_keybgrab_callback) return false; // already grabbed
 
-  int i;
-  for (i = 0; i < openbox->screenCount(); ++i)
-    if (openbox->screen(screen)->number() == screen)
-      break;
-  if (i >= openbox->screenCount())
-    return false; // couldn't find the screen.. it's not managed
+  if (!openbox->screen(screen))
+    return false; // the screen is not managed
   
-  Window root = otk::display->screenInfo(i)->rootWindow();
+  Window root = otk::display->screenInfo(screen)->rootWindow();
   if (XGrabKeyboard(**otk::display, root, false, GrabModeAsync,
-                    GrabModeSync, CurrentTime))
+                    GrabModeAsync, CurrentTime))
     return false;
-  printf("****GRABBED****\n");
   _keybgrab_callback = callback;
   return true;
 }
@@ -400,51 +397,50 @@ void Bindings::ungrabKeyboard()
 
   _keybgrab_callback = 0;
   XUngrabKeyboard(**otk::display, CurrentTime);
-  printf("****UNGRABBED****\n");
 }
 
 
 void Bindings::fireKey(int screen, unsigned int modifiers, unsigned int key,
-                       Time time, KeyAction action)
+                       Time time, KeyAction::KA action)
 {
   if (_keybgrab_callback) {
     Client *c = openbox->focusedClient();
     KeyData data(screen, c, time, modifiers, key, action);
     python_callback(_keybgrab_callback, &data);
-  } else {
-    // KeyRelease events only occur during keyboard grabs
-    if (action == EventKeyRelease) return;
+  }
+  
+  // KeyRelease events only occur during keyboard grabs
+  if (action == KeyAction::Release) return;
     
-    if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
-      resetChains(this);
-    } else {
-      KeyBindingTree *p = _curpos->first_child;
-      while (p) {
-        if (p->binding.key == key && p->binding.modifiers == modifiers) {
-          if (p->chain) {
-            if (_timer)
-              delete _timer;
-            _timer = new otk::Timer(5000, // 5 second timeout
-                                    (otk::Timer::TimeoutHandler)resetChains,
-                                    this);
-            // grab the server here to make sure no key pressed go missed
-            otk::display->grab();
-            grabKeys(false);
-            _curpos = p;
-            grabKeys(true);
-            otk::display->ungrab();
-          } else {
-            Client *c = openbox->focusedClient();
-            KeyData data(screen, c, time, modifiers, key, action);
-            CallbackList::iterator it, end = p->callbacks.end();
-            for (it = p->callbacks.begin(); it != end; ++it)
-              python_callback(*it, &data);
-            resetChains(this);
-          }
-          break;
+  if (key == _resetkey.key && modifiers == _resetkey.modifiers) {
+    resetChains(this);
+  } else {
+    KeyBindingTree *p = _curpos->first_child;
+    while (p) {
+      if (p->binding.key == key && p->binding.modifiers == modifiers) {
+        if (p->chain) {
+          if (_timer)
+            delete _timer;
+          _timer = new otk::Timer(5000, // 5 second timeout
+                                  (otk::Timer::TimeoutHandler)resetChains,
+                                  this);
+          // grab the server here to make sure no key pressed go missed
+          otk::display->grab();
+          grabKeys(false);
+          _curpos = p;
+          grabKeys(true);
+          otk::display->ungrab();
+        } else {
+          Client *c = openbox->focusedClient();
+          KeyData data(screen, c, time, modifiers, key, action);
+          CallbackList::iterator it, end = p->callbacks.end();
+          for (it = p->callbacks.begin(); it != end; ++it)
+            python_callback(*it, &data);
+          resetChains(this);
         }
-        p = p->next_sibling;
+        break;
       }
+      p = p->next_sibling;
     }
   }
 }
@@ -464,10 +460,10 @@ void Bindings::resetChains(Bindings *self)
 }
 
 
-bool Bindings::addButton(const std::string &but, MouseContext context,
-                           MouseAction action, PyObject *callback)
+bool Bindings::addButton(const std::string &but, MouseContext::MC context,
+                           MouseAction::MA action, PyObject *callback)
 {
-  assert(context >= 0 && context < NUM_MOUSE_CONTEXT);
+  assert(context >= 0 && context < MouseContext::NUM_MOUSE_CONTEXT);
   
   Binding b(0,0);
   if (!translate(but, b, false))
@@ -491,8 +487,9 @@ bool Bindings::addButton(const std::string &but, MouseContext context,
     bind->binding.modifiers = b.modifiers;
     _buttons[context].push_back(bind);
     // grab the button on all clients
-    for (int sn = 0; sn < openbox->screenCount(); ++sn) {
+    for (int sn = 0; sn < ScreenCount(**otk::display); ++sn) {
       Screen *s = openbox->screen(sn);
+      if (!s) continue; // not managed
       Client::List::iterator c_it, c_end = s->clients.end();
       for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
         grabButton(true, bind->binding, context, *c_it);
@@ -507,39 +504,40 @@ bool Bindings::addButton(const std::string &but, MouseContext context,
 
 void Bindings::removeAllButtons()
 {
-  for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
+  for (int i = 0; i < MouseContext::NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it) {
-      for (int a = 0; a < NUM_MOUSE_ACTION; ++a) {
+      for (int a = 0; a < MouseAction::NUM_MOUSE_ACTION; ++a) {
         while (!(*it)->callbacks[a].empty()) {
           Py_XDECREF((*it)->callbacks[a].front());
           (*it)->callbacks[a].pop_front();
         }
       }
       // ungrab the button on all clients
-      for (int sn = 0; sn < openbox->screenCount(); ++sn) {
+      for (int sn = 0; sn < ScreenCount(**otk::display); ++sn) {
         Screen *s = openbox->screen(sn);
+        if (!s) continue; // not managed
         Client::List::iterator c_it, c_end = s->clients.end();
         for (c_it = s->clients.begin(); c_it != c_end; ++c_it) {
-          grabButton(false, (*it)->binding, (MouseContext)i, *c_it);
+          grabButton(false, (*it)->binding, (MouseContext::MC)i, *c_it);
         }
       }
     }
   }
 }
 
-void Bindings::grabButton(bool grab, const Binding &b, MouseContext context,
-                            Client *client)
+void Bindings::grabButton(bool grab, const Binding &b,
+                          MouseContext::MC context, Client *client)
 {
   Window win;
   int mode = GrabModeAsync;
   unsigned int mask;
   switch(context) {
-  case MC_Frame:
+  case MouseContext::Frame:
     win = client->frame->window();
     mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
     break;
-  case MC_Window:
+  case MouseContext::Window:
     win = client->frame->plate();
     mode = GrabModeSync; // this is handled in fireButton
     mask = ButtonPressMask; // can't catch more than this with Sync mode
@@ -559,16 +557,16 @@ void Bindings::grabButton(bool grab, const Binding &b, MouseContext context,
 
 void Bindings::grabButtons(bool grab, Client *client)
 {
-  for (int i = 0; i < NUM_MOUSE_CONTEXT; ++i) {
+  for (int i = 0; i < MouseContext::NUM_MOUSE_CONTEXT; ++i) {
     ButtonBindingList::iterator it, end = _buttons[i].end();
     for (it = _buttons[i].begin(); it != end; ++it)
-      grabButton(grab, (*it)->binding, (MouseContext)i, client);
+      grabButton(grab, (*it)->binding, (MouseContext::MC)i, client);
   }
 }
 
 void Bindings::fireButton(MouseData *data)
 {
-  if (data->context == MC_Window) {
+  if (data->context == MouseContext::Window) {
     // Replay the event, so it goes to the client
     XAllowEvents(**otk::display, ReplayPointer, data->time);
   }
@@ -585,13 +583,13 @@ void Bindings::fireButton(MouseData *data)
 }
 
 
-bool Bindings::addEvent(EventAction action, PyObject *callback)
+bool Bindings::addEvent(EventAction::EA action, PyObject *callback)
 {
-  if (action < 0 || action >= NUM_EVENTS) {
+  if (action < 0 || action >= EventAction::NUM_EVENTS) {
     return false;
   }
 #ifdef    XKB
-  if (action == EventBell && _eventlist[action].empty())
+  if (action == EventAction::Bell && _eventlist[action].empty())
     XkbSelectEvents(**otk::display, XkbUseCoreKbd,
                     XkbBellNotifyMask, XkbBellNotifyMask);
 #endif // XKB
@@ -600,9 +598,9 @@ bool Bindings::addEvent(EventAction action, PyObject *callback)
   return true;
 }
 
-bool Bindings::removeEvent(EventAction action, PyObject *callback)
+bool Bindings::removeEvent(EventAction::EA action, PyObject *callback)
 {
-  if (action < 0 || action >= NUM_EVENTS) {
+  if (action < 0 || action >= EventAction::NUM_EVENTS) {
     return false;
   }
   
@@ -613,7 +611,7 @@ bool Bindings::removeEvent(EventAction action, PyObject *callback)
     Py_XDECREF(*it);
     _eventlist[action].erase(it);
 #ifdef    XKB
-    if (action == EventBell && _eventlist[action].empty())
+    if (action == EventAction::Bell && _eventlist[action].empty())
       XkbSelectEvents(**otk::display, XkbUseCoreKbd,
                       XkbBellNotifyMask, 0);
 #endif // XKB
@@ -624,7 +622,7 @@ bool Bindings::removeEvent(EventAction action, PyObject *callback)
 
 void Bindings::removeAllEvents()
 {
-  for (int i = 0; i < NUM_EVENTS; ++i) {
+  for (int i = 0; i < EventAction::NUM_EVENTS; ++i) {
     while (!_eventlist[i].empty()) {
       Py_XDECREF(_eventlist[i].front());
       _eventlist[i].pop_front();

@@ -1,6 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-%module openbox
+%module ob
 
 %{
 #ifdef HAVE_CONFIG_H

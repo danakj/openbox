@@ -32,34 +32,34 @@ public:
   
   inline WidgetType type() const { return _type; }
 
-  inline MouseContext mcontext() const {
+  inline MouseContext::MC mcontext() const {
     switch (_type) {
     case Type_Frame:
-      return MC_Frame;
+      return MouseContext::Frame;
     case Type_Titlebar:
-      return MC_Titlebar;
+      return MouseContext::Titlebar;
     case Type_Handle:
-      return MC_Handle;
+      return MouseContext::Handle;
     case Type_Plate:
-      return MC_Window;
+      return MouseContext::Window;
     case Type_Label:
-      return MC_Titlebar;
+      return MouseContext::Titlebar;
     case Type_MaximizeButton:
-      return MC_MaximizeButton;
+      return MouseContext::MaximizeButton;
     case Type_CloseButton:
-      return MC_CloseButton;
+      return MouseContext::CloseButton;
     case Type_IconifyButton:
-      return MC_IconifyButton;
+      return MouseContext::IconifyButton;
     case Type_AllDesktopsButton:
-      return MC_AllDesktopsButton;
+      return MouseContext::AllDesktopsButton;
     case Type_LeftGrip:
-      return MC_Grip;
+      return MouseContext::Grip;
     case Type_RightGrip:
-      return MC_Grip;
+      return MouseContext::Grip;
     case Type_Client:
-      return MC_Window;
+      return MouseContext::Window;
     case Type_Root:
-      return MC_Root;
+      return MouseContext::Root;
     default:
       assert(false); // unhandled type
     }

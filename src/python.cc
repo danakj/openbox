@@ -10,7 +10,7 @@
 
 extern "C" {
 // The initializer in openbox_wrap.cc
-extern void init_openbox(void);
+extern void init_ob(void);
 }
 
 namespace ob {
@@ -23,21 +23,20 @@ void python_init(char *argv0)
   Py_SetProgramName(argv0);
   Py_Initialize();
   // initialize the C python module
-  init_openbox();
+  init_ob();
   // include the openbox directories for python scripts in the sys path
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
   PyRun_SimpleString(const_cast<char*>(("sys.path.append('" +
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));
-  // import the otk and openbox modules into the main namespace
-  PyRun_SimpleString("from openbox import *;");
+  PyRun_SimpleString("sys.path.append('" SCRIPTDIR "')");
+  PyRun_SimpleString("import ob;");
   // set up convenience global variables
-  PyRun_SimpleString("openbox = Openbox_instance()");
-  PyRun_SimpleString("display = Display_instance()");
+  PyRun_SimpleString("ob.openbox = ob.Openbox_instance()");
+  PyRun_SimpleString("ob.display = ob.Display_instance()");
 
   // set up access to the python global variables
-  PyObject *obmodule = PyImport_AddModule("__main__");
+  PyObject *obmodule = PyImport_AddModule("config");
   obdict = PyModule_GetDict(obmodule);
 }
 
@@ -93,8 +92,8 @@ bool python_get_stringlist(const char *name, std::vector<otk::ustring> *value)
 // Stuff for calling from Python scripts //
 // ************************************* //
 
-PyObject *mbind(const std::string &button, ob::MouseContext context,
-                ob::MouseAction action, PyObject *func)
+PyObject *mbind(const std::string &button, ob::MouseContext::MC context,
+                ob::MouseAction::MA action, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -102,14 +101,14 @@ PyObject *mbind(const std::string &button, ob::MouseContext context,
   }
   
   if (!ob::openbox->bindings()->addButton(button, context,
-                                                    action, func)) {
+                                          action, func)) {
     PyErr_SetString(PyExc_RuntimeError,"Unable to add binding.");
     return NULL;
   }
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject *ebind(ob::EventAction action, PyObject *func)
+PyObject *ebind(ob::EventAction::EA action, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -143,7 +142,7 @@ PyObject *kungrab()
   Py_INCREF(Py_None); return Py_None;
 }
 
-PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func)
+PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func)
 {
   if (!PyCallable_Check(func)) {
     PyErr_SetString(PyExc_TypeError, "Invalid callback function.");
@@ -231,6 +230,13 @@ PyObject *send_client_msg(Window target, Atom type, Window about,
              SubstructureRedirectMask | SubstructureNotifyMask,
              &e);
   Py_INCREF(Py_None); return Py_None;
+}
+
+void execute(const std::string &bin, int screen)
+{
+  if (screen >= ScreenCount(**otk::display))
+    screen = 0;
+  otk::bexec(bin, otk::display->screenInfo(screen)->displayString());
 }
 
 }

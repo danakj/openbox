@@ -174,17 +174,15 @@ public:
   //! Returns the Bindings instance for the window manager
   inline Bindings *bindings() const { return _bindings; }
 
-  //! Returns a managed screen
+  //! Returns a managed screen or a null pointer
+  /*!
+    ALWAYS check the return value for a non-null, as any unmanaged screens
+    will return one. This includes screen(0) if the first managed screen is 1.
+  */
   inline Screen *screen(int num) {
-    assert(num >= 0); assert(num < (signed)_screens.size());
-    if (num < 0 || num >= screenCount())
-      return NULL;
+    assert(num >= 0); assert(num < (signed)ScreenCount(**otk::display));
+    if (num >= (signed)_screens.size()) return 0;
     return _screens[num];
-  }
-
-  //! Returns the number of managed screens
-  inline int screenCount() const {
-    return (signed)_screens.size();
   }
 
   //! Returns the mouse cursors used throughout Openbox
@@ -231,9 +229,6 @@ public:
   inline void restart(const std::string &bin = "") {
     _shutdown = true; _restart = true; _restart_prog = bin;
   }
-
-  //! Executes a command on a screen
-  void execute(int screen, const std::string &bin);
 };
 
 }

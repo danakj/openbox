@@ -134,7 +134,7 @@ Screen::Screen(int screen)
   openbox->registerHandler(_info->rootWindow(), this);
 
   // call the python Startup callbacks
-  EventData data(_number, 0, EventShutdown, 0);
+  EventData data(_number, 0, EventAction::Shutdown, 0);
   openbox->bindings()->fireEvent(&data);
 }
 
@@ -150,7 +150,7 @@ Screen::~Screen()
     unmanageWindow(clients.front());
 
   // call the python Shutdown callbacks
-  EventData data(_number, 0, EventShutdown, 0);
+  EventData data(_number, 0, EventAction::Shutdown, 0);
   openbox->bindings()->fireEvent(&data);
 
   XDestroyWindow(**otk::display, _focuswindow);
@@ -498,7 +498,7 @@ void Screen::manageWindow(Window window)
         client->positionRequested())) {
     // position the window intelligenty .. hopefully :)
     // call the python PLACEWINDOW binding
-    EventData data(_number, client, EventPlaceWindow, 0);
+    EventData data(_number, client, EventAction::PlaceWindow, 0);
     openbox->bindings()->fireEvent(&data);
   }
 
@@ -523,7 +523,7 @@ void Screen::manageWindow(Window window)
   openbox->bindings()->grabButtons(true, client);
 
   // call the python NEWWINDOW binding
-  EventData data(_number, client, EventNewWindow, 0);
+  EventData data(_number, client, EventAction::NewWindow, 0);
   openbox->bindings()->fireEvent(&data);
 
 #ifdef DEBUG
@@ -538,7 +538,7 @@ void Screen::unmanageWindow(Client *client)
   Frame *frame = client->frame;
 
   // call the python CLOSEWINDOW binding 
-  EventData data(_number, client, EventCloseWindow, 0);
+  EventData data(_number, client, EventAction::CloseWindow, 0);
   openbox->bindings()->fireEvent(&data);
 
   openbox->bindings()->grabButtons(false, client);

@@ -2,131 +2,150 @@
 ###          Functions for helping out with your window focus.          ###
 ###########################################################################
 
-# raise the window also when it is focused
-ob_focus_raise = 1
-# send focus somewhere when nothing is left with the focus if possible
-ob_focus_fallback = 0
+###########################################################################
+###         Options that affect the behavior of the focus module.       ###
+###                                                                     ###
+# raise the window also when it is focused                              ###
+cycle_raise = 1                                                         ###
+# raise as you cycle in stacked mode                                    ###
+stacked_cycle_raise = 0                                                 ###
+# send focus somewhere when nothing is left with the focus, if possible ###
+fallback = 0                                                            ###
+###                                                                     ###
+###########################################################################
+
+import ob
 
 # maintain a list of clients, stacked in focus order
-ob_clients = []
+_clients = []
 # maintaint he current focused window
-ob_doing_stacked = 0
+_doing_stacked = 0
 
-def ob_new_win(data):
-    global ob_clients
-    global ob_doing_stacked
-    global ob_cyc_w;
+def _new_win(data):
+    global _clients
+    global _doing_stacked
+    global _cyc_w;
 
-    if ob_doing_stacked:
-        ob_clients.insert(ob_clients.index(ob_cyc_w), data.client.window())
+    if _doing_stacked:
+        _clients.insert(_clients.index(_cyc_w), data.client.window())
     else:
-        if not len(ob_clients):
-            ob_clients.append(data.client.window())
+        if not len(_clients):
+            _clients.append(data.client.window())
         else:
-            ob_clients.insert(1, data.client.window()) # insert in 2nd slot
+            _clients.insert(1, data.client.window()) # insert in 2nd slot
 
-def ob_close_win(data):
-    global ob_clients
-    global ob_cyc_w;
-    global ob_doing_stacked
+def _close_win(data):
+    global _clients
+    global _cyc_w;
+    global _doing_stacked
 
-    if not ob_doing_stacked:
+    if not _doing_stacked:
         # not in the middle of stacked cycling, so who cares
-        ob_clients.remove(data.client.window())
+        _clients.remove(data.client.window())
     else:
         # have to fix the cycling if we remove anything
         win = data.client.window()
-        if ob_cyc_w == win:
-            do_stacked_cycle(data) # cycle off the window first
-        ob_clients.remove(win)
+        if _cyc_w == win:
+            _do_stacked_cycle(data) # cycle off the window first
+        _clients.remove(win)
 
-def ob_focused(data):
-    global ob_clients
-    global ob_doing_stacked
-    global ob_cyc_w
+def _focused(data):
+    global _clients
+    global _doing_stacked
+    global _cyc_w
     
     if data.client:
-        if not ob_doing_stacked: # only move the window when we're not cycling
+        if not _doing_stacked: # only move the window when we're not cycling
             win = data.client.window()
             # move it to the top
-            ob_clients.remove(win)
-            ob_clients.insert(0, win)
+            _clients.remove(win)
+            _clients.insert(0, win)
         else: # if we are cycling, then update our pointer
-            ob_cyc_w = data.client.window()
-    elif ob_focus_fallback: 
+            _cyc_w = data.client.window()
+    elif fallback: 
         # pass around focus
-        desktop = openbox.screen(ob_cyc_screen).desktop()
-        for w in ob_clients:
-            client = openbox.findClient(w)
+        desktop = ob.openbox.screen(_cyc_screen).desktop()
+        for w in _clients:
+            client = ob.openbox.findClient(w)
             if client and (client.desktop() == desktop and \
                            client.normal() and client.focus()):
                 break
 
-ebind(EventNewWindow, ob_new_win)
-ebind(EventCloseWindow, ob_close_win)
-ebind(EventFocus, ob_focused)
+_cyc_mask = 0
+_cyc_key = 0
+_cyc_w = 0 # last window cycled to
+_cyc_screen = 0
 
-ob_cyc_mask = 0
-ob_cyc_key = 0
-ob_cyc_w = 0 # last window cycled to
-ob_cyc_screen = 0
+def _do_stacked_cycle(data, forward):
+    global _cyc_w
+    global stacked_cycle_raise
+    global _clients
 
-def do_stacked_cycle(data):
-    global ob_cyc_w
+    clients = _clients[:] # make a copy
+
+    if not forward:
+        clients.reverse()
 
     try:
-        i = ob_clients.index(ob_cyc_w) + 1
+        i = clients.index(_cyc_w) + 1
     except ValueError:
-        i = 0
+        i = 1
+    clients = clients[i:] + clients[:i]
         
-    clients = ob_clients[i:] + ob_clients[:i]
+    desktop = ob.openbox.screen(data.screen).desktop()
     for w in clients:
-        client = openbox.findClient(w)
+        client = ob.openbox.findClient(w)
         if client and (client.desktop() == desktop and \
                        client.normal() and client.focus()):
+            if stacked_cycle_raise:
+                ob.openbox.screen(data.screen).raiseWindow(client)
             return
 
-def focus_next_stacked_grab(data):
-    global ob_cyc_mask;
-    global ob_cyc_key;
-    global ob_cyc_w;
-    global ob_doing_stacked;
+def _focus_stacked_ungrab(data):
+    global _cyc_mask;
+    global _cyc_key;
+    global _doing_stacked;
 
-    if data.action == EventKeyRelease:
+    if data.action == ob.KeyAction.Release:
         # have all the modifiers this started with been released?
-        if not ob_cyc_mask & data.state:
-            kungrab() # ungrab ourself
-            ob_doing_stacked = 0;
-            print "UNGRABBED!"
-    else:
-        if ob_cyc_key == data.key:
-            # the next window to try focusing in ob_clients[ob_cyc_i]
-            print "CYCLING!!"
-            do_stacked_cycle(data)
+        if not _cyc_mask & data.state:
+            ob.kungrab() # ungrab ourself
+            _doing_stacked = 0;
+            if cycle_raise:
+                client = ob.openbox.findClient(_cyc_w)
+                if client:
+                    ob.openbox.screen(data.screen).raiseWindow(client)
 
 def focus_next_stacked(data, forward=1):
-    global ob_cyc_mask
-    global ob_cyc_key
-    global ob_cyc_w
-    global ob_cyc_screen
-    global ob_doing_stacked
-    ob_cyc_mask = data.state
-    ob_cyc_key = data.key
-    ob_cyc_w = 0
-    ob_cyc_screen = data.screen
-    ob_doing_stacked = 1
+    """Focus the next (or previous, with forward=0) window in a stacked
+       order."""
+    global _cyc_mask
+    global _cyc_key
+    global _cyc_w
+    global _cyc_screen
+    global _doing_stacked
 
-    kgrab(data.screen, focus_next_stacked_grab)
-    print "GRABBED!"
-    focus_next_stacked_grab(data) # start with the first press
+    if _doing_stacked:
+        if _cyc_key == data.key:
+            _do_stacked_cycle(data,forward)
+    else:
+        _cyc_mask = data.state
+        _cyc_key = data.key
+        _cyc_w = 0
+        _cyc_screen = data.screen
+        _doing_stacked = 1
+
+        ob.kgrab(data.screen, _focus_stacked_ungrab)
+        focus_next_stacked(data, forward) # start with the first press
 
 def focus_prev_stacked(data):
-    return
+    """Focus the previous window in a stacked order."""
+    focus_next_stacked(data, forward=0)
 
 def focus_next(data, num=1, forward=1):
     """Focus the next (or previous, with forward=0) window in a linear
        order."""
-    screen = openbox.screen(data.screen)
+    screen = ob.openbox.screen(data.screen)
     count = screen.clientCount()
 
     if not count: return # no clients
@@ -156,7 +175,7 @@ def focus_next(data, num=1, forward=1):
         if client.normal() and \
                (client.desktop() == curdesk or client.desktop() == 0xffffffff)\
                and client.focus():
-            if ob_focus_raise:
+            if cycle_raise:
                 screen.raiseWindow(client)
             return
         if forward:
@@ -171,5 +190,9 @@ def focus_prev(data, num=1):
     """Focus the previous window in a linear order."""
     focus_next(data, num, forward=0)
 
+
+ob.ebind(ob.EventAction.NewWindow, _new_win)
+ob.ebind(ob.EventAction.CloseWindow, _close_win)
+ob.ebind(ob.EventAction.Focus, _focused)
 
 print "Loaded focus.py"

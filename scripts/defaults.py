@@ -1,36 +1,43 @@
+import focus      # add some default focus handling and cycling functions
+import focusmodel # default focus models
+import behavior   # defines default behaviors for interaction with windows
+import callbacks  # a lib of functions that can be used as binding callbacks
+import windowplacement # use a routine in here to place windows
+
+# try focus something when nothing is focused
+focus.fallback = 1
+
 # set up the mouse buttons
-setup_sloppy_focus()
-setup_window_clicks()
-setup_window_buttons()
-setup_scroll()
-# set up focus fallback so im not left with nothing focused all the time
-setup_fallback_focus()
+focusmodel.setup_sloppy_focus()
+behavior.setup_window_clicks()
+behavior.setup_window_buttons()
+behavior.setup_scroll()
 
 # my window placement algorithm
-ebind(EventPlaceWindow, placewindows_random)
+ob.ebind(ob.EventAction.PlaceWindow, windowplacement.random)
 
 # run xterm from root clicks
-mbind("Left", MC_Root, MouseClick, lambda(d): execute("xterm"))
+ob.mbind("Left", ob.MouseContext.Root, ob.MouseAction.Click,
+         lambda(d): ob.execute("xterm", d.screen))
 
-kbind(["A-F4"], KC_All, close)
+ob.kbind(["A-F4"], ob.KeyContext.All, callbacks.close)
 
 # desktop changing bindings
-kbind(["C-1"], KC_All, lambda(d): change_desktop(d, 0))
-kbind(["C-2"], KC_All, lambda(d): change_desktop(d, 1))
-kbind(["C-3"], KC_All, lambda(d): change_desktop(d, 2))
-kbind(["C-4"], KC_All, lambda(d): change_desktop(d, 3))
-kbind(["C-A-Right"], KC_All, lambda(d): next_desktop(d))
-kbind(["C-A-Left"], KC_All, lambda(d): prev_desktop(d))
+ob.kbind(["C-1"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 0))
+ob.kbind(["C-2"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 1))
+ob.kbind(["C-3"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 2))
+ob.kbind(["C-4"], ob.KeyContext.All, lambda(d): callbacks.change_desktop(d, 3))
+ob.kbind(["C-A-Right"], ob.KeyContext.All,
+         lambda(d): callbacks.next_desktop(d))
+ob.kbind(["C-A-Left"], ob.KeyContext.All,
+         lambda(d): callbacks.prev_desktop(d))
 
-kbind(["C-S-A-Right"], KC_All, lambda(d): send_to_next_desktop(d))
-kbind(["C-S-A-Left"], KC_All, lambda(d): send_to_prev_desktop(d))
+ob.kbind(["C-S-A-Right"], ob.KeyContext.All,
+         lambda(d): callbacks.send_to_next_desktop(d))
+ob.kbind(["C-S-A-Left"], ob.KeyContext.All,
+         lambda(d): callbacks.send_to_prev_desktop(d))
 
 # focus new windows
-def focusnew(data):
-    if not data.client: return
-    if data.client.normal():
-        focus(data)
-
-ebind(EventNewWindow, focusnew)
+ob.ebind(ob.EventAction.NewWindow, callbacks.focus)
 
 print "Loaded defaults.py"

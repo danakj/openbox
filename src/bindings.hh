@@ -51,7 +51,7 @@ typedef struct KeyBindingTree {
 
 typedef struct ButtonBinding {
   Binding binding;
-  CallbackList callbacks[NUM_MOUSE_ACTION];
+  CallbackList callbacks[MouseAction::NUM_MOUSE_ACTION];
   ButtonBinding() : binding(0, 0) {}
 };
 
@@ -77,12 +77,12 @@ private:
   static void resetChains(Bindings *self); // the timer's timeout function
 
   typedef std::list <ButtonBinding*> ButtonBindingList;
-  ButtonBindingList _buttons[NUM_MOUSE_CONTEXT];
+  ButtonBindingList _buttons[MouseContext::NUM_MOUSE_CONTEXT];
 
-  void grabButton(bool grab, const Binding &b, MouseContext context,
+  void grabButton(bool grab, const Binding &b, MouseContext::MC context,
                   Client *client);
 
-  CallbackList _eventlist[NUM_EVENTS];
+  CallbackList _eventlist[EventAction::NUM_EVENTS];
 
   PyObject *_keybgrab_callback;
   
@@ -114,7 +114,7 @@ public:
   void removeAllKeys();
 
   void fireKey(int screen, unsigned int modifiers,unsigned int key, Time time,
-               KeyAction action);
+               KeyAction::KA action);
 
   void setResetKey(const std::string &key);
 
@@ -123,8 +123,8 @@ public:
   bool grabKeyboard(int screen, PyObject *callback);
   void ungrabKeyboard();
 
-  bool addButton(const std::string &but, MouseContext context,
-                 MouseAction action, PyObject *callback);
+  bool addButton(const std::string &but, MouseContext::MC context,
+                 MouseAction::MA action, PyObject *callback);
 
   void grabButtons(bool grab, Client *client);
 
@@ -134,10 +134,10 @@ public:
   void fireButton(MouseData *data);
 
   //! Bind a callback for an event
-  bool addEvent(EventAction action, PyObject *callback);
+  bool addEvent(EventAction::EA action, PyObject *callback);
 
   //! Unbind the callback function from an event
-  bool removeEvent(EventAction action, PyObject *callback);
+  bool removeEvent(EventAction::EA action, PyObject *callback);
 
   //! Remove all callback functions
   void removeAllEvents();

@@ -133,7 +133,7 @@ void Client::getDesktop()
                          otk::Property::atoms.cardinal,
                          (long unsigned*)&_desktop)) {
 #ifdef DEBUG
-    printf("DEBUG: Window requested desktop: %ld\n", _desktop);
+//    printf("Window requested desktop: %ld\n", _desktop);
 #endif
   }
 }
@@ -1181,7 +1181,6 @@ void Client::applyStartupState()
   // these are in a carefully crafted order..
 
   if (_iconic) {
-    printf("MAP ICONIC\n");
     _iconic = false;
     setDesktop(ICONIC_DESKTOP);
   }
@@ -1210,7 +1209,7 @@ void Client::applyStartupState()
 void Client::fireUrgent()
 {
   // call the python UrgentWindow callbacks
-  EventData data(_screen, this, EventUrgentWindow, 0);
+  EventData data(_screen, this, EventAction::UrgentWindow, 0);
   openbox->bindings()->fireEvent(&data);
 }
 

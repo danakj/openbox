@@ -24,53 +24,63 @@ namespace ob {
 
 class Client;
 
-enum MouseContext {
-  MC_Frame,
-  MC_Titlebar,
-  MC_Handle,
-  MC_Window,
-  MC_MaximizeButton,
-  MC_CloseButton,
-  MC_IconifyButton,
-  MC_AllDesktopsButton,
-  MC_Grip,
-  MC_Root,
-  MC_MenuItem,
-  NUM_MOUSE_CONTEXT
+struct MouseContext {
+  enum MC {
+    Frame,
+    Titlebar,
+    Handle,
+    Window,
+    MaximizeButton,
+    CloseButton,
+    IconifyButton,
+    AllDesktopsButton,
+    Grip,
+    Root,
+    MenuItem,
+    NUM_MOUSE_CONTEXT
+  };
 };
 
-enum MouseAction {
-  MousePress,
-  MouseClick,
-  MouseDoubleClick,
-  MouseMotion,
-  NUM_MOUSE_ACTION
+struct MouseAction {
+  enum MA {
+    Press,
+    Click,
+    DoubleClick,
+    Motion,
+    NUM_MOUSE_ACTION
+  };
 };
 
-enum KeyContext {
-  KC_Menu,
-  KC_All,
-  NUM_KEY_CONTEXT
+struct KeyContext {
+  enum KC {
+    Menu,
+    All,
+    NUM_KEY_CONTEXT
+  };
 };
 
-enum KeyAction {
-  EventKeyPress,
-  EventKeyRelease,
-  NUM_KEY_ACTION
+struct KeyAction {
+  enum KA {
+    Press,
+    Release,
+    NUM_KEY_ACTION
+  };
 };
 
-enum EventAction {
-  EventEnterWindow,
-  EventLeaveWindow,
-  EventPlaceWindow,
-  EventNewWindow,
-  EventCloseWindow,
-  EventStartup,
-  EventShutdown,
-  EventFocus,
-  EventBell,
-  EventUrgentWindow,
-  NUM_EVENTS
+struct EventAction {
+  enum EA {
+    EnterWindow,
+    LeaveWindow,
+    PlaceWindow,
+    NewWindow,
+    CloseWindow,
+    Startup,
+    Shutdown,
+    Focus,
+    Bell,
+    UrgentWindow,
+    NUM_EVENTS
+  };
 };
 
 class MouseData {
@@ -80,8 +90,8 @@ public:
   Time time;
   unsigned int state;
   unsigned int button;
-  MouseContext context;
-  MouseAction action;
+  MouseContext::MC context;
+  MouseAction::MA action;
   int xroot;
   int yroot;
   int pressx;
@@ -92,9 +102,9 @@ public:
   int press_clientheight;
 
   MouseData(int screen, Client *client, Time time, unsigned int state,
-            unsigned int button, MouseContext context, MouseAction action,
-            int xroot, int yroot, const otk::Point &initpos,
-            const otk::Rect &initarea) {
+            unsigned int button, MouseContext::MC context,
+            MouseAction::MA action, int xroot, int yroot,
+            const otk::Point &initpos, const otk::Rect &initarea) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
@@ -112,7 +122,8 @@ public:
     this->press_clientheight = initarea.height();
   }
   MouseData(int screen, Client *client, Time time, unsigned int state,
-            unsigned int button, MouseContext context, MouseAction action) {
+            unsigned int button, MouseContext::MC context,
+            MouseAction::MA action) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
@@ -136,9 +147,9 @@ public:
   int screen;
   Client *client;
   unsigned int state;
-  EventAction action;
+  EventAction::EA action;
 
-  EventData(int screen, Client *client, EventAction action,
+  EventData(int screen, Client *client, EventAction::EA action,
             unsigned int state) {
     this->screen = screen;
     this->client = client;
@@ -154,10 +165,10 @@ public:
   Time time;
   unsigned int state;
   char *key;
-  KeyAction action;
+  KeyAction::KA action;
 
   KeyData(int screen, Client *client, Time time, unsigned int state,
-          unsigned int key, KeyAction action) {
+          unsigned int key, KeyAction::KA action) {
     this->screen = screen;
     this->client = client;
     this->time   = time;
@@ -187,21 +198,25 @@ void python_callback(PyObject *func, KeyData *data);
 
 #endif // SWIG
 
-PyObject *mbind(const std::string &button, ob::MouseContext context,
-                ob::MouseAction action, PyObject *func);
+PyObject *mbind(const std::string &button, ob::MouseContext::MC context,
+                ob::MouseAction::MA action, PyObject *func);
 
-PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
+PyObject *kbind(PyObject *keylist, ob::KeyContext::KC context, PyObject *func);
 
 PyObject *kgrab(int screen, PyObject *func);
 PyObject *kungrab();
 
-PyObject *ebind(ob::EventAction action, PyObject *func);
+PyObject *ebind(ob::EventAction::EA action, PyObject *func);
 
 void set_reset_key(const std::string &key);
 
 PyObject *send_client_msg(Window target, Atom type, Window about,
                           long data, long data1 = 0, long data2 = 0,
                           long data3 = 0, long data4 = 0);
+
+
+void execute(const std::string &bin, int screen=0);
+
 }
 
 

@@ -147,24 +147,28 @@ Openbox::Openbox(int argc, char **argv)
   python_init(argv[0]);
   
   // load config values
-  python_exec(SCRIPTDIR"/config.py"); // load openbox config values
+  //python_exec(SCRIPTDIR"/config.py"); // load openbox config values
   // run all of the python scripts
-  python_exec(SCRIPTDIR"/builtins.py"); // builtin callbacks
-  python_exec(SCRIPTDIR"/focus.py"); // focus helpers
+  //python_exec(SCRIPTDIR"/builtins.py"); // builtin callbacks
+  //python_exec(SCRIPTDIR"/focus.py"); // focus helpers
   // run the user's script or the system defaults if that fails
   if (!python_exec(_scriptfilepath.c_str()))
     python_exec(SCRIPTDIR"/defaults.py"); // system default bahaviors
 
   // initialize all the screens
-  Screen *screen;
-  int i = _single ? DefaultScreen(**otk::display) : 0;
-  int max = _single ? i + 1 : ScreenCount(**otk::display);
-  for (; i < max; ++i) {
+  for (int i = 0, max = ScreenCount(**otk::display); i < max; ++i) {
+    Screen *screen;
+    if (_single && i != DefaultScreen(**otk::display)) {
+      _screens.push_back(0);
+      continue;
+    }
     screen = new Screen(i);
     if (screen->managed())
       _screens.push_back(screen);
-    else
+    else {
       delete screen;
+      _screens.push_back(0);
+    }
   }
 
   if (_screens.empty()) {
@@ -390,15 +394,8 @@ void Openbox::setFocusedClient(Client *c)
   }
 
   // call the python Focus callbacks
-  EventData data(_focused_screen->number(), c, EventFocus, 0);
+  EventData data(_focused_screen->number(), c, EventAction::Focus, 0);
   _bindings->fireEvent(&data);
-}
-
-void Openbox::execute(int screen, const std::string &bin)
-{
-  if (screen >= ScreenCount(**otk::display))
-    screen = 0;
-  otk::bexec(bin, otk::display->screenInfo(screen)->displayString());
 }
 
 }

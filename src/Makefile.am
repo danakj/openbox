@@ -23,7 +23,7 @@ openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
                   openbox_wrap.cc
 openbox3_LDFLAGS= $(PYTHON_LDFLAGS)
 
-script_DATA = openbox.py
+script_DATA = ob.py
 
 EXTRA_DIST = $(script_DATA)
 

@@ -88,14 +88,14 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   else
     screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
-                 MousePress);
+                 MouseAction::Press);
   openbox->bindings()->fireButton(&data);
     
   if (_button) return; // won't count toward CLICK events
 
   _button = e.button;
 
-  if (w->mcontext() == MC_Window) {
+  if (w->mcontext() == MouseContext::Window) {
     /*
       Because of how events are grabbed on the client window, we can't get
       ButtonRelease events, so instead we simply manufacture them here, so that
@@ -143,7 +143,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   else
     screen = otk::display->findScreen(e.root)->screen();
   MouseData data(screen, c, e.time, state, e.button, w->mcontext(),
-                 MouseClick);
+                 MouseAction::Click);
   openbox->bindings()->fireButton(&data);
     
 
@@ -156,7 +156,7 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
       _release.win == e.window && _release.button == e.button) {
 
     // run the DOUBLECLICK python hook
-    data.action = MouseDoubleClick;
+    data.action = MouseAction::DoubleClick;
     openbox->bindings()->fireButton(&data);
     
     // reset so you cant triple click for 2 doubleclicks
@@ -183,7 +183,7 @@ void Actions::enterHandler(const XCrossingEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  EventData data(screen, c, EventEnterWindow, e.state);
+  EventData data(screen, c, EventAction::EnterWindow, e.state);
   openbox->bindings()->fireEvent(&data);
 }
 
@@ -199,14 +199,13 @@ void Actions::leaveHandler(const XCrossingEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  EventData data(screen, c, EventLeaveWindow, e.state);
+  EventData data(screen, c, EventAction::LeaveWindow, e.state);
   openbox->bindings()->fireEvent(&data);
 }
 
 
 void Actions::keyPressHandler(const XKeyEvent &e)
 {
-  printf("press\n");
   otk::EventHandler::keyPressHandler(e);
 
   // kill off the Button1Mask etc, only want the modifiers
@@ -214,13 +213,12 @@ void Actions::keyPressHandler(const XKeyEvent &e)
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   openbox->bindings()->
     fireKey(otk::display->findScreen(e.root)->screen(),
-            state, e.keycode, e.time, EventKeyPress);
+            state, e.keycode, e.time, KeyAction::Press);
 }
 
 
 void Actions::keyReleaseHandler(const XKeyEvent &e)
 {
-  printf("release\n");
   otk::EventHandler::keyReleaseHandler(e);
 
   // kill off the Button1Mask etc, only want the modifiers
@@ -248,7 +246,7 @@ void Actions::keyReleaseHandler(const XKeyEvent &e)
   
   openbox->bindings()->
     fireKey(otk::display->findScreen(e.root)->screen(),
-            state, e.keycode, e.time, EventKeyRelease);
+            state, e.keycode, e.time, KeyAction::Release);
 }
 
 
@@ -301,8 +299,9 @@ void Actions::motionHandler(const XMotionEvent &e)
     screen = c->screen();
   else
     screen = otk::display->findScreen(e.root)->screen();
-  MouseData data(screen, c, e.time, state, button, w->mcontext(), MouseMotion,
-                 x_root, y_root, _posqueue[0]->pos, _posqueue[0]->clientarea);
+  MouseData data(screen, c, e.time, state, button, w->mcontext(),
+                 MouseAction::Motion, x_root, y_root,
+                 _posqueue[0]->pos, _posqueue[0]->clientarea);
   openbox->bindings()->fireButton(&data);
 }
 
@@ -322,7 +321,7 @@ void Actions::xkbHandler(const XkbEvent &e)
       screen = c->screen();
     else
       screen = openbox->focusedScreen()->number();
-    EventData data(screen, c, EventBell, 0);
+    EventData data(screen, c, EventAction::Bell, 0);
     openbox->bindings()->fireEvent(&data);
     break;
   }

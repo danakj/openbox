@@ -219,7 +219,8 @@ void focus_fallback(FallbackType type)
         if (type != Fallback_Unfocusing || it->data != old)
             if (client_normal(it->data) &&
                 /* dont fall back to 'anonymous' fullscreen windows. theres no
-                   checks for this is in transient/group fallbacks. */
+                   checks for this is in transient/group fallbacks, so they can
+                   be fallback targets there. */
                 !((Client*)it->data)->fullscreen &&
                 client_focus(it->data))
                 return;

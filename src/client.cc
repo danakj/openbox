@@ -309,6 +309,10 @@ void Client::setupDecorAndFunctions()
   if (_disabled_decorations & Decor_Close)
     _decorations &= ~Decor_Close;
 
+  // You can't shade without a titlebar
+  if (!(_decorations & Decor_Titlebar))
+    _functions &= ~Func_Shade;
+  
   changeAllowedActions();
 
   if (frame) {
@@ -1142,15 +1146,23 @@ void Client::internal_move(int x, int y)
     event.xconfigure.display = **otk::display;
     event.xconfigure.event = _window;
     event.xconfigure.window = _window;
-    event.xconfigure.x = x;
-    event.xconfigure.y = y;
+    
+    // root window coords with border in mind
+    event.xconfigure.x = x - _border_width + frame->size().left;
+    event.xconfigure.y = y - _border_width + frame->size().top;
+    
     event.xconfigure.width = _area.width();
     event.xconfigure.height = _area.height();
     event.xconfigure.border_width = _border_width;
-    event.xconfigure.above = frame->window();
+    event.xconfigure.above = frame->plate();
     event.xconfigure.override_redirect = False;
     XSendEvent(event.xconfigure.display, event.xconfigure.window, False,
                StructureNotifyMask, &event);
+#if 0//def DEBUG
+    printf("Sent synthetic ConfigureNotify %d,%d %d,%d to 0x%lx\n",
+           event.xconfigure.x, event.xconfigure.y, event.xconfigure.width,
+           event.xconfigure.height, event.xconfigure.window);
+#endif
   }
 }
 

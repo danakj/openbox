@@ -1541,7 +1541,7 @@ void client_iconify(Client *self, gboolean iconic, gboolean curdesk)
 	XUnmapWindow(ob_display, self->window);
     } else {
 	if (curdesk)
-	    client_set_desktop(self, screen_desktop);
+	    client_set_desktop(self, screen_desktop, FALSE);
 	self->wmstate = self->shaded ? IconicState : NormalState;
 	XMapWindow(ob_display, self->window);
     }
@@ -1702,13 +1702,14 @@ void client_kill(Client *self)
     XKillClient(ob_display, self->window);
 }
 
-void client_set_desktop(Client *self, guint target)
+void client_set_desktop(Client *self, guint target, gboolean donthide)
 {
     guint old, i;
+    ConfigValue focus_new;
 
     if (target == self->desktop) return;
   
-    g_message("Setting desktop %u\n", target);
+    g_message("Setting desktop %u", target);
 
     g_assert(target < screen_num_desktops || target == DESKTOP_ALL);
 
@@ -1718,19 +1719,30 @@ void client_set_desktop(Client *self, guint target)
     /* the frame can display the current desktop state */
     engine_frame_adjust_state(self->frame);
     /* 'move' the window to the new desktop */
-    client_showhide(self);
+    if (!donthide)
+        client_showhide(self);
+    stacking_raise(self);
     screen_update_struts();
 
     /* update the focus lists */
+    if (!config_get("focusNew", Config_Bool, &focus_new))
+        g_assert_not_reached();
     if (old == DESKTOP_ALL) {
         for (i = 0; i < screen_num_desktops; ++i)
             focus_order[i] = g_list_remove(focus_order[i], self);
-        focus_order[target] = g_list_prepend(focus_order[target], self);
+        if (focus_new.bool)
+            focus_order[target] = g_list_prepend(focus_order[target], self);
+        else
+            focus_order[target] = g_list_append(focus_order[target], self);
     } else {
         focus_order[old] = g_list_remove(focus_order[old], self);
         if (target == DESKTOP_ALL)
-            for (i = 0; i < screen_num_desktops; ++i)
-                focus_order[i] = g_list_prepend(focus_order[i], self);
+            for (i = 0; i < screen_num_desktops; ++i) {
+                if (focus_new.bool)
+                    focus_order[i] = g_list_prepend(focus_order[i], self);
+                else
+                    focus_order[i] = g_list_append(focus_order[i], self);
+            }
     }
 
     dispatch_client(Event_Client_Desktop, self, target, old);

@@ -523,7 +523,8 @@ static void event_handle_client(Client *client, XEvent *e)
 	    }
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
-                client_set_desktop(client, (unsigned)e->xclient.data.l[0]);
+                client_set_desktop(client, (unsigned)e->xclient.data.l[0],
+                                   FALSE);
 	} else if (msgtype == prop_atoms.net_wm_state) {
 	    /* can't compress these */
 	    g_message("net_wm_state %s %ld %ld for 0x%lx",

@@ -382,7 +382,7 @@ void client_close(Client *self);
 void client_kill(Client *self);
 
 /*! Sends the window to the specified desktop */
-void client_set_desktop(Client *self, guint target);
+void client_set_desktop(Client *self, guint target, gboolean donthide);
 
 /*! Return a modal child of the client window
     @return A modal child of the client window, or 0 if none was found.

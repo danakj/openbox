@@ -72,6 +72,8 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     int surx, sury, vx, vy;
     int x, y, w, h, e;
     GSList *it;
+    Pixmap pixmap = None;
+    GLXPixmap glxpixmap = None;
 
     inst = RrSurfaceInstance(sur);
 
@@ -81,8 +83,21 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
 
     if (!RrSurfaceVisible(sur)) return;
 
-    ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
+    if (RrRenderToPixmap(inst)) {
+        /* create new pixmaps first, set and free old at end */
+        pixmap = XCreatePixmap(RrDisplay(inst), RrSurfaceWindow(sur),
+                               RrSurfaceWidth(sur), RrSurfaceHeight(sur),
+                               RrDepth(inst));
+        glxpixmap = glXCreateGLXPixmap(RrDisplay(inst),
+                                       RrVisualInfo(inst), pixmap);
+        ok = glXMakeCurrent(RrDisplay(inst), glxpixmap, RrContext(inst));
+    } else
+        ok = glXMakeCurrent(RrDisplay(inst),
+                            RrSurfaceWindow(sur), RrContext(inst));
     assert(ok);
+
+    if (RrRenderToPixmap(inst))
+        glDrawBuffer(GL_FRONT);
 
     glPushMatrix();
     glTranslatef(-RrSurfaceX(sur), -RrSurfaceY(sur), 0);
@@ -128,7 +143,18 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
 
     glPopMatrix();
 
-    glXSwapBuffers(RrDisplay(inst), RrSurfaceWindow(sur));
+    if (RrRenderToPixmap(inst)) {
+        glXMakeCurrent(RrDisplay(inst), None, NULL);
+        XSetWindowBackgroundPixmap(RrDisplay(inst),
+                                   RrSurfaceWindow(sur), pixmap);
+        if (RrSurfacePixmap(sur) != None) {
+            glXDestroyGLXPixmap(RrDisplay(inst), RrSurfaceGLXPixmap(sur));
+            XFreePixmap(RrDisplay(inst), RrSurfacePixmap(sur));
+        }
+        RrSurfacePixmap(sur) = pixmap;
+        RrSurfaceGLXPixmap(sur) = glxpixmap;
+        XClearWindow(RrDisplay(inst), RrSurfaceWindow(sur));
+    } else glXSwapBuffers(RrDisplay(inst), RrSurfaceWindow(sur));
 
     /* recurse and paint children */
     for (it = RrSurfaceChildren(sur); it; it = g_slist_next(it)) {

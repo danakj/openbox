@@ -355,8 +355,15 @@ static void event_done(gpointer data)
     focus_hilite = focus_in;
 
     if (focus_client != last) {
-        if (!focus_client)
-            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+        if (!focus_client) {
+            Window w;
+            int r;
+
+            /* is focus anywhere valid? */
+            XGetInputFocus(ob_display, &w, &r);
+            if (!w || w == RootWindow(ob_display, ob_screen))
+                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
+        }
         last = focus_client;
     }
 

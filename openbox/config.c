@@ -585,7 +585,7 @@ void config_startup(ObParseInst *i)
     parse_register(i, "resistance", parse_resistance, NULL);
 
     config_menu_warppointer = TRUE;
-    config_menu_xorstyle = TRUE;
+    config_menu_xorstyle = FALSE;
     config_menu_hilightfirst = TRUE;
     config_menu_hide_delay = 250;
     config_menu_files = NULL;

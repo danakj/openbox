@@ -203,6 +203,7 @@
   <context name="client">
     <mousebind button="Left" action="press">
       <action name="focus"/>
+      <action name="raise"/>
     </mousebind>
     <mousebind button="Middle" action="press">
       <action name="focus"/>

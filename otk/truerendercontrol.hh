@@ -51,6 +51,12 @@ public:
 
   inline void highlight(pixel32 *x, pixel32 *y, bool raised) const;
   void reduceDepth(XImage *im, pixel32 *data) const;
+  void verticalGradient(Surface &sf, const RenderTexture &texture,
+                        pixel32 *data) const;
+  void diagonalGradient(Surface &sf, const RenderTexture &texture,
+                        pixel32 *data) const;
+  void crossDiagonalGradient(Surface &sf, const RenderTexture &texture,
+                        pixel32 *data) const;
 };
 
 }

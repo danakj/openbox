@@ -102,7 +102,8 @@ static inline void renderPixel(XImage *im, unsigned char *dp,
 void TrueRenderControl::drawGradientBackground(
      Surface &sf, const RenderTexture &texture) const
 {
-  int w = sf.width(), h = sf.height(), off, x, y;
+  unsigned int r,g,b;
+  int w = sf.width(), h = sf.height(), off, x;
 
   const ScreenInfo *info = display->screenInfo(_screen);
   XImage *im = XCreateImage(**display, info->visual(), info->depth(),
@@ -110,30 +111,20 @@ void TrueRenderControl::drawGradientBackground(
   
   pixel32 *data = new pixel32[sf.height()*sf.width()];
   pixel32 current;
-  pixel32 *dp = data;
-  float dr, dg, db;
-  unsigned int r,g,b;
-//XXX: move this to seperate vgrad function
-  dr = (float)(texture.secondary_color().red() - texture.color().red());
-  dr/= (float)sf.height();
 
-  dg = (float)(texture.secondary_color().green() - texture.color().green());
-  dg/= (float)sf.height();
-
-  db = (float)(texture.secondary_color().blue() - texture.color().blue());
-  db/= (float)sf.height();
-
-  for (y = 0; y < h; ++y) {
-    r = texture.color().red() + (int)(dr * y);
-    g = texture.color().green() + (int)(dg * y);
-    b = texture.color().blue() + (int)(db * y);
-    current = (r << 16)
-            + (g << 8)
-            + b;
-    for (x = 0; x < w; ++x, dp ++)
-      *dp = current;
+  switch (texture.gradient()) {
+  case RenderTexture::Vertical:
+    verticalGradient(sf, texture, data);
+    break;
+  case RenderTexture::Diagonal:
+    diagonalGradient(sf, texture, data);
+    break;
+  case RenderTexture::CrossDiagonal:
+    crossDiagonalGradient(sf, texture, data);
+    break;
+  default:
+    printf("unhandled gradient\n");
   }
-//XXX: end of vgrad
 
   if (texture.relief() == RenderTexture::Flat && texture.border()) {
     r = texture.borderColor().red();
@@ -187,8 +178,102 @@ void TrueRenderControl::drawGradientBackground(
   XDestroyImage(im);
 }
 
+void TrueRenderControl::verticalGradient(Surface &sf,
+                                         const RenderTexture &texture,
+                                         pixel32 *data) const
+{
+  pixel32 current;
+  float dr, dg, db;
+  unsigned int r,g,b;
+
+  dr = (float)(texture.secondary_color().red() - texture.color().red());
+  dr/= (float)sf.height();
+
+  dg = (float)(texture.secondary_color().green() - texture.color().green());
+  dg/= (float)sf.height();
+
+  db = (float)(texture.secondary_color().blue() - texture.color().blue());
+  db/= (float)sf.height();
+
+  for (int y = 0; y < sf.height(); ++y) {
+    r = texture.color().red() + (int)(dr * y);
+    g = texture.color().green() + (int)(dg * y);
+    b = texture.color().blue() + (int)(db * y);
+    current = (r << 16)
+            + (g << 8)
+            + b;
+    for (int x = 0; x < sf.width(); ++x, ++data)
+      *data = current;
+  }
+}
+
+void TrueRenderControl::diagonalGradient(Surface &sf,
+                                         const RenderTexture &texture,
+                                         pixel32 *data) const
+{
+  pixel32 current;
+  float drx, dgx, dbx, dry, dgy, dby;
+  unsigned int r,g,b;
+
+
+  for (int y = 0; y < sf.height(); ++y) {
+    drx = (float)(texture.secondary_color().red() - texture.color().red());
+    dry = drx/(float)sf.height();
+    drx/= (float)sf.width();
+
+    dgx = (float)(texture.secondary_color().green() - texture.color().green());
+    dgy = dgx/(float)sf.height();
+    dgx/= (float)sf.width();
+
+    dbx = (float)(texture.secondary_color().blue() - texture.color().blue());
+    dby = dbx/(float)sf.height();
+    dbx/= (float)sf.width();
+    for (int x = 0; x < sf.width(); ++x, ++data) {
+      r = texture.color().red() + ((int)(drx * x) + (int)(dry * y))/2;
+      g = texture.color().green() + ((int)(dgx * x) + (int)(dgy * y))/2;
+      b = texture.color().blue() + ((int)(dbx * x) + (int)(dby * y))/2;
+      current = (r << 16)
+              + (g << 8)
+              + b;
+      *data = current;
+    }
+  }
+}
+
+void TrueRenderControl::crossDiagonalGradient(Surface &sf,
+                                         const RenderTexture &texture,
+                                         pixel32 *data) const
+{
+  pixel32 current;
+  float drx, dgx, dbx, dry, dgy, dby;
+  unsigned int r,g,b;
+
+  for (int y = 0; y < sf.height(); ++y) {
+    drx = (float)(texture.secondary_color().red() - texture.color().red());
+    dry = drx/(float)sf.height();
+    drx/= (float)sf.width();
+
+    dgx = (float)(texture.secondary_color().green() - texture.color().green());
+    dgy = dgx/(float)sf.height();
+    dgx/= (float)sf.width();
+
+    dbx = (float)(texture.secondary_color().blue() - texture.color().blue());
+    dby = dbx/(float)sf.height();
+    dbx/= (float)sf.width();
+    for (int x = sf.width(); x > 0; --x, ++data) {
+      r = texture.color().red() + ((int)(drx * (x-1)) + (int)(dry * y))/2;
+      g = texture.color().green() + ((int)(dgx * (x-1)) + (int)(dgy * y))/2;
+      b = texture.color().blue() + ((int)(dbx * (x-1)) + (int)(dby * y))/2;
+      current = (r << 16)
+              + (g << 8)
+              + b;
+      *data = current;
+    }
+  }
+}
 void TrueRenderControl::reduceDepth(XImage *im, pixel32 *data) const
 {
+// since pixel32 is the largest possible pixel size, we can share the array
   int r, g, b;
   int x,y;
   pixel16 *p = (pixel16 *)data;

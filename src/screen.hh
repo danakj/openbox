@@ -141,7 +141,9 @@ public:
   //!  An offscreen window which gets focus when nothing else has it
   inline Window focuswindow() const { return _focuswindow; }
   //! Returns the desktop being displayed
-  inline unsigned long desktop() const { return _desktop; }
+  inline long desktop() const { return _desktop; }
+  //! Returns the number of desktops
+  inline long numDesktops() const { return _num_desktops; }
 
   //! Update's the screen's combined strut of all the clients.
   /*!

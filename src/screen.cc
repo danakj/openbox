@@ -502,9 +502,14 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->addClient(client->frame->grip_left(), client);
   Openbox::instance->addClient(client->frame->grip_right(), client);
 
+  bool shown = false;
+  
   // if on the current desktop.. (or all desktops)
-  if (client->desktop() == _desktop || client->desktop() == (signed)0xffffffff)
+  if (client->desktop() == _desktop ||
+      client->desktop() == (signed)0xffffffff) {
+    shown = true;
     client->frame->show();
+  }
  
   // XXX: handle any requested states such as maximized
 
@@ -520,9 +525,11 @@ void OBScreen::manageWindow(Window window)
 
   Openbox::instance->bindings()->grabButtons(true, client);
 
-  // XXX: make this optional or more intelligent
-  if (client->normal())
-    client->focus();
+  if (shown) {
+    // XXX: make this optional or more intelligent
+    if (client->normal())
+      client->focus();
+  }
 
   // call the python NEWWINDOW binding
   EventData *data = new_event_data(window, EventNewWindow, 0);
@@ -552,7 +559,7 @@ void OBScreen::unmanageWindow(OBClient *client)
     OBClient *newfocus = 0;
     OBClient::List::iterator it, end = _stacking.end();
     for (it = _stacking.begin(); it != end; ++it)
-      if ((*it)->normal() && (*it)->focus()) {
+      if ((*it)->desktop() == _desktop && (*it)->normal() && (*it)->focus()) {
         newfocus = *it;
         break;
       }
@@ -631,6 +638,8 @@ void OBScreen::changeDesktop(long desktop)
 
   if (!(desktop >= 0 && desktop < _num_desktops)) return;
 
+  printf("Moving to desktop %ld\n", desktop);
+  
   long old = _desktop;
   
   _desktop = desktop;
@@ -655,6 +664,8 @@ void OBScreen::changeNumDesktops(long num)
   
   if (!(num > 0)) return;
 
+  // XXX: move windows on desktops that will no longer exist!
+  
   _num_desktops = num;
   Openbox::instance->property()->set(_info->rootWindow(),
                                      otk::OBProperty::net_number_of_desktops,

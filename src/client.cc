@@ -91,9 +91,15 @@ void OBClient::getDesktop()
   // defaults to the current desktop
   _desktop = Openbox::instance->screen(_screen)->desktop();
 
-  property->get(_window, otk::OBProperty::net_wm_desktop,
-                otk::OBProperty::Atom_Cardinal,
-                (long unsigned*)&_desktop);
+  if (!property->get(_window, otk::OBProperty::net_wm_desktop,
+                     otk::OBProperty::Atom_Cardinal,
+                     (long unsigned*)&_desktop)) {
+    // make sure the hint exists
+    Openbox::instance->property()->set(_window,
+                                       otk::OBProperty::net_wm_desktop,
+                                       otk::OBProperty::Atom_Cardinal,
+                                       (unsigned)_desktop);
+  }
 }
 
 
@@ -653,8 +659,17 @@ void OBClient::setDesktop(long target)
   assert(target >= 0 || target == (signed)0xffffffff);
   //assert(target == 0xffffffff || target < MAX);
 
-  // XXX: move the window to the new desktop (and set root property)
+  if (!(target >= 0 || target == (signed)0xffffffff)) return;
+  
   _desktop = target;
+
+  Openbox::instance->property()->set(_window,
+                                     otk::OBProperty::net_wm_desktop,
+                                     otk::OBProperty::Atom_Cardinal,
+                                     (unsigned)_desktop);
+  
+  
+  // XXX: move the window to the new desktop
 }
 
 

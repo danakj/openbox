@@ -1,6 +1,10 @@
 const char *NAME = "xftlsfonts";
 const char *VERSION = "1.0";
 
+#ifdef    HAVE_CONFIG_H
+#include "../config.h"
+#endif // HAVE_CONFIG_H
+
 #ifndef   XFT
 #include <iostream>
 

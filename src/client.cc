@@ -23,22 +23,218 @@ OBClient::OBClient(Window window)
 {
   assert(window);
 
-  // initialize vars to false/invalid values
-  _group = 0;
-  _gravity = _base_x = _base_y = _inc_x = _inc_y = _max_x = _max_y = _min_x =
-    _min_y = -1;
-  _state = -1;
-  _type = Type_Normal;
-  _desktop = 0xffffffff - 1;
-  _can_focus = _urgent = _focus_notify = _shaped = _modal = _shaded =
-    _max_horz = _max_vert = _fullscreen = _floating = false;
-  
-  
   // update EVERYTHING the first time!!
+
+  // the state is kinda assumed to be normal. is this right? XXX
+  _wmstate = NormalState;
+  
+  getArea();
+  getDesktop();
+  getType();
+  getState();
+  getShaped();
+
+  updateNormalHints();
+  updateWMHints();
+  // XXX: updateTransientFor();
+  updateTitle();
+  updateClass();
+
+#ifdef DEBUG
+  printf("Mapped window: 0x%lx\n"
+         "  title:          %s\n"
+         "  icon title:     %s\n"
+         "  app name:       %s\n"
+         "  class:          %s\n"
+         "  position:       %d, %d\n"
+         "  size:           %d, %d\n"
+         "  desktop:        %lu\n"
+         "  group:          0x%lx\n"
+         "  type:           %d\n"
+         "  min size        %d, %d\n"
+         "  base size       %d, %d\n"
+         "  max size        %d, %d\n"
+         "  size incr       %d, %d\n"
+         "  gravity         %d\n"
+         "  wm state        %ld\n"
+         "  can be focused: %s\n"
+         "  notify focus:   %s\n"
+         "  urgent:         %s\n"
+         "  shaped:         %s\n"
+         "  modal:          %s\n"
+         "  shaded:         %s\n"
+         "  iconic:         %s\n"
+         "  vert maximized: %s\n"
+         "  horz maximized: %s\n"
+         "  fullscreen:     %s\n"
+         "  floating:       %s\n",
+         _window,
+         _title.c_str(),
+         _icon_title.c_str(),
+         _app_name.c_str(),
+         _app_class.c_str(),
+         _area.x(), _area.y(),
+         _area.width(), _area.height(),
+         _desktop,
+         _group,
+         _type,
+         _min_x, _min_y,
+         _base_x, _base_y,
+         _max_x, _max_y,
+         _inc_x, _inc_y,
+         _gravity,
+         _wmstate,
+         _can_focus ? "yes" : "no",
+         _focus_notify ? "yes" : "no",
+         _urgent ? "yes" : "no",
+         _shaped ? "yes" : "no",
+         _modal ? "yes" : "no",
+         _shaded ? "yes" : "no",
+         _iconic ? "yes" : "no",
+         _max_vert ? "yes" : "no",
+         _max_horz ? "yes" : "no",
+         _fullscreen ? "yes" : "no",
+         _floating ? "yes" : "no");
+#endif
 }
+
 
 OBClient::~OBClient()
 {
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  // these values should not be persisted across a window unmapping/mapping
+  property->erase(_window, otk::OBProperty::net_wm_desktop);
+  property->erase(_window, otk::OBProperty::net_wm_state);
+}
+
+
+void OBClient::getDesktop()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  // defaults to the current desktop
+  _desktop = 0; // XXX: change this to the current desktop!
+
+  property->get(_window, otk::OBProperty::net_wm_desktop,
+                otk::OBProperty::Atom_Cardinal,
+                &_desktop);
+}
+
+
+void OBClient::getType()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  _type = (WindowType) -1;
+  
+  unsigned long *val;
+  unsigned long num = (unsigned) -1;
+  if (property->get(_window, otk::OBProperty::net_wm_window_type,
+                    otk::OBProperty::Atom_Atom,
+                    &num, &val)) {
+    // use the first value that we know about in the array
+    for (unsigned long i = 0; i < num; ++i) {
+      if (val[i] ==
+          property->atom(otk::OBProperty::net_wm_window_type_desktop))
+        _type = Type_Desktop;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_dock))
+        _type = Type_Dock;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_toolbar))
+        _type = Type_Toolbar;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_menu))
+        _type = Type_Menu;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_utility))
+        _type = Type_Utility;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_splash))
+        _type = Type_Splash;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_dialog))
+        _type = Type_Dialog;
+      else if (val[i] ==
+               property->atom(otk::OBProperty::net_wm_window_type_normal))
+        _type = Type_Normal;
+//      else if (val[i] ==
+//               property->atom(otk::OBProperty::kde_net_wm_window_type_override))
+//        mwm_decorations = 0; // prevent this window from getting any decor
+      // XXX: make this work again
+    }
+    delete val;
+  }
+    
+  if (_type == (WindowType) -1) {
+    /*
+     * the window type hint was not set, which means we either classify ourself
+     * as a normal window or a dialog, depending on if we are a transient.
+     */
+    // XXX: make this code work!
+    //if (isTransient())
+    //  _type = Type_Dialog;
+    //else
+      _type = Type_Normal;
+  }
+}
+
+
+void OBClient::getArea()
+{
+  XWindowAttributes wattrib;
+  assert(XGetWindowAttributes(otk::OBDisplay::display, _window, &wattrib));
+
+  _area.setRect(wattrib.x, wattrib.y, wattrib.width, wattrib.height);
+}
+
+
+void OBClient::getState()
+{
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  _modal = _shaded = _max_horz = _max_vert = _fullscreen = _floating = false;
+  
+  unsigned long *state;
+  unsigned long num = (unsigned) -1;
+  
+  if (property->get(_window, otk::OBProperty::net_wm_state,
+                    otk::OBProperty::Atom_Atom, &num, &state)) {
+    for (unsigned long i = 0; i < num; ++i) {
+      if (state[i] == property->atom(otk::OBProperty::net_wm_state_modal))
+        _modal = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_shaded))
+        _shaded = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_fullscreen))
+        _fullscreen = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_maximized_vert))
+        _max_vert = true;
+      else if (state[i] ==
+               property->atom(otk::OBProperty::net_wm_state_maximized_horz))
+        _max_horz = true;
+    }
+
+    delete [] state;
+  }
+}
+
+
+void OBClient::getShaped()
+{
+  _shaped = false;
+#ifdef   SHAPE
+  if (otk::OBDisplay::shape()) {
+    int foo;
+    unsigned int ufoo;
+
+    XShapeQueryExtents(otk::OBDisplay::display, client.window, &_shaped, &foo,
+                       &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo, &ufoo);
+  }
+#endif // SHAPE
 }
 
 
@@ -79,14 +275,19 @@ void OBClient::updateWMHints()
   if ((hints = XGetWMHints(otk::OBDisplay::display, _window)) != NULL) {
     if (hints->flags & InputHint)
       _can_focus = hints->input;
+
     if (hints->flags & XUrgencyHint)
       _urgent = true;
-    if (hints->flags & WindowGroupHint)
+
+    if (hints->flags & WindowGroupHint) {
       if (hints->window_group != _group) {
         // XXX: remove from the old group if there was one
         _group = hints->window_group;
         // XXX: do stuff with the group
       }
+    } else // no group!
+      _group = None;
+
     XFree(hints);
   }
 }
@@ -145,12 +346,13 @@ void OBClient::update(const XPropertyEvent &e)
     updateTitle();
   else if (e.atom == property->atom(otk::OBProperty::wm_class))
     updateClass();
+  // XXX: transient for hint
 }
 
 
 void OBClient::setWMState(long state)
 {
-  if (state == _state) return; // no change
+  if (state == _wmstate) return; // no change
   
   switch (state) {
   case IconicState:
@@ -160,7 +362,7 @@ void OBClient::setWMState(long state)
     // XXX: cause it to uniconify
     break;
   }
-  _state = state;
+  _wmstate = state;
 }
 
 
@@ -286,6 +488,12 @@ void OBClient::update(const XClientMessageEvent &e)
     setDesktop(e.data.l[0]);
   else if (e.message_type == property->atom(otk::OBProperty::net_wm_state))
     setState((StateAction)e.data.l[0], e.data.l[1], e.data.l[2]);
+}
+
+
+void OBClient::setArea(const otk::Rect &area)
+{
+  _area = area;
 }
 
 }

@@ -71,7 +71,7 @@ private:
   // XXX: transient_for, transients
 
   //! The desktop on which the window resides (0xffffffff for all desktops)
-  unsigned int _desktop;
+  unsigned long _desktop;
 
   //! Normal window title
   std::string  _title; // XXX: Have to keep track if this string is Utf8 or not
@@ -101,7 +101,7 @@ private:
 
   //! The state of the window, one of WithdrawnState, IconicState, or
   //! NormalState
-  long _state;
+  long _wmstate;
 
   //! Can the window receive input focus?
   bool _can_focus;
@@ -131,12 +131,19 @@ private:
 
   // XXX: motif decoration hints!
 
+  void getDesktop();
+  void getType();
+  void getArea();
+  void getState();
+  void getShaped();
+
   void setWMState(long state);
   void setDesktop(long desktop);
   void setState(StateAction action, long data1, long data2);
   
   void updateNormalHints();
   void updateWMHints();
+  // XXX: updateTransientFor();
   void updateTitle();
   void updateClass();
 
@@ -147,7 +154,7 @@ public:
   inline Window window() const { return _window; }
 
   inline WindowType type() const { return _type; }
-  inline unsigned int desktop() const { return _desktop; }
+  inline unsigned long desktop() const { return _desktop; }
   inline const std::string &title() const { return _title; }
   inline const std::string &iconTitle() const { return _title; }
   inline const std::string &appName() const { return _app_name; }
@@ -180,6 +187,8 @@ public:
 
   void update(const XPropertyEvent &e);
   void update(const XClientMessageEvent &e);
+
+  void setArea(const otk::Rect &area);
 };
 
 }

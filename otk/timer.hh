@@ -7,16 +7,7 @@
 */
 
 extern "C" {
-#ifdef    TIME_WITH_SYS_TIME
-#  include <sys/time.h>
-#  include <time.h>
-#else // !TIME_WITH_SYS_TIME
-#  ifdef    HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#  else // !HAVE_SYS_TIME_H
-#    include <time.h>
-#  endif // HAVE_SYS_TIME_H
-#endif // TIME_WITH_SYS_TIME
+#include <ctime>
 }
 
 #include <queue>
@@ -39,7 +30,9 @@ private:
   struct TimerCompare {
      //! Compares two timeval structs
      inline bool operator()(const Timer *a, const Timer *b) const {
-       return timercmp(&a->_timeout, &b->_timeout, >);
+       return ((&a->_timeout)->tv_sec == (&b->_timeout)->tv_sec) ?
+         ((&a->_timeout)->tv_usec > (&b->_timeout)->tv_usec) :
+         ((&a->_timeout)->tv_sec > (&b->_timeout)->tv_sec);
      }
   };
   friend struct TimerCompare; // give access to _timeout for shitty compilers

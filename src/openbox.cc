@@ -1,8 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef HAVE_CONFIG_H
-# include "../config.h"
-#endif
+#include "config.h"
 
 #include "openbox.hh"
 #include "client.hh"
@@ -19,14 +17,6 @@
 
 extern "C" {
 #include <X11/cursorfont.h>
-
-#ifdef    HAVE_STDIO_H
-#  include <stdio.h>
-#endif // HAVE_STDIO_H
-
-#ifdef    HAVE_STDLIB_H
-#  include <stdlib.h>
-#endif // HAVE_STDLIB_H
 
 #ifdef    HAVE_SIGNAL_H
 #  include <signal.h>
@@ -45,6 +35,8 @@ extern "C" {
 }
 
 #include <algorithm>
+#include <cstdio>
+#include <cstdlib>
 
 namespace ob {
 

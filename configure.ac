@@ -39,8 +39,8 @@ ALL_LINGUAS=""
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT([external])
 
-AC_CHECK_HEADERS(ctype.h dirent.h fcntl.h libgen.h locale.h nl_types.h process.h signal.h stdarg.h stdint.h stdio.h stdlib.h string.h time.h unistd.h sys/param.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
-AC_HEADER_TIME
+AC_CHECK_HEADERS(fcntl.h signal.h stdarg.h stdint.h unistd.h sys/select.h sys/signal.h sys/stat.h sys/time.h sys/types.h sys/wait.h)
+# AC_HEADER_TIME
 # AC_TYPE_SIGNAL
 
 # Check for Xft2

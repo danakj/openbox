@@ -1,8 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef HAVE_CONFIG_H
-# include "../config.h"
-#endif
+#include "config.h"
 
 #include "display.hh"
 #include "screeninfo.hh"
@@ -24,10 +22,6 @@ extern "C" {
 #include <X11/extensions/Xinerama.h>
 #endif // XINERAMA
 
-#ifdef    HAVE_STDIO_H
-#  include <stdio.h>
-#endif // HAVE_STDIO_H
-
 #ifdef    HAVE_SIGNAL_H
 #  include <signal.h>
 #endif // HAVE_SIGNAL_H
@@ -44,6 +38,8 @@ extern "C" {
 #include "../src/gettext.h"
 #define _(str) gettext(str)
 }
+
+#include <cstdio>
 
 namespace otk {
 

@@ -1,39 +1,29 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "config.h"
 
 extern "C" {
 #include <X11/Xatom.h>
-
-#ifdef HAVE_STDIO_H
-#include <stdio.h>
-#endif
-
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif
-
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
-#endif
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif // HAVE_UNISTD_H
 
-#if defined(HAVE_PROCESS_H) && defined(__EMX__)
-#  include <process.h>
-#endif //   HAVE_PROCESS_H             __EMX__
+// this is not checked in configure anymore!!
+//#if defined(HAVE_PROCESS_H) && defined(__EMX__)
+//#  include <process.h>
+//#endif //   HAVE_PROCESS_H             __EMX__
 
 #include "../src/gettext.h"
 #define _(str) gettext(str)
 
-#include <assert.h>
 }
 
 #include <algorithm>
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 
 #include "util.hh"
 
@@ -52,16 +42,16 @@ string expandTilde(const string& s) {
 
 
 void bexec(const string& command, const string& displaystring) {
-#ifndef    __EMX__
+//#ifndef    __EMX__
   if (! fork()) {
     setsid();
     putenv(displaystring);
     int ret = execl("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
     exit(ret);
   }
-#else //   __EMX__
-  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", command.c_str(), NULL);
-#endif // !__EMX__
+//#else //   __EMX__
+//  spawnlp(P_NOWAIT, "cmd.exe", "cmd.exe", "/c", command.c_str(), NULL);
+//#endif // !__EMX__
 }
 
 

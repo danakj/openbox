@@ -1,18 +1,8 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef HAVE_CONFIG_H
-# include "../config.h"
-#endif
+#include "config.h"
 
 extern "C" {
-#ifdef    HAVE_STDIO_H
-#  include <stdio.h>
-#endif // HAVE_STDIO_H
-
-#ifdef    HAVE_STRING_H
-#  include <string.h>
-#endif // HAVE_STRING_H
-
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -33,6 +23,8 @@ extern "C" {
 
 #include <vector>
 #include <algorithm>
+#include <cstdio>
+#include <cstring>
 
 static bool running;
 static int anotherWMRunning(Display *display, XErrorEvent *) {

@@ -11,7 +11,7 @@ extern "C" {
 #include <X11/Xft/Xft.h>
 }
 
-#include <assert.h>
+#include <cassert>
 
 namespace otk {
 

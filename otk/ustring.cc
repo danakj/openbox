@@ -1,14 +1,10 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "config.h"
 
 #include "ustring.hh"
 
-extern "C" {
-#include <assert.h>
-}
+#include <cassert>
 
 namespace otk {
 

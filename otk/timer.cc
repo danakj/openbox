@@ -1,8 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "config.h"
 
 #include "timer.hh"
 #include "display.hh"
@@ -10,12 +8,11 @@
 extern "C" {
 #ifdef    HAVE_SYS_SELECT_H
 #  include <sys/select.h>
-#else
-#  ifdef    HAVE_UNISTD_H
-#    include <sys/types.h>
-#    include <unistd.h>
-#  endif // HAVE_UNISTD_H
 #endif // HAVE_SYS_SELECT_H
+
+#ifdef    HAVE_SYS_TIME_H
+#  include <sys/time.h>
+#endif
 }
 
 namespace otk {

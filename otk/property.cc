@@ -1,19 +1,16 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "config.h"
 
 #include "property.hh"
 #include "display.hh"
 
 extern "C" {
 #include <X11/Xatom.h>
-
-#include <assert.h>
 }
 
 #include <algorithm>
+#include <cassert>
 
 namespace otk {
 

@@ -1,8 +1,6 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef HAVE_CONFIG_H
-# include "../config.h"
-#endif
+#include "config.h"
 
 #include "actions.hh"
 #include "openbox.hh"
@@ -13,7 +11,7 @@
 #include "bindings.hh"
 #include "otk/display.hh"
 
-#include <stdio.h>
+#include <cstdio>
 #include <algorithm>
 
 namespace ob {

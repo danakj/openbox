@@ -1,9 +1,14 @@
+#include "config.h"
+
 #include "otk.hh"
 #include "rendercontrol.hh"
 #include "rendertexture.hh"
 
-#include <stdio.h>
+extern "C" {
 #include <X11/Xlib.h>
+}
+
+#include <cstdio>
 
 int main(int argc, char **argv)
 {

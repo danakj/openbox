@@ -1,18 +1,11 @@
 // -*- mode: C++; indent-tabs-mode: nil; c-basic-offset: 2; -*-
 
-#ifdef HAVE_CONFIG_H
-# include "../config.h"
-#endif
+#include "config.h"
 
 #include "eventdispatcher.hh"
 #include "display.hh"
 
-extern "C" {
-#ifdef HAVE_STDIO_H
-#  include <stdio.h>
-#endif
-}
-
+#include <cstdio>
 #include <iostream>
 
 namespace otk {

@@ -4,19 +4,9 @@
   @brief Main entry point for the application
 */
 
-#ifdef    HAVE_CONFIG_H
-#  include "../config.h"
-#endif // HAVE_CONFIG_H
+#include "config.h"
 
 extern "C" {
-#ifdef    HAVE_LOCALE_H
-# include <locale.h>
-#endif // HAVE_LOCALE_H
-
-#ifdef    HAVE_STDIO_H
-# include <stdio.h>
-#endif // HAVE_STDIO_H
-
 #ifdef    HAVE_UNISTD_H
 #  include <sys/types.h>
 #  include <unistd.h>
@@ -27,6 +17,9 @@ extern "C" {
 
 #include "openbox.hh"
 #include "otk/util.hh"
+
+#include <clocale>
+#include <cstdio>
 
 int main(int argc, char **argv) {
   // initialize the locale

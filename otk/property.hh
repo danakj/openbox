@@ -11,11 +11,10 @@
 
 extern "C" {
 #include <X11/Xlib.h>
-
-#include <assert.h>
 }
 
 #include <vector>
+#include <cassert>
 
 namespace otk {
 

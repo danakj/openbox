@@ -1,5 +1,3 @@
-# data/styles/Makefile.am for Openbox
-
 styledir = $(pkgdatadir)/styles
 MAINTAINERCLEANFILES = Makefile.in
 style_DATA = artwiz bbs bluebox cthulhain deep fieron flux frobozz frobust \

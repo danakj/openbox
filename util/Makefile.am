@@ -1,5 +1,3 @@
-# util/Makefile.am for Blackbox - an X11 Window manager
-
 CPPFLAGS= @CPPFLAGS@
 
 #SUBDIRS = 		epist

@@ -375,6 +375,7 @@ AC_CONFIG_FILES([Makefile po/Makefile.in
 		doc/Makefile
 		doc/doxygen/Makefile
 		data/Makefile
+		data/buttons/Makefile
 		data/styles/Makefile
 		version.h
 		])

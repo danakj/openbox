@@ -1,5 +1,3 @@
-# util/epist/Makefile.am for Blackbox - an X11 Window manager
-
 DEFAULT_RC=$(pkgdatadir)/epistrc
 
 CLEANFILES = epist.1 epistrc.5

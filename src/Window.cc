@@ -1494,6 +1494,9 @@ void OpenboxWindow::close(void) {
 
 
 void OpenboxWindow::withdraw(void) {
+  if (flags.moving)
+    endMove();
+
   flags.visible = False;
   flags.iconic = False;
 

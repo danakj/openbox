@@ -379,6 +379,8 @@ itostring_unsigned = _openbox.itostring_unsigned
 
 itostring = _openbox.itostring
 
+putenv = _openbox.putenv
+
 basename = _openbox.basename
 
 class OtkEventHandler(_object):

@@ -37,13 +37,10 @@ private:
   unsigned char _green;
   unsigned char _blue;
 
-  mutable unsigned long _pixel;
-  mutable GC _gc;
+  unsigned long _pixel;
+  GC _gc;
 
-  mutable bool _allocated;
-  mutable bool _created;
-
-  void create() const;
+  void create();
   
 public:
   static void initialize();
@@ -58,8 +55,8 @@ public:
   inline unsigned char red() const { return _red; }
   inline unsigned char green() const { return _green; }
   inline unsigned char blue() const { return _blue; }
-  unsigned long pixel() const;
-  GC gc() const;
+  unsigned long pixel() const { return _pixel; }
+  GC gc() const { return _gc; }
 };
 
 }

@@ -330,7 +330,7 @@ static void sm_startup(int argc, char **argv)
         SmProp *props[7];
         gulong hint, pri;
         gchar pid[32];
-        gint i;
+        gint i, j;
         gboolean has_id;
 
         for (i = 1; i < argc - 1; ++i)
@@ -340,27 +340,29 @@ static void sm_startup(int argc, char **argv)
 
         prop_cmd.vals = g_new(SmPropValue, (has_id ? argc-2 : argc));
         prop_cmd.num_vals = (has_id ? argc-2 : argc);
-        for (i = 0; i < argc; ++i) {
+        for (i = 0, j = 0; i < argc; ++i, ++j) {
             if (strcmp (argv[i], "-sm-client-id") == 0) {
-                ++i; /* skip the next as well */
+                ++i, --j; /* skip the next as well, keep j where it is */
             } else {
-                prop_cmd.vals[i].value = argv[i];
-                prop_cmd.vals[i].length = strlen(argv[i]);
+                prop_cmd.vals[j].value = argv[i];
+                prop_cmd.vals[j].length = strlen(argv[i]);
             }
         }
 
         prop_res.vals = g_new(SmPropValue, (has_id ? argc : argc+2));
         prop_res.num_vals = (has_id ? argc : argc+2);
-        for (i = 0; i < argc; ++i) {
-            prop_res.vals[i].value = argv[i];
-            prop_res.vals[i].length = strlen(argv[i]);
+        for (i = 0, j = 0; i < argc; ++i, ++j) { 
+            if (strcmp (argv[i], "-sm-client-id") == 0) {
+                ++i, --j; /* skip the next as well, keep j where it is */
+            } else {
+                prop_res.vals[j].value = argv[i];
+                prop_res.vals[j].length = strlen(argv[i]);
+            }
         }
-        if (!has_id) {
-            prop_res.vals[i].value = "-sm-client-id";
-            prop_res.vals[i++].length = strlen("-sm-client-id");
-            prop_res.vals[i].value = ob_sm_id;
-            prop_res.vals[i++].length = strlen(ob_sm_id);
-        }
+        prop_res.vals[j].value = "-sm-client-id";
+        prop_res.vals[j++].length = strlen("-sm-client-id");
+        prop_res.vals[j].value = ob_sm_id;
+        prop_res.vals[j++].length = strlen(ob_sm_id);
 
         val_prog.value = argv[0];
         val_prog.length = strlen(argv[0]);

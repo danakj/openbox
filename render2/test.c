@@ -15,6 +15,11 @@ static int x_error_handler(Display * disp, XErrorEvent * error)
     return 0;
 }
 
+#define X 10
+#define Y 10
+#define W 100
+#define H 100
+
 int main()
 {
     Display *display;
@@ -34,7 +39,7 @@ int main()
     }
     XSetErrorHandler(x_error_handler);
     win = XCreateWindow(display, RootWindow(display, DefaultScreen(display)),
-                        10, 10, 100, 100, 0, 
+                        X, Y, W, H, 0, 
                         CopyFromParent,   /* depth */
                         CopyFromParent,   /* class */
                         CopyFromParent,   /* visual */
@@ -59,7 +64,7 @@ int main()
     }
 
     sur = RrSurfaceNew(inst, RR_SURFACE_PLANAR, win, 0);
-    RrSurfaceSetArea(sur, 10, 10, 100, 100);
+    RrSurfaceSetArea(sur, X, Y, W, H);
     RrColorSet(&pri, 0, 0, 0, 0);
     RrColorSet(&pri, 1, 1, 1, 0);
     RrPlanarSet(sur, RR_PLANAR_VERTICAL, &pri, &sec);

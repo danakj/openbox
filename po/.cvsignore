@@ -1,3 +1,5 @@
 Makefile
 Makefile.in
 POTFILES
+openbox.pot
+remove-potcdate.sed

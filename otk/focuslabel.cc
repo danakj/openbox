@@ -13,6 +13,7 @@ namespace otk {
 FocusLabel::FocusLabel(Widget *parent)
   : FocusWidget(parent), _text("")
 {
+  setStyle(_style);
 }
 
 FocusLabel::~FocusLabel()

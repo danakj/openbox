@@ -33,7 +33,7 @@ void Label::fitString(const std::string &str)
 
 void Label::fitSize(int w, int h)
 {
-  unsigned int sidemargin = style()->bevelWidth() * 2;
+  unsigned int sidemargin = _bevel_width * 2;
   resize(w + sidemargin * 2, h);
 }
 
@@ -42,7 +42,7 @@ void Label::update()
   if (_dirty) {
     int w = _rect.width(), h = _rect.height();
     const Font *ft = style()->labelFont();
-    unsigned int sidemargin = style()->bevelWidth() * 2;
+    unsigned int sidemargin = _bevel_width * 2;
     if (!_fixed_width)
       w = ft->measureString(_text) + sidemargin * 2;
     if (!_fixed_height)
@@ -66,7 +66,7 @@ void Label::renderForeground(void)
   Widget::renderForeground();
 
   const Font *ft = style()->labelFont();
-  unsigned int sidemargin = style()->bevelWidth() * 2;
+  unsigned int sidemargin = _bevel_width * 2;
 
   ustring t = _text; // the actual text to draw
   int x = sidemargin;    // x coord for the text

@@ -197,6 +197,7 @@ void x_paint(Window win, Appearance *l)
     int y = l->area.y;
     int w = l->area.width;
     int h = l->area.height;
+    Rect tarea; /* area in which to draw textures */
 
     if (w <= 0 || h <= 0 || x+w <= 0 || y+h <= 0) return;
 
@@ -231,6 +232,23 @@ void x_paint(Window win, Appearance *l)
     else gradient_render(&l->surface, w, h);
 
     for (i = 0; i < l->textures; i++) {
+        tarea = l->texture[i].position;
+        if (l->surface.data.planar.relief != Flat) {
+            switch (l->surface.data.planar.bevel) {
+            case Bevel1:
+                tarea.x += 1; tarea.y += 1;
+                tarea.width -= 2; tarea.height -= 2;
+                break;
+            case Bevel2:
+                tarea.x += 2; tarea.y += 2;
+                tarea.width -= 4; tarea.height -= 4;
+                break;
+            }
+        } else if (l->surface.data.planar.border) {
+            tarea.x += 1; tarea.y += 1;
+            tarea.width -= 2; tarea.height -= 2;
+        }
+
         switch (l->texture[i].type) {
         case Text:
             if (!transferred) {
@@ -244,7 +262,7 @@ void x_paint(Window win, Appearance *l)
                                         render_visual, render_colormap);
             }
             font_draw(l->xftdraw, &l->texture[i].data.text, 
-                      &l->texture[i].position);
+                      &tarea);
         break;
         case Bitmask:
             if (!transferred) {
@@ -256,12 +274,12 @@ void x_paint(Window win, Appearance *l)
             if (l->texture[i].data.mask.color->gc == None)
                 color_allocate_gc(l->texture[i].data.mask.color);
             mask_draw(l->pixmap, &l->texture[i].data.mask,
-                      &l->texture[i].position);
+                      &tarea);
         break;
         case RGBA:
             image_draw(l->surface.data.planar.pixel_data, 
                        &l->texture[i].data.rgba,
-                       &l->texture[i].position);
+                       &tarea);
         break;
         }
     }
@@ -405,11 +423,17 @@ void appearance_minsize(Appearance *l, Size *s)
 
     switch (l->surface.type) {
     case Surface_Planar:
-        if (l->surface.data.planar.border ||
-            l->surface.data.planar.bevel == Bevel1)
+        if (l->surface.data.planar.relief != Flat) {
+            switch (l->surface.data.planar.bevel) {
+            case Bevel1:
+                SIZE_SET(*s, 2, 2);
+                break;
+            case Bevel2:
+                SIZE_SET(*s, 4, 4);
+                break;
+            }
+        } else if (l->surface.data.planar.border)
             SIZE_SET(*s, 2, 2);
-        else if (l->surface.data.planar.bevel == Bevel2)
-            SIZE_SET(*s, 4, 4);
 
         for (i = 0; i < l->textures; ++i)
             switch (l->texture[i].type) {

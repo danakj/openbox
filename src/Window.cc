@@ -1867,6 +1867,14 @@ void BlackboxWindow::remaximize(void) {
 void BlackboxWindow::setWorkspace(unsigned int n) {
   blackbox_attrib.flags |= AttribWorkspace;
   blackbox_attrib.workspace = n;
+  if (n == BSENTINEL) { // iconified window
+    /*
+       we set the workspace to 'all workspaces' so that taskbars will show the
+       window. otherwise, it made uniconifying a window imposible without the
+       blackbox workspace menu
+    */
+    n = 0xffffffff;
+  }
   xatom->setValue(client.window, XAtom::net_wm_desktop, XAtom::cardinal, n);
 }
 

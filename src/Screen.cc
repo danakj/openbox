@@ -921,10 +921,7 @@ void BScreen::LoadStyle(void) {
 void BScreen::addIcon(BlackboxWindow *w) {
   if (! w) return;
 
-  // we set the workspace to 'all workspaces' so that taskbars will show the
-  // window. otherwise, it made uniconifying a window impoosible without the
-  // blackbox workspace menu
-  w->setWorkspace(0xffffffff);
+  w->setWorkspace(BSENTINEL);
   w->setWindowNumber(iconList.size());
 
   iconList.push_back(w);

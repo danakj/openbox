@@ -1601,7 +1601,6 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 		      gboolean user, gboolean final)
 {
     gboolean moved = FALSE, resized = FALSE;
-    int basew, baseh, minw, minh;
 
     /* gets the frame's position */
     frame_client_gravity(self->frame, &x, &y);
@@ -1658,23 +1657,26 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
         }
     }
 
-    /* find the base and min sizes */
-    if (self->base_size.width || self->base_size.height) {
-        basew = self->base_size.width;
-        baseh = self->base_size.height;
-    } else {
-        basew = self->min_size.width;
-        baseh = self->min_size.height;
-    }
-    if (self->min_size.width || self->min_size.height) {
-        minw = self->min_size.width;
-        minh = self->min_size.height;
-    } else {
-        minw = self->base_size.width;
-        minh = self->base_size.height;
-    }
-
     if (!(w == self->area.width && h == self->area.height)) {
+        int basew, baseh, minw, minh;
+
+        /* base size is substituted with min size if not specified */
+        if (self->base_size.width || self->base_size.height) {
+            basew = self->base_size.width;
+            baseh = self->base_size.height;
+        } else {
+            basew = self->min_size.width;
+            baseh = self->min_size.height;
+        }
+        /* min size is substituted with base size if not specified */
+        if (self->min_size.width || self->min_size.height) {
+            minw = self->min_size.width;
+            minh = self->min_size.height;
+        } else {
+            minw = self->base_size.width;
+            minh = self->base_size.height;
+        }
+
         w -= basew;
         h -= baseh;
 
@@ -1697,19 +1699,13 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
             h += ah;
     
             /* if this is a user-requested resize, then check against min/max
-               sizes and aspect ratios */
+               sizes */
 
             /* smaller than min size or bigger than max size? */
             if (w > self->max_size.width) w = self->max_size.width;
             if (w < minw) w = minw;
             if (h > self->max_size.height) h = self->max_size.height;
             if (h < minh) h = minh;
-
-            /* adjust the height ot match the width for the aspect ratios */
-            if (self->min_ratio)
-                if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
-            if (self->max_ratio)
-                if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
         }
 
         /* keep to the increments */
@@ -1728,6 +1724,21 @@ void client_configure(Client *self, Corner anchor, int x, int y, int w, int h,
 
         w += basew;
         h += baseh;
+
+        if (user) {
+            /* adjust the height to match the width for the aspect ratios.
+             for this, min size is not substituted for base size ever. */
+            w -= self->base_size.width;
+            h -= self->base_size.height;
+
+            if (self->min_ratio)
+                if (h * self->min_ratio > w) h = (int)(w / self->min_ratio);
+            if (self->max_ratio)
+                if (h * self->max_ratio < w) h = (int)(w / self->max_ratio);
+
+            w += self->base_size.width;
+            h += self->base_size.height;
+        }
     }
 
     switch (anchor) {

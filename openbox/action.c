@@ -698,6 +698,9 @@ ObAction *action_from_string(char *name, ObUserAction uact)
             a = action_new(actionstrings[i].func, uact);
             if (actionstrings[i].setup)
                 actionstrings[i].setup(&a, uact);
+            /* only key bindings can be interactive. thus saith the xor. */
+            if (uact != OB_USER_ACTION_KEYBOARD_KEY)
+                a->data.any.interactive = FALSE;
             break;
         }
     if (!exist)

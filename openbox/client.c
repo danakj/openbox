@@ -2897,7 +2897,10 @@ ObClient *client_find_directional(ObClient *c, ObDirection dir)
             continue;
         if (!client_normal(cur))
             continue;
-        if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+        /* using c->desktop instead of screen_desktop doesn't work if the
+         * current window was omnipresent, hope this doesn't have any other
+         * side effects */
+        if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
             continue;
         if(cur->iconic)
             continue;
@@ -3144,7 +3147,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(!client_normal(cur))
                 continue;
-            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
                 continue;
@@ -3185,7 +3188,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(!client_normal(cur))
                 continue;
-            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
                 continue;
@@ -3227,7 +3230,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(!client_normal(cur))
                 continue;
-            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
                 continue;
@@ -3269,7 +3272,7 @@ gint client_directional_edge_search(ObClient *c, ObDirection dir)
                 continue;
             if(!client_normal(cur))
                 continue;
-            if(c->desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
+            if(screen_desktop != cur->desktop && cur->desktop != DESKTOP_ALL)
                 continue;
             if(cur->iconic)
                 continue;

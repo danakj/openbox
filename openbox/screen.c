@@ -346,9 +346,13 @@ void screen_set_desktop(guint num)
     /* focus the last focused window on the desktop, and ignore enter events
        from the switch so it doesnt mess with the focus */
     while (XCheckTypedEvent(ob_display, EnterNotify, &e));
+#ifdef DEBUG_FOCUS
     g_message("switch fallback");
-    focus_fallback(Fallback_Desktop);
+#endif
+    focus_fallback(OB_FOCUS_FALLBACK_DESKTOP);
+#ifdef DEBUG_FOCUS
     g_message("/switch fallback");
+#endif
 
     dispatch_ob(Event_Ob_Desktop, num, old);
 }
@@ -489,7 +493,7 @@ void screen_show_desktop(gboolean show)
                 client_focus(it->data))
                 break;
     } else {
-        focus_fallback(Fallback_NoFocus);
+        focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
     }
 
     show = !!show; /* make it boolean */

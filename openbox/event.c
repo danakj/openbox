@@ -432,7 +432,7 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                 g_message("no valid FocusIn and no FocusOut events found, "
                           "falling back");
 #endif
-                focus_fallback(Fallback_NoFocus);
+                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
             }
         }
 	break;

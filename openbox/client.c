@@ -168,9 +168,9 @@ void client_manage_all()
         if (active) {
             g_assert(WINDOW_IS_CLIENT(active));
             if (!client_focus(WINDOW_AS_CLIENT(active)))
-                focus_fallback(Fallback_NoFocus);
+                focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
         } else
-            focus_fallback(Fallback_NoFocus);
+            focus_fallback(OB_FOCUS_FALLBACK_NOFOCUS);
     }
 }
 
@@ -2418,7 +2418,7 @@ void client_unfocus(ObClient *self)
 #ifdef DEBUG_FOCUS
     g_message("client_unfocus for %lx", self->window);
 #endif
-    focus_fallback(Fallback_Unfocusing);
+    focus_fallback(OB_FOCUS_FALLBACK_UNFOCUSING);
 }
 
 void client_activate(ObClient *self)

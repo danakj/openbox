@@ -23,13 +23,14 @@ void focus_shutdown();
 void focus_set_client(struct _ObClient *client);
 
 typedef enum {
-    Fallback_Desktop,    /* switching desktops */
-    Fallback_Unfocusing, /* forcefully remove focus from the current window */
-    Fallback_NoFocus     /* nothing has focus for some reason */
-} FallbackType;
+    OB_FOCUS_FALLBACK_DESKTOP,    /*!< switching desktops */
+    OB_FOCUS_FALLBACK_UNFOCUSING, /*!< forcefully remove focus from the
+                                    current window */
+    OB_FOCUS_FALLBACK_NOFOCUS     /*!< nothing has focus for some reason */
+} ObFocusFallbackType;
 
 /*! Call this when you need to focus something! */
-void focus_fallback(FallbackType type);
+void focus_fallback(ObFocusFallbackType type);
 
 /*! Cycle focus amongst windows
   Returns the _ObClient to which focus has been cycled, or NULL if none. */

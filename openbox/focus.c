@@ -172,7 +172,7 @@ static gboolean focus_fallback_transient(ObClient *top, ObClient *old)
     return client_focus(target);
 }
 
-void focus_fallback(FallbackType type)
+void focus_fallback(ObFocusFallbackType type)
 {
     GList *it;
     ObClient *old = NULL;
@@ -185,13 +185,13 @@ void focus_fallback(FallbackType type)
     */
     focus_set_client(NULL);
 
-    if (!(type == Fallback_Desktop ?
+    if (!(type == OB_FOCUS_FALLBACK_DESKTOP ?
           config_focus_last_on_desktop : config_focus_last)) {
         if (config_focus_follow) focus_under_pointer();
         return;
     }
 
-    if (type == Fallback_Unfocusing && old) {
+    if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
         /* try for transient relations */
         if (old->transient_for) {
             if (old->transient_for == OB_TRAN_GROUP) {
@@ -226,7 +226,7 @@ void focus_fallback(FallbackType type)
     }
 
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-        if (type != Fallback_Unfocusing || it->data != old)
+        if (type != OB_FOCUS_FALLBACK_UNFOCUSING || it->data != old)
             if (client_normal(it->data) &&
                 /* dont fall back to 'anonymous' fullscreen windows. theres no
                    checks for this is in transient/group fallbacks, so they can

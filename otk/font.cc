@@ -64,14 +64,14 @@ BFont::BFont(int screen_num, const string &fontstring,
                                   _fontstring.c_str())))
     return;
 
-  printf(_("Unable to load font: %s"), _fontstring.c_str());
+  printf(_("Unable to load font: %s\n"), _fontstring.c_str());
   printf(_("Trying fallback font: %s\n"), _fallback_font.c_str());
 
   if ((_xftfont = XftFontOpenName(OBDisplay::display, _screen_num,
                                   _fallback_font.c_str())))
     return;
 
-  printf(_("Unable to load font: %s"), _fallback_font.c_str());
+  printf(_("Unable to load font: %s\n"), _fallback_font.c_str());
   printf(_("Aborting!.\n"));
 
   ::exit(3); // can't continue without a font

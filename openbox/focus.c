@@ -40,7 +40,7 @@ void focus_shutdown()
         g_list_free(focus_order[i]);
     g_free(focus_order);
 
-    XDestroyWindow(focus_backup);
+    XDestroyWindow(ob_display, focus_backup);
 
     /* reset focus to root */
     XSetInputFocus(ob_display, PointerRoot, RevertToNone, CurrentTime);

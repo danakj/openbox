@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# Værktøjsbjælke
+# Toolbar
 $ #EditWkspcName
-# Andring af skrivebordets navn
+# Munkaasztal nevének változtatása
 $ #ToolbarPlacement
-# Værktøjsbjælkens placering
+# Toolbar elhelyezés 

@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Slit
+# 桌面應用程式 
 $ #SlitDirection
-# Slit retning
+# 桌面應用程式方向 
 $ #SlitPlacement
-# Slit placering
+# 桌面應用程式位置 

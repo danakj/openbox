@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Skriveborde
+# 工作區 
 $ #NewWorkspace
-# Nyt skrivebord
+# 新的工作區
 $ #RemoveLast
-# Fjern sidste
+# 移除最後的工作區

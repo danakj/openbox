@@ -1,0 +1,24 @@
+$set 14 #main
+
+$ #RCRequiresArg
+# помилка: "-rc" вимага╓ аргумент\n
+$ #DISPLAYRequiresArg
+# помилка: "-display" вимага╓ аргумент\n
+$ #WarnDisplaySet
+# попередження: не вдалося встановити зм╕нну середовища "DISPLAY"\n
+$ #Usage
+# Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
+  \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
+  \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
+  -display <string>\t\tобслуговувати вказаний дисплей.\n\
+  -rc <string>\t\t\tвикористовувати альтернативний файл ресурс╕в.\n\
+  -version\t\t\tвивести номер верс╕╖ ╕ вийти.\n\
+  -help\t\t\t\tвивести цю п╕дказку ╕ вийти.\n\n
+$ #CompileOptions
+# Compile time options:\n\
+  Debugging\t\t\t%s\n\
+  Interlacing:\t\t\t%s\n\
+  Shape:\t\t\t%s\n\
+  Slit:\t\t\t\t%s\n\
+  Event Clobbering:\t\t%s\n\
+  8bpp Ordered Dithering:\t%s\n\n

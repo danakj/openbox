@@ -11,12 +11,12 @@ $ #NoStrftimeTimeFormat24
 $ #NoStrftimeTimeFormat12
 # %02d:%02d %sm
 $ #NoStrftimeTimeFormatP
-# p
+# по
 $ #NoStrftimeTimeFormatA
-# a
+# до
 $ #ToolbarTitle
-# VФrktЬjsbjФlke
+# Пенал
 $ #EditWkspcName
-# Andring af skrivebordets navn
+# Редагувати ╕м'я поточного робочого м╕сця
 $ #ToolbarPlacement
-# VФrktЬjsbjФlkens placering
+# М╕сце розташування пенала

@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# V熳kt鷮sbj熞ke
+# 工具列
 $ #EditWkspcName
-# Andring af skrivebordets navn
+# 編輯目前工作區名稱 
 $ #ToolbarPlacement
-# V熳kt鷮sbj熞kens placering
+# 工具列位置

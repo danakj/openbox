@@ -1,8 +1,8 @@
 $set 7 #Slit
 
 $ #SlitTitle
-# Slit
+# Док
 $ #SlitDirection
-# Slit retning
+# Ор╕╓нтац╕я доку
 $ #SlitPlacement
-# Slit placering
+# М╕сцеположення доку

@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Send til ...
+# 傳送至... 
 $ #Shade
-# Skygge
+# 向上縮起
 $ #Iconify
-# Iconificeret
+# 最小化
 $ #Maximize
-# Maksimer
+# 最大化 
 $ #Raise
-# H獒
+# 上層
 $ #Lower
-# S熡k
+# 下層
 $ #Stick
-# Kl熲rig
+# 釘住
 $ #KillClient
-# Dr熲 klient
+# 強制關閉 
 $ #Close
-# Luk
+# 關閉

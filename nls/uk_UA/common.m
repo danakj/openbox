@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# Так
 $ #No
-# Nej
+# Н╕
 
 $ #DirectionTitle
-# Retning
+# Напрямок
 $ #DirectionHoriz
-# Horisontal
+# Горизонтально
 $ #DirectionVert
-# Vertikal
+# Вертикально
 
 $ #AlwaysOnTop
-# Altid Ьverst
+# Завжди нагор╕
 
 $ #PlacementTitle
-# Placering
+# М╕сце розташування
 $ #PlacementTopLeft
-# ьverste venstre hjЬrne
+# Угор╕ ╕ л╕воруч 
 $ #PlacementCenterLeft
-# Venstre i midten
+# По центру ╕ л╕воруч 
 $ #PlacementBottomLeft
-# Bunden til venstre
+# Унизу ╕ л╕воруч 
 $ #PlacementTopCenter
-# Toppen i midten
+# Зверху ╕ по центру
 $ #PlacementBottomCenter
-# Bunden i midten
+# Знизу ╕ по центру
 $ #PlacementTopRight
-# ьverst til hЬjre
+# Зверху ╕ праворуч
 $ #PlacementCenterRight
-# Til hЬjre i midten
+# По центру ╕ праворуч
 $ #PlacementBottomRight
-# Til hЬjre i bunden
+# Унизу ╕ праворуч
 
 $ #AutoHide
-# Gem automatisk
+# Автоматично ховати

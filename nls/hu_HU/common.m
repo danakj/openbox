@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# Igen
 $ #No
-# Nej
+# Nem
 
 $ #DirectionTitle
-# Retning
+# Irány
 $ #DirectionHoriz
-# Horisontal
+# Vízszintes
 $ #DirectionVert
-# Vertikal
+# Függõleges
 
 $ #AlwaysOnTop
-# Altid øverst
+# Mindig az elõtérben
 
 $ #PlacementTitle
-# Placering
+# Elhelyezés
 $ #PlacementTopLeft
-# Øverste venstre hjørne
+# Bal felül
 $ #PlacementCenterLeft
-# Venstre i midten
+# Bal középen
 $ #PlacementBottomLeft
-# Bunden til venstre
+# Bal lent
 $ #PlacementTopCenter
-# Toppen i midten
+# Középen felül
 $ #PlacementBottomCenter
-# Bunden i midten
+# Középen lent
 $ #PlacementTopRight
-# Øverst til højre
+# Jobb fent
 $ #PlacementCenterRight
-# Til højre i midten
+# Jobb középen
 $ #PlacementBottomRight
-# Til højre i bunden
+# Jobb lent
 
 $ #AutoHide
-# Gem automatisk
+# Autómatikus elrejtés

@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Skriveborde
+# Munkaasztalok
 $ #NewWorkspace
-# Nyt skrivebord
+# Új munkaasztal
 $ #RemoveLast
-# Fjern sidste
+# Utolsó munkaasztal törlése

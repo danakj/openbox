@@ -1,38 +1,38 @@
 $set 15 #Common
 
 $ #Yes
-# Ja
+# 正確
 $ #No
-# Nej
+# 取消 
 
 $ #DirectionTitle
-# Retning
+# 方向
 $ #DirectionHoriz
-# Horisontal
+# 橫向 
 $ #DirectionVert
-# Vertikal
+# 直向 
 
 $ #AlwaysOnTop
-# Altid 黲erst
+# 永遠在最上層
 
 $ #PlacementTitle
-# Placering
+# 放置 
 $ #PlacementTopLeft
-# 喌erste venstre hj鷨ne
+# 左上 
 $ #PlacementCenterLeft
-# Venstre i midten
+# 左邊置中
 $ #PlacementBottomLeft
-# Bunden til venstre
+# 左下 
 $ #PlacementTopCenter
-# Toppen i midten
+# 最上置中
 $ #PlacementBottomCenter
-# Bunden i midten
+# 最下置中 
 $ #PlacementTopRight
-# 喌erst til h鷮re
+# 右上 
 $ #PlacementCenterRight
-# Til h鷮re i midten
+# 右邊置中 
 $ #PlacementBottomRight
-# Til h鷮re i bunden
+# 右下 
 
 $ #AutoHide
-# Gem automatisk
+# 自動隱藏 

@@ -3,6 +3,6 @@ $set 7 #Slit
 $ #SlitTitle
 # Slit
 $ #SlitDirection
-# Slit retning
+# Slit irány 
 $ #SlitPlacement
-# Slit placering
+# Slit elhelyezés

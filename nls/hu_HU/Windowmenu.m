@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Send til ...
+# Küldés..
 $ #Shade
-# Skygge
+# Shade
 $ #Iconify
-# Iconificeret
+# Ikonizál
 $ #Maximize
-# Maksimer
+# Felnagyít
 $ #Raise
-# Hæv
+# Elõtérbe
 $ #Lower
-# Sænk
+# Háttérbe
 $ #Stick
-# Klæbrig
+# Mindenhol látható
 $ #KillClient
-# Dræb klient
+# Kill
 $ #Close
-# Luk
+# Bezárás

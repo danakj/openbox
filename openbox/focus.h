@@ -24,7 +24,6 @@ void focus_shutdown(gboolean reconfig);
 void focus_set_client(struct _ObClient *client);
 
 typedef enum {
-    OB_FOCUS_FALLBACK_DESKTOP,    /*!< switching desktops */
     OB_FOCUS_FALLBACK_UNFOCUSING, /*!< forcefully remove focus from the
                                     current window */
     OB_FOCUS_FALLBACK_NOFOCUS     /*!< nothing has focus for some reason */

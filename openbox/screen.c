@@ -398,7 +398,6 @@ void screen_set_desktop(guint num)
 {
     GList *it;
     guint old;
-    XEvent e;
      
     g_assert(num < screen_num_desktops);
 
@@ -435,18 +434,6 @@ void screen_set_desktop(guint num)
                 frame_hide(c->frame);
         }
     }
-
-    XSync(ob_display, FALSE);
-    /* focus the last focused window on the desktop, and ignore enter events
-       from the switch so it doesnt mess with the focus */
-    while (XCheckTypedEvent(ob_display, EnterNotify, &e));
-#ifdef DEBUG_FOCUS
-    ob_debug("switch fallback\n");
-#endif
-    focus_fallback(OB_FOCUS_FALLBACK_DESKTOP);
-#ifdef DEBUG_FOCUS
-    ob_debug("/switch fallback\n");
-#endif
 }
 
 static void get_row_col(guint d, guint *r, guint *c)

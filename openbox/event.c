@@ -36,6 +36,11 @@
 #include <X11/ICE/ICElib.h>
 #endif
 
+typedef struct
+{
+    gboolean ignored;
+} ObEventData;
+
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static void event_handle_menu(XEvent *e);
@@ -289,8 +294,8 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
 	if (INVALID_FOCUSIN(e) ||
             client == NULL) {
 #ifdef DEBUG_FOCUS
-        ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
-                 e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
+            ob_debug("FocusIn on %lx mode %d detail %d IGNORED\n",
+                     e->xfocus.window, e->xfocus.mode, e->xfocus.detail);
 #endif
             /* says a client was not found for the event (or a valid FocusIn
                event was not found.
@@ -372,14 +377,18 @@ static gboolean event_ignore(XEvent *e, ObClient *client)
                         }
                     }
 
-                    /* once all the FocusOut's have been dealt with, if there
-                       is a FocusIn still left and it is valid, then use it */
-                    event_process(&fe, NULL);
-                    /* secret magic way of event_process telling us that no
-                       client was found for the FocusIn event. ^_^ */
-                    if (fe.xfocus.window != None) {
-                        fallback = FALSE;
-                        break;
+                    {
+                        ObEventData d;
+
+                        /* once all the FocusOut's have been dealt with, if
+                           there is a FocusIn still left and it is valid, then
+                           use it */
+                        event_process(&fe, &d);
+                        if (!d.ignored) {
+                            ob_debug("FocusIn was OK, so don't fallback\n");
+                            fallback = FALSE;
+                            break;
+                        }
                     }
                 }
             }
@@ -432,6 +441,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObDockApp *dockapp = NULL;
     ObWindow *obwin = NULL;
     XEvent ee, *e;
+    ObEventData *ed = data;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -461,8 +471,12 @@ static void event_process(const XEvent *ec, gpointer data)
 
     event_set_lasttime(e);
     event_hack_mods(e);
-    if (event_ignore(e, client))
+    if (event_ignore(e, client)) {
+        if (ed)
+            ed->ignored = TRUE;
         return;
+    } else if (ed)
+            ed->ignored = FALSE;
 
     /* deal with it in the kernel */
     if (group)

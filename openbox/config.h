@@ -12,10 +12,6 @@ struct _ObParseInst;
 extern gboolean config_focus_new;
 /*! Focus windows when the mouse enters them */
 extern gboolean config_focus_follow;
-/*! Focus the last focused window as a fallback */
-extern gboolean config_focus_last;
-/*! Focus the last focused window as a fallback when switching desktops */
-extern gboolean config_focus_last_on_desktop;
 /*! Timeout for focusing windows on focus follows mouse, in microseconds */
 extern guint    config_focus_delay;
 

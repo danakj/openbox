@@ -162,11 +162,8 @@ void focus_fallback(ObFocusFallbackType type)
     */
     focus_set_client(NULL);
 
-    if (!(type == OB_FOCUS_FALLBACK_DESKTOP ?
-          config_focus_last_on_desktop : config_focus_last)) {
-        if (config_focus_follow) focus_under_pointer();
+    if (config_focus_follow && focus_under_pointer())
         return;
-    }
 
     if (type == OB_FOCUS_FALLBACK_UNFOCUSING && old) {
         /* try for transient relations */

@@ -13,8 +13,6 @@
 <focus>
   <focusNew>yes</focusNew>
   <followMouse>no</followMouse>
-  <focusLast>yes</focusLast>
-  <focusLastOnDesktop>yes</focusLastOnDesktop>
   <focusDelay>0</focusDelay>
 </focus>
 

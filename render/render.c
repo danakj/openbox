@@ -109,7 +109,7 @@ void RrPaint(RrAppearance *l, Window win, gint w, gint h)
                     RrPixel32_to_pixmap(l, 0, 0, w, h);
             }
             if (l->texture[i].data.mask.color->gc == None)
-                color_allocate_gc(l->texture[i].data.mask.color);
+                RrColorAllocateGC(l->texture[i].data.mask.color);
             RrPixmapMaskDraw(l->pixmap, &l->texture[i].data.mask, &tarea);
         break;
         case RR_TEXTURE_RGBA:
@@ -242,7 +242,7 @@ static void RrPixel32_to_pixmap(RrAppearance *l, gint x, gint y, gint w, gint h)
 */
     scratch = g_new(RrPixel32, im->width * im->height);
     im->data = (char*) scratch;
-    reduce_depth(l->inst, in, im);
+    RrReduceDepth(l->inst, in, im);
     XPutImage(RrDisplay(l->inst), out,
               DefaultGC(RrDisplay(l->inst), RrScreen(l->inst)),
               im, 0, 0, x, y, w, h);
@@ -336,7 +336,7 @@ gboolean RrPixmapToRGBA(const RrInstance *inst,
     }
 
     *data = g_new(RrPixel32, pw * ph);
-    increase_depth(inst, *data, xi);
+    RrIncreaseDepth(inst, *data, xi);
 
     if (mask) {
         /* apply transparency from the mask */

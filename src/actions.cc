@@ -71,6 +71,7 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
     (Openbox::instance->findHandler(e.window));
   assert(w); // everything should be a widget
 
+  // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   ButtonData *data = new_button_data(e.window, e.time, state, e.button,
@@ -108,6 +109,7 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // run the CLICK python hook
+  // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   ButtonData *data = new_button_data(e.window, e.time, state, e.button,
@@ -168,6 +170,7 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 {
   OtkEventHandler::keyPressHandler(e);
 
+  // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   Openbox::instance->bindings()->fireKey(state, e.keycode, e.time);
@@ -199,6 +202,7 @@ void OBActions::motionHandler(const XMotionEvent &e)
   assert(w); // everything should be a widget
 
   // run the MOTION python hook
+  // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
   unsigned int button = _posqueue[0]->button;

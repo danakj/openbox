@@ -394,7 +394,8 @@ BImageControl::~BImageControl(void) {
 Pixmap BImageControl::searchCache(const unsigned int width,
                                   const unsigned int height,
                                   const unsigned long texture,
-                                  const BColor &c1, const BColor &c2) {
+                                  const BColor &c1, const BColor &c2,
+                                  const BColor &bc) {
   if (cache.empty())
     return None;
 
@@ -404,11 +405,14 @@ Pixmap BImageControl::searchCache(const unsigned int width,
     CachedImage& tmp = *it;
     if (tmp.width == width && tmp.height == height &&
         tmp.texture == texture && tmp.pixel1 == c1.pixel())
-      if (texture & BTexture::Gradient) {
-        if (tmp.pixel2 == c2.pixel()) {
+      if (texture & BTexture::Gradient && tmp.pixel2 == c2.pixel()) {
+        if(texture & BTexture::Border && tmp.borderColor == bc.pixel()){
           tmp.count++;
           return tmp.pixmap;
         }
+      } else if(texture & BTexture::Border && tmp.borderColor == bc.pixel()){
+        tmp.count++;
+        return tmp.pixmap;
       } else {
         tmp.count++;
         return tmp.pixmap;
@@ -423,7 +427,8 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
   if (texture.texture() & BTexture::Parent_Relative) return ParentRelative;
 
   Pixmap pixmap = searchCache(width, height, texture.texture(),
-			      texture.color(), texture.colorTo());
+			      texture.color(), texture.colorTo(), 
+                              texture.borderColor());
   if (pixmap) return pixmap;
 
   BImage image(this, width, height);
@@ -445,6 +450,11 @@ Pixmap BImageControl::renderImage(unsigned int width, unsigned int height,
     tmp.pixel2 = texture.colorTo().pixel();
   else
     tmp.pixel2 = 0l;
+
+  if (texture.texture() & BTexture::Border)
+    tmp.borderColor = texture.borderColor().pixel();
+  else
+    tmp.borderColor = 0l;
 
   cache.push_back(tmp);
 

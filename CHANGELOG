@@ -1,6 +1,9 @@
 Changelog for Openbox:
 
 2.2.4:
+ * Fixed a bug in the image cache that would draw	(Scott Moynes)
+   borders incorrectly in rare circumstances.
+
  * Draw window titles in the titlebars and toolbar with (Ben Jansens)
    UTF encoding when they are set with the NETWM (UTF)
    hints.

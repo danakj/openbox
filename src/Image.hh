@@ -91,7 +91,7 @@ public:
     Pixmap pixmap;
 
     unsigned int count, width, height;
-    unsigned long pixel1, pixel2, texture;
+    unsigned long pixel1, pixel2, texture, borderColor;
   };
 
   BImageControl(BaseDisplay *dpy, const ScreenInfo *scrn,
@@ -160,7 +160,8 @@ private:
 
   Pixmap searchCache(const unsigned int width, const unsigned int height,
                      const unsigned long texture,
-                     const BColor &c1, const BColor &c2);
+                     const BColor &c1, const BColor &c2, 
+                     const BColor &borderColor);
 };
 
 

@@ -1,5 +1,0 @@
-/* Created with The GIMP */
-#define close_width 4
-#define close_height 4
-static unsigned char close_bits[] = {
-   0x09, 0x06, 0x06, 0x09 };

@@ -76,7 +76,7 @@ void frame_frame_gravity(Frame *self, int *x, int *y)
 	break;
     case StaticGravity:
     case ForgetGravity:
-	x += self->size.left;
+	*x += self->size.left;
 	break;
     }
 

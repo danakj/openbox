@@ -216,58 +216,18 @@ tools_kdetrayproxy_kdetrayproxy_SOURCES = \
 
 ## themes ##
 
-thebear_themedir = $(themedir)/thebear
-dist_thebear_theme_DATA = \
-	themes/thebear/themerc
+allegro_themedir = $(themedir)/allegro
+dist_allegro_theme_DATA = \
+	themes/allegro/themerc \
+	themes/allegro/bullet.xbm
 
-planton_themedir = $(themedir)/planton
-dist_planton_theme_DATA = \
-	themes/planton/themerc \
-	themes/planton/max.xbm \
-	themes/planton/max_toggled.xbm \
-	themes/planton/desk.xbm \
-	themes/planton/desk_toggled.xbm \
-	themes/planton/shade.xbm \
-	themes/planton/shade_toggled.xbm \
-	themes/planton/iconify.xbm \
-	themes/planton/close.xbm
+artwiz_themedir = $(themedir)/artwiz
+dist_artwiz_theme_DATA = \
+	themes/artwiz/themerc
 
-lightindustry_themedir = $(themedir)/Light-Industry
-dist_lightindustry_theme_DATA = \
-	themes/Light-Industry/themerc \
-	themes/Light-Industry/max.xbm \
-	themes/Light-Industry/iconify.xbm \
-	themes/Light-Industry/close.xbm
-
-lightindustrybig_themedir = $(themedir)/Light-Industry-big
-dist_lightindustrybig_theme_DATA = \
-	themes/Light-Industry-big/themerc \
-	themes/Light-Industry-big/max.xbm \
-	themes/Light-Industry-big/iconify.xbm \
-	themes/Light-Industry-big/close.xbm
-
-imerry_themedir = $(themedir)/I-merry
-dist_imerry_theme_DATA = \
-	themes/I-merry/themerc \
-	themes/I-merry/max.xbm \
-	themes/I-merry/iconify.xbm \
-	themes/I-merry/close.xbm
-
-greenz_themedir = $(themedir)/greenz
-dist_greenz_theme_DATA = \
-	themes/greenz/themerc
-
-bbstyle_themedir = $(themedir)/BBstylE
-dist_bbstyle_theme_DATA = \
-	themes/BBstylE/themerc \
-	themes/BBstylE/max.xbm \
-	themes/BBstylE/max_toggled.xbm \
-	themes/BBstylE/desk.xbm \
-	themes/BBstylE/desk_toggled.xbm \
-	themes/BBstylE/shade.xbm \
-	themes/BBstylE/shade_toggled.xbm \
-	themes/BBstylE/iconify.xbm \
-	themes/BBstylE/close.xbm
+blah41_themedir = $(themedir)/blah41
+dist_blah41_theme_DATA = \
+	themes/blah41/themerc
 
 om4ob_themedir = $(themedir)/om4ob
 dist_om4ob_theme_DATA = \
@@ -289,6 +249,10 @@ dist_om4ob_theme_DATA = \
 	themes/om4ob/shade_hover.xbm \
 	themes/om4ob/shade_toggled.xbm \
 	themes/om4ob/shade.xbm
+
+thebear_themedir = $(themedir)/thebear
+dist_thebear_theme_DATA = \
+	themes/thebear/themerc
 
 
 ## data ##

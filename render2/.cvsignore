@@ -7,3 +7,5 @@ Makefile
 libobrender2.la
 instance.lo
 init.lo
+debug.lo
+color.lo

@@ -1,5 +1,6 @@
 #include "instance.h"
-#include <glib.h>
+#include <stdlib.h>
+#include <assert.h>
 
 /*
 void truecolor_startup(void)
@@ -9,7 +10,7 @@ void truecolor_startup(void)
 
   timage = XCreateImage(ob_display, render_visual, render_depth,
                         ZPixmap, 0, NULL, 1, 1, 32, 0);
-  g_assert(timage != NULL);
+  assert(timage != NULL);
   /\* find the offsets for each color in the visual's masks *\/
   render_red_mask = red_mask = timage->red_mask;
   render_green_mask = green_mask = timage->green_mask;
@@ -37,15 +38,15 @@ struct RrInstance *RrInstanceNew(Display *display,
 {
     struct RrInstance *inst;
 
-    inst = g_new(struct RrInstance, 1);
+    inst = malloc(sizeof(struct RrInstance));
     inst->display = display;
     inst->screen = screen;
     inst->visinfo = visinfo;
     inst->cmap = XCreateColormap(display, RootWindow(display, screen),
                                  RrVisual(inst), AllocNone);
-    inst->glx_context = glXCreateContext(display, &visinfo, NULL, TRUE);
+    inst->glx_context = glXCreateContext(display, &visinfo, NULL, True);
 
-    g_assert(inst->glx_context);
+    assert(inst->glx_context);
 
     return inst;
 }
@@ -55,6 +56,6 @@ void RrInstanceFree(struct RrInstance *inst)
     if (inst) {
         glXDestroyContext(inst->display, inst->glx_context);
         XFreeColormap(inst->display, inst->cmap);
-        g_free(inst);
+        free(inst);
     }
 }

@@ -5,7 +5,8 @@
 THEME = "/usr/local/share/openbox/styles/fieron2"
 """The theme used to decorate everything."""
 
-TITLEBAR_LAYOUT = "DILMC"
+#TITLEBAR_LAYOUT = [ "icon", "title", "alldesktops", "iconify", "maximize", "close" ]
+TITLEBAR_LAYOUT = [ "alldesktops", "iconify", "title", "maximize", "close" ]
 """The layout of the buttons/label on client titlebars, can be made up of the
 following:
     I - iconify button

@@ -358,7 +358,7 @@ void Openbox::setFocusedClient(Client *c)
   // sometimes this is called with the already-focused window, this is
   // important for the python scripts to work (eg, c = 0 twice). don't just
   // return if _focused_client == c
-  
+
   assert(_focused_screen);
 
   // uninstall the old colormap

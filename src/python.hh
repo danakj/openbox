@@ -30,6 +30,7 @@ struct MouseContext {
     Titlebar,
     Handle,
     Window,
+    IconButton,
     MaximizeButton,
     CloseButton,
     IconifyButton,

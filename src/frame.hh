@@ -18,6 +18,7 @@ extern "C" {
 #include "otk/eventhandler.hh"
 
 #include <string>
+#include <vector>
 
 namespace ob {
 
@@ -31,6 +32,7 @@ struct FrameGeometry {
   int label_width;
   int label_height() { return font_height; }
   int handle_height; // static, from the style
+  int icon_x;        // x-position of the window icon button
   int handle_y;
   int button_size;   // static, from the style
   int grip_width() { return button_size * 2; }
@@ -73,11 +75,11 @@ private:
   Window  _handle;  // bottom bar
   Window  _lgrip;   // lefthand resize grab on the handle
   Window  _rgrip;   // righthand resize grab on the handle
-  Window *_buttons; // all of the titlebar buttons
-  int  _numbuttons; // number of buttons, size of _buttons array
-  int *_titleorder; // order of the buttons and the label (always
-                    // holds '_numbuttons + 1' elements (for the
-                    // label, which is coded as '-1')
+  Window  _max;     // maximize button
+  Window  _desk;    // all-desktops button
+  Window  _iconify; // iconify button
+  Window  _icon;    // window icon button
+  Window  _close;   // close button
 
   // surfaces for each 
   otk::Surface  *_frame_sur;
@@ -85,13 +87,29 @@ private:
   otk::Surface  *_label_sur;
   otk::Surface  *_handle_sur;
   otk::Surface  *_grip_sur;
-  otk::Surface **_buttons_sur;
+  otk::Surface  *_max_sur;
+  otk::Surface  *_desk_sur;
+  otk::Surface  *_iconify_sur;
+  otk::Surface  *_icon_sur;
+  otk::Surface  *_close_sur;
+
+  std::string _layout; // layout of the titlebar
+  bool _max_press;
+  bool _desk_press;
+  bool _iconify_press;
+  bool _icon_press;
+  bool _close_press;
 
   FrameGeometry geom;
   
   void applyStyle(const otk::RenderStyle &style);
   void layoutTitle();
   void renderLabel();
+  void renderMax();
+  void renderDesk();
+  void renderIconify();
+  void renderClose();
+  void renderIcon();
 
 public:
   //! Constructs an Frame object for a client

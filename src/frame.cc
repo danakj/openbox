@@ -12,6 +12,7 @@ extern "C" {
 #include "client.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
+#include "otk/surface.hh"
 
 #include <string>
 #include <cassert>
@@ -38,15 +39,26 @@ Frame::Frame(Client *client)
     _handle(0),
     _lgrip(0),
     _rgrip(0),
-    _buttons(0),
-    _numbuttons(0),
-    _titleorder(0),
+    _max(0),
+    _desk(0),
+    _iconify(0),
+    _icon(0),
+    _close(0),
     _frame_sur(0),
     _title_sur(0),
     _label_sur(0),
     _handle_sur(0),
     _grip_sur(0),
-    _buttons_sur(0)
+    _max_sur(0),
+    _desk_sur(0),
+    _iconify_sur(0),
+    _icon_sur(0),
+    _close_sur(0),
+    _max_press(false),
+    _desk_press(false),
+    _iconify_press(false),
+    _icon_press(false),
+    _close_press(false)
 {
   assert(client);
 
@@ -67,6 +79,11 @@ Frame::Frame(Client *client)
                        ExposureMask);
   _title = createWindow(info, _frame, mask, &attrib);
   _label = createWindow(info, _title, mask, &attrib);
+  _max = createWindow(info, _title, mask, &attrib);
+  _close = createWindow(info, _title, mask, &attrib);
+  _desk = createWindow(info, _title, mask, &attrib);
+  _icon = createWindow(info, _title, mask, &attrib);
+  _iconify = createWindow(info, _title, mask, &attrib);
   _handle = createWindow(info, _frame, mask, &attrib);
   mask |= CWCursor;
   attrib.cursor = openbox->cursors().ll_angle;
@@ -82,12 +99,7 @@ Frame::Frame(Client *client)
 
   applyStyle(*otk::RenderStyle::style(_client->screen()));
 
-  // XXX load buttons
-  _numbuttons = 0;
-  _buttons = new Window[0];
-  _buttons_sur = new otk::Surface*[0];
-  _titleorder = new int[1];
-  _titleorder[0] = -1;
+  _layout = "NDITMC";
 
   // register all of the windows with the event dispatcher
   Window *w = allWindows();
@@ -104,13 +116,14 @@ Frame::~Frame()
     openbox->clearHandler(w[i]);
   delete [] w;
 
-  for (int i = 0; i < _numbuttons; ++i) {
-    XDestroyWindow(**otk::display, _buttons[i]);
-    delete _buttons_sur[i];
-  }
   XDestroyWindow(**otk::display, _rgrip);
   XDestroyWindow(**otk::display, _lgrip);
   XDestroyWindow(**otk::display, _handle);
+  XDestroyWindow(**otk::display, _max);
+  XDestroyWindow(**otk::display, _icon);
+  XDestroyWindow(**otk::display, _iconify);
+  XDestroyWindow(**otk::display, _desk);
+  XDestroyWindow(**otk::display, _close);
   XDestroyWindow(**otk::display, _label);
   XDestroyWindow(**otk::display, _title);
   XDestroyWindow(**otk::display, _frame);
@@ -120,10 +133,11 @@ Frame::~Frame()
   if (_label_sur) delete _label_sur;
   if (_handle_sur) delete _handle_sur;
   if (_grip_sur) delete _grip_sur;
-
-  delete [] _buttons;
-  delete [] _titleorder;
-  delete [] _buttons_sur;
+  if (_max_sur) delete _max_sur;
+  if (_desk_sur) delete _desk_sur;
+  if (_iconify_sur) delete _iconify_sur;
+  if (_icon_sur) delete _icon_sur;
+  if (_close_sur) delete _close_sur;
 }
 
 void Frame::show()
@@ -151,12 +165,17 @@ MouseContext::MC Frame::mouseContext(Window win) const
   if (win == _plate)  return MouseContext::Window;
   if (win == _lgrip ||
       win == _rgrip)  return MouseContext::Grip;
+  if (win == _max)    return MouseContext::MaximizeButton;
+  if (win == _close)  return MouseContext::CloseButton;
+  if (win == _desk)   return MouseContext::AllDesktopsButton;
+  if (win == _iconify)return MouseContext::IconifyButton;
+  if (win == _icon)   return MouseContext::IconButton;
   return (MouseContext::MC) -1;
 }
 
 Window *Frame::allWindows() const
 {
-  Window *w = new Window[7 + _numbuttons + 1];
+  Window *w = new Window[12 + 1];
   unsigned int i = 0;
   w[i++] = _frame;
   w[i++] = _plate;
@@ -165,8 +184,11 @@ Window *Frame::allWindows() const
   w[i++] = _handle;
   w[i++] = _lgrip;
   w[i++] = _rgrip;
-  for (int j = 0; j < _numbuttons; ++j)
-    w[j + i++] = _buttons[j];
+  w[i++] = _max;
+  w[i++] = _desk;
+  w[i++] = _close;
+  w[i++] = _icon;
+  w[i++] = _iconify;
   w[i] = 0;
   return w;
 }
@@ -192,9 +214,11 @@ void Frame::applyStyle(const otk::RenderStyle &style)
   XResizeWindow(**otk::display, _lgrip, geom.grip_width(), geom.handle_height);
   XResizeWindow(**otk::display, _rgrip, geom.grip_width(), geom.handle_height);
   
-  for (int i = 0; i < _numbuttons; ++i)
-    XResizeWindow(**otk::display, _buttons[i],
-                  geom.button_size, geom.button_size);
+  XResizeWindow(**otk::display, _max, geom.button_size, geom.button_size);
+  XResizeWindow(**otk::display, _close, geom.button_size, geom.button_size);
+  XResizeWindow(**otk::display, _desk, geom.button_size, geom.button_size);
+  XResizeWindow(**otk::display, _iconify, geom.button_size, geom.button_size);
+  XResizeWindow(**otk::display, _icon, geom.button_size, geom.button_size);
 }
 
 void Frame::styleChanged(const otk::RenderStyle &style)
@@ -220,14 +244,14 @@ void Frame::adjustTitle()
 
 static void render(int screen, const otk::Size &size, Window win,
                    otk::Surface **surface,
-                   const otk::RenderTexture &texture)
+                   const otk::RenderTexture &texture, bool freedata=true)
 {
   otk::Surface *s = new otk::Surface(screen, size);
   otk::display->renderControl(screen)->drawBackground(*s, texture);
   XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
   XClearWindow(**otk::display, win);
   if (*surface) delete *surface;
-  s->freePixelData();
+  if (freedata) s->freePixelData();
   *surface = s;
 }
 
@@ -309,9 +333,14 @@ void Frame::adjustSize()
   if (decorations & Client::Decor_Titlebar) {
     render(screen, otk::Size(geom.width, geom.title_height()), _title,
            &_title_sur, *(focus ? style->titlebarFocusBackground() :
-                          style->titlebarUnfocusBackground()));
+                          style->titlebarUnfocusBackground()), false);
     
     renderLabel();
+    renderMax();
+    renderDesk();
+    renderIconify();
+    renderIcon();
+    renderClose();
   }
 
   if (decorations & Client::Decor_Handle) {
@@ -387,12 +416,150 @@ void Frame::renderLabel()
   _label_sur = s;
 }
 
+static void renderButton(int screen, bool focus, bool press, Window win,
+                         otk::Surface **sur, int butsize,
+                         const otk::PixmapMask *mask)
+{
+  const otk::RenderStyle *style = otk::RenderStyle::style(screen);
+  const otk::RenderControl *control = otk::display->renderControl(screen);
+  otk::Surface *s = new otk::Surface(screen, otk::Size(butsize, butsize));
+
+  const otk::RenderTexture *tx = (focus ?
+                                  (press ?
+                                   style->buttonPressFocusBackground() :
+                                   style->buttonUnpressFocusBackground()) :
+                                  (press ?
+                                   style->buttonPressUnfocusBackground() :
+                                   style->buttonUnpressUnfocusBackground()));
+  const otk::RenderColor *maskcolor = (focus ?
+                                       style->buttonFocusColor() :
+                                       style->buttonUnfocusColor());
+  control->drawBackground(*s, *tx);
+  control->drawMask(*s, *maskcolor, *mask);
+
+  XSetWindowBackgroundPixmap(**otk::display, win, s->pixmap());
+  XClearWindow(**otk::display, win);
+  if (*sur) delete *sur;
+  *sur = s;
+}
+
+void Frame::renderMax()
+{
+  renderButton(_client->screen(), _client->focused(), _max_press, _max,
+               &_max_sur, geom.button_size,
+               otk::RenderStyle::style(_client->screen())->maximizeMask());
+}
+
+void Frame::renderDesk()
+{
+  renderButton(_client->screen(), _client->focused(), _desk_press, _desk,
+               &_desk_sur, geom.button_size,
+               otk::RenderStyle::style(_client->screen())->alldesktopsMask());
+}
+
+void Frame::renderIconify()
+{
+  renderButton(_client->screen(), _client->focused(), _iconify_press, _iconify,
+               &_iconify_sur, geom.button_size,
+               otk::RenderStyle::style(_client->screen())->iconifyMask());
+}
+
+void Frame::renderClose()
+{
+  renderButton(_client->screen(), _client->focused(), _close_press, _close,
+               &_close_sur, geom.button_size,
+               otk::RenderStyle::style(_client->screen())->closeMask());
+}
+
+void Frame::renderIcon()
+{
+  const int screen = _client->screen();
+  const otk::RenderControl *control = otk::display->renderControl(screen);
+
+  otk::Surface *s = new otk::Surface(screen, otk::Size(geom.button_size,
+                                                       geom.button_size));
+  otk::pixel32 *dest = s->pixelData(), *src;
+  int w = _title_sur->size().width();
+  
+  src = _title_sur->pixelData() + w * (geom.bevel + 1) + geom.icon_x;
+  
+  // get the background under the icon button
+  for (int y = 0; y < geom.button_size; ++y, src += w - geom.button_size)
+    for (int x = 0; x < geom.button_size; ++x, ++dest, ++src)
+      *dest = *src;
+  control->drawImage(*s, 0, 0, 0);
+
+  XSetWindowBackgroundPixmap(**otk::display, _icon, s->pixmap());
+  XClearWindow(**otk::display, _icon);
+  if (_icon_sur) delete _icon_sur;
+  _icon_sur = s;
+}
+
 void Frame::layoutTitle()
 {
-  geom.label_width = geom.width - geom.bevel * 2;
+  geom.label_width = geom.width - geom.bevel * 2 -
+    (geom.button_size + geom.bevel) * (_layout.size() - 1);
   if (geom.label_width < 1) geom.label_width = 1;
-  XMoveResizeWindow(**otk::display, _label, geom.bevel, geom.bevel,
-                    geom.label_width, geom.font_height);
+
+  XResizeWindow(**otk::display, _label, geom.label_width, geom.font_height);
+  
+  int x = geom.bevel;
+  bool n, d, i, l, m ,c;
+  n = d = i = l = m = c = false;
+  for (const char *lc = _layout.c_str(); *lc; ++lc) {
+    switch (*lc) {
+    case 'n':
+    case 'N':
+      geom.icon_x = x;
+      XMapWindow(**otk::display, _icon);
+      XMoveWindow(**otk::display, _icon, x, geom.bevel + 1);
+      n = true;
+      x += geom.button_size;
+      break;
+    case 'd':
+    case 'D':
+      XMapWindow(**otk::display, _desk);
+      XMoveWindow(**otk::display, _desk, x, geom.bevel + 1);
+      d = true;
+      x += geom.button_size;
+      break;
+    case 'i':
+    case 'I':
+      XMapWindow(**otk::display, _iconify);
+      XMoveWindow(**otk::display, _iconify, x, geom.bevel + 1);
+      i = true;
+      x += geom.button_size;
+      break;
+    case 't':
+    case 'T':
+      XMapWindow(**otk::display, _label);
+      XMoveWindow(**otk::display, _label, x, geom.bevel);
+      l = true;
+      x += geom.label_width;
+      break;
+    case 'm':
+    case 'M':
+      XMapWindow(**otk::display, _max);
+      XMoveWindow(**otk::display, _max, x, geom.bevel + 1);
+      m = true;
+      x += geom.button_size;
+      break;
+    case 'c':
+    case 'C':
+      XMapWindow(**otk::display, _close);
+      XMoveWindow(**otk::display, _close, x, geom.bevel + 1);
+      c = true;
+      x += geom.button_size;
+      break;
+    }
+    x += geom.bevel;
+  }
+  if (!n) XUnmapWindow(**otk::display, _icon);
+  if (!d) XUnmapWindow(**otk::display, _desk);
+  if (!i) XUnmapWindow(**otk::display, _iconify);
+  if (!l) XUnmapWindow(**otk::display, _label);
+  if (!m) XUnmapWindow(**otk::display, _max);
+  if (!c) XUnmapWindow(**otk::display, _close);
 }
 
 void Frame::adjustPosition()

@@ -45,7 +45,7 @@ void Actions::insertPress(const XButtonEvent &e)
   }
   _posqueue[0] = a;
   a->button = e.button;
-  a->pos.setPoint(e.x_root, e.y_root);
+  a->pos = otk::Point(e.x_root, e.y_root);
 
   Client *c = openbox->findClient(e.window);
   if (c) a->clientarea = c->area();
@@ -264,14 +264,9 @@ void Actions::motionHandler(const XMotionEvent &e)
   
   // compress changes to a window into a single change
   XEvent ce;
-  while (XCheckTypedEvent(**otk::display, e.type, &ce)) {
-    if (ce.xmotion.window != e.window) {
-      XPutBackEvent(**otk::display, &ce);
-      break;
-    } else {
-      x_root = e.x_root;
-      y_root = e.y_root;
-    }
+  while (XCheckTypedWindowEvent(**otk::display, e.window, e.type, &ce)) {
+    x_root = e.x_root;
+    y_root = e.y_root;
   }
 
   WidgetBase *w = dynamic_cast<WidgetBase*>

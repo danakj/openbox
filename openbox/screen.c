@@ -605,7 +605,6 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
                            gboolean dialog, gboolean done, gboolean cancel)
 {
     static gboolean first = TRUE;
-    static gboolean lin;
     static guint origd, d;
     guint r, c;
 
@@ -617,13 +616,12 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
     }
     if (first) {
         first = FALSE;
-        lin = linear;
         d = origd = screen_desktop;
     }
 
     get_row_col(d, &r, &c);
 
-    if (lin) {
+    if (linear) {
         switch (dir) {
         case OB_DIRECTION_EAST:
             if (d < screen_num_desktops - 1)

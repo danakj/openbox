@@ -142,8 +142,45 @@ static GSList* area_remove(GSList *list, Rect *a)
 
 static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
 {
-    Rect *carea = data;
+    ObClient *c = data;
+    Rect *carea = &c->frame->area;
     const Rect *a1 = p1, *a2 = p2;
+    gboolean diffhead = FALSE;
+    guint i;
+    Rect *a;
+
+    for (i = 0; i < screen_num_monitors; ++i) {
+        a = screen_physical_area_monitor(i);
+        if (RECT_CONTAINS(*a, a1->x, a1->y) &&
+            !RECT_CONTAINS(*a, a2->x, a2->y))
+        {
+            diffhead = TRUE;
+            break;
+        }
+    }
+
+    /* has to be more than me in the group */
+    if (diffhead && c->group && c->group->members->next) {
+        guint *num, most;
+        GSList *it;
+
+        /* find how many clients in the group are on each monitor, use the
+           monitor with the most in it */
+        num = g_new0(guint, screen_num_monitors);
+        for (it = c->group->members; it; it = g_slist_next(it))
+            if (it->data != c)
+                ++num[client_monitor(it->data)];
+        most = 0;
+        for (i = 1; i < screen_num_monitors; ++i)
+            if (num[i] > num[most])
+                most = i;
+
+        a = screen_physical_area_monitor(most);
+        if (RECT_CONTAINS(*a, a1->x, a1->y))
+            return -1;
+        if (RECT_CONTAINS(*a, a2->x, a2->y))
+            return 1;
+    }
 
     return MIN((a1->width - carea->width), (a1->height - carea->height)) -
         MIN((a2->width - carea->width), (a2->height - carea->height));
@@ -189,7 +226,8 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
             }
         }
     } else if (type == SMART_GROUP) {
-        if (!client->group)
+        /* has to be more than me in the group */
+        if (!client->group || !client->group->members->next)
             return FALSE;
 
         for (sit = client->group->members; sit; sit = g_slist_next(sit)) {
@@ -200,7 +238,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
     } else
         g_assert_not_reached();
 
-    spaces = g_slist_sort_with_data(spaces, area_cmp, &client->frame->area);
+    spaces = g_slist_sort_with_data(spaces, area_cmp, client);
 
     for (sit = spaces; sit; sit = g_slist_next(sit)) {
         Rect *r = sit->data;

@@ -44,6 +44,7 @@ extern "C" {
 
 #include "i18n.hh"
 #include "blackbox.hh"
+#include "Clientmenu.hh"
 #include "Font.hh"
 #include "GCCache.hh"
 #include "Iconmenu.hh"
@@ -2039,6 +2040,9 @@ void BlackboxWindow::setFocusFlag(bool focus) {
 
   if (isFocused())
     blackbox->setFocusedWindow(this);
+  
+  Clientmenu *menu = screen->getWorkspace(blackbox_attrib.workspace)->getMenu();
+  menu->setItemSelected(window_number, isFocused());
 }
 
 

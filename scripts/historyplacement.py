@@ -10,9 +10,14 @@ import windowplacement # fallback routines
 ###                windowplacement module also apply!)                     ###
 ##############################################################################
 IGNORE_REQUESTED_POSITIONS = 0
-"""When true, the placement algorithm will attempt to place windows even
-   when they request a position (like XMMS). Note this only applies to
-   normal windows, not to special cases like desktops and docks."""
+"""When non-zero, the placement algorithm will attempt to place windows even
+   when they request a position (like XMMS). Note this only applies to normal
+   windows, not to special cases like desktops and docks."""
+DONT_DUPLICATE = 1
+"""When non-zero, if 2 copies of the same match in history are to be placed
+   before one of them is closed (so it would be placed over-top of the last
+   one), this will cause the second window to not be placed via history, and
+   the FALLBACK will be used instead."""
 FALLBACK = windowplacement.random
 """The window placement algorithm that will be used when history placement
    does not have a place for the window."""
@@ -20,7 +25,7 @@ CONFIRM_CALLBACK = 0
 """Set this to a function to have the function called before attempting to
    place a window via history. If the function returns a non-zero, then an
    attempt will be made to place the window. If it returns zero, the
-   fallback method will be directly applied instead."""
+   FALLBACK method will be directly applied instead."""
 FILENAME = 'historydb'
 """The name of the file where history data will be stored. The number of
    the screen is appended onto this filename."""
@@ -51,6 +56,7 @@ class _state:
         self.role = role
         self.x = x
         self.y = y
+        self.placed = 0
     def __eq__(self, other):
         if self.appname == other.appname and \
            self.appclass == other.appclass and \
@@ -128,8 +134,12 @@ def _place(data):
                     coords = _data[data.screen][i]
                     print "Found in history ("+str(coords.x)+","+\
                           str(coords.y)+")"
-                    data.client.move(coords.x, coords.y)
-                    return
+                    if not (DONT_DUPLICATE and coords.placed):
+                        data.client.move(coords.x, coords.y)
+                        coords.placed = 1
+                        return
+                    else:
+                        print "Already placed another window there"
                 else:
                     print "No match in history"
         except TypeError:

@@ -1,53 +1,54 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: viga X serveri küsitlemisel.\n  \
-teine akahaldur juba töötab displeil %s.\n
+# BScreen::BScreen: Erreur survenue pendant une requête adressée au serveur X.\n  \
+Un autre gestionnaire de fenêtres est déjà lancé %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: haldame displeid %d reolutsioonis 0x%lx, vörvisügavusel %d\n
+# BScreen::BScreen: Gestion de l'écran %d avec le mode visuel 0x%lx, profondeur %d\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): ei saanud laadida fonti '%s'\n
+# BScreen::LoadStyle(): Impossible de charger la police de caractères '%s'\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): ei saanud laadida vaikimisi määratud fonti.\n
+# BScreen::LoadStyle(): Impossible de charger la police de caractères initiale.\n
 $ #EmptyMenuFile
-# %s: tühi menüüfail\n
+# %s: Fichier de menu vide\n
 $ #xterm
 # xterm
 $ #Restart
-# Restart
+# Redémarrer
 $ #Exit
-# Välju
+# Sortie
 $ #EXECError
-# BScreen::parseMenuFile: [exec] viga, menüü pealkirja ja/või käsku pole määratud\n
+# BScreen::parseMenuFile: [exec] Erreur, pas de libellé de menu et/ou de commande definie\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [exit] Erreur, aucun libellé de menu défini\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] viga, menüü pealkirja ja/või failinime \
-pole määratud\n
+# BScreen::parseMenuFile: [style] Erreur, pas libellé de menu et/ou de nom de fichier\
+defini\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [config] Erreur, aucun libellé de menu défini\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] viga, failinime pole määratud\n
+# BScreen::parseMenuFile: [include] Erreur, aucun nom de fichier défini\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] viga, '%s' ei ole tavaline fail\n
+# BScreen::parseMenuFile: [include] Erreur, '%s' est un fichier invalide\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [submenu] Erreur, aucun libellé de menu défini\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [restart] Erreur, aucun libellé de menu défini\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [reconfig] Erreur, aucun libellé de menu défini\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, kataloogi pole määratud\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, aucun répertoire défini\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, '%s' pole kataloog\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, '%s' est un répertoire \
+invalide\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] viga, '%s' pole olemas\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] Erreur, '%s' est inexistant\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] viga, menüü pealkirja pole määratud\n
+# BScreen::parseMenuFile: [workspaces] Erreur, aucun libellé de menu défini\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# W: %4d x H: %4d
+# L: %4d x H: %4d
 

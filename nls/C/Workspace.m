@@ -1,4 +1,4 @@
 $set 11 #Workspace
 
 $ #DefaultNameFormat
-# Töölaud %d
+# Espace de travail %d

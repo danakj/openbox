@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: viga pixmapi loomisel\n
+# BImage::render_solid: Erreur de création de pixmap\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: viga XImage loomisel\n
+# BImage::renderXImage: Erreur de création de XImage\n
 $ #UnsupVisual
-# BImage::renderXImage: toeta visuaal\n
+# BImage::renderXImage: Mode visuel non supporté\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: viga pixmapi loomisel\n
+# BImage::renderPixmap: Erreur de création de pixmap\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: vale värvipaletti suurus %d (%d/%d/%d) - vähendame\n
+# BImageControl::BImageControl: Taille de la palette de couleurs invalide%d (%d/%d/%d) - coupe\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: viga värvipaletti määramisel \n
+# BImageControl::BImageControl: Erreur d'allocation de la palette de couleurs\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: ei õnnestunud värvi määrata %d/%d/%d\n
+# BImageControl::BImageControl: Echec d'allocation de couleur %d/%d/%d\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: pixmap cache - vabastame %d pixmappi\n
+# BImageControl::~BImageControl: Cache pixmap - abandon %d pixmaps\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: cache on liiga suur, sundpuhastus\n
+# BImageControl::renderImage: Occupation du cache importante, nettoyage forcé\n
 $ #ColorParseError
-# BImageControl::getColor: viga värvi analüüsimisel: '%s'\n
+# BImageControl::getColor: Erreur de lecture de couleur: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: viga värvi määramisel: '%s'\n
+# BImageControl::getColor: Erreur d'allocation,couleur: '%s'\n

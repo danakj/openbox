@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Saada...
+# Envoie vers ...
 $ #Shade
-# Varjuta
+# Fantôme
 $ #Iconify
-# Ikoniseeri
+# Iconifie
 $ #Maximize
-# Suurenda
+# Maximise
 $ #Raise
-# Esiplaanile
+# Élève
 $ #Lower
-# Tahaplaanile
+# Abaisse
 $ #Stick
-# Kleebi
+# Épingle
 $ #KillClient
-# Killi klient
+# Massacre
 $ #Close
-# Sulge
+# Ferme

@@ -1,38 +1,40 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Konfiguratsioon
+# Options de configuration
 $ #FocusModel
-# Fookusmood
+# Mode d'attribution du clavier
 $ #WindowPlacement
-# Akende paigutamine
+# Disposition des fenêtres
 $ #ImageDithering
-# Piltide teravustamine
+# Lissage des images
 $ #OpaqueMove
-# Nähtav akende liigutamine
+# Déplacement opaque des fenêtres
 $ #FullMax
-# Üle-ekraani suurendus
+# Maximisation complète
 $ #FocusNew
-# Fookus uutele akendele
+# Clavier à la nouvelle fenêtre
 $ #FocusLast
-# Fokusseeri viimane aken
+# Clavier à la dernière fenêtre
 $ #ClickToFocus
-# Klikka fookuse saamiseks
+# Cliquer pour obtenir le clavier
 $ #SloppyFocus
-# Kaasaskäiv fookus
+# Attribution du clavier souple
 $ #AutoRaise
-# Akende esiletoomine
+# Premier plan automatique
+$ #ClickRaise
+# Cliquer pour mettre au premier plan
 $ #SmartRows
-# Arukas paigutus (read)
+# Disposition futée (Lignes)
 $ #SmartCols
-# Arukas paigutus (tulbad)
+# Disposition futée (Colonnes)
 $ #Cascade
-# Kaskaadis
+# Disposition en cascade
 $ #LeftRight
-# Vasakult paremale
+# De gauche à droite
 $ #RightLeft
-# Paremalt vasakule
+# De droite à gauche
 $ #TopBottom
-# Ülevalt alla
+# De haut en bas
 $ #BottomTop
-# Alt ülesse
+# De bas en haut

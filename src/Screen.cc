@@ -231,7 +231,7 @@ BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                   XAtom::cardinal, 0); //first workspace
 
-  workspacemenu->setItemSelected(2, True);
+  //workspacemenu->setItemSelected(2, True);
 
   toolbar = new Toolbar(this);
 
@@ -1063,14 +1063,14 @@ void BScreen::changeWorkspaceID(unsigned int id) {
   blackbox->setFocusedWindow((BlackboxWindow *) 0);
     
   current_workspace->hideAll();
-  workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
+  //workspacemenu->setItemSelected(current_workspace->getID() + 2, False);
 
   current_workspace = getWorkspace(id);
 
   xatom->setValue(getRootWindow(), XAtom::net_current_desktop,
                   XAtom::cardinal, id);
 
-  workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
+  //workspacemenu->setItemSelected(current_workspace->getID() + 2, True);
   toolbar->redrawWorkspaceLabel(True);
 
   current_workspace->showAll();

@@ -607,6 +607,11 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
   
   if (dosel && item->isSelected()) {
+    // match the text color
+    BPen pen((highlight ? style->h_text :
+              (item->isEnabled() ? style->f_text :
+               style->d_text)));
+
       XPoint pts[6];
 
       pts[0].x = sel_x + 0;
@@ -621,13 +626,14 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
       pts[3].x = 5;
       pts[3].y = -5;
       
+      
       pts[4].x = 0;
       pts[4].y = -3;
       
       pts[5].x = -5;
       pts[5].y = 5;
 
-      XFillPolygon(display, menu.frame, pen.gc(), pts, 6, Complex,
+      XFillPolygon(display, menu.frame, pen.gc(), pts, 6, Nonconvex,
                    CoordModePrevious);
   }
 

@@ -9,8 +9,8 @@ static guint translate_modifier(char *str)
     else if (!strcmp("Mod3", str)) return Mod3Mask;
     else if (!strcmp("Mod4", str) || !strcmp("W", str)) return Mod4Mask;
     else if (!strcmp("Mod5", str)) return Mod5Mask;
-    else if (!strcmp("C", str)) return ControlMask;
-    else if (!strcmp("S", str)) return ShiftMask;
+    else if (!strcmp("Control", str) || !strcmp("C", str)) return ControlMask;
+    else if (!strcmp("Shift", str) || !strcmp("S", str)) return ShiftMask;
     g_warning("Invalid modifier '%s' in binding.", str);
     return 0;
 }

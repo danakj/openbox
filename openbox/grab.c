@@ -1,3 +1,4 @@
+#include "grab.h"
 #include "openbox.h"
 #include "event.h"
 #include "xerror.h"
@@ -76,7 +77,7 @@ gboolean grab_pointer_window(gboolean grab, ObCursor cur, Window win)
     return ret;
 }
 
-int grab_server(gboolean grab)
+gint grab_server(gboolean grab)
 {
     static guint sgrabs = 0;
     if (grab) {
@@ -93,9 +94,11 @@ int grab_server(gboolean grab)
     return sgrabs;
 }
 
-void grab_startup()
+void grab_startup(gboolean reconfig)
 {
     guint i = 0;
+
+    if (reconfig) return;
 
     mask_list[i++] = 0;
     mask_list[i++] = LockMask;
@@ -108,8 +111,10 @@ void grab_startup()
     g_assert(i == MASK_LIST_SIZE);
 }
 
-void grab_shutdown()
+void grab_shutdown(gboolean reconfig)
 {
+    if (reconfig) return;
+
     while (grab_keyboard(FALSE));
     while (grab_pointer(FALSE, OB_CURSOR_NONE));
     while (grab_pointer_window(FALSE, OB_CURSOR_NONE, None));

@@ -439,6 +439,7 @@ void Blackbox::process_event(XEvent *e) {
     if ( i > 0 )
       e = &realevent;
 
+    // the pointer is on the wrong screen
     if (! e->xmotion.same_screen)
       break;
 

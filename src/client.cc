@@ -551,6 +551,7 @@ void OBClient::setDesktop(long target)
 void OBClient::setState(StateAction action, long data1, long data2)
 {
   const otk::OBProperty *property = Openbox::instance->property();
+  bool restack = false, shadestate = _shaded;
 
   if (!(action == State_Add || action == State_Remove ||
         action == State_Toggle))
@@ -606,8 +607,8 @@ void OBClient::setState(StateAction action, long data1, long data2)
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_shaded)) {
         if (_shaded) continue;
-        _shaded = true;
-        // XXX: hide the client window
+        // shade when we're all thru here
+        shadestate = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
         _skip_taskbar = true;
@@ -618,17 +619,17 @@ void OBClient::setState(StateAction action, long data1, long data2)
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (_fullscreen) continue;
         _fullscreen = true;
-        // XXX: raise the window n shit
+        restack = false;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_above)) {
         if (_above) continue;
         _above = true;
-        // XXX: raise the window n shit
+        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_below)) {
         if (_below) continue;
         _below = true;
-        // XXX: lower the window n shit
+        restack = true;
       }
 
     } else { // action == State_Remove
@@ -648,8 +649,8 @@ void OBClient::setState(StateAction action, long data1, long data2)
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_shaded)) {
         if (!_shaded) continue;
-        _shaded = false;
-        // XXX: show the client window
+        // unshade when we're all thru here
+        shadestate = false;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_skip_taskbar)) {
         _skip_taskbar = false;
@@ -660,22 +661,26 @@ void OBClient::setState(StateAction action, long data1, long data2)
                  property->atom(otk::OBProperty::net_wm_state_fullscreen)) {
         if (!_fullscreen) continue;
         _fullscreen = false;
-        // XXX: lower the window to its proper layer
+        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_above)) {
         if (!_above) continue;
         _above = false;
-        // XXX: lower the window to its proper layer
+        restack = true;
       } else if (state ==
                  property->atom(otk::OBProperty::net_wm_state_below)) {
         if (!_below) continue;
         _below = false;
-        // XXX: raise the window to its proper layer
+        restack = true;
       }
     }
   }
-  calcLayer();
-  Openbox::instance->screen(_screen)->restack(true, this); // raise
+  if (shadestate != _shaded)
+    shade(shadestate);
+  if (restack) {
+    calcLayer();
+    Openbox::instance->screen(_screen)->restack(true, this); // raise
+  }
 }
 
 

@@ -126,7 +126,6 @@ void OBFrame::adjustSize()
 {
   // XXX: only if not overridden or something!!! MORE LOGIC HERE!!
   _decorations = _client->decorations();
-  _decorations = 0xffffffff;
 
   // true/false for whether to show each element of the titlebar
   bool tit_i = false, tit_m = false, tit_s = false, tit_c = false;

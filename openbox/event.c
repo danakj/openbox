@@ -1042,9 +1042,9 @@ static void event_handle_menu(Client *client, XEvent *e)
                 if (over->parent->mouseover)
                     over->parent->mouseover(over, FALSE);
                 else
-                    menu_control_mouseover(over, FALSE);
+                    menu_control_mouseover(over, FALSE); 
+                menu_entry_render(over);
             }
-            menu_entry_render(over);
 /*
             if (top->hide)
                 top->hide(top);

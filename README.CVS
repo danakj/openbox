@@ -3,19 +3,19 @@ To build Openbox from CVS you need:
 A C Compiler (GNU GCC 3.2+ suggested)
 GNU Gettext
 GNU Autoconf 2.50+
-GNU Automake 1.6+
+GNU Automake 1.7+
 GNU Libtool
 GNU Bison 1.875+
 GNU Flex
 Xft2 library/headers (devel package) (http://www.fontconfig.org)
 Xlib library/headers (devel package)
 Pkg-Config
-Glib 2.0+
-libxml2 2.0+
+Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
+libxml2 2.0+ library/headers (devel package)
 
 Optionally, if you want to build the configuration tool (this is recommended):
-GTK+ 2.0+
-libglade 2.0+
+GTK+ 2.0+ library/headers (devel package) (http://www.gtk.org)
+libglade 2.0+ library/headers (devel package) (http://www.gnome.org)
 
 I recommend the latest version of all these packages.
 

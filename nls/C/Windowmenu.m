@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# 送り先 ...
+# Verplaatsen naar ...
 $ #Shade
-# シェード
+# Alleen titel
 $ #Iconify
-# アイコン化
+# Minimaliseren
 $ #Maximize
-# 最大化
+# Maximaliseren
 $ #Raise
-# 前面に出す
+# Voorgrond
 $ #Lower
-# 背面に下げる
+# Achtergrond
 $ #Stick
-# 居座り
+# Altijd zichtbaar
 $ #KillClient
-# 強制終了
+# Afbreken
 $ #Close
-# 終了
+# Sluiten

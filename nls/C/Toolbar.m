@@ -15,8 +15,8 @@ $ #NoStrftimeTimeFormatP
 $ #NoStrftimeTimeFormatA
 # a
 $ #ToolbarTitle
-# ツールバー
+# Werkbalk
 $ #EditWkspcName
-# 今のワークスペース名を編集
+# Wijzig naam van huidig werkblad
 $ #ToolbarPlacement
-# ツールバーの位置
+# Plaats van werkbalk

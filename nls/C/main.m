@@ -1,21 +1,21 @@
 $set 14 #main
 
 $ #RCRequiresArg
-# errore: '-rc' richiede un argomento\n
+# エラー: '-rc' オプションは引数を必要とします\n
 $ #DISPLAYRequiresArg
-# errore: '-display' richiede an argomento\n
+# エラー: '-display' オプションは引数を必要とします\n
 $ #WarnDisplaySet
-# attenzione: impossibile impostare la variabile d'ambiente 'DISPLAY'\n
+# 警告: 環境変数 'DISPLAY' を設定できませんでした\n
 $ #Usage
 # Openbox %s : (c) 2002 - 2002 Ben Jansens\n\
   \t\t\t 2001 - 2002, Sean 'Shaleh' Perry\n\n\
   \t\t\t 1997 - 2000, 2002 Brad Hughes\n\n\
-  -display <string>\t\tusa connessione display.\n\
-  -rc <string>\t\t\tusa un file risorsa alternativo.\n\
-  -version\t\t\tmostra la versione e esci.\n\
-  -help\t\t\t\tmostra questo aiuto e esci.\n\n
+  -display <string>\t\t指定ディスプレイに接続\n\
+  -rc <string>\t\t\t代りのリソースファイルを使用\n\
+  -version\t\t\tバージョン情報を表示し、終了\n\
+  -help\t\t\t\tこのヘルプを表示し、終了\n\n
 $ #CompileOptions
-# Opzioni in fase di compilazione:\n\
+# コンパイル時オプション:\n\
   Debugging\t\t\t%s\n\
   Shape:\t\t\t%s\n\
   Slit:\t\t\t\t%s\n\

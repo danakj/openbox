@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# ワークスペース
+# Werkbladen
 $ #NewWorkspace
-# 新規ワークスペース
+# Nieuw werkblad
 $ #RemoveLast
-# 末尾のワークスペースを消す
+# Verwijder laatste werkblad

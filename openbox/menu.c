@@ -142,8 +142,9 @@ void menu_entry_free(ObMenuEntry *self)
     RrAppearanceFree(self->a_item);
     RrAppearanceFree(self->a_disabled);
     RrAppearanceFree(self->a_hilite);
+    RrAppearanceFree(self->a_submenu);
     XDestroyWindow(ob_display, self->item);
-
+    XDestroyWindow(ob_display, self->submenu_pic);
     g_free(self);
 }
     
@@ -273,13 +274,17 @@ void menu_add_entry(ObMenu *menu, ObMenuEntry *entry)
 
     attrib.event_mask = ENTRY_EVENTMASK;
     entry->item = createWindow(menu->items, CWEventMask, &attrib);
+    entry->submenu_pic = createWindow(menu->items, CWEventMask, &attrib);
     XMapWindow(ob_display, entry->item);
+    XMapWindow(ob_display, entry->submenu_pic);
 
-    entry->a_item = entry->a_disabled = entry->a_hilite = NULL;
+    entry->a_item = entry->a_disabled = entry->a_hilite = entry->a_submenu
+        = NULL;
 
     menu->invalid = TRUE;
 
     g_hash_table_insert(window_map, &entry->item, menu);
+    g_hash_table_insert(window_map, &entry->submenu_pic, menu);
 }
 
 void menu_show(char *name, int x, int y, ObClient *client)
@@ -473,9 +478,21 @@ void menu_control_mouseover(ObMenuEntry *self, gboolean enter)
 
             a = screen_physical_area_monitor(self->parent->xin_area);
 
-	    if (self->submenu->size.width + x >= a->x + a->width)
-		x = self->parent->location.x - self->submenu->size.width - 
-		    ob_rr_theme->bwidth + ob_rr_theme->menu_overlap;
+	    if (self->submenu->size.width + x >= a->x + a->width) {
+                int newparentx = a->x + a->width
+                    - self->submenu->size.width
+                    - self->parent->size.width
+                    - ob_rr_theme->bwidth
+                    - ob_rr_theme->menu_overlap;
+                
+                x = a->x + a->width - self->submenu->size.width
+                    - ob_rr_theme->menu_overlap;
+                XWarpPointer(ob_display, None, None, 0, 0, 0, 0,
+                             newparentx - self->parent->location.x, 0);
+
+                menu_show_full(self->parent, newparentx,
+                               self->parent->location.y, self->parent->client);
+            }
 	    
 	    menu_show_full(self->submenu, x,
 			   self->parent->location.y + self->y,

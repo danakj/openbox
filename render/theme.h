@@ -40,6 +40,7 @@ struct _RrTheme {
     RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
     RrColor *menu_color;
+    RrColor *menu_bullet_color;
     RrColor *menu_disabled_color;
     RrColor *menu_hilite_color;
 
@@ -75,6 +76,9 @@ struct _RrTheme {
     RrPixmapMask *close_hover_mask;
     RrPixmapMask *close_disabled_mask;
     RrPixmapMask *close_pressed_mask;
+
+    RrPixmapMask *menu_bullet_mask; /* submenu pointer */
+    RrPixmapMask *menu_toggle_mask; /* menu boolean */
 
     /* global appearances */
     RrAppearance *a_disabled_focused_max;
@@ -138,6 +142,7 @@ struct _RrTheme {
     RrAppearance *a_menu_item;
     RrAppearance *a_menu_disabled;
     RrAppearance *a_menu_hilite;
+    RrAppearance *a_menu_bullet;
     RrAppearance *a_clear;
 
     RrAppearance *app_hilite_bg;
@@ -145,6 +150,7 @@ struct _RrTheme {
     RrAppearance *app_hilite_label;
     RrAppearance *app_unhilite_label;
     RrAppearance *app_icon;
+
 };
 
 RrTheme *RrThemeNew(const RrInstance *inst, gchar *theme);

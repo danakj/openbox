@@ -1,3 +1,35 @@
+/*
+ * $Header$
+ *
+ * Timed menu plugin
+ * Provides a menu from either a periodically executing process or by
+ * periodically checking the timestamp of a file and loading if it has changed.
+ *
+ * Examples:
+ * Piped timed menu:
+ * rc3:
+ *  <menu id="name" label="Piped menu" plugin="timed_menu" timeout="120"
+ *   command="obcommand.py -c bsetbg -d ~/.openbox/backgrounds/" />
+ * timeout is in seconds
+ *
+ * Output of command:
+ * <timed_menu>
+ *    <item label="GLOVE.png">
+ *       <action name="execute">
+ *          <execute>
+ *             bsetbg "/home/woodblock/.openbox/backgrounds/GLOVE.png"
+ *          </execute>
+ *       </action>
+ *    </item>
+ *  </fifo_menu>
+ *
+ * stat() menu:
+ *  <menu id="name" label="Stat menu" plugin="timed_menu" type="stat"
+ *  timeout="120" file="~/.openbox/stat_menu" />
+ * stat_menu contents: same as timed menu
+ * 
+ */
+ 
 #include <glib.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,7 +59,7 @@ typedef enum {
 typedef struct {
     Timed_Menu_Type type;
     ObTimer *timer;
-    char *command; /* for the PIPE */
+    char *command; /* command to run or file to stat() */
     char *buf; /* buffer to hold partially read menu */
     unsigned long buflen; /* how many bytes are in the buffer */
     int fd; /* file descriptor to read menu from */
@@ -43,7 +75,6 @@ void plugin_shutdown() { }
 
 void timed_menu_clean_up(ObMenu *m) {
     if (TIMED_MENU_DATA(m)->buf != NULL) {
-        fprintf(stderr, "%s", TIMED_MENU_DATA(m)->buf);
         g_free(TIMED_MENU_DATA(m)->buf);
         TIMED_MENU_DATA(m)->buf = NULL;
     }
@@ -60,8 +91,6 @@ void timed_menu_clean_up(ObMenu *m) {
         waitpid(TIMED_MENU_DATA(m)->pid, NULL, 0);
         TIMED_MENU_DATA(m)->pid = -1;
     }
-
-    TIMED_MENU_DATA(m)->mtime = 0;
 }
 
 void timed_menu_read_pipe(int fd, void *d)
@@ -109,9 +138,9 @@ void timed_menu_read_pipe(int fd, void *d)
 
         node = xmlDocGetRootElement(doc);
 
-        if (!xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
-            if ((node = parse_find_node("item", node->xmlChildrenNode)))
-                parse_menu_full(doc, node, menu, FALSE);
+        if (node &&
+            !xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
+            parse_menu_full(doc, node, menu, FALSE);
         }
 
         timed_menu_clean_up(menu);
@@ -176,9 +205,25 @@ void timed_menu_timeout_handler(ObTimer *t, void *d)
                 }
 
                 if (stat_buf.st_mtime > TIMED_MENU_DATA(data)->mtime) {
+                    xmlDocPtr doc;
+                    xmlNodePtr node;
+
                     g_warning("file changed");
                     TIMED_MENU_DATA(data)->mtime = stat_buf.st_mtime;
-                    /* TODO: parse */
+       
+                    data->invalid = TRUE;
+                    menu_clear(data);
+
+                    doc = xmlParseFile(TIMED_MENU_DATA(data)->command);
+
+                    node = xmlDocGetRootElement(doc);
+
+                    if (node &&
+                        !xmlStrcasecmp(node->name, (const xmlChar*) "timed_menu")) {
+                        parse_menu_full(doc, node, data, FALSE);
+                    }
+
+                    timed_menu_clean_up(data);
                 }
             }
         }
@@ -190,6 +235,8 @@ void *plugin_create(PluginMenuCreateData *data)
     char *id;
     char *label;
     char *timeout;
+    char *type;
+    
     Timed_Menu_Data *d;
     ObMenu *m;
     
@@ -209,9 +256,19 @@ void *plugin_create(PluginMenuCreateData *data)
                            (label != NULL ? label : ""),
                            m));
 
-    if (!parse_attr_string("command", data->node, &d->command)) {
-        d->command = g_strdup("");
-    }
+    d->type = TIMED_MENU_PIPE;
+
+    if (parse_attr_string("type", data->node, &type) &&
+        !g_strcasecmp(type, "stat")) {
+        d->type = TIMED_MENU_STAT;
+        
+        if (!parse_attr_string("file", data->node, &d->command)) {
+            d->command = g_strdup("");
+        }
+    } else
+        if (!parse_attr_string("command", data->node, &d->command)) {
+            d->command = g_strdup("");
+        }
 
     if (parse_attr_string("timeout", data->node, &timeout)) {
         char *endptr;
@@ -222,7 +279,6 @@ void *plugin_create(PluginMenuCreateData *data)
     } else
         d->timer = timer_start(600 * 1000000, &timed_menu_timeout_handler, m);
 
-    d->type = TIMED_MENU_PIPE;
     d->buf = NULL;
     d->buflen = 0;
     d->fd = -1;

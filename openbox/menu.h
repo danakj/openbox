@@ -114,9 +114,12 @@ struct _ObMenuEntry
 
     /* render stuff */
     Window item;
+    Window submenu_pic;
+    
     RrAppearance *a_item;
     RrAppearance *a_disabled;
     RrAppearance *a_hilite;
+    RrAppearance *a_submenu;
     gint y;
     gint min_w;
 } MenuEntry;

@@ -45,8 +45,9 @@ void menu_render(ObMenu *self) {
             e->a_item = RrAppearanceCopy(ob_rr_theme->a_menu_item);
             e->a_disabled = RrAppearanceCopy(ob_rr_theme->a_menu_disabled);
             e->a_hilite = RrAppearanceCopy(ob_rr_theme->a_menu_hilite);
+            e->a_submenu = RrAppearanceCopy(ob_rr_theme->a_menu_bullet);
         }
-
+        
         e->a_item->texture[0].data.text.string = e->label;
         RrMinsize(e->a_item, &e->min_w, &self->item_h);
         self->size.width = MAX(self->size.width, e->min_w);
@@ -97,11 +98,14 @@ void menu_render(ObMenu *self) {
 void menu_entry_render(ObMenuEntry *self)
 {
     ObMenu *menu = self->parent;
-    RrAppearance *a;
+    RrAppearance *a, *s = NULL;
     
     switch (self->render_type) {
     case OB_MENU_ENTRY_RENDER_TYPE_SUBMENU:
-	/* TODO: submenu mask */
+        a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item)
+            : self->a_disabled;
+        s = self->a_submenu;
+        break;
     case OB_MENU_ENTRY_RENDER_TYPE_BOOLEAN:
 	/* TODO: boolean check */
 	a = self->enabled ? (self->hilite ? self->a_hilite : self->a_item) 
@@ -119,14 +123,23 @@ void menu_entry_render(ObMenuEntry *self)
 	g_assert_not_reached(); /* unhandled rendering type */
 	break;
     }
-    ob_debug("%s %d\n", self->label, self->hilite);
 
     XMoveResizeWindow(ob_display, self->item, 0, self->y,
                       menu->size.width, menu->item_h);
-
+    XMoveResizeWindow(ob_display, self->submenu_pic, menu->size.width - ob_rr_theme->bevel - 1, self->y,
+                      8, 8);
     a->surface.parent = menu->a_items;
     a->surface.parentx = 0;
     a->surface.parenty = self->y;
 
+    if (s) {
+        s->surface.parent = a;
+        s->surface.parentx = menu->size.width - 8;
+        s->surface.parenty = 0;
+    }
+
     RrPaint(a, self->item, menu->size.width, menu->item_h);
+
+    if (s) 
+        RrPaint(s, self->submenu_pic, 8, 8);
 }

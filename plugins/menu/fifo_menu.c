@@ -1,3 +1,25 @@
+/*
+ * $Header$
+ *
+ * FFIO menu plugin
+ * Provides a menu from a FIFO located in ~/.openbox/fifo_menu/id
+ * Example:
+ * rc3:
+ *   <menu id="fonk" label="fonk" plugin="fifo_menu"></menu>
+ * Menu format
+ * <fifo_menu>
+ *    <item label="GLOVE.png">
+ *       <action name="execute">
+ *          <execute>
+ *             bsetbg "/home/woodblock/.openbox/backgrounds/GLOVE.png"
+ *          </execute>
+ *       </action>
+ *    </item>
+ *  </fifo_menu>
+ *
+ * If the attribute pid="true" is in the <menu>
+ */
+
 #include <glib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -94,8 +116,7 @@ void fifo_menu_handler(int fd, void *d) {
             
             if (node &&
                 !xmlStrcasecmp(node->name, (const xmlChar*) "fifo_menu")) {
-                if ((node = parse_find_node("item", node->xmlChildrenNode)))
-                    parse_menu_full(doc, node, menu, FALSE);
+                parse_menu_full(doc, node, menu, FALSE);
             }
             
             fifo_menu_clean_up(menu);

@@ -59,6 +59,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
     theme->a_menu_item = RrAppearanceNew(inst, 1);
     theme->a_menu_disabled = RrAppearanceNew(inst, 1);
     theme->a_menu_hilite = RrAppearanceNew(inst, 1);
+    theme->a_menu_bullet = RrAppearanceNew(inst, 1);
     theme->a_clear = RrAppearanceNew(inst, 0);
 
     theme->app_hilite_bg = RrAppearanceNew(inst, 0);
@@ -243,12 +244,16 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
                     "menu.frame.textColor", &theme->menu_color))
         theme->menu_color = RrColorNew(inst, 0xff, 0xff, 0xff);
     if (!read_color(db, inst,
+                    "menu.bullet.picColor", &theme->menu_color))
+        theme->menu_bullet_color = RrColorNew(inst, 0x00, 0x00, 0x00);
+    if (!read_color(db, inst,
                     "menu.frame.disableColor", &theme->menu_disabled_color))
         theme->menu_disabled_color = RrColorNew(inst, 0, 0, 0);
     if (!read_color(db, inst,
                     "menu.hilite.textColor", &theme->menu_hilite_color))
         theme->menu_hilite_color = RrColorNew(inst, 0, 0, 0);
 
+    
     if (read_mask(inst, "max.xbm", theme, &theme->max_mask)) {
         if (!read_mask(inst, "max_pressed.xbm", theme,
                        &theme->max_pressed_mask)) {
@@ -390,7 +395,14 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->close_pressed_mask = RrPixmapMaskCopy(theme->close_mask);
         theme->close_disabled_mask = RrPixmapMaskCopy(theme->close_mask);
         theme->close_hover_mask = RrPixmapMaskCopy(theme->close_mask);
-    }        
+    }
+
+    if (!read_mask(inst, "bullet.xbm", theme, &theme->menu_bullet_mask)) {
+        unsigned char data[] =
+            { 0x18, 0x30, 0x60, 0xfe, 0xfe, 0x60, 0x30, 0x18 };
+        theme->menu_bullet_mask = RrPixmapMaskNew(inst, 8, 8,
+                                                  (gchar *)data);
+    }
 
     /* read the decoration textures */
     if (!read_appearance(db, inst,
@@ -616,6 +628,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 
     theme->a_menu_item->surface.grad = 
         theme->a_menu_disabled->surface.grad =
+        theme->a_menu_bullet->surface.grad =
         theme->app_icon->surface.grad = RR_SURFACE_PARENTREL;
 
     theme->a_menu_item->texture[0].type =
@@ -632,6 +645,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->menu_disabled_color;
     theme->a_menu_hilite->texture[0].data.text.color =
         theme->menu_hilite_color;
+    theme->a_menu_bullet->texture[0].data.mask.color =
+        theme->menu_bullet_color;
 
     theme->a_disabled_focused_max->texture[0].type = 
         theme->a_disabled_unfocused_max->texture[0].type = 
@@ -678,7 +693,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_focused_unpressed_iconify->texture[0].type = 
         theme->a_focused_pressed_iconify->texture[0].type = 
         theme->a_unfocused_unpressed_iconify->texture[0].type = 
-        theme->a_unfocused_pressed_iconify->texture[0].type = RR_TEXTURE_MASK;
+        theme->a_unfocused_pressed_iconify->texture[0].type =
+        theme->a_menu_bullet->texture[0].type = RR_TEXTURE_MASK;
+    
     theme->a_disabled_focused_max->texture[0].data.mask.mask = 
         theme->a_disabled_unfocused_max->texture[0].data.mask.mask = 
         theme->max_disabled_mask;
@@ -863,6 +880,7 @@ void RrThemeFree(RrTheme *theme)
         RrPixmapMaskFree(theme->close_disabled_mask);
         RrPixmapMaskFree(theme->close_hover_mask);
         RrPixmapMaskFree(theme->close_pressed_mask);
+        RrPixmapMaskFree(theme->menu_bullet_mask);
 
         RrFontClose(theme->winfont);
         RrFontClose(theme->mtitlefont);

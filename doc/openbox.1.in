@@ -109,8 +109,10 @@ On exit or restart, Openbox will save user defaults in the file
 in the user's home directory.
 Some resources in this file can be edited by hand.
 .SH USING OPENBOX
-From version 0.60.x, Openbox does no keyboard handling by itself; instead, it
-relies on an external program
+Openbox does no keyboard handling by itself; instead, it relies on an external
+program
+.IR epist (1)
+or
 .IR bbkeys (1)
 for this.
 So, in this section, we will discuss all mouse commands.

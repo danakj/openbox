@@ -9,13 +9,13 @@ extern "C" {
 #include <X11/Xlib.h>
 }
 
-#include <string>
-
 #include "client.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
 #include "otk/style.hh"
+
+#include <string>
 
 namespace ob {
 

@@ -27,7 +27,7 @@ using std::string;
 #include "blackbox.hh"
 #include "otk/font.hh"
 #include "otk/display.hh"
-#include "screen.hh"
+#include "bbscreen.hh"
 #include "otk/util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"

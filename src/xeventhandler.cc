@@ -13,7 +13,7 @@
 
 // XXX: REMOVE THIS SOON!!#!
 #include "blackbox.hh"
-#include "screen.hh"
+#include "bbscreen.hh"
 
 extern "C" {
 #include <X11/Xlib.h>

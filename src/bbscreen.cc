@@ -54,7 +54,7 @@ extern "C" {
 #include <string>
 using std::string;
 
-#include "screen.hh"
+#include "bbscreen.hh"
 #include "otk/font.hh"
 #include "otk/gccache.hh"
 #include "otk/image.hh"

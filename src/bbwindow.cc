@@ -27,7 +27,7 @@ extern "C" {
 #include "font.hh"
 #include "gccache.hh"
 #include "image.hh"
-#include "screen.hh"
+#include "bbscreen.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"
 

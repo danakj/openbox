@@ -5,7 +5,7 @@
 #endif
 
 #include "client.hh"
-#include "screen.hh"
+#include "bbscreen.hh"
 #include "openbox.hh"
 #include "otk/display.hh"
 #include "otk/property.hh"

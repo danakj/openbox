@@ -79,7 +79,7 @@ using std::string;
 #include "otk/gccache.hh"
 #include "otk/image.hh"
 #include "otk/assassin.hh"
-#include "screen.hh"
+#include "bbscreen.hh"
 #include "otk/util.hh"
 #include "bbwindow.hh"
 #include "workspace.hh"

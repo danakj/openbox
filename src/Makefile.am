@@ -15,7 +15,7 @@ bin_PROGRAMS= openbox3
 
 openbox3_LDADD=../otk/libotk.a @LIBINTL@
 
-openbox3_SOURCES= client.cc frame.cc screen.cc openbox.cc \
+openbox3_SOURCES= client.cc frame.cc bbscreen.cc openbox.cc \
                  bbwindow.cc workspace.cc blackbox.cc \
                  main.cc xeventhandler.cc
 

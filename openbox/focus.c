@@ -526,9 +526,8 @@ void focus_cycle(gboolean forward, gboolean linear,
     if (cancel) {
         focus_cycle_target = NULL;
         goto done_cycle;
-    } else if (done && dialog) {
+    } else if (done)
         goto done_cycle;
-    }
 
     if (!focus_order[screen_desktop])
         goto done_cycle;
@@ -588,9 +587,8 @@ void focus_directional_cycle(ObDirection dir,
     if (cancel) {
         focus_cycle_target = NULL;
         goto done_cycle;
-    } else if (done && dialog) {
+    } else if (done)
         goto done_cycle;
-    }
 
     if (!focus_order[screen_desktop])
         goto done_cycle;

@@ -223,7 +223,6 @@ void event_process(XEvent *e)
             !(e->xfocus.detail == NotifyNonlinearVirtual ||
               e->xfocus.detail == NotifyNonlinear))
             return;
-        g_message("FOCUS IN %lx", window);
         break;
     case FocusOut:
 	if (e->xfocus.mode == NotifyGrab ||
@@ -236,13 +235,10 @@ void event_process(XEvent *e)
         {
             XEvent fi;
             if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
-                g_message("FOCUS OUT %lx IN %lx", e->xfocus.window, fi.xfocus.window);
 		event_process(&fi);
 
                 if (fi.xfocus.window == e->xfocus.window)
                     return;
-	    } else {
-                g_message("FOCUS OUT %lx IN 0x0", e->xfocus.window);
             }
         }
 	break;

@@ -54,9 +54,13 @@ void parser::parse(string rc_file)
 
   yyin = fopen(rc_file.c_str(), "r");
 
-  yyparse(this);
+  if (yyin) {
+    yyparse(this);
+    fclose(yyin);
+  } else {
+    std::cerr << "ERROR: Configuration file could not be opened/found.\n";
+  }
 
-  fclose(yyin);
   _kt->reset();
   _kt->initialize();
 }

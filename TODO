@@ -3,12 +3,15 @@ Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
 * Add XEventHandler class to make event handling better than ever!
 
 * Crazy dope support for dockapps. Fully mimic window maker's handling of them.
+  - no, nm this. wmaker is poo.
 
 * reorganization of class model. Add XWidget class (contains an X drawable).
+  - using C, no longer using Xlib wrapping classes.
 
 * key/mouse/action bindings
-* handle keyboard input natively instead of relying on an external progra
+* handle keyboard input natively instead of relying on an external program
 * remappable bindings for keyboard input and for mouse input.
+  - done.
 
 * break the themeing into a replaceable plugin/script of some form and possibly
   also for the bindings.

@@ -8,6 +8,7 @@
 #include "focus.h"
 #include "extensions.h"
 #include "gettext.h"
+#include "grab.h"
 #include "engine.h"
 #include "themerc.h"
 #include "plugin.h"
@@ -137,11 +138,13 @@ int main(int argc, char **argv)
 	screen_startup();
 	focus_startup();
 	client_startup();
+        grab_startup();
         plugin_startup();
 
         /* XXX load all plugins!! */
         plugin_open("focus");
         plugin_open("keyboard");
+        plugin_open("mouse");
 
 	/* get all the existing windows */
 	client_manage_all();
@@ -154,7 +157,8 @@ int main(int argc, char **argv)
 
 	client_unmanage_all();
 
-        plugin_shutdown();
+        plugin_shutdown(); /* calls all the plugins' shutdown functions */
+        grab_shutdown();
 	client_shutdown();
 	screen_shutdown();
 	event_shutdown();

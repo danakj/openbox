@@ -108,22 +108,27 @@ static void resist_move(Client *c, int *x, int *y)
         }
 
     /* get the screen boundaries */
-    area = screen_area_xinerama(c->desktop, client_xinerama_area(c));
+    for (i = 0; i < screen_num_xin_areas; ++i) {
+        area = screen_area_xinerama(c->desktop, i);
 
-    al = area->x;
-    at = area->y;
-    ar = al + area->width - 1;
-    ab = at + area->height - 1;
+        if (!RECT_INTERSECTS_RECT(*area, c->frame->area))
+            continue;
 
-    /* snap to screen edges */
-    if (cl >= al && l < al && l >= al - resistance)
-        *x = al;
-    else if (cr <= ar && r > ar && r <= ar + resistance)
-        *x = ar - w + 1;
-    if (ct >= at && t < at && t >= at - resistance)
-        *y = at;
-    else if (cb <= ab && b > ab && b < ab + resistance)
-        *y = ab - h + 1;
+        al = area->x;
+        at = area->y;
+        ar = al + area->width - 1;
+        ab = at + area->height - 1;
+
+        /* snap to screen edges */
+        if (cl >= al && l < al && l >= al - resistance)
+            *x = al;
+        else if (cr <= ar && r > ar && r <= ar + resistance)
+            *x = ar - w + 1;
+        if (ct >= at && t < at && t >= at - resistance)
+            *y = at;
+        else if (cb <= ab && b > ab && b < ab + resistance)
+            *y = ab - h + 1;
+    }
 }
 
 static void resist_size(Client *c, int *w, int *h, Corner corn)

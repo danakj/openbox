@@ -225,11 +225,11 @@ int main(int argc, char **argv)
             focus_startup(reconfigure);
             window_startup(reconfigure);
             sn_startup(reconfigure);
-            moveresize_startup(reconfigure);
             screen_startup(reconfigure);
             group_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
+            moveresize_startup(reconfigure);
             keyboard_startup(reconfigure);
             mouse_startup(reconfigure);
             menu_startup(reconfigure);
@@ -261,12 +261,12 @@ int main(int argc, char **argv)
             menu_shutdown(reconfigure);
             mouse_shutdown(reconfigure);
             keyboard_shutdown(reconfigure);
+            moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
             group_shutdown(reconfigure);
             screen_shutdown(reconfigure);
             focus_shutdown(reconfigure);
-            moveresize_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             window_shutdown(reconfigure);
             grab_shutdown(reconfigure);

@@ -399,7 +399,8 @@ static void layout_title(Frame *self)
     n = d = i = l = m = c = s = FALSE;
 
     /* figure out whats being shown, and the width of the label */
-    self->label_width = self->width - (ob_theme->bevel + 1) * 2;
+    self->label_width = self->width -
+        (ob_theme->bwidth + ob_theme->bevel + 1) * 2;
     for (lc = ob_theme->title_layout; *lc != '\0'; ++lc) {
 	switch (*lc) {
 	case 'N':

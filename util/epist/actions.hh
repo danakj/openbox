@@ -6,14 +6,29 @@ enum ActionType {
   raiseWindow,
   lowerWindow,
   closeWindow,
-  changeDesktop,
   shade,
   moveWindowUp,
   moveWindowDown,
-  moveLeft,
-  moveRight,
+  moveWindowLeft,
+  moveWindowRight,
   nextWindow,
   prevWindow,
+
+  nextWindow,
+  prevWindow,
+  nextWindowOnAllDesktops,
+  prevWindowOnAllDesktops,
+
+  nextWindowOfClass,
+  prevWindowOfClass,
+
+  changeDesktop,
+  nextDesktop,
+  prevDesktop,
+
+  // these are openbox extensions
+  showRootMenu,
+  showWorkspaceMenu,
 
   stringChain, 
   keyChain,

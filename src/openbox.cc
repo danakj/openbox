@@ -88,8 +88,9 @@ Openbox::Openbox(int argc, char **argv)
   Openbox::instance = this;
 
   _displayreq = (char*) 0;
-  _argv0 = argv[0];
-  _doshutdown = false;
+  _argv = argv;
+  _shutdown = false;
+  _restart = false;
   _rcfilepath = otk::expandTilde("~/.openbox/rc3");
   _scriptfilepath = otk::expandTilde("~/.openbox/user.py");
   _focused_client = 0;
@@ -172,6 +173,8 @@ Openbox::~Openbox()
 {
   _state = State_Exiting; // time to kill everything
 
+  int first_screen = _screens.front()->number();
+  
   std::for_each(_screens.begin(), _screens.end(), otk::PointerAssassin());
 
   delete _bindings;
@@ -188,6 +191,20 @@ Openbox::~Openbox()
   // the shutdown process unblocks it. blackbox simply did a ::exit(0), so
   // all im gunna do is the same.
   //otk::OBDisplay::destroy();
+
+  if (_restart) {
+    if (!_restart_prog.empty()) {
+      const std::string &dstr =
+        otk::OBDisplay::screenInfo(first_screen)->displayString();
+      putenv(const_cast<char *>(dstr.c_str()));
+      execlp(_restart_prog.c_str(), _restart_prog.c_str(), NULL);
+      perror(_restart_prog.c_str());
+    }
+    
+    // fall back in case the above execlp doesn't work
+    execvp(_argv[0], _argv);
+    execvp(otk::basename(_argv[0]).c_str(), _argv);
+  }
 }
 
 
@@ -256,7 +273,7 @@ void Openbox::showHelp()
   -menu <string>     use alternate menu file.\n\
   -script <string>   use alternate startup script file.\n\
   -version           display version and exit.\n\
-  -help              display this help text and exit.\n\n"), _argv0);
+  -help              display this help text and exit.\n\n"), _argv[0]);
 
   printf(_("Compile time options:\n\
   Debugging: %s\n\
@@ -285,10 +302,10 @@ void Openbox::showHelp()
 
 void Openbox::eventLoop()
 {
-  while (!_doshutdown) {
+  while (!_shutdown) {
+    _timermanager.fire();
     dispatchEvents(); // from OtkEventDispatcher
     XFlush(otk::OBDisplay::display); // flush here before we go wait for timers
-    _timermanager.fire();
   }
 }
 

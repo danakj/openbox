@@ -101,14 +101,12 @@ string itostring(long i) {
   return tmp;
 }
 
-}
-
-#ifndef   HAVE_BASENAME
 string basename (const string& path) {
   string::size_type slash = path.rfind('/');
   if (slash == string::npos)
     return path;
   return path.substr(slash+1);
 }
-#endif // HAVE_BASENAME
+
+}
 

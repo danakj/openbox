@@ -1309,6 +1309,36 @@ static PyObject *_wrap_Openbox_shutdown(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_Openbox_restart(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::Openbox *arg1 = (ob::Openbox *) 0 ;
+    std::string const &arg2_defvalue = "" ;
+    std::string *arg2 = (std::string *) &arg2_defvalue ;
+    std::string temp2 ;
+    PyObject * obj0  = 0 ;
+    PyObject * obj1  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O|O:Openbox_restart",&obj0,&obj1)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Openbox,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    if (obj1) {
+        {
+            if (PyString_Check(obj1)) {
+                temp2 = std::string(PyString_AsString(obj1));
+                arg2 = &temp2;
+            }else {
+                SWIG_exception(SWIG_TypeError, "string expected");
+            }
+        }
+    }
+    (arg1)->restart((std::string const &)*arg2);
+    
+    Py_INCREF(Py_None); resultobj = Py_None;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyObject *_wrap_Openbox_execute(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Openbox *arg1 = (ob::Openbox *) 0 ;
@@ -1371,6 +1401,23 @@ static PyObject *_wrap_OBScreen_clientCount(PyObject *self, PyObject *args) {
     if(!PyArg_ParseTuple(args,(char *)"O:OBScreen_clientCount",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
     result = (int)ob_OBScreen_clientCount((ob::OBScreen const *)arg1);
+    
+    resultobj = PyInt_FromLong((long)result);
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
+static PyObject *_wrap_OBScreen_number(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
+    int result;
+    PyObject * obj0  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"O:OBScreen_number",&obj0)) goto fail;
+    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
+    result = (int)((ob::OBScreen const *)arg1)->number();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -2626,10 +2673,12 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_setFocusedClient", _wrap_Openbox_setFocusedClient, METH_VARARGS },
 	 { (char *)"Openbox_focusedScreen", _wrap_Openbox_focusedScreen, METH_VARARGS },
 	 { (char *)"Openbox_shutdown", _wrap_Openbox_shutdown, METH_VARARGS },
+	 { (char *)"Openbox_restart", _wrap_Openbox_restart, METH_VARARGS },
 	 { (char *)"Openbox_execute", _wrap_Openbox_execute, METH_VARARGS },
 	 { (char *)"Openbox_swigregister", Openbox_swigregister, METH_VARARGS },
 	 { (char *)"OBScreen_client", _wrap_OBScreen_client, METH_VARARGS },
 	 { (char *)"OBScreen_clientCount", _wrap_OBScreen_clientCount, METH_VARARGS },
+	 { (char *)"OBScreen_number", _wrap_OBScreen_number, METH_VARARGS },
 	 { (char *)"OBScreen_managed", _wrap_OBScreen_managed, METH_VARARGS },
 	 { (char *)"OBScreen_imageControl", _wrap_OBScreen_imageControl, METH_VARARGS },
 	 { (char *)"OBScreen_area", _wrap_OBScreen_area, METH_VARARGS },

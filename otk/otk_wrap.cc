@@ -12800,7 +12800,7 @@ static PyObject *_wrap_basename(PyObject *self, PyObject *args) {
             SWIG_exception(SWIG_TypeError, "string expected");
         }
     }
-    result = basename((std::string const &)*arg1);
+    result = otk::basename((std::string const &)*arg1);
     
     {
         resultobj = PyString_FromString((&result)->c_str());

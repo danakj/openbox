@@ -91,8 +91,8 @@ private:
   std::string _scriptfilepath;
   //! The display requested by the user, or null to use the DISPLAY env var
   char *_displayreq;
-  //! The value of argv[0], i.e. how this application was executed
-  char *_argv0;
+  //! The value of argv, i.e. how this application was executed
+  char **_argv;
 
   //! A list of all managed clients
   ClientMap _clients;
@@ -131,7 +131,15 @@ private:
   Cursors _cursors;
 
   //! When set to true, the Openbox::eventLoop function will stop and return
-  bool _doshutdown;
+  bool _shutdown;
+
+  //! When set to true, and Openbox is about to exit, it will spawn a new
+  //! process
+  bool _restart;
+
+  //! If this contains anything, a restart will try to execute the program in
+  //! this variable, and will fallback to reexec'ing itself if that fails
+  std::string _restart_prog;
 
   //! The client with input focus
   /*!
@@ -239,7 +247,11 @@ public:
     Causes the Openbox::eventLoop function to stop looping, so that the window
     manager can be destroyed.
   */
-  inline void shutdown() { _doshutdown = true; }
+  inline void shutdown() { _shutdown = true; }
+
+  inline void restart(const std::string &bin = "") {
+    _shutdown = true; _restart = true; _restart_prog = bin;
+  }
 
   //! Executes a command on a screen
   void execute(int screen, const std::string &bin);

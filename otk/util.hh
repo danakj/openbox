@@ -40,10 +40,9 @@ inline std::string itostring(unsigned int i)
 inline std::string itostring(int i)
   { return itostring((long) i); }
 
-}
 
-#ifndef   HAVE_BASENAME
 std::string basename(const std::string& path);
-#endif
+
+}
 
 #endif

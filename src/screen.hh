@@ -119,6 +119,8 @@ public:
   virtual ~OBScreen();
 #endif
 
+  inline int number() const { return _number; }
+  
   //! Returns if the screen was successfully managed
   /*!
     If this is false, then the screen should be deleted and should NOT be

@@ -61,6 +61,9 @@ def resize(data):
 def execute(bin, screen = 0):
     Openbox_execute(openbox, screen, bin)
 
+def restart(data):
+    Openbox_restart(openbox, "")
+
 def toggle_shade(data):
     print "toggle_shade"
 

@@ -2,7 +2,7 @@
 
 CXXFLAGS= @CXXFLAGS@
 
-SUBDIRS = 		epist
+#SUBDIRS = 		epist
 bin_SCRIPTS = 		bsetbg
 bin_PROGRAMS =		bsetroot xftlsfonts
 

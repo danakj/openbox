@@ -2,8 +2,5 @@ epist
 Makefile.in
 Makefile
 .deps
-lex.yy.c
-yacc_parser.cc
-yacc_parser.hh
 epist.1
 epistrc.5

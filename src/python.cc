@@ -28,7 +28,7 @@ void python_init(char *argv0)
   init_ob();
   // prepend the openbox directories for python scripts to the sys path
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString("sys.path.insert('0, " SCRIPTDIR "')");
+  PyRun_SimpleString("sys.path.insert(0, '" SCRIPTDIR "')");
   PyRun_SimpleString(const_cast<char*>(("sys.path.insert(0, '" +
                                         otk::expandTilde("~/.openbox/python") +
                                         "')").c_str()));

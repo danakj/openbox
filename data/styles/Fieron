@@ -1,0 +1,139 @@
+style.author:	miklos
+style.date:	Sept. 9, 2002
+
+rootCommand: bsetbg -solid "#474e56"
+
+! Toolbar settings...
+toolbar.button.pressed: flatborder gradient vertical
+toolbar.button.pressed.colorTo: #44657f
+toolbar.button.pressed.color: #699cc6
+toolbar.button.pressed.borderColor: #181f24
+toolbar.button.picColor:	#25252d
+
+toolbar.button:	flatborder gradient vertical
+toolbar.button.color:	#d1d9db
+toolbar.button.colorTo: #616568
+toolbar.button.borderColor: #25252d
+
+toolbar.windowLabel:	flatborder gradient vertical
+toolbar.windowLabel.color:	#699cc6
+toolbar.windowLabel.colorTo:	#44657f
+toolbar.windowLabel.borderColor: #25252d
+toolbar.windowLabel.textColor:	#acd5eb
+
+toolbar.label: parentrelative
+toolbar.label.textColor:	#2c4559
+
+toolbar.clock: parentrelative
+toolbar.clock.textColor:	#2c4559
+
+toolbar: flat gradient vertical
+toolbar.colorTo: #767677
+toolbar.color:	#e4e8e9
+
+toolbar.xft.font: tahoma
+toolbar.xft.size: 9
+toolbar.justify:	center
+
+
+! Menu settings...
+menu.frame: flat gradient crossdiagonal
+menu.frame.color:	#e4e8e9
+menu.frame.colorTo: #767677
+menu.frame.borderColor: #181f24
+menu.frame.textColor:	#2c4559
+
+menu.frame.xft.font: tahoma
+menu.frame.xft.size: 9
+menu.frame.justify:	left
+
+menu.title:	flatborder gradient vertical
+menu.title.color:	#5f7a8f
+menu.title.colorTo: #4d6070
+menu.title.borderColor: #c4c8c9
+menu.title.textColor:	#1c2f40
+
+menu.title.xft.font: tahoma
+menu.title.xft.size: 9
+menu.title.justify:	center
+
+menu.hilite:	Flatborder gradient vertical
+menu.hilite.colorTo:	#44657f
+menu.hilite.color: #699cc6
+menu.hilite.borderColor: #c4c8c9
+menu.hilite.textColor:	#acd5db
+
+menu.bullet:	diamond
+menu.bullet.position:	Right
+menu.frame.disableColor:	#ffffff
+
+! Window settings...
+window.button.focus: flatborder gradient vertical
+window.button.focus.color: #d1d9db
+window.button.focus.colorTo: #616568
+window.button.borderColor: #25252d
+
+window.button.unfocus: flatborder gradient vertical
+window.button.unfocus.color: #5f7a8f
+window.button.unfocus.colorTo: #4d6070
+window.button.unfocus.borderColor: #1c2f40
+window.button.unfocus.picColor: #1c2f40
+
+window.grip.focus:	flat gradient vertical
+window.grip.focus.color:	#699cc6
+window.grip.focus.colorTo: #44657f
+window.grip.focus.borderColor: #1c2f40
+
+window.grip.unfocus: flat gradient vertical
+window.grip.unfocus.color:	#5f7a8f
+window.grip.unfocus.colorTo: #4d6070
+
+window.handle.focus:	flat gradient vertical
+window.handle.focus.color:	#d1d9db
+window.handle.focus.colorTo: #616568
+window.handle.focus.borderColor: #1c2f40
+
+window.handle.unfocus:	flat gradient vertical
+window.handle.unfocus.color:	#6f8a9f
+window.handle.unfocus.colorTo: #5d7080
+
+window.label.focus:	flatborder gradient vertical
+window.label.focus.color:  #699cc6
+window.label.focus.colorTo:  #44657f
+window.label.focus.borderColor: #25252d
+window.label.focus.textColor:  #acd5eb
+
+
+
+window.xft.font: verdana
+window.xft.size: 9
+window.justify:	center
+
+window.label.unfocus:	flatborder gradient vertical
+window.label.unfocus.color:	#6f8a9f
+window.label.unfocus.colorTo:	#5d7080
+window.label.unfocus.textColor: #2c4559
+window.label.unfocus.borderColor: #25252d
+
+window.title.focus:	flat gradient vertical
+window.title.focus.colorTo: #767677
+window.title.focus.color:  #e4e8e9
+window.title.focus.borderColor: #25252d
+
+window.title.unfocus:	flat gradient vertical
+window.title.unfocus.color:	#5f788f
+window.title.unfocus.colorTo: #406070
+
+window.button.pressed:	flatborder gradient vertical
+window.button.pressed.colorTo:	#44657f
+window.button.pressed.color:	#699cc6
+
+window.frame.focusColor:	#c4c8c9
+window.frame.unfocusColor:	#6f8a9f
+handleWidth:	5
+frameWidth:	1
+bevelWidth:	1
+borderWidth:	1
+borderColor:	#25252d
+
+

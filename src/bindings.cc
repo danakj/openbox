@@ -386,11 +386,8 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
   for (it = _buttons[context].begin(); it != end; ++it)
     if ((*it)->binding.key == b.key &&
         (*it)->binding.modifiers == b.modifiers) {
-      ButtonBinding::CallbackList::iterator c_it,
-        c_end = (*it)->callback[action].end();
-      for (c_it = (*it)->callback[action].begin(); c_it != c_end; ++c_it)
-        if (*c_it == callback)
-          return true; // already bound
+      if ((*it)->callback[action] == callback)
+        return true; // already bound
       break;
     }
 
@@ -402,11 +399,11 @@ bool OBBindings::addButton(const std::string &but, MouseContext context,
     bind->binding.key = b.key;
     bind->binding.modifiers = b.modifiers;
     _buttons[context].push_back(bind);
-    printf("adding %d.%d to %d\n", b.key, b.modifiers, context);
     // XXX GRAB the new button everywhere!
   } else
     bind = *it;
-  bind->callback[action].push_back(callback);
+  Py_XDECREF(bind->callback[action]); // if it was already bound, unbind it
+  bind->callback[action] = callback;
   Py_INCREF(callback);
   return true;
 }
@@ -450,10 +447,8 @@ void OBBindings::fire(ButtonData *data)
   for (it = _buttons[data->context].begin(); it != end; ++it)
     if ((*it)->binding.key == data->button &&
         (*it)->binding.modifiers == data->state) {
-      ButtonBinding::CallbackList::iterator c_it,
-        c_end = (*it)->callback[data->action].end();
-      for (c_it = (*it)->callback[data->action].begin(); c_it != c_end; ++c_it)
-        python_callback(*c_it, (PyObject*)data);
+      if ((*it)->callback[data->action])
+        python_callback((*it)->callback[data->action], (PyObject*)data);
     }
 }
 

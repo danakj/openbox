@@ -80,9 +80,6 @@ private:
   //! Shape the frame window to the client window
   void adjustShape();
 
-  //! Grabs or ungrabs buttons on the frame
-  void grabButtons(bool grab);
-  
 public:
   //! Constructs an OBFrame object, and reparents the client to itself
   /*!

@@ -52,9 +52,9 @@ typedef struct KeyBindingTree {
 
 typedef struct ButtonBinding {
   Binding binding;
-  typedef std::list<PyObject*> CallbackList;
-  CallbackList callback[NUM_MOUSE_ACTION];
+  PyObject *callback[NUM_MOUSE_ACTION];
   ButtonBinding() : binding(0, 0) {
+    for(int i=0; i<NUM_MOUSE_ACTION; ++i) callback[i] = 0;
   }
 };
 

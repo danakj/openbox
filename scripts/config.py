@@ -17,18 +17,10 @@ theme = "/usr/local/share/openbox/styles/nyz"
 ### behaviors.                                                            ###
 #############################################################################
 
-# click_focus - '1' if clicking in a client will cause it to focus in the
-#               default hook functions; else '0'.
-click_focus = 0
-# click_raise - '1' if clicking in a client will cause it to raise to the
-#               top of its stacking layer; else '0'.
-click_raise = 0
-# enter_focus - '1' if entering a client window will cause it to focus in the
-#               default hook functions; else '0'.
-enter_focus = 1
-# leave_unfocus - '1' if leaving a client window will cause it to unfocus in
-#                 the default hook functions; else '0'.
-leave_unfocus = 1
+# resize_nearest - 1 to resize from the corner nearest where the mouse is, 0
+#                  to resize always from the bottom right corner
+resize_nearest = 1
+
 
 
 print "Loaded config.py"

@@ -91,7 +91,7 @@ typedef struct TextureText {
     ObFont *font;
     Justify justify;
     int shadow;
-    unsigned char tint;
+    char tint;
     unsigned char offset;
     color_rgb *color;
     char *string;

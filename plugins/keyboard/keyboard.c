@@ -131,37 +131,37 @@ static void binddef()
        at call-time when then action function is used.
     */
 
-    list->data = "C-Right";
+    list->data = "A-Right";
     a = action_new(action_next_desktop);
     a->data.nextprevdesktop.wrap = TRUE;
     kbind(list, a);
 
-    list->data = "C-Left";
+    list->data = "A-Left";
     a = action_new(action_previous_desktop);
     a->data.nextprevdesktop.wrap = TRUE;
     kbind(list, a);
 
-    list->data = "C-1";
+    list->data = "A-1";
     a = action_new(action_desktop);
     a->data.desktop.desk = 0;
     kbind(list, a);
 
-    list->data = "C-2"; 
+    list->data = "A-2"; 
     a = action_new(action_desktop);
     a->data.desktop.desk = 1;
     kbind(list, a);
 
-    list->data = "C-3";
+    list->data = "A-3";
     a = action_new(action_desktop);
     a->data.desktop.desk = 2;
     kbind(list, a);
 
-    list->data = "C-4";
+    list->data = "A-4";
     a = action_new(action_desktop);
     a->data.desktop.desk = 3;
     kbind(list, a);
 
-    list->data = "C-space";
+    list->data = "A-space";
     a = action_new(action_execute);
     a->data.execute.path = g_strdup("xterm");
     kbind(list, a);

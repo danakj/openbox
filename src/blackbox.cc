@@ -717,10 +717,14 @@ void Blackbox::process_event(XEvent *e) {
         BlackboxWindow *win = searchWindow(e->xclient.window);
 
         if (win) {
+          BScreen *screen = win->getScreen();
+
           if (win->isIconic())
             win->deiconify(False, True);
           if (win->isShaded())
             win->shade();
+          if (win->getWorkspaceNumber() != screen->getCurrentWorkspaceID())
+            screen->changeWorkspaceID(win->getWorkspaceNumber());
           if (win->isVisible() && win->setInputFocus()) {
             win->getScreen()->getWorkspace(win->getWorkspaceNumber())->
               raiseWindow(win);

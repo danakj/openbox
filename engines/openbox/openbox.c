@@ -12,8 +12,8 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-#define TITLE_HEIGHT    (s_winfont_height + s_bevel * 2)
 #define LABEL_HEIGHT    (s_winfont_height)
+#define TITLE_HEIGHT    (LABEL_HEIGHT + s_bevel * 2)
 #define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
 		         f->cbwidth)
 #define BUTTON_SIZE     (LABEL_HEIGHT - 2)
@@ -636,7 +636,7 @@ static void layout_title(ObFrame *self)
     if (self->label_width < 1) self->label_width = 1;
 
     XResizeWindow(ob_display, self->label, self->label_width,
-                  s_winfont_height);
+                  LABEL_HEIGHT);
   
     if (!n) {
 	self->frame.client->decorations &= ~Decor_Icon;

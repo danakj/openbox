@@ -410,7 +410,7 @@ static void parse_menu(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         if ((n = parse_find_node("hideDelay", node)))
             config_menu_hide_delay = parse_int(doc, n);
         if ((n = parse_find_node("desktopMenuIcons", node)))
-            config_menu_client_list_icons = parse_int(doc, n);
+            config_menu_client_list_icons = parse_bool(doc, n);
     }
 }
    

@@ -9,23 +9,27 @@
 
 void plugin_setup_config()
 {
+    ConfigValue val;
+
     config_def_set(config_def_new("focus.followMouse", Config_Bool,
                                   "Focus Follows Mouse",
                                   "Focus windows when the mouse pointer "
                                   "enters them."));
+    val.bool = TRUE;
+    config_set("focus.followMouse", Config_Bool, val);
     config_def_set(config_def_new("focus.focusNew", Config_Bool,
                                   "Focus New Windows",
                                   "Focus windows when they first appear "));
+    val.bool = TRUE;
+    config_set("focus.focusNew", Config_Bool, val);
+/*
     config_def_set(config_def_new("focus.warpOnDeskSwitch", Config_Bool,
                                   "Warp Pointer On Desktop Switch",
                                   "Warps the pointer to the focused window "
                                   "when switching desktops."));
+    config_set("focus.warpOnDeskSwitch", Config_Bool, FALSE);
+*/
 }
-
-/* config options */
-static gboolean follow_mouse = TRUE;
-static gboolean warp_on_desk_switch = FALSE;
-static gboolean focus_new = TRUE;
 
 /*static int skip_enter = 0;*/
 
@@ -85,7 +89,7 @@ static void focus_fallback(gboolean switching_desks)
 
                 chew_enter_events();
 
-                if (warp_on_desk_switch) {
+                if (FALSE /*warp_on_desk_switch*/) {
                     /* I have to do this warp twice! Otherwise windows dont get
                        Enter/Leave events when i warp on a desktop switch! */
                     XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
@@ -113,9 +117,16 @@ static void focus_desktop()
 
 static void event(ObEvent *e, void *foo)
 {
+    ConfigValue follow_mouse, focus_new;
+    gboolean r;
+    
+    r = config_get("focus.followMouse", Config_Bool, &follow_mouse);
+    g_assert(r);
+
     switch (e->type) {
     case Event_Client_Mapped:
-        if (focus_new && client_normal(e->data.c.client))
+        r = config_get("focus.focusNew", Config_Bool, &focus_new);
+        if (focus_new.bool && client_normal(e->data.c.client))
             client_focus(e->data.c.client);
         break;
 
@@ -123,7 +134,7 @@ static void event(ObEvent *e, void *foo)
         if (ob_state == State_Exiting) break;
 
         if (client_focused(e->data.c.client))
-            if (!follow_mouse || !focus_under_pointer())
+            if (!follow_mouse.bool || !focus_under_pointer())
                 focus_fallback(FALSE);
         break;
 
@@ -131,7 +142,7 @@ static void event(ObEvent *e, void *foo)
         /* focus the next available target if moving from the current
            desktop. */
         if ((unsigned)e->data.c.num[1] == screen_desktop)
-            if (!follow_mouse || !focus_under_pointer())
+            if (!follow_mouse.bool || !focus_under_pointer())
                 focus_fallback(FALSE);
 
     case Event_Ob_Desktop:
@@ -140,7 +151,7 @@ static void event(ObEvent *e, void *foo)
 
     case Event_Ob_ShowDesktop:
         if (!e->data.o.num[0]) { /* hiding the desktop, showing the clients */
-            if (!follow_mouse || !focus_under_pointer())
+            if (!follow_mouse.bool || !focus_under_pointer())
                 focus_fallback(TRUE);
         } else /* hiding clients, showing the desktop */
             focus_desktop();

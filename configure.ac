@@ -3,9 +3,6 @@ AC_INIT([src/main.cc])
 AC_CONFIG_HEADERS(config.h)
 AC_LANG(C++)
 
-# Determine build target
-OB_DEBUG
-
 AM_INIT_AUTOMAKE([openbox], [2.90.0cvs])
 
 test "$prefix" = "NONE" && prefix="$ac_default_prefix"
@@ -14,6 +11,8 @@ AC_PATH_PROG([regex_cmd], [sed])
 test "$regex_cmd" || AC_MSG_ERROR([sed not found])
 
 AM_MAINTAINER_MODE
+# Determine build target
+OB_DEBUG
 # Pick compiler specific/build target flags
 OB_COMPILER_FLAGS
 

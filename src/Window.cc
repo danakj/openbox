@@ -1218,9 +1218,11 @@ void BlackboxWindow::getWMNormalHints(void) {
     client.max_aspect_x = client.max_aspect_y = 1;
 #endif
 
-  // set no limit to how big a window can be by default
+  // don't limit the size of a window, the default max width is the biggest
+  // possible
   client.max_width = (unsigned) -1;
   client.max_height = (unsigned) -1;
+
 
   if (! XGetWMNormalHints(blackbox->getXDisplay(), client.window,
                           &sizehint, &icccm_mask))
@@ -3619,34 +3621,42 @@ void BlackboxWindow::doResize(int x_root, int y_root) {
 
   unsigned int gw, gh;
   Corner anchor;
+  int dx, dy; // the amount of change in the size of the window
 
   switch (resize_dir) {
   case BottomLeft:
     anchor = TopRight;
-    frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
-                           frame.rect.height() + (y_root - frame.grab_y));
+    dx = - (x_root - frame.grab_x);
+    dy = + (y_root - frame.grab_y);
     break;
   case BottomRight:
     anchor = TopLeft;
-    frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
-                           frame.rect.height() + (y_root - frame.grab_y));
+    dx = + (x_root - frame.grab_x);
+    dy = + (y_root - frame.grab_y);
     break;
   case TopLeft:
     anchor = BottomRight;
-    frame.changing.setSize(frame.rect.width() - (x_root - frame.grab_x),
-                           frame.rect.height() - (y_root - frame.grab_y));
+    dx = - (x_root - frame.grab_x);
+    dy = - (y_root - frame.grab_y);
     break;
   case TopRight:
     anchor = BottomLeft;
-    frame.changing.setSize(frame.rect.width() + (x_root - frame.grab_x),
-                           frame.rect.height() - (y_root - frame.grab_y));
+    dx = + (x_root - frame.grab_x);
+    dy = - (y_root - frame.grab_y);
     break;
 
   default:
     assert(false); // unhandled Corner
     return;        // unreachable, for the compiler
   }
-  
+
+  // make sure the user cant resize the window smaller than 0, which makes it
+  // wrap around and become huge
+  if (dx < -(signed)client.rect.width()) dx = -(signed)client.rect.width();
+  if (dy < -(signed)client.rect.height()) dy = -(signed)client.rect.height();
+
+  frame.changing.setSize(frame.rect.width() + dx, frame.rect.height() + dy);
+
   constrain(anchor, &gw, &gh);
 
   XDrawRectangle(blackbox->getXDisplay(), screen->getRootWindow(),

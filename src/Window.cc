@@ -57,6 +57,7 @@ extern "C" {
 #include "Window.hh"
 #include "Windowmenu.hh"
 #include "Workspace.hh"
+#include "Slit.hh"
 
 using std::string;
 using std::abs;
@@ -3089,15 +3090,40 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
       Workspace *w = screen->getWorkspace(getWorkspaceNumber());
       assert(w);
 
-      // try snap to another window
-      for (unsigned int i = 0, c = w->getCount(); i < c; ++i) {
-        BlackboxWindow *snapwin = w->getWindow(i);
-        if (snapwin == this)
-          continue;   // don't snap to self
+      RectList winsnaplist;
 
+      // try snap to another window
+
+      // add windows on the workspace to the snap list
+      const BlackboxWindowList& stack_list = w->getStackingList();
+      BlackboxWindowList::const_iterator st_it, st_end = stack_list.end();
+      for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
+        winsnaplist.push_back( (*st_it)->frameRect() );
+
+      // add the toolbar and the slit to the snap list.
+      // (only if they are not hidden)
+      Toolbar *tbar = screen->getToolbar();
+      Slit *slit = screen->getSlit();
+      Rect tbar_rect, slit_rect;
+      unsigned int bwidth = screen->getBorderWidth() * 2;
+
+      if (! (screen->doHideToolbar() || tbar->isHidden())) {
+        tbar_rect.setRect(tbar->getX(), tbar->getY(), tbar->getWidth() + bwidth,
+                          tbar->getHeight() + bwidth);
+        winsnaplist.push_back(tbar_rect);
+      }
+
+      if (! slit->isHidden()) {
+        slit_rect.setRect(slit->getX(), slit->getY(), slit->getWidth() + bwidth,
+                          slit->getHeight() + bwidth);
+        winsnaplist.push_back(slit_rect);
+      }
+
+      RectList::const_iterator it, end = winsnaplist.end();
+      for (it = winsnaplist.begin(); it != end; ++it) {
         bool snapped = False;
         
-        const Rect &winrect = snapwin->frameRect();
+        const Rect &winrect = *it;
         int dleft = abs(wright - winrect.left()),
            dright = abs(wleft - winrect.right()),
              dtop = abs(wbottom - winrect.top()),
@@ -3165,27 +3191,15 @@ void BlackboxWindow::doMove(int x_root, int y_root) {
 
     RectList snaplist; // the list of rects we will try to snap to
 
-    // snap to the strut (and screen boundaries for xinerama)
+    // snap to the screen edges (and screen boundaries for xinerama)
 #ifdef    XINERAMA
     if (screen->isXineramaActive() && blackbox->doXineramaSnapping()) {
-      if (! screen->doFullMax())
-        snaplist.insert(snaplist.begin(),
-                        screen->allAvailableAreas().begin(),
-                        screen->allAvailableAreas().end());
-
-      // always snap to the screen edges
       snaplist.insert(snaplist.begin(),
                       screen->getXineramaAreas().begin(),
                       screen->getXineramaAreas().end());
     } else
 #endif // XINERAMA
-    {
-      if (! screen->doFullMax())
-        snaplist.push_back(screen->availableArea());
-
-      // always snap to the screen edges
       snaplist.push_back(screen->getRect());
-    }
 
     RectList::const_iterator it, end = snaplist.end();
     for (it = snaplist.begin(); it != end; ++it) {

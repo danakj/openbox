@@ -1,12 +1,16 @@
 Changelog for Openbox:
-2.2.0
- * Bitmap buttons					(Scott Moynes)
+
+2.1.1:
+ * A build fix for xftlsfonts.                          (Scott Moynes)
+
+ * Add a configuration menu for changing Xft font       (Ben Jansens)
+   options, when Xft is compiled in.
 
 2.1.0:
- * make alt-right-click resizing work on bottom window  (Ben Jansens)
+ * Make alt-right-click resizing work on bottom window  (Ben Jansens)
    handles.
 
- * drop shadows for fonts, optional. (dropShadowFonts   (Ben Jansens)
+ * Drop shadows for fonts, optional. (dropShadowFonts   (Ben Jansens)
    in the rc file).
 
  * GNOME 2 Support. (Fixed problems with Gnome 2        (Ben Jansens)

@@ -105,6 +105,22 @@ private:
   };
 #endif // XINERAMA
 
+#ifdef    XFT
+  class Xftmenu : public Basemenu {
+  private:
+    Xftmenu(const Xftmenu&);
+    Xftmenu& operator=(const Xftmenu&);
+
+  protected:
+    virtual void itemSelected(int button, unsigned int index);
+    virtual void setValues(void);
+
+  public:
+    Xftmenu(Configmenu *cm);
+    virtual void reconfigure(void);
+  };
+#endif // XFT
+
   Focusmenu *focusmenu;
   Placementmenu *placementmenu;
   WindowToWindowSnapmenu *windowsnapmenu;
@@ -112,6 +128,9 @@ private:
 #ifdef    XINERAMA
   Xineramamenu *xineramamenu;
 #endif // XINERAMA
+#ifdef    XFT
+  Xftmenu *xftmenu;
+#endif // XFT
 
 //  friend class Focusmenu;
 //  friend class Placementmenu;
@@ -134,6 +153,9 @@ public:
 #ifdef    XINERAMA
   inline Basemenu *getXineramamenu(void) { return xineramamenu; }
 #endif // XINERAMA
+#ifdef    XFT
+  inline Basemenu *getXftmenu(void) { return xftmenu; }
+#endif // XFT
 
   virtual void reconfigure(void);
 };

@@ -61,22 +61,12 @@ struct Strut;
 
 enum TextJustify { LeftJustify = 1, RightJustify, CenterJustify };
 
-#ifdef    BITMAPBUTTONS
-struct PixmapMask {
-  Pixmap mask;
-  unsigned int w, h;
-};
-#endif // BITMAPBUTTONS
-
 struct WindowStyle {
   BColor l_text_focus, l_text_unfocus, b_pic_focus,
     b_pic_unfocus;
   BTexture f_focus, f_unfocus, t_focus, t_unfocus, l_focus, l_unfocus,
     h_focus, h_unfocus, b_focus, b_unfocus, b_pressed, g_focus, g_unfocus;
 
-#ifdef    BITMAPBUTTONS
-  PixmapMask close_button, max_button, icon_button, stick_button;
-#endif // BITMAPBUTTONS
   BFont *font;
 
   TextJustify justify;
@@ -89,10 +79,6 @@ struct ToolbarStyle {
   BColor l_text, w_text, c_text, b_pic;
   BTexture toolbar, label, window, button, pressed, clock;
 
-#ifdef    BITMAPBUTTONS
-  PixmapMask left_button, right_button;
-#endif // BITMAPBUTTONS
-  
   BFont *font;
 
   TextJustify justify;
@@ -104,11 +90,7 @@ struct ToolbarStyle {
 struct MenuStyle {
   BColor t_text, f_text, h_text, d_text;
   BTexture title, frame, hilite;
-  
-#ifdef    BITMAPBUTTONS
-  PixmapMask bullet_image, tick_image;
-#endif // BITMAPBUTTONS
-  
+
   BFont *t_font, *f_font;
 
   TextJustify t_justify, f_justify;
@@ -198,12 +180,6 @@ private:
 
   bool parseMenuFile(FILE *file, Rootmenu *menu);
 
-#ifdef    BITMAPBUTTONS
-  void readDatabaseMask(const std::string &rname,
-                        PixmapMask &pixmapMask,
-                        const Configuration &style);
-#endif // BITMAPBUTTONS
-  
   BTexture readDatabaseTexture(const std::string &rname,
                                const std::string &default_color,
                                const Configuration &style);
@@ -272,7 +248,7 @@ public:
   inline Slit *getSlit(void) { return slit; }
   inline Toolbar *getToolbar(void) { return toolbar; }
 
-  Workspace *getWorkspace(unsigned int index);
+  Workspace *getWorkspace(unsigned int index) const;
 
   inline Workspace *getCurrentWorkspace(void) { return current_workspace; }
 
@@ -397,9 +373,9 @@ public:
   void reassociateWindow(BlackboxWindow *w, unsigned int wkspc_id,
                          bool ignore_sticky);
   void propagateWindowName(const BlackboxWindow *bw);
-  void prevFocus(void);
-  void nextFocus(void);
-  void raiseFocus(void);
+  void prevFocus(void) const;
+  void nextFocus(void) const;
+  void raiseFocus(void) const;
   void load_rc(void);
   void save_rc(void);
   void reconfigure(void);

@@ -72,3 +72,9 @@ $ #XineramaMaximizing
 # Window Maximizing
 $ #XineramaSnapping
 # Window Snapping
+$ #XftOptions
+# Xft Font Options
+$ #XftAA
+# Anti-Alias Text
+$ #XftShadow
+# Drop Shadows Under Text

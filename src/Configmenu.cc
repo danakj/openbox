@@ -33,7 +33,7 @@
 #include "Screen.hh"
 
 Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
-  setLabel(i18n(ConfigmenuSet, ConfigmenuConfigOptions, "Config options"));
+  setLabel(i18n(ConfigmenuSet, ConfigmenuConfigOptions, "Config Options"));
   setInternalMenu();
 
   focusmenu = new Focusmenu(this);
@@ -43,6 +43,9 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 #ifdef    XINERAMA
   xineramamenu = new Xineramamenu(this);
 #endif // XINERAMA
+#ifdef    XFT
+  xftmenu = new Xftmenu(this);
+#endif // XFT
 
   insert(i18n(ConfigmenuSet, ConfigmenuFocusModel,
               "Focus Model"), focusmenu);
@@ -55,6 +58,10 @@ Configmenu::Configmenu(BScreen *scr) : Basemenu(scr) {
 #ifdef    XINERAMA
   insert(i18n(ConfigmenuSet, ConfigmenuXineramaSupport,
               "XineramaSupport"), xineramamenu);
+#endif // XINERAMA
+#ifdef    XFT
+  insert(i18n(ConfigmenuSet, ConfigmenuXftOptions,
+              "Xft Font Options"), xftmenu);
 #endif // XINERAMA
   insert(i18n(ConfigmenuSet, ConfigmenuImageDithering,
               "Image Dithering"), 1);
@@ -82,6 +89,9 @@ void Configmenu::setValues(void) {
 #ifdef    XINERAMA
   ++index;
 #endif // XINERAMA
+#ifdef    XFT
+  ++index;
+#endif // XFT
   setItemSelected(index++, getScreen()->doImageDither());
   setItemSelected(index++, getScreen()->doOpaqueMove());
   setItemSelected(index++, getScreen()->doWorkspaceWarping());
@@ -101,6 +111,9 @@ Configmenu::~Configmenu(void) {
 #ifdef    XINERAMA
   delete xineramamenu;
 #endif // XINERAMA
+#ifdef    XFT
+  delete xftmenu;
+#endif // XFT
 }
 
 
@@ -167,6 +180,9 @@ void Configmenu::reconfigure(void) {
 #ifdef    XINERAMA
   xineramamenu->reconfigure();
 #endif // XINERAMA
+#ifdef    XFT
+  xftmenu->reconfigure();
+#endif // XFT
 
   Basemenu::reconfigure();
 }
@@ -546,3 +562,54 @@ void Configmenu::Xineramamenu::itemSelected(int button, unsigned int index) {
   }
 }
 #endif // XINERAMA
+
+#ifdef    XFT
+Configmenu::Xftmenu::Xftmenu(Configmenu *cm):
+  Basemenu(cm->getScreen()) {
+  setLabel(i18n(ConfigmenuSet, ConfigmenuXftOptions, "Xft Font Options"));
+  setInternalMenu();
+
+  insert(i18n(ConfigmenuSet, ConfigmenuXftAA, "Anti-Alias Text"), 1);
+  insert(i18n(ConfigmenuSet, ConfigmenuXftShadow, "Drop Shadows Under Text"),
+         2);
+
+  update();
+  setValues();
+}
+
+
+void Configmenu::Xftmenu::setValues(void) {
+  setItemSelected(0, getScreen()->doAAFonts());
+  setItemEnabled(1, getScreen()->doAAFonts());
+  setItemSelected(1, getScreen()->doShadowFonts());
+}
+
+
+void Configmenu::Xftmenu::reconfigure(void) {
+  setValues();
+  Basemenu::reconfigure();
+}
+
+
+void Configmenu::Xftmenu::itemSelected(int button, unsigned int index) {
+  if (button != 1)
+    return;
+
+  BasemenuItem *item = find(index);
+
+  if (! item->function())
+    return;
+
+  switch (item->function()) {
+  case 1: // anti-alias text
+    getScreen()->saveAAFonts(! getScreen()->doAAFonts());
+    break;
+
+  case 2: // drop shadows
+    getScreen()->saveShadowFonts(! getScreen()->doShadowFonts());
+    break;
+  }
+
+  setValues();
+}
+#endif // XFT

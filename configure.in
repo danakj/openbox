@@ -1,7 +1,7 @@
 dnl configure.in for Openbox
 dnl Initialize autoconf and automake
 AC_INIT(src/blackbox.cc)
-AM_INIT_AUTOMAKE(openbox,2.2.0,no-define)
+AM_INIT_AUTOMAKE(openbox,2.1.1,no-define)
 
 dnl Determine default prefix
 test x$prefix = "xNONE" && prefix="$ac_default_prefix"
@@ -249,25 +249,6 @@ if test x$TIMEDCACHE = "xyes"; then
   AC_DEFINE(TIMEDCACHE,1,Use timed pixmap cache)
 fi
 
-dnl Check for bitmapped buttons
-BITMAPBUTTONS=""
-AC_MSG_CHECKING([whether to include bitmappable buttons])
-AC_ARG_ENABLE(
-  bitmap-buttons,
-[  --enable-bitmap-buttons include bitmappable buttons [default=yes]],
-  if test x$enableval = "xyes"; then
-    AC_MSG_RESULT([yes])
-    BITMAPBUTTONS="yes"
-  else
-    AC_MSG_RESULT([no])
-  fi,
-  AC_MSG_RESULT([yes])
-  BITMAPBUTTONS="yes"
-)
-if test x$BITMAPBUTTONS = "xyes"; then
-  AC_DEFINE(BITMAPBUTTONS,1,Include bitmappable buttons)
-fi
-
 dnl Determine the return type of signal handlers
 AC_TYPE_SIGNAL
 
@@ -305,6 +286,7 @@ nls/hu_HU/Makefile
 nls/it_IT/Makefile
 nls/ja_JP/Makefile
 nls/ko_KR/Makefile
+nls/lv_LV/Makefile
 nls/no_NO/Makefile
 nls/pl_PL/Makefile
 nls/nl_NL/Makefile

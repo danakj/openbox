@@ -1,5 +1,5 @@
-#include "widget.hh"
 #include "focuswidget.hh"
+#include "button.hh"
 #include "display.hh"
 #include "configuration.hh"
 #include "timerqueuemanager.hh"
@@ -22,10 +22,10 @@ int main(void) {
   my_style->load(style_conf);
 
   otk::OtkFocusWidget foo(my_style);
-  otk::OtkFocusWidget iconb(&foo);
+  otk::OtkButton iconb(&foo);
   otk::OtkFocusWidget label(&foo);
-  otk::OtkFocusWidget maxb(&foo);
-  otk::OtkFocusWidget closeb(&foo);
+  otk::OtkButton maxb(&foo);
+  otk::OtkButton closeb(&foo);
 
   foo.setBevelWidth(2);
   foo.setDirection(otk::OtkWidget::Vertical);
@@ -35,9 +35,8 @@ int main(void) {
   foo.setUnfocusTexture(my_style->getTitleUnfocus());
 
   // fixed size
-  iconb.resize(15, 15);
-  iconb.setTexture(my_style->getButtonFocus());
-  iconb.setUnfocusTexture(my_style->getButtonUnfocus());
+  iconb.setText("foo");
+  iconb.press();
 
   // fix width to 60 and let the height be calculated by its parent
   label.setWidth(60);
@@ -46,17 +45,14 @@ int main(void) {
   label.setUnfocusTexture(my_style->getLabelUnfocus());
 
   // fixed size
-  maxb.resize(15, 15);
-  maxb.setTexture(my_style->getButtonFocus());
-  maxb.setUnfocusTexture(my_style->getButtonUnfocus());
+  maxb.setText("bar");
 
   // fixed size
-  closeb.resize(15, 15);
-  closeb.setTexture(my_style->getButtonFocus());
-  closeb.setUnfocusTexture(my_style->getButtonUnfocus());
+  closeb.setText("fuubar");
 
   // will recursively unfocus its children
   //foo.unfocus();
+  foo.update();
   foo.show();
 
   while (1) {

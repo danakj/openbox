@@ -32,7 +32,6 @@ void dock_startup()
                                 CWOverrideRedirect | CWEventMask,
                                 &attrib);
     dock->a_frame = appearance_copy(theme_a_unfocused_title);
-    XSetWindowBorder(ob_display, dock->frame, theme_b_color->pixel);
     XSetWindowBorderWidth(ob_display, dock->frame, theme_bwidth);
 
     g_hash_table_insert(window_map, &dock->frame, dock);

@@ -482,9 +482,11 @@ void screen_install_colormap(Client *client, gboolean install)
 
     if (client == NULL) {
 	if (install)
-	    XInstallColormap(ob_display, render_colormap);
+	    XInstallColormap(ob_display,
+                             DefaultColormap(ob_display, ob_screen));
 	else
-	    XUninstallColormap(ob_display, render_colormap);
+	    XUninstallColormap(ob_display,
+                               DefaultColormap(ob_display, ob_screen));
     } else {
 	if (XGetWindowAttributes(ob_display, client->window, &wa) &&
             wa.colormap != None) {

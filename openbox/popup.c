@@ -99,10 +99,10 @@ void popup_show(Popup *self, char *text, Icon *icon)
         self->bg = XCreateWindow(ob_display, ob_root,
                                  0, 0, 1, 1, 0, render_depth, InputOutput,
                                  render_visual, CWOverrideRedirect, &attrib);
-
+/*
         XSetWindowBorderWidth(ob_display, self->bg, theme_bwidth);
         XSetWindowBorder(ob_display, self->bg, theme_b_color->pixel);
-
+*/
         self->text = XCreateWindow(ob_display, self->bg,
                                    0, 0, 1, 1, 0, render_depth, InputOutput,
                                    render_visual, 0, NULL);

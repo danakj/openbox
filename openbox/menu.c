@@ -163,13 +163,13 @@ Menu *menu_new_full(char *label, char *name, Menu *parent,
     attrib.event_mask = TITLE_EVENTMASK;
     self->title = createWindow(self->frame, CWEventMask, &attrib);
     self->items = createWindow(self->frame, 0, &attrib);
-
+/*
     XSetWindowBorderWidth(ob_display, self->frame, theme_bwidth);
     XSetWindowBackground(ob_display, self->frame, theme_b_color->pixel);
     XSetWindowBorderWidth(ob_display, self->title, theme_bwidth);
     XSetWindowBorder(ob_display, self->frame, theme_b_color->pixel);
     XSetWindowBorder(ob_display, self->title, theme_b_color->pixel);
-
+*/
     XMapWindow(ob_display, self->title);
     XMapWindow(ob_display, self->items);
 

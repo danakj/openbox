@@ -15,7 +15,7 @@ using std::cout;
 using std::endl;
 
 int main(int argc, char **argv) {
-  if (argc > 1) {
+  if (argc > 1)
     for (int i = 1; i < argc; ++i)
       if (string(argv[i]) == "-help" ||
           string(argv[i]) == "--help" ||
@@ -24,16 +24,48 @@ int main(int argc, char **argv) {
         cout << NAME << " version " << VERSION << endl;
         cout << "Copyright (c) 2002, Ben Jansens <ben@orodu.net>" << endl;
         cout << endl;
+        cout << "Usage: " << argv[0] << " [options]" << endl;
+        cout << "    -style     Show possible styles for each font" << endl;
+        cout << "    -slant     Show the slant for each font" << endl;
+        cout << "    -weight    Show the weight for each font" << endl;
+        cout << "    -file      Show which files contain each font" << endl;
+        cout << endl;
         return 1;
       }
-  }
 
   Display *display = XOpenDisplay(NULL);
 
-  XftFontSet *set = XftListFonts(display, DefaultScreen(display),
-                                 0, XFT_FAMILY, 0);
+  XftObjectSet *obj = XftObjectSetCreate();
+  if (! obj) {
+    cout << "Failed to create an XftObjectSet\n";
+    exit(2);
+  }
 
-  cout << "Found " << set->nfont << " fonts:" << endl;
+  XftObjectSetAdd(obj, XFT_FAMILY);
+
+  if (argc > 1)
+    for (int i = 1; i < argc; ++i) {
+      if (string(argv[i]) == "-style") XftObjectSetAdd(obj, XFT_STYLE);
+      else if (string(argv[i]) == "-file") XftObjectSetAdd(obj, XFT_FILE);
+      else if (string(argv[i]) == "-slant") XftObjectSetAdd(obj, XFT_SLANT);
+      else if (string(argv[i]) == "-weight") XftObjectSetAdd(obj, XFT_WEIGHT);
+    }
+
+  XftPattern *pat = XftPatternCreate();
+  if (! pat) {
+    cout << "Failed to create an XftPattern\n";
+    exit(2);
+  }
+
+  XftFontSet *set = XftListFontsPatternObjects(display, DefaultScreen(display),
+                                               pat, obj);
+  if (! set) {
+    cout << "Failed to find a matching XftFontSet\n";
+    exit(2);
+  }
+ 
+  XFree(pat);
+  XFree(obj);
 
   for (int i = 0; i < set->nfont; ++i) {
     for (int e = 0; e < set->fonts[i]->num; ++e) {
@@ -85,6 +117,8 @@ int main(int argc, char **argv) {
       cout << endl;
     }
   }
+  
+  cout << endl << "Found " << set->nfont << " matches." << endl;
 
   XFree(set);
   

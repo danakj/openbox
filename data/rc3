@@ -42,7 +42,7 @@ theme = "ebox"
 # amount of resistance to provide at edges (for resistance module)
 #resistance = 10
 
-# reistancee against other windows (for resistance module)
+# resistance against other windows (for resistance module)
 #resistance.windows = yes
 
 # the distance a drag must go before it is recognized

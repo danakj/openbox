@@ -7,6 +7,7 @@
 %}
 
 %include "stl.i"
+%include "typemaps.i"
 //%include std_list.i
 %include "ustring.i"
 
@@ -63,9 +64,12 @@ namespace otk {
 %include "button.hh"
 %include "display.hh"
 %include "rendercontrol.hh"
-%include "property.hh"
 %include "screeninfo.hh"
 %include "strut.hh"
+
+%apply unsigned long *INOUT { unsigned long *nelements };
+%apply unsigned long *OUTPUT { unsigned long *value };
+%include "property.hh"
 
 // for Window etc
 %import "X11/X.h"

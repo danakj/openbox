@@ -236,19 +236,18 @@ BaseDisplay::BaseDisplay(const char *app_name, const char *dpy_name) {
   shape.extensions = False;
 #endif // SHAPE
 
-  xinerama.extensions = False;
 #ifdef    XINERAMA
   if (XineramaQueryExtension(display, &xinerama.event_basep,
-                             &xinerama.error_basep)) {
-    if (XineramaQueryVersion(display, &xinerama.major,
-                             &xinerama.minor)) {
+                             &xinerama.error_basep) &&
+      XineramaQueryVersion(display, &xinerama.major, &xinerama.minor)) {
 #ifdef    DEBUG
-      fprintf(stderr,
-              "BaseDisplay::BaseDisplay: Found Xinerama version %d.%d\n",
-              xinerama.major, xinerama.minor);
+    fprintf(stderr,
+            "BaseDisplay::BaseDisplay: Found Xinerama version %d.%d\n",
+            xinerama.major, xinerama.minor);
 #endif // DEBUG
-      xinerama.extensions = True;
-    }
+    xinerama.extensions = True;
+  } else {
+    xinerama.extensions = False;
   }
 #endif // XINERAMA
 

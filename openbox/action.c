@@ -800,6 +800,7 @@ void action_execute(union ActionData *data)
                 g_warning("failed to execute '%s': %s",
                           cmd, e->message);
             }
+            g_free(cmd);
         } else {
             g_warning("failed to convert '%s' from utf8", data->execute.path);
         }

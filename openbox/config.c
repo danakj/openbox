@@ -390,6 +390,8 @@ void config_shutdown()
 
     g_free(config_theme);
 
+    g_free(config_title_layout);
+
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);
     g_slist_free(config_desktops_names);

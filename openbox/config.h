@@ -58,6 +58,8 @@ extern gint config_resize_popup_pos;
 extern ObStackingLayer config_dock_layer;
 /*! Is the dock floating */
 extern gboolean config_dock_floating;
+/*! Don't use a strut for the dock */
+extern gboolean config_dock_nostrut;
 /*! Where to place the dock if not floating */
 extern ObDirection config_dock_pos;
 /*! If config_dock_floating, this is the top-left corner's

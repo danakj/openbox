@@ -49,6 +49,7 @@ gint     config_resize_popup_pos;
 
 ObStackingLayer config_dock_layer;
 gboolean        config_dock_floating;
+gboolean        config_dock_nostrut;
 ObDirection     config_dock_pos;
 gint            config_dock_x;
 gint            config_dock_y;
@@ -363,7 +364,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_dock_y = parse_int(doc, n);
     } else {
         if ((n = parse_find_node("noStrut", node)))
-            config_dock_floating = parse_bool(doc, n);
+            config_dock_nostrut = parse_bool(doc, n);
     }
     if ((n = parse_find_node("stacking", node))) {
         if (parse_contains("top", doc, n))
@@ -574,6 +575,7 @@ void config_startup(ObParseInst *i)
     config_dock_layer = OB_STACKING_LAYER_ABOVE;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
     config_dock_floating = FALSE;
+    config_dock_nostrut = FALSE;
     config_dock_x = 0;
     config_dock_y = 0;
     config_dock_orient = OB_ORIENTATION_VERT;

@@ -2,6 +2,7 @@
   * Fixed some typos and errors in rc.xsd
   * Add the noStrut option to the dock (to allow maximizing windows over it),
     useful when it is not in the above layer.
+  * Fix transparent terminals not updating when using ToggleDecor.
 
 3.3-rc1:
   * Poked around a bit in the code that keeps windows onscreen, if you

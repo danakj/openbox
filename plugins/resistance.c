@@ -162,6 +162,8 @@ static void resist_size(Client *c, int *w, int *h, Corner corn)
     /* snap to other windows */
     if (resist_windows) {
         for (it = stacking_list; it != NULL; it = it->next) {
+            if (!WINDOW_IS_CLIENT(it->data))
+                continue;
             target = it->data;
 
             /* don't snap to invisibles or ourself */

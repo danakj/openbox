@@ -49,7 +49,7 @@ State    ob_state;
 gboolean ob_shutdown = FALSE;
 gboolean ob_restart  = FALSE;
 char    *ob_restart_path = NULL;
-gboolean ob_remote   = FALSE;
+gboolean ob_remote   = TRUE;
 gboolean ob_sync     = FALSE;
 Cursors  ob_cursors;
 char    *ob_rc_path  = NULL;

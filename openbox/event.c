@@ -219,30 +219,37 @@ void event_process(XEvent *e)
 	event_lasttime = e->xproperty.time;
 	break;
     case FocusIn:
+	if (e->xfocus.mode == NotifyGrab) return;
+/* 	if (e->type == FocusIn && window == focus_backup && focus_client != NULL) {
+*/
+            /* Something's focused but we got a focus event for the backup
+               window. this means that something unfocused before we received
+               the new FocusIn. Just ignore it, and refocus what should be
+               focused! */
+/*            client_focus(focus_client);
+            return;
+        }
+*/
+        break;
     case FocusOut:
-	if (e->xfocus.mode == NotifyGrab)
+	if (e->xfocus.mode == NotifyGrab) return;
 	    /*|| e.xfocus.mode == NotifyUngrab ||*/
-	       
 	    /* From Metacity, from WindowMaker, ignore all funky pointer
 	       root events. Its commented out cuz I don't think we need this
 	       at all. If problems arise we can look into it */
 	    /*e.xfocus.detail > NotifyNonlinearVirtual) */
-	    return; /* skip me! */
-	if (e->type == FocusOut) {
-	    /* FocusOut events just make us look for FocusIn events. They
-	       are mostly ignored otherwise. */
-	    XEvent fi;
-	    if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
+
+        /* FocusOut events just make us look for FocusIn events. They
+           are mostly ignored otherwise. */
+        {
+            XEvent fi;
+            if (XCheckTypedEvent(ob_display, FocusIn, &fi)) {
 		event_process(&fi);
 		/* dont unfocus the window we just focused! */
 		if (fi.xfocus.window == e->xfocus.window)
 		    return;
 	    }
-	} else if (window == focus_backup && focus_client != NULL)
-            /* Something's focused but we got a focus event for the backup
-               window. this means that something unfocused before we received
-               the new FocusIn. Just ignore it. */
-               return;
+        }
 	break;
     case EnterNotify:
     case LeaveNotify:

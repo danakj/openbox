@@ -159,9 +159,8 @@ Bindings::~Bindings()
   if (_timer)
     delete _timer;
 
-  grabKeys(false);
   removeAllKeys();
-//  removeAllButtons(); XXX
+  //removeAllButtons(); // this is done by each client as they are unmanaged
   removeAllEvents();
 }
 

@@ -61,10 +61,10 @@ static void focus_cycle_destructor(ObClient *client, gpointer data)
 }
 
 static Window createWindow(Window parent, gulong mask,
-			   XSetWindowAttributes *attrib)
+                           XSetWindowAttributes *attrib)
 {
     return XCreateWindow(ob_display, parent, 0, 0, 1, 1, 0,
-			 RrDepth(ob_rr_inst), InputOutput,
+                         RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
                        
 }
@@ -252,7 +252,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         if (old->transient_for) {
             gboolean trans = FALSE;
 
-            if (!config_focus_follow)
+            if (!config_focus_follow || config_focus_last)
                 trans = TRUE;
             else {
                 if ((target = client_under_pointer()) &&
@@ -289,7 +289,7 @@ ObClient* focus_fallback_target(ObFocusFallbackType type)
         }
     }
 
-    if (config_focus_follow) {
+    if (config_focus_follow && !config_focus_last) {
         if ((target = client_under_pointer()))
             if (client_normal(target) && client_can_focus(target))
                 return target;

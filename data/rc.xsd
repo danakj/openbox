@@ -71,6 +71,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="focusNew" type="ob:yesorno"/>
+            <xs:element name="focusLast" type="ob:yesorno"/>
             <xs:element name="followMouse" type="ob:yesorno"/>
             <xs:element name="focusDelay" type="xs:integer"/>
             <xs:element name="raiseOnFocus" type="ob:yesorno"/>
@@ -100,6 +101,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="firstdesk" type="xs:integer"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="resize">

@@ -16,6 +16,7 @@
 <focus>
   <focusNew>yes</focusNew>
   <followMouse>no</followMouse>
+  <focusLast>no</focusLast>
   <focusDelay>0</focusDelay>
   <raiseOnFocus>no</raiseOnFocus>
 </focus>
@@ -31,6 +32,7 @@
 
 <desktops>
   <number>4</number>
+  <firstdesk>1</firstdesk>
   <names>
     <name>one</name>
     <name>two</name>

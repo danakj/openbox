@@ -28,6 +28,7 @@ gboolean config_focus_new;
 gboolean config_focus_follow;
 guint    config_focus_delay;
 gboolean config_focus_raise;
+gboolean config_focus_last;
 
 ObPlacePolicy config_place_policy;
 
@@ -205,6 +206,8 @@ static void parse_focus(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_focus_delay = parse_int(doc, n) * 1000;
     if ((n = parse_find_node("raiseOnFocus", node)))
         config_focus_raise = parse_bool(doc, n);
+    if ((n = parse_find_node("focusLast", node)))
+        config_focus_last = parse_bool(doc, n);
 }
 
 static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -494,6 +497,7 @@ void config_startup(ObParseInst *i)
     config_focus_follow = FALSE;
     config_focus_delay = 0;
     config_focus_raise = FALSE;
+    config_focus_last = FALSE;
 
     parse_register(i, "focus", parse_focus, NULL);
 

@@ -29,6 +29,11 @@ namespace ob {
 class Frame;
 class Screen;
 
+struct Icon {
+  unsigned long w, h;
+  unsigned long *data;
+};
+
 //! The MWM Hints as retrieved from the window property
 /*!
   This structure only contains 3 elements, even though the Motif 2.0
@@ -313,6 +318,8 @@ private:
   //! The window should be underneath other windows of the same type
   bool _below;
 
+  //! The layer in which the window will be stacked, windows in lower layers
+  //! are always below windows in higher layers.
   StackLayer _layer;
 
   //! A bitmask of values in the Client::Decoration enum

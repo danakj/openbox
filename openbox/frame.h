@@ -54,6 +54,10 @@ struct _ObFrame
     Strut     size;
     Rect      area;
     gboolean  visible;
+
+    /*! Whether the window is obscured at all or fully visible. */
+    gboolean obscured;
+
     guint     decorations;
 
     Window    title;

@@ -8,7 +8,8 @@
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | \
+                         VisibilityChangeMask)
 #define ELEMENT_EVENTMASK (ButtonPressMask | ButtonReleaseMask | \
                            ButtonMotionMask | ExposureMask | \
                            EnterWindowMask | LeaveWindowMask)
@@ -36,6 +37,7 @@ ObFrame *frame_new()
     self = g_new(ObFrame, 1);
 
     self->visible = FALSE;
+    self->obscured = TRUE;
     self->decorations = 0;
 
     /* create all of the decor windows */

@@ -262,7 +262,7 @@ def setup_window_clicks():
 
 def setup_window_buttons():
     """Sets up the default behaviors for the buttons in the window titlebar."""
-    mbind("Left", MC_StickyButton, MouseClick, toggle_all_desktops)
+    mbind("Left", MC_AllDesktopsButton, MouseClick, toggle_all_desktops)
     mbind("Left", MC_CloseButton, MouseClick, close)
 
 def setup_scroll():

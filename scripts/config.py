@@ -14,10 +14,10 @@ theme = "/usr/local/share/openbox/styles/fieron2"
 # titlebar_layout - the layout of the buttons/label on client titlebars, can be
 #                   made up of the following:
 #                   I - iconify button, L - text label, M - maximize button,
-#                   S - sticky button, C - close button
+#                   D - all-desktops button, C - close button
 #                   If no 'L' is included in the string, one will be added to
 #                   the end by Openbox.
-titlebar_layout = "ILMC"
+titlebar_layout = "DILMC"
 
 # double_click_delay - the number of milliseconds in which 2 clicks are
 #                      perceived as a double-click.

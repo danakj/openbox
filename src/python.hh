@@ -32,7 +32,7 @@ enum MouseContext {
   MC_MaximizeButton,
   MC_CloseButton,
   MC_IconifyButton,
-  MC_StickyButton,
+  MC_AllDesktopsButton,
   MC_Grip,
   MC_Root,
   MC_MenuItem,

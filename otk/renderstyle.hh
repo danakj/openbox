@@ -63,7 +63,7 @@ private:
 
   PixmapMask *_max_mask;
   PixmapMask *_icon_mask;
-  PixmapMask *_stick_mask;
+  PixmapMask *_alldesk_mask;
   PixmapMask *_close_mask;
 
   int _handle_width;
@@ -120,7 +120,7 @@ public:
 
   inline PixmapMask *maximizeMask() const { return _max_mask; }
   inline PixmapMask *iconifyMask() const { return _icon_mask; }
-  inline PixmapMask *stickyMask() const { return _stick_mask; }
+  inline PixmapMask *alldesktopsMask() const { return _alldesk_mask; }
   inline PixmapMask *closeMask() const { return _close_mask; }
   
   inline int handleWidth() const { return _handle_width; }

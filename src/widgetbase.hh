@@ -17,7 +17,7 @@ public:
     Type_MaximizeButton,
     Type_CloseButton,
     Type_IconifyButton,
-    Type_StickyButton,
+    Type_AllDesktopsButton,
     Type_LeftGrip,
     Type_RightGrip,
     Type_Client,
@@ -50,8 +50,8 @@ public:
       return MC_CloseButton;
     case Type_IconifyButton:
       return MC_IconifyButton;
-    case Type_StickyButton:
-      return MC_StickyButton;
+    case Type_AllDesktopsButton:
+      return MC_AllDesktopsButton;
     case Type_LeftGrip:
       return MC_Grip;
     case Type_RightGrip:

@@ -169,8 +169,8 @@ void Client::getType()
 void Client::setupDecorAndFunctions()
 {
   // start with everything (cept fullscreen)
-  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border | Decor_Sticky |
-    Decor_Iconify | Decor_Maximize;
+  _decorations = Decor_Titlebar | Decor_Handle | Decor_Border |
+    Decor_AllDesktops | Decor_Iconify | Decor_Maximize;
   _functions = Func_Resize | Func_Move | Func_Iconify | Func_Maximize |
     Func_Shade;
   

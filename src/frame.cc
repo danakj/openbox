@@ -33,7 +33,7 @@ Frame::Frame(Client *client, otk::RenderStyle *style)
     _button_close(&_titlebar, WidgetBase::Type_CloseButton, client),
     _button_iconify(&_titlebar, WidgetBase::Type_IconifyButton, client),
     _button_max(&_titlebar, WidgetBase::Type_MaximizeButton, client),
-    _button_stick(&_titlebar, WidgetBase::Type_StickyButton, client),
+    _button_alldesk(&_titlebar, WidgetBase::Type_AllDesktopsButton, client),
     _label(&_titlebar, WidgetBase::Type_Label),
     _handle(this, WidgetBase::Type_Handle),
     _grip_left(&_handle, WidgetBase::Type_LeftGrip, client),
@@ -164,8 +164,8 @@ void Frame::adjustSize()
       _button_iconify.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & Client::Decor_Maximize)
       _button_max.setGeometry(0, bevel + 1, butsize, butsize);
-    if (_decorations & Client::Decor_Sticky)
-      _button_stick.setGeometry(0, bevel + 1, butsize, butsize);
+    if (_decorations & Client::Decor_AllDesktops)
+      _button_alldesk.setGeometry(0, bevel + 1, butsize, butsize);
     if (_decorations & Client::Decor_Close)
       _button_close.setGeometry(0, bevel + 1, butsize, butsize);
 
@@ -204,9 +204,9 @@ void Frame::adjustSize()
           continue;
         }
         break;
-      case 's':
-      case 'S':
-        if (!tit_s && (_decorations & Client::Decor_Sticky)) {
+      case 'd':
+      case 'D':
+        if (!tit_s && (_decorations & Client::Decor_AllDesktops)) {
           tit_s = true;
           continue;
         }
@@ -255,10 +255,10 @@ void Frame::adjustSize()
         _button_max.move(x, _button_max.rect().y());
         x += _button_max.width();
         break;
-      case 's':
-      case 'S':
-        _button_stick.move(x, _button_stick.rect().y());
-        x += _button_stick.width();
+      case 'd':
+      case 'D':
+        _button_alldesk.move(x, _button_alldesk.rect().y());
+        x += _button_alldesk.width();
         break;
       case 'c':
       case 'C':
@@ -278,15 +278,11 @@ void Frame::adjustSize()
                         width, _style->handleWidth());
     _grip_left.setGeometry(-bwidth,
                            -bwidth,
-                           // XXX: get a Point class in otk and use that for
-                           // the 'buttons size' since theyre all the same
                            butsize * 2,
                            _handle.height());
     _grip_right.setGeometry(((_handle.rect().right() + 1) -
                              butsize * 2),
                             -bwidth,
-                            // XXX: get a Point class in otk and use that for
-                            // the 'buttons size' since theyre all the same
                             butsize * 2,
                             _handle.height());
     _innersize.bottom += _handle.height() + bwidth;
@@ -317,9 +313,9 @@ void Frame::adjustSize()
     else
       _button_max.hide();
     if (tit_s)
-      _button_stick.show();
+      _button_alldesk.show();
     else
-      _button_stick.hide();
+      _button_alldesk.hide();
     if (tit_c)
       _button_close.show();
     else
@@ -401,7 +397,7 @@ void Frame::adjustShape()
 
 void Frame::adjustState()
 {
-  _button_stick.update();
+  _button_alldesk.update();
   _button_max.update();
 }
 

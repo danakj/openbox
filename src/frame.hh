@@ -52,7 +52,7 @@ private:
   ButtonWidget      _button_close;
   ButtonWidget      _button_iconify;
   ButtonWidget      _button_max;
-  ButtonWidget      _button_stick;
+  ButtonWidget      _button_alldesk;
   LabelWidget       _label;
   BackgroundWidget  _handle;
   ButtonWidget      _grip_left;
@@ -132,8 +132,8 @@ public:
   inline Window button_iconify() const { return _button_iconify.window(); }
   //! Gets the window id of the frame's "maximize button" subelement
   inline Window button_max() const { return _button_max.window(); }
-  //! Gets the window id of the frame's "sticky button" subelement
-  inline Window button_stick() const { return _button_stick.window(); }
+  //! Gets the window id of the frame's "all desktops button" subelement
+  inline Window button_alldesk() const { return _button_alldesk.window(); }
   //! Gets the window id of the frame's "handle" subelement
   inline Window handle() const { return _handle.window(); }
   //! Gets the window id of the frame's "left grip" subelement

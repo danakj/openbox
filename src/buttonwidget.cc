@@ -32,7 +32,7 @@ void ButtonWidget::setTextures()
   bool p = _pressed;
 
   switch (type()) {
-  case Type_StickyButton:
+  case Type_AllDesktopsButton:
     if (_client->desktop() == (signed)0xffffffff)
       p = true;
     break;
@@ -52,7 +52,7 @@ void ButtonWidget::setTextures()
     else
       setTexture(_style->gripUnfocusBackground());
     break;
-  case Type_StickyButton:
+  case Type_AllDesktopsButton:
   case Type_MaximizeButton:
   case Type_CloseButton:
   case Type_IconifyButton:
@@ -84,7 +84,7 @@ void ButtonWidget::setStyle(otk::RenderStyle *style)
   case Type_RightGrip:
     setBorderColor(_style->frameBorderColor());
     break;
-  case Type_StickyButton:
+  case Type_AllDesktopsButton:
   case Type_CloseButton:
   case Type_MaximizeButton:
   case Type_IconifyButton:
@@ -98,7 +98,7 @@ void ButtonWidget::setStyle(otk::RenderStyle *style)
 void ButtonWidget::update()
 {
   switch (type()) {
-  case Type_StickyButton:
+  case Type_AllDesktopsButton:
     if ((_client->desktop() == (signed)0xffffffff) != _state) {
       _state = !_state;
       setTextures();
@@ -128,8 +128,8 @@ void ButtonWidget::renderForeground()
 
   if (draw) {
     switch (type()) {
-    case Type_StickyButton:
-      pm = _style->stickyMask();
+    case Type_AllDesktopsButton:
+      pm = _style->alldesktopsMask();
       break;
     case Type_CloseButton:
       pm = _style->closeMask();

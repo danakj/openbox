@@ -89,7 +89,7 @@ public:
   enum WindowType { Type_Desktop, //!< A desktop (bottom-most window)
                     Type_Dock,    //!< A dock bar/panel window
                     Type_Toolbar, //!< A toolbar window, pulled off an app
-                    Type_Menu,    //!< A sticky menu from an app
+                    Type_Menu,    //!< An unpinned menu from an app
                     Type_Utility, //!< A small utility window such as a palette
                     Type_Splash,  //!< A splash screen window
                     Type_Dialog,  //!< A dialog window
@@ -133,13 +133,15 @@ public:
   typedef unsigned char FunctionFlags;
 
   //! The decorations the client window wants to be displayed on it
-  enum Decoration { Decor_Titlebar = 1 << 0, //!< Display a titlebar
-                    Decor_Handle   = 1 << 1, //!< Display a handle (bottom)
-                    Decor_Border   = 1 << 2, //!< Display a border
-                    Decor_Iconify  = 1 << 3, //!< Display an iconify button
-                    Decor_Maximize = 1 << 4, //!< Display a maximize button
-                    Decor_Sticky   = 1 << 5, //!< Display a sticky button
-                    Decor_Close    = 1 << 6  //!< Display a close button
+  enum Decoration { Decor_Titlebar    = 1 << 0, //!< Display a titlebar
+                    Decor_Handle      = 1 << 1, //!< Display a handle (bottom)
+                    Decor_Border      = 1 << 2, //!< Display a border
+                    Decor_Iconify     = 1 << 3, //!< Display an iconify button
+                    Decor_Maximize    = 1 << 4, //!< Display a maximize button
+                    //! Display a button to toggle the window's placement on
+                    //! all desktops
+                    Decor_AllDesktops = 1 << 5,
+                    Decor_Close       = 1 << 6  //!< Display a close button
   };
   //! Holds a bitmask of Client::Decoration values
   typedef unsigned char DecorationFlags;

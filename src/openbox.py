@@ -773,7 +773,7 @@ class Client(EventHandler,):
     Decor_Border = _openbox.Client_Decor_Border
     Decor_Iconify = _openbox.Client_Decor_Iconify
     Decor_Maximize = _openbox.Client_Decor_Maximize
-    Decor_Sticky = _openbox.Client_Decor_Sticky
+    Decor_AllDesktops = _openbox.Client_Decor_AllDesktops
     Decor_Close = _openbox.Client_Decor_Close
     State_Remove = _openbox.Client_State_Remove
     State_Add = _openbox.Client_State_Add
@@ -869,7 +869,7 @@ class Frame(_object):
     def button_close(*args): return apply(_openbox.Frame_button_close,args)
     def button_iconify(*args): return apply(_openbox.Frame_button_iconify,args)
     def button_max(*args): return apply(_openbox.Frame_button_max,args)
-    def button_stick(*args): return apply(_openbox.Frame_button_stick,args)
+    def button_alldesk(*args): return apply(_openbox.Frame_button_alldesk,args)
     def handle(*args): return apply(_openbox.Frame_handle,args)
     def grip_left(*args): return apply(_openbox.Frame_grip_left,args)
     def grip_right(*args): return apply(_openbox.Frame_grip_right,args)
@@ -890,7 +890,7 @@ MC_Window = _openbox.MC_Window
 MC_MaximizeButton = _openbox.MC_MaximizeButton
 MC_CloseButton = _openbox.MC_CloseButton
 MC_IconifyButton = _openbox.MC_IconifyButton
-MC_StickyButton = _openbox.MC_StickyButton
+MC_AllDesktopsButton = _openbox.MC_AllDesktopsButton
 MC_Grip = _openbox.MC_Grip
 MC_Root = _openbox.MC_Root
 MC_MenuItem = _openbox.MC_MenuItem

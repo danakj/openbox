@@ -192,12 +192,12 @@ RenderStyle::RenderStyle(int screen, const std::string &stylefile)
                             data, 8, 8);
   }
   
-  _stick_mask = new PixmapMask();
-  _stick_mask->w = _stick_mask->h = 8;
+  _alldesk_mask = new PixmapMask();
+  _alldesk_mask->w = _alldesk_mask->h = 8;
   {
     //char data[] = { 0x00, 0x00, 0x18, 0x3c, 0x3c, 0x18, 0x00, 0x00 };
     char data[] = { 0x00, 0x66, 0x66, 0x00, 0x00, 0x66, 0x66, 0x00 };
-    _stick_mask->mask =
+    _alldesk_mask->mask =
       XCreateBitmapFromData(**display,
                             display->screenInfo(_screen)->rootWindow(),
                             data, 8, 8);
@@ -252,7 +252,7 @@ RenderStyle::~RenderStyle()
 
   delete _max_mask;
   delete _icon_mask;
-  delete _stick_mask;
+  delete _alldesk_mask;
   delete _close_mask;
 }
 

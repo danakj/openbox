@@ -478,7 +478,7 @@ void Screen::manageWindow(Window window)
   openbox->addClient(client->frame->label(), client);
   openbox->addClient(client->frame->button_max(), client);
   openbox->addClient(client->frame->button_iconify(), client);
-  openbox->addClient(client->frame->button_stick(), client);
+  openbox->addClient(client->frame->button_alldesk(), client);
   openbox->addClient(client->frame->button_close(), client);
   openbox->addClient(client->frame->handle(), client);
   openbox->addClient(client->frame->grip_left(), client);
@@ -543,7 +543,7 @@ void Screen::unmanageWindow(Client *client)
   openbox->removeClient(frame->label());
   openbox->removeClient(frame->button_max());
   openbox->removeClient(frame->button_iconify());
-  openbox->removeClient(frame->button_stick());
+  openbox->removeClient(frame->button_alldesk());
   openbox->removeClient(frame->button_close());
   openbox->removeClient(frame->handle());
   openbox->removeClient(frame->grip_left());

@@ -109,16 +109,19 @@ public:
     }
     
     assert(_relief == Flat || (_bevel_dark_color && _bevel_light_color));
-    assert(!_border || _border_color);
-    assert(!_interlaced || _interlace_color);
+    //assert(!_border || _border_color);
+    //assert(!_interlaced || _interlace_color);
     assert(_color);
+    assert(_secondary_color);
+    assert(_border_color);
+    assert(_interlace_color);
   }
   
   virtual ~RenderTexture() {
     delete _color;
     delete _secondary_color;
     if (_bevel_dark_color) delete _bevel_dark_color;
-     if (_bevel_dark_color) delete _bevel_light_color;
+    if (_bevel_dark_color) delete _bevel_light_color;
     delete _border_color;
     delete _interlace_color;
   }

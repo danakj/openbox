@@ -9975,15 +9975,15 @@ static PyObject *_wrap_Frame_button_max(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_Frame_button_stick(PyObject *self, PyObject *args) {
+static PyObject *_wrap_Frame_button_alldesk(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::Frame *arg1 = (ob::Frame *) 0 ;
     Window result;
     PyObject * obj0  = 0 ;
     
-    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_stick",&obj0)) goto fail;
+    if(!PyArg_ParseTuple(args,(char *)"O:Frame_button_alldesk",&obj0)) goto fail;
     if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__Frame,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (Window)((ob::Frame const *)arg1)->button_stick();
+    result = (Window)((ob::Frame const *)arg1)->button_alldesk();
     
     resultobj = PyInt_FromLong((long)result);
     return resultobj;
@@ -11724,7 +11724,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Frame_button_close", _wrap_Frame_button_close, METH_VARARGS },
 	 { (char *)"Frame_button_iconify", _wrap_Frame_button_iconify, METH_VARARGS },
 	 { (char *)"Frame_button_max", _wrap_Frame_button_max, METH_VARARGS },
-	 { (char *)"Frame_button_stick", _wrap_Frame_button_stick, METH_VARARGS },
+	 { (char *)"Frame_button_alldesk", _wrap_Frame_button_alldesk, METH_VARARGS },
 	 { (char *)"Frame_handle", _wrap_Frame_handle, METH_VARARGS },
 	 { (char *)"Frame_grip_left", _wrap_Frame_grip_left, METH_VARARGS },
 	 { (char *)"Frame_grip_right", _wrap_Frame_grip_right, METH_VARARGS },
@@ -12018,7 +12018,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"Client_Decor_Border", (long) ob::Client::Decor_Border, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Decor_Iconify", (long) ob::Client::Decor_Iconify, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Decor_Maximize", (long) ob::Client::Decor_Maximize, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"Client_Decor_Sticky", (long) ob::Client::Decor_Sticky, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"Client_Decor_AllDesktops", (long) ob::Client::Decor_AllDesktops, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_Decor_Close", (long) ob::Client::Decor_Close, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_State_Remove", (long) ob::Client::State_Remove, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"Client_State_Add", (long) ob::Client::State_Add, 0, 0, 0},
@@ -12033,7 +12033,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"MC_MaximizeButton", (long) ob::MC_MaximizeButton, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_CloseButton", (long) ob::MC_CloseButton, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_IconifyButton", (long) ob::MC_IconifyButton, 0, 0, 0},
-{ SWIG_PY_INT,     (char *)"MC_StickyButton", (long) ob::MC_StickyButton, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"MC_AllDesktopsButton", (long) ob::MC_AllDesktopsButton, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Grip", (long) ob::MC_Grip, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Root", (long) ob::MC_Root, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_MenuItem", (long) ob::MC_MenuItem, 0, 0, 0},

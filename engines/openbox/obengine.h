@@ -1,10 +1,18 @@
 #ifndef __engine_openbox_h
 #define __engine_openbox_h
 
+#include "../../kernel/frame.h"
 #include "../../render/render.h"
 #include "../../render/color.h"
 #include "../../render/font.h"
 #include "../../render/mask.h"
+
+#define LABEL_HEIGHT    (s_winfont_height + 2)
+#define TITLE_HEIGHT    (LABEL_HEIGHT + s_bevel * 2)
+#define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
+		         f->cbwidth)
+#define BUTTON_SIZE     (LABEL_HEIGHT - 2)
+#define GRIP_WIDTH      (BUTTON_SIZE * 2)
 
 extern int s_bevel;
 extern int s_handle_height;
@@ -54,5 +62,48 @@ extern Appearance *a_unfocused_label;
 extern Appearance *a_icon;
 extern Appearance *a_focused_handle;
 extern Appearance *a_unfocused_handle;
+
+typedef struct ObFrame {
+    Frame frame;
+
+    Window title;
+    Window label;
+    Window max;
+    Window close;
+    Window desk;
+    Window icon;
+    Window iconify;
+    Window handle;
+    Window lgrip;
+    Window rgrip;
+
+    Appearance *a_unfocused_title;
+    Appearance *a_focused_title;
+    Appearance *a_unfocused_label;
+    Appearance *a_focused_label;
+    Appearance *a_icon;
+    Appearance *a_unfocused_handle;
+    Appearance *a_focused_handle;
+
+    Strut  innersize;
+
+    GSList *clients;
+
+    int width; /* title and handle */
+    int label_width;
+    int icon_x;        /* x-position of the window icon button */
+    int label_x;       /* x-position of the window title */
+    int iconify_x;     /* x-position of the window iconify button */
+    int desk_x;         /* x-position of the window all-desktops button */
+    int max_x;         /* x-position of the window maximize button */
+    int close_x;       /* x-position of the window close button */
+    int bwidth;        /* border width */
+    int cbwidth;       /* client border width */
+
+    gboolean max_press;
+    gboolean close_press;
+    gboolean desk_press;
+    gboolean iconify_press;
+} ObFrame;
 
 #endif

@@ -1,4 +1,4 @@
-#include "openbox.h"
+#include "obengine.h"
 #include "../../kernel/config.h"
 #include "../../kernel/openbox.h"
 

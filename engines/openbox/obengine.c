@@ -1,24 +1,13 @@
-#include "theme.h"
+#include "obtheme.h"
+#include "obrender.h"
+#include "obengine.h"
 #include "../../kernel/openbox.h"
-#include "../../kernel/screen.h"
 #include "../../kernel/extensions.h"
 #include "../../kernel/dispatch.h"
 #include "../../kernel/config.h"
-#include "../../kernel/frame.h"
-#include "../../render/render.h"
-#include "../../render/color.h"
-#include "../../render/font.h"
-#include "../../render/mask.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
-
-#define LABEL_HEIGHT    (s_winfont_height + 2)
-#define TITLE_HEIGHT    (LABEL_HEIGHT + s_bevel * 2)
-#define HANDLE_Y(f)     (f->innersize.top + f->frame.client->area.height + \
-		         f->cbwidth)
-#define BUTTON_SIZE     (LABEL_HEIGHT - 2)
-#define GRIP_WIDTH      (BUTTON_SIZE * 2)
 
 #define PLATE_EVENTMASK (SubstructureRedirectMask | ButtonPressMask)
 #define FRAME_EVENTMASK (EnterWindowMask | LeaveWindowMask)
@@ -76,58 +65,7 @@ Appearance *a_icon; /* always parentrelative, so no focused/unfocused */
 Appearance *a_focused_handle;
 Appearance *a_unfocused_handle;
 
-typedef struct ObFrame {
-    Frame frame;
-
-    Window title;
-    Window label;
-    Window max;
-    Window close;
-    Window desk;
-    Window icon;
-    Window iconify;
-    Window handle;
-    Window lgrip;
-    Window rgrip;
-
-    Appearance *a_unfocused_title;
-    Appearance *a_focused_title;
-    Appearance *a_unfocused_label;
-    Appearance *a_focused_label;
-    Appearance *a_icon;
-    Appearance *a_unfocused_handle;
-    Appearance *a_focused_handle;
-
-    Strut  innersize;
-
-    GSList *clients;
-
-    int width; /* title and handle */
-    int label_width;
-    int icon_x;        /* x-position of the window icon button */
-    int label_x;       /* x-position of the window title */
-    int iconify_x;     /* x-position of the window iconify button */
-    int desk_x;         /* x-position of the window all-desktops button */
-    int max_x;         /* x-position of the window maximize button */
-    int close_x;       /* x-position of the window close button */
-    int bwidth;        /* border width */
-    int cbwidth;       /* client border width */
-
-    gboolean max_press;
-    gboolean close_press;
-    gboolean desk_press;
-    gboolean iconify_press;
-} ObFrame;
-
 static void layout_title(ObFrame *self);
-static void render(ObFrame *self);
-static void render_label(ObFrame *self, Appearance *a);
-static void render_max(ObFrame *self, Appearance *a);
-static void render_icon(ObFrame *self, Appearance *a);
-static void render_iconify(ObFrame *self, Appearance *a);
-static void render_desk(ObFrame *self, Appearance *a);
-static void render_close(ObFrame *self, Appearance *a);
-
 static void frame_mouse_press(const ObEvent *e, ObFrame *self);
 static void frame_mouse_release(const ObEvent *e, ObFrame *self);
 
@@ -579,7 +517,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
                       self->frame.area.height - self->bwidth * 2);
 
     if (resized) {
-        render(self);
+        render_frame(self);
 
         frame_adjust_shape(self);
     }
@@ -587,22 +525,22 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
 
 void frame_adjust_state(ObFrame *self)
 {
-    render(self);
+    render_frame(self);
 }
 
 void frame_adjust_focus(ObFrame *self)
 {
-    render(self);
+    render_frame(self);
 }
 
 void frame_adjust_title(ObFrame *self)
 {
-    render(self);
+    render_frame(self);
 }
 
 void frame_adjust_icon(ObFrame *self)
 {
-    render(self);
+    render_frame(self);
 }
 
 void frame_grab_client(ObFrame *self, Client *client)
@@ -804,210 +742,21 @@ static void layout_title(ObFrame *self)
              self->label_width, LABEL_HEIGHT);
 }
 
-static void render(ObFrame *self)
-{
-    if (client_focused(self->frame.client)) {
-        XSetWindowBorder(ob_display, self->frame.plate,
-                         s_cb_focused_color->pixel);
-    } else {
-        XSetWindowBorder(ob_display, self->frame.plate,
-                         s_cb_unfocused_color->pixel);
-    }
-
-    if (self->frame.client->decorations & Decor_Titlebar) {
-        Appearance *t, *l, *m, *n, *i, *d, *c;
-
-        t = (client_focused(self->frame.client) ?
-             self->a_focused_title : self->a_unfocused_title);
-        l = (client_focused(self->frame.client) ?
-             self->a_focused_label : self->a_unfocused_label);
-        m = (client_focused(self->frame.client) ?
-             ((self->max_press ||
-              self->frame.client->max_vert || self->frame.client->max_horz) ?
-              a_focused_pressed_max : a_focused_unpressed_max) :
-             ((self->max_press ||
-              self->frame.client->max_vert || self->frame.client->max_horz) ?
-              a_unfocused_pressed_max : a_unfocused_unpressed_max));
-        n = self->a_icon;
-        i = (client_focused(self->frame.client) ?
-             (self->iconify_press ?
-              a_focused_pressed_iconify : a_focused_unpressed_iconify) :
-             (self->iconify_press ?
-              a_unfocused_pressed_iconify : a_unfocused_unpressed_iconify));
-        d = (client_focused(self->frame.client) ?
-             (self->desk_press || self->frame.client->desktop == DESKTOP_ALL ?
-              a_focused_pressed_desk : a_focused_unpressed_desk) :
-             (self->desk_press || self->frame.client->desktop == DESKTOP_ALL ?
-              a_unfocused_pressed_desk : a_unfocused_unpressed_desk));
-        c = (client_focused(self->frame.client) ?
-             (self->close_press ?
-              a_focused_pressed_close : a_focused_unpressed_close) :
-             (self->close_press ?
-              a_unfocused_pressed_close : a_unfocused_unpressed_close));
-
-        paint(self->title, t);
-
-        /* set parents for any parent relative guys */
-        l->surface.data.planar.parent = t;
-        l->surface.data.planar.parentx = self->label_x;
-        l->surface.data.planar.parenty = s_bevel;
-
-        m->surface.data.planar.parent = t;
-        m->surface.data.planar.parentx = self->max_x;
-        m->surface.data.planar.parenty = s_bevel + 1;
-
-        n->surface.data.planar.parent = t;
-        n->surface.data.planar.parentx = self->icon_x;
-        n->surface.data.planar.parenty = s_bevel + 1;
-
-        i->surface.data.planar.parent = t;
-        i->surface.data.planar.parentx = self->iconify_x;
-        i->surface.data.planar.parenty = s_bevel + 1;
-
-        d->surface.data.planar.parent = t;
-        d->surface.data.planar.parentx = self->desk_x;
-        d->surface.data.planar.parenty = s_bevel + 1;
-
-        c->surface.data.planar.parent = t;
-        c->surface.data.planar.parentx = self->close_x;
-        c->surface.data.planar.parenty = s_bevel + 1;
-
-        render_label(self, l);
-        render_max(self, m);
-        render_icon(self, n);
-        render_iconify(self, i);
-        render_desk(self, d);
-        render_close(self, c);
-    }
-
-    if (self->frame.client->decorations & Decor_Handle) {
-        Appearance *h, *g;
-
-        h = (client_focused(self->frame.client) ?
-             self->a_focused_handle : self->a_unfocused_handle);
-        g = (client_focused(self->frame.client) ?
-             a_focused_grip : a_unfocused_grip);
-
-        if (g->surface.data.planar.grad == Background_ParentRelative) {
-            g->surface.data.planar.parent = h;
-            paint(self->handle, h);
-        } else
-            paint(self->handle, h);
-
-        g->surface.data.planar.parentx = 0;
-        g->surface.data.planar.parenty = 0;
-
-        paint(self->lgrip, g);
-
-        g->surface.data.planar.parentx = self->width - GRIP_WIDTH;
-        g->surface.data.planar.parenty = 0;
-
-        paint(self->rgrip, g);
-    }
-}
-
-static void render_label(ObFrame *self, Appearance *a)
-{
-    if (self->label_x < 0) return;
-
-
-    /* set the texture's text! */
-    a->texture[0].data.text.string = self->frame.client->title;
-    RECT_SET(a->texture[0].position, 0, 0, self->label_width, LABEL_HEIGHT);
-
-    paint(self->label, a);
-}
-
-static void render_icon(ObFrame *self, Appearance *a)
-{
-    if (self->icon_x < 0) return;
-
-    if (self->frame.client->nicons) {
-        Icon *icon = client_icon(self->frame.client, BUTTON_SIZE, BUTTON_SIZE);
-        a->texture[0].type = RGBA;
-        a->texture[0].data.rgba.width = icon->width;
-        a->texture[0].data.rgba.height = icon->height;
-        a->texture[0].data.rgba.data = icon->data;
-        RECT_SET(self->a_icon->texture[0].position, 0, 0,
-                 BUTTON_SIZE,BUTTON_SIZE);
-    } else
-        a->texture[0].type = NoTexture;
-
-    paint(self->icon, a);
-}
-
-static void render_max(ObFrame *self, Appearance *a)
-{
-    if (self->max_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->max, a);
-}
-
-static void render_iconify(ObFrame *self, Appearance *a)
-{
-    if (self->iconify_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->iconify, a);
-}
-
-static void render_desk(ObFrame *self, Appearance *a)
-{
-    if (self->desk_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->desk, a);
-}
-
-static void render_close(ObFrame *self, Appearance *a)
-{
-    if (self->close_x < 0) return;
-
-    RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
-    paint(self->close, a);
-}
-
-GQuark get_context(Client *client, Window win)
-{
-    ObFrame *self;
-
-    if (win == ob_root) return g_quark_try_string("root");
-    if (client == NULL) return g_quark_try_string("none");
-    if (win == client->window) return g_quark_try_string("client");
-
-    self = (ObFrame*) client->frame;
-    if (win == self->frame.window) return g_quark_try_string("frame");
-    if (win == self->frame.plate)  return g_quark_try_string("client");
-    if (win == self->title)  return g_quark_try_string("titlebar");
-    if (win == self->label)  return g_quark_try_string("titlebar");
-    if (win == self->handle) return g_quark_try_string("handle");
-    if (win == self->lgrip)  return g_quark_try_string("blcorner");
-    if (win == self->rgrip)  return g_quark_try_string("brcorner");
-    if (win == self->max)  return g_quark_try_string("maximize");
-    if (win == self->iconify)  return g_quark_try_string("iconify");
-    if (win == self->close)  return g_quark_try_string("close");
-    if (win == self->icon)  return g_quark_try_string("icon");
-    if (win == self->desk)  return g_quark_try_string("alldesktops");
-
-    return g_quark_try_string("none");
-}
-
 static void frame_mouse_press(const ObEvent *e, ObFrame *self)
 {
     Window win = e->data.x.e->xbutton.window;
     if (win == self->max) {
         self->max_press = TRUE;
-        render(self);
+        render_frame(self);
     } else if (win == self->close) {
         self->close_press = TRUE;
-        render(self);
+        render_frame(self);
     } else if (win == self->iconify) {
         self->iconify_press = TRUE;
-        render(self);
+        render_frame(self);
     } else if (win == self->desk) { 
         self->desk_press = TRUE;
-        render(self);
+        render_frame(self);
     }
 }
 
@@ -1016,15 +765,15 @@ static void frame_mouse_release(const ObEvent *e, ObFrame *self)
     Window win = e->data.x.e->xbutton.window;
     if (win == self->max) {
         self->max_press = FALSE;
-        render(self);
+        render_frame(self);
     } else if (win == self->close) {
         self->close_press = FALSE; 
-        render(self);
+        render_frame(self);
     } else if (win == self->iconify) {
         self->iconify_press = FALSE;
-        render(self);
+        render_frame(self);
     } else if (win == self->desk) {
         self->desk_press = FALSE;
-        render(self);
+        render_frame(self);
     }
 }

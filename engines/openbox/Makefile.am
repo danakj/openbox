@@ -11,9 +11,9 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 engine_LTLIBRARIES=openbox.la
 
 openbox_la_LDFLAGS=-module -avoid-version
-openbox_la_SOURCES=openbox.c theme.c
+openbox_la_SOURCES=obengine.c obtheme.c obrender.c
 
-noinst_HEADERS=openbox.h theme.h
+noinst_HEADERS=obengine.h obtheme.h obrender.h
 
 MAINTAINERCLEANFILES= Makefile.in
 

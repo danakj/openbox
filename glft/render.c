@@ -1,6 +1,7 @@
 #include "render.h"
 #include "font.h"
 #include "debug.h"
+#include "glft.h"
 #include <glib.h>
 #include <GL/glx.h>
 
@@ -60,6 +61,7 @@ void GlftRenderString(struct GlftFont *font, const char *str, int bytes,
         return;
     }
 
+    glColor4f(color->r, color->g, color->b, color->a);
     glPushMatrix();
     glTranslatef(x, y, 0.0);
     c = str;

@@ -722,8 +722,6 @@ void Blackbox::process_event(XEvent *e) {
 
           if (win->isIconic())
             win->deiconify(False, True);
-          if (win->isShaded())
-            win->shade();
           if (win->getWorkspaceNumber() != screen->getCurrentWorkspaceID())
             screen->changeWorkspaceID(win->getWorkspaceNumber());
           if (win->isVisible() && win->setInputFocus()) {

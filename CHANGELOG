@@ -38,6 +38,8 @@ Changelog for Openbox:
    close request and you end up with a funky close
    button.                                              (Scott Moynes)
 
+ * fix positioning of the window menu                   (Ben Jansens)
+
 0.99.0:
  * renamed header files from *.hh to *.h.               (Ben Jansens)
 

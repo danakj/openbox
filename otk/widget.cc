@@ -438,7 +438,7 @@ void OtkWidget::removeChild(OtkWidget *child)
   if (it != _children.end())
     _children.erase(it);
 }
-#include <stdio.h>
+
 void OtkWidget::setStyle(Style *style)
 {
   assert(style);

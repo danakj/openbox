@@ -2,7 +2,7 @@
 #ifndef   __rootwindow_hh
 #define   __rootwindow_hh
 
-/*! @file client.hh
+/*! @file rootwindow.hh
   @brief The OBClient class maintains the state of a client window by handling
   property changes on the window and some client messages
 */

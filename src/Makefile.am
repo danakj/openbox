@@ -16,7 +16,8 @@ bin_PROGRAMS= openbox3
 openbox3_LDADD=../otk/libotk.a @LIBINTL@
 
 openbox3_SOURCES= actions.cc client.cc frame.cc openbox.cc screen.cc \
-                  main.cc rootwindow.cc backgroundwidget.cc
+                  main.cc rootwindow.cc backgroundwidget.cc labelwidget.cc \
+                  buttonwidget.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

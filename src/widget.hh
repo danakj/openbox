@@ -9,7 +9,14 @@ public:
   enum WidgetType {
     Type_Titlebar,
     Type_Handle,
-    Type_Plate
+    Type_Plate,
+    Type_Label,
+    Type_MaximizeButton,
+    Type_CloseButton,
+    Type_IconifyButton,
+    Type_StickyButton,
+    Type_LeftGrip,
+    Type_RightGrip
   };
 
 private:

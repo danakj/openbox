@@ -27,14 +27,14 @@ OBFrame::OBFrame(OBClient *client, otk::Style *style)
     _screen(otk::OBDisplay::screenInfo(client->screen())),
     _plate(this, OBWidget::Type_Plate),
     _titlebar(this, OBWidget::Type_Titlebar),
-    _button_close(&_titlebar),
-    _button_iconify(&_titlebar),
-    _button_max(&_titlebar),
-    _button_stick(&_titlebar),
-    _label(&_titlebar),
+    _button_close(&_titlebar, OBWidget::Type_CloseButton),
+    _button_iconify(&_titlebar, OBWidget::Type_IconifyButton),
+    _button_max(&_titlebar, OBWidget::Type_MaximizeButton),
+    _button_stick(&_titlebar, OBWidget::Type_StickyButton),
+    _label(&_titlebar, OBWidget::Type_Label),
     _handle(this, OBWidget::Type_Handle),
-    _grip_left(&_handle),
-    _grip_right(&_handle),
+    _grip_left(&_handle, OBWidget::Type_LeftGrip),
+    _grip_right(&_handle, OBWidget::Type_RightGrip),
     _decorations(client->decorations())
 {
   assert(client);
@@ -85,15 +85,6 @@ void OBFrame::setStyle(otk::Style *style)
   assert(style);
 
   otk::OtkWidget::setStyle(style);
-  // set the grips' textures
-  _grip_left.setTexture(style->getGripFocus());
-  _grip_left.setUnfocusTexture(style->getGripUnfocus());
-  _grip_left.setPressedFocusTexture(style->getGripFocus());
-  _grip_left.setPressedUnfocusTexture(style->getGripUnfocus());
-  _grip_right.setTexture(style->getGripFocus());
-  _grip_right.setUnfocusTexture(style->getGripUnfocus());
-  _grip_right.setPressedFocusTexture(style->getGripFocus());
-  _grip_right.setPressedUnfocusTexture(style->getGripUnfocus());
 
   // if a style was previously set, then 'replace' is true, cause we're
   // replacing a style
@@ -107,10 +98,6 @@ void OBFrame::setStyle(otk::Style *style)
 
   // XXX: change when focus changes!
   XSetWindowBorder(otk::OBDisplay::display, getWindow(),
-                   _style->getBorderColor()->pixel());
-  XSetWindowBorder(otk::OBDisplay::display, _grip_left.getWindow(),
-                   _style->getBorderColor()->pixel());
-  XSetWindowBorder(otk::OBDisplay::display, _grip_right.getWindow(),
                    _style->getBorderColor()->pixel());
 
   // if !replace, then adjust() will get called after the client is grabbed!

@@ -303,7 +303,8 @@ private:
   /*!
     This also maintains things like the client's minsize, and size increments.
     @param anchor The corner to keep in the same position when resizing
-    @param size The new size for the client
+    @param x The X component of the new size for the client
+    @param y The Y component of the new size for the client
   */
   void resize(Corner anchor, int x, int y);
   

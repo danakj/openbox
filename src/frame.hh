@@ -11,14 +11,13 @@ extern "C" {
 
 #include "client.hh"
 #include "backgroundwidget.hh"
+#include "labelwidget.hh"
+#include "buttonwidget.hh"
 #include "otk/strut.hh"
 #include "otk/rect.hh"
 #include "otk/screeninfo.hh"
 #include "otk/style.hh"
 #include "otk/widget.hh"
-#include "otk/button.hh"
-#include "otk/focuswidget.hh"
-#include "otk/focuslabel.hh"
 
 #include <string>
 
@@ -52,14 +51,14 @@ private:
   // decoration windows
   OBBackgroundWidget  _plate;   // sits entirely under the client window
   OBBackgroundWidget  _titlebar;
-  otk::OtkButton      _button_close;
-  otk::OtkButton      _button_iconify;
-  otk::OtkButton      _button_max;
-  otk::OtkButton      _button_stick;
-  otk::OtkFocusLabel  _label;
+  OBButtonWidget      _button_close;
+  OBButtonWidget      _button_iconify;
+  OBButtonWidget      _button_max;
+  OBButtonWidget      _button_stick;
+  OBLabelWidget       _label;
   OBBackgroundWidget  _handle;
-  otk::OtkButton      _grip_left;
-  otk::OtkButton      _grip_right;
+  OBButtonWidget      _grip_left;
+  OBButtonWidget      _grip_right;
 
   //! The decorations to display on the window.
   /*!

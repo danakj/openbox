@@ -12,10 +12,16 @@ AC_DEFUN([OB_DEBUG],
   [DEBUG=$enableval],[])
 
   # cvs builds are always debug
-  test "${VERSION%*cvs}" != "$VERSION" && DEBUG="yes"
-  
+  CVS=""
+  test "${VERSION%*cvs}" != "$VERSION" && CVS="yes"
+  test "$CVS" = "yes" && DEBUG="yes"
+
   if test "$DEBUG" = "yes"; then
-    AC_MSG_RESULT([DEBUG])
+    if test "$CVS" = "yes"; then
+      AC_MSG_RESULT([DEBUG (CVS build)])
+    else
+      AC_MSG_RESULT([DEBUG])
+    fi
     AC_DEFINE([DEBUG], [1], [Creating a debug build])
   else
     AC_MSG_RESULT([RELEASE])

@@ -1403,7 +1403,7 @@ void client_update_class(ObClient *self)
     }
 
     if (PROP_GETS(self->window, wm_window_role, locale, &s))
-	self->role = g_strdup(s);
+	self->role = s;
 
     if (self->name == NULL) self->name = g_strdup("");
     if (self->class == NULL) self->class = g_strdup("");

@@ -26,7 +26,7 @@ static void set_default_appearance(RrAppearance *a);
 RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
 {
     XrmDatabase db = NULL;
-    RrJustify winjust, mtitlejust, mjust;
+    RrJustify winjust, mtitlejust;
     gchar *str;
     gchar *font_str;
     RrTheme *theme;
@@ -142,14 +142,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         return NULL;
     }
     theme->mfont_height = RrFontHeight(theme->mfont);
-
-    mjust = RR_JUSTIFY_LEFT;
-    if (read_string(db, "menu.frame.justify", &str)) {
-        if (!g_ascii_strcasecmp(str, "right"))
-            mjust = RR_JUSTIFY_RIGHT;
-        else if (!g_ascii_strcasecmp(str, "center"))
-            mjust = RR_JUSTIFY_CENTER;
-    }
 
     /* load direct dimensions */
     if (!read_int(db, "menuOverlap", &theme->menu_overlap) ||
@@ -665,7 +657,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, gchar *name)
         theme->a_menu_text_hilite->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_text_item->texture[0].data.text.justify = 
         theme->a_menu_text_disabled->texture[0].data.text.justify = 
-        theme->a_menu_text_hilite->texture[0].data.text.justify = mjust;
+        theme->a_menu_text_hilite->texture[0].data.text.justify =
+        RR_JUSTIFY_LEFT;
     theme->a_menu_text_item->texture[0].data.text.font =
         theme->a_menu_text_disabled->texture[0].data.text.font =
         theme->a_menu_text_hilite->texture[0].data.text.font = theme->mfont;

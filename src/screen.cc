@@ -594,7 +594,7 @@ void Screen::lowerWindow(Client *client)
   assert(!_stacking.empty()); // this would be bad
 
   Client::List::iterator it = --_stacking.end();
-  Client::List::const_iterator end = _stacking.begin();
+  const Client::List::iterator end = _stacking.begin();
 
   for (; it != end && (*it)->layer() < client->layer(); --it);
   if (*it == client) return;          // already the bottom, return

@@ -149,29 +149,56 @@ static gint area_cmp(gconstpointer p1, gconstpointer p2, gpointer data)
         MIN((a2->width - carea->width), (a2->height - carea->height));
 }
 
+typedef enum
+{
+    SMART_FULL,
+    SMART_GROUP,
+    SMART_FOCUSED
+} ObSmartType;
+
+#define SMART_IGNORE(placer, c)                             \
+    (placer == c || c->shaded || !client_normal(c) ||       \
+     (c->desktop != DESKTOP_ALL &&                          \
+      c->desktop != (placer->desktop == DESKTOP_ALL ?       \
+                     screen_desktop : placer->desktop)))
+
 static gboolean place_smart(ObClient *client, gint *x, gint *y,
-                            gboolean only_focused)
+                            ObSmartType type)
 {
     guint i;
     gboolean ret = FALSE;
     GSList *spaces = NULL, *sit;
-    GList *it, *list;
-
-    list = focus_order[client->desktop == DESKTOP_ALL ?
-                       screen_desktop : client->desktop];
+    GList *it;
 
     for (i = 0; i < screen_num_monitors; ++i)
         spaces = area_add(spaces, screen_area_monitor(client->desktop, i));
 
-    for (it = list; it; it = g_list_next(it)) {
-        ObClient *c = it->data;
+    if (type == SMART_FULL || type == SMART_FOCUSED) {
+        GList *list;
 
-        if (c != client && !c->shaded && client_normal(c)) {
-            spaces = area_remove(spaces, &c->frame->area);
-            if (only_focused)
-                break;
+        list = focus_order[client->desktop == DESKTOP_ALL ?
+                           screen_desktop : client->desktop];
+
+        for (it = list; it; it = g_list_next(it)) {
+            ObClient *c = it->data;
+
+            if (!SMART_IGNORE(client, c)) {
+                spaces = area_remove(spaces, &c->frame->area);
+                if (type == SMART_FOCUSED)
+                    break;
+            }
         }
-    }
+    } else if (type == SMART_GROUP) {
+        if (!client->group)
+            return FALSE;
+
+        for (sit = client->group->members; sit; sit = g_slist_next(sit)) {
+            ObClient *c = sit->data;
+            if (!SMART_IGNORE(client, c))
+                spaces = area_remove(spaces, &c->frame->area);
+        }
+    } else
+        g_assert_not_reached();
 
     spaces = g_slist_sort_with_data(spaces, area_cmp, &client->frame->area);
 
@@ -182,7 +209,7 @@ static gboolean place_smart(ObClient *client, gint *x, gint *y,
             if (r->width >= client->frame->area.width &&
                 r->height >= client->frame->area.height) {
                 ret = TRUE;
-                if (only_focused) {
+                if (type != SMART_FULL) {
                     *x = r->x + (r->width - client->frame->area.width) / 2;
                     *y = r->y + (r->height - client->frame->area.height) / 2;
                 } else {
@@ -292,10 +319,11 @@ void place_client(ObClient *client, gint *x, gint *y)
 {
     if (client->positioned)
         return;
-    if (place_transient(client, x, y)    ||
-        place_dialog(client, x, y)       ||
-        place_smart(client, x, y, FALSE) ||
-        place_smart(client, x, y, TRUE)  ||
+    if (place_transient(client, x, y)            ||
+        place_dialog(client, x, y)               ||
+        place_smart(client, x, y, SMART_FULL)    ||
+        place_smart(client, x, y, SMART_GROUP)   ||
+        place_smart(client, x, y, SMART_FOCUSED) ||
         (config_focus_follow ?
          place_under_mouse(client, x, y) :
          place_random(client, x, y)))

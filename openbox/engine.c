@@ -125,7 +125,7 @@ static void parse_assign(char *name, ParseToken *value)
 void engine_startup()
 {
     module = NULL;
-    engine_name = NULL;
+    engine_name = g_strdup(DEFAULT_ENGINE);
     engine_theme = NULL;
     engine_layout = g_strdup("NDSLIMC");
     engine_font = g_strdup("Sans-7");

@@ -3,6 +3,8 @@
 #include "assassin.hh"
 #include "screeninfo.hh"
 
+#include <algorithm>
+
 namespace otk {
 
 OtkWidget::OtkWidget(OtkWidget *parent, Direction direction)

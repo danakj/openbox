@@ -3153,7 +3153,8 @@ void BlackboxWindow::doWindowSnapping(int &dx, int &dy) {
     const BlackboxWindowList& stack_list = w->getStackingList();
     BlackboxWindowList::const_iterator st_it, st_end = stack_list.end();
     for (st_it = stack_list.begin(); st_it != st_end; ++st_it)
-      rectlist.push_back( (*st_it)->frameRect() );
+      if (*st_it != this) // don't snap to ourself
+        rectlist.push_back( (*st_it)->frameRect() );
 
     // add the toolbar and the slit to the rect list.
     // (only if they are not hidden)

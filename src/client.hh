@@ -428,6 +428,9 @@ public:
     @param y The Y component of the new size for the client
   */
   void resize(Corner anchor, int x, int y);
+
+  //! Request the client to close its window.
+  void close();
   
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);

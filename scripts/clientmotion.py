@@ -1,6 +1,6 @@
 posqueue = [];
 
-def motion_press(action, win, type, modifiers, button, xroot, yroot, time):
+def def_motion_press(action, win, type, modifiers, button, xroot, yroot, time):
 	client = Openbox_findClient(openbox, win)
 
 	global posqueue
@@ -21,7 +21,8 @@ def motion_press(action, win, type, modifiers, button, xroot, yroot, time):
 	#  // area would be meaningless anyways
 	#  if (c) a->clientarea = c->area();
 	
-def motion_release(action, win, type, modifiers, button, xroot, yroot, time):
+def def_motion_release(action, win, type, modifiers, button, xroot, yroot,
+		       time):
 	global posqueue
 	for i in posqueue:
 		if i[0] == button:
@@ -42,7 +43,7 @@ def motion_release(action, win, type, modifiers, button, xroot, yroot, time):
 	#  }
 
 
-def motion(action, win, type, modifiers, xroot, yroot, time):
+def def_motion(action, win, type, modifiers, xroot, yroot, time):
 	client = Openbox_findClient(openbox, win)
 
 	global posqueue
@@ -72,6 +73,8 @@ def motion(action, win, type, modifiers, xroot, yroot, time):
 		#        _posqueue[0]->clientarea.height() + _dy);
 
 
-register(Action_ButtonPress, motion_press)
-register(Action_ButtonRelease, motion_release)
-register(Action_MouseMotion, motion)
+register(Action_ButtonPress, def_motion_press)
+register(Action_ButtonRelease, def_motion_release)
+register(Action_MouseMotion, def_motion)
+
+print "Loaded clientmotion.py"

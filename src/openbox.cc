@@ -163,6 +163,7 @@ Openbox::Openbox(int argc, char **argv)
   PyRun_SimpleString("openbox = Openbox_instance()");
 
   runPython(SCRIPTDIR"/clientmotion.py"); // moving and resizing clients
+  runPython(SCRIPTDIR"/clicks.py"); // titlebar/root clicks and dblclicks
   runPython(_scriptfilepath.c_str());
  
   // initialize all the screens

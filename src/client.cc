@@ -835,6 +835,30 @@ void OBClient::move(int x, int y)
 }
 
 
+void OBClient::close()
+{
+  XEvent ce;
+  const otk::OBProperty *property = Openbox::instance->property();
+
+  if (!(_functions & Func_Close)) return;
+
+  // XXX: itd be cool to do timeouts and shit here for killing the client's
+  //      process off
+
+  ce.xclient.type = ClientMessage;
+  ce.xclient.message_type =  property->atom(otk::OBProperty::wm_protocols);
+  ce.xclient.display = otk::OBDisplay::display;
+  ce.xclient.window = _window;
+  ce.xclient.format = 32;
+  ce.xclient.data.l[0] = property->atom(otk::OBProperty::wm_delete_window);
+  ce.xclient.data.l[1] = CurrentTime;
+  ce.xclient.data.l[2] = 0l;
+  ce.xclient.data.l[3] = 0l;
+  ce.xclient.data.l[4] = 0l;
+  XSendEvent(otk::OBDisplay::display, _window, False, NoEventMask, &ce);
+}
+
+
 void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 {
   OtkEventHandler::configureRequestHandler(e);

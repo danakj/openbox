@@ -91,28 +91,27 @@ struct _ObMenuEntry
 void menu_startup();
 void menu_shutdown();
 
-void menu_parse();
-
 ObMenu* menu_new(gchar *name, gchar *title, gpointer data);
-void menu_free(gchar *name);
-
-gboolean menu_open_plugin(ObParseInst *i, gchar *name, gchar *plugin);
-
-void menu_set_update_func(gchar *name, ObMenuUpdateFunc func);
-void menu_set_execute_func(gchar *name, ObMenuExecuteFunc func);
-void menu_set_destroy_func(gchar *name, ObMenuDestroyFunc func);
+void menu_free(ObMenu *menu);
 
 void menu_show(gchar *name, gint x, gint y, struct _ObClient *client);
 
+void menu_set_update_func(ObMenu *menu, ObMenuUpdateFunc func);
+void menu_set_execute_func(ObMenu *menu, ObMenuExecuteFunc func);
+void menu_set_destroy_func(ObMenu *menu, ObMenuDestroyFunc func);
+
 /* functions for building menus */
-void menu_clear_entries(gchar *name);
-ObMenuEntry* menu_add_normal(gchar *name, gint id, gchar *label,
+ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, gchar *label,
                              GSList *actions);
-ObMenuEntry* menu_add_submenu(gchar *name, gint id, gchar *submenu);
-ObMenuEntry* menu_add_separator(gchar *name, gint id);
+ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, gchar *submenu);
+ObMenuEntry* menu_add_separator(ObMenu *menu, gint id);
+
+void menu_clear_entries(ObMenu *menu);
+void menu_entry_remove(ObMenuEntry *self);
 
 ObMenuEntry* menu_find_entry_id(ObMenu *self, gint id);
 
+/* fills in the submenus, for use when a menu is being shown */
 void menu_find_submenus(ObMenu *self);
 
 #endif

@@ -8,7 +8,6 @@
 #include "frame.h"
 #include "screen.h"
 #include "action.h"
-#include "dispatch.h"
 #include "openbox.h"
 
 #include <glib.h>
@@ -705,13 +704,8 @@ ObAction *action_parse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
                 if ((n = parse_find_node("execute", node->xmlChildrenNode)))
                     act->data.execute.path = parse_string(doc, n);
             } else if (act->func == action_showmenu) {
-                if ((n = parse_find_node("menu", node->xmlChildrenNode))) {
-                    gchar *plugin;
-
+                if ((n = parse_find_node("menu", node->xmlChildrenNode)))
                     act->data.showmenu.name = parse_string(doc, n);
-                    if (parse_attr_string("plugin", n, &plugin))
-                        menu_open_plugin(i, act->data.showmenu.name, plugin);
-                }
             } else if (act->func == action_desktop) {
                 if ((n = parse_find_node("desktop", node->xmlChildrenNode)))
                     act->data.desktop.desk = parse_int(doc, n);

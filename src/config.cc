@@ -59,7 +59,6 @@ Config::Config()
 
   if (!python_get_string("TITLEBAR_LAYOUT", &titlebar_layout))
     titlebar_layout = "NTIMC";
-  printf("LAYOUT %s\n", titlebar_layout.c_str());
 
   if (!python_get_long("DOUBLE_CLICK_DELAY", &double_click_delay))
     double_click_delay = 300;

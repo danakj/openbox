@@ -244,7 +244,7 @@ void screen_set_num_desktops(guint num)
     for (it = client_list; it != NULL; it = it->next) {
         Client *c = it->data;
         if (c->desktop >= num)
-            client_set_desktop(num - 1);
+            client_set_desktop(c, num - 1);
     }
 
     dispatch_ob(Event_Ob_NumDesktops, num, old);

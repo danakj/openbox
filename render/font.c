@@ -152,7 +152,7 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     gint x,y,w,h;
     XftColor c;
     GString *text;
-    gint mw, em, mh;
+    gint mw, mh;
     size_t l;
     gboolean shortened = FALSE;
 
@@ -171,12 +171,11 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
         shortened = TRUE;
         /* remove a character from the middle */
         text = g_string_erase(text, l-- / 2, 1);
-        em = ELIPSES_LENGTH(t->font);
         /* if the elipses are too large, don't show them at all */
-        if (em > area->width)
+        if (ELIPSES_LENGTH(t->font) > area->width)
             shortened = FALSE;
         font_measure_full(t->font, text->str, &mw, &mh);
-        mw += em;
+        mw += ELIPSES_LENGTH(t->font);
     }
     if (shortened) {
         text = g_string_insert(text, (l + 1) / 2, ELIPSES);

@@ -928,6 +928,9 @@ static void event_handle_slit(Slit *s, XEvent *e)
 static void event_handle_slitapp(SlitApp *app, XEvent *e)
 {
     switch (e->type) {
+    case MotionNotify:
+        slit_app_drag(app, &e->xmotion);
+        break;
     case UnmapNotify:
 	if (app->ignore_unmaps) {
 	    app->ignore_unmaps--;

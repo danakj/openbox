@@ -96,14 +96,19 @@ void grab_shutdown()
     while (grab_server(FALSE));
 }
 
-void grab_button(guint button, guint state, Window win, guint mask,
-                 int pointer_mode)
+void grab_button_full(guint button, guint state, Window win, guint mask,
+                      int pointer_mode, Cursor cursor)
 {
     guint i;
 
     for (i = 0; i < MASK_LIST_SIZE; ++i)
         XGrabButton(ob_display, button, state | mask_list[i], win, FALSE, mask,
-                    pointer_mode, GrabModeSync, None, None);
+                    pointer_mode, GrabModeSync, None, cursor);
+}
+
+void grab_button(guint button, guint state, Window win, guint mask)
+{
+    grab_button_full(button, state, win, mask, GrabModeAsync, None);
 }
 
 void ungrab_button(guint button, guint state, Window win)

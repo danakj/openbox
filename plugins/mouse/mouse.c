@@ -72,7 +72,7 @@ static void grab_for_client(Client *client, gboolean grab)
             } else continue;
 
             if (grab)
-                grab_button(b->button, b->state, win, mask, mode);
+                grab_button_full(b->button, b->state, win, mask, mode, None);
             else
                 ungrab_button(b->button, b->state, win);
         }

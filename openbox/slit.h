@@ -45,6 +45,7 @@ void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib);
 void slit_remove_all();
 void slit_remove(SlitApp *app, gboolean reparent);
 
+void slit_app_drag(SlitApp *app, XMotionEvent *e);
 void slit_app_configure(SlitApp *app, int w, int h);
 
 #endif

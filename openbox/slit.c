@@ -1,5 +1,6 @@
 #include "slit.h"
 #include "screen.h"
+#include "grab.h"
 #include "timer.h"
 #include "openbox.h"
 #include "render/theme.h"
@@ -37,6 +38,8 @@ GHashTable *slit_app_map = NULL;
 static Slit *slit;
 static int nslits;
 
+static guint slit_hide_timeout = 3000; /* XXX make a config option */
+
 static void slit_configure(Slit *self);
 
 void slit_startup()
@@ -52,7 +55,7 @@ void slit_startup()
 
     for (i = 0; i < nslits; ++i) {
         slit[i].horz = FALSE;
-        slit[i].hide = TRUE;
+        slit[i].hide = FALSE;
         slit[i].hidden = TRUE;
         slit[i].pos = SlitPos_TopRight;
 
@@ -119,7 +122,6 @@ void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib)
         XMoveWindow(ob_display, app->win, -1000, -1000);
         XMapWindow(ob_display, app->win);
     }
-    g_message("   Slitting 0x%lx 0x%lx", app->icon_win, app->win);
     XMapWindow(ob_display, app->icon_win);
     XSync(ob_display, False);
 
@@ -127,6 +129,9 @@ void slit_add(Window win, XWMHints *wmhints, XWindowAttributes *attrib)
        be reparented back to root automatically */
     XChangeSaveSet(ob_display, app->icon_win, SetModeInsert);
     XSelectInput(ob_display, app->icon_win, SLITAPP_EVENT_MASK);
+
+    grab_button_full(2, 0, app->icon_win, ButtonMotionMask, GrabModeAsync,
+                     ob_cursors.move);
 
     g_hash_table_insert(slit_app_map, &app->icon_win, app);
 
@@ -144,6 +149,7 @@ void slit_remove_all()
 
 void slit_remove(SlitApp *app, gboolean reparent)
 {
+    ungrab_button(2, 0, app->icon_win);
     XSelectInput(ob_display, app->icon_win, NoEventMask);
     /* remove the window from our save set */
     XChangeSaveSet(ob_display, app->icon_win, SetModeDelete);
@@ -185,7 +191,7 @@ static void slit_configure(Slit *self)
         } else {
             app->x = 0;
             app->y = spot;
-            self->w = MAX(self->h, app->w);
+            self->w = MAX(self->w, app->w);
             self->h += app->h;
             spot += app->h;
         }
@@ -327,6 +333,10 @@ static void slit_configure(Slit *self)
         XMapWindow(ob_display, self->frame);
     } else
         XUnmapWindow(ob_display, self->frame);
+
+    /* but they are useful outside of this function! */
+    self->w += theme_bwidth * 2;
+    self->h += theme_bwidth * 2;
 }
 
 void slit_app_configure(SlitApp *app, int w, int h)
@@ -334,6 +344,64 @@ void slit_app_configure(SlitApp *app, int w, int h)
     app->w = w;
     app->h = h;
     slit_configure(app->slit);
+}
+
+void slit_app_drag(SlitApp *app, XMotionEvent *e)
+{
+    Slit *src, *dest = NULL;
+    SlitApp *over = NULL;
+    GList *it;
+    int i;
+    int x, y;
+    gboolean after;
+
+    src = app->slit;
+    x = e->x_root;
+    y = e->y_root;
+
+    /* which slit are we on top of? */
+    for (i = 0; i < nslits; ++i)
+        if (x >= slit[i].x &&
+            y >= slit[i].y &&
+            x < slit[i].x + slit[i].w &&
+            y < slit[i].y + slit[i].h) {
+            dest = &slit[i];
+            break;
+        }
+    if (!dest) return;
+
+    x -= dest->x;
+    y -= dest->y;
+
+    /* which slit app are we on top of? */
+    for (it = dest->slit_apps; it; it = it->next) {
+        over = it->data;
+        if (dest->horz) {
+            if (x >= over->x && x < over->x + over->w)
+                break;
+        } else {
+            if (y >= over->y && y < over->y + over->h)
+                break;
+        }
+    }
+    if (!it || app == over) return;
+
+    x -= over->x;
+    y -= over->y;
+
+    if (dest->horz)
+        after = (x > over->w / 2);
+    else
+        after = (y > over->h / 2);
+
+    /* remove before doing the it->next! */
+    src->slit_apps = g_list_remove(src->slit_apps, app);
+    if (src != dest) slit_configure(src);
+
+    if (after) it = it->next;
+
+    dest->slit_apps = g_list_insert_before(dest->slit_apps, it, app);
+    slit_configure(dest);
 }
 
 static void hide_timeout(Slit *self)
@@ -349,7 +417,7 @@ static void hide_timeout(Slit *self)
 
 void slit_hide(Slit *self, gboolean hide)
 {
-    if (self->hidden == hide)
+    if (self->hidden == hide || !self->hide)
         return;
     if (!hide) {
         /* show */
@@ -363,7 +431,7 @@ void slit_hide(Slit *self, gboolean hide)
         }
     } else {
         g_assert(!self->hide_timer);
-        self->hide_timer = timer_start(3000000,
+        self->hide_timer = timer_start(slit_hide_timeout * 1000,
                                        (TimeoutHandler)hide_timeout, self);
     }
 }

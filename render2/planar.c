@@ -1,6 +1,7 @@
 #include "planar.h"
 #include "surface.h"
 #include "color.h"
+#include "debug.h"
 #include <GL/glx.h>
 
 void RrPlanarSet(struct RrSurface *sur,
@@ -58,6 +59,7 @@ static void copy_parent(struct RrSurface *sur)
 
         XXX COPY PARENT PLS
         */
+        RrDebug("copy parent here pls\n");
     }
 }
 

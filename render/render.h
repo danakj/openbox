@@ -101,9 +101,16 @@ typedef struct {
     XftFont *xftfont;
 } ObFont;
 
+typedef enum {
+    Justify_Center,
+    Justify_Left,
+    Justify_Right
+} Justify;
+
 typedef struct TextureText {
     ObFont *font;
-    int shadow;  
+    Justify justify;
+    int shadow;
     unsigned char tint;
     unsigned char offset;
     color_rgb *color;

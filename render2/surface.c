@@ -23,9 +23,11 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
 
 static Window create_window(struct RrInstance *inst, Window parent)
 {
-    return XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
-                         RrDepth(inst), InputOutput, RrVisual(inst),
-                         0, NULL);
+    Window win = XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
+                               RrDepth(inst), InputOutput, RrVisual(inst),
+                               0, NULL);
+    XMapWindow(RrDisplay(inst), win);
+    return win;
 }
 
 struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,

@@ -4,70 +4,166 @@
 
 #include <glib.h>
 
-void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba, RrRect *area)
+#define AVERAGE(a, b)   ( ((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)) )
+
+static void scale_line(RrPixel32 *dest, RrPixel32 *source, gint w, gint dw)
 {
-    RrPixel32 *draw = rgba->data;
-    gint c, i, e, t, sfw, sfh;
-    sfw = area->width;
-    sfh = area->height;
+    gint num_pixels = dw;
+    gint int_part = w / dw;
+    gint fract_part = w % dw;
+    gint err = 0;
 
-    g_assert(rgba->data != NULL);
-
-    if ((rgba->width != sfw || rgba->height != sfh) &&
-        (rgba->width != rgba->cwidth || rgba->height != rgba->cheight)) {
-        double dx = rgba->width / (double)sfw;
-        double dy = rgba->height / (double)sfh;
-        double px = 0.0;
-        double py = 0.0;
-        int iy = 0;
-
-        /* scale it and cache it */
-        if (rgba->cache != NULL)
-            g_free(rgba->cache);
-        rgba->cache = g_new(RrPixel32, sfw * sfh);
-        rgba->cwidth = sfw;
-        rgba->cheight = sfh;
-        for (i = 0, c = 0, e = sfw*sfh; i < e; ++i) {
-            rgba->cache[i] = rgba->data[(int)px + iy];
-            if (++c >= sfw) {
-                c = 0;
-                px = 0;
-                py += dy;
-                iy = (int)py * rgba->width;
-            } else
-                px += dx;
+    while (num_pixels-- > 0) {
+        *dest++ = *source;
+        source += int_part;
+        err += fract_part;
+        if (err >= dw) {
+            err -= dw;
+            source++;
         }
+    }
+}
 
-        /* do we use the cache we may have just created, or the original? */
-        if (rgba->width != sfw || rgba->height != sfh)
-            draw = rgba->cache;
+static RrPixel32* scale_half(RrPixel32 *source, gint w, gint h)
+{
+    RrPixel32 *out, *dest, *sourceline, *sourceline2;
+    gint dw, dh, x, y;
 
-        /* apply the alpha channel */
-        for (i = 0, c = 0, t = area->x, e = sfw*sfh; i < e; ++i, ++t) {
-            guchar alpha, r, g, b, bgr, bgg, bgb;
+    sourceline = source;
+    sourceline2 = source + w;
 
-            alpha = draw[i] >> RrDefaultAlphaOffset;
-            r = draw[i] >> RrDefaultRedOffset;
-            g = draw[i] >> RrDefaultGreenOffset;
-            b = draw[i] >> RrDefaultBlueOffset;
+    dw = w >> 1;
+    dh = h >> 1;
 
-            if (c >= sfw) {
-                c = 0;
-                t += area->width - sfw;
-            }
+    out = dest = g_new(RrPixel32, dw * dh);
 
-            /* background color */
-            bgr = target[t] >> RrDefaultRedOffset;
-            bgg = target[t] >> RrDefaultGreenOffset;
-            bgb = target[t] >> RrDefaultBlueOffset;
+    for (y = 0; y < dh; ++y) {
+        RrPixel32 *s, *s2;
 
-            r = bgr + (((r - bgr) * alpha) >> 8);
-            g = bgg + (((g - bgg) * alpha) >> 8);
-            b = bgb + (((b - bgb) * alpha) >> 8);
+        s = sourceline;
+        s2 = sourceline2;
 
-            target[t] = (r << RrDefaultRedOffset)
-                      | (g << RrDefaultGreenOffset)
-                      | (b << RrDefaultBlueOffset);
+        for (x = 0; x < dw; ++x) {
+            *dest++ = AVERAGE(AVERAGE(*s, *(s+1)),
+                              AVERAGE(*s2, *(s2+1)));
+            s += 2;
+            s2 += 2;
+        }
+        sourceline += w << 1;
+        sourceline2 += w << 1;
+    }
+    return out;
+}
+
+static RrPixel32* scale_rect(RrPixel32 *fullsource,
+                             gint w, gint h, gint dw, gint dh)
+{
+    RrPixel32 *out, *dest;
+    RrPixel32 *source = fullsource;
+    RrPixel32 *oldsource = NULL;
+    RrPixel32 *prev_source = NULL;
+    gint num_pixels;
+    gint int_part;
+    gint fract_part;
+    gint err = 0;
+
+    while (dw <= (w >> 1) && dh <= (h >> 1)) {
+        source = scale_half(source, w, h);
+        w >>= 1; h >>= 1;
+        g_free(oldsource);
+        oldsource = source;
+    }
+
+    num_pixels = dh;
+    int_part = (h / dh) * w;
+    fract_part = h % dh;
+
+    out = dest = g_new(RrPixel32, dw * dh);
+
+    while (num_pixels-- > 0) {
+        if (source == prev_source) {
+            memcpy(dest, dest - dw, dw * sizeof(RrPixel32));
+        } else {
+            scale_line(dest, source, w, dw);
+            prev_source = source;
+        }
+        dest += dw;
+        source += int_part;
+        err += fract_part;
+        if (err >= dh) {
+            err -= dh;
+            source += w;
+        }
+    }
+
+    g_free(oldsource);
+
+    return out;
+}
+
+void RrImageDraw(RrPixel32 *target, RrTextureRGBA *rgba,
+                 gint target_w, gint target_h,
+                 RrRect *area)
+{
+    RrPixel32 *dest;
+    RrPixel32 *source;
+    gint sw, sh, dw, dh;
+    gint col, num_pixels;
+
+    sw = rgba->width;
+    sh = rgba->height;
+
+    /* keep the ratio */
+    dw = area->width;
+    dh = (int)(dw * ((double)sh / sw));
+    if (dh > area->height) {
+        dh = area->height;
+        dw = (int)(dh * ((double)sw / sh));
+    }
+
+    if (sw != dw || sh != dh) {
+        /*if (!(rgba->cache && dw == rgba->cwidth && dh == rgba->cheight))*/ {
+            g_free(rgba->cache);
+            rgba->cache = scale_rect(rgba->data, sw, sh, dw, dh);
+            rgba->cwidth = dw;
+            rgba->cheight = dh;
+        }
+        source = rgba->cache;
+    } else {
+        source = rgba->data;
+    }
+
+    /* copy source -> dest, and apply the alpha channel */
+    col = 0;
+    num_pixels = dw * dh;
+    dest = target + area->x + target_w * area->y;
+    while (num_pixels-- > 0) {
+        guchar alpha, r, g, b, bgr, bgg, bgb;
+
+        alpha = *source >> RrDefaultAlphaOffset;
+        r = *source >> RrDefaultRedOffset;
+        g = *source >> RrDefaultGreenOffset;
+        b = *source >> RrDefaultBlueOffset;
+        
+        /* background color */
+        bgr = *dest >> RrDefaultRedOffset;
+        bgg = *dest >> RrDefaultGreenOffset;
+        bgb = *dest >> RrDefaultBlueOffset;
+
+        r = bgr + (((r - bgr) * alpha) >> 8);
+        g = bgg + (((g - bgg) * alpha) >> 8);
+        b = bgb + (((b - bgb) * alpha) >> 8);
+
+        *dest = ((r << RrDefaultRedOffset) |
+                 (g << RrDefaultGreenOffset) |
+                 (b << RrDefaultBlueOffset));
+
+        dest++;
+        source++;
+
+        if (col++ >= dw) {
+            col = 0;
+            dest += target_w - dw;
         }
     }
 }

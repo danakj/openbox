@@ -11,7 +11,7 @@ static gboolean follow_mouse = TRUE;
 static gboolean warp_on_desk_switch = FALSE;
 static gboolean focus_new = FALSE;
 
-static int skip_enter = 0;
+/*static int skip_enter = 0;*/
 
 static gboolean focus_under_pointer()
 {
@@ -102,17 +102,16 @@ static void events(ObEvent *e, void *foo)
         break;
 
     case Event_X_EnterNotify:
-        if (skip_enter) {
+/*        if (skip_enter) {
             if (e->data.x.client != NULL)
                 g_message("skipped enter %lx", e->data.x.client->window);
             else
                 g_message("skipped enter 'root'");
             --skip_enter;
         }
-        else if (e->data.x.client != NULL && client_normal(e->data.x.client)) {
-            g_message("enter %lx", e->data.x.client->window);
+        else*/
+        if (e->data.x.client != NULL && client_normal(e->data.x.client))
             client_focus(e->data.x.client);
-        }
         break;
 
     default:

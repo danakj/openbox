@@ -152,10 +152,12 @@ Openbox::Openbox(int argc, char **argv)
 
   for (int i = 0, max = ScreenCount(**otk::display); i < max; ++i) {
     Screen *screen;
+    // in single mode skip the screens we don't want to manage
     if (_single && i != DefaultScreen(**otk::display)) {
       _screens.push_back(0);
       continue;
     }
+    // try manage the screen
     screen = new Screen(i);
     if (screen->managed()) {
       _screens.push_back(screen);

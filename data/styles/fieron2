@@ -149,13 +149,10 @@ bevelWidth:	1
 borderWidth:	1
 borderColor:	#181f24
 
-menu.arrow.mask:~/.openbox/buttons/fieron-bullet.xbm
-toolbar.button.left.mask:~/.openbox/buttons/fieron-bulletl.xbm
-toolbar.button.right.mask:~/.openbox/buttons/fieron-bullet.xbm
-window.button.max.mask:~/.openbox/buttons/fieron-max.xbm
-window.button.icon.mask:~/.openbox/buttons/fieron-icon.xbm
-window.button.stick.mask:~/.openbox/buttons/fieron-stick.xbm
-window.button.close.mask:~/.openbox/buttons/fieron-close.xbm
+window.button.max.mask:  fieron-max.xbm
+window.button.icon.mask: fieron-icon.xbm
+window.button.stick.mask:fieron-stick.xbm
+window.button.close.mask:fieron-close.xbm
 
 *.xft.flags: shadow bold
 *.xft.shadow.offset: 1

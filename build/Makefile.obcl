@@ -17,7 +17,7 @@ depdir := $(depdir)/$(dir)
 all: $(target)
 
 $(target): $(objects)
-	$(LINK) -o $@ $^ $(LDFLAGS)
+	$(LINK) -rpath $(libdir) -o $@ $^ $(LDFLAGS)
 
 $(dir)/%.lo: $(srcdir)/%.c $(depdir)/%.d
 	$(LTCOMPILE) -c -o $@ $<
@@ -31,6 +31,7 @@ install:
 	$(INSTALL) -d $(DESTDIR)$(libdir)/
 	$(LIBTOOL) --mode=install $(INSTALL) $(target) \
 		$(DESTDIR)$(libdir)/$(notdir $(target))
+	$(LIBTOOL) --mode=finish $(DESTDIR)$(libdir)
 
 uninstall:
 	$(LTRM) $(DESTDIR)$(libdir)/$(notdir $(target))

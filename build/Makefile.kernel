@@ -4,8 +4,9 @@ dir = kernel
 
 CPPFLAGS += $(GLIB_CFLAGS) $(GMODULE_CFLAGS) $(XFT_CFLAGS) $(X_CFLAGS) \
             -DG_LOG_DOMAIN=\"Openbox\"
-LIBS += $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS) $(X_LIBS) $(XINERAMA_LIBS)
-LDFLAGS += -export-dynamic
+LIBS += $(GLIB_LIBS) $(GMODULE_LIBS) $(XFT_LIBS) $(X_LIBS) $(XINERAMA_LIBS) \
+	-lobrender
+LDFLAGS += -Lrender -export-dynamic
 
 target = openbox3
 sources = action.c client.c config.c dispatch.c engine.c event.c group.c \
@@ -22,7 +23,7 @@ depdir := $(depdir)/$(dir)
 
 all: $(target)
 
-$(target): $(objects) render/librender.a
+$(target): $(objects) render/libobrender.la
 	$(LINK) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 # kill the implicit .c.y rule

@@ -149,9 +149,7 @@ static void event(ObEvent *e, void *foo)
                             p->action->data.cycle.cancel = FALSE;
                         }
 
-                        if (!grabbed_key ||
-                            p->action->func == action_cycle_windows)
-                            p->action->func(&p->action->data);
+                        p->action->func(&p->action->data);
 
                         if (p->action->func == action_cycle_windows &&
                             !grabbed_key) {

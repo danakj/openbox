@@ -65,6 +65,9 @@ private:
   void lowerTransients(const BlackboxWindow * const win,
                        StackVector::iterator &stack);
 
+  typedef std::vector<Rect> rectList;
+  rectList calcSpace(const Rect &win, const rectList &spaces) const;
+
   void placeWindow(BlackboxWindow *win);
   bool cascadePlacement(Rect& win, const int offset);
   bool smartPlacement(Rect& win);

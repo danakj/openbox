@@ -530,9 +530,8 @@ void Workspace::setName(const string& new_name) {
 /*
  * Calculate free space available for window placement.
  */
-typedef std::vector<Rect> rectList;
-
-static rectList calcSpace(const Rect &win, const rectList &spaces) {
+Workspace::rectList Workspace::calcSpace(const Rect &win,
+                                         const rectList &spaces) const {
   Rect isect, extra;
   rectList result;
   rectList::const_iterator siter, end = spaces.end();
@@ -553,21 +552,21 @@ static rectList calcSpace(const Rect &win, const rectList &spaces) {
 
     // left
     extra.setCoords(curr.left(), curr.top(),
-                    isect.left() - 1, curr.bottom());
+                    isect.left() - screen->getSnapOffset(), curr.bottom());
     if (extra.valid()) result.push_back(extra);
 
     // top
     extra.setCoords(curr.left(), curr.top(),
-                    curr.right(), isect.top() - 1);
+                    curr.right(), isect.top() - screen->getSnapOffset());
     if (extra.valid()) result.push_back(extra);
 
     // right
-    extra.setCoords(isect.right() + 1, curr.top(),
+    extra.setCoords(isect.right() + screen->getSnapOffset(), curr.top(),
                     curr.right(), curr.bottom());
     if (extra.valid()) result.push_back(extra);
 
     // bottom
-    extra.setCoords(curr.left(), isect.bottom() + 1,
+    extra.setCoords(curr.left(), isect.bottom() + screen->getSnapOffset(),
                     curr.right(), curr.bottom());
     if (extra.valid()) result.push_back(extra);
   }

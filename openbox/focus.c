@@ -356,14 +356,13 @@ static void popup_cycle(ObClient *c, gboolean show)
         while (p->transient_for && p->transient_for != OB_TRAN_GROUP)
             p = p->transient_for;
 
-/*
-        if (p != c)
-            title = g_strconcat((c->iconic ? c->icon_title : c->title),
+        if (p != c && !strcmp("", (c->iconic ? c->icon_title : c->title)))
+            title = g_strdup(p->iconic ? p->icon_title : p->title);
+            /*title = g_strconcat((c->iconic ? c->icon_title : c->title),
                                 " - ",
                                 (p->iconic ? p->icon_title : p->title),
                                 NULL);
-*/
-
+            */
         icon_popup_show(focus_cycle_popup,
                         (title ? title :
                          (c->iconic ? c->icon_title : c->title)),

@@ -1,4 +1,5 @@
 Makefile
 Makefile.in
 html
+latex
 doxygen.conf

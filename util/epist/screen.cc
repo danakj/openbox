@@ -149,7 +149,9 @@ void screen::processEvent(const XEvent &e) {
                                  DestroyNotify, &ev) ||
           XCheckTypedWindowEvent(_epist->getXDisplay(), e.xany.window,
                                  UnmapNotify, &ev)) {
-        processEvent(ev);
+
+        XWindow *win = _epist->findWindow(e.xany.window);
+        if (win) win->processEvent(ev);
       }
 
       updateClientList();

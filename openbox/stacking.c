@@ -243,7 +243,7 @@ void stacking_raise(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, TRUE);
-        wins = g_list_concat(wins, pick_group_windows(c, selected, TRUE));
+        /*wins = g_list_concat(wins, pick_group_windows(c, selected, TRUE));*/
     } else {
         wins = g_list_append(NULL, window);
         stacking_list = g_list_remove(stacking_list, window);
@@ -262,7 +262,7 @@ void stacking_lower(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         c = client_search_top_transient(selected);
         wins = pick_windows(c, selected, FALSE);
-        wins = g_list_concat(pick_group_windows(c, selected, FALSE), wins);
+        /*wins = g_list_concat(pick_group_windows(c, selected, FALSE), wins);*/
     } else {
         wins = g_list_append(NULL, window);
         stacking_list = g_list_remove(stacking_list, window);

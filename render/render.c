@@ -177,7 +177,7 @@ Appearance *appearance_copy(Appearance *orig)
     break;
     }
     copy->textures = orig->textures;
-    copy->texture = NULL; /* XXX FIX ME */
+    memcpy(copy->texture, orig->texture, orig->textures * sizeof(Texture));
     copy->pixmap = None;
     copy->xftdraw = NULL;
     return copy;

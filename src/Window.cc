@@ -3859,10 +3859,15 @@ void BlackboxWindow::enterNotifyEvent(const XCrossingEvent* ce) {
       bool success = setInputFocus();
       if (success)    // if focus succeeded install the colormap
         installColormap(True); // XXX: shouldnt we honour no install?
-    }
 
-    if (screen->doAutoRaise())
-      timer->start();
+      /*
+        We only auto-raise when the window wasn't focused because otherwise
+        we run into problems with gtk+ drop-down lists. The window ends up
+        raising over the list.
+      */
+      if (screen->doAutoRaise())
+        timer->start();
+    }
   }
 }
 

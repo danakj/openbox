@@ -104,7 +104,6 @@ void OBFrame::setStyle(otk::Style *style)
 
   if (replace) {
     // XXX: do shit here whatever
-    // XXX: save the position based on gravity
   }
   
   _style = style;
@@ -125,12 +124,15 @@ void OBFrame::setStyle(otk::Style *style)
                    _style->getBorderColor()->pixel());
   
   // if !replace, then adjust() will get called after the client is grabbed!
-  if (replace)
-    adjust(); // size/position everything
+  if (replace) {
+    // size/position everything
+    adjustSize();
+    adjustPosition();
+  }
 }
 
 
-void OBFrame::adjust()
+void OBFrame::adjustSize()
 {
   // XXX: only if not overridden or something!!! MORE LOGIC HERE!!
   _decorations = _client->decorations();
@@ -311,6 +313,14 @@ void OBFrame::adjust()
 }
 
 
+void OBFrame::adjustPosition()
+{
+  int x, y;
+  clientGravity(x, y);
+  move(x, y);
+}
+
+
 void OBFrame::adjustShape()
 {
 #ifdef SHAPE
@@ -365,15 +375,15 @@ void OBFrame::grabClient()
                   _plate.getWindow(), 0, 0);
   _client->ignore_unmaps++;
 
-  // select the event mask on the client's parent
-  //XSelectInput(otk::OBDisplay::display, _plate.getWindow(),
-  //             SubstructureRedirectMask);
+  // select the event mask on the client's parent (to receive config req's)
+  XSelectInput(otk::OBDisplay::display, _plate.getWindow(),
+               SubstructureRedirectMask);
 
   // map the client so it maps when the frame does
   XMapWindow(otk::OBDisplay::display, _client->window());
 
-  adjust();
-  applyGravity();
+  adjustSize();
+  adjustPosition();
 }
 
 
@@ -399,69 +409,115 @@ void OBFrame::releaseClient(bool remap)
 }
 
 
-void OBFrame::applyGravity()
+void OBFrame::clientGravity(int &x, int &y)
 {
-  int x, y;
-  // apply horizontal window gravity
+  x = _client->area().x();
+  y = _client->area().y();
+
+  // horizontal
   switch (_client->gravity()) {
   default:
   case NorthWestGravity:
   case SouthWestGravity:
   case WestGravity:
-    x = _client->area().x();
     break;
 
   case NorthGravity:
   case SouthGravity:
   case CenterGravity:
-    x = _client->area().x() - (_size.left + _size.right) / 2;
+    x -= (_size.left + _size.right) / 2;
     break;
 
   case NorthEastGravity:
   case SouthEastGravity:
   case EastGravity:
-    x = _client->area().x() - _size.left - _size.right + 2;
+    x -= _size.left + _size.right;
     break;
 
   case ForgetGravity:
   case StaticGravity:
-    x = _client->area().x() - _size.left;
+    x -= _size.left;
     break;
   }
 
-  // apply vertical window gravity
+  // vertical
   switch (_client->gravity()) {
   default:
   case NorthWestGravity:
   case NorthEastGravity:
   case NorthGravity:
-    y = _client->area().y();
     break;
 
   case CenterGravity:
   case EastGravity:
   case WestGravity:
-    y = _client->area().y() - (_size.top + _size.bottom) / 2;
+    y -= (_size.top + _size.bottom) / 2;
     break;
 
   case SouthWestGravity:
   case SouthEastGravity:
   case SouthGravity:
-    y = _client->area().y() - _size.top - _size.bottom + 2;
+    y -= _size.top + _size.bottom;
     break;
 
   case ForgetGravity:
   case StaticGravity:
-    y = _client->area().y() - _size.top;
+    y -= _size.top;
     break;
   }
-  move(x, y);
 }
 
 
-void OBFrame::reverseGravity()
+void OBFrame::frameGravity(int &x, int &y)
 {
-  move(_client->area().x() - _size.left, _client->area().y() - _size.top);
+  x = getRect().x();
+  y = getRect().y();
+  
+  // horizontal
+  switch (_client->gravity()) {
+  default:
+  case NorthWestGravity:
+  case WestGravity:
+  case SouthWestGravity:
+    break;
+  case NorthGravity:
+  case CenterGravity:
+  case SouthGravity:
+    x += (_size.left + _size.right) / 2;
+    break;
+  case NorthEastGravity:
+  case EastGravity:
+  case SouthEastGravity:
+    x += _size.left + _size.right;
+    break;
+  case StaticGravity:
+  case ForgetGravity:
+    x += _size.left;
+    break;
+  }
+
+  // vertical
+  switch (_client->gravity()) {
+  default:
+  case NorthWestGravity:
+  case WestGravity:
+  case SouthWestGravity:
+    break;
+  case NorthGravity:
+  case CenterGravity:
+  case SouthGravity:
+    y += (_size.top + _size.bottom) / 2;
+    break;
+  case NorthEastGravity:
+  case EastGravity:
+  case SouthEastGravity:
+    y += _size.top + _size.bottom;
+    break;
+  case StaticGravity:
+  case ForgetGravity:
+    y += _size.top;
+    break;
+  }
 }
 
 

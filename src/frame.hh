@@ -75,6 +75,9 @@ private:
   */
   void releaseClient(bool remap);
 
+  //! Shape the frame window to the client window
+  void adjustShape();
+
 public:
   //! Constructs an OBFrame object, and reparents the client to itself
   /*!
@@ -88,18 +91,25 @@ public:
   //! Set the style to decorate the frame with
   virtual void setStyle(otk::Style *style);
 
-  //! Update the frame to match the client
-  void adjust();
-  //! Shape the frame window to the client window
-  void adjustShape();
+  //! Update the frame's size to match the client
+  void adjustSize();
+  //! Update the frame's position to match the client
+  void adjustPosition();
 
-  //! Applies gravity for the client's gravity, moving the frame to the
-  //! appropriate place
-  void applyGravity();
+  //! Applies gravity to the client's position to find where the frame should
+  //! be positioned.
+  /*!
+    @return The proper coordinates for the frame, based on the client.
+  */
+  void clientGravity(int &x, int &y);
 
-  //! Reversely applies gravity for the client's gravity, moving the frame so
-  //! that the client is in its pre-gravity position
-  void reverseGravity();
+  //! Reversly applies gravity to the frame's position to find where the client
+  //! should be positioned.
+  /*!
+    @return The proper coordinates for the client, based on the frame.
+  */
+  void frameGravity(int &x, int &y);
+
 };
 
 }

@@ -26,7 +26,7 @@ namespace ob {
 
 OBClient::OBClient(int screen, Window window)
   : otk::OtkEventHandler(),
-    _screen(screen), _window(window)
+    frame(0), _screen(screen), _window(window)
 {
   assert(screen >= 0);
   assert(window);
@@ -371,6 +371,7 @@ void OBClient::updateNormalHints()
 {
   XSizeHints size;
   long ret;
+  int oldgravity = _gravity;
 
   // defaults
   _gravity = NorthWestGravity;
@@ -388,7 +389,7 @@ void OBClient::updateNormalHints()
 
     if (size.flags & PWinGravity)
       _gravity = size.win_gravity;
-    
+
     if (size.flags & PMinSize)
       _min_size.setPoint(size.min_width, size.min_height);
     
@@ -400,6 +401,15 @@ void OBClient::updateNormalHints()
     
     if (size.flags & PResizeInc)
       _size_inc.setPoint(size.width_inc, size.height_inc);
+  }
+
+  // if the client has a frame, i.e. has already been mapped and is
+  // changing its gravity
+  if (frame && _gravity != oldgravity) {
+    // move our idea of the client's position based on its new gravity
+    int x, y;
+    frame->frameGravity(x, y);
+    _area.setPos(x, y);
   }
 }
 
@@ -651,6 +661,57 @@ void OBClient::setState(StateAction action, long data1, long data2)
 }
 
 
+void OBClient::toggleClientBorder(bool addborder)
+{
+  // adjust our idea of where the client is, based on its border. When the
+  // border is removed, the client should now be considered to be in a
+  // different position.
+  // when re-adding the border to the client, the same operation needs to be
+  // reversed.
+  int x = _area.x(), y = _area.y();
+  switch(_gravity) {
+  case NorthWestGravity:
+  case WestGravity:
+  case SouthWestGravity:
+    if (addborder) x += _border_width;
+    else           x -= _border_width;
+    break;
+  case NorthEastGravity:
+  case EastGravity:
+  case SouthEastGravity:
+    if (addborder) x -= _border_width * 2;
+    else           x += _border_width * 2;
+    break;
+  }
+  switch(_gravity) {
+  case NorthWestGravity:
+  case NorthGravity:
+  case NorthEastGravity:
+    if (addborder) y += _border_width;
+    else           y -= _border_width;
+    break;
+  case SouthWestGravity:
+  case SouthGravity:
+  case SouthEastGravity:
+    if (addborder) y -= _border_width * 2;
+    else           y += _border_width * 2;
+    break;
+  default:
+    // no change for StaticGravity etc.
+    break;
+  }
+  _area.setPos(x, y);
+
+  if (addborder) {
+    XSetWindowBorderWidth(otk::OBDisplay::display, _window, _border_width);
+
+    // move the client so it is back it the right spot _with_ its border!
+    XMoveWindow(otk::OBDisplay::display, _window, x, y);
+  } else
+    XSetWindowBorderWidth(otk::OBDisplay::display, _window, 0);
+}
+
+
 void OBClient::clientMessageHandler(const XClientMessageEvent &e)
 {
   otk::OtkEventHandler::clientMessageHandler(e);
@@ -738,26 +799,29 @@ void OBClient::resize(Corner anchor, int w, int h)
 
   w += _base_size.x();
   h += _base_size.y();
-  
+
+  int x = _area.x(), y = _area.y();  
   switch (anchor) {
   case TopLeft:
     break;
   case TopRight:
-    _area.setX(_area.x() - _area.width() - w);
+    x -= w - _area.width();
     break;
   case BottomLeft:
-    _area.setY(_area.y() - _area.height() - h);
+    y -= h - _area.height();
     break;
   case BottomRight:
-    _area.setX(_area.x() - _area.width() - w);
-    _area.setY(_area.y() - _area.height() - h);
+    x -= w - _area.width();
+    y -= h - _area.height();
     break;
   }
 
   _area.setSize(w, h);
+  XResizeWindow(otk::OBDisplay::display, _window, w, h);
 
-  // resize the frame to match
-  frame->adjust();
+  // resize the frame to match the request
+  frame->adjustSize();
+  move(x, y);
 }
 
 
@@ -765,14 +829,14 @@ void OBClient::move(int x, int y)
 {
   _area.setPos(x, y);
   // move the frame to be in the requested position
-  frame->applyGravity();
+  frame->adjustPosition();
 }
 
 
 void OBClient::configureRequestHandler(const XConfigureRequestEvent &e)
 {
   OtkEventHandler::configureRequestHandler(e);
-  
+
   // XXX: if we are iconic (or shaded? (fvwm does that)) ignore the event
 
   if (e.value_mask & CWBorderWidth)

@@ -354,7 +354,7 @@ void OBScreen::manageWindow(Window window)
   Openbox::instance->registerHandler(window, client);
 
   // we dont want a border on the client
-  XSetWindowBorderWidth(otk::OBDisplay::display, window, 0);
+  client->toggleClientBorder(false);
   
   // specify that if we exit, the window should not be destroyed and should be
   // reparented back to root automatically
@@ -399,10 +399,9 @@ void OBScreen::unmanageWindow(OBClient *client)
   XSelectInput(otk::OBDisplay::display, client->window(), NoEventMask);
 
   frame->hide();
-  
-  // we dont want a border on the client
-  XSetWindowBorderWidth(otk::OBDisplay::display, client->window(),
-                        client->borderWidth());
+
+  // give the client its border back
+  client->toggleClientBorder(true);
 
   delete client->frame;
   client->frame = 0;

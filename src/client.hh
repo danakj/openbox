@@ -297,10 +297,6 @@ private:
   // XXX: updateTransientFor();
 
   //! Move the client window
-  /*!
-    This shouldnt be used to move the window internally! It will apply
-    window gravity after moving the window.
-  */
   void move(int x, int y);
   
   //! Resizes the client window, anchoring it in a given corner
@@ -409,8 +405,13 @@ public:
   */
   inline bool floating() const { return _floating; }
 
-  //! Returns the client's requested border width (not used by the wm)
-  inline int borderWidth() const { return _border_width; }
+  //! Removes or reapplies the client's border to its window
+  /*!
+    Used when managing and unmanaging a window.
+    @param addborder true if adding the border to the client; false if removing
+                     from the client
+  */
+  void toggleClientBorder(bool addborder);
 
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }

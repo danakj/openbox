@@ -271,7 +271,7 @@ def setup_scroll():
 
 def setup_fallback_focus():
     """Sets up a focus fallback routine so that when no windows are focused,
-       the last window on the desktop that had focus will be focused."""
+       the last window to have focus on the desktop will be focused."""
     focus_stack = []
     def focused(data):
         #global focus_stack

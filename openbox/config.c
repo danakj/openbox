@@ -364,11 +364,11 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
     }
     if ((n = parse_find_node("stacking", node))) {
         if (parse_contains("top", doc, n))
-            config_dock_layer = OB_STACKING_LAYER_DOCK_ABOVE;
+            config_dock_layer = OB_STACKING_LAYER_ABOVE;
         else if (parse_contains("normal", doc, n))
-            config_dock_layer = OB_STACKING_LAYER_DOCK_NORMAL;
+            config_dock_layer = OB_STACKING_LAYER_NORMAL;
         else if (parse_contains("bottom", doc, n))
-            config_dock_layer = OB_STACKING_LAYER_DOCK_BELOW;
+            config_dock_layer = OB_STACKING_LAYER_BELOW;
     }
     if ((n = parse_find_node("direction", node))) {
         if (parse_contains("horizontal", doc, n))
@@ -568,7 +568,7 @@ void config_startup(ObParseInst *i)
 
     parse_register(i, "resize", parse_resize, NULL);
 
-    config_dock_layer = OB_STACKING_LAYER_DOCK_ABOVE;
+    config_dock_layer = OB_STACKING_LAYER_ABOVE;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
     config_dock_floating = FALSE;
     config_dock_x = 0;

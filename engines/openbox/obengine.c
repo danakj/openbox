@@ -82,6 +82,9 @@ Appearance *ob_a_icon; /* always parentrelative, so no focused/unfocused */
 Appearance *ob_a_focused_handle;
 Appearance *ob_a_unfocused_handle;
 
+Appearance *ob_app_hilite_label;
+Appearance *ob_app_unhilite_label;
+
 static void layout_title(ObFrame *self);
 static void mouse_event(const ObEvent *e, ObFrame *self);
 
@@ -140,6 +143,8 @@ gboolean startup()
     ob_a_icon = appearance_new(Surface_Planar, 1);
     ob_a_focused_handle = appearance_new(Surface_Planar, 0);
     ob_a_unfocused_handle = appearance_new(Surface_Planar, 0);
+    ob_app_hilite_label = appearance_new(Surface_Planar, 1);
+    ob_app_unhilite_label = appearance_new(Surface_Planar, 1);
 
     if (obtheme_load()) {
         RECT_SET(ob_a_focused_pressed_desk->area, 0, 0,
@@ -284,6 +289,8 @@ void shutdown()
     appearance_free(ob_a_icon);
     appearance_free(ob_a_focused_handle);
     appearance_free(ob_a_unfocused_handle);
+    appearance_free(ob_app_hilite_label);
+    appearance_free(ob_app_unhilite_label);
 }
 
 static Window createWindow(Window parent, unsigned long mask,

@@ -202,3 +202,33 @@ static void obrender_close(ObFrame *self, Appearance *a)
     RECT_SET(a->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
     paint(self->close, a);
 }
+
+void render_label(Window win, Rect *area, char *text,
+                  gboolean hilight, gboolean toplevel)
+{
+    Appearance *a;
+
+    a = hilight ? ob_app_hilite_label : ob_app_unhilite_label;
+    a->texture[0].data.text.string = text;
+    RECT_SET(a->area, 0, 0, area->width, area->height);
+    a->texture[0].position = a->area;
+
+    if (toplevel) {
+        XSetWindowBorderWidth(ob_display, win, ob_s_bwidth);
+        XSetWindowBorder(ob_display, win, ob_s_b_color->pixel);
+    }
+
+    paint(win, a);
+}
+
+void size_label(char *text, gboolean hilight, gboolean toplevel, Size *s)
+{
+    Appearance *a;
+
+    a = hilight ? ob_app_hilite_label : ob_app_unhilite_label;
+    a->texture[0].data.text.string = text;
+
+    appearance_minsize(a, s);
+    s->width += ob_s_bevel * 2;
+    s->height += ob_s_bevel * 2;
+}

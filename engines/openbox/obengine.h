@@ -75,6 +75,9 @@ extern Appearance *ob_a_icon;
 extern Appearance *ob_a_focused_handle;
 extern Appearance *ob_a_unfocused_handle;
 
+extern Appearance *ob_app_hilite_label;
+extern Appearance *ob_app_unhilite_label;
+
 typedef struct ObFrame {
     Frame frame;
 

@@ -401,6 +401,7 @@ gboolean obtheme_load()
         ob_s_close_mask = pixmap_mask_new(7, 7, data);
     }        
 
+    /* read the decoration textures */
     if (!read_appearance(db, "window.title.focus", ob_a_focused_title))
 	set_default_appearance(ob_a_focused_title);
     if (!read_appearance(db, "window.title.unfocus", ob_a_unfocused_title))
@@ -418,6 +419,26 @@ gboolean obtheme_load()
     if (!read_appearance(db, "window.grip.unfocus", ob_a_unfocused_grip))
 	set_default_appearance(ob_a_unfocused_grip);
 
+    /* read the appearances for rendering non-decorations. these cannot be
+       parent-relative */
+    if (ob_a_focused_label->surface.data.planar.grad !=
+        Background_ParentRelative) {
+        if (!read_appearance(db, "window.label.focus", ob_app_hilite_label))
+            set_default_appearance(ob_app_hilite_label);
+    } else {
+        if (!read_appearance(db, "window.title.focus", ob_app_hilite_label))
+            set_default_appearance(ob_app_hilite_label);
+    }
+    if (ob_a_unfocused_label->surface.data.planar.grad !=
+        Background_ParentRelative) {
+        if (!read_appearance(db, "window.label.unfocus",ob_app_unhilite_label))
+            set_default_appearance(ob_app_unhilite_label);
+    } else {
+        if (!read_appearance(db, "window.title.unfocus",ob_app_unhilite_label))
+            set_default_appearance(ob_app_unhilite_label);
+    }
+
+    /* read buttons textures */
     if (!read_appearance(db, "window.button.pressed.focus",
 			 ob_a_focused_pressed_max))
 	if (!read_appearance(db, "window.button.pressed",
@@ -477,6 +498,13 @@ gboolean obtheme_load()
     ob_a_focused_label->texture[0].data.text.offset = engine_shadow_offset;
     ob_a_focused_label->texture[0].data.text.tint = engine_shadow_tint;
     ob_a_focused_label->texture[0].data.text.color = ob_s_title_focused_color;
+    ob_app_hilite_label->texture[0].type = Text;
+    ob_app_hilite_label->texture[0].data.text.justify = winjust;
+    ob_app_hilite_label->texture[0].data.text.font = ob_s_winfont;
+    ob_app_hilite_label->texture[0].data.text.shadow = engine_shadow;
+    ob_app_hilite_label->texture[0].data.text.offset = engine_shadow_offset;
+    ob_app_hilite_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_app_hilite_label->texture[0].data.text.color = ob_s_title_focused_color;
 
     ob_a_unfocused_label->texture[0].type = Text;
     ob_a_unfocused_label->texture[0].data.text.justify = winjust;
@@ -485,6 +513,14 @@ gboolean obtheme_load()
     ob_a_unfocused_label->texture[0].data.text.offset = engine_shadow_offset;
     ob_a_unfocused_label->texture[0].data.text.tint = engine_shadow_tint;
     ob_a_unfocused_label->texture[0].data.text.color =
+        ob_s_title_unfocused_color;
+    ob_app_unhilite_label->texture[0].type = Text;
+    ob_app_unhilite_label->texture[0].data.text.justify = winjust;
+    ob_app_unhilite_label->texture[0].data.text.font = ob_s_winfont;
+    ob_app_unhilite_label->texture[0].data.text.shadow = engine_shadow;
+    ob_app_unhilite_label->texture[0].data.text.offset = engine_shadow_offset;
+    ob_app_unhilite_label->texture[0].data.text.tint = engine_shadow_tint;
+    ob_app_unhilite_label->texture[0].data.text.color =
         ob_s_title_unfocused_color;
 
     ob_a_focused_unpressed_max->texture[0].type = 

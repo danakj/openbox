@@ -3,6 +3,7 @@ all install uninstall:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.kernel $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.engines $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.data $@
 #	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes $@
 
 clean:
@@ -10,6 +11,7 @@ clean:
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.kernel $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.plugins $@
 	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.engines $@
+	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.data $@
 #	@$(MAKE) -$(MAKEFLAGS) -f build/Makefile.themes $@
 	$(RM) *\~
 

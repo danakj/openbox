@@ -1,0 +1,38 @@
+include build/Makefile.incl
+
+dir = data
+
+files = rc3
+
+srcdir := $(srcdir)/$(dir)
+files := $(addprefix $(srcdir)/,$(files))
+
+all:
+
+$(target): $(objects)
+	$(AR) r $@ $^
+
+$(dir)/%.o: $(srcdir)/%.c $(depdir)/%.d
+	$(COMPILE) -c -o $@ $<
+
+$(depdir)/%.d: $(srcdir)/%.c
+	@echo Building dependancies for $<
+	@$(INSTALL) -d $(depdir)
+	@$(DEPCOMPILE) -w -MM -MF $@ -MQ $(<:.c=.o) $<
+
+install:
+	$(INSTALL) -d $(DESTDIR)$(rcdir)
+	$(INSTALL) -m 644 $(files) $(DESTDIR)$(rcdir)
+
+uninstall:
+	for i in $(notdir files); do \
+		$(RM) $(DESTDIR)$(rcdir)/$$i; \
+	done
+	-rmdir $(DESTDIR)$(rcdir)
+
+clean:
+	$(RM) $(srcdir)/*\~
+
+distclean:
+
+.PHONY: all install uninstall clean distclean

@@ -1,0 +1,226 @@
+[openbox]
+
+# the theme engine to use
+#engine = "openbox"
+
+# the theme to display with the theme engine
+theme = "ebox"
+
+# the order of the elements in windows' titlebars
+# n - icon
+# d - alldesktops button
+# s - shade button
+# l - text label
+# i - iconify button
+# m - maximize button
+# c - close button
+#titlebar.layout = "NDSLIMC"
+
+# the font for the window titlebars
+#font = "Sans-7"
+
+# the drop shadow for the window titlebars
+#font.shadow = no
+
+# the offset of the drop shadow for the window titlebars
+#font.shadow.offset = 1
+
+# the amount of opacity of the drop shadow for the window titlebars
+# -100 - 0 = white shadow (0 clear, -100 solid)
+# 0 - 100  = black shadow (0 clear, 100 solid)
+#font.shadow.tint = 25
+
+# does focus follow the mouse pointer
+#focusfollowsMouse = yes
+
+# focus new windows when they appear
+#focusNew = yes
+
+# place windows where they were last (for placement module)
+#placement.remember = yes
+
+# amount of resistance to provide at edges (for resistance module)
+#resistance = 10
+
+# reistancee against other windows (for resistance module)
+#resistance.windows = yes
+
+# the distance a drag must go before it is recognized
+#mouse.dragThreshold = 3
+
+# the amount of time in milliseconds in which two clicks must occur to cause a
+# doubleclick event
+#mouse.doubleClickTime = 200
+
+[keyboard]
+
+kbind (C-A-Escape)	execute "xlock -nolock -mode puzzle"
+kbind (F14)		execute "sshot"
+
+# xterm
+kbind (A-space)		execute "xterm"
+kbind (XF86Start)	execute "xterm -geometry 80x30-0-0 -title eris -e ssh xor@eris.orodu.net"
+
+# konqueror
+kbind (W-e)		execute "kfmclient openProfile filemanagement"
+kbind (XF86HomePage)	execute "kfmclient openProfile webbrowsing"
+
+# xmms
+kbind (XF86AudioPlay)	execute "xmms -p"
+kbind (XF86AudioStop)	execute "xmms -u"
+kbind (XF86AudioPrev)	execute "xmms -r"
+kbind (XF86AudioNext)	execute "xmms -f"
+
+# copy current song
+kbind (W-w)		execute "getxmms"
+
+kbind (A-Left)		PreviousDesktopWrap
+kbind (A-Right)		NextDesktopWrap
+
+kbind (A-1)		Desktop 1
+kbind (A-2)		Desktop 2
+kbind (A-3)		Desktop 3
+kbind (A-4)		Desktop 4
+
+kbind (C-A-1)		SendToDesktop 1
+kbind (C-A-2)		SendToDesktop 2
+kbind (C-A-3)		SendToDesktop 3
+kbind (C-A-4)		SendToDesktop 4
+
+kbind (C-S-x x)		ToggleMaximizeFull
+kbind (C-S-x Up)	ToggleMaximizeVert
+kbind (C-S-x Right)	ToggleMaximizeHorz
+
+kbind (C-A-Left)	MoveRelativeHorz -3
+kbind (C-A-Right)	MoveRelativeHorz  3
+kbind (C-A-Up)		MoveRelativeVert -3
+kbind (C-A-Down)	MoveRelativeVert  3
+
+kbind (A-F4)		Close
+
+kbind (W-D)		ToggleDecorations
+
+[mouse]
+
+#mbind Context		Event		Button	Action [Parameter]
+
+mbind	Titlebar	Drag		Left	Move
+mbind	Handle		Drag		Left	Move
+mbind	Frame		Drag		A-Left	Move
+
+mbind	BLCorner	Drag		Left	Resize
+mbind	BRCorner	Drag		Left	Resize
+mbind	Frame		Drag		A-Right	Resize
+
+mbind	Titlebar	Click		Left	Raise
+mbind	Titlebar	Press		Middle	Lower
+mbind	Handle		Click		Left	Raise
+mbind	Handle		Press		Middle	Lower
+mbind	Frame		Click		A-Left	Raise
+mbind	Frame		Click		A-Right	Lower
+
+mbind	Titlebar	Press		Left	Focus
+mbind	Handle		Press		Left	Focus
+mbind	BLCorner	Press		Left	Focus
+mbind	BRCorner	Press		Left	Focus
+mbind	Client		Press		Left	Focus
+mbind	Client		Press		Middle	Focus
+
+mbind	Titlebar	DoubleClick	Left	ToggleShade
+mbind	Titlebar	Click		Up	Shade
+mbind	Titlebar	Click		Down	UnShade
+
+mbind	Maximize	Click		Left	ToggleMaximizeFull
+mbind	Maximize	Click		Middle	ToggleMaximizeVert
+mbind	Maximize	Click		Right	ToggleMaximizeHorz
+mbind	Iconify		Click		Left	Iconify
+mbind	Icon		DoubleClick	Left	Close
+mbind	Close		Click		Left	Close
+mbind	Close		Click		Middle	Kill
+mbind	AllDesktops	Click		Left	ToggleOmnipresent
+mbind	Shade		Click		Left	ToggleShade
+
+mbind	Root		Click		Up	NextDesktopWrap
+mbind	Root		Click		Down	PreviousDesktopWrap
+mbind	Root		Click		A-Up	NextDesktopWrap
+mbind	Root		Click		A-Down	PreviousDesktopWrap
+mbind	Frame		Click		A-Up	NextDesktopWrap
+mbind	Frame		Click		A-Down	PreviousDesktopWrap
+mbind	Frame		Click		C-A-Up	SendToNextDesktopWrap
+mbind	Frame		Click		C-A-Down SendToPreviousDesktopWrap
+
+mbind	Root		Click		Left	execute "xterm"
+
+[foo]
+
+mbind Titlebar, Handle {
+	Left		press	Focus
+	Middle		press	Lower
+	Left		click	Raise
+	Right		click	Lower
+	Left		drag	Move
+}
+
+mbind Titlebar {
+	Up		press	Shade
+	Down		press	Unshade
+	Left		dclick	ToggleShade
+}
+
+mbind Frame {
+	A-Left		click	Raise
+	A-Left		drag	Move
+	A-Right		click	Lower
+	A-Right		drag	Resize
+	A-Up		click	NextDesktopWrap
+	A-Down		click	PreviousDesktopWrap
+	C-A-Up		click	SendToNextDesktopWrap
+	C-A-Down	click	SendToPreviousDesktopWrap
+}
+
+mbind BLCorner, BRCorner {
+	Left		press	Focus
+	Left		drag	Resize
+}
+
+mbind Client {
+	Left		press	Focus
+	Middle		press	Focus
+}
+
+mbind Root {
+	Left		click	execute "xterm"
+	Up		click	NextDesktopWrap
+	Down		click	PreviousDesktopWrap
+	A-Up		click	NextDesktopWrap
+	A-Down		click	PreviousDesktopWrap
+}
+
+mbind Maximize {
+	Left		click	ToggleMaximizeFull
+	Middle		click	ToggleMaximizeVert
+	Right		click	ToggleMaximizeHorz
+}
+
+
+mbind Iconify {
+	Left		click	Iconify
+}
+
+mbind Icon {
+	Left		dclick	Close
+}
+
+mbind Close {
+	Left		click	Close
+	Middle		click	Kill
+}
+
+mbind AllDesktops {
+	Left		click	ToggleOmnipresent
+}
+
+mbind Shade {
+	Left		click	ToggleShade
+}
+

@@ -170,6 +170,21 @@ void setup_action_movetoedge_west(Action *a)
     a->data.diraction.direction = Direction_West;
 }
 
+void setup_action_top_layer(Action *a)
+{
+    a->data.layer.layer = 1;
+}
+
+void setup_action_normal_layer(Action *a)
+{
+    a->data.layer.layer = 0;
+}
+
+void setup_action_bottom_layer(Action *a)
+{
+    a->data.layer.layer = -1;
+}
+
 ActionString actionstrings[] =
 {
     {
@@ -481,6 +496,31 @@ ActionString actionstrings[] =
         "showmenu",
         action_showmenu,
         NULL
+    },
+    {
+        "sendtotoplayer",
+        action_send_to_layer,
+        setup_action_top_layer
+    },
+    {
+        "togglealwaysontop",
+        action_toggle_layer,
+        setup_action_top_layer
+    },
+    {
+        "sendtonormallayer",
+        action_send_to_layer,
+        setup_action_normal_layer
+    },
+    {
+        "sendtobottomlayer",
+        action_send_to_layer,
+        setup_action_bottom_layer
+    },
+    {
+        "togglealwaysonbottom",
+        action_toggle_layer,
+        setup_action_bottom_layer
     },
     {
         "nextwindowlinear",
@@ -1086,4 +1126,22 @@ void action_movetoedge(union ActionData *data)
     client_configure(c, Corner_TopLeft,
                      x, y, c->area.width, c->area.height, TRUE, TRUE);
 
+}
+
+void action_send_to_layer(union ActionData *data)
+{
+    if (data->layer.c)
+        client_set_layer(data->layer.c, data->layer.layer);
+}
+
+void action_toggle_layer(union ActionData *data)
+{
+    Client *c = data->layer.c;
+
+    if (c) {
+        if (data->layer.layer < 0)
+            client_set_layer(c, c->below ? 0 : -1);
+        else if (data->layer.layer > 0)
+            client_set_layer(c, c->above ? 0 : 1);
+    }
 }

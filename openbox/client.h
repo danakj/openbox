@@ -497,4 +497,11 @@ Client *client_search_modal_child(Client *self);
 /*! Return the "closest" client in the given direction */
 Client *client_find_directional(Client *c, Direction dir);
 
+/*! Set a client window to be above/below other clients.
+  @layer < 0 indicates the client should be placed below other clients.<br>
+         = 0 indicates the client should be placed with other clients.<br>
+         > 0 indicates the client should be placed above other clients.
+*/
+void client_set_layer(Client *self, int layer);
+
 #endif

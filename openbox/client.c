@@ -2451,3 +2451,18 @@ Client *client_find_directional(Client *c, Direction dir)
 
     return best_client;
 }
+
+void client_set_layer(Client *self, int layer)
+{
+    if (layer < 0) {
+        self->below = TRUE;
+        self->above = FALSE;
+    } else if (layer == 0) {
+        self->below = self->above = FALSE;
+    } else {
+        self->below = FALSE;
+        self->above = TRUE;
+    }
+    client_calc_layer(self);
+    client_change_state(self); /* reflect this in the state hints */
+}

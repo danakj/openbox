@@ -48,6 +48,11 @@ struct Desktop {
     guint desk;
 };
 
+struct Layer {
+    Client *c;
+    int layer; /* < 0 = below, 0 = normal, > 0 = above */
+};
+
 struct NextPreviousDesktop {
     Client *c;
     gboolean wrap;
@@ -89,6 +94,7 @@ union ActionData {
     struct MoveResize moveresize;
     struct ShowMenu showmenu;
     struct CycleWindows cycle;
+    struct Layer layer;
 };
 
 typedef struct {
@@ -204,7 +210,12 @@ void action_exit(union ActionData *data);
 void action_showmenu(union ActionData *data);
 /* CycleWindows */
 void action_cycle_windows(union ActionData *data);
-
+/* DirectionalAction */
 void action_directional_focus(union ActionData *data);
+/* DirectionalAction */
 void action_movetoedge(union ActionData *data);
+/* Layer */
+void action_send_to_layer(union ActionData *data);
+/* Layer */
+void action_toggle_layer(union ActionData *data);
 #endif

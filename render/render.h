@@ -128,10 +128,10 @@ struct _RrAppearance {
 };
 
 #if (G_BYTE_ORDER == G_BIG_ENDIAN)
-#define RrDefaultRedOffset 0
-#define RrDefaultGreenOffset 8
-#define RrDefaultBlueOffset 16
-#define RrDefaultAlphaOffset 24
+#define RrDefaultAlphaOffset 0
+#define RrDefaultRedOffset 8
+#define RrDefaultGreenOffset 16
+#define RrDefaultBlueOffset 24
 #define RrEndian MSBFirst  
 #else
 #define RrDefaultAlphaOffset 24

@@ -75,6 +75,10 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
             (RrBlueOffset(inst) != RrDefaultBlueOffset) ||
             (RrGreenOffset(inst) != RrDefaultGreenOffset)) {
+            g_message("CONVERSION %d->%d %d->%d %d->%d",
+                      RrDefaultRedOffset, RrRedOffset(inst),
+                      RrDefaultBlueOffset, RrGreenOffset(inst),
+                      RrDefaultGreenOffset, RrBlueOffset(inst));
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;

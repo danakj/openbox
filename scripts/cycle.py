@@ -455,8 +455,6 @@ class _CycleDesktops(_Cycle):
         def __eq__(self, other):
             return other.index == self.index
 
-    START_WITH_NEXT = 0
-
     def __init__(self):
         _Cycle.__init__(self)
 

@@ -6,7 +6,6 @@
 #include "texture.hh"
 #include "style.hh"
 #include "eventdispatcher.hh"
-#include "application.hh"
 
 extern "C" {
 #include <assert.h>

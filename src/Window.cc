@@ -3091,21 +3091,25 @@ void OpenboxWindow::changeOpenboxHints(OpenboxHints *net) {
 
     default:
     case DecorNormal:
-      decorations.titlebar = decorations.border = decorations.handle =
-       decorations.iconify = decorations.maximize = decorations.menu = True;
+      decorations.titlebar = decorations.iconify = decorations.menu =
+        decorations.border = True;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
 
     case DecorTiny:
       decorations.titlebar = decorations.iconify = decorations.menu = True;
-      decorations.border = decorations.handle = decorations.maximize = False;
- 
+      decorations.border = decorations.border = decorations.handle = False;
+      decorations.maximize = functions.maximize;
+
       break;
 
     case DecorTool:
-      decorations.titlebar = decorations.menu = functions.move = True;
-      decorations.iconify = decorations.border = decorations.handle =
-	decorations.maximize = False;
+      decorations.titlebar = decorations.menu = True;
+      decorations.iconify = decorations.border = False;
+      decorations.handle = (functions.resize && !flags.transient);
+      decorations.maximize = functions.maximize;
 
       break;
     }

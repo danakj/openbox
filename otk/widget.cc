@@ -89,7 +89,7 @@ void Widget::show(bool children)
     _visible = true;
     if (_parent) _parent->calcDefaultSizes();
     else {
-      resize(_min_size);
+      resize(_area.size());
     }
     XMapWindow(**display, _window);
     update();

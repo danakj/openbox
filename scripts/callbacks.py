@@ -117,7 +117,7 @@ def restart(data, other = ""):
     """Restarts Openbox, optionally starting another window manager."""
     ob.openbox.restart(other)
 
-def exit(data):
+def exit(data=0):
     """Exits Openbox."""
     ob.openbox.shutdown()
 

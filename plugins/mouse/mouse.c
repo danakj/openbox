@@ -368,10 +368,14 @@ static void binddef()
     a = action_new(action_resize);
     mbind("A-3", "frame", MouseAction_Motion, a);
 
-    a = action_new(action_focusraise);
+    a = action_new(action_focus);
     mbind("1", "titlebar", MouseAction_Press, a);
-    a = action_new(action_focusraise);
+    a = action_new(action_focus);
     mbind("1", "handle", MouseAction_Press, a);
+    a = action_new(action_raise);
+    mbind("1", "titlebar", MouseAction_Click, a);
+    a = action_new(action_raise);
+    mbind("1", "handle", MouseAction_Click, a);
     a = action_new(action_lower);
     mbind("2", "titlebar", MouseAction_Press, a);
     a = action_new(action_lower);

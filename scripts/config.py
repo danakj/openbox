@@ -3,11 +3,6 @@
 ### openbox.                                                              ###
 #############################################################################
 
-# client_buttons - a list of the modifier(s) and buttons which are grabbed on
-#                  client windows (for interactive move/resize, etc).
-#  examples: "A-2", "C-A-2", "W-1"
-client_buttons = ["A-1", "A-2", "A-3"]
-
 # theme - the theme used to decorate everything.
 theme = "/usr/local/share/openbox/styles/fieron2"
 

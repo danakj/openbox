@@ -72,6 +72,7 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     struct RrSurface *p;
     int ok, i;
     int surx, sury;
+    int x, y, w, h, e;
     GSList *it;
 
     inst = RrSurfaceInstance(sur);
@@ -81,8 +82,6 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     if (!inst) return;
 
     if (!RrSurfaceVisible(sur)) return;
-
-    g_message("PAINTING SURFACE %p", sur);
 
     ok = glXMakeCurrent(RrDisplay(inst), RrSurfaceWindow(sur),RrContext(inst));
     assert(ok);
@@ -99,8 +98,7 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
 */
 
     glPushMatrix();
-    glTranslatef(-RrSurfaceX(sur),
-                 -RrSurfaceY(sur), 0);
+    glTranslatef(-RrSurfaceX(sur), -RrSurfaceY(sur), 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     p = sur;
@@ -114,16 +112,25 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     switch (RrSurfaceType(sur)) {
     case RR_SURFACE_PLANAR:
         RrPlanarPaint(sur, surx, sury);
+        e = RrPlanarEdgeWidth(sur);
+        x = RrSurfaceX(sur) + e;
+        y = RrSurfaceY(sur) + e;
+        w = RrSurfaceWidth(sur) - e * 2;
+        h = RrSurfaceHeight(sur) - e * 2;
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);
         break;
     case RR_SURFACE_NONE:
+        x = RrSurfaceX(sur);
+        y = RrSurfaceY(sur);
+        w = RrSurfaceWidth(sur);
+        h = RrSurfaceHeight(sur);
         break;
     }
 
     for (i = 0; i < sur->ntextures; ++i)
-        RrTexturePaint(sur, &sur->texture[i]);
+        RrTexturePaint(sur, &sur->texture[i], x, y, w, h);
 
     glPopMatrix();
 

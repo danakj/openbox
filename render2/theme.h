@@ -92,7 +92,7 @@ struct RrTheme {
     struct RrSurface *app_icon;
 };
 
-#define RrThemeLabelHeight(t) (RrFontHeight((t)->title_font))
+int RrThemeLabelHeight(struct RrTheme *t);
 #define RrThemeTitleHeight(t) (RrThemeLabelHeight(t) + \
                                ((t)->bevel + (t)->bwidth) * 2)
 #define RrThemeButtonSize(t)  (RrThemeLabelHeight(t) - (t)->bevel * 2)

@@ -1,5 +1,6 @@
 #include "render.h"
 #include "theme.h"
+#include "planar.h"
 #include <stdlib.h>
 
 struct RrTheme *RrThemeLoad(struct RrInstance *inst, const char *name)
@@ -307,4 +308,13 @@ void RrThemeDestroy(struct RrTheme *theme)
 
         free(theme);
     }
+}
+
+int RrThemeLabelHeight(struct RrTheme *t)
+{
+    int h;
+    h = RrFontHeight(t->title_font);
+    h += 2 * MAX(RrPlanarEdgeWidth(t->label),
+                 RrPlanarEdgeWidth(t->label_f));
+    return h;
 }

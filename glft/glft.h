@@ -42,6 +42,8 @@ void GlftMeasureString(struct GlftFont *font,
                        int *w,
                        int *h);
 
+int GlftFontAscent(struct GlftFont *font);
+int GlftFontDescent(struct GlftFont *font);
 int GlftFontHeight(struct GlftFont *font);
 int GlftFontMaxCharWidth(struct GlftFont *font);
 

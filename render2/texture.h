@@ -39,6 +39,7 @@ struct RrTexture {
     union RrTextureData data;
 };
 
-void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex);
+void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
+                    int x, int y, int w, int h);
 
 #endif

@@ -351,27 +351,30 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy)
                       RrPlanarBorderWidth(sur), &RrPlanarBorderColor(sur));
 }
 
-void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h)
+int RrPlanarEdgeWidth(struct RrSurface *sur)
 {
-    *w = *h = RrPlanarBorderWidth(sur);
+    int w;
+    w = RrPlanarBorderWidth(sur);
     switch (RrPlanarBevelType(sur)) {
     case RR_SUNKEN_OUTER:
-        (*w)++;
-        (*h)++;
+        w++;
         break;
     case RR_SUNKEN_INNER:
-        (*w)+=2;
-        (*h)+=2;
+        w += 2;
         break;
     case RR_RAISED_OUTER:
-        (*w)++;
-        (*h)++;
+        w += 2;
         break;
     case RR_RAISED_INNER:
-        (*w)+=2;
-        (*h)+=2;
+        w++;
         break;
     case RR_BEVEL_NONE:
         break;
     }
+    return w;
+}
+
+void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h)
+{
+    *w = *h = 2 * RrPlanarEdgeWidth(sur);
 }

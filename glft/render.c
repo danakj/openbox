@@ -56,6 +56,8 @@ static void drawstring(struct GlftFont *font, const char *str, int bytes,
     const char *c;
     struct GlftGlyph *g, *p = NULL;
 
+    y += font->descent - 1; /* XXX why -1? it works tho, it seems.. */
+
     glColor4f(color->r, color->g, color->b, color->a);
     glPushMatrix();
     glTranslatef(x, y, 0.0);

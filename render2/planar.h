@@ -27,4 +27,6 @@ void RrPlanarPaint(struct RrSurface *sur, int absx, int absy);
 
 void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h);
 
+int RrPlanarEdgeWidth(struct RrSurface *sur);
+
 #endif

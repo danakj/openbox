@@ -84,25 +84,18 @@ void RrTextureSetNone(struct RrSurface *sur,
     RrTextureFreeContents(tex);
 }
 
-void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex)
+void RrTexturePaint(struct RrSurface *sur, struct RrTexture *tex,
+                    int x, int y, int w, int h)
 {
-    struct GlftColor col;
-
     glEnable(GL_TEXTURE_2D);
     
     switch (tex->type) {
     case RR_TEXTURE_NONE:
         break;
     case RR_TEXTURE_TEXT:
-        assert(tex->data.text.font);
-        col.r = tex->data.text.color.r;
-        col.g = tex->data.text.color.g;
-        col.b = tex->data.text.color.b;
-        col.a = tex->data.text.color.a;
-
-        GlftRenderString(tex->data.text.font->font, tex->data.text.string, 
-                         strlen(tex->data.text.string), &col,
-                         RrSurfaceX(sur) + 2, RrSurfaceY(sur) + 4);
+        RrFontRenderString(sur, tex->data.text.font, &tex->data.text.color,
+                           tex->data.text.layout, tex->data.text.string,
+                           x, y, w, h);
         break;
     }
     glDisable(GL_TEXTURE_2D);

@@ -101,7 +101,7 @@ struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name)
     case FcResultNoMatch:
         font->index = 0;
         break;
-    case FcResultMatch:
+   case FcResultMatch:
         break;
     default:
         GlftDebug("error getting FC_INDEX from pattern\n");
@@ -235,8 +235,10 @@ struct GlftFont *GlftFontOpen(Display *d, int screen, const char *name)
         font->max_advance_width = font->face->size->metrics.max_advance >> 6;
     font->descent = -(font->face->size->metrics.descender >> 6);
     font->ascent = font->face->size->metrics.ascender >> 6;
-    if (font->minspace) font->height = font->ascent + font->descent;
-    else                font->height = font->face->size->metrics.height >> 6;
+    if (font->minspace)
+        font->height = font->ascent + font->descent;
+    else
+        font->height = font->face->size->metrics.height >> 6;
 
     font->kerning = FT_HAS_KERNING(font->face);
 
@@ -335,4 +337,14 @@ int GlftFontHeight(struct GlftFont *font)
 int GlftFontMaxCharWidth(struct GlftFont *font)
 {
     return font->max_advance_width;
+}
+
+int GlftFontAscent(struct GlftFont *font)
+{
+    return font->ascent;
+}
+
+int GlftFontDescent(struct GlftFont *font)
+{
+    return font->descent;
 }

@@ -69,6 +69,7 @@ Frame *frame_new()
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
     fd->window = RrSurfaceWindow(fd->surface);
+    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Top;
     RECT_SET(fd->area, 0, 0, 120, 20);
     fd->type = Decor_Titlebar;
@@ -82,6 +83,7 @@ Frame *frame_new()
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
     fd->window = RrSurfaceWindow(fd->surface);
+    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_Right;
     RECT_SET(fd->area, 0, 0, 5, 100);
     fd->type = Decor_Titlebar;
@@ -95,6 +97,7 @@ Frame *frame_new()
     fd->surface = RrSurfaceNewChild(RR_SURFACE_PLANAR, self->surface, 1);
     RrPlanarSet(fd->surface, RR_PLANAR_PIPECROSS, &pri, &sec);
     fd->window = RrSurfaceWindow(fd->surface);
+    XSelectInput(ob_display, fd->window, ELEMENT_EVENTMASK);
     fd->anchor = Decor_BottomLeft;
     RECT_SET(fd->area, 0, 0, 30, 30);
     fd->type = Decor_Titlebar;

@@ -1,99 +1,15 @@
-README for Openbox:
+Openbox
+Copyright (C) 2002-2003  Ben Jansens
 
-The source tree for Openbox is comprised of five subdirectories:
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-	data/		- this holds the default data files that Openbox
-                          requires for proper operation.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	doc/		- this holds the documentation files that explain
-	                  the various aspects of Openbox.
-
-	nls/		- this holds the message files used to generate
-			  message catalogs for different languages.
-
-	src/		- this holds the actual C++ source code for the window
-			  manager.
-
-	util/		- this holds source code for small utility programs
-			  that help Openbox do what it does best.
-
-
-Quick Start:
-------------
-The quickest and easiest way to get Openbox up and running is to run the
-following commands:
-
-% cd openbox-x.x.x
-% ./configure
-% make
-% su -c 'make install'
-
-This will configure, compile and install Openbox the quickest.  For those
-who like to spend the extra 15 seconds reading ./configure --help, some
-compile time options can be turned on and off before the build.
-
-For general information on GNU's ./configure, see the file INSTALL.
-
-
-Configuring Openbox:
----------------------
-The next thing most users want to do after installing Openbox is to configure
-the colors, fonts, menus, etc. to their liking.  This is covered by the files
-data/README, data/README.menu and data/README.style.  These files give
-detailed information on how to customize your new window manager.
-
-
-Included utilities:
--------------------
-Currently, the only included utilities are a program named bsetroot and a
-script called bsetbg. bsetroot is a replacement for xsetroot, minus a few
-options.  The difference between xsetroot and bsetroot is that bsetroot has
-been coded for multiple screens (e.g. multi-headed displays), where as the
-stock xsetroot is not. The bsetbg script acts as a wrapper for most of the
-popular programs used to set background pixmaps, making it possible
-for styles to provide a machine-independent rootCommand.
-
-
-Third-party utilities:
-----------------------
-Openbox does not handle any keyboard shortcuts; instead it supports a
-communication protocol which allows other programs to handle these and related
-tasks. If you'd like to be able to use keyboard shortcuts with Openbox,
-bbkeys (available at http://bbkeys.sourceforge.net) can provide you with this
-functionality.
-If you're looking for a GUI with which to configure your Openbox menu and/or
-styles, check out http://bbconf.sourceforge.net. bbconf is a QT program that
-does just that, as well as providing a GUI for editing your keybindings for the
-above mentioned bbkeys.
-
-Supported Platforms:
---------------------
-ix86-Linux 2.0.x (libc5 and glibc2)
-ix86-Linux 2.1.x (libc5 and glibc2)
-ix86-Linux 2.2.x (libc5 and glibc2)
-ix86-Linux 2.3.x (glibc2.1)
-ix86-Linux 2.4.x (glibc2.2)
-ix86-FreeBSD 4.0-current
-ix86-FreeBSD 3.3-{stable,release}
-ix86-FreeBSD 3.2-{stable,release}
-ix86-FreeBSD 3.1-{stable,release}
-ix86-FreeBSD 2.2.x-stable
-ix86-NetBSD 1.3.3
-ix86-NetBSD 1.4.1
-ix86-OpenBSD 2.6
-ix86-BSDi 4.0
-PPC-mkLinux (version?)
-ix86-Solaris 2.6
-Sparc-Solaris 2.6 (2.5 anyone?)
-Sparc-Solaris 2.7
-ix86-Solaris 7 (== 2.7?)
-Alpha-Digital UNIX 4.0D
-Alpha-Linux 2.2.x
-rs6k-AIX 4.1.3
-rs6k-AIX 4.3.2
-MIPS-IRIX 6.5 (requires gcc, MIPSpro didn't like some of the template-fu)
-ix86-OS/2 (version? recent successes?)
-hp9000/715-HP/UX 10.20 (with egcs 1.1.1)
-
-Please email ben@orodu.net for other success reports.
+    See the COPYING file for a copy of the GNU General Public License.
 

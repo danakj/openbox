@@ -1070,6 +1070,13 @@ void BScreen::unmanageWindow(BlackboxWindow *w, bool remap) {
 
   removeNetizen(w->getClientWindow());
 
+  /*
+    some managed windows can also be window group controllers.  when
+    unmanaging such windows, we should also delete the window group.
+  */
+  BWindowGroup *group = blackbox->searchGroup(w->getClientWindow());
+  delete group;
+
   delete w;
 }
 

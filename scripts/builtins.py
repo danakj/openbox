@@ -22,6 +22,22 @@ def state_shaded(data, add=2):
     send_client_msg(display.screenInfo(data.screen).rootWindow(),
                     Property_atoms().net_wm_state, data.client.window(), add,
                     Property_atoms().net_wm_state_shaded)
+
+def iconify(data):
+    """Iconifies the window on which the event occured"""
+    if not data.client: return
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
+                    Property_atoms().wm_change_state,
+                    data.client.window(), 3) # IconicState
+    
+def restore(data):
+    """Un-iconifies the window on which the event occured, but does not focus
+       if. If you want to focus the window too, it is recommended that you
+       use the activate() function."""
+    if not data.client: return
+    send_client_msg(display.screenInfo(data.screen).rootWindow(),
+                    Property_atoms().wm_change_state,
+                    data.client.window(), 1) # NormalState
     
 def close(data):
     """Closes the window on which the event occured"""
@@ -264,6 +280,7 @@ def setup_window_buttons():
     """Sets up the default behaviors for the buttons in the window titlebar."""
     mbind("Left", MC_AllDesktopsButton, MouseClick, toggle_all_desktops)
     mbind("Left", MC_CloseButton, MouseClick, close)
+    mbind("Left", MC_IconifyButton, MouseClick, iconify)
 
 def setup_scroll():
     """Sets up the default behaviors for the mouse scroll wheel.

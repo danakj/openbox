@@ -56,6 +56,9 @@ static void event(ObEvent *e, void *foo)
 {
     g_assert(e->type == Event_Client_New);
 
+    /* requested a position */
+    if (e->data.c.client->positioned) return;
+
     if (e->data.c.client->transient_for) {
         if (e->data.c.client->transient_for != OB_TRAN_GROUP) {
             ObClient *c = e->data.c.client;
@@ -100,9 +103,6 @@ static void event(ObEvent *e, void *foo)
             }
         }
     }
-
-    /* requested a position */
-    if (e->data.c.client->positioned) return;
 
     if (!history || !place_history(e->data.c.client))
         place_random(e->data.c.client);

@@ -311,8 +311,6 @@ void menu_show_full(Menu *self, int x, int y, Client *client)
     self->client = client;
 
     if (!self->shown) {
-        GSList *it;
-
         if (!self->parent) {
             grab_pointer(TRUE, None);
             grab_keyboard(TRUE);

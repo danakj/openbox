@@ -6,7 +6,8 @@
 #include "render/theme.h"
 #include "render/render.h"
 
-#define SLIT_EVENT_MASK (EnterWindowMask | LeaveWindowMask)
+#define SLIT_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \
+                         EnterWindowMask | LeaveWindowMask)
 #define SLITAPP_EVENT_MASK (StructureNotifyMask)
 
 struct Slit {

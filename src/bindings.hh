@@ -120,9 +120,7 @@ public:
 
   void grabButtons(bool grab, OBClient *client);
 
-  void fire(MouseAction action, OBWidget::WidgetType type, Window win,
-            unsigned int modifiers, unsigned int button,
-            int xroot, int yroot, Time time);
+  void fire(ButtonData *data);
 };
 
 }

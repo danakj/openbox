@@ -64,8 +64,6 @@ private:
     Used for motion events as the starting position.
   */
   ButtonPressAction *_posqueue[BUTTONS];
-  //! The delta x/y of the last motion sequence
-  int _dx, _dy;
 
   
   void insertPress(const XButtonEvent &e);
@@ -98,7 +96,6 @@ public:
   virtual void mapRequestHandler(const XMapRequestEvent &e);
   virtual void unmapHandler(const XUnmapEvent &e);
   virtual void destroyHandler(const XDestroyWindowEvent &e);
-
 
   //! Add a callback funtion to the back of the hook list
   /*!

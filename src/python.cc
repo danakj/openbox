@@ -22,61 +22,36 @@ static PyObject *obdict = NULL;
 // Define some custom types which are passed to python callbacks //
 // ************************************************************* //
 
-typedef struct {
-  PyObject_HEAD;
-  MouseAction action;
-  Window window;
-  MouseContext context;
-  unsigned int state;
-  unsigned int button;
-  int xroot;
-  int yroot;
-  Time time;
-} ActionData;
-
-typedef struct {
-  PyObject_HEAD;
-  Window window;
-  unsigned int state;
-  unsigned int key;
-  Time time;
-} BindingData;
-
-static void ActionDataDealloc(ActionData *self)
+static void dealloc(PyObject *self)
 {
-  PyObject_Del((PyObject*)self);
+  PyObject_Del(self);
 }
 
-static void BindingDataDealloc(BindingData *self)
-{
-  PyObject_Del((PyObject*)self);
-}
-
-PyObject *ActionData_action(ActionData *self, PyObject *args)
-{
-  if(!PyArg_ParseTuple(args,":action")) return NULL;
-  return PyLong_FromLong((int)self->action);
-}
-
-PyObject *ActionData_window(ActionData *self, PyObject *args)
+PyObject *MotionData_window(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":window")) return NULL;
   return PyLong_FromLong(self->window);
 }
 
-PyObject *ActionData_context(ActionData *self, PyObject *args)
+PyObject *MotionData_context(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":context")) return NULL;
   return PyLong_FromLong((int)self->context);
 }
 
-PyObject *ActionData_modifiers(ActionData *self, PyObject *args)
+PyObject *MotionData_action(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":action")) return NULL;
+  return PyLong_FromLong((int)self->action);
+}
+
+PyObject *MotionData_modifiers(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":modifiers")) return NULL;
   return PyLong_FromUnsignedLong(self->state);
 }
 
-PyObject *ActionData_button(ActionData *self, PyObject *args)
+PyObject *MotionData_button(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":button")) return NULL;
   int b = 0;
@@ -91,57 +66,112 @@ PyObject *ActionData_button(ActionData *self, PyObject *args)
   return PyLong_FromLong(b);
 }
 
-PyObject *ActionData_xroot(ActionData *self, PyObject *args)
+PyObject *MotionData_xroot(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":xroot")) return NULL;
   return PyLong_FromLong(self->xroot);
 }
 
-PyObject *ActionData_yroot(ActionData *self, PyObject *args)
+PyObject *MotionData_yroot(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":yroot")) return NULL;
   return PyLong_FromLong(self->yroot);
 }
 
-PyObject *ActionData_time(ActionData *self, PyObject *args)
+PyObject *MotionData_pressx(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":pressx")) return NULL;
+  return PyLong_FromLong(self->pressx);
+}
+
+PyObject *MotionData_pressy(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":pressy")) return NULL;
+  return PyLong_FromLong(self->pressy);
+}
+
+
+PyObject *MotionData_press_clientx(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":press_clientx")) return NULL;
+  return PyLong_FromLong(self->press_clientx);
+}
+
+PyObject *MotionData_press_clienty(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":press_clienty")) return NULL;
+  return PyLong_FromLong(self->press_clienty);
+}
+
+PyObject *MotionData_press_clientwidth(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":press_clientwidth")) return NULL;
+  return PyLong_FromLong(self->press_clientwidth);
+}
+
+PyObject *MotionData_press_clientheight(MotionData *self, PyObject *args)
+{
+  if(!PyArg_ParseTuple(args,":press_clientheight")) return NULL;
+  return PyLong_FromLong(self->press_clientheight);
+}
+
+PyObject *MotionData_time(MotionData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":time")) return NULL;
   return PyLong_FromLong(self->time);
 }
 
-static PyMethodDef ActionData_methods[] = {
-  {"action", (PyCFunction)ActionData_action, METH_VARARGS,
+static PyMethodDef MotionData_methods[] = {
+  {"action", (PyCFunction)MotionData_action, METH_VARARGS,
    "Return the action being executed."},
-  {"window", (PyCFunction)ActionData_window, METH_VARARGS,
+  {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
-  {"context", (PyCFunction)ActionData_context, METH_VARARGS,
+  {"context", (PyCFunction)MotionData_context, METH_VARARGS,
    "Return the context that the action is occuring in."},
-  {"modifiers", (PyCFunction)ActionData_modifiers, METH_VARARGS,
+  {"modifiers", (PyCFunction)MotionData_modifiers, METH_VARARGS,
    "Return the modifier keys state."},
-  {"button", (PyCFunction)ActionData_button, METH_VARARGS,
+  {"button", (PyCFunction)MotionData_button, METH_VARARGS,
    "Return the number of the pressed button (1-5)."},
-  {"xroot", (PyCFunction)ActionData_xroot, METH_VARARGS,
+  {"xroot", (PyCFunction)MotionData_xroot, METH_VARARGS,
    "Return the X-position of the mouse cursor on the root window."},
-  {"yroot", (PyCFunction)ActionData_yroot, METH_VARARGS,
+  {"yroot", (PyCFunction)MotionData_yroot, METH_VARARGS,
    "Return the Y-position of the mouse cursor on the root window."},
-  {"time", (PyCFunction)ActionData_time, METH_VARARGS,
+  {"pressx", (PyCFunction)MotionData_pressx, METH_VARARGS,
+   "Return the X-position of the mouse cursor at the start of the drag."},
+  {"pressy", (PyCFunction)MotionData_pressy, METH_VARARGS,
+   "Return the Y-position of the mouse cursor at the start of the drag."},
+  {"press_clientx", (PyCFunction)MotionData_press_clientx, METH_VARARGS,
+   "Return the X-position of the client at the start of the drag."},
+  {"press_clienty", (PyCFunction)MotionData_press_clienty, METH_VARARGS,
+   "Return the Y-position of the client at the start of the drag."},
+  {"press_clientwidth", (PyCFunction)MotionData_press_clientwidth,
+   METH_VARARGS,
+   "Return the width of the client at the start of the drag."},
+  {"press_clientheight", (PyCFunction)MotionData_press_clientheight,
+   METH_VARARGS,
+   "Return the height of the client at the start of the drag."},
+  {"time", (PyCFunction)MotionData_time, METH_VARARGS,
    "Return the time at which the event occured."},
   {NULL, NULL, 0, NULL}
 };
 
-PyObject *BindingData_window(BindingData *self, PyObject *args)
-{
-  if(!PyArg_ParseTuple(args,":window")) return NULL;
-  return PyLong_FromLong(self->window);
-}
+static PyMethodDef ButtonData_methods[] = {
+  {"action", (PyCFunction)MotionData_action, METH_VARARGS,
+   "Return the action being executed."},
+  {"context", (PyCFunction)MotionData_context, METH_VARARGS,
+   "Return the context that the action is occuring in."},
+  {"window", (PyCFunction)MotionData_window, METH_VARARGS,
+   "Return the client window id."},
+  {"modifiers", (PyCFunction)MotionData_modifiers, METH_VARARGS,
+   "Return the modifier keys state."},
+  {"button", (PyCFunction)MotionData_button, METH_VARARGS,
+   "Return the number of the pressed button (1-5)."},
+  {"time", (PyCFunction)MotionData_time, METH_VARARGS,
+   "Return the time at which the event occured."},
+  {NULL, NULL, 0, NULL}
+};
 
-PyObject *BindingData_modifiers(BindingData *self, PyObject *args)
-{
-  if(!PyArg_ParseTuple(args,":modifiers")) return NULL;
-  return PyLong_FromUnsignedLong(self->state);
-}
-
-PyObject *BindingData_key(BindingData *self, PyObject *args)
+PyObject *KeyData_key(KeyData *self, PyObject *args)
 {
   if(!PyArg_ParseTuple(args,":key")) return NULL;
   return PyString_FromString(
@@ -149,57 +179,116 @@ PyObject *BindingData_key(BindingData *self, PyObject *args)
 
 }
 
-PyObject *BindingData_time(BindingData *self, PyObject *args)
-{
-  if(!PyArg_ParseTuple(args,":time")) return NULL;
-  return PyLong_FromLong(self->time);
-}
-
-static PyMethodDef BindingData_methods[] = {
-  {"window", (PyCFunction)BindingData_window, METH_VARARGS,
+static PyMethodDef KeyData_methods[] = {
+  {"window", (PyCFunction)MotionData_window, METH_VARARGS,
    "Return the client window id."},
-  {"modifiers", (PyCFunction)BindingData_modifiers, METH_VARARGS,
+  {"modifiers", (PyCFunction)MotionData_modifiers, METH_VARARGS,
    "Return the modifier keys state."},
-  {"key", (PyCFunction)BindingData_key, METH_VARARGS,
+  {"key", (PyCFunction)KeyData_key, METH_VARARGS,
    "Return the name of the pressed key."},
-  {"time", (PyCFunction)BindingData_time, METH_VARARGS,
+  {"time", (PyCFunction)MotionData_time, METH_VARARGS,
    "Return the time at which the event occured."},
   {NULL, NULL, 0, NULL}
 };
 
-static PyObject *ActionDataGetAttr(PyObject *obj, char *name)
+static PyObject *MotionDataGetAttr(PyObject *obj, char *name)
 {
-  return Py_FindMethod(ActionData_methods, obj, name);
+  return Py_FindMethod(MotionData_methods, obj, name);
 }
 
-static PyObject *BindingDataGetAttr(PyObject *obj, char *name)
+static PyObject *ButtonDataGetAttr(PyObject *obj, char *name)
 {
-  return Py_FindMethod(BindingData_methods, obj, name);
+  return Py_FindMethod(ButtonData_methods, obj, name);
 }
 
-static PyTypeObject ActionData_Type = {
+static PyObject *KeyDataGetAttr(PyObject *obj, char *name)
+{
+  return Py_FindMethod(KeyData_methods, obj, name);
+}
+
+static PyTypeObject MotionData_Type = {
   PyObject_HEAD_INIT(NULL)
   0,
-  "ActionData",
-  sizeof(ActionData),
+  "MotionData",
+  sizeof(MotionData),
   0,
-  (destructor)ActionDataDealloc,
+  dealloc,
   0,
-  (getattrfunc)ActionDataGetAttr,
+  (getattrfunc)MotionDataGetAttr,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
-static PyTypeObject BindingData_Type = {
+static PyTypeObject ButtonData_Type = {
   PyObject_HEAD_INIT(NULL)
   0,
-  "BindingData",
-  sizeof(BindingData),
+  "ButtonData",
+  sizeof(ButtonData),
   0,
-  (destructor)BindingDataDealloc,
+  dealloc,
   0,
-  (getattrfunc)BindingDataGetAttr,
+  (getattrfunc)ButtonDataGetAttr,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
+
+static PyTypeObject KeyData_Type = {
+  PyObject_HEAD_INIT(NULL)
+  0,
+  "KeyData",
+  sizeof(KeyData),
+  0,
+  dealloc,
+  0,
+  (getattrfunc)KeyDataGetAttr,
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+MotionData *new_motion_data(Window window, Time time, unsigned int state,
+                          unsigned int button, MouseContext context,
+                          MouseAction action, int xroot, int yroot,
+                          const otk::Point &initpos, const otk::Rect &initarea)
+{
+  MotionData *data = PyObject_New(MotionData, &MotionData_Type);
+  data->window = window;
+  data->time   = time;
+  data->state  = state;
+  data->button = button;
+  data->context= context;
+  data->action = action;
+  data->xroot  = xroot;
+  data->yroot  = yroot;
+  data->pressx = initpos.x();
+  data->pressy = initpos.y();
+  data->press_clientx      = initarea.x();
+  data->press_clienty      = initarea.y();
+  data->press_clientwidth  = initarea.width();
+  data->press_clientheight = initarea.height();
+  return data;
+}
+
+ButtonData *new_button_data(Window window, Time time, unsigned int state,
+                          unsigned int button, MouseContext context,
+                          MouseAction action)
+{
+  ButtonData *data = PyObject_New(ButtonData, &ButtonData_Type);
+  data->window = window;
+  data->time   = time;
+  data->state  = state;
+  data->button = button;
+  data->context= context;
+  data->action = action;
+  return data;
+}
+
+KeyData *new_key_data(Window window, Time time, unsigned int state,
+                       unsigned int key)
+{
+  KeyData *data = PyObject_New(KeyData, &KeyData_Type);
+  data->window = window;
+  data->time   = time;
+  data->state  = state;
+  data->key    = key;
+  return data;
+}
 
 // **************** //
 // End custom types //
@@ -219,8 +308,9 @@ void python_init(char *argv0)
   obdict = PyModule_GetDict(obmodule);
 
   // set up the custom types
-  ActionData_Type.ob_type = &PyType_Type;
-  BindingData_Type.ob_type = &PyType_Type;
+  MotionData_Type.ob_type = &PyType_Type;
+  ButtonData_Type.ob_type = &PyType_Type;
+  KeyData_Type.ob_type = &PyType_Type;
 }
 
 void python_destroy()
@@ -240,7 +330,7 @@ bool python_exec(const std::string &path)
   return true;
 }
 
-static void call(PyObject *func, PyObject *data)
+void python_callback(PyObject *func, PyObject *data)
 {
   PyObject *arglist;
   PyObject *result;
@@ -256,42 +346,6 @@ static void call(PyObject *func, PyObject *data)
 
   Py_XDECREF(result);
   Py_DECREF(arglist);
-}
-
-void python_callback(PyObject *func, MouseAction action,
-                     Window window, MouseContext context,
-                     unsigned int state, unsigned int button,
-                     int xroot, int yroot, Time time)
-{
-  assert(func);
-  
-  ActionData *data = PyObject_New(ActionData, &ActionData_Type);
-  data->action = action;
-  data->window = window;
-  data->context= context;
-  data->state  = state;
-  data->button = button;
-  data->xroot  = xroot;
-  data->yroot  = yroot;
-  data->time   = time;
-
-  call(func, (PyObject*)data);
-  Py_DECREF(data);
-}
-
-void python_callback(PyObject *func, Window window, unsigned int state,
-			 unsigned int key, Time time)
-{
-  if (!func) return;
-
-  BindingData *data = PyObject_New(BindingData, &BindingData_Type);
-  data->window = window;
-  data->state  = state;
-  data->key    = key;
-  data->time   = time;
-
-  call(func, (PyObject*)data);
-  Py_DECREF(data);
 }
 
 bool python_get_string(const char *name, std::string *value)
@@ -438,4 +492,5 @@ void set_reset_key(const std::string &key)
 {
   ob::Openbox::instance->bindings()->setResetKey(key);
 }
+
 }

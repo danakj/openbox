@@ -350,7 +350,9 @@ void OBBindings::fire(unsigned int modifiers, unsigned int key, Time time)
           Window win = None;
           OBClient *c = Openbox::instance->focusedClient();
           if (c) win = c->window();
-          python_callback(p->callback, win, modifiers, key, time);
+          KeyData *data = new_key_data(win, time, modifiers, key);
+          python_callback(p->callback, (PyObject*)data);
+          Py_DECREF((PyObject*)data);
           reset(this);
         }
         break;
@@ -424,25 +426,15 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
     case MC_Window:
       win[0] = client->frame->plate();
       break;
+    case MC_Handle:
+      win[0] = client->frame->handle();
+      break;
     case MC_MaximizeButton:
-//      win[0] = client->frame->button_max();
-      break;
     case MC_CloseButton:
-//      win[0] = client->frame->button_close();
-      break;
     case MC_IconifyButton:
-//      win[0] = client->frame->button_iconify();
-      break;
     case MC_StickyButton: 
-//      win[0] = client->frame->button_stick();
-      break;
     case MC_Grip:
-//      win[0] = client->frame->grip_left();
-//      win[1] = client->frame->grip_right();
-      break;
     case MC_Root:
-//      win[0] = otk::OBDisplay::screenInfo(client->screen())->rootWindow();
-      break;
     case MC_MenuItem:
       break;
     default:
@@ -465,58 +457,18 @@ void OBBindings::grabButtons(bool grab, OBClient *client)
   }
 }
 
-void OBBindings::fire(MouseAction action, OBWidget::WidgetType type,
-                      Window win, unsigned int modifiers, unsigned int button,
-                      int xroot, int yroot, Time time)
+void OBBindings::fire(ButtonData *data)
 {
-  assert(action >= 0 && action < NUM_MOUSE_ACTION);
-
-  MouseContext context;
-  switch (type) {
-  case OBWidget::Type_Frame:
-    context = MC_Frame; break;
-  case OBWidget::Type_Titlebar:
-    context = MC_Titlebar; break;
-  case OBWidget::Type_Handle:
-    context = MC_Frame; break;
-  case OBWidget::Type_Plate:
-    context = MC_Window; break;
-  case OBWidget::Type_Label:
-    context = MC_Titlebar; break;
-  case OBWidget::Type_MaximizeButton:
-    context = MC_MaximizeButton; break;
-  case OBWidget::Type_CloseButton:
-    context = MC_CloseButton; break;
-  case OBWidget::Type_IconifyButton:
-    context = MC_IconifyButton; break;
-  case OBWidget::Type_StickyButton:
-    context = MC_StickyButton; break;
-  case OBWidget::Type_LeftGrip:
-    context = MC_Grip; break;
-  case OBWidget::Type_RightGrip:
-    context = MC_Grip; break;
-  case OBWidget::Type_Client:
-    context = MC_Window; break;
-  case OBWidget::Type_Root:
-    context = MC_Root; break;
-  default:
-    assert(false); // unhandled type
-  }
-
-  modifiers &= (ControlMask | ShiftMask | Mod1Mask | Mod2Mask | Mod3Mask |
-                Mod4Mask | Mod5Mask);
-
-  printf("but.mods %d.%d\n", button, modifiers);
+  printf("but.mods %d.%d\n", data->button, data->state);
   
-  ButtonBindingList::iterator it, end = _buttons[context].end();
-  for (it = _buttons[context].begin(); it != end; ++it)
-    if ((*it)->binding.key == button &&
-        (*it)->binding.modifiers == modifiers) {
+  ButtonBindingList::iterator it, end = _buttons[data->context].end();
+  for (it = _buttons[data->context].begin(); it != end; ++it)
+    if ((*it)->binding.key == data->button &&
+        (*it)->binding.modifiers == data->state) {
       ButtonBinding::CallbackList::iterator c_it,
-        c_end = (*it)->callback[action].end();
-      for (c_it = (*it)->callback[action].begin(); c_it != c_end; ++c_it)
-        python_callback(*c_it, action, win, context, modifiers,
-                        button, xroot, yroot, time);
+        c_end = (*it)->callback[data->action].end();
+      for (c_it = (*it)->callback[data->action].begin(); c_it != c_end; ++c_it)
+        python_callback(*c_it, (PyObject*)data);
     }
 }
 

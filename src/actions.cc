@@ -45,6 +45,7 @@ void OBActions::insertPress(const XButtonEvent &e)
 
   OBClient *c = Openbox::instance->findClient(e.window);
   if (c) a->clientarea = c->area();
+  printf("press %d x:%d y:%d winx:%d winy:%d\n", e.button, e.x_root, e.y_root, c->area().x(), c->area().y());
 }
 
 void OBActions::removePress(const XButtonEvent &e)
@@ -70,16 +71,14 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   // run the PRESS python hook
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
+  assert(w); // everything should be a widget
 
-/*  doCallback(Action_ButtonPress, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, e.button, e.x_root, e.y_root, e.time);*/
-  if (w) {
-    Openbox::instance->bindings()->fire(MousePress, w->type(), e.window,
-                                        e.state, e.button,
-                                        e.x_root, e.y_root, e.time);
-  } else
-    assert(false); // why isnt there a type?
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+  ButtonData *data = new_button_data(e.window, e.time, state, e.button,
+                                     w->mcontext(), MousePress);
+  Openbox::instance->bindings()->fire(data);
+  Py_DECREF((PyObject*)data);
     
   if (_button) return; // won't count toward CLICK events
 
@@ -94,6 +93,7 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
+  assert(w); // everything should be a widget
 
   // not for the button we're watching?
   if (_button != e.button) return;
@@ -110,29 +110,19 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     return;
 
   // run the CLICK python hook
-/*  doCallback(Action_Click, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, e.button, e.x_root, e.y_root, e.time);*/
-  if (w) {
-    Openbox::instance->bindings()->fire(MouseClick, w->type(), e.window,
-                                        e.state, e.button,
-                                        e.x_root, e.y_root, e.time);
-  } else
-    assert(false); // why isnt there a type?
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+  ButtonData *data = new_button_data(e.window, e.time, state, e.button,
+                                     w->mcontext(), MouseClick);
+  Openbox::instance->bindings()->fire(data);
+    
 
   if (e.time - _release.time < DOUBLECLICKDELAY &&
       _release.win == e.window && _release.button == e.button) {
 
     // run the DOUBLECLICK python hook
-/*    doCallback(Action_DoubleClick, e.window,
-               (OBWidget::WidgetType)(w ? w->type():-1),
-               e.state, e.button, e.x_root, e.y_root, e.time);*/
-    if (w) {
-      Openbox::instance->bindings()->fire(MouseDoubleClick, w->type(),
-                                          e.window, e.state, e.button,
-                                          e.x_root, e.y_root, e.time);
-    } else
-      assert(false); // why isnt there a type?
+    data->action = MouseDoubleClick;
+    Openbox::instance->bindings()->fire(data);
     
     // reset so you cant triple click for 2 doubleclicks
     _release.win = 0;
@@ -144,6 +134,8 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
     _release.button = e.button;
     _release.time = e.time;
   }
+
+  Py_DECREF((PyObject*)data);
 }
 
 
@@ -178,7 +170,9 @@ void OBActions::keyPressHandler(const XKeyEvent &e)
 //  OBWidget *w = dynamic_cast<OBWidget*>
 //    (Openbox::instance->findHandler(e.window));
 
-  Openbox::instance->bindings()->fire(e.state, e.keycode, e.time);
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+  Openbox::instance->bindings()->fire(state, e.keycode, e.time);
 }
 
 
@@ -200,24 +194,22 @@ void OBActions::motionHandler(const XMotionEvent &e)
     }
   }
 
-  _dx = x_root - _posqueue[0]->pos.x(); _posqueue[0]->pos.setX(x_root);
-  _dy = y_root - _posqueue[0]->pos.y(); _posqueue[0]->pos.setY(y_root);
-  
   OBWidget *w = dynamic_cast<OBWidget*>
     (Openbox::instance->findHandler(e.window));
+  assert(w); // everything should be a widget
 
-  // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
-  //      maybe that should all be done via python tho.. (or radial menus!)
-  // run the simple MOTION python hook for now...
-/*  doCallback(Action_MouseMotion, e.window,
-             (OBWidget::WidgetType)(w ? w->type():-1),
-             e.state, (unsigned)-1, x_root, y_root, e.time);*/
-  if (w) {
-    Openbox::instance->bindings()->fire(MouseMotion, w->type(), e.window,
-                                        e.state, _posqueue[0]->button,
-                                        _dx, _dy, e.time);
-  } else
-    assert(false); // why isnt there a type?
+  // run the MOTION python hook
+  unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
+                                  Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
+  unsigned int button = _posqueue[0]->button;
+  printf("motion %d x:%d y:%d winx:%d winy:%d\n", button, x_root, y_root,
+         _posqueue[0]->clientarea.x(), _posqueue[0]->clientarea.y());
+  MotionData *data = new_motion_data(e.window, e.time, state, button,
+                                     w->mcontext(), MouseMotion,
+                                     x_root, y_root, _posqueue[0]->pos,
+                                     _posqueue[0]->clientarea);
+  Openbox::instance->bindings()->fire((ButtonData*)data);
+  Py_DECREF((PyObject*)data);
 }
 
 void OBActions::mapRequestHandler(const XMapRequestEvent &e)

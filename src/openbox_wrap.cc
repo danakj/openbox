@@ -2805,6 +2805,7 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"OBClient_no_propagate_mask", (long) ob::OBClient::no_propagate_mask, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Frame", (long) ob::MC_Frame, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Titlebar", (long) ob::MC_Titlebar, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"MC_Handle", (long) ob::MC_Handle, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_Window", (long) ob::MC_Window, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_MaximizeButton", (long) ob::MC_MaximizeButton, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"MC_CloseButton", (long) ob::MC_CloseButton, 0, 0, 0},

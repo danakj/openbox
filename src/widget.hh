@@ -2,6 +2,8 @@
 #ifndef   __obwidget_hh
 #define   __obwidget_hh
 
+#include "python.hh"
+
 namespace ob {
 
 class OBWidget {
@@ -30,6 +32,39 @@ public:
   OBWidget(WidgetType type) : _type(type) {}
   
   inline WidgetType type() const { return _type; }
+
+  inline MouseContext mcontext() const {
+    switch (_type) {
+    case Type_Frame:
+      return MC_Frame;
+    case Type_Titlebar:
+      return MC_Titlebar;
+    case Type_Handle:
+      return MC_Handle;
+    case Type_Plate:
+      return MC_Window;
+    case Type_Label:
+      return MC_Titlebar;
+    case Type_MaximizeButton:
+      return MC_MaximizeButton;
+    case Type_CloseButton:
+      return MC_CloseButton;
+    case Type_IconifyButton:
+      return MC_IconifyButton;
+    case Type_StickyButton:
+      return MC_StickyButton;
+    case Type_LeftGrip:
+      return MC_Grip;
+    case Type_RightGrip:
+      return MC_Grip;
+    case Type_Client:
+      return MC_Window;
+    case Type_Root:
+      return MC_Root;
+    default:
+      assert(false); // unhandled type
+    }
+  }
 };
 
 }

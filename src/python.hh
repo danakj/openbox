@@ -6,6 +6,9 @@
   @brief wee
 */
 
+#include "otk/point.hh"
+#include "otk/rect.hh"
+
 extern "C" {
 #include <X11/Xlib.h>
 #include <Python.h>
@@ -19,6 +22,7 @@ namespace ob {
 enum MouseContext {
   MC_Frame,
   MC_Titlebar,
+  MC_Handle,
   MC_Window,
   MC_MaximizeButton,
   MC_CloseButton,
@@ -45,18 +49,61 @@ enum KeyContext {
 };
 
 #ifndef SWIG
+
+// *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
+typedef struct {
+  PyObject_HEAD;
+  Window window;
+  Time time;
+  unsigned int state;
+  unsigned int button;
+  MouseContext context;
+  MouseAction action;
+  int xroot;
+  int yroot;
+  int pressx;
+  int pressy;
+  int press_clientx;
+  int press_clienty;
+  int press_clientwidth;
+  int press_clientheight;
+} MotionData;
+
+// *** MotionData can be (and is) cast ButtonData!! (in actions.cc) *** //
+typedef struct {
+  PyObject_HEAD;
+  Window window;
+  Time time;
+  unsigned int state;
+  unsigned int button;
+  MouseContext context;
+  MouseAction action;
+} ButtonData;
+
+typedef struct {
+  PyObject_HEAD;
+  Window window;
+  Time time;
+  unsigned int state;
+  unsigned int key;
+} KeyData;
+
 void python_init(char *argv0);
 void python_destroy();
 bool python_exec(const std::string &path);
                  
-void python_callback(PyObject *func, MouseAction action,
-                     Window window, MouseContext context,
-                     unsigned int state, unsigned int button,
-                     int xroot, int yroot, Time time);
+MotionData *new_motion_data(Window window, Time time, unsigned int state,
+                            unsigned int button, MouseContext context,
+                            MouseAction action, int xroot, int yroot,
+                            const otk::Point &initpos,
+                            const otk::Rect &initarea);
+ButtonData *new_button_data(Window window, Time time, unsigned int state,
+                            unsigned int button, MouseContext context,
+                            MouseAction action);
+KeyData *new_key_data(Window window, Time time, unsigned int state,
+                      unsigned int key);
 
-void python_callback(PyObject *func, Window window, unsigned int state,
-                     unsigned int key, Time time);
-
+void python_callback(PyObject *func, PyObject *data);
 
 bool python_get_string(const char *name, std::string *value);
 bool python_get_stringlist(const char *name, std::vector<std::string> *value);

@@ -557,8 +557,11 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
 
   MenuStyle *style = screen->getMenuStyle();
-  BPen pen((highlight || item->isSelected()) ? style->h_text : style->f_text),
-      hipen(style->hilite.color());
+  BPen hipen(style->hilite.color());
+  // match the text color
+  BPen pen((highlight ? style->h_text :
+            (item->isEnabled() ? style->f_text :
+             style->d_text)));
 
 
   sel_x = item_x;
@@ -607,11 +610,6 @@ void Basemenu::drawItem(int index, bool highlight, bool clear,
   }
   
   if (dosel && item->isSelected()) {
-    // match the text color
-    BPen pen((highlight ? style->h_text :
-              (item->isEnabled() ? style->f_text :
-               style->d_text)));
-
       XPoint pts[6];
 
       // put the check mark on the opposite side of the menu

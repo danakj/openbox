@@ -304,6 +304,9 @@ static void gradient_solid(RrAppearance *l, int w, int h)
      (color##x[1] << RrDefaultGreenOffset) + \
      (color##x[2] << RrDefaultBlueOffset))
 
+#define INCREMENT(x, i) \
+    (inc##x[i])
+
 #define NEXT(x)                                           \
 {                                                         \
     int i;                                                \
@@ -314,13 +317,13 @@ static void gradient_solid(RrAppearance *l, int w, int h)
             /* Y (color) is dependant on X */             \
             error##x[i] += cdelta##x[i];                  \
             if ((error##x[i] << 1) >= len##x) {           \
-                color##x[i] += inc##x[i];                 \
+                color##x[i] += INCREMENT(x, i);           \
                 error##x[i] -= len##x;                    \
             }                                             \
         } else {                                          \
             /* X is dependant on Y (color) */             \
             while (1) {                                   \
-                color##x[i] += inc##x[i];                 \
+                color##x[i] += INCREMENT(x, i);           \
                 error##x[i] += len##x;                    \
                 if ((error##x[i] << 1) >= cdelta##x[i]) { \
                     error##x[i] -= cdelta##x[i];          \

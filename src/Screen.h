@@ -290,7 +290,7 @@ public:
 
 #ifdef    HAVE_STRFTIME
   inline char *getStrftimeFormat(void) { return resource.strftime_format; }
-  void saveStrftimeFormat(char *);
+  void saveStrftimeFormat(const char *);
 #else // !HAVE_STRFTIME
   inline int getDateFormat(void) { return resource.date_format; }
   inline void saveDateFormat(int f) { resource.date_format = f; }
@@ -308,7 +308,7 @@ public:
   int removeLastWorkspace(void);
 
   void removeWorkspaceNames(void);
-  void addWorkspaceName(char *);
+  void addWorkspaceName(const char *);
   void addNetizen(Netizen *);
   void removeNetizen(Window);
   void addIcon(OpenboxWindow *);

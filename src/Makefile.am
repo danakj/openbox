@@ -30,7 +30,7 @@ CPPFLAGS= @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ \
 
 bin_PROGRAMS= openbox
 
-openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc Resource.cc
+openbox_SOURCES= BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Resource.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 

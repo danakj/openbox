@@ -1574,7 +1574,7 @@ void BScreen::raiseWindows(Window *workspace_stack, int num) {
 
 
 #ifdef    HAVE_STRFTIME
-void BScreen::saveStrftimeFormat(char *format) {
+void BScreen::saveStrftimeFormat(const char *format) {
   if (resource.strftime_format)
     delete [] resource.strftime_format;
 
@@ -1583,7 +1583,7 @@ void BScreen::saveStrftimeFormat(char *format) {
 #endif // HAVE_STRFTIME
 
 
-void BScreen::addWorkspaceName(char *name) {
+void BScreen::addWorkspaceName(const char *name) {
   workspaceNames->insert(bstrdup(name));
 }
 

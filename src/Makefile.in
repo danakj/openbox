@@ -104,7 +104,7 @@ CPPFLAGS = @CPPFLAGS@ @SHAPE@ @SLIT@ @INTERLACE@ @ORDEREDPSEUDO@ @DEBUG@ @NEWWMS
 
 bin_PROGRAMS = openbox
 
-openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc Resource.cc
+openbox_SOURCES = BaseDisplay.cc Basemenu.cc Clientmenu.cc Configmenu.cc Iconmenu.cc Image.cc LinkedList.cc Netizen.cc Resource.cc Rootmenu.cc Screen.cc Slit.cc Timer.cc Toolbar.cc Window.cc Windowmenu.cc Workspace.cc Workspacemenu.cc openbox.cc bsd-snprintf.c i18n.cc main.cc
 
 MAINTAINERCLEANFILES = Makefile.in
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -121,9 +121,9 @@ X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 X_PRE_LIBS = @X_PRE_LIBS@
 openbox_OBJECTS =  BaseDisplay.o Basemenu.o Clientmenu.o Configmenu.o \
-Iconmenu.o Image.o LinkedList.o Netizen.o Rootmenu.o Screen.o Slit.o \
-Timer.o Toolbar.o Window.o Windowmenu.o Workspace.o Workspacemenu.o \
-openbox.o bsd-snprintf.o i18n.o main.o Resource.o
+Iconmenu.o Image.o LinkedList.o Netizen.o Resource.o Rootmenu.o \
+Screen.o Slit.o Timer.o Toolbar.o Window.o Windowmenu.o Workspace.o \
+Workspacemenu.o openbox.o bsd-snprintf.o i18n.o main.o
 openbox_LDADD = $(LDADD)
 openbox_DEPENDENCIES = 
 openbox_LDFLAGS = 

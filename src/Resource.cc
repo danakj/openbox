@@ -62,14 +62,12 @@ void obResource::setAutoSave(bool autosave) {
 }
 
 void obResource::save() {
-  assert(m_file.c_str() != NULL);
   assert(m_database != NULL);
   XrmPutFileDatabase(m_database, m_file.c_str());
   m_modified = false;
 }
 
 bool obResource::load() {
-  assert(m_file.c_str() != NULL);
   if (m_database != NULL)
     XrmDestroyDatabase(m_database);
   m_modified = false;
@@ -79,7 +77,6 @@ bool obResource::load() {
 }
 
 void obResource::setValue(const std::string &rname, bool value) {
-  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
 
   const char *val = (value ? "True" : "False");
@@ -92,7 +89,6 @@ void obResource::setValue(const std::string &rname, bool value) {
 }
 
 void obResource::setValue(const std::string &rname, long value) {
-  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   char val[11];
@@ -106,7 +102,6 @@ void obResource::setValue(const std::string &rname, long value) {
 }
 
 void obResource::setValue(const std::string &rname, const char *value) {
-  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
@@ -118,7 +113,6 @@ void obResource::setValue(const std::string &rname, const char *value) {
 }
 
 void obResource::setValue(const std::string &rname, const std::string &value) {
-  assert(rname.c_str() != NULL);
   assert(m_database != NULL);
   
   std::string rc_string = rname + ": " + value;
@@ -131,7 +125,6 @@ void obResource::setValue(const std::string &rname, const std::string &value) {
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           bool &value) const {
-  assert(rname.c_str() != NULL);
   assert(rclass.c_str() != NULL);
   assert(m_database != NULL);
   
@@ -141,7 +134,7 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           &rettype, &retvalue) || retvalue.addr == NULL)
     return false;
   std::string val = retvalue.addr;
-  if (val == "True")
+  if (0 == strncasecmp(val.c_str(), "true", val.length()))
     value = true;
   else
     value = false;
@@ -150,8 +143,6 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           long &value) const {
-  assert(rname.c_str() != NULL);
-  assert(rclass.c_str() != NULL);
   assert(m_database != NULL);
   
   char *rettype;
@@ -168,8 +159,6 @@ bool obResource::getValue(const std::string &rname, const std::string &rclass,
 
 bool obResource::getValue(const std::string &rname, const std::string &rclass,
                           std::string &value) const {
-  assert(rname.c_str() != NULL);
-  assert(rclass.c_str() != NULL);
   assert(m_database != NULL);
   
   char *rettype;

@@ -264,11 +264,8 @@ void Client::setupDecorAndFunctions()
         _decorations &= ~Decor_Border;
       if (! (_mwmhints.decorations & MwmDecor_Handle))
         _decorations &= ~Decor_Handle;
-      if (! (_mwmhints.decorations & MwmDecor_Title)) {
+      if (! (_mwmhints.decorations & MwmDecor_Title))
         _decorations &= ~Decor_Titlebar;
-        // if we don't have a titlebar, then we cannot shade!
-        _functions &= ~Func_Shade;
-      }
       if (! (_mwmhints.decorations & MwmDecor_Iconify))
         _decorations &= ~Decor_Iconify;
       if (! (_mwmhints.decorations & MwmDecor_Maximize))
@@ -313,16 +310,17 @@ void Client::setupDecorAndFunctions()
   if (_disabled_decorations & Decor_Close)
     _decorations &= ~Decor_Close;
 
-  // You can't shade without a titlebar
+  // if we don't have a titlebar, then we cannot shade!
   if (!(_decorations & Decor_Titlebar))
     _functions &= ~Func_Shade;
-  
+
   changeAllowedActions();
 
   if (frame) {
     frame->adjustSize(); // change the decors on the frame
     frame->adjustPosition(); // with more/less decorations, we may need to be
                              // moved
+    remaximize(); // with new decor, the window's maximized size may change
   }
 }
 
@@ -1344,6 +1342,21 @@ void Client::changeAllowedActions(void)
 
   otk::Property::set(_window, otk::Property::atoms.net_wm_allowed_actions,
                      otk::Property::atoms.atom, actions, num);
+
+  // make sure the window isn't breaking any rules now
+  
+  if (!(_functions & Func_Shade) && _shaded)
+    if (frame) shade(false);
+    else _shaded = false;
+  if (!(_functions & Func_Iconify) && _iconic)
+    if (frame) setDesktop(openbox->screen(_screen)->desktop());
+    else _iconic = false;
+  if (!(_functions & Func_Fullscreen) && _fullscreen)
+    if (frame) fullscreen(false);
+    else _fullscreen = false;
+  if (!(_functions & Func_Maximize) && (_max_horz || _max_vert))
+    if (frame) maximize(false, 0);
+    else _max_vert = _max_horz = false;
 }
 
 

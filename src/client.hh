@@ -443,9 +443,10 @@ private:
               be returned to normal state.
     @param savearea true to have the client's current size and position saved;
                     otherwise, they are not. You should not save when mapping a
-                    new window that is set to fullscreen.
+                    new window that is set to fullscreen. This has no effect
+                    when restoring a window from fullscreen.
   */
-  void fullscreen(bool fs, bool savearea);
+  void fullscreen(bool fs, bool savearea = true);
 
   //! Maximize or unmaximize the client window
   /*!
@@ -454,9 +455,10 @@ private:
     @param dir 0 to set both horz and vert, 1 to set horz, 2 to set vert.
     @param savearea true to have the client's current size and position saved;
                     otherwise, they are not. You should not save when mapping a
-                    new window that is set to fullscreen.
+                    new window that is set to fullscreen. This has no effect
+                    when unmaximizing a window.
   */
-  void maximize(bool max, int dir, bool savearea);
+  void maximize(bool max, int dir, bool savearea = true);
 
   //! Internal version of the Client::move function
   /*!

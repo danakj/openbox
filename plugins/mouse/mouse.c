@@ -113,10 +113,13 @@ static void fire_button(MouseAction a, GQuark context, Client *c, guint state,
 }
 
 /* corner should be the opposite corner of the window in which the pointer
-   clicked, Corner_TopLeft if a good default if there is no client */
-static void fire_motion(MouseAction a, GQuark context, Client *c, guint state,
-                        guint button, int cx, int cy, int cw, int ch,
-                        int dx, int dy, gboolean final, Corner corner)
+   clicked, Corner_TopLeft if a good default if there is no client 
+   Returns True or False for if a binding existed for the action or not.
+*/
+static gboolean fire_motion(MouseAction a, GQuark context, Client *c,
+                            guint state, guint button, int cx, int cy,
+                            int cw, int ch, int dx, int dy,
+                            gboolean final, Corner corner)
 {
     GSList *it;
     MouseBinding *b;
@@ -128,7 +131,7 @@ static void fire_motion(MouseAction a, GQuark context, Client *c, guint state,
 		break;
     }
     /* if not bound, then nothing to do! */
-    if (it == NULL) return;
+    if (it == NULL) return FALSE;
 
     if (b->action[a] != NULL && b->action[a]->func != NULL) {
         b->action[a]->data.any.c = c;
@@ -160,7 +163,9 @@ static void fire_motion(MouseAction a, GQuark context, Client *c, guint state,
             b->action[a]->data.resize.final = final;
         }
         b->action[a]->func(&b->action[a]->data);
+        return TRUE;
     }
+    return FALSE;
 }
 
 static Corner pick_corner(int x, int y, int cx, int cy, int cw, int ch)
@@ -183,7 +188,7 @@ static void event(ObEvent *e, void *foo)
     static Time ltime;
     static int px, py, cx, cy, cw, ch, dx, dy;
     static guint button = 0, lbutton = 0;
-    static gboolean drag = FALSE;
+    static gboolean drag = FALSE, drag_used = FALSE;
     static Corner corner = Corner_TopLeft;
     gboolean click = FALSE;
     gboolean dclick = FALSE;
@@ -230,7 +235,7 @@ static void event(ObEvent *e, void *foo)
                                      e->data.x.e->xbutton.window);
         if (e->data.x.e->xbutton.button == button) {
             /* end drags */
-            if (drag) {
+            if (drag_used) {
                 fire_motion(MouseAction_Motion, context,
                             e->data.x.client, e->data.x.e->xbutton.state,
                             e->data.x.e->xbutton.button,
@@ -264,7 +269,7 @@ static void event(ObEvent *e, void *foo)
             button = 0;
             ltime = e->data.x.e->xbutton.time;
         }
-        fire_button(MouseAction_Press, context,
+        fire_button(MouseAction_Release, context,
                     e->data.x.client, e->data.x.e->xbutton.state,
                     e->data.x.e->xbutton.button);
         if (click)
@@ -281,14 +286,17 @@ static void event(ObEvent *e, void *foo)
         if (button) {
             dx = e->data.x.e->xmotion.x_root - px;
             dy = e->data.x.e->xmotion.y_root - py;
-            if (ABS(dx) >= drag_threshold || ABS(dy) >= drag_threshold)
+            if (!drag &&
+                (ABS(dx) >= drag_threshold || ABS(dy) >= drag_threshold))
                 drag = TRUE;
             if (drag) {
                 context = engine_get_context(e->data.x.client,
                                              e->data.x.e->xbutton.window);
-                fire_motion(MouseAction_Motion, context,
-                            e->data.x.client, e->data.x.e->xmotion.state,
-                            button, cx, cy, cw, ch, dx, dy, FALSE, corner);
+                drag_used = fire_motion(MouseAction_Motion, context,
+                                        e->data.x.client,
+                                        e->data.x.e->xmotion.state,
+                                        button, cx, cy, cw, ch, dx, dy,
+                                        FALSE, corner);
             }
         }
         break;

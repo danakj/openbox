@@ -35,6 +35,8 @@ distclean-local:
 openbox.i: openbox.hh screen.hh client.hh python.hh frame.hh
 	touch $@
 
+%.py: %_wrap.cc
+
 %_wrap.cc: %.i
 	swig -c -I../otk $(filter -I%,$(CXXFLAGS)) -python -shadow -c++ -nodefault -o $@ $<
 

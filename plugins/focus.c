@@ -3,14 +3,29 @@
 #include "../kernel/client.h"
 #include "../kernel/focus.h"
 #include "../kernel/stacking.h"
+#include "../kernel/openbox.h"
 
 static GSList **focus_order = NULL;
+
+static void focus_fallback(guint desk, gboolean warp)
+{
+    GSList *it;
+
+    for (it = focus_order[desk]; it != NULL; it = it->next)
+        if (client_focus(it->data)) {
+            if (warp) { /* XXX make this configurable */
+                Client *c = it->data;
+                XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
+                             c->area.width / 2, c->area.height / 2);
+            }
+            break;
+        }
+}
 
 static void events(ObEvent *e, void *foo)
 {
     guint i;
     guint new, old;
-    GSList *it;
 
     switch (e->type) {
     case Event_Client_Mapped:
@@ -50,19 +65,14 @@ static void events(ObEvent *e, void *foo)
 
     case Event_Ob_Desktop:
         /* focus the next available target */
-        new = e->data.o.num[0];
-        for (it = focus_order[new]; it != NULL; it = it->next)
-            if (client_focus(it->data))
-                break;
+        focus_fallback(e->data.o.num[0], TRUE);
         break;
 
     case Event_Client_Unfocus:
-        if (focus_client == NULL) { /* nothing is left with focus! */
+        /* nothing is left with focus! */
+        if (focus_client == NULL) 
             /* focus the next available target */
-            for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
-                if (client_focus(it->data))
-                    break;
-        }
+            focus_fallback(screen_desktop, FALSE);
         break;
 
     case Event_Client_Focus:

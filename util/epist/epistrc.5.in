@@ -163,6 +163,11 @@ Disables all keybindings except for the binding which runs this action, for
 the current screen. Enables keybindings when run again. This command cannot be
 part of a chain.
 
+.SS toggleDecorations
+.B [Openbox specific]
+.br
+Toggles whether or not the window decorations are shown on the currently
+focused window. (Decorations include the titlebar, borders, and bottom handle.)
 .SS showRootMenu
 .B [Openbox specific]
 .br

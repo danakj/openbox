@@ -47,14 +47,6 @@ extern "C" {
 #  include <signal.h>
 #endif // HAVE_SIGNAL_H
 
-#ifndef   SA_NODEFER
-#  ifdef   SA_INTERRUPT
-#    define SA_NODEFER SA_INTERRUPT
-#  else // !SA_INTERRUPT
-#    define SA_NODEFER (0)
-#  endif // SA_INTERRUPT
-#endif // SA_NODEFER
-
 #ifdef    HAVE_SYS_WAIT_H
 #  include <sys/types.h>
 #  include <sys/wait.h>
@@ -80,7 +72,7 @@ static int handleXErrors(Display *d, XErrorEvent *e) {
 #ifdef    DEBUG
   char errtxt[128];
 
-  XGetErrorText(d, e->error_code, errtxt, 128);
+  XGetErrorText(d, e->error_code, errtxt, 128); // XXX: use this!!
   fprintf(stderr, "%s:  X error: %s(%d) opcodes %d/%d\n  resource 0x%lx\n",
           base_display->getApplicationName(), errtxt, e->error_code,
           e->request_code, e->minor_code, e->resourceid);

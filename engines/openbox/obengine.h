@@ -30,6 +30,7 @@ extern color_rgb *ob_s_titlebut_unfocused_color;
 extern int ob_s_winfont_height;
 extern int ob_s_winfont_shadow;
 extern int ob_s_winfont_shadow_offset;
+extern int ob_s_winfont_shadow_tint;
 extern ObFont *ob_s_winfont;
 
 extern pixmap_mask *ob_s_max_set_mask;

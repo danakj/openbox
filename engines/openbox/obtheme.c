@@ -277,7 +277,7 @@ gboolean obtheme_load()
     XrmDatabase db = NULL;
     Justify winjust;
     char *winjuststr;
-    ConfigValue theme, shadow, offset, font;
+    ConfigValue theme, shadow, offset, font, tint;
 
     if (config_get("theme", Config_String, &theme)) {
 	db = loaddb(theme.string);
@@ -299,21 +299,21 @@ gboolean obtheme_load()
 
     /* load the font, not from the theme file tho, its in the config */
 
-    if (!config_get("font.shadow", Config_Bool, &shadow)) {
-        shadow.bool = TRUE; /* default */
-        config_set("font.shadow", Config_Bool, shadow);
-    }
+    if (!config_get("font.shadow", Config_Bool, &shadow))
+        g_assert_not_reached();
     ob_s_winfont_shadow = shadow.bool;
-    if (!config_get("font.shadow.offset", Config_Integer, &offset) ||
-        offset.integer < 0 || offset.integer >= 10) {
-        offset.integer = 1; /* default */
-        config_set("font.shadow.offset", Config_Integer, offset);
-    }
+    if (!config_get("font.shadow.offset", Config_Integer, &offset))
+        g_assert_not_reached();
     ob_s_winfont_shadow_offset = offset.integer;
-    if (!config_get("font", Config_String, &font)) {
-        font.string = DEFAULT_FONT;
-        config_set("font", Config_String, font);
-    }
+    if (!config_get("font.shadow.tint", Config_Integer, &tint))
+        g_assert_not_reached();
+    /* XXX put these checks into the config system somehow!!! */
+    if (tint.integer < -100) tint.integer = -100;
+    if (tint.integer > 100) tint.integer = 100;
+    config_set("font.shadow.tint", Config_Integer, tint);
+    ob_s_winfont_shadow_tint = tint.integer;
+    if (!config_get("font", Config_String, &font))
+        g_assert_not_reached();
     ob_s_winfont = font_open(font.string);
     ob_s_winfont_height = font_height(ob_s_winfont, ob_s_winfont_shadow,
                                       ob_s_winfont_shadow_offset);
@@ -495,6 +495,7 @@ gboolean obtheme_load()
     ob_a_focused_label->texture[0].data.text.shadow = ob_s_winfont_shadow;
     ob_a_focused_label->texture[0].data.text.offset =
         ob_s_winfont_shadow_offset;
+    ob_a_focused_label->texture[0].data.text.tint = ob_s_winfont_shadow_tint;
     ob_a_focused_label->texture[0].data.text.color = ob_s_title_focused_color;
 
     ob_a_unfocused_label->texture[0].type = Text;
@@ -503,6 +504,7 @@ gboolean obtheme_load()
     ob_a_unfocused_label->texture[0].data.text.shadow = ob_s_winfont_shadow;
     ob_a_unfocused_label->texture[0].data.text.offset =
         ob_s_winfont_shadow_offset;
+    ob_a_unfocused_label->texture[0].data.text.tint = ob_s_winfont_shadow_tint;
     ob_a_unfocused_label->texture[0].data.text.color =
         ob_s_title_unfocused_color;
 

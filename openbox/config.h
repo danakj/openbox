@@ -54,6 +54,4 @@ gboolean config_def_add_value(ConfigDefEntry *entry, char *value);
    FALSE. */
 gboolean config_def_set(ConfigDefEntry *entry);
 
-void config_parse();
-
 #endif

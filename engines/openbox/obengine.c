@@ -36,6 +36,7 @@ color_rgb *ob_s_titlebut_unfocused_color;
 int ob_s_winfont_height;
 int ob_s_winfont_shadow;
 int ob_s_winfont_shadow_offset;
+int ob_s_winfont_shadow_tint;
 ObFont *ob_s_winfont;
 /* style settings - masks */
 pixmap_mask *ob_s_max_set_mask;
@@ -495,7 +496,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved, gboolean resized)
         self->icon_x = -1;
         self->desk_x = -1;
         self->shade_x = -1;
-        self->icon_x = -1;
+        self->iconify_x = -1;
         self->label_x = -1;
         self->max_x = -1;
         self->close_x = -1;
@@ -712,10 +713,8 @@ static void layout_title(ObFrame *self)
 
     n = d = i = l = m = c = s = FALSE;
 
-    if (!config_get("titlebar.layout", Config_String, &layout)) {
-        layout.string = "NDSLIMC";
-        config_set("titlebar.layout", Config_String, layout);
-    }
+    if (!config_get("titlebar.layout", Config_String, &layout))
+        g_assert_not_reached();
 
     /* figure out whats being shown, and the width of the label */
     self->label_width = self->width - (ob_s_bevel + 1) * 2;

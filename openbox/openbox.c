@@ -9,6 +9,7 @@
 #include "extensions.h"
 #include "gettext.h"
 #include "config.h"
+#include "parse.h"
 #include "grab.h"
 #include "engine.h"
 #include "plugin.h"
@@ -145,7 +146,7 @@ int main(int argc, char **argv)
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */
-     
+
     if (screen_annex()) { /* it will be ours! */
 	timer_startup();
         config_startup();
@@ -153,10 +154,16 @@ int main(int argc, char **argv)
 	font_startup();
         plugin_startup();
 
+        /* startup the parsing so plugins can register sections of the rc */
+        parse_startup();
+
         /* load the plugins specified in the pluginrc */
         plugin_loadall();
         /* parse/load user options */
-        config_parse();
+        parse_rc();
+
+        /* we're done with parsing now, kill it */
+        parse_shutdown();
 
 	engine_startup();
 	event_startup();

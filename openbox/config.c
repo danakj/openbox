@@ -25,26 +25,47 @@ void config_startup()
                                   "Engine",
                                   "The name of the theming engine to be used "
                                   "to decorate windows."));
+
     config_def_set(config_def_new("theme", Config_String,
                                   "Theme",
                                   "The name of the theme to load with the "
                                   "chosen engine."));
+
     config_def_set(config_def_new("font", Config_String,
                                   "Titlebar Font",
                                   "The fontstring specifying the font to "
                                   "be used in window titlebars."));
+    val.string = "Sans-7";
+    config_set("font", Config_String, val);
+
     config_def_set(config_def_new("font.shadow", Config_Bool,
                                   "Titlebar Font Shadow",
                                   "Whether or not the text in the window "
                                   "titlebars gets a drop shadow."));
+    val.bool = FALSE;
+    config_set("font.shadow", Config_Bool, val);
+
     config_def_set(config_def_new("font.shadow.offset", Config_Integer,
                                   "Titlebar Font Shadow Offset",
                                   "The offset of the drop shadow for text "
                                   "in the window titlebars."));
+    val.integer = 1;
+    config_set("font.shadow.offset", Config_Integer, val);
+
+    config_def_set(config_def_new("font.shadow.tint", Config_Integer,
+                                  "Titlebar Font Shadow Tint",
+                                  "The percentage of tint/opacity to give the "
+                                  "the shadow(from -100(white) to "
+                                  "100(black))."));
+    val.integer = 25;
+    config_set("font.shadow.tint", Config_Integer, val);
+
     config_def_set(config_def_new("titlebar.layout", Config_String,
                                   "Titlebar Layout",
                                   "The ordering of the elements in the "
                                   "window titlebars."));
+    val.string = "NDSLIMC";
+    config_set("titlebar.layout", Config_String, val);
 
     config_def_set(config_def_new("focusNew", Config_Bool,
                                   "Focus New Windows",
@@ -64,32 +85,6 @@ void config_shutdown()
 {
     g_datalist_clear(&config);
     g_datalist_clear(&config_def);
-}
-
-void config_parse()
-{
-    FILE *file;
-    char *path;
-    gboolean load = FALSE;
-
-    /* load the user rc */
-    path = g_build_filename(g_get_home_dir(), ".openbox", "rc3", NULL);
-    if ((file = fopen(path, "r")) != NULL) {
-        cparse_go(path, file);
-        fclose(file);
-        load = TRUE;
-    }
-    g_free(path);
-
-    if (!load) {
-        /* load the system wide rc */
-        path = g_build_filename(RCDIR, "rc3", NULL);
-        if ((file = fopen(path, "r")) != NULL) {
-            /*cparse_go(path, file);*/
-            fclose(file);
-        }
-        g_free(path);
-    }
 }
 
 gboolean config_set(char *name, ConfigValueType type, ConfigValue value)

@@ -5,7 +5,6 @@ CPPFLAGS=$(XFT_CFLAGS) $(GLIB_CFLAGS) @CPPFLAGS@ \
 -DENGINEDIR=\"$(enginedir)\" \
 -DTHEMEDIR=\"$(themedir)\" \
 -DDEFAULT_THEME=\"nyz\" \
--DDEFAULT_FONT=\"Sans-7\" \
 -DG_LOG_DOMAIN=\"Openbox-Engine\"
 
 engine_LTLIBRARIES=openbox.la

@@ -10,6 +10,8 @@ Goals for future releases of Openbox (THIS CAN AND WILL CHANGE):
 3.0:
 * Add XEventHandler class to make event handling better than ever!
 
+* Crazy dope support for dockapps. Fully mimic window maker's handling of them.
+
 * reorganization of class model. Add XWidget class (contains an X drawable).
 
 * key/mouse/action bindings
@@ -27,8 +29,6 @@ Openbox TODO list:
 
 * add asserts all throughout the code to catch bugs.
 
-* convert char *'s to stl's std::string. ?? this is a memory leak like no other!
-
 * make it possible to cycle workspaces by moving the mouse past the edge of
   the desktop?
 
@@ -37,13 +37,9 @@ Openbox TODO list:
 * add a modifer key which will scroll workspaces with the mousewheel even when
   not on the root window?
 
-* NETWM support (see http://www.freedesktop.org/standards/wm-spec/).
-
 * handle keyboard input natively instead of relying on an external program?
 
 * remappable bindings for keyboard input and for mouse input.
-
-* snap to edges, all edges, including window edges
 
 * port bbconf to Openbox.
 
@@ -63,11 +59,5 @@ Openbox TODO list:
 
 * draw non-opaque move/resize frames using the style's borderWidth.
 
-* better support for window groups.
-
-* support for Xft, to anti-alias text.
-
 * suppert for XRENDER, and use it for making window decorations/menus/etc
   translucent.
-
-* fix any existant memory leaks, this is on-going forever.

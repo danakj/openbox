@@ -52,15 +52,15 @@ ObFont *font_open(char *fontstring)
         return out;
     }
     g_warning(_("Unable to load font: %s\n"), fontstring);
-    g_warning(_("Trying fallback font: %s\n"), "fixed");
+    g_warning(_("Trying fallback font: %s\n"), "sans");
 
-    if ((xf = XftFontOpenName(ob_display, ob_screen, "fixed"))) {
+    if ((xf = XftFontOpenName(ob_display, ob_screen, "sans"))) {
         out = g_new(ObFont, 1);
         out->xftfont = xf;
         measure_height(out);
         return out;
     }
-    g_warning(_("Unable to load font: %s\n"), "fixed");
+    g_warning(_("Unable to load font: %s\n"), "sans");
     g_warning(_("Aborting!.\n"));
 
     exit(3); /* can't continue without a font */

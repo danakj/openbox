@@ -122,6 +122,9 @@ void event_process(XEvent *e)
 
     /* pick a window */
     switch (e->type) {
+    case MapRequest:
+	window = e->xmap.window;
+	break;
     case UnmapNotify:
 	window = e->xunmap.window;
 	break;
@@ -248,12 +251,15 @@ void event_process(XEvent *e)
     }
 
     client = g_hash_table_lookup(client_map, (gpointer)window);
+    g_message("EVENT: 0x%lx -> 0x%lx", window, client);
 
     /* deal with it in the kernel */
-    if (client) {
+    if (client)
 	event_handle_client(client, e);
-    } else if (window == ob_root)
+    else if (window == ob_root)
 	event_handle_root(e);
+    else if (e->type == MapRequest)
+	client_manage(window);
     else if (e->type == ConfigureRequest) {
 	/* unhandled configure requests must be used to configure the
 	   window directly */
@@ -286,10 +292,6 @@ static void event_handle_root(XEvent *e)
     Atom msgtype;
      
     switch(e->type) {
-    case MapRequest:
-	g_message("MapRequest on root");
-	client_manage(e->xmap.window);
-	break;
     case ClientMessage:
 	if (e->xclient.format != 32) break;
 
@@ -436,9 +438,6 @@ static void event_handle_client(Client *client, XEvent *e)
 	client_unmanage(client);
 	break;
     case MapRequest:
-	/* we shouldn't be able to get this unless we're iconic */
-	g_assert(client->iconic);
-
         if (screen_showing_desktop)
             screen_show_desktop(FALSE);
         client_iconify(client, FALSE, TRUE);

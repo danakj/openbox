@@ -40,8 +40,7 @@ extern "C" {
 Slit::Slit(BScreen *scr) {
   screen = scr;
   blackbox = screen->getBlackbox();
-  slitstr = (std::string)"session.screen" + itostring(screen->getScreenNumber())
-    + ".slit.";
+  slitstr = "session.screen" + itostring(screen->getScreenNumber()) + ".slit.";
   config = blackbox->getConfig();
 
   load_rc();

@@ -106,7 +106,7 @@ static int anotherWMRunning(Display *display, XErrorEvent *) {
 
 BScreen::BScreen(Blackbox *bb, unsigned int scrn) : ScreenInfo(bb, scrn) {
   blackbox = bb;
-  screenstr = (string)"session.screen" + itostring(scrn) + '.';
+  screenstr = "session.screen" + itostring(scrn) + '.';
   config = blackbox->getConfig();
   xatom = blackbox->getXAtom();
 

@@ -77,8 +77,8 @@ static long aMinuteFromNow(void) {
 Toolbar::Toolbar(BScreen *scrn) {
   screen = scrn;
   blackbox = screen->getBlackbox();
-  toolbarstr = (string)"session.screen" + itostring(screen->getScreenNumber())
-    + ".toolbar.";
+  toolbarstr = "session.screen" + itostring(screen->getScreenNumber()) +
+    ".toolbar.";
   config = blackbox->getConfig();
 
   load_rc();

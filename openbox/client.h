@@ -431,6 +431,8 @@ ObClient *client_search_modal_child(ObClient *self);
 
 ObClient *client_search_top_transient(ObClient *self);
 
+ObClient *client_search_transient(ObClient *self, ObClient *search);
+
 /*! Return the "closest" client in the given direction */
 ObClient *client_find_directional(ObClient *c, ObDirection dir);
 

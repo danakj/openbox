@@ -13,12 +13,6 @@ struct RrInstance {
     GLXContext glx_context;
 };
 
-struct RrInstance *RrInstanceNew(Display *display,
-                                 int screen,
-                                 XVisualInfo visinfo);
-void RrInstanceFree(struct RrInstance *inst);
-
-
 #define RrDisplay(i)  ((i)->display)
 #define RrScreen(i)   ((i)->screen)
 #define RrScreenWidth(i) (WidthOfScreen(ScreenOfDisplay((i)->display, \

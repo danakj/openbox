@@ -1,54 +1,109 @@
 #include "instance.h"
+#include "debug.h"
+#include "glft/glft.h"
 #include <stdlib.h>
 #include <assert.h>
 
-/*
-void truecolor_startup(void)
+static int glft_init = 0;
+
+static int glx_rating(Display *display, XVisualInfo *v)
 {
-  unsigned long red_mask, green_mask, blue_mask;
-  XImage *timage = NULL;
+    int rating = 0;
+    int val;
+    RrDebug("evaluating visual %d\n", (int)v->visualid);
+    glXGetConfig(display, v, GLX_BUFFER_SIZE, &val);
+    RrDebug("buffer size %d\n", val);
 
-  timage = XCreateImage(ob_display, render_visual, render_depth,
-                        ZPixmap, 0, NULL, 1, 1, 32, 0);
-  assert(timage != NULL);
-  /\* find the offsets for each color in the visual's masks *\/
-  render_red_mask = red_mask = timage->red_mask;
-  render_green_mask = green_mask = timage->green_mask;
-  render_blue_mask = blue_mask = timage->blue_mask;
+    switch (val) {
+    case 32:
+        rating += 300;
+    break;
+    case 24:
+        rating += 200;
+    break;
+    case 16:
+        rating += 100;
+    break;
+    }
 
-  render_red_offset = 0;
-  render_green_offset = 0;
-  render_blue_offset = 0;
+    glXGetConfig(display, v, GLX_LEVEL, &val);
+    RrDebug("level %d\n", val);
+    if (val != 0)
+        rating = -10000;
 
-  while (! (red_mask & 1))   { render_red_offset++;   red_mask   >>= 1; }
-  while (! (green_mask & 1)) { render_green_offset++; green_mask >>= 1; }
-  while (! (blue_mask & 1))  { render_blue_offset++;  blue_mask  >>= 1; }
+    glXGetConfig(display, v, GLX_DEPTH_SIZE, &val);
+    RrDebug("depth size %d\n", val);
+    switch (val) {
+    case 32:
+        rating += 30;
+    break;
+    case 24:
+        rating += 20;
+    break;
+    case 16:
+        rating += 10;
+    break;
+    case 0:
+        rating -= 10000;
+    }
 
-  render_red_shift = render_green_shift = render_blue_shift = 8;
-  while (red_mask)   { red_mask   >>= 1; render_red_shift--;   }
-  while (green_mask) { green_mask >>= 1; render_green_shift--; }
-  while (blue_mask)  { blue_mask  >>= 1; render_blue_shift--;  }
-  XFree(timage);
+    glXGetConfig(display, v, GLX_DOUBLEBUFFER, &val);
+    RrDebug("double buffer %d\n", val);
+    if (val)
+        rating++;
+    return rating;
 }
-*/
 
-struct RrInstance *RrInstanceNew(Display *display,
-                                 int screen,
-                                 XVisualInfo visinfo)
+struct RrInstance *RrInstanceNew(Display *display, int screen)
 {
-    struct RrInstance *inst;
+    int count, i = 0, val, best = 0, rate = 0, temp;
+    XVisualInfo vimatch, *vilist;
 
-    inst = malloc(sizeof(struct RrInstance));
-    inst->display = display;
-    inst->screen = screen;
-    inst->visinfo = visinfo;
-    inst->cmap = XCreateColormap(display, RootWindow(display, screen),
-                                 RrVisual(inst), AllocNone);
-    inst->glx_context = glXCreateContext(display, &visinfo, NULL, True);
+    vimatch.screen = screen;
+    vimatch.class = TrueColor;
+    vilist = XGetVisualInfo(display, VisualScreenMask | VisualClassMask,
+                            &vimatch, &count);
 
-    assert(inst->glx_context);
+    if (vilist) {
+        RrDebug("looking for a GL visual in %d visuals\n", count);
+        for (i = 0; i < count; i++) {
+            glXGetConfig(display, &vilist[i], GLX_USE_GL, &val);
+            if (val) {
+                temp = glx_rating(display, &vilist[i]);
+                if (temp > rate) {
+                    best = i;
+                    rate = temp;
+                }
+            }
+        }
+    }
+    if (rate > 0) {
+        struct RrInstance *inst;
 
-    return inst;
+        RrDebug("picked visual %d with rating %d\n", best, rate);
+
+        if (!glft_init) {
+            if (!GlftInit())
+                return NULL;
+            glft_init = 1;
+        }
+
+        inst = malloc(sizeof(struct RrInstance));
+        inst->display = display;
+        inst->screen = screen;
+        inst->visinfo = vilist[best];
+        inst->cmap = XCreateColormap(display, RootWindow(display, screen),
+                                     RrVisual(inst), AllocNone);
+        inst->glx_context = glXCreateContext(display, &vilist[best],
+                                             NULL, True);
+
+        assert(inst->glx_context);
+
+        return inst;
+    }
+
+    RrDebug("unable to find a suitable GL visual\n");
+    return NULL;
 }
 
 void RrInstanceFree(struct RrInstance *inst)
@@ -58,4 +113,19 @@ void RrInstanceFree(struct RrInstance *inst)
         XFreeColormap(inst->display, inst->cmap);
         free(inst);
     }
+}
+
+int RrInstanceDepth(struct RrInstance *inst)
+{
+    return inst->visinfo.depth;
+}
+
+Colormap RrInstanceColormap(struct RrInstance *inst)
+{
+    return inst->cmap;
+}
+
+Visual *RrInstanceVisual(struct RrInstance *inst)
+{
+    return inst->visinfo.visual;
 }

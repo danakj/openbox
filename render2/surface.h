@@ -37,6 +37,8 @@ struct RrSurface {
     int y;
     int w;
     int h;
+
+    int visible : 1;
 };
 
 struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum);

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void texture_free(struct RrTexture *tex)
+void RrTextureFreeContents(struct RrTexture *tex)
 {
     switch (tex->type) {
     case RR_TEXTURE_NONE:
@@ -28,7 +28,7 @@ void RrTextureSetRGBA(struct RrSurface *sur,
     struct RrTexture *tex = RrSurfaceTexture(sur, texnum);
 
     if (!tex) return;
-    texture_free(tex);
+    RrTextureFreeContents(tex);
     tex->type = RR_TEXTURE_RGBA;
     tex->data.rgba.data = data;
     tex->data.rgba.x = x;
@@ -47,7 +47,7 @@ void RrTextureSetText(struct RrSurface *sur,
     int l;
 
     if (!tex) return;
-    texture_free(tex);
+    RrTextureFreeContents(tex);
     tex->type = RR_TEXTURE_TEXT;
     tex->data.text.font = font;
     tex->data.text.layout = layout;

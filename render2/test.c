@@ -57,7 +57,7 @@ int main()
     XSetWMProtocols(display, win, &delete_win, 1);
 
     /* init Render */
-    if (!(inst = RrInit(display, DefaultScreen(display)))) {
+    if (!(inst = RrInstanceNew(display, DefaultScreen(display)))) {
         fprintf(stderr, "couldn't initialize the Render library "
                 "(no suitable GL support found)\n");
         return EXIT_FAILURE;
@@ -67,7 +67,7 @@ int main()
     RrSurfaceSetArea(sur, X, Y, W, H);
     RrColorSet(&pri, 0, 0, 0, 0);
     RrColorSet(&sec, 1, 1, 1, 0);
-    RrPlanarSet(sur, RR_PLANAR_VERTICAL, &pri, &sec);
+    RrPlanarSet(sur, RR_PLANAR_PIPECROSS, &pri, &sec);
 
     quit = 0;
     while (!quit) {
@@ -102,7 +102,7 @@ int main()
 
     }
 
-    RrDestroy(inst);
+    RrInstanceFree(inst);
 
     return 1;
 }

@@ -4,7 +4,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-/* initialization */
+/* instances */
 
 struct RrInstance;
 
@@ -13,15 +13,18 @@ struct RrInstance;
   @param display The X Display to use.
   @param screen The number of the screen to use.
 */
-struct RrInstance *RrInit(Display *display,
-                          int screen);
+struct RrInstance *RrInstanceNew(Display *display,
+                                 int screen);
 
 /*! Destroys an instance of the library. The instance should not be used after
   calling this function.
   @param inst The instance to destroy.
 */
-void RrDestroy(struct RrInstance *inst);
+void RrInstanceFree(struct RrInstance *inst);
 
+int RrInstanceDepth(struct RrInstance *inst);
+Colormap RrInstanceColormap(struct RrInstance *inst);
+Visual *RrInstanceVisual(struct RrInstance *inst);
 
 /* colors */
 
@@ -72,6 +75,7 @@ int RrFontMaxCharWidth(struct RrFont *font);
 struct RrSurface;
 
 enum RrSurfaceType {
+    RR_SURFACE_NONE,
     RR_SURFACE_PLANAR,
     RR_SURFACE_NONPLANAR
 };
@@ -80,22 +84,27 @@ enum RrSurfaceType {
  copied to a new RrSurface that can render. */
 struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
                                     int numtex);
-/*! Create a new top-level RrSurface for a Window. */
+/*! Create a new top-level RrSurface for a Window. The new RrSurface defaults
+  to a non-visible state.*/
 struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
                                enum RrSurfaceType type,
                                Window win,
                                int numtex);
-/*! Create a new RrSurface which is a child of another. */
+/*! Create a new RrSurface which is a child of another. The new RrSurface
+  defaults to a visible state. */
 struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
                                     struct RrSurface *parent,
                                     int numtex);
-/*! Copy an RrSurface, creating a new top-level RrSurface for a Window. */
+/*! Copy an RrSurface, creating a new top-level RrSurface for a Window. The
+  new RrSurface defaults to a non-visible state.*/
 struct RrSurface *RrSurfaceCopy(struct RrInstance *inst,
                                 struct RrSurface *sur,
                                 Window win);
-/*! Copy an RrSurface, creating a nwe RrSurface which is a child of another. */
+/*! Copy an RrSurface, creating a nwe RrSurface which is a child of another.
+  The new RrSurface defaults to a visible state.*/
 struct RrSurface *RrSurfaceCopyChild(struct RrSurface *sur,
                                      struct RrSurface *parent);
+/*! Destroys an RrSurface. */
 void RrSurfaceFree(struct RrSurface *sur);
 
 void RrSurfaceSetArea(struct RrSurface *sur,
@@ -105,6 +114,12 @@ void RrSurfaceSetArea(struct RrSurface *sur,
                       int h);
 
 Window RrSurfaceWindow(struct RrSurface *sur);
+
+void RrSurfaceShow(struct RrSurface *sur);
+void RrSurfaceHide(struct RrSurface *sur);
+int RrSurfaceVisible(struct RrSurface *sur);
+
+void RrSurfaceMinSize(struct RrSurface *sur, int *w, int *h);
 
 /* planar surfaces */
 

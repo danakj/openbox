@@ -15,7 +15,9 @@ void RrPaint(struct RrSurface *sur)
 void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
 {
     struct RrInstance *inst;
+    struct RrSurface *p;
     int ok;
+    int surx, sury;
 
     inst = RrSurfaceInstance(sur);
 
@@ -29,6 +31,10 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
     assert(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur));
     if (!(x + w <= RrSurfaceWidth(sur) && y + h <= RrSurfaceHeight(sur)))
         return;
+
+    /* XXX recurse and paint children */
+
+    if (!RrSurfaceVisible(sur)) return;
 
     RrDebug("making %p, %p, %p current\n",
             RrDisplay(inst), RrSurfaceWindow(sur), RrContext(inst));
@@ -48,12 +54,22 @@ void RrPaintArea(struct RrSurface *sur, int x, int y, int w, int h)
                  RrScreenHeight(inst)-RrSurfaceHeight(sur)-RrSurfaceY(sur), 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    p = sur;
+    surx = sury = 0;
+    while (p) {
+        surx += RrSurfaceX(p);
+        sury += RrSurfaceY(p);
+        p = p->parent;
+    }
+
     switch (RrSurfaceType(sur)) {
     case RR_SURFACE_PLANAR:
-        RrPlanarPaint(sur, RrSurfaceX(sur) + x, RrSurfaceY(sur) + y, w, h);
+        RrPlanarPaint(sur, surx + x, sury + y, w, h);
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);
+        break;
+    case RR_SURFACE_NONE:
         break;
     }
 

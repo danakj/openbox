@@ -16,4 +16,6 @@ struct RrPlanarSurface {
 
 void RrPlanarPaint(struct RrSurface *sur, int x, int y, int w, int h);
 
+void RrPlanarMinSize(struct RrSurface *sur, int *w, int *h);
+
 #endif

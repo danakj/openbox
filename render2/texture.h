@@ -23,6 +23,10 @@ struct RrTextureRGBA {
     int h;
 };
 
+struct RrTexture;
+
+void RrTextureFreeContents(struct RrTexture *tex);
+
 union RrTextureData {
     struct RrTextureText text;
     struct RrTextureRGBA rgba;

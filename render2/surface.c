@@ -22,6 +22,7 @@ static struct RrSurface *surface_new(enum RrSurfaceType type,
     sur->y = 0;
     sur->w = 1;
     sur->h = 1;
+    sur->visible = 0;
     return sur;
 }
 
@@ -30,7 +31,6 @@ static Window create_window(struct RrInstance *inst, Window parent)
     Window win = XCreateWindow(RrDisplay(inst), parent, 0, 0, 1, 1, 0,
                                RrDepth(inst), InputOutput, RrVisual(inst),
                                0, NULL);
-    XMapWindow(RrDisplay(inst), win);
     return win;
 }
 
@@ -43,6 +43,7 @@ struct RrSurface *RrSurfaceNewProto(enum RrSurfaceType type,
     sur->inst = NULL;
     sur->win = None;
     sur->parent = NULL;
+    sur->visible = 0;
     return sur;
 }
 
@@ -57,6 +58,7 @@ struct RrSurface *RrSurfaceNew(struct RrInstance *inst,
     sur->inst = inst;
     sur->win = win;
     sur->parent = NULL;
+    sur->visible = 0;
     return sur;
 }
 
@@ -74,6 +76,7 @@ struct RrSurface *RrSurfaceNewChild(enum RrSurfaceType type,
     sur->inst = parent->inst;
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
+    RrSurfaceShow(sur);
     return sur;
 }
 
@@ -90,6 +93,8 @@ static struct RrSurface *surface_copy(struct RrSurface *orig)
         break;
     case RR_SURFACE_NONPLANAR:
         assert(0);
+        break;
+    case RR_SURFACE_NONE:
         break;
     }
     sur->ntextures = orig->ntextures;
@@ -109,6 +114,7 @@ struct RrSurface *RrSurfaceCopy(struct RrInstance *inst,
     sur->inst = inst;
     sur->win = win;
     sur->parent = NULL;
+    sur->visible = 0;
     return sur;
 }
 
@@ -125,12 +131,16 @@ struct RrSurface *RrSurfaceCopyChild(struct RrSurface *orig,
     sur->inst = parent->inst;
     sur->win = create_window(sur->inst, parent->win);
     sur->parent = parent;
+    RrSurfaceShow(sur);
     return sur;
 }
 
 void RrSurfaceFree(struct RrSurface *sur)
 {
+    int i;
     if (sur) {
+        for (i = 0; i < sur->ntextures; ++i)
+            RrTextureFreeContents(&sur->texture[i]);
         if (sur->ntextures)
             free(sur->texture);
         if (sur->parent && sur->win)
@@ -145,10 +155,15 @@ void RrSurfaceSetArea(struct RrSurface *sur,
                       int w,
                       int h)
 {
+    assert(w > 0 && h > 0);
+    if (!(w > 0 && h > 0)) return;
+
     sur->x = x;
     sur->y = y;
     sur->w = w;
     sur->h = h;
+    if (sur->win)
+        XMoveResizeWindow(RrDisplay(sur->inst), sur->win, x, y, w, h);
 }
 
 Window RrSurfaceWindow(struct RrSurface *sur)
@@ -164,4 +179,67 @@ struct RrTexture *RrSurfaceTexture(struct RrSurface *sur, int texnum)
 {
     assert(texnum < sur->ntextures);
     return &(sur->texture[texnum]);
+}
+
+void RrSurfaceMinSize(struct RrSurface *sur, int *w, int *h)
+{
+    int i;
+    int minw, minh;
+
+    switch(sur->type) {
+    case RR_SURFACE_NONE:
+        *w = *h = 0;
+        break;
+    case RR_SURFACE_PLANAR:
+        RrPlanarMinSize(sur, w, h);
+        break;
+    case RR_SURFACE_NONPLANAR:
+        assert(0);
+        break;
+    }
+
+    for (i = 0; i < sur->ntextures; ++i) {
+        switch (sur->texture[i].type) {
+        case RR_TEXTURE_NONE:
+            minw = MAX(minw, 0);
+            minh = MAX(minh, 0);
+            break;
+        case RR_TEXTURE_TEXT:
+            /* XXX MEASUER STRING PLS */
+            minw = MAX(minw, 100 /*MEASURESTRING*/); 
+            minh = MAX(minh, 10  /*HEIGHTOFFONT*/);
+            break;
+        case RR_TEXTURE_RGBA:
+            minw = MAX(minw, (sur->texture[i].data.rgba.x +
+                              sur->texture[i].data.rgba.w));
+            minh = MAX(minw, (sur->texture[i].data.rgba.y +
+                              sur->texture[i].data.rgba.h));
+            break;
+        }
+    }
+
+    *w += minw;
+    *h += minh;
+    /* zeros are bad. */
+    if (*w == 0) *w = 1;
+    if (*h == 0) *h = 1;
+}
+
+void RrSurfaceShow(struct RrSurface *sur)
+{
+    sur->visible = 1;
+    if (sur->win)
+        XMapWindow(RrDisplay(sur->inst), sur->win);
+}
+
+void RrSurfaceHide(struct RrSurface *sur)
+{
+    sur->visible = 0;
+    if (sur->win)
+        XUnmapWindow(RrDisplay(sur->inst), sur->win);
+}
+
+int RrSurfaceVisible(struct RrSurface *sur)
+{
+    return sur->visible;
 }

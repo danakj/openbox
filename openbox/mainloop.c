@@ -591,34 +591,34 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
     g_get_current_time(&loop->now);
 
     for (it = loop->timers; it; it = next) {
-	ObMainLoopTimer *curr;
+        ObMainLoopTimer *curr;
         
         next = g_slist_next(it);
 
-	curr = it->data;
+        curr = it->data;
 
-	/* since timer_stop doesn't actually free the timer, we have to do our
-	   real freeing in here.
-	*/
-	if (curr->del_me) {
+        /* since timer_stop doesn't actually free the timer, we have to do our
+           real freeing in here.
+        */
+        if (curr->del_me) {
             /* delete the top */
-	    loop->timers = g_slist_delete_link(loop->timers, it); 
-	    g_free(curr);
-	    continue;
-	}
+            loop->timers = g_slist_delete_link(loop->timers, it); 
+            g_free(curr);
+            continue;
+        }
 	
-	/* the queue is sorted, so if this timer shouldn't fire, none are 
-	   ready */
+        /* the queue is sorted, so if this timer shouldn't fire, none are 
+           ready */
         if (timecompare(&NEAREST_TIMEOUT(loop), &loop->now) <= 0)
-	    break;
+            break;
 
-	/* we set the last fired time to delay msec after the previous firing,
-	   then re-insert.  timers maintain their order and may trigger more
-	   than once if they've waited more than one delay's worth of time.
-	*/
-	loop->timers = g_slist_delete_link(loop->timers, it);
-	g_time_val_add(&curr->last, curr->delay);
-	if (curr->func(curr->data)) {
+        /* we set the last fired time to delay msec after the previous firing,
+           then re-insert.  timers maintain their order and may trigger more
+           than once if they've waited more than one delay's worth of time.
+        */
+        loop->timers = g_slist_delete_link(loop->timers, it);
+        g_time_val_add(&curr->last, curr->delay);
+        if (curr->func(curr->data)) {
             g_time_val_add(&curr->timeout, curr->delay);
             insert_timer(loop, curr);
         } else {
@@ -631,13 +631,13 @@ static void timer_dispatch(ObMainLoop *loop, GTimeVal **wait)
     }
 
     if (fired) {
-	/* if at least one timer fires, then don't wait on X events, as there
-	   may already be some in the queue from the timer callbacks.
-	*/
-	loop->ret_wait.tv_sec = loop->ret_wait.tv_usec = 0;
-	*wait = &loop->ret_wait;
+        /* if at least one timer fires, then don't wait on X events, as there
+           may already be some in the queue from the timer callbacks.
+        */
+        loop->ret_wait.tv_sec = loop->ret_wait.tv_usec = 0;
+        *wait = &loop->ret_wait;
     } else if (nearest_timeout_wait(loop, &loop->ret_wait))
-	*wait = &loop->ret_wait;
+        *wait = &loop->ret_wait;
     else
-	*wait = NULL;
+        *wait = NULL;
 }

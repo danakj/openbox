@@ -242,13 +242,12 @@ bool Property::get(Window win, Atom atom, Atom type, unsigned long *nelements,
       // the number of longs that need to be retreived to get the property's
       // entire value. The last + 1 is the first long that we retrieved above.
       int remain = (ret_bytes - 1)/sizeof(long) + 1 + 1;
-      if (remain > size/8 * (signed)maxread) // dont get more than the max
-        remain = size/8 * (signed)maxread;
+      if (remain > size * (signed)maxread / 32) // dont get more than the max
+        remain = size * (signed)maxread / 32;
       result = XGetWindowProperty(**display, win, atom, 0l,
                                   remain, false, type, &ret_type, &ret_size,
                                   nelements, &ret_bytes, &c_val);
-      ret = (result == Success && ret_type == type && ret_size == size &&
-             ret_bytes == 0);
+      ret = (result == Success && ret_type == type && ret_size == size);
       /*
         If the property has changed type/size, or has grown since our first
         read of it, then stop here and try again. If it shrank, then this will

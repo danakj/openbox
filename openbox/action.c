@@ -30,7 +30,7 @@ void action_free(Action *a)
 
 void action_execute(union ActionData *data)
 {
-    GError *e;
+    GError *e = NULL;
     if (!g_spawn_command_line_async(data->execute.path, &e)) {
         g_warning("failed to execute '%s': %s",
                   data->execute.path, e->message);

@@ -1,3 +1,34 @@
+3.2:
+  * Added spanish and swedish translations
+  * Changed "Unnamed Desktop" to "Desktop n" where n is the actual
+    number of the desktop
+  * Hopefully no more of the hanging X totally bug
+  * the fullscreen property now overrides aspect hints, all programs i've
+    tried that use it (mplayer and tvtime) handle the aspect internally
+    anyway, this just makes sure you have black borders all the way to the
+    edge. If this breaks anything for you, let me know.
+  * Added M as an alias for Mod3 in the same manner that W is an alias for Mod4
+  * Added probably too many options and actions
+    * ToggleDockAutohide to toggle the autohide option at runtime,
+      doesn't save it to the config
+    * keepBorder option to set if you want the 1-pixel border when you
+      toggleDecorations
+    * added popupShow and popupPosition to control where and when the
+      move/resize-popup is shown, these go in the resize section of the config
+      popupPosition can be Top or Center, popupShow can be Always, Never or
+      Nonpixel (this is the default).
+    * Changed the default behaviour for the menus when opened along the bottom
+      edge of the screen, the xorStyle option can be used to turn it on again
+    * warpPointer option in the menu section to control if the mouse cursor is
+      to be warped by openbox when the menu moves to keep on screen to keep the
+      cursor in the same place relative to the menu. (I think i got that right)
+    * Added back the focusLast option (this controls what happens when you
+      change desktops and have followMouse on)
+    * Added an option to set which desktop to start on when you start openbox,
+      firstdesk, for example you might like to set it to 5 if you have a 3x3
+      grid to start in the middle.
+  * I think that was everything, have fun
+
 3.1:
 	* Added japanese translation (bug #1029)
 	* Closed bug #1060 (modal unfocused window should be placed above

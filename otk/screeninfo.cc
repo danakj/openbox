@@ -11,7 +11,7 @@ extern "C" {
 
 #include "screeninfo.hh"
 #include "display.hh"
-#include "src/util.hh"
+#include "util.hh"
 
 using std::string;
 
@@ -79,7 +79,7 @@ ScreenInfo::ScreenInfo(unsigned int num) {
     default_string.resize(pos);
 
   display_string = string("DISPLAY=") + default_string + '.' +
-    ob::itostring(static_cast<unsigned long>(screen_number));
+    otk::itostring(static_cast<unsigned long>(screen_number));
   
 #ifdef    XINERAMA
   xinerama_active = False;

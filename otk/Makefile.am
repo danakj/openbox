@@ -6,7 +6,7 @@ noinst_LIBRARIES=libotk.a
 
 libotk_a_SOURCES= color.cc display.cc font.cc gccache.cc image.cc property.cc \
                   imagecontrol.cc rect.cc screeninfo.cc texture.cc timer.cc \
-                  timerqueuemanager.cc
+                  timerqueuemanager.cc style.cc configuration.cc util.cc
 
 MAINTAINERCLEANFILES= Makefile.in
 
@@ -18,3 +18,6 @@ color.o: color.cc color.hh display.hh screeninfo.hh rect.hh
 gccache.o: gccache.cc gccache.hh display.hh color.hh assassin.hh \
  screeninfo.hh rect.hh
 rect.o: rect.cc rect.hh
+configuration.o: configuration.cc configuration.hh
+style.o: style.cc style.hh
+util.o: util.cc util.hh

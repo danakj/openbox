@@ -349,9 +349,11 @@ void OBScreen::manageWindow(Window window)
                           CWEventMask|CWDontPropagate, &attrib_set);
 
   // create the OBClient class, which gets all of the hints on the window
-  Openbox::instance->addClient(window, client = new OBClient(_number, window));
+  client = new OBClient(_number, window);
   // register for events
   Openbox::instance->registerHandler(window, client);
+  // add to the wm's map
+  Openbox::instance->addClient(window, client);
 
   // we dont want a border on the client
   client->toggleClientBorder(false);
@@ -366,6 +368,19 @@ void OBScreen::manageWindow(Window window)
 
   // create the decoration frame for the client window
   client->frame = new OBFrame(client, &_style);
+
+  // add to the wm's map
+  Openbox::instance->addClient(client->frame->getWindow(), client);
+  Openbox::instance->addClient(client->frame->plate(), client);
+  Openbox::instance->addClient(client->frame->titlebar(), client);
+  Openbox::instance->addClient(client->frame->label(), client);
+  Openbox::instance->addClient(client->frame->button_max(), client);
+  Openbox::instance->addClient(client->frame->button_iconify(), client);
+  Openbox::instance->addClient(client->frame->button_stick(), client);
+  Openbox::instance->addClient(client->frame->button_close(), client);
+  Openbox::instance->addClient(client->frame->handle(), client);
+  Openbox::instance->addClient(client->frame->grip_left(), client);
+  Openbox::instance->addClient(client->frame->grip_right(), client);
 
   // XXX: if on the current desktop..
   client->frame->show();
@@ -389,6 +404,17 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   // remove from the wm's map
   Openbox::instance->removeClient(client->window());
+  Openbox::instance->removeClient(frame->getWindow());
+  Openbox::instance->removeClient(frame->plate());
+  Openbox::instance->removeClient(frame->titlebar());
+  Openbox::instance->removeClient(frame->label());
+  Openbox::instance->removeClient(frame->button_max());
+  Openbox::instance->removeClient(frame->button_iconify());
+  Openbox::instance->removeClient(frame->button_stick());
+  Openbox::instance->removeClient(frame->button_close());
+  Openbox::instance->removeClient(frame->handle());
+  Openbox::instance->removeClient(frame->grip_left());
+  Openbox::instance->removeClient(frame->grip_right());
   // unregister for handling events
   Openbox::instance->clearHandler(client->window());
   

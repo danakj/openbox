@@ -7,6 +7,7 @@
 #include "actions.hh"
 #include "widget.hh"
 #include "openbox.hh"
+#include "client.hh"
 #include "otk/display.hh"
 
 #include <stdio.h>
@@ -177,6 +178,12 @@ void OBActions::motionHandler(const XMotionEvent &e)
   // XXX: i can envision all sorts of crazy shit with this.. gestures, etc
   printf("GUILE: MOTION: win %lx type %d  modifiers %u x %d y %d\n",
          (long)e.window, (w ? w->type():-1), e.state, _dx, _dy);
+
+  if (w && (w->type() == OBWidget::Type_Titlebar ||
+            w->type() == OBWidget::Type_Label)) {
+    OBClient *c = Openbox::instance->findClient(e.window);
+    if (c) c->move(c->area().x() + _dx, c->area().y() + _dy);
+  }
 }
 
 

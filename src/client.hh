@@ -297,18 +297,6 @@ private:
   void updateClass();
   // XXX: updateTransientFor();
 
-  //! Move the client window
-  void move(int x, int y);
-  
-  //! Resizes the client window, anchoring it in a given corner
-  /*!
-    This also maintains things like the client's minsize, and size increments.
-    @param anchor The corner to keep in the same position when resizing
-    @param x The X component of the new size for the client
-    @param y The Y component of the new size for the client
-  */
-  void resize(Corner anchor, int x, int y);
-  
 public:
   //! Constructs a new OBClient object around a specified window id
   /*!
@@ -418,6 +406,18 @@ public:
   //! Returns the position and size of the client relative to the root window
   inline const otk::Rect &area() const { return _area; }
 
+  //! Move the client window
+  void move(int x, int y);
+  
+  //! Resizes the client window, anchoring it in a given corner
+  /*!
+    This also maintains things like the client's minsize, and size increments.
+    @param anchor The corner to keep in the same position when resizing
+    @param x The X component of the new size for the client
+    @param y The Y component of the new size for the client
+  */
+  void resize(Corner anchor, int x, int y);
+  
   virtual void propertyHandler(const XPropertyEvent &e);
   virtual void clientMessageHandler(const XClientMessageEvent &e);
   virtual void shapeHandler(const XShapeEvent &e);

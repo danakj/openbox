@@ -1,6 +1,12 @@
 #include "application.hh"
 #include "eventhandler.hh"
 
+extern "C" {
+#ifdef HAVE_STDLIB_H
+# include <stdlib.h>
+#endif
+}
+
 #include <iostream>
 
 namespace otk {
@@ -35,8 +41,12 @@ OtkApplication::~OtkApplication()
 void OtkApplication::loadStyle(void)
 {
   // find the style name as a property
-  _style_conf->setFile("/usr/local/share/openbox/styles/artwiz");
-  _style_conf->load();
+  std::string style = "/usr/local/share/openbox/styles/artwiz";
+  _style_conf->setFile(style);
+  if (!_style_conf->load()) {
+    std::cerr << "Unable to load style \"" << style << "\". Aborting.\n";
+    ::exit(1);
+  }
   _style->load(*_style_conf);
 }
 

@@ -646,49 +646,81 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
         case OB_DIRECTION_EAST:
             ++c;
             if (c >= screen_desktop_layout.columns) {
-                if (!wrap) return d = screen_desktop;
-                c = 0;
+                if (wrap) {
+                    c = 0;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (!wrap) return d = screen_desktop;
-                ++c;
+                if (wrap) {
+                    ++c;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             break;
         case OB_DIRECTION_WEST:
             --c;
             if (c >= screen_desktop_layout.columns) {
-                if (!wrap) return d = screen_desktop;
-                c = screen_desktop_layout.columns - 1;
+                if (wrap) {
+                    c = screen_desktop_layout.columns - 1;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (!wrap) return d = screen_desktop;
-                --c;
+                if (wrap) {
+                    --c;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             break;
         case OB_DIRECTION_SOUTH:
             ++r;
             if (r >= screen_desktop_layout.rows) {
-                if (!wrap) return d = screen_desktop;
-                r = 0;
+                if (wrap) {
+                    r = 0;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (!wrap) return d = screen_desktop;
-                ++r;
+                if (wrap) {
+                    ++r;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             break;
         case OB_DIRECTION_NORTH:
             --r;
             if (r >= screen_desktop_layout.rows) {
-                if (!wrap) return d = screen_desktop;
-                r = screen_desktop_layout.rows - 1;
+                if (wrap) {
+                    r = screen_desktop_layout.rows - 1;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             d = translate_row_col(r, c);
             if (d >= screen_num_desktops) {
-                if (!wrap) return d = screen_desktop;
-                --r;
+                if (wrap) {
+                    --r;
+                } else {
+                    d = screen_desktop;
+                    goto show_cycle_dialog;
+                }
             }
             break;
         default:
@@ -699,6 +731,7 @@ guint screen_cycle_desktop(ObDirection dir, gboolean wrap, gboolean linear,
         d = translate_row_col(r, c);
     }
 
+show_cycle_dialog:
     if (dialog) {
         screen_desktop_popup(d, TRUE);
         return d;

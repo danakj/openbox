@@ -27,33 +27,13 @@
 
 %{
 namespace ob {
-void python_callback(PyObject *func, MotionData *data)
+void python_callback(PyObject *func, MouseData *data)
 {
   PyObject *arglist;
   PyObject *result;
 
   arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__MotionData,
-                                                    0));
-  
-  // call the callback
-  result = PyEval_CallObject(func, arglist);
-  if (!result || PyErr_Occurred()) {
-    // an exception occured in the script, display it
-    PyErr_Print();
-  }
-
-  Py_XDECREF(result);
-  Py_DECREF(arglist);
-}
-
-void python_callback(PyObject *func, ButtonData *data)
-{
-  PyObject *arglist;
-  PyObject *result;
-
-  arglist = Py_BuildValue("(O)", SWIG_NewPointerObj((void *) data,
-                                                    SWIGTYPE_p_ob__ButtonData,
+                                                    SWIGTYPE_p_ob__MouseData,
                                                     0));
   
   // call the callback
@@ -131,6 +111,9 @@ void python_callback(PyObject *func, KeyData *data)
 %import "../otk/eventhandler.hh"
 %import "widget.hh"
 %import "actions.hh"
+
+%include "../otk/point.hh"
+%include "../otk/rect.hh"
 
 %include "openbox.hh"
 %include "screen.hh"

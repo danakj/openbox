@@ -145,6 +145,12 @@ Blackbox::Blackbox(char **m_argv, char *dpy_name, char *rc, char *menu)
 
   ::blackbox = this;
   argv = m_argv;
+
+  // try to make sure the ~/.openbox directory exists
+  mkdir(expandTilde("~/.openbox").c_str(), S_IREAD | S_IWRITE | S_IEXEC |
+                                           S_IRGRP | S_IWGRP | S_IXGRP |
+                                           S_IROTH | S_IWOTH | S_IXOTH);
+  
   if (! rc) rc = "~/.openbox/rc";
   rc_file = expandTilde(rc);
   config.setFile(rc_file);  

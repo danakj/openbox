@@ -960,7 +960,7 @@ BlackboxWindow *BScreen::getIcon(unsigned int index) {
 unsigned int BScreen::addWorkspace(void) {
   Workspace *wkspc = new Workspace(this, workspacesList.size());
   workspacesList.push_back(wkspc);
-  saveWorkspaces(getWorkspaceCount() + 1);
+  saveWorkspaces(getWorkspaceCount());
   saveWorkspaceNames();
 
   workspacemenu->insert(wkspc->getName(), wkspc->getMenu(),
@@ -992,7 +992,7 @@ unsigned int BScreen::removeLastWorkspace(void) {
   workspacesList.pop_back();
   delete wkspc;
 
-  saveWorkspaces(getWorkspaceCount() - 1);
+  saveWorkspaces(getWorkspaceCount());
   saveWorkspaceNames();
 
   toolbar->reconfigure();

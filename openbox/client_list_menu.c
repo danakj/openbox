@@ -42,6 +42,7 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
     GList *it;
     gint i;
     gboolean icons = FALSE;
+    gboolean empty = TRUE;
 
     menu_clear_entries(menu);
 
@@ -52,6 +53,8 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             ObAction* act;
             ObMenuEntry *e;
             ObClientIcon *icon;
+
+            empty = FALSE;
 
             if (!icons && c->iconic) {
                 icons = TRUE;
@@ -72,7 +75,17 @@ static void desk_menu_update(ObMenuFrame *frame, gpointer data)
             }
         }
     }
-    
+
+    if (empty) {
+        /* no entries */
+
+        GSList *acts;
+        ObAction* act;
+        act = action_from_string("Desktop", OB_USER_ACTION_MENU_SELECTION);
+        act->data.desktop.desk = d->desktop;
+        acts = g_slist_prepend(NULL, act);
+        menu_add_normal(menu, 0, "Switch to...", acts);
+    }
 }
 
 /* executes it using the client in the actions, since we set that

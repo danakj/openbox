@@ -100,6 +100,7 @@ typedef struct TextureText {
 typedef struct {
     Pixmap mask;
     guint w, h;
+    char *data;
 } pixmap_mask;
 
 typedef struct TextureMask {

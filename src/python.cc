@@ -10,6 +10,9 @@
 
 extern "C" {
 #include <Python.h>
+
+#include "gettext.h"
+#define _(str) gettext(str)
 }
 
 namespace ob {
@@ -36,12 +39,28 @@ bool python_exec(const std::string &path)
 {
   FILE *rcpyfd = fopen(path.c_str(), "r");
   if (!rcpyfd) {
-    printf("Failed to load python file %s\n", path.c_str());
+    fprintf(stderr, _("Unabled to open python file %s\n"), path.c_str());
     return false;
   }
-  PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));
+
+  //PyRun_SimpleFile(rcpyfd, const_cast<char*>(path.c_str()));
+
+  PyObject *module = PyImport_AddModule("__main__");
+  assert(module);
+  PyObject *dict = PyModule_GetDict(module);
+  assert(dict);
+  PyObject *result = PyRun_File(rcpyfd, const_cast<char*>(path.c_str()),
+                                Py_file_input, dict, dict);
+  bool ret = result != NULL;
+  if (result == NULL)
+    PyErr_Print();
+  
+  Py_XDECREF(result);
+    
+  Py_DECREF(dict);
+
   fclose(rcpyfd);
-  return true;
+  return ret;
 }
 
 }

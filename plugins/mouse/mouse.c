@@ -197,9 +197,7 @@ static void event(ObEvent *e, void *foo)
 
     case Event_X_ButtonPress:
         if (!button) {
-            if (e->data.x.client == NULL)
-                corner = Corner_TopLeft;
-            else {
+            if (e->data.x.client != NULL) {
                 cx = e->data.x.client->frame->area.x;
                 cy = e->data.x.client->frame->area.y;
                 cw = e->data.x.client->frame->area.width;
@@ -207,8 +205,8 @@ static void event(ObEvent *e, void *foo)
                 px = e->data.x.e->xbutton.x_root;
                 py = e->data.x.e->xbutton.y_root;
                 corner = pick_corner(px, py, cx, cy, cw, ch);
-                button = e->data.x.e->xbutton.button;
             }
+            button = e->data.x.e->xbutton.button;
         }
         fire_button(MouseAction_Press,
                     engine_get_context(e->data.x.client,
@@ -228,26 +226,29 @@ static void event(ObEvent *e, void *foo)
                             e->data.x.e->xbutton.button,
                             cx, cy, cw, ch, dx, dy, TRUE, corner);
                 drag = FALSE;
-            }
-
-            /* clicks are only valid if its released over the window */
-	    if (e->data.x.e->xbutton.x >= 0 && e->data.x.e->xbutton.y >= 0) {
-		int junk;
-		Window wjunk;
-		guint ujunk, w, h;
-		XGetGeometry(ob_display, e->data.x.e->xbutton.window,
-                             &wjunk, &junk, &junk, &w, &h, &ujunk, &ujunk);
-		if (e->data.x.e->xbutton.x < (signed)w &&
-                    e->data.x.e->xbutton.y < (signed)h) {
-		    click =TRUE;
-                    /* double clicks happen if there were 2 in a row! */
-                    if (lbutton == button &&
-                        e->data.x.e->xbutton.time - 300 <= ltime)
-                        dclick = TRUE;
-                }
-                lbutton = button;
-	    } else
+                
                 lbutton = 0;
+            } else {
+                /* clicks are only valid if its released over the window */
+                if (e->data.x.e->xbutton.x >= 0 &&
+                    e->data.x.e->xbutton.y >= 0) {
+                    int junk;
+                    Window wjunk;
+                    guint ujunk, w, h;
+                    XGetGeometry(ob_display, e->data.x.e->xbutton.window,
+                                 &wjunk, &junk, &junk, &w, &h, &ujunk, &ujunk);
+                    if (e->data.x.e->xbutton.x < (signed)w &&
+                        e->data.x.e->xbutton.y < (signed)h) {
+                        click =TRUE;
+                        /* double clicks happen if there were 2 in a row! */
+                        if (lbutton == button &&
+                            e->data.x.e->xbutton.time - 300 <= ltime)
+                            dclick = TRUE;
+                    }
+                    lbutton = button;
+                } else
+                    lbutton = 0;
+            }
 
             button = 0;
             ltime = e->data.x.e->xbutton.time;
@@ -366,12 +367,59 @@ static void binddef()
     a = action_new(action_resize);
     mbind("A-3", "frame", MouseAction_Motion, a);
 
+    a = action_new(action_raise);
+    mbind("1", "titlebar", MouseAction_Press, a);
+    a = action_new(action_raise);
+    mbind("1", "handle", MouseAction_Press, a);
+    a = action_new(action_lower);
+    mbind("2", "titlebar", MouseAction_Press, a);
+    a = action_new(action_lower);
+    mbind("2", "handle", MouseAction_Press, a);
+    a = action_new(action_raise);
+    mbind("A-1", "frame", MouseAction_Click, a);
+    a = action_new(action_lower);
+    mbind("A-3", "frame", MouseAction_Click, a);
+
     a = action_new(action_toggle_shade);
     mbind("1", "titlebar", MouseAction_DClick, a);
     a = action_new(action_shade);
     mbind("4", "titlebar", MouseAction_Press, a);
     a = action_new(action_unshade);
     mbind("5", "titlebar", MouseAction_Click, a);
+
+    a = action_new(action_toggle_maximize_full);
+    mbind("1", "maximize", MouseAction_Click, a);
+    a = action_new(action_toggle_maximize_vert);
+    mbind("2", "maximize", MouseAction_Click, a);
+    a = action_new(action_toggle_maximize_horz);
+    mbind("3", "maximize", MouseAction_Click, a);
+    a = action_new(action_iconify);
+    mbind("1", "iconify", MouseAction_Click, a);
+    a = action_new(action_close);
+    mbind("1", "icon", MouseAction_DClick, a);
+    a = action_new(action_close);
+    mbind("1", "close", MouseAction_Click, a);
+    a = action_new(action_toggle_omnipresent);
+    mbind("1", "alldesktops", MouseAction_Click, a);
+
+    a = action_new(action_next_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("4", "root", MouseAction_Click, a);
+    a = action_new(action_previous_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("5", "root", MouseAction_Click, a);
+    a = action_new(action_next_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("A-4", "root", MouseAction_Click, a);
+    a = action_new(action_previous_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("A-5", "root", MouseAction_Click, a);
+    a = action_new(action_next_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("A-4", "frame", MouseAction_Click, a);
+    a = action_new(action_previous_desktop);
+    a->data.nextprevdesktop.wrap = TRUE;
+    mbind("A-5", "frame", MouseAction_Click, a);
 }
 
 void plugin_startup()

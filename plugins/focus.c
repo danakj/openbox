@@ -21,9 +21,13 @@ static void focus_fallback(guint desk, gboolean warp)
                    doesn't skip briefly to what was under the pointer */
                 if (XCheckTypedEvent(ob_display, EnterNotify, &e)) {
                     XPutBackEvent(ob_display, &e);
+                    /* XXX WERE NOT SKIPPING THEM ALL@&*)! */
+                    g_message("Skip");
                     ++skip_enter;
                 }
 
+                /* I have to do this warp twice! Otherwise windows dont get
+                   Enter/Leave events when i warp on a desktop switch! */
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,
                              c->area.width / 2, c->area.height / 2);
                 XWarpPointer(ob_display, None, c->window, 0, 0, 0, 0,

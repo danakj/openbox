@@ -74,6 +74,12 @@ Client::~Client()
 {
   const otk::Property *property = Openbox::instance->property();
 
+  // clean up childrens' references
+  while (!_transients.empty()) {
+    _transients.front()->_transient_for = 0;
+    _transients.pop_front();
+  }
+  
   // clean up parents reference to this
   if (_transient_for)
     _transient_for->_transients.remove(this); // remove from old parent

@@ -241,15 +241,7 @@ def setup_sloppy_focus(click_focus = 1, click_raise = 0):
        in a window can raise the window to the front of its stacking layer."""
     ebind(EventEnterWindow, focus)
     if click_focus:
-        mbind("Left", MC_Titlebar, MousePress, focus)
-        mbind("Left", MC_Handle, MousePress, focus)
-        mbind("Left", MC_Grip, MousePress, focus)
-        mbind("Left", MC_Window, MousePress, focus)
-        if click_raise:
-            mbind("Left", MC_Titlebar, MousePress, raise_win)
-            mbind("Left", MC_Handle, MousePress, raise_win)
-            mbind("Left", MC_Grip, MousePress, raise_win)
-            mbind("Left", MC_Window, MousePress, raise_win)
+        setup_click_focus(click_raise)
 
 def setup_window_clicks():
     """Sets up the default bindings for various mouse buttons for various

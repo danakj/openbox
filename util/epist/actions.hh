@@ -42,6 +42,8 @@ public:
     numberChain,
 
     cancel,
+
+    NUM_ACTIONS
   };
 
 private:

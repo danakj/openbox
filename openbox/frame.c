@@ -456,8 +456,12 @@ void frame_release_client(Frame *self, Client *client)
     if (XCheckTypedWindowEvent(ob_display, client->window,
 			       ReparentNotify, &ev)) {
 	XPutBackEvent(ob_display, &ev);
+
 	/* re-map the window since the unmanaging process unmaps it */
-	XMapWindow(ob_display, client->window);
+
+        /* XXX ... um no it doesnt it unmaps its parent, the window itself
+           retains its mapped state, no?! XXX
+           XMapWindow(ob_display, client->window); */
     } else {
 	/* according to the ICCCM - if the client doesn't reparent itself,
 	   then we will reparent the window to root for them */

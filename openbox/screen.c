@@ -1,4 +1,5 @@
 #include "openbox.h"
+#include "slit.h"
 #include "prop.h"
 #include "startup.h"
 #include "config.h"
@@ -218,6 +219,7 @@ void screen_resize(int w, int h)
     if (ob_state == State_Starting)
 	return;
 
+    slit_configure_all();
     screen_update_struts();
 
     for (it = client_list; it; it = it->next)

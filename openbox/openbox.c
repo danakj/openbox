@@ -1,4 +1,5 @@
 #include "openbox.h"
+#include "slit.h"
 #include "event.h"
 #include "menu.h"
 #include "client.h"
@@ -191,6 +192,7 @@ int main(int argc, char **argv)
 	screen_startup();
         group_startup();
 	client_startup();
+        slit_startup();
 
         /* call startup for all the plugins */
         plugin_startall();
@@ -203,9 +205,11 @@ int main(int argc, char **argv)
 	    event_loop();
 	ob_state = State_Exiting;
 
+        slit_remove_all();
 	client_unmanage_all();
 
         plugin_shutdown(); /* calls all the plugins' shutdown functions */
+        slit_shutdown();
 	client_shutdown();
         group_shutdown();
 	screen_shutdown();

@@ -1,4 +1,5 @@
 #include "client.h"
+#include "slit.h"
 #include "startup.h"
 #include "screen.h"
 #include "moveresize.h"
@@ -176,7 +177,7 @@ void client_manage(Window window)
     XEvent e;
     XWindowAttributes attrib;
     XSetWindowAttributes attrib_set;
-/*    XWMHints *wmhint; */
+    XWMHints *wmhint;
 
     grab_server(TRUE);
 
@@ -197,18 +198,18 @@ void client_manage(Window window)
 	return; /* don't manage it */
     }
   
-/*    /\* is the window a docking app *\/
+    /* is the window a docking app */
     if ((wmhint = XGetWMHints(ob_display, window))) {
 	if ((wmhint->flags & StateHint) &&
 	    wmhint->initial_state == WithdrawnState) {
-	    /\* XXX: make dock apps work! *\/
+            slit_add(window, wmhint, &attrib);
             grab_server(FALSE);
 	    XFree(wmhint);
 	    return;
 	}
 	XFree(wmhint);
     }
-*/
+
     g_message("Managing window: %lx", window);
 
     /* choose the events we want to receive on the CLIENT window */

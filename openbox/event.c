@@ -1,4 +1,5 @@
 #include "openbox.h"
+#include "slit.h"
 #include "client.h"
 #include "xerror.h"
 #include "prop.h"
@@ -23,6 +24,7 @@
 
 static void event_process(XEvent *e);
 static void event_handle_root(XEvent *e);
+static void event_handle_slitapp(SlitApp *app, XEvent *e);
 static void event_handle_client(Client *c, XEvent *e);
 static void event_handle_menu(Menu *menu, XEvent *e);
 
@@ -373,12 +375,14 @@ static gboolean event_ignore(XEvent *e, Client *client)
 static void event_process(XEvent *e)
 {
     Window window;
-    Client *client;
+    Client *client = NULL;
+    SlitApp *slitapp = NULL;
     Menu *menu = NULL;
 
     window = event_get_window(e);
     if (!(client = g_hash_table_lookup(client_map, &window)))
-        menu = g_hash_table_lookup(menu_map, &window);
+        if (!(slitapp = g_hash_table_lookup(slit_map, &window)))
+            menu = g_hash_table_lookup(menu_map, &window);
 
     event_set_lasttime(e);
     event_hack_mods(e);
@@ -391,6 +395,8 @@ static void event_process(XEvent *e)
         return;
     } else if (client)
 	event_handle_client(client, e);
+    else if (slitapp)
+	event_handle_slitapp(slitapp, e);
     else if (window == ob_root)
 	event_handle_root(e);
     else if (e->type == MapRequest)
@@ -899,5 +905,24 @@ static void event_handle_menu(Menu *menu, XEvent *e)
         }
         break;
 	}
+    }
+}
+
+static void event_handle_slitapp(SlitApp *app, XEvent *e)
+{
+    switch (e->type) {
+    case UnmapNotify:
+	if (app->ignore_unmaps) {
+	    app->ignore_unmaps--;
+	    break;
+	}
+	slit_remove(app, TRUE);
+	break;
+    case DestroyNotify:
+	slit_remove(app, FALSE);
+	break;
+    case ReparentNotify:
+	slit_remove(app, FALSE);
+	break;
     }
 }

@@ -1,6 +1,3 @@
-#ifdef USE_GL
-#include <GL/gl.h>
-#endif /* USE_GL */
 #include <glib.h>
 #include "render.h"
 #include "gradient.h"
@@ -402,21 +399,23 @@ void gradient_pyramid(Surface *sf, int inw, int inh)
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
+
+    drx = (float)(sf->secondary->r -
+                  sf->primary->r);
+    dry = drx/(float)h;
+    drx/= (float)w;
+
+    dgx = (float)(sf->secondary->g -
+                  sf->primary->g);
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
+
+    dbx = (float)(sf->secondary->b -
+                  sf->primary->b);
+    dby = dbx/(float)h;
+    dbx/= (float)w;
+
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->secondary->r -
-                      sf->primary->r);
-        dry = drx/(float)h;
-        drx/= (float)w;
-
-        dgx = (float)(sf->secondary->g -
-                      sf->primary->g);
-        dgy = dgx/(float)h;
-        dgx/= (float)w;
-
-        dbx = (float)(sf->secondary->b -
-                      sf->primary->b);
-        dby = dbx/(float)h;
-        dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
             r = sf->primary->r +
                 ((int)(drx * x) + (int)(dry * y))/2;
@@ -445,30 +444,33 @@ void gradient_rectangle(Surface *sf, int inw, int inh)
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
-    int val;
+
+    drx = (float)(sf->primary->r -
+                  sf->secondary->r);
+    dry = drx/(float)h;
+    drx/= (float)w;
+
+    dgx = (float)(sf->primary->g -
+                  sf->secondary->g);
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
+
+    dbx = (float)(sf->primary->b -
+                  sf->secondary->b);
+    dby = dbx/(float)h;
+    dbx/= (float)w;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->primary->r -
-                      sf->secondary->r);
-        dry = drx/(float)h;
-        drx/= (float)w;
-
-        dgx = (float)(sf->primary->g -
-                      sf->secondary->g);
-        dgy = dgx/(float)h;
-        dgx/= (float)w;
-
-        dbx = (float)(sf->primary->b -
-                      sf->secondary->b);
-        dby = dbx/(float)h;
-        dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
-            if ((float)x/(float)w < (float)y/(float)h) val = (int)(drx * x);
-            else val = (int)(dry * y);
-
-            r = sf->secondary->r + val;
-            g = sf->secondary->g + val;
-            b = sf->secondary->b + val;
+            if ((float)x/(float)w < (float)y/(float)h) {
+                r = sf->primary->r + (drx * x);
+                g = sf->primary->g + (dgx * x);
+                b = sf->primary->b + (dbx * x);
+            } else {
+                r = sf->primary->r + (dry * x);
+                g = sf->primary->g + (dgy * x);
+                b = sf->primary->b + (dby * x);
+            }
             current = (r << default_red_offset)
                 + (g << default_green_offset)
                 + (b << default_blue_offset);
@@ -490,30 +492,33 @@ void gradient_pipecross(Surface *sf, int inw, int inh)
     float drx, dgx, dbx, dry, dgy, dby;
     unsigned int r,g,b;
     int x, y, h=(inh/2) + 1, w=(inw/2) + 1;
-    int val;
+
+    drx = (float)(sf->secondary->r -
+                  sf->primary->r);
+    dry = drx/(float)h;
+    drx/= (float)w;
+
+    dgx = (float)(sf->secondary->g -
+                  sf->primary->g);
+    dgy = dgx/(float)h;
+    dgx/= (float)w;
+
+    dbx = (float)(sf->secondary->b -
+                  sf->primary->b);
+    dby = dbx/(float)h;
+    dbx/= (float)w;
 
     for (y = 0; y < h; ++y) {
-        drx = (float)(sf->secondary->r -
-                      sf->primary->r);
-        dry = drx/(float)h;
-        drx/= (float)w;
-
-        dgx = (float)(sf->secondary->g -
-                      sf->primary->g);
-        dgy = dgx/(float)h;
-        dgx/= (float)w;
-
-        dbx = (float)(sf->secondary->b -
-                      sf->primary->b);
-        dby = dbx/(float)h;
-        dbx/= (float)w;
         for (x = 0; x < w; ++x, data) {
-            if ((float)x/(float)w > (float)y/(float)h) val = (int)(drx * x);
-            else val = (int)(dry * y);
-
-            r = sf->primary->r + val;
-            g = sf->primary->g + val;
-            b = sf->primary->b + val;
+            if ((float)x/(float)w > (float)y/(float)h) {
+                r = sf->primary->r + (drx * x);
+                g = sf->primary->g + (dgx * x);
+                b = sf->primary->b + (dbx * x);
+            } else {
+                r = sf->primary->r + (dry * x);
+                g = sf->primary->g + (dgy * x);
+                b = sf->primary->b + (dby * x);
+            }
             current = (r << default_red_offset)
                 + (g << default_green_offset)
                 + (b << default_blue_offset);
@@ -526,233 +531,3 @@ void gradient_pipecross(Surface *sf, int inw, int inh)
         end-=inw;
     }
 }
-#ifdef USE_GL
-void render_gl_gradient(Surface *sf, int x, int y, int w, int h)
-{
-    float pr,pg,pb;
-    float sr, sg, sb;
-    float ar, ag, ab;
-
-    pr = (float)sf->primary->r/255.0;
-    pg = (float)sf->primary->g/255.0;
-    pb = (float)sf->primary->b/255.0;
-    if (sf->secondary) {
-        sr = (float)sf->secondary->r/255.0;
-        sg = (float)sf->secondary->g/255.0;
-        sb = (float)sf->secondary->b/255.0;
-    }
-    switch (sf->grad) {
-    case Background_Solid: /* already handled */
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glVertex2i(x+w, y);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glVertex2i(x, y+h);
-        glVertex2i(x, y);
-        glEnd();
-        return;
-    case Background_Horizontal:
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w, y);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y+h);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_Vertical:
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glVertex2i(x+w, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glVertex2i(x, y+h);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_Diagonal:
-	ar = (pr + sr) / 2.0;
-	ag = (pg + sg) / 2.0;
-	ab = (pb + sb) / 2.0;
-        glBegin(GL_TRIANGLES);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x, y);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w, y+h);
-
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x, y+h);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_CrossDiagonal:
-	ar = (pr + sr) / 2.0;
-	ag = (pg + sg) / 2.0;
-	ab = (pb + sb) / 2.0;
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w, y+h);
-
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w, y+h);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x, y+h);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_Pyramid:
-	ar = (pr + sr) / 2.0;
-	ag = (pg + sg) / 2.0;
-	ab = (pb + sb) / 2.0;
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x, y+h/2);
-
-        glVertex2i(x, y+h/2);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y+h);
-
-        glVertex2i(x, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w/2, y+h);
-
-        glVertex2i(x+w/2, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w, y+h/2);
-
-        glVertex2i(x+w, y+h/2);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y);
-
-        glVertex2i(x+w, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(ar, ag, ab);
-        glVertex2i(x+w/2, y);
-
-        glVertex2i(x+w/2, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_PipeCross:
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glVertex2i(x, y+h/2);
-
-        glVertex2i(x, y+h/2);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y+h);
-
-        glVertex2i(x, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glVertex2i(x+w/2, y+h);
-
-        glVertex2i(x+w/2, y+h);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glVertex2i(x+w, y+h/2);
-
-        glVertex2i(x+w, y+h/2);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y);
-
-        glVertex2i(x+w, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glVertex2i(x+w/2, y);
-
-        glVertex2i(x+w/2, y);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glEnd();
-        break;
-    case Background_Rectangle:
-        glBegin(GL_TRIANGLES);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y+h);
-
-        glVertex2i(x, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y+h);
-
-        glVertex2i(x+w, y+h);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x+w, y);
-
-        glVertex2i(x+w, y);
-        glColor3f(sr, sg, sb);
-        glVertex2i(x+w/2, y+h/2);
-        glColor3f(pr, pg, pb);
-        glVertex2i(x, y);
-
-        glEnd();
-        break;
-    default:
-        g_message("unhandled gradient");
-        return;
-    }
-}
-#endif /* USE_GL */

@@ -43,25 +43,13 @@ public:
   };
 #endif // SWIG
 private:
-  // milliseconds XXX: config option
-  static const int BUTTONS = 5;
-  
-  //! The mouse button currently being watched from a press for a CLICK
-  unsigned int _button;
   //! The last button release processed for CLICKs
   ButtonReleaseAction _release;
-  //! The point where the mouse was when each mouse button was pressed
-  /*!
-    Used for motion events as the starting position.
-  */
-  ButtonPressAction *_posqueue[BUTTONS];
+  //! The last button press processed for CLICKs
+  ButtonPressAction _press;
   //! This is set to true once a drag has started and false when done to make
   //! sure the threshold isnt checked anymore once a drag is underway
   bool _dragging;
-
-  
-  void insertPress(const XButtonEvent &e);
-  void removePress(const XButtonEvent &e);
 
 public:
   //! Constructs an Actions object

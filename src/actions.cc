@@ -16,63 +16,20 @@
 
 namespace ob {
 
-const int Actions::BUTTONS;
-
 Actions::Actions()
-  : _button(0),
-    _dragging(false)
+  : _dragging(false)
 {
-  for (int i=0; i<BUTTONS; ++i)
-    _posqueue[i] = new ButtonPressAction();
 }
 
 
 Actions::~Actions()
 {
-  for (int i=0; i<BUTTONS; ++i)
-    delete _posqueue[i];
 }
 
-
-void Actions::insertPress(const XButtonEvent &e)
-{
-  ButtonPressAction *a = _posqueue[BUTTONS - 1];
-  // rm'd the last one, shift them all down one
-  for (int i = BUTTONS-1; i > 0; --i) {
-    _posqueue[i] = _posqueue[i-1];
-  }
-  _posqueue[0] = a;
-  a->win = e.window;
-  a->button = e.button;
-  a->pos = otk::Point(e.x_root, e.y_root);
-
-  Client *c = openbox->findClient(e.window);
-  if (c) a->clientarea = c->area();
-}
-
-void Actions::removePress(const XButtonEvent &e)
-{
-  int i;
-  ButtonPressAction *a = 0;
-  for (i=0; i<BUTTONS-1; ++i)
-    if (_posqueue[i]->button == e.button) {
-      a = _posqueue[i];
-      break;
-    }
-  if (a) { // found one, remove it and shift the rest up one
-    for (; i < BUTTONS-1; ++i)
-      _posqueue[i] = _posqueue[i+1];
-    _posqueue[BUTTONS-1] = a;
-  }
-  _posqueue[BUTTONS-1]->button = 0;
-}
 
 void Actions::buttonPressHandler(const XButtonEvent &e)
 {
   otk::EventHandler::buttonPressHandler(e);
-  insertPress(e);
-
-  printf("press queue %u pressed %u\n", _button, e.button);
 
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);
@@ -86,20 +43,20 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
   else
     return; // not a valid mouse context
 
-  if (_button) {
+  if (_press.button) {
     unsigned int mask;
-    switch(_button) {
+    switch(_press.button) {
     case Button1: mask = Button1Mask; break;
     case Button2: mask = Button2Mask; break;
     case Button3: mask = Button3Mask; break;
     case Button4: mask = Button4Mask; break;
     case Button5: mask = Button5Mask; break;
-    default: assert(false); return; // unhandled button
+    default: mask = 0; // on other buttons we have to assume its not pressed...
     }
     // was the button released but we didnt get the event? (pointergrabs cause
     // this)
     if (!(e.state & mask))
-      _button = 0;
+      _press.button = 0;
   }
   
   // run the PRESS python hook
@@ -116,9 +73,15 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
                  MouseAction::Press);
   openbox->bindings()->fireButton(&data);
     
-  if (_button) return; // won't count toward CLICK events
+  if (_press.button) return; // won't count toward CLICK events
 
-  _button = e.button;
+  _press.win = e.window;
+  _press.button = e.button;
+  _press.pos = otk::Point(e.x_root, e.y_root);
+  if (c)
+    _press.clientarea = c->area();
+
+  printf("press queue %u pressed %u\n", _press.button, e.button);
 
   if (context == MouseContext::Window) {
     /*
@@ -136,7 +99,6 @@ void Actions::buttonPressHandler(const XButtonEvent &e)
 void Actions::buttonReleaseHandler(const XButtonEvent &e)
 {
   otk::EventHandler::buttonReleaseHandler(e);
-  //removePress(e);
   
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);
@@ -165,9 +127,9 @@ void Actions::buttonReleaseHandler(const XButtonEvent &e)
   openbox->bindings()->fireButton(&data);
 
   // not for the button we're watching?
-  if (_button != e.button) return;
+  if (_press.button != e.button) return;
 
-  _button = 0;
+  _press.button = 0;
   _dragging = false;
 
   // find the area of the window
@@ -308,7 +270,7 @@ void Actions::motionHandler(const XMotionEvent &e)
 
   if (!e.same_screen) return; // this just gets stupid
 
-  if (e.window != _posqueue[0]->win) return;
+  if (e.window != _press.win) return;
   
   MouseContext::MC context;
   EventHandler *h = openbox->findHandler(e.window);
@@ -339,8 +301,8 @@ void Actions::motionHandler(const XMotionEvent &e)
     screen = otk::display->findScreen(e.root)->screen();
 
   if (!_dragging) {
-    int dx = x_root - _posqueue[0]->pos.x();
-    int dy = y_root - _posqueue[0]->pos.y();
+    int dx = x_root - _press.pos.x();
+    int dy = y_root - _press.pos.y();
     long threshold = openbox->screen(screen)->config().drag_threshold;
     if (!(std::abs(dx) >= threshold || std::abs(dy) >= threshold))
       return; // not at the threshold yet
@@ -353,10 +315,10 @@ void Actions::motionHandler(const XMotionEvent &e)
   // kill off the Button1Mask etc, only want the modifiers
   unsigned int state = e.state & (ControlMask | ShiftMask | Mod1Mask |
                                   Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
-  unsigned int button = _posqueue[0]->button;
+  unsigned int button = _press.button;
   MouseData data(screen, c, e.time, state, button, context,
                  MouseAction::Motion, x_root, y_root,
-                 _posqueue[0]->pos, _posqueue[0]->clientarea);
+                 _press.pos, _press.clientarea);
   openbox->bindings()->fireButton(&data);
 }
 

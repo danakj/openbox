@@ -189,6 +189,13 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
                                        spo->border_color->b);
     else spc->border_color = NULL;
 
+    if (spo->interlaced_color != NULL)
+        spc->interlaced_color = RrColorNew(copy->inst,
+                                       spo->interlaced_color->r,
+                                       spo->interlaced_color->g,
+                                       spo->interlaced_color->b);
+    else spc->interlaced_color = NULL;
+
     if (spo->bevel_dark != NULL)
         spc->bevel_dark = RrColorNew(copy->inst,
                                      spo->bevel_dark->r,
@@ -242,6 +249,7 @@ void RrAppearanceFree(RrAppearance *a)
         RrColorFree(p->primary);
         RrColorFree(p->secondary);
         RrColorFree(p->border_color);
+        RrColorFree(p->interlaced_color);
         RrColorFree(p->bevel_dark);
         RrColorFree(p->bevel_light);
         g_free(p->pixel_data);

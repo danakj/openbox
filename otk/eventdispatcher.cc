@@ -44,10 +44,10 @@ void OtkEventDispatcher::dispatchEvents(void)
     XNextEvent(OBDisplay::display, &e);
     it = _map.find(e.xany.window);
 
-    if (it == _map.end())
-      handler = _fallback;
-    else
+    if (it != _map.end())
       handler = it->second;
+    else
+      handler = _fallback;
 
     if (handler)
       handler->handle(e);

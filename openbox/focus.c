@@ -8,7 +8,8 @@
 #include <glib.h>
 
 Client *focus_client = NULL;
-GList **focus_order = NULL;
+GList **focus_order = NULL; /* these lists are created when screen_startup
+                               sets the number of desktops */
 
 Window focus_backup = None;
 
@@ -16,8 +17,6 @@ void focus_set_client(Client *client);
 
 void focus_startup()
 {
-    guint i;
-
     /* create the window which gets focus when no clients get it. Have to
        make it override-redirect so we don't try manage it, since it is
        mapped. */
@@ -28,10 +27,6 @@ void focus_startup()
 				 -100, -100, 1, 1, 0, 0, InputOnly,
 				 CopyFromParent, CWOverrideRedirect, &attrib);
     XMapRaised(ob_display, focus_backup);
-
-    focus_order = g_new(GList*, screen_num_desktops);
-    for (i = 0; i < screen_num_desktops; ++i)
-        focus_order[i] = NULL;
 
     /* start with nothing focused */
     focus_set_client(NULL);

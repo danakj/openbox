@@ -5,121 +5,13 @@ Project Maintainer:
 
 Developers:
 	Ben Jansens (ben@orodu.net)
-	Scott Moynes (smoynes@nexus.carleton.ca)
+	Derek Foreman (derek@signalmarketing.com)
 	Marius Nita (marius@cs.pdx.edu)
+	Scott Moynes (smoynes@nexus.carleton.ca)
 
 Contributors:
 	Nick Jansens (jex@orodu.net)
-	- web site design
-	Ruhi Bloodworth (ruhi@colophon.cjb.net)
-	- smart window placement routines
+	- Web site design
 	Mike Bacso (smakwel@yahoo.com)
-	- openbox styles
-	Kyle McMartin (kyle@debian.org)
-	- openbox style, Debian package maintainer
+	- Openbox styles
 
--==============================================================================-
-
-Openbox was previously known as Blackbox. Here are the authors/contributors
-from that era:
-
-Project Maintainer:
-	Sean 'Shaleh' Perry <shaleh@debian.org>
-
-Developers:
-        Brad Hughes <bhughes@trolltech.com>
-	Sean 'Shaleh' Perry <shaleh@debian.org>
-
-Interim author for the 0.61.x series:
-        Jeff Raven <jraven@psu.edu>
-
-Contributors:
-	Ben 'xOr' Jansens <xor@orodu.net>
-	- metric tons of code patches
-        John Kennis <jkennis@chello.nl>
-	- bbpager, ideas, and support
-        Jason 'vanRijn' Kasper <vR@movingparts.net>
-	- bbkeys, ideas, support
-	Chris Mecca <flip@linuxguide.org>
-	 - use of his irix machine for testing
-	Dale P. Smith <dsmith@altustech.com>
-	 - bsetroot now sets xrootpmap_id atom
-	Matt Wilson <mwilson@quicksilver.net.nz>
-	 - for noticing all of the little things
-
-nls contributors:
-	Mads Martin Joergensen <mmj@suse.de>
-	 - Danish (da_DK)
-	Jan Schaumann <jschauma@netmeister.org>
-	 - German (de_DE)
-	Adriano Varoli Piazza <adrianovaroli@redusers.com>
-	 - Spanish (submitted as es_AR, ES and MX)
-	Duret Bertrand <bertrand.duret@libertysurf.fr>
-	 - updated French (fr_FR)
-	Bodnar Istvan <piggy@dub.hu>
-	 - Hungarian (hu_HU)
-	Luca Marrazzo <marra.luca@libero.it>
-	 - Italian (it_IT)
-	SATO Satoru <ssato@adachi.ne.jp>
-	 - Japanese (ja_JP)
-	Hyun Suk Noh <tzesti@users.sourceforge.net>
-	 - Korean (ko_KR)
-	Artis Trops <hornet@navigator.lv>
-	 - Latvian (lv_LV)
-	Wilbert Berendsen <wbsoft@xs4all.nl>
-	 - Dutch (nl_NL)
-	Øyvind Stegard <oyvind.stegard@bluezone.no>
-	 - Norwegian (no_NO)
-	Wojciech Krygier <wkrygie@kis.p.lodz.pl>
-	 - Polish (pl_PL)
-	Ciprian Popovici <ciprian@zuavra.net>
-	 - Romanian (ro_RO)
-	Michail A. Rusinov <one@da.ru>
-	Dmitriy N. Rusinov <rusinov@udm.net>
-	 - Russian (ru_RU)
-	Marian Andre <andre@intrak.sk>
-	 - Slovakian (sk_SK)
-	Ales Kosir <ales.kosir@telemach.net>
-	 - Slovenian (sl_SI)
-	Volodymyr M. Lisivka <lvm@mystery.lviv.net>
-	 - Ukrainian (uk_UA)
-	Wang Tiejun <wtj@dept3.buaa.edu.cn>
-	 - Chinese (zh_CN)
-	Moto Chen <han_yi_chen@yahoo.com.tw>
-	 - Taiwan Chinese (zh_TW)
-
-Past Contributors:
-        Jeffrey Sean Connell <ankh@canuck.gen.nz>
-          - debugger class code (ommited from sources)
-        Frank Belew <frb@umr.edu>
-          - dgradient code
-        Scott Garner <mrfab@arn.net>
-          - suggestions, bug reports and beta testing (*the* beta moron)
-        David Doan <ddoan@usa.net>
-         - testing of 8bpp code
-        Mark Seward <illuzion@paradise.net.nz>
-         - beta testing, bug reports and 32bpp testing
-        Keith Bolland <prime@strip.net.nz>
-         - beta testing, bug reports and suggestions
-        James Spooner <spoons@xtra.co.nz>
-         - beta testing, bug reports
-        Fred Knieper <derf@tamu.edu>
-         - beta testing, bug reports
-        Steve Udell <hettar@teleport.com>
-         - beta testing, bug reports, questions (very good ones)
-        Gregory Barlow <barlowg@ncssm-server.ncssm.edu>
-        - bug reports and patches/suggestions (original middle click advocate)
-        Dyon Balding <dyon.balding@eng.monash.edu.au>
-        - patch for Smart(er)Placement window placement
-        Mike Cole <mike@mydot.com>
-        - co-author/hacker of Image.cc (local LUG buddy)
-        John Kennis <jkennis@chello.nl>
-        - author of bbtools/beta testing/bug reports
-	Wilbert Berendsen <wbsoft@xs4all.nl>
-	- author of blackbox/bsetroot manpages
-
-(Brad's original message):
-I would also like to thank the creators of WindowMaker.  Reading the existing
-code has helped me immensely, and the BImage class follows the RImage data type
-very closely (the 8bpp code and dithering code was based off of WindowMaker's
-wrlib).

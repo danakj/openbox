@@ -1310,16 +1310,14 @@ void client_update_wmhints(ObClient *self)
         /* the WM_HINTS can contain an icon */
         client_update_icons(self);
 
-	XFree(hints);
+        XFree(hints);
     }
 
     if (ur != self->urgent) {
-	self->urgent = ur;
-	ob_debug("Urgent Hint for 0x%lx: %s\n", self->window,
-                 ur ? "ON" : "OFF");
-	/* fire the urgent callback if we're mapped, otherwise, wait until
-	   after we're mapped */
-	if (self->frame)
+        self->urgent = ur;
+        /* fire the urgent callback if we're mapped, otherwise, wait until
+           after we're mapped */
+        if (self->frame)
             client_urgent_notify(self);
     }
 }

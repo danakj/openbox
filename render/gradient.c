@@ -134,7 +134,6 @@ static void create_bevel_colors(RrAppearance *l)
     if (b > 0xFF) b = 0xFF;
     g_assert(!l->surface.bevel_light);
     l->surface.bevel_light = RrColorNew(l->inst, r, g, b);
-    RrColorAllocateGC(l->surface.bevel_light);
 
     /* dark color */
     r = l->surface.primary->r;
@@ -145,7 +144,6 @@ static void create_bevel_colors(RrAppearance *l)
     b = (b >> 1) + (b >> 2);
     g_assert(!l->surface.bevel_dark);
     l->surface.bevel_dark = RrColorNew(l->inst, r, g, b);
-    RrColorAllocateGC(l->surface.bevel_dark);
 }
 
 static void gradient_solid(RrAppearance *l, int w, int h) 
@@ -155,8 +153,6 @@ static void gradient_solid(RrAppearance *l, int w, int h)
     RrSurface *sp = &l->surface;
     int left = 0, top = 0, right = w - 1, bottom = h - 1;
 
-    if (sp->primary->gc == None)
-        RrColorAllocateGC(sp->primary);
     pix = (sp->primary->r << RrDefaultRedOffset)
         + (sp->primary->g << RrDefaultGreenOffset)
         + (sp->primary->b << RrDefaultBlueOffset);
@@ -165,14 +161,12 @@ static void gradient_solid(RrAppearance *l, int w, int h)
         for (b = 0; b < h; b++)
             sp->pixel_data[a + b * w] = pix;
 
-    XFillRectangle(RrDisplay(l->inst), l->pixmap, sp->primary->gc,
+    XFillRectangle(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->primary),
                    0, 0, w, h);
 
     if (sp->interlaced) {
-        if (sp->secondary->gc == None)
-            RrColorAllocateGC(sp->secondary);
         for (i = 0; i < h; i += 2)
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->secondary->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->secondary),
                       0, i, w, i);
     }
 
@@ -183,29 +177,25 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 
         switch (sp->bevel) {
         case RR_BEVEL_1:
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left, bottom, right, bottom);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       right, bottom, right, top);
                 
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left, top, right, top);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left, bottom, left, top);
             break;
         case RR_BEVEL_2:
-            XDrawLine(RrDisplay(l->inst), l->pixmap,
-                      sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left + 1, bottom - 2, right - 2, bottom - 2);
-            XDrawLine(RrDisplay(l->inst), l->pixmap,
-                      sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       right - 2, bottom - 2, right - 2, top + 1);
 
-            XDrawLine(RrDisplay(l->inst), l->pixmap,
-                      sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left + 1, top + 1, right - 2, top + 1);
-            XDrawLine(RrDisplay(l->inst), l->pixmap,
-                      sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left + 1, bottom - 2, left + 1, top + 1);
             break;
         default:
@@ -218,25 +208,25 @@ static void gradient_solid(RrAppearance *l, int w, int h)
 
         switch (sp->bevel) {
         case RR_BEVEL_1:
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left, bottom, right, bottom);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       right, bottom, right, top);
       
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left, top, right, top);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left, bottom, left, top);
             break;
         case RR_BEVEL_2:
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left + 1, bottom - 2, right - 2, bottom - 2);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_light->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       right - 2, bottom - 2, right - 2, top + 1);
       
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left + 1, top + 1, right - 2, top + 1);
-            XDrawLine(RrDisplay(l->inst), l->pixmap, sp->bevel_dark->gc,
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left + 1, bottom - 2, left + 1, top + 1);
 
             break;
@@ -246,9 +236,8 @@ static void gradient_solid(RrAppearance *l, int w, int h)
         break;
     case RR_RELIEF_FLAT:
         if (sp->border) {
-            if (sp->border_color->gc == None)
-                RrColorAllocateGC(sp->border_color);
-            XDrawRectangle(RrDisplay(l->inst), l->pixmap, sp->border_color->gc,
+            XDrawRectangle(RrDisplay(l->inst), l->pixmap,
+                           RrColorGC(sp->border_color),
                            left, top, right, bottom);
         }
         break;

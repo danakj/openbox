@@ -37,16 +37,16 @@ void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area)
     if (x < 0) x = 0;
     if (y < 0) y = 0;
 
-    XSetClipMask(RrDisplay(m->mask->inst), m->color->gc, m->mask->mask);
-    XSetClipOrigin(RrDisplay(m->mask->inst), m->color->gc, x, y);
+    XSetClipMask(RrDisplay(m->mask->inst), RrColorGC(m->color), m->mask->mask);
+    XSetClipOrigin(RrDisplay(m->mask->inst), RrColorGC(m->color), x, y);
 
     /* fill in the clipped region */
-    XFillRectangle(RrDisplay(m->mask->inst), p, m->color->gc, x, y,
+    XFillRectangle(RrDisplay(m->mask->inst), p, RrColorGC(m->color), x, y,
                    x + m->mask->width, y + m->mask->height);
 
     /* unset the clip region */
-    XSetClipMask(RrDisplay(m->mask->inst), m->color->gc, None);
-    XSetClipOrigin(RrDisplay(m->mask->inst), m->color->gc, 0, 0);
+    XSetClipMask(RrDisplay(m->mask->inst), RrColorGC(m->color), None);
+    XSetClipOrigin(RrDisplay(m->mask->inst), RrColorGC(m->color), 0, 0);
 }
 
 RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src)

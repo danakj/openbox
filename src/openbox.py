@@ -45,7 +45,6 @@ class Display(_object):
         try:
             if self.thisown: destroy(self)
         except: pass
-    def gcCache(*args): return apply(_openbox.Display_gcCache,args)
     def screenInfo(*args): return apply(_openbox.Display_screenInfo,args)
     def findScreen(*args): return apply(_openbox.Display_findScreen,args)
     def renderControl(*args): return apply(_openbox.Display_renderControl,args)

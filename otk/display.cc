@@ -6,7 +6,6 @@
 
 #include "display.hh"
 #include "screeninfo.hh"
-#include "gccache.hh"
 #include "rendercontrol.hh"
 #include "util.hh"
 
@@ -85,8 +84,7 @@ Display::Display()
     _scroll_lock_mask(0),
     _grab_count(0),
     _screeninfo_list(0),
-    _rendercontrol_list(0),
-    _gccache((GCCache*) 0)
+    _rendercontrol_list(0)
 {
   int junk;
   (void)junk;
@@ -175,14 +173,11 @@ DISPLAY environment variable approriately.\n\n"));
     _screeninfo_list[i] = new ScreenInfo(i);
     _rendercontrol_list[i] = RenderControl::getRenderControl(i);
   }
-
-  _gccache = new GCCache(ScreenCount(_display));
 }
 
 
 Display::~Display()
 {
-  delete _gccache;
   while (_grab_count > 0)
     ungrab();
 

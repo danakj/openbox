@@ -527,7 +527,8 @@ void Screen::manageWindow(Window window)
   openbox->bindings()->fireEvent(&data);
 
 #ifdef DEBUG
-  printf("Managed window 0x%lx\n", window);
+  printf("Managed window 0x%lx frame 0x%lx\n",
+         window, client->frame->window());
 #endif
 }
 
@@ -572,6 +573,9 @@ void Screen::unmanageWindow(Client *client)
   // reparent the window out of the frame
   frame->releaseClient();
 
+#ifdef DEBUG
+  Window framewin = client->frame->window();
+#endif
   delete client->frame;
   client->frame = 0;
 
@@ -585,7 +589,7 @@ void Screen::unmanageWindow(Client *client)
   client->unfocus();
 
 #ifdef DEBUG
-  printf("Unmanaged window 0x%lx\n", client->window());
+  printf("Unmanaged window 0x%lx frame %lx\n", client->window(), framewin);
 #endif
   
   delete client;

@@ -9,7 +9,6 @@ extern "C" {
 namespace otk {
 
 class ScreenInfo;
-class GCCache;
 class RenderControl;
 
 class Display;
@@ -58,16 +57,6 @@ private:
   //! screen
   RenderControl** _rendercontrol_list;
 
-  //! A cache for re-using GCs, used by the drawing objects
-  /*!
-    @see Pen
-    @see Font
-    @see Image
-    @see ImageControl
-    @see Texture
-  */
-  GCCache *_gccache;
-
   // Handles X errors on the display
   /*
     Displays the error if compiled for debugging.
@@ -83,9 +72,6 @@ public:
   Display();
   //! Destroys the class, closes the X display
   ~Display();
-
-  //! Returns the GC cache for the application
-  inline GCCache *gcCache() const { return _gccache; }
 
   //! Gets information on a specific screen
   /*!

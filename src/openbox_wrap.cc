@@ -685,31 +685,30 @@ SWIG_InstallConstants(PyObject *d, swig_const_info constants[]) {
 #define  SWIGTYPE_p_otk__EventHandler swig_types[37] 
 #define  SWIGTYPE_p_XReparentEvent swig_types[38] 
 #define  SWIGTYPE_p_otk__EventDispatcher swig_types[39] 
-#define  SWIGTYPE_p_otk__GCCache swig_types[40] 
-#define  SWIGTYPE_p_ob__Bindings swig_types[41] 
-#define  SWIGTYPE_p_ob__Openbox swig_types[42] 
-#define  SWIGTYPE_p_ob__Actions swig_types[43] 
-#define  SWIGTYPE_p_otk__Widget swig_types[44] 
-#define  SWIGTYPE_p_XEvent swig_types[45] 
-#define  SWIGTYPE_p_otk__Property swig_types[46] 
-#define  SWIGTYPE_p_PyObject swig_types[47] 
-#define  SWIGTYPE_p_otk__ScreenInfo swig_types[48] 
-#define  SWIGTYPE_p_otk__RenderStyle swig_types[49] 
-#define  SWIGTYPE_p_ob__EventData swig_types[50] 
-#define  SWIGTYPE_p_XCreateWindowEvent swig_types[51] 
-#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[52] 
-#define  SWIGTYPE_p_otk__Property__StringVect swig_types[53] 
-#define  SWIGTYPE_p_ob__WidgetBase swig_types[54] 
-#define  SWIGTYPE_p_otk__Atoms swig_types[55] 
-#define  SWIGTYPE_p_XKeyEvent swig_types[56] 
-#define  SWIGTYPE_p_int swig_types[57] 
-#define  SWIGTYPE_p_otk__Strut swig_types[58] 
+#define  SWIGTYPE_p_ob__Bindings swig_types[40] 
+#define  SWIGTYPE_p_ob__Openbox swig_types[41] 
+#define  SWIGTYPE_p_ob__Actions swig_types[42] 
+#define  SWIGTYPE_p_otk__Widget swig_types[43] 
+#define  SWIGTYPE_p_XEvent swig_types[44] 
+#define  SWIGTYPE_p_otk__Property swig_types[45] 
+#define  SWIGTYPE_p_PyObject swig_types[46] 
+#define  SWIGTYPE_p_otk__ScreenInfo swig_types[47] 
+#define  SWIGTYPE_p_otk__RenderStyle swig_types[48] 
+#define  SWIGTYPE_p_ob__EventData swig_types[49] 
+#define  SWIGTYPE_p_XCreateWindowEvent swig_types[50] 
+#define  SWIGTYPE_p_XDestroyWindowEvent swig_types[51] 
+#define  SWIGTYPE_p_otk__Property__StringVect swig_types[52] 
+#define  SWIGTYPE_p_ob__WidgetBase swig_types[53] 
+#define  SWIGTYPE_p_otk__Atoms swig_types[54] 
+#define  SWIGTYPE_p_XKeyEvent swig_types[55] 
+#define  SWIGTYPE_p_int swig_types[56] 
+#define  SWIGTYPE_p_otk__Strut swig_types[57] 
+#define  SWIGTYPE_p_unsigned_long swig_types[58] 
 #define  SWIGTYPE_p_p_unsigned_long swig_types[59] 
-#define  SWIGTYPE_p_unsigned_long swig_types[60] 
-#define  SWIGTYPE_p_XMotionEvent swig_types[61] 
-#define  SWIGTYPE_p_XButtonEvent swig_types[62] 
-#define  SWIGTYPE_p_XSelectionEvent swig_types[63] 
-static swig_type_info *swig_types[65];
+#define  SWIGTYPE_p_XMotionEvent swig_types[60] 
+#define  SWIGTYPE_p_XButtonEvent swig_types[61] 
+#define  SWIGTYPE_p_XSelectionEvent swig_types[62] 
+static swig_type_info *swig_types[64];
 
 /* -------- TYPES TABLE (END) -------- */
 
@@ -976,23 +975,6 @@ static PyObject *_wrap_delete_Display(PyObject *self, PyObject *args) {
     delete arg1;
     
     Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_Display_gcCache(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    otk::Display *arg1 = (otk::Display *) 0 ;
-    otk::GCCache *result;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"O:Display_gcCache",&obj0)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_otk__Display,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    result = (otk::GCCache *)((otk::Display const *)arg1)->gcCache();
-    
-    resultobj = SWIG_NewPointerObj((void *) result, SWIGTYPE_p_otk__GCCache, 0);
     return resultobj;
     fail:
     return NULL;
@@ -11367,7 +11349,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Property_atoms", _wrap_Property_atoms, METH_VARARGS },
 	 { (char *)"new_Display", _wrap_new_Display, METH_VARARGS },
 	 { (char *)"delete_Display", _wrap_delete_Display, METH_VARARGS },
-	 { (char *)"Display_gcCache", _wrap_Display_gcCache, METH_VARARGS },
 	 { (char *)"Display_screenInfo", _wrap_Display_screenInfo, METH_VARARGS },
 	 { (char *)"Display_findScreen", _wrap_Display_findScreen, METH_VARARGS },
 	 { (char *)"Display_renderControl", _wrap_Display_renderControl, METH_VARARGS },
@@ -11926,7 +11907,6 @@ static swig_type_info _swigt__p_XMappingEvent[] = {{"_p_XMappingEvent", 0, "XMap
 static swig_type_info _swigt__p_otk__EventHandler[] = {{"_p_otk__EventHandler", 0, "otk::EventHandler *", 0},{"_p_ob__Client", _p_ob__ClientTo_p_otk__EventHandler},{"_p_ob__Actions", _p_ob__ActionsTo_p_otk__EventHandler},{"_p_otk__EventHandler"},{"_p_ob__Frame", _p_ob__FrameTo_p_otk__EventHandler},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventHandler},{"_p_otk__Widget", _p_otk__WidgetTo_p_otk__EventHandler},{"_p_ob__Screen", _p_ob__ScreenTo_p_otk__EventHandler},{0}};
 static swig_type_info _swigt__p_XReparentEvent[] = {{"_p_XReparentEvent", 0, "XReparentEvent *", 0},{"_p_XReparentEvent"},{0}};
 static swig_type_info _swigt__p_otk__EventDispatcher[] = {{"_p_otk__EventDispatcher", 0, "otk::EventDispatcher *", 0},{"_p_otk__EventDispatcher"},{"_p_ob__Openbox", _p_ob__OpenboxTo_p_otk__EventDispatcher},{0}};
-static swig_type_info _swigt__p_otk__GCCache[] = {{"_p_otk__GCCache", 0, "otk::GCCache *", 0},{"_p_otk__GCCache"},{0}};
 static swig_type_info _swigt__p_ob__Bindings[] = {{"_p_ob__Bindings", 0, "ob::Bindings *", 0},{"_p_ob__Bindings"},{0}};
 static swig_type_info _swigt__p_ob__Openbox[] = {{"_p_ob__Openbox", 0, "ob::Openbox *", 0},{"_p_ob__Openbox"},{0}};
 static swig_type_info _swigt__p_ob__Actions[] = {{"_p_ob__Actions", 0, "ob::Actions *", 0},{"_p_ob__Actions"},{0}};
@@ -11945,8 +11925,8 @@ static swig_type_info _swigt__p_otk__Atoms[] = {{"_p_otk__Atoms", 0, "otk::Atoms
 static swig_type_info _swigt__p_XKeyEvent[] = {{"_p_XKeyEvent", 0, "XKeyEvent *", 0},{"_p_XKeyEvent"},{0}};
 static swig_type_info _swigt__p_int[] = {{"_p_int", 0, "int *", 0},{"_p_int"},{0}};
 static swig_type_info _swigt__p_otk__Strut[] = {{"_p_otk__Strut", 0, "otk::Strut *", 0},{"_p_otk__Strut"},{0}};
-static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "unsigned long **", 0},{"_p_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_unsigned_long[] = {{"_p_unsigned_long", 0, "unsigned long *", 0},{"_p_unsigned_long"},{0}};
+static swig_type_info _swigt__p_p_unsigned_long[] = {{"_p_p_unsigned_long", 0, "unsigned long **", 0},{"_p_p_unsigned_long"},{0}};
 static swig_type_info _swigt__p_XMotionEvent[] = {{"_p_XMotionEvent", 0, "XMotionEvent *", 0},{"_p_XMotionEvent"},{0}};
 static swig_type_info _swigt__p_XButtonEvent[] = {{"_p_XButtonEvent", 0, "XButtonEvent *", 0},{"_p_XButtonEvent"},{0}};
 static swig_type_info _swigt__p_XSelectionEvent[] = {{"_p_XSelectionEvent", 0, "XSelectionEvent *", 0},{"_p_XSelectionEvent"},{0}};
@@ -11992,7 +11972,6 @@ _swigt__p_XMappingEvent,
 _swigt__p_otk__EventHandler, 
 _swigt__p_XReparentEvent, 
 _swigt__p_otk__EventDispatcher, 
-_swigt__p_otk__GCCache, 
 _swigt__p_ob__Bindings, 
 _swigt__p_ob__Openbox, 
 _swigt__p_ob__Actions, 
@@ -12011,8 +11990,8 @@ _swigt__p_otk__Atoms,
 _swigt__p_XKeyEvent, 
 _swigt__p_int, 
 _swigt__p_otk__Strut, 
-_swigt__p_p_unsigned_long, 
 _swigt__p_unsigned_long, 
+_swigt__p_p_unsigned_long, 
 _swigt__p_XMotionEvent, 
 _swigt__p_XButtonEvent, 
 _swigt__p_XSelectionEvent, 

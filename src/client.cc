@@ -1266,7 +1266,7 @@ bool Client::focus()
   }
   while (XCheckTypedWindowEvent(**otk::display, _window, UnmapNotify, &ev)) {
     if (ignore_unmaps) {
-      --ignore_unmaps;
+      unmapHandler(ev.xunmap);
     } else {
       XPutBackEvent(**otk::display, &ev);
       return false;
@@ -1406,7 +1406,7 @@ void Client::unmapHandler(const XUnmapEvent &e)
 {
   if (ignore_unmaps) {
 #ifdef    DEBUG
-//  printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
+    printf("Ignored UnmapNotify for 0x%lx (event 0x%lx)\n", e.window, e.event);
 #endif // DEBUG
     ignore_unmaps--;
     return;

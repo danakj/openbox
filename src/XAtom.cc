@@ -434,7 +434,7 @@ bool XAtom::getValue(Window win, Atoms atom, Atoms type,
  */
 bool XAtom::getValue(Window win, Atoms atom, StringType type,
                      std::string &value) const {
-  int n = 1;
+  unsigned long n = 1;
   StringVect s;
   if (getValue(win, atom, type, n, s)) {
     value = s[0];
@@ -444,8 +444,8 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type,
 }
 
 
-bool XAtom::getValue(Window win, Atoms atom, StringType type, int &nelements,
-                     StringVect &strings) const {
+bool XAtom::getValue(Window win, Atoms atom, StringType type,
+                     unsigned long &nelements, StringVect &strings) const {
   assert(atom >= 0 && atom < NUM_ATOMS);
   assert(type >= 0 && type < NUM_STRING_TYPE);
   assert(win != None); assert(_atoms[atom] != None);
@@ -463,22 +463,22 @@ bool XAtom::getValue(Window win, Atoms atom, StringType type, int &nelements,
   if (!getValue(win, _atoms[atom], t, elements, &value, 8) || elements < 1)
     return false;
 
-  std::string s(reinterpret_cast<char *>(value));
+  std::string s(reinterpret_cast<char *>(value), elements);
   delete [] value;
 
   std::string::const_iterator it = s.begin(), end = s.end();
-  int num = 0;
+  unsigned long num = 0;
   while(num < nelements) {
     std::string::const_iterator tmp = it; // current string.begin()
     it = std::find(tmp, end, '\0');       // look for null between tmp and end
     strings.push_back(std::string(tmp, it));   // s[tmp:it)
-    if (it == end)
-      break;
+    if (it == end) break;
     ++it;
+    if (it == end) break;
     ++num;
   }
 
-  nelements = elements;
+  nelements = num;
 
   return true;
 }

@@ -207,7 +207,7 @@ public:
   bool getValue(Window win, Atoms atom, StringType type,
                 std::string &value) const;
   bool getValue(Window win, Atoms atom, StringType type,
-                int &nelements, StringVect &strings) const;
+                unsigned long &nelements, StringVect &strings) const;
   
   void eraseValue(Window win, Atoms atom) const;
 

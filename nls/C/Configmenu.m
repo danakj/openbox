@@ -1,38 +1,38 @@
 $set 3 #Configmenu
 
 $ #ConfigOptions
-# Opzioni di Configurazione
+# 設定オプション
 $ #FocusModel
-# Modalita' Focus
+# フォーカスモデル
 $ #WindowPlacement
-# Posizionamento Finestra
+# ウィンドウ配置
 $ #ImageDithering
-# Dithering dell'immagine
+# 画像ディザ
 $ #OpaqueMove
-# Movimento Opaco della finestra
+# ウィンドウ不透明移動
 $ #FullMax
-# Massimo Ingrandimento
+# 完全最大化
 $ #FocusNew
-# Attiva Focus alle nuove Finestre
+# 新規ウィンドウにフォーカス
 $ #FocusLast
-# Attiva Focus al cambio dell'Area di Lavoro
+# ワークスペース変更時にウィンドウにフォーカス
 $ #ClickToFocus
-# Clicca per il Focus
+# Click to Focus
 $ #SloppyFocus
-# Focus Intelligente (Sloppy)
+# Sloppy Focus
 $ #AutoRaise
-# Sollevamento Finestra Automatico
+# 自動的に前面に出す
 $ #SmartRows
-# Posizionamento Intelligente (Righe)
+# 賢く配置 (行)
 $ #SmartCols
-# Posizionamento Intelligente (Colonne)
+# 賢く配置 (列)
 $ #Cascade
-# Posizionamento a Cascata
+# ずらして配置
 $ #LeftRight
-# da Sinistra a Destra
+# 左から右へ
 $ #RightLeft
-# da Destra a Sinistra
+# 右から左へ
 $ #TopBottom
-# dall'Alto in Basso
+# 上から下へ
 $ #BottomTop
-# dal Basso in Alto
+# 下から上へ

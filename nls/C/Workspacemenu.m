@@ -1,8 +1,8 @@
 $set 12 #Workspacemenu
 
 $ #WorkspacesTitle
-# Aree di Lavoro
+# ワークスペース
 $ #NewWorkspace
-# Nuova Area di Lavoro
+# 新規ワークスペース
 $ #RemoveLast
-# Rimuovi Ultima
+# 末尾のワークスペースを消す

@@ -1,20 +1,20 @@
 $set 10 #Windowmenu
 
 $ #SendTo
-# Manda in ...
+# 送り先 ...
 $ #Shade
-# Arrotola
+# シェード
 $ #Iconify
-# Riduci a Icona
+# アイコン化
 $ #Maximize
-# Ingrandisci
+# 最大化
 $ #Raise
-# Alza
+# 前面に出す
 $ #Lower
-# Abbassa
+# 背面に下げる
 $ #Stick
-# Fissa
+# 居座り
 $ #KillClient
-# Uccidi Programma
+# 強制終了
 $ #Close
-# Chiudi
+# 終了

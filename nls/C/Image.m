@@ -1,24 +1,24 @@
 $set 5 #Image
 
 $ #ErrorCreatingSolidPixmap
-# BImage::render_solid: errore creando la pixmap\n
+# BImage::render_solid: ピックスマップ生成エラー\n
 $ #ErrorCreatingXImage
-# BImage::renderXImage: errore creando XImage\n
+# BImage::renderXImage: XImage 生成エラー\n
 $ #UnsupVisual
-# BImage::renderXImage: visuale non supportata\n
+# BImage::renderXImage: 未サポートの視覚効果\n
 $ #ErrorCreatingPixmap
-# BImage::renderPixmap: errore creando la pixmap\n
+# BImage::renderPixmap: ピックスマップ生成エラー\n
 $ #InvalidColormapSize
-# BImageControl::BImageControl: grandezza della mappa di colori non valida %d (%d/%d/%d) - riduzione\n
+# BImageControl::BImageControl: 不正なカラーマップサイズ %d (%d/%d/%d) - 減色中\n
 $ #ErrorAllocatingColormap
-# BImageControl::BImageControl: errore di assegnazione mappa di colori\n
+# BImageControl::BImageControl: カラーマップ確保エラー\n
 $ #ColorAllocFail
-# BImageControl::BImageControl: fallita l'assegnazione del colore %d/%d/%d\n
+# BImageControl::BImageControl: カラー %d/%d/%d の確保に失敗\n
 $ #PixmapRelease
-# BImageControl::~BImageControl: pixmap cache - rilascio %d pixmaps\n
+# BImageControl::~BImageControl: ピックスマップキャッシュ -  %d ピックスマップを解放\n
 $ #PixmapCacheLarge
-# BImageControl::renderImage: la cache e' larga, forzo la pulitura\n
+# BImageControl::renderImage: キャッシュが大きすぎるので強制的に掃除\n
 $ #ColorParseError
-# BImageControl::getColor: errore di analisi del colore: '%s'\n
+# BImageControl::getColor: カラー解析エラー: '%s'\n
 $ #ColorAllocError
-# BImageControl::getColor: errore di assegnazione del colore: '%s'\n
+# BImageControl::getColor: カラー確保エラー: '%s'\n

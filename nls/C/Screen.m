@@ -1,54 +1,53 @@
 $set 6 #Screen
 
 $ #AnotherWMRunning
-# BScreen::BScreen: e' accaduto un errore mentre si interrogava il server X.\n  \
-un'altro gestore di finestre e' attualmente in esecuzione sul display %s.\n
+# BScreen::BScreen: X ¥µ¡¼¥ÐÌä¹ç¤»Ãæ¤Ë¥¨¥é¡¼È¯À¸\n  \
+another window manager is already running on display %s.\n
 $ #ManagingScreen
-# BScreen::BScreen: gestendo schermo %d usando visuale 0x%lx, depth %d\n
+# BScreen::BScreen: ¥¹¥¯¥ê¡¼¥ó %d ¤ò»ë³Ð¸ú²Ì 0x%lx, ¿¼¤µ %d ¤ÇÀ©¸æ\n
 $ #FontLoadFail
-# BScreen::LoadStyle(): impossibile caricare il font '%s'\n
+# BScreen::LoadStyle(): ¥Õ¥©¥ó¥È '%s' ¤òÆÉ¤ß¹þ¤á¤Þ¤»¤ó¤Ç¤·¤¿\n
 $ #DefaultFontLoadFail
-# BScreen::LoadStyle(): impossibile caricare il font di default.\n
+# BScreen::LoadStyle(): ¥Ç¥Õ¥©¥ë¥È¥Õ¥©¥ó¥È¤òÆÉ¤ß¹þ¤á¤Þ¤»¤ó¤Ç¤·¤¿\n
 $ #EmptyMenuFile
-# %s: file menu vuoto\n
+# %s: ¶õ¤Î¥á¥Ë¥å¡¼¥Õ¥¡¥¤¥ë\n
 $ #xterm
 # xterm
 $ #Restart
-# Riavvia
+# ºÆµ¯Æ°
 $ #Exit
-# Esci
+# ½ªÎ»
 $ #EXECError
-# BScreen::parseMenuFile: [exec] errore, nessuna voce nel menu e/o comando definito\n
+# BScreen::parseMenuFile: [exec] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ë¤È(¤¢¤ë¤¤¤Ï)¥³¥Þ¥ó¥ÉÌ¤ÄêµÁ\n
 $ #EXITError
-# BScreen::parseMenuFile: [exit] errore, nessuna voce nel menu definita\n
+# BScreen::parseMenuFile: [exit] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #STYLEError
-# BScreen::parseMenuFile: [style] errore, nessuna voce nel menu e/o file\
-definto\n
+# BScreen::parseMenuFile: [style] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ë¤È(¤¢¤ë¤¤¤Ï)¥Õ¥¡¥¤¥ëÌ¾Ì¤ÄêµÁ\n
 $ #CONFIGError
-# BScreen::parseMenuFile: [config] errore, nessuna voce nel menu definta\n
+# BScreen::parseMenuFile: [config] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #INCLUDEError
-# BScreen::parseMenuFile: [include] errore, nessun file definito\n
+# BScreen::parseMenuFile: [include] ¥¨¥é¡¼¡¢¥Õ¥¡¥¤¥ëÌ¾Ì¤ÄêµÁ\n
 $ #INCLUDEErrorReg
-# BScreen::parseMenuFile: [include] errore, '%s' non è un file regolare\n
+# BScreen::parseMenuFile: [include] ¥¨¥é¡¼¡¢'%s' ¤Ï¥ì¥®¥å¥é¡¼¥Õ¥¡¥¤¥ë¤Ç¤Ï¤¢¤ê¤Þ¤»¤ó\n
 $ #SUBMENUError
-# BScreen::parseMenuFile: [submenu] errore, nessuna voce nel menu definta\n
+# BScreen::parseMenuFile: [submenu] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #RESTARTError
-# BScreen::parseMenuFile: [restart] errore, nessuna voce nel menu definta\n
+# BScreen::parseMenuFile: [restart] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #RECONFIGError
-# BScreen::parseMenuFile: [reconfig] errore, nessuna voce nel menu definta\n
+# BScreen::parseMenuFile: [reconfig] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #STYLESDIRError
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, nessuna cartella definita\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ¥¨¥é¡¼¡¢¥Ç¥£¥ì¥¯¥È¥êÌ¾Ì¤ÄêµÁ\n
 $ #STYLESDIRErrorNotDir
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, '%s' non e' una \
-cartella\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ¥¨¥é¡¼¡¢'%s' ¤Ï¥Ç¥£¥ì¥¯¥È¥ê¤Ç¤Ï\
+¤¢¤ê¤Þ¤»¤ó\n
 $ #STYLESDIRErrorNoExist
-# BScreen::parseMenuFile: [stylesdir/stylesmenu] errore, '%s' non esiste\n
+# BScreen::parseMenuFile: [stylesdir/stylesmenu] ¥¨¥é¡¼¡¢'%s' ¤ÏÂ¸ºß¤·¤Þ¤»¤ó\n
 $ #WORKSPACESError
-# BScreen::parseMenuFile: [workspaces] errore, nessuna voce nel menu definita\n
+# BScreen::parseMenuFile: [workspaces] ¥¨¥é¡¼¡¢¥á¥Ë¥å¡¼¥é¥Ù¥ëÌ¤ÄêµÁ\n
 $ #PositionLength
 # 0: 0000 x 0: 0000
 $ #PositionFormat
 # X: %4d x Y: %4d
 $ #GeometryFormat
-# W: %4d x H: %4d
+# Éý: %4d x ¹â¤µ: %4d
 

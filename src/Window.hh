@@ -417,6 +417,7 @@ public:
 
 #ifdef    SHAPE
   void configureShape(void);
+  void clearShape(void);
   void shapeEvent(XShapeEvent * /*unused*/);
 #endif // SHAPE
 

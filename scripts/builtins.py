@@ -105,6 +105,11 @@ def unshade(data):
     if not client: return
     OBClient_shade(client, 0)
 
+def change_desktop(data, num):
+    """Switches to a specified desktop"""
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    send_client_msg(root, OBProperty_net_current_desktop, root, num)
+
 def next_desktop(data, no_wrap=0):
     """Switches to the next desktop, optionally (by default) cycling around to
        the first when going past the last."""
@@ -115,7 +120,7 @@ def next_desktop(data, no_wrap=0):
         d = d + 1
     elif not no_wrap:
         d = 0
-    OBScreen_changeDesktop(screen, d)
+    change_desktop(data, d)
     
 def prev_desktop(data, no_wrap=0):
     """Switches to the previous desktop, optionally (by default) cycling around
@@ -127,12 +132,49 @@ def prev_desktop(data, no_wrap=0):
         d = d - 1
     elif not no_wrap:
         d = n - 1
-    OBScreen_changeDesktop(screen, d)
+    change_desktop(data, d)
 
-def change_desktop(data, num):
-    """Switches to a specified desktop"""
+def send_to_desktop(data, num):
+    """Sends a client to a specified desktop"""
+    root = ScreenInfo_rootWindow(OBDisplay_screenInfo(data.screen()))
+    client = Openbox_findClient(openbox, data.window())
+    if client:
+        window = OBClient_window(client)
+        send_client_msg(root, OBProperty_net_wm_desktop, window, num)
+
+def send_to_next_desktop(data, no_wrap=0, follow=1):
+    """Sends a window to the next desktop, optionally (by default) cycling
+       around to the first when going past the last. Also optionally moving to
+       the new desktop after sending the window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
     screen = Openbox_screen(openbox, data.screen())
-    OBScreen_changeDesktop(screen, num)
+    d = OBScreen_desktop(screen)
+    n = OBScreen_numDesktops(screen)
+    if (d < (n-1)):
+        d = d + 1
+    elif not no_wrap:
+        d = 0
+    send_to_desktop(data, d)
+    if follow:
+        change_desktop(data, d)
+    
+def send_to_prev_desktop(data, no_wrap=0, follow=1):
+    """Sends a window to the previous desktop, optionally (by default) cycling
+       around to the last when going past the first. Also optionally moving to
+       the new desktop after sending the window."""
+    client = Openbox_findClient(openbox, data.window())
+    if not client: return
+    screen = Openbox_screen(openbox, data.screen())
+    d = OBScreen_desktop(screen)
+    n = OBScreen_numDesktops(screen)
+    if (d > 0):
+        d = d - 1
+    elif not no_wrap:
+        d = n - 1
+    send_to_desktop(data, d)
+    if follow:
+        change_desktop(data, d)
     
 #########################################
 ### Convenience functions for scripts ###

@@ -116,6 +116,21 @@ private:
   //! Get desktop names from the root window property
   void updateDesktopNames();
 
+  //! Changes to the specified desktop, displaying windows on it and hiding
+  //! windows on the others.
+  /*!
+    @param desktop The number of the desktop to switch to (starts from 0).
+    If the desktop is out of valid range, it is ignored.
+  */
+  void changeDesktop(long desktop);
+
+  //! Changes the number of desktops.
+  /*!
+    @param num The number of desktops that should exist. This value must be
+               greater than 0 or it will be ignored.
+  */
+  void changeNumDesktops(long num);
+
 public:
 #ifndef SWIG
   //! Constructs a new OBScreen object
@@ -168,21 +183,6 @@ public:
   //! Raises/Lowers a client window above/below all others in its stacking
   //! layer
   void restack(bool raise, OBClient *client);
-
-  //! Changes to the specified desktop, displaying windows on it and hiding
-  //! windows on the others.
-  /*!
-    @param desktop The number of the desktop to switch to (starts from 0).
-    If the desktop is out of valid range, it is ignored.
-  */
-  void changeDesktop(long desktop);
-
-  //! Changes the number of desktops.
-  /*!
-    @param num The number of desktops that should exist. This value must be
-               greater than 0 or it will be ignored.
-  */
-  void changeNumDesktops(long num);
 
   //! Sets the name of a desktop
   /*!

@@ -8,6 +8,7 @@
 
 #include "otk/point.hh"
 #include "otk/rect.hh"
+#include "otk/property.hh"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -55,6 +56,7 @@ enum EventAction {
   EventCloseWindow,
   EventStartup,
   EventShutdown,
+  EventFocus,
   NUM_EVENTS
 };
 
@@ -141,6 +143,10 @@ PyObject *kbind(PyObject *keylist, ob::KeyContext context, PyObject *func);
 PyObject *ebind(ob::EventAction action, PyObject *func);
 
 void set_reset_key(const std::string &key);
+
+PyObject *send_client_msg(Window target, int type, Window about,
+                          long data, long data1 = 0, long data2 = 0,
+                          long data3 = 0, long data4 = 0);
 
 }
 

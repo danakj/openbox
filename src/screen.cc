@@ -564,19 +564,9 @@ void OBScreen::unmanageWindow(OBClient *client)
 
   // remove from the stacking order
   _stacking.remove(client);
-  
-  // pass around focus if this window was focused XXX do this better!
-  if (Openbox::instance->focusedClient() == client) {
-    OBClient *newfocus = 0;
-    OBClient::List::iterator it, end = _stacking.end();
-    for (it = _stacking.begin(); it != end; ++it)
-      if ((*it)->desktop() == _desktop && (*it)->normal() && (*it)->focus()) {
-        newfocus = *it;
-        break;
-      }
-    if (!newfocus)
-      client->unfocus();
-  }
+
+  // unfocus the client
+  client->unfocus();
 
   // remove from the wm's map
   Openbox::instance->removeClient(client->window());
@@ -669,6 +659,10 @@ void OBScreen::changeDesktop(long desktop)
       (*it)->frame->show();
     }
   }
+
+  // if nothing is focused, force the callbacks to fire
+//  if (!Openbox::instance->focusedClient())
+//    Openbox::instance->setFocusedClient(0);
 }
 
 void OBScreen::changeNumDesktops(long num)

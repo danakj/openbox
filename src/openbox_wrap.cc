@@ -1642,40 +1642,6 @@ static PyObject *_wrap_OBScreen_restack(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_OBScreen_changeDesktop(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    long arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Ol:OBScreen_changeDesktop",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->changeDesktop(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
-static PyObject *_wrap_OBScreen_changeNumDesktops(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
-    long arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Ol:OBScreen_changeNumDesktops",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBScreen,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->changeNumDesktops(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_OBScreen_setDesktopName(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBScreen *arg1 = (ob::OBScreen *) 0 ;
@@ -2530,23 +2496,6 @@ static PyObject *_wrap_OBClient_close(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject *_wrap_OBClient_setStackLayer(PyObject *self, PyObject *args) {
-    PyObject *resultobj;
-    ob::OBClient *arg1 = (ob::OBClient *) 0 ;
-    int arg2 ;
-    PyObject * obj0  = 0 ;
-    
-    if(!PyArg_ParseTuple(args,(char *)"Oi:OBClient_setStackLayer",&obj0,&arg2)) goto fail;
-    if ((SWIG_ConvertPtr(obj0,(void **) &arg1, SWIGTYPE_p_ob__OBClient,SWIG_POINTER_EXCEPTION | 0 )) == -1) SWIG_fail;
-    (arg1)->setStackLayer(arg2);
-    
-    Py_INCREF(Py_None); resultobj = Py_None;
-    return resultobj;
-    fail:
-    return NULL;
-}
-
-
 static PyObject *_wrap_OBClient_shade(PyObject *self, PyObject *args) {
     PyObject *resultobj;
     ob::OBClient *arg1 = (ob::OBClient *) 0 ;
@@ -2876,6 +2825,34 @@ static PyObject *_wrap_set_reset_key(PyObject *self, PyObject *args) {
 }
 
 
+static PyObject *_wrap_send_client_msg(PyObject *self, PyObject *args) {
+    PyObject *resultobj;
+    Window arg1 ;
+    int arg2 ;
+    Window arg3 ;
+    long arg4 ;
+    long arg5 = (long) 0 ;
+    long arg6 = (long) 0 ;
+    long arg7 = (long) 0 ;
+    long arg8 = (long) 0 ;
+    PyObject *result;
+    PyObject * obj0  = 0 ;
+    PyObject * obj2  = 0 ;
+    
+    if(!PyArg_ParseTuple(args,(char *)"OiOl|llll:send_client_msg",&obj0,&arg2,&obj2,&arg4,&arg5,&arg6,&arg7,&arg8)) goto fail;
+    arg1 = (Window) PyInt_AsLong(obj0);
+    if (PyErr_Occurred()) SWIG_fail;
+    arg3 = (Window) PyInt_AsLong(obj2);
+    if (PyErr_Occurred()) SWIG_fail;
+    result = (PyObject *)ob::send_client_msg(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+    
+    resultobj = result;
+    return resultobj;
+    fail:
+    return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { (char *)"Openbox_instance", _wrap_Openbox_instance, METH_VARARGS },
 	 { (char *)"Cursors_session_set", _wrap_Cursors_session_set, METH_VARARGS },
@@ -2924,8 +2901,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBScreen_manageWindow", _wrap_OBScreen_manageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_unmanageWindow", _wrap_OBScreen_unmanageWindow, METH_VARARGS },
 	 { (char *)"OBScreen_restack", _wrap_OBScreen_restack, METH_VARARGS },
-	 { (char *)"OBScreen_changeDesktop", _wrap_OBScreen_changeDesktop, METH_VARARGS },
-	 { (char *)"OBScreen_changeNumDesktops", _wrap_OBScreen_changeNumDesktops, METH_VARARGS },
 	 { (char *)"OBScreen_setDesktopName", _wrap_OBScreen_setDesktopName, METH_VARARGS },
 	 { (char *)"OBScreen_propertyHandler", _wrap_OBScreen_propertyHandler, METH_VARARGS },
 	 { (char *)"OBScreen_clientMessageHandler", _wrap_OBScreen_clientMessageHandler, METH_VARARGS },
@@ -2973,7 +2948,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"OBClient_move", _wrap_OBClient_move, METH_VARARGS },
 	 { (char *)"OBClient_resize", _wrap_OBClient_resize, METH_VARARGS },
 	 { (char *)"OBClient_close", _wrap_OBClient_close, METH_VARARGS },
-	 { (char *)"OBClient_setStackLayer", _wrap_OBClient_setStackLayer, METH_VARARGS },
 	 { (char *)"OBClient_shade", _wrap_OBClient_shade, METH_VARARGS },
 	 { (char *)"OBClient_focus", _wrap_OBClient_focus, METH_VARARGS },
 	 { (char *)"OBClient_unfocus", _wrap_OBClient_unfocus, METH_VARARGS },
@@ -2990,6 +2964,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"kbind", _wrap_kbind, METH_VARARGS },
 	 { (char *)"ebind", _wrap_ebind, METH_VARARGS },
 	 { (char *)"set_reset_key", _wrap_set_reset_key, METH_VARARGS },
+	 { (char *)"send_client_msg", _wrap_send_client_msg, METH_VARARGS },
 	 { NULL, NULL }
 };
 
@@ -3158,6 +3133,9 @@ static swig_const_info swig_const_table[] = {
 { SWIG_PY_INT,     (char *)"EventLeaveWindow", (long) ob::EventLeaveWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventNewWindow", (long) ob::EventNewWindow, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"EventCloseWindow", (long) ob::EventCloseWindow, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventStartup", (long) ob::EventStartup, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventShutdown", (long) ob::EventShutdown, 0, 0, 0},
+{ SWIG_PY_INT,     (char *)"EventFocus", (long) ob::EventFocus, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"NUM_EVENTS", (long) ob::NUM_EVENTS, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL", (long) 11, 0, 0, 0},
 { SWIG_PY_INT,     (char *)"X_PROTOCOL_REVISION", (long) 0, 0, 0, 0},

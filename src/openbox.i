@@ -15,7 +15,6 @@
 %}
 
 %include "stl.i"
-%include "exception.i"
 //%include std_list.i
 //%template(ClientList) std::list<OBClient*>;
 

@@ -359,6 +359,13 @@ void Openbox::setFocusedClient(OBClient *c)
                    otk::OBProperty::Atom_Window,
                    (c && _focused_screen == *it) ? c->window() : None);
   }
+
+  // call the python Focus callbacks
+  EventData *data = new_event_data(_focused_screen->number(),
+                                   c ? c->window() : 0,
+                                   EventFocus, 0);
+  Openbox::instance->bindings()->fireEvent(data);
+  Py_XDECREF((PyObject*)data);
 }
 
 void Openbox::execute(int screen, const std::string &bin)

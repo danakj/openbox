@@ -36,8 +36,13 @@
 #include "widget.hh"
 %}
 
-%include stl.i
+%include "stl.i"
 //%include std_list.i
+
+%ignore otk::OBDisplay::display;
+%inline %{
+  Display *OBDisplay_display() { return otk::OBDisplay::display; }
+%};
 
 namespace otk {
 %rename(setValue_bool) Configuration::setValue(std::string const &,bool);
@@ -99,3 +104,6 @@ namespace otk {
 %include "timerqueue.hh"
 %include "timerqueuemanager.hh"
 %include "util.hh"
+
+// for Mod1Mask etc
+%include "X11/X.h"

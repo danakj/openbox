@@ -658,8 +658,6 @@ void OBClient::setDesktop(long target)
   if (target == _desktop) return;
   
   printf("Setting desktop %ld\n", target);
-  assert(target >= 0 || target == (signed)0xffffffff);
-  //assert(target == 0xffffffff || target < MAX);
 
   if (!(target >= 0 || target == (signed)0xffffffff)) return;
   
@@ -670,8 +668,12 @@ void OBClient::setDesktop(long target)
                                      otk::OBProperty::Atom_Cardinal,
                                      (unsigned)_desktop);
   
-  
-  // XXX: move the window to the new desktop
+  // 'move' the window to the new desktop
+  if (_desktop == Openbox::instance->screen(_screen)->desktop() ||
+      _desktop == (signed)0xffffffff)
+    frame->show();
+  else
+    frame->hide();
 }
 
 
@@ -1063,21 +1065,6 @@ void OBClient::changeState()
                 otk::OBProperty::Atom_Atom, netstate, num);
 
   calcLayer();
-}
-
-
-void OBClient::setStackLayer(int l)
-{
-  if (l == 0)
-    _above = _below = false;  // normal
-  else if (l > 0) {
-    _above = true;
-    _below = false; // above
-  } else {
-    _above = false;
-    _below = true;  // below
-  }
-  changeState();
 }
 
 

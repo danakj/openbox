@@ -370,6 +370,7 @@ void python_init(char *argv0)
   init_openbox();
   PyRun_SimpleString("from _otk import *; from _openbox import *;");
   PyRun_SimpleString("openbox = Openbox_instance()");
+  PyRun_SimpleString("display = OBDisplay_display()");
 
   /* XXX
      sys.path.append('stuff')
@@ -552,6 +553,34 @@ void kunbind_all()
 void set_reset_key(const std::string &key)
 {
   ob::Openbox::instance->bindings()->setResetKey(key);
+}
+
+PyObject *send_client_msg(Window target, int type, Window about,
+                          long data, long data1, long data2,
+                          long data3, long data4)
+{
+  if (type < 0 || type >= otk::OBProperty::NUM_ATOMS) {
+      PyErr_SetString(PyExc_TypeError,
+                     "Invalid atom type. Must be from otk::OBProperty::Atoms");
+      return NULL;
+  }
+  
+  XEvent e;
+  e.xclient.type = ClientMessage;
+  e.xclient.format = 32;
+  e.xclient.message_type =
+    Openbox::instance->property()->atom((otk::OBProperty::Atoms)type);
+  e.xclient.window = about;
+  e.xclient.data.l[0] = data;
+  e.xclient.data.l[1] = data1;
+  e.xclient.data.l[2] = data2;
+  e.xclient.data.l[3] = data3;
+  e.xclient.data.l[4] = data4;
+
+  XSendEvent(otk::OBDisplay::display, target, false,
+             SubstructureRedirectMask | SubstructureNotifyMask,
+             &e);
+  Py_INCREF(Py_None); return Py_None;
 }
 
 }

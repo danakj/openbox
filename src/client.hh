@@ -335,11 +335,12 @@ private:
   
   //! Sets the wm_state to the specified value
   void setWMState(long state);
-  //! Sends the window to the specified desktop
-  void setDesktop(long desktop);
   //! Adjusts the window's net_state
   void setState(StateAction action, long data1, long data2);
 
+  //! Sends the window to the specified desktop
+  void setDesktop(long desktop);
+  
   //! Calculates the stacking layer for the client window
   void calcLayer();
 
@@ -368,7 +369,7 @@ public:
 #ifndef SWIG
   //! Constructs a new OBClient object around a specified window id
   /*!
-    @param window The window id that the OBClient class should handle
+BB    @param window The window id that the OBClient class should handle
     @param screen The screen on which the window resides
   */
   OBClient(int screen, Window window);
@@ -505,15 +506,6 @@ public:
   //! Request the client to close its window.
   void close();
 
-  //! Sets the window's stacking layer
-  /*!
-    @param l An integer specifying the layer.<br>
-    '0' - the normal layer<br>
-    '> 0' - the 'above' layer<br>
-    '< 0' - the 'below' layer
-  */
-  void setStackLayer(int l);
-  
   //! Shades or unshades the client window
   /*!
     @param shade true if the window should be shaded; false if it should be

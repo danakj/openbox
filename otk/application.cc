@@ -56,8 +56,9 @@ void OtkApplication::loadStyle(void)
 void OtkApplication::exec(void)
 {
   if (!_main_widget) {
-    std::cerr << "No main widget set. You must create a main OtkWidget for " <<
-      "the OtkApplication before calling OtkApplication::exec().\n";
+    std::cerr << "ERROR: No main widget set. You must create a main " <<
+      "OtkWidget for the OtkApplication before calling " <<
+      "OtkApplication::exec().\n";
     ::exit(1);
   }
   while (1) {
@@ -70,8 +71,8 @@ bool OtkApplication::setMainWidget(const OtkWidget *main_widget)
 {
   // ignore it if it has already been set
   if (_main_widget) {
-    std::cerr << "More than one main OtkWidget being created for the " <<
-      "OtkApplication!\n";
+    std::cerr << "WARNING: More than one main OtkWidget being created for " <<
+      "the OtkApplication!\n";
     return false;
   }
 

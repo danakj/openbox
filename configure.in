@@ -173,7 +173,7 @@ AC_ARG_ENABLE(debug,
   [  --enable-debug          include verbose debugging code [default=no]],
   if test x$enableval = "xyes"; then
     AC_MSG_RESULT([yes])
-    DEBUG="-DDEBUG -Wall -W"
+    DEBUG="-DDEBUG -Wall -W -fno-inline"
   else
     AC_MSG_RESULT([no])
     DEBUG="-DNDEBUG"

@@ -4,8 +4,8 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
-sh autoheader
 sh aclocal
+sh autoheader
 sh autoconf
 sh automake --foreign --include-deps --add-missing
 

@@ -1186,14 +1186,14 @@ void client_setup_decor_and_functions(ObClient *self)
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
-	self->functions &= ~OB_CLIENT_FUNC_SHADE;
+        self->functions &= ~OB_CLIENT_FUNC_SHADE;
 
     /* now we need to check against rules for the client's current state */
     if (self->fullscreen) {
-	self->functions &= (OB_CLIENT_FUNC_CLOSE |
+        self->functions &= (OB_CLIENT_FUNC_CLOSE |
                             OB_CLIENT_FUNC_FULLSCREEN |
                             OB_CLIENT_FUNC_ICONIFY);
-	self->decorations = 0;
+        self->decorations = 0;
     }
 
     client_change_allowed_actions(self);

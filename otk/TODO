@@ -1,8 +1,15 @@
 * make OtkButton do pixmaps
 
+* OtkMenu
+        this can wait, probably
+
 * OtkWidget
         see about focus()
         focus() on widgets means 'highlight', not take Focus. solve this mess
+
+* OtkTextWidget
+        widget that holds text that can be justified and whatnot
+        the button should prolly be modified to subclass this
 
 * OtkEventHandler
         make widget inherit from this

@@ -51,7 +51,7 @@ AC_SUBST(XML_LIBS)
 
 PKG_CHECK_MODULES(LIBSN, [libstartup-notification-1.0],
   [
-    AC_DEFINE(USE_LIBSN)
+    AC_DEFINE(USE_LIBSN, [1], [Use startup-notification])
     AC_SUBST(LIBSN_CFLAGS)
     AC_SUBST(LIBSN_LIBS)
   ],

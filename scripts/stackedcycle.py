@@ -9,8 +9,11 @@ INCLUDE_ALL_DESKTOPS = 0
 """If this is non-zero then windows from all desktops will be included in
    the stacking list."""
 INCLUDE_ICONS = 1
-"""If this is non-zero then windows which are iconified will be included
-   in the stacking list."""
+"""If this is non-zero then windows which are iconified on the current desktop
+   will be included in the stacking list."""
+INCLUDE_ICONS_ALL_DESKTOPS = 1
+"""If this is non-zero then windows which are iconified from all desktops
+   will be included in the stacking list."""
 INCLUDE_OMNIPRESENT = 1
 """If this is non-zero then windows which are on all-desktops at once will
    be included."""
@@ -72,7 +75,11 @@ class _cycledata:
         if not (client.canFocus() or client.focusNotify()): return 0
         if focus.AVOID_SKIP_TASKBAR and client.skipTaskbar(): return 0
 
-        if INCLUDE_ICONS and client.iconic(): return 1
+        if client.iconic():
+            if INCLUDE_ICONS:
+                if INCLUDE_ICONS_ALL_DESKTOPS: return 1
+                if desk == curdesk: return 1
+            return 0
         if INCLUDE_OMNIPRESENT and desk == 0xffffffff: return 1
         if INCLUDE_ALL_DESKTOPS: return 1
         if desk == curdesk: return 1

@@ -55,6 +55,8 @@ OtkWidget::~OtkWidget()
   if (_visible)
     hide();
 
+  _event_dispatcher->clearHandler(_window);
+
   std::for_each(_children.begin(), _children.end(), PointerAssassin());
 
   if (_parent)

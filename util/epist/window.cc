@@ -219,9 +219,11 @@ void XWindow::iconify() const {
 
 
 void XWindow::focus() const {
-  // this will also unshade the window..
+  // this will cause the window to be uniconified also
   _xatom->sendClientMessage(_screen->rootWindow(), XAtom::net_active_window,
                             _window);
+ 
+  //XSetInputFocus(_epist->getXDisplay(), _window, None, CurrentTime);
 }
 
 

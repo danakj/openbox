@@ -15,8 +15,6 @@ const unsigned int OBActions::DOUBLECLICKDELAY = 300;
 OBActions::OBActions()
   : _button(0), _enter_win(0)
 {
-  for (int i = 0; i < 2; ++i)
-    _presses[i] = new MousePressAction();
 
   // XXX: load a configuration out of somewhere
 
@@ -25,17 +23,6 @@ OBActions::OBActions()
 
 OBActions::~OBActions()
 {
-}
-
-
-void OBActions::insertPress(Window win, unsigned int button, Time time)
-{
-  MousePressAction *a = _presses[1];
-  _presses[1] = _presses[0];
-  _presses[0] = a;
-  a->win = win;
-  a->button = button;
-  a->time = time;
 }
 
 
@@ -48,8 +35,6 @@ void OBActions::buttonPressHandler(const XButtonEvent &e)
   if (_button) return; // won't count toward CLICK events
 
   _button = e.button;
-
-  insertPress(e.window, e.button, e.time);
 }
   
 
@@ -60,7 +45,7 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
          (long)e.window, e.state, e.button, e.time);
 
   // not for the button we're watching?
-  if (_button && _button != e.button) return;
+  if (_button != e.button) return;
 
   _button = 0;
 
@@ -77,14 +62,22 @@ void OBActions::buttonReleaseHandler(const XButtonEvent &e)
   printf("GUILE: CLICK: win %lx modifiers %u button %u time %lx\n",
          (long)e.window, e.state, e.button, e.time);
 
-  if (_presses[0]->win == _presses[1]->win &&
-      _presses[0]->button == _presses[1]->button &&
-      e.time - _presses[1]->time < DOUBLECLICKDELAY) {
+  if (e.time - _release.time < DOUBLECLICKDELAY &&
+      _release.win == e.window && _release.button == e.button) {
 
     // XXX: run the DOUBLECLICK guile hook
     printf("GUILE: DOUBLECLICK: win %lx modifiers %u button %u time %lx\n",
            (long)e.window, e.state, e.button, e.time);
 
+    // reset so you cant triple click for 2 doubleclicks
+    _release.win = 0;
+    _release.button = 0;
+    _release.time = 0;
+  } else {
+    // save the button release, might be part of a double click
+    _release.win = e.window;
+    _release.button = e.button;
+    _release.time = e.time;
   }
 }
 

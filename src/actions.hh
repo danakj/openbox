@@ -20,22 +20,19 @@ namespace ob {
 */
 class OBActions : public otk::OtkEventHandler {
 public:
-  struct MousePressAction {
+  struct MouseButtonAction {
     Window win;
     unsigned int button;
     Time time;
-    MousePressAction() { win = 0; button = 0; time = 0; }
+    MouseButtonAction() { win = 0; button = 0; time = 0; }
   };
   
 private:
   // milliseconds XXX: config option
   static const unsigned int DOUBLECLICKDELAY;
   
-  //! The last 2 button presses processed for CLICKs
-  /*!
-    Inserted such that index 0 is the latest action.
-  */
-  MousePressAction *_presses[2];
+  //! The last 2 button release processed for CLICKs
+  MouseButtonAction _release;
   //! The mouse button currently being watched from a press for a CLICK
   unsigned int _button;
   //! The window the last enter action occured on (where the mouse is located)

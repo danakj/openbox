@@ -52,12 +52,112 @@ static void sn_event_func(SnMonitorEvent *event, void *data);
 
 static void set_root_cursor();
 
+static gboolean replace_wm()
+{
+    char *wm_sn;
+    Atom wm_sn_atom;
+    Window current_wm_sn_owner;
+    Time timestamp;
+
+    wm_sn = g_strdup_printf("WM_S%d", ob_screen);
+    wm_sn_atom = XInternAtom(ob_display, wm_sn, FALSE);
+
+    current_wm_sn_owner = XGetSelectionOwner(ob_display, wm_sn_atom);
+    if (current_wm_sn_owner) {
+        if (!ob_replace_wm) {
+            g_message("A window manager is already running on screen %d",
+                      ob_screen);
+            return FALSE;
+        }
+        xerror_set_ignore(TRUE);
+        xerror_occured = FALSE;
+
+        /* We want to find out when the current selection owner dies */
+        XSelectInput(ob_display, current_wm_sn_owner, StructureNotifyMask);
+        XSync(ob_display, FALSE);
+
+        xerror_set_ignore(FALSE);
+        if (xerror_occured)
+            current_wm_sn_owner = None;
+    }
+
+    {
+        /* Generate a timestamp */
+        XEvent event;
+
+        XSelectInput(ob_display, screen_support_win, PropertyChangeMask);
+
+        XChangeProperty(ob_display, screen_support_win,
+                        prop_atoms.wm_class, prop_atoms.string,
+                        8, PropModeAppend, NULL, 0);
+        XWindowEvent(ob_display, screen_support_win,
+                     PropertyChangeMask, &event);
+
+        XSelectInput(ob_display, screen_support_win, NoEventMask);
+
+        timestamp = event.xproperty.time;
+    }
+
+    XSetSelectionOwner(ob_display, wm_sn_atom, screen_support_win,
+                       timestamp);
+
+    if (XGetSelectionOwner(ob_display, wm_sn_atom) != screen_support_win) {
+        g_message("Could not acquire window manager selection on screen %d",
+                  ob_screen);
+        return FALSE;
+    }
+
+    /* Wait for old window manager to go away */
+    if (current_wm_sn_owner) {
+      XEvent event;
+      gulong wait = 0;
+      const gulong timeout = G_USEC_PER_SEC * 15; /* wait for 15s max */
+
+      while (wait < timeout) {
+          if (XCheckWindowEvent(ob_display, current_wm_sn_owner,
+                                StructureNotifyMask, &event) &&
+              event.type == DestroyNotify)
+              break;
+          g_usleep(G_USEC_PER_SEC / 10);
+          wait += G_USEC_PER_SEC / 10;
+      }
+
+      if (wait >= timeout) {
+          g_message("Timeout expired while waiting for the current WM to die "
+                    "on screen %d", ob_screen);
+          return FALSE;
+      }
+    }
+
+    /* Send client message indicating that we are now the WM */
+    prop_message(RootWindow(ob_display, ob_screen), prop_atoms.manager,
+                 timestamp, wm_sn_atom, 0, 0, SubstructureNotifyMask);
+
+
+    return TRUE;
+}
+
 gboolean screen_annex()
 {
     XSetWindowAttributes attrib;
     pid_t pid;
     gint i, num_support;
     guint32 *supported;
+
+    /* create the netwm support window */
+    attrib.override_redirect = TRUE;
+    screen_support_win = XCreateWindow(ob_display,
+                                       RootWindow(ob_display, ob_screen),
+                                       -100, -100, 1, 1, 0,
+                                       CopyFromParent, InputOutput,
+                                       CopyFromParent,
+                                       CWOverrideRedirect, &attrib);
+    XMapRaised(ob_display, screen_support_win);
+
+    if (!replace_wm()) {
+        XDestroyWindow(ob_display, screen_support_win);
+        return FALSE;
+    }
 
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;
@@ -67,6 +167,8 @@ gboolean screen_annex()
     if (xerror_occured) {
         g_message("A window manager is already running on screen %d",
                   ob_screen);
+
+        XDestroyWindow(ob_display, screen_support_win);
 	return FALSE;
     }
 
@@ -79,16 +181,6 @@ gboolean screen_annex()
     pid = getpid();
     PROP_SET32(RootWindow(ob_display, ob_screen),
                openbox_pid, cardinal, pid);
-
-    /* create the netwm support window */
-    attrib.override_redirect = TRUE;
-    screen_support_win = XCreateWindow(ob_display,
-                                       RootWindow(ob_display, ob_screen),
-                                       -100, -100, 1, 1, 0,
-                                       CopyFromParent, InputOutput,
-                                       CopyFromParent,
-                                       CWOverrideRedirect, &attrib);
-    XMapRaised(ob_display, screen_support_win);
 
     /* set supporting window */
     PROP_SET32(RootWindow(ob_display, ob_screen),

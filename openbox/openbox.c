@@ -59,14 +59,15 @@ RrInstance *ob_rr_inst;
 RrTheme    *ob_rr_theme;
 Display    *ob_display;
 gint        ob_screen;
-Cursor      ob_cursors[OB_NUM_CURSORS];
-KeyCode     ob_keys[OB_NUM_KEYS];
+gboolean    ob_replace_wm;
 
 static ObState   state;
 static gboolean  xsync;
 static gboolean  shutdown;
 static gboolean  restart;
 static char     *restart_path;
+static Cursor    cursors[OB_NUM_CURSORS];
+static KeyCode   keys[OB_NUM_KEYS];
 
 static void signal_handler(const ObEvent *e, void *data);
 static void parse_args(int argc, char **argv);
@@ -169,41 +170,41 @@ int main(int argc, char **argv)
     putenv(g_strdup_printf("DISPLAY=%s", DisplayString(ob_display)));
 
     /* create available cursors */
-    ob_cursors[OB_CURSOR_POINTER] =
+    cursors[OB_CURSOR_POINTER] =
         XCreateFontCursor(ob_display, XC_left_ptr);
-    ob_cursors[OB_CURSOR_BUSY] =
+    cursors[OB_CURSOR_BUSY] =
         XCreateFontCursor(ob_display, XC_watch);
-    ob_cursors[OB_CURSOR_MOVE] =
+    cursors[OB_CURSOR_MOVE] =
         XCreateFontCursor(ob_display, XC_fleur);
-    ob_cursors[OB_CURSOR_NORTH] =
+    cursors[OB_CURSOR_NORTH] =
         XCreateFontCursor(ob_display, XC_top_side);
-    ob_cursors[OB_CURSOR_NORTHEAST] =
+    cursors[OB_CURSOR_NORTHEAST] =
         XCreateFontCursor(ob_display, XC_top_right_corner);
-    ob_cursors[OB_CURSOR_EAST] =
+    cursors[OB_CURSOR_EAST] =
         XCreateFontCursor(ob_display, XC_right_side);
-    ob_cursors[OB_CURSOR_SOUTHEAST] =
+    cursors[OB_CURSOR_SOUTHEAST] =
         XCreateFontCursor(ob_display, XC_bottom_right_corner);
-    ob_cursors[OB_CURSOR_SOUTH] =
+    cursors[OB_CURSOR_SOUTH] =
         XCreateFontCursor(ob_display, XC_bottom_side);
-    ob_cursors[OB_CURSOR_SOUTHWEST] =
+    cursors[OB_CURSOR_SOUTHWEST] =
         XCreateFontCursor(ob_display, XC_bottom_left_corner);
-    ob_cursors[OB_CURSOR_WEST] =
+    cursors[OB_CURSOR_WEST] =
         XCreateFontCursor(ob_display, XC_left_side);
-    ob_cursors[OB_CURSOR_NORTHWEST] =
+    cursors[OB_CURSOR_NORTHWEST] =
         XCreateFontCursor(ob_display, XC_top_left_corner);
 
     /* create available keycodes */
-    ob_keys[OB_KEY_RETURN] =
+    keys[OB_KEY_RETURN] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Return"));
-    ob_keys[OB_KEY_ESCAPE] =
+    keys[OB_KEY_ESCAPE] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Escape"));
-    ob_keys[OB_KEY_LEFT] =
+    keys[OB_KEY_LEFT] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Left"));
-    ob_keys[OB_KEY_RIGHT] =
+    keys[OB_KEY_RIGHT] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Right"));
-    ob_keys[OB_KEY_UP] =
+    keys[OB_KEY_UP] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Up"));
-    ob_keys[OB_KEY_DOWN] =
+    keys[OB_KEY_DOWN] =
         XKeysymToKeycode(ob_display, XStringToKeysym("Down"));
 
     prop_startup(); /* get atoms values for the display */
@@ -503,6 +504,8 @@ static void print_help()
     g_print("  --sm-client-id ID  Specify session management ID\n");
     g_print("  --sm-disable       Disable connection to session manager\n");
 #endif
+    g_print("  --replace          Replace the currently running window "
+            "manager\n");
     g_print("  --help             Display this help and exit\n");
     g_print("  --version          Display the version and exit\n");
     g_print("  --sync             Run in synchronous mode (this is slow and\n"
@@ -523,6 +526,8 @@ static void parse_args(int argc, char **argv)
             exit(0);
         } else if (!strcmp(argv[i], "--g-fatal-warnings")) {
             g_log_set_always_fatal(G_LOG_LEVEL_CRITICAL);
+        } else if (!strcmp(argv[i], "--replace")) {
+            ob_replace_wm = TRUE;
         } else if (!strcmp(argv[i], "--sync")) {
             xsync = TRUE;
 #ifdef USE_SM
@@ -594,13 +599,13 @@ void ob_exit()
 Cursor ob_cursor(ObCursor cursor)
 {
     g_assert(cursor < OB_NUM_CURSORS);
-    return ob_cursors[cursor];
+    return cursors[cursor];
 }
 
 KeyCode ob_keycode(ObKey key)
 {
     g_assert(key < OB_NUM_KEYS);
-    return ob_keys[key];
+    return keys[key];
 }
 
 ObState ob_state()

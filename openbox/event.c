@@ -186,6 +186,9 @@ static Window event_get_window(XEvent *e)
 
     /* pick a window */
     switch (e->type) {
+    case SelectionClear:
+        window = RootWindow(ob_display, ob_screen);
+        break;
     case MapRequest:
 	window = e->xmap.window;
 	break;
@@ -548,6 +551,11 @@ static void event_handle_root(XEvent *e)
     Atom msgtype;
      
     switch(e->type) {
+    case SelectionClear:
+        g_message("Another WM has requested to replace us. Exiting.");
+        ob_exit();
+        break;
+
     case ClientMessage:
 	if (e->xclient.format != 32) break;
 

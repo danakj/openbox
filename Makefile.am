@@ -48,6 +48,9 @@ render_libobrender_la_LIBADD = \
 	$(XFT_LIBS) \
 	$(GLIB_LIBS) \
 	parser/libobparser.la
+render_libobrender_la_LDFLAGS = \
+	-release $(LT_RELEASE) \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 render_libobrender_la_SOURCES = \
 	gettext.h \
 	render/color.h \
@@ -81,6 +84,9 @@ parser_libobparser_la_CPPFLAGS = \
 parser_libobparser_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
+parser_libobparser_la_LDFLAGS = \
+	-release $(LT_RELEASE) \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 parser_libobparser_la_SOURCES = \
 	parser/parse.h \
 	parser/parse.c

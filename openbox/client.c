@@ -300,8 +300,8 @@ void client_unmanage(Client *client)
 	g_free(client->icons);
     g_free(client->title);
     g_free(client->icon_title);
-    g_free(client->res_name);
-    g_free(client->res_class);
+    g_free(client->name);
+    g_free(client->class);
     g_free(client->role);
     g_free(client);
      
@@ -384,7 +384,7 @@ static void client_get_all(Client *self)
     /* defaults */
     self->frame = NULL;
     self->title = self->icon_title = NULL;
-    self->res_name = self->res_class = self->role = NULL;
+    self->name = self->class = self->role = NULL;
     self->wmstate = NormalState;
     self->transient = FALSE;
     self->transients = NULL;
@@ -1013,19 +1013,19 @@ void client_update_class(Client *self)
     gchar *s;
     guint i;
 
-    if (self->res_name) g_free(self->res_name);
-    if (self->res_class) g_free(self->res_class);
+    if (self->name) g_free(self->name);
+    if (self->class) g_free(self->class);
     if (self->role) g_free(self->role);
 
-    self->res_name = self->res_class = self->role = NULL;
+    self->name = self->class = self->role = NULL;
 
     data = g_ptr_array_new();
      
     if (PROP_GETSA(self->window, wm_class, string, data)) {
 	if (data->len > 0)
-	    self->res_name = g_strdup(g_ptr_array_index(data, 0));
+	    self->name = g_strdup(g_ptr_array_index(data, 0));
 	if (data->len > 1)
-	    self->res_class = g_strdup(g_ptr_array_index(data, 1));
+	    self->class = g_strdup(g_ptr_array_index(data, 1));
     }
      
     for (i = 0; i < data->len; ++i)
@@ -1035,8 +1035,8 @@ void client_update_class(Client *self)
     if (PROP_GETS(self->window, wm_window_role, string, s))
 	self->role = g_strdup(s);
 
-    if (self->res_name == NULL) self->res_name = g_strdup("");
-    if (self->res_class == NULL) self->res_class = g_strdup("");
+    if (self->name == NULL) self->name = g_strdup("");
+    if (self->class == NULL) self->class = g_strdup("");
     if (self->role == NULL) self->role = g_strdup("");
 }
 

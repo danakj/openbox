@@ -132,9 +132,9 @@ typedef struct Client {
     gchar *icon_title;
 
     /*! The application that created the window */
-    gchar *res_name;
+    gchar *name;
     /*! The class of the window, can used for grouping */
-    gchar *res_class;
+    gchar *class;
     /*! The specified role of the window, used for identification */
     gchar *role;
 

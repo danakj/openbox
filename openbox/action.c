@@ -92,6 +92,7 @@ Action *action_from_string(char *name)
         a = action_new(action_toggle_maximize_vert);
     } else if (!g_ascii_strcasecmp(name, "sendtodesktop")) {
         a = action_new(action_send_to_desktop);
+        a->data.sendto.follow = TRUE;
     } else if (!g_ascii_strcasecmp(name, "sendtonextdesktop")) {
         a = action_new(action_send_to_next_desktop);
         a->data.sendtonextprev.wrap = FALSE;
@@ -365,10 +366,14 @@ void action_toggle_maximize_vert(union ActionData *data)
 
 void action_send_to_desktop(union ActionData *data)
 {
-    if (data->desktop.c)
-        if (data->desktop.desk < screen_num_desktops ||
-            data->desktop.desk == DESKTOP_ALL)
-            client_set_desktop(data->desktop.c, data->desktop.desk, TRUE);
+    if (data->sendto.c) {
+        if (data->sendto.desk < screen_num_desktops ||
+            data->sendto.desk == DESKTOP_ALL) {
+            client_set_desktop(data->desktop.c,
+                               data->sendto.desk, data->sendto.follow);
+            if (data->sendto.follow) screen_set_desktop(data->sendto.desk);
+        }
+    }
 }
 
 void action_send_to_next_desktop(union ActionData *data)

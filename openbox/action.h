@@ -26,6 +26,12 @@ struct MoveResizeRelative {
     int delta;
 };
 
+struct SendToDesktop {
+    Client *c;
+    guint desk;
+    gboolean follow;
+};
+
 struct SendToNextPreviousDesktop {
     Client *c;
     gboolean wrap;
@@ -67,6 +73,7 @@ union ActionData {
     struct Execute execute;
     struct ClientAction client;
     struct MoveResizeRelative relative;
+    struct SendToDesktop sendto;
     struct SendToNextPreviousDesktop sendtonextprev;
     struct Desktop desktop;
     struct NextPreviousDesktop nextprevdesktop;
@@ -155,7 +162,7 @@ void action_maximize_vert(union ActionData *data);
 void action_unmaximize_vert(union ActionData *data);
 /* ClientAction */
 void action_toggle_maximize_vert(union ActionData *data);
-/* Desktop */
+/* SendToDesktop */
 void action_send_to_desktop(union ActionData *data);
 /* SendToNextPreviousDesktop */
 void action_send_to_next_desktop(union ActionData *data);

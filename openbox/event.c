@@ -674,22 +674,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (client != focus_client) {
             focus_set_client(client);
             frame_adjust_focus(client->frame, TRUE);
+            client_calc_layer(client);
         }
         break;
     case FocusOut:
 #ifdef DEBUG_FOCUS
         ob_debug("FocusOut on client for %lx\n", client->window);
 #endif
-        /* are we a fullscreen window or a transient of one? (checks layer)
-           if we are then we need to be iconified since we are losing focus
-         */
-        if (client->layer == OB_STACKING_LAYER_FULLSCREEN && !client->iconic &&
-            !client_search_focus_tree_full(client))
-            /* iconify fullscreen windows when they and their transients
-               aren't focused */
-            client_iconify(client, TRUE, TRUE);
         frame_adjust_focus(client->frame, FALSE);
-	break;
+        client_calc_layer(client);
+        break;
     case LeaveNotify:
         con = frame_context(client, e->xcrossing.window);
         switch (con) {

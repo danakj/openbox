@@ -223,8 +223,13 @@ void event_process(XEvent *e)
     case FocusIn:
         g_message("FocusIn on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
+        /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
+           because of RevertToPointerRoot. If the focus ends up reverting to
+           pointer root on a workspace change, then the FocusIn event that we
+           want will be of type NotifyAncestor. This situation does not occur
+           for FocusOut, so it is safely ignored there.
+        */
 	if (e->xfocus.detail == NotifyInferior ||
-            /*e->xfocus.detail == NotifyAncestor ||*/
             e->xfocus.detail > NotifyNonlinearVirtual) return;
             g_message("FocusIn on %lx", window);
         break;

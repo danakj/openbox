@@ -95,7 +95,7 @@ def _do_move():
             _poplabel = otk.Label(_popwidget)
             _poplabel.setTexture(style.labelFocusBackground())
             _popwidget.show(1)
-        _poplabel.resize(length, font.height())
+        _poplabel.fitString(text)
         _poplabel.setText(text)
         area = otk.display.screenInfo(_screen).rect()
         _popwidget.update() 

@@ -559,11 +559,14 @@ void Blackbox::process_event(XEvent *e) {
   }
 
   case FocusIn: {
-    if (e->xfocus.detail != NotifyNonlinear) {
+    if (e->xfocus.detail != NotifyNonlinear &&
+        e->xfocus.detail != NotifyAncestor) {
       /*
         don't process FocusIns when:
         1. the new focus window isn't an ancestor or inferior of the old
         focus window (NotifyNonlinear)
+        make sure to allow the FocusIn when the old focus window was an
+        ancestor but didn't have a parent, such as root (NotifyAncestor)
       */
       break;
     }

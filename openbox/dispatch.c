@@ -22,10 +22,7 @@ void dispatch_startup()
         j >>= 1;
         ++i;
     }
-    funcs = g_new(GSList*, i);
-
-    for (i = 0, j = 1; j < EVENT_RANGE; ++i, j <<= 1)
-        funcs[i] = NULL;
+    funcs = g_new0(GSList*, i);
 }
 
 void dispatch_shutdown()

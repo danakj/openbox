@@ -94,10 +94,8 @@ void RrPaint(struct RrSurface *sur, int recurse_always)
     glMatrixMode(GL_MODELVIEW);
     glViewport(0, 0, RrSurfaceWidth(sur), RrSurfaceHeight(sur));
 */
-
     glPushMatrix();
     glTranslatef(-RrSurfaceX(sur), -RrSurfaceY(sur), 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     p = sur;
     surx = sury = 0;

@@ -10,7 +10,7 @@ AC_DEFUN([PYTHON_DEVEL],
   python_prefix=${PYTHON%/bin*}
 
   # Check for Python include path
-  AC_MSG_CHECKING([for Python include path])
+  AC_MSG_CHECKING([for python include path])
   for i in "$python_prefix/include/python$PYTHON_VERSION/" \
            "$python_prefix/include/python/" "$python_prefix/"
   do
@@ -26,12 +26,12 @@ AC_DEFUN([PYTHON_DEVEL],
   then
     AC_MSG_RESULT([$python_path])
   else
-    AC_MSG_ERROR([cannot find Python include path])
+    AC_MSG_ERROR([cannot find python include path])
   fi
   AC_SUBST([PYTHON_CFLAGS], [-I$python_path])
 
   # Check for a Python library
-  AC_MSG_CHECKING([for Python library])
+  AC_MSG_CHECKING([for python library])
   PYLIB=""
   for i in "$python_prefix/lib" \
            "$python_prefix/lib/python$PYTHON_VERSION/config" \
@@ -61,7 +61,7 @@ AC_DEFUN([PYTHON_DEVEL],
   then
     AC_MSG_RESULT([$PYLIB])
   else
-    AC_MSG_ERROR([cannot find Python library])
+    AC_MSG_ERROR([cannot find python library])
   fi
   AC_SUBST([PYTHON_LIBS])
 ])

@@ -43,13 +43,14 @@ AC_DEFUN([XFT_ERROR],
 AC_DEFUN([XFT_DEVEL],
 [
   AC_REQUIRE([X11_DEVEL])
-
+  
   if test "$1"; then
-    XFT_MIN=$1
+    XFT_MIN="$1"
     XFT_MIN_MAJOR=${XFT_MIN%.*.*}
     XFT_MIN_MINOR=${XFT_MIN%.*}
     XFT_MIN_MINOR=${XFT_MIN_MINOR#*.}
     XFT_MIN_REVISION=${XFT_MIN#*.*.}
+    XFT_MIN="$XFT_MIN_MAJOR.$XFT_MIN_MINOR.$XFT_MIN_REVISION"
   else
     XFT_MIN=""
   fi
@@ -165,4 +166,124 @@ AC_DEFUN([XFT_DEVEL],
 
   AC_SUBST([XFT_CFLAGS])
   AC_SUBST([XFT_LIBS])
+])
+
+
+# X11_EXT_XKB()
+#
+# Check for the presence of the "Xkb" X Window System extension.
+# Defines "XKB" and sets the $(XKB) variable to "yes" if the extension is
+# present.
+AC_DEFUN([X11_EXT_XKB],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  AC_CHECK_LIB([X11], [XkbBell],
+    AC_MSG_CHECKING([for X11/XKBlib.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/XKBlib.h>
+    ],
+    [
+      Display *d;
+      Window w;
+      XkbBell(d, w, 0, 0);
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      XKB="yes"
+      AC_DEFINE([XKB], [1], [Found the XKB extension])
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      XKB="no"
+    ])
+  )
+  AC_MSG_CHECKING([for the Xkb extension])
+  if test "$XKB" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+# X11_EXT_SHAPE()
+#
+# Check for the presence of the "Shape" X Window System extension.
+# Defines "SHAPE", sets the $(SHAPE) variable to "yes", and sets the $(LIBS)
+# appropriately if the extension is present.
+AC_DEFUN([X11_EXT_SHAPE],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  AC_CHECK_LIB([Xext], [XShapeCombineShape],
+    AC_MSG_CHECKING([for X11/extensions/shape.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/extensions/shape.h>
+    ],
+    [
+      long foo = ShapeSet;
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      SHAPE="yes"
+      AC_DEFINE([SHAPE], [1], [Found the XShape extension])
+      LIBS="$LIBS -lXext"
+    ],
+    [ 
+      AC_MSG_RESULT([no])
+      SHAPE="no"
+    ])
+  )
+  AC_MSG_CHECKING([for the Shape extension])
+  if test "$SHAPE" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+
+# X11_EXT_XINERAMA()
+#
+# Check for the presence of the "Xinerama" X Window System extension.
+# Defines "XINERAMA", sets the $(XINERAMA) variable to "yes", and sets the
+# $(LIBS) appropriately if the extension is present.
+AC_DEFUN([X11_EXT_XINERAMA],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
+  [
+    AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/extensions/Xinerama.h>
+    ],
+    [
+      XineramaScreenInfo foo;
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      XINERAMA="yes"
+      AC_DEFINE([XINERAMA], [1], [Enable support of the Xinerama extension])
+      LIBS="$LIBS -lXinerama"
+    ],
+    [
+      AC_MSG_RESULT([no])
+      XINERAMA="no"
+    ])
+  ])
+  AC_MSG_CHECKING([for the Xinerama extension])
+  if test "$XINERAMA" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
 ])

@@ -30,8 +30,9 @@ void focus_set_client(struct Client *client);
 /*! Call this when you need to focus something! */
 void focus_fallback(gboolean switching_desks);
 
-/*! Cycle focus amongst windows */
-void focus_cycle(gboolean forward, gboolean linear, gboolean done,
-                 gboolean cancel);
+/*! Cycle focus amongst windows
+  Returns the Client to which focus has been cycled, or NULL if none. */
+struct Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
+                           gboolean cancel);
 
 #endif

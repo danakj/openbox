@@ -3,6 +3,7 @@
 #include "client.h"
 #include "frame.h"
 #include "screen.h"
+#include "group.h"
 #include "prop.h"
 #include "dispatch.h"
 #include "focus.h"
@@ -185,6 +186,21 @@ void focus_fallback(gboolean switching_desks)
         return;
     }
 
+    if (old && old->transient_for) {
+        if (old->transient_for == TRAN_GROUP) {
+            for (it = focus_order[screen_desktop]; it != NULL; it = it->next) {
+                GSList *sit;
+
+                for (sit = old->group->members; sit; sit = sit->next)
+                    if (sit->data == it->data && client_focus(sit->data))
+                        return;
+            }
+        } else {
+            if (client_focus(old->transient_for))
+                return;
+        }
+    }
+
     for (it = focus_order[screen_desktop]; it != NULL; it = it->next)
         if (it->data != old && client_normal(it->data))
             if (client_focus(it->data))
@@ -194,7 +210,7 @@ void focus_fallback(gboolean switching_desks)
     focus_set_client(NULL);
 }
 
-void focus_cycle(gboolean forward, gboolean linear, gboolean done,
+Client *focus_cycle(gboolean forward, gboolean linear, gboolean done,
                  gboolean cancel)
 {
     static Client *first = NULL;
@@ -235,15 +251,16 @@ void focus_cycle(gboolean forward, gboolean linear, gboolean done,
         if (ft == it->data && focus_client != ft && client_focusable(ft)) {
             if (client_focus(ft)) {
                 noreorder++; /* avoid reordering the focus_order */
-                break;
+                return ft;
             }
         }
     } while (it != start);
-    return;
+    return NULL;
 
 done_cycle:
     t = NULL;
     first = NULL;
     g_list_free(order);
     order = NULL;
+    return NULL;
 }

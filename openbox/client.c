@@ -1115,8 +1115,8 @@ void client_update_icons(Client *self)
 	/* store the icons */
 	i = 0;
 	for (j = 0; j < self->nicons; ++j) {
-	    w = self->icons[j].w = data[i++];
-	    h = self->icons[j].h = data[i++];
+	    w = self->icons[j].width = data[i++];
+	    h = self->icons[j].height = data[i++];
 	    self->icons[j].data =
 		g_memdup(&data[i], w * h * sizeof(gulong));
 	    i += w * h;
@@ -1124,11 +1124,6 @@ void client_update_icons(Client *self)
 	}
 
 	g_free(data);
-    }
-
-    if (self->nicons <= 0) {
-	self->nicons = 1;
-	self->icons = g_new0(Icon, 1);
     }
 
     if (self->frame)
@@ -1987,4 +1982,29 @@ void client_set_focused(Client *self, gboolean focused)
     client_calc_layer(self);
 
     engine_frame_adjust_focus(self->frame);
+}
+
+Icon *client_icon(Client *self, int w, int h)
+{
+    int i;
+    /* si is the smallest image >= req */
+    /* li is the largest image < req */
+    unsigned long size, smallest = 0xffffffff, largest = 0, si = 0, li = 0;
+
+    if (!self->nicons) return NULL;
+
+    for (i = 0; i < self->nicons; ++i) {
+        size = self->icons[i].width * self->icons[i].height;
+        if (size < smallest && size >= (unsigned)(w * h)) {
+            smallest = size;
+            si = i;
+        }
+        if (size > largest && size <= (unsigned)(w * h)) {
+            largest = size;
+            li = i;
+        }
+    }
+    if (largest == 0) /* didnt find one smaller than the requested size */
+        return &self->icons[si];
+    return &self->icons[li];
 }

@@ -176,7 +176,7 @@ gboolean startup()
     a_unfocused_title = appearance_new(Surface_Planar, 0);
     a_focused_label = appearance_new(Surface_Planar, 1);
     a_unfocused_label = appearance_new(Surface_Planar, 1);
-    a_icon = appearance_new(Surface_Planar, 0);/*1);*/
+    a_icon = appearance_new(Surface_Planar, 1);
     a_focused_handle = appearance_new(Surface_Planar, 0);
     a_unfocused_handle = appearance_new(Surface_Planar, 0);
 
@@ -790,8 +790,17 @@ static void render_icon(ObFrame *self)
 {
     if (self->icon_x < 0) return;
 
-    /* XXX set the texture's icon picture! */
-    RECT_SET(self->a_icon->texture[0].position, 0, 0, BUTTON_SIZE,BUTTON_SIZE);
+    if (self->frame.client->nicons) {
+        Icon *icon = client_icon(self->frame.client, BUTTON_SIZE, BUTTON_SIZE);
+        self->a_icon->texture[0].type = RGBA;
+        self->a_icon->texture[0].data.rgba.width = icon->width;
+        self->a_icon->texture[0].data.rgba.height = icon->height;
+        self->a_icon->texture[0].data.rgba.data = icon->data;
+        RECT_SET(self->a_icon->texture[0].position, 0, 0,
+                 BUTTON_SIZE,BUTTON_SIZE);
+    } else
+        self->a_icon->texture[0].type = NoTexture;
+
     paint(self->icon, self->a_icon, 0, 0, BUTTON_SIZE, BUTTON_SIZE);
 }
 

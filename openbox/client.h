@@ -11,7 +11,7 @@ struct Frame;
 
 /*! Holds an icon in ARGB format */
 typedef struct Icon {
-    unsigned long w, h;
+    unsigned long width, height;
     unsigned long *data;
 } Icon;
      
@@ -456,5 +456,7 @@ void client_setup_decor_and_functions(Client *self);
 
 /*! Retrieves the window's type and sets Client->type */
 void client_get_type(Client *self);
+
+Icon *client_icon(Client *self, int w, int h);
 
 #endif

@@ -222,8 +222,10 @@ void event_process(XEvent *e)
 	event_lasttime = e->xproperty.time;
 	break;
     case FocusIn:
+#ifdef DEBUG_FOCUS
         g_message("FocusIn on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
+#endif
         /* NotifyAncestor is not ignored in FocusIn like it is in FocusOut
            because of RevertToPointerRoot. If the focus ends up reverting to
            pointer root on a workspace change, then the FocusIn event that we
@@ -240,17 +242,23 @@ void event_process(XEvent *e)
             return;
         }
 
+#ifdef DEBUG_FOCUS
         g_message("FocusIn on %lx", window);
+#endif
         break;
     case FocusOut:
+#ifdef DEBUG_FOCUS
         g_message("FocusOut on %lx mode %d detail %d", window,
                   e->xfocus.mode, e->xfocus.detail);
+#endif
 	if (e->xfocus.mode == NotifyGrab ||
             e->xfocus.detail == NotifyInferior ||
             e->xfocus.detail == NotifyAncestor ||
             e->xfocus.detail > NotifyNonlinearVirtual) return;
-
-        g_message("FocusOut on %lx", window);
+ 
+#ifdef DEBUG_FOCUS
+       g_message("FocusOut on %lx", window);
+#endif
         /* Try process a FocusIn first, and if a legit one isn't found, then
            do the fallback shiznit. */
         {

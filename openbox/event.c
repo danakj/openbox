@@ -327,6 +327,15 @@ static void event_done(gpointer data)
 {
     static ObClient *last = NULL;
 
+    /* sometimes focus_hilite can be on an unfocused window, this make sure
+       it loses its focus hilite when focus moves */
+    if (focus_hilite &&
+        (focus_in && focus_hilite != focus_in) &&
+        (focus_out && focus_hilite != focus_out))
+    {
+        frame_adjust_focus(focus_hilite->frame, FALSE);
+    }
+
     if (focus_in) {
         if (focus_in != focus_client) {
             focus_set_client(focus_in);
@@ -340,6 +349,8 @@ static void event_done(gpointer data)
         frame_adjust_focus(focus_out->frame, FALSE);
         client_calc_layer(focus_out);
     }
+
+    focus_hilite = focus_in;
 
     if (focus_client != last) {
         if (!focus_client)

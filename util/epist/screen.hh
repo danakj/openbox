@@ -28,18 +28,21 @@ extern "C" {
 }
 
 #include <vector>
+#include <string>
 
 #include "window.hh"
 
 class epist;
 class screen;
 class XAtom;
+class ScreenInfo;
 
 class screen {
   epist *_epist;
   XAtom *_xatom;
   int _number;
   Window _root;
+  const ScreenInfo *_info;
 
   std::string _wm_name;
   
@@ -75,6 +78,7 @@ public:
   void cycleWorkspace(const bool forward, const bool loop = true) const;
   void changeWorkspace(const int num) const;
   void toggleShaded(const Window win) const;
+  void execCommand(const std::string &cmd) const;
 };
 
 #endif // __screen_hh

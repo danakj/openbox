@@ -40,6 +40,7 @@ using std::hex;
 using std::dec;
 using std::string;
 
+#include "../../src/BaseDisplay.hh"
 #include "../../src/XAtom.hh"
 #include "screen.hh"
 #include "epist.hh"
@@ -50,7 +51,8 @@ screen::screen(epist *epist, int number) {
   _xatom = _epist->xatom();
   _number = number;
   _active = _clients.end();
-  _root = RootWindow(_epist->getXDisplay(), _number);
+  _info = _epist->getScreenInfo(_number);
+  _root = _info->getRootWindow();
   
   // find a window manager supporting NETWM, waiting for it to load if we must
   int count = 20;  // try for 20 seconds
@@ -197,6 +199,10 @@ void screen::handleKeypress(const XEvent &e) {
 
       case Action::changeWorkspace:
         changeWorkspace(it->number());
+        return;
+
+      case Action::execute:
+        execCommand("aterm");
         return;
       }
 
@@ -349,14 +355,30 @@ void screen::updateActiveWindow() {
   else cout << "0x" << hex << (*_active)->window() << dec << endl;
 }
 
-/*
- * use this when execing a command to have it on the right screen
-      string dtmp = (string)"DISPLAY=" + display_name;
-      if (putenv(const_cast<char*>(dtmp.c_str()))) {
-        cout << "warning: couldn't set environment variable 'DISPLAY'\n";
-        perror("putenv()");
-      }
- */
+
+void screen::execCommand(const std::string &cmd) const {
+  pid_t pid;
+  if ((pid = fork()) == 0) {
+    extern char **environ;
+
+    char *const argv[] = {
+      "sh",
+      "-c",
+      const_cast<char *>(cmd.c_str()),
+      0
+    };
+    // make the command run on the correct screen
+    if (putenv(const_cast<char*>(_info->displayString().c_str()))) {
+      cout << "warning: couldn't set environment variable 'DISPLAY'\n";
+      perror("putenv()");
+    }
+    execve("/bin/sh", argv, environ);
+    exit(127);
+  } else if (pid == -1) {
+    cout << _epist->getApplicationName() <<
+      ": Could not fork a process for executing a command\n";
+  }
+}
 
 
 void screen::cycleWindow(const bool forward, const bool alldesktops,

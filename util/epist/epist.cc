@@ -156,6 +156,10 @@ epist::epist(char **argv, char *dpy_name, char *rc_file)
                            XKeysymToKeycode(getXDisplay(),
                                              XStringToKeysym("4")),
                            Mod1Mask | ControlMask | ShiftMask, 3));
+  _actions.push_back(Action(Action::execute,
+                           XKeysymToKeycode(getXDisplay(),
+                                             XStringToKeysym("F6")),
+                           Mod1Mask));
   activateGrabs();
 }
 

@@ -101,7 +101,7 @@ void popup_size_to_string(Popup *self, gchar *text)
 
     self->a_text->texture[0].data.text.string = text;
     RrMinsize(self->a_text, &textw, &texth);
-    textw += ob_rr_theme->bevel * 2;
+    /*XXX textw += ob_rr_theme->bevel * 2;*/
     texth += ob_rr_theme->bevel * 2;
 
     self->h = texth + ob_rr_theme->bevel * 2;
@@ -119,6 +119,7 @@ void popup_set_text_align(Popup *self, RrJustify align)
 
 void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 {
+    gint l, t, r, b;
     gint x, y, w, h;
     gint textw, texth;
     gint iconw;
@@ -130,6 +131,8 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
         self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     if (!self->a_text)
         self->a_text = RrAppearanceCopy(ob_rr_theme->app_hilite_label);
+
+    RrMargins(self->a_bg, &l, &t, &r, &b);
 
     XSetWindowBorderWidth(ob_display, self->bg, ob_rr_theme->bwidth);
     XSetWindowBorder(ob_display, self->bg, ob_rr_theme->b_color->pixel);
@@ -148,22 +151,23 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
 
     /* measure the shit out */
     RrMinsize(self->a_text, &textw, &texth);
-    textw += ob_rr_theme->bevel * 2;
+    /*XXX textw += ob_rr_theme->bevel * 2;*/
     texth += ob_rr_theme->bevel * 2;
 
     /* set the sizes up and reget the text sizes from the calculated
        outer sizes */
     if (self->h) {
         h = self->h;
-        texth = h - (ob_rr_theme->bevel * 2);
+        texth = h - (t+b + ob_rr_theme->bevel * 2);
     } else
-        h = texth + ob_rr_theme->bevel * 2;
+        h = t+b + texth + ob_rr_theme->bevel * 2;
     iconw = (self->hasicon ? texth : 0);
     if (self->w) {
         w = self->w;
-        textw = w - (iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2));
+        textw = w - (l+r + iconw + ob_rr_theme->bevel *
+                     (self->hasicon ? 3 : 2));
     } else
-        w = textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
+        w = l+r + textw + iconw + ob_rr_theme->bevel * (self->hasicon ? 3 : 2);
     /* sanity checks to avoid crashes! */
     if (w < 1) w = 1;
     if (h < 1) h = 1;
@@ -204,20 +208,20 @@ void popup_show(Popup *self, gchar *text, ObClientIcon *icon)
     XMoveResizeWindow(ob_display, self->bg, x, y, w, h);
 
     self->a_text->surface.parent = self->a_bg;
-    self->a_text->surface.parentx = iconw +
+    self->a_text->surface.parentx = l + iconw +
         ob_rr_theme->bevel * (self->hasicon ? 2 : 1);
-    self->a_text->surface.parenty = ob_rr_theme->bevel;
+    self->a_text->surface.parenty = t + ob_rr_theme->bevel;
     XMoveResizeWindow(ob_display, self->text,
-                      iconw + ob_rr_theme->bevel * (self->hasicon ? 2 : 1),
-                      ob_rr_theme->bevel, textw, texth);
+                      l + iconw + ob_rr_theme->bevel * (self->hasicon ? 2 : 1),
+                      t + ob_rr_theme->bevel, textw, texth);
 
     if (self->hasicon) {
         if (iconw < 1) iconw = 1; /* sanity check for crashes */
         self->a_icon->surface.parent = self->a_bg;
-        self->a_icon->surface.parentx = ob_rr_theme->bevel;
-        self->a_icon->surface.parenty = ob_rr_theme->bevel;
+        self->a_icon->surface.parentx = l + ob_rr_theme->bevel;
+        self->a_icon->surface.parenty = t + ob_rr_theme->bevel;
         XMoveResizeWindow(ob_display, self->icon,
-                          ob_rr_theme->bevel, ob_rr_theme->bevel,
+                          l + ob_rr_theme->bevel, t + ob_rr_theme->bevel,
                           iconw, texth);
     }
 

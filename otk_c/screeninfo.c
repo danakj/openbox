@@ -160,14 +160,14 @@ static PyMethodDef get_methods[] = {
 
 
 
-static void otkscreeninfo_dealloc(PyObject* self)
+static void otkscreeninfo_dealloc(OtkScreenInfo* self)
 {
-  Py_DECREF(((OtkScreenInfo*) self)->display_string);
-  Py_DECREF(((OtkScreenInfo*) self)->rect);
+  Py_DECREF(self->display_string);
+  Py_DECREF(self->rect);
 #ifdef XINERAMA
-  Py_DECREF(((OtkScreenInfo*) self)->xinerama_areas);
+  Py_DECREF(self->xinerama_areas);
 #endif
-  PyObject_Del(self);
+  PyObject_Del((PyObject*)self);
 }
 
 static PyObject *otkscreeninfo_getattr(PyObject *obj, char *name)
@@ -182,7 +182,7 @@ PyTypeObject OtkScreenInfo_Type = {
   "OtkScreenInfo",
   sizeof(OtkScreenInfo),
   0,
-  otkscreeninfo_dealloc, /*tp_dealloc*/
+  (destructor)otkscreeninfo_dealloc, /*tp_dealloc*/
   0,          /*tp_print*/
   otkscreeninfo_getattr, /*tp_getattr*/
   0,          /*tp_setattr*/
